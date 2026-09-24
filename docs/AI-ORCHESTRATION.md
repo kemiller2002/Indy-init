@@ -534,3 +534,29 @@ The AI architecture is healthy when replacing the model changes proposal quality
 - extension compatibility
 
 The model is a reasoning participant, not the system of record.
+
+
+## 42. Competition-grade adversarial orchestration
+
+The competition profile should follow [MULTI-AGENT-INVESTIGATION.md](MULTI-AGENT-INVESTIGATION.md).
+
+### 42.1 Blind role execution
+Specialized agents should receive the same frozen authoritative snapshot and should not see other agent outputs before their initial proposal set is recorded.
+
+### 42.2 Role specialization
+At minimum, the architecture should support specialized roles for hypothesis generation, skepticism, evidence auditing, experiment design, causal analysis, and verification auditing.
+
+### 42.3 Dependency-aware agreement
+If one model/agent saw or derived from another agent's output, the second output must not be represented as independent agreement.
+
+### 42.4 Reconciliation
+Reconciliation should focus on explicit disagreement and the evidence/action that could resolve it rather than forcing consensus.
+
+### 42.5 Tournament runs
+Frozen-state research runs may compare model/provider, prompt version, domain version, and policy version.
+
+### 42.6 Experiment pre-registration
+AI-assisted experiment design should support freezing predictions and interpretation criteria before result capture.
+
+### 42.7 Quality diagnostics
+AI may propose hidden assumptions, contradictions, evidence dependencies, circular-reasoning risks, missing alternatives, and orphan state. These remain proposals/derived diagnostics until accepted where authoritative state is required.
