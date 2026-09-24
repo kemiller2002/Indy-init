@@ -151,6 +151,30 @@ Completion evidence:
 - proposal acceptance revalidation tests
 - policy attribution in emitted events
 
+## Slice 2A: Semantic compiler and exhaustive transition validation
+
+Goal: turn the semantic model into build-time leverage.
+
+Implement:
+
+- typed semantic registry
+- command/event/capability metadata
+- structural transition generation
+- handler/evolve/codec completeness checks
+- generated state diagrams
+- semantic contract manifest/diff
+- state-space exploration
+- property tests
+- initial mutation testing
+
+Completion evidence:
+
+- zero registered commands without handlers
+- zero emitted events without evolve/codec support
+- lifecycle state-command matrix explored
+- critical semantic mutations killed
+- semantic contract manifest generated
+
 ## Slice 3: Local investigation workspace
 
 Goal: allow a complete investigation locally before remote persistence or AI is required.
@@ -468,6 +492,29 @@ Completion evidence:
 - proof graph links real artifacts
 - spectator view is read-only
 - proof bundle identifies exact build/version
+
+## Slice 11B: Engineering proof bundle
+
+Goal: prove what the build actually satisfies.
+
+Implement:
+
+- build identity
+- kickoff/start provenance
+- requirement/scenario/work/test/commit trace
+- Praxis summary
+- ROS summary
+- Aegis summary
+- semantic contract digest
+- accessibility/security evidence
+- known gaps/deviations
+- Folio proof report
+
+Completion evidence:
+
+- proof bound to exact commit/build/deployment
+- missing evidence remains visible
+- factory view links into real proof data
 
 ## Slice 11: Hackathon polish and factory reveal
 
