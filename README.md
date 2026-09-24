@@ -67,6 +67,7 @@ See [Hackathon Boundaries](docs/HACKATHON-BOUNDARIES.md).
 - [Command and Event Catalog](docs/COMMAND-EVENT-CATALOG.md)
 - [State Transition Tables](docs/STATE-TRANSITION-TABLES.md)
 - [F# Implementation Type Shapes](docs/FSHARP-TYPE-SHAPES.md)
+- [Domain Test Matrix](docs/DOMAIN-TEST-MATRIX.md)
 - [Persistence, Portability, and Recovery](docs/PERSISTENCE-CONTRACT.md)
 - [AI Investigation Orchestration](docs/AI-ORCHESTRATION.md)
 - [Investigation Workspace](docs/INVESTIGATION-WORKSPACE.md)
