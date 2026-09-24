@@ -291,3 +291,18 @@ Persistence follows [PERSISTENCE-CONTRACT.md](PERSISTENCE-CONTRACT.md).
 GitHub is the first provider, not the generic storage model. Investigation identity, semantic events, extension envelopes, policy attribution, and canonical export remain provider-independent.
 
 Provider-specific version tokens such as GitHub blob/commit SHAs belong in the adapter boundary. Conflicts are reconciled semantically, not through blind serialized-text merges.
+
+
+## AI orchestration boundary
+
+AI behavior follows [AI-ORCHESTRATION.md](AI-ORCHESTRATION.md).
+
+The model receives scoped semantic projections and produces validated proposals. It does not own authoritative lifecycle state, transition legality, semantic migration, or persistence truth.
+
+The architecture should support replacing or combining AI providers without changing domain semantics.
+
+## Primary workspace boundary
+
+The working experience follows [INVESTIGATION-WORKSPACE.md](INVESTIGATION-WORKSPACE.md).
+
+Chat is an input and explanation surface. Structured semantic state, capabilities, blockers, and proposal controls are the authoritative interaction surface for consequential work.
