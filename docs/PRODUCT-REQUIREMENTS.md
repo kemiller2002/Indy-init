@@ -882,3 +882,60 @@ The workspace must satisfy keyboard, focus, screen-reader, text scaling, reduced
 
 ### P34.14 Workspace contract
 Implementation should conform to [INVESTIGATION-WORKSPACE.md](INVESTIGATION-WORKSPACE.md).
+
+
+## P35. Security and privacy
+
+### P35.1 Explicit trust boundaries
+The architecture must define trust boundaries among browser/UI, domain runtime, local storage, persistence providers, AI providers, external evidence, and domain packs.
+
+### P35.2 Production authentication direction
+Production GitHub deployments should prefer GitHub App/OAuth-style authorization with least privilege over long-lived personal tokens.
+
+### P35.3 Credential exclusion
+Credentials must not be committed, placed in investigation events/reports, included in AI prompts unnecessarily, or logged in telemetry.
+
+### P35.4 Authorization separate from semantic legality
+A user may be authorized but semantically blocked, or semantically allowed but unauthorized. The system must preserve that distinction.
+
+### P35.5 Data classification
+Deployments should support classification metadata that can constrain AI use, export, sharing, retention, and integrations.
+
+### P35.6 AI disclosure controls
+Sending investigation data to AI must respect classification, provider configuration, organization/domain policy, and minimum-necessary context.
+
+### P35.7 Untrusted evidence
+Imported/external evidence, URLs, files, and AI-generated rich text must be treated as untrusted content.
+
+### P35.8 Rendering safety
+User/imported/AI content must be sanitized and must not create executable HTML/script injection paths.
+
+### P35.9 Browser hardening
+Web deployments should use a restrictive Content Security Policy and appropriate framing/request protections consistent with the deployment architecture.
+
+### P35.10 Local-data honesty
+Offline/local storage guarantees must be stated accurately; the product must not claim secure-at-rest properties it does not implement.
+
+### P35.11 Extension least privilege
+Domain packs/extensions must declare required capabilities and may not gain undeclared access to secrets, network resources, or persistence mutation.
+
+### P35.12 Artifact integrity
+External evidence artifacts should support digest/integrity verification where practical.
+
+### P35.13 Sensitive logging
+Operational telemetry must minimize sensitive investigation content and credentials.
+
+### P35.14 Export/redaction authorization
+Export, redaction, deletion, and policy/pack administration may require privileges distinct from ordinary investigation read/write.
+
+### P35.15 Deletion honesty
+The product must not simultaneously claim complete deletion and complete historical reconstructability when policy makes those incompatible.
+
+### P35.16 Audit separation
+Security audit events must be distinguishable from authoritative semantic investigation history while remaining correlatable.
+
+### P35.17 Safe defaults
+Default deployment posture should favor least privilege, sanitized untrusted content, no arbitrary external write tools, no arbitrary executable packs, explicit AI disclosure, and fail-closed behavior for unknown required semantics.
+
+### P35.18 Threat-model conformance
+Implementation should conform to [SECURITY-THREAT-MODEL.md](SECURITY-THREAT-MODEL.md).
