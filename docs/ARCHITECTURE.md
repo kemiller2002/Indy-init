@@ -9,7 +9,10 @@
 - offline tolerance
 - clear separation between UI, state/domain logic, AI reasoning, persistence, and reporting
 - reusable generic investigation kernel
-- EDF specialization after the hackathon
+- versioned domain-pack extensibility
+- storage-provider abstraction
+- AI-provider abstraction
+- EDF specialization after the hackathon without a core fork
 
 ## Logical architecture
 
@@ -39,6 +42,14 @@ Investigation state + legal transitions
               v
       Investigation repository
 ```
+
+## Persistence boundary
+
+The investigation domain must not depend directly on GitHub-specific storage semantics.
+
+Persistence should be represented through an explicit provider contract supporting operations such as load, append/change, optimistic version check, export, and recovery. GitHub is the first provider because it offers both storage and useful provenance.
+
+Future providers may include a service API, database-backed deployment, customer-hosted storage, or file-based import/export without changing investigation semantics.
 
 ## GitHub as persistence
 
@@ -108,6 +119,23 @@ Preferred production direction:
 
 A hackathon shortcut, if one is necessary, must be documented as a temporary deviation and must not be presented as the production design.
 
+## Domain packs
+
+Domain-specific behavior must extend the generic kernel through versioned domain packs.
+
+A domain pack may contribute:
+
+- vocabulary and labels
+- evidence and hypothesis categories
+- experiment/check templates
+- additional invariants and completion policy
+- UI projections
+- AI guidance
+- report sections
+- migrations and compatibility rules
+
+The core must remain usable without any domain pack. EDF should be the first specialist pack after the hackathon.
+
 ## Investigation kernel
 
 The generic domain should include at least:
@@ -149,6 +177,12 @@ SupportedHypothesis
        - required unknowns reconciled
        - verification policy satisfied
 ```
+
+## Versioning and migration
+
+Persisted investigations must record enough version information to interpret them later, including schema version and applicable domain-policy/domain-pack version.
+
+A client must not silently write an investigation whose persisted meaning it does not fully understand. Meaning-changing upgrades require explicit migration or compatibility behavior.
 
 ## AI boundary
 
