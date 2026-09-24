@@ -108,12 +108,20 @@ Do not implement:
 - universal proposition AST
 - general rules DSL
 
+Implementation contracts:
+
+- COMMAND-EVENT-CATALOG.md
+- STATE-TRANSITION-TABLES.md
+- FSHARP-TYPE-SHAPES.md
+
 Completion evidence:
 
 - core semantic tests
-- illegal-state/transition tests
+- table-driven state/command tests
+- pure evolve determinism tests
 - extension round-trip tests
 - no EDF vocabulary in generic core
+- no infrastructure dependencies in the Domain project
 
 ## Slice 2: Policy and capability engine
 
@@ -136,8 +144,10 @@ Implement:
 Completion evidence:
 
 - blocked/allowed scenarios
+- structural transition and policy-layer composition tests
 - all protected transitions explain blockers
 - UI-independent capability tests
+- proposal acceptance revalidation tests
 - policy attribution in emitted events
 
 ## Slice 3: Local investigation workspace
