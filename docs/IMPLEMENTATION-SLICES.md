@@ -1,0 +1,456 @@
+# Implementation Slices
+
+Status: planning only before hackathon kickoff.
+
+This document defines an implementation order that produces a durable product incrementally while preserving hackathon integrity. It does not contain the competition application's implementation.
+
+The slices are ordered to prove semantic integrity before adding convenience.
+
+## Guiding rule
+
+A slice is complete only when it leaves the system in a usable and internally coherent state.
+
+Do not build a broad but semantically hollow demo.
+
+Prefer:
+
+```text
+small + complete + evidenced
+```
+
+over:
+
+```text
+many screens + weak semantics
+```
+
+## Pre-kickoff preparation
+
+Allowed planning work includes:
+
+- requirements
+- semantic model
+- policy contract
+- persistence contract
+- UI contracts
+- acceptance scenarios
+- security threat model
+- test strategy
+- framework integration
+- deployment strategy
+- agent instructions
+- demo scenarios
+
+Do not prebuild the competition application implementation.
+
+## Slice 0: Bootstrap and evidence baseline
+
+Goal: prove the build starts from the required blank/approved state and establish engineering provenance.
+
+At kickoff:
+
+- record initial repository state
+- record timestamp
+- record framework/component versions
+- initialize Conditor/bootstrap path
+- initialize ROS/Ordo/Aegis/Praxis/Limen/Forma/Folio as permitted
+- capture build environment
+- create initial implementation commit
+- load approved requirement baseline
+- establish requirements-to-test traceability
+
+Completion evidence:
+
+- repository provenance
+- clean build
+- framework inventory
+- ROS work state
+- Praxis baseline
+- no unexplained prebuilt application code
+
+## Slice 1: Generic semantic kernel
+
+Goal: create the smallest useful typed investigation engine with no EDF dependency.
+
+Implement:
+
+- Investigation identity/lifecycle
+- Observation
+- Claim
+- Interpretation
+- Hypothesis
+- Evidence
+- EvidenceRelationship
+- Unknown
+- Assumption
+- Contradiction
+- Obligation
+- Prediction
+- InvestigationAction
+- Finding
+- NegativeKnowledge
+- causal assertion
+- corrective action
+- verification
+- conclusion
+- provenance
+- scope
+- semantic/version manifest
+- extension envelope
+
+Implement only the CoreStable semantics needed for the first use case.
+
+Do not implement:
+
+- EDF metrics
+- EDF topology
+- universal causal graph
+- universal proposition AST
+- general rules DSL
+
+Completion evidence:
+
+- core semantic tests
+- illegal-state/transition tests
+- extension round-trip tests
+- no EDF vocabulary in generic core
+
+## Slice 2: Policy and capability engine
+
+Goal: make legal behavior deterministic before UI starts inventing it.
+
+Implement:
+
+- command envelope
+- transition decision
+- blocker model
+- obligations
+- policy version identity
+- core invariant firewall
+- capability projection
+- cause-confirmation gate
+- resolution gate
+- review placeholder/contracts
+- optimistic aggregate version checking
+
+Completion evidence:
+
+- blocked/allowed scenarios
+- all protected transitions explain blockers
+- UI-independent capability tests
+- policy attribution in emitted events
+
+## Slice 3: Local investigation workspace
+
+Goal: allow a complete investigation locally before remote persistence or AI is required.
+
+Implement:
+
+- Investigation Start
+- Investigation Workspace
+- observation capture
+- manual hypothesis capture
+- evidence capture
+- relationships
+- unknowns/assumptions
+- contradictions
+- next legal actions
+- cause review
+- corrective action/verification
+- history
+- local persistence state
+
+Use Forma/Limen.
+
+Completion evidence:
+
+- iPad portrait/landscape
+- narrow phone
+- keyboard/accessibility
+- UI projection tests
+- workspace understandable without chat
+
+## Slice 4: Durable local-first persistence
+
+Goal: work safely through refresh/offline conditions.
+
+Implement:
+
+- local durable store
+- snapshot
+- event/command history needed for recovery
+- queued command states
+- restart recovery
+- local/remote-truth indicator abstraction
+- corruption handling
+
+Completion evidence:
+
+- refresh recovery
+- browser restart recovery
+- queue durability
+- no false synced state
+
+## Slice 5: GitHub persistence adapter
+
+Goal: add auditable remote persistence without coupling domain to GitHub.
+
+Implement:
+
+- selected repository binding
+- GitHub load
+- optimistic concurrency
+- atomic semantic write strategy
+- remote version token
+- conflict detection
+- canonical file layout adapter
+- import/export subset
+- artifact URL references
+
+Completion evidence:
+
+- sync
+- offline/reconnect
+- stale conflict
+- independent additions
+- semantic conflict
+- no silent overwrite
+- provider-independent InvestigationId
+
+## Slice 6: AI proposal loop
+
+Goal: make natural-language interaction useful without giving AI authority.
+
+Implement:
+
+- AI adapter abstraction
+- context builder
+- minimal state projection
+- prompt/version identity
+- structured proposal types
+- proposal UI
+- accept/edit/reject
+- evidence references
+- unknown/question proposals
+- competing hypothesis generation
+- next-action proposal
+- challenge mode
+- stale-proposal detection
+
+Completion evidence:
+
+- observation/inference separation
+- no fabricated Evidence
+- prompt-injection test
+- negative-knowledge retrieval
+- challenge-leading-hypothesis test
+- AI outage fallback
+
+## Slice 7: Investigation strategy
+
+Goal: make the product materially better than a structured notebook.
+
+Implement:
+
+- predictions
+- discriminating action comparison
+- blocking-question prioritization
+- contradiction-resolution suggestions
+- assumption verification suggestions
+- qualitative cost/risk/information-value explanation
+- alternative-explanation pressure
+
+Do not require a numeric scoring formula.
+
+Completion evidence:
+
+- chooses discriminating action over merely confirmatory action in controlled scenarios
+- explains recommendation
+- respects cost/risk override
+
+## Slice 8: Conclusion and corrective loop
+
+Goal: demonstrate that investigation does not stop at a plausible cause.
+
+Implement:
+
+- cause confirmation review
+- causal set support
+- residual uncertainty
+- mitigation/workaround/correction distinction
+- verification criteria
+- verification findings
+- failed verification/reopen
+- resolution gate
+
+Completion evidence:
+
+- cannot resolve before required verification
+- failed correction returns to work
+- causal set supported
+- accepted residual uncertainty remains visible
+
+## Slice 9: Reporting
+
+Goal: create professional portable output.
+
+Implement:
+
+- interim report
+- final report
+- source InvestigationId/version
+- hypotheses considered
+- evidence
+- falsified explanations
+- unknowns
+- contradictions
+- causal reasoning
+- corrective action
+- verification
+- residual uncertainty
+- Folio projection
+
+Completion evidence:
+
+- report snapshot identity
+- unresolved work visible in interim report
+- accessible print structure where supported
+
+## Slice 10: Security hardening required for public demo
+
+Goal: ensure demo shortcuts do not expose credentials or unsafe rendering.
+
+Implement/verify:
+
+- auth approach
+- secrets exclusion
+- sanitization
+- CSP where applicable
+- prompt-injection boundaries
+- least-privilege repo access
+- safe external URL handling
+- user-safe Aegis faults
+
+Completion evidence:
+
+- no secrets in repo/export/report
+- malicious content inert
+- untrusted evidence cannot alter AI/system instructions
+
+## Slice 11: Hackathon polish and factory reveal
+
+Goal: demonstrate both the app and the method used to create it.
+
+Implement:
+
+- demo scenario
+- visible state change
+- visible blocker
+- visible falsification
+- visible offline/persistence truth if useful
+- factory metrics
+- requirements coverage
+- tests
+- Praxis metrics
+- ROS/Ordo evidence
+- Aegis diagnostics
+- deployment
+
+Do not sacrifice core correctness for decorative scope.
+
+## Slice 12: Post-hackathon EDF domain pack
+
+Goal: make EDF the first real specialization without changing generic core.
+
+Implement initially:
+
+- EDF manifest
+- versioned vocabulary
+- EDF experiment import/mapping
+- metric definition extensions
+- unknown-effect extension
+- evidence-dependency projection
+- EDF policy
+- EDF report projection
+- EDF AI guidance
+- generic fallback
+
+Keep active research constructs Experimental unless current evidence justifies DomainStable.
+
+Completion evidence:
+
+- generic core source unchanged for ordinary EDF extensions
+- EDF pack can be disabled while core investigation remains readable
+- old/new EDF policy comparison works
+
+## Slice 13: EDF recursive research mode
+
+Goal: use the investigator to test EDF itself.
+
+Implement:
+
+- frozen investigation snapshots
+- domain/policy version comparison
+- model-run comparison
+- research run provenance
+- pack semantic comparison
+- reassessment without history rewrite
+
+Example experiments:
+
+- ContextCoverage v1 versus proposed v2
+- EvidenceClosure policy variants
+- UnknownEffect semantics
+- control-point ranking variants
+- calibration models
+
+## Slice 14: Long-term product growth
+
+Candidates after validated need:
+
+- collaboration/review
+- hosted persistence
+- database provider
+- service API
+- self-hosting
+- portfolio search
+- cross-investigation learning
+- notifications
+- organization policy
+- richer importers
+- enterprise access control
+- multi-model workflows
+
+Each should be added as a vertical slice with semantic acceptance evidence.
+
+## Stop-the-line rules
+
+Implementation stops for correction if:
+
+- UI invents transition legality
+- AI writes authoritative state outside commands
+- GitHub concepts enter generic semantic types
+- EDF research concepts enter generic core without promotion
+- pending remote state is shown as synced
+- unknown extension data is dropped
+- migration fabricates historical information
+- a blocker cannot explain its rule/state basis
+- verification is collapsed into implementation
+- original source text is overwritten by normalization
+- accessibility-critical behavior fails
+- a security shortcut starts becoming a core dependency
+
+## Minimum viable durable product
+
+If time is constrained, the minimum product worth keeping is:
+
+- generic typed semantic kernel
+- deterministic policy/capabilities
+- one strong workspace
+- local durability
+- GitHub provider
+- AI structured proposal loop
+- cause/verification loop
+- portable report
+
+Everything else can grow around that.
