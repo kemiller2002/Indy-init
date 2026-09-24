@@ -102,3 +102,58 @@ If a remote write is pending, show it as pending.
 If an unknown remains, show the unknown.
 
 That behavior is part of the product thesis.
+
+
+## Ambitious competition sequence
+
+The detailed sequence is defined in [COMPETITION-DEMO-CHOREOGRAPHY.md](COMPETITION-DEMO-CHOREOGRAPHY.md).
+
+Preferred live progression:
+
+1. Natural-language observation.
+2. Competing hypotheses appear as structured proposals.
+3. Hypothesis Battlefield shows different predictions/falsifiers.
+4. Blind multi-agent panel exposes disagreement/hidden assumption/evidence dependency.
+5. Pre-register a discriminating action.
+6. Ingest real finding/evidence.
+7. Current leader is weakened/falsified.
+8. "Why did this change?" explains the exact event/evidence/policy delta.
+9. Time travel shows the prior state.
+10. Counterfactual sandbox changes one assumption/evidence item without changing reality.
+11. Confirm a causal set only when the gate clears.
+12. Implement correction.
+13. Attempt resolution and show verification blocker.
+14. Record verification and resolve.
+15. Generate Folio report.
+16. Switch to Factory View and prove how the app itself was built.
+
+If live-model latency threatens flow, use a previously captured frozen research run for the multi-agent comparison and label it accurately rather than pretending it ran live.
+
+## Published competition alignment
+
+The current Indy Init challenge explicitly emphasizes:
+
+- production-grade app
+- software factory
+- machinery as well as product
+- defending technical decisions
+- blank implementation repo at kickoff
+- reusable harness/standards/tests/security/pipeline
+
+See [COMPETITION-ALIGNMENT.md](COMPETITION-ALIGNMENT.md) and [FLOOR-JUDGING-DEFENSE.md](FLOOR-JUDGING-DEFENSE.md).
+
+## Floor-judging posture
+
+Because judging is live at the table, the application should be left in an explorable state.
+
+Judges should be able to click into:
+
+- proposal provenance
+- blocker explanation
+- evidence lineage
+- history/time travel
+- proof graph
+- tests/metrics
+- known limitations
+
+Do not make the architecture defense depend on a slide deck.
