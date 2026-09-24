@@ -108,7 +108,7 @@
     { "id": "competition", "evidence": "demo health check and exact-build proof bundle pass before freeze" }
   ],
   "agentProtocol": {
-    "entryDocument": ".echelon/kickoff/indy-init.kickoff.json",
+    "entryDocument": "kickoff/indy-init.kickoff.json",
     "decisionRule": "Use the most reversible choice consistent with normative contracts; never resolve Experimental or Deferred research by silently hard-coding persisted semantics.",
     "completionRule": "A work item is complete only when its requirement, implementation, tests, runtime/verification evidence, and ROS/Praxis/Aegis obligations are satisfied or an explicit deviation is recorded."
   }
