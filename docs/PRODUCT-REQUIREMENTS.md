@@ -30,7 +30,7 @@ Every investigation must have a stable identifier independent of storage locatio
 Every investigation must retain both a concise human-readable title and the original observation/problem statement.
 
 ### P1.3 Investigation lifecycle
-Investigations must support explicit lifecycle states such as Draft, Active, AwaitingEvidence, AwaitingVerification, Resolved, Closed, Reopened, Superseded, and Archived.
+Investigations must support explicit persisted lifecycle states including Draft, Active, AwaitingEvidence, AwaitingVerification, Resolved, Closed, and Archived. Reopening must be represented as an explicit historical event that returns current lifecycle to an active state rather than erasing the prior resolution/closure.
 
 ### P1.4 Reopening
 A resolved or closed investigation may be reopened only with an explicit reason and provenance.
