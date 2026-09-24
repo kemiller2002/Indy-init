@@ -6,9 +6,9 @@ Planning and experiment repository for the Indy Init hackathon.
 
 Use the hackathon as an externally constrained test of the Echelon Foundry software factory.
 
-The competition application will be a **Root-Cause Investigator**. It will begin from zero application source code at kickoff and will use the prepared engineering framework, requirements, architecture, and design work to produce a working application during the event.
+The competition application will be the first implementation of a reusable **Root-Cause Investigator platform**. It will begin from zero application source code at kickoff and will use the prepared engineering framework, requirements, architecture, and design work to produce a working application during the event.
 
-The application is intentionally generic. After the hackathon, the same investigation kernel will be adapted as an **EDF Investigator** so that EDF can use it to investigate its own experiment results, regressions, assumptions, and unknown effects.
+The product is intentionally generic. After the hackathon, EDF will become the first domain specialization of the same investigation kernel so that EDF can investigate its own experiment results, regressions, assumptions, and unknown effects without forking the core product.
 
 ## Core hypothesis
 
@@ -58,6 +58,7 @@ See [Hackathon Boundaries](docs/HACKATHON-BOUNDARIES.md).
 ## Documents
 
 - [Product Concept](docs/PRODUCT-CONCEPT.md)
+- [Long-term Product Requirements](docs/PRODUCT-REQUIREMENTS.md)
 - [Requirements](docs/REQUIREMENTS.md)
 - [Architecture](docs/ARCHITECTURE.md)
 - [Hackathon Boundaries](docs/HACKATHON-BOUNDARIES.md)
