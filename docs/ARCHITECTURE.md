@@ -265,3 +265,12 @@ The target should be compatible with static hosting such as GitHub Pages when pr
 Any required backend for authentication or AI invocation must be minimized and explicitly documented.
 
 The architectural goal is not "zero server at any cost." The goal is the smallest defensible architecture that preserves security and the demonstration goals.
+
+
+## Decision stability
+
+Architecture decisions are governed by [DESIGN-DECISION-BOUNDARIES.md](DESIGN-DECISION-BOUNDARIES.md).
+
+The generic aggregate direction is specified in [CORE-DOMAIN-MODEL.md](CORE-DOMAIN-MODEL.md), and domain extension behavior is specified in [DOMAIN-PACK-CONTRACT.md](DOMAIN-PACK-CONTRACT.md).
+
+Where implementation details remain open, agents must prefer reversible choices and must not resolve active EDF research questions by hard-coding them into authoritative generic state.
