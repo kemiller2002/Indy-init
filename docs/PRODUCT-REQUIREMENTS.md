@@ -662,3 +662,27 @@ EDF-specific concepts that remain under active research must remain versioned ED
 
 ### P29.17 Architecture fitness
 The evolution-safety scenarios and fitness tests in [SEMANTIC-EVOLUTION.md](SEMANTIC-EVOLUTION.md) must be treated as architecture requirements.
+
+
+## P30. Design-decision governance
+
+### P30.1 Decision stability classification
+Consequential design decisions must be classifiable as LockedInvariant, StableDirection, ReversibleChoice, Experimental, or Deferred.
+
+### P30.2 No accidental promotion
+Implementation work must not silently convert an Experimental, Deferred, or ReversibleChoice item into a permanent persisted semantic dependency.
+
+### P30.3 Reversible default
+When a requirement can be satisfied by multiple architectures and no stable decision exists, the implementation should prefer the option with the lowest semantic lock-in and document it as reversible.
+
+### P30.4 Recorded promotion
+Promoting a decision to a stronger stability class requires explicit rationale/evidence and compatibility, migration, and acceptance-test analysis.
+
+### P30.5 Agent compliance
+Engineering agents must consult [DESIGN-DECISION-BOUNDARIES.md](DESIGN-DECISION-BOUNDARIES.md) before resolving architecture ambiguity.
+
+### P30.6 Minimal core conformance
+The generic investigation aggregate should conform to [CORE-DOMAIN-MODEL.md](CORE-DOMAIN-MODEL.md) unless a recorded decision justifies a change.
+
+### P30.7 Domain-pack conformance
+Domain specializations must conform to [DOMAIN-PACK-CONTRACT.md](DOMAIN-PACK-CONTRACT.md) rather than introducing alternate authoritative state models.
