@@ -358,3 +358,105 @@ And policy permits closure with residual uncertainty
 
 Then the investigation may close with an explicit non-confirmed conclusion posture
 And must not invent a ConfirmedCause merely to provide closure.
+
+
+## A41. Unknown optional extension survives round trip
+
+Given an investigation contains optional extension edf:new-construct@2
+And a client understands the core investigation but not that extension
+
+When the client edits unrelated core state and saves
+
+Then the extension is preserved without semantic loss
+And it is not silently removed, rewritten, or reclassified.
+
+## A42. Unknown required extension protects writes
+
+Given an investigation requires edf:critical-policy-construct@3 to interpret legal transitions
+And the client does not understand that extension
+
+Then the investigation may be shown in degraded or read-only form
+And the client must not permit authoritative writes whose correctness depends on the missing semantics.
+
+## A43. Experimental feature can be disabled safely
+
+Given experimental construct experiment:edf-topology@0.3 was used in investigation I1
+And the experiment is later disabled for new investigations
+
+Then I1 remains readable
+And its experimental records remain identifiable
+And new investigations do not require the construct.
+
+## A44. Material semantic change creates a new identity/version
+
+Given edf:context-coverage@1 and a proposed replacement have materially different meanings
+
+Then the replacement receives a distinct semantic version or identifier
+And historical @1 records are not silently interpreted as the new meaning.
+
+## A45. Policy change does not rewrite historical legality
+
+Given transition T was legal under EDF policy P1
+And EDF policy P2 later changes its prerequisites
+
+Then T remains historically attributable to P1
+And the system does not mark T as though P2 had governed it at the time.
+
+## A46. Reassessment creates new state
+
+Given conclusion C1 was reached under policy P1
+And newer evidence or policy P2 warrants reevaluation
+
+When the investigation is reassessed
+
+Then C1 remains historical fact
+And a new reassessment record links C1, P1, the new basis, and the current conclusion posture.
+
+## A47. EDF metric replacement requires no core schema change
+
+Given EDF retires metric M1 and introduces semantically different M2
+
+Then M2 can be introduced through the EDF domain pack
+And existing M1 observations remain interpretable
+And the generic investigation kernel does not require a schema change solely because the EDF metric changed.
+
+## A48. Retired construct has generic fallback
+
+Given an investigation contains an EDF construct whose specialized renderer is no longer installed
+
+Then the client can still show its semantic identifier, version, provenance, stability status, and safe generic content
+And critical information does not disappear from the investigation.
+
+## A49. Extension cannot weaken core invariant
+
+Given an experimental EDF profile attempts to permit an AgentProposal to become direct Evidence without the required authoritative transition
+
+Then activation or transition fails
+And an Aegis-compatible fault identifies the violated core invariant.
+
+## A50. AI proposal is revalidated after domain version change
+
+Given an agent creates a proposal under EDF domain pack version D1
+And the active domain pack changes to D2 before acceptance
+And D2 changes semantics relevant to the proposal
+
+Then the proposal is revalidated or marked stale
+And it is not accepted automatically under D2.
+
+## A51. Migration cannot invent unavailable historical data
+
+Given a newer semantic model requires field F
+And an old investigation never recorded enough information to derive F
+
+When the old investigation is loaded or migrated
+
+Then F remains Unknown, unavailable, or explicitly not recorded
+And the migration must not synthesize a false historical value.
+
+## A52. EDF construct does not become core by convenience
+
+Given a new EDF construct is useful for multiple EDF experiments
+But cross-domain necessity and stability have not been established
+
+Then it remains a versioned EDF extension
+And the generic kernel continues to operate without understanding the construct.
