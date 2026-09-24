@@ -113,6 +113,7 @@ Implementation contracts:
 - COMMAND-EVENT-CATALOG.md
 - STATE-TRANSITION-TABLES.md
 - FSHARP-TYPE-SHAPES.md
+- DOMAIN-TEST-MATRIX.md
 
 Completion evidence:
 
