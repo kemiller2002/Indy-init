@@ -136,6 +136,14 @@ A domain pack may contribute:
 
 The core must remain usable without any domain pack. EDF should be the first specialist pack after the hackathon.
 
+## Semantic authority
+
+The generic investigation kernel must conform to [INVESTIGATION-SEMANTICS.md](INVESTIGATION-SEMANTICS.md).
+
+The canonical semantics define domain meaning and invariants. UI projections, AI proposals, persistence adapters, domain packs, and report generation are consumers of that semantic model. They may not redefine it independently.
+
+Acceptance behavior is defined in [INVESTIGATION-ACCEPTANCE-SCENARIOS.md](INVESTIGATION-ACCEPTANCE-SCENARIOS.md) and should be promoted into executable domain tests.
+
 ## Investigation kernel
 
 The generic domain should include at least:
