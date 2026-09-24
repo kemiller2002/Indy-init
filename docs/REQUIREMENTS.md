@@ -1,6 +1,8 @@
 # Requirements
 
-Status: initial requirements baseline. These are planning artifacts, not application implementation.
+Status: hackathon release-profile requirements. These are planning artifacts, not application implementation.
+
+The canonical long-term product requirements are in [PRODUCT-REQUIREMENTS.md](PRODUCT-REQUIREMENTS.md). This file defines the first constrained implementation profile. Hackathon-specific constraints must not leak into or narrow the reusable investigation kernel.
 
 ## R0. Hackathon integrity
 
