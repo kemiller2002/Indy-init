@@ -1063,3 +1063,236 @@ And no core event case is invented by guessing its meaning.
 Given the generic domain project is built
 Then it can be compiled/tested without GitHub, browser, AI-provider, network, or persistence adapter assemblies
 And infrastructure depends inward toward Domain rather than the reverse.
+
+
+## A136. Time travel reconstructs authoritative state
+
+Given investigation I has authoritative history through version 42
+When the user selects version 18
+Then the system reconstructs the state that followed event 18
+And later evidence/events do not appear as though they were already known at version 18.
+
+## A137. Time travel is read-only by default
+
+Given the user is viewing version 18 while current is 42
+When the user attempts an authoritative mutation
+Then the product requires returning to current state or explicitly creating a branch/fork
+And it does not append a command against the historical projection silently.
+
+## A138. Semantic diff is not raw JSON diff
+
+Given versions 18 and 24 differ
+When the user requests a comparison
+Then the primary diff identifies semantic additions/transitions/blocker/capability changes
+And raw serialization is not required to understand the change.
+
+## A139. What changed my mind cites real causes
+
+Given H1 was Leading at version 18 and not Leading at version 24
+When the user asks why
+Then the explanation references the actual events/evidence/policy changes that altered the projection
+And it does not invent a narrative unsupported by state.
+
+## A140. Counterfactual branch cannot mutate source
+
+Given branch B starts from investigation I version 24
+When hypothetical evidence is invalidated inside B
+Then I remains unchanged
+And B records its hypothetical modification separately.
+
+## A141. Counterfactual evidence never becomes fact automatically
+
+Given branch B contains hypothetical evidence H
+When B is promoted to a follow-up investigation
+Then H is not admitted as real Evidence unless separately sourced/admitted
+And branch provenance remains visible.
+
+## A142. Evidence sensitivity is explainable
+
+Given current conclusion depends materially on E7
+When the user runs evidence-removal sensitivity
+Then the product shows which derived posture/capabilities change without E7
+And labels the result as hypothetical analysis.
+
+## A143. Assumption sensitivity exposes fragility
+
+Given causal assertion C depends on assumption A4
+When branch analysis treats A4 as rejected
+Then affected hypotheses/causal assertions/blockers are shown
+And source state remains unchanged.
+
+## A144. Blind agents do not see each other
+
+Given six agent roles run in blind phase
+Then each initial run is bound to the same frozen investigation version
+And no initial run context includes another role's output.
+
+## A145. Reconciliation is not independent evidence
+
+Given reconciliation agent R has read Generator G's proposal
+When R produces a similar proposal
+Then the UI/provenance does not count R as independent corroboration of G.
+
+## A146. Multi-agent disagreement produces a discriminating question
+
+Given agents materially disagree about whether H1 or H2 better explains E
+When reconciliation runs
+Then it should be able to propose evidence/action that would distinguish the disagreement where practical
+And the disagreement is not hidden by majority vote.
+
+## A147. One agent failure does not corrupt panel
+
+Given Evidence Auditor returns invalid structured output
+When the multi-agent panel completes
+Then the failed run is marked diagnosably
+And other agent runs/proposals remain available
+And authoritative investigation state is unchanged.
+
+## A148. Tournament uses frozen source
+
+Given models M1 and M2 are compared
+When both run on research task T
+Then both runs identify the same frozen InvestigationId/AggregateVersion and semantic/policy manifest
+And later investigation changes do not alter the recorded comparison input.
+
+## A149. Tournament does not declare arbitrary winner
+
+Given M1 and M2 differ
+Then the product may show metrics and experimental evaluation results
+But it does not invent an overall winner absent a defined evaluation rule.
+
+## A150. Evidence dependency graph reveals common source
+
+Given E1, E2, and E3 all derive from source S
+When dependency view renders
+Then the common lineage is visible
+And the UI does not imply three independent confirmations.
+
+## A151. Graph has accessible alternative
+
+Given a graph visualization is available
+Then equivalent material information is accessible through a keyboard/screen-reader usable list/table/tree projection
+And core work does not require interpreting visual geometry.
+
+## A152. Causal-set visualization does not force single root
+
+Given causal assertion C has members A and B
+Then the causal view can show both members and roles
+And it does not force either member into a false single-root hierarchy.
+
+## A153. Uncertainty map cells are explainable
+
+Given an uncertainty heatmap marks H1 as high contradiction burden
+When the user activates that cell
+Then the UI lists the contradictions/evidence causing the state
+And color/intensity alone is not the explanation.
+
+## A154. Hypothesis Battlefield exposes falsifier
+
+Given active hypothesis H1
+Then Battlefield view exposes or can request a falsifying prediction/action
+And it does not only show supporting evidence.
+
+## A155. What would falsify this remains a proposal
+
+Given the AI proposes test T as the strongest falsifier
+Then T is a ProposedInvestigationAction
+And it does not execute or become authoritative without normal acceptance/policy.
+
+## A156. What are we missing finds orphan evidence
+
+Given evidence E9 is admitted but linked to no claim/hypothesis/action
+When completeness diagnostics run
+Then E9 is surfaced as orphan/uninterpreted evidence
+And the diagnostic itself does not invent a relationship.
+
+## A157. Assumption miner does not create facts
+
+Given AI identifies implicit assumption A
+Then A is a proposal
+And it is not treated as an accepted assumption or fact until normal acceptance rules succeed.
+
+## A158. Contradiction miner does not resolve contradiction
+
+Given AI proposes candidate contradiction C
+Then the user can inspect participating entities/reason
+And accepting C records the contradiction
+And AI does not silently decide which side is correct.
+
+## A159. Circular reasoning warning is derived
+
+Given a support chain forms a candidate reasoning cycle
+When diagnostics detect it
+Then the system raises an inspectable warning/proposal
+And does not rewrite evidence relationships automatically.
+
+## A160. Prediction pre-registration preserves timing
+
+Given action T is about to run
+When prospective predictions are pre-registered
+Then their text, author, and aggregate version are frozen before result capture
+And later edits require explicit supersession/correction.
+
+## A161. Reproducibility bundle pins source
+
+Given experiment/action A produces a reproducibility bundle
+Then the bundle identifies exact investigation version, predictions, procedure, artifacts, semantic/domain/policy versions, and result
+And later state changes do not alter the bundle silently.
+
+## A162. Replay follows event order
+
+Given investigation history has aggregate versions 1..N
+When replay runs
+Then steps follow authoritative aggregate order
+And timestamps do not reorder events contrary to aggregate version.
+
+## A163. Replay supports reduced motion
+
+Given user prefers reduced motion
+Then replay remains usable through step/static transitions
+And no material information depends on animation.
+
+## A164. Spectator mode is read-only
+
+Given the application is in Spectator mode
+Then investigation state can be explored/replayed
+And no authoritative mutation control is available unless the user explicitly leaves Spectator mode with appropriate permission.
+
+## A165. Factory telemetry uses real evidence
+
+Given Factory View shows 120 passing tests
+Then that count comes from actual engineering evidence/telemetry
+And is not a hard-coded presentation number.
+
+## A166. Requirements proof graph links real artifacts
+
+Given requirement R is shown as implemented
+Then the proof view can navigate to its acceptance evidence/work item/test/commit/runtime evidence where available
+And missing links remain visible rather than fabricated.
+
+## A167. Build proof bundle binds exact artifact
+
+Given proof bundle P is generated
+Then P identifies the exact final build/commit/deployment/version it describes
+And later commits do not silently update P.
+
+## A168. Self-diagnostic mode uses normal investigator semantics
+
+Given the application's own deployment fails
+When self-diagnostic mode creates an investigation
+Then build/Aegis/Praxis/ROS records enter through normal observation/evidence/import semantics
+And the self-diagnostic path does not bypass the generic kernel.
+
+## A169. Semantic search returns authoritative entities
+
+Given the user asks "show evidence that contradicts H1"
+When authoritative relationships answer the query
+Then results are retrieved from structured state
+And the model does not substitute remembered/free-form claims.
+
+## A170. Demo health check fails visibly
+
+Given GitHub authorization is missing before the demo
+When readiness check runs
+Then the GitHub persistence check is red/blocked with actionable explanation
+And the system does not display a false all-green state.
