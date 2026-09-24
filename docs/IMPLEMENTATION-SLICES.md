@@ -301,6 +301,106 @@ Completion evidence:
 - causal set supported
 - accepted residual uncertainty remains visible
 
+## Slice 9A: Time travel and semantic diff
+
+Goal: make the event model visibly useful.
+
+Implement:
+
+- reconstruct at aggregate version
+- version scrubber
+- semantic diff
+- "what changed my mind?"
+- why capability/blocker changed
+- replay step mode
+
+Completion evidence:
+
+- deterministic version reconstruction
+- posture changes explained from real events
+- reduced-motion accessible replay
+
+## Slice 9B: Counterfactual and sensitivity
+
+Goal: support aggressive reasoning without corrupting authoritative state.
+
+Implement:
+
+- immutable branch source
+- hypothetical evidence/assumption changes
+- branch semantic diff
+- evidence/assumption sensitivity
+- "what would change the answer?"
+- explicit sandbox labeling
+
+Completion evidence:
+
+- source investigation unchanged
+- branch never produces authoritative events in source
+- promotion creates explicit new investigation/follow-up
+
+## Slice 9C: Advanced reasoning views
+
+Goal: make epistemic structure immediately visible.
+
+Implement:
+
+- Hypothesis Battlefield
+- evidence dependency graph/list
+- causal-set view
+- uncertainty map
+- version timeline
+- semantic diff view
+
+Completion evidence:
+
+- accessible non-graph alternatives
+- common-source dependency visible
+- causal set does not require universal DAG
+
+## Slice 9D: Adversarial multi-agent panel
+
+Goal: demonstrate independent AI reasoning roles.
+
+Implement:
+
+- blind frozen-state runs
+- Hypothesis Generator
+- Skeptic
+- Evidence Auditor
+- Experiment Designer
+- Causal Analyst
+- Verification Auditor
+- structured proposal normalization
+- disagreement/reconciliation view
+- cost/latency/provenance
+
+Completion evidence:
+
+- agents do not see each other in blind phase
+- derived agents not counted independent
+- acceptance still passes through normal commands/policy
+- one agent failure does not corrupt panel
+
+## Slice 9E: Investigation quality diagnostics
+
+Goal: expose reasoning defects automatically.
+
+Implement:
+
+- orphan evidence detection
+- hidden assumption proposals
+- contradiction mining
+- circular reasoning warning
+- prediction audit
+- falsifier generation
+- missing-explanation coverage map
+
+Completion evidence:
+
+- diagnostics are reviewable derived warnings/proposals
+- no diagnostic silently mutates authority
+
 ## Slice 9: Reporting
 
 Goal: create professional portable output.
@@ -347,6 +447,27 @@ Completion evidence:
 - no secrets in repo/export/report
 - malicious content inert
 - untrusted evidence cannot alter AI/system instructions
+
+## Slice 11A: Factory proof and spectator mode
+
+Goal: make the engineering thesis visible to judges.
+
+Implement:
+
+- spectator mode
+- investigation replay
+- factory telemetry
+- requirements proof graph
+- build provenance proof bundle
+- demo health check
+- optional self-diagnostic investigation
+
+Completion evidence:
+
+- telemetry sourced from real ROS/Praxis/Aegis/GitHub evidence
+- proof graph links real artifacts
+- spectator view is read-only
+- proof bundle identifies exact build/version
 
 ## Slice 11: Hackathon polish and factory reveal
 
