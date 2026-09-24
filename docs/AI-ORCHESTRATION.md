@@ -595,3 +595,27 @@ Deterministic domain/policy code supplies:
 - budget constraints
 
 Planner output remains recommendation, not authority.
+
+
+## 45. Governed tool execution
+
+AI tool use must follow [TOOL-EXECUTION-GATEWAY.md](TOOL-EXECUTION-GATEWAY.md).
+
+The model receives explicit tool descriptions/capabilities, never unrestricted system authority.
+
+Tool outputs are Findings/data with provenance and are not automatically Evidence.
+
+## 46. Bounded autonomous mode
+
+Autonomous orchestration should follow [BOUNDED-AUTONOMOUS-INVESTIGATION.md](BOUNDED-AUTONOMOUS-INVESTIGATION.md).
+
+Competition target:
+
+- Level 1 read-only tool autonomy
+- explicit budget
+- challenge-before-confirmation
+- human checkpoints for protected transitions
+- loop prevention
+- safe recovery
+
+Autonomy is a continuation of the command/policy/tool architecture, not a bypass around it.
