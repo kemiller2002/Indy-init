@@ -435,3 +435,24 @@ If independently generated UIs differ visually but preserve the same product mea
 If they satisfy the formal checks but humans still identify materially different or incorrect products, the missing invariant should be added to the contract model.
 
 This turns UI guidance itself into an EDF-like empirical engineering problem.
+
+
+## 15. Semantic projection invariants
+
+The UI contract must project the canonical investigation semantics rather than infer meaning independently.
+
+At minimum, screen contracts and projection tests must verify:
+
+- Observation remains distinguishable from Interpretation and Hypothesis.
+- AgentProposal remains distinguishable from AuthoritativeState.
+- FailsToSupport is not rendered as Contradicts.
+- Falsified hypotheses remain inspectable with falsification basis and scope.
+- Evidence dependency can be surfaced so correlated records are not visually implied to be independent confirmation.
+- Blocking Unknowns, Contradictions, and Obligations are visible where they affect legal actions.
+- A Leading explanation is not visually presented as ConfirmedCause.
+- Implemented corrective action is not presented as VerifiedEffective.
+- Residual uncertainty remains visible with the conclusion.
+- Pending or conflicted persistence is not rendered as successfully saved authoritative state.
+- A causal set can be represented without forcing one member into a false single-root-cause hierarchy.
+
+These projections should be derived from the domain state and capabilities defined by the canonical semantics wherever practical.
