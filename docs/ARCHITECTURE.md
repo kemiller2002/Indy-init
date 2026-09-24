@@ -119,6 +119,34 @@ Preferred production direction:
 
 A hackathon shortcut, if one is necessary, must be documented as a temporary deviation and must not be presented as the production design.
 
+## Evolution-safe semantic architecture
+
+The system must follow [SEMANTIC-EVOLUTION.md](SEMANTIC-EVOLUTION.md).
+
+The core architecture is intentionally layered:
+
+```text
+Generic Core
+  -> stable epistemic primitives and invariants
+
+Domain Pack
+  -> versioned domain semantics and policies
+
+Experimental Profile
+  -> explicitly enabled research constructs
+
+Projection Layers
+  -> UI, AI context, reports, persistence adapters
+```
+
+The generic kernel must not need source changes merely to add an EDF research construct.
+
+F# should use closed discriminated unions where closed-world semantics are a deliberate invariant. Concepts expected to evolve should use qualified typed semantic identities and validated extension envelopes rather than a continually expanding core union or untyped arbitrary JSON.
+
+Clients must preserve unknown optional extension data. When required semantics are unknown, they must prevent unsafe writes instead of guessing.
+
+Schema evolution and policy evolution are separate. Historical transitions retain the semantic and policy versions under which they occurred. Reassessment under newer semantics creates new state; it does not rewrite historical state.
+
 ## Domain packs
 
 Domain-specific behavior must extend the generic kernel through versioned domain packs.
