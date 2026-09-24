@@ -63,6 +63,8 @@ See [Hackathon Boundaries](docs/HACKATHON-BOUNDARIES.md).
 - [Semantic Evolution and Research Safety](docs/SEMANTIC-EVOLUTION.md)
 - [Minimal Core Domain Model](docs/CORE-DOMAIN-MODEL.md)
 - [Domain Pack Contract](docs/DOMAIN-PACK-CONTRACT.md)
+- [Policy and Transition Engine](docs/POLICY-ENGINE.md)
+- [Persistence, Portability, and Recovery](docs/PERSISTENCE-CONTRACT.md)
 - [Design Decision Boundaries](docs/DESIGN-DECISION-BOUNDARIES.md)
 - [Investigation Acceptance Scenarios](docs/INVESTIGATION-ACCEPTANCE-SCENARIOS.md)
 - [Requirements](docs/REQUIREMENTS.md)
