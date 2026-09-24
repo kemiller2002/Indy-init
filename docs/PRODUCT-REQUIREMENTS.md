@@ -1350,3 +1350,107 @@ Cross-case learning should follow [CROSS-INVESTIGATION-INTELLIGENCE.md](CROSS-IN
 
 ### P42.17 Research harness contract
 Research experiments should follow [RESEARCH-HARNESS.md](RESEARCH-HARNESS.md).
+
+
+## P43. Governed tools and bounded autonomy
+
+### P43.1 Tool gateway
+AI/investigation tooling must execute through an explicit Tool Execution Gateway rather than unrestricted shell/network/system access.
+
+### P43.2 Tool declaration
+Every tool must declare version, purpose, input/output schema, side-effect class, required authorization/review, resource limits, data-classification limits, and provenance behavior.
+
+### P43.3 Tool capability
+Tool execution authority must come from a host-issued scoped capability, not from model-generated instructions.
+
+### P43.4 Invocation provenance
+Each tool invocation must preserve tool/version, investigation/version, actor/agent, inputs or safe digests, timing, outcome, output refs, resource/cost data where relevant, and faults.
+
+### P43.5 Tool output is not automatically evidence
+Tool output must flow through Finding and evidence-admission semantics unless explicit policy safely auto-admits a deterministic low-risk result.
+
+### P43.6 Dry run
+Side-effecting tools should support dry-run where meaningful and expose target resources, permissions, risks, and rollback.
+
+### P43.7 Deterministic tool preference
+When a question is answerable deterministically through local/tool computation, the system should prefer that over model inference where practical.
+
+### P43.8 Tool provenance lineage
+Evidence derived from tools must preserve source artifact -> invocation -> finding -> evidence lineage.
+
+### P43.9 Bounded autonomous session
+The platform should support a bounded autonomous investigation session with explicit goal, budget, allowed tools, allowed command classes, review gates, stop conditions, and semantic/policy versions.
+
+### P43.10 Autonomy levels
+The product must distinguish analysis-only, read-only tool autonomy, low-risk semantic automation, reversible external actions, and high-consequence actions rather than treating autonomy as one binary toggle.
+
+### P43.11 Competition autonomy target
+The competition target should support read-only autonomous investigation and may support narrow policy-approved low-risk semantic automation.
+
+### P43.12 Autonomous budget
+Autonomous sessions may be constrained by wall time, AI cost, model calls, tool calls, queries, data volume, and human interruption limits.
+
+### P43.13 Autonomous stop conditions
+Sessions must stop at human-review gates, unauthorized side effects, budget exhaustion, no useful legal action, unresolved protected contradictions, incompatible semantics/policy, or user stop.
+
+### P43.14 Human checkpoints
+When autonomy stops for human input, the system must summarize evidence collected, state changes/proposals, blockers, spend, and why review is required.
+
+### P43.15 Protected transitions remain protected
+Autonomy cannot silently bypass ConfirmCause, ResolveInvestigation, AcceptResidualUncertainty, corrective approval, or external high-consequence gates when policy requires human review.
+
+### P43.16 Loop prevention
+Autonomous orchestration must detect repeated actions, repeated falsified paths, identical proposals, non-improving retries, and state oscillation.
+
+### P43.17 Tool gateway contract
+Execution should follow [TOOL-EXECUTION-GATEWAY.md](TOOL-EXECUTION-GATEWAY.md).
+
+### P43.18 Autonomous investigation contract
+Autonomy should follow [BOUNDED-AUTONOMOUS-INVESTIGATION.md](BOUNDED-AUTONOMOUS-INVESTIGATION.md).
+
+## P44. Local WASM analytics and evidence ingestion
+
+### P44.1 Local deterministic analytics
+Limen/WASM should perform deterministic event replay, semantic diff, capability projection, graph analysis, hashing, parsing, filtering, and other suitable work locally.
+
+### P44.2 Privacy-first context preparation
+Before AI disclosure, local processing should identify relevant entities and minimize/redact context according to policy.
+
+### P44.3 Offline analytical capability
+Without network, the product should retain time travel, semantic diff, counterfactual branches, evidence graph, local hashing, capability projection, and queued command workflows where locally available.
+
+### P44.4 Large-data prefilter
+Large logs/artifacts should be filterable/chunkable locally so only relevant content is sent to AI where possible.
+
+### P44.5 Content integrity
+Evidence/artifacts, exports, reports, and proof bundles should support local cryptographic digest generation where useful.
+
+### P44.6 Evidence ingestion pipeline
+Raw evidence capture must preserve original source and transformation lineage through capture, parse/extraction, finding, admission, and relationship stages.
+
+### P44.7 Capture record
+Evidence capture should record source type, actor, time, location/ref, digest, media type, size, classification, scope, and availability as applicable.
+
+### P44.8 Transformation provenance
+Every parser/extractor transformation must identify tool/parser version, input/output references/digests, warnings/errors, and whether the transformation is lossy.
+
+### P44.9 Extraction proposals
+Local parsers/AI may propose observations/findings/metadata/relationships but may not silently rewrite raw captures.
+
+### P44.10 Mobile media evidence
+Screenshot/photo/file capture must preserve the original artifact and treat extracted text/interpretation as derived.
+
+### P44.11 Log source anchors
+Extracted log findings should retain line/time/chunk anchors sufficient to return to the raw source.
+
+### P44.12 Structured engineering evidence
+Aegis faults, Praxis metrics, ROS records, tests, and GitHub diffs should be ingestible through the same provenance-preserving pipeline.
+
+### P44.13 Deduplication
+Exact/near-duplicate detection may suggest reuse/merging but must not silently merge semantically separate captures.
+
+### P44.14 Local analytics contract
+Local processing should follow [LOCAL-WASM-ANALYTICS.md](LOCAL-WASM-ANALYTICS.md).
+
+### P44.15 Ingestion contract
+Evidence capture/transformation should follow [EVIDENCE-INGESTION-PIPELINE.md](EVIDENCE-INGESTION-PIPELINE.md).
