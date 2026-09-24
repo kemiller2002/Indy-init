@@ -10,6 +10,8 @@ This should not fork the generic reasoning model unnecessarily. EDF should suppl
 
 ## EDF-specific concepts
 
+These are candidate or current EDF-domain concepts, not commitments to permanent investigator-core semantics. Their meaning, usefulness, and even continued existence may change as EDF research progresses.
+
 Potential specialist concepts include:
 
 - CDR
@@ -94,3 +96,78 @@ EDF policy may strengthen confirmation requirements, for example by requiring re
 It must not weaken the core guarantees around provenance, evidence/inference separation, unresolved contradictions, proposal authority, negative knowledge, or historical integrity.
 
 The intended result is one investigation engine with EDF as a versioned specialization, not an EDF-specific fork.
+
+
+## Research-safety boundary
+
+EDF is intentionally treated as an evolving domain pack.
+
+The investigator must not assume that the current EDF vocabulary is the final ontology. Current EDF research itself distinguishes a frozen working baseline from later experimental proposals, and some earlier evidence models have already been superseded. The integration architecture must therefore preserve the ability to challenge and replace EDF constructs.
+
+### Stable integration target
+
+EDF should depend only on generic investigator primitives that are expected to remain meaningful even if EDF changes:
+
+- Observation
+- Claim
+- Interpretation
+- Hypothesis
+- Assumption
+- Evidence
+- Prediction
+- InvestigationAction
+- Finding
+- Unknown
+- NegativeKnowledge
+- Contradiction
+- Obligation
+- Cause/causal set
+- corrective action
+- verification
+- conclusion posture
+- provenance
+- scope
+- semantic version
+
+### EDF extension target
+
+EDF-specific constructs should live behind versioned semantic identities until their stability is demonstrated.
+
+This includes, at minimum while research remains active:
+
+- CDR/MDR/MaDR definitions
+- ContextCoverage semantics
+- EvidenceClosure semantics
+- UnknownEffect specialization
+- topology and layered-origin concepts
+- control-point ranking semantics
+- analytical-lens definitions
+- calibration/confidence constructs
+- domain-specific evidence relationships
+- research registries and theory boundaries
+
+### No premature generic promotion
+
+An EDF construct should not enter the generic kernel merely because:
+
+- the current EDF release uses it;
+- it appears in multiple EDF experiments;
+- it makes an implementation easier;
+- an agent prefers a closed type;
+- it is likely to survive.
+
+Promotion requires evidence and the process defined in [SEMANTIC-EVOLUTION.md](SEMANTIC-EVOLUTION.md).
+
+### EDF versions can disagree
+
+Two EDF versions may legitimately encode different policies or semantic interpretations.
+
+The platform must be able to retain investigations under both versions, compare their outputs, and run a reassessment without rewriting either history.
+
+### Investigator as EDF research instrument
+
+A future EDF pack should allow EDF constructs themselves to become investigation subjects.
+
+For example, the system should support asking whether a new EvidenceClosure rule improves discrimination, whether an UnknownEffect construct reduces premature closure, or whether a metric change reflects improved semantics versus instrumentation drift.
+
+The architecture is successful if EDF can substantially change and the generic investigation kernel remains intact.
