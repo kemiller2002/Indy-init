@@ -1136,3 +1136,119 @@ Advanced competition features must degrade to semantically correct simpler views
 
 ### P38.39 Ambition profile
 Competition implementation should follow [COMPETITION-AMBITION.md](COMPETITION-AMBITION.md), with orchestration/branching/visualization behavior governed by the corresponding advanced-profile documents.
+
+
+## P39. Semantic compiler and verification amplification
+
+### P39.1 Semantic registry
+The first implementation should maintain a versioned semantic registry sufficient to describe core commands, events, lifecycle transitions, capabilities, payload types, semantic IDs, and ownership.
+
+### P39.2 Generated structural tests
+Where practical, structural transition tests should be generated from the semantic registry so every registered state/command combination has an explicit outcome.
+
+### P39.3 Generated capability metadata
+UI/AI capability descriptors should be generated or validated from the same semantic registry rather than maintained independently.
+
+### P39.4 Generated AI schemas
+Structured AI proposal schemas should be generated or validated from authoritative semantic payload definitions where practical.
+
+### P39.5 Generated event registry
+Event serialization identifiers, codecs, and compatibility metadata should be checked against the semantic registry.
+
+### P39.6 Generated Aegis metadata
+Stable invariant/transition fault codes and default explanations should be generated or validated against semantic command/policy metadata where practical.
+
+### P39.7 Generated diagrams
+Lifecycle/state diagrams and transition tables should be derivable from executable semantic metadata after kickoff.
+
+### P39.8 Drift detection
+CI must detect registered commands/events lacking handlers, evolve cases, codecs, structural tests, or required capability metadata.
+
+### P39.9 Semantic contract snapshot
+Each build should be able to emit a semantic-contract manifest identifying commands, events, capabilities, schemas, policies, domain packs, extension IDs, and version/digest information.
+
+### P39.10 Semantic contract diff
+Builds should identify added/removed/changed semantic contracts and flag breaking meaning changes without required version/migration treatment.
+
+### P39.11 Compatibility gate
+Release/build validation should fail when persisted semantic meaning changes incompatibly without explicit versioning/deprecation/migration.
+
+### P39.12 State-space exploration
+The build should systematically explore lifecycle state/command combinations and protected-transition policy combinations beyond hand-written examples.
+
+### P39.13 Property validation
+The test suite should include properties for replay determinism, prefix/time-travel consistency, version monotonicity, no silent deletion, extension preservation, cause-confirmation safety, resolution safety, and proposal authority separation.
+
+### P39.14 Mutation testing
+Critical semantic/policy mutations should be introduced deliberately and required tests should detect them.
+
+### P39.15 Semantic mutation stop-the-line
+A surviving mutation that weakens a CoreStable invariant or protected transition is a stop-the-line defect.
+
+### P39.16 Offline chaos
+The product should test network loss, acknowledgement loss, remote advancement, auth expiry, rate limits, restarts, and queue corruption.
+
+### P39.17 Concurrency simulation
+The product should test both commutative concurrent work and semantic conflicts across multiple clients.
+
+### P39.18 AI contract fuzzing
+Structured AI proposal validation should be tested with malformed, stale, oversized, unknown-semantic, and adversarial payloads.
+
+### P39.19 Prompt-injection corpus
+Security validation should maintain representative indirect/direct prompt-injection evidence cases.
+
+### P39.20 Replay equivalence
+Snapshot+tail replay must produce equivalent semantic state to full event replay for the same aggregate version.
+
+### P39.21 Cross-provider equivalence
+Canonical export/import between providers should preserve equivalent semantic projection and history.
+
+### P39.22 Domain-pack isolation
+The core invariant suite must pass unchanged under generic, EDF, EDF-experimental, and test-pack compositions.
+
+### P39.23 Generated proof data
+Formal/state-space validation should emit machine-readable evidence that can feed the engineering proof bundle.
+
+### P39.24 Semantic compiler contract
+Implementation should follow [SEMANTIC-COMPILER.md](SEMANTIC-COMPILER.md).
+
+### P39.25 Formal validation contract
+Verification should follow [FORMAL-VALIDATION.md](FORMAL-VALIDATION.md).
+
+## P40. Engineering proof and screen contracts
+
+### P40.1 Build-bound proof bundle
+Every competition-ready build should be able to generate a proof bundle bound to exact repository/commit/build/deployment identity.
+
+### P40.2 Requirement evidence states
+Proof data must distinguish NotStarted, InProgress, ImplementedUnverified, Verified, Deferred, and Deviated rather than collapsing everything to complete/incomplete.
+
+### P40.3 Requirement-to-runtime traceability
+Where evidence exists, the bundle should connect requirement, acceptance scenario, ROS work, source, test, commit, and runtime evidence.
+
+### P40.4 Honest gaps
+Missing traceability/evidence, unfinished requirements, known shortcuts, known defects, and test gaps must remain visible.
+
+### P40.5 AI engineering provenance
+Agent-generated engineering work should record provider/model/task/commit/test provenance where available without requiring private reasoning traces.
+
+### P40.6 Semantic contract evidence
+The proof bundle should include semantic/policy/domain/extension versions and semantic-contract digest.
+
+### P40.7 Accessibility/security evidence
+The proof bundle should include actual accessibility/security validation performed, not inferred claims.
+
+### P40.8 Proof immutability
+An issued proof bundle is a snapshot of one build and must not silently change with later commits.
+
+### P40.9 Screen semantic contracts
+Major screens must conform to [SCREEN-CONTRACTS.md](SCREEN-CONTRACTS.md) and application-specific Percepta contracts.
+
+### P40.10 Screen independence from layout
+Required screen meaning/actions/state visibility are normative; exact pixel layout/component composition remains replaceable.
+
+### P40.11 Responsive semantic parity
+iPad, phone, desktop, high-zoom, and reduced-motion projections must preserve critical blockers, authority state, and legal-action meaning.
+
+### P40.12 Proof bundle contract
+Build evidence should follow [ENGINEERING-PROOF-BUNDLE.md](ENGINEERING-PROOF-BUNDLE.md).
