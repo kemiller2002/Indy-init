@@ -787,3 +787,98 @@ Repair of inconsistent authoritative state must be explicit and auditable rather
 
 ### P32.18 Provider contract
 Implementation should conform to [PERSISTENCE-CONTRACT.md](PERSISTENCE-CONTRACT.md).
+
+
+## P33. AI investigation orchestration
+
+### P33.1 AI as collaborator
+AI must assist investigation through proposals, analysis, questions, and explanations without becoming the source of authoritative domain truth.
+
+### P33.2 Scoped context
+AI context must be assembled from explicit scoped projections appropriate to the reasoning task rather than blindly serializing the entire investigation.
+
+### P33.3 Context provenance
+Material AI reasoning should retain enough context/version provenance to determine which semantic/domain/policy state it used.
+
+### P33.4 Structured proposals
+Material AI suggestions that could become authoritative state must use typed structured proposals validated against semantic/domain schemas.
+
+### P33.5 Evidence references
+AI proposals relying on authoritative evidence should reference EvidenceIds or other traceable entity IDs.
+
+### P33.6 Source category preservation
+AI context and output must distinguish observation, evidence, finding, interpretation, assumption, unknown, negative knowledge, and historical conclusion.
+
+### P33.7 Prompt injection boundary
+External evidence and imported artifacts must be treated as untrusted content and cannot redefine platform/domain instructions.
+
+### P33.8 Narrow write tools
+AI must not receive unrestricted mutation access to investigation persistence. Consequential writes must use narrow validated commands.
+
+### P33.9 Question value
+AI-generated questions should identify the uncertainty, blocker, contradiction, or competing hypotheses they are intended to resolve.
+
+### P33.10 Challenge behavior
+The product must support deliberate challenge of the leading explanation, including overlooked alternatives, hidden assumptions, evidence dependency, and falsifying checks.
+
+### P33.11 Negative knowledge use
+AI must receive relevant scoped negative knowledge before proposing repeated explanations/actions when practical.
+
+### P33.12 Stale proposal detection
+AI proposals whose material inputs or semantic/policy versions change before acceptance must be revalidated or marked stale.
+
+### P33.13 AI outage tolerance
+Loss of AI service must not make authoritative investigation state inaccessible or corrupt existing work.
+
+### P33.14 Multi-model provenance
+If multiple models/providers are used, their roles, context versions, and outputs must remain distinguishable.
+
+### P33.15 AI research reproducibility
+Research-mode AI runs should support frozen investigation snapshot, semantic/policy version, prompt version, model/provider version, and tool configuration.
+
+### P33.16 Orchestration contract
+Implementation should conform to [AI-ORCHESTRATION.md](AI-ORCHESTRATION.md).
+
+## P34. Investigation workspace
+
+### P34.1 Structured state primary
+The primary workspace must make authoritative structured investigation state understandable without requiring the user to reconstruct meaning from chat history.
+
+### P34.2 Primary question
+The workspace must help users understand what is known, what could explain it, what conflicts with those explanations, and what should be done next.
+
+### P34.3 Required semantic regions
+The workspace must expose observation, hypotheses, evidence, unknowns/assumptions, contradictions, obligations/blockers, next actions, persistence state, and history access.
+
+### P34.4 Proposal interaction
+Users must be able to inspect, accept, edit, reject, defer, or ask why for material AI proposals according to policy.
+
+### P34.5 Hypothesis comparison
+Users must be able to compare active hypotheses by predictions, support, contradiction, unknowns, assumptions, and discriminating actions.
+
+### P34.6 Blocking unknown visibility
+Blocking unknowns and contradictions must not be hidden in secondary history or settings.
+
+### P34.7 Recommended versus legal
+The UI must distinguish recommended actions from merely legal actions and from unavailable actions.
+
+### P34.8 Discoverable blocked transitions
+Important unavailable transitions must remain discoverable with explicit blockers rather than simply disappearing.
+
+### P34.9 Semantic conflict UX
+Persistence conflicts must be explained in terms of conflicting investigation intent/state rather than raw serialized merge by default.
+
+### P34.10 Conclusion review
+High-consequence conclusion transitions should have a review surface exposing evidence, alternatives, contradictions, unknowns, assumptions, policy gate state, and required reviews.
+
+### P34.11 Verification UX
+Corrective action and verification must remain visually and semantically distinct.
+
+### P34.12 Mobile completeness
+Core investigation work must remain possible on iPad and narrow phone layouts without hover-dependent functionality.
+
+### P34.13 Accessibility
+The workspace must satisfy keyboard, focus, screen-reader, text scaling, reduced motion, semantic status, and non-color-only requirements.
+
+### P34.14 Workspace contract
+Implementation should conform to [INVESTIGATION-WORKSPACE.md](INVESTIGATION-WORKSPACE.md).
