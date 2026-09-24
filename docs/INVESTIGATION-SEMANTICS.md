@@ -973,7 +973,7 @@ type CauseRole =
     | Trigger
     | EnablingCondition
 
-type EvidenceRelationshipKind =
+type CoreEvidenceRelationshipKind =
     | Supports
     | Contradicts
     | Discriminates
@@ -984,6 +984,17 @@ type EvidenceRelationshipKind =
     | Supersedes
     | DependsOn
     | DerivedFrom
+
+type SemanticId =
+    {
+        Namespace : string
+        Name : string
+        Version : string
+    }
+
+type EvidenceRelationshipKind =
+    | CoreRelationship of CoreEvidenceRelationshipKind
+    | ExtensionRelationship of SemanticId
 
 type ConclusionStrength =
     | PlausibleExplanation
@@ -1101,3 +1112,58 @@ The model is doing its job if two investigators can disagree about the likely ca
 - what evidence would change the conclusion
 
 The system should make disagreement explicit and investigable rather than forcing premature consensus.
+
+
+## 32. Semantic evolution boundary
+
+The canonical semantics are not a declaration that the research ontology is finished.
+
+This document stabilizes the minimum generic meanings needed to preserve epistemic integrity. Domain methodology may continue to evolve through the extension architecture defined in [SEMANTIC-EVOLUTION.md](SEMANTIC-EVOLUTION.md).
+
+### 32.1 CoreStable meanings
+
+Core meanings should change rarely and only with explicit compatibility analysis.
+
+Examples include:
+
+- Observation does not mean inference.
+- Unknown does not mean false.
+- Evidence retains provenance.
+- Proposals are distinct from authoritative state.
+- Historical transitions retain their original meaning.
+- Blocking obligations block the transitions they protect.
+- Verification is distinct from implementation.
+
+### 32.2 Extensible classifications
+
+Taxonomies expected to grow should allow domain-specific qualified extensions.
+
+Examples include:
+
+- evidence relationship subtypes
+- evidence categories
+- causal-support dimensions
+- action kinds
+- metric definitions
+- domain-specific cause classifications
+- domain-specific conclusion or review metadata
+
+A core case may coexist with extension cases. Extension cases do not become generic truth merely because one domain uses them.
+
+### 32.3 Research concepts
+
+A research construct may be represented as an extension without implying that the platform endorses its validity.
+
+The platform can therefore investigate whether a construct is useful while preserving records created with it.
+
+### 32.4 Semantic version binding
+
+A material domain-specific assertion should be interpretable against the semantic version in force when it was created.
+
+A label alone is insufficient when the meaning has changed.
+
+### 32.5 No retroactive ontology
+
+New semantic constructs must not be projected backward into historical data as though the original investigator had recorded them.
+
+A newer projection may derive a new interpretation, but the derivation and its time/version must be explicit.
