@@ -1296,3 +1296,202 @@ Given GitHub authorization is missing before the demo
 When readiness check runs
 Then the GitHub persistence check is red/blocked with actionable explanation
 And the system does not display a false all-green state.
+
+
+## A171. Registry command requires handler
+
+Given core command C is registered
+When semantic compiler validation runs
+Then a decision handler/route exists for C
+And the build fails contract validation if it does not.
+
+## A172. Emitted event requires evolve handler
+
+Given command C may emit event E
+When semantic compiler validation runs
+Then E has a projection/evolve handler
+And E has a supported serialization identity/codec.
+
+## A173. Registered transition has structural test
+
+Given lifecycle transition T is registered
+Then generated/manual test evidence exists for its valid and invalid source states
+And missing structural coverage is reported.
+
+## A174. UI capability metadata cannot drift silently
+
+Given capability ConfirmCause exists in domain registry
+When UI contract generation/validation runs
+Then ConfirmCause has display/accessibility/blocker metadata
+And a renamed/removed capability creates an explicit contract change.
+
+## A175. AI schema matches semantic payload
+
+Given ProposedHypothesis structured output schema is generated from semantic definition
+When AI emits a payload outside that schema
+Then validation rejects it as authoritative proposal data
+And free-form explanation cannot bypass validation.
+
+## A176. Semantic contract diff flags breaking removal
+
+Given build B1 contains persisted event semantic E@1
+And build B2 removes support without deprecation/migration
+When contract diff runs
+Then B2 is flagged incompatible
+And release validation fails according to policy.
+
+## A177. Semantic version changes on meaning change
+
+Given a semantic identifier's payload meaning changes materially
+Then the semantic/compiler compatibility gate requires a new version/identifier or explicit compatible migration
+And display-label reuse alone is insufficient.
+
+## A178. Full state-command matrix has defined outcomes
+
+Given lifecycle L has states S and commands C
+When state-space exploration runs
+Then every relevant S x C combination has an explicit Allowed/Invalid/Blocked/Unsupported outcome
+And no combination falls through to accidental behavior.
+
+## A179. ConfirmCause blocker combination is explored
+
+Given protected transition ConfirmCause
+When policy state-space sampling varies contradiction, unknown, assumption, evidence, review, and permission conditions
+Then expected blocker composition is verified across representative combinations.
+
+## A180. Replay determinism property
+
+Given valid event stream E
+When projected repeatedly
+Then the same semantic state results
+And property testing can generate multiple valid streams to verify this.
+
+## A181. Prefix equals time travel
+
+Given valid event stream 1..N
+And prefix 1..K
+Then projecting prefix 1..K equals TimeTravel(K)
+And later events cannot leak into the historical projection.
+
+## A182. Semantic mutation is killed
+
+Given mutation M removes the rule that blocking unknowns block ConfirmCause
+When the protected semantic test suite runs
+Then at least one test fails
+And M is counted as killed.
+
+## A183. Critical surviving mutation stops release
+
+Given a mutation weakens a CoreStable invariant
+And no test fails
+Then validation reports a critical surviving mutation
+And the build is not considered semantically verified.
+
+## A184. Offline acknowledgement-loss retry is idempotent
+
+Given remote append succeeds
+And acknowledgement is lost
+When client retries the same idempotent command
+Then no duplicate semantic event is created
+And local queue converges to Applied.
+
+## A185. Auth expiry preserves local queue
+
+Given pending commands exist
+And authentication expires during synchronization
+Then commands remain durable
+And state becomes authorization-blocked rather than discarded/failed semantically.
+
+## A186. Concurrent semantic conflict is revalidated
+
+Given client A falsifies H1
+And stale client B attempts ConfirmCause relying on H1
+Then B's command is revalidated and blocked/conflicted
+And no field-level merge makes both states simultaneously authoritative.
+
+## A187. AI unknown semantic proposal fails closed
+
+Given AI emits ExtensionProposal semantic id X unknown to all active packs
+Then authoritative acceptance is unavailable
+And the unknown proposal can at most remain raw analysis/proposal evidence according to policy.
+
+## A188. Prompt-injection corpus remains data
+
+Given each adversarial prompt-injection fixture is ingested as evidence
+Then model/tool behavior remains constrained by platform/domain instructions
+And none of the fixtures gains command authority.
+
+## A189. Snapshot-tail replay equals full replay
+
+Given snapshot at version K and events K+1..N
+Then projecting snapshot+tail yields state equivalent to full replay 1..N
+And mismatch is an integrity failure.
+
+## A190. Cross-provider semantic equivalence
+
+Given complete investigation is exported from GitHub provider and imported to compatible file/in-memory provider
+Then projected semantic state/event identity is equivalent
+And provider metadata differences do not affect domain meaning.
+
+## A191. Core invariants survive EDF pack
+
+Given the complete core invariant suite
+When run with EDF pack active
+Then all core invariants still pass unchanged.
+
+## A192. Core invariants survive EDF experimental profile
+
+Given the complete core invariant suite
+When run with EDF experimental semantics/policy
+Then all core invariants still pass unchanged
+And experimental policy cannot weaken them.
+
+## A193. Proof bundle does not claim unrun tests
+
+Given accessibility manual screen-reader testing was not performed
+When proof bundle is generated
+Then it does not mark that evidence as Verified
+And the gap remains visible.
+
+## A194. Proof bundle requirement trace is navigable
+
+Given requirement P7.5 is Verified
+Then proof data identifies acceptance/test/runtime evidence supporting that status
+And a user can inspect the supporting artifacts.
+
+## A195. Proof bundle records deviations
+
+Given hackathon shortcut D is active
+Then the proof bundle lists D, rationale, risk, and replacement path
+And does not imply production-complete conformance.
+
+## A196. Proof bundle semantic digest changes with contract
+
+Given semantic registry changes between builds
+Then semantic contract digest differs
+And the proof bundle identifies the contract version/diff.
+
+## A197. Screen contract preserves blocker on phone
+
+Given S02 Workspace is rendered at narrow phone width
+And ConfirmCause has a material blocker
+Then the blocker remains discoverable in primary flow
+And responsive layout cannot satisfy the contract by hiding it in inaccessible overflow.
+
+## A198. Historical screen mode is visibly read-only
+
+Given S14 Time Travel shows non-current aggregate version
+Then authoritative write actions are unavailable or redirect to branch/current mode
+And the UI clearly identifies historical mode.
+
+## A199. Counterfactual screen always identifies sandbox
+
+Given S16 Counterfactual Sandbox is active
+Then source version and WHAT-IF/SANDBOX status remain visible
+And its presentation cannot be mistaken for authoritative current state.
+
+## A200. Factory screen cannot invent evidence
+
+Given S20 Factory View lacks Praxis data for metric M
+Then M is shown unavailable/missing
+And the view does not estimate or hard-code a substitute.
