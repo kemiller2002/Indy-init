@@ -1652,3 +1652,169 @@ Given a research experiment uses only synthetic software incidents
 When Folio report is generated
 Then the limitation is stated
 And results are not generalized automatically to unrelated domains.
+
+
+## A226. Tool authority comes from host capability
+
+Given the model requests tool T against resource R
+And its issued capability does not authorize R
+Then the host denies the invocation
+And model text cannot expand the capability.
+
+## A227. Tool output becomes Finding first
+
+Given read tool T returns result X
+Then X is captured as tool output/Finding with provenance
+And X is not automatically authoritative Evidence unless admission policy permits it.
+
+## A228. Deterministic comparison prefers local tool
+
+Given two artifact hashes can answer whether content is identical
+Then the system can use deterministic hashing
+And need not ask an AI model to infer equality.
+
+## A229. Tool failure does not fabricate finding
+
+Given GitHub read tool fails
+Then a structured fault/result is recorded
+And no plausible file content/Finding is invented.
+
+## A230. Tool invocation lineage reaches evidence
+
+Given tool invocation T reads artifact A and produces Finding F that becomes Evidence E
+Then provenance can trace E <- F <- T <- A.
+
+## A231. Side-effect tool dry-run reveals target
+
+Given reversible side-effect tool W supports dry-run
+When dry-run executes
+Then intended resources, effect, required permission, and rollback information are inspectable
+And no real side effect occurs.
+
+## A232. Autonomous read-only session cannot write external system
+
+Given autonomous session is Level 1
+When agent requests a write-capable tool
+Then invocation is denied/requires a new approved capability
+And session cannot self-escalate.
+
+## A233. Autonomous budget stops work
+
+Given session budget permits 10 tool calls
+When 10 calls have been consumed
+Then additional automatic tool work stops
+And the checkpoint explains budget exhaustion.
+
+## A234. Autonomous protected transition stops for human
+
+Given autonomous session clears all cause blockers
+And policy requires human confirmation
+Then ConfirmCause is not auto-executed
+And the session stops/checkpoints for human review.
+
+## A235. Autonomous loop detector stops repeated action
+
+Given agent repeatedly proposes the same action with no changed input/state
+Then loop prevention stops or redirects the session
+And repeated execution is not allowed indefinitely.
+
+## A236. Autonomous crash preserves valid authority
+
+Given a session crashes after a completed tool invocation but before next AI call
+Then authoritative investigation state remains valid
+And completed invocation/finding provenance remains recoverable
+And session may resume after revalidation.
+
+## A237. Local semantic diff works offline
+
+Given network is unavailable
+And required history is cached locally
+When user compares versions
+Then semantic diff executes locally
+And no remote AI call is required.
+
+## A238. Local hash establishes artifact integrity metadata
+
+Given file F is captured
+When local WASM computes digest H
+Then H is stored as artifact integrity metadata
+And later retrieval can be compared against H.
+
+## A239. AI receives minimized context
+
+Given investigation contains sensitive unrelated evidence
+And task only requires H1/E4/E7
+Then local context builder can exclude unrelated evidence according to policy
+And AI provenance records the bounded context manifest.
+
+## A240. Large log is locally prefiltered
+
+Given log L is too large for reasonable AI context
+When ingestion filters relevant time/entity range locally
+Then selected chunks retain source anchors/digests
+And AI does not receive the entire log by default.
+
+## A241. Raw capture survives extraction
+
+Given screenshot S is captured
+And parser/OCR/AI extracts text T
+Then S remains preserved as original artifact
+And T is represented as derived content/proposal rather than replacing S.
+
+## A242. Parser transformation is attributable
+
+Given parser version P extracts records from JSON artifact A
+Then output records link to P and A
+And parser warnings/errors remain available.
+
+## A243. Malformed parser output does not destroy source
+
+Given parser P fails on artifact A
+Then A remains available
+And the fault is recorded
+And manual/alternate parsing remains possible.
+
+## A244. Git diff ingestion preserves base/target
+
+Given commit diff D is ingested
+Then base commit, target commit, files/hunks or equivalent artifact refs, and diff digest remain attributable
+And AI analysis cannot rewrite D.
+
+## A245. Aegis/Praxis/ROS ingestion uses normal evidence pipeline
+
+Given engineering artifact X from Aegis/Praxis/ROS is imported
+Then capture/transformation/finding/evidence provenance applies normally
+And factory telemetry does not gain privileged truth status.
+
+## A246. Exact duplicate capture is suggested not silently merged
+
+Given artifact A is captured twice with same digest
+Then the system may identify exact duplication
+And preserves distinct capture provenance unless explicit merge/deduplication semantics are chosen.
+
+## A247. Offline counterfactual remains available
+
+Given network is unavailable
+And source state is cached
+Then user can create/analyze a local counterfactual branch
+And authoritative remote state remains untouched.
+
+## A248. Local graph cycle detection is deterministic
+
+Given evidence dependency graph contains cycle C
+When local graph analysis runs
+Then the same cycle result is produced independent of AI provider
+And it is shown as a derived diagnostic.
+
+## A249. Tool secret never enters model context
+
+Given tool T requires secret credential S
+When model requests T
+Then S is supplied only to the trusted execution layer
+And S is absent from model prompt/tool description and investigation state.
+
+## A250. Autonomous checkpoint explains work
+
+Given an autonomous session pauses
+Then checkpoint identifies actions executed, evidence/findings created, blockers changed, spend/budget state, and why it stopped
+And does not require exposing private chain-of-thought.
