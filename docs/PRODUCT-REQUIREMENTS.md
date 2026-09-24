@@ -1252,3 +1252,101 @@ iPad, phone, desktop, high-zoom, and reduced-motion projections must preserve cr
 
 ### P40.12 Proof bundle contract
 Build evidence should follow [ENGINEERING-PROOF-BUNDLE.md](ENGINEERING-PROOF-BUNDLE.md).
+
+
+## P41. Proof-carrying proposals and investigation planning
+
+### P41.1 Proof-carrying proposal envelope
+Material AI proposals should include inspectable evidence references, assumptions, scope, rationale, contradictions considered, expected state impact, falsifier/challenge condition, model/prompt provenance, and limitations as applicable.
+
+### P41.2 Proposal-kind obligations
+Hypothesis, contradiction, unknown, assumption, investigation-action, causal, corrective, and verification proposals must each satisfy proposal-kind-specific evidence/inspection requirements.
+
+### P41.3 Dependency-aware staleness
+Proposal staleness should be based on material dependencies such as referenced evidence/assumptions/policy/semantic versions rather than invalidating every proposal on every unrelated aggregate change.
+
+### P41.4 Proposal regeneration diff
+When a proposal is regenerated, the product should show meaningful changes in evidence, assumptions, falsifier, scope, or expected impact.
+
+### P41.5 Proposal cache provenance
+Cached research/proposal results must remain attributable to exact source state, model/provider, prompt version, role, policy/domain version, and tool configuration.
+
+### P41.6 Planner legality
+The investigation planner may recommend only actions that are semantically legal and authorized or clearly marked as requiring review/permission.
+
+### P41.7 Planner multi-objective explanation
+Planner recommendations should explain discrimination, blocker resolution, cost, risk, time, reversibility, urgency, and other relevant tradeoffs rather than hiding them in an unexplained score.
+
+### P41.8 Pareto alternatives
+When candidate actions trade off dimensions, the planner should expose a small set such as fastest useful, cheapest useful, most discriminating, and safest useful options.
+
+### P41.9 Falsification preference
+When one explanation dominates prematurely, the planner should actively seek a cheap/safe falsifying or discriminating action.
+
+### P41.10 Operational versus epistemic goals
+The planner must distinguish immediate mitigation from investigation learning and causal verification, and may recommend parallel tracks.
+
+### P41.11 Investigation budget
+Users/policy may constrain time, monetary cost, operational risk, AI spend, or human effort; planner recommendations must respect those constraints.
+
+### P41.12 Stop recommendation
+The planner may recommend stopping/accepting uncertainty when policy permits and marginal information value is too low, but must not manufacture certainty.
+
+### P41.13 Proof-carrying proposal contract
+AI proposal behavior should follow [PROOF-CARRYING-PROPOSALS.md](PROOF-CARRYING-PROPOSALS.md).
+
+### P41.14 Investigation planner contract
+Planner behavior should follow [INVESTIGATION-PLANNER.md](INVESTIGATION-PLANNER.md).
+
+## P42. Cross-investigation intelligence and research harness
+
+### P42.1 Prior case is not current evidence
+A prior investigation conclusion may seed a hypothesis or action template but must not become direct evidence for a new investigation automatically.
+
+### P42.2 Similarity retrieval provenance
+Related-case suggestions must explain why the prior case was retrieved and preserve workspace/classification/permission boundaries.
+
+### P42.3 Anti-confirmation-bias retrieval
+When prior similar cases are surfaced, the system should also seek materially similar cases with different causes or falsified explanations where available.
+
+### P42.4 Reusable experiments
+Prior experiment/action procedures may become templates, but predictions and scope must be rebound to the current investigation.
+
+### P42.5 Recurrence analytics
+Cross-investigation projections may identify repeated mechanisms, corrective failures, verification failures, assumptions, unknowns, or contributing factors.
+
+### P42.6 Knowledge cards
+Reusable knowledge artifacts may summarize mechanisms, applicability scope, required evidence, known counterexamples, and source investigations, but are not current-case evidence by themselves.
+
+### P42.7 Research experiment identity
+Research comparisons must define experiment question/hypothesis, frozen source cases, treatments, outcome measures, configuration, results, and limitations.
+
+### P42.8 Treatment dimensions
+Research treatments may vary model/provider, prompt, agent role, reconciliation, domain-pack version, policy version, planner version, UI projection, or context strategy.
+
+### P42.9 Blinded evaluation
+Where practical, research comparisons should blind evaluator from model/provider identity and randomize output order.
+
+### P42.10 Ground-truth and open-world distinction
+Synthetic/known cases may use ground truth; real investigations without certain ground truth must be evaluated on process/evidence/verification quality without fabricated correctness labels.
+
+### P42.11 Treatment isolation
+Treatments must use the same frozen source snapshot unless the experiment explicitly studies context differences.
+
+### P42.12 Research reproducibility
+Research runs must preserve enough configuration to reproduce or accurately explain non-reproducibility later.
+
+### P42.13 Regression gates
+New prompt/domain/policy/planner versions may be blocked from default promotion when benchmark evidence shows material regressions under agreed criteria.
+
+### P42.14 EDF research harness
+The platform should support controlled comparisons of evolving EDF constructs such as ContextCoverage, EvidenceClosure, UnknownEffect, topology, control-point ranking, and calibration.
+
+### P42.15 Research report
+Research experiments should be renderable through Folio with hypotheses, methods, treatments, results, limitations, and evidence.
+
+### P42.16 Cross-investigation contract
+Cross-case learning should follow [CROSS-INVESTIGATION-INTELLIGENCE.md](CROSS-INVESTIGATION-INTELLIGENCE.md).
+
+### P42.17 Research harness contract
+Research experiments should follow [RESEARCH-HARNESS.md](RESEARCH-HARNESS.md).
