@@ -910,6 +910,7 @@ type CoreEvent =
     | FindingRecorded of Finding
     | CausalAssertionRecorded of CausalAssertion
     | CauseConfirmed of CausalAssertionId
+    | ConfirmedCauseReopened of CausalAssertionId * reason:NonEmptyText
     | CorrectiveActionRecorded of CorrectiveAction
     | VerificationCriterionRecorded of VerificationCriterion
     | CorrectiveActionImplemented of CorrectiveActionId
