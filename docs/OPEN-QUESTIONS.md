@@ -162,16 +162,18 @@ Attempt to reduce the core set and push domain-specific distinctions into extens
 ## OQ-013 Hypothesis lifecycle
 
 Question:
-Are Proposed/Plausible/Supported/Leading/Weakened/Falsified/Confirmed/Superseded the minimal stable states?
+Are Proposed/Plausible/Supported/Weakened/Falsified/Superseded the minimal stable persisted states?
 
 Current posture:
-StableDirection, not yet immutable.
+First implementation decision made; empirical validation remains open.
+
+First implementation:
+- Leading is derived rather than persisted.
+- Confirmed cause belongs to CausalAssertion rather than HypothesisState.
+- Hypothesis history remains independent from causal confirmation.
 
 Research task:
-Test whether Leading is better derived than persisted.
-
-Potential simplification:
-Persist evidence/relationships and derive comparative "Leading."
+Test whether any remaining hypothesis states are better derived or can be reduced further.
 
 ## OQ-014 Claim epistemic state
 
@@ -552,3 +554,18 @@ When an open question is resolved:
 - preserve the old question/decision history
 
 Do not simply delete the question.
+
+
+## OQ-047 Causal assertion support posture
+
+Question:
+Should CausalAssertion have a persisted Supported state or should support remain entirely derived until ConfirmCause?
+
+Current posture:
+First implementation derives support and persists Proposed/Confirmed/Reopened/Superseded only.
+
+Reason:
+Avoid hardening an intermediate causal-confidence ontology while EDF and cross-domain causal semantics are still being researched.
+
+Trigger for change:
+Evidence that a durable supported-but-not-confirmed causal assertion has independent workflow/history value that cannot be represented by evidence relationships, blockers, or conclusion posture.
