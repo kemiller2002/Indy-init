@@ -456,3 +456,31 @@ At minimum, screen contracts and projection tests must verify:
 - A causal set can be represented without forcing one member into a false single-root-cause hierarchy.
 
 These projections should be derived from the domain state and capabilities defined by the canonical semantics wherever practical.
+
+
+## 16. Application screen contract baseline
+
+The initial application-specific screen inventory is defined in [SCREEN-CONTRACTS.md](SCREEN-CONTRACTS.md).
+
+Percepta should ultimately compile or validate these contracts against implementation.
+
+The screen contracts intentionally define:
+
+- purpose
+- primary question
+- required semantic regions
+- required actions
+- prohibited implications
+- responsive obligations
+- accessibility obligations
+- completion evidence
+
+They intentionally do not freeze:
+
+- exact grid
+- pixel dimensions
+- animation styling
+- component placement
+- desktop-only information architecture
+
+This enables multiple agents/design approaches to implement the same product meaning and allows semantic comparison of their results.
