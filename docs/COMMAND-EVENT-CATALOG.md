@@ -139,7 +139,7 @@ Confirmed
 | FalsifyHypothesis | HypothesisFalsified, possibly NegativeKnowledgeEstablished | falsifying basis + scope |
 | SupersedeHypothesis | HypothesisSuperseded | reason/replacement optional |
 | ReopenHypothesis | HypothesisReopened | new/corrected evidence, scope, or invalidated falsification premise |
-| ConfirmHypothesisAsCause | CauseConfirmed, HypothesisConfirmed | cause-confirmation gate satisfied |
+| ConfirmCause | CauseConfirmed | causal assertion references supported hypothesis/conditions and cause-confirmation gate is satisfied |
 
 Do not provide a generic SetHypothesisState command.
 
@@ -334,6 +334,8 @@ Some obligations are derived. Durable obligations use:
 WaiveObligation exists only where originating policy explicitly permits waiver. Core invariant obligations are not waivable.
 
 ## 18. Causal assertion commands
+
+A causal assertion has its own persisted lifecycle: Proposed, Confirmed, Reopened, Superseded. This is deliberately separate from HypothesisState.
 
 | Command | Event(s) |
 | --- | --- |
