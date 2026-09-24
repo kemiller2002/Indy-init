@@ -750,3 +750,38 @@ The workspace is successful when a user can answer, without reading chat history
 - what should I do next?
 - what actions are blocked and why?
 - is my work actually saved?
+
+
+## 57. Advanced competition surfaces
+
+The competition profile should add advanced projections from [ADVANCED-VISUALIZATIONS.md](ADVANCED-VISUALIZATIONS.md).
+
+### 57.1 Time-travel control
+History should support reconstruction/scrubbing to an exact aggregate version with current version clearly distinguishable.
+
+### 57.2 Semantic diff
+Users should compare versions through meaning changes rather than raw object/text diff by default.
+
+### 57.3 What changed
+Major posture/capability changes should offer a "Why did this change?" action tied to actual events/evidence/policy.
+
+### 57.4 Hypothesis Battlefield
+A dense comparison surface should expose strongest support, strongest contradiction, assumptions, unknowns, predictions, negative knowledge, and falsifying actions.
+
+### 57.5 Evidence dependency
+Evidence lineage/common-source dependency must have both graph and accessible hierarchical/table projections.
+
+### 57.6 Counterfactual mode
+Sandbox mode must be visually unmistakable from authoritative state and identify source version and hypothetical modifications.
+
+### 57.7 Multi-agent panel
+Agent roles, provider/model identity, agreements, disagreements, unique proposals, evidence citations, cost, latency, and human dispositions should be inspectable.
+
+### 57.8 Replay
+Replay must derive from authoritative events and support pause, step, deterministic sequence, reduced motion, and screen-reader summaries.
+
+### 57.9 Spectator mode
+Read-only presentation mode should surface problem, hypotheses, evidence, blocker, next action, causal view, persistence state, and live/replayed event stream.
+
+### 57.10 Factory view
+A separate competition surface should show real engineering provenance and traceability without being confused with investigation semantic state.
