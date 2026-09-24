@@ -743,3 +743,16 @@ A future domain pack should be implementable without changing this file's entity
 - domain AI guidance
 
 If adding a domain requires changing the generic aggregate for every new research concept, the boundary has failed.
+
+
+## 41. Concrete implementation contracts
+
+The first implementation profile is further specified by:
+
+- [COMMAND-EVENT-CATALOG.md](COMMAND-EVENT-CATALOG.md)
+- [STATE-TRANSITION-TABLES.md](STATE-TRANSITION-TABLES.md)
+- [FSHARP-TYPE-SHAPES.md](FSHARP-TYPE-SHAPES.md)
+
+These documents intentionally keep comparative posture such as Leading derived and place causal confirmation on CausalAssertion rather than HypothesisState.
+
+If empirical work later changes those choices, update the implementation profile, open-question register, acceptance scenarios, and migration analysis explicitly rather than silently changing persisted meaning.
