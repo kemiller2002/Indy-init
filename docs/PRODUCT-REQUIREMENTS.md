@@ -686,3 +686,104 @@ The generic investigation aggregate should conform to [CORE-DOMAIN-MODEL.md](COR
 
 ### P30.7 Domain-pack conformance
 Domain specializations must conform to [DOMAIN-PACK-CONTRACT.md](DOMAIN-PACK-CONTRACT.md) rather than introducing alternate authoritative state models.
+
+
+## P31. Policy and transition execution
+
+### P31.1 Central transition authority
+Consequential authoritative state changes must pass through a domain transition engine rather than be independently enforced by UI, AI, or persistence code.
+
+### P31.2 Explicit decisions
+Transition requests must return explicit Allowed, Blocked, RequiresReview, UnsupportedSemantics, Conflict, or equivalent typed outcomes instead of relying on generic exceptions.
+
+### P31.3 Explainable blockers
+Every unavailable consequential capability must expose machine-readable and human-readable blockers with policy/rule provenance and, where possible, a path to resolution.
+
+### P31.4 Policy layering
+Core, domain, experimental, organization, and investigation-local policy must compose through explicit precedence and relaxation rules.
+
+### P31.5 Core invariant firewall
+No policy layer may relax CoreStable invariants.
+
+### P31.6 Deterministic legality
+Authoritative transition legality must be deterministic for a given state, semantic manifest, policy set, and actor capability context.
+
+### P31.7 Policy attribution
+Authoritative events must preserve the policy/version references under which the transition was allowed.
+
+### P31.8 Capability projection
+Legal actions and blocking reasons should be projected by the domain engine for UI consumption rather than duplicated in presentation logic.
+
+### P31.9 Offline revalidation
+Offline queued commands must be revalidated against current authoritative state and policy before remote application.
+
+### P31.10 Idempotency
+Retryable commands must support idempotent handling so unstable networks do not create duplicate semantic events.
+
+### P31.11 Policy comparison
+Research workflows should support evaluating an immutable investigation snapshot under multiple policy versions without mutating authoritative state.
+
+### P31.12 Policy pinning
+Research investigations must be able to pin applicable policy/domain versions for reproducibility.
+
+### P31.13 Aegis faults
+Invalid transitions, unsupported semantics, invariant violations, and policy-engine failures must map to structured Aegis-compatible faults.
+
+### P31.14 Engine contract
+Implementation should conform to [POLICY-ENGINE.md](POLICY-ENGINE.md).
+
+## P32. Persistence, portability, and recovery
+
+### P32.1 Semantic/provider separation
+Authoritative investigation identity and meaning must remain independent of GitHub SHAs, paths, database keys, or other provider metadata.
+
+### P32.2 Canonical portable package
+The platform must define a versioned canonical portable representation sufficient for complete compatible import/export.
+
+### P32.3 Event order
+Authoritative event order must use aggregate sequence/version rather than wall-clock timestamp alone.
+
+### P32.4 Provider capability discovery
+Persistence providers must expose which capabilities they support when product behavior depends on them.
+
+### P32.5 Atomic semantic commit
+A domain decision that emits multiple related events must not be represented as remotely committed if only part of the semantic transition persisted.
+
+### P32.6 Optimistic concurrency
+Providers must support or emulate conflict detection sufficient to prevent silent stale overwrite.
+
+### P32.7 Semantic conflict handling
+Conflicts must be reconciled at command/domain-state level rather than blindly merging serialized text.
+
+### P32.8 Local durability
+Active offline work and queued commands should survive browser/application restart.
+
+### P32.9 Explicit local versus remote truth
+The UI must distinguish local pending state from remotely confirmed authoritative state.
+
+### P32.10 Artifact integrity
+Externally referenced material evidence should support integrity metadata such as cryptographic digest where practical.
+
+### P32.11 Missing/changed artifact state
+Unavailable or changed external artifacts must be surfaced explicitly rather than silently substituted.
+
+### P32.12 Complete round trip
+A compatible complete export/import must preserve authoritative events, entity IDs, extension data, semantic/policy versions, provenance, uncertainty, and historical conclusions.
+
+### P32.13 Import collision
+An imported InvestigationId collision must require explicit handling rather than silently overwrite an existing investigation.
+
+### P32.14 Cross-provider migration
+Moving between GitHub and another persistence provider must not change InvestigationId or domain semantics.
+
+### P32.15 Research snapshot pinning
+Experiments must be able to bind to an immutable investigation/evidence version for reproducibility.
+
+### P32.16 Corruption detection
+Persistence loading must detect malformed manifests, impossible versions, duplicate/missing event sequence, and snapshot/history inconsistencies where the provider supports those guarantees.
+
+### P32.17 Recovery evidence
+Repair of inconsistent authoritative state must be explicit and auditable rather than silently synthesized by an AI.
+
+### P32.18 Provider contract
+Implementation should conform to [PERSISTENCE-CONTRACT.md](PERSISTENCE-CONTRACT.md).
