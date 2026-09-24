@@ -939,3 +939,27 @@ Default deployment posture should favor least privilege, sanitized untrusted con
 
 ### P35.18 Threat-model conformance
 Implementation should conform to [SECURITY-THREAT-MODEL.md](SECURITY-THREAT-MODEL.md).
+
+
+## P36. Open-question governance and staged delivery
+
+### P36.1 Open questions remain explicit
+Material unresolved product, semantic, architecture, security, AI, persistence, or EDF research questions must be recorded rather than silently resolved by implementation.
+
+### P36.2 No deletion of resolved questions
+When an open question is resolved, preserve the decision history and update affected requirements, decision boundaries, and acceptance scenarios.
+
+### P36.3 Vertical slices
+Implementation should follow coherent vertical slices that leave the system usable and evidenced at each stage.
+
+### P36.4 Core before breadth
+Typed semantic integrity, policy/capability enforcement, workspace truthfulness, persistence truth, and verification semantics take priority over broad feature count.
+
+### P36.5 Stop-the-line
+Implementation must stop for correction when a layer bypasses core boundaries, including UI-owned legality, AI-owned authority, provider-specific domain types, dropped extensions, fabricated migration data, or false synchronization state.
+
+### P36.6 Implementation plan
+The build should follow [IMPLEMENTATION-SLICES.md](IMPLEMENTATION-SLICES.md) unless a recorded decision justifies resequencing.
+
+### P36.7 Research register
+Unresolved issues must be maintained in [OPEN-QUESTIONS.md](OPEN-QUESTIONS.md), with a bias toward reversible defaults.
