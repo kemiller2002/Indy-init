@@ -44,7 +44,6 @@ Persisted states:
 - Supported
 - Weakened
 - Falsified
-- Confirmed
 - Superseded
 
 Leading is initially derived.
@@ -60,8 +59,8 @@ Leading is initially derived.
 | Falsified | ReopenHypothesis | Plausible | new/corrected evidence, scope, or premise |
 | Weakened | MarkHypothesisPlausible | Plausible | strengthening basis |
 | Weakened | MarkHypothesisSupported | Supported | sufficient support |
-| Supported | ConfirmCause | Confirmed | cause-confirmation gate |
-| Confirmed | ReopenConfirmedCause | Supported or policy-selected active posture | new contradiction/evidence/failed verification |
+ 
+Cause confirmation is not a Hypothesis lifecycle transition. A supported hypothesis may participate in a separate CausalAssertion, which owns Confirmed/Reopened state.
 
 No generic SetHypothesisState exists.
 
