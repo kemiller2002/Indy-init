@@ -274,3 +274,20 @@ Architecture decisions are governed by [DESIGN-DECISION-BOUNDARIES.md](DESIGN-DE
 The generic aggregate direction is specified in [CORE-DOMAIN-MODEL.md](CORE-DOMAIN-MODEL.md), and domain extension behavior is specified in [DOMAIN-PACK-CONTRACT.md](DOMAIN-PACK-CONTRACT.md).
 
 Where implementation details remain open, agents must prefer reversible choices and must not resolve active EDF research questions by hard-coding them into authoritative generic state.
+
+
+## Policy execution boundary
+
+Authoritative transition evaluation follows [POLICY-ENGINE.md](POLICY-ENGINE.md).
+
+The UI, AI layer, and persistence adapters request commands and consume typed decisions/capabilities. They do not independently determine whether a transition is legal.
+
+Offline operation stores intent as versioned commands. On reconnect, commands are revalidated against current state, semantics, policy, and actor capabilities before application.
+
+## Persistence portability boundary
+
+Persistence follows [PERSISTENCE-CONTRACT.md](PERSISTENCE-CONTRACT.md).
+
+GitHub is the first provider, not the generic storage model. Investigation identity, semantic events, extension envelopes, policy attribution, and canonical export remain provider-independent.
+
+Provider-specific version tokens such as GitHub blob/commit SHAs belong in the adapter boundary. Conflicts are reconciled semantically, not through blind serialized-text merges.
