@@ -281,6 +281,54 @@ Completion evidence:
 - challenge-leading-hypothesis test
 - AI outage fallback
 
+## Slice 6A: Tool execution and local analytics
+
+Goal: let the investigator perform real bounded work.
+
+Implement:
+
+- tool registry
+- read/pure-analysis tool gateway
+- scoped tool capabilities
+- invocation provenance
+- Finding pipeline
+- GitHub read tool
+- local WASM hashing/diff/graph analysis
+- evidence ingestion for text/file/log/diff
+
+Completion evidence:
+
+- model cannot invoke undeclared tool/resource
+- tool result lineage preserved
+- deterministic local operation works offline
+- raw source survives parse/extraction
+
+## Slice 6B: Bounded autonomous investigation
+
+Goal: close the investigation loop without losing governance.
+
+Implement:
+
+- Level 1 read-only autonomous session
+- budget
+- stop conditions
+- planner integration
+- tool invocation
+- proposal/finding capture
+- challenge pass
+- human checkpoint
+
+Optional:
+narrow Level 2 auto-admission of explicitly configured deterministic low-risk findings.
+
+Completion evidence:
+
+- protected transitions stop for human
+- budget enforced
+- loop detection works
+- crash/restart leaves authoritative state valid
+- autonomous work produces inspectable provenance
+
 ## Slice 7: Investigation strategy
 
 Goal: make the product materially better than a structured notebook.
