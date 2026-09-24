@@ -71,3 +71,44 @@ Before the event, verify with the organizers any ambiguity involving:
 - authentication infrastructure
 
 If organizer guidance conflicts with this document, organizer guidance wins and the change should be recorded here.
+
+
+## Published rule verification
+
+Last reviewed: 2026-09-24.
+
+The currently published Indy Init hackathon page states:
+
+- the repository starts empty;
+- teams may plan beforehand, including the problem, stack, and sketch;
+- code starts at kickoff;
+- teams may use any model/framework/platform;
+- the challenge is to build a production-grade app and the software factory that ships it;
+- teams demonstrate the machinery as well as the product;
+- the build window is currently published as 9:30 AM to 5:00 PM on November 7, 2026.
+
+Sources:
+
+- https://indyinit.com/hackathon/
+- https://indyinit.com/
+- https://indyinit.com/faq/
+
+These published statements support aggressive pre-event planning/specification, but they do not answer every implementation-boundary question.
+
+Continue to verify ambiguity around:
+
+- whether executable application-specific tests may exist before kickoff;
+- whether application-specific machine-readable contracts count as planning or scaffolding;
+- whether generated implementation templates may contain application-specific code;
+- exact auth/deployment expectations;
+- whether a separate planning repository may be consumed directly by the blank implementation repo.
+
+Until clarified, keep this repository specification-heavy and keep competition application source code out of it.
+
+## Machine-readable specifications
+
+A machine-readable contract generated directly from these requirements may be extremely valuable for the software factory.
+
+Before producing application-specific executable/generated scaffolding from it before kickoff, confirm organizer interpretation.
+
+Architecture and semantic contracts themselves remain preparation artifacts.
