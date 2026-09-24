@@ -59,6 +59,8 @@ See [Hackathon Boundaries](docs/HACKATHON-BOUNDARIES.md).
 
 - [Product Concept](docs/PRODUCT-CONCEPT.md)
 - [Long-term Product Requirements](docs/PRODUCT-REQUIREMENTS.md)
+- [Investigation Semantics](docs/INVESTIGATION-SEMANTICS.md)
+- [Investigation Acceptance Scenarios](docs/INVESTIGATION-ACCEPTANCE-SCENARIOS.md)
 - [Requirements](docs/REQUIREMENTS.md)
 - [Architecture](docs/ARCHITECTURE.md)
 - [Hackathon Boundaries](docs/HACKATHON-BOUNDARIES.md)
