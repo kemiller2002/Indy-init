@@ -642,3 +642,38 @@ In particular:
 - stale client cannot overwrite newer state
 - report/export cannot silently ignore access policy
 - provider metadata cannot redefine semantic identity
+
+
+## 53. Tool execution security
+
+Tool execution must follow least privilege.
+
+Required controls:
+
+- host-issued scoped capabilities
+- declared resource/network scope
+- time/resource limits
+- input/output schema validation
+- data-classification enforcement
+- secret isolation
+- invocation provenance
+- side-effect classification
+- review gates
+
+The model cannot elevate a read capability into write authority.
+
+## 54. Autonomous-session security
+
+Autonomous sessions must have explicit:
+
+- allowed tools
+- allowed resources
+- command classes
+- budget
+- expiry
+- review gates
+- stop conditions
+
+A compromised or confused model therefore remains bounded by host enforcement.
+
+High-consequence remediation is outside the default competition autonomy profile.
