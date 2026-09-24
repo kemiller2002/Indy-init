@@ -1495,3 +1495,160 @@ And its presentation cannot be mistaken for authoritative current state.
 Given S20 Factory View lacks Praxis data for metric M
 Then M is shown unavailable/missing
 And the view does not estimate or hard-code a substitute.
+
+
+## A201. Hypothesis proposal carries falsifier
+
+Given AI proposes hypothesis H
+Then the proposal includes or explicitly states absence of a meaningful mechanism, prediction, and strongest plausible falsifier
+And the user can inspect evidence/assumptions supporting H.
+
+## A202. Proposal cites material dependencies
+
+Given proposal P depends on evidence E4 and assumption A2
+Then P records those dependencies
+And unrelated entity changes do not need to mark P stale.
+
+## A203. Superseded evidence invalidates dependent proposal
+
+Given proposal P depends materially on E4
+When E4 is superseded/invalidated
+Then P is marked stale or requires revalidation
+And it cannot be accepted blindly.
+
+## A204. Rejected assumption invalidates dependent proposal
+
+Given proposal P depends materially on A2
+When A2 becomes Rejected
+Then P becomes stale/requires revalidation.
+
+## A205. Proposal regeneration diff is semantic
+
+Given P1 and regenerated P2 differ
+Then the UI can show changed evidence, assumption, scope, falsifier, or expected state impact
+And does not require raw JSON comparison.
+
+## A206. Cached proposal exposes cache provenance
+
+Given a proposal result is reused from cache
+Then the UI/provenance identifies the frozen source/configuration that produced it
+And cached output is not presented as a fresh model run.
+
+## A207. Planner filters illegal actions
+
+Given candidate T1 would be discriminating but is semantically illegal
+Then T1 is not presented as directly executable recommendation
+And the planner may explain what prerequisite would make it available.
+
+## A208. Planner exposes tradeoffs
+
+Given T1 is fastest and T2 is more discriminating but riskier
+Then planner output exposes those dimensions
+And does not hide the tradeoff behind one unexplained score.
+
+## A209. Planner can present Pareto alternatives
+
+Given no action dominates all others
+Then the planner may present fastest useful, safest useful, cheapest useful, and most discriminating options
+And explains why no single action dominates.
+
+## A210. Planner challenges premature leader
+
+Given H1 is derived Leading
+And a cheap safe falsifying action exists
+Then planner can prioritize that action over another merely confirmatory action.
+
+## A211. Planner distinguishes mitigation and learning
+
+Given an incident is actively harming users
+And a mitigation M can stop harm while experiment T best identifies cause
+Then planner may recommend M and T as distinct/parallel objectives
+And mitigation is not presented as root-cause confirmation.
+
+## A212. Planner respects budget
+
+Given remaining investigation budget excludes high-cost test T1
+Then T1 is not recommended as feasible primary action
+And the planner can explain the constraint.
+
+## A213. Stop recommendation preserves uncertainty
+
+Given further useful investigation exceeds accepted cost/risk
+And policy permits stopping with residual uncertainty
+Then planner may recommend stop/accept residual
+And no ConfirmedCause is invented solely to close the investigation.
+
+## A214. Prior case does not become evidence
+
+Given prior investigation I1 concluded cause C
+And current I2 looks similar
+When cross-investigation retrieval surfaces I1
+Then C may be proposed as a hypothesis in I2
+And I1's conclusion is not admitted as direct Evidence for I2.
+
+## A215. Similarity retrieval shows basis
+
+Given prior investigation I1 is suggested
+Then the UI can show which observation/system/mechanism/scope features caused retrieval
+And similarity is not presented as causation.
+
+## A216. Cross-case retrieval respects permissions
+
+Given user cannot access workspace W2
+Then investigations in W2 are not used as visible or hidden AI retrieval context
+And no derived suggestion leaks their contents.
+
+## A217. Anti-confirmation retrieval includes counterexample
+
+Given two prior similar cases had cause C and one similar case had materially different cause D
+When prior-case intelligence is used
+Then the system should be capable of surfacing the counterexample D case
+And does not only reinforce C.
+
+## A218. Reused experiment rebinds predictions
+
+Given experiment template T is reused from prior case
+Then current predictions/scope are recorded against current hypotheses
+And prior predictions are not copied as if prospectively registered for the new case.
+
+## A219. Knowledge card is not current evidence
+
+Given knowledge card K describes mechanism M from prior cases
+Then K may inform hypotheses/actions
+And K alone does not establish that M occurred in the current investigation.
+
+## A220. Research treatments share frozen case
+
+Given experiment compares treatment A and B on case C
+Then both treatments use the same frozen InvestigationId/AggregateVersion unless experiment design explicitly states otherwise.
+
+## A221. Blind evaluation hides model identity
+
+Given research experiment enables evaluator blinding
+Then proposal display/order does not reveal model/provider identity before evaluation
+And identity is recoverable in provenance after unblinding.
+
+## A222. Real-world uncertain case is not assigned fake ground truth
+
+Given a real investigation lacks definitively verified cause
+Then research harness does not label model proposals correct/incorrect solely from the current conclusion
+And uses process/verification measures instead.
+
+## A223. Prompt regression can block promotion
+
+Given prompt version P2 performs materially worse than P1 on agreed benchmark criteria
+Then research governance may prevent P2 becoming default
+And benchmark evidence is recorded.
+
+## A224. EDF experiment compares semantics without rewrite
+
+Given EDF semantic treatment S1 and S2 are compared on frozen cases
+Then each produces separate derived/reassessment results
+And source investigation histories remain unchanged.
+
+## A225. Research report identifies limitations
+
+Given a research experiment uses only synthetic software incidents
+When Folio report is generated
+Then the limitation is stated
+And results are not generalized automatically to unrelated domains.
