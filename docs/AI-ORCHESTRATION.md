@@ -560,3 +560,38 @@ AI-assisted experiment design should support freezing predictions and interpreta
 
 ### 42.7 Quality diagnostics
 AI may propose hidden assumptions, contradictions, evidence dependencies, circular-reasoning risks, missing alternatives, and orphan state. These remain proposals/derived diagnostics until accepted where authoritative state is required.
+
+
+## 43. Proof-carrying proposal profile
+
+Material AI proposals should follow [PROOF-CARRYING-PROPOSALS.md](PROOF-CARRYING-PROPOSALS.md).
+
+The orchestration layer should preserve:
+
+- exact evidence/entity dependencies
+- assumptions
+- semantic/policy versions
+- falsifier/challenge condition
+- expected state impact
+- proposal-kind validation
+- staleness dependencies
+
+A proposal should become stale because a material dependency changed, not merely because an unrelated event incremented AggregateVersion.
+
+## 44. Planner integration
+
+The next-action planner should follow [INVESTIGATION-PLANNER.md](INVESTIGATION-PLANNER.md).
+
+AI may generate candidate actions and qualitative tradeoff reasoning.
+
+Deterministic domain/policy code supplies:
+
+- legal actions
+- blockers
+- authorization
+- known costs/risks
+- predictions
+- negative knowledge
+- budget constraints
+
+Planner output remains recommendation, not authority.
