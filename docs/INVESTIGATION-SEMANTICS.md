@@ -403,29 +403,28 @@ The model must allow evidence dependency graphs so the system does not treat rep
 
 ## 7. Hypothesis lifecycle
 
-Canonical lifecycle:
+Canonical persisted lifecycle:
 
 ```text
 Proposed
   -> Plausible
   -> Supported
-  -> Leading
-  -> Confirmed
 
-Proposed/Plausible/Supported/Leading
+Proposed/Plausible/Supported
   -> Weakened
   -> Falsified
 
-Any non-confirmed state
+Any active state
   -> Superseded
 
 Falsified
   -> Reopened
   -> Plausible
-
-Confirmed
-  -> Reopened
 ```
+
+"Leading" is a comparative posture derived from current evidence, alternatives, and policy. It is not initially a persisted hypothesis lifecycle state.
+
+"Confirmed cause" is represented by a CausalAssertion and its confirmation event. It is not initially a persisted Hypothesis state because a confirmed causal explanation may involve a causal set, multiple hypotheses, conditions, triggers, or contributing factors.
 
 Transitions are not automatic labels. They require evidence and policy.
 
@@ -446,15 +445,15 @@ Requires:
 - support is not solely an unverified assumption
 - known material contradictory evidence is visible
 
-### 7.3 Supported -> Leading
+### 7.3 Derived leading posture
 
-Requires:
+A hypothesis may be projected as Leading when:
 
-- the hypothesis currently explains more of the material evidence than alternatives under the applicable policy
-- this does not imply confirmation
+- it currently explains more of the material evidence than alternatives under the applicable comparison policy
 - material alternatives remain visible
+- the comparison derivation/version is known
 
-"Leading" is a comparative investigation state, not permission to suppress alternatives.
+Leading does not imply causal confirmation and does not permit suppression of alternatives.
 
 ### 7.4 Any active -> Weakened
 
@@ -478,9 +477,15 @@ Requires:
 - new evidence, corrected evidence, corrected scope, or invalidated falsification premise
 - explicit reason for reopening
 
-### 7.7 Leading -> Confirmed
+Reopening returns the hypothesis to an active evaluable state, initially Plausible unless policy/evidence supports another explicit transition.
 
-Requires the applicable Cause Confirmation Gate in section 15.
+### 7.7 Hypothesis participation in causal confirmation
+
+A Supported hypothesis may be referenced by a proposed CausalAssertion.
+
+ConfirmCause applies to the CausalAssertion and the active cause-confirmation gate. The source hypothesis remains historically Supported unless later evidence weakens, falsifies, or supersedes it.
+
+This separation prevents a one-hypothesis/one-cause assumption and supports causal sets.
 
 ## 8. Claim epistemic state
 
@@ -754,7 +759,7 @@ AwaitingVerification
 
 ## 21. Investigation lifecycle
 
-Suggested canonical lifecycle:
+Suggested canonical persisted lifecycle:
 
 ```text
 Draft
@@ -766,7 +771,7 @@ Draft
   -> Closed
 
 Resolved/Closed
-  -> Reopened
+  -> Active via InvestigationReopened
 
 Any non-destructive state
   -> Archived
@@ -780,8 +785,9 @@ Lifecycle semantics:
 - AwaitingVerification: causal conclusion/correction exists but outcome verification is pending
 - Resolved: resolution criteria satisfied
 - Closed: administrative closure after resolution
-- Reopened: previously resolved/closed state invalidated or materially questioned
 - Archived: removed from active workflow without erasing history
+
+Reopened is an authoritative event and historical fact, not initially a durable lifecycle case. The event transitions the current lifecycle back to Active while preserving the prior resolution/closure.
 
 ## 22. Resolution Gate
 
@@ -954,11 +960,15 @@ type HypothesisState =
     | Proposed
     | Plausible
     | Supported
-    | Leading
     | Weakened
     | Falsified
-    | Confirmed
     | Superseded
+
+type HypothesisComparisonPosture =
+    | NotCompared
+    | CandidateLeader
+    | Leading
+    | Tied
 
 type UnknownState =
     | Identified
