@@ -1014,3 +1014,125 @@ Domain must not depend on Web, AI, GitHub/persistence adapters, or provider-spec
 
 ### P37.16 Domain test matrix
 Core command/event/state implementation must be verified against [DOMAIN-TEST-MATRIX.md](DOMAIN-TEST-MATRIX.md), subject to organizer rules about when executable competition tests may be created.
+
+
+## P38. Advanced competition capabilities
+
+The competition profile should deliberately exercise the strongest capabilities that can be built without weakening the durable product model.
+
+### P38.1 Time travel
+The product should reconstruct investigation state at any authoritative aggregate version supported by the persistence history.
+
+### P38.2 Semantic diff
+Users should be able to compare two investigation versions in terms of state/evidence/blocker/capability changes rather than raw serialized text.
+
+### P38.3 What changed my mind
+For material posture changes, the product should explain which events, evidence, blockers, policy rules, or contradictions caused the change.
+
+### P38.4 Counterfactual sandbox
+Users should be able to create a non-authoritative branch from an immutable investigation version and apply explicitly hypothetical changes without mutating source state.
+
+### P38.5 Counterfactual promotion safety
+A branch may become a new real investigation only through explicit promotion/copy semantics; hypothetical evidence must never silently become fact.
+
+### P38.6 Sensitivity analysis
+The product should identify which evidence, assumptions, unknowns, or policy rules are pivotal to current conclusions/capabilities through explainable branch-based analysis.
+
+### P38.7 Evidence dependency visualization
+The UI should visualize source lineage and common dependencies so repeated artifacts from one source are not mistaken for independent confirmation.
+
+### P38.8 Causal-set visualization
+The product should visualize multi-member causal assertions, roles, mechanisms, contradictions, and verification targets without forcing a universal DAG ontology.
+
+### P38.9 Uncertainty map
+The workspace should provide an inspectable derived view of blocking unknowns, assumptions, contradictions, unsupported causal links, and verification gaps.
+
+### P38.10 Hypothesis battlefield
+The product should offer a dense comparison surface showing competing hypotheses, support, contradiction, assumptions, predictions, negative knowledge, and falsifying actions.
+
+### P38.11 Blind multi-agent panel
+The system should support multiple specialized AI roles operating independently on the same frozen state before reconciliation.
+
+### P38.12 Multi-agent independence
+Agents that see or derive from another agent's output must not be counted as independent corroboration.
+
+### P38.13 Agent role diversity
+Multi-agent value must come from distinct objectives such as generation, skepticism, evidence auditing, experiment design, causal analysis, and verification auditing rather than repeated identical prompts.
+
+### P38.14 Reconciliation round
+After blind analysis, the system may run a reconciliation round that focuses on explicit disagreements and proposes discriminating evidence/actions.
+
+### P38.15 Model/provider tournament
+Research mode should support comparing models/providers on the same frozen task with provenance, cost, latency, proposal quality, and downstream usefulness.
+
+### P38.16 Policy/domain tournament
+Research mode should support comparing policy or domain-pack versions against the same immutable investigation snapshot without mutating authoritative state.
+
+### P38.17 Prompt tournament
+Prompt/instruction versions should be comparable against identical frozen contexts.
+
+### P38.18 What would falsify this
+Each active hypothesis should support an operation that proposes its strongest or cheapest meaningful falsifier and/or the best test against a competing hypothesis.
+
+### P38.19 What are we missing
+The system should be able to challenge completeness by finding unexplained observations, hidden assumptions, unlinked evidence, evidence dependencies, unmodeled contradictions, scope gaps, and instrument/measurement failure.
+
+### P38.20 Orphan diagnostics
+The product should detect semantically suspicious orphan state such as evidence linked to nothing, hypotheses without predictions, verification without criteria, or corrective action without a causal target.
+
+### P38.21 Circular-reasoning diagnostics
+The system should identify candidate evidence/inference cycles and self-supporting reasoning paths for review.
+
+### P38.22 Contradiction mining
+AI may propose contradictions not yet explicitly represented, but users/policy control authoritative acceptance.
+
+### P38.23 Assumption mining
+AI may identify hidden assumptions in hypotheses, actions, interpretations, and conclusions and propose them as explicit state.
+
+### P38.24 Experiment pre-registration
+Investigation actions should support freezing prospective predictions, procedure, and interpretation criteria before results are observed.
+
+### P38.25 Reproducibility bundle
+A high-value investigation action should be exportable as a reproducibility bundle identifying exact source state, procedure, predictions, artifacts, result, interpretation, and semantic/policy versions.
+
+### P38.26 Investigation replay
+The UI should support deterministic replay driven by authoritative events, including pause/step and reduced-motion alternatives.
+
+### P38.27 Spectator mode
+The competition profile should include a read-only presentation mode displaying real investigation state rather than scripted fake state.
+
+### P38.28 Factory telemetry
+The product/demo should expose software-factory evidence such as ROS work, requirements traceability, tests, Praxis metrics, Aegis faults, commits, and deployment state.
+
+### P38.29 Requirements proof graph
+The competition profile should support tracing requirement -> acceptance scenario -> work item -> source -> test -> commit -> runtime evidence.
+
+### P38.30 Build provenance proof bundle
+The system should generate a Folio-compatible proof bundle showing kickoff baseline, framework versions, commit/test/metric history, known deviations, and final build provenance.
+
+### P38.31 Self-diagnostic mode
+The investigator should be able to ingest its own Aegis/Praxis/ROS/build evidence to investigate an actual application or deployment failure.
+
+### P38.32 Semantic search
+Natural-language queries should resolve to structured investigation retrieval rather than free-form model recollection where authoritative state can answer the question.
+
+### P38.33 Command palette
+Advanced operations should remain discoverable through a mobile/keyboard-friendly command palette.
+
+### P38.34 Mobile evidence capture
+Supported devices should allow rapid photo/screenshot/file/text/URL evidence capture with provenance and without auto-promoting AI extraction to fact.
+
+### P38.35 Immutable snapshot share
+A read-only share/review artifact should bind to an exact InvestigationId/AggregateVersion and must not silently update.
+
+### P38.36 Expert review packet
+The system should be able to package selected state/questions for an external expert and ingest the response with testimony/report provenance.
+
+### P38.37 Demo health check
+The competition profile should run a deterministic pre-demo readiness check covering deployment, persistence, AI, offline fallback, reports, secrets, and smoke tests.
+
+### P38.38 Graceful degradation
+Advanced competition features must degrade to semantically correct simpler views rather than causing the investigation to become unusable.
+
+### P38.39 Ambition profile
+Competition implementation should follow [COMPETITION-AMBITION.md](COMPETITION-AMBITION.md), with orchestration/branching/visualization behavior governed by the corresponding advanced-profile documents.
