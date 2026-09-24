@@ -68,6 +68,8 @@ See [Hackathon Boundaries](docs/HACKATHON-BOUNDARIES.md).
 - [AI Investigation Orchestration](docs/AI-ORCHESTRATION.md)
 - [Investigation Workspace](docs/INVESTIGATION-WORKSPACE.md)
 - [Security, Privacy, and Threat Model](docs/SECURITY-THREAT-MODEL.md)
+- [Implementation Slices](docs/IMPLEMENTATION-SLICES.md)
+- [Open Questions and Research Register](docs/OPEN-QUESTIONS.md)
 - [Design Decision Boundaries](docs/DESIGN-DECISION-BOUNDARIES.md)
 - [Investigation Acceptance Scenarios](docs/INVESTIGATION-ACCEPTANCE-SCENARIOS.md)
 - [Requirements](docs/REQUIREMENTS.md)
