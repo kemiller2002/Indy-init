@@ -65,6 +65,8 @@ See [Hackathon Boundaries](docs/HACKATHON-BOUNDARIES.md).
 - [Domain Pack Contract](docs/DOMAIN-PACK-CONTRACT.md)
 - [Policy and Transition Engine](docs/POLICY-ENGINE.md)
 - [Persistence, Portability, and Recovery](docs/PERSISTENCE-CONTRACT.md)
+- [AI Investigation Orchestration](docs/AI-ORCHESTRATION.md)
+- [Investigation Workspace](docs/INVESTIGATION-WORKSPACE.md)
 - [Design Decision Boundaries](docs/DESIGN-DECISION-BOUNDARIES.md)
 - [Investigation Acceptance Scenarios](docs/INVESTIGATION-ACCEPTANCE-SCENARIOS.md)
 - [Requirements](docs/REQUIREMENTS.md)
