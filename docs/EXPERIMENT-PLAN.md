@@ -90,3 +90,42 @@ The final record should distinguish:
 - incomplete
 - intentionally deferred
 - unknown
+
+
+## Product capability experiments
+
+The application itself should become an experimental platform as soon as the core is stable enough.
+
+Use [RESEARCH-HARNESS.md](RESEARCH-HARNESS.md) for repeatable comparisons.
+
+Candidate experiments:
+
+1. Single strong agent vs Generator + Skeptic + Evidence Auditor.
+2. Challenge mode on/off for premature-convergence rate.
+3. Proof-carrying proposal UI vs narrative AI response.
+4. Hypothesis Battlefield vs chat-only comparison for user understanding.
+5. Planner discrimination-first heuristic vs generic AI "what next?".
+6. Negative-knowledge retrieval on/off for repeated disproven work.
+7. Evidence-dependency visualization on/off for false corroboration detection.
+8. Time-travel/semantic-diff availability on/off for explanation/trust.
+9. Different prompt versions on identical frozen cases.
+10. Different model/providers on identical role/context.
+11. Generic policy vs EDF current vs EDF experimental policy on identical snapshots.
+12. ContextCoverage/EvidenceClosure/UnknownEffect variants as EDF research matures.
+
+### Experimental rigor
+
+Where practical:
+
+- freeze source investigation version;
+- preserve treatment configuration;
+- blind evaluators to model/provider;
+- randomize output order;
+- record cost/latency;
+- define outcome measures before looking at results;
+- distinguish synthetic known-ground-truth cases from real uncertain cases;
+- preserve failed/null results.
+
+### Competition value
+
+Even one small controlled comparison can strengthen the competition entry by showing that the architecture is being used to measure whether its own advanced AI techniques actually help.
