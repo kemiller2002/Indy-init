@@ -581,3 +581,30 @@ The long-term product is successful when:
 10. data can move between supported storage/deployment models;
 11. users remain in control of consequential state changes;
 12. the product remains useful after the hackathon constraints are removed.
+
+
+## P28. Semantic conformance
+
+### P28.1 Canonical semantics
+The authoritative meanings of observation, claim, interpretation, hypothesis, assumption, evidence, prediction, finding, unknown, negative knowledge, contradiction, obligation, causal mechanism, cause roles, corrective action, verification, and conclusion must conform to [INVESTIGATION-SEMANTICS.md](INVESTIGATION-SEMANTICS.md).
+
+### P28.2 Semantic invariants
+Implementation must enforce the generic investigation invariants defined in the canonical semantics rather than relying on UI convention or agent prompting.
+
+### P28.3 Transition legality
+Hypothesis, unknown, assumption, contradiction, action, corrective-action, and investigation lifecycle transitions must be validated by explicit domain rules.
+
+### P28.4 Cause confirmation gate
+A cause may not enter ConfirmedCause unless the active confirmation policy's required evidence, contradiction, unknown, assumption, alternative-explanation, mechanism, provenance, and invariant conditions are satisfied.
+
+### P28.5 Resolution gate
+An investigation may not enter Resolved unless the active resolution policy is satisfied, including required verification and blocking-obligation conditions.
+
+### P28.6 Semantic acceptance scenarios
+The scenarios in [INVESTIGATION-ACCEPTANCE-SCENARIOS.md](INVESTIGATION-ACCEPTANCE-SCENARIOS.md) are normative acceptance behavior and should become executable tests where practical.
+
+### P28.7 No narrative override
+Neither a human-authored narrative nor an AI-generated narrative may override contradictory authoritative state, blocking obligations, or illegal transition rules.
+
+### P28.8 Domain-pack compatibility
+Domain packs may strengthen domain semantics and policies but may not violate core evidence/inference separation, provenance, unknown semantics, proposal/authority separation, or historical integrity.
