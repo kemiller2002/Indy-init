@@ -963,3 +963,51 @@ The build should follow [IMPLEMENTATION-SLICES.md](IMPLEMENTATION-SLICES.md) unl
 
 ### P36.7 Research register
 Unresolved issues must be maintained in [OPEN-QUESTIONS.md](OPEN-QUESTIONS.md), with a bias toward reversible defaults.
+
+
+## P37. Command, event, and type contract
+
+### P37.1 Intent-based commands
+Authoritative writes must use explicit semantic commands rather than generic state setters or raw document replacement.
+
+### P37.2 Immutable semantic events
+Allowed commands must produce narrow past-tense semantic events that preserve what happened without embedding UI-only state.
+
+### P37.3 No generic setters
+The core must not expose generic SetState, SetRootCause, SetConfidence, ReplaceInvestigationJson, or equivalent bypasses around domain semantics.
+
+### P37.4 Derived comparison posture
+The first implementation must derive comparative hypothesis posture such as Leading rather than persisting it as historical lifecycle state.
+
+### P37.5 Cause/hypothesis separation
+Causal confirmation must belong to CausalAssertion rather than HypothesisState so causal sets and multi-factor explanations remain representable.
+
+### P37.6 Explicit reopening
+Reopening a confirmed cause or resolved investigation must append an explicit event and preserve the prior confirmation/resolution as history.
+
+### P37.7 Transition tables
+Persisted lifecycle transitions must conform to [STATE-TRANSITION-TABLES.md](STATE-TRANSITION-TABLES.md) unless a recorded semantic decision changes the profile.
+
+### P37.8 Command/event catalog
+Core authoritative command and event names/intent should conform to [COMMAND-EVENT-CATALOG.md](COMMAND-EVENT-CATALOG.md).
+
+### P37.9 Typed F# profile
+The first implementation should follow [FSHARP-TYPE-SHAPES.md](FSHARP-TYPE-SHAPES.md), preserving typed IDs, explicit lifecycle unions, semantic manifests, extension envelopes, pure decision/evolution functions, and dependency direction.
+
+### P37.10 Pure evolution
+Projecting authoritative state from an event must be deterministic and must not call network, AI, clock, random, or persistence services.
+
+### P37.11 Pure domain decision
+Transition legality should be testable as a pure function of state, command, policies, actor context, and semantic versions.
+
+### P37.12 Wire extensibility
+Wire event/extension identity must remain versioned/extensible even when a given core assembly uses typed discriminated unions internally.
+
+### P37.13 Event correction
+Incorrect semantic history must be corrected by append/supersession events rather than editing previously committed semantic events.
+
+### P37.14 Proposal acceptance revalidation
+Accepting a proposal must generate/re-run the target authoritative command under current state and policy rather than replay the proposal's earlier legality.
+
+### P37.15 Implementation dependency direction
+Domain must not depend on Web, AI, GitHub/persistence adapters, or provider-specific authentication types.
