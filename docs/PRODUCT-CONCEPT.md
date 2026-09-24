@@ -1,4 +1,4 @@
-# Product Concept: Root-Cause Investigator
+# Product Concept: Root-Cause Investigator Platform
 
 ## Problem
 
@@ -97,8 +97,25 @@ The investigator should distinguish:
 
 A corrective action is not considered successful merely because it was performed. The system must define and then test verification criteria.
 
+## Product direction
+
+The hackathon application is the first constrained release of a reusable investigation platform, not a disposable demo.
+
+The product must preserve a domain-neutral investigation kernel. Competition-specific provenance and timing rules belong to a release profile around the kernel rather than inside it.
+
+Long-term use should support:
+
+- multiple investigations and workspaces
+- pluggable domain specializations
+- multiple persistence providers
+- multiple AI providers
+- collaboration and review
+- cross-investigation search and learning
+- import/export and schema migration
+- service-backed, self-hosted, and static-capable deployment models where appropriate
+
 ## Generic first, EDF second
 
-The hackathon application is domain-neutral. Its kernel should model investigation primitives rather than EDF-specific concepts.
+The core must model investigation primitives rather than EDF-specific concepts.
 
-After the hackathon, EDF becomes the first specialist domain implementation.
+After the hackathon, EDF becomes the first domain pack. EDF-specific concepts such as experiment regressions, unknown effects, assumptions, metrics, and evidence dependencies should extend the generic model through explicit versioned contracts instead of creating an EDF fork.
