@@ -460,3 +460,70 @@ But cross-domain necessity and stability have not been established
 
 Then it remains a versioned EDF extension
 And the generic kernel continues to operate without understanding the construct.
+
+
+## A53. New EDF construct needs no generic aggregate change
+
+Given EDF introduces experimental construct X
+And X can be represented through a versioned extension envelope
+
+When X is added to the EDF pack
+
+Then the generic Investigation aggregate does not require a new core field or union case solely to support X.
+
+## A54. Domain pack cannot create alternate history
+
+Given an EDF pack wants specialized events
+
+Then those events participate in the same authoritative investigation event/history contract
+And the pack must not create a parallel authoritative history that can disagree silently with the core investigation.
+
+## A55. Pack policy adds blocker without duplicating UI logic
+
+Given EDF policy requires evidence E before ConfirmCause
+And E is absent
+
+Then the domain capability projection returns the blocker
+And the UI consumes that blocker
+And the UI does not need a hard-coded EDF-specific transition rule.
+
+## A56. Optional pack removal preserves core investigation
+
+Given an investigation contains optional EDF extensions
+And the EDF pack is unavailable
+
+Then generic core observations, evidence, hypotheses, unknowns, obligations, and conclusions remain inspectable
+And optional EDF extension information is preserved through generic fallback.
+
+## A57. Required pack removal fails safely
+
+Given an investigation's legal interpretation depends on a required EDF extension
+And the EDF pack is unavailable
+
+Then unsafe semantic writes are disabled
+And the system explains which required semantics are missing.
+
+## A58. Reversible persistence choice
+
+Given GitHub is the active persistence provider
+And a future deployment uses a service/database provider
+
+Then InvestigationId, domain semantics, event meaning, and canonical export remain unchanged
+And GitHub-specific paths or SHAs are not required by the generic domain model.
+
+## A59. Deferred question is not silently settled
+
+Given universal causal DAG semantics are classified Deferred
+And a feature needs to display causal relationships
+
+Then the implementation may use a reversible projection or extension
+But must not make a universal DAG representation mandatory persisted core state without an explicit promotion decision.
+
+## A60. Experimental EDF result can be rejected cleanly
+
+Given experimental EDF construct X was used in research investigations
+And later research rejects X
+
+Then new investigations can stop producing X
+And historical X records remain readable and attributable
+And no generic core migration is required solely to remove X from future EDF use.
