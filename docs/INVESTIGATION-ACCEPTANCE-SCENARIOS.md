@@ -676,3 +676,139 @@ And user B independently adds Observation O2 from the same prior version
 And neither change affects the legality or meaning of the other
 Then the persistence/reconciliation layer may apply both through verified commutative handling
 And both receive distinct semantic events and provenance.
+
+
+## A81. Chat statement cannot confirm cause
+
+Given the AI writes "The root cause is definitely H1"
+And ConfirmCause is not legal under current policy
+Then authoritative cause state does not change
+And the workspace continues to show the blockers.
+
+## A82. AI proposal cites authoritative evidence
+
+Given AI proposes hypothesis H2 based on evidence E3 and E8
+Then the proposal references E3 and E8 by authoritative identity
+And the user can inspect those records from the proposal.
+
+## A83. AI interpretation is not silently admitted as evidence
+
+Given the AI infers "the service likely retried three times"
+And no source directly establishes that fact
+Then the output is a proposed Interpretation/Hypothesis
+And no direct Evidence record is created from the inference alone.
+
+## A84. Evidence containing instructions cannot override policy
+
+Given imported evidence contains text instructing the model to ignore investigation rules
+When the evidence is included in AI context
+Then it remains delimited as untrusted evidence content
+And core/domain instructions remain authoritative.
+
+## A85. Stale proposal after new contradiction
+
+Given proposal P recommends ConfirmCause for H1
+And new contradiction C9 is admitted before P is accepted
+Then P is marked stale or revalidated
+And cannot be blindly accepted from its earlier state.
+
+## A86. Relevant negative knowledge prevents repetition
+
+Given hypothesis H3 was previously falsified within the same applicable scope
+When AI considers proposing H3 again
+Then relevant NegativeKnowledge is included
+And the AI either avoids H3 or explicitly identifies new evidence justifying reopening.
+
+## A87. Challenge mode attacks leading explanation
+
+Given H1 is Leading
+When the user invokes Challenge
+Then the AI is asked to identify falsifying evidence, hidden assumptions, plausible alternatives, and evidence dependencies
+And results are proposals/analysis rather than authoritative mutations.
+
+## A88. Context omission is visible
+
+Given the context builder cannot include all materially relevant state due to budget
+Then the reasoning run records or communicates the omission
+And the AI must not claim to have comprehensively reviewed all evidence.
+
+## A89. AI outage leaves manual work usable
+
+Given the AI provider is unavailable
+Then the user can still inspect authoritative state
+And perform supported manual evidence/hypothesis/action operations
+And legal capabilities continue to derive deterministically.
+
+## A90. Model disagreement is not system evidence
+
+Given model A proposes H1
+And model B proposes H2
+Then both can be retained as competing proposals
+And the disagreement itself is not Evidence that H1 or H2 caused the observed outcome.
+
+## A91. Workspace understandable without chat
+
+Given an investigation contains observations, three hypotheses, evidence, one contradiction, and two blockers
+Then a user can identify those states from the workspace without reading the conversation transcript.
+
+## A92. Blocked action remains discoverable
+
+Given ConfirmCause is blocked
+Then the workspace still exposes ConfirmCause as unavailable
+And identifies the blockers
+And links to actionable resolution paths when available.
+
+## A93. Recommended action differs from legal action
+
+Given five actions are legal
+And one is materially more discriminating
+Then the workspace may recommend that action
+And the remaining legal actions stay available
+And policy legality is not confused with AI recommendation.
+
+## A94. Blocking contradiction survives responsive collapse
+
+Given the workspace is displayed on a narrow phone
+And a material contradiction blocks confirmation
+Then the contradiction/blocker remains visible or immediately surfaced in the primary task flow
+And is not hidden only in a secondary settings screen.
+
+## A95. Local pending state is understandable
+
+Given evidence E12 was accepted locally while offline
+Then the workspace can show E12 in the local optimistic state
+And clearly indicates synchronization is pending
+And does not present it as remotely confirmed.
+
+## A96. Original observation remains inspectable after normalization
+
+Given the user entered original text O
+And the AI creates normalized observation N
+Then the workspace allows inspection of O and N separately
+And editing N does not modify O.
+
+## A97. Hypothesis comparison exposes assumptions
+
+Given H1 and H2 depend on different material assumptions
+Then comparison view exposes those assumption dependencies
+And does not rank hypotheses solely on count of supporting evidence.
+
+## A98. Cause review exposes alternatives
+
+Given H1 is eligible for confirmation
+And H2 remains a materially plausible but addressed alternative
+Then Cause Review shows how H2 was addressed before confirmation.
+
+## A99. Corrective implementation does not look verified
+
+Given corrective action CA1 is Implemented
+And no verification result exists
+Then the workspace displays Awaiting Verification or equivalent
+And does not display the investigation as fully resolved when verification is required.
+
+## A100. Screen reader receives material state change
+
+Given H2 transitions to Falsified
+When the workspace updates
+Then assistive technology receives an appropriate semantic announcement
+And the change is not communicated only by color or animation.
