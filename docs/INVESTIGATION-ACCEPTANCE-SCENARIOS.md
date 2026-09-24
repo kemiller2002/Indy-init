@@ -812,3 +812,108 @@ Given H2 transitions to Falsified
 When the workspace updates
 Then assistive technology receives an appropriate semantic announcement
 And the change is not communicated only by color or animation.
+
+
+## A101. Evidence cannot become instructions
+
+Given external evidence contains prompt-like instructions
+When AI analyzes that evidence
+Then those instructions are treated as untrusted content
+And they cannot override core/domain instructions or tool permissions.
+
+## A102. Authorized user can still be semantically blocked
+
+Given user U has write permission
+And ConfirmCause violates an unresolved core/domain blocker
+Then U cannot confirm the cause
+And the UI explains the semantic blocker rather than treating authorization as sufficient.
+
+## A103. Semantically legal user can still be unauthorized
+
+Given AddEvidence is legal in the current investigation state
+And user U lacks the required workspace permission
+Then the command is rejected for authorization
+And domain legality remains distinguishable from the authorization failure.
+
+## A104. Credential never enters investigation state
+
+Given the application has a GitHub or AI credential
+When investigation state is saved, exported, reported, or sent for AI reasoning
+Then the credential is absent unless a specific secure transport mechanism explicitly requires it outside semantic state.
+
+## A105. Malicious rich text is inert
+
+Given imported or AI-generated content contains script/event-handler/unsafe HTML
+When rendered in the application
+Then executable content is sanitized or rejected
+And the content cannot execute with application privileges.
+
+## A106. Restricted data can block AI disclosure
+
+Given an investigation is classified Restricted
+And current deployment policy forbids sending Restricted content to the configured AI provider
+Then AI invocation requiring that content is unavailable or degraded with explanation
+And the data is not transmitted.
+
+## A107. Export permission is distinct
+
+Given user U may read an investigation
+And deployment policy requires separate export privilege
+Then U can inspect the investigation
+But complete export is unavailable with an authorization explanation.
+
+## A108. Pack cannot access undeclared capability
+
+Given domain pack D declares no external-network capability
+When D attempts external network access through the host
+Then the host denies the operation
+And surfaces a structured extension/security fault.
+
+## A109. External artifact digest protects original meaning
+
+Given artifact A was admitted with digest H1
+And the source later serves different bytes H2
+Then the mismatch is visible
+And H2 is not silently substituted as the original evidentiary artifact.
+
+## A110. Session expiry preserves unsynced work
+
+Given the user has unsynced local commands
+And authentication expires
+Then local work remains recoverable
+And remote synchronization pauses until reauthentication/authorization succeeds.
+
+## A111. Revoked access stops remote writes
+
+Given user access to the persistence workspace is revoked
+When pending commands attempt to sync
+Then remote writes stop
+And the application surfaces authorization state
+And it does not retry indefinitely as though the provider were merely offline.
+
+## A112. Security fault does not leak secrets
+
+Given an authentication or provider failure occurs
+When an Aegis fault is shown to a normal user
+Then the explanation is actionable
+And tokens, secrets, unrelated data, and internal stack traces are not exposed.
+
+## A113. Report respects redaction/classification
+
+Given evidence E is redacted from a report audience
+When Folio generates the report
+Then the restricted content is not embedded
+And the report can indicate that redaction occurred according to policy.
+
+## A114. Direct repository tampering is detected
+
+Given a GitHub-backed investigation file is manually modified into an invalid event sequence
+When the application loads it
+Then integrity validation fails safely
+And AI is not asked to reconstruct a plausible history silently.
+
+## A115. Domain pack cannot bypass persistence
+
+Given a domain pack attempts to write directly to provider files
+Then authoritative mutation is denied unless performed through the host persistence/command contract
+And pack code cannot create an alternate hidden source of truth.
