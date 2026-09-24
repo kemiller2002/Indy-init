@@ -527,3 +527,152 @@ And later research rejects X
 Then new investigations can stop producing X
 And historical X records remain readable and attributable
 And no generic core migration is required solely to remove X from future EDF use.
+
+
+## A61. UI consumes domain blocker
+
+Given ConfirmCause is blocked by contradiction C7
+When the workspace renders the ConfirmCause capability
+Then the blocker originates from the policy/transition engine
+And the UI shows the reason
+And no duplicate UI-specific EDF legality rule is required.
+
+## A62. Actor permission differs from semantic legality
+
+Given AddEvidence is semantically legal
+And actor A lacks permission
+Then the capability explains the permission blocker.
+
+Given actor B has permission
+And the investigation is in a state where AddEvidence is semantically illegal under policy
+Then the capability explains the domain blocker.
+
+## A63. Policy exception is auditable
+
+Given policy allows an authorized user to accept a non-blocking residual unknown
+When the user exercises the exception
+Then actor, reason, authority, scope, policy version, and residual uncertainty are recorded
+And the core Unknown semantics are not changed.
+
+## A64. Retry does not duplicate events
+
+Given command C with idempotency key K was remotely applied
+And network loss prevents the client from seeing the acknowledgement
+When C with K is retried
+Then the prior result is returned or recognized
+And no duplicate semantic event is appended.
+
+## A65. Stale offline command is revalidated
+
+Given command C was queued offline against aggregate version 20
+And remote state changes to version 24
+When the client reconnects
+Then C is not blindly replayed
+And it is re-evaluated against version 24 and current policy
+And any changed blockers are shown.
+
+## A66. Policy comparison does not mutate investigation
+
+Given immutable investigation snapshot V30
+When EDF policy P1 and P2 are both evaluated against V30
+Then two derived policy-evaluation results are produced
+And V30 authoritative state is unchanged.
+
+## A67. Policy pin supports reproducibility
+
+Given research investigation I pins EDF policy P1
+And EDF P2 later becomes default
+Then reloading I uses or explicitly identifies P1 for its historical/continued research behavior
+And P2 does not silently replace the pinned version.
+
+## A68. Multi-event transition is atomic remotely
+
+Given one allowed command emits events E1, E2, and E3
+And the provider cannot persist the complete event set
+Then the transition is not represented as remotely committed
+And partial provider writes are recovered or treated as failure according to the provider contract.
+
+## A69. GitHub SHA remains provider metadata
+
+Given a GitHub-backed investigation moves to another provider
+Then its InvestigationId and semantic AggregateVersion remain meaningful
+And no core entity requires the former GitHub SHA to retain identity.
+
+## A70. Offline restart preserves pending work
+
+Given the user records evidence offline
+And the application is closed before synchronization
+When the application restarts
+Then the last remote-confirmed state is identifiable
+And the pending evidence command is recoverable
+And the UI shows that it has not yet been remotely confirmed.
+
+## A71. External artifact changed
+
+Given evidence E references artifact A with digest H1
+And later retrieval of A produces digest H2
+Then the product marks the artifact as changed or integrity-mismatched
+And does not silently treat H2 content as the originally evaluated artifact.
+
+## A72. External artifact unavailable
+
+Given evidence E references external artifact A
+And A can no longer be retrieved
+Then E remains in investigation history
+And artifact availability is shown as unavailable
+And the system does not delete E solely because A is unavailable.
+
+## A73. Complete export/import round trip
+
+Given investigation I has core events, EDF extensions, unresolved unknowns, historical conclusions, and report references
+When a complete canonical export is imported into a compatible empty deployment
+Then entity IDs, semantic/policy versions, extension envelopes, authoritative event order, provenance, and uncertainty are preserved.
+
+## A74. Import collision cannot overwrite silently
+
+Given target deployment already contains InvestigationId I
+When a package with InvestigationId I is imported
+Then the system requires an explicit duplicate/same-history/copy/reconciliation choice
+And does not silently overwrite the existing investigation.
+
+## A75. Cross-provider migration preserves meaning
+
+Given investigation I is exported from GitHub provider G
+And imported into service provider S
+Then InvestigationId, AggregateVersion, semantic event meanings, domain-pack references, and historical conclusions remain unchanged
+And only provider metadata changes.
+
+## A76. Research experiment pins immutable source
+
+Given experiment X consumes investigation version 44
+And the investigation later advances to version 51
+Then X remains attributable to version 44
+And rerunning X as a reproduction can resolve the same source state.
+
+## A77. Snapshot mismatch is detected
+
+Given snapshot S declares aggregate version 40
+And authoritative event history establishes a different state at version 40
+Then S is rejected or marked invalid
+And the mismatch is not silently accepted.
+
+## A78. Duplicate event ID is corruption
+
+Given persisted history contains two non-identical events with the same EventId
+Then load/integrity validation fails safely
+And the system surfaces an Aegis-compatible persistence integrity fault.
+
+## A79. Semantic conflict is not JSON merge
+
+Given user A falsifies H1
+And user B, from stale state, attempts a transition that requires H1 to remain active
+Then conflict resolution re-evaluates B's intended command against the current domain state
+And does not resolve the conflict by mechanically merging object fields.
+
+## A80. Independent additions may commute
+
+Given user A adds Evidence E1
+And user B independently adds Observation O2 from the same prior version
+And neither change affects the legality or meaning of the other
+Then the persistence/reconciliation layer may apply both through verified commutative handling
+And both receive distinct semantic events and provenance.
