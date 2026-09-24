@@ -303,6 +303,49 @@ Completion evidence:
 - explains recommendation
 - respects cost/risk override
 
+## Slice 7A: Proof-carrying proposals and planner
+
+Goal: make AI output inspectable enough to challenge and revalidate.
+
+Implement:
+
+- proposal evidence refs
+- assumptions/scope
+- falsifier
+- expected state impact
+- dependency-aware staleness
+- proposal diff
+- constrained next-action planner
+- Pareto alternatives
+- budget/risk constraints
+- mitigation-versus-learning parallel plan
+
+Completion evidence:
+
+- stale only on material dependency change
+- illegal action never recommended as executable
+- recommendation tradeoffs explainable
+- proposal acceptance still revalidates
+
+## Slice 7B: Cross-investigation intelligence
+
+Goal: reuse prior learning without contaminating current evidence.
+
+Implement:
+
+- similar-case retrieval
+- opposite-cause retrieval
+- reusable action templates
+- scoped negative-knowledge suggestions
+- recurrence projections
+- permission/classification boundaries
+
+Completion evidence:
+
+- prior cause enters only as hypothesis suggestion
+- unauthorized cases never enter AI/retrieval context
+- similarity shows counterexamples when available
+
 ## Slice 8: Conclusion and corrective loop
 
 Goal: demonstrate that investigation does not stop at a plausible cause.
@@ -582,6 +625,29 @@ Example experiments:
 - UnknownEffect semantics
 - control-point ranking variants
 - calibration models
+
+## Slice 13A: Research harness
+
+Goal: turn the investigator into a methodology/model laboratory.
+
+Implement:
+
+- ResearchExperiment identity
+- frozen cases
+- treatment definitions
+- model/prompt/policy/domain/planner variants
+- blinded evaluation option
+- outcome metrics
+- reproducibility metadata
+- regression comparison
+- Folio experiment report
+
+Completion evidence:
+
+- treatments use identical frozen cases where required
+- evaluator blinding works when enabled
+- no arbitrary winner without defined metric
+- EDF version comparisons remain non-destructive
 
 ## Slice 14: Long-term product growth
 
