@@ -70,3 +70,27 @@ EDF helped motivate the investigation model.
 The resulting investigator then becomes an instrument for challenging EDF.
 
 The goal is not to prove EDF correct. The goal is to create stronger mechanisms for finding where EDF is wrong, incomplete, or insufficiently evidenced.
+
+
+## Semantic integration
+
+EDF must consume the canonical investigation semantics rather than define a parallel investigation model.
+
+The EDF domain pack should map:
+
+- experiment observations and metric changes to Observation/Finding/Evidence
+- regression explanations to Hypothesis
+- model premises to Assumption
+- unknown effects to Unknown
+- disproven explanations to NegativeKnowledge
+- evidence dependency and cycle information to Evidence dependency relationships
+- proposed experiments to InvestigationAction
+- expected outcomes to Prediction
+- accepted causal explanations to Cause/Conclusion
+- follow-up checks to InvestigationAction or Verification according to intent
+
+EDF policy may strengthen confirmation requirements, for example by requiring reproduced experimental effects, explicit evidence closure, scoped context coverage, or reconciled unknown effects.
+
+It must not weaken the core guarantees around provenance, evidence/inference separation, unresolved contradictions, proposal authority, negative knowledge, or historical integrity.
+
+The intended result is one investigation engine with EDF as a versioned specialization, not an EDF-specific fork.
