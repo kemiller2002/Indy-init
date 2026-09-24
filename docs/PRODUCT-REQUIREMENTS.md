@@ -608,3 +608,57 @@ Neither a human-authored narrative nor an AI-generated narrative may override co
 
 ### P28.8 Domain-pack compatibility
 Domain packs may strengthen domain semantics and policies but may not violate core evidence/inference separation, provenance, unknown semantics, proposal/authority separation, or historical integrity.
+
+
+## P29. Research and semantic evolution
+
+### P29.1 Stable core boundary
+Only cross-domain epistemic invariants should be promoted into the generic kernel. Domain methodology and research constructs must remain in versioned extensions until evidence justifies stronger stability.
+
+### P29.2 Stability classification
+Semantic constructs must support explicit stability classification such as CoreStable, DomainStable, Experimental, Deprecated, and Retired.
+
+### P29.3 Promotion discipline
+New semantic constructs must follow an explicit research-to-core promotion process. The default is to keep uncertain constructs outside the core.
+
+### P29.4 Versioned semantic identity
+Evolving domain constructs must have qualified, versioned semantic identities independent of display labels.
+
+### P29.5 Strong typing without closed-world lock-in
+The F# model must use closed discriminated unions for genuinely stable core semantics and versioned typed extension references/envelopes for evolving domain semantics.
+
+### P29.6 Unknown extension preservation
+A client that encounters an optional extension it does not understand must preserve it without semantic loss and must not silently drop it during unrelated edits.
+
+### P29.7 Required extension protection
+If safe editing requires semantics the client does not understand, the client must enter degraded or read-only mode rather than risk corruption.
+
+### P29.8 Schema-policy separation
+Schema versions, domain-pack versions, semantic-extension versions, and policy versions must be independently identifiable when their meanings can evolve independently.
+
+### P29.9 Historical policy preservation
+A later policy change must not retroactively change why an earlier transition was legal. Re-evaluation must be represented as a new reassessment.
+
+### P29.10 Non-destructive migration
+Meaning-changing migrations must preserve original historical meaning. Compatibility projection, upcasting, additive migration, or side-by-side semantics should be preferred over destructive rewrites.
+
+### P29.11 Experimental isolation
+Experimental semantics must be namespaced, versioned, explicitly activated, visible as experimental when material, and removable from new work without making old investigations unreadable.
+
+### P29.12 Rollback plan
+Every experimental semantic extension must define rollback and historical-data behavior before it is used in authoritative investigations.
+
+### P29.13 Core invariant firewall
+No extension, domain pack, policy, or experimental profile may bypass the generic core invariants.
+
+### P29.14 Generic fallback
+Domain-specific information must have a safe generic fallback projection so critical information does not disappear when specialized UI or code is unavailable.
+
+### P29.15 Runtime AI composition
+AI guidance must be composed from the active core, domain-pack, policy, and explicitly enabled experimental versions rather than assuming all historical domain concepts are current.
+
+### P29.16 EDF research posture
+EDF-specific concepts that remain under active research must remain versioned EDF semantics rather than generic-kernel constructs unless and until promotion criteria are satisfied.
+
+### P29.17 Architecture fitness
+The evolution-safety scenarios and fitness tests in [SEMANTIC-EVOLUTION.md](SEMANTIC-EVOLUTION.md) must be treated as architecture requirements.
