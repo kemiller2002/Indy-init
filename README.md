@@ -64,3 +64,4 @@ See [Hackathon Boundaries](docs/HACKATHON-BOUNDARIES.md).
 - [Experiment Plan](docs/EXPERIMENT-PLAN.md)
 - [Demo Plan](docs/DEMO-PLAN.md)
 - [EDF Follow-on](docs/EDF-FOLLOW-ON.md)
+- [UI Contract Exploration](docs/UI-CONTRACT-EXPLORATION.md)
