@@ -917,3 +917,149 @@ And AI is not asked to reconstruct a plausible history silently.
 Given a domain pack attempts to write directly to provider files
 Then authoritative mutation is denied unless performed through the host persistence/command contract
 And pack code cannot create an alternate hidden source of truth.
+
+
+## A116. Leading posture is derived
+
+Given H1 and H2 are both Supported
+And current evidence causes the comparison projection to prefer H1
+Then H1 may be shown as Leading
+And no HypothesisLeading authoritative event is required.
+
+When later evidence makes H2 preferable
+Then the derived Leading posture may change
+And historical hypothesis lifecycle events remain unchanged.
+
+## A117. Cause confirmation does not confirm a hypothesis state
+
+Given supported hypotheses H1 and H2 jointly form causal assertion C1
+When C1 satisfies the cause-confirmation gate
+Then CauseConfirmed is recorded for C1
+And H1/H2 remain their historical hypothesis states
+And the system does not require a one-to-one HypothesisConfirmed transition.
+
+## A118. Causal set confirmation
+
+Given causal assertion C1 contains members A and B
+And neither A nor B alone is sufficient
+When C1 satisfies policy
+Then C1 can become Confirmed as a causal set
+And the model does not force A or B to become the single root cause.
+
+## A119. Reopen confirmed cause preserves confirmation
+
+Given causal assertion C1 was Confirmed
+And new material contradictory evidence arrives
+When ReopenConfirmedCause is accepted
+Then C1 becomes Reopened/currently under investigation
+And the prior CauseConfirmed event remains in history.
+
+## A120. Generic state setter is unavailable
+
+Given a caller attempts to set HypothesisState or InvestigationLifecycle directly
+Then no generic authoritative command exists for that mutation
+And the caller must use a semantic command whose prerequisites are evaluated.
+
+## A121. Proposal acceptance revalidates
+
+Given proposal P was legal when generated at version 12
+And investigation state advances to version 16
+When the user accepts P
+Then the target command is evaluated against version 16/current policy
+And ProposalAccepted is emitted only if that target command succeeds.
+
+## A122. Conclusion cannot upgrade causal authority
+
+Given no confirmed causal assertion exists
+When a caller records a narrative conclusion saying "Confirmed Cause"
+Then the conclusion command is blocked or restricted to a legally supported strength
+And narrative text cannot create causal authority.
+
+## A123. Event correction is append-only
+
+Given EvidenceAdmitted event E1 contains metadata later found incorrect
+When the correction is accepted
+Then a corrective/superseding event is appended
+And E1 is not edited in place.
+
+## A124. Observation original content is immutable
+
+Given observation O1 preserves the user's original statement
+When normalization or correction is needed
+Then a normalization/supersession event is appended
+And O1's original source text remains unchanged.
+
+## A125. Pure event evolution is deterministic
+
+Given identical prior state S and event envelope E
+When evolve is executed repeatedly
+Then it produces the same resulting projection
+And the result does not depend on clock, network, AI, or random state.
+
+## A126. Pure command decision is deterministic
+
+Given identical state, command, semantic manifest, policy set, and actor context
+When decide is executed repeatedly
+Then the semantic decision and blocker set are equivalent.
+
+## A127. Structurally impossible transition cannot be enabled by policy
+
+Given H1 is Falsified
+And a policy attempts to allow MarkHypothesisSupported directly without reopening
+Then the structural transition remains illegal
+And policy cannot override the core lifecycle table.
+
+## A128. Policy can block structurally legal transition
+
+Given H1 is Plausible
+And MarkHypothesisSupported is structurally possible
+But required evidence is missing under active policy
+Then the command is Blocked
+And the blocker identifies the evidence requirement.
+
+## A129. Historical event carries policy attribution
+
+Given command C is allowed under policy P3
+When its semantic event is committed
+Then the event envelope identifies P3 or immutable equivalent references sufficient to explain historical legality later.
+
+## A130. Extension command does not expand core command union
+
+Given EDF introduces domain command X
+And X is representable through the versioned extension command boundary
+Then X can be processed by the EDF pack
+And no new generic CoreCommand case is required solely for X.
+
+## A131. Provider type cannot enter domain identity
+
+Given GitHub persistence assigns SHA S to a commit
+Then S may exist in persistence/application state
+But core InvestigationId, EventId, HypothesisId, and AggregateVersion remain provider-independent.
+
+## A132. Reopened investigation returns active while history remains
+
+Given investigation I is Resolved
+When ReopenInvestigation succeeds
+Then current lifecycle becomes Active
+And the earlier InvestigationResolved event remains authoritative history
+And Reopened need not be a permanent lifecycle enum case.
+
+## A133. Corrective verification has no shortcut setter
+
+Given CA1 is Implemented
+When a caller attempts to mark the investigation Resolved without verification required by policy
+Then ResolveInvestigation is blocked
+And no SetVerified or SetResolved bypass exists outside semantic commands.
+
+## A134. Unknown extension event is preserved
+
+Given event history contains an optional extension event unknown to the generic client
+When the client loads and later saves unrelated compatible state
+Then the extension event/envelope is preserved
+And no core event case is invented by guessing its meaning.
+
+## A135. Domain assembly has no infrastructure dependency
+
+Given the generic domain project is built
+Then it can be compiled/tested without GitHub, browser, AI-provider, network, or persistence adapter assemblies
+And infrastructure depends inward toward Domain rather than the reverse.
