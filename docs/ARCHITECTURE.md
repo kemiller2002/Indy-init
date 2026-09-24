@@ -306,3 +306,14 @@ The architecture should support replacing or combining AI providers without chan
 The working experience follows [INVESTIGATION-WORKSPACE.md](INVESTIGATION-WORKSPACE.md).
 
 Chat is an input and explanation surface. Structured semantic state, capabilities, blockers, and proposal controls are the authoritative interaction surface for consequential work.
+
+
+## Security boundary
+
+Security and privacy behavior follow [SECURITY-THREAT-MODEL.md](SECURITY-THREAT-MODEL.md).
+
+External evidence is untrusted data. AI providers, persistence providers, local browser storage, and domain packs are explicit trust boundaries.
+
+Authorization and semantic legality remain separate. A caller must satisfy both.
+
+The initial hackathon deployment may use documented temporary shortcuts, but those shortcuts must not leak into the generic domain or persistence contracts.
