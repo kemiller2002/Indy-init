@@ -274,7 +274,6 @@ type HypothesisState =
     | Supported
     | Weakened
     | Falsified
-    | Confirmed
     | Superseded
 ```
 
@@ -646,19 +645,25 @@ type CausalMember = {
     Role : CauseRole
 }
 
+type CausalAssertionState =
+    | Proposed
+    | Confirmed
+    | Reopened
+    | Superseded
+
 type CausalAssertion = {
     Id : CausalAssertionId
     Outcome : EntityRef
     Members : CausalMember list
     Mechanism : NonEmptyText option
     Scope : Scope
-    Confirmed : bool
+    State : CausalAssertionState
     Provenance : Provenance
     Extensions : ExtensionEnvelope list
 }
 ```
 
-The bool may later become a richer state if research demonstrates need. Confirmation history remains in events regardless.
+Causal confirmation belongs to CausalAssertion rather than HypothesisState. This supports causal sets and avoids assuming one hypothesis maps one-to-one to one confirmed cause.
 
 ## 26. Corrective action and verification
 
