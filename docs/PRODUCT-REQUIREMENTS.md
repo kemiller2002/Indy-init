@@ -1011,3 +1011,6 @@ Accepting a proposal must generate/re-run the target authoritative command under
 
 ### P37.15 Implementation dependency direction
 Domain must not depend on Web, AI, GitHub/persistence adapters, or provider-specific authentication types.
+
+### P37.16 Domain test matrix
+Core command/event/state implementation must be verified against [DOMAIN-TEST-MATRIX.md](DOMAIN-TEST-MATRIX.md), subject to organizer rules about when executable competition tests may be created.
