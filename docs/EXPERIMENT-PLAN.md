@@ -129,3 +129,87 @@ Where practical:
 ### Competition value
 
 Even one small controlled comparison can strengthen the competition entry by showing that the architecture is being used to measure whether its own advanced AI techniques actually help.
+
+
+## Pre-competition factory determinism experiment
+
+### Question
+
+Can two capable implementation agents independently build the same sacrificial application from the same empty-repository factory contract without architecture coaching?
+
+### Treatments
+
+- OpenAI/Codex lane
+- Claude lane
+
+Both lanes use:
+
+- the same Conditor commit;
+- the same `evidence-triage-rehearsal` preset;
+- the same pinned kickoff contract;
+- separate empty target repositories;
+- the same Echelon components;
+- the same completion-evidence schema;
+- the same independent scorer.
+
+The lanes must not inspect each other's repository/output before evaluation.
+
+### Primary outcome
+
+**Human intervention count in foundational dimensions.**
+
+A foundational intervention includes having to explain something the initialized repository should already communicate, such as:
+
+- architecture direction;
+- where requirements live;
+- legal state ownership;
+- persistence boundaries;
+- AI authority;
+- screen meaning;
+- test/completion evidence expectations.
+
+Target: zero.
+
+### Secondary outcomes
+
+Record:
+
+- pass/fail;
+- clarification questions;
+- architecture violations;
+- contract-discovery failures;
+- first clean build time;
+- first usable UI time;
+- test failures/rework;
+- repeated file/hunk churn;
+- Aegis faults;
+- ROS corrections;
+- independent score failures;
+- elapsed time;
+- token/API cost where available.
+
+### Interpretation
+
+Do not infer a general model ranking from one pair run.
+
+The principal interpretation is:
+
+> Which failures reveal missing determinism in the factory or canonical contract?
+
+Agent-specific failures may be recorded separately, but any failure a reasonable capable agent could encounter should be converted into a reusable Echelon requirement/fix.
+
+### Repeat
+
+After generic factory defects are fixed, destroy both target repositories and rerun from empty.
+
+The second pair should require less intervention and less architectural rework.
+
+### Tooling
+
+The Conditor repository provides:
+
+```bash
+bash scripts/rehearse-agent-pair.sh
+```
+
+which preserves both target repositories, logs, exit codes, independent score artifacts, and `comparison.json`.
