@@ -1454,3 +1454,48 @@ Local processing should follow [LOCAL-WASM-ANALYTICS.md](LOCAL-WASM-ANALYTICS.md
 
 ### P44.15 Ingestion contract
 Evidence capture/transformation should follow [EVIDENCE-INGESTION-PIPELINE.md](EVIDENCE-INGESTION-PIPELINE.md).
+
+
+## P45. Factory consumption and kickoff determinism
+
+### P45.1 Canonical kickoff manifest
+The competition implementation must have one machine-readable kickoff manifest that identifies required components, normative documents, priority slices, screen contracts, stop-the-line conditions, success gates, and the agent execution protocol.
+
+### P45.2 Single agent entry
+A freshly initialized implementation repository must give an implementation agent one obvious canonical entry point rather than requiring the agent to discover the planning corpus ad hoc.
+
+### P45.3 Immutable planning baseline
+At competition kickoff, the planning repository baseline consumed by the factory must be pinned to an exact commit and recorded in build provenance.
+
+### P45.4 Verified UI contract package
+Percepta application/screen contracts promoted into the competition preset must be pinned to a revision that passed Percepta contract compilation/verification.
+
+### P45.5 Conditor contract materialization
+Conditor must materialize the canonical kickoff contract and referenced requirement/UI contract artifacts into the blank implementation repository without copying application implementation code.
+
+### P45.6 Missing contract is a hard failure
+The factory must not generate an agent handoff that points to a canonical execution contract that does not exist or will not be materialized by the same initialization plan.
+
+### P45.7 Shared AGENTS surface
+When Conditor writes agent guidance into a repository-level AGENTS.md shared with users or other tooling, it must own only a bounded managed region and preserve content outside that region.
+
+### P45.8 Fresh-agent rehearsal
+Before competition day, the factory must be rehearsed against a non-competition sacrificial application from an empty repository with no oral/private architecture briefing to the implementation agent.
+
+### P45.9 Independent rehearsal scoring
+A fresh-agent rehearsal does not pass solely because the provider exits successfully or marks a work item complete. Independent scoring must verify build, tests, architecture boundaries, evidence paths, and ROS completion.
+
+### P45.10 Rehearsal failure ownership
+Generic rehearsal failures must be classified back to the reusable owner such as Conditor, Ordo, ROS, Percepta, Forma, Limen, Aegis, Praxis, Folio, architecture, or external tooling rather than patched only in the sacrificial application.
+
+### P45.11 No competition implementation before kickoff
+Factory rehearsal artifacts may exercise generic/scaffold behavior and a sacrificial application, but must not contain the competition application's implementation source before the allowed coding window.
+
+### P45.12 Rehearsal evidence
+Each rehearsal should preserve factory version/commit, manifest digest, component versions, agent/provider identity, elapsed time, interventions, test/build results, and the independent score.
+
+### P45.13 Fresh-agent acceptance target
+Competition readiness requires a capable fresh agent to discover product intent, architecture boundaries, work sequencing, UI semantics, persistence boundaries, AI authority, test strategy, and completion evidence from the initialized repository itself.
+
+### P45.14 Factory contracts
+The canonical factory-consumption artifacts are [kickoff/indy-init.kickoff.json](../kickoff/indy-init.kickoff.json), [KICKOFF-EXECUTION-PACKET.md](KICKOFF-EXECUTION-PACKET.md), [FACTORY-REHEARSAL.md](FACTORY-REHEARSAL.md), and [FRESH-AGENT-FACTORY-ACCEPTANCE.md](FRESH-AGENT-FACTORY-ACCEPTANCE.md).
