@@ -747,3 +747,31 @@ If time is constrained, the minimum product worth keeping is:
 - portable report
 
 Everything else can grow around that.
+
+
+## Pre-kickoff factory rehearsal
+
+This work happens before the competition implementation begins and uses a sacrificial non-competition application.
+
+Required sequence:
+
+1. Pin the planning baseline.
+2. Materialize a canonical execution contract through Conditor.
+3. Validate Percepta contracts independently.
+4. Bootstrap an empty repository.
+5. Verify no competition application source is present.
+6. Launch a fresh implementation agent with no oral/private briefing.
+7. Require the agent to complete the live ROS mission.
+8. Require machine-readable completion evidence.
+9. Independently score build, tests, architecture boundaries, UI evidence, report evidence, and ROS state.
+10. Classify generic failures back to the owning Echelon capability.
+11. Repeat from an empty repository after fixes.
+
+Competition-ready exit:
+
+- no manual file copying;
+- no missing canonical contract;
+- no foundational architecture clarification required;
+- all required machine-readable contracts discoverable;
+- independent score passes;
+- the second clean-room run demonstrates lower intervention/churn than the first.
