@@ -179,3 +179,27 @@ Do not declare the factory ready merely because Conditor installs successfully.
 Ready means:
 
 > A fresh agent can correctly discover what to build, where to put it, which decisions are already made, how UI meaning is constrained, how completion is proven, and what it is forbidden to improvise.
+
+
+## 10. Paired blind rehearsal
+
+After the deterministic bootstrap smoke passes, run the sacrificial application independently with OpenAI/Codex and Claude.
+
+Requirements:
+
+- separate empty repositories;
+- identical pinned factory/preset;
+- no sibling-lane visibility;
+- no oral/private architecture briefing;
+- same independent scoring;
+- retain failures for analysis.
+
+The paired harness lives in Conditor:
+
+```bash
+bash scripts/rehearse-agent-pair.sh
+```
+
+A pair run is successful only if each lane independently satisfies fresh-agent acceptance. The comparison artifact is research evidence, not permission to average away a failure in one lane.
+
+The most important output is the set of factory changes required to make both lanes more deterministic on the next clean-room run.
