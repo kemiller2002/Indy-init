@@ -73,3 +73,22 @@ Every human intervention produces:
 5. regression test/rehearsal check.
 
 The objective is not to train one agent to know the project. The objective is to make the repository teach any capable agent what it needs to know.
+
+
+## Paired-lane use
+
+Fresh-agent acceptance is intended to be applied identically to independent agent lanes.
+
+For the OpenAI/Codex and Claude rehearsal:
+
+- do not relax criteria for one provider;
+- do not let the second lane inspect the first;
+- do not count a provider process exit as completion;
+- do not count a self-authored evidence file as sufficient unless referenced paths exist and independent checks pass;
+- classify foundational intervention as a factory failure signal even if the final repository eventually passes.
+
+The competition-readiness target is not merely "both agents can eventually build it."
+
+It is:
+
+> Both agents can discover the intended product and engineering constraints from the repository itself, without foundational human translation.
