@@ -1,0 +1,33 @@
+name: Competition contract conformance
+
+on:
+  pull_request:
+  push:
+    branches:
+      - implementation/competition-profile
+
+permissions:
+  contents: read
+
+jobs:
+  competition-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Validate competition profile
+        run: dotnet fsi competition/validate-competition-profile.fsx
+
+      - name: Generate contract bundle lock
+        run: dotnet fsi competition/generate-contract-lock.fsx competition/indy-init-contracts.source.json competition/indy-init-contracts.lock.json
+
+      - name: Upload generated lock
+        uses: actions/upload-artifact@v4
+        with:
+          name: indy-init-contract-lock
+          path: competition/indy-init-contracts.lock.json
+          if-no-files-found: error
