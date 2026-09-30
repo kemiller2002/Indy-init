@@ -23,9 +23,12 @@ jobs:
         run: dotnet fsi competition/validate-competition-profile.fsx
 
       - name: Generate contract bundle lock
-        run: dotnet fsi competition/generate-contract-lock.fsx competition/indy-init-contracts.source.json competition/indy-init-contracts.lock.json
+        run: dotnet fsi competition/generate-contract-lock.fsx competition/indy-init-contracts.source.json competition/indy-init-contracts.generated.json
 
-      - name: Upload generated lock
+      - name: Verify committed lock is current
+        run: cmp competition/indy-init-contracts.lock.json competition/indy-init-contracts.generated.json
+
+      - name: Upload verified lock
         uses: actions/upload-artifact@v4
         with:
           name: indy-init-contract-lock
