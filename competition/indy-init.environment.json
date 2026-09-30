@@ -1,0 +1,164 @@
+{
+  "schema": "indy-init.environment-profile/v1",
+  "id": "indy-init",
+  "version": "0.1.0",
+  "status": "pre-freeze",
+  "primaryPlatform": "osx-arm64",
+  "supportedPlatforms": [
+    "osx-arm64",
+    "linux-x64"
+  ],
+  "registryBaseProfile": {
+    "id": "echelon-engineering",
+    "version": "0.1.0"
+  },
+  "cleanHost": {
+    "managedByConditor": [
+      "echelon host tools selected by the resolved release set",
+      "repository lifecycle capabilities selected by the event profile",
+      "project bindings selected by the event profile"
+    ],
+    "external": [
+      {
+        "id": "git",
+        "required": true,
+        "minimumVersion": "2.40.0",
+        "reason": "source-control boundary; current Conditor workstation policy adopts rather than installs Git"
+      },
+      {
+        "id": "shell",
+        "required": true,
+        "minimumVersion": null,
+        "reason": "POSIX shell on macOS/Linux for bootstrap entry point"
+      },
+      {
+        "id": "provider-cli",
+        "required": true,
+        "minimumVersion": null,
+        "reason": "one approved AI provider execution boundary must be installed and authenticated; provider credentials remain external to Conditor"
+      },
+      {
+        "id": "browser",
+        "required": true,
+        "minimumVersion": null,
+        "reason": "competition application is browser-based; browser installation is outside Echelon distribution"
+      }
+    ]
+  },
+  "components": [
+    {
+      "systemId": "conditor",
+      "role": "bootstrap",
+      "required": true,
+      "purpose": [
+        "establish and verify the exact Echelon environment",
+        "emit environment receipt"
+      ]
+    },
+    {
+      "systemId": "praxis",
+      "role": "host-tool",
+      "required": true,
+      "purpose": [
+        "work execution and attribution formerly described as ROS",
+        "engineering metrics, thresholds, churn, and proof evidence"
+      ]
+    },
+    {
+      "systemId": "ordo",
+      "role": "host-tool",
+      "required": true,
+      "purpose": [
+        "state-directed requirements and legal-transition discipline"
+      ]
+    },
+    {
+      "systemId": "percepta",
+      "role": "repository-lifecycle",
+      "required": true,
+      "purpose": [
+        "machine-checkable application-specific UI meaning and evidence"
+      ]
+    },
+    {
+      "systemId": "aegis",
+      "role": "project-binding",
+      "required": true,
+      "purpose": [
+        "structured invariant, policy, integration, and runtime faults"
+      ]
+    },
+    {
+      "systemId": "limen",
+      "role": "project-binding",
+      "required": true,
+      "purpose": [
+        "F#/WASM browser boundary and deterministic local execution"
+      ]
+    },
+    {
+      "systemId": "forma",
+      "role": "project-binding",
+      "required": true,
+      "purpose": [
+        "accessible reusable web-component vocabulary"
+      ]
+    },
+    {
+      "systemId": "folio",
+      "role": "project-binding",
+      "required": true,
+      "purpose": [
+        "professional investigation and engineering proof reports"
+      ]
+    },
+    {
+      "systemId": "dokimos",
+      "role": "host-tool",
+      "required": false,
+      "purpose": [
+        "code-quality evidence when its stable distribution contract is ready before freeze"
+      ]
+    },
+    {
+      "systemId": "tutela",
+      "role": "host-tool",
+      "required": false,
+      "purpose": [
+        "security-engineering evidence when its stable distribution contract is ready before freeze"
+      ]
+    },
+    {
+      "systemId": "visual-engineering",
+      "role": "repository-lifecycle",
+      "required": false,
+      "purpose": [
+        "visual-engineering context if promoted into the frozen event profile"
+      ]
+    },
+    {
+      "systemId": "communication-engineering",
+      "role": "repository-lifecycle",
+      "required": false,
+      "purpose": [
+        "communication-engineering context if promoted into the frozen event profile"
+      ]
+    },
+    {
+      "systemId": "iter",
+      "role": "project-binding",
+      "required": false,
+      "purpose": [
+        "optional .NET application routing/common capability if the competition scaffold requires it"
+      ]
+    }
+  ],
+  "contractBundle": {
+    "sourceManifest": "competition/indy-init-contracts.source.json",
+    "lockAtFreeze": "competition/indy-init-contracts.lock.json"
+  },
+  "implementationBoundary": {
+    "applicationImplementationIncluded": false,
+    "rule": "The environment and contract bundle may contain tooling, schemas, requirements, screen contracts, and governing context, but no implementation of the competition application."
+  }
+}

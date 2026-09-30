@@ -1,0 +1,121 @@
+{
+  "schema": "indy-init.contract-bundle-source/v1",
+  "id": "indy-init-contracts",
+  "version": "0.1.0",
+  "repository": "kemiller2002/Indy-init",
+  "sourceCommit": "b2c67e5e3bf410a6acf0065f897588aa949a0663",
+  "inclusionPolicy": "explicit-whitelist-only",
+  "applicationImplementationIncluded": false,
+  "files": [
+    {
+      "path": "kickoff/indy-init.kickoff.json",
+      "gitBlobSha1": "eab9258bf9bea8e12f07cb33286d786cc3bb17dc",
+      "role": "kickoff"
+    },
+    {
+      "path": "kickoff/kickoff-manifest.schema.json",
+      "gitBlobSha1": "89b899e6393b53b7b7afea1ba5da402a33ce9b09",
+      "role": "schema"
+    },
+    {
+      "path": "docs/HACKATHON-BOUNDARIES.md",
+      "gitBlobSha1": "49da04329d9573cc655b3d48c85024e7fa903898",
+      "role": "boundary"
+    },
+    {
+      "path": "docs/PRODUCT-REQUIREMENTS.md",
+      "gitBlobSha1": "94dfb5ad4c8f79572fa0d9acacaff7522d75930e",
+      "role": "normative"
+    },
+    {
+      "path": "docs/REQUIREMENTS.md",
+      "gitBlobSha1": "95a8d74edd7396a1a976b1daa076900e9f9137cd",
+      "role": "normative"
+    },
+    {
+      "path": "docs/INVESTIGATION-SEMANTICS.md",
+      "gitBlobSha1": "f01a3c51eb9f2969791b43e59f7b47d57b5a41cf",
+      "role": "normative"
+    },
+    {
+      "path": "docs/SEMANTIC-EVOLUTION.md",
+      "gitBlobSha1": "09e2549368342e6b958c1a936aee5cf4c118f12e",
+      "role": "normative"
+    },
+    {
+      "path": "docs/DESIGN-DECISION-BOUNDARIES.md",
+      "gitBlobSha1": "1273d10ad7b4b57924be455d5b7a15bc70e95755",
+      "role": "normative"
+    },
+    {
+      "path": "docs/CORE-DOMAIN-MODEL.md",
+      "gitBlobSha1": "3aced549d76f85d0acfaf1b1ff74075829d0ff4e",
+      "role": "normative"
+    },
+    {
+      "path": "docs/COMMAND-EVENT-CATALOG.md",
+      "gitBlobSha1": "c564c927333c3ebe5afad04139cdacc75c49f477",
+      "role": "normative"
+    },
+    {
+      "path": "docs/STATE-TRANSITION-TABLES.md",
+      "gitBlobSha1": "3e2f0e93f9902b90dbe6ed4bc48625397757adf8",
+      "role": "normative"
+    },
+    {
+      "path": "docs/FSHARP-TYPE-SHAPES.md",
+      "gitBlobSha1": "27b11781255c1bef3fcde82a640395749b3851e7",
+      "role": "normative"
+    },
+    {
+      "path": "docs/POLICY-ENGINE.md",
+      "gitBlobSha1": "27417007810ffdcb1328de4630d845d7271df828",
+      "role": "normative"
+    },
+    {
+      "path": "docs/PERSISTENCE-CONTRACT.md",
+      "gitBlobSha1": "2220ac6eb636b7dd8ee7ce55648dbd382bb6db62",
+      "role": "normative"
+    },
+    {
+      "path": "docs/AI-ORCHESTRATION.md",
+      "gitBlobSha1": "3e0388f7aaa5b0abe9976e2fa4e5809aed6863c1",
+      "role": "normative"
+    },
+    {
+      "path": "docs/INVESTIGATION-WORKSPACE.md",
+      "gitBlobSha1": "5fb04f956c9c5aadafb5952a4a84ea65d977bc79",
+      "role": "normative"
+    },
+    {
+      "path": "docs/SCREEN-CONTRACTS.md",
+      "gitBlobSha1": "6983a2e1670b02919870c9c320016736f66f0dc6",
+      "role": "normative"
+    },
+    {
+      "path": "docs/DOMAIN-TEST-MATRIX.md",
+      "gitBlobSha1": "8525b9e18b6ce8e6cf7ef6a694c937f1a49bfe19",
+      "role": "normative"
+    },
+    {
+      "path": "docs/SECURITY-THREAT-MODEL.md",
+      "gitBlobSha1": "df0ba683b125afb6ebf2678584b295c1b03134eb",
+      "role": "normative"
+    },
+    {
+      "path": "docs/IMPLEMENTATION-SLICES.md",
+      "gitBlobSha1": "122490548a9612444e2b21c4cb8b4b443f9d0a8e",
+      "role": "normative"
+    },
+    {
+      "path": "docs/COMPETITION-ALIGNMENT.md",
+      "gitBlobSha1": "4bbfd483c8b28ef42bbd74c207994d70e5d1847b",
+      "role": "supporting"
+    },
+    {
+      "path": "docs/BUILD-DAY-EXECUTION.md",
+      "gitBlobSha1": "4624523e591499dc1a91b8bc54106e5caca56783",
+      "role": "supporting"
+    }
+  ]
+}
