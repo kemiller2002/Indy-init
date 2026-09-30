@@ -1,0 +1,166 @@
+{
+  "schema": "indy-init.contract-bundle-lock/v1",
+  "id": "indy-init-contracts",
+  "version": "0.1.0",
+  "repository": "kemiller2002/Indy-init",
+  "sourceCommit": "b2c67e5e3bf410a6acf0065f897588aa949a0663",
+  "inclusionPolicy": "explicit-whitelist-only",
+  "applicationImplementationIncluded": false,
+  "bundleSha256": "c633637319ab0d7d70eca9abd56934b9039129e64331704179c2a4cc87b3b7c1",
+  "files": [
+    {
+      "path": "kickoff/indy-init.kickoff.json",
+      "gitBlobSha1": "eab9258bf9bea8e12f07cb33286d786cc3bb17dc",
+      "role": "kickoff",
+      "sha256": "b2a256bf59127570c92dc53d4dab7a531eeefa1b34148458ed4cc3ef721b190a",
+      "size": 8959
+    },
+    {
+      "path": "kickoff/kickoff-manifest.schema.json",
+      "gitBlobSha1": "89b899e6393b53b7b7afea1ba5da402a33ce9b09",
+      "role": "schema",
+      "sha256": "8bc6c0ec139e880a0f860b89afd6fe20ad35287562ed99e7546747a6fedba208",
+      "size": 3686
+    },
+    {
+      "path": "docs/HACKATHON-BOUNDARIES.md",
+      "gitBlobSha1": "49da04329d9573cc655b3d48c85024e7fa903898",
+      "role": "boundary",
+      "sha256": "56979ea9f3da713e61c013c2ccca34fd789483e891911174ae0425a8f2fdd40b",
+      "size": 3691
+    },
+    {
+      "path": "docs/PRODUCT-REQUIREMENTS.md",
+      "gitBlobSha1": "94dfb5ad4c8f79572fa0d9acacaff7522d75930e",
+      "role": "normative",
+      "sha256": "222b1f129378d56a726031861f028e735f6a61bd0e2c41278136d50b7003b7ff",
+      "size": 78865
+    },
+    {
+      "path": "docs/REQUIREMENTS.md",
+      "gitBlobSha1": "95a8d74edd7396a1a976b1daa076900e9f9137cd",
+      "role": "normative",
+      "sha256": "1a0e4e900ef42e2377851d4a27cbe1456e284f9cc0669d0f710259afe2bc2f3b",
+      "size": 10916
+    },
+    {
+      "path": "docs/INVESTIGATION-SEMANTICS.md",
+      "gitBlobSha1": "f01a3c51eb9f2969791b43e59f7b47d57b5a41cf",
+      "role": "normative",
+      "sha256": "a39f239f3a46f0e5d0bcb548f53b2206b386348f86933f4c7af012f7815d1a54",
+      "size": 33444
+    },
+    {
+      "path": "docs/SEMANTIC-EVOLUTION.md",
+      "gitBlobSha1": "09e2549368342e6b958c1a936aee5cf4c118f12e",
+      "role": "normative",
+      "sha256": "17d792750cf75de8819cfa0c4d688b64176d4829777147b2511aadc00e3571fb",
+      "size": 19880
+    },
+    {
+      "path": "docs/DESIGN-DECISION-BOUNDARIES.md",
+      "gitBlobSha1": "1273d10ad7b4b57924be455d5b7a15bc70e95755",
+      "role": "normative",
+      "sha256": "a3ddbbcf614045f79d5fdf358fff5cd30c4d84815c207d05f2f709e9f35150f0",
+      "size": 10234
+    },
+    {
+      "path": "docs/CORE-DOMAIN-MODEL.md",
+      "gitBlobSha1": "3aced549d76f85d0acfaf1b1ff74075829d0ff4e",
+      "role": "normative",
+      "sha256": "0935669c017f269b0e2368352ea86c2e0d85e578c8675747be05b45bd1ee6ba1",
+      "size": 15899
+    },
+    {
+      "path": "docs/COMMAND-EVENT-CATALOG.md",
+      "gitBlobSha1": "c564c927333c3ebe5afad04139cdacc75c49f477",
+      "role": "normative",
+      "sha256": "0ac2ba0cfe77fe70b6f2e191148ba9b8ace8e27850d709cf13398d61f728e4c1",
+      "size": 19770
+    },
+    {
+      "path": "docs/STATE-TRANSITION-TABLES.md",
+      "gitBlobSha1": "3e2f0e93f9902b90dbe6ed4bc48625397757adf8",
+      "role": "normative",
+      "sha256": "cf0ccec15541aa871f5e5e923f8eec807856dd8ed3a08dbe2920bd8a566cf5ca",
+      "size": 10598
+    },
+    {
+      "path": "docs/FSHARP-TYPE-SHAPES.md",
+      "gitBlobSha1": "27b11781255c1bef3fcde82a640395749b3851e7",
+      "role": "normative",
+      "sha256": "97cab807545912a98378325bbd188531734e12aa9f6caec610d50128d1bcc643",
+      "size": 28618
+    },
+    {
+      "path": "docs/POLICY-ENGINE.md",
+      "gitBlobSha1": "27417007810ffdcb1328de4630d845d7271df828",
+      "role": "normative",
+      "sha256": "bbb9bf495bae0d3e2704894d59c5320f4a51e70f146ca5c350bb0ff2e822db84",
+      "size": 15457
+    },
+    {
+      "path": "docs/PERSISTENCE-CONTRACT.md",
+      "gitBlobSha1": "2220ac6eb636b7dd8ee7ce55648dbd382bb6db62",
+      "role": "normative",
+      "sha256": "e8e233b45d23e75e30336cbce8c9d0c92f760a7d1856db632208cf252fd27c73",
+      "size": 15174
+    },
+    {
+      "path": "docs/AI-ORCHESTRATION.md",
+      "gitBlobSha1": "3e0388f7aaa5b0abe9976e2fa4e5809aed6863c1",
+      "role": "normative",
+      "sha256": "793e3da699f0a2a5bafd6f8b7dc353faff3b6bfc3a9f5ef286289db1efbb886a",
+      "size": 17314
+    },
+    {
+      "path": "docs/INVESTIGATION-WORKSPACE.md",
+      "gitBlobSha1": "5fb04f956c9c5aadafb5952a4a84ea65d977bc79",
+      "role": "normative",
+      "sha256": "7c4e6e3d56d8e41b2ac657dc15abbeeb4adf0d36bf5e7471789710afb598057d",
+      "size": 18262
+    },
+    {
+      "path": "docs/SCREEN-CONTRACTS.md",
+      "gitBlobSha1": "6983a2e1670b02919870c9c320016736f66f0dc6",
+      "role": "normative",
+      "sha256": "7e2d48e0754fad9356bae942379361d0c77dd9ece467f2b3c22a6806f55f6f6d",
+      "size": 7266
+    },
+    {
+      "path": "docs/DOMAIN-TEST-MATRIX.md",
+      "gitBlobSha1": "8525b9e18b6ce8e6cf7ef6a694c937f1a49bfe19",
+      "role": "normative",
+      "sha256": "0fdda8d21613058fd7caf09cf04aa5dcf1944f5cf286fad9cde369d97309fd45",
+      "size": 13475
+    },
+    {
+      "path": "docs/SECURITY-THREAT-MODEL.md",
+      "gitBlobSha1": "df0ba683b125afb6ebf2678584b295c1b03134eb",
+      "role": "normative",
+      "sha256": "e068667afc50919a769a81bc75d58161ddeef39676c53e68da350d47e2cc9725",
+      "size": 16561
+    },
+    {
+      "path": "docs/IMPLEMENTATION-SLICES.md",
+      "gitBlobSha1": "122490548a9612444e2b21c4cb8b4b443f9d0a8e",
+      "role": "normative",
+      "sha256": "4fb6c3f24901a04e6d6a14b1ec6dfde1ecc8541e467d3b0a4029371564b856ef",
+      "size": 18224
+    },
+    {
+      "path": "docs/COMPETITION-ALIGNMENT.md",
+      "gitBlobSha1": "4bbfd483c8b28ef42bbd74c207994d70e5d1847b",
+      "role": "supporting",
+      "sha256": "a2f82a1a2b0275abc63977f497243d0d025ce242a683b1eb43f18d0e25ca7973",
+      "size": 6566
+    },
+    {
+      "path": "docs/BUILD-DAY-EXECUTION.md",
+      "gitBlobSha1": "4624523e591499dc1a91b8bc54106e5caca56783",
+      "role": "supporting",
+      "sha256": "d893d84e424cd9165561821f45e5c106171e65e804ffcdababa6ff53e3bd72b2",
+      "size": 6468
+    }
+  ]
+}
