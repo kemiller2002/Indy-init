@@ -17,7 +17,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: kemiller2002/conditor
-          ref: cbc972c6e6ef6df2c7c94578a59af205804d9596
+          ref: a925ca52f8435a948c946cf49bd7d4f9a0810adf
           path: conditor
 
       - name: Check out frozen Registry authority
