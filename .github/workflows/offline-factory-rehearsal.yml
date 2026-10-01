@@ -1,0 +1,194 @@
+name: Indy Init offline factory rehearsal
+
+on:
+  pull_request:
+  push:
+    branches:
+      - implementation/offline-factory-rehearsal
+
+permissions:
+  contents: read
+
+jobs:
+  offline-factory:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out Conditor implementation
+        uses: actions/checkout@v4
+        with:
+          repository: kemiller2002/conditor
+          ref: cbc972c6e6ef6df2c7c94578a59af205804d9596
+          path: conditor
+
+      - name: Check out frozen Registry authority
+        uses: actions/checkout@v4
+        with:
+          repository: kemiller2002/echelon-registry
+          ref: c174b8937b9ad3f543a020f737db4eca5fad6317
+          path: registry
+
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Build Conditor
+        working-directory: conditor
+        run: |
+          dotnet restore Conditor.slnx
+          dotnet build Conditor.slnx --configuration Release --no-restore
+
+      - name: Regenerate frozen Linux release set
+        shell: bash
+        run: |
+          set -euo pipefail
+          dotnet fsi registry/tools/resolve-profile.fsx -- \
+            --profile registry/profiles/indy-init.profile.json \
+            --snapshot registry/snapshots/indy-init-0.1.0.catalog.json \
+            --platform linux-x64 \
+            --output "$RUNNER_TEMP/indy-init-linux-x64.json"
+
+          observed="$(sha256sum "$RUNNER_TEMP/indy-init-linux-x64.json" | awk '{print $1}')"
+          expected="3ac237804c546244499619aa88803fd280de6bb3a5daec205ccf730f61be5b40"
+          test "$observed" = "$expected"
+
+      - name: Build exact offline bundle while source authority is available
+        shell: bash
+        env:
+          CONDITOR_GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          dotnet run --project conditor/src/Conditor.Cli --configuration Release --no-build -- \
+            bundle create \
+            --resolved-set "$RUNNER_TEMP/indy-init-linux-x64.json" \
+            --resolved-set-sha256 3ac237804c546244499619aa88803fd280de6bb3a5daec205ccf730f61be5b40 \
+            --manifest conditor/examples/indy-init.conditor.json \
+            --output "$RUNNER_TEMP/indy-init-bundle"
+
+          dotnet run --project conditor/src/Conditor.Cli --configuration Release --no-build -- \
+            bundle verify --path "$RUNNER_TEMP/indy-init-bundle"
+
+          test -f "$RUNNER_TEMP/indy-init-bundle/project/conditor.json"
+          test -f "$RUNNER_TEMP/indy-init-bundle/sources/kemiller2002_Indy-init/b2c67e5e3bf410a6acf0065f897588aa949a0663/kickoff/indy-init.kickoff.json"
+          test -f "$RUNNER_TEMP/indy-init-bundle/sources/kemiller2002_percepta/9e6307734f5ae03f98155bdd0588fee13d701b50/examples/indy-init/application.json"
+          test -f "$RUNNER_TEMP/indy-init-bundle/packages/aegis/EchelonFoundry.Aegis.Core.1.0.0.nupkg"
+          test -f "$RUNNER_TEMP/indy-init-bundle/packages/limen/echelon-foundry-typescript-wasm-kernel-0.6.2.tgz"
+          test -f "$RUNNER_TEMP/indy-init-bundle/packages/forma/echelon-foundry-design-system-0.3.0.tgz"
+          test -f "$RUNNER_TEMP/indy-init-bundle/packages/folio/echelon-foundry-print-components-0.3.0.tgz"
+
+      - name: Plan frozen workstation
+        shell: bash
+        run: |
+          set -euo pipefail
+          home="$RUNNER_TEMP/indy-init-home"
+          mkdir -p "$home"
+
+          dotnet run --project conditor/src/Conditor.Cli --configuration Release --no-build -- \
+            workstation plan \
+            --resolved-set "$RUNNER_TEMP/indy-init-bundle/resolved-set.json" \
+            --resolved-set-sha256 3ac237804c546244499619aa88803fd280de6bb3a5daec205ccf730f61be5b40 \
+            --home "$home" \
+            --json > "$RUNNER_TEMP/indy-init-plan.json"
+
+          python3 - "$RUNNER_TEMP/indy-init-plan.json" "$RUNNER_TEMP/indy-init-plan.digest" <<'PY'
+          import json, sys
+          plan = json.load(open(sys.argv[1]))
+          digest = plan.get("digest")
+          if not isinstance(digest, str) or not digest.startswith("sha256:"):
+              raise SystemExit("workstation plan did not emit an authorization digest")
+          open(sys.argv[2], "w").write(digest)
+          PY
+
+      - name: Apply workstation from bundle with network fallback forbidden
+        shell: bash
+        env:
+          HTTP_PROXY: http://127.0.0.1:9
+          HTTPS_PROXY: http://127.0.0.1:9
+          ALL_PROXY: http://127.0.0.1:9
+          NO_PROXY: ""
+        run: |
+          set -euo pipefail
+          unset CONDITOR_GITHUB_TOKEN GH_TOKEN GITHUB_TOKEN || true
+          home="$RUNNER_TEMP/indy-init-home"
+          digest="$(cat "$RUNNER_TEMP/indy-init-plan.digest")"
+
+          dotnet run --project conditor/src/Conditor.Cli --configuration Release --no-build -- \
+            workstation apply \
+            --resolved-set "$RUNNER_TEMP/indy-init-bundle/resolved-set.json" \
+            --resolved-set-sha256 3ac237804c546244499619aa88803fd280de6bb3a5daec205ccf730f61be5b40 \
+            --artifact-mirror "$RUNNER_TEMP/indy-init-bundle/mirror" \
+            --offline \
+            --home "$home" \
+            --authorize "$digest"
+
+          "$home/.local/bin/praxis" --version | grep -F "3.6.0"
+          "$home/.local/bin/ordo" --version | grep -F "1.4.0"
+          "$home/.local/bin/percepta-repo" --version | grep -F "0.1.0"
+
+      - name: Initialize and verify project with network poisoned
+        shell: bash
+        env:
+          HTTP_PROXY: http://127.0.0.1:9
+          HTTPS_PROXY: http://127.0.0.1:9
+          ALL_PROXY: http://127.0.0.1:9
+          NO_PROXY: ""
+        run: |
+          set -euo pipefail
+          unset CONDITOR_GITHUB_TOKEN GH_TOKEN GITHUB_TOKEN || true
+          home="$RUNNER_TEMP/indy-init-home"
+          target="$RUNNER_TEMP/indy-init-project"
+          cache="$RUNNER_TEMP/indy-init-empty-source-cache"
+          mkdir -p "$target" "$cache"
+          git -C "$target" init
+          git -C "$target" config user.email "factory-rehearsal@echelon.invalid"
+          git -C "$target" config user.name "Indy Init Factory Rehearsal"
+
+          export PATH="$home/.local/bin:$PATH"
+          export CONDITOR_CACHE_DIR="$cache"
+
+          dotnet run --project conditor/src/Conditor.Cli --configuration Release --no-build -- \
+            init \
+            --manifest "$RUNNER_TEMP/indy-init-bundle/project/conditor.json" \
+            --target "$target" \
+            --source-mirror "$RUNNER_TEMP/indy-init-bundle/sources" \
+            --offline
+
+          test -f "$target/docs/PRODUCT-REQUIREMENTS.md"
+          test -f "$target/.percepta/application.json"
+          test -f "$target/.percepta/contracts/s25-demo-health.json"
+          test -f "$target/src/kernel/package.json"
+          test -f "$target/.conditor/lock.json"
+
+          dotnet run --project conditor/src/Conditor.Cli --configuration Release --no-build -- \
+            verify \
+            --manifest "$RUNNER_TEMP/indy-init-bundle/project/conditor.json" \
+            --target "$target" \
+            --source-mirror "$RUNNER_TEMP/indy-init-bundle/sources" \
+            --offline
+
+      - name: Write factory receipt
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/factory-receipt"
+          cp "$RUNNER_TEMP/indy-init-bundle/bundle.json" "$RUNNER_TEMP/factory-receipt/bundle.json"
+          cp "$RUNNER_TEMP/indy-init-plan.json" "$RUNNER_TEMP/factory-receipt/workstation-plan.json"
+          cp "$RUNNER_TEMP/indy-init-project/.conditor/lock.json" "$RUNNER_TEMP/factory-receipt/project-lock.json"
+          sha256sum \
+            "$RUNNER_TEMP/factory-receipt/bundle.json" \
+            "$RUNNER_TEMP/factory-receipt/workstation-plan.json" \
+            "$RUNNER_TEMP/factory-receipt/project-lock.json" \
+            > "$RUNNER_TEMP/factory-receipt/sha256.txt"
+
+      - name: Upload exact offline bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: indy-init-0.1.0-linux-x64-offline-bundle
+          path: ${{ runner.temp }}/indy-init-bundle
+          if-no-files-found: error
+
+      - name: Upload factory receipt
+        uses: actions/upload-artifact@v4
+        with:
+          name: indy-init-0.1.0-linux-x64-factory-receipt
+          path: ${{ runner.temp }}/factory-receipt
+          if-no-files-found: error
