@@ -569,3 +569,18 @@ Avoid hardening an intermediate causal-confidence ontology while EDF and cross-d
 
 Trigger for change:
 Evidence that a durable supported-but-not-confirmed causal assertion has independent workflow/history value that cannot be represented by evidence relationships, blockers, or conclusion posture.
+
+
+## OQ-048 Repository identity in deep links
+
+Question:
+How should a deep link name the GitHub repository that holds an investigation, so that a copied URL resolves in another browser without leaking more than an identifier?
+
+Current posture:
+Investigation routes carry the repository as the `repo` query parameter (`owner/name`) inside the hash route ([Screen Contracts](SCREEN-CONTRACTS.md#url-contract)). A repository name is an identifier, not a credential. The fragment is not sent in HTTP requests or the `Referer` header, but it does stay in browser history and in any copied link. No token, OAuth code or key ever appears (R9.9). A recipient without read access sees a not-permitted state (R9.8).
+
+Reason:
+Every investigation, evidence item, branch and screen must be addressable by URL (R9.6, Praxis SAF-URL-1..10). Without the repository, a link opens only in the browser that already has that repository configured.
+
+Trigger for change:
+If private repository names themselves must not appear in shared links, replace `repo` with an opaque, server-resolved workspace ID. That needs a backend, which static hosting (D-203) does not provide. Record any such change as a legacy redirect (SAF-URL-7).

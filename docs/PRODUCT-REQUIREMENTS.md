@@ -883,6 +883,41 @@ The workspace must satisfy keyboard, focus, screen-reader, text scaling, reduced
 ### P34.14 Workspace contract
 Implementation should conform to [INVESTIGATION-WORKSPACE.md](INVESTIGATION-WORKSPACE.md).
 
+### P34.15 URL is the source of navigable state
+The workspace derives the view from the URL and writes the URL when navigable state changes. Navigable state is the screen, the entity IDs and the view parameters (as-of version, comparison pair, filters, sort, search, tab, page). A copied URL opened in another browser reproduces the view, subject to that user's repository access. Transient UI state is never in the URL: open menus, focus, unsaved Ask/Add text, draft evidence and unsubmitted forms. This is the portfolio standard Praxis SAF-URL-1..10, implemented with Limen's routing module (LCP-088..112).
+
+### P34.16 Every entity, branch and version is addressable
+Each of these has a canonical route, listed in [Screen Contracts](SCREEN-CONTRACTS.md#url-contract):
+
+- investigation;
+- hypothesis;
+- evidence item;
+- evidence dependency view;
+- unknown, assumption and contradiction;
+- action and experiment;
+- finding;
+- cause review;
+- corrective action;
+- verification;
+- counterfactual branch (by BranchId);
+- historical version (by aggregate version);
+- semantic diff (by version pair);
+- report.
+
+A historical or branch URL opens that exact version or branch and is visibly read-only or sandboxed (S14, S16). It never silently shows the current state instead.
+
+### P34.17 Canonical URLs and history
+URLs use one canonical form: declared parameters only, in declaration order, defaults omitted, sets sorted and de-duplicated, `%20` with upper-case hex. Moving to another screen or entity pushes a history entry. Refining the current view (filter, sort, search, tab, page, version scrubbing) replaces it. Back, Forward and reload restore the view from the URL alone, and adopting a URL never pushes.
+
+### P34.18 Hash routes on static hosting
+The application uses hash routes (`index.html#/investigations/{investigationId}/evidence/{evidenceId}`), with relative links and no `<base href>`, so a reloaded deep link never 404s on GitHub Pages (D-203, Limen DF-LIMEN-2026-0006). Sign-in keeps and resumes the target, and a return target never leaves the application.
+
+### P34.19 Unknown, deleted and forbidden targets
+A route to an unknown entity, a repository the user cannot read, or an investigation not available locally while offline shows an explicit not-found, not-permitted or unavailable-offline state. That state names what was requested and offers a way back. It is never blank and never shows another record. A malformed identifier is a typed invalid outcome, not an exception. Old routes keep working through legacy redirects when routes change.
+
+### P34.20 Route inventory, privacy and sharing
+The application publishes `.echelon/routes.json` (`echelon.routes/v1`), which `praxis foundations verify` checks. Pure `parse`/`format` functions with property-based round-trip tests own every route. URLs carry only GUIDs and view parameters, never tokens, keys, OAuth codes, evidence content or personal data (P35.3). Investigation, evidence, hypothesis, branch, version, diff and report views offer Copy link.
+
 
 ## P35. Security and privacy
 

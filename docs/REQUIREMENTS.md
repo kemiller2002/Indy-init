@@ -150,6 +150,22 @@ The UI should make hypotheses, evidence, contradictions, unknowns, and transitio
 ### R9.5 Conversation plus state
 Natural-language interaction may be central, but the structured investigation state must remain visible and inspectable.
 
+### R9.6 URL-addressable views
+Every screen and every addressable thing has a URL, and pasting that URL into another browser opens the same view. Addressable things are investigations, hypotheses, evidence items, unknowns, assumptions, contradictions, actions and experiments, findings, causes, corrective actions, verifications, counterfactual branches, historical versions and reports. The URL also carries the view's navigable state: the selected version or comparison pair, filters, sort, search, tab and page. This is the portfolio deep-linking standard (Praxis SAF-URL-1..10), and the route table is in [Screen Contracts](SCREEN-CONTRACTS.md#url-contract).
+
+### R9.7 Deep links survive reload, sign-in and offline
+Routes are hash-based (`index.html#/...`), with relative links and no `<base href>`. A reloaded or pasted deep link therefore never 404s on GitHub Pages (D-203; Limen DF-LIMEN-2026-0006). When GitHub sign-in is needed, the application keeps the target, returns to it afterwards, and never returns outside the application. A deep link to state that is already held locally opens offline, and its persistence state is shown truthfully.
+
+### R9.8 Missing, superseded or forbidden targets
+A URL naming an entity that does not exist, or a repository the user cannot read, shows a not-found or not-permitted state with a way back to the investigation or home. It never shows a blank page and never shows a different investigation or record. A superseded or rejected entity is still shown as such, because history is never deleted (R2.4).
+
+### R9.9 No secrets or evidence content in URLs
+URLs never contain a GitHub token, an OAuth code, an AI provider key, evidence text or attachment content, or personal data typed about anyone. Entities are addressed by their GUID identifiers. Limen's reserved parameter names (`token`, `code`, `key`, `session` and the rest) are refused.
+
+### R9.10 Route inventory, codec and sharing
+The application publishes `.echelon/routes.json` (`echelon.routes/v1`). Pure `parse` and `format` functions own every route, and generated tests prove `format (parse url)` is the canonical URL. The application uses Limen's routing module once Limen 0.9.0 is installed. Screens that people discuss or hand off offer a Copy link action.
+
+
 ## R10. GitHub persistence
 
 ### R10.1 Repository-backed persistence
