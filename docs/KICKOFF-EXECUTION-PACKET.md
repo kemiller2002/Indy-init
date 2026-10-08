@@ -27,7 +27,7 @@ No application feature coding begins before this evidence exists.
 
 Agents start with:
 
-`.echelon/kickoff/indy-init.kickoff.json`
+`kickoff/indy-init.kickoff.json`
 
 Then required-before-coding documents in the manifest.
 
