@@ -734,7 +734,7 @@ The minimum durable product should implement:
 11. Report Preview
 12. Persistence Conflict/Recovery
 
-Not every screen must be a separate route on small devices.
+Not every screen must be a separate page layout on small devices, but every screen keeps its own canonical URL ([Screen Contracts](SCREEN-CONTRACTS.md#url-contract)), so a copied link opens the same view on any device.
 
 ## 56. Completion criterion
 
