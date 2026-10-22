@@ -1,6 +1,6 @@
 # Causa Data Contract v1.0.0 (proposed freeze)
 
-Status: **NORMATIVE CANDIDATE, NOT YET VALIDATED/FROZEN**. Do not call this implemented until golden replay and live GitHub tests pass.
+Status: **SUPERSEDED CANDIDATE.** The validated, frozen v1.0.0 contract is `causa-data/contract/v1.0.0/CONTRACT.md`; see [CAUSA-STORAGE-RELEASE-v1.0.0.md](CAUSA-STORAGE-RELEASE-v1.0.0.md). This document is kept as the candidate the release was reconciled against.
 Owner: Indy Init / Causa. Data repository: `kemiller2002/causa-data`.
 This is the authoritative proposed on-disk wire contract. It is deliberately independent of F# record serialization, UI, GitHub blob SHA and provider implementation. Once verified, record the exact schema/content hashes, tag `causa-storage-v1.0.0`, and treat this document as immutable for R002 and competition. Incompatibilities require a new version and approved migration. The existing Indy-init FSHARP-TYPE-SHAPES document is *not* itself a wire schema.
 

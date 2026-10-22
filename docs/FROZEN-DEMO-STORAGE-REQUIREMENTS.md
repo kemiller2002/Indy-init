@@ -1,6 +1,6 @@
 # Frozen Demo Data and Storage Compatibility Requirements
 
-Canonical candidate wire fields, types, paths, event payloads and freeze gates: [CAUSA-DATA-CONTRACT-v1.md](CAUSA-DATA-CONTRACT-v1.md). The v1.0.0 contract is **not yet frozen** pending engine reconciliation, complete nested JSON Schemas and live replay tests.
+Canonical candidate wire fields, types, paths, event payloads and freeze gates: [CAUSA-DATA-CONTRACT-v1.md](CAUSA-DATA-CONTRACT-v1.md). The v1.0.0 contract is **frozen**: release identity, digests and tag status are in [CAUSA-STORAGE-RELEASE-v1.0.0.md](CAUSA-STORAGE-RELEASE-v1.0.0.md). The normative text is `causa-data/contract/v1.0.0/CONTRACT.md`.
 
 Status: normative planning requirement for Indy Init R002 and competition.
 Scope: GitHub-backed Root-Cause Investigator storage and synthetic demonstration data.
