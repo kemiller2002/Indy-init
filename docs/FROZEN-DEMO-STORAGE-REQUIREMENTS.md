@@ -1,5 +1,7 @@
 # Frozen Demo Data and Storage Compatibility Requirements
 
+Canonical candidate wire fields, types, paths, event payloads and freeze gates: [CAUSA-DATA-CONTRACT-v1.md](CAUSA-DATA-CONTRACT-v1.md). The v1.0.0 contract is **not yet frozen** pending engine reconciliation, complete nested JSON Schemas and live replay tests.
+
 Status: normative planning requirement for Indy Init R002 and competition.
 Scope: GitHub-backed Root-Cause Investigator storage and synthetic demonstration data.
 
@@ -13,7 +15,7 @@ Every new application build MUST read the same frozen dataset and reconstruct eq
 Changes to the frozen contract require an explicit new schema version, documented rationale, reviewed migration, forward/backward compatibility matrix, and test fixtures for both versions. No in-place migration or destructive rewrite of the frozen baseline. Incompatible change requires explicit authorization. An agent MUST fail the acceptance gate on unapproved schema drift.
 
 ## STORAGE-004: Repository isolation
-Proposed personal-account datastore: kemiller2002/indy-init-investigation-data (private initially). Keep immutable seed fixtures in a tagged commit and mutable demo writes in a separate branch/path. Never write secrets or personal data to fixtures. Do not store GitHub tokens.
+Proposed personal-account datastore: kemiller2002/causa-data (private initially). Keep immutable seed fixtures in a tagged commit and mutable demo writes in a separate branch/path. Never write secrets or personal data to fixtures. Do not store GitHub tokens.
 
 ## STORAGE-005: Seed scenarios
 Prepare deterministic synthetic investigations for: payment failure (competing hypotheses), intermittent outage (timeline), conflicting metrics (blocked contradiction), API latency (verification), authentication outage (resolved report). Include one deliberately invalid fixture excluded from the live index to demonstrate refusal.
