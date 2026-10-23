@@ -548,7 +548,7 @@ It does not replay the proposal's original legality judgment.
 
 These commands must obey SEMANTIC-EVOLUTION.md and DOMAIN-PACK-CONTRACT.md.
 
-*Persisted (frozen contract v1.0.0):* none of these events exists in v1.0.0; `domainPacks` is always `[]`. Implementing them requires contract v1.1.0 (COMPATIBILITY-DECISIONS U-03).
+*Persisted (frozen contract v1.0.0):* none of these events exists in v1.0.0; `domainPacks` is always `[]`. Implementing them requires contract v1.1.0 (decision U-03, 2026-10-23: deferred to v1.1.0; see [CAUSA-CONTRACT-RECONCILIATION.md](CAUSA-CONTRACT-RECONCILIATION.md#owner-decisions)).
 
 ## 24. Review commands
 

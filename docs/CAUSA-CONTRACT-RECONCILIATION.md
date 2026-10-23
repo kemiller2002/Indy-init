@@ -35,9 +35,14 @@ The frozen contract (tag `causa-storage-v1.0.0`, imported byte-for-byte at `requ
 | Required vs optional | 2 | "optional fields are omitted"; optional `CorrelationId` | No optional keys; absent option = required `null` (CONTRACT §2.5) | CAUSA-DATA-CONTRACT-v1 §2, PERSISTENCE-CONTRACT §5 |
 | Null semantics | 2 | `reason` required on every lifecycle event; `causationId` nullable | `reason` null except markAwaitingEvidence, reopenInvestigation, verificationFailed; `causationId` removed | CAUSA-DATA-CONTRACT-v1 §5/§7 |
 
-## Not resolved here (open owner decisions)
+## Owner decisions
 
-- **U-01 organizer permission** for a pre-created dataset and app-specific schemas (FROZEN-DEMO-STORAGE-REQUIREMENTS STORAGE-008): preserved, open.
-- **U-02 repository visibility**: STORAGE-004 says private; `causa-data` is public. Preserved, owner to confirm.
-- **U-03 catalog first-slice commands** `AttachExtension` and `PinPolicyVersion` have no engine command or v1.0.0 event; marked deferred (would need contract v1.1.0).
+Recorded 2026-10-23 on the owner's instruction to apply the recommended resolutions.
+
+| id | question | decision | rationale |
+|---|---|---|---|
+| U-01 | Organizer permission for a pre-created dataset and app-specific schemas (STORAGE-008) | **Pending the organizers** (not the owner's to decide). Recommended path adopted: use the frozen dataset unless the organizers disallow it; if disallowed, apply the STORAGE-008 fallback. | The generator is deterministic and the contract and acceptance gate live in these requirements, so the identical bytes (same dataset identity `f650a2e5…2b86`) can be regenerated after kickoff without importing application code. |
+| U-02 | `causa-data` visibility (STORAGE-004 proposed private; repository is public) | **Resolved: public**, with STORAGE-004's synthetic-data rule as the binding constraint. | All data is synthetic, and the contract forbids secrets, tokens and personal data (CONTRACT §2.12, §15). Public read access is needed by the static GitHub Pages application (anonymous fetch of the frozen dataset) and lets independent consumers verify the release. Private visibility would add no protection to synthetic data. |
+| U-03 | Catalog first-slice commands `AttachExtension` and `PinPolicyVersion` (no engine command, no v1.0.0 event) | **Resolved: deferred to a future v1.1.0** (class B additive extension, compatibility/RULES.md §2). They are not in the v1.0.0 contract and not required for R002. | v1.0.0 has no extension namespace (CONTRACT §13.5), and the policy id is already persisted per confirmation (`CausalAssertionConfirmed.policy`). Adding them now would be an unversioned contract change. |
+
 - Deferred domain vocabulary (claims, interpretations, obligations, reviews, reports, extensions, the 75 unregistered catalog events, and states such as `Blocked`, proposal `Revised/Deferred/Stale`, the 7 extra relationship kinds) remains research or future scope. It is not a conflict as long as nothing writes it into a v1.0.0 workspace.
