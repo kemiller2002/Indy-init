@@ -149,9 +149,9 @@ Reference constraints (an id that names no existing entity makes the history ina
 - none
 
 Semantic invariants (normative detail and rule codes in [SEMANTICS.md](SEMANTICS.md)):
-- `from` MUST equal the replayed lifecycle.
-- The (from, command, to) triple MUST be a legal lifecycle transition (SEMANTICS.md lifecycle table) and its gates MUST pass (resolution gate for resolveInvestigation).
-- `verificationFailed` is never issued directly: it is the follow-on of VerificationRecorded(outcome failed) while awaitingVerification.
+- `from` MUST equal the replayed lifecycle; (from, command) MUST be legal in SEMANTICS.md §7.9 and §9 (C2–C7).
+- resolveInvestigation MUST pass the resolution gate (SEMANTICS.md §14); a refused group starting with this event is coded HISTORY.UNGATED_RESOLUTION (§15.4).
+- `verificationFailed` is not a command: it is emitted only as the RecordVerification follow-on (C32) with from awaitingVerification, to active and reason exactly "A verification failed; work reopens (A21)."
 
 ### 3. `ObservationRecorded`
 
@@ -260,10 +260,9 @@ Reference constraints (an id that names no existing entity makes the history ina
 - `evidenceIds[]` → existing `evidence`
 
 Semantic invariants (normative detail and rule codes in [SEMANTICS.md](SEMANTICS.md)):
-- `from` MUST equal the replayed hypothesis state.
-- (from, command, to) MUST be a legal hypothesis transition.
-- reopen requires evidence admitted after the latest falsification (new evidence).
-- The change's `at`/`aggregateVersion` are the envelope's occurredAt/aggregateVersion.
+- (from, command) MUST be legal in SEMANTICS.md §7.1; markSupported, markWeakened, falsify and reopen require non-empty evidenceIds (R2.3).
+- reopen requires evidence admitted after the latest falsification (HYPOTHESIS.REOPEN_NEEDS_NEW_EVIDENCE, §10.3).
+- The change's `at`/`aggregateVersion` are the envelope's occurredAt/aggregateVersion (CONTRACT §7.2).
 
 ### 6. `EvidenceAdmitted`
 
@@ -298,9 +297,9 @@ Reference constraints (an id that names no existing entity makes the history ina
 - none
 
 Semantic invariants (normative detail and rule codes in [SEMANTICS.md](SEMANTICS.md)):
-- evidenceId MUST NOT equal the id of any existing entity of the same kind (id uniqueness).
-- contentKind artifact => content is a well-formed absolute http(s) URL (schema checks the prefix; full well-formedness is an admissibility rule).
-- Evidence always starts verification = unverified; there is no verification field.
+- evidenceId MUST be new.
+- contentKind artifact ⇒ content is a well-formed absolute http(s) URL (EVIDENCE.URL, SEMANTICS.md §10.4.1; platform dependence E-1).
+- There is no verification field; evidence starts unverified (CD-EVT-07).
 
 ### 7. `EvidenceSuperseded`
 
@@ -333,8 +332,7 @@ Reference constraints (an id that names no existing entity makes the history ina
 - `replacementEvidenceId` → existing `evidence`
 
 Semantic invariants (normative detail and rule codes in [SEMANTICS.md](SEMANTICS.md)):
-- replacementEvidenceId MUST differ from evidenceId.
-- evidenceId MUST NOT already be superseded.
+- Rules in SEMANTICS.md §10 (SupersedeEvidence): the replacement differs from the original and the original is not already superseded (fixtures engine-evidence-supersedes-itself, engine-evidence-already-superseded).
 
 ### 8. `EvidenceVerificationAssessed`
 
@@ -626,8 +624,8 @@ Reference constraints (an id that names no existing entity makes the history ina
 - `hypothesisId` → existing `hypotheses`
 
 Semantic invariants (normative detail and rule codes in [SEMANTICS.md](SEMANTICS.md)):
-- predictionId MUST NOT equal the id of any existing entity of the same kind (id uniqueness).
-- `timing` is decided by the engine, not requested: a forged timing is inadmissible.
+- predictionId MUST be new.
+- `timing` is the timing decided by SEMANTICS.md §10.17 (forced retrospective when the relevant evidence/finding already exists, A11), not the requested timing; a forged timing is inadmissible.
 
 ### 17. `ActionRecorded`
 
@@ -691,7 +689,8 @@ Reference constraints (an id that names no existing entity makes the history ina
 - `actionId` → existing `actions`
 
 Semantic invariants (normative detail and rule codes in [SEMANTICS.md](SEMANTICS.md)):
-- Transition MUST be legal from the replayed action state.
+- Via TransitionAction (C23) only the §7.5 targets approved, rejected, inProgress, cancelled.
+- `inProgress` and `completed` also appear as RecordFinding follow-ons in the same command group (C24, §10.20).
 
 ### 19. `FindingRecorded`
 
@@ -724,8 +723,8 @@ Reference constraints (an id that names no existing entity makes the history ina
 - `actionId` → existing `actions`
 
 Semantic invariants (normative detail and rule codes in [SEMANTICS.md](SEMANTICS.md)):
-- findingId MUST NOT equal the id of any existing entity of the same kind (id uniqueness).
-- A finding cannot be recorded for a rejected action.
+- findingId MUST be new; the action MUST be approved, inProgress or completed (ACTION.NOT_EXECUTABLE otherwise, e.g. a rejected action).
+- Command group shape (C24): approved → [ActionTransitioned inProgress, FindingRecorded, ActionTransitioned completed]; inProgress → [FindingRecorded, ActionTransitioned completed]; completed → [FindingRecorded].
 
 ### 20. `NegativeKnowledgeEstablished`
 
@@ -826,8 +825,8 @@ Reference constraints (an id that names no existing entity makes the history ina
 - `causeId` → existing `causes`
 
 Semantic invariants (normative detail and rule codes in [SEMANTICS.md](SEMANTICS.md)):
-- The cause confirmation gate MUST pass (SEMANTICS.md); otherwise HISTORY.UNGATED_CONFIRMATION / INADMISSIBLE_EVENT.
-- `policy` is the engine policy id in force.
+- The cause confirmation gate MUST pass (SEMANTICS.md §11); a refused group starting with this event is coded HISTORY.UNGATED_CONFIRMATION.
+- `policy` MUST be exactly "core-default/1" (C27); any other value is HISTORY.INADMISSIBLE_EVENT.
 
 ### 23. `CausalAssertionReopened`
 
@@ -858,7 +857,7 @@ Reference constraints (an id that names no existing entity makes the history ina
 - `causeId` → existing `causes`
 
 Semantic invariants (normative detail and rule codes in [SEMANTICS.md](SEMANTICS.md)):
-- Only a confirmed cause can be reopened.
+- Only a confirmed cause can be reopened (SEMANTICS.md §7.6).
 
 ### 24. `CorrectiveActionRecorded`
 
@@ -922,8 +921,9 @@ Reference constraints (an id that names no existing entity makes the history ina
 - `correctiveActionId` → existing `correctiveActions`
 
 Semantic invariants (normative detail and rule codes in [SEMANTICS.md](SEMANTICS.md)):
-- Transition MUST be legal from the replayed corrective-action state.
-- Entering awaitingVerificationOfEffect sets awaitingSinceVersion = aggregateVersion (starts a verification round).
+- Via TransitionCorrection (C30) only the §7.7 transitions.
+- `verificationFailed` and `verifiedEffective` are emitted only as RecordVerification follow-ons (C32, §12.3).
+- Entering awaitingVerificationOfEffect sets awaitingSinceVersion = aggregateVersion (starts a verification round, §12.1).
 
 ### 26. `CriterionRecorded`
 
@@ -990,10 +990,9 @@ Reference constraints (an id that names no existing entity makes the history ina
 - `evidenceIds[]` → existing `evidence`
 
 Semantic invariants (normative detail and rule codes in [SEMANTICS.md](SEMANTICS.md)):
-- verificationId MUST NOT equal the id of any existing entity of the same kind (id uniqueness).
-- outcome satisfied => evidenceIds non-empty.
-- Cited evidence MUST NOT predate the current verification round (freshness).
-- May be followed in the same command group by CorrectiveActionTransitioned / LifecycleChanged(verificationFailed) follow-ons.
+- verificationId MUST be new; outcome satisfied ⇒ evidenceIds non-empty.
+- Freshness and criteria rules: SEMANTICS.md §12.2.
+- Follow-ons in the same group (§12.3): failed → CorrectiveActionTransitioned verificationFailed (+ LifecycleChanged verificationFailed when awaitingVerification); satisfied with all criteria satisfied → CorrectiveActionTransitioned verifiedEffective.
 
 ### 28. `ConclusionRecorded`
 
@@ -1027,8 +1026,7 @@ Reference constraints (an id that names no existing entity makes the history ina
 - `causeIds[]` → existing `causes`
 
 Semantic invariants (normative detail and rule codes in [SEMANTICS.md](SEMANTICS.md)):
-- conclusionId MUST NOT equal the id of any existing entity of the same kind (id uniqueness).
-- Residual uncertainty rules and confirmed-cause strength rules apply (SEMANTICS.md).
+- conclusionId MUST be new; rules in SEMANTICS.md §13 (residual uncertainty, confirmed-cause strength).
 
 ### 29. `ProposalRecorded`
 
@@ -1061,8 +1059,8 @@ Reference constraints (an id that names no existing entity makes the history ina
 - none
 
 Semantic invariants (normative detail and rule codes in [SEMANTICS.md](SEMANTICS.md)):
-- proposalId MUST NOT equal the id of any existing entity of the same kind (id uniqueness).
-- The only event an agent actor MAY author (D-004); a proposal is never evidence.
+- proposalId MUST be new.
+- The only event an agent actor MAY author (D-004); acceptance and rejection require a human or system actor.
 
 ### 30. `ProposalWasAccepted`
 
@@ -1094,8 +1092,8 @@ Reference constraints (an id that names no existing entity makes the history ina
 - `targetId` → existing `entity created by the preceding event of the same command group`
 
 Semantic invariants (normative detail and rule codes in [SEMANTICS.md](SEMANTICS.md)):
-- Proposal MUST be active.
-- Emitted by a human/system acceptance command after the event that creates the target entity (same correlationId).
+- The proposal MUST be active (PROPOSAL.NOT_ACTIVE).
+- Group shape (C35): the target creation event first — HypothesisRecorded{statement: text, mechanism: null}, UnknownIdentified{question: text, materiality: material} or ActionRecorded{kind: test, purpose: text, targetHypothesisIds: []} — then ProposalWasAccepted; targetId = the created id.
 
 ### 31. `ProposalWasRejected`
 
@@ -1126,4 +1124,4 @@ Reference constraints (an id that names no existing entity makes the history ina
 - `proposalId` → existing `proposals`
 
 Semantic invariants (normative detail and rule codes in [SEMANTICS.md](SEMANTICS.md)):
-- Proposal MUST be active.
+- The proposal MUST be active (PROPOSAL.NOT_ACTIVE).
