@@ -143,12 +143,12 @@ Every event type must have a strict JSON Schema with `additionalProperties:false
 | `InvestigationClosed` | `reason:string` | `LifecycleChanged` command `closeInvestigation`, `reason: null` |
 | `InvestigationReopened` | `reason:string` | `LifecycleChanged` command `reopenInvestigation`, `reason` text (engine follow-on `verificationFailed` also returns to active) |
 | `InvestigationArchived` | `reason:string` | not registered (no v1 command reaches `archived`) |
-| `ObservationRecorded` | `observationId:uuid`, `original:string`, `observedAt:timestamp|null` | `ObservationRecorded` (same) |
-| `HypothesisProposed` | `hypothesisId:uuid`, `statement:string`, `mechanism:string|null` | `HypothesisRecorded` (same fields) |
+| `ObservationRecorded` | `observationId:uuid`, `original:string`, `observedAt:timestamp\|null` | `ObservationRecorded` (same) |
+| `HypothesisProposed` | `hypothesisId:uuid`, `statement:string`, `mechanism:string\|null` | `HypothesisRecorded` (same fields) |
 | `HypothesisStateChanged` | `hypothesisId:uuid`, `from:string`, `to:string`, `reason:string`, `evidenceIds:uuid[]` | `HypothesisTransitioned{hypothesisId, from, to, command, reason, evidenceIds}` |
-| `EvidenceAdmitted` | `evidenceId:uuid`, `contentKind:"text"|"artifact"`, `content:string`, `category:string`, `source:string`, `capturedAt:timestamp|null`, `verification:string` | `EvidenceAdmitted` without `verification` (starts `unverified`) |
+| `EvidenceAdmitted` | `evidenceId:uuid`, `contentKind:"text"\|"artifact"`, `content:string`, `category:string`, `source:string`, `capturedAt:timestamp\|null`, `verification:string` | `EvidenceAdmitted` without `verification` (starts `unverified`) |
 | `EvidenceVerificationChanged` | `evidenceId:uuid`, `from:string`, `to:string`, `reason:string` | `EvidenceVerificationAssessed{evidenceId, verification}` |
-| `EvidenceRelatedToHypothesis` | `relationshipId:uuid`, `evidenceId:uuid`, `hypothesisId:uuid`, `kind:string`, `rationale:string|null` | `EvidenceRelated` (same fields) |
+| `EvidenceRelatedToHypothesis` | `relationshipId:uuid`, `evidenceId:uuid`, `hypothesisId:uuid`, `kind:string`, `rationale:string\|null` | `EvidenceRelated` (same fields) |
 | `UnknownIdentified` | `unknownId:uuid`, `question:string`, `materiality:string` | `UnknownIdentified` (same) |
 | `UnknownStateChanged` | `unknownId:uuid`, `from:string`, `to:string`, `basis:string` | `UnknownTransitioned{unknownId, state, basis}` |
 | `AssumptionRecorded` | `assumptionId:uuid`, `proposition:string`, `materiality:string` | `AssumptionRecorded` (same); transitions are `AssumptionTransitioned{assumptionId, state}` |
@@ -158,13 +158,13 @@ Every event type must have a strict JSON Schema with `additionalProperties:false
 | `InvestigationActionProposed` | `actionId:uuid`, `kind:string`, `purpose:string`, `targetHypothesisIds:uuid[]` | `ActionRecorded` (same fields) |
 | `InvestigationActionStateChanged` | `actionId:uuid`, `from:string`, `to:string`, `reason:string` | `ActionTransitioned{actionId, state}` |
 | `FindingRecorded` | `findingId:uuid`, `actionId:uuid`, `originalResult:string` | `FindingRecorded` plus required-nullable `interpretation` |
-| `CausalAssertionProposed` | `causeId:uuid`, `outcome:string`, `members:array<{hypothesisId:uuid,role:string}>`, `mechanism:string|null` | `CausalAssertionRecorded` (same fields) |
+| `CausalAssertionProposed` | `causeId:uuid`, `outcome:string`, `members:array<{hypothesisId:uuid,role:string}>`, `mechanism:string\|null` | `CausalAssertionRecorded` (same fields) |
 | `CausalAssertionStateChanged` | `causeId:uuid`, `from:string`, `to:string`, `reason:string` | `CausalAssertionConfirmed{causeId, policy}` / `CausalAssertionReopened{causeId, reason}` |
 | `CorrectiveActionProposed` | `correctiveActionId:uuid`, `kind:string`, `description:string`, `targetCauseIds:uuid[]` | `CorrectiveActionRecorded` (same fields) |
 | `CorrectiveActionStateChanged` | `correctiveActionId:uuid`, `from:string`, `to:string`, `reason:string` | `CorrectiveActionTransitioned{correctiveActionId, state}` |
-| `VerificationCriterionRecorded` | `criterionId:uuid`, `correctiveActionId:uuid`, `expectedOutcome:string`, `method:string|null` | `CriterionRecorded` (same fields) |
+| `VerificationCriterionRecorded` | `criterionId:uuid`, `correctiveActionId:uuid`, `expectedOutcome:string`, `method:string\|null` | `CriterionRecorded` (same fields) |
 | `VerificationRecorded` | `verificationId:uuid`, `criterionId:uuid`, `outcome:string`, `evidenceIds:uuid[]` | `VerificationRecorded` (same; satisfied ⇒ evidence cited) |
-| `ConclusionRecorded` | `conclusionId:uuid`, `statement:string`, `strength:string`, `causeIds:uuid[]`, `residualUncertainty:string|null` | `ConclusionRecorded` (same) |
+| `ConclusionRecorded` | `conclusionId:uuid`, `statement:string`, `strength:string`, `causeIds:uuid[]`, `residualUncertainty:string\|null` | `ConclusionRecorded` (same) |
 
 Registry above is a **candidate subset**, not proof that the current rehearsal emits these exact names. The agent MUST reconcile against the actual F# Command/Event union and existing docs/COMMAND-EVENT-CATALOG.md before freezing. Every additional supported command/event (including supersession, negative knowledge, proposal lifecycle, verification failure and resolution) MUST be exhaustively registered. Unknown eventType must fail closed, not be skipped. Avoid collapsing semantically distinct events to generic `StateChanged` if the canonical domain catalog requires distinct events.
 
