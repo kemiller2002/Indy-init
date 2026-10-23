@@ -7,7 +7,7 @@ Section map:
   §6   command catalog / §8 decide / §9 lifecycle / §10 content / §11 cause gate / §12 verification /
        §13 conclusion / §14 resolution gate                  -> decide and helpers
   §7   transition tables                                     -> *_TABLE
-  §10.4.1 artifact URL well-formedness (+ §17 E-1)           -> artifact_url_verdict
+  §10.4.1-§10.4.2 artifact URL procedure (+ §17 E-1, CAUSA-URL-W) -> artifact_url_verdict, writer_url_check
   §15  History.validate                                      -> validate_history, command_of, code_for
 
 The state is an immutable-by-convention dict: every function returns a new value and never mutates its inputs.
@@ -377,93 +377,76 @@ def project_state(S: dict) -> dict:
 
 
 # ====================================================================================================================
-# §10.4.1 artifact URL well-formedness (with §17 E-1: platform-defined cases are reported as Unresolved)
+# §10.4.1 artifact URL well-formedness: normative decision procedure; §10.4.2 profile; §17 E-1
 # ====================================================================================================================
 
-_UNRESERVED_SUBDELIM = set("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~!$&'()*+,;=")
-_FORBIDDEN = set(' "<>\\^`{|}')
-_HEX = set("0123456789abcdefABCDEF")
+_ASCII_WS = "\t\n\x0b\x0c\r "
+_LABEL = r"[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?"
+# §10.4.2 profile pattern, ECMA '$' rendered as '\Z' (CONTRACT §2.13).  Groups: host, port, rest.
+_PROFILE = re.compile(r"[Hh][Tt][Tt][Pp][Ss]?://((?:" + _LABEL + r"(?:\." + _LABEL + r")*)|\[[0-9A-Fa-f:.]+\])"
+                      r"(?::([0-9]{1,5}))?([/?#][\x21-\x7E]*)?\Z")
+_PCHAR = frozenset("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~"   # unreserved
+                   "!$&'()*+,;="                                                          # sub-delims
+                   ":@/")
+_QCHAR = _PCHAR | {"?"}
+_HEXDIGITS = frozenset("0123456789abcdefABCDEF")
 
 
-def _component_verdict(s: str, extra_ok: str):
-    """None = certainly fine; False = certainly ill-formed; Unresolved = platform-defined."""
-    i = 0
-    while i < len(s):
-        c = s[i]
-        o = ord(c)
-        if o < 0x20 or 0x7F <= o <= 0x9F or c in _FORBIDDEN:
-            return False
-        if c == "%":
-            if not (len(s) >= i + 3 and s[i + 1] in _HEX and s[i + 2] in _HEX):
-                return False
-            i += 3
-            continue
-        if o > 0x9F:
-            return Unresolved("non-ASCII character in URL")
-        if c not in _UNRESERVED_SUBDELIM and c not in extra_ok:
-            return Unresolved(f"character {c!r} in URL component")
-        i += 1
-    return None
+def _chars_ok(s: str, allowed: frozenset) -> bool:
+    """Every character in `allowed`, except '%' which must start a %HH escape."""
+    return all((c in allowed) if c != "%" else (s[i + 1:i + 2] in _HEXDIGITS and s[i + 2:i + 3] in _HEXDIGITS
+                                                 and len(s) >= i + 3)
+               for i, c in enumerate(s))
 
 
-def _host_verdict(host: str):
-    if host == "":
-        return False
+def in_profile(u: str):
+    """§10.4.2 membership: the pattern matches the whole string and a bracketed host is RFC 4291 IPv6 text."""
+    m = _PROFILE.match(u)
+    if not m:
+        return None
+    host = m.group(1)
     if host.startswith("["):
-        if not host.endswith("]"):
-            return False
         try:
             ipaddress.IPv6Address(host[1:-1])
-            return None
         except ValueError:
-            return False
-    if any(c in _FORBIDDEN or ord(c) < 0x20 or 0x7F <= ord(c) <= 0x9F for c in host):
-        return False
-    if any(ord(c) > 0x7F for c in host):
-        return Unresolved("non-ASCII host (IDN handling is platform-defined)")
-    if re.fullmatch(r"[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)*\.?", host) and not any(
-            lbl.startswith("-") or lbl.endswith("-") for lbl in host.rstrip(".").split(".")):
-        return None
-    if any(c in "[]" for c in host):
-        return Unresolved("'[' or ']' outside an IPv6 host")
-    if re.fullmatch(r"[A-Za-z0-9._~!$&'()*+,;=%-]+", host):
-        return Unresolved(f"unusual host {host!r}")
-    return False
+            return None
+    return m
+
+
+def well_formed_profile(m) -> bool:
+    port, rest = m.group(2), m.group(3) or ""
+    hash_at = rest.find("#")
+    before, fragment = (rest, None) if hash_at < 0 else (rest[:hash_at], rest[hash_at + 1:])
+    q_at = before.find("?")
+    path, query = (before, None) if q_at < 0 else (before[:q_at], before[q_at + 1:])
+    return ((port is None or int(port) <= 65535)
+            and (fragment is None or "#" not in fragment)
+            and _chars_ok(path, _PCHAR)
+            and (query is None or _chars_ok(query, _QCHAR))
+            and (fragment is None or _chars_ok(fragment, _QCHAR)))
 
 
 def artifact_url_verdict(u: str):
-    """True = well-formed, False = EVIDENCE.URL, Unresolved = §17 E-1 platform-defined case."""
-    if not re.match(r"(?i)https?://", u):
+    """§10.4.1 decision procedure. True = well-formed, False = ill-formed (EVIDENCE.URL),
+    Unresolved = step 4, platform-defined (§17 E-1): the reader stops with 'admissibility not evaluated'."""
+    if not re.match(r"[Hh][Tt][Tt][Pp][Ss]?://", u):                                     # step 1: prefix
         return False
-    if u != u.strip("".join(ENGINE_WHITESPACE)):
-        return Unresolved("leading or trailing whitespace")
-    rest = u[u.index("://") + 3:]
-    if "\\" in rest:
+    if any(c in _ASCII_WS for c in u.strip(_ASCII_WS)):                                   # step 2: interior ws
         return False
-    m = re.match(r"([^/?#]*)([^?#]*)(\?[^#]*)?(#.*)?\Z", rest, re.S)
-    authority, path, query, fragment = m.group(1), m.group(2), m.group(3) or "", m.group(4) or ""
-    userinfo, _, hostport = authority.rpartition("@") if "@" in authority else ("", "", authority)
-    if hostport.startswith("["):
-        close = hostport.find("]")
-        host, portpart = (hostport, "") if close < 0 else (hostport[:close + 1], hostport[close + 1:])
-    else:
-        host, sep, port = hostport.partition(":")
-        portpart = sep + port
-    if portpart:
-        if not portpart.startswith(":"):
-            return False
-        port = portpart[1:]
-        if port and (not port.isascii() or not port.isdigit() or int(port) > 65535):
-            return False
-    verdicts = [_host_verdict(host),
-                _component_verdict(userinfo, ":"),
-                _component_verdict(path, ":@/"),
-                _component_verdict(query[1:], ":@/?"),
-                _component_verdict(fragment[1:], ":@/?")]
-    if any(v is False for v in verdicts):
-        return False
-    unresolved = [v for v in verdicts if isinstance(v, Unresolved)]
-    return unresolved[0] if unresolved else True
+    m = in_profile(u)                                                                     # step 3: profile
+    if m is not None:
+        return well_formed_profile(m)
+    return Unresolved("artifact URL outside the §10.4.2 profile (platform-defined, SEMANTICS §17 E-1)")  # step 4
+
+
+def writer_url_check(u: str):
+    """CAUSA-URL-W: None when a writer may persist `u`; otherwise (CAUSA code or None, domain refusal code or None)."""
+    if not re.match(r"[Hh][Tt][Tt][Pp][Ss]?://", u) or any(c in _ASCII_WS for c in u.strip(_ASCII_WS)):
+        return (None, "EVIDENCE.URL")
+    m = in_profile(u)
+    if m is None:
+        return ("CAUSA.UNREPRESENTABLE", None)
+    return None if well_formed_profile(m) else (None, "EVIDENCE.URL")
 
 
 # ====================================================================================================================
