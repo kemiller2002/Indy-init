@@ -2,6 +2,8 @@
 
 Status: pre-kickoff planning specification, not executable competition application tests.
 
+> **Normative status.** **Normative** test obligations; persisted names per the contract. Persisted data is governed only by the frozen Causa storage contract v1.0.0 ([README.md](../requirements/causa/data/v1.0.0/README.md), [FIELD-CATALOG.md](../requirements/causa/data/v1.0.0/FIELD-CATALOG.md), [EVENT-CATALOG.md](../requirements/causa/data/v1.0.0/EVENT-CATALOG.md)). Where this document states a persisted field, event name, enum value, layout, hash or concurrency rule differently, the contract governs; such statements are marked *Superseded by frozen contract v1.0.0* in place. Storage acceptance rows: [acceptance/TEST-MATRIX.json](../requirements/causa/data/v1.0.0/acceptance/TEST-MATRIX.json).
+
 This matrix translates the command/event/state contracts into test obligations. If organizer rules permit pre-written executable acceptance tests, these scenarios may be promoted into code. Otherwise, implement them after kickoff from this specification.
 
 ## 1. Test pattern
@@ -81,7 +83,7 @@ Prove:
 - blocked by required unverified corrective action
 - blocked by unresolved required verification
 - may allow explicit accepted residual uncertainty only when policy permits
-- emits InvestigationResolved
+- emits InvestigationResolved (persisted: `LifecycleChanged{command: resolveInvestigation}`)
 - does not delete active history
 - capability projection changes appropriately
 
@@ -145,7 +147,7 @@ Prove:
 Prove:
 
 - requires falsifying basis and scope
-- emits HypothesisFalsified
+- emits HypothesisFalsified (persisted: `HypothesisTransitioned{command: falsify}`)
 - falsified hypothesis remains visible/history-preserved
 - optional NegativeKnowledge may be established through explicit additional event
 - FailsToSupport alone does not necessarily satisfy falsification
@@ -229,6 +231,8 @@ Also prove:
 
 OQ-012 remains open, so tests should make it easy to remove a core relationship without rewriting unrelated semantics.
 
+> **Superseded by frozen contract v1.0.0:** v1.0.0 persists exactly `supports|contradicts|discriminates|insufficient`; tests for the other kinds and extension SemanticIds are deferred, and `insufficient` needs a test.
+
 ## 8. Assumption tests
 
 Prove:
@@ -278,8 +282,8 @@ Prove all structural transitions:
 - Proposed -> Approved
 - Proposed -> Rejected
 - Approved -> InProgress
-- Approved/InProgress -> Blocked
-- Blocked -> prior runnable posture
+- Approved/InProgress -> Blocked *(deferred: no v1.0.0 `actionState` value)*
+- Blocked -> prior runnable posture *(deferred)*
 - InProgress -> Completed
 - Completed -> Interpreted
 - Approved/InProgress -> Cancelled
@@ -348,7 +352,7 @@ Prove blockers for:
 
 Prove success:
 
-- emits CauseConfirmed for CausalAssertion
+- emits CauseConfirmed for CausalAssertion (persisted: `CausalAssertionConfirmed`)
 - does not emit HypothesisConfirmed
 - supports causal set
 - policy/version attribution preserved
@@ -357,7 +361,7 @@ Prove success:
 
 Prove:
 
-- prior CauseConfirmed remains historical
+- prior CauseConfirmed (`CausalAssertionConfirmed`) remains historical
 - current causal assertion becomes Reopened
 - new evidence/contradiction basis required
 - dependent conclusion/corrective state can generate reevaluation obligations
@@ -369,8 +373,8 @@ Prove:
 - Proposed -> Approved -> InProgress -> Implemented
 - Implemented does not equal VerifiedEffective
 - verification criterion required when policy says so
-- AwaitingVerification -> VerifiedEffective on satisfied verification
-- AwaitingVerification -> VerificationFailed on failed result
+- AwaitingVerification (persisted `awaitingVerificationOfEffect`) -> VerifiedEffective on satisfied verification (follow-on of `VerificationRecorded`)
+- AwaitingVerification (`awaitingVerificationOfEffect`) -> VerificationFailed on failed result (follow-on of `VerificationRecorded`)
 - failed verification can reopen investigation/cause work
 - ReworkRequired loops back through explicit action
 
@@ -402,7 +406,7 @@ Prove:
 - proposal does not mutate authoritative target state
 - accept creates/re-runs target command
 - state/version/policy change can make proposal stale
-- target blocker prevents ProposalAccepted
+- target blocker prevents ProposalAccepted (persisted: `ProposalWasAccepted`)
 - rejection remains proposal/audit history
 - extension proposal can be validated by domain pack
 
@@ -462,8 +466,8 @@ Prove:
 - event order uses AggregateVersion
 - correction appends event
 - prior events immutable
-- historical event retains policy/semantic manifest
-- unknown optional extension event preserved
+- historical event retains policy/semantic manifest *(Superseded by frozen contract v1.0.0: retains `semanticVersion`)*
+- unknown optional extension event preserved *(Superseded by frozen contract v1.0.0: an unknown event type is refused, `CAUSA.UNKNOWN_EVENT_TYPE`)*
 - malformed duplicate EventId fails integrity loading
 
 ## 25. Capability tests

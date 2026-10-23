@@ -1,0 +1,1173 @@
+{
+  "description": "Hand-written semantic source for FIELD-CATALOG.md. Keys are '<schema path>[/<array or map property>]#<property>'. Payload fields take meaning and F# type from FIELD-MAPPING.md. generate_catalogs.py fails if any schema property lacks an entry.",
+  "introducedVersion": "1.0.0",
+  "fields": {
+    "actor.schema.json#actor": {
+      "fsharp": "Provenance.Actor : Actor",
+      "meaning": "Actor of the creating event.",
+      "default": "The creating event's actor."
+    },
+    "actor.schema.json#actorId": {
+      "fsharp": "Actor.Id : NonEmptyText",
+      "meaning": "Stable, non-secret, non-personal actor identifier.",
+      "default": "Copied from the producing command's actor.",
+      "rule": "Non-blank text (CONTRACT §5.3)."
+    },
+    "actor.schema.json#kind": {
+      "fsharp": "Actor.Kind : ActorKind (Human | System | Agent of provider * model)",
+      "meaning": "Actor kind. \"agent\" actors MAY appear only on ProposalRecorded events (D-004).",
+      "default": "Copied from the producing command's actor.",
+      "rule": "human/system variant has exactly {actorId, kind}; agent variant has exactly {actorId, kind, provider, model}."
+    },
+    "actor.schema.json#model": {
+      "fsharp": "ActorKind.Agent model : string",
+      "meaning": "AI model of an agent actor.",
+      "default": "Copied from the agent actor.",
+      "rule": "Non-blank text; present only when kind = \"agent\"."
+    },
+    "actor.schema.json#provider": {
+      "fsharp": "ActorKind.Agent provider : string",
+      "meaning": "AI provider of an agent actor.",
+      "default": "Copied from the agent actor.",
+      "rule": "Non-blank text; present only when kind = \"agent\"."
+    },
+    "actor.schema.json#recordedAt": {
+      "fsharp": "Provenance.At : DateTimeOffset",
+      "meaning": "occurredAt of the creating event.",
+      "default": "The creating event's occurredAt."
+    },
+    "entities/action.schema.json#id": {
+      "fsharp": "InvestigationAction.Id : ActionId",
+      "meaning": "Entity id; equals ActionRecorded.actionId of the event that created it.",
+      "default": "Copied from the creating event.",
+      "rule": "Unique within its entity array; arrays are sorted by id using ordinal comparison of the UUID text."
+    },
+    "entities/action.schema.json#kind": {
+      "fsharp": "InvestigationAction.Kind : ActionKind",
+      "meaning": "Kind of investigative action.",
+      "default": "Copied from ActionRecorded.kind."
+    },
+    "entities/action.schema.json#provenance": {
+      "fsharp": "InvestigationAction.Provenance : Provenance",
+      "meaning": "Who created the entity and when: the actor and occurredAt of the event that created it. Never changed by later events (CONTRACT §8.3).",
+      "default": "Set once on creation from the creating event's actor and occurredAt."
+    },
+    "entities/action.schema.json#purpose": {
+      "fsharp": "InvestigationAction.Purpose : NonEmptyText",
+      "meaning": "Why the action is taken.",
+      "default": "Copied from ActionRecorded.purpose."
+    },
+    "entities/action.schema.json#state": {
+      "fsharp": "InvestigationAction.State : ActionState",
+      "meaning": "Current action state.",
+      "default": "\"proposed\" on creation; set by ActionTransitioned.state."
+    },
+    "entities/action.schema.json#targetHypothesisIds": {
+      "fsharp": "InvestigationAction.Targets : HypothesisId list",
+      "meaning": "Hypotheses the action tests, in citation order.",
+      "default": "Copied from ActionRecorded.targetHypothesisIds."
+    },
+    "entities/assumption.schema.json#id": {
+      "fsharp": "Assumption.Id : AssumptionId",
+      "meaning": "Entity id; equals AssumptionRecorded.assumptionId of the event that created it.",
+      "default": "Copied from the creating event.",
+      "rule": "Unique within its entity array; arrays are sorted by id using ordinal comparison of the UUID text."
+    },
+    "entities/assumption.schema.json#materiality": {
+      "fsharp": "Assumption.Materiality : Materiality",
+      "meaning": "How much the assumption matters.",
+      "default": "Copied from AssumptionRecorded.materiality."
+    },
+    "entities/assumption.schema.json#proposition": {
+      "fsharp": "Assumption.Proposition : NonEmptyText",
+      "meaning": "The assumed proposition.",
+      "default": "Copied from AssumptionRecorded.proposition."
+    },
+    "entities/assumption.schema.json#provenance": {
+      "fsharp": "Assumption.Provenance : Provenance",
+      "meaning": "Who created the entity and when: the actor and occurredAt of the event that created it. Never changed by later events (CONTRACT §8.3).",
+      "default": "Set once on creation from the creating event's actor and occurredAt."
+    },
+    "entities/assumption.schema.json#state": {
+      "fsharp": "Assumption.State : AssumptionState",
+      "meaning": "Current assumption state.",
+      "default": "\"explicitUnverified\" on creation; set by AssumptionTransitioned.state."
+    },
+    "entities/causal-member.schema.json#hypothesisId": {
+      "fsharp": "CausalMember.Hypothesis : HypothesisId",
+      "meaning": "Member hypothesis.",
+      "default": "Copied from CausalAssertionRecorded.members[].hypothesisId."
+    },
+    "entities/causal-member.schema.json#role": {
+      "fsharp": "CausalMember.Role : CauseRole",
+      "meaning": "Role the hypothesis plays in the cause.",
+      "default": "Copied from CausalAssertionRecorded.members[].role."
+    },
+    "entities/cause.schema.json#id": {
+      "fsharp": "CausalAssertion.Id : CausalAssertionId",
+      "meaning": "Entity id; equals CausalAssertionRecorded.causeId of the event that created it.",
+      "default": "Copied from the creating event.",
+      "rule": "Unique within its entity array; arrays are sorted by id using ordinal comparison of the UUID text."
+    },
+    "entities/cause.schema.json#mechanism": {
+      "fsharp": "CausalAssertion.Mechanism : NonEmptyText option",
+      "meaning": "Causal mechanism, if stated.",
+      "default": "Copied from CausalAssertionRecorded.mechanism."
+    },
+    "entities/cause.schema.json#members": {
+      "fsharp": "CausalAssertion.Members : CausalMember list",
+      "meaning": "Hypotheses composing the cause, with roles, in recorded order.",
+      "default": "Copied from CausalAssertionRecorded.members."
+    },
+    "entities/cause.schema.json#outcome": {
+      "fsharp": "CausalAssertion.Outcome : NonEmptyText",
+      "meaning": "The outcome being explained.",
+      "default": "Copied from CausalAssertionRecorded.outcome."
+    },
+    "entities/cause.schema.json#provenance": {
+      "fsharp": "CausalAssertion.Provenance : Provenance",
+      "meaning": "Who created the entity and when: the actor and occurredAt of the event that created it. Never changed by later events (CONTRACT §8.3).",
+      "default": "Set once on creation from the creating event's actor and occurredAt."
+    },
+    "entities/cause.schema.json#state": {
+      "fsharp": "CausalAssertion.State : CausalAssertionState",
+      "meaning": "Current causal assertion state.",
+      "default": "\"proposed\" on creation; \"confirmed\" on CausalAssertionConfirmed; \"reopened\" on CausalAssertionReopened."
+    },
+    "entities/conclusion.schema.json#causeIds": {
+      "fsharp": "Conclusion.Causes : CausalAssertionId list",
+      "meaning": "Causes the conclusion rests on, in citation order.",
+      "default": "Copied from ConclusionRecorded.causeIds."
+    },
+    "entities/conclusion.schema.json#id": {
+      "fsharp": "Conclusion.Id : ConclusionId",
+      "meaning": "Entity id; equals ConclusionRecorded.conclusionId of the event that created it.",
+      "default": "Copied from the creating event.",
+      "rule": "Unique within its entity array; arrays are sorted by id using ordinal comparison of the UUID text."
+    },
+    "entities/conclusion.schema.json#provenance": {
+      "fsharp": "Conclusion.Provenance : Provenance",
+      "meaning": "Who created the entity and when: the actor and occurredAt of the event that created it. Never changed by later events (CONTRACT §8.3).",
+      "default": "Set once on creation from the creating event's actor and occurredAt."
+    },
+    "entities/conclusion.schema.json#recordedAtVersion": {
+      "fsharp": "Conclusion.Sequence : int64",
+      "meaning": "aggregateVersion of the ConclusionRecorded event; the current conclusion is the one with the highest value.",
+      "default": "The aggregateVersion of the recording event."
+    },
+    "entities/conclusion.schema.json#residualUncertainty": {
+      "fsharp": "Conclusion.ResidualUncertainty : NonEmptyText option",
+      "meaning": "Explicit residual uncertainty (R6.4).",
+      "default": "Copied from ConclusionRecorded.residualUncertainty."
+    },
+    "entities/conclusion.schema.json#statement": {
+      "fsharp": "Conclusion.Statement : NonEmptyText",
+      "meaning": "The concluded statement.",
+      "default": "Copied from ConclusionRecorded.statement."
+    },
+    "entities/conclusion.schema.json#strength": {
+      "fsharp": "Conclusion.Strength : ConclusionStrength",
+      "meaning": "Strength of the conclusion.",
+      "default": "Copied from ConclusionRecorded.strength."
+    },
+    "entities/contradiction.schema.json#basis": {
+      "fsharp": "Contradiction.Basis : NonEmptyText option",
+      "meaning": "Basis of the latest transition.",
+      "default": "null on creation; set by ContradictionTransitioned.basis."
+    },
+    "entities/contradiction.schema.json#evidenceIds": {
+      "fsharp": "Contradiction.Evidence : EvidenceId list",
+      "meaning": "Evidence involved, in citation order.",
+      "default": "Copied from ContradictionRecorded.evidenceIds."
+    },
+    "entities/contradiction.schema.json#id": {
+      "fsharp": "Contradiction.Id : ContradictionId",
+      "meaning": "Entity id; equals ContradictionRecorded.contradictionId of the event that created it.",
+      "default": "Copied from the creating event.",
+      "rule": "Unique within its entity array; arrays are sorted by id using ordinal comparison of the UUID text."
+    },
+    "entities/contradiction.schema.json#materiality": {
+      "fsharp": "Contradiction.Materiality : Materiality",
+      "meaning": "How much the contradiction matters; blocking contradictions block cause confirmation.",
+      "default": "Copied from ContradictionRecorded.materiality."
+    },
+    "entities/contradiction.schema.json#provenance": {
+      "fsharp": "Contradiction.Provenance : Provenance",
+      "meaning": "Who created the entity and when: the actor and occurredAt of the event that created it. Never changed by later events (CONTRACT §8.3).",
+      "default": "Set once on creation from the creating event's actor and occurredAt."
+    },
+    "entities/contradiction.schema.json#state": {
+      "fsharp": "Contradiction.State : ContradictionState",
+      "meaning": "Current contradiction state.",
+      "default": "\"detected\" on creation; set by ContradictionTransitioned.state."
+    },
+    "entities/contradiction.schema.json#statement": {
+      "fsharp": "Contradiction.Statement : NonEmptyText",
+      "meaning": "What contradicts what.",
+      "default": "Copied from ContradictionRecorded.statement."
+    },
+    "entities/corrective-action.schema.json#awaitingSinceVersion": {
+      "fsharp": "CorrectiveAction.AwaitingSince : int64",
+      "meaning": "aggregateVersion at which the current verification round began; 0 = never awaited verification. Used by verification freshness.",
+      "default": "0 on creation; set to the event's aggregateVersion when CorrectiveActionTransitioned.state = awaitingVerificationOfEffect."
+    },
+    "entities/corrective-action.schema.json#description": {
+      "fsharp": "CorrectiveAction.Description : NonEmptyText",
+      "meaning": "What the corrective action does.",
+      "default": "Copied from CorrectiveActionRecorded.description."
+    },
+    "entities/corrective-action.schema.json#id": {
+      "fsharp": "CorrectiveAction.Id : CorrectiveActionId",
+      "meaning": "Entity id; equals CorrectiveActionRecorded.correctiveActionId of the event that created it.",
+      "default": "Copied from the creating event.",
+      "rule": "Unique within its entity array; arrays are sorted by id using ordinal comparison of the UUID text."
+    },
+    "entities/corrective-action.schema.json#kind": {
+      "fsharp": "CorrectiveAction.Kind : CorrectiveActionKind",
+      "meaning": "Mitigation, workaround, correction or prevention (R7.2).",
+      "default": "Copied from CorrectiveActionRecorded.kind."
+    },
+    "entities/corrective-action.schema.json#provenance": {
+      "fsharp": "CorrectiveAction.Provenance : Provenance",
+      "meaning": "Who created the entity and when: the actor and occurredAt of the event that created it. Never changed by later events (CONTRACT §8.3).",
+      "default": "Set once on creation from the creating event's actor and occurredAt."
+    },
+    "entities/corrective-action.schema.json#state": {
+      "fsharp": "CorrectiveAction.State : CorrectiveActionState",
+      "meaning": "Current corrective action state.",
+      "default": "\"proposed\" on creation; set by CorrectiveActionTransitioned.state."
+    },
+    "entities/corrective-action.schema.json#targetCauseIds": {
+      "fsharp": "CorrectiveAction.Targets : CausalAssertionId list",
+      "meaning": "Causes the action addresses, in citation order.",
+      "default": "Copied from CorrectiveActionRecorded.targetCauseIds."
+    },
+    "entities/criterion.schema.json#correctiveActionId": {
+      "fsharp": "Criterion.CorrectiveAction : CorrectiveActionId",
+      "meaning": "Corrective action this criterion verifies.",
+      "default": "Copied from CriterionRecorded.correctiveActionId."
+    },
+    "entities/criterion.schema.json#expectedOutcome": {
+      "fsharp": "Criterion.ExpectedOutcome : NonEmptyText",
+      "meaning": "What success looks like (R7.3).",
+      "default": "Copied from CriterionRecorded.expectedOutcome."
+    },
+    "entities/criterion.schema.json#id": {
+      "fsharp": "Criterion.Id : CriterionId",
+      "meaning": "Entity id; equals CriterionRecorded.criterionId of the event that created it.",
+      "default": "Copied from the creating event.",
+      "rule": "Unique within its entity array; arrays are sorted by id using ordinal comparison of the UUID text."
+    },
+    "entities/criterion.schema.json#method": {
+      "fsharp": "Criterion.Method : NonEmptyText option",
+      "meaning": "How it will be checked, if stated.",
+      "default": "Copied from CriterionRecorded.method."
+    },
+    "entities/criterion.schema.json#provenance": {
+      "fsharp": "Criterion.Provenance : Provenance",
+      "meaning": "Who created the entity and when: the actor and occurredAt of the event that created it. Never changed by later events (CONTRACT §8.3).",
+      "default": "Set once on creation from the creating event's actor and occurredAt."
+    },
+    "entities/evidence.schema.json#admittedAtVersion": {
+      "fsharp": "Evidence.AdmittedAt : int64",
+      "meaning": "aggregateVersion of the EvidenceAdmitted event; used for 'new evidence' and verification-freshness rules.",
+      "default": "The aggregateVersion of the admitting event."
+    },
+    "entities/evidence.schema.json#capturedAt": {
+      "fsharp": "Evidence.CapturedAt : DateTimeOffset option",
+      "meaning": "When the evidence was captured, if known.",
+      "default": "Copied from EvidenceAdmitted.capturedAt."
+    },
+    "entities/evidence.schema.json#category": {
+      "fsharp": "Evidence.Category : EvidenceCategory",
+      "meaning": "Kind of evidence.",
+      "default": "Copied from EvidenceAdmitted.category."
+    },
+    "entities/evidence.schema.json#content": {
+      "fsharp": "Evidence.Content : EvidenceContent (payload NonEmptyText or uri string)",
+      "meaning": "Evidence text verbatim, or the absolute http(s) URL of the artifact (R3.5).",
+      "default": "Copied from EvidenceAdmitted.content."
+    },
+    "entities/evidence.schema.json#contentKind": {
+      "fsharp": "Evidence.Content : EvidenceContent (case TextEvidence | ArtifactEvidence)",
+      "meaning": "Whether content is verbatim text or an artifact URL.",
+      "default": "Copied from EvidenceAdmitted.contentKind."
+    },
+    "entities/evidence.schema.json#id": {
+      "fsharp": "Evidence.Id : EvidenceId",
+      "meaning": "Entity id; equals EvidenceAdmitted.evidenceId of the event that created it.",
+      "default": "Copied from the creating event.",
+      "rule": "Unique within its entity array; arrays are sorted by id using ordinal comparison of the UUID text."
+    },
+    "entities/evidence.schema.json#provenance": {
+      "fsharp": "Evidence.Provenance : Provenance",
+      "meaning": "Who created the entity and when: the actor and occurredAt of the event that created it. Never changed by later events (CONTRACT §8.3).",
+      "default": "Set once on creation from the creating event's actor and occurredAt."
+    },
+    "entities/evidence.schema.json#source": {
+      "fsharp": "Evidence.Source : NonEmptyText",
+      "meaning": "Where the evidence came from (R3.2).",
+      "default": "Copied from EvidenceAdmitted.source."
+    },
+    "entities/evidence.schema.json#supersededBy": {
+      "fsharp": "Evidence.SupersededBy : EvidenceId option",
+      "meaning": "Replacement evidence, if this evidence was superseded. The original stays in history.",
+      "default": "null on admission; set by EvidenceSuperseded.replacementEvidenceId."
+    },
+    "entities/evidence.schema.json#verification": {
+      "fsharp": "Evidence.Verification : VerificationStatus",
+      "meaning": "Current verification assessment.",
+      "default": "\"unverified\" on admission; set by EvidenceVerificationAssessed.verification."
+    },
+    "entities/finding.schema.json#actionId": {
+      "fsharp": "Finding.Action : ActionId",
+      "meaning": "Action that produced the finding.",
+      "default": "Copied from FindingRecorded.actionId."
+    },
+    "entities/finding.schema.json#id": {
+      "fsharp": "Finding.Id : FindingId",
+      "meaning": "Entity id; equals FindingRecorded.findingId of the event that created it.",
+      "default": "Copied from the creating event.",
+      "rule": "Unique within its entity array; arrays are sorted by id using ordinal comparison of the UUID text."
+    },
+    "entities/finding.schema.json#interpretation": {
+      "fsharp": "Finding.Interpretation : NonEmptyText option",
+      "meaning": "Interpretation of the result, if any.",
+      "default": "Copied from FindingRecorded.interpretation."
+    },
+    "entities/finding.schema.json#originalResult": {
+      "fsharp": "Finding.OriginalResult : NonEmptyText",
+      "meaning": "Actual result exactly as entered (R4.4).",
+      "default": "Copied from FindingRecorded.originalResult."
+    },
+    "entities/finding.schema.json#provenance": {
+      "fsharp": "Finding.Provenance : Provenance",
+      "meaning": "Who created the entity and when: the actor and occurredAt of the event that created it. Never changed by later events (CONTRACT §8.3).",
+      "default": "Set once on creation from the creating event's actor and occurredAt."
+    },
+    "entities/hypothesis-change.schema.json#aggregateVersion": {
+      "fsharp": "HypothesisChange.Sequence : int64",
+      "meaning": "Event sequence of the change; used by 'new evidence since falsification' rules.",
+      "default": "The aggregateVersion of the HypothesisTransitioned event (CONTRACT §7.2)."
+    },
+    "entities/hypothesis-change.schema.json#at": {
+      "fsharp": "HypothesisChange.At : DateTimeOffset",
+      "meaning": "When the change happened.",
+      "default": "The occurredAt of the HypothesisTransitioned event (not persisted in the payload; CONTRACT §7.2)."
+    },
+    "entities/hypothesis-change.schema.json#command": {
+      "fsharp": "HypothesisChange.Command : string (HypothesisCommand case name)",
+      "meaning": "Command that caused the change.",
+      "default": "Copied from HypothesisTransitioned.command."
+    },
+    "entities/hypothesis-change.schema.json#evidenceIds": {
+      "fsharp": "HypothesisChange.Evidence : EvidenceId list",
+      "meaning": "Evidence cited for the change, in citation order.",
+      "default": "Copied from HypothesisTransitioned.evidenceIds."
+    },
+    "entities/hypothesis-change.schema.json#from": {
+      "fsharp": "HypothesisChange.From : HypothesisState",
+      "meaning": "State before the change.",
+      "default": "Copied from HypothesisTransitioned.from."
+    },
+    "entities/hypothesis-change.schema.json#reason": {
+      "fsharp": "HypothesisChange.Reason : NonEmptyText",
+      "meaning": "Why the change was made (R2.3).",
+      "default": "Copied from HypothesisTransitioned.reason."
+    },
+    "entities/hypothesis-change.schema.json#to": {
+      "fsharp": "HypothesisChange.To : HypothesisState",
+      "meaning": "State after the change.",
+      "default": "Copied from HypothesisTransitioned.to."
+    },
+    "entities/hypothesis.schema.json#history": {
+      "fsharp": "Hypothesis.History : HypothesisChange list",
+      "meaning": "Every hypothesis transition in aggregateVersion order (R2.3).",
+      "default": "[] on creation; HypothesisTransitioned appends one entry."
+    },
+    "entities/hypothesis.schema.json#id": {
+      "fsharp": "Hypothesis.Id : HypothesisId",
+      "meaning": "Entity id; equals HypothesisRecorded.hypothesisId of the event that created it.",
+      "default": "Copied from the creating event.",
+      "rule": "Unique within its entity array; arrays are sorted by id using ordinal comparison of the UUID text."
+    },
+    "entities/hypothesis.schema.json#mechanism": {
+      "fsharp": "Hypothesis.Mechanism : NonEmptyText option",
+      "meaning": "Proposed mechanism, if stated.",
+      "default": "Copied from HypothesisRecorded.mechanism."
+    },
+    "entities/hypothesis.schema.json#provenance": {
+      "fsharp": "Hypothesis.Provenance : Provenance",
+      "meaning": "Who created the entity and when: the actor and occurredAt of the event that created it. Never changed by later events (CONTRACT §8.3).",
+      "default": "Set once on creation from the creating event's actor and occurredAt."
+    },
+    "entities/hypothesis.schema.json#state": {
+      "fsharp": "Hypothesis.State : HypothesisState",
+      "meaning": "Current hypothesis state.",
+      "default": "\"proposed\" on creation; set to HypothesisTransitioned.to on each transition."
+    },
+    "entities/hypothesis.schema.json#statement": {
+      "fsharp": "Hypothesis.Statement : NonEmptyText",
+      "meaning": "Hypothesis statement, verbatim.",
+      "default": "Copied from HypothesisRecorded.statement."
+    },
+    "entities/negative-knowledge.schema.json#basisEvidenceIds": {
+      "fsharp": "NegativeKnowledge.Basis : EvidenceId list",
+      "meaning": "Evidence establishing it, at least one, in citation order.",
+      "default": "Copied from NegativeKnowledgeEstablished.basisEvidenceIds."
+    },
+    "entities/negative-knowledge.schema.json#id": {
+      "fsharp": "NegativeKnowledge.Id : NegativeKnowledgeId",
+      "meaning": "Entity id; equals NegativeKnowledgeEstablished.negativeKnowledgeId of the event that created it.",
+      "default": "Copied from the creating event.",
+      "rule": "Unique within its entity array; arrays are sorted by id using ordinal comparison of the UUID text."
+    },
+    "entities/negative-knowledge.schema.json#provenance": {
+      "fsharp": "NegativeKnowledge.Provenance : Provenance",
+      "meaning": "Who created the entity and when: the actor and occurredAt of the event that created it. Never changed by later events (CONTRACT §8.3).",
+      "default": "Set once on creation from the creating event's actor and occurredAt."
+    },
+    "entities/negative-knowledge.schema.json#scope": {
+      "fsharp": "NegativeKnowledge.Scope : NonEmptyText",
+      "meaning": "Scope within which the negative statement holds.",
+      "default": "Copied from NegativeKnowledgeEstablished.scope."
+    },
+    "entities/negative-knowledge.schema.json#statement": {
+      "fsharp": "NegativeKnowledge.Statement : NonEmptyText",
+      "meaning": "What was established NOT to be the case (R5.3).",
+      "default": "Copied from NegativeKnowledgeEstablished.statement."
+    },
+    "entities/observation.schema.json#id": {
+      "fsharp": "Observation.Id : ObservationId",
+      "meaning": "Entity id; equals InvestigationStarted/ObservationRecorded.observationId of the event that created it.",
+      "default": "Copied from the creating event.",
+      "rule": "Unique within its entity array; arrays are sorted by id using ordinal comparison of the UUID text."
+    },
+    "entities/observation.schema.json#observedAt": {
+      "fsharp": "Observation.ObservedAt : DateTimeOffset option",
+      "meaning": "When the observation was made, if known. Always null for the initial observation created by InvestigationStarted.",
+      "default": "null for the InvestigationStarted observation; otherwise copied from ObservationRecorded.observedAt."
+    },
+    "entities/observation.schema.json#original": {
+      "fsharp": "Observation.Original : NonEmptyText",
+      "meaning": "Observation text preserved verbatim (R1.2).",
+      "default": "Copied from InvestigationStarted.original / ObservationRecorded.original."
+    },
+    "entities/observation.schema.json#provenance": {
+      "fsharp": "Observation.Provenance : Provenance",
+      "meaning": "Who created the entity and when: the actor and occurredAt of the event that created it. Never changed by later events (CONTRACT §8.3).",
+      "default": "Set once on creation from the creating event's actor and occurredAt."
+    },
+    "entities/prediction.schema.json#hypothesisId": {
+      "fsharp": "Prediction.Hypothesis : HypothesisId",
+      "meaning": "Hypothesis the prediction derives from.",
+      "default": "Copied from PredictionRecorded.hypothesisId."
+    },
+    "entities/prediction.schema.json#id": {
+      "fsharp": "Prediction.Id : PredictionId",
+      "meaning": "Entity id; equals PredictionRecorded.predictionId of the event that created it.",
+      "default": "Copied from the creating event.",
+      "rule": "Unique within its entity array; arrays are sorted by id using ordinal comparison of the UUID text."
+    },
+    "entities/prediction.schema.json#provenance": {
+      "fsharp": "Prediction.Provenance : Provenance",
+      "meaning": "Who created the entity and when: the actor and occurredAt of the event that created it. Never changed by later events (CONTRACT §8.3).",
+      "default": "Set once on creation from the creating event's actor and occurredAt."
+    },
+    "entities/prediction.schema.json#statement": {
+      "fsharp": "Prediction.Statement : NonEmptyText",
+      "meaning": "What is predicted.",
+      "default": "Copied from PredictionRecorded.statement."
+    },
+    "entities/prediction.schema.json#strength": {
+      "fsharp": "Prediction.Strength : PredictionStrength",
+      "meaning": "How strongly the prediction follows from the hypothesis.",
+      "default": "Copied from PredictionRecorded.strength."
+    },
+    "entities/prediction.schema.json#timing": {
+      "fsharp": "Prediction.Timing : PredictionTiming",
+      "meaning": "Prospective or retrospective, as decided by the engine.",
+      "default": "Copied from PredictionRecorded.timing."
+    },
+    "entities/proposal.schema.json#decision": {
+      "fsharp": "Proposal.Decision : NonEmptyText option",
+      "meaning": "Rejection reason when rejected; otherwise null.",
+      "default": "null on creation; set to ProposalWasRejected.reason."
+    },
+    "entities/proposal.schema.json#id": {
+      "fsharp": "Proposal.Id : ProposalId",
+      "meaning": "Entity id; equals ProposalRecorded.proposalId of the event that created it.",
+      "default": "Copied from the creating event.",
+      "rule": "Unique within its entity array; arrays are sorted by id using ordinal comparison of the UUID text."
+    },
+    "entities/proposal.schema.json#kind": {
+      "fsharp": "Proposal.Kind : ProposalKind",
+      "meaning": "What the proposal would create if accepted.",
+      "default": "Copied from ProposalRecorded.kind."
+    },
+    "entities/proposal.schema.json#provenance": {
+      "fsharp": "Proposal.Provenance : Provenance",
+      "meaning": "Who created the entity and when: the actor and occurredAt of the event that created it. Never changed by later events (CONTRACT §8.3).",
+      "default": "Set once on creation from the creating event's actor and occurredAt."
+    },
+    "entities/proposal.schema.json#rationale": {
+      "fsharp": "Proposal.Rationale : NonEmptyText option",
+      "meaning": "Why it was proposed, if stated.",
+      "default": "Copied from ProposalRecorded.rationale."
+    },
+    "entities/proposal.schema.json#state": {
+      "fsharp": "Proposal.State : ProposalState",
+      "meaning": "Current proposal state.",
+      "default": "\"active\" on creation; \"accepted\" on ProposalWasAccepted; \"rejected\" on ProposalWasRejected."
+    },
+    "entities/proposal.schema.json#text": {
+      "fsharp": "Proposal.Text : NonEmptyText",
+      "meaning": "Proposed statement, question or purpose; never evidence (R15.2).",
+      "default": "Copied from ProposalRecorded.text."
+    },
+    "entities/relationship.schema.json#evidenceId": {
+      "fsharp": "Relationship.Evidence : EvidenceId",
+      "meaning": "Related evidence.",
+      "default": "Copied from EvidenceRelated.evidenceId."
+    },
+    "entities/relationship.schema.json#hypothesisId": {
+      "fsharp": "Relationship.Hypothesis : HypothesisId",
+      "meaning": "Related hypothesis.",
+      "default": "Copied from EvidenceRelated.hypothesisId."
+    },
+    "entities/relationship.schema.json#id": {
+      "fsharp": "Relationship.Id : RelationshipId",
+      "meaning": "Entity id; equals EvidenceRelated.relationshipId of the event that created it.",
+      "default": "Copied from the creating event.",
+      "rule": "Unique within its entity array; arrays are sorted by id using ordinal comparison of the UUID text."
+    },
+    "entities/relationship.schema.json#kind": {
+      "fsharp": "Relationship.Kind : RelationshipKind",
+      "meaning": "How the evidence bears on the hypothesis.",
+      "default": "Copied from EvidenceRelated.kind."
+    },
+    "entities/relationship.schema.json#provenance": {
+      "fsharp": "Relationship.Provenance : Provenance",
+      "meaning": "Who created the entity and when: the actor and occurredAt of the event that created it. Never changed by later events (CONTRACT §8.3).",
+      "default": "Set once on creation from the creating event's actor and occurredAt."
+    },
+    "entities/relationship.schema.json#rationale": {
+      "fsharp": "Relationship.Rationale : NonEmptyText option",
+      "meaning": "Why the relationship holds, if stated.",
+      "default": "Copied from EvidenceRelated.rationale."
+    },
+    "entities/unknown.schema.json#basis": {
+      "fsharp": "Unknown.Basis : NonEmptyText option",
+      "meaning": "Basis of the latest transition.",
+      "default": "null on creation; set by UnknownTransitioned.basis."
+    },
+    "entities/unknown.schema.json#id": {
+      "fsharp": "Unknown.Id : UnknownId",
+      "meaning": "Entity id; equals UnknownIdentified.unknownId of the event that created it.",
+      "default": "Copied from the creating event.",
+      "rule": "Unique within its entity array; arrays are sorted by id using ordinal comparison of the UUID text."
+    },
+    "entities/unknown.schema.json#materiality": {
+      "fsharp": "Unknown.Materiality : Materiality",
+      "meaning": "How much the unknown matters to the conclusion.",
+      "default": "Copied from UnknownIdentified.materiality."
+    },
+    "entities/unknown.schema.json#provenance": {
+      "fsharp": "Unknown.Provenance : Provenance",
+      "meaning": "Who created the entity and when: the actor and occurredAt of the event that created it. Never changed by later events (CONTRACT §8.3).",
+      "default": "Set once on creation from the creating event's actor and occurredAt."
+    },
+    "entities/unknown.schema.json#question": {
+      "fsharp": "Unknown.Question : NonEmptyText",
+      "meaning": "The open question.",
+      "default": "Copied from UnknownIdentified.question."
+    },
+    "entities/unknown.schema.json#state": {
+      "fsharp": "Unknown.State : UnknownState",
+      "meaning": "Current unknown state.",
+      "default": "\"identified\" on creation; set by UnknownTransitioned.state."
+    },
+    "entities/verification.schema.json#criterionId": {
+      "fsharp": "Verification.Criterion : CriterionId",
+      "meaning": "Criterion verified.",
+      "default": "Copied from VerificationRecorded.criterionId."
+    },
+    "entities/verification.schema.json#evidenceIds": {
+      "fsharp": "Verification.Evidence : EvidenceId list",
+      "meaning": "Evidence cited, in citation order; non-empty when satisfied (R7.4).",
+      "default": "Copied from VerificationRecorded.evidenceIds."
+    },
+    "entities/verification.schema.json#id": {
+      "fsharp": "Verification.Id : VerificationId",
+      "meaning": "Entity id; equals VerificationRecorded.verificationId of the event that created it.",
+      "default": "Copied from the creating event.",
+      "rule": "Unique within its entity array; arrays are sorted by id using ordinal comparison of the UUID text."
+    },
+    "entities/verification.schema.json#outcome": {
+      "fsharp": "Verification.Outcome : VerificationOutcome",
+      "meaning": "Verification outcome.",
+      "default": "Copied from VerificationRecorded.outcome."
+    },
+    "entities/verification.schema.json#provenance": {
+      "fsharp": "Verification.Provenance : Provenance",
+      "meaning": "Who created the entity and when: the actor and occurredAt of the event that created it. Never changed by later events (CONTRACT §8.3).",
+      "default": "Set once on creation from the creating event's actor and occurredAt."
+    },
+    "entities/verification.schema.json#recordedAtVersion": {
+      "fsharp": "Verification.Sequence : int64",
+      "meaning": "aggregateVersion of the VerificationRecorded event (verification freshness, R7.4).",
+      "default": "The aggregateVersion of the recording event."
+    },
+    "event-envelope.schema.json#actor": {
+      "fsharp": "Event.Actor : Actor",
+      "meaning": "Actor who issued the producing command.",
+      "default": "Supplied by the command.",
+      "rule": "See actor.schema.json; agent only on ProposalRecorded."
+    },
+    "event-envelope.schema.json#aggregateVersion": {
+      "fsharp": "Event.Sequence : int64",
+      "meaning": "Position in the history; 1..N in file order.",
+      "default": "Next version after the current one.",
+      "rule": "Exactly 1..N in file order (CAUSA.SEQUENCE_INVALID); InvestigationStarted is version 1."
+    },
+    "event-envelope.schema.json#correlationId": {
+      "fsharp": "Event.CommandId : Guid",
+      "meaning": "Id of the producing command; shared by all events of one command group.",
+      "default": "A fresh id per command.",
+      "rule": "Must not name two non-adjacent groups (CAUSA.CORRELATION_REUSED)."
+    },
+    "event-envelope.schema.json#eventId": {
+      "fsharp": "derived Guid (engine has no event id)",
+      "meaning": "Event identity, UUIDv5(241fefd4-c810-5a3a-9cfa-4bbd968ae1cb, investigationId + \"/\" + aggregateVersion + \"/\" + correlationId).",
+      "default": "Derived; never chosen freely.",
+      "rule": "Must equal the derivation (CAUSA.EVENT_ID_MISMATCH) and be unique (CAUSA.EVENT_ID_DUPLICATE)."
+    },
+    "event-envelope.schema.json#eventType": {
+      "fsharp": "EventBody case name",
+      "meaning": "Event discriminator selecting the payload schema.",
+      "default": "None.",
+      "rule": "Registered discriminator (CAUSA.UNKNOWN_EVENT_TYPE otherwise; fail closed)."
+    },
+    "event-envelope.schema.json#formatVersion": {
+      "fsharp": "constant \"1.0.0\" (no engine field)",
+      "meaning": "Wire format version.",
+      "default": "Always \"1.0.0\".",
+      "rule": "A string other than \"1.0.0\" is CAUSA.UNSUPPORTED_VERSION (stage 5); non-string is CAUSA.SCHEMA_VIOLATION."
+    },
+    "event-envelope.schema.json#investigationId": {
+      "fsharp": "Event.Investigation : InvestigationId",
+      "meaning": "Investigation the event belongs to.",
+      "default": "Copied from the investigation.",
+      "rule": "Must equal the manifest investigationId and directory name (CAUSA.INVESTIGATION_MISMATCH)."
+    },
+    "event-envelope.schema.json#occurredAt": {
+      "fsharp": "Event.At : DateTimeOffset",
+      "meaning": "Time the producing command was decided (engine RequestedAt), millisecond UTC.",
+      "default": "Supplied by the command boundary, millisecond-truncated.",
+      "rule": "Recorded, not validated for order; calendar-valid; sub-millisecond instants are CAUSA.UNREPRESENTABLE on write."
+    },
+    "event-envelope.schema.json#payload": {
+      "fsharp": "Event.Body : EventBody",
+      "meaning": "Event-specific data; shape selected by eventType.",
+      "default": "None.",
+      "rule": "Closed per-eventType schema in payloads/<eventType>.schema.json."
+    },
+    "event-envelope.schema.json#semanticVersion": {
+      "fsharp": "constant \"1.0.0\" (no engine field)",
+      "meaning": "Semantic (domain meaning) version.",
+      "default": "Always \"1.0.0\".",
+      "rule": "A string other than \"1.0.0\" is CAUSA.UNSUPPORTED_VERSION."
+    },
+    "golden-scenarios.schema.json#formatVersion": {
+      "fsharp": "string (constant \"1.0.0\")",
+      "meaning": "Wire format version.",
+      "default": "Always \"1.0.0\"."
+    },
+    "golden-scenarios.schema.json#scenarios": {
+      "fsharp": "ScenarioSummary list",
+      "meaning": "Informative generator summary per scenario (not authoritative).",
+      "default": "Fixed at freeze.",
+      "rule": "Contradicting the investigations is CAUSA.GOLDEN_MISMATCH."
+    },
+    "golden-scenarios.schema.json/scenarios#commands": {
+      "fsharp": "ScenarioSummary.Commands : int",
+      "meaning": "Commands issued: persisted command groups plus refused commands.",
+      "default": "Fixed at freeze."
+    },
+    "golden-scenarios.schema.json/scenarios#eventTypes": {
+      "fsharp": "ScenarioSummary.EventTypes : string list",
+      "meaning": "Distinct event types, sorted ordinally.",
+      "default": "Fixed at freeze."
+    },
+    "golden-scenarios.schema.json/scenarios#events": {
+      "fsharp": "ScenarioSummary.Events : int64",
+      "meaning": "Number of persisted events.",
+      "default": "Fixed at freeze."
+    },
+    "golden-scenarios.schema.json/scenarios#investigationId": {
+      "fsharp": "ScenarioSummary.InvestigationId : InvestigationId",
+      "meaning": "Investigation id.",
+      "default": "Fixed at freeze."
+    },
+    "golden-scenarios.schema.json/scenarios#refusals": {
+      "fsharp": "ScenarioSummary.Refusals : Refusal list",
+      "meaning": "Commands the engine refused (never persisted).",
+      "default": "Fixed at freeze."
+    },
+    "golden-scenarios.schema.json/scenarios#scenarioKey": {
+      "fsharp": "ScenarioSummary.ScenarioKey : string (slug)",
+      "meaning": "Scenario key.",
+      "default": "Fixed at freeze."
+    },
+    "golden-scenarios.schema.json/scenarios/refusals#engineCodes": {
+      "fsharp": "Refusal.EngineCodes : string",
+      "meaning": "Every code the engine returned, joined by '; '.",
+      "default": "Fixed at freeze."
+    },
+    "golden-scenarios.schema.json/scenarios/refusals#expectedCode": {
+      "fsharp": "Refusal.ExpectedCode : string",
+      "meaning": "Domain code the engine must return first.",
+      "default": "Fixed at freeze."
+    },
+    "golden-scenarios.schema.json/scenarios/refusals#step": {
+      "fsharp": "Refusal.Step : int",
+      "meaning": "0-based generator step index of the refused command.",
+      "default": "Fixed at freeze."
+    },
+    "investigation-manifest.schema.json#aggregateVersion": {
+      "fsharp": "int64",
+      "meaning": "Current aggregate version.",
+      "default": "Number of lines in events.ndjson.",
+      "rule": "Must equal the number of lines (stage 8, CAUSA.MANIFEST_MISMATCH)."
+    },
+    "investigation-manifest.schema.json#createdAt": {
+      "fsharp": "DateTimeOffset",
+      "meaning": "occurredAt of the first event.",
+      "default": "Copied from event 1.",
+      "rule": "Mismatch is CAUSA.MANIFEST_MISMATCH."
+    },
+    "investigation-manifest.schema.json#domainPacks": {
+      "fsharp": "string list (always empty)",
+      "meaning": "Domain packs applied; none exist in v1.0.0.",
+      "default": "Always [].",
+      "rule": "maxItems 0."
+    },
+    "investigation-manifest.schema.json#eventCount": {
+      "fsharp": "int64",
+      "meaning": "Number of events.",
+      "default": "Number of lines in events.ndjson.",
+      "rule": "Must equal the number of lines (CAUSA.MANIFEST_MISMATCH)."
+    },
+    "investigation-manifest.schema.json#eventsSha256": {
+      "fsharp": "Sha256 (lowercase hex string)",
+      "meaning": "SHA-256 of the exact events.ndjson bytes.",
+      "default": "Recomputed on every append.",
+      "rule": "Mismatch is CAUSA.EVENTS_HASH_MISMATCH."
+    },
+    "investigation-manifest.schema.json#formatVersion": {
+      "fsharp": "string (constant \"1.0.0\")",
+      "meaning": "Wire format version.",
+      "default": "Always \"1.0.0\"."
+    },
+    "investigation-manifest.schema.json#investigationId": {
+      "fsharp": "InvestigationId",
+      "meaning": "Investigation id.",
+      "default": "Copied from the events.",
+      "rule": "Must equal the directory name (CAUSA.MANIFEST_MISMATCH)."
+    },
+    "investigation-manifest.schema.json#schemaVersion": {
+      "fsharp": "string (constant \"1.0.0\")",
+      "meaning": "Schema version of the files.",
+      "default": "Always \"1.0.0\"."
+    },
+    "investigation-manifest.schema.json#semanticVersion": {
+      "fsharp": "string (constant \"1.0.0\")",
+      "meaning": "Semantic version of the history.",
+      "default": "Always \"1.0.0\"."
+    },
+    "investigation-manifest.schema.json#snapshotSha256": {
+      "fsharp": "Sha256 (lowercase hex string)",
+      "meaning": "SHA-256 of the canonical snapshot text without its trailing LF.",
+      "default": "Recomputed on every append.",
+      "rule": "Mismatch is CAUSA.SNAPSHOT_HASH_MISMATCH."
+    },
+    "investigation-manifest.schema.json#snapshotVersion": {
+      "fsharp": "int (constant 1)",
+      "meaning": "Projection rules version (§8.3).",
+      "default": "Always 1."
+    },
+    "investigation-manifest.schema.json#updatedAt": {
+      "fsharp": "DateTimeOffset",
+      "meaning": "occurredAt of the last event.",
+      "default": "Copied from event N.",
+      "rule": "Mismatch is CAUSA.MANIFEST_MISMATCH."
+    },
+    "negative-fixture.schema.json#appendedEvents": {
+      "fsharp": "NegativeFixture.AppendedEvents : FileBytes",
+      "meaning": "NDJSON lines to append, base64 (kind append).",
+      "default": "Fixed at freeze."
+    },
+    "negative-fixture.schema.json#baseScenarioKey": {
+      "fsharp": "NegativeFixture.BaseScenarioKey : string (slug)",
+      "meaning": "Frozen scenario the append/successor applies to.",
+      "default": "Fixed at freeze."
+    },
+    "negative-fixture.schema.json#description": {
+      "fsharp": "NegativeFixture.Description : NonEmptyText",
+      "meaning": "What the fixture violates.",
+      "default": "Fixed at freeze."
+    },
+    "negative-fixture.schema.json#directoryId": {
+      "fsharp": "NegativeFixture.DirectoryId : string",
+      "meaning": "Directory name under which the files are validated (kind investigation).",
+      "default": "Fixed at freeze."
+    },
+    "negative-fixture.schema.json#expectedAggregateVersion": {
+      "fsharp": "NegativeFixture.ExpectedAggregateVersion : int64",
+      "meaning": "Version the append command observed (kind append).",
+      "default": "Fixed at freeze."
+    },
+    "negative-fixture.schema.json#expectedDomainCode": {
+      "fsharp": "NegativeFixture.ExpectedDomainCode : string option",
+      "meaning": "Domain code for CAUSA.HISTORY_INADMISSIBLE; otherwise null.",
+      "default": "Fixed at freeze."
+    },
+    "negative-fixture.schema.json#expectedErrorCode": {
+      "fsharp": "NegativeFixture.ExpectedErrorCode : string (CAUSA.* code)",
+      "meaning": "Primary code a conforming reader must report.",
+      "default": "Fixed at freeze."
+    },
+    "negative-fixture.schema.json#files": {
+      "fsharp": "NegativeFixture.Files : Map<string, FileBytes>",
+      "meaning": "Directory entries by file name, base64 bytes (kind investigation or successor).",
+      "default": "Fixed at freeze."
+    },
+    "negative-fixture.schema.json#formatVersion": {
+      "fsharp": "NegativeFixture.FormatVersion : string (constant \"1.0.0\")",
+      "meaning": "Wire format version.",
+      "default": "Fixed at freeze."
+    },
+    "negative-fixture.schema.json#kind": {
+      "fsharp": "NegativeFixture.Kind : string (investigation | append | successor)",
+      "meaning": "Fixture kind (CONTRACT §12.2).",
+      "default": "Fixed at freeze."
+    },
+    "negative-fixture.schema.json#name": {
+      "fsharp": "NegativeFixture.Name : string (slug)",
+      "meaning": "Fixture name; equals the file stem.",
+      "default": "Fixed at freeze."
+    },
+    "negative-fixture.schema.json/appendedEvents#base64": {
+      "fsharp": "string (base64)",
+      "meaning": "Exact appended NDJSON bytes, base64-encoded.",
+      "default": "Fixed at freeze."
+    },
+    "negative-fixture.schema.json/files#base64": {
+      "fsharp": "string (base64)",
+      "meaning": "Exact file bytes, base64-encoded.",
+      "default": "Fixed at freeze."
+    },
+    "negative-fixture.schema.json/files#{fileName}": {
+      "fsharp": "FileBytes (one directory entry)",
+      "meaning": "One directory entry; the key is the exact file name (any name, so missing and extra files are representable, CONTRACT §3.3).",
+      "default": "Fixed at freeze."
+    },
+    "root-manifest.schema.json#createdAt": {
+      "fsharp": "DateTimeOffset",
+      "meaning": "When the dataset was generated.",
+      "default": "Fixed at generation."
+    },
+    "root-manifest.schema.json#datasetId": {
+      "fsharp": "string (constant \"causa-demo-v1\")",
+      "meaning": "Frozen dataset identity.",
+      "default": "Always \"causa-demo-v1\"."
+    },
+    "root-manifest.schema.json#formatVersion": {
+      "fsharp": "string (constant \"1.0.0\")",
+      "meaning": "Wire format version.",
+      "default": "Always \"1.0.0\"."
+    },
+    "root-manifest.schema.json#investigations": {
+      "fsharp": "DatasetEntry list",
+      "meaning": "Valid investigations, ordered by investigationId (ordinal), unique ids and keys.",
+      "default": "Fixed at freeze."
+    },
+    "root-manifest.schema.json#negativeFixtures": {
+      "fsharp": "NegativeFixtureRef list",
+      "meaning": "Negative fixtures with their expected primary code.",
+      "default": "Fixed at freeze.",
+      "rule": "Never listed as valid investigations."
+    },
+    "root-manifest.schema.json#schemaSha256": {
+      "fsharp": "Sha256",
+      "meaning": "Schema identity: SHA-256 of schemas/bundle.json bytes.",
+      "default": "Fixed at freeze.",
+      "rule": "Must equal the bundle digest (CAUSA.FIXTURE_DRIFT)."
+    },
+    "root-manifest.schema.json/investigations#eventsSha256": {
+      "fsharp": "DatasetEntry.EventsSha256 : Sha256",
+      "meaning": "Digest of the events.ndjson bytes.",
+      "default": "Fixed at freeze.",
+      "rule": "Any difference from the investigation is CAUSA.FIXTURE_DRIFT."
+    },
+    "root-manifest.schema.json/investigations#expectedLifecycle": {
+      "fsharp": "DatasetEntry.ExpectedLifecycle : InvestigationLifecycle",
+      "meaning": "Expected final lifecycle.",
+      "default": "Fixed at freeze.",
+      "rule": "Any difference from the investigation is CAUSA.FIXTURE_DRIFT."
+    },
+    "root-manifest.schema.json/investigations#expectedStateSha256": {
+      "fsharp": "DatasetEntry.ExpectedStateSha256 : Sha256",
+      "meaning": "Digest of the canonical state object (§8.4).",
+      "default": "Fixed at freeze.",
+      "rule": "Any difference from the investigation is CAUSA.FIXTURE_DRIFT."
+    },
+    "root-manifest.schema.json/investigations#expectedVersion": {
+      "fsharp": "DatasetEntry.ExpectedVersion : int64",
+      "meaning": "Expected final aggregateVersion.",
+      "default": "Fixed at freeze.",
+      "rule": "Any difference from the investigation is CAUSA.FIXTURE_DRIFT."
+    },
+    "root-manifest.schema.json/investigations#investigationId": {
+      "fsharp": "DatasetEntry.InvestigationId : InvestigationId",
+      "meaning": "Investigation id (= directory name).",
+      "default": "Fixed at freeze.",
+      "rule": "Any difference from the investigation is CAUSA.FIXTURE_DRIFT."
+    },
+    "root-manifest.schema.json/investigations#manifestSha256": {
+      "fsharp": "DatasetEntry.ManifestSha256 : Sha256",
+      "meaning": "Canonical digest of manifest.json.",
+      "default": "Fixed at freeze.",
+      "rule": "Any difference from the investigation is CAUSA.FIXTURE_DRIFT."
+    },
+    "root-manifest.schema.json/investigations#scenarioKey": {
+      "fsharp": "DatasetEntry.ScenarioKey : string (slug)",
+      "meaning": "Scenario key, e.g. payment-failure.",
+      "default": "Fixed at freeze.",
+      "rule": "Any difference from the investigation is CAUSA.FIXTURE_DRIFT."
+    },
+    "root-manifest.schema.json/investigations#snapshotSha256": {
+      "fsharp": "DatasetEntry.SnapshotSha256 : Sha256",
+      "meaning": "Canonical digest of snapshot.json.",
+      "default": "Fixed at freeze.",
+      "rule": "Any difference from the investigation is CAUSA.FIXTURE_DRIFT."
+    },
+    "root-manifest.schema.json/investigations#title": {
+      "fsharp": "DatasetEntry.Title : NonEmptyText",
+      "meaning": "Investigation title; must equal state.title.",
+      "default": "Fixed at freeze.",
+      "rule": "Any difference from the investigation is CAUSA.FIXTURE_DRIFT."
+    },
+    "root-manifest.schema.json/negativeFixtures#expectedErrorCode": {
+      "fsharp": "string (CAUSA.* code)",
+      "meaning": "Primary code a conforming reader must report.",
+      "default": "Fixed at freeze.",
+      "rule": "Must equal the fixture's own expectedErrorCode."
+    },
+    "root-manifest.schema.json/negativeFixtures#path": {
+      "fsharp": "string",
+      "meaning": "Path of the negative fixture relative to fixtures/v1.0.0/.",
+      "default": "Fixed at freeze.",
+      "rule": "Pattern ^negative/[a-z0-9][a-z0-9-]*\\.json$."
+    },
+    "schema-bundle.schema.json#algorithm": {
+      "fsharp": "SchemaBundle.Algorithm : string (constant \"sha256\")",
+      "meaning": "Digest algorithm.",
+      "default": "Fixed at freeze."
+    },
+    "schema-bundle.schema.json#canonicalization": {
+      "fsharp": "SchemaBundle.Canonicalization : string (constant \"RFC8785\")",
+      "meaning": "Canonical JSON form used by data files.",
+      "default": "Fixed at freeze."
+    },
+    "schema-bundle.schema.json#contractVersion": {
+      "fsharp": "SchemaBundle.ContractVersion : string (constant \"1.0.0\")",
+      "meaning": "Contract version.",
+      "default": "Fixed at freeze."
+    },
+    "schema-bundle.schema.json#formatVersion": {
+      "fsharp": "SchemaBundle.FormatVersion : string (constant \"1.0.0\")",
+      "meaning": "Wire format version.",
+      "default": "Fixed at freeze."
+    },
+    "schema-bundle.schema.json#schemas": {
+      "fsharp": "SchemaBundle.Schemas : SchemaEntry list",
+      "meaning": "Every *.schema.json under schemas/, sorted ordinally by path.",
+      "default": "Fixed at freeze."
+    },
+    "schema-bundle.schema.json/schemas#path": {
+      "fsharp": "string",
+      "meaning": "Schema path relative to schemas/, '/'-separated.",
+      "default": "Fixed at freeze."
+    },
+    "schema-bundle.schema.json/schemas#sha256": {
+      "fsharp": "Sha256",
+      "meaning": "SHA-256 of the schema file's exact bytes.",
+      "default": "Fixed at freeze.",
+      "rule": "Mismatch breaks schema identity."
+    },
+    "snapshot.schema.json#aggregateVersion": {
+      "fsharp": "int64",
+      "meaning": "Version of the last applied event.",
+      "default": "N."
+    },
+    "snapshot.schema.json#formatVersion": {
+      "fsharp": "string (constant \"1.0.0\")",
+      "meaning": "Wire format version.",
+      "default": "Always \"1.0.0\"."
+    },
+    "snapshot.schema.json#generatedAt": {
+      "fsharp": "DateTimeOffset",
+      "meaning": "occurredAt of event aggregateVersion (deterministic; not wall-clock).",
+      "default": "Copied from the last event.",
+      "rule": "Snapshot must be byte-identical to the replayed projection (CAUSA.SNAPSHOT_MISMATCH)."
+    },
+    "snapshot.schema.json#investigationId": {
+      "fsharp": "InvestigationId",
+      "meaning": "Investigation id.",
+      "default": "Copied from the events."
+    },
+    "snapshot.schema.json#projectionVersion": {
+      "fsharp": "int (constant 1)",
+      "meaning": "Projection rules version (§8.3).",
+      "default": "Always 1."
+    },
+    "snapshot.schema.json#semanticVersion": {
+      "fsharp": "string (constant \"1.0.0\")",
+      "meaning": "Semantic version.",
+      "default": "Always \"1.0.0\"."
+    },
+    "snapshot.schema.json#state": {
+      "fsharp": "Investigation (projection)",
+      "meaning": "Projected investigation state; see state.schema.json.",
+      "default": "Replay of the history (§8.3)."
+    },
+    "state.schema.json#actions": {
+      "fsharp": "Investigation.Actions : Map<_, InvestigationAction> (serialized as array)",
+      "meaning": "All InvestigationAction entities, sorted by id (ordinal UUID text).",
+      "default": "[] on InvestigationStarted; entries created by ActionRecorded.",
+      "rule": "Sorted by id ordinally; ids unique."
+    },
+    "state.schema.json#assumptions": {
+      "fsharp": "Investigation.Assumptions : Map<_, Assumption> (serialized as array)",
+      "meaning": "All Assumption entities, sorted by id (ordinal UUID text).",
+      "default": "[] on InvestigationStarted; entries created by AssumptionRecorded.",
+      "rule": "Sorted by id ordinally; ids unique."
+    },
+    "state.schema.json#causes": {
+      "fsharp": "Investigation.Causes : Map<_, CausalAssertion> (serialized as array)",
+      "meaning": "All CausalAssertion entities, sorted by id (ordinal UUID text).",
+      "default": "[] on InvestigationStarted; entries created by CausalAssertionRecorded.",
+      "rule": "Sorted by id ordinally; ids unique."
+    },
+    "state.schema.json#conclusions": {
+      "fsharp": "Investigation.Conclusions : Map<_, Conclusion> (serialized as array)",
+      "meaning": "All Conclusion entities, sorted by id (ordinal UUID text).",
+      "default": "[] on InvestigationStarted; entries created by ConclusionRecorded.",
+      "rule": "Sorted by id ordinally; ids unique."
+    },
+    "state.schema.json#contradictions": {
+      "fsharp": "Investigation.Contradictions : Map<_, Contradiction> (serialized as array)",
+      "meaning": "All Contradiction entities, sorted by id (ordinal UUID text).",
+      "default": "[] on InvestigationStarted; entries created by ContradictionRecorded.",
+      "rule": "Sorted by id ordinally; ids unique."
+    },
+    "state.schema.json#correctiveActions": {
+      "fsharp": "Investigation.CorrectiveActions : Map<_, CorrectiveAction> (serialized as array)",
+      "meaning": "All CorrectiveAction entities, sorted by id (ordinal UUID text).",
+      "default": "[] on InvestigationStarted; entries created by CorrectiveActionRecorded.",
+      "rule": "Sorted by id ordinally; ids unique."
+    },
+    "state.schema.json#createdAt": {
+      "fsharp": "Investigation.CreatedAt : DateTimeOffset",
+      "meaning": "occurredAt of event 1.",
+      "default": "From InvestigationStarted."
+    },
+    "state.schema.json#criteria": {
+      "fsharp": "Investigation.Criteria : Map<_, Criterion> (serialized as array)",
+      "meaning": "All Criterion entities, sorted by id (ordinal UUID text).",
+      "default": "[] on InvestigationStarted; entries created by CriterionRecorded.",
+      "rule": "Sorted by id ordinally; ids unique."
+    },
+    "state.schema.json#evidence": {
+      "fsharp": "Investigation.Evidence : Map<_, Evidence> (serialized as array)",
+      "meaning": "All Evidence entities, sorted by id (ordinal UUID text).",
+      "default": "[] on InvestigationStarted; entries created by EvidenceAdmitted.",
+      "rule": "Sorted by id ordinally; ids unique."
+    },
+    "state.schema.json#findings": {
+      "fsharp": "Investigation.Findings : Map<_, Finding> (serialized as array)",
+      "meaning": "All Finding entities, sorted by id (ordinal UUID text).",
+      "default": "[] on InvestigationStarted; entries created by FindingRecorded.",
+      "rule": "Sorted by id ordinally; ids unique."
+    },
+    "state.schema.json#hypotheses": {
+      "fsharp": "Investigation.Hypotheses : Map<_, Hypothesis> (serialized as array)",
+      "meaning": "All Hypothesis entities, sorted by id (ordinal UUID text).",
+      "default": "[] on InvestigationStarted; entries created by HypothesisRecorded.",
+      "rule": "Sorted by id ordinally; ids unique."
+    },
+    "state.schema.json#investigationId": {
+      "fsharp": "Investigation.Id : InvestigationId",
+      "meaning": "Investigation id.",
+      "default": "From InvestigationStarted envelope."
+    },
+    "state.schema.json#lifecycle": {
+      "fsharp": "Investigation.Lifecycle : InvestigationLifecycle",
+      "meaning": "Current lifecycle.",
+      "default": "\"draft\" on InvestigationStarted; set by LifecycleChanged.to."
+    },
+    "state.schema.json#negativeKnowledge": {
+      "fsharp": "Investigation.NegativeKnowledge : Map<_, NegativeKnowledge> (serialized as array)",
+      "meaning": "All NegativeKnowledge entities, sorted by id (ordinal UUID text).",
+      "default": "[] on InvestigationStarted; entries created by NegativeKnowledgeEstablished.",
+      "rule": "Sorted by id ordinally; ids unique."
+    },
+    "state.schema.json#observations": {
+      "fsharp": "Investigation.Observations : Map<_, Observation> (serialized as array)",
+      "meaning": "All Observation entities, sorted by id (ordinal UUID text).",
+      "default": "[] on InvestigationStarted; entries created by InvestigationStarted, ObservationRecorded.",
+      "rule": "Sorted by id ordinally; ids unique."
+    },
+    "state.schema.json#predictions": {
+      "fsharp": "Investigation.Predictions : Map<_, Prediction> (serialized as array)",
+      "meaning": "All Prediction entities, sorted by id (ordinal UUID text).",
+      "default": "[] on InvestigationStarted; entries created by PredictionRecorded.",
+      "rule": "Sorted by id ordinally; ids unique."
+    },
+    "state.schema.json#proposals": {
+      "fsharp": "Investigation.Proposals : Map<_, Proposal> (serialized as array)",
+      "meaning": "All Proposal entities, sorted by id (ordinal UUID text).",
+      "default": "[] on InvestigationStarted; entries created by ProposalRecorded.",
+      "rule": "Sorted by id ordinally; ids unique."
+    },
+    "state.schema.json#relationships": {
+      "fsharp": "Investigation.Relationships : Map<_, Relationship> (serialized as array)",
+      "meaning": "All Relationship entities, sorted by id (ordinal UUID text).",
+      "default": "[] on InvestigationStarted; entries created by EvidenceRelated.",
+      "rule": "Sorted by id ordinally; ids unique."
+    },
+    "state.schema.json#title": {
+      "fsharp": "Investigation.Title : NonEmptyText",
+      "meaning": "Investigation title.",
+      "default": "From InvestigationStarted.title."
+    },
+    "state.schema.json#unknowns": {
+      "fsharp": "Investigation.Unknowns : Map<_, Unknown> (serialized as array)",
+      "meaning": "All Unknown entities, sorted by id (ordinal UUID text).",
+      "default": "[] on InvestigationStarted; entries created by UnknownIdentified.",
+      "rule": "Sorted by id ordinally; ids unique."
+    },
+    "state.schema.json#verifications": {
+      "fsharp": "Investigation.Verifications : Map<_, Verification> (serialized as array)",
+      "meaning": "All Verification entities, sorted by id (ordinal UUID text).",
+      "default": "[] on InvestigationStarted; entries created by VerificationRecorded.",
+      "rule": "Sorted by id ordinally; ids unique."
+    },
+    "state.schema.json#version": {
+      "fsharp": "Investigation.Version : int64",
+      "meaning": "aggregateVersion of the last applied event.",
+      "default": "Every event sets it to its aggregateVersion."
+    }
+  }
+}

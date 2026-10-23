@@ -5,6 +5,8 @@ points to commit `c947c7e354be80766573a782546c8186336774cc` of `kemiller2002/cau
 repository's `release-tag` workflow (run 39874016465) only after that exact commit passed every gate anchored to the
 tag, the 17-case self-test and all three consumers.
 
+> **Normative status.** **Normative** for the release identities below (tag, digests, engine pin). Persisted data is governed only by the frozen Causa storage contract v1.0.0 ([README.md](../requirements/causa/data/v1.0.0/README.md), [FIELD-CATALOG.md](../requirements/causa/data/v1.0.0/FIELD-CATALOG.md), [EVENT-CATALOG.md](../requirements/causa/data/v1.0.0/EVENT-CATALOG.md)). Where this document states a persisted field, event name, enum value, layout, hash or concurrency rule differently, the contract governs; such statements are marked *Superseded by frozen contract v1.0.0* in place.
+
 Experiment record: `kemiller2002/research-documents`, `research/experiments/EX-CAUSA-STORAGE-2026-001/` (RESULT.md).
 
 ## Identities
@@ -27,9 +29,13 @@ Experiment record: `kemiller2002/research-documents`, `research/experiments/EX-C
 
 ## Authority
 
-- The normative contract is `causa-data/contract/v1.0.0/CONTRACT.md` at the tag.
+- The normative contract is `causa-data/contract/v1.0.0/CONTRACT.md` at the tag. Indy-init carries a byte-identical import at [requirements/causa/data/v1.0.0/](../requirements/causa/data/v1.0.0/README.md); the import must match the tag byte-for-byte (`compatibility/release-pin.json`).
 - [CAUSA-DATA-CONTRACT-v1.md](CAUSA-DATA-CONTRACT-v1.md) was the *candidate* that this release was reconciled against.
-  Where the two differ, CONTRACT.md wins. The differences are listed in the experiment's `COMPATIBILITY-DECISIONS.md`.
+  Where the two differ, CONTRACT.md wins. The differences are listed in the experiment's `COMPATIBILITY-DECISIONS.md` (`research-documents/research/experiments/EX-CAUSA-STORAGE-2026-001/`) and, for every Indy-init document, in [CAUSA-CONTRACT-RECONCILIATION.md](CAUSA-CONTRACT-RECONCILIATION.md).
+
+## Imported copy in Indy-init
+
+`requirements/causa/data/v1.0.0/` holds byte copies of `contract/v1.0.0/` (CONTRACT.md, FIELD-MAPPING.md, schemas, golden), `compatibility/v1.0.0/lock.json` and `RELEASE`, `engine.lock.json`, `global.json` and `fixtures/v1.0.0/manifest.json`. Check: SHA-256 of `schemas/bundle.json` = schema identity, of `fixtures/manifest.json` = dataset identity, of `compatibility/lock.json` = release identity. Start at [README.md](../requirements/causa/data/v1.0.0/README.md); field and event references: [FIELD-CATALOG.md](../requirements/causa/data/v1.0.0/FIELD-CATALOG.md), [EVENT-CATALOG.md](../requirements/causa/data/v1.0.0/EVENT-CATALOG.md).
 
 ## How R002 and the competition consume it
 
@@ -40,7 +46,7 @@ Experiment record: `kemiller2002/research-documents`, `research/experiments/EX-C
 
 ## How the tag was created
 
-The agent session that froze the release could not push tags. `.github/workflows/release-tag.yml` in causa-data does
+The agent session that froze the release could not push tags. `.github/workflows/release-tag.yml` in causa-data (on `main`; it is not inside the tagged tree) does
 it instead. It:
 - reads `.github/release-tag/request.txt`;
 - checks that the commit is in the branch history and that `RELEASE` names the tag;

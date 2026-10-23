@@ -84,6 +84,8 @@ GitHub API write cost, conflict behavior, append atomicity, human readability, s
 
 Do not make semantic event identity depend on file location.
 
+> **Superseded by frozen contract v1.0.0:** answered for v1.0.0: one canonical `events.ndjson` per investigation (CONTRACT §3); `eventId` is derived from investigation id, version and command id, not location (§5.2). Other options remain open for later versions.
+
 ## OQ-007 Snapshot frequency
 
 Question:
@@ -157,7 +159,7 @@ Current candidate core:
 Supports, Contradicts, Discriminates, Qualifies, Corroborates, FailsToSupport, Irrelevant, Supersedes, DependsOn, DerivedFrom.
 
 Research task:
-Attempt to reduce the core set and push domain-specific distinctions into extensions.
+Attempt to reduce the core set and push domain-specific distinctions into extensions. *(v1.0.0 froze four kinds: supports, contradicts, discriminates, insufficient; additions require a minor version.)*
 
 ## OQ-013 Hypothesis lifecycle
 
@@ -350,7 +352,7 @@ Question:
 Do we need hash chaining/signatures in first production use?
 
 Current posture:
-Optional security enhancement.
+Optional security enhancement. *(v1.0.0 answer: no chain and no signatures; byte-prefix successor rule and manifest digests, CONTRACT §9.3, §10.)*
 
 Trigger:
 Stronger audit/compliance/customer requirements.

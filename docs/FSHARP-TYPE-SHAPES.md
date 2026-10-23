@@ -2,6 +2,8 @@
 
 Status: normative first implementation profile, intentionally not final wire schema.
 
+> **Normative status.** **Normative** typed-domain profile; **not** a wire schema. Persisted data is governed only by the frozen Causa storage contract v1.0.0 ([README.md](../requirements/causa/data/v1.0.0/README.md), [FIELD-CATALOG.md](../requirements/causa/data/v1.0.0/FIELD-CATALOG.md), [EVENT-CATALOG.md](../requirements/causa/data/v1.0.0/EVENT-CATALOG.md)). Where this document states a persisted field, event name, enum value, layout, hash or concurrency rule differently, the contract governs; such statements are marked *Superseded by frozen contract v1.0.0* in place. The engine↔wire mapping is [FIELD-MAPPING.md](../requirements/causa/data/v1.0.0/FIELD-MAPPING.md). Any domain value below that has no v1.0.0 wire form MUST NOT be written to a v1.0.0 workspace (`CAUSA.UNREPRESENTABLE`); such values are marked deferred.
+
 These types show how to begin implementation while preserving the semantic evolution boundaries. They are guidance for the domain project, not permission to prematurely close research-sensitive taxonomies.
 
 ## 1. Design principles
@@ -110,6 +112,8 @@ type AggregateVersion = private AggregateVersion of int64
 
 Constructors should live in modules with validation/creation functions rather than exposing raw DU constructors where inappropriate.
 
+> **Superseded by frozen contract v1.0.0:** wire field names differ from these type names (e.g. `InvestigationActionId` → `actionId`, `VerificationCriterionId` → `criterionId`, `CausalAssertionId` → `causeId`); ids are lowercase canonical non-nil UUIDs; `EventId` is never minted at random: `eventId` is derived from `investigationId/aggregateVersion/correlationId` (CONTRACT §5.2). See [FIELD-CATALOG.md](../requirements/causa/data/v1.0.0/FIELD-CATALOG.md).
+
 ## 3. Non-empty semantic text
 
 ```fsharp
@@ -186,6 +190,8 @@ type Provenance = {
 
 Do not put OAuth tokens/permissions into Actor.
 
+> **Superseded by frozen contract v1.0.0:** persisted actor kinds are only `human`, `system` and `agent{provider, model}`; `ExternalSystem`, `ImportedHistorical`, `DisplayName`, `Runtime` and `PromptVersion` have no wire form (deferred). Persisted provenance is `{actor, recordedAt}` only, derived from the creating event; `SourceRef`, `ImportRef` and `TransformationRefs` are deferred (`actor.schema.json`).
+
 ## 6. Scope
 
 ```fsharp
@@ -214,6 +220,8 @@ type Scope = {
 ```
 
 PayloadJson is a boundary representation only. A loaded domain pack should decode it to a typed domain-specific value before using its semantics.
+
+> **Superseded by frozen contract v1.0.0:** v1.0.0 has no extension namespace and no scope fields: `Scope` and `ExtensionEnvelope` values must be empty for v1.0.0 persistence (CONTRACT §2.4, §13.5).
 
 ## 7. Entity references
 
@@ -249,6 +257,8 @@ type EntityRef = {
 ```
 
 Typed IDs are preferred inside entity-specific code; EntityRef is for heterogeneous graphs.
+
+> **Superseded by frozen contract v1.0.0:** v1.0.0 persists typed id fields only; `EntityRef` has no wire form (deferred).
 
 ## 8. Investigation lifecycle
 
@@ -342,7 +352,7 @@ type InvestigationActionState =
     | Proposed
     | Approved
     | InProgress
-    | Blocked
+    | Blocked   // Superseded by frozen contract v1.0.0: no wire value (deferred)
     | Completed
     | Interpreted
     | Rejected
@@ -357,7 +367,7 @@ type CorrectiveActionState =
     | Approved
     | InProgress
     | Implemented
-    | AwaitingVerification
+    | AwaitingVerification   // Superseded by frozen contract v1.0.0: the case is AwaitingVerificationOfEffect, wire `awaitingVerificationOfEffect`
     | VerifiedEffective
     | VerificationFailed
     | ReworkRequired
@@ -373,6 +383,8 @@ type CorrectiveActionKind =
     | CoreCorrectiveAction of CoreCorrectiveActionKind
     | ExtensionCorrectiveAction of SemanticId
 ```
+
+> **Superseded by frozen contract v1.0.0:** `correctiveActionKind` is closed (`mitigation|workaround|correction|prevention`); extension kinds have no wire form.
 
 ## 15. Evidence relationship kind
 
@@ -398,6 +410,8 @@ type EvidenceRelationshipKind =
 
 OQ-012 remains open. Do not treat the current core relationship set as empirically final merely because it is typed.
 
+> **Superseded by frozen contract v1.0.0:** the v1.0.0 wire set is exactly `supports|contradicts|discriminates|insufficient`. `Insufficient` is required and missing above; `Qualifies`, `Corroborates`, `FailsToSupport`, `Irrelevant`, `Supersedes`, `DependsOn`, `DerivedFrom` and extension kinds are deferred (OQ-012 stays open for later versions).
+
 ## 16. Core action kind
 
 ```fsharp
@@ -419,6 +433,8 @@ type InvestigationActionKind =
     | ExtensionAction of SemanticId
 ```
 
+> **Superseded by frozen contract v1.0.0:** the v1.0.0 wire set is exactly `test|inspection|query|comparison|experiment`. `Test` is missing above; `Question`, `Measurement`, `Simulation`, `Reproduction`, `ExternalVerification`, `CodeReview`, `Interview` and extension kinds are deferred.
+
 ## 17. Evidence category
 
 ```fsharp
@@ -439,6 +455,8 @@ type EvidenceCategory =
 
 AI interpretation is intentionally not a direct evidence category. Agent-generated interpretation remains Interpretation unless admitted evidence from an external source exists.
 
+> **Superseded by frozen contract v1.0.0:** the v1.0.0 `evidenceCategory` set has 7 values; `DerivedCalculation` and extension categories are deferred.
+
 ## 18. Verification state
 
 ```fsharp
@@ -453,7 +471,7 @@ Avoid a universal numeric quality score.
 
 ## 19. Core entity records
 
-These are indicative shapes, not final serialization.
+These are indicative shapes, not final serialization. v1.0.0 persisted shapes: [schemas/entities/](../requirements/causa/data/v1.0.0/schemas/entities/) and [FIELD-CATALOG.md](../requirements/causa/data/v1.0.0/FIELD-CATALOG.md).
 
 ```fsharp
 type Observation = {
@@ -508,6 +526,8 @@ type Assumption = {
 
 Relationships/dependencies should generally live as separate records/events rather than duplicated lists that can drift.
 
+> **Superseded by frozen contract v1.0.0:** persisted `observation` = `{id, original, observedAt, provenance}` (no Normalized, Scope, Verification, Extensions); persisted `hypothesis` = `{id, statement, mechanism, state, history[], provenance}` (no Explains/Scope/Extensions; `history` is persisted); persisted `assumption` = `{id, proposition, materiality, state, provenance}`. Claim and Interpretation have no v1.0.0 entity (deferred).
+
 ## 20. Evidence record
 
 ```fsharp
@@ -533,6 +553,8 @@ type Evidence = {
 }
 ```
 
+> **Superseded by frozen contract v1.0.0:** persisted `evidence` = `{id, contentKind, content, category, source, capturedAt, verification, supersededBy, admittedAtVersion, provenance}`; an artifact is only its absolute http(s) URL in `content` (`ArtifactId`, `MediaType`, `Digest` deferred).
+
 ## 21. Evidence relationship record
 
 ```fsharp
@@ -551,6 +573,8 @@ type EvidenceRelationship = {
 ```
 
 ## 22. Prediction
+
+> **Superseded by frozen contract v1.0.0:** persisted `relationship` targets a hypothesis: `{id, evidenceId, hypothesisId, kind, rationale, provenance}`.
 
 ```fsharp
 type PredictionStrength =
@@ -574,6 +598,8 @@ type Prediction = {
     Extensions : ExtensionEnvelope list
 }
 ```
+
+> **Superseded by frozen contract v1.0.0:** a persisted prediction has a single `hypothesisId` (not a list).
 
 ## 23. Unknown and contradiction
 
@@ -600,6 +626,8 @@ type Contradiction = {
 }
 ```
 
+> **Superseded by frozen contract v1.0.0:** persisted `unknown` adds `basis` (latest transition basis); persisted `contradiction` = `{id, statement, evidenceIds, materiality, state, basis, provenance}` (evidence ids, not EntityRef participants).
+
 ## 24. Investigation action and finding
 
 ```fsharp
@@ -624,6 +652,8 @@ type Finding = {
     Extensions : ExtensionEnvelope list
 }
 ```
+
+> **Superseded by frozen contract v1.0.0:** persisted `action` uses `targetHypothesisIds`; persisted `finding` has `interpretation` (nullable), not NormalizedResult.
 
 ## 25. Causal assertion
 
@@ -665,6 +695,8 @@ type CausalAssertion = {
 
 Causal confirmation belongs to CausalAssertion rather than HypothesisState. This supports causal sets and avoids assuming one hypothesis maps one-to-one to one confirmed cause.
 
+> **Superseded by frozen contract v1.0.0:** persisted `cause` = `{id, outcome (text), members[{hypothesisId, role}], mechanism, state, provenance}`; members reference hypotheses only; `causeRole` is closed (no extension roles).
+
 ## 26. Corrective action and verification
 
 ```fsharp
@@ -705,6 +737,8 @@ type Verification = {
 
 ## 27. Conclusion
 
+> **Superseded by frozen contract v1.0.0:** persisted `correctiveAction` adds `awaitingSinceVersion`; persisted `verification` adds `recordedAtVersion`; no Scope/Extensions.
+
 ```fsharp
 type ConclusionStrength =
     | PlausibleExplanation
@@ -730,16 +764,18 @@ type Conclusion = {
 
 ConclusionStrength is a report/current-posture representation. It does not bypass hypothesis/cause transitions.
 
+> **Superseded by frozen contract v1.0.0:** persisted `conclusion` = `{id, statement, strength, causeIds, residualUncertainty (text or null), recordedAtVersion, provenance}`; the evidence/unknown/contradiction/assumption reference lists and PolicyRefs are deferred.
+
 ## 28. Proposal
 
 ```fsharp
 type ProposalState =
     | Active
-    | Revised
+    | Revised    // Superseded by frozen contract v1.0.0: no wire value (deferred)
     | Accepted
     | Rejected
-    | Deferred
-    | Stale
+    | Deferred   // no wire value (deferred)
+    | Stale      // no wire value (deferred)
 
 type ProposalKind =
     | ProposedObservation
@@ -770,6 +806,8 @@ type Proposal = {
 
 A domain-specific proposal decoder validates PayloadJson before producing a target command.
 
+> **Superseded by frozen contract v1.0.0:** persisted `proposalKind` is `hypothesis|unknown|action` (the other 9 cases and extensions are deferred); persisted `proposal` = `{id, kind, text, rationale, state, decision, provenance}` (no PayloadJson, SourceRefs or SemanticManifest).
+
 ## 29. Semantic manifest
 
 ```fsharp
@@ -791,6 +829,8 @@ type InvestigationSemanticManifest = {
     SemanticDependencies : SemanticDependency list
 }
 ```
+
+> **Superseded by frozen contract v1.0.0:** v1.0.0 persists only `schemaVersion`/`semanticVersion` = `"1.0.0"` and `domainPacks: []` in `manifest.json`, and `semanticVersion` on each event; no policy refs or dependencies.
 
 ## 30. Investigation aggregate projection
 
@@ -826,6 +866,8 @@ type Investigation = {
 ```
 
 NegativeKnowledge and durable Obligations should be added to the aggregate in implementation even if omitted from this abbreviated listing.
+
+> **Superseded by frozen contract v1.0.0:** the persisted projection is `state.schema.json`: 5 scalars and 17 arrays (incl. `negativeKnowledge`; no claims, interpretations, manifest or extensions), each sorted by ordinal UUID text, not `Map`/Guid order.
 
 ## 31. Commands
 
@@ -889,9 +931,11 @@ type CommandEnvelope = {
 
 StartInvestigation may have ExpectedVersion=None.
 
+> **Superseded by frozen contract v1.0.0:** the persisted `correlationId` is `CommandId`; the optional CorrelationId/CausationId/IdempotencyKey are not persisted. `RequestedAt` becomes `occurredAt` and MUST be millisecond-truncated UTC (CONTRACT §2.9).
+
 ## 33. Events
 
-Do not require a forever-closed wire DU.
+Do not require a forever-closed wire DU. ***Superseded by frozen contract v1.0.0:** each contract version has a closed wire registry (31 events in v1.0.0, [EVENT-CATALOG.md](../requirements/causa/data/v1.0.0/EVENT-CATALOG.md)); new events arrive only with a new minor contract version (CONTRACT §13.1).*
 
 Inside a given core assembly version, typed core events are useful:
 
@@ -931,7 +975,7 @@ type EventPayload =
     | ExtensionEvent of SemanticId * payloadJson:string
 ```
 
-Wire serialization should carry an EventType SemanticId/version so older/newer clients can reason about compatibility.
+Wire serialization should carry an EventType SemanticId/version so older/newer clients can reason about compatibility. ***Superseded by frozen contract v1.0.0:** the wire carries `eventType` (closed PascalCase discriminator), `formatVersion` and `semanticVersion`. Wire names for the cases above: InvestigationActivated/Resolved/Reopened → `LifecycleChanged`; HypothesisMarkedPlausible/Supported, HypothesisFalsified, HypothesisReopened → `HypothesisTransitioned`; EvidenceRelationshipRecorded → `EvidenceRelated`; InvestigationActionRecorded → `ActionRecorded`; CauseConfirmed → `CausalAssertionConfirmed`; ConfirmedCauseReopened → `CausalAssertionReopened`; VerificationCriterionRecorded → `CriterionRecorded`; CorrectiveActionImplemented → `CorrectiveActionTransitioned`; ProposalRejected → `ProposalWasRejected`; ExtensionAttached → deferred.*
 
 ## 34. Event envelope
 
@@ -950,6 +994,8 @@ type EventEnvelope = {
     Payload : EventPayload
 }
 ```
+
+> **Superseded by frozen contract v1.0.0:** the v1.0.0 wire envelope has exactly `formatVersion, eventId, investigationId, aggregateVersion, eventType, occurredAt, actor, semanticVersion, correlationId (= CommandId), payload`; no SemanticManifest, PolicyRefs or CausationId (CONTRACT §5).
 
 ## 35. Blockers
 
@@ -1003,7 +1049,7 @@ type Decision =
     | Duplicate of EventId list
 ```
 
-Persistence assigns final aggregate versions/EventIds if the architecture chooses to separate proposed events from committed event envelopes.
+Persistence assigns final aggregate versions/EventIds if the architecture chooses to separate proposed events from committed event envelopes. ***Superseded by frozen contract v1.0.0:** EventIds are derived per CONTRACT §5.2, never random.*
 
 ## 37. Pure decision function
 
@@ -1131,7 +1177,7 @@ type IInvestigationStore =
 
 This interface belongs outside the pure domain assembly.
 
-GitHub implementation maps ProviderVersion to SHA/commit metadata.
+GitHub implementation maps ProviderVersion to SHA/commit metadata. *(v1.0.0: the branch head commit, CONTRACT §9.4.2.)*
 
 ## 43. Time/randomness
 
@@ -1146,9 +1192,9 @@ A command creation layer can safely supply them.
 Keep serialization DTOs separate from domain records when needed for:
 
 - backward compatibility
-- unknown extension preservation
+- unknown extension preservation *(Superseded by frozen contract v1.0.0: closed structures reject unknown data, CONTRACT §2.4, §13.5)*
 - wire versioning
-- optional fields
+- optional fields *(Superseded by frozen contract v1.0.0: no optional keys; `option` encodes as required `null`, §2.5)*
 - provider storage
 
 Do not decorate the pure domain model until serialization concerns dictate the type design.
@@ -1173,7 +1219,7 @@ Property tests are useful for:
 - no event rewrite
 - superseded records remain in history
 - unsupported required semantics never allow unsafe write
-- unknown optional extensions survive projection/serialization round-trip
+- unknown optional extensions survive projection/serialization round-trip *(Superseded by frozen contract v1.0.0: unknown data is refused with its CONTRACT §11.1 code, never dropped)*
 - no ConfirmCause when required blockers exist
 - no Resolved when verification gate fails
 

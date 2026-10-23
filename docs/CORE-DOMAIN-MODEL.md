@@ -6,6 +6,8 @@ This document translates the canonical investigation semantics into the smallest
 
 It intentionally describes semantic shape and aggregate boundaries rather than committing to a final serialization format.
 
+> **Normative status.** **Normative** conceptual model; **explanatory** for persisted shapes (v1.0.0 persisted entities: [schemas/entities/](../requirements/causa/data/v1.0.0/schemas/entities/)). Persisted data is governed only by the frozen Causa storage contract v1.0.0 ([README.md](../requirements/causa/data/v1.0.0/README.md), [FIELD-CATALOG.md](../requirements/causa/data/v1.0.0/FIELD-CATALOG.md), [EVENT-CATALOG.md](../requirements/causa/data/v1.0.0/EVENT-CATALOG.md)). Where this document states a persisted field, event name, enum value, layout, hash or concurrency rule differently, the contract governs; such statements are marked *Superseded by frozen contract v1.0.0* in place.
+
 ## 1. Design rule
 
 The core stores durable investigation meaning.
@@ -91,6 +93,8 @@ type InvestigationSemanticManifest =
 ```
 
 The manifest is part of authoritative state, not deployment documentation.
+
+> **Superseded by frozen contract v1.0.0:** for v1.0.0 persistence the manifest is represented only by `schemaVersion`/`semanticVersion` = `"1.0.0"` and `domainPacks: []` in `manifest.json` and `semanticVersion` on each event (CONTRACT §9.1); the state projection carries no manifest.
 
 ## 5. Core entity identifiers
 
@@ -203,6 +207,8 @@ Conceptual fields:
 
 Provenance must be additive. A transformation adds provenance; it does not replace origin provenance.
 
+> **Superseded by frozen contract v1.0.0:** v1.0.0 persists provenance as `{actor, recordedAt}` only, derived from the creating event; the other fields are deferred.
+
 ## 9. Observation
 
 Minimal semantic fields:
@@ -223,7 +229,11 @@ Observation
 
 Normalization must never replace original content.
 
+> **Superseded by frozen contract v1.0.0:** persisted `observation` = `{id, original, observedAt, provenance}` (no normalized summary, source kind, scope, separate recorded-at or verification state).
+
 ## 10. Claim
+
+*(No v1.0.0 entity; deferred. Same for Interpretation §11 and Obligation §22.)*
 
 Minimal fields:
 
@@ -257,6 +267,8 @@ Interpretation
 An Interpretation must have at least one reason/source reference unless it is explicitly recorded as an unsupported proposal.
 
 ## 12. Hypothesis
+
+*Superseded by frozen contract v1.0.0 for persisted shapes (§12–§26): the persisted entities are [schemas/entities/](../requirements/causa/data/v1.0.0/schemas/entities/) ([FIELD-CATALOG.md](../requirements/causa/data/v1.0.0/FIELD-CATALOG.md)); fields listed here without a v1.0.0 counterpart (scope, extensions, quality dimensions, cost/risk, owners, dependency references, ...) are deferred.*
 
 Minimal fields:
 
@@ -538,7 +550,7 @@ type Proposal<'T> =
     }
 ```
 
-Acceptance must create the appropriate authoritative command/event.
+Acceptance must create the appropriate authoritative command/event. *(Superseded by frozen contract v1.0.0 for the persisted shape: `proposal` = `{id, kind, text, rationale, state, decision, provenance}`; proposer and time are the `provenance`.)*
 
 The proposal itself remains historical provenance.
 
@@ -570,6 +582,8 @@ Required fields:
 The core validates envelope mechanics.
 
 The owning domain pack validates payload meaning.
+
+> **Superseded by frozen contract v1.0.0:** v1.0.0 has no extension namespace; extensions require a new contract version (CONTRACT §13.5).
 
 ## 30. Commands
 
@@ -649,6 +663,8 @@ Events must record:
 
 Events should be narrow statements about what happened, not full mutable snapshots.
 
+> **Superseded by frozen contract v1.0.0:** v1.0.0 events carry `formatVersion`/`semanticVersion` only; no semantic manifest or policy refs in the envelope (CONTRACT §5).
+
 ## 33. Projection
 
 Current state is a projection of authoritative events plus migration/upcast logic.
@@ -673,6 +689,8 @@ A snapshot must identify:
 - projection version
 
 A corrupt or stale snapshot must be disposable and reconstructable from authoritative data when the selected persistence provider supports event reconstruction.
+
+> **Superseded by frozen contract v1.0.0:** a v1.0.0 snapshot carries `semanticVersion` and `projectionVersion` only; a mismatching snapshot makes the investigation invalid on read (readers fail closed and repair nothing); a writer rebuilds it only in a new atomic append (CONTRACT §8.1, §11.2).
 
 ## 35. Capability projection
 

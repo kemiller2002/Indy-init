@@ -1,8 +1,89 @@
 # Command and Event Catalog
 
-Status: normative first implementation profile.
+Status: normative first implementation profile for commands and domain vocabulary; persisted event names per §0.
 
 This document defines the initial authoritative command and event vocabulary for the Root-Cause Investigator. It is intentionally more concrete than the semantic specifications, but it preserves the research boundaries in OPEN-QUESTIONS.md.
+
+> **Normative status.** **Normative** for commands and domain vocabulary. **Explanatory** for persisted event names: the event names below are domain vocabulary, and §0 gives the v1.0.0 wire event for each. Persisted data is governed only by the frozen Causa storage contract v1.0.0 ([README.md](../requirements/causa/data/v1.0.0/README.md), [FIELD-CATALOG.md](../requirements/causa/data/v1.0.0/FIELD-CATALOG.md), [EVENT-CATALOG.md](../requirements/causa/data/v1.0.0/EVENT-CATALOG.md)). Where this document states a persisted field, event name, enum value, layout, hash or concurrency rule differently, the contract governs; such statements are marked *Superseded by frozen contract v1.0.0* in place.
+
+## 0. Persisted (v1.0.0) event for each catalog event
+
+The persisted event vocabulary is the closed registry of 31 events in [EVENT-CATALOG.md](../requirements/causa/data/v1.0.0/EVENT-CATALOG.md). Names with no v1.0.0 wire event are deferred: adding one is a compatible additive extension (new minor contract version, CONTRACT §13.1), and a v1.0.0 reader refuses them. Line numbers below refer to this document before §0 was inserted.
+
+### 0.1 Catalog events persisted as a registered v1.0.0 event (58 catalog names → 31 wire events)
+
+| catalog event (line) | v1.0.0 wire event | discriminating field |
+|---|---|---|
+| InvestigationStarted (57) | `InvestigationStarted{title, observationId, original}` | — |
+| InvestigationActivated (59) | `LifecycleChanged` | `command: activateInvestigation`, `reason: null` |
+| InvestigationMarkedAwaitingEvidence (60) | `LifecycleChanged` | `command: markAwaitingEvidence`, `reason` text |
+| InvestigationMarkedAwaitingVerification (61) | `LifecycleChanged` | `command: markAwaitingVerification`, `reason: null` |
+| InvestigationResolved (62) | `LifecycleChanged` | `command: resolveInvestigation`, `reason: null`, no conclusionId |
+| InvestigationClosed (63) | `LifecycleChanged` | `command: closeInvestigation`, `reason: null` |
+| InvestigationReopened (64, 379) | `LifecycleChanged` | `command: reopenInvestigation` (user) or `verificationFailed` (follow-on of a failed verification while awaiting verification) |
+| ObservationRecorded (79) | `ObservationRecorded` | — |
+| HypothesisRecorded (135) | `HypothesisRecorded` | — |
+| HypothesisMarkedPlausible (136) | `HypothesisTransitioned` | `command: markPlausible` |
+| HypothesisMarkedSupported (137) | `HypothesisTransitioned` | `command: markSupported` |
+| HypothesisMarkedWeakened (138) | `HypothesisTransitioned` | `command: markWeakened` |
+| HypothesisFalsified (139) | `HypothesisTransitioned` | `command: falsify` (no NegativeKnowledge follow-on) |
+| HypothesisSuperseded (140) | `HypothesisTransitioned` | `command: supersede` |
+| HypothesisReopened (141) | `HypothesisTransitioned` | `command: reopen`, `to: plausible` |
+| CauseConfirmed (142, 347) | `CausalAssertionConfirmed{causeId, policy}` | — |
+| ConfirmedCauseReopened (348) | `CausalAssertionReopened{causeId, reason}` | — |
+| AssumptionRecorded (164) | `AssumptionRecorded` | — |
+| AssumptionProvisionallyAccepted / AssumptionVerified / AssumptionRejected (165-167) | `AssumptionTransitioned` | `state: provisionallyAccepted / verified / rejected` |
+| EvidenceAdmitted (180, 250) | `EvidenceAdmitted` | no `verification` field |
+| EvidenceVerificationChanged (181) | `EvidenceVerificationAssessed{evidenceId, verification}` | — |
+| EvidenceSuperseded (183) | `EvidenceSuperseded{evidenceId, replacementEvidenceId, reason}` | — |
+| EvidenceRelationshipRecorded (195) | `EvidenceRelated` | — |
+| PredictionRecorded (207) | `PredictionRecorded` | timing decided by the engine |
+| InvestigationActionRecorded (232) | `ActionRecorded` | — |
+| InvestigationActionApproved / Rejected / Started / Completed / Cancelled (233-235, 238, 240) | `ActionTransitioned` | `state: approved / rejected / inProgress / completed / cancelled` (completed is emitted inside the RecordFinding group) |
+| FindingRecorded (248) | `FindingRecorded` | `interpretation` nullable |
+| UnknownIdentified (273) | `UnknownIdentified` | — |
+| UnknownInvestigationStarted / UnknownResolved / UnknownAcceptedAsResidual (274-276) | `UnknownTransitioned` | `state: investigating / resolved / acceptedResidual`, `basis` |
+| NegativeKnowledgeEstablished (286) | `NegativeKnowledgeEstablished` | `basisEvidenceIds` ≥ 1 |
+| ContradictionRecorded (311) | `ContradictionRecorded` | — |
+| ContradictionTriaged / ContradictionResolved / ContradictionAcceptedAsResidual (312, 314, 315) | `ContradictionTransitioned` | `state: triaged / resolved / acceptedResidual`, `basis` |
+| CausalAssertionRecorded (342) | `CausalAssertionRecorded` | — |
+| CorrectiveActionRecorded (373) | `CorrectiveActionRecorded` | — |
+| CorrectiveActionApproved / Started / Implemented / AwaitingVerification / VerifiedEffective / VerificationFailed / ReworkRequired / Cancelled (374-381) | `CorrectiveActionTransitioned` | `state: approved / inProgress / implemented / awaitingVerificationOfEffect / verifiedEffective / verificationFailed / reworkRequired / cancelled` (the two verification outcomes are follow-ons of `VerificationRecorded`) |
+| VerificationCriterionRecorded (387) | `CriterionRecorded` | — |
+| VerificationRecorded (388) | `VerificationRecorded` | satisfied ⇒ evidence cited |
+| ConclusionRecorded (400) | `ConclusionRecorded` | — |
+| ProposalRecorded (412) | `ProposalRecorded` | agent actor allowed only here |
+| ProposalAccepted (413) | `ProposalWasAccepted{proposalId, targetId}` | follows the target entity's event in the same command group |
+| ProposalRejected (414) | `ProposalWasRejected{proposalId, reason}` | — |
+
+### 0.2 Catalog events with no v1.0.0 event: deferred (75 names)
+
+Adding any of these is a compatible additive extension (new minor contract version with its own tree, CONTRACT §13.1); a v1.0.0 reader refuses them.
+
+| catalog area (lines) | event names |
+|---|---|
+| Investigation (58, 65-67) | InvestigationRenamed, InvestigationArchived, InvestigationRelationshipAdded, InvestigationRelationshipSuperseded |
+| Observation (80-82) | ObservationNormalizationAdded, ObservationVerificationChanged, ObservationSuperseded |
+| Claim (92-94) | ClaimRecorded, ClaimAssessmentAdded, ClaimSuperseded |
+| Interpretation (102-103) | InterpretationRecorded, InterpretationSuperseded |
+| Assumption (168-170) | AssumptionExpired, AssumptionDependencyAdded, AssumptionDependencySuperseded |
+| Evidence (182, 184-187) | EvidenceMetadataCorrected, EvidenceArtifactAvailabilityChanged, EvidenceArtifactIntegrityMismatchRecorded, EvidenceDependencyAdded, EvidenceDependencySuperseded |
+| Evidence relationship (196-197) | EvidenceRelationshipReassessed, EvidenceRelationshipSuperseded |
+| Prediction (208-209) | PredictionMarkedRetrospective, PredictionSuperseded |
+| Investigation action (236-237, 239) | InvestigationActionBlocked, InvestigationActionUnblocked, InvestigationActionInterpreted |
+| Finding (249-251) | FindingNormalizationAdded, FindingAdmittedAsEvidence, FindingSuperseded |
+| Unknown (277-278) | UnknownSuperseded, UnknownMaterialityChanged |
+| Negative knowledge (287-288) | NegativeKnowledgeChallenged, NegativeKnowledgeSuperseded |
+| Contradiction (313, 316-317) | ContradictionInvestigationStarted, ContradictionSuperseded, ContradictionMaterialityChanged |
+| Obligation (327-332) | ObligationAccepted, ObligationAssigned, ObligationStarted, ObligationResolved, ObligationWaived, ObligationSuperseded |
+| Causal assertion (343-346) | CausalMemberAdded, CausalMemberSuperseded, CausalMechanismRecorded, CausalSupportAssessmentRecorded |
+| Verification (389-390) | VerificationCriterionSuperseded, VerificationSuperseded |
+| Conclusion (401-402) | ConclusionReassessed, ConclusionSuperseded |
+| Proposal (415-417) | ProposalRevised, ProposalDeferred, ProposalMarkedStale |
+| Extension / semantic version (427-436) | ExtensionAttached, ExtensionSuperseded, ExtensionMigrationRecorded, DomainPackActivated, DomainPackUpgraded, DomainPackDeactivated, ExperimentalProfileActivated, ExperimentalProfileDeactivated, PolicyVersionPinned, PolicyVersionPinChanged |
+| Review (444-448) | ReviewRequested, ReviewApproved, ReviewRejected, ReviewWithdrawn, ReviewExpired |
+| Report (458-460) | ReportIssued, ReportSuperseded |
+| Import / recovery (470-473) | InvestigationImported, InvestigationForked, InvestigationRecoveryRecorded, RedactionRecorded |
 
 The catalog follows one rule:
 
@@ -50,6 +131,8 @@ HypothesisFalsified
 UnknownAcceptedAsResidual
 ```
 
+*Persisted (frozen contract v1.0.0):* these persist as `EvidenceAdmitted`, `HypothesisTransitioned{command: falsify}` and `UnknownTransitioned{state: acceptedResidual}` (§0).
+
 ## 3. Investigation commands
 
 | Command | Primary event(s) | Core prerequisites |
@@ -65,6 +148,8 @@ UnknownAcceptedAsResidual
 | ArchiveInvestigation | InvestigationArchived | archive policy satisfied |
 | RelateInvestigation | InvestigationRelationshipAdded | both references valid/authorized |
 | RemoveInvestigationRelationship | InvestigationRelationshipSuperseded | relationship exists; history retained |
+
+*Persisted (frozen contract v1.0.0):* lifecycle events are one event, `LifecycleChanged{from, to, command, reason}`, with `command` = `activateInvestigation`, `markAwaitingEvidence`, `markAwaitingVerification`, `resolveInvestigation`, `closeInvestigation` or `reopenInvestigation`; `reason` is `null` except for markAwaitingEvidence and reopen. Rename, archive and investigation relationships are deferred (§0.2).
 
 Notes:
 
@@ -112,7 +197,7 @@ Authoritative hypothesis lifecycle for the first implementation:
 Proposed
   -> Plausible
   -> Supported
-  -> Confirmed
+  -> Confirmed   (superseded: see note below)
 
 Proposed/Plausible/Supported
   -> Weakened
@@ -128,6 +213,8 @@ Confirmed
   -> Reopened/Supported or other policy-defined active posture
 ```
 
+> **Superseded by frozen contract v1.0.0:** the persisted `hypothesisState` values are `proposed`, `plausible`, `supported`, `weakened`, `falsified`, `superseded`; there is **no** hypothesis `Confirmed` state. Confirmation belongs to the causal assertion (`causeState` `confirmed`, §18), consistent with STATE-TRANSITION-TABLES §2.
+
 "Leading" is initially derived rather than persisted.
 
 | Command | Event(s) | Prerequisites |
@@ -136,12 +223,14 @@ Confirmed
 | MarkHypothesisPlausible | HypothesisMarkedPlausible | relevance/rationale, no known immediate falsifier |
 | MarkHypothesisSupported | HypothesisMarkedSupported | material support, no policy blocker |
 | MarkHypothesisWeakened | HypothesisMarkedWeakened | weakening basis |
-| FalsifyHypothesis | HypothesisFalsified, possibly NegativeKnowledgeEstablished | falsifying basis + scope |
+| FalsifyHypothesis | HypothesisFalsified (persisted: `HypothesisTransitioned{command: falsify}`), possibly NegativeKnowledgeEstablished (v1.0.0: a separate EstablishNegativeKnowledge command) | falsifying basis + scope |
 | SupersedeHypothesis | HypothesisSuperseded | reason/replacement optional |
 | ReopenHypothesis | HypothesisReopened | new/corrected evidence, scope, or invalidated falsification premise |
 | ConfirmCause | CauseConfirmed | causal assertion references supported hypothesis/conditions and cause-confirmation gate is satisfied |
 
 Do not provide a generic SetHypothesisState command.
+
+*Persisted (frozen contract v1.0.0):* `HypothesisRecorded`; every hypothesis transition is `HypothesisTransitioned{hypothesisId, from, to, command, reason, evidenceIds}` with `command` = `markPlausible|markSupported|markWeakened|falsify|supersede|reopen`; ConfirmCause persists `CausalAssertionConfirmed{causeId, policy}`.
 
 ## 8. Assumption commands
 
@@ -171,6 +260,8 @@ Any active state
 
 A rejected/expired material assumption may emit or derive ReevaluationRequired obligations for dependent entities.
 
+*Persisted (frozen contract v1.0.0):* `AssumptionRecorded`; transitions are `AssumptionTransitioned{assumptionId, state}` with `state` = `provisionallyAccepted|verified|rejected`. `Expired` and the dependency events are deferred (no v1.0.0 event reaches `expired`).
+
 ## 9. Evidence commands
 
 Evidence admission lifecycle is intentionally small.
@@ -188,6 +279,8 @@ Evidence admission lifecycle is intentionally small.
 
 Evidence is not physically deleted through ordinary investigation commands.
 
+*Persisted (frozen contract v1.0.0):* `EvidenceAdmitted` (no `verification` field; starts `unverified`), `EvidenceVerificationAssessed{evidenceId, verification}` (not EvidenceVerificationChanged), `EvidenceSuperseded`. Metadata correction, artifact availability/integrity and dependency events are deferred.
+
 ## 10. Evidence relationship commands
 
 | Command | Event(s) |
@@ -196,7 +289,7 @@ Evidence is not physically deleted through ordinary investigation commands.
 | ReassessEvidenceRelationship | EvidenceRelationshipReassessed |
 | SupersedeEvidenceRelationship | EvidenceRelationshipSuperseded |
 
-Relationship kinds use CoreRelationship or versioned extension SemanticId.
+Relationship kinds use CoreRelationship or versioned extension SemanticId. ***Superseded by frozen contract v1.0.0:** the persisted event is `EvidenceRelated`; `kind` is exactly `supports|contradicts|discriminates|insufficient`; extension kinds require a new contract version. Reassess/Supersede are deferred.*
 
 A Reassess event records the new assessment and reason rather than rewriting the old relationship event.
 
@@ -227,6 +320,8 @@ Approved/InProgress -> Blocked
 Blocked -> Approved/InProgress
 ```
 
+> **Superseded by frozen contract v1.0.0:** `Blocked` has no v1.0.0 `actionState` value (deferred); `Interpreted` exists but no v1.0.0 event reaches it.
+
 | Command | Event(s) |
 | --- | --- |
 | RecordInvestigationAction | InvestigationActionRecorded |
@@ -241,6 +336,8 @@ Blocked -> Approved/InProgress
 
 Completed means execution ended, not that the finding supports any conclusion.
 
+*Persisted (frozen contract v1.0.0):* `ActionRecorded`; transitions are `ActionTransitioned{actionId, state}` with `state` = `approved|rejected|inProgress|completed|cancelled`. There is no separate complete command: RecordFinding emits `FindingRecorded` followed by `ActionTransitioned(completed)` (preceded by `ActionTransitioned(inProgress)` when the action was only approved) in one command group.
+
 ## 13. Finding commands
 
 | Command | Event(s) |
@@ -251,6 +348,8 @@ Completed means execution ended, not that the finding supports any conclusion.
 | SupersedeFinding | FindingSuperseded |
 
 Admission as evidence creates or links a distinct Evidence identity.
+
+*Persisted (frozen contract v1.0.0):* `FindingRecorded{findingId, actionId, originalResult, interpretation|null}`; normalization, admission-as-evidence and supersession events are deferred.
 
 ## 14. Unknown commands
 
@@ -278,6 +377,8 @@ Identified/Investigating
 | ChangeUnknownMateriality | UnknownMaterialityChanged |
 
 ChangeUnknownMateriality requires policy/provenance and must never be a silent convenience transition.
+
+*Persisted (frozen contract v1.0.0):* `UnknownIdentified`; transitions are `UnknownTransitioned{unknownId, state, basis}` with `state` = `investigating|resolved|acceptedResidual`. `Superseded` and materiality change are deferred.
 
 ## 15. Negative knowledge commands
 
@@ -318,6 +419,8 @@ Any active state
 
 Resolution must identify a resolution basis, not merely a preferred side.
 
+*Persisted (frozen contract v1.0.0):* `ContradictionRecorded`; transitions are `ContradictionTransitioned{contradictionId, state, basis}` with `state` = `triaged|resolved|acceptedResidual`. Start-investigating, supersede and materiality change are deferred.
+
 ## 17. Obligation commands
 
 Some obligations are derived. Durable obligations use:
@@ -349,7 +452,7 @@ A causal assertion has its own persisted lifecycle: Proposed, Confirmed, Reopene
 
 ConfirmCause is protected by the active confirmation policy.
 
-Causal roles use stable generic cases plus extension SemanticId.
+Causal roles use stable generic cases plus extension SemanticId. ***Superseded by frozen contract v1.0.0:** `causeRole` is exactly `rootCause|contributingFactor|trigger|enablingCondition`; persisted events are `CausalAssertionRecorded`, `CausalAssertionConfirmed{causeId, policy}` (not CauseConfirmed) and `CausalAssertionReopened{causeId, reason}` (not ConfirmedCauseReopened). Member, mechanism and support-assessment events are deferred.*
 
 ## 19. Corrective action commands
 
@@ -360,7 +463,7 @@ Proposed
   -> Approved
   -> InProgress
   -> Implemented
-  -> AwaitingVerification
+  -> AwaitingVerification   (persisted: awaitingVerificationOfEffect)
   -> VerifiedEffective
 
 AwaitingVerification
@@ -380,6 +483,8 @@ AwaitingVerification
 | RequireCorrectiveActionRework | CorrectiveActionReworkRequired |
 | CancelCorrectiveAction | CorrectiveActionCancelled |
 
+*Persisted (frozen contract v1.0.0):* `CorrectiveActionRecorded`; transitions are `CorrectiveActionTransitioned{correctiveActionId, state}` (state `awaitingVerificationOfEffect`, not AwaitingVerification). There is no separate MarkCorrectiveActionVerified / VerificationFailed command: they are follow-on events of `VerificationRecorded` in the RecordVerification command group (order: `VerificationRecorded`, `CorrectiveActionTransitioned`, and, if the investigation awaited verification and the outcome failed, `LifecycleChanged{command: verificationFailed}` instead of InvestigationReopened).
+
 ## 20. Verification commands
 
 | Command | Event(s) |
@@ -390,6 +495,8 @@ AwaitingVerification
 | SupersedeVerification | VerificationSuperseded |
 
 A verification result references its criterion and evidence/finding basis.
+
+*Persisted (frozen contract v1.0.0):* `CriterionRecorded` (not VerificationCriterionRecorded) and `VerificationRecorded`; supersession events are deferred.
 
 ## 21. Conclusion commands
 
@@ -402,6 +509,8 @@ Conclusions are authoritative snapshots of justified posture.
 | SupersedeConclusion | ConclusionSuperseded |
 
 RecordConclusion cannot grant a stronger causal state than policy permits. It summarizes authoritative state rather than overriding it.
+
+*Persisted (frozen contract v1.0.0):* `ConclusionRecorded`; the current conclusion is the one with the highest `recordedAtVersion`. Reassess/Supersede are deferred.
 
 ## 22. Proposal commands
 
@@ -420,6 +529,8 @@ AcceptProposal re-evaluates the resulting target command at acceptance time.
 
 It does not replay the proposal's original legality judgment.
 
+*Persisted (frozen contract v1.0.0):* `ProposalRecorded`, `ProposalWasAccepted{proposalId, targetId}` (not ProposalAccepted; it follows the target entity's event in the same command group) and `ProposalWasRejected{proposalId, reason}` (not ProposalRejected). Revise, defer and stale are deferred; `proposalState` is `active|accepted|rejected`.
+
 ## 23. Extension and semantic-version commands
 
 | Command | Event(s) |
@@ -436,6 +547,8 @@ It does not replay the proposal's original legality judgment.
 | ChangePolicyPin | PolicyVersionPinChanged |
 
 These commands must obey SEMANTIC-EVOLUTION.md and DOMAIN-PACK-CONTRACT.md.
+
+*Persisted (frozen contract v1.0.0):* none of these events exists in v1.0.0; `domainPacks` is always `[]`. Implementing them requires contract v1.1.0 (decision U-03, 2026-10-23: deferred to v1.1.0; see [CAUSA-CONTRACT-RECONCILIATION.md](CAUSA-CONTRACT-RECONCILIATION.md#owner-decisions)).
 
 ## 24. Review commands
 
@@ -475,6 +588,8 @@ These may be service/application-layer orchestration commands rather than aggreg
 Import must not fabricate historical commands/events absent from the source package.
 
 ## 27. Event categories
+
+*Domain vocabulary; persisted names per §0 and EVENT-CATALOG.md.*
 
 Core event categories:
 
@@ -542,7 +657,7 @@ Core event categories:
 - InvestigationRecoveryRecorded
 - RedactionRecorded
 
-The exact serialization EventType is a SemanticId, allowing future event types without growing a closed core wire enumeration.
+~~The exact serialization EventType is a SemanticId, allowing future event types without growing a closed core wire enumeration.~~ ***Superseded by frozen contract v1.0.0:** the serialized `eventType` is one of the 31 closed v1.0.0 discriminators (CONTRACT §7); an unregistered type invalidates the whole history (`CAUSA.UNKNOWN_EVENT_TYPE`). New event types require a new minor contract version (CONTRACT §13.1). The rationale (future event types without rewriting history) is preserved by that versioning rule.*
 
 ## 28. Event correction rule
 
@@ -613,14 +728,14 @@ For the earliest durable slice, implement first:
 21. RecordVerificationCriterion
 22. MarkCorrectiveActionImplemented
 23. RecordVerification
-24. MarkCorrectiveActionVerified
+24. MarkCorrectiveActionVerified *(v1.0.0: no separate command; `verifiedEffective` follows a satisfied VerificationRecorded when all criteria are satisfied)*
 25. RecordConclusion
 26. ResolveInvestigation
 27. ReopenInvestigation
 28. RecordProposal
 29. AcceptProposal
 30. RejectProposal
-31. AttachExtension
-32. PinPolicyVersion
+31. AttachExtension *(deferred: not in the v1.0.0 engine or registry; requires contract v1.1.0)*
+32. PinPolicyVersion *(deferred: as above)*
 
 Everything else can be added through later slices without invalidating these semantics.

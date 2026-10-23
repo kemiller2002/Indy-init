@@ -1,0 +1,520 @@
+{
+ "verdict": "PASS",
+ "counts": {
+  "PASS": 102,
+  "FAIL": 0,
+  "NOT_EVALUATED": 0
+ },
+ "rows": [
+  {
+   "row": "AC-SCHEMA-01",
+   "status": "PASS",
+   "detail": ""
+  },
+  {
+   "row": "AC-REG-01",
+   "status": "PASS",
+   "detail": ""
+  },
+  {
+   "row": "AC-INV-payment-failure",
+   "status": "PASS",
+   "detail": "valid; all 17 stages passed"
+  },
+  {
+   "row": "AC-INV-authentication-outage",
+   "status": "PASS",
+   "detail": "valid; all 17 stages passed"
+  },
+  {
+   "row": "AC-INV-conflicting-metrics",
+   "status": "PASS",
+   "detail": "valid; all 17 stages passed"
+  },
+  {
+   "row": "AC-INV-intermittent-outage",
+   "status": "PASS",
+   "detail": "valid; all 17 stages passed"
+  },
+  {
+   "row": "AC-INV-api-latency",
+   "status": "PASS",
+   "detail": "valid; all 17 stages passed"
+  },
+  {
+   "row": "AC-NEG-agent-authored-hypothesis",
+   "status": "PASS",
+   "detail": "events.ndjson line 4: eventType: 'ProposalRecorded' was expected [stage 15 not-reached]"
+  },
+  {
+   "row": "AC-NEG-altered-event-without-rehash",
+   "status": "PASS",
+   "detail": "eventsSha256 does not match events.ndjson bytes [stage 15 not-reached]"
+  },
+  {
+   "row": "AC-NEG-artifact-not-http",
+   "status": "PASS",
+   "detail": "events.ndjson line 9: payload/content: 'ftp://example.invalid/synthetic/resolver-query-log.txt' does not match '^[Hh][Tt][Tt][Pp][Ss]?://[^\\\\t\\\\n\\\\u000b\\\\f\\\\r \\\\u0085\\\\u00a0\\\\u1680\\\\u2000-\\\\u200a\\\\u2028\\\\u2029\\\\u202f\\\\u205f\\\\u3000]' [stage 15 not-reached]"
+  },
+  {
+   "row": "AC-NEG-blank-text",
+   "status": "PASS",
+   "detail": "events.ndjson line 4: payload/statement: '   ' does not match '[^\\\\t\\\\n\\\\u000b\\\\f\\\\r \\\\u0085\\\\u00a0\\\\u1680\\\\u2000-\\\\u200a\\\\u2028\\\\u2029\\\\u202f\\\\u205f\\\\u3000]' [stage 15 not-reached]"
+  },
+  {
+   "row": "AC-NEG-bom-in-events",
+   "status": "PASS",
+   "detail": "events.ndjson: byte order mark [stage 15 not-reached]"
+  },
+  {
+   "row": "AC-NEG-broken-snapshot-hash",
+   "status": "PASS",
+   "detail": "snapshotSha256 does not match the snapshot [stage 15 run]"
+  },
+  {
+   "row": "AC-NEG-calendar-invalid-manifest-created-at",
+   "status": "PASS",
+   "detail": "manifest.json: createdAt: '2026-02-30T10:00:00.000Z' is not a calendar-valid instant [stage 15 not-reached]"
+  },
+  {
+   "row": "AC-NEG-calendar-invalid-occurred-at",
+   "status": "PASS",
+   "detail": "events.ndjson line 3: occurredAt: '2026-02-30T10:08:00.000Z' is not a calendar-valid instant [stage 15 not-reached]"
+  },
+  {
+   "row": "AC-NEG-correlation-reused",
+   "status": "PASS",
+   "detail": "correlationId a727adbf-3876-50c7-9d2d-469a155b617a names a second, non-adjacent group at v6 [stage 15 not-reached]"
+  },
+  {
+   "row": "AC-NEG-duplicate-aggregate-version",
+   "status": "PASS",
+   "detail": "aggregateVersion values are not exactly 1..26 in file order [stage 15 not-reached]"
+  },
+  {
+   "row": "AC-NEG-duplicate-event-id",
+   "status": "PASS",
+   "detail": "duplicate eventId [stage 15 not-reached]"
+  },
+  {
+   "row": "AC-NEG-duplicate-json-key",
+   "status": "PASS",
+   "detail": "events.ndjson line 1: duplicate object key 'eventType' [stage 15 not-reached]"
+  },
+  {
+   "row": "AC-NEG-engine-agent-repeats-falsified",
+   "status": "PASS",
+   "detail": "Event 38 would be refused now (PROPOSAL.REPEATS_NEGATIVE_KNOWLEDGE):  [rule R5.4; 1 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-NEG-engine-awaiting-verification-without-work",
+   "status": "PASS",
+   "detail": "Event 27 would be refused now (LIFECYCLE.NO_VERIFICATION_WORK):  [rule STATE-TRANSITION-TABLES \u00a71; 1 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-NEG-engine-cause-already-confirmed",
+   "status": "PASS",
+   "detail": "Event 35 would be refused now (CAUSE.STATE):  [rule STATE-TRANSITION-TABLES \u00a710; 1 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-NEG-engine-cause-alternative-not-addressed",
+   "status": "PASS",
+   "detail": "Event 22 would be refused now (CAUSE.ALTERNATIVE_NOT_ADDRESSED):  [rule \u00a715.7; 1 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-NEG-engine-cause-no-root",
+   "status": "PASS",
+   "detail": "Event 22 would be refused now (CAUSE.NO_ROOT):  [rule R6.3; 1 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-NEG-engine-cause-open-contradiction",
+   "status": "PASS",
+   "detail": "Event 22 would be refused now (CAUSE.OPEN_CONTRADICTION):  [rule \u00a715.4; 1 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-NEG-engine-cause-open-unknown",
+   "status": "PASS",
+   "detail": "Event 22 would be refused now (CAUSE.OPEN_UNKNOWN):  [rule \u00a715.5; 1 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-NEG-engine-cause-unverified-assumption",
+   "status": "PASS",
+   "detail": "Event 22 would be refused now (CAUSE.UNVERIFIED_ASSUMPTION):  [rule \u00a715.6; 1 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-NEG-engine-cause-without-mechanism",
+   "status": "PASS",
+   "detail": "Event 36 would be refused now (CAUSE.NO_MECHANISM):  [rule \u00a715.8; 1 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-NEG-engine-conclusion-without-residual",
+   "status": "PASS",
+   "detail": "Event 29 would be refused now (CONCLUSION.RESIDUAL_REQUIRED):  [rule R6.4; 1 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-NEG-engine-confirmed-conclusion-unconfirmed-cause",
+   "status": "PASS",
+   "detail": "Event 29 would be refused now (CONCLUSION.UNSUPPORTED):  [rule R6.1; 1 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-NEG-engine-content-after-resolution",
+   "status": "PASS",
+   "detail": "Event 60 would be refused now (INVESTIGATION.NOT_OPEN):  [rule D-005; 1 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-NEG-engine-dangling-reference",
+   "status": "PASS",
+   "detail": "Event 27 would be refused now (NOT_FOUND): hypotheses b76e0d59-644f-55e9-aa0b-23343b913f39 not found [rule schema; 1 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-NEG-engine-duplicate-entity-id",
+   "status": "PASS",
+   "detail": "Event 27 would be refused now (DUPLICATE_ID): hypotheses 99a15892-43af-54ac-a983-7873549055f6 already exists [rule schema; 1 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-NEG-engine-evidence-already-superseded",
+   "status": "PASS",
+   "detail": "Event 38 would be refused now (EVIDENCE.ALREADY_SUPERSEDED):  [rule STATE-TRANSITION-TABLES \u00a74; 1 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-NEG-engine-evidence-supersedes-itself",
+   "status": "PASS",
+   "detail": "Event 27 would be refused now (EVIDENCE.SELF):  [rule schema; 1 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-NEG-engine-finding-for-rejected-action",
+   "status": "PASS",
+   "detail": "Event 38 would be refused now (ACTION.NOT_EXECUTABLE):  [rule STATE-TRANSITION-TABLES \u00a75; 1 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-NEG-engine-group-time-disagreement",
+   "status": "PASS",
+   "detail": "inconsistent command group [rule DEC-04; 1 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-NEG-engine-malformed-artifact-url",
+   "status": "PASS",
+   "detail": "Event 27 would be refused now (EVIDENCE.URL):  [rule R3.5; 1 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-NEG-engine-prediction-timing-forged",
+   "status": "PASS",
+   "detail": "Event 38: decided events differ from the recorded events [rule DEC-04; 1 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-NEG-engine-proposal-not-active",
+   "status": "PASS",
+   "detail": "Event 27 would be refused now (PROPOSAL.NOT_ACTIVE):  [rule STATE-TRANSITION-TABLES \u00a712; 1 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-NEG-engine-reopen-without-new-evidence",
+   "status": "PASS",
+   "detail": "Event 38 would be refused now (HYPOTHESIS.REOPEN_NEEDS_NEW_EVIDENCE):  [rule R2.5; 1 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-NEG-engine-resolve-cause-no-longer-holds",
+   "status": "PASS",
+   "detail": "Event 57 would be refused now (RESOLVE.CAUSE_NO_LONGER_HOLDS): CAUSE.OPEN_UNKNOWN [rule \u00a715.5; 1 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-NEG-engine-resolve-correction-not-verified",
+   "status": "PASS",
+   "detail": "Event 33 would be refused now (RESOLVE.CORRECTION_NOT_VERIFIED):  [rule R7.4; 1 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-NEG-engine-resolve-criterion-unsatisfied",
+   "status": "PASS",
+   "detail": "Event 58 would be refused now (RESOLVE.CRITERION_UNSATISFIED):  [rule R7.3; 1 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-NEG-engine-resolve-no-conclusion",
+   "status": "PASS",
+   "detail": "Event 55 would be refused now (RESOLVE.NO_CONCLUSION):  [rule R6.4; 1 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-NEG-engine-resolve-no-correction",
+   "status": "PASS",
+   "detail": "Event 32 would be refused now (RESOLVE.NO_CORRECTION):  [rule R7.2; 1 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-NEG-engine-resolve-residual-not-stated",
+   "status": "PASS",
+   "detail": "Event 58 would be refused now (RESOLVE.RESIDUAL_NOT_STATED):  [rule R6.4; 1 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-NEG-engine-verification-evidence-predates-round",
+   "status": "PASS",
+   "detail": "Event 35 would be refused now (VERIFICATION.EVIDENCE_PREDATES_ROUND):  [rule R7.4; 1 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-NEG-engine-verification-without-criteria",
+   "status": "PASS",
+   "detail": "Event 56 would be refused now (CORRECTION.NO_CRITERIA):  [rule R7.3; 1 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-NEG-event-line-non-canonical",
+   "status": "PASS",
+   "detail": "events.ndjson line 1: not RFC 8785 canonical [stage 15 not-reached]"
+  },
+  {
+   "row": "AC-NEG-events-blank-line",
+   "status": "PASS",
+   "detail": "events.ndjson: blank line [stage 15 not-reached]"
+  },
+  {
+   "row": "AC-NEG-events-crlf",
+   "status": "PASS",
+   "detail": "events.ndjson: CR character [stage 15 not-reached]"
+  },
+  {
+   "row": "AC-NEG-events-empty",
+   "status": "PASS",
+   "detail": "events.ndjson: empty file [stage 15 not-reached]"
+  },
+  {
+   "row": "AC-NEG-events-invalid-utf8",
+   "status": "PASS",
+   "detail": "events.ndjson: invalid UTF-8 (invalid continuation byte) [stage 15 not-reached]"
+  },
+  {
+   "row": "AC-NEG-events-missing-final-lf",
+   "status": "PASS",
+   "detail": "events.ndjson: missing final LF [stage 15 not-reached]"
+  },
+  {
+   "row": "AC-NEG-extra-file-in-directory",
+   "status": "PASS",
+   "detail": "directory must contain exactly ['manifest.json', 'events.ndjson', 'snapshot.json'], has ['events.ndjson', 'manifest.json', 'notes.txt', 'snapshot.json'] [stage 15 not-reached]"
+  },
+  {
+   "row": "AC-NEG-feff-inside-string",
+   "status": "PASS",
+   "detail": "events.ndjson line 3: escaped U+FEFF inside a string [stage 15 not-reached]"
+  },
+  {
+   "row": "AC-NEG-float-number",
+   "status": "PASS",
+   "detail": "events.ndjson line 1: non-integer number (fraction or exponent) [stage 15 not-reached]"
+  },
+  {
+   "row": "AC-NEG-forged-cause-confirmation",
+   "status": "PASS",
+   "detail": "Event 29 would be refused now (CAUSE.MEMBER_NOT_SUPPORTED):  [rule \u00a715.3; 6 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-NEG-forged-event-id",
+   "status": "PASS",
+   "detail": "line 3: eventId is not the \u00a75.2 derivation [stage 15 not-reached]"
+  },
+  {
+   "row": "AC-NEG-forged-resolution",
+   "status": "PASS",
+   "detail": "Event 35 would be refused now (RESOLVE.CORRECTION_NOT_VERIFIED):  [rule R7.4; 4 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-NEG-forged-snapshot",
+   "status": "PASS",
+   "detail": "snapshot is not the projection of the replayed history [stage 15 run]"
+  },
+  {
+   "row": "AC-NEG-identifier-trailing-newline",
+   "status": "PASS",
+   "detail": "events.ndjson line 3: eventId: 'f3772100-d37d-5476-885a-039c8a313c28\\n' does not match '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$' [stage 15 not-reached]"
+  },
+  {
+   "row": "AC-NEG-ideographic-space-text",
+   "status": "PASS",
+   "detail": "events.ndjson line 4: payload/statement: '\\u3000\\u3000' does not match '[^\\\\t\\\\n\\\\u000b\\\\f\\\\r \\\\u0085\\\\u00a0\\\\u1680\\\\u2000-\\\\u200a\\\\u2028\\\\u2029\\\\u202f\\\\u205f\\\\u3000]' [stage 15 not-reached]"
+  },
+  {
+   "row": "AC-NEG-illegal-hypothesis-transition",
+   "status": "PASS",
+   "detail": "Event 27 would be refused now (TRANSITION.ILLEGAL): markSupported not allowed from proposed [rule STATE-TRANSITION-TABLES; 1 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-NEG-integer-out-of-range",
+   "status": "PASS",
+   "detail": "events.ndjson line 1: integer outside [-(2^53-1), 2^53-1] [stage 15 not-reached]"
+  },
+  {
+   "row": "AC-NEG-invalid-enum-value",
+   "status": "PASS",
+   "detail": "events.ndjson line 15: payload/materiality: 'critical' is not one of ['blocking', 'material', 'nonMaterial', 'informational'] [stage 15 not-reached]"
+  },
+  {
+   "row": "AC-NEG-invalid-field-type",
+   "status": "PASS",
+   "detail": "events.ndjson line 4: payload/statement: 42 is not of type 'string' [stage 15 not-reached]"
+  },
+  {
+   "row": "AC-NEG-lone-surrogate",
+   "status": "PASS",
+   "detail": "events.ndjson line 3: unpaired UTF-16 surrogate escape [stage 15 not-reached]"
+  },
+  {
+   "row": "AC-NEG-manifest-created-at-mismatch",
+   "status": "PASS",
+   "detail": "manifest createdAt != occurredAt of the first event [stage 15 not-reached]"
+  },
+  {
+   "row": "AC-NEG-manifest-event-count-mismatch",
+   "status": "PASS",
+   "detail": "manifest aggregateVersion/eventCount != 26 lines [stage 15 not-reached]"
+  },
+  {
+   "row": "AC-NEG-manifest-interior-newline",
+   "status": "PASS",
+   "detail": "manifest.json: not RFC 8785 canonical [stage 15 not-reached]"
+  },
+  {
+   "row": "AC-NEG-manifest-updated-at-mismatch",
+   "status": "PASS",
+   "detail": "manifest updatedAt != occurredAt of the last event [stage 15 not-reached]"
+  },
+  {
+   "row": "AC-NEG-manifest-version-mismatch",
+   "status": "PASS",
+   "detail": "manifest aggregateVersion/eventCount != 26 lines [stage 15 not-reached]"
+  },
+  {
+   "row": "AC-NEG-manifest-wrong-investigation-id",
+   "status": "PASS",
+   "detail": "manifest investigationId c57e4407-dd43-5d63-8dbe-9d6ceac6c31a != directory 6fd2ddc9-bedd-5fff-9093-5506c4d68cb3 [stage 15 not-reached]"
+  },
+  {
+   "row": "AC-NEG-missing-snapshot-file",
+   "status": "PASS",
+   "detail": "directory must contain exactly ['manifest.json', 'events.ndjson', 'snapshot.json'], has ['events.ndjson', 'manifest.json'] [stage 15 not-reached]"
+  },
+  {
+   "row": "AC-NEG-missing-start",
+   "status": "PASS",
+   "detail": "no InvestigationStarted before this group [rule D-005; 68 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-NEG-negative-zero",
+   "status": "PASS",
+   "detail": "events.ndjson line 1: not RFC 8785 canonical [stage 15 not-reached]"
+  },
+  {
+   "row": "AC-NEG-nesting-depth-128",
+   "status": "PASS",
+   "detail": "events.ndjson line 1: payload: Additional properties are not allowed ('deep' was unexpected) [stage 15 not-reached]"
+  },
+  {
+   "row": "AC-NEG-nesting-depth-129",
+   "status": "PASS",
+   "detail": "events.ndjson line 1: nesting deeper than 128 [stage 15 not-reached]"
+  },
+  {
+   "row": "AC-NEG-nesting-too-deep",
+   "status": "PASS",
+   "detail": "events.ndjson line 1: nesting deeper than 128 [stage 15 not-reached]"
+  },
+  {
+   "row": "AC-NEG-nil-uuid",
+   "status": "PASS",
+   "detail": "events.ndjson line 3: payload/observationId: '00000000-0000-0000-0000-000000000000' should not be valid under {'const': '00000000-0000-0000-0000-000000000000'} [stage 15 not-reached]"
+  },
+  {
+   "row": "AC-NEG-non-canonical-manifest",
+   "status": "PASS",
+   "detail": "manifest.json: not RFC 8785 canonical [stage 15 not-reached]"
+  },
+  {
+   "row": "AC-NEG-non-string-format-version",
+   "status": "PASS",
+   "detail": "events.ndjson line 2: formatVersion: '1.0.0' was expected [stage 15 not-reached]"
+  },
+  {
+   "row": "AC-NEG-path-traversal-directory",
+   "status": "PASS",
+   "detail": "directory name '../../fixtures' is not a canonical UUID [stage 15 not-reached]"
+  },
+  {
+   "row": "AC-NEG-rewritten-history",
+   "status": "PASS",
+   "detail": "candidate events.ndjson does not start with the accepted events.ndjson bytes [stage 15 run]"
+  },
+  {
+   "row": "AC-NEG-sequence-gap",
+   "status": "PASS",
+   "detail": "aggregateVersion values are not exactly 1..25 in file order [stage 15 not-reached]"
+  },
+  {
+   "row": "AC-NEG-snapshot-missing-final-lf",
+   "status": "PASS",
+   "detail": "snapshot.json: missing final LF [stage 15 not-reached]"
+  },
+  {
+   "row": "AC-NEG-snapshot-non-canonical",
+   "status": "PASS",
+   "detail": "snapshot.json: not RFC 8785 canonical [stage 15 not-reached]"
+  },
+  {
+   "row": "AC-NEG-stale-expected-version",
+   "status": "PASS",
+   "detail": "expected version 33 != current 34 [stage 15 not-reached]"
+  },
+  {
+   "row": "AC-NEG-timestamp-without-milliseconds",
+   "status": "PASS",
+   "detail": "events.ndjson line 3: occurredAt: '2026-09-08T10:08:00Z' does not match '^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])T([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]\\\\.[0-9]{3}Z$' [stage 15 not-reached]"
+  },
+  {
+   "row": "AC-NEG-truncated-event-line",
+   "status": "PASS",
+   "detail": "events.ndjson line 26: unterminated string [stage 15 not-reached]"
+  },
+  {
+   "row": "AC-NEG-unexpected-payload-field",
+   "status": "PASS",
+   "detail": "events.ndjson line 4: payload: Additional properties are not allowed ('confidence' was unexpected) [stage 15 not-reached]"
+  },
+  {
+   "row": "AC-NEG-unknown-event-type",
+   "status": "PASS",
+   "detail": "events.ndjson line 27: unregistered eventType 'InvestigationDeleted' [stage 15 not-reached]"
+  },
+  {
+   "row": "AC-NEG-unsupported-format-version",
+   "status": "PASS",
+   "detail": "events.ndjson line 2: formatVersion='2.0.0' [stage 15 not-reached]"
+  },
+  {
+   "row": "AC-NEG-uppercase-uuid",
+   "status": "PASS",
+   "detail": "events.ndjson line 4: payload/hypothesisId: 'ACE16A94-6C8C-558F-B07E-E5265EA67F24' does not match '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$' [stage 15 not-reached]"
+  },
+  {
+   "row": "AC-NEG-wrong-investigation-id",
+   "status": "PASS",
+   "detail": "line 4 names investigation c57e4407-dd43-5d63-8dbe-9d6ceac6c31a [stage 15 not-reached]"
+  },
+  {
+   "row": "AC-APPEND-01",
+   "status": "PASS",
+   "detail": "version 34 -> 35, prefix preserved, independent reader accepts"
+  },
+  {
+   "row": "AC-APPEND-02",
+   "status": "PASS",
+   "detail": "primaryCode='CAUSA.VERSION_STALE' bytesUnchanged=True"
+  },
+  {
+   "row": "AC-PARITY-01",
+   "status": "PASS",
+   "detail": "PASS parity 0 unexplained difference(s)"
+  },
+  {
+   "row": "AC-PARITY-02",
+   "status": "PASS",
+   "detail": "PASS selftest 35/35"
+  },
+  {
+   "row": "AC-CATALOG-01",
+   "status": "PASS",
+   "detail": "PASS catalog.dataset-coverage 0 undocumented dataset paths"
+  }
+ ]
+}
