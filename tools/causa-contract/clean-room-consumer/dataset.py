@@ -9,7 +9,6 @@ Order (CLAR-10 §1):
 """
 from __future__ import annotations
 
-import base64
 import os
 from dataclasses import dataclass
 
@@ -110,31 +109,23 @@ def verify_dataset(view: DatasetView, schemas) -> Failure | str:
     ids = [i["investigationId"] for i in root["investigations"]]
     if ids != sorted(ids) or len(set(ids)) != len(ids) or len(set(keys)) != len(keys):
         return _drift("root manifest investigations are not ordered by id with unique ids and keys")
-    if tuple(sorted(ids)) != view.investigation_dirs:
-        return _drift("investigation directories differ from the root manifest entries")
     neg_paths = [n["path"] for n in root["negativeFixtures"]]
-    if any(not p.startswith("negative/") for p in neg_paths) or len(set(neg_paths)) != len(neg_paths):
-        return _drift("a negative fixture is listed outside negative/ or twice")
-    if sorted(p[len("negative/"):] for p in neg_paths) != list(view.negative_files):
-        return _drift("negative/ files differ from the root manifest listing")
-    for n in root["negativeFixtures"]:
-        fx = negs[n["path"]]
-        if fx["expectedErrorCode"] != n["expectedErrorCode"] or fx["name"] + ".json" != n["path"][len("negative/"):]:
-            return _drift(f"{n['path']}: name or expectedErrorCode differs from the root manifest")
-        if fx["kind"] == "investigation" and fx["directoryId"] in ids:
-            listed_valid = {f: view.files.get(f"{FIX}/investigations/{fx['directoryId']}/{f}") for f in FILES}
-            decoded = _decode(fx["files"])
-            if decoded == listed_valid:
-                return _drift(f"{n['path']}: negative fixture is listed as a valid investigation")
+    if any(p.startswith("investigations/") for p in neg_paths) or len(set(neg_paths)) != len(neg_paths):
+        return _drift("a negativeFixtures path is also an investigation, or is listed twice")
+    for n in root["negativeFixtures"]:          # entry field vs file (CONTRACT §11.1 "any root-manifest entry field")
+        if negs[n["path"]]["expectedErrorCode"] != n["expectedErrorCode"]:
+            return _drift(f"{n['path']}: expectedErrorCode differs from the root manifest")
     reports = {}
     for e in root["investigations"]:
         iid = e["investigationId"]
         prefix = f"{FIX}/investigations/{iid}/"
         files = {r[len(prefix):]: b for r, b in view.files.items() if r.startswith(prefix)}
         r = verify(iid, files, schemas)
-        if r.failure or r.admissibility != "evaluated":
-            return r.failure or _drift(f"{iid}: admissibility not evaluated")
-        got = {"eventsSha256": r.digests["events"], "manifestSha256": r.digests["manifest"],
+        if r.failure:                           # a reader-stage failure keeps its own code (CLAR-10 §2)
+            return r.failure
+        if r.admissibility != "evaluated":
+            return Failure("CAUSA.HISTORY_INADMISSIBLE", f"{iid}: admissibility not evaluated: {r.detail}")
+        got = {"investigationId": iid, "scenarioKey": e["scenarioKey"], "eventsSha256": r.digests["events"], "manifestSha256": r.digests["manifest"],
                "snapshotSha256": r.digests["snapshot"], "expectedStateSha256": digest_json(r.state),
                "expectedVersion": r.state["version"], "expectedLifecycle": r.state["lifecycle"],
                "title": r.state["title"]}
@@ -160,7 +151,3 @@ def verify_dataset(view: DatasetView, schemas) -> Failure | str:
             return Failure("CAUSA.GOLDEN_MISMATCH", f"scenarios.json {k}: {diff} contradict the investigation")
     return (f"dataset valid: {len(ids)} investigations, {len(neg_paths)} negative fixtures, "
             f"{len(listed)} schemas, golden files agree")
-
-
-def _decode(files: dict) -> dict:
-    return {n: base64.b64decode(e["base64"]) for n, e in files.items()}

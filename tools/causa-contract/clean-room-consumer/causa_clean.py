@@ -137,6 +137,8 @@ def cmd_append_observation(args, schemas) -> int:
     if frozen:
         return out(frozen.code, None, None, frozen.detail)
     note = recover(path, schemas)                                                 # CLAR-04 recovery
+    if is_failure(note):
+        return out(note.code, None, None, note.detail)
     if not os.path.isdir(path):
         return out("CAUSA.PATH_INVALID", None, None, "investigation directory does not exist"
                    + (f" ({note})" if note else ""))

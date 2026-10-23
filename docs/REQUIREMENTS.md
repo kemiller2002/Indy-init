@@ -216,7 +216,7 @@ Declared versions and evidence:
 
 | storage version | normative contract | frozen release | verification |
 |---|---|---|---|
-| `1.0.0` (current, only supported) | [requirements/causa/data/v1.0.0/](../requirements/causa/data/v1.0.0/README.md) | `kemiller2002/causa-data` tag `causa-storage-v1.0.0` (commit `c947c7e354be80766573a782546c8186336774cc`) | `tools/causa-contract/parity_gate.py` (bidirectional parity), `tools/causa-contract/acceptance.py` (102-row release gate), `tools/causa-contract/generate_catalogs.py check` (no undocumented fields) |
+| `1.0.0` (current, only supported) | [requirements/causa/data/v1.0.0/](../requirements/causa/data/v1.0.0/README.md) | `kemiller2002/causa-data` tag `causa-storage-v1.0.0` (commit `c947c7e354be80766573a782546c8186336774cc`) | `tools/causa-contract/parity_gate.py` (bidirectional parity), `tools/causa-contract/acceptance.py` (release gate: step 0, TEST-MATRIX, supplementary fixtures, URL vectors), provider gate AC-PROV-* ([PROVIDER-GITHUB.md](../requirements/causa/data/v1.0.0/PROVIDER-GITHUB.md)), `tools/causa-contract/generate_catalogs.py check` (no undocumented fields) |
 
 Acceptance criteria:
 

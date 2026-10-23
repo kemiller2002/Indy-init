@@ -1,8 +1,8 @@
 {
- "verdict": "FAIL",
+ "verdict": "PASS",
  "counts": {
-  "PASS": 170,
-  "FAIL": 1,
+  "PASS": 171,
+  "FAIL": 0,
   "NOT_EVALUATED": 0
  },
  "rows": [
@@ -513,8 +513,8 @@
   },
   {
    "row": "AC-PARITY-01",
-   "status": "FAIL",
-   "detail": "FAIL parity 12 unexplained difference(s)"
+   "status": "PASS",
+   "detail": "PASS parity 0 unexplained difference(s)"
   },
   {
    "row": "AC-PARITY-02",

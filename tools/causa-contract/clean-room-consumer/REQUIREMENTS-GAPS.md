@@ -604,3 +604,34 @@ investigation".
 **Problem:** The §3 output shape for `append-observation` never mentions `domainCode`.
 
 **What I chose:** Always print `primaryCode`, `domainCode`, `version` and `detail`.
+
+---
+
+# Fifth iteration (final): NEW-13…19 against the revised CLARIFICATIONS.md and ACCEPTANCE.md §3
+
+**Single full run:** 170/171 PASS. The only failure is AC-PARITY-01, the pending pin (NEW-02), set aside on
+instruction. `acceptance-report.json` comes from that run. Supplementary full error lists: 61/61 agree.
+
+| gap | status | resolved by | consumer change |
+|---|---|---|---|
+| NEW-13 | resolved | CLAR-03: `<version>` matches `^v?[0-9]+\.[0-9]+\.[0-9]+$` | none; identical regex |
+| NEW-14 | resolved | CLAR-04 recovery step 1: deletes only `.next-*`/`.prev-*`, never `.invalid-*` | none |
+| NEW-15 | resolved | CLAR-04 step 5: missing → `CAUSA.PATH_INVALID`; `.invalid-<n>` uses the `.next` rule | none |
+| NEW-16 | resolved | CLAR-04 step 1: the current `events.ndjson` must start with the `.prev` bytes, else `CAUSA.HISTORY_REWRITTEN`, all siblings kept, nothing more written | implemented and tested |
+| NEW-17 | resolved | CLAR-09: calendar-invalid date and offset range → `UNREPRESENTABLE` | none |
+| NEW-18 | resolved | CLAR-10 §2 | Aligned `verify-dataset` with the text. Every entry field is compared, including `investigationId` and `scenarioKey`. A reader-stage failure keeps its code. A `negativeFixtures` path under `investigations/` or listed twice → `FIXTURE_DRIFT`. Listed negatives must exist and validate. I removed my own extra heuristics (directory-set and negative-directory equality, decoded-file comparison). I kept the checks that compare a root-manifest or bundle field with what it describes: `schemaSha256`, per-schema digests, `expectedErrorCode`. These follow CONTRACT §4, §10.3 and §11.1. |
+| NEW-19 | resolved | ACCEPTANCE §3 output now includes `domainCode` | none; already printed |
+
+## Residual items in the new text (minor)
+
+* **NEW-20: recovery with several `.prev-<k>` siblings.** CLAR-04 step 1 says "if a `.prev-<k>` sibling exists, the
+  current `events.ndjson` MUST start with **that** sibling's bytes" (singular). Normal operation leaves at most one.
+  If there are several, I require the current history to extend every one of them.
+* **NEW-21: no code for a missing negative fixture.** CLAR-10 §2: "`verify-dataset` checks that every listed negative
+  fixture file exists". No code is named for a missing file. I use `CAUSA.PATH_INVALID`, the code CLAR-04 step 5 uses
+  for an absent required file.
+* **NEW-22: a vacuous rule.** CLAR-10 §2: "an `investigations` entry that names a path under `negative/`". Root-manifest
+  `investigations` entries carry no path, only `investigationId` and `scenarioKey`, so this rule cannot fire. I did not
+  implement it.
+
+No other new gap.

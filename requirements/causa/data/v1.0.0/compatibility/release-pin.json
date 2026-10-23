@@ -12,5 +12,20 @@
     "repository": "https://github.com/kemiller2002/indy-init-rehearsal-001",
     "commit": "55f49f61c939a3a780cee592f36f732a1328f981"
   },
-  "approvedDifferences": []
+  "approvedDifferences": [],
+  "requirementsDigests": {
+    "README.md": "6cd4a3d5171f6db30355700df89e002614a3cf0d4f3a63f5860e1982f8d09de7",
+    "SEMANTICS.md": "93336597e628250f51b925013686b8162ec49b92448f6bca646132fca9937fa8",
+    "INVARIANTS.md": "b29e4626447bd8fc1b43df427acd6ce77e19bd852ca7be2da55e597cea730e25",
+    "CLARIFICATIONS.md": "7551a9e6c2a4b172f2f7f5b18917852e383e28ed7d6d72096e9168de1c58f58f",
+    "PROVIDER-GITHUB.md": "75145d90971f198ff4ab684058fc5bc7c33373fd4a28bccaa9fdfd0c133cae0e",
+    "compatibility/RULES.md": "191de66e5a47751c3b95814778106fc91babb74f7bfe3cb18d4418e2a26b6e63",
+    "acceptance/ACCEPTANCE.md": "7dc1d37d7b8a889bf624da2f8628c30b34c31615918dc1615528dd1958903b44",
+    "acceptance/TEST-MATRIX.json": "1f0b1c28cea9d4e3155497a2891a9f8ceb9fa34a3fce187c4c8bcbe9b1146941",
+    "acceptance/supplementary/MATRIX.json": "2e32b0796bf74e0b6ff484cbdd8c4337fa7b9e0c5d44c09e411027372c5bab78",
+    "catalog/field-semantics.json": "08de9d6c1db45bd02d323a550405ac52e39aab40c12095cf66df6a03a6c34c9c",
+    "catalog/event-semantics.json": "884281bfe1742ac55333a14e17ac98439e6aa51e4dfe6e5d751537f4e6e45bfc",
+    "catalog/artifact-url-vectors.jsonl": "12e5e293efef5a11a4497dcec95d8584cd0527e55183175b848182f86fb655fe"
+  },
+  "requirementsDigestsNote": "SHA-256 of the non-frozen normative requirement files (parity_gate.py PINNED_REQUIREMENTS). Updated only in a reviewed commit; parity_gate.py never writes this file."
 }

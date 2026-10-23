@@ -96,8 +96,8 @@ unchanged: readers reject any other entry there. The writer MUST:
 **Recovery** runs before the writer's first read or write of an investigation in a process.
 
 1. If `investigations/<investigationId>` exists and verifies fully, it stays, with one condition (NEW-16): if a
-   `.prev-<k>` sibling exists, the current `events.ndjson` MUST start with that sibling's `events.ndjson` bytes
-   (CONTRACT §9.3).
+   `.prev-<k>` sibling exists, the current `events.ndjson` MUST start with the `events.ndjson` bytes of **every**
+   such sibling (CONTRACT §9.3; normally there is at most one; NEW-20).
    - If it does, the `.next-*` and `.prev-*` siblings for that id are deleted.
    - If it does not, the writer reports `CAUSA.HISTORY_REWRITTEN`, keeps every sibling, and writes nothing more
      to that investigation until a person resolves it.
@@ -169,11 +169,11 @@ definition. Implementations whose JSON Schema validator cannot express it MUST a
    - then the entry checks, with `CAUSA.FIXTURE_DRIFT`;
    - then `golden/scenarios.json`, with `CAUSA.GOLDEN_MISMATCH`.
 2. Unordered or duplicate `investigations` entries in the root manifest are `CAUSA.FIXTURE_DRIFT`, which the schema
-   cannot express. So is an `investigations` entry that names a path under `negative/` or a `negativeFixtures` path
-   that is also an investigation. Entry checks compare **every** field of an `investigations` entry with the
+   cannot express. So is a `negativeFixtures` entry whose decoded investigation id equals a listed valid investigation's id. Entry
+   checks compare **every** field of an `investigations` entry with the
    investigation as verified (NEW-18). An investigation that fails a reader stage is reported with that stage's code,
-   not `CAUSA.FIXTURE_DRIFT`. `verify-dataset` checks that every listed negative fixture file exists and validates
-   against `negative-fixture.schema.json`. Rejecting each negative with its code is the job of the per-fixture
+   not `CAUSA.FIXTURE_DRIFT`. `verify-dataset` checks that every listed negative fixture file exists (a missing one is
+   `CAUSA.PATH_INVALID`; NEW-21) and validates against `negative-fixture.schema.json`. Rejecting each negative with its code is the job of the per-fixture
    acceptance rows.
 3. In the consumer protocol, `verify` reports digests and the acceptance runner compares them with the root manifest.
    The comparison failing is `CAUSA.FIXTURE_DRIFT`, and a replayed state differing from the golden file is

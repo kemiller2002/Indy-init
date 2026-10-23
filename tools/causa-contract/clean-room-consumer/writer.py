@@ -177,11 +177,19 @@ def _verifies(iid: str, path: str, schemas) -> bool:
 
 
 def recover(path: str, schemas):
-    """CAUSA-CLAR-04 recovery, run before the first read or write of an investigation. Returns a note or None."""
+    """CAUSA-CLAR-04 recovery, run before the first read or write of an investigation.
+    Returns None, a note string, or a Failure (HISTORY_REWRITTEN)."""
     iid, investigations, staging = os.path.basename(path), os.path.dirname(path), _staging(path)
     transient = lambda: [e for e in _staged(staging, iid, ("next", "prev"))]  # noqa: E731
     if _verifies(iid, path, schemas):                                                        # 1
-        for _, _, name in transient():
+        current = read_dir(path)["events.ndjson"]
+        prevs = [name for _, kind, name in transient() if kind == "prev"]
+        rewritten = [name for name in prevs
+                     if not current.startswith(read_dir(os.path.join(staging, name)).get("events.ndjson") or b"")]
+        if rewritten:                       # NEW-16: keep every sibling, write nothing more
+            return Failure("CAUSA.HISTORY_REWRITTEN", f"investigations/{iid} does not extend .staging/"
+                                                      f"{rewritten[0]} (CONTRACT §9.3); siblings kept")
+        for _, _, name in transient():      # .next-* / .prev-* only; .invalid-* never deleted (NEW-14)
             _remove_set(os.path.join(staging, name))
         return None
     note = []
