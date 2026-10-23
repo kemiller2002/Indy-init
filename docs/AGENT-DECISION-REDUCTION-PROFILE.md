@@ -21,7 +21,7 @@ UI receives a versioned projection and legal capabilities from the F# engine. Co
 Use frozen causa-data/contract/v1.0.0/CONTRACT.md and tag causa-storage-v1.0.0 as the sole wire contract for this profile. Seed fixtures are immutable; working copies use separate paths. Storage adapters implement the existing provider-neutral interface and optimistic concurrency. No agent may improvise alternative field names, ordering, event shapes, or snapshot semantics. Show distinct local and remote persistence status; never claim live GitHub writes from mocked tests. Changes to frozen contract require explicit versioning and authorization.
 
 ## ADRP-006: Reuse and dependency decision
-Use existing F#/.NET, Limen, Forma, Folio, Aegis, Praxis, Ordo, Dokimos, and Percepta capabilities when they meet the contract. Pin exact verified versions in a lock/manifest before fan-out; do not assume a candidate version is compatible. Do not add new UI, state-management, graph, or animation dependencies without an explicit integration-cost justification and coordinator approval. Where a library lacks required functionality, implement the smallest isolated adapter.
+Use existing F#/.NET, Limen, Forma, Folio, Aegis, Praxis, Ordo, Dokimos, and Percepta capabilities when they meet the contract. Before EVERY run, discover the newest approved stable releases across all in-scope Echelon systems, resolve and test their compatibility as a set, then pin exact verified versions in the run lock. Historical R001 versions are not defaults. No automatic downgrade; block and resolve incompatibilities or obtain an explicit time-bounded exception. Follow REHEARSAL-DEPENDENCY-LOCK.md. Do not add new UI, state-management, graph, or animation dependencies without an explicit integration-cost justification and coordinator approval. Where a library lacks required functionality, implement the smallest isolated adapter.
 
 ## ADRP-007: Deterministic graph and timeline
 Render graph edges only from canonical projected relationships; deterministic layout seeded by stable IDs, with accessible textual alternative. Timeline sorts by canonical sequence/version, not wall-clock alone. Entity selection opens the same inspector from graph, timeline, search, and comparison. Do not implement independent causal inference, synthetic confidence, or implicit event mutation.
@@ -60,7 +60,7 @@ Preserve blank-application kickoff rules and provenance. Prepared requirements, 
 These are not invitations for each agent to invent a new architecture during the rehearsal.
 
 ## Pre-experiment readiness checklist
-- [ ] Verify pinned dependency versions and build compatibility.
+- [ ] Discover latest approved stable versions, resolve the complete Echelon stack, and verify compatibility before locking for this run.
 - [ ] Confirm canonical Praxis input folder/grammar in every affected repo and create work items there.
 - [ ] Freeze command/projection/provider interfaces and record owners.
 - [ ] Validate frozen fixture digests and five-scenario golden replay.
