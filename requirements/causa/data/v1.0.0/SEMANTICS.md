@@ -489,23 +489,40 @@ collect (§1.5) and refuse if it is non-empty. Unless stated otherwise the comma
       (b) `u` is accepted by **.NET 10 `System.Uri.IsWellFormedUriString(u, UriKind.Absolute)`** (engine `:421`).
       Note: the engine uses `IsWellFormedUriString`, which is stricter than `Uri.TryCreate(…, Absolute)`: it first
       requires `TryCreate` to succeed and then requires `IsWellFormedOriginalString()`.
-      Implementation-independent statement (normative where it is certain, see §17 E-1 for the rest). For an
-      `http`/`https` string, (b) is false if any of the following holds; implementations MUST reject these:
-      - the string does not parse as an absolute hierarchical URI `scheme "://" authority path-abempty ["?" query]
-        ["#" fragment]`, including: an empty host; a host that is not a valid DNS-style name, dotted IPv4 address,
-        bracketed IPv6 literal or IDN-convertible Unicode name (e.g. a host containing a space, as in
-        `https://exa mple.invalid/x`); a port containing a character other than a decimal digit, or whose value exceeds 65535 (an empty port and
-        leading zeros are accepted);
-      - a backslash `\` anywhere after the scheme (`http:\\host/…`, `http://host/a\b`);
-      - in userinfo, path, query or fragment: a C0 or C1 control character (U+0000–U+001F, U+007F–U+009F), a space,
-        or any of `"` `<` `>` `\` `^` `` ` `` `{` `|` `}` unescaped (they would need percent-encoding), or a `%`
-        that is not followed by two hexadecimal digits.
-      And (b) is true for a string of the form `http(s)://` + DNS host (letters, digits, `-`, `.`) + optional
-      `:port` + a path, query and fragment consisting only of RFC 3986 unreserved characters, sub-delims,
-      `:` `@` `/` `?` and well-formed `%HH` escapes. Dot segments (`/./`, `/../`) and `//` in the path do **not** make
-      it ill-formed (the .NET check deliberately skips them). Behaviour for non-ASCII characters, `[`/`]` outside an
-      IPv6 host, leading/trailing whitespace, and other edge cases is **platform-defined** (§17 E-1): there an
-      implementation MUST either call the .NET 10 function or treat the case as unresolved.
+      **Decision procedure (normative; replaces the earlier prose list, which was wrong for trailing whitespace,
+      C1 controls and empty DNS labels).** Evaluate in order; the first step that yields a verdict wins:
+      1. **Prefix.** If (a) fails, the verdict is *ill-formed*.
+      2. **Interior whitespace.** Let `t` be `u` with leading and trailing characters from
+         {U+0009, U+000A, U+000B, U+000C, U+000D, U+0020} removed. If `t` contains any of those characters, the verdict
+         is *ill-formed* (e.g. `https://exa mple.invalid/x`).
+      3. **Strict profile.** If `u` is in the **artifact-URL profile** (§10.4.2), the verdict is exactly the profile
+         predicate `wellFormedProfile(u)` of §10.4.2.
+      4. **Otherwise** the verdict is **platform-defined** (§17 E-1). A reader MUST then either evaluate .NET 10
+         `System.Uri.IsWellFormedUriString(u, UriKind.Absolute)` itself, or stop with "admissibility not evaluated"
+         (CONTRACT §11.3); it MUST NOT report the history admissible. Examples that land here: any non-ASCII
+         character, userinfo (`user@host`), hosts that are not LDH names, dotted IPv4 or zone-free IPv6 literals
+         (`host_name`, `-h`, `a..b`, `9._x`), trailing whitespace, `[`/`]` outside an IPv6 host.
+      **Writer rule (CAUSA-URL-W).** A writer MUST NOT persist an artifact URL that is not in the profile, or that is
+      in the profile but *ill-formed*; it refuses the command with `CAUSA.UNREPRESENTABLE` (profile violation) or the
+      domain refusal `EVIDENCE.URL` (ill-formed). Conforming data therefore never reaches step 4, and every conforming
+      reader agrees on every conforming history.
+   2. **Artifact-URL profile (§10.4.2).** Membership is purely syntactic. `u` is in the profile iff it matches, as a
+      whole string, the ECMA-262 pattern
+      `^[Hh][Tt][Tt][Pp][Ss]?://(?:LABEL(?:\.LABEL)*|\[[0-9A-Fa-f:.]+\])(?::[0-9]{1,5})?(?:[/?#][\x21-\x7E]*)?$`
+      with `LABEL = [A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?`, **and**, when the host is bracketed, the bracket
+      content is a valid RFC 4291 IPv6 address text (no zone identifier). For an in-profile `u`, split the part after
+      the authority into `path`, `?query` and `#fragment` at the first `?` and the first `#` (`#` wins over a later
+      `?`). Then `wellFormedProfile(u)` is true iff **all** hold:
+      - the port, if present, is ≤ 65535 (leading zeros allowed);
+      - `fragment` contains no further `#`;
+      - every character of `path` is in RFC 3986 `unreserved ∪ sub-delims ∪ {":", "@", "/"}`, and of `query` and
+        `fragment` in that set plus `"?"`, except that `%` MUST be followed by two hexadecimal digits (`%HH`).
+      Dot segments (`/./`, `/../`) and `//` in the path do not affect the verdict.
+      **Verification.** This procedure was checked against the engine predicate (prefix test + .NET 10.0.13 runtime
+      `Uri.IsWellFormedUriString`, SDK 10.0.402) on 290,917 distinct generated strings: steps 1–3 decide 41,173 of them
+      (20,541 well-formed, 20,632 ill-formed) and agree with .NET on every one; the other 249,744 are step 4. The vectors are
+      published as `catalog/artifact-url-vectors.jsonl` (normative test data) and the reference predicate as
+      `tools/causa-contract/differential/url_profile.py` (informative).
 5. **`SupersedeEvidence`** (`:427-432`). Refuse `collect(found(evidence, evidenceId), found(evidence,
    replacementEvidenceId), text(reason))`. Then, in order:
    - if `S.evidence[evidenceId].supersededBy ≠ null`: refuse `[EVIDENCE.ALREADY_SUPERSEDED]` (rule
@@ -925,7 +942,7 @@ specifiable**. Where the verdict is not "fully specified", the oracle wins (§0.
 
 | id | topic | engine | verdict |
 |---|---|---|---|
-| E-1 | Artifact URL well-formedness (`EVIDENCE.URL`) uses .NET `Uri.IsWellFormedUriString(u, UriKind.Absolute)` after an `OrdinalIgnoreCase` prefix test. | `Decide.fs:421` | **Specified but relies on platform behaviour: .NET 10 (SDK 10.0.402) `System.Uri` parsing and `IsWellFormedOriginalString`, including IRI and IDN handling (IDN uses the host ICU library).** §10.4.1 states the cases that are certain (derived from the .NET 10 source of `UriExt.InternalIsWellFormedOriginalString` and `Uri.CheckCanonical`, and checked against the two fixture data points: `https://example.invalid/synthetic/resolver-query-log-2026-09-14.txt` accepted, `https://exa mple.invalid/x` refused). Non-ASCII characters, `[`/`]` outside IPv6, trailing whitespace, unusual hosts and ports are **NOT specifiable from text alone** with confidence; no execution of the .NET function was available to the author. |
+| E-1 | Artifact URL well-formedness (`EVIDENCE.URL`) uses .NET `Uri.IsWellFormedUriString(u, UriKind.Absolute)` after an `OrdinalIgnoreCase` prefix test. | `Decide.fs:421` | **Specified but relies on platform behaviour: .NET 10 (SDK 10.0.402) `System.Uri` parsing and `IsWellFormedOriginalString`, including IRI and IDN handling (IDN uses the host ICU library).** **Resolved for conforming data (2026-10-23):** §10.4.1 now gives a decision procedure whose decided cases (prefix, interior whitespace, strict profile §10.4.2) were verified against the .NET 10 predicate on 290,917 strings (0 disagreements on the 41,173 decided), and the writer rule CAUSA-URL-W keeps every persisted URL inside the decided cases. Residual platform dependence: only strings outside the profile, which conforming writers never produce; readers fail closed on them (admissibility not evaluated). |
 | E-2 | `RecordVerification` reads the criterion's corrective action with an unchecked lookup. If the criterion names a corrective action that does not exist, the oracle throws `KeyNotFoundException` and `History.validate` returns no list (callers such as the causa-data `Store` do not catch it). | `Decide.fs:522` | **NOT specifiable** as "same first code": the oracle produces none. Reachable only when an earlier group was already inadmissible (a dangling `CriterionRecorded`), so the verdict (inadmissible) is unaffected. Implementations MUST report the history inadmissible and SHOULD report the first error accumulated before that group; this is a deliberate, documented divergence from an oracle crash. |
 | E-3 | Blank-text test (`String.IsNullOrWhiteSpace`) and `Trim`. | `Primitives.fs:85`, `Decide.fs:401` | **Fully specified here** (§3.2, §3.3): fixed 25-code-unit whitespace set, per UTF-16 code unit (CONTRACT §2.6). It follows .NET `char.IsWhiteSpace`, which is stable across .NET versions. |
 | E-4 | String equality is ordinal on UTF-16 code units; no normalisation. | F# `=` on `string` | **Fully specified here** (§3.1). |
