@@ -1,9 +1,9 @@
 {
- "note": "Merged from per-prefix runs (--only AC-SCHEMA/REG/INV/NEG/APPEND/PARITY/CATALOG/SUP/STEP0) because the full run aborts in AC-URL-01 (runner defect NEW-01).",
+ "verdict": "FAIL",
  "counts": {
-  "PASS": 103,
+  "PASS": 170,
   "FAIL": 1,
-  "RUNNER_ERROR": 1
+  "NOT_EVALUATED": 0
  },
  "rows": [
   {
@@ -17,19 +17,14 @@
    "detail": "matrix agrees with lock.expectedStates and lock.negatives"
   },
   {
-   "row": "AC-APPEND-01",
+   "row": "AC-SCHEMA-01",
    "status": "PASS",
-   "detail": "version 34 -> 35, prefix preserved, independent reader accepts"
+   "detail": ""
   },
   {
-   "row": "AC-APPEND-02",
+   "row": "AC-REG-01",
    "status": "PASS",
-   "detail": "primaryCode='CAUSA.VERSION_STALE' bytesUnchanged=True"
-  },
-  {
-   "row": "AC-CATALOG-01",
-   "status": "PASS",
-   "detail": "PASS catalog.dataset-coverage 0 undocumented dataset paths"
+   "detail": ""
   },
   {
    "row": "AC-INV-payment-failure",
@@ -507,9 +502,19 @@
    "detail": "line 4 names investigation c57e4407-dd43-5d63-8dbe-9d6ceac6c31a [stage 15 not-reached]"
   },
   {
+   "row": "AC-APPEND-01",
+   "status": "PASS",
+   "detail": "version 34 -> 35, prefix preserved, independent reader accepts"
+  },
+  {
+   "row": "AC-APPEND-02",
+   "status": "PASS",
+   "detail": "primaryCode='CAUSA.VERSION_STALE' bytesUnchanged=True"
+  },
+  {
    "row": "AC-PARITY-01",
    "status": "FAIL",
-   "detail": "FAIL parity 10 unexplained difference(s)"
+   "detail": "FAIL parity 12 unexplained difference(s)"
   },
   {
    "row": "AC-PARITY-02",
@@ -517,19 +522,344 @@
    "detail": "PASS selftest 35/35"
   },
   {
-   "row": "AC-REG-01",
+   "row": "AC-CATALOG-01",
    "status": "PASS",
-   "detail": ""
-  },
-  {
-   "row": "AC-SCHEMA-01",
-   "status": "PASS",
-   "detail": ""
+   "detail": "PASS catalog.dataset-coverage 0 undocumented dataset paths"
   },
   {
    "row": "AC-URL-01",
-   "status": "RUNNER_ERROR",
-   "detail": "runner crashed in url_outcome: str.splitlines() splits a vector containing raw U+0085 (see REQUIREMENTS-GAPS NEW-01); consumer url-verdict equals expected for 3596/3596 vectors in order"
+   "status": "PASS",
+   "detail": "3596/3596 vectors agree"
+  },
+  {
+   "row": "AC-DATASET-01",
+   "status": "PASS",
+   "detail": "dataset valid: 5 investigations, 90 negative fixtures, 60 schemas, golden files agree"
+  },
+  {
+   "row": "AC-SUP-sup-start-group-reconstructs-finding",
+   "status": "PASS",
+   "detail": "Event 1 would be refused now (INVESTIGATION.NOT_FOUND):  [rule schema; 1 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-SUP-sup-no-start-single-group",
+   "status": "PASS",
+   "detail": "no InvestigationStarted before this group [rule D-005; 1 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-SUP-sup-content-after-close",
+   "status": "PASS",
+   "detail": "Event 61 would be refused now (INVESTIGATION.NOT_OPEN):  [rule D-005; 1 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-SUP-sup-confirm-after-resolution",
+   "status": "PASS",
+   "detail": "Event 60 would be refused now (INVESTIGATION.NOT_OPEN):  [rule D-005; 1 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-SUP-sup-confirm-in-draft",
+   "status": "PASS",
+   "detail": "Event 20 would be refused now (INVESTIGATION.NOT_OPEN):  [rule D-005; 1 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-SUP-sup-accept-proposal-duplicate-target",
+   "status": "PASS",
+   "detail": "Event 28 would be refused now (DUPLICATE_ID): hypotheses ace16a94-6c8c-558f-b07e-e5265ea67f24 already exists [rule schema; 1 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-SUP-sup-contradiction-dangling-evidence",
+   "status": "PASS",
+   "detail": "Event 27 would be refused now (NOT_FOUND): some evidence not found [rule schema; 1 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-SUP-sup-hypothesis-reopen-superseded",
+   "status": "PASS",
+   "detail": "Event 35 would be refused now (TRANSITION.ILLEGAL): reopen not allowed from superseded [rule STATE-TRANSITION-TABLES; 1 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-SUP-sup-unknown-start-investigating-twice",
+   "status": "PASS",
+   "detail": "Event 38 would be refused now (TRANSITION.ILLEGAL): StartInvestigatingUnknown not allowed from investigating [rule STATE-TRANSITION-TABLES; 1 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-SUP-sup-contradiction-triage-twice",
+   "status": "PASS",
+   "detail": "Event 29 would be refused now (TRANSITION.ILLEGAL): TriageContradiction not allowed from triaged [rule STATE-TRANSITION-TABLES; 1 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-SUP-sup-assumption-accept-rejected",
+   "status": "PASS",
+   "detail": "Event 29 would be refused now (TRANSITION.ILLEGAL): ProvisionallyAcceptAssumption not allowed from rejected [rule STATE-TRANSITION-TABLES; 1 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-SUP-sup-action-approve-rejected",
+   "status": "PASS",
+   "detail": "Event 38 would be refused now (TRANSITION.ILLEGAL): ApproveAction not allowed from rejected [rule STATE-TRANSITION-TABLES; 1 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-SUP-sup-cause-reopen-proposed",
+   "status": "PASS",
+   "detail": "Event 29 would be refused now (TRANSITION.ILLEGAL):  [rule STATE-TRANSITION-TABLES \u00a710; 1 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-SUP-sup-correction-approve-cancelled",
+   "status": "PASS",
+   "detail": "Event 35 would be refused now (TRANSITION.ILLEGAL): ApproveCorrection not allowed from cancelled [rule STATE-TRANSITION-TABLES; 1 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-SUP-sup-accept-rejected-proposal",
+   "status": "PASS",
+   "detail": "Event 27 would be refused now (PROPOSAL.NOT_ACTIVE):  [rule STATE-TRANSITION-TABLES \u00a712; 1 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-SUP-sup-lifecycle-activate-active",
+   "status": "PASS",
+   "detail": "Event 27 would be refused now (TRANSITION.ILLEGAL): activateInvestigation not allowed from active [rule STATE-TRANSITION-TABLES; 1 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-SUP-sup-lifecycle-close-active",
+   "status": "PASS",
+   "detail": "Event 27 would be refused now (TRANSITION.ILLEGAL): closeInvestigation not allowed from active [rule STATE-TRANSITION-TABLES; 1 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-SUP-sup-lifecycle-reopen-active",
+   "status": "PASS",
+   "detail": "Event 27 would be refused now (TRANSITION.ILLEGAL): reopenInvestigation not allowed from active [rule STATE-TRANSITION-TABLES; 1 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-SUP-sup-resolve-from-awaiting-evidence",
+   "status": "PASS",
+   "detail": "Event 38 would be refused now (TRANSITION.ILLEGAL): resolveInvestigation not allowed from awaitingEvidence [rule STATE-TRANSITION-TABLES; 1 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-SUP-sup-resolve-from-resolved",
+   "status": "PASS",
+   "detail": "Event 60 would be refused now (TRANSITION.ILLEGAL): resolveInvestigation not allowed from resolved [rule STATE-TRANSITION-TABLES; 1 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-SUP-sup-artifact-url-port-out-of-range",
+   "status": "PASS",
+   "detail": "Event 27 would be refused now (EVIDENCE.URL):  [rule R3.5; 1 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-SUP-sup-artifact-url-bad-percent-escape",
+   "status": "PASS",
+   "detail": "Event 27 would be refused now (EVIDENCE.URL):  [rule R3.5; 1 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-SUP-sup-finding-for-proposed-action",
+   "status": "PASS",
+   "detail": "Event 28 would be refused now (ACTION.NOT_EXECUTABLE):  [rule STATE-TRANSITION-TABLES \u00a75; 1 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-SUP-sup-verification-not-awaiting",
+   "status": "PASS",
+   "detail": "Event 36 would be refused now (VERIFICATION.NOT_AWAITING):  [rule R7.4; 1 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-SUP-sup-verification-evidence-superseded",
+   "status": "PASS",
+   "detail": "Event 38 would be refused now (VERIFICATION.EVIDENCE_PREDATES_ROUND):  [rule R7.4; 1 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-SUP-sup-cause-not-found",
+   "status": "PASS",
+   "detail": "Event 35 would be refused now (CAUSE.NOT_FOUND):  [rule I-19; 1 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-SUP-sup-cause-member-not-supported",
+   "status": "PASS",
+   "detail": "Event 23 would be refused now (CAUSE.MEMBER_NOT_SUPPORTED):  [rule \u00a715.3; 1 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-SUP-sup-cause-no-supporting-evidence",
+   "status": "PASS",
+   "detail": "Event 23 would be refused now (CAUSE.NO_SUPPORTING_EVIDENCE):  [rule \u00a715.3; 1 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-SUP-sup-cause-contradicting-evidence",
+   "status": "PASS",
+   "detail": "Event 23 would be refused now (CAUSE.CONTRADICTING_EVIDENCE):  [rule \u00a715.4; 1 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-SUP-sup-cause-member-missing",
+   "status": "PASS",
+   "detail": "Event 20 would be refused now (NOT_FOUND): some hypotheses not found [rule schema; 2 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-SUP-sup-resolve-conclusion-stale",
+   "status": "PASS",
+   "detail": "Event 58 would be refused now (RESOLVE.CONCLUSION_STALE):  [rule R6.1; 1 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-SUP-sup-resolve-no-confirmed-cause",
+   "status": "PASS",
+   "detail": "Event 28 would be refused now (RESOLVE.NO_CONFIRMED_CAUSE):  [rule R6.1; 2 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-SUP-sup-resolve-blocking-unknown",
+   "status": "PASS",
+   "detail": "Event 57 would be refused now (RESOLVE.CAUSE_NO_LONGER_HOLDS): CAUSE.OPEN_UNKNOWN [rule \u00a715.5; 2 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-SUP-sup-agent-repeats-negative-knowledge",
+   "status": "PASS",
+   "detail": "Event 38 would be refused now (PROPOSAL.REPEATS_NEGATIVE_KNOWLEDGE):  [rule R5.4; 1 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-SUP-sup-agent-repeats-falsified-normalised",
+   "status": "PASS",
+   "detail": "Event 38 would be refused now (PROPOSAL.REPEATS_NEGATIVE_KNOWLEDGE):  [rule R5.4; 1 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-SUP-sup-forged-lifecycle-from",
+   "status": "PASS",
+   "detail": "Event 38: decided events differ from the recorded events [rule DEC-04; 1 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-SUP-sup-forged-resolution-from",
+   "status": "PASS",
+   "detail": "Event 56: decided events differ from the recorded events [rule DEC-04; 1 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-SUP-sup-forged-hypothesis-from",
+   "status": "PASS",
+   "detail": "Event 27: decided events differ from the recorded events [rule DEC-04; 1 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-SUP-sup-forged-confirmation-policy",
+   "status": "PASS",
+   "detail": "Event 21: decided events differ from the recorded events [rule DEC-04; 1 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-SUP-sup-forged-a21-reason",
+   "status": "PASS",
+   "detail": "Event 35: decided events differ from the recorded events [rule DEC-04; 1 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-SUP-sup-forged-verification-lifecycle-missing",
+   "status": "PASS",
+   "detail": "Event 35: decided events differ from the recorded events [rule DEC-04; 1 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-SUP-sup-forged-verification-lifecycle-extra",
+   "status": "PASS",
+   "detail": "Event 36: decided events differ from the recorded events [rule DEC-04; 1 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-SUP-sup-forged-verification-correction-missing",
+   "status": "PASS",
+   "detail": "Event 35: decided events differ from the recorded events [rule DEC-04; 1 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-SUP-sup-forged-verified-effective-premature",
+   "status": "PASS",
+   "detail": "Event 36: decided events differ from the recorded events [rule DEC-04; 1 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-SUP-sup-forged-verified-effective-missing",
+   "status": "PASS",
+   "detail": "Event 37: decided events differ from the recorded events [rule DEC-04; 1 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-SUP-sup-forged-inconclusive-follow-on",
+   "status": "PASS",
+   "detail": "Event 35: decided events differ from the recorded events [rule DEC-04; 1 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-SUP-sup-forged-finding-completion-missing",
+   "status": "PASS",
+   "detail": "Event 27: decided events differ from the recorded events [rule DEC-04; 1 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-SUP-sup-forged-finding-start-missing",
+   "status": "PASS",
+   "detail": "Event 29: decided events differ from the recorded events [rule DEC-04; 1 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-SUP-sup-forged-finding-extra-completion",
+   "status": "PASS",
+   "detail": "Event 38: decided events differ from the recorded events [rule DEC-04; 1 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-SUP-sup-forged-accept-hypothesis-mechanism",
+   "status": "PASS",
+   "detail": "Event 28: decided events differ from the recorded events [rule DEC-04; 1 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-SUP-sup-forged-accept-hypothesis-statement",
+   "status": "PASS",
+   "detail": "Event 28: decided events differ from the recorded events [rule DEC-04; 1 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-SUP-sup-forged-accept-unknown-materiality",
+   "status": "PASS",
+   "detail": "Event 28: decided events differ from the recorded events [rule DEC-04; 1 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-SUP-sup-forged-accept-action-kind",
+   "status": "PASS",
+   "detail": "Event 28: decided events differ from the recorded events [rule DEC-04; 1 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-SUP-sup-forged-accept-action-targets",
+   "status": "PASS",
+   "detail": "Event 28: decided events differ from the recorded events [rule DEC-04; 1 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-SUP-sup-forged-accept-target-missing",
+   "status": "PASS",
+   "detail": "Event 28: decided events differ from the recorded events [rule DEC-04; 1 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-SUP-sup-forged-accept-target-id-mismatch",
+   "status": "PASS",
+   "detail": "Event 28: decided events differ from the recorded events [rule DEC-04; 1 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-SUP-sup-forged-accept-order-reversed",
+   "status": "PASS",
+   "detail": "Event 28: decided events differ from the recorded events [rule DEC-04; 1 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-SUP-sup-unreconstructable-verification-failed",
+   "status": "PASS",
+   "detail": "no command reconstructs this group [rule DEC-04; 1 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-SUP-sup-unreconstructable-verified-effective",
+   "status": "PASS",
+   "detail": "no command reconstructs this group [rule DEC-04; 1 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-SUP-sup-unreconstructable-action-completed",
+   "status": "PASS",
+   "detail": "no command reconstructs this group [rule DEC-04; 1 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-SUP-sup-group-actor-disagreement",
+   "status": "PASS",
+   "detail": "inconsistent command group [rule DEC-04; 1 error(s)] [stage 15 run]"
+  },
+  {
+   "row": "AC-SUP-sup-valid-entity-transitions",
+   "status": "PASS",
+   "detail": "valid; all 17 stages passed"
+  },
+  {
+   "row": "AC-SUP-sup-valid-verification-rounds",
+   "status": "PASS",
+   "detail": "valid; all 17 stages passed"
+  },
+  {
+   "row": "AC-SUP-sup-valid-repetition-not-refused",
+   "status": "PASS",
+   "detail": "valid; all 17 stages passed"
+  },
+  {
+   "row": "AC-SUP-sup-valid-unicode-line-separators",
+   "status": "PASS",
+   "detail": "valid; all 17 stages passed"
   }
  ]
 }

@@ -259,13 +259,14 @@ def verify(dir_name: str, files: dict, schemas) -> Report:
     state = project_state(final) if final is not None else None
     first_err_v = validation.errors[0].version if validation.errors else None
     blocking_unresolved = [u for u in validation.unresolved if first_err_v is None or u[0] <= first_err_v]
-    expected_snapshot = build_snapshot(events, state)
-    f = _first(
-        lambda: None if manifest["snapshotSha256"] == sha256_hex(s_text.encode("utf-8")) else Failure(  # 16
-            "CAUSA.SNAPSHOT_HASH_MISMATCH", "snapshotSha256 does not match the snapshot"),
-        lambda: None if file_bytes(expected_snapshot) == s_bytes else Failure(                  # 17
-            "CAUSA.SNAPSHOT_MISMATCH", "snapshot is not the projection of the replayed history"))
+    def stages_16_17():
+        return _first(
+            lambda: None if manifest["snapshotSha256"] == sha256_hex(s_text.encode("utf-8")) else Failure(  # 16
+                "CAUSA.SNAPSHOT_HASH_MISMATCH", "snapshotSha256 does not match the snapshot"),
+            lambda: None if file_bytes(build_snapshot(events, state)) == s_bytes else Failure(            # 17
+                "CAUSA.SNAPSHOT_MISMATCH", "snapshot is not the projection of the replayed history"))
     if blocking_unresolved:
+        f = stages_16_17()
         # CAUSA-CLAR-02: primaryCode stays null; a stage 16-17 code is reported only in detail, as conditional.
         v, reason = blocking_unresolved[0]
         later = (f"; conditional on admissibility: {f.code} ({f.detail})" if f
@@ -277,6 +278,7 @@ def verify(dir_name: str, files: dict, schemas) -> Report:
         e0 = validation.errors[0]
         return _fail(Failure("CAUSA.HISTORY_INADMISSIBLE", f"{e0.message} [rule {e0.rule}; "
                              f"{len(validation.errors)} error(s)]", e0.code), digests, "run", state, events)
+    f = stages_16_17()
     if f:
         return _fail(f, digests, "run", state, events)
     return Report(None, "evaluated", "run", digests, state, tuple(events), "valid; all 17 stages passed")

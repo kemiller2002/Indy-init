@@ -482,3 +482,125 @@ ACCEPTANCE ACC-10 and §4 make the verdict depend on `acceptance/supplementary/M
 base, the appended chunk, or the combined set.
 
 **What I chose:** The base investigation's digests until the combined set is built, then the combined set's.
+
+---
+
+# Fourth iteration: NEW-01…12 rechecked against the revised CLARIFICATIONS.md and ACCEPTANCE.md §3
+
+I re-read CLARIFICATIONS.md and ACCEPTANCE.md §3, plus `acceptance/supplementary/`, which now exists.
+
+**Single full run:** 170/171 PASS. The only failure is AC-PARITY-01, which is NEW-02 and set aside on instruction.
+The run includes:
+
+* AC-STEP0-DATASET and AC-STEP0-MATRIX;
+* AC-URL-01 (3596/3596);
+* AC-DATASET-01;
+* all 64 supplementary rows (61 negative, 3 valid).
+
+**Stricter evidence:** the supplementary matrix publishes the oracle's *complete* ordered `History.validate` list,
+with history code and inner rule code, for each negative. My full lists equal it for **61/61** rows. The runner
+compares only the first code.
+
+| gap | status | resolved by / note |
+|---|---|---|
+| NEW-01 | resolved | ACCEPTANCE §3 now says lines are LF only and U+0085/U+2028/U+2029 are not breaks, and the runner was fixed. My NDJSON readers already split on `\n` only. The vector readers in `url-verdict` and `selftest_urls.py` now read bytes, because text-mode `open()` would treat a raw CR as a line end. |
+| NEW-02 | open (coordinator) | `release-pin.json` is not updated; `parity_gate` now reports 12 differences. |
+| NEW-03 | resolved | CLAR-04 moves staging to `workspaces/demo/<runId>/.staging/`, so `investigations/` holds only investigations and CONTRACT §3.2 applies unchanged. Implemented. |
+| NEW-04 | resolved, with residual NEW-14 and NEW-15 | CLAR-04 fixes `<n>` (1 + the largest present), the ranking (highest `<k>`; `.next` over `.prev` at equal `k` only if it extends it), `.invalid-<n>` kept, recovery before first access, and no rollback after `WRITE_UNCONFIRMED`. Implemented. |
+| NEW-05 | resolved | CLAR-03 precedence now includes base verification at step 2. It matches what I implemented. |
+| NEW-06 | resolved | CLAR-03 "Representability vs decide" matches my choice. Blank `--original` gives `COMMAND_REFUSED` with `VALIDATION.EMPTY`. |
+| NEW-07 | resolved, with residual NEW-13 | CLAR-03 "Paths" splits the cases: `PATH_FROZEN` at any depth below `fixtures/contract/compatibility/<version>/`, otherwise `PATH_INVALID` unless the target is exactly `workspaces/demo/<runId>/investigations/<uuid>`, evaluated after resolving symlinks and `.`/`..`. Implementing it exposed a bug of mine, now fixed: I checked the resolved path but recovered and wrote through the unresolved one, which could move a symlink. The resolved path is now used for every step. |
+| NEW-08 | resolved | CLAR-09: `t`/`z` accepted, `±00:00` is UTC, leap second 60 refused, UTC-year bound. Matches. |
+| NEW-09 | resolved | CLAR-10 §4 adds `verify-dataset` and AC-DATASET-01. Implemented in `dataset.py`. It passes on the frozen dataset and reports the right code for each mutation I tried: entry drift, golden state, scenarios.json, root framing, an extra negative file, unordered entries, a schema byte change. |
+| NEW-10 | resolved | CLAR-02: when stage 15 is not evaluated, I now run stages 16–17 and report any code only in `detail`, marked conditional; `primaryCode` stays null. |
+| NEW-11 | resolved | `acceptance/supplementary/` exists; 64/64 pass. |
+| NEW-12 | resolved | CLAR-07 matches what I already did. |
+
+## NEW-13: what counts as a `<version>` directory in CLAR-03 (minor)
+
+**Text:** "`CAUSA.PATH_FROZEN` applies when the resolved path is at any depth below a `fixtures/<version>/`,
+`contract/<version>/` or `compatibility/<version>/` directory."
+
+**What is missing:** `<version>` is not defined. Is it any child of `fixtures/`, or only a version-shaped name?
+
+**What I chose:** A segment matching `v?N.N.N` (for example `v1.0.0` or `v2.0.0`). A target such as
+`…/fixtures/scratch/…` is therefore not frozen; it is `PATH_INVALID` instead. The code differs, but nothing is
+written either way.
+
+## NEW-14: CLAR-04 recovery contradicts itself about `.invalid-<n>` (minor; a real contradiction)
+
+**Text:**
+
+* Recovery step 1: "If `investigations/<investigationId>` exists and verifies fully, it stays. Every staging sibling
+  for that id is deleted."
+* Step 2: "`.staging/<investigationId>.invalid-<n>` … kept for inspection, never deleted automatically."
+
+**Problem:** An `.invalid-<n>` directory is a staging sibling for that id, so step 1 deletes what step 2 says is never
+deleted automatically.
+
+**What I chose:** Step 1 deletes only `.next-*` and `.prev-*`. `.invalid-*` is never deleted.
+
+## NEW-15: CLAR-04 gives no code for a missing investigation (minor)
+
+**Text (recovery step 5):** "If no candidate verifies, the investigation is reported missing. Nothing is invented."
+
+**What is missing:** The code for "reported missing", and the `<n>` rule for `.invalid-<n>` in step 2. The `<n>` rule
+is stated only for `.next` in publish step 2.
+
+**What I chose:** `CAUSA.PATH_INVALID` ("investigation directory does not exist"), with the recovery note in
+`detail`. `.invalid-<n>` uses the same rule: 1 + the largest `<n>` present for that id.
+
+## NEW-16: recovery after `WRITE_UNCONFIRMED` can keep bytes that are not the writer's (minor)
+
+**Text (CLAR-04 publish step 4):** "otherwise report `CAUSA.WRITE_UNCONFIRMED`, perform no rollback, and run
+recovery". Recovery step 1: a fully verifying `investigations/<id>` "stays", and every staging sibling is deleted.
+
+**Problem:** If the re-read differs from the written bytes but still verifies, for example because another writer
+replaced it, step 1 keeps it and deletes `.prev-<n>`. The pre-write history is then gone, without a §9.3 prefix
+check against it.
+
+**What I chose:** Followed the text literally. I am recording the risk; no acceptance row covers it.
+
+## NEW-17: CLAR-09 does not give a code for a calendar-invalid date (minor)
+
+**Text (CLAR-09):** it lists refusals for sub-millisecond precision, a missing offset, a leap second and the UTC year.
+
+**What is missing:** A date such as `2026-02-30` (which RFC 3339 §5.7 makes invalid), or an offset hour above 23, is
+not in that list.
+
+**What I chose:** `CAUSA.UNREPRESENTABLE`, as for the listed cases.
+
+## NEW-18: CLAR-10 entry checks are still partly open (minor)
+
+**Text (CLAR-10 §1–§2):** "then the entry checks, with `CAUSA.FIXTURE_DRIFT`", "a negative fixture listed as a valid
+investigation".
+
+**What is missing:**
+
+* Which entry checks exist beyond the digests, version, lifecycle and title (CONTRACT §11.1).
+* What "listed as a valid investigation" means operationally.
+* Whether dataset verification must also *run* every negative fixture and check its expected code.
+* Which code applies when an investigation itself fails a reader stage inside dataset verification.
+
+**What I chose:**
+
+* Run the root-manifest entry comparisons, plus:
+  * the bundle's schema identity, equal to the root manifest's and to the requirements' identity;
+  * the bundle's file list and digests;
+  * investigation directories exactly equal to the entries;
+  * `negative/` files exactly equal to the listing, with `name` and `expectedErrorCode` matching.
+* An investigation-kind negative counts as "listed as valid" if its decoded files equal a listed investigation's
+  files under the same id.
+* Running the negatives is left to the acceptance rows.
+* An investigation that fails a reader stage reports that stage's code.
+
+## NEW-19: the append-observation output example omits `domainCode` (info)
+
+**Text:**
+
+* ACCEPTANCE §3: "It prints `{"primaryCode": null, "version": N+1}`, or the refusal code".
+* CLAR-03 requires `domainCode` for `CAUSA.COMMAND_REFUSED`.
+
+**Problem:** The §3 output shape for `append-observation` never mentions `domainCode`.
+
+**What I chose:** Always print `primaryCode`, `domainCode`, `version` and `detail`.
