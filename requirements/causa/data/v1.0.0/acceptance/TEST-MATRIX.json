@@ -1177,6 +1177,14 @@
    "expected": {
     "agree": "all"
    }
+  },
+  {
+   "id": "AC-DATASET-01",
+   "requirement": "ACC-12; CAUSA-CLAR-10",
+   "check": "consumer verify-dataset on the frozen dataset",
+   "expected": {
+    "primaryCode": null
+   }
   }
  ]
 }

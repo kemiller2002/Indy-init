@@ -47,7 +47,7 @@ def main(argv: list[str]) -> int:
     mutants, verdict_file = Path(argv[1]), Path(argv[2])
     consumer = argv[argv.index("--consumer") + 1]
     dataset = Path(argv[argv.index("--causa-data") + 1])
-    oracle = {Path(d["file"]).parent.name: d["codes"] for d in map(json.loads, verdict_file.read_text().splitlines())}
+    oracle = {Path(d["file"]).parent.name: d["codes"] for d in map(json.loads, (line for line in verdict_file.read_text().split("\n") if line))}
     labels = sorted(oracle)
     dirs = {lab: next(p for p in (mutants / lab).iterdir() if p.is_dir()) for lab in labels}
     with ThreadPoolExecutor(max_workers=8) as pool:

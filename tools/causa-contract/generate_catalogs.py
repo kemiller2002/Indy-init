@@ -249,7 +249,7 @@ def dataset_documents(dataset: Path) -> Iterable[tuple[str, Any, str]]:
     fx = dataset / "fixtures" / "v1.0.0"
     golden = dataset / "contract" / "v1.0.0" / "golden"
     for inv in sorted((fx / "investigations").iterdir()):
-        for line in (inv / "events.ndjson").read_text("utf-8").splitlines():
+        for line in (inv / "events.ndjson").read_text("utf-8").split("\n")[:-1]:
             event = json.loads(line)
             yield ("events.ndjson line (envelope)", {k: (v if k != "payload" else {}) for k, v in event.items()}, "$")
             yield (cm.PAYLOAD_DOC.format(event["eventType"]), event["payload"], "$.payload")

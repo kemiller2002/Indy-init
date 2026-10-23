@@ -27,6 +27,7 @@ requirements, not from code in `causa-data/tools/` or `indy-init-rehearsal-001`.
 | ACC-06 | Preserve existing data when writing. Appending a decided event at the observed version keeps the old `events.ndjson` bytes as a prefix, verifies, and is accepted by an independent structural reader. A stale append is refused with nothing written | `AC-APPEND-01`, `AC-APPEND-02` |
 | ACC-07 | Imported requirements equal the frozen release (bidirectional parity), and the gate detects every mutation class | `AC-PARITY-01`, `AC-PARITY-02` |
 | ACC-08 | No undocumented persisted field: catalogs equal regeneration, and every JSON path in the dataset is catalogued | `AC-CATALOG-01` |
+| ACC-12 | Verify the frozen dataset as a whole (root manifest, bundle, golden files, negative-fixture files) with no dataset-level error (CAUSA-CLAR-10) | `AC-DATASET-01` |
 | ACC-09 | Decide the artifact-URL verdict of every published vector exactly as SEMANTICS §10.4.1–§10.4.2 states (`wellFormed`, `illFormed`, `platformDefined`) | `AC-URL-01` |
 | ACC-10 | Reject every supplementary negative fixture with its expected codes and accept every supplementary valid history with its expected state digest ([supplementary/README.md](supplementary/README.md)) | `AC-SUP-*` (from `supplementary/MATRIX.json`) |
 | ACC-00 | **Step 0, trusted inputs.** Before any row runs, every frozen file in the dataset checkout equals `compatibility/lock.json`, and TEST-MATRIX agrees with `lock.expectedStates` and `lock.negatives`. Otherwise the suite stops and FAILs | `AC-STEP0-DATASET`, `AC-STEP0-MATRIX` |
@@ -42,6 +43,7 @@ JSON object as its last stdout line.
 <consumer> verify             --dataset <root> --investigation <investigation directory>
 <consumer> negative           --dataset <root> --fixture <negative fixture file>
 <consumer> url-verdict        --vectors <artifact-url-vectors.jsonl>
+<consumer> verify-dataset     --dataset <root>
 <consumer> append-observation --dir <investigation directory> --expected-version <N>
                               --observation-id <uuid> --original <text> --occurred-at <timestamp>
                               --actor-id <text> --actor-kind human|system --correlation-id <uuid>
@@ -57,7 +59,11 @@ JSON object as its last stdout line.
   - `append`: append the decoded lines to the frozen scenario `baseScenarioKey` at `expectedAggregateVersion` (§9.2
     order).
   - `successor`: verify the decoded file set as a successor of the frozen scenario (§9.3).
-* `url-verdict` → `{"verdicts": [...]}`, one of `"wellFormed"`, `"illFormed"`, `"platformDefined"` per input line, in order.
+* `url-verdict` → `{"verdicts": [...]}`, one of `"wellFormed"`, `"illFormed"`, `"platformDefined"` per input line, in order. Lines are
+  delimited by LF (U+000A) only. A URL may contain raw U+0085, U+2028 or U+2029, which are not line breaks. The same
+  rule applies to every NDJSON file: `events.ndjson` lines are LF-delimited, and verbatim text may contain those
+  characters unescaped (RFC 8785).
+* `verify-dataset --dataset <root>` → `{"primaryCode": null | code, "detail"}` (CAUSA-CLAR-10).
 * Protocol details are fixed by [../CLARIFICATIONS.md](../CLARIFICATIONS.md): the meaning of `"admissibility"` (CAUSA-CLAR-02), the codes on
   the command/write path (CAUSA-CLAR-03, e.g. `CAUSA.COMMAND_REFUSED` with `domainCode` = the inner rule code), how
   append and successor fixtures are evaluated (CAUSA-CLAR-05, -06; never use `directoryId` as a path), and the

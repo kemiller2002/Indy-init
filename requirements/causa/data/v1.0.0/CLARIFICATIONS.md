@@ -29,7 +29,9 @@ performed. It is `"evaluated"` when stage 15 ran, **and** when an earlier stage 
 change the primary code then. `"not-evaluated"` is reported only when stage 15 was reached and the consumer could not
 decide it. In v1.0.0 that happens only for an out-of-profile artifact URL (SEMANTICS §10.4.1 step 4). In that case
 `primaryCode` MUST be `null` only if every stage before 15 passed, and the consumer MUST NOT claim validity.
-`detail` SHOULD say whether stage 15 ran.
+`detail` SHOULD say whether stage 15 ran. When stage 15 is not evaluated, the consumer MAY still run stages 16–17.
+Any code they produce is reported only in `detail`, marked conditional on admissibility (CONTRACT §11.3), while
+`primaryCode` stays `null` (NEW-10).
 
 ## CAUSA-CLAR-03 — Codes on the command/write path (GAP-04, GAP-06, review F-13)
 
@@ -38,31 +40,73 @@ decide it. In v1.0.0 that happens only for an out-of-profile artifact URL (SEMAN
 | expected version ≠ current version | `CAUSA.VERSION_STALE` (CONTRACT §9.2) | nothing |
 | `decide` refuses the command (any SEMANTICS rule code, e.g. `INVESTIGATION.NOT_OPEN`, `DUPLICATE_ID`, `EVIDENCE.URL`) | `CAUSA.COMMAND_REFUSED`, with `domainCode` = the first inner rule code of the refusal | nothing |
 | a value has no v1 wire form (sub-millisecond instant, U+FEFF, lone surrogate, out-of-profile artifact URL per CAUSA-URL-W, engine `HypothesisChange.At/Sequence` ≠ envelope) | `CAUSA.UNREPRESENTABLE` | nothing |
-| the target directory is under `fixtures/v1.0.0/`, `contract/v1.0.0/` or `compatibility/v1.0.0/`, or is not under `workspaces/demo/<runId>/investigations/` | `CAUSA.PATH_FROZEN` | nothing |
+| the target directory is under `fixtures/<v>/`, `contract/<v>/` or `compatibility/<v>/` | `CAUSA.PATH_FROZEN` | nothing |
+| the target is not exactly `workspaces/demo/<runId>/investigations/<investigationId>` | `CAUSA.PATH_INVALID` | nothing |
 | the new file set fails any reader stage when verified before writing (CONTRACT §9.2 step 3) | that stage's code | nothing |
 | after writing, a re-read does not return the written bytes | `CAUSA.WRITE_UNCONFIRMED` | see CAUSA-CLAR-04 |
 | a candidate successor does not extend the accepted history | `CAUSA.HISTORY_REWRITTEN` (CONTRACT §9.3) | nothing |
 
-Precedence when several apply: path, then version, then representability of the inputs, then `decide`, then
-verification of the new file set, then confirmation. When the URL profile rule and another `AdmitEvidence` refusal both
-apply, `CAUSA.UNREPRESENTABLE` (input representability) wins.
+Precedence when several apply (NEW-05):
+1. path;
+2. verification of the base investigation, reported with its own reader code;
+3. version;
+4. representability of the inputs;
+5. `decide`;
+6. verification of the new file set;
+7. confirmation.
 
-## CAUSA-CLAR-04 — Atomicity for a local filesystem writer (GAP-05, review F-13)
+When the URL profile rule and another `AdmitEvidence` refusal both apply, `CAUSA.UNREPRESENTABLE` (input
+representability) wins.
+
+**Representability vs `decide`** (NEW-06): `CAUSA.UNREPRESENTABLE` covers only values that `decide` never inspects or
+cannot express:
+- timestamps with precision or offset problems;
+- U+FEFF and lone surrogates;
+- non-canonical UUID text;
+- out-of-profile URLs.
+
+A value that `decide` has a rule for (blank text → `VALIDATION.EMPTY`, an ill-formed in-profile URL → `EVIDENCE.URL`)
+is refused by `decide`, giving `CAUSA.COMMAND_REFUSED`.
+
+**Paths** (NEW-07): the target is evaluated after resolving symbolic links and `.`/`..`.
+- `CAUSA.PATH_FROZEN` applies when the resolved path is at any depth below a `fixtures/<version>/`,
+  `contract/<version>/` or `compatibility/<version>/` directory.
+- `CAUSA.PATH_INVALID` applies when it is not exactly `workspaces/demo/<runId>/investigations/<investigationId>`
+  with `<runId>` matching `^[a-z0-9][a-z0-9-]{0,63}$` and `<investigationId>` a canonical UUID (CONTRACT §3.2).
+
+## CAUSA-CLAR-04 — Atomicity for a local filesystem writer (GAP-05, review F-13, NEW-03, NEW-04)
 
 CONTRACT §9.4 defines atomicity for GitHub (see [PROVIDER-GITHUB.md](PROVIDER-GITHUB.md)). A local filesystem writer
-MUST:
+works in a **staging directory** `workspaces/demo/<runId>/.staging/`, which is a sibling of `investigations/` and on the
+same filesystem. `investigations/` therefore only ever contains investigation directories, so CONTRACT §3.2 applies
+unchanged: readers reject any other entry there. The writer MUST:
 
 1. build and verify the complete new file set in memory (all 17 stages);
-2. write it as a **new sibling directory** `<investigationId>.next-<n>`, fsync each file and the directory;
-3. publish by renaming the old directory to `<investigationId>.prev-<n>`, then the new one to `<investigationId>`, then
-   fsync the parent; and remove `.prev-<n>` only after a re-read of `<investigationId>` returns the written bytes
-   (otherwise `CAUSA.WRITE_UNCONFIRMED`).
+2. write it to `.staging/<investigationId>.next-<n>`, where `<n>` is 1 + the largest `<n>` already present in
+   `.staging/` for that id, or 1; then fsync each file and the directory;
+3. publish:
+   - rename `investigations/<investigationId>` to `.staging/<investigationId>.prev-<n>`;
+   - rename `.staging/<investigationId>.next-<n>` to `investigations/<investigationId>`;
+   - fsync both parent directories;
+4. re-read `investigations/<investigationId>`:
+   - if it returns the written bytes, delete `.prev-<n>`;
+   - otherwise report `CAUSA.WRITE_UNCONFIRMED`, perform no rollback, and run recovery.
 
-**Recovery.** On start, if `<investigationId>` is missing or invalid, and a `.prev-<n>` or `.next-<n>` sibling verifies
-fully, the writer restores the verified sibling, preferring `.next` only when it extends `.prev` per CONTRACT §9.3.
-Sibling directories are not investigation directories: a reader enumerating investigations ignores names that are not
-canonical UUIDs (they are not `CAUSA.PATH_INVALID` investigations, because they are not candidates at all). Readers
-never repair. Recovery is a writer action that only renames whole, verified file sets.
+**Recovery** runs before the writer's first read or write of an investigation in a process.
+
+1. If `investigations/<investigationId>` exists and verifies fully, it stays. Every staging sibling for that id is
+   deleted.
+2. Otherwise, any existing `investigations/<investigationId>` is moved to `.staging/<investigationId>.invalid-<n>` and
+   kept for inspection, never deleted automatically.
+3. Then the candidates among the `.next-<k>` and `.prev-<k>` siblings that verify fully are ranked:
+   - the highest `<k>` wins;
+   - at equal `<k>`, `.next` wins over `.prev` only if its `events.ndjson` starts with the `.prev` bytes (CONTRACT §9.3),
+     otherwise `.prev` wins.
+4. The winner is renamed into `investigations/`, and the other `.next`/`.prev` siblings are deleted.
+5. If no candidate verifies, the investigation is reported missing. Nothing is invented.
+
+Readers never repair. Recovery is a writer action that only renames whole, verified file sets. `.staging/` is never
+published by a remote provider, because CAUSA-PROV-15's path guard excludes it.
 
 ## CAUSA-CLAR-05 — Append evaluation details (GAP-07)
 
@@ -88,6 +132,8 @@ In the consumer protocol:
 - `manifestSha256` and `snapshotSha256` are the SHA-256 of the bytes as read without one trailing LF, which equals the
   canonical digest for valid files;
 - `null` is reported for a missing file;
+- for an `append` fixture that fails before the combined file set is built, the digests describe the base
+  investigation (NEW-12);
 - `stateSha256`, `version` and `lifecycle` describe the state replayed regardless of verdict (SEMANTICS §15.2 step 4)
   once stage 15 has run, and are `null` before that.
 
@@ -98,9 +144,13 @@ event line and of the snapshot, in that order. Nested objects carry no version f
 
 ## CAUSA-CLAR-09 — Timestamps at the command boundary (GAP-11, GAP-12)
 
-A command boundary accepts RFC 3339 instants with `Z` or a numeric offset and normalizes them to UTC
-`YYYY-MM-DDTHH:MM:SS.mmmZ`. It refuses with `CAUSA.UNREPRESENTABLE` (CONTRACT §2.9) an instant with sub-millisecond
-precision, an instant without an offset, and a year outside 0001–9999. Calendar validity (CONTRACT §2.9) is enforced
+A command boundary accepts RFC 3339 `date-time` values (RFC 3339 §5.6). It accepts `T`/`t` and `Z`/`z`
+case-insensitively, and treats `-00:00` and `+00:00` as UTC. It normalizes them to UTC `YYYY-MM-DDTHH:MM:SS.mmmZ`.
+It refuses with `CAUSA.UNREPRESENTABLE` (CONTRACT §2.9):
+- an instant with sub-millisecond precision (more than three fractional digits, unless the extra digits are all zero);
+- an instant without an offset;
+- a leap second `60`;
+- an instant whose **UTC** year falls outside 0001–9999. Calendar validity (CONTRACT §2.9) is enforced
 together with the `common.schema.json#/$defs/timestamp` pattern, at stage 7, for every timestamp reached through that
 definition. Implementations whose JSON Schema validator cannot express it MUST attach the check to that definition.
 
@@ -116,6 +166,9 @@ definition. Implementations whose JSON Schema validator cannot express it MUST a
 3. In the consumer protocol, `verify` reports digests and the acceptance runner compares them with the root manifest.
    The comparison failing is `CAUSA.FIXTURE_DRIFT`, and a replayed state differing from the golden file is
    `CAUSA.GOLDEN_MISMATCH`.
+4. Consumers expose dataset verification as the protocol command `verify-dataset --dataset <root>`, which returns
+   `{"primaryCode": null | code, "detail"}` (NEW-09). Acceptance row `AC-DATASET-01` expects `null` for the frozen
+   dataset.
 
 ## CAUSA-CLAR-11 — Engine crash case (GAP-13, SEMANTICS §17 E-2)
 

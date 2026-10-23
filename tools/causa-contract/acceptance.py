@@ -134,7 +134,7 @@ def append_rows(consumer: str, dataset: Path, base_dir: Path, base_version: int)
         work = Path(tmp) / "workspaces" / "demo" / "acceptance" / "investigations" / base_dir.name
         shutil.copytree(base_dir, work)
         before = {p.name: p.read_bytes() for p in work.iterdir()}
-        last = json.loads(before["events.ndjson"].decode().splitlines()[-1])
+        last = json.loads(before["events.ndjson"].decode().split("\n")[-2])
         stale = call(
             consumer, "append-observation", "--dir", str(work), "--expected-version", str(base_version - 1),
             "--observation-id", "9b1c2d6e-0000-4000-8000-0000000000a1", "--original", "Acceptance stale write",
@@ -155,7 +155,7 @@ def append_rows(consumer: str, dataset: Path, base_dir: Path, base_version: int)
         )
         after = {p.name: p.read_bytes() for p in work.iterdir()}
         prefix = after.get("events.ndjson", b"").startswith(before["events.ndjson"])
-        added = after.get("events.ndjson", b"")[len(before["events.ndjson"]):].decode("utf-8", "replace").splitlines()
+        added = after.get("events.ndjson", b"")[len(before["events.ndjson"]):].decode("utf-8", "replace").split("\n")[:-1]
         reverify = call(consumer, "verify", "--dataset", str(dataset), "--investigation", str(work))
         structural = structural_check(work, REQ_ROOT / "schemas") if "events.ndjson" in after else ("missing files",)
         new_event = json.loads(added[0]) if added else {}
@@ -195,7 +195,7 @@ def step0(dataset: Path) -> tuple[Outcome, ...]:
 
 def url_outcome(consumer: str) -> Outcome:
     vectors = REQ_ROOT / "catalog" / "artifact-url-vectors.jsonl"
-    rows = [json.loads(line) for line in vectors.read_text("utf-8").splitlines()]
+    rows = [json.loads(line) for line in vectors.read_text("utf-8").split("\n") if line]
     got = call(consumer, "url-verdict", "--vectors", str(vectors))
     verdicts = got.get("verdicts")
     if not isinstance(verdicts, list) or len(verdicts) != len(rows):
@@ -241,6 +241,8 @@ def run(consumer: str, dataset: Path, only: str) -> tuple[Outcome, ...]:
             return tool(rid, "parity_gate.py", "selftest", "--causa-data", str(dataset))
         if rid == "AC-CATALOG-01":
             return tool(rid, "generate_catalogs.py", "check", str(REQ_ROOT), "--dataset", str(dataset))
+        if rid == "AC-DATASET-01":
+            return compare(rid, exp, call(consumer, "verify-dataset", "--dataset", str(dataset)))
         if rid == "AC-URL-01":
             return url_outcome(consumer)
         if rid.startswith("AC-SUP-"):

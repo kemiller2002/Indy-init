@@ -258,7 +258,7 @@ def main(argv: list[str]) -> int:
     rng = random.Random(seed)
     index = []
     for inv in sorted((dataset / "fixtures" / "v1.0.0" / "investigations").iterdir()):
-        base = tuple(json.loads(line) for line in (inv / "events.ndjson").read_text("utf-8").splitlines())
+        base = tuple(json.loads(line) for line in (inv / "events.ndjson").read_text("utf-8").split("\n")[:-1])
         manifest = json.loads((inv / "manifest.json").read_text("utf-8"))
         snapshot_bytes = (inv / "snapshot.json").read_bytes()
         for name, op in OPERATORS.items():
