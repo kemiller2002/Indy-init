@@ -23,7 +23,7 @@ def label(verdict) -> str:
 
 def main(argv):
     path = argv[0] if argv else os.path.join(requirements_dir(), "catalog", "artifact-url-vectors.jsonl")
-    vectors = [json.loads(line) for line in open(path, encoding="utf-8") if line.strip()]
+    vectors = [json.loads(line) for line in open(path, "rb").read().decode("utf-8").split("\n") if line.strip()]  # LF only
     results = [(v, label(artifact_url_verdict(v["url"]))) for v in vectors]
     bad = [(v, got) for v, got in results if got != v["expected"]]
     for v, got in bad[:20]:

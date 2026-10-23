@@ -18,6 +18,7 @@ from semantics import Refused, Unresolved, decide, replay
 
 RUN_ID = re.compile(r"[a-z0-9][a-z0-9-]{0,63}\Z")              # CONTRACT §3.2
 FROZEN_TREES = ("fixtures", "contract", "compatibility")       # CAUSA-CLAR-03 / CONTRACT §3.4
+VERSION_DIR = re.compile(r"v?[0-9]+\.[0-9]+\.[0-9]+\Z")         # "<version>" segment, e.g. v1.0.0 (NEW-13)
 RFC3339 = re.compile(r"([0-9]{4})-([0-9]{2})-([0-9]{2})[Tt]([0-9]{2}):([0-9]{2}):([0-9]{2})(?:\.([0-9]+))?"
                      r"([Zz]|[+-][0-9]{2}:[0-9]{2})\Z")
 
@@ -27,14 +28,18 @@ RFC3339 = re.compile(r"([0-9]{4})-([0-9]{2})-([0-9]{2})[Tt]([0-9]{2}):([0-9]{2})
 # ====================================================================================================================
 
 def path_check(real_path: str):
-    """CAUSA.PATH_FROZEN unless the target is <...>/workspaces/demo/<runId>/investigations/<dir>, outside frozen trees."""
+    """CAUSA-CLAR-03 "Paths", on the path with symlinks and ./.. resolved:
+    PATH_FROZEN at any depth below fixtures/<version>/, contract/<version>/ or compatibility/<version>/;
+    PATH_INVALID unless exactly workspaces/demo/<runId>/investigations/<canonical UUID>."""
     parts = real_path.split(os.sep)
-    frozen = any(parts[i] in FROZEN_TREES and parts[i + 1] == "v1.0.0" for i in range(len(parts) - 1))
-    in_workspace = (len(parts) >= 5 and parts[-5] == "workspaces" and parts[-4] == "demo"
-                    and bool(RUN_ID.match(parts[-3])) and parts[-2] == "investigations")
-    if frozen or not in_workspace:
-        return Failure("CAUSA.PATH_FROZEN", "writes go only to workspaces/demo/<runId>/investigations/<id>, never "
-                                            "under a frozen v1.0.0 tree (CAUSA-CLAR-03, CONTRACT §3.4)")
+    if any(parts[i] in FROZEN_TREES and VERSION_DIR.match(parts[i + 1]) for i in range(len(parts) - 2)):
+        return Failure("CAUSA.PATH_FROZEN", "target is below a frozen fixtures|contract|compatibility/<version>/ tree "
+                                            "(CAUSA-CLAR-03, CONTRACT §3.4)")
+    exact = (len(parts) >= 5 and parts[-5] == "workspaces" and parts[-4] == "demo" and bool(RUN_ID.match(parts[-3]))
+             and parts[-2] == "investigations" and is_canonical_uuid(parts[-1]))
+    if not exact:
+        return Failure("CAUSA.PATH_INVALID", "target is not exactly workspaces/demo/<runId>/investigations/"
+                                             "<investigationId> (CAUSA-CLAR-03, CONTRACT §3.2)")
     return None
 
 
@@ -142,60 +147,90 @@ def _fsync_dir(path: str) -> None:
         os.close(fd)
 
 
-def _siblings(parent: str, name: str, kind: str) -> list:
-    pat = re.compile(re.escape(name) + r"\." + kind + r"-([1-9][0-9]*)\Z")
-    return sorted(((int(m.group(1)), e) for e in os.listdir(parent) if (m := pat.match(e))), reverse=True)
+def _staging(path: str) -> str:
+    """workspaces/demo/<runId>/.staging/, sibling of investigations/ (same filesystem)."""
+    return os.path.join(os.path.dirname(os.path.dirname(path)), ".staging")
 
 
-def _free_n(parent: str, name: str) -> int:
-    taken = {n for kind in ("next", "prev", "invalid") for n, _ in _siblings(parent, name, kind)}
-    return next(n for n in range(1, len(taken) + 2) if n not in taken)
+def _staged(staging: str, iid: str, kinds=("next", "prev", "invalid")) -> list:
+    """[(n, kind, name)] of staging siblings for `iid`."""
+    if not os.path.isdir(staging):
+        return []
+    pat = re.compile(re.escape(iid) + r"\.(" + "|".join(kinds) + r")-([1-9][0-9]*)\Z")
+    return [(int(m.group(2)), m.group(1), e) for e in os.listdir(staging) if (m := pat.match(e))]
+
+
+def _next_n(staging: str, iid: str) -> int:
+    """1 + the largest <n> already present in .staging/ for that id, or 1."""
+    return 1 + max((n for n, _, _ in _staged(staging, iid)), default=0)
+
+
+def _remove_set(path: str) -> None:
+    for fname in os.listdir(path):
+        full = os.path.join(path, fname)
+        os.rmdir(full) if os.path.isdir(full) and not os.path.islink(full) else os.remove(full)
+    os.rmdir(path)
+
+
+def _verifies(iid: str, path: str, schemas) -> bool:
+    return os.path.isdir(path) and verify(iid, read_dir(path), schemas).failure is None
 
 
 def recover(path: str, schemas):
-    """CLAR-04 recovery: if <id> is missing or invalid and a .prev-<n>/.next-<n> sibling verifies fully, restore it
-    (preferring .next only when it extends .prev, CONTRACT §9.3). Returns a note string or None."""
-    parent, name = os.path.dirname(path), os.path.basename(path)
-    if os.path.isdir(path) and verify(name, read_dir(path), schemas).failure is None:
+    """CAUSA-CLAR-04 recovery, run before the first read or write of an investigation. Returns a note or None."""
+    iid, investigations, staging = os.path.basename(path), os.path.dirname(path), _staging(path)
+    transient = lambda: [e for e in _staged(staging, iid, ("next", "prev"))]  # noqa: E731
+    if _verifies(iid, path, schemas):                                                        # 1
+        for _, _, name in transient():
+            _remove_set(os.path.join(staging, name))
         return None
-    ok = lambda p: os.path.isdir(p) and verify(name, read_dir(p), schemas).failure is None  # noqa: E731
-    best = lambda kind: next((os.path.join(parent, e) for _, e in _siblings(parent, name, kind)  # noqa: E731
-                              if ok(os.path.join(parent, e))), None)
-    prev, nxt = best("prev"), best("next")
-    if nxt and prev:
-        chosen = nxt if read_dir(nxt)["events.ndjson"].startswith(read_dir(prev)["events.ndjson"]) else prev
+    note = []
+    if os.path.lexists(path):                                                                # 2
+        os.makedirs(staging, exist_ok=True)
+        moved = f"{iid}.invalid-{_next_n(staging, iid)}"
+        os.rename(path, os.path.join(staging, moved))
+        note.append(f"invalid set kept as .staging/{moved}")
+    candidates = [(n, kind, name) for n, kind, name in transient()                         # 3
+                  if _verifies(iid, os.path.join(staging, name), schemas)]
+    if not candidates:                                                                       # 5
+        _fsync_dir(investigations)
+        return "; ".join(note + ["no verified staging candidate: investigation missing"])
+    top = max(n for n, _, _ in candidates)
+    at_top = {kind: name for n, kind, name in candidates if n == top}
+    if "next" in at_top and "prev" in at_top:
+        nxt, prv = (read_dir(os.path.join(staging, at_top[k]))["events.ndjson"] for k in ("next", "prev"))
+        winner = at_top["next"] if nxt.startswith(prv) else at_top["prev"]
     else:
-        chosen = nxt or prev
-    if chosen is None:
-        return None
-    if os.path.lexists(path):          # keep the invalid set, untouched, under a non-candidate name
-        os.rename(path, os.path.join(parent, f"{name}.invalid-{_free_n(parent, name)}"))
-    os.rename(chosen, path)
-    _fsync_dir(parent)
-    return f"recovered from {os.path.basename(chosen)}"
+        winner = next(iter(at_top.values()))
+    os.rename(os.path.join(staging, winner), path)                                           # 4
+    for _, _, name in transient():
+        _remove_set(os.path.join(staging, name))
+    _fsync_dir(investigations)
+    _fsync_dir(staging)
+    return "; ".join(note + [f"recovered from .staging/{winner}"])
 
 
-def publish(path: str, new_files: dict):
-    """CLAR-04: write <id>.next-<n>, fsync; rename <id> -> <id>.prev-<n>, .next-<n> -> <id>; fsync parent;
-    re-read; remove .prev-<n> only when the re-read returns the written bytes. Returns None or a Failure."""
-    parent, name = os.path.dirname(path), os.path.basename(path)
-    n = _free_n(parent, name)
-    nxt, prev = os.path.join(parent, f"{name}.next-{n}"), os.path.join(parent, f"{name}.prev-{n}")
-    os.mkdir(nxt)
+def publish(path: str, new_files: dict, schemas):
+    """CAUSA-CLAR-04 steps 2-4. Returns None or a Failure (WRITE_UNCONFIRMED: no rollback, recovery runs)."""
+    iid, investigations, staging = os.path.basename(path), os.path.dirname(path), _staging(path)
+    os.makedirs(staging, exist_ok=True)
+    n = _next_n(staging, iid)
+    nxt, prev = os.path.join(staging, f"{iid}.next-{n}"), os.path.join(staging, f"{iid}.prev-{n}")
+    os.mkdir(nxt)                                                                            # 2
     for fname in FILES:
         with open(os.path.join(nxt, fname), "wb") as fh:
             fh.write(new_files[fname])
             fh.flush()
             os.fsync(fh.fileno())
     _fsync_dir(nxt)
-    os.rename(path, prev)
+    os.rename(path, prev)                                                                    # 3
     os.rename(nxt, path)
-    _fsync_dir(parent)
-    if read_dir(path) != {f: new_files[f] for f in FILES}:
-        return Failure("CAUSA.WRITE_UNCONFIRMED", f"re-read of {name} did not return the written bytes; "
-                                                  f"{os.path.basename(prev)} kept")
-    for fname in os.listdir(prev):
-        os.remove(os.path.join(prev, fname))
-    os.rmdir(prev)
-    _fsync_dir(parent)
-    return None
+    _fsync_dir(investigations)
+    _fsync_dir(staging)
+    if read_dir(path) == {f: new_files[f] for f in FILES}:                                   # 4
+        _remove_set(prev)
+        _fsync_dir(staging)
+        return None
+    note = recover(path, schemas)
+    return Failure("CAUSA.WRITE_UNCONFIRMED", f"re-read of {iid} did not return the written bytes; no rollback; "
+                                              f"recovery: {note or 'investigation verifies'}")

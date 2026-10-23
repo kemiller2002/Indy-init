@@ -259,20 +259,24 @@ def verify(dir_name: str, files: dict, schemas) -> Report:
     state = project_state(final) if final is not None else None
     first_err_v = validation.errors[0].version if validation.errors else None
     blocking_unresolved = [u for u in validation.unresolved if first_err_v is None or u[0] <= first_err_v]
-    if blocking_unresolved:
-        v, reason = blocking_unresolved[0]
-        return Report(None, "not-evaluated", "unresolved", digests, state, tuple(events),
-                      f"structurally valid; admissibility not evaluated: group v{v}: {reason} (SEMANTICS §17)")
-    if validation.errors:
-        e0 = validation.errors[0]
-        return _fail(Failure("CAUSA.HISTORY_INADMISSIBLE", f"{e0.message} [rule {e0.rule}; "
-                             f"{len(validation.errors)} error(s)]", e0.code), digests, "run", state, events)
     expected_snapshot = build_snapshot(events, state)
     f = _first(
         lambda: None if manifest["snapshotSha256"] == sha256_hex(s_text.encode("utf-8")) else Failure(  # 16
             "CAUSA.SNAPSHOT_HASH_MISMATCH", "snapshotSha256 does not match the snapshot"),
         lambda: None if file_bytes(expected_snapshot) == s_bytes else Failure(                  # 17
             "CAUSA.SNAPSHOT_MISMATCH", "snapshot is not the projection of the replayed history"))
+    if blocking_unresolved:
+        # CAUSA-CLAR-02: primaryCode stays null; a stage 16-17 code is reported only in detail, as conditional.
+        v, reason = blocking_unresolved[0]
+        later = (f"; conditional on admissibility: {f.code} ({f.detail})" if f
+                 else "; stages 16-17 pass, conditional on admissibility")
+        return Report(None, "not-evaluated", "unresolved", digests, state, tuple(events),
+                      f"structurally valid; admissibility not evaluated: group v{v}: {reason} (SEMANTICS §17)"
+                      + later)
+    if validation.errors:
+        e0 = validation.errors[0]
+        return _fail(Failure("CAUSA.HISTORY_INADMISSIBLE", f"{e0.message} [rule {e0.rule}; "
+                             f"{len(validation.errors)} error(s)]", e0.code), digests, "run", state, events)
     if f:
         return _fail(f, digests, "run", state, events)
     return Report(None, "evaluated", "run", digests, state, tuple(events), "valid; all 17 stages passed")

@@ -5,6 +5,7 @@
   causa_clean.py verify             --dataset <root> --investigation <dir>
   causa_clean.py negative           --dataset <root> --fixture <file>
   causa_clean.py url-verdict        --vectors <artifact-url-vectors.jsonl>
+  causa_clean.py verify-dataset     --dataset <root>
   causa_clean.py append-observation --dir <dir> --expected-version N --observation-id <uuid> --original <text>
                                     --occurred-at <timestamp> --actor-id <text> --actor-kind human|system
                                     --correlation-id <uuid>
@@ -25,6 +26,7 @@ from canon import Failure, canonical, is_failure, parse_json  # noqa: E402
 from reader import append_lines, successor, verify  # noqa: E402
 from schemas import first_violation, load_schemas  # noqa: E402
 from semantics import Unresolved, artifact_url_verdict  # noqa: E402
+from dataset import load_view, verify_dataset  # noqa: E402
 from writer import path_check, plan_observation_append, publish, read_dir, recover  # noqa: E402
 
 
@@ -117,26 +119,33 @@ def url_label(url: str) -> str:
 
 def cmd_url_verdict(args, schemas) -> int:
     """ACCEPTANCE §3: one verdict per input line, in order (SEMANTICS §10.4.1-§10.4.2)."""
-    lines = open(args.vectors, encoding="utf-8").read().split("\n")
+    lines = open(args.vectors, "rb").read().decode("utf-8").split("\n")   # LF only (ACCEPTANCE §3)
     return emit({"verdicts": [url_label(json.loads(line)["url"]) for line in lines if line.strip()]})
+
+
+def cmd_verify_dataset(args, schemas) -> int:
+    """CAUSA-CLAR-10 §4: {"primaryCode": null | code, "detail"}."""
+    r = verify_dataset(load_view(args.dataset), schemas)
+    return emit({"primaryCode": r.code, "detail": r.detail} if is_failure(r) else {"primaryCode": None, "detail": r})
 
 
 def cmd_append_observation(args, schemas) -> int:
     out = lambda code, domain, version, detail: emit(  # noqa: E731
         {"primaryCode": code, "domainCode": domain, "version": version, "detail": detail})
-    path = os.path.normpath(os.path.abspath(args.dir))
-    frozen = path_check(os.path.realpath(path))                                   # CLAR-03: path first
+    path = os.path.realpath(args.dir)               # CLAR-03: symlinks and ./.. resolved; used for every later step
+    frozen = path_check(path)                                                     # CLAR-03: path first
     if frozen:
         return out(frozen.code, None, None, frozen.detail)
     note = recover(path, schemas)                                                 # CLAR-04 recovery
     if not os.path.isdir(path):
-        return out("CAUSA.PATH_INVALID", None, None, "investigation directory does not exist")
+        return out("CAUSA.PATH_INVALID", None, None, "investigation directory does not exist"
+                   + (f" ({note})" if note else ""))
     files = read_dir(path)
     plan = plan_observation_append(os.path.basename(path), files, args, schemas)
     if is_failure(plan):
         return out(plan.code, plan.domain, None, plan.detail)
     new_files, new_version = plan
-    unconfirmed = publish(path, new_files)                                        # CLAR-04 publish + confirm
+    unconfirmed = publish(path, new_files, schemas)                                        # CLAR-04 publish + confirm
     if unconfirmed:
         return out(unconfirmed.code, None, None, unconfirmed.detail)
     return out(None, None, new_version, "appended" + (f" ({note})" if note else ""))
@@ -164,6 +173,7 @@ def parser() -> argparse.ArgumentParser:
     n.add_argument("--fixture", required=True)
     u = sub.add_parser("url-verdict")
     u.add_argument("--vectors", required=True)
+    sub.add_parser("verify-dataset").add_argument("--dataset", required=True)
     a = sub.add_parser("append-observation")
     a.add_argument("--dir", required=True)
     a.add_argument("--expected-version", type=int, required=True)
@@ -179,7 +189,7 @@ def main(argv: list[str]) -> int:
     schemas = load_schemas()
     if is_failure(schemas):
         return emit(failure_json(schemas))
-    handler = {"info": cmd_info, "verify": cmd_verify, "negative": cmd_negative,
+    handler = {"info": cmd_info, "verify": cmd_verify, "negative": cmd_negative, "verify-dataset": cmd_verify_dataset,
                "append-observation": cmd_append_observation}[args.command]
     return handler(args, schemas)
 

@@ -100,6 +100,7 @@ class SchemaSet:
     snapshot: Any
     root_manifest: Any
     event_types: tuple
+    by_schema: dict          # schema path -> validator (dataset-level documents, CAUSA-CLAR-10)
 
 
 def _walk_refs(node: Any):
@@ -158,7 +159,10 @@ def load_schemas(req_dir: str | None = None):
         identity=sha256_hex(bundle_bytes), parsed=len(docs), by_path=docs,
         envelope=mk("event-envelope.schema.json"), manifest=mk("investigation-manifest.schema.json"),
         snapshot=mk("snapshot.schema.json"), root_manifest=mk("root-manifest.schema.json"),
-        event_types=tuple(envelope["properties"]["eventType"]["enum"]))
+        event_types=tuple(envelope["properties"]["eventType"]["enum"]),
+        by_schema={p: mk(p) for p in ("state.schema.json", "golden-scenarios.schema.json",
+                                     "negative-fixture.schema.json", "schema-bundle.schema.json",
+                                     "root-manifest.schema.json")})
 
 
 def first_violation(validator, instance: Any) -> str | None:
