@@ -105,7 +105,9 @@ def uid(tag: str, label: str) -> str:
 
 def load_events(dataset: Path, inv: str) -> Events:
     path = dataset / "fixtures" / "v1.0.0" / "investigations" / inv / "events.ndjson"
-    return tuple(json.loads(line) for line in path.read_text("utf-8").splitlines())
+    data = path.read_text("utf-8")
+    assert data.endswith("\n")
+    return tuple(json.loads(line) for line in data[:-1].split("\n"))   # LF only: text may hold raw U+0085/U+2028/U+2029
 
 
 def prefix(events: Events, n: int) -> Events:
@@ -1013,7 +1015,21 @@ def valids() -> tuple[Valid, ...]:
                                        "  the LOAD balancer drops connections during scheduled certificate rotation.")),
                             g(unknown_to(O_UNK_INV, "resolved", "The 03:28 rotation reproduced the burst.")),
                             g(lifecycle("activateInvestigation", "awaitingEvidence", "active"))))
-    return entity, rounds, repeat
+    n = "sup-valid-unicode-line-separators"
+    i = lambda label: uid(n, label)  # noqa: E731
+    separators = Valid(n, "payment-failure extended with verbatim text containing raw U+0085 (NEL), U+2028 (LINE "
+                          "SEPARATOR) and U+2029 (PARAGRAPH SEPARATOR). RFC 8785 does not escape them, so they appear "
+                          "raw inside events.ndjson lines; a reader must split lines on LF only (CONTRACT §2).",
+                       ("CONTRACT §2 LF framing", "RFC 8785 escaping", "§3.1 verbatim text"),
+                       appended(PAYMENT, None, n,
+                                g(observation(i("o1"), "Operator note line 1\u0085line 2\u2028line 3\u2029line 4.")),
+                                g(evidence(i("e1"), "Pasted log:\u2028gateway timeout\u2029retry\u0085declined",
+                                           category="log")),
+                                g(related(i("r1"), i("e1"), P_ACE, "supports",
+                                          "Rationale with\u2028a line separator.")),
+                                g(hypothesis(i("h1"), "Separators\u0085inside\u2028a\u2029statement.",
+                                             "Mechanism\u2029text."))))
+    return entity, rounds, repeat, separators
 
 
 # ====================================================================================================================

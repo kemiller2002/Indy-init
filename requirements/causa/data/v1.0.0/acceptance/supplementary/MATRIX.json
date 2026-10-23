@@ -1304,6 +1304,26 @@
     "version": 46,
     "lifecycle": "active"
    }
+  },
+  {
+   "id": "AC-SUP-sup-valid-unicode-line-separators",
+   "kind": "valid",
+   "input": "acceptance/supplementary/valid/sup-valid-unicode-line-separators/6fd2ddc9-bedd-5fff-9093-5506c4d68cb3",
+   "covers": [
+    "CONTRACT §2 LF framing",
+    "RFC 8785 escaping",
+    "§3.1 verbatim text"
+   ],
+   "errors": [],
+   "expected": {
+    "primaryCode": null,
+    "domainCode": null,
+    "admissibility": "evaluated",
+    "stateSha256": "84e7d253644f606b7d9cbf791655ef1cc5c8fb787b4312b72ce12e0b3c19766a",
+    "eventsSha256": "62d92e30127bb34e2bbb026dc4e5925cae62e9bc252c536b98e02a4f594a58eb",
+    "version": 30,
+    "lifecycle": "active"
+   }
   }
  ]
 }

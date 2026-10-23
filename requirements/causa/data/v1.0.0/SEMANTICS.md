@@ -871,10 +871,17 @@ field the decision computes. These are, exhaustively:
    (non-blank text), `AGENT.PROPOSAL_ONLY` (agents only on `ProposalRecorded`), `PROPOSAL.AGENT_CANNOT_ACCEPT` (always
    preceded by §8 step 1), `ENVELOPE.MISMATCH` (stage 10), `VERSION.STALE` (no expected version),
    `HYPOTHESIS.EVIDENCE_REQUIRED`, `NEGATIVE.BASIS_REQUIRED`, `CAUSE.NO_MEMBERS`, `VERIFICATION.EVIDENCE_REQUIRED`
-   (payload invariants), `INTERNAL` (never emitted by the decision path).
+   (payload invariants), `INTERNAL` (never emitted by the decision path), `INVESTIGATION.EXISTS` and every refusal
+   of `StartInvestigation` on an existing state (the envelope schema pins `InvestigationStarted` to
+   `aggregateVersion` 1, so `StartInvestigation` is always decided with no state; corrected 2026-10-23 after
+   supplementary-fixture construction showed the earlier text wrong).
 4. Reachable only after an earlier inadmissible group: `CAUSE.MEMBER_MISSING` (hypotheses are never removed), the
    exception of §17 E-2.
-5. Every other code of §16 can be the first inner code of the first failing group.
+5. `INVESTIGATION.NOT_FOUND` is reachable only in group 1, through the §15.3 reconstruction precedence: a first group
+   that starts with `InvestigationStarted` but reconstructs as another command decided with no state (supplementary
+   fixture `sup-start-group-reconstructs-finding`).
+6. Every other code of §16 can be the first inner code of the first failing group. Supplementary fixtures isolate each
+   one that can fire alone ([acceptance/supplementary/README.md](acceptance/supplementary/README.md)).
 
 ## 16. Rule-code index
 
