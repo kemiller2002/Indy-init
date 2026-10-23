@@ -69,8 +69,8 @@ JSON object as its last stdout line.
   append and successor fixtures are evaluated (CAUSA-CLAR-05, -06; never use `directoryId` as a path), and the
   digests reported for invalid inputs (CAUSA-CLAR-07).
 * `append-observation` decides `RecordObservation` through the consumer's implementation of [SEMANTICS.md](../SEMANTICS.md)
-  (observedAt `null`) and writes events, manifest and snapshot as one unit. It prints `{"primaryCode": null, "version": N+1}`,
-  or the refusal code (`CAUSA.VERSION_STALE` when `--expected-version` is not current).
+  (observedAt `null`) and writes events, manifest and snapshot as one unit. It prints `{"primaryCode": null, "domainCode": null, "version": N+1}`,
+  or the refusal code with its `domainCode` (CAUSA-CLAR-03) (`CAUSA.VERSION_STALE` when `--expected-version` is not current).
 
 ## 4. Running
 

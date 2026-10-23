@@ -70,7 +70,8 @@ is refused by `decide`, giving `CAUSA.COMMAND_REFUSED`.
 
 **Paths** (NEW-07): the target is evaluated after resolving symbolic links and `.`/`..`.
 - `CAUSA.PATH_FROZEN` applies when the resolved path is at any depth below a `fixtures/<version>/`,
-  `contract/<version>/` or `compatibility/<version>/` directory.
+  `contract/<version>/` or `compatibility/<version>/` directory. Here `<version>` is a path segment matching
+  `^v?[0-9]+\.[0-9]+\.[0-9]+$` (NEW-13).
 - `CAUSA.PATH_INVALID` applies when it is not exactly `workspaces/demo/<runId>/investigations/<investigationId>`
   with `<runId>` matching `^[a-z0-9][a-z0-9-]{0,63}$` and `<investigationId>` a canonical UUID (CONTRACT §3.2).
 
@@ -94,16 +95,22 @@ unchanged: readers reject any other entry there. The writer MUST:
 
 **Recovery** runs before the writer's first read or write of an investigation in a process.
 
-1. If `investigations/<investigationId>` exists and verifies fully, it stays. Every staging sibling for that id is
-   deleted.
-2. Otherwise, any existing `investigations/<investigationId>` is moved to `.staging/<investigationId>.invalid-<n>` and
-   kept for inspection, never deleted automatically.
+1. If `investigations/<investigationId>` exists and verifies fully, it stays, with one condition (NEW-16): if a
+   `.prev-<k>` sibling exists, the current `events.ndjson` MUST start with that sibling's `events.ndjson` bytes
+   (CONTRACT §9.3).
+   - If it does, the `.next-*` and `.prev-*` siblings for that id are deleted.
+   - If it does not, the writer reports `CAUSA.HISTORY_REWRITTEN`, keeps every sibling, and writes nothing more
+     to that investigation until a person resolves it.
+   - `.invalid-*` siblings are never deleted automatically (NEW-14).
+2. Otherwise, any existing `investigations/<investigationId>` is moved to `.staging/<investigationId>.invalid-<n>`
+   and kept for inspection, never deleted automatically. `<n>` follows the same rule as `.next-<n>` (NEW-15).
 3. Then the candidates among the `.next-<k>` and `.prev-<k>` siblings that verify fully are ranked:
    - the highest `<k>` wins;
    - at equal `<k>`, `.next` wins over `.prev` only if its `events.ndjson` starts with the `.prev` bytes (CONTRACT §9.3),
      otherwise `.prev` wins.
 4. The winner is renamed into `investigations/`, and the other `.next`/`.prev` siblings are deleted.
-5. If no candidate verifies, the investigation is reported missing. Nothing is invented.
+5. If no candidate verifies, the investigation is reported missing with `CAUSA.PATH_INVALID` (a required
+   directory is absent; NEW-15). Nothing is invented.
 
 Readers never repair. Recovery is a writer action that only renames whole, verified file sets. `.staging/` is never
 published by a remote provider, because CAUSA-PROV-15's path guard excludes it.
@@ -149,7 +156,7 @@ case-insensitively, and treats `-00:00` and `+00:00` as UTC. It normalizes them 
 It refuses with `CAUSA.UNREPRESENTABLE` (CONTRACT §2.9):
 - an instant with sub-millisecond precision (more than three fractional digits, unless the extra digits are all zero);
 - an instant without an offset;
-- a leap second `60`;
+- a leap second `60`, a calendar-invalid date, or an offset outside `-23:59`…`+23:59` (NEW-17);
 - an instant whose **UTC** year falls outside 0001–9999. Calendar validity (CONTRACT §2.9) is enforced
 together with the `common.schema.json#/$defs/timestamp` pattern, at stage 7, for every timestamp reached through that
 definition. Implementations whose JSON Schema validator cannot express it MUST attach the check to that definition.
@@ -161,8 +168,13 @@ definition. Implementations whose JSON Schema validator cannot express it MUST a
    - framing, canonical form, versions and schema, with the stage codes;
    - then the entry checks, with `CAUSA.FIXTURE_DRIFT`;
    - then `golden/scenarios.json`, with `CAUSA.GOLDEN_MISMATCH`.
-2. Unordered or duplicate `investigations` entries in the root manifest, and a negative fixture listed as a valid
-   investigation, are `CAUSA.FIXTURE_DRIFT`. They are not expressible in the schema.
+2. Unordered or duplicate `investigations` entries in the root manifest are `CAUSA.FIXTURE_DRIFT`, which the schema
+   cannot express. So is an `investigations` entry that names a path under `negative/` or a `negativeFixtures` path
+   that is also an investigation. Entry checks compare **every** field of an `investigations` entry with the
+   investigation as verified (NEW-18). An investigation that fails a reader stage is reported with that stage's code,
+   not `CAUSA.FIXTURE_DRIFT`. `verify-dataset` checks that every listed negative fixture file exists and validates
+   against `negative-fixture.schema.json`. Rejecting each negative with its code is the job of the per-fixture
+   acceptance rows.
 3. In the consumer protocol, `verify` reports digests and the acceptance runner compares them with the root manifest.
    The comparison failing is `CAUSA.FIXTURE_DRIFT`, and a replayed state differing from the golden file is
    `CAUSA.GOLDEN_MISMATCH`.
