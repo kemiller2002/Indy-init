@@ -1,0 +1,323 @@
+{
+  "description": "Hand-written per-event semantic source for EVENT-CATALOG.md. Admissibility rules are normative in SEMANTICS.md; this file summarizes creation/update targets and references.",
+  "events": {
+    "InvestigationStarted": {
+      "creates": "state + observations[observationId]",
+      "updates": null,
+      "references": {},
+      "invariants": [
+        "MUST be aggregateVersion 1 and the first event; exactly one per history.",
+        "observationId MUST NOT equal the id of any existing entity of the same kind (id uniqueness)."
+      ]
+    },
+    "LifecycleChanged": {
+      "creates": null,
+      "updates": "state.lifecycle",
+      "references": {},
+      "invariants": [
+        "`from` MUST equal the replayed lifecycle.",
+        "The (from, command, to) triple MUST be a legal lifecycle transition (SEMANTICS.md lifecycle table) and its gates MUST pass (resolution gate for resolveInvestigation).",
+        "`verificationFailed` is never issued directly: it is the follow-on of VerificationRecorded(outcome failed) while awaitingVerification."
+      ]
+    },
+    "ObservationRecorded": {
+      "creates": "observations[observationId]",
+      "updates": null,
+      "references": {},
+      "invariants": [
+        "observationId MUST NOT equal the id of any existing entity of the same kind (id uniqueness)."
+      ]
+    },
+    "HypothesisRecorded": {
+      "creates": "hypotheses[hypothesisId]",
+      "updates": null,
+      "references": {},
+      "invariants": [
+        "hypothesisId MUST NOT equal the id of any existing entity of the same kind (id uniqueness)."
+      ]
+    },
+    "HypothesisTransitioned": {
+      "creates": null,
+      "updates": "hypotheses[hypothesisId].state, .history",
+      "references": {
+        "hypothesisId": "hypotheses",
+        "evidenceIds[]": "evidence"
+      },
+      "invariants": [
+        "`from` MUST equal the replayed hypothesis state.",
+        "(from, command, to) MUST be a legal hypothesis transition.",
+        "reopen requires evidence admitted after the latest falsification (new evidence).",
+        "The change's `at`/`aggregateVersion` are the envelope's occurredAt/aggregateVersion."
+      ]
+    },
+    "EvidenceAdmitted": {
+      "creates": "evidence[evidenceId]",
+      "updates": null,
+      "references": {},
+      "invariants": [
+        "evidenceId MUST NOT equal the id of any existing entity of the same kind (id uniqueness).",
+        "contentKind artifact => content is a well-formed absolute http(s) URL (schema checks the prefix; full well-formedness is an admissibility rule).",
+        "Evidence always starts verification = unverified; there is no verification field."
+      ]
+    },
+    "EvidenceSuperseded": {
+      "creates": null,
+      "updates": "evidence[evidenceId].supersededBy",
+      "references": {
+        "evidenceId": "evidence",
+        "replacementEvidenceId": "evidence"
+      },
+      "invariants": [
+        "replacementEvidenceId MUST differ from evidenceId.",
+        "evidenceId MUST NOT already be superseded."
+      ]
+    },
+    "EvidenceVerificationAssessed": {
+      "creates": null,
+      "updates": "evidence[evidenceId].verification",
+      "references": {
+        "evidenceId": "evidence"
+      },
+      "invariants": []
+    },
+    "EvidenceRelated": {
+      "creates": "relationships[relationshipId]",
+      "updates": null,
+      "references": {
+        "evidenceId": "evidence",
+        "hypothesisId": "hypotheses"
+      },
+      "invariants": [
+        "relationshipId MUST NOT equal the id of any existing entity of the same kind (id uniqueness)."
+      ]
+    },
+    "UnknownIdentified": {
+      "creates": "unknowns[unknownId]",
+      "updates": null,
+      "references": {},
+      "invariants": [
+        "unknownId MUST NOT equal the id of any existing entity of the same kind (id uniqueness)."
+      ]
+    },
+    "UnknownTransitioned": {
+      "creates": null,
+      "updates": "unknowns[unknownId].state, .basis",
+      "references": {
+        "unknownId": "unknowns"
+      },
+      "invariants": [
+        "Transition MUST be legal from the replayed unknown state."
+      ]
+    },
+    "AssumptionRecorded": {
+      "creates": "assumptions[assumptionId]",
+      "updates": null,
+      "references": {},
+      "invariants": [
+        "assumptionId MUST NOT equal the id of any existing entity of the same kind (id uniqueness)."
+      ]
+    },
+    "AssumptionTransitioned": {
+      "creates": null,
+      "updates": "assumptions[assumptionId].state",
+      "references": {
+        "assumptionId": "assumptions"
+      },
+      "invariants": [
+        "Transition MUST be legal from the replayed assumption state."
+      ]
+    },
+    "ContradictionRecorded": {
+      "creates": "contradictions[contradictionId]",
+      "updates": null,
+      "references": {
+        "evidenceIds[]": "evidence"
+      },
+      "invariants": [
+        "contradictionId MUST NOT equal the id of any existing entity of the same kind (id uniqueness)."
+      ]
+    },
+    "ContradictionTransitioned": {
+      "creates": null,
+      "updates": "contradictions[contradictionId].state, .basis",
+      "references": {
+        "contradictionId": "contradictions"
+      },
+      "invariants": [
+        "Transition MUST be legal from the replayed contradiction state."
+      ]
+    },
+    "PredictionRecorded": {
+      "creates": "predictions[predictionId]",
+      "updates": null,
+      "references": {
+        "hypothesisId": "hypotheses"
+      },
+      "invariants": [
+        "predictionId MUST NOT equal the id of any existing entity of the same kind (id uniqueness).",
+        "`timing` is decided by the engine, not requested: a forged timing is inadmissible."
+      ]
+    },
+    "ActionRecorded": {
+      "creates": "actions[actionId]",
+      "updates": null,
+      "references": {
+        "targetHypothesisIds[]": "hypotheses"
+      },
+      "invariants": [
+        "actionId MUST NOT equal the id of any existing entity of the same kind (id uniqueness)."
+      ]
+    },
+    "ActionTransitioned": {
+      "creates": null,
+      "updates": "actions[actionId].state",
+      "references": {
+        "actionId": "actions"
+      },
+      "invariants": [
+        "Transition MUST be legal from the replayed action state."
+      ]
+    },
+    "FindingRecorded": {
+      "creates": "findings[findingId]",
+      "updates": null,
+      "references": {
+        "actionId": "actions"
+      },
+      "invariants": [
+        "findingId MUST NOT equal the id of any existing entity of the same kind (id uniqueness).",
+        "A finding cannot be recorded for a rejected action."
+      ]
+    },
+    "NegativeKnowledgeEstablished": {
+      "creates": "negativeKnowledge[negativeKnowledgeId]",
+      "updates": null,
+      "references": {
+        "basisEvidenceIds[]": "evidence"
+      },
+      "invariants": [
+        "negativeKnowledgeId MUST NOT equal the id of any existing entity of the same kind (id uniqueness).",
+        "basisEvidenceIds has at least one element."
+      ]
+    },
+    "CausalAssertionRecorded": {
+      "creates": "causes[causeId]",
+      "updates": null,
+      "references": {
+        "members[].hypothesisId": "hypotheses"
+      },
+      "invariants": [
+        "causeId MUST NOT equal the id of any existing entity of the same kind (id uniqueness).",
+        "members: at least one; whole-member duplicates invalid; same hypothesis MAY appear with different roles."
+      ]
+    },
+    "CausalAssertionConfirmed": {
+      "creates": null,
+      "updates": "causes[causeId].state = confirmed",
+      "references": {
+        "causeId": "causes"
+      },
+      "invariants": [
+        "The cause confirmation gate MUST pass (SEMANTICS.md); otherwise HISTORY.UNGATED_CONFIRMATION / INADMISSIBLE_EVENT.",
+        "`policy` is the engine policy id in force."
+      ]
+    },
+    "CausalAssertionReopened": {
+      "creates": null,
+      "updates": "causes[causeId].state = reopened",
+      "references": {
+        "causeId": "causes"
+      },
+      "invariants": [
+        "Only a confirmed cause can be reopened."
+      ]
+    },
+    "CorrectiveActionRecorded": {
+      "creates": "correctiveActions[correctiveActionId]",
+      "updates": null,
+      "references": {
+        "targetCauseIds[]": "causes"
+      },
+      "invariants": [
+        "correctiveActionId MUST NOT equal the id of any existing entity of the same kind (id uniqueness)."
+      ]
+    },
+    "CorrectiveActionTransitioned": {
+      "creates": null,
+      "updates": "correctiveActions[correctiveActionId].state (+ awaitingSinceVersion)",
+      "references": {
+        "correctiveActionId": "correctiveActions"
+      },
+      "invariants": [
+        "Transition MUST be legal from the replayed corrective-action state.",
+        "Entering awaitingVerificationOfEffect sets awaitingSinceVersion = aggregateVersion (starts a verification round)."
+      ]
+    },
+    "CriterionRecorded": {
+      "creates": "criteria[criterionId]",
+      "updates": null,
+      "references": {
+        "correctiveActionId": "correctiveActions"
+      },
+      "invariants": [
+        "criterionId MUST NOT equal the id of any existing entity of the same kind (id uniqueness)."
+      ]
+    },
+    "VerificationRecorded": {
+      "creates": "verifications[verificationId]",
+      "updates": null,
+      "references": {
+        "criterionId": "criteria",
+        "evidenceIds[]": "evidence"
+      },
+      "invariants": [
+        "verificationId MUST NOT equal the id of any existing entity of the same kind (id uniqueness).",
+        "outcome satisfied => evidenceIds non-empty.",
+        "Cited evidence MUST NOT predate the current verification round (freshness).",
+        "May be followed in the same command group by CorrectiveActionTransitioned / LifecycleChanged(verificationFailed) follow-ons."
+      ]
+    },
+    "ConclusionRecorded": {
+      "creates": "conclusions[conclusionId]",
+      "updates": null,
+      "references": {
+        "causeIds[]": "causes"
+      },
+      "invariants": [
+        "conclusionId MUST NOT equal the id of any existing entity of the same kind (id uniqueness).",
+        "Residual uncertainty rules and confirmed-cause strength rules apply (SEMANTICS.md)."
+      ]
+    },
+    "ProposalRecorded": {
+      "creates": "proposals[proposalId]",
+      "updates": null,
+      "references": {},
+      "invariants": [
+        "proposalId MUST NOT equal the id of any existing entity of the same kind (id uniqueness).",
+        "The only event an agent actor MAY author (D-004); a proposal is never evidence."
+      ]
+    },
+    "ProposalWasAccepted": {
+      "creates": null,
+      "updates": "proposals[proposalId].state = accepted",
+      "references": {
+        "proposalId": "proposals",
+        "targetId": "entity created by the preceding event of the same command group"
+      },
+      "invariants": [
+        "Proposal MUST be active.",
+        "Emitted by a human/system acceptance command after the event that creates the target entity (same correlationId)."
+      ]
+    },
+    "ProposalWasRejected": {
+      "creates": null,
+      "updates": "proposals[proposalId].state = rejected, .decision = reason",
+      "references": {
+        "proposalId": "proposals"
+      },
+      "invariants": [
+        "Proposal MUST be active."
+      ]
+    }
+  }
+}

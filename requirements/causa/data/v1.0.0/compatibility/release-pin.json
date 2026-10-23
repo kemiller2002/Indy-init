@@ -1,0 +1,16 @@
+{
+  "description": "Identity of the frozen Causa storage release that Indy-init requirements v1.0.0 conform to. Read by tools/causa-contract/parity_gate.py. Changing any value is a contract change (RULES.md).",
+  "repository": "https://github.com/kemiller2002/causa-data",
+  "tag": "causa-storage-v1.0.0",
+  "tagObject": "fd2991a392e913b741f0ed2bc4daa4bc4be57f6c",
+  "commit": "c947c7e354be80766573a782546c8186336774cc",
+  "contractVersion": "1.0.0",
+  "schemaBundleSha256": "0a68af8c93190d2e4d6c27beb2f8cb67c3aebdda586d01beb7122b71af179152",
+  "releaseIdentitySha256": "6a7e7802ff2a3ff500ab6065662514a96e09e6c15eb30212ba1377fcc5bf8fc5",
+  "datasetIdentitySha256": "f650a2e509a420872b46177b21f57ef6ebd7625ae4c69dd92198d3ca472c2b86",
+  "engine": {
+    "repository": "https://github.com/kemiller2002/indy-init-rehearsal-001",
+    "commit": "55f49f61c939a3a780cee592f36f732a1328f981"
+  },
+  "approvedDifferences": []
+}
