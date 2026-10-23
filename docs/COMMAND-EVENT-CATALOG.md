@@ -112,23 +112,26 @@ Authoritative hypothesis lifecycle for the first implementation:
 Proposed
   -> Plausible
   -> Supported
-  -> Confirmed
 
 Proposed/Plausible/Supported
   -> Weakened
   -> Falsified
 
-Any non-confirmed active state
+Proposed/Plausible/Supported/Weakened
   -> Superseded
 
 Falsified
   -> Plausible via ReopenHypothesis
 
-Confirmed
-  -> Reopened/Supported or other policy-defined active posture
+Weakened
+  -> Plausible or Supported when policy prerequisites hold
+
+Cause confirmation is a SEPARATE CausalAssertion transition:
+CauseProposed/CauseReopened -> CauseConfirmed via ConfirmCause.
+There is no Confirmed HypothesisState and no ConfirmHypothesis command.
 ```
 
-"Leading" is initially derived rather than persisted.
+"Leading" is initially derived rather than persisted. This first implementation lifecycle matches STATE-TRANSITION-TABLES.md and the accepted R001 F# Model.fs / Decide.fs. Historical domain semantics are not rewritten; this corrects the conflicting planning example.
 
 | Command | Event(s) | Prerequisites |
 | --- | --- | --- |
