@@ -1,0 +1,20 @@
+<!-- Differential oracle: the pinned engine's History.validate over wire histories.
+     Non-normative verification tooling. Build with:
+       dotnet build -c Release -o out -p:CausaData=<causa-data checkout at tag> -p:Engine=<indy-init-rehearsal-001 checkout at 55f49f6> -->
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <AssemblyName>oracle</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- Wire decoding is reused from the causa-data clean F# consumer at the release tag (read-only). -->
+    <Compile Include="$(CausaData)/tools/consumers/clean-fsharp/Json.fs" />
+    <Compile Include="$(CausaData)/tools/consumers/clean-fsharp/Wire.fs" />
+    <Compile Include="$(CausaData)/tools/consumers/clean-fsharp/Domain.fs" />
+    <Compile Include="Oracle.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="$(Engine)/src/engine/App.Engine.fsproj" />
+  </ItemGroup>
+</Project>
