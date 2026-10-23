@@ -5,7 +5,7 @@
  "rows": [
   {
    "id": "AC-SCHEMA-01",
-   "requirement": "CAUSA-INV-10, Phase 7.1",
+   "requirement": "ACC-01; CAUSA-INV-10",
    "check": "parse every schema in schemas/bundle.json with a Draft 2020-12 validator; every $ref resolves; bundle digests equal file bytes",
    "expected": {
     "schemasParsed": 60,
@@ -14,7 +14,7 @@
   },
   {
    "id": "AC-REG-01",
-   "requirement": "CAUSA-INV-11, Phase 7.2",
+   "requirement": "ACC-02; CAUSA-INV-11",
    "check": "consumer recognizes exactly the registered discriminators in EVENT-CATALOG.md order",
    "expected": {
     "eventTypes": [
@@ -54,7 +54,7 @@
   },
   {
    "id": "AC-INV-payment-failure",
-   "requirement": "CAUSA-INV-01/02/05/08/15, Phase 7.3-7.7",
+   "requirement": "ACC-03, ACC-04; CAUSA-INV-01, -02, -05, -08, -15",
    "check": "verify investigation directory through all 17 reader stages including stage 15 admissibility; replay; project; compare digests",
    "input": "fixtures/v1.0.0/investigations/6fd2ddc9-bedd-5fff-9093-5506c4d68cb3",
    "expected": {
@@ -71,7 +71,7 @@
   },
   {
    "id": "AC-INV-authentication-outage",
-   "requirement": "CAUSA-INV-01/02/05/08/15, Phase 7.3-7.7",
+   "requirement": "ACC-03, ACC-04; CAUSA-INV-01, -02, -05, -08, -15",
    "check": "verify investigation directory through all 17 reader stages including stage 15 admissibility; replay; project; compare digests",
    "input": "fixtures/v1.0.0/investigations/a6747bd3-2794-5ac7-83b8-5ea2a0c50f5e",
    "expected": {
@@ -88,7 +88,7 @@
   },
   {
    "id": "AC-INV-conflicting-metrics",
-   "requirement": "CAUSA-INV-01/02/05/08/15, Phase 7.3-7.7",
+   "requirement": "ACC-03, ACC-04; CAUSA-INV-01, -02, -05, -08, -15",
    "check": "verify investigation directory through all 17 reader stages including stage 15 admissibility; replay; project; compare digests",
    "input": "fixtures/v1.0.0/investigations/abd5f9b5-e335-5245-b951-802f01d5a2e5",
    "expected": {
@@ -105,7 +105,7 @@
   },
   {
    "id": "AC-INV-intermittent-outage",
-   "requirement": "CAUSA-INV-01/02/05/08/15, Phase 7.3-7.7",
+   "requirement": "ACC-03, ACC-04; CAUSA-INV-01, -02, -05, -08, -15",
    "check": "verify investigation directory through all 17 reader stages including stage 15 admissibility; replay; project; compare digests",
    "input": "fixtures/v1.0.0/investigations/c57e4407-dd43-5d63-8dbe-9d6ceac6c31a",
    "expected": {
@@ -122,7 +122,7 @@
   },
   {
    "id": "AC-INV-api-latency",
-   "requirement": "CAUSA-INV-01/02/05/08/15, Phase 7.3-7.7",
+   "requirement": "ACC-03, ACC-04; CAUSA-INV-01, -02, -05, -08, -15",
    "check": "verify investigation directory through all 17 reader stages including stage 15 admissibility; replay; project; compare digests",
    "input": "fixtures/v1.0.0/investigations/d588748e-8df9-5f27-859e-5d36d9a2b53d",
    "expected": {
@@ -139,7 +139,7 @@
   },
   {
    "id": "AC-NEG-agent-authored-hypothesis",
-   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "requirement": "ACC-05; CAUSA-INV-05",
    "check": "reject negative fixture (kind investigation)",
    "input": "fixtures/v1.0.0/negative/agent-authored-hypothesis.json",
    "expected": {
@@ -150,7 +150,7 @@
   },
   {
    "id": "AC-NEG-altered-event-without-rehash",
-   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "requirement": "ACC-05; CAUSA-INV-05",
    "check": "reject negative fixture (kind investigation)",
    "input": "fixtures/v1.0.0/negative/altered-event-without-rehash.json",
    "expected": {
@@ -161,7 +161,7 @@
   },
   {
    "id": "AC-NEG-artifact-not-http",
-   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "requirement": "ACC-05; CAUSA-INV-05",
    "check": "reject negative fixture (kind investigation)",
    "input": "fixtures/v1.0.0/negative/artifact-not-http.json",
    "expected": {
@@ -172,7 +172,7 @@
   },
   {
    "id": "AC-NEG-blank-text",
-   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "requirement": "ACC-05; CAUSA-INV-05",
    "check": "reject negative fixture (kind investigation)",
    "input": "fixtures/v1.0.0/negative/blank-text.json",
    "expected": {
@@ -183,7 +183,7 @@
   },
   {
    "id": "AC-NEG-bom-in-events",
-   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "requirement": "ACC-05; CAUSA-INV-05",
    "check": "reject negative fixture (kind investigation)",
    "input": "fixtures/v1.0.0/negative/bom-in-events.json",
    "expected": {
@@ -194,7 +194,7 @@
   },
   {
    "id": "AC-NEG-broken-snapshot-hash",
-   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "requirement": "ACC-05; CAUSA-INV-05",
    "check": "reject negative fixture (kind investigation)",
    "input": "fixtures/v1.0.0/negative/broken-snapshot-hash.json",
    "expected": {
@@ -205,7 +205,7 @@
   },
   {
    "id": "AC-NEG-calendar-invalid-manifest-created-at",
-   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "requirement": "ACC-05; CAUSA-INV-05",
    "check": "reject negative fixture (kind investigation)",
    "input": "fixtures/v1.0.0/negative/calendar-invalid-manifest-created-at.json",
    "expected": {
@@ -216,7 +216,7 @@
   },
   {
    "id": "AC-NEG-calendar-invalid-occurred-at",
-   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "requirement": "ACC-05; CAUSA-INV-05",
    "check": "reject negative fixture (kind investigation)",
    "input": "fixtures/v1.0.0/negative/calendar-invalid-occurred-at.json",
    "expected": {
@@ -227,7 +227,7 @@
   },
   {
    "id": "AC-NEG-correlation-reused",
-   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "requirement": "ACC-05; CAUSA-INV-05",
    "check": "reject negative fixture (kind investigation)",
    "input": "fixtures/v1.0.0/negative/correlation-reused.json",
    "expected": {
@@ -238,7 +238,7 @@
   },
   {
    "id": "AC-NEG-duplicate-aggregate-version",
-   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "requirement": "ACC-05; CAUSA-INV-05",
    "check": "reject negative fixture (kind investigation)",
    "input": "fixtures/v1.0.0/negative/duplicate-aggregate-version.json",
    "expected": {
@@ -249,7 +249,7 @@
   },
   {
    "id": "AC-NEG-duplicate-event-id",
-   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "requirement": "ACC-05; CAUSA-INV-05",
    "check": "reject negative fixture (kind investigation)",
    "input": "fixtures/v1.0.0/negative/duplicate-event-id.json",
    "expected": {
@@ -260,7 +260,7 @@
   },
   {
    "id": "AC-NEG-duplicate-json-key",
-   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "requirement": "ACC-05; CAUSA-INV-05",
    "check": "reject negative fixture (kind investigation)",
    "input": "fixtures/v1.0.0/negative/duplicate-json-key.json",
    "expected": {
@@ -271,7 +271,7 @@
   },
   {
    "id": "AC-NEG-engine-agent-repeats-falsified",
-   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "requirement": "ACC-05; CAUSA-INV-05",
    "check": "reject negative fixture (kind investigation)",
    "input": "fixtures/v1.0.0/negative/engine-agent-repeats-falsified.json",
    "expected": {
@@ -282,7 +282,7 @@
   },
   {
    "id": "AC-NEG-engine-awaiting-verification-without-work",
-   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "requirement": "ACC-05; CAUSA-INV-05",
    "check": "reject negative fixture (kind investigation)",
    "input": "fixtures/v1.0.0/negative/engine-awaiting-verification-without-work.json",
    "expected": {
@@ -293,7 +293,7 @@
   },
   {
    "id": "AC-NEG-engine-cause-already-confirmed",
-   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "requirement": "ACC-05; CAUSA-INV-05",
    "check": "reject negative fixture (kind investigation)",
    "input": "fixtures/v1.0.0/negative/engine-cause-already-confirmed.json",
    "expected": {
@@ -304,7 +304,7 @@
   },
   {
    "id": "AC-NEG-engine-cause-alternative-not-addressed",
-   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "requirement": "ACC-05; CAUSA-INV-05",
    "check": "reject negative fixture (kind investigation)",
    "input": "fixtures/v1.0.0/negative/engine-cause-alternative-not-addressed.json",
    "expected": {
@@ -315,7 +315,7 @@
   },
   {
    "id": "AC-NEG-engine-cause-no-root",
-   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "requirement": "ACC-05; CAUSA-INV-05",
    "check": "reject negative fixture (kind investigation)",
    "input": "fixtures/v1.0.0/negative/engine-cause-no-root.json",
    "expected": {
@@ -326,7 +326,7 @@
   },
   {
    "id": "AC-NEG-engine-cause-open-contradiction",
-   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "requirement": "ACC-05; CAUSA-INV-05",
    "check": "reject negative fixture (kind investigation)",
    "input": "fixtures/v1.0.0/negative/engine-cause-open-contradiction.json",
    "expected": {
@@ -337,7 +337,7 @@
   },
   {
    "id": "AC-NEG-engine-cause-open-unknown",
-   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "requirement": "ACC-05; CAUSA-INV-05",
    "check": "reject negative fixture (kind investigation)",
    "input": "fixtures/v1.0.0/negative/engine-cause-open-unknown.json",
    "expected": {
@@ -348,7 +348,7 @@
   },
   {
    "id": "AC-NEG-engine-cause-unverified-assumption",
-   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "requirement": "ACC-05; CAUSA-INV-05",
    "check": "reject negative fixture (kind investigation)",
    "input": "fixtures/v1.0.0/negative/engine-cause-unverified-assumption.json",
    "expected": {
@@ -359,7 +359,7 @@
   },
   {
    "id": "AC-NEG-engine-cause-without-mechanism",
-   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "requirement": "ACC-05; CAUSA-INV-05",
    "check": "reject negative fixture (kind investigation)",
    "input": "fixtures/v1.0.0/negative/engine-cause-without-mechanism.json",
    "expected": {
@@ -370,7 +370,7 @@
   },
   {
    "id": "AC-NEG-engine-conclusion-without-residual",
-   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "requirement": "ACC-05; CAUSA-INV-05",
    "check": "reject negative fixture (kind investigation)",
    "input": "fixtures/v1.0.0/negative/engine-conclusion-without-residual.json",
    "expected": {
@@ -381,7 +381,7 @@
   },
   {
    "id": "AC-NEG-engine-confirmed-conclusion-unconfirmed-cause",
-   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "requirement": "ACC-05; CAUSA-INV-05",
    "check": "reject negative fixture (kind investigation)",
    "input": "fixtures/v1.0.0/negative/engine-confirmed-conclusion-unconfirmed-cause.json",
    "expected": {
@@ -392,7 +392,7 @@
   },
   {
    "id": "AC-NEG-engine-content-after-resolution",
-   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "requirement": "ACC-05; CAUSA-INV-05",
    "check": "reject negative fixture (kind investigation)",
    "input": "fixtures/v1.0.0/negative/engine-content-after-resolution.json",
    "expected": {
@@ -403,7 +403,7 @@
   },
   {
    "id": "AC-NEG-engine-dangling-reference",
-   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "requirement": "ACC-05; CAUSA-INV-05",
    "check": "reject negative fixture (kind investigation)",
    "input": "fixtures/v1.0.0/negative/engine-dangling-reference.json",
    "expected": {
@@ -414,7 +414,7 @@
   },
   {
    "id": "AC-NEG-engine-duplicate-entity-id",
-   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "requirement": "ACC-05; CAUSA-INV-05",
    "check": "reject negative fixture (kind investigation)",
    "input": "fixtures/v1.0.0/negative/engine-duplicate-entity-id.json",
    "expected": {
@@ -425,7 +425,7 @@
   },
   {
    "id": "AC-NEG-engine-evidence-already-superseded",
-   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "requirement": "ACC-05; CAUSA-INV-05",
    "check": "reject negative fixture (kind investigation)",
    "input": "fixtures/v1.0.0/negative/engine-evidence-already-superseded.json",
    "expected": {
@@ -436,7 +436,7 @@
   },
   {
    "id": "AC-NEG-engine-evidence-supersedes-itself",
-   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "requirement": "ACC-05; CAUSA-INV-05",
    "check": "reject negative fixture (kind investigation)",
    "input": "fixtures/v1.0.0/negative/engine-evidence-supersedes-itself.json",
    "expected": {
@@ -447,7 +447,7 @@
   },
   {
    "id": "AC-NEG-engine-finding-for-rejected-action",
-   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "requirement": "ACC-05; CAUSA-INV-05",
    "check": "reject negative fixture (kind investigation)",
    "input": "fixtures/v1.0.0/negative/engine-finding-for-rejected-action.json",
    "expected": {
@@ -458,7 +458,7 @@
   },
   {
    "id": "AC-NEG-engine-group-time-disagreement",
-   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "requirement": "ACC-05; CAUSA-INV-05",
    "check": "reject negative fixture (kind investigation)",
    "input": "fixtures/v1.0.0/negative/engine-group-time-disagreement.json",
    "expected": {
@@ -469,7 +469,7 @@
   },
   {
    "id": "AC-NEG-engine-malformed-artifact-url",
-   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "requirement": "ACC-05; CAUSA-INV-05",
    "check": "reject negative fixture (kind investigation)",
    "input": "fixtures/v1.0.0/negative/engine-malformed-artifact-url.json",
    "expected": {
@@ -480,7 +480,7 @@
   },
   {
    "id": "AC-NEG-engine-prediction-timing-forged",
-   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "requirement": "ACC-05; CAUSA-INV-05",
    "check": "reject negative fixture (kind investigation)",
    "input": "fixtures/v1.0.0/negative/engine-prediction-timing-forged.json",
    "expected": {
@@ -491,7 +491,7 @@
   },
   {
    "id": "AC-NEG-engine-proposal-not-active",
-   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "requirement": "ACC-05; CAUSA-INV-05",
    "check": "reject negative fixture (kind investigation)",
    "input": "fixtures/v1.0.0/negative/engine-proposal-not-active.json",
    "expected": {
@@ -502,7 +502,7 @@
   },
   {
    "id": "AC-NEG-engine-reopen-without-new-evidence",
-   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "requirement": "ACC-05; CAUSA-INV-05",
    "check": "reject negative fixture (kind investigation)",
    "input": "fixtures/v1.0.0/negative/engine-reopen-without-new-evidence.json",
    "expected": {
@@ -513,7 +513,7 @@
   },
   {
    "id": "AC-NEG-engine-resolve-cause-no-longer-holds",
-   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "requirement": "ACC-05; CAUSA-INV-05",
    "check": "reject negative fixture (kind investigation)",
    "input": "fixtures/v1.0.0/negative/engine-resolve-cause-no-longer-holds.json",
    "expected": {
@@ -524,7 +524,7 @@
   },
   {
    "id": "AC-NEG-engine-resolve-correction-not-verified",
-   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "requirement": "ACC-05; CAUSA-INV-05",
    "check": "reject negative fixture (kind investigation)",
    "input": "fixtures/v1.0.0/negative/engine-resolve-correction-not-verified.json",
    "expected": {
@@ -535,7 +535,7 @@
   },
   {
    "id": "AC-NEG-engine-resolve-criterion-unsatisfied",
-   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "requirement": "ACC-05; CAUSA-INV-05",
    "check": "reject negative fixture (kind investigation)",
    "input": "fixtures/v1.0.0/negative/engine-resolve-criterion-unsatisfied.json",
    "expected": {
@@ -546,7 +546,7 @@
   },
   {
    "id": "AC-NEG-engine-resolve-no-conclusion",
-   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "requirement": "ACC-05; CAUSA-INV-05",
    "check": "reject negative fixture (kind investigation)",
    "input": "fixtures/v1.0.0/negative/engine-resolve-no-conclusion.json",
    "expected": {
@@ -557,7 +557,7 @@
   },
   {
    "id": "AC-NEG-engine-resolve-no-correction",
-   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "requirement": "ACC-05; CAUSA-INV-05",
    "check": "reject negative fixture (kind investigation)",
    "input": "fixtures/v1.0.0/negative/engine-resolve-no-correction.json",
    "expected": {
@@ -568,7 +568,7 @@
   },
   {
    "id": "AC-NEG-engine-resolve-residual-not-stated",
-   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "requirement": "ACC-05; CAUSA-INV-05",
    "check": "reject negative fixture (kind investigation)",
    "input": "fixtures/v1.0.0/negative/engine-resolve-residual-not-stated.json",
    "expected": {
@@ -579,7 +579,7 @@
   },
   {
    "id": "AC-NEG-engine-verification-evidence-predates-round",
-   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "requirement": "ACC-05; CAUSA-INV-05",
    "check": "reject negative fixture (kind investigation)",
    "input": "fixtures/v1.0.0/negative/engine-verification-evidence-predates-round.json",
    "expected": {
@@ -590,7 +590,7 @@
   },
   {
    "id": "AC-NEG-engine-verification-without-criteria",
-   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "requirement": "ACC-05; CAUSA-INV-05",
    "check": "reject negative fixture (kind investigation)",
    "input": "fixtures/v1.0.0/negative/engine-verification-without-criteria.json",
    "expected": {
@@ -601,7 +601,7 @@
   },
   {
    "id": "AC-NEG-event-line-non-canonical",
-   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "requirement": "ACC-05; CAUSA-INV-05",
    "check": "reject negative fixture (kind investigation)",
    "input": "fixtures/v1.0.0/negative/event-line-non-canonical.json",
    "expected": {
@@ -612,7 +612,7 @@
   },
   {
    "id": "AC-NEG-events-blank-line",
-   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "requirement": "ACC-05; CAUSA-INV-05",
    "check": "reject negative fixture (kind investigation)",
    "input": "fixtures/v1.0.0/negative/events-blank-line.json",
    "expected": {
@@ -623,7 +623,7 @@
   },
   {
    "id": "AC-NEG-events-crlf",
-   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "requirement": "ACC-05; CAUSA-INV-05",
    "check": "reject negative fixture (kind investigation)",
    "input": "fixtures/v1.0.0/negative/events-crlf.json",
    "expected": {
@@ -634,7 +634,7 @@
   },
   {
    "id": "AC-NEG-events-empty",
-   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "requirement": "ACC-05; CAUSA-INV-05",
    "check": "reject negative fixture (kind investigation)",
    "input": "fixtures/v1.0.0/negative/events-empty.json",
    "expected": {
@@ -645,7 +645,7 @@
   },
   {
    "id": "AC-NEG-events-invalid-utf8",
-   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "requirement": "ACC-05; CAUSA-INV-05",
    "check": "reject negative fixture (kind investigation)",
    "input": "fixtures/v1.0.0/negative/events-invalid-utf8.json",
    "expected": {
@@ -656,7 +656,7 @@
   },
   {
    "id": "AC-NEG-events-missing-final-lf",
-   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "requirement": "ACC-05; CAUSA-INV-05",
    "check": "reject negative fixture (kind investigation)",
    "input": "fixtures/v1.0.0/negative/events-missing-final-lf.json",
    "expected": {
@@ -667,7 +667,7 @@
   },
   {
    "id": "AC-NEG-extra-file-in-directory",
-   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "requirement": "ACC-05; CAUSA-INV-05",
    "check": "reject negative fixture (kind investigation)",
    "input": "fixtures/v1.0.0/negative/extra-file-in-directory.json",
    "expected": {
@@ -678,7 +678,7 @@
   },
   {
    "id": "AC-NEG-feff-inside-string",
-   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "requirement": "ACC-05; CAUSA-INV-05",
    "check": "reject negative fixture (kind investigation)",
    "input": "fixtures/v1.0.0/negative/feff-inside-string.json",
    "expected": {
@@ -689,7 +689,7 @@
   },
   {
    "id": "AC-NEG-float-number",
-   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "requirement": "ACC-05; CAUSA-INV-05",
    "check": "reject negative fixture (kind investigation)",
    "input": "fixtures/v1.0.0/negative/float-number.json",
    "expected": {
@@ -700,7 +700,7 @@
   },
   {
    "id": "AC-NEG-forged-cause-confirmation",
-   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "requirement": "ACC-05; CAUSA-INV-05",
    "check": "reject negative fixture (kind investigation)",
    "input": "fixtures/v1.0.0/negative/forged-cause-confirmation.json",
    "expected": {
@@ -711,7 +711,7 @@
   },
   {
    "id": "AC-NEG-forged-event-id",
-   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "requirement": "ACC-05; CAUSA-INV-05",
    "check": "reject negative fixture (kind investigation)",
    "input": "fixtures/v1.0.0/negative/forged-event-id.json",
    "expected": {
@@ -722,7 +722,7 @@
   },
   {
    "id": "AC-NEG-forged-resolution",
-   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "requirement": "ACC-05; CAUSA-INV-05",
    "check": "reject negative fixture (kind investigation)",
    "input": "fixtures/v1.0.0/negative/forged-resolution.json",
    "expected": {
@@ -733,7 +733,7 @@
   },
   {
    "id": "AC-NEG-forged-snapshot",
-   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "requirement": "ACC-05; CAUSA-INV-05",
    "check": "reject negative fixture (kind investigation)",
    "input": "fixtures/v1.0.0/negative/forged-snapshot.json",
    "expected": {
@@ -744,7 +744,7 @@
   },
   {
    "id": "AC-NEG-identifier-trailing-newline",
-   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "requirement": "ACC-05; CAUSA-INV-05",
    "check": "reject negative fixture (kind investigation)",
    "input": "fixtures/v1.0.0/negative/identifier-trailing-newline.json",
    "expected": {
@@ -755,7 +755,7 @@
   },
   {
    "id": "AC-NEG-ideographic-space-text",
-   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "requirement": "ACC-05; CAUSA-INV-05",
    "check": "reject negative fixture (kind investigation)",
    "input": "fixtures/v1.0.0/negative/ideographic-space-text.json",
    "expected": {
@@ -766,7 +766,7 @@
   },
   {
    "id": "AC-NEG-illegal-hypothesis-transition",
-   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "requirement": "ACC-05; CAUSA-INV-05",
    "check": "reject negative fixture (kind investigation)",
    "input": "fixtures/v1.0.0/negative/illegal-hypothesis-transition.json",
    "expected": {
@@ -777,7 +777,7 @@
   },
   {
    "id": "AC-NEG-integer-out-of-range",
-   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "requirement": "ACC-05; CAUSA-INV-05",
    "check": "reject negative fixture (kind investigation)",
    "input": "fixtures/v1.0.0/negative/integer-out-of-range.json",
    "expected": {
@@ -788,7 +788,7 @@
   },
   {
    "id": "AC-NEG-invalid-enum-value",
-   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "requirement": "ACC-05; CAUSA-INV-05",
    "check": "reject negative fixture (kind investigation)",
    "input": "fixtures/v1.0.0/negative/invalid-enum-value.json",
    "expected": {
@@ -799,7 +799,7 @@
   },
   {
    "id": "AC-NEG-invalid-field-type",
-   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "requirement": "ACC-05; CAUSA-INV-05",
    "check": "reject negative fixture (kind investigation)",
    "input": "fixtures/v1.0.0/negative/invalid-field-type.json",
    "expected": {
@@ -810,7 +810,7 @@
   },
   {
    "id": "AC-NEG-lone-surrogate",
-   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "requirement": "ACC-05; CAUSA-INV-05",
    "check": "reject negative fixture (kind investigation)",
    "input": "fixtures/v1.0.0/negative/lone-surrogate.json",
    "expected": {
@@ -821,7 +821,7 @@
   },
   {
    "id": "AC-NEG-manifest-created-at-mismatch",
-   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "requirement": "ACC-05; CAUSA-INV-05",
    "check": "reject negative fixture (kind investigation)",
    "input": "fixtures/v1.0.0/negative/manifest-created-at-mismatch.json",
    "expected": {
@@ -832,7 +832,7 @@
   },
   {
    "id": "AC-NEG-manifest-event-count-mismatch",
-   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "requirement": "ACC-05; CAUSA-INV-05",
    "check": "reject negative fixture (kind investigation)",
    "input": "fixtures/v1.0.0/negative/manifest-event-count-mismatch.json",
    "expected": {
@@ -843,7 +843,7 @@
   },
   {
    "id": "AC-NEG-manifest-interior-newline",
-   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "requirement": "ACC-05; CAUSA-INV-05",
    "check": "reject negative fixture (kind investigation)",
    "input": "fixtures/v1.0.0/negative/manifest-interior-newline.json",
    "expected": {
@@ -854,7 +854,7 @@
   },
   {
    "id": "AC-NEG-manifest-updated-at-mismatch",
-   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "requirement": "ACC-05; CAUSA-INV-05",
    "check": "reject negative fixture (kind investigation)",
    "input": "fixtures/v1.0.0/negative/manifest-updated-at-mismatch.json",
    "expected": {
@@ -865,7 +865,7 @@
   },
   {
    "id": "AC-NEG-manifest-version-mismatch",
-   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "requirement": "ACC-05; CAUSA-INV-05",
    "check": "reject negative fixture (kind investigation)",
    "input": "fixtures/v1.0.0/negative/manifest-version-mismatch.json",
    "expected": {
@@ -876,7 +876,7 @@
   },
   {
    "id": "AC-NEG-manifest-wrong-investigation-id",
-   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "requirement": "ACC-05; CAUSA-INV-05",
    "check": "reject negative fixture (kind investigation)",
    "input": "fixtures/v1.0.0/negative/manifest-wrong-investigation-id.json",
    "expected": {
@@ -887,7 +887,7 @@
   },
   {
    "id": "AC-NEG-missing-snapshot-file",
-   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "requirement": "ACC-05; CAUSA-INV-05",
    "check": "reject negative fixture (kind investigation)",
    "input": "fixtures/v1.0.0/negative/missing-snapshot-file.json",
    "expected": {
@@ -898,7 +898,7 @@
   },
   {
    "id": "AC-NEG-missing-start",
-   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "requirement": "ACC-05; CAUSA-INV-05",
    "check": "reject negative fixture (kind investigation)",
    "input": "fixtures/v1.0.0/negative/missing-start.json",
    "expected": {
@@ -909,7 +909,7 @@
   },
   {
    "id": "AC-NEG-negative-zero",
-   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "requirement": "ACC-05; CAUSA-INV-05",
    "check": "reject negative fixture (kind investigation)",
    "input": "fixtures/v1.0.0/negative/negative-zero.json",
    "expected": {
@@ -920,7 +920,7 @@
   },
   {
    "id": "AC-NEG-nesting-depth-128",
-   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "requirement": "ACC-05; CAUSA-INV-05",
    "check": "reject negative fixture (kind investigation)",
    "input": "fixtures/v1.0.0/negative/nesting-depth-128.json",
    "expected": {
@@ -931,7 +931,7 @@
   },
   {
    "id": "AC-NEG-nesting-depth-129",
-   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "requirement": "ACC-05; CAUSA-INV-05",
    "check": "reject negative fixture (kind investigation)",
    "input": "fixtures/v1.0.0/negative/nesting-depth-129.json",
    "expected": {
@@ -942,7 +942,7 @@
   },
   {
    "id": "AC-NEG-nesting-too-deep",
-   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "requirement": "ACC-05; CAUSA-INV-05",
    "check": "reject negative fixture (kind investigation)",
    "input": "fixtures/v1.0.0/negative/nesting-too-deep.json",
    "expected": {
@@ -953,7 +953,7 @@
   },
   {
    "id": "AC-NEG-nil-uuid",
-   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "requirement": "ACC-05; CAUSA-INV-05",
    "check": "reject negative fixture (kind investigation)",
    "input": "fixtures/v1.0.0/negative/nil-uuid.json",
    "expected": {
@@ -964,7 +964,7 @@
   },
   {
    "id": "AC-NEG-non-canonical-manifest",
-   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "requirement": "ACC-05; CAUSA-INV-05",
    "check": "reject negative fixture (kind investigation)",
    "input": "fixtures/v1.0.0/negative/non-canonical-manifest.json",
    "expected": {
@@ -975,7 +975,7 @@
   },
   {
    "id": "AC-NEG-non-string-format-version",
-   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "requirement": "ACC-05; CAUSA-INV-05",
    "check": "reject negative fixture (kind investigation)",
    "input": "fixtures/v1.0.0/negative/non-string-format-version.json",
    "expected": {
@@ -986,7 +986,7 @@
   },
   {
    "id": "AC-NEG-path-traversal-directory",
-   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "requirement": "ACC-05; CAUSA-INV-05",
    "check": "reject negative fixture (kind investigation)",
    "input": "fixtures/v1.0.0/negative/path-traversal-directory.json",
    "expected": {
@@ -997,7 +997,7 @@
   },
   {
    "id": "AC-NEG-rewritten-history",
-   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "requirement": "ACC-05; CAUSA-INV-05",
    "check": "reject negative fixture (kind successor)",
    "input": "fixtures/v1.0.0/negative/rewritten-history.json",
    "expected": {
@@ -1008,7 +1008,7 @@
   },
   {
    "id": "AC-NEG-sequence-gap",
-   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "requirement": "ACC-05; CAUSA-INV-05",
    "check": "reject negative fixture (kind investigation)",
    "input": "fixtures/v1.0.0/negative/sequence-gap.json",
    "expected": {
@@ -1019,7 +1019,7 @@
   },
   {
    "id": "AC-NEG-snapshot-missing-final-lf",
-   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "requirement": "ACC-05; CAUSA-INV-05",
    "check": "reject negative fixture (kind investigation)",
    "input": "fixtures/v1.0.0/negative/snapshot-missing-final-lf.json",
    "expected": {
@@ -1030,7 +1030,7 @@
   },
   {
    "id": "AC-NEG-snapshot-non-canonical",
-   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "requirement": "ACC-05; CAUSA-INV-05",
    "check": "reject negative fixture (kind investigation)",
    "input": "fixtures/v1.0.0/negative/snapshot-non-canonical.json",
    "expected": {
@@ -1041,7 +1041,7 @@
   },
   {
    "id": "AC-NEG-stale-expected-version",
-   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "requirement": "ACC-05; CAUSA-INV-05",
    "check": "reject negative fixture (kind append)",
    "input": "fixtures/v1.0.0/negative/stale-expected-version.json",
    "expected": {
@@ -1052,7 +1052,7 @@
   },
   {
    "id": "AC-NEG-timestamp-without-milliseconds",
-   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "requirement": "ACC-05; CAUSA-INV-05",
    "check": "reject negative fixture (kind investigation)",
    "input": "fixtures/v1.0.0/negative/timestamp-without-milliseconds.json",
    "expected": {
@@ -1063,7 +1063,7 @@
   },
   {
    "id": "AC-NEG-truncated-event-line",
-   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "requirement": "ACC-05; CAUSA-INV-05",
    "check": "reject negative fixture (kind investigation)",
    "input": "fixtures/v1.0.0/negative/truncated-event-line.json",
    "expected": {
@@ -1074,7 +1074,7 @@
   },
   {
    "id": "AC-NEG-unexpected-payload-field",
-   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "requirement": "ACC-05; CAUSA-INV-05",
    "check": "reject negative fixture (kind investigation)",
    "input": "fixtures/v1.0.0/negative/unexpected-payload-field.json",
    "expected": {
@@ -1085,7 +1085,7 @@
   },
   {
    "id": "AC-NEG-unknown-event-type",
-   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "requirement": "ACC-05; CAUSA-INV-05",
    "check": "reject negative fixture (kind investigation)",
    "input": "fixtures/v1.0.0/negative/unknown-event-type.json",
    "expected": {
@@ -1096,7 +1096,7 @@
   },
   {
    "id": "AC-NEG-unsupported-format-version",
-   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "requirement": "ACC-05; CAUSA-INV-05",
    "check": "reject negative fixture (kind investigation)",
    "input": "fixtures/v1.0.0/negative/unsupported-format-version.json",
    "expected": {
@@ -1107,7 +1107,7 @@
   },
   {
    "id": "AC-NEG-uppercase-uuid",
-   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "requirement": "ACC-05; CAUSA-INV-05",
    "check": "reject negative fixture (kind investigation)",
    "input": "fixtures/v1.0.0/negative/uppercase-uuid.json",
    "expected": {
@@ -1118,7 +1118,7 @@
   },
   {
    "id": "AC-NEG-wrong-investigation-id",
-   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "requirement": "ACC-05; CAUSA-INV-05",
    "check": "reject negative fixture (kind investigation)",
    "input": "fixtures/v1.0.0/negative/wrong-investigation-id.json",
    "expected": {
@@ -1129,7 +1129,7 @@
   },
   {
    "id": "AC-APPEND-01",
-   "requirement": "CAUSA-INV-03/14/15, Phase 7.9",
+   "requirement": "ACC-06; CAUSA-INV-03, CAUSA-INV-14, CAUSA-INV-15",
    "check": "append one engine-decided ObservationRecorded to a workspace copy of api-latency at the observed version; result verifies, old events.ndjson bytes are a prefix, untouched fields byte-identical, independent reader accepts structure",
    "expected": {
     "primaryCode": null,
@@ -1139,7 +1139,7 @@
   },
   {
    "id": "AC-APPEND-02",
-   "requirement": "CAUSA-INV-14",
+   "requirement": "ACC-06; CAUSA-INV-14",
    "check": "append at a stale expected version is refused and nothing is written",
    "expected": {
     "primaryCode": "CAUSA.VERSION_STALE",
@@ -1148,7 +1148,7 @@
   },
   {
    "id": "AC-PARITY-01",
-   "requirement": "CAUSA-DATA-001, CAUSA-COMPAT-07",
+   "requirement": "ACC-07; CAUSA-DATA-001, CAUSA-COMPAT-07",
    "check": "tools/causa-contract/parity_gate.py check",
    "expected": {
     "unexplainedDifferences": 0
@@ -1156,7 +1156,7 @@
   },
   {
    "id": "AC-PARITY-02",
-   "requirement": "CAUSA-COMPAT-07",
+   "requirement": "ACC-07; CAUSA-COMPAT-07",
    "check": "tools/causa-contract/parity_gate.py selftest",
    "expected": {
     "mutationsDetected": "all"
@@ -1164,10 +1164,18 @@
   },
   {
    "id": "AC-CATALOG-01",
-   "requirement": "Phase 3",
+   "requirement": "ACC-08",
    "check": "tools/causa-contract/generate_catalogs.py check --dataset: catalogs fresh, every schema property documented, every dataset JSON path documented",
    "expected": {
     "undocumented": 0
+   }
+  },
+  {
+   "id": "AC-URL-01",
+   "requirement": "ACC-09; SEMANTICS \u00a710.4.1-\u00a710.4.2, CAUSA-URL-W",
+   "check": "consumer url-verdict over catalog/artifact-url-vectors.jsonl; every verdict equals `expected`",
+   "expected": {
+    "agree": "all"
    }
   }
  ]

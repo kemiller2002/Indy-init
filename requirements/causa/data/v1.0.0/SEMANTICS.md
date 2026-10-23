@@ -24,10 +24,17 @@ RFC 2119.
    `HISTORY.SEQUENCE`, `HISTORY.INADMISSIBLE_EVENT`, `HISTORY.UNGATED_CONFIRMATION`, `HISTORY.UNGATED_RESOLUTION`).
    An implementation SHOULD also reproduce the complete ordered error list (§15.7), including the inner *rule codes*
    (`CAUSE.NO_ROOT`, `RESOLVE.NO_CORRECTION`, …) carried by each error. Messages are informative and need not match.
-3. Where this document and the oracle disagree on a history, the disagreement is a defect in this document. It MUST be
-   reported and resolved by changing this document, never by silently following either side. The places where the
-   text depends on platform behaviour, or where the oracle's behaviour cannot be reproduced from text alone, are listed
-   in §17 (Engine-dependence register). Inside those places, the oracle wins until the register entry is resolved.
+3. **Authority (resolves review finding F-01).** For `semanticVersion` `"1.0.0"` this document is the **complete**
+   definition of admissibility, and it is how these requirements discharge CONTRACT §11.3 ("admissible iff the pinned
+   engine's `History.validate` returns no errors"): the text was written to be equivalent to that oracle, and the
+   equivalence is evidenced by the frozen fixtures (34 stage-15 negatives, 5 valid histories, 5 golden refusals), by
+   supplementary fixtures (`acceptance/supplementary/`) and by differential testing of a clean-room implementation
+   against the oracle (3,120 generated histories, 0 disagreements; RESULT record of CAUSA-REQUIREMENTS-CONSOLIDATION-001).
+   An implementer MUST NOT need the oracle at runtime or at build time. Where this document and the oracle disagree on
+   a history, that is a **defect**: it MUST be reported and resolved by a reviewed change to this document, classified
+   under compatibility/RULES.md (a change in which histories are admissible is class D). Until resolved, conforming
+   implementations follow this document, and the defect is recorded in §17. The platform-dependent places are listed in
+   §17; each entry states how it is closed for conforming data.
 4. **Scope.** This document covers stage 15 only. Stages 1–14 (framing, JSON, canonical form, versions, schema, manifest,
    hashes, ids, sequence, event-id derivation, correlation reuse) and stages 16–17 (snapshot) are defined by CONTRACT
    §11.1. The rules here are written so that they also give a defined answer for histories that did not pass those
@@ -111,7 +118,8 @@ RFC 2119.
 3. **Trim and invariant lowercase** (used only by §10.27):
    - `trim(s)` removes every leading and trailing code unit of the whitespace set in §3.2 (engine `String.Trim()`).
    - `lowerInvariant(s)` maps each Unicode code point (surrogate pairs decoded) to its **simple** (one-to-one)
-     lowercase mapping, except that U+0130 maps to itself; code points without a lowercase mapping are unchanged.
+     lowercase mapping as defined by **Unicode 15.1.0** (`UnicodeData.txt` field 13, Simple_Lowercase_Mapping), except
+     that U+0130 maps to itself; code points without a simple lowercase mapping are unchanged.
      Full/special case mappings (e.g. U+0130 → "i̇", final sigma) MUST NOT be used. (Engine `ToLowerInvariant`; see
      §17 E-5 for the platform dependence.)
    - `norm(s) = lowerInvariant(trim(s))`.
@@ -946,7 +954,7 @@ specifiable**. Where the verdict is not "fully specified", the oracle wins (§0.
 | E-2 | `RecordVerification` reads the criterion's corrective action with an unchecked lookup. If the criterion names a corrective action that does not exist, the oracle throws `KeyNotFoundException` and `History.validate` returns no list (callers such as the causa-data `Store` do not catch it). | `Decide.fs:522` | **NOT specifiable** as "same first code": the oracle produces none. Reachable only when an earlier group was already inadmissible (a dangling `CriterionRecorded`), so the verdict (inadmissible) is unaffected. Implementations MUST report the history inadmissible and SHOULD report the first error accumulated before that group; this is a deliberate, documented divergence from an oracle crash. |
 | E-3 | Blank-text test (`String.IsNullOrWhiteSpace`) and `Trim`. | `Primitives.fs:85`, `Decide.fs:401` | **Fully specified here** (§3.2, §3.3): fixed 25-code-unit whitespace set, per UTF-16 code unit (CONTRACT §2.6). It follows .NET `char.IsWhiteSpace`, which is stable across .NET versions. |
 | E-4 | String equality is ordinal on UTF-16 code units; no normalisation. | F# `=` on `string` | **Fully specified here** (§3.1). |
-| E-5 | Repetition refusal compares `Trim().ToLowerInvariant()` of statements. | `Decide.fs:401` | **Specified but relies on platform behaviour: .NET invariant lower-casing.** On Linux with ICU (the default), non-ASCII code points are mapped with the host ICU's `u_tolower` (simple mapping) except U+0130, so the Unicode version — and the result for recently added cased letters — depends on the installed `libicu`; in globalization-invariant mode .NET uses its own simple-case tables. ASCII-only and common Latin/Greek/Cyrillic text is fully specified by §3.3. |
+| E-5 | Repetition refusal compares `Trim().ToLowerInvariant()` of statements. | `Decide.fs:401` | **Resolved (2026-10-23): pinned to Unicode 15.1.0 simple lowercase (§3.3).** Evidence: on the reference platform (.NET 10.0.13 runtime, ICU 74.2 = Unicode 15.1) `ToLowerInvariant` was compared, one code point at a time, with the Unicode 15.1.0 simple mapping (except U+0130) for all 1,112,064 scalar values: 0 differences. A host whose ICU implements a different Unicode version could differ from the oracle for newly added cased letters; such a difference is an oracle-platform defect, not a reason to deviate from §3.3. |
 | E-6 | Equality of `occurredAt` / `at` is by instant (`DateTimeOffset` equality ignores the offset). | `Decide.fs:785`, `:800` | **Fully specified here** (§3.1). On v1 wire data (UTC, millisecond, `Z`) instant equality and text equality coincide. |
 | E-7 | Iteration order of entity collections (F# `Map` keyed by `Guid` with `Guid.CompareTo`). | `Primitives.fs:19-23` | **Fully specified here** (§3.4): .NET 10 `Guid.CompareTo` compares the first 4-byte, then the two 2-byte fields as unsigned values and then the remaining 8 bytes in order, which equals ordinal order of the canonical text. Affects only inner error order/multiplicity, never a verdict or first domain code. |
 | E-8 | List equality (`decided <> bodies`) is F# structural equality: ordered, element-wise, and includes the hidden `HypothesisChange.At`/`.Sequence`. | `Decide.fs:800` | **Fully specified here** (§15.6). |

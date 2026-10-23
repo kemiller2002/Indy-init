@@ -173,6 +173,42 @@ def append_rows(consumer: str, dataset: Path, base_dir: Path, base_version: int)
 # ------------------------------------------------------------------------------------------------- runner
 
 
+def step0(dataset: Path) -> tuple[Outcome, ...]:
+    """Inputs are trustworthy: frozen files in the dataset checkout equal the release lock, and the matrix equals the lock."""
+    lock = json.loads((REQ_ROOT / "compatibility" / "lock.json").read_text("utf-8"))
+    drift = [f["path"] for f in lock["frozenFiles"] if sha256((dataset / f["path"]).read_bytes()) != f["sha256"]] if all((dataset / f["path"]).is_file() for f in lock["frozenFiles"]) else ["(missing frozen file)"]
+    matrix = json.loads((REQ_ROOT / "acceptance" / "TEST-MATRIX.json").read_text("utf-8"))
+    states = {e["investigationId"]: e["stateSha256"] for e in lock["expectedStates"]}
+    negatives = {n["name"]: (n["expectedErrorCode"], n.get("expectedDomainCode")) for n in lock["negatives"]}
+    rows = {r["id"]: r for r in matrix["rows"]}
+    mismatch = [
+        rid for rid, r in rows.items()
+        if (rid.startswith("AC-INV-") and r["expected"]["stateSha256"] != states.get(Path(r["input"]).name))
+        or (rid.startswith("AC-NEG-") and (r["expected"]["primaryCode"], r["expected"]["domainCode"]) != negatives.get(rid[len("AC-NEG-"):]))
+    ]
+    missing = sorted(set(negatives) - {rid[len("AC-NEG-"):] for rid in rows if rid.startswith("AC-NEG-")})
+    return (
+        Outcome("AC-STEP0-DATASET", "FAIL" if drift else "PASS", f"frozen files differing from lock.json: {drift}" if drift else f"{len(lock['frozenFiles'])} frozen files equal lock.json"),
+        Outcome("AC-STEP0-MATRIX", "FAIL" if mismatch or missing else "PASS", f"matrix rows disagreeing with lock: {mismatch}; negatives missing from matrix: {missing}" if mismatch or missing else "matrix agrees with lock.expectedStates and lock.negatives"),
+    )
+
+
+def url_outcome(consumer: str) -> Outcome:
+    vectors = REQ_ROOT / "catalog" / "artifact-url-vectors.jsonl"
+    rows = [json.loads(line) for line in vectors.read_text("utf-8").splitlines()]
+    got = call(consumer, "url-verdict", "--vectors", str(vectors))
+    verdicts = got.get("verdicts")
+    if not isinstance(verdicts, list) or len(verdicts) != len(rows):
+        return Outcome("AC-URL-01", "FAIL", got.get("protocolError", f"expected {len(rows)} verdicts"))
+    bad = [r["url"] for r, v in zip(rows, verdicts) if v != r["expected"]]
+    return Outcome("AC-URL-01", "FAIL" if bad else "PASS", f"{len(rows) - len(bad)}/{len(rows)} vectors agree" + (f"; first disagreements: {bad[:3]!r}" if bad else ""))
+
+
+def supplementary_rows() -> tuple[Mapping[str, Any], ...]:
+    path = REQ_ROOT / "acceptance" / "supplementary" / "MATRIX.json"
+    return tuple(json.loads(path.read_text("utf-8"))["rows"]) if path.exists() else ()
+
+
 def run(consumer: str, dataset: Path, only: str) -> tuple[Outcome, ...]:
     matrix = json.loads((REQ_ROOT / "acceptance" / "TEST-MATRIX.json").read_text("utf-8"))
     manifest = json.loads((dataset / "fixtures" / "v1.0.0" / "manifest.json").read_text("utf-8"))
@@ -205,9 +241,19 @@ def run(consumer: str, dataset: Path, only: str) -> tuple[Outcome, ...]:
             return tool(rid, "parity_gate.py", "selftest", "--causa-data", str(dataset))
         if rid == "AC-CATALOG-01":
             return tool(rid, "generate_catalogs.py", "check", str(REQ_ROOT), "--dataset", str(dataset))
+        if rid == "AC-URL-01":
+            return url_outcome(consumer)
+        if rid.startswith("AC-SUP-"):
+            target = str(REQ_ROOT / row["input"])
+            answer = call(consumer, "negative", "--dataset", str(dataset), "--fixture", target) if row["kind"] == "negative" else call(consumer, "verify", "--dataset", str(dataset), "--investigation", target)
+            return compare(rid, exp, answer)
         return Outcome(rid, "FAIL", "unknown matrix row")
 
-    return tuple(evaluate(r) for r in matrix["rows"] if r["id"].startswith(only))
+    gate = step0(dataset)
+    if any(o.status != "PASS" for o in gate):
+        return gate
+    rows = tuple(matrix["rows"]) + supplementary_rows()
+    return gate + tuple(evaluate(r) for r in rows if r["id"].startswith(only))
 
 
 def main(argv: list[str]) -> int:

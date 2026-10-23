@@ -10,20 +10,20 @@ valid (CONTRACT §11.3).
 
 | id | invariant | defined by | enforced by | code | fixture evidence |
 |---|---|---|---|---|---|
-| CAUSA-INV-01 | Events are authoritative | §1.2, §8.1 | snapshot and manifest rebuilt from events and compared | `CAUSA.SNAPSHOT_MISMATCH`, `CAUSA.MANIFEST_MISMATCH` | `forged-snapshot`, `manifest-*` (5) |
-| CAUSA-INV-02 | Snapshots are derived | §1.2, §8.1–§8.4 | byte-identical projection check | `CAUSA.SNAPSHOT_HASH_MISMATCH`, `CAUSA.SNAPSHOT_MISMATCH` | `broken-snapshot-hash`, `forged-snapshot`, `snapshot-non-canonical` |
-| CAUSA-INV-03 | Event histories are immutable | §5.5, §9.3 | successor prefix check | `CAUSA.HISTORY_REWRITTEN` | `rewritten-history`, `altered-event-without-rehash` |
+| CAUSA-INV-01 | Events are authoritative | §1.2, §8.1 | snapshot and manifest rebuilt from events and compared | `CAUSA.SNAPSHOT_MISMATCH`, `CAUSA.MANIFEST_MISMATCH` | `forged-snapshot` (SNAPSHOT_MISMATCH); `manifest-created-at-mismatch`, `manifest-event-count-mismatch`, `manifest-updated-at-mismatch`, `manifest-version-mismatch`, `manifest-wrong-investigation-id` (MANIFEST_MISMATCH) |
+| CAUSA-INV-02 | Snapshots are derived | §1.2, §8.1–§8.4 | byte-identical projection check | `CAUSA.SNAPSHOT_HASH_MISMATCH`, `CAUSA.SNAPSHOT_MISMATCH`, `CAUSA.NON_CANONICAL` | `broken-snapshot-hash` (SNAPSHOT_HASH_MISMATCH), `forged-snapshot` (SNAPSHOT_MISMATCH), `snapshot-non-canonical` (NON_CANONICAL) |
+| CAUSA-INV-03 | Event histories are immutable | §5.5, §9.3 | successor prefix check; events digest | `CAUSA.HISTORY_REWRITTEN`, `CAUSA.EVENTS_HASH_MISMATCH` | `rewritten-history` (HISTORY_REWRITTEN), `altered-event-without-rehash` (EVENTS_HASH_MISMATCH) |
 | CAUSA-INV-04 | Aggregate versions are contiguous | §5, §5.1 | stage 12 | `CAUSA.SEQUENCE_INVALID` | `sequence-gap`, `duplicate-aggregate-version` |
 | CAUSA-INV-05 | Replay rejects invalid histories | §11.1–§11.3 | 17 ordered reader stages, fail closed | stage codes | all 90 negative fixtures |
 | CAUSA-INV-06 | Event ids are never reused | §5.2 | derivation and uniqueness | `CAUSA.EVENT_ID_DUPLICATE`, `CAUSA.EVENT_ID_MISMATCH` | `duplicate-event-id`, `forged-event-id` |
 | CAUSA-INV-07 | Cross-entity references are valid | §8.3, SEMANTICS.md | re-decision (stage 15) | `CAUSA.HISTORY_INADMISSIBLE` / `HISTORY.INADMISSIBLE_EVENT` | `engine-dangling-reference`, `engine-duplicate-entity-id` |
 | CAUSA-INV-08 | Domain transitions are approved by the F# policy engine | §1.3, §11.3, SEMANTICS.md | re-decision of every command group | `CAUSA.HISTORY_INADMISSIBLE` + domain code | 34 stage-15 fixtures |
-| CAUSA-INV-09 | GitHub metadata never enters domain structures | §1.4, §2.4, §9.1, §9.4 | closed schemas | `CAUSA.SCHEMA_VIOLATION` | `unexpected-payload-field` |
+| CAUSA-INV-09 | GitHub metadata never enters domain structures | §1.4, §2.4, §9.1, §9.4 | closed schemas; provider rules | `CAUSA.SCHEMA_VIOLATION` | `unexpected-payload-field` (any added key, provider metadata included, is refused by the same closed-object rule); provider rows AC-PROV-* in [PROVIDER-GITHUB.md](PROVIDER-GITHUB.md) |
 | CAUSA-INV-10 | Canonical serialization and hashing are deterministic | §2.1–§2.3, §2.11, §8.4, §10 | byte form and digest checks | `CAUSA.NON_CANONICAL`, `CAUSA.ENCODING`, hash codes | `non-canonical-manifest`, `event-line-non-canonical`, `negative-zero`, `manifest-interior-newline`, `events-crlf` |
 | CAUSA-INV-11 | Unsupported event types fail closed | §7.1, §13.5 | stage 6 | `CAUSA.UNKNOWN_EVENT_TYPE` | `unknown-event-type` |
 | CAUSA-INV-12 | Schema changes require explicit versioning | §13, §14 | version fields and parity gate | `CAUSA.UNSUPPORTED_VERSION` | `unsupported-format-version`, parity self-test |
-| CAUSA-INV-13 | Frozen fixtures are never rewritten | §3.4, §14 | release tag anchor and parity gate | `CAUSA.FIXTURE_DRIFT`, gate failure | parity self-test mutations |
-| CAUSA-INV-14 | Storage writes are atomic and concurrency-correct | §9.2, §9.4 | version check, atomic commit, non-forced ref update | `CAUSA.VERSION_STALE`, provider `conflict` | `stale-expected-version` |
+| CAUSA-INV-13 | Frozen fixtures are never rewritten | §3.4, §14 | release tag anchor, parity gate, acceptance step 0, writer path rule | `CAUSA.FIXTURE_DRIFT`, `CAUSA.PATH_FROZEN`, gate failure | parity self-test mutations; acceptance step 0 (frozen-file digests); AC-PROV rows (working copy leaves frozen tree byte-identical) |
+| CAUSA-INV-14 | Storage writes are atomic and concurrency-correct | §9.2, §9.4 | version check, atomic commit, non-forced ref update | `CAUSA.VERSION_STALE`, sync state `conflicted` | `stale-expected-version`; AC-APPEND-02; AC-PROV rows in [PROVIDER-GITHUB.md](PROVIDER-GITHUB.md); local atomicity CAUSA-CLAR-04 |
 | CAUSA-INV-15 | A new build consumes the frozen dataset without migration | §13.2, §13.3 | acceptance suite against the pinned dataset | golden digest equality | 5 investigations, 5 golden states |
 
 ---
@@ -112,11 +112,13 @@ valid (CONTRACT §11.3).
    freshness, prediction timing, agent authority and repetition refusal. A group that the engine would refuse or decide
    differently is inadmissible (`CAUSA.HISTORY_INADMISSIBLE` with domain code `HISTORY.NO_START`, `HISTORY.SEQUENCE`,
    `HISTORY.INADMISSIBLE_EVENT`, `HISTORY.UNGATED_CONFIRMATION` or `HISTORY.UNGATED_RESOLUTION`).
-2. The decision rules are stated normatively in [SEMANTICS.md](SEMANTICS.md). The F# engine at
+2. "F# policy engine" here means any implementation of [SEMANTICS.md](SEMANTICS.md) that conforms by SEMANTICS §0.2
+   (CAUSA-CLAR-14). The decision rules are stated normatively in [SEMANTICS.md](SEMANTICS.md). The F# engine at
    `kemiller2002/indy-init-rehearsal-001@55f49f61c939a3a780cee592f36f732a1328f981` (pinned in
    `compatibility/engine.lock.json` and by assembly digests in `compatibility/lock.json`) is the **reference oracle**
    used to generate and verify the frozen dataset. An implementation of SEMANTICS.md conforms when it reproduces the
-   oracle's verdict and first domain code on every frozen fixture. SEMANTICS.md §"Engine-dependence register" records
+   oracle's verdict and first domain code on every history (SEMANTICS §0.2); passing every frozen and supplementary
+   fixture is necessary evidence, not sufficient. SEMANTICS.md §"Engine-dependence register" records
    where the text depends on platform behaviour.
 3. The application MUST route every domain mutation through the policy engine's decide step. UI code, storage adapters
    and AI agents MUST NOT construct domain events directly.
@@ -194,7 +196,7 @@ valid (CONTRACT §11.3).
 4. **Atomic publication.** The events append, manifest and snapshot of one command become visible together. On GitHub
    that means one commit whose tree contains all three files, published by a non-forced ref update (`PATCH /git/refs`,
    `force: false`). Sequential per-file Contents API writes do not conform (§9.4.1).
-5. **Conflicts.** A non-fast-forward ref update is a conflict. The writer reloads and re-verifies. If the
+5. **Conflicts** (full procedure and sync-state machine: [PROVIDER-GITHUB.md](PROVIDER-GITHUB.md)). A non-fast-forward ref update is a conflict. The writer reloads and re-verifies. If the
    investigation's files did not change, it rebases onto the new head. Otherwise it reports `conflict`, keeps its
    pending commands, and re-decides them through the engine. It MUST NOT text-merge, overwrite or force-push.
 6. **Truthful status.** Success is reported only after the provider confirms the ref update **and** a re-read at the new

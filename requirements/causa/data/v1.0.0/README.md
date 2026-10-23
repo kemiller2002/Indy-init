@@ -25,7 +25,11 @@ conformance resource. It conforms to this contract and holds no normative requir
 | [FIELD-CATALOG.md](FIELD-CATALOG.md) | **normative, generated** | generated from `schemas/` + `catalog/field-semantics.json` + FIELD-MAPPING.md | every persisted field in every document: type, F# type, required, nullable, values, format, bounds, meaning, rule, default, version |
 | [EVENT-CATALOG.md](EVENT-CATALOG.md) | **normative, generated** | generated from `schemas/` + `catalog/event-semantics.json` + CONTRACT.md §8.3 | every event discriminator with payload, references, projection effect and invariants |
 | [catalog/](catalog/) | normative source | written here | semantic text the catalog generator joins to the schemas |
-| [acceptance/ACCEPTANCE.md](acceptance/ACCEPTANCE.md), [acceptance/TEST-MATRIX.json](acceptance/TEST-MATRIX.json) | **normative** | written here | release gate (102 rows) and consumer protocol |
+| [acceptance/ACCEPTANCE.md](acceptance/ACCEPTANCE.md), [acceptance/TEST-MATRIX.json](acceptance/TEST-MATRIX.json) | **normative** | written here | release gate (step 0 + TEST-MATRIX + supplementary rows) and consumer protocol |
+| [acceptance/supplementary/](acceptance/supplementary/README.md) | **normative test data** | generated here against the reference oracle, cross-checked with the clean-room consumer | additional negative and valid histories covering decision rules the frozen negatives do not isolate |
+| [CLARIFICATIONS.md](CLARIFICATIONS.md) | **normative** | written here | CAUSA-CLAR-01…14: command-boundary de-duplication, protocol meanings, write-path codes, local atomicity, dataset codes, byte-exact storage |
+| [PROVIDER-GITHUB.md](PROVIDER-GITHUB.md) | **normative** | written here | GitHub provider: configuration, atomic append request sequence, status mapping, sync-state machine, conflict re-decision, provider gate AC-PROV-* |
+| [catalog/artifact-url-vectors.jsonl](catalog/artifact-url-vectors.jsonl) | **normative test data** | generated with the .NET 10 engine predicate | expected verdicts for SEMANTICS §10.4.1–§10.4.2 (AC-URL-01) |
 
 "Frozen" files MUST NOT be edited. Their bytes are verified against the tag by `tools/causa-contract/parity_gate.py`.
 CONTRACT.md was written for the `causa-data` layout. Read its paths with this mapping:
@@ -44,9 +48,11 @@ CONTRACT.md was written for the `causa-data` layout. Read its paths with this ma
 
 1. CONTRACT.md and the schemas (frozen) define structure, encoding, layout and error stages. A disagreement between them
    is a contract defect, and readers treat the input as invalid (CONTRACT preamble).
-2. SEMANTICS.md defines domain admissibility (stage 15). It restates the pinned engine's rules. Where it is silent or
-   ambiguous, the pinned engine at `indy-init-rehearsal-001@55f49f6` is the tie-breaking oracle, and the gap is a
-   defect to be recorded in SEMANTICS.md's engine-dependence register.
+2. SEMANTICS.md defines domain admissibility (stage 15) completely for `semanticVersion` 1.0.0 and is how these
+   requirements satisfy CONTRACT §11.3. The pinned engine at `indy-init-rehearsal-001@55f49f6` is the reference
+   oracle from which SEMANTICS.md was written and against which it is tested. It is evidence for defect reports, not a
+   runtime or build-time dependency. A disagreement is a defect resolved by a reviewed change to SEMANTICS.md
+   (SEMANTICS §0.3), never by consulting engine code.
 3. INVARIANTS.md, compatibility/RULES.md and ACCEPTANCE.md consolidate and operationalize 1–2. They add no wire
    structure.
 4. The catalogs are generated views of 1. If a catalog disagrees with a schema, regenerate it. A catalog never

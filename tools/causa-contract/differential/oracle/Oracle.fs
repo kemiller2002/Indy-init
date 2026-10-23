@@ -14,10 +14,15 @@ let private judge (path: string) : string =
     match decoded with
     | Error e -> sprintf "{\"file\":\"%s\",\"decode\":\"%s\",\"codes\":[]}" (esc path) (esc e)
     | Ok events ->
-        let codes =
-            try History.validate events |> List.map (fun e -> "\"" + esc e.Code + "\"") |> String.concat ","
-            with ex -> "\"EXCEPTION:" + esc (ex.GetType().Name) + "\""
-        sprintf "{\"file\":\"%s\",\"decode\":null,\"codes\":[%s]}" (esc path) codes
+        let errors =
+            try Ok (History.validate events)
+            with ex -> Error ex
+        let quote (s: string) = "\"" + esc s + "\""
+        let codes, messages =
+            match errors with
+            | Ok es -> es |> List.map (fun e -> quote e.Code) |> String.concat ",", es |> List.map (fun e -> quote e.Message) |> String.concat ","
+            | Error ex -> quote ("EXCEPTION:" + ex.GetType().Name), ""
+        sprintf "{\"file\":\"%s\",\"decode\":null,\"codes\":[%s],\"messages\":[%s]}" (esc path) codes messages
 
 [<EntryPoint>]
 let main argv =

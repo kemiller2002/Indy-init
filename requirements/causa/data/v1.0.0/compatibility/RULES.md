@@ -40,6 +40,30 @@ Notes:
 3. Editorial changes to CONTRACT.md or any schema file under `contract/v1.0.0` are forbidden. They change frozen bytes.
    Clarifications go in these requirements as explanatory text, or in a new contract version.
 
+### 2.1 Version-field effect of each class (CAUSA-COMPAT-01a, review F-14)
+
+| class | `formatVersion` | `schemaVersion` | `semanticVersion` | `snapshotVersion` / `projectionVersion` | schema identity | contract tree / tag |
+|---|---|---|---|---|---|---|
+| A implementation | unchanged | unchanged | unchanged | unchanged | unchanged | none |
+| B additive extension | `1.x.0` | `1.x.0` (always equal to `formatVersion`) | unchanged unless the extension changes meaning (then also D) | unchanged unless the projection changes (then C) | new | `contract/1.x.0/`, tag `causa-storage-v1.x.0` |
+| C versioned migration | `2.0.0` | `2.0.0` | unchanged unless meaning changes (then also D) | incremented if the §8.3 rules change | new | `contract/2.0.0/` + migration |
+| D semantic change | unchanged if wire shapes are unchanged | unchanged | new value (minor for a strictly narrower admissible set, major otherwise) | unchanged unless the projection changes | unchanged if no schema byte changes | new SEMANTICS version under `requirements/causa/data/<version>/` |
+
+Further rules:
+1. A history never mixes versions. Every line, the manifest and the snapshot of one investigation carry the same
+   `formatVersion`/`schemaVersion`/`semanticVersion` (CONTRACT §13.2: writers never append newer events to an older
+   history).
+2. `schemaVersion` names the schema set. The schema identity (bundle digest) pins its bytes. Two releases with the same
+   `schemaVersion` MUST have the same schema identity.
+
+### 2.2 Negative-fixture coverage (summary of the external CONTRACT §14 coverage list, review F-20)
+
+CONTRACT §14 points to `ADVERSARIAL-REVIEW.md` in research-documents for the list of decision rules covered by the
+frozen negatives. That list is now reproduced as the coverage table in SEMANTICS.md §18.1, together with the
+supplementary fixtures in [../acceptance/supplementary/README.md](../acceptance/supplementary/README.md). Read
+together, the two tables are the authoritative coverage statement for v1.0.0. The CD-* decisions cited in CONTRACT §16
+are reproduced in §5 below.
+
 ## 3. Reader and writer rules (CAUSA-COMPAT-02)
 
 1. A v1.0.0 reader reads exactly v1.0.0. It rejects every other `formatVersion`/`schemaVersion`/`semanticVersion` string

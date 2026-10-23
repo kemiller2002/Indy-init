@@ -208,7 +208,7 @@ def event_catalog(contract: cm.Contract) -> str:
 Normative. The registry is closed: exactly these {len(names)} discriminators, in engine `EventBody` order. Any other
 `eventType` string makes the whole history invalid (`CAUSA.UNKNOWN_EVENT_TYPE`, stage 6); a non-string `eventType` is
 `CAUSA.SCHEMA_VIOLATION` (stage 7). Unknown events are never skipped, preserved-and-ignored, or mapped to a generic
-event (INVARIANTS.md I-11).
+event (INVARIANTS.md CAUSA-INV-11).
 
 ## Envelope (every line of `events.ndjson`)
 
