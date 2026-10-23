@@ -1,0 +1,1174 @@
+{
+ "contractVersion": "1.0.0",
+ "dataset": "causa-demo-v1",
+ "datasetIdentitySha256": "f650a2e509a420872b46177b21f57ef6ebd7625ae4c69dd92198d3ca472c2b86",
+ "rows": [
+  {
+   "id": "AC-SCHEMA-01",
+   "requirement": "CAUSA-INV-10, Phase 7.1",
+   "check": "parse every schema in schemas/bundle.json with a Draft 2020-12 validator; every $ref resolves; bundle digests equal file bytes",
+   "expected": {
+    "schemasParsed": 60,
+    "schemaIdentity": "0a68af8c93190d2e4d6c27beb2f8cb67c3aebdda586d01beb7122b71af179152"
+   }
+  },
+  {
+   "id": "AC-REG-01",
+   "requirement": "CAUSA-INV-11, Phase 7.2",
+   "check": "consumer recognizes exactly the registered discriminators in EVENT-CATALOG.md order",
+   "expected": {
+    "eventTypes": [
+     "InvestigationStarted",
+     "LifecycleChanged",
+     "ObservationRecorded",
+     "HypothesisRecorded",
+     "HypothesisTransitioned",
+     "EvidenceAdmitted",
+     "EvidenceSuperseded",
+     "EvidenceVerificationAssessed",
+     "EvidenceRelated",
+     "UnknownIdentified",
+     "UnknownTransitioned",
+     "AssumptionRecorded",
+     "AssumptionTransitioned",
+     "ContradictionRecorded",
+     "ContradictionTransitioned",
+     "PredictionRecorded",
+     "ActionRecorded",
+     "ActionTransitioned",
+     "FindingRecorded",
+     "NegativeKnowledgeEstablished",
+     "CausalAssertionRecorded",
+     "CausalAssertionConfirmed",
+     "CausalAssertionReopened",
+     "CorrectiveActionRecorded",
+     "CorrectiveActionTransitioned",
+     "CriterionRecorded",
+     "VerificationRecorded",
+     "ConclusionRecorded",
+     "ProposalRecorded",
+     "ProposalWasAccepted",
+     "ProposalWasRejected"
+    ]
+   }
+  },
+  {
+   "id": "AC-INV-payment-failure",
+   "requirement": "CAUSA-INV-01/02/05/08/15, Phase 7.3-7.7",
+   "check": "verify investigation directory through all 17 reader stages including stage 15 admissibility; replay; project; compare digests",
+   "input": "fixtures/v1.0.0/investigations/6fd2ddc9-bedd-5fff-9093-5506c4d68cb3",
+   "expected": {
+    "primaryCode": null,
+    "domainCode": null,
+    "admissibility": "evaluated",
+    "stateSha256": "9ce1ec0eb49c83395f3a4f1d07e93075df7ed0814fd902b94dd3054105946f3b",
+    "eventsSha256": "a34c241e4eb637c1554744b381fbada8c08f536d77b4bc4148efc4fbb0811960",
+    "manifestSha256": "039994871fc45c24fba7866b9bb2653f7ca7bed553a48b673ad5a4bafaaf8bf5",
+    "snapshotSha256": "3f1536cbf1b96d0645550a848508473046d9c70a1b6cdc702080cf01cb43d1cd",
+    "version": 26,
+    "lifecycle": "active"
+   }
+  },
+  {
+   "id": "AC-INV-authentication-outage",
+   "requirement": "CAUSA-INV-01/02/05/08/15, Phase 7.3-7.7",
+   "check": "verify investigation directory through all 17 reader stages including stage 15 admissibility; replay; project; compare digests",
+   "input": "fixtures/v1.0.0/investigations/a6747bd3-2794-5ac7-83b8-5ea2a0c50f5e",
+   "expected": {
+    "primaryCode": null,
+    "domainCode": null,
+    "admissibility": "evaluated",
+    "stateSha256": "cd3ea94c8be64f38a8f60d99c6df7b9092488c605401701d22988147f1360c95",
+    "eventsSha256": "8c47a0b8d248d773eb1d13ead13676c406dedb5f10e6d981a6584b9454060780",
+    "manifestSha256": "17637c9488c77c495d20abdd8acdf8075f95f3c587643baff2c70638fb981386",
+    "snapshotSha256": "04d13830b38fd181f7564ff01210958de8fd3dd4bfdc831c5d8b4e8c9175207c",
+    "version": 59,
+    "lifecycle": "resolved"
+   }
+  },
+  {
+   "id": "AC-INV-conflicting-metrics",
+   "requirement": "CAUSA-INV-01/02/05/08/15, Phase 7.3-7.7",
+   "check": "verify investigation directory through all 17 reader stages including stage 15 admissibility; replay; project; compare digests",
+   "input": "fixtures/v1.0.0/investigations/abd5f9b5-e335-5245-b951-802f01d5a2e5",
+   "expected": {
+    "primaryCode": null,
+    "domainCode": null,
+    "admissibility": "evaluated",
+    "stateSha256": "f189ac3bf47f37894e0a1bcfe3e17756f2f5badbed7b6a38d68f25029bd481c5",
+    "eventsSha256": "deffe3cec616f22a0660ba20f3cee74c3d58ab3f38a298b3d4ea0d9606fa975d",
+    "manifestSha256": "f8900f7194ef2451b9582b5b5183a1a359c39fbebc2f6ccb738f0ae3134c3a24",
+    "snapshotSha256": "5a69932b7739fb4a81467d5a1d51953c40aa2966188aa2fe6ea3458c23eb6fd3",
+    "version": 28,
+    "lifecycle": "active"
+   }
+  },
+  {
+   "id": "AC-INV-intermittent-outage",
+   "requirement": "CAUSA-INV-01/02/05/08/15, Phase 7.3-7.7",
+   "check": "verify investigation directory through all 17 reader stages including stage 15 admissibility; replay; project; compare digests",
+   "input": "fixtures/v1.0.0/investigations/c57e4407-dd43-5d63-8dbe-9d6ceac6c31a",
+   "expected": {
+    "primaryCode": null,
+    "domainCode": null,
+    "admissibility": "evaluated",
+    "stateSha256": "289c26e5525c1b3d48b22b64cc4cf46198ed46130eb29d7fd6d2c3d03e3d7e10",
+    "eventsSha256": "90ed91e1dc3d50c94416e56eaaf4c479de69f51e57a2a0abe22fc84b4767b091",
+    "manifestSha256": "934174bf7bbb6134db0ff95746d996aab4905ff00a2b457513c3257ecf1a1f01",
+    "snapshotSha256": "97293aee9604e0d86a0d9fbcb61c1a43f70ec3ae685fd50e98e464329ea5f6bb",
+    "version": 37,
+    "lifecycle": "awaitingEvidence"
+   }
+  },
+  {
+   "id": "AC-INV-api-latency",
+   "requirement": "CAUSA-INV-01/02/05/08/15, Phase 7.3-7.7",
+   "check": "verify investigation directory through all 17 reader stages including stage 15 admissibility; replay; project; compare digests",
+   "input": "fixtures/v1.0.0/investigations/d588748e-8df9-5f27-859e-5d36d9a2b53d",
+   "expected": {
+    "primaryCode": null,
+    "domainCode": null,
+    "admissibility": "evaluated",
+    "stateSha256": "2ba34140daabd6286229af8b55bb09a72de7f321c2a978926f433871504273e1",
+    "eventsSha256": "a85cec5ef9e8c03ec1dde9b32723472a8d4a4de941222347f8c39a9aab87a035",
+    "manifestSha256": "4a20c9812d9593a3ab21802ab3eb8ad83cc42651eb53f633ddc9580e283319f6",
+    "snapshotSha256": "8b8fbee67bf526d8b524960dc73ec8b4bc954b78d0eb6c2080c53d88ae477890",
+    "version": 34,
+    "lifecycle": "awaitingVerification"
+   }
+  },
+  {
+   "id": "AC-NEG-agent-authored-hypothesis",
+   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "check": "reject negative fixture (kind investigation)",
+   "input": "fixtures/v1.0.0/negative/agent-authored-hypothesis.json",
+   "expected": {
+    "primaryCode": "CAUSA.SCHEMA_VIOLATION",
+    "domainCode": null,
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-NEG-altered-event-without-rehash",
+   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "check": "reject negative fixture (kind investigation)",
+   "input": "fixtures/v1.0.0/negative/altered-event-without-rehash.json",
+   "expected": {
+    "primaryCode": "CAUSA.EVENTS_HASH_MISMATCH",
+    "domainCode": null,
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-NEG-artifact-not-http",
+   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "check": "reject negative fixture (kind investigation)",
+   "input": "fixtures/v1.0.0/negative/artifact-not-http.json",
+   "expected": {
+    "primaryCode": "CAUSA.SCHEMA_VIOLATION",
+    "domainCode": null,
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-NEG-blank-text",
+   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "check": "reject negative fixture (kind investigation)",
+   "input": "fixtures/v1.0.0/negative/blank-text.json",
+   "expected": {
+    "primaryCode": "CAUSA.SCHEMA_VIOLATION",
+    "domainCode": null,
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-NEG-bom-in-events",
+   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "check": "reject negative fixture (kind investigation)",
+   "input": "fixtures/v1.0.0/negative/bom-in-events.json",
+   "expected": {
+    "primaryCode": "CAUSA.ENCODING",
+    "domainCode": null,
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-NEG-broken-snapshot-hash",
+   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "check": "reject negative fixture (kind investigation)",
+   "input": "fixtures/v1.0.0/negative/broken-snapshot-hash.json",
+   "expected": {
+    "primaryCode": "CAUSA.SNAPSHOT_HASH_MISMATCH",
+    "domainCode": null,
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-NEG-calendar-invalid-manifest-created-at",
+   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "check": "reject negative fixture (kind investigation)",
+   "input": "fixtures/v1.0.0/negative/calendar-invalid-manifest-created-at.json",
+   "expected": {
+    "primaryCode": "CAUSA.SCHEMA_VIOLATION",
+    "domainCode": null,
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-NEG-calendar-invalid-occurred-at",
+   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "check": "reject negative fixture (kind investigation)",
+   "input": "fixtures/v1.0.0/negative/calendar-invalid-occurred-at.json",
+   "expected": {
+    "primaryCode": "CAUSA.SCHEMA_VIOLATION",
+    "domainCode": null,
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-NEG-correlation-reused",
+   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "check": "reject negative fixture (kind investigation)",
+   "input": "fixtures/v1.0.0/negative/correlation-reused.json",
+   "expected": {
+    "primaryCode": "CAUSA.CORRELATION_REUSED",
+    "domainCode": null,
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-NEG-duplicate-aggregate-version",
+   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "check": "reject negative fixture (kind investigation)",
+   "input": "fixtures/v1.0.0/negative/duplicate-aggregate-version.json",
+   "expected": {
+    "primaryCode": "CAUSA.SEQUENCE_INVALID",
+    "domainCode": null,
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-NEG-duplicate-event-id",
+   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "check": "reject negative fixture (kind investigation)",
+   "input": "fixtures/v1.0.0/negative/duplicate-event-id.json",
+   "expected": {
+    "primaryCode": "CAUSA.EVENT_ID_DUPLICATE",
+    "domainCode": null,
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-NEG-duplicate-json-key",
+   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "check": "reject negative fixture (kind investigation)",
+   "input": "fixtures/v1.0.0/negative/duplicate-json-key.json",
+   "expected": {
+    "primaryCode": "CAUSA.JSON_MALFORMED",
+    "domainCode": null,
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-NEG-engine-agent-repeats-falsified",
+   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "check": "reject negative fixture (kind investigation)",
+   "input": "fixtures/v1.0.0/negative/engine-agent-repeats-falsified.json",
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.INADMISSIBLE_EVENT",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-NEG-engine-awaiting-verification-without-work",
+   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "check": "reject negative fixture (kind investigation)",
+   "input": "fixtures/v1.0.0/negative/engine-awaiting-verification-without-work.json",
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.INADMISSIBLE_EVENT",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-NEG-engine-cause-already-confirmed",
+   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "check": "reject negative fixture (kind investigation)",
+   "input": "fixtures/v1.0.0/negative/engine-cause-already-confirmed.json",
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.UNGATED_CONFIRMATION",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-NEG-engine-cause-alternative-not-addressed",
+   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "check": "reject negative fixture (kind investigation)",
+   "input": "fixtures/v1.0.0/negative/engine-cause-alternative-not-addressed.json",
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.UNGATED_CONFIRMATION",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-NEG-engine-cause-no-root",
+   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "check": "reject negative fixture (kind investigation)",
+   "input": "fixtures/v1.0.0/negative/engine-cause-no-root.json",
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.UNGATED_CONFIRMATION",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-NEG-engine-cause-open-contradiction",
+   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "check": "reject negative fixture (kind investigation)",
+   "input": "fixtures/v1.0.0/negative/engine-cause-open-contradiction.json",
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.UNGATED_CONFIRMATION",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-NEG-engine-cause-open-unknown",
+   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "check": "reject negative fixture (kind investigation)",
+   "input": "fixtures/v1.0.0/negative/engine-cause-open-unknown.json",
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.UNGATED_CONFIRMATION",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-NEG-engine-cause-unverified-assumption",
+   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "check": "reject negative fixture (kind investigation)",
+   "input": "fixtures/v1.0.0/negative/engine-cause-unverified-assumption.json",
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.UNGATED_CONFIRMATION",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-NEG-engine-cause-without-mechanism",
+   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "check": "reject negative fixture (kind investigation)",
+   "input": "fixtures/v1.0.0/negative/engine-cause-without-mechanism.json",
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.UNGATED_CONFIRMATION",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-NEG-engine-conclusion-without-residual",
+   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "check": "reject negative fixture (kind investigation)",
+   "input": "fixtures/v1.0.0/negative/engine-conclusion-without-residual.json",
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.INADMISSIBLE_EVENT",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-NEG-engine-confirmed-conclusion-unconfirmed-cause",
+   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "check": "reject negative fixture (kind investigation)",
+   "input": "fixtures/v1.0.0/negative/engine-confirmed-conclusion-unconfirmed-cause.json",
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.INADMISSIBLE_EVENT",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-NEG-engine-content-after-resolution",
+   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "check": "reject negative fixture (kind investigation)",
+   "input": "fixtures/v1.0.0/negative/engine-content-after-resolution.json",
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.INADMISSIBLE_EVENT",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-NEG-engine-dangling-reference",
+   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "check": "reject negative fixture (kind investigation)",
+   "input": "fixtures/v1.0.0/negative/engine-dangling-reference.json",
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.INADMISSIBLE_EVENT",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-NEG-engine-duplicate-entity-id",
+   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "check": "reject negative fixture (kind investigation)",
+   "input": "fixtures/v1.0.0/negative/engine-duplicate-entity-id.json",
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.INADMISSIBLE_EVENT",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-NEG-engine-evidence-already-superseded",
+   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "check": "reject negative fixture (kind investigation)",
+   "input": "fixtures/v1.0.0/negative/engine-evidence-already-superseded.json",
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.INADMISSIBLE_EVENT",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-NEG-engine-evidence-supersedes-itself",
+   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "check": "reject negative fixture (kind investigation)",
+   "input": "fixtures/v1.0.0/negative/engine-evidence-supersedes-itself.json",
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.INADMISSIBLE_EVENT",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-NEG-engine-finding-for-rejected-action",
+   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "check": "reject negative fixture (kind investigation)",
+   "input": "fixtures/v1.0.0/negative/engine-finding-for-rejected-action.json",
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.INADMISSIBLE_EVENT",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-NEG-engine-group-time-disagreement",
+   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "check": "reject negative fixture (kind investigation)",
+   "input": "fixtures/v1.0.0/negative/engine-group-time-disagreement.json",
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.INADMISSIBLE_EVENT",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-NEG-engine-malformed-artifact-url",
+   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "check": "reject negative fixture (kind investigation)",
+   "input": "fixtures/v1.0.0/negative/engine-malformed-artifact-url.json",
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.INADMISSIBLE_EVENT",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-NEG-engine-prediction-timing-forged",
+   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "check": "reject negative fixture (kind investigation)",
+   "input": "fixtures/v1.0.0/negative/engine-prediction-timing-forged.json",
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.INADMISSIBLE_EVENT",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-NEG-engine-proposal-not-active",
+   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "check": "reject negative fixture (kind investigation)",
+   "input": "fixtures/v1.0.0/negative/engine-proposal-not-active.json",
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.INADMISSIBLE_EVENT",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-NEG-engine-reopen-without-new-evidence",
+   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "check": "reject negative fixture (kind investigation)",
+   "input": "fixtures/v1.0.0/negative/engine-reopen-without-new-evidence.json",
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.INADMISSIBLE_EVENT",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-NEG-engine-resolve-cause-no-longer-holds",
+   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "check": "reject negative fixture (kind investigation)",
+   "input": "fixtures/v1.0.0/negative/engine-resolve-cause-no-longer-holds.json",
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.UNGATED_RESOLUTION",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-NEG-engine-resolve-correction-not-verified",
+   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "check": "reject negative fixture (kind investigation)",
+   "input": "fixtures/v1.0.0/negative/engine-resolve-correction-not-verified.json",
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.UNGATED_RESOLUTION",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-NEG-engine-resolve-criterion-unsatisfied",
+   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "check": "reject negative fixture (kind investigation)",
+   "input": "fixtures/v1.0.0/negative/engine-resolve-criterion-unsatisfied.json",
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.UNGATED_RESOLUTION",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-NEG-engine-resolve-no-conclusion",
+   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "check": "reject negative fixture (kind investigation)",
+   "input": "fixtures/v1.0.0/negative/engine-resolve-no-conclusion.json",
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.UNGATED_RESOLUTION",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-NEG-engine-resolve-no-correction",
+   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "check": "reject negative fixture (kind investigation)",
+   "input": "fixtures/v1.0.0/negative/engine-resolve-no-correction.json",
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.UNGATED_RESOLUTION",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-NEG-engine-resolve-residual-not-stated",
+   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "check": "reject negative fixture (kind investigation)",
+   "input": "fixtures/v1.0.0/negative/engine-resolve-residual-not-stated.json",
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.UNGATED_RESOLUTION",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-NEG-engine-verification-evidence-predates-round",
+   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "check": "reject negative fixture (kind investigation)",
+   "input": "fixtures/v1.0.0/negative/engine-verification-evidence-predates-round.json",
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.INADMISSIBLE_EVENT",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-NEG-engine-verification-without-criteria",
+   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "check": "reject negative fixture (kind investigation)",
+   "input": "fixtures/v1.0.0/negative/engine-verification-without-criteria.json",
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.INADMISSIBLE_EVENT",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-NEG-event-line-non-canonical",
+   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "check": "reject negative fixture (kind investigation)",
+   "input": "fixtures/v1.0.0/negative/event-line-non-canonical.json",
+   "expected": {
+    "primaryCode": "CAUSA.NON_CANONICAL",
+    "domainCode": null,
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-NEG-events-blank-line",
+   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "check": "reject negative fixture (kind investigation)",
+   "input": "fixtures/v1.0.0/negative/events-blank-line.json",
+   "expected": {
+    "primaryCode": "CAUSA.ENCODING",
+    "domainCode": null,
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-NEG-events-crlf",
+   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "check": "reject negative fixture (kind investigation)",
+   "input": "fixtures/v1.0.0/negative/events-crlf.json",
+   "expected": {
+    "primaryCode": "CAUSA.ENCODING",
+    "domainCode": null,
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-NEG-events-empty",
+   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "check": "reject negative fixture (kind investigation)",
+   "input": "fixtures/v1.0.0/negative/events-empty.json",
+   "expected": {
+    "primaryCode": "CAUSA.ENCODING",
+    "domainCode": null,
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-NEG-events-invalid-utf8",
+   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "check": "reject negative fixture (kind investigation)",
+   "input": "fixtures/v1.0.0/negative/events-invalid-utf8.json",
+   "expected": {
+    "primaryCode": "CAUSA.ENCODING",
+    "domainCode": null,
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-NEG-events-missing-final-lf",
+   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "check": "reject negative fixture (kind investigation)",
+   "input": "fixtures/v1.0.0/negative/events-missing-final-lf.json",
+   "expected": {
+    "primaryCode": "CAUSA.ENCODING",
+    "domainCode": null,
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-NEG-extra-file-in-directory",
+   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "check": "reject negative fixture (kind investigation)",
+   "input": "fixtures/v1.0.0/negative/extra-file-in-directory.json",
+   "expected": {
+    "primaryCode": "CAUSA.PATH_INVALID",
+    "domainCode": null,
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-NEG-feff-inside-string",
+   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "check": "reject negative fixture (kind investigation)",
+   "input": "fixtures/v1.0.0/negative/feff-inside-string.json",
+   "expected": {
+    "primaryCode": "CAUSA.JSON_MALFORMED",
+    "domainCode": null,
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-NEG-float-number",
+   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "check": "reject negative fixture (kind investigation)",
+   "input": "fixtures/v1.0.0/negative/float-number.json",
+   "expected": {
+    "primaryCode": "CAUSA.JSON_MALFORMED",
+    "domainCode": null,
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-NEG-forged-cause-confirmation",
+   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "check": "reject negative fixture (kind investigation)",
+   "input": "fixtures/v1.0.0/negative/forged-cause-confirmation.json",
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.UNGATED_CONFIRMATION",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-NEG-forged-event-id",
+   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "check": "reject negative fixture (kind investigation)",
+   "input": "fixtures/v1.0.0/negative/forged-event-id.json",
+   "expected": {
+    "primaryCode": "CAUSA.EVENT_ID_MISMATCH",
+    "domainCode": null,
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-NEG-forged-resolution",
+   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "check": "reject negative fixture (kind investigation)",
+   "input": "fixtures/v1.0.0/negative/forged-resolution.json",
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.UNGATED_RESOLUTION",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-NEG-forged-snapshot",
+   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "check": "reject negative fixture (kind investigation)",
+   "input": "fixtures/v1.0.0/negative/forged-snapshot.json",
+   "expected": {
+    "primaryCode": "CAUSA.SNAPSHOT_MISMATCH",
+    "domainCode": null,
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-NEG-identifier-trailing-newline",
+   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "check": "reject negative fixture (kind investigation)",
+   "input": "fixtures/v1.0.0/negative/identifier-trailing-newline.json",
+   "expected": {
+    "primaryCode": "CAUSA.SCHEMA_VIOLATION",
+    "domainCode": null,
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-NEG-ideographic-space-text",
+   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "check": "reject negative fixture (kind investigation)",
+   "input": "fixtures/v1.0.0/negative/ideographic-space-text.json",
+   "expected": {
+    "primaryCode": "CAUSA.SCHEMA_VIOLATION",
+    "domainCode": null,
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-NEG-illegal-hypothesis-transition",
+   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "check": "reject negative fixture (kind investigation)",
+   "input": "fixtures/v1.0.0/negative/illegal-hypothesis-transition.json",
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.INADMISSIBLE_EVENT",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-NEG-integer-out-of-range",
+   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "check": "reject negative fixture (kind investigation)",
+   "input": "fixtures/v1.0.0/negative/integer-out-of-range.json",
+   "expected": {
+    "primaryCode": "CAUSA.JSON_MALFORMED",
+    "domainCode": null,
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-NEG-invalid-enum-value",
+   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "check": "reject negative fixture (kind investigation)",
+   "input": "fixtures/v1.0.0/negative/invalid-enum-value.json",
+   "expected": {
+    "primaryCode": "CAUSA.SCHEMA_VIOLATION",
+    "domainCode": null,
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-NEG-invalid-field-type",
+   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "check": "reject negative fixture (kind investigation)",
+   "input": "fixtures/v1.0.0/negative/invalid-field-type.json",
+   "expected": {
+    "primaryCode": "CAUSA.SCHEMA_VIOLATION",
+    "domainCode": null,
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-NEG-lone-surrogate",
+   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "check": "reject negative fixture (kind investigation)",
+   "input": "fixtures/v1.0.0/negative/lone-surrogate.json",
+   "expected": {
+    "primaryCode": "CAUSA.JSON_MALFORMED",
+    "domainCode": null,
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-NEG-manifest-created-at-mismatch",
+   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "check": "reject negative fixture (kind investigation)",
+   "input": "fixtures/v1.0.0/negative/manifest-created-at-mismatch.json",
+   "expected": {
+    "primaryCode": "CAUSA.MANIFEST_MISMATCH",
+    "domainCode": null,
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-NEG-manifest-event-count-mismatch",
+   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "check": "reject negative fixture (kind investigation)",
+   "input": "fixtures/v1.0.0/negative/manifest-event-count-mismatch.json",
+   "expected": {
+    "primaryCode": "CAUSA.MANIFEST_MISMATCH",
+    "domainCode": null,
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-NEG-manifest-interior-newline",
+   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "check": "reject negative fixture (kind investigation)",
+   "input": "fixtures/v1.0.0/negative/manifest-interior-newline.json",
+   "expected": {
+    "primaryCode": "CAUSA.NON_CANONICAL",
+    "domainCode": null,
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-NEG-manifest-updated-at-mismatch",
+   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "check": "reject negative fixture (kind investigation)",
+   "input": "fixtures/v1.0.0/negative/manifest-updated-at-mismatch.json",
+   "expected": {
+    "primaryCode": "CAUSA.MANIFEST_MISMATCH",
+    "domainCode": null,
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-NEG-manifest-version-mismatch",
+   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "check": "reject negative fixture (kind investigation)",
+   "input": "fixtures/v1.0.0/negative/manifest-version-mismatch.json",
+   "expected": {
+    "primaryCode": "CAUSA.MANIFEST_MISMATCH",
+    "domainCode": null,
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-NEG-manifest-wrong-investigation-id",
+   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "check": "reject negative fixture (kind investigation)",
+   "input": "fixtures/v1.0.0/negative/manifest-wrong-investigation-id.json",
+   "expected": {
+    "primaryCode": "CAUSA.MANIFEST_MISMATCH",
+    "domainCode": null,
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-NEG-missing-snapshot-file",
+   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "check": "reject negative fixture (kind investigation)",
+   "input": "fixtures/v1.0.0/negative/missing-snapshot-file.json",
+   "expected": {
+    "primaryCode": "CAUSA.PATH_INVALID",
+    "domainCode": null,
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-NEG-missing-start",
+   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "check": "reject negative fixture (kind investigation)",
+   "input": "fixtures/v1.0.0/negative/missing-start.json",
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.NO_START",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-NEG-negative-zero",
+   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "check": "reject negative fixture (kind investigation)",
+   "input": "fixtures/v1.0.0/negative/negative-zero.json",
+   "expected": {
+    "primaryCode": "CAUSA.NON_CANONICAL",
+    "domainCode": null,
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-NEG-nesting-depth-128",
+   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "check": "reject negative fixture (kind investigation)",
+   "input": "fixtures/v1.0.0/negative/nesting-depth-128.json",
+   "expected": {
+    "primaryCode": "CAUSA.SCHEMA_VIOLATION",
+    "domainCode": null,
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-NEG-nesting-depth-129",
+   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "check": "reject negative fixture (kind investigation)",
+   "input": "fixtures/v1.0.0/negative/nesting-depth-129.json",
+   "expected": {
+    "primaryCode": "CAUSA.JSON_MALFORMED",
+    "domainCode": null,
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-NEG-nesting-too-deep",
+   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "check": "reject negative fixture (kind investigation)",
+   "input": "fixtures/v1.0.0/negative/nesting-too-deep.json",
+   "expected": {
+    "primaryCode": "CAUSA.JSON_MALFORMED",
+    "domainCode": null,
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-NEG-nil-uuid",
+   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "check": "reject negative fixture (kind investigation)",
+   "input": "fixtures/v1.0.0/negative/nil-uuid.json",
+   "expected": {
+    "primaryCode": "CAUSA.SCHEMA_VIOLATION",
+    "domainCode": null,
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-NEG-non-canonical-manifest",
+   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "check": "reject negative fixture (kind investigation)",
+   "input": "fixtures/v1.0.0/negative/non-canonical-manifest.json",
+   "expected": {
+    "primaryCode": "CAUSA.NON_CANONICAL",
+    "domainCode": null,
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-NEG-non-string-format-version",
+   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "check": "reject negative fixture (kind investigation)",
+   "input": "fixtures/v1.0.0/negative/non-string-format-version.json",
+   "expected": {
+    "primaryCode": "CAUSA.SCHEMA_VIOLATION",
+    "domainCode": null,
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-NEG-path-traversal-directory",
+   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "check": "reject negative fixture (kind investigation)",
+   "input": "fixtures/v1.0.0/negative/path-traversal-directory.json",
+   "expected": {
+    "primaryCode": "CAUSA.PATH_INVALID",
+    "domainCode": null,
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-NEG-rewritten-history",
+   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "check": "reject negative fixture (kind successor)",
+   "input": "fixtures/v1.0.0/negative/rewritten-history.json",
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_REWRITTEN",
+    "domainCode": null,
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-NEG-sequence-gap",
+   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "check": "reject negative fixture (kind investigation)",
+   "input": "fixtures/v1.0.0/negative/sequence-gap.json",
+   "expected": {
+    "primaryCode": "CAUSA.SEQUENCE_INVALID",
+    "domainCode": null,
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-NEG-snapshot-missing-final-lf",
+   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "check": "reject negative fixture (kind investigation)",
+   "input": "fixtures/v1.0.0/negative/snapshot-missing-final-lf.json",
+   "expected": {
+    "primaryCode": "CAUSA.ENCODING",
+    "domainCode": null,
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-NEG-snapshot-non-canonical",
+   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "check": "reject negative fixture (kind investigation)",
+   "input": "fixtures/v1.0.0/negative/snapshot-non-canonical.json",
+   "expected": {
+    "primaryCode": "CAUSA.NON_CANONICAL",
+    "domainCode": null,
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-NEG-stale-expected-version",
+   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "check": "reject negative fixture (kind append)",
+   "input": "fixtures/v1.0.0/negative/stale-expected-version.json",
+   "expected": {
+    "primaryCode": "CAUSA.VERSION_STALE",
+    "domainCode": null,
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-NEG-timestamp-without-milliseconds",
+   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "check": "reject negative fixture (kind investigation)",
+   "input": "fixtures/v1.0.0/negative/timestamp-without-milliseconds.json",
+   "expected": {
+    "primaryCode": "CAUSA.SCHEMA_VIOLATION",
+    "domainCode": null,
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-NEG-truncated-event-line",
+   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "check": "reject negative fixture (kind investigation)",
+   "input": "fixtures/v1.0.0/negative/truncated-event-line.json",
+   "expected": {
+    "primaryCode": "CAUSA.JSON_MALFORMED",
+    "domainCode": null,
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-NEG-unexpected-payload-field",
+   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "check": "reject negative fixture (kind investigation)",
+   "input": "fixtures/v1.0.0/negative/unexpected-payload-field.json",
+   "expected": {
+    "primaryCode": "CAUSA.SCHEMA_VIOLATION",
+    "domainCode": null,
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-NEG-unknown-event-type",
+   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "check": "reject negative fixture (kind investigation)",
+   "input": "fixtures/v1.0.0/negative/unknown-event-type.json",
+   "expected": {
+    "primaryCode": "CAUSA.UNKNOWN_EVENT_TYPE",
+    "domainCode": null,
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-NEG-unsupported-format-version",
+   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "check": "reject negative fixture (kind investigation)",
+   "input": "fixtures/v1.0.0/negative/unsupported-format-version.json",
+   "expected": {
+    "primaryCode": "CAUSA.UNSUPPORTED_VERSION",
+    "domainCode": null,
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-NEG-uppercase-uuid",
+   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "check": "reject negative fixture (kind investigation)",
+   "input": "fixtures/v1.0.0/negative/uppercase-uuid.json",
+   "expected": {
+    "primaryCode": "CAUSA.SCHEMA_VIOLATION",
+    "domainCode": null,
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-NEG-wrong-investigation-id",
+   "requirement": "CAUSA-INV-05, Phase 7.8",
+   "check": "reject negative fixture (kind investigation)",
+   "input": "fixtures/v1.0.0/negative/wrong-investigation-id.json",
+   "expected": {
+    "primaryCode": "CAUSA.INVESTIGATION_MISMATCH",
+    "domainCode": null,
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-APPEND-01",
+   "requirement": "CAUSA-INV-03/14/15, Phase 7.9",
+   "check": "append one engine-decided ObservationRecorded to a workspace copy of api-latency at the observed version; result verifies, old events.ndjson bytes are a prefix, untouched fields byte-identical, independent reader accepts structure",
+   "expected": {
+    "primaryCode": null,
+    "newVersion": "base+1",
+    "prefixPreserved": true
+   }
+  },
+  {
+   "id": "AC-APPEND-02",
+   "requirement": "CAUSA-INV-14",
+   "check": "append at a stale expected version is refused and nothing is written",
+   "expected": {
+    "primaryCode": "CAUSA.VERSION_STALE",
+    "bytesUnchanged": true
+   }
+  },
+  {
+   "id": "AC-PARITY-01",
+   "requirement": "CAUSA-DATA-001, CAUSA-COMPAT-07",
+   "check": "tools/causa-contract/parity_gate.py check",
+   "expected": {
+    "unexplainedDifferences": 0
+   }
+  },
+  {
+   "id": "AC-PARITY-02",
+   "requirement": "CAUSA-COMPAT-07",
+   "check": "tools/causa-contract/parity_gate.py selftest",
+   "expected": {
+    "mutationsDetected": "all"
+   }
+  },
+  {
+   "id": "AC-CATALOG-01",
+   "requirement": "Phase 3",
+   "check": "tools/causa-contract/generate_catalogs.py check --dataset: catalogs fresh, every schema property documented, every dataset JSON path documented",
+   "expected": {
+    "undocumented": 0
+   }
+  }
+ ]
+}

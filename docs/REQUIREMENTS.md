@@ -189,6 +189,47 @@ A remote write that has not completed must be represented as pending, not succes
 ### R10.7 Recovery
 Pending writes must be recoverable after application restart when practical.
 
+### R10.8 Normative persistence contract
+R10.1–R10.7 are satisfied, for storage contract v1.0.0, by the imported normative contract in
+[requirements/causa/data/v1.0.0/](../requirements/causa/data/v1.0.0/README.md). It covers the wire format and schemas
+([field catalog](../requirements/causa/data/v1.0.0/FIELD-CATALOG.md), [event catalog](../requirements/causa/data/v1.0.0/EVENT-CATALOG.md)),
+domain admissibility ([SEMANTICS.md](../requirements/causa/data/v1.0.0/SEMANTICS.md)), the persistence invariants
+([INVARIANTS.md](../requirements/causa/data/v1.0.0/INVARIANTS.md)), compatibility and migration
+([compatibility/RULES.md](../requirements/causa/data/v1.0.0/compatibility/RULES.md)) and the release gate
+([acceptance/ACCEPTANCE.md](../requirements/causa/data/v1.0.0/acceptance/ACCEPTANCE.md)). Where any other document in
+`docs/` states a persisted field, event, enum, layout, hash or concurrency rule differently, the imported contract
+governs.
+
+### CAUSA-DATA-001 Authoritative persistence specification
+The Indy Init requirements repository MUST contain the complete normative persistence contract for every supported
+storage version.
+
+No implementation may introduce, infer, or modify persisted field structures independently of the approved contract.
+
+The causa-data repository MUST conform to the contract version declared by Indy Init.
+
+Every application build MUST verify compatibility against the frozen contract and dataset before release.
+
+Any contract modification MUST be reviewed, versioned, and reflected in Indy Init before being implemented.
+
+Declared versions and evidence:
+
+| storage version | normative contract | frozen release | verification |
+|---|---|---|---|
+| `1.0.0` (current, only supported) | [requirements/causa/data/v1.0.0/](../requirements/causa/data/v1.0.0/README.md) | `kemiller2002/causa-data` tag `causa-storage-v1.0.0` (commit `c947c7e354be80766573a782546c8186336774cc`) | `tools/causa-contract/parity_gate.py` (bidirectional parity), `tools/causa-contract/acceptance.py` (102-row release gate), `tools/causa-contract/generate_catalogs.py check` (no undocumented fields) |
+
+Acceptance criteria:
+
+1. Every persisted field and event discriminator of each supported version is documented in that version's generated
+   field and event catalogs, and catalog generation fails on any undocumented schema property.
+2. The parity gate reports zero unexplained differences between the imported contract and the frozen tag, and detects
+   every mutation in its self-test.
+3. A build is releasable only when every row of the version's `acceptance/TEST-MATRIX.json` passes, including stage-15
+   admissibility. `NOT_EVALUATED` is not a pass.
+4. A contract change follows [compatibility/RULES.md §7](../requirements/causa/data/v1.0.0/compatibility/RULES.md): it
+   starts as an approved, versioned requirement directory here, then becomes a new frozen causa-data tree and tag, then
+   is imported back and gated. Frozen v1.0.0 files are never edited.
+
 ## R11. Authentication and security
 
 ### R11.1 GitHub authentication
