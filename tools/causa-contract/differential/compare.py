@@ -6,6 +6,7 @@ Usage: python3 -I compare.py <mutants dir> <oracle verdicts .jsonl> --consumer "
 Agreement rule (stage 15 is the only stage a mutant can fail before 17, see mutate.py):
   oracle admissible   -> consumer primaryCode in {null, CAUSA.SNAPSHOT_HASH_MISMATCH, CAUSA.SNAPSHOT_MISMATCH}
   oracle inadmissible -> consumer primaryCode = CAUSA.HISTORY_INADMISSIBLE and domainCode = oracle's first code
+  oracle exception    -> (SEMANTICS §17 E-2) consumer primaryCode = CAUSA.HISTORY_INADMISSIBLE
 A consumer answer "admissibility": "not-evaluated" is never agreement.
 """
 from __future__ import annotations
@@ -35,6 +36,10 @@ def agree(oracle_codes: list[str], got: Mapping[str, Any]) -> bool:
         return False
     if not oracle_codes:
         return got.get("primaryCode") in AFTER_15
+    if str(oracle_codes[0]).startswith("EXCEPTION"):
+        # SEMANTICS.md §17 E-2: the engine throws only after an earlier inadmissible group; a reader MUST report the
+        # history inadmissible (the first domain code is that earlier group's, which the oracle cannot return).
+        return got.get("primaryCode") == "CAUSA.HISTORY_INADMISSIBLE"
     return got.get("primaryCode") == "CAUSA.HISTORY_INADMISSIBLE" and got.get("domainCode") == oracle_codes[0]
 
 

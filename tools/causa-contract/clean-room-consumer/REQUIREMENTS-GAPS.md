@@ -1,6 +1,7 @@
 # Requirements gaps found while building the clean-room consumer
 
-Scope: `requirements/causa/data/v1.0.0/` was the only rule source. Result: all 102 acceptance rows pass. **No row
+Scope: `requirements/causa/data/v1.0.0/` was the only rule source. Second iteration (2026-10-23): GAP-01 was
+re-implemented from the corrected §10.4.1–§10.4.2. Result: all 102 acceptance rows pass. **No row
 needed outside information, a guess about expected values, or special-casing.** Every gap below was resolved from the
 text, or deliberately left undecided, and none of them changes a matrix row. Severity:
 
@@ -19,31 +20,82 @@ Additional evidence beyond the matrix, all produced with this implementation:
 
 ---
 
-## GAP-01: E-1 artifact URL well-formedness for platform-defined inputs (critical, scoped)
+## GAP-01: artifact URL well-formedness, E-1 (was critical; resolved by a requirements fix, residual minor)
 
-**Text (SEMANTICS §10.4.1):** "(b) `u` is accepted by **.NET 10 `System.Uri.IsWellFormedUriString(u, UriKind.Absolute)`**
-… Behaviour for non-ASCII characters, `[`/`]` outside an IPv6 host, leading/trailing whitespace, and other edge cases
-is **platform-defined** (§17 E-1): there an implementation MUST either call the .NET 10 function or treat the case as
-unresolved." §17 E-1 says the same cases are "**NOT specifiable from text alone**".
+### History: original text and finding (first iteration)
 
-**What is missing:** A complete decision procedure. A Python consumer cannot call .NET, so for those inputs the
-requirements give no answer.
+**Original text (SEMANTICS §10.4.1, before the fix):** "(b) `u` is accepted by **.NET 10
+`System.Uri.IsWellFormedUriString(u, UriKind.Absolute)`** … Behaviour for non-ASCII characters, `[`/`]` outside an
+IPv6 host, leading/trailing whitespace, and other edge cases is **platform-defined** (§17 E-1)". It also contained a
+prose list of cases that "implementations MUST reject" and a form that is "true". §17 E-1 called the rest "**NOT
+specifiable from text alone**".
 
-**What I chose:** I implemented every case that §10.4.1 lists as certain, in both directions: prefix,
-backslash, empty or space-containing host, bad port, controls, `" < > \ ^ ` { | }`, bad `%` escapes, bracketed
-IPv6, and the accepted DNS/unreserved form. Everything else returns `Unresolved`. That includes non-ASCII (IDN),
-`[`/`]` outside IPv6, leading or trailing whitespace, `_` in a host, labels that begin or end with `-`, a second `#`,
-and any other ASCII character outside unreserved, sub-delims, `:@/?`. When `Unresolved` occurs at or before the
-first stage-15 error, the consumer reports `"admissibility": "not-evaluated"` and does not claim the history is
-valid. That is the honest reading of "treat the case as unresolved".
+**What I reported:** A Python consumer cannot call .NET, so the requirements had no complete decision procedure. I
+implemented the prose list and returned `Unresolved` for everything else. I rated it critical for inputs outside the
+list.
 
-Two residual choices I am not certain of:
+**How it was found to be wrong:** I reported this as GAP-01. The coordinator then tested the old prose list against
+the .NET 10 predicate and found it was wrong in places. .NET *accepts* trailing whitespace, U+0085, and `{|}` when
+non-ASCII is present, and it *rejects* empty DNS labels such as `a..b`. My first implementation followed the old list,
+so it inherited those errors. For example, `{`, `|` and `}` in a path were "certainly ill-formed" in my code but are
+platform-defined in reality. No acceptance row exercised those inputs, so 102/102 passed with a wrong rule. The
+matrix alone could not have caught it.
 
-* A host such as `999.1.1.1` matches the DNS-label shape and is accepted. .NET might treat it as a malformed IPv4
-  address.
-* An empty port (`http://h:/`) is accepted, because §10.4.1 says "an empty port … accepted".
+### Fix (second iteration)
 
-No dataset input reaches an unresolved case. The two fixture data points behave as stated.
+The requirements now give a normative four-step procedure in §10.4.1:
+
+1. Prefix.
+2. Interior ASCII whitespace means ill-formed.
+3. The strict artifact-URL profile of §10.4.2 decides the verdict.
+4. Anything else is platform-defined.
+
+They also add writer rule CAUSA-URL-W, update §17 E-1 to "resolved for conforming data", and add the normative
+vectors `catalog/artifact-url-vectors.jsonl`. I re-read only §10.4.1–§10.4.2 and §17 E-1, not
+`tools/causa-contract/differential/url_profile.py`.
+
+`semantics.artifact_url_verdict` now implements those four steps literally:
+
+* The profile regex is the §10.4.2 pattern, with ECMA `$` rendered as `\Z`.
+* A bracketed host must parse as IPv6 with Python `ipaddress`; `%` and zone ids are excluded by the character class.
+* The path, query and fragment split is: first `#`, then first `?` before it.
+* The port must be ≤ 65535, the fragment must contain no second `#`, and path, query and fragment characters must
+  be in the stated sets with `%HH` escapes.
+* Step 4 returns `Unresolved`. At stage 15 that becomes `"admissibility": "not-evaluated"` with `primaryCode: null`,
+  and the history is never reported admissible. This applies when the case occurs at or before the first error. If
+  an earlier group is already inadmissible, that earlier error is reported, and the verdict stays "inadmissible".
+
+`semantics.writer_url_check` implements CAUSA-URL-W:
+
+* Outside the profile → `CAUSA.UNREPRESENTABLE`.
+* Prefix failure, interior whitespace, or an ill-formed URL inside the profile → domain refusal `EVIDENCE.URL`.
+
+The only write command in the consumer protocol is `append-observation`. It never carries an artifact URL, so the
+check is present but no CLI path calls it.
+
+### Outcome
+
+* `python3 -I selftest_urls.py`: **3596/3596 vectors agree** (wellFormed 1542/1542, illFormed 1522/1522,
+  platformDefined 532/532). The script reads only `url` and `expected`, never `dotnetAccepted`.
+* A side check of the data itself: every decided vector agrees with `dotnetAccepted`. Of the platformDefined
+  vectors, 264 are accepted by .NET and 268 are rejected, which confirms that no text rule could decide them.
+* Acceptance is still 102/102, and 3000 fuzz mutations still produce no exceptions.
+
+### Remaining ambiguity in the new text (minor)
+
+1. **"Valid RFC 4291 IPv6 address text."** RFC 4291 §2.2 does not settle every lexical corner. Examples are an
+   embedded IPv4 octet with leading zeros (`::1.2.3.04`) and more than four hex digits in a group. I use Python
+   `ipaddress.IPv6Address`, which rejects both. A rejected bracket host falls out of the profile to step 4
+   (not-evaluated), which fails closed, so a difference here can only turn a decided case into "not evaluated",
+   never into a wrong verdict. The vectors do not distinguish the readings.
+2. **CAUSA-URL-W ordering and output code.** The text does not say whether the profile check
+   (`CAUSA.UNREPRESENTABLE`) comes before or after the other `AdmitEvidence` checks, for example `DUPLICATE_ID`,
+   when both apply. How a domain refusal (`EVIDENCE.URL`) is reported as a CAUSA code is still open (see GAP-04).
+   This does not affect this consumer, which has no AdmitEvidence write path.
+3. **Deliberate narrowing (info, not a defect).** CAUSA-URL-W refuses out-of-profile URLs that .NET accepts, such
+   as the 264 vectors above. A history written directly by the oracle engine with such a URL is therefore
+   admissible to the oracle but "not evaluated" to a text-only reader. §17 E-1 states this ("readers fail closed on
+   them"), so I record it only so that the trade-off stays visible.
 
 ## GAP-02: E-5 `lowerInvariant` depends on the Unicode or ICU version (minor)
 
