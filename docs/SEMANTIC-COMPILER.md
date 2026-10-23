@@ -258,7 +258,7 @@ Between builds, generate semantic diff:
 
 ```text
 + Command: ReopenConfirmedCause
-+ Event: ConfirmedCauseReopened
++ Event: ConfirmedCauseReopened (persisted: CausalAssertionReopened)
 ~ Policy: confirmation@2 -> @3
 - Experimental semantic: edf:topology@0.2
 ```

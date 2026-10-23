@@ -6,6 +6,8 @@ This document defines what investigation concepts mean, how they differ, which t
 
 The generic kernel must preserve these semantics regardless of UI, storage provider, AI provider, or domain pack.
 
+> **Normative status.** **Normative** domain semantics; **explanatory** for persisted names and enum values. Persisted data is governed only by the frozen Causa storage contract v1.0.0 ([README.md](../requirements/causa/data/v1.0.0/README.md), [FIELD-CATALOG.md](../requirements/causa/data/v1.0.0/FIELD-CATALOG.md), [EVENT-CATALOG.md](../requirements/causa/data/v1.0.0/EVENT-CATALOG.md)). Where this document states a persisted field, event name, enum value, layout, hash or concurrency rule differently, the contract governs; such statements are marked *Superseded by frozen contract v1.0.0* in place. Implemented admissibility: [SEMANTICS.md](../requirements/causa/data/v1.0.0/SEMANTICS.md).
+
 ## 1. Core principle
 
 The system does not store "an answer." It stores an evolving, auditable epistemic state.
@@ -153,6 +155,8 @@ Core relationship kinds:
 The same evidence item may have different relationships to different hypotheses.
 
 "FailsToSupport" is not equivalent to "Contradicts."
+
+> **Superseded by frozen contract v1.0.0:** the persisted `relationshipKind` is exactly `supports|contradicts|discriminates|insufficient`; the other kinds above are deferred (OQ-012).
 
 ### 2.8 Prediction
 
@@ -358,6 +362,8 @@ Actor categories:
 - ExternalSystem
 - ImportedHistorical
 
+> **Superseded by frozen contract v1.0.0:** persisted actor kinds are `human`, `system`, `agent{provider, model}`; ExternalSystem and ImportedHistorical are deferred.
+
 Provenance should answer:
 
 - who or what created this?
@@ -555,6 +561,8 @@ Approved/InProgress
 Any active state
   -> Blocked
 ```
+
+> **Superseded by frozen contract v1.0.0:** `Blocked` has no persisted `actionState` value (deferred); no v1.0.0 event reaches `Interpreted`.
 
 Completion means the action ran or the question was answered. It does not mean the result has been interpreted or admitted as evidence.
 
@@ -845,6 +853,8 @@ Each event should include:
 - evidence references when required
 - schema/policy/domain-pack version
 
+> **Superseded by frozen contract v1.0.0:** the persisted event names are the 31 events of [EVENT-CATALOG.md](../requirements/causa/data/v1.0.0/EVENT-CATALOG.md) (e.g. InvestigationCreated → `InvestigationStarted`, HypothesisProposed → `HypothesisRecorded`, HypothesisStateChanged → `HypothesisTransitioned`, EvidenceRelationshipAdded → `EvidenceRelated`, ContradictionDetected → `ContradictionRecorded`, ActionProposed → `ActionRecorded`, CauseProposed → `CausalAssertionRecorded`, CauseConfirmed → `CausalAssertionConfirmed`, InvestigationResolved/Reopened → `LifecycleChanged`; ClaimCreated is deferred). The envelope has no prior-version field and carries only `formatVersion`/`semanticVersion` (CONTRACT §5).
+
 Events are historical facts about state change. They must not be rewritten to make the final story cleaner.
 
 ## 24. Invariants
@@ -994,6 +1004,7 @@ type CoreEvidenceRelationshipKind =
     | Supersedes
     | DependsOn
     | DerivedFrom
+    // Superseded by frozen contract v1.0.0: persisted relationshipKind = supports | contradicts | discriminates | insufficient; the other cases are deferred (OQ-012). EpistemicSource above has no v1.0.0 wire form.
 
 type SemanticId =
     {

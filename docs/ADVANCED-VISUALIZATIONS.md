@@ -48,7 +48,7 @@ Edges:
 - DerivedFrom
 - DependsOn
 - Supersedes
-- Corroborates where meaningful
+- Corroborates where meaningful *(not a persisted v1.0.0 relationship kind; deferred)*
 
 Visual requirement:
 Common-source clusters must be visually recognizable.

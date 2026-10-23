@@ -445,7 +445,7 @@ At minimum, screen contracts and projection tests must verify:
 
 - Observation remains distinguishable from Interpretation and Hypothesis.
 - AgentProposal remains distinguishable from AuthoritativeState.
-- FailsToSupport is not rendered as Contradicts.
+- FailsToSupport is not rendered as Contradicts. *(FailsToSupport is not persisted in v1.0.0; `relationshipKind` = supports|contradicts|discriminates|insufficient.)*
 - Falsified hypotheses remain inspectable with falsification basis and scope.
 - Evidence dependency can be surfaced so correlated records are not visually implied to be independent confirmation.
 - Blocking Unknowns, Contradictions, and Obligations are visible where they affect legal actions.

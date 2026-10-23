@@ -45,6 +45,8 @@ Investigation state + legal transitions
 
 ## Persistence boundary
 
+> **Normative status.** **Explanatory** for layout and sync states. Persisted data is governed only by the frozen Causa storage contract v1.0.0 ([README.md](../requirements/causa/data/v1.0.0/README.md), [FIELD-CATALOG.md](../requirements/causa/data/v1.0.0/FIELD-CATALOG.md), [EVENT-CATALOG.md](../requirements/causa/data/v1.0.0/EVENT-CATALOG.md)). Where this document states a persisted field, event name, enum value, layout, hash or concurrency rule differently, the contract governs; such statements are marked *Superseded by frozen contract v1.0.0* in place.
+
 The investigation domain must not depend directly on GitHub-specific storage semantics.
 
 Persistence should be represented through an explicit provider contract supporting operations such as load, append/change, optimistic version check, export, and recovery. GitHub is the first provider because it offers both storage and useful provenance.
@@ -70,6 +72,8 @@ investigations/
       current.json
 ```
 
+> **Superseded by frozen contract v1.0.0:** the v1.0.0 layout is `workspaces/demo/<runId>/investigations/<investigationId>/{manifest.json, events.ndjson, snapshot.json}` (exactly these three files, CONTRACT §3).
+
 Large or binary evidence can be referenced by URL rather than committed directly.
 
 ## Current state vs history
@@ -93,11 +97,13 @@ Remote persistence states should be explicit, for example:
 - Conflict
 - Failed
 
+> **Superseded by frozen contract v1.0.0:** *sending* and *unknown* (outcome not confirmed) must also stay distinct; "Failed" only when the provider confirmed nothing was written (CONTRACT §9.4.3).
+
 A remote commit is never assumed successful before confirmation.
 
 ## Concurrency
 
-GitHub writes should use optimistic concurrency based on the last known version/SHA.
+GitHub writes should use optimistic concurrency based on the last known version/SHA. *(v1.0.0: aggregate version plus the branch head commit; one commit per command, non-forced ref update, CONTRACT §9.2, §9.4.)*
 
 If the remote version changed:
 

@@ -6,6 +6,8 @@ These tables define initial legal lifecycle transitions. Policy may add prerequi
 
 This document deliberately distinguishes lifecycle state from derived posture.
 
+> **Normative status.** **Normative** domain direction for lifecycles. Persisted data is governed only by the frozen Causa storage contract v1.0.0 ([README.md](../requirements/causa/data/v1.0.0/README.md), [FIELD-CATALOG.md](../requirements/causa/data/v1.0.0/FIELD-CATALOG.md), [EVENT-CATALOG.md](../requirements/causa/data/v1.0.0/EVENT-CATALOG.md)). Where this document states a persisted field, event name, enum value, layout, hash or concurrency rule differently, the contract governs; such statements are marked *Superseded by frozen contract v1.0.0* in place. Persisted state values are the lowerCamelCase wire enumerations (CONTRACT §6, [FIELD-CATALOG.md](../requirements/causa/data/v1.0.0/FIELD-CATALOG.md)); the transitions the pinned engine implements are in [SEMANTICS.md](../requirements/causa/data/v1.0.0/SEMANTICS.md). Rows marked *deferred* have no v1.0.0 event.
+
 ## 1. Investigation lifecycle
 
 Persisted states:
@@ -27,12 +29,12 @@ Reopened is an event that normally returns Resolved/Closed to Active.
 | Active | MarkAwaitingEvidence | AwaitingEvidence | open evidence dependency/reason |
 | AwaitingEvidence | ActivateInvestigation | Active | wait cleared/work resumed |
 | Active | MarkAwaitingVerification | AwaitingVerification | verification work exists |
-| AwaitingVerification | ActivateInvestigation | Active | verification failed/new work |
+| AwaitingVerification | ActivateInvestigation | Active | verification failed/new work | *(A failed verification also emits `LifecycleChanged{command: verificationFailed}` automatically.)*
 | AwaitingVerification | ResolveInvestigation | Resolved | resolution gate |
 | Active | ResolveInvestigation | Resolved | policy permits and resolution gate |
 | Resolved | CloseInvestigation | Closed | closure policy |
 | Resolved/Closed | ReopenInvestigation | Active | explicit reopening basis |
-| any non-archived state | ArchiveInvestigation | Archived | archive policy |
+| any non-archived state | ArchiveInvestigation | Archived | archive policy *(deferred: no v1.0.0 event reaches this)* |
 | Archived | ActivateInvestigation | Active | explicit unarchive/reactivation policy |
 
 ## 2. Hypothesis lifecycle
@@ -80,7 +82,7 @@ States:
 | ExplicitUnverified | ProvisionallyAcceptAssumption | ProvisionallyAccepted |
 | ExplicitUnverified/ProvisionallyAccepted | VerifyAssumption | Verified |
 | ExplicitUnverified/ProvisionallyAccepted | RejectAssumption | Rejected |
-| ExplicitUnverified/ProvisionallyAccepted/Verified | ExpireAssumption | Expired |
+| ExplicitUnverified/ProvisionallyAccepted/Verified | ExpireAssumption | Expired *(deferred: no v1.0.0 event reaches this)* |
 
 If later evidence invalidates a previously verified assumption, use explicit reassessment/supersession rather than rewriting the old verification.
 
@@ -99,6 +101,8 @@ Evidence is append/supersede rather than a broad workflow.
 
 Original evidence content is never overwritten.
 
+> **Superseded by frozen contract v1.0.0:** evidence has no persisted state field: *Superseded* is `supersededBy` ≠ null and verification is the separate `verification` field (`entities/evidence.schema.json`). Metadata correction, artifact availability and integrity-mismatch commands are deferred.
+
 ## 5. Investigation action lifecycle
 
 States:
@@ -106,7 +110,7 @@ States:
 - Proposed
 - Approved
 - InProgress
-- Blocked
+- Blocked *(Superseded by frozen contract v1.0.0: no `actionState` value; deferred)*
 - Completed
 - Interpreted
 - Rejected
@@ -118,11 +122,11 @@ States:
 | Proposed | ApproveInvestigationAction | Approved |
 | Proposed | RejectInvestigationAction | Rejected |
 | Approved | StartInvestigationAction | InProgress |
-| Approved/InProgress | BlockInvestigationAction | Blocked |
-| Blocked | UnblockInvestigationAction | Approved or InProgress according to prior state |
+| Approved/InProgress | BlockInvestigationAction | Blocked *(deferred: no v1.0.0 event reaches this)* |
+| Blocked | UnblockInvestigationAction | Approved or InProgress according to prior state *(deferred: no v1.0.0 event reaches this)* |
 | Approved/InProgress | CancelInvestigationAction | Cancelled |
-| InProgress | CompleteInvestigationAction | Completed |
-| Completed | InterpretInvestigationAction | Interpreted |
+| InProgress (or Approved) | CompleteInvestigationAction — *Superseded by frozen contract v1.0.0: RecordFinding; completion follows `FindingRecorded` in the same command group* | Completed |
+| Completed | InterpretInvestigationAction | Interpreted *(deferred: no v1.0.0 event reaches this)* |
 
 ## 6. Unknown lifecycle
 
@@ -140,7 +144,7 @@ States:
 | Identified | StartInvestigatingUnknown | Investigating |
 | Identified/Investigating | ResolveUnknown | Resolved |
 | Identified/Investigating | AcceptUnknownAsResidual | AcceptedResidual |
-| Identified/Investigating | SupersedeUnknown | Superseded |
+| Identified/Investigating | SupersedeUnknown | Superseded *(deferred: no v1.0.0 event reaches this)* |
 
 Materiality is orthogonal and policy-controlled.
 
@@ -158,7 +162,7 @@ States:
 | Active | ChallengeNegativeKnowledge | Challenged |
 | Active/Challenged | SupersedeNegativeKnowledge | Superseded |
 
-Challenge preserves the original scoped record.
+Challenge preserves the original scoped record. *(v1.0.0 negative knowledge has no persisted state; this lifecycle is deferred.)*
 
 ## 8. Contradiction lifecycle
 
@@ -175,10 +179,10 @@ States:
 | --- | --- | --- |
 | none | RecordContradiction | Detected |
 | Detected | TriageContradiction | Triaged |
-| Detected/Triaged | StartInvestigatingContradiction | Investigating |
+| Detected/Triaged | StartInvestigatingContradiction | Investigating *(deferred: no v1.0.0 event reaches this)* |
 | Detected/Triaged/Investigating | ResolveContradiction | Resolved |
 | Detected/Triaged/Investigating | AcceptContradictionAsResidual | AcceptedResidual |
-| Detected/Triaged/Investigating | SupersedeContradiction | Superseded |
+| Detected/Triaged/Investigating | SupersedeContradiction | Superseded *(deferred: no v1.0.0 event reaches this)* |
 
 Resolution requires an explicit resolution basis.
 
@@ -220,7 +224,7 @@ First-profile states/postures:
 | none | RecordCausalAssertion | Proposed |
 | Proposed | ConfirmCause | Confirmed |
 | Confirmed | ReopenConfirmedCause | Reopened |
-| Proposed/Reopened | SupersedeCausalAssertion | Superseded |
+| Proposed/Reopened | SupersedeCausalAssertion | Superseded *(deferred: no v1.0.0 event reaches this)* |
 | Reopened | ConfirmCause | Confirmed |
 
 This avoids prematurely persisting a causal support taxonomy.
@@ -233,7 +237,7 @@ States:
 - Approved
 - InProgress
 - Implemented
-- AwaitingVerification
+- AwaitingVerification *(persisted as `awaitingVerificationOfEffect`)*
 - VerifiedEffective
 - VerificationFailed
 - ReworkRequired
@@ -247,8 +251,8 @@ States:
 | Approved | StartCorrectiveAction | InProgress |
 | InProgress | MarkCorrectiveActionImplemented | Implemented |
 | Implemented | StartCorrectiveActionVerification | AwaitingVerification |
-| AwaitingVerification | MarkCorrectiveActionVerified | VerifiedEffective |
-| AwaitingVerification | MarkCorrectiveActionVerificationFailed | VerificationFailed |
+| AwaitingVerification | MarkCorrectiveActionVerified — *Superseded by frozen contract v1.0.0: RecordVerification (satisfied, all criteria satisfied); follow-on event* | VerifiedEffective |
+| AwaitingVerification | MarkCorrectiveActionVerificationFailed — *Superseded by frozen contract v1.0.0: RecordVerification (failed); follow-on event* | VerificationFailed |
 | VerificationFailed | RequireCorrectiveActionRework | ReworkRequired |
 | ReworkRequired | StartCorrectiveAction | InProgress |
 
@@ -257,11 +261,11 @@ States:
 States:
 
 - Active
-- Revised
+- Revised *(no v1.0.0 value; deferred)*
 - Accepted
 - Rejected
-- Deferred
-- Stale
+- Deferred *(no v1.0.0 value; deferred)*
+- Stale *(no v1.0.0 value; deferred)*
 
 | From | Command | To |
 | --- | --- | --- |
@@ -272,7 +276,7 @@ States:
 | Active/Revised | DeferProposal | Deferred |
 | Active/Revised/Deferred | MarkProposalStale | Stale |
 
-A blocked target command does not produce ProposalAccepted.
+A blocked target command does not produce ProposalAccepted (persisted name: `ProposalWasAccepted`).
 
 ## 13. Review lifecycle
 
@@ -304,7 +308,7 @@ ConclusionRecorded C1
   -> C1 remains historical
 ```
 
-Current conclusion is derived as effective-current projection.
+Current conclusion is derived as effective-current projection. *(v1.0.0: the conclusion with the highest `recordedAtVersion`; `ConclusionReassessed` is deferred.)*
 
 ## 15. Domain-pack and policy version behavior
 
@@ -312,6 +316,8 @@ Current conclusion is derived as effective-current projection.
 - Optional packs may be deactivated if no required semantics become unavailable.
 - Policy pins change through explicit events.
 - Historical events remain associated with their original policy/semantic versions.
+
+*(v1.0.0: `domainPacks` is always `[]`; each event carries `semanticVersion`; pack and policy-pin events are deferred.)*
 
 ## 16. Transition evaluation order
 

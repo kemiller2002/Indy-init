@@ -190,7 +190,7 @@ But the investigation does not become Resolved if verification is required.
 
 ## A21. Verification failure reopens work
 
-Given a corrective action is AwaitingVerification
+Given a corrective action is AwaitingVerification (persisted: `awaitingVerificationOfEffect`)
 And the verification criterion fails
 
 Then the action transitions to VerificationFailed or ReworkRequired
@@ -934,7 +934,7 @@ And historical hypothesis lifecycle events remain unchanged.
 
 Given supported hypotheses H1 and H2 jointly form causal assertion C1
 When C1 satisfies the cause-confirmation gate
-Then CauseConfirmed is recorded for C1
+Then CauseConfirmed is recorded for C1 (persisted: `CausalAssertionConfirmed`)
 And H1/H2 remain their historical hypothesis states
 And the system does not require a one-to-one HypothesisConfirmed transition.
 
@@ -952,7 +952,7 @@ Given causal assertion C1 was Confirmed
 And new material contradictory evidence arrives
 When ReopenConfirmedCause is accepted
 Then C1 becomes Reopened/currently under investigation
-And the prior CauseConfirmed event remains in history.
+And the prior CauseConfirmed (`CausalAssertionConfirmed`) event remains in history.
 
 ## A120. Generic state setter is unavailable
 
@@ -966,7 +966,7 @@ Given proposal P was legal when generated at version 12
 And investigation state advances to version 16
 When the user accepts P
 Then the target command is evaluated against version 16/current policy
-And ProposalAccepted is emitted only if that target command succeeds.
+And ProposalAccepted (persisted: `ProposalWasAccepted`) is emitted only if that target command succeeds.
 
 ## A122. Conclusion cannot upgrade causal authority
 
@@ -1041,7 +1041,7 @@ But core InvestigationId, EventId, HypothesisId, and AggregateVersion remain pro
 Given investigation I is Resolved
 When ReopenInvestigation succeeds
 Then current lifecycle becomes Active
-And the earlier InvestigationResolved event remains authoritative history
+And the earlier InvestigationResolved (`LifecycleChanged{command: resolveInvestigation}`) event remains authoritative history
 And Reopened need not be a permanent lifecycle enum case.
 
 ## A133. Corrective verification has no shortcut setter

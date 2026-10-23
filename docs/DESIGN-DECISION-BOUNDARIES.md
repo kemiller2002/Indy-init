@@ -107,7 +107,7 @@ GitHub is the initial persistence provider.
 It is not the domain database abstraction.
 
 ### D-202 Repository file layout
-The exact JSON/NDJSON/file layout may change.
+The exact JSON/NDJSON/file layout may change. ***Superseded by frozen contract v1.0.0:** for v1.0.0 data the layout is frozen (CONTRACT §3); a change requires a new contract version ([compatibility/RULES.md](../requirements/causa/data/v1.0.0/compatibility/RULES.md)).*
 
 Stable identifiers and canonical export semantics matter more than path layout.
 

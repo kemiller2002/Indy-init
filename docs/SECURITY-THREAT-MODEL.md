@@ -294,6 +294,8 @@ The product must explain the tradeoff.
 
 ## 23. Persistence integrity
 
+> **Normative status.** **Normative** security posture; load validation follows the contract. Persisted data is governed only by the frozen Causa storage contract v1.0.0 ([README.md](../requirements/causa/data/v1.0.0/README.md), [FIELD-CATALOG.md](../requirements/causa/data/v1.0.0/FIELD-CATALOG.md), [EVENT-CATALOG.md](../requirements/causa/data/v1.0.0/EVENT-CATALOG.md)). Where this document states a persisted field, event name, enum value, layout, hash or concurrency rule differently, the contract governs; such statements are marked *Superseded by frozen contract v1.0.0* in place.
+
 Attackers or accidental edits may modify repository files outside the app.
 
 On load, validate:
@@ -303,6 +305,8 @@ On load, validate:
 - required extension schemas
 - snapshot/history agreement where possible
 - integrity digests where enabled
+
+> **Superseded by frozen contract v1.0.0:** validation is mandatory and complete: the 17-stage CONTRACT §11.1 check order, including engine admissibility; digests are always present ("where possible"/"where enabled" do not apply); there are no extension schemas in v1.0.0.
 
 Do not ask AI to "repair" malformed authority automatically.
 
@@ -327,7 +331,7 @@ If stronger tamper evidence is required, use:
 - event hash chaining
 - server-side authorization
 
-These are deployment controls, not replacements for semantic validation.
+These are deployment controls, not replacements for semantic validation. *(Event hash chaining cannot be stored inside v1.0.0 events; v1.0.0 detects rewriting with the byte-prefix successor rule, CONTRACT §9.3.)*
 
 ## 26. Branch protection
 

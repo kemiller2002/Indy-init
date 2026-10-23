@@ -50,6 +50,8 @@ The engine does not own:
 
 Every authoritative request should use a command envelope.
 
+> **Normative status.** **Normative** policy design; the command envelope itself is not persisted. Persisted data is governed only by the frozen Causa storage contract v1.0.0 ([README.md](../requirements/causa/data/v1.0.0/README.md), [FIELD-CATALOG.md](../requirements/causa/data/v1.0.0/FIELD-CATALOG.md), [EVENT-CATALOG.md](../requirements/causa/data/v1.0.0/EVENT-CATALOG.md)). Where this document states a persisted field, event name, enum value, layout, hash or concurrency rule differently, the contract governs; such statements are marked *Superseded by frozen contract v1.0.0* in place.
+
 Conceptual fields:
 
 ```text
@@ -68,6 +70,8 @@ CommandEnvelope
 ```
 
 The command must carry the aggregate version against which the caller made the decision when concurrency matters.
+
+> **Superseded by frozen contract v1.0.0:** only `CommandId` is persisted, as the event envelope's required `correlationId`; the optional CorrelationId/CausationId/IdempotencyKey here are not persisted. `RequestedAt` becomes `occurredAt` and must be millisecond-truncated UTC (CONTRACT §2.9, §5).
 
 ## 4. Decision model
 
