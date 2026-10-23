@@ -1,20 +1,35 @@
 {
- "verdict": "PASS",
+ "note": "Merged from per-prefix runs (--only AC-SCHEMA/REG/INV/NEG/APPEND/PARITY/CATALOG/SUP/STEP0) because the full run aborts in AC-URL-01 (runner defect NEW-01).",
  "counts": {
-  "PASS": 102,
-  "FAIL": 0,
-  "NOT_EVALUATED": 0
+  "PASS": 103,
+  "FAIL": 1,
+  "RUNNER_ERROR": 1
  },
  "rows": [
   {
-   "row": "AC-SCHEMA-01",
+   "row": "AC-STEP0-DATASET",
    "status": "PASS",
-   "detail": ""
+   "detail": "176 frozen files equal lock.json"
   },
   {
-   "row": "AC-REG-01",
+   "row": "AC-STEP0-MATRIX",
    "status": "PASS",
-   "detail": ""
+   "detail": "matrix agrees with lock.expectedStates and lock.negatives"
+  },
+  {
+   "row": "AC-APPEND-01",
+   "status": "PASS",
+   "detail": "version 34 -> 35, prefix preserved, independent reader accepts"
+  },
+  {
+   "row": "AC-APPEND-02",
+   "status": "PASS",
+   "detail": "primaryCode='CAUSA.VERSION_STALE' bytesUnchanged=True"
+  },
+  {
+   "row": "AC-CATALOG-01",
+   "status": "PASS",
+   "detail": "PASS catalog.dataset-coverage 0 undocumented dataset paths"
   },
   {
    "row": "AC-INV-payment-failure",
@@ -492,19 +507,9 @@
    "detail": "line 4 names investigation c57e4407-dd43-5d63-8dbe-9d6ceac6c31a [stage 15 not-reached]"
   },
   {
-   "row": "AC-APPEND-01",
-   "status": "PASS",
-   "detail": "version 34 -> 35, prefix preserved, independent reader accepts"
-  },
-  {
-   "row": "AC-APPEND-02",
-   "status": "PASS",
-   "detail": "primaryCode='CAUSA.VERSION_STALE' bytesUnchanged=True"
-  },
-  {
    "row": "AC-PARITY-01",
-   "status": "PASS",
-   "detail": "PASS parity 0 unexplained difference(s)"
+   "status": "FAIL",
+   "detail": "FAIL parity 10 unexplained difference(s)"
   },
   {
    "row": "AC-PARITY-02",
@@ -512,9 +517,19 @@
    "detail": "PASS selftest 35/35"
   },
   {
-   "row": "AC-CATALOG-01",
+   "row": "AC-REG-01",
    "status": "PASS",
-   "detail": "PASS catalog.dataset-coverage 0 undocumented dataset paths"
+   "detail": ""
+  },
+  {
+   "row": "AC-SCHEMA-01",
+   "status": "PASS",
+   "detail": ""
+  },
+  {
+   "row": "AC-URL-01",
+   "status": "RUNNER_ERROR",
+   "detail": "runner crashed in url_outcome: str.splitlines() splits a vector containing raw U+0085 (see REQUIREMENTS-GAPS NEW-01); consumer url-verdict equals expected for 3596/3596 vectors in order"
   }
  ]
 }

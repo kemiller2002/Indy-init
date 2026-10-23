@@ -20,6 +20,34 @@ Additional evidence beyond the matrix, all produced with this implementation:
 
 ---
 
+## Resolution status (third iteration, after CLARIFICATIONS.md and the SEMANTICS §0/§3.3 changes)
+
+I re-read only CLARIFICATIONS.md, acceptance/ACCEPTANCE.md and SEMANTICS §0, §3.3 and §17 E-5. The consumer now
+conforms to them.
+
+| gap | resolved by | consumer change |
+|---|---|---|
+| GAP-01 URL verdict | SEMANTICS §10.4.1–§10.4.2. CLAR-03: `CAUSA.UNREPRESENTABLE` wins over another `AdmitEvidence` refusal, which settles my residual item 2. | New `url-verdict` command. The IPv6-text corner (residual item 1) is still open. |
+| GAP-02 lowercase | SEMANTICS §3.3 pins Unicode 15.1.0 simple lowercase; §17 E-5 resolved | Python 3.13 `unicodedata` is 15.1.0. I checked all code points: U+0130 is the only one whose `str.lower()` is not one-to-one, so per-code-point `lower()` with U+0130 kept equals the pinned mapping. A runtime guard returns "not evaluated" for the repetition rule if the Unicode version differs. |
+| GAP-03 `admissibility` | CLAR-02 | none; it matches what I already chose |
+| GAP-04 command refusal code | CLAR-03: `CAUSA.COMMAND_REFUSED`, `domainCode` = first inner rule code | changed (I previously used `HISTORY_INADMISSIBLE`/`HISTORY.INADMISSIBLE_EVENT`) |
+| GAP-05 local atomicity | CLAR-04 | Replaced per-file renames with the `.next-<n>`/`.prev-<n>` sibling-directory publish, confirm-then-remove, and start-up recovery. |
+| GAP-06 frozen tree | CLAR-03: `CAUSA.PATH_FROZEN`, which also applies to any target outside `workspaces/demo/<runId>/investigations/` | changed (I previously used `PATH_INVALID`, frozen trees only) |
+| GAP-07 append evaluation | CLAR-05 | none; it matches |
+| GAP-08 successor | CLAR-06 | none. `directoryId` was already only data, never a path. |
+| GAP-09 digests | CLAR-07 | Stage-1 failures now report digests of the files that are present (previously all null). |
+| GAP-10 stage-5 scope | CLAR-08 | none |
+| GAP-11 command timestamps | CLAR-09 | Parsing is now strict RFC 3339. Years outside 0001–9999 after UTC normalization are refused; this used to crash on overflow. |
+| GAP-12 calendar validity | CLAR-09 | none; I already attached the check to the timestamp definition |
+| GAP-13 E-2 | CLAR-11 | none |
+| GAP-14 dataset codes | CLAR-10 | none. There is no protocol command for dataset verification (see NEW-09). |
+| GAP-15 oracle as tie-breaker | SEMANTICS §0.3 (this document is complete; disagreements are defects in it) and CLAR-14 | none |
+| GAP-16 golden refusal inputs | still informative and out of scope (ACCEPTANCE §6) | none |
+
+CLAR-01 (de-duplicating id lists) does not apply: this consumer's only command path, `RecordObservation`, takes no
+identifier list or causal members. CLAR-12 and CLAR-13 do not apply either: the consumer reads bytes and never writes
+URLs.
+
 ## GAP-01: artifact URL well-formedness, E-1 (was critical; resolved by a requirements fix, residual minor)
 
 ### History: original text and finding (first iteration)
@@ -302,3 +330,155 @@ a non-blank `residualUncertainty`. The full `engineCodes` order matched for all 
 I did not need `FIELD-CATALOG.md` (344 KB), `FIELD-MAPPING.md` or the per-event sections of `EVENT-CATALOG.md`
 beyond their headings and envelope rules. CONTRACT §6–§8, the schemas and SEMANTICS.md were sufficient. Catalog and
 parity rows (`AC-PARITY-*`, `AC-CATALOG-01`) test the requirement tooling, not the consumer.
+
+---
+
+# Third iteration: new gaps in CLARIFICATIONS.md, ACCEPTANCE.md and the suite (strict reading)
+
+## NEW-01: the runner cannot evaluate AC-URL-01 (critical for the suite verdict; not a consumer defect)
+
+**Text (ACCEPTANCE §3):** "`url-verdict` → `{"verdicts": [...]}`, one of … per input line, in order."
+
+**Problem:** `catalog/artifact-url-vectors.jsonl` has 3596 LF-terminated lines. One `url` value contains a raw
+U+0085 (NEL), which JSON allows unescaped. The runner reads the file with Python `str.splitlines()`, which also
+breaks at U+0085, U+2028, VT, FF and similar characters. It therefore gets 3597 pieces and crashes with
+`JSONDecodeError` inside `url_outcome`. I saw only the traceback, not the runner source.
+
+This aborts the whole `run`, so no full-suite verdict can currently be produced. The requirement text never defines
+"line". JSONL and CONTRACT §2.2 imply LF only, which is what my consumer uses.
+
+**Fix needed (requirements or runner):**
+1. State "lines are LF-delimited".
+2. Make the runner split on `\n`.
+3. Optionally, escape C1 and line-separator characters in the vectors file.
+
+My CLI output equals the `expected` column in order for 3596/3596 vectors.
+
+## NEW-02: AC-PARITY-01 fails because release-pin.json is stale (process; not a consumer defect)
+
+`parity_gate.py check` reports 10 `REQUIREMENT_UNPINNED_CHANGE` items. They cover README.md, SEMANTICS.md,
+INVARIANTS.md, CLARIFICATIONS.md, compatibility/RULES.md, acceptance/ACCEPTANCE.md, TEST-MATRIX.json, both
+catalog/*-semantics.json files and artifact-url-vectors.jsonl. The new normative text has not been pinned, so the
+suite cannot PASS until `release-pin.json` is updated in a reviewed change.
+
+## NEW-03: CLAR-04 sibling directories conflict with CONTRACT §3.2 (minor; a real text conflict)
+
+**Text:**
+
+* CLAR-04: "a reader enumerating investigations ignores names that are not canonical UUIDs (they are not
+  `CAUSA.PATH_INVALID` investigations …)".
+* CONTRACT §3.2: "A reader MUST reject any other directory name (`CAUSA.PATH_INVALID`)".
+* CLARIFICATIONS preamble: "Where a clarification and CONTRACT.md appear to conflict, CONTRACT.md wins and the
+  clarification is defective."
+
+**Problem:** By the preamble's own rule, a reader that enumerates `workspaces/demo/<runId>/investigations/` while a
+`.next-<n>`, `.prev-<n>` or (my) `.invalid-<n>` sibling exists must reject it. CLAR-04 says the opposite. My consumer
+never enumerates directories, so its behaviour is unaffected.
+
+**Fix needed:** CONTRACT §3.2 should scope "reject" to a directory that is *given* as an investigation, or
+CLAR-04 should put the siblings outside `investigations/`.
+
+## NEW-04: CLAR-04 leaves several recovery details open (minor)
+
+**Text (CLAR-04):** "On start, if `<investigationId>` is missing or invalid, and a `.prev-<n>` or `.next-<n>` sibling
+verifies fully, the writer restores the verified sibling … Recovery is a writer action that only renames whole,
+verified file sets."
+
+**What is missing, and what I chose:**
+
+| open point | my choice |
+|---|---|
+| (a) How `<n>` is chosen. | The smallest `n ≥ 1` not used by any `.next`, `.prev` or `.invalid` sibling. |
+| (b) What happens to an existing but *invalid* `<id>`. Renaming it is not "renaming a verified set", but restoring requires the name. | Move it aside, unchanged, to `<id>.invalid-<n>`. It is never deleted or repaired. A stricter reading would refuse instead. |
+| (c) Which sibling to use when several `n` verify. | The highest `n` of each kind. Then `.next` is used only if its events start with `.prev`'s, else `.prev`. |
+| (d) What "on start" means. | The start of every `append-observation`. |
+| (e) What happens to a non-chosen `.next`. | Left in place. |
+| (f) After `CAUSA.WRITE_UNCONFIRMED` the new set is already published as `<id>`; the table says "written: see CAUSA-CLAR-04", but CLAR-04 does not say whether to roll back. | Keep it published, keep `.prev-<n>`, and report `CAUSA.WRITE_UNCONFIRMED`. |
+
+## NEW-05: CLAR-03 precedence omits a failing base investigation (minor)
+
+**Text (CLAR-03):** "Precedence when several apply: path, then version, then representability of the inputs, then
+`decide` …"
+
+**What is missing:** The version check needs the current version, which comes from the verified base (CLAR-05 §1
+says the base must verify, but CLAR-05 is about append fixtures). Where a base that fails verification sits in the
+order is not stated.
+
+**What I chose:** path, then recovery (CLAR-04), then base verification (its own stage code), then version,
+representability, decide, verification of the new set, confirmation.
+
+## NEW-06: boundary between "representability" and "decide" (minor)
+
+**Text (CLAR-03):** "a value has no v1 wire form … → `CAUSA.UNREPRESENTABLE`"; "`decide` refuses … →
+`CAUSA.COMMAND_REFUSED`"; representability comes before decide.
+
+**Problem:** Blank `--original` has no wire form (the schema `text` definition), and decide also refuses it
+(`VALIDATION.EMPTY`). The precedence makes the classification matter.
+
+**What I chose:** If SEMANTICS has a rule for the value, `decide` reports it: blank `original` →
+`COMMAND_REFUSED` / `VALIDATION.EMPTY`. If decide never sees the value, it is `UNREPRESENTABLE`. That covers blank or
+U+FEFF `actorId`, an actor kind other than human/system, non-canonical ids, and U+FEFF or lone surrogates in any text.
+
+## NEW-07: the `CAUSA.PATH_FROZEN` condition is under-specified (minor)
+
+**Text (CLAR-03):** "the target directory is under `fixtures/v1.0.0/`, `contract/v1.0.0/` or
+`compatibility/v1.0.0/`, or is not under `workspaces/demo/<runId>/investigations/`".
+
+**What is missing:**
+
+* Whether "under" means directly (`…/investigations/<id>`) or at any depth.
+* Whether `<runId>` must match the CONTRACT §3.2 pattern.
+* Whether the test applies to the given path or the resolved one (symlinks).
+* A single code covers two different situations: frozen, and not a workspace.
+
+**What I chose:** The real path, with symlinks resolved, must end with
+`workspaces/demo/<runId>/investigations/<dir>`, where `<runId>` matches `^[a-z0-9][a-z0-9-]{0,63}$`. No path
+component pair may be `fixtures|contract|compatibility` followed by `v1.0.0`.
+
+## NEW-08: CLAR-09 year check, before or after normalization (minor)
+
+**Text (CLAR-09):** "refuses … a year outside 0001–9999".
+
+**What is missing:** Whether the year is the input's local year or the UTC year. For example,
+`0001-01-01T00:30:00+01:00` is year 0000 in UTC.
+
+**What I chose:** The input must be calendar-valid, *and* the normalized UTC instant must lie in 0001–9999.
+Related RFC 3339 corners:
+
+* Lowercase `t`/`z` are accepted.
+* A leap second `:60` is refused as calendar-invalid (CONTRACT §2.9).
+* `-00:00` is treated as UTC, although RFC 3339 gives it an "unknown local offset" meaning.
+
+## NEW-09: CLAR-10 dataset verification has no protocol command or acceptance row (minor)
+
+**Text (CLAR-10):** "Dataset verification is a separate operation …".
+
+**Problem:** ACCEPTANCE §3 has no command for it and no row exercises it, so a consumer cannot show that it
+conforms. I did not add a command; the root manifest is checked only when it is used to locate a scenario.
+
+## NEW-10: CLAR-02 and stages 16–17 after a not-evaluated stage 15 (minor)
+
+**Text:**
+
+* CLAR-02: "`primaryCode` MUST be `null` only if every stage before 15 passed".
+* CONTRACT §11.3: "For inputs whose expected code comes after stage 15, such a consumer's primary code is
+  conditional on admissibility, and it MUST say so."
+
+**What is missing:** Whether a consumer whose stage 15 is not evaluated should still run stages 16–17 and report
+their code as conditional, or stop with `null`.
+
+**What I chose:** Stop with `null`, and say so in `detail`. This happens only for out-of-profile URLs.
+
+## NEW-11: supplementary acceptance artefacts are referenced but absent (info)
+
+ACCEPTANCE ACC-10 and §4 make the verdict depend on `acceptance/supplementary/MATRIX.json` and
+`supplementary/README.md`. Neither exists yet, so no AC-SUP row ran.
+
+## NEW-12: digests reported for append and successor negatives (minor)
+
+**Text (CLAR-07):** "Digests describe the files as read".
+
+**What is missing:** For an `append` fixture that fails before step (3), the "files as read" are ambiguous: the
+base, the appended chunk, or the combined set.
+
+**What I chose:** The base investigation's digests until the combined set is built, then the combined set's.

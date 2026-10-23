@@ -1,0 +1,1309 @@
+{
+ "contractVersion": "1.0.0",
+ "dataset": "causa-demo-v1",
+ "generator": "tools/causa-contract/differential/supplementary.py",
+ "description": "Supplementary stage-15 rows (SEMANTICS §16, §7). 'errors' is the complete ordered History.validate list of the reference oracle: history code and inner rule code (null when the group is not a refusal).",
+ "rows": [
+  {
+   "id": "AC-SUP-sup-start-group-reconstructs-finding",
+   "kind": "negative",
+   "input": "acceptance/supplementary/negative/sup-start-group-reconstructs-finding.json",
+   "covers": [
+    "INVESTIGATION.NOT_FOUND",
+    "§8.2",
+    "§15.3.1"
+   ],
+   "errors": [
+    {
+     "code": "HISTORY.INADMISSIBLE_EVENT",
+     "inner": "INVESTIGATION.NOT_FOUND"
+    }
+   ],
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.INADMISSIBLE_EVENT",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-SUP-sup-no-start-single-group",
+   "kind": "negative",
+   "input": "acceptance/supplementary/negative/sup-no-start-single-group.json",
+   "covers": [
+    "HISTORY.NO_START",
+    "§15.2 2.1"
+   ],
+   "errors": [
+    {
+     "code": "HISTORY.NO_START",
+     "inner": null
+    }
+   ],
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.NO_START",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-SUP-sup-content-after-close",
+   "kind": "negative",
+   "input": "acceptance/supplementary/negative/sup-content-after-close.json",
+   "covers": [
+    "INVESTIGATION.NOT_OPEN",
+    "§8.6",
+    "§7.9"
+   ],
+   "errors": [
+    {
+     "code": "HISTORY.INADMISSIBLE_EVENT",
+     "inner": "INVESTIGATION.NOT_OPEN"
+    }
+   ],
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.INADMISSIBLE_EVENT",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-SUP-sup-confirm-after-resolution",
+   "kind": "negative",
+   "input": "acceptance/supplementary/negative/sup-confirm-after-resolution.json",
+   "covers": [
+    "INVESTIGATION.NOT_OPEN",
+    "§8.6",
+    "§15.4"
+   ],
+   "errors": [
+    {
+     "code": "HISTORY.UNGATED_CONFIRMATION",
+     "inner": "INVESTIGATION.NOT_OPEN"
+    }
+   ],
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.UNGATED_CONFIRMATION",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-SUP-sup-confirm-in-draft",
+   "kind": "negative",
+   "input": "acceptance/supplementary/negative/sup-confirm-in-draft.json",
+   "covers": [
+    "INVESTIGATION.NOT_OPEN",
+    "§11.3"
+   ],
+   "errors": [
+    {
+     "code": "HISTORY.UNGATED_CONFIRMATION",
+     "inner": "INVESTIGATION.NOT_OPEN"
+    }
+   ],
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.UNGATED_CONFIRMATION",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-SUP-sup-accept-proposal-duplicate-target",
+   "kind": "negative",
+   "input": "acceptance/supplementary/negative/sup-accept-proposal-duplicate-target.json",
+   "covers": [
+    "DUPLICATE_ID",
+    "§10.29.5"
+   ],
+   "errors": [
+    {
+     "code": "HISTORY.INADMISSIBLE_EVENT",
+     "inner": "DUPLICATE_ID"
+    }
+   ],
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.INADMISSIBLE_EVENT",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-SUP-sup-contradiction-dangling-evidence",
+   "kind": "negative",
+   "input": "acceptance/supplementary/negative/sup-contradiction-dangling-evidence.json",
+   "covers": [
+    "NOT_FOUND",
+    "§10.12"
+   ],
+   "errors": [
+    {
+     "code": "HISTORY.INADMISSIBLE_EVENT",
+     "inner": "NOT_FOUND"
+    }
+   ],
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.INADMISSIBLE_EVENT",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-SUP-sup-hypothesis-reopen-superseded",
+   "kind": "negative",
+   "input": "acceptance/supplementary/negative/sup-hypothesis-reopen-superseded.json",
+   "covers": [
+    "TRANSITION.ILLEGAL",
+    "§7.1"
+   ],
+   "errors": [
+    {
+     "code": "HISTORY.INADMISSIBLE_EVENT",
+     "inner": "TRANSITION.ILLEGAL"
+    }
+   ],
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.INADMISSIBLE_EVENT",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-SUP-sup-unknown-start-investigating-twice",
+   "kind": "negative",
+   "input": "acceptance/supplementary/negative/sup-unknown-start-investigating-twice.json",
+   "covers": [
+    "TRANSITION.ILLEGAL",
+    "§7.2"
+   ],
+   "errors": [
+    {
+     "code": "HISTORY.INADMISSIBLE_EVENT",
+     "inner": "TRANSITION.ILLEGAL"
+    }
+   ],
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.INADMISSIBLE_EVENT",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-SUP-sup-contradiction-triage-twice",
+   "kind": "negative",
+   "input": "acceptance/supplementary/negative/sup-contradiction-triage-twice.json",
+   "covers": [
+    "TRANSITION.ILLEGAL",
+    "§7.3"
+   ],
+   "errors": [
+    {
+     "code": "HISTORY.INADMISSIBLE_EVENT",
+     "inner": "TRANSITION.ILLEGAL"
+    }
+   ],
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.INADMISSIBLE_EVENT",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-SUP-sup-assumption-accept-rejected",
+   "kind": "negative",
+   "input": "acceptance/supplementary/negative/sup-assumption-accept-rejected.json",
+   "covers": [
+    "TRANSITION.ILLEGAL",
+    "§7.4"
+   ],
+   "errors": [
+    {
+     "code": "HISTORY.INADMISSIBLE_EVENT",
+     "inner": "TRANSITION.ILLEGAL"
+    }
+   ],
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.INADMISSIBLE_EVENT",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-SUP-sup-action-approve-rejected",
+   "kind": "negative",
+   "input": "acceptance/supplementary/negative/sup-action-approve-rejected.json",
+   "covers": [
+    "TRANSITION.ILLEGAL",
+    "§7.5"
+   ],
+   "errors": [
+    {
+     "code": "HISTORY.INADMISSIBLE_EVENT",
+     "inner": "TRANSITION.ILLEGAL"
+    }
+   ],
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.INADMISSIBLE_EVENT",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-SUP-sup-cause-reopen-proposed",
+   "kind": "negative",
+   "input": "acceptance/supplementary/negative/sup-cause-reopen-proposed.json",
+   "covers": [
+    "TRANSITION.ILLEGAL",
+    "§7.6",
+    "§10.23"
+   ],
+   "errors": [
+    {
+     "code": "HISTORY.INADMISSIBLE_EVENT",
+     "inner": "TRANSITION.ILLEGAL"
+    }
+   ],
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.INADMISSIBLE_EVENT",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-SUP-sup-correction-approve-cancelled",
+   "kind": "negative",
+   "input": "acceptance/supplementary/negative/sup-correction-approve-cancelled.json",
+   "covers": [
+    "TRANSITION.ILLEGAL",
+    "§7.7"
+   ],
+   "errors": [
+    {
+     "code": "HISTORY.INADMISSIBLE_EVENT",
+     "inner": "TRANSITION.ILLEGAL"
+    }
+   ],
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.INADMISSIBLE_EVENT",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-SUP-sup-accept-rejected-proposal",
+   "kind": "negative",
+   "input": "acceptance/supplementary/negative/sup-accept-rejected-proposal.json",
+   "covers": [
+    "PROPOSAL.NOT_ACTIVE",
+    "§7.8",
+    "§10.29.2"
+   ],
+   "errors": [
+    {
+     "code": "HISTORY.INADMISSIBLE_EVENT",
+     "inner": "PROPOSAL.NOT_ACTIVE"
+    }
+   ],
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.INADMISSIBLE_EVENT",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-SUP-sup-lifecycle-activate-active",
+   "kind": "negative",
+   "input": "acceptance/supplementary/negative/sup-lifecycle-activate-active.json",
+   "covers": [
+    "TRANSITION.ILLEGAL",
+    "§7.9",
+    "§9.1"
+   ],
+   "errors": [
+    {
+     "code": "HISTORY.INADMISSIBLE_EVENT",
+     "inner": "TRANSITION.ILLEGAL"
+    }
+   ],
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.INADMISSIBLE_EVENT",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-SUP-sup-lifecycle-close-active",
+   "kind": "negative",
+   "input": "acceptance/supplementary/negative/sup-lifecycle-close-active.json",
+   "covers": [
+    "TRANSITION.ILLEGAL",
+    "§7.9"
+   ],
+   "errors": [
+    {
+     "code": "HISTORY.INADMISSIBLE_EVENT",
+     "inner": "TRANSITION.ILLEGAL"
+    }
+   ],
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.INADMISSIBLE_EVENT",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-SUP-sup-lifecycle-reopen-active",
+   "kind": "negative",
+   "input": "acceptance/supplementary/negative/sup-lifecycle-reopen-active.json",
+   "covers": [
+    "TRANSITION.ILLEGAL",
+    "§7.9"
+   ],
+   "errors": [
+    {
+     "code": "HISTORY.INADMISSIBLE_EVENT",
+     "inner": "TRANSITION.ILLEGAL"
+    }
+   ],
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.INADMISSIBLE_EVENT",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-SUP-sup-resolve-from-awaiting-evidence",
+   "kind": "negative",
+   "input": "acceptance/supplementary/negative/sup-resolve-from-awaiting-evidence.json",
+   "covers": [
+    "TRANSITION.ILLEGAL",
+    "§7.9",
+    "§9.1",
+    "§15.4"
+   ],
+   "errors": [
+    {
+     "code": "HISTORY.UNGATED_RESOLUTION",
+     "inner": "TRANSITION.ILLEGAL"
+    }
+   ],
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.UNGATED_RESOLUTION",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-SUP-sup-resolve-from-resolved",
+   "kind": "negative",
+   "input": "acceptance/supplementary/negative/sup-resolve-from-resolved.json",
+   "covers": [
+    "TRANSITION.ILLEGAL",
+    "§7.9",
+    "§8.5"
+   ],
+   "errors": [
+    {
+     "code": "HISTORY.UNGATED_RESOLUTION",
+     "inner": "TRANSITION.ILLEGAL"
+    }
+   ],
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.UNGATED_RESOLUTION",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-SUP-sup-artifact-url-port-out-of-range",
+   "kind": "negative",
+   "input": "acceptance/supplementary/negative/sup-artifact-url-port-out-of-range.json",
+   "covers": [
+    "EVIDENCE.URL",
+    "§10.4.2"
+   ],
+   "errors": [
+    {
+     "code": "HISTORY.INADMISSIBLE_EVENT",
+     "inner": "EVIDENCE.URL"
+    }
+   ],
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.INADMISSIBLE_EVENT",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-SUP-sup-artifact-url-bad-percent-escape",
+   "kind": "negative",
+   "input": "acceptance/supplementary/negative/sup-artifact-url-bad-percent-escape.json",
+   "covers": [
+    "EVIDENCE.URL",
+    "§10.4.2"
+   ],
+   "errors": [
+    {
+     "code": "HISTORY.INADMISSIBLE_EVENT",
+     "inner": "EVIDENCE.URL"
+    }
+   ],
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.INADMISSIBLE_EVENT",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-SUP-sup-finding-for-proposed-action",
+   "kind": "negative",
+   "input": "acceptance/supplementary/negative/sup-finding-for-proposed-action.json",
+   "covers": [
+    "ACTION.NOT_EXECUTABLE",
+    "§10.20"
+   ],
+   "errors": [
+    {
+     "code": "HISTORY.INADMISSIBLE_EVENT",
+     "inner": "ACTION.NOT_EXECUTABLE"
+    }
+   ],
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.INADMISSIBLE_EVENT",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-SUP-sup-verification-not-awaiting",
+   "kind": "negative",
+   "input": "acceptance/supplementary/negative/sup-verification-not-awaiting.json",
+   "covers": [
+    "VERIFICATION.NOT_AWAITING",
+    "§12.2.3"
+   ],
+   "errors": [
+    {
+     "code": "HISTORY.INADMISSIBLE_EVENT",
+     "inner": "VERIFICATION.NOT_AWAITING"
+    }
+   ],
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.INADMISSIBLE_EVENT",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-SUP-sup-verification-evidence-superseded",
+   "kind": "negative",
+   "input": "acceptance/supplementary/negative/sup-verification-evidence-superseded.json",
+   "covers": [
+    "VERIFICATION.EVIDENCE_PREDATES_ROUND",
+    "§12.2.5",
+    "§4.4 fresh"
+   ],
+   "errors": [
+    {
+     "code": "HISTORY.INADMISSIBLE_EVENT",
+     "inner": "VERIFICATION.EVIDENCE_PREDATES_ROUND"
+    }
+   ],
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.INADMISSIBLE_EVENT",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-SUP-sup-cause-not-found",
+   "kind": "negative",
+   "input": "acceptance/supplementary/negative/sup-cause-not-found.json",
+   "covers": [
+    "CAUSE.NOT_FOUND",
+    "§11.1"
+   ],
+   "errors": [
+    {
+     "code": "HISTORY.UNGATED_CONFIRMATION",
+     "inner": "CAUSE.NOT_FOUND"
+    }
+   ],
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.UNGATED_CONFIRMATION",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-SUP-sup-cause-member-not-supported",
+   "kind": "negative",
+   "input": "acceptance/supplementary/negative/sup-cause-member-not-supported.json",
+   "covers": [
+    "CAUSE.MEMBER_NOT_SUPPORTED",
+    "§11.4.2"
+   ],
+   "errors": [
+    {
+     "code": "HISTORY.UNGATED_CONFIRMATION",
+     "inner": "CAUSE.MEMBER_NOT_SUPPORTED"
+    }
+   ],
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.UNGATED_CONFIRMATION",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-SUP-sup-cause-no-supporting-evidence",
+   "kind": "negative",
+   "input": "acceptance/supplementary/negative/sup-cause-no-supporting-evidence.json",
+   "covers": [
+    "CAUSE.NO_SUPPORTING_EVIDENCE",
+    "§11.4.2",
+    "§4.4 active"
+   ],
+   "errors": [
+    {
+     "code": "HISTORY.UNGATED_CONFIRMATION",
+     "inner": "CAUSE.NO_SUPPORTING_EVIDENCE"
+    }
+   ],
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.UNGATED_CONFIRMATION",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-SUP-sup-cause-contradicting-evidence",
+   "kind": "negative",
+   "input": "acceptance/supplementary/negative/sup-cause-contradicting-evidence.json",
+   "covers": [
+    "CAUSE.CONTRADICTING_EVIDENCE",
+    "§11.4.2"
+   ],
+   "errors": [
+    {
+     "code": "HISTORY.UNGATED_CONFIRMATION",
+     "inner": "CAUSE.CONTRADICTING_EVIDENCE"
+    }
+   ],
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.UNGATED_CONFIRMATION",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-SUP-sup-cause-member-missing",
+   "kind": "negative",
+   "input": "acceptance/supplementary/negative/sup-cause-member-missing.json",
+   "covers": [
+    "CAUSE.MEMBER_MISSING",
+    "§11.4.2",
+    "§15.9.4"
+   ],
+   "errors": [
+    {
+     "code": "HISTORY.INADMISSIBLE_EVENT",
+     "inner": "NOT_FOUND"
+    },
+    {
+     "code": "HISTORY.UNGATED_CONFIRMATION",
+     "inner": "CAUSE.MEMBER_MISSING"
+    }
+   ],
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.INADMISSIBLE_EVENT",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-SUP-sup-resolve-conclusion-stale",
+   "kind": "negative",
+   "input": "acceptance/supplementary/negative/sup-resolve-conclusion-stale.json",
+   "covers": [
+    "RESOLVE.CONCLUSION_STALE",
+    "§14.7",
+    "§13.2"
+   ],
+   "errors": [
+    {
+     "code": "HISTORY.UNGATED_RESOLUTION",
+     "inner": "RESOLVE.CONCLUSION_STALE"
+    }
+   ],
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.UNGATED_RESOLUTION",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-SUP-sup-resolve-no-confirmed-cause",
+   "kind": "negative",
+   "input": "acceptance/supplementary/negative/sup-resolve-no-confirmed-cause.json",
+   "covers": [
+    "RESOLVE.NO_CONFIRMED_CAUSE",
+    "§14.1",
+    "§14.3"
+   ],
+   "errors": [
+    {
+     "code": "HISTORY.UNGATED_RESOLUTION",
+     "inner": "RESOLVE.NO_CONFIRMED_CAUSE"
+    },
+    {
+     "code": "HISTORY.UNGATED_RESOLUTION",
+     "inner": "RESOLVE.NO_CORRECTION"
+    }
+   ],
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.UNGATED_RESOLUTION",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-SUP-sup-resolve-blocking-unknown",
+   "kind": "negative",
+   "input": "acceptance/supplementary/negative/sup-resolve-blocking-unknown.json",
+   "covers": [
+    "RESOLVE.BLOCKING_UNKNOWN",
+    "§14.5",
+    "§14.2"
+   ],
+   "errors": [
+    {
+     "code": "HISTORY.UNGATED_RESOLUTION",
+     "inner": "RESOLVE.CAUSE_NO_LONGER_HOLDS"
+    },
+    {
+     "code": "HISTORY.UNGATED_RESOLUTION",
+     "inner": "RESOLVE.BLOCKING_UNKNOWN"
+    }
+   ],
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.UNGATED_RESOLUTION",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-SUP-sup-agent-repeats-negative-knowledge",
+   "kind": "negative",
+   "input": "acceptance/supplementary/negative/sup-agent-repeats-negative-knowledge.json",
+   "covers": [
+    "PROPOSAL.REPEATS_NEGATIVE_KNOWLEDGE",
+    "§10.27",
+    "§3.3"
+   ],
+   "errors": [
+    {
+     "code": "HISTORY.INADMISSIBLE_EVENT",
+     "inner": "PROPOSAL.REPEATS_NEGATIVE_KNOWLEDGE"
+    }
+   ],
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.INADMISSIBLE_EVENT",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-SUP-sup-agent-repeats-falsified-normalised",
+   "kind": "negative",
+   "input": "acceptance/supplementary/negative/sup-agent-repeats-falsified-normalised.json",
+   "covers": [
+    "PROPOSAL.REPEATS_NEGATIVE_KNOWLEDGE",
+    "§10.27",
+    "§3.3"
+   ],
+   "errors": [
+    {
+     "code": "HISTORY.INADMISSIBLE_EVENT",
+     "inner": "PROPOSAL.REPEATS_NEGATIVE_KNOWLEDGE"
+    }
+   ],
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.INADMISSIBLE_EVENT",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-SUP-sup-forged-lifecycle-from",
+   "kind": "negative",
+   "input": "acceptance/supplementary/negative/sup-forged-lifecycle-from.json",
+   "covers": [
+    "§15.6 LifecycleChanged.from"
+   ],
+   "errors": [
+    {
+     "code": "HISTORY.INADMISSIBLE_EVENT",
+     "inner": null
+    }
+   ],
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.INADMISSIBLE_EVENT",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-SUP-sup-forged-resolution-from",
+   "kind": "negative",
+   "input": "acceptance/supplementary/negative/sup-forged-resolution-from.json",
+   "covers": [
+    "§15.6 LifecycleChanged.from",
+    "§15.4"
+   ],
+   "errors": [
+    {
+     "code": "HISTORY.INADMISSIBLE_EVENT",
+     "inner": null
+    }
+   ],
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.INADMISSIBLE_EVENT",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-SUP-sup-forged-hypothesis-from",
+   "kind": "negative",
+   "input": "acceptance/supplementary/negative/sup-forged-hypothesis-from.json",
+   "covers": [
+    "§15.6 HypothesisTransitioned.from"
+   ],
+   "errors": [
+    {
+     "code": "HISTORY.INADMISSIBLE_EVENT",
+     "inner": null
+    }
+   ],
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.INADMISSIBLE_EVENT",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-SUP-sup-forged-confirmation-policy",
+   "kind": "negative",
+   "input": "acceptance/supplementary/negative/sup-forged-confirmation-policy.json",
+   "covers": [
+    "§15.6 CausalAssertionConfirmed.policy",
+    "§3.5",
+    "§15.4"
+   ],
+   "errors": [
+    {
+     "code": "HISTORY.INADMISSIBLE_EVENT",
+     "inner": null
+    }
+   ],
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.INADMISSIBLE_EVENT",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-SUP-sup-forged-a21-reason",
+   "kind": "negative",
+   "input": "acceptance/supplementary/negative/sup-forged-a21-reason.json",
+   "covers": [
+    "§12.3 A21 reason"
+   ],
+   "errors": [
+    {
+     "code": "HISTORY.INADMISSIBLE_EVENT",
+     "inner": null
+    }
+   ],
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.INADMISSIBLE_EVENT",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-SUP-sup-forged-verification-lifecycle-missing",
+   "kind": "negative",
+   "input": "acceptance/supplementary/negative/sup-forged-verification-lifecycle-missing.json",
+   "covers": [
+    "§12.3 follow-ons"
+   ],
+   "errors": [
+    {
+     "code": "HISTORY.INADMISSIBLE_EVENT",
+     "inner": null
+    }
+   ],
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.INADMISSIBLE_EVENT",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-SUP-sup-forged-verification-lifecycle-extra",
+   "kind": "negative",
+   "input": "acceptance/supplementary/negative/sup-forged-verification-lifecycle-extra.json",
+   "covers": [
+    "§12.3 follow-ons"
+   ],
+   "errors": [
+    {
+     "code": "HISTORY.INADMISSIBLE_EVENT",
+     "inner": null
+    }
+   ],
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.INADMISSIBLE_EVENT",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-SUP-sup-forged-verification-correction-missing",
+   "kind": "negative",
+   "input": "acceptance/supplementary/negative/sup-forged-verification-correction-missing.json",
+   "covers": [
+    "§12.3 follow-ons"
+   ],
+   "errors": [
+    {
+     "code": "HISTORY.INADMISSIBLE_EVENT",
+     "inner": null
+    }
+   ],
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.INADMISSIBLE_EVENT",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-SUP-sup-forged-verified-effective-premature",
+   "kind": "negative",
+   "input": "acceptance/supplementary/negative/sup-forged-verified-effective-premature.json",
+   "covers": [
+    "§12.3 follow-ons",
+    "§4.4 allSatisfied"
+   ],
+   "errors": [
+    {
+     "code": "HISTORY.INADMISSIBLE_EVENT",
+     "inner": null
+    }
+   ],
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.INADMISSIBLE_EVENT",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-SUP-sup-forged-verified-effective-missing",
+   "kind": "negative",
+   "input": "acceptance/supplementary/negative/sup-forged-verified-effective-missing.json",
+   "covers": [
+    "§12.3 follow-ons"
+   ],
+   "errors": [
+    {
+     "code": "HISTORY.INADMISSIBLE_EVENT",
+     "inner": null
+    }
+   ],
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.INADMISSIBLE_EVENT",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-SUP-sup-forged-inconclusive-follow-on",
+   "kind": "negative",
+   "input": "acceptance/supplementary/negative/sup-forged-inconclusive-follow-on.json",
+   "covers": [
+    "§12.3 follow-ons"
+   ],
+   "errors": [
+    {
+     "code": "HISTORY.INADMISSIBLE_EVENT",
+     "inner": null
+    }
+   ],
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.INADMISSIBLE_EVENT",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-SUP-sup-forged-finding-completion-missing",
+   "kind": "negative",
+   "input": "acceptance/supplementary/negative/sup-forged-finding-completion-missing.json",
+   "covers": [
+    "§10.20 RecordFinding shape"
+   ],
+   "errors": [
+    {
+     "code": "HISTORY.INADMISSIBLE_EVENT",
+     "inner": null
+    }
+   ],
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.INADMISSIBLE_EVENT",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-SUP-sup-forged-finding-start-missing",
+   "kind": "negative",
+   "input": "acceptance/supplementary/negative/sup-forged-finding-start-missing.json",
+   "covers": [
+    "§10.20 RecordFinding shape"
+   ],
+   "errors": [
+    {
+     "code": "HISTORY.INADMISSIBLE_EVENT",
+     "inner": null
+    }
+   ],
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.INADMISSIBLE_EVENT",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-SUP-sup-forged-finding-extra-completion",
+   "kind": "negative",
+   "input": "acceptance/supplementary/negative/sup-forged-finding-extra-completion.json",
+   "covers": [
+    "§10.20 RecordFinding shape"
+   ],
+   "errors": [
+    {
+     "code": "HISTORY.INADMISSIBLE_EVENT",
+     "inner": null
+    }
+   ],
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.INADMISSIBLE_EVENT",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-SUP-sup-forged-accept-hypothesis-mechanism",
+   "kind": "negative",
+   "input": "acceptance/supplementary/negative/sup-forged-accept-hypothesis-mechanism.json",
+   "covers": [
+    "§10.29 AcceptProposal target shape"
+   ],
+   "errors": [
+    {
+     "code": "HISTORY.INADMISSIBLE_EVENT",
+     "inner": null
+    }
+   ],
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.INADMISSIBLE_EVENT",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-SUP-sup-forged-accept-hypothesis-statement",
+   "kind": "negative",
+   "input": "acceptance/supplementary/negative/sup-forged-accept-hypothesis-statement.json",
+   "covers": [
+    "§10.29 AcceptProposal target shape"
+   ],
+   "errors": [
+    {
+     "code": "HISTORY.INADMISSIBLE_EVENT",
+     "inner": null
+    }
+   ],
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.INADMISSIBLE_EVENT",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-SUP-sup-forged-accept-unknown-materiality",
+   "kind": "negative",
+   "input": "acceptance/supplementary/negative/sup-forged-accept-unknown-materiality.json",
+   "covers": [
+    "§10.29 AcceptProposal target shape"
+   ],
+   "errors": [
+    {
+     "code": "HISTORY.INADMISSIBLE_EVENT",
+     "inner": null
+    }
+   ],
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.INADMISSIBLE_EVENT",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-SUP-sup-forged-accept-action-kind",
+   "kind": "negative",
+   "input": "acceptance/supplementary/negative/sup-forged-accept-action-kind.json",
+   "covers": [
+    "§10.29 AcceptProposal target shape"
+   ],
+   "errors": [
+    {
+     "code": "HISTORY.INADMISSIBLE_EVENT",
+     "inner": null
+    }
+   ],
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.INADMISSIBLE_EVENT",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-SUP-sup-forged-accept-action-targets",
+   "kind": "negative",
+   "input": "acceptance/supplementary/negative/sup-forged-accept-action-targets.json",
+   "covers": [
+    "§10.29 AcceptProposal target shape"
+   ],
+   "errors": [
+    {
+     "code": "HISTORY.INADMISSIBLE_EVENT",
+     "inner": null
+    }
+   ],
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.INADMISSIBLE_EVENT",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-SUP-sup-forged-accept-target-missing",
+   "kind": "negative",
+   "input": "acceptance/supplementary/negative/sup-forged-accept-target-missing.json",
+   "covers": [
+    "§10.29 AcceptProposal target shape"
+   ],
+   "errors": [
+    {
+     "code": "HISTORY.INADMISSIBLE_EVENT",
+     "inner": null
+    }
+   ],
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.INADMISSIBLE_EVENT",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-SUP-sup-forged-accept-target-id-mismatch",
+   "kind": "negative",
+   "input": "acceptance/supplementary/negative/sup-forged-accept-target-id-mismatch.json",
+   "covers": [
+    "§10.29 AcceptProposal target shape"
+   ],
+   "errors": [
+    {
+     "code": "HISTORY.INADMISSIBLE_EVENT",
+     "inner": null
+    }
+   ],
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.INADMISSIBLE_EVENT",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-SUP-sup-forged-accept-order-reversed",
+   "kind": "negative",
+   "input": "acceptance/supplementary/negative/sup-forged-accept-order-reversed.json",
+   "covers": [
+    "§10.29 AcceptProposal target shape"
+   ],
+   "errors": [
+    {
+     "code": "HISTORY.INADMISSIBLE_EVENT",
+     "inner": null
+    }
+   ],
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.INADMISSIBLE_EVENT",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-SUP-sup-unreconstructable-verification-failed",
+   "kind": "negative",
+   "input": "acceptance/supplementary/negative/sup-unreconstructable-verification-failed.json",
+   "covers": [
+    "§15.3 none"
+   ],
+   "errors": [
+    {
+     "code": "HISTORY.INADMISSIBLE_EVENT",
+     "inner": null
+    }
+   ],
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.INADMISSIBLE_EVENT",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-SUP-sup-unreconstructable-verified-effective",
+   "kind": "negative",
+   "input": "acceptance/supplementary/negative/sup-unreconstructable-verified-effective.json",
+   "covers": [
+    "§15.3 none"
+   ],
+   "errors": [
+    {
+     "code": "HISTORY.INADMISSIBLE_EVENT",
+     "inner": null
+    }
+   ],
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.INADMISSIBLE_EVENT",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-SUP-sup-unreconstructable-action-completed",
+   "kind": "negative",
+   "input": "acceptance/supplementary/negative/sup-unreconstructable-action-completed.json",
+   "covers": [
+    "§15.3 none"
+   ],
+   "errors": [
+    {
+     "code": "HISTORY.INADMISSIBLE_EVENT",
+     "inner": null
+    }
+   ],
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.INADMISSIBLE_EVENT",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-SUP-sup-group-actor-disagreement",
+   "kind": "negative",
+   "input": "acceptance/supplementary/negative/sup-group-actor-disagreement.json",
+   "covers": [
+    "§15.2 2.3"
+   ],
+   "errors": [
+    {
+     "code": "HISTORY.INADMISSIBLE_EVENT",
+     "inner": null
+    }
+   ],
+   "expected": {
+    "primaryCode": "CAUSA.HISTORY_INADMISSIBLE",
+    "domainCode": "HISTORY.INADMISSIBLE_EVENT",
+    "admissibility": "evaluated"
+   }
+  },
+  {
+   "id": "AC-SUP-sup-valid-entity-transitions",
+   "kind": "valid",
+   "input": "acceptance/supplementary/valid/sup-valid-entity-transitions/6fd2ddc9-bedd-5fff-9093-5506c4d68cb3",
+   "covers": [
+    "§7.1",
+    "§7.2",
+    "§7.3",
+    "§7.4",
+    "§7.5",
+    "§7.8",
+    "§7.9",
+    "§7.10",
+    "§10.17",
+    "§10.20",
+    "§10.29"
+   ],
+   "errors": [],
+   "expected": {
+    "primaryCode": null,
+    "domainCode": null,
+    "admissibility": "evaluated",
+    "stateSha256": "62c2498ca6c39f28a7327a0f5438f1cf7b079afa7ebd7e9bd552da002a4ab041",
+    "eventsSha256": "80a327c532d308e5072f0f9a8787ef4b596a7e46a9b8b49a33fff200222fd259",
+    "version": 85,
+    "lifecycle": "active"
+   }
+  },
+  {
+   "id": "AC-SUP-sup-valid-verification-rounds",
+   "kind": "valid",
+   "input": "acceptance/supplementary/valid/sup-valid-verification-rounds/d588748e-8df9-5f27-859e-5d36d9a2b53d",
+   "covers": [
+    "§7.6",
+    "§7.7",
+    "§7.9",
+    "§11.4.2 addressed",
+    "§12.1",
+    "§12.3",
+    "§13",
+    "§14"
+   ],
+   "errors": [],
+   "expected": {
+    "primaryCode": null,
+    "domainCode": null,
+    "admissibility": "evaluated",
+    "stateSha256": "42fdba1816c68682b7b3e1e35ae78475b82f4e8276101334b110a56ca97730c8",
+    "eventsSha256": "053b13712d34824f8c9a21f087cace814a8091e957d8f2162267f653ae84a8cb",
+    "version": 68,
+    "lifecycle": "active"
+   }
+  },
+  {
+   "id": "AC-SUP-sup-valid-repetition-not-refused",
+   "kind": "valid",
+   "input": "acceptance/supplementary/valid/sup-valid-repetition-not-refused/c57e4407-dd43-5d63-8dbe-9d6ceac6c31a",
+   "covers": [
+    "§10.27",
+    "§3.3",
+    "§7.2",
+    "§7.9"
+   ],
+   "errors": [],
+   "expected": {
+    "primaryCode": null,
+    "domainCode": null,
+    "admissibility": "evaluated",
+    "stateSha256": "595dab8418fbd1534f20212f7b5588da9a59e7aa34a441616ad50caf7142bead",
+    "eventsSha256": "26b8687eb5318fecd3af510d435b8bf615c022b5e81beceac1b5a0d3f1110052",
+    "version": 46,
+    "lifecycle": "active"
+   }
+  }
+ ]
+}

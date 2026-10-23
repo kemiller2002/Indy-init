@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import ipaddress
 import re
+import unicodedata
 from dataclasses import dataclass, field
 from functools import reduce
 from typing import Any
@@ -97,6 +98,9 @@ def _simple_lower(ch: str) -> str:
         return ch
     low = ch.lower()
     return low if len(low) == 1 else ch
+
+
+UNICODE_PIN = "15.1.0"                                            # §3.3 pins Unicode 15.1.0 simple lowercase
 
 
 def norm(s: str) -> str:
@@ -751,6 +755,9 @@ def _record_proposal(S, env, c):
     if errs:
         return Refused(errs)
     if env["actor"].get("kind") == "agent" and c["kind"] == "hypothesis":
+        if unicodedata.unidata_version != UNICODE_PIN:
+            # str.lower() per code point equals the §3.3 simple mapping (U+0130 excepted) only on the pinned version.
+            return Unresolved(f"runtime Unicode {unicodedata.unidata_version} != pinned {UNICODE_PIN} (§3.3, E-5)")
         s = norm(c["text"])
         if any(h["state"] == "falsified" and norm(h["statement"]) == s for h in S["hypotheses"].values()) or any(
                 norm(n["statement"]) == s for n in S["negativeKnowledge"].values()):

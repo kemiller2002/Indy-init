@@ -6,6 +6,7 @@ Read-only.  It never copies, rewrites or "synchronizes" either side; any unexpla
 Usage:
   python3 -I tools/causa-contract/parity_gate.py check    --causa-data <git checkout of kemiller2002/causa-data>
   python3 -I tools/causa-contract/parity_gate.py selftest --causa-data <git checkout>
+  python3 -I tools/causa-contract/parity_gate.py digests  --causa-data <git checkout>   # print, never write, pin values
 
 The frozen side is read from the git object store at the pinned release tag (`git show <tag>:<path>`), never from the
 working tree, so local edits in the causa-data checkout cannot mask a difference.  The pin (tag name, tag object,
@@ -378,6 +379,31 @@ def run_gate(req: Side, frozen: Side, pin: Mapping[str, Any], approved: Iterable
     return unexplained, compared
 
 
+# Non-frozen normative files whose bytes are pinned in release-pin.json "requirementsDigests" (review F-10). Generated
+# catalogs are covered by generate_catalogs.py check instead. Changing one of these files requires a reviewed update of
+# the pin; the gate never writes the pin.
+PINNED_REQUIREMENTS = (
+    "README.md", "SEMANTICS.md", "INVARIANTS.md", "CLARIFICATIONS.md", "PROVIDER-GITHUB.md",
+    "compatibility/RULES.md", "acceptance/ACCEPTANCE.md", "acceptance/TEST-MATRIX.json",
+    "acceptance/supplementary/MATRIX.json", "catalog/field-semantics.json", "catalog/event-semantics.json",
+    "catalog/artifact-url-vectors.jsonl",
+)
+
+
+def current_requirement_digests(root: Path) -> Mapping[str, str | None]:
+    return MappingProxyType({p: (sha256((root / p).read_bytes()) if (root / p).is_file() else None) for p in PINNED_REQUIREMENTS})
+
+
+def requirement_pin_findings(root: Path, pin: Mapping[str, Any]) -> tuple[Finding, ...]:
+    pinned = pin.get("requirementsDigests", {})
+    current = current_requirement_digests(root)
+    return tuple(
+        Finding("REQUIREMENT_UNPINNED_CHANGE", f"requirements:{p}", f"sha256 {current[p]} != pinned {pinned.get(p)} (update release-pin.json in a reviewed commit)")
+        for p in PINNED_REQUIREMENTS
+        if current[p] != pinned.get(p)
+    )
+
+
 def load_pin(root: Path) -> tuple[Mapping[str, Any], tuple[Mapping[str, str], ...]]:
     pin = json.loads((root / "compatibility" / "release-pin.json").read_text("utf-8"))
     return pin, tuple(pin.get("approvedDifferences", ()))
@@ -502,9 +528,12 @@ def main(argv: list[str]) -> int:
     repo = Path(argv[argv.index("--causa-data") + 1])
     if mode == "selftest":
         return selftest(repo)
+    if mode == "digests":
+        print(json.dumps(dict(current_requirement_digests(REQ_ROOT)), indent=2))
+        return 0
     pin, approved = load_pin(REQ_ROOT)
     findings, compared = run_gate(requirement_side(REQ_ROOT), tag_side(repo, pin["tag"]), pin, approved, repo)
-    return report(findings, compared)
+    return report(findings + requirement_pin_findings(REQ_ROOT, pin), compared + (f"pinned requirement files: {len(PINNED_REQUIREMENTS)}",))
 
 
 if __name__ == "__main__":

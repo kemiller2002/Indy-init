@@ -176,14 +176,21 @@ def _fail(failure: Failure, digests: dict, stage15: str = "not-reached", state=N
                   f"{failure.detail} [stage 15 {stage15}]")
 
 
+def file_digests(files: dict) -> dict:
+    """CAUSA-CLAR-07: events = SHA-256 of bytes as read; manifest/snapshot = bytes as read minus one trailing LF;
+    null for a missing (or non-regular) file."""
+    get = lambda n: files.get(n)  # noqa: E731
+    return {"events": sha256_hex(get("events.ndjson")) if get("events.ndjson") is not None else None,
+            "manifest": digest_file_as_read(get("manifest.json")) if get("manifest.json") is not None else None,
+            "snapshot": digest_file_as_read(get("snapshot.json")) if get("snapshot.json") is not None else None}
+
+
 def verify(dir_name: str, files: dict, schemas) -> Report:
-    digests: dict = {}
+    digests = file_digests(files)                                                               # CLAR-07
     f = stage1_paths(dir_name, files)                                                           # 1
     if f:
         return _fail(f, digests)
     m_bytes, e_bytes, s_bytes = files["manifest.json"], files["events.ndjson"], files["snapshot.json"]
-    digests = {"events": sha256_hex(e_bytes), "manifest": digest_file_as_read(m_bytes),
-               "snapshot": digest_file_as_read(s_bytes)}
     f = _first(lambda: framing("manifest.json", m_bytes, False),                                # 2
                lambda: framing("events.ndjson", e_bytes, True),
                lambda: framing("snapshot.json", s_bytes, False))

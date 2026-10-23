@@ -1,46 +1,47 @@
 #!/usr/bin/env python3
-"""Clean-room Causa storage v1.0.0 consumer (ACCEPTANCE.md §3 consumer protocol).
+"""Clean-room Causa storage v1.0.0 consumer (ACCEPTANCE.md §3 consumer protocol, CLARIFICATIONS.md).
 
   causa_clean.py info               --dataset <root>
   causa_clean.py verify             --dataset <root> --investigation <dir>
   causa_clean.py negative           --dataset <root> --fixture <file>
+  causa_clean.py url-verdict        --vectors <artifact-url-vectors.jsonl>
   causa_clean.py append-observation --dir <dir> --expected-version N --observation-id <uuid> --original <text>
                                     --occurred-at <timestamp> --actor-id <text> --actor-kind human|system
                                     --correlation-id <uuid>
 
-The last stdout line is always one JSON object.  All I/O lives in this file; reader/semantics/canon are pure.
+The last stdout line is always one JSON object.  I/O lives here and in writer.py's filesystem edge.
 """
 from __future__ import annotations
 
 import argparse
 import base64
-import datetime
 import json
 import os
 import sys
-import tempfile
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))   # -I drops the script directory from sys.path
 
-from canon import Failure, canonical, event_id, file_bytes, is_canonical_uuid, is_failure, parse_json  # noqa: E402
-from reader import append_lines, rebuild, successor, verify  # noqa: E402
+from canon import Failure, canonical, is_failure, parse_json  # noqa: E402
+from reader import append_lines, successor, verify  # noqa: E402
 from schemas import first_violation, load_schemas  # noqa: E402
-from semantics import Refused, Unresolved, decide, replay  # noqa: E402
+from semantics import Unresolved, artifact_url_verdict  # noqa: E402
+from writer import path_check, plan_observation_append, publish, read_dir, recover  # noqa: E402
 
-FILES = ("manifest.json", "events.ndjson", "snapshot.json")
+
+def emit(obj: dict) -> int:
+    print(json.dumps(obj, ensure_ascii=True))
+    return 0
+
+
+def failure_json(f: Failure, **extra) -> dict:
+    return {"primaryCode": f.code, "domainCode": f.domain, "admissibility": "evaluated", "stateSha256": None,
+            "eventsSha256": None, "manifestSha256": None, "snapshotSha256": None, "version": None,
+            "lifecycle": None, "detail": f.detail, **extra}
 
 
 # --------------------------------------------------------------------------------------------------------------------
-# I/O helpers (impure edge)
+# Dataset lookups (root manifest, scenario directories)
 # --------------------------------------------------------------------------------------------------------------------
-
-def read_dir(path: str) -> dict:
-    """Every directory entry counts (CONTRACT §3.3); non-regular entries map to None."""
-    entries = sorted(os.listdir(path))
-    return {n: (open(os.path.join(path, n), "rb").read()
-                if os.path.isfile(os.path.join(path, n)) and not os.path.islink(os.path.join(path, n)) else None)
-            for n in entries}
-
 
 def load_root_manifest(dataset: str, schemas):
     path = os.path.join(dataset, "fixtures", "v1.0.0", "manifest.json")
@@ -59,22 +60,12 @@ def load_root_manifest(dataset: str, schemas):
 
 
 def scenario_dir(dataset: str, root: dict, key: str):
+    """CAUSA-CLAR-06: the base is found through the root manifest by scenarioKey; directoryId is never a path."""
     entry = next((i for i in root["investigations"] if i["scenarioKey"] == key), None)
     if entry is None:
         return Failure("CAUSA.FIXTURE_DRIFT", f"unknown scenario {key!r}")
     return entry["investigationId"], os.path.join(dataset, "fixtures", "v1.0.0", "investigations",
                                                   entry["investigationId"])
-
-
-def emit(obj: dict) -> int:
-    print(json.dumps(obj, ensure_ascii=True))
-    return 0
-
-
-def failure_json(f: Failure, **extra) -> dict:
-    return {"primaryCode": f.code, "domainCode": f.domain, "admissibility": "evaluated", "stateSha256": None,
-            "eventsSha256": None, "manifestSha256": None, "snapshotSha256": None, "version": None,
-            "lifecycle": None, "detail": f.detail, **extra}
 
 
 # --------------------------------------------------------------------------------------------------------------------
@@ -101,7 +92,7 @@ def cmd_negative(args, schemas) -> int:
     if is_failure(fx):
         return emit(failure_json(fx))
     kind = fx.get("kind")
-    if kind == "investigation":
+    if kind == "investigation":                       # in memory only: directoryId is data (CAUSA-CLAR-06)
         return emit(verify(fx["directoryId"], decode_files(fx["files"]), schemas).as_json())
     root = load_root_manifest(args.dataset, schemas)
     if is_failure(root):
@@ -119,143 +110,72 @@ def cmd_negative(args, schemas) -> int:
     return emit(failure_json(Failure("CAUSA.SCHEMA_VIOLATION", f"unknown negative fixture kind {kind!r}")))
 
 
-def normalize_instant(text: str):
-    """Command boundary (CONTRACT §2.9): accept RFC 3339, keep the instant, refuse sub-millisecond precision."""
-    try:
-        dt = datetime.datetime.fromisoformat(text.replace("z", "Z").replace("Z", "+00:00"))
-    except ValueError:
-        return Failure("CAUSA.UNREPRESENTABLE", f"not an RFC 3339 instant: {text!r}")
-    if dt.tzinfo is None:
-        return Failure("CAUSA.UNREPRESENTABLE", f"instant without offset: {text!r}")
-    if dt.microsecond % 1000:
-        return Failure("CAUSA.UNREPRESENTABLE", "sub-millisecond instant (writers refuse rather than truncate)")
-    frac = text.split(".", 1)[1] if "." in text else ""
-    digits = "".join(c for c in frac if c.isdigit())
-    if digits.rstrip("0") and len(digits.rstrip("0")) > 3:
-        return Failure("CAUSA.UNREPRESENTABLE", "sub-millisecond instant (writers refuse rather than truncate)")
-    utc = dt.astimezone(datetime.timezone.utc)
-    return utc.strftime("%Y-%m-%dT%H:%M:%S.") + f"{utc.microsecond // 1000:03d}Z"
+def url_label(url: str) -> str:
+    v = artifact_url_verdict(url)
+    return "platformDefined" if isinstance(v, Unresolved) else ("wellFormed" if v else "illFormed")
 
 
-def unrepresentable_text(*texts: str):
-    bad = next((t for t in texts if "﻿" in t or any(0xD800 <= ord(c) <= 0xDFFF for c in t)), None)
-    return Failure("CAUSA.UNREPRESENTABLE", "text contains U+FEFF or a lone surrogate") if bad is not None else None
-
-
-def plan_observation_append(dir_name: str, files: dict, args, schemas):
-    """Pure: decide RecordObservation (SEMANTICS §10.1) and produce the new file set, or a Failure."""
-    current = verify(dir_name, files, schemas)
-    if current.failure or current.admissibility != "evaluated":
-        return current.failure or Failure("CAUSA.HISTORY_INADMISSIBLE", current.detail)
-    version = current.state["version"]
-    if args.expected_version != version:                                                     # §9.2 (1)
-        return Failure("CAUSA.VERSION_STALE", f"expected version {args.expected_version} != current {version}")
-    at = normalize_instant(args.occurred_at)
-    if is_failure(at):
-        return at
-    bad = unrepresentable_text(args.original, args.actor_id)
-    if bad:
-        return bad
-    if not (is_canonical_uuid(args.observation_id) and is_canonical_uuid(args.correlation_id)):
-        return Failure("CAUSA.UNREPRESENTABLE", "ids must be lowercase canonical non-nil UUIDs")
-    actor = {"actorId": args.actor_id, "kind": args.actor_kind}
-    events = list(current.events)
-    state = replay(events)
-    env = {"investigationId": dir_name, "actor": actor, "at": at}
-    cmd = {"name": "RecordObservation", "observationId": args.observation_id, "original": args.original,
-           "observedAt": None}
-    decision = decide(state, env, cmd, expected_version=args.expected_version)
-    if isinstance(decision, Refused):
-        codes = "; ".join(f"{e.code} ({e.rule})" for e in decision.errors)
-        return Failure("CAUSA.HISTORY_INADMISSIBLE", f"command refused: {codes}", "HISTORY.INADMISSIBLE_EVENT")
-    if isinstance(decision, Unresolved):
-        return Failure("CAUSA.HISTORY_INADMISSIBLE", f"decision not evaluable: {decision.reason}")
-    new_events = [{"formatVersion": "1.0.0",
-                   "eventId": event_id(dir_name, version + 1 + i, args.correlation_id),
-                   "investigationId": dir_name, "aggregateVersion": version + 1 + i, "eventType": b.event_type,
-                   "occurredAt": at, "actor": actor, "semanticVersion": "1.0.0",
-                   "correlationId": args.correlation_id, "payload": b.payload}
-                  for i, b in enumerate(decision.bodies)]
-    appended = "".join(canonical(e) + "\n" for e in new_events).encode("utf-8")
-    new_files = rebuild(dir_name, events + new_events, files["events.ndjson"] + appended)
-    check = verify(dir_name, new_files, schemas)                    # §9.2: verify exactly as a reader would
-    if check.failure or check.admissibility != "evaluated":
-        return check.failure or Failure("CAUSA.HISTORY_INADMISSIBLE", check.detail)
-    return new_files, check.state["version"]
-
-
-def write_unit(path: str, new_files: dict) -> None:
-    """Impure: stage all three files next to the directory, fsync, then rename into place (events last-but-first:
-    events, snapshot, manifest).  A local filesystem offers no multi-file atomic commit (see REQUIREMENTS-GAPS.md)."""
-    parent = os.path.dirname(path)
-    staged = {}
-    for name in ("events.ndjson", "snapshot.json", "manifest.json"):
-        fd, tmp = tempfile.mkstemp(prefix=f".{os.path.basename(path)}.{name}.", dir=parent)
-        with os.fdopen(fd, "wb") as fh:
-            fh.write(new_files[name])
-            fh.flush()
-            os.fsync(fh.fileno())
-        staged[name] = tmp
-    for name, tmp in staged.items():
-        os.replace(tmp, os.path.join(path, name))
-    dfd = os.open(path, os.O_RDONLY)
-    try:
-        os.fsync(dfd)
-    finally:
-        os.close(dfd)
-
-
-def immutable_target(path: str):
-    """CONTRACT §3.4: writers MUST NOT create, modify or delete anything under fixtures/v1.0.0/ or contract/v1.0.0/."""
-    parts = os.path.realpath(path).split(os.sep)
-    frozen = any(parts[i] in ("fixtures", "contract") and parts[i + 1] == "v1.0.0" for i in range(len(parts) - 1))
-    return Failure("CAUSA.PATH_INVALID", "refusing to write under an immutable v1.0.0 tree (CONTRACT §3.4)") \
-        if frozen else None
+def cmd_url_verdict(args, schemas) -> int:
+    """ACCEPTANCE §3: one verdict per input line, in order (SEMANTICS §10.4.1-§10.4.2)."""
+    lines = open(args.vectors, encoding="utf-8").read().split("\n")
+    return emit({"verdicts": [url_label(json.loads(line)["url"]) for line in lines if line.strip()]})
 
 
 def cmd_append_observation(args, schemas) -> int:
-    path = os.path.normpath(args.dir)
-    dir_name = os.path.basename(path)
+    out = lambda code, domain, version, detail: emit(  # noqa: E731
+        {"primaryCode": code, "domainCode": domain, "version": version, "detail": detail})
+    path = os.path.normpath(os.path.abspath(args.dir))
+    frozen = path_check(os.path.realpath(path))                                   # CLAR-03: path first
+    if frozen:
+        return out(frozen.code, None, None, frozen.detail)
+    note = recover(path, schemas)                                                 # CLAR-04 recovery
+    if not os.path.isdir(path):
+        return out("CAUSA.PATH_INVALID", None, None, "investigation directory does not exist")
     files = read_dir(path)
-    plan = immutable_target(path) or plan_observation_append(dir_name, files, args, schemas)
+    plan = plan_observation_append(os.path.basename(path), files, args, schemas)
     if is_failure(plan):
-        return emit({"primaryCode": plan.code, "domainCode": plan.domain, "version": None, "detail": plan.detail})
+        return out(plan.code, plan.domain, None, plan.detail)
     new_files, new_version = plan
-    write_unit(path, new_files)
-    reread = read_dir(path)
-    if any(reread.get(n) != new_files[n] for n in FILES):
-        return emit({"primaryCode": "CAUSA.WRITE_UNCONFIRMED", "domainCode": None, "version": None,
-                     "detail": "re-read after write did not return the written bytes"})
-    return emit({"primaryCode": None, "domainCode": None, "version": new_version, "detail": "appended"})
+    unconfirmed = publish(path, new_files)                                        # CLAR-04 publish + confirm
+    if unconfirmed:
+        return out(unconfirmed.code, None, None, unconfirmed.detail)
+    return out(None, None, new_version, "appended" + (f" ({note})" if note else ""))
 
 
 # --------------------------------------------------------------------------------------------------------------------
 
+class JsonArgumentParser(argparse.ArgumentParser):
+    """Keep the protocol promise (last stdout line is one JSON object) even for usage errors."""
+
+    def error(self, message):
+        emit({"primaryCode": None, "error": "usage", "detail": message})
+        sys.exit(2)
+
+
 def parser() -> argparse.ArgumentParser:
-    p = argparse.ArgumentParser(prog="causa_clean")
-    sub = p.add_subparsers(dest="command", required=True)
-    i = sub.add_parser("info")
-    i.add_argument("--dataset")
+    p = JsonArgumentParser(prog="causa_clean")
+    sub = p.add_subparsers(dest="command", required=True, parser_class=JsonArgumentParser)
+    sub.add_parser("info").add_argument("--dataset")
     v = sub.add_parser("verify")
     v.add_argument("--dataset")
     v.add_argument("--investigation", required=True)
     n = sub.add_parser("negative")
     n.add_argument("--dataset", required=True)
     n.add_argument("--fixture", required=True)
+    u = sub.add_parser("url-verdict")
+    u.add_argument("--vectors", required=True)
     a = sub.add_parser("append-observation")
     a.add_argument("--dir", required=True)
     a.add_argument("--expected-version", type=int, required=True)
-    a.add_argument("--observation-id", required=True)
-    a.add_argument("--original", required=True)
-    a.add_argument("--occurred-at", required=True)
-    a.add_argument("--actor-id", required=True)
-    a.add_argument("--actor-kind", choices=("human", "system"), required=True)
-    a.add_argument("--correlation-id", required=True)
+    for opt in ("--observation-id", "--original", "--occurred-at", "--actor-id", "--actor-kind", "--correlation-id"):
+        a.add_argument(opt, required=True)
     return p
 
 
 def main(argv: list[str]) -> int:
     args = parser().parse_args(argv)
+    if args.command == "url-verdict":
+        return cmd_url_verdict(args, None)
     schemas = load_schemas()
     if is_failure(schemas):
         return emit(failure_json(schemas))
