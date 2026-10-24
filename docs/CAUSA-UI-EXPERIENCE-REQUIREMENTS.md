@@ -84,3 +84,19 @@ Convert these into granular implementation work items under each affected reposi
 - Sync/conflict and report accuracy evidence.
 - Independent adversarial review of UI-domain authority boundaries.
 - Exact deployed SHA and successful acceptance job conclusion.
+
+
+## UI-017: Investigation-facing copy is domain-focused [P0]
+Investigation pages MUST present user tasks, investigation content, actionable statuses, and concise recovery instructions. They MUST NOT display implementation explanations, storage schema versions, catalog identifiers, commit SHAs, replay/validation mechanics, framework versions, or infrastructure details as introductory paragraphs, persistent banners, or other routine UI copy. Specifically, remove the catalog/replay paragraph beginning "The active catalog historical-v1" from the investigation catalog. Where a technical issue affects the user's ability to proceed, show a short plain-language explanation and next action, with technical details accessible from Administration. Preserve required investigation provenance and evidence source attribution within their domain views; do not hide substantive investigation facts.
+
+## UI-018: Dedicated Administration page [P0]
+Provide a separately navigable Administration page for system information and operational diagnostics. It MUST show, as available and applicable: active provider and catalog, catalog version and source reference, storage/schema contract version, application and Echelon component versions, build/deployed commit, dataset validation and domain replay status, provider connectivity and authentication status without revealing secrets, and relevant diagnostic/error details. Distinguish unknown, unavailable, failed, and verified states. Never imply an unverified operation passed. System diagnostics MUST NOT leak into investigation screens. Administration is read-only unless a separately authorized operational action is specified.
+
+## UI-019: Dedicated Settings page [P0]
+Provide a separately navigable Settings page for user-adjustable preferences and configuration, distinct from Administration and investigation views. Include only supported settings, such as appearance/theme, accessibility or display preferences, and provider connection preferences where authorized. Distinguish a preference from a verified external connection. Do not expose controls that cannot be honored. Define persistence and scope of each setting (session, device, or account), show effective values, and avoid saving credentials in local storage or displaying tokens. Provider authentication and configuration must respect the established security and read-only scope contracts.
+
+## UI-020: Navigation and information architecture [P0]
+Provide clear, accessible top-level navigation to Investigations, Administration, and Settings. Investigation workflow actions remain in investigation context; operational information belongs in Administration; configurable preferences belong in Settings. Navigation must work on desktop, iPad, mobile, keyboard, and assistive technology, with an identifiable active page and sensible narrow-viewport behavior. Do not use an undifferentiated dashboard as a substitute for these destinations.
+
+## UI-021: Content and route verification [P0]
+Add browser tests using deterministic fixtures that assert: (1) the quoted catalog/replay technical paragraph and equivalent implementation prose are absent from routine investigation views; (2) operational details appear in Administration; (3) preferences appear in Settings and behave according to their documented persistence scope; (4) navigation, focus, labels, and responsive behavior work; (5) no credentials or secret values are rendered or logged; and (6) deployed exact-SHA verification exercises all three destinations. Tests must not simply check for page existence; they must verify content placement and user-visible behavior. Preserve traceability and approved-scope handling in Praxis.
