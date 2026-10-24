@@ -21,5 +21,6 @@ jobs:
         run: |
           python3 tools/test-preflight.py
           python3 tools/test-acceptance-ledger.py
+          python3 tools/test-requirements-baseline.py
       - name: Compile Python tooling
         run: python3 -m compileall -q tools

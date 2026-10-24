@@ -101,6 +101,7 @@ See [Hackathon Boundaries](docs/HACKATHON-BOUNDARIES.md).
 - [Design Decision Boundaries](docs/DESIGN-DECISION-BOUNDARIES.md)
 - [Investigation Acceptance Scenarios](docs/INVESTIGATION-ACCEPTANCE-SCENARIOS.md)
 - [Requirements](docs/REQUIREMENTS.md)
+- [Rehearsal Derivation Policy](docs/REHEARSAL-DERIVATION-POLICY.md) and the [Causa requirements baseline](requirements/README.md)
 - [Architecture](docs/ARCHITECTURE.md)
 - [Hackathon Boundaries](docs/HACKATHON-BOUNDARIES.md)
 - [Experiment Plan](docs/EXPERIMENT-PLAN.md)
