@@ -6,6 +6,8 @@ The canonical long-term product requirements are in [PRODUCT-REQUIREMENTS.md](PR
 
 Provider-neutral fixture data, rapid offline UI/domain testing, real GitHub integration, and release verification are specified in [PROVIDER-FIXTURE-AND-INTEGRATION-REQUIREMENTS.md](PROVIDER-FIXTURE-AND-INTEGRATION-REQUIREMENTS.md). PF-001 through PF-021 are normative for future rehearsals where applicable; derived rehearsal requirements must explicitly reconcile these obligations and record approved exclusions.
 
+Causal diagram rendering must reuse the verified Echelon workflow layout capability as specified in [WORKFLOW-DIAGRAM-INTEGRATION-REQUIREMENTS.md](WORKFLOW-DIAGRAM-INTEGRATION-REQUIREMENTS.md). WDL-001 through WDL-015 are normative for future rehearsals with causal diagrams; preserve their applicability, traceability, and acceptance obligations.
+
 ## R0. Hackathon integrity
 
 ### R0.1 Blank application implementation
