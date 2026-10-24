@@ -5,7 +5,7 @@ Status: APPROVED EXPERIMENT DESIGN; NOT EXECUTED. Applies to Rehearsal 3 only. R
 ## Hypothesis
 A time-boxed implementation phase with frequent durable commits and deferred noncritical tests/fixes will reduce agent interruptions, CI runs, and token expenditure and improve time to verified completion versus continuous verification. This is a hypothesis, not an established result. Compare against R001/R002 with scope and stack differences explicitly controlled.
 
-## Required policy (R3-DV-001..016)
+## Required policy (R3-DV-001..017)
 - R3-DV-001 [P0]: Discover, resolve, compatibility-test, and freeze the newest approved stable Echelon stack before implementation, following REHEARSAL-DEPENDENCY-LOCK.md. Do not defer this preflight.
 - R3-DV-002 [P0]: Seven hours (420 minutes) is a HARD MAXIMUM, not a target or a schedule to fill. Prior phase percentages are planning estimates only and MUST NOT act as minimum durations or prevent early phase transitions. Use monotonic elapsed time and record actual timestamps.
 - R3-DV-003 [P0]: During implementation, commit every 10–20 minutes or after each coherent slice, whichever is sooner. Explicitly label commits/checkpoints as UNVERIFIED when full verification has not run. Never call such a checkpoint passing.
@@ -23,6 +23,8 @@ A time-boxed implementation phase with frequent durable commits and deferred non
 - R3-DV-014 [P0]: Establish a rolling latest-safe implementation cutoff based on remaining verification/correction needs and observed failure backlog. Do not spend the entire seven hours coding. Start cheap cross-component integration early when it prevents costly late divergence, without returning to continuous full-suite testing.
 - R3-DV-015 [P0]: If all mandatory acceptance gates pass before seven hours, STOP successfully and record the actual completion time. Do not manufacture extra work to consume the remaining time. If the seven-hour limit is reached, STOP and report PASS/FAIL/BLOCKED and remaining defects without extending the clock.
 - R3-DV-016 [P0]: Record time saved in each phase, the moment integration began, correction reserve remaining, and actual total elapsed time. Evaluate how much time was available for correction and how much was used.
+
+- R3-DV-017 [P0] (amendment A1, 2026-10-24, before kickoff): When a slice first writes across a persistence or authorization boundary (remote storage, the GitHub provider, authentication or authorization), run the live-provider test for that boundary at that slice's first checkpoint. Do not leave it to final integration. This test is not routine verification: R3-DV-005 already forbids deferring authorization-boundary, data-loss and contract-blocking checks. Mocked tests may continue for speed, but they never stand in for this test. The full live-provider suite at final acceptance (G6) is unchanged. Rationale: in R002 the live GitHub provider found DC-004 and DC-005, which mocks could not reach (REHEARSAL-002-REPORT). Approved by the owner as decision OD-4 of the Echelon engineering program (kemiller2002/cohort-based-engineering `program/EXECUTION-STATE.md`). It changes test ordering only: no stack, scope or acceptance criterion.
 
 ## Acceptance experiment
 Primary metric: elapsed time to exact-SHA fully verified deployed app, with all P0 gates PASS.
