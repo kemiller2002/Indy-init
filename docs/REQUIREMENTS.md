@@ -4,6 +4,8 @@ Status: hackathon release-profile requirements. These are planning artifacts, no
 
 The canonical long-term product requirements are in [PRODUCT-REQUIREMENTS.md](PRODUCT-REQUIREMENTS.md). This file defines the first constrained implementation profile. Hackathon-specific constraints must not leak into or narrow the reusable investigation kernel.
 
+Provider-neutral fixture data, rapid offline UI/domain testing, real GitHub integration, and release verification are specified in [PROVIDER-FIXTURE-AND-INTEGRATION-REQUIREMENTS.md](PROVIDER-FIXTURE-AND-INTEGRATION-REQUIREMENTS.md). PF-001 through PF-021 are normative for future rehearsals where applicable; derived rehearsal requirements must explicitly reconcile these obligations and record approved exclusions.
+
 ## R0. Hackathon integrity
 
 ### R0.1 Blank application implementation
