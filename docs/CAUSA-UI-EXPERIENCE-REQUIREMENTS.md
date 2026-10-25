@@ -134,3 +134,31 @@ Moving information out of investigation views MUST NOT delete operational observ
 
 ## Rehearsal reconciliation for UI-022..UI-031
 These requirements are normative for future rehearsal requirements derivation. Record implementation/test traceability or an explicitly authorized scope disposition for each. Work items go to the owning repositories' documented Praxis input paths, not GitHub Issues. A requirements commit does not establish implementation or acceptance.
+
+
+## UI-032: Next Steps [P0]
+Show domain-derived next steps for unresolved contradictions, missing evidence, pending verification, and corrective actions. Link each to the underlying record and authorized action; never invent recommendations or treat unavailable data as no work.
+
+## UI-033: Connected investigation records [P0]
+Allow contextual traversal among evidence, hypotheses, causal assertions, corrective actions, and timeline events where actual domain relationships exist. Use stable identifiers, accessible navigation, and explicit absent-link states.
+
+## UI-034: Shared Forma inspector [P0]
+Use an existing or reusable Forma-compatible detail inspector across diagram, evidence, hypothesis, action, and timeline selection. Support desktop, iPad, mobile, keyboard, focus restoration, and consistent selection state. Verify component ownership before building.
+
+## UI-035: Contextual search and filters [P1]
+Search and filter investigation records by modeled source, state, verification, and supporting or contradictory relationship. Show result counts, active filters, and clear-filter actions; distinguish no matches from unavailable data.
+
+## UI-036: Investigation completeness checklist [P1]
+Evaluate explicit domain obligations such as documented incident, evidence sources, contradictions, supported root cause, corrective actions, and verification. Show status and supporting rule/evidence for each. Do not use misleading aggregate percentages.
+
+## UI-037: Offline guided demonstration [P0, competition profile]
+Provide a deterministic, clearly labeled demonstration using versioned fixtures and the real domain engine. Walk through evidence, contradictions, causal analysis, corrective actions, and authorized exploratory changes without network access, credentials, or mutations of real investigations.
+
+## UI-038: Decision provenance [P0]
+For domain-supported conclusions, explain supporting and conflicting evidence, linked hypotheses, verification history, and why unresolved findings remain unresolved. Source all explanations from typed authoritative records and make missing provenance explicit.
+
+## UI-039: Reusable implementation contracts [P0]
+Build UI-032..UI-038 from shared typed relationship, selection, inspector, and explanation contracts. Reuse Echelon components; avoid duplicating domain logic or implementing unrelated subsystems for each screen.
+
+## UI-040: End-to-end acceptance [P0]
+Verify next-step authority, record navigation, responsive inspector accessibility, search/filter accuracy, completeness rules, deterministic offline demo, and source-grounded explanations with positive and negative fixture cases and exact deployed-SHA tests. Trace all requirements through the documented Praxis input process; record approved exclusions explicitly.
