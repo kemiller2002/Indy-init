@@ -55,6 +55,7 @@ def check(data):
     accepted = data.get("accepted")
     require(type(accepted) is bool, "accepted must be boolean")
     if accepted is True:
+        require(compute_verdict(data) == "ACCEPTED", "declared acceptance conflicts with computed verdict")
         require(sha(deployed) and deployed == source, "accepted requires deployed SHA equal to source SHA")
         for gate in REQUIRED_GATES:
             require(gates.get(gate, {}).get("status") == "PASS", f"accepted requires {gate} PASS")
@@ -65,6 +66,45 @@ def check(data):
             if isinstance(item, dict) and item.get("severity") in ("CRITICAL", "HIGH"):
                 require(item.get("status") == "PASS", f"accepted requires critical/high defect class {item.get('id')} closed")
     return errors
+
+def compute_verdict(data):
+    """Compute from gate and requirement evidence, never from agent's accepted flag."""
+    if not isinstance(data, dict):
+        return "BLOCKED"
+    source = data.get("source_commit_sha")
+    if not isinstance(source, str) or not re.fullmatch(r"[0-9a-f]{40}", source):
+        return "BLOCKED"
+    if data.get("deployed_commit_sha") != source:
+        return "BLOCKED"
+    if any(not isinstance(data.get(k), list) for k in ("gates", "requirements", "defect_classes")):
+        return "BLOCKED"
+    gates = {g.get("id"): g for g in data["gates"] if isinstance(g, dict)}
+    if not REQUIRED_GATES.issubset(gates):
+        return "BLOCKED"
+    for g in (gates[k] for k in REQUIRED_GATES):
+        if g.get("status") == "FAIL":
+            return "FAIL"
+        if g.get("status") != "PASS" or g.get("verified_sha") != source or not g.get("evidence_paths"):
+            return "BLOCKED"
+    for item in data["requirements"]:
+        if not isinstance(item, dict):
+            return "BLOCKED"
+        if item.get("priority") == "P0":
+            if item.get("status") == "FAIL":
+                return "FAIL"
+            if item.get("status") != "PASS" or not item.get("tests") or not item.get("evidence_paths"):
+                return "BLOCKED"
+    for item in data["defect_classes"]:
+        if not isinstance(item, dict):
+            return "BLOCKED"
+        if item.get("severity") in ("HIGH", "CRITICAL"):
+            if item.get("status") == "FAIL":
+                return "FAIL"
+            if item.get("status") != "PASS" or not item.get("reviewer_evidence"):
+                return "BLOCKED"
+    if any(not isinstance(x, dict) or x.get("disposition") not in ("APPROVED", "RESOLVED") for x in data.get("unresolved_decisions", [])):
+        return "BLOCKED"
+    return "ACCEPTED"
 
 def main():
     if len(sys.argv) != 2:
@@ -81,7 +121,7 @@ def main():
     if errors:
         print(f"Ledger rejected: {len(errors)} violation(s)", file=sys.stderr)
         return 1
-    print("Ledger structurally valid; evidence existence and CI results require independent verification.")
+    print(f"Computed verdict: {compute_verdict(data)}; evidence existence and CI require independent verification.")
     return 0
 
 if __name__ == "__main__":
