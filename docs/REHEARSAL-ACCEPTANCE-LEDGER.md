@@ -31,6 +31,8 @@ Allowed statuses: NOT_RUN, PASS, FAIL, BLOCKED. Never convert missing evidence t
 ## Release acceptance predicate
 Accepted is permitted only if all required gates G0–G9 are PASS for the same verified source identity, no open critical defect class remains, and deployed acceptance is PASS. G10 completeness is separately reported and cannot be silently assumed. The run may be incomplete, blocked, or failed; partial successes are reported honestly.
 
+**The verdict is computed, never written** (owner decision OD-INDY-7, [OWNER-DECISIONS-2026-10-24.md](OWNER-DECISIONS-2026-10-24.md)). `tools/compute-acceptance-verdict.py LEDGER.json --repo . --report REPORT.md` derives ACCEPTED, INCOMPLETE, BLOCKED, FAILED or INVALID from the ledger, checks that every PASS item's evidence exists at its SHA, and exits 1 when the ledger's `accepted` flag or the report disagrees. The report carries exactly one `<!-- acceptance-verdict: VERDICT -->` line, and no Verdict/Outcome line may claim acceptance the computation does not give. A rehearsal's CI runs it on every commit that changes the ledger or the report. There is no exclusion path in the verdict: a P0 requirement leaves it only by leaving the owner-approved baseline.
+
 ## Requirement coverage
 Map the normative requirements in REQUIREMENTS.md, CAUSA-UI-EXPERIENCE-REQUIREMENTS.md, WASM-LOADING-EXPERIENCE-REQUIREMENTS.md, FROZEN-DEMO-STORAGE-REQUIREMENTS.md, DEFECT-CLASS-CLOSURE-AND-RELEASE-GATES.md and AGENT-DECISION-REDUCTION-PROFILE.md. Map existing SCREEN-CONTRACTS.md where screens are implemented. P1 scope is tracked explicitly; deferred items remain NOT_RUN rather than disappearing.
 
