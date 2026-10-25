@@ -84,3 +84,81 @@ Convert these into granular implementation work items under each affected reposi
 - Sync/conflict and report accuracy evidence.
 - Independent adversarial review of UI-domain authority boundaries.
 - Exact deployed SHA and successful acceptance job conclusion.
+
+
+## UI-017: Investigation-facing copy is domain-focused [P0]
+Investigation pages MUST present user tasks, investigation content, actionable statuses, and concise recovery instructions. They MUST NOT display implementation explanations, storage schema versions, catalog identifiers, commit SHAs, replay/validation mechanics, framework versions, or infrastructure details as introductory paragraphs, persistent banners, or other routine UI copy. Specifically, remove the catalog/replay paragraph beginning "The active catalog historical-v1" from the investigation catalog. Where a technical issue affects the user's ability to proceed, show a short plain-language explanation and next action, with technical details accessible from Administration. Preserve required investigation provenance and evidence source attribution within their domain views; do not hide substantive investigation facts.
+
+## UI-018: Dedicated Administration page [P0]
+Provide a separately navigable Administration page for system information and operational diagnostics. It MUST show, as available and applicable: active provider and catalog, catalog version and source reference, storage/schema contract version, application and Echelon component versions, build/deployed commit, dataset validation and domain replay status, provider connectivity and authentication status without revealing secrets, and relevant diagnostic/error details. Distinguish unknown, unavailable, failed, and verified states. Never imply an unverified operation passed. System diagnostics MUST NOT leak into investigation screens. Administration is read-only unless a separately authorized operational action is specified.
+
+## UI-019: Dedicated Settings page [P0]
+Provide a separately navigable Settings page for user-adjustable preferences and configuration, distinct from Administration and investigation views. Include only supported settings, such as appearance/theme, accessibility or display preferences, and provider connection preferences where authorized. Distinguish a preference from a verified external connection. Do not expose controls that cannot be honored. Define persistence and scope of each setting (session, device, or account), show effective values, and avoid saving credentials in local storage or displaying tokens. Provider authentication and configuration must respect the established security and read-only scope contracts.
+
+## UI-020: Navigation and information architecture [P0]
+Provide clear, accessible top-level navigation to Investigations, Administration, and Settings. Investigation workflow actions remain in investigation context; operational information belongs in Administration; configurable preferences belong in Settings. Navigation must work on desktop, iPad, mobile, keyboard, and assistive technology, with an identifiable active page and sensible narrow-viewport behavior. Do not use an undifferentiated dashboard as a substitute for these destinations.
+
+## UI-021: Content and route verification [P0]
+Add browser tests using deterministic fixtures that assert: (1) the quoted catalog/replay technical paragraph and equivalent implementation prose are absent from routine investigation views; (2) operational details appear in Administration; (3) preferences appear in Settings and behave according to their documented persistence scope; (4) navigation, focus, labels, and responsive behavior work; (5) no credentials or secret values are rendered or logged; and (6) deployed exact-SHA verification exercises all three destinations. Tests must not simply check for page existence; they must verify content placement and user-visible behavior. Preserve traceability and approved-scope handling in Praxis.
+
+
+## UI-022: Minimal application chrome and investigation cards [P0]
+The global header MUST emphasize application identity and top-level navigation, not data-provider commit hashes or connection implementation. The footer MUST omit build SHAs, component-stack inventories, and build timestamps; these belong on Administration (UI-018). Investigation catalog cards MUST prioritize investigation title, actual domain lifecycle/status, latest meaningful activity, supported counts of open questions/evidence, and a clear Open Investigation action. Do not show raw internal case keys as primary headings, "Expected lifecycle", duplicated declared/derived counts, or technical replay/verification explanations. Internal identifiers remain discoverable where required for legitimate reference, provenance, and diagnostics. Unknown counts MUST NOT be presented as zero.
+
+## UI-023: Separate technical integrity from investigative verification [P0]
+A successfully fetched, schema-validated, replayed, or cached investigation MUST NOT be labeled "Verified" unless the domain explicitly asserts the corresponding investigation-level verification state. Data integrity and runtime processing belong in Administration; investigation-facing badges MUST express only domain-authoritative conclusions, evidence status, or lifecycle. Define disjoint labels and projection fields for technical data validation versus verified findings. Regression tests MUST catch any conflation, including an investigation that loads correctly but contains disputed or unresolved findings.
+
+## UI-024: User-oriented terminology and presentation-language contract [P0]
+Define a centralized, testable presentation-language mapping from typed F# domain/projection/error states to concise user-facing labels, explanations, and actions. Do not let view templates or agents invent meanings, confidence, permitted transitions, or success claims. Default labels: "Investigations" instead of "Historical investigations"; "Opening investigation" instead of "Fetching and validating the investigation"; "Status" instead of "Expected lifecycle"; "Investigation history" instead of "Replayed state"; "Explore changes" instead of "Open a sandbox copy"; "Apply change to draft" instead of "Ask the engine" when that is the actual action; "Change history" instead of "Engine decisions"; and "Discard draft" instead of "Discard the sandbox". The wording MUST remain accurate to read-only, ephemeral, unsaved, and persisted states: never imply a draft was saved or a change was applied to the authoritative investigation when it was not. Technical codes and provider details belong in Administration, except where needed in an explicitly requested technical detail view. Preserve precise provenance and domain-specific terms where material.
+
+## UI-025: Investigation overview as the primary landing view [P0]
+Opening an investigation MUST lead to an Overview that answers, from domain-authoritative projections only: what happened and impact; current supported findings; supporting and contradictory evidence; unresolved questions; and next authorized actions. Show unknown/unavailable information explicitly rather than inventing summaries. Overview sections SHOULD link to Summary, Causal Analysis, Evidence, Hypotheses, Timeline, and Corrective Actions. No AI-generated interpretation or unsupported conclusions may be presented as established fact.
+
+## UI-026: Prominent causal analysis workspace [P0]
+Provide a dedicated Causal Analysis investigation section centered on the causal graph, with evidence and hypothesis inspection in context. Reuse the existing Echelon workflow layout system under WDL-001..WDL-015, rather than hardcoded coordinates. Graph node selection MUST reveal the corresponding authoritative hypothesis/cause and evidence counts, with navigation to the underlying records. Preserve accessible text equivalents and read-only scope; do not imply graph manipulation changes the domain.
+
+## UI-027: Contextual domain-authorized actions and draft clarity [P1]
+Present actions in the context of the relevant hypothesis, evidence, or corrective action, not as an engine command console. Offer only actions authorized by the F# domain engine, with clear reasons for unavailable actions where useful. Require reason/basis and confirmation when the domain contract requires them. Clearly distinguish exploratory draft changes, unsaved state, and committed authoritative changes; provide visible discard and consequence review. Never introduce persistence or mutation into a read-only rehearsal without explicit scope approval.
+
+## UI-028: Human-centered empty, loading, and failure states [P1]
+For empty catalogs, unavailable investigations, failed loads, disconnected providers, and invalid data, state in plain language what happened, whether user work is retained, and what action is possible next. Avoid showing repository branches, schema internals, raw state codes, or implementation traces in the primary message. Expose technical diagnostic details through Administration. Loading copy must describe the user's task and never fabricate progress. Preserve fail-closed behavior and truthful blocked/unknown statuses.
+
+## UI-029: Two-level navigation and responsive application shell [P0]
+The application shell MUST expose persistent, distinct primary destinations: Investigations, Administration, and Settings (UI-020). Within an investigation, secondary navigation MUST include Overview, Causal Analysis, Evidence, Hypotheses, Timeline, and Corrective Actions where supported. Indicate current destination and preserve accessible focus/navigation on desktop, iPad, and mobile. Do not flatten system settings into an investigation disclosure or use one oversized navigation list for both global and investigation-specific destinations.
+
+## UI-030: Presentation semantics verification and adversarial tests [P0]
+Add deterministic fixture and deployed-browser assertions covering UI-022..UI-029: absence of technical metadata from header/footer/cards; truthful actual status versus expected status; technical validation never becoming an investigation-level "Verified" badge; mapped user-facing terminology; overview backed by the domain snapshot; causal graph invoking the real workflow layout engine; draft actions respecting engine authority; failure-state copy; and two-level navigation/accessibility. Include negative controls for fabricated conclusions, unknown-as-zero, technical-language leakage, and misleading saved/verified states. Record source requirement IDs, tests, exact deployed SHA, and independent review. Do not mark unsupported features PASS.
+
+## UI-031: Preserve system detail without exposing it in the workflow [P0]
+Moving information out of investigation views MUST NOT delete operational observability or evidence provenance. Administration MUST retain provider/catalog identifiers, build and component versions, data validation, connection health, and diagnostic codes. Investigation evidence views MUST retain meaningful source attribution and traceability. Settings MUST contain only supported user-adjustable options; read-only technical facts belong in Administration. Apply role/access controls to sensitive operational information and never expose credentials.
+
+## Rehearsal reconciliation for UI-022..UI-031
+These requirements are normative for future rehearsal requirements derivation. Record implementation/test traceability or an explicitly authorized scope disposition for each. Work items go to the owning repositories' documented Praxis input paths, not GitHub Issues. A requirements commit does not establish implementation or acceptance.
+
+
+## UI-032: Next Steps [P0]
+Show domain-derived next steps for unresolved contradictions, missing evidence, pending verification, and corrective actions. Link each to the underlying record and authorized action; never invent recommendations or treat unavailable data as no work.
+
+## UI-033: Connected investigation records [P0]
+Allow contextual traversal among evidence, hypotheses, causal assertions, corrective actions, and timeline events where actual domain relationships exist. Use stable identifiers, accessible navigation, and explicit absent-link states.
+
+## UI-034: Shared Forma inspector [P0]
+Use an existing or reusable Forma-compatible detail inspector across diagram, evidence, hypothesis, action, and timeline selection. Support desktop, iPad, mobile, keyboard, focus restoration, and consistent selection state. Verify component ownership before building.
+
+## UI-035: Contextual search and filters [P1]
+Search and filter investigation records by modeled source, state, verification, and supporting or contradictory relationship. Show result counts, active filters, and clear-filter actions; distinguish no matches from unavailable data.
+
+## UI-036: Investigation completeness checklist [P1]
+Evaluate explicit domain obligations such as documented incident, evidence sources, contradictions, supported root cause, corrective actions, and verification. Show status and supporting rule/evidence for each. Do not use misleading aggregate percentages.
+
+## UI-037: Offline guided demonstration [P0, competition profile]
+Provide a deterministic, clearly labeled demonstration using versioned fixtures and the real domain engine. Walk through evidence, contradictions, causal analysis, corrective actions, and authorized exploratory changes without network access, credentials, or mutations of real investigations.
+
+## UI-038: Decision provenance [P0]
+For domain-supported conclusions, explain supporting and conflicting evidence, linked hypotheses, verification history, and why unresolved findings remain unresolved. Source all explanations from typed authoritative records and make missing provenance explicit.
+
+## UI-039: Reusable implementation contracts [P0]
+Build UI-032..UI-038 from shared typed relationship, selection, inspector, and explanation contracts. Reuse Echelon components; avoid duplicating domain logic or implementing unrelated subsystems for each screen.
+
+## UI-040: End-to-end acceptance [P0]
+Verify next-step authority, record navigation, responsive inspector accessibility, search/filter accuracy, completeness rules, deterministic offline demo, and source-grounded explanations with positive and negative fixture cases and exact deployed-SHA tests. Trace all requirements through the documented Praxis input process; record approved exclusions explicitly.
