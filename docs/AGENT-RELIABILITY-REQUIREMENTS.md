@@ -56,3 +56,27 @@ Status: normative for future Indy-init rehearsals and candidate reusable Echelon
 ## Adoption
 
 First inventory current Praxis, Ordo, Dokimos, Percepta and related contracts. For each AR requirement, record existing implementation, gap, owning repository, test plan, and dependency. Place resulting work in each owner's documented Praxis input path. Do not mark requirements implemented merely because this document exists.
+
+
+## Evidence-driven refinement (October 2026)
+
+The reported ARCH-002 trial found 29 architecture violations in 68 unguided trials versus 0 in 71 trials with the four-tier architecture brief. Additional Ordo enforcement showed no measured improvement and reportedly increased cost by 7%. Continuous agents reportedly reduced cost per accepted requirement by 40.9%. These are experiment-specific observations, not universal guarantees; retain raw trial evidence and study context-compaction effects separately.
+
+**AR-019 [P0] Computed verdict, not agent assertion.** The authoritative acceptance outcome MUST be computed from the evidence ledger, frozen baseline, required gates, requirements coverage, approved decisions, defect closures, and deployed SHA. Agent-authored accepted fields are advisory at most. Original Rehearsal 3 must yield BLOCKED; Rehearsal 2 candidate 45644a7 should yield ACCEPTED only if its actual ledger and evidence meet the frozen contract. Include tests for false accepted flags, missing CI, baseline tampering, and unauthorized waivers.
+
+**AR-020 [P0] Selective enforcement.** Retain the demonstrated four-tier architecture brief as default guidance. Do not add per-step Ordo architecture enforcement, typed agent records, or executable decision gates without a measured incremental correctness benefit that justifies cost and false rejections. Typed domain models and security/acceptance boundaries remain mandatory where independently justified.
+
+**AR-021 [P0] Continuous implementation agent.** Prefer one long-running implementation agent with compact durable checkpoints. Do not require structured handoffs by default. Measure correctness and requirement retention after context compaction; use independent reviewers at release candidates.
+
+**AR-022 [P0] Testing discipline.** Dependency-based test selection may prioritize but must not omit mandatory regression/security/integration coverage. Do not restrict CI to infrequent checkpoints when intermediate changes can hide failures. Require baseline tests that demonstrably fail on injected defects before trusting an experiment.
+
+**AR-023 [P0] Release-set integrity.** Select the latest *verified compatible release set*, not unrelated latest versions. Confirm whether Dokimos 0.7.0 and Percepta have published artifacts; do not claim attestation from a set lacking its required components. Resolve and verify Conditor scaffold defect SD-1. Pin the exact set and require evidence for waivers.
+
+**AR-024 [P0] Explicit kickoff decisions.** An authorized human must resolve the write scope, Percepta release/waiver, DF-CAUSA-2026-0003 operator decisions, and frozen requirements/stack before a timed full-write rehearsal. Agents must not self-ratify these decisions.
+
+**AR-025 [P1] Research controls.** Compare constrained versus baseline workflows on matched tasks with measured accepted requirements, false acceptance, escaped defects, token cost, elapsed time, and rework. Do not claim 'prevented by design' without a falsifiable test or generalize a single reviewer observation as proven efficacy.
+
+**AR-026 [P1] Shared HTTP cache.** Investigate a provider-neutral, opt-in cache policy at the Limen HTTP boundary with explicit freshness, invalidation, security, and stale-data semantics; do not silently use stale results for authoritative decisions. Place implementation in Limen's documented Praxis input path after owner/contract verification.
+
+### Reconciliation
+AR-019..AR-026 refine AR-001..AR-018 when there is tension. In particular AR-003 protects genuine approval authority, not agent-maintained pseudo-authority; AR-006 concerns domain correctness, not universal typed agent messages; AR-013 allows test prioritization, not skipping mandatory CI. These requirements do not establish that any release or implementation is complete.
