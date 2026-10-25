@@ -9,11 +9,11 @@ rehearsal must use it is defined in
 
 | | |
 |---|---|
-| Baseline id | `BL-CAUSA-INDY-INIT-bff21632a673` |
-| Pinned commit | `bff21632a67390e56ddeaf9ddc8d2344a7a90996` (kemiller2002/indy-init `main`, 2026-10-24) |
-| Documents | 16, each pinned by SHA-256 |
-| Requirements | 374 |
-| Obligations | 1981: 243 `acceptance`, 50 `value`, 1688 `constraint` |
+| Baseline id | `BL-CAUSA-INDY-INIT-002d8ba6e986` |
+| Pinned commit | `002d8ba6e98639a385dd771999099ba032c48086` (kemiller2002/indy-init `main`, 2026-10-24). Regenerated at the requirements freeze (docs/OWNER-DECISIONS-2026-10-24.md, OD-INDY-6) |
+| Documents | 19, each pinned by SHA-256 |
+| Requirements | 450 |
+| Obligations | 2220: 325 `acceptance`, 51 `value`, 1844 `constraint` |
 | Regenerate | `python3 -I tools/build-requirements-baseline.py . <commit> > requirements/causa-requirements-baseline.json` |
 | Tests | `python3 tools/test-requirements-baseline.py` (run by the preflight-tooling workflow) |
 
@@ -31,7 +31,7 @@ inventoried is reported as drift (`uninventoried-requirement`).
 
 | Document | Requirements | `requirementPattern` |
 |---|---|---|
-| `docs/CAUSA-UI-EXPERIENCE-REQUIREMENTS.md` | UI-001..UI-016 and its normative sections | `^## (UI-\d{3}):` |
+| `docs/CAUSA-UI-EXPERIENCE-REQUIREMENTS.md` | UI-001..UI-040 and its normative sections | `^## (UI-\d{3}):` |
 | `docs/WASM-LOADING-EXPERIENCE-REQUIREMENTS.md` | WASM-LOAD-001..008 | `^## (WASM-LOAD-\d{3}):` |
 | `docs/PROVIDER-FIXTURE-AND-INTEGRATION-REQUIREMENTS.md` | PF-001..PF-021 and the acceptance scenarios | `^\*\*(PF-\d{3}) ` |
 | `docs/REHEARSAL-EXTERNAL-DATA-BOUNDARY.md` | EXT-DATA-001..012, the goal, acceptance and intake | `^- (EXT-DATA-\d{3}) ` |
@@ -47,6 +47,9 @@ inventoried is reported as drift (`uninventoried-requirement`).
 | `docs/CAUSA-STORAGE-RELEASE-v1.0.0.md` | release identity, contents, authority, consumption | none (no ids) |
 | `docs/REHEARSAL-AGENT-INTERFACE-FREEZE.md` | each boundary and procedure section | none (no ids) |
 | `docs/REHEARSAL-ACCEPTANCE-LEDGER.md` | each ledger section | none (no ids) |
+| `docs/WORKFLOW-DIAGRAM-INTEGRATION-REQUIREMENTS.md` | WDL-001..015 | `^\*\*(WDL-\d{3}) ` |
+| `docs/SYSTEM-VERSION-AND-COMPATIBILITY-REQUIREMENTS.md` | VER-001..010 | `^\*\*(VER-\d{3}) ` |
+| `docs/AGENT-RELIABILITY-REQUIREMENTS.md` | AR-001..018 | `^\*\*(AR-\d{3}) ` |
 
 ### Why these documents
 
@@ -130,7 +133,7 @@ then regenerated with it.
 - **Granularity.** Obligations are sentences. A sentence that packs several
   duties is one obligation, and a derived criterion that carries only part of
   it is caught only by its tokens or by review.
-- **Most obligations need a review.** Obligations without tokens (1688
+- **Most obligations need a review.** Obligations without tokens (1844
   `constraint` and most `acceptance`) can only be accepted through a recorded
   human equivalence review, or a disposition with an operator approval. The
   gate keeps them `needs-review` until then, by design.

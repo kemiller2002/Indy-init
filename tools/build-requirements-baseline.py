@@ -49,6 +49,11 @@ DOCUMENTS = [
     ("docs/STATE-TRANSITION-TABLES.md", "STATE-TRANSITION-TABLES", None),
     ("docs/KICKOFF-EXECUTION-PACKET.md", "KICKOFF-EXECUTION-PACKET", None),
     ("docs/CAUSA-STORAGE-RELEASE-v1.0.0.md", "CAUSA-STORAGE-RELEASE", None),
+    # Added 2026-10-24 (owner decision OD-INDY-5, docs/OWNER-DECISIONS-2026-10-24.md):
+    # normative for future rehearsals and referenced from docs/REQUIREMENTS.md.
+    ("docs/WORKFLOW-DIAGRAM-INTEGRATION-REQUIREMENTS.md", "WORKFLOW-DIAGRAM-INTEGRATION", r"^\*\*(WDL-\d{3}) "),
+    ("docs/SYSTEM-VERSION-AND-COMPATIBILITY-REQUIREMENTS.md", "SYSTEM-VERSION-AND-COMPATIBILITY", r"^\*\*(VER-\d{3}) "),
+    ("docs/AGENT-RELIABILITY-REQUIREMENTS.md", "AGENT-RELIABILITY", r"^\*\*(AR-\d{3}) "),
     # Normative rehearsal contracts without requirement ids.
     ("docs/REHEARSAL-AGENT-INTERFACE-FREEZE.md", "REHEARSAL-AGENT-INTERFACE-FREEZE", None),
     ("docs/REHEARSAL-ACCEPTANCE-LEDGER.md", "REHEARSAL-ACCEPTANCE-LEDGER", None),

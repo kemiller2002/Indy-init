@@ -62,7 +62,9 @@ def check(data):
             if isinstance(item, dict) and item.get("priority") == "P0":
                 require(item.get("status") == "PASS", f"accepted requires P0 requirement {item.get('id')} PASS")
         for item in data.get("defect_classes", []):
-            if isinstance(item, dict) and item.get("severity") in ("CRITICAL", "HIGH"):
+            # Case-insensitive: Rehearsal 2's ledger wrote "critical"/"high", which an exact
+            # uppercase match silently treated as not critical.
+            if isinstance(item, dict) and str(item.get("severity", "")).upper() in ("CRITICAL", "HIGH"):
                 require(item.get("status") == "PASS", f"accepted requires critical/high defect class {item.get('id')} closed")
     return errors
 

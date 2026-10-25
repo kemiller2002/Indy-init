@@ -1,13 +1,13 @@
 {
   "schema": "praxis.requirements-baseline/1",
-  "id": "BL-CAUSA-INDY-INIT-bff21632a673",
+  "id": "BL-CAUSA-INDY-INIT-002d8ba6e986",
   "source": {
     "repository": "kemiller2002/indy-init",
-    "commit": "bff21632a67390e56ddeaf9ddc8d2344a7a90996",
+    "commit": "002d8ba6e98639a385dd771999099ba032c48086",
     "documents": [
       {
         "path": "docs/CAUSA-UI-EXPERIENCE-REQUIREMENTS.md",
-        "sha256": "6c590e5f2de9e9889df998ba90ed8eb13d3a805e5da77823171b0a659f3c13b7",
+        "sha256": "55a8b0b8b1bbd07b10bba1c6760306d0d84f8e69b2db846af571298e4f35e777",
         "requirementPattern": "^## (UI-\\d{3}):"
       },
       {
@@ -47,7 +47,7 @@
       },
       {
         "path": "docs/REQUIREMENTS.md",
-        "sha256": "59ba312681e867a969bf1bc1a7954f2240b73721a8e211dcb142c62fd878947f",
+        "sha256": "9644e82d7d29af8291a54eb19c123f8e3a2318913f317183f57739324c4a4f12",
         "requirementPattern": "^### (R\\d+\\.\\d+) "
       },
       {
@@ -71,6 +71,21 @@
       {
         "path": "docs/CAUSA-STORAGE-RELEASE-v1.0.0.md",
         "sha256": "438e711456ba0596426e7c62fbc9e796858cfbbe0b1a6fc7f01b423aafa00724"
+      },
+      {
+        "path": "docs/WORKFLOW-DIAGRAM-INTEGRATION-REQUIREMENTS.md",
+        "sha256": "1965b70e0df184217dbbd0c01a5b2bef248ab0b78994eb07914af0a5b06bd678",
+        "requirementPattern": "^\\*\\*(WDL-\\d{3}) "
+      },
+      {
+        "path": "docs/SYSTEM-VERSION-AND-COMPATIBILITY-REQUIREMENTS.md",
+        "sha256": "2ee06cbda0028a95e33d7a23e462728f1c7eaa63f9ee047b36b3e238a62c0889",
+        "requirementPattern": "^\\*\\*(VER-\\d{3}) "
+      },
+      {
+        "path": "docs/AGENT-RELIABILITY-REQUIREMENTS.md",
+        "sha256": "fe2215774719f3b26e7c409dac4d32b4e7fc086c0132599c3fe9233b23356e16",
+        "requirementPattern": "^\\*\\*(AR-\\d{3}) "
       },
       {
         "path": "docs/REHEARSAL-AGENT-INTERFACE-FREEZE.md",
@@ -940,6 +955,737 @@
           "id": "CAUSA-UI-EXPERIENCE§required-evidence-O6",
           "kind": "acceptance",
           "text": "Exact deployed SHA and successful acceptance job conclusion."
+        }
+      ]
+    },
+    {
+      "id": "UI-017",
+      "title": "Investigation-facing copy is domain-focused",
+      "priority": "P0",
+      "document": "docs/CAUSA-UI-EXPERIENCE-REQUIREMENTS.md",
+      "heading": "## UI-017: Investigation-facing copy is domain-focused [P0]",
+      "sectionSha256": "5dad1db7f924c73e0d9bc119c5348035763c220e3107bd11f1d41ad15423a6c4",
+      "obligations": [
+        {
+          "id": "UI-017-O1",
+          "kind": "constraint",
+          "text": "Investigation pages MUST present user tasks, investigation content, actionable statuses, and concise recovery instructions."
+        },
+        {
+          "id": "UI-017-O2",
+          "kind": "constraint",
+          "text": "They MUST NOT display implementation explanations, storage schema versions, catalog identifiers, commit SHAs, replay/validation mechanics, framework versions, or infrastructure details as introductory paragraphs, persistent banners, or other routine UI copy."
+        },
+        {
+          "id": "UI-017-O3",
+          "kind": "constraint",
+          "text": "Specifically, remove the catalog/replay paragraph beginning \"The active catalog historical-v1\" from the investigation catalog."
+        },
+        {
+          "id": "UI-017-O4",
+          "kind": "constraint",
+          "text": "Where a technical issue affects the user's ability to proceed, show a short plain-language explanation and next action, with technical details accessible from Administration."
+        },
+        {
+          "id": "UI-017-O5",
+          "kind": "constraint",
+          "text": "Preserve required investigation provenance and evidence source attribution within their domain views; do not hide substantive investigation facts."
+        }
+      ]
+    },
+    {
+      "id": "UI-018",
+      "title": "Dedicated Administration page",
+      "priority": "P0",
+      "document": "docs/CAUSA-UI-EXPERIENCE-REQUIREMENTS.md",
+      "heading": "## UI-018: Dedicated Administration page [P0]",
+      "sectionSha256": "1f1ee1c829c5d0f823b66b634ffe5a8f7ae5cab75fd0cd6a86897c2cd9c81b40",
+      "obligations": [
+        {
+          "id": "UI-018-O1",
+          "kind": "constraint",
+          "text": "Provide a separately navigable Administration page for system information and operational diagnostics."
+        },
+        {
+          "id": "UI-018-O2",
+          "kind": "constraint",
+          "text": "It MUST show, as available and applicable: active provider and catalog, catalog version and source reference, storage/schema contract version, application and Echelon component versions, build/deployed commit, dataset validation and domain replay status, provider connectivity and authentication status without revealing secrets, and relevant diagnostic/error details."
+        },
+        {
+          "id": "UI-018-O3",
+          "kind": "acceptance",
+          "text": "Distinguish unknown, unavailable, failed, and verified states."
+        },
+        {
+          "id": "UI-018-O4",
+          "kind": "constraint",
+          "text": "Never imply an unverified operation passed."
+        },
+        {
+          "id": "UI-018-O5",
+          "kind": "constraint",
+          "text": "System diagnostics MUST NOT leak into investigation screens."
+        },
+        {
+          "id": "UI-018-O6",
+          "kind": "constraint",
+          "text": "Administration is read-only unless a separately authorized operational action is specified."
+        }
+      ]
+    },
+    {
+      "id": "UI-019",
+      "title": "Dedicated Settings page",
+      "priority": "P0",
+      "document": "docs/CAUSA-UI-EXPERIENCE-REQUIREMENTS.md",
+      "heading": "## UI-019: Dedicated Settings page [P0]",
+      "sectionSha256": "b83b4cfa57091616ac92d1f911450ea3859b2ba87138ff4d5be6924c53ad6962",
+      "obligations": [
+        {
+          "id": "UI-019-O1",
+          "kind": "constraint",
+          "text": "Provide a separately navigable Settings page for user-adjustable preferences and configuration, distinct from Administration and investigation views."
+        },
+        {
+          "id": "UI-019-O2",
+          "kind": "constraint",
+          "text": "Include only supported settings, such as appearance/theme, accessibility or display preferences, and provider connection preferences where authorized."
+        },
+        {
+          "id": "UI-019-O3",
+          "kind": "acceptance",
+          "text": "Distinguish a preference from a verified external connection."
+        },
+        {
+          "id": "UI-019-O4",
+          "kind": "constraint",
+          "text": "Do not expose controls that cannot be honored."
+        },
+        {
+          "id": "UI-019-O5",
+          "kind": "constraint",
+          "text": "Define persistence and scope of each setting (session, device, or account), show effective values, and avoid saving credentials in local storage or displaying tokens."
+        },
+        {
+          "id": "UI-019-O6",
+          "kind": "constraint",
+          "text": "Provider authentication and configuration must respect the established security and read-only scope contracts."
+        }
+      ]
+    },
+    {
+      "id": "UI-020",
+      "title": "Navigation and information architecture",
+      "priority": "P0",
+      "document": "docs/CAUSA-UI-EXPERIENCE-REQUIREMENTS.md",
+      "heading": "## UI-020: Navigation and information architecture [P0]",
+      "sectionSha256": "c7262568e52459875bb6492d13dee5d414c9b127cd038a99fbe45f2ea335e8ae",
+      "obligations": [
+        {
+          "id": "UI-020-O1",
+          "kind": "constraint",
+          "text": "Provide clear, accessible top-level navigation to Investigations, Administration, and Settings."
+        },
+        {
+          "id": "UI-020-O2",
+          "kind": "constraint",
+          "text": "Investigation workflow actions remain in investigation context; operational information belongs in Administration; configurable preferences belong in Settings."
+        },
+        {
+          "id": "UI-020-O3",
+          "kind": "constraint",
+          "text": "Navigation must work on desktop, iPad, mobile, keyboard, and assistive technology, with an identifiable active page and sensible narrow-viewport behavior."
+        },
+        {
+          "id": "UI-020-O4",
+          "kind": "constraint",
+          "text": "Do not use an undifferentiated dashboard as a substitute for these destinations."
+        }
+      ]
+    },
+    {
+      "id": "UI-021",
+      "title": "Content and route verification",
+      "priority": "P0",
+      "document": "docs/CAUSA-UI-EXPERIENCE-REQUIREMENTS.md",
+      "heading": "## UI-021: Content and route verification [P0]",
+      "sectionSha256": "5103d12b08ccaf4ce11b94e7505cd85ef5cbfb1c7f617d98d94f1e4f507492ee",
+      "obligations": [
+        {
+          "id": "UI-021-O1",
+          "kind": "acceptance",
+          "text": "Add browser tests using deterministic fixtures that assert: (1) the quoted catalog/replay technical paragraph and equivalent implementation prose are absent from routine investigation views; (2) operational details appear in Administration; (3) preferences appear in Settings and behave according to their documented persistence scope; (4) navigation, focus, labels, and responsive behavior work; (5) no credentials or secret values are rendered or logged; and (6) deployed exact-SHA verification exercises all three destinations.",
+          "tokens": [
+            "three"
+          ]
+        },
+        {
+          "id": "UI-021-O2",
+          "kind": "acceptance",
+          "text": "Tests must not simply check for page existence; they must verify content placement and user-visible behavior."
+        },
+        {
+          "id": "UI-021-O3",
+          "kind": "constraint",
+          "text": "Preserve traceability and approved-scope handling in Praxis."
+        }
+      ]
+    },
+    {
+      "id": "UI-022",
+      "title": "Minimal application chrome and investigation cards",
+      "priority": "P0",
+      "document": "docs/CAUSA-UI-EXPERIENCE-REQUIREMENTS.md",
+      "heading": "## UI-022: Minimal application chrome and investigation cards [P0]",
+      "sectionSha256": "2d10eef31aba81e043e14cbb5604e26946f6724d02c54ad5b46280a1b8c84f2c",
+      "obligations": [
+        {
+          "id": "UI-022-O1",
+          "kind": "constraint",
+          "text": "The global header MUST emphasize application identity and top-level navigation, not data-provider commit hashes or connection implementation."
+        },
+        {
+          "id": "UI-022-O2",
+          "kind": "constraint",
+          "text": "The footer MUST omit build SHAs, component-stack inventories, and build timestamps; these belong on Administration (UI-018)."
+        },
+        {
+          "id": "UI-022-O3",
+          "kind": "constraint",
+          "text": "Investigation catalog cards MUST prioritize investigation title, actual domain lifecycle/status, latest meaningful activity, supported counts of open questions/evidence, and a clear Open Investigation action."
+        },
+        {
+          "id": "UI-022-O4",
+          "kind": "constraint",
+          "text": "Do not show raw internal case keys as primary headings, \"Expected lifecycle\", duplicated declared/derived counts, or technical replay/verification explanations."
+        },
+        {
+          "id": "UI-022-O5",
+          "kind": "constraint",
+          "text": "Internal identifiers remain discoverable where required for legitimate reference, provenance, and diagnostics."
+        },
+        {
+          "id": "UI-022-O6",
+          "kind": "constraint",
+          "text": "Unknown counts MUST NOT be presented as zero."
+        }
+      ]
+    },
+    {
+      "id": "UI-023",
+      "title": "Separate technical integrity from investigative verification",
+      "priority": "P0",
+      "document": "docs/CAUSA-UI-EXPERIENCE-REQUIREMENTS.md",
+      "heading": "## UI-023: Separate technical integrity from investigative verification [P0]",
+      "sectionSha256": "fa6221238b47c447ba720540d245d4ac4afd24bccdba9845f66ee4ba0ae277e4",
+      "obligations": [
+        {
+          "id": "UI-023-O1",
+          "kind": "acceptance",
+          "text": "A successfully fetched, schema-validated, replayed, or cached investigation MUST NOT be labeled \"Verified\" unless the domain explicitly asserts the corresponding investigation-level verification state."
+        },
+        {
+          "id": "UI-023-O2",
+          "kind": "constraint",
+          "text": "Data integrity and runtime processing belong in Administration; investigation-facing badges MUST express only domain-authoritative conclusions, evidence status, or lifecycle."
+        },
+        {
+          "id": "UI-023-O3",
+          "kind": "acceptance",
+          "text": "Define disjoint labels and projection fields for technical data validation versus verified findings."
+        },
+        {
+          "id": "UI-023-O4",
+          "kind": "acceptance",
+          "text": "Regression tests MUST catch any conflation, including an investigation that loads correctly but contains disputed or unresolved findings."
+        }
+      ]
+    },
+    {
+      "id": "UI-024",
+      "title": "User-oriented terminology and presentation-language contract",
+      "priority": "P0",
+      "document": "docs/CAUSA-UI-EXPERIENCE-REQUIREMENTS.md",
+      "heading": "## UI-024: User-oriented terminology and presentation-language contract [P0]",
+      "sectionSha256": "7e921434380d43da741f481af95a859c55d0188be16d3bf2473e0c9275615e2c",
+      "obligations": [
+        {
+          "id": "UI-024-O1",
+          "kind": "constraint",
+          "text": "Define a centralized, testable presentation-language mapping from typed F# domain/projection/error states to concise user-facing labels, explanations, and actions."
+        },
+        {
+          "id": "UI-024-O2",
+          "kind": "constraint",
+          "text": "Do not let view templates or agents invent meanings, confidence, permitted transitions, or success claims."
+        },
+        {
+          "id": "UI-024-O3",
+          "kind": "constraint",
+          "text": "Default labels: \"Investigations\" instead of \"Historical investigations\"; \"Opening investigation\" instead of \"Fetching and validating the investigation\"; \"Status\" instead of \"Expected lifecycle\"; \"Investigation history\" instead of \"Replayed state\"; \"Explore changes\" instead of \"Open a sandbox copy\"; \"Apply change to draft\" instead of \"Ask the engine\" when that is the actual action; \"Change history\" instead of \"Engine decisions\"; and \"Discard draft\" instead of \"Discard the sandbox\"."
+        },
+        {
+          "id": "UI-024-O4",
+          "kind": "constraint",
+          "text": "The wording MUST remain accurate to read-only, ephemeral, unsaved, and persisted states: never imply a draft was saved or a change was applied to the authoritative investigation when it was not."
+        },
+        {
+          "id": "UI-024-O5",
+          "kind": "constraint",
+          "text": "Technical codes and provider details belong in Administration, except where needed in an explicitly requested technical detail view."
+        },
+        {
+          "id": "UI-024-O6",
+          "kind": "constraint",
+          "text": "Preserve precise provenance and domain-specific terms where material."
+        }
+      ]
+    },
+    {
+      "id": "UI-025",
+      "title": "Investigation overview as the primary landing view",
+      "priority": "P0",
+      "document": "docs/CAUSA-UI-EXPERIENCE-REQUIREMENTS.md",
+      "heading": "## UI-025: Investigation overview as the primary landing view [P0]",
+      "sectionSha256": "9d0914d9a6d6d29de3ef44e9539cb4d9ba62f774ea09165d6f28ed174ce2c20b",
+      "obligations": [
+        {
+          "id": "UI-025-O1",
+          "kind": "constraint",
+          "text": "Opening an investigation MUST lead to an Overview that answers, from domain-authoritative projections only: what happened and impact; current supported findings; supporting and contradictory evidence; unresolved questions; and next authorized actions."
+        },
+        {
+          "id": "UI-025-O2",
+          "kind": "constraint",
+          "text": "Show unknown/unavailable information explicitly rather than inventing summaries."
+        },
+        {
+          "id": "UI-025-O3",
+          "kind": "constraint",
+          "text": "Overview sections SHOULD link to Summary, Causal Analysis, Evidence, Hypotheses, Timeline, and Corrective Actions."
+        },
+        {
+          "id": "UI-025-O4",
+          "kind": "constraint",
+          "text": "No AI-generated interpretation or unsupported conclusions may be presented as established fact."
+        }
+      ]
+    },
+    {
+      "id": "UI-026",
+      "title": "Prominent causal analysis workspace",
+      "priority": "P0",
+      "document": "docs/CAUSA-UI-EXPERIENCE-REQUIREMENTS.md",
+      "heading": "## UI-026: Prominent causal analysis workspace [P0]",
+      "sectionSha256": "50775a30d9185019aed77a65e44684e9280030512016f07f43e654dcebf5bd87",
+      "obligations": [
+        {
+          "id": "UI-026-O1",
+          "kind": "constraint",
+          "text": "Provide a dedicated Causal Analysis investigation section centered on the causal graph, with evidence and hypothesis inspection in context."
+        },
+        {
+          "id": "UI-026-O2",
+          "kind": "constraint",
+          "text": "Reuse the existing Echelon workflow layout system under WDL-001..WDL-015, rather than hardcoded coordinates."
+        },
+        {
+          "id": "UI-026-O3",
+          "kind": "constraint",
+          "text": "Graph node selection MUST reveal the corresponding authoritative hypothesis/cause and evidence counts, with navigation to the underlying records."
+        },
+        {
+          "id": "UI-026-O4",
+          "kind": "constraint",
+          "text": "Preserve accessible text equivalents and read-only scope; do not imply graph manipulation changes the domain."
+        }
+      ]
+    },
+    {
+      "id": "UI-027",
+      "title": "Contextual domain-authorized actions and draft clarity",
+      "priority": "P1",
+      "document": "docs/CAUSA-UI-EXPERIENCE-REQUIREMENTS.md",
+      "heading": "## UI-027: Contextual domain-authorized actions and draft clarity [P1]",
+      "sectionSha256": "2488e48308689cce34bd8c2c7380ccd6452494e9ff1b0bd597b35de0314c1225",
+      "obligations": [
+        {
+          "id": "UI-027-O1",
+          "kind": "constraint",
+          "text": "Present actions in the context of the relevant hypothesis, evidence, or corrective action, not as an engine command console."
+        },
+        {
+          "id": "UI-027-O2",
+          "kind": "constraint",
+          "text": "Offer only actions authorized by the F# domain engine, with clear reasons for unavailable actions where useful."
+        },
+        {
+          "id": "UI-027-O3",
+          "kind": "constraint",
+          "text": "Require reason/basis and confirmation when the domain contract requires them."
+        },
+        {
+          "id": "UI-027-O4",
+          "kind": "constraint",
+          "text": "Clearly distinguish exploratory draft changes, unsaved state, and committed authoritative changes; provide visible discard and consequence review."
+        },
+        {
+          "id": "UI-027-O5",
+          "kind": "constraint",
+          "text": "Never introduce persistence or mutation into a read-only rehearsal without explicit scope approval."
+        }
+      ]
+    },
+    {
+      "id": "UI-028",
+      "title": "Human-centered empty, loading, and failure states",
+      "priority": "P1",
+      "document": "docs/CAUSA-UI-EXPERIENCE-REQUIREMENTS.md",
+      "heading": "## UI-028: Human-centered empty, loading, and failure states [P1]",
+      "sectionSha256": "44c6787624fc1edfb51687d3aad510812346a66569aee0d2b2fe9a6e0813100a",
+      "obligations": [
+        {
+          "id": "UI-028-O1",
+          "kind": "constraint",
+          "text": "For empty catalogs, unavailable investigations, failed loads, disconnected providers, and invalid data, state in plain language what happened, whether user work is retained, and what action is possible next."
+        },
+        {
+          "id": "UI-028-O2",
+          "kind": "constraint",
+          "text": "Avoid showing repository branches, schema internals, raw state codes, or implementation traces in the primary message."
+        },
+        {
+          "id": "UI-028-O3",
+          "kind": "constraint",
+          "text": "Expose technical diagnostic details through Administration."
+        },
+        {
+          "id": "UI-028-O4",
+          "kind": "constraint",
+          "text": "Loading copy must describe the user's task and never fabricate progress."
+        },
+        {
+          "id": "UI-028-O5",
+          "kind": "constraint",
+          "text": "Preserve fail-closed behavior and truthful blocked/unknown statuses."
+        }
+      ]
+    },
+    {
+      "id": "UI-029",
+      "title": "Two-level navigation and responsive application shell",
+      "priority": "P0",
+      "document": "docs/CAUSA-UI-EXPERIENCE-REQUIREMENTS.md",
+      "heading": "## UI-029: Two-level navigation and responsive application shell [P0]",
+      "sectionSha256": "91ef8c475faf51f4ce36c7b9c7d6cef1a307f1be9fa4de7203caf86d494ab06d",
+      "obligations": [
+        {
+          "id": "UI-029-O1",
+          "kind": "constraint",
+          "text": "The application shell MUST expose persistent, distinct primary destinations: Investigations, Administration, and Settings (UI-020)."
+        },
+        {
+          "id": "UI-029-O2",
+          "kind": "constraint",
+          "text": "Within an investigation, secondary navigation MUST include Overview, Causal Analysis, Evidence, Hypotheses, Timeline, and Corrective Actions where supported."
+        },
+        {
+          "id": "UI-029-O3",
+          "kind": "constraint",
+          "text": "Indicate current destination and preserve accessible focus/navigation on desktop, iPad, and mobile."
+        },
+        {
+          "id": "UI-029-O4",
+          "kind": "constraint",
+          "text": "Do not flatten system settings into an investigation disclosure or use one oversized navigation list for both global and investigation-specific destinations."
+        }
+      ]
+    },
+    {
+      "id": "UI-030",
+      "title": "Presentation semantics verification and adversarial tests",
+      "priority": "P0",
+      "document": "docs/CAUSA-UI-EXPERIENCE-REQUIREMENTS.md",
+      "heading": "## UI-030: Presentation semantics verification and adversarial tests [P0]",
+      "sectionSha256": "80ed07c9f802749793ee44599b4857e458739e61ebefc3f718307c2b80cc01b1",
+      "obligations": [
+        {
+          "id": "UI-030-O1",
+          "kind": "acceptance",
+          "text": "Add deterministic fixture and deployed-browser assertions covering UI-022..UI-029: absence of technical metadata from header/footer/cards; truthful actual status versus expected status; technical validation never becoming an investigation-level \"Verified\" badge; mapped user-facing terminology; overview backed by the domain snapshot; causal graph invoking the real workflow layout engine; draft actions respecting engine authority; failure-state copy; and two-level navigation/accessibility.",
+          "tokens": [
+            "two"
+          ]
+        },
+        {
+          "id": "UI-030-O2",
+          "kind": "acceptance",
+          "text": "Include negative controls for fabricated conclusions, unknown-as-zero, technical-language leakage, and misleading saved/verified states."
+        },
+        {
+          "id": "UI-030-O3",
+          "kind": "acceptance",
+          "text": "Record source requirement IDs, tests, exact deployed SHA, and independent review."
+        },
+        {
+          "id": "UI-030-O4",
+          "kind": "constraint",
+          "text": "Do not mark unsupported features PASS."
+        }
+      ]
+    },
+    {
+      "id": "UI-031",
+      "title": "Preserve system detail without exposing it in the workflow",
+      "priority": "P0",
+      "document": "docs/CAUSA-UI-EXPERIENCE-REQUIREMENTS.md",
+      "heading": "## UI-031: Preserve system detail without exposing it in the workflow [P0]",
+      "sectionSha256": "6fffa3ac7d3bd79dc1d58ddd28a3f4cb720103965dd1d98604c0a7686d7aa9ad",
+      "obligations": [
+        {
+          "id": "UI-031-O1",
+          "kind": "constraint",
+          "text": "Moving information out of investigation views MUST NOT delete operational observability or evidence provenance."
+        },
+        {
+          "id": "UI-031-O2",
+          "kind": "constraint",
+          "text": "Administration MUST retain provider/catalog identifiers, build and component versions, data validation, connection health, and diagnostic codes."
+        },
+        {
+          "id": "UI-031-O3",
+          "kind": "constraint",
+          "text": "Investigation evidence views MUST retain meaningful source attribution and traceability."
+        },
+        {
+          "id": "UI-031-O4",
+          "kind": "constraint",
+          "text": "Settings MUST contain only supported user-adjustable options; read-only technical facts belong in Administration."
+        },
+        {
+          "id": "UI-031-O5",
+          "kind": "constraint",
+          "text": "Apply role/access controls to sensitive operational information and never expose credentials."
+        }
+      ]
+    },
+    {
+      "id": "CAUSA-UI-EXPERIENCE§rehearsal-reconciliation-for-ui-022-ui-031",
+      "title": "Rehearsal reconciliation for UI-022..UI-031",
+      "priority": "unstated",
+      "document": "docs/CAUSA-UI-EXPERIENCE-REQUIREMENTS.md",
+      "heading": "## Rehearsal reconciliation for UI-022..UI-031",
+      "sectionSha256": "dcadd05f915809bb6306b831923aa45a0d15e02396252c72e40c0553fa2405c1",
+      "obligations": [
+        {
+          "id": "CAUSA-UI-EXPERIENCE§rehearsal-reconciliation-for-ui-022-ui-031-O1",
+          "kind": "constraint",
+          "text": "These requirements are normative for future rehearsal requirements derivation."
+        },
+        {
+          "id": "CAUSA-UI-EXPERIENCE§rehearsal-reconciliation-for-ui-022-ui-031-O2",
+          "kind": "acceptance",
+          "text": "Record implementation/test traceability or an explicitly authorized scope disposition for each."
+        },
+        {
+          "id": "CAUSA-UI-EXPERIENCE§rehearsal-reconciliation-for-ui-022-ui-031-O3",
+          "kind": "constraint",
+          "text": "Work items go to the owning repositories' documented Praxis input paths, not GitHub Issues."
+        },
+        {
+          "id": "CAUSA-UI-EXPERIENCE§rehearsal-reconciliation-for-ui-022-ui-031-O4",
+          "kind": "acceptance",
+          "text": "A requirements commit does not establish implementation or acceptance."
+        }
+      ]
+    },
+    {
+      "id": "UI-032",
+      "title": "Next Steps",
+      "priority": "P0",
+      "document": "docs/CAUSA-UI-EXPERIENCE-REQUIREMENTS.md",
+      "heading": "## UI-032: Next Steps [P0]",
+      "sectionSha256": "873ca03c69f402501ad002235a83a2420f9bae3e58a56371449bf77294e60c12",
+      "obligations": [
+        {
+          "id": "UI-032-O1",
+          "kind": "constraint",
+          "text": "Show domain-derived next steps for unresolved contradictions, missing evidence, pending verification, and corrective actions."
+        },
+        {
+          "id": "UI-032-O2",
+          "kind": "constraint",
+          "text": "Link each to the underlying record and authorized action; never invent recommendations or treat unavailable data as no work."
+        }
+      ]
+    },
+    {
+      "id": "UI-033",
+      "title": "Connected investigation records",
+      "priority": "P0",
+      "document": "docs/CAUSA-UI-EXPERIENCE-REQUIREMENTS.md",
+      "heading": "## UI-033: Connected investigation records [P0]",
+      "sectionSha256": "29b8981af9826fc30eb7d7e5f230092dc1de56e2213a9ee169eba784c29edb20",
+      "obligations": [
+        {
+          "id": "UI-033-O1",
+          "kind": "constraint",
+          "text": "Allow contextual traversal among evidence, hypotheses, causal assertions, corrective actions, and timeline events where actual domain relationships exist."
+        },
+        {
+          "id": "UI-033-O2",
+          "kind": "constraint",
+          "text": "Use stable identifiers, accessible navigation, and explicit absent-link states."
+        }
+      ]
+    },
+    {
+      "id": "UI-034",
+      "title": "Shared Forma inspector",
+      "priority": "P0",
+      "document": "docs/CAUSA-UI-EXPERIENCE-REQUIREMENTS.md",
+      "heading": "## UI-034: Shared Forma inspector [P0]",
+      "sectionSha256": "b840195f7a9c479fa7b663c207f5dab25c654acf06c46bf2464fd53817a816b9",
+      "obligations": [
+        {
+          "id": "UI-034-O1",
+          "kind": "constraint",
+          "text": "Use an existing or reusable Forma-compatible detail inspector across diagram, evidence, hypothesis, action, and timeline selection."
+        },
+        {
+          "id": "UI-034-O2",
+          "kind": "constraint",
+          "text": "Support desktop, iPad, mobile, keyboard, focus restoration, and consistent selection state."
+        },
+        {
+          "id": "UI-034-O3",
+          "kind": "acceptance",
+          "text": "Verify component ownership before building."
+        }
+      ]
+    },
+    {
+      "id": "UI-035",
+      "title": "Contextual search and filters",
+      "priority": "P1",
+      "document": "docs/CAUSA-UI-EXPERIENCE-REQUIREMENTS.md",
+      "heading": "## UI-035: Contextual search and filters [P1]",
+      "sectionSha256": "ac506fc09aeb392ef68b33f4f2f122880da3c35ddbd0b69e01c92584b0e93831",
+      "obligations": [
+        {
+          "id": "UI-035-O1",
+          "kind": "constraint",
+          "text": "Search and filter investigation records by modeled source, state, verification, and supporting or contradictory relationship."
+        },
+        {
+          "id": "UI-035-O2",
+          "kind": "constraint",
+          "text": "Show result counts, active filters, and clear-filter actions; distinguish no matches from unavailable data."
+        }
+      ]
+    },
+    {
+      "id": "UI-036",
+      "title": "Investigation completeness checklist",
+      "priority": "P1",
+      "document": "docs/CAUSA-UI-EXPERIENCE-REQUIREMENTS.md",
+      "heading": "## UI-036: Investigation completeness checklist [P1]",
+      "sectionSha256": "51ab5988f042f5dac9594f0e8ab3ccd5d00b8c36082359d889a9f576174670e1",
+      "obligations": [
+        {
+          "id": "UI-036-O1",
+          "kind": "constraint",
+          "text": "Evaluate explicit domain obligations such as documented incident, evidence sources, contradictions, supported root cause, corrective actions, and verification."
+        },
+        {
+          "id": "UI-036-O2",
+          "kind": "constraint",
+          "text": "Show status and supporting rule/evidence for each."
+        },
+        {
+          "id": "UI-036-O3",
+          "kind": "constraint",
+          "text": "Do not use misleading aggregate percentages."
+        }
+      ]
+    },
+    {
+      "id": "UI-037",
+      "title": "Offline guided demonstration [P0, competition profile]",
+      "priority": "unstated",
+      "document": "docs/CAUSA-UI-EXPERIENCE-REQUIREMENTS.md",
+      "heading": "## UI-037: Offline guided demonstration [P0, competition profile]",
+      "sectionSha256": "f9d36e064c156bd979012eb02b260662de857ef2640751915f07d72f917b638c",
+      "obligations": [
+        {
+          "id": "UI-037-O1",
+          "kind": "constraint",
+          "text": "Provide a deterministic, clearly labeled demonstration using versioned fixtures and the real domain engine."
+        },
+        {
+          "id": "UI-037-O2",
+          "kind": "constraint",
+          "text": "Walk through evidence, contradictions, causal analysis, corrective actions, and authorized exploratory changes without network access, credentials, or mutations of real investigations."
+        }
+      ]
+    },
+    {
+      "id": "UI-038",
+      "title": "Decision provenance",
+      "priority": "P0",
+      "document": "docs/CAUSA-UI-EXPERIENCE-REQUIREMENTS.md",
+      "heading": "## UI-038: Decision provenance [P0]",
+      "sectionSha256": "cf73cfc561e93a838dd500a70d9ddded0ec2b1f7714b34b1dc7dc854085c5948",
+      "obligations": [
+        {
+          "id": "UI-038-O1",
+          "kind": "constraint",
+          "text": "For domain-supported conclusions, explain supporting and conflicting evidence, linked hypotheses, verification history, and why unresolved findings remain unresolved."
+        },
+        {
+          "id": "UI-038-O2",
+          "kind": "constraint",
+          "text": "Source all explanations from typed authoritative records and make missing provenance explicit."
+        }
+      ]
+    },
+    {
+      "id": "UI-039",
+      "title": "Reusable implementation contracts",
+      "priority": "P0",
+      "document": "docs/CAUSA-UI-EXPERIENCE-REQUIREMENTS.md",
+      "heading": "## UI-039: Reusable implementation contracts [P0]",
+      "sectionSha256": "f64d2db0db88bb966bed798b0de9903a341d936e3838debae5c4a6f71d03ff7a",
+      "obligations": [
+        {
+          "id": "UI-039-O1",
+          "kind": "constraint",
+          "text": "Build UI-032..UI-038 from shared typed relationship, selection, inspector, and explanation contracts."
+        },
+        {
+          "id": "UI-039-O2",
+          "kind": "constraint",
+          "text": "Reuse Echelon components; avoid duplicating domain logic or implementing unrelated subsystems for each screen."
+        }
+      ]
+    },
+    {
+      "id": "UI-040",
+      "title": "End-to-end acceptance",
+      "priority": "P0",
+      "document": "docs/CAUSA-UI-EXPERIENCE-REQUIREMENTS.md",
+      "heading": "## UI-040: End-to-end acceptance [P0]",
+      "sectionSha256": "cdfdb96e8a8814c09641da22a94d75cf80e51348d5ae913ad77799dbb381b307",
+      "obligations": [
+        {
+          "id": "UI-040-O1",
+          "kind": "acceptance",
+          "text": "Verify next-step authority, record navigation, responsive inspector accessibility, search/filter accuracy, completeness rules, deterministic offline demo, and source-grounded explanations with positive and negative fixture cases and exact deployed-SHA tests."
+        },
+        {
+          "id": "UI-040-O2",
+          "kind": "acceptance",
+          "text": "Trace all requirements through the documented Praxis input process; record approved exclusions explicitly."
         }
       ]
     },
@@ -3716,7 +4462,7 @@
       "priority": "unstated",
       "document": "docs/REQUIREMENTS.md",
       "heading": "# Requirements",
-      "sectionSha256": "f98e8ef0293024d8e6cc08f41327034c57cfa167e88b8e7b6b8b29b199a05c2c",
+      "sectionSha256": "1710288614c5479d76993fab11a49e4b361ad24f03286ea001ba1ecd966ceb60",
       "obligations": [
         {
           "id": "REQUIREMENTS§preamble-O1",
@@ -3742,6 +4488,66 @@
           "id": "REQUIREMENTS§preamble-O5",
           "kind": "constraint",
           "text": "PF-001 through PF-021 are normative for future rehearsals where applicable; derived rehearsal requirements must explicitly reconcile these obligations and record approved exclusions."
+        },
+        {
+          "id": "REQUIREMENTS§preamble-O6",
+          "kind": "acceptance",
+          "text": "Causal diagram rendering must reuse the verified Echelon workflow layout capability as specified in [WORKFLOW-DIAGRAM-INTEGRATION-REQUIREMENTS.md](WORKFLOW-DIAGRAM-INTEGRATION-REQUIREMENTS.md)."
+        },
+        {
+          "id": "REQUIREMENTS§preamble-O7",
+          "kind": "acceptance",
+          "text": "WDL-001 through WDL-015 are normative for future rehearsals with causal diagrams; preserve their applicability, traceability, and acceptance obligations."
+        },
+        {
+          "id": "REQUIREMENTS§preamble-O8",
+          "kind": "constraint",
+          "text": "All future rehearsals and builds MUST comply with [SYSTEM-VERSION-AND-COMPATIBILITY-REQUIREMENTS.md](SYSTEM-VERSION-AND-COMPATIBILITY-REQUIREMENTS.md), VER-001 through VER-010."
+        },
+        {
+          "id": "REQUIREMENTS§preamble-O9",
+          "kind": "acceptance",
+          "text": "Resolve the latest stable compatible releases of each applicable Echelon system at baseline lock, verify integration, and pin immutable versions for reproducibility."
+        },
+        {
+          "id": "REQUIREMENTS§preamble-O10",
+          "kind": "constraint",
+          "text": "Do not assume a hardcoded version remains current."
+        },
+        {
+          "id": "REQUIREMENTS§preamble-O11",
+          "kind": "constraint",
+          "text": "Autonomous engineering reliability controls are specified in [AGENT-RELIABILITY-REQUIREMENTS.md](AGENT-RELIABILITY-REQUIREMENTS.md), AR-001 through AR-018, for applicable future rehearsals."
+        }
+      ]
+    },
+    {
+      "id": "REQUIREMENTS§version-and-integration-baseline",
+      "title": "Version and integration baseline",
+      "priority": "unstated",
+      "document": "docs/REQUIREMENTS.md",
+      "heading": "## Version and integration baseline",
+      "sectionSha256": "bd746aaf3dc894af5e485d6eb3dd4ae8339991fec1b6ca64c1de6f606820adea",
+      "obligations": [
+        {
+          "id": "REQUIREMENTS§version-and-integration-baseline-O1",
+          "kind": "constraint",
+          "text": "All future rehearsals and builds MUST comply with [SYSTEM-VERSION-AND-COMPATIBILITY-REQUIREMENTS.md](SYSTEM-VERSION-AND-COMPATIBILITY-REQUIREMENTS.md), VER-001 through VER-010."
+        },
+        {
+          "id": "REQUIREMENTS§version-and-integration-baseline-O2",
+          "kind": "acceptance",
+          "text": "Resolve the latest stable compatible releases of each applicable Echelon system at baseline lock, verify integration, and pin immutable versions for reproducibility."
+        },
+        {
+          "id": "REQUIREMENTS§version-and-integration-baseline-O3",
+          "kind": "constraint",
+          "text": "Do not assume a hardcoded version remains current."
+        },
+        {
+          "id": "REQUIREMENTS§version-and-integration-baseline-O4",
+          "kind": "constraint",
+          "text": "Autonomous engineering reliability controls are specified in [AGENT-RELIABILITY-REQUIREMENTS.md](AGENT-RELIABILITY-REQUIREMENTS.md), AR-001 through AR-018, for applicable future rehearsals."
         }
       ]
     },
@@ -13075,6 +13881,1179 @@
           "id": "CAUSA-STORAGE-RELEASE§how-r002-and-the-competition-consume-it-O6",
           "kind": "constraint",
           "text": "The provider token stays in the local store."
+        }
+      ]
+    },
+    {
+      "id": "WORKFLOW-DIAGRAM-INTEGRATION§preamble",
+      "title": "Workflow Layout Integration and Causal Diagram Requirements",
+      "priority": "unstated",
+      "document": "docs/WORKFLOW-DIAGRAM-INTEGRATION-REQUIREMENTS.md",
+      "heading": "# Workflow Layout Integration and Causal Diagram Requirements",
+      "sectionSha256": "39e724c414af207986dc1b6263307b7995cb7758ee7913add28eb92ddb5b5e19",
+      "obligations": [
+        {
+          "id": "WORKFLOW-DIAGRAM-INTEGRATION§preamble-O1",
+          "kind": "constraint",
+          "text": "Authority: Indy-init."
+        },
+        {
+          "id": "WORKFLOW-DIAGRAM-INTEGRATION§preamble-O2",
+          "kind": "acceptance",
+          "text": "These requirements supplement the Causa UI, screen, provider, and acceptance contracts."
+        },
+        {
+          "id": "WORKFLOW-DIAGRAM-INTEGRATION§preamble-O3",
+          "kind": "constraint",
+          "text": "Causa must compose the **existing Echelon workflow layout capability** rather than implement a new hardcoded graph layout engine."
+        },
+        {
+          "id": "WORKFLOW-DIAGRAM-INTEGRATION§preamble-O4",
+          "kind": "acceptance",
+          "text": "First discover and verify the actual owning repository, public API, supported rendering model, version, and availability."
+        },
+        {
+          "id": "WORKFLOW-DIAGRAM-INTEGRATION§preamble-O5",
+          "kind": "constraint",
+          "text": "Do not assume the layout engine lives in Forma Studio, and do not invent an API."
+        },
+        {
+          "id": "WORKFLOW-DIAGRAM-INTEGRATION§preamble-O6",
+          "kind": "constraint",
+          "text": "If the capability is unavailable or lacks a required contract, record the gap and propose work in its owning repository through the canonical Praxis input process."
+        }
+      ]
+    },
+    {
+      "id": "WORKFLOW-DIAGRAM-INTEGRATION§design-rule",
+      "title": "Design rule",
+      "priority": "unstated",
+      "document": "docs/WORKFLOW-DIAGRAM-INTEGRATION-REQUIREMENTS.md",
+      "heading": "## Design rule",
+      "sectionSha256": "eb22e749d979fdbd39a14adc59834c1b1934b3cbb4e3a8990e48ab9542d53af6",
+      "obligations": [
+        {
+          "id": "WORKFLOW-DIAGRAM-INTEGRATION§design-rule-O1",
+          "kind": "constraint",
+          "text": "Causa must compose the **existing Echelon workflow layout capability** rather than implement a new hardcoded graph layout engine."
+        },
+        {
+          "id": "WORKFLOW-DIAGRAM-INTEGRATION§design-rule-O2",
+          "kind": "acceptance",
+          "text": "First discover and verify the actual owning repository, public API, supported rendering model, version, and availability."
+        },
+        {
+          "id": "WORKFLOW-DIAGRAM-INTEGRATION§design-rule-O3",
+          "kind": "constraint",
+          "text": "Do not assume the layout engine lives in Forma Studio, and do not invent an API."
+        },
+        {
+          "id": "WORKFLOW-DIAGRAM-INTEGRATION§design-rule-O4",
+          "kind": "constraint",
+          "text": "If the capability is unavailable or lacks a required contract, record the gap and propose work in its owning repository through the canonical Praxis input process."
+        }
+      ]
+    },
+    {
+      "id": "WDL-001",
+      "title": "Existing capability discovery",
+      "priority": "P0",
+      "document": "docs/WORKFLOW-DIAGRAM-INTEGRATION-REQUIREMENTS.md",
+      "heading": "**WDL-001 [P0] Existing capability discovery.** Identify the workflow layout engine's owning repository, supported package or source integration, API, version, license, and constraints before implementation. Document evidence of a working example and identify any required upstream changes.",
+      "sectionSha256": "d9ad6212336ab4b6d3acf93b9c55b7ef37564e4ede6ae1db7d63690be4bdbd1c",
+      "obligations": [
+        {
+          "id": "WDL-001-O1",
+          "kind": "constraint",
+          "text": "Identify the workflow layout engine's owning repository, supported package or source integration, API, version, license, and constraints before implementation."
+        },
+        {
+          "id": "WDL-001-O2",
+          "kind": "constraint",
+          "text": "Document evidence of a working example and identify any required upstream changes."
+        }
+      ]
+    },
+    {
+      "id": "WDL-002",
+      "title": "No duplicate engine",
+      "priority": "P0",
+      "document": "docs/WORKFLOW-DIAGRAM-INTEGRATION-REQUIREMENTS.md",
+      "heading": "**WDL-002 [P0] No duplicate engine.** Causa must not introduce a second general-purpose graph layout implementation or maintain fixed SVG coordinates for domain nodes and edges when the existing workflow engine supports them. An explicitly documented temporary fallback requires approval and cannot be represented as satisfying this requirement.",
+      "sectionSha256": "3cf3e7ea322ddd4e217a0b528791bf8f568183c248c710ebcdbcd9da75f8193a",
+      "obligations": [
+        {
+          "id": "WDL-002-O1",
+          "kind": "constraint",
+          "text": "Causa must not introduce a second general-purpose graph layout implementation or maintain fixed SVG coordinates for domain nodes and edges when the existing workflow engine supports them."
+        },
+        {
+          "id": "WDL-002-O2",
+          "kind": "constraint",
+          "text": "An explicitly documented temporary fallback requires approval and cannot be represented as satisfying this requirement."
+        }
+      ]
+    },
+    {
+      "id": "WDL-003",
+      "title": "Typed domain-to-graph projection",
+      "priority": "P0",
+      "document": "docs/WORKFLOW-DIAGRAM-INTEGRATION-REQUIREMENTS.md",
+      "heading": "**WDL-003 [P0] Typed domain-to-graph projection.** Define a typed F# adapter that projects authoritative causal assertions, outcomes, hypotheses, cause roles (root cause, trigger, contributing factor, enabling condition), and evidence counts into graph nodes and relationships. The projection must not invent causal claims, change domain states, or perform domain inference.",
+      "sectionSha256": "52057ef96861b418d8d3b5ed15037e2e60ea96e692175bd084aed5107ce6a1ae",
+      "obligations": [
+        {
+          "id": "WDL-003-O1",
+          "kind": "constraint",
+          "text": "Define a typed F# adapter that projects authoritative causal assertions, outcomes, hypotheses, cause roles (root cause, trigger, contributing factor, enabling condition), and evidence counts into graph nodes and relationships."
+        },
+        {
+          "id": "WDL-003-O2",
+          "kind": "constraint",
+          "text": "The projection must not invent causal claims, change domain states, or perform domain inference."
+        }
+      ]
+    },
+    {
+      "id": "WDL-004",
+      "title": "Separation of concerns",
+      "priority": "P0",
+      "document": "docs/WORKFLOW-DIAGRAM-INTEGRATION-REQUIREMENTS.md",
+      "heading": "**WDL-004 [P0] Separation of concerns.** Causa owns graph semantics; the reusable workflow system owns placement, routing, spacing, and supported layout constraints; Forma owns accessible visual components and semantic styling. Keep these responsibilities independently testable.",
+      "sectionSha256": "e1e6572ef774256778f676dd238923d2bbc84d60417f721eb11b189f87e3222d",
+      "obligations": [
+        {
+          "id": "WDL-004-O1",
+          "kind": "constraint",
+          "text": "Causa owns graph semantics; the reusable workflow system owns placement, routing, spacing, and supported layout constraints; Forma owns accessible visual components and semantic styling."
+        },
+        {
+          "id": "WDL-004-O2",
+          "kind": "constraint",
+          "text": "Keep these responsibilities independently testable."
+        }
+      ]
+    },
+    {
+      "id": "WDL-005",
+      "title": "Data-driven layout",
+      "priority": "P0",
+      "document": "docs/WORKFLOW-DIAGRAM-INTEGRATION-REQUIREMENTS.md",
+      "heading": "**WDL-005 [P0] Data-driven layout.** Node placement and edge geometry must be computed from graph input and supported constraints, not from hardcoded coordinates for specific investigations. Layout must remain valid for zero, one, many, disconnected, and cyclic graphs where the domain permits them.",
+      "sectionSha256": "1cb9d6b31a34e2cee3cbcb7c330140099c8174e7e1d2460479e560205e716905",
+      "obligations": [
+        {
+          "id": "WDL-005-O1",
+          "kind": "constraint",
+          "text": "Node placement and edge geometry must be computed from graph input and supported constraints, not from hardcoded coordinates for specific investigations."
+        },
+        {
+          "id": "WDL-005-O2",
+          "kind": "constraint",
+          "text": "Layout must remain valid for zero, one, many, disconnected, and cyclic graphs where the domain permits them."
+        }
+      ]
+    },
+    {
+      "id": "WDL-006",
+      "title": "Visual correctness",
+      "priority": "P0",
+      "document": "docs/WORKFLOW-DIAGRAM-INTEGRATION-REQUIREMENTS.md",
+      "heading": "**WDL-006 [P0] Visual correctness.** Layout must avoid unintended node overlaps, clipped labels, inaccessible connectors, and hidden evidence counts. Edge crossings and visual ambiguity should be minimized using documented layout capabilities; do not promise zero crossings for arbitrary graphs.",
+      "sectionSha256": "1fc6396524edfe78fb6364af02b7308a1fa25c535937fe12d6a52e55ffdc4c61",
+      "obligations": [
+        {
+          "id": "WDL-006-O1",
+          "kind": "constraint",
+          "text": "Layout must avoid unintended node overlaps, clipped labels, inaccessible connectors, and hidden evidence counts."
+        },
+        {
+          "id": "WDL-006-O2",
+          "kind": "constraint",
+          "text": "Edge crossings and visual ambiguity should be minimized using documented layout capabilities; do not promise zero crossings for arbitrary graphs."
+        }
+      ]
+    },
+    {
+      "id": "WDL-007",
+      "title": "Responsive and accessible rendering",
+      "priority": "P0",
+      "document": "docs/WORKFLOW-DIAGRAM-INTEGRATION-REQUIREMENTS.md",
+      "heading": "**WDL-007 [P0] Responsive and accessible rendering.** Support desktop, iPad portrait/landscape, and mobile with accessible text equivalents, meaningful labels, keyboard navigation/focus, adequate contrast, zoom/reflow or intentional navigable overflow, and reduced-motion preferences. Diagram information must not depend on color alone.",
+      "sectionSha256": "a1b6f985d94bd945bd528f382449b90fd051ffbd5e9b5e4b6bf3d2217c606d1e",
+      "obligations": [
+        {
+          "id": "WDL-007-O1",
+          "kind": "constraint",
+          "text": "Support desktop, iPad portrait/landscape, and mobile with accessible text equivalents, meaningful labels, keyboard navigation/focus, adequate contrast, zoom/reflow or intentional navigable overflow, and reduced-motion preferences."
+        },
+        {
+          "id": "WDL-007-O2",
+          "kind": "constraint",
+          "text": "Diagram information must not depend on color alone."
+        }
+      ]
+    },
+    {
+      "id": "WDL-008",
+      "title": "Forma design-system alignment",
+      "priority": "P0",
+      "document": "docs/WORKFLOW-DIAGRAM-INTEGRATION-REQUIREMENTS.md",
+      "heading": "**WDL-008 [P0] Forma design-system alignment.** Render graph nodes and statuses using Forma-compatible components/tokens and the canonical Causa UI-016 semantic palette. Colors must reflect domain-authoritative states; layout cannot assign causal or evidentiary meaning.",
+      "sectionSha256": "dd2a91be9cbc6cd4d39ae0cc6d9396e8b650271544a4475421cf994e1cc87a85",
+      "obligations": [
+        {
+          "id": "WDL-008-O1",
+          "kind": "constraint",
+          "text": "Render graph nodes and statuses using Forma-compatible components/tokens and the canonical Causa UI-016 semantic palette."
+        },
+        {
+          "id": "WDL-008-O2",
+          "kind": "constraint",
+          "text": "Colors must reflect domain-authoritative states; layout cannot assign causal or evidentiary meaning."
+        }
+      ]
+    },
+    {
+      "id": "WDL-009",
+      "title": "Stable and deterministic output",
+      "priority": "P0",
+      "document": "docs/WORKFLOW-DIAGRAM-INTEGRATION-REQUIREMENTS.md",
+      "heading": "**WDL-009 [P0] Stable and deterministic output.** Given identical graph data, layout engine version, viewport constraints, and configuration, output must be deterministic within documented tolerances. Stable node IDs and ordering must survive refreshes; avoid needless visual movement.",
+      "sectionSha256": "d66c1eb138a288db4d76d15d251a05cc246cd5460fa5576b2a08cafe65cdf195",
+      "obligations": [
+        {
+          "id": "WDL-009-O1",
+          "kind": "constraint",
+          "text": "Given identical graph data, layout engine version, viewport constraints, and configuration, output must be deterministic within documented tolerances."
+        },
+        {
+          "id": "WDL-009-O2",
+          "kind": "constraint",
+          "text": "Stable node IDs and ordering must survive refreshes; avoid needless visual movement."
+        }
+      ]
+    },
+    {
+      "id": "WDL-010",
+      "title": "Interaction contract",
+      "priority": "P0",
+      "document": "docs/WORKFLOW-DIAGRAM-INTEGRATION-REQUIREMENTS.md",
+      "heading": "**WDL-010 [P0] Interaction contract.** Where the workflow component supports interaction, node selection and navigation must resolve to authoritative investigation records. Read-only rehearsal scope must not expose editing, drag-to-modify-domain, or persistence capabilities without explicit authorization.",
+      "sectionSha256": "fd7390dd0e6ce94fc360567d560468db57d1f8f3879ba42d275e8b64651d0353",
+      "obligations": [
+        {
+          "id": "WDL-010-O1",
+          "kind": "constraint",
+          "text": "Where the workflow component supports interaction, node selection and navigation must resolve to authoritative investigation records."
+        },
+        {
+          "id": "WDL-010-O2",
+          "kind": "constraint",
+          "text": "Read-only rehearsal scope must not expose editing, drag-to-modify-domain, or persistence capabilities without explicit authorization."
+        }
+      ]
+    },
+    {
+      "id": "WDL-011",
+      "title": "Fixture-backed development",
+      "priority": "P0",
+      "document": "docs/WORKFLOW-DIAGRAM-INTEGRATION-REQUIREMENTS.md",
+      "heading": "**WDL-011 [P0] Fixture-backed development.** Include deterministic graph fixtures: empty, single-node, four cause roles, dense evidence, long labels, disconnected graph, and permitted cycles. The fixture provider must use the same domain-to-graph projection as the real GitHub provider (PF-001..PF-021).",
+      "sectionSha256": "0bc72e193f674037f6d0a8a79470fdb9b1072cdbfc5a2d443b810bf12a4a3d9f",
+      "obligations": [
+        {
+          "id": "WDL-011-O1",
+          "kind": "value",
+          "text": "Include deterministic graph fixtures: empty, single-node, four cause roles, dense evidence, long labels, disconnected graph, and permitted cycles.",
+          "tokens": [
+            "four"
+          ]
+        },
+        {
+          "id": "WDL-011-O2",
+          "kind": "constraint",
+          "text": "The fixture provider must use the same domain-to-graph projection as the real GitHub provider (PF-001..PF-021)."
+        }
+      ]
+    },
+    {
+      "id": "WDL-012",
+      "title": "Layered tests",
+      "priority": "P0",
+      "document": "docs/WORKFLOW-DIAGRAM-INTEGRATION-REQUIREMENTS.md",
+      "heading": "**WDL-012 [P0] Layered tests.** Independently test graph projection, layout invariants, rendering/accessibility, and live integration. Verify expected nodes, roles, relationships, evidence counts, no unintended overlap or clipping, stable output, keyboard/text-equivalent access, and real historical investigation rendering.",
+      "sectionSha256": "27f9d3e4822d99c6323307a5532ee9db93b7d6ca6197e6fb3795d61e835a417f",
+      "obligations": [
+        {
+          "id": "WDL-012-O1",
+          "kind": "acceptance",
+          "text": "Independently test graph projection, layout invariants, rendering/accessibility, and live integration."
+        },
+        {
+          "id": "WDL-012-O2",
+          "kind": "acceptance",
+          "text": "Verify expected nodes, roles, relationships, evidence counts, no unintended overlap or clipping, stable output, keyboard/text-equivalent access, and real historical investigation rendering."
+        }
+      ]
+    },
+    {
+      "id": "WDL-013",
+      "title": "Comparative experiment",
+      "priority": "P1",
+      "document": "docs/WORKFLOW-DIAGRAM-INTEGRATION-REQUIREMENTS.md",
+      "heading": "**WDL-013 [P1] Comparative experiment.** Compare the existing fixed-coordinate SVG approach against the reusable workflow layout system on identical causal graphs. Record layout correctness, overlap, clipping, edge crossings, responsiveness, implementation effort, test effort, and agent token consumption. Hold graph data and acceptance criteria constant; preserve original measurements and distinguish observed results from estimates.",
+      "sectionSha256": "6bcd8ed0b8cd9e36e1e568c2b7338803c9d8223992f76822ce3c3b159ea93495",
+      "obligations": [
+        {
+          "id": "WDL-013-O1",
+          "kind": "acceptance",
+          "text": "Compare the existing fixed-coordinate SVG approach against the reusable workflow layout system on identical causal graphs."
+        },
+        {
+          "id": "WDL-013-O2",
+          "kind": "acceptance",
+          "text": "Record layout correctness, overlap, clipping, edge crossings, responsiveness, implementation effort, test effort, and agent token consumption."
+        },
+        {
+          "id": "WDL-013-O3",
+          "kind": "acceptance",
+          "text": "Hold graph data and acceptance criteria constant; preserve original measurements and distinguish observed results from estimates."
+        }
+      ]
+    },
+    {
+      "id": "WDL-014",
+      "title": "Integration gate",
+      "priority": "P0",
+      "document": "docs/WORKFLOW-DIAGRAM-INTEGRATION-REQUIREMENTS.md",
+      "heading": "**WDL-014 [P0] Integration gate.** Before claiming completion, prove the application actually invokes the identified workflow layout capability, records the pinned dependency version/SHA, and passes fixture, accessibility, and deployed-browser tests. A visually similar hand-coded diagram is not equivalent.",
+      "sectionSha256": "70a8c8953650cd9366c432d106142ebe103154139456766df2bcd4bf85571474",
+      "obligations": [
+        {
+          "id": "WDL-014-O1",
+          "kind": "acceptance",
+          "text": "Before claiming completion, prove the application actually invokes the identified workflow layout capability, records the pinned dependency version/SHA, and passes fixture, accessibility, and deployed-browser tests."
+        },
+        {
+          "id": "WDL-014-O2",
+          "kind": "constraint",
+          "text": "A visually similar hand-coded diagram is not equivalent."
+        }
+      ]
+    },
+    {
+      "id": "WDL-015",
+      "title": "Requirements preservation",
+      "priority": "P0",
+      "document": "docs/WORKFLOW-DIAGRAM-INTEGRATION-REQUIREMENTS.md",
+      "heading": "**WDL-015 [P0] Requirements preservation.** Every future rehearsal requirements package must trace WDL-001..WDL-015 to implementation and verification or record an explicitly approved scope exclusion. Do not silently omit these obligations during derivation.",
+      "sectionSha256": "9c61f41040bae4b4e813f3416f52c46f26d1d18057876d98310c3c719d2af6aa",
+      "obligations": [
+        {
+          "id": "WDL-015-O1",
+          "kind": "constraint",
+          "text": "Every future rehearsal requirements package must trace WDL-001..WDL-015 to implementation and verification or record an explicitly approved scope exclusion."
+        },
+        {
+          "id": "WDL-015-O2",
+          "kind": "constraint",
+          "text": "Do not silently omit these obligations during derivation."
+        }
+      ]
+    },
+    {
+      "id": "WORKFLOW-DIAGRAM-INTEGRATION§acceptance-scenarios",
+      "title": "Acceptance scenarios",
+      "priority": "unstated",
+      "document": "docs/WORKFLOW-DIAGRAM-INTEGRATION-REQUIREMENTS.md",
+      "heading": "## Acceptance scenarios",
+      "sectionSha256": "d1c805072b87e8cc04a8e99ce27a23f04c3c5c6fcb697c4ac387915dbe64f292",
+      "obligations": [
+        {
+          "id": "WORKFLOW-DIAGRAM-INTEGRATION§acceptance-scenarios-O1",
+          "kind": "acceptance",
+          "text": "Load a populated causal investigation offline; render through the actual Echelon workflow layout system without GitHub access."
+        },
+        {
+          "id": "WORKFLOW-DIAGRAM-INTEGRATION§acceptance-scenarios-O2",
+          "kind": "acceptance",
+          "text": "Change graph membership or long-label content; placement adjusts without Causa-specific coordinate edits."
+        },
+        {
+          "id": "WORKFLOW-DIAGRAM-INTEGRATION§acceptance-scenarios-O3",
+          "kind": "acceptance",
+          "text": "Render the same graph twice with the same engine/version/viewport; positions are stable within documented tolerances."
+        },
+        {
+          "id": "WORKFLOW-DIAGRAM-INTEGRATION§acceptance-scenarios-O4",
+          "kind": "acceptance",
+          "text": "Verify that every causal assertion and evidence count in the graph matches the F# domain projection."
+        },
+        {
+          "id": "WORKFLOW-DIAGRAM-INTEGRATION§acceptance-scenarios-O5",
+          "kind": "acceptance",
+          "text": "Exercise desktop, iPad portrait/landscape, mobile, keyboard, zoom, and text equivalent."
+        },
+        {
+          "id": "WORKFLOW-DIAGRAM-INTEGRATION§acceptance-scenarios-O6",
+          "kind": "acceptance",
+          "text": "Verify that real GitHub-backed investigations use the same graph projection and layout integration."
+        },
+        {
+          "id": "WORKFLOW-DIAGRAM-INTEGRATION§acceptance-scenarios-O7",
+          "kind": "acceptance",
+          "text": "Inspect the dependency and runtime evidence to confirm the existing engine was used, not reimplemented."
+        },
+        {
+          "id": "WORKFLOW-DIAGRAM-INTEGRATION§acceptance-scenarios-O8",
+          "kind": "acceptance",
+          "text": "Run the controlled comparison and publish measured results, including token and implementation costs."
+        }
+      ]
+    },
+    {
+      "id": "WORKFLOW-DIAGRAM-INTEGRATION§rehearsal-preparation",
+      "title": "Rehearsal preparation",
+      "priority": "unstated",
+      "document": "docs/WORKFLOW-DIAGRAM-INTEGRATION-REQUIREMENTS.md",
+      "heading": "## Rehearsal preparation",
+      "sectionSha256": "39bf41b85bbdaa94fbcb5cbedc6d5a264a14fff908b56b0c5962f85ba98d033b",
+      "obligations": [
+        {
+          "id": "WORKFLOW-DIAGRAM-INTEGRATION§rehearsal-preparation-O1",
+          "kind": "constraint",
+          "text": "Before the next rehearsal, resolve the workflow layout engine's true owner and public contract."
+        },
+        {
+          "id": "WORKFLOW-DIAGRAM-INTEGRATION§rehearsal-preparation-O2",
+          "kind": "constraint",
+          "text": "Add any upstream implementation requirements to the owning repository's Praxis input directory, using its documented canonical path, not GitHub Issues."
+        },
+        {
+          "id": "WORKFLOW-DIAGRAM-INTEGRATION§rehearsal-preparation-O3",
+          "kind": "constraint",
+          "text": "Reconcile this document with the rehearsal baseline and approved scope before implementation."
+        }
+      ]
+    },
+    {
+      "id": "VER-001",
+      "title": "Latest compatible verified release",
+      "priority": "P0",
+      "document": "docs/SYSTEM-VERSION-AND-COMPATIBILITY-REQUIREMENTS.md",
+      "heading": "**VER-001 [P0] Latest compatible verified release.** Each build MUST use the newest available stable, published, compatible release of every applicable Echelon system at the time the build baseline is locked. Applicable systems include Praxis, Ordo, Dokimos, Percepta, Forma, Forma Studio/workflow layout, Limen, Folio, and any actually integrated Echelon dependencies. Discover the real owner and release channel for each; do not invent a release or assume every system is a runtime dependency.",
+      "sectionSha256": "2af28735dcf65bdeddde523ba5e0a220c754bd7a8ca661174c8abf863c350902",
+      "obligations": [
+        {
+          "id": "VER-001-O1",
+          "kind": "constraint",
+          "text": "Each build MUST use the newest available stable, published, compatible release of every applicable Echelon system at the time the build baseline is locked."
+        },
+        {
+          "id": "VER-001-O2",
+          "kind": "constraint",
+          "text": "Applicable systems include Praxis, Ordo, Dokimos, Percepta, Forma, Forma Studio/workflow layout, Limen, Folio, and any actually integrated Echelon dependencies."
+        },
+        {
+          "id": "VER-001-O3",
+          "kind": "constraint",
+          "text": "Discover the real owner and release channel for each; do not invent a release or assume every system is a runtime dependency."
+        }
+      ]
+    },
+    {
+      "id": "VER-002",
+      "title": "Verify release freshness",
+      "priority": "P0",
+      "document": "docs/SYSTEM-VERSION-AND-COMPATIBILITY-REQUIREMENTS.md",
+      "heading": "**VER-002 [P0] Verify release freshness.** Query authoritative package registries, GitHub releases/tags, or the owning repository's documented release source immediately before baseline lock. Record checked timestamp, candidate release, source reference, and why it was selected. Do not equate latest main commit with latest released artifact.",
+      "sectionSha256": "b7f3e83a63d88d42af41cefd0dc9de8a32d5427149517b614d34f2c71962b923",
+      "obligations": [
+        {
+          "id": "VER-002-O1",
+          "kind": "constraint",
+          "text": "Query authoritative package registries, GitHub releases/tags, or the owning repository's documented release source immediately before baseline lock."
+        },
+        {
+          "id": "VER-002-O2",
+          "kind": "constraint",
+          "text": "Record checked timestamp, candidate release, source reference, and why it was selected."
+        },
+        {
+          "id": "VER-002-O3",
+          "kind": "constraint",
+          "text": "Do not equate latest main commit with latest released artifact."
+        }
+      ]
+    },
+    {
+      "id": "VER-003",
+      "title": "Compatibility over blind upgrades",
+      "priority": "P0",
+      "document": "docs/SYSTEM-VERSION-AND-COMPATIBILITY-REQUIREMENTS.md",
+      "heading": "**VER-003 [P0] Compatibility over blind upgrades.** Prefer latest stable only when integration contracts and acceptance tests pass. If the newest release is incompatible, fail the upgrade gate or obtain a documented, authorized exception for the newest known compatible release. Never silently fall back to an old version.",
+      "sectionSha256": "3102e08cd418876b0127a4fe09abc2d1887e7f2bc0dfbb1124893e274d76202b",
+      "obligations": [
+        {
+          "id": "VER-003-O1",
+          "kind": "acceptance",
+          "text": "Prefer latest stable only when integration contracts and acceptance tests pass."
+        },
+        {
+          "id": "VER-003-O2",
+          "kind": "acceptance",
+          "text": "If the newest release is incompatible, fail the upgrade gate or obtain a documented, authorized exception for the newest known compatible release."
+        },
+        {
+          "id": "VER-003-O3",
+          "kind": "acceptance",
+          "text": "Never silently fall back to an old version."
+        }
+      ]
+    },
+    {
+      "id": "VER-004",
+      "title": "Reproducible lock",
+      "priority": "P0",
+      "document": "docs/SYSTEM-VERSION-AND-COMPATIBILITY-REQUIREMENTS.md",
+      "heading": "**VER-004 [P0] Reproducible lock.** Pin exact package versions and immutable artifact digests/commit SHAs in a machine-readable dependency manifest. The lock is fixed for a given rehearsal/run and must not drift mid-run. Re-resolve latest versions for each new rehearsal or explicitly authorized refresh.",
+      "sectionSha256": "2df18b29fd9f75dabad562e5fbfeaed28bba170bf78b628e94112a713b4ade12",
+      "obligations": [
+        {
+          "id": "VER-004-O1",
+          "kind": "constraint",
+          "text": "Pin exact package versions and immutable artifact digests/commit SHAs in a machine-readable dependency manifest."
+        },
+        {
+          "id": "VER-004-O2",
+          "kind": "constraint",
+          "text": "The lock is fixed for a given rehearsal/run and must not drift mid-run."
+        },
+        {
+          "id": "VER-004-O3",
+          "kind": "constraint",
+          "text": "Re-resolve latest versions for each new rehearsal or explicitly authorized refresh."
+        }
+      ]
+    },
+    {
+      "id": "VER-005",
+      "title": "No unreviewed prereleases",
+      "priority": "P0",
+      "document": "docs/SYSTEM-VERSION-AND-COMPATIBILITY-REQUIREMENTS.md",
+      "heading": "**VER-005 [P0] No unreviewed prereleases.** Do not adopt alpha, beta, RC, unpublished source, or unverified local builds merely because they are newer. Such use requires explicit approval, provenance, and the same compatibility and security gates.",
+      "sectionSha256": "76299fa1c175ab4341c12f1b925906ddc575a934a12b62343f0117bf28a7a2b7",
+      "obligations": [
+        {
+          "id": "VER-005-O1",
+          "kind": "constraint",
+          "text": "Do not adopt alpha, beta, RC, unpublished source, or unverified local builds merely because they are newer."
+        },
+        {
+          "id": "VER-005-O2",
+          "kind": "constraint",
+          "text": "Such use requires explicit approval, provenance, and the same compatibility and security gates."
+        }
+      ]
+    },
+    {
+      "id": "VER-006",
+      "title": "Cross-system contract validation",
+      "priority": "P0",
+      "document": "docs/SYSTEM-VERSION-AND-COMPATIBILITY-REQUIREMENTS.md",
+      "heading": "**VER-006 [P0] Cross-system contract validation.** Verify supported API/schema compatibility across Praxis, Ordo, Dokimos, Percepta, Forma, workflow layout, Limen, Folio, and other applicable systems. Exercise integration tests, not just version-string comparisons. Include the local bootstrap/build path and deployed browser where applicable.",
+      "sectionSha256": "1a48976356d4176bde2acd82cd7260ec8e3e5c337eda837964ff0e76ebc06208",
+      "obligations": [
+        {
+          "id": "VER-006-O1",
+          "kind": "acceptance",
+          "text": "Verify supported API/schema compatibility across Praxis, Ordo, Dokimos, Percepta, Forma, workflow layout, Limen, Folio, and other applicable systems."
+        },
+        {
+          "id": "VER-006-O2",
+          "kind": "acceptance",
+          "text": "Exercise integration tests, not just version-string comparisons."
+        },
+        {
+          "id": "VER-006-O3",
+          "kind": "constraint",
+          "text": "Include the local bootstrap/build path and deployed browser where applicable."
+        }
+      ]
+    },
+    {
+      "id": "VER-007",
+      "title": "Version observability",
+      "priority": "P0",
+      "document": "docs/SYSTEM-VERSION-AND-COMPATIBILITY-REQUIREMENTS.md",
+      "heading": "**VER-007 [P0] Version observability.** Show resolved application, dependency, and build versions in Administration (UI-018), not investigation pages, catalog cards, or the global footer. Versions must reflect actual loaded components rather than aspirational requirements.",
+      "sectionSha256": "463de02bd7c733e57979fc0ed0f03fd7f75d72cd0090e21f43f55a2b3f2f0aa3",
+      "obligations": [
+        {
+          "id": "VER-007-O1",
+          "kind": "constraint",
+          "text": "Show resolved application, dependency, and build versions in Administration (UI-018), not investigation pages, catalog cards, or the global footer."
+        },
+        {
+          "id": "VER-007-O2",
+          "kind": "constraint",
+          "text": "Versions must reflect actual loaded components rather than aspirational requirements."
+        }
+      ]
+    },
+    {
+      "id": "VER-008",
+      "title": "CI enforcement",
+      "priority": "P0",
+      "document": "docs/SYSTEM-VERSION-AND-COMPATIBILITY-REQUIREMENTS.md",
+      "heading": "**VER-008 [P0] CI enforcement.** A mandatory gate must verify the locked manifest against installed/loaded artifacts and compatibility evidence. Missing dependencies, stale evidence, unverified artifacts, or skipped gates result in BLOCKED/FAIL, not PASS.",
+      "sectionSha256": "fbde7fa36dac3788dcbbd7e3f4305f608dcd79dc1631ed9252cf08d0b43ba901",
+      "obligations": [
+        {
+          "id": "VER-008-O1",
+          "kind": "acceptance",
+          "text": "A mandatory gate must verify the locked manifest against installed/loaded artifacts and compatibility evidence."
+        },
+        {
+          "id": "VER-008-O2",
+          "kind": "constraint",
+          "text": "Missing dependencies, stale evidence, unverified artifacts, or skipped gates result in BLOCKED/FAIL, not PASS."
+        }
+      ]
+    },
+    {
+      "id": "VER-009",
+      "title": "Upgrade impact and rollback",
+      "priority": "P1",
+      "document": "docs/SYSTEM-VERSION-AND-COMPATIBILITY-REQUIREMENTS.md",
+      "heading": "**VER-009 [P1] Upgrade impact and rollback.** Record release notes, breaking changes, migration needs, security advisories, rollback target, and tests affected by each upgrade. Keep historical run manifests and evidence immutable.",
+      "sectionSha256": "69ba5310fe39ccecffa175f8c958c866a378a61ab471a7e3d4f95061d728321f",
+      "obligations": [
+        {
+          "id": "VER-009-O1",
+          "kind": "acceptance",
+          "text": "Record release notes, breaking changes, migration needs, security advisories, rollback target, and tests affected by each upgrade."
+        },
+        {
+          "id": "VER-009-O2",
+          "kind": "constraint",
+          "text": "Keep historical run manifests and evidence immutable."
+        }
+      ]
+    },
+    {
+      "id": "VER-010",
+      "title": "Requirements traceability",
+      "priority": "P0",
+      "document": "docs/SYSTEM-VERSION-AND-COMPATIBILITY-REQUIREMENTS.md",
+      "heading": "**VER-010 [P0] Requirements traceability.** Every future rehearsal must reconcile VER-001..VER-010 with implementation and tests or an explicitly approved exclusion. Work items must go through each owning repository's documented Praxis input path, not GitHub Issues.",
+      "sectionSha256": "50e6801b5ee5e7605df435aea151b4de14fd8941ba7a61f64dcc5884599f1c3c",
+      "obligations": [
+        {
+          "id": "VER-010-O1",
+          "kind": "acceptance",
+          "text": "Every future rehearsal must reconcile VER-001..VER-010 with implementation and tests or an explicitly approved exclusion."
+        },
+        {
+          "id": "VER-010-O2",
+          "kind": "constraint",
+          "text": "Work items must go through each owning repository's documented Praxis input path, not GitHub Issues."
+        }
+      ]
+    },
+    {
+      "id": "SYSTEM-VERSION-AND-COMPATIBILITY§acceptance",
+      "title": "Acceptance",
+      "priority": "unstated",
+      "document": "docs/SYSTEM-VERSION-AND-COMPATIBILITY-REQUIREMENTS.md",
+      "heading": "## Acceptance",
+      "sectionSha256": "2a14c083f6fae378c74ace95674f9984b2a1a6eaf64c4f2febd53cf2a9dfc35e",
+      "obligations": [
+        {
+          "id": "SYSTEM-VERSION-AND-COMPATIBILITY§acceptance-O1",
+          "kind": "acceptance",
+          "text": "Produce a version inventory from authoritative sources at baseline lock."
+        },
+        {
+          "id": "SYSTEM-VERSION-AND-COMPATIBILITY§acceptance-O2",
+          "kind": "acceptance",
+          "text": "Select the newest stable compatible release of every applicable system, with explicit evidence."
+        },
+        {
+          "id": "SYSTEM-VERSION-AND-COMPATIBILITY§acceptance-O3",
+          "kind": "acceptance",
+          "text": "Prove installed package and runtime versions match the immutable lock."
+        },
+        {
+          "id": "SYSTEM-VERSION-AND-COMPATIBILITY§acceptance-O4",
+          "kind": "acceptance",
+          "text": "Exercise cross-system contract, fixture, integration, and deployed-browser tests."
+        },
+        {
+          "id": "SYSTEM-VERSION-AND-COMPATIBILITY§acceptance-O5",
+          "kind": "acceptance",
+          "text": "Reject a newer incompatible release rather than silently downgrading."
+        },
+        {
+          "id": "SYSTEM-VERSION-AND-COMPATIBILITY§acceptance-O6",
+          "kind": "acceptance",
+          "text": "Verify that Administration shows actual versions and investigation pages do not."
+        },
+        {
+          "id": "SYSTEM-VERSION-AND-COMPATIBILITY§acceptance-O7",
+          "kind": "acceptance",
+          "text": "Preserve the full manifest and verification report alongside the rehearsal evidence."
+        },
+        {
+          "id": "SYSTEM-VERSION-AND-COMPATIBILITY§acceptance-O8",
+          "kind": "acceptance",
+          "text": "This specification does not claim any current version is the latest; it requires the next run to establish that fact."
+        }
+      ]
+    },
+    {
+      "id": "AR-001",
+      "title": "Source-of-truth baseline",
+      "priority": "P0",
+      "document": "docs/AGENT-RELIABILITY-REQUIREMENTS.md",
+      "heading": "**AR-001 [P0] Source-of-truth baseline.** Every run must pin authoritative requirements and their source repository, commit, and content digest. A modified baseline must be detected and require an authorized change process.",
+      "sectionSha256": "f52f8019e6f8f62f92b04b5864551eb9205fb88e781b99d97d6e2a7fc8f628f4",
+      "obligations": [
+        {
+          "id": "AR-001-O1",
+          "kind": "constraint",
+          "text": "Every run must pin authoritative requirements and their source repository, commit, and content digest."
+        },
+        {
+          "id": "AR-001-O2",
+          "kind": "constraint",
+          "text": "A modified baseline must be detected and require an authorized change process."
+        }
+      ]
+    },
+    {
+      "id": "AR-002",
+      "title": "Lossless requirement derivation",
+      "priority": "P0",
+      "document": "docs/AGENT-RELIABILITY-REQUIREMENTS.md",
+      "heading": "**AR-002 [P0] Lossless requirement derivation.** Each source obligation must have a machine-verifiable mapping to an implementation requirement, or a recorded scope disposition. Detect omissions, weakening, negation, and role/value swaps, not only literal missing strings.",
+      "sectionSha256": "1c2e82a10f999128722e39c19195cb3b848686abaffe020dbefb8f4089f2cc03",
+      "obligations": [
+        {
+          "id": "AR-002-O1",
+          "kind": "constraint",
+          "text": "Each source obligation must have a machine-verifiable mapping to an implementation requirement, or a recorded scope disposition."
+        },
+        {
+          "id": "AR-002-O2",
+          "kind": "constraint",
+          "text": "Detect omissions, weakening, negation, and role/value swaps, not only literal missing strings."
+        }
+      ]
+    },
+    {
+      "id": "AR-003",
+      "title": "Authenticated decisions",
+      "priority": "P0",
+      "document": "docs/AGENT-RELIABILITY-REQUIREMENTS.md",
+      "heading": "**AR-003 [P0] Authenticated decisions.** Agents must not approve their own exclusions, waivers, acceptance, or architectural exceptions. Require verifiable operator or delegated-authority approval, bound to the exact requirement and baseline digest.",
+      "sectionSha256": "978919b5aaff7a9d3a3bb8f58e0fe00cd6e332713b914db6d327cbef485c98e7",
+      "obligations": [
+        {
+          "id": "AR-003-O1",
+          "kind": "acceptance",
+          "text": "Agents must not approve their own exclusions, waivers, acceptance, or architectural exceptions."
+        },
+        {
+          "id": "AR-003-O2",
+          "kind": "acceptance",
+          "text": "Require verifiable operator or delegated-authority approval, bound to the exact requirement and baseline digest."
+        }
+      ]
+    },
+    {
+      "id": "AR-004",
+      "title": "Mandatory CI preservation gate",
+      "priority": "P0",
+      "document": "docs/AGENT-RELIABILITY-REQUIREMENTS.md",
+      "heading": "**AR-004 [P0] Mandatory CI preservation gate.** A required, non-optional job must verify baseline integrity, requirement coverage, approvals, and evidence before merge or acceptance. Failing, missing, skipped, or bypassed checks cannot be reported PASS.",
+      "sectionSha256": "edc671c7058f642ba76202a30cda63f0b25aa8f6ceea654d4f13a7ac9029649c",
+      "obligations": [
+        {
+          "id": "AR-004-O1",
+          "kind": "acceptance",
+          "text": "A required, non-optional job must verify baseline integrity, requirement coverage, approvals, and evidence before merge or acceptance."
+        },
+        {
+          "id": "AR-004-O2",
+          "kind": "acceptance",
+          "text": "Failing, missing, skipped, or bypassed checks cannot be reported PASS."
+        }
+      ]
+    },
+    {
+      "id": "AR-005",
+      "title": "Capability registry and reuse",
+      "priority": "P0",
+      "document": "docs/AGENT-RELIABILITY-REQUIREMENTS.md",
+      "heading": "**AR-005 [P0] Capability registry and reuse.** Before designing a component, discover existing Echelon capabilities, owners, supported versions, and contracts. Reuse verified implementations; require an explicit approved justification for duplication.",
+      "sectionSha256": "eda9275aaa78a182ac913ee3d12945ce41e3e359dd0d4c038b3c1d4c05b5562a",
+      "obligations": [
+        {
+          "id": "AR-005-O1",
+          "kind": "constraint",
+          "text": "Before designing a component, discover existing Echelon capabilities, owners, supported versions, and contracts."
+        },
+        {
+          "id": "AR-005-O2",
+          "kind": "acceptance",
+          "text": "Reuse verified implementations; require an explicit approved justification for duplication."
+        }
+      ]
+    },
+    {
+      "id": "AR-006",
+      "title": "Typed state and transition contracts",
+      "priority": "P0",
+      "document": "docs/AGENT-RELIABILITY-REQUIREMENTS.md",
+      "heading": "**AR-006 [P0] Typed state and transition contracts.** Represent valid states, permissions, and transitions with typed F# contracts where practical. Invalid or unauthorized transitions must be rejected before side effects.",
+      "sectionSha256": "862451313925bfb2972847695b155db0bf8bc2e60a668834ae47e00110c1aea0",
+      "obligations": [
+        {
+          "id": "AR-006-O1",
+          "kind": "constraint",
+          "text": "Represent valid states, permissions, and transitions with typed F# contracts where practical."
+        },
+        {
+          "id": "AR-006-O2",
+          "kind": "constraint",
+          "text": "Invalid or unauthorized transitions must be rejected before side effects."
+        }
+      ]
+    },
+    {
+      "id": "AR-007",
+      "title": "Evidence-backed acceptance",
+      "priority": "P0",
+      "document": "docs/AGENT-RELIABILITY-REQUIREMENTS.md",
+      "heading": "**AR-007 [P0] Evidence-backed acceptance.** Every PASS must cite the actual test, assertion, artifact, environment, and source SHA. Distinguish PASS, FAIL, PARTIAL, BLOCKED, and NOT_RUN; never infer PASS from code presence or a mock result.",
+      "sectionSha256": "46121812787e6c053ca8a8705212f0128a9be98bb8efacd66c988353f17f5790",
+      "obligations": [
+        {
+          "id": "AR-007-O1",
+          "kind": "acceptance",
+          "text": "Every PASS must cite the actual test, assertion, artifact, environment, and source SHA."
+        },
+        {
+          "id": "AR-007-O2",
+          "kind": "acceptance",
+          "text": "Distinguish PASS, FAIL, PARTIAL, BLOCKED, and NOT_RUN; never infer PASS from code presence or a mock result."
+        }
+      ]
+    },
+    {
+      "id": "AR-008",
+      "title": "Adversarial independent review",
+      "priority": "P0",
+      "document": "docs/AGENT-RELIABILITY-REQUIREMENTS.md",
+      "heading": "**AR-008 [P0] Adversarial independent review.** A reviewer distinct from the implementer must attempt to falsify high-risk claims, inspect requirements and evidence, and record gaps. Reviewers cannot self-ratify operator decisions.",
+      "sectionSha256": "5066e0bae5f3973f2c5cdb0daf10f4cd29de28fa7b34d25f6294822af99312a6",
+      "obligations": [
+        {
+          "id": "AR-008-O1",
+          "kind": "constraint",
+          "text": "A reviewer distinct from the implementer must attempt to falsify high-risk claims, inspect requirements and evidence, and record gaps."
+        },
+        {
+          "id": "AR-008-O2",
+          "kind": "constraint",
+          "text": "Reviewers cannot self-ratify operator decisions."
+        }
+      ]
+    },
+    {
+      "id": "AR-009",
+      "title": "Negative-control testing",
+      "priority": "P0",
+      "document": "docs/AGENT-RELIABILITY-REQUIREMENTS.md",
+      "heading": "**AR-009 [P0] Negative-control testing.** Critical tests must include a deliberately invalid case that fails for the intended reason. Detect tests that pass regardless of implementation or verify mere existence rather than behavior.",
+      "sectionSha256": "959b066e46f087ee1b7e063c9b204c427d6732428421c94d04785605202540ce",
+      "obligations": [
+        {
+          "id": "AR-009-O1",
+          "kind": "acceptance",
+          "text": "Critical tests must include a deliberately invalid case that fails for the intended reason."
+        },
+        {
+          "id": "AR-009-O2",
+          "kind": "acceptance",
+          "text": "Detect tests that pass regardless of implementation or verify mere existence rather than behavior."
+        }
+      ]
+    },
+    {
+      "id": "AR-010",
+      "title": "Layered provider verification",
+      "priority": "P0",
+      "document": "docs/AGENT-RELIABILITY-REQUIREMENTS.md",
+      "heading": "**AR-010 [P0] Layered provider verification.** Run fast deterministic domain/fixture tests frequently, provider contract tests at integration boundaries, and real provider and deployed browser tests at acceptance. Live tests must never silently substitute mocks.",
+      "sectionSha256": "4870370a5e91b0fbaf389bc171d95177248f768392f3ef9659294518582cf5d9",
+      "obligations": [
+        {
+          "id": "AR-010-O1",
+          "kind": "acceptance",
+          "text": "Run fast deterministic domain/fixture tests frequently, provider contract tests at integration boundaries, and real provider and deployed browser tests at acceptance."
+        },
+        {
+          "id": "AR-010-O2",
+          "kind": "acceptance",
+          "text": "Live tests must never silently substitute mocks."
+        }
+      ]
+    },
+    {
+      "id": "AR-011",
+      "title": "Reproducibility and provenance",
+      "priority": "P0",
+      "document": "docs/AGENT-RELIABILITY-REQUIREMENTS.md",
+      "heading": "**AR-011 [P0] Reproducibility and provenance.** Record tool versions, pinned dependency SHAs, fixture seeds and digests, build inputs, CI run IDs, and deployed SHA. Re-run must distinguish reproducible differences from environment drift.",
+      "sectionSha256": "72635e51f3c04af7641529cbb978d45d168d27596d38dfe28a76b3a03f848676",
+      "obligations": [
+        {
+          "id": "AR-011-O1",
+          "kind": "constraint",
+          "text": "Record tool versions, pinned dependency SHAs, fixture seeds and digests, build inputs, CI run IDs, and deployed SHA."
+        },
+        {
+          "id": "AR-011-O2",
+          "kind": "constraint",
+          "text": "Re-run must distinguish reproducible differences from environment drift."
+        }
+      ]
+    },
+    {
+      "id": "AR-012",
+      "title": "Controlled work scope",
+      "priority": "P0",
+      "document": "docs/AGENT-RELIABILITY-REQUIREMENTS.md",
+      "heading": "**AR-012 [P0] Controlled work scope.** Agent changes must be bounded to named requirements and paths; commits should stage intended files only. Detect unrelated changes and require explicit review before inclusion.",
+      "sectionSha256": "be85469f5710295d3014494262652b0c72a7b1bd51fbfd4eb7e6b55c5f6617c5",
+      "obligations": [
+        {
+          "id": "AR-012-O1",
+          "kind": "constraint",
+          "text": "Agent changes must be bounded to named requirements and paths; commits should stage intended files only."
+        },
+        {
+          "id": "AR-012-O2",
+          "kind": "constraint",
+          "text": "Detect unrelated changes and require explicit review before inclusion."
+        }
+      ]
+    },
+    {
+      "id": "AR-013",
+      "title": "Risk-based verification",
+      "priority": "P0",
+      "document": "docs/AGENT-RELIABILITY-REQUIREMENTS.md",
+      "heading": "**AR-013 [P0] Risk-based verification.** Select tests based on changed contracts and dependency impact, preserving mandatory security, integrity, and release gates. Batching tests for efficiency cannot bypass required checks.",
+      "sectionSha256": "8e33358f53762ace7333829af9f0c6489ba13148f12c6fa66ba352eb79e4b59a",
+      "obligations": [
+        {
+          "id": "AR-013-O1",
+          "kind": "acceptance",
+          "text": "Select tests based on changed contracts and dependency impact, preserving mandatory security, integrity, and release gates."
+        },
+        {
+          "id": "AR-013-O2",
+          "kind": "acceptance",
+          "text": "Batching tests for efficiency cannot bypass required checks."
+        }
+      ]
+    },
+    {
+      "id": "AR-014",
+      "title": "Secure capability isolation",
+      "priority": "P0",
+      "document": "docs/AGENT-RELIABILITY-REQUIREMENTS.md",
+      "heading": "**AR-014 [P0] Secure capability isolation.** Agents receive only the credentials, repository access, context, and mutation permissions required for current work. Never echo secrets in logs, prompts, screenshots, or test artifacts.",
+      "sectionSha256": "f028ebddfe35062756b737d1272f329771fe07dafc12249710c0cd83a97b3b9d",
+      "obligations": [
+        {
+          "id": "AR-014-O1",
+          "kind": "constraint",
+          "text": "Agents receive only the credentials, repository access, context, and mutation permissions required for current work."
+        },
+        {
+          "id": "AR-014-O2",
+          "kind": "acceptance",
+          "text": "Never echo secrets in logs, prompts, screenshots, or test artifacts."
+        }
+      ]
+    },
+    {
+      "id": "AR-015",
+      "title": "Long-running agent continuity",
+      "priority": "P0",
+      "document": "docs/AGENT-RELIABILITY-REQUIREMENTS.md",
+      "heading": "**AR-015 [P0] Long-running agent continuity.** Maintain durable, compact, machine-readable checkpoints of objectives, decisions, completed work, open defects, evidence, and next actions so agent restarts do not re-decide settled questions.",
+      "sectionSha256": "7260d71ea39cd7a96dac3a8b31e26ae60698453ac01854ef6efa72ac30f6ed8d",
+      "obligations": [
+        {
+          "id": "AR-015-O1",
+          "kind": "constraint",
+          "text": "Maintain durable, compact, machine-readable checkpoints of objectives, decisions, completed work, open defects, evidence, and next actions so agent restarts do not re-decide settled questions."
+        }
+      ]
+    },
+    {
+      "id": "AR-016",
+      "title": "Reliability experiment",
+      "priority": "P1",
+      "document": "docs/AGENT-RELIABILITY-REQUIREMENTS.md",
+      "heading": "**AR-016 [P1] Reliability experiment.** Compare existing agent workflow with constrained workflow on matched tasks, recording correctness, requirement retention, false PASS rate, rework, elapsed time, and token usage. Preserve raw evidence, define acceptance metrics before the run, and do not treat unobserved gains as measured.",
+      "sectionSha256": "12b30de1bf957a89845fbd3410dee7e143d231c334fa8121eec730667c404d38",
+      "obligations": [
+        {
+          "id": "AR-016-O1",
+          "kind": "acceptance",
+          "text": "Compare existing agent workflow with constrained workflow on matched tasks, recording correctness, requirement retention, false PASS rate, rework, elapsed time, and token usage."
+        },
+        {
+          "id": "AR-016-O2",
+          "kind": "acceptance",
+          "text": "Preserve raw evidence, define acceptance metrics before the run, and do not treat unobserved gains as measured."
+        }
+      ]
+    },
+    {
+      "id": "AR-017",
+      "title": "Ownership and intake",
+      "priority": "P0",
+      "document": "docs/AGENT-RELIABILITY-REQUIREMENTS.md",
+      "heading": "**AR-017 [P0] Ownership and intake.** Route implementation work to the actual owning repository through its documented Praxis input folder and accepted grammar, never GitHub Issues. Do not assume component ownership from its name.",
+      "sectionSha256": "35a93f06964bb44cfcae77c9a59ea12515917f3ce82ecaa465997329248ab4bd",
+      "obligations": [
+        {
+          "id": "AR-017-O1",
+          "kind": "acceptance",
+          "text": "Route implementation work to the actual owning repository through its documented Praxis input folder and accepted grammar, never GitHub Issues."
+        },
+        {
+          "id": "AR-017-O2",
+          "kind": "constraint",
+          "text": "Do not assume component ownership from its name."
+        }
+      ]
+    },
+    {
+      "id": "AR-018",
+      "title": "Fail-closed acceptance",
+      "priority": "P0",
+      "document": "docs/AGENT-RELIABILITY-REQUIREMENTS.md",
+      "heading": "**AR-018 [P0] Fail-closed acceptance.** Missing credentials, unavailable external verification, unsigned approvals, stale evidence, failed gates, or unverified deployed artifacts must produce BLOCKED or FAIL as appropriate. An agent cannot override these outcomes with narrative.",
+      "sectionSha256": "87ac1c25b214c31cbd575b78284612f5f9b3b422d4e4fec48be70ac6593d2191",
+      "obligations": [
+        {
+          "id": "AR-018-O1",
+          "kind": "acceptance",
+          "text": "Missing credentials, unavailable external verification, unsigned approvals, stale evidence, failed gates, or unverified deployed artifacts must produce BLOCKED or FAIL as appropriate."
+        },
+        {
+          "id": "AR-018-O2",
+          "kind": "acceptance",
+          "text": "An agent cannot override these outcomes with narrative."
+        }
+      ]
+    },
+    {
+      "id": "AGENT-RELIABILITY§required-adversarial-acceptance-cases",
+      "title": "Required adversarial acceptance cases",
+      "priority": "unstated",
+      "document": "docs/AGENT-RELIABILITY-REQUIREMENTS.md",
+      "heading": "## Required adversarial acceptance cases",
+      "sectionSha256": "1b46cd826772db926c29bb80727dcdffc66c95f16c8a3e03ef79e637a47c1f6f",
+      "obligations": [
+        {
+          "id": "AGENT-RELIABILITY§required-adversarial-acceptance-cases-O1",
+          "kind": "acceptance",
+          "text": "Remove or weaken a mandatory UI requirement: preservation gate fails."
+        },
+        {
+          "id": "AGENT-RELIABILITY§required-adversarial-acceptance-cases-O2",
+          "kind": "acceptance",
+          "text": "Modify baseline content while retaining a prior digest: integrity gate fails."
+        },
+        {
+          "id": "AGENT-RELIABILITY§required-adversarial-acceptance-cases-O3",
+          "kind": "acceptance",
+          "text": "Swap semantic roles or negate a requirement without removing its keywords: semantic preservation review detects it."
+        },
+        {
+          "id": "AGENT-RELIABILITY§required-adversarial-acceptance-cases-O4",
+          "kind": "acceptance",
+          "text": "Forge an agent-authored operator approval: approval gate fails."
+        },
+        {
+          "id": "AGENT-RELIABILITY§required-adversarial-acceptance-cases-O5",
+          "kind": "acceptance",
+          "text": "Skip or disable the CI gate: acceptance remains blocked."
+        },
+        {
+          "id": "AGENT-RELIABILITY§required-adversarial-acceptance-cases-O6",
+          "kind": "acceptance",
+          "text": "Use mock data in place of a required live test: acceptance remains blocked."
+        },
+        {
+          "id": "AGENT-RELIABILITY§required-adversarial-acceptance-cases-O7",
+          "kind": "acceptance",
+          "text": "Present source code without behavior evidence: no PASS is granted."
+        },
+        {
+          "id": "AGENT-RELIABILITY§required-adversarial-acceptance-cases-O8",
+          "kind": "acceptance",
+          "text": "Re-run a task with the same pinned inputs: evidence and decisions remain traceable."
+        },
+        {
+          "id": "AGENT-RELIABILITY§required-adversarial-acceptance-cases-O9",
+          "kind": "acceptance",
+          "text": "Modify an unrelated file: scope guard reports it."
+        },
+        {
+          "id": "AGENT-RELIABILITY§required-adversarial-acceptance-cases-O10",
+          "kind": "acceptance",
+          "text": "Compare matched constrained/unconstrained agent runs and publish correctness and cost without invented measurements."
+        }
+      ]
+    },
+    {
+      "id": "AGENT-RELIABILITY§adoption",
+      "title": "Adoption",
+      "priority": "unstated",
+      "document": "docs/AGENT-RELIABILITY-REQUIREMENTS.md",
+      "heading": "## Adoption",
+      "sectionSha256": "6c948b5198c974dd86bfc70a5d46469e6f6085caab54ec0966a00c6bd2398a91",
+      "obligations": [
+        {
+          "id": "AGENT-RELIABILITY§adoption-O1",
+          "kind": "constraint",
+          "text": "First inventory current Praxis, Ordo, Dokimos, Percepta and related contracts."
+        },
+        {
+          "id": "AGENT-RELIABILITY§adoption-O2",
+          "kind": "acceptance",
+          "text": "For each AR requirement, record existing implementation, gap, owning repository, test plan, and dependency."
+        },
+        {
+          "id": "AGENT-RELIABILITY§adoption-O3",
+          "kind": "constraint",
+          "text": "Place resulting work in each owner's documented Praxis input path."
+        },
+        {
+          "id": "AGENT-RELIABILITY§adoption-O4",
+          "kind": "constraint",
+          "text": "Do not mark requirements implemented merely because this document exists."
         }
       ]
     },
