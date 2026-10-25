@@ -25,6 +25,31 @@ class LedgerTests(unittest.TestCase):
     def test_pending_valid(self):
         self.assertEqual(ledger.check(base()), [])
 
+    def test_computed_blocked_even_if_agent_declares_false(self):
+        self.assertEqual(ledger.compute_verdict(base()), "BLOCKED")
+
+    def test_blocked_original_rehearsal_shape(self):
+        x = base()
+        x["deployed_commit_sha"] = SHA
+        x["gates"][2]["status"] = "BLOCKED"
+        self.assertEqual(ledger.compute_verdict(x), "BLOCKED")
+
+    def test_computed_accepted_complete_synthetic_ledger(self):
+        x = base()
+        x["deployed_commit_sha"] = SHA
+        x["gates"] = [{"id": f"G{i}", "status": "PASS", "verified_sha": SHA,
+                       "evidence_paths": ["evidence/test.json"]} for i in range(10)]
+        x["requirements"] = [{"id": "P0-1", "priority": "P0", "status": "PASS",
+                              "tests": ["test-1"], "evidence_paths": ["evidence/test.json"]}]
+        self.assertEqual(ledger.compute_verdict(x), "ACCEPTED")
+        x["gates"][1]["status"] = "NOT_RUN"
+        self.assertEqual(ledger.compute_verdict(x), "BLOCKED")
+
+    def test_false_accepted_flag_rejected_with_blocked_gate(self):
+        x = base()
+        x["accepted"] = True
+        self.assertTrue(any("computed verdict" in e for e in ledger.check(x)))
+
     def test_missing_gate_rejected(self):
         x = base()
         x["gates"].pop()
