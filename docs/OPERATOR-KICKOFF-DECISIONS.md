@@ -21,3 +21,12 @@ This document records the operator's expressed decision; it is not a cryptograph
 ## Next work
 
 Carry DEC-WRITES-001 and DEC-PERCEPTA-001 into the next requirements reconciliation and implementation planning, without modifying historical rehearsal evidence. Resolve the remaining operator decisions before freezing the stack and performing a timed write-path rehearsal.
+
+
+## Additional operator authorization (2026-10-24)
+
+The operator subsequently stated: "Do what you recommend I approve." This authorizes proceeding with the recommended engineering work: independently computed acceptance, non-bypassable requirement preservation, compatible release-set repairs (including investigation of Dokimos 0.7.0, Percepta release, and Conditor SD-1), and preparation of a timed full-write rehearsal.
+
+This is approval of the *work plan*, not a declaration that unknown evidence passed or that specific unresolved decision alternatives were chosen. The five individual DF-CAUSA-2026-0003 decisions must be retrieved and evaluated before recording their dispositions. Do not infer their answers or mark the baseline/release set frozen without verification.
+
+Execution order: (1) retrieve decision evidence; (2) reconcile requirements and releases; (3) verify required CI and independent acceptance; (4) lock the verified stack; (5) run and assess a timed write-path rehearsal. Report BLOCKED for any missing prerequisite.
