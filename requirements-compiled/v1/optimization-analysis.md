@@ -73,10 +73,10 @@ None of the thirteen was caused by a missing application requirement. Each was c
 These problems were found from the sources alone. Each would have cost a rehearsal slice to discover during a run. All of them are in `curation/findings.json`.
 
 - **F-001 (critical):** UI-001 and UI-015 require the five frozen synthetic investigations on launch. EXT-DATA-001/002, OD-INDY-3 and the active-catalog policy (exactly three historical cases) forbid exactly that. No reconciliation section covers it.
-- **F-002 (resolved by the owner's record during this compilation):** DF-CAUSA-2026-0003 was answered twice.
+- **F-002 (no longer blocking; owner confirmation pending):** DF-CAUSA-2026-0003 was answered twice.
   - Indy-init OD-INDY-3/4 (2026-10-24): explicit Connect, GUID routes.
   - A Rehearsal 3 agent transcription (2026-10-25): auto-load and case-key exceptions.
-  - The transcription was withdrawn on 2026-10-26 (rehearsal-003 remediation report section 10, at `bc6eb5b`). This package pins that commit and treats OD-INDY-3/4 as decided.
+  - An agent withdrew the transcription on 2026-10-26 (rehearsal-003 remediation report section 10, at `bc6eb5b`), and the owner merged a summary restating OD-INDY-1..8 (PR #14). No owner-authored statement settles it, so the package follows the authoritative indy-init record and asks the owner to confirm (RCP-001-03).
   - The first compilation, at rehearsal-003 `28183a7`, still showed the conflict. When the commit was re-pinned, the compiler's citation check (V11) rejected the stale quote, which is how the change was detected.
 - **F-003 (critical):** the committed baseline (002d8ba, 450 requirements) is behind its own source. AR-019…AR-026 are missing. The Praxis gate would report drift on day one.
 - **F-004 (critical):** the mandatory preservation gate exists only on a draft Praxis branch (praxis#292). VER-005 forbids using it without an exception, so RDP-004 cannot currently be met.

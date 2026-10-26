@@ -86,7 +86,7 @@
       "identity": [
         { "label": "catalog manifest", "repo": "causa-data", "rev": "22260f429501d0d6963fc33302ed1e64d742a374", "path": "catalog/historical-v1/manifest.json", "expectedSha256": "8c361929cfb429c31c059c92d6148036bf2b5861f81dace635a1f7de18dbf87c" }
       ],
-      "citations": [ { "repo": "causa-data", "path": "README.md", "quote": "An external application reads them by selecting repository" } ]
+      "citations": [ { "repo": "causa-data", "path": "README.md", "quote": "An external application reads them by selecting repository" }, { "repo": "causa-data", "path": "catalog/historical-v1/verification/release.json", "quote": "\"catalogManifestSha256\": \"8c361929cfb429c31c059c92d6148036bf2b5861f81dace635a1f7de18dbf87c\"" } ]
     },
     {
       "id": "CT-009", "name": "Limen kernel and EngineTransport", "provider": "@echelon-foundry/limen 0.9.0 + limen-fsharp 0.9.0", "consumer": "application shell and F# engine",

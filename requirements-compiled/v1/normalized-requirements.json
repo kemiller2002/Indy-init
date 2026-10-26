@@ -7382,9 +7382,12 @@
           "detail": "no obligation states MUST/SHOULD/MAY or an imperative prohibition"
         }
       ],
-      "findings": [],
+      "findings": [
+        "F-008"
+      ],
       "reviewStatus": "flagged-for-review",
       "reviewReasons": [
+        "F-008",
         "ACCEPTANCE-CRITERIA-MISSING"
       ]
     },
@@ -7464,9 +7467,12 @@
           "detail": "no obligation states MUST/SHOULD/MAY or an imperative prohibition"
         }
       ],
-      "findings": [],
+      "findings": [
+        "F-008"
+      ],
       "reviewStatus": "flagged-for-review",
       "reviewReasons": [
+        "F-008",
         "ACCEPTANCE-CRITERIA-MISSING"
       ]
     },

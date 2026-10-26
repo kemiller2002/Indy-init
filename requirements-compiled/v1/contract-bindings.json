@@ -342,6 +342,13 @@
           "quote": "An external application reads them by selecting repository",
           "verified": true,
           "detail": "found at 22260f429501d0d6963fc33302ed1e64d742a374"
+        },
+        {
+          "repo": "causa-data",
+          "path": "catalog/historical-v1/verification/release.json",
+          "quote": "\"catalogManifestSha256\": \"8c361929cfb429c31c059c92d6148036bf2b5861f81dace635a1f7de18dbf87c\"",
+          "verified": true,
+          "detail": "found at 22260f429501d0d6963fc33302ed1e64d742a374"
         }
       ],
       "identityResults": [

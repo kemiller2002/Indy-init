@@ -11935,11 +11935,14 @@
       "dependencies": {
         "referencedRequirements": [],
         "workItems": [
+          "T27",
           "T34"
         ]
       },
       "ambiguities": {
-        "findings": [],
+        "findings": [
+          "F-008"
+        ],
         "mechanical": [
           {
             "code": "MODALITY-UNMARKED",
@@ -12033,11 +12036,14 @@
       "dependencies": {
         "referencedRequirements": [],
         "workItems": [
+          "T28",
           "T34"
         ]
       },
       "ambiguities": {
-        "findings": [],
+        "findings": [
+          "F-008"
+        ],
         "mechanical": [
           {
             "code": "MODALITY-UNMARKED",
@@ -17977,7 +17983,7 @@
       "dependencies": {
         "referencedRequirements": [],
         "workItems": [
-          "T28"
+          "T34"
         ]
       },
       "ambiguities": {
@@ -18028,7 +18034,7 @@
       "dependencies": {
         "referencedRequirements": [],
         "workItems": [
-          "T28"
+          "T34"
         ]
       },
       "ambiguities": {
@@ -18081,7 +18087,7 @@
       "dependencies": {
         "referencedRequirements": [],
         "workItems": [
-          "T28"
+          "T34"
         ]
       },
       "ambiguities": {

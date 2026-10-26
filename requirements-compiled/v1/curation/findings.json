@@ -69,11 +69,11 @@
       "id": "F-002",
       "type": "conflict",
       "severity": "major",
-      "material": true,
-      "status": "resolved-by-owner",
+      "material": false,
+      "status": "unresolved",
       "owner": "operator (kemiller2002)",
-      "title": "DF-CAUSA-2026-0003 was answered twice (OD-INDY-3/4 on 2026-10-24; a withdrawn Rehearsal 3 transcription on 2026-10-25); the owner record stands",
-      "description": "Indy-init OD-INDY-3 (explicit Connect, no auto-load) and OD-INDY-4 (GUID routes, case keys as aliases) answer DF-CAUSA-2026-0003. On 2026-10-25 the Rehearsal 3 remediation agent transcribed a blanket approval as the opposite answers (auto-load exception, case-key URL exception, waiver W1) and wrote approval files. On 2026-10-26 that transcription was withdrawn: the remediation report's section 10 states the owner record supersedes it, and the owner-merged indy-init REHEARSAL-003-RESULTS.md restates OD-INDY-1..8. Residual, non-blocking: OPERATOR-KICKOFF-DECISIONS says the five DF-CAUSA-2026-0003 decisions must not be inferred, and AR-003 asks for authenticated decisions; OD-INDY-3..8 are agent-recorded acceptances of recommendations. This package treats OD-INDY-3/4 as the owner's decision (DEC-004B, DEC-012) and records the residual for the owner to confirm in Ordo.",
+      "title": "DF-CAUSA-2026-0003 was answered twice; the contrary 2026-10-25 transcription is withdrawn, owner confirmation of OD-INDY-3/4 pending",
+      "description": "Indy-init OD-INDY-3 (explicit Connect, no auto-load) and OD-INDY-4 (GUID routes, case keys as aliases) answer DF-CAUSA-2026-0003; they are agent-recorded acceptances of the owner's 'Do what you recommend' (owner-merged in PR #13). On 2026-10-25 the Rehearsal 3 remediation agent transcribed a later operator reply ('I approve all things') as the opposite answers and wrote approval files. On 2026-10-26 an agent withdrew that transcription (remediation report section 10; DF record 'Withdrawn'), and the owner merged indy-init PR #14 whose REHEARSAL-003-RESULTS.md restates OD-INDY-1..8. No owner-authored statement settles it: OPERATOR-KICKOFF-DECISIONS says the DF-CAUSA-2026-0003 answers must not be inferred, and AR-003 asks for authenticated decisions. This package follows the authoritative indy-init record (DEC-004B, DEC-012) and marks the finding non-material because the R4 plan and every requirement text already agree with OD-INDY-3/4; the owner should confirm in Ordo (RCP-001-03).",
       "requirements": [
         "EXT-DATA-002",
         "EXT-DATA-003",
@@ -87,17 +87,14 @@
         "DEC-004B",
         "DEC-012"
       ],
-      "options": [],
+      "options": [
+        "Owner confirms OD-INDY-3/4 in an authenticated record"
+      ],
       "citations": [
         {
           "repo": "indy-init",
           "path": "docs/OWNER-DECISIONS-2026-10-24.md",
           "quote": "GUID routes, with case keys as aliases"
-        },
-        {
-          "repo": "indy-init",
-          "path": "docs/OWNER-DECISIONS-2026-10-24.md",
-          "quote": "is rejected as a precedent"
         },
         {
           "repo": "indy-init",
@@ -123,9 +120,7 @@
           "repo": "indy-init-rehearsal-003",
           "path": "research/decisions/DF-CAUSA-2026-0003--operator-decisions-requested.md",
           "quote": "Waiver W1 not granted."
-        }
-      ],
-      "resolutionSources": [
+        },
         {
           "repo": "indy-init-rehearsal-003",
           "path": "docs/REHEARSAL-003-REMEDIATION-REPORT.md",
@@ -146,7 +141,7 @@
       "status": "unresolved",
       "owner": "operator (kemiller2002), via a reviewed owner commit (OD-INDY-6)",
       "title": "The committed baseline is pinned at 002d8ba; the source commit adds AR-019..AR-026 and changes the ledger's acceptance predicate",
-      "description": "requirements/causa-requirements-baseline.json pins 002d8ba with 450 requirements. Regenerating it with the unmodified tools/build-requirements-baseline.py at 598a759 gives 460: AR-019..AR-026 and two AGENT-RELIABILITY sections are added, and REHEARSAL-ACCEPTANCE-LEDGER§preamble and §release-acceptance-predicate changed (computed verdict). The Praxis gate would report drift. This package inventories the 460 at 598a759 and does not edit the committed baseline. R4 precondition P2 requires the re-pin at the kickoff commit.",
+      "description": "requirements/causa-requirements-baseline.json pins 002d8ba with 450 requirements. Regenerating it with the unmodified tools/build-requirements-baseline.py at the source commit 252cd2e gives 460: AR-019..AR-026 and two AGENT-RELIABILITY sections are added, and REHEARSAL-ACCEPTANCE-LEDGER§preamble and §release-acceptance-predicate changed (computed verdict). The Praxis gate would report drift. This package inventories the 460 at 252cd2e (baseline documents are identical to 598a759) and does not edit the committed baseline. R4 precondition P2 requires the re-pin at the kickoff commit.",
       "requirements": [
         "AR-019",
         "AR-020",
@@ -349,13 +344,15 @@
       "status": "unresolved",
       "owner": "operator (kemiller2002)",
       "title": "Scope and order of the AI proposal loop, time travel and factory proof for Rehearsal 4 and the event",
-      "description": "The kickoff packet (in the baseline) orders 'AI proposals' seventh, never cuts the 'AI proposal authority boundary', and checkpoints a working structured AI proposal loop at 12:45 and time travel at 2:45. ADRP-012's build order (higher in ADRP-001 precedence than planning documents, if the packet is one) omits AI proposals and the semantic compiler. OD-INDY-5 makes AI-ORCHESTRATION context, not an acceptance obligation, and the R4 plan measures only write milestones. Whether a working AI proposal loop and time travel are P0 for R4/the event cannot be read from the sources; it decides whether T27/T28 are on the plan.",
+      "description": "The kickoff packet (in the baseline) orders 'AI proposals' seventh and time travel ninth, keeps the 'AI proposal authority boundary' (an invariant) on its do-not-cut list, and checkpoints a working structured AI proposal loop at 12:45 and time travel at 2:45. ADRP-012's build order (higher in ADRP-001 precedence than planning documents, if the packet is one) omits both features. OD-INDY-5 makes the long-term platform documents 'and similar' context rather than acceptance obligations; whether that covers AI-ORCHESTRATION is an inference. The R4 plan measures only write milestones. Whether a working AI proposal loop and time travel are P0 for R4/the event cannot be read from the sources; it decides whether T27/T28 are on the plan.",
       "requirements": [
+        "ADRP-012",
+        "KICKOFF-EXECUTION-PACKET§12-45",
+        "KICKOFF-EXECUTION-PACKET§2-45",
         "KICKOFF-EXECUTION-PACKET§3-work-order",
         "KICKOFF-EXECUTION-PACKET§6-cut-order",
         "KICKOFF-EXECUTION-PACKET§7-checkpoints",
         "KICKOFF-EXECUTION-PACKET§ai-tool-agent",
-        "ADRP-012",
         "R11.4"
       ],
       "decisions": [
@@ -396,7 +393,7 @@
       "status": "unresolved",
       "owner": "operator (kemiller2002); contract change through causa-data STORAGE-003 process",
       "title": "The frozen storage contract mandates a GitHub write primitive that Rehearsal 2 proved cannot compare-and-swap",
-      "description": "causa-data CONTRACT.md v1.0.0 section 9.4 requires publication by a non-forced ref update (PATCH /git/refs). Rehearsal 2 review 6 proved the REST API cannot compare-and-swap a branch, and on the owner's decision the save became one GraphQL createCommitOnBranch guarded by expectedHeadOid. The frozen contract was not revised, and ADRP-005 makes it the sole wire contract and forbids improvisation. An R4 agent must either follow the contract (re-introducing the DC-001 class) or deviate from a frozen contract without a version (STORAGE-003).",
+      "description": "causa-data CONTRACT.md v1.0.0 section 9.4 requires publication by a non-forced ref update (PATCH /git/refs). Rehearsal 2 review 6 proved the REST API cannot compare-and-swap a branch, and on the owner's decision the save became one GraphQL createCommitOnBranch guarded by expectedHeadOid. The frozen contract was not revised, and ADRP-005 makes it the sole wire contract and forbids improvisation. An R4 agent must either follow the contract (re-introducing the publish-over-a-moved-head failure R2 found in its sixth closure review, recorded under DC-005) or deviate from a frozen contract without a version (STORAGE-003).",
       "requirements": [
         "EXT-DATA-006",
         "EXT-DATA-011",
@@ -431,7 +428,7 @@
         {
           "repo": "indy-init",
           "path": "docs/AGENT-DECISION-REDUCTION-PROFILE.md",
-          "quote": "No agent may improvise alternative field names, ordering, event shapes, or snapshot semantics."
+          "quote": "Changes to frozen contract require explicit versioning and authorization."
         }
       ]
     },

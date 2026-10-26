@@ -231,7 +231,7 @@
     },
     {
       "id": "T27", "title": "Structured AI proposal loop (scope pending F-008)", "owner": "domain", "kind": "implementation", "satisfiedBy": "new-implementation",
-      "covers": ["KICKOFF-EXECUTION-PACKET§ai-tool-agent", "R11.4"],
+      "covers": ["KICKOFF-EXECUTION-PACKET§ai-tool-agent", "KICKOFF-EXECUTION-PACKET§12-45", "R11.4"],
       "dependsOn": [
         { "task": "T13", "reason": "proposals are validated by the kernel and never authoritative by generation (D-004)" },
         { "task": "T00", "reason": "scope is an owner decision (F-008)" }
@@ -241,7 +241,7 @@
     },
     {
       "id": "T28", "title": "History, time travel and semantic diff (scope pending F-008)", "owner": "ui", "kind": "implementation", "satisfiedBy": "new-implementation",
-      "covers": ["S14", "S15", "regex:^R14\\."],
+      "covers": ["S14", "S15", "KICKOFF-EXECUTION-PACKET§2-45"],
       "dependsOn": [
         { "task": "T22", "reason": "uses the workspace views and inspector" },
         { "task": "T00", "reason": "scope is an owner decision (F-008)" }
@@ -300,7 +300,7 @@
     },
     {
       "id": "T34", "title": "Acceptance: preservation gate re-run, ledger, computed verdict, measurements", "owner": "integration", "kind": "verification", "satisfiedBy": "verification",
-      "covers": ["doc:docs/REHEARSAL-ACCEPTANCE-LEDGER.md", "doc:docs/AGENT-RELIABILITY-REQUIREMENTS.md", "doc:docs/KICKOFF-EXECUTION-PACKET.md", "doc:docs/AGENT-DECISION-REDUCTION-PROFILE.md", "doc:docs/DEFECT-CLASS-CLOSURE-AND-RELEASE-GATES.md", "regex:^R16\\.", "REQUIREMENTS§preamble"],
+      "covers": ["doc:docs/REHEARSAL-ACCEPTANCE-LEDGER.md", "doc:docs/AGENT-RELIABILITY-REQUIREMENTS.md", "doc:docs/KICKOFF-EXECUTION-PACKET.md", "doc:docs/AGENT-DECISION-REDUCTION-PROFILE.md", "doc:docs/DEFECT-CLASS-CLOSURE-AND-RELEASE-GATES.md", "regex:^R16\\.", "regex:^R14\\.", "REQUIREMENTS§preamble"],
       "dependsOn": [
         { "task": "T33", "reason": "final review precedes the verdict (R4-03)" },
         { "task": "T08", "reason": "acceptance re-runs the same gate against the same pinned baseline (RDP-004)" }

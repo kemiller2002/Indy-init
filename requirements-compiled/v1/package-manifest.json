@@ -155,7 +155,7 @@
   "inputs": [
     {
       "path": "curation/contracts.json",
-      "sha256": "46cde646cff02621fa1a5ce16a66f5e39a334048711242329a6d3c8b4434627e"
+      "sha256": "c952094da9a681c6375a64487c44c4527d365897d66259f615ad4f90396d2582"
     },
     {
       "path": "curation/decisions.json",
@@ -171,7 +171,7 @@
     },
     {
       "path": "curation/findings.json",
-      "sha256": "42614dab19ccfca2df8ce894d3fa82742dec7c2e29af78741c0e9bb0427503aa"
+      "sha256": "ac89afb594f23b79b6210850e135d45283821d7b606f7df37c2688a268730039"
     },
     {
       "path": "curation/sources.json",
@@ -179,7 +179,7 @@
     },
     {
       "path": "curation/tasks.json",
-      "sha256": "68e8515660f5aa8b58a3814f216f04f6f6fe807cdea6df42df7a877e1d9dc6fc"
+      "sha256": "abdb61a5514a9c8436778f982c5417e4321699cd6a48fe7c351a6cd13b0cf444"
     },
     {
       "path": "curation/verification-rules.json",
@@ -193,13 +193,13 @@
     },
     {
       "path": "optimization-analysis.md",
-      "sha256": "5d1da086434749288514e28f857ff7272dfec483dc6b278b3e4a5168aa1ca811"
+      "sha256": "ae19f55e550de048301f8dee4dc485c148cdeaa92d65246a0949235bd981c4a4"
     }
   ],
   "generated": [
     {
       "path": "contract-bindings.json",
-      "sha256": "1a3b2f29ea433cfb2d961e5030b1d22b6f8c7ad0ac0e7e3ee5739ceb506a0eec"
+      "sha256": "c23c126dc8249b4976158386228ef8053f99fbdd67b941cad4988cdc6ef94fcb"
     },
     {
       "path": "decision-registry.json",
@@ -207,7 +207,7 @@
     },
     {
       "path": "dependency-graph.json",
-      "sha256": "54cb889ee7fbecb393d3294ae1f9f181cad62c3902441d0979809e3e4e165172"
+      "sha256": "61d62168c53145a7b201fa5d96f0ad57f226a27c778b5af68a3e8920b43a7005"
     },
     {
       "path": "execution-plan-resource.json",
@@ -219,7 +219,7 @@
     },
     {
       "path": "normalized-requirements.json",
-      "sha256": "f96432e91d635381f4b47ad9152d19bcf8a173eeca6fad0cbd45c247a5b37869"
+      "sha256": "b3d2ea19eec4537a8fba8687f020baeeaa0dcfd7f3f83216c83aa0995576561b"
     },
     {
       "path": "percepta-experiment.json",
@@ -227,7 +227,7 @@
     },
     {
       "path": "requirements-inventory.json",
-      "sha256": "3c0e4ab1a5fd0cc3b8635531ae154a20978d8b207e43589639048d0aeeb2c73f"
+      "sha256": "48cc6c7f84c99d37a6210dff64b63c22b6ad26c37d54a69cacac9ed46bbeab13"
     },
     {
       "path": "requirements-source-map.json",
@@ -239,7 +239,7 @@
     },
     {
       "path": "verification-manifest.json",
-      "sha256": "1997b1a62fc617623b6ff02433561f1458468084b1b810bd704717cd7a11712e"
+      "sha256": "6d4a98da60372183119142799cdb6e18181d8d0c48526866ba214780343a102f"
     }
   ],
   "compilationVerdict": "PASS",
