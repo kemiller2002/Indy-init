@@ -4,7 +4,7 @@ This package compiles the Causa requirements into a structured form. Every part 
 
 |   |   |
 |---|---|
-| Source | kemiller2002/indy-init `0054221c5c8fa7d665a3537923784ff0d1607cd3`. The compiler builds the baseline at this commit itself, with the F# port of the baseline generator. |
+| Source | kemiller2002/indy-init `9dc7d575f9d981e2be6f83543e18f548332e1a53`. The compiler builds the baseline at this commit itself, with the F# port of the baseline generator. |
 | Other repositories | the exact commits in `curation/sources.json` (also in `package-manifest.json`) |
 | Compilation verdict | **PASS**: every check V01–V17 passes, including V14 (no baseline drift) |
 | Rehearsal readiness | **BLOCKED**: 5 blockers, all upstream releases, listed in `requirements-validation-report.json`. The executed preflight gives BLOCKED; see `readiness/READINESS-REPORT.md`. |

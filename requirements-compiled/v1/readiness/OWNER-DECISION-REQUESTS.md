@@ -1,6 +1,6 @@
 # Owner decision requests for Rehearsal 4
 
-**Status:** DECIDED, except item 7, which needs no action. Items 1 and 2 were decided by the owner's merge of #18. Items 3 to 6 and the F-002 residual are decided by OD-INDY-9 to OD-INDY-13 (`docs/OWNER-DECISIONS-2026-10-26.md`), in force from the owner's merge of the pull request that adds them. An agent wrote this document; it decides nothing (RDP-003, AR-003, OD-INDY-7).
+**Status:** DECIDED, except item 7, which needs no action. Items 1 and 2 were decided by the owner-approved merge of #18. Items 3 to 6 and the F-002 residual are decided by OD-INDY-9 to OD-INDY-13 (`docs/OWNER-DECISIONS-2026-10-26.md`), which the owner approved in #20. An agent wrote this document; it decides nothing (RDP-003, AR-003, OD-INDY-7).
 
 **How to approve.** Record an approval in an owner-authored form: an owner commit to an OWNER-DECISIONS addendum, or an Ordo decision. Each request below names the record it needs.
 

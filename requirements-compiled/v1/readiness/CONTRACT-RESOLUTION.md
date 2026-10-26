@@ -1,6 +1,6 @@
 # Contract resolution report
 
-**Status:** CT-007 and CT-017 are decided by OD-INDY-9 and OD-INDY-10 (`docs/OWNER-DECISIONS-2026-10-26.md`, in force from the owner's merge). The other resolutions are proposals. No contract is marked verified; the status vocabulary is in `contract-bindings.json`. Nothing was changed in causa-data, Praxis or the Registry.
+**Status:** CT-007 and CT-017 are decided by OD-INDY-9 and OD-INDY-10 (`docs/OWNER-DECISIONS-2026-10-26.md`, approved by the owner in #20). The other resolutions are proposals. No contract is marked verified; the status vocabulary is in `contract-bindings.json`. Nothing was changed in causa-data, Praxis or the Registry.
 
 | Contract | Status | Resolution |
 |---|---|---|
@@ -15,7 +15,7 @@
 
 ## 1. CT-007 / F-009: owner exception for the GitHub publication mechanism (OD-INDY-9)
 
-The owner records this text as OD-INDY-9 (DEC-006, alternative (a)). It is in force from the owner's merge of `docs/OWNER-DECISIONS-2026-10-26.md`.
+The owner records this text as OD-INDY-9 (DEC-006, alternative (a)). The owner approved it in #20.
 
 > **Exception to causa-storage v1.0.0 §9.4.1 (GitHub publication mechanism).**
 >

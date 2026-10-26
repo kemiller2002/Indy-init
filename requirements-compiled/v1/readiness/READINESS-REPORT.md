@@ -5,17 +5,17 @@
 - The preflight's computed verdict is BLOCKED, with no FAIL left.
 - 5 readiness blockers remain, all upstream releases. Each needs a release by the system's owner, not an owner decision. The operator's test repository and CI secret (T05) are also still needed.
 - The owner's decisions so far:
-  - The owner approved and merged #17 and #18 on 2026-10-26. The merge of #18 decided F-001/DEC-024 and F-006, and fixed the baseline drift (F-003).
-  - OD-INDY-9 to OD-INDY-13 (`docs/OWNER-DECISIONS-2026-10-26.md`) decide DEC-006, DEC-025, DEC-022 and DEC-023, and confirm OD-INDY-3/4. They are in force from the owner's merge of the pull request that adds them.
+  - The owner approved #17 and #18 on 2026-10-26, and they were merged on that instruction. The merge of #18 decided F-001/DEC-024 and F-006, and fixed the baseline drift (F-003).
+  - OD-INDY-9 to OD-INDY-13 (`docs/OWNER-DECISIONS-2026-10-26.md`) decide DEC-006, DEC-025, DEC-022 and DEC-023, and confirm OD-INDY-3/4. The owner approved them in #20.
 
 ## Revisions and sources
 
 | | |
 |---|---|
-| Source | kemiller2002/indy-init `0054221`: main with #16 (acceptance verifier), #17 (readiness tooling), #18 (owner-approved requirement changes), #19, and the owner decision record of 2026-10-26 |
+| Source | kemiller2002/indy-init `9dc7d57`: main with #16 (acceptance verifier), #17 (readiness tooling), #18 (owner-approved requirement changes), #19, and the owner decision record of 2026-10-26 |
 | Package | `requirements-compiled/v1`, compilation **PASS**: all checks V01–V17 pass, and V14 confirms there is no baseline drift |
 | Requirements | 467 inventoried (461 baseline, including EXT-DATA-013, plus 6 external), 2325 obligations, 108 P0. All are preserved; none is marked verified. |
-| Evidence | `evidence/preflight-run.json` (executed at 0054221), `evidence/auth-contract-probe.json`, `evidence/baseline-equivalence.json`. `evidence/preflight-owner-branch-projection.json` is historical: the pre-merge projection of #18. |
+| Evidence | `evidence/preflight-run.json` (executed at 9dc7d57), `evidence/auth-contract-probe.json`, `evidence/baseline-equivalence.json`. `evidence/preflight-owner-branch-projection.json` is historical: the pre-merge projection of #18. |
 
 ## Blockers: classification and state
 
@@ -33,7 +33,7 @@
 **Counts:**
 - 16 at the start of this work.
 - 11 are resolved:
-  - 3 by the owner's merge of #18: F-001, DEC-024 and F-003;
+  - 3 by the owner-approved merge of #18: F-001, DEC-024 and F-003;
   - 8 by OD-INDY-9 to OD-INDY-12: F-009, DEC-006, CT-007, F-008, DEC-022, DEC-025, CT-017 and DEC-023.
 - Also resolved, though they were not readiness blockers: F-006 (#18), and F-002, F-012, F-013 and F-019 (OD-INDY-10, -12 and -13).
 - 5 are open, all waiting on upstream releases: F-004, CT-013, F-005, CT-012 and CT-016.
@@ -47,7 +47,7 @@
 |---|---|---|
 | PRE-DEC-01 owner decisions | PASS | No unresolved decision |
 | PRE-DEC-02 critical findings | BLOCKED | F-004, F-005 open |
-| PRE-REQ-01 baseline drift | PASS | Pinned at c751d58; no drift at 0054221 |
+| PRE-REQ-01 baseline drift | PASS | Pinned at c751d58; no drift at 9dc7d57 |
 | PRE-REQ-02 package compiles | PASS | |
 | PRE-REQ-03 Praxis gate released | BLOCKED | v3.20.0 has no `preservation` command |
 | PRE-REQ-04 gate PASS on the derived package | NOT_RUN | Needs T07–T09 |
@@ -56,7 +56,7 @@
 | PRE-DEP-03 identities | PASS | 5 of 5 match |
 | PRE-AUTH-01 CI secret | BLOCKED | CAUSA_GITHUB_TOKEN and CAUSA_TEST_REPO are not set here (T05) |
 | PRE-AUTH-02 auth contract | NOT_RUN | Needs the secret. The negative-control probe showed this sandbox rewrites credentials, so it must run in CI |
-| PRE-SEC-01 committed secrets | PASS | No token patterns at 0054221 |
+| PRE-SEC-01 committed secrets | PASS | No token patterns at 9dc7d57 |
 | PRE-TOOL-01 SDK | PASS | 10.0.402 = global.json |
 | PRE-TOOL-02 Conditor SD-1 | PASS | v0.10.11 contains CON-367 |
 | PRE-TOOL-03 bootstrap | NOT_RUN | T10 record |
