@@ -1,0 +1,884 @@
+{
+  "schema": "indy-init.rc-decisions/1",
+  "description": "Precomputed decisions. Classes: fixed-architectural (authoritative source, do not reconsider without evidence of incompatibility), verified-reusable (an existing, checked artifact or release to reuse), implementation (a reversible choice already made for the first slice), runtime-situational (resolved per run, e.g. the release set), unresolved (needs the owner; the agent stops that slice). 'home' says where the decision belongs: ordo (decision authority), praxis (intake/derivation), dokimos (verification gate), registry, or the rehearsal repository.",
+  "decisions": [
+    {
+      "id": "DEC-001",
+      "title": "F# typed domain engine is the sole semantic authority",
+      "classification": "fixed-architectural",
+      "home": "ordo",
+      "statement": "The F# domain engine decides legal commands, transitions, causal assertions and verification; the UI renders projections only.",
+      "constraints": [
+        "UI never computes legality, evidence weight, confidence or causal truth (ADRP-004)",
+        "Replay validates every event through the engine; no browser-only validator (Boundary C)"
+      ],
+      "requirements": [
+        "ADRP-004",
+        "D-101",
+        "D-104",
+        "CAUSA-UI-EXPERIENCE§preamble"
+      ],
+      "findings": [],
+      "sources": [
+        {
+          "repo": "indy-init",
+          "path": "docs/DESIGN-DECISION-BOUNDARIES.md",
+          "quote": "Use F# domain types to make invalid generic-core state difficult or impossible to represent."
+        },
+        {
+          "repo": "indy-init",
+          "path": "docs/CAUSA-UI-EXPERIENCE-REQUIREMENTS.md",
+          "quote": "The F# domain engine is the sole authority for legal commands, state transitions, causal assertions, and verification."
+        }
+      ]
+    },
+    {
+      "id": "DEC-002",
+      "title": "Forma is the design system; no independent design system",
+      "classification": "fixed-architectural",
+      "home": "ordo",
+      "statement": "UI composition uses Forma (registered release 0.9.0). Forma ships HTML/CSS and inert <ef-*> authoring tags; behaviour comes from Limen, not from custom elements.",
+      "constraints": [
+        "Do not register Forma tags as custom elements or add a component framework",
+        "UI-016 palette applied through Forma tokens",
+        "No new UI, state-management, graph or animation dependency without coordinator approval (ADRP-006)"
+      ],
+      "requirements": [
+        "ADRP-003",
+        "ADRP-006",
+        "UI-016",
+        "UI-034",
+        "WDL-008"
+      ],
+      "findings": [],
+      "sources": [
+        {
+          "repo": "indy-init",
+          "path": "docs/AGENT-DECISION-REDUCTION-PROFILE.md",
+          "quote": "Prefer Forma components; do not introduce an independent design system."
+        },
+        {
+          "repo": "forma",
+          "path": "README.md",
+          "quote": "The wrapper is not registered with customElements.define()"
+        }
+      ]
+    },
+    {
+      "id": "DEC-003",
+      "title": "Limen hosts the F# engine across the browser/WASM boundary",
+      "classification": "fixed-architectural",
+      "home": "ordo",
+      "statement": "The browser application is a Limen host: HTML/CSS shell first, WASM engine behind Limen's EngineTransport, one projection stream into the DOM.",
+      "constraints": [
+        "HTML/CSS loading shell before WASM (ADRP-011, WASM-LOAD-001)",
+        "A failed transport start leaves a recoverable visible error, never a silent placeholder (WASM-LOAD-005; R2 DC-006)",
+        "Limen 0.x minors may break the protocol: pin the exact version"
+      ],
+      "requirements": [
+        "ADRP-011",
+        "R13.3",
+        "WASM-LOAD-001",
+        "WASM-LOAD-005"
+      ],
+      "findings": [],
+      "sources": [
+        {
+          "repo": "indy-init",
+          "path": "docs/KICKOFF-EXECUTION-PACKET.md",
+          "quote": "Limen boundary;"
+        },
+        {
+          "repo": "indy-init",
+          "path": "docs/AGENT-DECISION-REDUCTION-PROFILE.md",
+          "quote": "loading: HTML/CSS shell before WASM"
+        },
+        {
+          "repo": "limen",
+          "path": "docs/03-kernel-lifecycle.md",
+          "quote": "the page stays at its placeholder content"
+        }
+      ]
+    },
+    {
+      "id": "DEC-004A",
+      "title": "Investigation data is read at runtime from an external, user-connected GitHub repository; nothing is bundled",
+      "classification": "fixed-architectural",
+      "home": "ordo",
+      "statement": "The application ships zero investigation records and obtains them only after the user connects an authorized external repository (causa-data or another conforming repository).",
+      "constraints": [
+        "No demo records in source, test assets shipped to production, Pages deployment or bundle (EXT-DATA-001)",
+        "Repository content is untrusted even when authenticated (EXT-DATA-012)",
+        "No mutation on connect or read (EXT-DATA-006)"
+      ],
+      "requirements": [
+        "EXT-DATA-001",
+        "EXT-DATA-006",
+        "EXT-DATA-012",
+        "REHEARSAL-EXTERNAL-DATA-BOUNDARY§goal"
+      ],
+      "findings": [],
+      "sources": [
+        {
+          "repo": "indy-init",
+          "path": "docs/REHEARSAL-EXTERNAL-DATA-BOUNDARY.md",
+          "quote": "obtains actual investigation records only after the user explicitly connects an authorized external GitHub repository"
+        },
+        {
+          "repo": "indy-init",
+          "path": "docs/REHEARSAL-EXTERNAL-DATA-BOUNDARY.md",
+          "quote": "The data repository MUST be configurable and isolated from the application repository."
+        }
+      ]
+    },
+    {
+      "id": "DEC-004B",
+      "title": "First launch shows an explicit Connect data repository action; no auto-load",
+      "classification": "fixed-architectural",
+      "home": "ordo",
+      "statement": "A fresh launch shows an accessible, empty, disconnected workspace; choosing the public historical catalog is an explicit choice inside Connect (OD-INDY-3). The contrary 2026-10-25 transcription was withdrawn (F-002).",
+      "constraints": [
+        "Writes need a user-chosen, authorized repository (EXT-DATA-006, EXT-DATA-009)",
+        "No implicit demo import or fallback (EXT-DATA-002)",
+        "Launch content of UI-001/UI-015 is still open (F-001)"
+      ],
+      "requirements": [
+        "EXT-DATA-002",
+        "EXT-DATA-003"
+      ],
+      "findings": [
+        "F-002"
+      ],
+      "sources": [
+        {
+          "repo": "indy-init",
+          "path": "docs/OWNER-DECISIONS-2026-10-24.md",
+          "quote": "There is no auto-load of a public catalogue."
+        },
+        {
+          "repo": "indy-init-rehearsal-003",
+          "path": "docs/REHEARSAL-003-REMEDIATION-REPORT.md",
+          "quote": "Owner decisions supersede §9 (2026-10-26)"
+        }
+      ]
+    },
+    {
+      "id": "DEC-005",
+      "title": "Causa storage contract v1.0.0 is the sole wire contract",
+      "classification": "fixed-architectural",
+      "home": "ordo",
+      "statement": "Use causa-data contract/v1.0.0/CONTRACT.md at tag causa-storage-v1.0.0, checked by its three identities (schema, dataset, release). No agent improvises field names, ordering, event shapes or snapshot semantics.",
+      "constraints": [
+        "Identity mismatch is FAIL (STORAGE-007); identities independently checked in contract-bindings.json CT-006",
+        "Writes only under workspaces/demo/<runId>/; never under fixtures/",
+        "Contract changes need a new version and authorization (STORAGE-003)",
+        "Section 9.4's GitHub mechanism is contested (DEC-006, F-009)"
+      ],
+      "requirements": [
+        "ADRP-005",
+        "STORAGE-001",
+        "STORAGE-003",
+        "STORAGE-007",
+        "EXT-DATA-011",
+        "CAUSA-STORAGE-RELEASE§authority"
+      ],
+      "findings": [],
+      "sources": [
+        {
+          "repo": "indy-init",
+          "path": "docs/AGENT-DECISION-REDUCTION-PROFILE.md",
+          "quote": "Use frozen causa-data/contract/v1.0.0/CONTRACT.md and tag causa-storage-v1.0.0 as the sole wire contract for this profile."
+        },
+        {
+          "repo": "indy-init",
+          "path": "docs/CAUSA-STORAGE-RELEASE-v1.0.0.md",
+          "quote": "Status: RELEASED."
+        }
+      ]
+    },
+    {
+      "id": "DEC-006",
+      "title": "GitHub write primitive: contract's non-forced ref PATCH versus R2's guarded GraphQL commit",
+      "classification": "unresolved",
+      "home": "ordo",
+      "statement": "See F-009. Until decided, the write-path slice (T18 onward for writes) is BLOCKED under ADRP-001's conflict stop.",
+      "constraints": [],
+      "requirements": [
+        "EXT-DATA-006",
+        "STORAGE-006"
+      ],
+      "findings": [
+        "F-009"
+      ],
+      "sources": [
+        {
+          "repo": "causa-data",
+          "path": "contract/v1.0.0/CONTRACT.md",
+          "quote": "published by a non-forced ref update"
+        }
+      ]
+    },
+    {
+      "id": "DEC-007",
+      "title": "Active demonstration catalog: Apollo 1, Apollo 11, Challenger (causa-data historical-v1)",
+      "classification": "verified-reusable",
+      "home": "rehearsal-repository",
+      "statement": "causa-data provides the three-case catalog, built through the pinned engine, independently reviewed and verified (catalog/historical-v1/verification). The application reuses it by connecting to kemiller2002/causa-data, workspace historical-v1. Its status as an application acceptance requirement is open (F-001, F-006).",
+      "constraints": [
+        "Load externally only; never bundle (EXT-DATA-001)",
+        "Read-only: frozen and catalog files are never written",
+        "Manifest identity checked (CT-008)"
+      ],
+      "requirements": [
+        "HISTORICAL-CASE-CATALOG§catalog-policy",
+        "HISTORICAL-CASE-CATALOG§completion-gate"
+      ],
+      "findings": [
+        "F-001",
+        "F-006"
+      ],
+      "sources": [
+        {
+          "repo": "causa-data",
+          "path": "research/HISTORICAL-CASE-CATALOG.md",
+          "quote": "The active demonstration catalog MUST contain exactly three historical cases"
+        },
+        {
+          "repo": "causa-data",
+          "path": "README.md",
+          "quote": "The active demonstration catalog contains exactly three historical investigations."
+        }
+      ]
+    },
+    {
+      "id": "DEC-008",
+      "title": "Writes are P0 for Rehearsal 4 and the event",
+      "classification": "fixed-architectural",
+      "home": "ordo",
+      "statement": "Create, write, reload and conflict handling against a real repository are in scope and never deferred.",
+      "constraints": [
+        "Live writes at the first persistence checkpoint (R4-02)",
+        "Mocked tests never count as live write verification (EXT-DATA-010)"
+      ],
+      "requirements": [
+        "EXT-DATA-006",
+        "EXT-DATA-009",
+        "UI-006"
+      ],
+      "findings": [],
+      "sources": [
+        {
+          "repo": "indy-init",
+          "path": "docs/OWNER-DECISIONS-2026-10-24.md",
+          "quote": "Writes are P0 for the event."
+        },
+        {
+          "repo": "indy-init",
+          "path": "docs/OPERATOR-KICKOFF-DECISIONS.md",
+          "quote": "DEC-WRITES-001: Writes are required for the Indy Init application."
+        }
+      ]
+    },
+    {
+      "id": "DEC-009",
+      "title": "Percepta semantic UI verification is required from a released, pinned CLI",
+      "classification": "fixed-architectural",
+      "home": "dokimos",
+      "statement": "UI completion requires evidence from the released Percepta semantic CLI pinned by the kickoff set; no waiver.",
+      "constraints": [
+        "Evidence from unreleased builds does not count; waiver W1 was not granted (the 2026-10-25 grant was withdrawn, F-002)",
+        "Registration is pending (F-005)"
+      ],
+      "requirements": [
+        "UI-015",
+        "UI-030",
+        "PF-016"
+      ],
+      "findings": [],
+      "sources": [
+        {
+          "repo": "indy-init",
+          "path": "docs/OWNER-DECISIONS-2026-10-24.md",
+          "quote": "Percepta semantic UI verification is released, not waived."
+        },
+        {
+          "repo": "indy-init",
+          "path": "docs/OPERATOR-KICKOFF-DECISIONS.md",
+          "quote": "DEC-PERCEPTA-001: Percepta is required."
+        }
+      ]
+    },
+    {
+      "id": "DEC-010",
+      "title": "The acceptance verdict is computed from the ledger, never written",
+      "classification": "fixed-architectural",
+      "home": "dokimos",
+      "statement": "tools/compute-acceptance-verdict.py derives the verdict; agents never set ratification fields.",
+      "constraints": [
+        "CI runs the computation on every ledger or report change (R4-04)",
+        "Missing evidence is NOT_RUN/BLOCKED, never PASS"
+      ],
+      "requirements": [
+        "AR-019",
+        "REHEARSAL-ACCEPTANCE-LEDGER§release-acceptance-predicate",
+        "AR-018"
+      ],
+      "findings": [],
+      "sources": [
+        {
+          "repo": "indy-init",
+          "path": "docs/OWNER-DECISIONS-2026-10-24.md",
+          "quote": "The acceptance verdict is computed, never written."
+        },
+        {
+          "repo": "indy-init",
+          "path": "docs/REHEARSAL-ACCEPTANCE-LEDGER.md",
+          "quote": "The verdict is computed, never written"
+        }
+      ]
+    },
+    {
+      "id": "DEC-011",
+      "title": "Hash-based routes on static hosting",
+      "classification": "implementation",
+      "home": "rehearsal-repository",
+      "statement": "Routes are index.html#/..., relative links, no <base href>; a later service deployment must keep hash links working.",
+      "constraints": [
+        "ReversibleChoice D-203",
+        "Route codec round-trip tested (R9.10)"
+      ],
+      "requirements": [
+        "R9.7",
+        "R9.10",
+        "D-203"
+      ],
+      "findings": [],
+      "sources": [
+        {
+          "repo": "indy-init",
+          "path": "docs/DESIGN-DECISION-BOUNDARIES.md",
+          "quote": "Because static hosting cannot answer arbitrary paths, routes are hash-based"
+        }
+      ]
+    },
+    {
+      "id": "DEC-012",
+      "title": "GUID routes; case keys are redirecting aliases only",
+      "classification": "fixed-architectural",
+      "home": "ordo",
+      "statement": "URLs follow SCREEN-CONTRACTS §url-contract and R9.9; #/investigations/<caseKey> redirects to the GUID route and is never stored (OD-INDY-4).",
+      "constraints": [
+        "Hash routes (DEC-011)",
+        "No secrets or evidence content in URLs (R9.9)"
+      ],
+      "requirements": [
+        "R9.9",
+        "SCREEN-CONTRACTS§url-contract"
+      ],
+      "findings": [
+        "F-002"
+      ],
+      "sources": [
+        {
+          "repo": "indy-init",
+          "path": "docs/OWNER-DECISIONS-2026-10-24.md",
+          "quote": "GUID routes, with case keys as aliases"
+        },
+        {
+          "repo": "indy-init",
+          "path": "docs/REHEARSAL-003-RESULTS.md",
+          "quote": "explicit Connect, GUID routes"
+        }
+      ]
+    },
+    {
+      "id": "DEC-013",
+      "title": "Kickoff release set",
+      "classification": "runtime-situational",
+      "home": "registry",
+      "statement": "Resolved per run: the newest stable, compatible, verified, Registry-approved set after Conditor qualification. Today echelon-current 1.27.0 plus a registered percepta-semantic (pending 1.28.0).",
+      "constraints": [
+        "Exact pins and digests in the run lock; no mid-run drift (VER-004, DEP-CURRENT-006)",
+        "No silent downgrade (VER-003)"
+      ],
+      "requirements": [
+        "VER-001",
+        "VER-004",
+        "DEP-CURRENT-006",
+        "AR-023"
+      ],
+      "findings": [
+        "F-005",
+        "F-015"
+      ],
+      "sources": [
+        {
+          "repo": "indy-init",
+          "path": "docs/OWNER-DECISIONS-2026-10-24.md",
+          "quote": "Rehearsal 4 runs on exactly that set."
+        },
+        {
+          "repo": "indy-init",
+          "path": "docs/REHEARSAL-DEPENDENCY-LOCK.md",
+          "quote": "The run uses exactly this set."
+        }
+      ]
+    },
+    {
+      "id": "DEC-014",
+      "title": "GitHub is the initial persistence provider behind a provider-neutral port",
+      "classification": "implementation",
+      "home": "rehearsal-repository",
+      "statement": "GitHub is the first provider; domain semantics never depend on it.",
+      "constraints": [
+        "ReversibleChoice D-201; LockedInvariant D-014 storage abstraction",
+        "No GitHub identity in domain types (kickoff packet persistence agent)"
+      ],
+      "requirements": [
+        "D-201",
+        "D-014",
+        "PF-001",
+        "R10.1"
+      ],
+      "findings": [],
+      "sources": [
+        {
+          "repo": "indy-init",
+          "path": "docs/DESIGN-DECISION-BOUNDARIES.md",
+          "quote": "GitHub is the initial persistence provider."
+        }
+      ]
+    },
+    {
+      "id": "DEC-015",
+      "title": "Static hosting on GitHub Pages",
+      "classification": "implementation",
+      "home": "rehearsal-repository",
+      "statement": "Deploy as a static site; deployed-SHA acceptance runs against it.",
+      "constraints": [
+        "ReversibleChoice D-203",
+        "No data access through publicly readable Pages assets (EXT-DATA-012)"
+      ],
+      "requirements": [
+        "D-203",
+        "EXT-DATA-012"
+      ],
+      "findings": [],
+      "sources": [
+        {
+          "repo": "indy-init",
+          "path": "docs/DESIGN-DECISION-BOUNDARIES.md",
+          "quote": "GitHub Pages/static hosting is a target where practical."
+        }
+      ]
+    },
+    {
+      "id": "DEC-016",
+      "title": "Agent topology for the run",
+      "classification": "runtime-situational",
+      "home": "rehearsal-repository",
+      "statement": "Rehearsal 4: one continuous lead agent and a fresh read-only reviewer at the first release candidate and before the final verdict (Plan B). Plan A's parallel lanes need owner approval (F-007).",
+      "constraints": [
+        "Reviewer receives code, requirements and constraints, not the lead's conclusions (R4-03)"
+      ],
+      "requirements": [
+        "AR-021",
+        "ADRP-008"
+      ],
+      "findings": [
+        "F-007"
+      ],
+      "sources": [
+        {
+          "repo": "indy-init",
+          "path": "docs/REHEARSAL-004-WRITE-PATH-PLAN.md",
+          "quote": "Topology: one continuous lead agent."
+        },
+        {
+          "repo": "indy-init",
+          "path": "docs/AGENT-RELIABILITY-REQUIREMENTS.md",
+          "quote": "Prefer one long-running implementation agent with compact durable checkpoints."
+        }
+      ]
+    },
+    {
+      "id": "DEC-017",
+      "title": "Requirements preservation gate passes before implementation and at acceptance",
+      "classification": "fixed-architectural",
+      "home": "dokimos",
+      "statement": "Derive from the pinned baseline; every requirement gets a disposition; the Praxis gate passes before implementation and again at acceptance.",
+      "constraints": [
+        "Approvals are written by the operator, never by an agent (RDP-003)",
+        "Gate unavailable means BLOCKED/UNKNOWN, never PASS (RDP-005)",
+        "No released Praxis carries the gate yet (F-004)"
+      ],
+      "requirements": [
+        "AR-001",
+        "AR-002",
+        "AR-004",
+        "WDL-015",
+        "VER-010"
+      ],
+      "findings": [
+        "F-004"
+      ],
+      "sources": [
+        {
+          "repo": "indy-init",
+          "path": "docs/REHEARSAL-DERIVATION-POLICY.md",
+          "quote": "Implementation work items MUST NOT begin until praxis requirements preservation verify returns PASS"
+        }
+      ]
+    },
+    {
+      "id": "DEC-018",
+      "title": "Latest compatible verified release of every Echelon system; R001 versions are not defaults",
+      "classification": "fixed-architectural",
+      "home": "registry",
+      "statement": "Discover, resolve as a set, verify, then lock; block on incompatibility.",
+      "constraints": [
+        "No unreviewed prereleases (VER-005)",
+        "Actual loaded versions shown in Administration only (VER-007)"
+      ],
+      "requirements": [
+        "VER-001",
+        "VER-003",
+        "VER-005",
+        "DEP-CURRENT-002",
+        "ADRP-006"
+      ],
+      "findings": [],
+      "sources": [
+        {
+          "repo": "indy-init",
+          "path": "docs/SYSTEM-VERSION-AND-COMPATIBILITY-REQUIREMENTS.md",
+          "quote": "Each build MUST use the newest available stable, published, compatible release of every applicable Echelon system"
+        },
+        {
+          "repo": "indy-init",
+          "path": "docs/AGENT-DECISION-REDUCTION-PROFILE.md",
+          "quote": "Historical R001 versions are not defaults."
+        }
+      ]
+    },
+    {
+      "id": "DEC-019",
+      "title": "Credential boundary",
+      "classification": "fixed-architectural",
+      "home": "ordo",
+      "statement": "Credentials are never committed, bundled, logged, put in URLs, shown in errors, stored in localStorage or written to event files; tokens travel only in the Authorization header.",
+      "constraints": [
+        "In-memory credentials need reauthorization after reload (EXT-DATA-004)",
+        "CI secret scoped to contents write on the test repository only (R4 P4)",
+        "Uploaded test artifacts must not contain tokens (R3 N1)"
+      ],
+      "requirements": [
+        "EXT-DATA-004",
+        "R11.3",
+        "R9.9",
+        "PF-015"
+      ],
+      "findings": [],
+      "sources": [
+        {
+          "repo": "indy-init",
+          "path": "docs/REHEARSAL-EXTERNAL-DATA-BOUNDARY.md",
+          "quote": "Credentials MUST never be committed, bundled, logged, embedded in URLs, exposed in error text, stored in localStorage, or written into domain event files."
+        },
+        {
+          "repo": "causa-data",
+          "path": "contract/v1.0.0/CONTRACT.md",
+          "quote": "Tokens are sent only in the"
+        }
+      ]
+    },
+    {
+      "id": "DEC-020",
+      "title": "Primary target: iPad Safari, portrait and landscape",
+      "classification": "fixed-architectural",
+      "home": "ordo",
+      "statement": "Acceptance screenshots and interaction checks include iPad portrait and landscape (WebKit).",
+      "constraints": [
+        "Mobile remains usable (R9.2)",
+        "Keyboard and touch paths (UI-011)"
+      ],
+      "requirements": [
+        "R9.1",
+        "R9.2",
+        "UI-011",
+        "UI-016"
+      ],
+      "findings": [],
+      "sources": [
+        {
+          "repo": "indy-init",
+          "path": "docs/REQUIREMENTS.md",
+          "quote": "The primary target is iPad Safari in both portrait and landscape orientations."
+        }
+      ]
+    },
+    {
+      "id": "DEC-021",
+      "title": "Locked invariants D-001..D-015",
+      "classification": "fixed-architectural",
+      "home": "ordo",
+      "statement": "Observation/inference separation, provenance, unknown semantics, proposal authority, historical integrity, transition legality, blocking obligations, verification distinction, persistence truth, extension firewall and preservation, safe unsupported semantics, domain-neutral core, storage and AI-provider abstraction.",
+      "constraints": [
+        "No promotion of Reversible/Experimental/Deferred items without a recorded decision (DESIGN-DECISION-BOUNDARIES section 6)"
+      ],
+      "requirements": [
+        "D-001",
+        "D-002",
+        "D-003",
+        "D-004",
+        "D-005",
+        "D-006",
+        "D-007",
+        "D-008",
+        "D-009",
+        "D-010",
+        "D-011",
+        "D-012",
+        "D-013",
+        "D-014",
+        "D-015"
+      ],
+      "findings": [],
+      "sources": [
+        {
+          "repo": "indy-init",
+          "path": "docs/DESIGN-DECISION-BOUNDARIES.md",
+          "quote": "These are foundational product guarantees."
+        }
+      ]
+    },
+    {
+      "id": "DEC-022",
+      "title": "AI proposal loop and time travel in Rehearsal 4 / event scope",
+      "classification": "unresolved",
+      "home": "ordo",
+      "statement": "See F-008.",
+      "constraints": [],
+      "requirements": [
+        "KICKOFF-EXECUTION-PACKET§3-work-order"
+      ],
+      "findings": [
+        "F-008"
+      ],
+      "sources": [
+        {
+          "repo": "indy-init",
+          "path": "docs/KICKOFF-EXECUTION-PACKET.md",
+          "quote": "Structured AI proposal loop works."
+        }
+      ]
+    },
+    {
+      "id": "DEC-023",
+      "title": "Use of R001-derived interfaces at the event",
+      "classification": "unresolved",
+      "home": "ordo",
+      "statement": "See F-013.",
+      "constraints": [],
+      "requirements": [
+        "R0.1",
+        "ADRP-016"
+      ],
+      "findings": [
+        "F-013"
+      ],
+      "sources": [
+        {
+          "repo": "indy-init",
+          "path": "docs/REHEARSAL-AGENT-INTERFACE-FREEZE.md",
+          "quote": "Extract actual types and exported interfaces from accepted R001 F# source and Limen adapter."
+        }
+      ]
+    },
+    {
+      "id": "DEC-024",
+      "title": "What the launch view shows",
+      "classification": "unresolved",
+      "home": "ordo",
+      "statement": "See F-001.",
+      "constraints": [],
+      "requirements": [
+        "UI-001",
+        "UI-015"
+      ],
+      "findings": [
+        "F-001"
+      ],
+      "sources": [
+        {
+          "repo": "indy-init",
+          "path": "docs/CAUSA-UI-EXPERIENCE-REQUIREMENTS.md",
+          "quote": "On launch, show all five frozen demonstration investigations and user working copies."
+        }
+      ]
+    },
+    {
+      "id": "DEC-025",
+      "title": "User authentication mechanism for the connect flow",
+      "classification": "unresolved",
+      "home": "ordo",
+      "statement": "See F-019.",
+      "constraints": [],
+      "requirements": [
+        "R11.1",
+        "EXT-DATA-003"
+      ],
+      "findings": [
+        "F-019"
+      ],
+      "sources": [
+        {
+          "repo": "indy-init",
+          "path": "docs/REHEARSAL-EXTERNAL-DATA-BOUNDARY.md",
+          "quote": "Prefer short-lived least-privilege tokens or GitHub App authorization."
+        }
+      ]
+    },
+    {
+      "id": "DEC-026",
+      "title": "Aegis-compatible faults for invalid transitions and violated invariants",
+      "classification": "verified-reusable",
+      "home": "rehearsal-repository",
+      "statement": "Reuse Aegis 1.0.0 (registered in echelon-current 1.27.0) for typed faults instead of inventing an error model.",
+      "constraints": [
+        "Typed rejection/fault on Boundary A",
+        "Aegis 2.0.0 is outside the profile range (registry assessment)"
+      ],
+      "requirements": [
+        "R8.3",
+        "REHEARSAL-AGENT-INTERFACE-FREEZE§boundary-a-command-submission"
+      ],
+      "findings": [],
+      "sources": [
+        {
+          "repo": "indy-init",
+          "path": "docs/REQUIREMENTS.md",
+          "quote": "Invalid transitions and violated invariants must be represented through Aegis-compatible faults rather than hidden exceptions or generic error text."
+        },
+        {
+          "repo": "echelon-registry",
+          "path": "sets/echelon-current/1.27.0.json",
+          "quote": "\"systemId\": \"aegis\""
+        }
+      ]
+    },
+    {
+      "id": "DEC-027",
+      "title": ".NET SDK 10.0.402 with rollForward disabled",
+      "classification": "verified-reusable",
+      "home": "rehearsal-repository",
+      "statement": "The storage release and its engine build were verified on SDK 10.0.402; the rehearsal pins the same SDK in global.json and makes every workflow install it (R3 D-02/D-06).",
+      "constraints": [
+        "global.json must exist in the rehearsal repository before any workflow names it"
+      ],
+      "requirements": [
+        "DEP-CURRENT-004",
+        "VER-004"
+      ],
+      "findings": [],
+      "sources": [
+        {
+          "repo": "indy-init",
+          "path": "docs/CAUSA-STORAGE-RELEASE-v1.0.0.md",
+          "quote": "10.0.402 (rollForward: disable)"
+        },
+        {
+          "repo": "causa-data",
+          "path": "global.json",
+          "quote": "\"version\": \"10.0.402\""
+        }
+      ]
+    },
+    {
+      "id": "DEC-028",
+      "title": "Dokimos 0.7.0 with Praxis 3.20.0 for attested verified completion",
+      "classification": "verified-reusable",
+      "home": "registry",
+      "statement": "Verified completion uses dokimos completion verify (0.7.0) paired with the registered Praxis; 0.6.0 is refused for attestation.",
+      "constraints": [
+        "Evidence reuse only per Dokimos Reusable rules (verification-manifest.json)"
+      ],
+      "requirements": [
+        "DCC-006",
+        "AR-007",
+        "AR-023"
+      ],
+      "findings": [],
+      "sources": [
+        {
+          "repo": "indy-init",
+          "path": "docs/OWNER-DECISIONS-2026-10-24.md",
+          "quote": "attested completion needs it alongside Praxis"
+        },
+        {
+          "repo": "echelon-registry",
+          "path": "sets/echelon-current/1.27.0.json",
+          "quote": "Replaced by Dokimos 0.7.0"
+        }
+      ]
+    },
+    {
+      "id": "DEC-029",
+      "title": "Work items enter through each repository's documented Praxis input path, never GitHub Issues",
+      "classification": "fixed-architectural",
+      "home": "praxis",
+      "statement": "Requirements packages and work items go to the documented Praxis intake (.praxis/inbox/documents/, legacy input-documents/ is also read).",
+      "constraints": [
+        "Intake files are source material, not canonical state",
+        "Derived records name their INPUT claim (praxis inbox derive)"
+      ],
+      "requirements": [
+        "VER-010",
+        "AR-017",
+        "REHEARSAL-EXTERNAL-DATA-BOUNDARY§implementation-intake"
+      ],
+      "findings": [],
+      "sources": [
+        {
+          "repo": "indy-init",
+          "path": "docs/REHEARSAL-DERIVATION-POLICY.md",
+          "quote": "Never use GitHub Issues."
+        },
+        {
+          "repo": "praxis",
+          "path": "docs/fallback-reconciliation.md",
+          "quote": "the legacy input-documents/ is read too"
+        }
+      ]
+    },
+    {
+      "id": "DEC-030",
+      "title": "Reuse existing Echelon capabilities; smallest isolated adapter where one is missing",
+      "classification": "fixed-architectural",
+      "home": "ordo",
+      "statement": "Use F#/.NET, Limen, Forma, Folio, Aegis, Praxis, Ordo, Dokimos and Percepta where they meet the contract.",
+      "constraints": [
+        "No duplicate workflow layout engine (WDL-002)",
+        "Write invariants reuse R3's typed request book and session nonce designs (R4-01)"
+      ],
+      "requirements": [
+        "ADRP-006",
+        "AR-005",
+        "WDL-002"
+      ],
+      "findings": [],
+      "sources": [
+        {
+          "repo": "indy-init",
+          "path": "docs/AGENT-DECISION-REDUCTION-PROFILE.md",
+          "quote": "Where a library lacks required functionality, implement the smallest isolated adapter."
+        },
+        {
+          "repo": "indy-init",
+          "path": "docs/REHEARSAL-004-WRITE-PATH-PLAN.md",
+          "quote": "R3's typed request book and session nonce are reused designs, not rediscovered ones"
+        }
+      ]
+    }
+  ]
+}
