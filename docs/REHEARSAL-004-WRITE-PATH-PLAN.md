@@ -4,6 +4,7 @@
 **Authority:** [OWNER-DECISIONS-2026-10-24.md](OWNER-DECISIONS-2026-10-24.md) (OD-INDY-1, -6, -7, -8).
 **Inherits:** R3-DV-001..017 from [REHEARSAL-003-DEFERRED-VERIFICATION-EXPERIMENT.md](REHEARSAL-003-DEFERRED-VERIFICATION-EXPERIMENT.md),
 except where this plan says otherwise.
+**Rehearsal 3 results:** [REHEARSAL-003-RESULTS.md](REHEARSAL-003-RESULTS.md). It covers the verdict, the reusable designs, the lessons and the gate weaknesses.
 
 ## 1. Question
 
