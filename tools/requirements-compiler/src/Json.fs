@@ -85,7 +85,10 @@ let jopt f = function Some x -> f x | None -> JNull
 
 // ---- deterministic writer --------------------------------------------------
 
-let private escape (s: string) =
+/// asciiOnly: escape every character outside printable ASCII (the compiler's own artifacts).
+/// Otherwise follow Python's json.dump(ensure_ascii=False): escape only quote, backslash and C0 controls,
+/// which is the format of the existing baseline generator.
+let private escape (asciiOnly: bool) (s: string) =
     let sb = StringBuilder(s.Length + 2)
     sb.Append('"') |> ignore
     s
@@ -96,18 +99,20 @@ let private escape (s: string) =
         | '\n' -> sb.Append("\\n") |> ignore
         | '\r' -> sb.Append("\\r") |> ignore
         | '\t' -> sb.Append("\\t") |> ignore
-        | c when c < ' ' || c > '~' -> sb.AppendFormat(CultureInfo.InvariantCulture, "\\u{0:x4}", int c) |> ignore
+        | '\b' -> sb.Append("\\b") |> ignore
+        | '\f' -> sb.Append("\\f") |> ignore
+        | c when c < ' ' || (asciiOnly && c > '~') -> sb.AppendFormat(CultureInfo.InvariantCulture, "\\u{0:x4}", int c) |> ignore
         | c -> sb.Append(c) |> ignore)
     sb.Append('"').ToString()
 
-let rec private write (sb: StringBuilder) (indent: int) (j: Json) : unit =
+let rec private write (asciiOnly: bool) (sb: StringBuilder) (indent: int) (j: Json) : unit =
     let pad n = String(' ', n)
     match j with
     | JNull -> sb.Append("null") |> ignore
     | JBool b -> sb.Append(if b then "true" else "false") |> ignore
     | JInt i -> sb.Append(i.ToString(CultureInfo.InvariantCulture)) |> ignore
     | JNum d -> sb.Append(d.ToString("0.###", CultureInfo.InvariantCulture)) |> ignore
-    | JStr s -> sb.Append(escape s) |> ignore
+    | JStr s -> sb.Append(escape asciiOnly s) |> ignore
     | JArr [] -> sb.Append("[]") |> ignore
     | JObj [] -> sb.Append("{}") |> ignore
     | JArr xs ->
@@ -115,20 +120,25 @@ let rec private write (sb: StringBuilder) (indent: int) (j: Json) : unit =
         xs
         |> List.iteri (fun i x ->
             sb.Append(pad (indent + 2)) |> ignore
-            write sb (indent + 2) x
+            write asciiOnly sb (indent + 2) x
             sb.Append(if i < xs.Length - 1 then ",\n" else "\n") |> ignore)
         sb.Append(pad indent).Append("]") |> ignore
     | JObj props ->
         sb.Append("{\n") |> ignore
         props
         |> List.iteri (fun i (k, v) ->
-            sb.Append(pad (indent + 2)).Append(escape k).Append(": ") |> ignore
-            write sb (indent + 2) v
+            sb.Append(pad (indent + 2)).Append(escape asciiOnly k).Append(": ") |> ignore
+            write asciiOnly sb (indent + 2) v
             sb.Append(if i < props.Length - 1 then ",\n" else "\n") |> ignore)
         sb.Append(pad indent).Append("}") |> ignore
 
-/// Serializes with two-space indentation, ASCII-only output and a trailing newline.
-let serialize (j: Json) : string =
+let private render (asciiOnly: bool) (j: Json) =
     let sb = StringBuilder()
-    write sb 0 j
+    write asciiOnly sb 0 j
     sb.Append('\n').ToString()
+
+/// Serializes with two-space indentation, ASCII-only output and a trailing newline.
+let serialize (j: Json) : string = render true j
+
+/// Byte-compatible with Python's json.dump(indent=2, ensure_ascii=False) plus a trailing newline.
+let serializePythonStyle (j: Json) : string = render false j

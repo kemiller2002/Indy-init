@@ -44,6 +44,8 @@ type WorkTask =
       Gates: string list
       Contracts: string list
       Decisions: string list
+      Phase: string
+      ConditionalOn: string option
       Raw: Json }
 
 type VerificationRule =
@@ -65,7 +67,9 @@ type Curation =
       Tasks: WorkTask list
       Rules: VerificationRule list
       Experiment: Json
-      External: Json list }
+      External: Json list
+      PreflightChecks: Json list
+      DefectTests: Json list }
 
 let citationOf (j: Json) =
     { Repo = str "repo" j
@@ -91,6 +95,8 @@ let taskOf (j: Json) : WorkTask =
       Gates = strs "gates" j
       Contracts = strs "contracts" j
       Decisions = strs "decisions" j
+      Phase = strOpt "phase" j |> Option.defaultValue ""
+      ConditionalOn = strOpt "conditionalOn" j
       Raw = j }
 
 let ruleOf (j: Json) : VerificationRule =

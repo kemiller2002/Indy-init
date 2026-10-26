@@ -216,7 +216,20 @@
           "path": "contract/v1.0.0/CONTRACT.md",
           "quote": "published by a non-forced ref update"
         }
-      ]
+      ],
+      "blockerClass": "contract-incompatibility",
+      "alternatives": [
+        "(a) Owner exception: causa-storage v1.0.0 wire format, paths and section 9.4.2-9.4.5 unchanged; the conforming GitHub publication mechanism of 9.4.1 is one GraphQL createCommitOnBranch carrying the three files, with expectedHeadOid set to the commit the decision was read at",
+        "(b) Version the contract (causa-storage 1.1.0, STORAGE-003) with the same rule; schemas and fixtures unchanged, new compatibility lock and release tag through causa-data's release workflow",
+        "(c) Keep the REST non-forced ref update (rejected: Rehearsal 2 review 6 proved it cannot compare-and-swap)"
+      ],
+      "recommendation": "(a) for Rehearsal 4 and the event; (b) after the event. (a) changes no data format, schema identity or fixture, needs no upstream release, and keeps optimistic concurrency (the decision's base commit stays the concurrency token, a moved head is refused and handled as a conflict). The exact amendment text is in readiness/CONTRACT-RESOLUTION.md.",
+      "consequences": [
+        "CT-007 unblocks; T04 completes by recording the exception",
+        "DCT-001/DCT-003 and the T18 recordings target createCommitOnBranch and its refusal on a moved head",
+        "causa-data CONTRACT.md stays unedited until (b)"
+      ],
+      "approvalRequired": "Owner-authored record (Ordo decision or owner commit to an OWNER-DECISIONS addendum) naming DEC-006 and F-009; agents do not write it (RDP-003, AR-003)"
     },
     {
       "id": "DEC-007",
@@ -671,7 +684,18 @@
           "path": "docs/KICKOFF-EXECUTION-PACKET.md",
           "quote": "Structured AI proposal loop works."
         }
-      ]
+      ],
+      "blockerClass": "owner-decision",
+      "alternatives": [
+        "(a) AI proposal loop (T27) and time travel (T28) in Rehearsal 4 scope",
+        "(b) Excluded from Rehearsal 4 with owner approval; event scope decided from the R4 result (R4 section 6). The proposal-authority invariant (D-004) and R11.4 stay in scope either way"
+      ],
+      "recommendation": "(b). Rehearsal 4's question is the write path within 420 minutes and it measures only write milestones; the kickoff packet's do-not-cut list names the AI proposal authority boundary (an invariant), not the loop. Excluding the two features removes two timed tasks without removing any invariant.",
+      "consequences": [
+        "T27 and T28 leave the timed plan only after an approved exclusion covering KICKOFF-EXECUTION-PACKET 12-45, 2-45 and ai-tool-agent, S14 and S15",
+        "Without approval they stay on the plan before T31"
+      ],
+      "approvalRequired": "Owner approval record covering the exclusion (praxis.requirements-approvals/1 written by the owner, RDP-003)"
     },
     {
       "id": "DEC-023",
@@ -693,7 +717,18 @@
           "path": "docs/REHEARSAL-AGENT-INTERFACE-FREEZE.md",
           "quote": "Extract actual types and exported interfaces from accepted R001 F# source and Limen adapter."
         }
-      ]
+      ],
+      "blockerClass": "owner-decision",
+      "alternatives": [
+        "(a) Rehearsal 4 extracts interfaces from existing rehearsal source (permitted: it is a rehearsal); the event carries only the documented interface manifest, no source, subject to organizer confirmation (T06)",
+        "(b) Both derive interfaces at kickoff from the frozen storage contract and the command/event catalog"
+      ],
+      "recommendation": "(a). It keeps T14 short in Rehearsal 4 and lets the organizer rule on the event without blocking the rehearsal. If the organizer refuses, the event uses (b).",
+      "consequences": [
+        "T14 consumes an existing manifest in R4",
+        "Event plan depends on PRE-ORG-01"
+      ],
+      "approvalRequired": "Owner decision for R4; organizer confirmation for the event"
     },
     {
       "id": "DEC-024",
@@ -715,7 +750,18 @@
           "path": "docs/CAUSA-UI-EXPERIENCE-REQUIREMENTS.md",
           "quote": "On launch, show all five frozen demonstration investigations and user working copies."
         }
-      ]
+      ],
+      "blockerClass": "requirement-conflict",
+      "alternatives": [
+        "(a) Owner commit restating UI-001 and UI-015 against the connected catalog: after explicit Connect, the launch view lists the active catalog (historical-v1: Apollo 1, Apollo 11, Challenger STS-51-L); before Connect, an empty disconnected workspace; the five synthetic v1.0.0 fixtures stay the contract test corpus (G4). Add EXT-DATA-013 for loading the active catalog",
+        "(b) Keep UI-001 literally with an exception to EXT-DATA-001/002 and the catalog policy"
+      ],
+      "recommendation": "(a). It agrees with EXT-DATA-001/002, OD-INDY-3 and the causa-data catalog policy, keeps runtime loading from the user-connected repository and bundles no data. The proposed text is on branch claude/r4-owner-requirement-changes.",
+      "consequences": [
+        "UI-001, UI-015 obligations change and EXT-DATA-013 is added: baseline regenerated (F-003)",
+        "T22 and T25 acceptance target the three historical cases"
+      ],
+      "approvalRequired": "Owner merge of the requirement-change PR (OD-INDY-6: only owner commits change the baseline)"
     },
     {
       "id": "DEC-025",
@@ -736,8 +782,26 @@
           "repo": "indy-init",
           "path": "docs/REHEARSAL-EXTERNAL-DATA-BOUNDARY.md",
           "quote": "Prefer short-lived least-privilege tokens or GitHub App authorization."
+        },
+        {
+          "repo": "indy-init-rehearsal-003",
+          "path": "docs/REHEARSAL-003-REMEDIATION-REPORT.md",
+          "quote": "the anonymous path passes only fully or on GitHub's own exhausted-quota answer"
         }
-      ]
+      ],
+      "blockerClass": "owner-decision",
+      "alternatives": [
+        "(a) Fine-grained personal access token entered by the user in the Connect form: limited to the selected data repository (Contents read/write, Metadata read), short expiry, held in memory only (re-entered after reload, EXT-DATA-004), sent only in the Authorization header; the app reads X-OAuth-Scopes (exposed by api.github.com CORS) and refuses classic tokens carrying 'repo' or admin scopes",
+        "(b) GitHub App user token through the device flow: needs a token-exchange service, because a static page cannot call GitHub's login endpoints cross-origin (to be verified; this session's proxy prevented the check); adds a service outside static hosting",
+        "(c) OAuth web flow: needs a client secret and therefore a backend"
+      ],
+      "recommendation": "(a), with a credential required for every connection (no anonymous mode: Rehearsal 3 hit GitHub's exhausted anonymous quota). It needs no service, works in iPad Safari (plain fetch with an Authorization header; api.github.com answers Access-Control-Allow-Origin: *), and keeps least privilege. The CI live job uses the separate CAUSA_GITHUB_TOKEN Actions secret, never the browser path.",
+      "consequences": [
+        "CT-017 becomes defined; DCT-004 covers absent permission fields",
+        "Connect UI: repository, branch, workspace, token field (type=password, autocomplete=off), clear refusal messages",
+        "PRE-AUTH-02 verifies the CI token is not a broad classic token"
+      ],
+      "approvalRequired": "Owner decision record (security boundary); F-019 and F-012 close with it"
     },
     {
       "id": "DEC-026",

@@ -1,0 +1,151 @@
+{
+  "schema": "indy-init.preflight-evidence/1",
+  "executedAt": "2026-10-26T13:01:33Z",
+  "sourceCommit": "be484f0ae33c1f1b19677d5111866abb96c1c297",
+  "verdict": "FAIL",
+  "rule": "READY only when every check is PASS (PRE-ORG-01 may stay NOT_RUN for a rehearsal); any FAIL gives FAIL, otherwise BLOCKED",
+  "summary": {
+    "BLOCKED": 6,
+    "FAIL": 2,
+    "NOT_RUN": 4,
+    "PASS": 5
+  },
+  "results": [
+    {
+      "id": "PRE-AUTH-01",
+      "category": "authentication",
+      "type": "env-present",
+      "title": "Live-job secret and test repository are configured (values never read into evidence)",
+      "status": "BLOCKED",
+      "detail": "not set: CAUSA_GITHUB_TOKEN, CAUSA_TEST_REPO"
+    },
+    {
+      "id": "PRE-AUTH-02",
+      "category": "authentication",
+      "type": "github-auth-contract",
+      "title": "Token reads the test repository and is not a broad classic token (no 'repo'/'admin' X-OAuth-Scopes)",
+      "status": "NOT_RUN",
+      "detail": "CAUSA_GITHUB_TOKEN and CAUSA_TEST_REPO are required; nothing was sent"
+    },
+    {
+      "id": "PRE-DEC-01",
+      "category": "owner-decisions",
+      "type": "package-state",
+      "title": "Every decision the run depends on is decided by the owner",
+      "status": "BLOCKED",
+      "detail": "unresolved: DEC-006, DEC-022, DEC-023, DEC-024, DEC-025"
+    },
+    {
+      "id": "PRE-DEC-02",
+      "category": "owner-decisions",
+      "type": "package-state",
+      "title": "No critical material finding is unresolved",
+      "status": "BLOCKED",
+      "detail": "open: F-001, F-003, F-004, F-005, F-008, F-009"
+    },
+    {
+      "id": "PRE-DEP-01",
+      "category": "dependency-release",
+      "type": "registry-set-contains",
+      "title": "The newest approved echelon-current set contains every required system, including percepta-semantic",
+      "status": "BLOCKED",
+      "detail": "newest set sets/echelon-current/1.27.0.json (status approved) lacks: percepta-semantic"
+    },
+    {
+      "id": "PRE-DEP-02",
+      "category": "contract-compatibility",
+      "type": "package-state",
+      "title": "No contract the run consumes is blocked (write primitive, Percepta, Praxis gate, release set)",
+      "status": "BLOCKED",
+      "detail": "blocked: CT-007, CT-012, CT-013, CT-016"
+    },
+    {
+      "id": "PRE-DEP-03",
+      "category": "contract-compatibility",
+      "type": "package-state",
+      "title": "Storage contract and historical catalog identities match (CT-006, CT-008)",
+      "status": "PASS",
+      "detail": "5 identities match"
+    },
+    {
+      "id": "PRE-ORG-01",
+      "category": "owner-decisions",
+      "type": "manual",
+      "title": "Organizer confirmation for prepared data and requirements (event only; not required for Rehearsal 4)",
+      "status": "NOT_RUN",
+      "detail": "needs a record: organizer confirmation covering causa-data, the historical catalog and this package (ADRP readiness checklist)"
+    },
+    {
+      "id": "PRE-REQ-01",
+      "category": "requirements-baseline",
+      "type": "baseline-pinned",
+      "title": "Committed baseline is pinned at the source commit and equals the generator's output there",
+      "status": "PASS",
+      "detail": "pinned at c751d58d66e3f105a8c67a0cb5e069314bdbd391; no drift: requirements, obligations and document hashes equal the generator's output at be484f0ae33c1f1b19677d5111866abb96c1c297"
+    },
+    {
+      "id": "PRE-REQ-02",
+      "category": "requirements-preservation",
+      "type": "package-state",
+      "title": "Compiled package passes every critical check (V01-V13, V15-V16)",
+      "status": "FAIL",
+      "detail": "compilation verdict FAIL"
+    },
+    {
+      "id": "PRE-REQ-03",
+      "category": "requirements-preservation",
+      "type": "git-ref-contains",
+      "title": "A released Praxis carries `requirements preservation verify` (RDP-004 without a VER-005 exception)",
+      "status": "BLOCKED",
+      "detail": "latest release v3.20.0 has no 'preservation' under src/Praxis.Cli"
+    },
+    {
+      "id": "PRE-REQ-04",
+      "category": "requirements-preservation",
+      "type": "manual",
+      "title": "Preservation gate PASS on the derived package, disposition and operator approvals",
+      "status": "NOT_RUN",
+      "detail": "needs a record: praxis requirements preservation verify exit 0, evidence committed in the rehearsal repository (RDP-004)"
+    },
+    {
+      "id": "PRE-SEC-01",
+      "category": "authentication",
+      "type": "secret-scan",
+      "title": "No GitHub credential is committed in the planning repository",
+      "status": "PASS",
+      "detail": "no GitHub token pattern in any tracked file at be484f0ae33c1f1b19677d5111866abb96c1c297"
+    },
+    {
+      "id": "PRE-TOOL-01",
+      "category": "toolchain",
+      "type": "sdk-pinned",
+      "title": "The installed .NET SDK equals the pinned SDK (10.0.402, rollForward disable)",
+      "status": "FAIL",
+      "detail": "check raised: Could not find file '/tmp/claude-0/wt-req/global.json'."
+    },
+    {
+      "id": "PRE-TOOL-02",
+      "category": "toolchain",
+      "type": "git-ref-contains",
+      "title": "The latest Conditor release carries the SD-1 fix (CON-367: scaffold pins web packages through their Registry distribution)",
+      "status": "PASS",
+      "detail": "v0.10.11 contains 'CON-367' under src/Conditor.Core"
+    },
+    {
+      "id": "PRE-TOOL-03",
+      "category": "toolchain",
+      "type": "manual",
+      "title": "Bootstrap without the SD-1 workaround reaches first green CI",
+      "status": "NOT_RUN",
+      "detail": "needs a record: bootstrap commit in the rehearsal repository produced by Conditor on the kickoff set without the SD-1 hand workaround, first green CI (R4 P3, P5)"
+    },
+    {
+      "id": "PRE-VER-01",
+      "category": "verification-planning",
+      "type": "package-state",
+      "title": "Preflight and timed-execution manifests are complete and consistent (V16)",
+      "status": "PASS",
+      "detail": "V16 PASS"
+    }
+  ]
+}

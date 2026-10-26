@@ -2,68 +2,273 @@
   "schema": "indy-init.rc-sources/1",
   "description": "Revisions, classification tables, verification defaults and plan assumptions used by requirements-compiler. Every repository below is read at exactly the recorded commit.",
   "repositories": [
-    { "name": "indy-init", "commit": "252cd2ef42f81c366bd2d7e9341c26edb7c64d55", "role": "primary: authoritative requirements (source commit of this package)" },
-    { "name": "causa-data", "commit": "22260f429501d0d6963fc33302ed1e64d742a374", "role": "storage contract, active historical catalog and its requirements" },
-    { "name": "praxis", "commit": "bf7bf04fde6b252a06fe7e12cddc6d4d3ac99eb3", "role": "requirements intake contract" },
-    { "name": "ordo", "commit": "2df928ae4618eb075d226ff307843827486ffe39", "role": "decision authority" },
-    { "name": "dokimos", "commit": "bf6a62bb6246177c30cc64af35921a300b7ddf9a", "role": "verification and completion evidence" },
-    { "name": "percepta", "commit": "e5bb5961b739bd8ae58bc6b9040f8495eee2c49a", "role": "semantic UI verification and telemetry metric vocabulary" },
-    { "name": "forma", "commit": "28d1101ec0121bbdca7e83bd981cfd58726bcd60", "role": "design system" },
-    { "name": "limen", "commit": "ddfc1e877cff1bbcb585952289f8eeae3062addd", "role": "browser/WASM boundary" },
-    { "name": "folio", "commit": "217d644e39b11127620f8d83a1e1ee9dff59ec48", "role": "print/report components" },
-    { "name": "echelon-registry", "commit": "882bf2e2f2499e6c1c1c77f54539e1acc3d9aa7b", "role": "approved release sets" },
-    { "name": "indy-init-rehearsal-001", "commit": "dd63ab4ab0fab0ea07d2d1390dc10636e37243cb", "role": "historical evidence (R1)" },
-    { "name": "indy-init-rehearsal-002", "commit": "b053d1da4ef533fba7d6728c369c58a29a1e2440", "role": "historical evidence (R2)" },
-    { "name": "indy-init-rehearsal-003", "commit": "bc6eb5b4e3d4ccc11e9f1c39b57276f408caa3b8", "role": "historical evidence (R3)" }
+    {
+      "name": "indy-init",
+      "commit": "9d989389260342c77feea1aca52dd8d3d7b746ae",
+      "role": "primary: authoritative requirements (source commit of this package)"
+    },
+    {
+      "name": "causa-data",
+      "commit": "22260f429501d0d6963fc33302ed1e64d742a374",
+      "role": "storage contract, active historical catalog and its requirements"
+    },
+    {
+      "name": "praxis",
+      "commit": "bf7bf04fde6b252a06fe7e12cddc6d4d3ac99eb3",
+      "role": "requirements intake contract"
+    },
+    {
+      "name": "ordo",
+      "commit": "2df928ae4618eb075d226ff307843827486ffe39",
+      "role": "decision authority"
+    },
+    {
+      "name": "dokimos",
+      "commit": "bf6a62bb6246177c30cc64af35921a300b7ddf9a",
+      "role": "verification and completion evidence"
+    },
+    {
+      "name": "percepta",
+      "commit": "e5bb5961b739bd8ae58bc6b9040f8495eee2c49a",
+      "role": "semantic UI verification and telemetry metric vocabulary"
+    },
+    {
+      "name": "forma",
+      "commit": "28d1101ec0121bbdca7e83bd981cfd58726bcd60",
+      "role": "design system"
+    },
+    {
+      "name": "limen",
+      "commit": "ddfc1e877cff1bbcb585952289f8eeae3062addd",
+      "role": "browser/WASM boundary"
+    },
+    {
+      "name": "folio",
+      "commit": "217d644e39b11127620f8d83a1e1ee9dff59ec48",
+      "role": "print/report components"
+    },
+    {
+      "name": "echelon-registry",
+      "commit": "2d6338e8286a968ec7e4f356af60dde789797e5a",
+      "role": "approved release sets"
+    },
+    {
+      "name": "indy-init-rehearsal-001",
+      "commit": "dd63ab4ab0fab0ea07d2d1390dc10636e37243cb",
+      "role": "historical evidence (R1)"
+    },
+    {
+      "name": "indy-init-rehearsal-002",
+      "commit": "b053d1da4ef533fba7d6728c369c58a29a1e2440",
+      "role": "historical evidence (R2)"
+    },
+    {
+      "name": "indy-init-rehearsal-003",
+      "commit": "bc6eb5b4e3d4ccc11e9f1c39b57276f408caa3b8",
+      "role": "historical evidence (R3)"
+    },
+    {
+      "name": "conditor",
+      "commit": "b37c7d35d1a1c2dbfcc94e58d38fb08f1e1f5680",
+      "role": "bootstrap tool (SD-1 fix status)"
+    }
   ],
   "dependencyVersions": [
-    { "system": "echelon-current release set", "version": "1.27.0", "source": "echelon-registry sets/echelon-current/1.27.0.json (approved 2026-10-24; records the percepta-semantic exception)" },
-    { "system": "praxis", "version": "3.20.0", "source": "tag v3.20.0 -> ee6430af; set 1.27.0. The preservation gate is not in this release (draft praxis#292)" },
-    { "system": "ordo", "version": "1.17.0", "source": "tag v1.17.0 -> bb43c26c; set 1.27.0" },
-    { "system": "dokimos", "version": "0.7.0", "source": "tag dokimos-v0.7.0 -> 04b5f856; set 1.27.0" },
-    { "system": "percepta (repository lifecycle)", "version": "0.1.0", "source": "set 1.27.0" },
-    { "system": "percepta-semantic", "version": "0.2.1 (released, not registered)", "source": "tag percepta-semantic-v0.2.1 -> 8b78df80; absent from set 1.27.0" },
-    { "system": "limen", "version": "0.9.0", "source": "tag v0.9.0 -> 96eb75fb; set 1.27.0 (0.9.1 pending, unregistered)" },
-    { "system": "limen-fsharp", "version": "0.9.0", "source": "set 1.27.0" },
-    { "system": "forma", "version": "0.9.0", "source": "tag v0.9.0 -> 18e6ff7b; set 1.27.0 (0.9.1 pending, unregistered)" },
-    { "system": "folio", "version": "0.4.0", "source": "set 1.27.0; tag v0.4.1 -> a94cea73 exists and is not assessed in the set" },
-    { "system": "aegis", "version": "1.0.0", "source": "set 1.27.0" },
-    { "system": "causa storage contract", "version": "1.0.0", "source": "tag causa-storage-v1.0.0 -> c947c7e3" },
-    { "system": "causa historical catalog", "version": "historical-v1 (catalogVersion 1.0.0)", "source": "causa-data catalog/active.json at 22260f42" },
-    { "system": ".NET SDK", "version": "10.0.402", "source": "causa-data global.json; tools/requirements-compiler/global.json" }
+    {
+      "system": "echelon-current release set",
+      "version": "1.27.0",
+      "source": "echelon-registry sets/echelon-current/1.27.0.json at 2d6338e (newest set; records the percepta-semantic exception)"
+    },
+    {
+      "system": "praxis",
+      "version": "3.20.0",
+      "source": "tag v3.20.0 -> ee6430af; set 1.27.0. The preservation gate is not in this release (draft praxis#292)"
+    },
+    {
+      "system": "ordo",
+      "version": "1.17.0",
+      "source": "tag v1.17.0 -> bb43c26c; set 1.27.0"
+    },
+    {
+      "system": "dokimos",
+      "version": "0.7.0",
+      "source": "tag dokimos-v0.7.0 -> 04b5f856; set 1.27.0"
+    },
+    {
+      "system": "percepta (repository lifecycle)",
+      "version": "0.1.0",
+      "source": "set 1.27.0"
+    },
+    {
+      "system": "percepta-semantic",
+      "version": "0.2.1 (released; registered as a release; in no approved set)",
+      "source": "tag percepta-semantic-v0.2.1 -> 8b78df80; echelon-registry releases/percepta-semantic/0.2.1.release.json (PR #96/#97, merged 2026-10-26); echelon-current 1.28.0 not cut"
+    },
+    {
+      "system": "limen",
+      "version": "0.9.0",
+      "source": "tag v0.9.0 -> 96eb75fb; set 1.27.0 (0.9.1 pending, unregistered)"
+    },
+    {
+      "system": "limen-fsharp",
+      "version": "0.9.0",
+      "source": "set 1.27.0"
+    },
+    {
+      "system": "forma",
+      "version": "0.9.0",
+      "source": "tag v0.9.0 -> 18e6ff7b; set 1.27.0 (0.9.1 pending, unregistered)"
+    },
+    {
+      "system": "folio",
+      "version": "0.4.0",
+      "source": "set 1.27.0; tag v0.4.1 -> a94cea73 exists and is not assessed in the set"
+    },
+    {
+      "system": "aegis",
+      "version": "1.0.0",
+      "source": "set 1.27.0"
+    },
+    {
+      "system": "causa storage contract",
+      "version": "1.0.0",
+      "source": "tag causa-storage-v1.0.0 -> c947c7e3"
+    },
+    {
+      "system": "causa historical catalog",
+      "version": "historical-v1 (catalogVersion 1.0.0)",
+      "source": "causa-data catalog/active.json at 22260f42"
+    },
+    {
+      "system": ".NET SDK",
+      "version": "10.0.402",
+      "source": "causa-data global.json; tools/requirements-compiler/global.json"
+    },
+    {
+      "system": "conditor",
+      "version": "0.10.11",
+      "source": "tag v0.10.11 -> b37c7d35; carries CON-367 (SD-1 scaffold distribution fix, WI-0050); qualified echelon-current 1.27.0 (registry approval evidence)"
+    }
   ],
   "implementationStatusBasis": "No implementation evidence is attributed to this requirement. kemiller2002/indy-init is the planning repository and contains no application source at the source commit (validation check V10). Rehearsal results are not carried forward as evidence: Rehearsal 2's ledger is INVALID under tools/validate-acceptance-ledger.py and Rehearsal 3 is NOT ACCEPTED (docs/OWNER-DECISIONS-2026-10-24.md, Consequences).",
   "nearDuplicateThreshold": "0.6",
   "categories": [
-    { "match": "origin:external", "category": "data-content" },
-    { "match": "doc:docs/CAUSA-UI-EXPERIENCE-REQUIREMENTS.md", "category": "ui" },
-    { "match": "doc:docs/WASM-LOADING-EXPERIENCE-REQUIREMENTS.md", "category": "ui-loading" },
-    { "match": "doc:docs/PROVIDER-FIXTURE-AND-INTEGRATION-REQUIREMENTS.md", "category": "integration-testing" },
-    { "match": "doc:docs/REHEARSAL-EXTERNAL-DATA-BOUNDARY.md", "category": "data-boundary" },
-    { "match": "doc:docs/FROZEN-DEMO-STORAGE-REQUIREMENTS.md", "category": "storage-contract" },
-    { "match": "doc:docs/CAUSA-STORAGE-RELEASE-v1.0.0.md", "category": "storage-contract" },
-    { "match": "doc:docs/DEFECT-CLASS-CLOSURE-AND-RELEASE-GATES.md", "category": "quality-process" },
-    { "match": "doc:docs/AGENT-DECISION-REDUCTION-PROFILE.md", "category": "implementation-profile" },
-    { "match": "doc:docs/REHEARSAL-DEPENDENCY-LOCK.md", "category": "dependency-management" },
-    { "match": "doc:docs/SYSTEM-VERSION-AND-COMPATIBILITY-REQUIREMENTS.md", "category": "dependency-management" },
-    { "match": "regex:^R0\\.", "category": "competition-integrity" },
-    { "match": "regex:^R[1-8]\\.\\d+$", "category": "domain" },
-    { "match": "regex:^R9\\.", "category": "ui" },
-    { "match": "regex:^R10\\.", "category": "persistence" },
-    { "match": "regex:^R11\\.", "category": "security" },
-    { "match": "regex:^R12\\.", "category": "reporting" },
-    { "match": "regex:^R1[34]\\.", "category": "engineering-factory" },
-    { "match": "regex:^R15\\.", "category": "epistemic" },
-    { "match": "regex:^R16\\.", "category": "demonstration" },
-    { "match": "doc:docs/REQUIREMENTS.md", "category": "release-profile" },
-    { "match": "doc:docs/SCREEN-CONTRACTS.md", "category": "ui-screen" },
-    { "match": "doc:docs/DESIGN-DECISION-BOUNDARIES.md", "category": "architecture-decision" },
-    { "match": "doc:docs/STATE-TRANSITION-TABLES.md", "category": "domain" },
-    { "match": "doc:docs/KICKOFF-EXECUTION-PACKET.md", "category": "execution-process" },
-    { "match": "doc:docs/WORKFLOW-DIAGRAM-INTEGRATION-REQUIREMENTS.md", "category": "ui-visualization" },
-    { "match": "doc:docs/AGENT-RELIABILITY-REQUIREMENTS.md", "category": "agent-reliability" },
-    { "match": "doc:docs/REHEARSAL-AGENT-INTERFACE-FREEZE.md", "category": "interface-contract" },
-    { "match": "doc:docs/REHEARSAL-ACCEPTANCE-LEDGER.md", "category": "verification-evidence" }
+    {
+      "match": "origin:external",
+      "category": "data-content"
+    },
+    {
+      "match": "doc:docs/CAUSA-UI-EXPERIENCE-REQUIREMENTS.md",
+      "category": "ui"
+    },
+    {
+      "match": "doc:docs/WASM-LOADING-EXPERIENCE-REQUIREMENTS.md",
+      "category": "ui-loading"
+    },
+    {
+      "match": "doc:docs/PROVIDER-FIXTURE-AND-INTEGRATION-REQUIREMENTS.md",
+      "category": "integration-testing"
+    },
+    {
+      "match": "doc:docs/REHEARSAL-EXTERNAL-DATA-BOUNDARY.md",
+      "category": "data-boundary"
+    },
+    {
+      "match": "doc:docs/FROZEN-DEMO-STORAGE-REQUIREMENTS.md",
+      "category": "storage-contract"
+    },
+    {
+      "match": "doc:docs/CAUSA-STORAGE-RELEASE-v1.0.0.md",
+      "category": "storage-contract"
+    },
+    {
+      "match": "doc:docs/DEFECT-CLASS-CLOSURE-AND-RELEASE-GATES.md",
+      "category": "quality-process"
+    },
+    {
+      "match": "doc:docs/AGENT-DECISION-REDUCTION-PROFILE.md",
+      "category": "implementation-profile"
+    },
+    {
+      "match": "doc:docs/REHEARSAL-DEPENDENCY-LOCK.md",
+      "category": "dependency-management"
+    },
+    {
+      "match": "doc:docs/SYSTEM-VERSION-AND-COMPATIBILITY-REQUIREMENTS.md",
+      "category": "dependency-management"
+    },
+    {
+      "match": "regex:^R0\\.",
+      "category": "competition-integrity"
+    },
+    {
+      "match": "regex:^R[1-8]\\.\\d+$",
+      "category": "domain"
+    },
+    {
+      "match": "regex:^R9\\.",
+      "category": "ui"
+    },
+    {
+      "match": "regex:^R10\\.",
+      "category": "persistence"
+    },
+    {
+      "match": "regex:^R11\\.",
+      "category": "security"
+    },
+    {
+      "match": "regex:^R12\\.",
+      "category": "reporting"
+    },
+    {
+      "match": "regex:^R1[34]\\.",
+      "category": "engineering-factory"
+    },
+    {
+      "match": "regex:^R15\\.",
+      "category": "epistemic"
+    },
+    {
+      "match": "regex:^R16\\.",
+      "category": "demonstration"
+    },
+    {
+      "match": "doc:docs/REQUIREMENTS.md",
+      "category": "release-profile"
+    },
+    {
+      "match": "doc:docs/SCREEN-CONTRACTS.md",
+      "category": "ui-screen"
+    },
+    {
+      "match": "doc:docs/DESIGN-DECISION-BOUNDARIES.md",
+      "category": "architecture-decision"
+    },
+    {
+      "match": "doc:docs/STATE-TRANSITION-TABLES.md",
+      "category": "domain"
+    },
+    {
+      "match": "doc:docs/KICKOFF-EXECUTION-PACKET.md",
+      "category": "execution-process"
+    },
+    {
+      "match": "doc:docs/WORKFLOW-DIAGRAM-INTEGRATION-REQUIREMENTS.md",
+      "category": "ui-visualization"
+    },
+    {
+      "match": "doc:docs/AGENT-RELIABILITY-REQUIREMENTS.md",
+      "category": "agent-reliability"
+    },
+    {
+      "match": "doc:docs/REHEARSAL-AGENT-INTERFACE-FREEZE.md",
+      "category": "interface-contract"
+    },
+    {
+      "match": "doc:docs/REHEARSAL-ACCEPTANCE-LEDGER.md",
+      "category": "verification-evidence"
+    }
   ],
   "verificationDefaults": {
     "freshness": [
@@ -107,5 +312,13 @@
         "All readiness blockers in requirements-validation-report.json."
       ]
     }
-  ]
+  ],
+  "blockerClasses": {
+    "requirement-conflict": "Indy-init requirement conflict",
+    "owner-decision": "Owner decision",
+    "external-dependency": "External dependency (upstream release or registration)",
+    "contract-incompatibility": "Contract incompatibility",
+    "environment": "Environment or configuration issue",
+    "verification-deficiency": "Verification deficiency"
+  }
 }

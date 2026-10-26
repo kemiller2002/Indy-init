@@ -593,7 +593,7 @@
       ],
       "obligations": [],
       "similarity": null,
-      "text": "REHEARSAL-ACCEPTANCE-LEDGER\u00a7preamble repeats all 8 obligations of REHEARSAL-ACCEPTANCE-LEDGER\u00a7release-acceptance-predicate"
+      "text": "REHEARSAL-ACCEPTANCE-LEDGER\u00a7preamble repeats all 19 obligations of REHEARSAL-ACCEPTANCE-LEDGER\u00a7release-acceptance-predicate"
     },
     {
       "id": "CNT-0053",
@@ -626,7 +626,7 @@
       ],
       "obligations": [],
       "similarity": null,
-      "text": "REHEARSAL-ACCEPTANCE-LEDGER\u00a7preamble repeats all 10 obligations of REHEARSAL-ACCEPTANCE-LEDGER\u00a7single-ledger-format"
+      "text": "REHEARSAL-ACCEPTANCE-LEDGER\u00a7preamble repeats all 14 obligations of REHEARSAL-ACCEPTANCE-LEDGER\u00a7single-ledger-format"
     },
     {
       "id": "CNT-0056",
@@ -13074,7 +13074,22 @@
         "REHEARSAL-ACCEPTANCE-LEDGER\u00a7preamble-O36",
         "REHEARSAL-ACCEPTANCE-LEDGER\u00a7preamble-O37",
         "REHEARSAL-ACCEPTANCE-LEDGER\u00a7preamble-O38",
-        "REHEARSAL-ACCEPTANCE-LEDGER\u00a7preamble-O39"
+        "REHEARSAL-ACCEPTANCE-LEDGER\u00a7preamble-O39",
+        "REHEARSAL-ACCEPTANCE-LEDGER\u00a7preamble-O40",
+        "REHEARSAL-ACCEPTANCE-LEDGER\u00a7preamble-O41",
+        "REHEARSAL-ACCEPTANCE-LEDGER\u00a7preamble-O42",
+        "REHEARSAL-ACCEPTANCE-LEDGER\u00a7preamble-O43",
+        "REHEARSAL-ACCEPTANCE-LEDGER\u00a7preamble-O44",
+        "REHEARSAL-ACCEPTANCE-LEDGER\u00a7preamble-O45",
+        "REHEARSAL-ACCEPTANCE-LEDGER\u00a7preamble-O46",
+        "REHEARSAL-ACCEPTANCE-LEDGER\u00a7preamble-O47",
+        "REHEARSAL-ACCEPTANCE-LEDGER\u00a7preamble-O48",
+        "REHEARSAL-ACCEPTANCE-LEDGER\u00a7preamble-O49",
+        "REHEARSAL-ACCEPTANCE-LEDGER\u00a7preamble-O50",
+        "REHEARSAL-ACCEPTANCE-LEDGER\u00a7preamble-O51",
+        "REHEARSAL-ACCEPTANCE-LEDGER\u00a7preamble-O52",
+        "REHEARSAL-ACCEPTANCE-LEDGER\u00a7preamble-O53",
+        "REHEARSAL-ACCEPTANCE-LEDGER\u00a7preamble-O54"
       ],
       "textPolicy": "verbatim: obligation text is carried only in requirements-inventory.json and is not reworded",
       "acceptance": {
@@ -13118,7 +13133,22 @@
           "REHEARSAL-ACCEPTANCE-LEDGER\u00a7preamble-O36",
           "REHEARSAL-ACCEPTANCE-LEDGER\u00a7preamble-O37",
           "REHEARSAL-ACCEPTANCE-LEDGER\u00a7preamble-O38",
-          "REHEARSAL-ACCEPTANCE-LEDGER\u00a7preamble-O39"
+          "REHEARSAL-ACCEPTANCE-LEDGER\u00a7preamble-O39",
+          "REHEARSAL-ACCEPTANCE-LEDGER\u00a7preamble-O40",
+          "REHEARSAL-ACCEPTANCE-LEDGER\u00a7preamble-O41",
+          "REHEARSAL-ACCEPTANCE-LEDGER\u00a7preamble-O42",
+          "REHEARSAL-ACCEPTANCE-LEDGER\u00a7preamble-O43",
+          "REHEARSAL-ACCEPTANCE-LEDGER\u00a7preamble-O44",
+          "REHEARSAL-ACCEPTANCE-LEDGER\u00a7preamble-O45",
+          "REHEARSAL-ACCEPTANCE-LEDGER\u00a7preamble-O46",
+          "REHEARSAL-ACCEPTANCE-LEDGER\u00a7preamble-O47",
+          "REHEARSAL-ACCEPTANCE-LEDGER\u00a7preamble-O48",
+          "REHEARSAL-ACCEPTANCE-LEDGER\u00a7preamble-O49",
+          "REHEARSAL-ACCEPTANCE-LEDGER\u00a7preamble-O50",
+          "REHEARSAL-ACCEPTANCE-LEDGER\u00a7preamble-O51",
+          "REHEARSAL-ACCEPTANCE-LEDGER\u00a7preamble-O52",
+          "REHEARSAL-ACCEPTANCE-LEDGER\u00a7preamble-O53",
+          "REHEARSAL-ACCEPTANCE-LEDGER\u00a7preamble-O54"
         ],
         "linkedSections": [
           "REHEARSAL-ACCEPTANCE-LEDGER\u00a7release-acceptance-predicate"
@@ -13157,6 +13187,7 @@
       "modality": "must",
       "category": "verification-evidence",
       "tags": [
+        "security",
         "error-handling"
       ],
       "obligations": [
@@ -13167,7 +13198,18 @@
         "REHEARSAL-ACCEPTANCE-LEDGER\u00a7release-acceptance-predicate-O5",
         "REHEARSAL-ACCEPTANCE-LEDGER\u00a7release-acceptance-predicate-O6",
         "REHEARSAL-ACCEPTANCE-LEDGER\u00a7release-acceptance-predicate-O7",
-        "REHEARSAL-ACCEPTANCE-LEDGER\u00a7release-acceptance-predicate-O8"
+        "REHEARSAL-ACCEPTANCE-LEDGER\u00a7release-acceptance-predicate-O8",
+        "REHEARSAL-ACCEPTANCE-LEDGER\u00a7release-acceptance-predicate-O9",
+        "REHEARSAL-ACCEPTANCE-LEDGER\u00a7release-acceptance-predicate-O10",
+        "REHEARSAL-ACCEPTANCE-LEDGER\u00a7release-acceptance-predicate-O11",
+        "REHEARSAL-ACCEPTANCE-LEDGER\u00a7release-acceptance-predicate-O12",
+        "REHEARSAL-ACCEPTANCE-LEDGER\u00a7release-acceptance-predicate-O13",
+        "REHEARSAL-ACCEPTANCE-LEDGER\u00a7release-acceptance-predicate-O14",
+        "REHEARSAL-ACCEPTANCE-LEDGER\u00a7release-acceptance-predicate-O15",
+        "REHEARSAL-ACCEPTANCE-LEDGER\u00a7release-acceptance-predicate-O16",
+        "REHEARSAL-ACCEPTANCE-LEDGER\u00a7release-acceptance-predicate-O17",
+        "REHEARSAL-ACCEPTANCE-LEDGER\u00a7release-acceptance-predicate-O18",
+        "REHEARSAL-ACCEPTANCE-LEDGER\u00a7release-acceptance-predicate-O19"
       ],
       "textPolicy": "verbatim: obligation text is carried only in requirements-inventory.json and is not reworded",
       "acceptance": {
@@ -13180,7 +13222,18 @@
           "REHEARSAL-ACCEPTANCE-LEDGER\u00a7release-acceptance-predicate-O5",
           "REHEARSAL-ACCEPTANCE-LEDGER\u00a7release-acceptance-predicate-O6",
           "REHEARSAL-ACCEPTANCE-LEDGER\u00a7release-acceptance-predicate-O7",
-          "REHEARSAL-ACCEPTANCE-LEDGER\u00a7release-acceptance-predicate-O8"
+          "REHEARSAL-ACCEPTANCE-LEDGER\u00a7release-acceptance-predicate-O8",
+          "REHEARSAL-ACCEPTANCE-LEDGER\u00a7release-acceptance-predicate-O9",
+          "REHEARSAL-ACCEPTANCE-LEDGER\u00a7release-acceptance-predicate-O10",
+          "REHEARSAL-ACCEPTANCE-LEDGER\u00a7release-acceptance-predicate-O11",
+          "REHEARSAL-ACCEPTANCE-LEDGER\u00a7release-acceptance-predicate-O12",
+          "REHEARSAL-ACCEPTANCE-LEDGER\u00a7release-acceptance-predicate-O13",
+          "REHEARSAL-ACCEPTANCE-LEDGER\u00a7release-acceptance-predicate-O14",
+          "REHEARSAL-ACCEPTANCE-LEDGER\u00a7release-acceptance-predicate-O15",
+          "REHEARSAL-ACCEPTANCE-LEDGER\u00a7release-acceptance-predicate-O16",
+          "REHEARSAL-ACCEPTANCE-LEDGER\u00a7release-acceptance-predicate-O17",
+          "REHEARSAL-ACCEPTANCE-LEDGER\u00a7release-acceptance-predicate-O18",
+          "REHEARSAL-ACCEPTANCE-LEDGER\u00a7release-acceptance-predicate-O19"
         ],
         "linkedSections": []
       },
@@ -13295,13 +13348,18 @@
         "REHEARSAL-ACCEPTANCE-LEDGER\u00a7single-ledger-format-O7",
         "REHEARSAL-ACCEPTANCE-LEDGER\u00a7single-ledger-format-O8",
         "REHEARSAL-ACCEPTANCE-LEDGER\u00a7single-ledger-format-O9",
-        "REHEARSAL-ACCEPTANCE-LEDGER\u00a7single-ledger-format-O10"
+        "REHEARSAL-ACCEPTANCE-LEDGER\u00a7single-ledger-format-O10",
+        "REHEARSAL-ACCEPTANCE-LEDGER\u00a7single-ledger-format-O11",
+        "REHEARSAL-ACCEPTANCE-LEDGER\u00a7single-ledger-format-O12",
+        "REHEARSAL-ACCEPTANCE-LEDGER\u00a7single-ledger-format-O13",
+        "REHEARSAL-ACCEPTANCE-LEDGER\u00a7single-ledger-format-O14"
       ],
       "textPolicy": "verbatim: obligation text is carried only in requirements-inventory.json and is not reworded",
       "acceptance": {
         "status": "present",
         "own": [
-          "REHEARSAL-ACCEPTANCE-LEDGER\u00a7single-ledger-format-O3"
+          "REHEARSAL-ACCEPTANCE-LEDGER\u00a7single-ledger-format-O2",
+          "REHEARSAL-ACCEPTANCE-LEDGER\u00a7single-ledger-format-O7"
         ],
         "linkedSections": [
           "REHEARSAL-ACCEPTANCE-LEDGER\u00a7release-acceptance-predicate"

@@ -1,0 +1,25 @@
+{
+  "schema": "indy-init.baseline-equivalence-evidence/1",
+  "executedAt": "2026-10-26T12:42:57Z",
+  "python": "tools/build-requirements-baseline.py (unmodified), run as: python3 -I tools/build-requirements-baseline.py ROOT COMMIT",
+  "fsharp": "requirements-compiler baseline ROOT COMMIT (tools/requirements-compiler/src/Baseline.fs)",
+  "method": "Each commit exported with git archive; both generators run on the same tree; outputs compared with cmp",
+  "outputs": [
+    { "commit": "002d8ba6e98639a385dd771999099ba032c48086", "pythonSha256": "5a4c3c83777c5ce63f017707ff6078a79d3724ea89b931ab0250a2d4ac7a7415", "fsharpSha256": "5a4c3c83777c5ce63f017707ff6078a79d3724ea89b931ab0250a2d4ac7a7415", "identical": true }
+    ,
+    { "commit": "598a759b597e05d59e60bfbeb608c66d3945118b", "pythonSha256": "015e31ca80c0b3464653e5b212d07e74b575a589f8f08d43fad1a6096a6f6148", "fsharpSha256": "015e31ca80c0b3464653e5b212d07e74b575a589f8f08d43fad1a6096a6f6148", "identical": true }
+    ,
+    { "commit": "252cd2ef42f81c366bd2d7e9341c26edb7c64d55", "pythonSha256": "17d1c38bacf69a71e132eae0649af41b54f6bf2ad0de4b34f41acbbeeb2d3be3", "fsharpSha256": "17d1c38bacf69a71e132eae0649af41b54f6bf2ad0de4b34f41acbbeeb2d3be3", "identical": true }
+    ,
+    { "commit": "b785b68c5172e6bdc257e350032ec851a4637ed4", "pythonSha256": "efb875c5558794581ce72a79a4d1d399bd14e776de94de359c517ffaad80b642", "fsharpSha256": "efb875c5558794581ce72a79a4d1d399bd14e776de94de359c517ffaad80b642", "identical": true }
+  ],
+  "committedBaselineReproduced": true,
+  "errorPaths": [
+    { "case": "invalid commit argument", "pythonExit": 2, "fsharpExit": 2 },
+    { "case": "missing argument", "pythonExit": 2, "fsharpExit": 2 },
+    { "case": "unreadable root", "pythonExit": 1, "fsharpExit": 1 },
+    { "case": "duplicate requirement id (same message)", "pythonExit": 1, "fsharpExit": 1 },
+    { "case": "requirement without obligation text (same message)", "pythonExit": 1, "fsharpExit": 1 }
+  ],
+  "alsoCheckedOn": "the proposed requirement-change branch (2edaea4): outputs identical"
+}

@@ -1,0 +1,797 @@
+{
+  "schema": "indy-init.timed-execution-manifest/1",
+  "run": "Rehearsal 4 (write-path dress rehearsal)",
+  "plan": "B-resource-optimized (default; Plan A's parallel lanes need owner approval, F-007)",
+  "clock": {
+    "startsAt": "first green bootstrap CI (task T10, REHEARSAL-004-WRITE-PATH-PLAN P5)",
+    "ceilingMinutes": 420,
+    "stopRule": "stop when the computed verdict is ACCEPTED, or at 420 minutes (R4-07)"
+  },
+  "preconditions": "Every check in preflight-manifest.json is PASS, or NOT_RUN only for PRE-ORG-01 (event-only).",
+  "milestones": [
+    {
+      "milestone": "first green CI",
+      "task": "T10"
+    },
+    {
+      "milestone": "first verified remote write",
+      "task": "T21"
+    },
+    {
+      "milestone": "first verified conflict handling",
+      "task": "T21"
+    },
+    {
+      "milestone": "first deployed candidate",
+      "task": "T31"
+    },
+    {
+      "milestone": "reviewer findings per round",
+      "task": "T30, T33"
+    },
+    {
+      "milestone": "computed verdict and time to it",
+      "task": "T34"
+    }
+  ],
+  "measurements": [
+    "CI runs created, executed and failed",
+    "tokens per agent (Praxis >= 3.17 attribution)",
+    "defect classes, recurrence against R2 and R3, fix-induced defects",
+    "unavailable values are recorded as unavailable (R4 section 5)"
+  ],
+  "coverage": {
+    "p0Requirements": 107,
+    "p0CoveredByTimedTasks": 102,
+    "p0CoveredOnlyByPreflight": [
+      "VER-001",
+      "VER-002",
+      "VER-003",
+      "VER-005",
+      "VER-010"
+    ]
+  },
+  "summary": {
+    "tasks": 24,
+    "steps": 23,
+    "plannedCiRuns": 8,
+    "byWorkstream": {
+      "application-implementation": 5,
+      "defect-correction": 1,
+      "final-acceptance": 1,
+      "independent-review": 2,
+      "integration-testing": 4,
+      "live-provider-integration": 2,
+      "persistence-implementation": 3,
+      "ui-implementation": 6
+    }
+  },
+  "tasks": [
+    {
+      "id": "T12",
+      "title": "Invariant inventory and write-invariant tests first (DC-001..DC-006)",
+      "workstream": "application-implementation",
+      "lane": "lead",
+      "step": 1,
+      "kind": "implementation",
+      "dependsOn": [],
+      "preflightPrerequisites": [
+        "T08",
+        "T10"
+      ],
+      "conditionalOn": null,
+      "ciRun": false,
+      "requirementsCovered": 6,
+      "p0RequirementsCovered": 2,
+      "defectClassTests": [
+        "DCT-001-A",
+        "DCT-001-B",
+        "DCT-002-A",
+        "DCT-002-B",
+        "DCT-003-A"
+      ],
+      "contracts": [],
+      "gates": [
+        "G3",
+        "G7"
+      ],
+      "completion": [
+        "each R2 defect class DC-001..DC-006 and R1 M4 / R3 M1 request-identity class has a failing-first test (R4-01)",
+        "negative controls demonstrably fail on injected defects (AR-022)"
+      ]
+    },
+    {
+      "id": "T13",
+      "title": "F# semantic kernel and policy/capabilities",
+      "workstream": "application-implementation",
+      "lane": "lead",
+      "step": 2,
+      "kind": "implementation",
+      "dependsOn": [
+        "T12"
+      ],
+      "preflightPrerequisites": [],
+      "conditionalOn": null,
+      "ciRun": false,
+      "requirementsCovered": 60,
+      "p0RequirementsCovered": 1,
+      "defectClassTests": [],
+      "contracts": [
+        "CT-001",
+        "CT-003",
+        "CT-018"
+      ],
+      "gates": [
+        "G3"
+      ],
+      "completion": [
+        "decide/evolve for the lifecycle tables; illegal-transition and forged-history variants rejected (G3)",
+        "capabilities derived in F# with reasons for blocked actions"
+      ]
+    },
+    {
+      "id": "T11",
+      "title": "Stack lock and compatibility gate",
+      "workstream": "integration-testing",
+      "lane": "lead",
+      "step": 3,
+      "kind": "verification",
+      "dependsOn": [],
+      "preflightPrerequisites": [
+        "T10"
+      ],
+      "conditionalOn": null,
+      "ciRun": true,
+      "requirementsCovered": 13,
+      "p0RequirementsCovered": 4,
+      "defectClassTests": [],
+      "contracts": [
+        "CT-016",
+        "CT-009",
+        "CT-010",
+        "CT-011",
+        "CT-014"
+      ],
+      "gates": [
+        "G1"
+      ],
+      "completion": [
+        "CI fails when installed versions differ from the lock (VER-008)",
+        "Limen startup, Forma render, Folio print and frozen golden replay smoke pass on the locked set (DEP-CURRENT-004)"
+      ]
+    },
+    {
+      "id": "T14",
+      "title": "Interface freeze: versioned manifest for boundaries A-E",
+      "workstream": "application-implementation",
+      "lane": "lead",
+      "step": 4,
+      "kind": "implementation",
+      "dependsOn": [
+        "T13"
+      ],
+      "preflightPrerequisites": [
+        "T00"
+      ],
+      "conditionalOn": null,
+      "ciRun": false,
+      "requirementsCovered": 16,
+      "p0RequirementsCovered": 0,
+      "defectClassTests": [],
+      "contracts": [
+        "CT-001",
+        "CT-002",
+        "CT-003",
+        "CT-004",
+        "CT-005",
+        "CT-018"
+      ],
+      "gates": [
+        "G2"
+      ],
+      "completion": [
+        "one manifest with types, request/response examples, error variants and contract tests; its SHA recorded in the ledger",
+        "mandatory negative cases implemented as tests"
+      ]
+    },
+    {
+      "id": "T16",
+      "title": "Application shell, loading experience, routes and visual identity",
+      "workstream": "ui-implementation",
+      "lane": "lead",
+      "step": 5,
+      "kind": "implementation",
+      "dependsOn": [
+        "T11"
+      ],
+      "preflightPrerequisites": [
+        "T08"
+      ],
+      "conditionalOn": null,
+      "ciRun": false,
+      "requirementsCovered": 24,
+      "p0RequirementsCovered": 5,
+      "defectClassTests": [
+        "DCT-006-A",
+        "DCT-INPUT-A"
+      ],
+      "contracts": [
+        "CT-009",
+        "CT-010"
+      ],
+      "gates": [
+        "G5"
+      ],
+      "completion": [
+        "HTML/CSS shell before WASM; transport failure shows a recoverable error; retry works after a 503 (R2 DC-006)",
+        "route codec round-trip tests; deep links survive reload",
+        "UI-016 palette via Forma tokens with contrast checks"
+      ]
+    },
+    {
+      "id": "T18",
+      "title": "Provider conformance: record real GitHub behaviour and build fakes from it",
+      "workstream": "live-provider-integration",
+      "lane": "lead",
+      "step": 6,
+      "kind": "implementation",
+      "dependsOn": [],
+      "preflightPrerequisites": [
+        "T05",
+        "T04",
+        "T08",
+        "T10"
+      ],
+      "conditionalOn": null,
+      "ciRun": false,
+      "requirementsCovered": 26,
+      "p0RequirementsCovered": 21,
+      "defectClassTests": [
+        "DCT-004-A",
+        "DCT-005-A"
+      ],
+      "contracts": [
+        "CT-007",
+        "CT-017",
+        "CT-004"
+      ],
+      "gates": [
+        "G6"
+      ],
+      "completion": [
+        "recorded responses include write, conflict (expected-version mismatch), 422 missing branch, cache headers on mutable reads, installation-token permissions (R2 DC-004/005, R3 H1, D-07)",
+        "fakes served only from recordings"
+      ]
+    },
+    {
+      "id": "T19",
+      "title": "Local durability and persistence truth",
+      "workstream": "persistence-implementation",
+      "lane": "lead",
+      "step": 7,
+      "kind": "implementation",
+      "dependsOn": [
+        "T14"
+      ],
+      "preflightPrerequisites": [],
+      "conditionalOn": null,
+      "ciRun": false,
+      "requirementsCovered": 4,
+      "p0RequirementsCovered": 1,
+      "defectClassTests": [],
+      "contracts": [
+        "CT-004",
+        "CT-018"
+      ],
+      "gates": [
+        "G6"
+      ],
+      "completion": [
+        "pending, sending, conflicted, unknown and synced remain distinct (CONTRACT 9.4.3; D-009)",
+        "offline edits survive reload"
+      ]
+    },
+    {
+      "id": "T15",
+      "title": "Frozen fixture replay against the storage contract",
+      "workstream": "application-implementation",
+      "lane": "lead",
+      "step": 8,
+      "kind": "implementation",
+      "dependsOn": [
+        "T13"
+      ],
+      "preflightPrerequisites": [],
+      "conditionalOn": null,
+      "ciRun": false,
+      "requirementsCovered": 19,
+      "p0RequirementsCovered": 1,
+      "defectClassTests": [],
+      "contracts": [
+        "CT-006",
+        "CT-003"
+      ],
+      "gates": [
+        "G4"
+      ],
+      "completion": [
+        "three identities match (STORAGE-007)",
+        "five golden scenarios reproduce expected projections; 90 negative fixtures refused",
+        "seed hashes unchanged after the run"
+      ]
+    },
+    {
+      "id": "T17",
+      "title": "Integration checkpoint 1: a legal command end to end in the browser",
+      "workstream": "integration-testing",
+      "lane": "lead",
+      "step": 9,
+      "kind": "integration-checkpoint",
+      "dependsOn": [
+        "T14",
+        "T16"
+      ],
+      "preflightPrerequisites": [],
+      "conditionalOn": null,
+      "ciRun": true,
+      "requirementsCovered": 2,
+      "p0RequirementsCovered": 0,
+      "defectClassTests": [],
+      "contracts": [
+        "CT-001",
+        "CT-002",
+        "CT-009"
+      ],
+      "gates": [
+        "G2",
+        "G5"
+      ],
+      "completion": [
+        "a typed command crosses Limen, returns events or a typed fault, and every dependent view refreshes from one projection version (ADRP-004)",
+        "runs in WebKit in CI"
+      ]
+    },
+    {
+      "id": "T20",
+      "title": "Connect flow and GitHub provider: read, create, write, conflict",
+      "workstream": "persistence-implementation",
+      "lane": "lead",
+      "step": 10,
+      "kind": "implementation",
+      "dependsOn": [
+        "T18",
+        "T19"
+      ],
+      "preflightPrerequisites": [
+        "T00"
+      ],
+      "conditionalOn": null,
+      "ciRun": false,
+      "requirementsCovered": 26,
+      "p0RequirementsCovered": 12,
+      "defectClassTests": [],
+      "contracts": [
+        "CT-004",
+        "CT-006",
+        "CT-007",
+        "CT-017"
+      ],
+      "gates": [
+        "G6"
+      ],
+      "completion": [
+        "no mutation on connect or read; explicit create; no overwrite of unread history (EXT-DATA-006)",
+        "eight connection states distinguished (EXT-DATA-007)",
+        "credentials never leave memory or the Authorization header"
+      ]
+    },
+    {
+      "id": "T21",
+      "title": "Integration checkpoint 2: live write path against the real test repository",
+      "workstream": "live-provider-integration",
+      "lane": "lead",
+      "step": 11,
+      "kind": "integration-checkpoint",
+      "dependsOn": [
+        "T20",
+        "T17"
+      ],
+      "preflightPrerequisites": [],
+      "conditionalOn": null,
+      "ciRun": true,
+      "requirementsCovered": 4,
+      "p0RequirementsCovered": 4,
+      "defectClassTests": [
+        "DCT-LIVE-A"
+      ],
+      "contracts": [
+        "CT-007",
+        "CT-004",
+        "CT-017"
+      ],
+      "gates": [
+        "G6"
+      ],
+      "completion": [
+        "create, write, reload, conflict and rejected-token pass live, backed by independent SHA reads (R4-02)",
+        "first verified remote write and first verified conflict handling times recorded (R4 measurements)"
+      ]
+    },
+    {
+      "id": "T22",
+      "title": "Investigation workspace views",
+      "workstream": "ui-implementation",
+      "lane": "lead",
+      "step": 12,
+      "kind": "implementation",
+      "dependsOn": [
+        "T17"
+      ],
+      "preflightPrerequisites": [
+        "T00"
+      ],
+      "conditionalOn": null,
+      "ciRun": false,
+      "requirementsCovered": 79,
+      "p0RequirementsCovered": 30,
+      "defectClassTests": [],
+      "contracts": [
+        "CT-002",
+        "CT-010",
+        "CT-012"
+      ],
+      "gates": [
+        "G5"
+      ],
+      "completion": [
+        "each implemented screen satisfies its Percepta contract at the deployed SHA",
+        "unimplemented P1/experimental screens recorded as NOT_RUN, not passed (ADRP-002)"
+      ]
+    },
+    {
+      "id": "T24",
+      "title": "Discover the workflow layout engine and existing capabilities",
+      "workstream": "integration-testing",
+      "lane": "lead",
+      "step": 13,
+      "kind": "implementation",
+      "dependsOn": [
+        "T11"
+      ],
+      "preflightPrerequisites": [],
+      "conditionalOn": null,
+      "ciRun": false,
+      "requirementsCovered": 4,
+      "p0RequirementsCovered": 3,
+      "defectClassTests": [],
+      "contracts": [],
+      "gates": [
+        "G1"
+      ],
+      "completion": [
+        "owner repository, package, API, version and license recorded with a working example (WDL-001), or an owner decision on WDL scope"
+      ]
+    },
+    {
+      "id": "T25",
+      "title": "Load the active historical catalog after Connect",
+      "workstream": "persistence-implementation",
+      "lane": "lead",
+      "step": 14,
+      "kind": "implementation",
+      "dependsOn": [
+        "T20",
+        "T15"
+      ],
+      "preflightPrerequisites": [
+        "T00"
+      ],
+      "conditionalOn": null,
+      "ciRun": false,
+      "requirementsCovered": 6,
+      "p0RequirementsCovered": 0,
+      "defectClassTests": [],
+      "contracts": [
+        "CT-008",
+        "CT-006"
+      ],
+      "gates": [
+        "G4",
+        "G6"
+      ],
+      "completion": [
+        "three cases load from kemiller2002/causa-data workspace historical-v1 and replay to the manifest's expectedStateSha256",
+        "historical_catalog.py verify --app passes (no bundling)"
+      ]
+    },
+    {
+      "id": "T23",
+      "title": "Causal graph with the existing workflow layout engine",
+      "workstream": "ui-implementation",
+      "lane": "lead",
+      "step": 15,
+      "kind": "implementation",
+      "dependsOn": [
+        "T24",
+        "T17"
+      ],
+      "preflightPrerequisites": [],
+      "conditionalOn": null,
+      "ciRun": false,
+      "requirementsCovered": 21,
+      "p0RequirementsCovered": 14,
+      "defectClassTests": [],
+      "contracts": [
+        "CT-002"
+      ],
+      "gates": [
+        "G5"
+      ],
+      "completion": [
+        "deterministic layout seeded by stable ids with a textual alternative (ADRP-007)",
+        "no duplicate layout engine (WDL-002)"
+      ]
+    },
+    {
+      "id": "T30",
+      "title": "Independent architecture and invariant review before the first release candidate",
+      "workstream": "independent-review",
+      "lane": "reviewer",
+      "step": 15,
+      "kind": "verification",
+      "dependsOn": [
+        "T21",
+        "T22",
+        "T25"
+      ],
+      "preflightPrerequisites": [],
+      "conditionalOn": null,
+      "ciRun": true,
+      "requirementsCovered": 73,
+      "p0RequirementsCovered": 1,
+      "defectClassTests": [],
+      "contracts": [],
+      "gates": [
+        "G7"
+      ],
+      "completion": [
+        "fresh reviewer receives code, requirements and constraints only (R4-03)",
+        "findings recorded per defect class"
+      ]
+    },
+    {
+      "id": "T26",
+      "title": "Report preview and Folio export",
+      "workstream": "ui-implementation",
+      "lane": "lead",
+      "step": 16,
+      "kind": "implementation",
+      "dependsOn": [
+        "T17"
+      ],
+      "preflightPrerequisites": [],
+      "conditionalOn": null,
+      "ciRun": false,
+      "requirementsCovered": 4,
+      "p0RequirementsCovered": 0,
+      "defectClassTests": [],
+      "contracts": [
+        "CT-005",
+        "CT-011"
+      ],
+      "gates": [
+        "G8"
+      ],
+      "completion": [
+        "incomplete investigations render as incomplete (R12.3)",
+        "print output verified at the deployed SHA"
+      ]
+    },
+    {
+      "id": "T27",
+      "title": "Structured AI proposal loop (scope pending F-008)",
+      "workstream": "application-implementation",
+      "lane": "lead",
+      "step": 17,
+      "kind": "implementation",
+      "dependsOn": [
+        "T13"
+      ],
+      "preflightPrerequisites": [
+        "T00"
+      ],
+      "conditionalOn": "DEC-022",
+      "ciRun": false,
+      "requirementsCovered": 3,
+      "p0RequirementsCovered": 0,
+      "defectClassTests": [],
+      "contracts": [
+        "CT-001"
+      ],
+      "gates": [
+        "G3"
+      ],
+      "completion": [
+        "proposals enter as proposals; external evidence cannot redefine instructions (R11.4)",
+        "or an owner-approved exclusion"
+      ]
+    },
+    {
+      "id": "T28",
+      "title": "History, time travel and semantic diff (scope pending F-008)",
+      "workstream": "ui-implementation",
+      "lane": "lead",
+      "step": 18,
+      "kind": "implementation",
+      "dependsOn": [
+        "T22"
+      ],
+      "preflightPrerequisites": [
+        "T00"
+      ],
+      "conditionalOn": "DEC-022",
+      "ciRun": false,
+      "requirementsCovered": 3,
+      "p0RequirementsCovered": 0,
+      "defectClassTests": [],
+      "contracts": [
+        "CT-002"
+      ],
+      "gates": [
+        "G5"
+      ],
+      "completion": [
+        "history renders from canonical sequence, never wall-clock alone (ADRP-007)",
+        "or an owner-approved exclusion"
+      ]
+    },
+    {
+      "id": "T29",
+      "title": "Administration and Settings pages with actual loaded versions",
+      "workstream": "ui-implementation",
+      "lane": "lead",
+      "step": 19,
+      "kind": "implementation",
+      "dependsOn": [
+        "T11",
+        "T17"
+      ],
+      "preflightPrerequisites": [],
+      "conditionalOn": null,
+      "ciRun": false,
+      "requirementsCovered": 3,
+      "p0RequirementsCovered": 3,
+      "defectClassTests": [],
+      "contracts": [
+        "CT-016"
+      ],
+      "gates": [
+        "G5"
+      ],
+      "completion": [
+        "versions shown only in Administration and equal to loaded components (VER-007)"
+      ]
+    },
+    {
+      "id": "T31",
+      "title": "Release candidate: full applicable matrix at the deployed SHA",
+      "workstream": "integration-testing",
+      "lane": "lead",
+      "step": 20,
+      "kind": "integration-checkpoint",
+      "dependsOn": [
+        "T30",
+        "T23",
+        "T26",
+        "T27",
+        "T28",
+        "T29"
+      ],
+      "preflightPrerequisites": [],
+      "conditionalOn": null,
+      "ciRun": true,
+      "requirementsCovered": 7,
+      "p0RequirementsCovered": 3,
+      "defectClassTests": [],
+      "contracts": [
+        "CT-012",
+        "CT-010",
+        "CT-011"
+      ],
+      "gates": [
+        "G5",
+        "G8",
+        "G9"
+      ],
+      "completion": [
+        "browser, accessibility, integration, security and report suites pass on the deployed exact SHA",
+        "Percepta evidence from the registered release"
+      ]
+    },
+    {
+      "id": "T32",
+      "title": "Defect-class closure",
+      "workstream": "defect-correction",
+      "lane": "lead",
+      "step": 21,
+      "kind": "verification",
+      "dependsOn": [
+        "T31"
+      ],
+      "preflightPrerequisites": [],
+      "conditionalOn": null,
+      "ciRun": true,
+      "requirementsCovered": 7,
+      "p0RequirementsCovered": 0,
+      "defectClassTests": [],
+      "contracts": [
+        "CT-014"
+      ],
+      "gates": [
+        "G7"
+      ],
+      "completion": [
+        "original reproduction, adversarial variants, invariant enforcement and SHA-bound proof per class (DCC-005)"
+      ]
+    },
+    {
+      "id": "T33",
+      "title": "Fresh reviewer before the final verdict",
+      "workstream": "independent-review",
+      "lane": "reviewer",
+      "step": 22,
+      "kind": "verification",
+      "dependsOn": [
+        "T32"
+      ],
+      "preflightPrerequisites": [],
+      "conditionalOn": null,
+      "ciRun": true,
+      "requirementsCovered": 1,
+      "p0RequirementsCovered": 1,
+      "defectClassTests": [],
+      "contracts": [],
+      "gates": [
+        "G7"
+      ],
+      "completion": [
+        "no open critical defect class (release acceptance predicate)"
+      ]
+    },
+    {
+      "id": "T34",
+      "title": "Acceptance: preservation gate re-run, ledger, computed verdict, measurements",
+      "workstream": "final-acceptance",
+      "lane": "lead",
+      "step": 23,
+      "kind": "verification",
+      "dependsOn": [
+        "T33"
+      ],
+      "preflightPrerequisites": [
+        "T08"
+      ],
+      "conditionalOn": null,
+      "ciRun": true,
+      "requirementsCovered": 106,
+      "p0RequirementsCovered": 23,
+      "defectClassTests": [],
+      "contracts": [
+        "CT-013",
+        "CT-015",
+        "CT-014"
+      ],
+      "gates": [
+        "G0",
+        "G9",
+        "G10"
+      ],
+      "completion": [
+        "preservation gate exit 0 at acceptance with evidence committed",
+        "ledger in causa.acceptance-ledger/2 with every PASS evidence path in a causa.acceptance-evidence-manifest/1 bundle",
+        "compute-acceptance-verdict.py run with the pinned baseline and SHA-256, approvals file and SHA-256, trusted operator ids and evidence manifest SHA-256; its verdict is the report's only verdict line",
+        "R4 measurements recorded; unavailable values recorded as unavailable"
+      ]
+    }
+  ]
+}

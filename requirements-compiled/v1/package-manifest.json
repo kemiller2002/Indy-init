@@ -3,15 +3,15 @@
   "package": "requirements-compiled/v1",
   "source": {
     "repository": "kemiller2002/indy-init",
-    "commit": "252cd2ef42f81c366bd2d7e9341c26edb7c64d55",
-    "baselineId": "BL-CAUSA-INDY-INIT-252cd2ef42f8",
-    "baselineSha256": "17d1c38bacf69a71e132eae0649af41b54f6bf2ad0de4b34f41acbbeeb2d3be3",
-    "baselineGenerator": "tools/build-requirements-baseline.py (existing; unmodified)"
+    "commit": "9d989389260342c77feea1aca52dd8d3d7b746ae",
+    "baselineId": "BL-CAUSA-INDY-INIT-9d9893892603",
+    "baselineSha256": "26101a79000f79a9a3d7d9c3d1d3b8baa1c6fd475c69f17a8dba5aab773898d6",
+    "baselineGenerator": "requirements-compiler baseline (F# port; byte-equivalent to tools/build-requirements-baseline.py)"
   },
   "repositories": [
     {
       "name": "indy-init",
-      "commit": "252cd2ef42f81c366bd2d7e9341c26edb7c64d55",
+      "commit": "9d989389260342c77feea1aca52dd8d3d7b746ae",
       "role": "primary: authoritative requirements (source commit of this package)"
     },
     {
@@ -56,7 +56,7 @@
     },
     {
       "name": "echelon-registry",
-      "commit": "882bf2e2f2499e6c1c1c77f54539e1acc3d9aa7b",
+      "commit": "2d6338e8286a968ec7e4f356af60dde789797e5a",
       "role": "approved release sets"
     },
     {
@@ -73,13 +73,18 @@
       "name": "indy-init-rehearsal-003",
       "commit": "bc6eb5b4e3d4ccc11e9f1c39b57276f408caa3b8",
       "role": "historical evidence (R3)"
+    },
+    {
+      "name": "conditor",
+      "commit": "b37c7d35d1a1c2dbfcc94e58d38fb08f1e1f5680",
+      "role": "bootstrap tool (SD-1 fix status)"
     }
   ],
   "dependencyVersions": [
     {
       "system": "echelon-current release set",
       "version": "1.27.0",
-      "source": "echelon-registry sets/echelon-current/1.27.0.json (approved 2026-10-24; records the percepta-semantic exception)"
+      "source": "echelon-registry sets/echelon-current/1.27.0.json at 2d6338e (newest set; records the percepta-semantic exception)"
     },
     {
       "system": "praxis",
@@ -103,8 +108,8 @@
     },
     {
       "system": "percepta-semantic",
-      "version": "0.2.1 (released, not registered)",
-      "source": "tag percepta-semantic-v0.2.1 -> 8b78df80; absent from set 1.27.0"
+      "version": "0.2.1 (released; registered as a release; in no approved set)",
+      "source": "tag percepta-semantic-v0.2.1 -> 8b78df80; echelon-registry releases/percepta-semantic/0.2.1.release.json (PR #96/#97, merged 2026-10-26); echelon-current 1.28.0 not cut"
     },
     {
       "system": "limen",
@@ -145,6 +150,11 @@
       "system": ".NET SDK",
       "version": "10.0.402",
       "source": "causa-data global.json; tools/requirements-compiler/global.json"
+    },
+    {
+      "system": "conditor",
+      "version": "0.10.11",
+      "source": "tag v0.10.11 -> b37c7d35; carries CON-367 (SD-1 scaffold distribution fix, WI-0050); qualified echelon-current 1.27.0 (registry approval evidence)"
     }
   ],
   "tool": {
@@ -155,11 +165,15 @@
   "inputs": [
     {
       "path": "curation/contracts.json",
-      "sha256": "c952094da9a681c6375a64487c44c4527d365897d66259f615ad4f90396d2582"
+      "sha256": "4a605bfbc2f1f532d260a9e2ef49dc7a8daf50f6224cf48e4ad803b0ee586cf8"
     },
     {
       "path": "curation/decisions.json",
-      "sha256": "639c7198334bd2582496e5e85c3424e9965518c0285129bc90f6a648d1d9abb6"
+      "sha256": "399bbfc144b8c00c4f1b6e42d81e6029cc9b2397435cbeaf72e62c1e9cc9954a"
+    },
+    {
+      "path": "curation/defect-class-tests.json",
+      "sha256": "dd1306e4da8f8cceef238f197db8973c3bfe8be3f43661db817473f0aba4c6a4"
     },
     {
       "path": "curation/experiment.json",
@@ -171,15 +185,19 @@
     },
     {
       "path": "curation/findings.json",
-      "sha256": "ac89afb594f23b79b6210850e135d45283821d7b606f7df37c2688a268730039"
+      "sha256": "0064df60bf13e88505970acb00151b8650f2bda124783a224965fdb11e97ca3a"
+    },
+    {
+      "path": "curation/preflight-checks.json",
+      "sha256": "76eba005334acd4b60e5c0930247aee313276a72133b8d5fab80df5da972cd44"
     },
     {
       "path": "curation/sources.json",
-      "sha256": "13a745ecac7fac1eb9534138ca8c782b6033f0be274736a2d128f4b5c2bd39fb"
+      "sha256": "e27b14db58685b9cac8fd8d5a84f56ebde633ac3721f78f6a82a4d7b1b9fbcbe"
     },
     {
       "path": "curation/tasks.json",
-      "sha256": "abdb61a5514a9c8436778f982c5417e4321699cd6a48fe7c351a6cd13b0cf444"
+      "sha256": "3fce9bfe99d3c20bac94c224b12a364449931aed6eaab150283950877a5fa784"
     },
     {
       "path": "curation/verification-rules.json",
@@ -189,57 +207,85 @@
   "authored": [
     {
       "path": "README.md",
-      "sha256": "8962a30a0b098119233a95007f0b52e412ed10ddab1622bb2b872f6b221b9402"
+      "sha256": "628730dd9c741c1d564f72cb23c7d8e788258edea3291d30e5dd5acb70c2d2e6"
     },
     {
       "path": "optimization-analysis.md",
       "sha256": "ae19f55e550de048301f8dee4dc485c148cdeaa92d65246a0949235bd981c4a4"
+    },
+    {
+      "path": "readiness/READINESS-REPORT.md",
+      "sha256": "29d45f29de0a2b79a95976db6bafde3ff70f05736bb9646032276ef95b163fd8"
+    },
+    {
+      "path": "readiness/OWNER-DECISION-REQUESTS.md",
+      "sha256": "de2c7495925c8a1a45e6f6733becce23c3652cffbc88be97f6c533930a3ab9c6"
+    },
+    {
+      "path": "readiness/CONTRACT-RESOLUTION.md",
+      "sha256": "de2ab06194c3e0c23de483e9ceb67f97801d624e21eb796a21a2e9d7f4adf627"
+    },
+    {
+      "path": "readiness/FSHARP-TOOLING-ASSESSMENT.md",
+      "sha256": "c98e4a2840809f2f571863afd2bfa4f99ffcaa1e606a783d17a8378354c22cbd"
+    },
+    {
+      "path": "readiness/DEPENDENCY-COMPATIBILITY.md",
+      "sha256": "4ff3d8932837b9f14beb27ab2ecb7c522b8d51dd7bbc6c87c5145a2ebd700b69"
     }
   ],
   "generated": [
     {
       "path": "contract-bindings.json",
-      "sha256": "c23c126dc8249b4976158386228ef8053f99fbdd67b941cad4988cdc6ef94fcb"
+      "sha256": "68eade1a61d6a4e24490e691541dd3890b9b496ad47e5618dfc0e6e3848ff63e"
     },
     {
       "path": "decision-registry.json",
-      "sha256": "1693203ed07cfa2381e408fa06317dd20f961f1f26ed28ed38838d134786b056"
+      "sha256": "82d781d5fc380808f751ea5b3760d5a77e5f9dedeb3fc8c57d183bbe2c78b0ea"
     },
     {
       "path": "dependency-graph.json",
-      "sha256": "61d62168c53145a7b201fa5d96f0ad57f226a27c778b5af68a3e8920b43a7005"
+      "sha256": "39d952b50d51e354d8b74026f27873d73f27e85892a2e977e59692491ec216d2"
     },
     {
       "path": "execution-plan-resource.json",
-      "sha256": "f235e530ccade3ec0b186826437fe72f8e69069f238259d9e9c5477aeed833ee"
+      "sha256": "ea9c4c1fcb57de2374bbb7b3fbfe9d5bc9a7e0db4a9815ca1fe49d7a1e0790a6"
     },
     {
       "path": "execution-plan-time.json",
-      "sha256": "b030d33309bfcd6f44de784990e4d0e20a73317bdb3a955648fe29002b2e46db"
+      "sha256": "077eee332faa69f5b7f0fc59bb6c0bffaed3159b5509875583adac00318a3a8e"
     },
     {
       "path": "normalized-requirements.json",
-      "sha256": "b3d2ea19eec4537a8fba8687f020baeeaa0dcfd7f3f83216c83aa0995576561b"
+      "sha256": "4253da82063ecc56b6a49deecae6753e8ce488918fdaf2c9794133c8a1979aea"
     },
     {
       "path": "percepta-experiment.json",
       "sha256": "ba2f8cfd993f2d5dde5d09984bfe6983513aa2de0fbc3f475c480b32149348f3"
     },
     {
+      "path": "preflight-manifest.json",
+      "sha256": "8a9dc3e0d6496f42f65e9c0a5154cebb89b392f0faab22494eeb52625229a8ba"
+    },
+    {
       "path": "requirements-inventory.json",
-      "sha256": "48cc6c7f84c99d37a6210dff64b63c22b6ad26c37d54a69cacac9ed46bbeab13"
+      "sha256": "2539984bc3985c7ae83d99e0550792dc4a11e670d19f90d50960c961fca85f86"
     },
     {
       "path": "requirements-source-map.json",
-      "sha256": "171d524dce0d2d35c8d205e7c34a9e7872f914083ebe72c786659e112a470af6"
+      "sha256": "b73c50b588c54eeac8f138409e6eb5b5632d86f90c6f44b259115735d0f67593"
     },
     {
       "path": "requirements-validation-report.json",
-      "sha256": "d81a8504f3d09fc9837280a9ef426939495b0de6e1529594412a7eb66bddf55c"
+      "sha256": "c5a4fa9541a44b893df8dada855e68d9cf367df1f67b8bfc350e71b495ae00ba"
+    },
+    {
+      "path": "timed-execution-manifest.json",
+      "sha256": "05b4c5a71a6cd844a53f9c557e62f5af57c01c74aaa4cc1f127a2c3a58bdf315"
     },
     {
       "path": "verification-manifest.json",
-      "sha256": "6d4a98da60372183119142799cdb6e18181d8d0c48526866ba214780343a102f"
+      "sha256": "e9fe29d13d0aaf53fc96975ad21747180e9aa5473ba03f8c634d2cec1bf4058f"
     }
   ],
   "compilationVerdict": "PASS",

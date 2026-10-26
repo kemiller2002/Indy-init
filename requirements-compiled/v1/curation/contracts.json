@@ -3,180 +3,570 @@
   "description": "Contracts between components. A status is never 'verified': this package checks identities only. 'identity-verified' means the pinned artifacts hash to the recorded identities (computed by the compiler at the recorded revision); compatibility still has to be exercised by the named verification method.",
   "contracts": [
     {
-      "id": "CT-001", "producedBy": "T14", "name": "Boundary A: command submission", "provider": "F# domain engine (rehearsal repository)", "consumer": "UI via Limen host",
+      "id": "CT-001",
+      "producedBy": "T14",
+      "name": "Boundary A: command submission",
+      "provider": "F# domain engine (rehearsal repository)",
+      "consumer": "UI via Limen host",
       "contractVersion": "none yet: the versioned interface manifest is produced by task T14",
       "requiredCompatibility": "exact interface-manifest SHA signed off by every owner before parallel work",
       "verificationMethod": "producer/consumer contract tests at the interface-manifest SHA, including stale version, duplicate submission and unauthorized command negatives (G2)",
-      "dependencyVersions": ["limen 0.9.0", "limen-fsharp 0.9.0", ".NET SDK 10.0.402", "aegis 1.0.0 (typed faults)"],
-      "evidenceIdentity": "interface manifest SHA-256 + contract test run at source SHA",
-      "status": "missing", "requirements": ["REHEARSAL-AGENT-INTERFACE-FREEZE§boundary-a-command-submission", "ADRP-004", "ADRP-008"],
-      "identity": [],
-      "citations": [ { "repo": "indy-init", "path": "docs/REHEARSAL-AGENT-INTERFACE-FREEZE.md", "quote": "Input MUST include investigation ID, actor/provenance, typed command, expected aggregate version" } ]
-    },
-    {
-      "id": "CT-002", "producedBy": "T14", "name": "Boundary B: versioned projection", "provider": "F# domain engine", "consumer": "every screen; Percepta screen contracts",
-      "contractVersion": "none yet (T14)", "requiredCompatibility": "same projection version across dependent views; no synthetic confidence, cause, severity or owner fields",
-      "verificationMethod": "projection golden tests from frozen replay plus Percepta semantic verification of populated states (G2, G5)",
-      "dependencyVersions": ["percepta-semantic (release to be registered)"], "evidenceIdentity": "interface manifest SHA-256; Percepta evidence JSON (schemaVersion 1.0.0) at deployed SHA",
-      "status": "missing", "requirements": ["REHEARSAL-AGENT-INTERFACE-FREEZE§boundary-b-versioned-projection", "UI-013", "UI-023"],
-      "identity": [],
-      "citations": [ { "repo": "indy-init", "path": "docs/REHEARSAL-AGENT-INTERFACE-FREEZE.md", "quote": "A single immutable projection identifies investigation, aggregate version, lifecycle" } ]
-    },
-    {
-      "id": "CT-003", "producedBy": "T14", "name": "Boundary C: replay", "provider": "F# domain engine", "consumer": "persistence adapter, catalog loader, golden tests",
-      "contractVersion": "none yet (T14); semantics bound by causa storage v1.0.0", "requiredCompatibility": "every event validated by the engine; typed invalid-history fault; no browser-only validator",
-      "verificationMethod": "golden replay of the five frozen scenarios and the 90 negative fixtures (causa gate), plus forged-history variants (G3, G4)",
-      "dependencyVersions": ["causa-storage-v1.0.0"], "evidenceIdentity": "causa gate output anchored to causa-storage-v1.0.0 + engine test results at source SHA",
-      "status": "missing", "requirements": ["REHEARSAL-AGENT-INTERFACE-FREEZE§boundary-c-replay", "STORAGE-002"],
-      "identity": [],
-      "citations": [ { "repo": "indy-init", "path": "docs/REHEARSAL-AGENT-INTERFACE-FREEZE.md", "quote": "No alternative browser-only validator." } ]
-    },
-    {
-      "id": "CT-004", "producedBy": "T14", "name": "Boundary D: provider-neutral persistence port", "provider": "storage adapter (local store and GitHub provider)", "consumer": "domain/application layer",
-      "contractVersion": "none yet (T14)", "requiredCompatibility": "load, append with expected version, acknowledge remote persistence, surface conflict, recover local edits; local-durable separate from remotely-synced",
-      "verificationMethod": "four verification levels (PF-011): domain, fixture provider, recorded real-provider conformance, live provider job against the test repository (G6)",
-      "dependencyVersions": ["causa-storage-v1.0.0", "GitHub REST/GraphQL API (see CT-007)"], "evidenceIdentity": "live job run id + independent SHA re-reads of written commits",
-      "status": "missing", "requirements": ["REHEARSAL-AGENT-INTERFACE-FREEZE§boundary-d-persistence", "PF-001", "PF-011", "R10.6"],
-      "identity": [],
-      "citations": [ { "repo": "indy-init", "path": "docs/REHEARSAL-AGENT-INTERFACE-FREEZE.md", "quote": "Provider-neutral operations: load, append with expected version, acknowledge remote persistence, surface conflict, and recover local edits." } ]
-    },
-    {
-      "id": "CT-005", "producedBy": "T14", "name": "Boundary E: report projection to Folio", "provider": "F# domain engine (read-only report projection)", "consumer": "Folio print components",
-      "contractVersion": "none yet (T14)", "requiredCompatibility": "report cannot elevate an unverified hypothesis to a confirmed cause",
-      "verificationMethod": "report fidelity tests against projections; print rendering with Folio's report contracts (ef-print-finding, ef-print-integrity) (G8)",
-      "dependencyVersions": ["folio 0.4.0 (registered; v0.4.1 tag unassessed, F-015)"], "evidenceIdentity": "rendered report artifact digest at deployed SHA",
-      "status": "missing", "requirements": ["REHEARSAL-AGENT-INTERFACE-FREEZE§boundary-e-report", "R12.1", "R12.3"],
-      "identity": [],
-      "citations": [ { "repo": "indy-init", "path": "docs/REHEARSAL-AGENT-INTERFACE-FREEZE.md", "quote": "Report rendering cannot elevate an unverified hypothesis to a confirmed cause." } ]
-    },
-    {
-      "id": "CT-006", "name": "Causa storage contract v1.0.0", "provider": "kemiller2002/causa-data (tag causa-storage-v1.0.0)", "consumer": "application storage adapter; catalog loader",
-      "contractVersion": "1.0.0", "requiredCompatibility": "exact: all three identities must match (STORAGE-007); reader/writer specification without vendoring records (EXT-DATA-011)",
-      "verificationMethod": "identities (checked here) + `causa gate . --anchor causa-storage-v1.0.0` + application replay and round-trip tests (G4)",
-      "dependencyVersions": [".NET SDK 10.0.402", "engine indy-init-rehearsal-001@55f49f61c939a3a780cee592f36f732a1328f981"],
-      "evidenceIdentity": "schema, dataset and release SHA-256 identities listed below",
-      "status": "identity-verified", "requirements": ["CAUSA-STORAGE-RELEASE§identities", "STORAGE-001", "STORAGE-007", "EXT-DATA-011", "ADRP-005"],
-      "identity": [
-        { "label": "schema identity (contract/v1.0.0/schemas/bundle.json)", "repo": "causa-data", "rev": "c947c7e354be80766573a782546c8186336774cc", "path": "contract/v1.0.0/schemas/bundle.json", "expectedSha256": "0a68af8c93190d2e4d6c27beb2f8cb67c3aebdda586d01beb7122b71af179152" },
-        { "label": "dataset identity (fixtures/v1.0.0/manifest.json)", "repo": "causa-data", "rev": "c947c7e354be80766573a782546c8186336774cc", "path": "fixtures/v1.0.0/manifest.json", "expectedSha256": "f650a2e509a420872b46177b21f57ef6ebd7625ae4c69dd92198d3ca472c2b86" },
-        { "label": "release identity (compatibility/v1.0.0/lock.json)", "repo": "causa-data", "rev": "c947c7e354be80766573a782546c8186336774cc", "path": "compatibility/v1.0.0/lock.json", "expectedSha256": "6a7e7802ff2a3ff500ab6065662514a96e09e6c15eb30212ba1377fcc5bf8fc5" },
-        { "label": "schema identity unchanged at the catalog commit", "repo": "causa-data", "rev": "22260f429501d0d6963fc33302ed1e64d742a374", "path": "contract/v1.0.0/schemas/bundle.json", "expectedSha256": "0a68af8c93190d2e4d6c27beb2f8cb67c3aebdda586d01beb7122b71af179152" }
+      "dependencyVersions": [
+        "limen 0.9.0",
+        "limen-fsharp 0.9.0",
+        ".NET SDK 10.0.402",
+        "aegis 1.0.0 (typed faults)"
       ],
-      "citations": [ { "repo": "indy-init", "path": "docs/CAUSA-STORAGE-RELEASE-v1.0.0.md", "quote": "0a68af8c93190d2e4d6c27beb2f8cb67c3aebdda586d01beb7122b71af179152" } ]
-    },
-    {
-      "id": "CT-007", "name": "GitHub write primitive (atomic, guarded publication)", "provider": "GitHub API", "consumer": "GitHub persistence provider",
-      "contractVersion": "contested: CONTRACT.md 9.4 (non-forced ref PATCH) versus R2 owner decision (GraphQL createCommitOnBranch with expectedHeadOid)",
-      "requiredCompatibility": "atomic three-file publication refused on a moved head; success only after a re-read at the new head",
-      "verificationMethod": "recorded real-provider conformance (including race and stale-read variants) and the live conflict test (G6)",
-      "dependencyVersions": ["GitHub GraphQL createCommitOnBranch", "GitHub REST git refs"], "evidenceIdentity": "live job run id, commit SHAs, independent re-read",
-      "status": "blocked", "requirements": ["EXT-DATA-006", "STORAGE-006", "R10.4"],
+      "evidenceIdentity": "interface manifest SHA-256 + contract test run at source SHA",
+      "status": "missing",
+      "requirements": [
+        "REHEARSAL-AGENT-INTERFACE-FREEZE§boundary-a-command-submission",
+        "ADRP-004",
+        "ADRP-008"
+      ],
       "identity": [],
       "citations": [
-        { "repo": "causa-data", "path": "contract/v1.0.0/CONTRACT.md", "quote": "A ref update that is not" },
-        { "repo": "indy-init-rehearsal-002", "path": "docs/REHEARSAL-002-REPORT.md", "quote": "which GitHub applies atomically or refuses" }
+        {
+          "repo": "indy-init",
+          "path": "docs/REHEARSAL-AGENT-INTERFACE-FREEZE.md",
+          "quote": "Input MUST include investigation ID, actor/provenance, typed command, expected aggregate version"
+        }
       ]
     },
     {
-      "id": "CT-008", "name": "Active historical catalog historical-v1", "provider": "kemiller2002/causa-data catalog/historical-v1", "consumer": "connect flow and catalog view",
-      "contractVersion": "catalog 1.0.0 (causa-historical-v1.0.0) over storage contract 1.0.0", "requiredCompatibility": "manifest lists exactly three cases with digests; records are ordinary v1.0.0 file sets in workspace historical-v1",
-      "verificationMethod": "`python3 -I tools/py/historical_catalog.py verify . --app <app checkout>` (includes no-app-bundling check) and application load test after Connect",
-      "dependencyVersions": ["causa-storage-v1.0.0"], "evidenceIdentity": "catalog manifest SHA-256 below; per-case expectedStateSha256 in the manifest",
-      "status": "identity-verified", "requirements": ["HISTORICAL-CASE-CATALOG§catalog-policy", "HISTORICAL-CASE-CATALOG§completion-gate"],
-      "identity": [
-        { "label": "catalog manifest", "repo": "causa-data", "rev": "22260f429501d0d6963fc33302ed1e64d742a374", "path": "catalog/historical-v1/manifest.json", "expectedSha256": "8c361929cfb429c31c059c92d6148036bf2b5861f81dace635a1f7de18dbf87c" }
+      "id": "CT-002",
+      "producedBy": "T14",
+      "name": "Boundary B: versioned projection",
+      "provider": "F# domain engine",
+      "consumer": "every screen; Percepta screen contracts",
+      "contractVersion": "none yet (T14)",
+      "requiredCompatibility": "same projection version across dependent views; no synthetic confidence, cause, severity or owner fields",
+      "verificationMethod": "projection golden tests from frozen replay plus Percepta semantic verification of populated states (G2, G5)",
+      "dependencyVersions": [
+        "percepta-semantic (release to be registered)"
       ],
-      "citations": [ { "repo": "causa-data", "path": "README.md", "quote": "An external application reads them by selecting repository" }, { "repo": "causa-data", "path": "catalog/historical-v1/verification/release.json", "quote": "\"catalogManifestSha256\": \"8c361929cfb429c31c059c92d6148036bf2b5861f81dace635a1f7de18dbf87c\"" } ]
+      "evidenceIdentity": "interface manifest SHA-256; Percepta evidence JSON (schemaVersion 1.0.0) at deployed SHA",
+      "status": "missing",
+      "requirements": [
+        "REHEARSAL-AGENT-INTERFACE-FREEZE§boundary-b-versioned-projection",
+        "UI-013",
+        "UI-023"
+      ],
+      "identity": [],
+      "citations": [
+        {
+          "repo": "indy-init",
+          "path": "docs/REHEARSAL-AGENT-INTERFACE-FREEZE.md",
+          "quote": "A single immutable projection identifies investigation, aggregate version, lifecycle"
+        }
+      ]
     },
     {
-      "id": "CT-009", "name": "Limen kernel and EngineTransport", "provider": "@echelon-foundry/limen 0.9.0 + limen-fsharp 0.9.0", "consumer": "application shell and F# engine",
-      "contractVersion": "0.9.0 (exact pin; 0.x minors may break the protocol)", "requiredCompatibility": "exact version from the kickoff lock",
+      "id": "CT-003",
+      "producedBy": "T14",
+      "name": "Boundary C: replay",
+      "provider": "F# domain engine",
+      "consumer": "persistence adapter, catalog loader, golden tests",
+      "contractVersion": "none yet (T14); semantics bound by causa storage v1.0.0",
+      "requiredCompatibility": "every event validated by the engine; typed invalid-history fault; no browser-only validator",
+      "verificationMethod": "golden replay of the five frozen scenarios and the 90 negative fixtures (causa gate), plus forged-history variants (G3, G4)",
+      "dependencyVersions": [
+        "causa-storage-v1.0.0"
+      ],
+      "evidenceIdentity": "causa gate output anchored to causa-storage-v1.0.0 + engine test results at source SHA",
+      "status": "missing",
+      "requirements": [
+        "REHEARSAL-AGENT-INTERFACE-FREEZE§boundary-c-replay",
+        "STORAGE-002"
+      ],
+      "identity": [],
+      "citations": [
+        {
+          "repo": "indy-init",
+          "path": "docs/REHEARSAL-AGENT-INTERFACE-FREEZE.md",
+          "quote": "No alternative browser-only validator."
+        }
+      ]
+    },
+    {
+      "id": "CT-004",
+      "producedBy": "T14",
+      "name": "Boundary D: provider-neutral persistence port",
+      "provider": "storage adapter (local store and GitHub provider)",
+      "consumer": "domain/application layer",
+      "contractVersion": "none yet (T14)",
+      "requiredCompatibility": "load, append with expected version, acknowledge remote persistence, surface conflict, recover local edits; local-durable separate from remotely-synced",
+      "verificationMethod": "four verification levels (PF-011): domain, fixture provider, recorded real-provider conformance, live provider job against the test repository (G6)",
+      "dependencyVersions": [
+        "causa-storage-v1.0.0",
+        "GitHub REST/GraphQL API (see CT-007)"
+      ],
+      "evidenceIdentity": "live job run id + independent SHA re-reads of written commits",
+      "status": "missing",
+      "requirements": [
+        "REHEARSAL-AGENT-INTERFACE-FREEZE§boundary-d-persistence",
+        "PF-001",
+        "PF-011",
+        "R10.6"
+      ],
+      "identity": [],
+      "citations": [
+        {
+          "repo": "indy-init",
+          "path": "docs/REHEARSAL-AGENT-INTERFACE-FREEZE.md",
+          "quote": "Provider-neutral operations: load, append with expected version, acknowledge remote persistence, surface conflict, and recover local edits."
+        }
+      ]
+    },
+    {
+      "id": "CT-005",
+      "producedBy": "T14",
+      "name": "Boundary E: report projection to Folio",
+      "provider": "F# domain engine (read-only report projection)",
+      "consumer": "Folio print components",
+      "contractVersion": "none yet (T14)",
+      "requiredCompatibility": "report cannot elevate an unverified hypothesis to a confirmed cause",
+      "verificationMethod": "report fidelity tests against projections; print rendering with Folio's report contracts (ef-print-finding, ef-print-integrity) (G8)",
+      "dependencyVersions": [
+        "folio 0.4.0 (registered; v0.4.1 tag unassessed, F-015)"
+      ],
+      "evidenceIdentity": "rendered report artifact digest at deployed SHA",
+      "status": "missing",
+      "requirements": [
+        "REHEARSAL-AGENT-INTERFACE-FREEZE§boundary-e-report",
+        "R12.1",
+        "R12.3"
+      ],
+      "identity": [],
+      "citations": [
+        {
+          "repo": "indy-init",
+          "path": "docs/REHEARSAL-AGENT-INTERFACE-FREEZE.md",
+          "quote": "Report rendering cannot elevate an unverified hypothesis to a confirmed cause."
+        }
+      ]
+    },
+    {
+      "id": "CT-006",
+      "name": "Causa storage contract v1.0.0",
+      "provider": "kemiller2002/causa-data (tag causa-storage-v1.0.0)",
+      "consumer": "application storage adapter; catalog loader",
+      "contractVersion": "1.0.0",
+      "requiredCompatibility": "exact: all three identities must match (STORAGE-007); reader/writer specification without vendoring records (EXT-DATA-011)",
+      "verificationMethod": "identities (checked here) + `causa gate . --anchor causa-storage-v1.0.0` + application replay and round-trip tests (G4)",
+      "dependencyVersions": [
+        ".NET SDK 10.0.402",
+        "engine indy-init-rehearsal-001@55f49f61c939a3a780cee592f36f732a1328f981"
+      ],
+      "evidenceIdentity": "schema, dataset and release SHA-256 identities listed below",
+      "status": "identity-verified",
+      "requirements": [
+        "CAUSA-STORAGE-RELEASE§identities",
+        "STORAGE-001",
+        "STORAGE-007",
+        "EXT-DATA-011",
+        "ADRP-005"
+      ],
+      "identity": [
+        {
+          "label": "schema identity (contract/v1.0.0/schemas/bundle.json)",
+          "repo": "causa-data",
+          "rev": "c947c7e354be80766573a782546c8186336774cc",
+          "path": "contract/v1.0.0/schemas/bundle.json",
+          "expectedSha256": "0a68af8c93190d2e4d6c27beb2f8cb67c3aebdda586d01beb7122b71af179152"
+        },
+        {
+          "label": "dataset identity (fixtures/v1.0.0/manifest.json)",
+          "repo": "causa-data",
+          "rev": "c947c7e354be80766573a782546c8186336774cc",
+          "path": "fixtures/v1.0.0/manifest.json",
+          "expectedSha256": "f650a2e509a420872b46177b21f57ef6ebd7625ae4c69dd92198d3ca472c2b86"
+        },
+        {
+          "label": "release identity (compatibility/v1.0.0/lock.json)",
+          "repo": "causa-data",
+          "rev": "c947c7e354be80766573a782546c8186336774cc",
+          "path": "compatibility/v1.0.0/lock.json",
+          "expectedSha256": "6a7e7802ff2a3ff500ab6065662514a96e09e6c15eb30212ba1377fcc5bf8fc5"
+        },
+        {
+          "label": "schema identity unchanged at the catalog commit",
+          "repo": "causa-data",
+          "rev": "22260f429501d0d6963fc33302ed1e64d742a374",
+          "path": "contract/v1.0.0/schemas/bundle.json",
+          "expectedSha256": "0a68af8c93190d2e4d6c27beb2f8cb67c3aebdda586d01beb7122b71af179152"
+        }
+      ],
+      "citations": [
+        {
+          "repo": "indy-init",
+          "path": "docs/CAUSA-STORAGE-RELEASE-v1.0.0.md",
+          "quote": "0a68af8c93190d2e4d6c27beb2f8cb67c3aebdda586d01beb7122b71af179152"
+        }
+      ]
+    },
+    {
+      "id": "CT-007",
+      "name": "GitHub write primitive (atomic, guarded publication)",
+      "provider": "GitHub API",
+      "consumer": "GitHub persistence provider",
+      "contractVersion": "contested: CONTRACT.md 9.4 (non-forced ref PATCH) versus R2 owner decision (GraphQL createCommitOnBranch with expectedHeadOid)",
+      "requiredCompatibility": "atomic three-file publication refused on a moved head; success only after a re-read at the new head",
+      "verificationMethod": "recorded real-provider conformance (including race and stale-read variants) and the live conflict test (G6)",
+      "dependencyVersions": [
+        "GitHub GraphQL createCommitOnBranch",
+        "GitHub REST git refs"
+      ],
+      "evidenceIdentity": "live job run id, commit SHAs, independent re-read",
+      "status": "blocked",
+      "requirements": [
+        "EXT-DATA-006",
+        "STORAGE-006",
+        "R10.4"
+      ],
+      "identity": [],
+      "citations": [
+        {
+          "repo": "causa-data",
+          "path": "contract/v1.0.0/CONTRACT.md",
+          "quote": "A ref update that is not"
+        },
+        {
+          "repo": "indy-init-rehearsal-002",
+          "path": "docs/REHEARSAL-002-REPORT.md",
+          "quote": "which GitHub applies atomically or refuses"
+        }
+      ],
+      "blockerClass": "contract-incompatibility"
+    },
+    {
+      "id": "CT-008",
+      "name": "Active historical catalog historical-v1",
+      "provider": "kemiller2002/causa-data catalog/historical-v1",
+      "consumer": "connect flow and catalog view",
+      "contractVersion": "catalog 1.0.0 (causa-historical-v1.0.0) over storage contract 1.0.0",
+      "requiredCompatibility": "manifest lists exactly three cases with digests; records are ordinary v1.0.0 file sets in workspace historical-v1",
+      "verificationMethod": "`python3 -I tools/py/historical_catalog.py verify . --app <app checkout>` (includes no-app-bundling check) and application load test after Connect",
+      "dependencyVersions": [
+        "causa-storage-v1.0.0"
+      ],
+      "evidenceIdentity": "catalog manifest SHA-256 below; per-case expectedStateSha256 in the manifest",
+      "status": "identity-verified",
+      "requirements": [
+        "HISTORICAL-CASE-CATALOG§catalog-policy",
+        "HISTORICAL-CASE-CATALOG§completion-gate"
+      ],
+      "identity": [
+        {
+          "label": "catalog manifest",
+          "repo": "causa-data",
+          "rev": "22260f429501d0d6963fc33302ed1e64d742a374",
+          "path": "catalog/historical-v1/manifest.json",
+          "expectedSha256": "8c361929cfb429c31c059c92d6148036bf2b5861f81dace635a1f7de18dbf87c"
+        }
+      ],
+      "citations": [
+        {
+          "repo": "causa-data",
+          "path": "README.md",
+          "quote": "An external application reads them by selecting repository"
+        },
+        {
+          "repo": "causa-data",
+          "path": "catalog/historical-v1/verification/release.json",
+          "quote": "\"catalogManifestSha256\": \"8c361929cfb429c31c059c92d6148036bf2b5861f81dace635a1f7de18dbf87c\""
+        }
+      ]
+    },
+    {
+      "id": "CT-009",
+      "name": "Limen kernel and EngineTransport",
+      "provider": "@echelon-foundry/limen 0.9.0 + limen-fsharp 0.9.0",
+      "consumer": "application shell and F# engine",
+      "contractVersion": "0.9.0 (exact pin; 0.x minors may break the protocol)",
+      "requiredCompatibility": "exact version from the kickoff lock",
       "verificationMethod": "startup, failure (transport rejection) and retry tests in WebKit at the deployed SHA (WASM-LOAD-008, DEP-CURRENT-004)",
-      "dependencyVersions": ["limen 0.9.0", "limen-fsharp 0.9.0"], "evidenceIdentity": "lock entry digest (registry releaseManifestSha256) + startup test run",
-      "status": "unverified", "requirements": ["WASM-LOAD-001", "WASM-LOAD-004", "WASM-LOAD-005", "R13.3"],
+      "dependencyVersions": [
+        "limen 0.9.0",
+        "limen-fsharp 0.9.0"
+      ],
+      "evidenceIdentity": "lock entry digest (registry releaseManifestSha256) + startup test run",
+      "status": "unverified",
+      "requirements": [
+        "WASM-LOAD-001",
+        "WASM-LOAD-004",
+        "WASM-LOAD-005",
+        "R13.3"
+      ],
       "identity": [],
-      "citations": [ { "repo": "limen", "path": "docs/03-kernel-lifecycle.md", "quote": "the page stays at its placeholder content" } ]
+      "citations": [
+        {
+          "repo": "limen",
+          "path": "docs/03-kernel-lifecycle.md",
+          "quote": "the page stays at its placeholder content"
+        }
+      ]
     },
     {
-      "id": "CT-010", "name": "Forma design system and color contract", "provider": "@echelon-foundry/design-system 0.9.0", "consumer": "application UI (UI-016 palette, shell, inspector)",
-      "contractVersion": "0.9.0 (forma.color-contract/1.0.0)", "requiredCompatibility": "exact version from the kickoff lock",
+      "id": "CT-010",
+      "name": "Forma design system and color contract",
+      "provider": "@echelon-foundry/design-system 0.9.0",
+      "consumer": "application UI (UI-016 palette, shell, inspector)",
+      "contractVersion": "0.9.0 (forma.color-contract/1.0.0)",
+      "requiredCompatibility": "exact version from the kickoff lock",
       "verificationMethod": "token presence and contrast checks, Percepta screen contracts, axe accessibility, deployed screenshots (G5)",
-      "dependencyVersions": ["forma 0.9.0"], "evidenceIdentity": "lock entry digest + deployed screenshot set",
-      "status": "unverified", "requirements": ["UI-016", "ADRP-003", "UI-034"],
+      "dependencyVersions": [
+        "forma 0.9.0"
+      ],
+      "evidenceIdentity": "lock entry digest + deployed screenshot set",
+      "status": "unverified",
+      "requirements": [
+        "UI-016",
+        "ADRP-003",
+        "UI-034"
+      ],
       "identity": [],
-      "citations": [ { "repo": "forma", "path": "README.md", "quote": "The wrapper is not registered with customElements.define()" } ]
+      "citations": [
+        {
+          "repo": "forma",
+          "path": "README.md",
+          "quote": "The wrapper is not registered with customElements.define()"
+        }
+      ]
     },
     {
-      "id": "CT-011", "name": "Folio print components", "provider": "@echelon-foundry/print-components 0.4.0", "consumer": "report preview and export",
-      "contractVersion": "0.4.0 (registered)", "requiredCompatibility": "exact version from the kickoff lock",
+      "id": "CT-011",
+      "name": "Folio print components",
+      "provider": "@echelon-foundry/print-components 0.4.0",
+      "consumer": "report preview and export",
+      "contractVersion": "0.4.0 (registered)",
+      "requiredCompatibility": "exact version from the kickoff lock",
       "verificationMethod": "Folio printing smoke (DEP-CURRENT-004) and report fidelity tests (G8)",
-      "dependencyVersions": ["folio 0.4.0"], "evidenceIdentity": "lock entry digest + rendered report artifact",
-      "status": "unverified", "requirements": ["R12.1", "UI-009"],
+      "dependencyVersions": [
+        "folio 0.4.0"
+      ],
+      "evidenceIdentity": "lock entry digest + rendered report artifact",
+      "status": "unverified",
+      "requirements": [
+        "R12.1",
+        "UI-009"
+      ],
       "identity": [],
-      "citations": [ { "repo": "indy-init", "path": "docs/REHEARSAL-DEPENDENCY-LOCK.md", "quote": "Folio printing" } ]
+      "citations": [
+        {
+          "repo": "indy-init",
+          "path": "docs/REHEARSAL-DEPENDENCY-LOCK.md",
+          "quote": "Folio printing"
+        }
+      ]
     },
     {
-      "id": "CT-012", "name": "Percepta semantic CLI: contract and evidence schemas", "provider": "percepta-semantic (released v0.2.1, not registered)", "consumer": "UI acceptance (G5)",
-      "contractVersion": "percepta-contract.schema.json; percepta-evidence.schema.json schemaVersion 1.0.0", "requiredCompatibility": "the release pinned by the kickoff set",
+      "id": "CT-012",
+      "name": "Percepta semantic CLI: contract and evidence schemas",
+      "provider": "percepta-semantic (released v0.2.1, not registered)",
+      "consumer": "UI acceptance (G5)",
+      "contractVersion": "percepta-contract.schema.json; percepta-evidence.schema.json schemaVersion 1.0.0",
+      "requiredCompatibility": "the release pinned by the kickoff set",
       "verificationMethod": "`percepta verify --contract <screen> --url <deployed SHA>`; `percepta validate-evidence`",
-      "dependencyVersions": ["percepta-semantic 0.2.1 (pending registration)"], "evidenceIdentity": "evidence JSON digest + deployed SHA",
-      "status": "blocked", "requirements": ["UI-015", "UI-030", "PF-016"],
+      "dependencyVersions": [
+        "percepta-semantic 0.2.1 (registered release; not in an approved set)"
+      ],
+      "evidenceIdentity": "evidence JSON digest + deployed SHA",
+      "status": "blocked",
+      "requirements": [
+        "UI-015",
+        "UI-030",
+        "PF-016"
+      ],
       "identity": [],
-      "citations": [ { "repo": "echelon-registry", "path": "sets/echelon-current/1.27.0.json", "quote": "It is therefore not the complete Rehearsal 4 kickoff set" } ]
+      "citations": [
+        {
+          "repo": "echelon-registry",
+          "path": "sets/echelon-current/1.27.0.json",
+          "quote": "It is therefore not the complete Rehearsal 4 kickoff set"
+        }
+      ],
+      "blockerClass": "external-dependency"
     },
     {
-      "id": "CT-013", "name": "Praxis requirements preservation gate", "provider": "Praxis (draft praxis#292; no release)", "consumer": "rehearsal requirements derivation and acceptance (RDP-004)",
-      "contractVersion": "praxis.requirements-baseline/1, -disposition/1, -approvals/1, -preservation/1 (draft)", "requiredCompatibility": "a released, registered Praxis carrying the gate",
+      "id": "CT-013",
+      "name": "Praxis requirements preservation gate",
+      "provider": "Praxis (draft praxis#292; no release)",
+      "consumer": "rehearsal requirements derivation and acceptance (RDP-004)",
+      "contractVersion": "praxis.requirements-baseline/1, -disposition/1, -approvals/1, -preservation/1 (draft)",
+      "requiredCompatibility": "a released, registered Praxis carrying the gate",
       "verificationMethod": "gate exit 0 on the derived package, disposition and operator approvals; evidence JSON committed (RDP-004)",
-      "dependencyVersions": ["praxis 3.20.0 (no gate)"], "evidenceIdentity": "praxis.requirements-preservation/1 output with input SHA-256s",
-      "status": "blocked", "requirements": ["AR-004", "WDL-015", "VER-010"],
+      "dependencyVersions": [
+        "praxis 3.20.0 (no gate)"
+      ],
+      "evidenceIdentity": "praxis.requirements-preservation/1 output with input SHA-256s",
+      "status": "blocked",
+      "requirements": [
+        "AR-004",
+        "WDL-015",
+        "VER-010"
+      ],
       "identity": [],
-      "citations": [ { "repo": "indy-init", "path": "docs/REHEARSAL-DERIVATION-POLICY.md", "quote": "The gate is praxis requirements preservation verify" } ]
+      "citations": [
+        {
+          "repo": "indy-init",
+          "path": "docs/REHEARSAL-DERIVATION-POLICY.md",
+          "quote": "The gate is praxis requirements preservation verify"
+        }
+      ],
+      "blockerClass": "external-dependency"
     },
     {
-      "id": "CT-014", "name": "Dokimos verified completion", "provider": "dokimos 0.7.0", "consumer": "Praxis work completion; acceptance evidence",
-      "contractVersion": "dokimos.completion-verification; echelon.verification-receipt/1 (attested)", "requiredCompatibility": "pairing with Praxis 3.20.0 (registry capability verified-completion-attested)",
+      "id": "CT-014",
+      "name": "Dokimos verified completion",
+      "provider": "dokimos 0.7.0",
+      "consumer": "Praxis work completion; acceptance evidence",
+      "contractVersion": "dokimos.completion-verification; echelon.verification-receipt/1 (attested)",
+      "requiredCompatibility": "pairing with Praxis 3.20.0 (registry capability verified-completion-attested)",
       "verificationMethod": "`dokimos completion verify --packet --authority` per completed work item",
-      "dependencyVersions": ["dokimos 0.7.0", "praxis 3.20.0"], "evidenceIdentity": "receipt bound to commit, Ordo contract digest and validation policy digest",
-      "status": "unverified", "requirements": ["DCC-006", "AR-007"],
+      "dependencyVersions": [
+        "dokimos 0.7.0",
+        "praxis 3.20.0"
+      ],
+      "evidenceIdentity": "receipt bound to commit, Ordo contract digest and validation policy digest",
+      "status": "unverified",
+      "requirements": [
+        "DCC-006",
+        "AR-007"
+      ],
       "identity": [],
-      "citations": [ { "repo": "echelon-registry", "path": "sets/echelon-current/1.27.0.json", "quote": "Replaced by Dokimos 0.7.0" } ]
+      "citations": [
+        {
+          "repo": "echelon-registry",
+          "path": "sets/echelon-current/1.27.0.json",
+          "quote": "Replaced by Dokimos 0.7.0"
+        }
+      ]
     },
     {
-      "id": "CT-015", "name": "Acceptance ledger and computed verdict", "provider": "kemiller2002/indy-init tools (validate-acceptance-ledger.py, compute-acceptance-verdict.py)", "consumer": "rehearsal CI and final report",
-      "contractVersion": "REHEARSAL-ACCEPTANCE-LEDGER.md at the source commit", "requiredCompatibility": "the ledger format at the pinned indy-init commit",
-      "verificationMethod": "CI runs compute-acceptance-verdict.py on every ledger or report change (R4-04); negative controls in tools/test-acceptance-verdict.py",
-      "dependencyVersions": ["python 3.12 (indy-init CI)"], "evidenceIdentity": "ledger JSON digest + verdict at report SHA",
-      "status": "unverified", "requirements": ["REHEARSAL-ACCEPTANCE-LEDGER§single-ledger-format", "AR-019", "ADRP-014"],
+      "id": "CT-015",
+      "name": "Acceptance ledger and computed verdict",
+      "provider": "kemiller2002/indy-init tools (validate-acceptance-ledger.py, compute-acceptance-verdict.py)",
+      "consumer": "rehearsal CI and final report",
+      "contractVersion": "causa.acceptance-ledger/2 with causa.acceptance-evidence-manifest/1 and causa.acceptance-evidence/1 (REHEARSAL-ACCEPTANCE-LEDGER.md at 9d98938, indy-init PR #16)",
+      "requiredCompatibility": "the verifier at the pinned indy-init commit, given independently supplied trust inputs: candidate repository and source SHA, the exact requirements baseline and its SHA-256 with a source checkout at the baseline commit, an externally pinned approvals file and SHA-256 with --trusted-operator-id, and a content-addressed evidence manifest with its SHA-256",
+      "verificationMethod": "CI runs the structural and independent-verdict regression suites on every push (tools/test-acceptance-ledger.py, tools/test-acceptance-verdict.py); T34 runs compute-acceptance-verdict.py with the pinned inputs; the report carries exactly one computed verdict line",
+      "dependencyVersions": [
+        "python 3.12 (indy-init CI)"
+      ],
+      "evidenceIdentity": "ledger JSON digest + verdict at report SHA",
+      "status": "unverified",
+      "requirements": [
+        "REHEARSAL-ACCEPTANCE-LEDGER§single-ledger-format",
+        "AR-019",
+        "ADRP-014"
+      ],
       "identity": [],
-      "citations": [ { "repo": "indy-init", "path": "docs/REHEARSAL-ACCEPTANCE-LEDGER.md", "quote": "derives ACCEPTED, INCOMPLETE, BLOCKED, FAILED or INVALID from the ledger" } ]
+      "citations": [
+        {
+          "repo": "indy-init",
+          "path": "docs/REHEARSAL-ACCEPTANCE-LEDGER.md",
+          "quote": "derives ACCEPTED, INCOMPLETE, BLOCKED, FAILED or INVALID from the ledger"
+        },
+        {
+          "repo": "indy-init",
+          "path": "docs/REHEARSAL-ACCEPTANCE-LEDGER.md",
+          "quote": "inline approvals are forbidden"
+        },
+        {
+          "repo": "indy-init",
+          "path": "docs/REHEARSAL-ACCEPTANCE-LEDGER.md",
+          "quote": "Agent-authored approvals in the ledger and untrusted operator identities are invalid."
+        }
+      ]
     },
     {
-      "id": "CT-016", "name": "Kickoff release-set lock", "provider": "echelon-registry (echelon-current) qualified by Conditor", "consumer": "rehearsal bootstrap and CI version gate",
-      "contractVersion": "echelon.release-set/v1; echelon-current 1.27.0 now, 1.28.0 required", "requiredCompatibility": "installed and loaded versions equal the lock (VER-008)",
+      "id": "CT-016",
+      "name": "Kickoff release-set lock",
+      "provider": "echelon-registry (echelon-current) qualified by Conditor",
+      "consumer": "rehearsal bootstrap and CI version gate",
+      "contractVersion": "echelon.release-set/v1; echelon-current 1.27.0 now, 1.28.0 required",
+      "requiredCompatibility": "installed and loaded versions equal the lock (VER-008)",
       "verificationMethod": "Conditor bootstrap verify/doctor; CI gate comparing installed artifacts to the lock (DEP-CURRENT-008)",
-      "dependencyVersions": ["see package-manifest.json dependencyVersions"], "evidenceIdentity": "release set file digest + Conditor qualification run",
-      "status": "blocked", "requirements": ["VER-004", "VER-008", "DEP-CURRENT-006", "DEP-CURRENT-008"],
+      "dependencyVersions": [
+        "see package-manifest.json dependencyVersions"
+      ],
+      "evidenceIdentity": "release set file digest + Conditor qualification run",
+      "status": "blocked",
+      "requirements": [
+        "VER-004",
+        "VER-008",
+        "DEP-CURRENT-006",
+        "DEP-CURRENT-008"
+      ],
       "identity": [],
-      "citations": [ { "repo": "echelon-registry", "path": "sets/echelon-current/1.27.0.json", "quote": "cut echelon-current 1.28.0" } ]
+      "citations": [
+        {
+          "repo": "echelon-registry",
+          "path": "sets/echelon-current/1.27.0.json",
+          "quote": "cut echelon-current 1.28.0"
+        }
+      ],
+      "blockerClass": "external-dependency"
     },
     {
-      "id": "CT-017", "name": "Authentication and authorization boundary for the connect flow", "provider": "GitHub (token or App authorization)", "consumer": "connect flow, GitHub provider",
-      "contractVersion": "undecided (F-019)", "requiredCompatibility": "least privilege; repository and branch permission checks before any write; never infer authority from advisory fields such as permissions.push (R2 DC-004)",
+      "id": "CT-017",
+      "name": "Authentication and authorization boundary for the connect flow",
+      "provider": "GitHub (token or App authorization)",
+      "consumer": "connect flow, GitHub provider",
+      "contractVersion": "undecided (F-019)",
+      "requiredCompatibility": "least privilege; repository and branch permission checks before any write; never infer authority from advisory fields such as permissions.push (R2 DC-004)",
       "verificationMethod": "denial without authorization, rejected-token and insufficient-scope live tests (EXT-DATA-009, R4-02)",
-      "dependencyVersions": ["GitHub API"], "evidenceIdentity": "live job run id",
-      "status": "missing", "requirements": ["R11.1", "R11.2", "EXT-DATA-003", "EXT-DATA-004", "EXT-DATA-005"],
+      "dependencyVersions": [
+        "GitHub API"
+      ],
+      "evidenceIdentity": "live job run id",
+      "status": "missing",
+      "requirements": [
+        "R11.1",
+        "R11.2",
+        "EXT-DATA-003",
+        "EXT-DATA-004",
+        "EXT-DATA-005"
+      ],
       "identity": [],
-      "citations": [ { "repo": "indy-init", "path": "docs/REHEARSAL-EXTERNAL-DATA-BOUNDARY.md", "quote": "A token alone is not sufficient to infer a safe repository target." } ]
+      "citations": [
+        {
+          "repo": "indy-init",
+          "path": "docs/REHEARSAL-EXTERNAL-DATA-BOUNDARY.md",
+          "quote": "A token alone is not sufficient to infer a safe repository target."
+        }
+      ],
+      "blockerClass": "owner-decision"
     },
     {
-      "id": "CT-018", "producedBy": "T14", "name": "Error and fault contract", "provider": "F# domain engine (Aegis-compatible faults) and providers (typed provider failures)", "consumer": "UI states and diagnostics",
-      "contractVersion": "none yet (part of the T14 interface manifest)", "requiredCompatibility": "typed rejection/fault variants on Boundary A; provider failures classified by write stage so 'may have applied' is never reported as 'not written' (R2 DC-003)",
+      "id": "CT-018",
+      "producedBy": "T14",
+      "name": "Error and fault contract",
+      "provider": "F# domain engine (Aegis-compatible faults) and providers (typed provider failures)",
+      "consumer": "UI states and diagnostics",
+      "contractVersion": "none yet (part of the T14 interface manifest)",
+      "requiredCompatibility": "typed rejection/fault variants on Boundary A; provider failures classified by write stage so 'may have applied' is never reported as 'not written' (R2 DC-003)",
       "verificationMethod": "negative cases of the interface freeze and provider-failure fixtures (PF-008)",
-      "dependencyVersions": ["aegis 1.0.0"], "evidenceIdentity": "interface manifest SHA + fault test results",
-      "status": "missing", "requirements": ["R8.3", "PF-008", "UI-010", "REHEARSAL-AGENT-INTERFACE-FREEZE§mandatory-negative-cases"],
+      "dependencyVersions": [
+        "aegis 1.0.0"
+      ],
+      "evidenceIdentity": "interface manifest SHA + fault test results",
+      "status": "missing",
+      "requirements": [
+        "R8.3",
+        "PF-008",
+        "UI-010",
+        "REHEARSAL-AGENT-INTERFACE-FREEZE§mandatory-negative-cases"
+      ],
       "identity": [],
-      "citations": [ { "repo": "causa-data", "path": "contract/v1.0.0/CONTRACT.md", "quote": "Pending, sending, conflicted and unknown remain distinct states." } ]
+      "citations": [
+        {
+          "repo": "causa-data",
+          "path": "contract/v1.0.0/CONTRACT.md",
+          "quote": "Pending, sending, conflicted and unknown remain distinct states."
+        }
+      ]
     }
   ]
 }

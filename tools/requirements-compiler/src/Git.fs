@@ -6,7 +6,7 @@ open System.Diagnostics
 open System.IO
 open System.Security.Cryptography
 
-let private run (repo: string) (args: string list) : Result<byte[], string> =
+let run (repo: string) (args: string list) : Result<byte[], string> =
     let psi = ProcessStartInfo("git")
     [ "-C"; repo ] @ args |> List.iter psi.ArgumentList.Add
     psi.RedirectStandardOutput <- true

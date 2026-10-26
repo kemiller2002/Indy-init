@@ -12,12 +12,14 @@
     <Compile Include="Json.fs" />
     <Compile Include="Git.fs" />
     <Compile Include="Text.fs" />
+    <Compile Include="Baseline.fs" />
     <Compile Include="Model.fs" />
     <Compile Include="Inventory.fs" />
     <Compile Include="Normalize.fs" />
     <Compile Include="Graph.fs" />
     <Compile Include="Artifacts.fs" />
     <Compile Include="Validate.fs" />
+    <Compile Include="Preflight.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 </Project>
