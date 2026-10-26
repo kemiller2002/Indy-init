@@ -14,20 +14,15 @@ open Json
 open Model
 open Text
 
-let private generatedFiles =
-    [ "requirements-inventory.json"
-      "normalized-requirements.json"
-      "requirements-source-map.json"
-      "decision-registry.json"
-      "contract-bindings.json"
-      "dependency-graph.json"
-      "verification-manifest.json"
-      "execution-plan-time.json"
-      "execution-plan-resource.json"
-      "percepta-experiment.json"
-      "requirements-validation-report.json" ]
 
-let private authoredFiles = [ "README.md"; "optimization-analysis.md" ]
+let private authoredFiles =
+    [ "README.md"
+      "optimization-analysis.md"
+      "readiness/READINESS-REPORT.md"
+      "readiness/OWNER-DECISION-REQUESTS.md"
+      "readiness/CONTRACT-RESOLUTION.md"
+      "readiness/FSHARP-TOOLING-ASSESSMENT.md"
+      "readiness/DEPENDENCY-COMPATIBILITY.md" ]
 
 type Options =
     { Source: string
@@ -36,7 +31,8 @@ type Options =
       Curation: string
       Out: string
       Repos: Map<string, string>
-      Check: bool }
+      Check: bool
+      Evidence: string }
 
 let rec parseArgs (args: string list) (o: Options) =
     match args with
@@ -51,6 +47,7 @@ let rec parseArgs (args: string list) (o: Options) =
         | [| n; p |] -> parseArgs rest { o with Repos = o.Repos.Add(n, p) }
         | _ -> Error(sprintf "--repo expects NAME=DIR, got '%s'" v)
     | "--check" :: rest -> parseArgs rest { o with Check = true }
+    | "--evidence" :: v :: rest -> parseArgs rest { o with Evidence = v }
     | a :: _ -> Error(sprintf "unknown argument '%s'" a)
 
 let private fileSha (path: string) = File.ReadAllBytes path |> Git.sha256Hex
@@ -65,14 +62,44 @@ let private loadCuration (dir: string) =
       Tasks = arr "tasks" (load "tasks.json") |> List.map taskOf
       Rules = arr "rules" (load "verification-rules.json") |> List.map ruleOf
       Experiment = load "experiment.json"
-      External = arr "documents" (load "external-requirements.json") }
+      External = arr "documents" (load "external-requirements.json")
+      PreflightChecks = arr "checks" (load "preflight-checks.json")
+      DefectTests = arr "tests" (load "defect-class-tests.json") }
 
 let private curationFiles (dir: string) =
     Directory.GetFiles(dir, "*.json") |> Array.map Path.GetFileName |> Array.sort |> List.ofArray
 
-let private compileOrThrow (o: Options) : int =
+type Built =
+    { Files: (string * string) list
+      Checks: Validate.Check list
+      Report: Json
+      Inputs: Validate.Inputs
+      VerdictPass: bool }
+
+/// Builds the whole package in memory: generated files, validation checks and report.
+let buildPackage (o: Options) : Built =
     let curation = loadCuration o.Curation
-    let baseline = parseFile o.Baseline
+
+    // The baseline is either supplied, or built in-process by the F# port at the recorded indy-init commit.
+    let baselineBytes, baselineGenerator =
+        if o.Baseline <> "" then
+            File.ReadAllBytes o.Baseline, "supplied file (" + Path.GetFileName o.Baseline + ")"
+        else
+            let commit =
+                arr "repositories" curation.Sources
+                |> List.find (fun r -> str "name" r = "indy-init")
+                |> str "commit"
+
+            let read path =
+                match Git.showFile o.Source commit path with
+                | Ok b -> utf8 b
+                | Error e -> failwithf "cannot read %s at %s: %s" path commit e
+
+            Baseline.build read commit |> serializePythonStyle |> Text.Encoding.UTF8.GetBytes,
+            "requirements-compiler baseline (F# port; byte-equivalent to tools/build-requirements-baseline.py)"
+
+    let baseline = parseBytes baselineBytes
+    let baselineSha = Git.sha256Hex baselineBytes
     let source = field "source" baseline |> Option.defaultValue JNull
     let sourceCommit = str "commit" source
     let repos = o.Repos.Add("indy-init", o.Source)
@@ -185,6 +212,7 @@ let private compileOrThrow (o: Options) : int =
         (curation.Findings |> List.collect (fun f -> citationsOf "citations" f @ citationsOf "resolutionSources" f))
         @ (curation.Decisions |> List.collect (citationsOf "sources"))
         @ (curation.Contracts |> List.collect (citationsOf "citations"))
+        @ (curation.DefectTests |> List.collect (citationsOf "citations"))
         |> List.distinct
 
     let fileCache =
@@ -258,7 +286,7 @@ let private compileOrThrow (o: Options) : int =
         { SourceRepo = str "repository" source
           SourceCommit = sourceCommit
           BaselineId = str "id" baseline
-          BaselineSha256 = fileSha o.Baseline
+          BaselineSha256 = baselineSha
           Documents = documents
           Requirements = requirements
           Categories = categories
@@ -310,7 +338,9 @@ let private compileOrThrow (o: Options) : int =
           "verification-manifest.json", Artifacts.verificationManifest compiled
           "execution-plan-time.json", Artifacts.executionPlan compiled planA
           "execution-plan-resource.json", Artifacts.executionPlan compiled planB
-          "percepta-experiment.json", Artifacts.perceptaExperiment compiled ]
+          "percepta-experiment.json", Artifacts.perceptaExperiment compiled
+          "preflight-manifest.json", Artifacts.preflightManifest compiled
+          "timed-execution-manifest.json", Artifacts.timedExecutionManifest compiled planB ]
 
     // Validation reads the serialized artifacts back, so it checks what is actually written.
     let reparsed = outputs0 |> List.map (fun (n, j) -> n, serialize j |> Text.Encoding.UTF8.GetBytes |> parseBytes) |> Map.ofList
@@ -341,7 +371,7 @@ let private compileOrThrow (o: Options) : int =
         |> List.map (fun f -> f, fileSha (Path.Combine(o.Out, f)))
 
     let sdk =
-        let g = Path.Combine(o.Source, "tools", "requirements-compiler", "global.json")
+        let g = Path.Combine(o.Source, "global.json")
         if File.Exists g then field "sdk" (parseFile g) |> Option.map (str "version") |> Option.defaultValue "unpinned"
         else "unpinned"
 
@@ -354,8 +384,8 @@ let private compileOrThrow (o: Options) : int =
                   [ "repository", JStr(str "repository" source)
                     "commit", JStr sourceCommit
                     "baselineId", JStr(str "id" baseline)
-                    "baselineSha256", JStr(fileSha o.Baseline)
-                    "baselineGenerator", JStr "tools/build-requirements-baseline.py (existing; unmodified)" ]
+                    "baselineSha256", JStr baselineSha
+                    "baselineGenerator", JStr baselineGenerator ]
               "repositories",
               arr "repositories" curation.Sources
               |> List.map (fun r -> JObj [ "name", JStr(str "name" r); "commit", JStr(str "commit" r); "role", JStr(str "role" r) ])
@@ -373,8 +403,18 @@ let private compileOrThrow (o: Options) : int =
               "compilationVerdict", field "compilationVerdict" report |> Option.defaultValue JNull
               "rehearsalReadiness", field "rehearsalReadiness" report |> Option.bind (field "verdict") |> Option.defaultValue JNull ]
 
-    let allFiles = rendered @ [ "package-manifest.json", serialize manifest ]
-    let verdictPass = str "compilationVerdict" report = "PASS"
+    { Files = rendered @ [ "package-manifest.json", serialize manifest ]
+      Checks = checks
+      Report = report
+      Inputs = inputs
+      VerdictPass = str "compilationVerdict" report = "PASS" }
+
+let private compileOrThrow (o: Options) : int =
+    let built = buildPackage o
+    let allFiles = built.Files
+    let checks = built.Checks
+    let report = built.Report
+    let verdictPass = built.VerdictPass
 
     if o.Check then
         let differing =
@@ -415,15 +455,78 @@ let defaults =
       Curation = "requirements-compiled/v1/curation"
       Out = "requirements-compiled/v1"
       Repos = Map.empty
-      Check = false }
+      Check = false
+      Evidence = "" }
+
+/// `baseline ROOT COMMIT`: same contract as tools/build-requirements-baseline.py (reads the working
+/// tree under ROOT, writes the baseline to stdout; exit 2 on usage, 1 on a rule violation).
+let baselineCommand (root: string) (commit: string) : int =
+    if not (Baseline.isCommit commit) then
+        eprintfn "usage: requirements-compiler baseline ROOT COMMIT(40 hex)"
+        2
+    else
+        try
+            let read (path: string) = File.ReadAllText(Path.Combine(root, path), Text.Encoding.UTF8)
+            let out = Console.OpenStandardOutput()
+            let bytes = Baseline.build read commit |> serializePythonStyle |> Text.Encoding.UTF8.GetBytes
+            out.Write(bytes, 0, bytes.Length)
+            out.Flush()
+            0
+        with
+        | Baseline.BaselineError msg ->
+            eprintfn "%s" msg
+            1
+        | :? IOException as ex ->
+            eprintfn "%s" ex.Message
+            1
+
+/// `preflight <compile options> --evidence FILE`: builds the package in memory, executes every preflight
+/// check and writes the evidence. Exit 0 READY, 3 BLOCKED or FAIL, 2 unusable input.
+let preflightCommand (o: Options) : int =
+    try
+        let built = buildPackage o
+        let ctx: Preflight.Context =
+            { Compiled = built.Inputs.Compiled
+              Report = built.Report
+              Source = o.Source
+              SourceCommit = built.Inputs.Compiled.SourceCommit
+              Repos = o.Repos.Add("indy-init", o.Source) }
+
+        let results =
+            built.Inputs.Compiled.Curation.PreflightChecks
+            |> List.sortBy (str "id")
+            |> List.map (fun k -> k, Preflight.runCheck ctx k)
+
+        let evidence = Preflight.evidence ctx DateTime.UtcNow results
+        results |> List.iter (fun (k, r) -> printfn "%-12s %-12s %s" (str "id" k) r.Status r.Detail)
+        let v = str "verdict" evidence
+        printfn "preflight: %s" v
+
+        if o.Evidence <> "" then
+            Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath o.Evidence)) |> ignore
+            File.WriteAllText(o.Evidence, serialize evidence)
+
+        if v = "READY" then 0 else 3
+    with ex ->
+        eprintfn "input error: %s" ex.Message
+        2
 
 [<EntryPoint>]
 let main argv =
-    match parseArgs (List.ofArray argv) defaults with
-    | Error e ->
-        eprintfn "%s" e
+    match List.ofArray argv with
+    | [ "baseline"; root; commit ] -> baselineCommand root commit
+    | "preflight" :: rest ->
+        match parseArgs rest defaults with
+        | Error e ->
+            eprintfn "%s" e
+            2
+        | Ok o -> preflightCommand o
+    | "baseline" :: _ ->
+        eprintfn "usage: requirements-compiler baseline ROOT COMMIT(40 hex)"
         2
-    | Ok o when o.Baseline = "" ->
-        eprintfn "--baseline is required"
-        2
-    | Ok o -> compile o
+    | args ->
+        match parseArgs args defaults with
+        | Error e ->
+            eprintfn "%s" e
+            2
+        | Ok o -> compile o

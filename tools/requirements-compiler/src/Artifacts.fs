@@ -502,3 +502,178 @@ let perceptaExperiment (c: Compiled) =
                 |> JArr ]
         )
     | other -> other
+
+// ---- readiness: package state, preflight and timed-execution manifests --------------------------
+
+/// Deterministic evaluation of a package-state preflight condition: (status, detail).
+/// Conditions that need the validation report are left to the preflight run.
+let packageState (c: Compiled) (condition: string) : string * string =
+    let ids (xs: Json list) = xs |> List.map (str "id") |> List.sort |> String.concat ", "
+
+    match condition with
+    | "no-unresolved-decisions" ->
+        match c.Curation.Decisions |> List.filter (fun d -> str "classification" d = "unresolved") with
+        | [] -> "PASS", "no unresolved decision"
+        | ds -> "BLOCKED", "unresolved: " + ids ds
+    | "no-open-critical-findings" ->
+        match c.Curation.Findings |> List.filter (fun f -> isOpenMaterial f && str "severity" f = "critical") with
+        | [] -> "PASS", "no open critical finding"
+        | fs -> "BLOCKED", "open: " + ids fs
+    | "no-blocked-contracts" ->
+        match c.Curation.Contracts |> List.filter (fun k -> str "status" k = "blocked") with
+        | [] -> "PASS", "no blocked contract"
+        | ks -> "BLOCKED", "blocked: " + ids ks
+    | "identities-match" ->
+        let results = c.IdentityResults |> Map.toList |> List.collect snd
+        if not results.IsEmpty && results |> List.forall (boolOr "match" false) then "PASS", sprintf "%d identities match" results.Length
+        else "FAIL", "an identity does not match"
+    | _ -> "requires-execution", "evaluated by `requirements-compiler preflight`"
+
+let private taskById (c: Compiled) = c.Curation.Tasks |> List.map (fun t -> t.Id, t) |> Map.ofList
+
+let private coveredBy (c: Compiled) =
+    c.Coverage |> Map.toList |> List.collect (fun (r, ts) -> ts |> List.map (fun t -> t, r)) |> List.groupBy fst
+    |> List.map (fun (t, xs) -> t, xs |> List.map snd) |> Map.ofList
+
+let private priorityOf (c: Compiled) =
+    c.Requirements |> List.map (fun r -> r.Id, r.Priority) |> Map.ofList
+
+let preflightManifest (c: Compiled) =
+
+    let check (k: Json) =
+        let status, detail =
+            if str "type" k = "package-state" then packageState c (field "params" k |> Option.map (str "condition") |> Option.defaultValue "")
+            elif str "type" k = "manual" then "NOT_RUN", "needs an owner or organizer record; never passes automatically"
+            else "requires-execution", "evaluated by `requirements-compiler preflight`"
+
+        JObj
+            [ "id", JStr(str "id" k)
+              "category", JStr(str "category" k)
+              "title", JStr(str "title" k)
+              "type", JStr(str "type" k)
+              "params", field "params" k |> Option.defaultValue (JObj [])
+              "tasks", jstrs (strs "tasks" k)
+              "refs", jstrs (strs "refs" k)
+              "packageStatus", JStr status
+              "detail", JStr detail ]
+
+    let tasks = c.Curation.Tasks |> List.filter (fun t -> t.Phase = "preflight") |> List.sortBy (fun t -> t.Id)
+
+    JObj
+        [ "schema", JStr "indy-init.preflight-manifest/1"
+          "run", JStr "Rehearsal 4 (write-path dress rehearsal)"
+          "boundary", JStr "Untimed. Ends at the first green bootstrap CI, where the 420-minute timer starts (REHEARSAL-004-WRITE-PATH-PLAN P5)."
+          "competitionUse", JStr "Rehearsal preflight artifacts are not automatically permissible at the event: organizer confirmation is check PRE-ORG-01 (ADRP-016)."
+          "statusVocabulary",
+          JObj
+              [ "PASS", JStr "satisfied by the package state"
+                "BLOCKED", JStr "a named owner decision, upstream release or contract is missing"
+                "FAIL", JStr "a deterministic check failed"
+                "NOT_RUN", JStr "needs a person's record"
+                "requires-execution", JStr "only `requirements-compiler preflight` can decide it; see readiness/evidence" ]
+          "summary",
+          countBy (fun (k: Json) -> fst (if str "type" k = "package-state" then packageState c (field "params" k |> Option.map (str "condition") |> Option.defaultValue "") elif str "type" k = "manual" then "NOT_RUN", "" else "requires-execution", "")) c.Curation.PreflightChecks
+          "checks", c.Curation.PreflightChecks |> List.sortBy (str "id") |> List.map check |> JArr
+          "tasks",
+          tasks
+          |> List.map (fun t ->
+              JObj
+                  [ "id", JStr t.Id
+                    "title", JStr t.Title
+                    "owner", JStr t.Owner
+                    "satisfiedBy", JStr t.SatisfiedBy
+                    "dependsOn", jstrs (t.DependsOn |> List.map (fun d -> d.Task))
+                    "decisions", jstrs t.Decisions
+                    "contracts", jstrs t.Contracts
+                    "completion", jstrs t.Completion
+                    "gates", jstrs t.Gates ])
+          |> JArr ]
+
+
+/// The workstream a timed task belongs to, as named in the readiness mission.
+let private workstream (t: WorkTask) =
+    match t.Id, t.Owner, t.Kind with
+    | ("T18" | "T21"), _, _ -> "live-provider-integration"
+    | "T32", _, _ -> "defect-correction"
+    | "T34", _, _ -> "final-acceptance"
+    | _, "reviewer", _ -> "independent-review"
+    | _, _, "integration-checkpoint" -> "integration-testing"
+    | _, "persistence", _ -> "persistence-implementation"
+    | _, "ui", _ -> "ui-implementation"
+    | _, "domain", _ -> "application-implementation"
+    | _ -> "integration-testing"
+
+let timedExecutionManifest (c: Compiled) (plan: PlanSpec) =
+    match c.Order with
+    | Error _ -> JObj [ "schema", JStr "indy-init.timed-execution-manifest/1"; "error", JStr "dependency graph has a cycle" ]
+    | Ok order ->
+        let byId = taskById c
+        let slots = Graph.schedule plan.LaneOf plan.Unbounded order c.Curation.Tasks
+        let timed = slots |> List.filter (fun s -> byId.[s.Task].Phase = "timed")
+        let stepRank = timed |> List.map (fun s -> s.Step) |> List.distinct |> List.sort |> List.mapi (fun i s -> s, i + 1) |> Map.ofList
+        let covered = coveredBy c
+        let priority = priorityOf c
+        let tests = c.Curation.DefectTests |> List.groupBy (str "task") |> Map.ofList
+        let p0 = c.Requirements |> List.filter (fun r -> r.Priority = "P0") |> List.map (fun r -> r.Id)
+
+        let p0InTimed =
+            p0 |> List.filter (fun r -> c.Coverage.TryFind r |> Option.defaultValue [] |> List.exists (fun t -> byId.[t].Phase = "timed"))
+
+        let task (s: Graph.Slot) =
+            let t = byId.[s.Task]
+            let reqs = covered.TryFind t.Id |> Option.defaultValue []
+
+            JObj
+                [ "id", JStr t.Id
+                  "title", JStr t.Title
+                  "workstream", JStr(workstream t)
+                  "lane", JStr s.Lane
+                  "step", jint stepRank.[s.Step]
+                  "kind", JStr t.Kind
+                  "dependsOn", jstrs (t.DependsOn |> List.filter (fun d -> byId.[d.Task].Phase = "timed") |> List.map (fun d -> d.Task))
+                  "preflightPrerequisites", jstrs (t.DependsOn |> List.filter (fun d -> byId.[d.Task].Phase <> "timed") |> List.map (fun d -> d.Task))
+                  "conditionalOn", jopt JStr t.ConditionalOn
+                  "ciRun", JBool(plan.CiTriggerKinds.Contains t.Kind)
+                  "requirementsCovered", jint reqs.Length
+                  "p0RequirementsCovered", jint (reqs |> List.filter (fun r -> priority.[r] = "P0") |> List.length)
+                  "defectClassTests", jstrs (tests.TryFind t.Id |> Option.defaultValue [] |> List.map (str "id"))
+                  "contracts", jstrs t.Contracts
+                  "gates", jstrs t.Gates
+                  "completion", jstrs t.Completion ]
+
+        JObj
+            [ "schema", JStr "indy-init.timed-execution-manifest/1"
+              "run", JStr "Rehearsal 4 (write-path dress rehearsal)"
+              "plan", JStr(plan.Key + " (default; Plan A's parallel lanes need owner approval, F-007)")
+              "clock",
+              JObj
+                  [ "startsAt", JStr "first green bootstrap CI (task T10, REHEARSAL-004-WRITE-PATH-PLAN P5)"
+                    "ceilingMinutes", jint 420
+                    "stopRule", JStr "stop when the computed verdict is ACCEPTED, or at 420 minutes (R4-07)" ]
+              "preconditions", JStr "Every check in preflight-manifest.json is PASS, or NOT_RUN only for PRE-ORG-01 (event-only)."
+              "milestones",
+              JArr
+                  [ JObj [ "milestone", JStr "first green CI"; "task", JStr "T10" ]
+                    JObj [ "milestone", JStr "first verified remote write"; "task", JStr "T21" ]
+                    JObj [ "milestone", JStr "first verified conflict handling"; "task", JStr "T21" ]
+                    JObj [ "milestone", JStr "first deployed candidate"; "task", JStr "T31" ]
+                    JObj [ "milestone", JStr "reviewer findings per round"; "task", JStr "T30, T33" ]
+                    JObj [ "milestone", JStr "computed verdict and time to it"; "task", JStr "T34" ] ]
+              "measurements",
+              jstrs
+                  [ "CI runs created, executed and failed"
+                    "tokens per agent (Praxis >= 3.17 attribution)"
+                    "defect classes, recurrence against R2 and R3, fix-induced defects"
+                    "unavailable values are recorded as unavailable (R4 section 5)" ]
+              "coverage",
+              JObj
+                  [ "p0Requirements", jint p0.Length
+                    "p0CoveredByTimedTasks", jint p0InTimed.Length
+                    "p0CoveredOnlyByPreflight", jstrs (p0 |> List.filter (fun r -> not (List.contains r p0InTimed))) ]
+              "summary",
+              JObj
+                  [ "tasks", jint timed.Length
+                    "steps", jint stepRank.Count
+                    "plannedCiRuns", jint (timed |> List.filter (fun s -> plan.CiTriggerKinds.Contains byId.[s.Task].Kind) |> List.length)
+                    "byWorkstream", countBy (fun (s: Graph.Slot) -> workstream byId.[s.Task]) timed ]
+              "tasks", timed |> List.sortBy (fun s -> s.Step, s.Task) |> List.map task |> JArr ]

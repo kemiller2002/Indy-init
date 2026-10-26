@@ -1,0 +1,587 @@
+{
+  "schema": "indy-init.preflight-manifest/1",
+  "run": "Rehearsal 4 (write-path dress rehearsal)",
+  "boundary": "Untimed. Ends at the first green bootstrap CI, where the 420-minute timer starts (REHEARSAL-004-WRITE-PATH-PLAN P5).",
+  "competitionUse": "Rehearsal preflight artifacts are not automatically permissible at the event: organizer confirmation is check PRE-ORG-01 (ADRP-016).",
+  "statusVocabulary": {
+    "PASS": "satisfied by the package state",
+    "BLOCKED": "a named owner decision, upstream release or contract is missing",
+    "FAIL": "a deterministic check failed",
+    "NOT_RUN": "needs a person's record",
+    "requires-execution": "only `requirements-compiler preflight` can decide it; see readiness/evidence"
+  },
+  "summary": {
+    "BLOCKED": 3,
+    "NOT_RUN": 3,
+    "PASS": 1,
+    "requires-execution": 10
+  },
+  "checks": [
+    {
+      "id": "PRE-AUTH-01",
+      "category": "authentication",
+      "title": "Live-job secret and test repository are configured (values never read into evidence)",
+      "type": "env-present",
+      "params": {
+        "variables": "CAUSA_GITHUB_TOKEN,CAUSA_TEST_REPO"
+      },
+      "tasks": [
+        "T05"
+      ],
+      "refs": [
+        "PF-015",
+        "DEC-019"
+      ],
+      "packageStatus": "requires-execution",
+      "detail": "evaluated by `requirements-compiler preflight`"
+    },
+    {
+      "id": "PRE-AUTH-02",
+      "category": "authentication",
+      "title": "Token reads the test repository and is not a broad classic token (no 'repo'/'admin' X-OAuth-Scopes)",
+      "type": "github-auth-contract",
+      "params": {
+        "tokenVariable": "CAUSA_GITHUB_TOKEN",
+        "repoVariable": "CAUSA_TEST_REPO"
+      },
+      "tasks": [
+        "T05"
+      ],
+      "refs": [
+        "EXT-DATA-004",
+        "R11.2",
+        "CT-017"
+      ],
+      "packageStatus": "requires-execution",
+      "detail": "evaluated by `requirements-compiler preflight`"
+    },
+    {
+      "id": "PRE-DEC-01",
+      "category": "owner-decisions",
+      "title": "Every decision the run depends on is decided by the owner",
+      "type": "package-state",
+      "params": {
+        "condition": "no-unresolved-decisions"
+      },
+      "tasks": [
+        "T00"
+      ],
+      "refs": [
+        "DEC-006",
+        "DEC-022",
+        "DEC-023",
+        "DEC-024",
+        "DEC-025"
+      ],
+      "packageStatus": "BLOCKED",
+      "detail": "unresolved: DEC-006, DEC-022, DEC-023, DEC-024, DEC-025"
+    },
+    {
+      "id": "PRE-DEC-02",
+      "category": "owner-decisions",
+      "title": "No critical material finding is unresolved",
+      "type": "package-state",
+      "params": {
+        "condition": "no-open-critical-findings"
+      },
+      "tasks": [
+        "T00"
+      ],
+      "refs": [
+        "F-001",
+        "F-003",
+        "F-004",
+        "F-005",
+        "F-008",
+        "F-009"
+      ],
+      "packageStatus": "BLOCKED",
+      "detail": "open: F-001, F-003, F-004, F-005, F-008, F-009"
+    },
+    {
+      "id": "PRE-DEP-01",
+      "category": "dependency-release",
+      "title": "The newest approved echelon-current set contains every required system, including percepta-semantic",
+      "type": "registry-set-contains",
+      "params": {
+        "repo": "echelon-registry",
+        "set": "echelon-current",
+        "systems": "percepta-semantic,dokimos,praxis,limen,forma,folio,ordo,aegis",
+        "status": "approved"
+      },
+      "tasks": [
+        "T03"
+      ],
+      "refs": [
+        "F-005",
+        "CT-012",
+        "CT-016"
+      ],
+      "packageStatus": "requires-execution",
+      "detail": "evaluated by `requirements-compiler preflight`"
+    },
+    {
+      "id": "PRE-DEP-02",
+      "category": "contract-compatibility",
+      "title": "No contract the run consumes is blocked (write primitive, Percepta, Praxis gate, release set)",
+      "type": "package-state",
+      "params": {
+        "condition": "no-blocked-contracts"
+      },
+      "tasks": [
+        "T03",
+        "T04"
+      ],
+      "refs": [
+        "CT-007",
+        "CT-012",
+        "CT-013",
+        "CT-016"
+      ],
+      "packageStatus": "BLOCKED",
+      "detail": "blocked: CT-007, CT-012, CT-013, CT-016"
+    },
+    {
+      "id": "PRE-DEP-03",
+      "category": "contract-compatibility",
+      "title": "Storage contract and historical catalog identities match (CT-006, CT-008)",
+      "type": "package-state",
+      "params": {
+        "condition": "identities-match"
+      },
+      "tasks": [
+        "T15",
+        "T25"
+      ],
+      "refs": [
+        "CT-006",
+        "CT-008"
+      ],
+      "packageStatus": "PASS",
+      "detail": "5 identities match"
+    },
+    {
+      "id": "PRE-ORG-01",
+      "category": "owner-decisions",
+      "title": "Organizer confirmation for prepared data and requirements (event only; not required for Rehearsal 4)",
+      "type": "manual",
+      "params": {
+        "record": "organizer confirmation covering causa-data, the historical catalog and this package (ADRP readiness checklist)"
+      },
+      "tasks": [
+        "T06"
+      ],
+      "refs": [
+        "ADRP-016"
+      ],
+      "packageStatus": "NOT_RUN",
+      "detail": "needs an owner or organizer record; never passes automatically"
+    },
+    {
+      "id": "PRE-REQ-01",
+      "category": "requirements-baseline",
+      "title": "Committed baseline is pinned at the source commit and equals the generator's output there",
+      "type": "baseline-pinned",
+      "params": {
+        "baseline": "requirements/causa-requirements-baseline.json"
+      },
+      "tasks": [
+        "T01"
+      ],
+      "refs": [
+        "F-003",
+        "AR-001"
+      ],
+      "packageStatus": "requires-execution",
+      "detail": "evaluated by `requirements-compiler preflight`"
+    },
+    {
+      "id": "PRE-REQ-02",
+      "category": "requirements-preservation",
+      "title": "Compiled package passes every critical check (V01-V13, V15-V16)",
+      "type": "package-state",
+      "params": {
+        "condition": "compilation-pass"
+      },
+      "tasks": [
+        "T07"
+      ],
+      "refs": [
+        "AR-002"
+      ],
+      "packageStatus": "requires-execution",
+      "detail": "evaluated by `requirements-compiler preflight`"
+    },
+    {
+      "id": "PRE-REQ-03",
+      "category": "requirements-preservation",
+      "title": "A released Praxis carries `requirements preservation verify` (RDP-004 without a VER-005 exception)",
+      "type": "git-ref-contains",
+      "params": {
+        "repo": "praxis",
+        "ref": "latest-tag:v",
+        "path": "src/Praxis.Cli",
+        "pattern": "preservation"
+      },
+      "tasks": [
+        "T02",
+        "T08"
+      ],
+      "refs": [
+        "F-004",
+        "CT-013"
+      ],
+      "packageStatus": "requires-execution",
+      "detail": "evaluated by `requirements-compiler preflight`"
+    },
+    {
+      "id": "PRE-REQ-04",
+      "category": "requirements-preservation",
+      "title": "Preservation gate PASS on the derived package, disposition and operator approvals",
+      "type": "manual",
+      "params": {
+        "record": "praxis requirements preservation verify exit 0, evidence committed in the rehearsal repository (RDP-004)"
+      },
+      "tasks": [
+        "T08",
+        "T09"
+      ],
+      "refs": [
+        "AR-004"
+      ],
+      "packageStatus": "NOT_RUN",
+      "detail": "needs an owner or organizer record; never passes automatically"
+    },
+    {
+      "id": "PRE-SEC-01",
+      "category": "authentication",
+      "title": "No GitHub credential is committed in the planning repository",
+      "type": "secret-scan",
+      "params": {
+        "repo": "indy-init"
+      },
+      "tasks": [
+        "T05"
+      ],
+      "refs": [
+        "EXT-DATA-004",
+        "R11.3"
+      ],
+      "packageStatus": "requires-execution",
+      "detail": "evaluated by `requirements-compiler preflight`"
+    },
+    {
+      "id": "PRE-TOOL-01",
+      "category": "toolchain",
+      "title": "The installed .NET SDK equals the pinned SDK (10.0.402, rollForward disable)",
+      "type": "sdk-pinned",
+      "params": {
+        "globalJson": "global.json"
+      },
+      "tasks": [
+        "T10"
+      ],
+      "refs": [
+        "DEC-027"
+      ],
+      "packageStatus": "requires-execution",
+      "detail": "evaluated by `requirements-compiler preflight`"
+    },
+    {
+      "id": "PRE-TOOL-02",
+      "category": "toolchain",
+      "title": "The latest Conditor release carries the SD-1 fix (CON-367: scaffold pins web packages through their Registry distribution)",
+      "type": "git-ref-contains",
+      "params": {
+        "repo": "conditor",
+        "ref": "latest-tag:v",
+        "path": "src/Conditor.Core",
+        "pattern": "CON-367"
+      },
+      "tasks": [
+        "T03",
+        "T10"
+      ],
+      "refs": [
+        "AR-023"
+      ],
+      "packageStatus": "requires-execution",
+      "detail": "evaluated by `requirements-compiler preflight`"
+    },
+    {
+      "id": "PRE-TOOL-03",
+      "category": "toolchain",
+      "title": "Bootstrap without the SD-1 workaround reaches first green CI",
+      "type": "manual",
+      "params": {
+        "record": "bootstrap commit in the rehearsal repository produced by Conditor on the kickoff set without the SD-1 hand workaround, first green CI (R4 P3, P5)"
+      },
+      "tasks": [
+        "T10"
+      ],
+      "refs": [
+        "AR-023",
+        "DEC-027"
+      ],
+      "packageStatus": "NOT_RUN",
+      "detail": "needs an owner or organizer record; never passes automatically"
+    },
+    {
+      "id": "PRE-VER-01",
+      "category": "verification-planning",
+      "title": "Preflight and timed-execution manifests are complete and consistent (V16)",
+      "type": "package-state",
+      "params": {
+        "condition": "manifests-valid"
+      },
+      "tasks": [
+        "T07"
+      ],
+      "refs": [],
+      "packageStatus": "requires-execution",
+      "detail": "evaluated by `requirements-compiler preflight`"
+    }
+  ],
+  "tasks": [
+    {
+      "id": "T00",
+      "title": "Owner decisions on the readiness blockers",
+      "owner": "operator",
+      "satisfiedBy": "operator-action",
+      "dependsOn": [],
+      "decisions": [
+        "DEC-006",
+        "DEC-022",
+        "DEC-023",
+        "DEC-024",
+        "DEC-025"
+      ],
+      "contracts": [
+        "CT-007",
+        "CT-017"
+      ],
+      "completion": [
+        "F-001, F-008, F-009, F-011, F-012, F-013 and F-019 each carry an owner decision recorded outside agent authorship (AR-003)",
+        "Every requirement edit the decisions imply is committed by the owner to indy-init"
+      ],
+      "gates": [
+        "G0"
+      ]
+    },
+    {
+      "id": "T01",
+      "title": "Regenerate and pin the baseline at the kickoff commit",
+      "owner": "coordinator",
+      "satisfiedBy": "existing-capability",
+      "dependsOn": [
+        "T00"
+      ],
+      "decisions": [
+        "DEC-017"
+      ],
+      "contracts": [],
+      "completion": [
+        "requirements/causa-requirements-baseline.json source.commit equals the kickoff commit (R4 P2)",
+        "tools/test-requirements-baseline.py passes",
+        "this package recompiled against the new baseline with compilation PASS"
+      ],
+      "gates": [
+        "G0"
+      ]
+    },
+    {
+      "id": "T02",
+      "title": "Release a Praxis version carrying the hardened preservation gate",
+      "owner": "upstream",
+      "satisfiedBy": "upstream-release",
+      "dependsOn": [],
+      "decisions": [
+        "DEC-017"
+      ],
+      "contracts": [
+        "CT-013"
+      ],
+      "completion": [
+        "a tagged Praxis release whose CLI has `requirements preservation verify` and the REQ-PRES-001 R1-R5 refusals",
+        "or an owner-approved, time-bounded VER-005 exception for a named build"
+      ],
+      "gates": [
+        "G1"
+      ]
+    },
+    {
+      "id": "T03",
+      "title": "Cut, qualify and approve the kickoff release set (echelon-current 1.28.0)",
+      "owner": "upstream",
+      "satisfiedBy": "upstream-release",
+      "dependsOn": [
+        "T02"
+      ],
+      "decisions": [
+        "DEC-013",
+        "DEC-018"
+      ],
+      "contracts": [
+        "CT-016",
+        "CT-012"
+      ],
+      "completion": [
+        "set registered with percepta-semantic, Dokimos 0.7.0, a Conditor release with SD-1 fixed, folio 0.4.1 assessed (F-015)",
+        "Conditor qualification run passes",
+        "owner approval recorded in the Registry (R4 P1)"
+      ],
+      "gates": [
+        "G1"
+      ]
+    },
+    {
+      "id": "T04",
+      "title": "Version or except the storage contract's GitHub write primitive",
+      "owner": "upstream",
+      "satisfiedBy": "operator-action",
+      "dependsOn": [
+        "T00"
+      ],
+      "decisions": [
+        "DEC-006",
+        "DEC-005"
+      ],
+      "contracts": [
+        "CT-006",
+        "CT-007"
+      ],
+      "completion": [
+        "causa-data contract revision (STORAGE-003 process) or owner exception naming the conforming primitive",
+        "causa gate passes for the unchanged v1.0.0 fixtures"
+      ],
+      "gates": [
+        "G4"
+      ]
+    },
+    {
+      "id": "T05",
+      "title": "Provision the write-capable test data repository and CAUSA_GITHUB_TOKEN",
+      "owner": "operator",
+      "satisfiedBy": "operator-action",
+      "dependsOn": [],
+      "decisions": [
+        "DEC-019"
+      ],
+      "contracts": [
+        "CT-017"
+      ],
+      "completion": [
+        "secret present with contents write on the test repository only (R4 P4); value never read by the agent",
+        "a no-op authenticated read from CI succeeds before kickoff (R3 failed on a missing secret)"
+      ],
+      "gates": [
+        "G6"
+      ]
+    },
+    {
+      "id": "T06",
+      "title": "Organizer confirmation for prepared requirements, data and tooling",
+      "owner": "operator",
+      "satisfiedBy": "operator-action",
+      "dependsOn": [],
+      "decisions": [
+        "DEC-023"
+      ],
+      "contracts": [],
+      "completion": [
+        "recorded organizer answer covering causa-data, the historical catalog and this package (ADRP readiness checklist)"
+      ],
+      "gates": [
+        "G0"
+      ]
+    },
+    {
+      "id": "T07",
+      "title": "Derive the requirements package and dispositions in the rehearsal repository",
+      "owner": "coordinator",
+      "satisfiedBy": "existing-capability",
+      "dependsOn": [
+        "T01"
+      ],
+      "decisions": [
+        "DEC-029",
+        "DEC-017"
+      ],
+      "contracts": [
+        "CT-013"
+      ],
+      "completion": [
+        "praxis.requirements-disposition/1 gives every baseline requirement exactly one disposition",
+        "every obligation mapped or marked for an operator approval request; no approval written by the agent (RDP-003)"
+      ],
+      "gates": [
+        "G0"
+      ]
+    },
+    {
+      "id": "T08",
+      "title": "Preservation gate PASS before implementation",
+      "owner": "coordinator",
+      "satisfiedBy": "verification",
+      "dependsOn": [
+        "T07",
+        "T09",
+        "T02"
+      ],
+      "decisions": [
+        "DEC-017"
+      ],
+      "contracts": [
+        "CT-013"
+      ],
+      "completion": [
+        "gate exit 0 against the pinned baseline, derived package, disposition and approvals",
+        "evidence JSON and exact command committed (RDP-004)"
+      ],
+      "gates": [
+        "G0"
+      ]
+    },
+    {
+      "id": "T09",
+      "title": "Operator approval records for exclusions, supersessions and conflicts",
+      "owner": "operator",
+      "satisfiedBy": "operator-action",
+      "dependsOn": [
+        "T07"
+      ],
+      "decisions": [],
+      "contracts": [],
+      "completion": [
+        "praxis.requirements-approvals/1 written by the operator (or produced from an Ordo decision); none by an agent"
+      ],
+      "gates": [
+        "G0"
+      ]
+    },
+    {
+      "id": "T10",
+      "title": "Blank repository bootstrap on the kickoff set; first green CI",
+      "owner": "integration",
+      "satisfiedBy": "existing-capability",
+      "dependsOn": [
+        "T03"
+      ],
+      "decisions": [
+        "DEC-013",
+        "DEC-027"
+      ],
+      "contracts": [
+        "CT-016"
+      ],
+      "completion": [
+        "bootstrap commit recorded; SD-1 workaround not applied by hand (R4 P3)",
+        "global.json with SDK 10.0.402 exists before any workflow names it (R3 D-02/D-06)",
+        "first green CI on the bootstrap commit; timer starts (R4 P5)"
+      ],
+      "gates": [
+        "G1"
+      ]
+    }
+  ]
+}

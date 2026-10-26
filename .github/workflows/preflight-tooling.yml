@@ -19,3 +19,21 @@ jobs:
           python3 tools/test-requirements-baseline.py
       - name: Compile Python tooling
         run: python3 -m compileall -q tools
+  fsharp-tooling:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+      - name: Build the F# requirements compiler and its tests
+        run: dotnet build tools/requirements-compiler/tests -c Release
+      - name: Offline tests (baseline port reproduces the committed baseline, units, preflight verdict)
+        run: dotnet run -c Release --no-build --project tools/requirements-compiler/tests -- --offline --source .
+      - name: F# and Python baseline generators agree byte for byte at this commit
+        run: |
+          python3 -I tools/build-requirements-baseline.py . "$GITHUB_SHA" > "$RUNNER_TEMP/py.json"
+          dotnet tools/requirements-compiler/src/bin/Release/net10.0/requirements-compiler.dll baseline . "$GITHUB_SHA" > "$RUNNER_TEMP/fs.json"
+          cmp "$RUNNER_TEMP/py.json" "$RUNNER_TEMP/fs.json"

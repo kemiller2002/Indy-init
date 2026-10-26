@@ -2,8 +2,8 @@
   "schema": "indy-init.requirements-validation-report/1",
   "source": {
     "repository": "kemiller2002/indy-init",
-    "commit": "252cd2ef42f81c366bd2d7e9341c26edb7c64d55",
-    "baselineSha256": "17d1c38bacf69a71e132eae0649af41b54f6bf2ad0de4b34f41acbbeeb2d3be3"
+    "commit": "b785b68c5172e6bdc257e350032ec851a4637ed4",
+    "baselineSha256": "efb875c5558794581ce72a79a4d1d399bd14e776de94de359c517ffaad80b642"
   },
   "compilationVerdict": "PASS",
   "compilationRule": "FAIL when any critical check reports a problem; the compiler then exits 3",
@@ -100,12 +100,33 @@
       "problems": []
     },
     {
+      "id": "V15",
+      "title": "Every readiness blocker is classified and every open decision carries alternatives, a recommendation and the approval it needs",
+      "critical": true,
+      "status": "PASS",
+      "problems": []
+    },
+    {
+      "id": "V16",
+      "title": "Preflight and timed-execution manifests are complete and consistent",
+      "critical": true,
+      "status": "PASS",
+      "problems": []
+    },
+    {
+      "id": "V17",
+      "title": "Every P0 requirement is covered by a work item and a verification gate",
+      "critical": true,
+      "status": "PASS",
+      "problems": []
+    },
+    {
       "id": "V14",
-      "title": "The committed baseline is pinned at the compiled source commit (readiness, non-critical for compilation)",
+      "title": "The committed baseline has no drift against the source commit (readiness, non-critical for compilation)",
       "critical": false,
       "status": "WARN",
       "problems": [
-        "requirements/causa-requirements-baseline.json is pinned at 002d8ba6e98639a385dd771999099ba032c48086, not the source commit 252cd2ef42f81c366bd2d7e9341c26edb7c64d55",
+        "requirements/causa-requirements-baseline.json (pinned at 002d8ba6e98639a385dd771999099ba032c48086) differs from the generator's output at the source commit b785b68c5172e6bdc257e350032ec851a4637ed4",
         "10 requirements at the source commit are missing from the committed baseline: AGENT-RELIABILITY\u00a7evidence-driven-refinement-october-2026, AGENT-RELIABILITY\u00a7reconciliation, AR-019, AR-020, AR-021, AR-022, AR-023, AR-024, AR-025, AR-026"
       ]
     }
@@ -117,82 +138,130 @@
       {
         "kind": "finding",
         "id": "F-001",
-        "title": "Launch content: UI-001/UI-015 require the five frozen synthetic investigations; EXT-DATA, OD-INDY-3 and the active catalog require an empty launch and three historical cases"
+        "title": "Launch content: UI-001/UI-015 require the five frozen synthetic investigations; EXT-DATA, OD-INDY-3 and the active catalog require an empty launch and three historical cases",
+        "blockerClass": "requirement-conflict",
+        "owner": "operator (kemiller2002)",
+        "recommendation": ""
       },
       {
         "kind": "finding",
         "id": "F-003",
-        "title": "The committed baseline is pinned at 002d8ba; the source commit adds AR-019..AR-026 and changes the ledger's acceptance predicate"
+        "title": "The committed baseline is pinned at 002d8ba; the source commit adds AR-019..AR-026 and changes the ledger's acceptance predicate",
+        "blockerClass": "verification-deficiency",
+        "owner": "operator (kemiller2002), via a reviewed owner commit (OD-INDY-6)",
+        "recommendation": ""
       },
       {
         "kind": "finding",
         "id": "F-004",
-        "title": "The mandatory preservation gate is not in any Praxis release; using the draft would violate VER-005"
+        "title": "The mandatory preservation gate is not in any Praxis release; using the draft would violate VER-005",
+        "blockerClass": "external-dependency",
+        "owner": "upstream: kemiller2002/praxis",
+        "recommendation": ""
       },
       {
         "kind": "finding",
         "id": "F-005",
-        "title": "Kickoff release set incomplete: the released Percepta semantic CLI is not registered (echelon-current 1.28.0 not cut)"
+        "title": "Kickoff release set incomplete: percepta-semantic 0.2.1 is registered as a release but no approved echelon-current set contains it (1.28.0 not cut)",
+        "blockerClass": "external-dependency",
+        "owner": "upstream: kemiller2002/echelon-registry, kemiller2002/conditor; approval by operator",
+        "recommendation": ""
       },
       {
         "kind": "finding",
         "id": "F-008",
-        "title": "Scope and order of the AI proposal loop, time travel and factory proof for Rehearsal 4 and the event"
+        "title": "Scope and order of the AI proposal loop, time travel and factory proof for Rehearsal 4 and the event",
+        "blockerClass": "owner-decision",
+        "owner": "operator (kemiller2002)",
+        "recommendation": ""
       },
       {
         "kind": "finding",
         "id": "F-009",
-        "title": "The frozen storage contract mandates a GitHub write primitive that Rehearsal 2 proved cannot compare-and-swap"
+        "title": "The frozen storage contract mandates a GitHub write primitive that Rehearsal 2 proved cannot compare-and-swap",
+        "blockerClass": "contract-incompatibility",
+        "owner": "operator (kemiller2002); contract change through causa-data STORAGE-003 process",
+        "recommendation": ""
       },
       {
         "kind": "decision",
         "id": "DEC-006",
-        "title": "GitHub write primitive: contract's non-forced ref PATCH versus R2's guarded GraphQL commit"
+        "title": "GitHub write primitive: contract's non-forced ref PATCH versus R2's guarded GraphQL commit",
+        "blockerClass": "contract-incompatibility",
+        "owner": "Owner-authored record (Ordo decision or owner commit to an OWNER-DECISIONS addendum) naming DEC-006 and F-009; agents do not write it (RDP-003, AR-003)",
+        "recommendation": "(a) for Rehearsal 4 and the event; (b) after the event. (a) changes no data format, schema identity or fixture, needs no upstream release, and keeps optimistic concurrency (the decision's base commit stays the concurrency token, a moved head is refused and handled as a conflict). The exact amendment text is in readiness/CONTRACT-RESOLUTION.md."
       },
       {
         "kind": "decision",
         "id": "DEC-022",
-        "title": "AI proposal loop and time travel in Rehearsal 4 / event scope"
+        "title": "AI proposal loop and time travel in Rehearsal 4 / event scope",
+        "blockerClass": "owner-decision",
+        "owner": "Owner approval record covering the exclusion (praxis.requirements-approvals/1 written by the owner, RDP-003)",
+        "recommendation": "(b). Rehearsal 4's question is the write path within 420 minutes and it measures only write milestones; the kickoff packet's do-not-cut list names the AI proposal authority boundary (an invariant), not the loop. Excluding the two features removes two timed tasks without removing any invariant."
       },
       {
         "kind": "decision",
         "id": "DEC-023",
-        "title": "Use of R001-derived interfaces at the event"
+        "title": "Use of R001-derived interfaces at the event",
+        "blockerClass": "owner-decision",
+        "owner": "Owner decision for R4; organizer confirmation for the event",
+        "recommendation": "(a). It keeps T14 short in Rehearsal 4 and lets the organizer rule on the event without blocking the rehearsal. If the organizer refuses, the event uses (b)."
       },
       {
         "kind": "decision",
         "id": "DEC-024",
-        "title": "What the launch view shows"
+        "title": "What the launch view shows",
+        "blockerClass": "requirement-conflict",
+        "owner": "Owner merge of the requirement-change PR (OD-INDY-6: only owner commits change the baseline)",
+        "recommendation": "(a). It agrees with EXT-DATA-001/002, OD-INDY-3 and the causa-data catalog policy, keeps runtime loading from the user-connected repository and bundles no data. The proposed text is on branch claude/r4-owner-requirement-changes."
       },
       {
         "kind": "decision",
         "id": "DEC-025",
-        "title": "User authentication mechanism for the connect flow"
+        "title": "User authentication mechanism for the connect flow",
+        "blockerClass": "owner-decision",
+        "owner": "Owner decision record (security boundary); F-019 and F-012 close with it",
+        "recommendation": "(a), with a credential required for every connection (no anonymous mode: Rehearsal 3 hit GitHub's exhausted anonymous quota). It needs no service, works in iPad Safari (plain fetch with an Authorization header; api.github.com answers Access-Control-Allow-Origin: *), and keeps least privilege. The CI live job uses the separate CAUSA_GITHUB_TOKEN Actions secret, never the browser path."
       },
       {
         "kind": "contract-blocked",
         "id": "CT-007",
-        "title": "GitHub write primitive (atomic, guarded publication)"
+        "title": "GitHub write primitive (atomic, guarded publication)",
+        "blockerClass": "contract-incompatibility",
+        "owner": "",
+        "recommendation": ""
       },
       {
         "kind": "contract-blocked",
         "id": "CT-012",
-        "title": "Percepta semantic CLI: contract and evidence schemas"
+        "title": "Percepta semantic CLI: contract and evidence schemas",
+        "blockerClass": "external-dependency",
+        "owner": "",
+        "recommendation": ""
       },
       {
         "kind": "contract-blocked",
         "id": "CT-013",
-        "title": "Praxis requirements preservation gate"
+        "title": "Praxis requirements preservation gate",
+        "blockerClass": "external-dependency",
+        "owner": "",
+        "recommendation": ""
       },
       {
         "kind": "contract-blocked",
         "id": "CT-016",
-        "title": "Kickoff release-set lock"
+        "title": "Kickoff release-set lock",
+        "blockerClass": "external-dependency",
+        "owner": "",
+        "recommendation": ""
       },
       {
         "kind": "contract-missing",
         "id": "CT-017",
-        "title": "Authentication and authorization boundary for the connect flow"
+        "title": "Authentication and authorization boundary for the connect flow",
+        "blockerClass": "owner-decision",
+        "owner": "",
+        "recommendation": ""
       }
     ]
   }

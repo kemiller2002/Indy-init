@@ -4,10 +4,10 @@ This package compiles the Causa requirements into a structured form. Every part 
 
 |   |   |
 |---|---|
-| Source | kemiller2002/indy-init `252cd2ef42f81c366bd2d7e9341c26edb7c64d55` (the regenerated baseline is pinned to this commit) |
+| Source | kemiller2002/indy-init `b785b68c5172e6bdc257e350032ec851a4637ed4`. The compiler builds the baseline at this commit itself, with the F# port of the baseline generator. |
 | Other repositories | the exact commits in `curation/sources.json` (also in `package-manifest.json`) |
-| Compilation verdict | **PASS**: every critical check V01–V13 passes |
-| Rehearsal readiness | **BLOCKED**: 16 blockers, listed in `requirements-validation-report.json` |
+| Compilation verdict | **PASS**: every critical check (V01–V13, V15–V17) passes; V14 warns that the committed baseline has drifted (F-003) |
+| Rehearsal readiness | **BLOCKED**: 16 blockers, listed in `requirements-validation-report.json`. The executed preflight gives FAIL; see `readiness/READINESS-REPORT.md`. |
 | Target run | the repository's **Rehearsal 4** (write-path dress rehearsal). The mission brief called it "Rehearsal 3" (F-020). |
 
 Two things this package does not do:
@@ -27,11 +27,14 @@ Two things this package does not do:
 | `verification-manifest.json` | 6 | One entry per requirement: gates, owners, acceptance criteria, rules (evidence, freshness, invalidation, tooling) and dependencies that affect validity. |
 | `execution-plan-time.json` | 7 | Plan A: owner lanes, critical-path-first, early integration checkpoints. |
 | `execution-plan-resource.json` | 7 | Plan B: one lead agent plus a fresh reviewer, CI batched at checkpoints. Both plans contain the same tasks, completion conditions and gates. |
-| `requirements-validation-report.json` | 8 | Checks V01–V14, the compilation verdict and the rehearsal-readiness blockers. |
+| `requirements-validation-report.json` | 8 | Checks V01–V17, the compilation verdict, and the readiness blockers with their class and recommendation. |
+| `preflight-manifest.json` | R4 | The Rehearsal 4 preflight: 17 executable checks and the preflight tasks T00–T10. It is untimed and ends at the first green bootstrap CI. |
+| `timed-execution-manifest.json` | R4 | Plan B timed tasks with steps, workstreams, milestones, CI runs, P0 coverage and the failing-first defect-class tests. |
 | `optimization-analysis.md` | 9 | Rehearsal 1–3 failures mapped to package elements. Demonstrated causes are kept separate from hypotheses. |
 | `percepta-experiment.json` | 10 | `EX-CAUSA-2026-RC1`: existing approach compared with Plan A and Plan B, scope held constant. It has not been launched. |
 | `package-manifest.json` | 12 | Source revisions, dependency versions, and the SHA-256 of every input and output. |
-| `curation/` | inputs | Hand-written analysis the compiler checks: sources, findings, decisions, contracts, tasks, verification rules, external requirements and the experiment. |
+| `curation/` | inputs | Hand-written analysis the compiler checks: sources, findings, decisions (with recommendations), contracts, tasks (with phase), verification rules, preflight checks, defect-class test specifications, external requirements and the experiment. |
+| `readiness/` | R4 | The readiness report, owner decision requests, contract resolution, F# tooling assessment, dependency compatibility, and `evidence/` holding the executed preflight and equivalence evidence. |
 
 ## How to read it (agents: start here)
 
@@ -46,21 +49,27 @@ Two things this package does not do:
 The compiler is F# (.NET SDK 10.0.402, `tools/requirements-compiler`). It reads every repository through `git show <commit>:<path>`, so working-tree edits cannot leak in.
 
 ```bash
-# 1. The existing, unmodified baseline generator, at the source commit
-python3 -I tools/build-requirements-baseline.py . 252cd2ef42f81c366bd2d7e9341c26edb7c64d55 > /tmp/baseline.json
-
-# 2. Checkouts containing each commit listed in curation/sources.json (shallow clones are enough)
-K=/path/to/checkouts   # causa-data, praxis, ordo, dokimos, percepta, forma, limen, folio, echelon-registry, indy-init-rehearsal-00{1,2,3}
-REPOS=$(for r in causa-data praxis ordo dokimos percepta forma limen folio echelon-registry \
+# 1. Checkouts containing each commit listed in curation/sources.json (shallow clones are enough)
+K=/path/to/checkouts
+REPOS=$(for r in causa-data praxis ordo dokimos percepta forma limen folio echelon-registry conditor \
   indy-init-rehearsal-001 indy-init-rehearsal-002 indy-init-rehearsal-003; do printf -- '--repo %s=%s/%s ' $r $K $r; done)
+RC="dotnet tools/requirements-compiler/src/bin/Release/net10.0/requirements-compiler.dll"
+dotnet build tools/requirements-compiler/tests -c Release
 
-# 3. Compile (exit 0 PASS, 3 FAIL, 2 unusable input), or verify the committed package (exit 4 on any difference)
-dotnet run -c Release --project tools/requirements-compiler/src -- --source . --baseline /tmp/baseline.json \
-  --committed-baseline requirements/causa-requirements-baseline.json \
+# 2. Compile (exit 0 PASS, 3 FAIL, 2 unusable input), or verify the committed package (exit 4 on any difference).
+#    The baseline is built in-process at the recorded indy-init commit; `--baseline FILE` supplies one instead.
+$RC --source . --committed-baseline requirements/causa-requirements-baseline.json \
   --curation requirements-compiled/v1/curation --out requirements-compiled/v1 $REPOS [--check]
 
-# 4. Negative controls, determinism and the committed-package check
-dotnet run -c Release --project tools/requirements-compiler/tests -- <same arguments as step 3, without --check>
+# 3. Rehearsal 4 preflight: executes every check and writes evidence (exit 0 READY, 3 BLOCKED or FAIL)
+$RC preflight <same options as step 2> --evidence requirements-compiled/v1/readiness/evidence/preflight-run.json
+
+# 4. Baseline generation alone (same contract as tools/build-requirements-baseline.py)
+$RC baseline . <40-hex commit> > baseline.json
+
+# 5. Tests: offline (CI) and full (negative controls, determinism, committed-package check)
+dotnet run -c Release --no-build --project tools/requirements-compiler/tests -- --offline --source .
+dotnet run -c Release --no-build --project tools/requirements-compiler/tests -- <same options as step 2, without --check>
 ```
 
 **Determinism.**
@@ -69,7 +78,7 @@ dotnet run -c Release --project tools/requirements-compiler/tests -- <same argum
 - Nothing reads a clock, the network or the working tree.
 - The test suite compiles twice and compares the bytes, then runs `--check` against this directory.
 
-**Tests.** `tools/requirements-compiler/tests` injects 13 defects, and each one must fail its named check:
+**Tests.** The offline mode, which CI runs in job `fsharp-tooling`, checks two things: that the F# baseline port reproduces the committed Python-generated baseline byte for byte, and the ported unit cases. The full mode also injects 17 defects, and each one must fail its named check:
 - a non-verbatim citation;
 - a dependency cycle;
 - a requirement in no work item;
@@ -82,13 +91,17 @@ dotnet run -c Release --project tools/requirements-compiler/tests -- <same argum
 - a wrong repository revision;
 - an undefined Percepta metric;
 - a requirement with no verification rule;
-- a tampered baseline obligation.
+- a tampered baseline obligation;
+- an unclassified readiness blocker;
+- an open decision without a recommendation;
+- a recurring defect class without a failing-first test;
+- a preflight task that depends on a timed task.
 
-**For a new run** (for example after the owner re-pins the baseline, T01):
-1. Update the commits in `curation/sources.json`.
-2. Regenerate the baseline at the new commit.
-3. Compile, then fix every failing citation or reference the compiler reports.
-4. If anything changed, publish the result as `v2/` rather than editing `v1/`.
+**For a new run** (for example after owner decisions, or at the kickoff re-pin, T01):
+1. Update the commits in `curation/sources.json`, and the decision and finding statuses the owner has decided.
+2. Compile, then fix every failing citation or reference the compiler reports. When a requirement text changes, V11 rejects the old quotes, so the curation cannot silently go stale.
+3. Re-run the preflight.
+4. `v1` is updated in place until the Rehearsal 4 kickoff. Publish the frozen kickoff state as `v2/`.
 
 ## Mechanical rules (no judgement)
 
@@ -129,4 +142,4 @@ This would remove the hand transcription that lost UI-016 in Rehearsal 3. It mus
 - Findings, decisions, contracts and tasks are analyst judgements. The compiler proves that their citations are verbatim at the recorded commits and that their references resolve. It does not prove that the judgement is right; that needs a person.
 - Contract status is at most `identity-verified`. No integration has been exercised.
 - Plan steps are unit steps, so they order the work but do not estimate time.
-- The compiler and its tests need local checkouts of the 13 repositories. They are therefore not wired into indy-init CI; adding them would mean cloning 12 repositories on every push.
+- The full compilation and the full test suite need local checkouts of the 14 repositories in `curation/sources.json`. CI runs only the offline subset: the baseline port, its units, and the cross-check against the Python generator.

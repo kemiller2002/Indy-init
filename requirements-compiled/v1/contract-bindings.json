@@ -42,7 +42,7 @@
           "path": "docs/REHEARSAL-AGENT-INTERFACE-FREEZE.md",
           "quote": "Input MUST include investigation ID, actor/provenance, typed command, expected aggregate version",
           "verified": true,
-          "detail": "found at 252cd2ef42f81c366bd2d7e9341c26edb7c64d55"
+          "detail": "found at b785b68c5172e6bdc257e350032ec851a4637ed4"
         }
       ],
       "identityResults": []
@@ -73,7 +73,7 @@
           "path": "docs/REHEARSAL-AGENT-INTERFACE-FREEZE.md",
           "quote": "A single immutable projection identifies investigation, aggregate version, lifecycle",
           "verified": true,
-          "detail": "found at 252cd2ef42f81c366bd2d7e9341c26edb7c64d55"
+          "detail": "found at b785b68c5172e6bdc257e350032ec851a4637ed4"
         }
       ],
       "identityResults": []
@@ -103,7 +103,7 @@
           "path": "docs/REHEARSAL-AGENT-INTERFACE-FREEZE.md",
           "quote": "No alternative browser-only validator.",
           "verified": true,
-          "detail": "found at 252cd2ef42f81c366bd2d7e9341c26edb7c64d55"
+          "detail": "found at b785b68c5172e6bdc257e350032ec851a4637ed4"
         }
       ],
       "identityResults": []
@@ -136,7 +136,7 @@
           "path": "docs/REHEARSAL-AGENT-INTERFACE-FREEZE.md",
           "quote": "Provider-neutral operations: load, append with expected version, acknowledge remote persistence, surface conflict, and recover local edits.",
           "verified": true,
-          "detail": "found at 252cd2ef42f81c366bd2d7e9341c26edb7c64d55"
+          "detail": "found at b785b68c5172e6bdc257e350032ec851a4637ed4"
         }
       ],
       "identityResults": []
@@ -167,7 +167,7 @@
           "path": "docs/REHEARSAL-AGENT-INTERFACE-FREEZE.md",
           "quote": "Report rendering cannot elevate an unverified hypothesis to a confirmed cause.",
           "verified": true,
-          "detail": "found at 252cd2ef42f81c366bd2d7e9341c26edb7c64d55"
+          "detail": "found at b785b68c5172e6bdc257e350032ec851a4637ed4"
         }
       ],
       "identityResults": []
@@ -229,7 +229,7 @@
           "path": "docs/CAUSA-STORAGE-RELEASE-v1.0.0.md",
           "quote": "0a68af8c93190d2e4d6c27beb2f8cb67c3aebdda586d01beb7122b71af179152",
           "verified": true,
-          "detail": "found at 252cd2ef42f81c366bd2d7e9341c26edb7c64d55"
+          "detail": "found at b785b68c5172e6bdc257e350032ec851a4637ed4"
         }
       ],
       "identityResults": [
@@ -291,6 +291,7 @@
         "R10.4"
       ],
       "identity": [],
+      "blockerClass": "contract-incompatibility",
       "citations": [
         {
           "repo": "causa-data",
@@ -449,7 +450,7 @@
           "path": "docs/REHEARSAL-DEPENDENCY-LOCK.md",
           "quote": "Folio printing",
           "verified": true,
-          "detail": "found at 252cd2ef42f81c366bd2d7e9341c26edb7c64d55"
+          "detail": "found at b785b68c5172e6bdc257e350032ec851a4637ed4"
         }
       ],
       "identityResults": []
@@ -463,7 +464,7 @@
       "requiredCompatibility": "the release pinned by the kickoff set",
       "verificationMethod": "`percepta verify --contract <screen> --url <deployed SHA>`; `percepta validate-evidence`",
       "dependencyVersions": [
-        "percepta-semantic 0.2.1 (pending registration)"
+        "percepta-semantic 0.2.1 (registered release; not in an approved set)"
       ],
       "evidenceIdentity": "evidence JSON digest + deployed SHA",
       "status": "blocked",
@@ -473,13 +474,14 @@
         "PF-016"
       ],
       "identity": [],
+      "blockerClass": "external-dependency",
       "citations": [
         {
           "repo": "echelon-registry",
           "path": "sets/echelon-current/1.27.0.json",
           "quote": "It is therefore not the complete Rehearsal 4 kickoff set",
           "verified": true,
-          "detail": "found at 882bf2e2f2499e6c1c1c77f54539e1acc3d9aa7b"
+          "detail": "found at 2d6338e8286a968ec7e4f356af60dde789797e5a"
         }
       ],
       "identityResults": []
@@ -503,13 +505,14 @@
         "VER-010"
       ],
       "identity": [],
+      "blockerClass": "external-dependency",
       "citations": [
         {
           "repo": "indy-init",
           "path": "docs/REHEARSAL-DERIVATION-POLICY.md",
           "quote": "The gate is praxis requirements preservation verify",
           "verified": true,
-          "detail": "found at 252cd2ef42f81c366bd2d7e9341c26edb7c64d55"
+          "detail": "found at b785b68c5172e6bdc257e350032ec851a4637ed4"
         }
       ],
       "identityResults": []
@@ -539,7 +542,7 @@
           "path": "sets/echelon-current/1.27.0.json",
           "quote": "Replaced by Dokimos 0.7.0",
           "verified": true,
-          "detail": "found at 882bf2e2f2499e6c1c1c77f54539e1acc3d9aa7b"
+          "detail": "found at 2d6338e8286a968ec7e4f356af60dde789797e5a"
         }
       ],
       "identityResults": []
@@ -569,7 +572,7 @@
           "path": "docs/REHEARSAL-ACCEPTANCE-LEDGER.md",
           "quote": "derives ACCEPTED, INCOMPLETE, BLOCKED, FAILED or INVALID from the ledger",
           "verified": true,
-          "detail": "found at 252cd2ef42f81c366bd2d7e9341c26edb7c64d55"
+          "detail": "found at b785b68c5172e6bdc257e350032ec851a4637ed4"
         }
       ],
       "identityResults": []
@@ -594,13 +597,14 @@
         "DEP-CURRENT-008"
       ],
       "identity": [],
+      "blockerClass": "external-dependency",
       "citations": [
         {
           "repo": "echelon-registry",
           "path": "sets/echelon-current/1.27.0.json",
           "quote": "cut echelon-current 1.28.0",
           "verified": true,
-          "detail": "found at 882bf2e2f2499e6c1c1c77f54539e1acc3d9aa7b"
+          "detail": "found at 2d6338e8286a968ec7e4f356af60dde789797e5a"
         }
       ],
       "identityResults": []
@@ -626,13 +630,14 @@
         "EXT-DATA-005"
       ],
       "identity": [],
+      "blockerClass": "owner-decision",
       "citations": [
         {
           "repo": "indy-init",
           "path": "docs/REHEARSAL-EXTERNAL-DATA-BOUNDARY.md",
           "quote": "A token alone is not sufficient to infer a safe repository target.",
           "verified": true,
-          "detail": "found at 252cd2ef42f81c366bd2d7e9341c26edb7c64d55"
+          "detail": "found at b785b68c5172e6bdc257e350032ec851a4637ed4"
         }
       ],
       "identityResults": []

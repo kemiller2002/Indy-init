@@ -304,11 +304,97 @@ let private baselineFreshness (i: Inputs) =
         let committedIds = idsOf "requirements" b |> Set.ofList
         let compiledIds = idsOf "requirements" i.Baseline |> Set.ofList
 
-        [ if committed <> i.Compiled.SourceCommit then
-              yield sprintf "requirements/causa-requirements-baseline.json is pinned at %s, not the source commit %s" committed i.Compiled.SourceCommit
+        let drift = Baseline.content b <> Baseline.content i.Baseline
+
+        [ if drift then
+              yield sprintf "requirements/causa-requirements-baseline.json (pinned at %s) differs from the generator's output at the source commit %s" committed i.Compiled.SourceCommit
           let added = Set.difference compiledIds committedIds
           if not added.IsEmpty then yield sprintf "%d requirements at the source commit are missing from the committed baseline: %s" added.Count (String.concat ", " (Set.toList added)) ]
-        |> check "V14" "The committed baseline is pinned at the compiled source commit (readiness, non-critical for compilation)" false
+        |> check "V14" "The committed baseline has no drift against the source commit (readiness, non-critical for compilation)" false
+
+let private blockersOf (c: Compiled) : Json list =
+    [ for f in c.Curation.Findings |> List.sortBy (str "id") do
+          if isOpenMaterial f && str "severity" f = "critical" then yield f
+      for d in c.Curation.Decisions |> List.sortBy (str "id") do
+          if str "classification" d = "unresolved" then yield d
+      for k in c.Curation.Contracts |> List.sortBy (str "id") do
+          let st = str "status" k
+          // A contract the run itself produces (producedBy) is expected to be missing before kickoff.
+          if st = "blocked" || (st = "missing" && strOpt "producedBy" k |> Option.isNone) then yield k ]
+
+let private blockersClassified (i: Inputs) =
+    let classes = field "blockerClasses" i.Compiled.Curation.Sources |> Option.map (function JObj ps -> ps |> List.map fst | _ -> []) |> Option.defaultValue [] |> Set.ofList
+
+    [ for b in blockersOf i.Compiled do
+          let id = str "id" b
+          match strOpt "blockerClass" b with
+          | Some c when classes.Contains c -> ()
+          | Some c -> yield sprintf "%s has unknown blocker class '%s'" id c
+          | None -> yield sprintf "%s is a readiness blocker without a blocker class" id
+      for d in i.Compiled.Curation.Decisions do
+          if str "classification" d = "unresolved" then
+              for key in [ "recommendation"; "approvalRequired" ] do
+                  if (strOpt key d |> Option.defaultValue "").Trim() = "" then yield sprintf "%s lacks %s" (str "id" d) key
+              if (strs "alternatives" d).Length < 2 then yield sprintf "%s presents fewer than two alternatives" (str "id" d) ]
+    |> check "V15" "Every readiness blocker is classified and every open decision carries alternatives, a recommendation and the approval it needs" true
+
+let private manifestsValid (i: Inputs) =
+    let c = i.Compiled
+    let tasks = c.Curation.Tasks |> List.map (fun t -> t.Id, t) |> Map.ofList
+    let known =
+        Set.unionMany
+            [ c.Requirements |> List.map (fun r -> r.Id) |> Set.ofList
+              c.Curation.Findings |> List.map (str "id") |> Set.ofList
+              c.Curation.Decisions |> List.map (str "id") |> Set.ofList
+              c.Curation.Contracts |> List.map (str "id") |> Set.ofList ]
+    let checkTypes = set [ "package-state"; "baseline-pinned"; "sdk-pinned"; "secret-scan"; "git-ref-contains"; "registry-set-contains"; "env-present"; "github-auth-contract"; "manual" ]
+    let timed = i.Outputs.["timed-execution-manifest.json"]
+    let timedSteps = arr "tasks" timed |> List.map (fun t -> str "id" t, intOpt "step" t |> Option.defaultValue 0L) |> Map.ofList
+    let pre = i.Outputs.["preflight-manifest.json"]
+    let checkIds = c.Curation.PreflightChecks |> List.map (str "id")
+
+    [ for t in c.Curation.Tasks do
+          if t.Phase <> "preflight" && t.Phase <> "timed" then yield sprintf "%s has phase '%s'" t.Id t.Phase
+          if t.Phase = "preflight" then
+              for d in t.DependsOn do
+                  if tasks.ContainsKey d.Task && tasks.[d.Task].Phase = "timed" then yield sprintf "preflight task %s depends on timed task %s" t.Id d.Task
+          if t.Phase = "timed" && not (timedSteps.ContainsKey t.Id) then yield sprintf "timed task %s is missing from the timed-execution manifest" t.Id
+          if t.Phase = "timed" then
+              for d in t.DependsOn do
+                  match timedSteps.TryFind d.Task, timedSteps.TryFind t.Id with
+                  | Some a, Some b when a >= b -> yield sprintf "timed manifest runs %s before its prerequisite %s" t.Id d.Task
+                  | _ -> ()
+          match t.ConditionalOn with
+          | Some d when not (known.Contains d) -> yield sprintf "%s is conditional on unknown %s" t.Id d
+          | _ -> ()
+      if (List.distinct checkIds).Length <> checkIds.Length then yield "duplicate preflight check id"
+      if (arr "checks" pre).Length <> checkIds.Length then yield "preflight manifest does not list every check"
+      for k in c.Curation.PreflightChecks do
+          let id = str "id" k
+          if not (checkTypes.Contains(str "type" k)) then yield sprintf "%s has unknown type %s" id (str "type" k)
+          for t in strs "tasks" k do
+              if not (tasks.ContainsKey t) then yield sprintf "%s names unknown task %s" id t
+          for r in strs "refs" k do
+              if not (known.Contains r) then yield sprintf "%s names unknown reference %s" id r
+      for x in c.Curation.DefectTests do
+          let id = str "id" x
+          if not (tasks.ContainsKey(str "task" x)) then yield sprintf "%s names unknown task %s" id (str "task" x)
+          for r in strs "requirements" x do
+              if not (known.Contains r) then yield sprintf "%s names unknown requirement %s" id r
+      for cls in [ "DC-001"; "DC-002"; "DC-003"; "DC-004"; "DC-005"; "DC-006" ] do
+          if not (c.Curation.DefectTests |> List.exists (fun x -> str "defectClass" x = cls)) then yield sprintf "no failing-first test specified for %s" cls ]
+    |> check "V16" "Preflight and timed-execution manifests are complete and consistent" true
+
+let private p0Coverage (i: Inputs) =
+    let vm = i.Outputs.["verification-manifest.json"]
+    let gated = arr "entries" vm |> List.filter (fun e -> not (strs "gates" e).IsEmpty) |> List.map (str "requirement") |> Set.ofList
+
+    i.Compiled.Requirements
+    |> List.filter (fun r -> r.Priority = "P0")
+    |> List.collect (fun r ->
+        [ if not (i.Compiled.Coverage.ContainsKey r.Id) then yield sprintf "P0 %s is in no work item" r.Id
+          if not (gated.Contains r.Id) then yield sprintf "P0 %s has no verification gate" r.Id ])
+    |> check "V17" "Every P0 requirement is covered by a work item and a verification gate" true
 
 let run (i: Inputs) : Check list =
     [ inventoryComplete i
@@ -324,6 +410,9 @@ let run (i: Inputs) : Check list =
       citations i
       revisions i
       experiment i
+      blockersClassified i
+      manifestsValid i
+      p0Coverage i
       baselineFreshness i ]
 
 let report (i: Inputs) (checks: Check list) =
@@ -331,17 +420,20 @@ let report (i: Inputs) (checks: Check list) =
     let c = i.Compiled
 
     let blockers =
-        [ for f in c.Curation.Findings |> List.sortBy (str "id") do
-              if isOpenMaterial f && str "severity" f = "critical" then
-                  yield JObj [ "kind", JStr "finding"; "id", JStr(str "id" f); "title", JStr(str "title" f) ]
-          for d in c.Curation.Decisions |> List.sortBy (str "id") do
-              if str "classification" d = "unresolved" then
-                  yield JObj [ "kind", JStr "decision"; "id", JStr(str "id" d); "title", JStr(str "title" d) ]
-          for k in c.Curation.Contracts |> List.sortBy (str "id") do
-              let st = str "status" k
-              // A contract the run itself produces (producedBy) is expected to be missing before kickoff.
-              if st = "blocked" || (st = "missing" && strOpt "producedBy" k |> Option.isNone) then
-                  yield JObj [ "kind", JStr(sprintf "contract-%s" st); "id", JStr(str "id" k); "title", JStr(str "name" k) ] ]
+        blockersOf c
+        |> List.map (fun b ->
+            let kind =
+                if c.Curation.Findings |> List.exists (fun f -> str "id" f = str "id" b) then "finding"
+                elif c.Curation.Decisions |> List.exists (fun d -> str "id" d = str "id" b) then "decision"
+                else sprintf "contract-%s" (str "status" b)
+
+            JObj
+                [ "kind", JStr kind
+                  "id", JStr(str "id" b)
+                  "title", JStr(strOpt "title" b |> Option.orElse (strOpt "name" b) |> Option.defaultValue "")
+                  "blockerClass", JStr(strOpt "blockerClass" b |> Option.defaultValue "unclassified")
+                  "owner", JStr(strOpt "owner" b |> Option.defaultValue (strOpt "approvalRequired" b |> Option.defaultValue ""))
+                  "recommendation", JStr(strOpt "recommendation" b |> Option.defaultValue "") ])
 
     JObj
         [ "schema", JStr "indy-init.requirements-validation-report/1"

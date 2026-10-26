@@ -63,7 +63,8 @@
           "path": "research/HISTORICAL-CASE-CATALOG.md",
           "quote": "No synthetic software incidents may appear in the active demo catalog."
         }
-      ]
+      ],
+      "blockerClass": "requirement-conflict"
     },
     {
       "id": "F-002",
@@ -177,7 +178,8 @@
           "path": "docs/REHEARSAL-004-WRITE-PATH-PLAN.md",
           "quote": "Requirements baseline regenerated and pinned at the kickoff commit."
         }
-      ]
+      ],
+      "blockerClass": "verification-deficiency"
     },
     {
       "id": "F-004",
@@ -216,7 +218,8 @@
           "path": ".praxis/inbox/documents/2026-10-24-REQ-PRES-001-tamper-evident-requirements-preservation.md",
           "quote": "The draft gate can be bypassed."
         }
-      ]
+      ],
+      "blockerClass": "external-dependency"
     },
     {
       "id": "F-005",
@@ -225,8 +228,8 @@
       "material": true,
       "status": "unresolved",
       "owner": "upstream: kemiller2002/echelon-registry, kemiller2002/conditor; approval by operator",
-      "title": "Kickoff release set incomplete: the released Percepta semantic CLI is not registered (echelon-current 1.28.0 not cut)",
-      "description": "OD-INDY-2 requires UI completion evidence from the released semantic CLI pinned by the kickoff set. percepta-semantic-v0.1.0, v0.2.0 and v0.2.1 are tagged, but echelon-current 1.27.0 records that it is not the complete Rehearsal 4 kickoff set and no 1.28.0 exists on the registry main branch (registration branches exist, unmerged). R4 precondition P1 is unmet.",
+      "title": "Kickoff release set incomplete: percepta-semantic 0.2.1 is registered as a release but no approved echelon-current set contains it (1.28.0 not cut)",
+      "description": "OD-INDY-2 requires UI completion evidence from the released semantic CLI pinned by the kickoff set. percepta-semantic-v0.2.1 is tagged and, since echelon-registry PR #96/#97 (merged 2026-10-26, main 2d6338e), recorded as a release (releases/percepta-semantic/0.2.1.release.json). The newest set is still echelon-current 1.27.0, which records that it is not the complete Rehearsal 4 kickoff set. Remaining upstream work: cut echelon-current 1.28.0 with percepta-semantic, Conditor-qualify it, and record the owner's approval (R4 P1).",
       "requirements": [
         "VER-001",
         "VER-004",
@@ -250,8 +253,14 @@
           "repo": "indy-init",
           "path": "docs/OWNER-DECISIONS-2026-10-24.md",
           "quote": "UI completion requires evidence from the released semantic CLI, pinned by the kickoff release set"
+        },
+        {
+          "repo": "echelon-registry",
+          "path": "releases/percepta-semantic/0.2.1.release.json",
+          "quote": "\"tag\": \"percepta-semantic-v0.2.1\""
         }
-      ]
+      ],
+      "blockerClass": "external-dependency"
     },
     {
       "id": "F-006",
@@ -383,7 +392,8 @@
           "path": "docs/OWNER-DECISIONS-2026-10-24.md",
           "quote": "They are not acceptance obligations for the event"
         }
-      ]
+      ],
+      "blockerClass": "owner-decision"
     },
     {
       "id": "F-009",
@@ -430,7 +440,8 @@
           "path": "docs/AGENT-DECISION-REDUCTION-PROFILE.md",
           "quote": "Changes to frozen contract require explicit versioning and authorization."
         }
-      ]
+      ],
+      "blockerClass": "contract-incompatibility"
     },
     {
       "id": "F-010",
