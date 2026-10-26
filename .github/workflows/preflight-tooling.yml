@@ -37,3 +37,12 @@ jobs:
           python3 -I tools/build-requirements-baseline.py . "$GITHUB_SHA" > "$RUNNER_TEMP/py.json"
           dotnet tools/requirements-compiler/src/bin/Release/net10.0/requirements-compiler.dll baseline . "$GITHUB_SHA" > "$RUNNER_TEMP/fs.json"
           cmp "$RUNNER_TEMP/py.json" "$RUNNER_TEMP/fs.json"
+      - name: Check out the approved Causa GitHub adapter (indy-init-rehearsal-002 at its accepted commit)
+        uses: actions/checkout@v4
+        with:
+          repository: kemiller2002/indy-init-rehearsal-002
+          ref: b053d1da4ef533fba7d6728c369c58a29a1e2440
+          path: .adapter
+          persist-credentials: false
+      - name: Build the T05 persistence verifier against that adapter
+        run: dotnet build tools/persistence-verification -c Release -p:CausaEngineDir="$GITHUB_WORKSPACE/.adapter/src/engine"
