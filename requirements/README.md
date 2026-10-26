@@ -9,11 +9,11 @@ rehearsal must use it is defined in
 
 | | |
 |---|---|
-| Baseline id | `BL-CAUSA-INDY-INIT-002d8ba6e986` |
-| Pinned commit | `002d8ba6e98639a385dd771999099ba032c48086` (kemiller2002/indy-init `main`, 2026-10-24). Regenerated at the requirements freeze (docs/OWNER-DECISIONS-2026-10-24.md, OD-INDY-6) |
+| Baseline id | `BL-CAUSA-INDY-INIT-c751d58d66e3` |
+| Pinned commit | `c751d58d66e3f105a8c67a0cb5e069314bdbd391` (the proposed launch-content and active-catalog change, F-001/F-006 of `requirements-compiled/v1`). Previously `002d8ba6e98639a385dd771999099ba032c48086`, which lacked AR-019..AR-026 (F-003). Re-pin at the Rehearsal 4 kickoff commit (OD-INDY-6) |
 | Documents | 19, each pinned by SHA-256 |
-| Requirements | 450 |
-| Obligations | 2220: 325 `acceptance`, 51 `value`, 1844 `constraint` |
+| Requirements | 461 |
+| Obligations | 2293: 378 `acceptance`, 55 `value`, 1860 `constraint` |
 | Regenerate | `python3 -I tools/build-requirements-baseline.py . <commit> > requirements/causa-requirements-baseline.json` |
 | Tests | `python3 tools/test-requirements-baseline.py` (run by the preflight-tooling workflow) |
 
@@ -34,7 +34,7 @@ inventoried is reported as drift (`uninventoried-requirement`).
 | `docs/CAUSA-UI-EXPERIENCE-REQUIREMENTS.md` | UI-001..UI-040 and its normative sections | `^## (UI-\d{3}):` |
 | `docs/WASM-LOADING-EXPERIENCE-REQUIREMENTS.md` | WASM-LOAD-001..008 | `^## (WASM-LOAD-\d{3}):` |
 | `docs/PROVIDER-FIXTURE-AND-INTEGRATION-REQUIREMENTS.md` | PF-001..PF-021 and the acceptance scenarios | `^\*\*(PF-\d{3}) ` |
-| `docs/REHEARSAL-EXTERNAL-DATA-BOUNDARY.md` | EXT-DATA-001..012, the goal, acceptance and intake | `^- (EXT-DATA-\d{3}) ` |
+| `docs/REHEARSAL-EXTERNAL-DATA-BOUNDARY.md` | EXT-DATA-001..013, the goal, acceptance and intake | `^- (EXT-DATA-\d{3}) ` |
 | `docs/FROZEN-DEMO-STORAGE-REQUIREMENTS.md` | STORAGE-001..009 and the required evidence | `^## (STORAGE-\d{3}):` |
 | `docs/DEFECT-CLASS-CLOSURE-AND-RELEASE-GATES.md` | DCC-001..012 and the acceptance matrix | `^## (DCC-\d{3}):` |
 | `docs/AGENT-DECISION-REDUCTION-PROFILE.md` | ADRP-001..016 and the readiness checklist | `^## (ADRP-\d{3}):` |
