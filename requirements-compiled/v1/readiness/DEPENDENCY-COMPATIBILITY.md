@@ -6,7 +6,7 @@ Observed 2026-10-26 from `git ls-remote` and the Registry's main branch (`2d6338
 
 | System | In echelon-current 1.27.0 (approved) | Newest tag observed | Status for Rehearsal 4 |
 |---|---|---|---|
-| Praxis | 3.20.0 | v3.20.0 | Usable, but **lacks the preservation gate** (PRE-REQ-03 BLOCKED; F-004). A release carrying praxis#292 is needed. |
+| Praxis | 3.20.0 | **v3.21.0** | **3.21.0 carries the preservation gate** (PRE-REQ-03 PASS). It is released and verified, but in no approved set yet; include it in 1.28.0. |
 | Ordo | 1.17.0 | v1.17.0 | Current |
 | Dokimos | 0.7.0 | dokimos-v0.7.0 | Current. It is required for attested completion with Praxis ≥ 3.17 (OD-INDY-8). |
 | Percepta (repo lifecycle) | 0.1.0 | percepta-repo-v0.1.0 | Current |
@@ -23,7 +23,7 @@ Observed 2026-10-26 from `git ls-remote` and the Registry's main branch (`2d6338
 ## What the kickoff set (echelon-current 1.28.0) must contain
 
 - percepta-semantic 0.2.1 (OD-INDY-2)
-- the Praxis release that carries the preservation gate (RDP-004 without breaking VER-005)
+- Praxis 3.21.0, the release that carries the preservation gate (RDP-004 without breaking VER-005)
 - Dokimos 0.7.0
 - Conditor ≥ 0.10.11 (SD-1)
 - folio 0.4.1 assessed (selected or refused with a reason, VER-003)

@@ -8,7 +8,7 @@
   ],
   "summary": {
     "normalized": 467,
-    "flaggedForReview": 160,
+    "flaggedForReview": 155,
     "exactDuplicateGroups": 0,
     "structuralContainments": 84,
     "nearDuplicatePairs": 5,
@@ -2027,10 +2027,8 @@
         "F-004",
         "F-025"
       ],
-      "reviewStatus": "flagged-for-review",
-      "reviewReasons": [
-        "F-004"
-      ]
+      "reviewStatus": "normalized",
+      "reviewReasons": []
     },
     {
       "id": "NR-AR-003",
@@ -2100,10 +2098,8 @@
         "F-004",
         "F-025"
       ],
-      "reviewStatus": "flagged-for-review",
-      "reviewReasons": [
-        "F-004"
-      ]
+      "reviewStatus": "normalized",
+      "reviewReasons": []
     },
     {
       "id": "NR-AR-005",
@@ -19376,10 +19372,8 @@
         "F-004",
         "F-024"
       ],
-      "reviewStatus": "flagged-for-review",
-      "reviewReasons": [
-        "F-004"
-      ]
+      "reviewStatus": "normalized",
+      "reviewReasons": []
     },
     {
       "id": "NR-VER-006",
@@ -19566,10 +19560,8 @@
         "F-004",
         "F-025"
       ],
-      "reviewStatus": "flagged-for-review",
-      "reviewReasons": [
-        "F-004"
-      ]
+      "reviewStatus": "normalized",
+      "reviewReasons": []
     },
     {
       "id": "NR-WASM-LOAD-001",
@@ -20570,10 +20562,8 @@
         "F-004",
         "F-025"
       ],
-      "reviewStatus": "flagged-for-review",
-      "reviewReasons": [
-        "F-004"
-      ]
+      "reviewStatus": "normalized",
+      "reviewReasons": []
     },
     {
       "id": "NR-WORKFLOW-DIAGRAM-INTEGRATION\u00a7acceptance-scenarios",

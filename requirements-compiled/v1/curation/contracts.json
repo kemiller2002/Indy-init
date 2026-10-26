@@ -396,28 +396,62 @@
       "name": "Praxis requirements preservation gate",
       "provider": "Praxis (draft praxis#292; no release)",
       "consumer": "rehearsal requirements derivation and acceptance (RDP-004)",
-      "contractVersion": "praxis.requirements-baseline/1, -disposition/1, -approvals/1, -preservation/1 (draft)",
+      "contractVersion": "Praxis 3.21.0 (tag v3.21.0, commit fa474c42): praxis.requirements-baseline/1, -disposition/1, -approvals/1, -preservation/1",
       "requiredCompatibility": "a released, registered Praxis carrying the gate",
       "verificationMethod": "gate exit 0 on the derived package, disposition and operator approvals; evidence JSON committed (RDP-004)",
       "dependencyVersions": [
         "praxis 3.20.0 (no gate)"
       ],
       "evidenceIdentity": "praxis.requirements-preservation/1 output with input SHA-256s",
-      "status": "blocked",
+      "status": "identity-verified",
       "requirements": [
         "AR-004",
         "WDL-015",
         "VER-010"
       ],
-      "identity": [],
+      "identity": [
+        {
+          "label": "baseline contract (schemas/praxis-requirements-baseline.schema.json)",
+          "repo": "praxis",
+          "rev": "fa474c420e59b26ecacf767a63257e602f039a8c",
+          "path": "schemas/praxis-requirements-baseline.schema.json",
+          "expectedSha256": "8be268e74764b343c7461abfdd797ffa974171890db6cb82b01b2bdf8e1e4277"
+        },
+        {
+          "label": "disposition contract (schemas/praxis-requirements-disposition.schema.json)",
+          "repo": "praxis",
+          "rev": "fa474c420e59b26ecacf767a63257e602f039a8c",
+          "path": "schemas/praxis-requirements-disposition.schema.json",
+          "expectedSha256": "4f3c0a5ff96a3e7dce60f3b16b1fa0ce4b668b1f11ce0f5181420445d7690737"
+        },
+        {
+          "label": "approvals contract (schemas/praxis-requirements-approvals.schema.json)",
+          "repo": "praxis",
+          "rev": "fa474c420e59b26ecacf767a63257e602f039a8c",
+          "path": "schemas/praxis-requirements-approvals.schema.json",
+          "expectedSha256": "7e626cb0b76d49e4929fcb82da89d0d04723a2e64b0c2829fc513e38932216a6"
+        },
+        {
+          "label": "evidence contract (schemas/praxis-requirements-preservation.schema.json)",
+          "repo": "praxis",
+          "rev": "fa474c420e59b26ecacf767a63257e602f039a8c",
+          "path": "schemas/praxis-requirements-preservation.schema.json",
+          "expectedSha256": "f9c3c0a735f5cbc216280b3db8e11ff475507e01cd70e1d50d18cb7009392c87"
+        }
+      ],
       "citations": [
         {
           "repo": "indy-init",
           "path": "docs/REHEARSAL-DERIVATION-POLICY.md",
           "quote": "The gate is praxis requirements preservation verify"
+        },
+        {
+          "repo": "praxis",
+          "path": "docs/requirements-preservation.md",
+          "quote": "The gate refuses a baseline whose bytes differ"
         }
       ],
-      "blockerClass": "external-dependency"
+      "blockerClass": null
     },
     {
       "id": "CT-014",

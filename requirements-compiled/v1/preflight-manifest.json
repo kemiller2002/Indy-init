@@ -96,7 +96,7 @@
         "F-009"
       ],
       "packageStatus": "BLOCKED",
-      "detail": "open: F-004, F-005"
+      "detail": "open: F-005"
     },
     {
       "id": "PRE-DEP-01",
@@ -139,7 +139,7 @@
         "CT-016"
       ],
       "packageStatus": "BLOCKED",
-      "detail": "blocked: CT-012, CT-013, CT-016"
+      "detail": "blocked: CT-012, CT-016"
     },
     {
       "id": "PRE-DEP-03",
@@ -158,7 +158,7 @@
         "CT-008"
       ],
       "packageStatus": "PASS",
-      "detail": "5 identities match"
+      "detail": "9 identities match"
     },
     {
       "id": "PRE-ORG-01",

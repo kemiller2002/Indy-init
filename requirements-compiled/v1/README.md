@@ -7,7 +7,7 @@ This package compiles the Causa requirements into a structured form. Every part 
 | Source | kemiller2002/indy-init `9dc7d575f9d981e2be6f83543e18f548332e1a53`. The compiler builds the baseline at this commit itself, with the F# port of the baseline generator. |
 | Other repositories | the exact commits in `curation/sources.json` (also in `package-manifest.json`) |
 | Compilation verdict | **PASS**: every check V01–V17 passes, including V14 (no baseline drift) |
-| Rehearsal readiness | **BLOCKED**: 5 blockers, all upstream releases, listed in `requirements-validation-report.json`. The executed preflight gives BLOCKED; see `readiness/READINESS-REPORT.md`. |
+| Rehearsal readiness | **BLOCKED**: 3 blockers, all in the release set (echelon-current 1.28.0), listed in `requirements-validation-report.json`. The executed preflight gives BLOCKED; see `readiness/READINESS-REPORT.md`. |
 | Target run | the repository's **Rehearsal 4** (write-path dress rehearsal). The mission brief called it "Rehearsal 3" (F-020). |
 
 Two things this package does not do:

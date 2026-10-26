@@ -112,7 +112,7 @@ The contract is CT-017; `CONTRACT-RESOLUTION.md` §2 gives it.
 ## 7. Requests that are not decisions
 
 These are upstream releases, handled by their owners:
-- **Praxis:** release the hardened preservation gate (F-004).
+- **Praxis:** release the hardened preservation gate (F-004). **Done:** Praxis 3.21.0, 2026-10-26.
 - **Registry:** cut and qualify echelon-current 1.28.0 with percepta-semantic 0.2.1, and assess folio 0.4.1 (F-005, F-015).
 
 See `DEPENDENCY-COMPATIBILITY.md`.

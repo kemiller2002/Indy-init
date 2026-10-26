@@ -21,7 +21,7 @@
     },
     {
       "name": "praxis",
-      "commit": "bf7bf04fde6b252a06fe7e12cddc6d4d3ac99eb3",
+      "commit": "fa474c420e59b26ecacf767a63257e602f039a8c",
       "role": "requirements intake contract"
     },
     {
@@ -165,7 +165,7 @@
   "inputs": [
     {
       "path": "curation/contracts.json",
-      "sha256": "44cea0d67a4c41450bf8e19489870dcbd0bb34cdbec61f0394dab9b9c5fe0dee"
+      "sha256": "bab5ba5adcf8506493ff04c595e2130c75a8681139498497297bceac9e695daa"
     },
     {
       "path": "curation/decisions.json",
@@ -185,7 +185,7 @@
     },
     {
       "path": "curation/findings.json",
-      "sha256": "b4f3b5123e93040e15dd14e7daca00bbc17d251bdbff363a5a1b5c3986cc3fc0"
+      "sha256": "243561f4f13d2da72966eca9f8f83cdf9748f80cc8d9136a35753da9091f27e5"
     },
     {
       "path": "curation/preflight-checks.json",
@@ -193,7 +193,7 @@
     },
     {
       "path": "curation/sources.json",
-      "sha256": "47755a55ecd15fea22db50b1be124b26eed314f1bb62e58ddb14a6217dbad17a"
+      "sha256": "c9d966bbaa6af9c4d1485eb4b36e21a7dd5693051bb541abb39a20b79bdb0701"
     },
     {
       "path": "curation/tasks.json",
@@ -207,7 +207,7 @@
   "authored": [
     {
       "path": "README.md",
-      "sha256": "3973b43e0770d256a119165a2e7953da1545ac93bed8ba89f42da3bd921ee7c4"
+      "sha256": "b58be90e7cca240edaab29a13b288d13bdc74555257f43a21bb2513df85a7ddf"
     },
     {
       "path": "optimization-analysis.md",
@@ -215,15 +215,15 @@
     },
     {
       "path": "readiness/READINESS-REPORT.md",
-      "sha256": "e6c6b84147b8fda36475900e621f0b44072cd11740ba44e4fc98f079a59a823e"
+      "sha256": "6666e9610c1575798b25720e2411ab09a6ce51b2f63f5d487eb166509297e592"
     },
     {
       "path": "readiness/OWNER-DECISION-REQUESTS.md",
-      "sha256": "675ebe3c68c2c0c140cc5226943ed3967c89a8fab58da196316040fa790e5f8c"
+      "sha256": "1940c3dc3c73d01c03ff14b1dc25af0f2720b826011a0049dda88704e31fb95f"
     },
     {
       "path": "readiness/CONTRACT-RESOLUTION.md",
-      "sha256": "e036a43f95a8774159e8216bce6a34f823a4456e13f28510ea346fd170457618"
+      "sha256": "7d4f5df00ce38180bb92c9462aad056c788aa9d0434caf6116caa8f00270460c"
     },
     {
       "path": "readiness/FSHARP-TOOLING-ASSESSMENT.md",
@@ -231,17 +231,17 @@
     },
     {
       "path": "readiness/DEPENDENCY-COMPATIBILITY.md",
-      "sha256": "1b47a9e1722fb9871b495a9769501d1304c46983bbf749458c61575dd3b79e2f"
+      "sha256": "89bc23121d811f17fbde9dcb209860aab7c25e533d9bf29e863924ed44d76cf7"
     }
   ],
   "generated": [
     {
       "path": "contract-bindings.json",
-      "sha256": "93011bac6ed4e63a5ea6ccbad73f8ce6434434fce7e3c0c7b7edb5a03dd3aff0"
+      "sha256": "e28098fdfadc8ca526ccd371c1fb9bb5d535a83c25cf814f6bd44f172e804bff"
     },
     {
       "path": "decision-registry.json",
-      "sha256": "e9050b1ca761377b7c8efb62e7df2799ddcf0057f63d885ef903ae0f247afa9d"
+      "sha256": "3d1ce9072ed80bbdb4595bdce5bfba414d2e67337ecf5870135193f62aafb2fa"
     },
     {
       "path": "dependency-graph.json",
@@ -257,7 +257,7 @@
     },
     {
       "path": "normalized-requirements.json",
-      "sha256": "6c6d673f971821f7d9b694668349adc5f970cbe5fb1e65508cfae46b99fb4727"
+      "sha256": "5c9dfd96eed855ddfe54fb0f84738b04616cdcb4e90fbba989797a068deb575d"
     },
     {
       "path": "percepta-experiment.json",
@@ -265,7 +265,7 @@
     },
     {
       "path": "preflight-manifest.json",
-      "sha256": "9b448d13e6e561914f91d3b2636ada22fc1ea4818ea2d35e9422eba5e1ed9f48"
+      "sha256": "e12a5cae64cca5a8ac31afbed961aca785938f2d52b78a2de89083032752bc72"
     },
     {
       "path": "requirements-inventory.json",
@@ -277,7 +277,7 @@
     },
     {
       "path": "requirements-validation-report.json",
-      "sha256": "4ffae84958f2345a764691fff5ddaecc4af4560270b7a5f6a375a6aeeb7e43aa"
+      "sha256": "81078056a92f32c07ccb3c635fce6086fc7471752d9768957ce830279ffc0a12"
     },
     {
       "path": "timed-execution-manifest.json",

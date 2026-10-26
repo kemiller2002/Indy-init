@@ -8,7 +8,7 @@
 | CT-008 historical catalog | identity-verified | The manifest hash matches `verification/release.json` (PRE-DEP-03) |
 | CT-007 GitHub write primitive | unverified | §1: owner exception, recorded as OD-INDY-9. T05 exercised the primitive against real GitHub: a guarded write succeeded, a stale write was refused with `STALE_DATA` (`evidence/t05-persistence-verification.json`). T18 and T21 verify it in the application. |
 | CT-017 authentication | unverified | §2: decided as OD-INDY-10. PRE-AUTH-02 passed in CI with the fine-grained secret (T05). T21 verifies the in-app flow. |
-| CT-013 Praxis preservation gate | **blocked** | §3: upstream release needed |
+| CT-013 Praxis preservation gate | identity-verified | §3: released in Praxis 3.21.0; the four contract schemas are pinned by SHA-256 |
 | CT-012 Percepta semantic, CT-016 release set | **blocked** | §4: echelon-current 1.28.0 needed |
 | CT-001..CT-005, CT-018 (boundaries A–E, faults) | missing (`producedBy: T14`) | §5: produced during the run, not kickoff blockers |
 | CT-009 Limen, CT-010 Forma, CT-011 Folio, CT-014 Dokimos, CT-015 ledger | unverified | §6: exercised by T11, T16, T26, T34 |
@@ -72,6 +72,14 @@ This is the minimum mechanism that meets EXT-DATA-003/004, R11.1–R11.3 and iPa
 - It never writes the token anywhere.
 
 ## 3. CT-013 / F-004: Praxis preservation gate
+
+**Status (2026-10-26): released.**
+- Praxis 3.21.0 (tag `v3.21.0`, `fa474c42`) carries the gate with R1 and R2 (REQ-PRES-004).
+- PRE-REQ-03 passes.
+- The published linux-x64 artifact passes all 17 positive and negative cases on the pinned baseline (`READINESS-REPORT.md`, "Praxis requirements-preservation release").
+- Step 3 below, inclusion in echelon-current 1.28.0, remains with the Registry (F-005).
+
+The analysis that led to the release:
 
 **Evidence (PRE-REQ-03, executed):** the latest Praxis release, v3.20.0, has no `preservation` command under `src/Praxis.Cli`. The gate exists only on draft PR praxis#292. Its own intake document, REQ-PRES-001, lists known bypasses: self-written approvals, an edited baseline, role-swapped tokens.
 

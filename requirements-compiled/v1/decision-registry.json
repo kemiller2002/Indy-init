@@ -1173,7 +1173,7 @@
           "path": "docs/fallback-reconciliation.md",
           "quote": "the legacy input-documents/ is read too",
           "verified": true,
-          "detail": "found at bf7bf04fde6b252a06fe7e12cddc6d4d3ac99eb3"
+          "detail": "found at fa474c420e59b26ecacf767a63257e602f039a8c"
         }
       ],
       "sourcesVerified": true
