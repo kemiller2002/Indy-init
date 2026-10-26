@@ -1,13 +1,13 @@
 {
   "schema": "praxis.requirements-baseline/1",
-  "id": "BL-CAUSA-INDY-INIT-002d8ba6e986",
+  "id": "BL-CAUSA-INDY-INIT-2edaea4f65ba",
   "source": {
     "repository": "kemiller2002/indy-init",
-    "commit": "002d8ba6e98639a385dd771999099ba032c48086",
+    "commit": "2edaea4f65bac13b6c9cc55ac475208e5215affa",
     "documents": [
       {
         "path": "docs/CAUSA-UI-EXPERIENCE-REQUIREMENTS.md",
-        "sha256": "55a8b0b8b1bbd07b10bba1c6760306d0d84f8e69b2db846af571298e4f35e777",
+        "sha256": "8998af20c6bb8bfc90c59e45ca6106efca3fd44576fd4cdf4ec1440ab3fa3b66",
         "requirementPattern": "^## (UI-\\d{3}):"
       },
       {
@@ -22,7 +22,7 @@
       },
       {
         "path": "docs/REHEARSAL-EXTERNAL-DATA-BOUNDARY.md",
-        "sha256": "427bc30887e50385ac32e9ba95da51b7b1d0fbde905cdbc8bf8bf40ca6b9a569",
+        "sha256": "a1b487a928709dab8d88b367caf522b16da4602459eca5d62457663cffe4ccc7",
         "requirementPattern": "^- (EXT-DATA-\\d{3}) "
       },
       {
@@ -84,7 +84,7 @@
       },
       {
         "path": "docs/AGENT-RELIABILITY-REQUIREMENTS.md",
-        "sha256": "fe2215774719f3b26e7c409dac4d32b4e7fc086c0132599c3fe9233b23356e16",
+        "sha256": "92ce61dce8f12fee2c337498f20d5d364a97ba4ee070f920de89cc36d600bd46",
         "requirementPattern": "^\\*\\*(AR-\\d{3}) "
       },
       {
@@ -93,7 +93,7 @@
       },
       {
         "path": "docs/REHEARSAL-ACCEPTANCE-LEDGER.md",
-        "sha256": "b4d53fc329de43c331b9b785cdaf3bc52019faf5662a57abb5e32d624d1d76e3"
+        "sha256": "850abb22687456a562819f7ba8c80f13908bfad00a3c5b893b6e51e477145eb2"
       }
     ]
   },
@@ -235,15 +235,12 @@
       "priority": "P0",
       "document": "docs/CAUSA-UI-EXPERIENCE-REQUIREMENTS.md",
       "heading": "## UI-001: Investigation dashboard [P0]",
-      "sectionSha256": "db5a4954b66b77220eb4e2c7da8afdd69d79b17f18155b31c4772c4300beada4",
+      "sectionSha256": "dc5ca3c2e4680ccc4ad3d97f4ec4cfbc86caddf0188ccf2820145d296a487591",
       "obligations": [
         {
           "id": "UI-001-O1",
-          "kind": "value",
-          "text": "On launch, show all five frozen demonstration investigations and user working copies.",
-          "tokens": [
-            "five"
-          ]
+          "kind": "constraint",
+          "text": "Before Connect, show an accessible, empty, disconnected workspace with the explicit Connect data repository action (EXT-DATA-002); after Connect, show the connected repository's investigations and the user's working copies, which for the active demonstration catalog (causa-data historical-v1, EXT-DATA-013) are exactly Apollo 1 (AS-204), Apollo 11 and Space Shuttle Challenger (STS-51-L)."
         },
         {
           "id": "UI-001-O2",
@@ -841,7 +838,7 @@
       "priority": "P0",
       "document": "docs/CAUSA-UI-EXPERIENCE-REQUIREMENTS.md",
       "heading": "## UI-015: Acceptance and traceability [P0]",
-      "sectionSha256": "4dbdfaa51a87a36c56c48a53c25b2f4d344ec2e934f5388fc926815e84d9f29c",
+      "sectionSha256": "f6cc6b7fc08f7bd96452ce01c8c76614522a072d92fdc605f1bf6a469b2fc7a5",
       "obligations": [
         {
           "id": "UI-015-O1",
@@ -851,8 +848,10 @@
         {
           "id": "UI-015-O2",
           "kind": "acceptance",
-          "text": "Verify the five frozen investigations load and replay, keyboard/touch paths, graph textual equivalent, timeline ordering, legal command enforcement, save/sync truthfulness, offline/conflict recovery, responsive reflow, report fidelity, and startup failure.",
+          "text": "Verify the three active-catalog investigations (EXT-DATA-013) load from the connected repository and replay, verify the five frozen v1.0.0 fixtures replay as the storage contract's test corpus, keyboard/touch paths, graph textual equivalent, timeline ordering, legal command enforcement, save/sync truthfulness, offline/conflict recovery, responsive reflow, report fidelity, and startup failure.",
           "tokens": [
+            "v1.0.0",
+            "three",
             "five"
           ]
         },
@@ -2839,6 +2838,41 @@
           "id": "EXT-DATA-012-O3",
           "kind": "constraint",
           "text": "Do not grant data access through publicly readable Pages assets."
+        }
+      ]
+    },
+    {
+      "id": "EXT-DATA-013",
+      "title": "EXT-DATA-013",
+      "priority": "P0",
+      "document": "docs/REHEARSAL-EXTERNAL-DATA-BOUNDARY.md",
+      "heading": "- EXT-DATA-013 [P0] The active demonstration catalog is the one named by causa-data `catalog/active.json` (historical-v1): exactly three historical investigations, Apollo 1 (AS-204), Apollo 11 and Space Shuttle Challenger (STS-51-L). After an explicit Connect to that repository and workspace, the application MUST load all three through the full contract validation and F# replay pipeline to the states recorded in the catalog manifest, MUST NOT present any synthetic investigation as a catalog case, and MUST NOT bundle any of their records. The five synthetic v1.0.0 fixtures remain the storage contract's test corpus only (STORAGE-005, STORAGE-007).",
+      "sectionSha256": "3fee33f51d7d05a2a74a7b10947a15055c8d71e0819273b3a03fcbf3220891f6",
+      "obligations": [
+        {
+          "id": "EXT-DATA-013-O1",
+          "kind": "value",
+          "text": "The active demonstration catalog is the one named by causa-data `catalog/active.json` (historical-v1): exactly three historical investigations, Apollo 1 (AS-204), Apollo 11 and Space Shuttle Challenger (STS-51-L).",
+          "tokens": [
+            "three"
+          ]
+        },
+        {
+          "id": "EXT-DATA-013-O2",
+          "kind": "value",
+          "text": "After an explicit Connect to that repository and workspace, the application MUST load all three through the full contract validation and F# replay pipeline to the states recorded in the catalog manifest, MUST NOT present any synthetic investigation as a catalog case, and MUST NOT bundle any of their records.",
+          "tokens": [
+            "three"
+          ]
+        },
+        {
+          "id": "EXT-DATA-013-O3",
+          "kind": "acceptance",
+          "text": "The five synthetic v1.0.0 fixtures remain the storage contract's test corpus only (STORAGE-005, STORAGE-007).",
+          "tokens": [
+            "v1.0.0",
+            "five"
+          ]
         }
       ]
     },
@@ -15058,6 +15092,271 @@
       ]
     },
     {
+      "id": "AGENT-RELIABILITY§evidence-driven-refinement-october-2026",
+      "title": "Evidence-driven refinement (October 2026)",
+      "priority": "unstated",
+      "document": "docs/AGENT-RELIABILITY-REQUIREMENTS.md",
+      "heading": "## Evidence-driven refinement (October 2026)",
+      "sectionSha256": "8bca7264acdb95393118bade54a14701aabc65c68251f3f3382cfb835b258fac",
+      "obligations": [
+        {
+          "id": "AGENT-RELIABILITY§evidence-driven-refinement-october-2026-O1",
+          "kind": "value",
+          "text": "The reported ARCH-002 trial found 29 architecture violations in 68 unguided trials versus 0 in 71 trials with the four-tier architecture brief.",
+          "tokens": [
+            "four"
+          ]
+        },
+        {
+          "id": "AGENT-RELIABILITY§evidence-driven-refinement-october-2026-O2",
+          "kind": "value",
+          "text": "Additional Ordo enforcement showed no measured improvement and reportedly increased cost by 7%.",
+          "tokens": [
+            "7%"
+          ]
+        },
+        {
+          "id": "AGENT-RELIABILITY§evidence-driven-refinement-october-2026-O3",
+          "kind": "acceptance",
+          "text": "Continuous agents reportedly reduced cost per accepted requirement by 40.9%.",
+          "tokens": [
+            "40.9%"
+          ]
+        },
+        {
+          "id": "AGENT-RELIABILITY§evidence-driven-refinement-october-2026-O4",
+          "kind": "constraint",
+          "text": "These are experiment-specific observations, not universal guarantees; retain raw trial evidence and study context-compaction effects separately."
+        }
+      ]
+    },
+    {
+      "id": "AR-019",
+      "title": "Computed verdict, not agent assertion",
+      "priority": "P0",
+      "document": "docs/AGENT-RELIABILITY-REQUIREMENTS.md",
+      "heading": "**AR-019 [P0] Computed verdict, not agent assertion.** The authoritative acceptance outcome MUST be computed from the evidence ledger, frozen baseline, required gates, requirements coverage, approved decisions, defect closures, and deployed SHA. Agent-authored accepted fields are advisory at most. Original Rehearsal 3 must yield BLOCKED; Rehearsal 2 candidate 45644a7 should yield ACCEPTED only if its actual ledger and evidence meet the frozen contract. Include tests for false accepted flags, missing CI, baseline tampering, and unauthorized waivers.",
+      "sectionSha256": "e74dd40499aed55482647c46328ff26f32207b2c49949a05b331fdca7d5862d4",
+      "obligations": [
+        {
+          "id": "AR-019-O1",
+          "kind": "acceptance",
+          "text": "The authoritative acceptance outcome MUST be computed from the evidence ledger, frozen baseline, required gates, requirements coverage, approved decisions, defect closures, and deployed SHA."
+        },
+        {
+          "id": "AR-019-O2",
+          "kind": "acceptance",
+          "text": "Agent-authored accepted fields are advisory at most."
+        },
+        {
+          "id": "AR-019-O3",
+          "kind": "acceptance",
+          "text": "Original Rehearsal 3 must yield BLOCKED; Rehearsal 2 candidate 45644a7 should yield ACCEPTED only if its actual ledger and evidence meet the frozen contract."
+        },
+        {
+          "id": "AR-019-O4",
+          "kind": "acceptance",
+          "text": "Include tests for false accepted flags, missing CI, baseline tampering, and unauthorized waivers."
+        }
+      ]
+    },
+    {
+      "id": "AR-020",
+      "title": "Selective enforcement",
+      "priority": "P0",
+      "document": "docs/AGENT-RELIABILITY-REQUIREMENTS.md",
+      "heading": "**AR-020 [P0] Selective enforcement.** Retain the demonstrated four-tier architecture brief as default guidance. Do not add per-step Ordo architecture enforcement, typed agent records, or executable decision gates without a measured incremental correctness benefit that justifies cost and false rejections. Typed domain models and security/acceptance boundaries remain mandatory where independently justified.",
+      "sectionSha256": "39fb13f6bddfc0479aebbb0f4bb74870e4d968bb107ea70b4dfccbbf7c09375e",
+      "obligations": [
+        {
+          "id": "AR-020-O1",
+          "kind": "acceptance",
+          "text": "Retain the demonstrated four-tier architecture brief as default guidance.",
+          "tokens": [
+            "four"
+          ]
+        },
+        {
+          "id": "AR-020-O2",
+          "kind": "acceptance",
+          "text": "Do not add per-step Ordo architecture enforcement, typed agent records, or executable decision gates without a measured incremental correctness benefit that justifies cost and false rejections."
+        },
+        {
+          "id": "AR-020-O3",
+          "kind": "acceptance",
+          "text": "Typed domain models and security/acceptance boundaries remain mandatory where independently justified."
+        }
+      ]
+    },
+    {
+      "id": "AR-021",
+      "title": "Continuous implementation agent",
+      "priority": "P0",
+      "document": "docs/AGENT-RELIABILITY-REQUIREMENTS.md",
+      "heading": "**AR-021 [P0] Continuous implementation agent.** Prefer one long-running implementation agent with compact durable checkpoints. Do not require structured handoffs by default. Measure correctness and requirement retention after context compaction; use independent reviewers at release candidates.",
+      "sectionSha256": "4fda52658407ef80f3ef40c43f239910b0c731ce365cb292fcea7da007dd25f5",
+      "obligations": [
+        {
+          "id": "AR-021-O1",
+          "kind": "constraint",
+          "text": "Prefer one long-running implementation agent with compact durable checkpoints."
+        },
+        {
+          "id": "AR-021-O2",
+          "kind": "constraint",
+          "text": "Do not require structured handoffs by default."
+        },
+        {
+          "id": "AR-021-O3",
+          "kind": "constraint",
+          "text": "Measure correctness and requirement retention after context compaction; use independent reviewers at release candidates."
+        }
+      ]
+    },
+    {
+      "id": "AR-022",
+      "title": "Testing discipline",
+      "priority": "P0",
+      "document": "docs/AGENT-RELIABILITY-REQUIREMENTS.md",
+      "heading": "**AR-022 [P0] Testing discipline.** Dependency-based test selection may prioritize but must not omit mandatory regression/security/integration coverage. Do not restrict CI to infrequent checkpoints when intermediate changes can hide failures. Require baseline tests that demonstrably fail on injected defects before trusting an experiment.",
+      "sectionSha256": "08c13700f14c802b9d9894e833a2c3eaa45a3a29c187c9dd3b69dee5c223bd3e",
+      "obligations": [
+        {
+          "id": "AR-022-O1",
+          "kind": "acceptance",
+          "text": "Dependency-based test selection may prioritize but must not omit mandatory regression/security/integration coverage."
+        },
+        {
+          "id": "AR-022-O2",
+          "kind": "constraint",
+          "text": "Do not restrict CI to infrequent checkpoints when intermediate changes can hide failures."
+        },
+        {
+          "id": "AR-022-O3",
+          "kind": "acceptance",
+          "text": "Require baseline tests that demonstrably fail on injected defects before trusting an experiment."
+        }
+      ]
+    },
+    {
+      "id": "AR-023",
+      "title": "Release-set integrity",
+      "priority": "P0",
+      "document": "docs/AGENT-RELIABILITY-REQUIREMENTS.md",
+      "heading": "**AR-023 [P0] Release-set integrity.** Select the latest *verified compatible release set*, not unrelated latest versions. Confirm whether Dokimos 0.7.0 and Percepta have published artifacts; do not claim attestation from a set lacking its required components. Resolve and verify Conditor scaffold defect SD-1. Pin the exact set and require evidence for waivers.",
+      "sectionSha256": "a4cab5d491984c119c70b5ebb2c26e219bcf6c6db513d439d416a06fc2695ef8",
+      "obligations": [
+        {
+          "id": "AR-023-O1",
+          "kind": "acceptance",
+          "text": "Select the latest *verified compatible release set*, not unrelated latest versions."
+        },
+        {
+          "id": "AR-023-O2",
+          "kind": "value",
+          "text": "Confirm whether Dokimos 0.7.0 and Percepta have published artifacts; do not claim attestation from a set lacking its required components.",
+          "tokens": [
+            "0.7.0"
+          ]
+        },
+        {
+          "id": "AR-023-O3",
+          "kind": "acceptance",
+          "text": "Resolve and verify Conditor scaffold defect SD-1."
+        },
+        {
+          "id": "AR-023-O4",
+          "kind": "constraint",
+          "text": "Pin the exact set and require evidence for waivers."
+        }
+      ]
+    },
+    {
+      "id": "AR-024",
+      "title": "Explicit kickoff decisions",
+      "priority": "P0",
+      "document": "docs/AGENT-RELIABILITY-REQUIREMENTS.md",
+      "heading": "**AR-024 [P0] Explicit kickoff decisions.** An authorized human must resolve the write scope, Percepta release/waiver, DF-CAUSA-2026-0003 operator decisions, and frozen requirements/stack before a timed full-write rehearsal. Agents must not self-ratify these decisions.",
+      "sectionSha256": "766cfcf4c27eab371c4cebd79da8aabf4e34209957c6e90b468117cfecb7c726",
+      "obligations": [
+        {
+          "id": "AR-024-O1",
+          "kind": "constraint",
+          "text": "An authorized human must resolve the write scope, Percepta release/waiver, DF-CAUSA-2026-0003 operator decisions, and frozen requirements/stack before a timed full-write rehearsal."
+        },
+        {
+          "id": "AR-024-O2",
+          "kind": "constraint",
+          "text": "Agents must not self-ratify these decisions."
+        }
+      ]
+    },
+    {
+      "id": "AR-025",
+      "title": "Research controls",
+      "priority": "P1",
+      "document": "docs/AGENT-RELIABILITY-REQUIREMENTS.md",
+      "heading": "**AR-025 [P1] Research controls.** Compare constrained versus baseline workflows on matched tasks with measured accepted requirements, false acceptance, escaped defects, token cost, elapsed time, and rework. Do not claim 'prevented by design' without a falsifiable test or generalize a single reviewer observation as proven efficacy.",
+      "sectionSha256": "56a3cf15e324cdb164f8ced13ca2c98ab99f491b5fd42a537441592d87c83efb",
+      "obligations": [
+        {
+          "id": "AR-025-O1",
+          "kind": "acceptance",
+          "text": "Compare constrained versus baseline workflows on matched tasks with measured accepted requirements, false acceptance, escaped defects, token cost, elapsed time, and rework."
+        },
+        {
+          "id": "AR-025-O2",
+          "kind": "acceptance",
+          "text": "Do not claim 'prevented by design' without a falsifiable test or generalize a single reviewer observation as proven efficacy."
+        }
+      ]
+    },
+    {
+      "id": "AR-026",
+      "title": "Shared HTTP cache",
+      "priority": "P1",
+      "document": "docs/AGENT-RELIABILITY-REQUIREMENTS.md",
+      "heading": "**AR-026 [P1] Shared HTTP cache.** Investigate a provider-neutral, opt-in cache policy at the Limen HTTP boundary with explicit freshness, invalidation, security, and stale-data semantics; do not silently use stale results for authoritative decisions. Place implementation in Limen's documented Praxis input path after owner/contract verification.",
+      "sectionSha256": "e9d727ebd5241067b240d5ef54b6e4fbeca4bf8f28f428acd270800ee1d231b6",
+      "obligations": [
+        {
+          "id": "AR-026-O1",
+          "kind": "constraint",
+          "text": "Investigate a provider-neutral, opt-in cache policy at the Limen HTTP boundary with explicit freshness, invalidation, security, and stale-data semantics; do not silently use stale results for authoritative decisions."
+        },
+        {
+          "id": "AR-026-O2",
+          "kind": "constraint",
+          "text": "Place implementation in Limen's documented Praxis input path after owner/contract verification."
+        }
+      ]
+    },
+    {
+      "id": "AGENT-RELIABILITY§reconciliation",
+      "title": "Reconciliation",
+      "priority": "unstated",
+      "document": "docs/AGENT-RELIABILITY-REQUIREMENTS.md",
+      "heading": "### Reconciliation",
+      "sectionSha256": "cc3266520de20cb5bbb63c669a3fc4e3b0869aa2792e91c05930a729cdb91f27",
+      "obligations": [
+        {
+          "id": "AGENT-RELIABILITY§reconciliation-O1",
+          "kind": "constraint",
+          "text": "AR-019..AR-026 refine AR-001..AR-018 when there is tension."
+        },
+        {
+          "id": "AGENT-RELIABILITY§reconciliation-O2",
+          "kind": "acceptance",
+          "text": "In particular AR-003 protects genuine approval authority, not agent-maintained pseudo-authority; AR-006 concerns domain correctness, not universal typed agent messages; AR-013 allows test prioritization, not skipping mandatory CI."
+        },
+        {
+          "id": "AGENT-RELIABILITY§reconciliation-O3",
+          "kind": "constraint",
+          "text": "These requirements do not establish that any release or implementation is complete."
+        }
+      ]
+    },
+    {
       "id": "REHEARSAL-AGENT-INTERFACE-FREEZE§preamble",
       "title": "Next Rehearsal Agent Handoff Contract",
       "priority": "unstated",
@@ -15485,7 +15784,7 @@
       "priority": "unstated",
       "document": "docs/REHEARSAL-ACCEPTANCE-LEDGER.md",
       "heading": "# Rehearsal Executable Acceptance Ledger Contract",
-      "sectionSha256": "8505512e91e08a3c1ddf36b83770d3bb46db6d3715d001846604a5de0d7c62ee",
+      "sectionSha256": "9beca62645daa7406d6ce017555a71e9062daf6b3707358ea7484abb897108da",
       "obligations": [
         {
           "id": "REHEARSAL-ACCEPTANCE-LEDGER§preamble-O1",
@@ -15613,50 +15912,75 @@
         {
           "id": "REHEARSAL-ACCEPTANCE-LEDGER§preamble-O25",
           "kind": "acceptance",
-          "text": "Map the normative requirements in REQUIREMENTS.md, CAUSA-UI-EXPERIENCE-REQUIREMENTS.md, WASM-LOADING-EXPERIENCE-REQUIREMENTS.md, FROZEN-DEMO-STORAGE-REQUIREMENTS.md, DEFECT-CLASS-CLOSURE-AND-RELEASE-GATES.md and AGENT-DECISION-REDUCTION-PROFILE.md."
+          "text": "**The verdict is computed, never written** (owner decision OD-INDY-7, [OWNER-DECISIONS-2026-10-24.md](OWNER-DECISIONS-2026-10-24.md))."
         },
         {
           "id": "REHEARSAL-ACCEPTANCE-LEDGER§preamble-O26",
           "kind": "acceptance",
-          "text": "Map existing SCREEN-CONTRACTS.md where screens are implemented."
+          "text": "`tools/compute-acceptance-verdict.py LEDGER.json --repo . --report REPORT.md` derives ACCEPTED, INCOMPLETE, BLOCKED, FAILED or INVALID from the ledger, checks that every PASS item's evidence exists at its SHA, and exits 1 when the ledger's `accepted` flag or the report disagrees."
         },
         {
           "id": "REHEARSAL-ACCEPTANCE-LEDGER§preamble-O27",
           "kind": "acceptance",
-          "text": "P1 scope is tracked explicitly; deferred items remain NOT_RUN rather than disappearing."
+          "text": "The report carries exactly one `<!-- acceptance-verdict: VERDICT -->` line, and no Verdict/Outcome line may claim acceptance the computation does not give."
         },
         {
           "id": "REHEARSAL-ACCEPTANCE-LEDGER§preamble-O28",
           "kind": "acceptance",
-          "text": "Use targeted checks during development; batch compatible fixes into a release candidate."
+          "text": "A rehearsal's CI runs it on every commit that changes the ledger or the report."
         },
         {
           "id": "REHEARSAL-ACCEPTANCE-LEDGER§preamble-O29",
           "kind": "acceptance",
-          "text": "Independent architecture review before first candidate."
+          "text": "There is no exclusion path in the verdict: a P0 requirement leaves it only by leaving the owner-approved baseline."
         },
         {
           "id": "REHEARSAL-ACCEPTANCE-LEDGER§preamble-O30",
           "kind": "acceptance",
-          "text": "Preserve R001 baseline and historical results unchanged."
+          "text": "Map the normative requirements in REQUIREMENTS.md, CAUSA-UI-EXPERIENCE-REQUIREMENTS.md, WASM-LOADING-EXPERIENCE-REQUIREMENTS.md, FROZEN-DEMO-STORAGE-REQUIREMENTS.md, DEFECT-CLASS-CLOSURE-AND-RELEASE-GATES.md and AGENT-DECISION-REDUCTION-PROFILE.md."
         },
         {
           "id": "REHEARSAL-ACCEPTANCE-LEDGER§preamble-O31",
           "kind": "acceptance",
-          "text": "Emit one ledger per candidate and one final immutable report with exact source/deployment identities."
+          "text": "Map existing SCREEN-CONTRACTS.md where screens are implemented."
         },
         {
           "id": "REHEARSAL-ACCEPTANCE-LEDGER§preamble-O32",
           "kind": "acceptance",
-          "text": "Implement a small validator/generator consuming requirement IDs, test results and gate artifacts."
+          "text": "P1 scope is tracked explicitly; deferred items remain NOT_RUN rather than disappearing."
         },
         {
           "id": "REHEARSAL-ACCEPTANCE-LEDGER§preamble-O33",
           "kind": "acceptance",
-          "text": "It must reject duplicate IDs, unknown statuses, missing proof, mismatched SHAs, and an Accepted flag with incomplete required gates."
+          "text": "Use targeted checks during development; batch compatible fixes into a release candidate."
         },
         {
           "id": "REHEARSAL-ACCEPTANCE-LEDGER§preamble-O34",
+          "kind": "acceptance",
+          "text": "Independent architecture review before first candidate."
+        },
+        {
+          "id": "REHEARSAL-ACCEPTANCE-LEDGER§preamble-O35",
+          "kind": "acceptance",
+          "text": "Preserve R001 baseline and historical results unchanged."
+        },
+        {
+          "id": "REHEARSAL-ACCEPTANCE-LEDGER§preamble-O36",
+          "kind": "acceptance",
+          "text": "Emit one ledger per candidate and one final immutable report with exact source/deployment identities."
+        },
+        {
+          "id": "REHEARSAL-ACCEPTANCE-LEDGER§preamble-O37",
+          "kind": "acceptance",
+          "text": "Implement a small validator/generator consuming requirement IDs, test results and gate artifacts."
+        },
+        {
+          "id": "REHEARSAL-ACCEPTANCE-LEDGER§preamble-O38",
+          "kind": "acceptance",
+          "text": "It must reject duplicate IDs, unknown statuses, missing proof, mismatched SHAs, and an Accepted flag with incomplete required gates."
+        },
+        {
+          "id": "REHEARSAL-ACCEPTANCE-LEDGER§preamble-O39",
           "kind": "acceptance",
           "text": "Do not build a new generic workflow platform merely to implement this ledger."
         }
@@ -15796,7 +16120,7 @@
       "priority": "unstated",
       "document": "docs/REHEARSAL-ACCEPTANCE-LEDGER.md",
       "heading": "## Release acceptance predicate",
-      "sectionSha256": "af9bcd630d889461f56f4331f86676eca5321b1c6fe327468c45cbbe554e252c",
+      "sectionSha256": "51ba3b4eea9db2a293761ad99ca2ddd962f854c2863108405c01ca3161885a71",
       "obligations": [
         {
           "id": "REHEARSAL-ACCEPTANCE-LEDGER§release-acceptance-predicate-O1",
@@ -15812,6 +16136,31 @@
           "id": "REHEARSAL-ACCEPTANCE-LEDGER§release-acceptance-predicate-O3",
           "kind": "acceptance",
           "text": "The run may be incomplete, blocked, or failed; partial successes are reported honestly."
+        },
+        {
+          "id": "REHEARSAL-ACCEPTANCE-LEDGER§release-acceptance-predicate-O4",
+          "kind": "acceptance",
+          "text": "**The verdict is computed, never written** (owner decision OD-INDY-7, [OWNER-DECISIONS-2026-10-24.md](OWNER-DECISIONS-2026-10-24.md))."
+        },
+        {
+          "id": "REHEARSAL-ACCEPTANCE-LEDGER§release-acceptance-predicate-O5",
+          "kind": "acceptance",
+          "text": "`tools/compute-acceptance-verdict.py LEDGER.json --repo . --report REPORT.md` derives ACCEPTED, INCOMPLETE, BLOCKED, FAILED or INVALID from the ledger, checks that every PASS item's evidence exists at its SHA, and exits 1 when the ledger's `accepted` flag or the report disagrees."
+        },
+        {
+          "id": "REHEARSAL-ACCEPTANCE-LEDGER§release-acceptance-predicate-O6",
+          "kind": "acceptance",
+          "text": "The report carries exactly one `<!-- acceptance-verdict: VERDICT -->` line, and no Verdict/Outcome line may claim acceptance the computation does not give."
+        },
+        {
+          "id": "REHEARSAL-ACCEPTANCE-LEDGER§release-acceptance-predicate-O7",
+          "kind": "acceptance",
+          "text": "A rehearsal's CI runs it on every commit that changes the ledger or the report."
+        },
+        {
+          "id": "REHEARSAL-ACCEPTANCE-LEDGER§release-acceptance-predicate-O8",
+          "kind": "acceptance",
+          "text": "There is no exclusion path in the verdict: a P0 requirement leaves it only by leaving the owner-approved baseline."
         }
       ]
     },
