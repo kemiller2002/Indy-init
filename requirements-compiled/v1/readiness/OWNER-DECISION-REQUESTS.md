@@ -113,6 +113,6 @@ The contract is CT-017; `CONTRACT-RESOLUTION.md` §2 gives it.
 
 These are upstream releases, handled by their owners:
 - **Praxis:** release the hardened preservation gate (F-004). **Done:** Praxis 3.21.0, 2026-10-26.
-- **Registry:** cut and qualify echelon-current 1.28.0 with percepta-semantic 0.2.1, and assess folio 0.4.1 (F-005, F-015).
+- **Registry:** done. echelon-current 1.28.0 is cut, qualified by Conditor 0.10.12 and approved by the owner; it selects percepta-semantic 0.2.1 and Folio 0.4.1 (F-005, F-015 resolved).
 
 See `DEPENDENCY-COMPATIBILITY.md`.

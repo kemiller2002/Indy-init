@@ -207,7 +207,7 @@
   "authored": [
     {
       "path": "README.md",
-      "sha256": "b58be90e7cca240edaab29a13b288d13bdc74555257f43a21bb2513df85a7ddf"
+      "sha256": "f3485ba1c3a00bab2df89ec5480f7babb14d5c3f562dfd9c0f2c397895cad824"
     },
     {
       "path": "optimization-analysis.md",
@@ -215,15 +215,15 @@
     },
     {
       "path": "readiness/READINESS-REPORT.md",
-      "sha256": "6666e9610c1575798b25720e2411ab09a6ce51b2f63f5d487eb166509297e592"
+      "sha256": "2b56b074f4303254f164933d1f9db72efbf06c42501f4064cc915ab70956e04d"
     },
     {
       "path": "readiness/OWNER-DECISION-REQUESTS.md",
-      "sha256": "1940c3dc3c73d01c03ff14b1dc25af0f2720b826011a0049dda88704e31fb95f"
+      "sha256": "1e9a1a53a408ffde7c83c2b8a9d558ab901f08dd8548d64bfef3531d1a1b2771"
     },
     {
       "path": "readiness/CONTRACT-RESOLUTION.md",
-      "sha256": "7d4f5df00ce38180bb92c9462aad056c788aa9d0434caf6116caa8f00270460c"
+      "sha256": "7da2a7b00d6d62c052db50db9c53b5bc29dc29bb58f1ca6b6a347f284f5ef04b"
     },
     {
       "path": "readiness/FSHARP-TOOLING-ASSESSMENT.md",
@@ -231,7 +231,7 @@
     },
     {
       "path": "readiness/DEPENDENCY-COMPATIBILITY.md",
-      "sha256": "89bc23121d811f17fbde9dcb209860aab7c25e533d9bf29e863924ed44d76cf7"
+      "sha256": "4b13d412d0301634820f68eec9c79fb8f9650de52a7aa3bbef798610041e9675"
     }
   ],
   "generated": [

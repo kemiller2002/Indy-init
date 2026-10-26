@@ -1,13 +1,12 @@
 {
   "schema": "indy-init.preflight-evidence/1",
-  "executedAt": "2026-10-26T15:48:03Z",
+  "executedAt": "2026-10-26T23:32:52Z",
   "sourceCommit": "9dc7d575f9d981e2be6f83543e18f548332e1a53",
   "verdict": "BLOCKED",
   "rule": "READY only when every check is PASS (PRE-ORG-01 may stay NOT_RUN for a rehearsal); any FAIL gives FAIL, otherwise BLOCKED",
   "summary": {
-    "BLOCKED": 4,
     "NOT_RUN": 3,
-    "PASS": 10
+    "PASS": 14
   },
   "results": [
     {
@@ -39,24 +38,24 @@
       "category": "owner-decisions",
       "type": "package-state",
       "title": "No critical material finding is unresolved",
-      "status": "BLOCKED",
-      "detail": "open: F-004, F-005"
+      "status": "PASS",
+      "detail": "no open critical finding"
     },
     {
       "id": "PRE-DEP-01",
       "category": "dependency-release",
       "type": "registry-set-contains",
       "title": "The newest approved echelon-current set contains every required system, including percepta-semantic",
-      "status": "BLOCKED",
-      "detail": "newest set sets/echelon-current/1.27.0.json (status approved) lacks: percepta-semantic"
+      "status": "PASS",
+      "detail": "sets/echelon-current/1.28.0.json (approved) contains percepta-semantic,dokimos,praxis,limen,forma,folio,ordo,aegis"
     },
     {
       "id": "PRE-DEP-02",
       "category": "contract-compatibility",
       "type": "package-state",
       "title": "No contract the run consumes is blocked (write primitive, Percepta, Praxis gate, release set)",
-      "status": "BLOCKED",
-      "detail": "blocked: CT-012, CT-013, CT-016"
+      "status": "PASS",
+      "detail": "no blocked contract"
     },
     {
       "id": "PRE-DEP-03",
@@ -64,7 +63,7 @@
       "type": "package-state",
       "title": "Storage contract and historical catalog identities match (CT-006, CT-008)",
       "status": "PASS",
-      "detail": "5 identities match"
+      "detail": "16 identities match"
     },
     {
       "id": "PRE-ORG-01",
@@ -95,8 +94,8 @@
       "category": "requirements-preservation",
       "type": "git-ref-contains",
       "title": "A released Praxis carries `requirements preservation verify` (RDP-004 without a VER-005 exception)",
-      "status": "BLOCKED",
-      "detail": "latest release v3.20.0 has no 'preservation' under src/Praxis.Cli"
+      "status": "PASS",
+      "detail": "v3.21.0 contains 'preservation' under src/Praxis.Cli"
     },
     {
       "id": "PRE-REQ-04",
@@ -128,7 +127,7 @@
       "type": "git-ref-contains",
       "title": "The latest Conditor release carries the SD-1 fix (CON-367: scaffold pins web packages through their Registry distribution)",
       "status": "PASS",
-      "detail": "v0.10.11 contains 'CON-367' under src/Conditor.Core"
+      "detail": "v0.10.12 contains 'CON-367' under src/Conditor.Core"
     },
     {
       "id": "PRE-TOOL-03",
