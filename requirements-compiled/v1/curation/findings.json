@@ -1,0 +1,996 @@
+{
+  "schema": "indy-init.rc-findings/1",
+  "description": "Analyst findings that the mechanical rules cannot detect. Every citation is checked verbatim at the recorded commit. 'material' means the finding changes what must be built or accepted; a material unresolved finding flags every requirement it names for review. Statuses: unresolved, resolved-by-precedence, resolved-by-owner, no-action-required. Nothing here resolves a finding by choosing an option.",
+  "findings": [
+    {
+      "id": "F-001",
+      "type": "conflict",
+      "severity": "critical",
+      "material": true,
+      "status": "unresolved",
+      "owner": "operator (kemiller2002)",
+      "title": "Launch content: UI-001/UI-015 require the five frozen synthetic investigations; EXT-DATA, OD-INDY-3 and the active catalog require an empty launch and three historical cases",
+      "description": "UI-001 requires the launch view to show all five frozen demonstration investigations and UI-015 requires verifying they load. EXT-DATA-001 forbids shipping them, EXT-DATA-002 and OD-INDY-3 require an empty, disconnected first launch with an explicit Connect action, and causa-data's catalog policy requires exactly three historical cases with no synthetic incidents in the active catalog. STORAGE-005 still names the five synthetic scenarios as seed data. No reconciliation section covers UI-001 or UI-015. ADRP-001 ranks the frozen data contract (2) above the UI documents (5), but the catalog policy is not part of that contract, so precedence does not decide it.",
+      "requirements": [
+        "UI-001",
+        "UI-015",
+        "EXT-DATA-001",
+        "EXT-DATA-002",
+        "STORAGE-005",
+        "HISTORICAL-CASE-CATALOG§catalog-policy"
+      ],
+      "decisions": [
+        "DEC-024",
+        "DEC-007"
+      ],
+      "options": [
+        "Owner commit restating UI-001/UI-015 against 'the connected catalog' (after Connect: the three historical-v1 cases), keeping the five synthetic fixtures as contract test corpus only",
+        "Keep UI-001 literally and record an exception to EXT-DATA-001/002 and the catalog policy"
+      ],
+      "citations": [
+        {
+          "repo": "indy-init",
+          "path": "docs/CAUSA-UI-EXPERIENCE-REQUIREMENTS.md",
+          "quote": "On launch, show all five frozen demonstration investigations and user working copies."
+        },
+        {
+          "repo": "indy-init",
+          "path": "docs/CAUSA-UI-EXPERIENCE-REQUIREMENTS.md",
+          "quote": "Verify the five frozen investigations load and replay"
+        },
+        {
+          "repo": "indy-init",
+          "path": "docs/REHEARSAL-EXTERNAL-DATA-BOUNDARY.md",
+          "quote": "A fresh launch MUST display an accessible empty/disconnected workspace and an explicit Connect data repository action."
+        },
+        {
+          "repo": "indy-init",
+          "path": "docs/OWNER-DECISIONS-2026-10-24.md",
+          "quote": "First launch shows an explicit Connect data repository action"
+        },
+        {
+          "repo": "indy-init",
+          "path": "docs/FROZEN-DEMO-STORAGE-REQUIREMENTS.md",
+          "quote": "Prepare deterministic synthetic investigations for: payment failure"
+        },
+        {
+          "repo": "causa-data",
+          "path": "research/HISTORICAL-CASE-CATALOG.md",
+          "quote": "The active demonstration catalog MUST contain exactly three historical cases"
+        },
+        {
+          "repo": "causa-data",
+          "path": "research/HISTORICAL-CASE-CATALOG.md",
+          "quote": "No synthetic software incidents may appear in the active demo catalog."
+        }
+      ]
+    },
+    {
+      "id": "F-002",
+      "type": "conflict",
+      "severity": "critical",
+      "material": true,
+      "status": "unresolved",
+      "owner": "operator (kemiller2002)",
+      "title": "Two operator records answer DF-CAUSA-2026-0003 differently (first launch, URL identifiers), and a third says those answers must not be inferred",
+      "description": "Indy-init OD-INDY-3 (explicit Connect, no auto-load) and OD-INDY-4 (GUID routes, case keys as aliases) were recorded on 2026-10-24 as accepted recommendations. The Rehearsal 3 remediation records the operator approving, on 2026-10-25, the auto-load exception and the case-key URL exception for the same DF-CAUSA-2026-0003 items. The later indy-init record (OPERATOR-KICKOFF-DECISIONS, same merge) says the five DF-CAUSA-2026-0003 decisions must be retrieved and evaluated and their answers not inferred. All three are agent transcriptions; AR-003/AR-024 require authenticated decisions. OD-INDY-1 (writes P0) and OD-INDY-2 (Percepta released) are the owner's own words, are corroborated by DEC-WRITES-001 and DEC-PERCEPTA-001, and are explicitly event-wide, so this finding does not reopen them; it does need the owner to state that the 2026-10-25 R3 approvals are scoped to Rehearsal 3.",
+      "requirements": [
+        "EXT-DATA-002",
+        "EXT-DATA-003",
+        "R9.9",
+        "R9.10",
+        "SCREEN-CONTRACTS§url-contract",
+        "AR-003",
+        "AR-024"
+      ],
+      "decisions": [
+        "DEC-004B",
+        "DEC-012"
+      ],
+      "options": [
+        "Owner confirms OD-INDY-3 and OD-INDY-4 for Rehearsal 4 and the event, and states the 2026-10-25 approvals apply to Rehearsal 3 only",
+        "Owner adopts the 2026-10-25 answers (auto-load, case-key URLs) for the event, with the requirement edits that implies"
+      ],
+      "citations": [
+        {
+          "repo": "indy-init",
+          "path": "docs/OWNER-DECISIONS-2026-10-24.md",
+          "quote": "GUID routes, with case keys as aliases"
+        },
+        {
+          "repo": "indy-init",
+          "path": "docs/OWNER-DECISIONS-2026-10-24.md",
+          "quote": "is rejected as a precedent"
+        },
+        {
+          "repo": "indy-init",
+          "path": "docs/OPERATOR-KICKOFF-DECISIONS.md",
+          "quote": "Do not infer their answers or mark the baseline/release set frozen without verification."
+        },
+        {
+          "repo": "indy-init-rehearsal-003",
+          "path": "docs/REHEARSAL-003-REMEDIATION-REPORT.md",
+          "quote": "first-launch auto-load exception approved;"
+        },
+        {
+          "repo": "indy-init-rehearsal-003",
+          "path": "docs/REHEARSAL-003-REMEDIATION-REPORT.md",
+          "quote": "case-key URL exception approved;"
+        },
+        {
+          "repo": "indy-init-rehearsal-003",
+          "path": "research/decisions/DF-CAUSA-2026-0003--operator-decisions-requested.md",
+          "quote": "Waiver PERCEPTA-SEMCLI-001-W1 granted"
+        }
+      ]
+    },
+    {
+      "id": "F-003",
+      "type": "drift",
+      "severity": "critical",
+      "material": true,
+      "status": "unresolved",
+      "owner": "operator (kemiller2002), via a reviewed owner commit (OD-INDY-6)",
+      "title": "The committed baseline is pinned at 002d8ba; the source commit adds AR-019..AR-026 and changes the ledger's acceptance predicate",
+      "description": "requirements/causa-requirements-baseline.json pins 002d8ba with 450 requirements. Regenerating it with the unmodified tools/build-requirements-baseline.py at 598a759 gives 460: AR-019..AR-026 and two AGENT-RELIABILITY sections are added, and REHEARSAL-ACCEPTANCE-LEDGER§preamble and §release-acceptance-predicate changed (computed verdict). The Praxis gate would report drift. This package inventories the 460 at 598a759 and does not edit the committed baseline. R4 precondition P2 requires the re-pin at the kickoff commit.",
+      "requirements": [
+        "AR-019",
+        "AR-020",
+        "AR-021",
+        "AR-022",
+        "AR-023",
+        "AR-024",
+        "AR-025",
+        "AR-026",
+        "AGENT-RELIABILITY§evidence-driven-refinement-october-2026",
+        "AGENT-RELIABILITY§reconciliation",
+        "REHEARSAL-ACCEPTANCE-LEDGER§preamble",
+        "REHEARSAL-ACCEPTANCE-LEDGER§release-acceptance-predicate"
+      ],
+      "decisions": [],
+      "options": [
+        "Regenerate and commit the baseline at the kickoff commit (RDP-001), then derive",
+        "Record an operator decision to stay on 002d8ba and exclude AR-019..AR-026 with approval"
+      ],
+      "citations": [
+        {
+          "repo": "indy-init",
+          "path": "requirements/README.md",
+          "quote": "002d8ba6e98639a385dd771999099ba032c48086"
+        },
+        {
+          "repo": "indy-init",
+          "path": "docs/REHEARSAL-DERIVATION-POLICY.md",
+          "quote": "If the source documents change after pinning, the gate reports drift."
+        },
+        {
+          "repo": "indy-init",
+          "path": "docs/REHEARSAL-004-WRITE-PATH-PLAN.md",
+          "quote": "Requirements baseline regenerated and pinned at the kickoff commit."
+        }
+      ]
+    },
+    {
+      "id": "F-004",
+      "type": "missing-contract",
+      "severity": "critical",
+      "material": true,
+      "status": "unresolved",
+      "owner": "upstream: kemiller2002/praxis",
+      "title": "The mandatory preservation gate is not in any Praxis release; using the draft would violate VER-005",
+      "description": "RDP-004 and R4-06 require `praxis requirements preservation verify` to pass before implementation. Praxis v3.20.0 (the registered release) has no such command; it exists only on the draft branch of praxis#292, whose own intake (REQ-PRES-001) lists bypasses. VER-005 forbids unreleased or unverified builds without explicit approval. Until a release carries the gate, implementation cannot start under RDP-004 without an owner exception.",
+      "requirements": [
+        "AR-004",
+        "AR-002",
+        "WDL-015",
+        "VER-005",
+        "VER-010"
+      ],
+      "decisions": [],
+      "options": [
+        "Release and register a Praxis version containing the hardened gate (REQ-PRES-001 R1-R5) before kickoff",
+        "Owner-approved, time-bounded exception to use the draft gate build with recorded provenance (VER-005)"
+      ],
+      "citations": [
+        {
+          "repo": "indy-init",
+          "path": "docs/REHEARSAL-DERIVATION-POLICY.md",
+          "quote": "Implementation work items MUST NOT begin until praxis requirements preservation verify returns PASS"
+        },
+        {
+          "repo": "indy-init",
+          "path": "docs/SYSTEM-VERSION-AND-COMPATIBILITY-REQUIREMENTS.md",
+          "quote": "Do not adopt alpha, beta, RC, unpublished source, or unverified local builds merely because they are newer."
+        },
+        {
+          "repo": "praxis",
+          "path": ".praxis/inbox/documents/2026-10-24-REQ-PRES-001-tamper-evident-requirements-preservation.md",
+          "quote": "The draft gate can be bypassed."
+        }
+      ]
+    },
+    {
+      "id": "F-005",
+      "type": "missing-contract",
+      "severity": "critical",
+      "material": true,
+      "status": "unresolved",
+      "owner": "upstream: kemiller2002/echelon-registry, kemiller2002/conditor; approval by operator",
+      "title": "Kickoff release set incomplete: the released Percepta semantic CLI is not registered (echelon-current 1.28.0 not cut)",
+      "description": "OD-INDY-2 requires UI completion evidence from the released semantic CLI pinned by the kickoff set. percepta-semantic-v0.1.0, v0.2.0 and v0.2.1 are tagged, but echelon-current 1.27.0 records that it is not the complete Rehearsal 4 kickoff set and no 1.28.0 exists on the registry main branch (registration branches exist, unmerged). R4 precondition P1 is unmet.",
+      "requirements": [
+        "VER-001",
+        "VER-004",
+        "AR-023",
+        "UI-015",
+        "UI-030"
+      ],
+      "decisions": [
+        "DEC-013"
+      ],
+      "options": [
+        "Register percepta-semantic, cut and Conditor-qualify echelon-current 1.28.0, owner approval in the Registry"
+      ],
+      "citations": [
+        {
+          "repo": "echelon-registry",
+          "path": "sets/echelon-current/1.27.0.json",
+          "quote": "It is therefore not the complete Rehearsal 4 kickoff set"
+        },
+        {
+          "repo": "indy-init",
+          "path": "docs/OWNER-DECISIONS-2026-10-24.md",
+          "quote": "UI completion requires evidence from the released semantic CLI, pinned by the kickoff release set"
+        }
+      ]
+    },
+    {
+      "id": "F-006",
+      "type": "gap",
+      "severity": "major",
+      "material": true,
+      "status": "unresolved",
+      "owner": "operator (kemiller2002)",
+      "title": "The Apollo 1 / Apollo 11 / Challenger catalog requirement lives only in causa-data and is outside the preservation baseline",
+      "description": "causa-data research/HISTORICAL-CASE-CATALOG.md requires the application to load exactly three historical cases externally, and its completion gate needs 'the application loads them externally'. No indy-init requirement names these cases, so the Praxis gate cannot detect their omission (the DC-008 failure mode). This package inventories the document as external requirements; adding it (or an indy-init requirement referencing it) to the baseline is an owner scope decision (requirements/README.md).",
+      "requirements": [
+        "HISTORICAL-CASE-CATALOG§catalog-policy",
+        "HISTORICAL-CASE-CATALOG§completion-gate",
+        "UI-001"
+      ],
+      "decisions": [
+        "DEC-007"
+      ],
+      "options": [
+        "Owner commit adding a Causa requirement that the connected active catalog (historical-v1) loads and renders, and regenerate the baseline",
+        "Owner records that the historical catalog is demonstration content only, outside acceptance"
+      ],
+      "citations": [
+        {
+          "repo": "causa-data",
+          "path": "research/HISTORICAL-CASE-CATALOG.md",
+          "quote": "Keep app repositories free of demo records: load cases from this external data repository only after authorized connection."
+        },
+        {
+          "repo": "indy-init",
+          "path": "requirements/README.md",
+          "quote": "Leaving a document out is a scope decision, so this list is reviewable."
+        }
+      ]
+    },
+    {
+      "id": "F-007",
+      "type": "conflict",
+      "severity": "major",
+      "material": false,
+      "status": "unresolved",
+      "owner": "operator (kemiller2002)",
+      "title": "Agent topology: parallel owner agents (ADRP-008, kickoff packet section 4) versus one continuous lead agent (AR-021, R4-03)",
+      "description": "ADRP-008 and the kickoff packet assign parallel owners after the kernel stabilizes. AR-021 prefers one long-running implementation agent, and the Rehearsal 4 plan fixes one continuous lead agent plus a fresh reviewer. AR's reconciliation only says AR-019..026 refine AR-001..018, so it does not settle ADRP-008. Owner roles can be held by one agent, so the requirements are compatible under Plan B; Plan A (parallel lanes) needs owner approval. Not material: no requirement content changes with the choice.",
+      "requirements": [
+        "ADRP-008",
+        "AR-021",
+        "KICKOFF-EXECUTION-PACKET§4-parallel-ownership-after-kernel-stabilizes"
+      ],
+      "decisions": [
+        "DEC-016"
+      ],
+      "options": [
+        "Plan B topology (default, matches R4-03)",
+        "Plan A topology with owner approval"
+      ],
+      "citations": [
+        {
+          "repo": "indy-init",
+          "path": "docs/AGENT-DECISION-REDUCTION-PROFILE.md",
+          "quote": "Assign one owner each for F# domain/policy, UI/WASM, storage/auth adapter, and integration/release evidence."
+        },
+        {
+          "repo": "indy-init",
+          "path": "docs/KICKOFF-EXECUTION-PACKET.md",
+          "quote": "Parallel ownership after kernel stabilizes"
+        },
+        {
+          "repo": "indy-init",
+          "path": "docs/AGENT-RELIABILITY-REQUIREMENTS.md",
+          "quote": "Prefer one long-running implementation agent with compact durable checkpoints."
+        },
+        {
+          "repo": "indy-init",
+          "path": "docs/REHEARSAL-004-WRITE-PATH-PLAN.md",
+          "quote": "Topology: one continuous lead agent."
+        },
+        {
+          "repo": "indy-init",
+          "path": "docs/AGENT-RELIABILITY-REQUIREMENTS.md",
+          "quote": "AR-019..AR-026 refine AR-001..AR-018 when there is tension."
+        }
+      ]
+    },
+    {
+      "id": "F-008",
+      "type": "ambiguity",
+      "severity": "critical",
+      "material": true,
+      "status": "unresolved",
+      "owner": "operator (kemiller2002)",
+      "title": "Scope and order of the AI proposal loop, time travel and factory proof for Rehearsal 4 and the event",
+      "description": "The kickoff packet (in the baseline) orders 'AI proposals' seventh, never cuts the 'AI proposal authority boundary', and checkpoints a working structured AI proposal loop at 12:45 and time travel at 2:45. ADRP-012's build order (higher in ADRP-001 precedence than planning documents, if the packet is one) omits AI proposals and the semantic compiler. OD-INDY-5 makes AI-ORCHESTRATION context, not an acceptance obligation, and the R4 plan measures only write milestones. Whether a working AI proposal loop and time travel are P0 for R4/the event cannot be read from the sources; it decides whether T27/T28 are on the plan.",
+      "requirements": [
+        "KICKOFF-EXECUTION-PACKET§3-work-order",
+        "KICKOFF-EXECUTION-PACKET§6-cut-order",
+        "KICKOFF-EXECUTION-PACKET§7-checkpoints",
+        "KICKOFF-EXECUTION-PACKET§ai-tool-agent",
+        "ADRP-012",
+        "R11.4"
+      ],
+      "decisions": [
+        "DEC-022"
+      ],
+      "options": [
+        "AI proposal loop and time travel in scope (T27, T28 stay on the critical set)",
+        "Owner-approved exclusion for R4 with the event decision deferred to the R4 result (R4 section 6)"
+      ],
+      "citations": [
+        {
+          "repo": "indy-init",
+          "path": "docs/KICKOFF-EXECUTION-PACKET.md",
+          "quote": "Structured AI proposal loop works."
+        },
+        {
+          "repo": "indy-init",
+          "path": "docs/KICKOFF-EXECUTION-PACKET.md",
+          "quote": "AI proposal authority boundary;"
+        },
+        {
+          "repo": "indy-init",
+          "path": "docs/AGENT-DECISION-REDUCTION-PROFILE.md",
+          "quote": "Order: freeze contract and interface pins; F# kernel and invariants; frozen fixture replay;"
+        },
+        {
+          "repo": "indy-init",
+          "path": "docs/OWNER-DECISIONS-2026-10-24.md",
+          "quote": "They are not acceptance obligations for the event"
+        }
+      ]
+    },
+    {
+      "id": "F-009",
+      "type": "conflict",
+      "severity": "critical",
+      "material": true,
+      "status": "unresolved",
+      "owner": "operator (kemiller2002); contract change through causa-data STORAGE-003 process",
+      "title": "The frozen storage contract mandates a GitHub write primitive that Rehearsal 2 proved cannot compare-and-swap",
+      "description": "causa-data CONTRACT.md v1.0.0 section 9.4 requires publication by a non-forced ref update (PATCH /git/refs). Rehearsal 2 review 6 proved the REST API cannot compare-and-swap a branch, and on the owner's decision the save became one GraphQL createCommitOnBranch guarded by expectedHeadOid. The frozen contract was not revised, and ADRP-005 makes it the sole wire contract and forbids improvisation. An R4 agent must either follow the contract (re-introducing the DC-001 class) or deviate from a frozen contract without a version (STORAGE-003).",
+      "requirements": [
+        "EXT-DATA-006",
+        "EXT-DATA-011",
+        "STORAGE-003",
+        "STORAGE-006",
+        "ADRP-005",
+        "R10.4"
+      ],
+      "decisions": [
+        "DEC-006"
+      ],
+      "options": [
+        "Version the contract (e.g. 1.1.0 or 1.0.1 per STORAGE-003) so GraphQL createCommitOnBranch with expectedHeadOid is the conforming GitHub primitive; data format unchanged",
+        "Owner exception recording that section 9.4.1's mechanism is superseded by the R2 decision while the wire format stays v1.0.0"
+      ],
+      "citations": [
+        {
+          "repo": "causa-data",
+          "path": "contract/v1.0.0/CONTRACT.md",
+          "quote": "published by a non-forced ref update"
+        },
+        {
+          "repo": "indy-init-rehearsal-002",
+          "path": "docs/REHEARSAL-002-REPORT.md",
+          "quote": "review 6 proved that GitHub's REST API cannot compare-and-swap a branch"
+        },
+        {
+          "repo": "indy-init-rehearsal-002",
+          "path": "docs/REHEARSAL-002-REPORT.md",
+          "quote": "On the owner's decision the save became one GraphQL"
+        },
+        {
+          "repo": "indy-init",
+          "path": "docs/AGENT-DECISION-REDUCTION-PROFILE.md",
+          "quote": "No agent may improvise alternative field names, ordering, event shapes, or snapshot semantics."
+        }
+      ]
+    },
+    {
+      "id": "F-010",
+      "type": "ambiguity",
+      "severity": "major",
+      "material": false,
+      "status": "unresolved",
+      "owner": "operator (kemiller2002)",
+      "title": "Most requirements carry no P0/P1 priority, yet the R4 decision rule cuts 'P1 UI scope'",
+      "description": "Of 460 baseline requirements, priorities are stated only in the UI, PF, EXT-DATA, WDL, VER and AR documents. REQUIREMENTS.md R0.1..R16.5, STORAGE, DCC, ADRP, DEP-CURRENT, WASM-LOAD and SCREEN-CONTRACTS state none (mechanical flag PRIORITY-UNSTATED). Rehearsal 2's ledger assigned priorities itself. The R4 section 6 cut rule and ADRP-012 depend on priority. Recorded, not resolved: no priority is inferred.",
+      "requirements": [],
+      "decisions": [],
+      "options": [
+        "Owner assigns priorities by document (a table in the baseline README) before the event freeze",
+        "Treat every unprioritised requirement as P0 by owner decision"
+      ],
+      "citations": [
+        {
+          "repo": "indy-init",
+          "path": "docs/REHEARSAL-004-WRITE-PATH-PLAN.md",
+          "quote": "Cut P1 UI scope for the event. Keep P0"
+        },
+        {
+          "repo": "indy-init",
+          "path": "docs/AGENT-DECISION-REDUCTION-PROFILE.md",
+          "quote": "do not silently cut P0 scope or essential invariants"
+        }
+      ]
+    },
+    {
+      "id": "F-011",
+      "type": "ambiguity",
+      "severity": "major",
+      "material": true,
+      "status": "unresolved",
+      "owner": "kemiller2002/indy-init maintainers (baseline generator rule) and operator",
+      "title": "UI-037's P0 marker is in its heading as '[P0, competition profile]' and the baseline records priority 'unstated'",
+      "description": "The generator's priority rule does not parse a qualified marker, so the gate treats UI-037 as unprioritised, and 'competition profile' does not say whether Rehearsal 4 is in that profile. The fix is a generator rule or an owner edit, never a hand edit of the manifest (requirements/README.md).",
+      "requirements": [
+        "UI-037"
+      ],
+      "decisions": [],
+      "options": [
+        "Owner states whether UI-037 is P0 for R4; generator rule updated to parse qualified markers"
+      ],
+      "citations": [
+        {
+          "repo": "indy-init",
+          "path": "docs/CAUSA-UI-EXPERIENCE-REQUIREMENTS.md",
+          "quote": "Offline guided demonstration [P0, competition profile]"
+        }
+      ]
+    },
+    {
+      "id": "F-012",
+      "type": "ambiguity",
+      "severity": "major",
+      "material": true,
+      "status": "unresolved",
+      "owner": "operator (kemiller2002)",
+      "title": "Does reading the public historical catalog require a credential?",
+      "description": "STORAGE-004 proposed a private datastore; causa-data is public and holds a public historical catalog. EXT-DATA-003 requires a scoped credential through a secure connection flow, OD-INDY-3 makes the public catalog an explicit choice inside Connect, and EXT-DATA-012 forbids granting data access through publicly readable Pages assets. Whether an unauthenticated read of a public repository is permitted (and how it is labelled) is not stated; the connect flow and its tests depend on it.",
+      "requirements": [
+        "STORAGE-004",
+        "EXT-DATA-003",
+        "EXT-DATA-005",
+        "EXT-DATA-012"
+      ],
+      "decisions": [],
+      "options": [
+        "Anonymous read allowed for public repositories, write requires a scoped credential",
+        "Credential required for every connection"
+      ],
+      "citations": [
+        {
+          "repo": "indy-init",
+          "path": "docs/FROZEN-DEMO-STORAGE-REQUIREMENTS.md",
+          "quote": "Proposed personal-account datastore: kemiller2002/causa-data (private initially)."
+        },
+        {
+          "repo": "indy-init",
+          "path": "docs/REHEARSAL-EXTERNAL-DATA-BOUNDARY.md",
+          "quote": "provide a scoped credential through a secure connection flow"
+        },
+        {
+          "repo": "causa-data",
+          "path": "README.md",
+          "quote": "The historical catalog contains only public historical records"
+        }
+      ]
+    },
+    {
+      "id": "F-013",
+      "type": "ambiguity",
+      "severity": "major",
+      "material": true,
+      "status": "unresolved",
+      "owner": "operator (kemiller2002) with organizer confirmation (ADRP-016)",
+      "title": "Interface freeze extracts types from R001 source; the event starts from a blank repository",
+      "description": "The interface-freeze procedure extracts types and interfaces from accepted R001 F# source, and the storage contract's domain authority is the R001 engine. R0.1 requires the competition implementation to start from a blank repository, STORAGE-008 forbids importing application-specific implementation code, and organizer confirmation is still an open readiness item. For Rehearsal 4 this is permissible preparation; for the event it is undecided whether R001-derived interface manifests and tests may be used.",
+      "requirements": [
+        "R0.1",
+        "R0.3",
+        "ADRP-016",
+        "STORAGE-008",
+        "REHEARSAL-AGENT-INTERFACE-FREEZE§contract-freeze-procedure"
+      ],
+      "decisions": [
+        "DEC-023"
+      ],
+      "options": [
+        "Organizer-approved: interface manifest (documentation) may be carried; no source",
+        "Interfaces re-derived from the frozen contract and command catalog at kickoff"
+      ],
+      "citations": [
+        {
+          "repo": "indy-init",
+          "path": "docs/REHEARSAL-AGENT-INTERFACE-FREEZE.md",
+          "quote": "Extract actual types and exported interfaces from accepted R001 F# source and Limen adapter."
+        },
+        {
+          "repo": "indy-init",
+          "path": "docs/REQUIREMENTS.md",
+          "quote": "The competition application's source implementation must begin at hackathon kickoff from a blank application repository or the organizer-approved equivalent."
+        },
+        {
+          "repo": "indy-init",
+          "path": "docs/FROZEN-DEMO-STORAGE-REQUIREMENTS.md",
+          "quote": "do not import application-specific implementation code into the blank competition repo"
+        }
+      ]
+    },
+    {
+      "id": "F-014",
+      "type": "ambiguity",
+      "severity": "minor",
+      "material": false,
+      "status": "unresolved",
+      "owner": "kemiller2002/indy-init maintainers",
+      "title": "Status lines of two rehearsal documents are stale",
+      "description": "REHEARSAL-003-DEFERRED-VERIFICATION-EXPERIMENT.md still says NOT EXECUTED and NEXT-REHEARSAL-PREFLIGHT-STATUS.md says no experiment started (2026-10-23), while Rehearsal 3 ran and is NOT ACCEPTED. Neither document is in the baseline; an agent reading them as context is misled.",
+      "requirements": [],
+      "decisions": [],
+      "options": [
+        "Update the two status lines in an owner commit"
+      ],
+      "citations": [
+        {
+          "repo": "indy-init",
+          "path": "docs/REHEARSAL-003-DEFERRED-VERIFICATION-EXPERIMENT.md",
+          "quote": "Status: APPROVED EXPERIMENT DESIGN; NOT EXECUTED."
+        },
+        {
+          "repo": "indy-init",
+          "path": "docs/NEXT-REHEARSAL-PREFLIGHT-STATUS.md",
+          "quote": "No experiment started."
+        },
+        {
+          "repo": "indy-init-rehearsal-003",
+          "path": "docs/REHEARSAL-003-REPORT.md",
+          "quote": "Outcome: NOT ACCEPTED (blocked)."
+        }
+      ]
+    },
+    {
+      "id": "F-015",
+      "type": "gap",
+      "severity": "major",
+      "material": false,
+      "status": "unresolved",
+      "owner": "upstream: kemiller2002/echelon-registry",
+      "title": "Release set pins Folio 0.4.0 while Folio v0.4.1 is tagged and unassessed",
+      "description": "VER-001/VER-002 require the newest stable compatible release with recorded evidence of why it was selected. echelon-current 1.27.0 selects folio 0.4.0 and its assessments list forma 0.9.1, limen 0.9.1 and aegis 2.0.0 but not folio 0.4.1 (tag v0.4.1 -> a94cea73). Either the tag is not a published release or the set misses an assessment; this needs recording before lock.",
+      "requirements": [
+        "VER-001",
+        "VER-002"
+      ],
+      "decisions": [
+        "DEC-013"
+      ],
+      "options": [
+        "Assess folio 0.4.1 in echelon-current 1.28.0"
+      ],
+      "citations": [
+        {
+          "repo": "indy-init",
+          "path": "docs/SYSTEM-VERSION-AND-COMPATIBILITY-REQUIREMENTS.md",
+          "quote": "Do not equate latest main commit with latest released artifact."
+        },
+        {
+          "repo": "echelon-registry",
+          "path": "sets/echelon-current/1.27.0.json",
+          "quote": "\"systemId\": \"folio\""
+        }
+      ]
+    },
+    {
+      "id": "F-016",
+      "type": "missing-contract",
+      "severity": "minor",
+      "material": false,
+      "status": "unresolved",
+      "owner": "upstream: kemiller2002/echelon-registry",
+      "title": "The causa storage contract has no Registry entry or compatibility record",
+      "description": "VER-006 requires cross-system contract validation; the storage contract's identity is recorded only in indy-init CAUSA-STORAGE-RELEASE-v1.0.0.md and causa-data. The Registry has no causa entry (searched at 882bf2e). This package checks the three identities directly (CT-006), which is sufficient for R4 but leaves the pairing outside the release-set gate.",
+      "requirements": [
+        "VER-006",
+        "STORAGE-009"
+      ],
+      "decisions": [],
+      "options": [
+        "Register causa-storage 1.0.0 as a contract artifact with its identities"
+      ],
+      "citations": [
+        {
+          "repo": "indy-init",
+          "path": "docs/SYSTEM-VERSION-AND-COMPATIBILITY-REQUIREMENTS.md",
+          "quote": "Verify supported API/schema compatibility across Praxis, Ordo, Dokimos, Percepta, Forma, workflow layout, Limen, Folio, and other applicable systems."
+        }
+      ]
+    },
+    {
+      "id": "F-017",
+      "type": "missing-contract",
+      "severity": "major",
+      "material": false,
+      "status": "unresolved",
+      "owner": "integration owner (task T24)",
+      "title": "The workflow layout engine required by WDL has no identified owner, release or API",
+      "description": "WDL-001 requires identifying the workflow layout engine's repository, package, API, version and license before implementation; VER-001 lists 'Forma Studio/workflow layout' as an applicable system. echelon-current 1.27.0 has no forma-studio entry. Discovery is task T24, scheduled before the causal graph work.",
+      "requirements": [
+        "WDL-001",
+        "WDL-002",
+        "VER-001"
+      ],
+      "decisions": [],
+      "options": [
+        "T24 records the engine with evidence; if none is releasable, owner decision on WDL scope"
+      ],
+      "citations": [
+        {
+          "repo": "indy-init",
+          "path": "docs/WORKFLOW-DIAGRAM-INTEGRATION-REQUIREMENTS.md",
+          "quote": "Identify the workflow layout engine's owning repository, supported package or source integration, API, version, license, and constraints before implementation."
+        }
+      ]
+    },
+    {
+      "id": "F-018",
+      "type": "gap",
+      "severity": "major",
+      "material": false,
+      "status": "unresolved",
+      "owner": "operator (kemiller2002)",
+      "title": "Rehearsal 4's own execution rules are outside the preservation baseline",
+      "description": "The R4 plan inherits R3-DV-001..017 and adds R4-01..R4-07 (write invariants first, live writes at the first persistence checkpoint, computed verdict). The baseline excludes REHEARSAL-003-DEFERRED-VERIFICATION-EXPERIMENT.md as 'Rehearsal 3 only' and does not list the R4 plan, so these rules are not preservation-checked. This package carries them as work items (T12, T18, T21, T30, T33, T34) but cannot make them gate-enforced.",
+      "requirements": [],
+      "decisions": [],
+      "options": [
+        "Owner adds the R4 plan (and the inherited R3-DV rules) to the baseline scope for R4"
+      ],
+      "citations": [
+        {
+          "repo": "indy-init",
+          "path": "docs/REHEARSAL-004-WRITE-PATH-PLAN.md",
+          "quote": "Inherits: R3-DV-001..017"
+        },
+        {
+          "repo": "indy-init",
+          "path": "requirements/README.md",
+          "quote": "Applies to Rehearsal 3 only, by its own status line."
+        }
+      ]
+    },
+    {
+      "id": "F-019",
+      "type": "missing-contract",
+      "severity": "major",
+      "material": true,
+      "status": "unresolved",
+      "owner": "operator (kemiller2002); security review",
+      "title": "No authentication contract for the application's user connection flow",
+      "description": "R11.1 requires GitHub authentication, EXT-DATA-004 prefers short-lived least-privilege tokens or GitHub App authorization, D-210 keeps the mechanism reversible, and ADRP lists exact OAuth/Fides integration as still open pending capability and security checks. The R4 plan specifies only the CI secret for the live write job. Which mechanism the browser application uses (fine-grained token entry, GitHub App device flow, OAuth via a broker) is undecided and determines the connect UI, the token lifetime tests and DC-004 (installation tokens omit permissions.push).",
+      "requirements": [
+        "R11.1",
+        "R11.2",
+        "EXT-DATA-003",
+        "EXT-DATA-004"
+      ],
+      "decisions": [
+        "DEC-025"
+      ],
+      "options": [
+        "Fine-grained token pasted into an in-memory connect form (no broker)",
+        "GitHub App user-to-server token via device flow"
+      ],
+      "citations": [
+        {
+          "repo": "indy-init",
+          "path": "docs/REHEARSAL-EXTERNAL-DATA-BOUNDARY.md",
+          "quote": "Prefer short-lived least-privilege tokens or GitHub App authorization."
+        },
+        {
+          "repo": "indy-init",
+          "path": "docs/AGENT-DECISION-REDUCTION-PROFILE.md",
+          "quote": "Exact production OAuth/Fides integration, provider deployment topology, and physical local browser durability require capability/security checks before selecting a concrete adapter."
+        }
+      ]
+    },
+    {
+      "id": "F-020",
+      "type": "ambiguity",
+      "severity": "minor",
+      "material": false,
+      "status": "no-action-required",
+      "owner": "mission requester",
+      "title": "Rehearsal numbering: the 'Rehearsal 3' this package prepares for is the repository's Rehearsal 4",
+      "description": "Rehearsal 3 has run (NOT ACCEPTED); the next run is the Rehearsal 4 write-path dress rehearsal, which is PLAN, not executed, and kemiller2002/indy-init-rehearsal-004 is empty. This package targets that next run. Historical analysis covers Rehearsals 1, 2 and 3.",
+      "requirements": [],
+      "decisions": [],
+      "options": [],
+      "citations": [
+        {
+          "repo": "indy-init",
+          "path": "docs/REHEARSAL-004-WRITE-PATH-PLAN.md",
+          "quote": "Status: PLAN, not executed."
+        }
+      ],
+      "resolutionSources": [
+        {
+          "repo": "indy-init",
+          "path": "docs/OWNER-DECISIONS-2026-10-24.md",
+          "quote": "Rehearsal 4 is required."
+        }
+      ]
+    },
+    {
+      "id": "F-021",
+      "type": "ambiguity",
+      "severity": "minor",
+      "material": false,
+      "status": "unresolved",
+      "owner": "operator (kemiller2002)",
+      "title": "Kickoff manifest requires ROS and Aegis; VER-001's applicable-system list omits ROS",
+      "description": "kickoff/indy-init.kickoff.json marks ros and aegis required. VER-001 lists Praxis, Ordo, Dokimos, Percepta, Forma, workflow layout, Limen and Folio, and echelon-current 1.27.0 has aegis but no ros entry. Whether ROS is a pinned component of the kickoff set is unstated.",
+      "requirements": [
+        "VER-001",
+        "R13.2",
+        "R8.3"
+      ],
+      "decisions": [],
+      "options": [
+        "State ROS's role (praxis runtime vs separate system) in the kickoff set"
+      ],
+      "citations": [
+        {
+          "repo": "indy-init",
+          "path": "kickoff/indy-init.kickoff.json",
+          "quote": "\"id\": \"ros\""
+        }
+      ]
+    },
+    {
+      "id": "F-022",
+      "type": "overlap",
+      "severity": "minor",
+      "material": false,
+      "status": "no-action-required",
+      "owner": "coordinator",
+      "title": "Credential handling is stated in four places",
+      "description": "Overlapping obligations that a derivation can satisfy with one implementation and one piece of evidence mapped to every id. Not a merge: each requirement keeps its own disposition. Implement one credential boundary (DEC-019) and verify it once with tests whose ids are mapped to all four requirements; no separate implementations.",
+      "requirements": [
+        "EXT-DATA-004",
+        "R11.3",
+        "PF-015",
+        "R9.9"
+      ],
+      "decisions": [],
+      "options": [],
+      "citations": [
+        {
+          "repo": "indy-init",
+          "path": "docs/REQUIREMENTS.md",
+          "quote": "Authentication material must never be committed into repositories or investigation artifacts."
+        }
+      ]
+    },
+    {
+      "id": "F-023",
+      "type": "overlap",
+      "severity": "minor",
+      "material": false,
+      "status": "no-action-required",
+      "owner": "coordinator",
+      "title": "Deployed-exact-SHA acceptance is restated by seven requirements",
+      "description": "Overlapping obligations that a derivation can satisfy with one implementation and one piece of evidence mapped to every id. Not a merge: each requirement keeps its own disposition. One deployed acceptance job (T31/T34, gate G9) whose evidence maps to every listed requirement.",
+      "requirements": [
+        "UI-015",
+        "UI-040",
+        "PF-020",
+        "EXT-DATA-009",
+        "STORAGE-007",
+        "DCC-008",
+        "ADRP-010"
+      ],
+      "decisions": [],
+      "options": [],
+      "citations": [
+        {
+          "repo": "indy-init",
+          "path": "docs/AGENT-DECISION-REDUCTION-PROFILE.md",
+          "quote": "A release is Accepted only when the deployed exact SHA has a successful deployed acceptance job."
+        }
+      ]
+    },
+    {
+      "id": "F-024",
+      "type": "overlap",
+      "severity": "minor",
+      "material": false,
+      "status": "no-action-required",
+      "owner": "coordinator",
+      "title": "Release-selection policy is stated twice (VER-001..VER-005 and DEP-CURRENT-001..DEP-CURRENT-008)",
+      "description": "Overlapping obligations that a derivation can satisfy with one implementation and one piece of evidence mapped to every id. Not a merge: each requirement keeps its own disposition. One discovery-resolve-verify-lock procedure (T03, T10, T11) satisfies both; REHEARSAL-DEPENDENCY-LOCK already supersedes ADRP-006's retention language by its status line.",
+      "requirements": [
+        "VER-001",
+        "VER-002",
+        "VER-003",
+        "VER-004",
+        "VER-005",
+        "DEP-CURRENT-001",
+        "DEP-CURRENT-002",
+        "DEP-CURRENT-005",
+        "DEP-CURRENT-006"
+      ],
+      "decisions": [],
+      "options": [],
+      "citations": [
+        {
+          "repo": "indy-init",
+          "path": "docs/REHEARSAL-DEPENDENCY-LOCK.md",
+          "quote": "Supersedes the prior R001-retention defaults in this document and any conflicting version-retention language in AGENT-DECISION-REDUCTION-PROFILE.md."
+        }
+      ]
+    },
+    {
+      "id": "F-025",
+      "type": "overlap",
+      "severity": "minor",
+      "material": false,
+      "status": "no-action-required",
+      "owner": "coordinator",
+      "title": "Requirements preservation is required by six requirements",
+      "description": "Overlapping obligations that a derivation can satisfy with one implementation and one piece of evidence mapped to every id. Not a merge: each requirement keeps its own disposition. One gate run (T08, re-run at T34) is the evidence for all of them.",
+      "requirements": [
+        "AR-001",
+        "AR-002",
+        "AR-004",
+        "WDL-015",
+        "VER-010",
+        "CAUSA-UI-EXPERIENCE§praxis-intake-and-implementation"
+      ],
+      "decisions": [],
+      "options": [],
+      "citations": [
+        {
+          "repo": "indy-init",
+          "path": "docs/WORKFLOW-DIAGRAM-INTEGRATION-REQUIREMENTS.md",
+          "quote": "Do not silently omit these obligations during derivation."
+        }
+      ]
+    },
+    {
+      "id": "F-026",
+      "type": "overlap",
+      "severity": "minor",
+      "material": false,
+      "status": "no-action-required",
+      "owner": "coordinator",
+      "title": "Independent review before the first release candidate is required three times",
+      "description": "Overlapping obligations that a derivation can satisfy with one implementation and one piece of evidence mapped to every id. Not a merge: each requirement keeps its own disposition. One review (T30) with a second fresh review before the verdict (T33, R4-03).",
+      "requirements": [
+        "ADRP-009",
+        "DCC-002",
+        "AR-008"
+      ],
+      "decisions": [],
+      "options": [],
+      "citations": [
+        {
+          "repo": "indy-init",
+          "path": "docs/AGENT-DECISION-REDUCTION-PROFILE.md",
+          "quote": "Run an independent architecture/invariant review before the first release candidate."
+        }
+      ]
+    },
+    {
+      "id": "F-027",
+      "type": "overlap",
+      "severity": "minor",
+      "material": false,
+      "status": "no-action-required",
+      "owner": "coordinator",
+      "title": "The computed-verdict rule appears in the ledger contract, AR-018, AR-019 and ADRP-014",
+      "description": "Overlapping obligations that a derivation can satisfy with one implementation and one piece of evidence mapped to every id. Not a merge: each requirement keeps its own disposition. Satisfied once by compute-acceptance-verdict.py in CI (DEC-010, CT-015).",
+      "requirements": [
+        "AR-018",
+        "AR-019",
+        "ADRP-014",
+        "REHEARSAL-ACCEPTANCE-LEDGER§release-acceptance-predicate"
+      ],
+      "decisions": [],
+      "options": [],
+      "citations": [
+        {
+          "repo": "indy-init",
+          "path": "docs/REHEARSAL-ACCEPTANCE-LEDGER.md",
+          "quote": "Never convert missing evidence to PASS."
+        }
+      ]
+    },
+    {
+      "id": "F-028",
+      "type": "overlap",
+      "severity": "minor",
+      "material": false,
+      "status": "no-action-required",
+      "owner": "coordinator",
+      "title": "Loading, empty and failure states are specified in four documents",
+      "description": "Overlapping obligations that a derivation can satisfy with one implementation and one piece of evidence mapped to every id. Not a merge: each requirement keeps its own disposition. One state model from the F# engine and Limen kernel status, rendered once in the shell (T16) and verified by one Percepta contract set.",
+      "requirements": [
+        "ADRP-011",
+        "UI-010",
+        "UI-028",
+        "WASM-LOAD-003",
+        "WASM-LOAD-005"
+      ],
+      "decisions": [],
+      "options": [],
+      "citations": [
+        {
+          "repo": "indy-init",
+          "path": "docs/AGENT-DECISION-REDUCTION-PROFILE.md",
+          "quote": "No data: explicit empty-state action; loading: HTML/CSS shell before WASM; failure: visible recoverable error"
+        }
+      ]
+    },
+    {
+      "id": "F-029",
+      "type": "overlap",
+      "severity": "minor",
+      "material": false,
+      "status": "no-action-required",
+      "owner": "coordinator",
+      "title": "Layered provider verification is stated by PF-011 and AR-010",
+      "description": "Overlapping obligations that a derivation can satisfy with one implementation and one piece of evidence mapped to every id. Not a merge: each requirement keeps its own disposition. One four-level verification design (T18, T21).",
+      "requirements": [
+        "PF-011",
+        "AR-010",
+        "PF-013",
+        "PF-014"
+      ],
+      "decisions": [],
+      "options": [],
+      "citations": [
+        {
+          "repo": "indy-init",
+          "path": "docs/PROVIDER-FIXTURE-AND-INTEGRATION-REQUIREMENTS.md",
+          "quote": "Four independent verification levels"
+        }
+      ]
+    }
+  ]
+}

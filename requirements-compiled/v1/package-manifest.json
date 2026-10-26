@@ -1,0 +1,247 @@
+{
+  "schema": "indy-init.requirements-package/1",
+  "package": "requirements-compiled/v1",
+  "source": {
+    "repository": "kemiller2002/indy-init",
+    "commit": "598a759b597e05d59e60bfbeb608c66d3945118b",
+    "baselineId": "BL-CAUSA-INDY-INIT-598a759b597e",
+    "baselineSha256": "015e31ca80c0b3464653e5b212d07e74b575a589f8f08d43fad1a6096a6f6148",
+    "baselineGenerator": "tools/build-requirements-baseline.py (existing; unmodified)"
+  },
+  "repositories": [
+    {
+      "name": "indy-init",
+      "commit": "598a759b597e05d59e60bfbeb608c66d3945118b",
+      "role": "primary: authoritative requirements (source commit of this package)"
+    },
+    {
+      "name": "causa-data",
+      "commit": "22260f429501d0d6963fc33302ed1e64d742a374",
+      "role": "storage contract, active historical catalog and its requirements"
+    },
+    {
+      "name": "praxis",
+      "commit": "bf7bf04fde6b252a06fe7e12cddc6d4d3ac99eb3",
+      "role": "requirements intake contract"
+    },
+    {
+      "name": "ordo",
+      "commit": "2df928ae4618eb075d226ff307843827486ffe39",
+      "role": "decision authority"
+    },
+    {
+      "name": "dokimos",
+      "commit": "bf6a62bb6246177c30cc64af35921a300b7ddf9a",
+      "role": "verification and completion evidence"
+    },
+    {
+      "name": "percepta",
+      "commit": "e5bb5961b739bd8ae58bc6b9040f8495eee2c49a",
+      "role": "semantic UI verification and telemetry metric vocabulary"
+    },
+    {
+      "name": "forma",
+      "commit": "28d1101ec0121bbdca7e83bd981cfd58726bcd60",
+      "role": "design system"
+    },
+    {
+      "name": "limen",
+      "commit": "ddfc1e877cff1bbcb585952289f8eeae3062addd",
+      "role": "browser/WASM boundary"
+    },
+    {
+      "name": "folio",
+      "commit": "217d644e39b11127620f8d83a1e1ee9dff59ec48",
+      "role": "print/report components"
+    },
+    {
+      "name": "echelon-registry",
+      "commit": "882bf2e2f2499e6c1c1c77f54539e1acc3d9aa7b",
+      "role": "approved release sets"
+    },
+    {
+      "name": "indy-init-rehearsal-001",
+      "commit": "dd63ab4ab0fab0ea07d2d1390dc10636e37243cb",
+      "role": "historical evidence (R1)"
+    },
+    {
+      "name": "indy-init-rehearsal-002",
+      "commit": "b053d1da4ef533fba7d6728c369c58a29a1e2440",
+      "role": "historical evidence (R2)"
+    },
+    {
+      "name": "indy-init-rehearsal-003",
+      "commit": "28183a78808c7b020baa7d533a257b602934208f",
+      "role": "historical evidence (R3)"
+    }
+  ],
+  "dependencyVersions": [
+    {
+      "system": "echelon-current release set",
+      "version": "1.27.0",
+      "source": "echelon-registry sets/echelon-current/1.27.0.json (approved 2026-10-24; records the percepta-semantic exception)"
+    },
+    {
+      "system": "praxis",
+      "version": "3.20.0",
+      "source": "tag v3.20.0 -> ee6430af; set 1.27.0. The preservation gate is not in this release (draft praxis#292)"
+    },
+    {
+      "system": "ordo",
+      "version": "1.17.0",
+      "source": "tag v1.17.0 -> bb43c26c; set 1.27.0"
+    },
+    {
+      "system": "dokimos",
+      "version": "0.7.0",
+      "source": "tag dokimos-v0.7.0 -> 04b5f856; set 1.27.0"
+    },
+    {
+      "system": "percepta (repository lifecycle)",
+      "version": "0.1.0",
+      "source": "set 1.27.0"
+    },
+    {
+      "system": "percepta-semantic",
+      "version": "0.2.1 (released, not registered)",
+      "source": "tag percepta-semantic-v0.2.1 -> 8b78df80; absent from set 1.27.0"
+    },
+    {
+      "system": "limen",
+      "version": "0.9.0",
+      "source": "tag v0.9.0 -> 96eb75fb; set 1.27.0 (0.9.1 pending, unregistered)"
+    },
+    {
+      "system": "limen-fsharp",
+      "version": "0.9.0",
+      "source": "set 1.27.0"
+    },
+    {
+      "system": "forma",
+      "version": "0.9.0",
+      "source": "tag v0.9.0 -> 18e6ff7b; set 1.27.0 (0.9.1 pending, unregistered)"
+    },
+    {
+      "system": "folio",
+      "version": "0.4.0",
+      "source": "set 1.27.0; tag v0.4.1 -> a94cea73 exists and is not assessed in the set"
+    },
+    {
+      "system": "aegis",
+      "version": "1.0.0",
+      "source": "set 1.27.0"
+    },
+    {
+      "system": "causa storage contract",
+      "version": "1.0.0",
+      "source": "tag causa-storage-v1.0.0 -> c947c7e3"
+    },
+    {
+      "system": "causa historical catalog",
+      "version": "historical-v1 (catalogVersion 1.0.0)",
+      "source": "causa-data catalog/active.json at 22260f42"
+    },
+    {
+      "system": ".NET SDK",
+      "version": "10.0.402",
+      "source": "causa-data global.json; tools/requirements-compiler/global.json"
+    }
+  ],
+  "tool": {
+    "name": "tools/requirements-compiler",
+    "language": "F#",
+    "dotnetSdk": "10.0.402"
+  },
+  "inputs": [
+    {
+      "path": "curation/contracts.json",
+      "sha256": "46cde646cff02621fa1a5ce16a66f5e39a334048711242329a6d3c8b4434627e"
+    },
+    {
+      "path": "curation/decisions.json",
+      "sha256": "965ded516dd051eea0cfe188c59cc596615aea1d763a30c1d87ba7c07531078a"
+    },
+    {
+      "path": "curation/experiment.json",
+      "sha256": "daf19af4ecff566679311e814335d8da4a4e9241f784b421e8a1e8e52b0b3355"
+    },
+    {
+      "path": "curation/external-requirements.json",
+      "sha256": "42d11686508d4342ffa54b95b9924b31431923c4e3c34a222ceeb7356be08447"
+    },
+    {
+      "path": "curation/findings.json",
+      "sha256": "3d1d00acfdfacd4bac39fd9ccd0d7bf32bd3a752964b34de04178f937a5148bc"
+    },
+    {
+      "path": "curation/sources.json",
+      "sha256": "4b51a7c43527cd913f06a25ee9558f09cdb08190e42bbd3d84d6edf9d9228dd7"
+    },
+    {
+      "path": "curation/tasks.json",
+      "sha256": "c881d0e01900445f39b30aed1fabd38cca6b8902b8be2936076483551144f65b"
+    },
+    {
+      "path": "curation/verification-rules.json",
+      "sha256": "b7dd0b7f6e7d3bedaf76b1f3609d4a95111d305b9b696a7d5cc831e9cbbacdf4"
+    }
+  ],
+  "authored": [
+    {
+      "path": "README.md",
+      "sha256": "be80dea2950dd8e4f6f99fd4f5d8661849821cd1d93eb0fb53a36927468a1358"
+    },
+    {
+      "path": "optimization-analysis.md",
+      "sha256": "f8ec363fbbb8212c80d71482016b3b2ffda88b8be1f62c97c348abb5899b74a8"
+    }
+  ],
+  "generated": [
+    {
+      "path": "contract-bindings.json",
+      "sha256": "ebf04f3ddb5c540eae65a0afd318313238dcb7578cf7cf7b51a21fd8f059f652"
+    },
+    {
+      "path": "decision-registry.json",
+      "sha256": "0d2900692477e0f0ed6cf003b83f27ebc80e0c30b1e53408e6d2df9aac6ae651"
+    },
+    {
+      "path": "dependency-graph.json",
+      "sha256": "555f70d02e44c8c08928f29b708fb54b02f087d1f623a99a6e78964ab38191e8"
+    },
+    {
+      "path": "execution-plan-resource.json",
+      "sha256": "cdd66872c7d04bb8eb2a2d061346618e54ecefebc16067e7f95649026d577070"
+    },
+    {
+      "path": "execution-plan-time.json",
+      "sha256": "d10d96c75cb83d41a4df5866e2b6916a85dfd6408731e4fce1754ec794ab9492"
+    },
+    {
+      "path": "normalized-requirements.json",
+      "sha256": "4e8e79a7edc647a72bad92838ef528ffdb13a1772e83173c7e813fdc60035589"
+    },
+    {
+      "path": "percepta-experiment.json",
+      "sha256": "ba2f8cfd993f2d5dde5d09984bfe6983513aa2de0fbc3f475c480b32149348f3"
+    },
+    {
+      "path": "requirements-inventory.json",
+      "sha256": "6e1b237147f4062af0721ee7a7723d0fd7194442e5968df2dafccdcf839f4d9e"
+    },
+    {
+      "path": "requirements-source-map.json",
+      "sha256": "a90efa2e333414b5324995550831fcc5788193b1840811c2ee2da99a3fc526e9"
+    },
+    {
+      "path": "requirements-validation-report.json",
+      "sha256": "8d1ee7bcae573a367fbb1f5a57376ec91ccbfa42e89aa19772f13753e860c151"
+    },
+    {
+      "path": "verification-manifest.json",
+      "sha256": "1997b1a62fc617623b6ff02433561f1458468084b1b810bd704717cd7a11712e"
+    }
+  ],
+  "compilationVerdict": "PASS",
+  "rehearsalReadiness": "BLOCKED"
+}

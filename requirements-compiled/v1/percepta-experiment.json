@@ -1,0 +1,194 @@
+{
+  "id": "EX-CAUSA-2026-RC1",
+  "title": "Compiled requirements versus the existing approach for the Causa write-path rehearsal",
+  "status": "proposed",
+  "tests_hypotheses": [
+    "H1: With scope and acceptance held constant, executing from the compiled package (Plan A or B) reaches the same or more verified requirements with fewer integration failures than deriving from the baseline at kickoff.",
+    "H2: Plan B uses fewer tokens, tool calls and CI runs than Plan A at the same verified coverage.",
+    "H3: Plan A reaches the first verified remote write sooner than Plan B."
+  ],
+  "version": "1",
+  "tags": [
+    "causa",
+    "indy-init",
+    "requirements-compilation",
+    "percepta"
+  ],
+  "research_area": "factory execution efficiency",
+  "launch": "NOT LAUNCHED. This mission defines the experiment only; no rehearsal is run.",
+  "preconditions": [
+    "Every readiness blocker in requirements-validation-report.json is resolved; otherwise an arm measures blocker handling, not execution",
+    "The kickoff release set lock exists (T03) and is identical for every arm",
+    "The baseline is pinned at one indy-init commit, identical for every arm, and the package is recompiled against it"
+  ],
+  "arms": [
+    {
+      "id": "ARM-0",
+      "name": "existing approach",
+      "plan": "",
+      "treatment": "Agent starts from kickoff/indy-init.kickoff.json and the R4 plan, derives requirements itself (RDP procedure); the compiled package is withheld."
+    },
+    {
+      "id": "ARM-A",
+      "name": "compiled + time optimized",
+      "plan": "execution-plan-time.json",
+      "treatment": "Agent receives this package and executes Plan A (parallel lanes; needs the owner approval in F-007)."
+    },
+    {
+      "id": "ARM-B",
+      "name": "compiled + resource optimized",
+      "plan": "execution-plan-resource.json",
+      "treatment": "Agent receives this package and executes Plan B (one lead agent, fresh reviewer, batched CI)."
+    }
+  ],
+  "heldConstant": [
+    "application scope: the pinned baseline plus the owner's T00 decisions",
+    "acceptance: verification-manifest.json entries and the computed verdict",
+    "kickoff release-set lock and .NET SDK",
+    "model identifier and model settings (recorded per run; a model change during a run invalidates the run)",
+    "runner image, CI workflow definitions and the test data repository state at start (fresh workspace path per run)",
+    "420-minute ceiling and stop rule (R4-07)"
+  ],
+  "design": {
+    "unit": "one timed run from first green bootstrap CI (R4 P5) to the computed verdict or 420 minutes",
+    "replication": "at least two runs per arm; order of arms randomised; all runs within one release-set lock",
+    "minimumViable": "If full runs are unaffordable, run the bounded write-path slice (T12 to T21) per arm with the same metrics; report it as a slice result, never as a full-rehearsal result",
+    "confounders": [
+      "model or provider version change between runs",
+      "dependency drift (new upstream releases): blocked by the run lock",
+      "GitHub API rate limits and runner queue time: recorded as time.waiting_ms and CI queue seconds and reported separately",
+      "learning effects: each run starts from an empty repository and a fresh agent context",
+      "operator interventions: counted (agent.human_escalations) and timed (time.human_interruption_ms)"
+    ],
+    "analysis": "Report per-arm medians and ranges, never a single-run difference as an effect. No efficiency claim without at least two runs per arm showing the same direction; otherwise 'inconclusive'."
+  },
+  "metrics": [
+    {
+      "id": "M-TOKENS",
+      "name": "Total tokens",
+      "perceptaMetric": "tokens.total",
+      "source": "Praxis >= 3.17 attribution per agent (R4 section 5) mapped to Percepta telemetry",
+      "unavailableRule": "record unavailable; never estimate"
+    },
+    {
+      "id": "M-ELAPSED",
+      "name": "Elapsed time to computed verdict and to each R4 milestone",
+      "perceptaMetric": "time.wall_ms",
+      "source": "timer-start record and milestone commits",
+      "unavailableRule": "record unavailable"
+    },
+    {
+      "id": "M-CI",
+      "name": "CI executions created, executed, failed",
+      "perceptaMetric": "",
+      "source": "GitHub Actions API for the rehearsal repository (no Percepta metric defines CI runs; tool.build_executions is local builds only)",
+      "unavailableRule": "record unavailable"
+    },
+    {
+      "id": "M-TOOLCALLS",
+      "name": "Agent tool calls",
+      "perceptaMetric": "tool.calls",
+      "source": "agent transcript telemetry",
+      "unavailableRule": "record unavailable"
+    },
+    {
+      "id": "M-HANDOFFS",
+      "name": "Agent handoffs and subagents",
+      "perceptaMetric": "agent.handoffs",
+      "source": "agent transcript telemetry",
+      "unavailableRule": "record unavailable"
+    },
+    {
+      "id": "M-SUBAGENTS",
+      "name": "Subagents spawned",
+      "perceptaMetric": "agent.subagents_spawned",
+      "source": "agent transcript telemetry",
+      "unavailableRule": "record unavailable"
+    },
+    {
+      "id": "M-INTEGRATION-FAILURES",
+      "name": "Integration failures",
+      "perceptaMetric": "defects.discovered",
+      "source": "failed integration checkpoints (T17, T21, T31) plus defects found after first green CI, classified by defect class",
+      "unavailableRule": "count from ledger defect_classes"
+    },
+    {
+      "id": "M-REGRESSIONS",
+      "name": "Fix-induced defects",
+      "perceptaMetric": "regressions.found",
+      "source": "defect records citing a fix SHA as cause",
+      "unavailableRule": "record unavailable"
+    },
+    {
+      "id": "M-COVERAGE",
+      "name": "Requirement coverage",
+      "perceptaMetric": "requirements.satisfied",
+      "source": "ledger rows PASS with evidence over baseline requirements; preservation gate verdict",
+      "unavailableRule": "never infer PASS"
+    },
+    {
+      "id": "M-VERIFIED",
+      "name": "Verified completion",
+      "perceptaMetric": "acceptance_criteria.satisfied",
+      "source": "compute-acceptance-verdict.py verdict and Dokimos completion verify receipts",
+      "unavailableRule": "verdict as computed"
+    },
+    {
+      "id": "M-FRESHNESS",
+      "name": "Evidence freshness failures",
+      "perceptaMetric": "",
+      "source": "Dokimos EVIDENCE_STALE / FRESHNESS_UNDETERMINED / VALIDATION_UNBOUND refusals and compute-acceptance-verdict evidence-at-SHA failures",
+      "unavailableRule": "record unavailable"
+    },
+    {
+      "id": "M-SILENT-OMISSIONS",
+      "name": "Requirements silently omitted",
+      "perceptaMetric": "quality.silent_omissions",
+      "source": "preservation gate disposition-missing and obligation-unmapped findings",
+      "unavailableRule": "gate unavailable means unknown"
+    }
+  ],
+  "successCriteria": "None pre-declared as an improvement. Each hypothesis is reported supported, contradicted or inconclusive from the measured values.",
+  "metricVerification": [
+    {
+      "metric": "acceptance_criteria.satisfied",
+      "definedInPercepta": true
+    },
+    {
+      "metric": "agent.handoffs",
+      "definedInPercepta": true
+    },
+    {
+      "metric": "agent.subagents_spawned",
+      "definedInPercepta": true
+    },
+    {
+      "metric": "defects.discovered",
+      "definedInPercepta": true
+    },
+    {
+      "metric": "quality.silent_omissions",
+      "definedInPercepta": true
+    },
+    {
+      "metric": "regressions.found",
+      "definedInPercepta": true
+    },
+    {
+      "metric": "requirements.satisfied",
+      "definedInPercepta": true
+    },
+    {
+      "metric": "time.wall_ms",
+      "definedInPercepta": true
+    },
+    {
+      "metric": "tokens.total",
+      "definedInPercepta": true
+    },
+    {
+      "metric": "tool.calls",
+      "definedInPercepta": true
+    }
+  ]
+}

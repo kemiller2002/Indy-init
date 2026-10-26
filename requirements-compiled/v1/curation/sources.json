@@ -1,0 +1,111 @@
+{
+  "schema": "indy-init.rc-sources/1",
+  "description": "Revisions, classification tables, verification defaults and plan assumptions used by requirements-compiler. Every repository below is read at exactly the recorded commit.",
+  "repositories": [
+    { "name": "indy-init", "commit": "598a759b597e05d59e60bfbeb608c66d3945118b", "role": "primary: authoritative requirements (source commit of this package)" },
+    { "name": "causa-data", "commit": "22260f429501d0d6963fc33302ed1e64d742a374", "role": "storage contract, active historical catalog and its requirements" },
+    { "name": "praxis", "commit": "bf7bf04fde6b252a06fe7e12cddc6d4d3ac99eb3", "role": "requirements intake contract" },
+    { "name": "ordo", "commit": "2df928ae4618eb075d226ff307843827486ffe39", "role": "decision authority" },
+    { "name": "dokimos", "commit": "bf6a62bb6246177c30cc64af35921a300b7ddf9a", "role": "verification and completion evidence" },
+    { "name": "percepta", "commit": "e5bb5961b739bd8ae58bc6b9040f8495eee2c49a", "role": "semantic UI verification and telemetry metric vocabulary" },
+    { "name": "forma", "commit": "28d1101ec0121bbdca7e83bd981cfd58726bcd60", "role": "design system" },
+    { "name": "limen", "commit": "ddfc1e877cff1bbcb585952289f8eeae3062addd", "role": "browser/WASM boundary" },
+    { "name": "folio", "commit": "217d644e39b11127620f8d83a1e1ee9dff59ec48", "role": "print/report components" },
+    { "name": "echelon-registry", "commit": "882bf2e2f2499e6c1c1c77f54539e1acc3d9aa7b", "role": "approved release sets" },
+    { "name": "indy-init-rehearsal-001", "commit": "dd63ab4ab0fab0ea07d2d1390dc10636e37243cb", "role": "historical evidence (R1)" },
+    { "name": "indy-init-rehearsal-002", "commit": "b053d1da4ef533fba7d6728c369c58a29a1e2440", "role": "historical evidence (R2)" },
+    { "name": "indy-init-rehearsal-003", "commit": "28183a78808c7b020baa7d533a257b602934208f", "role": "historical evidence (R3)" }
+  ],
+  "dependencyVersions": [
+    { "system": "echelon-current release set", "version": "1.27.0", "source": "echelon-registry sets/echelon-current/1.27.0.json (approved 2026-10-24; records the percepta-semantic exception)" },
+    { "system": "praxis", "version": "3.20.0", "source": "tag v3.20.0 -> ee6430af; set 1.27.0. The preservation gate is not in this release (draft praxis#292)" },
+    { "system": "ordo", "version": "1.17.0", "source": "tag v1.17.0 -> bb43c26c; set 1.27.0" },
+    { "system": "dokimos", "version": "0.7.0", "source": "tag dokimos-v0.7.0 -> 04b5f856; set 1.27.0" },
+    { "system": "percepta (repository lifecycle)", "version": "0.1.0", "source": "set 1.27.0" },
+    { "system": "percepta-semantic", "version": "0.2.1 (released, not registered)", "source": "tag percepta-semantic-v0.2.1 -> 8b78df80; absent from set 1.27.0" },
+    { "system": "limen", "version": "0.9.0", "source": "tag v0.9.0 -> 96eb75fb; set 1.27.0 (0.9.1 pending, unregistered)" },
+    { "system": "limen-fsharp", "version": "0.9.0", "source": "set 1.27.0" },
+    { "system": "forma", "version": "0.9.0", "source": "tag v0.9.0 -> 18e6ff7b; set 1.27.0 (0.9.1 pending, unregistered)" },
+    { "system": "folio", "version": "0.4.0", "source": "set 1.27.0; tag v0.4.1 -> a94cea73 exists and is not assessed in the set" },
+    { "system": "aegis", "version": "1.0.0", "source": "set 1.27.0" },
+    { "system": "causa storage contract", "version": "1.0.0", "source": "tag causa-storage-v1.0.0 -> c947c7e3" },
+    { "system": "causa historical catalog", "version": "historical-v1 (catalogVersion 1.0.0)", "source": "causa-data catalog/active.json at 22260f42" },
+    { "system": ".NET SDK", "version": "10.0.402", "source": "causa-data global.json; tools/requirements-compiler/global.json" }
+  ],
+  "implementationStatusBasis": "No implementation evidence is attributed to this requirement. kemiller2002/indy-init is the planning repository and contains no application source at the source commit (validation check V10). Rehearsal results are not carried forward as evidence: Rehearsal 2's ledger is INVALID under tools/validate-acceptance-ledger.py and Rehearsal 3 is NOT ACCEPTED (docs/OWNER-DECISIONS-2026-10-24.md, Consequences).",
+  "nearDuplicateThreshold": "0.6",
+  "categories": [
+    { "match": "origin:external", "category": "data-content" },
+    { "match": "doc:docs/CAUSA-UI-EXPERIENCE-REQUIREMENTS.md", "category": "ui" },
+    { "match": "doc:docs/WASM-LOADING-EXPERIENCE-REQUIREMENTS.md", "category": "ui-loading" },
+    { "match": "doc:docs/PROVIDER-FIXTURE-AND-INTEGRATION-REQUIREMENTS.md", "category": "integration-testing" },
+    { "match": "doc:docs/REHEARSAL-EXTERNAL-DATA-BOUNDARY.md", "category": "data-boundary" },
+    { "match": "doc:docs/FROZEN-DEMO-STORAGE-REQUIREMENTS.md", "category": "storage-contract" },
+    { "match": "doc:docs/CAUSA-STORAGE-RELEASE-v1.0.0.md", "category": "storage-contract" },
+    { "match": "doc:docs/DEFECT-CLASS-CLOSURE-AND-RELEASE-GATES.md", "category": "quality-process" },
+    { "match": "doc:docs/AGENT-DECISION-REDUCTION-PROFILE.md", "category": "implementation-profile" },
+    { "match": "doc:docs/REHEARSAL-DEPENDENCY-LOCK.md", "category": "dependency-management" },
+    { "match": "doc:docs/SYSTEM-VERSION-AND-COMPATIBILITY-REQUIREMENTS.md", "category": "dependency-management" },
+    { "match": "regex:^R0\\.", "category": "competition-integrity" },
+    { "match": "regex:^R[1-8]\\.\\d+$", "category": "domain" },
+    { "match": "regex:^R9\\.", "category": "ui" },
+    { "match": "regex:^R10\\.", "category": "persistence" },
+    { "match": "regex:^R11\\.", "category": "security" },
+    { "match": "regex:^R12\\.", "category": "reporting" },
+    { "match": "regex:^R1[34]\\.", "category": "engineering-factory" },
+    { "match": "regex:^R15\\.", "category": "epistemic" },
+    { "match": "regex:^R16\\.", "category": "demonstration" },
+    { "match": "doc:docs/REQUIREMENTS.md", "category": "release-profile" },
+    { "match": "doc:docs/SCREEN-CONTRACTS.md", "category": "ui-screen" },
+    { "match": "doc:docs/DESIGN-DECISION-BOUNDARIES.md", "category": "architecture-decision" },
+    { "match": "doc:docs/STATE-TRANSITION-TABLES.md", "category": "domain" },
+    { "match": "doc:docs/KICKOFF-EXECUTION-PACKET.md", "category": "execution-process" },
+    { "match": "doc:docs/WORKFLOW-DIAGRAM-INTEGRATION-REQUIREMENTS.md", "category": "ui-visualization" },
+    { "match": "doc:docs/AGENT-RELIABILITY-REQUIREMENTS.md", "category": "agent-reliability" },
+    { "match": "doc:docs/REHEARSAL-AGENT-INTERFACE-FREEZE.md", "category": "interface-contract" },
+    { "match": "doc:docs/REHEARSAL-ACCEPTANCE-LEDGER.md", "category": "verification-evidence" }
+  ],
+  "verificationDefaults": {
+    "freshness": [
+      "bound to the exact application source commit SHA under test (and the deployed SHA for deployed checks, G9)",
+      "bound to the requirements baseline id and its sha256 used by the run (RDP-001)",
+      "bound to the dependency lock digest of the run (VER-004, DEP-CURRENT-006)",
+      "bound to the interface manifest SHA when the requirement crosses a boundary (G2)"
+    ],
+    "invalidatedBy": [
+      "any change to the application source commit under test",
+      "baseline re-pin, or drift reported by the preservation gate (RDP-001, RDP-004)",
+      "any change to the dependency lock (VER-004)",
+      "evidence produced by an unreleased or unregistered tool build (VER-005)",
+      "a digest, revision or id that does not match the host observation (dokimos completion verify)"
+    ],
+    "evidenceReuse": "Reuse is permitted only when Dokimos reports the evidence Reusable:true with matching id, SHA-256 digest and immutable revision, and no invalidatedBy condition has occurred since; otherwise the check is re-run. Evidence from earlier rehearsals is never reused for this run."
+  },
+  "plans": [
+    {
+      "key": "A-time-optimized",
+      "assumptions": [
+        "Each owner role (domain, ui, persistence, integration, coordinator, reviewer) runs in its own lane; operator and upstream lanes do not constrain concurrency.",
+        "Every task is one unit step: no task duration is known from evidence, so steps order work and do not estimate time.",
+        "One CI run per merged task (implementation, checkpoint and verification kinds) is the planned upper bound.",
+        "Ready tasks are started longest-remaining-chain first, so the critical path is never delayed by a shorter branch."
+      ],
+      "operatorDecisionsRequired": [
+        "Approve parallel agent fan-out: REHEARSAL-004-WRITE-PATH-PLAN R4-03 and AR-021 prefer one continuous lead agent (finding F-007).",
+        "All readiness blockers in requirements-validation-report.json."
+      ]
+    },
+    {
+      "key": "B-resource-optimized",
+      "assumptions": [
+        "All implementation roles are held by one continuous lead agent (R4-03, AR-021); the fresh reviewer is a separate lane used at T30 and T33 only.",
+        "Every task is one unit step: no task duration is known from evidence.",
+        "CI is batched: a CI run is planned at each integration checkpoint and verification task, not per task (ADRP-010, AR-022: batching may not suppress a required check).",
+        "Repository reads are limited to the compiled package plus the files a task names; the package replaces rediscovery of decisions and contracts."
+      ],
+      "operatorDecisionsRequired": [
+        "All readiness blockers in requirements-validation-report.json."
+      ]
+    }
+  ]
+}
