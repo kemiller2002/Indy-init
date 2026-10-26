@@ -9,11 +9,11 @@ rehearsal must use it is defined in
 
 | | |
 |---|---|
-| Baseline id | `BL-CAUSA-INDY-INIT-2edaea4f65ba` |
-| Pinned commit | `2edaea4f65bac13b6c9cc55ac475208e5215affa` (the proposed launch-content and active-catalog change, F-001/F-006 of `requirements-compiled/v1`). Previously `002d8ba6e98639a385dd771999099ba032c48086`, which lacked AR-019..AR-026 (F-003). Re-pin at the Rehearsal 4 kickoff commit (OD-INDY-6) |
+| Baseline id | `BL-CAUSA-INDY-INIT-c751d58d66e3` |
+| Pinned commit | `c751d58d66e3f105a8c67a0cb5e069314bdbd391` (the proposed launch-content and active-catalog change, F-001/F-006 of `requirements-compiled/v1`). Previously `002d8ba6e98639a385dd771999099ba032c48086`, which lacked AR-019..AR-026 (F-003). Re-pin at the Rehearsal 4 kickoff commit (OD-INDY-6) |
 | Documents | 19, each pinned by SHA-256 |
 | Requirements | 461 |
-| Obligations | 2263: 351 `acceptance`, 55 `value`, 1857 `constraint` |
+| Obligations | 2293: 378 `acceptance`, 55 `value`, 1860 `constraint` |
 | Regenerate | `python3 -I tools/build-requirements-baseline.py . <commit> > requirements/causa-requirements-baseline.json` |
 | Tests | `python3 tools/test-requirements-baseline.py` (run by the preflight-tooling workflow) |
 

@@ -1,9 +1,9 @@
 {
   "schema": "praxis.requirements-baseline/1",
-  "id": "BL-CAUSA-INDY-INIT-2edaea4f65ba",
+  "id": "BL-CAUSA-INDY-INIT-c751d58d66e3",
   "source": {
     "repository": "kemiller2002/indy-init",
-    "commit": "2edaea4f65bac13b6c9cc55ac475208e5215affa",
+    "commit": "c751d58d66e3f105a8c67a0cb5e069314bdbd391",
     "documents": [
       {
         "path": "docs/CAUSA-UI-EXPERIENCE-REQUIREMENTS.md",
@@ -93,7 +93,7 @@
       },
       {
         "path": "docs/REHEARSAL-ACCEPTANCE-LEDGER.md",
-        "sha256": "850abb22687456a562819f7ba8c80f13908bfad00a3c5b893b6e51e477145eb2"
+        "sha256": "6a53719f13c5261798232ce221c0079310e85127e4351338db1abc6775a5e7d5"
       }
     ]
   },
@@ -15784,7 +15784,7 @@
       "priority": "unstated",
       "document": "docs/REHEARSAL-ACCEPTANCE-LEDGER.md",
       "heading": "# Rehearsal Executable Acceptance Ledger Contract",
-      "sectionSha256": "9beca62645daa7406d6ce017555a71e9062daf6b3707358ea7484abb897108da",
+      "sectionSha256": "c7b9878ead17a81b85ccec06b5ce22cb1a5a4c24b6ff8ad5eef064e2f8fda60f",
       "obligations": [
         {
           "id": "REHEARSAL-ACCEPTANCE-LEDGER§preamble-O1",
@@ -15794,70 +15794,90 @@
         {
           "id": "REHEARSAL-ACCEPTANCE-LEDGER§preamble-O2",
           "kind": "acceptance",
-          "text": "run_id, source_commit_sha, deployed_commit_sha (nullable until deployed), contract_version, frozen_fixture_digest, dependency_lock_sha, interface_manifest_sha"
+          "text": "schema: `causa.acceptance-ledger/2`"
         },
         {
           "id": "REHEARSAL-ACCEPTANCE-LEDGER§preamble-O3",
           "kind": "acceptance",
-          "text": "requirements[]: {id, source_doc, priority, owner, implementation_paths[], tests[], evidence_paths[], status, reason}"
+          "text": "run_id, source_commit_sha, deployed_commit_sha (nullable until deployed), contract_version, frozen_fixture_digest, dependency_lock_sha, interface_manifest_sha"
         },
         {
           "id": "REHEARSAL-ACCEPTANCE-LEDGER§preamble-O4",
           "kind": "acceptance",
-          "text": "defect_classes[]: {id, severity, violated_invariant, original_repro, variants[], fix_sha, reviewer_evidence, status}"
+          "text": "requirements_baseline: {id, repository, commit, sha256}"
         },
         {
           "id": "REHEARSAL-ACCEPTANCE-LEDGER§preamble-O5",
           "kind": "acceptance",
-          "text": "gates[]: {id, name, scope, verified_sha, status, evidence_paths[], started_at, completed_at}"
+          "text": "approvals_sha256 and evidence_manifest_sha256, supplied by the independent verifier"
         },
         {
           "id": "REHEARSAL-ACCEPTANCE-LEDGER§preamble-O6",
           "kind": "acceptance",
-          "text": "metrics: {first_green_elapsed_seconds, first_candidate_elapsed_seconds, accepted_elapsed_seconds, candidate_count, repeated_defect_class_count, token_count, ci_queue_seconds, ci_test_seconds, verified_requirement_count}"
+          "text": "scope_changes[]: {requirement_id, action, approval_id, to when priority changes}; inline approvals are forbidden"
         },
         {
           "id": "REHEARSAL-ACCEPTANCE-LEDGER§preamble-O7",
           "kind": "acceptance",
-          "text": "unresolved_decisions[] with owner, impact, and disposition."
+          "text": "requirements[]: {id, source_doc, priority, owner, implementation_paths[], tests[], evidence_paths[], status, reason}"
         },
         {
           "id": "REHEARSAL-ACCEPTANCE-LEDGER§preamble-O8",
           "kind": "acceptance",
-          "text": "Allowed statuses: NOT_RUN, PASS, FAIL, BLOCKED."
+          "text": "defect_classes[]: {id, severity, violated_invariant, original_repro, variants[], fix_sha, reviewer_evidence, evidence_paths[], status}"
         },
         {
           "id": "REHEARSAL-ACCEPTANCE-LEDGER§preamble-O9",
           "kind": "acceptance",
-          "text": "Never convert missing evidence to PASS."
+          "text": "gates[]: {id, name, scope, verified_sha, status, evidence_paths[], started_at, completed_at}"
         },
         {
           "id": "REHEARSAL-ACCEPTANCE-LEDGER§preamble-O10",
           "kind": "acceptance",
-          "text": "No synthetic metrics."
+          "text": "metrics: {first_green_elapsed_seconds, first_candidate_elapsed_seconds, accepted_elapsed_seconds, candidate_count, repeated_defect_class_count, token_count, ci_queue_seconds, ci_test_seconds, verified_requirement_count}"
         },
         {
           "id": "REHEARSAL-ACCEPTANCE-LEDGER§preamble-O11",
           "kind": "acceptance",
-          "text": "| G0 Scope | requirement IDs, owner, profile priority, source precedence resolution | BLOCKED if mandatory conflict |"
+          "text": "unresolved_decisions[] with owner, impact, and disposition."
         },
         {
           "id": "REHEARSAL-ACCEPTANCE-LEDGER§preamble-O12",
           "kind": "acceptance",
-          "text": "| G1 Dependencies | verified package/SHA/integrity lock, SDK, WASM/Forma/Folio smoke | BLOCKED if unknown |"
+          "text": "Allowed statuses: NOT_RUN, PASS, FAIL, BLOCKED."
         },
         {
           "id": "REHEARSAL-ACCEPTANCE-LEDGER§preamble-O13",
           "kind": "acceptance",
-          "text": "| G2 Interfaces | frozen versioned handoff manifest and producer/consumer tests | BLOCKED if not extracted |"
+          "text": "Never convert missing evidence to PASS."
         },
         {
           "id": "REHEARSAL-ACCEPTANCE-LEDGER§preamble-O14",
           "kind": "acceptance",
-          "text": "| G3 Domain | F# unit tests, illegal-transition and forged-history variants | FAIL if invalid history accepted |"
+          "text": "No synthetic metrics."
         },
         {
           "id": "REHEARSAL-ACCEPTANCE-LEDGER§preamble-O15",
+          "kind": "acceptance",
+          "text": "| G0 Scope | requirement IDs, owner, profile priority, source precedence resolution | BLOCKED if mandatory conflict |"
+        },
+        {
+          "id": "REHEARSAL-ACCEPTANCE-LEDGER§preamble-O16",
+          "kind": "acceptance",
+          "text": "| G1 Dependencies | verified package/SHA/integrity lock, SDK, WASM/Forma/Folio smoke | BLOCKED if unknown |"
+        },
+        {
+          "id": "REHEARSAL-ACCEPTANCE-LEDGER§preamble-O17",
+          "kind": "acceptance",
+          "text": "| G2 Interfaces | frozen versioned handoff manifest and producer/consumer tests | BLOCKED if not extracted |"
+        },
+        {
+          "id": "REHEARSAL-ACCEPTANCE-LEDGER§preamble-O18",
+          "kind": "acceptance",
+          "text": "| G3 Domain | F# unit tests, illegal-transition and forged-history variants | FAIL if invalid history accepted |"
+        },
+        {
+          "id": "REHEARSAL-ACCEPTANCE-LEDGER§preamble-O19",
           "kind": "acceptance",
           "text": "| G4 Frozen data | five golden scenarios, hashes, 90 negative fixtures where applicable | FAIL on schema drift |",
           "tokens": [
@@ -15865,122 +15885,177 @@
           ]
         },
         {
-          "id": "REHEARSAL-ACCEPTANCE-LEDGER§preamble-O16",
+          "id": "REHEARSAL-ACCEPTANCE-LEDGER§preamble-O20",
           "kind": "acceptance",
           "text": "| G5 UI | P0 screen contracts, startup/error, iPad/keyboard/a11y, projection fidelity | FAIL for missing required behavior |"
         },
         {
-          "id": "REHEARSAL-ACCEPTANCE-LEDGER§preamble-O17",
+          "id": "REHEARSAL-ACCEPTANCE-LEDGER§preamble-O21",
           "kind": "acceptance",
           "text": "| G6 Persistence | local vs remote truth, expected-version conflict, reload, no fixture mutation | BLOCKED if live provider untested |"
         },
         {
-          "id": "REHEARSAL-ACCEPTANCE-LEDGER§preamble-O18",
+          "id": "REHEARSAL-ACCEPTANCE-LEDGER§preamble-O22",
           "kind": "acceptance",
           "text": "| G7 Defect class | independent review and SHA-bound closure for critical/recurring classes | FAIL while open |"
         },
         {
-          "id": "REHEARSAL-ACCEPTANCE-LEDGER§preamble-O19",
+          "id": "REHEARSAL-ACCEPTANCE-LEDGER§preamble-O23",
           "kind": "acceptance",
           "text": "| G8 Candidate | full applicable browser/integration/security/report tests | FAIL on missing required suite |"
         },
         {
-          "id": "REHEARSAL-ACCEPTANCE-LEDGER§preamble-O20",
+          "id": "REHEARSAL-ACCEPTANCE-LEDGER§preamble-O24",
           "kind": "acceptance",
           "text": "| G9 Deployment | deployed SHA equals verified SHA, successful acceptance job on same SHA | FAIL/BLOCKED otherwise |"
         },
         {
-          "id": "REHEARSAL-ACCEPTANCE-LEDGER§preamble-O21",
+          "id": "REHEARSAL-ACCEPTANCE-LEDGER§preamble-O25",
           "kind": "acceptance",
           "text": "| G10 Measurement | elapsed time, candidates, review recurrence, token and test cost | BLOCKED if unavailable; do not invent |"
         },
         {
-          "id": "REHEARSAL-ACCEPTANCE-LEDGER§preamble-O22",
+          "id": "REHEARSAL-ACCEPTANCE-LEDGER§preamble-O26",
           "kind": "acceptance",
           "text": "Accepted is permitted only if all required gates G0–G9 are PASS for the same verified source identity, no open critical defect class remains, and deployed acceptance is PASS."
         },
         {
-          "id": "REHEARSAL-ACCEPTANCE-LEDGER§preamble-O23",
+          "id": "REHEARSAL-ACCEPTANCE-LEDGER§preamble-O27",
           "kind": "acceptance",
           "text": "G10 completeness is separately reported and cannot be silently assumed."
         },
         {
-          "id": "REHEARSAL-ACCEPTANCE-LEDGER§preamble-O24",
+          "id": "REHEARSAL-ACCEPTANCE-LEDGER§preamble-O28",
           "kind": "acceptance",
           "text": "The run may be incomplete, blocked, or failed; partial successes are reported honestly."
         },
         {
-          "id": "REHEARSAL-ACCEPTANCE-LEDGER§preamble-O25",
+          "id": "REHEARSAL-ACCEPTANCE-LEDGER§preamble-O29",
           "kind": "acceptance",
           "text": "**The verdict is computed, never written** (owner decision OD-INDY-7, [OWNER-DECISIONS-2026-10-24.md](OWNER-DECISIONS-2026-10-24.md))."
         },
         {
-          "id": "REHEARSAL-ACCEPTANCE-LEDGER§preamble-O26",
-          "kind": "acceptance",
-          "text": "`tools/compute-acceptance-verdict.py LEDGER.json --repo . --report REPORT.md` derives ACCEPTED, INCOMPLETE, BLOCKED, FAILED or INVALID from the ledger, checks that every PASS item's evidence exists at its SHA, and exits 1 when the ledger's `accepted` flag or the report disagrees."
-        },
-        {
-          "id": "REHEARSAL-ACCEPTANCE-LEDGER§preamble-O27",
-          "kind": "acceptance",
-          "text": "The report carries exactly one `<!-- acceptance-verdict: VERDICT -->` line, and no Verdict/Outcome line may claim acceptance the computation does not give."
-        },
-        {
-          "id": "REHEARSAL-ACCEPTANCE-LEDGER§preamble-O28",
-          "kind": "acceptance",
-          "text": "A rehearsal's CI runs it on every commit that changes the ledger or the report."
-        },
-        {
-          "id": "REHEARSAL-ACCEPTANCE-LEDGER§preamble-O29",
-          "kind": "acceptance",
-          "text": "There is no exclusion path in the verdict: a P0 requirement leaves it only by leaving the owner-approved baseline."
-        },
-        {
           "id": "REHEARSAL-ACCEPTANCE-LEDGER§preamble-O30",
           "kind": "acceptance",
-          "text": "Map the normative requirements in REQUIREMENTS.md, CAUSA-UI-EXPERIENCE-REQUIREMENTS.md, WASM-LOADING-EXPERIENCE-REQUIREMENTS.md, FROZEN-DEMO-STORAGE-REQUIREMENTS.md, DEFECT-CLASS-CLOSURE-AND-RELEASE-GATES.md and AGENT-DECISION-REDUCTION-PROFILE.md."
+          "text": "`tools/compute-acceptance-verdict.py` derives ACCEPTED, INCOMPLETE, BLOCKED, FAILED or INVALID from the ledger and independently supplied trust inputs."
         },
         {
           "id": "REHEARSAL-ACCEPTANCE-LEDGER§preamble-O31",
           "kind": "acceptance",
-          "text": "Map existing SCREEN-CONTRACTS.md where screens are implemented."
+          "text": "It requires the candidate repository and trusted source SHA; the exact requirements baseline and its independently supplied SHA-256; a source checkout at the baseline commit; an externally pinned approvals file and SHA-256 plus the trusted operator identities; and a content-addressed evidence manifest, evidence directory and manifest SHA-256."
         },
         {
           "id": "REHEARSAL-ACCEPTANCE-LEDGER§preamble-O32",
           "kind": "acceptance",
-          "text": "P1 scope is tracked explicitly; deferred items remain NOT_RUN rather than disappearing."
+          "text": "It exits 1 when the ledger's `accepted` flag or the report disagrees."
         },
         {
           "id": "REHEARSAL-ACCEPTANCE-LEDGER§preamble-O33",
           "kind": "acceptance",
-          "text": "Use targeted checks during development; batch compatible fixes into a release candidate."
+          "text": "The report carries exactly one `<!-- acceptance-verdict: VERDICT -->` line, and no Verdict/Outcome line may claim acceptance the computation does not give."
         },
         {
           "id": "REHEARSAL-ACCEPTANCE-LEDGER§preamble-O34",
           "kind": "acceptance",
-          "text": "Independent architecture review before first candidate."
+          "text": "The verifier opens every baseline source document at the pinned commit."
         },
         {
           "id": "REHEARSAL-ACCEPTANCE-LEDGER§preamble-O35",
           "kind": "acceptance",
-          "text": "Preserve R001 baseline and historical results unchanged."
+          "text": "It compares every baseline P0 identity with the ledger, so deleting or downgrading an item cannot remove it from acceptance."
         },
         {
           "id": "REHEARSAL-ACCEPTANCE-LEDGER§preamble-O36",
           "kind": "acceptance",
-          "text": "Emit one ledger per candidate and one final immutable report with exact source/deployment identities."
+          "text": "A scope change is effective only when it exactly matches an operator approval in the externally pinned approvals file and that approval's operator identity is named independently with `--trusted-operator-id`."
         },
         {
           "id": "REHEARSAL-ACCEPTANCE-LEDGER§preamble-O37",
           "kind": "acceptance",
-          "text": "Implement a small validator/generator consuming requirement IDs, test results and gate artifacts."
+          "text": "Agent-authored approvals in the ledger and untrusted operator identities are invalid."
         },
         {
           "id": "REHEARSAL-ACCEPTANCE-LEDGER§preamble-O38",
           "kind": "acceptance",
-          "text": "It must reject duplicate IDs, unknown statuses, missing proof, mismatched SHAs, and an Accepted flag with incomplete required gates."
+          "text": "Every PASS evidence path names a `causa.acceptance-evidence/1` JSON result in a `causa.acceptance-evidence-manifest/1` bundle."
         },
         {
           "id": "REHEARSAL-ACCEPTANCE-LEDGER§preamble-O39",
+          "kind": "acceptance",
+          "text": "The verifier checks the bundle's run and source identities, the bytes and SHA-256 of each result, the result's subject, status, command and exit code, required CI/deployment evidence types, and independent defect review evidence."
+        },
+        {
+          "id": "REHEARSAL-ACCEPTANCE-LEDGER§preamble-O40",
+          "kind": "acceptance",
+          "text": "Missing, stale, altered or cross-run evidence is INVALID."
+        },
+        {
+          "id": "REHEARSAL-ACCEPTANCE-LEDGER§preamble-O41",
+          "kind": "acceptance",
+          "text": "Digest pinning establishes integrity; authentication of the pins remains the responsibility of the trusted CI artifact, protected reference, Dokimos attestation or independent verifier supplying them."
+        },
+        {
+          "id": "REHEARSAL-ACCEPTANCE-LEDGER§preamble-O42",
+          "kind": "acceptance",
+          "text": "A rehearsal's CI runs the structural and independent-verdict regression suites on every push and pull request."
+        },
+        {
+          "id": "REHEARSAL-ACCEPTANCE-LEDGER§preamble-O43",
+          "kind": "acceptance",
+          "text": "This repository does not claim that the job is non-bypassable unless repository rules independently require it."
+        },
+        {
+          "id": "REHEARSAL-ACCEPTANCE-LEDGER§preamble-O44",
+          "kind": "acceptance",
+          "text": "There is no ledger-local exclusion path: a P0 requirement leaves the verdict only through an externally pinned operator approval bound to the exact baseline."
+        },
+        {
+          "id": "REHEARSAL-ACCEPTANCE-LEDGER§preamble-O45",
+          "kind": "acceptance",
+          "text": "Map the normative requirements in REQUIREMENTS.md, CAUSA-UI-EXPERIENCE-REQUIREMENTS.md, WASM-LOADING-EXPERIENCE-REQUIREMENTS.md, FROZEN-DEMO-STORAGE-REQUIREMENTS.md, DEFECT-CLASS-CLOSURE-AND-RELEASE-GATES.md and AGENT-DECISION-REDUCTION-PROFILE.md."
+        },
+        {
+          "id": "REHEARSAL-ACCEPTANCE-LEDGER§preamble-O46",
+          "kind": "acceptance",
+          "text": "Map existing SCREEN-CONTRACTS.md where screens are implemented."
+        },
+        {
+          "id": "REHEARSAL-ACCEPTANCE-LEDGER§preamble-O47",
+          "kind": "acceptance",
+          "text": "P1 scope is tracked explicitly; deferred items remain NOT_RUN rather than disappearing."
+        },
+        {
+          "id": "REHEARSAL-ACCEPTANCE-LEDGER§preamble-O48",
+          "kind": "acceptance",
+          "text": "Use targeted checks during development; batch compatible fixes into a release candidate."
+        },
+        {
+          "id": "REHEARSAL-ACCEPTANCE-LEDGER§preamble-O49",
+          "kind": "acceptance",
+          "text": "Independent architecture review before first candidate."
+        },
+        {
+          "id": "REHEARSAL-ACCEPTANCE-LEDGER§preamble-O50",
+          "kind": "acceptance",
+          "text": "Preserve R001 baseline and historical results unchanged."
+        },
+        {
+          "id": "REHEARSAL-ACCEPTANCE-LEDGER§preamble-O51",
+          "kind": "acceptance",
+          "text": "Emit one ledger per candidate and one final immutable report with exact source/deployment identities."
+        },
+        {
+          "id": "REHEARSAL-ACCEPTANCE-LEDGER§preamble-O52",
+          "kind": "acceptance",
+          "text": "Implement a small validator/generator consuming requirement IDs, test results and gate artifacts."
+        },
+        {
+          "id": "REHEARSAL-ACCEPTANCE-LEDGER§preamble-O53",
+          "kind": "acceptance",
+          "text": "It must reject duplicate IDs, unknown statuses, missing proof, mismatched SHAs, and an Accepted flag with incomplete required gates."
+        },
+        {
+          "id": "REHEARSAL-ACCEPTANCE-LEDGER§preamble-O54",
           "kind": "acceptance",
           "text": "Do not build a new generic workflow platform merely to implement this ledger."
         }
@@ -15992,7 +16067,7 @@
       "priority": "unstated",
       "document": "docs/REHEARSAL-ACCEPTANCE-LEDGER.md",
       "heading": "## Single ledger format",
-      "sectionSha256": "926899170d20b6db2bf76d3cb8d183d9d4756183e826fae50fa991b2e488160a",
+      "sectionSha256": "fb20e3ab2dbc4cd4724bc76c197b73e41222a4fe8cec4968f70c13433dbcda07",
       "obligations": [
         {
           "id": "REHEARSAL-ACCEPTANCE-LEDGER§single-ledger-format-O1",
@@ -16001,46 +16076,66 @@
         },
         {
           "id": "REHEARSAL-ACCEPTANCE-LEDGER§single-ledger-format-O2",
+          "kind": "acceptance",
+          "text": "schema: `causa.acceptance-ledger/2`"
+        },
+        {
+          "id": "REHEARSAL-ACCEPTANCE-LEDGER§single-ledger-format-O3",
           "kind": "constraint",
           "text": "run_id, source_commit_sha, deployed_commit_sha (nullable until deployed), contract_version, frozen_fixture_digest, dependency_lock_sha, interface_manifest_sha"
         },
         {
-          "id": "REHEARSAL-ACCEPTANCE-LEDGER§single-ledger-format-O3",
-          "kind": "acceptance",
-          "text": "requirements[]: {id, source_doc, priority, owner, implementation_paths[], tests[], evidence_paths[], status, reason}"
-        },
-        {
           "id": "REHEARSAL-ACCEPTANCE-LEDGER§single-ledger-format-O4",
           "kind": "constraint",
-          "text": "defect_classes[]: {id, severity, violated_invariant, original_repro, variants[], fix_sha, reviewer_evidence, status}"
+          "text": "requirements_baseline: {id, repository, commit, sha256}"
         },
         {
           "id": "REHEARSAL-ACCEPTANCE-LEDGER§single-ledger-format-O5",
           "kind": "constraint",
-          "text": "gates[]: {id, name, scope, verified_sha, status, evidence_paths[], started_at, completed_at}"
+          "text": "approvals_sha256 and evidence_manifest_sha256, supplied by the independent verifier"
         },
         {
           "id": "REHEARSAL-ACCEPTANCE-LEDGER§single-ledger-format-O6",
           "kind": "constraint",
-          "text": "metrics: {first_green_elapsed_seconds, first_candidate_elapsed_seconds, accepted_elapsed_seconds, candidate_count, repeated_defect_class_count, token_count, ci_queue_seconds, ci_test_seconds, verified_requirement_count}"
+          "text": "scope_changes[]: {requirement_id, action, approval_id, to when priority changes}; inline approvals are forbidden"
         },
         {
           "id": "REHEARSAL-ACCEPTANCE-LEDGER§single-ledger-format-O7",
-          "kind": "constraint",
-          "text": "unresolved_decisions[] with owner, impact, and disposition."
+          "kind": "acceptance",
+          "text": "requirements[]: {id, source_doc, priority, owner, implementation_paths[], tests[], evidence_paths[], status, reason}"
         },
         {
           "id": "REHEARSAL-ACCEPTANCE-LEDGER§single-ledger-format-O8",
           "kind": "constraint",
-          "text": "Allowed statuses: NOT_RUN, PASS, FAIL, BLOCKED."
+          "text": "defect_classes[]: {id, severity, violated_invariant, original_repro, variants[], fix_sha, reviewer_evidence, evidence_paths[], status}"
         },
         {
           "id": "REHEARSAL-ACCEPTANCE-LEDGER§single-ledger-format-O9",
           "kind": "constraint",
-          "text": "Never convert missing evidence to PASS."
+          "text": "gates[]: {id, name, scope, verified_sha, status, evidence_paths[], started_at, completed_at}"
         },
         {
           "id": "REHEARSAL-ACCEPTANCE-LEDGER§single-ledger-format-O10",
+          "kind": "constraint",
+          "text": "metrics: {first_green_elapsed_seconds, first_candidate_elapsed_seconds, accepted_elapsed_seconds, candidate_count, repeated_defect_class_count, token_count, ci_queue_seconds, ci_test_seconds, verified_requirement_count}"
+        },
+        {
+          "id": "REHEARSAL-ACCEPTANCE-LEDGER§single-ledger-format-O11",
+          "kind": "constraint",
+          "text": "unresolved_decisions[] with owner, impact, and disposition."
+        },
+        {
+          "id": "REHEARSAL-ACCEPTANCE-LEDGER§single-ledger-format-O12",
+          "kind": "constraint",
+          "text": "Allowed statuses: NOT_RUN, PASS, FAIL, BLOCKED."
+        },
+        {
+          "id": "REHEARSAL-ACCEPTANCE-LEDGER§single-ledger-format-O13",
+          "kind": "constraint",
+          "text": "Never convert missing evidence to PASS."
+        },
+        {
+          "id": "REHEARSAL-ACCEPTANCE-LEDGER§single-ledger-format-O14",
           "kind": "constraint",
           "text": "No synthetic metrics."
         }
@@ -16120,7 +16215,7 @@
       "priority": "unstated",
       "document": "docs/REHEARSAL-ACCEPTANCE-LEDGER.md",
       "heading": "## Release acceptance predicate",
-      "sectionSha256": "51ba3b4eea9db2a293761ad99ca2ddd962f854c2863108405c01ca3161885a71",
+      "sectionSha256": "7c0d3f172d36ff6d0076c01c87783c3b090f66ee58a16dea128a7c3af944dc3e",
       "obligations": [
         {
           "id": "REHEARSAL-ACCEPTANCE-LEDGER§release-acceptance-predicate-O1",
@@ -16145,22 +16240,77 @@
         {
           "id": "REHEARSAL-ACCEPTANCE-LEDGER§release-acceptance-predicate-O5",
           "kind": "acceptance",
-          "text": "`tools/compute-acceptance-verdict.py LEDGER.json --repo . --report REPORT.md` derives ACCEPTED, INCOMPLETE, BLOCKED, FAILED or INVALID from the ledger, checks that every PASS item's evidence exists at its SHA, and exits 1 when the ledger's `accepted` flag or the report disagrees."
+          "text": "`tools/compute-acceptance-verdict.py` derives ACCEPTED, INCOMPLETE, BLOCKED, FAILED or INVALID from the ledger and independently supplied trust inputs."
         },
         {
           "id": "REHEARSAL-ACCEPTANCE-LEDGER§release-acceptance-predicate-O6",
           "kind": "acceptance",
-          "text": "The report carries exactly one `<!-- acceptance-verdict: VERDICT -->` line, and no Verdict/Outcome line may claim acceptance the computation does not give."
+          "text": "It requires the candidate repository and trusted source SHA; the exact requirements baseline and its independently supplied SHA-256; a source checkout at the baseline commit; an externally pinned approvals file and SHA-256 plus the trusted operator identities; and a content-addressed evidence manifest, evidence directory and manifest SHA-256."
         },
         {
           "id": "REHEARSAL-ACCEPTANCE-LEDGER§release-acceptance-predicate-O7",
           "kind": "acceptance",
-          "text": "A rehearsal's CI runs it on every commit that changes the ledger or the report."
+          "text": "It exits 1 when the ledger's `accepted` flag or the report disagrees."
         },
         {
           "id": "REHEARSAL-ACCEPTANCE-LEDGER§release-acceptance-predicate-O8",
           "kind": "acceptance",
-          "text": "There is no exclusion path in the verdict: a P0 requirement leaves it only by leaving the owner-approved baseline."
+          "text": "The report carries exactly one `<!-- acceptance-verdict: VERDICT -->` line, and no Verdict/Outcome line may claim acceptance the computation does not give."
+        },
+        {
+          "id": "REHEARSAL-ACCEPTANCE-LEDGER§release-acceptance-predicate-O9",
+          "kind": "acceptance",
+          "text": "The verifier opens every baseline source document at the pinned commit."
+        },
+        {
+          "id": "REHEARSAL-ACCEPTANCE-LEDGER§release-acceptance-predicate-O10",
+          "kind": "acceptance",
+          "text": "It compares every baseline P0 identity with the ledger, so deleting or downgrading an item cannot remove it from acceptance."
+        },
+        {
+          "id": "REHEARSAL-ACCEPTANCE-LEDGER§release-acceptance-predicate-O11",
+          "kind": "acceptance",
+          "text": "A scope change is effective only when it exactly matches an operator approval in the externally pinned approvals file and that approval's operator identity is named independently with `--trusted-operator-id`."
+        },
+        {
+          "id": "REHEARSAL-ACCEPTANCE-LEDGER§release-acceptance-predicate-O12",
+          "kind": "acceptance",
+          "text": "Agent-authored approvals in the ledger and untrusted operator identities are invalid."
+        },
+        {
+          "id": "REHEARSAL-ACCEPTANCE-LEDGER§release-acceptance-predicate-O13",
+          "kind": "acceptance",
+          "text": "Every PASS evidence path names a `causa.acceptance-evidence/1` JSON result in a `causa.acceptance-evidence-manifest/1` bundle."
+        },
+        {
+          "id": "REHEARSAL-ACCEPTANCE-LEDGER§release-acceptance-predicate-O14",
+          "kind": "acceptance",
+          "text": "The verifier checks the bundle's run and source identities, the bytes and SHA-256 of each result, the result's subject, status, command and exit code, required CI/deployment evidence types, and independent defect review evidence."
+        },
+        {
+          "id": "REHEARSAL-ACCEPTANCE-LEDGER§release-acceptance-predicate-O15",
+          "kind": "acceptance",
+          "text": "Missing, stale, altered or cross-run evidence is INVALID."
+        },
+        {
+          "id": "REHEARSAL-ACCEPTANCE-LEDGER§release-acceptance-predicate-O16",
+          "kind": "acceptance",
+          "text": "Digest pinning establishes integrity; authentication of the pins remains the responsibility of the trusted CI artifact, protected reference, Dokimos attestation or independent verifier supplying them."
+        },
+        {
+          "id": "REHEARSAL-ACCEPTANCE-LEDGER§release-acceptance-predicate-O17",
+          "kind": "acceptance",
+          "text": "A rehearsal's CI runs the structural and independent-verdict regression suites on every push and pull request."
+        },
+        {
+          "id": "REHEARSAL-ACCEPTANCE-LEDGER§release-acceptance-predicate-O18",
+          "kind": "acceptance",
+          "text": "This repository does not claim that the job is non-bypassable unless repository rules independently require it."
+        },
+        {
+          "id": "REHEARSAL-ACCEPTANCE-LEDGER§release-acceptance-predicate-O19",
+          "kind": "acceptance",
+          "text": "There is no ledger-local exclusion path: a P0 requirement leaves the verdict only through an externally pinned operator approval bound to the exact baseline."
         }
       ]
     },
