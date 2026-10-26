@@ -9,10 +9,9 @@
   ],
   "rule": "Agents must not reconsider a fixed-architectural decision without recorded evidence of incompatibility (DESIGN-DECISION-BOUNDARIES section 6).",
   "summary": {
-    "fixed-architectural": 18,
+    "fixed-architectural": 20,
     "implementation": 3,
-    "runtime-situational": 2,
-    "unresolved": 4,
+    "runtime-situational": 4,
     "verified-reusable": 4
   },
   "decisions": [
@@ -39,14 +38,14 @@
           "path": "docs/DESIGN-DECISION-BOUNDARIES.md",
           "quote": "Use F# domain types to make invalid generic-core state difficult or impossible to represent.",
           "verified": true,
-          "detail": "found at c848a18b8da5ac7733882495f5c22ac105860ab7"
+          "detail": "found at 9dc7d575f9d981e2be6f83543e18f548332e1a53"
         },
         {
           "repo": "indy-init",
           "path": "docs/CAUSA-UI-EXPERIENCE-REQUIREMENTS.md",
           "quote": "The F# domain engine is the sole authority for legal commands, state transitions, causal assertions, and verification.",
           "verified": true,
-          "detail": "found at c848a18b8da5ac7733882495f5c22ac105860ab7"
+          "detail": "found at 9dc7d575f9d981e2be6f83543e18f548332e1a53"
         }
       ],
       "sourcesVerified": true
@@ -76,7 +75,7 @@
           "path": "docs/AGENT-DECISION-REDUCTION-PROFILE.md",
           "quote": "Prefer Forma components; do not introduce an independent design system.",
           "verified": true,
-          "detail": "found at c848a18b8da5ac7733882495f5c22ac105860ab7"
+          "detail": "found at 9dc7d575f9d981e2be6f83543e18f548332e1a53"
         },
         {
           "repo": "forma",
@@ -112,14 +111,14 @@
           "path": "docs/KICKOFF-EXECUTION-PACKET.md",
           "quote": "Limen boundary;",
           "verified": true,
-          "detail": "found at c848a18b8da5ac7733882495f5c22ac105860ab7"
+          "detail": "found at 9dc7d575f9d981e2be6f83543e18f548332e1a53"
         },
         {
           "repo": "indy-init",
           "path": "docs/AGENT-DECISION-REDUCTION-PROFILE.md",
           "quote": "loading: HTML/CSS shell before WASM",
           "verified": true,
-          "detail": "found at c848a18b8da5ac7733882495f5c22ac105860ab7"
+          "detail": "found at 9dc7d575f9d981e2be6f83543e18f548332e1a53"
         },
         {
           "repo": "limen",
@@ -155,14 +154,14 @@
           "path": "docs/REHEARSAL-EXTERNAL-DATA-BOUNDARY.md",
           "quote": "obtains actual investigation records only after the user explicitly connects an authorized external GitHub repository",
           "verified": true,
-          "detail": "found at c848a18b8da5ac7733882495f5c22ac105860ab7"
+          "detail": "found at 9dc7d575f9d981e2be6f83543e18f548332e1a53"
         },
         {
           "repo": "indy-init",
           "path": "docs/REHEARSAL-EXTERNAL-DATA-BOUNDARY.md",
           "quote": "The data repository MUST be configurable and isolated from the application repository.",
           "verified": true,
-          "detail": "found at c848a18b8da5ac7733882495f5c22ac105860ab7"
+          "detail": "found at 9dc7d575f9d981e2be6f83543e18f548332e1a53"
         }
       ],
       "sourcesVerified": true
@@ -191,7 +190,7 @@
           "path": "docs/OWNER-DECISIONS-2026-10-24.md",
           "quote": "There is no auto-load of a public catalogue.",
           "verified": true,
-          "detail": "found at c848a18b8da5ac7733882495f5c22ac105860ab7"
+          "detail": "found at 9dc7d575f9d981e2be6f83543e18f548332e1a53"
         },
         {
           "repo": "indy-init-rehearsal-003",
@@ -230,14 +229,14 @@
           "path": "docs/AGENT-DECISION-REDUCTION-PROFILE.md",
           "quote": "Use frozen causa-data/contract/v1.0.0/CONTRACT.md and tag causa-storage-v1.0.0 as the sole wire contract for this profile.",
           "verified": true,
-          "detail": "found at c848a18b8da5ac7733882495f5c22ac105860ab7"
+          "detail": "found at 9dc7d575f9d981e2be6f83543e18f548332e1a53"
         },
         {
           "repo": "indy-init",
           "path": "docs/CAUSA-STORAGE-RELEASE-v1.0.0.md",
           "quote": "Status: RELEASED.",
           "verified": true,
-          "detail": "found at c848a18b8da5ac7733882495f5c22ac105860ab7"
+          "detail": "found at 9dc7d575f9d981e2be6f83543e18f548332e1a53"
         }
       ],
       "sourcesVerified": true
@@ -245,10 +244,16 @@
     {
       "id": "DEC-006",
       "title": "GitHub write primitive: contract's non-forced ref PATCH versus R2's guarded GraphQL commit",
-      "classification": "unresolved",
+      "classification": "fixed-architectural",
       "home": "ordo",
-      "statement": "See F-009. Until decided, the write-path slice (T18 onward for writes) is BLOCKED under ADRP-001's conflict stop.",
-      "constraints": [],
+      "statement": "Owner-approved in docs/OWNER-DECISIONS-2026-10-26.md (indy-init PR #20, OD-INDY-9). causa-storage v1.0.0 stays the wire contract. For GitHub, one semantic command is published as one GraphQL createCommitOnBranch carrying the events append, manifest and snapshot, with expectedHeadOid set to the commit the deciding state was read at. A refusal on a moved head is a non-fast-forward under section 9.4.2; success is reported only after a re-read at the new head (9.4.3). The non-forced REST ref update is not conforming. The exception holds until causa-storage 1.1.0 (STORAGE-003).",
+      "constraints": [
+        "causa-storage v1.0.0 paths, file sets, schemas, fixtures and identities unchanged; sections 9.4.2 to 9.4.5 apply",
+        "One createCommitOnBranch per semantic command, with expectedHeadOid set to the commit the deciding state was read at; that commit is the provider version token",
+        "A refusal on a moved head is a non-fast-forward: reload, re-verify, rebase or report conflict, never force",
+        "Success only after a re-read at the new head; a failure after sending is unknown",
+        "No REST ref update for publication"
+      ],
       "requirements": [
         "EXT-DATA-006",
         "STORAGE-006"
@@ -268,7 +273,7 @@
         "DCT-001/DCT-003 and the T18 recordings target createCommitOnBranch and its refusal on a moved head",
         "causa-data CONTRACT.md stays unedited until (b)"
       ],
-      "approvalRequired": "Owner-authored record (Ordo decision or owner commit to an OWNER-DECISIONS addendum) naming DEC-006 and F-009; agents do not write it (RDP-003, AR-003)",
+      "approvalRequired": "Given: owner approval of docs/OWNER-DECISIONS-2026-10-26.md (indy-init PR #20, OD-INDY-9)",
       "sources": [
         {
           "repo": "causa-data",
@@ -276,6 +281,27 @@
           "quote": "published by a non-forced ref update",
           "verified": true,
           "detail": "found at 22260f429501d0d6963fc33302ed1e64d742a374"
+        },
+        {
+          "repo": "indy-init",
+          "path": "docs/OWNER-DECISIONS-2026-10-26.md",
+          "quote": "in force from the merge of indy-init pull request #20, which adds this file to main, on the owner's approval of this exact text",
+          "verified": true,
+          "detail": "found at 9dc7d575f9d981e2be6f83543e18f548332e1a53"
+        },
+        {
+          "repo": "indy-init",
+          "path": "docs/OWNER-DECISIONS-2026-10-26.md",
+          "quote": "For GitHub, one semantic command is published as one GraphQL createCommitOnBranch mutation.",
+          "verified": true,
+          "detail": "found at 9dc7d575f9d981e2be6f83543e18f548332e1a53"
+        },
+        {
+          "repo": "indy-init",
+          "path": "docs/OWNER-DECISIONS-2026-10-26.md",
+          "quote": "The non-forced REST ref update is no longer conforming.",
+          "verified": true,
+          "detail": "found at 9dc7d575f9d981e2be6f83543e18f548332e1a53"
         }
       ],
       "sourcesVerified": true
@@ -340,14 +366,14 @@
           "path": "docs/OWNER-DECISIONS-2026-10-24.md",
           "quote": "Writes are P0 for the event.",
           "verified": true,
-          "detail": "found at c848a18b8da5ac7733882495f5c22ac105860ab7"
+          "detail": "found at 9dc7d575f9d981e2be6f83543e18f548332e1a53"
         },
         {
           "repo": "indy-init",
           "path": "docs/OPERATOR-KICKOFF-DECISIONS.md",
           "quote": "DEC-WRITES-001: Writes are required for the Indy Init application.",
           "verified": true,
-          "detail": "found at c848a18b8da5ac7733882495f5c22ac105860ab7"
+          "detail": "found at 9dc7d575f9d981e2be6f83543e18f548332e1a53"
         }
       ],
       "sourcesVerified": true
@@ -374,14 +400,14 @@
           "path": "docs/OWNER-DECISIONS-2026-10-24.md",
           "quote": "Percepta semantic UI verification is released, not waived.",
           "verified": true,
-          "detail": "found at c848a18b8da5ac7733882495f5c22ac105860ab7"
+          "detail": "found at 9dc7d575f9d981e2be6f83543e18f548332e1a53"
         },
         {
           "repo": "indy-init",
           "path": "docs/OPERATOR-KICKOFF-DECISIONS.md",
           "quote": "DEC-PERCEPTA-001: Percepta is required.",
           "verified": true,
-          "detail": "found at c848a18b8da5ac7733882495f5c22ac105860ab7"
+          "detail": "found at 9dc7d575f9d981e2be6f83543e18f548332e1a53"
         }
       ],
       "sourcesVerified": true
@@ -408,14 +434,14 @@
           "path": "docs/OWNER-DECISIONS-2026-10-24.md",
           "quote": "The acceptance verdict is computed, never written.",
           "verified": true,
-          "detail": "found at c848a18b8da5ac7733882495f5c22ac105860ab7"
+          "detail": "found at 9dc7d575f9d981e2be6f83543e18f548332e1a53"
         },
         {
           "repo": "indy-init",
           "path": "docs/REHEARSAL-ACCEPTANCE-LEDGER.md",
           "quote": "The verdict is computed, never written",
           "verified": true,
-          "detail": "found at c848a18b8da5ac7733882495f5c22ac105860ab7"
+          "detail": "found at 9dc7d575f9d981e2be6f83543e18f548332e1a53"
         }
       ],
       "sourcesVerified": true
@@ -442,7 +468,7 @@
           "path": "docs/DESIGN-DECISION-BOUNDARIES.md",
           "quote": "Because static hosting cannot answer arbitrary paths, routes are hash-based",
           "verified": true,
-          "detail": "found at c848a18b8da5ac7733882495f5c22ac105860ab7"
+          "detail": "found at 9dc7d575f9d981e2be6f83543e18f548332e1a53"
         }
       ],
       "sourcesVerified": true
@@ -470,14 +496,14 @@
           "path": "docs/OWNER-DECISIONS-2026-10-24.md",
           "quote": "GUID routes, with case keys as aliases",
           "verified": true,
-          "detail": "found at c848a18b8da5ac7733882495f5c22ac105860ab7"
+          "detail": "found at 9dc7d575f9d981e2be6f83543e18f548332e1a53"
         },
         {
           "repo": "indy-init",
           "path": "docs/REHEARSAL-003-RESULTS.md",
           "quote": "explicit Connect, GUID routes",
           "verified": true,
-          "detail": "found at c848a18b8da5ac7733882495f5c22ac105860ab7"
+          "detail": "found at 9dc7d575f9d981e2be6f83543e18f548332e1a53"
         }
       ],
       "sourcesVerified": true
@@ -508,14 +534,14 @@
           "path": "docs/OWNER-DECISIONS-2026-10-24.md",
           "quote": "Rehearsal 4 runs on exactly that set.",
           "verified": true,
-          "detail": "found at c848a18b8da5ac7733882495f5c22ac105860ab7"
+          "detail": "found at 9dc7d575f9d981e2be6f83543e18f548332e1a53"
         },
         {
           "repo": "indy-init",
           "path": "docs/REHEARSAL-DEPENDENCY-LOCK.md",
           "quote": "The run uses exactly this set.",
           "verified": true,
-          "detail": "found at c848a18b8da5ac7733882495f5c22ac105860ab7"
+          "detail": "found at 9dc7d575f9d981e2be6f83543e18f548332e1a53"
         }
       ],
       "sourcesVerified": true
@@ -543,7 +569,7 @@
           "path": "docs/DESIGN-DECISION-BOUNDARIES.md",
           "quote": "GitHub is the initial persistence provider.",
           "verified": true,
-          "detail": "found at c848a18b8da5ac7733882495f5c22ac105860ab7"
+          "detail": "found at 9dc7d575f9d981e2be6f83543e18f548332e1a53"
         }
       ],
       "sourcesVerified": true
@@ -569,7 +595,7 @@
           "path": "docs/DESIGN-DECISION-BOUNDARIES.md",
           "quote": "GitHub Pages/static hosting is a target where practical.",
           "verified": true,
-          "detail": "found at c848a18b8da5ac7733882495f5c22ac105860ab7"
+          "detail": "found at 9dc7d575f9d981e2be6f83543e18f548332e1a53"
         }
       ],
       "sourcesVerified": true
@@ -596,14 +622,14 @@
           "path": "docs/REHEARSAL-004-WRITE-PATH-PLAN.md",
           "quote": "Topology: one continuous lead agent.",
           "verified": true,
-          "detail": "found at c848a18b8da5ac7733882495f5c22ac105860ab7"
+          "detail": "found at 9dc7d575f9d981e2be6f83543e18f548332e1a53"
         },
         {
           "repo": "indy-init",
           "path": "docs/AGENT-RELIABILITY-REQUIREMENTS.md",
           "quote": "Prefer one long-running implementation agent with compact durable checkpoints.",
           "verified": true,
-          "detail": "found at c848a18b8da5ac7733882495f5c22ac105860ab7"
+          "detail": "found at 9dc7d575f9d981e2be6f83543e18f548332e1a53"
         }
       ],
       "sourcesVerified": true
@@ -635,7 +661,7 @@
           "path": "docs/REHEARSAL-DERIVATION-POLICY.md",
           "quote": "Implementation work items MUST NOT begin until praxis requirements preservation verify returns PASS",
           "verified": true,
-          "detail": "found at c848a18b8da5ac7733882495f5c22ac105860ab7"
+          "detail": "found at 9dc7d575f9d981e2be6f83543e18f548332e1a53"
         }
       ],
       "sourcesVerified": true
@@ -664,14 +690,14 @@
           "path": "docs/SYSTEM-VERSION-AND-COMPATIBILITY-REQUIREMENTS.md",
           "quote": "Each build MUST use the newest available stable, published, compatible release of every applicable Echelon system",
           "verified": true,
-          "detail": "found at c848a18b8da5ac7733882495f5c22ac105860ab7"
+          "detail": "found at 9dc7d575f9d981e2be6f83543e18f548332e1a53"
         },
         {
           "repo": "indy-init",
           "path": "docs/AGENT-DECISION-REDUCTION-PROFILE.md",
           "quote": "Historical R001 versions are not defaults.",
           "verified": true,
-          "detail": "found at c848a18b8da5ac7733882495f5c22ac105860ab7"
+          "detail": "found at 9dc7d575f9d981e2be6f83543e18f548332e1a53"
         }
       ],
       "sourcesVerified": true
@@ -700,7 +726,7 @@
           "path": "docs/REHEARSAL-EXTERNAL-DATA-BOUNDARY.md",
           "quote": "Credentials MUST never be committed, bundled, logged, embedded in URLs, exposed in error text, stored in localStorage, or written into domain event files.",
           "verified": true,
-          "detail": "found at c848a18b8da5ac7733882495f5c22ac105860ab7"
+          "detail": "found at 9dc7d575f9d981e2be6f83543e18f548332e1a53"
         },
         {
           "repo": "causa-data",
@@ -735,7 +761,7 @@
           "path": "docs/REQUIREMENTS.md",
           "quote": "The primary target is iPad Safari in both portrait and landscape orientations.",
           "verified": true,
-          "detail": "found at c848a18b8da5ac7733882495f5c22ac105860ab7"
+          "detail": "found at 9dc7d575f9d981e2be6f83543e18f548332e1a53"
         }
       ],
       "sourcesVerified": true
@@ -773,7 +799,7 @@
           "path": "docs/DESIGN-DECISION-BOUNDARIES.md",
           "quote": "These are foundational product guarantees.",
           "verified": true,
-          "detail": "found at c848a18b8da5ac7733882495f5c22ac105860ab7"
+          "detail": "found at 9dc7d575f9d981e2be6f83543e18f548332e1a53"
         }
       ],
       "sourcesVerified": true
@@ -781,10 +807,13 @@
     {
       "id": "DEC-022",
       "title": "AI proposal loop and time travel in Rehearsal 4 / event scope",
-      "classification": "unresolved",
+      "classification": "runtime-situational",
       "home": "ordo",
-      "statement": "See F-008.",
-      "constraints": [],
+      "statement": "Owner-approved in docs/OWNER-DECISIONS-2026-10-26.md (indy-init PR #20, OD-INDY-11). The structured AI proposal loop and time travel / semantic diff (T27, T28) are excluded from Rehearsal 4. The proposal-authority invariant (D-004) and prompt/data boundaries (R11.4) stay in scope. The event's scope for these features is decided from the Rehearsal 4 result (R4 section 6). The tasks leave the run only once the operator's approvals file (T09) covers the exclusion.",
+      "constraints": [
+        "D-004 and R11.4 stay in scope",
+        "The exclusion reaches the verifier only through the operator's pinned approvals file (T09)"
+      ],
       "requirements": [
         "KICKOFF-EXECUTION-PACKET\u00a73-work-order"
       ],
@@ -801,14 +830,35 @@
         "T27 and T28 leave the timed plan only after an approved exclusion covering KICKOFF-EXECUTION-PACKET 12-45, 2-45 and ai-tool-agent, S14 and S15",
         "Without approval they stay on the plan before T31"
       ],
-      "approvalRequired": "Owner approval record covering the exclusion (praxis.requirements-approvals/1 written by the owner, RDP-003)",
+      "approvalRequired": "Given: owner approval of docs/OWNER-DECISIONS-2026-10-26.md (indy-init PR #20, OD-INDY-11); the operator's praxis.requirements-approvals/1 file (T09) is still needed for the verifier",
       "sources": [
         {
           "repo": "indy-init",
           "path": "docs/KICKOFF-EXECUTION-PACKET.md",
           "quote": "Structured AI proposal loop works.",
           "verified": true,
-          "detail": "found at c848a18b8da5ac7733882495f5c22ac105860ab7"
+          "detail": "found at 9dc7d575f9d981e2be6f83543e18f548332e1a53"
+        },
+        {
+          "repo": "indy-init",
+          "path": "docs/OWNER-DECISIONS-2026-10-26.md",
+          "quote": "in force from the merge of indy-init pull request #20, which adds this file to main, on the owner's approval of this exact text",
+          "verified": true,
+          "detail": "found at 9dc7d575f9d981e2be6f83543e18f548332e1a53"
+        },
+        {
+          "repo": "indy-init",
+          "path": "docs/OWNER-DECISIONS-2026-10-26.md",
+          "quote": "Rehearsal 4 scope: the structured AI proposal loop and time travel / semantic diff are excluded.",
+          "verified": true,
+          "detail": "found at 9dc7d575f9d981e2be6f83543e18f548332e1a53"
+        },
+        {
+          "repo": "indy-init",
+          "path": "docs/OWNER-DECISIONS-2026-10-26.md",
+          "quote": "The proposal-authority invariant (D-004) and prompt/data boundaries (R11.4) stay in scope.",
+          "verified": true,
+          "detail": "found at 9dc7d575f9d981e2be6f83543e18f548332e1a53"
         }
       ],
       "sourcesVerified": true
@@ -816,10 +866,13 @@
     {
       "id": "DEC-023",
       "title": "Use of R001-derived interfaces at the event",
-      "classification": "unresolved",
+      "classification": "runtime-situational",
       "home": "ordo",
-      "statement": "See F-013.",
-      "constraints": [],
+      "statement": "Owner-approved in docs/OWNER-DECISIONS-2026-10-26.md (indy-init PR #20, OD-INDY-12). Rehearsal 4 may extract interfaces from existing rehearsal source (T14). The event may carry only the documented interface manifest, never source, and only after the organizer confirms (PRE-ORG-01); otherwise it derives interfaces at kickoff from the frozen storage contract and the command/event catalog.",
+      "constraints": [
+        "No rehearsal source is carried to the event",
+        "Event use of the interface manifest needs organizer confirmation (PRE-ORG-01)"
+      ],
       "requirements": [
         "R0.1",
         "ADRP-016"
@@ -837,14 +890,35 @@
         "T14 consumes an existing manifest in R4",
         "Event plan depends on PRE-ORG-01"
       ],
-      "approvalRequired": "Owner decision for R4; organizer confirmation for the event",
+      "approvalRequired": "Given: owner approval of docs/OWNER-DECISIONS-2026-10-26.md (indy-init PR #20, OD-INDY-12); organizer confirmation for the event (PRE-ORG-01)",
       "sources": [
         {
           "repo": "indy-init",
           "path": "docs/REHEARSAL-AGENT-INTERFACE-FREEZE.md",
           "quote": "Extract actual types and exported interfaces from accepted R001 F# source and Limen adapter.",
           "verified": true,
-          "detail": "found at c848a18b8da5ac7733882495f5c22ac105860ab7"
+          "detail": "found at 9dc7d575f9d981e2be6f83543e18f548332e1a53"
+        },
+        {
+          "repo": "indy-init",
+          "path": "docs/OWNER-DECISIONS-2026-10-26.md",
+          "quote": "in force from the merge of indy-init pull request #20, which adds this file to main, on the owner's approval of this exact text",
+          "verified": true,
+          "detail": "found at 9dc7d575f9d981e2be6f83543e18f548332e1a53"
+        },
+        {
+          "repo": "indy-init",
+          "path": "docs/OWNER-DECISIONS-2026-10-26.md",
+          "quote": "Rehearsal 4 may extract interfaces from existing rehearsal source (T14).",
+          "verified": true,
+          "detail": "found at 9dc7d575f9d981e2be6f83543e18f548332e1a53"
+        },
+        {
+          "repo": "indy-init",
+          "path": "docs/OWNER-DECISIONS-2026-10-26.md",
+          "quote": "The event may carry only the documented interface manifest, never source, and only after the organizer confirms (PRE-ORG-01).",
+          "verified": true,
+          "detail": "found at 9dc7d575f9d981e2be6f83543e18f548332e1a53"
         }
       ],
       "sourcesVerified": true
@@ -885,14 +959,14 @@
           "path": "docs/CAUSA-UI-EXPERIENCE-REQUIREMENTS.md",
           "quote": "Before Connect, show an accessible, empty, disconnected workspace with the explicit Connect data repository action (EXT-DATA-002)",
           "verified": true,
-          "detail": "found at c848a18b8da5ac7733882495f5c22ac105860ab7"
+          "detail": "found at 9dc7d575f9d981e2be6f83543e18f548332e1a53"
         },
         {
           "repo": "indy-init",
           "path": "docs/REHEARSAL-EXTERNAL-DATA-BOUNDARY.md",
           "quote": "The active demonstration catalog is the one named by causa-data",
           "verified": true,
-          "detail": "found at c848a18b8da5ac7733882495f5c22ac105860ab7"
+          "detail": "found at 9dc7d575f9d981e2be6f83543e18f548332e1a53"
         }
       ],
       "sourcesVerified": true
@@ -900,16 +974,25 @@
     {
       "id": "DEC-025",
       "title": "User authentication mechanism for the connect flow",
-      "classification": "unresolved",
+      "classification": "fixed-architectural",
       "home": "ordo",
-      "statement": "See F-019.",
-      "constraints": [],
+      "statement": "Owner-approved in docs/OWNER-DECISIONS-2026-10-26.md (indy-init PR #20, OD-INDY-10). Connect takes a fine-grained personal access token for the selected data repository only (Contents read/write, Metadata read, short expiry), held in memory only, re-entered after reload and sent only in the Authorization header. Classic tokens granting repo or admin scopes are refused. Every connection needs a credential; there is no anonymous mode. The CI live job uses the separate CAUSA_GITHUB_TOKEN secret.",
+      "constraints": [
+        "Token scoped to the selected data repository: Contents read/write, Metadata read, short expiry",
+        "Held in memory only: never in localStorage, sessionStorage, IndexedDB, URLs, logs, error text, events or files; re-entered after reload",
+        "Sent only in the Authorization header",
+        "Classic tokens whose X-OAuth-Scopes grant repo or admin scopes are refused",
+        "A credential for every connection; no anonymous mode",
+        "Permission fields are advisory (DC-004)",
+        "Browser credentials and the CI secret CAUSA_GITHUB_TOKEN are separate"
+      ],
       "requirements": [
         "R11.1",
         "EXT-DATA-003"
       ],
       "findings": [
-        "F-019"
+        "F-019",
+        "F-012"
       ],
       "blockerClass": "owner-decision",
       "alternatives": [
@@ -923,14 +1006,14 @@
         "Connect UI: repository, branch, workspace, token field (type=password, autocomplete=off), clear refusal messages",
         "PRE-AUTH-02 verifies the CI token is not a broad classic token"
       ],
-      "approvalRequired": "Owner decision record (security boundary); F-019 and F-012 close with it",
+      "approvalRequired": "Given: owner approval of docs/OWNER-DECISIONS-2026-10-26.md (indy-init PR #20, OD-INDY-10)",
       "sources": [
         {
           "repo": "indy-init",
           "path": "docs/REHEARSAL-EXTERNAL-DATA-BOUNDARY.md",
           "quote": "Prefer short-lived least-privilege tokens or GitHub App authorization.",
           "verified": true,
-          "detail": "found at c848a18b8da5ac7733882495f5c22ac105860ab7"
+          "detail": "found at 9dc7d575f9d981e2be6f83543e18f548332e1a53"
         },
         {
           "repo": "indy-init-rehearsal-003",
@@ -938,6 +1021,27 @@
           "quote": "the anonymous path passes only fully or on GitHub's own exhausted-quota answer",
           "verified": true,
           "detail": "found at bc6eb5b4e3d4ccc11e9f1c39b57276f408caa3b8"
+        },
+        {
+          "repo": "indy-init",
+          "path": "docs/OWNER-DECISIONS-2026-10-26.md",
+          "quote": "in force from the merge of indy-init pull request #20, which adds this file to main, on the owner's approval of this exact text",
+          "verified": true,
+          "detail": "found at 9dc7d575f9d981e2be6f83543e18f548332e1a53"
+        },
+        {
+          "repo": "indy-init",
+          "path": "docs/OWNER-DECISIONS-2026-10-26.md",
+          "quote": "Authentication for Connect: a fine-grained personal access token.",
+          "verified": true,
+          "detail": "found at 9dc7d575f9d981e2be6f83543e18f548332e1a53"
+        },
+        {
+          "repo": "indy-init",
+          "path": "docs/OWNER-DECISIONS-2026-10-26.md",
+          "quote": "Every connection needs a credential; there is no anonymous mode",
+          "verified": true,
+          "detail": "found at 9dc7d575f9d981e2be6f83543e18f548332e1a53"
         }
       ],
       "sourcesVerified": true
@@ -963,7 +1067,7 @@
           "path": "docs/REQUIREMENTS.md",
           "quote": "Invalid transitions and violated invariants must be represented through Aegis-compatible faults rather than hidden exceptions or generic error text.",
           "verified": true,
-          "detail": "found at c848a18b8da5ac7733882495f5c22ac105860ab7"
+          "detail": "found at 9dc7d575f9d981e2be6f83543e18f548332e1a53"
         },
         {
           "repo": "echelon-registry",
@@ -995,7 +1099,7 @@
           "path": "docs/CAUSA-STORAGE-RELEASE-v1.0.0.md",
           "quote": "10.0.402 (rollForward: disable)",
           "verified": true,
-          "detail": "found at c848a18b8da5ac7733882495f5c22ac105860ab7"
+          "detail": "found at 9dc7d575f9d981e2be6f83543e18f548332e1a53"
         },
         {
           "repo": "causa-data",
@@ -1028,7 +1132,7 @@
           "path": "docs/OWNER-DECISIONS-2026-10-24.md",
           "quote": "attested completion needs it alongside Praxis",
           "verified": true,
-          "detail": "found at c848a18b8da5ac7733882495f5c22ac105860ab7"
+          "detail": "found at 9dc7d575f9d981e2be6f83543e18f548332e1a53"
         },
         {
           "repo": "echelon-registry",
@@ -1062,7 +1166,7 @@
           "path": "docs/REHEARSAL-DERIVATION-POLICY.md",
           "quote": "Never use GitHub Issues.",
           "verified": true,
-          "detail": "found at c848a18b8da5ac7733882495f5c22ac105860ab7"
+          "detail": "found at 9dc7d575f9d981e2be6f83543e18f548332e1a53"
         },
         {
           "repo": "praxis",
@@ -1096,14 +1200,14 @@
           "path": "docs/AGENT-DECISION-REDUCTION-PROFILE.md",
           "quote": "Where a library lacks required functionality, implement the smallest isolated adapter.",
           "verified": true,
-          "detail": "found at c848a18b8da5ac7733882495f5c22ac105860ab7"
+          "detail": "found at 9dc7d575f9d981e2be6f83543e18f548332e1a53"
         },
         {
           "repo": "indy-init",
           "path": "docs/REHEARSAL-004-WRITE-PATH-PLAN.md",
           "quote": "R3's typed request book and session nonce are reused designs, not rediscovered ones",
           "verified": true,
-          "detail": "found at c848a18b8da5ac7733882495f5c22ac105860ab7"
+          "detail": "found at 9dc7d575f9d981e2be6f83543e18f548332e1a53"
         }
       ],
       "sourcesVerified": true

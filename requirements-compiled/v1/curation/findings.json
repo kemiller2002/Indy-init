@@ -60,10 +60,10 @@
       "type": "conflict",
       "severity": "major",
       "material": false,
-      "status": "unresolved",
+      "status": "resolved-by-owner",
       "owner": "operator (kemiller2002)",
       "title": "DF-CAUSA-2026-0003 was answered twice; the contrary 2026-10-25 transcription is withdrawn, owner confirmation of OD-INDY-3/4 pending",
-      "description": "Indy-init OD-INDY-3 (explicit Connect, no auto-load) and OD-INDY-4 (GUID routes, case keys as aliases) answer DF-CAUSA-2026-0003; they are agent-recorded acceptances of the owner's 'Do what you recommend' (owner-merged in PR #13). On 2026-10-25 the Rehearsal 3 remediation agent transcribed a later operator reply ('I approve all things') as the opposite answers and wrote approval files. On 2026-10-26 an agent withdrew that transcription (remediation report section 10; DF record 'Withdrawn'), and the owner merged indy-init PR #14 whose REHEARSAL-003-RESULTS.md restates OD-INDY-1..8. No owner-authored statement settles it: OPERATOR-KICKOFF-DECISIONS says the DF-CAUSA-2026-0003 answers must not be inferred, and AR-003 asks for authenticated decisions. This package follows the authoritative indy-init record (DEC-004B, DEC-012) and marks the finding non-material because the R4 plan and every requirement text already agree with OD-INDY-3/4; the owner should confirm in Ordo (RCP-001-03).",
+      "description": "Owner-approved in docs/OWNER-DECISIONS-2026-10-26.md (indy-init PR #20, OD-INDY-13). The owner confirms OD-INDY-3 (explicit Connect, no auto-load) and OD-INDY-4 (GUID routes, case keys as aliases); the Rehearsal 3 transcription of 2026-10-25 stays withdrawn. Before it: Indy-init OD-INDY-3 (explicit Connect, no auto-load) and OD-INDY-4 (GUID routes, case keys as aliases) answer DF-CAUSA-2026-0003; they are agent-recorded acceptances of the owner's 'Do what you recommend' (owner-merged in PR #13). On 2026-10-25 the Rehearsal 3 remediation agent transcribed a later operator reply ('I approve all things') as the opposite answers and wrote approval files. On 2026-10-26 an agent withdrew that transcription (remediation report section 10; DF record 'Withdrawn'), and the owner merged indy-init PR #14 whose REHEARSAL-003-RESULTS.md restates OD-INDY-1..8. No owner-authored statement settles it: OPERATOR-KICKOFF-DECISIONS says the DF-CAUSA-2026-0003 answers must not be inferred, and AR-003 asks for authenticated decisions. This package follows the authoritative indy-init record (DEC-004B, DEC-012) and marks the finding non-material because the R4 plan and every requirement text already agree with OD-INDY-3/4; the owner should confirm in Ordo (RCP-001-03).",
       "requirements": [
         "EXT-DATA-002",
         "EXT-DATA-003",
@@ -120,6 +120,23 @@
           "repo": "indy-init",
           "path": "docs/REHEARSAL-003-RESULTS.md",
           "quote": "Agents must not interpret blanket approvals or write approval files"
+        }
+      ],
+      "resolutionSources": [
+        {
+          "repo": "indy-init",
+          "path": "docs/OWNER-DECISIONS-2026-10-26.md",
+          "quote": "in force from the merge of indy-init pull request #20, which adds this file to main, on the owner's approval of this exact text"
+        },
+        {
+          "repo": "indy-init",
+          "path": "docs/OWNER-DECISIONS-2026-10-26.md",
+          "quote": "Confirmation of OD-INDY-3 and OD-INDY-4."
+        },
+        {
+          "repo": "indy-init",
+          "path": "docs/OWNER-DECISIONS-2026-10-26.md",
+          "quote": "The Rehearsal 3 transcription of 2026-10-25 stays withdrawn"
         }
       ]
     },
@@ -347,10 +364,10 @@
       "type": "ambiguity",
       "severity": "critical",
       "material": true,
-      "status": "unresolved",
+      "status": "resolved-by-owner",
       "owner": "operator (kemiller2002)",
       "title": "Scope and order of the AI proposal loop, time travel and factory proof for Rehearsal 4 and the event",
-      "description": "The kickoff packet (in the baseline) orders 'AI proposals' seventh and time travel ninth, keeps the 'AI proposal authority boundary' (an invariant) on its do-not-cut list, and checkpoints a working structured AI proposal loop at 12:45 and time travel at 2:45. ADRP-012's build order (higher in ADRP-001 precedence than planning documents, if the packet is one) omits both features. OD-INDY-5 makes the long-term platform documents 'and similar' context rather than acceptance obligations; whether that covers AI-ORCHESTRATION is an inference. The R4 plan measures only write milestones. Whether a working AI proposal loop and time travel are P0 for R4/the event cannot be read from the sources; it decides whether T27/T28 are on the plan.",
+      "description": "Owner-approved in docs/OWNER-DECISIONS-2026-10-26.md (indy-init PR #20, OD-INDY-11). The AI proposal loop and time travel (T27, T28) are excluded from Rehearsal 4 and the event scope is decided from its result; D-004 and R11.4 stay in scope. The verifier still needs the operator's approvals file (T09). Before it: The kickoff packet (in the baseline) orders 'AI proposals' seventh and time travel ninth, keeps the 'AI proposal authority boundary' (an invariant) on its do-not-cut list, and checkpoints a working structured AI proposal loop at 12:45 and time travel at 2:45. ADRP-012's build order (higher in ADRP-001 precedence than planning documents, if the packet is one) omits both features. OD-INDY-5 makes the long-term platform documents 'and similar' context rather than acceptance obligations; whether that covers AI-ORCHESTRATION is an inference. The R4 plan measures only write milestones. Whether a working AI proposal loop and time travel are P0 for R4/the event cannot be read from the sources; it decides whether T27/T28 are on the plan.",
       "requirements": [
         "ADRP-012",
         "KICKOFF-EXECUTION-PACKET§12-45",
@@ -390,17 +407,34 @@
           "quote": "They are not acceptance obligations for the event"
         }
       ],
-      "blockerClass": "owner-decision"
+      "blockerClass": "owner-decision",
+      "resolutionSources": [
+        {
+          "repo": "indy-init",
+          "path": "docs/OWNER-DECISIONS-2026-10-26.md",
+          "quote": "in force from the merge of indy-init pull request #20, which adds this file to main, on the owner's approval of this exact text"
+        },
+        {
+          "repo": "indy-init",
+          "path": "docs/OWNER-DECISIONS-2026-10-26.md",
+          "quote": "Rehearsal 4 scope: the structured AI proposal loop and time travel / semantic diff are excluded."
+        },
+        {
+          "repo": "indy-init",
+          "path": "docs/OWNER-DECISIONS-2026-10-26.md",
+          "quote": "The proposal-authority invariant (D-004) and prompt/data boundaries (R11.4) stay in scope."
+        }
+      ]
     },
     {
       "id": "F-009",
       "type": "conflict",
       "severity": "critical",
       "material": true,
-      "status": "unresolved",
+      "status": "resolved-by-owner",
       "owner": "operator (kemiller2002); contract change through causa-data STORAGE-003 process",
       "title": "The frozen storage contract mandates a GitHub write primitive that Rehearsal 2 proved cannot compare-and-swap",
-      "description": "causa-data CONTRACT.md v1.0.0 section 9.4 requires publication by a non-forced ref update (PATCH /git/refs). Rehearsal 2 review 6 proved the REST API cannot compare-and-swap a branch, and on the owner's decision the save became one GraphQL createCommitOnBranch guarded by expectedHeadOid. The frozen contract was not revised, and ADRP-005 makes it the sole wire contract and forbids improvisation. An R4 agent must either follow the contract (re-introducing the publish-over-a-moved-head failure R2 found in its sixth closure review, recorded under DC-005) or deviate from a frozen contract without a version (STORAGE-003).",
+      "description": "Owner-approved in docs/OWNER-DECISIONS-2026-10-26.md (indy-init PR #20, OD-INDY-9). For GitHub, the conforming publication is one GraphQL createCommitOnBranch with expectedHeadOid, as an exception to section 9.4.1 that leaves the v1.0.0 wire format unchanged until causa-storage 1.1.0 (STORAGE-003). Before it: causa-data CONTRACT.md v1.0.0 section 9.4 requires publication by a non-forced ref update (PATCH /git/refs). Rehearsal 2 review 6 proved the REST API cannot compare-and-swap a branch, and on the owner's decision the save became one GraphQL createCommitOnBranch guarded by expectedHeadOid. The frozen contract was not revised, and ADRP-005 makes it the sole wire contract and forbids improvisation. An R4 agent must either follow the contract (re-introducing the publish-over-a-moved-head failure R2 found in its sixth closure review, recorded under DC-005) or deviate from a frozen contract without a version (STORAGE-003).",
       "requirements": [
         "EXT-DATA-006",
         "EXT-DATA-011",
@@ -438,7 +472,24 @@
           "quote": "Changes to frozen contract require explicit versioning and authorization."
         }
       ],
-      "blockerClass": "contract-incompatibility"
+      "blockerClass": "contract-incompatibility",
+      "resolutionSources": [
+        {
+          "repo": "indy-init",
+          "path": "docs/OWNER-DECISIONS-2026-10-26.md",
+          "quote": "in force from the merge of indy-init pull request #20, which adds this file to main, on the owner's approval of this exact text"
+        },
+        {
+          "repo": "indy-init",
+          "path": "docs/OWNER-DECISIONS-2026-10-26.md",
+          "quote": "For GitHub, one semantic command is published as one GraphQL createCommitOnBranch mutation."
+        },
+        {
+          "repo": "indy-init",
+          "path": "docs/OWNER-DECISIONS-2026-10-26.md",
+          "quote": "The non-forced REST ref update is no longer conforming."
+        }
+      ]
     },
     {
       "id": "F-010",
@@ -497,17 +548,19 @@
       "type": "ambiguity",
       "severity": "major",
       "material": true,
-      "status": "unresolved",
+      "status": "resolved-by-owner",
       "owner": "operator (kemiller2002)",
       "title": "Does reading the public historical catalog require a credential?",
-      "description": "STORAGE-004 proposed a private datastore; causa-data is public and holds a public historical catalog. EXT-DATA-003 requires a scoped credential through a secure connection flow, OD-INDY-3 makes the public catalog an explicit choice inside Connect, and EXT-DATA-012 forbids granting data access through publicly readable Pages assets. Whether an unauthenticated read of a public repository is permitted (and how it is labelled) is not stated; the connect flow and its tests depend on it.",
+      "description": "Owner-approved in docs/OWNER-DECISIONS-2026-10-26.md (indy-init PR #20, OD-INDY-10). Every connection, including a read of the public catalog, needs a credential; there is no anonymous mode. Before it: STORAGE-004 proposed a private datastore; causa-data is public and holds a public historical catalog. EXT-DATA-003 requires a scoped credential through a secure connection flow, OD-INDY-3 makes the public catalog an explicit choice inside Connect, and EXT-DATA-012 forbids granting data access through publicly readable Pages assets. Whether an unauthenticated read of a public repository is permitted (and how it is labelled) is not stated; the connect flow and its tests depend on it.",
       "requirements": [
         "STORAGE-004",
         "EXT-DATA-003",
         "EXT-DATA-005",
         "EXT-DATA-012"
       ],
-      "decisions": [],
+      "decisions": [
+        "DEC-025"
+      ],
       "options": [
         "Anonymous read allowed for public repositories, write requires a scoped credential",
         "Credential required for every connection"
@@ -528,6 +581,18 @@
           "path": "README.md",
           "quote": "The historical catalog contains only public historical records"
         }
+      ],
+      "resolutionSources": [
+        {
+          "repo": "indy-init",
+          "path": "docs/OWNER-DECISIONS-2026-10-26.md",
+          "quote": "in force from the merge of indy-init pull request #20, which adds this file to main, on the owner's approval of this exact text"
+        },
+        {
+          "repo": "indy-init",
+          "path": "docs/OWNER-DECISIONS-2026-10-26.md",
+          "quote": "Every connection needs a credential; there is no anonymous mode"
+        }
       ]
     },
     {
@@ -535,10 +600,10 @@
       "type": "ambiguity",
       "severity": "major",
       "material": true,
-      "status": "unresolved",
+      "status": "resolved-by-owner",
       "owner": "operator (kemiller2002) with organizer confirmation (ADRP-016)",
       "title": "Interface freeze extracts types from R001 source; the event starts from a blank repository",
-      "description": "The interface-freeze procedure extracts types and interfaces from accepted R001 F# source, and the storage contract's domain authority is the R001 engine. R0.1 requires the competition implementation to start from a blank repository, STORAGE-008 forbids importing application-specific implementation code, and organizer confirmation is still an open readiness item. For Rehearsal 4 this is permissible preparation; for the event it is undecided whether R001-derived interface manifests and tests may be used.",
+      "description": "Owner-approved in docs/OWNER-DECISIONS-2026-10-26.md (indy-init PR #20, OD-INDY-12). Rehearsal 4 may extract interfaces from rehearsal source. The event carries only the documented interface manifest and only with organizer confirmation (PRE-ORG-01, still open); otherwise it derives interfaces at kickoff. Before it: The interface-freeze procedure extracts types and interfaces from accepted R001 F# source, and the storage contract's domain authority is the R001 engine. R0.1 requires the competition implementation to start from a blank repository, STORAGE-008 forbids importing application-specific implementation code, and organizer confirmation is still an open readiness item. For Rehearsal 4 this is permissible preparation; for the event it is undecided whether R001-derived interface manifests and tests may be used.",
       "requirements": [
         "R0.1",
         "R0.3",
@@ -568,6 +633,23 @@
           "repo": "indy-init",
           "path": "docs/FROZEN-DEMO-STORAGE-REQUIREMENTS.md",
           "quote": "do not import application-specific implementation code into the blank competition repo"
+        }
+      ],
+      "resolutionSources": [
+        {
+          "repo": "indy-init",
+          "path": "docs/OWNER-DECISIONS-2026-10-26.md",
+          "quote": "in force from the merge of indy-init pull request #20, which adds this file to main, on the owner's approval of this exact text"
+        },
+        {
+          "repo": "indy-init",
+          "path": "docs/OWNER-DECISIONS-2026-10-26.md",
+          "quote": "Rehearsal 4 may extract interfaces from existing rehearsal source (T14)."
+        },
+        {
+          "repo": "indy-init",
+          "path": "docs/OWNER-DECISIONS-2026-10-26.md",
+          "quote": "The event may carry only the documented interface manifest, never source, and only after the organizer confirms (PRE-ORG-01)."
         }
       ]
     },
@@ -718,10 +800,10 @@
       "type": "missing-contract",
       "severity": "major",
       "material": true,
-      "status": "unresolved",
+      "status": "resolved-by-owner",
       "owner": "operator (kemiller2002); security review",
       "title": "No authentication contract for the application's user connection flow",
-      "description": "R11.1 requires GitHub authentication, EXT-DATA-004 prefers short-lived least-privilege tokens or GitHub App authorization, D-210 keeps the mechanism reversible, and ADRP lists exact OAuth/Fides integration as still open pending capability and security checks. The R4 plan specifies only the CI secret for the live write job. Which mechanism the browser application uses (fine-grained token entry, GitHub App device flow, OAuth via a broker) is undecided and determines the connect UI, the token lifetime tests and DC-004 (installation tokens omit permissions.push).",
+      "description": "Owner-approved in docs/OWNER-DECISIONS-2026-10-26.md (indy-init PR #20, OD-INDY-10). The connect flow takes a fine-grained personal access token scoped to the data repository, held in memory only and sent only in the Authorization header (CT-017). Before it: R11.1 requires GitHub authentication, EXT-DATA-004 prefers short-lived least-privilege tokens or GitHub App authorization, D-210 keeps the mechanism reversible, and ADRP lists exact OAuth/Fides integration as still open pending capability and security checks. The R4 plan specifies only the CI secret for the live write job. Which mechanism the browser application uses (fine-grained token entry, GitHub App device flow, OAuth via a broker) is undecided and determines the connect UI, the token lifetime tests and DC-004 (installation tokens omit permissions.push).",
       "requirements": [
         "R11.1",
         "R11.2",
@@ -745,6 +827,18 @@
           "repo": "indy-init",
           "path": "docs/AGENT-DECISION-REDUCTION-PROFILE.md",
           "quote": "Exact production OAuth/Fides integration, provider deployment topology, and physical local browser durability require capability/security checks before selecting a concrete adapter."
+        }
+      ],
+      "resolutionSources": [
+        {
+          "repo": "indy-init",
+          "path": "docs/OWNER-DECISIONS-2026-10-26.md",
+          "quote": "in force from the merge of indy-init pull request #20, which adds this file to main, on the owner's approval of this exact text"
+        },
+        {
+          "repo": "indy-init",
+          "path": "docs/OWNER-DECISIONS-2026-10-26.md",
+          "quote": "Authentication for Connect: a fine-grained personal access token."
         }
       ]
     },

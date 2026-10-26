@@ -1,6 +1,6 @@
 # Owner decision requests for Rehearsal 4
 
-**Status:** REQUESTED. None of these is approved. An agent wrote this document; it decides nothing (RDP-003, AR-003, OD-INDY-7).
+**Status:** DECIDED, except item 7, which needs no action. Items 1 and 2 were decided by the owner-approved merge of #18. Items 3 to 6 and the F-002 residual are decided by OD-INDY-9 to OD-INDY-13 (`docs/OWNER-DECISIONS-2026-10-26.md`), which the owner approved in #20. An agent wrote this document; it decides nothing (RDP-003, AR-003, OD-INDY-7).
 
 **How to approve.** Record an approval in an owner-authored form: an owner commit to an OWNER-DECISIONS addendum, or an Ordo decision. Each request below names the record it needs.
 
@@ -19,15 +19,15 @@ The machine-readable form of every request is in `decision-registry.json`: the f
 |---|---|---|---|
 | 1 | DEC-024 / F-001: what the launch view shows | **APPROVED 2026-10-26:** owner merge of #18 (c848a18) | Given |
 | 2 | F-003: baseline re-pin | **APPROVED 2026-10-26:** owner merge of #18. The baseline is at c751d58 with 461 requirements; re-pin again at the kickoff commit (T01). | Given |
-| 3 | DEC-006 / F-009: GitHub write primitive | Owner exception, with the text in `CONTRACT-RESOLUTION.md` §1. Version the causa-data contract (1.1.0) after the event. | Owner-authored decision naming DEC-006 and F-009 |
-| 4 | DEC-025 / F-019 / F-012: authentication | A fine-grained personal access token, scoped to the data repository, entered in Connect and held in memory. A credential is required for every connection. | Owner decision record (security boundary) |
-| 5 | DEC-022 / F-008: AI proposal loop and time travel | Exclude both from Rehearsal 4, with approval. Keep the proposal-authority invariant (D-004, R11.4). | Owner approval records covering the exclusion (`praxis.requirements-approvals/1`, owner-written) |
-| 6 | DEC-023 / F-013: interfaces from earlier rehearsals | Allowed for Rehearsal 4. At the event, carry the documented manifest only, subject to the organizer. | Owner decision; organizer confirmation for the event (PRE-ORG-01) |
+| 3 | DEC-006 / F-009: GitHub write primitive | **DECIDED: OD-INDY-9.** Owner exception, with the text in `CONTRACT-RESOLUTION.md` §1. Version the causa-data contract (1.1.0) after the event. | Given (OD-INDY-9) |
+| 4 | DEC-025 / F-019 / F-012: authentication | **DECIDED: OD-INDY-10.** A fine-grained personal access token, scoped to the data repository, entered in Connect and held in memory. A credential is required for every connection. | Given (OD-INDY-10) |
+| 5 | DEC-022 / F-008: AI proposal loop and time travel | **DECIDED: OD-INDY-11.** Exclude both from Rehearsal 4. Keep the proposal-authority invariant (D-004, R11.4). | Given (OD-INDY-11). The operator still writes the `praxis.requirements-approvals/1` file for the verifier (T09). |
+| 6 | DEC-023 / F-013: interfaces from earlier rehearsals | **DECIDED: OD-INDY-12.** Allowed for Rehearsal 4. At the event, carry the documented manifest only, subject to the organizer. | Given (OD-INDY-12); organizer confirmation for the event is still needed (PRE-ORG-01) |
 | 7 | F-007: agent topology | No action needed: Plan B (one lead plus a fresh reviewer) is the default. Plan A's parallel lanes need approval only if wanted. | Only if Plan A is chosen |
 
 Not blocking, but recommended:
 - **F-010 / F-011:** give a priority to the requirements that have none, and say whether UI-037's "[P0, competition profile]" is P0 for Rehearsal 4.
-- **F-002 residual:** confirm OD-INDY-3/4 in an authenticated record.
+- **F-002 residual:** DECIDED: OD-INDY-13 confirms OD-INDY-3/4.
 
 ## 1. DEC-024: launch content (F-001, F-006)
 

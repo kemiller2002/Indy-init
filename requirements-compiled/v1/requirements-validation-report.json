@@ -2,8 +2,8 @@
   "schema": "indy-init.requirements-validation-report/1",
   "source": {
     "repository": "kemiller2002/indy-init",
-    "commit": "c848a18b8da5ac7733882495f5c22ac105860ab7",
-    "baselineSha256": "f76e67ffedb49324a80b4929058ec119c16cdc5b8bae276d80bfcec09ec30f8c"
+    "commit": "9dc7d575f9d981e2be6f83543e18f548332e1a53",
+    "baselineSha256": "b768e6f0de1014324be04d0b615c720892d121f68e2f1ec97195d74144b13a16"
   },
   "compilationVerdict": "PASS",
   "compilationRule": "FAIL when any critical check reports a problem; the compiler then exits 3",
@@ -149,62 +149,6 @@
         "recommendation": ""
       },
       {
-        "kind": "finding",
-        "id": "F-008",
-        "title": "Scope and order of the AI proposal loop, time travel and factory proof for Rehearsal 4 and the event",
-        "blockerClass": "owner-decision",
-        "owner": "operator (kemiller2002)",
-        "recommendation": ""
-      },
-      {
-        "kind": "finding",
-        "id": "F-009",
-        "title": "The frozen storage contract mandates a GitHub write primitive that Rehearsal 2 proved cannot compare-and-swap",
-        "blockerClass": "contract-incompatibility",
-        "owner": "operator (kemiller2002); contract change through causa-data STORAGE-003 process",
-        "recommendation": ""
-      },
-      {
-        "kind": "decision",
-        "id": "DEC-006",
-        "title": "GitHub write primitive: contract's non-forced ref PATCH versus R2's guarded GraphQL commit",
-        "blockerClass": "contract-incompatibility",
-        "owner": "Owner-authored record (Ordo decision or owner commit to an OWNER-DECISIONS addendum) naming DEC-006 and F-009; agents do not write it (RDP-003, AR-003)",
-        "recommendation": "(a) for Rehearsal 4 and the event; (b) after the event. (a) changes no data format, schema identity or fixture, needs no upstream release, and keeps optimistic concurrency (the decision's base commit stays the concurrency token, a moved head is refused and handled as a conflict). The exact amendment text is in readiness/CONTRACT-RESOLUTION.md."
-      },
-      {
-        "kind": "decision",
-        "id": "DEC-022",
-        "title": "AI proposal loop and time travel in Rehearsal 4 / event scope",
-        "blockerClass": "owner-decision",
-        "owner": "Owner approval record covering the exclusion (praxis.requirements-approvals/1 written by the owner, RDP-003)",
-        "recommendation": "(b). Rehearsal 4's question is the write path within 420 minutes and it measures only write milestones; the kickoff packet's do-not-cut list names the AI proposal authority boundary (an invariant), not the loop. Excluding the two features removes two timed tasks without removing any invariant."
-      },
-      {
-        "kind": "decision",
-        "id": "DEC-023",
-        "title": "Use of R001-derived interfaces at the event",
-        "blockerClass": "owner-decision",
-        "owner": "Owner decision for R4; organizer confirmation for the event",
-        "recommendation": "(a). It keeps T14 short in Rehearsal 4 and lets the organizer rule on the event without blocking the rehearsal. If the organizer refuses, the event uses (b)."
-      },
-      {
-        "kind": "decision",
-        "id": "DEC-025",
-        "title": "User authentication mechanism for the connect flow",
-        "blockerClass": "owner-decision",
-        "owner": "Owner decision record (security boundary); F-019 and F-012 close with it",
-        "recommendation": "(a), with a credential required for every connection (no anonymous mode: Rehearsal 3 hit GitHub's exhausted anonymous quota). It needs no service, works in iPad Safari (plain fetch with an Authorization header; api.github.com answers Access-Control-Allow-Origin: *), and keeps least privilege. The CI live job uses the separate CAUSA_GITHUB_TOKEN Actions secret, never the browser path."
-      },
-      {
-        "kind": "contract-blocked",
-        "id": "CT-007",
-        "title": "GitHub write primitive (atomic, guarded publication)",
-        "blockerClass": "contract-incompatibility",
-        "owner": "",
-        "recommendation": ""
-      },
-      {
         "kind": "contract-blocked",
         "id": "CT-012",
         "title": "Percepta semantic CLI: contract and evidence schemas",
@@ -225,14 +169,6 @@
         "id": "CT-016",
         "title": "Kickoff release-set lock",
         "blockerClass": "external-dependency",
-        "owner": "",
-        "recommendation": ""
-      },
-      {
-        "kind": "contract-missing",
-        "id": "CT-017",
-        "title": "Authentication and authorization boundary for the connect flow",
-        "blockerClass": "owner-decision",
         "owner": "",
         "recommendation": ""
       }

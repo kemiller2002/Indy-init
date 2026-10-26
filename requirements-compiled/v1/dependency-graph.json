@@ -917,7 +917,7 @@
     },
     {
       "id": "T27",
-      "title": "Structured AI proposal loop (scope pending F-008)",
+      "title": "Structured AI proposal loop (excluded from Rehearsal 4 by OD-INDY-11)",
       "owner": "domain",
       "kind": "implementation",
       "satisfiedBy": "new-implementation",
@@ -947,7 +947,7 @@
     },
     {
       "id": "T28",
-      "title": "History, time travel and semantic diff (scope pending F-008)",
+      "title": "History, time travel and semantic diff (excluded from Rehearsal 4 by OD-INDY-11)",
       "owner": "ui",
       "kind": "implementation",
       "satisfiedBy": "new-implementation",

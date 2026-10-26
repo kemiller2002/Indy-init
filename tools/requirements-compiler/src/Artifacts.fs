@@ -633,6 +633,7 @@ let timedExecutionManifest (c: Compiled) (plan: PlanSpec) =
                   "dependsOn", jstrs (t.DependsOn |> List.filter (fun d -> byId.[d.Task].Phase = "timed") |> List.map (fun d -> d.Task))
                   "preflightPrerequisites", jstrs (t.DependsOn |> List.filter (fun d -> byId.[d.Task].Phase <> "timed") |> List.map (fun d -> d.Task))
                   "conditionalOn", jopt JStr t.ConditionalOn
+                  "excludedBy", jopt JStr t.ExcludedBy
                   "ciRun", JBool(plan.CiTriggerKinds.Contains t.Kind)
                   "requirementsCovered", jint reqs.Length
                   "p0RequirementsCovered", jint (reqs |> List.filter (fun r -> priority.[r] = "P0") |> List.length)
@@ -651,6 +652,7 @@ let timedExecutionManifest (c: Compiled) (plan: PlanSpec) =
                     "ceilingMinutes", jint 420
                     "stopRule", JStr "stop when the computed verdict is ACCEPTED, or at 420 minutes (R4-07)" ]
               "preconditions", JStr "Every check in preflight-manifest.json is PASS, or NOT_RUN only for PRE-ORG-01 (event-only)."
+              "exclusions", JStr "A task with excludedBy stays on the plan until the operator's approvals file (T09) covers the exclusion; agents do not write that file (AR-003, RDP-003)."
               "milestones",
               JArr
                   [ JObj [ "milestone", JStr "first green CI"; "task", JStr "T10" ]
