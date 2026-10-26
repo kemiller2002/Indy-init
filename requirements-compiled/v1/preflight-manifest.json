@@ -11,9 +11,9 @@
     "requires-execution": "only `requirements-compiler preflight` can decide it; see readiness/evidence"
   },
   "summary": {
-    "BLOCKED": 3,
+    "BLOCKED": 2,
     "NOT_RUN": 3,
-    "PASS": 1,
+    "PASS": 2,
     "requires-execution": 10
   },
   "checks": [
@@ -73,8 +73,8 @@
         "DEC-024",
         "DEC-025"
       ],
-      "packageStatus": "BLOCKED",
-      "detail": "unresolved: DEC-006, DEC-022, DEC-023, DEC-025"
+      "packageStatus": "PASS",
+      "detail": "no unresolved decision"
     },
     {
       "id": "PRE-DEC-02",
@@ -96,7 +96,7 @@
         "F-009"
       ],
       "packageStatus": "BLOCKED",
-      "detail": "open: F-004, F-005, F-008, F-009"
+      "detail": "open: F-004, F-005"
     },
     {
       "id": "PRE-DEP-01",
@@ -139,7 +139,7 @@
         "CT-016"
       ],
       "packageStatus": "BLOCKED",
-      "detail": "blocked: CT-007, CT-012, CT-013, CT-016"
+      "detail": "blocked: CT-012, CT-013, CT-016"
     },
     {
       "id": "PRE-DEP-03",

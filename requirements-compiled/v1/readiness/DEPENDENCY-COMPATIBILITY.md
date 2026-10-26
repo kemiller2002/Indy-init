@@ -16,7 +16,7 @@ Observed 2026-10-26 from `git ls-remote` and the Registry's main branch (`2d6338
 | Folio | 0.4.0 | **v0.4.1** | The set pins 0.4.0. v0.4.1 is tagged but not assessed (F-015, VER-001/002). Assess it in 1.28.0. |
 | Aegis | 1.0.0 | — | 2.0.0 is pending and outside the profile range |
 | Conditor | qualified the set as 0.10.11 | v0.10.11 | **The SD-1 fix (CON-367) is released** (PRE-TOOL-02 PASS). Bootstrap without the workaround is still to be shown (PRE-TOOL-03, T10). |
-| causa storage contract | (not in the Registry, F-016) | causa-storage-v1.0.0 | Identities match (PRE-DEP-03 PASS). The §9.4.1 mechanism is contested (F-009). |
+| causa storage contract | (not in the Registry, F-016) | causa-storage-v1.0.0 | Identities match (PRE-DEP-03 PASS). For GitHub, the §9.4.1 mechanism is replaced by the owner exception OD-INDY-9 (F-009). |
 | causa historical catalog | (not in the Registry) | historical-v1 (`22260f4`) | Manifest identity matches (PRE-DEP-03 PASS) |
 | .NET SDK | — | 10.0.402 | Pinned in the root `global.json`, and installed locally (PRE-TOOL-01 PASS). The CI job `fsharp-tooling` installs it from `global.json`. |
 

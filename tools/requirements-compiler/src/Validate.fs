@@ -347,6 +347,7 @@ let private manifestsValid (i: Inputs) =
               c.Curation.Findings |> List.map (str "id") |> Set.ofList
               c.Curation.Decisions |> List.map (str "id") |> Set.ofList
               c.Curation.Contracts |> List.map (str "id") |> Set.ofList ]
+    let decisionClass = c.Curation.Decisions |> List.map (fun d -> str "id" d, str "classification" d) |> Map.ofList
     let checkTypes = set [ "package-state"; "baseline-pinned"; "sdk-pinned"; "secret-scan"; "git-ref-contains"; "registry-set-contains"; "env-present"; "github-auth-contract"; "manual" ]
     let timed = i.Outputs.["timed-execution-manifest.json"]
     let timedSteps = arr "tasks" timed |> List.map (fun t -> str "id" t, intOpt "step" t |> Option.defaultValue 0L) |> Map.ofList
@@ -366,6 +367,10 @@ let private manifestsValid (i: Inputs) =
                   | _ -> ()
           match t.ConditionalOn with
           | Some d when not (known.Contains d) -> yield sprintf "%s is conditional on unknown %s" t.Id d
+          | _ -> ()
+          match t.ExcludedBy with
+          | Some d when t.ConditionalOn <> Some d -> yield sprintf "%s is excluded by %s but not conditional on it" t.Id d
+          | Some d when decisionClass.TryFind d |> Option.forall ((=) "unresolved") -> yield sprintf "%s is excluded by %s, which is not decided" t.Id d
           | _ -> ()
       if (List.distinct checkIds).Length <> checkIds.Length then yield "duplicate preflight check id"
       if (arr "checks" pre).Length <> checkIds.Length then yield "preflight manifest does not list every check"

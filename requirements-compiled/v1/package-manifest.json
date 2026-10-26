@@ -3,15 +3,15 @@
   "package": "requirements-compiled/v1",
   "source": {
     "repository": "kemiller2002/indy-init",
-    "commit": "c848a18b8da5ac7733882495f5c22ac105860ab7",
-    "baselineId": "BL-CAUSA-INDY-INIT-c848a18b8da5",
-    "baselineSha256": "f76e67ffedb49324a80b4929058ec119c16cdc5b8bae276d80bfcec09ec30f8c",
+    "commit": "0054221c5c8fa7d665a3537923784ff0d1607cd3",
+    "baselineId": "BL-CAUSA-INDY-INIT-0054221c5c8f",
+    "baselineSha256": "d1f715409c8c3087ad421f2011f06825b31167b92944e410e92e72f1b4bca285",
     "baselineGenerator": "requirements-compiler baseline (F# port; byte-equivalent to tools/build-requirements-baseline.py)"
   },
   "repositories": [
     {
       "name": "indy-init",
-      "commit": "c848a18b8da5ac7733882495f5c22ac105860ab7",
+      "commit": "0054221c5c8fa7d665a3537923784ff0d1607cd3",
       "role": "primary: authoritative requirements (source commit of this package)"
     },
     {
@@ -165,11 +165,11 @@
   "inputs": [
     {
       "path": "curation/contracts.json",
-      "sha256": "4a605bfbc2f1f532d260a9e2ef49dc7a8daf50f6224cf48e4ad803b0ee586cf8"
+      "sha256": "44cea0d67a4c41450bf8e19489870dcbd0bb34cdbec61f0394dab9b9c5fe0dee"
     },
     {
       "path": "curation/decisions.json",
-      "sha256": "37ee4582ce6eed368841c9a9964f090a14fc90f2d883b165aaf54ff665f75bbb"
+      "sha256": "cb52f062cb1d8d403bcd705cbae6350c1d036abab05f147136acb5c620eb1a42"
     },
     {
       "path": "curation/defect-class-tests.json",
@@ -185,7 +185,7 @@
     },
     {
       "path": "curation/findings.json",
-      "sha256": "f663bbdb393386800068946a37b7e735369cc173779bca20bf6de8f3b1db34b8"
+      "sha256": "c534e6a00e25e8cab33582a603691b7b5319fecc90c442e054005c5c82f152ab"
     },
     {
       "path": "curation/preflight-checks.json",
@@ -193,11 +193,11 @@
     },
     {
       "path": "curation/sources.json",
-      "sha256": "d5ea86b89d556d7d3462e5a67445e9290b0f8e8b42526340770ed58777f1cffe"
+      "sha256": "777c6a09c5ef33dedf02bf420e616b0223d85fc6bd4f856fb2f5c4daba473cfb"
     },
     {
       "path": "curation/tasks.json",
-      "sha256": "abd2791f1ec3c44fb122b3da42f33bb9d2e6f5e1c37656efdf5778361b489f67"
+      "sha256": "32369e0e65df85ebacbe5a76ae2fc3b29fcc448467fb12f0cb24e204992c499b"
     },
     {
       "path": "curation/verification-rules.json",
@@ -207,7 +207,7 @@
   "authored": [
     {
       "path": "README.md",
-      "sha256": "4c473577033d75c00247d6ad56104047d1e5d4924fa87edcbc6757bbc6144534"
+      "sha256": "6c52fa735560fe8f774bd88960208dabaeaf54fe1216600a174fd7378ede0451"
     },
     {
       "path": "optimization-analysis.md",
@@ -215,15 +215,15 @@
     },
     {
       "path": "readiness/READINESS-REPORT.md",
-      "sha256": "5baa6a2366368ca5b0db00fc4bd9a2e2b05e34403b31a82aadc5b3182a291ec0"
+      "sha256": "5640400f338936b25a428f7dbc9fe3e0e0f3bd78e586f91709daf5214bbe95c8"
     },
     {
       "path": "readiness/OWNER-DECISION-REQUESTS.md",
-      "sha256": "3d5bb1142bec99bab02b97023ff96b8189e61415ef6ccf7cb4d1658939d39a88"
+      "sha256": "4e5db48c89303d3f1a50cbd3d255dbc67f403b1e168b7715db42da22657d8996"
     },
     {
       "path": "readiness/CONTRACT-RESOLUTION.md",
-      "sha256": "de2ab06194c3e0c23de483e9ceb67f97801d624e21eb796a21a2e9d7f4adf627"
+      "sha256": "31ca01450a8a3f620e7f46acc14a5bb35f7bdc84bb186d4c8b00d2d4e6d12997"
     },
     {
       "path": "readiness/FSHARP-TOOLING-ASSESSMENT.md",
@@ -231,21 +231,21 @@
     },
     {
       "path": "readiness/DEPENDENCY-COMPATIBILITY.md",
-      "sha256": "4ff3d8932837b9f14beb27ab2ecb7c522b8d51dd7bbc6c87c5145a2ebd700b69"
+      "sha256": "1b47a9e1722fb9871b495a9769501d1304c46983bbf749458c61575dd3b79e2f"
     }
   ],
   "generated": [
     {
       "path": "contract-bindings.json",
-      "sha256": "d9be0dbcd1e8b20d899cc48eea24c119d6322f2c64ccc4babd2f39617fa5c543"
+      "sha256": "82213f0cb9acd3987600fe24fe24067755f25c0ef09a128612173c440f25a002"
     },
     {
       "path": "decision-registry.json",
-      "sha256": "437acc7ccec9254316590897ef2c2b3b93ab365a0cf840aa3695e6ce061667a9"
+      "sha256": "fb08d5e11fc5046e825c24ecc1cfa8ec6e9f2d0264fcb5136535b9d6e2ce0f0f"
     },
     {
       "path": "dependency-graph.json",
-      "sha256": "e7b66dd2e9982af0139eabb6137387c829ed37f64a74a1d2d0c603ef388a1e7f"
+      "sha256": "ca410ff48eeb60b048eaa66da9037167725456c4f0d4d66fca01fda2ccf70ab7"
     },
     {
       "path": "execution-plan-resource.json",
@@ -257,7 +257,7 @@
     },
     {
       "path": "normalized-requirements.json",
-      "sha256": "9dcb7452401f84904ce404b41a45019844f1af553e45281f04e5a1e4ff87cd86"
+      "sha256": "6c6d673f971821f7d9b694668349adc5f970cbe5fb1e65508cfae46b99fb4727"
     },
     {
       "path": "percepta-experiment.json",
@@ -265,23 +265,23 @@
     },
     {
       "path": "preflight-manifest.json",
-      "sha256": "ba69faa1682d531fe4cca2b9bb7263b6873ed8ddfc2d2e504028a15d12615de0"
+      "sha256": "9b448d13e6e561914f91d3b2636ada22fc1ea4818ea2d35e9422eba5e1ed9f48"
     },
     {
       "path": "requirements-inventory.json",
-      "sha256": "fcecc19c6b4987d58188a8c0dd1437c34c791a47bc95a1d13fb945123d94a380"
+      "sha256": "cd03ed4963297ed0df4d2d55533ecb1f672898e2d25c77663f86b080124486f6"
     },
     {
       "path": "requirements-source-map.json",
-      "sha256": "cdcb9d6edba6cc058e8053f81d92fc913b221bb778050479e3ff6ac9174e025c"
+      "sha256": "4ba4b8d5341200d37199271d1986796cdef07328f3ff2a04acc60a5ab7f68c4b"
     },
     {
       "path": "requirements-validation-report.json",
-      "sha256": "c06db11b24f5fe05b56c1c12baffb003fece46e5238a67ccb13917fe69cf81d2"
+      "sha256": "a058d056844573a38c98d96f401771ff785ddfd54c18f03d968f0ec3de85e0b7"
     },
     {
       "path": "timed-execution-manifest.json",
-      "sha256": "d6308f4dbe9c72f2c6a59d98db20365395fbc214220af74efb7ec16c998b635a"
+      "sha256": "563977aebe87c7bf32fd264bb4b74dd7776cf2f14db94ae9292a67f28eeba009"
     },
     {
       "path": "verification-manifest.json",

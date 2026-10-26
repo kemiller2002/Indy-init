@@ -46,6 +46,7 @@ type WorkTask =
       Decisions: string list
       Phase: string
       ConditionalOn: string option
+      ExcludedBy: string option
       Raw: Json }
 
 type VerificationRule =
@@ -97,6 +98,7 @@ let taskOf (j: Json) : WorkTask =
       Decisions = strs "decisions" j
       Phase = strOpt "phase" j |> Option.defaultValue ""
       ConditionalOn = strOpt "conditionalOn" j
+      ExcludedBy = strOpt "excludedBy" j
       Raw = j }
 
 let ruleOf (j: Json) : VerificationRule =

@@ -7,10 +7,10 @@
     "blocked": "cannot be verified until a named precondition is met"
   },
   "summary": {
-    "blocked": 4,
+    "blocked": 3,
     "identity-verified": 2,
-    "missing": 7,
-    "unverified": 5
+    "missing": 6,
+    "unverified": 7
   },
   "contracts": [
     {
@@ -42,7 +42,7 @@
           "path": "docs/REHEARSAL-AGENT-INTERFACE-FREEZE.md",
           "quote": "Input MUST include investigation ID, actor/provenance, typed command, expected aggregate version",
           "verified": true,
-          "detail": "found at c848a18b8da5ac7733882495f5c22ac105860ab7"
+          "detail": "found at 0054221c5c8fa7d665a3537923784ff0d1607cd3"
         }
       ],
       "identityResults": []
@@ -73,7 +73,7 @@
           "path": "docs/REHEARSAL-AGENT-INTERFACE-FREEZE.md",
           "quote": "A single immutable projection identifies investigation, aggregate version, lifecycle",
           "verified": true,
-          "detail": "found at c848a18b8da5ac7733882495f5c22ac105860ab7"
+          "detail": "found at 0054221c5c8fa7d665a3537923784ff0d1607cd3"
         }
       ],
       "identityResults": []
@@ -103,7 +103,7 @@
           "path": "docs/REHEARSAL-AGENT-INTERFACE-FREEZE.md",
           "quote": "No alternative browser-only validator.",
           "verified": true,
-          "detail": "found at c848a18b8da5ac7733882495f5c22ac105860ab7"
+          "detail": "found at 0054221c5c8fa7d665a3537923784ff0d1607cd3"
         }
       ],
       "identityResults": []
@@ -136,7 +136,7 @@
           "path": "docs/REHEARSAL-AGENT-INTERFACE-FREEZE.md",
           "quote": "Provider-neutral operations: load, append with expected version, acknowledge remote persistence, surface conflict, and recover local edits.",
           "verified": true,
-          "detail": "found at c848a18b8da5ac7733882495f5c22ac105860ab7"
+          "detail": "found at 0054221c5c8fa7d665a3537923784ff0d1607cd3"
         }
       ],
       "identityResults": []
@@ -167,7 +167,7 @@
           "path": "docs/REHEARSAL-AGENT-INTERFACE-FREEZE.md",
           "quote": "Report rendering cannot elevate an unverified hypothesis to a confirmed cause.",
           "verified": true,
-          "detail": "found at c848a18b8da5ac7733882495f5c22ac105860ab7"
+          "detail": "found at 0054221c5c8fa7d665a3537923784ff0d1607cd3"
         }
       ],
       "identityResults": []
@@ -229,7 +229,7 @@
           "path": "docs/CAUSA-STORAGE-RELEASE-v1.0.0.md",
           "quote": "0a68af8c93190d2e4d6c27beb2f8cb67c3aebdda586d01beb7122b71af179152",
           "verified": true,
-          "detail": "found at c848a18b8da5ac7733882495f5c22ac105860ab7"
+          "detail": "found at 0054221c5c8fa7d665a3537923784ff0d1607cd3"
         }
       ],
       "identityResults": [
@@ -276,22 +276,20 @@
       "name": "GitHub write primitive (atomic, guarded publication)",
       "provider": "GitHub API",
       "consumer": "GitHub persistence provider",
-      "contractVersion": "contested: CONTRACT.md 9.4 (non-forced ref PATCH) versus R2 owner decision (GraphQL createCommitOnBranch with expectedHeadOid)",
+      "contractVersion": "causa-storage v1.0.0 with the owner exception to section 9.4.1 (OD-INDY-9): GraphQL createCommitOnBranch with expectedHeadOid",
       "requiredCompatibility": "atomic three-file publication refused on a moved head; success only after a re-read at the new head",
       "verificationMethod": "recorded real-provider conformance (including race and stale-read variants) and the live conflict test (G6)",
       "dependencyVersions": [
-        "GitHub GraphQL createCommitOnBranch",
-        "GitHub REST git refs"
+        "GitHub GraphQL createCommitOnBranch"
       ],
       "evidenceIdentity": "live job run id, commit SHAs, independent re-read",
-      "status": "blocked",
+      "status": "unverified",
       "requirements": [
         "EXT-DATA-006",
         "STORAGE-006",
         "R10.4"
       ],
       "identity": [],
-      "blockerClass": "contract-incompatibility",
       "citations": [
         {
           "repo": "causa-data",
@@ -306,6 +304,13 @@
           "quote": "which GitHub applies atomically or refuses",
           "verified": true,
           "detail": "found at b053d1da4ef533fba7d6728c369c58a29a1e2440"
+        },
+        {
+          "repo": "indy-init",
+          "path": "docs/OWNER-DECISIONS-2026-10-26.md",
+          "quote": "For GitHub, one semantic command is published as one GraphQL createCommitOnBranch mutation.",
+          "verified": true,
+          "detail": "found at 0054221c5c8fa7d665a3537923784ff0d1607cd3"
         }
       ],
       "identityResults": []
@@ -450,7 +455,7 @@
           "path": "docs/REHEARSAL-DEPENDENCY-LOCK.md",
           "quote": "Folio printing",
           "verified": true,
-          "detail": "found at c848a18b8da5ac7733882495f5c22ac105860ab7"
+          "detail": "found at 0054221c5c8fa7d665a3537923784ff0d1607cd3"
         }
       ],
       "identityResults": []
@@ -512,7 +517,7 @@
           "path": "docs/REHEARSAL-DERIVATION-POLICY.md",
           "quote": "The gate is praxis requirements preservation verify",
           "verified": true,
-          "detail": "found at c848a18b8da5ac7733882495f5c22ac105860ab7"
+          "detail": "found at 0054221c5c8fa7d665a3537923784ff0d1607cd3"
         }
       ],
       "identityResults": []
@@ -572,21 +577,21 @@
           "path": "docs/REHEARSAL-ACCEPTANCE-LEDGER.md",
           "quote": "derives ACCEPTED, INCOMPLETE, BLOCKED, FAILED or INVALID from the ledger",
           "verified": true,
-          "detail": "found at c848a18b8da5ac7733882495f5c22ac105860ab7"
+          "detail": "found at 0054221c5c8fa7d665a3537923784ff0d1607cd3"
         },
         {
           "repo": "indy-init",
           "path": "docs/REHEARSAL-ACCEPTANCE-LEDGER.md",
           "quote": "inline approvals are forbidden",
           "verified": true,
-          "detail": "found at c848a18b8da5ac7733882495f5c22ac105860ab7"
+          "detail": "found at 0054221c5c8fa7d665a3537923784ff0d1607cd3"
         },
         {
           "repo": "indy-init",
           "path": "docs/REHEARSAL-ACCEPTANCE-LEDGER.md",
           "quote": "Agent-authored approvals in the ledger and untrusted operator identities are invalid.",
           "verified": true,
-          "detail": "found at c848a18b8da5ac7733882495f5c22ac105860ab7"
+          "detail": "found at 0054221c5c8fa7d665a3537923784ff0d1607cd3"
         }
       ],
       "identityResults": []
@@ -626,16 +631,16 @@
     {
       "id": "CT-017",
       "name": "Authentication and authorization boundary for the connect flow",
-      "provider": "GitHub (token or App authorization)",
+      "provider": "GitHub (fine-grained personal access token)",
       "consumer": "connect flow, GitHub provider",
-      "contractVersion": "undecided (F-019)",
+      "contractVersion": "OD-INDY-10: fine-grained personal access token for the selected data repository, in memory only, Authorization header only (readiness/CONTRACT-RESOLUTION.md section 2)",
       "requiredCompatibility": "least privilege; repository and branch permission checks before any write; never infer authority from advisory fields such as permissions.push (R2 DC-004)",
       "verificationMethod": "denial without authorization, rejected-token and insufficient-scope live tests (EXT-DATA-009, R4-02)",
       "dependencyVersions": [
         "GitHub API"
       ],
       "evidenceIdentity": "live job run id",
-      "status": "missing",
+      "status": "unverified",
       "requirements": [
         "R11.1",
         "R11.2",
@@ -644,14 +649,20 @@
         "EXT-DATA-005"
       ],
       "identity": [],
-      "blockerClass": "owner-decision",
       "citations": [
         {
           "repo": "indy-init",
           "path": "docs/REHEARSAL-EXTERNAL-DATA-BOUNDARY.md",
           "quote": "A token alone is not sufficient to infer a safe repository target.",
           "verified": true,
-          "detail": "found at c848a18b8da5ac7733882495f5c22ac105860ab7"
+          "detail": "found at 0054221c5c8fa7d665a3537923784ff0d1607cd3"
+        },
+        {
+          "repo": "indy-init",
+          "path": "docs/OWNER-DECISIONS-2026-10-26.md",
+          "quote": "Authentication for Connect: a fine-grained personal access token.",
+          "verified": true,
+          "detail": "found at 0054221c5c8fa7d665a3537923784ff0d1607cd3"
         }
       ],
       "identityResults": []

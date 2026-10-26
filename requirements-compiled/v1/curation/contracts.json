@@ -210,15 +210,14 @@
       "name": "GitHub write primitive (atomic, guarded publication)",
       "provider": "GitHub API",
       "consumer": "GitHub persistence provider",
-      "contractVersion": "contested: CONTRACT.md 9.4 (non-forced ref PATCH) versus R2 owner decision (GraphQL createCommitOnBranch with expectedHeadOid)",
+      "contractVersion": "causa-storage v1.0.0 with the owner exception to section 9.4.1 (OD-INDY-9): GraphQL createCommitOnBranch with expectedHeadOid",
       "requiredCompatibility": "atomic three-file publication refused on a moved head; success only after a re-read at the new head",
       "verificationMethod": "recorded real-provider conformance (including race and stale-read variants) and the live conflict test (G6)",
       "dependencyVersions": [
-        "GitHub GraphQL createCommitOnBranch",
-        "GitHub REST git refs"
+        "GitHub GraphQL createCommitOnBranch"
       ],
       "evidenceIdentity": "live job run id, commit SHAs, independent re-read",
-      "status": "blocked",
+      "status": "unverified",
       "requirements": [
         "EXT-DATA-006",
         "STORAGE-006",
@@ -235,9 +234,13 @@
           "repo": "indy-init-rehearsal-002",
           "path": "docs/REHEARSAL-002-REPORT.md",
           "quote": "which GitHub applies atomically or refuses"
+        },
+        {
+          "repo": "indy-init",
+          "path": "docs/OWNER-DECISIONS-2026-10-26.md",
+          "quote": "For GitHub, one semantic command is published as one GraphQL createCommitOnBranch mutation."
         }
-      ],
-      "blockerClass": "contract-incompatibility"
+      ]
     },
     {
       "id": "CT-008",
@@ -512,16 +515,16 @@
     {
       "id": "CT-017",
       "name": "Authentication and authorization boundary for the connect flow",
-      "provider": "GitHub (token or App authorization)",
+      "provider": "GitHub (fine-grained personal access token)",
       "consumer": "connect flow, GitHub provider",
-      "contractVersion": "undecided (F-019)",
+      "contractVersion": "OD-INDY-10: fine-grained personal access token for the selected data repository, in memory only, Authorization header only (readiness/CONTRACT-RESOLUTION.md section 2)",
       "requiredCompatibility": "least privilege; repository and branch permission checks before any write; never infer authority from advisory fields such as permissions.push (R2 DC-004)",
       "verificationMethod": "denial without authorization, rejected-token and insufficient-scope live tests (EXT-DATA-009, R4-02)",
       "dependencyVersions": [
         "GitHub API"
       ],
       "evidenceIdentity": "live job run id",
-      "status": "missing",
+      "status": "unverified",
       "requirements": [
         "R11.1",
         "R11.2",
@@ -535,9 +538,13 @@
           "repo": "indy-init",
           "path": "docs/REHEARSAL-EXTERNAL-DATA-BOUNDARY.md",
           "quote": "A token alone is not sufficient to infer a safe repository target."
+        },
+        {
+          "repo": "indy-init",
+          "path": "docs/OWNER-DECISIONS-2026-10-26.md",
+          "quote": "Authentication for Connect: a fine-grained personal access token."
         }
-      ],
-      "blockerClass": "owner-decision"
+      ]
     },
     {
       "id": "CT-018",

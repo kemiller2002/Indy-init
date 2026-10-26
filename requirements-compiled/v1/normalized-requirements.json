@@ -8,7 +8,7 @@
   ],
   "summary": {
     "normalized": 467,
-    "flaggedForReview": 174,
+    "flaggedForReview": 160,
     "exactDuplicateGroups": 0,
     "structuralContainments": 84,
     "nearDuplicatePairs": 5,
@@ -1221,10 +1221,8 @@
       "findings": [
         "F-009"
       ],
-      "reviewStatus": "flagged-for-review",
-      "reviewReasons": [
-        "F-009"
-      ]
+      "reviewStatus": "normalized",
+      "reviewReasons": []
     },
     {
       "id": "NR-ADRP-006",
@@ -1527,10 +1525,8 @@
       "findings": [
         "F-008"
       ],
-      "reviewStatus": "flagged-for-review",
-      "reviewReasons": [
-        "F-008"
-      ]
+      "reviewStatus": "normalized",
+      "reviewReasons": []
     },
     {
       "id": "NR-ADRP-013",
@@ -1700,7 +1696,6 @@
       ],
       "reviewStatus": "flagged-for-review",
       "reviewReasons": [
-        "F-013",
         "ACCEPTANCE-CRITERIA-MISSING"
       ]
     },
@@ -6425,11 +6420,8 @@
         "F-012",
         "F-019"
       ],
-      "reviewStatus": "flagged-for-review",
-      "reviewReasons": [
-        "F-012",
-        "F-019"
-      ]
+      "reviewStatus": "normalized",
+      "reviewReasons": []
     },
     {
       "id": "NR-EXT-DATA-004",
@@ -6464,10 +6456,8 @@
         "F-019",
         "F-022"
       ],
-      "reviewStatus": "flagged-for-review",
-      "reviewReasons": [
-        "F-019"
-      ]
+      "reviewStatus": "normalized",
+      "reviewReasons": []
     },
     {
       "id": "NR-EXT-DATA-005",
@@ -6499,10 +6489,8 @@
       "findings": [
         "F-012"
       ],
-      "reviewStatus": "flagged-for-review",
-      "reviewReasons": [
-        "F-012"
-      ]
+      "reviewStatus": "normalized",
+      "reviewReasons": []
     },
     {
       "id": "NR-EXT-DATA-006",
@@ -6546,10 +6534,8 @@
       "findings": [
         "F-009"
       ],
-      "reviewStatus": "flagged-for-review",
-      "reviewReasons": [
-        "F-009"
-      ]
+      "reviewStatus": "normalized",
+      "reviewReasons": []
     },
     {
       "id": "NR-EXT-DATA-007",
@@ -6721,10 +6707,8 @@
       "findings": [
         "F-009"
       ],
-      "reviewStatus": "flagged-for-review",
-      "reviewReasons": [
-        "F-009"
-      ]
+      "reviewStatus": "normalized",
+      "reviewReasons": []
     },
     {
       "id": "NR-EXT-DATA-012",
@@ -6762,10 +6746,8 @@
       "findings": [
         "F-012"
       ],
-      "reviewStatus": "flagged-for-review",
-      "reviewReasons": [
-        "F-012"
-      ]
+      "reviewStatus": "normalized",
+      "reviewReasons": []
     },
     {
       "id": "NR-EXT-DATA-013",
@@ -7417,7 +7399,6 @@
       ],
       "reviewStatus": "flagged-for-review",
       "reviewReasons": [
-        "F-008",
         "ACCEPTANCE-CRITERIA-MISSING"
       ]
     },
@@ -7502,7 +7483,6 @@
       ],
       "reviewStatus": "flagged-for-review",
       "reviewReasons": [
-        "F-008",
         "ACCEPTANCE-CRITERIA-MISSING"
       ]
     },
@@ -7634,7 +7614,6 @@
       ],
       "reviewStatus": "flagged-for-review",
       "reviewReasons": [
-        "F-008",
         "ACCEPTANCE-CRITERIA-MISSING"
       ]
     },
@@ -7984,7 +7963,6 @@
       ],
       "reviewStatus": "flagged-for-review",
       "reviewReasons": [
-        "F-008",
         "ACCEPTANCE-CRITERIA-MISSING"
       ]
     },
@@ -8043,10 +8021,8 @@
       "findings": [
         "F-008"
       ],
-      "reviewStatus": "flagged-for-review",
-      "reviewReasons": [
-        "F-008"
-      ]
+      "reviewStatus": "normalized",
+      "reviewReasons": []
     },
     {
       "id": "NR-KICKOFF-EXECUTION-PACKET\u00a78-stop-the-line",
@@ -8171,7 +8147,6 @@
       ],
       "reviewStatus": "flagged-for-review",
       "reviewReasons": [
-        "F-008",
         "ACCEPTANCE-CRITERIA-MISSING"
       ]
     },
@@ -9533,7 +9508,6 @@
       ],
       "reviewStatus": "flagged-for-review",
       "reviewReasons": [
-        "F-013",
         "ACCEPTANCE-CRITERIA-MISSING"
       ]
     },
@@ -9607,7 +9581,6 @@
       ],
       "reviewStatus": "flagged-for-review",
       "reviewReasons": [
-        "F-013",
         "ACCEPTANCE-CRITERIA-MISSING"
       ]
     },
@@ -9943,7 +9916,6 @@
       ],
       "reviewStatus": "flagged-for-review",
       "reviewReasons": [
-        "F-009",
         "ACCEPTANCE-CRITERIA-MISSING"
       ]
     },
@@ -10109,7 +10081,6 @@
       ],
       "reviewStatus": "flagged-for-review",
       "reviewReasons": [
-        "F-019",
         "ACCEPTANCE-CRITERIA-MISSING"
       ]
     },
@@ -10152,7 +10123,6 @@
       ],
       "reviewStatus": "flagged-for-review",
       "reviewReasons": [
-        "F-019",
         "ACCEPTANCE-CRITERIA-MISSING"
       ]
     },
@@ -10236,7 +10206,6 @@
       ],
       "reviewStatus": "flagged-for-review",
       "reviewReasons": [
-        "F-008",
         "ACCEPTANCE-CRITERIA-MISSING"
       ]
     },
@@ -13673,10 +13642,8 @@
       "findings": [
         "F-013"
       ],
-      "reviewStatus": "flagged-for-review",
-      "reviewReasons": [
-        "F-013"
-      ]
+      "reviewStatus": "normalized",
+      "reviewReasons": []
     },
     {
       "id": "NR-REHEARSAL-AGENT-INTERFACE-FREEZE\u00a7mandatory-negative-cases",
@@ -17154,10 +17121,8 @@
       "findings": [
         "F-009"
       ],
-      "reviewStatus": "flagged-for-review",
-      "reviewReasons": [
-        "F-009"
-      ]
+      "reviewStatus": "normalized",
+      "reviewReasons": []
     },
     {
       "id": "NR-STORAGE-004",
@@ -17201,10 +17166,8 @@
       "findings": [
         "F-012"
       ],
-      "reviewStatus": "flagged-for-review",
-      "reviewReasons": [
-        "F-012"
-      ]
+      "reviewStatus": "normalized",
+      "reviewReasons": []
     },
     {
       "id": "NR-STORAGE-005",
@@ -17293,10 +17256,8 @@
       "findings": [
         "F-009"
       ],
-      "reviewStatus": "flagged-for-review",
-      "reviewReasons": [
-        "F-009"
-      ]
+      "reviewStatus": "normalized",
+      "reviewReasons": []
     },
     {
       "id": "NR-STORAGE-007",
@@ -17383,10 +17344,8 @@
       "findings": [
         "F-013"
       ],
-      "reviewStatus": "flagged-for-review",
-      "reviewReasons": [
-        "F-013"
-      ]
+      "reviewStatus": "normalized",
+      "reviewReasons": []
     },
     {
       "id": "NR-STORAGE-009",

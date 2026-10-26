@@ -1,21 +1,21 @@
 # Contract resolution report
 
-**Status:** proposals. No contract is marked verified; the status vocabulary is in `contract-bindings.json`. Nothing was changed in causa-data, Praxis or the Registry.
+**Status:** CT-007 and CT-017 are decided by OD-INDY-9 and OD-INDY-10 (`docs/OWNER-DECISIONS-2026-10-26.md`, in force from the owner's merge). The other resolutions are proposals. No contract is marked verified; the status vocabulary is in `contract-bindings.json`. Nothing was changed in causa-data, Praxis or the Registry.
 
 | Contract | Status | Resolution |
 |---|---|---|
 | CT-006 causa storage v1.0.0 | identity-verified | The three identities are re-hashed by the compiler and by preflight PRE-DEP-03. They match. |
 | CT-008 historical catalog | identity-verified | The manifest hash matches `verification/release.json` (PRE-DEP-03) |
-| CT-007 GitHub write primitive | **blocked** | §1: owner exception text, prepared |
-| CT-017 authentication | **missing** | §2: contract defined, pending DEC-025 |
+| CT-007 GitHub write primitive | unverified | §1: owner exception, recorded as OD-INDY-9. T18 and T21 verify it against the test repository. |
+| CT-017 authentication | unverified | §2: decided as OD-INDY-10. PRE-AUTH-02 and T21 verify it. |
 | CT-013 Praxis preservation gate | **blocked** | §3: upstream release needed |
 | CT-012 Percepta semantic, CT-016 release set | **blocked** | §4: echelon-current 1.28.0 needed |
 | CT-001..CT-005, CT-018 (boundaries A–E, faults) | missing (`producedBy: T14`) | §5: produced during the run, not kickoff blockers |
 | CT-009 Limen, CT-010 Forma, CT-011 Folio, CT-014 Dokimos, CT-015 ledger | unverified | §6: exercised by T11, T16, T26, T34 |
 
-## 1. CT-007 / F-009: proposed owner exception for the GitHub publication mechanism
+## 1. CT-007 / F-009: owner exception for the GitHub publication mechanism (OD-INDY-9)
 
-This is the text proposed for an owner-authored decision (DEC-006, alternative (a)). It is not in force until the owner records it.
+The owner records this text as OD-INDY-9 (DEC-006, alternative (a)). It is in force from the owner's merge of `docs/OWNER-DECISIONS-2026-10-26.md`.
 
 > **Exception to causa-storage v1.0.0 §9.4.1 (GitHub publication mechanism).**
 >
@@ -49,7 +49,7 @@ The fakes are built from those recordings (DCT-001-A, DCT-003-A).
 
 **Follow-up after the event:** causa-data releases contract 1.1.0 through its own `release-tag` workflow, with a new compatibility lock and the same schema and dataset identities.
 
-## 2. CT-017: authentication contract (pending DEC-025)
+## 2. CT-017: authentication contract (OD-INDY-10)
 
 This is the minimum mechanism that meets EXT-DATA-003/004, R11.1–R11.3 and iPad Safari without adding a service.
 

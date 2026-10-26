@@ -199,10 +199,16 @@
     {
       "id": "DEC-006",
       "title": "GitHub write primitive: contract's non-forced ref PATCH versus R2's guarded GraphQL commit",
-      "classification": "unresolved",
+      "classification": "fixed-architectural",
       "home": "ordo",
-      "statement": "See F-009. Until decided, the write-path slice (T18 onward for writes) is BLOCKED under ADRP-001's conflict stop.",
-      "constraints": [],
+      "statement": "Owner-approved by the merge of the pull request adding docs/OWNER-DECISIONS-2026-10-26.md (OD-INDY-9). causa-storage v1.0.0 stays the wire contract. For GitHub, one semantic command is published as one GraphQL createCommitOnBranch carrying the events append, manifest and snapshot, with expectedHeadOid set to the commit the deciding state was read at. A refusal on a moved head is a non-fast-forward under section 9.4.2; success is reported only after a re-read at the new head (9.4.3). The non-forced REST ref update is not conforming. The exception holds until causa-storage 1.1.0 (STORAGE-003).",
+      "constraints": [
+        "causa-storage v1.0.0 paths, file sets, schemas, fixtures and identities unchanged; sections 9.4.2 to 9.4.5 apply",
+        "One createCommitOnBranch per semantic command, with expectedHeadOid set to the commit the deciding state was read at; that commit is the provider version token",
+        "A refusal on a moved head is a non-fast-forward: reload, re-verify, rebase or report conflict, never force",
+        "Success only after a re-read at the new head; a failure after sending is unknown",
+        "No REST ref update for publication"
+      ],
       "requirements": [
         "EXT-DATA-006",
         "STORAGE-006"
@@ -215,6 +221,21 @@
           "repo": "causa-data",
           "path": "contract/v1.0.0/CONTRACT.md",
           "quote": "published by a non-forced ref update"
+        },
+        {
+          "repo": "indy-init",
+          "path": "docs/OWNER-DECISIONS-2026-10-26.md",
+          "quote": "in force from the owner's merge of the pull request that adds this file to main"
+        },
+        {
+          "repo": "indy-init",
+          "path": "docs/OWNER-DECISIONS-2026-10-26.md",
+          "quote": "For GitHub, one semantic command is published as one GraphQL createCommitOnBranch mutation."
+        },
+        {
+          "repo": "indy-init",
+          "path": "docs/OWNER-DECISIONS-2026-10-26.md",
+          "quote": "The non-forced REST ref update is no longer conforming."
         }
       ],
       "blockerClass": "contract-incompatibility",
@@ -229,7 +250,7 @@
         "DCT-001/DCT-003 and the T18 recordings target createCommitOnBranch and its refusal on a moved head",
         "causa-data CONTRACT.md stays unedited until (b)"
       ],
-      "approvalRequired": "Owner-authored record (Ordo decision or owner commit to an OWNER-DECISIONS addendum) naming DEC-006 and F-009; agents do not write it (RDP-003, AR-003)"
+      "approvalRequired": "Given: owner merge of the pull request adding docs/OWNER-DECISIONS-2026-10-26.md (OD-INDY-9)"
     },
     {
       "id": "DEC-007",
@@ -669,10 +690,13 @@
     {
       "id": "DEC-022",
       "title": "AI proposal loop and time travel in Rehearsal 4 / event scope",
-      "classification": "unresolved",
+      "classification": "runtime-situational",
       "home": "ordo",
-      "statement": "See F-008.",
-      "constraints": [],
+      "statement": "Owner-approved by the merge of the pull request adding docs/OWNER-DECISIONS-2026-10-26.md (OD-INDY-11). The structured AI proposal loop and time travel / semantic diff (T27, T28) are excluded from Rehearsal 4. The proposal-authority invariant (D-004) and prompt/data boundaries (R11.4) stay in scope. The event's scope for these features is decided from the Rehearsal 4 result (R4 section 6). The tasks leave the run only once the operator's approvals file (T09) covers the exclusion.",
+      "constraints": [
+        "D-004 and R11.4 stay in scope",
+        "The exclusion reaches the verifier only through the operator's pinned approvals file (T09)"
+      ],
       "requirements": [
         "KICKOFF-EXECUTION-PACKET§3-work-order"
       ],
@@ -684,6 +708,21 @@
           "repo": "indy-init",
           "path": "docs/KICKOFF-EXECUTION-PACKET.md",
           "quote": "Structured AI proposal loop works."
+        },
+        {
+          "repo": "indy-init",
+          "path": "docs/OWNER-DECISIONS-2026-10-26.md",
+          "quote": "in force from the owner's merge of the pull request that adds this file to main"
+        },
+        {
+          "repo": "indy-init",
+          "path": "docs/OWNER-DECISIONS-2026-10-26.md",
+          "quote": "Rehearsal 4 scope: the structured AI proposal loop and time travel / semantic diff are excluded."
+        },
+        {
+          "repo": "indy-init",
+          "path": "docs/OWNER-DECISIONS-2026-10-26.md",
+          "quote": "The proposal-authority invariant (D-004) and prompt/data boundaries (R11.4) stay in scope."
         }
       ],
       "blockerClass": "owner-decision",
@@ -696,15 +735,18 @@
         "T27 and T28 leave the timed plan only after an approved exclusion covering KICKOFF-EXECUTION-PACKET 12-45, 2-45 and ai-tool-agent, S14 and S15",
         "Without approval they stay on the plan before T31"
       ],
-      "approvalRequired": "Owner approval record covering the exclusion (praxis.requirements-approvals/1 written by the owner, RDP-003)"
+      "approvalRequired": "Given: owner merge of the pull request adding docs/OWNER-DECISIONS-2026-10-26.md (OD-INDY-11); the operator's praxis.requirements-approvals/1 file (T09) is still needed for the verifier"
     },
     {
       "id": "DEC-023",
       "title": "Use of R001-derived interfaces at the event",
-      "classification": "unresolved",
+      "classification": "runtime-situational",
       "home": "ordo",
-      "statement": "See F-013.",
-      "constraints": [],
+      "statement": "Owner-approved by the merge of the pull request adding docs/OWNER-DECISIONS-2026-10-26.md (OD-INDY-12). Rehearsal 4 may extract interfaces from existing rehearsal source (T14). The event may carry only the documented interface manifest, never source, and only after the organizer confirms (PRE-ORG-01); otherwise it derives interfaces at kickoff from the frozen storage contract and the command/event catalog.",
+      "constraints": [
+        "No rehearsal source is carried to the event",
+        "Event use of the interface manifest needs organizer confirmation (PRE-ORG-01)"
+      ],
       "requirements": [
         "R0.1",
         "ADRP-016"
@@ -717,6 +759,21 @@
           "repo": "indy-init",
           "path": "docs/REHEARSAL-AGENT-INTERFACE-FREEZE.md",
           "quote": "Extract actual types and exported interfaces from accepted R001 F# source and Limen adapter."
+        },
+        {
+          "repo": "indy-init",
+          "path": "docs/OWNER-DECISIONS-2026-10-26.md",
+          "quote": "in force from the owner's merge of the pull request that adds this file to main"
+        },
+        {
+          "repo": "indy-init",
+          "path": "docs/OWNER-DECISIONS-2026-10-26.md",
+          "quote": "Rehearsal 4 may extract interfaces from existing rehearsal source (T14)."
+        },
+        {
+          "repo": "indy-init",
+          "path": "docs/OWNER-DECISIONS-2026-10-26.md",
+          "quote": "The event may carry only the documented interface manifest, never source, and only after the organizer confirms (PRE-ORG-01)."
         }
       ],
       "blockerClass": "owner-decision",
@@ -729,7 +786,7 @@
         "T14 consumes an existing manifest in R4",
         "Event plan depends on PRE-ORG-01"
       ],
-      "approvalRequired": "Owner decision for R4; organizer confirmation for the event"
+      "approvalRequired": "Given: owner merge of the pull request adding docs/OWNER-DECISIONS-2026-10-26.md (OD-INDY-12); organizer confirmation for the event (PRE-ORG-01)"
     },
     {
       "id": "DEC-024",
@@ -777,16 +834,25 @@
     {
       "id": "DEC-025",
       "title": "User authentication mechanism for the connect flow",
-      "classification": "unresolved",
+      "classification": "fixed-architectural",
       "home": "ordo",
-      "statement": "See F-019.",
-      "constraints": [],
+      "statement": "Owner-approved by the merge of the pull request adding docs/OWNER-DECISIONS-2026-10-26.md (OD-INDY-10). Connect takes a fine-grained personal access token for the selected data repository only (Contents read/write, Metadata read, short expiry), held in memory only, re-entered after reload and sent only in the Authorization header. Classic tokens granting repo or admin scopes are refused. Every connection needs a credential; there is no anonymous mode. The CI live job uses the separate CAUSA_GITHUB_TOKEN secret.",
+      "constraints": [
+        "Token scoped to the selected data repository: Contents read/write, Metadata read, short expiry",
+        "Held in memory only: never in localStorage, sessionStorage, IndexedDB, URLs, logs, error text, events or files; re-entered after reload",
+        "Sent only in the Authorization header",
+        "Classic tokens whose X-OAuth-Scopes grant repo or admin scopes are refused",
+        "A credential for every connection; no anonymous mode",
+        "Permission fields are advisory (DC-004)",
+        "Browser credentials and the CI secret CAUSA_GITHUB_TOKEN are separate"
+      ],
       "requirements": [
         "R11.1",
         "EXT-DATA-003"
       ],
       "findings": [
-        "F-019"
+        "F-019",
+        "F-012"
       ],
       "sources": [
         {
@@ -798,6 +864,21 @@
           "repo": "indy-init-rehearsal-003",
           "path": "docs/REHEARSAL-003-REMEDIATION-REPORT.md",
           "quote": "the anonymous path passes only fully or on GitHub's own exhausted-quota answer"
+        },
+        {
+          "repo": "indy-init",
+          "path": "docs/OWNER-DECISIONS-2026-10-26.md",
+          "quote": "in force from the owner's merge of the pull request that adds this file to main"
+        },
+        {
+          "repo": "indy-init",
+          "path": "docs/OWNER-DECISIONS-2026-10-26.md",
+          "quote": "Authentication for Connect: a fine-grained personal access token."
+        },
+        {
+          "repo": "indy-init",
+          "path": "docs/OWNER-DECISIONS-2026-10-26.md",
+          "quote": "Every connection needs a credential; there is no anonymous mode"
         }
       ],
       "blockerClass": "owner-decision",
@@ -812,7 +893,7 @@
         "Connect UI: repository, branch, workspace, token field (type=password, autocomplete=off), clear refusal messages",
         "PRE-AUTH-02 verifies the CI token is not a broad classic token"
       ],
-      "approvalRequired": "Owner decision record (security boundary); F-019 and F-012 close with it"
+      "approvalRequired": "Given: owner merge of the pull request adding docs/OWNER-DECISIONS-2026-10-26.md (OD-INDY-10)"
     },
     {
       "id": "DEC-026",
