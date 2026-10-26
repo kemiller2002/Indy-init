@@ -56,7 +56,7 @@
     },
     {
       "name": "echelon-registry",
-      "commit": "2d6338e8286a968ec7e4f356af60dde789797e5a",
+      "commit": "e6d8a734aadb8697c59d46376d1a358db98ca19e",
       "role": "approved release sets"
     },
     {
@@ -76,7 +76,7 @@
     },
     {
       "name": "conditor",
-      "commit": "b37c7d35d1a1c2dbfcc94e58d38fb08f1e1f5680",
+      "commit": "84d4847d996ac3f9fb64e20747468e28447ee7d1",
       "role": "bootstrap tool (SD-1 fix status)"
     }
   ],
@@ -165,7 +165,7 @@
   "inputs": [
     {
       "path": "curation/contracts.json",
-      "sha256": "bab5ba5adcf8506493ff04c595e2130c75a8681139498497297bceac9e695daa"
+      "sha256": "d9948dcf35fafe3a9bf44c1aff8a74b6bcef2318c994b80f2790f206c2346137"
     },
     {
       "path": "curation/decisions.json",
@@ -185,7 +185,7 @@
     },
     {
       "path": "curation/findings.json",
-      "sha256": "243561f4f13d2da72966eca9f8f83cdf9748f80cc8d9136a35753da9091f27e5"
+      "sha256": "45c1b6265b7e669facb33eb12d357b9046cb7e66af87f7f74120a407c6850bf3"
     },
     {
       "path": "curation/preflight-checks.json",
@@ -193,7 +193,7 @@
     },
     {
       "path": "curation/sources.json",
-      "sha256": "c9d966bbaa6af9c4d1485eb4b36e21a7dd5693051bb541abb39a20b79bdb0701"
+      "sha256": "70f9eeba86f44ea09f3d0950cfcb5aba39309c383d40aac542fe89c3ff530a6b"
     },
     {
       "path": "curation/tasks.json",
@@ -237,11 +237,11 @@
   "generated": [
     {
       "path": "contract-bindings.json",
-      "sha256": "e28098fdfadc8ca526ccd371c1fb9bb5d535a83c25cf814f6bd44f172e804bff"
+      "sha256": "819fce0005c7a51c3bc6d96e1e56d2870b822a3ddf574e45f4a4dd61cc0a9756"
     },
     {
       "path": "decision-registry.json",
-      "sha256": "3d1ce9072ed80bbdb4595bdce5bfba414d2e67337ecf5870135193f62aafb2fa"
+      "sha256": "1edbef64b3ccdf3ebe9e5b46bb347be2339ec60b5f8d6d02630a0ca8efffac20"
     },
     {
       "path": "dependency-graph.json",
@@ -257,7 +257,7 @@
     },
     {
       "path": "normalized-requirements.json",
-      "sha256": "5c9dfd96eed855ddfe54fb0f84738b04616cdcb4e90fbba989797a068deb575d"
+      "sha256": "9fea70e7cc8edf5ec6dfd72a6269284003e6d8ef30e4ccc390c7c68576f861da"
     },
     {
       "path": "percepta-experiment.json",
@@ -265,7 +265,7 @@
     },
     {
       "path": "preflight-manifest.json",
-      "sha256": "e12a5cae64cca5a8ac31afbed961aca785938f2d52b78a2de89083032752bc72"
+      "sha256": "7a5adbb6b9a3b2bc724d15775599888d539d6610b8cf5e36ea09b16c9b9e5f52"
     },
     {
       "path": "requirements-inventory.json",
@@ -277,7 +277,7 @@
     },
     {
       "path": "requirements-validation-report.json",
-      "sha256": "81078056a92f32c07ccb3c635fce6086fc7471752d9768957ce830279ffc0a12"
+      "sha256": "9c7b041e9b970fcfb450d5ccbed83aba4da7dc81d4ac4ee82fb29c59a944cb37"
     },
     {
       "path": "timed-execution-manifest.json",
@@ -289,5 +289,5 @@
     }
   ],
   "compilationVerdict": "PASS",
-  "rehearsalReadiness": "BLOCKED"
+  "rehearsalReadiness": "READY"
 }

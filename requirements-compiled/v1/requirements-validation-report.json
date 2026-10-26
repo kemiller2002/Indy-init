@@ -129,33 +129,8 @@
     }
   ],
   "rehearsalReadiness": {
-    "verdict": "BLOCKED",
+    "verdict": "READY",
     "rule": "BLOCKED while any critical material unresolved finding, unresolved decision, blocked contract, or missing contract that no planned task produces remains; a compilation PASS is not readiness",
-    "blockers": [
-      {
-        "kind": "finding",
-        "id": "F-005",
-        "title": "Kickoff release set incomplete: percepta-semantic 0.2.1 is registered as a release but no approved echelon-current set contains it (1.28.0 not cut)",
-        "blockerClass": "external-dependency",
-        "owner": "upstream: kemiller2002/echelon-registry, kemiller2002/conditor; approval by operator",
-        "recommendation": ""
-      },
-      {
-        "kind": "contract-blocked",
-        "id": "CT-012",
-        "title": "Percepta semantic CLI: contract and evidence schemas",
-        "blockerClass": "external-dependency",
-        "owner": "",
-        "recommendation": ""
-      },
-      {
-        "kind": "contract-blocked",
-        "id": "CT-016",
-        "title": "Kickoff release-set lock",
-        "blockerClass": "external-dependency",
-        "owner": "",
-        "recommendation": ""
-      }
-    ]
+    "blockers": []
   }
 }

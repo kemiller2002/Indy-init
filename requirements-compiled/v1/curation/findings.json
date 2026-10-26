@@ -199,7 +199,7 @@
       "status": "no-action-required",
       "owner": "upstream: kemiller2002/praxis",
       "title": "The mandatory preservation gate is not in any Praxis release; using the draft would violate VER-005",
-      "description": "Resolved upstream by the stable Praxis v3.21.0 release (tag v3.21.0, commit fa474c42, 2026-10-26). It carries `praxis requirements preservation verify` with REQ-PRES-001 R1 (baseline digest) and R2 (authenticated, non-agent approvals), the minimum named in readiness/CONTRACT-RESOLUTION.md section 3. The published linux-x64 artifact was verified against the pinned baseline: readiness/evidence/praxis-preservation-verification.json. VER-001 still requires the release in the approved kickoff set (echelon-current 1.28.0, F-005). Before: RDP-004 and R4-06 require `praxis requirements preservation verify` to pass before implementation. Praxis v3.20.0 (the registered release) has no such command; it exists only on the draft branch of praxis#292, whose own intake (REQ-PRES-001) lists bypasses. VER-005 forbids unreleased or unverified builds without explicit approval. Until a release carries the gate, implementation cannot start under RDP-004 without an owner exception.",
+      "description": "Resolved upstream by the stable Praxis v3.21.0 release (tag v3.21.0, commit fa474c42, 2026-10-26). It carries `praxis requirements preservation verify` with REQ-PRES-001 R1 (baseline digest) and R2 (authenticated, non-agent approvals), the minimum named in readiness/CONTRACT-RESOLUTION.md section 3. The published linux-x64 artifact was verified against the pinned baseline: readiness/evidence/praxis-preservation-verification.json. VER-001 is met: the approved kickoff set echelon-current 1.28.0 selects Praxis 3.21.0 (F-005). Before: RDP-004 and R4-06 require `praxis requirements preservation verify` to pass before implementation. Praxis v3.20.0 (the registered release) has no such command; it exists only on the draft branch of praxis#292, whose own intake (REQ-PRES-001) lists bypasses. VER-005 forbids unreleased or unverified builds without explicit approval. Until a release carries the gate, implementation cannot start under RDP-004 without an owner exception.",
       "requirements": [
         "AR-004",
         "AR-002",
@@ -243,10 +243,10 @@
       "type": "missing-contract",
       "severity": "critical",
       "material": true,
-      "status": "unresolved",
+      "status": "no-action-required",
       "owner": "upstream: kemiller2002/echelon-registry, kemiller2002/conditor; approval by operator",
       "title": "Kickoff release set incomplete: percepta-semantic 0.2.1 is registered as a release but no approved echelon-current set contains it (1.28.0 not cut)",
-      "description": "OD-INDY-2 requires UI completion evidence from the released semantic CLI pinned by the kickoff set. percepta-semantic-v0.2.1 is tagged and, since echelon-registry PR #96/#97 (merged 2026-10-26, main 2d6338e), recorded as a release (releases/percepta-semantic/0.2.1.release.json). The newest set is still echelon-current 1.27.0, which records that it is not the complete Rehearsal 4 kickoff set. Remaining upstream work: cut echelon-current 1.28.0 with percepta-semantic, Conditor-qualify it, and record the owner's approval (R4 P1).",
+      "description": "Resolved upstream by echelon-current 1.28.0 (kemiller2002/echelon-registry#98, main e6d8a734, 2026-10-26): it selects percepta-semantic 0.2.1 together with Praxis 3.21.0, Dokimos 0.7.0 and Folio 0.4.1, was qualified by released Conditor 0.10.12 (conditor#111; REG-RU-007 PASS) and approved by the owner under OD-INDY-8. It carries no VER-003 exception. PRE-DEP-01 passes. Before: OD-INDY-2 requires UI completion evidence from the released semantic CLI pinned by the kickoff set. percepta-semantic-v0.2.1 is tagged and, since echelon-registry PR #96/#97 (merged 2026-10-26, main 2d6338e), recorded as a release (releases/percepta-semantic/0.2.1.release.json). The newest set is still echelon-current 1.27.0, which records that it is not the complete Rehearsal 4 kickoff set. Remaining upstream work: cut echelon-current 1.28.0 with percepta-semantic, Conditor-qualify it, and record the owner's approval (R4 P1).",
       "requirements": [
         "VER-001",
         "VER-004",
@@ -277,7 +277,19 @@
           "quote": "\"tag\": \"percepta-semantic-v0.2.1\""
         }
       ],
-      "blockerClass": "external-dependency"
+      "blockerClass": "external-dependency",
+      "resolutionSources": [
+        {
+          "repo": "echelon-registry",
+          "path": "sets/echelon-current/1.28.0.json",
+          "quote": "\"status\": \"approved\""
+        },
+        {
+          "repo": "echelon-registry",
+          "path": "sets/echelon-current/1.28.0.json",
+          "quote": "\"systemId\": \"percepta-semantic\""
+        }
+      ]
     },
     {
       "id": "F-006",
@@ -697,10 +709,10 @@
       "type": "gap",
       "severity": "major",
       "material": false,
-      "status": "unresolved",
+      "status": "no-action-required",
       "owner": "upstream: kemiller2002/echelon-registry",
       "title": "Release set pins Folio 0.4.0 while Folio v0.4.1 is tagged and unassessed",
-      "description": "VER-001/VER-002 require the newest stable compatible release with recorded evidence of why it was selected. echelon-current 1.27.0 selects folio 0.4.0 and its assessments list forma 0.9.1, limen 0.9.1 and aegis 2.0.0 but not folio 0.4.1 (tag v0.4.1 -> a94cea73). Either the tag is not a published release or the set misses an assessment; this needs recording before lock.",
+      "description": "Resolved upstream: echelon-current 1.28.0 assessed Folio 0.4.1 (a published release whose package digest matches its checksums) and selected it; released Conditor 0.10.12 qualifies it, and Chrona's CI moves Folio 0.4.0 -> 0.4.1 with the real release. Before: VER-001/VER-002 require the newest stable compatible release with recorded evidence of why it was selected. echelon-current 1.27.0 selects folio 0.4.0 and its assessments list forma 0.9.1, limen 0.9.1 and aegis 2.0.0 but not folio 0.4.1 (tag v0.4.1 -> a94cea73). Either the tag is not a published release or the set misses an assessment; this needs recording before lock.",
       "requirements": [
         "VER-001",
         "VER-002"
@@ -721,6 +733,13 @@
           "repo": "echelon-registry",
           "path": "sets/echelon-current/1.27.0.json",
           "quote": "\"systemId\": \"folio\""
+        }
+      ],
+      "resolutionSources": [
+        {
+          "repo": "echelon-registry",
+          "path": "sets/echelon-current/1.28.0.json",
+          "quote": "Replaced by Folio 0.4.1"
         }
       ]
     },
