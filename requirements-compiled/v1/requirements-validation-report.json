@@ -2,8 +2,8 @@
   "schema": "indy-init.requirements-validation-report/1",
   "source": {
     "repository": "kemiller2002/indy-init",
-    "commit": "9d989389260342c77feea1aca52dd8d3d7b746ae",
-    "baselineSha256": "26101a79000f79a9a3d7d9c3d1d3b8baa1c6fd475c69f17a8dba5aab773898d6"
+    "commit": "c848a18b8da5ac7733882495f5c22ac105860ab7",
+    "baselineSha256": "f76e67ffedb49324a80b4929058ec119c16cdc5b8bae276d80bfcec09ec30f8c"
   },
   "compilationVerdict": "PASS",
   "compilationRule": "FAIL when any critical check reports a problem; the compiler then exits 3",
@@ -124,33 +124,14 @@
       "id": "V14",
       "title": "The committed baseline has no drift against the source commit (readiness, non-critical for compilation)",
       "critical": false,
-      "status": "WARN",
-      "problems": [
-        "requirements/causa-requirements-baseline.json (pinned at 002d8ba6e98639a385dd771999099ba032c48086) differs from the generator's output at the source commit 9d989389260342c77feea1aca52dd8d3d7b746ae",
-        "10 requirements at the source commit are missing from the committed baseline: AGENT-RELIABILITY\u00a7evidence-driven-refinement-october-2026, AGENT-RELIABILITY\u00a7reconciliation, AR-019, AR-020, AR-021, AR-022, AR-023, AR-024, AR-025, AR-026"
-      ]
+      "status": "PASS",
+      "problems": []
     }
   ],
   "rehearsalReadiness": {
     "verdict": "BLOCKED",
     "rule": "BLOCKED while any critical material unresolved finding, unresolved decision, blocked contract, or missing contract that no planned task produces remains; a compilation PASS is not readiness",
     "blockers": [
-      {
-        "kind": "finding",
-        "id": "F-001",
-        "title": "Launch content: UI-001/UI-015 require the five frozen synthetic investigations; EXT-DATA, OD-INDY-3 and the active catalog require an empty launch and three historical cases",
-        "blockerClass": "requirement-conflict",
-        "owner": "operator (kemiller2002)",
-        "recommendation": ""
-      },
-      {
-        "kind": "finding",
-        "id": "F-003",
-        "title": "The committed baseline is pinned at 002d8ba; the source commit adds AR-019..AR-026 and changes the acceptance ledger contract",
-        "blockerClass": "verification-deficiency",
-        "owner": "operator (kemiller2002), via a reviewed owner commit (OD-INDY-6)",
-        "recommendation": ""
-      },
       {
         "kind": "finding",
         "id": "F-004",
@@ -206,14 +187,6 @@
         "blockerClass": "owner-decision",
         "owner": "Owner decision for R4; organizer confirmation for the event",
         "recommendation": "(a). It keeps T14 short in Rehearsal 4 and lets the organizer rule on the event without blocking the rehearsal. If the organizer refuses, the event uses (b)."
-      },
-      {
-        "kind": "decision",
-        "id": "DEC-024",
-        "title": "What the launch view shows",
-        "blockerClass": "requirement-conflict",
-        "owner": "Owner merge of the requirement-change PR (OD-INDY-6: only owner commits change the baseline)",
-        "recommendation": "(a). It agrees with EXT-DATA-001/002, OD-INDY-3 and the causa-data catalog policy, keeps runtime loading from the user-connected repository and bundles no data. The proposed text is on branch claude/r4-owner-requirement-changes."
       },
       {
         "kind": "decision",

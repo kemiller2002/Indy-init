@@ -4,7 +4,7 @@
   "acyclic": true,
   "summary": {
     "tasks": 35,
-    "genuineEdges": 58,
+    "genuineEdges": 56,
     "preferenceEdges": 2,
     "criticalPathLength": 16,
     "maxDepth": 16,
@@ -53,14 +53,13 @@
         "DEC-006",
         "DEC-022",
         "DEC-023",
-        "DEC-024",
         "DEC-025"
       ],
       "gates": [
         "G0"
       ],
       "completion": [
-        "F-001, F-008, F-009, F-011, F-012, F-013 and F-019 each carry an owner decision recorded outside agent authorship (AR-003)",
+        "F-008, F-009, F-011, F-012, F-013 and F-019 each carry an owner decision recorded outside agent authorship (AR-003); F-001 was decided by the owner's merge of PR #18",
         "Every requirement edit the decisions imply is committed by the owner to indy-init"
       ]
     },
@@ -711,7 +710,7 @@
         "STORAGE-004",
         "STORAGE-006"
       ],
-      "coveredRequirementCount": 26,
+      "coveredRequirementCount": 27,
       "contracts": [
         "CT-004",
         "CT-006",
@@ -869,9 +868,10 @@
       "depth": 11,
       "onCriticalPath": false,
       "covers": [
-        "origin:external"
+        "origin:external",
+        "EXT-DATA-013"
       ],
-      "coveredRequirementCount": 6,
+      "coveredRequirementCount": 7,
       "contracts": [
         "CT-008",
         "CT-006"
@@ -1322,11 +1322,6 @@
       "reason": "views consume the verified projection path"
     },
     {
-      "from": "T00",
-      "to": "T22",
-      "reason": "launch content is undecided (F-001)"
-    },
-    {
       "from": "T24",
       "to": "T23",
       "reason": "WDL-001 requires the engine to be identified before implementation"
@@ -1350,11 +1345,6 @@
       "from": "T15",
       "to": "T25",
       "reason": "catalog records are v1.0.0 file sets replayed through the engine"
-    },
-    {
-      "from": "T00",
-      "to": "T25",
-      "reason": "whether the catalog is an acceptance requirement is open (F-001, F-006)"
     },
     {
       "from": "T17",
@@ -2690,6 +2680,13 @@
       "requirement": "EXT-DATA-012",
       "tasks": [
         "T20"
+      ]
+    },
+    {
+      "requirement": "EXT-DATA-013",
+      "tasks": [
+        "T20",
+        "T25"
       ]
     },
     {

@@ -17,8 +17,8 @@ The machine-readable form of every request is in `decision-registry.json`: the f
 
 | # | Request | Recommendation | Approval record |
 |---|---|---|---|
-| 1 | DEC-024 / F-001: what the launch view shows | Merge PR "proposed requirement changes": UI-001 and UI-015 restated against the connected catalog, plus the new EXT-DATA-013 | Owner merge of that PR. Per OD-INDY-6, only owner commits change the baseline. |
-| 2 | F-003: baseline re-pin | Same PR. It regenerates the baseline with the existing tool, now 461 requirements and AR-019..AR-026 preserved. Re-pin again at the kickoff commit. | Owner merge of that PR |
+| 1 | DEC-024 / F-001: what the launch view shows | **APPROVED 2026-10-26:** owner merge of #18 (c848a18) | Given |
+| 2 | F-003: baseline re-pin | **APPROVED 2026-10-26:** owner merge of #18. The baseline is at c751d58 with 461 requirements; re-pin again at the kickoff commit (T01). | Given |
 | 3 | DEC-006 / F-009: GitHub write primitive | Owner exception, with the text in `CONTRACT-RESOLUTION.md` §1. Version the causa-data contract (1.1.0) after the event. | Owner-authored decision naming DEC-006 and F-009 |
 | 4 | DEC-025 / F-019 / F-012: authentication | A fine-grained personal access token, scoped to the data repository, entered in Connect and held in memory. A credential is required for every connection. | Owner decision record (security boundary) |
 | 5 | DEC-022 / F-008: AI proposal loop and time travel | Exclude both from Rehearsal 4, with approval. Keep the proposal-authority invariant (D-004, R11.4). | Owner approval records covering the exclusion (`praxis.requirements-approvals/1`, owner-written) |

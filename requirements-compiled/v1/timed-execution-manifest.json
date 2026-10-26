@@ -41,8 +41,8 @@
     "unavailable values are recorded as unavailable (R4 section 5)"
   ],
   "coverage": {
-    "p0Requirements": 107,
-    "p0CoveredByTimedTasks": 102,
+    "p0Requirements": 108,
+    "p0CoveredByTimedTasks": 103,
     "p0CoveredOnlyByPreflight": [
       "VER-001",
       "VER-002",
@@ -367,8 +367,8 @@
       ],
       "conditionalOn": null,
       "ciRun": false,
-      "requirementsCovered": 26,
-      "p0RequirementsCovered": 12,
+      "requirementsCovered": 27,
+      "p0RequirementsCovered": 13,
       "defectClassTests": [],
       "contracts": [
         "CT-004",
@@ -427,9 +427,7 @@
       "dependsOn": [
         "T17"
       ],
-      "preflightPrerequisites": [
-        "T00"
-      ],
+      "preflightPrerequisites": [],
       "conditionalOn": null,
       "ciRun": false,
       "requirementsCovered": 79,
@@ -483,13 +481,11 @@
         "T20",
         "T15"
       ],
-      "preflightPrerequisites": [
-        "T00"
-      ],
+      "preflightPrerequisites": [],
       "conditionalOn": null,
       "ciRun": false,
-      "requirementsCovered": 6,
-      "p0RequirementsCovered": 0,
+      "requirementsCovered": 7,
+      "p0RequirementsCovered": 1,
       "defectClassTests": [],
       "contracts": [
         "CT-008",

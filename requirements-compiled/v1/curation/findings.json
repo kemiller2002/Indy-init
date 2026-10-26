@@ -7,10 +7,10 @@
       "type": "conflict",
       "severity": "critical",
       "material": true,
-      "status": "unresolved",
+      "status": "resolved-by-owner",
       "owner": "operator (kemiller2002)",
       "title": "Launch content: UI-001/UI-015 require the five frozen synthetic investigations; EXT-DATA, OD-INDY-3 and the active catalog require an empty launch and three historical cases",
-      "description": "UI-001 requires the launch view to show all five frozen demonstration investigations and UI-015 requires verifying they load. EXT-DATA-001 forbids shipping them, EXT-DATA-002 and OD-INDY-3 require an empty, disconnected first launch with an explicit Connect action, and causa-data's catalog policy requires exactly three historical cases with no synthetic incidents in the active catalog. STORAGE-005 still names the five synthetic scenarios as seed data. No reconciliation section covers UI-001 or UI-015. ADRP-001 ranks the frozen data contract (2) above the UI documents (5), but the catalog policy is not part of that contract, so precedence does not decide it.",
+      "description": "Resolved by the owner's merge of indy-init PR #18 (c848a18, 2026-10-26). Before it, UI-001 required showing 'all five frozen demonstration investigations' on launch and UI-015 verifying them, contradicting EXT-DATA-001/002, OD-INDY-3 and the causa-data catalog policy. UI-001-O1 now shows an empty, disconnected workspace before Connect and, after Connect, the connected repository's investigations (for the active catalog exactly Apollo 1, Apollo 11 and Challenger STS-51-L); UI-015-O2 verifies the three active-catalog cases and keeps the five synthetic v1.0.0 fixtures as the contract test corpus; EXT-DATA-013 states the catalog requirement.",
       "requirements": [
         "UI-001",
         "UI-015",
@@ -23,20 +23,12 @@
         "DEC-024",
         "DEC-007"
       ],
-      "options": [
-        "Owner commit restating UI-001/UI-015 against 'the connected catalog' (after Connect: the three historical-v1 cases), keeping the five synthetic fixtures as contract test corpus only",
-        "Keep UI-001 literally and record an exception to EXT-DATA-001/002 and the catalog policy"
-      ],
+      "options": [],
       "citations": [
         {
           "repo": "indy-init",
           "path": "docs/CAUSA-UI-EXPERIENCE-REQUIREMENTS.md",
-          "quote": "On launch, show all five frozen demonstration investigations and user working copies."
-        },
-        {
-          "repo": "indy-init",
-          "path": "docs/CAUSA-UI-EXPERIENCE-REQUIREMENTS.md",
-          "quote": "Verify the five frozen investigations load and replay"
+          "quote": "Before Connect, show an accessible, empty, disconnected workspace with the explicit Connect data repository action (EXT-DATA-002)"
         },
         {
           "repo": "indy-init",
@@ -44,27 +36,24 @@
           "quote": "A fresh launch MUST display an accessible empty/disconnected workspace and an explicit Connect data repository action."
         },
         {
-          "repo": "indy-init",
-          "path": "docs/OWNER-DECISIONS-2026-10-24.md",
-          "quote": "First launch shows an explicit Connect data repository action"
-        },
-        {
-          "repo": "indy-init",
-          "path": "docs/FROZEN-DEMO-STORAGE-REQUIREMENTS.md",
-          "quote": "Prepare deterministic synthetic investigations for: payment failure"
-        },
-        {
           "repo": "causa-data",
           "path": "research/HISTORICAL-CASE-CATALOG.md",
           "quote": "The active demonstration catalog MUST contain exactly three historical cases"
-        },
-        {
-          "repo": "causa-data",
-          "path": "research/HISTORICAL-CASE-CATALOG.md",
-          "quote": "No synthetic software incidents may appear in the active demo catalog."
         }
       ],
-      "blockerClass": "requirement-conflict"
+      "blockerClass": "requirement-conflict",
+      "resolutionSources": [
+        {
+          "repo": "indy-init",
+          "path": "docs/CAUSA-UI-EXPERIENCE-REQUIREMENTS.md",
+          "quote": "Verify the three active-catalog investigations (EXT-DATA-013) load from the connected repository and replay"
+        },
+        {
+          "repo": "indy-init",
+          "path": "docs/REHEARSAL-EXTERNAL-DATA-BOUNDARY.md",
+          "quote": "The active demonstration catalog is the one named by causa-data"
+        }
+      ]
     },
     {
       "id": "F-002",
@@ -139,10 +128,10 @@
       "type": "drift",
       "severity": "critical",
       "material": true,
-      "status": "unresolved",
+      "status": "resolved-by-owner",
       "owner": "operator (kemiller2002), via a reviewed owner commit (OD-INDY-6)",
       "title": "The committed baseline is pinned at 002d8ba; the source commit adds AR-019..AR-026 and changes the acceptance ledger contract",
-      "description": "requirements/causa-requirements-baseline.json pins 002d8ba with 450 requirements. The generator at the source commit 9d98938 gives 460: AR-019..AR-026 and two AGENT-RELIABILITY sections are added, and REHEARSAL-ACCEPTANCE-LEDGER's preamble, single-ledger-format and release-acceptance-predicate sections changed (computed verdict, then indy-init PR #16: ledger v2, pinned approvals and evidence manifests). Because the generator numbers obligations by position, an added sentence shifts later obligation ids in its section, so any disposition must be derived after the re-pin. The Praxis gate would report drift. This package inventories the baseline at the source commit and does not edit the committed baseline. R4 precondition P2 requires the re-pin at the kickoff commit.",
+      "description": "Resolved by the owner's merge of indy-init PR #18 (c848a18): requirements/causa-requirements-baseline.json was regenerated with the unmodified generator at c751d58 (461 requirements, AR-019..AR-026 and the PR #16 ledger changes included); it has no drift against the source commit (V14, PRE-REQ-01). Residual, scheduled: R4 precondition P2 still re-pins at the kickoff commit (task T01), and dispositions are derived after that re-pin because obligation ids are positional.",
       "requirements": [
         "AR-019",
         "AR-020",
@@ -158,15 +147,12 @@
         "REHEARSAL-ACCEPTANCE-LEDGER§release-acceptance-predicate"
       ],
       "decisions": [],
-      "options": [
-        "Regenerate and commit the baseline at the kickoff commit (RDP-001), then derive",
-        "Record an operator decision to stay on 002d8ba and exclude AR-019..AR-026 with approval"
-      ],
+      "options": [],
       "citations": [
         {
           "repo": "indy-init",
           "path": "requirements/README.md",
-          "quote": "002d8ba6e98639a385dd771999099ba032c48086"
+          "quote": "c751d58d66e3f105a8c67a0cb5e069314bdbd391"
         },
         {
           "repo": "indy-init",
@@ -179,7 +165,14 @@
           "quote": "Requirements baseline regenerated and pinned at the kickoff commit."
         }
       ],
-      "blockerClass": "verification-deficiency"
+      "blockerClass": "verification-deficiency",
+      "resolutionSources": [
+        {
+          "repo": "indy-init",
+          "path": "requirements/README.md",
+          "quote": "Re-pin at the Rehearsal 4 kickoff commit"
+        }
+      ]
     },
     {
       "id": "F-004",
@@ -267,10 +260,10 @@
       "type": "gap",
       "severity": "major",
       "material": true,
-      "status": "unresolved",
+      "status": "resolved-by-owner",
       "owner": "operator (kemiller2002)",
       "title": "The Apollo 1 / Apollo 11 / Challenger catalog requirement lives only in causa-data and is outside the preservation baseline",
-      "description": "causa-data research/HISTORICAL-CASE-CATALOG.md requires the application to load exactly three historical cases externally, and its completion gate needs 'the application loads them externally'. No indy-init requirement names these cases, so the Praxis gate cannot detect their omission (the DC-008 failure mode). This package inventories the document as external requirements; adding it (or an indy-init requirement referencing it) to the baseline is an owner scope decision (requirements/README.md).",
+      "description": "Resolved by the owner's merge of indy-init PR #18 (c848a18): EXT-DATA-013 [P0] puts the active catalog (causa-data historical-v1: Apollo 1, Apollo 11, Challenger STS-51-L) in the preservation baseline, loaded externally after Connect and never bundled. causa-data research/HISTORICAL-CASE-CATALOG.md stays inventoried as external requirements for its content rules.",
       "requirements": [
         "HISTORICAL-CASE-CATALOG§catalog-policy",
         "HISTORICAL-CASE-CATALOG§completion-gate",
@@ -279,10 +272,7 @@
       "decisions": [
         "DEC-007"
       ],
-      "options": [
-        "Owner commit adding a Causa requirement that the connected active catalog (historical-v1) loads and renders, and regenerate the baseline",
-        "Owner records that the historical catalog is demonstration content only, outside acceptance"
-      ],
+      "options": [],
       "citations": [
         {
           "repo": "causa-data",
@@ -293,6 +283,13 @@
           "repo": "indy-init",
           "path": "requirements/README.md",
           "quote": "Leaving a document out is a scope decision, so this list is reviewable."
+        }
+      ],
+      "resolutionSources": [
+        {
+          "repo": "indy-init",
+          "path": "docs/REHEARSAL-EXTERNAL-DATA-BOUNDARY.md",
+          "quote": "The active demonstration catalog is the one named by causa-data"
         }
       ]
     },

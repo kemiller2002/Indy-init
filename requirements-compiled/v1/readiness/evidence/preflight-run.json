@@ -1,14 +1,13 @@
 {
   "schema": "indy-init.preflight-evidence/1",
-  "executedAt": "2026-10-26T12:57:41Z",
-  "sourceCommit": "9d989389260342c77feea1aca52dd8d3d7b746ae",
-  "verdict": "FAIL",
+  "executedAt": "2026-10-26T13:11:50Z",
+  "sourceCommit": "c848a18b8da5ac7733882495f5c22ac105860ab7",
+  "verdict": "BLOCKED",
   "rule": "READY only when every check is PASS (PRE-ORG-01 may stay NOT_RUN for a rehearsal); any FAIL gives FAIL, otherwise BLOCKED",
   "summary": {
     "BLOCKED": 6,
-    "FAIL": 1,
     "NOT_RUN": 4,
-    "PASS": 6
+    "PASS": 7
   },
   "results": [
     {
@@ -33,7 +32,7 @@
       "type": "package-state",
       "title": "Every decision the run depends on is decided by the owner",
       "status": "BLOCKED",
-      "detail": "unresolved: DEC-006, DEC-022, DEC-023, DEC-024, DEC-025"
+      "detail": "unresolved: DEC-006, DEC-022, DEC-023, DEC-025"
     },
     {
       "id": "PRE-DEC-02",
@@ -41,7 +40,7 @@
       "type": "package-state",
       "title": "No critical material finding is unresolved",
       "status": "BLOCKED",
-      "detail": "open: F-001, F-003, F-004, F-005, F-008, F-009"
+      "detail": "open: F-004, F-005, F-008, F-009"
     },
     {
       "id": "PRE-DEP-01",
@@ -80,8 +79,8 @@
       "category": "requirements-baseline",
       "type": "baseline-pinned",
       "title": "Committed baseline is pinned at the source commit and equals the generator's output there",
-      "status": "FAIL",
-      "detail": "drift: the baseline pinned at 002d8ba6e98639a385dd771999099ba032c48086 differs from the generator's output at the source commit 9d989389260342c77feea1aca52dd8d3d7b746ae (F-003, RDP-001)"
+      "status": "PASS",
+      "detail": "pinned at c751d58d66e3f105a8c67a0cb5e069314bdbd391; no drift: requirements, obligations and document hashes equal the generator's output at c848a18b8da5ac7733882495f5c22ac105860ab7"
     },
     {
       "id": "PRE-REQ-02",
@@ -113,7 +112,7 @@
       "type": "secret-scan",
       "title": "No GitHub credential is committed in the planning repository",
       "status": "PASS",
-      "detail": "no GitHub token pattern in any tracked file at 9d989389260342c77feea1aca52dd8d3d7b746ae"
+      "detail": "no GitHub token pattern in any tracked file at c848a18b8da5ac7733882495f5c22ac105860ab7"
     },
     {
       "id": "PRE-TOOL-01",

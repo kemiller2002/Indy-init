@@ -243,6 +243,7 @@
         "Manifest identity checked (CT-008)"
       ],
       "requirements": [
+        "EXT-DATA-013",
         "HISTORICAL-CASE-CATALOG§catalog-policy",
         "HISTORICAL-CASE-CATALOG§completion-gate"
       ],
@@ -732,14 +733,19 @@
     },
     {
       "id": "DEC-024",
-      "title": "What the launch view shows",
-      "classification": "unresolved",
+      "title": "Launch view: empty and disconnected before Connect; the connected catalog after Connect",
+      "classification": "fixed-architectural",
       "home": "ordo",
-      "statement": "See F-001.",
-      "constraints": [],
+      "statement": "Owner-approved by the merge of indy-init PR #18 (c848a18). Before Connect the launch view is an empty, disconnected workspace with the explicit Connect action; after Connect it lists the connected repository's investigations, for the active catalog exactly Apollo 1 (AS-204), Apollo 11 and Challenger (STS-51-L) (EXT-DATA-013). The five synthetic v1.0.0 fixtures are the storage contract's test corpus only.",
+      "constraints": [
+        "No bundled investigation records (EXT-DATA-001)",
+        "Catalog loaded through full validation and F# replay (EXT-DATA-013)",
+        "No synthetic case presented as a catalog case"
+      ],
       "requirements": [
         "UI-001",
-        "UI-015"
+        "UI-015",
+        "EXT-DATA-013"
       ],
       "findings": [
         "F-001"
@@ -748,7 +754,12 @@
         {
           "repo": "indy-init",
           "path": "docs/CAUSA-UI-EXPERIENCE-REQUIREMENTS.md",
-          "quote": "On launch, show all five frozen demonstration investigations and user working copies."
+          "quote": "Before Connect, show an accessible, empty, disconnected workspace with the explicit Connect data repository action (EXT-DATA-002)"
+        },
+        {
+          "repo": "indy-init",
+          "path": "docs/REHEARSAL-EXTERNAL-DATA-BOUNDARY.md",
+          "quote": "The active demonstration catalog is the one named by causa-data"
         }
       ],
       "blockerClass": "requirement-conflict",
@@ -761,7 +772,7 @@
         "UI-001, UI-015 obligations change and EXT-DATA-013 is added: baseline regenerated (F-003)",
         "T22 and T25 acceptance target the three historical cases"
       ],
-      "approvalRequired": "Owner merge of the requirement-change PR (OD-INDY-6: only owner commits change the baseline)"
+      "approvalRequired": "Given: owner merge of indy-init PR #18 (OD-INDY-6)"
     },
     {
       "id": "DEC-025",

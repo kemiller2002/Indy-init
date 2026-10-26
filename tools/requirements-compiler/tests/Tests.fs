@@ -111,13 +111,13 @@ let private cases: Case list =
     let dep task reason = JObj [ "task", JStr task; "reason", JStr reason ]
 
     [ case "positive-control" ignore 0 []
-      case "citation-not-verbatim" (fun d -> edit (cur "findings.json" d) "On launch, show all five frozen demonstration investigations" "On launch, show all six frozen demonstration investigations") 3 [ "V11" ]
+      case "citation-not-verbatim" (fun d -> edit (cur "findings.json" d) "published by a non-forced ref update" "published by a forced ref update") 3 [ "V11" ]
       case "dependency-cycle" (fun d -> setField (cur "tasks.json" d) "tasks" "T00" "dependsOn" (JArr [ dep "T34" "injected cycle" ])) 3 [ "V05"; "V09" ]
       case "requirement-out-of-scope" (fun d -> setField (cur "tasks.json" d) "tasks" "T25" "covers" (jstrs [ "UI-001" ])) 3 [ "V09" ]
       case "fixed-decision-unsourced" (fun d -> setField (cur "decisions.json" d) "decisions" "DEC-020" "sources" (JArr [])) 3 [ "V08" ]
       case "contract-over-claimed" (fun d -> setField (cur "contracts.json" d) "contracts" "CT-009" "status" (JStr "verified")) 3 [ "V07" ]
       case "identity-mismatch" (fun d -> edit (cur "contracts.json" d) "8c361929cfb429c31c059c92d6148036bf2b5861f81dace635a1f7de18dbf87c\"" "0000000000000000000000000000000000000000000000000000000000000000\"") 3 [ "V07" ]
-      case "conflict-silently-accepted" (fun d -> setField (cur "findings.json" d) "findings" "F-001" "decisions" (jstrs [ "DEC-024"; "DEC-007"; "DEC-001" ])) 3 [ "V03" ]
+      case "conflict-silently-accepted" (fun d -> setField (cur "findings.json" d) "findings" "F-009" "decisions" (jstrs [ "DEC-006"; "DEC-001" ])) 3 [ "V03" ]
       case "conflict-resolved-without-source" (fun d -> setField (cur "findings.json" d) "findings" "F-007" "status" (JStr "resolved-by-precedence")) 3 [ "V03" ]
       case "unknown-reference" (fun d -> setField (cur "decisions.json" d) "decisions" "DEC-020" "requirements" (jstrs [ "R9.1"; "UI-999" ])) 3 [ "V04" ]
       case "repository-revision-mismatch" (fun d -> edit (cur "sources.json" d) "\"commit\": \"22260f429501d0d6963fc33302ed1e64d742a374\"" "\"commit\": \"1111111111111111111111111111111111111111\"") 2 []
@@ -125,7 +125,7 @@ let private cases: Case list =
       case "verification-rule-removed" (fun d ->
           edit (cur "verification-rules.json" d) "\"match\": [\"all\"]" "\"match\": [\"origin:baseline\"]"
           edit (cur "verification-rules.json" d) "\"match\": [\"origin:external\"]" "\"match\": [\"origin:none\"]") 3 [ "V06" ]
-      case "blocker-unclassified" (fun d -> setField (cur "findings.json" d) "findings" "F-001" "blockerClass" (JStr "")) 3 [ "V15" ]
+      case "blocker-unclassified" (fun d -> setField (cur "findings.json" d) "findings" "F-009" "blockerClass" (JStr "")) 3 [ "V15" ]
       case "decision-without-recommendation" (fun d -> setField (cur "decisions.json" d) "decisions" "DEC-022" "recommendation" (JStr "")) 3 [ "V15" ]
       case "defect-class-test-missing" (fun d -> mutateList (cur "defect-class-tests.json" d) "tests" (List.filter (fun t -> str "defectClass" t <> "DC-006"))) 3 [ "V16" ]
       case "preflight-depends-on-timed" (fun d -> setField (cur "tasks.json" d) "tasks" "T05" "dependsOn" (JArr [ dep "T12" "injected" ])) 3 [ "V16" ]
