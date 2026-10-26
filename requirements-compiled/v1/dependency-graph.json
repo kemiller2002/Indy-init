@@ -50,9 +50,7 @@
         "CT-017"
       ],
       "decisions": [
-        "DEC-004B",
         "DEC-006",
-        "DEC-012",
         "DEC-022",
         "DEC-023",
         "DEC-024",
@@ -62,7 +60,7 @@
         "G0"
       ],
       "completion": [
-        "F-001, F-002, F-008, F-009, F-011, F-012, F-013 and F-019 each carry an owner decision recorded outside agent authorship (AR-003)",
+        "F-001, F-008, F-009, F-011, F-012, F-013 and F-019 each carry an owner decision recorded outside agent authorship (AR-003)",
         "Every requirement edit the decisions imply is committed by the owner to indy-init"
       ]
     },
@@ -1302,7 +1300,7 @@
     {
       "from": "T00",
       "to": "T20",
-      "reason": "first-launch behaviour and the authentication mechanism are owner decisions (F-002, F-019)"
+      "reason": "the authentication mechanism and public-read credential rule are owner decisions (F-019, F-012)"
     },
     {
       "from": "T20",

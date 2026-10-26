@@ -3,15 +3,15 @@
   "package": "requirements-compiled/v1",
   "source": {
     "repository": "kemiller2002/indy-init",
-    "commit": "598a759b597e05d59e60bfbeb608c66d3945118b",
-    "baselineId": "BL-CAUSA-INDY-INIT-598a759b597e",
-    "baselineSha256": "015e31ca80c0b3464653e5b212d07e74b575a589f8f08d43fad1a6096a6f6148",
+    "commit": "252cd2ef42f81c366bd2d7e9341c26edb7c64d55",
+    "baselineId": "BL-CAUSA-INDY-INIT-252cd2ef42f8",
+    "baselineSha256": "17d1c38bacf69a71e132eae0649af41b54f6bf2ad0de4b34f41acbbeeb2d3be3",
     "baselineGenerator": "tools/build-requirements-baseline.py (existing; unmodified)"
   },
   "repositories": [
     {
       "name": "indy-init",
-      "commit": "598a759b597e05d59e60bfbeb608c66d3945118b",
+      "commit": "252cd2ef42f81c366bd2d7e9341c26edb7c64d55",
       "role": "primary: authoritative requirements (source commit of this package)"
     },
     {
@@ -71,7 +71,7 @@
     },
     {
       "name": "indy-init-rehearsal-003",
-      "commit": "28183a78808c7b020baa7d533a257b602934208f",
+      "commit": "bc6eb5b4e3d4ccc11e9f1c39b57276f408caa3b8",
       "role": "historical evidence (R3)"
     }
   ],
@@ -159,7 +159,7 @@
     },
     {
       "path": "curation/decisions.json",
-      "sha256": "965ded516dd051eea0cfe188c59cc596615aea1d763a30c1d87ba7c07531078a"
+      "sha256": "639c7198334bd2582496e5e85c3424e9965518c0285129bc90f6a648d1d9abb6"
     },
     {
       "path": "curation/experiment.json",
@@ -171,15 +171,15 @@
     },
     {
       "path": "curation/findings.json",
-      "sha256": "3d1d00acfdfacd4bac39fd9ccd0d7bf32bd3a752964b34de04178f937a5148bc"
+      "sha256": "42614dab19ccfca2df8ce894d3fa82742dec7c2e29af78741c0e9bb0427503aa"
     },
     {
       "path": "curation/sources.json",
-      "sha256": "4b51a7c43527cd913f06a25ee9558f09cdb08190e42bbd3d84d6edf9d9228dd7"
+      "sha256": "13a745ecac7fac1eb9534138ca8c782b6033f0be274736a2d128f4b5c2bd39fb"
     },
     {
       "path": "curation/tasks.json",
-      "sha256": "c881d0e01900445f39b30aed1fabd38cca6b8902b8be2936076483551144f65b"
+      "sha256": "68e8515660f5aa8b58a3814f216f04f6f6fe807cdea6df42df7a877e1d9dc6fc"
     },
     {
       "path": "curation/verification-rules.json",
@@ -189,37 +189,37 @@
   "authored": [
     {
       "path": "README.md",
-      "sha256": "be80dea2950dd8e4f6f99fd4f5d8661849821cd1d93eb0fb53a36927468a1358"
+      "sha256": "8962a30a0b098119233a95007f0b52e412ed10ddab1622bb2b872f6b221b9402"
     },
     {
       "path": "optimization-analysis.md",
-      "sha256": "f8ec363fbbb8212c80d71482016b3b2ffda88b8be1f62c97c348abb5899b74a8"
+      "sha256": "5d1da086434749288514e28f857ff7272dfec483dc6b278b3e4a5168aa1ca811"
     }
   ],
   "generated": [
     {
       "path": "contract-bindings.json",
-      "sha256": "ebf04f3ddb5c540eae65a0afd318313238dcb7578cf7cf7b51a21fd8f059f652"
+      "sha256": "1a3b2f29ea433cfb2d961e5030b1d22b6f8c7ad0ac0e7e3ee5739ceb506a0eec"
     },
     {
       "path": "decision-registry.json",
-      "sha256": "0d2900692477e0f0ed6cf003b83f27ebc80e0c30b1e53408e6d2df9aac6ae651"
+      "sha256": "1693203ed07cfa2381e408fa06317dd20f961f1f26ed28ed38838d134786b056"
     },
     {
       "path": "dependency-graph.json",
-      "sha256": "555f70d02e44c8c08928f29b708fb54b02f087d1f623a99a6e78964ab38191e8"
+      "sha256": "54cb889ee7fbecb393d3294ae1f9f181cad62c3902441d0979809e3e4e165172"
     },
     {
       "path": "execution-plan-resource.json",
-      "sha256": "cdd66872c7d04bb8eb2a2d061346618e54ecefebc16067e7f95649026d577070"
+      "sha256": "f235e530ccade3ec0b186826437fe72f8e69069f238259d9e9c5477aeed833ee"
     },
     {
       "path": "execution-plan-time.json",
-      "sha256": "d10d96c75cb83d41a4df5866e2b6916a85dfd6408731e4fce1754ec794ab9492"
+      "sha256": "b030d33309bfcd6f44de784990e4d0e20a73317bdb3a955648fe29002b2e46db"
     },
     {
       "path": "normalized-requirements.json",
-      "sha256": "4e8e79a7edc647a72bad92838ef528ffdb13a1772e83173c7e813fdc60035589"
+      "sha256": "f96432e91d635381f4b47ad9152d19bcf8a173eeca6fad0cbd45c247a5b37869"
     },
     {
       "path": "percepta-experiment.json",
@@ -227,15 +227,15 @@
     },
     {
       "path": "requirements-inventory.json",
-      "sha256": "6e1b237147f4062af0721ee7a7723d0fd7194442e5968df2dafccdcf839f4d9e"
+      "sha256": "3c0e4ab1a5fd0cc3b8635531ae154a20978d8b207e43589639048d0aeeb2c73f"
     },
     {
       "path": "requirements-source-map.json",
-      "sha256": "a90efa2e333414b5324995550831fcc5788193b1840811c2ee2da99a3fc526e9"
+      "sha256": "171d524dce0d2d35c8d205e7c34a9e7872f914083ebe72c786659e112a470af6"
     },
     {
       "path": "requirements-validation-report.json",
-      "sha256": "8d1ee7bcae573a367fbb1f5a57376ec91ccbfa42e89aa19772f13753e860c151"
+      "sha256": "d81a8504f3d09fc9837280a9ef426939495b0de6e1529594412a7eb66bddf55c"
     },
     {
       "path": "verification-manifest.json",

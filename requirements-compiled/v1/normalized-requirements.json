@@ -8,7 +8,7 @@
   ],
   "summary": {
     "normalized": 466,
-    "flaggedForReview": 193,
+    "flaggedForReview": 191,
     "exactDuplicateGroups": 0,
     "structuralContainments": 84,
     "nearDuplicatePairs": 4,
@@ -2059,10 +2059,8 @@
       "findings": [
         "F-002"
       ],
-      "reviewStatus": "flagged-for-review",
-      "reviewReasons": [
-        "F-002"
-      ]
+      "reviewStatus": "normalized",
+      "reviewReasons": []
     },
     {
       "id": "NR-AR-004",
@@ -2786,7 +2784,6 @@
       ],
       "reviewStatus": "flagged-for-review",
       "reviewReasons": [
-        "F-002",
         "F-003"
       ]
     },
@@ -6392,8 +6389,7 @@
       ],
       "reviewStatus": "flagged-for-review",
       "reviewReasons": [
-        "F-001",
-        "F-002"
+        "F-001"
       ]
     },
     {
@@ -6440,7 +6436,6 @@
       ],
       "reviewStatus": "flagged-for-review",
       "reviewReasons": [
-        "F-002",
         "F-012",
         "F-019"
       ]
@@ -12525,10 +12520,8 @@
       "findings": [
         "F-002"
       ],
-      "reviewStatus": "flagged-for-review",
-      "reviewReasons": [
-        "F-002"
-      ]
+      "reviewStatus": "normalized",
+      "reviewReasons": []
     },
     {
       "id": "NR-R9.2",
@@ -12928,7 +12921,6 @@
       ],
       "reviewStatus": "flagged-for-review",
       "reviewReasons": [
-        "F-002",
         "ACCEPTANCE-CRITERIA-MISSING"
       ]
     },
@@ -15804,7 +15796,6 @@
       ],
       "reviewStatus": "flagged-for-review",
       "reviewReasons": [
-        "F-002",
         "ACCEPTANCE-CRITERIA-MISSING"
       ]
     },

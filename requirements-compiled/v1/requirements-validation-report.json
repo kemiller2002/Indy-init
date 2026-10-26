@@ -2,8 +2,8 @@
   "schema": "indy-init.requirements-validation-report/1",
   "source": {
     "repository": "kemiller2002/indy-init",
-    "commit": "598a759b597e05d59e60bfbeb608c66d3945118b",
-    "baselineSha256": "015e31ca80c0b3464653e5b212d07e74b575a589f8f08d43fad1a6096a6f6148"
+    "commit": "252cd2ef42f81c366bd2d7e9341c26edb7c64d55",
+    "baselineSha256": "17d1c38bacf69a71e132eae0649af41b54f6bf2ad0de4b34f41acbbeeb2d3be3"
   },
   "compilationVerdict": "PASS",
   "compilationRule": "FAIL when any critical check reports a problem; the compiler then exits 3",
@@ -105,7 +105,7 @@
       "critical": false,
       "status": "WARN",
       "problems": [
-        "requirements/causa-requirements-baseline.json is pinned at 002d8ba6e98639a385dd771999099ba032c48086, not the source commit 598a759b597e05d59e60bfbeb608c66d3945118b",
+        "requirements/causa-requirements-baseline.json is pinned at 002d8ba6e98639a385dd771999099ba032c48086, not the source commit 252cd2ef42f81c366bd2d7e9341c26edb7c64d55",
         "10 requirements at the source commit are missing from the committed baseline: AGENT-RELIABILITY\u00a7evidence-driven-refinement-october-2026, AGENT-RELIABILITY\u00a7reconciliation, AR-019, AR-020, AR-021, AR-022, AR-023, AR-024, AR-025, AR-026"
       ]
     }
@@ -118,11 +118,6 @@
         "kind": "finding",
         "id": "F-001",
         "title": "Launch content: UI-001/UI-015 require the five frozen synthetic investigations; EXT-DATA, OD-INDY-3 and the active catalog require an empty launch and three historical cases"
-      },
-      {
-        "kind": "finding",
-        "id": "F-002",
-        "title": "Two operator records answer DF-CAUSA-2026-0003 differently (first launch, URL identifiers), and a third says those answers must not be inferred"
       },
       {
         "kind": "finding",
@@ -151,18 +146,8 @@
       },
       {
         "kind": "decision",
-        "id": "DEC-004B",
-        "title": "First launch: explicit Connect action versus auto-load of the public catalog"
-      },
-      {
-        "kind": "decision",
         "id": "DEC-006",
         "title": "GitHub write primitive: contract's non-forced ref PATCH versus R2's guarded GraphQL commit"
-      },
-      {
-        "kind": "decision",
-        "id": "DEC-012",
-        "title": "Route identifiers: GUID routes with case-key aliases versus case-key URLs"
       },
       {
         "kind": "decision",

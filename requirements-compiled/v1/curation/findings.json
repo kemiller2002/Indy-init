@@ -68,12 +68,12 @@
     {
       "id": "F-002",
       "type": "conflict",
-      "severity": "critical",
+      "severity": "major",
       "material": true,
-      "status": "unresolved",
+      "status": "resolved-by-owner",
       "owner": "operator (kemiller2002)",
-      "title": "Two operator records answer DF-CAUSA-2026-0003 differently (first launch, URL identifiers), and a third says those answers must not be inferred",
-      "description": "Indy-init OD-INDY-3 (explicit Connect, no auto-load) and OD-INDY-4 (GUID routes, case keys as aliases) were recorded on 2026-10-24 as accepted recommendations. The Rehearsal 3 remediation records the operator approving, on 2026-10-25, the auto-load exception and the case-key URL exception for the same DF-CAUSA-2026-0003 items. The later indy-init record (OPERATOR-KICKOFF-DECISIONS, same merge) says the five DF-CAUSA-2026-0003 decisions must be retrieved and evaluated and their answers not inferred. All three are agent transcriptions; AR-003/AR-024 require authenticated decisions. OD-INDY-1 (writes P0) and OD-INDY-2 (Percepta released) are the owner's own words, are corroborated by DEC-WRITES-001 and DEC-PERCEPTA-001, and are explicitly event-wide, so this finding does not reopen them; it does need the owner to state that the 2026-10-25 R3 approvals are scoped to Rehearsal 3.",
+      "title": "DF-CAUSA-2026-0003 was answered twice (OD-INDY-3/4 on 2026-10-24; a withdrawn Rehearsal 3 transcription on 2026-10-25); the owner record stands",
+      "description": "Indy-init OD-INDY-3 (explicit Connect, no auto-load) and OD-INDY-4 (GUID routes, case keys as aliases) answer DF-CAUSA-2026-0003. On 2026-10-25 the Rehearsal 3 remediation agent transcribed a blanket approval as the opposite answers (auto-load exception, case-key URL exception, waiver W1) and wrote approval files. On 2026-10-26 that transcription was withdrawn: the remediation report's section 10 states the owner record supersedes it, and the owner-merged indy-init REHEARSAL-003-RESULTS.md restates OD-INDY-1..8. Residual, non-blocking: OPERATOR-KICKOFF-DECISIONS says the five DF-CAUSA-2026-0003 decisions must not be inferred, and AR-003 asks for authenticated decisions; OD-INDY-3..8 are agent-recorded acceptances of recommendations. This package treats OD-INDY-3/4 as the owner's decision (DEC-004B, DEC-012) and records the residual for the owner to confirm in Ordo.",
       "requirements": [
         "EXT-DATA-002",
         "EXT-DATA-003",
@@ -87,10 +87,7 @@
         "DEC-004B",
         "DEC-012"
       ],
-      "options": [
-        "Owner confirms OD-INDY-3 and OD-INDY-4 for Rehearsal 4 and the event, and states the 2026-10-25 approvals apply to Rehearsal 3 only",
-        "Owner adopts the 2026-10-25 answers (auto-load, case-key URLs) for the event, with the requirement edits that implies"
-      ],
+      "options": [],
       "citations": [
         {
           "repo": "indy-init",
@@ -120,7 +117,24 @@
         {
           "repo": "indy-init-rehearsal-003",
           "path": "research/decisions/DF-CAUSA-2026-0003--operator-decisions-requested.md",
-          "quote": "Waiver PERCEPTA-SEMCLI-001-W1 granted"
+          "quote": "Withdrawn: the agent's transcription of 2026-10-25"
+        },
+        {
+          "repo": "indy-init-rehearsal-003",
+          "path": "research/decisions/DF-CAUSA-2026-0003--operator-decisions-requested.md",
+          "quote": "Waiver W1 not granted."
+        }
+      ],
+      "resolutionSources": [
+        {
+          "repo": "indy-init-rehearsal-003",
+          "path": "docs/REHEARSAL-003-REMEDIATION-REPORT.md",
+          "quote": "Owner decisions supersede §9 (2026-10-26)"
+        },
+        {
+          "repo": "indy-init",
+          "path": "docs/REHEARSAL-003-RESULTS.md",
+          "quote": "Agents must not interpret blanket approvals or write approval files"
         }
       ]
     },

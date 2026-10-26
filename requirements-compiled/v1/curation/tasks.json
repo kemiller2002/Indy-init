@@ -6,8 +6,8 @@
       "id": "T00", "title": "Owner decisions on the readiness blockers", "owner": "operator", "kind": "precondition", "satisfiedBy": "operator-action",
       "covers": ["UI-001", "UI-015", "EXT-DATA-002", "AR-024", "AR-003", "UI-037"],
       "dependsOn": [], "preferenceAfter": [],
-      "decisions": ["DEC-004B", "DEC-006", "DEC-012", "DEC-022", "DEC-023", "DEC-024", "DEC-025"], "contracts": ["CT-007", "CT-017"], "gates": ["G0"],
-      "completion": ["F-001, F-002, F-008, F-009, F-011, F-012, F-013 and F-019 each carry an owner decision recorded outside agent authorship (AR-003)", "Every requirement edit the decisions imply is committed by the owner to indy-init"]
+      "decisions": ["DEC-006", "DEC-022", "DEC-023", "DEC-024", "DEC-025"], "contracts": ["CT-007", "CT-017"], "gates": ["G0"],
+      "completion": ["F-001, F-008, F-009, F-011, F-012, F-013 and F-019 each carry an owner decision recorded outside agent authorship (AR-003)", "Every requirement edit the decisions imply is committed by the owner to indy-init"]
     },
     {
       "id": "T01", "title": "Regenerate and pin the baseline at the kickoff commit", "owner": "coordinator", "kind": "precondition", "satisfiedBy": "existing-capability", "capability": "indy-init tools/build-requirements-baseline.py",
@@ -169,7 +169,7 @@
       "dependsOn": [
         { "task": "T18", "reason": "built and tested against the recorded provider behaviour" },
         { "task": "T19", "reason": "remote acknowledgment layers on local persistence truth" },
-        { "task": "T00", "reason": "first-launch behaviour and the authentication mechanism are owner decisions (F-002, F-019)" }
+        { "task": "T00", "reason": "the authentication mechanism and public-read credential rule are owner decisions (F-019, F-012)" }
       ], "preferenceAfter": [],
       "decisions": ["DEC-004A", "DEC-004B", "DEC-008", "DEC-019", "DEC-025"], "contracts": ["CT-004", "CT-006", "CT-007", "CT-017"], "gates": ["G6"],
       "completion": ["no mutation on connect or read; explicit create; no overwrite of unread history (EXT-DATA-006)", "eight connection states distinguished (EXT-DATA-007)", "credentials never leave memory or the Authorization header"]

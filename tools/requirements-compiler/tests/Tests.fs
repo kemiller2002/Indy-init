@@ -20,6 +20,23 @@ let private edit (path: string) (oldText: string) (newText: string) =
     if at < 0 then failwithf "mutation target not found in %s: %s" path oldText
     File.WriteAllText(path, text.Substring(0, at) + newText + text.Substring(at + oldText.Length))
 
+/// Structural mutation: replaces one field of the item with the given id in a curation list.
+let private setField (path: string) (listKey: string) (id: string) (key: string) (value: Json) =
+    let replaceIn =
+        function
+        | JObj props when strOpt "id" (JObj props) = Some id ->
+            if not (props |> List.exists (fun (k, _) -> k = key)) then failwithf "%s has no field %s" id key
+            JObj(props |> List.map (fun (k, v) -> if k = key then k, value else k, v))
+        | j -> j
+
+    match parseFile path with
+    | JObj top ->
+        let items = arr listKey (JObj top)
+        if not (items |> List.exists (fun j -> strOpt "id" j = Some id)) then failwithf "mutation target %s not found in %s" id path
+        let updated = top |> List.map (fun (k, v) -> if k = listKey then k, JArr(items |> List.map replaceIn) else k, v)
+        File.WriteAllText(path, serialize (JObj updated))
+    | _ -> failwithf "%s is not a JSON object" path
+
 let private quiet (f: unit -> 'a) =
     let out = Console.Out
     Console.SetOut TextWriter.Null
@@ -72,7 +89,7 @@ let private cases: Case list =
         Mutate = fun d _ -> edit (cur "tasks.json" d) "\"covers\": [\"origin:external\"]" "\"covers\": [\"UI-001\"]"
         ExpectExit = 3; ExpectFailing = [ "V09" ] }
       { Name = "fixed-decision-unsourced"
-        Mutate = fun d _ -> edit (cur "decisions.json" d) "\"sources\": [ { \"repo\": \"indy-init\", \"path\": \"docs/REQUIREMENTS.md\", \"quote\": \"The primary target is iPad Safari in both portrait and landscape orientations.\" } ]" "\"sources\": []"
+        Mutate = fun d _ -> setField (cur "decisions.json" d) "decisions" "DEC-020" "sources" (JArr [])
         ExpectExit = 3; ExpectFailing = [ "V08" ] }
       { Name = "contract-over-claimed"
         Mutate = fun d _ -> edit (cur "contracts.json" d) "\"status\": \"unverified\", \"requirements\": [\"WASM-LOAD-001\"" "\"status\": \"verified\", \"requirements\": [\"WASM-LOAD-001\""
@@ -87,7 +104,7 @@ let private cases: Case list =
         Mutate = fun d _ -> edit (cur "findings.json" d) "\"id\": \"F-007\",\n      \"type\": \"conflict\",\n      \"severity\": \"major\",\n      \"material\": false,\n      \"status\": \"unresolved\"" "\"id\": \"F-007\",\n      \"type\": \"conflict\",\n      \"severity\": \"major\",\n      \"material\": false,\n      \"status\": \"resolved-by-precedence\""
         ExpectExit = 3; ExpectFailing = [ "V03" ] }
       { Name = "unknown-reference"
-        Mutate = fun d _ -> edit (cur "decisions.json" d) "\"requirements\": [\"R9.1\", \"R9.2\", \"UI-011\", \"UI-016\"]" "\"requirements\": [\"R9.1\", \"R9.2\", \"UI-011\", \"UI-999\"]"
+        Mutate = fun d _ -> setField (cur "decisions.json" d) "decisions" "DEC-020" "requirements" (jstrs [ "R9.1"; "UI-999" ])
         ExpectExit = 3; ExpectFailing = [ "V04" ] }
       { Name = "repository-revision-mismatch"
         Mutate = fun d _ -> edit (cur "sources.json" d) "\"commit\": \"22260f429501d0d6963fc33302ed1e64d742a374\"" "\"commit\": \"1111111111111111111111111111111111111111\""

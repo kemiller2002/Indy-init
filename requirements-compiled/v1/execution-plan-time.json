@@ -305,7 +305,7 @@
       "step": 1,
       "dependsOn": [],
       "completion": [
-        "F-001, F-002, F-008, F-009, F-011, F-012, F-013 and F-019 each carry an owner decision recorded outside agent authorship (AR-003)",
+        "F-001, F-008, F-009, F-011, F-012, F-013 and F-019 each carry an owner decision recorded outside agent authorship (AR-003)",
         "Every requirement edit the decisions imply is committed by the owner to indy-init"
       ],
       "gates": [

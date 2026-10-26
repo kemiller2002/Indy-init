@@ -7,7 +7,7 @@ Intake: Praxis document ingestion. This document is source material, not a canon
 
 Every item below is **proposed**. Nothing here is approved, and no requirement is changed by this document. The authoritative requirements are unmodified (`docs/`, `requirements/causa-requirements-baseline.json`).
 
-Source package: `requirements-compiled/v1/`, compiled from indy-init `598a759b597e05d59e60bfbeb608c66d3945118b`:
+Source package: `requirements-compiled/v1/`, compiled from indy-init `252cd2ef42f81c366bd2d7e9341c26edb7c64d55`:
 - compilation PASS;
 - rehearsal readiness BLOCKED.
 
@@ -26,7 +26,7 @@ The finding ids below (F-…) refer to `requirements-compiled/v1/curation/findin
 |---|---|---|---|
 | RCP-001-01 | decision | Re-pin `requirements/causa-requirements-baseline.json` at the kickoff commit (RDP-001), or record an owner decision to stay on 002d8ba. The committed baseline lacks AR-019..AR-026 and two changed ledger sections. | F-003 |
 | RCP-001-02 | decision | Resolve the launch-content conflict. UI-001 and UI-015 require "all five frozen demonstration investigations" on launch. EXT-DATA-001/002, OD-INDY-3 and the active-catalog policy require an empty first launch and three historical cases. | F-001 |
-| RCP-001-03 | decision | State which DF-CAUSA-2026-0003 answers apply to Rehearsal 4 and the event: OD-INDY-3/4 of 2026-10-24, or the Rehearsal 3 approvals of 2026-10-25. Confirm that the 2026-10-25 approvals are Rehearsal-3-scoped. | F-002 |
+| RCP-001-03 | decision | Confirm OD-INDY-3..8 as owner decisions in an authenticated form (AR-003). The 2026-10-25 contrary transcription was withdrawn on 2026-10-26, and OPERATOR-KICKOFF-DECISIONS still says the DF-CAUSA-2026-0003 answers must not be inferred. Not blocking: this package treats OD-INDY-3/4 as decided. | F-002 |
 | RCP-001-04 | requirement | Version the causa storage contract (STORAGE-003) so that the conforming GitHub publication is an atomic, head-guarded commit (GraphQL `createCommitOnBranch` with `expectedHeadOid`, per the Rehearsal 2 owner decision), or record an exception. Section 9.4.1 currently mandates the REST ref update that Rehearsal 2 proved cannot compare-and-swap. | F-009 |
 | RCP-001-05 | requirement | Add a Causa requirement: after Connect, the active catalog `historical-v1` (Apollo 1, Apollo 11, Challenger STS-51-L) loads externally and replays to its manifest states. Alternatively, record it as demonstration content outside acceptance. Today it exists only in causa-data and is not preservation-gated. | F-006 |
 | RCP-001-06 | decision | Decide whether the AI proposal loop and time travel (kickoff packet checkpoints 12:45 and 2:45; "AI proposal authority boundary" never cut) are in scope for Rehearsal 4 and the event. | F-008 |

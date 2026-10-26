@@ -4,10 +4,10 @@ This package compiles the Causa requirements into a structured form. Every part 
 
 |   |   |
 |---|---|
-| Source | kemiller2002/indy-init `598a759b597e05d59e60bfbeb608c66d3945118b` (the regenerated baseline is pinned to this commit) |
+| Source | kemiller2002/indy-init `252cd2ef42f81c366bd2d7e9341c26edb7c64d55` (the regenerated baseline is pinned to this commit) |
 | Other repositories | the exact commits in `curation/sources.json` (also in `package-manifest.json`) |
 | Compilation verdict | **PASS**: every critical check V01–V13 passes |
-| Rehearsal readiness | **BLOCKED**: 19 blockers, listed in `requirements-validation-report.json` |
+| Rehearsal readiness | **BLOCKED**: 16 blockers, listed in `requirements-validation-report.json` |
 | Target run | the repository's **Rehearsal 4** (write-path dress rehearsal). The mission brief called it "Rehearsal 3" (F-020). |
 
 Two things this package does not do:
@@ -18,7 +18,7 @@ Two things this package does not do:
 
 | File | Phase | What it is |
 |---|---|---|
-| `requirements-inventory.json` | 1 | Every requirement and obligation, verbatim. It records source commit, document, heading and section hash, category, tags, modality, implementation status, acceptance criteria, dependencies, ambiguities, conflicts and a link to verification. There are 466 requirements: the 460 of the baseline at `598a759` plus 6 sections of causa-data's historical-catalog requirements. |
+| `requirements-inventory.json` | 1 | Every requirement and obligation, verbatim. It records source commit, document, heading and section hash, category, tags, modality, implementation status, acceptance criteria, dependencies, ambiguities, conflicts and a link to verification. There are 466 requirements: the 460 of the baseline at `252cd2e` plus 6 sections of causa-data's historical-catalog requirements. |
 | `normalized-requirements.json` | 2 | One normalized record per requirement. Nothing is merged or reworded. It holds overlap groups (structural containment, near duplicates), mechanical flags, findings and `reviewStatus`. |
 | `requirements-source-map.json` | 2 | Normalized id → original requirement → document section and hash → obligation ids. |
 | `decision-registry.json` | 3 | 31 decisions, classified fixed-architectural, verified-reusable, implementation, runtime-situational or unresolved. Every source quote is verified at its commit. |
@@ -47,7 +47,7 @@ The compiler is F# (.NET SDK 10.0.402, `tools/requirements-compiler`). It reads 
 
 ```bash
 # 1. The existing, unmodified baseline generator, at the source commit
-python3 -I tools/build-requirements-baseline.py . 598a759b597e05d59e60bfbeb608c66d3945118b > /tmp/baseline.json
+python3 -I tools/build-requirements-baseline.py . 252cd2ef42f81c366bd2d7e9341c26edb7c64d55 > /tmp/baseline.json
 
 # 2. Checkouts containing each commit listed in curation/sources.json (shallow clones are enough)
 K=/path/to/checkouts   # causa-data, praxis, ordo, dokimos, percepta, forma, limen, folio, echelon-registry, indy-init-rehearsal-00{1,2,3}
@@ -113,7 +113,7 @@ No new service is introduced. JSON is stored in git and checked by the compiler.
 | System | What goes there | Interface (documented today) |
 |---|---|---|
 | **Praxis** | The proposals in `input-documents/2026-10-26-RCP-001-compiled-requirements-package-v1.md`, and later the rehearsal's derived RQ package and disposition | The Praxis inbox: `.praxis/inbox/documents/`, with legacy `input-documents/` still read (praxis `docs/fallback-reconciliation.md`). Then `praxis inbox claim / derive / complete`. The preservation gate (`praxis.requirements-baseline/1`, `-disposition/1`, `-approvals/1`) is draft-only, praxis#292 (F-004). Indy-init is not Praxis-initialized, so `praxis init` is needed before `inbox claim` works here. |
-| **Ordo** | Decisions with `home: ordo`: the 15 fixed decisions as records, and the 7 unresolved decisions as owner decision requests. Approvals that close findings. | Ordo decision records (`research/decisions/DF-*`). The Praxis gate's `ordoDecision` reference is reserved for Ordo-backed approvals (praxis `docs/requirements-preservation.md`, draft). Agents never write approvals (RDP-003). |
+| **Ordo** | Decisions with `home: ordo`: the 17 fixed decisions as records, and the 5 unresolved decisions as owner decision requests. Approvals that close findings. | Ordo decision records (`research/decisions/DF-*`). The Praxis gate's `ordoDecision` reference is reserved for Ordo-backed approvals (praxis `docs/requirements-preservation.md`, draft). Agents never write approvals (RDP-003). |
 | **Dokimos** | Verification obligations: every `verification-manifest.json` entry whose owner names Dokimos, the preservation-gate run (a Dokimos gate branches on its exit code), and completion receipts | `dokimos completion verify --packet --authority` (0.7.0). Evidence reuse follows its `Reusable` / digest / revision rule, quoted in `defaults.evidenceReuse`. |
 | **Percepta** | UI acceptance (rule VR-UI) and the experiment `EX-CAUSA-2026-RC1` | `percepta verify --contract --url` with the registered semantic release (F-005). The experiment follows Percepta's `experiment.schema.json` (id, title, status, `tests_hypotheses`) and uses metric ids from `telemetry/metrics.json`; V13 checks they exist. |
 | **Registry / Conditor** | Kickoff set echelon-current 1.28.0 (T03) | `sets/echelon-current/*.json` plus Conditor qualification |

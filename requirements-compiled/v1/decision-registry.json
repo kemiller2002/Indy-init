@@ -9,10 +9,10 @@
   ],
   "rule": "Agents must not reconsider a fixed-architectural decision without recorded evidence of incompatibility (DESIGN-DECISION-BOUNDARIES section 6).",
   "summary": {
-    "fixed-architectural": 15,
+    "fixed-architectural": 17,
     "implementation": 3,
     "runtime-situational": 2,
-    "unresolved": 7,
+    "unresolved": 5,
     "verified-reusable": 4
   },
   "decisions": [
@@ -39,14 +39,14 @@
           "path": "docs/DESIGN-DECISION-BOUNDARIES.md",
           "quote": "Use F# domain types to make invalid generic-core state difficult or impossible to represent.",
           "verified": true,
-          "detail": "found at 598a759b597e05d59e60bfbeb608c66d3945118b"
+          "detail": "found at 252cd2ef42f81c366bd2d7e9341c26edb7c64d55"
         },
         {
           "repo": "indy-init",
           "path": "docs/CAUSA-UI-EXPERIENCE-REQUIREMENTS.md",
           "quote": "The F# domain engine is the sole authority for legal commands, state transitions, causal assertions, and verification.",
           "verified": true,
-          "detail": "found at 598a759b597e05d59e60bfbeb608c66d3945118b"
+          "detail": "found at 252cd2ef42f81c366bd2d7e9341c26edb7c64d55"
         }
       ],
       "sourcesVerified": true
@@ -76,7 +76,7 @@
           "path": "docs/AGENT-DECISION-REDUCTION-PROFILE.md",
           "quote": "Prefer Forma components; do not introduce an independent design system.",
           "verified": true,
-          "detail": "found at 598a759b597e05d59e60bfbeb608c66d3945118b"
+          "detail": "found at 252cd2ef42f81c366bd2d7e9341c26edb7c64d55"
         },
         {
           "repo": "forma",
@@ -112,14 +112,14 @@
           "path": "docs/KICKOFF-EXECUTION-PACKET.md",
           "quote": "Limen boundary;",
           "verified": true,
-          "detail": "found at 598a759b597e05d59e60bfbeb608c66d3945118b"
+          "detail": "found at 252cd2ef42f81c366bd2d7e9341c26edb7c64d55"
         },
         {
           "repo": "indy-init",
           "path": "docs/AGENT-DECISION-REDUCTION-PROFILE.md",
           "quote": "loading: HTML/CSS shell before WASM",
           "verified": true,
-          "detail": "found at 598a759b597e05d59e60bfbeb608c66d3945118b"
+          "detail": "found at 252cd2ef42f81c366bd2d7e9341c26edb7c64d55"
         },
         {
           "repo": "limen",
@@ -155,27 +155,32 @@
           "path": "docs/REHEARSAL-EXTERNAL-DATA-BOUNDARY.md",
           "quote": "obtains actual investigation records only after the user explicitly connects an authorized external GitHub repository",
           "verified": true,
-          "detail": "found at 598a759b597e05d59e60bfbeb608c66d3945118b"
+          "detail": "found at 252cd2ef42f81c366bd2d7e9341c26edb7c64d55"
         },
         {
           "repo": "indy-init",
           "path": "docs/REHEARSAL-EXTERNAL-DATA-BOUNDARY.md",
           "quote": "The data repository MUST be configurable and isolated from the application repository.",
           "verified": true,
-          "detail": "found at 598a759b597e05d59e60bfbeb608c66d3945118b"
+          "detail": "found at 252cd2ef42f81c366bd2d7e9341c26edb7c64d55"
         }
       ],
       "sourcesVerified": true
     },
     {
       "id": "DEC-004B",
-      "title": "First launch: explicit Connect action versus auto-load of the public catalog",
-      "classification": "unresolved",
+      "title": "First launch shows an explicit Connect data repository action; no auto-load",
+      "classification": "fixed-architectural",
       "home": "ordo",
-      "statement": "OD-INDY-3 (explicit Connect) and the 2026-10-25 Rehearsal 3 approval (auto-load exception) disagree; see F-002.",
-      "constraints": [],
+      "statement": "A fresh launch shows an accessible, empty, disconnected workspace; choosing the public historical catalog is an explicit choice inside Connect (OD-INDY-3). The contrary 2026-10-25 transcription was withdrawn (F-002).",
+      "constraints": [
+        "Writes need a user-chosen, authorized repository (EXT-DATA-006, EXT-DATA-009)",
+        "No implicit demo import or fallback (EXT-DATA-002)",
+        "Launch content of UI-001/UI-015 is still open (F-001)"
+      ],
       "requirements": [
-        "EXT-DATA-002"
+        "EXT-DATA-002",
+        "EXT-DATA-003"
       ],
       "findings": [
         "F-002"
@@ -186,7 +191,14 @@
           "path": "docs/OWNER-DECISIONS-2026-10-24.md",
           "quote": "There is no auto-load of a public catalogue.",
           "verified": true,
-          "detail": "found at 598a759b597e05d59e60bfbeb608c66d3945118b"
+          "detail": "found at 252cd2ef42f81c366bd2d7e9341c26edb7c64d55"
+        },
+        {
+          "repo": "indy-init-rehearsal-003",
+          "path": "docs/REHEARSAL-003-REMEDIATION-REPORT.md",
+          "quote": "Owner decisions supersede \u00a79 (2026-10-26)",
+          "verified": true,
+          "detail": "found at bc6eb5b4e3d4ccc11e9f1c39b57276f408caa3b8"
         }
       ],
       "sourcesVerified": true
@@ -218,14 +230,14 @@
           "path": "docs/AGENT-DECISION-REDUCTION-PROFILE.md",
           "quote": "Use frozen causa-data/contract/v1.0.0/CONTRACT.md and tag causa-storage-v1.0.0 as the sole wire contract for this profile.",
           "verified": true,
-          "detail": "found at 598a759b597e05d59e60bfbeb608c66d3945118b"
+          "detail": "found at 252cd2ef42f81c366bd2d7e9341c26edb7c64d55"
         },
         {
           "repo": "indy-init",
           "path": "docs/CAUSA-STORAGE-RELEASE-v1.0.0.md",
           "quote": "Status: RELEASED.",
           "verified": true,
-          "detail": "found at 598a759b597e05d59e60bfbeb608c66d3945118b"
+          "detail": "found at 252cd2ef42f81c366bd2d7e9341c26edb7c64d55"
         }
       ],
       "sourcesVerified": true
@@ -314,14 +326,14 @@
           "path": "docs/OWNER-DECISIONS-2026-10-24.md",
           "quote": "Writes are P0 for the event.",
           "verified": true,
-          "detail": "found at 598a759b597e05d59e60bfbeb608c66d3945118b"
+          "detail": "found at 252cd2ef42f81c366bd2d7e9341c26edb7c64d55"
         },
         {
           "repo": "indy-init",
           "path": "docs/OPERATOR-KICKOFF-DECISIONS.md",
           "quote": "DEC-WRITES-001: Writes are required for the Indy Init application.",
           "verified": true,
-          "detail": "found at 598a759b597e05d59e60bfbeb608c66d3945118b"
+          "detail": "found at 252cd2ef42f81c366bd2d7e9341c26edb7c64d55"
         }
       ],
       "sourcesVerified": true
@@ -333,7 +345,7 @@
       "home": "dokimos",
       "statement": "UI completion requires evidence from the released Percepta semantic CLI pinned by the kickoff set; no waiver.",
       "constraints": [
-        "Evidence from unreleased builds does not count (R3 W1 was R3-scoped; see F-002)",
+        "Evidence from unreleased builds does not count; waiver W1 was not granted (the 2026-10-25 grant was withdrawn, F-002)",
         "Registration is pending (F-005)"
       ],
       "requirements": [
@@ -348,14 +360,14 @@
           "path": "docs/OWNER-DECISIONS-2026-10-24.md",
           "quote": "Percepta semantic UI verification is released, not waived.",
           "verified": true,
-          "detail": "found at 598a759b597e05d59e60bfbeb608c66d3945118b"
+          "detail": "found at 252cd2ef42f81c366bd2d7e9341c26edb7c64d55"
         },
         {
           "repo": "indy-init",
           "path": "docs/OPERATOR-KICKOFF-DECISIONS.md",
           "quote": "DEC-PERCEPTA-001: Percepta is required.",
           "verified": true,
-          "detail": "found at 598a759b597e05d59e60bfbeb608c66d3945118b"
+          "detail": "found at 252cd2ef42f81c366bd2d7e9341c26edb7c64d55"
         }
       ],
       "sourcesVerified": true
@@ -382,14 +394,14 @@
           "path": "docs/OWNER-DECISIONS-2026-10-24.md",
           "quote": "The acceptance verdict is computed, never written.",
           "verified": true,
-          "detail": "found at 598a759b597e05d59e60bfbeb608c66d3945118b"
+          "detail": "found at 252cd2ef42f81c366bd2d7e9341c26edb7c64d55"
         },
         {
           "repo": "indy-init",
           "path": "docs/REHEARSAL-ACCEPTANCE-LEDGER.md",
           "quote": "The verdict is computed, never written",
           "verified": true,
-          "detail": "found at 598a759b597e05d59e60bfbeb608c66d3945118b"
+          "detail": "found at 252cd2ef42f81c366bd2d7e9341c26edb7c64d55"
         }
       ],
       "sourcesVerified": true
@@ -416,18 +428,21 @@
           "path": "docs/DESIGN-DECISION-BOUNDARIES.md",
           "quote": "Because static hosting cannot answer arbitrary paths, routes are hash-based",
           "verified": true,
-          "detail": "found at 598a759b597e05d59e60bfbeb608c66d3945118b"
+          "detail": "found at 252cd2ef42f81c366bd2d7e9341c26edb7c64d55"
         }
       ],
       "sourcesVerified": true
     },
     {
       "id": "DEC-012",
-      "title": "Route identifiers: GUID routes with case-key aliases versus case-key URLs",
-      "classification": "unresolved",
+      "title": "GUID routes; case keys are redirecting aliases only",
+      "classification": "fixed-architectural",
       "home": "ordo",
-      "statement": "OD-INDY-4 and the 2026-10-25 case-key URL exception disagree; see F-002.",
-      "constraints": [],
+      "statement": "URLs follow SCREEN-CONTRACTS \u00a7url-contract and R9.9; #/investigations/<caseKey> redirects to the GUID route and is never stored (OD-INDY-4).",
+      "constraints": [
+        "Hash routes (DEC-011)",
+        "No secrets or evidence content in URLs (R9.9)"
+      ],
       "requirements": [
         "R9.9",
         "SCREEN-CONTRACTS\u00a7url-contract"
@@ -441,7 +456,14 @@
           "path": "docs/OWNER-DECISIONS-2026-10-24.md",
           "quote": "GUID routes, with case keys as aliases",
           "verified": true,
-          "detail": "found at 598a759b597e05d59e60bfbeb608c66d3945118b"
+          "detail": "found at 252cd2ef42f81c366bd2d7e9341c26edb7c64d55"
+        },
+        {
+          "repo": "indy-init",
+          "path": "docs/REHEARSAL-003-RESULTS.md",
+          "quote": "explicit Connect, GUID routes",
+          "verified": true,
+          "detail": "found at 252cd2ef42f81c366bd2d7e9341c26edb7c64d55"
         }
       ],
       "sourcesVerified": true
@@ -472,14 +494,14 @@
           "path": "docs/OWNER-DECISIONS-2026-10-24.md",
           "quote": "Rehearsal 4 runs on exactly that set.",
           "verified": true,
-          "detail": "found at 598a759b597e05d59e60bfbeb608c66d3945118b"
+          "detail": "found at 252cd2ef42f81c366bd2d7e9341c26edb7c64d55"
         },
         {
           "repo": "indy-init",
           "path": "docs/REHEARSAL-DEPENDENCY-LOCK.md",
           "quote": "The run uses exactly this set.",
           "verified": true,
-          "detail": "found at 598a759b597e05d59e60bfbeb608c66d3945118b"
+          "detail": "found at 252cd2ef42f81c366bd2d7e9341c26edb7c64d55"
         }
       ],
       "sourcesVerified": true
@@ -507,7 +529,7 @@
           "path": "docs/DESIGN-DECISION-BOUNDARIES.md",
           "quote": "GitHub is the initial persistence provider.",
           "verified": true,
-          "detail": "found at 598a759b597e05d59e60bfbeb608c66d3945118b"
+          "detail": "found at 252cd2ef42f81c366bd2d7e9341c26edb7c64d55"
         }
       ],
       "sourcesVerified": true
@@ -533,7 +555,7 @@
           "path": "docs/DESIGN-DECISION-BOUNDARIES.md",
           "quote": "GitHub Pages/static hosting is a target where practical.",
           "verified": true,
-          "detail": "found at 598a759b597e05d59e60bfbeb608c66d3945118b"
+          "detail": "found at 252cd2ef42f81c366bd2d7e9341c26edb7c64d55"
         }
       ],
       "sourcesVerified": true
@@ -560,14 +582,14 @@
           "path": "docs/REHEARSAL-004-WRITE-PATH-PLAN.md",
           "quote": "Topology: one continuous lead agent.",
           "verified": true,
-          "detail": "found at 598a759b597e05d59e60bfbeb608c66d3945118b"
+          "detail": "found at 252cd2ef42f81c366bd2d7e9341c26edb7c64d55"
         },
         {
           "repo": "indy-init",
           "path": "docs/AGENT-RELIABILITY-REQUIREMENTS.md",
           "quote": "Prefer one long-running implementation agent with compact durable checkpoints.",
           "verified": true,
-          "detail": "found at 598a759b597e05d59e60bfbeb608c66d3945118b"
+          "detail": "found at 252cd2ef42f81c366bd2d7e9341c26edb7c64d55"
         }
       ],
       "sourcesVerified": true
@@ -599,7 +621,7 @@
           "path": "docs/REHEARSAL-DERIVATION-POLICY.md",
           "quote": "Implementation work items MUST NOT begin until praxis requirements preservation verify returns PASS",
           "verified": true,
-          "detail": "found at 598a759b597e05d59e60bfbeb608c66d3945118b"
+          "detail": "found at 252cd2ef42f81c366bd2d7e9341c26edb7c64d55"
         }
       ],
       "sourcesVerified": true
@@ -628,14 +650,14 @@
           "path": "docs/SYSTEM-VERSION-AND-COMPATIBILITY-REQUIREMENTS.md",
           "quote": "Each build MUST use the newest available stable, published, compatible release of every applicable Echelon system",
           "verified": true,
-          "detail": "found at 598a759b597e05d59e60bfbeb608c66d3945118b"
+          "detail": "found at 252cd2ef42f81c366bd2d7e9341c26edb7c64d55"
         },
         {
           "repo": "indy-init",
           "path": "docs/AGENT-DECISION-REDUCTION-PROFILE.md",
           "quote": "Historical R001 versions are not defaults.",
           "verified": true,
-          "detail": "found at 598a759b597e05d59e60bfbeb608c66d3945118b"
+          "detail": "found at 252cd2ef42f81c366bd2d7e9341c26edb7c64d55"
         }
       ],
       "sourcesVerified": true
@@ -664,7 +686,7 @@
           "path": "docs/REHEARSAL-EXTERNAL-DATA-BOUNDARY.md",
           "quote": "Credentials MUST never be committed, bundled, logged, embedded in URLs, exposed in error text, stored in localStorage, or written into domain event files.",
           "verified": true,
-          "detail": "found at 598a759b597e05d59e60bfbeb608c66d3945118b"
+          "detail": "found at 252cd2ef42f81c366bd2d7e9341c26edb7c64d55"
         },
         {
           "repo": "causa-data",
@@ -699,7 +721,7 @@
           "path": "docs/REQUIREMENTS.md",
           "quote": "The primary target is iPad Safari in both portrait and landscape orientations.",
           "verified": true,
-          "detail": "found at 598a759b597e05d59e60bfbeb608c66d3945118b"
+          "detail": "found at 252cd2ef42f81c366bd2d7e9341c26edb7c64d55"
         }
       ],
       "sourcesVerified": true
@@ -737,7 +759,7 @@
           "path": "docs/DESIGN-DECISION-BOUNDARIES.md",
           "quote": "These are foundational product guarantees.",
           "verified": true,
-          "detail": "found at 598a759b597e05d59e60bfbeb608c66d3945118b"
+          "detail": "found at 252cd2ef42f81c366bd2d7e9341c26edb7c64d55"
         }
       ],
       "sourcesVerified": true
@@ -761,7 +783,7 @@
           "path": "docs/KICKOFF-EXECUTION-PACKET.md",
           "quote": "Structured AI proposal loop works.",
           "verified": true,
-          "detail": "found at 598a759b597e05d59e60bfbeb608c66d3945118b"
+          "detail": "found at 252cd2ef42f81c366bd2d7e9341c26edb7c64d55"
         }
       ],
       "sourcesVerified": true
@@ -786,7 +808,7 @@
           "path": "docs/REHEARSAL-AGENT-INTERFACE-FREEZE.md",
           "quote": "Extract actual types and exported interfaces from accepted R001 F# source and Limen adapter.",
           "verified": true,
-          "detail": "found at 598a759b597e05d59e60bfbeb608c66d3945118b"
+          "detail": "found at 252cd2ef42f81c366bd2d7e9341c26edb7c64d55"
         }
       ],
       "sourcesVerified": true
@@ -811,7 +833,7 @@
           "path": "docs/CAUSA-UI-EXPERIENCE-REQUIREMENTS.md",
           "quote": "On launch, show all five frozen demonstration investigations and user working copies.",
           "verified": true,
-          "detail": "found at 598a759b597e05d59e60bfbeb608c66d3945118b"
+          "detail": "found at 252cd2ef42f81c366bd2d7e9341c26edb7c64d55"
         }
       ],
       "sourcesVerified": true
@@ -836,7 +858,7 @@
           "path": "docs/REHEARSAL-EXTERNAL-DATA-BOUNDARY.md",
           "quote": "Prefer short-lived least-privilege tokens or GitHub App authorization.",
           "verified": true,
-          "detail": "found at 598a759b597e05d59e60bfbeb608c66d3945118b"
+          "detail": "found at 252cd2ef42f81c366bd2d7e9341c26edb7c64d55"
         }
       ],
       "sourcesVerified": true
@@ -862,7 +884,7 @@
           "path": "docs/REQUIREMENTS.md",
           "quote": "Invalid transitions and violated invariants must be represented through Aegis-compatible faults rather than hidden exceptions or generic error text.",
           "verified": true,
-          "detail": "found at 598a759b597e05d59e60bfbeb608c66d3945118b"
+          "detail": "found at 252cd2ef42f81c366bd2d7e9341c26edb7c64d55"
         },
         {
           "repo": "echelon-registry",
@@ -894,7 +916,7 @@
           "path": "docs/CAUSA-STORAGE-RELEASE-v1.0.0.md",
           "quote": "10.0.402 (rollForward: disable)",
           "verified": true,
-          "detail": "found at 598a759b597e05d59e60bfbeb608c66d3945118b"
+          "detail": "found at 252cd2ef42f81c366bd2d7e9341c26edb7c64d55"
         },
         {
           "repo": "causa-data",
@@ -927,7 +949,7 @@
           "path": "docs/OWNER-DECISIONS-2026-10-24.md",
           "quote": "attested completion needs it alongside Praxis",
           "verified": true,
-          "detail": "found at 598a759b597e05d59e60bfbeb608c66d3945118b"
+          "detail": "found at 252cd2ef42f81c366bd2d7e9341c26edb7c64d55"
         },
         {
           "repo": "echelon-registry",
@@ -961,7 +983,7 @@
           "path": "docs/REHEARSAL-DERIVATION-POLICY.md",
           "quote": "Never use GitHub Issues.",
           "verified": true,
-          "detail": "found at 598a759b597e05d59e60bfbeb608c66d3945118b"
+          "detail": "found at 252cd2ef42f81c366bd2d7e9341c26edb7c64d55"
         },
         {
           "repo": "praxis",
@@ -995,14 +1017,14 @@
           "path": "docs/AGENT-DECISION-REDUCTION-PROFILE.md",
           "quote": "Where a library lacks required functionality, implement the smallest isolated adapter.",
           "verified": true,
-          "detail": "found at 598a759b597e05d59e60bfbeb608c66d3945118b"
+          "detail": "found at 252cd2ef42f81c366bd2d7e9341c26edb7c64d55"
         },
         {
           "repo": "indy-init",
           "path": "docs/REHEARSAL-004-WRITE-PATH-PLAN.md",
           "quote": "R3's typed request book and session nonce are reused designs, not rediscovered ones",
           "verified": true,
-          "detail": "found at 598a759b597e05d59e60bfbeb608c66d3945118b"
+          "detail": "found at 252cd2ef42f81c366bd2d7e9341c26edb7c64d55"
         }
       ],
       "sourcesVerified": true

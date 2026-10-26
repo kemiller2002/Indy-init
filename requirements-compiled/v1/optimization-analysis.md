@@ -52,30 +52,32 @@ Columns:
 | 3 | `permissions.push` treated as authority (DC-004). Stale cached mutable reads (DC-005 → R3 D-07). GitHub returns 422 for a missing branch, but the fake returned 404 (R3 H1). | R2, R3 | **D**: provider behaviours the fakes did not model (R2 report lesson 1; DC-004/005; R3 H1) | Integration-testing timing / contract validation | T18 records real provider responses before the adapter is built. T21 is the live checkpoint at the first persistence milestone. CT-017 constraint. |
 | 4 | Request-identity class recurred in every run: R1 M4, R2 DC-002, R3 M1 and D-04. "Prevented by design" was claimed and was false. | R1–R3 | **D**: the recurrence is recorded (R3 report line 120). **H**: the cause is that the earlier fix was not reused. | Capability reuse | T12 writes failing-first tests for DC-001…006 and for the identity class before any write code (R4-01). DEC-030 reuses R3's typed request book. |
 | 5 | "Not written" reported after a send (DC-003, variants over 7 rounds) | R2 | **D**: "may have applied" state missing from the design (report lesson 3) | Requirement definition | CT-018 states this explicitly. Storage contract §9.4.3 already requires `unknown` to be a distinct state. |
-| 6 | Kickoff gates blocked: no `CAUSA_GITHUB_TOKEN`, no released Percepta | R3 | **D** (report §3) | Evidence planning / preconditions | T05 (secret plus a no-op authenticated read before kickoff) and T03 (registered Percepta). Both are on the plan before the timer starts. |
+| 6 | Kickoff gates blocked: no `CAUSA_GITHUB_TOKEN`, no released Percepta. The remediation later passed Test A once the secret existed (REHEARSAL-003-RESULTS.md). | R3 | **D** (report §3) | Evidence planning / preconditions | T05 (secret plus a no-op authenticated read before kickoff) and T03 (registered Percepta). Both are on the plan before the timer starts. |
 | 7 | Conditor SD-1 (Folio pinned from npm, 404) recurred | R2, R3 | **D** (DEF-STACK-001; R3 defect analysis) | Environment / capability reuse | T03 completion requires a Conditor release with SD-1 fixed. T10 forbids the hand workaround (R4 P3). |
 | 8 | Workflow named a missing `global.json` (D-02). The fix pinned an SDK the Dokimos workflow did not install (D-06, fix-induced). | R3 | **D** (R3 report §6) | Environment / dependency ordering | DEC-027 and the T10 completion condition: `global.json` exists before any workflow names it, and every workflow installs that SDK. |
 | 9 | Phase-0 stack verification took about the first hour. First green CI came 16 min later than R1. | R2 | **D** (report lines 98–99) | Dependency ordering | T03 and T11 move set qualification upstream of kickoff (R4 P1, P5: preflight untimed). |
 | 10 | Self-declared acceptance overturned: R2 ledger INVALID; R3 first draft claimed ACCEPTED | R2, R3 | **D** (OWNER-DECISIONS; R3 report line 9) | Evidence planning | DEC-010 (computed verdict). Every verification entry starts `NOT_RUN`. V10 fails compilation if any requirement is marked complete. |
 | 11 | Live-test token could reach uploaded artifacts (N1, high, fix-induced) | R3 | **D** (R3 report §9) | Security boundary / evidence planning | DEC-019 constraint: uploaded artifacts must not contain tokens. VR-PERSISTENCE evidence rule. |
 | 12 | Forged event histories accepted, recurring | R1 | **D** recurrence (DCC-011). **H**: validation bypassed the canonical decide/evolve path. | Contract validation | CT-003 (Boundary C: replay validates every event through the engine). T12 and T13 adversarial variants. |
+| 13 | A bound input field without `data-on="input"` lost typed text to the next projection, twice | R3 | **D** (indy-init REHEARSAL-003-RESULTS.md, lesson 3) | Contract validation (Limen DOM vocabulary) | Recorded here for T16 and T22. Limen's documented `data-on` binding (CT-009) is the reused capability; no requirement is missing. |
 
 What this mapping shows:
-- **Six of the twelve rows are contract-validation or integration-timing failures** (rows 2, 3, 4, 5, 8, 12).
+- **Seven of the thirteen rows are contract-validation or integration-timing failures** (rows 2, 3, 4, 5, 8, 12, 13).
 - **Three are precondition or evidence failures that were visible before kickoff** (rows 6, 7, 9).
 - **The remaining three** are about the integrity of requirements and acceptance (rows 1, 10, 11).
 
-None of the twelve was caused by a missing application requirement. Each was caused by a contract, precondition or verification step that was discovered late.
+None of the thirteen was caused by a missing application requirement. Each was caused by a contract, precondition or verification step that was discovered late.
 
 ## 4. What compilation found that no rehearsal had found yet
 
 These problems were found from the sources alone. Each would have cost a rehearsal slice to discover during a run. All of them are in `curation/findings.json`.
 
 - **F-001 (critical):** UI-001 and UI-015 require the five frozen synthetic investigations on launch. EXT-DATA-001/002, OD-INDY-3 and the active-catalog policy (exactly three historical cases) forbid exactly that. No reconciliation section covers it.
-- **F-002 (critical):** two operator records answer DF-CAUSA-2026-0003 differently.
-  - Indy-init (2026-10-24): explicit Connect, GUID routes.
-  - Rehearsal 3 remediation (2026-10-25): auto-load exception, case-key URL exception.
-  - A third record says these answers must not be inferred.
+- **F-002 (resolved by the owner's record during this compilation):** DF-CAUSA-2026-0003 was answered twice.
+  - Indy-init OD-INDY-3/4 (2026-10-24): explicit Connect, GUID routes.
+  - A Rehearsal 3 agent transcription (2026-10-25): auto-load and case-key exceptions.
+  - The transcription was withdrawn on 2026-10-26 (rehearsal-003 remediation report section 10, at `bc6eb5b`). This package pins that commit and treats OD-INDY-3/4 as decided.
+  - The first compilation, at rehearsal-003 `28183a7`, still showed the conflict. When the commit was re-pinned, the compiler's citation check (V11) rejected the stale quote, which is how the change was detected.
 - **F-003 (critical):** the committed baseline (002d8ba, 450 requirements) is behind its own source. AR-019…AR-026 are missing. The Praxis gate would report drift on day one.
 - **F-004 (critical):** the mandatory preservation gate exists only on a draft Praxis branch (praxis#292). VER-005 forbids using it without an exception, so RDP-004 cannot currently be met.
 - **F-005 (critical):** the Percepta semantic CLI is released (v0.2.1) but not registered. echelon-current 1.27.0 says it is not the complete R4 set.
@@ -115,7 +117,7 @@ These problems were found from the sources alone. Each would have cost a rehears
 
 These are hypotheses, not savings. Each states the assumption it depends on and the measurement that would test it.
 
-1. **Untimed resolution of the 19 readiness blockers** (`requirements-validation-report.json` → `rehearsalReadiness.blockers`).
+1. **Untimed resolution of the 16 readiness blockers** (`requirements-validation-report.json` → `rehearsalReadiness.blockers`).
    - Assumption: each blocker otherwise stops a slice mid-run under the ADRP-001 conflict stop or RDP-005.
    - Historical anchor: R3 ended BLOCKED on two of these classes of condition (rows 6 and 7 of §3).
    - Test: count `agent.human_escalations` and the blocked slices per arm.
@@ -129,7 +131,7 @@ These are hypotheses, not savings. Each states the assumption it depends on and 
    - Historical anchor: R3 created 59 CI runs in its timed phase.
    - Test: CI runs created, executed and failed per arm.
 4. **Less rediscovery.**
-   - Assumption: agents read the package instead of the 72 documents in `docs/`. The package carries 31 decisions (15 fixed, 7 unresolved), 18 contracts and 35 work items, and every one of their citations is verified.
+   - Assumption: agents read the package instead of the 72 documents in `docs/`. The package carries 31 decisions (17 fixed, 5 unresolved), 18 contracts and 35 work items, and every one of their citations is verified.
    - Test: `tokens.total`, `tool.calls` and `tool.file_reads` per arm.
    - Historical anchor: R3 used 116.8 M tokens in its timed phase. No R1 or R2 token figure exists.
 

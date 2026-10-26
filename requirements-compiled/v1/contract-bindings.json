@@ -42,7 +42,7 @@
           "path": "docs/REHEARSAL-AGENT-INTERFACE-FREEZE.md",
           "quote": "Input MUST include investigation ID, actor/provenance, typed command, expected aggregate version",
           "verified": true,
-          "detail": "found at 598a759b597e05d59e60bfbeb608c66d3945118b"
+          "detail": "found at 252cd2ef42f81c366bd2d7e9341c26edb7c64d55"
         }
       ],
       "identityResults": []
@@ -73,7 +73,7 @@
           "path": "docs/REHEARSAL-AGENT-INTERFACE-FREEZE.md",
           "quote": "A single immutable projection identifies investigation, aggregate version, lifecycle",
           "verified": true,
-          "detail": "found at 598a759b597e05d59e60bfbeb608c66d3945118b"
+          "detail": "found at 252cd2ef42f81c366bd2d7e9341c26edb7c64d55"
         }
       ],
       "identityResults": []
@@ -103,7 +103,7 @@
           "path": "docs/REHEARSAL-AGENT-INTERFACE-FREEZE.md",
           "quote": "No alternative browser-only validator.",
           "verified": true,
-          "detail": "found at 598a759b597e05d59e60bfbeb608c66d3945118b"
+          "detail": "found at 252cd2ef42f81c366bd2d7e9341c26edb7c64d55"
         }
       ],
       "identityResults": []
@@ -136,7 +136,7 @@
           "path": "docs/REHEARSAL-AGENT-INTERFACE-FREEZE.md",
           "quote": "Provider-neutral operations: load, append with expected version, acknowledge remote persistence, surface conflict, and recover local edits.",
           "verified": true,
-          "detail": "found at 598a759b597e05d59e60bfbeb608c66d3945118b"
+          "detail": "found at 252cd2ef42f81c366bd2d7e9341c26edb7c64d55"
         }
       ],
       "identityResults": []
@@ -167,7 +167,7 @@
           "path": "docs/REHEARSAL-AGENT-INTERFACE-FREEZE.md",
           "quote": "Report rendering cannot elevate an unverified hypothesis to a confirmed cause.",
           "verified": true,
-          "detail": "found at 598a759b597e05d59e60bfbeb608c66d3945118b"
+          "detail": "found at 252cd2ef42f81c366bd2d7e9341c26edb7c64d55"
         }
       ],
       "identityResults": []
@@ -229,7 +229,7 @@
           "path": "docs/CAUSA-STORAGE-RELEASE-v1.0.0.md",
           "quote": "0a68af8c93190d2e4d6c27beb2f8cb67c3aebdda586d01beb7122b71af179152",
           "verified": true,
-          "detail": "found at 598a759b597e05d59e60bfbeb608c66d3945118b"
+          "detail": "found at 252cd2ef42f81c366bd2d7e9341c26edb7c64d55"
         }
       ],
       "identityResults": [
@@ -442,7 +442,7 @@
           "path": "docs/REHEARSAL-DEPENDENCY-LOCK.md",
           "quote": "Folio printing",
           "verified": true,
-          "detail": "found at 598a759b597e05d59e60bfbeb608c66d3945118b"
+          "detail": "found at 252cd2ef42f81c366bd2d7e9341c26edb7c64d55"
         }
       ],
       "identityResults": []
@@ -502,7 +502,7 @@
           "path": "docs/REHEARSAL-DERIVATION-POLICY.md",
           "quote": "The gate is praxis requirements preservation verify",
           "verified": true,
-          "detail": "found at 598a759b597e05d59e60bfbeb608c66d3945118b"
+          "detail": "found at 252cd2ef42f81c366bd2d7e9341c26edb7c64d55"
         }
       ],
       "identityResults": []
@@ -562,7 +562,7 @@
           "path": "docs/REHEARSAL-ACCEPTANCE-LEDGER.md",
           "quote": "derives ACCEPTED, INCOMPLETE, BLOCKED, FAILED or INVALID from the ledger",
           "verified": true,
-          "detail": "found at 598a759b597e05d59e60bfbeb608c66d3945118b"
+          "detail": "found at 252cd2ef42f81c366bd2d7e9341c26edb7c64d55"
         }
       ],
       "identityResults": []
@@ -625,7 +625,7 @@
           "path": "docs/REHEARSAL-EXTERNAL-DATA-BOUNDARY.md",
           "quote": "A token alone is not sufficient to infer a safe repository target.",
           "verified": true,
-          "detail": "found at 598a759b597e05d59e60bfbeb608c66d3945118b"
+          "detail": "found at 252cd2ef42f81c366bd2d7e9341c26edb7c64d55"
         }
       ],
       "identityResults": []

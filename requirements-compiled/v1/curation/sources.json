@@ -2,7 +2,7 @@
   "schema": "indy-init.rc-sources/1",
   "description": "Revisions, classification tables, verification defaults and plan assumptions used by requirements-compiler. Every repository below is read at exactly the recorded commit.",
   "repositories": [
-    { "name": "indy-init", "commit": "598a759b597e05d59e60bfbeb608c66d3945118b", "role": "primary: authoritative requirements (source commit of this package)" },
+    { "name": "indy-init", "commit": "252cd2ef42f81c366bd2d7e9341c26edb7c64d55", "role": "primary: authoritative requirements (source commit of this package)" },
     { "name": "causa-data", "commit": "22260f429501d0d6963fc33302ed1e64d742a374", "role": "storage contract, active historical catalog and its requirements" },
     { "name": "praxis", "commit": "bf7bf04fde6b252a06fe7e12cddc6d4d3ac99eb3", "role": "requirements intake contract" },
     { "name": "ordo", "commit": "2df928ae4618eb075d226ff307843827486ffe39", "role": "decision authority" },
@@ -14,7 +14,7 @@
     { "name": "echelon-registry", "commit": "882bf2e2f2499e6c1c1c77f54539e1acc3d9aa7b", "role": "approved release sets" },
     { "name": "indy-init-rehearsal-001", "commit": "dd63ab4ab0fab0ea07d2d1390dc10636e37243cb", "role": "historical evidence (R1)" },
     { "name": "indy-init-rehearsal-002", "commit": "b053d1da4ef533fba7d6728c369c58a29a1e2440", "role": "historical evidence (R2)" },
-    { "name": "indy-init-rehearsal-003", "commit": "28183a78808c7b020baa7d533a257b602934208f", "role": "historical evidence (R3)" }
+    { "name": "indy-init-rehearsal-003", "commit": "bc6eb5b4e3d4ccc11e9f1c39b57276f408caa3b8", "role": "historical evidence (R3)" }
   ],
   "dependencyVersions": [
     { "system": "echelon-current release set", "version": "1.27.0", "source": "echelon-registry sets/echelon-current/1.27.0.json (approved 2026-10-24; records the percepta-semantic exception)" },
