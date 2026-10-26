@@ -42,7 +42,7 @@
           "path": "docs/REHEARSAL-AGENT-INTERFACE-FREEZE.md",
           "quote": "Input MUST include investigation ID, actor/provenance, typed command, expected aggregate version",
           "verified": true,
-          "detail": "found at 9d989389260342c77feea1aca52dd8d3d7b746ae"
+          "detail": "found at c848a18b8da5ac7733882495f5c22ac105860ab7"
         }
       ],
       "identityResults": []
@@ -73,7 +73,7 @@
           "path": "docs/REHEARSAL-AGENT-INTERFACE-FREEZE.md",
           "quote": "A single immutable projection identifies investigation, aggregate version, lifecycle",
           "verified": true,
-          "detail": "found at 9d989389260342c77feea1aca52dd8d3d7b746ae"
+          "detail": "found at c848a18b8da5ac7733882495f5c22ac105860ab7"
         }
       ],
       "identityResults": []
@@ -103,7 +103,7 @@
           "path": "docs/REHEARSAL-AGENT-INTERFACE-FREEZE.md",
           "quote": "No alternative browser-only validator.",
           "verified": true,
-          "detail": "found at 9d989389260342c77feea1aca52dd8d3d7b746ae"
+          "detail": "found at c848a18b8da5ac7733882495f5c22ac105860ab7"
         }
       ],
       "identityResults": []
@@ -136,7 +136,7 @@
           "path": "docs/REHEARSAL-AGENT-INTERFACE-FREEZE.md",
           "quote": "Provider-neutral operations: load, append with expected version, acknowledge remote persistence, surface conflict, and recover local edits.",
           "verified": true,
-          "detail": "found at 9d989389260342c77feea1aca52dd8d3d7b746ae"
+          "detail": "found at c848a18b8da5ac7733882495f5c22ac105860ab7"
         }
       ],
       "identityResults": []
@@ -167,7 +167,7 @@
           "path": "docs/REHEARSAL-AGENT-INTERFACE-FREEZE.md",
           "quote": "Report rendering cannot elevate an unverified hypothesis to a confirmed cause.",
           "verified": true,
-          "detail": "found at 9d989389260342c77feea1aca52dd8d3d7b746ae"
+          "detail": "found at c848a18b8da5ac7733882495f5c22ac105860ab7"
         }
       ],
       "identityResults": []
@@ -229,7 +229,7 @@
           "path": "docs/CAUSA-STORAGE-RELEASE-v1.0.0.md",
           "quote": "0a68af8c93190d2e4d6c27beb2f8cb67c3aebdda586d01beb7122b71af179152",
           "verified": true,
-          "detail": "found at 9d989389260342c77feea1aca52dd8d3d7b746ae"
+          "detail": "found at c848a18b8da5ac7733882495f5c22ac105860ab7"
         }
       ],
       "identityResults": [
@@ -450,7 +450,7 @@
           "path": "docs/REHEARSAL-DEPENDENCY-LOCK.md",
           "quote": "Folio printing",
           "verified": true,
-          "detail": "found at 9d989389260342c77feea1aca52dd8d3d7b746ae"
+          "detail": "found at c848a18b8da5ac7733882495f5c22ac105860ab7"
         }
       ],
       "identityResults": []
@@ -512,7 +512,7 @@
           "path": "docs/REHEARSAL-DERIVATION-POLICY.md",
           "quote": "The gate is praxis requirements preservation verify",
           "verified": true,
-          "detail": "found at 9d989389260342c77feea1aca52dd8d3d7b746ae"
+          "detail": "found at c848a18b8da5ac7733882495f5c22ac105860ab7"
         }
       ],
       "identityResults": []
@@ -572,21 +572,21 @@
           "path": "docs/REHEARSAL-ACCEPTANCE-LEDGER.md",
           "quote": "derives ACCEPTED, INCOMPLETE, BLOCKED, FAILED or INVALID from the ledger",
           "verified": true,
-          "detail": "found at 9d989389260342c77feea1aca52dd8d3d7b746ae"
+          "detail": "found at c848a18b8da5ac7733882495f5c22ac105860ab7"
         },
         {
           "repo": "indy-init",
           "path": "docs/REHEARSAL-ACCEPTANCE-LEDGER.md",
           "quote": "inline approvals are forbidden",
           "verified": true,
-          "detail": "found at 9d989389260342c77feea1aca52dd8d3d7b746ae"
+          "detail": "found at c848a18b8da5ac7733882495f5c22ac105860ab7"
         },
         {
           "repo": "indy-init",
           "path": "docs/REHEARSAL-ACCEPTANCE-LEDGER.md",
           "quote": "Agent-authored approvals in the ledger and untrusted operator identities are invalid.",
           "verified": true,
-          "detail": "found at 9d989389260342c77feea1aca52dd8d3d7b746ae"
+          "detail": "found at c848a18b8da5ac7733882495f5c22ac105860ab7"
         }
       ],
       "identityResults": []
@@ -651,7 +651,7 @@
           "path": "docs/REHEARSAL-EXTERNAL-DATA-BOUNDARY.md",
           "quote": "A token alone is not sufficient to infer a safe repository target.",
           "verified": true,
-          "detail": "found at 9d989389260342c77feea1aca52dd8d3d7b746ae"
+          "detail": "found at c848a18b8da5ac7733882495f5c22ac105860ab7"
         }
       ],
       "identityResults": []

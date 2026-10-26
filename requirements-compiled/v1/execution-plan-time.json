@@ -5,7 +5,7 @@
   "objective": "Minimize elapsed steps: one lane per owner role, critical-path-first list scheduling, integration checkpoints as early as their prerequisites allow",
   "scope": {
     "tasks": 35,
-    "requirementsCovered": 466,
+    "requirementsCovered": 467,
     "acceptance": "identical for both plans: every entry of verification-manifest.json; no requirement is dropped or weakened"
   },
   "lanes": [
@@ -31,7 +31,7 @@
   "plannedStructure": {
     "steps": 18,
     "maxConcurrentTasks": 4,
-    "crossLaneHandoffs": 43,
+    "crossLaneHandoffs": 41,
     "plannedCiRunsUpperBound": 25,
     "ciTriggerKinds": [
       "implementation",
@@ -305,7 +305,7 @@
       "step": 1,
       "dependsOn": [],
       "completion": [
-        "F-001, F-008, F-009, F-011, F-012, F-013 and F-019 each carry an owner decision recorded outside agent authorship (AR-003)",
+        "F-008, F-009, F-011, F-012, F-013 and F-019 each carry an owner decision recorded outside agent authorship (AR-003); F-001 was decided by the owner's merge of PR #18",
         "Every requirement edit the decisions imply is committed by the owner to indy-init"
       ],
       "gates": [
@@ -645,8 +645,7 @@
       "lane": "ui",
       "step": 10,
       "dependsOn": [
-        "T17",
-        "T00"
+        "T17"
       ],
       "completion": [
         "each implemented screen satisfies its Percepta contract at the deployed SHA",
@@ -692,8 +691,7 @@
       "step": 11,
       "dependsOn": [
         "T20",
-        "T15",
-        "T00"
+        "T15"
       ],
       "completion": [
         "three cases load from kemiller2002/causa-data workspace historical-v1 and replay to the manifest's expectedStateSha256",

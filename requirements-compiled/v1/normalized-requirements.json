@@ -7,15 +7,15 @@
     "A requirement named by a material unresolved finding, or carrying a major flag, is flagged-for-review."
   ],
   "summary": {
-    "normalized": 466,
-    "flaggedForReview": 191,
+    "normalized": 467,
+    "flaggedForReview": 174,
     "exactDuplicateGroups": 0,
     "structuralContainments": 84,
-    "nearDuplicatePairs": 4,
+    "nearDuplicatePairs": 5,
     "flagsByCode": {
       "ACCEPTANCE-CRITERIA-MISSING": 149,
-      "ACCESSIBILITY-NOT-LOCAL": 67,
-      "ERROR-HANDLING-UNSTATED": 111,
+      "ACCESSIBILITY-NOT-LOCAL": 66,
+      "ERROR-HANDLING-UNSTATED": 112,
       "MODALITY-UNMARKED": 143,
       "PRIORITY-IN-TITLE-ONLY": 1,
       "PRIORITY-UNSTATED": 160,
@@ -993,6 +993,20 @@
       "id": "NDP-0004",
       "kind": "near-duplicate-obligation",
       "requirements": [
+        "EXT-DATA-013",
+        "HISTORICAL-CASE-CATALOG\u00a7catalog-policy"
+      ],
+      "obligations": [
+        "EXT-DATA-013-O1",
+        "HISTORICAL-CASE-CATALOG\u00a7catalog-policy-O1"
+      ],
+      "similarity": 0.6,
+      "text": "The active demonstration catalog is the one named by causa-data `catalog/active.json` (historical-v1): exactly three historical investigations, Apollo 1 (AS-204), Apollo 11 and Space Shuttle Challenger (STS-51-L)."
+    },
+    {
+      "id": "NDP-0005",
+      "kind": "near-duplicate-obligation",
+      "requirements": [
         "FROZEN-DEMO-STORAGE\u00a7implementation-work",
         "WASM-LOADING-EXPERIENCE\u00a7implementation"
       ],
@@ -1842,10 +1856,8 @@
       "findings": [
         "F-003"
       ],
-      "reviewStatus": "flagged-for-review",
-      "reviewReasons": [
-        "F-003"
-      ]
+      "reviewStatus": "normalized",
+      "reviewReasons": []
     },
     {
       "id": "NR-AGENT-RELIABILITY\u00a7reconciliation",
@@ -1904,10 +1916,8 @@
       "findings": [
         "F-003"
       ],
-      "reviewStatus": "flagged-for-review",
-      "reviewReasons": [
-        "F-003"
-      ]
+      "reviewStatus": "normalized",
+      "reviewReasons": []
     },
     {
       "id": "NR-AGENT-RELIABILITY\u00a7required-adversarial-acceptance-cases",
@@ -2597,10 +2607,8 @@
         "F-003",
         "F-027"
       ],
-      "reviewStatus": "flagged-for-review",
-      "reviewReasons": [
-        "F-003"
-      ]
+      "reviewStatus": "normalized",
+      "reviewReasons": []
     },
     {
       "id": "NR-AR-020",
@@ -2636,10 +2644,8 @@
       "findings": [
         "F-003"
       ],
-      "reviewStatus": "flagged-for-review",
-      "reviewReasons": [
-        "F-003"
-      ]
+      "reviewStatus": "normalized",
+      "reviewReasons": []
     },
     {
       "id": "NR-AR-021",
@@ -2670,10 +2676,8 @@
         "F-003",
         "F-007"
       ],
-      "reviewStatus": "flagged-for-review",
-      "reviewReasons": [
-        "F-003"
-      ]
+      "reviewStatus": "normalized",
+      "reviewReasons": []
     },
     {
       "id": "NR-AR-022",
@@ -2708,10 +2712,8 @@
       "findings": [
         "F-003"
       ],
-      "reviewStatus": "flagged-for-review",
-      "reviewReasons": [
-        "F-003"
-      ]
+      "reviewStatus": "normalized",
+      "reviewReasons": []
     },
     {
       "id": "NR-AR-023",
@@ -2748,7 +2750,6 @@
       ],
       "reviewStatus": "flagged-for-review",
       "reviewReasons": [
-        "F-003",
         "F-005"
       ]
     },
@@ -2782,10 +2783,8 @@
         "F-002",
         "F-003"
       ],
-      "reviewStatus": "flagged-for-review",
-      "reviewReasons": [
-        "F-003"
-      ]
+      "reviewStatus": "normalized",
+      "reviewReasons": []
     },
     {
       "id": "NR-AR-025",
@@ -2819,10 +2818,8 @@
       "findings": [
         "F-003"
       ],
-      "reviewStatus": "flagged-for-review",
-      "reviewReasons": [
-        "F-003"
-      ]
+      "reviewStatus": "normalized",
+      "reviewReasons": []
     },
     {
       "id": "NR-AR-026",
@@ -2851,10 +2848,8 @@
       "findings": [
         "F-003"
       ],
-      "reviewStatus": "flagged-for-review",
-      "reviewReasons": [
-        "F-003"
-      ]
+      "reviewStatus": "normalized",
+      "reviewReasons": []
     },
     {
       "id": "NR-CAUSA-STORAGE-RELEASE\u00a7authority",
@@ -6346,10 +6341,8 @@
       "findings": [
         "F-001"
       ],
-      "reviewStatus": "flagged-for-review",
-      "reviewReasons": [
-        "F-001"
-      ]
+      "reviewStatus": "normalized",
+      "reviewReasons": []
     },
     {
       "id": "NR-EXT-DATA-002",
@@ -6387,10 +6380,8 @@
         "F-001",
         "F-002"
       ],
-      "reviewStatus": "flagged-for-review",
-      "reviewReasons": [
-        "F-001"
-      ]
+      "reviewStatus": "normalized",
+      "reviewReasons": []
     },
     {
       "id": "NR-EXT-DATA-003",
@@ -6777,6 +6768,48 @@
       ]
     },
     {
+      "id": "NR-EXT-DATA-013",
+      "source": "EXT-DATA-013",
+      "origin": "baseline",
+      "title": "EXT-DATA-013",
+      "priority": "P0",
+      "modality": "must",
+      "category": "data-boundary",
+      "tags": [],
+      "obligations": [
+        "EXT-DATA-013-O1",
+        "EXT-DATA-013-O2",
+        "EXT-DATA-013-O3"
+      ],
+      "textPolicy": "verbatim: obligation text is carried only in requirements-inventory.json and is not reworded",
+      "acceptance": {
+        "status": "present",
+        "own": [
+          "EXT-DATA-013-O3"
+        ],
+        "linkedSections": [
+          "REHEARSAL-EXTERNAL-DATA-BOUNDARY\u00a7acceptance"
+        ]
+      },
+      "dependencies": [
+        "STORAGE-005",
+        "STORAGE-007"
+      ],
+      "overlaps": [
+        "NDP-0004"
+      ],
+      "flags": [
+        {
+          "code": "ERROR-HANDLING-UNSTATED",
+          "severity": "info",
+          "detail": "no failure, refusal, conflict or recovery behaviour stated in this section"
+        }
+      ],
+      "findings": [],
+      "reviewStatus": "normalized",
+      "reviewReasons": []
+    },
+    {
       "id": "NR-FROZEN-DEMO-STORAGE\u00a7implementation-work",
       "source": "FROZEN-DEMO-STORAGE\u00a7implementation-work",
       "origin": "baseline",
@@ -6801,7 +6834,7 @@
       },
       "dependencies": [],
       "overlaps": [
-        "NDP-0004"
+        "NDP-0005"
       ],
       "flags": [],
       "findings": [],
@@ -7030,17 +7063,16 @@
         ]
       },
       "dependencies": [],
-      "overlaps": [],
+      "overlaps": [
+        "NDP-0004"
+      ],
       "flags": [],
       "findings": [
         "F-001",
         "F-006"
       ],
-      "reviewStatus": "flagged-for-review",
-      "reviewReasons": [
-        "F-001",
-        "F-006"
-      ]
+      "reviewStatus": "normalized",
+      "reviewReasons": []
     },
     {
       "id": "NR-HISTORICAL-CASE-CATALOG\u00a7completion-gate",
@@ -7076,10 +7108,8 @@
       "findings": [
         "F-006"
       ],
-      "reviewStatus": "flagged-for-review",
-      "reviewReasons": [
-        "F-006"
-      ]
+      "reviewStatus": "normalized",
+      "reviewReasons": []
     },
     {
       "id": "NR-HISTORICAL-CASE-CATALOG\u00a7evidence-and-modeling-requirements",
@@ -13173,10 +13203,8 @@
       "findings": [
         "F-003"
       ],
-      "reviewStatus": "flagged-for-review",
-      "reviewReasons": [
-        "F-003"
-      ]
+      "reviewStatus": "normalized",
+      "reviewReasons": []
     },
     {
       "id": "NR-REHEARSAL-ACCEPTANCE-LEDGER\u00a7release-acceptance-predicate",
@@ -13246,10 +13274,8 @@
         "F-003",
         "F-027"
       ],
-      "reviewStatus": "flagged-for-review",
-      "reviewReasons": [
-        "F-003"
-      ]
+      "reviewStatus": "normalized",
+      "reviewReasons": []
     },
     {
       "id": "NR-REHEARSAL-ACCEPTANCE-LEDGER\u00a7release-batching-and-evidence",
@@ -17221,10 +17247,8 @@
       "findings": [
         "F-001"
       ],
-      "reviewStatus": "flagged-for-review",
-      "reviewReasons": [
-        "F-001"
-      ]
+      "reviewStatus": "normalized",
+      "reviewReasons": []
     },
     {
       "id": "NR-STORAGE-006",
@@ -17464,6 +17488,7 @@
       "modality": "must",
       "category": "ui",
       "tags": [
+        "accessibility",
         "error-handling"
       ],
       "obligations": [
@@ -17482,29 +17507,24 @@
           "CAUSA-UI-EXPERIENCE\u00a7required-evidence"
         ]
       },
-      "dependencies": [],
+      "dependencies": [
+        "EXT-DATA-002",
+        "EXT-DATA-013"
+      ],
       "overlaps": [],
       "flags": [
         {
           "code": "VAGUE-TERMS",
           "severity": "minor",
           "detail": "where supported"
-        },
-        {
-          "code": "ACCESSIBILITY-NOT-LOCAL",
-          "severity": "info",
-          "detail": "no accessibility obligation in this section; cross-cutting UI-011, R9.3, WASM-LOAD-006 and WDL-007 apply"
         }
       ],
       "findings": [
         "F-001",
         "F-006"
       ],
-      "reviewStatus": "flagged-for-review",
-      "reviewReasons": [
-        "F-001",
-        "F-006"
-      ]
+      "reviewStatus": "normalized",
+      "reviewReasons": []
     },
     {
       "id": "NR-UI-002",
@@ -18082,7 +18102,9 @@
           "CAUSA-UI-EXPERIENCE\u00a7required-evidence"
         ]
       },
-      "dependencies": [],
+      "dependencies": [
+        "EXT-DATA-013"
+      ],
       "overlaps": [],
       "flags": [],
       "findings": [
@@ -18092,7 +18114,6 @@
       ],
       "reviewStatus": "flagged-for-review",
       "reviewReasons": [
-        "F-001",
         "F-005"
       ]
     },
@@ -19998,7 +20019,7 @@
       },
       "dependencies": [],
       "overlaps": [
-        "NDP-0004"
+        "NDP-0005"
       ],
       "flags": [
         {

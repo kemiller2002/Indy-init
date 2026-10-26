@@ -2,25 +2,25 @@
 
 **Verdict: BLOCKED. Rehearsal 4 must not start.**
 
-- The preflight's computed verdict is FAIL: PRE-REQ-01 is the baseline drift (F-003).
-- 16 readiness blockers remain. They have 8 distinct causes, and each needs the owner or an upstream release.
-- Every resolution that this repository can prepare has been prepared and is waiting for approval.
+- The preflight's computed verdict is BLOCKED, with no FAIL left.
+- 13 readiness blockers remain. They have 6 distinct causes, and each needs an owner decision or an upstream release.
+- The owner approved and merged #17 and #18 on 2026-10-26. The merge of #18 decided F-001/DEC-024 and F-006, and fixed the baseline drift (F-003).
 
 ## Revisions and sources
 
 | | |
 |---|---|
-| Source | kemiller2002/indy-init `9d98938` (main: package v1 plus indy-init PR #16, the independent acceptance verifier) |
-| Package | `requirements-compiled/v1`, compilation **PASS**. Critical checks V01–V13 and V15–V17 pass; V14 warns about the drift. |
-| Requirements | 466 inventoried (460 baseline at `9d98938` plus 6 external), 2322 obligations. PR #16 added 30 obligations to the acceptance-ledger contract. All are preserved; none is marked verified. |
-| Evidence | `evidence/preflight-run.json` (executed), `evidence/preflight-owner-branch-projection.json`, `evidence/auth-contract-probe.json`, `evidence/baseline-equivalence.json` |
+| Source | kemiller2002/indy-init `c848a18`: main with #16 (acceptance verifier), #17 (this readiness tooling) and #18 (owner-approved requirement changes) |
+| Package | `requirements-compiled/v1`, compilation **PASS**: all checks V01–V17 pass, and V14 confirms there is no baseline drift |
+| Requirements | 467 inventoried (461 baseline, including EXT-DATA-013, plus 6 external), 2325 obligations, 108 P0. All are preserved; none is marked verified. |
+| Evidence | `evidence/preflight-run.json` (executed at c848a18), `evidence/auth-contract-probe.json`, `evidence/baseline-equivalence.json`. `evidence/preflight-owner-branch-projection.json` is historical: the pre-merge projection of #18. |
 
 ## Blockers: classification and state
 
 | Blocker | Class | Cause | Prepared here | Needs |
 |---|---|---|---|---|
-| F-001, DEC-024 | Indy-init requirement conflict | UI-001/UI-015 require five demo investigations on launch | Requirement edit (UI-001-O1, UI-015-O2, new EXT-DATA-013) on branch `claude/r4-owner-requirement-changes` | Owner merge |
-| F-003 | Verification deficiency | Baseline pinned at 002d8ba lacks AR-019..AR-026 | Regenerated baseline on the same branch; PRE-REQ-01 passes there (projection evidence) | Owner merge; re-pin at kickoff (T01) |
+| ~~F-001, DEC-024~~ | Indy-init requirement conflict | UI-001/UI-015 required five demo investigations on launch | **Resolved:** owner merge of #18 (UI-001-O1, UI-015-O2, EXT-DATA-013) | — |
+| ~~F-003~~ | Verification deficiency | Baseline pinned at 002d8ba lacked AR-019..AR-026 | **Resolved:** owner merge of #18; PRE-REQ-01 PASS | Re-pin at the kickoff commit (T01), as planned |
 | F-009, DEC-006, CT-007 | Contract incompatibility | Storage contract §9.4.1 mandates a REST update that cannot compare-and-swap | Exception text (`CONTRACT-RESOLUTION.md` §1) | Owner decision |
 | F-008, DEC-022 | Owner decision | AI loop and time travel scope | Recommendation: exclude from R4 with approval | Owner decision plus approval records |
 | DEC-025, CT-017 | Owner decision | Authentication mechanism undecided | CT-017 defined (fine-grained token, memory only), plus the F# auth check PRE-AUTH-02 with a negative control | Owner decision |
@@ -29,8 +29,9 @@
 | F-005, CT-012, CT-016 | External dependency | percepta-semantic 0.2.1 is now a registered release, but in no approved set (PRE-DEP-01, executed) | The contents of 1.28.0 are specified | Registry set 1.28.0, Conditor qualification, owner approval |
 
 **Counts:**
-- 16 at the start of this work, and 16 still open: no blocker can be closed without the owner or an upstream release.
-- Resolution prepared and waiting for owner approval: 11. These are F-001, DEC-024, F-003, F-009, DEC-006, CT-007, F-008, DEC-022, DEC-025, CT-017 and DEC-023.
+- 16 at the start of this work. 3 are resolved by the owner's merge of #18: F-001, DEC-024 and F-003. F-006, which was not a readiness blocker, is also resolved.
+- 13 are open.
+- Resolution prepared, waiting for an owner-authored decision: 8. These are F-009, DEC-006, CT-007, F-008, DEC-022, DEC-025, CT-017 and DEC-023.
 - Waiting on upstream releases: 5. These are F-004, CT-013, F-005, CT-012 and CT-016.
 - Upstream progress since package v1: percepta-semantic 0.2.1 was registered as a release (Registry PR #96/#97, by the owner), and the Conditor SD-1 fix is confirmed released in v0.10.11.
 
@@ -38,9 +39,9 @@
 
 | Check | Status | Detail |
 |---|---|---|
-| PRE-DEC-01 owner decisions | BLOCKED | DEC-006, DEC-022, DEC-023, DEC-024, DEC-025 unresolved |
-| PRE-DEC-02 critical findings | BLOCKED | F-001, F-003, F-004, F-005, F-008, F-009 open |
-| PRE-REQ-01 baseline drift | **FAIL** | Pinned 002d8ba differs from the generator's output at 9d98938 (passes on the owner branch) |
+| PRE-DEC-01 owner decisions | BLOCKED | DEC-006, DEC-022, DEC-023, DEC-025 unresolved |
+| PRE-DEC-02 critical findings | BLOCKED | F-004, F-005, F-008, F-009 open |
+| PRE-REQ-01 baseline drift | PASS | Pinned at c751d58; no drift at c848a18 |
 | PRE-REQ-02 package compiles | PASS | |
 | PRE-REQ-03 Praxis gate released | BLOCKED | v3.20.0 has no `preservation` command |
 | PRE-REQ-04 gate PASS on the derived package | NOT_RUN | Needs T07–T09 |
@@ -49,7 +50,7 @@
 | PRE-DEP-03 identities | PASS | 5 of 5 match |
 | PRE-AUTH-01 CI secret | BLOCKED | CAUSA_GITHUB_TOKEN and CAUSA_TEST_REPO are not set here (T05) |
 | PRE-AUTH-02 auth contract | NOT_RUN | Needs the secret. The negative-control probe showed this sandbox rewrites credentials, so it must run in CI |
-| PRE-SEC-01 committed secrets | PASS | No token patterns at 9d98938 |
+| PRE-SEC-01 committed secrets | PASS | No token patterns at c848a18 |
 | PRE-TOOL-01 SDK | PASS | 10.0.402 = global.json |
 | PRE-TOOL-02 Conditor SD-1 | PASS | v0.10.11 contains CON-367 |
 | PRE-TOOL-03 bootstrap | NOT_RUN | T10 record |
@@ -72,7 +73,7 @@
 - **`timed-execution-manifest.json`:** Plan B, the default.
   - 24 timed tasks in 23 steps, with 8 batched CI runs.
   - The clock starts at the first green bootstrap CI and has a 420-minute ceiling. The milestones are those of R4 §5.
-  - 102 of 107 P0 requirements are covered by timed tasks. VER-001/002/003/005/010 are preflight work.
+  - 103 of 108 P0 requirements are covered by timed tasks. VER-001/002/003/005/010 are preflight work.
   - The DC-001..DC-006 failing-first tests are attached to T12, T16, T18 and T21.
   - T27 and T28 are `conditionalOn: DEC-022`.
   - Workstreams covered: application, persistence, live provider, UI, integration testing, independent review, defect correction and final acceptance.
@@ -94,9 +95,7 @@ V16 fails compilation if any of DC-001..DC-006 loses its test.
 
 ## Order of work to reach READY
 
-1. **Owner:**
-   - merge the requirement-change PR (F-001, F-003);
-   - decide DEC-006, DEC-025, DEC-022 and DEC-023 (`OWNER-DECISION-REQUESTS.md`).
+1. **Owner:** decide DEC-006, DEC-025, DEC-022 and DEC-023 in an owner-authored record (`OWNER-DECISION-REQUESTS.md`). The requirement-change PR (#18) is merged.
 2. **Upstream:**
    - release Praxis with the gate;
    - cut, qualify and approve echelon-current 1.28.0.

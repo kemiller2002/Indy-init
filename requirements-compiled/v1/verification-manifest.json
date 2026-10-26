@@ -333,16 +333,16 @@
     }
   ],
   "summary": {
-    "entries": 466,
+    "entries": 467,
     "byGate": {
-      "G0": 466,
+      "G0": 467,
       "G1": 21,
       "G10": 68,
       "G2": 11,
       "G3": 74,
       "G4": 25,
       "G5": 117,
-      "G6": 54,
+      "G6": 55,
       "G7": 117,
       "G8": 5,
       "G9": 5
@@ -351,16 +351,16 @@
       "Conditor + echelon-registry + CI version gate": 21,
       "Dokimos": 74,
       "Dokimos (deployed acceptance)": 5,
-      "Dokimos + live provider CI job": 54,
+      "Dokimos + live provider CI job": 55,
       "Folio print tests + Percepta": 5,
       "Percepta": 117,
-      "Praxis (run by a Dokimos gate)": 460,
+      "Praxis (run by a Dokimos gate)": 461,
       "causa-data catalog verifiers": 6,
       "causa-data compatibility gate": 19,
       "coordinator + Praxis work records": 68,
       "independent architecture review": 71,
       "independent reviewer + Dokimos": 46,
-      "indy-init compute-acceptance-verdict.py": 466,
+      "indy-init compute-acceptance-verdict.py": 467,
       "integration owner + Dokimos": 11
     }
   },
@@ -5822,6 +5822,47 @@
           "CT-004",
           "CT-006",
           "CT-007",
+          "CT-017"
+        ]
+      },
+      "currentStatus": "NOT_RUN"
+    },
+    {
+      "id": "VM-EXT-DATA-013",
+      "requirement": "EXT-DATA-013",
+      "priority": "P0",
+      "rules": [
+        "VR-LEDGER",
+        "VR-PRESERVATION",
+        "VR-PERSISTENCE"
+      ],
+      "gates": [
+        "G0",
+        "G6"
+      ],
+      "owners": [
+        "Dokimos + live provider CI job",
+        "Praxis (run by a Dokimos gate)",
+        "indy-init compute-acceptance-verdict.py"
+      ],
+      "acceptanceTest": {
+        "criteria": [
+          "EXT-DATA-013-O3"
+        ],
+        "linkedSections": [
+          "REHEARSAL-EXTERNAL-DATA-BOUNDARY\u00a7acceptance"
+        ]
+      },
+      "dependenciesAffectingValidity": {
+        "requirements": [
+          "STORAGE-005",
+          "STORAGE-007"
+        ],
+        "contracts": [
+          "CT-004",
+          "CT-006",
+          "CT-007",
+          "CT-008",
           "CT-017"
         ]
       },
@@ -13518,7 +13559,10 @@
         ]
       },
       "dependenciesAffectingValidity": {
-        "requirements": [],
+        "requirements": [
+          "EXT-DATA-002",
+          "EXT-DATA-013"
+        ],
         "contracts": [
           "CT-002",
           "CT-007",
@@ -14018,7 +14062,9 @@
         ]
       },
       "dependenciesAffectingValidity": {
-        "requirements": [],
+        "requirements": [
+          "EXT-DATA-013"
+        ],
         "contracts": [
           "CT-002",
           "CT-007",

@@ -74,7 +74,7 @@
         "DEC-025"
       ],
       "packageStatus": "BLOCKED",
-      "detail": "unresolved: DEC-006, DEC-022, DEC-023, DEC-024, DEC-025"
+      "detail": "unresolved: DEC-006, DEC-022, DEC-023, DEC-025"
     },
     {
       "id": "PRE-DEC-02",
@@ -96,7 +96,7 @@
         "F-009"
       ],
       "packageStatus": "BLOCKED",
-      "detail": "open: F-001, F-003, F-004, F-005, F-008, F-009"
+      "detail": "open: F-004, F-005, F-008, F-009"
     },
     {
       "id": "PRE-DEP-01",
@@ -353,7 +353,6 @@
         "DEC-006",
         "DEC-022",
         "DEC-023",
-        "DEC-024",
         "DEC-025"
       ],
       "contracts": [
@@ -361,7 +360,7 @@
         "CT-017"
       ],
       "completion": [
-        "F-001, F-008, F-009, F-011, F-012, F-013 and F-019 each carry an owner decision recorded outside agent authorship (AR-003)",
+        "F-008, F-009, F-011, F-012, F-013 and F-019 each carry an owner decision recorded outside agent authorship (AR-003); F-001 was decided by the owner's merge of PR #18",
         "Every requirement edit the decisions imply is committed by the owner to indy-init"
       ],
       "gates": [
