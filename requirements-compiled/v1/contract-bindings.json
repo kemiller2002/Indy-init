@@ -42,7 +42,7 @@
           "path": "docs/REHEARSAL-AGENT-INTERFACE-FREEZE.md",
           "quote": "Input MUST include investigation ID, actor/provenance, typed command, expected aggregate version",
           "verified": true,
-          "detail": "found at b785b68c5172e6bdc257e350032ec851a4637ed4"
+          "detail": "found at 9d989389260342c77feea1aca52dd8d3d7b746ae"
         }
       ],
       "identityResults": []
@@ -73,7 +73,7 @@
           "path": "docs/REHEARSAL-AGENT-INTERFACE-FREEZE.md",
           "quote": "A single immutable projection identifies investigation, aggregate version, lifecycle",
           "verified": true,
-          "detail": "found at b785b68c5172e6bdc257e350032ec851a4637ed4"
+          "detail": "found at 9d989389260342c77feea1aca52dd8d3d7b746ae"
         }
       ],
       "identityResults": []
@@ -103,7 +103,7 @@
           "path": "docs/REHEARSAL-AGENT-INTERFACE-FREEZE.md",
           "quote": "No alternative browser-only validator.",
           "verified": true,
-          "detail": "found at b785b68c5172e6bdc257e350032ec851a4637ed4"
+          "detail": "found at 9d989389260342c77feea1aca52dd8d3d7b746ae"
         }
       ],
       "identityResults": []
@@ -136,7 +136,7 @@
           "path": "docs/REHEARSAL-AGENT-INTERFACE-FREEZE.md",
           "quote": "Provider-neutral operations: load, append with expected version, acknowledge remote persistence, surface conflict, and recover local edits.",
           "verified": true,
-          "detail": "found at b785b68c5172e6bdc257e350032ec851a4637ed4"
+          "detail": "found at 9d989389260342c77feea1aca52dd8d3d7b746ae"
         }
       ],
       "identityResults": []
@@ -167,7 +167,7 @@
           "path": "docs/REHEARSAL-AGENT-INTERFACE-FREEZE.md",
           "quote": "Report rendering cannot elevate an unverified hypothesis to a confirmed cause.",
           "verified": true,
-          "detail": "found at b785b68c5172e6bdc257e350032ec851a4637ed4"
+          "detail": "found at 9d989389260342c77feea1aca52dd8d3d7b746ae"
         }
       ],
       "identityResults": []
@@ -229,7 +229,7 @@
           "path": "docs/CAUSA-STORAGE-RELEASE-v1.0.0.md",
           "quote": "0a68af8c93190d2e4d6c27beb2f8cb67c3aebdda586d01beb7122b71af179152",
           "verified": true,
-          "detail": "found at b785b68c5172e6bdc257e350032ec851a4637ed4"
+          "detail": "found at 9d989389260342c77feea1aca52dd8d3d7b746ae"
         }
       ],
       "identityResults": [
@@ -450,7 +450,7 @@
           "path": "docs/REHEARSAL-DEPENDENCY-LOCK.md",
           "quote": "Folio printing",
           "verified": true,
-          "detail": "found at b785b68c5172e6bdc257e350032ec851a4637ed4"
+          "detail": "found at 9d989389260342c77feea1aca52dd8d3d7b746ae"
         }
       ],
       "identityResults": []
@@ -512,7 +512,7 @@
           "path": "docs/REHEARSAL-DERIVATION-POLICY.md",
           "quote": "The gate is praxis requirements preservation verify",
           "verified": true,
-          "detail": "found at b785b68c5172e6bdc257e350032ec851a4637ed4"
+          "detail": "found at 9d989389260342c77feea1aca52dd8d3d7b746ae"
         }
       ],
       "identityResults": []
@@ -552,9 +552,9 @@
       "name": "Acceptance ledger and computed verdict",
       "provider": "kemiller2002/indy-init tools (validate-acceptance-ledger.py, compute-acceptance-verdict.py)",
       "consumer": "rehearsal CI and final report",
-      "contractVersion": "REHEARSAL-ACCEPTANCE-LEDGER.md at the source commit",
-      "requiredCompatibility": "the ledger format at the pinned indy-init commit",
-      "verificationMethod": "CI runs compute-acceptance-verdict.py on every ledger or report change (R4-04); negative controls in tools/test-acceptance-verdict.py",
+      "contractVersion": "causa.acceptance-ledger/2 with causa.acceptance-evidence-manifest/1 and causa.acceptance-evidence/1 (REHEARSAL-ACCEPTANCE-LEDGER.md at 9d98938, indy-init PR #16)",
+      "requiredCompatibility": "the verifier at the pinned indy-init commit, given independently supplied trust inputs: candidate repository and source SHA, the exact requirements baseline and its SHA-256 with a source checkout at the baseline commit, an externally pinned approvals file and SHA-256 with --trusted-operator-id, and a content-addressed evidence manifest with its SHA-256",
+      "verificationMethod": "CI runs the structural and independent-verdict regression suites on every push (tools/test-acceptance-ledger.py, tools/test-acceptance-verdict.py); T34 runs compute-acceptance-verdict.py with the pinned inputs; the report carries exactly one computed verdict line",
       "dependencyVersions": [
         "python 3.12 (indy-init CI)"
       ],
@@ -572,7 +572,21 @@
           "path": "docs/REHEARSAL-ACCEPTANCE-LEDGER.md",
           "quote": "derives ACCEPTED, INCOMPLETE, BLOCKED, FAILED or INVALID from the ledger",
           "verified": true,
-          "detail": "found at b785b68c5172e6bdc257e350032ec851a4637ed4"
+          "detail": "found at 9d989389260342c77feea1aca52dd8d3d7b746ae"
+        },
+        {
+          "repo": "indy-init",
+          "path": "docs/REHEARSAL-ACCEPTANCE-LEDGER.md",
+          "quote": "inline approvals are forbidden",
+          "verified": true,
+          "detail": "found at 9d989389260342c77feea1aca52dd8d3d7b746ae"
+        },
+        {
+          "repo": "indy-init",
+          "path": "docs/REHEARSAL-ACCEPTANCE-LEDGER.md",
+          "quote": "Agent-authored approvals in the ledger and untrusted operator identities are invalid.",
+          "verified": true,
+          "detail": "found at 9d989389260342c77feea1aca52dd8d3d7b746ae"
         }
       ],
       "identityResults": []
@@ -637,7 +651,7 @@
           "path": "docs/REHEARSAL-EXTERNAL-DATA-BOUNDARY.md",
           "quote": "A token alone is not sufficient to infer a safe repository target.",
           "verified": true,
-          "detail": "found at b785b68c5172e6bdc257e350032ec851a4637ed4"
+          "detail": "found at 9d989389260342c77feea1aca52dd8d3d7b746ae"
         }
       ],
       "identityResults": []

@@ -553,7 +553,8 @@
       "decisions": [],
       "contracts": [],
       "completion": [
-        "praxis.requirements-approvals/1 written by the operator (or produced from an Ordo decision); none by an agent"
+        "praxis.requirements-approvals/1 written by the operator (or produced from an Ordo decision); none by an agent",
+        "the same approvals are supplied to the acceptance verifier as an externally pinned file (SHA-256) with the operator named by --trusted-operator-id; inline or agent-authored approvals are invalid (REHEARSAL-ACCEPTANCE-LEDGER, PR #16)"
       ],
       "gates": [
         "G0"

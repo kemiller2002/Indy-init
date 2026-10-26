@@ -141,8 +141,8 @@
       "material": true,
       "status": "unresolved",
       "owner": "operator (kemiller2002), via a reviewed owner commit (OD-INDY-6)",
-      "title": "The committed baseline is pinned at 002d8ba; the source commit adds AR-019..AR-026 and changes the ledger's acceptance predicate",
-      "description": "requirements/causa-requirements-baseline.json pins 002d8ba with 450 requirements. Regenerating it with the unmodified tools/build-requirements-baseline.py at the source commit 252cd2e gives 460: AR-019..AR-026 and two AGENT-RELIABILITY sections are added, and REHEARSAL-ACCEPTANCE-LEDGER§preamble and §release-acceptance-predicate changed (computed verdict). The Praxis gate would report drift. This package inventories the 460 at 252cd2e (baseline documents are identical to 598a759) and does not edit the committed baseline. R4 precondition P2 requires the re-pin at the kickoff commit.",
+      "title": "The committed baseline is pinned at 002d8ba; the source commit adds AR-019..AR-026 and changes the acceptance ledger contract",
+      "description": "requirements/causa-requirements-baseline.json pins 002d8ba with 450 requirements. The generator at the source commit 9d98938 gives 460: AR-019..AR-026 and two AGENT-RELIABILITY sections are added, and REHEARSAL-ACCEPTANCE-LEDGER's preamble, single-ledger-format and release-acceptance-predicate sections changed (computed verdict, then indy-init PR #16: ledger v2, pinned approvals and evidence manifests). Because the generator numbers obligations by position, an added sentence shifts later obligation ids in its section, so any disposition must be derived after the re-pin. The Praxis gate would report drift. This package inventories the baseline at the source commit and does not edit the committed baseline. R4 precondition P2 requires the re-pin at the kickoff commit.",
       "requirements": [
         "AR-019",
         "AR-020",

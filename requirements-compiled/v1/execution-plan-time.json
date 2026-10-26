@@ -420,7 +420,8 @@
         "T07"
       ],
       "completion": [
-        "praxis.requirements-approvals/1 written by the operator (or produced from an Ordo decision); none by an agent"
+        "praxis.requirements-approvals/1 written by the operator (or produced from an Ordo decision); none by an agent",
+        "the same approvals are supplied to the acceptance verifier as an externally pinned file (SHA-256) with the operator named by --trusted-operator-id; inline or agent-authored approvals are invalid (REHEARSAL-ACCEPTANCE-LEDGER, PR #16)"
       ],
       "gates": [
         "G0"
@@ -842,7 +843,8 @@
       ],
       "completion": [
         "preservation gate exit 0 at acceptance with evidence committed",
-        "compute-acceptance-verdict.py verdict is the report's only verdict line",
+        "ledger in causa.acceptance-ledger/2 with every PASS evidence path in a causa.acceptance-evidence-manifest/1 bundle",
+        "compute-acceptance-verdict.py run with the pinned baseline and SHA-256, approvals file and SHA-256, trusted operator ids and evidence manifest SHA-256; its verdict is the report's only verdict line",
         "R4 measurements recorded; unavailable values recorded as unavailable"
       ],
       "gates": [

@@ -10,9 +10,9 @@
 
 | | |
 |---|---|
-| Source | kemiller2002/indy-init `b785b68` (main, the merged package v1) |
+| Source | kemiller2002/indy-init `9d98938` (main: package v1 plus indy-init PR #16, the independent acceptance verifier) |
 | Package | `requirements-compiled/v1`, compilation **PASS**. Critical checks V01–V13 and V15–V17 pass; V14 warns about the drift. |
-| Requirements | 466 inventoried (460 baseline at `b785b68` plus 6 external), 2292 obligations. All are preserved; none is marked verified. |
+| Requirements | 466 inventoried (460 baseline at `9d98938` plus 6 external), 2322 obligations. PR #16 added 30 obligations to the acceptance-ledger contract. All are preserved; none is marked verified. |
 | Evidence | `evidence/preflight-run.json` (executed), `evidence/preflight-owner-branch-projection.json`, `evidence/auth-contract-probe.json`, `evidence/baseline-equivalence.json` |
 
 ## Blockers: classification and state
@@ -40,7 +40,7 @@
 |---|---|---|
 | PRE-DEC-01 owner decisions | BLOCKED | DEC-006, DEC-022, DEC-023, DEC-024, DEC-025 unresolved |
 | PRE-DEC-02 critical findings | BLOCKED | F-001, F-003, F-004, F-005, F-008, F-009 open |
-| PRE-REQ-01 baseline drift | **FAIL** | Pinned 002d8ba differs from the generator's output at b785b68 (passes on the owner branch) |
+| PRE-REQ-01 baseline drift | **FAIL** | Pinned 002d8ba differs from the generator's output at 9d98938 (passes on the owner branch) |
 | PRE-REQ-02 package compiles | PASS | |
 | PRE-REQ-03 Praxis gate released | BLOCKED | v3.20.0 has no `preservation` command |
 | PRE-REQ-04 gate PASS on the derived package | NOT_RUN | Needs T07–T09 |
@@ -49,7 +49,7 @@
 | PRE-DEP-03 identities | PASS | 5 of 5 match |
 | PRE-AUTH-01 CI secret | BLOCKED | CAUSA_GITHUB_TOKEN and CAUSA_TEST_REPO are not set here (T05) |
 | PRE-AUTH-02 auth contract | NOT_RUN | Needs the secret. The negative-control probe showed this sandbox rewrites credentials, so it must run in CI |
-| PRE-SEC-01 committed secrets | PASS | No token patterns at b785b68 |
+| PRE-SEC-01 committed secrets | PASS | No token patterns at 9d98938 |
 | PRE-TOOL-01 SDK | PASS | 10.0.402 = global.json |
 | PRE-TOOL-02 Conditor SD-1 | PASS | v0.10.11 contains CON-367 |
 | PRE-TOOL-03 bootstrap | NOT_RUN | T10 record |
@@ -76,6 +76,15 @@
   - The DC-001..DC-006 failing-first tests are attached to T12, T16, T18 and T21.
   - T27 and T28 are `conditionalOn: DEC-022`.
   - Workstreams covered: application, persistence, live provider, UI, integration testing, independent review, defect correction and final acceptance.
+
+## Acceptance verifier (indy-init PR #16, merged by the owner during this work)
+
+`compute-acceptance-verdict.py` now requires independently pinned trust inputs:
+- the baseline and its SHA-256;
+- the approvals file and its SHA-256, with trusted operator ids;
+- an evidence manifest, under ledger schema v2.
+
+CT-015, T09 and T34 are updated to match. The verifier inventories the baseline it is given. After PR #18 and the kickoff re-pin, the verifier's baseline inputs must be the re-pinned baseline.
 
 ## Recurring-defect prevention (prepared)
 

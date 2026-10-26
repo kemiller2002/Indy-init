@@ -1,7 +1,7 @@
 {
   "schema": "indy-init.preflight-evidence/1",
-  "executedAt": "2026-10-26T12:48:40Z",
-  "sourceCommit": "b785b68c5172e6bdc257e350032ec851a4637ed4",
+  "executedAt": "2026-10-26T12:57:41Z",
+  "sourceCommit": "9d989389260342c77feea1aca52dd8d3d7b746ae",
   "verdict": "FAIL",
   "rule": "READY only when every check is PASS (PRE-ORG-01 may stay NOT_RUN for a rehearsal); any FAIL gives FAIL, otherwise BLOCKED",
   "summary": {
@@ -81,7 +81,7 @@
       "type": "baseline-pinned",
       "title": "Committed baseline is pinned at the source commit and equals the generator's output there",
       "status": "FAIL",
-      "detail": "drift: the baseline pinned at 002d8ba6e98639a385dd771999099ba032c48086 differs from the generator's output at the source commit b785b68c5172e6bdc257e350032ec851a4637ed4 (F-003, RDP-001)"
+      "detail": "drift: the baseline pinned at 002d8ba6e98639a385dd771999099ba032c48086 differs from the generator's output at the source commit 9d989389260342c77feea1aca52dd8d3d7b746ae (F-003, RDP-001)"
     },
     {
       "id": "PRE-REQ-02",
@@ -113,7 +113,7 @@
       "type": "secret-scan",
       "title": "No GitHub credential is committed in the planning repository",
       "status": "PASS",
-      "detail": "no GitHub token pattern in any tracked file at b785b68c5172e6bdc257e350032ec851a4637ed4"
+      "detail": "no GitHub token pattern in any tracked file at 9d989389260342c77feea1aca52dd8d3d7b746ae"
     },
     {
       "id": "PRE-TOOL-01",

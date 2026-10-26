@@ -3,15 +3,15 @@
   "package": "requirements-compiled/v1",
   "source": {
     "repository": "kemiller2002/indy-init",
-    "commit": "b785b68c5172e6bdc257e350032ec851a4637ed4",
-    "baselineId": "BL-CAUSA-INDY-INIT-b785b68c5172",
-    "baselineSha256": "efb875c5558794581ce72a79a4d1d399bd14e776de94de359c517ffaad80b642",
+    "commit": "9d989389260342c77feea1aca52dd8d3d7b746ae",
+    "baselineId": "BL-CAUSA-INDY-INIT-9d9893892603",
+    "baselineSha256": "26101a79000f79a9a3d7d9c3d1d3b8baa1c6fd475c69f17a8dba5aab773898d6",
     "baselineGenerator": "requirements-compiler baseline (F# port; byte-equivalent to tools/build-requirements-baseline.py)"
   },
   "repositories": [
     {
       "name": "indy-init",
-      "commit": "b785b68c5172e6bdc257e350032ec851a4637ed4",
+      "commit": "9d989389260342c77feea1aca52dd8d3d7b746ae",
       "role": "primary: authoritative requirements (source commit of this package)"
     },
     {
@@ -165,7 +165,7 @@
   "inputs": [
     {
       "path": "curation/contracts.json",
-      "sha256": "94188b4e2c38042d4cf9461d5e9b3a317e48a7ef129289062944e3a7eac287aa"
+      "sha256": "4a605bfbc2f1f532d260a9e2ef49dc7a8daf50f6224cf48e4ad803b0ee586cf8"
     },
     {
       "path": "curation/decisions.json",
@@ -185,7 +185,7 @@
     },
     {
       "path": "curation/findings.json",
-      "sha256": "208b407decab1cdc9842daacbf6c2a97ba8c8911cb4f5427836a7de23cfd16e8"
+      "sha256": "0064df60bf13e88505970acb00151b8650f2bda124783a224965fdb11e97ca3a"
     },
     {
       "path": "curation/preflight-checks.json",
@@ -193,11 +193,11 @@
     },
     {
       "path": "curation/sources.json",
-      "sha256": "d245362a8c3bfa17bea43d159b3d45de941dc12bf929a826e933c55e073cfa3f"
+      "sha256": "e27b14db58685b9cac8fd8d5a84f56ebde633ac3721f78f6a82a4d7b1b9fbcbe"
     },
     {
       "path": "curation/tasks.json",
-      "sha256": "02039bb9f9e6b8098875e990ee9a51ac68c5bc8424ff04d941d611e7d8ee8bab"
+      "sha256": "3fce9bfe99d3c20bac94c224b12a364449931aed6eaab150283950877a5fa784"
     },
     {
       "path": "curation/verification-rules.json",
@@ -207,7 +207,7 @@
   "authored": [
     {
       "path": "README.md",
-      "sha256": "accb6dbdad9ff6f4b42d95173cf628072ddee0f05ce42d72c32414a00b466d0f"
+      "sha256": "628730dd9c741c1d564f72cb23c7d8e788258edea3291d30e5dd5acb70c2d2e6"
     },
     {
       "path": "optimization-analysis.md",
@@ -215,11 +215,11 @@
     },
     {
       "path": "readiness/READINESS-REPORT.md",
-      "sha256": "94446d796fc62ced8af2a5bd3e869ae66c26be0e30d0654e5910f4d18925fa29"
+      "sha256": "29d45f29de0a2b79a95976db6bafde3ff70f05736bb9646032276ef95b163fd8"
     },
     {
       "path": "readiness/OWNER-DECISION-REQUESTS.md",
-      "sha256": "cccb23548fa359995f1e7b904d26e981dbf6abde9c954f11de315e039d36628a"
+      "sha256": "de2c7495925c8a1a45e6f6733becce23c3652cffbc88be97f6c533930a3ab9c6"
     },
     {
       "path": "readiness/CONTRACT-RESOLUTION.md",
@@ -227,7 +227,7 @@
     },
     {
       "path": "readiness/FSHARP-TOOLING-ASSESSMENT.md",
-      "sha256": "0c8ae942dbd17714b35c5178980495e297cdf76131d262f33130fb26b6c9bbb4"
+      "sha256": "c98e4a2840809f2f571863afd2bfa4f99ffcaa1e606a783d17a8378354c22cbd"
     },
     {
       "path": "readiness/DEPENDENCY-COMPATIBILITY.md",
@@ -237,27 +237,27 @@
   "generated": [
     {
       "path": "contract-bindings.json",
-      "sha256": "f97ebbf3f7e154786bb32dd959969146ae8f319abaabe42fd6e0f2b03cb02c9b"
+      "sha256": "68eade1a61d6a4e24490e691541dd3890b9b496ad47e5618dfc0e6e3848ff63e"
     },
     {
       "path": "decision-registry.json",
-      "sha256": "b86b9a380d37ee69377cd9ecf8df850345abb37fdd50610d09944232ef269117"
+      "sha256": "82d781d5fc380808f751ea5b3760d5a77e5f9dedeb3fc8c57d183bbe2c78b0ea"
     },
     {
       "path": "dependency-graph.json",
-      "sha256": "61d62168c53145a7b201fa5d96f0ad57f226a27c778b5af68a3e8920b43a7005"
+      "sha256": "39d952b50d51e354d8b74026f27873d73f27e85892a2e977e59692491ec216d2"
     },
     {
       "path": "execution-plan-resource.json",
-      "sha256": "f235e530ccade3ec0b186826437fe72f8e69069f238259d9e9c5477aeed833ee"
+      "sha256": "ea9c4c1fcb57de2374bbb7b3fbfe9d5bc9a7e0db4a9815ca1fe49d7a1e0790a6"
     },
     {
       "path": "execution-plan-time.json",
-      "sha256": "b030d33309bfcd6f44de784990e4d0e20a73317bdb3a955648fe29002b2e46db"
+      "sha256": "077eee332faa69f5b7f0fc59bb6c0bffaed3159b5509875583adac00318a3a8e"
     },
     {
       "path": "normalized-requirements.json",
-      "sha256": "b3d2ea19eec4537a8fba8687f020baeeaa0dcfd7f3f83216c83aa0995576561b"
+      "sha256": "4253da82063ecc56b6a49deecae6753e8ce488918fdaf2c9794133c8a1979aea"
     },
     {
       "path": "percepta-experiment.json",
@@ -265,27 +265,27 @@
     },
     {
       "path": "preflight-manifest.json",
-      "sha256": "2ce6577785560b84f7828325a7fe119c4092bb6ebdfcc5519b9f5bb126cd6433"
+      "sha256": "8a9dc3e0d6496f42f65e9c0a5154cebb89b392f0faab22494eeb52625229a8ba"
     },
     {
       "path": "requirements-inventory.json",
-      "sha256": "1358f31dad4c3618345ddfc8beaa610e33a1f3b78e17495b79031c0620402eed"
+      "sha256": "2539984bc3985c7ae83d99e0550792dc4a11e670d19f90d50960c961fca85f86"
     },
     {
       "path": "requirements-source-map.json",
-      "sha256": "9488edea1fac60bb80680df9e90d3d146bfe375877100595f6954a16c92fe23f"
+      "sha256": "b73c50b588c54eeac8f138409e6eb5b5632d86f90c6f44b259115735d0f67593"
     },
     {
       "path": "requirements-validation-report.json",
-      "sha256": "cc4ff82b39efffa7aafc5807847d4e837a76ec6c1fd6011c3e150df976380152"
+      "sha256": "c5a4fa9541a44b893df8dada855e68d9cf367df1f67b8bfc350e71b495ae00ba"
     },
     {
       "path": "timed-execution-manifest.json",
-      "sha256": "57b6b234d2882dc8603f2481842e1e0bb4f19ed9e77f0bc4a7ca73fa48bb2016"
+      "sha256": "05b4c5a71a6cd844a53f9c557e62f5af57c01c74aaa4cc1f127a2c3a58bdf315"
     },
     {
       "path": "verification-manifest.json",
-      "sha256": "6d4a98da60372183119142799cdb6e18181d8d0c48526866ba214780343a102f"
+      "sha256": "e9fe29d13d0aaf53fc96975ad21747180e9aa5473ba03f8c634d2cec1bf4058f"
     }
   ],
   "compilationVerdict": "PASS",

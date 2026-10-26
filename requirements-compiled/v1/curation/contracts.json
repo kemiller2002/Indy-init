@@ -448,9 +448,9 @@
       "name": "Acceptance ledger and computed verdict",
       "provider": "kemiller2002/indy-init tools (validate-acceptance-ledger.py, compute-acceptance-verdict.py)",
       "consumer": "rehearsal CI and final report",
-      "contractVersion": "REHEARSAL-ACCEPTANCE-LEDGER.md at the source commit",
-      "requiredCompatibility": "the ledger format at the pinned indy-init commit",
-      "verificationMethod": "CI runs compute-acceptance-verdict.py on every ledger or report change (R4-04); negative controls in tools/test-acceptance-verdict.py",
+      "contractVersion": "causa.acceptance-ledger/2 with causa.acceptance-evidence-manifest/1 and causa.acceptance-evidence/1 (REHEARSAL-ACCEPTANCE-LEDGER.md at 9d98938, indy-init PR #16)",
+      "requiredCompatibility": "the verifier at the pinned indy-init commit, given independently supplied trust inputs: candidate repository and source SHA, the exact requirements baseline and its SHA-256 with a source checkout at the baseline commit, an externally pinned approvals file and SHA-256 with --trusted-operator-id, and a content-addressed evidence manifest with its SHA-256",
+      "verificationMethod": "CI runs the structural and independent-verdict regression suites on every push (tools/test-acceptance-ledger.py, tools/test-acceptance-verdict.py); T34 runs compute-acceptance-verdict.py with the pinned inputs; the report carries exactly one computed verdict line",
       "dependencyVersions": [
         "python 3.12 (indy-init CI)"
       ],
@@ -467,6 +467,16 @@
           "repo": "indy-init",
           "path": "docs/REHEARSAL-ACCEPTANCE-LEDGER.md",
           "quote": "derives ACCEPTED, INCOMPLETE, BLOCKED, FAILED or INVALID from the ledger"
+        },
+        {
+          "repo": "indy-init",
+          "path": "docs/REHEARSAL-ACCEPTANCE-LEDGER.md",
+          "quote": "inline approvals are forbidden"
+        },
+        {
+          "repo": "indy-init",
+          "path": "docs/REHEARSAL-ACCEPTANCE-LEDGER.md",
+          "quote": "Agent-authored approvals in the ledger and untrusted operator identities are invalid."
         }
       ]
     },

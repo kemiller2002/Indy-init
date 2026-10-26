@@ -4,6 +4,8 @@
 
 **How to approve.** Record an approval in an owner-authored form: an owner commit to an OWNER-DECISIONS addendum, or an Ordo decision. Each request below names the record it needs.
 
+Scope approvals, such as exclusions or P0 changes, must also reach the acceptance verifier. Since indy-init PR #16, that means an **externally pinned approvals file**: the verifier is given the file's SHA-256, and the operator is named with `--trusted-operator-id`. Approvals written inline in the ledger, or by an agent, are invalid (REHEARSAL-ACCEPTANCE-LEDGER.md).
+
 **After approval.**
 1. Update the decision's `classification` in `curation/decisions.json`, and the finding's `status`.
 2. Recompile the package.

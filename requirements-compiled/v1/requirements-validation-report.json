@@ -2,8 +2,8 @@
   "schema": "indy-init.requirements-validation-report/1",
   "source": {
     "repository": "kemiller2002/indy-init",
-    "commit": "b785b68c5172e6bdc257e350032ec851a4637ed4",
-    "baselineSha256": "efb875c5558794581ce72a79a4d1d399bd14e776de94de359c517ffaad80b642"
+    "commit": "9d989389260342c77feea1aca52dd8d3d7b746ae",
+    "baselineSha256": "26101a79000f79a9a3d7d9c3d1d3b8baa1c6fd475c69f17a8dba5aab773898d6"
   },
   "compilationVerdict": "PASS",
   "compilationRule": "FAIL when any critical check reports a problem; the compiler then exits 3",
@@ -126,7 +126,7 @@
       "critical": false,
       "status": "WARN",
       "problems": [
-        "requirements/causa-requirements-baseline.json (pinned at 002d8ba6e98639a385dd771999099ba032c48086) differs from the generator's output at the source commit b785b68c5172e6bdc257e350032ec851a4637ed4",
+        "requirements/causa-requirements-baseline.json (pinned at 002d8ba6e98639a385dd771999099ba032c48086) differs from the generator's output at the source commit 9d989389260342c77feea1aca52dd8d3d7b746ae",
         "10 requirements at the source commit are missing from the committed baseline: AGENT-RELIABILITY\u00a7evidence-driven-refinement-october-2026, AGENT-RELIABILITY\u00a7reconciliation, AR-019, AR-020, AR-021, AR-022, AR-023, AR-024, AR-025, AR-026"
       ]
     }
@@ -146,7 +146,7 @@
       {
         "kind": "finding",
         "id": "F-003",
-        "title": "The committed baseline is pinned at 002d8ba; the source commit adds AR-019..AR-026 and changes the ledger's acceptance predicate",
+        "title": "The committed baseline is pinned at 002d8ba; the source commit adds AR-019..AR-026 and changes the acceptance ledger contract",
         "blockerClass": "verification-deficiency",
         "owner": "operator (kemiller2002), via a reviewed owner commit (OD-INDY-6)",
         "recommendation": ""
