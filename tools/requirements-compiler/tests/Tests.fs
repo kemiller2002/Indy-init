@@ -125,7 +125,7 @@ let private cases: Case list =
       case "verification-rule-removed" (fun d ->
           edit (cur "verification-rules.json" d) "\"match\": [\"all\"]" "\"match\": [\"origin:baseline\"]"
           edit (cur "verification-rules.json" d) "\"match\": [\"origin:external\"]" "\"match\": [\"origin:none\"]") 3 [ "V06" ]
-      case "blocker-unclassified" (fun d -> setField (cur "findings.json" d) "findings" "F-004" "blockerClass" (JStr "")) 3 [ "V15" ]
+      case "blocker-unclassified" (fun d -> setField (cur "findings.json" d) "findings" "F-005" "blockerClass" (JStr "")) 3 [ "V15" ]
       case "decision-without-recommendation" (fun d ->
           setField (cur "decisions.json" d) "decisions" "DEC-022" "classification" (JStr "unresolved")
           setField (cur "decisions.json" d) "decisions" "DEC-022" "recommendation" (JStr "")) 3 [ "V15" ]

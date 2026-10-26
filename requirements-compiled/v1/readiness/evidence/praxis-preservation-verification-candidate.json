@@ -1,0 +1,358 @@
+{
+  "schema": "indy-init.praxis-preservation-verification/1",
+  "praxis": {
+    "path": "/home/user/praxis/src/Praxis.Cli/bin/Release/net10.0/praxis.dll",
+    "version": "praxis 3.20.0",
+    "sha256": "2d40a783376c8ec1891684fe2eb70c5f66ce60f5754b89281a848a8cce524576"
+  },
+  "baseline": {
+    "id": "BL-CAUSA-INDY-INIT-c751d58d66e3",
+    "commit": "c751d58d66e3f105a8c67a0cb5e069314bdbd391",
+    "sha256": "b369381437a92112eb15a4bb428dcbbe3731cdbe9da0544ff87e777992e3e863",
+    "previousSha256": "5a4c3c83777c5ce63f017707ff6078a79d3724ea89b931ab0250a2d4ac7a7415"
+  },
+  "package": {
+    "path": "requirements-compiled/v1/normalized-requirements.json",
+    "sha256": "6c6d673f971821f7d9b694668349adc5f970cbe5fb1e65508cfae46b99fb4727"
+  },
+  "source": "indy-init-c751d58",
+  "trust": {
+    "operator": "indy-init-fixture-operator",
+    "reviewer": "indy-init-fixture-reviewer"
+  },
+  "cases": [
+    {
+      "id": "P1",
+      "title": "Missing P0 requirement",
+      "contract": "P1 missing requirements",
+      "expectedVerdict": "fail",
+      "actualVerdict": "fail",
+      "exitCode": 3,
+      "expectedCodes": [
+        "disposition-missing"
+      ],
+      "reasonCodes": [
+        "disposition-missing"
+      ],
+      "packageSha256": "5e02e92a4e581d8d4e107fd1d4a99daeabe81fa89462cf2d9e7a924c0acdbc99",
+      "evidence": "cases/P1/evidence.json",
+      "evidenceSha256": "4b7bba8c567a82c2220ce355d6328904627861caebc103527362dd809790ea36",
+      "deterministic": true,
+      "result": "PASS",
+      "problems": []
+    },
+    {
+      "id": "P2",
+      "title": "P0 requirement carried at a lower priority",
+      "contract": "P2 downgraded requirements",
+      "expectedVerdict": "fail",
+      "actualVerdict": "fail",
+      "exitCode": 3,
+      "expectedCodes": [
+        "priority-downgraded"
+      ],
+      "reasonCodes": [
+        "priority-downgraded"
+      ],
+      "packageSha256": "7843d3be54b2b006ae369392376857f4023c585ea2b5211d7cf533ee68491aab",
+      "evidence": "cases/P2/evidence.json",
+      "evidenceSha256": "dc0add2deeefe826154b27619167c12283169e0b78c7047221fe4c10ec767f76",
+      "deterministic": true,
+      "result": "PASS",
+      "problems": []
+    },
+    {
+      "id": "P2b",
+      "title": "P0 acceptance obligation weakened to a statement",
+      "contract": "P2 downgraded requirements",
+      "expectedVerdict": "fail",
+      "actualVerdict": "fail",
+      "exitCode": 3,
+      "expectedCodes": [
+        "acceptance-criterion-missing"
+      ],
+      "reasonCodes": [
+        "acceptance-criterion-missing"
+      ],
+      "packageSha256": "08f00fc571101cf05ea774164166310ecba7c1447662166d99ce5c4d24f5fb53",
+      "evidence": "cases/P2b/evidence.json",
+      "evidenceSha256": "2b90430c97929c3608cb82a9d77774bb6f03d79029a3241fa87bf8714979f71e",
+      "deterministic": true,
+      "result": "PASS",
+      "problems": []
+    },
+    {
+      "id": "P3",
+      "title": "Exclusion with no approval record",
+      "contract": "P3 unauthorized exclusions",
+      "expectedVerdict": "fail",
+      "actualVerdict": "fail",
+      "exitCode": 3,
+      "expectedCodes": [
+        "approval-missing"
+      ],
+      "reasonCodes": [
+        "approval-missing"
+      ],
+      "packageSha256": "8445992202dbd4d3e5377dc153126ad706ccb12808284bc88dab1de17232a4d4",
+      "evidence": "cases/P3/evidence.json",
+      "evidenceSha256": "4db443001561523cdeac07efb80f688acebfac7a0be92930c3299384e76caa99",
+      "deterministic": true,
+      "result": "PASS",
+      "problems": []
+    },
+    {
+      "id": "P3b",
+      "title": "Exclusion approved by an agent",
+      "contract": "P3 unauthorized exclusions",
+      "expectedVerdict": "fail",
+      "actualVerdict": "fail",
+      "exitCode": 3,
+      "expectedCodes": [
+        "approval-agent-authored"
+      ],
+      "reasonCodes": [
+        "approval-agent-authored"
+      ],
+      "packageSha256": "8f460e2b18d68dbd1c74fe01a74b95eb85ea6d9dad914e0dc3507c6ac025067e",
+      "evidence": "cases/P3b/evidence.json",
+      "evidenceSha256": "dbeb692ea490bb013b6e9101e6a1a0ce6f2842b225cafe5b951097de68043000",
+      "deterministic": true,
+      "result": "PASS",
+      "problems": []
+    },
+    {
+      "id": "P3c",
+      "title": "Exclusion approved by an identity the caller does not trust",
+      "contract": "P3 unauthorized exclusions",
+      "expectedVerdict": "fail",
+      "actualVerdict": "fail",
+      "exitCode": 3,
+      "expectedCodes": [
+        "approval-untrusted"
+      ],
+      "reasonCodes": [
+        "approval-untrusted"
+      ],
+      "packageSha256": "7caeca82f51ee2dd97640bd33e55f0b45f1a180a526b7ac32a6fb98ec1e89474",
+      "evidence": "cases/P3c/evidence.json",
+      "evidenceSha256": "06c25429d98bb8d3cc63c13620e00bcf70f15b927f72d66cbe8b9d5dd2d2fe9c",
+      "deterministic": true,
+      "result": "PASS",
+      "problems": []
+    },
+    {
+      "id": "P4",
+      "title": "Baseline altered after the derivation (UI-016 P0 to P1)",
+      "contract": "P4 altered baseline",
+      "expectedVerdict": "fail",
+      "actualVerdict": "fail",
+      "exitCode": 3,
+      "expectedCodes": [
+        "baseline-digest-mismatch"
+      ],
+      "reasonCodes": [
+        "baseline-digest-mismatch"
+      ],
+      "packageSha256": "966e40fb15bfcff8f575adebdb68fbbc64372919ea254bab384f98af437e68ad",
+      "evidence": "cases/P4/evidence.json",
+      "evidenceSha256": "0f2a5866c851a1bf1384ae206878efc4ce6d3f940ad095db32f272c4d3f49be9",
+      "deterministic": true,
+      "result": "PASS",
+      "problems": []
+    },
+    {
+      "id": "P5",
+      "title": "Requirement id changed without an authorized transformation",
+      "contract": "P5 requirement identity mismatch",
+      "expectedVerdict": "fail",
+      "actualVerdict": "fail",
+      "exitCode": 3,
+      "expectedCodes": [
+        "disposition-unknown-requirement",
+        "disposition-missing"
+      ],
+      "reasonCodes": [
+        "disposition-missing",
+        "disposition-unknown-requirement"
+      ],
+      "packageSha256": "1563c5d3f8631da841caada78c467c59a323a58518bf3ad1b0c443b41c5db49c",
+      "evidence": "cases/P5/evidence.json",
+      "evidenceSha256": "e6234da7fbf5459ed5963e6fbb249f0988baf20380148732eb65bf6f5a8dbf92",
+      "deterministic": true,
+      "result": "PASS",
+      "problems": []
+    },
+    {
+      "id": "P6",
+      "title": "Obligation reported complete on an agent\u0027s review",
+      "contract": "P6 false completion",
+      "expectedVerdict": "blocked",
+      "actualVerdict": "blocked",
+      "exitCode": 3,
+      "expectedCodes": [
+        "review-untrusted"
+      ],
+      "reasonCodes": [
+        "review-untrusted"
+      ],
+      "packageSha256": "36925c9fb1246cd04ff6d5965cd70d0f7deb22fae777e7b5689a9aa4e82713f4",
+      "evidence": "cases/P6/evidence.json",
+      "evidenceSha256": "ab8747a0a6ef2e7ba7ce4a5f6285802dc005fe1f8b945251b8edc1c8d5eb86f3",
+      "deterministic": true,
+      "result": "PASS",
+      "problems": []
+    },
+    {
+      "id": "P6b",
+      "title": "Obligation reported complete against a criterion that does not exist",
+      "contract": "P6 false completion",
+      "expectedVerdict": "fail",
+      "actualVerdict": "fail",
+      "exitCode": 3,
+      "expectedCodes": [
+        "criterion-not-found"
+      ],
+      "reasonCodes": [
+        "criterion-not-found",
+        "value-token-missing"
+      ],
+      "packageSha256": "a671b685c214ea2cd340ad2707f85a7aaef5ff91750b689bc300269307c06e80",
+      "evidence": "cases/P6b/evidence.json",
+      "evidenceSha256": "7bd782369311f086dc142b0a5b25677f8d2bd3900c48229e2e310eef74d658d5",
+      "deterministic": true,
+      "result": "PASS",
+      "problems": []
+    },
+    {
+      "id": "P7",
+      "title": "Disposition prepared against another baseline (002d8ba)",
+      "contract": "P7 cross-run evidence",
+      "expectedVerdict": "fail",
+      "actualVerdict": "fail",
+      "exitCode": 3,
+      "expectedCodes": [
+        "baseline-mismatch",
+        "baseline-digest-mismatch"
+      ],
+      "reasonCodes": [
+        "baseline-digest-mismatch",
+        "baseline-mismatch"
+      ],
+      "packageSha256": "d9bc3a5efbf7a678c74b6cf9a4b156377f20f79f7be89a86b1602dcc978e5f60",
+      "evidence": "cases/P7/evidence.json",
+      "evidenceSha256": "1895707e5bf1833e80113254174e2e72e636cb2d170d57bd6f1cdf84451a842e",
+      "deterministic": true,
+      "result": "PASS",
+      "problems": []
+    },
+    {
+      "id": "P7b",
+      "title": "Approvals presented with another run\u0027s digest",
+      "contract": "P7 cross-run evidence",
+      "expectedVerdict": "fail",
+      "actualVerdict": "fail",
+      "exitCode": 3,
+      "expectedCodes": [
+        "approvals-digest-mismatch"
+      ],
+      "reasonCodes": [
+        "approvals-digest-mismatch"
+      ],
+      "packageSha256": "8ce15740daaa13b85116105901729393dae65fb307cacae1b5108ffa01a77a67",
+      "evidence": "cases/P7b/evidence.json",
+      "evidenceSha256": "2b977b38e7b437ebc1082c941e0c005c4fe6db895bde9f845beb4987f532ce46",
+      "deterministic": true,
+      "result": "PASS",
+      "problems": []
+    },
+    {
+      "id": "P8",
+      "title": "Exclusion approved by the trusted operator",
+      "contract": "P8 approved exclusion",
+      "expectedVerdict": "pass",
+      "actualVerdict": "pass",
+      "exitCode": 0,
+      "expectedCodes": [],
+      "reasonCodes": [],
+      "packageSha256": "8ce15740daaa13b85116105901729393dae65fb307cacae1b5108ffa01a77a67",
+      "evidence": "cases/P8/evidence.json",
+      "evidenceSha256": "2b179344bf23aec1ea27c4683ad7786b6e7914f74cb367f6d4f0d57fa9754748",
+      "deterministic": true,
+      "result": "PASS",
+      "problems": []
+    },
+    {
+      "id": "P9",
+      "title": "Unchanged identity derivation of the compiled package",
+      "contract": "P9 unchanged requirements",
+      "expectedVerdict": "pass",
+      "actualVerdict": "pass",
+      "exitCode": 0,
+      "expectedCodes": [],
+      "reasonCodes": [],
+      "packageSha256": "966e40fb15bfcff8f575adebdb68fbbc64372919ea254bab384f98af437e68ad",
+      "evidence": "cases/P9/evidence.json",
+      "evidenceSha256": "bd1d7a537a6028ca19e1d9bb64390e1383adcc2eb7f58a28662616127a78ef78",
+      "deterministic": true,
+      "result": "PASS",
+      "problems": []
+    },
+    {
+      "id": "P10",
+      "title": "Disposition records no baseline digest",
+      "contract": "P10 incomplete verification",
+      "expectedVerdict": "blocked",
+      "actualVerdict": "blocked",
+      "exitCode": 3,
+      "expectedCodes": [
+        "baseline-digest-missing"
+      ],
+      "reasonCodes": [
+        "baseline-digest-missing"
+      ],
+      "packageSha256": "5b262d06a75e8d60816855db068d4d983f3bb419b0a3b6ee38a9b4a742627dc0",
+      "evidence": "cases/P10/evidence.json",
+      "evidenceSha256": "3879bbb7bf34ee257c41dbaaf16ba3658bdb41f23aed4627510cbd7766688f09",
+      "deterministic": true,
+      "result": "PASS",
+      "problems": []
+    },
+    {
+      "id": "P10b",
+      "title": "Approvals without their published digest",
+      "contract": "P10 incomplete verification",
+      "expectedVerdict": "blocked",
+      "actualVerdict": "blocked",
+      "exitCode": 3,
+      "expectedCodes": [
+        "approvals-unauthenticated"
+      ],
+      "reasonCodes": [
+        "approvals-unauthenticated"
+      ],
+      "packageSha256": "8ce15740daaa13b85116105901729393dae65fb307cacae1b5108ffa01a77a67",
+      "evidence": "cases/P10b/evidence.json",
+      "evidenceSha256": "ecbc621911061a2df13913355f8c9b7e1e14bd4a263abeb04e0107c245f6343e",
+      "deterministic": true,
+      "result": "PASS",
+      "problems": []
+    },
+    {
+      "id": "P10c",
+      "title": "Baseline unreadable",
+      "contract": "P10 incomplete verification",
+      "expectedVerdict": "none",
+      "actualVerdict": "none",
+      "exitCode": 2,
+      "expectedCodes": [],
+      "reasonCodes": [],
+      "packageSha256": "966e40fb15bfcff8f575adebdb68fbbc64372919ea254bab384f98af437e68ad",
+      "evidence": null,
+      "deterministic": true,
+      "result": "PASS",
+      "problems": []
+    }
+  ],
+  "verdict": "PASS"
+}

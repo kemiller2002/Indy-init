@@ -3,7 +3,8 @@
 **Verdict: BLOCKED. Rehearsal 4 must not start.**
 
 - The preflight's computed verdict is BLOCKED, with no FAIL left.
-- 5 readiness blockers remain, all upstream releases. Each needs a release by the system's owner, not an owner decision.
+- 3 readiness blockers remain, all in the release set (echelon-current 1.28.0). Each needs a release by the system's owner, not an owner decision.
+- The Praxis preservation gate is released: Praxis 3.21.0 (2026-10-26) carries it, and the published artifact was verified against the pinned baseline; see "Praxis requirements-preservation release" below.
 - T05 is verified (2026-10-26). The secret and the isolated test repository work end to end with the approved guarded write; see "T05 persistence verification" below.
 - The owner's decisions so far:
   - The owner approved #17 and #18 on 2026-10-26, and they were merged on that instruction. The merge of #18 decided F-001/DEC-024 and F-006, and fixed the baseline drift (F-003).
@@ -16,7 +17,7 @@
 | Source | kemiller2002/indy-init `9dc7d57`: main with #16 (acceptance verifier), #17 (readiness tooling), #18 (owner-approved requirement changes), #19, and the owner decision record of 2026-10-26 |
 | Package | `requirements-compiled/v1`, compilation **PASS**: all checks V01–V17 pass, and V14 confirms there is no baseline drift |
 | Requirements | 467 inventoried (461 baseline, including EXT-DATA-013, plus 6 external), 2325 obligations, 108 P0. All are preserved; none is marked verified. |
-| Evidence | `evidence/preflight-run.json` (all 17 checks executed in CI with the secret: indy-init-rehearsal-003 run 40352698801, source 9dc7d57), `evidence/t05-persistence-verification.json`, `evidence/auth-contract-probe.json`, `evidence/baseline-equivalence.json`. `evidence/preflight-owner-branch-projection.json` is historical: the pre-merge projection of #18. |
+| Evidence | `evidence/preflight-run.json` (all 17 checks executed in CI with the secret: indy-init-rehearsal-003 run 40352698801, source 9dc7d57), `evidence/preflight-run-praxis-3.21.0.json` (all 17 checks, run locally after the Praxis 3.21.0 release), `evidence/praxis-preservation-verification.json` and `-candidate.json` (the Praxis gate on the real baseline), `evidence/t05-persistence-verification.json`, `evidence/auth-contract-probe.json`, `evidence/baseline-equivalence.json`. `evidence/preflight-owner-branch-projection.json` is historical: the pre-merge projection of #18. |
 
 ## Blockers: classification and state
 
@@ -28,33 +29,39 @@
 | ~~F-008, DEC-022~~ | Owner decision | AI loop and time travel scope | **Resolved:** OD-INDY-11 excludes T27 and T28 from Rehearsal 4. They carry `excludedBy: DEC-022`. | The operator's approvals file (T09) before they leave the run |
 | ~~DEC-025, CT-017~~ | Owner decision | Authentication mechanism undecided | **Resolved:** OD-INDY-10, a fine-grained token held in memory (`CONTRACT-RESOLUTION.md` §2). CT-017 is unverified until PRE-AUTH-02/T21. | — |
 | ~~DEC-023~~ | Owner decision | Reuse of earlier rehearsal interfaces at the event | **Resolved:** OD-INDY-12 | Organizer confirmation for the event (PRE-ORG-01) |
-| F-004, CT-013 | External dependency | No Praxis release carries the preservation gate (PRE-REQ-03, executed) | The minimum release is identified (`CONTRACT-RESOLUTION.md` §3) | Praxis release, or an owner VER-005 exception |
+| ~~F-004, CT-013~~ | External dependency | No Praxis release carried the preservation gate | **Resolved:** Praxis 3.21.0 (`fa474c42`). PRE-REQ-03 PASS; CT-013 identity-verified (four contract schemas); published artifact verified | Inclusion in echelon-current 1.28.0 (with F-005) |
 | F-005, CT-012, CT-016 | External dependency | percepta-semantic 0.2.1 is now a registered release, but in no approved set (PRE-DEP-01, executed) | The contents of 1.28.0 are specified | Registry set 1.28.0, Conditor qualification, owner approval |
 
 **Counts:**
 - 16 at the start of this work.
-- 11 are resolved:
+- 13 are resolved:
   - 3 by the owner-approved merge of #18: F-001, DEC-024 and F-003;
   - 8 by OD-INDY-9 to OD-INDY-12: F-009, DEC-006, CT-007, F-008, DEC-022, DEC-025, CT-017 and DEC-023.
+  - 2 by the Praxis 3.21.0 release: F-004 and CT-013.
 - Also resolved, though they were not readiness blockers: F-006 (#18), and F-002, F-012, F-013 and F-019 (OD-INDY-10, -12 and -13).
-- 5 are open, all waiting on upstream releases: F-004, CT-013, F-005, CT-012 and CT-016.
+- 3 are open, all waiting on the release set: F-005, CT-012 and CT-016.
 - Upstream progress since package v1: percepta-semantic 0.2.1 was registered as a release (Registry PR #96/#97, by the owner), and the Conditor SD-1 fix is confirmed released in v0.10.11.
 
-## Preflight (executed: `evidence/preflight-run.json`)
+## Preflight (executed)
 
-10 PASS, 4 BLOCKED, 3 NOT_RUN, 0 FAIL. The CI run reproduced every other check exactly as executed locally.
+11 PASS, 3 BLOCKED, 3 NOT_RUN, 0 FAIL. Two runs, each executing all 17 checks:
+
+- `evidence/preflight-run.json`: in CI with the secret (T05, indy-init-rehearsal-003 run 40352698801). It is the source for PRE-AUTH-01 and PRE-AUTH-02.
+- `evidence/preflight-run-praxis-3.21.0.json`: run locally after the Praxis release, with the Praxis checkout at `fa474c42`. It is the source for every other row.
+
+The local run cannot test authentication (no secret), and gives PRE-AUTH-01 BLOCKED and PRE-AUTH-02 NOT_RUN.
 
 | Check | Status | Detail |
 |---|---|---|
 | PRE-DEC-01 owner decisions | PASS | No unresolved decision |
-| PRE-DEC-02 critical findings | BLOCKED | F-004, F-005 open |
+| PRE-DEC-02 critical findings | BLOCKED | F-005 open |
 | PRE-REQ-01 baseline drift | PASS | Pinned at c751d58; no drift at 9dc7d57 |
 | PRE-REQ-02 package compiles | PASS | |
-| PRE-REQ-03 Praxis gate released | BLOCKED | v3.20.0 has no `preservation` command |
+| PRE-REQ-03 Praxis gate released | PASS | v3.21.0 contains `preservation` under src/Praxis.Cli |
 | PRE-REQ-04 gate PASS on the derived package | NOT_RUN | Needs T07–T09 |
 | PRE-DEP-01 release set | BLOCKED | echelon-current 1.27.0 lacks percepta-semantic |
-| PRE-DEP-02 contracts | BLOCKED | CT-012, CT-013, CT-016 |
-| PRE-DEP-03 identities | PASS | 5 of 5 match |
+| PRE-DEP-02 contracts | BLOCKED | CT-012, CT-016 |
+| PRE-DEP-03 identities | PASS | 9 of 9 match, including the four Praxis 3.21.0 contract schemas (CT-013) |
 | PRE-AUTH-01 CI secret | PASS | CAUSA_GITHUB_TOKEN and CAUSA_TEST_REPO set in the authorized workflow (values not read) |
 | PRE-AUTH-02 auth contract | PASS | In CI: invalid token refused (401); test repository readable (200); fine-grained token (no classic scopes) |
 | PRE-SEC-01 committed secrets | PASS | No token patterns at 9dc7d57 |
@@ -105,8 +112,7 @@ V16 fails compilation if any of DC-001..DC-006 loses its test.
 ## Order of work to reach READY
 
 1. **Upstream:**
-   - release Praxis with the gate (F-004);
-   - cut, qualify and approve echelon-current 1.28.0 (F-005).
+   - cut, qualify and approve echelon-current 1.28.0 (F-005). It must include Praxis 3.21.0, the release that carries the gate.
 2. **Operator:**
    - write the approvals file (T09), including the T27/T28 exclusion.
 3. **Agent:**
@@ -135,6 +141,39 @@ The timer starts at T10's first green CI. Do not start Rehearsal 4 before the pr
 Two owner follow-ups, neither of which affects the result:
 - **Test repository visibility:** the test repository is public, but the T05 brief asks for a private repository where supported.
 - **`CAUSA_TEST_REPO` variable:** it is not set in indy-init-rehearsal-003, so the workflow names the repository directly. The variable takes precedence once it is set.
+
+## Praxis requirements-preservation release (2026-10-26, executed)
+
+Praxis **3.21.0** carries `praxis requirements preservation verify`, hardened by REQ-PRES-004 with REQ-PRES-001 R1 and R2:
+
+| | |
+|---|---|
+| Release | <https://github.com/kemiller2002/praxis/releases/tag/v3.21.0>, stable, tag at `fa474c42`. The release bump is `806df9ce`; PR praxis#292 merged as `956bf429`. |
+| Artifact | `praxis-linux-x64.tar.gz`, sha256 `eae9c427460468cc1e01f6951684e72fc4fe882ab1982e60d90d1aeb9afd3eef` (matches `native-checksums.txt` and GitHub's digest). Installed with the documented installer `scripts/install-native.sh --version 3.21.0`. `praxis-bin` sha256 `70176412…`. |
+| CI | Praxis PR CI: the full suite 2411/2411 with Dokimos 0.7.0, plus lifecycle and worker suites on Linux, macOS and Windows. Release: native-release run 40378037642 (tests and validation, then publish). |
+| Not published | NuGet: publishing is disabled by repository configuration (`NUGET_PUBLISH_ENABLED`). The GitHub release is the distribution channel. |
+
+`evidence/praxis-preservation-verification.json` is the published binary run by `tools/praxis-preservation-verification` against the pinned baseline (`c751d58`, 461 requirements, 2,293 obligations). The fixture is an identity derivation of this compiled package; each case changes it once:
+
+| Case | Expected | Actual |
+|---|---|---|
+| P1 missing P0 (UI-016) | reject | fail `disposition-missing` |
+| P2 P0 carried at P1; P2b acceptance obligation weakened | reject | fail `priority-downgraded`; fail `acceptance-criterion-missing` |
+| P3 no approval; P3b agent approval; P3c untrusted approver | reject | fail `approval-missing`; `approval-agent-authored`; `approval-untrusted` |
+| P4 baseline altered (UI-016 P0 to P1) | reject | fail `baseline-digest-mismatch` |
+| P5 requirement id changed | reject | fail `disposition-unknown-requirement`, `disposition-missing` |
+| P6 completion on an agent's review; P6b on a missing criterion | reject | blocked `review-untrusted`; fail `criterion-not-found` |
+| P7 disposition for baseline 002d8ba; P7b approvals from another run | reject | fail `baseline-mismatch`, `baseline-digest-mismatch`; fail `approvals-digest-mismatch` |
+| P8 exclusion approved by the trusted operator | accept, traceable | pass; UI-016 listed as an approved exclusion |
+| P9 unchanged identity derivation | accept | pass (461 requirements, 0 findings above info) |
+| P10 no baseline digest; P10b approvals unpinned; P10c baseline unreadable | block | blocked `baseline-digest-missing`; blocked `approvals-unauthenticated`; exit 2, no verdict |
+
+Every case ran twice, byte-identically. With output paths normalized, the evidence of all 16 evidence-producing cases is byte-identical to the pre-release candidate build (`evidence/praxis-preservation-verification-candidate.json`).
+
+**Limits.**
+- Approval trust rests on a caller-supplied digest and trusted identities, not a signature.
+- REQ-PRES-001 R3 to R5 are not implemented.
+- PRE-REQ-04, the gate passing on the rehearsal's own derived package, remains a T08 record.
 
 ## Re-run
 

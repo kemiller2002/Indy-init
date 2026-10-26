@@ -196,10 +196,10 @@
       "type": "missing-contract",
       "severity": "critical",
       "material": true,
-      "status": "unresolved",
+      "status": "no-action-required",
       "owner": "upstream: kemiller2002/praxis",
       "title": "The mandatory preservation gate is not in any Praxis release; using the draft would violate VER-005",
-      "description": "RDP-004 and R4-06 require `praxis requirements preservation verify` to pass before implementation. Praxis v3.20.0 (the registered release) has no such command; it exists only on the draft branch of praxis#292, whose own intake (REQ-PRES-001) lists bypasses. VER-005 forbids unreleased or unverified builds without explicit approval. Until a release carries the gate, implementation cannot start under RDP-004 without an owner exception.",
+      "description": "Resolved upstream by the stable Praxis v3.21.0 release (tag v3.21.0, commit fa474c42, 2026-10-26). It carries `praxis requirements preservation verify` with REQ-PRES-001 R1 (baseline digest) and R2 (authenticated, non-agent approvals), the minimum named in readiness/CONTRACT-RESOLUTION.md section 3. The published linux-x64 artifact was verified against the pinned baseline: readiness/evidence/praxis-preservation-verification.json. VER-001 still requires the release in the approved kickoff set (echelon-current 1.28.0, F-005). Before: RDP-004 and R4-06 require `praxis requirements preservation verify` to pass before implementation. Praxis v3.20.0 (the registered release) has no such command; it exists only on the draft branch of praxis#292, whose own intake (REQ-PRES-001) lists bypasses. VER-005 forbids unreleased or unverified builds without explicit approval. Until a release carries the gate, implementation cannot start under RDP-004 without an owner exception.",
       "requirements": [
         "AR-004",
         "AR-002",
@@ -225,11 +225,18 @@
         },
         {
           "repo": "praxis",
-          "path": ".praxis/inbox/documents/2026-10-24-REQ-PRES-001-tamper-evident-requirements-preservation.md",
+          "path": ".praxis/processed/INPUT-d9086d5909f4b5ac/source/2026-10-24-REQ-PRES-001-tamper-evident-requirements-preservation.md",
           "quote": "The draft gate can be bypassed."
         }
       ],
-      "blockerClass": "external-dependency"
+      "blockerClass": "external-dependency",
+      "resolutionSources": [
+        {
+          "repo": "praxis",
+          "path": "docs/requirements-preservation.md",
+          "quote": "so an edited or substituted baseline, or a disposition prepared against another baseline, cannot pass."
+        }
+      ]
     },
     {
       "id": "F-005",

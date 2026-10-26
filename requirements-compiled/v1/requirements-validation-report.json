@@ -134,14 +134,6 @@
     "blockers": [
       {
         "kind": "finding",
-        "id": "F-004",
-        "title": "The mandatory preservation gate is not in any Praxis release; using the draft would violate VER-005",
-        "blockerClass": "external-dependency",
-        "owner": "upstream: kemiller2002/praxis",
-        "recommendation": ""
-      },
-      {
-        "kind": "finding",
         "id": "F-005",
         "title": "Kickoff release set incomplete: percepta-semantic 0.2.1 is registered as a release but no approved echelon-current set contains it (1.28.0 not cut)",
         "blockerClass": "external-dependency",
@@ -152,14 +144,6 @@
         "kind": "contract-blocked",
         "id": "CT-012",
         "title": "Percepta semantic CLI: contract and evidence schemas",
-        "blockerClass": "external-dependency",
-        "owner": "",
-        "recommendation": ""
-      },
-      {
-        "kind": "contract-blocked",
-        "id": "CT-013",
-        "title": "Praxis requirements preservation gate",
         "blockerClass": "external-dependency",
         "owner": "",
         "recommendation": ""
