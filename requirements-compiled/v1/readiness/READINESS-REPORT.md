@@ -3,7 +3,8 @@
 **Verdict: BLOCKED. Rehearsal 4 must not start.**
 
 - The preflight's computed verdict is BLOCKED, with no FAIL left.
-- 5 readiness blockers remain, all upstream releases. Each needs a release by the system's owner, not an owner decision. The operator's test repository and CI secret (T05) are also still needed.
+- 5 readiness blockers remain, all upstream releases. Each needs a release by the system's owner, not an owner decision.
+- T05 is verified (2026-10-26). The secret and the isolated test repository work end to end with the approved guarded write; see "T05 persistence verification" below.
 - The owner's decisions so far:
   - The owner approved #17 and #18 on 2026-10-26, and they were merged on that instruction. The merge of #18 decided F-001/DEC-024 and F-006, and fixed the baseline drift (F-003).
   - OD-INDY-9 to OD-INDY-13 (`docs/OWNER-DECISIONS-2026-10-26.md`) decide DEC-006, DEC-025, DEC-022 and DEC-023, and confirm OD-INDY-3/4. The owner approved them in #20.
@@ -15,7 +16,7 @@
 | Source | kemiller2002/indy-init `9dc7d57`: main with #16 (acceptance verifier), #17 (readiness tooling), #18 (owner-approved requirement changes), #19, and the owner decision record of 2026-10-26 |
 | Package | `requirements-compiled/v1`, compilation **PASS**: all checks V01–V17 pass, and V14 confirms there is no baseline drift |
 | Requirements | 467 inventoried (461 baseline, including EXT-DATA-013, plus 6 external), 2325 obligations, 108 P0. All are preserved; none is marked verified. |
-| Evidence | `evidence/preflight-run.json` (executed at 9dc7d57), `evidence/auth-contract-probe.json`, `evidence/baseline-equivalence.json`. `evidence/preflight-owner-branch-projection.json` is historical: the pre-merge projection of #18. |
+| Evidence | `evidence/preflight-run.json` (all 17 checks executed in CI with the secret: indy-init-rehearsal-003 run 40352698801, source 9dc7d57), `evidence/t05-persistence-verification.json`, `evidence/auth-contract-probe.json`, `evidence/baseline-equivalence.json`. `evidence/preflight-owner-branch-projection.json` is historical: the pre-merge projection of #18. |
 
 ## Blockers: classification and state
 
@@ -41,7 +42,7 @@
 
 ## Preflight (executed: `evidence/preflight-run.json`)
 
-8 PASS, 5 BLOCKED, 4 NOT_RUN, 0 FAIL.
+10 PASS, 4 BLOCKED, 3 NOT_RUN, 0 FAIL. The CI run reproduced every other check exactly as executed locally.
 
 | Check | Status | Detail |
 |---|---|---|
@@ -54,8 +55,8 @@
 | PRE-DEP-01 release set | BLOCKED | echelon-current 1.27.0 lacks percepta-semantic |
 | PRE-DEP-02 contracts | BLOCKED | CT-012, CT-013, CT-016 |
 | PRE-DEP-03 identities | PASS | 5 of 5 match |
-| PRE-AUTH-01 CI secret | BLOCKED | CAUSA_GITHUB_TOKEN and CAUSA_TEST_REPO are not set here (T05) |
-| PRE-AUTH-02 auth contract | NOT_RUN | Needs the secret. The negative-control probe showed this sandbox rewrites credentials, so it must run in CI |
+| PRE-AUTH-01 CI secret | PASS | CAUSA_GITHUB_TOKEN and CAUSA_TEST_REPO set in the authorized workflow (values not read) |
+| PRE-AUTH-02 auth contract | PASS | In CI: invalid token refused (401); test repository readable (200); fine-grained token (no classic scopes) |
 | PRE-SEC-01 committed secrets | PASS | No token patterns at 9dc7d57 |
 | PRE-TOOL-01 SDK | PASS | 10.0.402 = global.json |
 | PRE-TOOL-02 Conditor SD-1 | PASS | v0.10.11 contains CON-367 |
@@ -107,15 +108,33 @@ V16 fails compilation if any of DC-001..DC-006 loses its test.
    - release Praxis with the gate (F-004);
    - cut, qualify and approve echelon-current 1.28.0 (F-005).
 2. **Operator:**
-   - provision the test repository and `CAUSA_GITHUB_TOKEN` (T05);
    - write the approvals file (T09), including the T27/T28 exclusion.
 3. **Agent:**
    - update the curation statuses that follow from steps 1–2;
    - recompile, which forces citation updates (V11);
-   - re-run the preflight in the rehearsal repository's CI, so that PRE-AUTH-02 is meaningful;
+   - re-run the preflight in CI (the T05 workflow does this), so that PRE-AUTH-02 stays meaningful;
    - derive and disposition (T07), then pass the gate (T08) and bootstrap (T10).
 
 The timer starts at T10's first green CI. Do not start Rehearsal 4 before the preflight verdict is READY.
+
+## T05 persistence verification (2026-10-26, executed)
+
+`evidence/t05-persistence-verification.json`, from indy-init-rehearsal-003 workflow run 40352698801. The run used the `CAUSA_GITHUB_TOKEN` secret against `kemiller2002/causa-write-test` (branch `main`), with no fallback to the workflow token. The tool is the F# verifier `tools/persistence-verification` (Indy-init e7a5a42), which compiles the approved adapter, indy-init-rehearsal-002 `src/engine/GitHub.fs` at b053d1d.
+
+| Check | Result |
+|---|---|
+| Negative control | An invalid token gets 401 |
+| Authentication | 200 for the test repository; a fine-grained token |
+| Guarded write | `createCommitOnBranch` with `expectedHeadOid` 3e19eba created 6ace866, whose only parent is 3e19eba |
+| Readback | 154 bytes, identical (sha256 666ffe49…) |
+| Stale write | Expected head 3e19eba after 6ace866: refused by GitHub (`STALE_DATA`, adapter `NotFastForward`); branch still at 6ace866, data intact |
+| Cleanup | Guarded deletion 55dd105; the branch tree equals the starting tree (acfcd2c) |
+| Production | kemiller2002/causa-data main unchanged at 22260f4 |
+| Credentials | Absent from the probe files, the evidence and the preflight output (in-run screen); the log shows only masked values |
+
+Two owner follow-ups, neither of which affects the result:
+- **Test repository visibility:** the test repository is public, but the T05 brief asks for a private repository where supported.
+- **`CAUSA_TEST_REPO` variable:** it is not set in indy-init-rehearsal-003, so the workflow names the repository directly. The variable takes precedence once it is set.
 
 ## Re-run
 

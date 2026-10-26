@@ -215,7 +215,7 @@
     },
     {
       "path": "readiness/READINESS-REPORT.md",
-      "sha256": "f73bc617bd3ece5024cfff99155b303787c132bf367c3f9742c7c24b41d781fa"
+      "sha256": "e6c6b84147b8fda36475900e621f0b44072cd11740ba44e4fc98f079a59a823e"
     },
     {
       "path": "readiness/OWNER-DECISION-REQUESTS.md",
@@ -223,7 +223,7 @@
     },
     {
       "path": "readiness/CONTRACT-RESOLUTION.md",
-      "sha256": "cee4571cdea714df3f5ab64aae8ea8b550275f40f85feb011dd6a5e6e3ca90c9"
+      "sha256": "e036a43f95a8774159e8216bce6a34f823a4456e13f28510ea346fd170457618"
     },
     {
       "path": "readiness/FSHARP-TOOLING-ASSESSMENT.md",

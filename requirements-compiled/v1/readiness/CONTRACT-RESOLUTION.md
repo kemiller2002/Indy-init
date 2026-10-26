@@ -6,8 +6,8 @@
 |---|---|---|
 | CT-006 causa storage v1.0.0 | identity-verified | The three identities are re-hashed by the compiler and by preflight PRE-DEP-03. They match. |
 | CT-008 historical catalog | identity-verified | The manifest hash matches `verification/release.json` (PRE-DEP-03) |
-| CT-007 GitHub write primitive | unverified | §1: owner exception, recorded as OD-INDY-9. T18 and T21 verify it against the test repository. |
-| CT-017 authentication | unverified | §2: decided as OD-INDY-10. PRE-AUTH-02 and T21 verify it. |
+| CT-007 GitHub write primitive | unverified | §1: owner exception, recorded as OD-INDY-9. T05 exercised the primitive against real GitHub: a guarded write succeeded, a stale write was refused with `STALE_DATA` (`evidence/t05-persistence-verification.json`). T18 and T21 verify it in the application. |
+| CT-017 authentication | unverified | §2: decided as OD-INDY-10. PRE-AUTH-02 passed in CI with the fine-grained secret (T05). T21 verifies the in-app flow. |
 | CT-013 Praxis preservation gate | **blocked** | §3: upstream release needed |
 | CT-012 Percepta semantic, CT-016 release set | **blocked** | §4: echelon-current 1.28.0 needed |
 | CT-001..CT-005, CT-018 (boundaries A–E, faults) | missing (`producedBy: T14`) | §5: produced during the run, not kickoff blockers |

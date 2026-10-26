@@ -1,0 +1,115 @@
+{
+  "schema": "indy-init.t05-persistence-evidence/1",
+  "executedAt": "2026-10-26T15:47:27Z",
+  "runId": "t05-40352698801-1",
+  "workflowRun": "https://github.com/kemiller2002/indy-init-rehearsal-003/actions/runs/40352698801",
+  "testRepository": "kemiller2002/causa-write-test",
+  "branch": "main",
+  "adapter": {
+    "repository": "kemiller2002/indy-init-rehearsal-002",
+    "commit": "b053d1da4ef533fba7d6728c369c58a29a1e2440",
+    "file": "src/engine/GitHub.fs"
+  },
+  "harnessCommit": "e7a5a42a158642052b273880ce379624f6f32eea",
+  "facts": {
+    "H0": "3e19eba94d378d9365878d7629815723ffe7d92c",
+    "H1": "6ace866f789afce496884d5e13a003c291bd33a7",
+    "H2": "55dd105afbedc297cc20ef15b7f3bb11b4cbfa9c",
+    "acceptedPath": "workspaces/demo/t05-40352698801-1/t05-accepted.json",
+    "acceptedSha256": "666ffe491a1e251cd9d26f56037e2c1d20d0b934cbd102606e96c581d5faf593",
+    "branch": "main",
+    "private": "false",
+    "productionAfter": "22260f429501d0d6963fc33302ed1e64d742a374",
+    "productionBefore": "22260f429501d0d6963fc33302ed1e64d742a374",
+    "staleRefusal": "STALE_DATA",
+    "tree0": "acfcd2cd43ba8eb08a297e6da80fb8075b8436fe",
+    "tree2": "acfcd2cd43ba8eb08a297e6da80fb8075b8436fe"
+  },
+  "checks": [
+    {
+      "id": "T05-01",
+      "title": "Credential and test repository supplied to the authorized workflow",
+      "status": "PASS",
+      "detail": "credential present (value never read into output); test repository kemiller2002/causa-write-test; run t05-40352698801-1"
+    },
+    {
+      "id": "T05-02",
+      "title": "GitHub refuses an invalid credential (no rewriting proxy, no anonymous fallback)",
+      "status": "PASS",
+      "detail": "invalid token answered 401"
+    },
+    {
+      "id": "T05-03",
+      "title": "Authentication: the credential reads the test repository and is not a broad classic token",
+      "status": "PASS",
+      "detail": "200 for kemiller2002/causa-write-test; default branch main; public; classic scopes absent (fine-grained token)"
+    },
+    {
+      "id": "T05-03a",
+      "title": "Test repository is private",
+      "status": "ADVISORY",
+      "detail": "public: the T05 brief asks for a private test repository where supported (owner action); the content written is test data only"
+    },
+    {
+      "id": "T05-04",
+      "title": "Test repository holds no production data; branch head read (H0)",
+      "status": "PASS",
+      "detail": "H0 3e19eba94d378d9365878d7629815723ffe7d92c, tree acfcd2cd43ba8eb08a297e6da80fb8075b8436fe; 1 files: README.md"
+    },
+    {
+      "id": "T05-05",
+      "title": "Production data repository head recorded before any write",
+      "status": "PASS",
+      "detail": "kemiller2002/causa-data main at 22260f429501d0d6963fc33302ed1e64d742a374"
+    },
+    {
+      "id": "T05-06",
+      "title": "Guarded GraphQL commit (createCommitOnBranch, expectedHeadOid = H0) succeeds",
+      "status": "PASS",
+      "detail": "expected head 3e19eba94d378d9365878d7629815723ffe7d92c; GitHub created 6ace866f789afce496884d5e13a003c291bd33a7; wrote workspaces/demo/t05-40352698801-1/t05-accepted.json"
+    },
+    {
+      "id": "T05-07",
+      "title": "Write applied: the branch names H1, whose only parent is H0",
+      "status": "PASS",
+      "detail": "branch at 6ace866f789afce496884d5e13a003c291bd33a7; parent 3e19eba94d378d9365878d7629815723ffe7d92c"
+    },
+    {
+      "id": "T05-08",
+      "title": "Readback: the committed file at H1 equals the submitted bytes",
+      "status": "PASS",
+      "detail": "154 bytes, sha256 666ffe491a1e251cd9d26f56037e2c1d20d0b934cbd102606e96c581d5faf593"
+    },
+    {
+      "id": "T05-09",
+      "title": "Stale write (expectedHeadOid = H0 after H1) is rejected by GitHub",
+      "status": "PASS",
+      "detail": "refused: HTTP 200, GraphQL error type STALE_DATA; adapter classification NotFastForward"
+    },
+    {
+      "id": "T05-10",
+      "title": "Repository state preserved after the rejected write",
+      "status": "PASS",
+      "detail": "branch still at 6ace866f789afce496884d5e13a003c291bd33a7; accepted file intact; stale file absent (404)"
+    },
+    {
+      "id": "T05-11",
+      "title": "Cleanup: a guarded deletion restores the branch tree to H0's",
+      "status": "PASS",
+      "detail": "removed workspaces/demo/t05-40352698801-1/t05-accepted.json in 55dd105afbedc297cc20ef15b7f3bb11b4cbfa9c (expected head 6ace866f789afce496884d5e13a003c291bd33a7); branch at 55dd105afbedc297cc20ef15b7f3bb11b4cbfa9c with tree acfcd2cd43ba8eb08a297e6da80fb8075b8436fe = H0's tree"
+    },
+    {
+      "id": "T05-12",
+      "title": "Production data repository unchanged",
+      "status": "PASS",
+      "detail": "kemiller2002/causa-data main still at 22260f429501d0d6963fc33302ed1e64d742a374"
+    },
+    {
+      "id": "T05-13",
+      "title": "No credential in committed content, evidence or output",
+      "status": "PASS",
+      "detail": "credential absent from both probe files and from the evidence"
+    }
+  ],
+  "verdict": "PASS"
+}

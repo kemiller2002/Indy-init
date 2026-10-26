@@ -1,13 +1,13 @@
 {
   "schema": "indy-init.preflight-evidence/1",
-  "executedAt": "2026-10-26T13:44:16Z",
+  "executedAt": "2026-10-26T15:48:03Z",
   "sourceCommit": "9dc7d575f9d981e2be6f83543e18f548332e1a53",
   "verdict": "BLOCKED",
   "rule": "READY only when every check is PASS (PRE-ORG-01 may stay NOT_RUN for a rehearsal); any FAIL gives FAIL, otherwise BLOCKED",
   "summary": {
-    "BLOCKED": 5,
-    "NOT_RUN": 4,
-    "PASS": 8
+    "BLOCKED": 4,
+    "NOT_RUN": 3,
+    "PASS": 10
   },
   "results": [
     {
@@ -15,16 +15,16 @@
       "category": "authentication",
       "type": "env-present",
       "title": "Live-job secret and test repository are configured (values never read into evidence)",
-      "status": "BLOCKED",
-      "detail": "not set: CAUSA_GITHUB_TOKEN, CAUSA_TEST_REPO"
+      "status": "PASS",
+      "detail": "all variables set (values not read)"
     },
     {
       "id": "PRE-AUTH-02",
       "category": "authentication",
       "type": "github-auth-contract",
       "title": "Token reads the test repository and is not a broad classic token (no 'repo'/'admin' X-OAuth-Scopes)",
-      "status": "NOT_RUN",
-      "detail": "CAUSA_GITHUB_TOKEN and CAUSA_TEST_REPO are required; nothing was sent"
+      "status": "PASS",
+      "detail": "invalid token refused (401); test repository readable (200); classic scopes absent (fine-grained or app token)"
     },
     {
       "id": "PRE-DEC-01",
