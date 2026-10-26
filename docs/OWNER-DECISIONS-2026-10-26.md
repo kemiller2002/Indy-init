@@ -1,15 +1,17 @@
 # Owner decisions, 2026-10-26
 
-**Status:** in force from the owner's merge of the pull request that adds this file to `main`. Until that merge it is only a proposal.
+**Status:** in force from the merge of indy-init pull request #20, which adds this file to `main`, on the owner's approval of this exact text.
 
-**Decided by:** kemiller2002 (Kevin Miller), the repository owner, by merging the pull request that adds this file. On 2026-10-26 the owner answered the recommendations in `requirements-compiled/v1/readiness/OWNER-DECISION-REQUESTS.md` with "Do what you recommend".
+**Decided by:** kemiller2002 (Kevin Miller), the repository owner, on 2026-10-26, in two steps:
+1. The owner answered the recommendations in `requirements-compiled/v1/readiness/OWNER-DECISION-REQUESTS.md` with "Do what you recommend".
+2. The owner reviewed pull request #20, which states each decision below in full. Asked how to approve OD-INDY-9 to OD-INDY-13, the owner chose "Approve; you merge it" in the Claude Code session https://claude.ai/code/session_01TG1BA3aoV14fyzeJCzeHDL.
 
-**Recorded by:** an agent session (Claude Code). The agent wrote this record; it made none of the decisions and did not merge it.
+**Recorded by:** an agent session (Claude Code). The agent wrote this record and merged #20 on the owner's explicit instruction. It made none of the decisions.
 
-**Why a merge, not the reply alone:**
+**Why the reply alone was not enough:**
 - AR-003 forbids an agent to approve its own architectural exceptions or exclusions. It requires verifiable approval bound to the exact requirement.
 - [OPERATOR-KICKOFF-DECISIONS.md](OPERATOR-KICKOFF-DECISIONS.md) reads the same phrase as authorizing recommended engineering work.
-- So each decision below names the exact alternative chosen, and **the owner's merge of this file is the approval**. The owner's merge of #18 approved the launch-content change the same way.
+- So each decision below names the exact alternative chosen, and **the owner approved this exact text** after reviewing it. #18 was approved the same way: by an explicit instruction to merge it.
 
 **What they answer:** the open decisions DEC-006, DEC-022, DEC-023 and DEC-025, and the confirmation that F-002 asked for, from `requirements-compiled/v1` (findings F-009, F-008, F-013, F-019 and F-012, and F-002).
 
