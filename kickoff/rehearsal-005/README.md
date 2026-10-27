@@ -42,8 +42,12 @@ These are the operator's. An agent must not do them.
 
 1. **T07:** derive from the pinned baseline with the Rehearsal 4 F# derivation (`tools/derive-requirements`).
 2. **T08:** pass the Praxis preservation gate once the operator's approvals exist. That gives PRE-REQ-04.
-3. **Initialize the acceptance ledger at kickoff**, with every P0 mapped to its planned check (see the acceptance tooling in `freeze.json`).
-4. **T10:** run `conditor init --preset indy-init` on the empty repository and push. The first green CI gives PRE-TOOL-03 and starts the clock:
+3. **Bring in the acceptance tooling.** Copy the pipeline files `freeze.json` lists under `acceptanceTooling.rehearsalPipeline` from indy-init-rehearsal-004 at the recorded commit, and check their digests. These are:
+   - `acceptance/traceability.json`, `p0-acceptance-plan.json` and `p0-curation.json`;
+   - `tools/acceptance/` and `tools/acceptance-plan/`.
+   OD-INDY-12 allows reusing them. Then initialize the ledger: `tools/acceptance/checkpoint.sh kickoff <Indy-init checkout>`. It writes a `causa.acceptance-ledger/2` ledger with all 108 P0 requirements NOT_RUN and their planned checks named.
+4. **Map before implementing.** Before writing the code for a requirement, map its obligations to their tests. `tools/acceptance-plan plan --check --strict` fails when a test names a P0 requirement it is not mapped to.
+5. **T10:** run `conditor init --preset indy-init` on the empty repository and push. The first green CI gives PRE-TOOL-03 and starts the clock:
 
    ```
    dotnet fsi tools/rehearsal-clock/clock.fsx start --dir evidence/rehearsal --start-utc <first green check> --basis "<run ids>"
@@ -51,8 +55,9 @@ These are the operator's. An agent must not do them.
 
 ## During the run
 
-- **Checkpoints:** record each one with `clock.fsx checkpoint`, passing `--ledger` with the provisional ledger, so the counts come from the ledger. `clock.fsx status` fails while a due checkpoint is unrecorded; run it at every work boundary.
-- **Verdict:** the final verdict is computed by the authoritative verifier from CI-published evidence, in the same `causa.acceptance-ledger/2` format used at the checkpoints.
+- **Checkpoints:** at each checkpoint run `tools/acceptance/checkpoint.sh <label> <Indy-init> dotnet core site browser secret`. It collects evidence incrementally and computes a provisional verdict with the authoritative verifier, clearly labelled provisional. Then run `clock.fsx checkpoint --ledger acceptance/checkpoints/<label>/ledger.json`, so the counts come from the ledger. `clock.fsx status` fails while a due checkpoint is unrecorded; run it at every work boundary.
+- **CI:** reuse the workflow files `freeze.json` lists under `ciWorkflows`. They give dependency-aware jobs, a content-addressed site, sharded browser jobs, and a secret gate before every upload. The live suite keeps no traces, screenshots or video.
+- **Verdict:** `EVIDENCE_MANIFEST_SHA256=<digest published by CI> tools/acceptance/verify.sh <deployed sha> <Indy-init> <Indy-init>` runs the authoritative verifier over the CI-published bundle, in the same ledger format used at the checkpoints, then an independent recomputation. Pin the manifest digest from CI, never from the bundle itself: a self-pinned forged bundle is not rejected by the verifier alone (LIM-01).
 
 ## Evidence in this directory
 

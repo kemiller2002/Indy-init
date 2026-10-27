@@ -1,0 +1,338 @@
+{
+  "schema": "indy-init.rehearsal-freeze/1",
+  "sources": {
+    "indyInit": "8b79fe4290645d5eb3461b40d27da8439bc9a791",
+    "registry": "31086664ddaf18fd827bb0276394aea82735620d",
+    "rehearsalTooling": {
+      "ref": "origin/r5/integration",
+      "commit": "bd677bba80b2d2ca96053904132c265fcd46bd41"
+    }
+  },
+  "requirementsBaseline": {
+    "id": "BL-CAUSA-INDY-INIT-aab8f80c7743",
+    "sourceCommit": "aab8f80c7743392e794b3b631542903ed4ed6f64",
+    "sha256": "621e2f960038dcfb0daa2a9fe18a0c1c350faed297ba2856da1236a0360857b9",
+    "documentsChecked": 19,
+    "documentsChangedSincePin": []
+  },
+  "compiledPackage": {
+    "path": "requirements-compiled/v1",
+    "packageManifestSha256": "0cd4c3f5fe8d167e41b9d06a8c582f72bee71dd572810b36ce457fac1e42ace7"
+  },
+  "releaseSet": {
+    "channel": "echelon-current",
+    "version": "1.28.0",
+    "status": "approved",
+    "approvedBy": "kemiller2002",
+    "approvedAt": "2026-10-26T21:03:14Z",
+    "platform": "linux-x64",
+    "channelFileSha256": "5aee6c3c355dbb1b556d7a1dba9db80ece9c88862f31239c3558c441bb7abc67",
+    "components": [
+      {
+        "systemId": "praxis",
+        "version": "3.21.0",
+        "role": "host-tool",
+        "tag": "v3.21.0",
+        "commit": "fa474c420e59b26ecacf767a63257e602f039a8c",
+        "releaseManifestSha256": "6fed7eea26039704ec28e58b655cd1c6b7d0228cabe668afb4c49cd222af58c1"
+      },
+      {
+        "systemId": "ordo",
+        "version": "1.17.0",
+        "role": "host-tool",
+        "tag": "v1.17.0",
+        "commit": "bb43c26c106f4cbe972234636c5c67edc235c188",
+        "releaseManifestSha256": "d9ee8be3b8723582389bcade5a969827f92a89266aab801c7e6b6e3bc224e0e8"
+      },
+      {
+        "systemId": "percepta",
+        "version": "0.1.0",
+        "role": "repository-lifecycle",
+        "tag": "percepta-repo-v0.1.0",
+        "commit": "3027983f20b91d6856a27c1cf8ee2582108ef6be",
+        "releaseManifestSha256": "07b6291c63ff25e6b669edb8c845e48ba76831b6a6133efa4ad3a390439b1b2b"
+      },
+      {
+        "systemId": "percepta-semantic",
+        "version": "0.2.1",
+        "role": "host-tool",
+        "tag": "percepta-semantic-v0.2.1",
+        "commit": "8b78df803abb401e2e77320203a2b944d919f6c7",
+        "releaseManifestSha256": "156ef405778000991724e95c7cf80e3761d189397e1c069207055cce100b3e37"
+      },
+      {
+        "systemId": "dokimos",
+        "version": "0.7.0",
+        "role": "repository-lifecycle",
+        "tag": "dokimos-v0.7.0",
+        "commit": "04b5f856367b47a087285109c1fc5923ec351389",
+        "releaseManifestSha256": "c3faefc6ae60a718bbc15aa0e93eb0d8dde3ef18e344f0c15dbae8eb4e0e0ddf"
+      },
+      {
+        "systemId": "visual-engineering",
+        "version": "1.0.1",
+        "role": "repository-lifecycle",
+        "tag": "visual-engineering-v1.0.1",
+        "commit": "b648cdef291d39c443ccb10215529ad69afe8b32",
+        "releaseManifestSha256": "23ab4fdb38d3fc7827519cc3c29df88c950211db1d53d114c53f36a662a0dbda"
+      },
+      {
+        "systemId": "communication-engineering",
+        "version": "1.0.0",
+        "role": "repository-lifecycle",
+        "tag": "v1.0.0",
+        "commit": "707396de512065fe35aff6fcf82cd28118df14b3",
+        "releaseManifestSha256": "d4b79053301635b6335caf81c2ca28b0721cca4a78967501be820a8eb7118296"
+      },
+      {
+        "systemId": "tutela",
+        "version": "0.1.0",
+        "role": "repository-lifecycle",
+        "tag": "v0.1.0",
+        "commit": "94afcc91a84bd3b94a4ee639f169d0727eaac727",
+        "releaseManifestSha256": "5db1e8a1f039ae88b2b9426c7cbeec1783b40e29d58b0dfd40dfa90104a3c4ba"
+      },
+      {
+        "systemId": "aegis",
+        "version": "1.0.0",
+        "role": "project-binding",
+        "tag": "nuget:EchelonFoundry.Aegis.Core@1.0.0",
+        "commit": "56935c889b4f5cbf0b8046d3c2078f205cdb20c7",
+        "releaseManifestSha256": "4530cfa3396c1e57d3e1a6500c661cd2d520236e852d1d9e88aa44c385d0bd6b"
+      },
+      {
+        "systemId": "limen",
+        "version": "0.9.0",
+        "role": "project-binding",
+        "tag": "v0.9.0",
+        "commit": "96eb75fb5c5aeea41f59e7476d76e143dc35a759",
+        "releaseManifestSha256": "5ffc580705cb612f9a5c99ee7ee0f81c7f18904947336a6e14a9be19393a74db"
+      },
+      {
+        "systemId": "forma",
+        "version": "0.9.0",
+        "role": "project-binding",
+        "tag": "v0.9.0",
+        "commit": "18e6ff7b15e54862521a101ac2589da0c597fc98",
+        "releaseManifestSha256": "674c10a5a317c5e4dbf2f52a495ae3ec4a995907c24d86e02c0bdc3625f70da9"
+      },
+      {
+        "systemId": "folio",
+        "version": "0.4.1",
+        "role": "project-binding",
+        "tag": "v0.4.1",
+        "commit": "a94cea73dd4b4c5409fb0d4399ba65f7dbc51f5e",
+        "releaseManifestSha256": "d453d980ce7f81e3c5bd227e34bd8d287417ea79ca09aa97ae9fdc56a28c6880"
+      },
+      {
+        "systemId": "strata",
+        "version": "0.1.1",
+        "role": "repository-lifecycle",
+        "tag": "v0.1.1",
+        "commit": "f650d91e2930dfcbe82a1d2c52d8c5245e0f9996",
+        "releaseManifestSha256": "262bf735e8af934a5d104cad910e34d55e8ffcf310696f8604560bc73eb8ab04"
+      },
+      {
+        "systemId": "arca",
+        "version": "0.5.0",
+        "role": "project-binding",
+        "tag": "v0.5.0",
+        "commit": "5dd00d94de60f82db623211a8e5bcab2ab8b2e84",
+        "releaseManifestSha256": "1cab5320290e6084f873e942465fe2289c8bc952b8ec7ce3a445ad24b8ac2e84"
+      },
+      {
+        "systemId": "fides",
+        "version": "0.2.0",
+        "role": "project-binding",
+        "tag": "v0.2.0",
+        "commit": "dea13cef62b0bd34e2d4295659b4965da87f2698",
+        "releaseManifestSha256": "0ef2204d8ec298e6d930ce11d66629794486a5e31367959d7f9dbd39468b6a2a"
+      },
+      {
+        "systemId": "summa-contracts",
+        "version": "0.1.0",
+        "role": "project-binding",
+        "tag": "contracts-v0.1.0",
+        "commit": "e888cfb102be7001db7129121a5769a02c44a968",
+        "releaseManifestSha256": "b952e4c667bc83aae23092397e8de3bcd75ecd2a6d59ef7d1047f2f5d094bcfe"
+      },
+      {
+        "systemId": "limen-fsharp",
+        "version": "0.9.0",
+        "role": "project-binding",
+        "tag": "v0.9.0",
+        "commit": "96eb75fb5c5aeea41f59e7476d76e143dc35a759",
+        "releaseManifestSha256": "d8aec120fdaff6bb2a9dcd6e4d79b8a92d69f8cc0227de1c6b7166c6c3b8ce3a"
+      }
+    ]
+  },
+  "conditor": {
+    "version": "0.10.13",
+    "registryRecord": "releases/conditor/0.10.13.release.json",
+    "registryRecordSha256": "7437e117e70af41dda78535a77402a5dcf16e77cbebf26f96c43c38cc1cba525",
+    "executableSha256": "64bbd566a982734691616d0e31785b65b0a5c73c2031b684fd19bade80ac5d0e"
+  },
+  "repositoryLock": {
+    "sha256": "719be140d921aef052c51b443b867c370af04b9f0a806f1e8e19979b3d3c2337",
+    "components": [
+      {
+        "id": "praxis",
+        "version": "3.21.0"
+      },
+      {
+        "id": "ordo",
+        "version": "1.17.0"
+      },
+      {
+        "id": "percepta",
+        "version": "0.1.0"
+      },
+      {
+        "id": "aegis",
+        "version": "1.0.0"
+      },
+      {
+        "id": "limen",
+        "version": "0.9.0"
+      },
+      {
+        "id": "forma",
+        "version": "0.9.0"
+      },
+      {
+        "id": "folio",
+        "version": "0.4.1"
+      }
+    ]
+  },
+  "acceptanceTooling": {
+    "verifier": {
+      "repository": "kemiller2002/indy-init",
+      "path": "tools/compute-acceptance-verdict.py",
+      "sha256": "1c868951d435692d6de8973cce6fb8842100de41052564b11dac89e341c1f03c"
+    },
+    "rehearsalPipeline": [
+      {
+        "path": "acceptance/p0-acceptance-plan.json",
+        "sha256": "c8b13584a23549c0d44df81de8b1b5adfc1a813daa462667af2c4769d5a30dd4"
+      },
+      {
+        "path": "acceptance/p0-curation-pending.json",
+        "sha256": "65a01b4f4cc26c3e6e6f82b1dce36245df84aa6e076377ffa517b5e03f4f3883"
+      },
+      {
+        "path": "acceptance/p0-curation.json",
+        "sha256": "ee0aa6643db3569a13890e7dbc8b197ebbdaceedbb2a2016cb60f9cb7da708e3"
+      },
+      {
+        "path": "acceptance/traceability.json",
+        "sha256": "794e74c4f9c9c549a0c7a27613a9e3c2b416de0d31c8fccd2e7ddc2c657a56cf"
+      },
+      {
+        "path": "tools/acceptance-plan/AcceptancePlan.fsproj",
+        "sha256": "2767a4807773a06551602a916d97c73df322cd9a20b4cc084b58d6f16eb65ede"
+      },
+      {
+        "path": "tools/acceptance-plan/Inputs.fs",
+        "sha256": "72479d4098ef369fb2055f7fabf2a534c922255b845635876f7ed9428c8013aa"
+      },
+      {
+        "path": "tools/acceptance-plan/Json.fs",
+        "sha256": "0f3218b4caa34dc7bacb4aac59bcd0f6d1e44e7b65e6fe2de3f0cd09afe0a981"
+      },
+      {
+        "path": "tools/acceptance-plan/Plan.fs",
+        "sha256": "3f593094b64d55874d87a0a1773a9a089dd6b392c13d407d8d11ef23972989d0"
+      },
+      {
+        "path": "tools/acceptance-plan/Program.fs",
+        "sha256": "8b25c29c06e438f1c82fa4e64169adbab78021501aa3aa7d8632ef2f8fb566c4"
+      },
+      {
+        "path": "tools/acceptance-plan/Remap.fs",
+        "sha256": "04bf8cae68063f7cc3047f56703dff3e6d53ce60901f6396c0f00054c873095b"
+      },
+      {
+        "path": "tools/acceptance-plan/Verifier.fs",
+        "sha256": "5c2eec3a6ffa286ff1e1d582d3a83ee33ad52829d472607ea6346a6edea6f4ea"
+      },
+      {
+        "path": "tools/acceptance/build-evidence.mjs",
+        "sha256": "789b705f58e7a82f8d5ccc69f3ccc40c8d52190fab2cfb9233822e76babdcebf"
+      },
+      {
+        "path": "tools/acceptance/checkpoint.sh",
+        "sha256": "869fb5e9e5391a075b178bc249ee0480da733908581d9d2ef42d7e2dbe70cb8b"
+      },
+      {
+        "path": "tools/acceptance/verify.sh",
+        "sha256": "b084deb43753ed624cf3859fd4702f32f8e29fe62319c35ffabbd58040477edb"
+      }
+    ]
+  },
+  "ciWorkflows": [
+    {
+      "path": ".github/workflows/build-and-test.yml",
+      "sha256": "5349cb8566b0ba6e70fbd7265e211ed1ca62741ecaf7e6d8b89163374791ac1a"
+    },
+    {
+      "path": ".github/workflows/deploy-pages.yml",
+      "sha256": "7336e22b635c2411525f5a5c33333987eb5e70159bd8888c0c1df2bee3d8e3c3"
+    },
+    {
+      "path": ".github/workflows/echelon-foundations.yml",
+      "sha256": "a1f3ab61de97714b6dae9adfb2776e91c7e4cee31ebb2c940de4b2c7dd3fe876"
+    },
+    {
+      "path": ".github/workflows/praxis-validation.yml",
+      "sha256": "6a2e063e41afc8f275feb2130e69eecc93d03984b0c5b0df44d8bbb99344d840"
+    },
+    {
+      "path": ".github/workflows/wasm-diagnostics.yml",
+      "sha256": "99df10024b6a1818058b4d4a3510acabb230ef28920ce1affd748bd89c6cfe70"
+    }
+  ],
+  "decisions": {
+    "note": "Owner decisions and deviations the Rehearsal 5 kickoff depends on, with their current status. These are references to recorded decisions, not identities; an entry marked pending is not approved.",
+    "operatorAuthorization": {
+      "status": "not given",
+      "detail": "Rehearsal 5 has not started. The Rehearsal 5 clock starts only after the operator\u0027s explicit authorization (sprint brief \u00A713)."
+    },
+    "operatorApprovals": {
+      "status": "pending",
+      "detail": "After the T07 derivation in the Rehearsal 5 repository, the operator writes the approvals (causa.requirements-approvals/1 for the verifier, praxis.requirements-approvals/1 for the gate) and the equivalence reviews (T09). Agents must not write or transcribe them (RDP-003, OD-INDY-7). Rehearsal 4 deviated twice; remediation OD-3 (ratify or replace those transcriptions) is open.",
+      "references": [
+        "kickoff/rehearsal-004/README.md",
+        "kemiller2002/indy-init-rehearsal-004 docs/decisions/R4-REM-OWNER-DECISIONS.md (OD-3)"
+      ]
+    },
+    "scope": {
+      "status": "pending",
+      "detail": "OD-INDY-11 excluded T27 and T28 (AI proposal loop, time travel) from Rehearsal 4 only. Whether Rehearsal 5 keeps that exclusion is the owner\u0027s decision; until decided, Rehearsal 5 runs the full baseline.",
+      "references": [
+        "docs/OWNER-DECISIONS-2026-10-26.md (OD-INDY-11)"
+      ]
+    },
+    "dependencyDeviations": [
+      {
+        "id": "R4-DEC-001",
+        "subject": "@echelon-foundry/forma-workflow 1.0.0 is used but is not in the Echelon Registry",
+        "status": "owner-approved for Rehearsal 4; carry-over to Rehearsal 5 pending (remediation OD-6: publish it, or keep R4-DEC-001)",
+        "reference": "kemiller2002/indy-init-rehearsal-004 docs/decisions/R4-DEC-001-forma-workflow-dependency.md"
+      },
+      {
+        "id": "VERIFIER-PYTHON",
+        "subject": "The authoritative acceptance verifier (tools/compute-acceptance-verdict.py) is Python",
+        "status": "the owner\u0027s authoritative tool; it is run, never reimplemented; not part of the application or its build",
+        "reference": "kemiller2002/indy-init-rehearsal-004 tools/acceptance/verify.sh"
+      }
+    ],
+    "resolvedSinceRehearsal4": [
+      {
+        "subject": "Conditor 0.10.13 (bootstrap tool) was not in the Registry",
+        "resolution": "release record added and REG-RU-007 re-run against it on the 1.28.0 channel (kemiller2002/echelon-registry#99)"
+      }
+    ]
+  },
+  "problems": []
+}
