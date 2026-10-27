@@ -4,8 +4,8 @@ The compiled requirements for the baseline that follows Rehearsal 4. It is produ
 
 | | |
 |---|---|
-| Source | kemiller2002/indy-init `78277924cc2bfceb7c8bcfaeb55b6ad3804490db` (adds `docs/WASM-DIAGNOSTICS-REQUIREMENTS.md`, WASM-DIAG-001) |
-| Baseline | `BL-CAUSA-INDY-INIT-78277924cc2b`, sha256 `acbb0996c7c54f6ce4f98a0834a3164ba5d2fc1e72ccb580e300e1955092bce3` (463 requirements) |
+| Source | kemiller2002/indy-init `1aebfbedbed1b1fd390793732cd0eee643e0ae50` (adds `docs/WASM-DIAGNOSTICS-REQUIREMENTS.md`, WASM-DIAG-001, marked `[P0]` by the owner) |
+| Baseline | `BL-CAUSA-INDY-INIT-1aebfbedbed1`, sha256 `9c84dbaa95b6341d9e2565808f296714f068625f5b037b229c5e0ccf8a480d11` (463 requirements, 109 P0) |
 | Other repositories | the exact commits in `curation/sources.json`, the same as v1 |
 | Compilation verdict | as recorded in `requirements-validation-report.json` (PASS when this package was committed) |
 | Change record | [`docs/decisions/2026-10-27-WASM-DIAG-001-baseline.md`](../../docs/decisions/2026-10-27-WASM-DIAG-001-baseline.md) |
@@ -14,7 +14,7 @@ The compiled requirements for the baseline that follows Rehearsal 4. It is produ
 
 Only two files differ from `v1/curation`:
 
-- `sources.json`: the indy-init commit is `78277924…`, and `"package": "requirements-compiled/v2"` labels the manifest. v1's curation has no `package` field, so its label stays `requirements-compiled/v1`.
+- `sources.json`: the indy-init commit is `1aebfbedbed1…`, and `"package": "requirements-compiled/v2"` labels the manifest. v1's curation has no `package` field, so its label stays `requirements-compiled/v1`.
 - `tasks.json`: one added work item, **T35**, "WebAssembly runtime diagnostics configuration and reproducible diagnostic evidence (WASM-DIAG-001)". It covers the new document, depends on T16 and T11, and is gated by G1. It is a planning entry for the next rehearsal. The agent session that compiled this package added it, and the owner can revise it.
 
 Nothing in this package marks a requirement implemented or verified: every requirement is `not-verified` and every verification entry is `NOT_RUN`.

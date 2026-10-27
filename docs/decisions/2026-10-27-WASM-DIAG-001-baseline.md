@@ -58,7 +58,7 @@ python3 -I tools/build-requirements-baseline.py . 78277924cc2bfceb7c8bcfaeb55b6a
 ## Effect on acceptance
 
 - **Scope.** One new normative requirement, WASM-DIAG-001, plus its document's Implementation section. Any baseline-derived rehearsal from this pin on must give both a disposition (RDP-002).
-- **Priority.** The generator classifies it as `unstated`, because the heading carries no `[P#]` marker. It is therefore not counted as P0 (V17).
+- **Priority.** At `78277924` the generator classified it as `unstated` (no `[P#]` marker). The owner has since made it P0; see the amendment below.
 - **Obligations.** The generator split WASM-DIAG-001 into ten obligations:
   - O1 to O9 are `constraint`.
   - O10 is `acceptance`. The keyword rule matched "acceptance pipeline"; this is mechanical and was not adjusted by hand.
@@ -74,4 +74,20 @@ The first attempt failed V09 because the new requirement was in no work item. Tw
 1. **Work item T35**, added in v2's `curation/tasks.json` only: "WebAssembly runtime diagnostics configuration and reproducible diagnostic evidence (WASM-DIAG-001)". It covers the new document, depends on T16 (engine build) and T11 (stack lock), and is gated by G1. Its completion conditions restate the requirement's obligations. It is a planning entry for the next rehearsal, not a Rehearsal 4 task. The agent session added it, and the owner can revise it.
 2. **Package label.** `package-manifest.json` takes its `"package"` label from an optional `"package"` field in `curation/sources.json`. v2 sets `requirements-compiled/v2`. v1's curation has no such field and keeps the `requirements-compiled/v1` label, so v1's bytes are unchanged (`--check` exits 0).
 
-**Open for the owner:** WASM-DIAG-001's priority. The heading carries no `[P#]` marker, so the generator records it as `unstated`. Making it mandatory would mean adding a marker such as `[P0]` to the heading, a requirement change to be decided and recorded by the owner.
+## Amendment: WASM-DIAG-001 is P0 (owner decision, 2026-10-27)
+
+The owner answered the open question above in the remediation session: **"Make it P0"**.
+
+- **Requirement change.** Commit `1aebfbedbed1b1fd390793732cd0eee643e0ae50` adds the `[P0]` marker to the WASM-DIAG-001 heading. Nothing else in the document changed.
+- **Re-pin.** The baseline was regenerated at that commit with the documented command (two runs byte-identical; the F# port gives the same bytes).
+
+| | Superseded (never used for acceptance, unmerged) | Current |
+|---|---|---|
+| Baseline id | `BL-CAUSA-INDY-INIT-78277924cc2b` | `BL-CAUSA-INDY-INIT-1aebfbedbed1` |
+| SHA-256 | `acbb0996…092bce3` | `9c84dbaa95b6341d9e2565808f296714f068625f5b037b229c5e0ccf8a480d11` |
+| WASM-DIAG-001 priority | `unstated` | `P0` |
+| P0 requirements | 108 | 109 |
+
+- **What changed in the baseline.** Only the WASM-DIAG-001 entry (its priority) and the WASM-DIAGNOSTICS document hash. Requirements (463) and obligations (2305) are unchanged in number and content.
+- **Package v2** was recompiled from `1aebfbedbed1`: PASS (V01–V17), READY; `--check` exits 0. V17 now requires WASM-DIAG-001 to be covered by a work item and a verification gate; T35 (gated by G1) covers it.
+- **Effect on acceptance.** From this pin on, WASM-DIAG-001 is a mandatory requirement: a rehearsal derived from this baseline cannot be ACCEPTED while it is not PASS. The Rehearsal 4 baseline and the v1 package are unchanged (v1 `--check` exits 0); Rehearsal 4's acceptance is not affected.

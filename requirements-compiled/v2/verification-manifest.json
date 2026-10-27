@@ -15362,7 +15362,7 @@
     {
       "id": "VM-WASM-DIAG-001",
       "requirement": "WASM-DIAG-001",
-      "priority": "unstated",
+      "priority": "P0",
       "rules": [
         "VR-LEDGER",
         "VR-PRESERVATION"

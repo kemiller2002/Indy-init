@@ -9,9 +9,9 @@ rehearsal must use it is defined in
 
 | | |
 |---|---|
-| Baseline id | `BL-CAUSA-INDY-INIT-78277924cc2b` |
-| Pinned commit | `78277924cc2bfceb7c8bcfaeb55b6ad3804490db`, the post-Rehearsal 4 re-pin that adds `docs/WASM-DIAGNOSTICS-REQUIREMENTS.md` (WASM-DIAG-001, defect D-HIST-WASM; see [`docs/decisions/2026-10-27-WASM-DIAG-001-baseline.md`](../docs/decisions/2026-10-27-WASM-DIAG-001-baseline.md)). Against the previous pin every existing requirement, obligation and document hash is identical; the change adds one document and its two requirements (WASM-DIAG-001 and `WASM-DIAGNOSTICS§implementation`). |
-| SHA-256 | `acbb0996c7c54f6ce4f98a0834a3164ba5d2fc1e72ccb580e300e1955092bce3` |
+| Baseline id | `BL-CAUSA-INDY-INIT-1aebfbedbed1` |
+| Pinned commit | `1aebfbedbed1b1fd390793732cd0eee643e0ae50`, which marks WASM-DIAG-001 `[P0]` (owner decision, 2026-10-27); it supersedes the unmerged pin `78277924cc2b` (SHA-256 `acbb0996…092bce3`), identical except WASM-DIAG-001's priority. That pin was the post-Rehearsal 4 re-pin that adds `docs/WASM-DIAGNOSTICS-REQUIREMENTS.md` (WASM-DIAG-001, defect D-HIST-WASM; see [`docs/decisions/2026-10-27-WASM-DIAG-001-baseline.md`](../docs/decisions/2026-10-27-WASM-DIAG-001-baseline.md)). Against the previous pin every existing requirement, obligation and document hash is identical; the change adds one document and its two requirements (WASM-DIAG-001 and `WASM-DIAGNOSTICS§implementation`). |
+| SHA-256 | `9c84dbaa95b6341d9e2565808f296714f068625f5b037b229c5e0ccf8a480d11` |
 | Previous pin (Rehearsal 4, frozen) | `BL-CAUSA-INDY-INIT-aab8f80c7743`, SHA-256 `621e2f960038dcfb0daa2a9fe18a0c1c350faed297ba2856da1236a0360857b9`, kept byte-identical at [`frozen/BL-CAUSA-INDY-INIT-aab8f80c7743.json`](frozen/BL-CAUSA-INDY-INIT-aab8f80c7743.json). Pinned commit `aab8f80c7743392e794b3b631542903ed4ed6f64`, the Rehearsal 4 kickoff re-pin (T01, OD-INDY-6), moved from `a9df7ad` after the PRE-SEC-01 fixture fix. No drift from the previous pin `c751d58d66e3f105a8c67a0cb5e069314bdbd391`: every requirement, obligation and document hash is identical; only the commit identity changes. Earlier pins: `2edaea4f65ba` (F-001/F-006) and `002d8ba6e986`, which lacked AR-019..AR-026 (F-003). Re-pin at the Rehearsal 4 kickoff commit (OD-INDY-6) |
 | Documents | 20, each pinned by SHA-256 |
 | Requirements | 463 |

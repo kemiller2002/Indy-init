@@ -1,9 +1,9 @@
 {
   "schema": "praxis.requirements-baseline/1",
-  "id": "BL-CAUSA-INDY-INIT-78277924cc2b",
+  "id": "BL-CAUSA-INDY-INIT-1aebfbedbed1",
   "source": {
     "repository": "kemiller2002/indy-init",
-    "commit": "78277924cc2bfceb7c8bcfaeb55b6ad3804490db",
+    "commit": "1aebfbedbed1b1fd390793732cd0eee643e0ae50",
     "documents": [
       {
         "path": "docs/CAUSA-UI-EXPERIENCE-REQUIREMENTS.md",
@@ -89,7 +89,7 @@
       },
       {
         "path": "docs/WASM-DIAGNOSTICS-REQUIREMENTS.md",
-        "sha256": "8108a07bda1c9bf4cac665ea088e1d564ff53734becf944136d5f0ff25de9933",
+        "sha256": "381ce84a326e71fbee62bd5dac39651a9ebdd307390fc8ff8ea9ecb50f957dbc",
         "requirementPattern": "^## (WASM-DIAG-\\d{3}):"
       },
       {
@@ -15364,10 +15364,10 @@
     {
       "id": "WASM-DIAG-001",
       "title": "Runtime diagnostics for the .NET WebAssembly engine",
-      "priority": "unstated",
+      "priority": "P0",
       "document": "docs/WASM-DIAGNOSTICS-REQUIREMENTS.md",
-      "heading": "## WASM-DIAG-001: Runtime diagnostics for the .NET WebAssembly engine",
-      "sectionSha256": "772ef091e8125848043fe42d5b07e327d732a94e058d3919a17ed7334725d03b",
+      "heading": "## WASM-DIAG-001: Runtime diagnostics for the .NET WebAssembly engine [P0]",
+      "sectionSha256": "2effeee69256fc5bdcdc767ea8bb5e9e8cce9c09e17999f52b532a56c7fdffc2",
       "obligations": [
         {
           "id": "WASM-DIAG-001-O1",

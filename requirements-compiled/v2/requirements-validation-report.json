@@ -2,8 +2,8 @@
   "schema": "indy-init.requirements-validation-report/1",
   "source": {
     "repository": "kemiller2002/indy-init",
-    "commit": "78277924cc2bfceb7c8bcfaeb55b6ad3804490db",
-    "baselineSha256": "acbb0996c7c54f6ce4f98a0834a3164ba5d2fc1e72ccb580e300e1955092bce3"
+    "commit": "1aebfbedbed1b1fd390793732cd0eee643e0ae50",
+    "baselineSha256": "9c84dbaa95b6341d9e2565808f296714f068625f5b037b229c5e0ccf8a480d11"
   },
   "compilationVerdict": "PASS",
   "compilationRule": "FAIL when any critical check reports a problem; the compiler then exits 3",

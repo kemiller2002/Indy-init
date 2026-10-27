@@ -18,7 +18,7 @@
       "ERROR-HANDLING-UNSTATED": 112,
       "MODALITY-UNMARKED": 143,
       "PRIORITY-IN-TITLE-ONLY": 1,
-      "PRIORITY-UNSTATED": 161,
+      "PRIORITY-UNSTATED": 160,
       "VAGUE-TERMS": 56
     }
   },
@@ -19601,7 +19601,7 @@
       "source": "WASM-DIAG-001",
       "origin": "baseline",
       "title": "Runtime diagnostics for the .NET WebAssembly engine",
-      "priority": "unstated",
+      "priority": "P0",
       "modality": "must",
       "category": "uncategorized",
       "tags": [
@@ -19631,11 +19631,6 @@
       "dependencies": [],
       "overlaps": [],
       "flags": [
-        {
-          "code": "PRIORITY-UNSTATED",
-          "severity": "minor",
-          "detail": "the source assigns no P0/P1 priority; cut decisions cannot rank it"
-        },
         {
           "code": "VAGUE-TERMS",
           "severity": "minor",

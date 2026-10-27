@@ -42,8 +42,8 @@
     "unavailable values are recorded as unavailable (R4 section 5)"
   ],
   "coverage": {
-    "p0Requirements": 108,
-    "p0CoveredByTimedTasks": 103,
+    "p0Requirements": 109,
+    "p0CoveredByTimedTasks": 104,
     "p0CoveredOnlyByPreflight": [
       "VER-001",
       "VER-002",
@@ -794,7 +794,7 @@
       "excludedBy": null,
       "ciRun": false,
       "requirementsCovered": 2,
-      "p0RequirementsCovered": 0,
+      "p0RequirementsCovered": 1,
       "defectClassTests": [],
       "contracts": [],
       "gates": [

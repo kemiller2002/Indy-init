@@ -3,15 +3,15 @@
   "package": "requirements-compiled/v2",
   "source": {
     "repository": "kemiller2002/indy-init",
-    "commit": "78277924cc2bfceb7c8bcfaeb55b6ad3804490db",
-    "baselineId": "BL-CAUSA-INDY-INIT-78277924cc2b",
-    "baselineSha256": "acbb0996c7c54f6ce4f98a0834a3164ba5d2fc1e72ccb580e300e1955092bce3",
+    "commit": "1aebfbedbed1b1fd390793732cd0eee643e0ae50",
+    "baselineId": "BL-CAUSA-INDY-INIT-1aebfbedbed1",
+    "baselineSha256": "9c84dbaa95b6341d9e2565808f296714f068625f5b037b229c5e0ccf8a480d11",
     "baselineGenerator": "requirements-compiler baseline (F# port; byte-equivalent to tools/build-requirements-baseline.py)"
   },
   "repositories": [
     {
       "name": "indy-init",
-      "commit": "78277924cc2bfceb7c8bcfaeb55b6ad3804490db",
+      "commit": "1aebfbedbed1b1fd390793732cd0eee643e0ae50",
       "role": "primary: authoritative requirements (source commit of this package)"
     },
     {
@@ -193,7 +193,7 @@
     },
     {
       "path": "curation/sources.json",
-      "sha256": "8884f2e8e930cdbde5ea7b194e79fcbc7dc95007d1826b4b6911f22efc895c9e"
+      "sha256": "34374b41571ffeb8a9c83e5113494948c136292dbd19ce4b002ce18757905395"
     },
     {
       "path": "curation/tasks.json",
@@ -213,11 +213,11 @@
   "generated": [
     {
       "path": "contract-bindings.json",
-      "sha256": "6d64699624eeaac37140558e55954131fa24b793adecacb74d0bb112cc257ebf"
+      "sha256": "0fc094df862d515c623d40d28aac0c414346dcef6d263b83e1753313f97c5663"
     },
     {
       "path": "decision-registry.json",
-      "sha256": "b5254f8824d89105202d2eb29f261d6bd3e9bafbc739f64d6d94a4470e904281"
+      "sha256": "c2818587189c83a65ee6b32db765c4a34f3d476705abca72053f8af2b118440f"
     },
     {
       "path": "dependency-graph.json",
@@ -233,7 +233,7 @@
     },
     {
       "path": "normalized-requirements.json",
-      "sha256": "28170bd0ba48ab1228c5ffd2f32ded67f7890e6e6495464138035e38b10bd1f5"
+      "sha256": "409c783dcc95234b7ee7631e59d43fef6c60f87e2b29c106cd31b7bdcb21600d"
     },
     {
       "path": "percepta-experiment.json",
@@ -245,23 +245,23 @@
     },
     {
       "path": "requirements-inventory.json",
-      "sha256": "097f7a533a98d8df1828090bd852211fb50a247c45b069800ab9b4fea5c6ae35"
+      "sha256": "af48fcd265f2cdab9aee44293a0e15ea698e91f8883fd14665725dcca9ffc4a0"
     },
     {
       "path": "requirements-source-map.json",
-      "sha256": "1a225b8a552f6fd4594dd534db169985a10b94c4512cf8febdefd0ebaf21ef80"
+      "sha256": "59d51ee9ed22610327300a40c9f75dc0d876e6ad208dea4b8901170528d43b43"
     },
     {
       "path": "requirements-validation-report.json",
-      "sha256": "58565127a16d9b8ea209f48d5acf7d0c6a591e3456316a0fcd2026bc8d9c1a29"
+      "sha256": "98364660ccd847a8c577ac72e32336bd4442f528e6aa39a5a99c191ccbe294b8"
     },
     {
       "path": "timed-execution-manifest.json",
-      "sha256": "4bb01dee5c1e1928f070356c4f48292845103a96b5a1478639858558bd7f24ee"
+      "sha256": "6d12b1ef8cd39930939b9f3d46155b0bdf14a6c3aed29d12f5d94607dad6fbc9"
     },
     {
       "path": "verification-manifest.json",
-      "sha256": "925f50d24e258ba0332c19ac84f647c02686ac78f20039b34864759fb7d11726"
+      "sha256": "882237f266b024192d3e6af408036e2898874de55e7b16993897e2fb7ef06521"
     }
   ],
   "compilationVerdict": "PASS",
