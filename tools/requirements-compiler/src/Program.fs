@@ -22,7 +22,8 @@ let private authoredFiles =
       "readiness/OWNER-DECISION-REQUESTS.md"
       "readiness/CONTRACT-RESOLUTION.md"
       "readiness/FSHARP-TOOLING-ASSESSMENT.md"
-      "readiness/DEPENDENCY-COMPATIBILITY.md" ]
+      "readiness/DEPENDENCY-COMPATIBILITY.md"
+      "verification-plan.schema.json" ]
 
 type Options =
     { Source: string
@@ -342,6 +343,34 @@ let buildPackage (o: Options) : Built =
           "preflight-manifest.json", Artifacts.preflightManifest compiled
           "timed-execution-manifest.json", Artifacts.timedExecutionManifest compiled planB ]
 
+    // Phase Two: the verification plan, derived from the baseline, the verification manifest and the
+    // plan curation; the approvals file that authorizes exclusions is read at its pinned commit.
+    let planSpec = parseFile (Path.Combine(o.Curation, "verification-plan.json"))
+    let planInputs: VerificationPlan.Inputs =
+        let a = field "approvals" planSpec |> Option.defaultValue JNull
+        let repo = repoOf (str "repo" a)
+        let bytes =
+            match Git.showFile repo.Path (str "commit" a) (str "path" a) with
+            | Ok b -> b
+            | Error e -> failwithf "approvals file %s is unreadable at %s: %s" (str "path" a) (str "commit" a) e
+
+        { Repository = str "repository" source
+          Commit = sourceCommit
+          BaselineId = str "id" baseline
+          BaselineSha256 = baselineSha
+          Baseline = baseline
+          Manifest = Artifacts.verificationManifest compiled
+          Spec = planSpec
+          Approvals =
+            { Repository = sprintf "kemiller2002/%s" repo.Name
+              Commit = str "commit" a
+              Path = str "path" a
+              Sha256 = Git.sha256Hex bytes
+              TrustedOperators = strs "trustedOperators" a
+              Document = parseBytes bytes } }
+
+    let outputs0 = outputs0 @ [ "verification-plan.json", VerificationPlan.build planInputs ]
+
     // Validation reads the serialized artifacts back, so it checks what is actually written.
     let reparsed = outputs0 |> List.map (fun (n, j) -> n, serialize j |> Text.Encoding.UTF8.GetBytes |> parseBytes) |> Map.ofList
 
@@ -360,7 +389,13 @@ let buildPackage (o: Options) : Built =
           SourceFiles = sourceFiles
           CommittedBaseline = if File.Exists o.CommittedBaseline then Some(parseFile o.CommittedBaseline) else None }
 
-    let checks = Validate.run inputs
+    let planCheck: Validate.Check =
+        { Id = "V18"
+          Title = "The verification plan preserves every baseline P0 requirement and obligation; exclusions are operator-authorized and test bindings resolve"
+          Critical = true
+          Problems = VerificationPlan.problems planInputs @ VerificationPlan.preservationProblems baseline reparsed.["verification-plan.json"] }
+
+    let checks = Validate.run inputs @ [ planCheck ]
     let report = Validate.report inputs checks
     let outputs = outputs0 @ [ "requirements-validation-report.json", report ]
     let rendered = outputs |> List.map (fun (n, j) -> n, serialize j)

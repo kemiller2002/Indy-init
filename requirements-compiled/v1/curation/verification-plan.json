@@ -1,0 +1,42 @@
+{
+  "schema": "indy-init.verification-plan-curation/1",
+  "description": "Inputs to verification-plan.json that are not in the baseline or the verification rules. Freshness policies are listed strictest first; a requirement takes the strictest policy among the default, its gates' policies and its bound tests' kinds. testBindings name exact test identities per baseline obligation id; an unbound obligation is reported missing, never guessed. exclusions must each name an authenticated operator approval in the pinned approvals file.",
+  "approvals": {
+    "repo": "indy-init",
+    "commit": "1ede27f76520235d3974a329e325d38101f52e5a",
+    "path": "kickoff/rehearsal-004/approvals.causa.json",
+    "sha256": "3e70dcd2e87811c4f3744ee97585855639741c3ba7a63d98f4b842c7e86bace7",
+    "trustedOperators": ["kemiller2002"]
+  },
+  "freshnessPolicies": [
+    {
+      "id": "FP-LIVE-PER-COMMIT",
+      "testKinds": ["live"],
+      "rule": "Evidence comes from a live provider or deployed-site run of the exact candidate source commit, in the run named by the ledger (run_id and source_sha match).",
+      "reusable": false,
+      "reuseCondition": "never reused: a new commit, a new run or a new deployment requires a new live run"
+    },
+    {
+      "id": "FP-REVIEW-PER-COMMIT",
+      "testKinds": ["review"],
+      "rule": "Independent review evidence names the reviewed commit; it is fresh only for that commit, or for a later commit whose diff since the reviewed commit touches none of the reviewed paths, as stated by the reviewer.",
+      "reusable": false,
+      "reuseCondition": "not reused by the verifier; a re-review (or a reviewer's no-change attestation) is new evidence"
+    },
+    {
+      "id": "FP-DETERMINISTIC-INPUT-DIGEST",
+      "testKinds": ["deterministic"],
+      "rule": "Evidence comes from a deterministic test (unit, property, fixture replay, offline browser) whose result depends only on its declared inputs.",
+      "reusable": true,
+      "reuseCondition": "reusable within one run only when the test identity and the digest of every declared input (tested source paths, fixtures, dependency lock, baseline sha256) are unchanged and Dokimos reports the evidence Reusable:true with matching id, digest and immutable revision; never reused from an earlier rehearsal"
+    }
+  ],
+  "defaultPolicy": "FP-DETERMINISTIC-INPUT-DIGEST",
+  "gatePolicies": {
+    "G6": "FP-LIVE-PER-COMMIT",
+    "G7": "FP-REVIEW-PER-COMMIT",
+    "G9": "FP-LIVE-PER-COMMIT"
+  },
+  "testBindings": [],
+  "exclusions": []
+}
