@@ -29,7 +29,9 @@ Rehearsal 4's evidence identifies its baseline by id and SHA-256. The frozen
 copy in `frozen/` keeps those exact bytes available on the current branch (they
 also remain at every earlier commit), and it is never regenerated or edited. A later baseline is regenerated into
 `causa-requirements-baseline.json`, and the baseline it replaces is first
-copied byte for byte into `frozen/<baseline id>.json`.
+copied byte for byte into `frozen/<baseline id>.json`. A frozen baseline is
+reproduced with the generator at its own commit, because the document list
+lives in the generator.
 
 ## Documents in the baseline
 
