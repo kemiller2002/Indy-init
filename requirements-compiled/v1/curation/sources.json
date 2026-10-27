@@ -49,7 +49,7 @@
     },
     {
       "name": "echelon-registry",
-      "commit": "2d6338e8286a968ec7e4f356af60dde789797e5a",
+      "commit": "e6d8a734aadb8697c59d46376d1a358db98ca19e",
       "role": "approved release sets"
     },
     {
@@ -69,7 +69,7 @@
     },
     {
       "name": "conditor",
-      "commit": "b37c7d35d1a1c2dbfcc94e58d38fb08f1e1f5680",
+      "commit": "84d4847d996ac3f9fb64e20747468e28447ee7d1",
       "role": "bootstrap tool (SD-1 fix status)"
     }
   ],

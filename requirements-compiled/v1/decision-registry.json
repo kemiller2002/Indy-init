@@ -1074,7 +1074,7 @@
           "path": "sets/echelon-current/1.27.0.json",
           "quote": "\"systemId\": \"aegis\"",
           "verified": true,
-          "detail": "found at 2d6338e8286a968ec7e4f356af60dde789797e5a"
+          "detail": "found at e6d8a734aadb8697c59d46376d1a358db98ca19e"
         }
       ],
       "sourcesVerified": true
@@ -1139,7 +1139,7 @@
           "path": "sets/echelon-current/1.27.0.json",
           "quote": "Replaced by Dokimos 0.7.0",
           "verified": true,
-          "detail": "found at 2d6338e8286a968ec7e4f356af60dde789797e5a"
+          "detail": "found at e6d8a734aadb8697c59d46376d1a358db98ca19e"
         }
       ],
       "sourcesVerified": true

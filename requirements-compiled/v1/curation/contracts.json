@@ -366,30 +366,57 @@
     {
       "id": "CT-012",
       "name": "Percepta semantic CLI: contract and evidence schemas",
-      "provider": "percepta-semantic (released v0.2.1, not registered)",
+      "provider": "percepta-semantic 0.2.1 (released; selected by the approved echelon-current 1.28.0)",
       "consumer": "UI acceptance (G5)",
       "contractVersion": "percepta-contract.schema.json; percepta-evidence.schema.json schemaVersion 1.0.0",
       "requiredCompatibility": "the release pinned by the kickoff set",
       "verificationMethod": "`percepta verify --contract <screen> --url <deployed SHA>`; `percepta validate-evidence`",
       "dependencyVersions": [
-        "percepta-semantic 0.2.1 (registered release; not in an approved set)"
+        "percepta-semantic 0.2.1 (echelon-current 1.28.0, approved)"
       ],
       "evidenceIdentity": "evidence JSON digest + deployed SHA",
-      "status": "blocked",
+      "status": "identity-verified",
       "requirements": [
         "UI-015",
         "UI-030",
         "PF-016"
       ],
-      "identity": [],
+      "identity": [
+        {
+          "label": "contract schema (schemas/percepta-contract.schema.json)",
+          "repo": "percepta",
+          "rev": "8b78df803abb401e2e77320203a2b944d919f6c7",
+          "path": "schemas/percepta-contract.schema.json",
+          "expectedSha256": "78773aeb2452f90da911d5e9cd50067db6b1bf172dd244ce6a64932f43148cd6"
+        },
+        {
+          "label": "evidence schema (schemas/percepta-evidence.schema.json, schemaVersion 1.0.0)",
+          "repo": "percepta",
+          "rev": "8b78df803abb401e2e77320203a2b944d919f6c7",
+          "path": "schemas/percepta-evidence.schema.json",
+          "expectedSha256": "c09d6569f54d18b665a1b844cd2fc56c66157128ff3124f4592fba8f435e761e"
+        },
+        {
+          "label": "Registry release record (releases/percepta-semantic/0.2.1.release.json)",
+          "repo": "echelon-registry",
+          "rev": "e6d8a734aadb8697c59d46376d1a358db98ca19e",
+          "path": "releases/percepta-semantic/0.2.1.release.json",
+          "expectedSha256": "156ef405778000991724e95c7cf80e3761d189397e1c069207055cce100b3e37"
+        }
+      ],
       "citations": [
         {
           "repo": "echelon-registry",
           "path": "sets/echelon-current/1.27.0.json",
           "quote": "It is therefore not the complete Rehearsal 4 kickoff set"
+        },
+        {
+          "repo": "echelon-registry",
+          "path": "sets/echelon-current/1.28.0.json",
+          "quote": "\"systemId\": \"percepta-semantic\""
         }
       ],
-      "blockerClass": "external-dependency"
+      "blockerClass": null
     },
     {
       "id": "CT-013",
@@ -522,29 +549,63 @@
       "name": "Kickoff release-set lock",
       "provider": "echelon-registry (echelon-current) qualified by Conditor",
       "consumer": "rehearsal bootstrap and CI version gate",
-      "contractVersion": "echelon.release-set/v1; echelon-current 1.27.0 now, 1.28.0 required",
+      "contractVersion": "echelon.release-set/v1; echelon-current 1.28.0 (approved 2026-10-26, Registry e6d8a734)",
       "requiredCompatibility": "installed and loaded versions equal the lock (VER-008)",
       "verificationMethod": "Conditor bootstrap verify/doctor; CI gate comparing installed artifacts to the lock (DEP-CURRENT-008)",
       "dependencyVersions": [
         "see package-manifest.json dependencyVersions"
       ],
       "evidenceIdentity": "release set file digest + Conditor qualification run",
-      "status": "blocked",
+      "status": "identity-verified",
       "requirements": [
         "VER-004",
         "VER-008",
         "DEP-CURRENT-006",
         "DEP-CURRENT-008"
       ],
-      "identity": [],
+      "identity": [
+        {
+          "label": "release-set record (sets/echelon-current/1.28.0.json, approved)",
+          "repo": "echelon-registry",
+          "rev": "e6d8a734aadb8697c59d46376d1a358db98ca19e",
+          "path": "sets/echelon-current/1.28.0.json",
+          "expectedSha256": "0b75dc5a6d4b3595e0190f9986e3d34a8d9e702da495bc287e69ca57cd2adfa6"
+        },
+        {
+          "label": "channel index (channels/echelon-current/channel.json)",
+          "repo": "echelon-registry",
+          "rev": "e6d8a734aadb8697c59d46376d1a358db98ca19e",
+          "path": "channels/echelon-current/channel.json",
+          "expectedSha256": "a02a8c779ba5f69bc67466416755d1cecefc6d2d4dd8e1aff680f4c0842520f9"
+        },
+        {
+          "label": "linux-x64 resolved set (channels/echelon-current/linux-x64.json)",
+          "repo": "echelon-registry",
+          "rev": "e6d8a734aadb8697c59d46376d1a358db98ca19e",
+          "path": "channels/echelon-current/linux-x64.json",
+          "expectedSha256": "5aee6c3c355dbb1b556d7a1dba9db80ece9c88862f31239c3558c441bb7abc67"
+        },
+        {
+          "label": "qualifying Conditor release record (releases/conditor/0.10.12.release.json)",
+          "repo": "echelon-registry",
+          "rev": "e6d8a734aadb8697c59d46376d1a358db98ca19e",
+          "path": "releases/conditor/0.10.12.release.json",
+          "expectedSha256": "4aab4ad7bdf9da0b0b34fa691ffcb84b266c9d7eb58b602807312efd6eff822a"
+        }
+      ],
       "citations": [
         {
           "repo": "echelon-registry",
           "path": "sets/echelon-current/1.27.0.json",
           "quote": "cut echelon-current 1.28.0"
+        },
+        {
+          "repo": "echelon-registry",
+          "path": "sets/echelon-current/1.28.0.json",
+          "quote": "\"status\": \"approved\""
         }
       ],
-      "blockerClass": "external-dependency"
+      "blockerClass": null
     },
     {
       "id": "CT-017",

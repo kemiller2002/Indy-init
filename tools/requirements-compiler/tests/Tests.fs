@@ -117,7 +117,7 @@ let private cases: Case list =
       case "fixed-decision-unsourced" (fun d -> setField (cur "decisions.json" d) "decisions" "DEC-020" "sources" (JArr [])) 3 [ "V08" ]
       case "contract-over-claimed" (fun d -> setField (cur "contracts.json" d) "contracts" "CT-009" "status" (JStr "verified")) 3 [ "V07" ]
       case "identity-mismatch" (fun d -> edit (cur "contracts.json" d) "8c361929cfb429c31c059c92d6148036bf2b5861f81dace635a1f7de18dbf87c\"" "0000000000000000000000000000000000000000000000000000000000000000\"") 3 [ "V07" ]
-      case "conflict-silently-accepted" (fun d -> setField (cur "findings.json" d) "findings" "F-005" "decisions" (jstrs [ "DEC-013"; "DEC-001" ])) 3 [ "V03" ]
+      case "conflict-silently-accepted" (fun d -> setField (cur "findings.json" d) "findings" "F-011" "decisions" (jstrs [ "DEC-013"; "DEC-001" ])) 3 [ "V03" ]
       case "conflict-resolved-without-source" (fun d -> setField (cur "findings.json" d) "findings" "F-007" "status" (JStr "resolved-by-precedence")) 3 [ "V03" ]
       case "unknown-reference" (fun d -> setField (cur "decisions.json" d) "decisions" "DEC-020" "requirements" (jstrs [ "R9.1"; "UI-999" ])) 3 [ "V04" ]
       case "repository-revision-mismatch" (fun d -> edit (cur "sources.json" d) "\"commit\": \"22260f429501d0d6963fc33302ed1e64d742a374\"" "\"commit\": \"1111111111111111111111111111111111111111\"") 2 []
@@ -125,7 +125,9 @@ let private cases: Case list =
       case "verification-rule-removed" (fun d ->
           edit (cur "verification-rules.json" d) "\"match\": [\"all\"]" "\"match\": [\"origin:baseline\"]"
           edit (cur "verification-rules.json" d) "\"match\": [\"origin:external\"]" "\"match\": [\"origin:none\"]") 3 [ "V06" ]
-      case "blocker-unclassified" (fun d -> setField (cur "findings.json" d) "findings" "F-005" "blockerClass" (JStr "")) 3 [ "V15" ]
+      // No readiness blocker remains in the package, so the case makes one: F-011, open and material,
+      // raised to critical, carries no blocker class.
+      case "blocker-unclassified" (fun d -> setField (cur "findings.json" d) "findings" "F-011" "severity" (JStr "critical")) 3 [ "V15" ]
       case "decision-without-recommendation" (fun d ->
           setField (cur "decisions.json" d) "decisions" "DEC-022" "classification" (JStr "unresolved")
           setField (cur "decisions.json" d) "decisions" "DEC-022" "recommendation" (JStr "")) 3 [ "V15" ]

@@ -1,9 +1,11 @@
 # Rehearsal 4 readiness report
 
-**Verdict: BLOCKED. Rehearsal 4 must not start.**
+**Verdict: no readiness blocker remains. The preflight is not yet READY: two of its checks are records that Rehearsal 4's own untimed setup produces. The timed run must not start before the preflight is READY.**
 
-- The preflight's computed verdict is BLOCKED, with no FAIL left.
-- 3 readiness blockers remain, all in the release set (echelon-current 1.28.0). Each needs a release by the system's owner, not an owner decision.
+- The preflight in CI with the secret (2026-10-26, run 40420386699): 14 PASS, 3 NOT_RUN, 0 BLOCKED, 0 FAIL. Its rule needs every check at PASS, except PRE-ORG-01 (event only). The two remaining checks are produced in the Rehearsal 4 repository:
+  - PRE-REQ-04: the preservation gate passes (T07 derive, T09 operator approvals, T08 gate);
+  - PRE-TOOL-03: the Conditor bootstrap reaches first green CI (T10). The timer starts there.
+- The kickoff release set is approved: echelon-current 1.28.0 (Registry `e6d8a734`, echelon-registry#98) selects percepta-semantic 0.2.1, Praxis 3.21.0, Dokimos 0.7.0 and Folio 0.4.1, qualified by released Conditor 0.10.12 and approved by the owner (OD-INDY-8). F-005, CT-012 and CT-016 are resolved.
 - The Praxis preservation gate is released: Praxis 3.21.0 (2026-10-26) carries it, and the published artifact was verified against the pinned baseline; see "Praxis requirements-preservation release" below.
 - T05 is verified (2026-10-26). The secret and the isolated test repository work end to end with the approved guarded write; see "T05 persistence verification" below.
 - The owner's decisions so far:
@@ -17,7 +19,7 @@
 | Source | kemiller2002/indy-init `9dc7d57`: main with #16 (acceptance verifier), #17 (readiness tooling), #18 (owner-approved requirement changes), #19, and the owner decision record of 2026-10-26 |
 | Package | `requirements-compiled/v1`, compilation **PASS**: all checks V01–V17 pass, and V14 confirms there is no baseline drift |
 | Requirements | 467 inventoried (461 baseline, including EXT-DATA-013, plus 6 external), 2325 obligations, 108 P0. All are preserved; none is marked verified. |
-| Evidence | `evidence/preflight-run.json` (all 17 checks executed in CI with the secret: indy-init-rehearsal-003 run 40352698801, source 9dc7d57), `evidence/preflight-run-praxis-3.21.0.json` (all 17 checks, run locally after the Praxis 3.21.0 release), `evidence/praxis-preservation-verification.json` and `-candidate.json` (the Praxis gate on the real baseline), `evidence/t05-persistence-verification.json`, `evidence/auth-contract-probe.json`, `evidence/baseline-equivalence.json`. `evidence/preflight-owner-branch-projection.json` is historical: the pre-merge projection of #18. |
+| Evidence | `evidence/preflight-run.json` (all 17 checks executed in CI with the secret: indy-init-rehearsal-003 run 40420386699, on this package with the echelon-current 1.28.0 curation, Indy-init `04ea5f2`), `evidence/preflight-run-praxis-3.21.0.json` (historical: all 17 checks, run locally after the Praxis 3.21.0 release), `evidence/praxis-preservation-verification.json` and `-candidate.json` (the Praxis gate on the real baseline), `evidence/t05-persistence-verification.json`, `evidence/auth-contract-probe.json`, `evidence/baseline-equivalence.json`. `evidence/preflight-owner-branch-projection.json` is historical: the pre-merge projection of #18. |
 
 ## Blockers: classification and state
 
@@ -29,44 +31,42 @@
 | ~~F-008, DEC-022~~ | Owner decision | AI loop and time travel scope | **Resolved:** OD-INDY-11 excludes T27 and T28 from Rehearsal 4. They carry `excludedBy: DEC-022`. | The operator's approvals file (T09) before they leave the run |
 | ~~DEC-025, CT-017~~ | Owner decision | Authentication mechanism undecided | **Resolved:** OD-INDY-10, a fine-grained token held in memory (`CONTRACT-RESOLUTION.md` §2). CT-017 is unverified until PRE-AUTH-02/T21. | — |
 | ~~DEC-023~~ | Owner decision | Reuse of earlier rehearsal interfaces at the event | **Resolved:** OD-INDY-12 | Organizer confirmation for the event (PRE-ORG-01) |
-| ~~F-004, CT-013~~ | External dependency | No Praxis release carried the preservation gate | **Resolved:** Praxis 3.21.0 (`fa474c42`). PRE-REQ-03 PASS; CT-013 identity-verified (four contract schemas); published artifact verified | Inclusion in echelon-current 1.28.0 (with F-005) |
-| F-005, CT-012, CT-016 | External dependency | percepta-semantic 0.2.1 is now a registered release, but in no approved set (PRE-DEP-01, executed) | The contents of 1.28.0 are specified | Registry set 1.28.0, Conditor qualification, owner approval |
+| ~~F-004, CT-013~~ | External dependency | No Praxis release carried the preservation gate | **Resolved:** Praxis 3.21.0 (`fa474c42`). PRE-REQ-03 PASS; CT-013 identity-verified (four contract schemas); published artifact verified; selected by echelon-current 1.28.0 | — |
+| ~~F-005, CT-012, CT-016~~ | External dependency | percepta-semantic 0.2.1 was registered but in no approved set | **Resolved:** echelon-current 1.28.0 approved (Registry `e6d8a734`), qualified by released Conditor 0.10.12 (REG-RU-007 PASS). PRE-DEP-01 and PRE-DEP-02 PASS. CT-012 identity-verified (Percepta contract and evidence schemas at `percepta-semantic-v0.2.1`, Registry release record); CT-016 identity-verified (approved set record, channel index, linux-x64 set, Conditor 0.10.12 record) | — |
 
 **Counts:**
 - 16 at the start of this work.
-- 13 are resolved:
+- All 16 are resolved:
   - 3 by the owner-approved merge of #18: F-001, DEC-024 and F-003;
   - 8 by OD-INDY-9 to OD-INDY-12: F-009, DEC-006, CT-007, F-008, DEC-022, DEC-025, CT-017 and DEC-023.
   - 2 by the Praxis 3.21.0 release: F-004 and CT-013.
-- Also resolved, though they were not readiness blockers: F-006 (#18), and F-002, F-012, F-013 and F-019 (OD-INDY-10, -12 and -13).
-- 3 are open, all waiting on the release set: F-005, CT-012 and CT-016.
-- Upstream progress since package v1: percepta-semantic 0.2.1 was registered as a release (Registry PR #96/#97, by the owner), and the Conditor SD-1 fix is confirmed released in v0.10.11.
+  - 3 by the approved echelon-current 1.28.0: F-005, CT-012 and CT-016.
+- Also resolved, though they were not readiness blockers: F-006 (#18), F-002, F-012, F-013 and F-019 (OD-INDY-10, -12 and -13), and F-015 (Folio 0.4.1 assessed and selected in 1.28.0).
+- None is open.
+- Upstream: percepta-semantic 0.2.1 registered (Registry #96/#97); Praxis 3.21.0, Conditor 0.10.12 and echelon-current 1.28.0 released and approved (Registry #98, conditor#111); the Conditor SD-1 fix is in v0.10.11 and later.
 
 ## Preflight (executed)
 
-11 PASS, 3 BLOCKED, 3 NOT_RUN, 0 FAIL. Two runs, each executing all 17 checks:
+14 PASS, 0 BLOCKED, 3 NOT_RUN, 0 FAIL: `evidence/preflight-run.json`, all 17 checks executed in CI with the secret (the T05 workflow, indy-init-rehearsal-003 run 40420386699, on Indy-init `04ea5f2`). The same run repeated T05's guarded write against the test repository: PASS.
 
-- `evidence/preflight-run.json`: in CI with the secret (T05, indy-init-rehearsal-003 run 40352698801). It is the source for PRE-AUTH-01 and PRE-AUTH-02.
-- `evidence/preflight-run-praxis-3.21.0.json`: run locally after the Praxis release, with the Praxis checkout at `fa474c42`. It is the source for every other row.
-
-The local run cannot test authentication (no secret), and gives PRE-AUTH-01 BLOCKED and PRE-AUTH-02 NOT_RUN.
+A local run of the same package, without the secret, gives the same results except PRE-AUTH-01 BLOCKED and PRE-AUTH-02 NOT_RUN.
 
 | Check | Status | Detail |
 |---|---|---|
 | PRE-DEC-01 owner decisions | PASS | No unresolved decision |
-| PRE-DEC-02 critical findings | BLOCKED | F-005 open |
+| PRE-DEC-02 critical findings | PASS | No open critical finding |
 | PRE-REQ-01 baseline drift | PASS | Pinned at c751d58; no drift at 9dc7d57 |
 | PRE-REQ-02 package compiles | PASS | |
 | PRE-REQ-03 Praxis gate released | PASS | v3.21.0 contains `preservation` under src/Praxis.Cli |
 | PRE-REQ-04 gate PASS on the derived package | NOT_RUN | Needs T07–T09 |
-| PRE-DEP-01 release set | BLOCKED | echelon-current 1.27.0 lacks percepta-semantic |
-| PRE-DEP-02 contracts | BLOCKED | CT-012, CT-016 |
-| PRE-DEP-03 identities | PASS | 9 of 9 match, including the four Praxis 3.21.0 contract schemas (CT-013) |
+| PRE-DEP-01 release set | PASS | `sets/echelon-current/1.28.0.json` (approved) contains percepta-semantic, Dokimos, Praxis, Limen, Forma, Folio, Ordo and Aegis |
+| PRE-DEP-02 contracts | PASS | No blocked contract |
+| PRE-DEP-03 identities | PASS | 16 of 16 match, including the Praxis 3.21.0 contract schemas (CT-013), the Percepta semantic schemas (CT-012) and the 1.28.0 set (CT-016) |
 | PRE-AUTH-01 CI secret | PASS | CAUSA_GITHUB_TOKEN and CAUSA_TEST_REPO set in the authorized workflow (values not read) |
 | PRE-AUTH-02 auth contract | PASS | In CI: invalid token refused (401); test repository readable (200); fine-grained token (no classic scopes) |
 | PRE-SEC-01 committed secrets | PASS | No token patterns at 9dc7d57 |
 | PRE-TOOL-01 SDK | PASS | 10.0.402 = global.json |
-| PRE-TOOL-02 Conditor SD-1 | PASS | v0.10.11 contains CON-367 |
+| PRE-TOOL-02 Conditor SD-1 | PASS | v0.10.12, the latest release, contains CON-367 |
 | PRE-TOOL-03 bootstrap | NOT_RUN | T10 record |
 | PRE-ORG-01 organizer | NOT_RUN | Event only |
 | PRE-VER-01 manifests | PASS | V16 |
@@ -111,15 +111,13 @@ V16 fails compilation if any of DC-001..DC-006 loses its test.
 
 ## Order of work to reach READY
 
-1. **Upstream:**
-   - cut, qualify and approve echelon-current 1.28.0 (F-005). It must include Praxis 3.21.0, the release that carries the gate.
-2. **Operator:**
-   - write the approvals file (T09), including the T27/T28 exclusion.
-3. **Agent:**
-   - update the curation statuses that follow from steps 1–2;
-   - recompile, which forces citation updates (V11);
-   - re-run the preflight in CI (the T05 workflow does this), so that PRE-AUTH-02 stays meaningful;
-   - derive and disposition (T07), then pass the gate (T08) and bootstrap (T10).
+1. **Upstream:** done. echelon-current 1.28.0 is cut, qualified by released Conditor 0.10.12 and approved (F-005), with Praxis 3.21.0, the release that carries the gate.
+2. **Agent:** done for step 1. The curation statuses are updated (F-005, F-015, CT-012, CT-016), the package is recompiled (V11 citations pass), and the preflight is re-run in CI with the secret (run 40420386699: 14 PASS, 3 NOT_RUN).
+3. **Rehearsal 4 setup (untimed), in the rehearsal repository:**
+   - derive and disposition (T07), recording the exclusions the derivation requests;
+   - the operator writes the approvals file (T09), including the T27/T28 exclusion. It covers exactly the ids T07 requests, and is pinned by SHA-256 outside the agent's reach;
+   - pass the gate (T08): PRE-REQ-04;
+   - bootstrap (T10): PRE-TOOL-03.
 
 The timer starts at T10's first green CI. Do not start Rehearsal 4 before the preflight verdict is READY.
 

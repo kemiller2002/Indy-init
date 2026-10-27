@@ -9,7 +9,7 @@
 | CT-007 GitHub write primitive | unverified | §1: owner exception, recorded as OD-INDY-9. T05 exercised the primitive against real GitHub: a guarded write succeeded, a stale write was refused with `STALE_DATA` (`evidence/t05-persistence-verification.json`). T18 and T21 verify it in the application. |
 | CT-017 authentication | unverified | §2: decided as OD-INDY-10. PRE-AUTH-02 passed in CI with the fine-grained secret (T05). T21 verifies the in-app flow. |
 | CT-013 Praxis preservation gate | identity-verified | §3: released in Praxis 3.21.0; the four contract schemas are pinned by SHA-256 |
-| CT-012 Percepta semantic, CT-016 release set | **blocked** | §4: echelon-current 1.28.0 needed |
+| CT-012 Percepta semantic, CT-016 release set | identity-verified | §4: the approved echelon-current 1.28.0 selects percepta-semantic 0.2.1; schemas, release record and set record pinned by SHA-256 (PRE-DEP-01, PRE-DEP-02, PRE-DEP-03) |
 | CT-001..CT-005, CT-018 (boundaries A–E, faults) | missing (`producedBy: T14`) | §5: produced during the run, not kickoff blockers |
 | CT-009 Limen, CT-010 Forma, CT-011 Folio, CT-014 Dokimos, CT-015 ledger | unverified | §6: exercised by T11, T16, T26, T34 |
 
@@ -96,16 +96,18 @@ RDP-004 is not bypassed either way: implementation does not start without the ga
 
 ## 4. CT-012 / CT-016 / F-005: release set
 
-**Evidence (PRE-DEP-01, executed):**
-- percepta-semantic 0.2.1 has a release record: `releases/percepta-semantic/0.2.1.release.json`, from registry PR #96/#97, main `2d6338e`.
-- The newest approved set is still echelon-current 1.27.0, which lacks percepta-semantic.
+**Resolved (2026-10-26).** echelon-current 1.28.0 is approved on Registry main (`e6d8a734`, echelon-registry#98):
+- it selects percepta-semantic 0.2.1, Praxis 3.21.0 (§3), Dokimos 0.7.0 and Folio 0.4.1 (F-015), and keeps the rest of 1.27.0;
+- released Conditor 0.10.12 (conditor#111) qualifies it: REG-RU-007 passes, and Conditor's kickoff-set job installs the set from the real release bytes with every receipt matched;
+- the owner approved it under OD-INDY-8; it carries no VER-003 exception.
 
-**Remaining upstream steps:**
-1. Cut echelon-current 1.28.0 with percepta-semantic 0.2.1, the Praxis release from §3, Dokimos 0.7.0 and Conditor 0.10.11, and assess folio 0.4.1.
-2. Conditor-qualify the set.
-3. Record the owner's approval.
+**Identities (PRE-DEP-03):**
+- CT-012: `schemas/percepta-contract.schema.json` and `schemas/percepta-evidence.schema.json` at `percepta-semantic-v0.2.1` (`8b78df80`), and the Registry release record `releases/percepta-semantic/0.2.1.release.json`.
+- CT-016: `sets/echelon-current/1.28.0.json` (approved), `channels/echelon-current/channel.json`, `channels/echelon-current/linux-x64.json`, and the qualifying `releases/conditor/0.10.12.release.json`.
 
-**Conditor SD-1:** PRE-TOOL-02 passed. Conditor v0.10.11 carries CON-367, so the scaffold pins web packages through their Registry distribution. Bootstrap without the hand workaround is still to be shown in T10 (PRE-TOOL-03).
+Runtime compliance is still verified in the run: the bootstrap installs the lock (T10, VER-008) and UI acceptance runs the semantic CLI (VR-UI).
+
+**Conditor SD-1:** PRE-TOOL-02 passed. Conditor v0.10.11 and later, including v0.10.12, carry CON-367, so the scaffold pins web packages through their Registry distribution. Bootstrap without the hand workaround is still to be shown in T10 (PRE-TOOL-03).
 
 ## 5. Contracts produced during the run
 

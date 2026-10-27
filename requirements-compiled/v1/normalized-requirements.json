@@ -8,7 +8,7 @@
   ],
   "summary": {
     "normalized": 467,
-    "flaggedForReview": 155,
+    "flaggedForReview": 150,
     "exactDuplicateGroups": 0,
     "structuralContainments": 84,
     "nearDuplicatePairs": 5,
@@ -2739,10 +2739,8 @@
         "F-003",
         "F-005"
       ],
-      "reviewStatus": "flagged-for-review",
-      "reviewReasons": [
-        "F-005"
-      ]
+      "reviewStatus": "normalized",
+      "reviewReasons": []
     },
     {
       "id": "NR-AR-024",
@@ -18067,10 +18065,8 @@
         "F-005",
         "F-023"
       ],
-      "reviewStatus": "flagged-for-review",
-      "reviewReasons": [
-        "F-005"
-      ]
+      "reviewStatus": "normalized",
+      "reviewReasons": []
     },
     {
       "id": "NR-UI-016",
@@ -18750,10 +18746,8 @@
       "findings": [
         "F-005"
       ],
-      "reviewStatus": "flagged-for-review",
-      "reviewReasons": [
-        "F-005"
-      ]
+      "reviewStatus": "normalized",
+      "reviewReasons": []
     },
     {
       "id": "NR-UI-031",
@@ -19233,10 +19227,8 @@
         "F-021",
         "F-024"
       ],
-      "reviewStatus": "flagged-for-review",
-      "reviewReasons": [
-        "F-005"
-      ]
+      "reviewStatus": "normalized",
+      "reviewReasons": []
     },
     {
       "id": "NR-VER-002",
@@ -19339,10 +19331,8 @@
         "F-005",
         "F-024"
       ],
-      "reviewStatus": "flagged-for-review",
-      "reviewReasons": [
-        "F-005"
-      ]
+      "reviewStatus": "normalized",
+      "reviewReasons": []
     },
     {
       "id": "NR-VER-005",
