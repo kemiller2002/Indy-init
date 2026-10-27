@@ -18,3 +18,13 @@ The coding agent **transcribed** that approval into these files and committed th
 - The 750 reviews approve verbatim carriage in bulk. They are an owner decision on the derivation method, not a per-obligation reading.
 
 The Rehearsal 4 report must list this deviation. If the owner rejects the transcription, revert this directory and PRE-REQ-04 returns to NOT_RUN.
+
+## Verifier-format approvals (second RDP-003 deviation, 2026-10-27)
+
+`tools/compute-acceptance-verdict.py` accepts only `causa.requirements-approvals/1`; `approvals.json` above is `praxis.requirements-approvals/1`, so the verifier would return INVALID. APR-R4-001's exclusions (T27, T28) touch only requirements whose baseline priority is `unstated`, which need no ledger scope change, so the verifier-format file approves nothing:
+
+| File | SHA-256 |
+|---|---|
+| `approvals.causa.json` (`causa.requirements-approvals/1`, bound to baseline `621e2f96…57b9`, no approvals) | `3e70dcd2e87811c4f3744ee97585855639741c3ba7a63d98f4b842c7e86bace7` |
+
+The owner chose to have the agent commit exactly this content (chat, 2026-10-27 03:02 EDT, answer "B" to option B). Written by the coding agent; the Rehearsal 4 report lists it as a deviation from RDP-003.
