@@ -1,0 +1,23 @@
+{
+  "schema": "praxis.requirements-approvals/1",
+  "approvals": [
+    {
+      "decisionId": "APR-R4-001",
+      "authority": "operator: repository owner kemiller2002",
+      "scope": "Rehearsal 4 only: exclude the requirements covered solely by T27 (structured AI proposal loop) and T28 (history, time travel, semantic diff), per OD-INDY-11 / DEC-022. Approved by the owner in chat on 2026-10-26 at 20:55 EDT (\"I approve all\"), transcribed into this file by the coding agent at the owner's instruction.",
+      "covers": [
+        "KICKOFF-EXECUTION-PACKET§12-45",
+        "KICKOFF-EXECUTION-PACKET§2-45",
+        "KICKOFF-EXECUTION-PACKET§ai-tool-agent",
+        "S14",
+        "S15"
+      ],
+      "date": "2026-10-26",
+      "ordoDecision": null,
+      "approvedBy": {
+        "id": "kemiller2002",
+        "kind": "human"
+      }
+    }
+  ]
+}
