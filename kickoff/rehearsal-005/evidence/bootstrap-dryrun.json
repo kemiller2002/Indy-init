@@ -1,0 +1,37 @@
+{
+  "schema": "indy-init.bootstrap-dryrun/1",
+  "purpose": "Show that a clean Conditor bootstrap of the Rehearsal 5 kickoff set works, without creating the Rehearsal 5 repository or starting its clock.",
+  "executedAt": "2026-10-27T15:02:00Z",
+  "host": "Claude cloud session, linux-x64, .NET SDK 10.0.402",
+  "conditor": {
+    "version": "0.10.13",
+    "executable": "conditor-linux-x64 from https://github.com/kemiller2002/conditor/releases/tag/v0.10.13",
+    "executableSha256": "64bbd566a982734691616d0e31785b65b0a5c73c2031b684fd19bade80ac5d0e",
+    "checksumVerified": "sha256sum -c against the release's checksums.txt: OK"
+  },
+  "releaseSet": {
+    "file": "echelon-registry channels/echelon-current/linux-x64.json at main e6d8a734",
+    "sha256": "5aee6c3c355dbb1b556d7a1dba9db80ece9c88862f31239c3558c441bb7abc67"
+  },
+  "workstation": {
+    "command": "conditor workstation plan/apply --resolved-set set.json --resolved-set-sha256 <sha> --home <isolated dir> --target-id r5-dryrun",
+    "planRefusals": [],
+    "planDigest": "sha256:2b2737ac7c9253ff848c10cbc7d45fb3769fbcaf71303f46534fa076227dfd82",
+    "result": "Workstation ready. (17.7 s)",
+    "installedTools": [ "praxis", "ordo", "percepta", "percepta-repo", "dokimos", "strata" ]
+  },
+  "bootstrap": {
+    "repository": "fresh empty git repository in a scratch directory (not pushed anywhere)",
+    "init": { "command": "conditor init --preset indy-init", "exit": 0, "actions": 109 },
+    "verify": { "command": "conditor verify", "exit": 0 },
+    "scaffoldBuild": { "command": "dotnet build App.slnx -c Release", "errors": 0 },
+    "scaffoldTests": { "command": "dotnet test App.slnx -c Release --no-build", "passed": 5, "failed": 0 },
+    "praxisValidate": "validation passed (after the bootstrap commit)",
+    "lockSha256": "719be140d921aef052c51b443b867c370af04b9f0a806f1e8e19979b3d3c2337",
+    "sameAsRehearsal4Lock": true,
+    "rehearsal4Lock": "kemiller2002/indy-init-rehearsal-004 e0cc043 .conditor/lock.json (719be140...)",
+    "seconds": { "initAndVerify": 23, "buildAndTest": 11 }
+  },
+  "environmentNote": "This session sets GH_TOKEN and GITHUB_TOKEN for its own git proxy. Conditor sends them as credentials when it materializes the public Percepta contracts, and the proxy refuses them for repositories not attached to the session (first attempt stopped at action 81). Conditor was therefore run with those two variables removed, so the public repository was fetched anonymously. Conditor itself was not changed. An operator workstation with no such proxy does not need this.",
+  "notShown": "First green CI of the bootstrap commit (PRE-TOOL-03). That happens only in the Rehearsal 5 repository and starts the Rehearsal 5 clock."
+}

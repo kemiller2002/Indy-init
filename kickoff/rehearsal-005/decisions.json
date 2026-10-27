@@ -1,0 +1,40 @@
+{
+  "note": "Owner decisions and deviations the Rehearsal 5 kickoff depends on, with their current status. These are references to recorded decisions, not identities; an entry marked pending is not approved.",
+  "operatorAuthorization": {
+    "status": "not given",
+    "detail": "Rehearsal 5 has not started. The Rehearsal 5 clock starts only after the operator's explicit authorization (sprint brief §13)."
+  },
+  "operatorApprovals": {
+    "status": "pending",
+    "detail": "After the T07 derivation in the Rehearsal 5 repository, the operator writes the approvals (causa.requirements-approvals/1 for the verifier, praxis.requirements-approvals/1 for the gate) and the equivalence reviews (T09). Agents must not write or transcribe them (RDP-003, OD-INDY-7). Rehearsal 4 deviated twice; remediation OD-3 (ratify or replace those transcriptions) is open.",
+    "references": [
+      "kickoff/rehearsal-004/README.md",
+      "kemiller2002/indy-init-rehearsal-004 docs/decisions/R4-REM-OWNER-DECISIONS.md (OD-3)"
+    ]
+  },
+  "scope": {
+    "status": "pending",
+    "detail": "OD-INDY-11 excluded T27 and T28 (AI proposal loop, time travel) from Rehearsal 4 only. Whether Rehearsal 5 keeps that exclusion is the owner's decision; until decided, Rehearsal 5 runs the full baseline.",
+    "references": [ "docs/OWNER-DECISIONS-2026-10-26.md (OD-INDY-11)" ]
+  },
+  "dependencyDeviations": [
+    {
+      "id": "R4-DEC-001",
+      "subject": "@echelon-foundry/forma-workflow 1.0.0 is used but is not in the Echelon Registry",
+      "status": "owner-approved for Rehearsal 4; carry-over to Rehearsal 5 pending (remediation OD-6: publish it, or keep R4-DEC-001)",
+      "reference": "kemiller2002/indy-init-rehearsal-004 docs/decisions/R4-DEC-001-forma-workflow-dependency.md"
+    },
+    {
+      "id": "VERIFIER-PYTHON",
+      "subject": "The authoritative acceptance verifier (tools/compute-acceptance-verdict.py) is Python",
+      "status": "the owner's authoritative tool; it is run, never reimplemented; not part of the application or its build",
+      "reference": "kemiller2002/indy-init-rehearsal-004 tools/acceptance/verify.sh"
+    }
+  ],
+  "resolvedSinceRehearsal4": [
+    {
+      "subject": "Conditor 0.10.13 (bootstrap tool) was not in the Registry",
+      "resolution": "release record added and REG-RU-007 re-run against it on the 1.28.0 channel (kemiller2002/echelon-registry#99)"
+    }
+  ]
+}

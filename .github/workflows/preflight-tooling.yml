@@ -32,6 +32,8 @@ jobs:
         run: dotnet build tools/requirements-compiler/tests -c Release
       - name: Offline tests (baseline port reproduces the committed baseline, units, preflight verdict)
         run: dotnet run -c Release --no-build --project tools/requirements-compiler/tests -- --offline --source .
+      - name: Rehearsal clock replays the Rehearsal 4 timeline (overdue, lateness, ledger counts)
+        run: tools/rehearsal-clock/test-clock.sh
       - name: F# and Python baseline generators agree byte for byte at this commit
         run: |
           python3 -I tools/build-requirements-baseline.py . "$GITHUB_SHA" > "$RUNNER_TEMP/py.json"
