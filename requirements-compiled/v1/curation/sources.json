@@ -4,7 +4,7 @@
   "repositories": [
     {
       "name": "indy-init",
-      "commit": "a9df7ad0a711c72caa5e945a15924277d7aef18b",
+      "commit": "aab8f80c7743392e794b3b631542903ed4ed6f64",
       "role": "primary: authoritative requirements (source commit of this package)"
     },
     {

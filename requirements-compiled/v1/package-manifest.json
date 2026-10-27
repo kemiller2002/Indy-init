@@ -3,15 +3,15 @@
   "package": "requirements-compiled/v1",
   "source": {
     "repository": "kemiller2002/indy-init",
-    "commit": "a9df7ad0a711c72caa5e945a15924277d7aef18b",
-    "baselineId": "BL-CAUSA-INDY-INIT-a9df7ad0a711",
-    "baselineSha256": "76ef3158a09ddbbd4bb7b96f3336040974cb89a11d4169b079940ef59cbc155b",
+    "commit": "aab8f80c7743392e794b3b631542903ed4ed6f64",
+    "baselineId": "BL-CAUSA-INDY-INIT-aab8f80c7743",
+    "baselineSha256": "621e2f960038dcfb0daa2a9fe18a0c1c350faed297ba2856da1236a0360857b9",
     "baselineGenerator": "requirements-compiler baseline (F# port; byte-equivalent to tools/build-requirements-baseline.py)"
   },
   "repositories": [
     {
       "name": "indy-init",
-      "commit": "a9df7ad0a711c72caa5e945a15924277d7aef18b",
+      "commit": "aab8f80c7743392e794b3b631542903ed4ed6f64",
       "role": "primary: authoritative requirements (source commit of this package)"
     },
     {
@@ -193,7 +193,7 @@
     },
     {
       "path": "curation/sources.json",
-      "sha256": "bff415f80d9f812d0e4645ad190fc46b4869c104399854ed83b6ac7fe45e3470"
+      "sha256": "21ab9ccfd3504caae54ae1d69c8007ec0549348d3e7e57d38fe169d40adf6ff6"
     },
     {
       "path": "curation/tasks.json",
@@ -207,7 +207,7 @@
   "authored": [
     {
       "path": "README.md",
-      "sha256": "edec4e29a8c4770922c4d2dbb4d54968a98879233c8c4b845aff8f704a55272b"
+      "sha256": "8143770d5012d8f2142b0e8eae8b33f0e45bc6cfa8fd3b0368d97c48ad710afb"
     },
     {
       "path": "optimization-analysis.md",
@@ -237,11 +237,11 @@
   "generated": [
     {
       "path": "contract-bindings.json",
-      "sha256": "1bb1369ba67d63ea3e182798d5249376d159be17e9e34efdbeed020b19928ac7"
+      "sha256": "01a132b2eeced714a6e20d2f79d14e40e14a33cd1cbe52462242809d486ddc8a"
     },
     {
       "path": "decision-registry.json",
-      "sha256": "e9346ac5ab0b543ca444aaacf3025988c5a677adf7cd622e4482a89f4b8dcee7"
+      "sha256": "2da83af4191bfc7b12a55dd6fc1cc6ecb46e1863072cfd4588cc6cce5534e0a8"
     },
     {
       "path": "dependency-graph.json",
@@ -269,15 +269,15 @@
     },
     {
       "path": "requirements-inventory.json",
-      "sha256": "702da7d3f054a6571a7041963fab072058339809e982d5ce1363a877f8b1f44c"
+      "sha256": "91d5e767f2869606963e686c3f0027ff377217ec82edd63eb02438dcb4945cb5"
     },
     {
       "path": "requirements-source-map.json",
-      "sha256": "07c12ccd3553f608d723ecc3d9f5b397cc897bdedadb7711311309f9df6892e3"
+      "sha256": "37f378d6c84fab6adfc61150b462460bc10a17827adbc5d57a979a18b930db7b"
     },
     {
       "path": "requirements-validation-report.json",
-      "sha256": "656a502707cf9fe4d91aef16354d6ca295294cce759cee0ab7fe29054905b935"
+      "sha256": "741f12668511695531a6f57531a1751f288239652a61fabffedcf5da51a6afce"
     },
     {
       "path": "timed-execution-manifest.json",
