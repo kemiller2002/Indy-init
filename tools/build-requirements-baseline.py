@@ -54,6 +54,9 @@ DOCUMENTS = [
     ("docs/WORKFLOW-DIAGRAM-INTEGRATION-REQUIREMENTS.md", "WORKFLOW-DIAGRAM-INTEGRATION", r"^\*\*(WDL-\d{3}) "),
     ("docs/SYSTEM-VERSION-AND-COMPATIBILITY-REQUIREMENTS.md", "SYSTEM-VERSION-AND-COMPATIBILITY", r"^\*\*(VER-\d{3}) "),
     ("docs/AGENT-RELIABILITY-REQUIREMENTS.md", "AGENT-RELIABILITY", r"^\*\*(AR-\d{3}) "),
+    # Added after Rehearsal 4 (defect D-HIST-WASM, docs/decisions/): normative for the
+    # baseline that follows BL-CAUSA-INDY-INIT-aab8f80c7743; it does not apply to Rehearsal 4.
+    ("docs/WASM-DIAGNOSTICS-REQUIREMENTS.md", "WASM-DIAGNOSTICS", r"^## (WASM-DIAG-\d{3}):"),
     # Normative rehearsal contracts without requirement ids.
     ("docs/REHEARSAL-AGENT-INTERFACE-FREEZE.md", "REHEARSAL-AGENT-INTERFACE-FREEZE", None),
     ("docs/REHEARSAL-ACCEPTANCE-LEDGER.md", "REHEARSAL-ACCEPTANCE-LEDGER", None),

@@ -50,6 +50,7 @@ inventoried is reported as drift (`uninventoried-requirement`).
 | `docs/WORKFLOW-DIAGRAM-INTEGRATION-REQUIREMENTS.md` | WDL-001..015 | `^\*\*(WDL-\d{3}) ` |
 | `docs/SYSTEM-VERSION-AND-COMPATIBILITY-REQUIREMENTS.md` | VER-001..010 | `^\*\*(VER-\d{3}) ` |
 | `docs/AGENT-RELIABILITY-REQUIREMENTS.md` | AR-001..018 | `^\*\*(AR-\d{3}) ` |
+| `docs/WASM-DIAGNOSTICS-REQUIREMENTS.md` | WASM-DIAG-001 (the remediation brief's REQ-WASM-DIAG-001; added after Rehearsal 4, D-HIST-WASM) | `^## (WASM-DIAG-\d{3}):` |
 
 ### Why these documents
 
