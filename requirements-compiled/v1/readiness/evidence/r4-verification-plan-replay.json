@@ -1,0 +1,2955 @@
+{
+  "schema": "indy-init.verification-replay-evidence/1",
+  "purpose": "Phase Eight: the verifier pipeline (compute-acceptance-verdict.py unmodified, plus the verification-plan assessment) re-run over the frozen Rehearsal 4 candidate evidence, with negative controls on temporary copies",
+  "plan": {
+    "planId": "VP-d1efaf695ef4",
+    "algorithm": "sha256",
+    "digest": "d1efaf695ef4e4e43f1c5d3b33c3f7e87e36d5980afdbf2472c316d89915634f",
+    "covers": "sha256 of the plan serialized by the compiler's canonical writer (ASCII JSON, two-space indent, trailing newline) with planIdentity removed"
+  },
+  "candidate": {
+    "repository": "kemiller2002/indy-init-rehearsal-004",
+    "sourceSha": "ab08b764daddde9e978a78fef957d9ae01505c6a",
+    "evidenceSource": "branch acceptance-evidence, directory ab08b764daddde9e978a78fef957d9ae01505c6a/ (read with git archive; not modified)",
+    "ledgerSha256": "0027fdbcc95239438a3723ce5a212904744f3b78976950f2e8d4ea5301131b3e",
+    "evidenceManifestSha256": "e74b1257f53d0e5d8de2e21f18a4ed5d95abd32440a7a1db61fe0238ec37663e"
+  },
+  "trustInputs": {
+    "baseline": "requirements/causa-requirements-baseline.json (BL-CAUSA-INDY-INIT-aab8f80c7743)",
+    "baselineSha256": "621e2f960038dcfb0daa2a9fe18a0c1c350faed297ba2856da1236a0360857b9",
+    "approvals": "kickoff/rehearsal-004/approvals.causa.json",
+    "approvalsSha256": "3e70dcd2e87811c4f3744ee97585855639741c3ba7a63d98f4b842c7e86bace7",
+    "trustedOperator": "kemiller2002"
+  },
+  "command": "dotnet run -c Release --no-build --project tools/requirements-compiler/tests -- --replay --source . --evidence-root <acceptance-evidence>/<sha> --candidate-repo <indy-init-rehearsal-004 clone> --trusted-source-sha <sha> --out <this file>",
+  "result": "PASS: every case produced the expected verdicts; no case was accepted",
+  "cases": [
+    {
+      "case": "r4-as-published",
+      "mutation": "none: the evidence the R4 release-candidate job published for ab08b76",
+      "expected": {
+        "computeAcceptanceVerdict": "FAILED",
+        "planAssessment": "FAILED"
+      },
+      "computeAcceptanceVerdict": {
+        "exit": 3,
+        "verdict": "FAILED",
+        "nonPassReasons": 118,
+        "integrityReasons": []
+      },
+      "planAssessment": {
+        "verdict": "FAILED",
+        "summary": {
+          "requirements": 108,
+          "byStatus": {
+            "PASS": 0,
+            "FAIL": 9,
+            "BLOCKED": 0,
+            "NOT_RUN": 98,
+            "MISSING": 0,
+            "UNBOUND": 1,
+            "STALE": 0,
+            "INVALID": 0,
+            "EXCLUDED": 0
+          },
+          "obligations": 326,
+          "obligationsByStatus": {
+            "FAIL": 26,
+            "NOT_RUN": 298,
+            "UNBOUND": 2
+          }
+        },
+        "integrityProblems": []
+      },
+      "outcome": "as-expected",
+      "problems": []
+    },
+    {
+      "case": "evidence-digest-mutated",
+      "mutation": "one byte appended to requirements/EXT-DATA-002.json; the manifest keeps the published digest",
+      "expected": {
+        "computeAcceptanceVerdict": "INVALID",
+        "planAssessment": "INVALID"
+      },
+      "computeAcceptanceVerdict": {
+        "exit": 3,
+        "verdict": "INVALID",
+        "nonPassReasons": 119,
+        "integrityReasons": [
+          "P0 requirement EXT-DATA-002: evidence artifact digest mismatch: requirements/EXT-DATA-002.json"
+        ]
+      },
+      "planAssessment": {
+        "verdict": "INVALID",
+        "summary": {
+          "requirements": 108,
+          "byStatus": {
+            "PASS": 0,
+            "FAIL": 9,
+            "BLOCKED": 0,
+            "NOT_RUN": 98,
+            "MISSING": 0,
+            "UNBOUND": 0,
+            "STALE": 0,
+            "INVALID": 1,
+            "EXCLUDED": 0
+          },
+          "obligations": 326,
+          "obligationsByStatus": {
+            "FAIL": 26,
+            "INVALID": 2,
+            "NOT_RUN": 298
+          }
+        },
+        "integrityProblems": []
+      },
+      "outcome": "as-expected",
+      "problems": []
+    },
+    {
+      "case": "unauthorized-exclusion",
+      "mutation": "PF-005 (a FAIL) removed from the ledger and declared excluded with approval APR-INVENTED, which no operator approval contains",
+      "expected": {
+        "computeAcceptanceVerdict": "INVALID",
+        "planAssessment": "INVALID"
+      },
+      "computeAcceptanceVerdict": {
+        "exit": 3,
+        "verdict": "INVALID",
+        "nonPassReasons": 118,
+        "integrityReasons": [
+          "scope change PF-005 exclude lacks a matching externally pinned operator approval"
+        ]
+      },
+      "planAssessment": {
+        "verdict": "INVALID",
+        "summary": {
+          "requirements": 108,
+          "byStatus": {
+            "PASS": 0,
+            "FAIL": 8,
+            "BLOCKED": 0,
+            "NOT_RUN": 98,
+            "MISSING": 0,
+            "UNBOUND": 1,
+            "STALE": 0,
+            "INVALID": 1,
+            "EXCLUDED": 0
+          },
+          "obligations": 326,
+          "obligationsByStatus": {
+            "FAIL": 24,
+            "INVALID": 2,
+            "NOT_RUN": 298,
+            "UNBOUND": 2
+          }
+        },
+        "integrityProblems": [
+          "unauthorized exclusion of PF-005 (approval 'APR-INVENTED' is not an authenticated operator exclusion)"
+        ]
+      },
+      "outcome": "as-expected",
+      "problems": []
+    },
+    {
+      "case": "stale-evidence-repinned",
+      "mutation": "requirements/EXT-DATA-002.json rebound to the older candidate 5b48de2 and its manifest digest re-pinned (digest valid, evidence stale)",
+      "expected": {
+        "computeAcceptanceVerdict": "INVALID",
+        "planAssessment": "INVALID"
+      },
+      "computeAcceptanceVerdict": {
+        "exit": 3,
+        "verdict": "INVALID",
+        "nonPassReasons": 120,
+        "integrityReasons": [
+          "ledger evidence_manifest_sha256 differs from the independently pinned evidence manifest",
+          "P0 requirement EXT-DATA-002: evidence requirements/EXT-DATA-002.json source_sha differs from the verified subject"
+        ]
+      },
+      "planAssessment": {
+        "verdict": "INVALID",
+        "summary": {
+          "requirements": 108,
+          "byStatus": {
+            "PASS": 0,
+            "FAIL": 9,
+            "BLOCKED": 0,
+            "NOT_RUN": 98,
+            "MISSING": 0,
+            "UNBOUND": 0,
+            "STALE": 1,
+            "INVALID": 0,
+            "EXCLUDED": 0
+          },
+          "obligations": 326,
+          "obligationsByStatus": {
+            "FAIL": 26,
+            "NOT_RUN": 298,
+            "STALE": 2
+          }
+        },
+        "integrityProblems": []
+      },
+      "outcome": "as-expected",
+      "problems": []
+    },
+    {
+      "case": "stale-manifest",
+      "mutation": "evidence-manifest.json source_sha set to the older candidate 5b48de2",
+      "expected": {
+        "computeAcceptanceVerdict": "INVALID",
+        "planAssessment": "INVALID"
+      },
+      "computeAcceptanceVerdict": {
+        "exit": 3,
+        "verdict": "INVALID",
+        "nonPassReasons": 120,
+        "integrityReasons": [
+          "ledger evidence_manifest_sha256 differs from the independently pinned evidence manifest",
+          "evidence manifest is stale or bound to a different source revision"
+        ]
+      },
+      "planAssessment": {
+        "verdict": "INVALID",
+        "summary": {
+          "requirements": 108,
+          "byStatus": {
+            "PASS": 0,
+            "FAIL": 9,
+            "BLOCKED": 0,
+            "NOT_RUN": 98,
+            "MISSING": 0,
+            "UNBOUND": 1,
+            "STALE": 0,
+            "INVALID": 0,
+            "EXCLUDED": 0
+          },
+          "obligations": 326,
+          "obligationsByStatus": {
+            "FAIL": 26,
+            "NOT_RUN": 298,
+            "UNBOUND": 2
+          }
+        },
+        "integrityProblems": [
+          "evidence manifest is bound to a different source revision (stale)"
+        ]
+      },
+      "outcome": "as-expected",
+      "problems": []
+    },
+    {
+      "case": "evidence-removed",
+      "mutation": "requirements/EXT-DATA-002.json deleted from the bundle (manifest unchanged)",
+      "expected": {
+        "computeAcceptanceVerdict": "INVALID",
+        "planAssessment": "FAILED"
+      },
+      "computeAcceptanceVerdict": {
+        "exit": 3,
+        "verdict": "INVALID",
+        "nonPassReasons": 119,
+        "integrityReasons": [
+          "P0 requirement EXT-DATA-002: evidence artifact cannot be retrieved: requirements/EXT-DATA-002.json"
+        ]
+      },
+      "planAssessment": {
+        "verdict": "FAILED",
+        "summary": {
+          "requirements": 108,
+          "byStatus": {
+            "PASS": 0,
+            "FAIL": 9,
+            "BLOCKED": 0,
+            "NOT_RUN": 98,
+            "MISSING": 1,
+            "UNBOUND": 0,
+            "STALE": 0,
+            "INVALID": 0,
+            "EXCLUDED": 0
+          },
+          "obligations": 326,
+          "obligationsByStatus": {
+            "FAIL": 26,
+            "MISSING": 2,
+            "NOT_RUN": 298
+          }
+        },
+        "integrityProblems": []
+      },
+      "outcome": "as-expected",
+      "problems": []
+    },
+    {
+      "case": "fail-relabelled-pass",
+      "mutation": "PF-005 status changed from FAIL to PASS with no evidence",
+      "expected": {
+        "computeAcceptanceVerdict": "INVALID",
+        "planAssessment": "FAILED"
+      },
+      "computeAcceptanceVerdict": {
+        "exit": 3,
+        "verdict": "INVALID",
+        "nonPassReasons": 118,
+        "integrityReasons": [
+          "requirements[34] PASS requires tests and evidence_paths"
+        ]
+      },
+      "planAssessment": {
+        "verdict": "FAILED",
+        "summary": {
+          "requirements": 108,
+          "byStatus": {
+            "PASS": 0,
+            "FAIL": 8,
+            "BLOCKED": 0,
+            "NOT_RUN": 98,
+            "MISSING": 1,
+            "UNBOUND": 1,
+            "STALE": 0,
+            "INVALID": 0,
+            "EXCLUDED": 0
+          },
+          "obligations": 326,
+          "obligationsByStatus": {
+            "FAIL": 24,
+            "MISSING": 2,
+            "NOT_RUN": 298,
+            "UNBOUND": 2
+          }
+        },
+        "integrityProblems": []
+      },
+      "outcome": "as-expected",
+      "problems": []
+    }
+  ],
+  "publishedAssessment": {
+    "schema": "indy-init.verification-plan-assessment/1",
+    "plan": {
+      "planId": "VP-d1efaf695ef4",
+      "digest": "d1efaf695ef4e4e43f1c5d3b33c3f7e87e36d5980afdbf2472c316d89915634f"
+    },
+    "candidate": {
+      "sourceSha": "ab08b764daddde9e978a78fef957d9ae01505c6a",
+      "runId": "40490687398",
+      "evidenceManifestSha256": "e74b1257f53d0e5d8de2e21f18a4ed5d95abd32440a7a1db61fe0238ec37663e"
+    },
+    "verdict": "FAILED",
+    "accepted": false,
+    "integrityProblems": [],
+    "summary": {
+      "requirements": 108,
+      "byStatus": {
+        "PASS": 0,
+        "FAIL": 9,
+        "BLOCKED": 0,
+        "NOT_RUN": 98,
+        "MISSING": 0,
+        "UNBOUND": 1,
+        "STALE": 0,
+        "INVALID": 0,
+        "EXCLUDED": 0
+      },
+      "obligations": 326,
+      "obligationsByStatus": {
+        "FAIL": 26,
+        "NOT_RUN": 298,
+        "UNBOUND": 2
+      }
+    },
+    "requirements": [
+      {
+        "requirement": "AR-001",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-REVIEW-PER-COMMIT",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: O2: no negative evidence that a modified baseline is detected; [preservation gate in CI] requirements preservation gate was run manually (evidence files) and is not a CI step or required check"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-a5795f29e0de763c",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-e30db6532f5cf262",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "AR-002",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-REVIEW-PER-COMMIT",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: O2: no negative control showing weakening/negation/role-swap detection; 750 short obligations approved in bulk"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-b5f193731c58028b",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-413ff7efb9ab1eaf",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "AR-003",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-REVIEW-PER-COMMIT",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: O1/O2: approvals.json and approvals.causa.json were written by the coding agent (recorded RDP-003 deviation); R4-DEC-001 also recorded by the agent"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-9b0ea135ac4e6776",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-74e10fdbcee13f97",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "AR-004",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-REVIEW-PER-COMMIT",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: O1: [preservation gate in CI] requirements preservation gate was run manually (evidence files) and is not a CI step or required check; branch protection requires only build-and-test, foundations and validate"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-60d3de8d19b647a8",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-95819a9f20306ce1",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "AR-005",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-REVIEW-PER-COMMIT",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: O1: capability discovery recorded only for the graph component"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-a5e276239baf88ad",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-59214484c4423a46",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "AR-006",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-REVIEW-PER-COMMIT",
+        "reasons": [
+          "no evidence",
+          "gap: T33: App-level events were accepted in illegal states (R2-01/R2-02); fixed after 6950158 without a test: missing"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-6886a2a6e612f704",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-199103f9166730e7",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "AR-007",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-REVIEW-PER-COMMIT",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: [acceptance ledger/traceability] no per-requirement acceptance ledger, computed verdict or test-to-requirement map exists in the repo (T34 pending) | O2: no PASS/FAIL/PARTIAL/BLOCKED/NOT_RUN classification exists"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-42705f754abba51b",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-8d0817ad76ab9956",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "AR-008",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-REVIEW-PER-COMMIT",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: [independent review] no recorded independent/adversarial review (T30 'running' per checkpoints, no record)"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-94507c8e92862459",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-7593c929d716d3bf",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "AR-009",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-REVIEW-PER-COMMIT",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: O2: no mutation/injected-defect run showing tests fail without the implementation"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-821ce84e76d497b9",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-787e24f3c23195e9",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "AR-010",
+        "ledgerStatus": "FAIL",
+        "status": "FAIL",
+        "freshnessPolicy": "FP-REVIEW-PER-COMMIT",
+        "reasons": [
+          "Not fully verified: O1: [deployed-SHA browser] no test runs against the deployed Pages URL; the deploy job only checks build-info.json commit"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-2f4beacb25bb0586",
+            "status": "FAIL"
+          },
+          {
+            "id": "VPO-fbcff0eece408886",
+            "status": "FAIL"
+          }
+        ]
+      },
+      {
+        "requirement": "AR-011",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-REVIEW-PER-COMMIT",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: O1: no consolidated provenance record (tool versions, fixture digests, run IDs, deployed SHA) | O2: no reproducibility-vs-drift comparison"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-79a72fb717368c95",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-dbd2edcdfa078b0e",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "AR-012",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-REVIEW-PER-COMMIT",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: O1/O2: no check bounding changes to named requirements/paths or flagging unrelated changes"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-a59db6f04d98cd0d",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-33b57a9348c4707d",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "AR-013",
+        "ledgerStatus": "FAIL",
+        "status": "FAIL",
+        "freshnessPolicy": "FP-REVIEW-PER-COMMIT",
+        "reasons": [
+          "Not fully verified: O1: no dependency-based test selection exists (everything runs)"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-c83b17e570429db6",
+            "status": "FAIL"
+          },
+          {
+            "id": "VPO-98deffeeff197c5d",
+            "status": "FAIL"
+          }
+        ]
+      },
+      {
+        "requirement": "AR-014",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-REVIEW-PER-COMMIT",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: O1: token least privilege not verified | O2: traces uploaded on failure can contain the filled token; no log/artifact scrubbing check"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-770de2a43b888b53",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-c41f10e4ed8a086b",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "AR-015",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-REVIEW-PER-COMMIT",
+        "reasons": [
+          "no evidence",
+          "gap: T33: the checkpoint record's content is not checked: missing"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-b54c8db02f0fb4b3",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "AR-017",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-REVIEW-PER-COMMIT",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: O1/O2: no evidence of Praxis input routing or ownership verification"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-4f48b0b01fd918ea",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-30ecf50560947199",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "AR-018",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-REVIEW-PER-COMMIT",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: O2: no computed verdict in the rehearsal repo; missing secret is FAIL not BLOCKED"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-9827ff5a95a7c74f",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-b65e916f00fd843a",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "AR-019",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-REVIEW-PER-COMMIT",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: O1: verdict not yet computed (approvals schema mismatch per checkpoints; T34 pending) | O3: no Rehearsal 3 BLOCKED test found in test-acceptance-verdict.py"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-6f2f2edbfc6b5c65",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-a96869ed8f00e776",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-4a40040c5484b444",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-a191144b5315b64a",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "AR-020",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-REVIEW-PER-COMMIT",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: O1/O2: no record retaining the four-tier brief or justifying added enforcement"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-da69ee0106c21847",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-5e9adab59b7498ad",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-e6cb4bb12bf3f901",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "AR-021",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-REVIEW-PER-COMMIT",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: O3: no measurement of retention after compaction; [independent review] no recorded independent/adversarial review (T30 'running' per checkpoints, no record)"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-1382da3cee447700",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-d84c2e19e3161c81",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-936a73d2f53c22ad",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "AR-022",
+        "ledgerStatus": "FAIL",
+        "status": "FAIL",
+        "freshnessPolicy": "FP-REVIEW-PER-COMMIT",
+        "reasons": [
+          "Not fully verified: O3: no injected-defect baseline run"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-7f06980ae32e712b",
+            "status": "FAIL"
+          },
+          {
+            "id": "VPO-a71f7df7b092e654",
+            "status": "FAIL"
+          },
+          {
+            "id": "VPO-7b54ff75e3784cae",
+            "status": "FAIL"
+          }
+        ]
+      },
+      {
+        "requirement": "AR-023",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-REVIEW-PER-COMMIT",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: O2: Percepta pinned 0.1.0 but no attestation evidence; Dokimos 0.7.0 only as a host tool | O3: no evidence SD-1 resolved"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-d1885e94421cf8a4",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-9145c1f2ed57ebca",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-e6f25a1308c520c6",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-7478642aec32b7da",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "AR-024",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-REVIEW-PER-COMMIT",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: O1: no explicit record of the Percepta release/waiver or DF-CAUSA-2026-0003 decisions in the snapshot | O2: operator approvals transcribed by the agent (recorded deviation)"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-2825c9554af4f069",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-5feb800a1da326b9",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "EXT-DATA-001",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-LIVE-PER-COMMIT",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: O1: [bundle content] no build/test check that the site ships no investigation datasets/records (build only scans for token-shaped strings) | O2: no check that synthetic test records are not shipped"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-f8cbaa452cd4eb0b",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-0304a8342e7147dd",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "EXT-DATA-002",
+        "ledgerStatus": "PASS",
+        "status": "UNBOUND",
+        "freshnessPolicy": "FP-LIVE-PER-COMMIT",
+        "reasons": [
+          "evidence passes, but the plan has no test identity for every obligation, so the obligations are not shown to be verified"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-d79488f204e14ff8",
+            "status": "UNBOUND"
+          },
+          {
+            "id": "VPO-8ba57ebcfe06030f",
+            "status": "UNBOUND"
+          }
+        ]
+      },
+      {
+        "requirement": "EXT-DATA-003",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-LIVE-PER-COMMIT",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: O1: no test that repository/branch/workspace must be supplied; mocked tests connect using a prefilled default repository | O2: no negative test that a token alone cannot pick the target"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-1e613b30576dc52c",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-70c58e3278725c35",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "EXT-DATA-004",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-LIVE-PER-COMMIT",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: O1: no check that tokens are absent from console logs, error text, or written event files | O2/O4: token type/privilege not checked (label says fine-grained only)"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-2de744fb2c8bdc70",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-0e682dd716a12d49",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-54b0eef91ceeada4",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-a460a95198e68863",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "EXT-DATA-005",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-LIVE-PER-COMMIT",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: O1: branch permission check not tested"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-0b0fb80724185366",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-c135d16c59f5baf8",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "EXT-DATA-006",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-LIVE-PER-COMMIT",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: O1: no test asserts no write request on connect/read (fake log is not checked for POST after connect) | O2: 'separately verified authorization' not tested (DCT-004-A shows missing permissions do not deny)"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-7ced47ef45099aab",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-d7fbd84e40ded145",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "EXT-DATA-007",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-LIVE-PER-COMMIT",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: O1: connecting and loading states not asserted"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-4c2041ba04ba0b31",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-57fe23e7c821450f",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "EXT-DATA-008",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-LIVE-PER-COMMIT",
+        "reasons": [
+          "no evidence",
+          "gap: T33: no check against the authoritative causa-data schema/validator; the read-back is computed with the writer's own code: missing"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-61b2e81f99761d55",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-9c6055c47e4eb07d",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "EXT-DATA-009",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-LIVE-PER-COMMIT",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: O1: [bundle content] no build/test check that the site ships no investigation datasets/records (build only scans for token-shaped strings); malformed-data refusal only mocked | O2: [deployed-SHA browser] no test runs against the deployed Pages URL; the deploy job only checks build-info.json commit"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-05eeddad528e2cd4",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-b50ee1d4e3e78f25",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "EXT-DATA-010",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-LIVE-PER-COMMIT",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: O1: no immutability check of R001 | O2: no independent measurement (timings) of startup/authorization/read/write/recovery"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-d8a63d43b7a2cf56",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-c6c90d9f4acc5fe6",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-37d860d18826cf0a",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "EXT-DATA-011",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-LIVE-PER-COMMIT",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: [frozen fixtures] no test replays the five frozen v1.0.0 storage-contract fixtures (checkpoint T15 claims it, no test in snapshot) | [bundle content] no build/test check that the site ships no investigation datasets/records (build only scans for token-shaped strings)"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-5933d986a6ba6dc3",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-2d84a4c6df612b0d",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "EXT-DATA-012",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-LIVE-PER-COMMIT",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: O2: no untrusted-text sanitization (XSS) test | O3: no check that no data is served from Pages assets"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-074f1b1804e54869",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-0157918192f093da",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-43aef41e6256b122",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "EXT-DATA-013",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-LIVE-PER-COMMIT",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: O1: app hardcodes catalog/historical-v1/manifest.json and never reads catalog/active.json; 'exactly three' not asserted | O2: no test that synthetic cases are not presented as catalog cases in the real deployment; [bundle content] no build/test check that the site ships no investigation datasets/records (build only scans for token-shaped strings) | O3: [frozen fixtures] no test replays the five frozen v1.0.0 storage-contract fixtures (checkpoint T15 claims it, no test in snapshot)"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-4b4747eaff96e385",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-c81484cbcf203d4f",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-77f6e22e08d5bba0",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "PF-001",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-LIVE-PER-COMMIT",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: O1: no typed investigation-data port with fixture and GitHub adapters; only the GitHub adapter exists | [fixture provider] no fixture provider/mode in the application; the only fixture is the test-only fake GitHub with one 3-event synthetic case | O2/O3: no shared-semantics test across providers"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-b090ff3e3c16c13d",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-ff3dc45c64bfa0cb",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-da07c2ac97baa9f1",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "PF-002",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-LIVE-PER-COMMIT",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: O1: no automated check that the fixture path carries no domain logic (true by inspection of tests/browser/support/fake-github.js, which serves raw contract bytes)"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-c90593e00b2dae72",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-acd13bfa08dba51a",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "PF-003",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-LIVE-PER-COMMIT",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: O1: no explicit local fixture mode or documented FAKE-style command | [fixture provider] no fixture provider/mode in the application; the only fixture is the test-only fake GitHub with one 3-event synthetic case | O3: no test that fixture mode cannot activate in production | O4: no active-data-mode indicator"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-6eaf42e86c5ffad7",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-d4b0d50550578aeb",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-00c1408c9f31d4a2",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-0a23bb42b8fb58b4",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "PF-004",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-LIVE-PER-COMMIT",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: O1: [frozen fixtures] no test replays the five frozen v1.0.0 storage-contract fixtures (checkpoint T15 claims it, no test in snapshot) | O2: no machine-readable fixture manifest with expected error outcomes | O3: app refuses causa-data as a write target (App.fs) but no test covers it"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-557743cb4997c484",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-3d67d1f2b8287e39",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-dc48d066cfa2309d",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "PF-005",
+        "ledgerStatus": "FAIL",
+        "status": "FAIL",
+        "freshnessPolicy": "FP-LIVE-PER-COMMIT",
+        "reasons": [
+          "ci: browser suite: failed"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-0c1ba98e8a26ee4b",
+            "status": "FAIL"
+          },
+          {
+            "id": "VPO-5581f11810c02191",
+            "status": "FAIL"
+          }
+        ]
+      },
+      {
+        "requirement": "PF-006",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-LIVE-PER-COMMIT",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: O1: no populated fixture (competing hypotheses, contradicting evidence, corrective actions, verification records, semantic colors); fake has 3 events | O2: no test"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-ad958e7a60d7fd9b",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-f00be0cb5a2bb0f8",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "PF-007",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-LIVE-PER-COMMIT",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: O1: no completed/verified investigation, contradictory-evidence, or malformed/missing catalog fixtures"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-9d59cc57fd44b927",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-f52d9071426e82b3",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "PF-008",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-LIVE-PER-COMMIT",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: O1: no missing-branch/HTTP 422, rate-limit, timeout, malformed provider response, or retry fixtures"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-533a2328decf91cb",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-8fbeadc2bfc10f7a",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "PF-009",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-LIVE-PER-COMMIT",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: O1: delayed, reordered and cancelled requests not scheduled in any test | O2: no test that cached success cannot mask a new authentication failure | O3: credential generation and active-provider identity not tested"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-cd9dd8ec730c3d3e",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-2d4b7557ce013e50",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-8c435e1ebdf43e7c",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "PF-011",
+        "ledgerStatus": "FAIL",
+        "status": "FAIL",
+        "freshnessPolicy": "FP-LIVE-PER-COMMIT",
+        "reasons": [
+          "Not fully verified: O2: UI level lacks responsive and accessibility checks | O3: no shared provider-conformance suite run against both fake and real adapter | O5: provider-conformance level has no independent command or CI outcome"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-8579de88e6b699f8",
+            "status": "FAIL"
+          },
+          {
+            "id": "VPO-91b97073e4e85125",
+            "status": "FAIL"
+          },
+          {
+            "id": "VPO-74efa48033c82a96",
+            "status": "FAIL"
+          },
+          {
+            "id": "VPO-903077d337faf198",
+            "status": "FAIL"
+          },
+          {
+            "id": "VPO-da8e100075889a8d",
+            "status": "FAIL"
+          },
+          {
+            "id": "VPO-2a6aa540f193ab6c",
+            "status": "FAIL"
+          }
+        ]
+      },
+      {
+        "requirement": "PF-012",
+        "ledgerStatus": "FAIL",
+        "status": "FAIL",
+        "freshnessPolicy": "FP-LIVE-PER-COMMIT",
+        "reasons": [
+          "Not fully verified: O1: no documented command for a populated fixture-backed UI | [fixture provider] no fixture provider/mode in the application; the only fixture is the test-only fake GitHub with one 3-event synthetic case | O3: no per-layer timing records or performance budgets"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-89df49b291078827",
+            "status": "FAIL"
+          },
+          {
+            "id": "VPO-23b26660a58ef990",
+            "status": "FAIL"
+          },
+          {
+            "id": "VPO-39d6eb77cb2097af",
+            "status": "FAIL"
+          }
+        ]
+      },
+      {
+        "requirement": "PF-013",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-LIVE-PER-COMMIT",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: O1: no versioned sanitized observation set in this repo (T05 evidence lives in indy-init) | O2: no test detects fake/real divergence | O4: no refresh process"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-bb13dc090d4c152b",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-03b8215501e25334",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-ab625062f52606bb",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-3d7d8f82a053dce7",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "PF-014",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-LIVE-PER-COMMIT",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: O1: catalog is read from causa-data main, not a pinned ref | O2: [deployed-SHA browser] no test runs against the deployed Pages URL; the deploy job only checks build-info.json commit | O3: live-evidence.json records run/repository/commits but not source SHA or provider mode"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-d87bf2493f9268ae",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-c81b5785b2ffa1c2",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-6292ea3728a2532b",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-7672a3ef81f74ac5",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "PF-015",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-LIVE-PER-COMMIT",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: O1: the app requires a PAT even for the public catalog; no anonymous test | O2: least-privilege scope of CAUSA_GITHUB_TOKEN not verified | O3: 'Upload browser traces on failure' uploads Playwright traces that record fill() of the token field; no trace/log scrubbing check | O4: missing secret yields FAIL (exit 1), not a BLOCKED classification"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-a59ccf551bbd8407",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-3721d1beaef6b57f",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-ca58030e3eecdf9b",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-9a5982e4a5994629",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "PF-016",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-LIVE-PER-COMMIT",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: O1: no populated-state color exercise or contrast checks | O2: [Percepta/visual evidence] .percepta contracts exist but nothing executes them; no screenshots or independent visual review; [deployed-SHA browser] no test runs against the deployed Pages URL; the deploy job only checks build-info.json commit"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-8cd7943440a55f6f",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-727b07dc99ecb7c5",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "PF-017",
+        "ledgerStatus": "FAIL",
+        "status": "FAIL",
+        "freshnessPolicy": "FP-LIVE-PER-COMMIT",
+        "reasons": [
+          "Not fully verified: O1: no separate provider-contract layer outcome"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-92aa50bd20b70eeb",
+            "status": "FAIL"
+          },
+          {
+            "id": "VPO-3c80e06a4abb77cf",
+            "status": "FAIL"
+          }
+        ]
+      },
+      {
+        "requirement": "PF-018",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-LIVE-PER-COMMIT",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: O1: [acceptance ledger/traceability] no per-requirement acceptance ledger, computed verdict or test-to-requirement map exists in the repo (T34 pending) | O2: [preservation gate in CI] requirements preservation gate was run manually (evidence files) and is not a CI step or required check"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-dfe1c434e9f7f329",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-4b7f3050c9ba72b7",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "PF-019",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-LIVE-PER-COMMIT",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: O1: process obligation with no recorded evidence | O2: Test step fails on skipped .NET tests, but skipped Playwright tests are not checked"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-7833f2bbb6af960d",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-eac3d689399c924e",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "PF-020",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-LIVE-PER-COMMIT",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: O1: no provider-conformance level; [deployed-SHA browser] no test runs against the deployed Pages URL; the deploy job only checks build-info.json commit | O2: missing live credential is FAIL rather than BLOCKED"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-fe04733e99e5e461",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-b58ad46c59853677",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "UI-001",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-DETERMINISTIC-INPUT-DIGEST",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: O1: live test checks the three catalog titles are visible but not that the catalog has exactly three | O2: 'last activity' is rendered but never asserted; working-copy cards (View.fs) omit the contradictions count | O3: no test that severity/owner are omitted or labeled unassigned | O4: no next-legal-action on cards and no test | O5: no sort control implemented; selection and loading states untested (empty and error states are tested)"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-2f4f9de66ddd6434",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-02b53bd16db4ee17",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-05f9c2a398ed7454",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-985886de7f012c74",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-1cd1f428fe646f06",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-b3ea3d93850c4c8f",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "UI-003",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-DETERMINISTIC-INPUT-DIGEST",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: O1: only event type text and entry counts asserted; actor, timestamp, version/sequence and chronological order unverified | O2: category filter verified; no before/after detail view exists | O3: no event-time vs recorded-time distinction and no ordering test | O4: no link from timeline entry to affected entities"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-33324aeb860bce06",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-c3326322b8ed473a",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-7fe0d0f0d00df8a0",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-db25c20e9414ab46",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "UI-004",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-DETERMINISTIC-INPUT-DIGEST",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: O1: only absence of 'Add evidence' on a read-only case is asserted; no test that rendered commands equal engine-authorized commands | O2: no prohibited-action-with-reason case (only a refused submission message) | O3: no confirmation for destructive/irreversible operations exists or is tested | O4: duplicate-submission protection not tested (Save disabled only in the Unknown state) | O5: keyboard only for the Connect form; no touch-target check | O6: no check that UI holds no parallel policy logic"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-be99a964783c59b5",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-9659118aa1ef95ff",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-b9af1bcfc961c8bb",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-be22751d9b5b8098",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-3b9b2a8a4bf56535",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-04eb901270c2994a",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "UI-005",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-DETERMINISTIC-INPUT-DIGEST",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: O1: record timestamp, original content, interpretation, reliability and contradicting links not asserted | O2: no test that the original evidence is unchanged when interpretation changes | O3: no sanitization (XSS/URL) test; only 'Capture time: not recorded' labels missing provenance | O4: no navigation into the inspector from graph, timeline or comparison"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-ff2e466b7aaa3e12",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-cc57508f3ac056de",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-34334672f9ff0014",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-c7c84a08e62427e4",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "UI-006",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-LIVE-PER-COMMIT",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: O1: no local-save or offline-queue states exist (no local persistence); only unsaved/saved/conflict/unknown are tested | O3: last successful sync time is not shown or tested | O4: conflict keeps local edits and offers 'Reload from GitHub', but there is no compare flow"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-89ed6170f531961e",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-b3efad6eb85360be",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-4c06d10238d15c5c",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-34731ac9a977b818",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-d60e3a3a25cb106d",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-bb08b9a414ba4cd7",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "UI-010",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-DETERMINISTIC-INPUT-DIGEST",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: O1: no tests for no-evidence, unavailable projection, schema-mismatch (distinct from malformed), expired authentication, or failed sync | O2: no systematic check that each error states what happened, what was preserved and a next step | O3: Retry on boot failure is checked for focus but not that it performs a real reload"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-4355a83607ddc8da",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-e54ee03f405cdc8f",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-97351596eb39e14e",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-b8e1657130d006fd",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-fba8a61be6d12adf",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "UI-011",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-DETERMINISTIC-INPUT-DIGEST",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: O1: no checks for semantic status announcements, non-color-only states or touch targets | [responsive/iPad/mobile] Playwright runs only the 'Desktop Chrome' project; no iPad portrait/landscape, mobile, 200% reflow checks | [accessibility] no automated a11y audit (axe/landmarks/contrast/touch-target/screen-reader/reduced-motion) exists | O3: no check that no essential operation needs drag-and-drop or hover | O4: focus/scroll preservation across transitions and WASM handoff not tested | [graph text equivalent] no test asserts the structured text equivalent of the causal graph or keyboard access to it"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-447fd64210e3d9e3",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-0684fde6ced06208",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-40f80428200fc71c",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-cb75698b278332f5",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-0e6a69f7673cace8",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "UI-013",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-DETERMINISTIC-INPUT-DIGEST",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: O1: no test that all views show the same aggregate version | O2: overview refresh after commands is observed, but not atomicity across graph/timeline/report | O3: no stale-data identification test across versions"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-f1a416eaeec6c129",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-21abf6acd60d0acc",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-d08de632c7c1a4ab",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-adf482d16e75a882",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "UI-014",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-DETERMINISTIC-INPUT-DIGEST",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: O1: icon, favicon, typography and status-color consistency not tested (page titles are) | O2: WASM-LOADING requirements only partially exercised (loading and failure); no icon check"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-9501908622238a66",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-0bd752bd2ac89796",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-014f5e1139ed692b",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "UI-015",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-LIVE-PER-COMMIT",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: O1: tests are tagged with some UI ids in titles, but most UI requirements have no tagged test and no traceability map exists | [acceptance ledger/traceability] no per-requirement acceptance ledger, computed verdict or test-to-requirement map exists in the repo (T34 pending) | O2: [frozen fixtures] no test replays the five frozen v1.0.0 storage-contract fixtures (checkpoint T15 claims it, no test in snapshot); no touch, graph text-equivalent, timeline ordering or responsive tests | O3: [deployed-SHA browser] no test runs against the deployed Pages URL; the deploy job only checks build-info.json commit | O4: missing secret fails the live step; no BLOCKED/UNKNOWN classification exists"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-59c5cc78868b7d74",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-dccec1843ba79b6b",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-5c8d5917d17f8960",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-fd43b3e4e7e02f59",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "UI-016",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-DETERMINISTIC-INPUT-DIGEST",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: O8: test reads --causa-* custom properties, not Forma semantic theme tokens | O9: no check that Forma components are used | O10/O11: no contrast measurement or WCAG AA check | O12: no check that status is not conveyed by color alone | O13: no cross-view token semantics check | O14: no grayscale print legibility check | O15: [Percepta/visual evidence] .percepta contracts exist but nothing executes them; no screenshots or independent visual review; [deployed-SHA browser] no test runs against the deployed Pages URL; the deploy job only checks build-info.json commit; [responsive/iPad/mobile] Playwright runs only the 'Desktop Chrome' project; no iPad portrait/landscape, mobile, 200% reflow checks | O16: no test that amber/coral/teal appear in populated states"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-cecb71404071030d",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-3d80d031f05ec0dc",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-d0c711c2da0f3800",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-e0e945fc040386e1",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-fbc386df77130f2d",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-8905fd51176a3fc6",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-fe19413526420c16",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-d657e8dd084961b1",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-f4f9d09fc20df79d",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-5a993f5a761fd6ee",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-6051ea46b65ebe27",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-7fd9b69b4aa5b401",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-de371f74930347b8",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-406b16e7341d28c2",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-3f1eb00d9960fe1c",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-b3cab23e517cd0d3",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-1a1aae8ffa920386",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "UI-017",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-DETERMINISTIC-INPUT-DIGEST",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: O2: only the investigation header is checked for verified/integrity/replay/digest; other routine copy unchecked | O3: no test asserts the 'The active catalog historical-v1' paragraph is absent | O4: no check that technical details are reachable from Administration"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-7b0ba1d1f6f663a5",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-78541ad7e7bfc045",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-0b37bb6a955165e2",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-7e849b4055bdfadf",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-c18f969a9c8b65bf",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "UI-018",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-DETERMINISTIC-INPUT-DIGEST",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: O2: catalog version/source, storage contract version, most component versions and auth status not asserted | O3: failed and unknown states not exercised | O6: no test that Administration is read-only"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-41642822de594b56",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-a07751ce0dce5689",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-a74264901d267d03",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-97a56b1abd22a396",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-18e6fc4dd0730354",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-b27f3de8fd81d25c",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "UI-019",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-DETERMINISTIC-INPUT-DIGEST",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: O1: Settings reached by URL only; navigation to it not tested | O3: connected-state wording not tested | O5: persistence scope of text size not tested (no reload/persistence assertion) | O6: no test of provider security/read-only scope from Settings"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-23d8a096e64b2625",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-1224fd4d58ddcaa6",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-d39e3d1f28d9e2ac",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-fc28e815f45f2e9b",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-c5d77a4b2eb52927",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-a500f6d5a0f3e254",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "UI-020",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-DETERMINISTIC-INPUT-DIGEST",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: O1: only the Administration link in Primary navigation is exercised | [responsive/iPad/mobile] Playwright runs only the 'Desktop Chrome' project; no iPad portrait/landscape, mobile, 200% reflow checks | O3: active page asserted only for investigation sections (aria-current), not primary destinations | O4: no test"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-e5cfc842f2367421",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-9eb8f87800355c73",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-86dfcce77d8a048f",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-e5017d9f8ae702fb",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "UI-021",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-DETERMINISTIC-INPUT-DIGEST",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: O1(1): catalog/replay paragraph absence not asserted (only an investigation-header regex) | O1(3): settings persistence scope untested | O1(4): responsive behavior untested | O1(5): no check that credentials are absent from console logs | O1(6): [deployed-SHA browser] no test runs against the deployed Pages URL; the deploy job only checks build-info.json commit | O3: [preservation gate in CI] requirements preservation gate was run manually (evidence files) and is not a CI step or required check"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-2ad36bd062191d2b",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-026da8a495857549",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-57c0df8ba4399c17",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "UI-022",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-DETERMINISTIC-INPUT-DIGEST",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: O1/O2: [header/footer/cards content] no test asserts absence of commit SHAs/versions/technical prose from global header, footer or cards | O3: 'latest meaningful activity' not asserted | O4: no test for raw case keys / 'Expected lifecycle' / duplicated counts | O6: [negative controls] missing negative fixtures: fabricated conclusion, unknown-as-zero, disputed/contradicted findings"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-8f9c1b8914be43f6",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-3f3db98e519aa95c",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-3fc89c9d18b678a4",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-c6f789b832466ab9",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-78852bf4d2da804b",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-56201f80b312c7c8",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "UI-023",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-DETERMINISTIC-INPUT-DIGEST",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: O3: no defined disjoint labels/projection fields documented or tested | O4: fixture has unresolved findings, but no disputed/contradicted-finding regression case"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-d0e33c8aaaf705f2",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-c8114e2b7bd759fa",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-f0256bc31283be14",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-58231f4725864068",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "UI-024",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-DETERMINISTIC-INPUT-DIGEST",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: O1: no test of a centralized presentation-language mapping | O2: no test | O3: default labels untested; implementation still uses 'Historical investigations' (list aria-label used by tests), contrary to the default label | O5: no test"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-d8ac36bdb18a7b39",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-e8570ba5427ce32b",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-d4a9c8fd05795e00",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-6f0a2e18f9a19003",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-e1fb14be4ca10f5f",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-7fff10ce82e7c162",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "UI-025",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-DETERMINISTIC-INPUT-DIGEST",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: O1: impact and next authorized actions only partly checked | O3: only the 'Add evidence' link is exercised; links to Summary, Causal Analysis, Hypotheses, Timeline, Corrective Actions untested | O4: [negative controls] missing negative fixtures: fabricated conclusion, unknown-as-zero, disputed/contradicted findings"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-12f35805677987db",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-e49834d009021cd0",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-fcf404b4a7afa635",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-f97eb988899c23af",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "UI-026",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-DETERMINISTIC-INPUT-DIGEST",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: O3: evidence counts and navigation to underlying records not asserted | O4: [graph text equivalent] no test asserts the structured text equivalent of the causal graph or keyboard access to it; read-only (inspect mode) not tested"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-684e6c5f94988bd9",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-db2d02dab493e914",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-b36c63fba6f83d4c",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-05441c1c18ce3dc1",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "UI-029",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-DETERMINISTIC-INPUT-DIGEST",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: O1: Investigations and Settings primary links not exercised | O2: Corrective Actions section never opened in a test | [responsive/iPad/mobile] Playwright runs only the 'Desktop Chrome' project; no iPad portrait/landscape, mobile, 200% reflow checks"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-7bb1e8c5bdccc2f2",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-628a11b571e65796",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-625e96f365f2c1b8",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-dba405d7ed58872b",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "UI-030",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-DETERMINISTIC-INPUT-DIGEST",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: O1: [deployed-SHA browser] no test runs against the deployed Pages URL; the deploy job only checks build-info.json commit; header/footer/cards, terminology and failure-copy assertions missing | O2: [negative controls] missing negative fixtures: fabricated conclusion, unknown-as-zero, disputed/contradicted findings | O3: [acceptance ledger/traceability] no per-requirement acceptance ledger, computed verdict or test-to-requirement map exists in the repo (T34 pending); [independent review] no recorded independent/adversarial review (T30 'running' per checkpoints, no record)"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-bff050b54a481780",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-885e4767b84371de",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-0a1011b7c5476354",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-f70d9f1e42371d48",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "UI-031",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-DETERMINISTIC-INPUT-DIGEST",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: O2: diagnostic codes and connection health in Administration not asserted | O5: no role/access control exists or is tested"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-5c147c83f19f2c8c",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-a4ab030e74ad080a",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-5fe930a650a08b04",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-7fe69b1e93fa0c7f",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-06e616ae2378cfcd",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "UI-032",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-DETERMINISTIC-INPUT-DIGEST",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: O1: next steps for contradictions, pending verification and corrective actions not tested | O2: no negative test that unavailable data is not treated as no work"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-29cc81617de241fb",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-141be05c7de03e17",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "UI-033",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-DETERMINISTIC-INPUT-DIGEST",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: O1: relationships are displayed but traversal links between records are not tested; corrective actions and timeline traversal absent"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-5a85f3ea85db30b2",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-63d89380e8017050",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "UI-034",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-DETERMINISTIC-INPUT-DIGEST",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: O1: only an evidence inspector exists; graph selection uses a separate status line, no shared inspector across diagram/hypothesis/action/timeline | O2: [responsive/iPad/mobile] Playwright runs only the 'Desktop Chrome' project; no iPad portrait/landscape, mobile, 200% reflow checks; focus restoration untested | O3: no component-ownership record for the inspector"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-f3ebcdbe15cdf92d",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-8f8156f91b64963b",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-a2099d5e8abc8ef0",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "UI-038",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-DETERMINISTIC-INPUT-DIGEST",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: O1: verification history and 'why unresolved' explanations not tested | O2: missing provenance only checked for capture time"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-f8666daf6fdf79d7",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-ffda9fea0324a42e",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "UI-039",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-DETERMINISTIC-INPUT-DIGEST",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: O1: no check of shared typed relationship/selection/inspector/explanation contracts"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-ad49e5ff43f1ace6",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-f1f1bfbfc325fa21",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "UI-040",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-LIVE-PER-COMMIT",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: O1: no responsive-inspector, offline-demo or source-grounded-explanation tests; [negative controls] missing negative fixtures: fabricated conclusion, unknown-as-zero, disputed/contradicted findings; [deployed-SHA browser] no test runs against the deployed Pages URL; the deploy job only checks build-info.json commit | O2: preservation traces requirements to derived docs, not to tests; approvals are an agent transcription (indy-init kickoff/rehearsal-004/README.md)"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-8a5de7e5afae98cb",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-45c306b736593248",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "VER-001",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-DETERMINISTIC-INPUT-DIGEST",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: O1: no evidence each pinned version was the newest compatible release at lock time | O3: owner/release channel discovery recorded only for forma-workflow"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-f8c818739fb10bb9",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-6ae60e9f7196e16c",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-e6647e8155448d52",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "VER-002",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-DETERMINISTIC-INPUT-DIGEST",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: O2: no per-system checked timestamp/candidate/source/selection-reason record in the repo | O3: no check"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-5281c2e8b5927722",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-924f0b36b70bfd0e",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-d4566deb24f7e80b",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "VER-003",
+        "ledgerStatus": "FAIL",
+        "status": "FAIL",
+        "freshnessPolicy": "FP-DETERMINISTIC-INPUT-DIGEST",
+        "reasons": [
+          "Not fully verified: O2: no upgrade gate that tests the newest release"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-d7cf349736bfc48f",
+            "status": "FAIL"
+          },
+          {
+            "id": "VPO-b06105a4b3121295",
+            "status": "FAIL"
+          },
+          {
+            "id": "VPO-882ef92ed9177a58",
+            "status": "FAIL"
+          }
+        ]
+      },
+      {
+        "requirement": "VER-004",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-DETERMINISTIC-INPUT-DIGEST",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: O2: the lock gate does not compare .conditor/lock.json against the frozen lockSha256 recorded in clock/preflight | O3: no re-resolution evidence"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-0fcb67bd52732582",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-90a9a6272db10df8",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-e362dff6239f51ed",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "VER-005",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-DETERMINISTIC-INPUT-DIGEST",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: O1: no check rejecting prerelease/unpublished versions"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-8828df556b382d9a",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-8deeef0ef7b7e4ab",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "VER-006",
+        "ledgerStatus": "FAIL",
+        "status": "FAIL",
+        "freshnessPolicy": "FP-DETERMINISTIC-INPUT-DIGEST",
+        "reasons": [
+          "Not fully verified: O1: no compatibility checks for Praxis, Ordo, Dokimos, Percepta, Limen contracts beyond the app booting | O3: [deployed-SHA browser] no test runs against the deployed Pages URL; the deploy job only checks build-info.json commit"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-4e417c6f238cb460",
+            "status": "FAIL"
+          },
+          {
+            "id": "VPO-b82b86a55e20e54f",
+            "status": "FAIL"
+          },
+          {
+            "id": "VPO-86b8bffb323a80b7",
+            "status": "FAIL"
+          }
+        ]
+      },
+      {
+        "requirement": "VER-007",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-DETERMINISTIC-INPUT-DIGEST",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: O1: [header/footer/cards content] no test asserts absence of commit SHAs/versions/technical prose from global header, footer or cards | O2: only forma-workflow version asserted"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-b93e86bd3809524a",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-183d6671da7467b8",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "VER-008",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-DETERMINISTIC-INPUT-DIGEST",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: O1: 'compatibility evidence' not verified by the gate | O2: stale evidence not detected"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-e49383126481c2f7",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-22f350dce03290a4",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "VER-010",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-DETERMINISTIC-INPUT-DIGEST",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: O1: VER-001..010 not reconciled with implementation/tests | O2: no evidence of Praxis input path use"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-6f0348e05133ebd2",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-1d26080e6f69aad4",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "WDL-001",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-DETERMINISTIC-INPUT-DIGEST",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: O2: required upstream changes not addressed; package is outside the Echelon registry (recorded deviation)"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-b34d65289bec1814",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-35548bc529249967",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "WDL-002",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-DETERMINISTIC-INPUT-DIGEST",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: O1: no automated check that the graph document carries no coordinates / no second layout engine"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-69f661459a587bbd",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-ebaf420b3a7538cd",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "WDL-003",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-DETERMINISTIC-INPUT-DIGEST",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: O1: only root-cause role and two nodes tested; trigger/contributing/enabling roles and evidence counts not tested"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-0a171a55852aaf80",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-d2d5200b61947ce8",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "WDL-004",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-DETERMINISTIC-INPUT-DIGEST",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: O2: projection (View.fs graphDocument) has no isolated test; responsibilities only tested together"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-beeaf5b2a56c521d",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-9ecccb3e2aa9f3f4",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "WDL-005",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-DETERMINISTIC-INPUT-DIGEST",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: O2: no zero/one/many/disconnected/cyclic graph tests"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-434d1a1d24b4b20e",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-2a3f7cbe7df14c03",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "WDL-006",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-DETERMINISTIC-INPUT-DIGEST",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: O1: no overlap/clipping/connector/count-visibility checks | O2: no crossing-minimization evidence"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-9fe0158bf99720e2",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-37a1821f8918e8a9",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "WDL-007",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-DETERMINISTIC-INPUT-DIGEST",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: [responsive/iPad/mobile] Playwright runs only the 'Desktop Chrome' project; no iPad portrait/landscape, mobile, 200% reflow checks | [graph text equivalent] no test asserts the structured text equivalent of the causal graph or keyboard access to it | [accessibility] no automated a11y audit (axe/landmarks/contrast/touch-target/screen-reader/reduced-motion) exists | O2: no not-color-alone check for the diagram"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-39cfd9f8545f99b9",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-170fa438de9df91f",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "WDL-008",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-DETERMINISTIC-INPUT-DIGEST",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: O1: no test that nodes use Forma tokens / UI-016 palette | O2: no state-to-color test"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-94576f95354806bd",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-17ea30ea2f160b62",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "WDL-009",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-DETERMINISTIC-INPUT-DIGEST",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: O1: no determinism test | O2: no node-id stability across refresh test"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-531b33816ba9cddf",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-7f9018a0a0d1e32b",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "WDL-010",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-DETERMINISTIC-INPUT-DIGEST",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: O2: no test that the graph exposes no editing/drag capability"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-1c3905d9fa746df0",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-3eba4ae44451132f",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "WDL-011",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-DETERMINISTIC-INPUT-DIGEST",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: O1: no graph fixtures (empty, single, four roles, dense, long labels, disconnected, cycles) | [fixture provider] no fixture provider/mode in the application; the only fixture is the test-only fake GitHub with one 3-event synthetic case"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-0fa99d435ca39516",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-b148b239fc1c24b0",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "WDL-012",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-DETERMINISTIC-INPUT-DIGEST",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: O1: projection, layout, rendering/a11y and live graph not independently tested; live suite does not open the graph | O2: no evidence counts, overlap, stability, keyboard or real-historical-rendering checks"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-3ec21931ff613a67",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-f635d053f07b64fe",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "WDL-014",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-DETERMINISTIC-INPUT-DIGEST",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: O1: no accessibility tests; [deployed-SHA browser] no test runs against the deployed Pages URL; the deploy job only checks build-info.json commit"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-4c6f9ea0dcc0bd29",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-adec3c95bc6ac2c4",
+            "status": "NOT_RUN"
+          }
+        ]
+      },
+      {
+        "requirement": "WDL-015",
+        "ledgerStatus": "NOT_RUN",
+        "status": "NOT_RUN",
+        "freshnessPolicy": "FP-DETERMINISTIC-INPUT-DIGEST",
+        "reasons": [
+          "no evidence",
+          "Not fully verified: O1: WDL-001..015 not traced to implementation/verification (this draft is the first such map)"
+        ],
+        "obligations": [
+          {
+            "id": "VPO-b55ed2a4a2fd465c",
+            "status": "NOT_RUN"
+          },
+          {
+            "id": "VPO-97136db88b6c60fb",
+            "status": "NOT_RUN"
+          }
+        ]
+      }
+    ]
+  }
+}

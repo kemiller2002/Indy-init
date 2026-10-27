@@ -126,6 +126,13 @@
       "critical": false,
       "status": "PASS",
       "problems": []
+    },
+    {
+      "id": "V18",
+      "title": "The verification plan preserves every baseline P0 requirement and obligation; exclusions are operator-authorized and test bindings resolve",
+      "critical": true,
+      "status": "PASS",
+      "problems": []
     }
   ],
   "rehearsalReadiness": {

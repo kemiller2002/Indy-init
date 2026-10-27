@@ -6,7 +6,7 @@ This package compiles the Causa requirements into a structured form. Every part 
 |---|---|
 | Source | kemiller2002/indy-init `aab8f80c7743392e794b3b631542903ed4ed6f64` (Rehearsal 4 kickoff re-pin, T01, after the PRE-SEC-01 fixture fix; earlier `a9df7ad`; previously `9dc7d57`, with no requirement change between them). The compiler builds the baseline at this commit itself, with the F# port of the baseline generator. |
 | Other repositories | the exact commits in `curation/sources.json` (also in `package-manifest.json`) |
-| Compilation verdict | **PASS**: every check V01–V17 passes, including V14 (no baseline drift) |
+| Compilation verdict | **PASS**: every check V01–V18 passes, including V14 (no baseline drift) and V18 (verification plan) |
 | Rehearsal readiness | **READY** per the compiler: no readiness blocker remains (`requirements-validation-report.json`). The executed preflight (CI, with the secret) gives 14 PASS and 3 NOT_RUN; two of those are produced by Rehearsal 4's untimed setup (T08, T10). See `readiness/READINESS-REPORT.md`. |
 | Target run | the repository's **Rehearsal 4** (write-path dress rehearsal). The mission brief called it "Rehearsal 3" (F-020). |
 
@@ -25,9 +25,10 @@ Two things this package does not do:
 | `contract-bindings.json` | 4 | 18 contracts, each with provider, consumer, version, required compatibility, verification method, dependency versions, evidence identity and status. CT-006 and CT-008 identities are re-hashed by the compiler. |
 | `dependency-graph.json` | 5 | 35 work items, 58 genuine edges and 2 preference edges (never scheduled). Also topological order, critical path, parallel levels and requirement coverage. |
 | `verification-manifest.json` | 6 | One entry per requirement: gates, owners, acceptance criteria, rules (evidence, freshness, invalidation, tooling) and dependencies that affect validity. |
+| `verification-plan.json` | 6 | One entry per baseline P0 requirement (108): obligations with stable `VPO-` ids, verification method, test identity (`missing` unless a curated binding names the test), evidence contract, dependencies, freshness policy and exclusion status. The plan identity is a content digest. Schema `verification-plan.schema.json`; consumer contract `docs/VERIFICATION-PLAN-CONTRACT.md`. |
 | `execution-plan-time.json` | 7 | Plan A: owner lanes, critical-path-first, early integration checkpoints. |
 | `execution-plan-resource.json` | 7 | Plan B: one lead agent plus a fresh reviewer, CI batched at checkpoints. Both plans contain the same tasks, completion conditions and gates. |
-| `requirements-validation-report.json` | 8 | Checks V01–V17, the compilation verdict, and the readiness blockers with their class and recommendation. |
+| `requirements-validation-report.json` | 8 | Checks V01–V18, the compilation verdict, and the readiness blockers with their class and recommendation. |
 | `preflight-manifest.json` | R4 | The Rehearsal 4 preflight: 17 executable checks and the preflight tasks T00–T10. It is untimed and ends at the first green bootstrap CI. |
 | `timed-execution-manifest.json` | R4 | Plan B timed tasks with steps, workstreams, milestones, CI runs, P0 coverage and the failing-first defect-class tests. |
 | `optimization-analysis.md` | 9 | Rehearsal 1–3 failures mapped to package elements. Demonstrated causes are kept separate from hypotheses. |
@@ -67,7 +68,16 @@ $RC preflight <same options as step 2> --evidence requirements-compiled/v1/readi
 # 4. Baseline generation alone (same contract as tools/build-requirements-baseline.py)
 $RC baseline . <40-hex commit> > baseline.json
 
-# 5. Tests: offline (CI) and full (negative controls, determinism, committed-package check)
+# 5. Phase Eight: verify a candidate's ledger and evidence bundle against the verification plan (exit 0 only for ACCEPTED)
+$RC verify-plan --plan requirements-compiled/v1/verification-plan.json --baseline requirements/causa-requirements-baseline.json \
+  --ledger L.json --evidence-manifest M.json --evidence-manifest-sha256 HEX --evidence-root DIR \
+  --trusted-source-sha SHA --approvals kickoff/rehearsal-004/approvals.causa.json --trusted-operator-id kemiller2002
+
+# 6. Rehearsal 4 replay with negative controls (writes readiness/evidence/r4-verification-plan-replay.json)
+dotnet run -c Release --no-build --project tools/requirements-compiler/tests -- --replay --source . \
+  --evidence-root <R4 acceptance-evidence>/<sha> --candidate-repo <indy-init-rehearsal-004 clone> --trusted-source-sha <sha> --out FILE
+
+# 7. Tests: offline (CI) and full (negative controls, determinism, committed-package check)
 dotnet run -c Release --no-build --project tools/requirements-compiler/tests -- --offline --source .
 dotnet run -c Release --no-build --project tools/requirements-compiler/tests -- <same options as step 2, without --check>
 ```
@@ -78,7 +88,18 @@ dotnet run -c Release --no-build --project tools/requirements-compiler/tests -- 
 - Nothing reads a clock, the network or the working tree.
 - The test suite compiles twice and compares the bytes, then runs `--check` against this directory.
 
-**Tests.** The offline mode, which CI runs in job `fsharp-tooling`, checks two things: that the F# baseline port reproduces the committed Python-generated baseline byte for byte, and the ported unit cases. The full mode also injects 17 defects, and each one must fail its named check:
+**Tests.** The offline mode, which CI runs in job `fsharp-tooling`, checks three things:
+- the F# baseline port reproduces the committed Python-generated baseline byte for byte;
+- the ported unit cases;
+- the verification plan:
+  - two builds are byte-identical and equal the committed plan;
+  - exactly 108 P0 requirements at the Rehearsal 4 baseline `aab8f80`;
+  - stable obligation ids;
+  - missing-test detection;
+  - requirements-preservation enforcement (a dropped, downgraded or altered requirement is detected even when re-sealed);
+  - unauthorized-exclusion rejection.
+
+The full mode also injects 19 defects, and each one must fail its named check:
 - a non-verbatim citation;
 - a dependency cycle;
 - a requirement in no work item;
@@ -95,7 +116,9 @@ dotnet run -c Release --no-build --project tools/requirements-compiler/tests -- 
 - an unclassified readiness blocker;
 - an open decision without a recommendation;
 - a recurring defect class without a failing-first test;
-- a preflight task that depends on a timed task.
+- a preflight task that depends on a timed task;
+- a verification-plan exclusion without an operator approval (V18);
+- a test binding to an unknown obligation (V18).
 
 **For a new run** (for example after owner decisions, or at the kickoff re-pin, T01):
 1. Update the commits in `curation/sources.json`, and the decision and finding statuses the owner has decided.

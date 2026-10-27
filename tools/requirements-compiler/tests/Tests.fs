@@ -134,8 +134,166 @@ let private cases: Case list =
       case "defect-class-test-missing" (fun d -> mutateList (cur "defect-class-tests.json" d) "tests" (List.filter (fun t -> str "defectClass" t <> "DC-006"))) 3 [ "V16" ]
       case "preflight-depends-on-timed" (fun d -> setField (cur "tasks.json" d) "tasks" "T05" "dependsOn" (JArr [ dep "T12" "injected" ])) 3 [ "V16" ]
       case "exclusion-by-undecided-decision" (fun d -> setField (cur "decisions.json" d) "decisions" "DEC-022" "classification" (JStr "unresolved")) 3 [ "V16" ]
+      // Verification plan (V18): an exclusion without an authenticated operator approval, and a test
+      // binding to an obligation that is not a baseline P0 obligation, each fail compilation.
+      case "plan-unauthorized-exclusion" (fun d ->
+          mutateList (cur "verification-plan.json" d) "exclusions" (fun _ -> [ JObj [ "requirement", JStr "PF-005"; "approval", JStr "APR-INVENTED" ] ])) 3 [ "V18" ]
+      case "plan-binding-unknown-obligation" (fun d ->
+          mutateList (cur "verification-plan.json" d) "testBindings" (fun _ ->
+              [ JObj [ "obligation", JStr "PF-999-O1"; "tests", JArr [ JObj [ "id", JStr "core: invented"; "kind", JStr "deterministic" ] ] ] ])) 3 [ "V18" ]
       { case "baseline-obligation-tampered" ignore 3 [ "V01" ] with
           SuppliedBaseline = Some(fun text -> text.Replace("Use these initial canonical palette values:", "Use these optional palette values:")) } ]
+
+// ---- verification plan (offline: committed baseline, committed verification manifest, git history) ----
+
+let private r4BaselineCommit = "aab8f80c7743392e794b3b631542903ed4ed6f64"
+let private r4BaselineSha256 = "621e2f960038dcfb0daa2a9fe18a0c1c350faed297ba2856da1236a0360857b9"
+
+/// Plan inputs from committed files only, so CI can build the plan without the other checkouts.
+let planInputs (source: string) (baselineText: string) : VerificationPlan.Inputs =
+    let v1 = Path.Combine(source, "requirements-compiled", "v1")
+    let spec = parseFile (Path.Combine(v1, "curation", "verification-plan.json"))
+    let a = field "approvals" spec |> Option.defaultValue JNull
+    let approvals =
+        match Git.showFile source (str "commit" a) (str "path" a) with
+        | Ok b -> b
+        | Error e -> failwithf "approvals unreadable: %s" e
+    let baselineBytes = Text.Encoding.UTF8.GetBytes baselineText
+    let baseline = parseBytes baselineBytes
+    let src = field "source" baseline |> Option.defaultValue JNull
+
+    { Repository = str "repository" src
+      Commit = str "commit" src
+      BaselineId = str "id" baseline
+      BaselineSha256 = Git.sha256Hex baselineBytes
+      Baseline = baseline
+      Manifest = parseFile (Path.Combine(v1, "verification-manifest.json"))
+      Spec = spec
+      Approvals =
+        { Repository = "kemiller2002/indy-init"
+          Commit = str "commit" a
+          Path = str "path" a
+          Sha256 = Git.sha256Hex approvals
+          TrustedOperators = strs "trustedOperators" a
+          Document = parseBytes approvals } }
+
+let private withSpec (i: VerificationPlan.Inputs) (key: string) (value: Json) =
+    match i.Spec with
+    | JObj ps -> { i with Spec = JObj(ps |> List.map (fun (k, v) -> if k = key then k, value else k, v)) }
+    | _ -> i
+
+let private mapRequirements (f: Json list -> Json list) (plan: Json) =
+    match plan with
+    | JObj ps -> JObj(ps |> List.map (fun (k, v) -> if k = "requirements" then k, JArr(f (arr "requirements" plan)) else k, v))
+    | j -> j
+
+let private setIn (key: string) (value: Json) (j: Json) =
+    match j with
+    | JObj ps -> JObj(ps |> List.map (fun (k, v) -> if k = key then k, value else k, v))
+    | j -> j
+
+/// Re-seals a mutated plan with a correct identity, so a preservation failure cannot hide behind a digest failure.
+let private reseal (plan: Json) =
+    let d = VerificationPlan.digestOf plan
+    let identity = field "planIdentity" plan |> Option.defaultValue (JObj []) |> setIn "digest" (JStr d) |> setIn "planId" (JStr("VP-" + d.Substring(0, 12)))
+    setIn "planIdentity" identity plan
+
+let private planTests (source: string) : string list =
+    let committedBaseline = File.ReadAllText(Path.Combine(source, "requirements", "causa-requirements-baseline.json"))
+    let i = planInputs source committedBaseline
+    let plan = VerificationPlan.build i
+    let text = serialize plan
+    let entryOf rid (p: Json) = arr "requirements" p |> List.find (fun e -> str "requirement" e = rid)
+    let obligation oid (e: Json) = arr "obligations" e |> List.find (fun o -> str "sourceObligation" o = oid)
+    let tiStatus (j: Json) = field "testIdentity" j |> Option.map (str "status") |> Option.defaultValue ""
+    let scopeInt key (p: Json) = field "scope" p |> Option.bind (intOpt key) |> Option.defaultValue -1L
+    let hasProblem (needle: string) (ps: string list) = ps |> List.exists (fun p -> p.Contains(needle, StringComparison.Ordinal))
+
+    // Determinism: built twice from the same inputs, byte-identical, and equal to the committed artifact.
+    let determinism =
+        let committedPlan = Path.Combine(source, "requirements-compiled", "v1", "verification-plan.json")
+        [ if serialize (VerificationPlan.build i) <> text then yield "determinism: two builds differ"
+          if File.Exists committedPlan && File.ReadAllText committedPlan <> text then yield "determinism: committed verification-plan.json differs from a rebuild" ]
+
+    // No missing P0: at the R4 baseline (aab8f80) exactly 108 P0 requirements, all represented once.
+    let completeness =
+        let r4 = buildBaselineAt source r4BaselineCommit
+        let r4Plan = VerificationPlan.build (planInputs source r4)
+        [ if Git.sha256Hex (Text.Encoding.UTF8.GetBytes r4) <> r4BaselineSha256 then yield "R4 baseline: rebuilt baseline sha256 differs from 621e2f96...57b9"
+          if (VerificationPlan.p0Of (parseBytes (Text.Encoding.UTF8.GetBytes r4))).Length <> 108 then yield "R4 baseline: expected 108 P0 requirements"
+          if scopeInt "requirements" r4Plan <> 108L || (arr "requirements" r4Plan).Length <> 108 then yield "R4 baseline: plan does not carry exactly 108 P0 requirements"
+          if not (VerificationPlan.preservationProblems (parseBytes (Text.Encoding.UTF8.GetBytes r4)) r4Plan).IsEmpty then yield "R4 baseline: plan fails preservation"
+          if not (VerificationPlan.problems i).IsEmpty then yield sprintf "committed inputs: unexpected problems %A" (VerificationPlan.problems i)
+          if not (VerificationPlan.preservationProblems i.Baseline (parseBytes (Text.Encoding.UTF8.GetBytes text))).IsEmpty then yield "committed inputs: plan fails preservation" ]
+
+    // Stable obligation ids: a fixed value, independent of bindings and order, and sensitive to the text.
+    let stableIds =
+        let text1 = "Every run must pin authoritative requirements and their source repository, commit, and content digest."
+        let bound = withSpec i "testBindings" (JArr [ JObj [ "obligation", JStr "AR-001-O2"; "tests", JArr [ JObj [ "id", JStr "t"; "kind", JStr "deterministic" ] ] ] ])
+        let ids (p: Json) = arr "requirements" p |> List.collect (arr "obligations") |> List.map (str "id")
+        [ if VerificationPlan.obligationId "AR-001" "AR-001-O1" text1 <> "VPO-a5795f29e0de763c" then yield "stable ids: AR-001-O1 id changed"
+          if str "id" (obligation "AR-001-O1" (entryOf "AR-001" plan)) <> "VPO-a5795f29e0de763c" then yield "stable ids: plan AR-001-O1 id changed"
+          if ids (VerificationPlan.build bound) <> ids plan then yield "stable ids: a test binding changed obligation ids"
+          if VerificationPlan.obligationId "AR-001" "AR-001-O1" (text1 + " ") = "VPO-a5795f29e0de763c" then yield "stable ids: a text change kept the id"
+          if (ids plan |> List.distinct).Length <> (ids plan).Length then yield "stable ids: obligation ids collide" ]
+
+    // Missing-test detection: unbound obligations are 'missing'; a binding makes exactly that one 'bound'.
+    let missingTests =
+        let binding o tests = JObj [ "obligation", JStr o; "tests", JArr tests ]
+        let t id kind = JObj [ "id", JStr id; "kind", JStr kind ]
+        let one = withSpec i "testBindings" (JArr [ binding "AR-001-O1" [ t "core: AR-001 pins the baseline" "deterministic" ] ])
+        let p1 = VerificationPlan.build one
+        let liveOne = VerificationPlan.build (withSpec i "testBindings" (JArr [ binding "AR-001-O1" [ t "live: AR-001" "live" ] ]))
+        [ if scopeInt "missingTestObligations" plan <> scopeInt "obligations" plan || scopeInt "boundObligations" plan <> 0L then yield "missing tests: unbound plan must report every obligation missing"
+          if arr "requirements" plan |> List.exists (fun e -> tiStatus e <> "missing") then yield "missing tests: a requirement without bindings is not 'missing'"
+          if tiStatus (obligation "AR-001-O1" (entryOf "AR-001" p1)) <> "bound" then yield "missing tests: bound obligation not 'bound'"
+          if tiStatus (obligation "AR-001-O2" (entryOf "AR-001" p1)) <> "missing" then yield "missing tests: sibling obligation not 'missing'"
+          if tiStatus (entryOf "AR-001" p1) <> "partial" then yield "missing tests: partly bound requirement not 'partial'"
+          if scopeInt "boundObligations" p1 <> 1L then yield "missing tests: bound count not 1"
+          if field "freshness" (entryOf "AR-001" liveOne) |> Option.map (str "policy") <> Some "FP-LIVE-PER-COMMIT" then yield "freshness: a live test does not force FP-LIVE-PER-COMMIT"
+          if not (VerificationPlan.problems (withSpec i "testBindings" (JArr [ binding "AR-001-O1" [] ])) |> hasProblem "names no test") then yield "missing tests: an empty binding is accepted"
+          if not (VerificationPlan.problems (withSpec i "testBindings" (JArr [ binding "XX-001-O1" [ t "x" "deterministic" ] ])) |> hasProblem "unknown or non-P0 obligation") then yield "missing tests: a binding to an unknown obligation is accepted"
+          if not (VerificationPlan.problems (withSpec i "testBindings" (JArr [ binding "AR-001-O1" [ t "x" "flaky" ] ])) |> hasProblem "unknown kind") then yield "missing tests: an unknown test kind is accepted" ]
+
+    // Requirements preservation: any loss or alteration of a P0 requirement is detected, even when re-sealed.
+    let preservation =
+        let pp p = VerificationPlan.preservationProblems i.Baseline p
+        let tamperObligation (e: Json) =
+            if str "requirement" e <> "PF-005" then e
+            else setIn "obligations" (JArr(arr "obligations" e |> List.mapi (fun k o -> if k = 0 then setIn "text" (JStr "Weakened text.") o else o))) e
+        [ if not (pp (reseal (mapRequirements (List.filter (fun e -> str "requirement" e <> "PF-005")) plan)) |> hasProblem "missing P0 requirement: PF-005") then yield "preservation: a dropped P0 requirement is not detected"
+          if not (pp (reseal (mapRequirements (List.map (fun e -> if str "requirement" e = "PF-005" then setIn "priority" (JStr "P1") e else e)) plan)) |> hasProblem "priority changed") then yield "preservation: a downgraded priority is not detected"
+          if not (pp (reseal (mapRequirements (List.map tamperObligation) plan)) |> hasProblem "obligations differ") then yield "preservation: an altered obligation is not detected"
+          if not (pp (mapRequirements (List.filter (fun e -> str "requirement" e <> "PF-005")) plan) |> hasProblem "digest does not match") then yield "preservation: an unsealed edit is not detected by the plan identity"
+          if not (pp (reseal (mapRequirements (fun es -> es @ [ setIn "requirement" (JStr "PF-999") es.Head ]) plan)) |> hasProblem "not a baseline P0 requirement") then yield "preservation: an invented requirement is not detected" ]
+
+    // Unauthorized exclusion: rejected and never applied; an authenticated operator approval is honoured.
+    let exclusions =
+        let excl rid approval = JArr [ JObj [ "requirement", JStr rid; "approval", JStr approval ] ]
+        let unauthorized = withSpec i "exclusions" (excl "PF-005" "APR-INVENTED")
+        let approvalDoc kind id =
+            JObj
+                [ "schema", JStr "causa.requirements-approvals/1"
+                  "baseline_sha256", JStr i.BaselineSha256
+                  "approvals",
+                  JArr
+                      [ JObj
+                            [ "id", JStr "APR-TEST"
+                              "authority", JObj [ "kind", JStr kind; "id", JStr id ]
+                              "changes", JArr [ JObj [ "requirement_id", JStr "PF-005"; "action", JStr "exclude" ] ] ] ] ]
+        let withApprovals doc (x: VerificationPlan.Inputs) = { x with Approvals = { x.Approvals with Document = doc } }
+        let authorized = withSpec i "exclusions" (excl "PF-005" "APR-TEST") |> withApprovals (approvalDoc "operator" "kemiller2002")
+        let wrongAuthority = withSpec i "exclusions" (excl "PF-005" "APR-TEST") |> withApprovals (approvalDoc "agent" "claude")
+        let excludedStatus (p: Json) = field "exclusion" (entryOf "PF-005" p) |> Option.map (str "status")
+        [ if not (VerificationPlan.problems unauthorized |> hasProblem "unauthorized exclusion of P0 requirement PF-005") then yield "exclusion: an unauthorized exclusion is accepted"
+          if excludedStatus (VerificationPlan.build unauthorized) <> Some "in-scope" then yield "exclusion: an unauthorized exclusion was applied"
+          if not (VerificationPlan.problems wrongAuthority |> hasProblem "unauthorized exclusion") then yield "exclusion: a non-operator approval is accepted"
+          if not (VerificationPlan.problems (withSpec i "exclusions" (excl "UI-999" "APR-TEST")) |> hasProblem "unknown or non-P0") then yield "exclusion: an exclusion of an unknown requirement is accepted"
+          if not (VerificationPlan.problems authorized).IsEmpty then yield sprintf "exclusion: an authorized exclusion is rejected %A" (VerificationPlan.problems authorized)
+          if excludedStatus (VerificationPlan.build authorized) <> Some "excluded" then yield "exclusion: an authorized exclusion is not recorded"
+          if (arr "requirements" (VerificationPlan.build authorized)).Length <> 108 then yield "exclusion: an excluded requirement left the plan" ]
+
+    determinism @ completeness @ stableIds @ missingTests @ preservation @ exclusions |> List.map (sprintf "verification plan: %s")
 
 // ---- offline tests -----------------------------------------------------------------------------
 
@@ -175,7 +333,9 @@ let private offline (source: string) : string list =
           if Preflight.verdict [ k "A", o "BLOCKED"; k "B", o "FAIL" ] <> "FAIL" then yield "FAIL dominates" ]
         |> List.map (sprintf "preflight verdict: %s")
 
-    equivalence @ units @ verdicts
+    let plan = try planTests source with ex -> [ "verification plan: " + ex.Message ]
+
+    equivalence @ units @ verdicts @ plan
 
 [<EntryPoint>]
 let main argv =
@@ -185,12 +345,27 @@ let main argv =
         if failures.IsEmpty then 0 else 1
 
     match List.ofArray argv with
+    | "--replay" :: rest ->
+        let rec go (xs: string list) (o: Replay.Options) =
+            match xs with
+            | "--source" :: v :: r -> go r { o with Source = v }
+            | "--evidence-root" :: v :: r -> go r { o with EvidenceRoot = v }
+            | "--candidate-repo" :: v :: r -> go r { o with CandidateRepo = v }
+            | "--trusted-source-sha" :: v :: r -> go r { o with TrustedSourceSha = v }
+            | "--out" :: v :: r -> go r { o with Out = v }
+            | [] -> Some o
+            | _ -> None
+        match go rest { Source = "."; EvidenceRoot = ""; CandidateRepo = ""; TrustedSourceSha = ""; Out = "" } with
+        | Some o when o.EvidenceRoot <> "" && o.CandidateRepo <> "" && o.TrustedSourceSha <> "" && o.Out <> "" -> Replay.run o
+        | _ ->
+            eprintfn "usage: --replay --source DIR --evidence-root DIR --candidate-repo DIR --trusted-source-sha SHA --out FILE"
+            2
     | "--offline" :: rest ->
         match Program.parseArgs rest Program.defaults with
         | Error e ->
             eprintfn "%s" e
             2
-        | Ok o -> report (offline o.Source) "offline tests (baseline equivalence, baseline units, preflight verdict)"
+        | Ok o -> report (offline o.Source) "offline tests (baseline equivalence, baseline units, preflight verdict, verification plan)"
     | args ->
         match Program.parseArgs args Program.defaults with
         | Error e ->

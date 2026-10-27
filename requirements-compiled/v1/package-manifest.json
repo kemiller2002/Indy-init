@@ -200,6 +200,10 @@
       "sha256": "32369e0e65df85ebacbe5a76ae2fc3b29fcc448467fb12f0cb24e204992c499b"
     },
     {
+      "path": "curation/verification-plan.json",
+      "sha256": "1e17997c7a5fc49e227e35f6a00b86b534f46f622636bc56625088a17c37a0c4"
+    },
+    {
       "path": "curation/verification-rules.json",
       "sha256": "b7dd0b7f6e7d3bedaf76b1f3609d4a95111d305b9b696a7d5cc831e9cbbacdf4"
     }
@@ -207,7 +211,7 @@
   "authored": [
     {
       "path": "README.md",
-      "sha256": "8143770d5012d8f2142b0e8eae8b33f0e45bc6cfa8fd3b0368d97c48ad710afb"
+      "sha256": "728496124c4c49fb261fb55e5d73754af4ad2e260f75574aa812999db4cb0545"
     },
     {
       "path": "optimization-analysis.md",
@@ -232,6 +236,10 @@
     {
       "path": "readiness/DEPENDENCY-COMPATIBILITY.md",
       "sha256": "4b13d412d0301634820f68eec9c79fb8f9650de52a7aa3bbef798610041e9675"
+    },
+    {
+      "path": "verification-plan.schema.json",
+      "sha256": "cab51802907979bc7667c9c3b5560f5d49831f77a9205c5810f38cf348ae6f5a"
     }
   ],
   "generated": [
@@ -277,7 +285,7 @@
     },
     {
       "path": "requirements-validation-report.json",
-      "sha256": "741f12668511695531a6f57531a1751f288239652a61fabffedcf5da51a6afce"
+      "sha256": "5b25f431625dc24b3027514d9e5e62cabd0d848033899cc3fda066954ebd5032"
     },
     {
       "path": "timed-execution-manifest.json",
@@ -286,6 +294,10 @@
     {
       "path": "verification-manifest.json",
       "sha256": "08e20dbe449cc11354d895181864d7d3ff1d0d2217d409dc2cca34daab66b962"
+    },
+    {
+      "path": "verification-plan.json",
+      "sha256": "5b4e996d6986bfb1d199aeabd80ffc5b3f68a0757d58daf1f0d9e6f1b8d64a77"
     }
   ],
   "compilationVerdict": "PASS",

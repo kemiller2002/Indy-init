@@ -22,7 +22,8 @@ let private authoredFiles =
       "readiness/OWNER-DECISION-REQUESTS.md"
       "readiness/CONTRACT-RESOLUTION.md"
       "readiness/FSHARP-TOOLING-ASSESSMENT.md"
-      "readiness/DEPENDENCY-COMPATIBILITY.md" ]
+      "readiness/DEPENDENCY-COMPATIBILITY.md"
+      "verification-plan.schema.json" ]
 
 type Options =
     { Source: string
@@ -342,6 +343,34 @@ let buildPackage (o: Options) : Built =
           "preflight-manifest.json", Artifacts.preflightManifest compiled
           "timed-execution-manifest.json", Artifacts.timedExecutionManifest compiled planB ]
 
+    // Phase Two: the verification plan, derived from the baseline, the verification manifest and the
+    // plan curation; the approvals file that authorizes exclusions is read at its pinned commit.
+    let planSpec = parseFile (Path.Combine(o.Curation, "verification-plan.json"))
+    let planInputs: VerificationPlan.Inputs =
+        let a = field "approvals" planSpec |> Option.defaultValue JNull
+        let repo = repoOf (str "repo" a)
+        let bytes =
+            match Git.showFile repo.Path (str "commit" a) (str "path" a) with
+            | Ok b -> b
+            | Error e -> failwithf "approvals file %s is unreadable at %s: %s" (str "path" a) (str "commit" a) e
+
+        { Repository = str "repository" source
+          Commit = sourceCommit
+          BaselineId = str "id" baseline
+          BaselineSha256 = baselineSha
+          Baseline = baseline
+          Manifest = Artifacts.verificationManifest compiled
+          Spec = planSpec
+          Approvals =
+            { Repository = sprintf "kemiller2002/%s" repo.Name
+              Commit = str "commit" a
+              Path = str "path" a
+              Sha256 = Git.sha256Hex bytes
+              TrustedOperators = strs "trustedOperators" a
+              Document = parseBytes bytes } }
+
+    let outputs0 = outputs0 @ [ "verification-plan.json", VerificationPlan.build planInputs ]
+
     // Validation reads the serialized artifacts back, so it checks what is actually written.
     let reparsed = outputs0 |> List.map (fun (n, j) -> n, serialize j |> Text.Encoding.UTF8.GetBytes |> parseBytes) |> Map.ofList
 
@@ -360,7 +389,13 @@ let buildPackage (o: Options) : Built =
           SourceFiles = sourceFiles
           CommittedBaseline = if File.Exists o.CommittedBaseline then Some(parseFile o.CommittedBaseline) else None }
 
-    let checks = Validate.run inputs
+    let planCheck: Validate.Check =
+        { Id = "V18"
+          Title = "The verification plan preserves every baseline P0 requirement and obligation; exclusions are operator-authorized and test bindings resolve"
+          Critical = true
+          Problems = VerificationPlan.problems planInputs @ VerificationPlan.preservationProblems baseline reparsed.["verification-plan.json"] }
+
+    let checks = Validate.run inputs @ [ planCheck ]
     let report = Validate.report inputs checks
     let outputs = outputs0 @ [ "requirements-validation-report.json", report ]
     let rendered = outputs |> List.map (fun (n, j) -> n, serialize j)
@@ -511,10 +546,67 @@ let preflightCommand (o: Options) : int =
         eprintfn "input error: %s" ex.Message
         2
 
+/// `verify-plan`: Phase Eight. Assesses a candidate's ledger and evidence bundle against the verification
+/// plan (see PlanVerification). Writes the assessment to --out (or stdout).
+/// Exit 0 ACCEPTED, 3 not accepted, 2 unusable input.
+let verifyPlanCommand (args: string list) : int =
+    let rec opts (xs: string list) (m: Map<string, string list>) =
+        match xs with
+        | k :: v :: rest when k.StartsWith("--", StringComparison.Ordinal) ->
+            opts rest (m.Add(k, (m.TryFind k |> Option.defaultValue []) @ [ v ]))
+        | [] -> Ok m
+        | x :: _ -> Error(sprintf "unexpected argument '%s'" x)
+
+    let required =
+        [ "--plan"; "--baseline"; "--ledger"; "--evidence-manifest"; "--evidence-manifest-sha256"; "--evidence-root"; "--trusted-source-sha"; "--approvals"; "--trusted-operator-id" ]
+
+    match opts args Map.empty with
+    | Error e ->
+        eprintfn "%s" e
+        2
+    | Ok m when required |> List.exists (m.ContainsKey >> not) ->
+        eprintfn "usage: requirements-compiler verify-plan %s [--out FILE]" (required |> List.map (fun k -> k + " V") |> String.concat " ")
+        2
+    | Ok m ->
+        try
+            let one k = m.[k] |> List.last
+            let root = Path.GetFullPath(one "--evidence-root")
+
+            let readEvidence (rel: string) =
+                let full = Path.GetFullPath(Path.Combine(root, rel))
+                if rel.Contains("..") || Path.IsPathRooted rel || not (full.StartsWith(root + string Path.DirectorySeparatorChar, StringComparison.Ordinal)) then None
+                elif File.Exists full then Some(File.ReadAllBytes full)
+                else None
+
+            let baselineBytes = File.ReadAllBytes(one "--baseline")
+
+            let assessment =
+                PlanVerification.assess
+                    { Plan = parseFile (one "--plan")
+                      Baseline = parseBytes baselineBytes
+                      BaselineSha256 = Git.sha256Hex baselineBytes
+                      Ledger = parseFile (one "--ledger")
+                      ManifestRaw = File.ReadAllBytes(one "--evidence-manifest")
+                      ExpectedManifestSha256 = one "--evidence-manifest-sha256"
+                      ReadEvidence = readEvidence
+                      TrustedSourceSha = one "--trusted-source-sha"
+                      ApprovalsRaw = File.ReadAllBytes(one "--approvals")
+                      TrustedOperators = m.["--trusted-operator-id"] }
+
+            let text = serialize assessment
+            match m.TryFind "--out" with
+            | Some [ out ] -> File.WriteAllText(out, text)
+            | _ -> printf "%s" text
+            if str "verdict" assessment = "ACCEPTED" then 0 else 3
+        with ex ->
+            eprintfn "input error: %s" ex.Message
+            2
+
 [<EntryPoint>]
 let main argv =
     match List.ofArray argv with
     | [ "baseline"; root; commit ] -> baselineCommand root commit
+    | "verify-plan" :: rest -> verifyPlanCommand rest
     | "preflight" :: rest ->
         match parseArgs rest defaults with
         | Error e ->

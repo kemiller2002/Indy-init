@@ -8,6 +8,7 @@
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Replay.fs" />
     <Compile Include="Tests.fs" />
   </ItemGroup>
   <ItemGroup>
