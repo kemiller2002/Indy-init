@@ -3,15 +3,15 @@
   "package": "requirements-compiled/v1",
   "source": {
     "repository": "kemiller2002/indy-init",
-    "commit": "9dc7d575f9d981e2be6f83543e18f548332e1a53",
-    "baselineId": "BL-CAUSA-INDY-INIT-9dc7d575f9d9",
-    "baselineSha256": "b768e6f0de1014324be04d0b615c720892d121f68e2f1ec97195d74144b13a16",
+    "commit": "a9df7ad0a711c72caa5e945a15924277d7aef18b",
+    "baselineId": "BL-CAUSA-INDY-INIT-a9df7ad0a711",
+    "baselineSha256": "76ef3158a09ddbbd4bb7b96f3336040974cb89a11d4169b079940ef59cbc155b",
     "baselineGenerator": "requirements-compiler baseline (F# port; byte-equivalent to tools/build-requirements-baseline.py)"
   },
   "repositories": [
     {
       "name": "indy-init",
-      "commit": "9dc7d575f9d981e2be6f83543e18f548332e1a53",
+      "commit": "a9df7ad0a711c72caa5e945a15924277d7aef18b",
       "role": "primary: authoritative requirements (source commit of this package)"
     },
     {
@@ -193,7 +193,7 @@
     },
     {
       "path": "curation/sources.json",
-      "sha256": "70f9eeba86f44ea09f3d0950cfcb5aba39309c383d40aac542fe89c3ff530a6b"
+      "sha256": "bff415f80d9f812d0e4645ad190fc46b4869c104399854ed83b6ac7fe45e3470"
     },
     {
       "path": "curation/tasks.json",
@@ -237,11 +237,11 @@
   "generated": [
     {
       "path": "contract-bindings.json",
-      "sha256": "819fce0005c7a51c3bc6d96e1e56d2870b822a3ddf574e45f4a4dd61cc0a9756"
+      "sha256": "1bb1369ba67d63ea3e182798d5249376d159be17e9e34efdbeed020b19928ac7"
     },
     {
       "path": "decision-registry.json",
-      "sha256": "1edbef64b3ccdf3ebe9e5b46bb347be2339ec60b5f8d6d02630a0ca8efffac20"
+      "sha256": "e9346ac5ab0b543ca444aaacf3025988c5a677adf7cd622e4482a89f4b8dcee7"
     },
     {
       "path": "dependency-graph.json",
@@ -269,15 +269,15 @@
     },
     {
       "path": "requirements-inventory.json",
-      "sha256": "f467f7b13caab23740a4dd6869caebc539d2392a1d66ef29765901af066f869e"
+      "sha256": "702da7d3f054a6571a7041963fab072058339809e982d5ce1363a877f8b1f44c"
     },
     {
       "path": "requirements-source-map.json",
-      "sha256": "47575975e1a8c085da0943cefd54564604a0997660b2d54a6be3903b5e757358"
+      "sha256": "07c12ccd3553f608d723ecc3d9f5b397cc897bdedadb7711311309f9df6892e3"
     },
     {
       "path": "requirements-validation-report.json",
-      "sha256": "9c7b041e9b970fcfb450d5ccbed83aba4da7dc81d4ac4ee82fb29c59a944cb37"
+      "sha256": "656a502707cf9fe4d91aef16354d6ca295294cce759cee0ab7fe29054905b935"
     },
     {
       "path": "timed-execution-manifest.json",

@@ -9,8 +9,8 @@ rehearsal must use it is defined in
 
 | | |
 |---|---|
-| Baseline id | `BL-CAUSA-INDY-INIT-c751d58d66e3` |
-| Pinned commit | `c751d58d66e3f105a8c67a0cb5e069314bdbd391` (the proposed launch-content and active-catalog change, F-001/F-006 of `requirements-compiled/v1`). Previously `002d8ba6e98639a385dd771999099ba032c48086`, which lacked AR-019..AR-026 (F-003). Re-pin at the Rehearsal 4 kickoff commit (OD-INDY-6) |
+| Baseline id | `BL-CAUSA-INDY-INIT-a9df7ad0a711` |
+| Pinned commit | `a9df7ad0a711c72caa5e945a15924277d7aef18b`, the Rehearsal 4 kickoff re-pin (T01, OD-INDY-6). No drift from the previous pin `c751d58d66e3f105a8c67a0cb5e069314bdbd391`: every requirement, obligation and document hash is identical; only the commit identity changes. Earlier pins: `2edaea4f65ba` (F-001/F-006) and `002d8ba6e986`, which lacked AR-019..AR-026 (F-003) |
 | Documents | 19, each pinned by SHA-256 |
 | Requirements | 461 |
 | Obligations | 2293: 378 `acceptance`, 55 `value`, 1860 `constraint` |

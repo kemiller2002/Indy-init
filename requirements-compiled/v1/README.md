@@ -4,7 +4,7 @@ This package compiles the Causa requirements into a structured form. Every part 
 
 |   |   |
 |---|---|
-| Source | kemiller2002/indy-init `9dc7d575f9d981e2be6f83543e18f548332e1a53`. The compiler builds the baseline at this commit itself, with the F# port of the baseline generator. |
+| Source | kemiller2002/indy-init `a9df7ad0a711c72caa5e945a15924277d7aef18b` (Rehearsal 4 kickoff re-pin, T01; previously `9dc7d57`, with no requirement change between them). The compiler builds the baseline at this commit itself, with the F# port of the baseline generator. |
 | Other repositories | the exact commits in `curation/sources.json` (also in `package-manifest.json`) |
 | Compilation verdict | **PASS**: every check V01–V17 passes, including V14 (no baseline drift) |
 | Rehearsal readiness | **READY** per the compiler: no readiness blocker remains (`requirements-validation-report.json`). The executed preflight (CI, with the secret) gives 14 PASS and 3 NOT_RUN; two of those are produced by Rehearsal 4's untimed setup (T08, T10). See `readiness/READINESS-REPORT.md`. |
