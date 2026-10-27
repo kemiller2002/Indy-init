@@ -16,7 +16,7 @@ The brief is in kemiller2002/indy-init-rehearsal-004 `.praxis/inbox/documents/20
 | CI optimization | **Done** | Full suite: 5 min 21 s on PR #5, against 6 min 49 s for the same suite in R4's single job; 3 runs per push instead of 5; caches hit. The local WASM fast path takes 29 s warm, against R4's 12–15 min CI round trip. `CI-SECURITY.md` |
 | Security | **Done** | The workflow iframe is sandboxed with a CSP (R1-15). A secret gate runs before every upload; the negative control rejects 11/11 leak shapes. Live-suite artifacts carry no trace, screenshot or video. Review defect D4 fixed: the secret gate now also runs before the Pages upload on the manual deploy path (r5/fix-d a303b9b). D2, the UI-026 sandbox test failing on one host, was a late layout shift that made the click miss, not a relay defect; the test now waits for a stable frame (2f8b2bd). |
 | Integration | **Done, not merged** | `r5/integration` (PR #5) is green on the full suite. It was not merged into `remediation/r4`, because two other sessions changed that line in parallel (PRs #1, #3, #4). The owner chooses the canonical line. |
-| Preflight | **BLOCKED** | CI with the rotated secret and `--kickoff-decisions` (run 40552834704): 13 PASS, 1 BLOCKED (PRE-DEC-01: seven owner items pending), 3 NOT_RUN; T05 live write verification PASS. PRE-REQ-04 and PRE-TOOL-03 are produced only by the Rehearsal 5 setup. PRE-ORG-01 is event-only. |
+| Preflight | **BLOCKED** | CI with the rotated secret and `--kickoff-decisions` (run 40554685393): 13 PASS, 1 BLOCKED (PRE-DEC-01: six owner decisions pending), 3 NOT_RUN; T05 live write verification PASS. PRE-REQ-04 and PRE-TOOL-03 are produced only by the Rehearsal 5 setup. PRE-ORG-01 is event-only. |
 
 ## Mandatory readiness gates (brief §12)
 

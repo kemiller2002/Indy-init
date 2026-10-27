@@ -1,10 +1,10 @@
 {
   "schema": "indy-init.preflight-evidence/1",
-  "executedAt": "2026-10-27T17:41:53Z",
+  "executedAt": "2026-10-27T17:54:03Z",
   "sourceCommit": "aab8f80c7743392e794b3b631542903ed4ed6f64",
-  "workflowRun": "https://github.com/kemiller2002/indy-init-rehearsal-004/actions/runs/40552834704",
-  "harnessCommit": "42be5fcca47084956b76a14451d7d611566c4627",
-  "note": "PREFLIGHT-EVIDENCE line of the r5/preflight workflow, run with --kickoff-decisions kickoff/rehearsal-005/decisions.json, using indy-init-rehearsal-004 secret CAUSA_GITHUB_TOKEN (the token rotated after the Rehearsal 4 exposure). The earlier run 40529269652, without --kickoff-decisions, gave PRE-DEC-01 PASS because the check saw only the compiled curation (readiness-review defect D1). indy-init-rehearsal-003 run 40528892899, with that repository's older secret, answered 401. Check titles are omitted here; ids, statuses and details are verbatim from the run log.",
+  "workflowRun": "https://github.com/kemiller2002/indy-init-rehearsal-004/actions/runs/40554685393",
+  "harnessCommit": "f7449ead285f2a5c4d8f246796942482c161a2b2",
+  "note": "PREFLIGHT-EVIDENCE line of the r5/preflight workflow, run with --kickoff-decisions (fails closed; authorization and approvals are not counted twice) kickoff/rehearsal-005/decisions.json, using indy-init-rehearsal-004 secret CAUSA_GITHUB_TOKEN (the token rotated after the Rehearsal 4 exposure). The earlier run 40529269652, without --kickoff-decisions, gave PRE-DEC-01 PASS because the check saw only the compiled curation (readiness-review defect D1). indy-init-rehearsal-003 run 40528892899, with that repository's older secret, answered 401. Check titles are omitted here; ids, statuses and details are verbatim from the run log.",
   "verdict": "BLOCKED",
   "rule": "READY only when every check is PASS (PRE-ORG-01 may stay NOT_RUN for a rehearsal); any FAIL gives FAIL, otherwise BLOCKED",
   "summary": {
@@ -26,7 +26,7 @@
     {
       "id": "PRE-DEC-01",
       "status": "BLOCKED",
-      "detail": "no unresolved decision; kickoff decisions pending the owner: operatorAuthorization, operatorApprovals, scope, R4-DEC-001, PCT-1..PCT-4, OD-4, CANONICAL-REMEDIATION"
+      "detail": "no unresolved decision; kickoff decisions pending the owner: scope, R4-DEC-001, PCT-1..PCT-4, OD-4, CANONICAL-REMEDIATION, OD-5"
     },
     {
       "id": "PRE-DEC-02",

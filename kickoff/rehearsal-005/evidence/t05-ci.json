@@ -1,8 +1,8 @@
 {
   "schema": "indy-init.t05-persistence-evidence/1",
-  "executedAt": "2026-10-27T17:41:09Z",
-  "runId": "t05-40552834704-1",
-  "workflowRun": "https://github.com/kemiller2002/indy-init-rehearsal-004/actions/runs/40552834704",
+  "executedAt": "2026-10-27T17:53:07Z",
+  "runId": "t05-40554685393-1",
+  "workflowRun": "https://github.com/kemiller2002/indy-init-rehearsal-004/actions/runs/40554685393",
   "testRepository": "kemiller2002/causa-write-test",
   "branch": "main",
   "adapter": {
@@ -10,16 +10,16 @@
     "commit": "b053d1da4ef533fba7d6728c369c58a29a1e2440",
     "file": "src/engine/GitHub.fs"
   },
-  "harnessCommit": "42be5fcca47084956b76a14451d7d611566c4627",
+  "harnessCommit": "f7449ead285f2a5c4d8f246796942482c161a2b2",
   "facts": {
-    "H0": "dda815574b79dfe8180532136f42e68aaaa79b4d",
-    "H1": "94200ed861311601193fcbf43736feb03d3c0d4a",
-    "H2": "3c9505816da1b17a970e078e49b2c773baa7f3ae",
-    "acceptedPath": "workspaces/demo/t05-40552834704-1/t05-accepted.json",
-    "acceptedSha256": "b6c0828a54955295aef6c44d8752e86eac5d2c074dadd5025c3739edd2d5caea",
+    "H0": "3c9505816da1b17a970e078e49b2c773baa7f3ae",
+    "H1": "5eb65d1218962766bdc17ab3460041a083e93d6a",
+    "H2": "e1f8b15ae86a15158700d90fa5a4f09fd0328cea",
+    "acceptedPath": "workspaces/demo/t05-40554685393-1/t05-accepted.json",
+    "acceptedSha256": "4fef9d06897a11bfaa1430fd89ef62e9d98ee93bcfc11c12e41f26b3d8cde3a4",
     "private": "false",
-    "productionAfter": "22260f429501d0d6963fc33302ed1e64d742a374",
-    "productionBefore": "22260f429501d0d6963fc33302ed1e64d742a374",
+    "productionAfter": "dcb8cb994eab81d0384b9c8abc5f0b593f398442",
+    "productionBefore": "dcb8cb994eab81d0384b9c8abc5f0b593f398442",
     "staleRefusal": "STALE_DATA",
     "tree0": "2fa452e9fcbc3998679830a2564e6b29c9b6dc3b",
     "tree2": "2fa452e9fcbc3998679830a2564e6b29c9b6dc3b"
@@ -47,12 +47,12 @@
     {
       "id": "T05-04",
       "status": "PASS",
-      "detail": "H0 dda81557, 36 files of test data"
+      "detail": "H0 3c950581, 36 files of test data"
     },
     {
       "id": "T05-05",
       "status": "PASS",
-      "detail": "kemiller2002/causa-data main at 22260f42 before any write"
+      "detail": "kemiller2002/causa-data main at dcb8cb99 before any write (causa-data#5 merged 13:45 EDT: tool and README only)"
     },
     {
       "id": "T05-06",

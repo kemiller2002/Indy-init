@@ -1,11 +1,11 @@
 {
   "schema": "indy-init.rehearsal-freeze/1",
   "sources": {
-    "indyInit": "f7eeb3afa50adf0466a23b493c22db81835dcf05",
+    "indyInit": "5469d93bc6a7c0cc151cb62a6447a98db31aaec9",
     "registry": "31086664ddaf18fd827bb0276394aea82735620d",
     "rehearsalTooling": {
       "ref": "origin/r5/integration",
-      "commit": "7748690dd0400ad1d283d943e6c5a6c533941c3c"
+      "commit": "7920c39aa02bb82be78f167927fe4fa016ee6406"
     }
   },
   "requirementsBaseline": {
@@ -214,7 +214,7 @@
     "rehearsalPipeline": [
       {
         "path": "acceptance/p0-acceptance-plan.json",
-        "sha256": "c8b13584a23549c0d44df81de8b1b5adfc1a813daa462667af2c4769d5a30dd4"
+        "sha256": "cdc37b2761741c9c1290159cf789f226a4ee16b129994484cab9597bd065bdc1"
       },
       {
         "path": "acceptance/p0-curation-pending.json",
@@ -242,11 +242,11 @@
       },
       {
         "path": "tools/acceptance-plan/Plan.fs",
-        "sha256": "3f593094b64d55874d87a0a1773a9a089dd6b392c13d407d8d11ef23972989d0"
+        "sha256": "e58595492577a2d026dcba7d6b4fa4d17e8f8dc82870726a4f2f262d28d751ca"
       },
       {
         "path": "tools/acceptance-plan/Program.fs",
-        "sha256": "8b25c29c06e438f1c82fa4e64169adbab78021501aa3aa7d8632ef2f8fb566c4"
+        "sha256": "13556bcd901590c85cb6143a2ce9ff3ec2b38f4cdc8a35fce50cbb3e564a465c"
       },
       {
         "path": "tools/acceptance-plan/Remap.fs",
@@ -277,7 +277,7 @@
     },
     {
       "path": ".github/workflows/deploy-pages.yml",
-      "sha256": "7336e22b635c2411525f5a5c33333987eb5e70159bd8888c0c1df2bee3d8e3c3"
+      "sha256": "ecb985bfa8f48072c6cf30ac64ecc9fae76e611d6a870a40d7fd2a81c3653571"
     },
     {
       "path": ".github/workflows/echelon-foundations.yml",
@@ -293,10 +293,10 @@
     }
   ],
   "decisions": {
-    "note": "Owner decisions and deviations the Rehearsal 5 kickoff depends on, with their current status. These are references to recorded decisions, not identities; an entry marked pending is not approved.",
+    "note": "Owner decisions and deviations the Rehearsal 5 kickoff depends on, with their current status. The preflight (--kickoff-decisions) blocks PRE-DEC-01 on every entry whose status is not decided, accepted, approved, resolved or after-ready-preflight; an entry with coveredBy is checked by the preflight check it names.",
     "operatorAuthorization": {
-      "status": "not given",
-      "detail": "Rehearsal 5 has not started. The Rehearsal 5 clock starts only after the operator\u0027s explicit authorization (sprint brief \u00A713)."
+      "status": "after-ready-preflight",
+      "detail": "Not given. The operator authorizes Rehearsal 5 only after a READY preflight, so this is not a preflight condition."
     },
     "operatorApprovals": {
       "status": "pending",
@@ -304,7 +304,8 @@
       "references": [
         "kickoff/rehearsal-004/README.md",
         "kemiller2002/indy-init-rehearsal-004 docs/decisions/R4-REM-OWNER-DECISIONS.md (OD-3)"
-      ]
+      ],
+      "coveredBy": "PRE-REQ-04"
     },
     "scope": {
       "status": "pending",
@@ -317,13 +318,15 @@
       {
         "id": "R4-DEC-001",
         "subject": "@echelon-foundry/forma-workflow 1.0.0 is used but is not in the Echelon Registry",
-        "status": "owner-approved for Rehearsal 4; carry-over to Rehearsal 5 pending (remediation OD-6: publish it, or keep R4-DEC-001)",
+        "status": "pending",
+        "detail": "Owner-approved for Rehearsal 4 only. Carry-over to Rehearsal 5 needs the owner: remediation OD-6 asks whether to publish forma-workflow in the Registry or keep R4-DEC-001.",
         "reference": "kemiller2002/indy-init-rehearsal-004 docs/decisions/R4-DEC-001-forma-workflow-dependency.md"
       },
       {
         "id": "VERIFIER-PYTHON",
         "subject": "The authoritative acceptance verifier (tools/compute-acceptance-verdict.py) is Python",
-        "status": "the owner\u0027s authoritative tool; it is run, never reimplemented; not part of the application or its build",
+        "status": "accepted",
+        "detail": "the owner\u0027s authoritative tool; it is run, never reimplemented; not part of the application or its build",
         "reference": "kemiller2002/indy-init-rehearsal-004 tools/acceptance/verify.sh"
       }
     ],
@@ -331,6 +334,35 @@
       {
         "subject": "Conditor 0.10.13 (bootstrap tool) was not in the Registry",
         "resolution": "release record added and REG-RU-007 re-run against it on the 1.28.0 channel (kemiller2002/echelon-registry#99)"
+      }
+    ],
+    "verification": [
+      {
+        "id": "PCT-1..PCT-4",
+        "subject": "Percepta screen contracts cannot run against Causa",
+        "status": "pending",
+        "detail": "percepta-semantic 0.2.1 verifies only a local file committed at the source revision, not a served or deployed site; Causa has no state-injection hook and one data-percepta hook; the 25 contracts are generic example screens. A Causa contract set and a test-only state hook need the owner (the OD-1 waiver covers the Rehearsal 4 baseline only).",
+        "reference": "kemiller2002/indy-init-rehearsal-004 evidence/r5-readiness/p0-percepta-compatibility.json"
+      }
+    ],
+    "openRemediationDecisions": [
+      {
+        "id": "OD-4",
+        "subject": "PF-015-O1 anonymous public-catalog reads versus explicit Connect",
+        "status": "pending",
+        "reference": "kemiller2002/indy-init-rehearsal-004 docs/decisions/R4-REM-OWNER-DECISIONS.md"
+      },
+      {
+        "id": "CANONICAL-REMEDIATION",
+        "subject": "Which remediation line Rehearsal 5 reuses: indy-init-rehearsal-004 PR #5 (this sprint), remediation/r4 (PR #1) or PRs #3/#4; they conflict in 14 files",
+        "status": "pending",
+        "reference": "kemiller2002/indy-init-rehearsal-004 docs/r5-readiness/SPRINT-REPORT.md"
+      },
+      {
+        "id": "OD-5",
+        "subject": "UI-006 local persistence and offline queue: in scope for November 7, or deferred with a recorded limitation",
+        "status": "pending",
+        "reference": "kemiller2002/indy-init-rehearsal-004 docs/decisions/R4-REM-OWNER-DECISIONS.md"
       }
     ]
   },
