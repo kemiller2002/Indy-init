@@ -34,18 +34,23 @@ let private gitText repo args =
 let private versionKey (v: string) =
     Regex.Matches(v, @"\d+") |> Seq.map (fun m -> int m.Value) |> List.ofSeq
 
-/// The pending items of a kickoff decisions record: every object whose `status` is "pending" or "not given", or
-/// starts with "pending", named by its `id` or by its key path.
+/// The statuses that count as decided. Anything else, including a missing or unrecognized status, is undecided:
+/// the check fails closed.
+let decidedStatuses = set [ "decided"; "accepted"; "approved"; "resolved"; "after-ready-preflight" ]
+
+/// The undecided items of a kickoff decisions record: every object with a `status` outside `decidedStatuses`,
+/// named by its `id` or by its key path. An item with `coveredBy` is left to the preflight check it names (for
+/// example the operator approvals, which PRE-REQ-04 requires), so it is not counted twice.
 let pendingKickoffItems (decisions: Json) : string list =
-    let isPending (s: string) =
-        let t = s.Trim().ToLowerInvariant()
-        t = "pending" || t = "not given" || t.StartsWith "pending"
+    let isDecided (s: string) = decidedStatuses.Contains(s.Trim().ToLowerInvariant())
     let rec walk (path: string) (j: Json) : string list =
         match j with
         | JObj props ->
             let here =
-                match strOpt "status" j with
-                | Some s when isPending s -> [ strOpt "id" j |> Option.defaultValue path ]
+                match strOpt "status" j, strOpt "coveredBy" j with
+                | Some s, None when not (isDecided s) -> [ strOpt "id" j |> Option.defaultValue path ]
+                | None, None when (strOpt "id" j).IsSome && (strOpt "subject" j).IsSome && (field "resolution" j).IsNone ->
+                    [ strOpt "id" j |> Option.defaultValue path ]
                 | _ -> []
             here @ (props |> List.collect (fun (k, v) -> walk (if path = "" then k else path + "." + k) v))
         | JArr items -> items |> List.mapi (fun i v -> walk (sprintf "%s[%d]" path i) v) |> List.concat

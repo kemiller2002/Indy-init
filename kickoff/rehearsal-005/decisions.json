@@ -1,8 +1,8 @@
 {
-  "note": "Owner decisions and deviations the Rehearsal 5 kickoff depends on, with their current status. These are references to recorded decisions, not identities; an entry marked pending is not approved.",
+  "note": "Owner decisions and deviations the Rehearsal 5 kickoff depends on, with their current status. The preflight (--kickoff-decisions) blocks PRE-DEC-01 on every entry whose status is not decided, accepted, approved, resolved or after-ready-preflight; an entry with coveredBy is checked by the preflight check it names.",
   "operatorAuthorization": {
-    "status": "not given",
-    "detail": "Rehearsal 5 has not started. The Rehearsal 5 clock starts only after the operator's explicit authorization (sprint brief §13)."
+    "status": "after-ready-preflight",
+    "detail": "Not given. The operator authorizes Rehearsal 5 only after a READY preflight, so this is not a preflight condition."
   },
   "operatorApprovals": {
     "status": "pending",
@@ -10,7 +10,8 @@
     "references": [
       "kickoff/rehearsal-004/README.md",
       "kemiller2002/indy-init-rehearsal-004 docs/decisions/R4-REM-OWNER-DECISIONS.md (OD-3)"
-    ]
+    ],
+    "coveredBy": "PRE-REQ-04"
   },
   "scope": {
     "status": "pending",
@@ -62,6 +63,12 @@
       "subject": "Which remediation line Rehearsal 5 reuses: indy-init-rehearsal-004 PR #5 (this sprint), remediation/r4 (PR #1) or PRs #3/#4; they conflict in 14 files",
       "status": "pending",
       "reference": "kemiller2002/indy-init-rehearsal-004 docs/r5-readiness/SPRINT-REPORT.md"
+    },
+    {
+      "id": "OD-5",
+      "subject": "UI-006 local persistence and offline queue: in scope for November 7, or deferred with a recorded limitation",
+      "status": "pending",
+      "reference": "kemiller2002/indy-init-rehearsal-004 docs/decisions/R4-REM-OWNER-DECISIONS.md"
     }
   ]
 }
