@@ -32,7 +32,8 @@ type Options =
       Out: string
       Repos: Map<string, string>
       Check: bool
-      Evidence: string }
+      Evidence: string
+      KickoffDecisions: string }
 
 let rec parseArgs (args: string list) (o: Options) =
     match args with
@@ -48,6 +49,7 @@ let rec parseArgs (args: string list) (o: Options) =
         | _ -> Error(sprintf "--repo expects NAME=DIR, got '%s'" v)
     | "--check" :: rest -> parseArgs rest { o with Check = true }
     | "--evidence" :: v :: rest -> parseArgs rest { o with Evidence = v }
+    | "--kickoff-decisions" :: v :: rest -> parseArgs rest { o with KickoffDecisions = v }
     | a :: _ -> Error(sprintf "unknown argument '%s'" a)
 
 let private fileSha (path: string) = File.ReadAllBytes path |> Git.sha256Hex
@@ -456,7 +458,8 @@ let defaults =
       Out = "requirements-compiled/v1"
       Repos = Map.empty
       Check = false
-      Evidence = "" }
+      Evidence = ""
+      KickoffDecisions = "" }
 
 /// `baseline ROOT COMMIT`: same contract as tools/build-requirements-baseline.py (reads the working
 /// tree under ROOT, writes the baseline to stdout; exit 2 on usage, 1 on a rule violation).
@@ -490,7 +493,8 @@ let preflightCommand (o: Options) : int =
               Report = built.Report
               Source = o.Source
               SourceCommit = built.Inputs.Compiled.SourceCommit
-              Repos = o.Repos.Add("indy-init", o.Source) }
+              Repos = o.Repos.Add("indy-init", o.Source)
+              KickoffDecisions = if o.KickoffDecisions = "" then None else Some(parseFile o.KickoffDecisions) }
 
         let results =
             built.Inputs.Compiled.Curation.PreflightChecks

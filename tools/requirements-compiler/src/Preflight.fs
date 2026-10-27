@@ -19,7 +19,10 @@ type Context =
       Report: Json
       Source: string
       SourceCommit: string
-      Repos: Map<string, string> }
+      Repos: Map<string, string>
+      /// The rehearsal kickoff decisions record (kickoff/rehearsal-NNN/decisions.json), when given: its pending
+      /// items are owner decisions the run depends on that the compiled curation does not carry.
+      KickoffDecisions: Json option }
 
 let private param (k: Json) (name: string) =
     field "params" k |> Option.bind (strOpt name) |> Option.defaultValue ""
@@ -31,8 +34,33 @@ let private gitText repo args =
 let private versionKey (v: string) =
     Regex.Matches(v, @"\d+") |> Seq.map (fun m -> int m.Value) |> List.ofSeq
 
+/// The pending items of a kickoff decisions record: every object whose `status` is "pending" or "not given", or
+/// starts with "pending", named by its `id` or by its key path.
+let pendingKickoffItems (decisions: Json) : string list =
+    let isPending (s: string) =
+        let t = s.Trim().ToLowerInvariant()
+        t = "pending" || t = "not given" || t.StartsWith "pending"
+    let rec walk (path: string) (j: Json) : string list =
+        match j with
+        | JObj props ->
+            let here =
+                match strOpt "status" j with
+                | Some s when isPending s -> [ strOpt "id" j |> Option.defaultValue path ]
+                | _ -> []
+            here @ (props |> List.collect (fun (k, v) -> walk (if path = "" then k else path + "." + k) v))
+        | JArr items -> items |> List.mapi (fun i v -> walk (sprintf "%s[%d]" path i) v) |> List.concat
+        | _ -> []
+    walk "" decisions
+
 let private packageState (ctx: Context) (condition: string) =
     match condition with
+    | "no-unresolved-decisions" ->
+        let s, d = Artifacts.packageState ctx.Compiled condition
+        match ctx.KickoffDecisions |> Option.map pendingKickoffItems |> Option.defaultValue [] with
+        | [] -> outcome s d
+        | pending ->
+            let status = if s = "PASS" then "BLOCKED" else s
+            outcome status (sprintf "%s; kickoff decisions pending the owner: %s" d (String.concat ", " pending))
     | "compilation-pass" ->
         let v = str "compilationVerdict" ctx.Report
         outcome (if v = "PASS" then "PASS" else "FAIL") ("compilation verdict " + v)

@@ -175,7 +175,21 @@ let private offline (source: string) : string list =
           if Preflight.verdict [ k "A", o "BLOCKED"; k "B", o "FAIL" ] <> "FAIL" then yield "FAIL dominates" ]
         |> List.map (sprintf "preflight verdict: %s")
 
-    equivalence @ units @ verdicts
+    // PRE-DEC-01 with --kickoff-decisions: a pending kickoff decision blocks, a decided one does not.
+    let kickoff =
+        let decisions =
+            JObj [ "operatorApprovals", JObj [ "status", JStr "pending" ]
+                   "operatorAuthorization", JObj [ "status", JStr "not given" ]
+                   "dependencyDeviations",
+                   JArr [ JObj [ "id", JStr "R4-DEC-001"; "status", JStr "pending" ]
+                          JObj [ "id", JStr "DONE"; "status", JStr "owner-approved" ] ] ]
+        let pending = Preflight.pendingKickoffItems decisions
+        [ if pending <> [ "operatorApprovals"; "operatorAuthorization"; "R4-DEC-001" ] then yield sprintf "pending items found: %A" pending
+          if List.contains "DONE" pending then yield "a decided deviation is not pending"
+          if Preflight.pendingKickoffItems (JObj [ "x", JObj [ "status", JStr "decided" ] ]) <> [] then yield "decided items are not pending" ]
+        |> List.map (sprintf "kickoff decisions: %s")
+
+    equivalence @ units @ verdicts @ kickoff
 
 [<EntryPoint>]
 let main argv =

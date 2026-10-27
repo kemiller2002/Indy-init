@@ -15,19 +15,23 @@
   "scope": {
     "status": "pending",
     "detail": "OD-INDY-11 excluded T27 and T28 (AI proposal loop, time travel) from Rehearsal 4 only. Whether Rehearsal 5 keeps that exclusion is the owner's decision; until decided, Rehearsal 5 runs the full baseline.",
-    "references": [ "docs/OWNER-DECISIONS-2026-10-26.md (OD-INDY-11)" ]
+    "references": [
+      "docs/OWNER-DECISIONS-2026-10-26.md (OD-INDY-11)"
+    ]
   },
   "dependencyDeviations": [
     {
       "id": "R4-DEC-001",
       "subject": "@echelon-foundry/forma-workflow 1.0.0 is used but is not in the Echelon Registry",
-      "status": "owner-approved for Rehearsal 4; carry-over to Rehearsal 5 pending (remediation OD-6: publish it, or keep R4-DEC-001)",
+      "status": "pending",
+      "detail": "Owner-approved for Rehearsal 4 only. Carry-over to Rehearsal 5 needs the owner: remediation OD-6 asks whether to publish forma-workflow in the Registry or keep R4-DEC-001.",
       "reference": "kemiller2002/indy-init-rehearsal-004 docs/decisions/R4-DEC-001-forma-workflow-dependency.md"
     },
     {
       "id": "VERIFIER-PYTHON",
       "subject": "The authoritative acceptance verifier (tools/compute-acceptance-verdict.py) is Python",
-      "status": "the owner's authoritative tool; it is run, never reimplemented; not part of the application or its build",
+      "status": "accepted",
+      "detail": "the owner's authoritative tool; it is run, never reimplemented; not part of the application or its build",
       "reference": "kemiller2002/indy-init-rehearsal-004 tools/acceptance/verify.sh"
     }
   ],
@@ -35,6 +39,29 @@
     {
       "subject": "Conditor 0.10.13 (bootstrap tool) was not in the Registry",
       "resolution": "release record added and REG-RU-007 re-run against it on the 1.28.0 channel (kemiller2002/echelon-registry#99)"
+    }
+  ],
+  "verification": [
+    {
+      "id": "PCT-1..PCT-4",
+      "subject": "Percepta screen contracts cannot run against Causa",
+      "status": "pending",
+      "detail": "percepta-semantic 0.2.1 verifies only a local file committed at the source revision, not a served or deployed site; Causa has no state-injection hook and one data-percepta hook; the 25 contracts are generic example screens. A Causa contract set and a test-only state hook need the owner (the OD-1 waiver covers the Rehearsal 4 baseline only).",
+      "reference": "kemiller2002/indy-init-rehearsal-004 evidence/r5-readiness/p0-percepta-compatibility.json"
+    }
+  ],
+  "openRemediationDecisions": [
+    {
+      "id": "OD-4",
+      "subject": "PF-015-O1 anonymous public-catalog reads versus explicit Connect",
+      "status": "pending",
+      "reference": "kemiller2002/indy-init-rehearsal-004 docs/decisions/R4-REM-OWNER-DECISIONS.md"
+    },
+    {
+      "id": "CANONICAL-REMEDIATION",
+      "subject": "Which remediation line Rehearsal 5 reuses: indy-init-rehearsal-004 PR #5 (this sprint), remediation/r4 (PR #1) or PRs #3/#4; they conflict in 14 files",
+      "status": "pending",
+      "reference": "kemiller2002/indy-init-rehearsal-004 docs/r5-readiness/SPRINT-REPORT.md"
     }
   ]
 }

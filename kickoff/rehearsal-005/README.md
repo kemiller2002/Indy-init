@@ -63,4 +63,4 @@ These are the operator's. An agent must not do them.
 
 - `evidence/bootstrap-dryrun.json`: a clean bootstrap of the kickoff set in a scratch repository: workstation install, `conditor init`/`verify` exit 0, scaffold build and 5/5 tests, the same lock as Rehearsal 4. It does not show the first green CI, which would start the clock.
 - `evidence/preflight-local.json`: the Indy-init preflight in the agent session (no secret).
-- `evidence/preflight-ci.json`: the same preflight in CI with the repository secret.
+- `evidence/preflight-ci.json`: the same preflight in CI with the repository secret, run with `--kickoff-decisions kickoff/rehearsal-005/decisions.json`. PRE-DEC-01 is BLOCKED until every pending item there is decided by the owner.
