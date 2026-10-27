@@ -1,0 +1,104 @@
+{
+  "schema": "indy-init.rc-verification-rules/1",
+  "description": "Verification obligations by requirement family. Every matching rule applies (they accumulate). Gates are those of REHEARSAL-ACCEPTANCE-LEDGER.md (G0-G10). Owners are existing systems; no new verifier is introduced.",
+  "rules": [
+    {
+      "id": "VR-LEDGER", "match": ["all"], "gate": "G0", "owner": "indy-init compute-acceptance-verdict.py",
+      "method": "ledger row {id, source_doc, priority, owner, implementation_paths, tests, evidence_paths, status, reason}; verdict computed, evidence checked at its SHA",
+      "evidence": ["acceptance ledger row with tests and evidence_paths at the verified SHA"],
+      "freshness": [], "invalidatedBy": ["ledger edited without a re-computed verdict (R4-04)"],
+      "tooling": "python3 tools/compute-acceptance-verdict.py LEDGER.json --repo . --report REPORT.md"
+    },
+    {
+      "id": "VR-PRESERVATION", "match": ["origin:baseline"], "gate": "G0", "owner": "Praxis (run by a Dokimos gate)",
+      "method": "requirement disposition and obligation mapping pass the preservation gate before implementation and at acceptance",
+      "evidence": ["praxis.requirements-preservation/1 evidence JSON with input SHA-256s"],
+      "freshness": ["re-run whenever the source, derived package or approvals change"], "invalidatedBy": ["drift finding from the gate"],
+      "tooling": "praxis requirements preservation verify (no released build yet: F-004)"
+    },
+    {
+      "id": "VR-UI", "match": ["doc:docs/CAUSA-UI-EXPERIENCE-REQUIREMENTS.md", "doc:docs/SCREEN-CONTRACTS.md", "doc:docs/WASM-LOADING-EXPERIENCE-REQUIREMENTS.md", "doc:docs/WORKFLOW-DIAGRAM-INTEGRATION-REQUIREMENTS.md", "regex:^R9\\.", "regex:^R16\\."], "gate": "G5", "owner": "Percepta",
+      "method": "Percepta semantic contract verification of populated states at the deployed exact SHA; WebKit at iPad portrait/landscape, desktop and mobile; axe accessibility; keyboard and reduced-motion checks",
+      "evidence": ["Percepta evidence JSON (schemaVersion 1.0.0) per screen contract", "deployed-SHA screenshots at desktop, iPad portrait/landscape, mobile", "accessibility report"],
+      "freshness": ["bound to the deployed SHA and the registered Percepta release"], "invalidatedBy": ["Percepta evidence from an unreleased build (OD-INDY-2)", "any UI change after capture"],
+      "tooling": "percepta verify --contract <contract> --url <deployed URL>; percepta validate-evidence"
+    },
+    {
+      "id": "VR-DOMAIN", "match": ["doc:docs/STATE-TRANSITION-TABLES.md", "regex:^R[1-8]\\.\\d+$", "regex:^R15\\.", "regex:^D-0\\d\\d$", "REHEARSAL-AGENT-INTERFACE-FREEZE§boundary-a-command-submission", "REHEARSAL-AGENT-INTERFACE-FREEZE§boundary-b-versioned-projection", "REHEARSAL-AGENT-INTERFACE-FREEZE§boundary-c-replay"], "gate": "G3", "owner": "Dokimos",
+      "method": "F# unit and property tests including illegal-transition and forged-history variants; behaviour verification",
+      "evidence": ["test results at the source SHA", "dokimos behavior verify output"],
+      "freshness": [], "invalidatedBy": ["kernel or policy change"],
+      "tooling": "dotnet test; dokimos behavior verify"
+    },
+    {
+      "id": "VR-INTERFACE", "match": ["doc:docs/REHEARSAL-AGENT-INTERFACE-FREEZE.md", "ADRP-008"], "gate": "G2", "owner": "integration owner + Dokimos",
+      "method": "producer/consumer contract tests at the interface-manifest SHA, owner sign-off, mandatory negative cases",
+      "evidence": ["interface manifest SHA", "contract test results", "negative-case results", "decision log"],
+      "freshness": ["bound to the interface-manifest SHA"], "invalidatedBy": ["manifest revision without consumer compatibility proof"],
+      "tooling": "dotnet test (contract tests); dokimos construction verify"
+    },
+    {
+      "id": "VR-STORAGE", "match": ["doc:docs/FROZEN-DEMO-STORAGE-REQUIREMENTS.md", "doc:docs/CAUSA-STORAGE-RELEASE-v1.0.0.md", "EXT-DATA-011", "ADRP-005"], "gate": "G4", "owner": "causa-data compatibility gate",
+      "method": "three identities match; golden replay of five scenarios; 90 negative fixtures refused; seed hashes unchanged",
+      "evidence": ["causa gate output anchored to causa-storage-v1.0.0", "replay/projection golden results"],
+      "freshness": ["bound to the causa-storage-v1.0.0 identities"], "invalidatedBy": ["any identity mismatch", "contract version change (F-009 outcome)"],
+      "tooling": "tools/fetch-engine.sh && causa gate . --anchor causa-storage-v1.0.0"
+    },
+    {
+      "id": "VR-PERSISTENCE", "match": ["doc:docs/REHEARSAL-EXTERNAL-DATA-BOUNDARY.md", "doc:docs/PROVIDER-FIXTURE-AND-INTEGRATION-REQUIREMENTS.md", "regex:^R10\\.", "regex:^R11\\.", "REHEARSAL-AGENT-INTERFACE-FREEZE§boundary-d-persistence", "UI-006"], "gate": "G6", "owner": "Dokimos + live provider CI job",
+      "method": "four verification levels (PF-011); live create/read/write/reload/conflict/rejected-token against the test repository with independent SHA re-reads; fakes only from recorded responses",
+      "evidence": ["live job run id and log", "independent re-read of written commit SHAs", "recorded provider responses"],
+      "freshness": ["live evidence from this run only"], "invalidatedBy": ["provider adapter change", "mocked-only evidence (EXT-DATA-010)"],
+      "tooling": "GitHub Actions live job using CAUSA_GITHUB_TOKEN; dokimos completion verify"
+    },
+    {
+      "id": "VR-DEPENDENCIES", "match": ["doc:docs/REHEARSAL-DEPENDENCY-LOCK.md", "doc:docs/SYSTEM-VERSION-AND-COMPATIBILITY-REQUIREMENTS.md", "REQUIREMENTS§version-and-integration-baseline"], "gate": "G1", "owner": "Conditor + echelon-registry + CI version gate",
+      "method": "lock compared with installed and loaded artifacts; set qualification; compatibility smoke",
+      "evidence": ["release set file and approval", "Conditor qualification run", "CI version-gate result"],
+      "freshness": ["bound to the kickoff lock"], "invalidatedBy": ["any lock change"],
+      "tooling": "conditor verify/doctor; registry set echelon-current"
+    },
+    {
+      "id": "VR-DEFECT-CLASS", "match": ["doc:docs/DEFECT-CLASS-CLOSURE-AND-RELEASE-GATES.md", "doc:docs/AGENT-RELIABILITY-REQUIREMENTS.md", "ADRP-009"], "gate": "G7", "owner": "independent reviewer + Dokimos",
+      "method": "class closure: original reproduction, adversarial variants, invariant enforcement, independent approval, SHA-bound proof",
+      "evidence": ["defect-class record with fix SHA and reviewer evidence"],
+      "freshness": [], "invalidatedBy": ["recurrence of the class"],
+      "tooling": "dokimos completion verify; reviewer report"
+    },
+    {
+      "id": "VR-DECISIONS", "match": ["doc:docs/DESIGN-DECISION-BOUNDARIES.md"], "gate": "G7", "owner": "independent architecture review",
+      "method": "review against D-xxx classifications; no promotion without a recorded decision (section 6)",
+      "evidence": ["architecture review record"],
+      "freshness": [], "invalidatedBy": ["classification change"],
+      "tooling": "reviewer checklist from DESIGN-DECISION-BOUNDARIES section 7"
+    },
+    {
+      "id": "VR-REPORT", "match": ["regex:^R12\\.", "UI-009", "REHEARSAL-AGENT-INTERFACE-FREEZE§boundary-e-report"], "gate": "G8", "owner": "Folio print tests + Percepta",
+      "method": "report fidelity against projections; print rendering",
+      "evidence": ["rendered report artifact at the deployed SHA"],
+      "freshness": [], "invalidatedBy": ["report projection change"],
+      "tooling": "Folio print-components test harness"
+    },
+    {
+      "id": "VR-DEPLOYMENT", "match": ["UI-015", "UI-040", "PF-020", "EXT-DATA-009", "STORAGE-007"], "gate": "G9", "owner": "Dokimos (deployed acceptance)",
+      "method": "deployed SHA equals verified SHA; successful acceptance job on the same SHA",
+      "evidence": ["deployment record", "acceptance job on the deployed SHA"],
+      "freshness": ["deployed SHA only"], "invalidatedBy": ["redeploy"],
+      "tooling": "deployed acceptance workflow; dokimos completion verify"
+    },
+    {
+      "id": "VR-PROCESS", "match": ["doc:docs/AGENT-DECISION-REDUCTION-PROFILE.md", "doc:docs/KICKOFF-EXECUTION-PACKET.md", "doc:docs/REHEARSAL-ACCEPTANCE-LEDGER.md", "regex:^R0\\.", "regex:^R1[34]\\.", "REQUIREMENTS§preamble"], "gate": "G10", "owner": "coordinator + Praxis work records",
+      "method": "process obligation shown by Praxis work items, checkpoints, provenance and measurements; never inferred",
+      "evidence": ["Praxis work item and checkpoint records", "measurement record (R4 section 5)"],
+      "freshness": [], "invalidatedBy": ["missing measurement recorded as a value (must be 'unavailable')"],
+      "tooling": "praxis work/checkpoint/provenance; Percepta telemetry metric ids"
+    },
+    {
+      "id": "VR-CATALOG", "match": ["origin:external"], "gate": "G4", "owner": "causa-data catalog verifiers",
+      "method": "catalog verification plus application load after Connect; no bundling in the application",
+      "evidence": ["historical-verify output", "historical_catalog.py verify --app <app checkout> output", "application load test at deployed SHA"],
+      "freshness": ["bound to the catalog manifest SHA-256 (CT-008)"], "invalidatedBy": ["catalog manifest change"],
+      "tooling": "dotnet causa.dll historical-verify .; python3 -I tools/py/historical_catalog.py verify . --app <app>"
+    }
+  ]
+}

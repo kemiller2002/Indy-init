@@ -50,11 +50,10 @@ python3 -I tools/build-requirements-baseline.py . 78277924cc2bfceb7c8bcfaeb55b6a
 - **Frozen copy of the baseline.** The Rehearsal 4 baseline is kept byte-identical at [`requirements/frozen/BL-CAUSA-INDY-INIT-aab8f80c7743.json`](../../requirements/frozen/BL-CAUSA-INDY-INIT-aab8f80c7743.json). Its SHA-256 was checked: `621e2f96…0857b9`, equal to the file at `1ede27f`.
 - **v1 package untouched.** `requirements-compiled/v1/` is not modified on this branch.
 - **Status of the document.** The new document says it does not apply to Rehearsal 4 and does not change Rehearsal 4's acceptance. Rehearsal 4's evidence names its baseline by id and SHA-256. Both still resolve to the same bytes.
-- **Reproducing the historical artifacts.** Use the tools at the historical commit. The generator's document list is in code, so the tools on this branch expect `docs/WASM-DIAGNOSTICS-REQUIREMENTS.md`, which does not exist at `aab8f80`. Run on this branch, the compiler's v1 `--check` exits 2 (input error: the document is unreadable at `aab8f80`). With the tools at `1ede27f`, both artifacts reproduce:
-  - `python3 -I tools/build-requirements-baseline.py . aab8f80c7743392e794b3b631542903ed4ed6f64`, run in a worktree at `1ede27f`, gives SHA-256 `621e2f96…0857b9`.
-  - The requirements-compiler, built at `1ede27f`, run with `--check` against `requirements-compiled/v1` (same options as its README), exits 0.
-
-  A lasting fix would make the document list depend on the source commit, for example by reading it from the tool at that commit. That is a compiler design change; it is not made here.
+- **Reproducing the historical artifacts.** The document lists are commit-aware. `docs/WASM-DIAGNOSTICS-REQUIREMENTS.md` is listed in `INTRODUCED_AFTER_REHEARSAL_4` (Python) and `introducedAfterRehearsal4` (F#). It is skipped at a source commit where it does not exist and required at every later commit. So the tools on this branch rebuild the Rehearsal 4 artifacts:
+  - `python3 -I tools/build-requirements-baseline.py <worktree at aab8f80> aab8f80c7743392e794b3b631542903ed4ed6f64` gives SHA-256 `621e2f96…0857b9`.
+  - `requirements-compiler baseline <worktree at aab8f80> aab8f80c…` gives the same bytes.
+  - The branch compiler's `--check` against `requirements-compiled/v1`, run with `--committed-baseline requirements/frozen/BL-CAUSA-INDY-INIT-aab8f80c7743.json`, exits 0.
 
 ## Effect on acceptance
 
@@ -66,20 +65,13 @@ python3 -I tools/build-requirements-baseline.py . 78277924cc2bfceb7c8bcfaeb55b6a
   - No obligation carries a value token. Each one needs a recorded human equivalence review, or an operator-approved disposition, before the preservation gate accepts it.
 - **Status.** Nothing is implemented or verified. In any future acceptance verdict, WASM-DIAG-001 is NOT_RUN until evidence for it exists. A preservation PASS would not count as that evidence (RDP-005).
 
-## Compiled package v2: not produced (blocked)
+## Compiled package v2
 
-The new package was to be compiled by the F# requirements-compiler into `requirements-compiled/v2/`, pinned to `78277924cc2b`. The compiler supports this with `--out`.
+[`requirements-compiled/v2/`](../../requirements-compiled/v2/README.md) is compiled from `78277924cc2b` by the F# requirements-compiler. Compilation verdict: **PASS** (V01–V17); rehearsal readiness: READY. Two compilations were byte-identical, and `--check` exits 0.
 
-**Curation.** The curation for the attempt was v1's, copied, with only `sources.json` → `indy-init.commit` changed to `78277924cc2bfceb7c8bcfaeb55b6ad3804490db`. The command was the v1 README's step 2, with `--curation requirements-compiled/v2/curation`.
+The first attempt failed V09 because the new requirement was in no work item. Two changes resolved it, and both are recorded here:
 
-**Result.** The compiler reports compilation **FAIL** (exit 3); rehearsal readiness is READY. One check fails:
-- V09 FAIL: "WASM-DIAG-001 is in no work item" and "WASM-DIAGNOSTICS§implementation is in no work item".
-- Every other check passes: V01–V08, V10–V13, V15–V17, and V14 (no baseline drift).
+1. **Work item T35**, added in v2's `curation/tasks.json` only: "WebAssembly runtime diagnostics configuration and reproducible diagnostic evidence (WASM-DIAG-001)". It covers the new document, depends on T16 (engine build) and T11 (stack lock), and is gated by G1. Its completion conditions restate the requirement's obligations. It is a planning entry for the next rehearsal, not a Rehearsal 4 task. The agent session added it, and the owner can revise it.
+2. **Package label.** `package-manifest.json` takes its `"package"` label from an optional `"package"` field in `curation/sources.json`. v2 sets `requirements-compiled/v2`. v1's curation has no such field and keeps the `requirements-compiled/v1` label, so v1's bytes are unchanged (`--check` exits 0).
 
-**Determinism.** Two compilations were byte-identical, and two `--check` runs found no differing file. Both `--check` runs exit 3 because the verdict is FAIL.
-
-**Why it was not committed.** Passing V09 needs the curation's `tasks.json` to place the new requirement in a work item, which is a planning judgement. v1's tasks are the Rehearsal 4 plan. For example, T16 covers `doc:docs/WASM-LOADING-EXPERIENCE-REQUIREMENTS.md`, but WASM-DIAG-001 explicitly does not apply to Rehearsal 4. Adding it to a task only to make the check pass would be forcing the check, so no v2 directory was committed.
-
-**Two decisions needed before v2 can be published:**
-1. Which work item covers WASM-DIAG-001 and `WASM-DIAGNOSTICS§implementation`. It could be a new task, or an existing one with its own completion conditions and gates. This is a v2 `tasks.json` change.
-2. The package label. The compiler writes `"package": "requirements-compiled/v1"` into `package-manifest.json` whatever `--out` is (`tools/requirements-compiler/src/Program.fs`). A v2 package would mislabel itself until that string comes from an input. One option is an optional `package` field in `curation/sources.json` that defaults to v1, so v1's bytes stay the same.
+**Open for the owner:** WASM-DIAG-001's priority. The heading carries no `[P#]` marker, so the generator records it as `unstated`. Making it mandatory would mean adding a marker such as `[P0]` to the heading, a requirement change to be decided and recorded by the owner.

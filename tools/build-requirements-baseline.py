@@ -32,6 +32,10 @@ import re
 import sys
 from pathlib import Path
 
+# Documents added after the Rehearsal 4 pin (BL-CAUSA-INDY-INIT-aab8f80c7743): skipped at a commit that
+# predates them, so earlier baselines still regenerate byte for byte; required at any later commit.
+INTRODUCED_AFTER_REHEARSAL_4 = {"docs/WASM-DIAGNOSTICS-REQUIREMENTS.md"}
+
 DOCUMENTS = [
     ("docs/CAUSA-UI-EXPERIENCE-REQUIREMENTS.md", "CAUSA-UI-EXPERIENCE", r"^## (UI-\d{3}):"),
     ("docs/WASM-LOADING-EXPERIENCE-REQUIREMENTS.md", "WASM-LOADING-EXPERIENCE", r"^## (WASM-LOAD-\d{3}):"),
@@ -158,6 +162,8 @@ def slug(text):
 def build(root, commit):
     documents, requirements, seen_ids = [], [], set()
     for path, key, pattern in DOCUMENTS:
+        if path in INTRODUCED_AFTER_REHEARSAL_4 and not (root / path).exists():
+            continue
         text = normalize((root / path).read_text(encoding="utf-8"))
         lines = [line.rstrip() for line in text.split("\n")]
         regex = re.compile(pattern if pattern else r"(?!x)x")

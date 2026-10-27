@@ -378,7 +378,8 @@ let buildPackage (o: Options) : Built =
     let manifest =
         JObj
             [ "schema", JStr "indy-init.requirements-package/1"
-              "package", JStr "requirements-compiled/v1"
+              // The package's own label (curation/sources.json "package"); v1's curation has none.
+              "package", JStr(field "package" curation.Sources |> Option.map (function JStr s -> s | _ -> "requirements-compiled/v1") |> Option.defaultValue "requirements-compiled/v1")
               "source",
               JObj
                   [ "repository", JStr(str "repository" source)

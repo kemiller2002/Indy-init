@@ -30,6 +30,11 @@ let documents: (string * string * string option) list =
       "docs/REHEARSAL-AGENT-INTERFACE-FREEZE.md", "REHEARSAL-AGENT-INTERFACE-FREEZE", None
       "docs/REHEARSAL-ACCEPTANCE-LEDGER.md", "REHEARSAL-ACCEPTANCE-LEDGER", None ]
 
+/// Documents added after the Rehearsal 4 pin (BL-CAUSA-INDY-INIT-aab8f80c7743). At a source commit that predates
+/// one of them it is skipped, so the baseline and package of that commit still rebuild byte for byte with these
+/// tools; at any later commit it is required like every other document.
+let introducedAfterRehearsal4 = set [ "docs/WASM-DIAGNOSTICS-REQUIREMENTS.md" ]
+
 let private excludedSections =
     set
         [ "docs/REHEARSAL-DEPENDENCY-LOCK.md", "## Current observed historical baseline (NOT a recommended target)"
@@ -217,7 +222,10 @@ let build (read: string -> string) (commit: string) : Json =
 
         document :: docs, docReqs, seen'
 
-    let docs, reqs, _ = documents |> List.fold folder ([], [], Set.empty)
+    let present (path: string, _, _) =
+        not (introducedAfterRehearsal4.Contains path) || (try read path |> ignore; true with _ -> false)
+
+    let docs, reqs, _ = documents |> List.filter present |> List.fold folder ([], [], Set.empty)
 
     JObj
         [ "schema", JStr "praxis.requirements-baseline/1"
