@@ -1,0 +1,89 @@
+{
+ "schema": "indy-init.r5-frozen-preflight/1",
+ "frozenAt": "2026-10-27T19:51:59Z",
+ "status": "frozen before the timed run; awaiting operator authorization to start the clock",
+ "requirementsBaseline": {
+  "id": "BL-CAUSA-INDY-INIT-aab8f80c7743",
+  "sourceCommit": "aab8f80c7743392e794b3b631542903ed4ed6f64",
+  "sha256": "621e2f960038dcfb0daa2a9fe18a0c1c350faed297ba2856da1236a0360857b9",
+  "repin": "none: rebuilt at 9af35db it equals the aab8f80 pin requirement for requirement (461 requirements, 108 P0, conflicts equal)"
+ },
+ "compiledPackage": {
+  "path": "requirements-compiled/v1",
+  "packageManifestSha256": "b771cd401e76f103f517916056f29e5a046819f7d5754e3ee77e556d3156db59",
+  "compilation": "PASS V01-V18, --check byte-identical"
+ },
+ "verificationPlan": {
+  "path": "requirements-compiled/v1/verification-plan.json",
+  "planId": "VP-e77a2134e1b0",
+  "digest": "sha256:e77a2134e1b014539fd5e585a6c440debee03074dc274e3496c60b0e7c3b2942",
+  "fileSha256": "f79efdfacb0167ec4e089c40a46279165d451ac8d5478e60ad938f94805e3356",
+  "scope": "108 P0 requirements, 326 obligations; every obligation's test identity is 'missing' until Rehearsal 5 binds tests in curation/verification-plan.json testBindings",
+  "note": "approvals pin moved from kickoff/rehearsal-004 to kickoff/rehearsal-005/approvals.causa.json @295bc647 (same bytes); planId changed from VP-d1efaf695ef4 for that reason only"
+ },
+ "approvedExclusions": {
+  "decision": "none",
+  "requirements": []
+ },
+ "operatorApprovals": {
+  "file": "kickoff/rehearsal-005/approvals.json",
+  "sha256": "711859d610ee6af1174aa33ebc6455ec77a7d107af02aa3fe80da0003616c011",
+  "verifierFile": "kickoff/rehearsal-005/approvals.causa.json",
+  "verifierSha256": "3e70dcd2e87811c4f3744ee97585855639741c3ba7a63d98f4b842c7e86bace7",
+  "trustedId": "kemiller2002",
+  "deviation": "agent wrote the approvals files on the owner's instruction 'You write the approval files' (RDP-003); see kickoff/rehearsal-005/README.md",
+  "equivalenceReviews": "added during Rehearsal 5 untimed setup, after the rehearsal-repository derivation (R4: T07/T09)"
+ },
+ "dependencies": {
+  "releaseSet": "echelon-current 1.29.0, approved (echelon-registry 402bec21, sets/echelon-current/1.29.0.json sha256 d078ca7a17303e2ef38f37b7fd33474193736baf29ccdc3cc078953df1a376d9; linux-x64 set sha256 d3774e7a24c0df9728ec2fcec197aa2582cfc612c642342c800d64aa4583a290)",
+  "repositoryLock": {
+   "praxis": "3.22.0",
+   "ordo": "1.18.0",
+   "percepta": "0.1.0",
+   "aegis": "1.0.0",
+   "limen": "0.9.0",
+   "forma": "0.9.0",
+   "folio": "0.4.1",
+   "lockSha256": "pending: produced by the Conditor bootstrap commit in indy-init-rehearsal-005 (PRE-TOOL-03)"
+  },
+  "hostTools": {
+   "praxis": "3.22.0 (praxis-linux-x64.tar.gz sha256 36edb44b058e417b2e8e6ad321f9f9090ed408b32921ed36489b81cc085745c0)",
+   "ordo": "1.18.0",
+   "dokimos": "0.8.0",
+   "perceptaSemantic": "0.3.0",
+   "perceptaRepo": "0.1.0",
+   "strata": "0.1.1",
+   "conditor": "0.10.14 (conditor-linux-x64 sha256 40ce13f8f7e43757da4d6e7a5ac89c00c47889bb2c8f32788ecd100f435c0f6d; qualifies echelon-current 1.29.0, conditor#114)",
+   "dotnetSdk": "10.0.402",
+   "dotnetWorkloads": "wasm-tools (Conditor profile fsharp-limen-wasm: all prerequisites satisfied on the prep host)"
+  }
+ },
+ "persistenceVerification": {
+  "reference": "requirements-compiled/v1/readiness/evidence/t05-persistence-verification.json (indy-init-rehearsal-003 run 40352698801)",
+  "note": "historical evidence; not proof the new application works. The owner reports the Rehearsal 5 token secret is saved; confirmed by the first CI job that uses it"
+ },
+ "preflight": {
+  "local": "requirements-compiled/v1/readiness/evidence/preflight-run-r5-local.json (9af35db+): 12 PASS, 0 FAIL",
+  "records": {
+   "PRE-AUTH-01/02": "secret saved by the owner on indy-init-rehearsal-005 (2026-10-27, value never read); BLOCKED/NOT_RUN locally because the secret exists only in CI; confirmed by the first CI job that uses it",
+   "PRE-REQ-04": "NOT_RUN: produced in indy-init-rehearsal-005 during untimed setup (praxis requirements preservation verify exit 0, evidence committed there)",
+   "PRE-TOOL-03": "NOT_RUN: bootstrap commit in indy-init-rehearsal-005 by Conditor 0.10.14 on echelon-current 1.29.0; first green CI starts the timer",
+   "PRE-ORG-01": "NOT_RUN, event only",
+   "pagesSettings": "owner action: Pages source = GitHub Actions and the github-pages environment allows main, before kickoff (both changed mid-run in Rehearsal 4)"
+  }
+ },
+ "rehearsalRepository": {
+  "name": "kemiller2002/indy-init-rehearsal-005",
+  "mainSha": "52e9a74c870804eb72936439fbf79c651ef348c1",
+  "state": "initial commit, README.md only; untouched during preparation"
+ },
+ "executionEnvironment": {
+  "host": "Claude cloud session, linux-x64",
+  "agent": "Claude Code",
+  "capabilities": [
+   "api.nuget.org reachable: local F# and WebAssembly builds work (Rehearsal 4 could only build them in CI)",
+   "Chromium and Playwright available for browser verification"
+  ]
+ },
+ "operatorAuthorization": "pending: the Rehearsal 5 clock starts only on the owner's explicit authorization"
+}
