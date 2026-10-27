@@ -1,11 +1,11 @@
 {
   "schema": "indy-init.rehearsal-freeze/1",
   "sources": {
-    "indyInit": "8b79fe4290645d5eb3461b40d27da8439bc9a791",
+    "indyInit": "f7eeb3afa50adf0466a23b493c22db81835dcf05",
     "registry": "31086664ddaf18fd827bb0276394aea82735620d",
     "rehearsalTooling": {
       "ref": "origin/r5/integration",
-      "commit": "bd677bba80b2d2ca96053904132c265fcd46bd41"
+      "commit": "7748690dd0400ad1d283d943e6c5a6c533941c3c"
     }
   },
   "requirementsBaseline": {
