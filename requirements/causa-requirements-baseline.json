@@ -1,9 +1,9 @@
 {
   "schema": "praxis.requirements-baseline/1",
-  "id": "BL-CAUSA-INDY-INIT-aab8f80c7743",
+  "id": "BL-CAUSA-INDY-INIT-78277924cc2b",
   "source": {
     "repository": "kemiller2002/indy-init",
-    "commit": "aab8f80c7743392e794b3b631542903ed4ed6f64",
+    "commit": "78277924cc2bfceb7c8bcfaeb55b6ad3804490db",
     "documents": [
       {
         "path": "docs/CAUSA-UI-EXPERIENCE-REQUIREMENTS.md",
@@ -86,6 +86,11 @@
         "path": "docs/AGENT-RELIABILITY-REQUIREMENTS.md",
         "sha256": "92ce61dce8f12fee2c337498f20d5d364a97ba4ee070f920de89cc36d600bd46",
         "requirementPattern": "^\\*\\*(AR-\\d{3}) "
+      },
+      {
+        "path": "docs/WASM-DIAGNOSTICS-REQUIREMENTS.md",
+        "sha256": "8108a07bda1c9bf4cac665ea088e1d564ff53734becf944136d5f0ff25de9933",
+        "requirementPattern": "^## (WASM-DIAG-\\d{3}):"
       },
       {
         "path": "docs/REHEARSAL-AGENT-INTERFACE-FREEZE.md",
@@ -15353,6 +15358,86 @@
           "id": "AGENT-RELIABILITY§reconciliation-O3",
           "kind": "constraint",
           "text": "These requirements do not establish that any release or implementation is complete."
+        }
+      ]
+    },
+    {
+      "id": "WASM-DIAG-001",
+      "title": "Runtime diagnostics for the .NET WebAssembly engine",
+      "priority": "unstated",
+      "document": "docs/WASM-DIAGNOSTICS-REQUIREMENTS.md",
+      "heading": "## WASM-DIAG-001: Runtime diagnostics for the .NET WebAssembly engine",
+      "sectionSha256": "772ef091e8125848043fe42d5b07e327d732a94e058d3919a17ed7334725d03b",
+      "obligations": [
+        {
+          "id": "WASM-DIAG-001-O1",
+          "kind": "constraint",
+          "text": "The build MUST provide a diagnostics configuration of the .NET WebAssembly engine that enables Microsoft's EventPipe diagnostics (EnableDiagnostics, EventSourceSupport and MetricsSupport), so that managed heap dumps, CPU samples and metrics can be collected with the runtime's documented browser APIs."
+        },
+        {
+          "id": "WASM-DIAG-001-O2",
+          "kind": "constraint",
+          "text": "The diagnostics configuration MUST NOT be the deployed production build."
+        },
+        {
+          "id": "WASM-DIAG-001-O3",
+          "kind": "constraint",
+          "text": "A runtime failure MUST be capturable with browser developer tools, including the JavaScript and WebAssembly call stack of the failure, using an unstripped native runtime or its symbol map so that WebAssembly frames can be named."
+        },
+        {
+          "id": "WASM-DIAG-001-O4",
+          "kind": "constraint",
+          "text": "Managed memory diagnostics MUST include heap dumps and garbage-collection activity before and after the failing operation where the runtime supports them."
+        },
+        {
+          "id": "WASM-DIAG-001-O5",
+          "kind": "constraint",
+          "text": "Runtime performance profiling MUST be available through EventPipe CPU sampling or browser performance profiling, and each capture MUST record its duration and the operation it covers."
+        },
+        {
+          "id": "WASM-DIAG-001-O6",
+          "kind": "constraint",
+          "text": "Exceptions and runtime failures MUST be captured with the exception type, message and stack, and the engine's state after the failure (usable or stopped) MUST be recorded."
+        },
+        {
+          "id": "WASM-DIAG-001-O7",
+          "kind": "constraint",
+          "text": "Every diagnostic record MUST identify the .NET SDK, runtime and WebAssembly workload versions, the build configuration and execution mode (interpreter or AOT, and runtime options), the browser name and version, and the exact source commit."
+        },
+        {
+          "id": "WASM-DIAG-001-O8",
+          "kind": "constraint",
+          "text": "Diagnostic evidence MUST be reproducible: the inputs, the build variant and the commands that produced it MUST be recorded so that another person can repeat the capture and obtain comparable results."
+        },
+        {
+          "id": "WASM-DIAG-001-O9",
+          "kind": "constraint",
+          "text": "Diagnostic artifacts MUST be handled as sensitive: they MUST NOT contain credentials or tokens, MUST be scanned for token-shaped strings before they are uploaded or published, and MUST NOT be kept in public locations longer than needed."
+        },
+        {
+          "id": "WASM-DIAG-001-O10",
+          "kind": "acceptance",
+          "text": "Where practical, the capture and its checks MUST run automatically in CI, on a branch or workflow that does not affect the acceptance pipeline; where automation is not practical, the reason MUST be recorded."
+        }
+      ]
+    },
+    {
+      "id": "WASM-DIAGNOSTICS§implementation",
+      "title": "Implementation",
+      "priority": "unstated",
+      "document": "docs/WASM-DIAGNOSTICS-REQUIREMENTS.md",
+      "heading": "## Implementation",
+      "sectionSha256": "965edcf82178b1ecbe0fca324d5745c455029f679b95e1e9c1b665c045254e36",
+      "obligations": [
+        {
+          "id": "WASM-DIAGNOSTICS§implementation-O1",
+          "kind": "constraint",
+          "text": "Place implementation work items in the target repository's documented Praxis input folder, not GitHub Issues."
+        },
+        {
+          "id": "WASM-DIAGNOSTICS§implementation-O2",
+          "kind": "constraint",
+          "text": "This document adds requirements only; it does not assert that any build has implemented them."
         }
       ]
     },

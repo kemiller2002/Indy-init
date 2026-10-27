@@ -9,18 +9,27 @@ rehearsal must use it is defined in
 
 | | |
 |---|---|
-| Baseline id | `BL-CAUSA-INDY-INIT-aab8f80c7743` |
-| Pinned commit | `aab8f80c7743392e794b3b631542903ed4ed6f64`, the Rehearsal 4 kickoff re-pin (T01, OD-INDY-6), moved from `a9df7ad` after the PRE-SEC-01 fixture fix. No drift from the previous pin `c751d58d66e3f105a8c67a0cb5e069314bdbd391`: every requirement, obligation and document hash is identical; only the commit identity changes. Earlier pins: `2edaea4f65ba` (F-001/F-006) and `002d8ba6e986`, which lacked AR-019..AR-026 (F-003). Re-pin at the Rehearsal 4 kickoff commit (OD-INDY-6) |
-| Documents | 19, each pinned by SHA-256 |
-| Requirements | 461 |
-| Obligations | 2293: 378 `acceptance`, 55 `value`, 1860 `constraint` |
+| Baseline id | `BL-CAUSA-INDY-INIT-78277924cc2b` |
+| Pinned commit | `78277924cc2bfceb7c8bcfaeb55b6ad3804490db`, the post-Rehearsal 4 re-pin that adds `docs/WASM-DIAGNOSTICS-REQUIREMENTS.md` (WASM-DIAG-001, defect D-HIST-WASM; see [`docs/decisions/2026-10-27-WASM-DIAG-001-baseline.md`](../docs/decisions/2026-10-27-WASM-DIAG-001-baseline.md)). Against the previous pin every existing requirement, obligation and document hash is identical; the change adds one document and its two requirements (WASM-DIAG-001 and `WASM-DIAGNOSTICS§implementation`). |
+| SHA-256 | `acbb0996c7c54f6ce4f98a0834a3164ba5d2fc1e72ccb580e300e1955092bce3` |
+| Previous pin (Rehearsal 4, frozen) | `BL-CAUSA-INDY-INIT-aab8f80c7743`, SHA-256 `621e2f960038dcfb0daa2a9fe18a0c1c350faed297ba2856da1236a0360857b9`, kept byte-identical at [`frozen/BL-CAUSA-INDY-INIT-aab8f80c7743.json`](frozen/BL-CAUSA-INDY-INIT-aab8f80c7743.json). Pinned commit `aab8f80c7743392e794b3b631542903ed4ed6f64`, the Rehearsal 4 kickoff re-pin (T01, OD-INDY-6), moved from `a9df7ad` after the PRE-SEC-01 fixture fix. No drift from the previous pin `c751d58d66e3f105a8c67a0cb5e069314bdbd391`: every requirement, obligation and document hash is identical; only the commit identity changes. Earlier pins: `2edaea4f65ba` (F-001/F-006) and `002d8ba6e986`, which lacked AR-019..AR-026 (F-003). Re-pin at the Rehearsal 4 kickoff commit (OD-INDY-6) |
+| Documents | 20, each pinned by SHA-256 |
+| Requirements | 463 |
+| Obligations | 2305: 379 `acceptance`, 55 `value`, 1871 `constraint` |
 | Regenerate | `python3 -I tools/build-requirements-baseline.py . <commit> > requirements/causa-requirements-baseline.json` |
 | Tests | `python3 tools/test-requirements-baseline.py` (run by the preflight-tooling workflow) |
 
 The script is deterministic: run twice, it produces byte-identical output.
-Against this checkout at the pinned commit, the Praxis gate reports no
-`baseline-invalid` and no drift findings, and one `disposition-missing`
-finding per requirement when the disposition is empty.
+Against the Rehearsal 4 checkout at its pinned commit, the Praxis gate reported
+no `baseline-invalid` and no drift findings, and one `disposition-missing`
+finding per requirement when the disposition is empty. The gate has not been
+re-run against the current pin.
+
+Rehearsal 4's evidence identifies its baseline by id and SHA-256. The frozen
+copy in `frozen/` keeps those exact bytes available on the current branch (they
+also remain at every earlier commit), and it is never regenerated or edited. A later baseline is regenerated into
+`causa-requirements-baseline.json`, and the baseline it replaces is first
+copied byte for byte into `frozen/<baseline id>.json`.
 
 ## Documents in the baseline
 
