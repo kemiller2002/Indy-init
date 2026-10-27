@@ -1,6 +1,7 @@
 # Rehearsal 4: write-path dress rehearsal (plan)
 
 **Status:** PLAN, not executed. Kickoff needs both preconditions in §2. The owner starts the run.
+**Result:** executed on 2026-10-27. The computed verdict was FAILED (NOT ACCEPTED): [REHEARSAL-004-RESULTS.md](REHEARSAL-004-RESULTS.md). This plan is kept as it stood before the run.
 **Authority:** [OWNER-DECISIONS-2026-10-24.md](OWNER-DECISIONS-2026-10-24.md) (OD-INDY-1, -6, -7, -8).
 **Inherits:** R3-DV-001..017 from [REHEARSAL-003-DEFERRED-VERIFICATION-EXPERIMENT.md](REHEARSAL-003-DEFERRED-VERIFICATION-EXPERIMENT.md),
 except where this plan says otherwise.
