@@ -1,0 +1,80 @@
+{
+  "schema": "indy-init.r4-frozen-preflight/1",
+  "frozenAt": "2026-10-27T06:04:14Z",
+  "status": "frozen before the timed run",
+  "requirementsBaseline": {
+    "id": "BL-CAUSA-INDY-INIT-aab8f80c7743",
+    "sourceCommit": "aab8f80c7743392e794b3b631542903ed4ed6f64",
+    "sha256": "621e2f960038dcfb0daa2a9fe18a0c1c350faed297ba2856da1236a0360857b9",
+    "repinCommit": "45c9657"
+  },
+  "compiledPackage": {
+    "path": "requirements-compiled/v1",
+    "packageManifestSha256": "0cd4c3f5fe8d167e41b9d06a8c582f72bee71dd572810b36ce457fac1e42ace7",
+    "compilation": "PASS V01-V17, --check byte-identical"
+  },
+  "approvedExclusions": {
+    "decision": "APR-R4-001 (OD-INDY-11, DEC-022: T27, T28)",
+    "requirements": [
+      "KICKOFF-EXECUTION-PACKET§12-45",
+      "KICKOFF-EXECUTION-PACKET§2-45",
+      "KICKOFF-EXECUTION-PACKET§ai-tool-agent",
+      "S14",
+      "S15"
+    ]
+  },
+  "operatorApprovals": {
+    "file": "kickoff/rehearsal-004/approvals.json",
+    "sha256": "f893adea3d38b19ee310a31a91624fccd17ea7140337a9bec7b33b1a869ddf56",
+    "reviews": "kickoff/rehearsal-004/equivalence-reviews.json sha256 164fc216e05c9a64347f55e634b4939fec8393790fbd15c711303af9e43bc448",
+    "trustedId": "kemiller2002",
+    "deviation": "agent transcription of the owner chat approval (RDP-003); see kickoff/rehearsal-004/README.md"
+  },
+  "dependencies": {
+    "releaseSet": "echelon-current 1.28.0 (echelon-registry e6d8a734, linux-x64 set sha256 5aee6c3c355dbb1b556d7a1dba9db80ece9c88862f31239c3558c441bb7abc67)",
+    "repositoryLock": {
+      "praxis": "3.21.0",
+      "ordo": "1.17.0",
+      "percepta": "0.1.0",
+      "aegis": "1.0.0",
+      "limen": "0.9.0",
+      "forma": "0.9.0",
+      "folio": "0.4.1",
+      "lockSha256": "719be140d921aef052c51b443b867c370af04b9f0a806f1e8e19979b3d3c2337"
+    },
+    "hostTools": {
+      "praxis": "3.21.0 (praxis-linux-x64.tar.gz sha256 eae9c427460468cc1e01f6951684e72fc4fe882ab1982e60d90d1aeb9afd3eef)",
+      "ordo": "1.17.0",
+      "dokimos": "0.7.0",
+      "perceptaSemantic": "0.2.1",
+      "perceptaRepo": "0.1.0",
+      "strata": "0.1.1",
+      "conditor": "0.10.13 (conditor-linux-x64 sha256 64bbd566a982734691616d0e31785b65b0a5c73c2031b684fd19bade80ac5d0e; preset fix conditor#112, WI-0054)",
+      "dotnetSdk": "10.0.402"
+    }
+  },
+  "persistenceVerification": {
+    "reference": "requirements-compiled/v1/readiness/evidence/t05-persistence-verification.json (indy-init-rehearsal-003 run 40352698801)",
+    "note": "historical T05 evidence; not proof the new application works"
+  },
+  "preflight": {
+    "local": "requirements-compiled/v1/readiness/evidence/preflight-run-r4-local.json (aab8f80): 12 PASS",
+    "records": {
+      "PRE-SEC-01": "PASS after fixture fix 1e521d3",
+      "PRE-REQ-04": "PASS: rehearsal-004 preflight/t07-derivation 3a5248d, Praxis gate exit 0",
+      "PRE-TOOL-03": "bootstrap commit e0cc0430743c15b43550f00d606c1e63d55a5a3c; first green CI starts the timer",
+      "PRE-AUTH-01/02": "secret set by the owner on rehearsal-004 (2026-10-27 01:58 EDT, value never read); confirmed by the first CI job that uses it",
+      "PRE-ORG-01": "NOT_RUN, event only"
+    }
+  },
+  "rehearsalRepository": "kemiller2002/indy-init-rehearsal-004",
+  "executionEnvironment": {
+    "host": "Claude cloud session, linux-x64",
+    "agent": "claude-opus-5-5 (Claude Code)",
+    "limits": [
+      "api.nuget.org unreachable from the session: builds and tests verified through CI",
+      "GitHub API limited to attached repositories"
+    ]
+  },
+  "operatorAuthorization": "owner instructed the run to start (2026-10-26 20:48/20:50 EDT; option B 2026-10-27 01:49 EDT; 01:54 EDT)"
+}
