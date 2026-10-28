@@ -35,19 +35,6 @@ let private gapJson (g: Gap) =
 
 let private contract (o: Json) = field "acceptanceContract" o |> Option.defaultValue (JObj [])
 
-/// A binding the verifiers can check: a process or owner binding names a known Praxis record kind (owner evidence
-/// only `praxis:owner-approval`), a Praxis id with kind `review` is only `praxis:independent-review`, and no other
-/// kind may use a Praxis id. The same rules compilation applies; the gate repeats them for a plan it is handed.
-let private validProducer (t: Json) =
-    let id = strOpt "id" t |> Option.defaultValue ""
-    let praxis = id.StartsWith(ProcessVerification.bindingPrefix, StringComparison.Ordinal)
-    let kind = if praxis then id.Substring ProcessVerification.bindingPrefix.Length else ""
-    match strOpt "kind" t with
-    | Some "process" -> praxis && List.contains kind ProcessVerification.recordKinds
-    | Some "owner" -> kind = "owner-approval"
-    | Some "review" when praxis -> kind = "independent-review"
-    | _ -> not praxis
-
 /// Every unresolved (obligation, category) of the plan's mandatory scope.
 let gaps (plan: Json) : Gap list =
     arr "requirements" plan
@@ -76,7 +63,7 @@ let gaps (plan: Json) : Gap list =
                     let declaring = tests |> List.filter (fun t -> List.contains cat (strs "categories" t))
                     let isProcess = classOf cat = "process" || classOf cat = "owner"
                     if declaring.IsEmpty then Some(gap cat (if isProcess then "no-bound-producer" else "no-bound-test"))
-                    elif declaring |> List.forall (validProducer >> not) then Some(gap cat "invalid-producer")
+                    elif declaring |> List.forall (ProcessVerification.admissible plan cat >> not) then Some(gap cat "invalid-producer")
                     else None)))
 
 /// Problems with the readiness rules themselves. A permit that matches no gap is stale and is a problem: the

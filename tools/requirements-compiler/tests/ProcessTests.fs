@@ -78,6 +78,27 @@ let private executionOfKind (k: string) (f: Fixture) =
 
 let private append (p: Json -> bool) (g: Json -> Json) (f: Fixture) = { f with Events = f.Events @ (f.Events |> List.filter p |> List.map g) }
 
+/// Re-seals an edited plan with its own correct identity: the plan a careless curator might freeze.
+let private reseal (plan: Json) =
+    let digest = VerificationPlan.digestOf plan
+    match plan with
+    | JObj ps -> JObj(ps |> List.map (fun (k, v) -> if k = "planIdentity" then k, setPath [ "digest" ] (JStr digest) v else k, v))
+    | p -> p
+
+/// The plan with one obligation's bound tests replaced.
+let private rebind (obligation: string) (tests: Json list) (plan: Json) =
+    let mapList key f j = match field key j with
+                          | Some(JArr xs) -> setPath [ key ] (JArr(List.map f xs)) j
+                          | _ -> j
+    plan
+    |> mapList "requirements" (mapList "obligations" (fun o ->
+        if strOpt "sourceObligation" o = Some obligation then setPath [ "acceptanceContract"; "testIdentity"; "tests" ] (JArr tests) o else o))
+    |> reseal
+
+let private mapAttestation (reference: string) (g: Json -> Json) (f: Fixture) =
+    let mapped = arr "attestations" f.Attestations |> List.map (fun a -> if strOpt "reference" a = Some reference then g a else a)
+    { f with Attestations = setPath [ "attestations" ] (JArr mapped) f.Attestations }
+
 /// (name, the diagnostic it must produce, the mutated fixture, the change to the plan under test)
 let controls (plan: Json) (f: Fixture) : (string * string * Fixture * Json) list =
     let implementer = "example/implementing-agent"
@@ -128,7 +149,36 @@ let controls (plan: Json) (f: Fixture) : (string * string * Fixture * Json) list
       (match plan with
        | JObj ps -> JObj(ps @ [ "edited", JBool true ])
        | p -> p)
-      one "self-supplied process rules" "INVALID" { f with Rules = setPath [ "reviewers" ] (jstrs [ implementer ]) f.Rules; RulesSha256 = "0" } ]
+      one "self-supplied process rules" "INVALID" { f with Rules = setPath [ "agents" ] (jstrs [ implementer; "example/review-agent" ]) f.Rules; RulesSha256 = "0" }
+      // Second independent review: a review is anchored outside the log, decisions cover exactly what they name, and
+      // the latest word wins for rejections, test results and release selections.
+      one "a review written into the log without its attestation" "UNATTESTED-REVIEW" (mapWhere (isKind "independent-review") (setPath [ "statement"; "attestation" ] JNull) f)
+      one "a review citing someone else's attestation" "SELF-ACCEPTANCE" (mapWhere (isKind "independent-review") (setPath [ "statement"; "attestation" ] (JStr "github-review:kemiller2002/simulated-rehearsal#1@1001")) f)
+      one "a review attested for an older commit" "STALE-REVIEW" (mapAttestation "kemiller2002/simulated-rehearsal#2@2001" (setPath [ "commit" ] (JStr parent)) f)
+      one
+          "one owner approval cited for a broader scope change"
+          "UNAPPROVED-SCOPE-CHANGE"
+          (append (isKind "scope-change") (setPath [ "statement"; "subjects" ] (jstrs [ "**/*" ])) f)
+      one
+          "an owner rejection without an attestation"
+          "UNAPPROVED-SCOPE-CHANGE"
+          (append (isKind "owner-approval") (setPath [ "statement"; "outcome" ] (JStr "rejected") >> setPath [ "statement"; "attestation" ] JNull) f)
+      one "a later failed test from the trusted run" "TEST-NOT-PASSED" (append (isKind "test-result") (setPath [ "statement"; "outcome" ] (JStr "fail")) f)
+      one "a later release selection of another candidate" "RELEASE-SUPERSEDED" (append (isKind "release-selection") (setPath [ "statement"; "candidate" ] (JStr otherSha)) f)
+      "an owner-decision category bound to a record kind that cannot provide it",
+      "UNBOUND-PROCESS-EVIDENCE",
+      drop (isKind "owner-approval") f,
+      rebind "AR-024-O1" [ JObj [ "id", JStr "praxis:checkpoint"; "kind", JStr "process"; "categories", jstrs [ "owner-decision" ] ] ] plan ]
+
+/// Record-level controls: the record never qualifies, whatever obligation it would serve.
+let recordControls (f: Fixture) : (string * string * Fixture) list =
+    let implementer = "example/implementing-agent"
+    [ "the implementer recording the final disposition",
+      "TRANSCRIBED-DECISION",
+      mapWhere (isKind "final-disposition") (setPath [ "actor"; "id" ] (JStr implementer) >> setPath [ "provenance"; "class" ] (JStr "agent-assertion")) f
+      "a final disposition attested for another commit",
+      "UNATTESTED-DISPOSITION",
+      mapAttestation "kemiller2002/simulated-rehearsal#3@3001" (setPath [ "commit" ] (JStr otherSha)) f ]
 
 let private codesOf (assessment: Json) =
     (if str "verdict" assessment = "INVALID" then [ "INVALID" ] else [])
@@ -156,6 +206,12 @@ let simulation (source: string) (buildPlan: Json -> Json) : Json * string list =
         |> List.map (fun (name, code, mutated, plan) ->
             let a = ProcessVerification.assess (inputs plan mutated)
             name, code, a)
+    let recordResults =
+        recordControls f
+        |> List.map (fun (name, code, mutated) ->
+            let a = ProcessVerification.assess (inputs proposedPlan mutated)
+            let codes = arr "records" a |> List.filter (fun r -> boolOr "qualifies" true r |> not) |> List.collect (arr "diagnostics") |> List.map (str "code")
+            name, code, List.contains code codes)
     let readiness plan = PlanReadiness.assess plan (VerificationPlan.digestOf plan) None
     let withRules plan rules = PlanReadiness.assess plan (VerificationPlan.digestOf plan) (Some(rules, "pinned", "pinned"))
     let summaryOf (a: Json) = field "summary" a |> Option.defaultValue JNull
@@ -167,6 +223,13 @@ let simulation (source: string) (buildPlan: Json -> Json) : Json * string list =
               yield sprintf "process simulation positive: %d obligations decided, the proposal binds %d" (arr "obligations" positive).Length (arr "testBindings" proposal).Length
           if str "verdict" noBindings = "VERIFIED" then yield "process simulation: the committed plan (no producer bindings) verified process evidence"
           if VerificationPlan.processRecordKinds <> ProcessVerification.recordKinds then yield "process record kinds differ between VerificationPlan and ProcessVerification"
+          for (name, code, caught) in recordResults do
+              if not caught then yield sprintf "process record control '%s': no record carries %s" name code
+          // The gate repeats compilation's kind rules: an application test cannot resolve an owner-decision category.
+          let misbound = rebind "AR-024-O1" [ JObj [ "id", JStr "dotnet:Some.Test"; "kind", JStr "deterministic"; "categories", jstrs [ "owner-decision"; "independent-acceptance" ] ] ] proposedPlan
+          let misboundGate = PlanReadiness.assess misbound (VerificationPlan.digestOf misbound) None
+          if arr "unresolved" misboundGate |> List.exists (fun g -> strOpt "obligation" g = Some "AR-024-O1" && strOpt "category" g = Some "owner-decision" && strOpt "reason" g = Some "invalid-producer") |> not then
+              yield "readiness: an application test was accepted as an owner-decision producer"
           for (name, code, a) in results do
               if str "verdict" a = "VERIFIED" then yield sprintf "process control '%s': verdict VERIFIED" name
               if not (List.contains code (codesOf a)) then yield sprintf "process control '%s': expected %s, got %A" name code (codesOf a)
@@ -217,6 +280,7 @@ let simulation (source: string) (buildPlan: Json -> Json) : Json * string list =
                   [ "committedPlan", JObj [ "verdict", JStr(str "verdict" (readiness committedPlan)); "summary", summaryOf (readiness committedPlan) ]
                     "withProposedProcessBindings", JObj [ "verdict", JStr(str "verdict" (readiness proposedPlan)); "summary", summaryOf (readiness proposedPlan) ] ]
               "positive", JObj [ "verdict", JStr(str "verdict" positive); "summary", summaryOf positive ]
+              "recordControls", recordResults |> List.map (fun (name, code, caught) -> JObj [ "control", JStr name; "expected", JStr code; "pass", JBool caught ]) |> JArr
               "withoutBindings", JObj [ "verdict", JStr(str "verdict" noBindings); "summary", summaryOf noBindings ]
               "controls",
               results

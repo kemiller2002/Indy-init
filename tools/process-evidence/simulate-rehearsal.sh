@@ -57,7 +57,7 @@ run_as impl work checkpoint --id WI-0001 --summary "Engine slice pushed" --next-
 run_as impl work evidence --id WI-0001 --kind scope-change --summary "Add src/engine/Replay.fs to the owned paths" \
   --subject src/engine/Replay.fs --decision DEC-SIM-001 --occurred-at "$(now)"
 run_as owner work evidence --id WI-0001 --kind owner-approval --summary "Owner approves the scope change" \
-  --subject DEC-SIM-001 --outcome approved --attestation "github-review:kemiller2002/simulated-rehearsal#1@1001" --occurred-at "$(now)"
+  --subject DEC-SIM-001 --subject src/engine/Replay.fs --outcome approved --attestation "github-review:kemiller2002/simulated-rehearsal#1@1001" --occurred-at "$(now)"
 commit_push "praxis state"
 candidate=$(g rev-parse HEAD)
 
@@ -70,9 +70,9 @@ run_as ci work evidence --id WI-0001 --kind acceptance-reference --summary "Acce
   --candidate "$candidate" --reference "evidence/acceptance/run-9000000001/verdict.json" --occurred-at "$(now)"
 run_as reviewer work start --id WI-0002 --type review --role review --occurred-at "$(now)"
 run_as reviewer work evidence --id WI-0002 --kind independent-review --summary "Adversarial review of the candidate: no blocking findings" \
-  --candidate "$candidate" --outcome approved --subject WI-0001 --occurred-at "$(now)"
+  --candidate "$candidate" --outcome approved --subject WI-0001 --attestation "github-review:kemiller2002/simulated-rehearsal#2@2001" --occurred-at "$(now)"
 run_as owner work evidence --id WI-0001 --kind final-disposition --summary "Owner accepts the candidate" \
-  --candidate "$candidate" --outcome accepted --occurred-at "$(now)"
+  --candidate "$candidate" --outcome accepted --attestation "github-review:kemiller2002/simulated-rehearsal#3@3001" --occurred-at "$(now)"
 
 mkdir -p "$out/executions"
 cp "$repo/.ros/events/events.jsonl" "$out/events.jsonl"
@@ -83,15 +83,18 @@ done
 echo "$candidate" > "$out/candidate.txt"
 g rev-list "$candidate" > "$out/ancestry.txt"
 
-# What CI would observe from the GitHub API in the trusted run: the owner's approving review, with the decision ids
-# the reviewed pull request carries (an attestation proves only the decisions it names).
+# What CI would observe from the GitHub API in the trusted run: approving pull-request reviews by the owner (with the
+# decisions and paths the reviewed pull request carries: an attestation proves only what it names) and by the frozen
+# independent reviewer, each with the commit it approved.
 cat > "$out/attestations.json" <<JSON
 {
   "schema": "indy-init.owner-attestations/1",
   "runId": "9000000001",
   "candidate": "$candidate",
   "attestations": [
-    { "type": "github-review", "reference": "kemiller2002/simulated-rehearsal#1@1001", "login": "kemiller2002", "state": "APPROVED", "decisions": ["DEC-SIM-001"], "submittedAt": "$(now)" }
+    { "type": "github-review", "reference": "kemiller2002/simulated-rehearsal#1@1001", "login": "kemiller2002", "state": "APPROVED", "decisions": ["DEC-SIM-001", "src/engine/Replay.fs"], "commit": "$candidate", "submittedAt": "$(now)" },
+    { "type": "github-review", "reference": "kemiller2002/simulated-rehearsal#2@2001", "login": "example-reviewer", "state": "APPROVED", "commit": "$candidate", "submittedAt": "$(now)" },
+    { "type": "github-review", "reference": "kemiller2002/simulated-rehearsal#3@3001", "login": "kemiller2002", "state": "APPROVED", "commit": "$candidate", "submittedAt": "$(now)" }
   ]
 }
 JSON
@@ -103,7 +106,7 @@ cat > "$out/rules.json" <<'JSON'
   "owners": [ { "login": "kemiller2002", "actorIds": ["kemiller2002"] } ],
   "repository": "simulated-rehearsal",
   "agents": ["example/implementing-agent"],
-  "reviewers": ["example/review-agent"],
+  "reviewers": [ { "actorId": "example/review-agent", "login": "example-reviewer" } ],
   "automation": ["github/github-actions"],
   "reviewRoles": ["review"]
 }

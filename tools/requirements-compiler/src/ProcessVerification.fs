@@ -146,7 +146,12 @@ let recordOf (executions: Map<string, Json>) (trustedRun: string option) (sequen
 let private owners (rules: Json) = arr "owners" rules
 let private ownerActorIds (rules: Json) = owners rules |> List.collect (strs "actorIds") |> Set.ofList
 let private ownerLogins (rules: Json) = owners rules |> List.choose (opt "login") |> Set.ofList
-let private reviewers (rules: Json) = strs "reviewers" rules |> Set.ofList
+/// The frozen independent reviewers: each Praxis actor id with the GitHub login whose review attests its findings.
+let private reviewerLogins (rules: Json) =
+    arr "reviewers" rules |> List.choose (fun r -> match opt "actorId" r, opt "login" r with
+                                                   | Some a, Some l -> Some(a, l)
+                                                   | _ -> None) |> Map.ofList
+let private reviewers (rules: Json) = reviewerLogins rules |> Map.keys |> Set.ofSeq
 let private roster (rules: Json) = Set.unionMany [ Set.ofList (strs "agents" rules); Set.ofList (strs "automation" rules); ownerActorIds rules; reviewers rules ]
 let private reviewRoles (rules: Json) = strs "reviewRoles" rules |> Set.ofList
 
@@ -165,25 +170,33 @@ let inputProblems (i: Inputs) : string list =
       for o in owners i.Rules do
           if opt "login" o |> Option.isNone then yield "an owner in the process rules has no login"
       if (reviewRoles i.Rules).IsEmpty then yield "process rules name no review role"
-      if (reviewers i.Rules).IsEmpty then yield "process rules name no independent reviewer"
+      if (reviewers i.Rules).IsEmpty then yield "process rules name no independent reviewer (reviewers: [{actorId, login}])"
+      if not (Set.intersect (reviewers i.Rules) (Set.ofList (strs "agents" i.Rules))).IsEmpty then
+          yield "an independent reviewer is also listed as an implementing agent"
       if not (isHex40 i.Candidate) then yield "the candidate must be a full 40-character lowercase commit SHA"
       match i.Attestations with
       | Some a when strOpt "schema" a <> Some attestationsSchemaId -> yield sprintf "owner attestations have schema %A, expected %s" (strOpt "schema" a) attestationsSchemaId
       | Some _ when i.TrustedRunId.IsNone -> yield "owner attestations were supplied without the trusted CI run id that observed them"
       | _ -> () ]
 
-/// Approving owner reviews CI observed in the trusted run for this candidate: reference → the decisions it approves.
-let private observedAttestations (i: Inputs) : Map<string, Set<string>> =
+/// What CI observed about one approving pull-request review in the trusted run.
+type ObservedAttestation =
+    { Login: string
+      Decisions: Set<string>
+      Commit: string option }
+
+/// Approving reviews CI observed in the trusted run for this candidate, by reference ("TYPE:REF"). Only an owner's or
+/// a frozen reviewer's login counts.
+let private observedAttestations (i: Inputs) : Map<string, ObservedAttestation> =
+    let logins = Set.union (ownerLogins i.Rules) (reviewerLogins i.Rules |> Map.values |> Set.ofSeq)
     match i.Attestations, i.TrustedRunId with
     | Some a, Some run when opt "runId" a = Some run && opt "candidate" a = Some i.Candidate ->
         arr "attestations" a
-        |> List.filter (fun x -> opt "state" x = Some "APPROVED" && (ownerLogins i.Rules).Contains(opt "login" x |> Option.defaultValue ""))
+        |> List.filter (fun x -> opt "state" x = Some "APPROVED" && logins.Contains(opt "login" x |> Option.defaultValue ""))
         |> List.choose (fun x ->
-            match opt "type" x, opt "reference" x with
-            | Some t, Some r -> Some(t + ":" + r, Set.ofList (strs "decisions" x))
+            match opt "type" x, opt "reference" x, opt "login" x with
+            | Some t, Some r, Some l -> Some(t + ":" + r, { Login = l; Decisions = Set.ofList (strs "decisions" x); Commit = opt "commit" x })
             | _ -> None)
-        |> List.groupBy fst
-        |> List.map (fun (k, vs) -> k, vs |> List.map snd |> Set.unionMany)
         |> Map.ofList
     | _ -> Map.empty
 
@@ -196,7 +209,7 @@ let private decided (r: Record) = r.Subjects @ Option.toList r.Decision |> Set.o
 
 /// Every reason this record cannot serve as evidence for the candidate. Empty means it qualifies as a record; a
 /// kind-specific rule (below) may still find it insufficient.
-let recordDiagnostics (i: Inputs) (implementers: Set<string>) (attested: Map<string, Set<string>>) (r: Record) : Diagnostic list =
+let recordDiagnostics (i: Inputs) (implementers: Set<string>) (attested: Map<string, ObservedAttestation>) (r: Record) : Diagnostic list =
     let subject = sprintf "%s %s" r.Kind (if r.EventId = "" then "(no event id)" else r.EventId)
     [ match opt "repository" i.Rules, r.Repository with
       | Some expected, actual when actual <> Some expected ->
@@ -241,9 +254,24 @@ let recordDiagnostics (i: Inputs) (implementers: Set<string>) (attested: Map<str
           match r.ExecutionRole with
           | Some role when (reviewRoles i.Rules).Contains role -> ()
           | role -> yield d "SELF-ACCEPTANCE" subject (sprintf "the review ran in execution role %A, not a review role of the frozen rules" role)
+          // A finding written in the log is the reviewer's word; the reviewer's own approving review of this exact
+          // candidate commit, observed by CI in the trusted run, is what anchors it.
+          match r.Attestation |> Option.bind attested.TryFind with
+          | None -> yield d "UNATTESTED-REVIEW" subject (sprintf "attestation %A was not observed by CI in the trusted run for this candidate" r.Attestation)
+          | Some a ->
+              if (reviewerLogins i.Rules).TryFind r.ActorId <> Some a.Login then
+                  yield d "SELF-ACCEPTANCE" subject (sprintf "the attesting review is by '%s', not the frozen login of reviewer '%s'" a.Login r.ActorId)
+              if a.Commit <> Some i.Candidate then
+                  yield d "STALE-REVIEW" subject (sprintf "the attesting review approved commit %A, not the candidate %s" a.Commit i.Candidate)
+      | "final-disposition" ->
+          match r.Class, r.Attestation |> Option.bind attested.TryFind with
+          | "owner-decision", Some a when (ownerActorIds i.Rules).Contains r.ActorId && (ownerLogins i.Rules).Contains a.Login && a.Commit = Some i.Candidate -> ()
+          | "owner-decision", _ -> yield d "UNATTESTED-DISPOSITION" subject "the disposition is not the owner's, attested by CI for this candidate commit"
+          | cls, _ -> yield d "TRANSCRIBED-DECISION" subject (sprintf "a final disposition recorded as %s is not the owner's" cls)
       | "owner-approval" ->
           match r.Class, r.Attestation |> Option.bind attested.TryFind with
-          | "owner-decision", Some approves ->
+          | "owner-decision", Some a when (ownerLogins i.Rules).Contains a.Login ->
+              let approves = a.Decisions
               if not ((ownerActorIds i.Rules).Contains r.ActorId) then
                   yield d "MISSING-APPROVAL" subject (sprintf "recorded by '%s', who is not an owner identity of the frozen rules" r.ActorId)
               if (decided r).IsEmpty then yield d "MISSING-APPROVAL" subject "the owner decision names nothing it decides"
@@ -254,16 +282,19 @@ let recordDiagnostics (i: Inputs) (implementers: Set<string>) (attested: Map<str
                           "UNATTESTED-OWNER-DECISION"
                           subject
                           (sprintf "the attestation does not name %s; an attestation proves only the decisions it names" (String.Join(", ", unbound)))
-          | "owner-decision", None ->
-              yield d "UNATTESTED-OWNER-DECISION" subject (sprintf "attestation %A was not observed by CI in the trusted run for this candidate" r.Attestation)
+          | "owner-decision", _ ->
+              yield d "UNATTESTED-OWNER-DECISION" subject (sprintf "attestation %A is not an owner review observed by CI in the trusted run for this candidate" r.Attestation)
           | cls, _ -> yield d "TRANSCRIBED-DECISION" subject (sprintf "an owner approval recorded as %s is not the owner's decision" cls)
       | _ -> () ]
 
 // ---- kind-specific satisfaction -----------------------------------------------------------------------------------
 
 /// Owner decisions that stand: for each decided subject, the latest authentic owner record decides, and it must approve.
-let private standingApprovals (authenticOwner: Record list) =
-    authenticOwner
+let private standingApprovals (owners: Set<string>) (qualifyingOwner: Record list) (all: Record list) =
+    // An owner's rejection always counts, attested or not: it can only withdraw an approval, never grant one.
+    let rejections = all |> List.filter (fun r -> r.Kind = "owner-approval" && r.Outcome = Some "rejected" && owners.Contains r.ActorId)
+    qualifyingOwner @ rejections
+    |> List.distinctBy (fun r -> r.Sequence)
     |> List.collect (fun r -> decided r |> Set.toList |> List.map (fun s -> s, r))
     |> List.groupBy fst
     |> List.choose (fun (s, rs) ->
@@ -274,7 +305,8 @@ let private standingApprovals (authenticOwner: Record list) =
 let private latestOf (rs: Record list) = rs |> List.sortBy (fun r -> r.Sequence) |> List.tryLast
 
 /// Whether the qualifying records of `kind` prove it for this run, with the reasons when they do not.
-let private kindSatisfied (reviewRoles: Set<string>) (kind: string) (qualifying: Record list) (all: Record list) (approved: Set<string>) : Diagnostic list =
+let private kindSatisfied (i: Inputs) (kind: string) (qualifying: Record list) (all: Record list) (approved: Set<string>) : Diagnostic list =
+    let reviewRoles = reviewRoles i.Rules
     let ofKind k = qualifying |> List.filter (fun r -> r.Kind = k)
     let none code detail = if (ofKind kind).IsEmpty then [ d code kind detail ] else []
     match kind with
@@ -292,10 +324,17 @@ let private kindSatisfied (reviewRoles: Set<string>) (kind: string) (qualifying:
     | "scope-change"
     | "assignment" ->
         [ if kind = "assignment" then yield! none "MISSING-ASSIGNMENT" "no qualifying assignment record"
+          // A scope change stands only when the owner's standing, attested decision names the decision id and every
+          // path or requirement the change adds; one approval does not cover another change citing the same id.
           for r in all |> List.filter (fun r -> r.Kind = "scope-change") do
               match r.Decision with
-              | Some dec when approved.Contains dec -> ()
-              | dec -> yield d "UNAPPROVED-SCOPE-CHANGE" r.EventId (sprintf "scope change approved by %A, which is not a standing attested owner decision" dec) ]
+              | Some dec when approved.Contains dec && r.Subjects |> List.forall approved.Contains -> ()
+              | dec ->
+                  yield
+                      d
+                          "UNAPPROVED-SCOPE-CHANGE"
+                          r.EventId
+                          (sprintf "scope change %s citing %A is not covered by a standing attested owner decision" (String.Join(", ", r.Subjects)) dec) ]
     | "owner-approval" -> if approved.IsEmpty then [ d "MISSING-APPROVAL" kind "no standing attested owner approval for this candidate" ] else []
     | "independent-review" ->
         // The latest qualifying review of the candidate decides; a later rejection withdraws an earlier approval.
@@ -303,7 +342,22 @@ let private kindSatisfied (reviewRoles: Set<string>) (kind: string) (qualifying:
         | None -> [ d "MISSING-INDEPENDENT-REVIEW" kind "no qualifying independent review of this candidate" ]
         | Some r when r.Outcome <> Some "approved" -> [ d "REVIEW-NOT-APPROVED" r.EventId (sprintf "the latest review's outcome is %A" r.Outcome) ]
         | Some _ -> []
-    | "release-selection" -> none "MISSING-RELEASE-SELECTION" "no release selection names this candidate"
+    | "release-selection" ->
+        // The latest selection by a known identity decides: selecting another candidate later supersedes this one.
+        let latest = all |> List.filter (fun r -> r.Kind = "release-selection" && (roster i.Rules).Contains r.ActorId) |> latestOf
+        [ yield! none "MISSING-RELEASE-SELECTION" "no release selection names this candidate"
+          match latest with
+          | Some r when r.Candidate <> Some i.Candidate ->
+              yield d "RELEASE-SUPERSEDED" r.EventId (sprintf "a later release selection chose %A" r.Candidate)
+          | _ -> () ]
+    | "test-result" ->
+        // The latest trusted CI result for the candidate decides: a later failure withdraws an earlier pass.
+        let latest =
+            all |> List.filter (fun r -> r.Kind = "test-result" && r.Class = "tool-observed" && r.Candidate = Some i.Candidate) |> latestOf
+        [ yield! none "MISSING-PROCESS-RECORD" "no qualifying test-result record"
+          match latest with
+          | Some r when r.Outcome <> Some "pass" -> yield d "TEST-NOT-PASSED" r.EventId (sprintf "the latest trusted test result is %A" r.Outcome)
+          | _ -> () ]
     | "final-disposition" ->
         match latestOf (ofKind kind) with
         | None -> [ d "MISSING-PROCESS-RECORD" kind "no qualifying final-disposition record" ]
@@ -315,6 +369,29 @@ let private kindSatisfied (reviewRoles: Set<string>) (kind: string) (qualifying:
 
 let private boundTests (o: Json) =
     field "acceptanceContract" o |> Option.bind (field "testIdentity") |> Option.map (arr "tests") |> Option.defaultValue []
+
+/// Whether a binding may provide a category: its kind is one the plan's embedded categories table allows for that
+/// category, and a Praxis producer's kind fits its record kind. Compilation enforces the same; a frozen plan built
+/// without that check must not get further here.
+let admissible (plan: Json) (category: string) (t: Json) =
+    let kinds =
+        field "evidenceCategories" plan
+        |> Option.map (arr "categories")
+        |> Option.defaultValue []
+        |> List.tryFind (fun c -> strOpt "id" c = Some category)
+        |> Option.map (strs "testKinds")
+        |> Option.defaultValue []
+    let kind = opt "kind" t |> Option.defaultValue ""
+    let id = opt "id" t |> Option.defaultValue ""
+    let record = if id.StartsWith(bindingPrefix, StringComparison.Ordinal) then Some(id.Substring bindingPrefix.Length) else None
+    List.contains kind kinds
+    && (match kind, record with
+        | "process", Some k -> List.contains k recordKinds
+        | "owner", Some k -> k = "owner-approval"
+        | "review", Some k -> k = "independent-review"
+        | ("process" | "owner"), None -> false
+        | _, Some _ -> false
+        | _, None -> true)
 
 let private required (o: Json) =
     field "acceptanceContract" o |> Option.map (strs "requiredEvidenceCategories") |> Option.defaultValue []
@@ -333,16 +410,16 @@ let assess (i: Inputs) : Json =
     let assessed = records |> List.map (fun r -> r, recordDiagnostics i implementers attested r)
     let qualifying = assessed |> List.filter (snd >> List.isEmpty) |> List.map fst
     // Rejections are authentic records too: the latest authentic owner record for a subject decides.
-    let approved = qualifying |> List.filter (fun r -> r.Kind = "owner-approval") |> standingApprovals
+    let approved = standingApprovals (ownerActorIds i.Rules) (qualifying |> List.filter (fun r -> r.Kind = "owner-approval")) records
 
     let categoryResult (o: Json) (category: string) =
         let bindings =
             boundTests o
-            |> List.filter (fun t -> List.contains category (strs "categories" t))
+            |> List.filter (fun t -> List.contains category (strs "categories" t) && admissible i.Plan category t)
             |> List.choose (fun t -> opt "id" t |> Option.filter (fun x -> x.StartsWith(bindingPrefix, StringComparison.Ordinal)))
             |> List.map (fun x -> x.Substring bindingPrefix.Length)
         let perKind =
-            bindings |> List.map (fun k -> k, kindSatisfied (reviewRoles i.Rules) k qualifying records approved, qualifying |> List.filter (fun r -> r.Kind = k))
+            bindings |> List.map (fun k -> k, kindSatisfied i k qualifying records approved, qualifying |> List.filter (fun r -> r.Kind = k))
         // Every producer the plan binds to the category must deliver; one satisfied producer does not excuse another.
         let satisfied = perKind |> List.filter (fun (_, ds, rs) -> ds.IsEmpty && not rs.IsEmpty)
         let allSatisfied = not bindings.IsEmpty && satisfied.Length = perKind.Length

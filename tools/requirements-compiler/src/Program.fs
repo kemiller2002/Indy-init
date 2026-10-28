@@ -565,10 +565,11 @@ let private processInputs (get: string -> string option) (plan: Json) (candidate
         | Some p, _ -> p
         | None, Some r -> Path.Combine(r, ".ros", "events", "events.jsonl")
         | None, None -> ""
+    // A missing log is unusable input, not an empty run.
     let events =
         if File.Exists eventsPath then
             File.ReadAllLines eventsPath |> Array.filter (fun l -> l.Trim() <> "") |> Array.map (Text.Encoding.UTF8.GetBytes >> parseBytes) |> List.ofArray
-        else []
+        else failwithf "the Praxis event log %s does not exist" eventsPath
     // Envelopes as Praxis stores them (.ros/executions/<id>/envelope.json) or exported flat (<id>.json).
     let executionsDir =
         match get "executions", repo with
@@ -588,12 +589,15 @@ let private processInputs (get: string -> string option) (plan: Json) (candidate
     let rulesBytes = File.ReadAllBytes(need "rules")
     // Ancestry from the candidate repository, or from an exported `git rev-list CANDIDATE` listing.
     let ancestry = get "ancestry" |> Option.map (File.ReadAllLines >> Array.map (fun l -> l.Trim()) >> Set.ofArray)
+    // Only full commit ids are compared: a revision expression such as HEAD~1 is not an observed commit.
+    let isCommitId (x: string) = x.Length = 40 && x |> Seq.forall (fun ch -> (ch >= '0' && ch <= '9') || (ch >= 'a' && ch <= 'f'))
     let isAncestor (commit: string) (c: string) =
-        commit = c
+        isCommitId commit && isCommitId c
+        && (commit = c
         || (match ancestry, repo with
             | Some listed, _ -> c = candidate && listed.Contains commit
             | None, Some r -> Git.run r [ "merge-base"; "--is-ancestor"; commit; c ] |> Result.isOk
-            | None, None -> false)
+            | None, None -> false))
     { Plan = plan
       ExpectedPlanDigest = need "plan-digest"
       Events = events

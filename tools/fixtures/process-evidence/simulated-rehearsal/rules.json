@@ -4,7 +4,7 @@
   "owners": [ { "login": "kemiller2002", "actorIds": ["kemiller2002"] } ],
   "repository": "simulated-rehearsal",
   "agents": ["example/implementing-agent"],
-  "reviewers": ["example/review-agent"],
+  "reviewers": [ { "actorId": "example/review-agent", "login": "example-reviewer" } ],
   "automation": ["github/github-actions"],
   "reviewRoles": ["review"]
 }

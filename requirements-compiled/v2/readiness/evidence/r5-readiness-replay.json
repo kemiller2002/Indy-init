@@ -59,15 +59,15 @@
       "summary": {
         "obligations": 326,
         "categoryChecks": 633,
-        "resolved": 494,
-        "unresolved": 139,
+        "resolved": 439,
+        "unresolved": 194,
         "unresolvedByClass": {
-          "application-test": 49,
+          "application-test": 104,
           "owner": 3,
           "process": 25,
           "reviewer": 62
         },
-        "unresolvedObligations": 88,
+        "unresolvedObligations": 140,
         "permitted": 0
       },
       "missingAtEndFlaggedBeforeImplementation": 49
@@ -79,13 +79,13 @@
       "summary": {
         "obligations": 326,
         "categoryChecks": 633,
-        "resolved": 524,
-        "unresolved": 109,
+        "resolved": 469,
+        "unresolved": 164,
         "unresolvedByClass": {
-          "application-test": 49,
+          "application-test": 104,
           "reviewer": 60
         },
-        "unresolvedObligations": 86,
+        "unresolvedObligations": 138,
         "permitted": 0
       },
       "missingAtEndFlaggedBeforeImplementation": 47

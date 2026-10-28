@@ -1,6 +1,6 @@
 {
   "schema": "ordo.execution/1",
-  "executionId": "EXE-20261028T072042699Z-12c399db",
+  "executionId": "EXE-20261028T073612930Z-94463223",
   "workItem": "WI-0002",
   "actor": {
     "id": "example/review-agent",
@@ -25,11 +25,11 @@
     "evaluator.modify",
     "scope.expand"
   ],
-  "baselineRevision": "b2fb0bbe782ccaf10ccdc032fa57d86ddf77d08a",
+  "baselineRevision": "2a8fc1780c5dc9959afad8ae34d3b3e089780ccc",
   "candidateRevision": null,
-  "workspace": "checkout:EXE-20261028T072042699Z-12c399db",
+  "workspace": "checkout:EXE-20261028T073612930Z-94463223",
   "workspaceBinding": {
-    "id": "checkout:EXE-20261028T072042699Z-12c399db",
+    "id": "checkout:EXE-20261028T073612930Z-94463223",
     "branch": "main",
     "path": null,
     "mechanism": "working-directory"
@@ -49,7 +49,7 @@
   "evaluator": null,
   "humanOnlyTransitions": [],
   "parentExecution": null,
-  "startedAt": "2026-10-28T07:20:42.813Z",
+  "startedAt": "2026-10-28T07:36:13.072Z",
   "state": "active",
   "stateReason": null,
   "origin": {
