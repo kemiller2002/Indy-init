@@ -1,0 +1,992 @@
+{
+  "schema": "indy-init.rehearsal-preflight/1",
+  "rehearsal": "006",
+  "generatedAt": "2026-10-28",
+  "indyInitCommit": "856157a78d47946d264ec49ee8325fcf996ae9b9",
+  "overall": "BLOCKED",
+  "blockingStages": [
+    1,
+    4,
+    15,
+    17
+  ],
+  "ownerDecisions": [
+    {
+      "date": "2026-10-28",
+      "decision": "Waive the causa-data four-case requirement (lightbulb, everyday-v1, demonstration-v1, Conditor workspace initialization of rehearsal-006)."
+    },
+    {
+      "date": "2026-10-28",
+      "decision": "Rehearsal 6 loads the existing published historical-v1 workspace (Apollo 1, Apollo 11, Challenger) and writes only to isolated workspaces/demo/<runId>/."
+    }
+  ],
+  "timedRehearsalStarted": false,
+  "stages": [
+    {
+      "stage": 1,
+      "name": "Repository readiness",
+      "result": "BLOCKED",
+      "mandatory": true,
+      "evidence": [
+        "git ls-remote https://github.com/kemiller2002/indy-init-rehearsal-006 -> 65e346ee70c04d2bf6d4935d06484eb95c8cfae6 HEAD, refs/heads/main (only ref)",
+        "local checkout /home/user/kemiller2002/indy-init-rehearsal-006: single commit 65e346ee70c04d2bf6d4935d06484eb95c8cfae6 'Initial commit', author Kevin Miller <kemiller2002@gmail.com>, 2026-10-27T20:21:42-04:00, branch main tracking origin/main",
+        "git status --porcelain: empty (clean); git ls-tree -r HEAD: README.md only (contents '# indy-init-rehearsal-006')",
+        "list_repos: kemiller2002/indy-init-rehearsal-006 public, can_push=true (account-level)",
+        "add_repo(access=read): status read_available - public repo served by anonymous git proxy; nothing attached; 'this session cannot push' and GitHub API/MCP do not cover it unless attached with access=push (not requested)",
+        "mcp__github__actions_list on R6 and R5: 'Access denied: repository not configured for this session' (allowed list: causa-data, indy-init, dokimos, praxis, ordo, limen, conditor, causa-write-test, echelon-registry, forma, arca)",
+        "gh api repos/.../pages, actions/secrets, actions/variables, environments: HTTP 403 from proxy for both R5 and R6",
+        "https://kemiller2002.github.io/indy-init-rehearsal-006/ -> 301 -> https://kevinmmiller.us/indy-init-rehearsal-006/ -> 404 (nothing deployed)",
+        "https://kevinmmiller.us/indy-init-rehearsal-005/version.json -> 200 {sha: b972cb44... (= R5 HEAD), run_id: 40642872180}: R5's Pages + DEPLOY_TARGET setup worked",
+        "R5 .github/workflows: build-and-test.yml, echelon-foundations.yml, praxis-validation.yml; R6 has no .github directory",
+        "R5 has no global.json; R5 CI uses setup-dotnet 10.0.x (+10.0.402 for the plan verifier). kemiller2002/indy-init global.json pins 10.0.402 rollForward disable. Local: dotnet --list-sdks -> 10.0.402 only",
+        "Registry kemiller2002/echelon-registry origin/main = b20763f893f0e0e9efff48e72fd8721956408bb3 (contains b20763f); sets/echelon-current/1.32.0.json status approved by kemiller2002 2026-10-28T17:52:00Z; linux-x64.json sha256 bf52d105...27d1 matches the set's platform digest",
+        "All 40 linux-x64 artifacts in the resolved set downloaded and sha256-matched (stage 13)"
+      ],
+      "findings": [
+        "1 Repository exists: PASS",
+        "2 Initial commit 65e346ee70c04d2bf6d4935d06484eb95c8cfae6, branch main, author Kevin Miller <kemiller2002@gmail.com>: PASS",
+        "3 Working tree clean: PASS",
+        "4 Permissions: account can_push=true for R6; this session currently has read-only (anonymous) access, no push credential attached and no GitHub API/MCP access to R6. PARTIAL - push would need add_repo access=push at kickoff (not done, by instruction)",
+        "5 CI configuration: ABSENT (README only)",
+        "6 Deployment configuration: ABSENT. Pages site for R6 returns 404; whether Pages source is set to GitHub Actions and DEPLOY_TARGET exists cannot be read from this session (API 403)",
+        "7 Secrets/variables: NOT VERIFIABLE from here. R5 required: secrets.CAUSA_GITHUB_TOKEN (live suite + provider-conformance writes to the test repo), secrets.CAUSA_TEST_REPO or vars.CAUSA_TEST_REPO, vars.DEPLOY_TARGET=github-pages, Pages source=GitHub Actions with the github-pages environment (pages: write, id-token: write). Public repos it reads (causa-data at 3d861bc1, Indy-init at a pinned ref, praxis reusable workflow at aa7c7ca6) are reachable anonymously; causa-write-test is reachable",
+        "8 Approved component versions resolve: PASS (1.32.0 approved; all linux-x64 artifacts download and match sha256; Conditor 0.10.17 linux-x64 matches its release checksums.txt)",
+        "9 Toolchain: R5 has no global.json; the pin in use is Indy-init's global.json 10.0.402 (rollForward disable) and R5 CI uses 10.0.x. 10.0.402 is installed here: PASS. wasm-tools workload NOT installed (see stage 13)",
+        "10 No copied Causa application: PASS (tree is README.md only)",
+        "Aegis 1.0.0 IS in the 1.32.0 set (EchelonFoundry.Aegis.Core, nuget, Apache-2.0). Aegis 2.0.0 is assessed 'pending' (outside profile range <2.0.0)",
+        "The set's actual versions differ from the brief's shorthand: Percepta = percepta-repo 0.1.0 (lifecycle) + percepta-semantic 0.3.0 (host CLI); Folio 0.4.1. The set also contains visual-engineering 1.0.1, communication-engineering 1.0.0, tutela 0.1.0, strata 0.1.1 (no linux-arm64), fides 0.2.0, summa-contracts 0.1.0. Conditor is not a set component; it qualifies the set",
+        "License notes recorded in the set: Limen 0.9.1, Forma 0.11.0 and Arca 0.6.0 are PolyForm-Noncommercial-1.0.0 (owner accepted)",
+        "The owner's preflight script text was not available in this session; its rule 'Block readiness if any mandatory prerequisite is missing' is applied as given. Neither KICKOFF-EXECUTION-PACKET.md nor NEXT-REHEARSAL-PREFLIGHT-STATUS.md in indy-init says that CI is established at kickoff. If the owner treats CI and Pages as kickoff deliverables, items 5 to 7 become kickoff obligations rather than blockers. That is an owner decision, not something this preflight can establish"
+      ],
+      "blockers": [
+        "No CI workflow in R6",
+        "No deployment configuration in R6 (Pages not serving; settings unreadable)",
+        "Required secrets/variables (CAUSA_GITHUB_TOKEN, CAUSA_TEST_REPO, DEPLOY_TARGET) unverifiable and presumed absent on a fresh repo",
+        "Session holds no push credential for R6 (read-only anonymous lane)"
+      ],
+      "whatIsNeeded": [
+        "Owner: enable Pages for R6 with source 'GitHub Actions'; set repo variable DEPLOY_TARGET=github-pages (and confirm the custom-domain redirect to kevinmmiller.us/indy-init-rehearsal-006/ is intended)",
+        "Owner: add secret CAUSA_GITHUB_TOKEN (fine-grained, contents write on the test repo only) and secret or variable CAUSA_TEST_REPO (for example kemiller2002/causa-write-test) if R6 keeps R5's live and provider-conformance jobs",
+        "At kickoff, as infrastructure only: add R5's workflow set (build-and-test.yml deploy/deployed-smoke/site/browser/wasm-smoke skeleton, praxis-validation.yml, echelon-foundations.yml), re-pinned to echelon-current 1.32.0 (R5's lock-gate pins 1.29.0) and Praxis 3.23.0 (R5 pins praxis_ref aa7c7ca6), with no Causa application code",
+        "Add a global.json (10.0.402, rollForward disable) or keep setup-dotnet 10.0.x consistently; R5 had none",
+        "Attach R6 to the session with add_repo access=push at kickoff (and to the GitHub MCP allowed list if API/Actions reads are required); confirm branch protection required checks (R5 used 'foundations / verify-foundations')",
+        "Owner confirmation of whether CI and deployment are preflight prerequisites or kickoff deliverables"
+      ]
+    },
+    {
+      "stage": 2,
+      "name": "Requirements baseline",
+      "result": "PASS",
+      "mandatory": true,
+      "mandatoryBasis": "Inferred: AR-001 requires a pinned baseline and the plan is built on it. The owner's preflight script is authoritative for this flag; it was not available to this agent.",
+      "evidence": [
+        "Compiler built from indy-init@856157a78d47946d264ec49ee8325fcf996ae9b9 (tools/requirements-compiler last changed at f27694d3de86d1294d72c4d45a814e1a46a3f108); dotnet build tools/requirements-compiler/tests -c Release: 0 warnings, 0 errors. DLL sha256 06abf41c...2fb7.",
+        "Compilation into scratch pf/compile with all 13 --repo sources: exit 0, 'compilation: PASS; rehearsal readiness: READY'. V01-V18 all PASS (log pf/compile.log).",
+        "14 of 15 generated JSON files are byte-identical to requirements-compiled/v2; package-manifest.json differs only in its 'authored' list (README.md and verification-plan.schema.json are absent from the scratch directory). This is expected.",
+        "Offline suite (--offline --source .): 'all passed', exit 0 (pf/offline.log).",
+        "Full suite (with repos, --out requirements-compiled/v2, including --check, determinism and 24 negative/positive compilation cases): 'all passed', exit 0 (pf/full.log). git status was clean afterwards.",
+        "Independent recount from the baseline JSON: 461 requirements, unique ids; 2293 obligations, unique ids; 0 conflicts; priorities: P0 108, P1 16, unstated 337; P0 obligations 326.",
+        "Plan scope: 108 P0 requirements and 326 obligations. All 326 are bound, 0 unclassified, 0 excluded and 0 verified. Every obligation has verificationMethod, requiredEvidenceCategories, evidenceProducers (application-test 543, reviewer 62, process 25, owner 3), dependencies and freshness.",
+        "Requirement dependency graph in the plan: 84 edges and no cycle found (an independent DFS agrees with V05)."
+      ],
+      "findings": [
+        "Baseline BL-CAUSA-INDY-INIT-aab8f80c7743: file sha256 621e2f960038dcfb0daa2a9fe18a0c1c350faed297ba2856da1236a0360857b9. Source commit is kemiller2002/indy-init aab8f80c7743392e794b3b631542903ed4ed6f64, across 19 documents.",
+        "Plan VP-0eb9c791dd0b, digest 0eb9c791dd0beba7d63f709a810c2f0d379ea71e03c74a53d8b34951a9260766, as expected. The file sha256 is 3126091a...280e; it differs because the digest covers the canonical serialization without planIdentity.",
+        "Owner-controlled decisions in the plan: 3 owner-decision obligations (AR-008-O2, AR-024-O1, AR-024-O2), mapped to DEC-R6-KICKOFF by kickoff/rehearsal-006/process-evidence-rules.json. 62 obligations require independent-acceptance via praxis:independent-review.",
+        "No silent exclusion: V18 PASS, the exclusion list is empty, and the excluded counts are 0 for both requirements and obligations.",
+        "Lightbulb / everyday investigation, demonstration-v1 template, Conditor workspace initialization: NONE found in the baseline JSON, the normalized requirements, input-documents/, docs/ or kickoff/. The patterns searched were lightbulb, light bulb, everyday investigation, demonstration-v1, demonstration v1 and workspace init. Conditor appears in the baseline only as a named Echelon system in a version-currency obligation, and in input-documents only as a tooling target (test-env, scaffold). The frozen baseline does not include any of these. If the owner wants them, they are new requirements and need a new baseline/plan version.",
+        "AR-027..AR-035 are NOT in the frozen baseline. The baseline's AGENT-RELIABILITY section lists AR-001..AR-026 only; AR-027..AR-033 were added in b7e7623 and AR-034/AR-035 in 6665928, both after aab8f80."
+      ],
+      "blockers": []
+    },
+    {
+      "stage": 3,
+      "name": "Rehearsal 5 implementation audit",
+      "result": "PASS",
+      "mandatory": true,
+      "mandatoryBasis": "The audit describes itself as decision support (README: 'Its classifications are audit judgements, not acceptance results'). It was merged as indy-init#35 (01442b0).",
+      "evidence": [
+        "Read docs/REHEARSAL-005-RESULTS.md, the audit README, summary.json, requirement-matrix.json/.md, implementation-, verification- and process-evidence-findings, independent-review.md, rehearsal-006-recommendations.md and post-rehearsal-evidence/.",
+        "Coverage: the 31 P0 NOT_RUN ids in the R5 frozen ledger (indy-init-rehearsal-005 evidence/acceptance/run-40620099844-1b9fb56/bundle/ledger.json) equal the 31 matrix rows exactly. verdict.json is INCOMPLETE. The sha256s of verdict.json (c93928f0...), traceability.json (bff1e56f...) and final.json (84dce386...) match summary.json.",
+        "Classification distribution: VERIFIED_DURING_REHEARSAL 77, IMPLEMENTED_VERIFICATION_MISSING 3, PARTIALLY_IMPLEMENTED 7, NOT_IMPLEMENTED 0, INDETERMINATE 3, PROCESS_EVIDENCE_MISSING 18. The process sub-statuses are UNKNOWN 10, PERFORMED_EVIDENCE_INADEQUATE 6 and NOT_PERFORMED 2. All five distinctions the brief asks for are present.",
+        "Audit validator (tools/rehearsal-005-audit/validator, run from a scratch copy against R5 at b972cb4): 10/10 integrity checks PASS, 'AUDIT INTEGRITY: PASS'."
+      ],
+      "spotChecks": [
+        {
+          "req": "EXT-DATA-005 (PARTIAL)",
+          "claim": "RepositoryInfo.CanPush is parsed but never used",
+          "result": "HOLDS",
+          "basis": "git grep at 1b9fb56: CanPush appears only at the GitHub.fs type, doc comment and parse site (line 137)."
+        },
+        {
+          "req": "PF-015 (PARTIAL)",
+          "claim": "Credential.create refuses a blank token, so there is no anonymous path",
+          "result": "HOLDS",
+          "basis": "src/persistence/Provider.fs:62-63, IsNullOrWhiteSpace -> Error 'A credential is required.'"
+        },
+        {
+          "req": "AR-011 (PARTIAL)",
+          "claim": "No global.json; CI installs dotnet-version 10.0.x",
+          "result": "HOLDS",
+          "basis": "global.json is absent at 1b9fb56; build-and-test.yml has 10.0.x in 9+ jobs."
+        },
+        {
+          "req": "UI-016 (PARTIAL)",
+          "claim": "Amber indicator borders #E9A23B are 1.95:1 on ivory and 2.17:1 on white",
+          "result": "HOLDS",
+          "basis": "causa.css --causa-amber #E9A23B, ivory #F5F3ED; recomputed WCAG ratios are 1.95 and 2.17."
+        },
+        {
+          "req": "UI-031 (PARTIAL)",
+          "claim": "No role/access control for Administration",
+          "result": "HOLDS",
+          "basis": "Routes.fs maps #/administration directly; no role or authorization logic was found."
+        },
+        {
+          "req": "PF-009 (IMPLEMENTED_VERIFICATION_MISSING)",
+          "claim": "causa_fresh nonce on mutable reads; DCT-005-A test exists",
+          "result": "HOLDS",
+          "basis": "GitHub.fs:42,47; DctProviderTests.fs:62."
+        },
+        {
+          "req": "EXT-DATA-006 (IMPLEMENTED_VERIFICATION_MISSING)",
+          "claim": "Tags removed in 5336ec4 alongside the F-1 fix",
+          "result": "HOLDS",
+          "basis": "The 5336ec4 diff removes the VPO-d7fbd84e40ded145 (=EXT-DATA-006-O2) traits from DCT-001-A/B. verdict.json lists 'P0 requirement EXT-DATA-006: NOT_RUN'."
+        },
+        {
+          "req": "UI-011 (PARTIAL)",
+          "claim": "Tag removed in f412598; post-rehearsal probe shows focus falls to body after back navigation",
+          "result": "HOLDS",
+          "basis": "The f412598 message drops UI-011-O4/WDL-014-O1/UI-015-O3/UI-016-O11; ui-probe.json backNavigation.focusAfterBack='body'."
+        },
+        {
+          "req": "PF-014 (INDETERMINATE)",
+          "claim": "Live specs ran against a local dist, not the deployed site",
+          "result": "HOLDS",
+          "basis": "CAUSA_BASE_URL is referenced only in playwright.config.js and never set in .github/workflows at 1b9fb56."
+        },
+        {
+          "req": "AR-012 (PROCESS_EVIDENCE_MISSING)",
+          "claim": "58 work.attribution.reconciled events (post hoc attribution)",
+          "result": "HOLDS",
+          "basis": "58 at b972cb4 (the audit's source commit); 57 at 1b9fb56."
+        },
+        {
+          "req": "Post-rehearsal .NET re-run",
+          "claim": "252/252 passed",
+          "result": "HOLDS",
+          "basis": "dotnet-frozen-suite.txt: 33+72+71+76 = 252, 0 failed."
+        }
+      ],
+      "findings": [
+        "Audit conclusion: R5's bottleneck was VERIFICATION (and process-evidence governance), not implementation. 0 of 31 requirements are missing outright. Of the 49 missing obligations, 33 trace to plan defects (19) or governance evidence never produced (14), against 5 for development. Recommendation: weight R6 toward verification/evidence automation and process changes, with small app work (UI-011-O4 focus, plus owner-dependent UI-016/UI-031/EXT-DATA-005/PF-015).",
+        "Independence of the review: NOT fully independent, by the files' own statement. independent-review.md says the reviewer is 'an agent in the same operator session as the auditor... independent of the classification, not of the Echelon tooling or of the operator'. The reviewer's raw output (independent-review-raw.json) is self-described ('independent review agent (no implementation or classification role)'). The auditor wrote the resolution table and adopted or rejected changes. Both the audit and the review were committed by 'Claude' in one commit (78e7be3). indy-init#35 has no GitHub reviews. Independence is therefore asserted, not attested.",
+        "The audit's own limits are stated: no live-provider runs, no exact-SHA deployed run possible, no WebKit, Percepta verify-app not re-run, and offline isolation by proxy redirect only."
+      ],
+      "blockers": []
+    },
+    {
+      "stage": 4,
+      "name": "Corrective actions",
+      "result": "FAIL",
+      "mandatory": true,
+      "mandatoryBasis": "input-documents/2026-10-28-R5A-001-rehearsal-5-audit-follow-ups.md: 'Priority: P0 before Rehearsal 6 starts'. ESO-001 lists ESO-R6-01..11 as the owner-approved R6 kickoff requirements. NO document designates AR-027..AR-035 themselves as mandatory for R6 readiness, and none of them is in the frozen baseline.",
+      "evidence": [
+        "PRs merged (REST API) by kemiller2002 with CI success on the merge commits: praxis#296 048a5dc (25 checks); indy-init#33 d8e2826, #34 a9b80ef, #36 856157a; dokimos#59 fb15bf0 (8); limen#113 3983246 (13), #114 743cdb9 (16); conditor#117 83287e9 (21), #118 5fc778c (21); ordo#109 27215dd (10); echelon-registry#103 b20763f.",
+        "All of them are in the pinned releases: Praxis v3.23.0, dokimos-v0.9.0, Limen v0.9.1, Conditor v0.10.17 and Ordo v1.19.0 (GitHub compare: ahead or identical)."
+      ],
+      "ars": [
+        {
+          "id": "AR-027",
+          "inFrozenBaseline": false,
+          "classification": "partially implemented",
+          "evidence": [
+            "Indy-init compiler: V01 verbatim carriage and V18 preservation, plus 17 plan negative controls including value-swap-in-text, role-swap-in-text and swapped-value-tokens (Tests.fs contractTests/planControls), all passing in the offline and full suites run here.",
+            "praxis docs/requirements-preservation.md at 398af6dd (3.23.0) still states 'R3, role-bound tokens: a role swap of two values still passes'."
+          ],
+          "note": "An independent check exists and is self-tested. The Praxis gate fix routed by AR-027 is not implemented."
+        },
+        {
+          "id": "AR-028",
+          "inFrozenBaseline": false,
+          "classification": "partially implemented",
+          "evidence": [
+            "conditor#117/#118 merged (83287e9, 5fc778c), in Conditor 0.10.17 (compare: ahead); CI success. conditor docs/test-environment.md: a single contract for ports and URLs, plus a preflight."
+          ],
+          "note": "The tooling exists. Adoption in the R6 app (ESO-R6-08) happens at kickoff, so it is unverified for R6."
+        },
+        {
+          "id": "AR-029",
+          "inFrozenBaseline": false,
+          "classification": "partially implemented",
+          "evidence": [
+            "limen#113/#114 merged (3983246, 743cdb9), in Limen 0.9.1; CI success. limen docs/57: a static frame-size check on built assemblies."
+          ],
+          "note": "wasm-check covers the 'locals size too big' class statically. The browser start smoke on every primary route is application CI that R6 must build. It is not covered by existing tooling."
+        },
+        {
+          "id": "AR-030",
+          "inFrozenBaseline": false,
+          "classification": "not implemented",
+          "evidence": [
+            "No test-hook or production-artifact check was found in limen or conditor docs (grep for test hook / EnableTestHooks / production artifact)."
+          ],
+          "note": "R5's fix lives only in the R5 app. R6 must re-implement it and prove it; no template or tool enforces it."
+        },
+        {
+          "id": "AR-031",
+          "inFrozenBaseline": false,
+          "classification": "not implemented",
+          "evidence": [
+            "kickoff/rehearsal-006 holds no screen-contract scope Decision Record."
+          ],
+          "note": "This is an owner decision due before the clock starts. It is not recorded yet."
+        },
+        {
+          "id": "AR-032",
+          "inFrozenBaseline": false,
+          "classification": "partially implemented",
+          "evidence": [
+            "echelon-registry#103 merged (b20763f) echelon-current 1.32.0 with Forma 0.11.0 and Arca 0.6.0; plan obligations VER-001..VER-004 are bound to praxis:dependency-decision."
+          ],
+          "note": "No lock-gate change was found that fails an Echelon package outside the set. Whether forma-workflow is inside 1.32.0 was not verified here."
+        },
+        {
+          "id": "AR-033",
+          "inFrozenBaseline": false,
+          "classification": "partially implemented",
+          "evidence": [
+            "requirements-compiled/v2/curation/preflight-checks.json PRE-AUTH-01 (env-present CAUSA_GITHUB_TOKEN, CAUSA_TEST_REPO) and PRE-AUTH-02."
+          ],
+          "note": "DEPLOY_TARGET is not checked by any preflight check. The checks read the environment, not repository settings."
+        },
+        {
+          "id": "AR-034",
+          "inFrozenBaseline": false,
+          "classification": "partially implemented",
+          "evidence": [
+            "verify-process controls STALE-REVIEW, SELF-ACCEPTANCE, UNATTESTED-REVIEW, REVIEW-NOT-APPROVED (47 process controls pass); 62 obligations bound to praxis:independent-review; process rules name reviewer anthropic/claude-code-reviewer."
+          ],
+          "note": "Review at the final candidate is enforced. Nothing enforces review at the FIRST release candidate, or a per-binding tag audit (R5A-001-04 unbound-after-review is not implemented)."
+        },
+        {
+          "id": "AR-035",
+          "inFrozenBaseline": false,
+          "classification": "partially implemented",
+          "evidence": [
+            "Owner decision ESO-R6-09 (d85785c): adopt Arca 0.6.0 (Web Lock queue). Byte read-back and globally unique idempotency keys remain app requirements; the two-tab reproduction test is to be written."
+          ],
+          "note": "The SPEED-OPTIMIZATION-REPORT notes that Arca reconciliation accepts ancestor commits or idempotency keys without a byte read-back, which is the pre-fix F-1 shape (found by reading code, not run). No R6 regression tests exist yet."
+        }
+      ],
+      "themes": [
+        {
+          "theme": "verification-plan binding",
+          "classification": "implemented and verified",
+          "evidence": [
+            "indy-init#34 (a9b80ef) and #36 (856157a) merged by kemiller2002, CI success",
+            "All 326 obligations / 633 category checks bound; plan-readiness READY (run here)",
+            "R6ReadinessTests: the curation equals process proposal + r6 proposal; independent-acceptance only via praxis:independent-review; live-provider only via live tests"
+          ],
+          "note": "The application-test bindings name tests that do not exist yet (by design)."
+        },
+        {
+          "theme": "acceptance evidence automation",
+          "classification": "partially implemented",
+          "evidence": [
+            "kickoff/rehearsal-006/acceptance-process.yml (template) runs review-attestations + verify-process",
+            "verify-plan supports --process-* inputs"
+          ],
+          "note": "The template does not run verify-plan or compute-acceptance-verdict; the full acceptance job is not in the template. INDY_INIT_COMMIT is 'REPLACE-AT-KICKOFF'. Not exercised in CI."
+        },
+        {
+          "theme": "independent review evidence",
+          "classification": "implemented but unverified",
+          "evidence": [
+            "praxis#296 work evidence --kind independent-review; verify-process review controls (SELF-ACCEPTANCE, STALE-REVIEW, UNATTESTED-REVIEW, REVIEW-NOT-APPROVED) pass on synthetic fixtures"
+          ],
+          "note": "Synthetic only. The reviewer's GitHub attestation login is kemiller2002, the same as the owner, so independence rests on the owner's review. None of today's tooling PRs (praxis#296, indy-init#32-#36, dokimos#59, limen#113/#114, conditor#117/#118) has a GitHub review."
+        },
+        {
+          "theme": "agent scope and checkpoint evidence",
+          "classification": "implemented but unverified",
+          "evidence": [
+            "praxis:assignment/scope-change/checkpoint producers bound (AR-012, AR-015, AR-021); controls MISSING-CHECKPOINT, UNVERIFIED-CHECKPOINT, UNAPPROVED-SCOPE-CHANGE pass"
+          ],
+          "note": "Verified on a simulated rehearsal only. A record's existence does not prove semantic compliance (e.g. AR-021-O2 'do not require structured handoffs' is proven by a checkpoint record)."
+        },
+        {
+          "theme": "owner decision recording",
+          "classification": "implemented but unverified",
+          "evidence": [
+            "review-attestations command; controls TRANSCRIBED-DECISION, UNATTESTED-OWNER-DECISION, MISSING-APPROVAL pass; R6ReadinessTests reviewConverter"
+          ],
+          "note": "DEC-R6-KICKOFF is not yet posted. R5A-001-08/-10/-11 owner decisions (DEC-025 vs PF-015/EXT-DATA-005, amber indicators, UI-031 roles, AR-019-O3 wording) are NOT recorded."
+        },
+        {
+          "theme": "release selection",
+          "classification": "implemented and verified",
+          "evidence": [
+            "praxis:release-selection producer; controls MISSING-RELEASE-SELECTION, RELEASE-SUPERSEDED, EVIDENCE-OTHER-CANDIDATE pass; stack echelon-current 1.32.0 pinned (echelon-registry#103)"
+          ],
+          "note": "Verified with synthetic evidence."
+        },
+        {
+          "theme": "dependency and integration ownership",
+          "classification": "partially implemented",
+          "evidence": [
+            "praxis:dependency-decision bound to 11 obligations; praxis:execution-start for AR-017/VER-010",
+            "ESO-R6-07 (stream ownership, praxis streams check)"
+          ],
+          "note": "ESO-R6-07 is 'at kickoff'; no integration contract for R6 exists yet."
+        },
+        {
+          "theme": "WASM startup verification",
+          "classification": "partially implemented",
+          "evidence": [
+            "limen#113/#114 in Limen 0.9.1; CI success"
+          ],
+          "note": "A static frame check only. The start smoke (AR-029) and the build-order wiring (ESO-R6-08) are R6 kickoff/app work."
+        },
+        {
+          "theme": "browser and deployed-artifact verification",
+          "classification": "partially implemented",
+          "evidence": [
+            "conditor#117/#118 test-env contract with an artifact identity (build-info, sha256)"
+          ],
+          "note": "R5A-001-01 (the network guard admits the deployed origin) and R5A-001-02 (pin causa-data in every job) were not found implemented in the scaffold."
+        },
+        {
+          "theme": "persistence regression tests",
+          "classification": "not implemented",
+          "evidence": [
+            "ESO-R6-09 decision recorded (adopt Arca 0.6.0)"
+          ],
+          "note": "The two-tab deterministic reproduction and the byte read-back tests are R6 work; Arca's read-back gap was noted, not tested."
+        },
+        {
+          "theme": "traceability freshness",
+          "classification": "partially implemented",
+          "evidence": [
+            "The plan has freshness policies per obligation; the verify-plan STALE-EVIDENCE control passes; ordo#109 merged (27215dd) in Ordo 1.19.0; dokimos#59 (fb15bf0) in dokimos-v0.9.0: the release checkpoint refuses reuse"
+          ],
+          "note": "R5 F-4 (a local build shows stale traceability) and R5A-001-04 (unbound-after-review) are not addressed."
+        },
+        {
+          "theme": "production test-hook protection",
+          "classification": "not implemented",
+          "evidence": [],
+          "note": "Same as AR-030."
+        }
+      ],
+      "findings": [
+        "AR-027..AR-035 are recorded in docs/AGENT-RELIABILITY-REQUIREMENTS.md after the baseline commit. They are not in BL-CAUSA-INDY-INIT-aab8f80c7743 or in plan VP-0eb9c791dd0b, so verify-plan will never require evidence for them in R6.",
+        "R5A-001 (P0 before R6) status: -01, -02, -03 (scaffold: deployed-origin guard, pinned fixtures, SDK pin): not found implemented. -04 (unbound-after-review): not implemented. -05 (aggregate UI-015-O2 derived): not implemented, UI-015-O2 is still bound directly. -06 (preflight records as bindable producers): partially (VER-004-O3 binds praxis:dependency-decision; AR-023-O3 is review-only). -07 (review on the candidate, reviewer identity in Praxis): implemented in tooling. -08, -10, -11 (owner decisions): NOT recorded. -09 (UI-011-O4 focus): R6 app work. No routing of R5A-001 items into the target repositories' Praxis inboxes was found in the local checkouts.",
+        "There is a plan conflict that plan-readiness does not detect. PF-015-O1 (integration/live/security, catalog without PAT) and EXT-DATA-005-O1 remain in the plan unchanged, while owner decision DEC-025 forbids anonymous mode. R6 will hit the same unresolvable obligations unless the owner decides first."
+      ],
+      "blockers": [
+        "Owner decisions R5A-001-08/-10/-11 (DEC-025 vs PF-015-O1/O2 and EXT-DATA-005-O1; UI-016-O11 amber indicators; UI-031-O5 roles; AR-019-O3 wording) are not recorded.",
+        "R5A-001-01..-05 are not implemented.",
+        "AR-030 production test-hook protection and AR-031 screen-contract scope decisions have no implementation or record.",
+        "If the owner intends AR-027..AR-035 to be gated in R6, a new baseline and plan version is required. Today the frozen plan excludes them."
+      ]
+    },
+    {
+      "stage": 5,
+      "name": "Verification-plan readiness",
+      "result": "PASS",
+      "mandatory": true,
+      "mandatoryBasis": "kickoff/rehearsal-006/README.md: 'Check the gate before implementation begins'; ESO-R6-02; ESO-P2-02.",
+      "evidence": [
+        "plan-readiness --plan requirements-compiled/v2/verification-plan.json --plan-digest 0eb9c791...0766: READY, exit 0. Summary: 326 obligations, 633 category checks, 633 resolved, 0 unresolved, 0 permitted, rules sha256 null (README: 'none: plan-readiness is READY with no permitted gap'). Output: pf/plan-readiness.json.",
+        "Negative control: the same plan with a wrong --plan-digest gives BLOCKED, exit 3.",
+        "Process simulation (--process-simulation --source . --out pf/process-simulation.json): 'all passed', byte-identical to committed readiness/evidence/process-evidence-simulation.json. Positive: VERIFIED, 13 records, 30/30 category checks. Negative controls: 47/47 pass. Record controls: 3/3 pass. withoutBindings: INCOMPLETE (0/28 verified).",
+        "R4 replay (--replay with evidence root /tmp/claude-0/r4ev/ab08b764..., candidate repo indy-init-rehearsal-004): 'replay: all cases as expected', exit 0. 7 cases: r4-as-published FAILED/INVALID; evidence-digest-mutated, unauthorized-exclusion, stale-evidence-repinned, stale-manifest, evidence-removed and fail-relabelled-pass are each INVALID/INVALID. Output is byte-identical to the committed r4-verification-plan-replay.json.",
+        "verify-plan CLI on the historical R4 ledger and manifest against the v2 plan: INVALID, exit 3, accepted=false, 866 TEST-MAPPING diagnostics (R4 tests are unbound in v2), 0 PASS requirements. With a wrong pinned manifest sha256: INVALID with EVIDENCE-INTEGRITY. No R6 evidence was created."
+      ],
+      "criteria": {
+        "method": "326/326 have gates and verification rules.",
+        "producer": "326/326 have an evidenceProducer for every required category (application-test 543, reviewer 62, process 25, owner 3).",
+        "executableOrActionableProducer": "Process/owner/reviewer producers are released Praxis commands (praxis work evidence kinds, Praxis 3.23.0) consumed by verify-process. Application-test producers are test ids that do NOT exist yet (playwright 166, dotnet 110 bindings); R6 implementers must write them under the exact names.",
+        "completeCoverage": "Every required category of every obligation is bound (633/633); 0 unclassified.",
+        "bindingMechanism": "curation/verification-plan.json testBindings = process proposal (29) + r6 proposal (336 more), checked by R6ReadinessTests; the verifier matches testId character for character.",
+        "identityAndFreshness": "Every obligation has a freshness policy: FP-DETERMINISTIC-INPUT-DIGEST 156, FP-LIVE-PER-COMMIT 97, FP-REVIEW-PER-COMMIT 52, FP-PROCESS-THIS-RUN 21. Evidence must match run_id and source_sha; Dokimos reuse is not attested by the bundle (it is treated as STALE).",
+        "verifierRecognition": "YES. The bound kinds deterministic 185, live 91, review 62, process 26 and owner 3 are all handled: application kinds by PlanVerification (ledger rows plus per-obligation evidence entries), praxis:<kind> by ProcessVerification.coveredBy (process: recordKinds; owner: owner-approval; review: independent-review).",
+        "explicitIndependentReview": "62 obligations require independent-acceptance, each bound only to praxis:independent-review (enforced by R6ReadinessTests).",
+        "ownerDecisionsIdentified": "3 owner-decision obligations (AR-008-O2, AR-024-O1, AR-024-O2) -> DEC-R6-KICKOFF in the frozen rules (sha256 6f164353...e17c).",
+        "noCircularDependency": "The requirement dependency graph is a DAG (84 edges; V05 PASS). No obligation is proven only by verify-plan's own output. UI-030-O3 and VER-010-O1 rely on praxis:acceptance-reference records, which verify-process checks independently (trusted run id, commit identity)."
+      },
+      "pr32": {
+        "merged": "yes, 2026-10-28T06:06:46Z as cf328bb by kemiller2002; no GitHub reviews on the PR.",
+        "inBaseline": "Not applicable. It changes only requirements-compiled/v1 (curation, plan, manifest) and a test; the baseline is untouched.",
+        "independentlyValidated": "Only by the R5 audit's analysis (verification-findings.md). It found that PR #32 also changed freshness for AR-010 and WDL-012 via test kinds, and removed four partial tags. There is no separate validation record.",
+        "carriesIntoV2": "NO. The v2 curation testBindings (366 obligation-test pairs) equal exactly the union of proposals/process-bindings.proposed.json and proposals/r6-test-bindings.proposed.json. 0 test ids are shared with the v1 post-#32 curation (604 pairs). v2's other curation keys came from v1 before #32 (the only key #32 changed was testBindings).",
+        "knownInvalidBindingsRemain": "None of R5's over-tagged or partial bindings remain in v2. Whether each v2 convention-generated binding fully proves its obligation is undetermined until the tests exist (AR-034 tag audit)."
+      },
+      "findings": [
+        "Application-test bindings name tests that do not exist yet; this is by design. The verifier recognizes their evidence types, but no application evidence can be verified until R6 writes those tests under the exact ids (for example 'playwright:acceptance/UI-017.spec.js > UI-017-O2 [chromium]').",
+        "verify-plan has no plan-digest pin for application-test bindings; it reports the planId it was given. A re-curated plan is caught only indirectly: --process-plan-digest makes verify-process INVALID, which empties process coverage, so the run cannot be ACCEPTED. Application obligations in a re-curated plan would still show 'verified'. The consumer must compare the reported planId to VP-0eb9c791dd0b. This is a code-reading inference, not executed.",
+        "Semantic weakness: several process obligations are proven by the existence of a correctly attributed record, not by its correctness. Examples: VER-001-O1 'newest available stable release' is proven by a dependency-decision record, and AR-021-O2 by a checkpoint record.",
+        "PF-015-O1 and EXT-DATA-005-O1 are READY by binding but conflict with owner decision DEC-025 (see stage 4). READY does not mean satisfiable."
+      ],
+      "blockers": []
+    },
+    {
+      "stage": 6,
+      "name": "Historical content (historical-v1, used in place as catalog plus workspace)",
+      "result": "PASS",
+      "mandatory": true,
+      "evidence": [
+        "causa-data origin/main = dcb8cb994eab81d0384b9c8abc5f0b593f398442 (git ls-remote); canonical checkout clean before and after",
+        "Causa.Tool built from a scratch clone at dcb8cb9 with the pinned engine 55f49f61c939a3a780cee592f36f732a1328f981 (tools/fetch-engine.sh verified the commit)",
+        "`causa historical-verify /home/user/causa-data` (read-only, no report file): checks=53 passed=53 failed=0, incl. per-case validate (stages 1-17 incl. History.validate), manifest-consistency, research digests, provenance, catalog.combined-load (6 orders + repeat, 21 loads), combined-replay-deterministic, event-ids-disjoint (1315 ids, 0 shared), deterministic-reconstruction (rebuilt 14 files through Decide.execute; differing: none; unexpected: none). Log: scratchpad/pf/hv-canonical.txt",
+        "Deterministic rebuild: `causa historical-build` run against the scratch clone only; afterwards `git status --porcelain` empty and `diff -r` of workspaces/demo/historical-v1 and catalog/ against the canonical checkout identical (byte-identical rebuild). Log: scratchpad/pf/hb-scratch.txt",
+        "Independent digest check (sha256sum/jq, no project code): eventsSha256 equals raw file bytes for all 3; manifestSha256 and snapshotSha256 equal SHA-256 of canonical JSON (= file bytes without trailing newline), per CONTRACT §8.4/§4; provenanceSha256 likewise; researchSourcesSha256/researchClaimsSha256 equal raw bytes; all 15 digests match",
+        "catalog/historical-v1/manifest.json sha256 8c361929cfb429c31c059c92d6148036bf2b5861f81dace635a1f7de18dbf87c equals catalogManifestSha256 in verification/release.json (closest existing analogue of a 'template digest')",
+        "Investigation ids: apollo-1 c6b26614-fc43-5013-a15c-cf95942ee07b (v432, awaitingVerification), apollo-11 e3adbee5-5096-5a10-bbfb-cecda86a154b (v431, awaitingEvidence), challenger-sts-51l 1784da3c-7141-59ee-a495-1d5d44bf2284 (v452, active)",
+        "Storage-contract compatibility: `causa verify` (v1.0.0 fixtures + 90 negatives) checks=106 passed=106; manifest schemaSha256 0a68af8c...9152 equals the contract bundle identity in release.json; Python independent verifier (`historical_catalog.py verify . --base origin/main`, scratch clone) checks=91 passed=90 failed=0 review=1 (app.no-bundled-catalog-data not evaluated without --app), incl. immutability.frozen-paths-equal-release-tag PASS",
+        "Anchored gate `causa gate --anchor causa-storage-v1.0.0`: GitHub Actions run 40553545885 (compatibility gate) on main dcb8cb9 = success; repository-suite.txt records gate PASS, gate-selftest 17 PASS"
+      ],
+      "findings": [
+        "Content verifies. It exists as catalog/historical-v1/ + catalog/active.json + workspaces/demo/historical-v1/investigations/, not as templates/historical-v1/. Per owner decision the templates/ layout requirement no longer applies.",
+        "On main there is no template-copy mechanism. Unmerged branches codex/immutable-historical-rehearsal-workspaces (2de19d0, CI green) and codex/causa-workspace-e2e-20261028 (c3101ec, CI red) add templates/historical-v1/ and template/workspace commands; no PR is open for either. On 2de19d0 (scratch build) `template-verify --template historical-v1` returned VERIFIED, templateDigest fbc776c2f4aa27d0cf2d6825ebf45b1c0c2c5219186179638818007d0b116425, and its template investigations are byte-identical to main's historical-v1 workspace; 14/14 WorkspaceTests passed. Informational only; not merged.",
+        "Local re-run of the anchored gate in this sandbox FAILS on a single rule, engine.loaded: FSharp.Core.dll and the engine dll loaded by the Release build differ from the gate's sterile build of the pinned commit (Aegis.Core identical). All frozen-bytes/anchor rules raised no failure. CI on the same commit passes, so this is attributed to the sandbox's .NET/NuGet environment, not to the data; noted so it is not mistaken for a data failure."
+      ],
+      "blockers": [],
+      "whatIsNeeded": []
+    },
+    {
+      "stage": 7,
+      "name": "Lightbulb (templates/everyday-v1)",
+      "result": "NOT_RUN",
+      "mandatory": false,
+      "waiver": "owner 2026-10-28: four-case causa-data requirement waived; Rehearsal 6 loads the published historical-v1 workspace and writes only to isolated workspaces/demo/<runId>/",
+      "evidence": [
+        "No templates/ on causa-data main; `git grep -i -E 'lightbulb|light bulb|light-bulb|everyday-v1|demonstration-v1|burned.out'` across all 9 remote branches: 0 hits"
+      ],
+      "findings": [
+        "Content absent everywhere in causa-data (all branches)."
+      ],
+      "blockers": [],
+      "whatIsNeeded": []
+    },
+    {
+      "stage": 8,
+      "name": "Combined (templates/demonstration-v1)",
+      "result": "NOT_RUN",
+      "mandatory": false,
+      "waiver": "owner 2026-10-28: four-case causa-data requirement waived; Rehearsal 6 loads the published historical-v1 workspace and writes only to isolated workspaces/demo/<runId>/",
+      "evidence": [
+        "No demonstration-v1 on any causa-data branch (same search as stage 7)"
+      ],
+      "findings": [
+        "Absent. Branch tooling hardcodes templateId = \"historical-v1\" and exactly three ids (Workspace.fs:73-81), so a four-case template would also need tool changes."
+      ],
+      "blockers": [],
+      "whatIsNeeded": []
+    },
+    {
+      "stage": 9,
+      "name": "Conditor integration",
+      "result": "NOT_RUN",
+      "mandatory": false,
+      "waiver": "owner 2026-10-28: four-case causa-data requirement waived; Rehearsal 6 loads the published historical-v1 workspace and writes only to isolated workspaces/demo/<runId>/",
+      "evidence": [
+        "conditor origin/main 94308dd (Release v0.10.17): `git grep -i causa` hits only inbox/research documents and an example manifest; no src/ or tests/ integration",
+        "Unmerged conditor branch codex/causa-rehearsal-preflight (581ba80, 2026-10-28, no PR): adds `conditor rehearsal init`, src/Conditor.Core/Rehearsal.fs (471 lines), tests/Conditor.Tests/RehearsalTests.fs (151 lines), docs/causa-rehearsal-initialization.md, readiness-receipt schema; it shells out to the causa-data branch commands template-verify, workspace-local-check, workspace-remote-check, workspace-create, workspace-verify, workspace-publish, workspace-remote-verify, workspace-application-verify"
+      ],
+      "findings": [
+        "Released Conditor supports nothing for Causa workspaces. The integration exists only on unmerged branches on both sides (conditor codex/causa-rehearsal-preflight + causa-data codex/immutable-historical-rehearsal-workspaces); its tests were not run here."
+      ],
+      "blockers": [],
+      "whatIsNeeded": []
+    },
+    {
+      "stage": 10,
+      "name": "Initialize workspace rehearsal-006",
+      "result": "NOT_RUN",
+      "mandatory": false,
+      "waiver": "owner 2026-10-28: four-case causa-data requirement waived; Rehearsal 6 loads the published historical-v1 workspace and writes only to isolated workspaces/demo/<runId>/",
+      "evidence": [
+        "workspaces/demo/rehearsal-006 does not exist on causa-data main (dcb8cb9) nor on any remote branch; workspaces/demo contains historical-v1, live-20261022202313, live-20261022202349, rest-39850690710, rest-39875835357",
+        "Branch codex/causa-workspace-e2e-20261028 contains a trial workspace workspaces/demo/rehearsal-900001 (not on main)"
+      ],
+      "findings": [
+        "Nothing was created. rehearsal-006 is free and must not be overwritten if created later."
+      ],
+      "blockers": [],
+      "whatIsNeeded": []
+    },
+    {
+      "stage": 11,
+      "name": "Isolation (re-targeted: R6 writes isolated to workspaces/demo/<runId>/, historical-v1 frozen and protected)",
+      "result": "PASS",
+      "mandatory": true,
+      "evidence": [
+        "causa-data README (main): 'Never migrate, overwrite or reshape frozen files. Writes go only to isolated workspaces/demo/<runId>/ paths.'",
+        "R5 provider (indy-init-rehearsal-005 b972cb4, src/persistence/Provider.fs): Target.create validates workspace with ^[a-z0-9][a-z0-9-]{0,63}\\z (rejects empty, uppercase, '/', '.', traversal, >64); workspaceRoot = workspaces/demo/<workspace>; pathAllowed permits only workspaces/demo/<ws>/investigations/<uuid>/{manifest.json,events.ndjson,snapshot.json}",
+        "R5 Sync.fs:961 refuses writes when the selected workspace is the catalog workspace ('The historical catalog workspace is read-only.'); catalog documents are ReadOnly and Submit/Save/Create are refused (Sync.fs:994,1076,1097); Sync.fs:655 fails the catalog closed if the catalog workspace holds unlisted investigations",
+        "R5 Persistence.Tests (SyncAppTests + CatalogAppTests) run in a disposable scratch clone: 27 passed, 0 failed, incl. 'the target is an explicit, validated selection' (rejects empty and '../../catalog' workspace), 'writes are confined to the selected workspace' (rejects catalog/active.json, workspaces/demo/historical-v1/..., '..' and non-storage file names), 'after Connect every catalog case ... is read-only' (all requests GET; writes refused), 'another workspace of the same repository does not engage the catalog'. List: scratchpad/pf/r5-tests.txt",
+        "causa-data F# historical-verify deterministic-reconstruction: 'differing: none; unexpected: none' — any change or extra file in workspaces/demo/historical-v1 is detected",
+        "causa-data Python immutability checks PASS: frozen-paths-equal-release-tag (contract/, fixtures/, compatibility/, engine.lock.json, global.json identical to causa-storage-v1.0.0) and prior-workspaces-untouched",
+        "Isolation demonstrated in CI for the branch tooling: workspace test 'two workspaces isolate an appended event from the template and canonical source' passed (scratch, branch 2de19d0) — informational"
+      ],
+      "findings": [
+        "Protection of historical-v1 against runtime writes rests on the R5 app (read-only catalog workspace refusal, path allow-list) plus post-hoc detection by historical-verify. The Python CI check is weaker: prior-workspaces-untouched allows *additions* under workspaces/demo/historical-v1/ and only rejects modifications, and it diffs against origin/main, so on a push to main it compares main with itself and is vacuous. It also fails any branch that adds a new workspace (seen in run 40735287605 for rehearsal-900001), so R6 workspaces must be written directly by the app to main, not via a branch/PR, or the check must be updated.",
+        "Test coverage for invalid workspace names is limited to '' and '../../catalog'; uppercase, '/', '.' and length are rejected by the regex but not individually tested."
+      ],
+      "blockers": [],
+      "whatIsNeeded": []
+    },
+    {
+      "stage": 12,
+      "name": "Compatibility (re-targeted: R5 GitHub provider loads historical-v1 from the published repo)",
+      "result": "PASS",
+      "mandatory": true,
+      "evidence": [
+        "Fresh read-only live check 2026-10-28T18:51Z: R5 `causa-persistence catalog` (built from b972cb4 in a scratch clone) against defaults kemiller2002/causa-data, branch main (dcb8cb9), workspace historical-v1: connection 'connected', refusals 0, 3 cases, each readOnly=true, replayed by engine Storage.read (History.validate) with stateSha256 = expectedStateSha256; 'RESULT: PASS (live catalog load; digests and replayed state digests match the catalog manifest; every case admitted by the engine's History.validate)'. Log: scratchpad/pf/r5-catalog-live.txt. The command issues GETs only.",
+        "R5 recorded evidence: evidence/acceptance/run-40620099844-1b9fb56/gate-records/provider-conformance/provider-conformance.json, catalog.result = RESULT: PASS with the same three ids and state digests (apollo-1 67af9c9f..., apollo-11 b82ac9ce..., challenger 296bdf27...)",
+        "causa-data catalog/historical-v1/verification/r002-external-load.txt: Rehearsal 2 app (c4d5bbf) loaded the 3 investigations VALID from claude/historical-catalog-v1@2c14ef9 — older app and pre-merge branch, cited as history only"
+      ],
+      "findings": [
+        "All three investigations load and replay to the manifest digests through the R5 provider from published main."
+      ],
+      "blockers": [],
+      "whatIsNeeded": []
+    },
+    {
+      "stage": 13,
+      "name": "Toolchain",
+      "result": "PASS",
+      "mandatory": true,
+      "evidence": [
+        "praxis 3.23.0 praxis-linux-x64.tar.gz: sha256 63ae6b31843901ca37fa23936973253cc8fa2df096ca9620b83c66a15b01060b == expected",
+        "praxis 3.23.0 native-checksums.txt: sha256 b1f283b4b3fec46d1dfca6db79d69b5f649527a442fb0b8d744d48e3706b0677 == expected",
+        "ordo 1.19.0 ordo-linux-x64.tar.gz: sha256 2898e8541a2bc2836f3e1efee108f2b05594118b9ca1ecf4464a452c33aa4a36 == expected",
+        "ordo 1.19.0 native-checksums.txt: sha256 ff4370e9b71869b6547c40cd467954f680b87bf027eaaf3831d88a5553513db7 == expected",
+        "percepta 0.1.0 percepta-repo-linux-x64: sha256 e46113aa08c9d2a97dfb1f75ca65c986946e1601c5f2c5cdcc9e8c25841d6039 == expected",
+        "percepta 0.1.0 checksums.txt: sha256 ff99817e48d4ae09307b2e313a0e6facc645dc952566de1391e510d95a2093d3 == expected",
+        "percepta-semantic 0.3.0 percepta-semantic-0.3.0-linux-x64.tar.gz: sha256 a3ea1ea7c497a79f14d29ed087a495ad513e58e0cca3d50968525a7440a834da == expected",
+        "percepta-semantic 0.3.0 checksums.txt: sha256 91547d27df8b4386dce5058c1499de554ce241ba96560cbf34669cc760ff6964 == expected",
+        "dokimos 0.9.0 dokimos-linux-x64.tar.gz: sha256 7131b09419e6da039fe32a31e86528cb43112769892f53ac54d8943be2e22069 == expected",
+        "dokimos 0.9.0 dokimos-checksums.txt: sha256 1a213297cc8555b14e26ccab221426cbbc1a76837a09e03d50374507b2f9c5dc == expected",
+        "dokimos 0.9.0 LICENSE: sha256 ffcca38841adb694b6f380647e15f17c446a4d1656fed51a1e2041d064c94cc8 == expected",
+        "visual-engineering 1.0.1 echelon-foundry-visual-engineering-1.0.1.tgz: sha256 32347d5c134f724cb35f9c33d882c2ed51f860381f0d5802634da3da74fb3f2f == expected",
+        "communication-engineering 1.0.0 echelon-foundry-communication-engineering-1.0.0.tgz: sha256 d808867e4af59363673e991153ff788146b5a277e0b01c2d84e0f86d98347437 == expected",
+        "communication-engineering 1.0.0 SHA256SUMS: sha256 fd4b48a2c7173675ec7a15f44766b8a5b50fde6bcf4813267b234d25eaf5aa1d == expected",
+        "tutela 0.1.0 echelon-foundry-tutela-0.1.0.tgz: sha256 222fdaafa88b3798363fb4664682b409a05cdecf9b23178f028749898b40a861 == expected",
+        "tutela 0.1.0 SHA256SUMS: sha256 bf75418b013c735a6e240ed9b0519f69a2d811c33c7755c4c1a026481b66a02d == expected",
+        "aegis 1.0.0 EchelonFoundry.Aegis.Core.1.0.0.nupkg: sha256 24255d245463f1ce819ce98f10bc5f6a062f8b3342d0bf4eee00fef9a45a835d == expected",
+        "limen 0.9.1 echelon-foundry-limen-0.9.1.tgz: sha256 a7dd300577a145ff56bfa2d8ebae21e864c00b1409e701ebb3704cc367d4ddc8 == expected",
+        "forma 0.11.0 echelon-foundry-design-system-0.11.0.tgz: sha256 82b8b8e4c844cd51c6f6477665c85f359556b413418f381f353454e81507f1dd == expected",
+        "forma 0.11.0 forma-marketing.sha256: sha256 7b9522cb8359cecc61e1e132b52d16144b03a7f92d3bd6aaa4d0bffb3ef497ce == expected",
+        "folio 0.4.1 echelon-foundry-print-components-0.4.1.tgz: sha256 57c6a0eccad41e6acef7c0b91a6e072276b0ebaddda27fbb3b36abd956aeea1b == expected",
+        "folio 0.4.1 checksums.txt: sha256 aab49e9b12a85db0fd5a206b33378cbc3038b326664d6c6e2eab6c3812a2e328 == expected",
+        "strata 0.1.1 strata-linux-x64.tar.gz: sha256 497ec245b60994e13b8a8923ec6a8fb994acdb8365d022e9e4fcf955605f2a1b == expected",
+        "strata 0.1.1 native-checksums.txt: sha256 fc42113dfbeb48f361cd2b402c1a3a5dbdcd3c38c35034e2856544f7d618a1fe == expected",
+        "arca 0.6.0 EchelonFoundry.Arca.Core.0.6.0.nupkg: sha256 e93c434553819704f57bfc6c9e70ed0333ca2dad37247ce9d4068a7abffc9646 == expected",
+        "arca 0.6.0 EchelonFoundry.Arca.GitHub.0.6.0.nupkg: sha256 34f160c4825952f0b2f8c48cb06943bdb2f6c25ed357ced31e9a8d2240c57fe9 == expected",
+        "arca 0.6.0 EchelonFoundry.Arca.Limen.0.6.0.nupkg: sha256 c4ef571f1fd1171cbe1a441ad5cd6d574c5faea148a45effd0b94f4131535a11 == expected",
+        "arca 0.6.0 checksums.txt: sha256 6bce2c70b3f42258cc0de800719b92ca7c984c8b94ee4ebfa5c2485bc1c5e61e == expected",
+        "fides 0.2.0 EchelonFoundry.Fides.0.2.0.nupkg: sha256 ee557e9285894d898f6a727b8ced968fc08c6f73bc8b3cc86bc5f5c669a31863 == expected",
+        "fides 0.2.0 EchelonFoundry.Fides.Arca.0.2.0.nupkg: sha256 c7c8df26a47d49f0385d39f1614d03837671e7b6c071baa399cab910bb42b84b == expected",
+        "fides 0.2.0 EchelonFoundry.Fides.Client.0.2.0.nupkg: sha256 b65efb1357cd10fcf2d9a2e2080e24cb2f488c470ba8802e6d4a578628936e95 == expected",
+        "fides 0.2.0 EchelonFoundry.Fides.Hosting.0.2.0.nupkg: sha256 53f8126e8b74002d71bd2ae539640951c5a103bcf2c6e17d33a527d75128f944 == expected",
+        "fides 0.2.0 checksums.txt: sha256 a32e49303d650afa60cd51f860732216afb633c103f0c4ce0cbf76c93592378d == expected",
+        "summa-contracts 0.1.0 EchelonFoundry.Summa.Contracts.0.1.0.nupkg: sha256 8ef0e595f9749edac7fc3c46c1d400ba1a4d44f10090c3ed27291855845d15f1 == expected",
+        "summa-contracts 0.1.0 checksums.txt: sha256 526dc765ac6736de9043a0cc08b4f9932b4b79518c4bff0b049d5366df7f6776 == expected",
+        "limen-fsharp 0.9.0 EchelonFoundry.Limen.Contract.0.9.0.nupkg: sha256 1db1ec2c19f45331b31fc0d13a876259e12efa4de7509f6ee4939567984c2817 == expected",
+        "limen-fsharp 0.9.0 EchelonFoundry.Limen.Guest.0.9.0.nupkg: sha256 8d626c5c63d4695b866bcddc7893c7661fc495f307519d597f0e7199196be388 == expected",
+        "limen-fsharp 0.9.0 EchelonFoundry.Limen.Routing.0.9.0.nupkg: sha256 278e3f221cd98aaec3bf0b3069bc222a1554eababaf66931e8baa6c2fb7561a0 == expected",
+        "limen-fsharp 0.9.0 EchelonFoundry.Limen.Store.0.9.0.nupkg: sha256 ce71b5bbdc38704615c212b4a5955467598ed97c8d9982a9b8bac0b6b4b7bc8d == expected",
+        "limen-fsharp 0.9.0 checksums.txt: sha256 91983b9587c4fdafc0aef079db8690ae0f31d9cde025fff0483b1c4515f44e35 == expected",
+        "conditor 0.10.17 conditor-linux-x64 (release v0.10.17, published 2026-10-28T17:46:30Z): sha256 933be5f29db69051172956f959c70d911ac964d9404dbf55103c700e03ddce1f == release checksums.txt == GitHub asset digest",
+        "praxis --version -> 'praxis 3.23.0'; praxis status --json in a scratch clone of R5 -> validation passed, findingCount 0",
+        "ordo --version -> 1.19.0; ordo status --json (R5 scratch clone) -> state upgrade-required (installed 1.18.0), as expected for R5",
+        "dokimos --version -> ReleaseVersion 0.9.0, DokimosVersion 0.9.0+2dab315b; dokimos identity --root (R5 clone) -> checks agree",
+        "percepta-repo --version -> 0.1.0; percepta-repo status --json (R5 clone) -> state current, installedVersion 0.1.0",
+        "percepta version -> 'percepta 0.3.0+c9747c2632074fc2cac94c1ad44ed22f5c2a251b'",
+        "limen (npm 0.9.1 tarball, runtimes/linux-x64/limen sha256 6d87e908...78d5) --version -> 'limen 0.9.1'; limen wasm-check run (stage 14)",
+        "forma 0.11.0 package.json name @echelon-foundry/design-system version 0.11.0; bin forma-color --help -> 'usage: forma-color validate [--contract FILE] FILE...' exit 0",
+        "folio 0.4.1 package.json @echelon-foundry/print-components 0.4.1 (library package, no CLI); tgz sha256 also matches folio checksums.txt",
+        "aegis 1.0.0 nupkg nuspec id EchelonFoundry.Aegis.Core version 1.0.0, lib/net8.0/Aegis.Core.dll (library, no CLI)",
+        "conditor components --json / compatibility --json list aegis 1.0.0 qualified; conditor test-env resolve/digest/preflight with a scratch minimal contract: resolve exit 0 (port 48222; PF_TEST_PORT=48333 override honoured), digest b16ce8c8...0de0 equals the documented sha256sum recipe, preflight passed in 179 ms (port, build config, browser revision 1243, artifact digest)",
+        "F#: dotnet new console -lang F# + dotnet build -c Release (SDK 10.0.402): 0 warnings, 0 errors; run prints 'Hello from F#'",
+        "Tests: dotnet new xunit -lang F# + dotnet test: Passed 1, Failed 0, Skipped 0",
+        "WASM: dotnet workload list -> no workloads installed (wasm-tools available in dotnet workload search, not installed). A minimal F# project on Microsoft.NET.Sdk.WebAssembly built without the workload (runtime pack from NuGet) and ran under node 22 via dotnet.js: printed 'wasm-hello Wasm', runMain exit 0",
+        "R5's src/app built in Release in a scratch clone (27.6 s, 0 errors)",
+        "Browser: Playwright 1.63.0 (/opt/node-tools), Chromium 153.0.8010.12 headless (/opt/pw-browsers/chromium-1243): data URL loaded, title 'pf', marker 'ok', console captured 'log:console-capture-ok'; the site served on the port from conditor test-env resolve loaded ('preflight-marker')",
+        "Deployment: R5's deploy path (actions/upload-pages-artifact@v3, actions/deploy-pages@v4) runs only in GitHub Actions; the R5 Pages URL serves version.json with R5 HEAD SHA b972cb44"
+      ],
+      "findings": [
+        "All Echelon components in the 1.32.0 linux-x64 resolved set downloaded from the set's URLs and matched sha256 (40/40 artifacts, including Aegis 1.0.0, which is in the set)",
+        "Executables answer their version commands at the approved versions: praxis 3.23.0, ordo 1.19.0, dokimos 0.9.0, percepta-repo 0.1.0, percepta 0.3.0, limen 0.9.1. Conditor 0.10.17 has no --version output: it prints usage, so its version is attested by the release tag and asset digest",
+        "strata 0.1.1 (in the set, not in the requested list) needs a Postgres connection string even for --version",
+        "The wasm-tools workload is absent. R5 CI installs it (dotnet workload install wasm-tools) in the site and wasm-smoke jobs. Interpreter-mode builds work without it, but R5's site build ran under it, so CI must keep the install step. Not installed here: it is a large download, not a trivial one",
+        "The ordo status in R5 reports upgrade-required (1.18.0 -> 1.19.0). This is expected: R5 predates 1.32.0, and R6 starts fresh",
+        "Deployment support is checkable only as far as the R5 Pages evidence goes; a deploy can't be exercised from here (no workflow dispatch, no R6 CI)"
+      ],
+      "blockers": [],
+      "whatIsNeeded": [
+        "CI must keep 'dotnet workload install wasm-tools' (or a later equivalent), as R5 did",
+        "R6 CI should install host tools from the 1.32.0 channel with sha256 verification, as R5's install-host-tool.sh did"
+      ]
+    },
+    {
+      "stage": 14,
+      "name": "WebAssembly diagnostics",
+      "result": "PASS",
+      "mandatory": true,
+      "evidence": [
+        "limen 0.9.1 wasm-check --help: read-only, exit 0 below the limit and 3 at or over it, LIMEN030 error at >=65,535-byte tier-0 frame, LIMEN031 warning at >=32,768",
+        "Controlled examples: /home/user/limen (v0.9.1) cli/tests/InterpreterFrame.Examples copied to scratch and built with SDK 10.0.402 (Examples.fs generated by generate.fsx). wasm-check: 69 methods; errors LIMEN030 on Nested.project$cont@206 122,416, Large.project 102,832, Closures.project 80,672, GeneratedMatch.project 80,656, StructLocals.project 72,720, LargeEdge.project 68,064, GeneratedMatchEdge.project 66,544; warnings LIMEN031 on LargeNear 63,664, StructLocalsNear 62,544, GeneratedMatchNear 50,416; Small.project 2,400 no finding; exit 3. Every figure equals docs/57's measured table",
+        "R5 failure class reproduced independently (scratch worktree of a local R5 clone; R5 not modified): commit ec6407b built in Release -> Causa.App.View::project 70,720 bytes (1+8,838 locals), LIMEN030, exit 3; parent-of-fix bb89d44 -> largest View/keys2@463::Invoke 5,216, no finding, exit 0 (matches docs/57). JSON: /tmp/claude-0/-home-user/39ad7b23-c1af-5e90-a30a-399aa26ff3ce/scratchpad/pf/run/wasm-check-r5-ec6407b.json",
+        "R5 HEAD b972cb44: Causa.App.AnalysisView::extend 58,784 bytes (90% of limit, 2+7,345 locals), LIMEN031 warning, exit 0. JSON: /tmp/claude-0/-home-user/39ad7b23-c1af-5e90-a30a-399aa26ff3ce/scratchpad/pf/run/wasm-check-r5-head.json",
+        "Runtime startup diagnostics (R5 src/kernel/main.ts): StartFailed / BridgeError entries in window.causaDiagnostics, an unhandledrejection handler for framework load failures, a start timeout, and a boot banner with retry",
+        "Managed exception reporting: the Limen BrowserKernel diagnostics sink reports BridgeError; start-smoke.spec.js fails on 'locals size too big' and CAUSA.INTERNAL in diagnostics",
+        "Browser console capture: Playwright page.on('console') verified here; Limen 0.9.1 browser-kernel.js writes through console and the build stamps window.__ECHELON_RUNTIME__ (found in dist/kernel/browser-kernel.js)",
+        "Version stamps: R5 build-site.mjs records component versions (VER-007) and CI writes dist/version.json {sha, run_id}; deployed-smoke compares it with GITHUB_SHA",
+        "WASM artifact validation: build-site.mjs copies _framework without .br/.gz/.pdb, scans .wasm/.dll for token-shaped strings (latin1 and utf16le), and refuses a production output that names EnableTestHooks",
+        "Route startup smoke: R5 tests/browser/start-smoke.spec.js checks 6 routes in the production and test builds",
+        "Interpreter configuration: MONO_INTERPRETER_OPTIONS='-ssa,-bblocks' plus the jiterpreter turned off (--no-jiterpreter-traces-enabled, -interp-entry-enabled, -jit-call-enabled) in main.ts and Engine.WasmSmoke/run.mjs (R4 D-HIST-WASM)",
+        "docs/50 (worker hosting) in Limen is about dedicated-worker hosting of guests; docs/57 describes wasm-check"
+      ],
+      "findings": [
+        "Yes: limen wasm-check (0.9.1, F# CLI from the npm package's runtimes/linux-x64) detects R5's oversized-method failure class. It flagged exactly the method the interpreter refused at R5 ec6407b, and every controlled example classified as documented",
+        "The check works on .dll build output only. Webcil .wasm under _framework is reported as LIMEN033 and not read, so CI must point it at bin/Release/net10.0/",
+        "Risk carried into R6 if it reuses R5's application shape: R5 HEAD's AnalysisView::extend is already at 90% of the limit",
+        "R5 CI did not run wasm-check (it predates Limen 0.9.1). R6 CI should run it after the Release build, beside the start smoke",
+        "The interpreter options are a .NET 10.0.14 workaround. Confirm they are still needed on the runtime pack that CI resolves"
+      ],
+      "blockers": [],
+      "whatIsNeeded": [
+        "R6 CI step: dotnet build -c Release src/app && limen wasm-check src/app/bin/Release/net10.0/ --json (fail on exit 3), plus a route start smoke against the real WASM build"
+      ]
+    },
+    {
+      "stage": 15,
+      "name": "CI and deployment",
+      "result": "BLOCKED",
+      "mandatory": true,
+      "evidence": [
+        "R5 build-and-test.yml: triggers pull_request, push to main and r5/**, workflow_dispatch; permissions contents: read; main runs never cancelled",
+        "Deployment target: GitHub Pages. The deploy job runs on push to main when vars.DEPLOY_TARGET=='github-pages' and build-and-test succeeded; permissions pages: write and id-token: write; environment github-pages; actions/upload-pages-artifact@v3 + actions/deploy-pages@v4; concurrency group pages",
+        "Artifact publication: actions/upload-artifact per job (site, site-test, core-results, browser-results, live-results JSON only and never traces, wasm-smoke, lock-gate, percepta, deployed-results, acceptance-evidence)",
+        "Candidate SHA tracking: dist/version.json {sha: GITHUB_SHA, run_id}; deployed-smoke polls the deployed version.json until it equals GITHUB_SHA, and the acceptance ledger binds the deployed SHA; INDY_INIT_REF and the causa-data ref are pinned",
+        "Version stamps: build-site VER-007 component versions; lock-gate T11 stack lock vs echelon-current 1.29.0 (the pinned channel copy must equal the registry file at the pinned commit)",
+        "Browser test configuration: playwright.config.js with CAUSA_PORT default 4821 and CAUSA_TEST_PORT 4822; projects ipad-portrait, ipad-landscape and phone-320 for @responsive; CI installs chromium, plus webkit when configured; skipped tests fail the job; @live is separate",
+        "Independent test-server ports: R5 has no conditor.test-environment.json (conditor test-env resolve on an R5 clone -> 'No test-environment contract'). Ports come from env vars in playwright.config.js. Conditor 0.10.17 test-env resolve/preflight/digest verified working on a minimal scratch contract, including the port-variable override",
+        "Artifact digest verification: host tools installed via install-host-tool.sh with SHA-256 from the pinned channel; deployed.spec.js compares every served file's sha256 with the built artifact byte for byte; Conditor test-env artifact digest checked (stage 13)",
+        "R6 has no .github/workflows, so there is no CI to run a minimal-artifact infrastructure smoke"
+      ],
+      "findings": [
+        "R5's workflows are a complete template: Pages deploy, SHA-bound version.json, deployed byte-for-byte smoke, artifact uploads, and SHA-256-verified host tools",
+        "Gaps to close when adopting it: re-pin lock-gate to 1.32.0 and praxis_ref to Praxis 3.23.0; add conditor.test-environment.json and use 'conditor test-env resolve --shell' in place of hard-coded 4821/4822 ports; add a limen wasm-check step",
+        "Infrastructure smoke with a minimal artifact: NOT RUN. R6 has no CI, and pushing a workflow is out of scope"
+      ],
+      "blockers": [
+        "R6 has no CI workflow and no Pages deployment, so the infrastructure smoke cannot run",
+        "GitHub Actions/Pages settings for R6 cannot be read from this session"
+      ],
+      "whatIsNeeded": [
+        "At kickoff: commit R5's workflow set as infrastructure only (re-pinned to 1.32.0), plus Pages enablement and DEPLOY_TARGET, then run a minimal-artifact deploy and deployed-smoke on main to prove version.json == SHA",
+        "A conditor.test-environment.json for independent test-server ports and artifact digest",
+        "Secrets CAUSA_GITHUB_TOKEN and CAUSA_TEST_REPO if the live jobs are kept"
+      ]
+    },
+    {
+      "stage": 16,
+      "name": "Acceptance infrastructure self-test",
+      "result": "PASS",
+      "mandatory": true,
+      "mandatoryBasis": "Inferred from the stage's purpose: the verifier must be trusted before R6 evidence is assessed. The owner's script is authoritative for this flag.",
+      "evidence": [
+        "Compiler offline suite: all passed. Full suite: all passed, including 24 compilation negative/positive cases, the determinism check and --check of the committed package.",
+        "contractTests: the fields check (326 contracts complete); unclassified controls; 7 binding/table controls; planControls: 17 tampering controls plus 1 swap-naming assertion; checker: 10 synthetic-candidate scenarios (1 positive, 1 related-unit-test, 8 negative). All pass. The suite prints only 'all passed', so these counts come from the source (tools/requirements-compiler/tests/Tests.fs), not from run output.",
+        "Process controls: 47/47 negative controls and 3/3 record controls pass; positive VERIFIED (run output pf/process-simulation.json).",
+        "R6ReadinessTests: bindings, duplicateIds (3), reviewConverter and frozenRules all pass (in the offline suite).",
+        "tools/test-acceptance-verdict.py: Ran 19 tests, OK. tools/test-acceptance-ledger.py: Ran 11 tests, OK.",
+        "R4 replay: 7/7 cases as expected; verify-plan CLI on R4: INVALID."
+      ],
+      "capabilities": [
+        {
+          "n": 1,
+          "capability": "requirement ingestion",
+          "status": "self-tested",
+          "evidence": "V01/V02/V11 PASS; baseline equivalence (offline); baseline-obligation-tampered case -> V01; baseline unit tests."
+        },
+        {
+          "n": 2,
+          "capability": "obligation enumeration",
+          "status": "self-tested",
+          "evidence": "contract fields: exactly 326 obligations with complete contracts; stable VPO ids; MISSING-OBLIGATION/MISSING-REQUIREMENT controls."
+        },
+        {
+          "n": 3,
+          "capability": "evidence collection and binding",
+          "status": "self-tested",
+          "evidence": "checker TEST-MAPPING (ledger-test-unbound, bound-test-absent, evidence-cross-claim); related unit test -> UNVERIFIED; no-obligation-entries -> UNVERIFIED; binding kind/category controls."
+        },
+        {
+          "n": 4,
+          "capability": "candidate identity",
+          "status": "self-tested",
+          "evidence": "INCORRECT-COMMIT-IDENTITY, INCORRECT-REPOSITORY and EVIDENCE-OTHER-CANDIDATE process controls; test_a08_source_deployment_mismatch; evidence source_sha/run_id must match."
+        },
+        {
+          "n": 5,
+          "capability": "freshness",
+          "status": "self-tested",
+          "evidence": "checker stale-evidence -> STALE-EVIDENCE/INVALID; R4 stale-evidence-repinned/stale-manifest; test_a07_stale_evidence, test_a16_cross_run_evidence_reuse; STALE-REVIEW."
+        },
+        {
+          "n": 6,
+          "capability": "independent review handling",
+          "status": "self-tested",
+          "evidence": "SELF-ACCEPTANCE (x3 variants), STALE-REVIEW (x2), UNATTESTED-REVIEW (x2), REVIEW-NOT-APPROVED (x3)."
+        },
+        {
+          "n": 7,
+          "capability": "defect closure",
+          "status": "partially self-tested",
+          "evidence": "test_a12_unresolved_critical_defect and test_critical_defect_pass_requires_evidence_path (Python); compile case defect-class-test-missing -> V16. NO self-test in the plan verifier (verify-plan/verify-process) for defect-class closure (VR-DEFECT-CLASS), and none for 'unbound after review' re-binding."
+        },
+        {
+          "n": 8,
+          "capability": "release selection",
+          "status": "self-tested",
+          "evidence": "MISSING-RELEASE-SELECTION, RELEASE-SUPERSEDED (x2) process controls."
+        },
+        {
+          "n": 9,
+          "capability": "gate evaluation",
+          "status": "self-tested",
+          "evidence": "test_a04_blocked_gate, test_a05_not_run_gate, test_a13_accepted_flag_cannot_override_blocked_gate, test_missing_gate_rejected; plan-readiness BLOCKED on a wrong digest (run here); preflight verdict units."
+        },
+        {
+          "n": 10,
+          "capability": "final verdict",
+          "status": "self-tested",
+          "evidence": "test_a01_complete_valid_acceptance, test_computed_accepted_complete_synthetic_ledger; checker positive -> INCOMPLETE when other rows are NOT_RUN; verdict severity order; DISPOSITION-NOT-ACCEPTED control; R4 replay never ACCEPTED."
+        }
+      ],
+      "refusals": {
+        "missingEvidenceRejected": "PROVEN. test_a06_missing_ci_evidence, test_a09_nonexistent_evidence, test_unproven_pass_rejected; R4 evidence-removed -> INVALID; verify-plan 'PASS claimed without evidence_paths' -> MISSING; checker no-obligation-entries -> UNVERIFIED; process controls drop records -> MISSING-*.",
+        "invalidEvidenceCannotPassByRebinding": "PROVEN within the frozen-plan model. A ledger test not bound in the plan -> TEST-MAPPING/INVALID; evidence claiming a test bound to another obligation -> TEST-MAPPING, not verified; binding a deterministic test as live-provider is refused at compile (V18 plan-binding-kind-cannot-provide); a rebound/edited plan -> verify-process INVALID ('a plan edited after freezing (producers rebound)'); a re-sealed tampered plan -> CONTRACT-INCONSISTENT/ALTERED-VALUE; fail-relabelled-pass -> INVALID. Caveat: verify-plan itself takes no application plan-digest pin (see stage 5)."
+      },
+      "findings": [
+        "Exact counts: 24 compilation cases; 17 plan tampering controls (+1 assertion); 10 checker scenarios; 47 process controls + 3 record controls; 7 R4 replay cases; 19 + 11 Python tests. All pass.",
+        "Capabilities without a dedicated self-test in the plan-level verifier: defect-class closure (only the Python verdict tool covers it), 'unbound after review' (R5A-001-04, not implemented), Dokimos reuse attestation (the verifier treats any reuse claim as STALE; no positive path), and an end-to-end acceptance-process.yml run (the workflow template has never executed)."
+      ],
+      "blockers": []
+    },
+    {
+      "stage": 17,
+      "name": "Freeze the baseline",
+      "result": "BLOCKED",
+      "mandatory": true,
+      "evidence": [],
+      "findings": [
+        "Values that would be frozen are recorded under records, but nothing is frozen while mandatory stages [1, 4, 15] are not PASS."
+      ],
+      "blockers": [
+        "Mandatory stages [1, 4, 15] are not PASS."
+      ]
+    }
+  ],
+  "records": {
+    "repositoryToolchainCi": {
+      "repository": "kemiller2002/indy-init-rehearsal-006 (public; local /home/user/kemiller2002/indy-init-rehearsal-006)",
+      "initialCommit": {
+        "sha": "65e346ee70c04d2bf6d4935d06484eb95c8cfae6",
+        "author": "Kevin Miller <kemiller2002@gmail.com>",
+        "date": "2026-10-27T20:21:42-04:00",
+        "message": "Initial commit",
+        "files": [
+          "README.md"
+        ]
+      },
+      "branch": "main (only remote ref; HEAD -> main)",
+      "toolchain": {
+        "dotnetSdk": "10.0.402 (/root/.dotnet; matches Indy-init global.json pin, rollForward disable; R5 has no global.json, CI uses 10.0.x)",
+        "workloads": "none installed (wasm-tools not installed; browser-wasm interpreter builds work without it)",
+        "node": "v22.22.0",
+        "playwright": "1.63.0",
+        "chromium": "153.0.8010.12 (/opt/pw-browsers/chromium-1243)"
+      },
+      "registryVersion": {
+        "repository": "kemiller2002/echelon-registry",
+        "commit": "b20763f893f0e0e9efff48e72fd8721956408bb3",
+        "set": "echelon-current 1.32.0 (approved 2026-10-28T17:52:00Z, OD-INDY-8)",
+        "linuxX64ChannelSha256": "bf52d105279f5239697239cd7d57485f632f022f7bb89e2ca89cc852314527d1",
+        "qualifiedBy": "Conditor 0.10.17"
+      },
+      "componentVersions": {
+        "praxis": "3.23.0",
+        "ordo": "1.19.0",
+        "dokimos": "0.9.0",
+        "percepta (repo lifecycle)": "0.1.0",
+        "percepta-semantic": "0.3.0",
+        "limen": "0.9.1",
+        "limen-fsharp": "0.9.0",
+        "forma": "0.11.0",
+        "folio": "0.4.1",
+        "arca": "0.6.0",
+        "aegis": "1.0.0 (in set)",
+        "fides": "0.2.0",
+        "summa-contracts": "0.1.0",
+        "strata": "0.1.1",
+        "visual-engineering": "1.0.1",
+        "communication-engineering": "1.0.0",
+        "tutela": "0.1.0",
+        "conditor": "0.10.17 (qualifier, not a set component)"
+      },
+      "environment": {
+        "platform": "linux-x64",
+        "scratch": "/tmp/claude-0/-home-user/39ad7b23-c1af-5e90-a30a-399aa26ff3ce/scratchpad/pf",
+        "githubAccess": "R6/R5: anonymous git read only; GitHub API/MCP not configured for these repos; no push credential attached",
+        "r5Reference": "/home/user/kemiller2002/indy-init-rehearsal-005 at b972cb446de543018a65d8726cae6f8283821791 (unmodified; work done in scratch clones)"
+      }
+    },
+    "requirementsVerification": {
+      "indyInitCommit": "856157a78d47946d264ec49ee8325fcf996ae9b9",
+      "baseline": {
+        "id": "BL-CAUSA-INDY-INIT-aab8f80c7743",
+        "path": "requirements/causa-requirements-baseline.json",
+        "sha256": "621e2f960038dcfb0daa2a9fe18a0c1c350faed297ba2856da1236a0360857b9",
+        "sourceCommit": "aab8f80c7743392e794b3b631542903ed4ed6f64",
+        "requirements": 461,
+        "obligations": 2293,
+        "p0Requirements": 108,
+        "p0Obligations": 326,
+        "p1Requirements": 16,
+        "conflicts": 0
+      },
+      "plan": {
+        "id": "VP-0eb9c791dd0b",
+        "digest": "0eb9c791dd0beba7d63f709a810c2f0d379ea71e03c74a53d8b34951a9260766",
+        "fileSha256": "3126091a8cb5e39502c350792c1bc815766059f4fbdf850b47d78a0500d0280e",
+        "boundObligations": 326,
+        "categoryChecks": 633,
+        "verifiedObligations": 0
+      },
+      "compiler": {
+        "path": "tools/requirements-compiler",
+        "lastCommit": "f27694d3de86d1294d72c4d45a814e1a46a3f108",
+        "builtAt": "856157a78d47946d264ec49ee8325fcf996ae9b9",
+        "dllSha256": "06abf41cfc5c842af321e6941abb2bad61b19db6f34961943666c0947a112fb7"
+      },
+      "validation": {
+        "V01-V18": "all PASS",
+        "compilation": "PASS",
+        "rehearsalReadiness": "READY",
+        "offlineSuite": "all passed",
+        "fullSuite": "all passed (24 cases, determinism, --check)",
+        "planReadiness": "READY 633/633",
+        "processSimulation": "VERIFIED; 47/47 + 3/3 controls",
+        "r4Replay": "7/7 as expected",
+        "pythonVerdictTests": "19 OK",
+        "pythonLedgerTests": "11 OK",
+        "r5AuditValidator": "10/10 PASS"
+      },
+      "processRules": {
+        "path": "kickoff/rehearsal-006/process-evidence-rules.json",
+        "sha256": "6f16435369a046e534e4787903ea96c4a9f7e0adcf7b5b51d4ea15ac156be17c"
+      },
+      "lightbulbDemoConditorInitRequirements": "none in the baseline or input-documents",
+      "ar027to035InFrozenBaseline": false,
+      "r5Audit": {
+        "conclusion": "verification/process-evidence bottleneck, not implementation",
+        "notRunCovered": "31/31",
+        "spotChecks": "11 checked, 11 hold",
+        "reviewIndependence": "same operator session; self-declared; not attested"
+      },
+      "outputs": {
+        "compile": "/tmp/claude-0/-home-user/39ad7b23-c1af-5e90-a30a-399aa26ff3ce/scratchpad/pf/compile/",
+        "planReadiness": "/tmp/claude-0/-home-user/39ad7b23-c1af-5e90-a30a-399aa26ff3ce/scratchpad/pf/plan-readiness.json",
+        "processSimulation": "/tmp/claude-0/-home-user/39ad7b23-c1af-5e90-a30a-399aa26ff3ce/scratchpad/pf/process-simulation.json",
+        "r4Replay": "/tmp/claude-0/-home-user/39ad7b23-c1af-5e90-a30a-399aa26ff3ce/scratchpad/pf/r4-replay.json",
+        "verifyPlanR4": "/tmp/claude-0/-home-user/39ad7b23-c1af-5e90-a30a-399aa26ff3ce/scratchpad/pf/verify-plan-r4.json",
+        "logs": [
+          "/tmp/claude-0/-home-user/39ad7b23-c1af-5e90-a30a-399aa26ff3ce/scratchpad/pf/compile.log",
+          "/tmp/claude-0/-home-user/39ad7b23-c1af-5e90-a30a-399aa26ff3ce/scratchpad/pf/offline.log",
+          "/tmp/claude-0/-home-user/39ad7b23-c1af-5e90-a30a-399aa26ff3ce/scratchpad/pf/full.log",
+          "/tmp/claude-0/-home-user/39ad7b23-c1af-5e90-a30a-399aa26ff3ce/scratchpad/pf/py-verdict.log",
+          "/tmp/claude-0/-home-user/39ad7b23-c1af-5e90-a30a-399aa26ff3ce/scratchpad/pf/py-ledger.log"
+        ]
+      },
+      "repoWrites": "none (a tools/__pycache__ created by running the Python tests was removed; git status is clean; requirements-compiler bin/obj build outputs exist as instructed)"
+    },
+    "dataWorkspace": {
+      "causaData": {
+        "path": "/home/user/causa-data",
+        "mainSha": "dcb8cb994eab81d0384b9c8abc5f0b593f398442",
+        "templatesDirOnMain": false,
+        "rehearsal006Exists": false,
+        "workspacesOnMain": [
+          "historical-v1",
+          "live-20261022202313",
+          "live-20261022202349",
+          "rest-39850690710",
+          "rest-39875835357"
+        ],
+        "catalogManifestSha256": "8c361929cfb429c31c059c92d6148036bf2b5861f81dace635a1f7de18dbf87c",
+        "schemaSha256": "0a68af8c93190d2e4d6c27beb2f8cb67c3aebdda586d01beb7122b71af179152",
+        "engineCommit": "55f49f61c939a3a780cee592f36f732a1328f981",
+        "investigations": [
+          {
+            "caseKey": "apollo-1",
+            "investigationId": "c6b26614-fc43-5013-a15c-cf95942ee07b",
+            "version": 432,
+            "lifecycle": "awaitingVerification",
+            "stateSha256": "67af9c9f05db07d67279f84bb185600f12604b5af67a3954c337581dfdd6552f"
+          },
+          {
+            "caseKey": "apollo-11",
+            "investigationId": "e3adbee5-5096-5a10-bbfb-cecda86a154b",
+            "version": 431,
+            "lifecycle": "awaitingEvidence",
+            "stateSha256": "b82ac9ce37f218fbb53709945bd83283b06bc85e8cb4e4121bd1eaf1dc914f92"
+          },
+          {
+            "caseKey": "challenger-sts-51l",
+            "investigationId": "1784da3c-7141-59ee-a495-1d5d44bf2284",
+            "version": 452,
+            "lifecycle": "active",
+            "stateSha256": "296bdf273968cf15a8526126a242852738cc5fa811bc853f6467fb3e3c67a7e8"
+          }
+        ],
+        "unmergedBranches": {
+          "codex/immutable-historical-rehearsal-workspaces": {
+            "sha": "2de19d09c30d1db546c6259211bb59adc7313f69",
+            "ci": "success (run 40738188954)",
+            "pr": "none",
+            "templateDigest": "fbc776c2f4aa27d0cf2d6825ebf45b1c0c2c5219186179638818007d0b116425"
+          },
+          "codex/causa-workspace-e2e-20261028": {
+            "sha": "c3101ec32521482b5a939fd43dde0e8676fb4d93",
+            "ci": "failure (run 40735287605: immutability.prior-workspaces-untouched rejects workspaces/demo/rehearsal-900001)",
+            "pr": "none"
+          }
+        }
+      },
+      "conditor": {
+        "mainSha": "94308dd",
+        "causaIntegrationOnMain": false,
+        "unmergedBranch": {
+          "name": "codex/causa-rehearsal-preflight",
+          "sha": "581ba80",
+          "pr": "none"
+        }
+      },
+      "rehearsal005": {
+        "path": "/home/user/kemiller2002/indy-init-rehearsal-005",
+        "sha": "b972cb446de543018a65d8726cae6f8283821791",
+        "providerTests": "27 passed / 0 failed (SyncAppTests + CatalogAppTests, scratch clone)"
+      },
+      "scratchLogs": "/tmp/claude-0/-home-user/39ad7b23-c1af-5e90-a30a-399aa26ff3ce/scratchpad/pf/",
+      "repositoriesModified": false
+    }
+  }
+}
