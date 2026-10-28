@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Post-rehearsal tests for the Rehearsal 5 implementation audit
+       (docs/rehearsal-005-implementation-audit). They run against an isolated, unmodified checkout of
+       kemiller2002/indy-init-rehearsal-005 at 1b9fb56873fe7a98dffd5172066d909449c17eae and reuse its own test
+       harness by project reference; nothing is added to or changed in the historical candidate.
+       dotnet test -p:R5Dir=<checkout> . Results are post-rehearsal evidence, never historical acceptance. -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <Deterministic>true</Deterministic>
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+  </PropertyGroup>
+  <Target Name="RequireR5Dir" BeforeTargets="ResolveProjectReferences">
+    <Error Condition="'$(R5Dir)' == '' Or !Exists('$(R5Dir)/tests/Persistence.Tests/Harness.fs')" Text="Set R5Dir to an unmodified checkout of indy-init-rehearsal-005 at 1b9fb56." />
+  </Target>
+  <ItemGroup>
+    <Compile Include="PersistenceAuditTests.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="$(R5Dir)/tests/Persistence.Tests/Persistence.Tests.fsproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
+    <PackageReference Include="xunit" Version="2.9.2" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" />
+  </ItemGroup>
+</Project>

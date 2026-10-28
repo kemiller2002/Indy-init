@@ -1,0 +1,9 @@
+# Post-rehearsal evidence (Rehearsal 5 implementation audit). Not historical acceptance evidence.
+# Candidate: indy-init-rehearsal-005 @ 1b9fb56873fe7a98dffd5172066d909449c17eae (isolated worktree, unmodified)
+# same suite with HTTPS_PROXY/HTTP_PROXY/ALL_PROXY=http://127.0.0.1:9, GITHUB_TOKEN/GH_TOKEN/CAUSA_GITHUB_TOKEN/CAUSA_TEST_REPO unset (no kernel network namespace was available)
+# Recorded: 2026-10-28T14:51:59Z
+
+Passed!  - Failed:     0, Passed:    33, Skipped:     0, Total:    33, Duration: 835 ms - Causa.Acceptance.Tests.dll (net10.0)
+Passed!  - Failed:     0, Passed:    72, Skipped:     0, Total:    72, Duration: 4 s - Causa.App.Tests.dll (net10.0)
+Passed!  - Failed:     0, Passed:    71, Skipped:     0, Total:    71, Duration: 6 s - App.Engine.Tests.dll (net10.0)
+Passed!  - Failed:     0, Passed:    76, Skipped:     0, Total:    76, Duration: 5 s - Persistence.Tests.dll (net10.0)

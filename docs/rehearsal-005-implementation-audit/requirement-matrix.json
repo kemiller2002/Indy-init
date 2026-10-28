@@ -1,0 +1,3748 @@
+{
+  "schema": "indy-init.r5-implementation-audit/1",
+  "description": "Rehearsal 5 implementation-versus-verification audit: one entry per P0 requirement the frozen acceptance ledger reports NOT_RUN. Classifications are audit judgements, not acceptance results. testRefs/evidenceRefs kind \"historical\" means it existed in or before run 40620099844; \"post-rehearsal\" means the audit produced it afterwards. Paths without a prefix are in kemiller2002/indy-init-rehearsal-005 at b972cb4 (src/ and tests/ identical to 1b9fb56); \"indy-init:\" paths are in this repository. remainingWork.applicationCode counts product code, or acceptance-tooling code for scope \"tooling\".",
+  "frozen": {
+    "repository": "kemiller2002/indy-init-rehearsal-005",
+    "candidateSha": "1b9fb56873fe7a98dffd5172066d909449c17eae",
+    "evidenceCommit": "b972cb446de543018a65d8726cae6f8283821791",
+    "ciRun": "40620099844",
+    "plan": "VP-e77a2134e1b0",
+    "baseline": "BL-CAUSA-INDY-INIT-aab8f80c7743",
+    "verdict": "INCOMPLETE",
+    "outcome": "NOT ACCEPTED"
+  },
+  "causeCodes": {
+    "1": "No implementation",
+    "2": "No test",
+    "3": "Test existed but was not executed",
+    "4": "Test executed but lacked sufficient assertions",
+    "5": "Evidence existed but was not collected",
+    "6": "Evidence collected but not bound",
+    "7": "Evidence bound to the wrong candidate",
+    "8": "Evidence rejected for freshness or provenance",
+    "9": "Process evidence never generated",
+    "10": "Owner or reviewer action missing",
+    "11": "Verification plan defect",
+    "12": "Other (explained per obligation)"
+  },
+  "requirements": [
+    {
+      "id": "AR-005",
+      "title": "Capability registry and reuse",
+      "scope": "process",
+      "classification": "PROCESS_EVIDENCE_MISSING",
+      "processStatus": "UNKNOWN",
+      "implemented": "n/a (process)",
+      "verified": "no",
+      "confidence": "medium",
+      "frozenStatus": "NOT_RUN",
+      "frozenPlan": {
+        "document": "docs/AGENT-RELIABILITY-REQUIREMENTS.md",
+        "acceptanceCriteria": [
+          "AR-005-O2"
+        ],
+        "linkedSections": [
+          "AGENT-RELIABILITY§required-adversarial-acceptance-cases"
+        ],
+        "gates": [
+          "G0",
+          "G7"
+        ],
+        "verificationRules": [
+          "VR-LEDGER",
+          "VR-PRESERVATION",
+          "VR-DEFECT-CLASS"
+        ],
+        "requiredEvidence": [
+          "acceptance ledger row with tests and evidence_paths at the verified SHA",
+          "praxis.requirements-preservation/1 evidence JSON with input SHA-256s",
+          "defect-class record with fix SHA and reviewer evidence"
+        ],
+        "dependencies": {
+          "requirements": [],
+          "contracts": [
+            "CT-013",
+            "CT-014",
+            "CT-015"
+          ]
+        },
+        "freshness": "FP-REVIEW-PER-COMMIT"
+      },
+      "obligations": [
+        {
+          "id": "AR-005-O1",
+          "vpo": "VPO-a5e276239baf88ad",
+          "frozenVerification": "NOT_RUN",
+          "primaryCause": 9,
+          "secondaryCauses": [
+            11
+          ],
+          "missingEvidence": "No record that Echelon capabilities, owners, versions and contracts were discovered before each component was designed. WDL-001 records this for the layout engine only.",
+          "text": "Before designing a component, discover existing Echelon capabilities, owners, supported versions, and contracts.",
+          "boundTests": []
+        },
+        {
+          "id": "AR-005-O2",
+          "vpo": "VPO-59214484c4423a46",
+          "frozenVerification": "NOT_RUN",
+          "primaryCause": 9,
+          "secondaryCauses": [
+            10
+          ],
+          "missingEvidence": "No reuse inventory and no approved justification for duplicated implementations; for example src/persistence/Json.fs and src/engine/Json.fs are two JSON codecs with no recorded justification.",
+          "text": "Reuse verified implementations; require an explicit approved justification for duplication.",
+          "boundTests": []
+        }
+      ],
+      "sourceRefs": [],
+      "testRefs": [],
+      "evidenceRefs": [
+        {
+          "kind": "historical",
+          "path": "SDE-MAP.md"
+        },
+        {
+          "kind": "historical",
+          "path": "tests/browser/graph-layout.spec.js"
+        }
+      ],
+      "investigation": "Looked for a capability-discovery or reuse record in the candidate: SDE-MAP.md, acceptance/reuse.json (test reuse, not capability reuse), research/decisions, .praxis/inbox. Only the layout engine has a discovery record (WDL-001, PASS). Whether discovery happened for the other components cannot be established from the repository.",
+      "remainingWork": {
+        "applicationCode": "none",
+        "tests": "none",
+        "evidence": "medium",
+        "planCorrections": "small",
+        "ownerDecisions": "none",
+        "independentReview": "small"
+      },
+      "existingEvidenceAtDeadline": "insufficient",
+      "review": {
+        "challenged": true,
+        "initialClassification": "PROCESS_EVIDENCE_MISSING",
+        "initialProcessStatus": "UNKNOWN",
+        "finalClassification": "PROCESS_EVIDENCE_MISSING",
+        "note": "Upheld by the independent review."
+      }
+    },
+    {
+      "id": "AR-008",
+      "title": "Adversarial independent review",
+      "scope": "process",
+      "classification": "PROCESS_EVIDENCE_MISSING",
+      "processStatus": "UNKNOWN",
+      "implemented": "n/a (process)",
+      "verified": "no",
+      "confidence": "high",
+      "frozenStatus": "NOT_RUN",
+      "frozenPlan": {
+        "document": "docs/AGENT-RELIABILITY-REQUIREMENTS.md",
+        "acceptanceCriteria": [],
+        "linkedSections": [
+          "AGENT-RELIABILITY§required-adversarial-acceptance-cases"
+        ],
+        "gates": [
+          "G0",
+          "G7"
+        ],
+        "verificationRules": [
+          "VR-LEDGER",
+          "VR-PRESERVATION",
+          "VR-DEFECT-CLASS"
+        ],
+        "requiredEvidence": [
+          "acceptance ledger row with tests and evidence_paths at the verified SHA",
+          "praxis.requirements-preservation/1 evidence JSON with input SHA-256s",
+          "defect-class record with fix SHA and reviewer evidence"
+        ],
+        "dependencies": {
+          "requirements": [],
+          "contracts": [
+            "CT-013",
+            "CT-014",
+            "CT-015"
+          ]
+        },
+        "freshness": "FP-REVIEW-PER-COMMIT"
+      },
+      "obligations": [
+        {
+          "id": "AR-008-O1",
+          "vpo": "VPO-94507c8e92862459",
+          "frozenVerification": "NOT_RUN",
+          "primaryCause": 11,
+          "secondaryCauses": [
+            5,
+            10,
+            9
+          ],
+          "missingEvidence": "Two review files exist (acceptance/reviews/R5-independent-review.md, R5-final-review.md). The plan binds obligations only to executed tests, so no review record can satisfy them. Reviewer independence is asserted by the files, not authenticated, and the final review covered be01851, not the final candidate 1b9fb56.",
+          "text": "A reviewer distinct from the implementer must attempt to falsify high-risk claims, inspect requirements and evidence, and record gaps.",
+          "boundTests": []
+        },
+        {
+          "id": "AR-008-O2",
+          "vpo": "VPO-7593c929d716d3bf",
+          "frozenVerification": "NOT_RUN",
+          "primaryCause": 11,
+          "secondaryCauses": [
+            5
+          ],
+          "missingEvidence": "Both reviews list decisions 'recorded as given (not ratified)'. That is a process record the plan cannot bind.",
+          "text": "Reviewers cannot self-ratify operator decisions.",
+          "boundTests": []
+        }
+      ],
+      "sourceRefs": [],
+      "testRefs": [],
+      "evidenceRefs": [
+        {
+          "kind": "historical",
+          "path": "acceptance/reviews/R5-independent-review.md"
+        },
+        {
+          "kind": "historical",
+          "path": "acceptance/reviews/R5-final-review.md"
+        }
+      ],
+      "investigation": "Two reviews by agents described as fresh exist and found real defects (F-1 critical, F-2, F-3, F-5, R2-F1/F2, R3-F1/F2, plus 13 over-tagged obligations). Independence is self-asserted, and the last review ran at be01851 and 543ddc2, not at 1b9fb56. 282 of 283 commits up to 1b9fb56 are authored \"Claude\", and all 201 session trailers name one session, review commits included, so independence cannot be established.",
+      "remainingWork": {
+        "applicationCode": "none",
+        "tests": "none",
+        "evidence": "small",
+        "planCorrections": "small",
+        "ownerDecisions": "none",
+        "independentReview": "medium"
+      },
+      "existingEvidenceAtDeadline": "insufficient",
+      "review": {
+        "challenged": true,
+        "initialClassification": "PROCESS_EVIDENCE_MISSING",
+        "initialProcessStatus": "PERFORMED_EVIDENCE_INADEQUATE",
+        "finalClassification": "PROCESS_EVIDENCE_MISSING",
+        "note": "Sub-status changed to UNKNOWN (accepted): one session id on all 201 trailered commits, reviews included."
+      }
+    },
+    {
+      "id": "AR-011",
+      "title": "Reproducibility and provenance",
+      "scope": "tooling",
+      "classification": "PARTIALLY_IMPLEMENTED",
+      "processStatus": null,
+      "implemented": "partial",
+      "verified": "partial (O1 PASS)",
+      "confidence": "high",
+      "frozenStatus": "NOT_RUN",
+      "frozenPlan": {
+        "document": "docs/AGENT-RELIABILITY-REQUIREMENTS.md",
+        "acceptanceCriteria": [],
+        "linkedSections": [
+          "AGENT-RELIABILITY§required-adversarial-acceptance-cases"
+        ],
+        "gates": [
+          "G0",
+          "G7"
+        ],
+        "verificationRules": [
+          "VR-LEDGER",
+          "VR-PRESERVATION",
+          "VR-DEFECT-CLASS"
+        ],
+        "requiredEvidence": [
+          "acceptance ledger row with tests and evidence_paths at the verified SHA",
+          "praxis.requirements-preservation/1 evidence JSON with input SHA-256s",
+          "defect-class record with fix SHA and reviewer evidence"
+        ],
+        "dependencies": {
+          "requirements": [],
+          "contracts": [
+            "CT-009",
+            "CT-010",
+            "CT-011",
+            "CT-013",
+            "CT-014",
+            "CT-015",
+            "CT-016"
+          ]
+        },
+        "freshness": "FP-REVIEW-PER-COMMIT"
+      },
+      "obligations": [
+        {
+          "id": "AR-011-O1",
+          "vpo": "VPO-79a72fb717368c95",
+          "frozenVerification": "PASS",
+          "text": "Record tool versions, pinned dependency SHAs, fixture seeds and digests, build inputs, CI run IDs, and deployed SHA.",
+          "boundTests": [
+            "Causa.Acceptance.RunTests.EvidenceTests.AR-007 AR-011 every PASS cites its tests, result files, command, environment, run and source SHA; the ledger records the build inputs"
+          ]
+        },
+        {
+          "id": "AR-011-O2",
+          "vpo": "VPO-dbd2edcdfa078b0e",
+          "frozenVerification": "NOT_RUN",
+          "primaryCause": 1,
+          "secondaryCauses": [
+            2,
+            12
+          ],
+          "missingEvidence": "Nothing compares a re-run with the original and separates reproducible differences from environment drift. CI installs dotnet-version 10.0.x, and the rehearsal repository has no global.json. A post-rehearsal rebuild of 1b9fb56 with SDK 10.0.402 gives 193 .NET WebAssembly framework files different content-hash fingerprints (absent from the deployed site) and changes the bytes of 2 same-named runtime files (wasm/_framework/dotnet.js, System.Collections.Immutable.7hl5l3lm5d.wasm). 3 metadata files differ by design. No tool classified this drift.",
+          "text": "Re-run must distinguish reproducible differences from environment drift.",
+          "boundTests": []
+        }
+      ],
+      "sourceRefs": [
+        {
+          "path": "tools/acceptance/Causa.Acceptance/Producers.fs",
+          "symbol": "producer provenance"
+        },
+        {
+          "path": ".github/workflows/build-and-test.yml",
+          "symbol": "setup-dotnet dotnet-version 10.0.x"
+        }
+      ],
+      "testRefs": [
+        {
+          "kind": "historical",
+          "path": "tools/acceptance/Causa.Acceptance.RunTests/EvidenceTests.fs",
+          "name": "AR-007 AR-011 every PASS cites its tests, result files, command, environment, run and source SHA",
+          "result": "passed in run 40620099844"
+        }
+      ],
+      "evidenceRefs": [
+        {
+          "kind": "historical",
+          "path": "evidence/acceptance/run-40620099844-1b9fb56/gate-records/reuse-plan/plan.json"
+        },
+        {
+          "kind": "post-rehearsal",
+          "path": "indy-init:docs/rehearsal-005-implementation-audit/post-rehearsal-evidence/deployed-vs-local-build.tsv"
+        }
+      ],
+      "investigation": "Provenance is recorded (O1 PASS). There is no re-run comparison that separates reproducible differences from environment drift, and the .NET SDK is not pinned in the rehearsal repository (CI uses 10.0.x). A post-rehearsal rebuild with SDK 10.0.402 differs from the deployed build in 193 framework fingerprints and 2 same-named runtime files. Nothing in the engineering system can say whether that is drift or a product change.",
+      "remainingWork": {
+        "applicationCode": "small",
+        "tests": "small",
+        "evidence": "small",
+        "planCorrections": "none",
+        "ownerDecisions": "none",
+        "independentReview": "none"
+      },
+      "existingEvidenceAtDeadline": "insufficient",
+      "review": {
+        "challenged": true,
+        "initialClassification": "PARTIALLY_IMPLEMENTED",
+        "initialProcessStatus": null,
+        "finalClassification": "PARTIALLY_IMPLEMENTED",
+        "note": "Upheld by the independent review."
+      }
+    },
+    {
+      "id": "AR-012",
+      "title": "Controlled work scope",
+      "scope": "process",
+      "classification": "PROCESS_EVIDENCE_MISSING",
+      "processStatus": "UNKNOWN",
+      "implemented": "n/a (process)",
+      "verified": "no",
+      "confidence": "medium",
+      "frozenStatus": "NOT_RUN",
+      "frozenPlan": {
+        "document": "docs/AGENT-RELIABILITY-REQUIREMENTS.md",
+        "acceptanceCriteria": [],
+        "linkedSections": [
+          "AGENT-RELIABILITY§required-adversarial-acceptance-cases"
+        ],
+        "gates": [
+          "G0",
+          "G7"
+        ],
+        "verificationRules": [
+          "VR-LEDGER",
+          "VR-PRESERVATION",
+          "VR-DEFECT-CLASS"
+        ],
+        "requiredEvidence": [
+          "acceptance ledger row with tests and evidence_paths at the verified SHA",
+          "praxis.requirements-preservation/1 evidence JSON with input SHA-256s",
+          "defect-class record with fix SHA and reviewer evidence"
+        ],
+        "dependencies": {
+          "requirements": [],
+          "contracts": [
+            "CT-013",
+            "CT-014",
+            "CT-015"
+          ]
+        },
+        "freshness": "FP-REVIEW-PER-COMMIT"
+      },
+      "obligations": [
+        {
+          "id": "AR-012-O1",
+          "vpo": "VPO-a59db6f04d98cd0d",
+          "frozenVerification": "NOT_RUN",
+          "primaryCause": 9,
+          "secondaryCauses": [
+            11
+          ],
+          "missingEvidence": "Stream branches have no per-agent scope declaration (named requirements and paths). Attribution was reconciled after the fact: 58 work.attribution.reconciled events in .ros/events/events.jsonl.",
+          "text": "Agent changes must be bounded to named requirements and paths; commits should stage intended files only.",
+          "boundTests": []
+        },
+        {
+          "id": "AR-012-O2",
+          "vpo": "VPO-33b57a9348c4707d",
+          "frozenVerification": "NOT_RUN",
+          "primaryCause": 9,
+          "secondaryCauses": [
+            1
+          ],
+          "missingEvidence": "No detector for unrelated changes and no review record for including them. EII-001-B1 proposes a stream contract.",
+          "text": "Detect unrelated changes and require explicit review before inclusion.",
+          "boundTests": []
+        }
+      ],
+      "sourceRefs": [],
+      "testRefs": [],
+      "evidenceRefs": [
+        {
+          "kind": "historical",
+          "path": ".ros/events/events.jsonl"
+        }
+      ],
+      "investigation": "Work was split into owned streams on separate branches, and every main commit is attributed to WI-0001..WI-0008. That attribution was reconciled after the fact (58 reconciliation events), and no record states each agent's bounded requirements and paths before it worked.",
+      "remainingWork": {
+        "applicationCode": "none",
+        "tests": "none",
+        "evidence": "medium",
+        "planCorrections": "small",
+        "ownerDecisions": "none",
+        "independentReview": "none"
+      },
+      "existingEvidenceAtDeadline": "insufficient",
+      "review": {
+        "challenged": true,
+        "initialClassification": "PROCESS_EVIDENCE_MISSING",
+        "initialProcessStatus": "PERFORMED_EVIDENCE_INADEQUATE",
+        "finalClassification": "PROCESS_EVIDENCE_MISSING",
+        "note": "Sub-status changed to UNKNOWN (accepted): no scope declaration or unrelated-change review record."
+      }
+    },
+    {
+      "id": "AR-015",
+      "title": "Long-running agent continuity",
+      "scope": "process",
+      "classification": "PROCESS_EVIDENCE_MISSING",
+      "processStatus": "NOT_PERFORMED",
+      "implemented": "n/a (process)",
+      "verified": "no",
+      "confidence": "high",
+      "frozenStatus": "NOT_RUN",
+      "frozenPlan": {
+        "document": "docs/AGENT-RELIABILITY-REQUIREMENTS.md",
+        "acceptanceCriteria": [],
+        "linkedSections": [
+          "AGENT-RELIABILITY§required-adversarial-acceptance-cases"
+        ],
+        "gates": [
+          "G0",
+          "G7"
+        ],
+        "verificationRules": [
+          "VR-LEDGER",
+          "VR-PRESERVATION",
+          "VR-DEFECT-CLASS"
+        ],
+        "requiredEvidence": [
+          "acceptance ledger row with tests and evidence_paths at the verified SHA",
+          "praxis.requirements-preservation/1 evidence JSON with input SHA-256s",
+          "defect-class record with fix SHA and reviewer evidence"
+        ],
+        "dependencies": {
+          "requirements": [],
+          "contracts": [
+            "CT-013",
+            "CT-014",
+            "CT-015"
+          ]
+        },
+        "freshness": "FP-REVIEW-PER-COMMIT"
+      },
+      "obligations": [
+        {
+          "id": "AR-015-O1",
+          "vpo": "VPO-b54c8db02f0fb4b3",
+          "frozenVerification": "NOT_RUN",
+          "primaryCause": 9,
+          "secondaryCauses": [
+            11
+          ],
+          "missingEvidence": "One Praxis work.checkpointed event in a 392-minute run with two container restarts. The streams resumed from agent transcripts, not from durable machine-readable checkpoints.",
+          "text": "Maintain durable, compact, machine-readable checkpoints of objectives, decisions, completed work, open defects, evidence, and next actions so agent restarts do not re-decide settled questions.",
+          "boundTests": []
+        }
+      ],
+      "sourceRefs": [],
+      "testRefs": [],
+      "evidenceRefs": [
+        {
+          "kind": "historical",
+          "path": ".ros/events/events.jsonl"
+        },
+        {
+          "kind": "historical",
+          "path": "HANDOFF.md"
+        }
+      ],
+      "investigation": "The Praxis checkpoint mechanism exists (HANDOFF.md: praxis work checkpoint), but it recorded one checkpoint (2026-10-27T20:20:18Z) in a 392-minute run. After two container restarts the streams resumed from agent transcripts.",
+      "remainingWork": {
+        "applicationCode": "none",
+        "tests": "none",
+        "evidence": "medium",
+        "planCorrections": "small",
+        "ownerDecisions": "none",
+        "independentReview": "none"
+      },
+      "existingEvidenceAtDeadline": "insufficient",
+      "review": {
+        "challenged": true,
+        "initialClassification": "PROCESS_EVIDENCE_MISSING",
+        "initialProcessStatus": "NOT_PERFORMED",
+        "finalClassification": "PROCESS_EVIDENCE_MISSING",
+        "note": "Reviewer proposed PERFORMED_EVIDENCE_INADEQUATE; rejected on evidence: the only checkpoint (WI-0002, 20:20Z) is the bootstrap item, and none was maintained during implementation or across the two restarts, so the obligation (maintain checkpoints) was not performed."
+      }
+    },
+    {
+      "id": "AR-017",
+      "title": "Ownership and intake",
+      "scope": "process",
+      "classification": "PROCESS_EVIDENCE_MISSING",
+      "processStatus": "UNKNOWN",
+      "implemented": "n/a (process)",
+      "verified": "no",
+      "confidence": "medium",
+      "frozenStatus": "NOT_RUN",
+      "frozenPlan": {
+        "document": "docs/AGENT-RELIABILITY-REQUIREMENTS.md",
+        "acceptanceCriteria": [
+          "AR-017-O1"
+        ],
+        "linkedSections": [
+          "AGENT-RELIABILITY§required-adversarial-acceptance-cases"
+        ],
+        "gates": [
+          "G0",
+          "G7"
+        ],
+        "verificationRules": [
+          "VR-LEDGER",
+          "VR-PRESERVATION",
+          "VR-DEFECT-CLASS"
+        ],
+        "requiredEvidence": [
+          "acceptance ledger row with tests and evidence_paths at the verified SHA",
+          "praxis.requirements-preservation/1 evidence JSON with input SHA-256s",
+          "defect-class record with fix SHA and reviewer evidence"
+        ],
+        "dependencies": {
+          "requirements": [],
+          "contracts": [
+            "CT-013",
+            "CT-014",
+            "CT-015"
+          ]
+        },
+        "freshness": "FP-REVIEW-PER-COMMIT"
+      },
+      "obligations": [
+        {
+          "id": "AR-017-O1",
+          "vpo": "VPO-4f48b0b01fd918ea",
+          "frozenVerification": "NOT_RUN",
+          "primaryCause": 9,
+          "secondaryCauses": [
+            11
+          ],
+          "missingEvidence": "No record of routing during the run. The Praxis preservation-gate finding was routed only after the run (EII-001).",
+          "text": "Route implementation work to the actual owning repository through its documented Praxis input folder and accepted grammar, never GitHub Issues.",
+          "boundTests": []
+        },
+        {
+          "id": "AR-017-O2",
+          "vpo": "VPO-30ecf50560947199",
+          "frozenVerification": "NOT_RUN",
+          "primaryCause": 9,
+          "secondaryCauses": [
+            11
+          ],
+          "missingEvidence": "No ownership-discovery record per component.",
+          "text": "Do not assume component ownership from its name.",
+          "boundTests": []
+        }
+      ],
+      "sourceRefs": [],
+      "testRefs": [],
+      "evidenceRefs": [
+        {
+          "kind": "historical",
+          "path": ".praxis/inbox/documents/2026-10-27-R5-REQ-001-derived-requirements-package.md"
+        }
+      ],
+      "investigation": "Findings for other repositories (the Praxis preservation gate, F-004) were identified during the run, and the results say they 'should be routed'. They were routed after the run through Indy-init input-documents (EII-001). The audit did not search the owners' issue trackers, so 'never GitHub Issues' is not established.",
+      "remainingWork": {
+        "applicationCode": "none",
+        "tests": "none",
+        "evidence": "small",
+        "planCorrections": "small",
+        "ownerDecisions": "none",
+        "independentReview": "none"
+      },
+      "existingEvidenceAtDeadline": "insufficient",
+      "review": {
+        "challenged": true,
+        "initialClassification": "PROCESS_EVIDENCE_MISSING",
+        "initialProcessStatus": "UNKNOWN",
+        "finalClassification": "PROCESS_EVIDENCE_MISSING",
+        "note": "Upheld by the independent review."
+      }
+    },
+    {
+      "id": "AR-019",
+      "title": "Computed verdict, not agent assertion",
+      "scope": "tooling",
+      "classification": "PARTIALLY_IMPLEMENTED",
+      "processStatus": null,
+      "implemented": "partial (R2 clause met; R3 clause not met)",
+      "verified": "partial",
+      "confidence": "medium",
+      "frozenStatus": "NOT_RUN",
+      "frozenPlan": {
+        "document": "docs/AGENT-RELIABILITY-REQUIREMENTS.md",
+        "acceptanceCriteria": [
+          "AR-019-O1",
+          "AR-019-O2",
+          "AR-019-O3",
+          "AR-019-O4"
+        ],
+        "linkedSections": [
+          "AGENT-RELIABILITY§required-adversarial-acceptance-cases"
+        ],
+        "gates": [
+          "G0",
+          "G7"
+        ],
+        "verificationRules": [
+          "VR-LEDGER",
+          "VR-PRESERVATION",
+          "VR-DEFECT-CLASS"
+        ],
+        "requiredEvidence": [
+          "acceptance ledger row with tests and evidence_paths at the verified SHA",
+          "praxis.requirements-preservation/1 evidence JSON with input SHA-256s",
+          "defect-class record with fix SHA and reviewer evidence"
+        ],
+        "dependencies": {
+          "requirements": [],
+          "contracts": [
+            "CT-013",
+            "CT-014",
+            "CT-015"
+          ]
+        },
+        "freshness": "FP-REVIEW-PER-COMMIT"
+      },
+      "obligations": [
+        {
+          "id": "AR-019-O1",
+          "vpo": "VPO-6f2f2edbfc6b5c65",
+          "frozenVerification": "PASS",
+          "text": "The authoritative acceptance outcome MUST be computed from the evidence ledger, frozen baseline, required gates, requirements coverage, approved decisions, defect closures, and deployed SHA.",
+          "boundTests": [
+            "Causa.Acceptance.RunTests.VerifierTests.AR-019 AR-001 the verdict is computed from the pinned baseline, plan, approvals and this run's evidence"
+          ]
+        },
+        {
+          "id": "AR-019-O2",
+          "vpo": "VPO-a96869ed8f00e776",
+          "frozenVerification": "PASS",
+          "text": "Agent-authored accepted fields are advisory at most.",
+          "boundTests": [
+            "Causa.Acceptance.RunTests.VerifierTests.AR-019 a false accepted flag in the ledger is a contradictory claim, never an acceptance"
+          ]
+        },
+        {
+          "id": "AR-019-O3",
+          "vpo": "VPO-4a40040c5484b444",
+          "frozenVerification": "NOT_RUN",
+          "primaryCause": 1,
+          "secondaryCauses": [
+            11,
+            5
+          ],
+          "missingEvidence": "Rehearsal 3's original results are not a machine ledger; validate-acceptance-ledger.py rejects them as structurally invalid (exit 1), and Indy-init's own verification classifies R3 as FAIL, not BLOCKED. Rehearsal 2 (45644a7) is INVALID, not ACCEPTED, which the Indy-init test test_rehearsal_2_original_ledger_is_not_independently_acceptable shows. That evidence lives in Indy-init and was never brought into the R5 bundle.",
+          "text": "Original Rehearsal 3 must yield BLOCKED; Rehearsal 2 candidate 45644a7 should yield ACCEPTED only if its actual ledger and evidence meet the frozen contract.",
+          "boundTests": []
+        },
+        {
+          "id": "AR-019-O4",
+          "vpo": "VPO-a191144b5315b64a",
+          "frozenVerification": "PASS",
+          "text": "Include tests for false accepted flags, missing CI, baseline tampering, and unauthorized waivers.",
+          "boundTests": [
+            "Causa.Acceptance.RunTests.VerifierTests.AR-001 AR-019 a modified baseline is detected by both verifiers",
+            "Causa.Acceptance.RunTests.VerifierTests.AR-003 AR-019 an exclusion the agent approved itself is refused by both verifiers",
+            "Causa.Acceptance.RunTests.VerifierTests.AR-007 AR-018 rows forged to PASS without their evidence are not accepted by either verifier",
+            "Causa.Acceptance.RunTests.VerifierTests.AR-018 AR-019 a gate claimed PASS without its CI evidence in the bundle is not accepted",
+            "Causa.Acceptance.RunTests.VerifierTests.AR-019 a false accepted flag in the ledger is a contradictory claim, never an acceptance"
+          ]
+        }
+      ],
+      "sourceRefs": [
+        {
+          "path": "indy-init:tools/compute-acceptance-verdict.py",
+          "symbol": "compute"
+        }
+      ],
+      "testRefs": [
+        {
+          "kind": "historical",
+          "path": "indy-init:tools/test-acceptance-verdict.py",
+          "name": "test_rehearsal_2_original_ledger_is_not_independently_acceptable",
+          "result": "passed in Indy-init; re-run post-rehearsal at 459f65a: 19 tests OK"
+        }
+      ],
+      "evidenceRefs": [
+        {
+          "kind": "historical",
+          "path": "indy-init:docs/CAUSA-ACCEPTANCE-VERIFICATION-2026-10-26.md"
+        }
+      ],
+      "investigation": "The verifier rejects R2 (INVALID, not ACCEPTED), which meets the R2 clause. O3 also says the original Rehearsal 3 must yield BLOCKED. The R3 record is not a machine ledger: validate-acceptance-ledger.py rejects it structurally (exit 1), and Indy-init classifies R3 as FAIL. The specified outcome, BLOCKED, is not produced, and no owner ruling treats FAIL/INVALID as meeting it. Needs either a machine-readable R3 ledger that the verifier reports as BLOCKED, or an owner decision amending O3.",
+      "remainingWork": {
+        "applicationCode": "small",
+        "tests": "small",
+        "evidence": "small",
+        "planCorrections": "small",
+        "ownerDecisions": "small",
+        "independentReview": "none"
+      },
+      "existingEvidenceAtDeadline": "insufficient",
+      "review": {
+        "challenged": true,
+        "initialClassification": "INDETERMINATE",
+        "initialProcessStatus": null,
+        "finalClassification": "PARTIALLY_IMPLEMENTED",
+        "note": "Changed D->B (accepted): the R3 clause's specified outcome (BLOCKED) is demonstrably not produced; no owner ruling makes FAIL/INVALID equivalent."
+      }
+    },
+    {
+      "id": "AR-020",
+      "title": "Selective enforcement",
+      "scope": "process",
+      "classification": "PROCESS_EVIDENCE_MISSING",
+      "processStatus": "UNKNOWN",
+      "implemented": "n/a (process)",
+      "verified": "no",
+      "confidence": "medium",
+      "frozenStatus": "NOT_RUN",
+      "frozenPlan": {
+        "document": "docs/AGENT-RELIABILITY-REQUIREMENTS.md",
+        "acceptanceCriteria": [
+          "AR-020-O1",
+          "AR-020-O2",
+          "AR-020-O3"
+        ],
+        "linkedSections": [
+          "AGENT-RELIABILITY§required-adversarial-acceptance-cases"
+        ],
+        "gates": [
+          "G0",
+          "G7"
+        ],
+        "verificationRules": [
+          "VR-LEDGER",
+          "VR-PRESERVATION",
+          "VR-DEFECT-CLASS"
+        ],
+        "requiredEvidence": [
+          "acceptance ledger row with tests and evidence_paths at the verified SHA",
+          "praxis.requirements-preservation/1 evidence JSON with input SHA-256s",
+          "defect-class record with fix SHA and reviewer evidence"
+        ],
+        "dependencies": {
+          "requirements": [],
+          "contracts": [
+            "CT-013",
+            "CT-014",
+            "CT-015"
+          ]
+        },
+        "freshness": "FP-REVIEW-PER-COMMIT"
+      },
+      "obligations": [
+        {
+          "id": "AR-020-O1",
+          "vpo": "VPO-da69ee0106c21847",
+          "frozenVerification": "NOT_RUN",
+          "primaryCause": 11,
+          "secondaryCauses": [
+            5
+          ],
+          "missingEvidence": "The four-tier brief is retained at .sde/architecture/FOUR-TIER-ARCHITECTURE.md in the candidate. It is a repository artifact the plan cannot bind.",
+          "text": "Retain the demonstrated four-tier architecture brief as default guidance.",
+          "boundTests": []
+        },
+        {
+          "id": "AR-020-O2",
+          "vpo": "VPO-5e9adab59b7498ad",
+          "frozenVerification": "NOT_RUN",
+          "primaryCause": 11,
+          "secondaryCauses": [
+            9
+          ],
+          "missingEvidence": "A negative obligation: absence of per-step Ordo enforcement can be observed in the repository but not proven by a test.",
+          "text": "Do not add per-step Ordo architecture enforcement, typed agent records, or executable decision gates without a measured incremental correctness benefit that justifies cost and false rejections.",
+          "boundTests": []
+        },
+        {
+          "id": "AR-020-O3",
+          "vpo": "VPO-e6cb4bb12bf3f901",
+          "frozenVerification": "NOT_RUN",
+          "primaryCause": 11,
+          "secondaryCauses": [
+            5
+          ],
+          "missingEvidence": "Typed F# domain model (src/engine/Model.fs) and documented boundaries (docs/architecture/BOUNDARIES.md) exist. There is no binding path for them.",
+          "text": "Typed domain models and security/acceptance boundaries remain mandatory where independently justified.",
+          "boundTests": []
+        }
+      ],
+      "sourceRefs": [],
+      "testRefs": [],
+      "evidenceRefs": [
+        {
+          "kind": "historical",
+          "path": ".sde/architecture/FOUR-TIER-ARCHITECTURE.md"
+        },
+        {
+          "kind": "historical",
+          "path": "docs/architecture/BOUNDARIES.md"
+        },
+        {
+          "kind": "historical",
+          "path": "src/engine/Model.fs"
+        }
+      ],
+      "investigation": "All three obligations can be observed in the candidate: the four-tier brief is retained, no per-step Ordo enforcement was added, and the domain model is typed with documented boundaries. The plan accepts only test identity, so none of this could bind. The independent review cited 5333387 (an executable Percepta NOT-APPLICABLE gate added during the run) as contradicting O2. It is an acceptance boundary, which O3 permits, so the evidence neither confirms nor refutes compliance.",
+      "remainingWork": {
+        "applicationCode": "none",
+        "tests": "none",
+        "evidence": "small",
+        "planCorrections": "small",
+        "ownerDecisions": "none",
+        "independentReview": "small"
+      },
+      "existingEvidenceAtDeadline": "insufficient",
+      "review": {
+        "challenged": true,
+        "initialClassification": "PROCESS_EVIDENCE_MISSING",
+        "initialProcessStatus": "PERFORMED_EVIDENCE_INADEQUATE",
+        "finalClassification": "PROCESS_EVIDENCE_MISSING",
+        "note": "Classification upheld; existing-evidence claim withdrawn (accepted). Sub-status changed to UNKNOWN by the auditor: the reviewer cited 5333387 as contradicting O2, but it is an acceptance boundary that O3 allows, so compliance is unresolved."
+      }
+    },
+    {
+      "id": "AR-021",
+      "title": "Continuous implementation agent",
+      "scope": "process",
+      "classification": "PROCESS_EVIDENCE_MISSING",
+      "processStatus": "NOT_PERFORMED",
+      "implemented": "n/a (process)",
+      "verified": "no",
+      "confidence": "high",
+      "frozenStatus": "NOT_RUN",
+      "frozenPlan": {
+        "document": "docs/AGENT-RELIABILITY-REQUIREMENTS.md",
+        "acceptanceCriteria": [],
+        "linkedSections": [
+          "AGENT-RELIABILITY§required-adversarial-acceptance-cases"
+        ],
+        "gates": [
+          "G0",
+          "G7"
+        ],
+        "verificationRules": [
+          "VR-LEDGER",
+          "VR-PRESERVATION",
+          "VR-DEFECT-CLASS"
+        ],
+        "requiredEvidence": [
+          "acceptance ledger row with tests and evidence_paths at the verified SHA",
+          "praxis.requirements-preservation/1 evidence JSON with input SHA-256s",
+          "defect-class record with fix SHA and reviewer evidence"
+        ],
+        "dependencies": {
+          "requirements": [],
+          "contracts": [
+            "CT-013",
+            "CT-014",
+            "CT-015"
+          ]
+        },
+        "freshness": "FP-REVIEW-PER-COMMIT"
+      },
+      "obligations": [
+        {
+          "id": "AR-021-O1",
+          "vpo": "VPO-1382da3cee447700",
+          "frozenVerification": "NOT_RUN",
+          "primaryCause": 12,
+          "secondaryCauses": [
+            11
+          ],
+          "missingEvidence": "The process deviated: R5 ran five implementation streams and two reviewers under a coordinator, not one long-running implementation agent. The obligation states a preference, so this is not a violation.",
+          "text": "Prefer one long-running implementation agent with compact durable checkpoints.",
+          "boundTests": []
+        },
+        {
+          "id": "AR-021-O2",
+          "vpo": "VPO-d84c2e19e3161c81",
+          "frozenVerification": "NOT_RUN",
+          "primaryCause": 11,
+          "secondaryCauses": [
+            9
+          ],
+          "missingEvidence": "A negative obligation (do not require structured handoffs), with no evidence path.",
+          "text": "Do not require structured handoffs by default.",
+          "boundTests": []
+        },
+        {
+          "id": "AR-021-O3",
+          "vpo": "VPO-936a73d2f53c22ad",
+          "frozenVerification": "NOT_RUN",
+          "primaryCause": 9,
+          "secondaryCauses": [
+            10
+          ],
+          "missingEvidence": "Correctness and requirement retention after compaction were not measured. The final independent review ran at be01851, not at the final candidate.",
+          "text": "Measure correctness and requirement retention after context compaction; use independent reviewers at release candidates.",
+          "boundTests": []
+        }
+      ],
+      "sourceRefs": [],
+      "testRefs": [],
+      "evidenceRefs": [
+        {
+          "kind": "historical",
+          "path": "acceptance/reviews/R5-final-review.md"
+        }
+      ],
+      "investigation": "R5 deliberately ran parallel streams instead of the preferred single long-running agent (O1), and nothing measured requirement retention after compaction (O3). A release-candidate review happened, but at be01851, not at the final candidate.",
+      "remainingWork": {
+        "applicationCode": "none",
+        "tests": "none",
+        "evidence": "medium",
+        "planCorrections": "small",
+        "ownerDecisions": "small",
+        "independentReview": "small"
+      },
+      "existingEvidenceAtDeadline": "insufficient",
+      "review": {
+        "challenged": true,
+        "initialClassification": "PROCESS_EVIDENCE_MISSING",
+        "initialProcessStatus": "NOT_PERFORMED",
+        "finalClassification": "PROCESS_EVIDENCE_MISSING",
+        "note": "Upheld by the independent review."
+      }
+    },
+    {
+      "id": "AR-023",
+      "title": "Release-set integrity",
+      "scope": "process",
+      "classification": "PROCESS_EVIDENCE_MISSING",
+      "processStatus": "PERFORMED_EVIDENCE_INADEQUATE",
+      "implemented": "n/a (process)",
+      "verified": "partial (O1, O2, O4 PASS)",
+      "confidence": "high",
+      "frozenStatus": "NOT_RUN",
+      "frozenPlan": {
+        "document": "docs/AGENT-RELIABILITY-REQUIREMENTS.md",
+        "acceptanceCriteria": [
+          "AR-023-O1",
+          "AR-023-O3"
+        ],
+        "linkedSections": [
+          "AGENT-RELIABILITY§required-adversarial-acceptance-cases"
+        ],
+        "gates": [
+          "G0",
+          "G7"
+        ],
+        "verificationRules": [
+          "VR-LEDGER",
+          "VR-PRESERVATION",
+          "VR-DEFECT-CLASS"
+        ],
+        "requiredEvidence": [
+          "acceptance ledger row with tests and evidence_paths at the verified SHA",
+          "praxis.requirements-preservation/1 evidence JSON with input SHA-256s",
+          "defect-class record with fix SHA and reviewer evidence"
+        ],
+        "dependencies": {
+          "requirements": [],
+          "contracts": [
+            "CT-012",
+            "CT-013",
+            "CT-014",
+            "CT-015",
+            "CT-016"
+          ]
+        },
+        "freshness": "FP-REVIEW-PER-COMMIT"
+      },
+      "obligations": [
+        {
+          "id": "AR-023-O1",
+          "vpo": "VPO-d1885e94421cf8a4",
+          "frozenVerification": "PASS",
+          "text": "Select the latest *verified compatible release set*, not unrelated latest versions.",
+          "boundTests": [
+            "Causa.Acceptance.RunTests.EvidenceTests.VER-005 VER-003 AR-023 the installed stack is the published release set, with no prerelease and no fallback"
+          ]
+        },
+        {
+          "id": "AR-023-O2",
+          "vpo": "VPO-9145c1f2ed57ebca",
+          "frozenVerification": "PASS",
+          "text": "Confirm whether Dokimos 0.7.0 and Percepta have published artifacts; do not claim attestation from a set lacking its required components.",
+          "boundTests": [
+            "Causa.Acceptance.RunTests.EvidenceTests.VER-005 VER-003 AR-023 the installed stack is the published release set, with no prerelease and no fallback"
+          ]
+        },
+        {
+          "id": "AR-023-O3",
+          "vpo": "VPO-e6f25a1308c520c6",
+          "frozenVerification": "NOT_RUN",
+          "primaryCause": 5,
+          "secondaryCauses": [
+            11
+          ],
+          "missingEvidence": "Conditor SD-1 was verified in the Indy-init preflight (PRE-TOOL-02 PASS: v0.10.14 contains CON-367), and the bootstrap commit cf86744 came from Conditor 0.10.14 without the hand workaround. Neither was collected into the run bundle.",
+          "text": "Resolve and verify Conditor scaffold defect SD-1.",
+          "boundTests": []
+        },
+        {
+          "id": "AR-023-O4",
+          "vpo": "VPO-7478642aec32b7da",
+          "frozenVerification": "PASS",
+          "text": "Pin the exact set and require evidence for waivers.",
+          "boundTests": [
+            "Causa.Acceptance.RunTests.EvidenceTests.VER-004 AR-023 the exact release set is pinned by digest and the run used exactly that pin"
+          ]
+        }
+      ],
+      "sourceRefs": [],
+      "testRefs": [],
+      "evidenceRefs": [
+        {
+          "kind": "historical",
+          "path": "indy-init:requirements-compiled/v1/readiness/evidence/preflight-run-r5-local.json"
+        },
+        {
+          "kind": "historical",
+          "path": "conditor.json"
+        }
+      ],
+      "investigation": "SD-1 was resolved and verified before the run (PRE-TOOL-02 PASS: Conditor 0.10.14 contains CON-367), and the bootstrap commit cf86744 was produced without the hand workaround. The evidence exists but was not collected into the run bundle.",
+      "remainingWork": {
+        "applicationCode": "none",
+        "tests": "none",
+        "evidence": "small",
+        "planCorrections": "small",
+        "ownerDecisions": "none",
+        "independentReview": "none"
+      },
+      "existingEvidenceAtDeadline": "insufficient",
+      "review": {
+        "challenged": true,
+        "initialClassification": "PROCESS_EVIDENCE_MISSING",
+        "initialProcessStatus": "PERFORMED_EVIDENCE_INADEQUATE",
+        "finalClassification": "PROCESS_EVIDENCE_MISSING",
+        "note": "Upheld; existing-evidence claim downgraded (accepted): the preflight record is pre-run, agent-local, with no run id or source SHA, and PRE-TOOL-02 checks only that CON-367 is present."
+      }
+    },
+    {
+      "id": "AR-024",
+      "title": "Explicit kickoff decisions",
+      "scope": "process",
+      "classification": "PROCESS_EVIDENCE_MISSING",
+      "processStatus": "UNKNOWN",
+      "implemented": "n/a (process)",
+      "verified": "no",
+      "confidence": "high",
+      "frozenStatus": "NOT_RUN",
+      "frozenPlan": {
+        "document": "docs/AGENT-RELIABILITY-REQUIREMENTS.md",
+        "acceptanceCriteria": [],
+        "linkedSections": [
+          "AGENT-RELIABILITY§required-adversarial-acceptance-cases"
+        ],
+        "gates": [
+          "G0",
+          "G7"
+        ],
+        "verificationRules": [
+          "VR-LEDGER",
+          "VR-PRESERVATION",
+          "VR-DEFECT-CLASS"
+        ],
+        "requiredEvidence": [
+          "acceptance ledger row with tests and evidence_paths at the verified SHA",
+          "praxis.requirements-preservation/1 evidence JSON with input SHA-256s",
+          "defect-class record with fix SHA and reviewer evidence"
+        ],
+        "dependencies": {
+          "requirements": [],
+          "contracts": [
+            "CT-007",
+            "CT-013",
+            "CT-014",
+            "CT-015",
+            "CT-017"
+          ]
+        },
+        "freshness": "FP-REVIEW-PER-COMMIT"
+      },
+      "obligations": [
+        {
+          "id": "AR-024-O1",
+          "vpo": "VPO-2825c9554af4f069",
+          "frozenVerification": "NOT_RUN",
+          "primaryCause": 10,
+          "secondaryCauses": [
+            5
+          ],
+          "missingEvidence": "Owner decisions were given in chat and transcribed by the agent (RDP-003): approvals files, equivalence reviews, registry approval, DF-CAUSA-2026-0001 and -0002, AI provider. None is authenticated as the owner's action.",
+          "text": "An authorized human must resolve the write scope, Percepta release/waiver, DF-CAUSA-2026-0003 operator decisions, and frozen requirements/stack before a timed full-write rehearsal.",
+          "boundTests": []
+        },
+        {
+          "id": "AR-024-O2",
+          "vpo": "VPO-5feb800a1da326b9",
+          "frozenVerification": "NOT_RUN",
+          "primaryCause": 10,
+          "secondaryCauses": [
+            11
+          ],
+          "missingEvidence": "The agent wrote kickoff/rehearsal-005/approvals.json and approvals.causa.json on the owner's chat instruction. That is a recorded deviation, and no authenticated owner action closes it.",
+          "text": "Agents must not self-ratify these decisions.",
+          "boundTests": []
+        }
+      ],
+      "sourceRefs": [],
+      "testRefs": [],
+      "evidenceRefs": [
+        {
+          "kind": "historical",
+          "path": "research/decisions/DF-CAUSA-2026-0001--r5-dec-001-forma-workflow-1-1-0.md"
+        },
+        {
+          "kind": "historical",
+          "path": "indy-init:kickoff/rehearsal-005/preflight-record.json"
+        }
+      ],
+      "investigation": "The decisions were made by the owner before or during the run, but only in chat; the agent transcribed them and wrote the approvals files (a recorded RDP-003 deviation). No authenticated owner record exists.",
+      "remainingWork": {
+        "applicationCode": "none",
+        "tests": "none",
+        "evidence": "small",
+        "planCorrections": "none",
+        "ownerDecisions": "small",
+        "independentReview": "none"
+      },
+      "existingEvidenceAtDeadline": "insufficient",
+      "review": {
+        "challenged": true,
+        "initialClassification": "PROCESS_EVIDENCE_MISSING",
+        "initialProcessStatus": "PERFORMED_EVIDENCE_INADEQUATE",
+        "finalClassification": "PROCESS_EVIDENCE_MISSING",
+        "note": "Sub-status changed to UNKNOWN (accepted): owner decisions attested only by agent transcription."
+      }
+    },
+    {
+      "id": "EXT-DATA-005",
+      "title": "EXT-DATA-005",
+      "scope": "application",
+      "classification": "PARTIALLY_IMPLEMENTED",
+      "processStatus": null,
+      "implemented": "partial (no repository/branch permission check, by owner decision DEC-025)",
+      "verified": "O2 PASS; O1 path/manifest/admissibility checks verified post-rehearsal, permission clause absent",
+      "confidence": "high",
+      "frozenStatus": "NOT_RUN",
+      "frozenPlan": {
+        "document": "docs/REHEARSAL-EXTERNAL-DATA-BOUNDARY.md",
+        "acceptanceCriteria": [],
+        "linkedSections": [
+          "REHEARSAL-EXTERNAL-DATA-BOUNDARY§acceptance"
+        ],
+        "gates": [
+          "G0",
+          "G6"
+        ],
+        "verificationRules": [
+          "VR-LEDGER",
+          "VR-PRESERVATION",
+          "VR-PERSISTENCE"
+        ],
+        "requiredEvidence": [
+          "acceptance ledger row with tests and evidence_paths at the verified SHA",
+          "praxis.requirements-preservation/1 evidence JSON with input SHA-256s",
+          "live job run id and log",
+          "independent re-read of written commit SHAs",
+          "recorded provider responses"
+        ],
+        "dependencies": {
+          "requirements": [],
+          "contracts": [
+            "CT-004",
+            "CT-006",
+            "CT-007",
+            "CT-017"
+          ]
+        },
+        "freshness": "FP-LIVE-PER-COMMIT"
+      },
+      "obligations": [
+        {
+          "id": "EXT-DATA-005-O1",
+          "vpo": "VPO-0b0fb80724185366",
+          "frozenVerification": "NOT_RUN",
+          "primaryCause": 11,
+          "secondaryCauses": [
+            1,
+            4,
+            6
+          ],
+          "missingEvidence": "The only bound test (DCT-004-A) asserted that permission fields do not gate saving, so the independent review removed the tag (5336ec4). Repository and branch permissions are not checked anywhere in src/: RepositoryInfo.CanPush is parsed (GitHub.fs) and stored but never used, because owner decision DEC-025 / OD-INDY-10 makes permission fields advisory (DC-004). The frozen plan never reconciled that decision with this clause. Path, manifest, schema and admissibility checks are implemented; their tests ran and passed under other VPO ids, and post-rehearsal tests add more.",
+          "text": "The GitHub provider MUST check repository and branch permissions, validate file paths and manifests, and load only schema-compatible data through the full contract validation and F# history-admissibility pipeline.",
+          "boundTests": []
+        },
+        {
+          "id": "EXT-DATA-005-O2",
+          "vpo": "VPO-c135d16c59f5baf8",
+          "frozenVerification": "PASS",
+          "text": "Malformed, forged, unauthorized, or incompatible data MUST fail closed with safe diagnostics.",
+          "boundTests": [
+            "Persistence.Tests.StoreTests.VPO-acd13bfa08dba51a VPO-c90593e00b2dae72 VPO-c135d16c59f5baf8 an inadmissible history is refused through the persistence path by the engine's History.validate",
+            "Persistence.Tests.StoreTests.VPO-c135d16c59f5baf8 VPO-f52d9071426e82b3 malformed and forged file sets fail closed at the first failing stage",
+            "Persistence.Tests.StoreTests.VPO-c135d16c59f5baf8 a self-consistent but forged snapshot is refused as not the projection of the history",
+            "Persistence.Tests.SyncAppTests.VPO-2d4b7557ce013e50 VPO-c135d16c59f5baf8 a revoked token fails the next request, drops the credential and keeps local work; a replacement token saves it",
+            "Persistence.Tests.SyncAppTests.VPO-c135d16c59f5baf8 VPO-0157918192f093da authenticated but forged repository content fails closed and is not loaded",
+            "DCT-LIVE-A create, write, reload, conflict (resolved by Reload), two tabs with a lost write (never reconciled as saved) and rejected token against the real test repository, each confirmed by an independent SHA re-read"
+          ]
+        }
+      ],
+      "sourceRefs": [
+        {
+          "path": "src/persistence/Catalog.fs",
+          "symbol": "Catalog.parsePointer, Catalog.parseManifest, Catalog.checkCase"
+        },
+        {
+          "path": "src/persistence/Store.fs",
+          "symbol": "Store.read (Storage.read 17 stages, History.validate)"
+        },
+        {
+          "path": "src/persistence/GitHub.fs",
+          "symbol": "GitHub.parseRepository, getBranchHead"
+        },
+        {
+          "path": "src/persistence/Sync.fs",
+          "symbol": "failureConnection, ProbeRepository"
+        }
+      ],
+      "testRefs": [
+        {
+          "kind": "historical",
+          "path": "tests/Persistence.Tests/CatalogAppTests.fs",
+          "name": "malformed pointer or manifest fails closed; missing case; drift; unlisted investigation",
+          "result": "passed in run 40620099844 under other VPO ids; passed again post-rehearsal"
+        },
+        {
+          "kind": "historical",
+          "path": "tests/Persistence.Tests/StoreTests.fs",
+          "name": "inadmissible history refused through the persistence path; malformed and forged file sets",
+          "result": "passed in run 40620099844"
+        },
+        {
+          "kind": "post-rehearsal",
+          "path": "indy-init:tools/rehearsal-005-audit/post-rehearsal-tests/PersistenceAuditTests.fs",
+          "name": "EXT-DATA-005-O1 traits (9 cases)",
+          "result": "passed (13/13 file total)"
+        }
+      ],
+      "evidenceRefs": [
+        {
+          "kind": "post-rehearsal",
+          "path": "indy-init:docs/rehearsal-005-implementation-audit/post-rehearsal-evidence/post-rehearsal-tests.trx"
+        },
+        {
+          "kind": "historical",
+          "path": "indy-init:docs/OWNER-DECISIONS-2026-10-26.md",
+          "note": "OD-INDY-10 / DEC-025"
+        }
+      ],
+      "investigation": "Paths, manifests, schema version and history admissibility are validated, and failures close the load: implemented, and proven by historical and post-rehearsal tests. The clause \"check repository and branch permissions\" is not implemented. Permission fields are read but advisory under owner decision DEC-025 / OD-INDY-10 (DC-004), and RepositoryInfo.CanPush is never consulted. GitHub refusing access (accessDenied) is not a permission check by the application. Closing the gap needs an owner decision reconciling the requirement with DEC-025, and code only if the owner keeps the clause.",
+      "remainingWork": {
+        "applicationCode": "small",
+        "tests": "small",
+        "evidence": "small",
+        "planCorrections": "small",
+        "ownerDecisions": "small",
+        "independentReview": "none"
+      },
+      "existingEvidenceAtDeadline": "insufficient",
+      "review": {
+        "challenged": true,
+        "initialClassification": "IMPLEMENTED_VERIFICATION_MISSING",
+        "initialProcessStatus": null,
+        "finalClassification": "PARTIALLY_IMPLEMENTED",
+        "note": "Downgraded A->B (accepted): no repository/branch permission check exists; DEC-025 makes permissions advisory. Primary cause set to 11 (unreconciled decision) rather than the reviewer's 1, for consistency with PF-015-O1, which has the same root."
+      }
+    },
+    {
+      "id": "EXT-DATA-006",
+      "title": "EXT-DATA-006",
+      "scope": "application",
+      "classification": "IMPLEMENTED_VERIFICATION_MISSING",
+      "processStatus": null,
+      "implemented": "yes",
+      "verified": "tests ran and passed at the candidate; unbound",
+      "confidence": "high",
+      "frozenStatus": "NOT_RUN",
+      "frozenPlan": {
+        "document": "docs/REHEARSAL-EXTERNAL-DATA-BOUNDARY.md",
+        "acceptanceCriteria": [
+          "EXT-DATA-006-O2"
+        ],
+        "linkedSections": [
+          "REHEARSAL-EXTERNAL-DATA-BOUNDARY§acceptance"
+        ],
+        "gates": [
+          "G0",
+          "G6"
+        ],
+        "verificationRules": [
+          "VR-LEDGER",
+          "VR-PRESERVATION",
+          "VR-PERSISTENCE"
+        ],
+        "requiredEvidence": [
+          "acceptance ledger row with tests and evidence_paths at the verified SHA",
+          "praxis.requirements-preservation/1 evidence JSON with input SHA-256s",
+          "live job run id and log",
+          "independent re-read of written commit SHAs",
+          "recorded provider responses"
+        ],
+        "dependencies": {
+          "requirements": [],
+          "contracts": [
+            "CT-004",
+            "CT-006",
+            "CT-007",
+            "CT-017"
+          ]
+        },
+        "freshness": "FP-LIVE-PER-COMMIT"
+      },
+      "obligations": [
+        {
+          "id": "EXT-DATA-006-O1",
+          "vpo": "VPO-7ced47ef45099aab",
+          "frozenVerification": "PASS",
+          "text": "No data or repository mutation occurs on connect or read.",
+          "boundTests": [
+            "Persistence.Tests.CatalogAppTests.VPO-c81484cbcf203d4f VPO-d60e3a3a25cb106d VPO-dc48d066cfa2309d VPO-557743cb4997c484 after Connect every catalog case loads, replays to its manifest digest and is read-only",
+            "Persistence.Tests.SyncAppTests.VPO-7ced47ef45099aab connecting and reading never mutate the repository"
+          ]
+        },
+        {
+          "id": "EXT-DATA-006-O2",
+          "vpo": "VPO-d7fbd84e40ded145",
+          "frozenVerification": "NOT_RUN",
+          "primaryCause": 6,
+          "secondaryCauses": [
+            10
+          ],
+          "missingEvidence": "Tagged tests were falsified by F-1 at the independent review. F-1 was fixed in 5336ec4 and the tags were removed in the same commit. The fix's tests (DCT-001-A/B, the conflict test, DCT-004-A) and the live two-tab DCT-LIVE-A variant passed in run 40620099844, but nobody re-bound them after the fix was re-reviewed.",
+          "text": "Creating a new investigation is an explicit user action; write/publish requires separately verified authorization, optimistic concurrency, and no overwrite of unread remote history.",
+          "boundTests": []
+        }
+      ],
+      "sourceRefs": [
+        {
+          "path": "src/persistence/Sync.fs",
+          "symbol": "write markers with page-load nonce, guarded createCommitOnBranch, reconcile read-back"
+        },
+        {
+          "path": "src/persistence/GitHub.fs",
+          "symbol": "parseCommit (HeadMoved, Unknown)"
+        }
+      ],
+      "testRefs": [
+        {
+          "kind": "historical",
+          "path": "tests/Persistence.Tests/DcTableTests.fs",
+          "name": "DCT-001-A, DCT-001-B",
+          "result": "passed in run 40620099844; passed again post-rehearsal"
+        },
+        {
+          "kind": "historical",
+          "path": "tests/browser/live-persistence.spec.js",
+          "name": "DCT-LIVE-A (two tabs with a lost write never reconciled as saved)",
+          "result": "passed in run 40620099844 (live)"
+        },
+        {
+          "kind": "post-rehearsal",
+          "path": "indy-init:docs/rehearsal-005-implementation-audit/post-rehearsal-evidence/dotnet-frozen-suite.txt",
+          "name": "frozen .NET suite re-run (252 tests)",
+          "result": "passed 252/252"
+        }
+      ],
+      "evidenceRefs": [
+        {
+          "kind": "historical",
+          "path": "acceptance/defect-classes.json"
+        },
+        {
+          "kind": "historical",
+          "path": "indy-init:docs/OWNER-DECISIONS-2026-10-26.md",
+          "note": "OD-INDY-10 / DEC-025"
+        }
+      ],
+      "investigation": "Explicit create, guarded write with optimistic concurrency, and no overwrite of unread remote history are implemented. F-1 (which falsified this obligation at the first review) was fixed in 5336ec4 and closed by the T33 reviewer with live two-tab evidence.",
+      "remainingWork": {
+        "applicationCode": "none",
+        "tests": "none",
+        "evidence": "small",
+        "planCorrections": "none",
+        "ownerDecisions": "none",
+        "independentReview": "none"
+      },
+      "existingEvidenceAtDeadline": "sufficient",
+      "review": {
+        "challenged": true,
+        "initialClassification": "IMPLEMENTED_VERIFICATION_MISSING",
+        "initialProcessStatus": null,
+        "finalClassification": "IMPLEMENTED_VERIFICATION_MISSING",
+        "note": "Upheld A; existing evidence at the deadline holds (run 40620099844 at 1b9fb56). Caveat: 'separately verified authorization' holds only under DEC-025 (GitHub's answer to the write decides)."
+      }
+    },
+    {
+      "id": "PF-005",
+      "title": "Provider isolation",
+      "scope": "application",
+      "classification": "IMPLEMENTED_VERIFICATION_MISSING",
+      "processStatus": null,
+      "implemented": "yes",
+      "verified": "post-rehearsal only (O1); O2 PASS",
+      "confidence": "medium",
+      "frozenStatus": "NOT_RUN",
+      "frozenPlan": {
+        "document": "docs/PROVIDER-FIXTURE-AND-INTEGRATION-REQUIREMENTS.md",
+        "acceptanceCriteria": [
+          "PF-005-O1",
+          "PF-005-O2"
+        ],
+        "linkedSections": [
+          "PROVIDER-FIXTURE-AND-INTEGRATION§acceptance-scenarios"
+        ],
+        "gates": [
+          "G0",
+          "G6"
+        ],
+        "verificationRules": [
+          "VR-LEDGER",
+          "VR-PRESERVATION",
+          "VR-PERSISTENCE"
+        ],
+        "requiredEvidence": [
+          "acceptance ledger row with tests and evidence_paths at the verified SHA",
+          "praxis.requirements-preservation/1 evidence JSON with input SHA-256s",
+          "live job run id and log",
+          "independent re-read of written commit SHAs",
+          "recorded provider responses"
+        ],
+        "dependencies": {
+          "requirements": [],
+          "contracts": [
+            "CT-004",
+            "CT-007",
+            "CT-017"
+          ]
+        },
+        "freshness": "FP-LIVE-PER-COMMIT"
+      },
+      "obligations": [
+        {
+          "id": "PF-005-O1",
+          "vpo": "VPO-0c1ba98e8a26ee4b",
+          "frozenVerification": "NOT_RUN",
+          "primaryCause": 2,
+          "secondaryCauses": [
+            11
+          ],
+          "missingEvidence": "No test asserts that UI and domain tests are independent of GitHub, network and credentials. The isolation holds by construction: a recorded-behaviour fake, and a network guard in tests/browser/support/fixtures.js. A post-rehearsal run of all 252 .NET tests with networking forced to a dead proxy and no credentials passed.",
+          "text": "UI and domain tests must not directly depend on GitHub, GitHub Actions, network availability, or credentials.",
+          "boundTests": []
+        },
+        {
+          "id": "PF-005-O2",
+          "vpo": "VPO-5581f11810c02191",
+          "frozenVerification": "PASS",
+          "text": "Real-provider tests must not silently fall back to fixtures or report mocked results as live success.",
+          "boundTests": [
+            "DCT-LIVE-A create, write, reload, conflict (resolved by Reload), two tabs with a lost write (never reconciled as saved) and rejected token against the real test repository, each confirmed by an independent SHA re-read"
+          ]
+        }
+      ],
+      "sourceRefs": [
+        {
+          "path": "tests/Persistence.Tests/Harness.fs",
+          "symbol": "App over RecordedGitHub"
+        },
+        {
+          "path": "src/persistence/RecordedGitHub.fs",
+          "symbol": "RecordedGitHub"
+        },
+        {
+          "path": "tests/browser/support/fixtures.js",
+          "symbol": "network guard"
+        }
+      ],
+      "testRefs": [
+        {
+          "kind": "post-rehearsal",
+          "path": "indy-init:docs/rehearsal-005-implementation-audit/post-rehearsal-evidence/dotnet-frozen-suite-offline.txt",
+          "name": "frozen .NET suite with proxy forced to 127.0.0.1:9 and no credentials",
+          "result": "passed 252/252"
+        },
+        {
+          "kind": "post-rehearsal",
+          "path": "indy-init:docs/rehearsal-005-implementation-audit/post-rehearsal-evidence/browser-frozen-suite.txt",
+          "name": "frozen non-live browser suite under its network guard",
+          "result": "passed (see file; Percepta verify-app not runnable without its CLI)"
+        }
+      ],
+      "evidenceRefs": [],
+      "investigation": "The isolation is structural: application tests drive the real program against a recorded-behaviour fake, and browser tests fail on any non-GitHub host and answer GitHub from recordings. The offline re-run forced the proxy to a dead port rather than using a kernel network namespace (none was available).",
+      "remainingWork": {
+        "applicationCode": "none",
+        "tests": "small",
+        "evidence": "small",
+        "planCorrections": "none",
+        "ownerDecisions": "none",
+        "independentReview": "none"
+      },
+      "existingEvidenceAtDeadline": "insufficient",
+      "review": {
+        "challenged": true,
+        "initialClassification": "IMPLEMENTED_VERIFICATION_MISSING",
+        "initialProcessStatus": null,
+        "finalClassification": "IMPLEMENTED_VERIFICATION_MISSING",
+        "note": "Upheld A. Caveat: the offline .NET run redirected proxy variables (no network namespace); the browser suite was not run offline, but its own guard fails any test that reaches a non-local host."
+      }
+    },
+    {
+      "id": "PF-009",
+      "title": "Concurrency fixtures",
+      "scope": "application",
+      "classification": "IMPLEMENTED_VERIFICATION_MISSING",
+      "processStatus": null,
+      "implemented": "yes",
+      "verified": "post-rehearsal only (O3); O1, O2 PASS",
+      "confidence": "high",
+      "frozenStatus": "NOT_RUN",
+      "frozenPlan": {
+        "document": "docs/PROVIDER-FIXTURE-AND-INTEGRATION-REQUIREMENTS.md",
+        "acceptanceCriteria": [],
+        "linkedSections": [
+          "PROVIDER-FIXTURE-AND-INTEGRATION§acceptance-scenarios"
+        ],
+        "gates": [
+          "G0",
+          "G6"
+        ],
+        "verificationRules": [
+          "VR-LEDGER",
+          "VR-PRESERVATION",
+          "VR-PERSISTENCE"
+        ],
+        "requiredEvidence": [
+          "acceptance ledger row with tests and evidence_paths at the verified SHA",
+          "praxis.requirements-preservation/1 evidence JSON with input SHA-256s",
+          "live job run id and log",
+          "independent re-read of written commit SHAs",
+          "recorded provider responses"
+        ],
+        "dependencies": {
+          "requirements": [],
+          "contracts": [
+            "CT-004",
+            "CT-007",
+            "CT-017"
+          ]
+        },
+        "freshness": "FP-LIVE-PER-COMMIT"
+      },
+      "obligations": [
+        {
+          "id": "PF-009-O1",
+          "vpo": "VPO-cd9dd8ec730c3d3e",
+          "frozenVerification": "PASS",
+          "text": "Deterministically schedule delayed, reordered, superseded, cancelled, and retried requests.",
+          "boundTests": [
+            "Persistence.Tests.DcTableTests.DCT-002-A VPO-2d4b7557ce013e50 VPO-cd9dd8ec730c3d3e a late answer for a replaced write is discarded",
+            "Persistence.Tests.FixtureTests.VPO-34731ac9a977b818 VPO-cd9dd8ec730c3d3e the fixture conflict scenario: a deterministic other writer, then Reload keeps the change and Discard adopts theirs",
+            "Persistence.Tests.SyncAppTests.VPO-b3efad6eb85360be VPO-cd9dd8ec730c3d3e a save whose answer was lost is unknown and is settled only by re-reading",
+            "Persistence.Tests.SyncAppTests.VPO-cd9dd8ec730c3d3e a lost save that was not applied reconciles back to pending and can be retried",
+            "a conflict is resolved in the browser: Reload keeps this device's change beside the repository's copy, Discard (confirmed) adopts the repository's copy [VPO-34731ac9a977b818] [VPO-cd9dd8ec730c3d3e]"
+          ]
+        },
+        {
+          "id": "PF-009-O2",
+          "vpo": "VPO-2d4b7557ce013e50",
+          "frozenVerification": "PASS",
+          "text": "A stale response must never overwrite the state of a newer request, and cached success must never mask a new authentication failure.",
+          "boundTests": [
+            "Persistence.Tests.DcTableTests.DCT-002-A VPO-2d4b7557ce013e50 VPO-cd9dd8ec730c3d3e a late answer for a replaced write is discarded",
+            "Persistence.Tests.DcTableTests.REQUEST-IDENTITY VPO-2d4b7557ce013e50 an answer to an earlier connection never lands on a newer one",
+            "Persistence.Tests.DctProviderTests.DCT-005-A VPO-2d4b7557ce013e50 every mutable read has a URL unique across sessions and page loads, and the new head is observed",
+            "Persistence.Tests.SyncAppTests.VPO-2d4b7557ce013e50 VPO-c135d16c59f5baf8 a revoked token fails the next request, drops the credential and keeps local work; a replacement token saves it",
+            "Persistence.Tests.SyncAppTests.VPO-2d4b7557ce013e50 answers for unknown requests or an earlier connection are refused and change nothing"
+          ]
+        },
+        {
+          "id": "PF-009-O3",
+          "vpo": "VPO-8c435e1ebdf43e7c",
+          "frozenVerification": "NOT_RUN",
+          "primaryCause": 4,
+          "secondaryCauses": [
+            6
+          ],
+          "missingEvidence": "Bound tests proved request identity and an earlier connection only, so the tag was removed (5336ec4). Active-target switching and credential-generation refusal were not asserted. Post-rehearsal tests assert both.",
+          "text": "Request identity, active provider, credential generation, and freshness must be honored.",
+          "boundTests": []
+        }
+      ],
+      "sourceRefs": [
+        {
+          "path": "src/persistence/Sync.fs",
+          "symbol": "Model.Generation, InFlight, answered, credentialRejected"
+        },
+        {
+          "path": "src/persistence/GitHub.fs",
+          "symbol": "getBranchHead with causa_fresh nonce"
+        }
+      ],
+      "testRefs": [
+        {
+          "kind": "historical",
+          "path": "tests/Persistence.Tests/DcTableTests.fs",
+          "name": "REQUEST-IDENTITY an answer to an earlier connection never lands on a newer one",
+          "result": "passed in run 40620099844"
+        },
+        {
+          "kind": "historical",
+          "path": "tests/Persistence.Tests/DctProviderTests.fs",
+          "name": "DCT-005-A every mutable read has a URL unique across sessions and page loads",
+          "result": "passed in run 40620099844"
+        },
+        {
+          "kind": "post-rehearsal",
+          "path": "indy-init:tools/rehearsal-005-audit/post-rehearsal-tests/PersistenceAuditTests.fs",
+          "name": "PF-009-O3 traits (3 tests)",
+          "result": "passed"
+        }
+      ],
+      "evidenceRefs": [
+        {
+          "kind": "post-rehearsal",
+          "path": "indy-init:docs/rehearsal-005-implementation-audit/post-rehearsal-evidence/post-rehearsal-tests.trx"
+        }
+      ],
+      "investigation": "Request identity, a generation counter bumped on Connect, Disconnect and credential rejection, and nonce-addressed fresh reads are implemented. The post-rehearsal tests show a late answer for a previously active target, or for a rejected credential's generation, is refused and leaves the model unchanged.",
+      "remainingWork": {
+        "applicationCode": "none",
+        "tests": "none",
+        "evidence": "small",
+        "planCorrections": "none",
+        "ownerDecisions": "none",
+        "independentReview": "none"
+      },
+      "existingEvidenceAtDeadline": "insufficient",
+      "review": {
+        "challenged": true,
+        "initialClassification": "IMPLEMENTED_VERIFICATION_MISSING",
+        "initialProcessStatus": null,
+        "finalClassification": "IMPLEMENTED_VERIFICATION_MISSING",
+        "note": "Upheld A. Caveat: the fixture-versus-GitHub provider switch is covered by code (PersistencePort, Generation) but not executed by a test."
+      }
+    },
+    {
+      "id": "PF-014",
+      "title": "Live integration acceptance",
+      "scope": "application",
+      "classification": "INDETERMINATE",
+      "processStatus": null,
+      "implemented": "harness yes; deployed live run not executed",
+      "verified": "partial (O1, O3, O4 PASS)",
+      "confidence": "medium",
+      "frozenStatus": "NOT_RUN",
+      "frozenPlan": {
+        "document": "docs/PROVIDER-FIXTURE-AND-INTEGRATION-REQUIREMENTS.md",
+        "acceptanceCriteria": [
+          "PF-014-O1",
+          "PF-014-O2",
+          "PF-014-O3",
+          "PF-014-O4"
+        ],
+        "linkedSections": [
+          "PROVIDER-FIXTURE-AND-INTEGRATION§acceptance-scenarios"
+        ],
+        "gates": [
+          "G0",
+          "G6"
+        ],
+        "verificationRules": [
+          "VR-LEDGER",
+          "VR-PRESERVATION",
+          "VR-PERSISTENCE"
+        ],
+        "requiredEvidence": [
+          "acceptance ledger row with tests and evidence_paths at the verified SHA",
+          "praxis.requirements-preservation/1 evidence JSON with input SHA-256s",
+          "live job run id and log",
+          "independent re-read of written commit SHAs",
+          "recorded provider responses"
+        ],
+        "dependencies": {
+          "requirements": [],
+          "contracts": [
+            "CT-004",
+            "CT-007",
+            "CT-017"
+          ]
+        },
+        "freshness": "FP-LIVE-PER-COMMIT"
+      },
+      "obligations": [
+        {
+          "id": "PF-014-O1",
+          "vpo": "VPO-d87bf2493f9268ae",
+          "frozenVerification": "PASS",
+          "text": "At defined integration checkpoints and before release acceptance, run a real GitHub provider test against the approved repository and pinned catalog.",
+          "boundTests": [
+            "DCT-LIVE-A create, write, reload, conflict (resolved by Reload), two tabs with a lost write (never reconciled as saved) and rejected token against the real test repository, each confirmed by an independent SHA re-read"
+          ]
+        },
+        {
+          "id": "PF-014-O2",
+          "vpo": "VPO-c81b5785b2ffa1c2",
+          "frozenVerification": "NOT_RUN",
+          "primaryCause": 3,
+          "secondaryCauses": [
+            4,
+            12
+          ],
+          "missingEvidence": "Live browser specs ran against a locally served dist/, not the deployed application, although playwright.config.js supports CAUSA_BASE_URL. No version or digest is asserted in the browser; the live catalog load (causa-persistence catalog) does check every manifest digest. The live browser and catalog jobs checked out causa-data at ref main, not a pinned commit.",
+          "text": "Confirm actual network communication, correct request-to-response association, three historical investigation reconstructions, expected versions/digests, and deployed application behavior.",
+          "boundTests": []
+        },
+        {
+          "id": "PF-014-O3",
+          "vpo": "VPO-6292ea3728a2532b",
+          "frozenVerification": "PASS",
+          "text": "Record repository ref, source SHA, run ID, and provider mode.",
+          "boundTests": [
+            "DCT-LIVE-A create, write, reload, conflict (resolved by Reload), two tabs with a lost write (never reconciled as saved) and rejected token against the real test repository, each confirmed by an independent SHA re-read"
+          ]
+        },
+        {
+          "id": "PF-014-O4",
+          "vpo": "VPO-7672a3ef81f74ac5",
+          "frozenVerification": "PASS",
+          "text": "Never claim live success from mocks.",
+          "boundTests": [
+            "DCT-LIVE-A create, write, reload, conflict (resolved by Reload), two tabs with a lost write (never reconciled as saved) and rejected token against the real test repository, each confirmed by an independent SHA re-read"
+          ]
+        }
+      ],
+      "sourceRefs": [
+        {
+          "path": "playwright.config.js",
+          "symbol": "CAUSA_BASE_URL"
+        },
+        {
+          "path": "src/persistence/Tool/Program.fs",
+          "symbol": "causa-persistence record / catalog"
+        },
+        {
+          "path": "src/persistence/Catalog.fs",
+          "symbol": "Catalog.checkCase"
+        }
+      ],
+      "testRefs": [
+        {
+          "kind": "historical",
+          "path": "tests/browser/live-persistence.spec.js",
+          "name": "EXT-DATA-013 three historical cases after Connect (@live)",
+          "result": "passed in run 40620099844 against local dist/"
+        }
+      ],
+      "evidenceRefs": [
+        {
+          "kind": "historical",
+          "path": "evidence/acceptance/run-40620099844-1b9fb56/gate-records/provider-conformance/provider-conformance.json"
+        }
+      ],
+      "investigation": "Real network communication, request association and the three reconstructions with manifest digests are evidenced by provider conformance (19 live checks) and the live catalog load. The 'deployed application behavior' part was never executed: the live specs ran against a local build. The audit has no credential and Pages no longer serves 1b9fb56, so it cannot run them.",
+      "remainingWork": {
+        "applicationCode": "none",
+        "tests": "small",
+        "evidence": "small",
+        "planCorrections": "none",
+        "ownerDecisions": "none",
+        "independentReview": "none"
+      },
+      "existingEvidenceAtDeadline": "insufficient",
+      "review": {
+        "challenged": true,
+        "initialClassification": "INDETERMINATE",
+        "initialProcessStatus": null,
+        "finalClassification": "INDETERMINATE",
+        "note": "Upheld by the independent review."
+      }
+    },
+    {
+      "id": "PF-015",
+      "title": "Credentials and security",
+      "scope": "application",
+      "classification": "PARTIALLY_IMPLEMENTED",
+      "processStatus": null,
+      "implemented": "partial",
+      "verified": "partial (O3, O4 PASS)",
+      "confidence": "high",
+      "frozenStatus": "NOT_RUN",
+      "frozenPlan": {
+        "document": "docs/PROVIDER-FIXTURE-AND-INTEGRATION-REQUIREMENTS.md",
+        "acceptanceCriteria": [
+          "PF-015-O1",
+          "PF-015-O2",
+          "PF-015-O3"
+        ],
+        "linkedSections": [
+          "PROVIDER-FIXTURE-AND-INTEGRATION§acceptance-scenarios"
+        ],
+        "gates": [
+          "G0",
+          "G6"
+        ],
+        "verificationRules": [
+          "VR-LEDGER",
+          "VR-PRESERVATION",
+          "VR-PERSISTENCE"
+        ],
+        "requiredEvidence": [
+          "acceptance ledger row with tests and evidence_paths at the verified SHA",
+          "praxis.requirements-preservation/1 evidence JSON with input SHA-256s",
+          "live job run id and log",
+          "independent re-read of written commit SHAs",
+          "recorded provider responses"
+        ],
+        "dependencies": {
+          "requirements": [],
+          "contracts": [
+            "CT-004",
+            "CT-007",
+            "CT-017"
+          ]
+        },
+        "freshness": "FP-LIVE-PER-COMMIT"
+      },
+      "obligations": [
+        {
+          "id": "PF-015-O1",
+          "vpo": "VPO-a59ccf551bbd8407",
+          "frozenVerification": "NOT_RUN",
+          "primaryCause": 11,
+          "secondaryCauses": [
+            1
+          ],
+          "missingEvidence": "Owner decision DEC-025 / OD-INDY-10: every connection needs a credential and there is no anonymous mode, because R3 exhausted the anonymous quota. Credential.create refuses a blank token, so no catalog test can run without a PAT (F-3). The plan kept this obligation without reconciling it with the decision.",
+          "text": "Public read-only catalog tests should not require a PAT when anonymous access is sufficient.",
+          "boundTests": []
+        },
+        {
+          "id": "PF-015-O2",
+          "vpo": "VPO-3721d1beaef6b57f",
+          "frozenVerification": "NOT_RUN",
+          "primaryCause": 2,
+          "secondaryCauses": [
+            10,
+            11
+          ],
+          "missingEvidence": "No test or record shows that CAUSA_GITHUB_TOKEN has least-privilege permissions. The live write tests need write access to the test repository, so the obligation's 'read-only' wording conflicts with PF-014 and needs an owner decision. The application refuses broad classic scopes (Sync ProbeRepository, GitHub.broadClassicScopes).",
+          "text": "Authenticated integration tests use an approved secret such as `CAUSA_GITHUB_TOKEN` when explicitly required, with least-privilege read-only permissions.",
+          "boundTests": []
+        },
+        {
+          "id": "PF-015-O3",
+          "vpo": "VPO-ca58030e3eecdf9b",
+          "frozenVerification": "PASS",
+          "text": "Never embed or print credentials, put them in URLs, or include them in screenshots, traces, logs, or artifacts.",
+          "boundTests": [
+            "Persistence.Tests.SyncAppTests.VPO-2de744fb2c8bdc70 VPO-bb08b9a414ba4cd7 VPO-ca58030e3eecdf9b VPO-c41f10e4ed8a086b the token appears only in the Authorization header",
+            "DCT-LIVE-A create, write, reload, conflict (resolved by Reload), two tabs with a lost write (never reconciled as saved) and rejected token against the real test repository, each confirmed by an independent SHA re-read"
+          ]
+        },
+        {
+          "id": "PF-015-O4",
+          "vpo": "VPO-9a5982e4a5994629",
+          "frozenVerification": "PASS",
+          "text": "A missing secret yields BLOCKED, not PASS.",
+          "boundTests": [
+            "Persistence.Tests.BlockedTests.VPO-9a5982e4a5994629 VPO-b58ad46c59853677 a missing provider secret is BLOCKED with a failing exit code, never a pass"
+          ]
+        }
+      ],
+      "sourceRefs": [
+        {
+          "path": "src/persistence/Provider.fs",
+          "symbol": "Credential.create"
+        },
+        {
+          "path": "src/app/PersistencePort.fs",
+          "symbol": "Connect requires a credential"
+        },
+        {
+          "path": "src/persistence/GitHub.fs",
+          "symbol": "broadClassicScopes"
+        }
+      ],
+      "testRefs": [
+        {
+          "kind": "post-rehearsal",
+          "path": "indy-init:tools/rehearsal-005-audit/post-rehearsal-tests/PersistenceAuditTests.fs",
+          "name": "characterisation: the application has no anonymous path",
+          "result": "passed (confirms the gap)"
+        }
+      ],
+      "evidenceRefs": [
+        {
+          "kind": "historical",
+          "path": "acceptance/reviews/R5-independent-review.md"
+        },
+        {
+          "kind": "historical",
+          "path": "indy-init:docs/OWNER-DECISIONS-2026-10-26.md",
+          "note": "OD-INDY-10 / DEC-025"
+        }
+      ],
+      "investigation": "Credentials never leak (O3 PASS) and a missing secret is BLOCKED (O4 PASS). O1 is not met: there is no anonymous read path, so catalog tests need a PAT (F-3). That absence is owner decision DEC-025 (no anonymous mode), and the plan did not reconcile it. O2 (least-privilege read-only CAUSA_GITHUB_TOKEN) is unverified, and DEC-025 itself gives that secret contents write on the test repository. Both need an owner decision; code is needed only if the owner reverses DEC-025.",
+      "remainingWork": {
+        "applicationCode": "medium",
+        "tests": "small",
+        "evidence": "small",
+        "planCorrections": "small",
+        "ownerDecisions": "small",
+        "independentReview": "none"
+      },
+      "existingEvidenceAtDeadline": "insufficient",
+      "review": {
+        "challenged": true,
+        "initialClassification": "PARTIALLY_IMPLEMENTED",
+        "initialProcessStatus": null,
+        "finalClassification": "PARTIALLY_IMPLEMENTED",
+        "note": "Upheld B; cause for O1 changed 1->11 (accepted): the absence is owner decision DEC-025, unreconciled by the plan."
+      }
+    },
+    {
+      "id": "PF-019",
+      "title": "Local-first workflow",
+      "scope": "process",
+      "classification": "PROCESS_EVIDENCE_MISSING",
+      "processStatus": "UNKNOWN",
+      "implemented": "n/a (process)",
+      "verified": "partial (O2 PASS)",
+      "confidence": "medium",
+      "frozenStatus": "NOT_RUN",
+      "frozenPlan": {
+        "document": "docs/PROVIDER-FIXTURE-AND-INTEGRATION-REQUIREMENTS.md",
+        "acceptanceCriteria": [
+          "PF-019-O1",
+          "PF-019-O2"
+        ],
+        "linkedSections": [
+          "PROVIDER-FIXTURE-AND-INTEGRATION§acceptance-scenarios"
+        ],
+        "gates": [
+          "G0",
+          "G6"
+        ],
+        "verificationRules": [
+          "VR-LEDGER",
+          "VR-PRESERVATION",
+          "VR-PERSISTENCE"
+        ],
+        "requiredEvidence": [
+          "acceptance ledger row with tests and evidence_paths at the verified SHA",
+          "praxis.requirements-preservation/1 evidence JSON with input SHA-256s",
+          "live job run id and log",
+          "independent re-read of written commit SHAs",
+          "recorded provider responses"
+        ],
+        "dependencies": {
+          "requirements": [],
+          "contracts": [
+            "CT-004",
+            "CT-007",
+            "CT-017"
+          ]
+        },
+        "freshness": "FP-LIVE-PER-COMMIT"
+      },
+      "obligations": [
+        {
+          "id": "PF-019-O1",
+          "vpo": "VPO-7833f2bbb6af960d",
+          "frozenVerification": "NOT_RUN",
+          "primaryCause": 9,
+          "secondaryCauses": [
+            11
+          ],
+          "missingEvidence": "The development-order workflow (smallest tests first, batched integration, full live suite before release) was not recorded per stream. Layer timings exist only for CI (gate-records/layer-timings.json).",
+          "text": "During development, agents should run the smallest relevant deterministic tests first, batch integration checks at meaningful checkpoints, and run the complete live/deployed suite before release.",
+          "boundTests": []
+        },
+        {
+          "id": "PF-019-O2",
+          "vpo": "VPO-eac3d689399c924e",
+          "frozenVerification": "PASS",
+          "text": "Never skip a test required by an impacted risk or dependency.",
+          "boundTests": [
+            "Causa.Acceptance.Tests.PipelineTests.AR-013 AR-022 PF-019 batching and reuse never bypass a mandatory check"
+          ]
+        }
+      ],
+      "sourceRefs": [],
+      "testRefs": [],
+      "evidenceRefs": [
+        {
+          "kind": "historical",
+          "path": "evidence/acceptance/run-40620099844-1b9fb56/gate-records/layer-timings.json"
+        }
+      ],
+      "investigation": "O1 is a development-workflow obligation for agents. CI layering is evidenced, but the agents' local test order was not recorded.",
+      "remainingWork": {
+        "applicationCode": "none",
+        "tests": "none",
+        "evidence": "small",
+        "planCorrections": "small",
+        "ownerDecisions": "none",
+        "independentReview": "none"
+      },
+      "existingEvidenceAtDeadline": "insufficient",
+      "review": {
+        "challenged": true,
+        "initialClassification": "PROCESS_EVIDENCE_MISSING",
+        "initialProcessStatus": "UNKNOWN",
+        "finalClassification": "PROCESS_EVIDENCE_MISSING",
+        "note": "Upheld by the independent review."
+      }
+    },
+    {
+      "id": "UI-011",
+      "title": "Keyboard, accessibility and iPad usability",
+      "scope": "application",
+      "classification": "PARTIALLY_IMPLEMENTED",
+      "processStatus": null,
+      "implemented": "partial (O4)",
+      "verified": "O1-O3, O5 PASS",
+      "confidence": "medium",
+      "frozenStatus": "NOT_RUN",
+      "frozenPlan": {
+        "document": "docs/CAUSA-UI-EXPERIENCE-REQUIREMENTS.md",
+        "acceptanceCriteria": [],
+        "linkedSections": [
+          "CAUSA-UI-EXPERIENCE§required-evidence"
+        ],
+        "gates": [
+          "G0",
+          "G5"
+        ],
+        "verificationRules": [
+          "VR-LEDGER",
+          "VR-PRESERVATION",
+          "VR-UI"
+        ],
+        "requiredEvidence": [
+          "acceptance ledger row with tests and evidence_paths at the verified SHA",
+          "praxis.requirements-preservation/1 evidence JSON with input SHA-256s",
+          "Percepta evidence JSON (schemaVersion 1.0.0) per screen contract",
+          "deployed-SHA screenshots at desktop, iPad portrait/landscape, mobile",
+          "accessibility report"
+        ],
+        "dependencies": {
+          "requirements": [],
+          "contracts": [
+            "CT-002",
+            "CT-009",
+            "CT-010",
+            "CT-012"
+          ]
+        },
+        "freshness": "FP-DETERMINISTIC-INPUT-DIGEST"
+      },
+      "obligations": [
+        {
+          "id": "UI-011-O1",
+          "vpo": "VPO-447fd64210e3d9e3",
+          "frozenVerification": "PASS",
+          "text": "Support keyboard-only navigation, visible focus, skip-to-content, appropriate landmarks, semantic status announcements, labeled controls, non-color-only states, and minimum usable touch targets.",
+          "boundTests": [
+            "every bound screen satisfies its Percepta contract (verify-app) [VPO-59c5cc78868b7d74] [VPO-447fd64210e3d9e3] [VPO-0684fde6ced06208] [VPO-9659118aa1ef95ff]",
+            "identity, accessibility and layout (UI-011, UI-014, UI-016) > keyboard: skip link first, visible focus, landmarks and a favicon [VPO-447fd64210e3d9e3] [VPO-9501908622238a66]"
+          ]
+        },
+        {
+          "id": "UI-011-O2",
+          "vpo": "VPO-0684fde6ced06208",
+          "frozenVerification": "PASS",
+          "text": "Support iPad portrait/landscape, narrow mobile screens, desktop, 200% text reflow, reduced motion, and screen readers.",
+          "boundTests": [
+            "every bound screen satisfies its Percepta contract (verify-app) [VPO-59c5cc78868b7d74] [VPO-447fd64210e3d9e3] [VPO-0684fde6ced06208] [VPO-9659118aa1ef95ff]",
+            "identity, accessibility and layout (UI-011, UI-014, UI-016) > reflows without horizontal scrolling and keeps 44px targets @responsive [VPO-0684fde6ced06208] [VPO-86dfcce77d8a048f] [VPO-3b9b2a8a4bf56535]",
+            "identity, accessibility and layout (UI-011, UI-014, UI-016) > reflows without horizontal scrolling and keeps 44px targets @responsive [VPO-0684fde6ced06208] [VPO-86dfcce77d8a048f] [VPO-3b9b2a8a4bf56535]",
+            "identity, accessibility and layout (UI-011, UI-014, UI-016) > reflows without horizontal scrolling and keeps 44px targets @responsive [VPO-0684fde6ced06208] [VPO-86dfcce77d8a048f] [VPO-3b9b2a8a4bf56535]",
+            "identity, accessibility and layout (UI-011, UI-014, UI-016) > reflows without horizontal scrolling and keeps 44px targets @responsive [VPO-0684fde6ced06208] [VPO-86dfcce77d8a048f] [VPO-3b9b2a8a4bf56535]"
+          ]
+        },
+        {
+          "id": "UI-011-O3",
+          "vpo": "VPO-40f80428200fc71c",
+          "frozenVerification": "PASS",
+          "text": "No essential operation may require drag-and-drop or hover.",
+          "boundTests": [
+            "no essential operation needs drag-and-drop or hover: hover only restyles, nothing is draggable, and a command completes by keyboard [VPO-40f80428200fc71c] [VPO-3b9b2a8a4bf56535]"
+          ]
+        },
+        {
+          "id": "UI-011-O4",
+          "vpo": "VPO-cb75698b278332f5",
+          "frozenVerification": "NOT_RUN",
+          "primaryCause": 1,
+          "secondaryCauses": [
+            4
+          ],
+          "missingEvidence": "The only tagged test checked focus after the WebAssembly handoff, so the final review removed the tag (f412598). Post-rehearsal probe: after a command re-render, scroll and focus are kept exactly (the control's viewport top is unchanged at 313.125 px); after back navigation, scroll is restored but focus falls to body.",
+          "text": "Preserve focus and scroll context during transitions and WebAssembly handoff.",
+          "boundTests": []
+        },
+        {
+          "id": "UI-011-O5",
+          "vpo": "VPO-0e6a69f7673cace8",
+          "frozenVerification": "PASS",
+          "text": "Graphs require equivalent accessible textual interaction.",
+          "boundTests": [
+            "causal graph with the Forma workflow engine (T23) > the causal analysis renders in the real forma-workflow frame, a selection shows its record, and the text list carries the same structure [VPO-684e6c5f94988bd9] [VPO-db2d02dab493e914] [VPO-b36c63fba6f83d4c] [VPO-05441c1c18ce3dc1] [VPO-0e6a69f7673cace8] [VPO-adec3c95bc6ac2c4] [VPO-3eba4ae44451132f]"
+          ]
+        }
+      ],
+      "sourceRefs": [
+        {
+          "path": "src/kernel/main.ts",
+          "symbol": "ready.focus(), selected-record focus, confirmation focus"
+        },
+        {
+          "path": "src/app/UxView.fs",
+          "symbol": "inspector focus return"
+        }
+      ],
+      "testRefs": [
+        {
+          "kind": "historical",
+          "path": "tests/browser/shell.spec.js",
+          "name": "the branded shell shows before the WebAssembly runtime and hands off without a blank frame",
+          "result": "passed in run 40620099844 (focus after handoff)"
+        },
+        {
+          "kind": "post-rehearsal",
+          "path": "indy-init:tools/rehearsal-005-audit/post-rehearsal-ui/Program.fs",
+          "name": "UI-011-O4 scroll and focus probe",
+          "result": "passed for command re-render; back navigation restores scroll but focus falls to body"
+        }
+      ],
+      "evidenceRefs": [
+        {
+          "kind": "post-rehearsal",
+          "path": "indy-init:docs/rehearsal-005-implementation-audit/post-rehearsal-evidence/ui-probe.json"
+        }
+      ],
+      "investigation": "The application has no scroll management code; scroll is kept by the browser's scroll anchoring and history restoration (Chromium measured; WebKit not measured). Focus is managed for handoff, selection, inspector and confirmation, but a back navigation leaves focus on body.",
+      "remainingWork": {
+        "applicationCode": "small",
+        "tests": "small",
+        "evidence": "small",
+        "planCorrections": "none",
+        "ownerDecisions": "none",
+        "independentReview": "none"
+      },
+      "existingEvidenceAtDeadline": "insufficient",
+      "review": {
+        "challenged": true,
+        "initialClassification": "PARTIALLY_IMPLEMENTED",
+        "initialProcessStatus": null,
+        "finalClassification": "PARTIALLY_IMPLEMENTED",
+        "note": "Upheld B; cause 4->1 (accepted): a sufficient test would fail on focus after back navigation."
+      }
+    },
+    {
+      "id": "UI-015",
+      "title": "Acceptance and traceability",
+      "scope": "application",
+      "classification": "INDETERMINATE",
+      "processStatus": null,
+      "implemented": "elements implemented; deployed exact-SHA run missing",
+      "verified": "O1, O4 PASS",
+      "confidence": "medium",
+      "frozenStatus": "NOT_RUN",
+      "frozenPlan": {
+        "document": "docs/CAUSA-UI-EXPERIENCE-REQUIREMENTS.md",
+        "acceptanceCriteria": [
+          "UI-015-O1",
+          "UI-015-O2",
+          "UI-015-O3",
+          "UI-015-O4"
+        ],
+        "linkedSections": [
+          "CAUSA-UI-EXPERIENCE§required-evidence"
+        ],
+        "gates": [
+          "G0",
+          "G5",
+          "G9"
+        ],
+        "verificationRules": [
+          "VR-LEDGER",
+          "VR-PRESERVATION",
+          "VR-UI",
+          "VR-DEPLOYMENT"
+        ],
+        "requiredEvidence": [
+          "acceptance ledger row with tests and evidence_paths at the verified SHA",
+          "praxis.requirements-preservation/1 evidence JSON with input SHA-256s",
+          "Percepta evidence JSON (schemaVersion 1.0.0) per screen contract",
+          "deployed-SHA screenshots at desktop, iPad portrait/landscape, mobile",
+          "accessibility report",
+          "deployment record",
+          "acceptance job on the deployed SHA"
+        ],
+        "dependencies": {
+          "requirements": [
+            "EXT-DATA-013"
+          ],
+          "contracts": [
+            "CT-002",
+            "CT-007",
+            "CT-010",
+            "CT-012",
+            "CT-017"
+          ]
+        },
+        "freshness": "FP-LIVE-PER-COMMIT"
+      },
+      "obligations": [
+        {
+          "id": "UI-015-O1",
+          "vpo": "VPO-59c5cc78868b7d74",
+          "frozenVerification": "PASS",
+          "text": "For each UI requirement, create tagged acceptance tests and a traceability map to underlying domain contracts.",
+          "boundTests": [
+            "every bound screen satisfies its Percepta contract (verify-app) [VPO-59c5cc78868b7d74] [VPO-447fd64210e3d9e3] [VPO-0684fde6ced06208] [VPO-9659118aa1ef95ff]"
+          ]
+        },
+        {
+          "id": "UI-015-O2",
+          "vpo": "VPO-dccec1843ba79b6b",
+          "frozenVerification": "NOT_RUN",
+          "primaryCause": 11,
+          "secondaryCauses": [
+            6
+          ],
+          "missingEvidence": "An aggregate obligation that restates other obligations: catalog load and replay (EXT-DATA-013), frozen fixtures (FixtureReplayTests), keyboard and touch (UI-011-O1/O3), graph text (UI-011-O5), command enforcement (UI-004), save/sync truthfulness (UI-006), conflict recovery (PF-*), reflow (UI-011-O2), report and startup failure (WASM-LOAD). Each element passed under its own VPO; no test names this one.",
+          "text": "Verify the three active-catalog investigations (EXT-DATA-013) load from the connected repository and replay, verify the five frozen v1.0.0 fixtures replay as the storage contract's test corpus, keyboard/touch paths, graph textual equivalent, timeline ordering, legal command enforcement, save/sync truthfulness, offline/conflict recovery, responsive reflow, report fidelity, and startup failure.",
+          "boundTests": []
+        },
+        {
+          "id": "UI-015-O3",
+          "vpo": "VPO-5c8d5917d17f8960",
+          "frozenVerification": "NOT_RUN",
+          "primaryCause": 3,
+          "secondaryCauses": [
+            12,
+            7
+          ],
+          "missingEvidence": "The production browser suite never ran against the deployed exact SHA, although the config supports CAUSA_BASE_URL. The mocked-persistence negative control ran against the local test build. Pages now serves b972cb4 (same product source, different build), so the exact-SHA run can no longer be made. Secondary (12): the deployed mode is unusable for mocked specs, because the network guard in tests/browser/support/fixtures.js aborts the deployed host (reproduced post-rehearsal: \"a mocked browser test tried to reach the real network\").",
+          "text": "Test on deployed exact SHA; mocked persistence MUST NOT be represented as live write verification.",
+          "boundTests": []
+        },
+        {
+          "id": "UI-015-O4",
+          "vpo": "VPO-fd43b3e4e7e02f59",
+          "frozenVerification": "PASS",
+          "text": "Missing verification is BLOCKED/UNKNOWN, not PASS.",
+          "boundTests": [
+            "Causa.Acceptance.Tests.AcceptanceTests.a Percepta contract counts as not applicable only when it cites an existing accepted DF decision",
+            "Causa.Acceptance.Tests.AcceptanceTests.failing, missing, skipped or merely declared tests are never reported PASS",
+            "Causa.Acceptance.Tests.PipelineTests.UI-015 G5 succeeds only with 0 FAIL, 0 NOT-BOUND, no orphans, and NOT-APPLICABLE only by a cited accepted decision",
+            "Causa.App.Tests.ProjectionTests.VPO-fd43b3e4e7e02f59 the proof page names the run and commit the evidence came from apart from this build, and says when none was published",
+            "the evidence's own run and commit are labelled apart from this build's; missing traceability reads 'not published' [VPO-fd43b3e4e7e02f59]",
+            "the factory view shows only published values: ROS work, requirement and test counts, Praxis, Aegis and the deployed commit [VPO-fd43b3e4e7e02f59]",
+            "the requirements proof states published counts exactly, and a requirement is proven only when every obligation passed [VPO-fd43b3e4e7e02f59]"
+          ]
+        }
+      ],
+      "sourceRefs": [
+        {
+          "path": "playwright.config.js",
+          "symbol": "CAUSA_BASE_URL"
+        },
+        {
+          "path": "tests/browser/fixture-mode.spec.js",
+          "symbol": "UI-015-O3 negative control"
+        }
+      ],
+      "testRefs": [
+        {
+          "kind": "historical",
+          "path": "tests/browser/fixture-mode.spec.js",
+          "name": "UI-015-O3 mocked persistence is never represented as a live write (negative control)",
+          "result": "passed in run 40620099844 against the local test build"
+        },
+        {
+          "kind": "post-rehearsal",
+          "path": "indy-init:docs/rehearsal-005-implementation-audit/post-rehearsal-evidence/browser-deployed-suite.txt",
+          "name": "frozen production browser suite against the deployed site (b972cb4, product source identical to 1b9fb56)",
+          "result": "see file"
+        }
+      ],
+      "evidenceRefs": [
+        {
+          "kind": "historical",
+          "path": "evidence/acceptance/run-40620099844-1b9fb56/gate-records/deployed-screenshots/screenshots.json"
+        }
+      ],
+      "investigation": "Every element of O2 is implemented and proven under another obligation. O3's 'deployed exact SHA' run never happened, and it can no longer happen because Pages serves b972cb4. A run against b972cb4 is the closest available evidence, not exact-SHA evidence.",
+      "remainingWork": {
+        "applicationCode": "none",
+        "tests": "small",
+        "evidence": "small",
+        "planCorrections": "small",
+        "ownerDecisions": "none",
+        "independentReview": "none"
+      },
+      "existingEvidenceAtDeadline": "insufficient",
+      "review": {
+        "challenged": true,
+        "initialClassification": "INDETERMINATE",
+        "initialProcessStatus": null,
+        "finalClassification": "INDETERMINATE",
+        "note": "Upheld by the independent review."
+      }
+    },
+    {
+      "id": "UI-016",
+      "title": "Causa semantic color system",
+      "scope": "application",
+      "classification": "PARTIALLY_IMPLEMENTED",
+      "processStatus": null,
+      "implemented": "partial (non-text indicator contrast)",
+      "verified": "15 of 17 obligations PASS",
+      "confidence": "medium",
+      "frozenStatus": "NOT_RUN",
+      "frozenPlan": {
+        "document": "docs/CAUSA-UI-EXPERIENCE-REQUIREMENTS.md",
+        "acceptanceCriteria": [
+          "UI-016-O15",
+          "UI-016-O16",
+          "UI-016-O17"
+        ],
+        "linkedSections": [
+          "CAUSA-UI-EXPERIENCE§required-evidence"
+        ],
+        "gates": [
+          "G0",
+          "G5"
+        ],
+        "verificationRules": [
+          "VR-LEDGER",
+          "VR-PRESERVATION",
+          "VR-UI"
+        ],
+        "requiredEvidence": [
+          "acceptance ledger row with tests and evidence_paths at the verified SHA",
+          "praxis.requirements-preservation/1 evidence JSON with input SHA-256s",
+          "Percepta evidence JSON (schemaVersion 1.0.0) per screen contract",
+          "deployed-SHA screenshots at desktop, iPad portrait/landscape, mobile",
+          "accessibility report"
+        ],
+        "dependencies": {
+          "requirements": [],
+          "contracts": [
+            "CT-002",
+            "CT-009",
+            "CT-010",
+            "CT-012"
+          ]
+        },
+        "freshness": "FP-DETERMINISTIC-INPUT-DIGEST"
+      },
+      "obligations": [
+        {
+          "id": "UI-016-O1",
+          "vpo": "VPO-cecb71404071030d",
+          "frozenVerification": "PASS",
+          "text": "The interface MUST have a deliberate, visibly colored Causa identity, not an effectively monochrome black/gray/white presentation.",
+          "boundTests": [
+            "identity, accessibility and layout (UI-011, UI-014, UI-016) > the Causa palette is mapped to named Forma tokens with measured contrast [VPO-cecb71404071030d] [VPO-3d80d031f05ec0dc] [VPO-d0c711c2da0f3800] [VPO-e0e945fc040386e1] [VPO-fbc386df77130f2d] [VPO-8905fd51176a3fc6] [VPO-fe19413526420c16] [VPO-d657e8dd084961b1] [VPO-1a1aae8ffa920386] [VPO-5a993f5a761fd6ee]"
+          ]
+        },
+        {
+          "id": "UI-016-O2",
+          "vpo": "VPO-3d80d031f05ec0dc",
+          "frozenVerification": "PASS",
+          "text": "Use these initial canonical palette values:",
+          "boundTests": [
+            "identity, accessibility and layout (UI-011, UI-014, UI-016) > the Causa palette is mapped to named Forma tokens with measured contrast [VPO-cecb71404071030d] [VPO-3d80d031f05ec0dc] [VPO-d0c711c2da0f3800] [VPO-e0e945fc040386e1] [VPO-fbc386df77130f2d] [VPO-8905fd51176a3fc6] [VPO-fe19413526420c16] [VPO-d657e8dd084961b1] [VPO-1a1aae8ffa920386] [VPO-5a993f5a761fd6ee]"
+          ]
+        },
+        {
+          "id": "UI-016-O3",
+          "vpo": "VPO-d0c711c2da0f3800",
+          "frozenVerification": "PASS",
+          "text": "| Deep navy | Deep navy | `#14283F` | Primary navigation, masthead, structural emphasis |",
+          "boundTests": [
+            "identity, accessibility and layout (UI-011, UI-014, UI-016) > the Causa palette is mapped to named Forma tokens with measured contrast [VPO-cecb71404071030d] [VPO-3d80d031f05ec0dc] [VPO-d0c711c2da0f3800] [VPO-e0e945fc040386e1] [VPO-fbc386df77130f2d] [VPO-8905fd51176a3fc6] [VPO-fe19413526420c16] [VPO-d657e8dd084961b1] [VPO-1a1aae8ffa920386] [VPO-5a993f5a761fd6ee]"
+          ]
+        },
+        {
+          "id": "UI-016-O4",
+          "vpo": "VPO-e0e945fc040386e1",
+          "frozenVerification": "PASS",
+          "text": "| Teal | Teal | `#087F8C` | Primary investigation actions, active selection and positive workflow emphasis |",
+          "boundTests": [
+            "identity, accessibility and layout (UI-011, UI-014, UI-016) > the Causa palette is mapped to named Forma tokens with measured contrast [VPO-cecb71404071030d] [VPO-3d80d031f05ec0dc] [VPO-d0c711c2da0f3800] [VPO-e0e945fc040386e1] [VPO-fbc386df77130f2d] [VPO-8905fd51176a3fc6] [VPO-fe19413526420c16] [VPO-d657e8dd084961b1] [VPO-1a1aae8ffa920386] [VPO-5a993f5a761fd6ee]"
+          ]
+        },
+        {
+          "id": "UI-016-O5",
+          "vpo": "VPO-fbc386df77130f2d",
+          "frozenVerification": "PASS",
+          "text": "| Amber | Amber | `#E9A23B` | Unresolved unknowns, pending review and attention |",
+          "boundTests": [
+            "identity, accessibility and layout (UI-011, UI-014, UI-016) > the Causa palette is mapped to named Forma tokens with measured contrast [VPO-cecb71404071030d] [VPO-3d80d031f05ec0dc] [VPO-d0c711c2da0f3800] [VPO-e0e945fc040386e1] [VPO-fbc386df77130f2d] [VPO-8905fd51176a3fc6] [VPO-fe19413526420c16] [VPO-d657e8dd084961b1] [VPO-1a1aae8ffa920386] [VPO-5a993f5a761fd6ee]"
+          ]
+        },
+        {
+          "id": "UI-016-O6",
+          "vpo": "VPO-8905fd51176a3fc6",
+          "frozenVerification": "PASS",
+          "text": "| Coral | Coral | `#D66B58` | Contradictions, material conflicts and critical investigation alerts |",
+          "boundTests": [
+            "identity, accessibility and layout (UI-011, UI-014, UI-016) > the Causa palette is mapped to named Forma tokens with measured contrast [VPO-cecb71404071030d] [VPO-3d80d031f05ec0dc] [VPO-d0c711c2da0f3800] [VPO-e0e945fc040386e1] [VPO-fbc386df77130f2d] [VPO-8905fd51176a3fc6] [VPO-fe19413526420c16] [VPO-d657e8dd084961b1] [VPO-1a1aae8ffa920386] [VPO-5a993f5a761fd6ee]"
+          ]
+        },
+        {
+          "id": "UI-016-O7",
+          "vpo": "VPO-fe19413526420c16",
+          "frozenVerification": "PASS",
+          "text": "| Soft ivory | Soft ivory | `#F5F3ED` | Main workspace surface and light backgrounds |",
+          "boundTests": [
+            "identity, accessibility and layout (UI-011, UI-014, UI-016) > the Causa palette is mapped to named Forma tokens with measured contrast [VPO-cecb71404071030d] [VPO-3d80d031f05ec0dc] [VPO-d0c711c2da0f3800] [VPO-e0e945fc040386e1] [VPO-fbc386df77130f2d] [VPO-8905fd51176a3fc6] [VPO-fe19413526420c16] [VPO-d657e8dd084961b1] [VPO-1a1aae8ffa920386] [VPO-5a993f5a761fd6ee]"
+          ]
+        },
+        {
+          "id": "UI-016-O8",
+          "vpo": "VPO-d657e8dd084961b1",
+          "frozenVerification": "PASS",
+          "text": "All colors MUST be mapped to named, semantic Forma theme tokens, not scattered hardcoded CSS declarations.",
+          "boundTests": [
+            "identity, accessibility and layout (UI-011, UI-014, UI-016) > the Causa palette is mapped to named Forma tokens with measured contrast [VPO-cecb71404071030d] [VPO-3d80d031f05ec0dc] [VPO-d0c711c2da0f3800] [VPO-e0e945fc040386e1] [VPO-fbc386df77130f2d] [VPO-8905fd51176a3fc6] [VPO-fe19413526420c16] [VPO-d657e8dd084961b1] [VPO-1a1aae8ffa920386] [VPO-5a993f5a761fd6ee]"
+          ]
+        },
+        {
+          "id": "UI-016-O9",
+          "vpo": "VPO-f4f9d09fc20df79d",
+          "frozenVerification": "PASS",
+          "text": "Use Forma components for surfaces, controls, states and focus treatment.",
+          "boundTests": [
+            "fixture scenarios show navy, teal, amber, coral and ivory in the states they mean, each with a text label and measured contrast [VPO-8cd7943440a55f6f] [VPO-b3cab23e517cd0d3] [VPO-7fd9b69b4aa5b401] [VPO-f4f9d09fc20df79d] [VPO-5a993f5a761fd6ee]"
+          ]
+        },
+        {
+          "id": "UI-016-O10",
+          "vpo": "VPO-5a993f5a761fd6ee",
+          "frozenVerification": "PASS",
+          "text": "Define derived foreground, hover, disabled, border and dark-mode tokens only after measuring contrast; the five hex values are starting identity colors, not a guarantee of accessible foreground/background combinations.",
+          "boundTests": [
+            "fixture scenarios show navy, teal, amber, coral and ivory in the states they mean, each with a text label and measured contrast [VPO-8cd7943440a55f6f] [VPO-b3cab23e517cd0d3] [VPO-7fd9b69b4aa5b401] [VPO-f4f9d09fc20df79d] [VPO-5a993f5a761fd6ee]",
+            "identity, accessibility and layout (UI-011, UI-014, UI-016) > the Causa palette is mapped to named Forma tokens with measured contrast [VPO-cecb71404071030d] [VPO-3d80d031f05ec0dc] [VPO-d0c711c2da0f3800] [VPO-e0e945fc040386e1] [VPO-fbc386df77130f2d] [VPO-8905fd51176a3fc6] [VPO-fe19413526420c16] [VPO-d657e8dd084961b1] [VPO-1a1aae8ffa920386] [VPO-5a993f5a761fd6ee]"
+          ]
+        },
+        {
+          "id": "UI-016-O11",
+          "vpo": "VPO-6051ea46b65ebe27",
+          "frozenVerification": "NOT_RUN",
+          "primaryCause": 1,
+          "secondaryCauses": [
+            4
+          ],
+          "missingEvidence": "The tagged test measured only declared ink tokens on ivory (tag removed in f412598). Post-rehearsal probe over eight views: every rendered text run meets AA, wash surfaces included. Amber indicator borders (#E9A23B) are 1.95:1 on ivory and 2.17:1 on white, below the 3:1 non-text threshold.",
+          "text": "Ensure WCAG AA contrast for normal text (4.5:1), large text (3:1), and relevant non-text indicators (3:1).",
+          "boundTests": []
+        },
+        {
+          "id": "UI-016-O12",
+          "vpo": "VPO-7fd9b69b4aa5b401",
+          "frozenVerification": "PASS",
+          "text": "Do not convey lifecycle, confidence, danger, verification or sync status through color alone: pair color with text and/or icons, and distinguish causal semantics from decorative accents.",
+          "boundTests": [
+            "fixture scenarios show navy, teal, amber, coral and ivory in the states they mean, each with a text label and measured contrast [VPO-8cd7943440a55f6f] [VPO-b3cab23e517cd0d3] [VPO-7fd9b69b4aa5b401] [VPO-f4f9d09fc20df79d] [VPO-5a993f5a761fd6ee]"
+          ]
+        },
+        {
+          "id": "UI-016-O13",
+          "vpo": "VPO-de371f74930347b8",
+          "frozenVerification": "PASS",
+          "text": "Use the same token semantics across dashboard, investigation views, timeline, causal graph, evidence inspector, report and startup shell.",
+          "boundTests": [
+            "absence of data does not force a status colour, and the same state has the same colours in every view [VPO-b3cab23e517cd0d3] [VPO-de371f74930347b8]"
+          ]
+        },
+        {
+          "id": "UI-016-O14",
+          "vpo": "VPO-406b16e7341d28c2",
+          "frozenVerification": "PASS",
+          "text": "Print/Folio output MUST remain legible in grayscale.",
+          "boundTests": [
+            "the printed report stays legible in grayscale [VPO-406b16e7341d28c2]"
+          ]
+        },
+        {
+          "id": "UI-016-O15",
+          "vpo": "VPO-3f1eb00d9960fe1c",
+          "frozenVerification": "NOT_RUN",
+          "primaryCause": 10,
+          "secondaryCauses": [
+            6
+          ],
+          "missingEvidence": "Deployed exact-SHA screenshots at desktop, iPad portrait and landscape, and mobile exist (gate-records/deployed-screenshots, 1b9fb56873fe) but are not bound. Token, contrast, focus and reduced-motion checks passed under other VPOs. No independent visual review of the screenshots was recorded.",
+          "text": "Acceptance MUST include actual screenshots from the deployed exact SHA at desktop, iPad portrait/landscape and mobile sizes, plus automated token presence and contrast checks, keyboard focus checks, reduced-motion checks and independent visual review.",
+          "boundTests": []
+        },
+        {
+          "id": "UI-016-O16",
+          "vpo": "VPO-b3cab23e517cd0d3",
+          "frozenVerification": "PASS",
+          "text": "Verify that navy, teal, amber, coral and ivory appear in appropriate populated states; absence of data must not force a misleading status color.",
+          "boundTests": [
+            "absence of data does not force a status colour, and the same state has the same colours in every view [VPO-b3cab23e517cd0d3] [VPO-de371f74930347b8]",
+            "fixture scenarios show navy, teal, amber, coral and ivory in the states they mean, each with a text label and measured contrast [VPO-8cd7943440a55f6f] [VPO-b3cab23e517cd0d3] [VPO-7fd9b69b4aa5b401] [VPO-f4f9d09fc20df79d] [VPO-5a993f5a761fd6ee]"
+          ]
+        },
+        {
+          "id": "UI-016-O17",
+          "vpo": "VPO-1a1aae8ffa920386",
+          "frozenVerification": "PASS",
+          "text": "A grayscale-only interface is a failed UI-016 acceptance even if functional tests pass.",
+          "boundTests": [
+            "identity, accessibility and layout (UI-011, UI-014, UI-016) > the Causa palette is mapped to named Forma tokens with measured contrast [VPO-cecb71404071030d] [VPO-3d80d031f05ec0dc] [VPO-d0c711c2da0f3800] [VPO-e0e945fc040386e1] [VPO-fbc386df77130f2d] [VPO-8905fd51176a3fc6] [VPO-fe19413526420c16] [VPO-d657e8dd084961b1] [VPO-1a1aae8ffa920386] [VPO-5a993f5a761fd6ee]"
+          ]
+        }
+      ],
+      "sourceRefs": [
+        {
+          "path": "src/kernel/causa.css",
+          "symbol": "--causa-color-attention borders (.causa-item--hypothesis, --blocker, --open, .causa-attention, .causa-report__incomplete, .causa-check)"
+        }
+      ],
+      "testRefs": [
+        {
+          "kind": "historical",
+          "path": "tests/browser/shell.spec.js",
+          "name": "the Causa palette is mapped to named Forma tokens with measured contrast",
+          "result": "passed in run 40620099844 (declared ink pairs only)"
+        },
+        {
+          "kind": "post-rehearsal",
+          "path": "indy-init:tools/rehearsal-005-audit/post-rehearsal-ui/Program.fs",
+          "name": "UI-016-O11 rendered contrast probe (8 views)",
+          "result": "text: 0 failures; non-text: amber indicator borders 1.95-2.17:1"
+        }
+      ],
+      "evidenceRefs": [
+        {
+          "kind": "historical",
+          "path": "evidence/acceptance/run-40620099844-1b9fb56/gate-records/deployed-screenshots/screenshots.json"
+        },
+        {
+          "kind": "post-rehearsal",
+          "path": "indy-init:docs/rehearsal-005-implementation-audit/post-rehearsal-evidence/ui-probe.json"
+        }
+      ],
+      "investigation": "Text contrast meets AA on every measured view and surface. The amber indicator borders that mark attention states sit below 3:1. They are paired with text labels (UI-016-O12 PASS), so whether they count as 'relevant non-text indicators' needs an accessibility decision. O15 lacks only binding of the existing deployed screenshots and an independent visual review.",
+      "remainingWork": {
+        "applicationCode": "small",
+        "tests": "small",
+        "evidence": "small",
+        "planCorrections": "none",
+        "ownerDecisions": "small",
+        "independentReview": "small"
+      },
+      "existingEvidenceAtDeadline": "insufficient",
+      "review": {
+        "challenged": true,
+        "initialClassification": "PARTIALLY_IMPLEMENTED",
+        "initialProcessStatus": null,
+        "finalClassification": "PARTIALLY_IMPLEMENTED",
+        "note": "Upheld B; cause 4->1 (accepted): amber indicators measure below 3:1."
+      }
+    },
+    {
+      "id": "UI-021",
+      "title": "Content and route verification",
+      "scope": "application",
+      "classification": "PROCESS_EVIDENCE_MISSING",
+      "processStatus": "PERFORMED_EVIDENCE_INADEQUATE",
+      "implemented": "yes (O1, O2 PASS)",
+      "verified": "application behaviour PASS",
+      "confidence": "medium",
+      "frozenStatus": "NOT_RUN",
+      "frozenPlan": {
+        "document": "docs/CAUSA-UI-EXPERIENCE-REQUIREMENTS.md",
+        "acceptanceCriteria": [
+          "UI-021-O1",
+          "UI-021-O2"
+        ],
+        "linkedSections": [
+          "CAUSA-UI-EXPERIENCE§required-evidence"
+        ],
+        "gates": [
+          "G0",
+          "G5"
+        ],
+        "verificationRules": [
+          "VR-LEDGER",
+          "VR-PRESERVATION",
+          "VR-UI"
+        ],
+        "requiredEvidence": [
+          "acceptance ledger row with tests and evidence_paths at the verified SHA",
+          "praxis.requirements-preservation/1 evidence JSON with input SHA-256s",
+          "Percepta evidence JSON (schemaVersion 1.0.0) per screen contract",
+          "deployed-SHA screenshots at desktop, iPad portrait/landscape, mobile",
+          "accessibility report"
+        ],
+        "dependencies": {
+          "requirements": [],
+          "contracts": [
+            "CT-002",
+            "CT-010",
+            "CT-012"
+          ]
+        },
+        "freshness": "FP-DETERMINISTIC-INPUT-DIGEST"
+      },
+      "obligations": [
+        {
+          "id": "UI-021-O1",
+          "vpo": "VPO-2ad36bd062191d2b",
+          "frozenVerification": "PASS",
+          "text": "Add browser tests using deterministic fixtures that assert: (1) the quoted catalog/replay technical paragraph and equivalent implementation prose are absent from routine investigation views; (2) operational details appear in Administration; (3) preferences appear in Settings and behave according to their documented persistence scope; (4) navigation, focus, labels, and responsive behavior work; (5) no credentials or secret values are rendered or logged; and (6) deployed exact-SHA verification exercises all three destinations.",
+          "boundTests": [
+            "investigation work apart from Administration and Settings (UI-017, UI-018, UI-020, UI-021, UI-023, UI-029, UI-030, UI-031) > routine investigation views carry no implementation prose, codes or versions; Administration keeps them [VPO-7b0ba1d1f6f663a5] [VPO-78541ad7e7bfc045] [VPO-0b37bb6a955165e2] [VPO-18e6fc4dd0730354] [VPO-2ad36bd062191d2b] [VPO-026da8a495857549] [VPO-5c147c83f19f2c8c] [VPO-bff050b54a481780] [VPO-e1fb14be4ca10f5f]",
+            "investigation work apart from Administration and Settings (UI-017, UI-018, UI-020, UI-021, UI-023, UI-029, UI-030, UI-031) > workflow actions stay in the investigation, operational facts in Administration, preferences in Settings; two-level navigation [VPO-9eb8f87800355c73] [VPO-e5017d9f8ae702fb] [VPO-dba405d7ed58872b] [VPO-7fe69b1e93fa0c7f] [VPO-2ad36bd062191d2b] [VPO-fcf404b4a7afa635]"
+          ]
+        },
+        {
+          "id": "UI-021-O2",
+          "vpo": "VPO-026da8a495857549",
+          "frozenVerification": "PASS",
+          "text": "Tests must not simply check for page existence; they must verify content placement and user-visible behavior.",
+          "boundTests": [
+            "investigation work apart from Administration and Settings (UI-017, UI-018, UI-020, UI-021, UI-023, UI-029, UI-030, UI-031) > routine investigation views carry no implementation prose, codes or versions; Administration keeps them [VPO-7b0ba1d1f6f663a5] [VPO-78541ad7e7bfc045] [VPO-0b37bb6a955165e2] [VPO-18e6fc4dd0730354] [VPO-2ad36bd062191d2b] [VPO-026da8a495857549] [VPO-5c147c83f19f2c8c] [VPO-bff050b54a481780] [VPO-e1fb14be4ca10f5f]"
+          ]
+        },
+        {
+          "id": "UI-021-O3",
+          "vpo": "VPO-57c0df8ba4399c17",
+          "frozenVerification": "NOT_RUN",
+          "primaryCause": 11,
+          "secondaryCauses": [
+            5
+          ],
+          "missingEvidence": "A Praxis traceability obligation with a test-only binding. Praxis work-item attribution (WI-0001..WI-0008) and 'approvedExclusions: none' exist.",
+          "text": "Preserve traceability and approved-scope handling in Praxis.",
+          "boundTests": []
+        }
+      ],
+      "sourceRefs": [],
+      "testRefs": [],
+      "evidenceRefs": [
+        {
+          "kind": "historical",
+          "path": ".ros/events/events.jsonl"
+        },
+        {
+          "kind": "historical",
+          "path": "indy-init:kickoff/rehearsal-005/preflight-record.json"
+        }
+      ],
+      "investigation": "The application behaviour is fully verified. Only the Praxis traceability and approved-scope obligation is open; the work-item attribution and the 'no exclusions' record exist but were reconciled after the fact.",
+      "remainingWork": {
+        "applicationCode": "none",
+        "tests": "none",
+        "evidence": "small",
+        "planCorrections": "small",
+        "ownerDecisions": "none",
+        "independentReview": "none"
+      },
+      "existingEvidenceAtDeadline": "insufficient",
+      "review": {
+        "challenged": true,
+        "initialClassification": "PROCESS_EVIDENCE_MISSING",
+        "initialProcessStatus": "PERFORMED_EVIDENCE_INADEQUATE",
+        "finalClassification": "PROCESS_EVIDENCE_MISSING",
+        "note": "Upheld; existing-evidence claim downgraded (accepted): attribution reconciled after the fact."
+      }
+    },
+    {
+      "id": "UI-030",
+      "title": "Presentation semantics verification and adversarial tests",
+      "scope": "application",
+      "classification": "PROCESS_EVIDENCE_MISSING",
+      "processStatus": "PERFORMED_EVIDENCE_INADEQUATE",
+      "implemented": "yes (O1, O2, O4 PASS)",
+      "verified": "application behaviour PASS",
+      "confidence": "high",
+      "frozenStatus": "NOT_RUN",
+      "frozenPlan": {
+        "document": "docs/CAUSA-UI-EXPERIENCE-REQUIREMENTS.md",
+        "acceptanceCriteria": [
+          "UI-030-O1",
+          "UI-030-O2",
+          "UI-030-O3"
+        ],
+        "linkedSections": [
+          "CAUSA-UI-EXPERIENCE§required-evidence"
+        ],
+        "gates": [
+          "G0",
+          "G5"
+        ],
+        "verificationRules": [
+          "VR-LEDGER",
+          "VR-PRESERVATION",
+          "VR-UI"
+        ],
+        "requiredEvidence": [
+          "acceptance ledger row with tests and evidence_paths at the verified SHA",
+          "praxis.requirements-preservation/1 evidence JSON with input SHA-256s",
+          "Percepta evidence JSON (schemaVersion 1.0.0) per screen contract",
+          "deployed-SHA screenshots at desktop, iPad portrait/landscape, mobile",
+          "accessibility report"
+        ],
+        "dependencies": {
+          "requirements": [
+            "UI-022",
+            "UI-023",
+            "UI-024",
+            "UI-025",
+            "UI-026",
+            "UI-027",
+            "UI-028",
+            "UI-029"
+          ],
+          "contracts": [
+            "CT-002",
+            "CT-010",
+            "CT-012"
+          ]
+        },
+        "freshness": "FP-DETERMINISTIC-INPUT-DIGEST"
+      },
+      "obligations": [
+        {
+          "id": "UI-030-O1",
+          "vpo": "VPO-bff050b54a481780",
+          "frozenVerification": "PASS",
+          "text": "Add deterministic fixture and deployed-browser assertions covering UI-022..UI-029: absence of technical metadata from header/footer/cards; truthful actual status versus expected status; technical validation never becoming an investigation-level \"Verified\" badge; mapped user-facing terminology; overview backed by the domain snapshot; causal graph invoking the real workflow layout engine; draft actions respecting engine authority; failure-state copy; and two-level navigation/accessibility.",
+          "boundTests": [
+            "investigation work apart from Administration and Settings (UI-017, UI-018, UI-020, UI-021, UI-023, UI-029, UI-030, UI-031) > routine investigation views carry no implementation prose, codes or versions; Administration keeps them [VPO-7b0ba1d1f6f663a5] [VPO-78541ad7e7bfc045] [VPO-0b37bb6a955165e2] [VPO-18e6fc4dd0730354] [VPO-2ad36bd062191d2b] [VPO-026da8a495857549] [VPO-5c147c83f19f2c8c] [VPO-bff050b54a481780] [VPO-e1fb14be4ca10f5f]"
+          ]
+        },
+        {
+          "id": "UI-030-O2",
+          "vpo": "VPO-885e4767b84371de",
+          "frozenVerification": "PASS",
+          "text": "Include negative controls for fabricated conclusions, unknown-as-zero, technical-language leakage, and misleading saved/verified states.",
+          "boundTests": [
+            "Causa.App.Tests.LanguageTests.VPO-e8570ba5427ce32b VPO-885e4767b84371de findings wording never claims a confirmed cause or verification the domain does not assert",
+            "Causa.App.Tests.RecordsTests.VPO-141be05c7de03e17 VPO-885e4767b84371de a case with nothing recorded is not shown as having no work, and nothing is invented",
+            "Causa.App.Tests.UxViewTests.VPO-885e4767b84371de VPO-02b53bd16db4ee17 an unknown count on a card is never shown as zero, and no next action is invented",
+            "detail inspector and relationships (UI-005, UI-033, UI-034, UI-038, UI-039) > a cause's explanation lists its hypotheses, supporting and conflicting evidence, history and why it is not confirmed; nothing is concluded [VPO-f8666daf6fdf79d7] [VPO-ffda9fea0324a42e] [VPO-885e4767b84371de] [VPO-8a5de7e5afae98cb]",
+            "investigation work apart from Administration and Settings (UI-017, UI-018, UI-020, UI-021, UI-023, UI-029, UI-030, UI-031) > an investigation that loaded correctly but has unresolved findings is never labelled Verified; findings come from the domain [VPO-d0e33c8aaaf705f2] [VPO-c8114e2b7bd759fa] [VPO-f0256bc31283be14] [VPO-58231f4725864068] [VPO-885e4767b84371de] [VPO-6f0a2e18f9a19003]"
+          ]
+        },
+        {
+          "id": "UI-030-O3",
+          "vpo": "VPO-0a1011b7c5476354",
+          "frozenVerification": "NOT_RUN",
+          "primaryCause": 11,
+          "secondaryCauses": [
+            7,
+            10
+          ],
+          "missingEvidence": "traceability.json records requirement ids, tests and the deployed SHA. The independent reviews covered be01851 and 543ddc2, not the final candidate 1b9fb56.",
+          "text": "Record source requirement IDs, tests, exact deployed SHA, and independent review.",
+          "boundTests": []
+        },
+        {
+          "id": "UI-030-O4",
+          "vpo": "VPO-f70d9f1e42371d48",
+          "frozenVerification": "PASS",
+          "text": "Do not mark unsupported features PASS.",
+          "boundTests": [
+            "identity, failures and component ownership (UI-017-O4, UI-022-O1, UI-030-O4, UI-034-O3, UI-039-O2) > Administration never presents an unsupported or unmeasured item as passed [VPO-f70d9f1e42371d48]"
+          ]
+        }
+      ],
+      "sourceRefs": [],
+      "testRefs": [],
+      "evidenceRefs": [
+        {
+          "kind": "historical",
+          "path": "evidence/acceptance/run-40620099844-1b9fb56/bundle/traceability.json"
+        },
+        {
+          "kind": "historical",
+          "path": "acceptance/reviews/R5-final-review.md"
+        }
+      ],
+      "investigation": "Requirement ids, tests and the deployed SHA are recorded. The independent review did not cover the final candidate SHA.",
+      "remainingWork": {
+        "applicationCode": "none",
+        "tests": "none",
+        "evidence": "small",
+        "planCorrections": "small",
+        "ownerDecisions": "none",
+        "independentReview": "small"
+      },
+      "existingEvidenceAtDeadline": "insufficient",
+      "review": {
+        "challenged": true,
+        "initialClassification": "PROCESS_EVIDENCE_MISSING",
+        "initialProcessStatus": "PERFORMED_EVIDENCE_INADEQUATE",
+        "finalClassification": "PROCESS_EVIDENCE_MISSING",
+        "note": "Upheld by the independent review."
+      }
+    },
+    {
+      "id": "UI-031",
+      "title": "Preserve system detail without exposing it in the workflow",
+      "scope": "application",
+      "classification": "PARTIALLY_IMPLEMENTED",
+      "processStatus": null,
+      "implemented": "partial (no role/access control)",
+      "verified": "O1-O4 PASS",
+      "confidence": "high",
+      "frozenStatus": "NOT_RUN",
+      "frozenPlan": {
+        "document": "docs/CAUSA-UI-EXPERIENCE-REQUIREMENTS.md",
+        "acceptanceCriteria": [],
+        "linkedSections": [
+          "CAUSA-UI-EXPERIENCE§required-evidence"
+        ],
+        "gates": [
+          "G0",
+          "G5"
+        ],
+        "verificationRules": [
+          "VR-LEDGER",
+          "VR-PRESERVATION",
+          "VR-UI"
+        ],
+        "requiredEvidence": [
+          "acceptance ledger row with tests and evidence_paths at the verified SHA",
+          "praxis.requirements-preservation/1 evidence JSON with input SHA-256s",
+          "Percepta evidence JSON (schemaVersion 1.0.0) per screen contract",
+          "deployed-SHA screenshots at desktop, iPad portrait/landscape, mobile",
+          "accessibility report"
+        ],
+        "dependencies": {
+          "requirements": [],
+          "contracts": [
+            "CT-002",
+            "CT-010",
+            "CT-012"
+          ]
+        },
+        "freshness": "FP-DETERMINISTIC-INPUT-DIGEST"
+      },
+      "obligations": [
+        {
+          "id": "UI-031-O1",
+          "vpo": "VPO-5c147c83f19f2c8c",
+          "frozenVerification": "PASS",
+          "text": "Moving information out of investigation views MUST NOT delete operational observability or evidence provenance.",
+          "boundTests": [
+            "investigation work apart from Administration and Settings (UI-017, UI-018, UI-020, UI-021, UI-023, UI-029, UI-030, UI-031) > evidence views keep source attribution and the record's provenance after technical details moved out [VPO-5c147c83f19f2c8c] [VPO-5fe930a650a08b04] [VPO-c18f969a9c8b65bf] [VPO-7fff10ce82e7c162]",
+            "investigation work apart from Administration and Settings (UI-017, UI-018, UI-020, UI-021, UI-023, UI-029, UI-030, UI-031) > routine investigation views carry no implementation prose, codes or versions; Administration keeps them [VPO-7b0ba1d1f6f663a5] [VPO-78541ad7e7bfc045] [VPO-0b37bb6a955165e2] [VPO-18e6fc4dd0730354] [VPO-2ad36bd062191d2b] [VPO-026da8a495857549] [VPO-5c147c83f19f2c8c] [VPO-bff050b54a481780] [VPO-e1fb14be4ca10f5f]"
+          ]
+        },
+        {
+          "id": "UI-031-O2",
+          "vpo": "VPO-a4ab030e74ad080a",
+          "frozenVerification": "PASS",
+          "text": "Administration MUST retain provider/catalog identifiers, build and component versions, data validation, connection health, and diagnostic codes.",
+          "boundTests": [
+            "report, timeline and administration views (T22, T26, T29) > Administration groups facts by section and never presents an unverified item as passed [VPO-97a56b1abd22a396] [VPO-a74264901d267d03] [VPO-b27f3de8fd81d25c] [VPO-a4ab030e74ad080a]"
+          ]
+        },
+        {
+          "id": "UI-031-O3",
+          "vpo": "VPO-5fe930a650a08b04",
+          "frozenVerification": "PASS",
+          "text": "Investigation evidence views MUST retain meaningful source attribution and traceability.",
+          "boundTests": [
+            "detail inspector and relationships (UI-005, UI-033, UI-034, UI-038, UI-039) > the evidence inspector shows provenance, timestamps, cleaned original text, missing provenance labelled, links to its hypothesis, dependents and lineage [VPO-ff2e466b7aaa3e12] [VPO-34334672f9ff0014] [VPO-5fe930a650a08b04] [VPO-c18f969a9c8b65bf]",
+            "investigation work apart from Administration and Settings (UI-017, UI-018, UI-020, UI-021, UI-023, UI-029, UI-030, UI-031) > evidence views keep source attribution and the record's provenance after technical details moved out [VPO-5c147c83f19f2c8c] [VPO-5fe930a650a08b04] [VPO-c18f969a9c8b65bf] [VPO-7fff10ce82e7c162]"
+          ]
+        },
+        {
+          "id": "UI-031-O4",
+          "vpo": "VPO-7fe69b1e93fa0c7f",
+          "frozenVerification": "PASS",
+          "text": "Settings MUST contain only supported user-adjustable options; read-only technical facts belong in Administration.",
+          "boundTests": [
+            "investigation work apart from Administration and Settings (UI-017, UI-018, UI-020, UI-021, UI-023, UI-029, UI-030, UI-031) > workflow actions stay in the investigation, operational facts in Administration, preferences in Settings; two-level navigation [VPO-9eb8f87800355c73] [VPO-e5017d9f8ae702fb] [VPO-dba405d7ed58872b] [VPO-7fe69b1e93fa0c7f] [VPO-2ad36bd062191d2b] [VPO-fcf404b4a7afa635]"
+          ]
+        },
+        {
+          "id": "UI-031-O5",
+          "vpo": "VPO-06e616ae2378cfcd",
+          "frozenVerification": "NOT_RUN",
+          "primaryCause": 1,
+          "secondaryCauses": [
+            10
+          ],
+          "missingEvidence": "No role or access control exists for operational information. Administration is visible to anyone who opens the page; the credential part is met (the token never reaches page, URL or storage). Whether a single-user browser application needs roles is an owner decision.",
+          "text": "Apply role/access controls to sensitive operational information and never expose credentials.",
+          "boundTests": []
+        }
+      ],
+      "sourceRefs": [
+        {
+          "path": "src/app/Routes.fs",
+          "symbol": "administration route"
+        },
+        {
+          "path": "src/persistence/Sync.fs",
+          "symbol": "Credential held in memory only"
+        }
+      ],
+      "testRefs": [
+        {
+          "kind": "historical",
+          "path": "tests/Persistence.Tests/SyncAppTests.fs",
+          "name": "the token appears only in the Authorization header",
+          "result": "passed in run 40620099844"
+        }
+      ],
+      "evidenceRefs": [
+        {
+          "kind": "historical",
+          "path": "acceptance/reviews/R5-independent-review.md"
+        }
+      ],
+      "investigation": "Searched src/app for role, access-control and authorization concepts: there are none, and the only 'roles' are the S17 analysis panel's agent roles. Operational information in Administration is shown to every visitor of the page; credentials are never exposed.",
+      "remainingWork": {
+        "applicationCode": "medium",
+        "tests": "small",
+        "evidence": "small",
+        "planCorrections": "none",
+        "ownerDecisions": "small",
+        "independentReview": "none"
+      },
+      "existingEvidenceAtDeadline": "insufficient",
+      "review": {
+        "challenged": true,
+        "initialClassification": "PARTIALLY_IMPLEMENTED",
+        "initialProcessStatus": null,
+        "finalClassification": "PARTIALLY_IMPLEMENTED",
+        "note": "Upheld by the independent review."
+      }
+    },
+    {
+      "id": "UI-040",
+      "title": "End-to-end acceptance",
+      "scope": "application",
+      "classification": "PROCESS_EVIDENCE_MISSING",
+      "processStatus": "PERFORMED_EVIDENCE_INADEQUATE",
+      "implemented": "yes (O1 PASS)",
+      "verified": "application behaviour PASS",
+      "confidence": "medium",
+      "frozenStatus": "NOT_RUN",
+      "frozenPlan": {
+        "document": "docs/CAUSA-UI-EXPERIENCE-REQUIREMENTS.md",
+        "acceptanceCriteria": [
+          "UI-040-O1",
+          "UI-040-O2"
+        ],
+        "linkedSections": [
+          "CAUSA-UI-EXPERIENCE§required-evidence"
+        ],
+        "gates": [
+          "G0",
+          "G5",
+          "G9"
+        ],
+        "verificationRules": [
+          "VR-LEDGER",
+          "VR-PRESERVATION",
+          "VR-UI",
+          "VR-DEPLOYMENT"
+        ],
+        "requiredEvidence": [
+          "acceptance ledger row with tests and evidence_paths at the verified SHA",
+          "praxis.requirements-preservation/1 evidence JSON with input SHA-256s",
+          "Percepta evidence JSON (schemaVersion 1.0.0) per screen contract",
+          "deployed-SHA screenshots at desktop, iPad portrait/landscape, mobile",
+          "accessibility report",
+          "deployment record",
+          "acceptance job on the deployed SHA"
+        ],
+        "dependencies": {
+          "requirements": [],
+          "contracts": [
+            "CT-002",
+            "CT-010",
+            "CT-011",
+            "CT-012"
+          ]
+        },
+        "freshness": "FP-LIVE-PER-COMMIT"
+      },
+      "obligations": [
+        {
+          "id": "UI-040-O1",
+          "vpo": "VPO-8a5de7e5afae98cb",
+          "frozenVerification": "PASS",
+          "text": "Verify next-step authority, record navigation, responsive inspector accessibility, search/filter accuracy, completeness rules, deterministic offline demo, and source-grounded explanations with positive and negative fixture cases and exact deployed-SHA tests.",
+          "boundTests": [
+            "detail inspector and relationships (UI-005, UI-033, UI-034, UI-038, UI-039) > a cause's explanation lists its hypotheses, supporting and conflicting evidence, history and why it is not confirmed; nothing is concluded [VPO-f8666daf6fdf79d7] [VPO-ffda9fea0324a42e] [VPO-885e4767b84371de] [VPO-8a5de7e5afae98cb]",
+            "detail inspector and relationships (UI-005, UI-033, UI-034, UI-038, UI-039) > traversal follows recorded relationships with stable addresses and explicit absent links, and closing restores focus @responsive [VPO-5a85f3ea85db30b2] [VPO-63d89380e8017050] [VPO-f3ebcdbe15cdf92d] [VPO-8f8156f91b64963b] [VPO-ad49e5ff43f1ace6] [VPO-8a5de7e5afae98cb]",
+            "detail inspector and relationships (UI-005, UI-033, UI-034, UI-038, UI-039) > traversal follows recorded relationships with stable addresses and explicit absent links, and closing restores focus @responsive [VPO-5a85f3ea85db30b2] [VPO-63d89380e8017050] [VPO-f3ebcdbe15cdf92d] [VPO-8f8156f91b64963b] [VPO-ad49e5ff43f1ace6] [VPO-8a5de7e5afae98cb]",
+            "detail inspector and relationships (UI-005, UI-033, UI-034, UI-038, UI-039) > traversal follows recorded relationships with stable addresses and explicit absent links, and closing restores focus @responsive [VPO-5a85f3ea85db30b2] [VPO-63d89380e8017050] [VPO-f3ebcdbe15cdf92d] [VPO-8f8156f91b64963b] [VPO-ad49e5ff43f1ace6] [VPO-8a5de7e5afae98cb]",
+            "detail inspector and relationships (UI-005, UI-033, UI-034, UI-038, UI-039) > traversal follows recorded relationships with stable addresses and explicit absent links, and closing restores focus @responsive [VPO-5a85f3ea85db30b2] [VPO-63d89380e8017050] [VPO-f3ebcdbe15cdf92d] [VPO-8f8156f91b64963b] [VPO-ad49e5ff43f1ace6] [VPO-8a5de7e5afae98cb]",
+            "next steps (UI-032, UI-040) > next steps come from the domain, link to the record and carry the policy's verdict; none is invented [VPO-29cc81617de241fb] [VPO-141be05c7de03e17] [VPO-8a5de7e5afae98cb]"
+          ]
+        },
+        {
+          "id": "UI-040-O2",
+          "vpo": "VPO-45c306b736593248",
+          "frozenVerification": "NOT_RUN",
+          "primaryCause": 11,
+          "secondaryCauses": [
+            5
+          ],
+          "missingEvidence": "The R5 derived-requirements package is in .praxis/inbox/documents/2026-10-27-R5-REQ-001-derived-requirements-package.md and the preflight records 'approvedExclusions: none'. The plan has no way to bind either.",
+          "text": "Trace all requirements through the documented Praxis input process; record approved exclusions explicitly.",
+          "boundTests": []
+        }
+      ],
+      "sourceRefs": [],
+      "testRefs": [],
+      "evidenceRefs": [
+        {
+          "kind": "historical",
+          "path": ".praxis/inbox/documents/2026-10-27-R5-REQ-001-derived-requirements-package.md"
+        },
+        {
+          "kind": "historical",
+          "path": "indy-init:kickoff/rehearsal-005/preflight-record.json"
+        }
+      ],
+      "investigation": "The end-to-end behaviour is verified. The requirements went through the Praxis inbox, and 'no approved exclusions' is recorded in the frozen preflight; neither could bind.",
+      "remainingWork": {
+        "applicationCode": "none",
+        "tests": "none",
+        "evidence": "small",
+        "planCorrections": "small",
+        "ownerDecisions": "none",
+        "independentReview": "none"
+      },
+      "existingEvidenceAtDeadline": "insufficient",
+      "review": {
+        "challenged": true,
+        "initialClassification": "PROCESS_EVIDENCE_MISSING",
+        "initialProcessStatus": "PERFORMED_EVIDENCE_INADEQUATE",
+        "finalClassification": "PROCESS_EVIDENCE_MISSING",
+        "note": "Upheld; existing-evidence claim downgraded (accepted): repository documents, not live per-commit evidence."
+      }
+    },
+    {
+      "id": "VER-001",
+      "title": "Latest compatible verified release",
+      "scope": "process",
+      "classification": "PROCESS_EVIDENCE_MISSING",
+      "processStatus": "UNKNOWN",
+      "implemented": "n/a (process)",
+      "verified": "no",
+      "confidence": "medium",
+      "frozenStatus": "NOT_RUN",
+      "frozenPlan": {
+        "document": "docs/SYSTEM-VERSION-AND-COMPATIBILITY-REQUIREMENTS.md",
+        "acceptanceCriteria": [],
+        "linkedSections": [
+          "SYSTEM-VERSION-AND-COMPATIBILITY§acceptance"
+        ],
+        "gates": [
+          "G0",
+          "G1"
+        ],
+        "verificationRules": [
+          "VR-LEDGER",
+          "VR-PRESERVATION",
+          "VR-DEPENDENCIES"
+        ],
+        "requiredEvidence": [
+          "acceptance ledger row with tests and evidence_paths at the verified SHA",
+          "praxis.requirements-preservation/1 evidence JSON with input SHA-256s",
+          "release set file and approval",
+          "Conditor qualification run",
+          "CI version-gate result"
+        ],
+        "dependencies": {
+          "requirements": [],
+          "contracts": [
+            "CT-016"
+          ]
+        },
+        "freshness": "FP-DETERMINISTIC-INPUT-DIGEST"
+      },
+      "obligations": [
+        {
+          "id": "VER-001-O1",
+          "vpo": "VPO-f8c818739fb10bb9",
+          "frozenVerification": "NOT_RUN",
+          "primaryCause": 11,
+          "secondaryCauses": [
+            5
+          ],
+          "missingEvidence": "PRE-DEP-01 PASS (echelon-current 1.29.0 approved) and the lock gate (PASS 55) exist. The 'newest at lock time' claim rests on the registry approval, not on a bound selection record.",
+          "text": "Each build MUST use the newest available stable, published, compatible release of every applicable Echelon system at the time the build baseline is locked.",
+          "boundTests": []
+        },
+        {
+          "id": "VER-001-O2",
+          "vpo": "VPO-6ae60e9f7196e16c",
+          "frozenVerification": "NOT_RUN",
+          "primaryCause": 11,
+          "secondaryCauses": [
+            5
+          ],
+          "missingEvidence": "The applicable-system list is in acceptance/stack/pin.json and the preflight record. There is no binding path.",
+          "text": "Applicable systems include Praxis, Ordo, Dokimos, Percepta, Forma, Forma Studio/workflow layout, Limen, Folio, and any actually integrated Echelon dependencies.",
+          "boundTests": []
+        },
+        {
+          "id": "VER-001-O3",
+          "vpo": "VPO-e6647e8155448d52",
+          "frozenVerification": "NOT_RUN",
+          "primaryCause": 11,
+          "secondaryCauses": [
+            9
+          ],
+          "missingEvidence": "No per-system owner and release-channel discovery record, apart from forma-workflow (WDL-001).",
+          "text": "Discover the real owner and release channel for each; do not invent a release or assume every system is a runtime dependency.",
+          "boundTests": []
+        }
+      ],
+      "sourceRefs": [],
+      "testRefs": [],
+      "evidenceRefs": [
+        {
+          "kind": "historical",
+          "path": "acceptance/stack/pin.json"
+        },
+        {
+          "kind": "historical",
+          "path": "indy-init:requirements-compiled/v1/readiness/evidence/preflight-run-r5-local.json"
+        }
+      ],
+      "investigation": "The newest approved compatible set (echelon-current 1.29.0) was selected and pinned. There is no per-system owner and channel discovery record (O3) except for forma-workflow.",
+      "remainingWork": {
+        "applicationCode": "none",
+        "tests": "none",
+        "evidence": "small",
+        "planCorrections": "small",
+        "ownerDecisions": "none",
+        "independentReview": "none"
+      },
+      "existingEvidenceAtDeadline": "insufficient",
+      "review": {
+        "challenged": true,
+        "initialClassification": "PROCESS_EVIDENCE_MISSING",
+        "initialProcessStatus": "PERFORMED_EVIDENCE_INADEQUATE",
+        "finalClassification": "PROCESS_EVIDENCE_MISSING",
+        "note": "Sub-status changed to UNKNOWN (accepted): discovery record only for forma-workflow, same evidence as AR-005."
+      }
+    },
+    {
+      "id": "VER-002",
+      "title": "Verify release freshness",
+      "scope": "process",
+      "classification": "PROCESS_EVIDENCE_MISSING",
+      "processStatus": "PERFORMED_EVIDENCE_INADEQUATE",
+      "implemented": "n/a (process)",
+      "verified": "no",
+      "confidence": "medium",
+      "frozenStatus": "NOT_RUN",
+      "frozenPlan": {
+        "document": "docs/SYSTEM-VERSION-AND-COMPATIBILITY-REQUIREMENTS.md",
+        "acceptanceCriteria": [],
+        "linkedSections": [
+          "SYSTEM-VERSION-AND-COMPATIBILITY§acceptance"
+        ],
+        "gates": [
+          "G0",
+          "G1"
+        ],
+        "verificationRules": [
+          "VR-LEDGER",
+          "VR-PRESERVATION",
+          "VR-DEPENDENCIES"
+        ],
+        "requiredEvidence": [
+          "acceptance ledger row with tests and evidence_paths at the verified SHA",
+          "praxis.requirements-preservation/1 evidence JSON with input SHA-256s",
+          "release set file and approval",
+          "Conditor qualification run",
+          "CI version-gate result"
+        ],
+        "dependencies": {
+          "requirements": [],
+          "contracts": [
+            "CT-012",
+            "CT-016"
+          ]
+        },
+        "freshness": "FP-DETERMINISTIC-INPUT-DIGEST"
+      },
+      "obligations": [
+        {
+          "id": "VER-002-O1",
+          "vpo": "VPO-5281c2e8b5927722",
+          "frozenVerification": "NOT_RUN",
+          "primaryCause": 5,
+          "secondaryCauses": [
+            11
+          ],
+          "missingEvidence": "The preflight ran at 2026-10-27T19:51:18Z against registry commit 402bec21, before the freeze at 19:51:59Z. It was not collected as VER-002 evidence.",
+          "text": "Query authoritative package registries, GitHub releases/tags, or the owning repository's documented release source immediately before baseline lock.",
+          "boundTests": []
+        },
+        {
+          "id": "VER-002-O2",
+          "vpo": "VPO-924f0b36b70bfd0e",
+          "frozenVerification": "NOT_RUN",
+          "primaryCause": 9,
+          "secondaryCauses": [
+            5
+          ],
+          "missingEvidence": "The checked timestamp and source exist (preflight). No candidate list and no 'why selected' rationale were recorded; the 1.28.0 to 1.29.0 move rests on the owner's chat instruction 'go ahead and update it'.",
+          "text": "Record checked timestamp, candidate release, source reference, and why it was selected.",
+          "boundTests": []
+        },
+        {
+          "id": "VER-002-O3",
+          "vpo": "VPO-d4566deb24f7e80b",
+          "frozenVerification": "NOT_RUN",
+          "primaryCause": 11,
+          "secondaryCauses": [
+            5
+          ],
+          "missingEvidence": "Releases are pinned by registry digest, not by main commits. That is observable, but there is no binding path.",
+          "text": "Do not equate latest main commit with latest released artifact.",
+          "boundTests": []
+        }
+      ],
+      "sourceRefs": [],
+      "testRefs": [],
+      "evidenceRefs": [
+        {
+          "kind": "historical",
+          "path": "indy-init:requirements-compiled/v1/readiness/evidence/preflight-run-r5-local.json"
+        }
+      ],
+      "investigation": "The registry was queried before the freeze (executedAt 19:51:18Z). The candidate list and selection rationale (O2) were not recorded.",
+      "remainingWork": {
+        "applicationCode": "none",
+        "tests": "none",
+        "evidence": "small",
+        "planCorrections": "small",
+        "ownerDecisions": "none",
+        "independentReview": "none"
+      },
+      "existingEvidenceAtDeadline": "insufficient",
+      "review": {
+        "challenged": true,
+        "initialClassification": "PROCESS_EVIDENCE_MISSING",
+        "initialProcessStatus": "PERFORMED_EVIDENCE_INADEQUATE",
+        "finalClassification": "PROCESS_EVIDENCE_MISSING",
+        "note": "Upheld by the independent review."
+      }
+    },
+    {
+      "id": "VER-003",
+      "title": "Compatibility over blind upgrades",
+      "scope": "process",
+      "classification": "PROCESS_EVIDENCE_MISSING",
+      "processStatus": "UNKNOWN",
+      "implemented": "n/a (process)",
+      "verified": "partial (O3 PASS)",
+      "confidence": "medium",
+      "frozenStatus": "NOT_RUN",
+      "frozenPlan": {
+        "document": "docs/SYSTEM-VERSION-AND-COMPATIBILITY-REQUIREMENTS.md",
+        "acceptanceCriteria": [
+          "VER-003-O1",
+          "VER-003-O2",
+          "VER-003-O3"
+        ],
+        "linkedSections": [
+          "SYSTEM-VERSION-AND-COMPATIBILITY§acceptance"
+        ],
+        "gates": [
+          "G0",
+          "G1"
+        ],
+        "verificationRules": [
+          "VR-LEDGER",
+          "VR-PRESERVATION",
+          "VR-DEPENDENCIES"
+        ],
+        "requiredEvidence": [
+          "acceptance ledger row with tests and evidence_paths at the verified SHA",
+          "praxis.requirements-preservation/1 evidence JSON with input SHA-256s",
+          "release set file and approval",
+          "Conditor qualification run",
+          "CI version-gate result"
+        ],
+        "dependencies": {
+          "requirements": [],
+          "contracts": [
+            "CT-016"
+          ]
+        },
+        "freshness": "FP-DETERMINISTIC-INPUT-DIGEST"
+      },
+      "obligations": [
+        {
+          "id": "VER-003-O1",
+          "vpo": "VPO-d7cf349736bfc48f",
+          "frozenVerification": "NOT_RUN",
+          "primaryCause": 11,
+          "secondaryCauses": [
+            5
+          ],
+          "missingEvidence": "The lock gate and integration tests passed on the selected set. There is no binding path.",
+          "text": "Prefer latest stable only when integration contracts and acceptance tests pass.",
+          "boundTests": []
+        },
+        {
+          "id": "VER-003-O2",
+          "vpo": "VPO-b06105a4b3121295",
+          "frozenVerification": "NOT_RUN",
+          "primaryCause": 11,
+          "secondaryCauses": [
+            10
+          ],
+          "missingEvidence": "DF-CAUSA-2026-0001 records the forma-workflow 1.1.0 exception, owner-approved in chat (agent-transcribed).",
+          "text": "If the newest release is incompatible, fail the upgrade gate or obtain a documented, authorized exception for the newest known compatible release.",
+          "boundTests": []
+        },
+        {
+          "id": "VER-003-O3",
+          "vpo": "VPO-882ef92ed9177a58",
+          "frozenVerification": "PASS",
+          "text": "Never silently fall back to an old version.",
+          "boundTests": [
+            "Causa.Acceptance.RunTests.EvidenceTests.VER-005 VER-003 AR-023 the installed stack is the published release set, with no prerelease and no fallback"
+          ]
+        }
+      ],
+      "sourceRefs": [],
+      "testRefs": [],
+      "evidenceRefs": [
+        {
+          "kind": "historical",
+          "path": "evidence/acceptance/run-40620099844-1b9fb56/lock-gate.json"
+        },
+        {
+          "kind": "historical",
+          "path": "research/decisions/DF-CAUSA-2026-0001--r5-dec-001-forma-workflow-1-1-0.md"
+        }
+      ],
+      "investigation": "The lock gate and integration tests passed on the selected set, and the one exception (forma-workflow 1.1.0) has a decision record. The record was transcribed by the agent from chat.",
+      "remainingWork": {
+        "applicationCode": "none",
+        "tests": "none",
+        "evidence": "small",
+        "planCorrections": "small",
+        "ownerDecisions": "small",
+        "independentReview": "none"
+      },
+      "existingEvidenceAtDeadline": "insufficient",
+      "review": {
+        "challenged": true,
+        "initialClassification": "PROCESS_EVIDENCE_MISSING",
+        "initialProcessStatus": "PERFORMED_EVIDENCE_INADEQUATE",
+        "finalClassification": "PROCESS_EVIDENCE_MISSING",
+        "note": "Sub-status changed to UNKNOWN (accepted): exception authorization attested only by agent transcription."
+      }
+    },
+    {
+      "id": "VER-004",
+      "title": "Reproducible lock",
+      "scope": "process",
+      "classification": "PROCESS_EVIDENCE_MISSING",
+      "processStatus": "PERFORMED_EVIDENCE_INADEQUATE",
+      "implemented": "n/a (process)",
+      "verified": "partial (O1, O2 PASS)",
+      "confidence": "high",
+      "frozenStatus": "NOT_RUN",
+      "frozenPlan": {
+        "document": "docs/SYSTEM-VERSION-AND-COMPATIBILITY-REQUIREMENTS.md",
+        "acceptanceCriteria": [],
+        "linkedSections": [
+          "SYSTEM-VERSION-AND-COMPATIBILITY§acceptance"
+        ],
+        "gates": [
+          "G0",
+          "G1"
+        ],
+        "verificationRules": [
+          "VR-LEDGER",
+          "VR-PRESERVATION",
+          "VR-DEPENDENCIES"
+        ],
+        "requiredEvidence": [
+          "acceptance ledger row with tests and evidence_paths at the verified SHA",
+          "praxis.requirements-preservation/1 evidence JSON with input SHA-256s",
+          "release set file and approval",
+          "Conditor qualification run",
+          "CI version-gate result"
+        ],
+        "dependencies": {
+          "requirements": [],
+          "contracts": [
+            "CT-009",
+            "CT-010",
+            "CT-011",
+            "CT-014",
+            "CT-016"
+          ]
+        },
+        "freshness": "FP-DETERMINISTIC-INPUT-DIGEST"
+      },
+      "obligations": [
+        {
+          "id": "VER-004-O1",
+          "vpo": "VPO-0fcb67bd52732582",
+          "frozenVerification": "PASS",
+          "text": "Pin exact package versions and immutable artifact digests/commit SHAs in a machine-readable dependency manifest.",
+          "boundTests": [
+            "Causa.Acceptance.RunTests.EvidenceTests.VER-004 AR-023 the exact release set is pinned by digest and the run used exactly that pin"
+          ]
+        },
+        {
+          "id": "VER-004-O2",
+          "vpo": "VPO-90a9a6272db10df8",
+          "frozenVerification": "PASS",
+          "text": "The lock is fixed for a given rehearsal/run and must not drift mid-run.",
+          "boundTests": [
+            "Causa.Acceptance.RunTests.EvidenceTests.VER-004 AR-023 the exact release set is pinned by digest and the run used exactly that pin"
+          ]
+        },
+        {
+          "id": "VER-004-O3",
+          "vpo": "VPO-e362dff6239f51ed",
+          "frozenVerification": "NOT_RUN",
+          "primaryCause": 5,
+          "secondaryCauses": [
+            11
+          ],
+          "missingEvidence": "R5 re-resolved to echelon-current 1.29.0 (preflight-record.json and the registry approval). It was not collected into the bundle.",
+          "text": "Re-resolve latest versions for each new rehearsal or explicitly authorized refresh.",
+          "boundTests": []
+        }
+      ],
+      "sourceRefs": [],
+      "testRefs": [],
+      "evidenceRefs": [
+        {
+          "kind": "historical",
+          "path": "indy-init:kickoff/rehearsal-005/preflight-record.json"
+        }
+      ],
+      "investigation": "R5 re-resolved the release set (1.28.0 to 1.29.0) before the run; the preflight record holds the evidence.",
+      "remainingWork": {
+        "applicationCode": "none",
+        "tests": "none",
+        "evidence": "small",
+        "planCorrections": "small",
+        "ownerDecisions": "none",
+        "independentReview": "none"
+      },
+      "existingEvidenceAtDeadline": "insufficient",
+      "review": {
+        "challenged": true,
+        "initialClassification": "PROCESS_EVIDENCE_MISSING",
+        "initialProcessStatus": "PERFORMED_EVIDENCE_INADEQUATE",
+        "finalClassification": "PROCESS_EVIDENCE_MISSING",
+        "note": "Upheld; existing-evidence claim downgraded (accepted): rests on the pre-run, agent-local preflight record."
+      }
+    },
+    {
+      "id": "VER-010",
+      "title": "Requirements traceability",
+      "scope": "process",
+      "classification": "PROCESS_EVIDENCE_MISSING",
+      "processStatus": "UNKNOWN",
+      "implemented": "n/a (process)",
+      "verified": "no",
+      "confidence": "medium",
+      "frozenStatus": "NOT_RUN",
+      "frozenPlan": {
+        "document": "docs/SYSTEM-VERSION-AND-COMPATIBILITY-REQUIREMENTS.md",
+        "acceptanceCriteria": [
+          "VER-010-O1"
+        ],
+        "linkedSections": [
+          "SYSTEM-VERSION-AND-COMPATIBILITY§acceptance"
+        ],
+        "gates": [
+          "G0",
+          "G1"
+        ],
+        "verificationRules": [
+          "VR-LEDGER",
+          "VR-PRESERVATION",
+          "VR-DEPENDENCIES"
+        ],
+        "requiredEvidence": [
+          "acceptance ledger row with tests and evidence_paths at the verified SHA",
+          "praxis.requirements-preservation/1 evidence JSON with input SHA-256s",
+          "release set file and approval",
+          "Conditor qualification run",
+          "CI version-gate result"
+        ],
+        "dependencies": {
+          "requirements": [
+            "VER-001",
+            "VER-002",
+            "VER-003",
+            "VER-004",
+            "VER-005",
+            "VER-006",
+            "VER-007",
+            "VER-008",
+            "VER-009"
+          ],
+          "contracts": [
+            "CT-013"
+          ]
+        },
+        "freshness": "FP-DETERMINISTIC-INPUT-DIGEST"
+      },
+      "obligations": [
+        {
+          "id": "VER-010-O1",
+          "vpo": "VPO-6f0348e05133ebd2",
+          "frozenVerification": "NOT_RUN",
+          "primaryCause": 11,
+          "secondaryCauses": [
+            5
+          ],
+          "missingEvidence": "VER-005..VER-009 PASS and VER-001..VER-004 are classified here. There is no reconciliation record that binds them.",
+          "text": "Every future rehearsal must reconcile VER-001..VER-010 with implementation and tests or an explicitly approved exclusion.",
+          "boundTests": []
+        },
+        {
+          "id": "VER-010-O2",
+          "vpo": "VPO-1d26080e6f69aad4",
+          "frozenVerification": "NOT_RUN",
+          "primaryCause": 9,
+          "secondaryCauses": [
+            11
+          ],
+          "missingEvidence": "No record that work items were routed through each owning repository's Praxis input path during the run.",
+          "text": "Work items must go through each owning repository's documented Praxis input path, not GitHub Issues.",
+          "boundTests": []
+        }
+      ],
+      "sourceRefs": [],
+      "testRefs": [],
+      "evidenceRefs": [
+        {
+          "kind": "historical",
+          "path": "evidence/acceptance/run-40620099844-1b9fb56/bundle/ledger.json"
+        }
+      ],
+      "investigation": "VER-005..VER-009 PASS and VER-001..VER-004 have evidence outside the bundle. No reconciliation record and no record of Praxis-path routing during the run exist.",
+      "remainingWork": {
+        "applicationCode": "none",
+        "tests": "none",
+        "evidence": "small",
+        "planCorrections": "small",
+        "ownerDecisions": "none",
+        "independentReview": "none"
+      },
+      "existingEvidenceAtDeadline": "insufficient",
+      "review": {
+        "challenged": true,
+        "initialClassification": "PROCESS_EVIDENCE_MISSING",
+        "initialProcessStatus": "PERFORMED_EVIDENCE_INADEQUATE",
+        "finalClassification": "PROCESS_EVIDENCE_MISSING",
+        "note": "Sub-status changed to UNKNOWN (accepted): no reconciliation or routing record."
+      }
+    },
+    {
+      "id": "WDL-014",
+      "title": "Integration gate",
+      "scope": "application",
+      "classification": "INDETERMINATE",
+      "processStatus": null,
+      "implemented": "yes at the local candidate build; deployed exact-SHA run missing",
+      "verified": "local only; deployed post-rehearsal at b972cb4",
+      "confidence": "medium",
+      "frozenStatus": "NOT_RUN",
+      "frozenPlan": {
+        "document": "docs/WORKFLOW-DIAGRAM-INTEGRATION-REQUIREMENTS.md",
+        "acceptanceCriteria": [
+          "WDL-014-O1"
+        ],
+        "linkedSections": [
+          "WORKFLOW-DIAGRAM-INTEGRATION§acceptance-scenarios"
+        ],
+        "gates": [
+          "G0",
+          "G5"
+        ],
+        "verificationRules": [
+          "VR-LEDGER",
+          "VR-PRESERVATION",
+          "VR-UI"
+        ],
+        "requiredEvidence": [
+          "acceptance ledger row with tests and evidence_paths at the verified SHA",
+          "praxis.requirements-preservation/1 evidence JSON with input SHA-256s",
+          "Percepta evidence JSON (schemaVersion 1.0.0) per screen contract",
+          "deployed-SHA screenshots at desktop, iPad portrait/landscape, mobile",
+          "accessibility report"
+        ],
+        "dependencies": {
+          "requirements": [],
+          "contracts": [
+            "CT-002"
+          ]
+        },
+        "freshness": "FP-DETERMINISTIC-INPUT-DIGEST"
+      },
+      "obligations": [
+        {
+          "id": "WDL-014-O1",
+          "vpo": "VPO-4c6f9ea0dcc0bd29",
+          "frozenVerification": "NOT_RUN",
+          "primaryCause": 3,
+          "secondaryCauses": [
+            12,
+            6
+          ],
+          "missingEvidence": "Invocation of the real forma-workflow frame, the pinned version check (graph-layout.spec.js, which ran but is unbound) and the accessibility specs ran against the local site only. The final review removed the partial tag (f412598). No graph spec ran against the deployed site. Secondary (12): CAUSA_BASE_URL deployed mode is blocked by the mocked-spec network guard.",
+          "text": "Before claiming completion, prove the application actually invokes the identified workflow layout capability, records the pinned dependency version/SHA, and passes fixture, accessibility, and deployed-browser tests.",
+          "boundTests": []
+        },
+        {
+          "id": "WDL-014-O2",
+          "vpo": "VPO-adec3c95bc6ac2c4",
+          "frozenVerification": "PASS",
+          "text": "A visually similar hand-coded diagram is not equivalent.",
+          "boundTests": [
+            "causal graph with the Forma workflow engine (T23) > the causal analysis renders in the real forma-workflow frame, a selection shows its record, and the text list carries the same structure [VPO-684e6c5f94988bd9] [VPO-db2d02dab493e914] [VPO-b36c63fba6f83d4c] [VPO-05441c1c18ce3dc1] [VPO-0e6a69f7673cace8] [VPO-adec3c95bc6ac2c4] [VPO-3eba4ae44451132f]"
+          ]
+        }
+      ],
+      "sourceRefs": [
+        {
+          "path": "src/app/Graph.fs",
+          "symbol": "forma-workflow frame projection"
+        },
+        {
+          "path": "package.json",
+          "symbol": "@echelon-foundry/forma-workflow 1.1.0"
+        }
+      ],
+      "testRefs": [
+        {
+          "kind": "historical",
+          "path": "tests/browser/shell.spec.js",
+          "name": "the causal analysis renders in the real forma-workflow frame",
+          "result": "passed in run 40620099844 (local)"
+        },
+        {
+          "kind": "historical",
+          "path": "tests/browser/graph-layout.spec.js",
+          "name": "the recorded engine is the installed one",
+          "result": "passed in run 40620099844 (unbound)"
+        },
+        {
+          "kind": "post-rehearsal",
+          "path": "indy-init:docs/rehearsal-005-implementation-audit/post-rehearsal-evidence/browser-deployed-suite.txt",
+          "name": "graph specs against the deployed site",
+          "result": "see file"
+        }
+      ],
+      "evidenceRefs": [],
+      "investigation": "The app invokes the real forma-workflow frame (shell.spec.js:258, historical and post-rehearsal local runs at 1b9fb56), the pinned version is checked (graph-layout.spec.js), and accessibility specs pass. The obligation also requires deployed-browser tests. The only deployed run is post-rehearsal, against b972cb4 through a localhost forwarder; its graph-layout specs load the vendored frame directly, and the app-invocation spec uses the local test build. The deployed part cannot now be run at the exact SHA, so the requirement cannot be established.",
+      "remainingWork": {
+        "applicationCode": "none",
+        "tests": "small",
+        "evidence": "small",
+        "planCorrections": "none",
+        "ownerDecisions": "none",
+        "independentReview": "none"
+      },
+      "existingEvidenceAtDeadline": "insufficient",
+      "review": {
+        "challenged": true,
+        "initialClassification": "IMPLEMENTED_VERIFICATION_MISSING",
+        "initialProcessStatus": null,
+        "finalClassification": "INDETERMINATE",
+        "note": "Changed A->D (auditor, from the reviewer's caveat): the deployed post-rehearsal run is b972cb4 and its graph-layout specs load the vendored frame directly; the app-invocation spec ran only on the local build, so the deployed clause is not established."
+      }
+    }
+  ]
+}

@@ -1,0 +1,155 @@
+{
+  "schema": "indy-init.r5-implementation-audit-summary/1",
+  "note": "Audit classification, not an official acceptance result. The Rehearsal 5 verdict is unchanged.",
+  "frozen": {
+    "verdict": "INCOMPLETE",
+    "outcome": "NOT ACCEPTED",
+    "accepted": false,
+    "p0": {
+      "total": 108,
+      "pass": 77,
+      "notRun": 31,
+      "fail": 0
+    },
+    "obligations": {
+      "total": 326,
+      "pass": 277,
+      "notRun": 49,
+      "fail": 0
+    },
+    "gates": {
+      "pass": 8,
+      "notRun": 2
+    },
+    "sha256": {
+      "evidence/acceptance/run-40620099844-1b9fb56/bundle/traceability.json": "bff1e56ffbd49dc0f72f2eaf6e6a2f5cb92cb725b0d37fa7fd78b3cae981f09a",
+      "evidence/acceptance/run-40620099844-1b9fb56/verdict.json": "c93928f0e3e65cdd167f481684e494fc8830e9ef2a30f53a1999485ca3a5a170",
+      "evidence/rehearsal/final.json": "84dce386bd22b901ba6faa6b9c59cb4b26adc4b541a24a910cd391aa669f1928"
+    }
+  },
+  "classification": {
+    "VERIFIED_DURING_REHEARSAL": 77,
+    "IMPLEMENTED_VERIFICATION_MISSING": 3,
+    "PARTIALLY_IMPLEMENTED": 7,
+    "NOT_IMPLEMENTED": 0,
+    "INDETERMINATE": 3,
+    "PROCESS_EVIDENCE_MISSING": 18,
+    "TOTAL": 108
+  },
+  "processStatus": {
+    "PERFORMED_EVIDENCE_INADEQUATE": 6,
+    "NOT_PERFORMED": 2,
+    "UNKNOWN": 10
+  },
+  "applicationOnly": {
+    "scopeRule": "UI-*, PF-*, EXT-DATA-*, WDL-* requirements except PF-019 (its open obligation is an agent-workflow obligation)",
+    "total": 75,
+    "verifiedDuringRehearsal": 61,
+    "IMPLEMENTED_VERIFICATION_MISSING": 3,
+    "PARTIALLY_IMPLEMENTED": 5,
+    "NOT_IMPLEMENTED": 0,
+    "INDETERMINATE": 3,
+    "PROCESS_EVIDENCE_MISSING": 3
+  },
+  "metrics": {
+    "implementationCoverage": {
+      "value": 74.1,
+      "unit": "percent",
+      "definition": "(verified during rehearsal + implemented, verification missing) / 108; audit classification, not acceptance"
+    },
+    "applicationImplementationCoverage": {
+      "value": 85.3,
+      "unit": "percent",
+      "definition": "same, application-only (75)"
+    },
+    "applicationBehaviourCoverage": {
+      "value": 89.3,
+      "unit": "percent",
+      "definition": "application-only, additionally counting UI-021, UI-030 and UI-040, whose application obligations all passed and whose only open obligation is process evidence"
+    },
+    "verificationGap": {
+      "requirements": 3,
+      "ids": [
+        "EXT-DATA-006",
+        "PF-005",
+        "PF-009"
+      ],
+      "definition": "implemented requirements without adequate acceptance evidence"
+    },
+    "functionalGap": {
+      "requirements": 7,
+      "ids": [
+        "AR-011",
+        "AR-019",
+        "EXT-DATA-005",
+        "PF-015",
+        "UI-011",
+        "UI-016",
+        "UI-031"
+      ],
+      "codeUnconditional": [
+        "UI-011",
+        "AR-011",
+        "AR-019"
+      ],
+      "codeConditionalOnOwnerDecision": [
+        "EXT-DATA-005",
+        "PF-015",
+        "UI-016",
+        "UI-031"
+      ],
+      "definition": "requirements with a specified behaviour missing; codeUnconditional need code whatever the owner decides (AR-011, AR-019 are acceptance tooling, not application), the rest need code only if the owner keeps the clause as written"
+    },
+    "evidenceGap": {
+      "requirements": 24,
+      "definition": "requirements whose remaining work is testing, binding, deployed execution or process evidence only (A + D + E)"
+    },
+    "unknownGap": {
+      "requirements": 3,
+      "ids": [
+        "PF-014",
+        "UI-015",
+        "WDL-014"
+      ],
+      "processStatusUnknown": 10,
+      "definition": "implementation status cannot be established; processStatusUnknown counts process requirements whose performance cannot be established"
+    },
+    "passableWithEvidenceAtDeadline": {
+      "requirements": 1,
+      "ids": [
+        "EXT-DATA-006"
+      ],
+      "definition": "every open obligation had admissible evidence (run 40620099844, at 1b9fb56) that only lacked a binding"
+    }
+  },
+  "missingObligationsByPrimaryCause": {
+    "1": 5,
+    "2": 2,
+    "3": 3,
+    "4": 1,
+    "5": 3,
+    "6": 1,
+    "9": 11,
+    "10": 3,
+    "11": 19,
+    "12": 1
+  },
+  "missingObligationsByBottleneck": {
+    "development": 5,
+    "testing": 6,
+    "evidenceCollectionAndBinding": 4,
+    "processAndGovernance": 14,
+    "verificationPlanDefects": 19,
+    "other": 1
+  },
+  "independentReview": {
+    "performed": true,
+    "reviewer": "independent review agent (no implementation or classification role)",
+    "file": "independent-review.md",
+    "classificationChanges": 3,
+    "processStatusChanges": 7,
+    "existingEvidenceClaimsWithdrawn": 5,
+    "causeCodeCorrections": 7,
+    "rejectedProposals": 1
+  }
+}
