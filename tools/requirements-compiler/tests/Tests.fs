@@ -244,8 +244,10 @@ let private planTests (source: string) : string list =
         let one = withSpec i "testBindings" (JArr [ binding "AR-001-O1" [ t "core: AR-001 pins the baseline" "deterministic" ] ])
         let p1 = VerificationPlan.build one
         let liveOne = VerificationPlan.build (withSpec i "testBindings" (JArr [ binding "AR-001-O1" [ t "live: AR-001" "live" ] ]))
-        [ if scopeInt "missingTestObligations" plan <> scopeInt "obligations" plan || scopeInt "boundObligations" plan <> 0L then yield "missing tests: unbound plan must report every obligation missing"
-          if arr "requirements" plan |> List.exists (fun e -> tiStatus e <> "missing") then yield "missing tests: a requirement without bindings is not 'missing'"
+        // Built from the same inputs with no bindings, so the check holds whether or not the committed curation binds tests.
+        let unbound = VerificationPlan.build (withSpec i "testBindings" (JArr []))
+        [ if scopeInt "missingTestObligations" unbound <> scopeInt "obligations" unbound || scopeInt "boundObligations" unbound <> 0L then yield "missing tests: unbound plan must report every obligation missing"
+          if arr "requirements" unbound |> List.exists (fun e -> tiStatus e <> "missing") then yield "missing tests: a requirement without bindings is not 'missing'"
           if tiStatus (obligation "AR-001-O1" (entryOf "AR-001" p1)) <> "bound" then yield "missing tests: bound obligation not 'bound'"
           if tiStatus (obligation "AR-001-O2" (entryOf "AR-001" p1)) <> "missing" then yield "missing tests: sibling obligation not 'missing'"
           if tiStatus (entryOf "AR-001" p1) <> "partial" then yield "missing tests: partly bound requirement not 'partial'"
