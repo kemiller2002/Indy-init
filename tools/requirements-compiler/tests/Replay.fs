@@ -85,7 +85,7 @@ let private planAssessment (o: Options) (dir: string) =
     let baselineBytes = File.ReadAllBytes(Path.Combine(o.Source, "requirements", "causa-requirements-baseline.json"))
     let manifest = File.ReadAllBytes(Path.Combine(dir, "evidence-manifest.json"))
     PlanVerification.assess
-        { Plan = parseFile (Path.Combine(o.Source, "requirements-compiled", "v1", "verification-plan.json"))
+        { Plan = parseFile (Path.Combine(o.Source, "requirements-compiled", "v2", "verification-plan.json"))
           Baseline = parseBytes baselineBytes
           BaselineSha256 = sha baselineBytes
           Ledger = parseFile (Path.Combine(dir, "ledger.json"))
@@ -106,19 +106,28 @@ let private cases (ledgerFails: string list) (ledgerNotRun: string list) : Case 
     let hasIntegrity (needle: string) (a: Json) =
         if strs "integrityProblems" a |> List.exists (fun p -> p.Contains(needle, StringComparison.Ordinal)) then []
         else [ sprintf "expected an integrity problem containing '%s'" needle ]
+    let hasCode (code: string) (subject: string) (a: Json) =
+        if arr "diagnostics" a |> List.exists (fun d -> str "code" d = code && str "subject" d = subject) then []
+        else [ sprintf "expected diagnostic %s for %s" code subject ]
+    let noneVerified (a: Json) =
+        let verified = arr "requirements" a |> List.collect (arr "obligations") |> List.filter (fun o -> strOpt "verificationStatus" o = Some "verified")
+        if verified.IsEmpty then [] else [ sprintf "%d obligations verified without bound tests" verified.Length ]
 
     [ { Name = "r4-as-published"
         Mutation = "none: the evidence the R4 release-candidate job published for ab08b76"
         Mutate = ignore
         ExpectPython = "FAILED"
-        ExpectPlan = "FAILED"
+        // The R4 ledger names tests for every row, and the plan binds none: each claim is an incorrect test mapping.
+        ExpectPlan = "INVALID"
         Check =
           fun a ->
               [ for rid in ledgerFails do
                     if statusOf rid a <> "FAIL" then yield sprintf "failed obligation did not stay failed: %s is %s" rid (statusOf rid a)
                 for rid in ledgerNotRun do
                     if statusOf rid a <> "NOT_RUN" then yield sprintf "missing evidence did not stay missing: %s is %s" rid (statusOf rid a)
-                if statusOf "EXT-DATA-002" a <> "UNBOUND" then yield "EXT-DATA-002 must be UNBOUND: evidence passes but the plan has no test identity"
+                if statusOf "EXT-DATA-002" a <> "INVALID" then yield "EXT-DATA-002 must be INVALID: its PASS cites tests the plan does not bind to its obligations"
+                yield! hasCode "TEST-MAPPING" "EXT-DATA-002" a
+                yield! noneVerified a
                 if not (strs "integrityProblems" a).IsEmpty then yield sprintf "unexpected integrity problems %A" (strs "integrityProblems" a) ] }
       { Name = "evidence-digest-mutated"
         Mutation = "one byte appended to requirements/EXT-DATA-002.json; the manifest keeps the published digest"
@@ -136,7 +145,7 @@ let private cases (ledgerFails: string list) (ledgerNotRun: string list) : Case 
                   |> setIn "scope_changes" (JArr [ JObj [ "requirement_id", JStr "PF-005"; "action", JStr "exclude"; "approval_id", JStr "APR-INVENTED" ] ]))
         ExpectPython = "INVALID"
         ExpectPlan = "INVALID"
-        Check = fun a -> hasIntegrity "unauthorized exclusion of PF-005" a @ (if statusOf "PF-005" a = "INVALID" then [] else [ "PF-005 must be INVALID" ]) }
+        Check = fun a -> hasIntegrity "unauthorized exclusion of PF-005" a @ hasCode "UNAUTHORIZED-EXCLUSION" "PF-005" a @ (if statusOf "PF-005" a = "INVALID" then [] else [ "PF-005 must be INVALID" ]) }
       { Name = "stale-evidence-repinned"
         Mutation = "requirements/EXT-DATA-002.json rebound to the older candidate 5b48de2 and its manifest digest re-pinned (digest valid, evidence stale)"
         Mutate =
@@ -145,24 +154,24 @@ let private cases (ledgerFails: string list) (ledgerNotRun: string list) : Case 
               repin d ev
         ExpectPython = "INVALID"
         ExpectPlan = "INVALID"
-        Check = fun a -> if statusOf "EXT-DATA-002" a = "STALE" then [] else [ "EXT-DATA-002 must be STALE" ] }
+        Check = fun a -> hasCode "STALE-EVIDENCE" "EXT-DATA-002" a @ noneVerified a @ (if statusOf "EXT-DATA-002" a = "STALE" then [] else [ "EXT-DATA-002 must be STALE" ]) }
       { Name = "stale-manifest"
         Mutation = "evidence-manifest.json source_sha set to the older candidate 5b48de2"
         Mutate = fun d -> rewrite (Path.Combine(d, "evidence-manifest.json")) (setIn "source_sha" (JStr olderCandidate))
         ExpectPython = "INVALID"
         ExpectPlan = "INVALID"
-        Check = hasIntegrity "different source revision" }
+        Check = fun a -> hasIntegrity "different source revision" a @ hasCode "STALE-EVIDENCE" "candidate" a }
       { Name = "evidence-removed"
         Mutation = "requirements/EXT-DATA-002.json deleted from the bundle (manifest unchanged)"
         Mutate = fun d -> File.Delete(Path.Combine(d, ev))
         ExpectPython = "INVALID"
-        ExpectPlan = "FAILED"
+        ExpectPlan = "INVALID"
         Check = fun a -> if statusOf "EXT-DATA-002" a = "MISSING" then [] else [ "EXT-DATA-002 must be MISSING" ] }
       { Name = "fail-relabelled-pass"
         Mutation = "PF-005 status changed from FAIL to PASS with no evidence"
         Mutate = fun d -> rewrite (ledger d) (mapRows (fun r -> Some(if str "id" r = "PF-005" then setIn "status" (JStr "PASS") r else r)))
         ExpectPython = "INVALID"
-        ExpectPlan = "FAILED"
+        ExpectPlan = "INVALID"
         Check = fun a -> if statusOf "PF-005" a = "MISSING" then [] else [ sprintf "PF-005 must be MISSING, is %s" (statusOf "PF-005" a) ] } ]
 
 let run (o: Options) : int =
@@ -209,12 +218,12 @@ let run (o: Options) : int =
                   "problems", jstrs problems ])
 
     let ok = results |> List.forall (fun r -> strOpt "outcome" r = Some "as-expected")
-    let planJ = parseFile (Path.Combine(o.Source, "requirements-compiled", "v1", "verification-plan.json"))
+    let planJ = parseFile (Path.Combine(o.Source, "requirements-compiled", "v2", "verification-plan.json"))
 
     let record =
         JObj
             [ "schema", JStr "indy-init.verification-replay-evidence/1"
-              "purpose", JStr "Phase Eight: the verifier pipeline (compute-acceptance-verdict.py unmodified, plus the verification-plan assessment) re-run over the frozen Rehearsal 4 candidate evidence, with negative controls on temporary copies"
+              "purpose", JStr "Phase Eight: the verifier pipeline (compute-acceptance-verdict.py unmodified, plus the verification-plan assessment against requirements-compiled/v2) re-run over the frozen Rehearsal 4 candidate evidence, with negative controls on temporary copies"
               "plan", field "planIdentity" planJ |> Option.defaultValue JNull
               "candidate",
               JObj

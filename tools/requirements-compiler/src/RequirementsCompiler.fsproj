@@ -19,6 +19,7 @@
     <Compile Include="Graph.fs" />
     <Compile Include="Artifacts.fs" />
     <Compile Include="Validate.fs" />
+    <Compile Include="EvidenceCategories.fs" />
     <Compile Include="VerificationPlan.fs" />
     <Compile Include="PlanVerification.fs" />
     <Compile Include="Preflight.fs" />

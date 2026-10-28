@@ -9,6 +9,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Replay.fs" />
+    <Compile Include="RehearsalBaselines.fs" />
     <Compile Include="Tests.fs" />
   </ItemGroup>
   <ItemGroup>

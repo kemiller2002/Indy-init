@@ -1,0 +1,139 @@
+{
+  "schema": "indy-init.evidence-categories/1",
+  "description": "Declared rules that assign required evidence categories to plan obligations. A rule applies to an obligation when every condition it states holds (conditions: rules = verification rule ids from verification-rules.json, gates, documents, requirements = selector grammar of Model.matches, titlePattern = .NET regex over the requirement title, obligationKinds, obligations = exact baseline obligation ids, freshnessPolicies = the requirement's plan policy); within one condition any listed value matches. Every applicable rule contributes its category; the union is the obligation's required set. An obligation no rule reaches is reported 'unclassified' missing coverage, never assigned a default. Each rule cites the declared requirement data it rests on (source), so a reviewer can check it without reading code.",
+  "categories": [
+    {
+      "id": "unit",
+      "definition": "Deterministic tests of one component in isolation (F# unit and property tests, illegal-transition and forged-history variants); no browser, provider or network.",
+      "testKinds": ["deterministic"],
+      "freshnessPolicy": null
+    },
+    {
+      "id": "integration",
+      "definition": "Tests across a boundary between components or systems: producer/consumer contract tests, recorded-response provider contract tests, storage golden replay, dependency compatibility smoke, catalog verification.",
+      "testKinds": ["deterministic", "live"],
+      "freshnessPolicy": null
+    },
+    {
+      "id": "browser",
+      "definition": "The application exercised in a real browser engine (WebKit/Chromium via Percepta or Playwright), offline-fixture or deployed, including printed and rendered output.",
+      "testKinds": ["deterministic", "live"],
+      "freshnessPolicy": null
+    },
+    {
+      "id": "live-provider",
+      "definition": "Real requests against the authorized live provider (the GitHub test repository) in the candidate's own run, with independent re-reads; mocked or recorded responses never count.",
+      "testKinds": ["live"],
+      "freshnessPolicy": "FP-LIVE-PER-COMMIT"
+    },
+    {
+      "id": "security",
+      "definition": "Evidence that a security property holds: credential handling, least privilege, secret non-disclosure in logs, URLs, screenshots and artifacts.",
+      "testKinds": ["deterministic", "live", "review"],
+      "freshnessPolicy": null
+    },
+    {
+      "id": "accessibility",
+      "definition": "Accessibility verification: automated accessibility report (axe), keyboard-only and focus checks, reduced motion, screen-reader semantics.",
+      "testKinds": ["deterministic", "live", "review"],
+      "freshnessPolicy": null
+    },
+    {
+      "id": "independent-acceptance",
+      "definition": "Evidence produced by a party independent of the implementing agent: an independent reviewer's record, or an acceptance job the implementer does not author, bound to the reviewed or deployed SHA.",
+      "testKinds": ["review"],
+      "freshnessPolicy": "FP-REVIEW-PER-COMMIT"
+    }
+  ],
+  "rules": [
+    {
+      "id": "EC-UI-BROWSER",
+      "category": "browser",
+      "when": { "rules": ["VR-UI"] },
+      "source": "verification-rules.json VR-UI method: \"Percepta semantic contract verification of populated states at the deployed exact SHA; WebKit at iPad portrait/landscape, desktop and mobile\""
+    },
+    {
+      "id": "EC-UI-ACCESSIBILITY",
+      "category": "accessibility",
+      "when": { "rules": ["VR-UI"] },
+      "source": "verification-rules.json VR-UI method: \"axe accessibility; keyboard and reduced-motion checks\"; evidence: \"accessibility report\""
+    },
+    {
+      "id": "EC-DOMAIN-UNIT",
+      "category": "unit",
+      "when": { "rules": ["VR-DOMAIN"] },
+      "source": "verification-rules.json VR-DOMAIN method: \"F# unit and property tests including illegal-transition and forged-history variants\""
+    },
+    {
+      "id": "EC-INTERFACE-INTEGRATION",
+      "category": "integration",
+      "when": { "rules": ["VR-INTERFACE"] },
+      "source": "verification-rules.json VR-INTERFACE method: \"producer/consumer contract tests at the interface-manifest SHA\""
+    },
+    {
+      "id": "EC-STORAGE-INTEGRATION",
+      "category": "integration",
+      "when": { "rules": ["VR-STORAGE"] },
+      "source": "verification-rules.json VR-STORAGE method: \"three identities match; golden replay of five scenarios; 90 negative fixtures refused\""
+    },
+    {
+      "id": "EC-PERSISTENCE-LIVE",
+      "category": "live-provider",
+      "when": { "rules": ["VR-PERSISTENCE"] },
+      "source": "verification-rules.json VR-PERSISTENCE (gate G6) method: \"live create/read/write/reload/conflict/rejected-token against the test repository with independent SHA re-reads\"; freshness: \"live evidence from this run only\""
+    },
+    {
+      "id": "EC-PERSISTENCE-INTEGRATION",
+      "category": "integration",
+      "when": { "rules": ["VR-PERSISTENCE"] },
+      "source": "verification-rules.json VR-PERSISTENCE method: \"four verification levels (PF-011)\" and \"fakes only from recorded responses\" (the provider-conformance level, PF-011-O3: shared contract tests against fixture and GitHub adapters)"
+    },
+    {
+      "id": "EC-DEPENDENCIES-INTEGRATION",
+      "category": "integration",
+      "when": { "rules": ["VR-DEPENDENCIES"] },
+      "source": "verification-rules.json VR-DEPENDENCIES method: \"lock compared with installed and loaded artifacts; set qualification; compatibility smoke\""
+    },
+    {
+      "id": "EC-DEFECT-CLASS-INDEPENDENT",
+      "category": "independent-acceptance",
+      "when": { "rules": ["VR-DEFECT-CLASS"] },
+      "source": "verification-rules.json VR-DEFECT-CLASS (gate G7) method: \"independent approval, SHA-bound proof\"; owner: \"independent reviewer + Dokimos\""
+    },
+    {
+      "id": "EC-DECISIONS-INDEPENDENT",
+      "category": "independent-acceptance",
+      "when": { "rules": ["VR-DECISIONS"] },
+      "source": "verification-rules.json VR-DECISIONS (gate G7) owner: \"independent architecture review\""
+    },
+    {
+      "id": "EC-REPORT-BROWSER",
+      "category": "browser",
+      "when": { "rules": ["VR-REPORT"] },
+      "source": "verification-rules.json VR-REPORT method: \"report fidelity against projections; print rendering\"; evidence: \"rendered report artifact at the deployed SHA\""
+    },
+    {
+      "id": "EC-DEPLOYMENT-INDEPENDENT",
+      "category": "independent-acceptance",
+      "when": { "rules": ["VR-DEPLOYMENT"] },
+      "source": "verification-rules.json VR-DEPLOYMENT (gate G9) owner: \"Dokimos (deployed acceptance)\"; method: \"successful acceptance job on the same SHA\""
+    },
+    {
+      "id": "EC-CATALOG-INTEGRATION",
+      "category": "integration",
+      "when": { "rules": ["VR-CATALOG"] },
+      "source": "verification-rules.json VR-CATALOG method: \"catalog verification plus application load after Connect\""
+    },
+    {
+      "id": "EC-SECURITY-TITLE",
+      "category": "security",
+      "when": { "titlePattern": "(?i)\\bsecur|\\bcredential" },
+      "source": "baseline requirement titles that name security or credentials (at aab8f80: AR-014 \"Secure capability isolation\", PF-015 \"Credentials and security\"); no verification rule declares a security method, so the title is the declared data used"
+    }
+  ],
+  "notCategorized": [
+    { "rule": "VR-LEDGER", "reason": "the ledger row is the carrier of claims, not evidence of an obligation" },
+    { "rule": "VR-PRESERVATION", "reason": "requirements preservation proves the derivation, not the implementation of an obligation" },
+    { "rule": "VR-PROCESS", "reason": "process records (Praxis work items, checkpoints) match none of the seven categories; an obligation reached only by VR-PROCESS is reported unclassified" }
+  ]
+}

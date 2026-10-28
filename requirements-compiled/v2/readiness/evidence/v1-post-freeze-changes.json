@@ -1,0 +1,42 @@
+{
+  "schema": "indy-init.package-version-record/1",
+  "finding": "requirements-compiled/v1 changed after the Rehearsal 4 freeze without a new package version being cut",
+  "recordedAt": "2026-10-28",
+  "recordedIn": "EII-C (input-documents/2026-10-28-EII-C-executable-acceptance.md, EII-C-06)",
+  "rehearsal4Freeze": {
+    "record": "kickoff/rehearsal-004/preflight-record.json (frozenAt 2026-10-27T06:04:14Z, commit ad2f1af)",
+    "packageManifestSha256": "0cd4c3f5fe8d167e41b9d06a8c582f72bee71dd572810b36ce457fac1e42ace7",
+    "verificationPlan": "absent at the freeze"
+  },
+  "changesToV1AfterTheFreeze": [
+    {
+      "commit": "5d69cca",
+      "subject": "Compile verification-plan.json in the requirements compiler (Phase Two)",
+      "packageManifestSha256": "49f350cdd72f469c2377c14987fe52b574ed7538bb49537bb06499b2825b5886",
+      "change": "curation/verification-plan.json and verification-plan.json added to v1; V18 added to requirements-validation-report.json"
+    },
+    {
+      "commit": "f9219d1",
+      "subject": "Verify candidates against the verification plan; replay Rehearsal 4 with negative controls",
+      "packageManifestSha256": "5b8e9b34b8df48bf49d134262f4b742e81ed7320892cd13237f2047c0179a872",
+      "change": "README.md (authored) changed and readiness/evidence/r4-verification-plan-replay.json added"
+    },
+    {
+      "commit": "4b38213",
+      "subject": "Freeze the Rehearsal 5 preflight on echelon-current 1.29.0; bind the plan to the R5 approvals",
+      "packageManifestSha256": "b771cd401e76f103f517916056f29e5a046819f7d5754e3ee77e556d3156db59",
+      "change": "curation/verification-plan.json approvals pin moved to kickoff/rehearsal-005 (same bytes), so verification-plan.json changed (VP-d1efaf695ef4 became VP-e77a2134e1b0); readiness/evidence/preflight-run-r5-local.json added. This is the package the Rehearsal 5 freeze records"
+    }
+  ],
+  "rehearsal5Freeze": {
+    "record": "kickoff/rehearsal-005/preflight-record.json (frozenAt 2026-10-27T19:51:59Z)",
+    "packageManifestSha256": "b771cd401e76f103f517916056f29e5a046819f7d5754e3ee77e556d3156db59",
+    "planId": "VP-e77a2134e1b0"
+  },
+  "disposition": {
+    "history": "not rewritten: every v1 state above stays reproducible from its commit, and both freeze records name the manifest they used",
+    "v1": "frozen as committed at 459f65a (manifest b771cd40...); the current compiler no longer regenerates v1, because the plan it emits now carries acceptance contracts. Regenerate v1 with the compiler at 459f65a.",
+    "v2": "requirements-compiled/v2 is cut for the EII-C change: same baseline (BL-CAUSA-INDY-INIT-aab8f80c7743), same curation plus curation/evidence-categories.json; only verification-plan.json, requirements-validation-report.json and package-manifest.json differ in content from v1",
+    "rule": "a change to any generated or curated file of a package that a rehearsal freeze record names is cut as a new package version"
+  }
+}
