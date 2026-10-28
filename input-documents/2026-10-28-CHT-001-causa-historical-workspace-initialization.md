@@ -42,8 +42,8 @@ The next rehearsal is BLOCKED until all of the following are true:
 
 On 2026-10-28 the feature implementation produced:
 
-- Causa Data branch `codex/immutable-historical-rehearsal-workspaces`, commits `d213361` and `2600a44`.
-- Conditor branch `codex/causa-rehearsal-preflight`, commit `581ba80`.
+- Causa Data branch `codex/immutable-historical-rehearsal-workspaces`, culminating in commit `cfd761d` (historical implementation commits begin at `d213361`).
+- Conditor branch `codex/causa-rehearsal-preflight-v2`, culminating in commit `822f0ca` with Praxis work item `WI-0062` complete.
 - Disposable Causa branch `codex/causa-workspace-e2e-20261028`, workspace `rehearsal-900001`, published commit `c3101ec32521482b5a939fd43dde0e8676fb4d93`, with a Conditor READY receipt.
 
 These prove the implementation path on disposable infrastructure. They do not claim that the branches are merged, a Conditor release has been cut, the next event workspace has been chosen, or timed execution has begun.

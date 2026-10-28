@@ -15,7 +15,7 @@ Before selecting an event workspace:
 1. Use reviewed Causa Data and Conditor revisions containing CHT-001.
 2. Authenticate the host's normal Git credential mechanism for `kemiller2002/causa-data`; do not put a token in the manifest or receipt.
 3. Check out Causa Data with the pinned F# engine available.
-4. Add the rehearsal section to the existing `conditor.json`. The rehearsal id and name must agree (`006` and `rehearsal-006`, for example), and `create`, `publish` and `verify` must all be true.
+4. Add the rehearsal section to the existing `conditor.json`. The rehearsal id and name must agree (`006` and `rehearsal-006`, for example), and `create`, `publish` and `verify` must all be true. Select `historical-v1` for the three frozen historical cases or `demonstration-v1` for those cases plus the everyday burned-out-lightbulb investigation.
 5. Confirm the destination branch is the deliberate publication branch. The next event's branch is an operator choice; no tool silently substitutes `main` or an earlier workspace.
 
 ## Initialization gate
@@ -26,15 +26,15 @@ Run:
 conditor rehearsal init --target . --manifest ./conditor.json --json
 ```
 
-The command verifies the template; proves local and remote destination absence; creates and verifies the local workspace; publishes it with a non-forced commit; independently reads the published commit back; and checks the actual Causa workspace resolver while loading all three histories.
+The command verifies the selected template; proves local and remote destination absence; creates and verifies the local workspace; publishes it with a non-forced commit; independently reads the published commit back; and checks the actual Causa workspace resolver while loading the template's exact investigation set.
 
 The receipt is written to `.conditor/evidence/rehearsal-<id>-readiness.json` unless the manifest declares another repository-relative path. Preserve it with the rehearsal preflight evidence. Confirm:
 
 - `overallReadinessVerdict` is `READY`;
 - the destination repository, branch and workspace are the selected values;
 - `publishedCommit` is the current head of that branch;
-- the template digest is the reviewed `historical-v1` digest;
-- all three investigation identifiers are present;
+- the template identifier and digest are the reviewed values for the selected template;
+- the exact expected investigation identifiers are present (three for `historical-v1`, four for `demonstration-v1`);
 - local, remote and application verification states are complete.
 
 Any `BLOCKED` verdict stops the preflight. Follow only the receipt's permitted recovery action. Never overwrite or delete an existing destination to make the gate pass, never reuse a prior rehearsal, and never replace a failed workspace with an empty one.
@@ -59,4 +59,4 @@ If initialization stops after local creation but before publication, the receipt
 
 ## Requirement intake
 
-The prospective requirements are in [`input-documents/2026-10-28-CHT-001-causa-historical-workspace-initialization.md`](../input-documents/2026-10-28-CHT-001-causa-historical-workspace-initialization.md). Indy Init uses the legacy `input-documents/` Praxis intake until it is Praxis-initialized. The document is not an approval and remains pending until derived records are produced by ingestion.
+The prospective requirements are in [`input-documents/2026-10-28-CHT-001-causa-historical-workspace-initialization.md`](../input-documents/2026-10-28-CHT-001-causa-historical-workspace-initialization.md) and [`input-documents/2026-10-28-ELB-001-everyday-lightbulb-demonstration.md`](../input-documents/2026-10-28-ELB-001-everyday-lightbulb-demonstration.md). Indy Init uses the legacy `input-documents/` Praxis intake until it is Praxis-initialized. These documents are not approvals and remain pending until derived records are produced by ingestion.

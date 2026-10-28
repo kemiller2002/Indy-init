@@ -36,12 +36,13 @@ No new rehearsal has started. CHT-001 is recorded in the legacy Praxis intake at
 
 | Check | Status | Evidence |
 |---|---|---|
-| Immutable three-investigation template and digest | IMPLEMENTED ON FEATURE BRANCH, NOT MERGED | `causa-data` branch `codex/immutable-historical-rehearsal-workspaces`, commits `d213361`, `2600a44` |
-| Independent workspace creation and isolation | VERIFIED ON FEATURE BRANCH | Causa 25-test suite; two-workspace append isolation |
-| Conditor ordered fail-closed initialization | IMPLEMENTED ON FEATURE BRANCH, NOT MERGED | `conditor` branch `codex/causa-rehearsal-preflight`, commit `581ba80` |
+| Immutable historical, everyday and combined templates | IMPLEMENTED ON FEATURE BRANCH, NOT MERGED | `causa-data` branch `codex/immutable-historical-rehearsal-workspaces`, commit `cfd761d`; digests and source commits recorded in each manifest |
+| Deterministic lightbulb reasoning and negative control | VERIFIED ON FEATURE BRANCH | Engine-authored 48-event successful history; engine-driven failed-replacement scenario; Causa 32-test suite |
+| Independent workspace creation and isolation | VERIFIED ON FEATURE BRANCH | Two-workspace append isolation; template and canonical-source byte checks |
+| Conditor ordered fail-closed initialization | IMPLEMENTED ON FEATURE BRANCH, NOT MERGED | `conditor` branch `codex/causa-rehearsal-preflight-v2`, commit `822f0ca`; Praxis work item `WI-0062` complete |
 | GitHub publication, remote readback and application load | VERIFIED ON DISPOSABLE BRANCH | `causa-data` branch `codex/causa-workspace-e2e-20261028`, `rehearsal-900001`, commit `c3101ec32521482b5a939fd43dde0e8676fb4d93` |
-| CHT-001 Praxis derivation | NOT RUN | Intake document exists; Indy Init has no Praxis installation |
+| CHT-001 / ELB-001 Praxis derivation | NOT RUN | Intake documents exist; Indy Init has no Praxis installation |
 | Event workspace selection | NOT RUN | Operator must select the next rehearsal id after merge/release |
 | Timed execution | NOT RUN | READY initialization is preparation only; explicit start remains required |
 
-The next rehearsal remains blocked until the feature changes are reviewed and merged, CHT-001 is ingested with derived records, an operator selects a new unique id, and the real preflight receipt is READY. The disposable `rehearsal-900001` workspace is integration-test evidence and must not be reused as the event workspace.
+The next rehearsal remains blocked until the feature changes are reviewed and merged, CHT-001 and ELB-001 are ingested with derived records, an operator selects a new unique id and template, and the real preflight receipt is READY. Disposable integration-test workspaces must not be reused as the event workspace.
