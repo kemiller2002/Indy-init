@@ -36,7 +36,7 @@ No new rehearsal has started. CHT-001 is recorded in the legacy Praxis intake at
 
 | Check | Status | Evidence |
 |---|---|---|
-| Immutable historical, everyday and combined templates | IMPLEMENTED ON FEATURE BRANCH, NOT MERGED | `causa-data` branch `codex/immutable-historical-rehearsal-workspaces`, commit `cfd761d`; digests and source commits recorded in each manifest |
+| Immutable historical, everyday and combined templates | IMPLEMENTED ON FEATURE BRANCH, NOT MERGED | `causa-data` branch `codex/immutable-historical-rehearsal-workspaces`, commit `626be63`; digests and source commits recorded in each manifest |
 | Deterministic lightbulb reasoning and negative control | VERIFIED ON FEATURE BRANCH | Engine-authored 48-event successful history; engine-driven failed-replacement scenario; Causa 32-test suite |
 | Independent workspace creation and isolation | VERIFIED ON FEATURE BRANCH | Two-workspace append isolation; template and canonical-source byte checks |
 | Conditor ordered fail-closed initialization | IMPLEMENTED ON FEATURE BRANCH, NOT MERGED | `conditor` branch `codex/causa-rehearsal-preflight-v2`, commit `822f0ca`; Praxis work item `WI-0062` complete |

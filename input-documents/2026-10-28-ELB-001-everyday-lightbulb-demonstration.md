@@ -42,7 +42,7 @@ If the next rehearsal uses the combined judge demonstration, it remains BLOCKED 
 
 On 2026-10-28 the feature implementation produced:
 
-- Causa Data branch `codex/immutable-historical-rehearsal-workspaces`, commits `2c935df`, `089f29f` and `cfd761d` for the deterministic everyday investigation, combined canonical source and immutable templates.
+- Causa Data branch `codex/immutable-historical-rehearsal-workspaces`, commits `2c935df`, `089f29f`, `cfd761d` and `626be63` for the deterministic everyday investigation, combined canonical source, immutable templates and the narrowed immutability guard.
 - Conditor branch `codex/causa-rehearsal-preflight-v2`, commits `e77bfd1` and `822f0ca`, including explicit selected-template identity and four-investigation orchestration tests.
 - Causa's 32-test F# suite and 53 canonical historical-catalog validations passed before this intake was recorded.
 - Disposable branch `codex/causa-demonstration-e2e-20261028` published `rehearsal-900003` at commit `8d52ec9e02200977d4621ef4bf1aa429c6c788db`; Conditor independently read it back and produced a four-investigation READY receipt. A scratch harness using the frozen Rehearsal 5 provider loaded all four cases and proved a supported write changed only the selected workspace.
