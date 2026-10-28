@@ -19,7 +19,7 @@ evidence about how the rehearsal was run. Its plan began implementation with no 
 (Indy-init PR #32, VP-5d1202ddec1e) was merged after the run and does not change its pinned plan or verdict. Measurements and findings:
 `docs/engineering-improvement/SPEED-OPTIMIZATION-REPORT.md`.
 
-## Proposed requirements (implemented on the initiative's branches, pending owner merge)
+## Requirements (implemented; merged on 2026-10-28)
 
 | ID | Requirement |
 |---|---|
@@ -37,13 +37,14 @@ evidence about how the rehearsal was run. Its plan began implementation with no 
 
 ## Rehearsal 6 preparation requirements
 
-These are for the owner to approve into Rehearsal 6's frozen kickoff. They are not approved by this document, and
-Rehearsal 6 is not started.
+The owner approved these for Rehearsal 6's frozen kickoff on 2026-10-28, in the initiative's session ("I approve
+anything necessary"). That statement was transcribed by an agent, so under RDP-003 the approval takes effect through the
+owner's own merge of the pull request that records it. Rehearsal 6 is not started by this document.
 
 | ID | Requirement | Source |
 |---|---|---|
 | ESO-R6-01 | Pin a stack release that contains the initiative's merged changes (Praxis with `work evidence`; Indy-init compiler with `plan-readiness` and `verify-process`; Limen `wasm-check`; Conditor `test-env resolve` and preflight; Dokimos failure-aware reuse). Rehearsal 5's echelon-current 1.29.0 contains none of them. | report §Adoption |
-| ESO-R6-02 | Before implementation, the owner approves test and producer bindings for every mandatory obligation (start from `requirements-compiled/v2/proposals/process-bindings.proposed.json` for process and owner categories), and `plan-readiness` is READY against the frozen plan and frozen readiness rules. | ESO-P2-02 |
+| ESO-R6-02 | Before implementation, the owner approves test and producer bindings for every mandatory obligation (process and owner categories are bound in `curation/verification-plan.json` from the approved proposal), and `plan-readiness` is READY against the frozen plan and frozen readiness rules. | ESO-P2-02 |
 | ESO-R6-03 | Freeze the process-evidence rules (`indy-init.process-evidence-rules/1`: owner logins and Praxis actor ids, agent and automation identities, review roles) at kickoff. | ESO-P1 |
 | ESO-R6-04 | Agents record process evidence with `praxis work evidence` at the moment of each event; every implementing work item has a verified checkpoint; reviewers work under their own identity in a `review` execution role. | ESO-P1-01 |
 | ESO-R6-05 | The acceptance job fetches the owner's approving reviews from the GitHub API into `indy-init.owner-attestations/1` for its own run, runs `verify-process`, and passes the assessment to `verify-plan --process-assessment`. | ESO-P1-03 |
