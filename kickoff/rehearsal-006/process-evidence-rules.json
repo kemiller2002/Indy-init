@@ -1,0 +1,15 @@
+{
+  "schema": "indy-init.process-evidence-rules/1",
+  "description": "Frozen process-evidence rules of Indy Init Rehearsal 6 (ESO-R6-03): who may act, who the owner is, who reviews independently and which execution roles are review roles. Pinned by SHA-256 at kickoff; verify-process refuses any other bytes.",
+  "owners": [ { "login": "kemiller2002", "actorIds": ["kemiller2002"] } ],
+  "repository": "indy-init-rehearsal-006",
+  "agents": ["anthropic/claude-code", "claude"],
+  "reviewers": [ { "actorId": "anthropic/claude-code-reviewer", "login": "kemiller2002" } ],
+  "automation": ["github/github-actions", "ros-bootstrap"],
+  "reviewRoles": ["review"],
+  "ownerDecisions": {
+    "AR-024-O1": ["DEC-R6-KICKOFF"],
+    "AR-024-O2": ["DEC-R6-KICKOFF"],
+    "AR-008-O2": ["DEC-R6-KICKOFF"]
+  }
+}

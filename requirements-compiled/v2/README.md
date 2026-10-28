@@ -5,8 +5,8 @@ Version 2 of the compiled requirements package. It is cut for one change, **exec
 |   |   |
 |---|---|
 | Source | kemiller2002/indy-init `aab8f80c7743392e794b3b631542903ed4ed6f64`, baseline `BL-CAUSA-INDY-INIT-aab8f80c7743` (sha256 `621e2f96…57b9`), the same as v1 |
-| Curation | v1's curation, except the description, the freshness policy `FP-PROCESS-THIS-RUN` and 29 producer `testBindings` in `curation/verification-plan.json`, plus the table `curation/evidence-categories.json` |
-| Verification plan | `VP-1b2fed568a3b` (digest `1b2fed56…da92`): 108 P0 requirements, 326 obligations, each with an acceptance contract; 0 unclassified, 29 bound (to Praxis producers only), 0 verified. Earlier v2 identities: `VP-06f6d4ef5deb`, before the producer bindings; `VP-6b0f59cee664`, before the process and owner evidence classes (see below) |
+| Curation | v1's curation, except the description, the freshness policy `FP-PROCESS-THIS-RUN` and the `testBindings` in `curation/verification-plan.json` (the 29 producer bindings of `proposals/process-bindings.proposed.json`, extended by `proposals/r6-test-bindings.proposed.json`), plus the table `curation/evidence-categories.json` |
+| Verification plan | `VP-0eb9c791dd0b` (digest `0eb9c791…0766`): 108 P0 requirements, 326 obligations, each with an acceptance contract; 0 unclassified, all 326 bound (Rehearsal 6 test bindings, ESO-R6-02), 0 verified. Earlier v2 identities: `VP-1b2fed568a3b`, with only the 29 Praxis producer bindings; `VP-06f6d4ef5deb`, before the producer bindings; `VP-6b0f59cee664`, before the process and owner evidence classes (see below) |
 | Schema | `indy-init.verification-plan/1`, revision 2 (additive; see below) |
 | Compilation verdict | PASS (V01–V18). Rehearsal readiness: READY, as in v1 |
 

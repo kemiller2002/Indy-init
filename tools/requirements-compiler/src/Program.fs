@@ -737,6 +737,44 @@ let planReadinessCommand (args: string list) : int =
             eprintfn "input error: %s" ex.Message
             2
 
+/// `propose-test-bindings`: ESO-R6-02. Proposes a test identity for every unresolved application-test and reviewer
+/// category of the plan (see TestBindingProposal). Writes a proposal; never approves it. Exit 0, 2 unusable input.
+let proposeTestBindingsCommand (args: string list) : int =
+    match optionMap args with
+    | Error e ->
+        eprintfn "%s" e
+        2
+    | Ok m when not (m.ContainsKey "--plan") ->
+        eprintfn "usage: requirements-compiler propose-test-bindings --plan FILE [--out FILE]"
+        2
+    | Ok m ->
+        try
+            writeOut m (TestBindingProposal.propose (parseFile (List.last m.["--plan"])))
+            0
+        with ex ->
+            eprintfn "input error: %s" ex.Message
+            2
+
+/// `review-attestations`: ESO-R6-05. Turns the pull-request reviews the acceptance job fetched in its own run into
+/// `indy-init.owner-attestations/1` (see ReviewAttestations). Exit 0, 2 unusable input.
+let reviewAttestationsCommand (args: string list) : int =
+    let required = [ "--repository"; "--run-id"; "--candidate"; "--pulls" ]
+    match optionMap args with
+    | Error e ->
+        eprintfn "%s" e
+        2
+    | Ok m when required |> List.exists (m.ContainsKey >> not) ->
+        eprintfn "usage: requirements-compiler review-attestations --repository OWNER/REPO --run-id ID --candidate SHA --pulls FILE [--out FILE]"
+        2
+    | Ok m ->
+        try
+            let one k = m.[k] |> List.last
+            writeOut m (ReviewAttestations.build (one "--repository") (one "--run-id") (one "--candidate") (parseFile (one "--pulls")))
+            0
+        with ex ->
+            eprintfn "input error: %s" ex.Message
+            2
+
 [<EntryPoint>]
 let main argv =
     match List.ofArray argv with
@@ -744,6 +782,8 @@ let main argv =
     | "verify-plan" :: rest -> verifyPlanCommand rest
     | "verify-process" :: rest -> verifyProcessCommand rest
     | "plan-readiness" :: rest -> planReadinessCommand rest
+    | "propose-test-bindings" :: rest -> proposeTestBindingsCommand rest
+    | "review-attestations" :: rest -> reviewAttestationsCommand rest
     | "preflight" :: rest ->
         match parseArgs rest defaults with
         | Error e ->

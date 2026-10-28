@@ -325,7 +325,18 @@ let simulation (source: string) (buildPlan: Json -> Json) : Json * string list =
           if (arr "obligations" positive).Length <> (arr "testBindings" proposal).Length then
               yield sprintf "process simulation positive: %d obligations decided, the proposal binds %d" (arr "obligations" positive).Length (arr "testBindings" proposal).Length
           if str "verdict" noBindings = "VERIFIED" then yield "process simulation: a plan with no producer bindings verified process evidence"
-          if VerificationPlan.digestOf committedPlan <> VerificationPlan.digestOf proposedPlan then yield "process simulation: the committed plan's bindings differ from the approved proposal"
+          // The committed plan carries every approved process binding unchanged (it also binds the Rehearsal 6 test
+          // proposal, which R6ReadinessTests checks).
+          let identity (t: Json) = str "id" t, str "kind" t
+          let committedTests =
+              arr "requirements" committedPlan
+              |> List.collect (arr "obligations")
+              |> List.map (fun o -> str "sourceObligation" o, field "acceptanceContract" o |> Option.bind (field "testIdentity") |> Option.map (arr "tests") |> Option.defaultValue [] |> List.map identity |> Set.ofList)
+              |> Map.ofList
+          for b in arr "testBindings" proposal do
+              for t in arr "tests" b do
+                  if not (committedTests.TryFind(str "obligation" b) |> Option.defaultValue Set.empty |> Set.contains (identity t)) then
+                      yield sprintf "process simulation: the committed plan does not bind %s to %s" (str "obligation" b) (str "id" t)
           if VerificationPlan.processRecordKinds <> ProcessVerification.recordKinds then yield "process record kinds differ between VerificationPlan and ProcessVerification"
           for (name, code, caught) in recordResults do
               if not caught then yield sprintf "process record control '%s': no record carries %s" name code
@@ -361,7 +372,9 @@ let simulation (source: string) (buildPlan: Json -> Json) : Json * string list =
               | JObj ps -> JObj(ps @ [ "edited", JBool true ])
               | p -> p
           if str "verdict" (PlanReadiness.assess edited (VerificationPlan.digestOf proposedPlan) None) <> "BLOCKED" then yield "readiness: an edited plan was not BLOCKED"
-          if str "verdict" (readiness committedPlan) <> "BLOCKED" then yield "readiness: the committed plan, which binds nothing, is not BLOCKED" ]
+          if str "verdict" (readiness (buildPlan (JArr []))) <> "BLOCKED" then yield "readiness: a plan that binds nothing is not BLOCKED"
+          // The process bindings alone leave application and reviewer categories open.
+          if str "verdict" (readiness proposedPlan) <> "BLOCKED" then yield "readiness: the process bindings alone made the plan READY" ]
 
     let evidence =
         JObj

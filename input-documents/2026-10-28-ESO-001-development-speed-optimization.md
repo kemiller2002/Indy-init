@@ -54,3 +54,16 @@ owner's own merge of the pull request that records it. Rehearsal 6 is not starte
 | ESO-R6-09 | Persistence: decide between adopting Arca 0.6.0 and carrying Rehearsal 5's persistence fixes forward; either way make the local read-merge-write exclusive across tabs (Web Locks where available, with an explicit fallback) and add the deterministic two-tab reproduction test. R3-F2 is open. | `investigations/regression-preservation.md` |
 | ESO-R6-10 | UI: consume a released Forma with the application type roles (0.11.0 is merged but not published); require overflow, corner-containment and axe checks in the application. | `investigations/regression-preservation.md` |
 | ESO-R6-11 | Record the measurements of the report's comparison table during the run (time to first working application, time to verified completion, CI minutes from the Actions API, tokens, integration repairs, mandatory requirements verified, defects escaping early tests). | report §Comparison |
+
+## Status (2026-10-28)
+
+| ID | Status |
+|---|---|
+| ESO-R6-01 | Done. echelon-current 1.32.0 (echelon-registry#103, approved by the owner on 2026-10-28): Praxis 3.23.0, Ordo 1.19.0, Dokimos 0.9.0, Limen 0.9.1 (1.31.0, echelon-registry#102) plus Forma 0.11.0 and Arca 0.6.0, qualified by Conditor 0.10.17. Chrona stays on 1.31.0 until it migrates to Arca 0.6.0's API (owner decision). |
+| ESO-R6-02 | Prepared. Every category of the 326 obligations is bound (plan `VP-0eb9c791dd0b`); `plan-readiness` is READY. Takes effect on the owner's merge. |
+| ESO-R6-03 | Prepared. `kickoff/rehearsal-006/process-evidence-rules.json` (SHA-256 `6f164353…e17c`). The reviewer is `anthropic/claude-code-reviewer`, attested by the owner's GitHub login (owner decision, 2026-10-28). |
+| ESO-R6-04, -06 | The commands are released (`praxis work evidence`, `praxis telemetry ingest`); the agents use them during the rehearsal. |
+| ESO-R6-05 | Prepared. `kickoff/rehearsal-006/acceptance-process.yml` and `requirements-compiler review-attestations`. The job runs `verify-process`; `verify-plan` computes the same assessment itself from its `--process-*` inputs rather than reading a `--process-assessment` file. |
+| ESO-R6-07, -08, -11 | At kickoff, in the rehearsal repository. |
+| ESO-R6-09 | Decided by the owner on 2026-10-28: **adopt Arca 0.6.0** (released at v0.6.0, d0ce9dae), in echelon-current 1.32.0 (echelon-registry#103). Arca 0.6.0 changes its license from MIT to PolyForm-Noncommercial-1.0.0, which the owner accepted. Arca's single-owner Web Lock queue closes R3-F2's cross-tab read-merge-write for data that goes through it. Two Rehearsal 5 protections Arca 0.6.0 does not provide stay requirements of the application: confirm a save only by a byte read-back of the stored record (causa contract §9.4.3), and make idempotency keys globally unique per page load (an F-1-style collision would be reconciled as landed). Keep the deterministic two-tab reproduction test (`investigations/regression-preservation.md`). |
+| ESO-R6-10 | Decided by the owner on 2026-10-28: **adopt Forma 0.11.0** (typography roles, forma-conformance corner helpers). Its release run failed on a stale fixture pin; forma#172 fixed it; 0.11.0 is released (v0.11.0, 7a545813) and in echelon-current 1.32.0. |

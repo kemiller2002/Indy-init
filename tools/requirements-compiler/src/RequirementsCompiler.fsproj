@@ -23,6 +23,8 @@
     <Compile Include="VerificationPlan.fs" />
     <Compile Include="ProcessVerification.fs" />
     <Compile Include="PlanReadiness.fs" />
+    <Compile Include="TestBindingProposal.fs" />
+    <Compile Include="ReviewAttestations.fs" />
     <Compile Include="PlanVerification.fs" />
     <Compile Include="Preflight.fs" />
     <Compile Include="Program.fs" />

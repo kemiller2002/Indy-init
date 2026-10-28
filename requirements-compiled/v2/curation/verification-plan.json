@@ -65,6 +65,13 @@
           "categories": [
             "process-record"
           ]
+        },
+        {
+          "id": "praxis:independent-review",
+          "kind": "review",
+          "categories": [
+            "independent-acceptance"
+          ]
         }
       ]
     },
@@ -76,6 +83,13 @@
           "kind": "process",
           "categories": [
             "process-record"
+          ]
+        },
+        {
+          "id": "praxis:independent-review",
+          "kind": "review",
+          "categories": [
+            "independent-acceptance"
           ]
         }
       ]
@@ -120,6 +134,13 @@
           "categories": [
             "process-record"
           ]
+        },
+        {
+          "id": "praxis:independent-review",
+          "kind": "review",
+          "categories": [
+            "independent-acceptance"
+          ]
         }
       ]
     },
@@ -131,6 +152,13 @@
           "kind": "process",
           "categories": [
             "process-record"
+          ]
+        },
+        {
+          "id": "praxis:independent-review",
+          "kind": "review",
+          "categories": [
+            "independent-acceptance"
           ]
         }
       ]
@@ -144,6 +172,13 @@
           "categories": [
             "process-record"
           ]
+        },
+        {
+          "id": "praxis:independent-review",
+          "kind": "review",
+          "categories": [
+            "independent-acceptance"
+          ]
         }
       ]
     },
@@ -155,6 +190,13 @@
           "kind": "process",
           "categories": [
             "process-record"
+          ]
+        },
+        {
+          "id": "praxis:independent-review",
+          "kind": "review",
+          "categories": [
+            "independent-acceptance"
           ]
         }
       ]
@@ -168,6 +210,13 @@
           "categories": [
             "process-record"
           ]
+        },
+        {
+          "id": "praxis:independent-review",
+          "kind": "review",
+          "categories": [
+            "independent-acceptance"
+          ]
         }
       ]
     },
@@ -179,6 +228,13 @@
           "kind": "process",
           "categories": [
             "process-record"
+          ]
+        },
+        {
+          "id": "praxis:independent-review",
+          "kind": "review",
+          "categories": [
+            "independent-acceptance"
           ]
         }
       ]
@@ -192,6 +248,13 @@
           "categories": [
             "process-record"
           ]
+        },
+        {
+          "id": "praxis:independent-review",
+          "kind": "review",
+          "categories": [
+            "independent-acceptance"
+          ]
         }
       ]
     },
@@ -203,6 +266,13 @@
           "kind": "process",
           "categories": [
             "process-record"
+          ]
+        },
+        {
+          "id": "praxis:independent-review",
+          "kind": "review",
+          "categories": [
+            "independent-acceptance"
           ]
         }
       ]
@@ -216,6 +286,13 @@
           "categories": [
             "owner-decision"
           ]
+        },
+        {
+          "id": "praxis:independent-review",
+          "kind": "review",
+          "categories": [
+            "independent-acceptance"
+          ]
         }
       ]
     },
@@ -227,6 +304,13 @@
           "kind": "owner",
           "categories": [
             "owner-decision"
+          ]
+        },
+        {
+          "id": "praxis:independent-review",
+          "kind": "review",
+          "categories": [
+            "independent-acceptance"
           ]
         }
       ]
@@ -240,6 +324,14 @@
           "categories": [
             "process-record"
           ]
+        },
+        {
+          "id": "dotnet:Causa.Acceptance.Live.PF019Tests.PF-019-O1",
+          "kind": "live",
+          "categories": [
+            "integration",
+            "live-provider"
+          ]
         }
       ]
     },
@@ -251,6 +343,14 @@
           "kind": "process",
           "categories": [
             "process-record"
+          ]
+        },
+        {
+          "id": "playwright:acceptance/UI-021.spec.js > UI-021-O3 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
           ]
         }
       ]
@@ -271,6 +371,14 @@
           "categories": [
             "process-record"
           ]
+        },
+        {
+          "id": "playwright:acceptance/UI-030.spec.js > UI-030-O3 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
         }
       ]
     },
@@ -282,6 +390,21 @@
           "kind": "process",
           "categories": [
             "process-record"
+          ]
+        },
+        {
+          "id": "playwright:acceptance/UI-040.spec.js > UI-040-O2 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        },
+        {
+          "id": "praxis:independent-review",
+          "kind": "review",
+          "categories": [
+            "independent-acceptance"
           ]
         }
       ]
@@ -295,6 +418,13 @@
           "categories": [
             "process-record"
           ]
+        },
+        {
+          "id": "dotnet:Causa.Acceptance.Deterministic.VER001Tests.VER-001-O1",
+          "kind": "deterministic",
+          "categories": [
+            "integration"
+          ]
         }
       ]
     },
@@ -306,6 +436,13 @@
           "kind": "process",
           "categories": [
             "process-record"
+          ]
+        },
+        {
+          "id": "dotnet:Causa.Acceptance.Deterministic.VER001Tests.VER-001-O2",
+          "kind": "deterministic",
+          "categories": [
+            "integration"
           ]
         }
       ]
@@ -319,6 +456,13 @@
           "categories": [
             "process-record"
           ]
+        },
+        {
+          "id": "dotnet:Causa.Acceptance.Deterministic.VER001Tests.VER-001-O3",
+          "kind": "deterministic",
+          "categories": [
+            "integration"
+          ]
         }
       ]
     },
@@ -330,6 +474,13 @@
           "kind": "process",
           "categories": [
             "process-record"
+          ]
+        },
+        {
+          "id": "dotnet:Causa.Acceptance.Deterministic.VER002Tests.VER-002-O1",
+          "kind": "deterministic",
+          "categories": [
+            "integration"
           ]
         }
       ]
@@ -343,6 +494,13 @@
           "categories": [
             "process-record"
           ]
+        },
+        {
+          "id": "dotnet:Causa.Acceptance.Deterministic.VER002Tests.VER-002-O2",
+          "kind": "deterministic",
+          "categories": [
+            "integration"
+          ]
         }
       ]
     },
@@ -354,6 +512,13 @@
           "kind": "process",
           "categories": [
             "process-record"
+          ]
+        },
+        {
+          "id": "dotnet:Causa.Acceptance.Deterministic.VER002Tests.VER-002-O3",
+          "kind": "deterministic",
+          "categories": [
+            "integration"
           ]
         }
       ]
@@ -367,6 +532,13 @@
           "categories": [
             "process-record"
           ]
+        },
+        {
+          "id": "dotnet:Causa.Acceptance.Deterministic.VER003Tests.VER-003-O1",
+          "kind": "deterministic",
+          "categories": [
+            "integration"
+          ]
         }
       ]
     },
@@ -378,6 +550,13 @@
           "kind": "process",
           "categories": [
             "process-record"
+          ]
+        },
+        {
+          "id": "dotnet:Causa.Acceptance.Deterministic.VER003Tests.VER-003-O2",
+          "kind": "deterministic",
+          "categories": [
+            "integration"
           ]
         }
       ]
@@ -391,6 +570,13 @@
           "categories": [
             "process-record"
           ]
+        },
+        {
+          "id": "dotnet:Causa.Acceptance.Deterministic.VER004Tests.VER-004-O3",
+          "kind": "deterministic",
+          "categories": [
+            "integration"
+          ]
         }
       ]
     },
@@ -403,6 +589,13 @@
           "categories": [
             "process-record"
           ]
+        },
+        {
+          "id": "dotnet:Causa.Acceptance.Deterministic.VER010Tests.VER-010-O1",
+          "kind": "deterministic",
+          "categories": [
+            "integration"
+          ]
         }
       ]
     },
@@ -414,6 +607,3917 @@
           "kind": "process",
           "categories": [
             "process-record"
+          ]
+        },
+        {
+          "id": "dotnet:Causa.Acceptance.Deterministic.VER010Tests.VER-010-O2",
+          "kind": "deterministic",
+          "categories": [
+            "integration"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "AR-001-O1",
+      "tests": [
+        {
+          "id": "praxis:independent-review",
+          "kind": "review",
+          "categories": [
+            "independent-acceptance"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "AR-001-O2",
+      "tests": [
+        {
+          "id": "praxis:independent-review",
+          "kind": "review",
+          "categories": [
+            "independent-acceptance"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "AR-002-O1",
+      "tests": [
+        {
+          "id": "praxis:independent-review",
+          "kind": "review",
+          "categories": [
+            "independent-acceptance"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "AR-002-O2",
+      "tests": [
+        {
+          "id": "praxis:independent-review",
+          "kind": "review",
+          "categories": [
+            "independent-acceptance"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "AR-003-O1",
+      "tests": [
+        {
+          "id": "praxis:independent-review",
+          "kind": "review",
+          "categories": [
+            "independent-acceptance"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "AR-003-O2",
+      "tests": [
+        {
+          "id": "praxis:independent-review",
+          "kind": "review",
+          "categories": [
+            "independent-acceptance"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "AR-004-O1",
+      "tests": [
+        {
+          "id": "praxis:independent-review",
+          "kind": "review",
+          "categories": [
+            "independent-acceptance"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "AR-004-O2",
+      "tests": [
+        {
+          "id": "praxis:independent-review",
+          "kind": "review",
+          "categories": [
+            "independent-acceptance"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "AR-006-O1",
+      "tests": [
+        {
+          "id": "praxis:independent-review",
+          "kind": "review",
+          "categories": [
+            "independent-acceptance"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "AR-006-O2",
+      "tests": [
+        {
+          "id": "praxis:independent-review",
+          "kind": "review",
+          "categories": [
+            "independent-acceptance"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "AR-007-O1",
+      "tests": [
+        {
+          "id": "praxis:independent-review",
+          "kind": "review",
+          "categories": [
+            "independent-acceptance"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "AR-007-O2",
+      "tests": [
+        {
+          "id": "praxis:independent-review",
+          "kind": "review",
+          "categories": [
+            "independent-acceptance"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "AR-009-O1",
+      "tests": [
+        {
+          "id": "praxis:independent-review",
+          "kind": "review",
+          "categories": [
+            "independent-acceptance"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "AR-009-O2",
+      "tests": [
+        {
+          "id": "praxis:independent-review",
+          "kind": "review",
+          "categories": [
+            "independent-acceptance"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "AR-010-O1",
+      "tests": [
+        {
+          "id": "praxis:independent-review",
+          "kind": "review",
+          "categories": [
+            "independent-acceptance"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "AR-010-O2",
+      "tests": [
+        {
+          "id": "praxis:independent-review",
+          "kind": "review",
+          "categories": [
+            "independent-acceptance"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "AR-011-O1",
+      "tests": [
+        {
+          "id": "praxis:independent-review",
+          "kind": "review",
+          "categories": [
+            "independent-acceptance"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "AR-011-O2",
+      "tests": [
+        {
+          "id": "praxis:independent-review",
+          "kind": "review",
+          "categories": [
+            "independent-acceptance"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "AR-013-O1",
+      "tests": [
+        {
+          "id": "praxis:independent-review",
+          "kind": "review",
+          "categories": [
+            "independent-acceptance"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "AR-013-O2",
+      "tests": [
+        {
+          "id": "praxis:independent-review",
+          "kind": "review",
+          "categories": [
+            "independent-acceptance"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "AR-014-O1",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Deterministic.AR014Tests.AR-014-O1",
+          "kind": "deterministic",
+          "categories": [
+            "security"
+          ]
+        },
+        {
+          "id": "praxis:independent-review",
+          "kind": "review",
+          "categories": [
+            "independent-acceptance"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "AR-014-O2",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Deterministic.AR014Tests.AR-014-O2",
+          "kind": "deterministic",
+          "categories": [
+            "security"
+          ]
+        },
+        {
+          "id": "praxis:independent-review",
+          "kind": "review",
+          "categories": [
+            "independent-acceptance"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "AR-018-O1",
+      "tests": [
+        {
+          "id": "praxis:independent-review",
+          "kind": "review",
+          "categories": [
+            "independent-acceptance"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "AR-018-O2",
+      "tests": [
+        {
+          "id": "praxis:independent-review",
+          "kind": "review",
+          "categories": [
+            "independent-acceptance"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "AR-019-O1",
+      "tests": [
+        {
+          "id": "praxis:independent-review",
+          "kind": "review",
+          "categories": [
+            "independent-acceptance"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "AR-019-O2",
+      "tests": [
+        {
+          "id": "praxis:independent-review",
+          "kind": "review",
+          "categories": [
+            "independent-acceptance"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "AR-019-O3",
+      "tests": [
+        {
+          "id": "praxis:independent-review",
+          "kind": "review",
+          "categories": [
+            "independent-acceptance"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "AR-019-O4",
+      "tests": [
+        {
+          "id": "praxis:independent-review",
+          "kind": "review",
+          "categories": [
+            "independent-acceptance"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "AR-020-O1",
+      "tests": [
+        {
+          "id": "praxis:independent-review",
+          "kind": "review",
+          "categories": [
+            "independent-acceptance"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "AR-020-O2",
+      "tests": [
+        {
+          "id": "praxis:independent-review",
+          "kind": "review",
+          "categories": [
+            "independent-acceptance"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "AR-020-O3",
+      "tests": [
+        {
+          "id": "praxis:independent-review",
+          "kind": "review",
+          "categories": [
+            "independent-acceptance"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "AR-022-O1",
+      "tests": [
+        {
+          "id": "praxis:independent-review",
+          "kind": "review",
+          "categories": [
+            "independent-acceptance"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "AR-022-O2",
+      "tests": [
+        {
+          "id": "praxis:independent-review",
+          "kind": "review",
+          "categories": [
+            "independent-acceptance"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "AR-022-O3",
+      "tests": [
+        {
+          "id": "praxis:independent-review",
+          "kind": "review",
+          "categories": [
+            "independent-acceptance"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "AR-023-O1",
+      "tests": [
+        {
+          "id": "praxis:independent-review",
+          "kind": "review",
+          "categories": [
+            "independent-acceptance"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "AR-023-O2",
+      "tests": [
+        {
+          "id": "praxis:independent-review",
+          "kind": "review",
+          "categories": [
+            "independent-acceptance"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "AR-023-O3",
+      "tests": [
+        {
+          "id": "praxis:independent-review",
+          "kind": "review",
+          "categories": [
+            "independent-acceptance"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "AR-023-O4",
+      "tests": [
+        {
+          "id": "praxis:independent-review",
+          "kind": "review",
+          "categories": [
+            "independent-acceptance"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "EXT-DATA-001-O1",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Live.EXTDATA001Tests.EXT-DATA-001-O1",
+          "kind": "live",
+          "categories": [
+            "integration",
+            "live-provider"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "EXT-DATA-001-O2",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Live.EXTDATA001Tests.EXT-DATA-001-O2",
+          "kind": "live",
+          "categories": [
+            "integration",
+            "live-provider"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "EXT-DATA-002-O1",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Live.EXTDATA002Tests.EXT-DATA-002-O1",
+          "kind": "live",
+          "categories": [
+            "integration",
+            "live-provider"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "EXT-DATA-002-O2",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Live.EXTDATA002Tests.EXT-DATA-002-O2",
+          "kind": "live",
+          "categories": [
+            "integration",
+            "live-provider"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "EXT-DATA-003-O1",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Live.EXTDATA003Tests.EXT-DATA-003-O1",
+          "kind": "live",
+          "categories": [
+            "integration",
+            "live-provider"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "EXT-DATA-003-O2",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Live.EXTDATA003Tests.EXT-DATA-003-O2",
+          "kind": "live",
+          "categories": [
+            "integration",
+            "live-provider"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "EXT-DATA-004-O1",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Live.EXTDATA004Tests.EXT-DATA-004-O1",
+          "kind": "live",
+          "categories": [
+            "integration",
+            "live-provider"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "EXT-DATA-004-O2",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Live.EXTDATA004Tests.EXT-DATA-004-O2",
+          "kind": "live",
+          "categories": [
+            "integration",
+            "live-provider"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "EXT-DATA-004-O3",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Live.EXTDATA004Tests.EXT-DATA-004-O3",
+          "kind": "live",
+          "categories": [
+            "integration",
+            "live-provider"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "EXT-DATA-004-O4",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Live.EXTDATA004Tests.EXT-DATA-004-O4",
+          "kind": "live",
+          "categories": [
+            "integration",
+            "live-provider"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "EXT-DATA-005-O1",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Live.EXTDATA005Tests.EXT-DATA-005-O1",
+          "kind": "live",
+          "categories": [
+            "integration",
+            "live-provider"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "EXT-DATA-005-O2",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Live.EXTDATA005Tests.EXT-DATA-005-O2",
+          "kind": "live",
+          "categories": [
+            "integration",
+            "live-provider"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "EXT-DATA-006-O1",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Live.EXTDATA006Tests.EXT-DATA-006-O1",
+          "kind": "live",
+          "categories": [
+            "integration",
+            "live-provider"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "EXT-DATA-006-O2",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Live.EXTDATA006Tests.EXT-DATA-006-O2",
+          "kind": "live",
+          "categories": [
+            "integration",
+            "live-provider"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "EXT-DATA-007-O1",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Live.EXTDATA007Tests.EXT-DATA-007-O1",
+          "kind": "live",
+          "categories": [
+            "integration",
+            "live-provider"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "EXT-DATA-007-O2",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Live.EXTDATA007Tests.EXT-DATA-007-O2",
+          "kind": "live",
+          "categories": [
+            "integration",
+            "live-provider"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "EXT-DATA-008-O1",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Live.EXTDATA008Tests.EXT-DATA-008-O1",
+          "kind": "live",
+          "categories": [
+            "integration",
+            "live-provider"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "EXT-DATA-008-O2",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Live.EXTDATA008Tests.EXT-DATA-008-O2",
+          "kind": "live",
+          "categories": [
+            "integration",
+            "live-provider"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "EXT-DATA-009-O1",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Live.EXTDATA009Tests.EXT-DATA-009-O1",
+          "kind": "live",
+          "categories": [
+            "integration",
+            "live-provider"
+          ]
+        },
+        {
+          "id": "praxis:independent-review",
+          "kind": "review",
+          "categories": [
+            "independent-acceptance"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "EXT-DATA-009-O2",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Live.EXTDATA009Tests.EXT-DATA-009-O2",
+          "kind": "live",
+          "categories": [
+            "integration",
+            "live-provider"
+          ]
+        },
+        {
+          "id": "praxis:independent-review",
+          "kind": "review",
+          "categories": [
+            "independent-acceptance"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "EXT-DATA-010-O1",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Live.EXTDATA010Tests.EXT-DATA-010-O1",
+          "kind": "live",
+          "categories": [
+            "integration",
+            "live-provider"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "EXT-DATA-010-O2",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Live.EXTDATA010Tests.EXT-DATA-010-O2",
+          "kind": "live",
+          "categories": [
+            "integration",
+            "live-provider"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "EXT-DATA-010-O3",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Live.EXTDATA010Tests.EXT-DATA-010-O3",
+          "kind": "live",
+          "categories": [
+            "integration",
+            "live-provider"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "EXT-DATA-011-O1",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Live.EXTDATA011Tests.EXT-DATA-011-O1",
+          "kind": "live",
+          "categories": [
+            "integration",
+            "live-provider"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "EXT-DATA-011-O2",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Live.EXTDATA011Tests.EXT-DATA-011-O2",
+          "kind": "live",
+          "categories": [
+            "integration",
+            "live-provider"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "EXT-DATA-012-O1",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Live.EXTDATA012Tests.EXT-DATA-012-O1",
+          "kind": "live",
+          "categories": [
+            "integration",
+            "live-provider"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "EXT-DATA-012-O2",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Live.EXTDATA012Tests.EXT-DATA-012-O2",
+          "kind": "live",
+          "categories": [
+            "integration",
+            "live-provider"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "EXT-DATA-012-O3",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Live.EXTDATA012Tests.EXT-DATA-012-O3",
+          "kind": "live",
+          "categories": [
+            "integration",
+            "live-provider"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "EXT-DATA-013-O1",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Live.EXTDATA013Tests.EXT-DATA-013-O1",
+          "kind": "live",
+          "categories": [
+            "integration",
+            "live-provider"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "EXT-DATA-013-O2",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Live.EXTDATA013Tests.EXT-DATA-013-O2",
+          "kind": "live",
+          "categories": [
+            "integration",
+            "live-provider"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "EXT-DATA-013-O3",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Live.EXTDATA013Tests.EXT-DATA-013-O3",
+          "kind": "live",
+          "categories": [
+            "integration",
+            "live-provider"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PF-001-O1",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Live.PF001Tests.PF-001-O1",
+          "kind": "live",
+          "categories": [
+            "integration",
+            "live-provider"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PF-001-O2",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Live.PF001Tests.PF-001-O2",
+          "kind": "live",
+          "categories": [
+            "integration",
+            "live-provider"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PF-001-O3",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Live.PF001Tests.PF-001-O3",
+          "kind": "live",
+          "categories": [
+            "integration",
+            "live-provider"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PF-002-O1",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Live.PF002Tests.PF-002-O1",
+          "kind": "live",
+          "categories": [
+            "integration",
+            "live-provider"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PF-002-O2",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Live.PF002Tests.PF-002-O2",
+          "kind": "live",
+          "categories": [
+            "integration",
+            "live-provider"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PF-003-O1",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Live.PF003Tests.PF-003-O1",
+          "kind": "live",
+          "categories": [
+            "integration",
+            "live-provider"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PF-003-O2",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Live.PF003Tests.PF-003-O2",
+          "kind": "live",
+          "categories": [
+            "integration",
+            "live-provider"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PF-003-O3",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Live.PF003Tests.PF-003-O3",
+          "kind": "live",
+          "categories": [
+            "integration",
+            "live-provider"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PF-003-O4",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Live.PF003Tests.PF-003-O4",
+          "kind": "live",
+          "categories": [
+            "integration",
+            "live-provider"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PF-004-O1",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Live.PF004Tests.PF-004-O1",
+          "kind": "live",
+          "categories": [
+            "integration",
+            "live-provider"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PF-004-O2",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Live.PF004Tests.PF-004-O2",
+          "kind": "live",
+          "categories": [
+            "integration",
+            "live-provider"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PF-004-O3",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Live.PF004Tests.PF-004-O3",
+          "kind": "live",
+          "categories": [
+            "integration",
+            "live-provider"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PF-005-O1",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Live.PF005Tests.PF-005-O1",
+          "kind": "live",
+          "categories": [
+            "integration",
+            "live-provider"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PF-005-O2",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Live.PF005Tests.PF-005-O2",
+          "kind": "live",
+          "categories": [
+            "integration",
+            "live-provider"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PF-006-O1",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Live.PF006Tests.PF-006-O1",
+          "kind": "live",
+          "categories": [
+            "integration",
+            "live-provider"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PF-006-O2",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Live.PF006Tests.PF-006-O2",
+          "kind": "live",
+          "categories": [
+            "integration",
+            "live-provider"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PF-007-O1",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Live.PF007Tests.PF-007-O1",
+          "kind": "live",
+          "categories": [
+            "integration",
+            "live-provider"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PF-007-O2",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Live.PF007Tests.PF-007-O2",
+          "kind": "live",
+          "categories": [
+            "integration",
+            "live-provider"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PF-008-O1",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Live.PF008Tests.PF-008-O1",
+          "kind": "live",
+          "categories": [
+            "integration",
+            "live-provider"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PF-008-O2",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Live.PF008Tests.PF-008-O2",
+          "kind": "live",
+          "categories": [
+            "integration",
+            "live-provider"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PF-009-O1",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Live.PF009Tests.PF-009-O1",
+          "kind": "live",
+          "categories": [
+            "integration",
+            "live-provider"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PF-009-O2",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Live.PF009Tests.PF-009-O2",
+          "kind": "live",
+          "categories": [
+            "integration",
+            "live-provider"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PF-009-O3",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Live.PF009Tests.PF-009-O3",
+          "kind": "live",
+          "categories": [
+            "integration",
+            "live-provider"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PF-011-O1",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Live.PF011Tests.PF-011-O1",
+          "kind": "live",
+          "categories": [
+            "integration",
+            "live-provider"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PF-011-O2",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Live.PF011Tests.PF-011-O2",
+          "kind": "live",
+          "categories": [
+            "integration",
+            "live-provider"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PF-011-O3",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Live.PF011Tests.PF-011-O3",
+          "kind": "live",
+          "categories": [
+            "integration",
+            "live-provider"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PF-011-O4",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Live.PF011Tests.PF-011-O4",
+          "kind": "live",
+          "categories": [
+            "integration",
+            "live-provider"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PF-011-O5",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Live.PF011Tests.PF-011-O5",
+          "kind": "live",
+          "categories": [
+            "integration",
+            "live-provider"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PF-011-O6",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Live.PF011Tests.PF-011-O6",
+          "kind": "live",
+          "categories": [
+            "integration",
+            "live-provider"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PF-012-O1",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Live.PF012Tests.PF-012-O1",
+          "kind": "live",
+          "categories": [
+            "integration",
+            "live-provider"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PF-012-O2",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Live.PF012Tests.PF-012-O2",
+          "kind": "live",
+          "categories": [
+            "integration",
+            "live-provider"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PF-012-O3",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Live.PF012Tests.PF-012-O3",
+          "kind": "live",
+          "categories": [
+            "integration",
+            "live-provider"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PF-013-O1",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Live.PF013Tests.PF-013-O1",
+          "kind": "live",
+          "categories": [
+            "integration",
+            "live-provider"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PF-013-O2",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Live.PF013Tests.PF-013-O2",
+          "kind": "live",
+          "categories": [
+            "integration",
+            "live-provider"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PF-013-O3",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Live.PF013Tests.PF-013-O3",
+          "kind": "live",
+          "categories": [
+            "integration",
+            "live-provider"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PF-013-O4",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Live.PF013Tests.PF-013-O4",
+          "kind": "live",
+          "categories": [
+            "integration",
+            "live-provider"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PF-014-O1",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Live.PF014Tests.PF-014-O1",
+          "kind": "live",
+          "categories": [
+            "integration",
+            "live-provider"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PF-014-O2",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Live.PF014Tests.PF-014-O2",
+          "kind": "live",
+          "categories": [
+            "integration",
+            "live-provider"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PF-014-O3",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Live.PF014Tests.PF-014-O3",
+          "kind": "live",
+          "categories": [
+            "integration",
+            "live-provider"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PF-014-O4",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Live.PF014Tests.PF-014-O4",
+          "kind": "live",
+          "categories": [
+            "integration",
+            "live-provider"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PF-015-O1",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Live.PF015Tests.PF-015-O1",
+          "kind": "live",
+          "categories": [
+            "integration",
+            "live-provider",
+            "security"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PF-015-O2",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Live.PF015Tests.PF-015-O2",
+          "kind": "live",
+          "categories": [
+            "integration",
+            "live-provider",
+            "security"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PF-015-O3",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Live.PF015Tests.PF-015-O3",
+          "kind": "live",
+          "categories": [
+            "integration",
+            "live-provider",
+            "security"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PF-015-O4",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Live.PF015Tests.PF-015-O4",
+          "kind": "live",
+          "categories": [
+            "integration",
+            "live-provider",
+            "security"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PF-016-O1",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Live.PF016Tests.PF-016-O1",
+          "kind": "live",
+          "categories": [
+            "integration",
+            "live-provider"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PF-016-O2",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Live.PF016Tests.PF-016-O2",
+          "kind": "live",
+          "categories": [
+            "integration",
+            "live-provider"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PF-017-O1",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Live.PF017Tests.PF-017-O1",
+          "kind": "live",
+          "categories": [
+            "integration",
+            "live-provider"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PF-017-O2",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Live.PF017Tests.PF-017-O2",
+          "kind": "live",
+          "categories": [
+            "integration",
+            "live-provider"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PF-018-O1",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Live.PF018Tests.PF-018-O1",
+          "kind": "live",
+          "categories": [
+            "integration",
+            "live-provider"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PF-018-O2",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Live.PF018Tests.PF-018-O2",
+          "kind": "live",
+          "categories": [
+            "integration",
+            "live-provider"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PF-019-O2",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Live.PF019Tests.PF-019-O2",
+          "kind": "live",
+          "categories": [
+            "integration",
+            "live-provider"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PF-020-O1",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Live.PF020Tests.PF-020-O1",
+          "kind": "live",
+          "categories": [
+            "integration",
+            "live-provider"
+          ]
+        },
+        {
+          "id": "praxis:independent-review",
+          "kind": "review",
+          "categories": [
+            "independent-acceptance"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PF-020-O2",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Live.PF020Tests.PF-020-O2",
+          "kind": "live",
+          "categories": [
+            "integration",
+            "live-provider"
+          ]
+        },
+        {
+          "id": "praxis:independent-review",
+          "kind": "review",
+          "categories": [
+            "independent-acceptance"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-001-O1",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-001.spec.js > UI-001-O1 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-001-O2",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-001.spec.js > UI-001-O2 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-001-O3",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-001.spec.js > UI-001-O3 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-001-O4",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-001.spec.js > UI-001-O4 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-001-O5",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-001.spec.js > UI-001-O5 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-001-O6",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-001.spec.js > UI-001-O6 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-003-O1",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-003.spec.js > UI-003-O1 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-003-O2",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-003.spec.js > UI-003-O2 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-003-O3",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-003.spec.js > UI-003-O3 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-003-O4",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-003.spec.js > UI-003-O4 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-004-O1",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-004.spec.js > UI-004-O1 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-004-O2",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-004.spec.js > UI-004-O2 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-004-O3",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-004.spec.js > UI-004-O3 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-004-O4",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-004.spec.js > UI-004-O4 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-004-O5",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-004.spec.js > UI-004-O5 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-004-O6",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-004.spec.js > UI-004-O6 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-005-O1",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-005.spec.js > UI-005-O1 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-005-O2",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-005.spec.js > UI-005-O2 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-005-O3",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-005.spec.js > UI-005-O3 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-005-O4",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-005.spec.js > UI-005-O4 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-006-O1",
+      "tests": [
+        {
+          "id": "playwright:live/UI-006.spec.js > UI-006-O1 [chromium]",
+          "kind": "live",
+          "categories": [
+            "integration",
+            "browser",
+            "live-provider",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-006-O2",
+      "tests": [
+        {
+          "id": "playwright:live/UI-006.spec.js > UI-006-O2 [chromium]",
+          "kind": "live",
+          "categories": [
+            "integration",
+            "browser",
+            "live-provider",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-006-O3",
+      "tests": [
+        {
+          "id": "playwright:live/UI-006.spec.js > UI-006-O3 [chromium]",
+          "kind": "live",
+          "categories": [
+            "integration",
+            "browser",
+            "live-provider",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-006-O4",
+      "tests": [
+        {
+          "id": "playwright:live/UI-006.spec.js > UI-006-O4 [chromium]",
+          "kind": "live",
+          "categories": [
+            "integration",
+            "browser",
+            "live-provider",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-006-O5",
+      "tests": [
+        {
+          "id": "playwright:live/UI-006.spec.js > UI-006-O5 [chromium]",
+          "kind": "live",
+          "categories": [
+            "integration",
+            "browser",
+            "live-provider",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-006-O6",
+      "tests": [
+        {
+          "id": "playwright:live/UI-006.spec.js > UI-006-O6 [chromium]",
+          "kind": "live",
+          "categories": [
+            "integration",
+            "browser",
+            "live-provider",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-010-O1",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-010.spec.js > UI-010-O1 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-010-O2",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-010.spec.js > UI-010-O2 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-010-O3",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-010.spec.js > UI-010-O3 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-010-O4",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-010.spec.js > UI-010-O4 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-010-O5",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-010.spec.js > UI-010-O5 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-011-O1",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-011.spec.js > UI-011-O1 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-011-O2",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-011.spec.js > UI-011-O2 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-011-O3",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-011.spec.js > UI-011-O3 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-011-O4",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-011.spec.js > UI-011-O4 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-011-O5",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-011.spec.js > UI-011-O5 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-013-O1",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-013.spec.js > UI-013-O1 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-013-O2",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-013.spec.js > UI-013-O2 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-013-O3",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-013.spec.js > UI-013-O3 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-013-O4",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-013.spec.js > UI-013-O4 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-014-O1",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-014.spec.js > UI-014-O1 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-014-O2",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-014.spec.js > UI-014-O2 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-014-O3",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-014.spec.js > UI-014-O3 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-015-O1",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-015.spec.js > UI-015-O1 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        },
+        {
+          "id": "praxis:independent-review",
+          "kind": "review",
+          "categories": [
+            "independent-acceptance"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-015-O2",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-015.spec.js > UI-015-O2 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        },
+        {
+          "id": "praxis:independent-review",
+          "kind": "review",
+          "categories": [
+            "independent-acceptance"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-015-O3",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-015.spec.js > UI-015-O3 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        },
+        {
+          "id": "praxis:independent-review",
+          "kind": "review",
+          "categories": [
+            "independent-acceptance"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-015-O4",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-015.spec.js > UI-015-O4 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        },
+        {
+          "id": "praxis:independent-review",
+          "kind": "review",
+          "categories": [
+            "independent-acceptance"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-016-O1",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-016.spec.js > UI-016-O1 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-016-O2",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-016.spec.js > UI-016-O2 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-016-O3",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-016.spec.js > UI-016-O3 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-016-O4",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-016.spec.js > UI-016-O4 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-016-O5",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-016.spec.js > UI-016-O5 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-016-O6",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-016.spec.js > UI-016-O6 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-016-O7",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-016.spec.js > UI-016-O7 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-016-O8",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-016.spec.js > UI-016-O8 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-016-O9",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-016.spec.js > UI-016-O9 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-016-O10",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-016.spec.js > UI-016-O10 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-016-O11",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-016.spec.js > UI-016-O11 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-016-O12",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-016.spec.js > UI-016-O12 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-016-O13",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-016.spec.js > UI-016-O13 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-016-O14",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-016.spec.js > UI-016-O14 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-016-O15",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-016.spec.js > UI-016-O15 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-016-O16",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-016.spec.js > UI-016-O16 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-016-O17",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-016.spec.js > UI-016-O17 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-017-O1",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-017.spec.js > UI-017-O1 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-017-O2",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-017.spec.js > UI-017-O2 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-017-O3",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-017.spec.js > UI-017-O3 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-017-O4",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-017.spec.js > UI-017-O4 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-017-O5",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-017.spec.js > UI-017-O5 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-018-O1",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-018.spec.js > UI-018-O1 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-018-O2",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-018.spec.js > UI-018-O2 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-018-O3",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-018.spec.js > UI-018-O3 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-018-O4",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-018.spec.js > UI-018-O4 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-018-O5",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-018.spec.js > UI-018-O5 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-018-O6",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-018.spec.js > UI-018-O6 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-019-O1",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-019.spec.js > UI-019-O1 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-019-O2",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-019.spec.js > UI-019-O2 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-019-O3",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-019.spec.js > UI-019-O3 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-019-O4",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-019.spec.js > UI-019-O4 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-019-O5",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-019.spec.js > UI-019-O5 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-019-O6",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-019.spec.js > UI-019-O6 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-020-O1",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-020.spec.js > UI-020-O1 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-020-O2",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-020.spec.js > UI-020-O2 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-020-O3",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-020.spec.js > UI-020-O3 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-020-O4",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-020.spec.js > UI-020-O4 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-021-O1",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-021.spec.js > UI-021-O1 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-021-O2",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-021.spec.js > UI-021-O2 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-022-O1",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-022.spec.js > UI-022-O1 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-022-O2",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-022.spec.js > UI-022-O2 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-022-O3",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-022.spec.js > UI-022-O3 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-022-O4",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-022.spec.js > UI-022-O4 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-022-O5",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-022.spec.js > UI-022-O5 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-022-O6",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-022.spec.js > UI-022-O6 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-023-O1",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-023.spec.js > UI-023-O1 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-023-O2",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-023.spec.js > UI-023-O2 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-023-O3",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-023.spec.js > UI-023-O3 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-023-O4",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-023.spec.js > UI-023-O4 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-024-O1",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-024.spec.js > UI-024-O1 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-024-O2",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-024.spec.js > UI-024-O2 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-024-O3",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-024.spec.js > UI-024-O3 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-024-O4",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-024.spec.js > UI-024-O4 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-024-O5",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-024.spec.js > UI-024-O5 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-024-O6",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-024.spec.js > UI-024-O6 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-025-O1",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-025.spec.js > UI-025-O1 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-025-O2",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-025.spec.js > UI-025-O2 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-025-O3",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-025.spec.js > UI-025-O3 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-025-O4",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-025.spec.js > UI-025-O4 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-026-O1",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-026.spec.js > UI-026-O1 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-026-O2",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-026.spec.js > UI-026-O2 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-026-O3",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-026.spec.js > UI-026-O3 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-026-O4",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-026.spec.js > UI-026-O4 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-029-O1",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-029.spec.js > UI-029-O1 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-029-O2",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-029.spec.js > UI-029-O2 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-029-O3",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-029.spec.js > UI-029-O3 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-029-O4",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-029.spec.js > UI-029-O4 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-030-O1",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-030.spec.js > UI-030-O1 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-030-O2",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-030.spec.js > UI-030-O2 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-030-O4",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-030.spec.js > UI-030-O4 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-031-O1",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-031.spec.js > UI-031-O1 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-031-O2",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-031.spec.js > UI-031-O2 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-031-O3",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-031.spec.js > UI-031-O3 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-031-O4",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-031.spec.js > UI-031-O4 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-031-O5",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-031.spec.js > UI-031-O5 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-032-O1",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-032.spec.js > UI-032-O1 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-032-O2",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-032.spec.js > UI-032-O2 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-033-O1",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-033.spec.js > UI-033-O1 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-033-O2",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-033.spec.js > UI-033-O2 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-034-O1",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-034.spec.js > UI-034-O1 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-034-O2",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-034.spec.js > UI-034-O2 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-034-O3",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-034.spec.js > UI-034-O3 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-038-O1",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-038.spec.js > UI-038-O1 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-038-O2",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-038.spec.js > UI-038-O2 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-039-O1",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-039.spec.js > UI-039-O1 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-039-O2",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-039.spec.js > UI-039-O2 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-040-O1",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-040.spec.js > UI-040-O1 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        },
+        {
+          "id": "praxis:independent-review",
+          "kind": "review",
+          "categories": [
+            "independent-acceptance"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "VER-003-O3",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Deterministic.VER003Tests.VER-003-O3",
+          "kind": "deterministic",
+          "categories": [
+            "integration"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "VER-004-O1",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Deterministic.VER004Tests.VER-004-O1",
+          "kind": "deterministic",
+          "categories": [
+            "integration"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "VER-004-O2",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Deterministic.VER004Tests.VER-004-O2",
+          "kind": "deterministic",
+          "categories": [
+            "integration"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "VER-005-O1",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Deterministic.VER005Tests.VER-005-O1",
+          "kind": "deterministic",
+          "categories": [
+            "integration"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "VER-005-O2",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Deterministic.VER005Tests.VER-005-O2",
+          "kind": "deterministic",
+          "categories": [
+            "integration"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "VER-006-O1",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Deterministic.VER006Tests.VER-006-O1",
+          "kind": "deterministic",
+          "categories": [
+            "integration"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "VER-006-O2",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Deterministic.VER006Tests.VER-006-O2",
+          "kind": "deterministic",
+          "categories": [
+            "integration"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "VER-006-O3",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Deterministic.VER006Tests.VER-006-O3",
+          "kind": "deterministic",
+          "categories": [
+            "integration"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "VER-007-O1",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Deterministic.VER007Tests.VER-007-O1",
+          "kind": "deterministic",
+          "categories": [
+            "integration"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "VER-007-O2",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Deterministic.VER007Tests.VER-007-O2",
+          "kind": "deterministic",
+          "categories": [
+            "integration"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "VER-008-O1",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Deterministic.VER008Tests.VER-008-O1",
+          "kind": "deterministic",
+          "categories": [
+            "integration"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "VER-008-O2",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Deterministic.VER008Tests.VER-008-O2",
+          "kind": "deterministic",
+          "categories": [
+            "integration"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "WDL-001-O1",
+      "tests": [
+        {
+          "id": "playwright:acceptance/WDL-001.spec.js > WDL-001-O1 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "WDL-001-O2",
+      "tests": [
+        {
+          "id": "playwright:acceptance/WDL-001.spec.js > WDL-001-O2 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "WDL-002-O1",
+      "tests": [
+        {
+          "id": "playwright:acceptance/WDL-002.spec.js > WDL-002-O1 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "WDL-002-O2",
+      "tests": [
+        {
+          "id": "playwright:acceptance/WDL-002.spec.js > WDL-002-O2 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "WDL-003-O1",
+      "tests": [
+        {
+          "id": "playwright:acceptance/WDL-003.spec.js > WDL-003-O1 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "WDL-003-O2",
+      "tests": [
+        {
+          "id": "playwright:acceptance/WDL-003.spec.js > WDL-003-O2 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "WDL-004-O1",
+      "tests": [
+        {
+          "id": "playwright:acceptance/WDL-004.spec.js > WDL-004-O1 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "WDL-004-O2",
+      "tests": [
+        {
+          "id": "playwright:acceptance/WDL-004.spec.js > WDL-004-O2 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "WDL-005-O1",
+      "tests": [
+        {
+          "id": "playwright:acceptance/WDL-005.spec.js > WDL-005-O1 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "WDL-005-O2",
+      "tests": [
+        {
+          "id": "playwright:acceptance/WDL-005.spec.js > WDL-005-O2 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "WDL-006-O1",
+      "tests": [
+        {
+          "id": "playwright:acceptance/WDL-006.spec.js > WDL-006-O1 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "WDL-006-O2",
+      "tests": [
+        {
+          "id": "playwright:acceptance/WDL-006.spec.js > WDL-006-O2 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "WDL-007-O1",
+      "tests": [
+        {
+          "id": "playwright:acceptance/WDL-007.spec.js > WDL-007-O1 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "WDL-007-O2",
+      "tests": [
+        {
+          "id": "playwright:acceptance/WDL-007.spec.js > WDL-007-O2 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "WDL-008-O1",
+      "tests": [
+        {
+          "id": "playwright:acceptance/WDL-008.spec.js > WDL-008-O1 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "WDL-008-O2",
+      "tests": [
+        {
+          "id": "playwright:acceptance/WDL-008.spec.js > WDL-008-O2 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "WDL-009-O1",
+      "tests": [
+        {
+          "id": "playwright:acceptance/WDL-009.spec.js > WDL-009-O1 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "WDL-009-O2",
+      "tests": [
+        {
+          "id": "playwright:acceptance/WDL-009.spec.js > WDL-009-O2 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "WDL-010-O1",
+      "tests": [
+        {
+          "id": "playwright:acceptance/WDL-010.spec.js > WDL-010-O1 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "WDL-010-O2",
+      "tests": [
+        {
+          "id": "playwright:acceptance/WDL-010.spec.js > WDL-010-O2 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "WDL-011-O1",
+      "tests": [
+        {
+          "id": "playwright:acceptance/WDL-011.spec.js > WDL-011-O1 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "WDL-011-O2",
+      "tests": [
+        {
+          "id": "playwright:acceptance/WDL-011.spec.js > WDL-011-O2 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "WDL-012-O1",
+      "tests": [
+        {
+          "id": "playwright:acceptance/WDL-012.spec.js > WDL-012-O1 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "WDL-012-O2",
+      "tests": [
+        {
+          "id": "playwright:acceptance/WDL-012.spec.js > WDL-012-O2 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "WDL-014-O1",
+      "tests": [
+        {
+          "id": "playwright:acceptance/WDL-014.spec.js > WDL-014-O1 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "WDL-014-O2",
+      "tests": [
+        {
+          "id": "playwright:acceptance/WDL-014.spec.js > WDL-014-O2 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "WDL-015-O1",
+      "tests": [
+        {
+          "id": "playwright:acceptance/WDL-015.spec.js > WDL-015-O1 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "WDL-015-O2",
+      "tests": [
+        {
+          "id": "playwright:acceptance/WDL-015.spec.js > WDL-015-O2 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
           ]
         }
       ]
