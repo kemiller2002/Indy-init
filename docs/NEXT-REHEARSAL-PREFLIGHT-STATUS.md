@@ -41,6 +41,7 @@ No new rehearsal has started. CHT-001 is recorded in the legacy Praxis intake at
 | Independent workspace creation and isolation | VERIFIED ON FEATURE BRANCH | Two-workspace append isolation; template and canonical-source byte checks |
 | Conditor ordered fail-closed initialization | IMPLEMENTED ON FEATURE BRANCH, NOT MERGED | `conditor` branch `codex/causa-rehearsal-preflight-v2`, commit `822f0ca`; Praxis work item `WI-0062` complete |
 | GitHub publication, remote readback and application load | VERIFIED ON DISPOSABLE BRANCH | `causa-data` branch `codex/causa-workspace-e2e-20261028`, `rehearsal-900001`, commit `c3101ec32521482b5a939fd43dde0e8676fb4d93` |
+| Four-case combined publication and frozen-application compatibility | VERIFIED ON DISPOSABLE BRANCH | `causa-data` branch `codex/causa-demonstration-e2e-20261028`, `rehearsal-900003`, commit `8d52ec9e02200977d4621ef4bf1aa429c6c788db`; READY receipt and frozen Rehearsal 5 provider harness |
 | CHT-001 / ELB-001 Praxis derivation | NOT RUN | Intake documents exist; Indy Init has no Praxis installation |
 | Event workspace selection | NOT RUN | Operator must select the next rehearsal id after merge/release |
 | Timed execution | NOT RUN | READY initialization is preparation only; explicit start remains required |

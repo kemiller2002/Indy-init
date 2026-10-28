@@ -45,6 +45,7 @@ On 2026-10-28 the feature implementation produced:
 - Causa Data branch `codex/immutable-historical-rehearsal-workspaces`, commits `2c935df`, `089f29f` and `cfd761d` for the deterministic everyday investigation, combined canonical source and immutable templates.
 - Conditor branch `codex/causa-rehearsal-preflight-v2`, commits `e77bfd1` and `822f0ca`, including explicit selected-template identity and four-investigation orchestration tests.
 - Causa's 32-test F# suite and 53 canonical historical-catalog validations passed before this intake was recorded.
+- Disposable branch `codex/causa-demonstration-e2e-20261028` published `rehearsal-900003` at commit `8d52ec9e02200977d4621ef4bf1aa429c6c788db`; Conditor independently read it back and produced a four-investigation READY receipt. A scratch harness using the frozen Rehearsal 5 provider loaded all four cases and proved a supported write changed only the selected workspace.
 
 These are implementation and local validation evidence only. They do not claim merge, release, a selected event workspace, a READY event receipt or the start of timed execution.
 
