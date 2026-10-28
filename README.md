@@ -103,6 +103,7 @@ See [Hackathon Boundaries](docs/HACKATHON-BOUNDARIES.md).
 - [Requirements](docs/REQUIREMENTS.md)
 - [Rehearsal 3 Results](docs/REHEARSAL-003-RESULTS.md) (outcome, reusable designs, lessons; machine-readable summary linked)
 - [Rehearsal 4 Results](docs/REHEARSAL-004-RESULTS.md) (computed NOT ACCEPTED; key facts, reusable designs, lessons; verdict and ledger linked)
+- [Rehearsal 5 Results](docs/REHEARSAL-005-RESULTS.md) (computed INCOMPLETE, NOT ACCEPTED: G0–G7 pass, 0 FAIL, 49 obligations without proving tests; findings AR-027..AR-035)
 - [Verification Plan Consumer Contract](docs/VERIFICATION-PLAN-CONTRACT.md) (`requirements-compiled/v1/verification-plan.json`, schema `indy-init.verification-plan/1`)
 - [Rehearsal Derivation Policy](docs/REHEARSAL-DERIVATION-POLICY.md) and the [Causa requirements baseline](requirements/README.md)
 - [Architecture](docs/ARCHITECTURE.md)
