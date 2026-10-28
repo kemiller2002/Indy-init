@@ -1,0 +1,1040 @@
+ECHELON FOUNDRY
+
+INDY INIT REHEARSAL 6
+
+Owner Decisions, Acceptance Scope, and Preflight Resolution
+
+Owner: kemiller2002
+Rehearsal: 006
+Application: Causa
+Execution: Preflight only
+Timed rehearsal: Not authorized
+
+Primary repository
+
+kemiller2002/Indy-init
+
+Supporting repositories
+
+* kemiller2002/causa-data
+* kemiller2002/causa
+* kemiller2002/conditor
+* kemiller2002/percepta
+* kemiller2002/praxis
+* kemiller2002/ordo
+* kemiller2002/dokimos
+* kemiller2002/indy-init-rehearsal-005
+* kemiller2002/indy-init-rehearsal-006
+
+⸻
+
+1. Mission
+
+Resolve all outstanding owner decisions identified during Rehearsal 6 preflight.
+
+The objective is to eliminate ambiguity before timed execution begins.
+
+Every decision must be:
+
+1. Presented to the owner.
+2. Explicitly answered.
+3. Recorded with provenance.
+4. Evaluated against the frozen requirements.
+5. Applied through the approved change-control process.
+6. Independently reviewed where required.
+7. Reflected in the verification plan.
+8. Reflected in the preflight verdict.
+
+The agent must not make owner-controlled decisions.
+
+Recommendations are permitted.
+
+Assumed approvals are prohibited.
+
+Do not start Rehearsal 6.
+
+⸻
+
+2. Operating Principles
+
+Follow the Echelon Foundry engineering conventions.
+
+Use F# for new executable tooling.
+
+Do not create GitHub Issues.
+
+Use the established Praxis requirements intake directories.
+
+Do not modify completed Rehearsal 5 evidence.
+
+Do not overwrite frozen requirements or verification plans.
+
+Do not invent approval records.
+
+Do not represent an agent’s recommendation as an owner decision.
+
+Do not use a decision record as proof that an application requirement has passed.
+
+Do not silently exclude acceptance obligations.
+
+Do not automatically merge pull requests.
+
+Preserve the distinction between:
+
+* Owner authorization.
+* Engineering recommendations.
+* Scope changes.
+* Implementation.
+* Verification.
+* Acceptance.
+
+⸻
+
+3. Inspect the Current State
+
+Before making changes, inspect the following.
+
+Indy Init
+
+Repository:
+
+kemiller2002/Indy-init
+
+Read:
+
+docs/rehearsal-006/R6-OWNER-DECISIONS-SCRIPT.md
+docs/rehearsal-006/PREFLIGHT.md
+docs/rehearsal-006/preflight.json
+docs/REHEARSAL-005-RESULTS.md
+docs/AGENT-RELIABILITY-REQUIREMENTS.md
+
+Inspect the applicable:
+
+* Requirements baseline.
+* Verification plan.
+* Acceptance process.
+* Rehearsal 5 implementation audit.
+* Rehearsal 6 kickoff configuration.
+* Owner-decision records.
+* Existing pull requests.
+
+The owner-decisions script currently exists on:
+
+claude/echelon-speed-optimization-vtqjg4
+
+Use the actual current branch and commit SHA.
+
+Do not assume it has been merged into main.
+
+Supporting repositories
+
+Inspect only the portions relevant to the outstanding decisions.
+
+Avoid broad repository exploration.
+
+Record the source commit SHA for each inspected contract.
+
+⸻
+
+4. Existing Owner Decisions
+
+The current owner-decisions script records the following decisions dated October 28, 2026:
+
+1. The four-investigation requirement was waived.
+2. Rehearsal 6 would use the published historical-v1 workspace.
+3. CI and deployment setup were moved from preflight into kickoff.
+4. The approved engineering stack is echelon-current 1.32.0.
+5. Arca 0.6.0 was adopted with its license change.
+6. Chrona remains on 1.31.0.
+
+Treat these as previously recorded decisions, subject to verification of their actual provenance.
+
+Do not silently reverse them.
+
+Do not ask the owner to reconfirm decisions that are not in conflict.
+
+However, the lightbulb demonstration introduces a potential conflict with the earlier dataset waiver.
+
+That conflict requires an explicit new owner decision.
+
+⸻
+
+5. Decision Collection Strategy
+
+Present all outstanding owner decisions together.
+
+Do not conduct seven separate conversations unless the owner requests that format.
+
+For each decision:
+
+* Explain the issue.
+* Identify the affected requirements.
+* Present the available options.
+* State the engineering recommendation.
+* Explain the consequence of each option.
+* Ask the owner to choose.
+
+The owner may accept the recommendation, select another option, or request changes.
+
+Do not interpret silence as approval.
+
+Do not infer approval from earlier unrelated discussions.
+
+Collect the complete decision set before modifying the frozen verification scope.
+
+This minimizes repeated compilation, validation, and review.
+
+⸻
+
+6. Decision Q1: GitHub Authentication and Permissions
+
+Decision ID: DEC-R6-001
+
+Background
+
+Earlier decision DEC-025 established:
+
+* No anonymous application mode.
+* GitHub permission fields are advisory.
+
+This conflicts with portions of:
+
+* PF-015-O1.
+* PF-015-O2.
+* EXT-DATA-005-O1.
+
+Option A: Preserve DEC-025
+
+Continue requiring authentication for catalog access.
+
+Treat repository permission fields as advisory.
+
+Propose authorized scope changes for conflicting obligations.
+
+Option B: Revise DEC-025
+
+Support anonymous read-only access to public catalogs where permitted.
+
+Require authenticated access for protected data and writes.
+
+Implement actual repository and branch permission checks where supported by the provider.
+
+Engineering recommendation
+
+Recommend B.
+
+Separate read authorization from write authorization.
+
+Publicly readable investigation catalogs should not require unnecessary credentials.
+
+Writes must require appropriate authentication and authorization.
+
+Do not infer write permission merely from successful reads.
+
+Do not rely exclusively on advisory permission metadata.
+
+Required safeguards
+
+* Never expose credentials.
+* Never write tokens to investigation records.
+* Never grant write permissions implicitly.
+* Validate repository and branch access.
+* Validate paths and manifests.
+* Preserve schema and history validation.
+* Record permission failures accurately.
+
+Owner action
+
+Ask the owner to select A or B.
+
+Do not apply the recommendation without approval.
+
+⸻
+
+7. Decision Q2: Amber Indicator Contrast
+
+Decision ID: DEC-R6-002
+
+Background
+
+UI-016-O11 requires WCAG AA contrast for applicable text and non-text indicators.
+
+Rehearsal 5’s amber borders did not meet the specified 3:1 non-text contrast threshold.
+
+Option A
+
+Retain the applicable 3:1 contrast requirement.
+
+Adjust the color or indicator treatment to satisfy it.
+
+Option B
+
+Treat the affected amber indicators as outside the applicable non-text indicator requirement.
+
+Engineering recommendation
+
+Recommend A.
+
+Accessible indicators should remain accessible without relying on an exemption.
+
+Possible implementations include:
+
+* Darker amber.
+* Stronger borders.
+* Additional shapes.
+* Icons.
+* Text labels.
+
+Use actual contrast measurements.
+
+Do not assume that adding adjacent text automatically exempts a graphical indicator from applicable requirements.
+
+Owner action
+
+Ask the owner to select A or B.
+
+⸻
+
+8. Decision Q3: Role and Access Controls
+
+Decision ID: DEC-R6-003
+
+Background
+
+UI-031-O5 requires role/access controls for sensitive operational information and protection of credentials.
+
+Causa is currently designed as a single-user browser application.
+
+Option A
+
+Declare application-level role management not applicable to the approved single-user scope.
+
+Continue enforcing:
+
+* Credential protection.
+* Repository authorization.
+* Provider permissions.
+* Data isolation.
+* Secure handling of operational information.
+
+Option B
+
+Require a full application-level role model.
+
+Implement and verify the additional roles and permissions.
+
+Engineering recommendation
+
+Recommend A, subject to the actual application scope.
+
+Do not invent a multi-user authorization system without a demonstrated requirement.
+
+However, a single-user application is not exempt from authentication, authorization, or credential protection.
+
+Any scope change must preserve those obligations.
+
+Owner action
+
+Ask the owner to select A or B.
+
+⸻
+
+9. Decision Q4: Rehearsal 3 Verdict Semantics
+
+Decision ID: DEC-R6-004
+
+Background
+
+AR-019-O3 references a specific BLOCKED verdict for the original Rehearsal 3.
+
+The current verifier may produce INVALID or FAIL instead.
+
+Option A
+
+Accept any authoritative non-accepting verdict as satisfying the relevant non-acceptance assertion, while preserving its exact diagnostic classification.
+
+Option B
+
+Require the literal BLOCKED verdict.
+
+Modify the verifier or contract as necessary.
+
+Engineering recommendation
+
+Recommend A, with explicit semantics.
+
+INVALID, FAIL, and BLOCKED must remain distinct outcomes.
+
+Do not collapse them into a single result in reports.
+
+A scope change must explain why the revised assertion preserves the underlying safety requirement.
+
+Do not weaken any separate requirement that mandates a particular verdict category.
+
+Owner action
+
+Ask the owner to select A or B.
+
+⸻
+
+10. Decision Q5: Corrective Actions AR-027 Through AR-035
+
+Decision ID: DEC-R6-005
+
+Background
+
+The following corrective-action requirements were introduced after the previous requirements baseline was frozen:
+
+Requirement	Priority	Purpose
+AR-027	P0	Independent requirements derivation
+AR-028	P0	Isolated local verification
+AR-029	P0	WebAssembly route startup verification
+AR-030	P0	Production test-hook exclusion
+AR-031	P0	Owner-controlled screen scope
+AR-032	P1	Complete release dependency set
+AR-033	P1	Credential and variable readiness
+AR-034	P0	Early adversarial review
+AR-035	P0	Multi-writer persistence verification
+
+Option A
+
+Treat these as engineering practices.
+
+Do not add them to scored acceptance.
+
+Option B
+
+Add the requirements to a new versioned baseline and verification plan.
+
+Bind the applicable obligations.
+
+Run plan-readiness and verification-system tests.
+
+Freeze the revised baseline.
+
+Option C
+
+Add only an owner-selected subset.
+
+Engineering recommendation
+
+Recommend B.
+
+These corrective actions address defects and verification gaps observed in previous rehearsals.
+
+If we want to measure whether the engineering system has improved, the corrective actions should be part of the measured contract.
+
+Preserve their approved priority levels.
+
+Do not silently promote P1 requirements to P0.
+
+Required implementation
+
+If B is selected:
+
+1. Create a new baseline version.
+2. Preserve the previous baseline.
+3. Create a new verification-plan version.
+4. Define obligations and evidence producers.
+5. Apply valid bindings.
+6. Run plan-readiness.
+7. Run the relevant offline verification suite.
+8. Independently review the new scope.
+9. Update kickoff references.
+10. Record the resulting digests.
+
+Do not modify frozen baseline files in place.
+
+Owner action
+
+Ask the owner to select A, B, or C.
+
+If C is selected, request the exact requirement IDs.
+
+⸻
+
+11. Decision Q6: Percepta Screen-Contract Scope
+
+Decision ID: DEC-R6-006
+
+Background
+
+The Rehearsal 6 bootstrap uses generic Indy Init Percepta screen contracts.
+
+Some may not apply to Causa.
+
+Rehearsal 5 excluded S16 through an owner decision.
+
+Do not automatically carry that exclusion into Rehearsal 6.
+
+Required preparation
+
+Before requesting the decision:
+
+1. Inspect the generic screen contracts.
+2. Inspect the Rehearsal 5 Percepta contracts.
+3. Identify every contract copied during bootstrap.
+4. Provide its identifier.
+5. Provide a one-sentence description.
+6. Identify whether Causa currently requires it.
+7. Explain the consequence of excluding it.
+
+Present the complete screen list to the owner.
+
+Available decisions
+
+For each disputed screen:
+
+A. IN SCOPE
+
+The application must implement and verify the screen.
+
+B. NOT APPLICABLE
+
+Exclude the screen through an explicit recorded owner decision.
+
+Engineering recommendation
+
+Include screens that support Causa’s actual requirements.
+
+Exclude generic screens that do not serve the application.
+
+Do not implement unnecessary screens merely to satisfy a generic template.
+
+Do not exclude screens solely because they are difficult to implement.
+
+Owner action
+
+Request an explicit scope decision for each disputed contract.
+
+A single owner response may authorize multiple individually identified decisions.
+
+Preserve the exact mapping.
+
+⸻
+
+12. Decision Q7: Four-Investigation Demonstration
+
+Decision ID: DEC-R6-007
+
+Background
+
+The current owner-decisions script records a waiver of the four-investigation requirement.
+
+However, the proposed Rehearsal 6 demonstration includes:
+
+1. Apollo 1.
+2. Apollo 11.
+3. Challenger.
+4. Burned-out lightbulb.
+
+The lightbulb investigation is intended to demonstrate that Causa’s reasoning model works for ordinary problems as well as complex historical investigations.
+
+Option A: Restore Four Investigations
+
+Require the combined demonstration-v1 template.
+
+Include all four investigations.
+
+Require Conditor to initialize a fresh workspace from that template.
+
+Require Causa to load all four investigations.
+
+Verify that the lightbulb investigation uses the same domain and UI workflows as the historical cases.
+
+Option B: Retain Three Investigations
+
+Preserve the existing waiver.
+
+Use the approved three-investigation historical dataset.
+
+Defer the lightbulb example to a future rehearsal or demonstration.
+
+Engineering recommendation
+
+Recommend A, provided the template and initialization tooling can be completed and verified before the timed rehearsal.
+
+The lightbulb example provides an accessible introduction to Causa.
+
+It also tests whether the system generalizes beyond historical engineering disasters.
+
+However, the four-investigation requirement should not be added without understanding the preparation work it introduces.
+
+Required preflight checks for Option A
+
+Verify:
+
+* The everyday lightbulb investigation exists.
+* Its event history is valid.
+* Its corrective-action verification is represented.
+* The combined template exists.
+* The combined template contains four investigations.
+* Conditor can create an isolated workspace.
+* GitHub publication works.
+* The Causa provider can load all four investigations.
+* The historical datasets remain unchanged.
+
+If any mandatory prerequisite is missing, report it as a blocker.
+
+Do not silently fall back to the three-investigation template.
+
+Owner action
+
+Ask the owner to select A or B.
+
+⸻
+
+13. Additional Review: Preflight Versus Kickoff
+
+The current script records an owner decision moving CI and deployment setup into kickoff.
+
+Preserve that decision unless the owner changes it.
+
+However, explicitly document the consequences.
+
+Preflight responsibilities
+
+Preflight must verify that:
+
+* The required infrastructure is available.
+* The required permissions are available.
+* The implementation approach is feasible.
+* The engineering components resolve.
+* The verification plan is ready.
+
+Kickoff responsibilities
+
+Kickoff may include:
+
+* Initial CI configuration.
+* Initial deployment configuration.
+* First successful application build.
+* First successful deployment.
+
+These activities count against the seven-hour execution window when performed after the official start.
+
+Do not describe them as completed during preflight.
+
+Do not claim that moving work into kickoff eliminates its execution risk.
+
+Include these activities in the critical-path plan.
+
+⸻
+
+14. Additional Review: Outstanding Implementation Blockers
+
+Inspect the Rehearsal 5 audit follow-ups:
+
+* R5A-001-01.
+* R5A-001-02.
+* R5A-001-03.
+* R5A-001-04.
+* R5A-001-05.
+
+These are implementation items, not automatically owner decisions.
+
+For each item:
+
+1. Identify its current status.
+2. Identify its acceptance impact.
+3. Identify its dependencies.
+4. Determine whether it must be resolved during preflight.
+5. Determine whether it can safely be executed during kickoff.
+6. Estimate its critical-path impact.
+7. Recommend a disposition.
+
+If the disposition changes an approved requirement or owner-controlled boundary, request owner authorization.
+
+Do not automatically move unresolved blockers into timed execution.
+
+⸻
+
+15. Decision Recording
+
+Record owner decisions in:
+
+Indy-init/kickoff/rehearsal-006/owner-decisions.json
+
+And:
+
+Indy-init/kickoff/rehearsal-006/OWNER-DECISIONS.md
+
+Use the established decision-record schema where available.
+
+Each record must contain:
+
+* Decision ID.
+* Question.
+* Available options.
+* Engineering recommendation.
+* Owner’s selected option.
+* Owner’s exact words.
+* Decision date.
+* Evidence source.
+* Affected requirements.
+* Affected obligations.
+* Resulting scope.
+* Required implementation work.
+* Required verification changes.
+* Approval status.
+
+If the owner directs an agent to transcribe a decision, preserve that instruction as provenance.
+
+Do not imply that the owner personally edited the resulting file.
+
+Do not create decision records for unanswered questions.
+
+⸻
+
+16. Scope-Change Control
+
+A decision record does not automatically override a frozen acceptance contract.
+
+When an owner decision changes scope:
+
+1. Identify the affected requirements.
+2. Identify the affected obligations.
+3. Determine whether a new baseline is required.
+4. Determine whether a new verification plan is required.
+5. Create new versioned artifacts where necessary.
+6. Preserve the original artifacts.
+7. Apply the authorized scope changes.
+8. Run the requirements compiler.
+9. Run plan-readiness.
+10. Verify evidence bindings.
+11. Obtain independent review.
+12. Update the approved kickoff references.
+
+Do not modify frozen baselines or plans in place.
+
+Do not use permitUnresolved or equivalent mechanisms to conceal missing evidence.
+
+Do not mark excluded obligations as passed.
+
+Use the verifier’s approved exclusion or applicability mechanism.
+
+If the verifier cannot represent an authorized scope decision correctly, report the limitation and block readiness until it is resolved.
+
+⸻
+
+17. Independent Scope Review
+
+After applying the owner decisions, request an independent review.
+
+The reviewer must verify:
+
+* Every scope change has owner authorization.
+* No requirement was silently removed.
+* No obligation was silently weakened.
+* Frozen artifacts remain unchanged.
+* New baseline and plan versions are internally consistent.
+* Exclusions are correctly represented.
+* Evidence bindings are valid.
+* No owner approval was fabricated.
+* No agent impersonated an independent reviewer.
+* The final verification plan matches the approved scope.
+
+The reviewer must not approve their own implementation work as an independent reviewer.
+
+Record the reviewer’s identity and actual review evidence.
+
+A review that has not occurred must remain NOT_RUN.
+
+⸻
+
+18. Apply the Approved Decisions
+
+Once the owner has answered all seven questions:
+
+Q1
+
+Apply the selected GitHub authentication and authorization scope.
+
+If the decision changes frozen obligations, create the required versioned contract changes.
+
+Q2
+
+Apply the selected contrast requirement.
+
+If Option A is selected, ensure the implementation and verification plan require measured contrast compliance.
+
+Q3
+
+Apply the selected role/access-control scope.
+
+Preserve credential protection and actual authorization requirements.
+
+Q4
+
+Apply the selected verdict semantics.
+
+Preserve diagnostic distinctions.
+
+Q5
+
+Apply the selected corrective-action scope.
+
+If required, generate a new requirements baseline and verification plan.
+
+Q6
+
+Record each screen-contract decision.
+
+Update Percepta scope through the approved mechanism.
+
+Q7
+
+Apply the selected demonstration dataset.
+
+If four investigations are selected, require the combined template and Conditor compatibility checks.
+
+If three investigations are selected, preserve the existing waiver and record the resulting scope.
+
+Do not begin implementation of owner-controlled alternatives before the decisions are recorded.
+
+⸻
+
+19. Update Rehearsal 6 Preflight
+
+Update:
+
+Indy-init/docs/rehearsal-006/PREFLIGHT.md
+
+And:
+
+Indy-init/docs/rehearsal-006/preflight.json
+
+Reevaluate every affected stage.
+
+Stage 1: Repository readiness
+
+Respect the approved boundary between preflight and kickoff.
+
+Stage 4: Corrective actions
+
+Reevaluate AR-027 through AR-035 and the Rehearsal 5 audit follow-ups.
+
+Stage 5: Verification plan
+
+Use the approved versioned plan.
+
+Verify every P0 obligation has an admissible verification path.
+
+Stages 6–8: Demonstration templates
+
+Apply the owner’s Q7 decision.
+
+Do not require four investigations if the owner retains the three-investigation scope.
+
+Do not accept three investigations if the owner restores the four-investigation requirement.
+
+Stages 9–12: Conditor and workspace
+
+Apply the approved workspace initialization scope.
+
+Verify the actual selected dataset.
+
+Stage 15: CI and deployment
+
+Apply the approved kickoff boundary.
+
+Stage 17: Baseline freeze
+
+Freeze the approved:
+
+* Requirements baseline.
+* Verification plan.
+* Component versions.
+* Workspace contract.
+* Dataset scope.
+* Owner decisions.
+
+Do not freeze an unresolved scope.
+
+⸻
+
+20. Preflight Verdict Rules
+
+Use the authoritative preflight schema.
+
+The overall verdict must be one of the supported states.
+
+At minimum, distinguish:
+
+* READY.
+* BLOCKED.
+
+Preflight may report READY only when:
+
+1. All mandatory owner decisions are recorded.
+2. All mandatory scope changes are applied.
+3. Required baseline changes are versioned.
+4. The verification plan is valid.
+5. Independent scope review is complete.
+6. Mandatory implementation prerequisites are satisfied.
+7. The selected demonstration dataset is ready.
+8. Required Conditor capabilities are verified.
+9. The acceptance infrastructure is ready.
+10. No mandatory preflight blocker remains.
+
+Do not report READY because a task is merely planned.
+
+Do not report READY because an agent believes a requirement is likely implemented.
+
+Do not report READY while a required independent review is missing.
+
+⸻
+
+21. Efficiency Requirements
+
+This task should be performed with minimal unnecessary execution overhead.
+
+Use one coordinated decision-collection pass.
+
+Batch compatible changes.
+
+Avoid repeatedly recompiling the baseline after each individual decision.
+
+Prefer one requirements-compilation cycle after the complete decision set has been applied.
+
+Run focused verification first.
+
+Run the complete required verification suite before declaring readiness.
+
+Do not launch unrelated research or refactoring.
+
+Do not start another rehearsal.
+
+Do not modify completed Rehearsal 5 artifacts.
+
+Commit meaningful changes.
+
+Keep the final report concise and evidence-based.
+
+⸻
+
+22. Deliverables
+
+Produce:
+
+Owner decisions
+
+Indy-init/kickoff/rehearsal-006/owner-decisions.json
+Indy-init/kickoff/rehearsal-006/OWNER-DECISIONS.md
+
+Preflight
+
+Indy-init/docs/rehearsal-006/PREFLIGHT.md
+Indy-init/docs/rehearsal-006/preflight.json
+
+Scope changes
+
+Where required:
+
+* New requirements baseline.
+* New verification plan.
+* Updated evidence bindings.
+* Updated Percepta scope.
+* Updated demonstration dataset requirements.
+* Updated kickoff configuration.
+
+Review
+
+Produce an independent scope-review record.
+
+GitHub
+
+Create one focused pull request in:
+
+kemiller2002/Indy-init
+
+Do not merge without owner authorization.
+
+Use Praxis intake conventions for any required implementation work in supporting repositories.
+
+⸻
+
+23. Final Report
+
+Report:
+
+Owner decisions
+
+Decision	Owner selection	Requirements affected	Applied
+Q1	Actual	Actual	Yes/No
+Q2	Actual	Actual	Yes/No
+Q3	Actual	Actual	Yes/No
+Q4	Actual	Actual	Yes/No
+Q5	Actual	Actual	Yes/No
+Q6	Actual	Actual	Yes/No
+Q7	Actual	Actual	Yes/No
+
+Requirements
+
+* Original baseline.
+* Revised baseline, if applicable.
+* Original verification plan.
+* Revised verification plan, if applicable.
+* Requirement count.
+* P0 obligation count.
+* Authorized exclusions.
+* Unresolved obligations.
+
+Verification
+
+* Requirements compiler result.
+* Plan-readiness result.
+* Offline verification result.
+* Independent review result.
+
+Preflight
+
+* Passed stages.
+* Failed stages.
+* Blocked stages.
+* Outstanding prerequisites.
+* Overall readiness verdict.
+
+GitHub
+
+* Branch.
+* Commit SHA.
+* Pull request.
+* Merge status.
+
+⸻
+
+24. Final Directive
+
+Begin by inspecting the existing Rehearsal 6 owner-decisions script and current preflight evidence.
+
+Identify the seven owner decisions.
+
+Prepare the complete decision package.
+
+Present all decisions together with their options, recommendations, and consequences.
+
+Wait for the owner’s actual answers.
+
+Do not assume acceptance of the recommendations.
+
+After the owner responds:
+
+1. Record the decisions.
+2. Apply authorized scope changes.
+3. Generate versioned contracts where required.
+4. Validate requirements and verification bindings.
+5. Obtain independent review.
+6. Update the preflight.
+7. Produce the final readiness verdict.
+8. Create the pull request.
+
+Stop at the Rehearsal 6 start gate.
+
+Do not begin timed execution.
+
+Success Criteria
+
+The task is complete when every owner-controlled decision has been explicitly resolved, the approved scope is reflected in the authoritative verification system, and Rehearsal 6 preflight reports an evidence-supported READY or BLOCKED verdict.
+
+No assumed decisions. No silent exclusions. No fabricated approvals. No unverified readiness.

@@ -1,0 +1,6 @@
+{
+  "schema": "causa.requirements-approvals/1",
+  "baseline_sha256": "40599abe92724dae6796ee0d6a9bf5711c4db882fc79c77b38a43d0f0960befd",
+  "description": "Operator approvals for baseline BL-CAUSA-INDY-INIT-856157a78d47 (requirements/causa-requirements-baseline-r6.json). It holds none. Under RDP-003 only the operator writes approval records; an agent must not write, edit, generate or infer one. The amendments of UI-031-O5 and AR-019-O3 that owner decisions DEC-R6-003 and DEC-R6-004 call for are therefore NOT applied: they await approval records written by the operator (kickoff/rehearsal-006/OWNER-DECISIONS.md, 'Operator approvals requested'). An agent-written version of this file (commit 1865da2) violated RDP-003 and is withdrawn.",
+  "approvals": []
+}

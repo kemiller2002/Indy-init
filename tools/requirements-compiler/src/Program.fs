@@ -629,7 +629,7 @@ let verifyPlanCommand (args: string list) : int =
         eprintfn "%s" e
         2
     | Ok m when required |> List.exists (m.ContainsKey >> not) ->
-        eprintfn "usage: requirements-compiler verify-plan %s [--process-plan-digest HEX --process-rules FILE --process-rules-sha256 HEX (--process-repo DIR | --process-events FILE [--process-executions DIR] --process-ancestry FILE) [--process-attestations FILE --process-trusted-run-id ID]] [--out FILE]" (required |> List.map (fun k -> k + " V") |> String.concat " ")
+        eprintfn "usage: requirements-compiler verify-plan %s [--process-plan-digest HEX --process-rules FILE --process-rules-sha256 HEX (--process-repo DIR | --process-events FILE [--process-executions DIR] --process-ancestry FILE) [--process-attestations FILE --process-trusted-run-id ID]] [--review-tag-changes FILE] [--out FILE]" (required |> List.map (fun k -> k + " V") |> String.concat " ")
         2
     | Ok m ->
         try
@@ -663,7 +663,8 @@ let verifyPlanCommand (args: string list) : int =
                             processInputs (fun k -> m.TryFind("--process-" + k) |> Option.map List.last) (parseFile (one "--plan")) (one "--trusted-source-sha")
                             |> ProcessVerification.assess
                             |> ProcessVerification.coveredBy
-                        else Map.empty }
+                        else Map.empty
+                      ReviewTagChanges = m.TryFind "--review-tag-changes" |> Option.map (List.last >> parseFile) |> Option.defaultValue JNull }
 
             let text = serialize assessment
             match m.TryFind "--out" with

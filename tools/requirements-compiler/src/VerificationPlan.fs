@@ -100,17 +100,129 @@ let private bindingsOf (spec: Json) =
 let private exclusionsOf (spec: Json) =
     arr "exclusions" spec |> List.map (fun e -> str "requirement" e, str "approval" e)
 
-/// (approval id, requirement id) pairs that an authenticated operator approval in the pinned file excludes.
-let authorizedExclusions (a: Approvals) : Set<string * string> =
+/// Approvals in the pinned file whose authority is a trusted operator.
+let private operatorApprovals (a: Approvals) =
     arr "approvals" a.Document
     |> List.filter (fun ap ->
         let auth = field "authority" ap |> Option.defaultValue JNull
         strOpt "kind" auth = Some "operator" && List.contains (strOpt "id" auth |> Option.defaultValue "") a.TrustedOperators)
+
+/// (approval id, requirement id) pairs that an authenticated operator approval in the pinned file excludes.
+let authorizedExclusions (a: Approvals) : Set<string * string> =
+    operatorApprovals a
     |> List.collect (fun ap ->
         arr "changes" ap
         |> List.filter (fun c -> strOpt "action" c = Some "exclude")
         |> List.choose (fun c -> strOpt "requirement_id" c |> Option.map (fun r -> str "id" ap, r)))
     |> Set.ofList
+
+/// (approval id, obligation id) -> (criterion, rationale) for every authenticated operator change
+/// {obligation_id, action: amend, criterion, rationale} in the pinned file.
+let authorizedAmendments (a: Approvals) : Map<string * string, string * string> =
+    operatorApprovals a
+    |> List.collect (fun ap ->
+        arr "changes" ap
+        |> List.filter (fun c -> strOpt "action" c = Some "amend")
+        |> List.choose (fun c ->
+            match strOpt "obligation_id" c, strOpt "criterion" c with
+            | Some o, Some criterion when not (String.IsNullOrWhiteSpace criterion) ->
+                Some((str "id" ap, o), (criterion, strOpt "rationale" c |> Option.defaultValue ""))
+            | _ -> None))
+    |> Map.ofList
+
+// ---- scope decisions: amended and derived obligations (revision 3, additive; absent unless curated) ---------------
+
+/// Diagnostic codes and missing-coverage reasons that only a plan with `scopeDecisions` can produce.
+let scopeDiagnosticCodes = [ "UNAUTHORIZED-AMENDMENT"; "DERIVATION-INCONSISTENT" ]
+let scopeMissingCoverageReasons = [ "constituent-unverified"; "unbound-after-review"; "removed-by-review" ]
+
+/// A clause of a derived obligation. Its constituents must each be verified. The derived obligation's own bound tests
+/// prove the clause too when it is residual: it has no constituent, or it is marked `direct` because its constituents
+/// prove less than the clause states.
+type Clause = { Text: string; Constituents: string list; Direct: bool }
+
+let isResidual (c: Clause) = c.Constituents.IsEmpty || c.Direct
+
+/// The only words a derivation may leave unaccounted for. The curation cannot extend this list, so it cannot drop a
+/// clause by declaring its words connectives.
+let connectiveVocabulary = [ "Verify"; "verify"; "and"; "or"; "the"; "a"; "an"; "of"; "to" ]
+
+type Derivation = { Obligation: string; Decision: string; Connectives: string list; Clauses: Clause list }
+
+let derivationOf (d: Json) =
+    { Obligation = strOpt "obligation" d |> Option.defaultValue ""
+      Decision = strOpt "decision" d |> Option.defaultValue ""
+      Connectives = strs "connectives" d
+      Clauses =
+        arr "clauses" d
+        |> List.map (fun c ->
+            { Text = strOpt "clause" c |> Option.defaultValue ""
+              Constituents = arr "constituents" c |> List.map (function JStr k -> k | j -> str "obligation" j)
+              Direct = boolOr "direct" false c }) }
+
+let private amendmentsOf (spec: Json) = arr "obligationAmendments" spec
+let private derivationsOf (spec: Json) = arr "derivedObligations" spec |> List.map derivationOf
+
+/// The first occurrence of `phrase` in `text` that starts and ends on a word boundary, so that a clause is a whole
+/// phrase of the text and never part of a word ("timeline order" is not in "timeline ordering").
+let phraseIndex (text: string) (phrase: string) : int option =
+    let boundary k = k < 0 || k >= text.Length || not (Char.IsLetterOrDigit text.[k])
+    let rec from (start: int) =
+        match (if phrase = "" then -1 else text.IndexOf(phrase, start, StringComparison.Ordinal)) with
+        | -1 -> None
+        | k when boundary (k - 1) && boundary (k + phrase.Length) -> Some k
+        | k -> from (k + 1)
+    from 0
+
+/// The words of `text` that no clause accounts for: each clause is removed once, in order, and what is left is
+/// split on spaces and punctuation.
+let derivationResidue (text: string) (clauses: string list) : string list =
+    let rest =
+        clauses
+        |> List.fold
+            (fun (t: string) c ->
+                match phraseIndex t c with
+                | None -> t
+                | Some k -> t.Substring(0, k) + " " + t.Substring(k + c.Length))
+            text
+    rest.Split([| ' '; '\t'; '\n'; ','; '.'; ';'; ':'; '('; ')' |], StringSplitOptions.RemoveEmptyEntries) |> List.ofArray
+
+/// A derivation as the plan carries it: each constituent with its VPO id, and each clause marked residual when no
+/// other obligation verifies it (the derived obligation's own bound tests prove a residual clause).
+let derivationJson (vpo: string -> string) (d: Derivation) =
+    JObj
+        [ "decision", JStr d.Decision
+          "connectives", jstrs d.Connectives
+          "clauses",
+          d.Clauses
+          |> List.map (fun c ->
+              JObj
+                  [ "clause", JStr c.Text
+                    "residual", JBool(isResidual c)
+                    "direct", JBool c.Direct
+                    "constituents", c.Constituents |> List.map (fun k -> JObj [ "obligation", JStr k; "obligationId", JStr(vpo k) ]) |> JArr ])
+          |> JArr ]
+
+/// Problems with one derivation against its obligation's verbatim text: every clause is verbatim in the text, the
+/// clauses account for all of it except the declared connectives, and every constituent is another in-scope P0
+/// obligation that is not itself derived.
+let derivationProblems (text: string) (inScope: Set<string>) (derived: Set<string>) (d: Derivation) : string list =
+    [ if d.Clauses.IsEmpty then yield "names no clause"
+      if String.IsNullOrWhiteSpace d.Decision then yield "names no decision"
+      for w in d.Connectives do
+          if not (List.contains w connectiveVocabulary) then yield sprintf "declares connective '%s', which is not in the fixed connective vocabulary" w
+          elif not (derivationResidue text [] |> List.contains w) then yield sprintf "declares connective '%s', which is not a word of its text" w
+      for c in d.Clauses do
+          if String.IsNullOrWhiteSpace c.Text || (phraseIndex text c.Text).IsNone then
+              yield sprintf "clause \"%s\" is not verbatim in the obligation text" c.Text
+          for k in c.Constituents do
+              if k = d.Obligation then yield sprintf "clause \"%s\" names the obligation itself" c.Text
+              elif derived.Contains k then yield sprintf "constituent %s is itself derived" k
+              elif not (inScope.Contains k) then yield sprintf "constituent %s is not an in-scope P0 obligation" k
+      match derivationResidue text (d.Clauses |> List.map (fun c -> c.Text)) |> List.filter (fun w -> not (List.contains w d.Connectives)) with
+      | [] -> ()
+      | rest -> yield sprintf "leaves obligation text that no clause accounts for: %s" (String.concat " " rest) ]
+    |> List.map (sprintf "derived obligation %s %s" d.Obligation)
 
 /// Input problems: anything that would make the plan claim more, or less, than its authorities support.
 let problems (i: Inputs) : string list =
@@ -136,6 +248,25 @@ let problems (i: Inputs) : string list =
           if not (p0Ids.Contains rid) then yield sprintf "exclusion targets unknown or non-P0 requirement %s" rid
           elif not (authorized.Contains(approval, rid)) then
               yield sprintf "unauthorized exclusion of P0 requirement %s: approval %s is not an authenticated operator exclusion in the pinned approvals file" rid approval
+      let authorizedAmend = authorizedAmendments i.Approvals
+      for a in amendmentsOf i.Spec do
+          let oid, approval = str "obligation" a, str "approval" a
+          if not (obligationsOf.Contains oid) then yield sprintf "amendment targets unknown or non-P0 obligation %s" oid
+          elif not (authorizedAmend.ContainsKey(approval, oid)) then
+              yield sprintf "unauthorized amendment of P0 obligation %s: approval %s is not an authenticated operator change {obligation_id, action: amend, criterion} in the pinned approvals file" oid approval
+          if String.IsNullOrWhiteSpace(strOpt "decision" a |> Option.defaultValue "") then yield sprintf "amendment of %s names no decision" oid
+      for (dup, n) in amendmentsOf i.Spec |> List.countBy (str "obligation") do
+          if n > 1 then yield sprintf "obligation %s is amended more than once" dup
+      let excludedReqs = exclusionsOf i.Spec |> List.filter (fun (r, a) -> authorized.Contains(a, r)) |> List.map fst |> Set.ofList
+      let texts = p0 |> List.collect (fun r -> arr "obligations" r |> List.map (fun o -> str "id" o, (str "id" r, str "text" o))) |> Map.ofList
+      let inScope = texts |> Map.filter (fun _ (r, _) -> not (excludedReqs.Contains r)) |> Map.keys |> Set.ofSeq
+      let derived = derivationsOf i.Spec |> List.map (fun d -> d.Obligation) |> Set.ofList
+      for (dup, n) in derivationsOf i.Spec |> List.countBy (fun d -> d.Obligation) do
+          if n > 1 then yield sprintf "obligation %s is derived more than once" dup
+      for d in derivationsOf i.Spec do
+          match texts.TryFind d.Obligation with
+          | None -> yield sprintf "derivation targets unknown or non-P0 obligation %s" d.Obligation
+          | Some(_, text) -> yield! derivationProblems text inScope derived d
       for (dup, n) in bindings |> List.countBy fst do
           if n > 1 then yield sprintf "obligation %s is bound more than once" dup
       for (o, tests) in bindings do
@@ -274,8 +405,13 @@ let contractFor (categories: Json) (policyOrder: string list) (entry: Json) (o: 
                 "categoryPolicies", categoryPolicies |> List.map (fun (c, p) -> JObj [ "category", JStr c; "policy", JStr p ]) |> JArr ]
           "verificationStatus", JStr(if excluded then "excluded" elif requiredIds.IsEmpty then "unclassified" else "unverified")
           "missingCoverage", JArr(if excluded then [] else missing) ]
+    // An amended or derived obligation carries its scope decision into its contract, unchanged.
+    |> fun contract ->
+        match contract, [ "amendment"; "derivation" ] |> List.choose (fun k -> field k o |> Option.map (fun v -> k, v)) with
+        | JObj ps, (_ :: _ as scope) -> JObj(ps @ scope)
+        | c, _ -> c
 
-let private entry (i: Inputs) (rules: Map<string, Json>) (manifestEntries: Map<string, Json>) (bindings: Map<string, TestRef list>) (excluded: Map<string, string>) (r: Json) =
+let private entry (i: Inputs) (rules: Map<string, Json>) (manifestEntries: Map<string, Json>) (bindings: Map<string, TestRef list>) (excluded: Map<string, string>) (scope: Map<string, (string * Json) list>) (r: Json) =
     let rid = str "id" r
     let m = manifestEntries.[rid]
     let ruleJs = strs "rules" m |> List.map (fun x -> rules.[x])
@@ -289,7 +425,7 @@ let private entry (i: Inputs) (rules: Map<string, Json>) (manifestEntries: Map<s
             let text = str "text" o
             let tests = bindings.TryFind oid |> Option.defaultValue [] |> List.sortBy (fun t -> t.Id, t.Kind)
             tests,
-            JObj
+            JObj(
                 [ "id", JStr(obligationId rid oid text)
                   "sourceObligation", JStr oid
                   "index", jint (idx + 1)
@@ -300,7 +436,9 @@ let private entry (i: Inputs) (rules: Map<string, Json>) (manifestEntries: Map<s
                   JObj
                       [ "status", JStr(if tests.IsEmpty then "missing" else "bound")
                         "tests", tests |> List.map (fun t -> JObj [ "id", JStr t.Id; "kind", JStr t.Kind ]) |> JArr ]
-                  "tokens", jstrs (strs "tokens" o) ])
+                  "tokens", jstrs (strs "tokens" o) ]
+                @ (scope.TryFind oid |> Option.defaultValue [])
+            ))
 
     let bound = obligations |> List.filter (fun (ts, _) -> not ts.IsEmpty) |> List.length
     let missing = obligations.Length - bound
@@ -395,7 +533,30 @@ let build (i: Inputs) : Json =
     let authorized = authorizedExclusions i.Approvals
     let excluded = exclusionsOf i.Spec |> List.filter (fun (r, a) -> authorized.Contains(a, r)) |> List.map (fun (r, a) -> r, a) |> Map.ofList
     let p0 = p0Of i.Baseline |> List.filter (fun r -> manifestEntries.ContainsKey(str "id" r))
-    let entries = p0 |> List.map (entry i rules manifestEntries bindings excluded)
+    let byObligation = p0 |> List.collect (fun r -> arr "obligations" r |> List.map (fun o -> str "id" o, (str "id" r, o))) |> Map.ofList
+    let vpo k = let r, o = byObligation.[k] in obligationId r k (str "text" o)
+    // Only an authorized amendment and a consistent derivation are applied; `problems` reports the others.
+    let authorizedAmend = authorizedAmendments i.Approvals
+    let amendments =
+        amendmentsOf i.Spec
+        |> List.choose (fun a ->
+            let oid, approval = str "obligation" a, str "approval" a
+            authorizedAmend.TryFind(approval, oid)
+            |> Option.filter (fun _ -> byObligation.ContainsKey oid)
+            |> Option.map (fun (criterion, rationale) ->
+                oid,
+                ("amendment",
+                 JObj [ "approval", JStr approval; "decision", JStr(str "decision" a); "criterion", JStr criterion; "rationale", JStr rationale ])))
+    let inScope = byObligation |> Map.filter (fun _ (r, _) -> not (excluded.ContainsKey r)) |> Map.keys |> Set.ofSeq
+    let derivedIds = derivationsOf i.Spec |> List.map (fun d -> d.Obligation) |> Set.ofList
+    let derivations =
+        derivationsOf i.Spec
+        |> List.choose (fun d ->
+            match byObligation.TryFind d.Obligation with
+            | Some(_, o) when (derivationProblems (str "text" o) inScope derivedIds d).IsEmpty -> Some(d.Obligation, ("derivation", derivationJson vpo d))
+            | _ -> None)
+    let scope = amendments @ derivations |> List.groupBy fst |> List.map (fun (k, xs) -> k, xs |> List.map snd |> List.distinctBy fst) |> Map.ofList
+    let entries = p0 |> List.map (entry i rules manifestEntries bindings excluded scope)
     let obligations = entries |> List.collect (arr "obligations")
     let boundCount = obligations |> List.filter (fun o -> field "testIdentity" o |> Option.map (str "status") = Some "bound") |> List.length
     let contracts = obligations |> List.choose (field "acceptanceContract")
@@ -408,7 +569,23 @@ let build (i: Inputs) : Json =
             && arr "missingCoverage" c |> List.forall (fun m -> strOpt "reason" m = Some "no-evidence"))
         |> List.length
 
-    withIdentity
+    let scopeDecisions =
+        if scope.IsEmpty then []
+        else
+            [ "scopeDecisions",
+              JObj
+                  [ "amendmentRule",
+                    JStr
+                        "An obligation's acceptance criterion is amended only by an authenticated operator change {obligation_id, action: amend, criterion, rationale} in the pinned approvals file, listed in curation obligationAmendments with the owner decision it applies. The baseline text stays verbatim beside the amendment. An amendment changes what the bound tests must prove; it never verifies the obligation and never removes it from scope. Any other amendment fails compilation (V18) and makes verify-plan INVALID (UNAUTHORIZED-AMENDMENT)."
+                    "derivationRule",
+                    JStr
+                        "A derived obligation restates other obligations. Each clause is verbatim in its text, and the clauses account for all of it except the declared connectives. A clause names the in-scope P0 obligations that must be verified for it; a residual clause (one that names none, or is marked direct because its constituents prove less than it states) is also proven by the derived obligation's own bound tests. Connectives come from a fixed vocabulary. Which obligation states a clause is a review judgement (AR-034-O2), not something the compiler can decide. The derived obligation is verified only when its own required categories are covered and every constituent obligation is verified (constituent-unverified otherwise)."
+                    "amendedObligations", jstrs (amendments |> List.map fst |> List.distinct |> List.sort)
+                    "derivedObligations", jstrs (derivations |> List.map fst |> List.sort)
+                    "diagnostics", jstrs scopeDiagnosticCodes
+                    "missingCoverage", jstrs scopeMissingCoverageReasons ] ]
+
+    withIdentity(
         [ "schema", JStr schemaId
           "source",
           JObj
@@ -475,8 +652,10 @@ let build (i: Inputs) : Json =
               [ "rule",
                 JStr "A P0 requirement leaves scope only through an exclusion listed in curation/verification-plan.json whose approval is an authenticated operator change {requirement_id, action: exclude} in the pinned approvals file. It stays in the plan, marked excluded with its approval; any other exclusion fails compilation (V18)."
                 "approvalSchema", JStr "causa.requirements-approvals/1" ]
-          "evidenceCategories", EvidenceCategories.embedded i.Categories.Path i.Categories.Sha256 i.Categories.Table
-          "requirements", JArr entries ]
+          "evidenceCategories", EvidenceCategories.embedded i.Categories.Path i.Categories.Sha256 i.Categories.Table ]
+        @ scopeDecisions
+        @ [ "requirements", JArr entries ]
+    )
 
 // ---- preservation: what a checker re-derives from the baseline and the plan alone --------------------------------
 
@@ -691,6 +870,58 @@ let preservationDiagnostics (baseline: Json) (plan: Json) : Diagnostic list =
           let rid = strOpt "requirement" e |> Option.defaultValue ""
           if not (p0Ids.Contains rid) then
               yield diag "EXTRA-REQUIREMENT" rid (sprintf "plan carries %s, which is not a baseline P0 requirement" rid) recompile ]
+
+/// Derived obligations, re-checked from the plan alone: each derivation still holds against its obligation's verbatim
+/// text, its constituents are in-scope obligations of this plan under their own VPO ids, and residual marks are exact.
+let derivationDiagnostics (plan: Json) : Diagnostic list =
+    let entries = arr "requirements" plan
+    let obligations = entries |> List.collect (arr "obligations")
+    let vpoOf = obligations |> List.map (fun o -> str "sourceObligation" o, str "id" o) |> Map.ofList
+    let inScope =
+        entries
+        |> List.filter (fun e -> field "exclusion" e |> Option.bind (strOpt "status") <> Some "excluded")
+        |> List.collect (arr "obligations")
+        |> List.map (str "sourceObligation")
+        |> Set.ofList
+    let derivedObligations = obligations |> List.choose (fun o -> field "derivation" o |> Option.map (fun d -> o, d))
+    let derived = derivedObligations |> List.map (fst >> str "sourceObligation") |> Set.ofList
+    let action = "recompile the plan; a derivation is curated in curation/verification-plan.json, never edited in the plan"
+    [ for (o, d) in derivedObligations do
+          let oid = str "sourceObligation" o
+          for p in derivationProblems (str "text" o) inScope derived { derivationOf d with Obligation = oid } do
+              yield diag "DERIVATION-INCONSISTENT" oid p action
+          for c in arr "clauses" d do
+              if boolOr "residual" false c <> ((arr "constituents" c).IsEmpty || boolOr "direct" false c) then
+                  yield diag "DERIVATION-INCONSISTENT" oid (sprintf "derived obligation %s marks clause \"%s\" residual inconsistently" oid (str "clause" c)) action
+              for k in arr "constituents" c do
+                  if vpoOf.TryFind(str "obligation" k) <> Some(str "obligationId" k) then
+                      yield
+                          diag
+                              "DERIVATION-INCONSISTENT"
+                              oid
+                              (sprintf "derived obligation %s names constituent %s under VPO id %s, which is not its id in this plan" oid (str "obligation" k) (str "obligationId" k))
+                              action ]
+
+/// Amended obligations, checked against the pinned approvals file: each amendment must be an authenticated operator
+/// change for that obligation, carried exactly (criterion and rationale).
+let amendmentDiagnostics (plan: Json) (a: Approvals) : Diagnostic list =
+    let authorized = authorizedAmendments a
+    [ for o in arr "requirements" plan |> List.collect (arr "obligations") do
+          match field "amendment" o with
+          | None -> ()
+          | Some am ->
+              let oid = str "sourceObligation" o
+              match authorized.TryFind(str "approval" am, oid) with
+              | Some(criterion, rationale) when criterion = str "criterion" am && rationale = str "rationale" am -> ()
+              | Some _ ->
+                  yield diag "UNAUTHORIZED-AMENDMENT" oid (sprintf "the amendment of %s differs from approval %s in the pinned approvals file" oid (str "approval" am)) "recompile the plan from the pinned approvals file"
+              | None ->
+                  yield
+                      diag
+                          "UNAUTHORIZED-AMENDMENT"
+                          oid
+                          (sprintf "obligation %s is amended by '%s', which is not an authenticated operator amendment in the pinned approvals file" oid (str "approval" am))
+                          "obtain the owner's operator approval {obligation_id, action: amend, criterion, rationale} in the pinned approvals file, or verify the baseline text" ]
 
 /// The preservation diagnostics rendered as text (compilation check V18 and the plan assessment).
 let preservationProblems (baseline: Json) (plan: Json) : string list =

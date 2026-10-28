@@ -1,0 +1,224 @@
+{
+  "schema": "indy-init.scope-review/1",
+  "reviewer": {
+    "kind": "agent",
+    "id": "anthropic/claude-code-reviewer",
+    "context": "fresh-context subagent spawned by the implementing session; no shared implementation context; did not author the reviewed commits"
+  },
+  "reviewedRange": "856157a..f8b1a2c",
+  "date": "2026-10-28",
+  "method": "All files were read at f8b1a2c (git show / a detached worktree at /tmp/claude-0/review/wt-f8b), not from the working tree: the branch HEAD moved to 9297528 during the review (see SR-15). The compiler was built from f8b1a2c. Scratch outputs are under /tmp/claude-0/review/.",
+  "checks": [
+    {
+      "id": 1,
+      "result": "PARTIAL",
+      "evidence": [
+        "owner-decisions.json and OWNER-DECISIONS.md quote the owner exactly: ownerWords \"Do what you recommend to get it started\" on DEC-R6-001..006 and -008, and \"Keep three cases (Recommended)\" on DEC-R6-007.",
+        "Both files state transcription provenance: \"recordedBy\": \"agent (Claude Code), on the owner's instruction; the owner did not edit this file\"; the Markdown says \"The owner did not edit this file.\" No record implies the owner edited a file.",
+        "Every decision is APPROVAL_PENDING_MERGE; DEC-R6-007 discloses that the owner's script recommended A and the agent recommended B, and that the selected label's \"(Recommended)\" was the agent's.",
+        "Every decision record DEC-R6-001..008 answers a question that was asked and answered (Q1-Q7, and the R5A-001-01..05 dispositions). No record exists for an unanswered question.",
+        "git log --all -S\"pass on the causa-data\" -> first appears in f8b1a2c."
+      ],
+      "findings": ["SR-07", "SR-08", "SR-10"]
+    },
+    {
+      "id": 2,
+      "result": "PASS",
+      "evidence": [
+        "Obligation-by-obligation comparison of requirements-compiled/v2/verification-plan.json with v3 (python, keyed by sourceObligation): 326 -> 355 obligations; removed: none; added: exactly the 29 obligations of AR-027, -028, -029, -030, -031, -034, -035.",
+        "For the 326 common obligations every field (id/VPO, text, textSha256, kind, tokens, index, testIdentity, acceptanceContract incl. requiredEvidenceCategories, categoryDerivation, freshness, dependencies) is identical, except: 'amendment' added on AR-019-O3 and UI-031-O5 (obligation and contract), 'derivation' added on UI-015-O2 (obligation and contract). Requirement-level fields: no difference for any common requirement.",
+        "Amended obligations keep the baseline text verbatim (UI-031-O5: \"Apply role/access controls to sensitive operational information and never expose credentials.\"; AR-019-O3: \"Original Rehearsal 3 must yield BLOCKED; ...\").",
+        "UI-031-O5 amendment vs selected option A: it drops only application-level role management and keeps credential protection, authorization of every repository operation against provider permissions, workspace isolation and secure handling of operational information. It is stricter than the committed script's option A (\"reduces to never expose credentials\"). Nothing weakened beyond the option. Required categories unchanged (browser, accessibility).",
+        "AR-019-O3 amendment vs option A: any authoritative non-accepting verdict (INVALID, FAIL or BLOCKED), exact verdict and classification reported, categories not merged; the 45644a7 clause is kept verbatim. Stricter than the committed script's option A (\"Any non-accepting verdict\"). Nothing weakened beyond the option.",
+        "Amendment criterion is identical in approvals.causa.json, the plan obligation, the acceptance contract, owner-decisions.json and OWNER-DECISIONS.md (scripted string comparison: all True).",
+        "AR-027..AR-035 priorities in docs/AGENT-RELIABILITY-REQUIREMENTS.md: AR-027/028/029/030/031/034/035 [P0], AR-032/033 [P1]. Baseline r6: AR-032 P1, AR-033 P1; neither is in the v3 plan (R6ScopeTests also asserts this)."
+      ],
+      "findings": []
+    },
+    {
+      "id": 3,
+      "result": "PASS",
+      "evidence": [
+        "git diff 856157a..f8b1a2c --stat -- requirements-compiled/v1 requirements-compiled/v2 requirements/causa-requirements-baseline.json kickoff/rehearsal-005 docs/rehearsal-005-implementation-audit input-documents docs/AGENT-RELIABILITY-REQUIREMENTS.md docs/REHEARSAL-DERIVATION-POLICY.md -> empty.",
+        "git diff 856157a..f8b1a2c --name-only | grep -ci 'rehearsal-00[1-5]' -> 0.",
+        "sha256 requirements/causa-requirements-baseline.json = 621e2f960038dcfb0daa2a9fe18a0c1c350faed297ba2856da1236a0360857b9 (the frozen value R6ScopeTests pins).",
+        "v2 --check against the frozen baseline and v2 curation at f8b1a2c: exit 0 (v2 rebuilds byte for byte with the changed compiler)."
+      ],
+      "findings": []
+    },
+    {
+      "id": 4,
+      "result": "PASS",
+      "evidence": [
+        "git worktree at 856157a; requirements-compiler baseline /tmp/claude-0/review/rv856 856157a78d47946d264ec49ee8325fcf996ae9b9 > gen-r6.json: exit 0; cmp with requirements/causa-requirements-baseline-r6.json: IDENTICAL; both sha256 40599abe92724dae6796ee0d6a9bf5711c4db882fc79c77b38a43d0f0960befd.",
+        "Frozen vs r6 baseline: id and source.commit change; only document hash changed is docs/AGENT-RELIABILITY-REQUIREMENTS.md; conflicts identical; 461 -> 471 requirements, 108 -> 115 P0; removed none; added AR-027..AR-035 and the section 'AGENT-RELIABILITY§rehearsal-5-findings-october-2026' (priority unstated, 3 obligations, the section preamble); changed only 'AGENT-RELIABILITY§reconciliation' (one sentence prepended: \"AR-027..AR-035 add to AR-001..AR-026 and refine them only where stated.\"). All other requirements byte-equal.",
+        "git diff aab8f80 856157a -- docs/AGENT-RELIABILITY-REQUIREMENTS.md: only the new section (preamble + AR-027..AR-035) and that reconciliation sentence."
+      ],
+      "findings": []
+    },
+    {
+      "id": 5,
+      "result": "PARTIAL",
+      "evidence": [
+        "v3 --check (r6 baseline, v3 curation, 13 source repos from /home/user/rc-src) at f8b1a2c: exit 0, no output. Negative control: one character changed in v3/verification-plan.json -> 'differs: verification-plan.json', exit 4.",
+        "plan-readiness --plan requirements-compiled/v3/verification-plan.json --plan-digest 13516e0d...a66c: verdict READY, problems [], 355 obligations, 671/671 category checks resolved, permitted 0, exit 0.",
+        "Offline suite at f8b1a2c: 'offline tests (...): all passed'. Negative control: one character changed in the v3 curation clause 'report fidelity' -> 6 failures incl. 'derived obligation UI-015-O2 leaves obligation text that no clause accounts for' and 'UI-015-O2 is not derived', so R6ScopeTests is wired in and live.",
+        "requirements-compiled/v3/verification-plan.schema.json is byte-identical to v2's (cmp), $id '.../v1/revision-2', root additionalProperties false; jsonschema validation of the v3 plan against it: 7 errors ('scopeDecisions' unexpected at root; 'amendment' unexpected on requirements[17].obligations[2]; 'derivation' unexpected on requirements[71].obligations[1]; ...). The v2 plan: 0 errors."
+      ],
+      "findings": ["SR-04"]
+    },
+    {
+      "id": 6,
+      "result": "PARTIAL",
+      "evidence": [
+        "v3 curation exclusions: []; every v3 requirement exclusion {status: in-scope, approval: null} (115/115); no 'permitUnresolved' anywhere in the plan, curation or kickoff/rehearsal-006; all 355 obligations verificationStatus 'unverified', every missingCoverage reason 'no-evidence' (671); scope.verifiedObligations 0. The only 'verified'/'PASS'/'passed' strings are in statusVocabulary and the evidence-contract prose.",
+        "approvals.causa.json contains only two 'amend' changes, no 'exclude'.",
+        "Amendment mechanism: compile refuses invented, non-operator and cross-obligation approvals (R6ScopeTests negative controls pass); verify-plan re-checks criterion and rationale against the approvals bytes, which must match the plan's pinned sha256 (PlanVerification.fs line 317); contract amendment is re-derived from the obligation (contractDiagnostics compares the full serialized contract). Removing an amendment only restores the stricter baseline text. No weakening bypass found for amendments other than the authority question in SR-01.",
+        "Derivation mechanism: broken by curation edits that compile (V18 PASS) and are READY (SR-03), and by a resealed plan edit that only digest pins catch (SR-06). Review-tag removals: opt-in and unpinned (SR-05)."
+      ],
+      "findings": ["SR-03", "SR-05", "SR-06", "SR-12"]
+    },
+    {
+      "id": 7,
+      "result": "PASS",
+      "evidence": [
+        "v3 curation testBindings == process-bindings.proposed.json extended by r6-test-bindings.proposed.json (normalized per obligation: equal, 0 differences); R6ScopeTests also asserts byte equality with TestBindingProposal.applyTo and regenerates the r6 proposal from the process-only plan (passes).",
+        "v3 process proposal is byte-identical to v2's. The v3 r6 proposal keeps all 324 v2 obligations' bindings unchanged and adds the 29 AR obligations; 372 test entries (the '372 tests' of DEC-R6-005), 284 distinct ids.",
+        "All 326 v2 curation bindings are unchanged in v3.",
+        "evidence-categories.json: v2 rules all present and unchanged (rule set diff: removed none, changed none; the rest of the textual diff is JSON reformatting); four rules added. Each quoted obligation text is a verbatim substring of the rule's source (scripted check: AR-029-O1, AR-030-O1, AR-030-O2, AR-035-O1..O4 all 'verbatim'). Added rules only add categories (browser for AR-029-O1, AR-035-O1/O4; security for AR-030-O1/O2; integration for AR-035-O1..O4). scope.obligationsByCategory only increases (integration 114->118, browser 166->169, security 6->8, independent-acceptance 62->91)."
+      ],
+      "findings": ["SR-14"]
+    },
+    {
+      "id": 8,
+      "result": "PARTIAL",
+      "evidence": [
+        "approvals.causa.json description: 'Every change below was transcribed by an agent on the owner's instruction; the owner did not edit this file.' Each approval carries provenance.recordedBy 'agent (Claude Code), on the owner's instruction' and the owner's quoted words. Nothing presents an agent statement as the owner's words.",
+        "But each approval also carries authority {kind: operator, id: kemiller2002}, which VerificationPlan.operatorApprovals accepts as an 'authenticated operator' approval on a string match. docs/REHEARSAL-DERIVATION-POLICY.md RDP-003: 'The operator writes the approvals file ... An agent MUST NOT: write, edit, generate or infer an approval record'. input-documents/2026-10-28-R5A-001-...md line 34: 'Owner decisions (R5A-001-11) are recorded by the owner, not transcribed by an agent (RDP-003).' DEC-R6-003/-004 are the R5A-001-11 decisions.",
+        "All commits in range are authored by 'Claude <noreply@anthropic.com>' (git log --format='%an <%ae>'), including the approvals file (1865da2)."
+      ],
+      "findings": ["SR-01"]
+    },
+    {
+      "id": 9,
+      "result": "PARTIAL",
+      "evidence": [
+        "UI-015-O2 text: 'Verify the three active-catalog investigations (EXT-DATA-013) load from the connected repository and replay, verify the five frozen v1.0.0 fixtures replay as the storage contract's test corpus, keyboard/touch paths, graph textual equivalent, timeline ordering, legal command enforcement, save/sync truthfulness, offline/conflict recovery, responsive reflow, report fidelity, and startup failure.' Its 11 clauses are verbatim and cover the text with connectives Verify/verify/and.",
+        "Sound mappings: keyboard/touch paths -> UI-004-O5, UI-011-O1, UI-011-O3; graph textual equivalent -> UI-011-O5; save/sync truthfulness -> UI-006-O1, UI-006-O2; responsive reflow -> UI-011-O2.",
+        "'legal command enforcement' -> UI-004-O1 ('Render only policy-authorized commands ...') and UI-004-O6 ('UI MUST NOT implement a parallel policy engine.'). Neither states enforcement against an illegal or stale submission; UI-004-O4 ('Reject stale-version submissions, show domain fault messages safely, and avoid duplicate submission.') and AR-006-O2 ('Invalid or unauthorized transitions must be rejected before side effects.') do, and are not constituents.",
+        "'offline/conflict recovery' -> UI-006-O4 (conflict recovery, sound) and UI-010-O1 ('Design specific recoverable states for ... offline network ...'): a designed state, not recovery from offline (queue and resync).",
+        "'the three active-catalog investigations ... load from the connected repository and replay' -> EXT-DATA-013-O2, whose categories are integration and live-provider only (no browser); the clause sits in a UI acceptance obligation.",
+        "Residual clauses (frozen fixtures, timeline ordering, report fidelity, startup failure) are correctly kept residual, which keeps them on UI-015-O2's own test (conservative). The stated reason 'no P0 obligation states them' is wrong for timeline ordering (UI-003-O1 'chronological event history', UI-003-O3 'order by canonical event sequence') and partly for the fixtures (EXT-DATA-013-O3) and startup (UI-014-O2).",
+        "Mechanically, verify-plan only adds a condition (derived is verified only if its own categories are covered AND every constituent is verified; R6ScopeTests checker passes), so evidence requirements did not shrink; what shrank is the plan's statement of what UI-015-O2's own bound test must prove ('Its own bound tests prove its residual clauses')."
+      ],
+      "findings": ["SR-02", "SR-09"]
+    },
+    {
+      "id": 10,
+      "result": "PASS",
+      "evidence": [
+        "kickoff/rehearsal-006/README.md at f8b1a2c pins requirements-compiled/v3/verification-plan.json, VP-13516e0d5930, digest 13516e0d5930d30c89e02cbd2aea895afaea1f08358c02538702aea7bcd8a66c, baseline sha 40599abe...befd, 671/355/372 counts; the plan-readiness example uses the v3 digest. acceptance-process.yml: PLAN v3 path, PLAN_DIGEST 13516e0d...a66c; RULES_SHA256 6f164353...be17c equals sha256 of process-evidence-rules.json.",
+        "grep for 0eb9c791, requirements-compiled/v2, 633, '326 obligations', aab8f80 in kickoff/rehearsal-006/: only the README sentence 'It replaces VP-0eb9c791dd0b (v2, unchanged)'.",
+        "The README example decision id was changed from DEC-R6-007 to DEC-R6-RUN-001, avoiding a collision with the new DEC-R6-007.",
+        "Outside the two pinned files: docs/rehearsal-006/PREFLIGHT.md and preflight.json (not changed after d7a37ad in range) still tell consumers to compare against VP-0eb9c791dd0b."
+      ],
+      "findings": ["SR-13"]
+    }
+  ],
+  "findings": [
+    {
+      "id": "SR-01",
+      "severity": "major",
+      "summary": "The approvals file is an agent-written approval record that the compiler accepts as an authenticated operator approval; RDP-003 forbids this as written, and the records restate RDP-003 as if it permitted it.",
+      "detail": "approvals.causa.json (commit 1865da2, author Claude) carries authority {kind: operator, id: kemiller2002}. VerificationPlan.operatorApprovals treats that string as an authenticated operator approval, and the plan and docs call the amendments 'authenticated operator' changes. RDP-003 says 'An agent MUST NOT: write, edit, generate or infer an approval record', and the R5A-001 intake says the R5A-001-11 decisions (DEC-R6-003, -004) are 'recorded by the owner, not transcribed by an agent'. The records say 'RDP-003: an agent's transcription takes effect only when the owner merges the pull request'. That is not RDP-003's text. It is an interpretation that has precedent on main (docs/PROCESS-EVIDENCE-AND-READINESS.md, owner-merged). The file is honestly labelled as a transcription, and nothing in it presents an agent statement as the owner's. This repeats the defect class the Rehearsal 5 audit scored against AR-024-O1 ('None is authenticated as the owner's action'). Remedy: record it explicitly as an RDP-003 deviation that the owner accepts in the PR review, or have the owner commit the approvals file. Either way the owner's authenticated act, not the JSON authority field, should be what makes the amendments authoritative."
+    },
+    {
+      "id": "SR-02",
+      "severity": "major",
+      "summary": "UI-015-O2 clause 'legal command enforcement' is mapped to constituents that prove less than the clause.",
+      "detail": "Its constituents are UI-004-O1 (render only policy-authorized commands) and UI-004-O6 (no parallel policy engine). Neither requires rejecting an illegal or stale command. UI-004-O4 (reject stale-version submissions, safe fault messages, no duplicate submission) and AR-006-O2 (invalid or unauthorized transitions rejected before side effects) state that, and are not constituents. Because the plan says UI-015-O2's own bound tests prove only its residual clauses, enforcement is no longer something UI-015-O2's test is asked to prove, and its constituents do not prove it either. Two weaker cases: 'offline/conflict recovery' relies on UI-010-O1, which designs a recoverable offline state but does not require recovery; 'catalog load and replay' relies on EXT-DATA-013-O2, which needs no browser evidence. DEC-R6-008 authorizes the derivation as recommended, but this mapping was not part of the recommendation's stated consequence. Fix: add UI-004-O4 and AR-006-O2 to 'legal command enforcement' (and a sync or offline-queue obligation to 'offline/conflict recovery'), or make those clauses residual."
+    },
+    {
+      "id": "SR-03",
+      "severity": "major",
+      "summary": "The derivation consistency check can be defeated through curation: connectives may be any word of the text, and clause-to-constituent semantics are unchecked. Both weakenings compile (V18 PASS) and are READY.",
+      "detail": "derivationProblems accepts any connective that is a word of the obligation text, and removes every occurrence of that word from the residue. So a curation can drop whole clauses by declaring their words connectives. Nothing relates a clause to what its constituents state, so every residual clause can be mapped to an unrelated obligation, leaving UI-015-O2 with no residual clause for its own test. The README claim that the clauses and connectives 'account for every word' therefore does not protect the obligation. The committed v3 does not do this. Any such edit produces a new plan digest, so it would surface in review of the pins.",
+      "reproduction": "In /tmp/claude-0/review/mut-connective: v3 curation with connectives += [report, fidelity, startup, failure] and the clauses 'report fidelity' and 'startup failure' removed. requirements-compiler --source <f8b1a2c worktree> --committed-baseline requirements/causa-requirements-baseline-r6.json --curation mut-connective/curation --out mut-connective/out <repos>: exit 0, 'PASS V18'; plan VP-a286514e0d57 carries the derivation with 9 clauses; plan-readiness with its digest: READY, 0 permitted. In /tmp/claude-0/review/mut-mismap: 'timeline ordering', 'report fidelity' and 'startup failure' mapped to UI-011-O2, and the fixtures clause to EXT-DATA-013-O2: exit 0, PASS V18, VP-115ed2085b5e with zero residual clauses, READY."
+    },
+    {
+      "id": "SR-04",
+      "severity": "major",
+      "summary": "The v3 plan does not validate against the schema shipped in its own package.",
+      "detail": "requirements-compiled/v3/verification-plan.schema.json is byte-identical to v2's revision-2 schema ($id .../revision-2, root additionalProperties false). The v3 plan, described as 'revision 3', adds scopeDecisions, obligation.amendment and obligation.derivation. jsonschema reports 7 errors on the v3 plan and 0 on v2. docs/VERIFICATION-PLAN-CONTRACT.md tells strict validators to use the schema, so a strict consumer rejects the pinned plan. Fix: ship a revision-3 schema in v3 that declares the three members."
+    },
+    {
+      "id": "SR-05",
+      "severity": "minor",
+      "summary": "R5A-001-04 is recorded as 'implemented', but review-tag removals take effect only when an optional, unpinned --review-tag-changes file is supplied.",
+      "detail": "PlanVerification.assess treats ReviewTagChanges = JNull as no removals. No pinned invocation passes the flag: acceptance-process.yml runs only verify-process, and the README's verify-plan example omits it. Omitting the file silently lets a test a review removed count again. That contradicts DEC-R6-008's wording 'A test a review removed from an obligation never counts again'. The listing logic itself works (R6ScopeTests checker passes). Pin the review-tag-changes file, or require it, in the acceptance invocation at kickoff."
+    },
+    {
+      "id": "SR-06",
+      "severity": "minor",
+      "summary": "A resealed plan with UI-015-O2's derivation removed passes preservation, derivation diagnostics and plan-readiness. Only the digest pins catch it.",
+      "detail": "derivationDiagnostics only inspects obligations that still carry a derivation. Nothing cross-checks scopeDecisions.derivedObligations (which still lists UI-015-O2) against the obligations. verify-plan has no plan-digest pin, a pre-existing gap documented in PREFLIGHT.md. Without the derivation, UI-015-O2 verifies without its constituents. It is mitigated by plan-readiness --plan-digest and verify-process --plan-digest.",
+      "reproduction": "dotnet fsi /tmp/claude-0/review/fsx/strip.fsx (drops 'derivation' from UI-015-O2 and its contract, reseals the identity): preservation diagnostics 0, derivation diagnostics 0, plan-readiness READY with permitted 0 against the resealed digest, scopeDecisions still lists [UI-015-O2]."
+    },
+    {
+      "id": "SR-07",
+      "severity": "minor",
+      "summary": "The option texts the owner approved cannot be verified from the repository.",
+      "detail": "The records cite a second owner script, 'Owner Decisions, Acceptance Scope, and Preflight Resolution', which is not committed. For Q1, Q3 and Q4 the option texts in the records differ from the committed R6-OWNER-DECISIONS-SCRIPT.md. For example, the committed Q3 option A is 'The obligation reduces to \"never expose credentials\"', while the record's option A also keeps repository authorization, isolation and secure handling. Both amendments are at least as strict as either version, so nothing is weakened. Still, 'Do what you recommend' approved recommendations whose exact text a reader cannot check. Commit the second script, or quote the options as asked."
+    },
+    {
+      "id": "SR-08",
+      "severity": "minor",
+      "summary": "The context entries quote owner words that are not among the owner statements supplied for this review and first appear in f8b1a2c.",
+      "detail": "owner-decisions.json context quotes 'Ok let's pass on the causa-data requirement of the four cases' and '1 counts as kickoff' (and 'I approve' for the stack). git log -S shows the first two first appear in f8b1a2c. The stack approval is pre-existing on main (README at 856157a: 'approved by the owner on 2026-10-28'), and the four-case waiver is also covered by the Q7 answer. No plan change rests solely on these quotes, but they are presented as owner words this review cannot verify."
+    },
+    {
+      "id": "SR-09",
+      "severity": "minor",
+      "summary": "The reason given for UI-015-O2's residual clauses ('no P0 obligation states them') is wrong for timeline ordering, and partly wrong for fixtures and startup.",
+      "detail": "UI-003-O1 ('Show chronological event history ...') and UI-003-O3 ('order by canonical event sequence where timestamps conflict') state timeline ordering. EXT-DATA-013-O3 states the five v1.0.0 fixtures' role as the storage corpus. UI-014-O2 governs startup behavior. Keeping these residual is conservative, not a weakening, but the records and README state an incorrect basis."
+    },
+    {
+      "id": "SR-10",
+      "severity": "minor",
+      "summary": "DEC-R6-001 leaves PF-015-O2's read-only-secret versus live-write tension to 'the implementation and the independent reviewer'.",
+      "detail": "Deciding how PF-015-O2 ('an approved secret ... with least-privilege read-only permissions') is met while the PF-014 live writes need write access is an interpretation of scope. The R6 script reserves such interpretations for the owner ('Do not choose for the owner'). The record correctly does not decide it. However, the suggested second write token would be a new secret, which AR-033 requires to be ready before kickoff, and it needs owner approval. This should be an owner decision before kickoff, not left to the implementer."
+    },
+    {
+      "id": "SR-11",
+      "severity": "minor",
+      "summary": "The v3 rebuild depends on approvals commit 1865da2 staying reachable. A squash merge breaks it.",
+      "detail": "curation/verification-plan.json pins approvals by commit 1865da2, and R6ScopeTests reads it with Git.showFile. The README asks for a merge commit, but nothing enforces that. After a squash merge, --check and the offline suite on main would fail to read the approvals."
+    },
+    {
+      "id": "SR-12",
+      "severity": "minor",
+      "summary": "The 'decision' field of obligationAmendments and derivedObligations is unvalidated free text.",
+      "detail": "VerificationPlan.problems only requires it to be non-empty. It is not checked against the approval's 'decision' or against owner-decisions.json, so the plan's citation of a decision can be wrong without any diagnostic. The committed values (DEC-R6-003, -004, -008) are correct."
+    },
+    {
+      "id": "SR-13",
+      "severity": "minor",
+      "summary": "The Rehearsal 6 preflight records are stale against v3 at f8b1a2c.",
+      "detail": "docs/rehearsal-006/PREFLIGHT.md and preflight.json were not changed after d7a37ad. They still say consumers must compare the reported plan id to VP-0eb9c791dd0b, and they report BLOCKED. The script's section 7 asks for a re-evaluated preflight. The kickoff pins themselves (README, acceptance-process.yml) are correct."
+    },
+    {
+      "id": "SR-14",
+      "severity": "minor",
+      "summary": "AR-031-O2 requires only reviewer acceptance, although its text calls for an owner Decision Record and the owner-decision category exists.",
+      "detail": "AR-031-O2 reads 'Before the clock starts, the owner MUST decide ... and the decision MUST be recorded as a Decision Record.' It is bound only to praxis:independent-review (independent-acceptance). This is not a reduction against v2 (the obligation is new). Given SR-01, the owner's authorship of DEC-R6-006 is not machine-checked."
+    },
+    {
+      "id": "SR-15",
+      "severity": "minor",
+      "summary": "The branch moved beyond the reviewed range, and the later commits change the reviewed records.",
+      "detail": "HEAD is 9297528, after 317eaf1 and 9297528. These change kickoff/rehearsal-006/owner-decisions.json (+354/-57 lines across the three files), OWNER-DECISIONS.md and input-documents/2026-10-28-R5A-001-...md. 9297528 adds DEC-R6-009 with ownerWords 'I approve all recommendations and necessary merges going forward', which is not among the statements given to this reviewer. This review does not cover those commits, and its verdict does not extend to them."
+    }
+  ],
+  "verdict": "NO_BLOCKING_FINDINGS",
+  "attestation": "NOT_ATTESTED: counts as the independent review only when the owner (kemiller2002) attests it with a GitHub review of the pull request"
+}
