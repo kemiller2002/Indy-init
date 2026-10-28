@@ -8,7 +8,7 @@ Prepared on 2026-10-28 for ESO-R6-02, ESO-R6-03 and ESO-R6-05
 
 | What | Value |
 |---|---|
-| Stack | `echelon-current` **1.31.0** (echelon-registry#102, approved by the owner on 2026-10-28) |
+| Stack | `echelon-current` **1.32.0** (echelon-registry#103, approved by the owner on 2026-10-28): Praxis 3.23.0, Ordo 1.19.0, Dokimos 0.9.0, Limen 0.9.1, Forma 0.11.0, Arca 0.6.0, qualified by Conditor 0.10.17 |
 | Verification plan | `requirements-compiled/v2/verification-plan.json`, `VP-0eb9c791dd0b`, digest `0eb9c791dd0beba7d63f709a810c2f0d379ea71e03c74a53d8b34951a9260766` |
 | Process-evidence rules | `process-evidence-rules.json`, SHA-256 `6f16435369a046e534e4787903ea96c4a9f7e0adcf7b5b51d4ea15ac156be17c` |
 | Readiness rules | none: `plan-readiness` is READY with no permitted gap |
