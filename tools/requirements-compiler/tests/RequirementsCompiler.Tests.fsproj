@@ -12,6 +12,7 @@
     <Compile Include="RehearsalBaselines.fs" />
     <Compile Include="ProcessTests.fs" />
     <Compile Include="R6ReadinessTests.fs" />
+    <Compile Include="R6ScopeTests.fs" />
     <Compile Include="Tests.fs" />
   </ItemGroup>
   <ItemGroup>

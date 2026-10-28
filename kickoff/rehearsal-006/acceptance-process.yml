@@ -23,8 +23,8 @@ permissions:
 
 env:
   INDY_INIT_COMMIT: "REPLACE-AT-KICKOFF"
-  PLAN: indy-init/requirements-compiled/v2/verification-plan.json
-  PLAN_DIGEST: "0eb9c791dd0beba7d63f709a810c2f0d379ea71e03c74a53d8b34951a9260766"
+  PLAN: indy-init/requirements-compiled/v3/verification-plan.json
+  PLAN_DIGEST: "13516e0d5930d30c89e02cbd2aea895afaea1f08358c02538702aea7bcd8a66c"
   RULES: indy-init/kickoff/rehearsal-006/process-evidence-rules.json
   RULES_SHA256: "6f16435369a046e534e4787903ea96c4a9f7e0adcf7b5b51d4ea15ac156be17c"
 

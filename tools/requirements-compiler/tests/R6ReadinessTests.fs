@@ -79,12 +79,13 @@ let reviewConverter () : string list =
           | _ -> yield sprintf "review converter: decisions %s" (serialize (JArr ds))
           if str "commit" x <> c || str "state" x <> "APPROVED" || str "login" x <> "kemiller2002" then yield "review converter: review fields" ]
 
-/// The frozen rules are well formed against the committed plan, and every pin the kickoff names is the real hash.
+/// The frozen rules are well formed against the plan the kickoff pins (v3, owner decision DEC-R6-005), and every pin
+/// the kickoff names is the real hash.
 let frozenRules (source: string) : string list =
     let rulesPath = Path.Combine(kickoff source, "process-evidence-rules.json")
     let bytes = File.ReadAllBytes rulesPath
     let sha = Git.sha256Hex bytes
-    let plan = parseFile (Path.Combine(v2 source, "verification-plan.json"))
+    let plan = parseFile (Path.Combine(source, "requirements-compiled", "v3", "verification-plan.json"))
     let digest = VerificationPlan.digestOf plan
     let i : ProcessVerification.Inputs =
         { Plan = plan; ExpectedPlanDigest = digest; Events = []; Executions = Map.empty; Rules = parseBytes bytes

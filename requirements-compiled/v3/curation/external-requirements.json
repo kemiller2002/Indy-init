@@ -1,0 +1,13 @@
+{
+  "schema": "indy-init.rc-external-requirements/1",
+  "description": "Requirement documents outside the indy-init baseline that state obligations for the Causa application. They are inventoried so they are traceable; they are NOT part of the Praxis preservation baseline (see finding F-006).",
+  "documents": [
+    {
+      "key": "HISTORICAL-CASE-CATALOG",
+      "repo": "causa-data",
+      "path": "research/HISTORICAL-CASE-CATALOG.md",
+      "sha256": "9f1a1897a13f8b31c27607686b58fe3115a9d5e4b4de1e2d4d4bb5106e4c68b8",
+      "reason": "States the required active demonstration catalog (Apollo 1, Apollo 11, Challenger) and that the application loads it externally."
+    }
+  ]
+}

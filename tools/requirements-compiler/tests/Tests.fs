@@ -346,7 +346,8 @@ let private assessCandidate (i: VerificationPlan.Inputs) (approvalsRaw: byte[]) 
           TrustedSourceSha = candidateSha
           ApprovalsRaw = approvalsRaw
           TrustedOperators = [ "kemiller2002" ]
-          ProcessCovered = c.Process }
+          ProcessCovered = c.Process
+          ReviewTagChanges = JNull }
 
 /// Re-pins every manifest entry to the evidence as it now is (a producer that re-hashed what it wrote).
 let private repinAll (c: Candidate) =
@@ -704,7 +705,7 @@ let main argv =
             eprintfn "%s" e
             2
         | Ok o ->
-            let processFailures = snd (processSimulation o.Source) @ producerBindings o.Source @ r6Readiness o.Source
+            let processFailures = snd (processSimulation o.Source) @ producerBindings o.Source @ r6Readiness o.Source @ R6ScopeTests.all o.Source
             report (offline o.Source @ processFailures) "offline tests (baseline equivalence, baseline units, preflight verdict, verification plan, acceptance contracts, process evidence)"
     | "--readiness-replay" :: rest ->
         match rest with

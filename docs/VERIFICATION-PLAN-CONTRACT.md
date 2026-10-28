@@ -4,11 +4,11 @@ The verification plan is the per-requirement statement of what acceptance must p
 
 | | |
 |---|---|
-| Artifact | `requirements-compiled/v2/verification-plan.json` (v1, frozen as committed at `459f65a`, holds `VP-e77a2134e1b0`, the plan Rehearsal 5 uses) |
+| Artifact | `requirements-compiled/v3/verification-plan.json`, the plan Rehearsal 6 pins. v2 (`VP-0eb9c791dd0b`) is unchanged and still rebuilt byte for byte; v1, frozen as committed at `459f65a`, holds `VP-e77a2134e1b0`, the plan Rehearsal 5 uses |
 | Schema | `requirements-compiled/v2/verification-plan.schema.json` (JSON Schema 2020-12, `schema: "indy-init.verification-plan/1"`, revision 2) |
 | Generator | `tools/requirements-compiler` (F#), in the same run as the rest of the package. It is listed in `package-manifest.json` under `generated`. |
 | Curated input | `requirements-compiled/v2/curation/verification-plan.json`: freshness policies, the gate-to-policy map, test bindings (with evidence categories), exclusions and the pinned approvals source. `requirements-compiled/v2/curation/evidence-categories.json`: the declared evidence-category rules |
-| Current identity | `planId` `VP-0eb9c791dd0b`, digest `0eb9c791dd0beba7d63f709a810c2f0d379ea71e03c74a53d8b34951a9260766` (baseline `BL-CAUSA-INDY-INIT-aab8f80c7743`: 108 P0 requirements, 326 obligations, all bound: 29 to Praxis producers, the rest by the Rehearsal 6 test proposal; 0 unclassified). Process and owner evidence classes: [PROCESS-EVIDENCE-AND-READINESS.md](PROCESS-EVIDENCE-AND-READINESS.md) |
+| Current identity | `planId` `VP-13516e0d5930`, digest `13516e0d5930d30c89e02cbd2aea895afaea1f08358c02538702aea7bcd8a66c` (v3; baseline `BL-CAUSA-INDY-INIT-856157a78d47`: 115 P0 requirements, 355 obligations, all bound: 29 to Praxis producers, the rest by the Rehearsal 6 test proposal; 0 unclassified; owner decisions DEC-R6-001..008). Process and owner evidence classes: [PROCESS-EVIDENCE-AND-READINESS.md](PROCESS-EVIDENCE-AND-READINESS.md) |
 
 **Revision 2 is additive.** Every revision-1 member keeps its name, type and meaning; the only change to an existing member is the value `UNVERIFIED` appended to `statusVocabulary.verification`. Ordo's reader (`VerificationPlanWire.readPlan`, which ignores unknown members) reads the v2 plan: 108 requirements, 326 obligations. The v1 schema document is closed (`additionalProperties: false`), so a strict validator of that document rejects a revision-2 plan; validate against the v2 schema.
 
@@ -84,9 +84,21 @@ The verification plan is the per-requirement statement of what acceptance must p
 | `STALE-EVIDENCE` | Evidence or its manifest comes from another run or commit, even when the digests have been re-pinned. | `evidence … is bound to source … not the candidate …` |
 | `UNAUTHORIZED-EXCLUSION` | An exclusion without an authenticated operator approval in the pinned approvals file and in the plan. | `unauthorized exclusion of PF-005 (approval 'APR-INVENTED' …)` |
 | `CONTRACT-INCONSISTENT` | An acceptance contract that differs from what the embedded rules derive, for example removed categories or a forged `verified`. | `acceptance contract differs from what the embedded rules derive (requiredEvidenceCategories, …)` |
+| `UNAUTHORIZED-AMENDMENT` | An obligation amendment that is not exactly an authenticated operator change `{obligation_id, action: amend, criterion, rationale}` in the pinned approvals file. | `obligation UI-016-O11 is amended by 'APR-R6-003', which is not an authenticated operator amendment …` |
+| `DERIVATION-INCONSISTENT` | A derived obligation whose clauses are not whole verbatim phrases of its text, leave text unaccounted for, or name constituents that are missing, excluded, derived, or under another VPO id. | `derived obligation UI-015-O2 leaves obligation text that no clause accounts for: timeline ordering` |
 | `PLAN-IDENTITY`, `EXTRA-REQUIREMENT`, `EXTRA-OBLIGATION`, `DUPLICATE`, `EVIDENCE-INTEGRITY` | A digest mismatch, invented entries, duplicates, or a manifest, ledger or approvals pin mismatch. | |
 
 Any of these makes the verdict INVALID.
+
+**Scope decisions (revision 3, additive).** A plan carries the top-level member `scopeDecisions` only when its curation amends or derives an obligation; v2 has neither and is unchanged.
+
+- **An amended obligation** keeps its baseline text verbatim and gains `amendment {approval, decision, criterion, rationale}`, also copied into its acceptance contract. The amendment changes what the bound tests must prove. It never verifies the obligation or removes it from scope.
+- **A derived obligation** gains `derivation {decision, connectives, clauses: [{clause, residual, constituents: [{obligation, obligationId}]}]}`. Its own bound tests prove its residual clauses. It is verified only when its own categories are covered **and** every constituent is verified. Otherwise each unverified constituent is listed with reason `constituent-unverified`.
+- **Review tag changes** (`--review-tag-changes FILE`, `indy-init.review-tag-changes/1`, R5A-001-04): `{changes: [{obligation, test, review, resolution?}]}`.
+  - A test a review removed never counts for that obligation again.
+  - Its categories are missing as `unbound-after-review` until the removal is resolved, then as `removed-by-review`. A removal is resolved by `rebound` to tests the plan binds to the obligation, or by `not-rebound` with a reason.
+  - The assessment lists every removal under `unboundAfterReview`.
+  - An inadmissible change is reported as `REVIEW-TAG-CHANGE` and stays open. A removal can only withdraw evidence, never add it.
 
 ## Verifying a candidate against the plan
 
@@ -132,7 +144,7 @@ it verified; it never reads an assessment file. See
 
 ## Consuming the plan before implementation
 
-See `requirements-compiled/v2/README.md`, "How agents consume the plan before implementation". In short:
+See `requirements-compiled/v2/README.md`, "How agents consume the plan before implementation" (unchanged for v3; see `requirements-compiled/v3/README.md`). In short:
 1. Pin the digest, and read each obligation's `requiredEvidenceCategories` and `freshness.policy` before writing code.
 2. Have the owner bind each test to the obligations it fully proves, with exactly the categories it proves.
 3. Report results per VPO id.

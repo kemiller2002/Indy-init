@@ -1,0 +1,143 @@
+{
+  "schema": "indy-init.requirements-validation-report/1",
+  "source": {
+    "repository": "kemiller2002/indy-init",
+    "commit": "856157a78d47946d264ec49ee8325fcf996ae9b9",
+    "baselineSha256": "40599abe92724dae6796ee0d6a9bf5711c4db882fc79c77b38a43d0f0960befd"
+  },
+  "compilationVerdict": "PASS",
+  "compilationRule": "FAIL when any critical check reports a problem; the compiler then exits 3",
+  "checks": [
+    {
+      "id": "V01",
+      "title": "Every original requirement and obligation is represented verbatim; the baseline matches its source commit",
+      "critical": true,
+      "status": "PASS",
+      "problems": []
+    },
+    {
+      "id": "V02",
+      "title": "Every normalized requirement and obligation traces to its source",
+      "critical": true,
+      "status": "PASS",
+      "problems": []
+    },
+    {
+      "id": "V03",
+      "title": "No unresolved contradiction is silently accepted",
+      "critical": true,
+      "status": "PASS",
+      "problems": []
+    },
+    {
+      "id": "V04",
+      "title": "All referenced dependencies, tasks, decisions and contracts exist",
+      "critical": true,
+      "status": "PASS",
+      "problems": []
+    },
+    {
+      "id": "V05",
+      "title": "The dependency graph is a valid DAG with justified edges",
+      "critical": true,
+      "status": "PASS",
+      "problems": []
+    },
+    {
+      "id": "V06",
+      "title": "Every requirement has verification coverage",
+      "critical": true,
+      "status": "PASS",
+      "problems": []
+    },
+    {
+      "id": "V07",
+      "title": "Every contract is identifiable and no contract is over-claimed",
+      "critical": true,
+      "status": "PASS",
+      "problems": []
+    },
+    {
+      "id": "V08",
+      "title": "Every fixed decision has a verified authoritative source and constraints",
+      "critical": true,
+      "status": "PASS",
+      "problems": []
+    },
+    {
+      "id": "V09",
+      "title": "Both execution plans preserve the complete scope, dependencies and completion conditions",
+      "critical": true,
+      "status": "PASS",
+      "problems": []
+    },
+    {
+      "id": "V10",
+      "title": "No requirement is marked complete; the source commit holds no application implementation",
+      "critical": true,
+      "status": "PASS",
+      "problems": []
+    },
+    {
+      "id": "V11",
+      "title": "Every citation is found verbatim at the recorded commit",
+      "critical": true,
+      "status": "PASS",
+      "problems": []
+    },
+    {
+      "id": "V12",
+      "title": "Every repository checkout is at the recorded commit",
+      "critical": true,
+      "status": "PASS",
+      "problems": []
+    },
+    {
+      "id": "V13",
+      "title": "The Percepta experiment references defined metrics and generated plans",
+      "critical": true,
+      "status": "PASS",
+      "problems": []
+    },
+    {
+      "id": "V15",
+      "title": "Every readiness blocker is classified and every open decision carries alternatives, a recommendation and the approval it needs",
+      "critical": true,
+      "status": "PASS",
+      "problems": []
+    },
+    {
+      "id": "V16",
+      "title": "Preflight and timed-execution manifests are complete and consistent",
+      "critical": true,
+      "status": "PASS",
+      "problems": []
+    },
+    {
+      "id": "V17",
+      "title": "Every P0 requirement is covered by a work item and a verification gate",
+      "critical": true,
+      "status": "PASS",
+      "problems": []
+    },
+    {
+      "id": "V14",
+      "title": "The committed baseline has no drift against the source commit (readiness, non-critical for compilation)",
+      "critical": false,
+      "status": "PASS",
+      "problems": []
+    },
+    {
+      "id": "V18",
+      "title": "The verification plan preserves every baseline P0 requirement and obligation; exclusions are operator-authorized; test bindings resolve and declare valid evidence categories; every obligation carries its derived acceptance contract",
+      "critical": true,
+      "status": "PASS",
+      "problems": []
+    }
+  ],
+  "rehearsalReadiness": {
+    "verdict": "READY",
+    "rule": "BLOCKED while any critical material unresolved finding, unresolved decision, blocked contract, or missing contract that no planned task produces remains; a compilation PASS is not readiness",
+    "blockers": []
+  }
+}

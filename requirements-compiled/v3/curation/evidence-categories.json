@@ -1,0 +1,401 @@
+{
+  "schema": "indy-init.evidence-categories/1",
+  "description": "Declared rules that assign required evidence categories to plan obligations. A rule applies to an obligation when every condition it states holds (conditions: rules = verification rule ids from verification-rules.json, gates, documents, requirements = selector grammar of Model.matches, titlePattern = .NET regex over the requirement title, obligationKinds, obligations = exact baseline obligation ids, freshnessPolicies = the requirement's plan policy); within one condition any listed value matches. Every applicable rule contributes its category; the union is the obligation's required set. An obligation no rule reaches is reported 'unclassified' missing coverage, never assigned a default. Each rule cites the declared requirement data it rests on (source), so a reviewer can check it without reading code. Categories also state their evidence class (application-test, reviewer, process, owner) and the producer expected to create the evidence; process and owner categories are proven by run records and owner attestations (verify-process), never by an application test.",
+  "categories": [
+    {
+      "id": "unit",
+      "definition": "Deterministic tests of one component in isolation (F# unit and property tests, illegal-transition and forged-history variants); no browser, provider or network.",
+      "testKinds": [
+        "deterministic"
+      ],
+      "freshnessPolicy": null,
+      "evidenceClass": "application-test",
+      "producer": "test run of the application (Dokimos / CI test job)"
+    },
+    {
+      "id": "integration",
+      "definition": "Tests across a boundary between components or systems: producer/consumer contract tests, recorded-response provider contract tests, storage golden replay, dependency compatibility smoke, catalog verification.",
+      "testKinds": [
+        "deterministic",
+        "live"
+      ],
+      "freshnessPolicy": null,
+      "evidenceClass": "application-test",
+      "producer": "test run of the application (Dokimos / CI test job)"
+    },
+    {
+      "id": "browser",
+      "definition": "The application exercised in a real browser engine (WebKit/Chromium via Percepta or Playwright), offline-fixture or deployed, including printed and rendered output.",
+      "testKinds": [
+        "deterministic",
+        "live"
+      ],
+      "freshnessPolicy": null,
+      "evidenceClass": "application-test",
+      "producer": "browser test run (Percepta / Playwright in CI)"
+    },
+    {
+      "id": "live-provider",
+      "definition": "Real requests against the authorized live provider (the GitHub test repository) in the candidate's own run, with independent re-reads; mocked or recorded responses never count.",
+      "testKinds": [
+        "live"
+      ],
+      "freshnessPolicy": "FP-LIVE-PER-COMMIT",
+      "evidenceClass": "application-test",
+      "producer": "live provider test run in the candidate's own CI run"
+    },
+    {
+      "id": "security",
+      "definition": "Evidence that a security property holds: credential handling, least privilege, secret non-disclosure in logs, URLs, screenshots and artifacts.",
+      "testKinds": [
+        "deterministic",
+        "live",
+        "review"
+      ],
+      "freshnessPolicy": null,
+      "evidenceClass": "application-test",
+      "producer": "security test run or security review record"
+    },
+    {
+      "id": "accessibility",
+      "definition": "Accessibility verification: automated accessibility report (axe), keyboard-only and focus checks, reduced motion, screen-reader semantics.",
+      "testKinds": [
+        "deterministic",
+        "live",
+        "review"
+      ],
+      "freshnessPolicy": null,
+      "evidenceClass": "application-test",
+      "producer": "accessibility test run or accessibility review record"
+    },
+    {
+      "id": "independent-acceptance",
+      "definition": "Evidence produced by a party independent of the implementing agent: an independent reviewer's record, or an acceptance job the implementer does not author, bound to the reviewed or deployed SHA.",
+      "testKinds": [
+        "review"
+      ],
+      "freshnessPolicy": "FP-REVIEW-PER-COMMIT",
+      "evidenceClass": "reviewer",
+      "producer": "independent reviewer record (Praxis work evidence --kind independent-review) or an acceptance job the implementer does not author"
+    },
+    {
+      "id": "process-record",
+      "definition": "A record of how the work was carried out, written while it happened to the run's Praxis event log: assignment, execution start, checkpoints, dependency decisions, scope changes, release-candidate selection, test-result and acceptance references. A record the tooling observed (a verified checkpoint, CI automation) or a statement an agent made, bound to the candidate; never a reviewer finding or an owner decision.",
+      "testKinds": [
+        "process"
+      ],
+      "freshnessPolicy": "FP-PROCESS-THIS-RUN",
+      "evidenceClass": "process",
+      "producer": "Praxis work event log of the rehearsal repository (work start, work checkpoint, work evidence)"
+    },
+    {
+      "id": "owner-decision",
+      "definition": "A decision that only the owner or an authorized human may make, recorded by that human and backed by an attestation the verifier checks against the frozen rules (for example a pull-request review by the owner's login, fetched by CI). A decision an agent transcribed is an agent assertion and never counts.",
+      "testKinds": [
+        "owner"
+      ],
+      "freshnessPolicy": "FP-PROCESS-THIS-RUN",
+      "evidenceClass": "owner",
+      "producer": "owner-approval records in the Praxis work event log, with CI-observed attestations"
+    }
+  ],
+  "rules": [
+    {
+      "id": "EC-UI-BROWSER",
+      "category": "browser",
+      "when": {
+        "rules": [
+          "VR-UI"
+        ]
+      },
+      "source": "verification-rules.json VR-UI method: \"Percepta semantic contract verification of populated states at the deployed exact SHA; WebKit at iPad portrait/landscape, desktop and mobile\""
+    },
+    {
+      "id": "EC-UI-ACCESSIBILITY",
+      "category": "accessibility",
+      "when": {
+        "rules": [
+          "VR-UI"
+        ]
+      },
+      "source": "verification-rules.json VR-UI method: \"axe accessibility; keyboard and reduced-motion checks\"; evidence: \"accessibility report\""
+    },
+    {
+      "id": "EC-DOMAIN-UNIT",
+      "category": "unit",
+      "when": {
+        "rules": [
+          "VR-DOMAIN"
+        ]
+      },
+      "source": "verification-rules.json VR-DOMAIN method: \"F# unit and property tests including illegal-transition and forged-history variants\""
+    },
+    {
+      "id": "EC-INTERFACE-INTEGRATION",
+      "category": "integration",
+      "when": {
+        "rules": [
+          "VR-INTERFACE"
+        ]
+      },
+      "source": "verification-rules.json VR-INTERFACE method: \"producer/consumer contract tests at the interface-manifest SHA\""
+    },
+    {
+      "id": "EC-STORAGE-INTEGRATION",
+      "category": "integration",
+      "when": {
+        "rules": [
+          "VR-STORAGE"
+        ]
+      },
+      "source": "verification-rules.json VR-STORAGE method: \"three identities match; golden replay of five scenarios; 90 negative fixtures refused\""
+    },
+    {
+      "id": "EC-PERSISTENCE-LIVE",
+      "category": "live-provider",
+      "when": {
+        "rules": [
+          "VR-PERSISTENCE"
+        ]
+      },
+      "source": "verification-rules.json VR-PERSISTENCE (gate G6) method: \"live create/read/write/reload/conflict/rejected-token against the test repository with independent SHA re-reads\"; freshness: \"live evidence from this run only\""
+    },
+    {
+      "id": "EC-PERSISTENCE-INTEGRATION",
+      "category": "integration",
+      "when": {
+        "rules": [
+          "VR-PERSISTENCE"
+        ]
+      },
+      "source": "verification-rules.json VR-PERSISTENCE method: \"four verification levels (PF-011)\" and \"fakes only from recorded responses\" (the provider-conformance level, PF-011-O3: shared contract tests against fixture and GitHub adapters)"
+    },
+    {
+      "id": "EC-DEPENDENCIES-INTEGRATION",
+      "category": "integration",
+      "when": {
+        "rules": [
+          "VR-DEPENDENCIES"
+        ]
+      },
+      "source": "verification-rules.json VR-DEPENDENCIES method: \"lock compared with installed and loaded artifacts; set qualification; compatibility smoke\""
+    },
+    {
+      "id": "EC-DEFECT-CLASS-INDEPENDENT",
+      "category": "independent-acceptance",
+      "when": {
+        "rules": [
+          "VR-DEFECT-CLASS"
+        ]
+      },
+      "source": "verification-rules.json VR-DEFECT-CLASS (gate G7) method: \"independent approval, SHA-bound proof\"; owner: \"independent reviewer + Dokimos\""
+    },
+    {
+      "id": "EC-DECISIONS-INDEPENDENT",
+      "category": "independent-acceptance",
+      "when": {
+        "rules": [
+          "VR-DECISIONS"
+        ]
+      },
+      "source": "verification-rules.json VR-DECISIONS (gate G7) owner: \"independent architecture review\""
+    },
+    {
+      "id": "EC-REPORT-BROWSER",
+      "category": "browser",
+      "when": {
+        "rules": [
+          "VR-REPORT"
+        ]
+      },
+      "source": "verification-rules.json VR-REPORT method: \"report fidelity against projections; print rendering\"; evidence: \"rendered report artifact at the deployed SHA\""
+    },
+    {
+      "id": "EC-DEPLOYMENT-INDEPENDENT",
+      "category": "independent-acceptance",
+      "when": {
+        "rules": [
+          "VR-DEPLOYMENT"
+        ]
+      },
+      "source": "verification-rules.json VR-DEPLOYMENT (gate G9) owner: \"Dokimos (deployed acceptance)\"; method: \"successful acceptance job on the same SHA\""
+    },
+    {
+      "id": "EC-CATALOG-INTEGRATION",
+      "category": "integration",
+      "when": {
+        "rules": [
+          "VR-CATALOG"
+        ]
+      },
+      "source": "verification-rules.json VR-CATALOG method: \"catalog verification plus application load after Connect\""
+    },
+    {
+      "id": "EC-SECURITY-TITLE",
+      "category": "security",
+      "when": {
+        "titlePattern": "(?i)\\bsecur|\\bcredential"
+      },
+      "source": "baseline requirement titles that name security or credentials (at aab8f80: AR-014 \"Secure capability isolation\", PF-015 \"Credentials and security\"); no verification rule declares a security method, so the title is the declared data used"
+    },
+    {
+      "id": "EC-PROCESS-DISCOVERY",
+      "category": "process-record",
+      "when": {
+        "obligations": [
+          "AR-005-O1",
+          "AR-005-O2"
+        ]
+      },
+      "source": "baseline obligation text (process, not product behaviour): AR-005-O1 \"Before designing a component, discover existing Echelon capabilities, owners, supported versions, and contracts.\"; AR-005-O2 \"Reuse verified implementations; require an explicit approved justification for duplication.\""
+    },
+    {
+      "id": "EC-PROCESS-SCOPE",
+      "category": "process-record",
+      "when": {
+        "obligations": [
+          "AR-012-O1",
+          "AR-012-O2"
+        ]
+      },
+      "source": "baseline obligation text (process, not product behaviour): AR-012-O1 \"Agent changes must be bounded to named requirements and paths; commits should stage intended files only.\"; AR-012-O2 \"Detect unrelated changes and require explicit review before inclusion.\""
+    },
+    {
+      "id": "EC-PROCESS-CHECKPOINTS",
+      "category": "process-record",
+      "when": {
+        "obligations": [
+          "AR-015-O1",
+          "AR-021-O1",
+          "AR-021-O2"
+        ]
+      },
+      "source": "baseline obligation text (process, not product behaviour): AR-015-O1 \"Maintain durable, compact, machine-readable checkpoints of objectives, decisions, completed work, open defects, evidence, and next actions so agent restarts do not re-decide settled questions.\"; AR-021-O1 \"Prefer one long-running implementation agent with compact durable checkpoints.\"; AR-021-O2 \"Do not require structured handoffs by default.\""
+    },
+    {
+      "id": "EC-PROCESS-INTAKE",
+      "category": "process-record",
+      "when": {
+        "obligations": [
+          "AR-017-O1",
+          "AR-017-O2",
+          "UI-021-O3",
+          "UI-040-O2",
+          "VER-010-O1",
+          "VER-010-O2"
+        ]
+      },
+      "source": "baseline obligation text (process, not product behaviour): AR-017-O1 \"Route implementation work to the actual owning repository through its documented Praxis input folder and accepted grammar, never GitHub Issues.\"; AR-017-O2 \"Do not assume component ownership from its name.\"; UI-021-O3 \"Preserve traceability and approved-scope handling in Praxis.\"; UI-040-O2 \"Trace all requirements through the documented Praxis input process; record approved exclusions explicitly.\"; VER-010-O1 \"Every future rehearsal must reconcile VER-001..VER-010 with implementation and tests or an explicitly approved exclusion.\"; VER-010-O2 \"Work items must go through each owning repository's documented Praxis input path, not GitHub Issues.\""
+    },
+    {
+      "id": "EC-PROCESS-RELEASE-SELECTION",
+      "category": "process-record",
+      "when": {
+        "obligations": [
+          "VER-001-O1",
+          "VER-001-O2",
+          "VER-001-O3",
+          "VER-002-O1",
+          "VER-002-O2",
+          "VER-002-O3",
+          "VER-003-O1",
+          "VER-003-O2",
+          "VER-004-O3"
+        ]
+      },
+      "source": "baseline obligation text (process, not product behaviour): VER-001-O1 \"Each build MUST use the newest available stable, published, compatible release of every applicable Echelon system at the time the build baseline is locked.\"; VER-001-O2 \"Applicable systems include Praxis, Ordo, Dokimos, Percepta, Forma, Forma Studio/workflow layout, Limen, Folio, and any actually integrated Echelon dependencies.\"; VER-001-O3 \"Discover the real owner and release channel for each; do not invent a release or assume every system is a runtime dependency.\"; VER-002-O1 \"Query authoritative package registries, GitHub releases/tags, or the owning repository's documented release source immediately before baseline lock.\"; VER-002-O2 \"Record checked timestamp, candidate release, source reference, and why it was selected.\"; VER-002-O3 \"Do not equate latest main commit with latest released artifact.\"; VER-003-O1 \"Prefer latest stable only when integration contracts and acceptance tests pass.\"; VER-003-O2 \"If the newest release is incompatible, fail the upgrade gate or obtain a documented, authorized exception for the newest known compatible release.\"; VER-004-O3 \"Re-resolve latest versions for each new rehearsal or explicitly authorized refresh.\""
+    },
+    {
+      "id": "EC-PROCESS-REVIEW-RECORD",
+      "category": "process-record",
+      "when": {
+        "obligations": [
+          "AR-021-O3",
+          "UI-030-O3"
+        ]
+      },
+      "source": "baseline obligation text (process, not product behaviour): AR-021-O3 \"Measure correctness and requirement retention after context compaction; use independent reviewers at release candidates.\"; UI-030-O3 \"Record source requirement IDs, tests, exact deployed SHA, and independent review.\""
+    },
+    {
+      "id": "EC-PROCESS-TEST-ORDER",
+      "category": "process-record",
+      "when": {
+        "obligations": [
+          "PF-019-O1"
+        ]
+      },
+      "source": "baseline obligation text (process, not product behaviour): PF-019-O1 \"During development, agents should run the smallest relevant deterministic tests first, batch integration checks at meaningful checkpoints, and run the complete live/deployed suite before release.\""
+    },
+    {
+      "id": "EC-OWNER-KICKOFF-DECISIONS",
+      "category": "owner-decision",
+      "when": {
+        "obligations": [
+          "AR-024-O1",
+          "AR-024-O2",
+          "AR-008-O2"
+        ]
+      },
+      "source": "baseline obligation text (a decision only an authorized human makes): AR-024-O1 \"An authorized human must resolve the write scope, Percepta release/waiver, DF-CAUSA-2026-0003 operator decisions, and frozen requirements/stack before a timed full-write rehearsal.\"; AR-024-O2 \"Agents must not self-ratify these decisions.\"; AR-008-O2 \"Reviewers cannot self-ratify operator decisions.\""
+    },
+    {
+      "id": "EC-AR029-START-BROWSER",
+      "category": "browser",
+      "when": {
+        "obligations": [
+          "AR-029-O1"
+        ]
+      },
+      "source": "baseline obligation text at 856157a (AR-027..AR-035, added for Rehearsal 6 by DEC-R6-005; the text requires a start in a real browser): AR-029-O1 \"Every change to the application MUST show, in CI, that both the production and test builds start in a real browser on every primary route with no runtime or interpreter fault.\""
+    },
+    {
+      "id": "EC-AR030-PRODUCTION-SECURITY",
+      "category": "security",
+      "when": {
+        "obligations": [
+          "AR-030-O1",
+          "AR-030-O2"
+        ]
+      },
+      "source": "baseline obligation text at 856157a (AR-027..AR-035, added for Rehearsal 6 by DEC-R6-005; the text requires CI proof that the production artifact exposes no test control): AR-030-O1 \"Test-only hooks, state injection, fixture modes and their exports MUST be compiled out of the production build, not merely disabled.\"; AR-030-O2 \"CI MUST prove the production artifact contains none of them and that neither page globals nor runtime exports can enable them.\""
+    },
+    {
+      "id": "EC-AR035-MULTI-WRITER-INTEGRATION",
+      "category": "integration",
+      "when": {
+        "obligations": [
+          "AR-035-O1",
+          "AR-035-O2",
+          "AR-035-O3",
+          "AR-035-O4"
+        ]
+      },
+      "source": "baseline obligation text at 856157a (AR-027..AR-035, added for Rehearsal 6 by DEC-R6-005; the text requires persistence proven across writers): AR-035-O1 \"Persistence MUST be proven under concurrent writers: several tabs, devices and page loads, with lost answers and reloads.\"; AR-035-O2 \"Write markers MUST be unique across writers, and a save MUST NOT count as confirmed until the committed content has been read back and verified.\"; AR-035-O3 \"After a write is sent, any answer the code does not recognise MUST be treated as \"may have saved\", never as \"not written\".\"; AR-035-O4 \"Device-local durable state MUST survive several tabs sharing one store.\""
+    },
+    {
+      "id": "EC-AR035-MULTI-TAB-BROWSER",
+      "category": "browser",
+      "when": {
+        "obligations": [
+          "AR-035-O1",
+          "AR-035-O4"
+        ]
+      },
+      "source": "baseline obligation text at 856157a (AR-027..AR-035, added for Rehearsal 6 by DEC-R6-005; the text requires several tabs): AR-035-O1 \"Persistence MUST be proven under concurrent writers: several tabs, devices and page loads, with lost answers and reloads.\"; AR-035-O4 \"Device-local durable state MUST survive several tabs sharing one store.\""
+    }
+  ],
+  "notCategorized": [
+    {
+      "rule": "VR-LEDGER",
+      "reason": "the ledger row is the carrier of claims, not evidence of an obligation"
+    },
+    {
+      "rule": "VR-PRESERVATION",
+      "reason": "requirements preservation proves the derivation, not the implementation of an obligation"
+    },
+    {
+      "rule": "VR-PROCESS",
+      "reason": "process records (Praxis work items, checkpoints) match none of the seven categories; an obligation reached only by VR-PROCESS is reported unclassified"
+    }
+  ]
+}

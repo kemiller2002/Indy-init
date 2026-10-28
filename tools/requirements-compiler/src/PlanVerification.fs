@@ -29,7 +29,10 @@ type Trust =
       TrustedOperators: string list
       /// Process and owner categories verified per VPO id by `verify-process` for this plan and candidate
       /// (ProcessVerification.coveredBy); empty when no process assessment is supplied.
-      ProcessCovered: Map<string, Set<string>> }
+      ProcessCovered: Map<string, Set<string>>
+      /// Review tag changes (indy-init.review-tag-changes/1, R5A-001-04): tests a review removed from an obligation,
+      /// and how each removal was resolved. JNull when none are supplied. A removal only ever withdraws evidence.
+      ReviewTagChanges: Json }
 
 type ObligationResult =
     { Id: string
@@ -171,12 +174,61 @@ let private mappingDiagnostics (rid: string) (obligations: Json list) (row: Json
                                   (sprintf "evidence test '%s' claims obligation %s (%s), which it is not bound to in the plan" tid (str "sourceObligation" o) vid)
                                   mappingAction ]
 
+let reviewTagChangesSchema = "indy-init.review-tag-changes/1"
+
+/// What reviews removed from one obligation: the removed test ids, and whether every removal is resolved.
+type Removal = { Tests: Set<string>; Open: bool }
+
+/// Removals per source obligation, with diagnostics for changes that cannot be honoured as written. A removal names a
+/// test the plan binds to the obligation and the review that removed it. It is resolved by `rebound` (tests the plan
+/// binds to the same obligation and no review removed) or `not-rebound` (a stated reason); anything else stays open.
+/// A removed test never counts for that obligation again, whatever the resolution.
+let reviewRemovals (plan: Json) (changes: Json) : Map<string, Removal> * Diagnostic list =
+    let bound =
+        arr "requirements" plan
+        |> List.collect (arr "obligations")
+        |> List.map (fun o -> str "sourceObligation" o, ledgerTests o |> List.map (fun t -> t.Id) |> Set.ofList)
+        |> Map.ofList
+    let action = "record the review that removed the tag and resolve it: re-bind to tests the plan binds to the obligation, or state why not"
+    let entries = arr "changes" changes
+    let removedOf oid = entries |> List.filter (fun c -> ledgerString "obligation" c = oid) |> List.map (ledgerString "test") |> Set.ofList
+    let resolved (c: Json) =
+        let r = field "resolution" c |> Option.defaultValue JNull
+        let oid = ledgerString "obligation" c
+        match strOpt "kind" r with
+        | Some "rebound" ->
+            let tests = strs "tests" r
+            not tests.IsEmpty
+            && ledgerString "review" r <> ""
+            && tests |> List.forall (fun t -> (bound.TryFind oid |> Option.defaultValue Set.empty).Contains t && not ((removedOf oid).Contains t))
+        | Some "not-rebound" -> ledgerString "reason" r <> "" && ledgerString "review" r <> ""
+        | _ -> false
+    let diagnostics =
+        [ if changes <> JNull && strOpt "schema" changes <> Some reviewTagChangesSchema then
+              yield diag "REVIEW-TAG-CHANGE" "review-tag-changes" (sprintf "review tag changes have schema %A, expected %s" (strOpt "schema" changes) reviewTagChangesSchema) action
+          for c in entries do
+              let oid, test = ledgerString "obligation" c, ledgerString "test" c
+              if not ((bound.TryFind oid |> Option.defaultValue Set.empty).Contains test) then
+                  yield diag "REVIEW-TAG-CHANGE" oid (sprintf "a review removed test '%s' from %s, which the plan does not bind to it" test oid) action
+              if ledgerString "review" c = "" then yield diag "REVIEW-TAG-CHANGE" oid (sprintf "the removal of '%s' from %s names no review" test oid) action
+              match field "resolution" c with
+              | Some r when r <> JNull && not (resolved c) ->
+                  yield diag "REVIEW-TAG-CHANGE" oid (sprintf "the resolution of the removal of '%s' from %s is not admissible, so the removal stays open" test oid) action
+              | _ -> () ]
+    entries
+    |> List.groupBy (ledgerString "obligation")
+    |> List.map (fun (oid, cs) -> oid, { Tests = cs |> List.map (ledgerString "test") |> Set.ofList; Open = cs |> List.exists (resolved >> not) })
+    |> Map.ofList,
+    diagnostics
+
 /// Coverage of one obligation. `verifiedEvidence` holds only documents that passed every requirement-level check.
-let private coverage (processCovered: Map<string, Set<string>>) (evidenceStatus: string) (verifiedEvidence: Json list) (o: Json) =
+let private coverage (processCovered: Map<string, Set<string>>) (removal: Removal option) (evidenceStatus: string) (verifiedEvidence: Json list) (o: Json) =
     let vid = str "id" o
     let required = requiredOf o
     let producers = boundTests o |> List.filter isProducer
-    let tests = ledgerTests o
+    let removed = removal |> Option.map (fun r -> r.Tests) |> Option.defaultValue Set.empty
+    let tests = ledgerTests o |> List.filter (fun t -> not (removed.Contains t.Id))
+    let removedDeclared = ledgerTests o |> List.filter (fun t -> removed.Contains t.Id) |> List.collect (fun t -> t.Categories) |> Set.ofList
     let passed =
         verifiedEvidence
         |> List.collect (arr "obligations")
@@ -200,6 +252,8 @@ let private coverage (processCovered: Map<string, Set<string>>) (evidenceStatus:
             |> List.map (fun c ->
                 c,
                 if produced.Contains c && not (declared.Contains c) then "no-process-evidence"
+                elif not (declared.Contains c) && removedDeclared.Contains c then
+                    if removal |> Option.exists (fun r -> r.Open) then "unbound-after-review" else "removed-by-review"
                 elif not (declared.Contains c) then "no-bound-test"
                 else
                     match evidenceStatus with
@@ -231,9 +285,11 @@ let assess (t: Trust) : Json =
     let ledgerBaseline = field "requirements_baseline" ledger |> Option.defaultValue JNull
     let approvals = tryParse t.ApprovalsRaw |> Option.defaultValue JNull
 
-    let authorized =
-        authorizedExclusions
-            { Repository = ""; Commit = ""; Path = ""; Sha256 = sha t.ApprovalsRaw; TrustedOperators = t.TrustedOperators; Document = approvals }
+    let approvalsFile: Approvals =
+        { Repository = ""; Commit = ""; Path = ""; Sha256 = sha t.ApprovalsRaw; TrustedOperators = t.TrustedOperators; Document = approvals }
+
+    let authorized = authorizedExclusions approvalsFile
+    let removals, removalDiagnostics = reviewRemovals plan t.ReviewTagChanges
 
     let planExcluded =
         arr "requirements" plan
@@ -253,6 +309,8 @@ let assess (t: Trust) : Json =
     // Integrity of the inputs: any problem here makes the verdict INVALID.
     let integrity =
         [ yield! preservationDiagnostics t.Baseline plan
+          yield! amendmentDiagnostics plan approvalsFile
+          yield! derivationDiagnostics plan
           if strOpt "baselineSha256" planSource <> Some t.BaselineSha256 then yield integrityDiag "plan is bound to a different requirements baseline"
           if strOpt "sha256" ledgerBaseline <> Some t.BaselineSha256 || strOpt "id" ledgerBaseline <> strOpt "baselineId" planSource then
               yield integrityDiag "ledger requirements baseline differs from the plan's baseline"
@@ -322,7 +380,8 @@ let assess (t: Trust) : Json =
                 obligations
                 |> List.map (fun o ->
                     // A row that does not claim PASS verifies nothing, whatever its evidence says.
-                    let required, covered, missing = coverage t.ProcessCovered coverageStatus (if rowStatus = "PASS" then verifiedEvidence else []) o
+                    let required, covered, missing =
+                        coverage t.ProcessCovered (removals.TryFind(str "sourceObligation" o)) coverageStatus (if rowStatus = "PASS" then verifiedEvidence else []) o
                     let verified = not excludedByPlan && not required.IsEmpty && missing.IsEmpty && mapping.IsEmpty
                     { Id = str "id" o
                       Source = str "sourceObligation" o
@@ -390,8 +449,36 @@ let assess (t: Trust) : Json =
               Obligations = obligationResults |> List.map (fun o -> { o with Status = obligationStatus o }) },
             mapping @ stale)
 
-    let results = assessed |> List.map fst
-    let requirementDiagnostics = assessed |> List.collect snd
+    // A derived obligation is verified only when every constituent is verified too. Constituents are never derived,
+    // so one pass over the per-obligation results is exact.
+    let verifiedObligations =
+        assessed |> List.collect (fst >> fun r -> r.Obligations) |> List.filter (fun o -> o.Verification = "verified") |> List.map (fun o -> o.Source) |> Set.ofList
+    let constituentsOf =
+        arr "requirements" plan
+        |> List.collect (arr "obligations")
+        |> List.choose (fun o ->
+            field "derivation" o
+            |> Option.map (fun d -> str "sourceObligation" o, arr "clauses" d |> List.collect (arr "constituents") |> List.map (str "obligation") |> List.distinct))
+        |> Map.ofList
+    let withConstituents (r: RequirementResult) =
+        let obligations =
+            r.Obligations
+            |> List.map (fun o ->
+                match constituentsOf.TryFind o.Source |> Option.map (List.filter (verifiedObligations.Contains >> not)) with
+                | Some(_ :: _ as unverified) ->
+                    { o with
+                        Verification = (if o.Verification = "verified" then "unverified" else o.Verification)
+                        Status = (if o.Status = "PASS" then "UNVERIFIED" else o.Status)
+                        Missing = o.Missing @ (unverified |> List.map (fun k -> k, "constituent-unverified")) }
+                | _ -> o)
+        let downgraded = r.Status = "PASS" && obligations |> List.exists (fun o -> o.Verification <> "verified" && o.Verification <> "excluded")
+        { r with
+            Obligations = obligations
+            Status = (if downgraded then "UNVERIFIED" else r.Status)
+            Reasons = (if downgraded then r.Reasons @ [ "a derived obligation has a constituent obligation that is not verified" ] else r.Reasons) }
+
+    let results = assessed |> List.map (fst >> withConstituents)
+    let requirementDiagnostics = (assessed |> List.collect snd) @ removalDiagnostics
     let diagnostics = integrity @ requirementDiagnostics
     let statuses = results |> List.map (fun r -> r.Status)
     let mappingFound = requirementDiagnostics |> List.exists (fun d -> d.Code = "TEST-MAPPING")
@@ -424,6 +511,15 @@ let assess (t: Trust) : Json =
                 "obligationsByStatus", countBy (fun o -> o.Status)
                 "obligationsByVerification", countBy (fun o -> o.Verification)
                 "diagnosticsByCode", diagnostics |> List.countBy (fun d -> d.Code) |> List.sortBy fst |> List.map (fun (c, n) -> c, jint n) |> JObj ]
+          yield!
+              (if t.ReviewTagChanges = JNull then []
+               else
+                   [ "unboundAfterReview",
+                     removals
+                     |> Map.toList
+                     |> List.map (fun (oid, r) ->
+                         JObj [ "obligation", JStr oid; "removedTests", jstrs (Set.toList r.Tests); "resolution", JStr(if r.Open then "open" else "resolved") ])
+                     |> JArr ])
           "requirements",
           results
           |> List.map (fun r ->

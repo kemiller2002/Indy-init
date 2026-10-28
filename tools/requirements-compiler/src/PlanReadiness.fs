@@ -100,7 +100,9 @@ let assess (plan: Json) (expectedDigest: string) (rules: (Json * string * string
           match rules with
           | Some(_, actual, frozen) when actual <> frozen -> yield sprintf "the readiness rules hash to %s, not the frozen %s" actual frozen
           | _ -> ()
-          yield! ruleProblems rulesDocument all ]
+          yield! ruleProblems rulesDocument all
+          // A derived obligation is resolved only through constituents this plan keeps in scope.
+          yield! VerificationPlan.derivationDiagnostics plan |> List.map VerificationPlan.render ]
     let rules = rulesDocument
     let permits = all |> List.choose (fun g -> permitted rules g |> Option.map (fun p -> g, p))
     let unresolved = all |> List.filter (fun g -> (permitted rules g).IsNone)
