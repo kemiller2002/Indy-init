@@ -186,17 +186,27 @@ type ObservedAttestation =
       Commit: string option }
 
 /// Approving reviews CI observed in the trusted run for this candidate, by reference ("TYPE:REF"). Only an owner's or
-/// a frozen reviewer's login counts.
+/// a frozen reviewer's login counts, and only that login's **latest** review state on that pull request: a later
+/// CHANGES_REQUESTED or DISMISSED review withdraws the earlier approval, so a log record citing it no longer counts.
 let private observedAttestations (i: Inputs) : Map<string, ObservedAttestation> =
     let logins = Set.union (ownerLogins i.Rules) (reviewerLogins i.Rules |> Map.values |> Set.ofSeq)
+    let pullRequest (reference: string) = match reference.IndexOf '@' with
+                                          | n when n > 0 -> reference.Substring(0, n)
+                                          | _ -> reference
     match i.Attestations, i.TrustedRunId with
     | Some a, Some run when opt "runId" a = Some run && opt "candidate" a = Some i.Candidate ->
         arr "attestations" a
-        |> List.filter (fun x -> opt "state" x = Some "APPROVED" && logins.Contains(opt "login" x |> Option.defaultValue ""))
+        |> List.filter (fun x -> logins.Contains(opt "login" x |> Option.defaultValue ""))
         |> List.choose (fun x ->
             match opt "type" x, opt "reference" x, opt "login" x with
-            | Some t, Some r, Some l -> Some(t + ":" + r, { Login = l; Decisions = Set.ofList (strs "decisions" x); Commit = opt "commit" x })
+            | Some t, Some r, Some l -> Some((l, t + ":" + pullRequest r), (t + ":" + r, x))
             | _ -> None)
+        |> List.groupBy fst
+        |> List.choose (fun (_, entries) ->
+            let reference, x = entries |> List.map snd |> List.maxBy (fun (_, x) -> opt "submittedAt" x |> Option.defaultValue "")
+            if opt "state" x = Some "APPROVED" then
+                Some(reference, { Login = str "login" x; Decisions = Set.ofList (strs "decisions" x); Commit = opt "commit" x })
+            else None)
         |> Map.ofList
     | _ -> Map.empty
 
@@ -265,8 +275,13 @@ let recordDiagnostics (i: Inputs) (implementers: Set<string>) (attested: Map<str
                   yield d "STALE-REVIEW" subject (sprintf "the attesting review approved commit %A, not the candidate %s" a.Commit i.Candidate)
       | "final-disposition" ->
           match r.Class, r.Attestation |> Option.bind attested.TryFind with
-          | "owner-decision", Some a when (ownerActorIds i.Rules).Contains r.ActorId && (ownerLogins i.Rules).Contains a.Login && a.Commit = Some i.Candidate -> ()
-          | "owner-decision", _ -> yield d "UNATTESTED-DISPOSITION" subject "the disposition is not the owner's, attested by CI for this candidate commit"
+          | "owner-decision", Some a when
+              (ownerActorIds i.Rules).Contains r.ActorId
+              && (ownerLogins i.Rules).Contains a.Login
+              && a.Commit = Some i.Candidate
+              && a.Decisions.Contains "final-disposition" -> ()
+          | "owner-decision", _ ->
+              yield d "UNATTESTED-DISPOSITION" subject "the disposition is not the owner's, attested by CI as the final disposition of this candidate commit"
           | cls, _ -> yield d "TRANSCRIBED-DECISION" subject (sprintf "a final disposition recorded as %s is not the owner's" cls)
       | "owner-approval" ->
           match r.Class, r.Attestation |> Option.bind attested.TryFind with
@@ -289,32 +304,30 @@ let recordDiagnostics (i: Inputs) (implementers: Set<string>) (attested: Map<str
 
 // ---- kind-specific satisfaction -----------------------------------------------------------------------------------
 
-/// Owner decisions that stand: for each decided subject, the latest authentic owner record decides, and it must approve.
+/// Owner decisions that stand: subjects an authentic, attested owner approval decides, minus every subject any owner
+/// record rejects. A rejection always counts, attested or not, and wherever it sits in the log: it can only withdraw,
+/// so a replayed approval line cannot outrank it. A decision the owner rejected needs a new decision id.
 let private standingApprovals (owners: Set<string>) (qualifyingOwner: Record list) (all: Record list) =
-    // An owner's rejection always counts, attested or not: it can only withdraw an approval, never grant one.
-    let rejections = all |> List.filter (fun r -> r.Kind = "owner-approval" && r.Outcome = Some "rejected" && owners.Contains r.ActorId)
-    qualifyingOwner @ rejections
-    |> List.distinctBy (fun r -> r.Sequence)
-    |> List.collect (fun r -> decided r |> Set.toList |> List.map (fun s -> s, r))
-    |> List.groupBy fst
-    |> List.choose (fun (s, rs) ->
-        let latest = rs |> List.map snd |> List.maxBy (fun r -> r.Sequence)
-        if latest.Outcome = Some "approved" then Some s else None)
-    |> Set.ofList
-
-let private latestOf (rs: Record list) = rs |> List.sortBy (fun r -> r.Sequence) |> List.tryLast
+    let rejected =
+        all
+        |> List.filter (fun r -> r.Kind = "owner-approval" && r.Outcome <> Some "approved" && owners.Contains r.ActorId)
+        |> List.collect (decided >> Set.toList)
+        |> Set.ofList
+    let approvedSubjects = qualifyingOwner |> List.filter (fun r -> r.Outcome = Some "approved") |> List.collect (decided >> Set.toList) |> Set.ofList
+    Set.difference approvedSubjects rejected
 
 /// Whether the qualifying records of `kind` prove it for this run, with the reasons when they do not.
-let private kindSatisfied (i: Inputs) (kind: string) (qualifying: Record list) (all: Record list) (approved: Set<string>) : Diagnostic list =
-    let reviewRoles = reviewRoles i.Rules
+let private kindSatisfied (i: Inputs) (obligation: string) (kind: string) (qualifying: Record list) (all: Record list) (approved: Set<string>) : Diagnostic list =
     let ofKind k = qualifying |> List.filter (fun r -> r.Kind = k)
     let none code detail = if (ofKind kind).IsEmpty then [ d code kind detail ] else []
     match kind with
     | "checkpoint" ->
-        // Every implementing work item needs a verified checkpoint; a review that commits nothing does not.
+        // Every work item an implementing agent of the frozen rules started needs a verified checkpoint, whatever role
+        // its envelope claims; a frozen reviewer's review that commits nothing does not.
+        let agents = Set.ofList (strs "agents" i.Rules)
         let started =
             all
-            |> List.filter (fun r -> r.Kind = "execution-start" && not (reviewRoles.Contains(r.ExecutionRole |> Option.defaultValue "")))
+            |> List.filter (fun r -> r.Kind = "execution-start" && (agents.Contains r.ActorId || not ((reviewers i.Rules).Contains r.ActorId)))
             |> List.map (fun r -> r.WorkItem)
             |> List.distinct
         let checkpointed = ofKind "checkpoint" |> List.map (fun r -> r.WorkItem) |> Set.ofList
@@ -335,34 +348,48 @@ let private kindSatisfied (i: Inputs) (kind: string) (qualifying: Record list) (
                           "UNAPPROVED-SCOPE-CHANGE"
                           r.EventId
                           (sprintf "scope change %s citing %A is not covered by a standing attested owner decision" (String.Join(", ", r.Subjects)) dec) ]
-    | "owner-approval" -> if approved.IsEmpty then [ d "MISSING-APPROVAL" kind "no standing attested owner approval for this candidate" ] else []
+    | "owner-approval" ->
+        // An owner obligation is proven by the decisions the frozen rules name for it, not by any approval at all.
+        match field "ownerDecisions" i.Rules |> Option.map (strs obligation) with
+        | None
+        | Some [] -> [ d "MISSING-APPROVAL" obligation (sprintf "the frozen rules name no owner decision for %s" obligation) ]
+        | Some decisions ->
+            [ for dec in decisions do
+                  if not (approved.Contains dec) then
+                      yield d "MISSING-APPROVAL" obligation (sprintf "owner decision %s for %s is not a standing attested approval" dec obligation) ]
     | "independent-review" ->
-        // The latest qualifying review of the candidate decides; a later rejection withdraws an earlier approval.
-        match latestOf (ofKind kind) with
-        | None -> [ d "MISSING-INDEPENDENT-REVIEW" kind "no qualifying independent review of this candidate" ]
-        | Some r when r.Outcome <> Some "approved" -> [ d "REVIEW-NOT-APPROVED" r.EventId (sprintf "the latest review's outcome is %A" r.Outcome) ]
-        | Some _ -> []
+        // Any rejection by a frozen reviewer of this candidate withdraws the review, wherever it sits in the log.
+        let rejections =
+            all |> List.filter (fun r -> r.Kind = "independent-review" && r.Outcome <> Some "approved" && (reviewers i.Rules).Contains r.ActorId && r.Candidate = Some i.Candidate)
+        [ if (ofKind kind |> List.filter (fun r -> r.Outcome = Some "approved")).IsEmpty then
+              yield d "MISSING-INDEPENDENT-REVIEW" kind "no qualifying approving independent review of this candidate"
+          for r in rejections do
+              yield d "REVIEW-NOT-APPROVED" r.EventId (sprintf "reviewer '%s' recorded %A for this candidate" r.ActorId r.Outcome) ]
     | "release-selection" ->
-        // The latest selection by a known identity decides: selecting another candidate later supersedes this one.
-        let latest = all |> List.filter (fun r -> r.Kind = "release-selection" && (roster i.Rules).Contains r.ActorId) |> latestOf
+        // Selecting another candidate after this one was first selected supersedes it; re-selecting it later does not
+        // undo that.
+        let selections = all |> List.filter (fun r -> r.Kind = "release-selection" && (roster i.Rules).Contains r.ActorId)
+        let first = selections |> List.filter (fun r -> r.Candidate = Some i.Candidate) |> List.sortBy (fun r -> r.Sequence) |> List.tryHead
         [ yield! none "MISSING-RELEASE-SELECTION" "no release selection names this candidate"
-          match latest with
-          | Some r when r.Candidate <> Some i.Candidate ->
-              yield d "RELEASE-SUPERSEDED" r.EventId (sprintf "a later release selection chose %A" r.Candidate)
-          | _ -> () ]
+          match first with
+          | Some f ->
+              for r in selections do
+                  if r.Sequence > f.Sequence && r.Candidate <> Some i.Candidate then
+                      yield d "RELEASE-SUPERSEDED" r.EventId (sprintf "a later release selection chose %A" r.Candidate)
+          | None -> () ]
     | "test-result" ->
-        // The latest trusted CI result for the candidate decides: a later failure withdraws an earlier pass.
-        let latest =
-            all |> List.filter (fun r -> r.Kind = "test-result" && r.Class = "tool-observed" && r.Candidate = Some i.Candidate) |> latestOf
+        // Any failing trusted CI result for the candidate withdraws every pass.
         [ yield! none "MISSING-PROCESS-RECORD" "no qualifying test-result record"
-          match latest with
-          | Some r when r.Outcome <> Some "pass" -> yield d "TEST-NOT-PASSED" r.EventId (sprintf "the latest trusted test result is %A" r.Outcome)
-          | _ -> () ]
+          for r in all do
+              if r.Kind = "test-result" && r.Class = "tool-observed" && r.Candidate = Some i.Candidate && r.Outcome <> Some "pass" then
+                  yield d "TEST-NOT-PASSED" r.EventId (sprintf "a trusted test result is %A" r.Outcome) ]
     | "final-disposition" ->
-        match latestOf (ofKind kind) with
-        | None -> [ d "MISSING-PROCESS-RECORD" kind "no qualifying final-disposition record" ]
-        | Some r when r.Outcome <> Some "accepted" -> [ d "DISPOSITION-NOT-ACCEPTED" r.EventId (sprintf "the latest disposition is %A" r.Outcome) ]
-        | Some _ -> []
+        // Any disposition by the owner other than accepted withdraws the acceptance.
+        [ if (ofKind kind |> List.filter (fun r -> r.Outcome = Some "accepted")).IsEmpty then
+              yield d "MISSING-PROCESS-RECORD" kind "no qualifying accepted final disposition"
+          for r in all do
+              if r.Kind = "final-disposition" && r.Outcome <> Some "accepted" && (ownerActorIds i.Rules).Contains r.ActorId && r.Candidate = Some i.Candidate then
+                  yield d "DISPOSITION-NOT-ACCEPTED" r.EventId (sprintf "the owner recorded %A" r.Outcome) ]
     | k -> none "MISSING-PROCESS-RECORD" (sprintf "no qualifying %s record" k)
 
 // ---- assessment ---------------------------------------------------------------------------------------------------
@@ -399,13 +426,14 @@ let private required (o: Json) =
 let assess (i: Inputs) : Json =
     let problems = inputProblems i
     let records = i.Events |> List.mapi (recordOf i.Executions i.TrustedRunId) |> List.choose id
-    // Anyone who checkpointed commits, or started work outside a review role, implemented something in this run,
-    // whatever role they later chose.
+    // The frozen implementing agents, and anyone who checkpointed commits or started work outside a review role,
+    // implemented something in this run, whatever role they later chose.
     let implementers =
         records
         |> List.filter (fun r -> r.Kind = "checkpoint" || (r.Kind = "execution-start" && not ((reviewRoles i.Rules).Contains(r.ExecutionRole |> Option.defaultValue ""))))
         |> List.map (fun r -> r.ActorId)
         |> Set.ofList
+        |> Set.union (Set.ofList (strs "agents" i.Rules))
     let attested = observedAttestations i
     let assessed = records |> List.map (fun r -> r, recordDiagnostics i implementers attested r)
     let qualifying = assessed |> List.filter (snd >> List.isEmpty) |> List.map fst
@@ -413,13 +441,14 @@ let assess (i: Inputs) : Json =
     let approved = standingApprovals (ownerActorIds i.Rules) (qualifying |> List.filter (fun r -> r.Kind = "owner-approval")) records
 
     let categoryResult (o: Json) (category: string) =
+        let obligation = str "sourceObligation" o
         let bindings =
             boundTests o
             |> List.filter (fun t -> List.contains category (strs "categories" t) && admissible i.Plan category t)
             |> List.choose (fun t -> opt "id" t |> Option.filter (fun x -> x.StartsWith(bindingPrefix, StringComparison.Ordinal)))
             |> List.map (fun x -> x.Substring bindingPrefix.Length)
         let perKind =
-            bindings |> List.map (fun k -> k, kindSatisfied i k qualifying records approved, qualifying |> List.filter (fun r -> r.Kind = k))
+            bindings |> List.map (fun k -> k, kindSatisfied i obligation k qualifying records approved, qualifying |> List.filter (fun r -> r.Kind = k))
         // Every producer the plan binds to the category must deliver; one satisfied producer does not excuse another.
         let satisfied = perKind |> List.filter (fun (_, ds, rs) -> ds.IsEmpty && not rs.IsEmpty)
         let allSatisfied = not bindings.IsEmpty && satisfied.Length = perKind.Length

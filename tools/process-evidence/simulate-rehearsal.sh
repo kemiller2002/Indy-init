@@ -58,6 +58,8 @@ run_as impl work evidence --id WI-0001 --kind scope-change --summary "Add src/en
   --subject src/engine/Replay.fs --decision DEC-SIM-001 --occurred-at "$(now)"
 run_as owner work evidence --id WI-0001 --kind owner-approval --summary "Owner approves the scope change" \
   --subject DEC-SIM-001 --subject src/engine/Replay.fs --outcome approved --attestation "github-review:kemiller2002/simulated-rehearsal#1@1001" --occurred-at "$(now)"
+run_as owner work evidence --id WI-0001 --kind owner-approval --summary "Owner resolves the kickoff decisions (write scope, release set, frozen requirements)" \
+  --subject DEC-SIM-KICKOFF --outcome approved --attestation "github-review:kemiller2002/simulated-rehearsal#4@4001" --occurred-at "$(now)"
 commit_push "praxis state"
 candidate=$(g rev-parse HEAD)
 
@@ -93,8 +95,9 @@ cat > "$out/attestations.json" <<JSON
   "candidate": "$candidate",
   "attestations": [
     { "type": "github-review", "reference": "kemiller2002/simulated-rehearsal#1@1001", "login": "kemiller2002", "state": "APPROVED", "decisions": ["DEC-SIM-001", "src/engine/Replay.fs"], "commit": "$candidate", "submittedAt": "$(now)" },
+    { "type": "github-review", "reference": "kemiller2002/simulated-rehearsal#4@4001", "login": "kemiller2002", "state": "APPROVED", "decisions": ["DEC-SIM-KICKOFF"], "commit": "$candidate", "submittedAt": "$(now)" },
     { "type": "github-review", "reference": "kemiller2002/simulated-rehearsal#2@2001", "login": "example-reviewer", "state": "APPROVED", "commit": "$candidate", "submittedAt": "$(now)" },
-    { "type": "github-review", "reference": "kemiller2002/simulated-rehearsal#3@3001", "login": "kemiller2002", "state": "APPROVED", "commit": "$candidate", "submittedAt": "$(now)" }
+    { "type": "github-review", "reference": "kemiller2002/simulated-rehearsal#3@3001", "login": "kemiller2002", "state": "APPROVED", "decisions": ["final-disposition"], "commit": "$candidate", "submittedAt": "$(now)" }
   ]
 }
 JSON
@@ -108,7 +111,12 @@ cat > "$out/rules.json" <<'JSON'
   "agents": ["example/implementing-agent"],
   "reviewers": [ { "actorId": "example/review-agent", "login": "example-reviewer" } ],
   "automation": ["github/github-actions"],
-  "reviewRoles": ["review"]
+  "reviewRoles": ["review"],
+  "ownerDecisions": {
+    "AR-024-O1": ["DEC-SIM-KICKOFF"],
+    "AR-024-O2": ["DEC-SIM-KICKOFF"],
+    "AR-008-O2": ["DEC-SIM-KICKOFF"]
+  }
 }
 JSON
 

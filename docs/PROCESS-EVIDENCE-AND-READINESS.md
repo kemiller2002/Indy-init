@@ -86,23 +86,29 @@ process), so the verifier trusts nothing a record says about itself:
 - **Frozen rules** (`indy-init.process-evidence-rules/1`, pinned by `--rules-sha256`): the owners (`login`, the Praxis
   `actorIds` they record under), the implementing agents, the **independent reviewers** (a roster frozen in advance,
   `{actorId, login}`: the Praxis identity and the GitHub login whose review anchors its findings; a reviewer may not
-  also be an implementing agent), the automation identities, the review roles and the rehearsal repository.
+  also be an implementing agent), the automation identities, the review roles, the rehearsal repository, and
+  `ownerDecisions`: for each owner obligation, the decision ids that prove it (an owner category is verified only by
+  those decisions, never by an approval of something else).
 - **Attestations** (`indy-init.owner-attestations/1`): what the acceptance job observed from the GitHub API in its
   own run: approving pull-request reviews by the owner or a frozen reviewer, each with the commit it approved
   (`commit`) and, for owner decisions, the decision ids and paths the pull request carries (`decisions`). They count
-  only when their `runId` equals the `--trusted-run-id` the job passes and they name this candidate. An attestation
+  only when their `runId` equals the `--trusted-run-id` the job passes and they name this candidate, and only the
+  latest review state of each login on each pull request counts: a later CHANGES_REQUESTED or DISMISSED review voids
+  the earlier approval. An attestation
   proves only what it names: an owner-approval record that decides anything else is unattested, and a scope change
   stands only when the standing owner decision names both its decision id and every path or requirement it adds.
 - **Reviews** are anchored the same way: a review record must cite the reviewer's own approving review of the exact
   candidate commit, observed by CI. A review written into the log, under any identity, without it is unattested.
-- **Final disposition** is the owner's: a human owner record attested by CI for the candidate commit.
+- **Final disposition** is the owner's: a human owner record attested by CI for the candidate commit as the final
+  disposition (its attestation names `final-disposition`).
 - **CI records**: a test result or acceptance reference counts only when it is tool-observed **and** names the trusted
   run (`observed.identity.runId`); a CI claim from any other run is treated as an agent assertion. A test result must
   pass.
-- **Latest wins**: for each owner decision subject, for the candidate's review, for the trusted test results and for
-  release selection, the latest record decides: a later rejection, failure or selection of another candidate
-  withdraws an earlier approval, pass or selection. An owner's rejection counts even without an attestation, since it
-  can only withdraw.
+- **Withdrawals always count, wherever they sit in the log**: any owner rejection of a decision, any frozen reviewer's
+  non-approving review of the candidate, any owner disposition other than accepted, any failing trusted test result,
+  and any selection of another candidate after this one was selected withdraws the approval, review, acceptance, pass
+  or selection, attested or not. A withdrawal can only make the verdict stricter, so a replayed approval line cannot
+  outrank it; a decision the owner rejected needs a new decision id.
 
 A record qualifies only if all of these hold, otherwise it carries the diagnostic shown:
 
@@ -143,7 +149,7 @@ not expected in ledger rows.
 
 | File | What it shows |
 |---|---|
-| `requirements-compiled/v2/readiness/evidence/process-evidence-simulation.json` | A simulated rehearsal recorded by the real Praxis CLI (`tools/process-evidence/simulate-rehearsal.sh`, fixture `tools/fixtures/process-evidence/simulated-rehearsal/`): implementer, reviewer, owner and CI each act under their own identity. With the proposed bindings, all 30 process, owner and review categories are VERIFIED from 12 records captured as the work happened. 32 negative controls, each a single change to the recorded log, the attestations, the frozen inputs or the plan, fail closed with the named diagnostic, and 2 record-level controls refuse the record: the nine required ones (missing approval, incorrect agent identity, missing checkpoint, unapproved scope change, self-acceptance, stale review, incorrect commit identity, missing release selection, evidence from another candidate) and 25 more found by two independent reviews (among them: a transcribed or unattested owner decision, an attestation reused for another decision or a broader scope change, an owner rejection with or without attestation, failed, untrusted or later-failed test results, the implementer reviewing under a review role or a reviewer identity, a review without its attestation or attested for an older commit, a later review rejection or release selection, an unverified checkpoint, a missing commit, another repository, a mis-kinded binding, the implementer's own final disposition, an edited plan, self-supplied rules). |
+| `requirements-compiled/v2/readiness/evidence/process-evidence-simulation.json` | A simulated rehearsal recorded by the real Praxis CLI (`tools/process-evidence/simulate-rehearsal.sh`, fixture `tools/fixtures/process-evidence/simulated-rehearsal/`): implementer, reviewer, owner and CI each act under their own identity. With the proposed bindings, all 30 process, owner and review categories are VERIFIED from 12 records captured as the work happened. 39 negative controls, each a change to the recorded log, the attestations, the frozen inputs or the plan, fail closed with the named diagnostic, and 3 record-level controls refuse the record: the nine required ones (missing approval, incorrect agent identity, missing checkpoint, unapproved scope change, self-acceptance, stale review, incorrect commit identity, missing release selection, evidence from another candidate) and 33 more found by three independent reviews (among them: a transcribed or unattested owner decision, an attestation reused for another decision or a broader scope change, an owner rejection with or without attestation, failed, untrusted or later-failed test results, the implementer reviewing under a review role or a reviewer identity, a review without its attestation or attested for an older commit, a later review rejection (attested or not) or release selection, a replayed approval after a rejection, a later CHANGES_REQUESTED review, an owner approval of an unrelated decision, a disposition citing another attestation, an unverified checkpoint, a missing commit, another repository, a mis-kinded binding, the implementer's own final disposition, an edited plan, self-supplied rules). |
 | `requirements-compiled/v2/readiness/evidence/r5-readiness-replay.json` | Rehearsal 5's binding problem replayed through the gate (read only; R5's verdict is unchanged). Its kickoff plan `VP-e77a2134e1b0` is BLOCKED on all 326 obligations. Its 277 final bindings declare no evidence categories. Even granting each of them every application-test category its test kind can provide, 140 obligations stay unresolved before implementation (many R5 bindings name a test kind that cannot provide the category, for example a deterministic test for live-provider evidence), among them all 49 R5 left unproven; 37 of those 49 need process, owner or reviewer evidence. |
 
 Both are regenerated by the compiler tests (`--process-simulation`, `--readiness-replay`); the offline suite (CI) runs
@@ -157,6 +163,9 @@ the simulation and the producer-binding controls on every change.
   run id of the trusted acceptance job is known only when it runs, so the strongest arrangement is for that job itself
   to record the CI evidence it checks. Owner decisions rest on the CI-observed attestation, not on the Praxis actor; the
   attestation file is trusted only inside the acceptance job that fetched it.
+- A checkpoint's `verification.status` and an execution envelope's role are written by Praxis but live in the same
+  writable repository; `verify-process` checks the checkpoint's commit against the candidate's real ancestry and takes
+  implementers from the frozen agent roster, so neither is relied on alone.
 - Praxis event ids are content hashes but are not signed; `verify-process` does not recompute them. Editing the log is
   detectable through git history, not cryptographically.
 - A process record shows that a step was recorded at the time, with what Praxis observed. Whether it was the right

@@ -165,6 +165,46 @@ let controls (plan: Json) (f: Fixture) : (string * string * Fixture * Json) list
           (append (isKind "owner-approval") (setPath [ "statement"; "outcome" ] (JStr "rejected") >> setPath [ "statement"; "attestation" ] JNull) f)
       one "a later failed test from the trusted run" "TEST-NOT-PASSED" (append (isKind "test-result") (setPath [ "statement"; "outcome" ] (JStr "fail")) f)
       one "a later release selection of another candidate" "RELEASE-SUPERSEDED" (append (isKind "release-selection") (setPath [ "statement"; "candidate" ] (JStr otherSha)) f)
+      // Third independent review: rejections always withdraw, CI's latest review state decides, owner obligations
+      // need the decisions the frozen rules name for them, and dispositions are attested as dispositions.
+      one
+          "a reviewer's later rejection, written without an attestation"
+          "REVIEW-NOT-APPROVED"
+          (append (isKind "independent-review") (setPath [ "statement"; "outcome" ] (JStr "rejected") >> setPath [ "statement"; "attestation" ] JNull) f)
+      one
+          "an owner rejection followed by a replayed approval line"
+          "UNAPPROVED-SCOPE-CHANGE"
+          (f
+           |> append (isKind "owner-approval") (setPath [ "statement"; "outcome" ] (JStr "rejected") >> setPath [ "statement"; "attestation" ] JNull)
+           |> append (fun e -> isKind "owner-approval" e && strOpt "outcome" (field "statement" e |> Option.defaultValue JNull) = Some "approved") id)
+      one
+          "the reviewer's CI review later changed to changes requested"
+          "UNATTESTED-REVIEW"
+          { f with
+              Attestations =
+                setPath
+                    [ "attestations" ]
+                    (JArr(
+                        arr "attestations" f.Attestations
+                        @ [ JObj [ "type", JStr "github-review"; "reference", JStr "kemiller2002/simulated-rehearsal#2@2002"; "login", JStr "example-reviewer"; "state", JStr "CHANGES_REQUESTED"; "commit", JStr f.Candidate; "submittedAt", JStr "9999-12-31T00:00:00Z" ] ]
+                    ))
+                    f.Attestations }
+      one
+          "the owner approved only an unrelated decision"
+          "MISSING-APPROVAL"
+          (drop (fun e -> isKind "owner-approval" e && (field "statement" e |> Option.map (strs "subjects") |> Option.defaultValue []) |> List.contains "DEC-SIM-KICKOFF") f)
+      one
+          "a trusted test failure followed by a replayed pass"
+          "TEST-NOT-PASSED"
+          (f |> append (isKind "test-result") (setPath [ "statement"; "outcome" ] (JStr "fail")) |> append (fun e -> isKind "test-result" e && strOpt "outcome" (field "statement" e |> Option.defaultValue JNull) = Some "pass") id)
+      one
+          "the candidate re-selected after another was selected"
+          "RELEASE-SUPERSEDED"
+          (f |> append (isKind "release-selection") (setPath [ "statement"; "candidate" ] (JStr otherSha)) |> append (fun e -> isKind "release-selection" e && strOpt "candidate" (field "statement" e |> Option.defaultValue JNull) = Some f.Candidate) id)
+      "the owner's later rejection of the final disposition",
+      "DISPOSITION-NOT-ACCEPTED",
+      append (isKind "final-disposition") (setPath [ "statement"; "outcome" ] (JStr "not-accepted") >> setPath [ "statement"; "attestation" ] JNull) f,
+      rebind "UI-030-O3" [ for k in [ "acceptance-reference"; "release-selection"; "final-disposition" ] -> JObj [ "id", JStr("praxis:" + k); "kind", JStr "process"; "categories", jstrs [ "process-record" ] ] ] plan
       "an owner-decision category bound to a record kind that cannot provide it",
       "UNBOUND-PROCESS-EVIDENCE",
       drop (isKind "owner-approval") f,
@@ -178,7 +218,10 @@ let recordControls (f: Fixture) : (string * string * Fixture) list =
       mapWhere (isKind "final-disposition") (setPath [ "actor"; "id" ] (JStr implementer) >> setPath [ "provenance"; "class" ] (JStr "agent-assertion")) f
       "a final disposition attested for another commit",
       "UNATTESTED-DISPOSITION",
-      mapAttestation "kemiller2002/simulated-rehearsal#3@3001" (setPath [ "commit" ] (JStr otherSha)) f ]
+      mapAttestation "kemiller2002/simulated-rehearsal#3@3001" (setPath [ "commit" ] (JStr otherSha)) f
+      "a final disposition citing the owner's scope-change approval",
+      "UNATTESTED-DISPOSITION",
+      mapWhere (isKind "final-disposition") (setPath [ "statement"; "attestation" ] (JStr "github-review:kemiller2002/simulated-rehearsal#1@1001")) f ]
 
 let private codesOf (assessment: Json) =
     (if str "verdict" assessment = "INVALID" then [ "INVALID" ] else [])

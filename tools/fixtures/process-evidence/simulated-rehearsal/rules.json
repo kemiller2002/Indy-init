@@ -6,5 +6,10 @@
   "agents": ["example/implementing-agent"],
   "reviewers": [ { "actorId": "example/review-agent", "login": "example-reviewer" } ],
   "automation": ["github/github-actions"],
-  "reviewRoles": ["review"]
+  "reviewRoles": ["review"],
+  "ownerDecisions": {
+    "AR-024-O1": ["DEC-SIM-KICKOFF"],
+    "AR-024-O2": ["DEC-SIM-KICKOFF"],
+    "AR-008-O2": ["DEC-SIM-KICKOFF"]
+  }
 }
