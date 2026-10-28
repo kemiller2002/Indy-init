@@ -54,7 +54,7 @@ Sources: `docs/REHEARSAL-005-RESULTS.md`; R5 `evidence/rehearsal/final.json`; R5
 | Priority | What exists (evaluated first) | What changed | Where |
 |---|---|---|---|
 | 1. Automatic acceptance evidence | The Praxis event log already records `work.started`, `work.checkpointed`, `artifact.contributed`. Nothing records reviews, owner approvals, scope changes, release selection or disposition as process evidence. Nothing verifies process obligations. | `praxis work evidence` writes `work.evidence.recorded` to the **same** log. Each record keeps the statement apart from what Praxis observed, and has a provenance class an agent cannot upgrade. `requirements-compiler verify-process` decides process, owner and review obligations per candidate. Owner decisions count only with a CI-observed attestation. | praxis #296, Indy-init #33 |
-| 2. Verification plan before implementation | The v2 plan (EII-C) has per-obligation contracts. Rehearsal readiness was READY with 0 bound tests, and process obligations were classified as test categories. | Evidence classes and producers per category. New `process-record` (25) and `owner-decision` (3) categories; this is additive, and no rule was relaxed. The `plan-readiness` gate is BLOCKED until every mandatory mapping is resolved or permitted by frozen rules. Proposed producer bindings are left for the owner. | Indy-init #33 |
+| 2. Verification plan before implementation | The v2 plan (EII-C) has per-obligation contracts. Rehearsal readiness was READY with 0 bound tests, and process obligations were classified as test categories. | Evidence classes and producers per category. New `process-record` (25) and `owner-decision` (3) categories; this is additive, and no rule was relaxed. The `plan-readiness` gate is BLOCKED until every mandatory mapping is resolved or permitted by frozen rules. The 29 proposed producer bindings were approved by the owner and are applied in the curation (plan `VP-1b2fed568a3b`). | Indy-init #33, #34 |
 | 3. Integration overhead | `praxis streams check` (praxis#295) already provides ownership, shared interfaces, dependencies, artifacts, required tests, readiness and the dependency order. | No new mechanism. Retrospective: 36 of 58 main→stream merges had no path overlap. Rehearsal 6 rule ESO-R6-07. | analysis only |
 | 4. Incremental verification | Dokimos content-addressed identity, freshness policies and affected-test selection (0.8.0); failing outcomes block reuse (dokimos#58); Ordo policy-aware freshness (ordo#108). | Mandatory final verification at the release checkpoint; Ordo reads per-obligation freshness. See §3. | dokimos #59, ordo #109 |
 | 5. WASM preflight | `limen wasm-check` (limen#113) already covers all six required cases against the real interpreter. | Documented the build → wasm-check → browser order. No test cases needed. | limen #114 |
@@ -77,7 +77,7 @@ Sources: `docs/REHEARSAL-005-RESULTS.md`; R5 `evidence/rehearsal/final.json`; R5
   acting under its own identity. The 13 records were captured as the work happened: 5 tool-observed, 4 agent
   assertions, 1 reviewer finding, 3 owner decisions. The reviewer finding and the owner decisions are anchored by
   CI-observed pull-request reviews.
-  - With the proposed bindings, **30 of 30** process, owner and review categories verify for the candidate.
+  - With the producer bindings (now the committed plan's), **30 of 30** process, owner and review categories verify for the candidate.
   - **47 of 47 negative controls** fail closed, each with its named diagnostic. They cover the nine required cases:
     - missing approval;
     - incorrect agent identity;
@@ -241,4 +241,5 @@ review is required, not optional. It also means the absence of findings is not c
 
 ## 7. Rehearsal 6 preparation
 
-ESO-R6-01 to ESO-R6-11 in the intake document. Rehearsal 6 is not started.
+ESO-R6-01 to ESO-R6-11 in the intake document, approved by the owner on 2026-10-28 (taking effect through the owner's
+merge of the pull request that records them, RDP-003). Rehearsal 6 is not started.

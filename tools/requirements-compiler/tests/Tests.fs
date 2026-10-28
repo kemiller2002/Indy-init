@@ -369,6 +369,7 @@ let private contractTests (source: string) : string list =
     let contract (o: Json) = field "acceptanceContract" o |> Option.defaultValue JNull
     let pp (p: Json) = VerificationPlan.preservationProblems i0.Baseline p
     let plain = VerificationPlan.build i0
+    let curated = arr "testBindings" i0.Spec |> List.map (str "obligation") |> Set.ofList
 
     // -- the plan carries a complete, derived acceptance contract on every obligation --------------------------
     let fields =
@@ -380,7 +381,8 @@ let private contractTests (source: string) : string list =
               for k in keys do
                   if (field k c).IsNone then yield sprintf "contract: %s lacks %s" (str "sourceObligation" o) k
               if strOpt "verificationStatus" c = Some "verified" then yield sprintf "contract: %s is verified in the plan" (str "sourceObligation" o)
-              if field "testIdentity" c |> Option.bind (strOpt "status") <> Some "unbound" then yield sprintf "contract: %s test identity is not explicitly unbound" (str "sourceObligation" o)
+              let expected = if curated.Contains(str "sourceObligation" o) then "bound" else "unbound"
+              if field "testIdentity" c |> Option.bind (strOpt "status") <> Some expected then yield sprintf "contract: %s test identity is not explicitly %s" (str "sourceObligation" o) expected
               for c' in strs "requiredEvidenceCategories" c do
                   if not (List.contains c' EvidenceCategories.vocabulary) then yield sprintf "contract: %s has category %s outside the vocabulary" (str "sourceObligation" o) c'
               let derived = arr "categoryDerivation" c |> List.map (str "category")

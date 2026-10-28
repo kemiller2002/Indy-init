@@ -57,14 +57,14 @@
       ]
     },
     "plan": {
-      "planId": "VP-06f6d4ef5deb",
-      "digest": "06f6d4ef5deb3f36ef55d5dde7f7d1b7ab0e6ca807ab769f606d5bb3754872a4",
+      "planId": "VP-1b2fed568a3b",
+      "digest": "1b2fed568a3b6837ad923b7e81a237292f0677342665bbeed248dd042becda92",
       "requirements": 108,
       "obligations": 326,
       "obligationsWithAcceptanceContract": 326,
       "unclassifiedObligations": 0,
       "verifiedObligations": 0,
-      "boundObligations": 0,
+      "boundObligations": 29,
       "obligationsByCategory": {
         "unit": 0,
         "integration": 114,
@@ -152,14 +152,14 @@
       "differenceDetail": []
     },
     "plan": {
-      "planId": "VP-06f6d4ef5deb",
-      "digest": "06f6d4ef5deb3f36ef55d5dde7f7d1b7ab0e6ca807ab769f606d5bb3754872a4",
+      "planId": "VP-1b2fed568a3b",
+      "digest": "1b2fed568a3b6837ad923b7e81a237292f0677342665bbeed248dd042becda92",
       "requirements": 108,
       "obligations": 326,
       "obligationsWithAcceptanceContract": 326,
       "unclassifiedObligations": 0,
       "verifiedObligations": 0,
-      "boundObligations": 0,
+      "boundObligations": 29,
       "obligationsByCategory": {
         "unit": 0,
         "integration": 114,

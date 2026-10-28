@@ -9,9 +9,9 @@
   },
   "plans": {
     "committed": {
-      "planId": "VP-06f6d4ef5deb",
+      "planId": "VP-1b2fed568a3b",
       "algorithm": "sha256",
-      "digest": "06f6d4ef5deb3f36ef55d5dde7f7d1b7ab0e6ca807ab769f606d5bb3754872a4",
+      "digest": "1b2fed568a3b6837ad923b7e81a237292f0677342665bbeed248dd042becda92",
       "covers": "sha256 of the plan serialized by the compiler's canonical writer (ASCII JSON, two-space indent, trailing newline) with planIdentity removed"
     },
     "withProposedBindings": {
@@ -27,15 +27,13 @@
       "summary": {
         "obligations": 326,
         "categoryChecks": 633,
-        "resolved": 0,
-        "unresolved": 633,
+        "resolved": 30,
+        "unresolved": 603,
         "unresolvedByClass": {
           "application-test": 543,
-          "owner": 3,
-          "process": 25,
-          "reviewer": 62
+          "reviewer": 60
         },
-        "unresolvedObligations": 326,
+        "unresolvedObligations": 324,
         "permitted": 0
       }
     },

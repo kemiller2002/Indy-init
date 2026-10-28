@@ -303,7 +303,7 @@ let simulation (source: string) (buildPlan: Json -> Json) : Json * string list =
     let committedPlan = parseFile (Path.Combine(source, "requirements-compiled", "v2", "verification-plan.json"))
     let proposedPlan = buildPlan (JArr(arr "testBindings" proposal))
     let positive = ProcessVerification.assess (inputs proposedPlan f)
-    let noBindings = ProcessVerification.assess (inputs committedPlan f)
+    let noBindings = ProcessVerification.assess (inputs (buildPlan (JArr [])) f)
     let results =
         controls proposedPlan f
         |> List.map (fun (name, code, mutated, plan) ->
@@ -324,7 +324,8 @@ let simulation (source: string) (buildPlan: Json -> Json) : Json * string list =
               yield sprintf "process simulation positive: verdict %s, unverified %A, codes %A" (str "verdict" positive) (unverified positive) (codesOf positive)
           if (arr "obligations" positive).Length <> (arr "testBindings" proposal).Length then
               yield sprintf "process simulation positive: %d obligations decided, the proposal binds %d" (arr "obligations" positive).Length (arr "testBindings" proposal).Length
-          if str "verdict" noBindings = "VERIFIED" then yield "process simulation: the committed plan (no producer bindings) verified process evidence"
+          if str "verdict" noBindings = "VERIFIED" then yield "process simulation: a plan with no producer bindings verified process evidence"
+          if VerificationPlan.digestOf committedPlan <> VerificationPlan.digestOf proposedPlan then yield "process simulation: the committed plan's bindings differ from the approved proposal"
           if VerificationPlan.processRecordKinds <> ProcessVerification.recordKinds then yield "process record kinds differ between VerificationPlan and ProcessVerification"
           for (name, code, caught) in recordResults do
               if not caught then yield sprintf "process record control '%s': no record carries %s" name code

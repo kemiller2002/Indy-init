@@ -5,8 +5,8 @@ Version 2 of the compiled requirements package. It is cut for one change, **exec
 |   |   |
 |---|---|
 | Source | kemiller2002/indy-init `aab8f80c7743392e794b3b631542903ed4ed6f64`, baseline `BL-CAUSA-INDY-INIT-aab8f80c7743` (sha256 `621e2f96…57b9`), the same as v1 |
-| Curation | v1's curation, unchanged except the description and the freshness policy `FP-PROCESS-THIS-RUN` in `curation/verification-plan.json`, plus the table `curation/evidence-categories.json` |
-| Verification plan | `VP-06f6d4ef5deb` (digest `06f6d4ef…72a4`): 108 P0 requirements, 326 obligations, each with an acceptance contract; 0 unclassified, 0 bound, 0 verified. Earlier v2 identity: `VP-6b0f59cee664`, before the process and owner evidence classes (see below) |
+| Curation | v1's curation, except the description, the freshness policy `FP-PROCESS-THIS-RUN` and 29 producer `testBindings` in `curation/verification-plan.json`, plus the table `curation/evidence-categories.json` |
+| Verification plan | `VP-1b2fed568a3b` (digest `1b2fed56…da92`): 108 P0 requirements, 326 obligations, each with an acceptance contract; 0 unclassified, 29 bound (to Praxis producers only), 0 verified. Earlier v2 identities: `VP-06f6d4ef5deb`, before the producer bindings; `VP-6b0f59cee664`, before the process and owner evidence classes (see below) |
 | Schema | `indy-init.verification-plan/1`, revision 2 (additive; see below) |
 | Compilation verdict | PASS (V01–V18). Rehearsal readiness: READY, as in v1 |
 
@@ -68,7 +68,7 @@ froze v1), so the rule above does not require a v3. No existing rule changed; th
 Process and owner categories are proven by Praxis records through `verify-process`, never by an application test, and
 `plan-readiness` blocks implementation while any mandatory mapping is unresolved. See
 [`docs/PROCESS-EVIDENCE-AND-READINESS.md`](../../docs/PROCESS-EVIDENCE-AND-READINESS.md).
-`proposals/process-bindings.proposed.json` is an agent proposal for the owner, not part of the compiled curation.
+`proposals/process-bindings.proposed.json` was the agent's proposal. Its 29 bindings are now copied verbatim into `curation/verification-plan.json` `testBindings`; the offline suite checks that the committed plan equals the plan built from the proposal. The owner approved them on 2026-10-28 in the initiative's session ("I approve anything necessary"). That statement was transcribed by an agent, so under RDP-003 the approval takes effect only through the owner's own merge of the pull request that applies them.
 
 ## How agents consume the plan before implementation
 

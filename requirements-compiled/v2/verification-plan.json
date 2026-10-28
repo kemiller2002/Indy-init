@@ -1,9 +1,9 @@
 {
   "schema": "indy-init.verification-plan/1",
   "planIdentity": {
-    "planId": "VP-06f6d4ef5deb",
+    "planId": "VP-1b2fed568a3b",
     "algorithm": "sha256",
-    "digest": "06f6d4ef5deb3f36ef55d5dde7f7d1b7ab0e6ca807ab769f606d5bb3754872a4",
+    "digest": "1b2fed568a3b6837ad923b7e81a237292f0677342665bbeed248dd042becda92",
     "covers": "sha256 of the plan serialized by the compiler's canonical writer (ASCII JSON, two-space indent, trailing newline) with planIdentity removed"
   },
   "source": {
@@ -26,14 +26,14 @@
     "origin": "baseline",
     "requirements": 108,
     "obligations": 326,
-    "boundObligations": 0,
-    "missingTestObligations": 326,
+    "boundObligations": 29,
+    "missingTestObligations": 297,
     "excludedRequirements": 0,
     "verifiedObligations": 0,
     "unverifiedObligations": 326,
     "unclassifiedObligations": 0,
     "excludedObligations": 0,
-    "obligationsWithEveryCategoryBound": 0,
+    "obligationsWithEveryCategoryBound": 2,
     "obligationsByCategory": {
       "unit": 0,
       "integration": 114,
@@ -1527,8 +1527,13 @@
           "text": "Before designing a component, discover existing Echelon capabilities, owners, supported versions, and contracts.",
           "textSha256": "cf855fc5429441a5bfd0431f264ab9e5bcf29347848f7429a110e6c5326405f1",
           "testIdentity": {
-            "status": "missing",
-            "tests": []
+            "status": "bound",
+            "tests": [
+              {
+                "id": "praxis:dependency-decision",
+                "kind": "process"
+              }
+            ]
           },
           "tokens": [],
           "acceptanceContract": {
@@ -1578,8 +1583,16 @@
               }
             ],
             "testIdentity": {
-              "status": "unbound",
-              "tests": []
+              "status": "bound",
+              "tests": [
+                {
+                  "id": "praxis:dependency-decision",
+                  "kind": "process",
+                  "categories": [
+                    "process-record"
+                  ]
+                }
+              ]
             },
             "dependencies": {
               "requirements": [],
@@ -1612,8 +1625,8 @@
               },
               {
                 "category": "process-record",
-                "reason": "no-bound-test",
-                "detail": "no test bound to this obligation declares this category"
+                "reason": "no-evidence",
+                "detail": "a bound test declares this category; only an assessed evidence bundle can verify it"
               }
             ]
           }
@@ -1626,8 +1639,13 @@
           "text": "Reuse verified implementations; require an explicit approved justification for duplication.",
           "textSha256": "6007f6e0622ba9261ec6099dd9fc3334858014f2249f16da8690f4ee70992bf9",
           "testIdentity": {
-            "status": "missing",
-            "tests": []
+            "status": "bound",
+            "tests": [
+              {
+                "id": "praxis:dependency-decision",
+                "kind": "process"
+              }
+            ]
           },
           "tokens": [],
           "acceptanceContract": {
@@ -1677,8 +1695,16 @@
               }
             ],
             "testIdentity": {
-              "status": "unbound",
-              "tests": []
+              "status": "bound",
+              "tests": [
+                {
+                  "id": "praxis:dependency-decision",
+                  "kind": "process",
+                  "categories": [
+                    "process-record"
+                  ]
+                }
+              ]
             },
             "dependencies": {
               "requirements": [],
@@ -1711,8 +1737,8 @@
               },
               {
                 "category": "process-record",
-                "reason": "no-bound-test",
-                "detail": "no test bound to this obligation declares this category"
+                "reason": "no-evidence",
+                "detail": "a bound test declares this category; only an assessed evidence bundle can verify it"
               }
             ]
           }
@@ -1756,9 +1782,9 @@
         ]
       },
       "testIdentity": {
-        "status": "missing",
-        "boundObligations": 0,
-        "missingObligations": 2
+        "status": "bound",
+        "boundObligations": 2,
+        "missingObligations": 0
       },
       "evidenceContract": {
         "subjectType": "requirement",
@@ -2321,8 +2347,13 @@
           "text": "A reviewer distinct from the implementer must attempt to falsify high-risk claims, inspect requirements and evidence, and record gaps.",
           "textSha256": "47dfd45fa6e067bc131f8fca55a5eec4de6ff82d714c813d383cd016570ad30e",
           "testIdentity": {
-            "status": "missing",
-            "tests": []
+            "status": "bound",
+            "tests": [
+              {
+                "id": "praxis:independent-review",
+                "kind": "review"
+              }
+            ]
           },
           "tokens": [],
           "acceptanceContract": {
@@ -2360,8 +2391,16 @@
               }
             ],
             "testIdentity": {
-              "status": "unbound",
-              "tests": []
+              "status": "bound",
+              "tests": [
+                {
+                  "id": "praxis:independent-review",
+                  "kind": "review",
+                  "categories": [
+                    "independent-acceptance"
+                  ]
+                }
+              ]
             },
             "dependencies": {
               "requirements": [],
@@ -2385,8 +2424,8 @@
             "missingCoverage": [
               {
                 "category": "independent-acceptance",
-                "reason": "no-bound-test",
-                "detail": "no test bound to this obligation declares this category"
+                "reason": "no-evidence",
+                "detail": "a bound test declares this category; only an assessed evidence bundle can verify it"
               }
             ]
           }
@@ -2399,8 +2438,17 @@
           "text": "Reviewers cannot self-ratify operator decisions.",
           "textSha256": "3daa217895503c3c8c2a24750d9414a63239b784e23f8f3e20450eb376262b28",
           "testIdentity": {
-            "status": "missing",
-            "tests": []
+            "status": "bound",
+            "tests": [
+              {
+                "id": "praxis:independent-review",
+                "kind": "review"
+              },
+              {
+                "id": "praxis:owner-approval",
+                "kind": "owner"
+              }
+            ]
           },
           "tokens": [],
           "acceptanceContract": {
@@ -2450,8 +2498,23 @@
               }
             ],
             "testIdentity": {
-              "status": "unbound",
-              "tests": []
+              "status": "bound",
+              "tests": [
+                {
+                  "id": "praxis:independent-review",
+                  "kind": "review",
+                  "categories": [
+                    "independent-acceptance"
+                  ]
+                },
+                {
+                  "id": "praxis:owner-approval",
+                  "kind": "owner",
+                  "categories": [
+                    "owner-decision"
+                  ]
+                }
+              ]
             },
             "dependencies": {
               "requirements": [],
@@ -2479,13 +2542,13 @@
             "missingCoverage": [
               {
                 "category": "independent-acceptance",
-                "reason": "no-bound-test",
-                "detail": "no test bound to this obligation declares this category"
+                "reason": "no-evidence",
+                "detail": "a bound test declares this category; only an assessed evidence bundle can verify it"
               },
               {
                 "category": "owner-decision",
-                "reason": "no-bound-test",
-                "detail": "no test bound to this obligation declares this category"
+                "reason": "no-evidence",
+                "detail": "a bound test declares this category; only an assessed evidence bundle can verify it"
               }
             ]
           }
@@ -2527,9 +2590,9 @@
         ]
       },
       "testIdentity": {
-        "status": "missing",
-        "boundObligations": 0,
-        "missingObligations": 2
+        "status": "bound",
+        "boundObligations": 2,
+        "missingObligations": 0
       },
       "evidenceContract": {
         "subjectType": "requirement",
@@ -3353,8 +3416,13 @@
           "text": "Agent changes must be bounded to named requirements and paths; commits should stage intended files only.",
           "textSha256": "4110304588a2438cdb755f4fa1392a1cb41b8476f4b78fd21e22f654bbfa490e",
           "testIdentity": {
-            "status": "missing",
-            "tests": []
+            "status": "bound",
+            "tests": [
+              {
+                "id": "praxis:assignment",
+                "kind": "process"
+              }
+            ]
           },
           "tokens": [],
           "acceptanceContract": {
@@ -3404,8 +3472,16 @@
               }
             ],
             "testIdentity": {
-              "status": "unbound",
-              "tests": []
+              "status": "bound",
+              "tests": [
+                {
+                  "id": "praxis:assignment",
+                  "kind": "process",
+                  "categories": [
+                    "process-record"
+                  ]
+                }
+              ]
             },
             "dependencies": {
               "requirements": [],
@@ -3438,8 +3514,8 @@
               },
               {
                 "category": "process-record",
-                "reason": "no-bound-test",
-                "detail": "no test bound to this obligation declares this category"
+                "reason": "no-evidence",
+                "detail": "a bound test declares this category; only an assessed evidence bundle can verify it"
               }
             ]
           }
@@ -3452,8 +3528,13 @@
           "text": "Detect unrelated changes and require explicit review before inclusion.",
           "textSha256": "91e10ad80630a0abcba14f4ebe6371af9b58e15af0cb5ccdfedabedeb37c7565",
           "testIdentity": {
-            "status": "missing",
-            "tests": []
+            "status": "bound",
+            "tests": [
+              {
+                "id": "praxis:scope-change",
+                "kind": "process"
+              }
+            ]
           },
           "tokens": [],
           "acceptanceContract": {
@@ -3503,8 +3584,16 @@
               }
             ],
             "testIdentity": {
-              "status": "unbound",
-              "tests": []
+              "status": "bound",
+              "tests": [
+                {
+                  "id": "praxis:scope-change",
+                  "kind": "process",
+                  "categories": [
+                    "process-record"
+                  ]
+                }
+              ]
             },
             "dependencies": {
               "requirements": [],
@@ -3537,8 +3626,8 @@
               },
               {
                 "category": "process-record",
-                "reason": "no-bound-test",
-                "detail": "no test bound to this obligation declares this category"
+                "reason": "no-evidence",
+                "detail": "a bound test declares this category; only an assessed evidence bundle can verify it"
               }
             ]
           }
@@ -3580,9 +3669,9 @@
         ]
       },
       "testIdentity": {
-        "status": "missing",
-        "boundObligations": 0,
-        "missingObligations": 2
+        "status": "bound",
+        "boundObligations": 2,
+        "missingObligations": 0
       },
       "evidenceContract": {
         "subjectType": "requirement",
@@ -4190,8 +4279,13 @@
           "text": "Maintain durable, compact, machine-readable checkpoints of objectives, decisions, completed work, open defects, evidence, and next actions so agent restarts do not re-decide settled questions.",
           "textSha256": "98a1b97c465729df6b93b95f274e885b10147a9d0f71f458973e6c7692ae0bee",
           "testIdentity": {
-            "status": "missing",
-            "tests": []
+            "status": "bound",
+            "tests": [
+              {
+                "id": "praxis:checkpoint",
+                "kind": "process"
+              }
+            ]
           },
           "tokens": [],
           "acceptanceContract": {
@@ -4241,8 +4335,16 @@
               }
             ],
             "testIdentity": {
-              "status": "unbound",
-              "tests": []
+              "status": "bound",
+              "tests": [
+                {
+                  "id": "praxis:checkpoint",
+                  "kind": "process",
+                  "categories": [
+                    "process-record"
+                  ]
+                }
+              ]
             },
             "dependencies": {
               "requirements": [],
@@ -4275,8 +4377,8 @@
               },
               {
                 "category": "process-record",
-                "reason": "no-bound-test",
-                "detail": "no test bound to this obligation declares this category"
+                "reason": "no-evidence",
+                "detail": "a bound test declares this category; only an assessed evidence bundle can verify it"
               }
             ]
           }
@@ -4318,9 +4420,9 @@
         ]
       },
       "testIdentity": {
-        "status": "missing",
-        "boundObligations": 0,
-        "missingObligations": 1
+        "status": "bound",
+        "boundObligations": 1,
+        "missingObligations": 0
       },
       "evidenceContract": {
         "subjectType": "requirement",
@@ -4379,8 +4481,13 @@
           "text": "Route implementation work to the actual owning repository through its documented Praxis input folder and accepted grammar, never GitHub Issues.",
           "textSha256": "3bd61cf71a1085d5cd609e23f08c5f64e5aa0fa4cda8473a2b0c654dfaf1b730",
           "testIdentity": {
-            "status": "missing",
-            "tests": []
+            "status": "bound",
+            "tests": [
+              {
+                "id": "praxis:execution-start",
+                "kind": "process"
+              }
+            ]
           },
           "tokens": [],
           "acceptanceContract": {
@@ -4430,8 +4537,16 @@
               }
             ],
             "testIdentity": {
-              "status": "unbound",
-              "tests": []
+              "status": "bound",
+              "tests": [
+                {
+                  "id": "praxis:execution-start",
+                  "kind": "process",
+                  "categories": [
+                    "process-record"
+                  ]
+                }
+              ]
             },
             "dependencies": {
               "requirements": [],
@@ -4464,8 +4579,8 @@
               },
               {
                 "category": "process-record",
-                "reason": "no-bound-test",
-                "detail": "no test bound to this obligation declares this category"
+                "reason": "no-evidence",
+                "detail": "a bound test declares this category; only an assessed evidence bundle can verify it"
               }
             ]
           }
@@ -4478,8 +4593,13 @@
           "text": "Do not assume component ownership from its name.",
           "textSha256": "e41960f47c2d2b9405afc0801372c50822d3c1f3bca77e67f386c94570441a83",
           "testIdentity": {
-            "status": "missing",
-            "tests": []
+            "status": "bound",
+            "tests": [
+              {
+                "id": "praxis:execution-start",
+                "kind": "process"
+              }
+            ]
           },
           "tokens": [],
           "acceptanceContract": {
@@ -4529,8 +4649,16 @@
               }
             ],
             "testIdentity": {
-              "status": "unbound",
-              "tests": []
+              "status": "bound",
+              "tests": [
+                {
+                  "id": "praxis:execution-start",
+                  "kind": "process",
+                  "categories": [
+                    "process-record"
+                  ]
+                }
+              ]
             },
             "dependencies": {
               "requirements": [],
@@ -4563,8 +4691,8 @@
               },
               {
                 "category": "process-record",
-                "reason": "no-bound-test",
-                "detail": "no test bound to this obligation declares this category"
+                "reason": "no-evidence",
+                "detail": "a bound test declares this category; only an assessed evidence bundle can verify it"
               }
             ]
           }
@@ -4608,9 +4736,9 @@
         ]
       },
       "testIdentity": {
-        "status": "missing",
-        "boundObligations": 0,
-        "missingObligations": 2
+        "status": "bound",
+        "boundObligations": 2,
+        "missingObligations": 0
       },
       "evidenceContract": {
         "subjectType": "requirement",
@@ -5655,8 +5783,13 @@
           "text": "Prefer one long-running implementation agent with compact durable checkpoints.",
           "textSha256": "5b40e32de831bb8e0241c0bcaa301e4cd7eab5fa405f6adb2ad635cc0a46c01a",
           "testIdentity": {
-            "status": "missing",
-            "tests": []
+            "status": "bound",
+            "tests": [
+              {
+                "id": "praxis:checkpoint",
+                "kind": "process"
+              }
+            ]
           },
           "tokens": [],
           "acceptanceContract": {
@@ -5706,8 +5839,16 @@
               }
             ],
             "testIdentity": {
-              "status": "unbound",
-              "tests": []
+              "status": "bound",
+              "tests": [
+                {
+                  "id": "praxis:checkpoint",
+                  "kind": "process",
+                  "categories": [
+                    "process-record"
+                  ]
+                }
+              ]
             },
             "dependencies": {
               "requirements": [],
@@ -5740,8 +5881,8 @@
               },
               {
                 "category": "process-record",
-                "reason": "no-bound-test",
-                "detail": "no test bound to this obligation declares this category"
+                "reason": "no-evidence",
+                "detail": "a bound test declares this category; only an assessed evidence bundle can verify it"
               }
             ]
           }
@@ -5754,8 +5895,13 @@
           "text": "Do not require structured handoffs by default.",
           "textSha256": "e3c5c909923a6e7622643594a8b99cf6290b05c37e57aa8439a28cdb76e4f862",
           "testIdentity": {
-            "status": "missing",
-            "tests": []
+            "status": "bound",
+            "tests": [
+              {
+                "id": "praxis:checkpoint",
+                "kind": "process"
+              }
+            ]
           },
           "tokens": [],
           "acceptanceContract": {
@@ -5805,8 +5951,16 @@
               }
             ],
             "testIdentity": {
-              "status": "unbound",
-              "tests": []
+              "status": "bound",
+              "tests": [
+                {
+                  "id": "praxis:checkpoint",
+                  "kind": "process",
+                  "categories": [
+                    "process-record"
+                  ]
+                }
+              ]
             },
             "dependencies": {
               "requirements": [],
@@ -5839,8 +5993,8 @@
               },
               {
                 "category": "process-record",
-                "reason": "no-bound-test",
-                "detail": "no test bound to this obligation declares this category"
+                "reason": "no-evidence",
+                "detail": "a bound test declares this category; only an assessed evidence bundle can verify it"
               }
             ]
           }
@@ -5853,8 +6007,13 @@
           "text": "Measure correctness and requirement retention after context compaction; use independent reviewers at release candidates.",
           "textSha256": "5fc0e38b78af65b955b5742e1b6f611d7b98742465bc9ca36cef567a20f5a6ed",
           "testIdentity": {
-            "status": "missing",
-            "tests": []
+            "status": "bound",
+            "tests": [
+              {
+                "id": "praxis:independent-review",
+                "kind": "process"
+              }
+            ]
           },
           "tokens": [],
           "acceptanceContract": {
@@ -5904,8 +6063,16 @@
               }
             ],
             "testIdentity": {
-              "status": "unbound",
-              "tests": []
+              "status": "bound",
+              "tests": [
+                {
+                  "id": "praxis:independent-review",
+                  "kind": "process",
+                  "categories": [
+                    "process-record"
+                  ]
+                }
+              ]
             },
             "dependencies": {
               "requirements": [],
@@ -5938,8 +6105,8 @@
               },
               {
                 "category": "process-record",
-                "reason": "no-bound-test",
-                "detail": "no test bound to this obligation declares this category"
+                "reason": "no-evidence",
+                "detail": "a bound test declares this category; only an assessed evidence bundle can verify it"
               }
             ]
           }
@@ -5981,9 +6148,9 @@
         ]
       },
       "testIdentity": {
-        "status": "missing",
-        "boundObligations": 0,
-        "missingObligations": 3
+        "status": "bound",
+        "boundObligations": 3,
+        "missingObligations": 0
       },
       "evidenceContract": {
         "subjectType": "requirement",
@@ -6786,8 +6953,13 @@
           "text": "An authorized human must resolve the write scope, Percepta release/waiver, DF-CAUSA-2026-0003 operator decisions, and frozen requirements/stack before a timed full-write rehearsal.",
           "textSha256": "d27a7543a7f88c97939bc01ce67cdafabd26b79e8e339690b51bde995f595903",
           "testIdentity": {
-            "status": "missing",
-            "tests": []
+            "status": "bound",
+            "tests": [
+              {
+                "id": "praxis:owner-approval",
+                "kind": "owner"
+              }
+            ]
           },
           "tokens": [],
           "acceptanceContract": {
@@ -6837,8 +7009,16 @@
               }
             ],
             "testIdentity": {
-              "status": "unbound",
-              "tests": []
+              "status": "bound",
+              "tests": [
+                {
+                  "id": "praxis:owner-approval",
+                  "kind": "owner",
+                  "categories": [
+                    "owner-decision"
+                  ]
+                }
+              ]
             },
             "dependencies": {
               "requirements": [],
@@ -6873,8 +7053,8 @@
               },
               {
                 "category": "owner-decision",
-                "reason": "no-bound-test",
-                "detail": "no test bound to this obligation declares this category"
+                "reason": "no-evidence",
+                "detail": "a bound test declares this category; only an assessed evidence bundle can verify it"
               }
             ]
           }
@@ -6887,8 +7067,13 @@
           "text": "Agents must not self-ratify these decisions.",
           "textSha256": "85631daa7bb85a53a8e67d01f7e87cf34669559dce6d29797d5c8aa919d913b4",
           "testIdentity": {
-            "status": "missing",
-            "tests": []
+            "status": "bound",
+            "tests": [
+              {
+                "id": "praxis:owner-approval",
+                "kind": "owner"
+              }
+            ]
           },
           "tokens": [],
           "acceptanceContract": {
@@ -6938,8 +7123,16 @@
               }
             ],
             "testIdentity": {
-              "status": "unbound",
-              "tests": []
+              "status": "bound",
+              "tests": [
+                {
+                  "id": "praxis:owner-approval",
+                  "kind": "owner",
+                  "categories": [
+                    "owner-decision"
+                  ]
+                }
+              ]
             },
             "dependencies": {
               "requirements": [],
@@ -6974,8 +7167,8 @@
               },
               {
                 "category": "owner-decision",
-                "reason": "no-bound-test",
-                "detail": "no test bound to this obligation declares this category"
+                "reason": "no-evidence",
+                "detail": "a bound test declares this category; only an assessed evidence bundle can verify it"
               }
             ]
           }
@@ -7017,9 +7210,9 @@
         ]
       },
       "testIdentity": {
-        "status": "missing",
-        "boundObligations": 0,
-        "missingObligations": 2
+        "status": "bound",
+        "boundObligations": 2,
+        "missingObligations": 0
       },
       "evidenceContract": {
         "subjectType": "requirement",
@@ -17861,8 +18054,13 @@
           "text": "During development, agents should run the smallest relevant deterministic tests first, batch integration checks at meaningful checkpoints, and run the complete live/deployed suite before release.",
           "textSha256": "557eeb6d94b64f7a4b1b38c63e18ee1f858de606d7ad1006af85cc70da9b5fa2",
           "testIdentity": {
-            "status": "missing",
-            "tests": []
+            "status": "bound",
+            "tests": [
+              {
+                "id": "praxis:test-result",
+                "kind": "process"
+              }
+            ]
           },
           "tokens": [],
           "acceptanceContract": {
@@ -17924,8 +18122,16 @@
               }
             ],
             "testIdentity": {
-              "status": "unbound",
-              "tests": []
+              "status": "bound",
+              "tests": [
+                {
+                  "id": "praxis:test-result",
+                  "kind": "process",
+                  "categories": [
+                    "process-record"
+                  ]
+                }
+              ]
             },
             "dependencies": {
               "requirements": [],
@@ -17963,8 +18169,8 @@
               },
               {
                 "category": "process-record",
-                "reason": "no-bound-test",
-                "detail": "no test bound to this obligation declares this category"
+                "reason": "no-evidence",
+                "detail": "a bound test declares this category; only an assessed evidence bundle can verify it"
               }
             ]
           }
@@ -18104,9 +18310,9 @@
         ]
       },
       "testIdentity": {
-        "status": "missing",
-        "boundObligations": 0,
-        "missingObligations": 2
+        "status": "partial",
+        "boundObligations": 1,
+        "missingObligations": 1
       },
       "evidenceContract": {
         "subjectType": "requirement",
@@ -28166,8 +28372,8 @@
               ]
             },
             "freshness": {
-              "policy": "FP-DETERMINISTIC-INPUT-DIGEST",
-              "requirementPolicy": "FP-DETERMINISTIC-INPUT-DIGEST",
+              "policy": "FP-PROCESS-THIS-RUN",
+              "requirementPolicy": "FP-PROCESS-THIS-RUN",
               "categoryPolicies": []
             },
             "verificationStatus": "unverified",
@@ -28256,8 +28462,8 @@
               ]
             },
             "freshness": {
-              "policy": "FP-DETERMINISTIC-INPUT-DIGEST",
-              "requirementPolicy": "FP-DETERMINISTIC-INPUT-DIGEST",
+              "policy": "FP-PROCESS-THIS-RUN",
+              "requirementPolicy": "FP-PROCESS-THIS-RUN",
               "categoryPolicies": []
             },
             "verificationStatus": "unverified",
@@ -28283,8 +28489,13 @@
           "text": "Preserve traceability and approved-scope handling in Praxis.",
           "textSha256": "7fffe04c710fee9b765ceae1e60df50d480ff26c7adb6b8cc03cd41a6eda82cb",
           "testIdentity": {
-            "status": "missing",
-            "tests": []
+            "status": "bound",
+            "tests": [
+              {
+                "id": "praxis:execution-start",
+                "kind": "process"
+              }
+            ]
           },
           "tokens": [],
           "acceptanceContract": {
@@ -28346,8 +28557,16 @@
               }
             ],
             "testIdentity": {
-              "status": "unbound",
-              "tests": []
+              "status": "bound",
+              "tests": [
+                {
+                  "id": "praxis:execution-start",
+                  "kind": "process",
+                  "categories": [
+                    "process-record"
+                  ]
+                }
+              ]
             },
             "dependencies": {
               "requirements": [],
@@ -28359,7 +28578,7 @@
             },
             "freshness": {
               "policy": "FP-PROCESS-THIS-RUN",
-              "requirementPolicy": "FP-DETERMINISTIC-INPUT-DIGEST",
+              "requirementPolicy": "FP-PROCESS-THIS-RUN",
               "categoryPolicies": [
                 {
                   "category": "process-record",
@@ -28381,8 +28600,8 @@
               },
               {
                 "category": "process-record",
-                "reason": "no-bound-test",
-                "detail": "no test bound to this obligation declares this category"
+                "reason": "no-evidence",
+                "detail": "a bound test declares this category; only an assessed evidence bundle can verify it"
               }
             ]
           }
@@ -28427,9 +28646,9 @@
         ]
       },
       "testIdentity": {
-        "status": "missing",
-        "boundObligations": 0,
-        "missingObligations": 3
+        "status": "partial",
+        "boundObligations": 1,
+        "missingObligations": 2
       },
       "evidenceContract": {
         "subjectType": "requirement",
@@ -28451,7 +28670,7 @@
         ]
       },
       "freshness": {
-        "policy": "FP-DETERMINISTIC-INPUT-DIGEST",
+        "policy": "FP-PROCESS-THIS-RUN",
         "boundTo": [
           "bound to the exact application source commit SHA under test (and the deployed SHA for deployed checks, G9)",
           "bound to the requirements baseline id and its sha256 used by the run (RDP-001)",
@@ -31763,8 +31982,8 @@
               ]
             },
             "freshness": {
-              "policy": "FP-DETERMINISTIC-INPUT-DIGEST",
-              "requirementPolicy": "FP-DETERMINISTIC-INPUT-DIGEST",
+              "policy": "FP-PROCESS-THIS-RUN",
+              "requirementPolicy": "FP-PROCESS-THIS-RUN",
               "categoryPolicies": []
             },
             "verificationStatus": "unverified",
@@ -31862,8 +32081,8 @@
               ]
             },
             "freshness": {
-              "policy": "FP-DETERMINISTIC-INPUT-DIGEST",
-              "requirementPolicy": "FP-DETERMINISTIC-INPUT-DIGEST",
+              "policy": "FP-PROCESS-THIS-RUN",
+              "requirementPolicy": "FP-PROCESS-THIS-RUN",
               "categoryPolicies": []
             },
             "verificationStatus": "unverified",
@@ -31889,8 +32108,17 @@
           "text": "Record source requirement IDs, tests, exact deployed SHA, and independent review.",
           "textSha256": "2d4898e5b4858a4aede9fea3ea46148df44c5813918b7d5d4317ae9ed5b5f7af",
           "testIdentity": {
-            "status": "missing",
-            "tests": []
+            "status": "bound",
+            "tests": [
+              {
+                "id": "praxis:acceptance-reference",
+                "kind": "process"
+              },
+              {
+                "id": "praxis:release-selection",
+                "kind": "process"
+              }
+            ]
           },
           "tokens": [],
           "acceptanceContract": {
@@ -31952,8 +32180,23 @@
               }
             ],
             "testIdentity": {
-              "status": "unbound",
-              "tests": []
+              "status": "bound",
+              "tests": [
+                {
+                  "id": "praxis:acceptance-reference",
+                  "kind": "process",
+                  "categories": [
+                    "process-record"
+                  ]
+                },
+                {
+                  "id": "praxis:release-selection",
+                  "kind": "process",
+                  "categories": [
+                    "process-record"
+                  ]
+                }
+              ]
             },
             "dependencies": {
               "requirements": [
@@ -31974,7 +32217,7 @@
             },
             "freshness": {
               "policy": "FP-PROCESS-THIS-RUN",
-              "requirementPolicy": "FP-DETERMINISTIC-INPUT-DIGEST",
+              "requirementPolicy": "FP-PROCESS-THIS-RUN",
               "categoryPolicies": [
                 {
                   "category": "process-record",
@@ -31996,8 +32239,8 @@
               },
               {
                 "category": "process-record",
-                "reason": "no-bound-test",
-                "detail": "no test bound to this obligation declares this category"
+                "reason": "no-evidence",
+                "detail": "a bound test declares this category; only an assessed evidence bundle can verify it"
               }
             ]
           }
@@ -32082,8 +32325,8 @@
               ]
             },
             "freshness": {
-              "policy": "FP-DETERMINISTIC-INPUT-DIGEST",
-              "requirementPolicy": "FP-DETERMINISTIC-INPUT-DIGEST",
+              "policy": "FP-PROCESS-THIS-RUN",
+              "requirementPolicy": "FP-PROCESS-THIS-RUN",
               "categoryPolicies": []
             },
             "verificationStatus": "unverified",
@@ -32142,9 +32385,9 @@
         ]
       },
       "testIdentity": {
-        "status": "missing",
-        "boundObligations": 0,
-        "missingObligations": 4
+        "status": "partial",
+        "boundObligations": 1,
+        "missingObligations": 3
       },
       "evidenceContract": {
         "subjectType": "requirement",
@@ -32175,7 +32418,7 @@
         ]
       },
       "freshness": {
-        "policy": "FP-DETERMINISTIC-INPUT-DIGEST",
+        "policy": "FP-PROCESS-THIS-RUN",
         "boundTo": [
           "bound to the exact application source commit SHA under test (and the deployed SHA for deployed checks, G9)",
           "bound to the requirements baseline id and its sha256 used by the run (RDP-001)",
@@ -34361,8 +34604,13 @@
           "text": "Trace all requirements through the documented Praxis input process; record approved exclusions explicitly.",
           "textSha256": "dba3bf06b790d764273d8e0a64df72e3ff5f2fa0ec8eee0d104fd6b6329cd144",
           "testIdentity": {
-            "status": "missing",
-            "tests": []
+            "status": "bound",
+            "tests": [
+              {
+                "id": "praxis:execution-start",
+                "kind": "process"
+              }
+            ]
           },
           "tokens": [],
           "acceptanceContract": {
@@ -34438,8 +34686,16 @@
               }
             ],
             "testIdentity": {
-              "status": "unbound",
-              "tests": []
+              "status": "bound",
+              "tests": [
+                {
+                  "id": "praxis:execution-start",
+                  "kind": "process",
+                  "categories": [
+                    "process-record"
+                  ]
+                }
+              ]
             },
             "dependencies": {
               "requirements": [],
@@ -34483,8 +34739,8 @@
               },
               {
                 "category": "process-record",
-                "reason": "no-bound-test",
-                "detail": "no test bound to this obligation declares this category"
+                "reason": "no-evidence",
+                "detail": "a bound test declares this category; only an assessed evidence bundle can verify it"
               }
             ]
           }
@@ -34537,9 +34793,9 @@
         ]
       },
       "testIdentity": {
-        "status": "missing",
-        "boundObligations": 0,
-        "missingObligations": 2
+        "status": "partial",
+        "boundObligations": 1,
+        "missingObligations": 1
       },
       "evidenceContract": {
         "subjectType": "requirement",
@@ -34607,8 +34863,13 @@
           "text": "Each build MUST use the newest available stable, published, compatible release of every applicable Echelon system at the time the build baseline is locked.",
           "textSha256": "3f8a81e4873304c93d287c6783212aa5e3f117ad10fae256097005c498baf4bc",
           "testIdentity": {
-            "status": "missing",
-            "tests": []
+            "status": "bound",
+            "tests": [
+              {
+                "id": "praxis:dependency-decision",
+                "kind": "process"
+              }
+            ]
           },
           "tokens": [],
           "acceptanceContract": {
@@ -34658,8 +34919,16 @@
               }
             ],
             "testIdentity": {
-              "status": "unbound",
-              "tests": []
+              "status": "bound",
+              "tests": [
+                {
+                  "id": "praxis:dependency-decision",
+                  "kind": "process",
+                  "categories": [
+                    "process-record"
+                  ]
+                }
+              ]
             },
             "dependencies": {
               "requirements": [],
@@ -34669,7 +34938,7 @@
             },
             "freshness": {
               "policy": "FP-PROCESS-THIS-RUN",
-              "requirementPolicy": "FP-DETERMINISTIC-INPUT-DIGEST",
+              "requirementPolicy": "FP-PROCESS-THIS-RUN",
               "categoryPolicies": [
                 {
                   "category": "process-record",
@@ -34686,8 +34955,8 @@
               },
               {
                 "category": "process-record",
-                "reason": "no-bound-test",
-                "detail": "no test bound to this obligation declares this category"
+                "reason": "no-evidence",
+                "detail": "a bound test declares this category; only an assessed evidence bundle can verify it"
               }
             ]
           }
@@ -34700,8 +34969,13 @@
           "text": "Applicable systems include Praxis, Ordo, Dokimos, Percepta, Forma, Forma Studio/workflow layout, Limen, Folio, and any actually integrated Echelon dependencies.",
           "textSha256": "ca0d2dae7caca1426d5a20926056bf2fb91fa0da9eeb905b843ca01dac85302a",
           "testIdentity": {
-            "status": "missing",
-            "tests": []
+            "status": "bound",
+            "tests": [
+              {
+                "id": "praxis:dependency-decision",
+                "kind": "process"
+              }
+            ]
           },
           "tokens": [],
           "acceptanceContract": {
@@ -34751,8 +35025,16 @@
               }
             ],
             "testIdentity": {
-              "status": "unbound",
-              "tests": []
+              "status": "bound",
+              "tests": [
+                {
+                  "id": "praxis:dependency-decision",
+                  "kind": "process",
+                  "categories": [
+                    "process-record"
+                  ]
+                }
+              ]
             },
             "dependencies": {
               "requirements": [],
@@ -34762,7 +35044,7 @@
             },
             "freshness": {
               "policy": "FP-PROCESS-THIS-RUN",
-              "requirementPolicy": "FP-DETERMINISTIC-INPUT-DIGEST",
+              "requirementPolicy": "FP-PROCESS-THIS-RUN",
               "categoryPolicies": [
                 {
                   "category": "process-record",
@@ -34779,8 +35061,8 @@
               },
               {
                 "category": "process-record",
-                "reason": "no-bound-test",
-                "detail": "no test bound to this obligation declares this category"
+                "reason": "no-evidence",
+                "detail": "a bound test declares this category; only an assessed evidence bundle can verify it"
               }
             ]
           }
@@ -34793,8 +35075,13 @@
           "text": "Discover the real owner and release channel for each; do not invent a release or assume every system is a runtime dependency.",
           "textSha256": "9d8a7ba0c2f233fbe4bc99d5e4a40354d18e387c2c03e304319aef265f46af20",
           "testIdentity": {
-            "status": "missing",
-            "tests": []
+            "status": "bound",
+            "tests": [
+              {
+                "id": "praxis:dependency-decision",
+                "kind": "process"
+              }
+            ]
           },
           "tokens": [],
           "acceptanceContract": {
@@ -34844,8 +35131,16 @@
               }
             ],
             "testIdentity": {
-              "status": "unbound",
-              "tests": []
+              "status": "bound",
+              "tests": [
+                {
+                  "id": "praxis:dependency-decision",
+                  "kind": "process",
+                  "categories": [
+                    "process-record"
+                  ]
+                }
+              ]
             },
             "dependencies": {
               "requirements": [],
@@ -34855,7 +35150,7 @@
             },
             "freshness": {
               "policy": "FP-PROCESS-THIS-RUN",
-              "requirementPolicy": "FP-DETERMINISTIC-INPUT-DIGEST",
+              "requirementPolicy": "FP-PROCESS-THIS-RUN",
               "categoryPolicies": [
                 {
                   "category": "process-record",
@@ -34872,8 +35167,8 @@
               },
               {
                 "category": "process-record",
-                "reason": "no-bound-test",
-                "detail": "no test bound to this obligation declares this category"
+                "reason": "no-evidence",
+                "detail": "a bound test declares this category; only an assessed evidence bundle can verify it"
               }
             ]
           }
@@ -34915,9 +35210,9 @@
         ]
       },
       "testIdentity": {
-        "status": "missing",
-        "boundObligations": 0,
-        "missingObligations": 3
+        "status": "bound",
+        "boundObligations": 3,
+        "missingObligations": 0
       },
       "evidenceContract": {
         "subjectType": "requirement",
@@ -34937,7 +35232,7 @@
         ]
       },
       "freshness": {
-        "policy": "FP-DETERMINISTIC-INPUT-DIGEST",
+        "policy": "FP-PROCESS-THIS-RUN",
         "boundTo": [
           "bound to the exact application source commit SHA under test (and the deployed SHA for deployed checks, G9)",
           "bound to the requirements baseline id and its sha256 used by the run (RDP-001)",
@@ -34977,8 +35272,13 @@
           "text": "Query authoritative package registries, GitHub releases/tags, or the owning repository's documented release source immediately before baseline lock.",
           "textSha256": "83b05b7264723eecc4776b2d4070179660921f4e72b34f6949413a4c15d582f1",
           "testIdentity": {
-            "status": "missing",
-            "tests": []
+            "status": "bound",
+            "tests": [
+              {
+                "id": "praxis:dependency-decision",
+                "kind": "process"
+              }
+            ]
           },
           "tokens": [],
           "acceptanceContract": {
@@ -35028,8 +35328,16 @@
               }
             ],
             "testIdentity": {
-              "status": "unbound",
-              "tests": []
+              "status": "bound",
+              "tests": [
+                {
+                  "id": "praxis:dependency-decision",
+                  "kind": "process",
+                  "categories": [
+                    "process-record"
+                  ]
+                }
+              ]
             },
             "dependencies": {
               "requirements": [],
@@ -35040,7 +35348,7 @@
             },
             "freshness": {
               "policy": "FP-PROCESS-THIS-RUN",
-              "requirementPolicy": "FP-DETERMINISTIC-INPUT-DIGEST",
+              "requirementPolicy": "FP-PROCESS-THIS-RUN",
               "categoryPolicies": [
                 {
                   "category": "process-record",
@@ -35057,8 +35365,8 @@
               },
               {
                 "category": "process-record",
-                "reason": "no-bound-test",
-                "detail": "no test bound to this obligation declares this category"
+                "reason": "no-evidence",
+                "detail": "a bound test declares this category; only an assessed evidence bundle can verify it"
               }
             ]
           }
@@ -35071,8 +35379,13 @@
           "text": "Record checked timestamp, candidate release, source reference, and why it was selected.",
           "textSha256": "fbf738d1b625666a6330cf3d576c5c87bf9c348fa0a3f60f3791642d5b425b01",
           "testIdentity": {
-            "status": "missing",
-            "tests": []
+            "status": "bound",
+            "tests": [
+              {
+                "id": "praxis:dependency-decision",
+                "kind": "process"
+              }
+            ]
           },
           "tokens": [],
           "acceptanceContract": {
@@ -35122,8 +35435,16 @@
               }
             ],
             "testIdentity": {
-              "status": "unbound",
-              "tests": []
+              "status": "bound",
+              "tests": [
+                {
+                  "id": "praxis:dependency-decision",
+                  "kind": "process",
+                  "categories": [
+                    "process-record"
+                  ]
+                }
+              ]
             },
             "dependencies": {
               "requirements": [],
@@ -35134,7 +35455,7 @@
             },
             "freshness": {
               "policy": "FP-PROCESS-THIS-RUN",
-              "requirementPolicy": "FP-DETERMINISTIC-INPUT-DIGEST",
+              "requirementPolicy": "FP-PROCESS-THIS-RUN",
               "categoryPolicies": [
                 {
                   "category": "process-record",
@@ -35151,8 +35472,8 @@
               },
               {
                 "category": "process-record",
-                "reason": "no-bound-test",
-                "detail": "no test bound to this obligation declares this category"
+                "reason": "no-evidence",
+                "detail": "a bound test declares this category; only an assessed evidence bundle can verify it"
               }
             ]
           }
@@ -35165,8 +35486,13 @@
           "text": "Do not equate latest main commit with latest released artifact.",
           "textSha256": "8985d7294597907a6a80899a4f424bdbb451d5d070fbf9171930bd242dae794a",
           "testIdentity": {
-            "status": "missing",
-            "tests": []
+            "status": "bound",
+            "tests": [
+              {
+                "id": "praxis:dependency-decision",
+                "kind": "process"
+              }
+            ]
           },
           "tokens": [],
           "acceptanceContract": {
@@ -35216,8 +35542,16 @@
               }
             ],
             "testIdentity": {
-              "status": "unbound",
-              "tests": []
+              "status": "bound",
+              "tests": [
+                {
+                  "id": "praxis:dependency-decision",
+                  "kind": "process",
+                  "categories": [
+                    "process-record"
+                  ]
+                }
+              ]
             },
             "dependencies": {
               "requirements": [],
@@ -35228,7 +35562,7 @@
             },
             "freshness": {
               "policy": "FP-PROCESS-THIS-RUN",
-              "requirementPolicy": "FP-DETERMINISTIC-INPUT-DIGEST",
+              "requirementPolicy": "FP-PROCESS-THIS-RUN",
               "categoryPolicies": [
                 {
                   "category": "process-record",
@@ -35245,8 +35579,8 @@
               },
               {
                 "category": "process-record",
-                "reason": "no-bound-test",
-                "detail": "no test bound to this obligation declares this category"
+                "reason": "no-evidence",
+                "detail": "a bound test declares this category; only an assessed evidence bundle can verify it"
               }
             ]
           }
@@ -35288,9 +35622,9 @@
         ]
       },
       "testIdentity": {
-        "status": "missing",
-        "boundObligations": 0,
-        "missingObligations": 3
+        "status": "bound",
+        "boundObligations": 3,
+        "missingObligations": 0
       },
       "evidenceContract": {
         "subjectType": "requirement",
@@ -35311,7 +35645,7 @@
         ]
       },
       "freshness": {
-        "policy": "FP-DETERMINISTIC-INPUT-DIGEST",
+        "policy": "FP-PROCESS-THIS-RUN",
         "boundTo": [
           "bound to the exact application source commit SHA under test (and the deployed SHA for deployed checks, G9)",
           "bound to the requirements baseline id and its sha256 used by the run (RDP-001)",
@@ -35351,8 +35685,13 @@
           "text": "Prefer latest stable only when integration contracts and acceptance tests pass.",
           "textSha256": "5a1cbba01465f9ee1ac188de13f586d9519b0c6124ea39367f4da3acee0a20c5",
           "testIdentity": {
-            "status": "missing",
-            "tests": []
+            "status": "bound",
+            "tests": [
+              {
+                "id": "praxis:dependency-decision",
+                "kind": "process"
+              }
+            ]
           },
           "tokens": [],
           "acceptanceContract": {
@@ -35402,8 +35741,16 @@
               }
             ],
             "testIdentity": {
-              "status": "unbound",
-              "tests": []
+              "status": "bound",
+              "tests": [
+                {
+                  "id": "praxis:dependency-decision",
+                  "kind": "process",
+                  "categories": [
+                    "process-record"
+                  ]
+                }
+              ]
             },
             "dependencies": {
               "requirements": [],
@@ -35413,7 +35760,7 @@
             },
             "freshness": {
               "policy": "FP-PROCESS-THIS-RUN",
-              "requirementPolicy": "FP-DETERMINISTIC-INPUT-DIGEST",
+              "requirementPolicy": "FP-PROCESS-THIS-RUN",
               "categoryPolicies": [
                 {
                   "category": "process-record",
@@ -35430,8 +35777,8 @@
               },
               {
                 "category": "process-record",
-                "reason": "no-bound-test",
-                "detail": "no test bound to this obligation declares this category"
+                "reason": "no-evidence",
+                "detail": "a bound test declares this category; only an assessed evidence bundle can verify it"
               }
             ]
           }
@@ -35444,8 +35791,13 @@
           "text": "If the newest release is incompatible, fail the upgrade gate or obtain a documented, authorized exception for the newest known compatible release.",
           "textSha256": "8755cbd33349abffcbd1c932f92730c7bf04129f1fea19f0eab2f9a9f20791f8",
           "testIdentity": {
-            "status": "missing",
-            "tests": []
+            "status": "bound",
+            "tests": [
+              {
+                "id": "praxis:dependency-decision",
+                "kind": "process"
+              }
+            ]
           },
           "tokens": [],
           "acceptanceContract": {
@@ -35495,8 +35847,16 @@
               }
             ],
             "testIdentity": {
-              "status": "unbound",
-              "tests": []
+              "status": "bound",
+              "tests": [
+                {
+                  "id": "praxis:dependency-decision",
+                  "kind": "process",
+                  "categories": [
+                    "process-record"
+                  ]
+                }
+              ]
             },
             "dependencies": {
               "requirements": [],
@@ -35506,7 +35866,7 @@
             },
             "freshness": {
               "policy": "FP-PROCESS-THIS-RUN",
-              "requirementPolicy": "FP-DETERMINISTIC-INPUT-DIGEST",
+              "requirementPolicy": "FP-PROCESS-THIS-RUN",
               "categoryPolicies": [
                 {
                   "category": "process-record",
@@ -35523,8 +35883,8 @@
               },
               {
                 "category": "process-record",
-                "reason": "no-bound-test",
-                "detail": "no test bound to this obligation declares this category"
+                "reason": "no-evidence",
+                "detail": "a bound test declares this category; only an assessed evidence bundle can verify it"
               }
             ]
           }
@@ -35586,8 +35946,8 @@
               ]
             },
             "freshness": {
-              "policy": "FP-DETERMINISTIC-INPUT-DIGEST",
-              "requirementPolicy": "FP-DETERMINISTIC-INPUT-DIGEST",
+              "policy": "FP-PROCESS-THIS-RUN",
+              "requirementPolicy": "FP-PROCESS-THIS-RUN",
               "categoryPolicies": []
             },
             "verificationStatus": "unverified",
@@ -35641,9 +36001,9 @@
         ]
       },
       "testIdentity": {
-        "status": "missing",
-        "boundObligations": 0,
-        "missingObligations": 3
+        "status": "partial",
+        "boundObligations": 2,
+        "missingObligations": 1
       },
       "evidenceContract": {
         "subjectType": "requirement",
@@ -35663,7 +36023,7 @@
         ]
       },
       "freshness": {
-        "policy": "FP-DETERMINISTIC-INPUT-DIGEST",
+        "policy": "FP-PROCESS-THIS-RUN",
         "boundTo": [
           "bound to the exact application source commit SHA under test (and the deployed SHA for deployed checks, G9)",
           "bound to the requirements baseline id and its sha256 used by the run (RDP-001)",
@@ -35756,8 +36116,8 @@
               ]
             },
             "freshness": {
-              "policy": "FP-DETERMINISTIC-INPUT-DIGEST",
-              "requirementPolicy": "FP-DETERMINISTIC-INPUT-DIGEST",
+              "policy": "FP-PROCESS-THIS-RUN",
+              "requirementPolicy": "FP-PROCESS-THIS-RUN",
               "categoryPolicies": []
             },
             "verificationStatus": "unverified",
@@ -35831,8 +36191,8 @@
               ]
             },
             "freshness": {
-              "policy": "FP-DETERMINISTIC-INPUT-DIGEST",
-              "requirementPolicy": "FP-DETERMINISTIC-INPUT-DIGEST",
+              "policy": "FP-PROCESS-THIS-RUN",
+              "requirementPolicy": "FP-PROCESS-THIS-RUN",
               "categoryPolicies": []
             },
             "verificationStatus": "unverified",
@@ -35853,8 +36213,13 @@
           "text": "Re-resolve latest versions for each new rehearsal or explicitly authorized refresh.",
           "textSha256": "63bbb629f219e10d44bf2c7223a41ad26d64010de276b7f80189d75e06810579",
           "testIdentity": {
-            "status": "missing",
-            "tests": []
+            "status": "bound",
+            "tests": [
+              {
+                "id": "praxis:dependency-decision",
+                "kind": "process"
+              }
+            ]
           },
           "tokens": [],
           "acceptanceContract": {
@@ -35904,8 +36269,16 @@
               }
             ],
             "testIdentity": {
-              "status": "unbound",
-              "tests": []
+              "status": "bound",
+              "tests": [
+                {
+                  "id": "praxis:dependency-decision",
+                  "kind": "process",
+                  "categories": [
+                    "process-record"
+                  ]
+                }
+              ]
             },
             "dependencies": {
               "requirements": [],
@@ -35919,7 +36292,7 @@
             },
             "freshness": {
               "policy": "FP-PROCESS-THIS-RUN",
-              "requirementPolicy": "FP-DETERMINISTIC-INPUT-DIGEST",
+              "requirementPolicy": "FP-PROCESS-THIS-RUN",
               "categoryPolicies": [
                 {
                   "category": "process-record",
@@ -35936,8 +36309,8 @@
               },
               {
                 "category": "process-record",
-                "reason": "no-bound-test",
-                "detail": "no test bound to this obligation declares this category"
+                "reason": "no-evidence",
+                "detail": "a bound test declares this category; only an assessed evidence bundle can verify it"
               }
             ]
           }
@@ -35979,9 +36352,9 @@
         ]
       },
       "testIdentity": {
-        "status": "missing",
-        "boundObligations": 0,
-        "missingObligations": 3
+        "status": "partial",
+        "boundObligations": 1,
+        "missingObligations": 2
       },
       "evidenceContract": {
         "subjectType": "requirement",
@@ -36005,7 +36378,7 @@
         ]
       },
       "freshness": {
-        "policy": "FP-DETERMINISTIC-INPUT-DIGEST",
+        "policy": "FP-PROCESS-THIS-RUN",
         "boundTo": [
           "bound to the exact application source commit SHA under test (and the deployed SHA for deployed checks, G9)",
           "bound to the requirements baseline id and its sha256 used by the run (RDP-001)",
@@ -37087,8 +37460,13 @@
           "text": "Every future rehearsal must reconcile VER-001..VER-010 with implementation and tests or an explicitly approved exclusion.",
           "textSha256": "18bfbc82074da729cabb44adb0e4f7b0c64e22495e329fb3fa3d2d76e11e0a70",
           "testIdentity": {
-            "status": "missing",
-            "tests": []
+            "status": "bound",
+            "tests": [
+              {
+                "id": "praxis:acceptance-reference",
+                "kind": "process"
+              }
+            ]
           },
           "tokens": [],
           "acceptanceContract": {
@@ -37138,8 +37516,16 @@
               }
             ],
             "testIdentity": {
-              "status": "unbound",
-              "tests": []
+              "status": "bound",
+              "tests": [
+                {
+                  "id": "praxis:acceptance-reference",
+                  "kind": "process",
+                  "categories": [
+                    "process-record"
+                  ]
+                }
+              ]
             },
             "dependencies": {
               "requirements": [
@@ -37159,7 +37545,7 @@
             },
             "freshness": {
               "policy": "FP-PROCESS-THIS-RUN",
-              "requirementPolicy": "FP-DETERMINISTIC-INPUT-DIGEST",
+              "requirementPolicy": "FP-PROCESS-THIS-RUN",
               "categoryPolicies": [
                 {
                   "category": "process-record",
@@ -37176,8 +37562,8 @@
               },
               {
                 "category": "process-record",
-                "reason": "no-bound-test",
-                "detail": "no test bound to this obligation declares this category"
+                "reason": "no-evidence",
+                "detail": "a bound test declares this category; only an assessed evidence bundle can verify it"
               }
             ]
           }
@@ -37190,8 +37576,13 @@
           "text": "Work items must go through each owning repository's documented Praxis input path, not GitHub Issues.",
           "textSha256": "3414f3ccde51c8e27d48251caf3861f49ebe552a97276de9883a2d8152bd2c8d",
           "testIdentity": {
-            "status": "missing",
-            "tests": []
+            "status": "bound",
+            "tests": [
+              {
+                "id": "praxis:execution-start",
+                "kind": "process"
+              }
+            ]
           },
           "tokens": [],
           "acceptanceContract": {
@@ -37241,8 +37632,16 @@
               }
             ],
             "testIdentity": {
-              "status": "unbound",
-              "tests": []
+              "status": "bound",
+              "tests": [
+                {
+                  "id": "praxis:execution-start",
+                  "kind": "process",
+                  "categories": [
+                    "process-record"
+                  ]
+                }
+              ]
             },
             "dependencies": {
               "requirements": [
@@ -37262,7 +37661,7 @@
             },
             "freshness": {
               "policy": "FP-PROCESS-THIS-RUN",
-              "requirementPolicy": "FP-DETERMINISTIC-INPUT-DIGEST",
+              "requirementPolicy": "FP-PROCESS-THIS-RUN",
               "categoryPolicies": [
                 {
                   "category": "process-record",
@@ -37279,8 +37678,8 @@
               },
               {
                 "category": "process-record",
-                "reason": "no-bound-test",
-                "detail": "no test bound to this obligation declares this category"
+                "reason": "no-evidence",
+                "detail": "a bound test declares this category; only an assessed evidence bundle can verify it"
               }
             ]
           }
@@ -37324,9 +37723,9 @@
         ]
       },
       "testIdentity": {
-        "status": "missing",
-        "boundObligations": 0,
-        "missingObligations": 2
+        "status": "bound",
+        "boundObligations": 2,
+        "missingObligations": 0
       },
       "evidenceContract": {
         "subjectType": "requirement",
@@ -37356,7 +37755,7 @@
         ]
       },
       "freshness": {
-        "policy": "FP-DETERMINISTIC-INPUT-DIGEST",
+        "policy": "FP-PROCESS-THIS-RUN",
         "boundTo": [
           "bound to the exact application source commit SHA under test (and the deployed SHA for deployed checks, G9)",
           "bound to the requirements baseline id and its sha256 used by the run (RDP-001)",

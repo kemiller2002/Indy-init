@@ -2,9 +2,9 @@
   "schema": "indy-init.verification-replay-evidence/1",
   "purpose": "Phase Eight: the verifier pipeline (compute-acceptance-verdict.py unmodified, plus the verification-plan assessment against requirements-compiled/v2) re-run over the frozen Rehearsal 4 candidate evidence, with negative controls on temporary copies",
   "plan": {
-    "planId": "VP-06f6d4ef5deb",
+    "planId": "VP-1b2fed568a3b",
     "algorithm": "sha256",
-    "digest": "06f6d4ef5deb3f36ef55d5dde7f7d1b7ab0e6ca807ab769f606d5bb3754872a4",
+    "digest": "1b2fed568a3b6837ad923b7e81a237292f0677342665bbeed248dd042becda92",
     "covers": "sha256 of the plan serialized by the compiler's canonical writer (ASCII JSON, two-space indent, trailing newline) with planIdentity removed"
   },
   "candidate": {
@@ -379,8 +379,8 @@
   "publishedAssessment": {
     "schema": "indy-init.verification-plan-assessment/1",
     "plan": {
-      "planId": "VP-06f6d4ef5deb",
-      "digest": "06f6d4ef5deb3f36ef55d5dde7f7d1b7ab0e6ca807ab769f606d5bb3754872a4"
+      "planId": "VP-1b2fed568a3b",
+      "digest": "1b2fed568a3b6837ad923b7e81a237292f0677342665bbeed248dd042becda92"
     },
     "candidate": {
       "sourceSha": "ab08b764daddde9e978a78fef957d9ae01505c6a",
@@ -4163,7 +4163,7 @@
               },
               {
                 "category": "process-record",
-                "reason": "no-bound-test"
+                "reason": "no-process-evidence"
               }
             ]
           },
@@ -4184,7 +4184,7 @@
               },
               {
                 "category": "process-record",
-                "reason": "no-bound-test"
+                "reason": "no-process-evidence"
               }
             ]
           }
@@ -4300,7 +4300,7 @@
             "missingCoverage": [
               {
                 "category": "independent-acceptance",
-                "reason": "no-bound-test"
+                "reason": "no-process-evidence"
               }
             ]
           },
@@ -4317,11 +4317,11 @@
             "missingCoverage": [
               {
                 "category": "independent-acceptance",
-                "reason": "no-bound-test"
+                "reason": "no-process-evidence"
               },
               {
                 "category": "owner-decision",
-                "reason": "no-bound-test"
+                "reason": "no-process-evidence"
               }
             ]
           }
@@ -4485,7 +4485,7 @@
               },
               {
                 "category": "process-record",
-                "reason": "no-bound-test"
+                "reason": "no-process-evidence"
               }
             ]
           },
@@ -4506,7 +4506,7 @@
               },
               {
                 "category": "process-record",
-                "reason": "no-bound-test"
+                "reason": "no-process-evidence"
               }
             ]
           }
@@ -4636,7 +4636,7 @@
               },
               {
                 "category": "process-record",
-                "reason": "no-bound-test"
+                "reason": "no-process-evidence"
               }
             ]
           }
@@ -4669,7 +4669,7 @@
               },
               {
                 "category": "process-record",
-                "reason": "no-bound-test"
+                "reason": "no-process-evidence"
               }
             ]
           },
@@ -4690,7 +4690,7 @@
               },
               {
                 "category": "process-record",
-                "reason": "no-bound-test"
+                "reason": "no-process-evidence"
               }
             ]
           }
@@ -4903,7 +4903,7 @@
               },
               {
                 "category": "process-record",
-                "reason": "no-bound-test"
+                "reason": "no-process-evidence"
               }
             ]
           },
@@ -4924,7 +4924,7 @@
               },
               {
                 "category": "process-record",
-                "reason": "no-bound-test"
+                "reason": "no-process-evidence"
               }
             ]
           },
@@ -4945,7 +4945,7 @@
               },
               {
                 "category": "process-record",
-                "reason": "no-bound-test"
+                "reason": "no-process-evidence"
               }
             ]
           }
@@ -5113,7 +5113,7 @@
               },
               {
                 "category": "owner-decision",
-                "reason": "no-bound-test"
+                "reason": "no-process-evidence"
               }
             ]
           },
@@ -5134,7 +5134,7 @@
               },
               {
                 "category": "owner-decision",
-                "reason": "no-bound-test"
+                "reason": "no-process-evidence"
               }
             ]
           }
@@ -7258,7 +7258,7 @@
               },
               {
                 "category": "process-record",
-                "reason": "no-bound-test"
+                "reason": "no-process-evidence"
               }
             ]
           },
@@ -9398,7 +9398,7 @@
         "requirement": "UI-021",
         "ledgerStatus": "NOT_RUN",
         "status": "NOT_RUN",
-        "freshnessPolicy": "FP-DETERMINISTIC-INPUT-DIGEST",
+        "freshnessPolicy": "FP-PROCESS-THIS-RUN",
         "reasons": [
           "no evidence",
           "Not fully verified: O1(1): catalog/replay paragraph absence not asserted (only an investigation-header regex) | O1(3): settings persistence scope untested | O1(4): responsive behavior untested | O1(5): no check that credentials are absent from console logs | O1(6): [deployed-SHA browser] no test runs against the deployed Pages URL; the deploy job only checks build-info.json commit | O3: [preservation gate in CI] requirements preservation gate was run manually (evidence files) and is not a CI step or required check"
@@ -9468,7 +9468,7 @@
               },
               {
                 "category": "process-record",
-                "reason": "no-bound-test"
+                "reason": "no-process-evidence"
               }
             ]
           }
@@ -10138,7 +10138,7 @@
         "requirement": "UI-030",
         "ledgerStatus": "NOT_RUN",
         "status": "NOT_RUN",
-        "freshnessPolicy": "FP-DETERMINISTIC-INPUT-DIGEST",
+        "freshnessPolicy": "FP-PROCESS-THIS-RUN",
         "reasons": [
           "no evidence",
           "Not fully verified: O1: [deployed-SHA browser] no test runs against the deployed Pages URL; the deploy job only checks build-info.json commit; header/footer/cards, terminology and failure-copy assertions missing | O2: [negative controls] missing negative fixtures: fabricated conclusion, unknown-as-zero, disputed/contradicted findings | O3: [acceptance ledger/traceability] no per-requirement acceptance ledger, computed verdict or test-to-requirement map exists in the repo (T34 pending); [independent review] no recorded independent/adversarial review (T30 'running' per checkpoints, no record)"
@@ -10208,7 +10208,7 @@
               },
               {
                 "category": "process-record",
-                "reason": "no-bound-test"
+                "reason": "no-process-evidence"
               }
             ]
           },
@@ -10706,7 +10706,7 @@
               },
               {
                 "category": "process-record",
-                "reason": "no-bound-test"
+                "reason": "no-process-evidence"
               }
             ]
           }
@@ -10716,7 +10716,7 @@
         "requirement": "VER-001",
         "ledgerStatus": "NOT_RUN",
         "status": "NOT_RUN",
-        "freshnessPolicy": "FP-DETERMINISTIC-INPUT-DIGEST",
+        "freshnessPolicy": "FP-PROCESS-THIS-RUN",
         "reasons": [
           "no evidence",
           "Not fully verified: O1: no evidence each pinned version was the newest compatible release at lock time | O3: owner/release channel discovery recorded only for forma-workflow"
@@ -10739,7 +10739,7 @@
               },
               {
                 "category": "process-record",
-                "reason": "no-bound-test"
+                "reason": "no-process-evidence"
               }
             ]
           },
@@ -10760,7 +10760,7 @@
               },
               {
                 "category": "process-record",
-                "reason": "no-bound-test"
+                "reason": "no-process-evidence"
               }
             ]
           },
@@ -10781,7 +10781,7 @@
               },
               {
                 "category": "process-record",
-                "reason": "no-bound-test"
+                "reason": "no-process-evidence"
               }
             ]
           }
@@ -10791,7 +10791,7 @@
         "requirement": "VER-002",
         "ledgerStatus": "NOT_RUN",
         "status": "NOT_RUN",
-        "freshnessPolicy": "FP-DETERMINISTIC-INPUT-DIGEST",
+        "freshnessPolicy": "FP-PROCESS-THIS-RUN",
         "reasons": [
           "no evidence",
           "Not fully verified: O2: no per-system checked timestamp/candidate/source/selection-reason record in the repo | O3: no check"
@@ -10814,7 +10814,7 @@
               },
               {
                 "category": "process-record",
-                "reason": "no-bound-test"
+                "reason": "no-process-evidence"
               }
             ]
           },
@@ -10835,7 +10835,7 @@
               },
               {
                 "category": "process-record",
-                "reason": "no-bound-test"
+                "reason": "no-process-evidence"
               }
             ]
           },
@@ -10856,7 +10856,7 @@
               },
               {
                 "category": "process-record",
-                "reason": "no-bound-test"
+                "reason": "no-process-evidence"
               }
             ]
           }
@@ -10866,7 +10866,7 @@
         "requirement": "VER-003",
         "ledgerStatus": "FAIL",
         "status": "FAIL",
-        "freshnessPolicy": "FP-DETERMINISTIC-INPUT-DIGEST",
+        "freshnessPolicy": "FP-PROCESS-THIS-RUN",
         "reasons": [
           "Not fully verified: O2: no upgrade gate that tests the newest release"
         ],
@@ -10888,7 +10888,7 @@
               },
               {
                 "category": "process-record",
-                "reason": "no-bound-test"
+                "reason": "no-process-evidence"
               }
             ]
           },
@@ -10909,7 +10909,7 @@
               },
               {
                 "category": "process-record",
-                "reason": "no-bound-test"
+                "reason": "no-process-evidence"
               }
             ]
           },
@@ -10935,7 +10935,7 @@
         "requirement": "VER-004",
         "ledgerStatus": "NOT_RUN",
         "status": "NOT_RUN",
-        "freshnessPolicy": "FP-DETERMINISTIC-INPUT-DIGEST",
+        "freshnessPolicy": "FP-PROCESS-THIS-RUN",
         "reasons": [
           "no evidence",
           "Not fully verified: O2: the lock gate does not compare .conditor/lock.json against the frozen lockSha256 recorded in clock/preflight | O3: no re-resolution evidence"
@@ -10990,7 +10990,7 @@
               },
               {
                 "category": "process-record",
-                "reason": "no-bound-test"
+                "reason": "no-process-evidence"
               }
             ]
           }
@@ -11191,7 +11191,7 @@
         "requirement": "VER-010",
         "ledgerStatus": "NOT_RUN",
         "status": "NOT_RUN",
-        "freshnessPolicy": "FP-DETERMINISTIC-INPUT-DIGEST",
+        "freshnessPolicy": "FP-PROCESS-THIS-RUN",
         "reasons": [
           "no evidence",
           "Not fully verified: O1: VER-001..010 not reconciled with implementation/tests | O2: no evidence of Praxis input path use"
@@ -11214,7 +11214,7 @@
               },
               {
                 "category": "process-record",
-                "reason": "no-bound-test"
+                "reason": "no-process-evidence"
               }
             ]
           },
@@ -11235,7 +11235,7 @@
               },
               {
                 "category": "process-record",
-                "reason": "no-bound-test"
+                "reason": "no-process-evidence"
               }
             ]
           }

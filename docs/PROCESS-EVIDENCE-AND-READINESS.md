@@ -47,10 +47,10 @@ refuses a process or owner binding without a `praxis:` id, an unknown kind, owne
 `praxis:owner-approval`, and any category a binding's kind cannot provide. When several producers are bound to one
 category, each of them must deliver.
 
-`requirements-compiled/v2/proposals/process-bindings.proposed.json` holds **proposed** bindings for all 28 process and
-owner obligation-categories (and AR-008-O1's independent review). It is an agent proposal and is not approved. Bindings
-take effect only when the owner copies them into `curation/verification-plan.json` `testBindings` and the plan is
-recompiled (RDP-003).
+`requirements-compiled/v2/proposals/process-bindings.proposed.json` holds the proposed bindings for all 28 process and
+owner obligation-categories (and AR-008-O1's independent review). They are copied verbatim into
+`curation/verification-plan.json` `testBindings`, and the plan is recompiled as `VP-1b2fed568a3b`. The owner approved them on 2026-10-28 in the initiative's session ("I approve anything necessary"). That statement was transcribed by an agent, so under RDP-003 the approval takes effect only through the owner's own merge of the pull request that applies them. Application-test
+and reviewer categories remain unbound: Rehearsal 6 binds them before implementation (ESO-R6-02).
 
 ## `plan-readiness`: before implementation
 
