@@ -77,7 +77,7 @@ Sources: `docs/REHEARSAL-005-RESULTS.md`; R5 `evidence/rehearsal/final.json`; R5
   assertions, 1 reviewer finding, 3 owner decisions. The reviewer finding and the owner decisions are anchored by
   CI-observed pull-request reviews.
   - With the proposed bindings, **30 of 30** process, owner and review categories verify for the candidate.
-  - **43 of 43 negative controls** fail closed, each with its named diagnostic. They cover the nine required cases:
+  - **47 of 47 negative controls** fail closed, each with its named diagnostic. They cover the nine required cases:
     - missing approval;
     - incorrect agent identity;
     - missing checkpoint;
@@ -88,7 +88,7 @@ Sources: `docs/REHEARSAL-005-RESULTS.md`; R5 `evidence/rehearsal/final.json`; R5
     - missing release selection;
     - evidence reused from another candidate.
 
-    The other 34 are from the independent reviews (§5). In addition, **3 record-level controls** refuse the record.
+    The other 38 are from the independent reviews (§5). In addition, **3 record-level controls** refuse the record.
   - Evidence: `requirements-compiled/v2/readiness/evidence/process-evidence-simulation.json`.
 - **What it would have changed in Rehearsal 5 (not measured causally).**
   - R5 recorded one checkpoint and 58 post-hoc attributions.
@@ -212,11 +212,12 @@ changes adversarially, in rounds, each against the fixed code.
 | 2 | 10, of which 3 high. Examples: a review existed by being written down; one owner approval covered any scope change; an honest owner rejection was ignored; a later failure, a superseding selection, or the implementer's own disposition was not caught; binding kinds were not re-checked | all fixed, each with a control |
 | 3 | 5. Examples: later rejections could be bypassed or replayed; one owner approval satisfied unrelated owner obligations; the checkpoint status and the envelope role were self-reported | fixed (withdrawals always count; CI's latest review state decides; `ownerDecisions` per obligation; implementers from the frozen roster); the self-reported checkpoint status is documented as a limit |
 | 4 | 3 (medium or lower): a non-approving review CI observed on another pull request was ignored; a scope change could rest on a path approved under another or a rejected decision; in `verify-plan` a passing ledger test could stand in for a bound Praxis producer | fixed (any CI-observed non-approval withdraws; decisions map to the paths they approve; producer-bound categories are covered only by the producer, and mixed bindings are refused at compilation) |
+| 5 | 3 (medium or lower): attestation decisions and paths were one flat set, so a path was not tied to its decision and a withdrawn path stayed approved; a scope change naming nothing passed; a same-second approval and withdrawal resolved to the approval | fixed (attestations bind paths per decision; withdrawn paths are withdrawn from every decision; a scope change must name what it adds; ties go to the withdrawal) |
 
-The simulation now runs 43 log controls and 3 record controls, all failing closed, while the positive control
+The simulation now runs 47 log controls and 3 record controls, all failing closed, while the positive control
 verifies 30/30. Every round found real defects that the author's own tests had missed. The severity fell from round to round
-(4 critical, then 3 high, then 3 high, then 3 medium or lower). That supports the initiative's rule that independent
-review is required, not optional. It also means the absence of findings is not claimed: a fifth round was not run.
+(4 critical, then 3 high, then 3 high, then 3 medium or lower, then 3 medium or lower). That supports the initiative's rule that independent
+review is required, not optional. It also means the absence of findings is not claimed: the fifth round still found issues.
 
 ## 6. Remaining risks
 
@@ -224,8 +225,8 @@ review is required, not optional. It also means the absence of findings is not c
   trusted only inside the acceptance job that fetched them. Test results and acceptance references rest on a
   self-reported CI run id. Checkpoint verification status and event ids are written into the same repository; event
   ids are unsigned content hashes. Deleting log lines can remove records, though not CI-observed withdrawals.
-- Four review rounds were run. The fourth still found medium-severity issues (now fixed), so a fifth round should
-  precede any reliance on `verify-process` for an acceptance verdict.
+- Five review rounds were run. Each found issues, with severity falling to medium or lower in the last two; all are
+  fixed. Another independent round should precede any reliance on `verify-process` for an acceptance verdict.
 - `verify-plan`'s process-evidence path (`--process-*`) was exercised by unit-level code and reading, not by an
   end-to-end run against a real ledger and evidence bundle.
 - A process record proves that a step was recorded when it happened, not that it was the right step. Those

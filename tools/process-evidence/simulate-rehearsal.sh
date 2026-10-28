@@ -94,7 +94,7 @@ cat > "$out/attestations.json" <<JSON
   "runId": "9000000001",
   "candidate": "$candidate",
   "attestations": [
-    { "type": "github-review", "reference": "kemiller2002/simulated-rehearsal#1@1001", "login": "kemiller2002", "state": "APPROVED", "decisions": ["DEC-SIM-001", "src/engine/Replay.fs"], "commit": "$candidate", "submittedAt": "$(now)" },
+    { "type": "github-review", "reference": "kemiller2002/simulated-rehearsal#1@1001", "login": "kemiller2002", "state": "APPROVED", "decisions": [ { "id": "DEC-SIM-001", "paths": ["src/engine/Replay.fs"] } ], "commit": "$candidate", "submittedAt": "$(now)" },
     { "type": "github-review", "reference": "kemiller2002/simulated-rehearsal#4@4001", "login": "kemiller2002", "state": "APPROVED", "decisions": ["DEC-SIM-KICKOFF"], "commit": "$candidate", "submittedAt": "$(now)" },
     { "type": "github-review", "reference": "kemiller2002/simulated-rehearsal#2@2001", "login": "example-reviewer", "state": "APPROVED", "commit": "$candidate", "submittedAt": "$(now)" },
     { "type": "github-review", "reference": "kemiller2002/simulated-rehearsal#3@3001", "login": "kemiller2002", "state": "APPROVED", "decisions": ["final-disposition"], "commit": "$candidate", "submittedAt": "$(now)" }

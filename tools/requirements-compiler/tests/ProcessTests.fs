@@ -104,6 +104,15 @@ let private addAttestation (reference: string) (login: string) (state: string) (
         )
     { f with Attestations = setPath [ "attestations" ] (JArr(arr "attestations" f.Attestations @ [ entry ])) f.Attestations }
 
+let private addAttestationJson (reference: string) (login: string) (state: string) (decisions: Json) (commit: string option) (f: Fixture) =
+    let entry =
+        JObj(
+            [ "type", JStr "github-review"; "reference", JStr reference; "login", JStr login; "state", JStr state; "decisions", decisions ]
+            @ (commit |> Option.map (fun c -> [ "commit", JStr c ]) |> Option.defaultValue [])
+            @ [ "submittedAt", JStr "9999-12-31T00:00:00Z" ]
+        )
+    { f with Attestations = setPath [ "attestations" ] (JArr(arr "attestations" f.Attestations @ [ entry ])) f.Attestations }
+
 let private mapAttestation (reference: string) (g: Json -> Json) (f: Fixture) =
     let mapped = arr "attestations" f.Attestations |> List.map (fun a -> if strOpt "reference" a = Some reference then g a else a)
     { f with Attestations = setPath [ "attestations" ] (JArr mapped) f.Attestations }
@@ -228,6 +237,34 @@ let controls (plan: Json) (f: Fixture) : (string * string * Fixture * Json) list
           (f
            |> mapWhere (isKind "scope-change") (setPath [ "statement"; "decision" ] (JStr "DEC-SIM-KICKOFF"))
            |> append (fun e -> isKind "owner-approval" e && (field "statement" e |> Option.bind (strOpt "decision")) = Some "DEC-SIM-001") (setPath [ "statement"; "outcome" ] (JStr "rejected")))
+      // Fifth independent review: a path is covered only by the decision it is bound to and is withdrawn wherever a
+      // withdrawal names it; a scope change must name what it adds; a same-second tie goes to the withdrawal.
+      one "a scope change that names nothing" "UNAPPROVED-SCOPE-CHANGE" (mapWhere (isKind "scope-change") (setPath [ "statement"; "subjects" ] (jstrs [])) f)
+      one
+          "a path the owner later withdrew under another decision"
+          "UNAPPROVED-SCOPE-CHANGE"
+          (f
+           |> mapAttestation "kemiller2002/simulated-rehearsal#1@1001" (setPath [ "decisions" ] (JArr [ JObj [ "id", JStr "DEC-SIM-001"; "paths", jstrs [ "src/engine/Replay.fs"; "src/payments/" ] ] ]))
+           |> append (fun e -> isKind "owner-approval" e && (field "statement" e |> Option.bind (strOpt "decision")) = Some "DEC-SIM-001") (setPath [ "statement"; "subjects" ] (jstrs [ "src/payments/" ]))
+           |> append (isKind "scope-change") (setPath [ "statement"; "subjects" ] (jstrs [ "src/payments/" ]))
+           |> addAttestationJson "kemiller2002/simulated-rehearsal#9@9001" "kemiller2002" "CHANGES_REQUESTED" (JArr [ JObj [ "id", JStr "DEC-SIM-002"; "paths", jstrs [ "src/payments/" ] ] ]) None)
+      one
+          "a path claimed under a decision the attestation does not bind it to"
+          "UNAPPROVED-SCOPE-CHANGE"
+          (f
+           |> mapAttestation "kemiller2002/simulated-rehearsal#1@1001" (setPath [ "decisions" ] (JArr [ JObj [ "id", JStr "DEC-SIM-001"; "paths", jstrs [ "src/engine/Replay.fs" ] ]; JObj [ "id", JStr "DEC-SIM-002"; "paths", jstrs [ "src/payments/" ] ] ]))
+           |> append (fun e -> isKind "owner-approval" e && (field "statement" e |> Option.bind (strOpt "decision")) = Some "DEC-SIM-001") (setPath [ "statement"; "subjects" ] (jstrs [ "src/payments/" ]))
+           |> mapWhere (isKind "scope-change") (setPath [ "statement"; "subjects" ] (jstrs [ "src/payments/" ])))
+      one
+          "an approval and a withdrawal submitted in the same second"
+          "MISSING-APPROVAL"
+          (let stamp = arr "attestations" f.Attestations |> List.find (fun a -> strOpt "reference" a = Some "kemiller2002/simulated-rehearsal#4@4001") |> str "submittedAt"
+           { f with
+               Attestations =
+                 setPath
+                     [ "attestations" ]
+                     (JArr(arr "attestations" f.Attestations @ [ JObj [ "type", JStr "github-review"; "reference", JStr "kemiller2002/simulated-rehearsal#4@4000"; "login", JStr "kemiller2002"; "state", JStr "CHANGES_REQUESTED"; "decisions", jstrs [ "DEC-SIM-KICKOFF" ]; "submittedAt", JStr stamp ] ]))
+                     f.Attestations })
       "an owner-decision category bound to a record kind that cannot provide it",
       "UNBOUND-PROCESS-EVIDENCE",
       drop (isKind "owner-approval") f,

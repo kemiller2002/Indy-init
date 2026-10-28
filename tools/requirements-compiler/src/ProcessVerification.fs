@@ -183,14 +183,27 @@ let inputProblems (i: Inputs) : string list =
 /// reviewer login on some pull request is not APPROVED. It withdraws whatever that review names, on any pull request.
 type CiWithdrawal =
     { Login: string
-      Decisions: Set<string>
+      /// Decision id → the paths and requirements the pull request approves under that decision.
+      Decisions: Map<string, Set<string>>
       Commit: string option }
 
 /// What CI observed about one approving pull-request review in the trusted run.
 type ObservedAttestation =
     { Login: string
-      Decisions: Set<string>
+      /// Decision id → the paths and requirements the pull request approves under that decision.
+      Decisions: Map<string, Set<string>>
       Commit: string option }
+
+/// An attestation's decisions: each entry is a decision id (a string) or `{id, paths}` binding the paths and
+/// requirements that decision covers. A path is covered only by the decision it is bound to.
+let private decisionsOf (x: Json) : Map<string, Set<string>> =
+    arr "decisions" x
+    |> List.choose (function
+        | JStr id -> Some(id, Set.empty)
+        | entry -> opt "id" entry |> Option.map (fun id -> id, Set.ofList (strs "paths" entry)))
+    |> List.groupBy fst
+    |> List.map (fun (id, xs) -> id, xs |> List.map snd |> Set.unionMany)
+    |> Map.ofList
 
 /// The latest CI-observed review state per (login, pull request) of the owners and frozen reviewers, in the trusted run
 /// for this candidate: (reference, entry).
@@ -208,14 +221,18 @@ let private latestReviews (i: Inputs) : (string * Json) list =
             | Some t, Some r, Some l -> Some((l, t + ":" + pullRequest r), (t + ":" + r, x))
             | _ -> None)
         |> List.groupBy fst
-        |> List.map (fun (_, entries) -> entries |> List.map snd |> List.maxBy (fun (_, x) -> opt "submittedAt" x |> Option.defaultValue ""))
+        // Latest by submission time; on a tie a non-approving state wins, so a same-second withdrawal is never lost.
+        |> List.map (fun (_, entries) ->
+            entries
+            |> List.map snd
+            |> List.maxBy (fun (_, x) -> opt "submittedAt" x |> Option.defaultValue "", (if opt "state" x = Some "APPROVED" then 0 else 1)))
     | _ -> []
 
 /// Every non-approving latest review CI observed: a withdrawal, whichever pull request it is on.
 let private ciWithdrawals (i: Inputs) : CiWithdrawal list =
     latestReviews i
     |> List.filter (fun (_, x) -> opt "state" x <> Some "APPROVED")
-    |> List.map (fun (_, x) -> { Login = str "login" x; Decisions = Set.ofList (strs "decisions" x); Commit = opt "commit" x })
+    |> List.map (fun (_, x) -> { Login = str "login" x; Decisions = decisionsOf x; Commit = opt "commit" x })
 
 /// Approving reviews CI observed in the trusted run for this candidate, by reference ("TYPE:REF"). Only an owner's or
 /// a frozen reviewer's login counts, and only that login's **latest** review state on that pull request: a later
@@ -223,7 +240,7 @@ let private ciWithdrawals (i: Inputs) : CiWithdrawal list =
 let private observedAttestations (i: Inputs) : Map<string, ObservedAttestation> =
     latestReviews i
     |> List.filter (fun (_, x) -> opt "state" x = Some "APPROVED")
-    |> List.map (fun (reference, x) -> reference, { Login = str "login" x; Decisions = Set.ofList (strs "decisions" x); Commit = opt "commit" x })
+    |> List.map (fun (reference, x) -> reference, { Login = str "login" x; Decisions = decisionsOf x; Commit = opt "commit" x })
     |> Map.ofList
 
 // ---- per-record qualification -------------------------------------------------------------------------------------
@@ -295,24 +312,29 @@ let recordDiagnostics (i: Inputs) (implementers: Set<string>) (attested: Map<str
               (ownerActorIds i.Rules).Contains r.ActorId
               && (ownerLogins i.Rules).Contains a.Login
               && a.Commit = Some i.Candidate
-              && a.Decisions.Contains "final-disposition" -> ()
+              && a.Decisions.ContainsKey "final-disposition" -> ()
           | "owner-decision", _ ->
               yield d "UNATTESTED-DISPOSITION" subject "the disposition is not the owner's, attested by CI as the final disposition of this candidate commit"
           | cls, _ -> yield d "TRANSCRIBED-DECISION" subject (sprintf "a final disposition recorded as %s is not the owner's" cls)
       | "owner-approval" ->
           match r.Class, r.Attestation |> Option.bind attested.TryFind with
           | "owner-decision", Some a when (ownerLogins i.Rules).Contains a.Login ->
-              let approves = a.Decisions
               if not ((ownerActorIds i.Rules).Contains r.ActorId) then
                   yield d "MISSING-APPROVAL" subject (sprintf "recorded by '%s', who is not an owner identity of the frozen rules" r.ActorId)
-              if r.Decision.IsNone then yield d "MISSING-APPROVAL" subject "the owner decision names no decision id (--decision)"
-              let unbound = Set.difference (decided r) approves
-              if not unbound.IsEmpty then
-                  yield
-                      d
-                          "UNATTESTED-OWNER-DECISION"
-                          subject
-                          (sprintf "the attestation does not name %s; an attestation proves only the decisions it names" (String.Join(", ", unbound)))
+              match r.Decision with
+              | None -> yield d "MISSING-APPROVAL" subject "the owner decision names no decision id (--decision)"
+              | Some dec ->
+                  // The attestation must name the decision, and bind every path the record claims to that decision.
+                  match a.Decisions.TryFind dec with
+                  | None -> yield d "UNATTESTED-OWNER-DECISION" subject (sprintf "the attestation does not name decision %s" dec)
+                  | Some covered ->
+                      let unbound = Set.difference (Set.ofList r.Subjects) covered
+                      if not unbound.IsEmpty then
+                          yield
+                              d
+                                  "UNATTESTED-OWNER-DECISION"
+                                  subject
+                                  (sprintf "the attestation does not bind %s to decision %s" (String.Join(", ", unbound)) dec)
           | "owner-decision", _ ->
               yield d "UNATTESTED-OWNER-DECISION" subject (sprintf "attestation %A is not an owner review observed by CI in the trusted run for this candidate" r.Attestation)
           | cls, _ -> yield d "TRANSCRIBED-DECISION" subject (sprintf "an owner approval recorded as %s is not the owner's decision" cls)
@@ -326,19 +348,23 @@ let recordDiagnostics (i: Inputs) (implementers: Set<string>) (attested: Map<str
 /// withdraw, so a replayed approval cannot outrank it, and a rejected decision needs a new id.
 let private standingApprovals (i: Inputs) (qualifyingOwner: Record list) (all: Record list) : Map<string, Set<string>> =
     let owners = ownerActorIds i.Rules
-    let rejected =
+    let logRejections = all |> List.filter (fun r -> r.Kind = "owner-approval" && r.Outcome <> Some "approved" && owners.Contains r.ActorId)
+    let ciRejections = ciWithdrawals i |> List.filter (fun w -> (ownerLogins i.Rules).Contains w.Login)
+    // Withdrawn decision ids, and withdrawn paths: a path named by any withdrawal is withdrawn from every decision.
+    let rejectedDecisions =
         Set.union
-            (all
-             |> List.filter (fun r -> r.Kind = "owner-approval" && r.Outcome <> Some "approved" && owners.Contains r.ActorId)
-             |> List.collect (decided >> Set.toList)
-             |> Set.ofList)
-            (ciWithdrawals i |> List.filter (fun w -> (ownerLogins i.Rules).Contains w.Login) |> List.collect (fun w -> Set.toList w.Decisions) |> Set.ofList)
+            (logRejections |> List.collect (fun r -> Option.toList r.Decision @ r.Subjects) |> Set.ofList)
+            (ciRejections |> List.collect (fun w -> w.Decisions |> Map.keys |> List.ofSeq) |> Set.ofList)
+    let rejectedPaths =
+        Set.union
+            (logRejections |> List.collect (fun r -> r.Subjects) |> Set.ofList)
+            (ciRejections |> List.collect (fun w -> w.Decisions |> Map.values |> Seq.collect id |> List.ofSeq) |> Set.ofList)
     qualifyingOwner
     |> List.filter (fun r -> r.Outcome = Some "approved")
     |> List.choose (fun r -> r.Decision |> Option.map (fun dec -> dec, Set.ofList r.Subjects))
-    |> List.filter (fun (dec, _) -> not (rejected.Contains dec))
+    |> List.filter (fun (dec, _) -> not (rejectedDecisions.Contains dec))
     |> List.groupBy fst
-    |> List.map (fun (dec, xs) -> dec, xs |> List.map snd |> Set.unionMany)
+    |> List.map (fun (dec, xs) -> dec, Set.difference (xs |> List.map snd |> Set.unionMany) rejectedPaths)
     |> Map.ofList
 
 /// Whether the qualifying records of `kind` prove it for this run, with the reasons when they do not.
@@ -366,7 +392,7 @@ let private kindSatisfied (i: Inputs) (obligation: string) (kind: string) (quali
           // path or requirement the change adds; one approval does not cover another change citing the same id.
           for r in all |> List.filter (fun r -> r.Kind = "scope-change") do
               match r.Decision with
-              | Some dec when approved.ContainsKey dec && r.Subjects |> List.forall approved.[dec].Contains -> ()
+              | Some dec when not r.Subjects.IsEmpty && approved.ContainsKey dec && r.Subjects |> List.forall approved.[dec].Contains -> ()
               | dec ->
                   yield
                       d
@@ -420,7 +446,7 @@ let private kindSatisfied (i: Inputs) (obligation: string) (kind: string) (quali
               if r.Kind = "final-disposition" && r.Outcome <> Some "accepted" && (ownerActorIds i.Rules).Contains r.ActorId && r.Candidate = Some i.Candidate then
                   yield d "DISPOSITION-NOT-ACCEPTED" r.EventId (sprintf "the owner recorded %A" r.Outcome)
           for w in ciWithdrawals i do
-              if (ownerLogins i.Rules).Contains w.Login && w.Decisions.Contains "final-disposition" then
+              if (ownerLogins i.Rules).Contains w.Login && w.Decisions.ContainsKey "final-disposition" then
                   yield d "DISPOSITION-NOT-ACCEPTED" w.Login "CI observed a non-approving owner review of the final disposition" ]
     | k -> none "MISSING-PROCESS-RECORD" (sprintf "no qualifying %s record" k)
 
