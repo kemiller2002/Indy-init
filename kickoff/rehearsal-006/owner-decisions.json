@@ -10,12 +10,25 @@
     "ownerInstruction": "Do what you recommend to get it started",
     "ownerInstructionScope": "The owner gave this instruction in answer to the whole decision set (Q1-Q6 and the R5A-001-01..05 dispositions). It selects the engineering recommendation stated for each question. Q7 was asked separately and answered separately.",
     "effective": "RDP-003: an agent's transcription takes effect only when the owner merges the pull request that adds this file. Until then every decision below is APPROVAL_PENDING_MERGE.",
-    "notProof": "A decision changes scope. It never verifies an obligation, and nothing here marks one verified."
+    "notProof": "A decision changes scope. It never verifies an obligation, and nothing here marks one verified.",
+    "laterInstruction": "On 2026-10-28 the owner also said \"I approve all recommendations and necessary merges going forward\". It selects the recommendation of DEC-R6-009 and authorizes the agent to merge the pull requests these decisions need. A merge the agent performs on this instruction is recorded as an agent merge on the owner's instruction, not as the owner's own merge."
   },
   "context": [
-    { "decision": "Four-case causa-data requirement waived; Rehearsal 6 loads the published historical-v1 workspace (Apollo 1, Apollo 11, Challenger) and writes only to isolated workspaces/demo/<runId>/ paths", "ownerWords": "Ok let's pass on the causa-data requirement of the four cases", "date": "2026-10-28" },
-    { "decision": "CI and deployment of kemiller2002/indy-init-rehearsal-006 are kickoff work, not preflight prerequisites", "ownerWords": "1 counts as kickoff", "date": "2026-10-28" },
-    { "decision": "Stack echelon-current 1.32.0 (Arca 0.6.0 with its license change; Chrona stays on 1.31.0)", "ownerWords": "I approve", "date": "2026-10-28" }
+    {
+      "decision": "Four-case causa-data requirement waived; Rehearsal 6 loads the published historical-v1 workspace (Apollo 1, Apollo 11, Challenger) and writes only to isolated workspaces/demo/<runId>/ paths",
+      "ownerWords": "Ok let's pass on the causa-data requirement of the four cases",
+      "date": "2026-10-28"
+    },
+    {
+      "decision": "CI and deployment of kemiller2002/indy-init-rehearsal-006 are kickoff work, not preflight prerequisites",
+      "ownerWords": "1 counts as kickoff",
+      "date": "2026-10-28"
+    },
+    {
+      "decision": "Stack echelon-current 1.32.0 (Arca 0.6.0 with its license change; Chrona stays on 1.31.0)",
+      "ownerWords": "I approve",
+      "date": "2026-10-28"
+    }
   ],
   "decisions": [
     {
@@ -30,11 +43,23 @@
       "ownerWords": "Do what you recommend to get it started",
       "date": "2026-10-28",
       "evidenceSource": "Owner message in session https://claude.ai/code/session_01G1iECgGEzEnCXsPBoE8bH3, transcribed by the agent",
-      "affectedRequirements": ["PF-015", "EXT-DATA-005"],
+      "affectedRequirements": [
+        "PF-015",
+        "EXT-DATA-005"
+      ],
       "affectedObligations": [
-        { "obligation": "PF-015-O1", "status": "in scope, unchanged" },
-        { "obligation": "PF-015-O2", "status": "in scope, unchanged" },
-        { "obligation": "EXT-DATA-005-O1", "status": "in scope, unchanged" }
+        {
+          "obligation": "PF-015-O1",
+          "status": "in scope, unchanged"
+        },
+        {
+          "obligation": "PF-015-O2",
+          "status": "in scope, unchanged"
+        },
+        {
+          "obligation": "EXT-DATA-005-O1",
+          "status": "in scope, unchanged"
+        }
       ],
       "resultingScope": "No scope change. DEC-025 no longer governs Rehearsal 6. The three obligations are verified as written.",
       "implementationWork": [
@@ -59,8 +84,15 @@
       "ownerWords": "Do what you recommend to get it started",
       "date": "2026-10-28",
       "evidenceSource": "Owner message in session https://claude.ai/code/session_01G1iECgGEzEnCXsPBoE8bH3, transcribed by the agent",
-      "affectedRequirements": ["UI-016"],
-      "affectedObligations": [ { "obligation": "UI-016-O11", "status": "in scope, unchanged" } ],
+      "affectedRequirements": [
+        "UI-016"
+      ],
+      "affectedObligations": [
+        {
+          "obligation": "UI-016-O11",
+          "status": "in scope, unchanged"
+        }
+      ],
       "resultingScope": "No scope change.",
       "implementationWork": [
         "Amber indicators meet 3:1 against every surface they appear on: a darker amber token, a stronger border, or an added shape or icon; the canonical #E9A23B stays the identity color (UI-016-O5).",
@@ -81,10 +113,19 @@
       "ownerWords": "Do what you recommend to get it started",
       "date": "2026-10-28",
       "evidenceSource": "Owner message in session https://claude.ai/code/session_01G1iECgGEzEnCXsPBoE8bH3, transcribed by the agent",
-      "affectedRequirements": ["UI-031"],
-      "affectedObligations": [ { "obligation": "UI-031-O5", "status": "in scope, amended (APR-R6-003); baseline text kept verbatim" } ],
+      "affectedRequirements": [
+        "UI-031"
+      ],
+      "affectedObligations": [
+        {
+          "obligation": "UI-031-O5",
+          "status": "in scope, amended (APR-R6-003); baseline text kept verbatim"
+        }
+      ],
       "resultingScope": "Amended acceptance criterion: \"Never expose credentials. Application-level role management does not apply to Causa's approved single-user scope. Credential protection, authorization of every repository operation against the provider's actual permissions, workspace data isolation and secure handling of operational information still apply and must be verified.\"",
-      "implementationWork": [ "No role model. Credential protection and the permission checks of DEC-R6-001." ],
+      "implementationWork": [
+        "No role model. Credential protection and the permission checks of DEC-R6-001."
+      ],
       "verificationChanges": "The v3 plan carries the amendment on UI-031-O5 (approval APR-R6-003 in kickoff/rehearsal-006/approvals.causa.json). verify-plan refuses the plan as INVALID if the amendment is not that operator approval, exactly (UNAUTHORIZED-AMENDMENT).",
       "approvalStatus": "APPROVAL_PENDING_MERGE"
     },
@@ -100,10 +141,19 @@
       "ownerWords": "Do what you recommend to get it started",
       "date": "2026-10-28",
       "evidenceSource": "Owner message in session https://claude.ai/code/session_01G1iECgGEzEnCXsPBoE8bH3, transcribed by the agent",
-      "affectedRequirements": ["AR-019"],
-      "affectedObligations": [ { "obligation": "AR-019-O3", "status": "in scope, amended (APR-R6-004); baseline text kept verbatim" } ],
+      "affectedRequirements": [
+        "AR-019"
+      ],
+      "affectedObligations": [
+        {
+          "obligation": "AR-019-O3",
+          "status": "in scope, amended (APR-R6-004); baseline text kept verbatim"
+        }
+      ],
       "resultingScope": "Amended acceptance criterion: \"Original Rehearsal 3 must yield an authoritative non-accepting verdict (INVALID, FAIL or BLOCKED), and the report must state the exact verdict and its diagnostic classification without merging INVALID, FAIL and BLOCKED into one outcome; Rehearsal 2 candidate 45644a7 should yield ACCEPTED only if its actual ledger and evidence meet the frozen contract.\" AR-007-O2 and AR-018-O1, which keep the categories distinct, are unchanged.",
-      "implementationWork": [ "None; reports keep INVALID, FAIL and BLOCKED distinct." ],
+      "implementationWork": [
+        "None; reports keep INVALID, FAIL and BLOCKED distinct."
+      ],
       "verificationChanges": "The v3 plan carries the amendment on AR-019-O3 (approval APR-R6-004), checked as for DEC-R6-003.",
       "approvalStatus": "APPROVAL_PENDING_MERGE"
     },
@@ -120,53 +170,209 @@
       "ownerWords": "Do what you recommend to get it started",
       "date": "2026-10-28",
       "evidenceSource": "Owner message in session https://claude.ai/code/session_01G1iECgGEzEnCXsPBoE8bH3, transcribed by the agent",
-      "affectedRequirements": ["AR-027", "AR-028", "AR-029", "AR-030", "AR-031", "AR-032", "AR-033", "AR-034", "AR-035"],
-      "affectedObligations": [ { "obligation": "AR-027-O1..AR-035-O5 (29 obligations of the seven P0 requirements)", "status": "in scope, bound, unverified" } ],
+      "affectedRequirements": [
+        "AR-027",
+        "AR-028",
+        "AR-029",
+        "AR-030",
+        "AR-031",
+        "AR-032",
+        "AR-033",
+        "AR-034",
+        "AR-035"
+      ],
+      "affectedObligations": [
+        {
+          "obligation": "AR-027-O1..AR-035-O5 (29 obligations of the seven P0 requirements)",
+          "status": "in scope, bound, unverified"
+        }
+      ],
       "resultingScope": "Baseline BL-CAUSA-INDY-INIT-856157a78d47 (requirements/causa-requirements-baseline-r6.json, sha256 40599abe…befd): 471 requirements, 115 P0. AR-027, -028, -029, -030, -031, -034 and -035 are P0 and enter the plan; AR-032 and AR-033 stay P1, as the source states, and are not promoted. Plan VP-13516e0d5930 (requirements-compiled/v3): 115 P0 requirements, 355 obligations. The previous baseline and v1/v2 are unchanged.",
-      "implementationWork": [ "Rehearsal 6 implements and proves AR-027..AR-035 under their bound test identities." ],
+      "implementationWork": [
+        "Rehearsal 6 implements and proves AR-027..AR-035 under their bound test identities."
+      ],
       "verificationChanges": "Four new evidence-category rules, each quoting its obligation text verbatim: browser for AR-029-O1 and AR-035-O1/O4, security for AR-030-O1/O2, integration for AR-035-O1..O4. Every other new obligation requires independent acceptance through the existing AR verification rule. Bindings were regenerated by propose-test-bindings (372 tests). plan-readiness is READY: 671 of 671 category checks, no permits.",
       "approvalStatus": "APPROVAL_PENDING_MERGE"
     },
     {
       "id": "DEC-R6-006",
       "question": "Q6 (AR-031): for each generic Indy-Init Percepta screen contract the bootstrap copies, IN SCOPE or NOT-APPLICABLE? Rehearsal 5's scoping does not carry over.",
-      "options": { "A": "IN SCOPE: implement and verify the screen.", "B": "NOT-APPLICABLE: excluded through this recorded decision." },
+      "options": {
+        "A": "IN SCOPE: implement and verify the screen.",
+        "B": "NOT-APPLICABLE: excluded through this recorded decision."
+      },
       "recommendation": "S16 NOT-APPLICABLE (the Causa engine has no counterfactual capability and no requirement asks for one); every other contract IN SCOPE, because each serves a Causa requirement or was kept in scope by the owner in Rehearsal 5.",
       "selected": "S16 NOT-APPLICABLE; S01-S15 and S17-S25 IN SCOPE",
       "ownerWords": "Do what you recommend to get it started",
       "date": "2026-10-28",
       "evidenceSource": "Owner message in session https://claude.ai/code/session_01G1iECgGEzEnCXsPBoE8bH3, transcribed by the agent. Contract list: docs/SCREEN-CONTRACTS.md and kemiller2002/indy-init-rehearsal-005 .percepta/contracts (s01..s25) at b972cb4.",
-      "affectedRequirements": ["AR-031", "S01..S25 (docs/SCREEN-CONTRACTS.md; baseline requirements, not P0)"],
-      "screens": [
-        { "id": "S01", "contract": "s01-investigation-start", "description": "Investigation Start", "scope": "IN SCOPE" },
-        { "id": "S02", "contract": "s02-investigation-workspace", "description": "Investigation Workspace", "scope": "IN SCOPE" },
-        { "id": "S03", "contract": "s03-hypothesis-battlefield", "description": "Hypothesis Battlefield", "scope": "IN SCOPE" },
-        { "id": "S04", "contract": "s04-hypothesis-detail", "description": "Hypothesis Detail", "scope": "IN SCOPE" },
-        { "id": "S05", "contract": "s05-evidence-capture", "description": "Evidence Capture", "scope": "IN SCOPE" },
-        { "id": "S06", "contract": "s06-evidence-detail", "description": "Evidence Detail", "scope": "IN SCOPE" },
-        { "id": "S07", "contract": "s07-evidence-dependency", "description": "Evidence Dependency", "scope": "IN SCOPE" },
-        { "id": "S08", "contract": "s08-epistemic-blocker-detail", "description": "Unknown / Assumption / Contradiction", "scope": "IN SCOPE" },
-        { "id": "S09", "contract": "s09-action-experiment-designer", "description": "Action / Experiment Designer", "scope": "IN SCOPE" },
-        { "id": "S10", "contract": "s10-finding-result-capture", "description": "Finding / Result Capture", "scope": "IN SCOPE" },
-        { "id": "S11", "contract": "s11-cause-review", "description": "Cause Review", "scope": "IN SCOPE" },
-        { "id": "S12", "contract": "s12-corrective-action", "description": "Corrective Action", "scope": "IN SCOPE" },
-        { "id": "S13", "contract": "s13-verification", "description": "Verification", "scope": "IN SCOPE" },
-        { "id": "S14", "contract": "s14-history-time-travel", "description": "History / Time Travel", "scope": "IN SCOPE" },
-        { "id": "S15", "contract": "s15-semantic-diff", "description": "Semantic Diff", "scope": "IN SCOPE" },
-        { "id": "S16", "contract": "s16-counterfactual-sandbox", "description": "Counterfactual Sandbox", "scope": "NOT-APPLICABLE", "reason": "The Causa engine has no counterfactual capability, and no Causa requirement beyond the generic contract asks for one." },
-        { "id": "S17", "contract": "s17-multi-agent-panel", "description": "Multi-Agent Panel", "scope": "IN SCOPE" },
-        { "id": "S18", "contract": "s18-research-tournament", "description": "Research Tournament", "scope": "IN SCOPE" },
-        { "id": "S19", "contract": "s19-replay-spectator", "description": "Replay / Spectator", "scope": "IN SCOPE" },
-        { "id": "S20", "contract": "s20-factory-view", "description": "Factory View", "scope": "IN SCOPE" },
-        { "id": "S21", "contract": "s21-requirements-proof", "description": "Requirements Proof", "scope": "IN SCOPE" },
-        { "id": "S22", "contract": "s22-report-preview", "description": "Report Preview", "scope": "IN SCOPE" },
-        { "id": "S23", "contract": "s23-persistence-conflict-recovery", "description": "Persistence / Conflict Recovery", "scope": "IN SCOPE" },
-        { "id": "S24", "contract": "s24-settings-semantic-manifest", "description": "Settings / Semantic Manifest", "scope": "IN SCOPE" },
-        { "id": "S25", "contract": "s25-demo-health", "description": "Demo Health", "scope": "IN SCOPE" }
+      "affectedRequirements": [
+        "AR-031",
+        "S01..S25 (docs/SCREEN-CONTRACTS.md; baseline requirements, not P0)"
       ],
-      "affectedObligations": [ { "obligation": "AR-031-O2", "status": "decision recorded before kickoff; still to be proven at acceptance (independent acceptance), not verified by this record" } ],
+      "screens": [
+        {
+          "id": "S01",
+          "contract": "s01-investigation-start",
+          "description": "Investigation Start",
+          "scope": "IN SCOPE"
+        },
+        {
+          "id": "S02",
+          "contract": "s02-investigation-workspace",
+          "description": "Investigation Workspace",
+          "scope": "IN SCOPE"
+        },
+        {
+          "id": "S03",
+          "contract": "s03-hypothesis-battlefield",
+          "description": "Hypothesis Battlefield",
+          "scope": "IN SCOPE"
+        },
+        {
+          "id": "S04",
+          "contract": "s04-hypothesis-detail",
+          "description": "Hypothesis Detail",
+          "scope": "IN SCOPE"
+        },
+        {
+          "id": "S05",
+          "contract": "s05-evidence-capture",
+          "description": "Evidence Capture",
+          "scope": "IN SCOPE"
+        },
+        {
+          "id": "S06",
+          "contract": "s06-evidence-detail",
+          "description": "Evidence Detail",
+          "scope": "IN SCOPE"
+        },
+        {
+          "id": "S07",
+          "contract": "s07-evidence-dependency",
+          "description": "Evidence Dependency",
+          "scope": "IN SCOPE"
+        },
+        {
+          "id": "S08",
+          "contract": "s08-epistemic-blocker-detail",
+          "description": "Unknown / Assumption / Contradiction",
+          "scope": "IN SCOPE"
+        },
+        {
+          "id": "S09",
+          "contract": "s09-action-experiment-designer",
+          "description": "Action / Experiment Designer",
+          "scope": "IN SCOPE"
+        },
+        {
+          "id": "S10",
+          "contract": "s10-finding-result-capture",
+          "description": "Finding / Result Capture",
+          "scope": "IN SCOPE"
+        },
+        {
+          "id": "S11",
+          "contract": "s11-cause-review",
+          "description": "Cause Review",
+          "scope": "IN SCOPE"
+        },
+        {
+          "id": "S12",
+          "contract": "s12-corrective-action",
+          "description": "Corrective Action",
+          "scope": "IN SCOPE"
+        },
+        {
+          "id": "S13",
+          "contract": "s13-verification",
+          "description": "Verification",
+          "scope": "IN SCOPE"
+        },
+        {
+          "id": "S14",
+          "contract": "s14-history-time-travel",
+          "description": "History / Time Travel",
+          "scope": "IN SCOPE"
+        },
+        {
+          "id": "S15",
+          "contract": "s15-semantic-diff",
+          "description": "Semantic Diff",
+          "scope": "IN SCOPE"
+        },
+        {
+          "id": "S16",
+          "contract": "s16-counterfactual-sandbox",
+          "description": "Counterfactual Sandbox",
+          "scope": "NOT-APPLICABLE",
+          "reason": "The Causa engine has no counterfactual capability, and no Causa requirement beyond the generic contract asks for one."
+        },
+        {
+          "id": "S17",
+          "contract": "s17-multi-agent-panel",
+          "description": "Multi-Agent Panel",
+          "scope": "IN SCOPE"
+        },
+        {
+          "id": "S18",
+          "contract": "s18-research-tournament",
+          "description": "Research Tournament",
+          "scope": "IN SCOPE"
+        },
+        {
+          "id": "S19",
+          "contract": "s19-replay-spectator",
+          "description": "Replay / Spectator",
+          "scope": "IN SCOPE"
+        },
+        {
+          "id": "S20",
+          "contract": "s20-factory-view",
+          "description": "Factory View",
+          "scope": "IN SCOPE"
+        },
+        {
+          "id": "S21",
+          "contract": "s21-requirements-proof",
+          "description": "Requirements Proof",
+          "scope": "IN SCOPE"
+        },
+        {
+          "id": "S22",
+          "contract": "s22-report-preview",
+          "description": "Report Preview",
+          "scope": "IN SCOPE"
+        },
+        {
+          "id": "S23",
+          "contract": "s23-persistence-conflict-recovery",
+          "description": "Persistence / Conflict Recovery",
+          "scope": "IN SCOPE"
+        },
+        {
+          "id": "S24",
+          "contract": "s24-settings-semantic-manifest",
+          "description": "Settings / Semantic Manifest",
+          "scope": "IN SCOPE"
+        },
+        {
+          "id": "S25",
+          "contract": "s25-demo-health",
+          "description": "Demo Health",
+          "scope": "IN SCOPE"
+        }
+      ],
+      "affectedObligations": [
+        {
+          "obligation": "AR-031-O2",
+          "status": "decision recorded before kickoff; still to be proven at acceptance (independent acceptance), not verified by this record"
+        }
+      ],
       "resultingScope": "24 contracts IN SCOPE. S16 may be bound NOT-APPLICABLE in the rehearsal's .percepta/bindings.json only by citing DEC-R6-006. S17, S18, S20 and S21 stay in scope: unless they are implemented and bound, gate G5 cannot pass (as in Rehearsal 5).",
-      "implementationWork": [ "At kickoff, record DEC-R6-006 in the rehearsal repository's decisions and bind S16 not-applicable citing it." ],
+      "implementationWork": [
+        "At kickoff, record DEC-R6-006 in the rehearsal repository's decisions and bind S16 not-applicable citing it."
+      ],
       "verificationChanges": "None to the plan (S01..S25 are not P0). Percepta gate G5 reads the bindings.",
       "approvalStatus": "APPROVAL_PENDING_MERGE"
     },
@@ -182,8 +388,15 @@
       "ownerWords": "Keep three cases (Recommended)",
       "date": "2026-10-28",
       "evidenceSource": "Owner's answer to a structured question in session https://claude.ai/code/session_01G1iECgGEzEnCXsPBoE8bH3; the option label is quoted as selected",
-      "affectedRequirements": ["EXT-DATA-013"],
-      "affectedObligations": [ { "obligation": "EXT-DATA-013-O1", "status": "in scope, unchanged (it names historical-v1, three investigations)" } ],
+      "affectedRequirements": [
+        "EXT-DATA-013"
+      ],
+      "affectedObligations": [
+        {
+          "obligation": "EXT-DATA-013-O1",
+          "status": "in scope, unchanged (it names historical-v1, three investigations)"
+        }
+      ],
       "resultingScope": "historical-v1 (Apollo 1, Apollo 11, Challenger) at causa-data dcb8cb9; writes only to workspaces/demo/<runId>/. Preflight stages 7-10 stay waived.",
       "implementationWork": [],
       "verificationChanges": "None.",
@@ -192,20 +405,81 @@
     {
       "id": "DEC-R6-008",
       "question": "R5A-001-01..05 are implementation items, not owner decisions. For each, kickoff work or preflight work?",
-      "options": { "kickoff": "Done in the first part of the timed window, on the critical path.", "preflight": "Done before the clock starts, in Indy-init." },
+      "options": {
+        "kickoff": "Done in the first part of the timed window, on the critical path.",
+        "preflight": "Done before the clock starts, in Indy-init."
+      },
       "recommendation": "R5A-001-01, -02 and -03 are kickoff work (they live in the rehearsal repository's CI and scaffold, which is itself kickoff work). R5A-001-04 and -05 are preflight work in the Indy-init compiler and checker.",
       "selected": "As recommended",
       "ownerWords": "Do what you recommend to get it started",
       "date": "2026-10-28",
       "evidenceSource": "Owner message in session https://claude.ai/code/session_01G1iECgGEzEnCXsPBoE8bH3, transcribed by the agent",
       "items": [
-        { "item": "R5A-001-01", "disposition": "kickoff", "status": "not implemented", "work": "The mocked suite's network guard admits exactly CAUSA_BASE_URL's origin, with a negative control; enables the deployed exact-SHA run (UI-015-O3, WDL-014-O1, PF-014-O2, UI-016-O15).", "criticalPath": "about 20 minutes; blocks the deployed browser evidence" },
-        { "item": "R5A-001-02", "disposition": "kickoff", "status": "not implemented", "work": "Every CI job that reads causa-data checks it out at the pinned commit dcb8cb9, browser and live jobs included.", "criticalPath": "about 10 minutes, inside the CI setup" },
-        { "item": "R5A-001-03", "disposition": "kickoff", "status": "not implemented", "work": "global.json pins the .NET SDK with rollForward disable; CI installs exactly that SDK and the wasm-tools workload.", "criticalPath": "about 15 minutes, inside the CI setup" },
-        { "item": "R5A-001-04", "disposition": "preflight", "status": "implemented in Indy-init (verify-plan --review-tag-changes; R6ScopeTests)", "work": "A test a review removed from an obligation never counts again; the obligation is listed unbound-after-review until a re-binding to plan-bound tests or a stated reason resolves it." },
-        { "item": "R5A-001-05", "disposition": "preflight", "status": "implemented in Indy-init (derivedObligations; v3 plan)", "work": "UI-015-O2 is compiled as derived: seven clauses verified by their constituent obligations, four residual clauses (frozen fixtures, timeline ordering, report fidelity, startup failure) proven by its own bound test, because no P0 obligation states them. It is verified only when every constituent is." }
+        {
+          "item": "R5A-001-01",
+          "disposition": "kickoff",
+          "status": "not implemented",
+          "work": "The mocked suite's network guard admits exactly CAUSA_BASE_URL's origin, with a negative control; enables the deployed exact-SHA run (UI-015-O3, WDL-014-O1, PF-014-O2, UI-016-O15).",
+          "criticalPath": "about 20 minutes; blocks the deployed browser evidence"
+        },
+        {
+          "item": "R5A-001-02",
+          "disposition": "kickoff",
+          "status": "not implemented",
+          "work": "Every CI job that reads causa-data checks it out at the pinned commit dcb8cb9, browser and live jobs included.",
+          "criticalPath": "about 10 minutes, inside the CI setup"
+        },
+        {
+          "item": "R5A-001-03",
+          "disposition": "kickoff",
+          "status": "not implemented",
+          "work": "global.json pins the .NET SDK with rollForward disable; CI installs exactly that SDK and the wasm-tools workload.",
+          "criticalPath": "about 15 minutes, inside the CI setup"
+        },
+        {
+          "item": "R5A-001-04",
+          "disposition": "preflight",
+          "status": "implemented in Indy-init (verify-plan --review-tag-changes; R6ScopeTests)",
+          "work": "A test a review removed from an obligation never counts again; the obligation is listed unbound-after-review until a re-binding to plan-bound tests or a stated reason resolves it."
+        },
+        {
+          "item": "R5A-001-05",
+          "disposition": "preflight",
+          "status": "implemented in Indy-init (derivedObligations; v3 plan)",
+          "work": "UI-015-O2 is compiled as derived: seven clauses verified by their constituent obligations, four residual clauses (frozen fixtures, timeline ordering, report fidelity, startup failure) proven by its own bound test, because no P0 obligation states them. It is verified only when every constituent is."
+        }
       ],
       "resultingScope": "No requirement changes. The kickoff items are added to the kickoff critical path. They count against the seven-hour window.",
+      "approvalStatus": "APPROVAL_PENDING_MERGE"
+    },
+    {
+      "id": "DEC-R6-009",
+      "question": "R5A-001-06 and R5A-001-09 had no disposition after DEC-R6-008. Kickoff work, preflight work, or Rehearsal 6 application work?",
+      "options": {
+        "kickoff": "Done in the first part of the timed window.",
+        "preflight": "Done before the clock starts.",
+        "application": "Rehearsal 6 implements it and proves it at acceptance under the plan."
+      },
+      "recommendation": "R5A-001-06: kickoff. The plan already binds VER-002-O1, VER-004-O3 and UI-040-O2 to Praxis producers (release-selection, intake), and AR-023-O3 to the independent review. What remains is to record this preflight's result (docs/rehearsal-006/preflight.json, by sha256) and the registry pin as Praxis records at kickoff, so the run's bundle carries them. R5A-001-09: Rehearsal 6 application work, proven by UI-011-O4's bound test in VP-13516e0d5930. It cannot precede the rehearsal, because the application does not exist yet.",
+      "selected": "As recommended",
+      "ownerWords": "I approve all recommendations and necessary merges going forward",
+      "date": "2026-10-28",
+      "evidenceSource": "Owner message in session https://claude.ai/code/session_01G1iECgGEzEnCXsPBoE8bH3, transcribed by the agent",
+      "items": [
+        {
+          "item": "R5A-001-06",
+          "disposition": "kickoff",
+          "status": "partially implemented (producers bound in the plan)",
+          "work": "At kickoff, record the preflight result and the registry pin as Praxis records cited by the run's evidence bundle."
+        },
+        {
+          "item": "R5A-001-09",
+          "disposition": "application",
+          "status": "not implemented (no application yet)",
+          "work": "Place focus deliberately after back navigation and route transitions; proven by UI-011-O4."
+        }
+      ],
+      "resultingScope": "No requirement changes.",
       "approvalStatus": "APPROVAL_PENDING_MERGE"
     }
   ]

@@ -51,7 +51,7 @@ The owner's answers are recorded in [`kickoff/rehearsal-006/owner-decisions.json
 | R5A-001-11 | DEC-R6-003, DEC-R6-004 | UI-031-O5 and AR-019-O3 are amended by operator approvals APR-R6-003 and APR-R6-004 |
 | AR-031 | DEC-R6-006 | S16 NOT-APPLICABLE; S01–S15 and S17–S25 in scope |
 
-No decision record covers R5A-001-06, -07 or -09:
+| R5A-001-06 | DEC-R6-009 | Kickoff work: the preflight result and the registry pin become Praxis records in the run's bundle |
+| R5A-001-09 | DEC-R6-009 | Rehearsal 6 application work, proven by UI-011-O4 |
 
-- **-07:** implemented in tooling.
-- **-06 and -09:** still need a disposition. See `docs/rehearsal-006/PREFLIGHT.md`.
+R5A-001-07 is implemented in tooling and needs no decision.

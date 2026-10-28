@@ -30,6 +30,7 @@ The machine-readable record is [`owner-decisions.json`](owner-decisions.json). T
 | DEC-R6-006 | Screen-contract scope (AR-031) | S16 NOT-APPLICABLE; S01–S15 and S17–S25 IN SCOPE | 24 contracts in scope. S16 may be bound NOT-APPLICABLE only by citing DEC-R6-006. |
 | DEC-R6-007 | Four investigations or three | **B**, three (`historical-v1`) | The waiver stands. Preflight stages 7–10 stay waived. |
 | DEC-R6-008 | R5A-001-01..05 dispositions | As recommended | 01–03 are kickoff work. 04 and 05 are preflight work, now implemented. |
+| DEC-R6-009 | R5A-001-06 and -09 dispositions | As recommended ("I approve all recommendations and necessary merges going forward") | 06 is kickoff work: record the preflight result and the registry pin as Praxis records. 09 is application work, proven by UI-011-O4. |
 
 ### DEC-R6-001: open point, left to the implementation and the reviewer
 
