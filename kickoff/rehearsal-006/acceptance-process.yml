@@ -1,0 +1,97 @@
+# Rehearsal 6 acceptance job: process, owner and review evidence (ESO-R6-05).
+#
+# Template. At kickoff, copy it to .github/workflows/acceptance-process.yml in kemiller2002/indy-init-rehearsal-006 and
+# set INDY_INIT_COMMIT to the Indy-init commit that carries the frozen plan and rules. Every other pin below is the
+# frozen value; change none of them without a new owner decision.
+#
+# The job observes the owner's and the reviewer's pull-request reviews from the GitHub API in its own run, turns them
+# into indy-init.owner-attestations/1, and runs requirements-compiler verify-process against the candidate's Praxis
+# log. The attestations are trusted only inside this run (verify-process --trusted-run-id).
+name: Acceptance (process evidence)
+
+on:
+  workflow_dispatch:
+    inputs:
+      candidate:
+        description: "Full 40-character SHA of the release candidate"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  pull-requests: read
+
+env:
+  INDY_INIT_COMMIT: "REPLACE-AT-KICKOFF"
+  PLAN: indy-init/requirements-compiled/v2/verification-plan.json
+  PLAN_DIGEST: "0eb9c791dd0beba7d63f709a810c2f0d379ea71e03c74a53d8b34951a9260766"
+  RULES: indy-init/kickoff/rehearsal-006/process-evidence-rules.json
+  RULES_SHA256: "6f16435369a046e534e4787903ea96c4a9f7e0adcf7b5b51d4ea15ac156be17c"
+
+jobs:
+  process-evidence:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Refuse an unpinned run
+        run: |
+          [[ "$INDY_INIT_COMMIT" =~ ^[0-9a-f]{40}$ ]] || { echo "::error::INDY_INIT_COMMIT is not pinned"; exit 2; }
+          [[ "${{ inputs.candidate }}" =~ ^[0-9a-f]{40}$ ]] || { echo "::error::candidate must be a full 40-character SHA"; exit 2; }
+
+      - name: Check out the candidate with full history
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.candidate }}
+          fetch-depth: 0
+          path: candidate
+
+      - name: Check out the pinned Indy-init
+        uses: actions/checkout@v4
+        with:
+          repository: kemiller2002/Indy-init
+          ref: ${{ env.INDY_INIT_COMMIT }}
+          path: indy-init
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: indy-init/global.json
+
+      - name: Build the requirements compiler
+        run: dotnet build indy-init/tools/requirements-compiler/src -c Release
+
+      - name: Observe every pull request's reviews in this run
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          gh api --paginate "repos/$REPO/pulls?state=all&per_page=100" --jq '.[].number' |
+            while read -r n; do
+              gh api --paginate "repos/$REPO/pulls/$n/reviews?per_page=100" | jq -s --argjson n "$n" '{number: $n, reviews: add}'
+            done | jq -s . > pulls.json
+          jq 'length' pulls.json
+
+      - name: Attestations observed by this run
+        run: |
+          dotnet indy-init/tools/requirements-compiler/src/bin/Release/net10.0/requirements-compiler.dll review-attestations \
+            --repository "${{ github.repository }}" --run-id "${{ github.run_id }}" --candidate "${{ inputs.candidate }}" \
+            --pulls pulls.json --out attestations.json
+
+      - name: Verify process, owner and review evidence
+        run: |
+          set +e
+          dotnet indy-init/tools/requirements-compiler/src/bin/Release/net10.0/requirements-compiler.dll verify-process \
+            --plan "$PLAN" --plan-digest "$PLAN_DIGEST" --rules "$RULES" --rules-sha256 "$RULES_SHA256" \
+            --candidate "${{ inputs.candidate }}" --repo candidate \
+            --attestations attestations.json --trusted-run-id "${{ github.run_id }}" --out process-assessment.json
+          code=$?
+          jq '{verdict, summary}' process-assessment.json
+          exit $code
+
+      - name: Keep the evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: process-evidence-${{ inputs.candidate }}
+          path: |
+            pulls.json
+            attestations.json
+            process-assessment.json

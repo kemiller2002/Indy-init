@@ -242,4 +242,5 @@ review is required, not optional. It also means the absence of findings is not c
 ## 7. Rehearsal 6 preparation
 
 ESO-R6-01 to ESO-R6-11 in the intake document, approved by the owner on 2026-10-28 (taking effect through the owner's
-merge of the pull request that records them, RDP-003). Rehearsal 6 is not started.
+merge of the pull request that records them, RDP-003). Rehearsal 6 is not started. Status: the intake document's
+"Status" section; kickoff records in `kickoff/rehearsal-006/`.

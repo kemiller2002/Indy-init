@@ -54,3 +54,16 @@ owner's own merge of the pull request that records it. Rehearsal 6 is not starte
 | ESO-R6-09 | Persistence: decide between adopting Arca 0.6.0 and carrying Rehearsal 5's persistence fixes forward; either way make the local read-merge-write exclusive across tabs (Web Locks where available, with an explicit fallback) and add the deterministic two-tab reproduction test. R3-F2 is open. | `investigations/regression-preservation.md` |
 | ESO-R6-10 | UI: consume a released Forma with the application type roles (0.11.0 is merged but not published); require overflow, corner-containment and axe checks in the application. | `investigations/regression-preservation.md` |
 | ESO-R6-11 | Record the measurements of the report's comparison table during the run (time to first working application, time to verified completion, CI minutes from the Actions API, tokens, integration repairs, mandatory requirements verified, defects escaping early tests). | report §Comparison |
+
+## Status (2026-10-28)
+
+| ID | Status |
+|---|---|
+| ESO-R6-01 | Done. echelon-current 1.31.0 (echelon-registry#102, approved by the owner): Praxis 3.23.0, Ordo 1.19.0, Dokimos 0.9.0, Limen 0.9.1, qualified by Conditor 0.10.16. |
+| ESO-R6-02 | Prepared. Every category of the 326 obligations is bound (plan `VP-0eb9c791dd0b`); `plan-readiness` is READY. Takes effect on the owner's merge. |
+| ESO-R6-03 | Prepared. `kickoff/rehearsal-006/process-evidence-rules.json` (SHA-256 `6f164353…e17c`). The reviewer is `anthropic/claude-code-reviewer`, attested by the owner's GitHub login (owner decision, 2026-10-28). |
+| ESO-R6-04, -06 | The commands are released (`praxis work evidence`, `praxis telemetry ingest`); the agents use them during the rehearsal. |
+| ESO-R6-05 | Prepared. `kickoff/rehearsal-006/acceptance-process.yml` and `requirements-compiler review-attestations`. The job runs `verify-process`; `verify-plan` computes the same assessment itself from its `--process-*` inputs rather than reading a `--process-assessment` file. |
+| ESO-R6-07, -08, -11 | At kickoff, in the rehearsal repository. |
+| ESO-R6-09 | Open: persistence decision (Arca 0.6.0 or Rehearsal 5's fixes) and the cross-tab lock. |
+| ESO-R6-10 | Open: Forma 0.11.0 is merged but not published, and is not in 1.31.0. |

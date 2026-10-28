@@ -596,6 +596,11 @@ let private planWithBindings (source: string) (bindings: Json) =
 
 let private processSimulation (source: string) = ProcessTests.simulation source (planWithBindings source)
 
+let private r6Readiness (source: string) =
+    let committed = File.ReadAllText(Path.Combine(source, "requirements", "causa-requirements-baseline.json"))
+    let i = planInputs source committed
+    R6ReadinessTests.all source (planWithBindings source) (fun bindings -> VerificationPlan.problems (withSpec i "testBindings" bindings))
+
 let private producerBindings (source: string) =
     let committed = File.ReadAllText(Path.Combine(source, "requirements", "causa-requirements-baseline.json"))
     let i = planInputs source committed
@@ -699,7 +704,7 @@ let main argv =
             eprintfn "%s" e
             2
         | Ok o ->
-            let processFailures = snd (processSimulation o.Source) @ producerBindings o.Source
+            let processFailures = snd (processSimulation o.Source) @ producerBindings o.Source @ r6Readiness o.Source
             report (offline o.Source @ processFailures) "offline tests (baseline equivalence, baseline units, preflight verdict, verification plan, acceptance contracts, process evidence)"
     | "--readiness-replay" :: rest ->
         match rest with

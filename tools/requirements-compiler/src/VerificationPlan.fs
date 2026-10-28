@@ -141,7 +141,11 @@ let problems (i: Inputs) : string list =
       for (o, tests) in bindings do
           if not (obligationsOf.Contains o) then yield sprintf "test binding targets unknown or non-P0 obligation %s" o
           if tests.IsEmpty then yield sprintf "test binding for %s names no test (leave it unbound instead)" o
-          for (dup, n) in tests |> List.countBy (fun t -> t.Id) do
+          // A Praxis producer names a record kind, not a test: one record kind may serve an obligation once per
+          // evidence kind (praxis:independent-review as both a process record and the independent review). An
+          // application test id is unique.
+          let identity (t: TestRef) = if t.Id.StartsWith("praxis:", StringComparison.Ordinal) then t.Id + " (" + t.Kind + ")" else t.Id
+          for (dup, n) in tests |> List.countBy identity do
               if n > 1 then yield sprintf "test binding for %s names test '%s' more than once" o dup
           for t in tests do
               if String.IsNullOrWhiteSpace t.Id then yield sprintf "test binding for %s has an empty test id" o
