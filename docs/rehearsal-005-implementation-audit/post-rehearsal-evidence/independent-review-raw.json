@@ -1,0 +1,455 @@
+{
+  "reviewer": "independent review agent (no implementation or classification role)",
+  "reviewedAt": "2026-10-28T15:05:00Z",
+  "method": "Read-only. Read the full frozen obligation text from indy-init 4b38213:requirements-compiled/v1/verification-plan.json (VP-e77a2134e1b0); all 102 obligation texts in matrix-pre.json match it byte for byte, and all 49 NOT_RUN statuses match the frozen traceability.json. Read the cited source and test code in the frozen checkout (src/tests identical to 1b9fb56). Re-ran the audit's post-rehearsal tests against r5-wt (HEAD 1b9fb56873fe, clean): 13/13 passed. Read pw-deployed.log after it completed (82 passed, 4 failed). Fetched only public, read-only URLs (deployed build-info.json, a 404 probe, and the causa-data repository visibility).",
+  "requirements": [
+    {
+      "id": "AR-005",
+      "auditClassification": "PROCESS_EVIDENCE_MISSING",
+      "recommendedClassification": "PROCESS_EVIDENCE_MISSING",
+      "recommendedProcessStatus": "UNKNOWN",
+      "verdict": "upheld",
+      "evidence": "No capability-discovery or reuse inventory for components other than forma-workflow (WDL-001). The duplicated codecs exist: src/persistence/Json.fs (9398 B, namespace Causa.Persistence) and src/engine/Json.fs (9695 B, namespace IndyInitRootCauseInvestigator.Engine). Nothing in the repository shows whether discovery happened, so UNKNOWN is correct.",
+      "unsupportedAssumptions": [],
+      "existingEvidenceSufficientAtDeadline": false,
+      "causeCorrections": []
+    },
+    {
+      "id": "AR-008",
+      "auditClassification": "PROCESS_EVIDENCE_MISSING",
+      "recommendedClassification": "PROCESS_EVIDENCE_MISSING",
+      "recommendedProcessStatus": "UNKNOWN",
+      "verdict": "downgrade",
+      "evidence": "A review activity did happen: the review files exist, and fix commits answer them (5336ec4 'review F-1, F-2', b07d2a5 'review R2-F2, R2-F1', 0649acd 'review R3-F1'). The obligation, however, is a review by a reviewer distinct from the implementer, and nothing shows that distinction. All 284 agent commits are authored 'Claude <noreply@anthropic.com>', and every commit that carries a session trailer (203 of them, review commits 5286197 and 0ad65b3 included) names the same session, session_01G1iECdHZXLR6xBfMivMsx3. The independence statement exists only inside the review files ('Reviewer | independent review agent; did not build any of the reviewed code'), which is the agent's own claim. Whether the required kind of review took place cannot be established, so the status should be UNKNOWN, not PERFORMED_EVIDENCE_INADEQUATE.",
+      "unsupportedAssumptions": [
+        "That the reviewers were distinct from the implementers. The only evidence is the review files' self-description, and every commit shares one session id."
+      ],
+      "existingEvidenceSufficientAtDeadline": false,
+      "causeCorrections": [
+        {
+          "obligation": "AR-008-O1",
+          "from": "11 (secondary 5,10)",
+          "to": "11 (secondary 9,5,10)",
+          "why": "Even with a binding path, no evidence of reviewer independence (separate identity, session or authentication) was ever generated."
+        }
+      ]
+    },
+    {
+      "id": "AR-011",
+      "auditClassification": "PARTIALLY_IMPLEMENTED",
+      "recommendedClassification": "PARTIALLY_IMPLEMENTED",
+      "recommendedProcessStatus": null,
+      "verdict": "upheld",
+      "evidence": "No re-run or drift classifier exists in scripts/, tools/, .github/ or vendor/. The only 'drift' hits are requirements-preservation drift (EvidenceTests.fs:162) and an npm lock check (LockGate.fs:171). There is no global.json, and build-and-test.yml:65/148/216 use dotnet-version \"10.0.x\". O2 is absent, so B holds at requirement level (O1 PASS). The audit's supporting number is wrong, though. In deployed-compare.tsv, 193 of the 198 DIFF rows have deployed hash b620507312c5e975..., which is GitHub Pages' 404 body: fetching a missing URL under https://kevinmmiller.us/indy-init-rehearsal-005/ returns exactly that hash. Those 193 files are not byte differences; the deployed site has no file at the locally rebuilt fingerprinted names. Only 5 same-path files differ in content (build-info.json, evidence/factory.json, evidence/proof.json, System.Collections.Immutable.7hl5l3lm5d.wasm, dotnet.js). The deployed site is also b972cb4 (build-info builtAt 2026-10-28T06:22:37Z), not 1b9fb56.",
+      "unsupportedAssumptions": [
+        "'A post-rehearsal rebuild changed 198 of 263 deployed artifacts': 193 of those are 404 responses, and the deployed build is b972cb4, not the candidate's deployment."
+      ],
+      "existingEvidenceSufficientAtDeadline": false,
+      "causeCorrections": []
+    },
+    {
+      "id": "AR-012",
+      "auditClassification": "PROCESS_EVIDENCE_MISSING",
+      "recommendedClassification": "PROCESS_EVIDENCE_MISSING",
+      "recommendedProcessStatus": "UNKNOWN",
+      "verdict": "downgrade",
+      "evidence": "O1 has partial evidence the audit missed: .ros/work/queue.json titles name requirement or task ranges before work, for example WI-0007 '(UI-001,UI-017..UI-040)' and WI-0005 '(T18-T21,T25)'. But every work.started event has \"paths\": [], so path bounding was never recorded. O2 has no detector and no review record of any decision to include unrelated changes. That leaves no evidence that the O2 process happened, and none that it did not. The least-supported obligation is UNKNOWN, so the requirement cannot be PERFORMED_EVIDENCE_INADEQUATE.",
+      "unsupportedAssumptions": [
+        "'No record states each agent's bounded requirements ... before it worked' is too strong: the queue titles name requirement ranges. Paths are indeed unrecorded."
+      ],
+      "existingEvidenceSufficientAtDeadline": false,
+      "causeCorrections": []
+    },
+    {
+      "id": "AR-015",
+      "auditClassification": "PROCESS_EVIDENCE_MISSING",
+      "recommendedClassification": "PROCESS_EVIDENCE_MISSING",
+      "recommendedProcessStatus": "PERFORMED_EVIDENCE_INADEQUATE",
+      "verdict": "upgrade",
+      "evidence": ".ros/events/events.jsonl holds one real work.checkpointed event (WI-0002, occurredAt 2026-10-27T20:20:18Z, commit 7730f78, remote-verified, with summary and nextAction). That is a record of the event itself, not only a mechanism, so NOT_PERFORMED contradicts the repository. Checkpointing was performed once and then not maintained: there are none for WI-0003..WI-0009 among 532 events. That is PERFORMED_EVIDENCE_INADEQUATE. The audit's 'two container restarts; streams resumed from agent transcripts' comes only from the agent-authored indy-init docs/REHEARSAL-005-RESULTS.md:75 (commit 1d1e48d, author Claude) and is not independently evidenced.",
+      "unsupportedAssumptions": [
+        "The two container restarts and the resumption from transcripts are asserted only by an agent-written results document."
+      ],
+      "existingEvidenceSufficientAtDeadline": false,
+      "causeCorrections": []
+    },
+    {
+      "id": "AR-017",
+      "auditClassification": "PROCESS_EVIDENCE_MISSING",
+      "recommendedClassification": "PROCESS_EVIDENCE_MISSING",
+      "recommendedProcessStatus": "UNKNOWN",
+      "verdict": "upheld",
+      "evidence": "No outbound routing record exists in the candidate. Only the inbound .praxis/inbox document exists. Other owners' inboxes and issue trackers were not searched, by the audit or by me, so UNKNOWN is correct.",
+      "unsupportedAssumptions": [],
+      "existingEvidenceSufficientAtDeadline": false,
+      "causeCorrections": []
+    },
+    {
+      "id": "AR-019",
+      "auditClassification": "INDETERMINATE",
+      "recommendedClassification": "PARTIALLY_IMPLEMENTED",
+      "recommendedProcessStatus": null,
+      "verdict": "downgrade",
+      "evidence": "The evidence settles the outcome, so INDETERMINATE does not fit. The R2 clause is met: indy-init tools/test-acceptance-verdict.py:379-387 asserts verdict == \"INVALID\" for the R2 ledger (re-run at 459f65a, 19 OK). The R3 clause is not: the obligation says 'Original Rehearsal 3 must yield BLOCKED', but indy-init docs/CAUSA-ACCEPTANCE-VERIFICATION-2026-10-26.md:22 and :45-47 records that validate-acceptance-ledger.py exits 1 (structural rejection, 16 violations) and the R3 classification is FAIL. compute-acceptance-verdict.py:27-28 can produce BLOCKED, but no path maps the original R3 record to it. One required behaviour is demonstrably absent, which is B. 'The plan text cannot be satisfied as written' is the audit's opinion: a verifier could classify an unparseable historical record as BLOCKED. An owner may rule the text defective; until then it is unmet. R5's own verifier (tools/acceptance) has no R2 or R3 test.",
+      "unsupportedAssumptions": [
+        "That the plan text is unsatisfiable. Mapping a non-ledger record to BLOCKED is a feasible design."
+      ],
+      "existingEvidenceSufficientAtDeadline": false,
+      "causeCorrections": [
+        {
+          "obligation": "AR-019-O3",
+          "from": "11 (secondary 5)",
+          "to": "1 (secondary 11,5)",
+          "why": "No verifier path yields BLOCKED for the original R3 record. The plan-defect reading needs an owner ruling that does not exist."
+        }
+      ]
+    },
+    {
+      "id": "AR-020",
+      "auditClassification": "PROCESS_EVIDENCE_MISSING",
+      "recommendedClassification": "PROCESS_EVIDENCE_MISSING",
+      "recommendedProcessStatus": "PERFORMED_EVIDENCE_INADEQUATE",
+      "verdict": "upheld",
+      "evidence": "O1 and O3 are observable artifacts: .sde/architecture/FOUR-TIER-ARCHITECTURE.md, src/engine/Model.fs and docs/architecture/BOUNDARIES.md. The audit's claim that 'all three obligations can be observed', and its 'sufficient' rating, do not hold for O2. O2 forbids adding executable decision gates or typed agent records 'without a measured incremental correctness benefit'. The run added executable gates, for example 5333387 'G5: percepta verify-app allows NOT-APPLICABLE only when ... (causa-acceptance bindings-check)' (tools/acceptance/Causa.Acceptance/Bindings.fs plus a workflow change), and no benefit measurement exists. These gates may be independently justified by other requirements, but that justification is not recorded. Freshness for AR-020 is FP-REVIEW-PER-COMMIT, which needs independent review evidence naming the reviewed commit, and no review names 1b9fb56.",
+      "unsupportedAssumptions": [
+        "That no unjustified executable gates were added. Gates were added during the run with no measured-benefit record.",
+        "That repository artifacts would be admissible. The plan admits only test identity, and the policy requires a per-commit review."
+      ],
+      "existingEvidenceSufficientAtDeadline": false,
+      "causeCorrections": []
+    },
+    {
+      "id": "AR-021",
+      "auditClassification": "PROCESS_EVIDENCE_MISSING",
+      "recommendedClassification": "PROCESS_EVIDENCE_MISSING",
+      "recommendedProcessStatus": "NOT_PERFORMED",
+      "verdict": "upheld",
+      "evidence": "No compaction-retention measurement exists anywhere in the repository (O3). The reviews ran at fbe4d87, be01851 and 543ddc2, not at 1b9fb56. The parallel-stream structure is evident in the merge history (origin/r5/persist, r5/acc, r5/ux, r5/review, r5/review2).",
+      "unsupportedAssumptions": [],
+      "existingEvidenceSufficientAtDeadline": false,
+      "causeCorrections": []
+    },
+    {
+      "id": "AR-023",
+      "auditClassification": "PROCESS_EVIDENCE_MISSING",
+      "recommendedClassification": "PROCESS_EVIDENCE_MISSING",
+      "recommendedProcessStatus": "PERFORMED_EVIDENCE_INADEQUATE",
+      "verdict": "upheld",
+      "evidence": "The sub-status stands; the 'sufficient' rating does not. The evidence is indy-init requirements-compiled/v1/readiness/evidence/preflight-run-r5-local.json: executedAt 19:51:18Z, before the run, committed by the agent in 4b38213, with no run_id or source_sha. Its check, PRE-TOOL-02, is a string-presence test ('v0.10.14 contains CON-367 under src/Conditor.Core'). That shows a fix id is present, not that the SD-1 behaviour was verified. The evidence contract's mustMatch requires run_id and source_sha, and AR-023's freshness is FP-REVIEW-PER-COMMIT, bound to the exact application commit, so this evidence was not admissible. 'cf86744 was produced without the hand workaround' is asserted with no supporting comparison.",
+      "unsupportedAssumptions": [
+        "That PRE-TOOL-02 verifies SD-1. It only finds the fix id.",
+        "That the bootstrap used no hand workaround. Nothing is cited."
+      ],
+      "existingEvidenceSufficientAtDeadline": false,
+      "causeCorrections": []
+    },
+    {
+      "id": "AR-024",
+      "auditClassification": "PROCESS_EVIDENCE_MISSING",
+      "recommendedClassification": "PROCESS_EVIDENCE_MISSING",
+      "recommendedProcessStatus": "UNKNOWN",
+      "verdict": "downgrade",
+      "evidence": "The audit says 'The decisions were made by the owner before or during the run, but only in chat'. The only source for that is the agent's own transcriptions: approvals.json, DF-CAUSA-2026-0001/0002, and REHEARSAL-005-RESULTS.md:53 ('The agent transcribed them'). Under the rule not to infer a historical event from records that support it, the owner's act is not established by repository evidence. The only human-authored commit in the rehearsal repository is the initial one (52e9a74, Kevin Miller). The status is UNKNOWN until the owner confirms through an authenticated channel.",
+      "unsupportedAssumptions": [
+        "That the owner actually made these decisions. The only evidence is the agent's transcription."
+      ],
+      "existingEvidenceSufficientAtDeadline": false,
+      "causeCorrections": []
+    },
+    {
+      "id": "EXT-DATA-005",
+      "auditClassification": "IMPLEMENTED_VERIFICATION_MISSING",
+      "recommendedClassification": "PARTIALLY_IMPLEMENTED",
+      "recommendedProcessStatus": null,
+      "verdict": "downgrade",
+      "evidence": "O1 requires 'MUST check repository and branch permissions'. Branch permissions are never read or checked anywhere in src/: there is no protection or permission request, and getBranchHead (GitHub.fs:47) only reads the ref. Repository permissions are parsed into RepositoryInfo.CanPush (GitHub.fs:9-14,131-137) and stored at Sync.fs:808, but CanPush is referenced nowhere else in src/ (grep). The audit's post-rehearsal tests (PersistenceAuditTests.fs) assert path and manifest refusals (6 pointer cases, 7 manifest cases), plus an invisible private repository connecting as accessDenied. None asserts a branch-permission or repository-permission check. The accessDenied test proves only that GitHub's own 404/403 closes the load, which is GitHub enforcing access, not the provider checking it. The frozen DEC-025 (OD-INDY-10, decision-registry.json at 4b38213, line ~979: 'Permission fields are advisory (DC-004)') conflicts with a literal 'check' and was not reconciled with EXT-DATA-005 in the plan. Either the clause is unimplemented (B) or the plan needs an owner correction; in neither case is A supported. The path, manifest, schema and admissibility clauses are covered: post-rehearsal tests 13/13 re-run green, and StoreTests were bound to O2 PASS.",
+      "unsupportedAssumptions": [
+        "That 'access is enforced by GitHub's own answer' satisfies 'the provider MUST check repository and branch permissions'.",
+        "remainingWork.applicationCode 'none': a branch-permission check, or an owner plan correction, is needed."
+      ],
+      "existingEvidenceSufficientAtDeadline": false,
+      "causeCorrections": [
+        {
+          "obligation": "EXT-DATA-005-O1",
+          "from": "4 (secondary 6)",
+          "to": "1 (secondary 11,4,6)",
+          "why": "There is no branch-permission check in the implementation, so a sufficient test would fail, not pass. The plan does not reconcile the clause with DEC-025/DC-004."
+        }
+      ]
+    },
+    {
+      "id": "EXT-DATA-006",
+      "auditClassification": "IMPLEMENTED_VERIFICATION_MISSING",
+      "recommendedClassification": "IMPLEMENTED_VERIFICATION_MISSING",
+      "recommendedProcessStatus": null,
+      "verdict": "upheld",
+      "evidence": "Explicit create: SyncAppTests.fs:146 'explicit create is saved locally, written in one guarded commit'. Optimistic concurrency and no overwrite of unread history: DcTableTests.fs:39-49 (expectedHeadOid = readAt; a moved branch becomes a conflict, a second Save is refused, one POST) and :52-76, :207, :268, :288. Write authorization: DctProviderTests.fs:38-58, where a read-only credential's write is refused (FORBIDDEN), held, the head is unchanged, and a renewed credential saves. 'Separately verified authorization' is met only under DEC-025/DC-004's reading that GitHub's answer to the write decides (CanPush unused). That reading is a frozen decision, so I accept it, but it should be stated. Tags for VPO-d7fbd84e40ded145 were removed in 5336ec4 (git log -S). DCT-LIVE-A passed in run 40620099844 (traceability: suite playwright, resultFile TestResults/live/live-results.json). The investigation's 'closed by the T33 reviewer' is an agent statement (see AR-008) and is not needed for this classification.",
+      "unsupportedAssumptions": [
+        "F-1 closure is attributed to an 'independent' T33 reviewer whose independence is unestablished. The classification rests on CI tests instead."
+      ],
+      "existingEvidenceSufficientAtDeadline": true,
+      "causeCorrections": []
+    },
+    {
+      "id": "PF-005",
+      "auditClassification": "IMPLEMENTED_VERIFICATION_MISSING",
+      "recommendedClassification": "IMPLEMENTED_VERIFICATION_MISSING",
+      "recommendedProcessStatus": null,
+      "verdict": "upheld",
+      "evidence": ".NET tests: a grep finds no HttpClient, Socket or WebRequest use in tests/ (the only hits are the forbidden-type list in WasmSafetyTests.fs:20-21). The offline re-run passed 252/252. Browser: tests/browser/support/fixtures.js aborts any non-local request and asserts escaped == [] on every mocked spec, and pw-local shows 106 passed (the 1 failure is the missing Percepta CLI, not network). The upheld classification has caveats. (a) The offline run only redirected HTTPS_PROXY/HTTP_PROXY, which constrains proxy-honouring clients, not DNS or raw sockets. (b) Engine and graph tests need a pre-provisioned causa-data checkout (FixtureReplayTests.fs:15-22, GraphTests.fs:306-315, CAUSA_DATA_DIR) of a GitHub-hosted repository. It is a local directory, not a network dependency, but provisioning it is out-of-band. (c) The browser suite was not run offline.",
+      "unsupportedAssumptions": [
+        "That forcing the proxy variables equals 'no network'. No network namespace was used (the audit says so)."
+      ],
+      "existingEvidenceSufficientAtDeadline": false,
+      "causeCorrections": []
+    },
+    {
+      "id": "PF-009",
+      "auditClassification": "IMPLEMENTED_VERIFICATION_MISSING",
+      "recommendedClassification": "IMPLEMENTED_VERIFICATION_MISSING",
+      "recommendedProcessStatus": null,
+      "verdict": "upheld",
+      "evidence": "Post-rehearsal tests (re-run: pass) assert three things. A held answer for workspace A is refused after Connect to B, and the model is unchanged. A held answer under a credential later rejected is refused, the generation increases, the credential is None and accessDenied is preserved. Generations are strictly distinct across connect and disconnect. Freshness is covered by DCT-005-A (bound to O2). Caveat: the frozen text says 'active provider', which in PF documents means fixture versus GitHub (PF-001/PF-003). The audit's test switches the workspace, not the provider. The implementation does cover a provider switch: PersistencePort.fs:318 clears s.Fixture on a non-fixture Connect, Sync.fs:1032-1051 bumps Generation and clears InFlight on every Connect, and the fixture provider answers synchronously inside drain (PersistencePort.fs:205-213), so no fixture answer can outlive a switch. A provider-switch test would make the evidence direct; I accept the mechanism-level coverage because the same Generation path is executed.",
+      "unsupportedAssumptions": [
+        "The audit labels workspace switching as 'active provider target'. The provider switch itself was never executed."
+      ],
+      "existingEvidenceSufficientAtDeadline": false,
+      "causeCorrections": []
+    },
+    {
+      "id": "PF-014",
+      "auditClassification": "INDETERMINATE",
+      "recommendedClassification": "INDETERMINATE",
+      "recommendedProcessStatus": null,
+      "verdict": "upheld",
+      "evidence": "Live specs (live-persistence.spec.js, live-graph.spec.js) import @playwright/test directly and could run with CAUSA_BASE_URL, but they never ran against the deployed site. Pages now serves b972cb4 (build-info commit b972cb446de5, builtAt 06:22:37Z). The audit has no credential. No execution establishes 'deployed application behavior', so D is correct. It is not B, because the harness exists.",
+      "unsupportedAssumptions": [],
+      "existingEvidenceSufficientAtDeadline": false,
+      "causeCorrections": []
+    },
+    {
+      "id": "PF-015",
+      "auditClassification": "PARTIALLY_IMPLEMENTED",
+      "recommendedClassification": "PARTIALLY_IMPLEMENTED",
+      "recommendedProcessStatus": null,
+      "verdict": "upheld",
+      "evidence": "The gap is real and confirmed. kemiller2002/causa-data is public (an anonymous API read returns visibility 'public'), yet live-graph.spec.js:9,18,57 requires CAUSA_GITHUB_TOKEN even for catalog reads, and Credential.create refuses a blank token (post-rehearsal characterisation test). The audit calls this an open limit, F-3. It is in fact a frozen owner decision: DEC-025 (OD-INDY-10) in 4b38213:requirements-compiled/v1/decision-registry.json says 'A credential for every connection; no anonymous mode' (Rehearsal 3 exhausted the anonymous quota). The plan kept PF-015-O1 without reconciling it. For O2, no scope check of the CI token exists in the workflow or tests (no grep hits for X-OAuth-Scopes or classic-token checks in the workflow or live specs), and indy-init preflight PRE-AUTH-02 is NOT_RUN ('nothing was sent'). DEC-025 also states the CI token has contents write, which contradicts O2's 'read-only'.",
+      "unsupportedAssumptions": [
+        "'O1 fails in product code' omits that the absence of an anonymous mode was owner-decided (DEC-025)."
+      ],
+      "existingEvidenceSufficientAtDeadline": false,
+      "causeCorrections": [
+        {
+          "obligation": "PF-015-O1",
+          "from": "1",
+          "to": "11 (secondary 1)",
+          "why": "The implementation is absent by frozen decision DEC-025, and the plan retains an obligation that contradicts it."
+        },
+        {
+          "obligation": "PF-015-O2",
+          "from": "2 (secondary 10)",
+          "to": "2 (secondary 11,10)",
+          "why": "DEC-025 grants the CI token contents write, which conflicts with 'read-only' in the plan."
+        }
+      ]
+    },
+    {
+      "id": "PF-019",
+      "auditClassification": "PROCESS_EVIDENCE_MISSING",
+      "recommendedClassification": "PROCESS_EVIDENCE_MISSING",
+      "recommendedProcessStatus": "UNKNOWN",
+      "verdict": "upheld",
+      "evidence": "Only CI layer timings exist. The agents' local test order is unrecorded. UNKNOWN is correct.",
+      "unsupportedAssumptions": [],
+      "existingEvidenceSufficientAtDeadline": false,
+      "causeCorrections": []
+    },
+    {
+      "id": "UI-011",
+      "auditClassification": "PARTIALLY_IMPLEMENTED",
+      "recommendedClassification": "PARTIALLY_IMPLEMENTED",
+      "recommendedProcessStatus": null,
+      "verdict": "upheld",
+      "evidence": "ui-probe.json (measuredAtUtc 14:43Z, site 127.0.0.1:4922 test build of 1b9fb56). After a command re-render, focus and viewport position are kept (313.125 px before and after). After back navigation, scrollY is restored (1442) but focusAfterBack = 'body'. Focus loss on a transition is a demonstrated gap, and the probe ran the frozen candidate including Limen and Forma vendor code, so nothing vendored restores it. Coverage is one Chromium probe per transition type; WebKit and other transitions are unmeasured, so the gap could be wider.",
+      "unsupportedAssumptions": [],
+      "existingEvidenceSufficientAtDeadline": false,
+      "causeCorrections": [
+        {
+          "obligation": "UI-011-O4",
+          "from": "4 (secondary 1)",
+          "to": "1 (secondary 4)",
+          "why": "The audit classifies the requirement B because the implementation is incomplete, so a sufficient test would FAIL. The audit already uses 1 for that situation (UI-031-O5, AR-011-O2)."
+        }
+      ]
+    },
+    {
+      "id": "UI-015",
+      "auditClassification": "INDETERMINATE",
+      "recommendedClassification": "INDETERMINATE",
+      "recommendedProcessStatus": null,
+      "verdict": "upheld",
+      "evidence": "O3 needs the 'deployed exact SHA'. pw-deployed.log (now complete: 82 passed, 4 failed) ran against b972cb4 through a localhost proxy, not 1b9fb56, and the deployed bytes were never shown to equal the candidate's build (see AR-011). The 3 evidence-screens failures come from comparing local dist/evidence/proof.json with the deployed one ('Expected 3 proven ... Received 277 proven'), a harness artifact. O2 is an aggregate. I spot-checked 'timeline ordering', which the audit's list omits: it is covered by history.spec.js:22 and shell.spec.js:293. D is right.",
+      "unsupportedAssumptions": [
+        "The testRef cites indy-init post-rehearsal-evidence/browser-deployed-suite.txt with result 'see file'. That file did not exist at review time; only scratchpad/pw-deployed.log does."
+      ],
+      "existingEvidenceSufficientAtDeadline": false,
+      "causeCorrections": []
+    },
+    {
+      "id": "UI-016",
+      "auditClassification": "PARTIALLY_IMPLEMENTED",
+      "recommendedClassification": "PARTIALLY_IMPLEMENTED",
+      "recommendedProcessStatus": null,
+      "verdict": "upheld",
+      "evidence": "ui-probe.json, 8 views: 0 text runs below the required ratio. Borders: div.causa-attention 1.95, p.causa-report__incomplete 1.95, li.causa-item--hypothesis 2.17, li.causa-item--blocker 2.17, all below 3:1. The probe did not measure inside the forma-workflow iframe or focus-ring contrast, so the non-text gap may be larger, not smaller. O15: screenshots.json names sha 1b9fb56873fe and holds four sizes (desktop, iPad portrait and landscape, mobile 390x844), unbound, with no independent visual review record.",
+      "unsupportedAssumptions": [],
+      "existingEvidenceSufficientAtDeadline": false,
+      "causeCorrections": [
+        {
+          "obligation": "UI-016-O11",
+          "from": "4 (secondary 1)",
+          "to": "1 (secondary 4,10)",
+          "why": "Measured amber indicators fail 3:1, so a sufficient test would fail. Whether they are 'relevant indicators' is an owner or accessibility decision (10)."
+        }
+      ]
+    },
+    {
+      "id": "UI-021",
+      "auditClassification": "PROCESS_EVIDENCE_MISSING",
+      "recommendedClassification": "PROCESS_EVIDENCE_MISSING",
+      "recommendedProcessStatus": "PERFORMED_EVIDENCE_INADEQUATE",
+      "verdict": "upheld",
+      "evidence": "Attribution exists, but the audit itself says it was 'reconciled after the fact' (58 work.attribution.reconciled events). The preflight 'approvedExclusions' lives in indy-init, pre-run and unbound. UI-021 freshness is FP-DETERMINISTIC-INPUT-DIGEST, bound to the candidate commit, the deployed SHA and the Percepta release. Neither artifact carries the run_id or source_sha the evidence contract requires. 'Sufficient' therefore contradicts the audit's own investigation.",
+      "unsupportedAssumptions": [
+        "That post-hoc reconciled attribution plus a pre-run preflight record would have been admissible."
+      ],
+      "existingEvidenceSufficientAtDeadline": false,
+      "causeCorrections": []
+    },
+    {
+      "id": "UI-030",
+      "auditClassification": "PROCESS_EVIDENCE_MISSING",
+      "recommendedClassification": "PROCESS_EVIDENCE_MISSING",
+      "recommendedProcessStatus": "PERFORMED_EVIDENCE_INADEQUATE",
+      "verdict": "upheld",
+      "evidence": "traceability.json records requirement ids, tests and the SHA. The reviews name fbe4d87, be01851 and 543ddc2, never 1b9fb56, and their independence is unestablished (AR-008). Secondary cause 7 (bound to the wrong candidate) is apt.",
+      "unsupportedAssumptions": [
+        "That the reviews were independent."
+      ],
+      "existingEvidenceSufficientAtDeadline": false,
+      "causeCorrections": []
+    },
+    {
+      "id": "UI-031",
+      "auditClassification": "PARTIALLY_IMPLEMENTED",
+      "recommendedClassification": "PARTIALLY_IMPLEMENTED",
+      "recommendedProcessStatus": null,
+      "verdict": "upheld",
+      "evidence": "O1-O4 PASS. O5's role or access control is absent, and the credential clause is met (SyncAppTests.fs:361). B at requirement level is correct. Whether a static single-user page has 'sensitive operational information' needing roles is an owner decision, as the audit says.",
+      "unsupportedAssumptions": [],
+      "existingEvidenceSufficientAtDeadline": false,
+      "causeCorrections": []
+    },
+    {
+      "id": "UI-040",
+      "auditClassification": "PROCESS_EVIDENCE_MISSING",
+      "recommendedClassification": "PROCESS_EVIDENCE_MISSING",
+      "recommendedProcessStatus": "PERFORMED_EVIDENCE_INADEQUATE",
+      "verdict": "upheld",
+      "evidence": "The inbox document was committed during the run (2a15e6b, 20:03:41Z), so the process demonstrably happened. UI-040 freshness is FP-LIVE-PER-COMMIT ('Evidence comes from a live provider or deployed-site run of the exact candidate source commit'). An inbox markdown file and a pre-run indy-init preflight record are not that kind of evidence, so the 'sufficient' rating fails.",
+      "unsupportedAssumptions": [
+        "That repository documents satisfy a live-per-commit freshness policy."
+      ],
+      "existingEvidenceSufficientAtDeadline": false,
+      "causeCorrections": []
+    },
+    {
+      "id": "VER-001",
+      "auditClassification": "PROCESS_EVIDENCE_MISSING",
+      "recommendedClassification": "PROCESS_EVIDENCE_MISSING",
+      "recommendedProcessStatus": "UNKNOWN",
+      "verdict": "downgrade",
+      "evidence": "O1 and O2 have artifacts (PRE-DEP-01 PASS: echelon-current 1.29.0 approved; acceptance/stack/pin.json). For O3 the audit itself finds 'no per-system owner and release-channel discovery record, apart from forma-workflow'. Whether discovery happened for the other systems is unestablished, as for AR-005, which the audit rated UNKNOWN on the same kind of evidence. 'Newest at lock time' rests on registry approval, not on a recorded comparison.",
+      "unsupportedAssumptions": [
+        "That discovery was performed for systems other than forma-workflow."
+      ],
+      "existingEvidenceSufficientAtDeadline": false,
+      "causeCorrections": []
+    },
+    {
+      "id": "VER-002",
+      "auditClassification": "PROCESS_EVIDENCE_MISSING",
+      "recommendedClassification": "PROCESS_EVIDENCE_MISSING",
+      "recommendedProcessStatus": "PERFORMED_EVIDENCE_INADEQUATE",
+      "verdict": "upheld",
+      "evidence": "preflight-run-r5-local.json executedAt 2026-10-27T19:51:18Z, before freeze commit 4b38213 (19:52:17Z). The query was performed, though agent-run and local. The rationale for 1.29.0 rests on an agent-transcribed chat instruction.",
+      "unsupportedAssumptions": [
+        "The owner's 'go ahead and update it' is agent-transcribed."
+      ],
+      "existingEvidenceSufficientAtDeadline": false,
+      "causeCorrections": []
+    },
+    {
+      "id": "VER-003",
+      "auditClassification": "PROCESS_EVIDENCE_MISSING",
+      "recommendedClassification": "PROCESS_EVIDENCE_MISSING",
+      "recommendedProcessStatus": "UNKNOWN",
+      "verdict": "downgrade",
+      "evidence": "O1 is observable (lock-gate.json PASS). O2 needs an 'authorized exception'. DF-CAUSA-2026-0001 exists, but the authorization is attested only by the agent's transcription of chat, as for AR-024. The authorization event is unestablished.",
+      "unsupportedAssumptions": [
+        "That the forma-workflow 1.1.0 exception was owner-authorized."
+      ],
+      "existingEvidenceSufficientAtDeadline": false,
+      "causeCorrections": []
+    },
+    {
+      "id": "VER-004",
+      "auditClassification": "PROCESS_EVIDENCE_MISSING",
+      "recommendedClassification": "PROCESS_EVIDENCE_MISSING",
+      "recommendedProcessStatus": "PERFORMED_EVIDENCE_INADEQUATE",
+      "verdict": "upheld",
+      "evidence": "The re-resolution to 1.29.0 before the run is recorded (preflight, freeze commit 4b38213), so PERFORMED_EVIDENCE_INADEQUATE stands. 'Sufficient' does not. The record lives in indy-init, has no run_id or source_sha (evidence contract mustMatch), and FP-DETERMINISTIC-INPUT-DIGEST reuse requires Dokimos 'Reusable:true' with a matching digest within the run, which this record does not have.",
+      "unsupportedAssumptions": [
+        "That a pre-run, out-of-bundle preflight record would have been admissible."
+      ],
+      "existingEvidenceSufficientAtDeadline": false,
+      "causeCorrections": []
+    },
+    {
+      "id": "VER-010",
+      "auditClassification": "PROCESS_EVIDENCE_MISSING",
+      "recommendedClassification": "PROCESS_EVIDENCE_MISSING",
+      "recommendedProcessStatus": "UNKNOWN",
+      "verdict": "downgrade",
+      "evidence": "The audit's own investigation says 'No reconciliation record and no record of Praxis-path routing during the run exist'. That cannot support PERFORMED_EVIDENCE_INADEQUATE. O1 was partly performed by the ledger (VER-005..009 PASS; VER-001..004 NOT_RUN with no exclusion). O2 (routing) has no evidence either way, and the audit rates the identical question for AR-017 UNKNOWN.",
+      "unsupportedAssumptions": [
+        "That the reconciliation or routing process was performed."
+      ],
+      "existingEvidenceSufficientAtDeadline": false,
+      "causeCorrections": []
+    },
+    {
+      "id": "WDL-014",
+      "auditClassification": "IMPLEMENTED_VERIFICATION_MISSING",
+      "recommendedClassification": "IMPLEMENTED_VERIFICATION_MISSING",
+      "recommendedProcessStatus": null,
+      "verdict": "upheld",
+      "evidence": "Upheld with caveats now that pw-deployed.log has completed (82 passed, 4 failed). App-level invocation passed against the deployed site: shell.spec.js:258 'renders in the real forma-workflow frame' (line 60 of the log). The pinned version and integrity were checked (graph-layout.spec.js:171-192: version, lock integrity, licence), and the graph accessibility specs passed (graph-layout.spec.js:73, :95). Caveats. (a) Most graph-layout specs bypass the application: renderGraph (support/graph-harness.js:7-21) loads vendor/forma-workflow/frame.html directly, so they prove the deployed site serves the vendored frame, not that the app invokes it. Only shell.spec.js:258 proves invocation. (b) The deployed build is b972cb4, not the candidate's deployment. (c) The 4 failures (evidence-screens x3 harness artifact, Percepta CLI missing) mean 'passes deployed-browser tests' is true only for the graph-relevant subset. (d) The matrix cites browser-deployed-suite.txt with 'see file' and the claim 'deployed post-rehearsal at b972cb4' before any such file existed. Publish pw-deployed.log as that file, or the classification falls to INDETERMINATE.",
+      "unsupportedAssumptions": [
+        "At authoring time the matrix asserted a deployed post-rehearsal result that was not yet recorded."
+      ],
+      "existingEvidenceSufficientAtDeadline": false,
+      "causeCorrections": []
+    }
+  ],
+  "generalFindings": [
+    "Integrity: all 102 obligation texts in matrix-pre.json equal the frozen plan VP-e77a2134e1b0 (4b38213), and all 49 NOT_RUN statuses equal the frozen traceability.json. Note: final.json names the curated plan VP-5d1202ddec1e (indy-init cf328bb) while traceability.json uses VP-e77a2134e1b0; the matrix follows the latter.",
+    "Agent statements used as verification: all 284 agent commits in the rehearsal repository are authored 'Claude', and every one carrying a session trailer (203) names session_01G1iECdHZXLR6xBfMivMsx3, reviews included. 'Independent reviewer', 'T33 reviewer closed F-1/DCT-LIVE-A', 'owner decided in chat', 'two container restarts' and 'bootstrap without hand workaround' all rest on agent-authored text. None of the five A classifications strictly depends on them (they rest on CI and post-rehearsal tests), but AR-008, AR-024, VER-003, AR-015 and EXT-DATA-006's narrative do.",
+    "deployed-compare.tsv is mis-measured: 193 of its 198 DIFF rows carry the GitHub Pages 404 body hash b620507312c5e975..., confirmed by fetching a missing URL. The comparison requested the local rebuild's fingerprinted file names from a site built separately (b972cb4, 06:22Z), so it shows a non-deterministic or different build, not 198 changed artifacts. Any matrix text citing '198 of 263 artifacts changed' (AR-011) should be restated.",
+    "Frozen decision DEC-025 (OD-INDY-10: no anonymous mode; permission fields advisory; CI token has contents write) bears on EXT-DATA-005-O1, EXT-DATA-006-O2, PF-015-O1 and PF-015-O2, and the matrix never cites it. The plan kept obligations that contradict it, which is a plan-correction item.",
+    "Pre-run and agent-local evidence (indy-init preflight-run-r5-local.json, kickoff preflight-record.json) carries no run_id or source_sha, so under the evidence contract's mustMatch it cannot be admissible run evidence. All six 'existingEvidenceAtDeadline: sufficient' claims were checked: only EXT-DATA-006 holds (CI results from run 40620099844 at 1b9fb56, live job in the same run, missing only the binding). AR-020, AR-023, UI-021, UI-040 and VER-004 should be 'insufficient'.",
+    "Primary-cause convention is inconsistent. Where the audit itself finds the implementation incomplete (B), it sometimes records 4 (insufficient assertions: UI-011-O4, UI-016-O11, EXT-DATA-005-O1) and sometimes 1 (UI-031-O5, AR-011-O2, PF-015-O1). If the implementation is incomplete, a sufficient test would fail, so the primary cause should be 1 and 4 secondary.",
+    "Re-execution: the audit's 13 post-rehearsal tests re-ran green against r5-wt at 1b9fb56873fe (clean tree). They are well constructed (non-vacuity control, model-equality assertions), but they cover only what they assert: no branch or repository permission check, and no provider (fixture to GitHub) switch.",
+    "Several matrix testRefs say 'result: see file' for files absent from indy-init docs/rehearsal-005-implementation-audit/post-rehearsal-evidence at review time (browser-deployed-suite.txt). A matrix row must not assert a result before its evidence exists."
+  ]
+}
