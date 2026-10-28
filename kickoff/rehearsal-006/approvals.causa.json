@@ -1,0 +1,45 @@
+{
+  "schema": "causa.requirements-approvals/1",
+  "baseline_sha256": "40599abe92724dae6796ee0d6a9bf5711c4db882fc79c77b38a43d0f0960befd",
+  "description": "Rehearsal 6 scope changes to baseline BL-CAUSA-INDY-INIT-856157a78d47 (requirements/causa-requirements-baseline-r6.json). Each change applies one owner decision in kickoff/rehearsal-006/owner-decisions.json. Every change below was transcribed by an agent on the owner's instruction; the owner did not edit this file. Under RDP-003 they take effect only when the owner merges the pull request that adds this file.",
+  "approvals": [
+    {
+      "id": "APR-R6-003",
+      "decision": "DEC-R6-003",
+      "authority": { "kind": "operator", "id": "kemiller2002" },
+      "provenance": {
+        "recordedBy": "agent (Claude Code), on the owner's instruction",
+        "ownerWords": "Do what you recommend to get it started",
+        "date": "2026-10-28",
+        "effective": "on the owner's merge of the pull request that adds this file (RDP-003)"
+      },
+      "changes": [
+        {
+          "action": "amend",
+          "obligation_id": "UI-031-O5",
+          "criterion": "Never expose credentials. Application-level role management does not apply to Causa's approved single-user scope. Credential protection, authorization of every repository operation against the provider's actual permissions, workspace data isolation and secure handling of operational information still apply and must be verified.",
+          "rationale": "DEC-R6-003, option A. Causa is a single-user browser application with no user roles, so a role model would be invented scope. The obligation's credential clause is unchanged, and authentication, authorization and isolation are kept explicitly, because a single-user application is not exempt from them."
+        }
+      ]
+    },
+    {
+      "id": "APR-R6-004",
+      "decision": "DEC-R6-004",
+      "authority": { "kind": "operator", "id": "kemiller2002" },
+      "provenance": {
+        "recordedBy": "agent (Claude Code), on the owner's instruction",
+        "ownerWords": "Do what you recommend to get it started",
+        "date": "2026-10-28",
+        "effective": "on the owner's merge of the pull request that adds this file (RDP-003)"
+      },
+      "changes": [
+        {
+          "action": "amend",
+          "obligation_id": "AR-019-O3",
+          "criterion": "Original Rehearsal 3 must yield an authoritative non-accepting verdict (INVALID, FAIL or BLOCKED), and the report must state the exact verdict and its diagnostic classification without merging INVALID, FAIL and BLOCKED into one outcome; Rehearsal 2 candidate 45644a7 should yield ACCEPTED only if its actual ledger and evidence meet the frozen contract.",
+          "rationale": "DEC-R6-004, option A. The safety property is that the original Rehearsal 3 is never accepted. The verifier refuses it as INVALID or FAIL, which are stronger refusals than BLOCKED. AR-007-O2 and AR-018-O1, which keep the verdict categories distinct, are unchanged."
+        }
+      ]
+    }
+  ]
+}
