@@ -1,35 +1,35 @@
 {
   "schema": "ordo.execution/1",
-  "executionId": "EXE-20261028T065146828Z-79ab83ec",
-  "workItem": "WI-0002",
+  "executionId": "EXE-20261028T072039072Z-7a55bbed",
+  "workItem": "WI-0001",
   "actor": {
-    "id": "example/review-agent",
+    "id": "example/implementing-agent",
     "kind": "agent",
     "provider": "example",
     "model": null,
-    "runtime": "reviewer"
+    "runtime": "implementer"
   },
-  "role": "review",
+  "role": "implementation",
   "capabilities": [
-    "evidence.record",
-    "review.inspect",
-    "review.findings",
-    "review.request-rework",
-    "review.accept",
-    "review.reject"
-  ],
-  "prohibitions": [
     "implementation.modify",
     "implementation.modify-tests",
+    "evaluator.invoke",
+    "verification.observe",
+    "evidence.record"
+  ],
+  "prohibitions": [
+    "specification.create-promise",
+    "specification.approve",
     "acceptance.modify",
     "evaluator.modify",
-    "scope.expand"
+    "verification.verdict",
+    "review.accept"
   ],
-  "baselineRevision": "4b915da0cfd0ee06291f91c2b6d7271b84a8add1",
+  "baselineRevision": "4e9f5a306ac6867bbe8a214ace13cc68f0e809ca",
   "candidateRevision": null,
-  "workspace": "checkout:EXE-20261028T065146828Z-79ab83ec",
+  "workspace": "checkout:EXE-20261028T072039072Z-7a55bbed",
   "workspaceBinding": {
-    "id": "checkout:EXE-20261028T065146828Z-79ab83ec",
+    "id": "checkout:EXE-20261028T072039072Z-7a55bbed",
     "branch": "main",
     "path": null,
     "mechanism": "working-directory"
@@ -49,7 +49,7 @@
   "evaluator": null,
   "humanOnlyTransitions": [],
   "parentExecution": null,
-  "startedAt": "2026-10-28T06:51:46.956Z",
+  "startedAt": "2026-10-28T07:20:39.214Z",
   "state": "active",
   "stateReason": null,
   "origin": {

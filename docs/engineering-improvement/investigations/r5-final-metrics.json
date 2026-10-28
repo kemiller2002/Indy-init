@@ -1,0 +1,534 @@
+{
+  "schema": "echelon.r5-final-metrics/1",
+  "generatedUtc": "2026-10-28",
+  "repository": "kemiller2002/indy-init-rehearsal-005",
+  "clone": "/home/user/kemiller2002/indy-init-rehearsal-005",
+  "mainRef": "b972cb446de543018a65d8726cae6f8283821791",
+  "window": {
+    "startUtc": "2026-10-27T20:08:38Z",
+    "finalVerdictUtc": "2026-10-28T02:41:07Z",
+    "deadlineUtc": "2026-10-28T03:08:38Z",
+    "elapsedMinutes": 392,
+    "finalRun": 40620099844,
+    "candidateSha": "1b9fb56873fe7a98dffd5172066d909449c17eae"
+  },
+  "ciApiStatus": {
+    "available": false,
+    "reason": "GitHub Actions API not reachable from this session: mcp__github__actions_list returned 'Access denied: repository ... is not configured for this session'; anonymous api.github.com via the session proxy returned 403 ('GitHub access to this repository is not enabled for this session'); gh CLI token invalid; add_repo(access:push) to attach API credentials was denied by the auto-mode permission classifier. add_repo(access:read) only grants git reads."
+  },
+  "m1_ciRunsByWorkflowConclusion": {
+    "status": "UNAVAILABLE",
+    "reason": "GitHub Actions API not reachable from this session: mcp__github__actions_list returned 'Access denied: repository ... is not configured for this session'; anonymous api.github.com via the session proxy returned 403 ('GitHub access to this repository is not enabled for this session'); gh CLI token invalid; add_repo(access:push) to attach API credentials was denied by the auto-mode permission classifier. add_repo(access:read) only grants git reads.",
+    "partialFromRepository": {
+      "method": "run IDs quoted in commit messages, acceptance/reviews/*.md, evidence/ and .ros/events (grep for 11-digit run IDs 405xxxxxxxx-406xxxxxxxx); conclusions only where the text states them. Not a census.",
+      "distinctRunIdsQuotedInRepo": 17,
+      "buildAndTestRunsQuotedAsFailed": [
+        {
+          "run": 40586028131,
+          "source": "4a6aeff body",
+          "failure": "WebKit boot test page.goto timeout"
+        },
+        {
+          "run": 40599949953,
+          "source": "2e7599e body",
+          "failure": "browser specs ERR_CONNECTION_REFUSED on hardcoded port 4322"
+        },
+        {
+          "run": 40613071150,
+          "source": "ff12cbf body",
+          "failure": "23 ux tests ERR_CONNECTION_REFUSED on 4322"
+        },
+        {
+          "run": 40613496969,
+          "source": "ff12cbf body",
+          "failure": "23 ux tests ERR_CONNECTION_REFUSED on 4322"
+        },
+        {
+          "run": 40615430960,
+          "source": "acceptance/reviews/R5-final-review.md",
+          "failure": "run finished with failure because of the ux.spec port (live job passed)"
+        }
+      ],
+      "buildAndTestRunsQuotedAsAllGreen": [
+        {
+          "run": 40610187284,
+          "source": "R5-independent-review.md",
+          "note": "completed success, all 16 jobs incl. deploy, deployed-smoke, acceptance"
+        },
+        {
+          "run": 40620099844,
+          "source": "evidence/acceptance/index.json + layer-timings.json",
+          "note": "final candidate; every job success"
+        }
+      ]
+    }
+  },
+  "m2_ciExecutionMinutes": {
+    "status": "UNAVAILABLE for the window (all runs)",
+    "reason": "GitHub Actions API not reachable from this session: mcp__github__actions_list returned 'Access denied: repository ... is not configured for this session'; anonymous api.github.com via the session proxy returned 403 ('GitHub access to this repository is not enabled for this session'); gh CLI token invalid; add_repo(access:push) to attach API credentials was denied by the auto-mode permission classifier. add_repo(access:read) only grants git reads.",
+    "partialFinalRunOnly": {
+      "run": "40620099844 attempt 1",
+      "source": "evidence/acceptance/run-40620099844-1b9fb56/gate-records/layer-timings.json (written by the acceptance job from the Actions jobs API, actions: read)",
+      "jobsRecorded": 14,
+      "jobSecondsSum": 1467,
+      "jobMinutesSum": 24.45,
+      "excluded": "the acceptance job itself (it writes the file) is not listed; its duration is UNAVAILABLE",
+      "firstJobStart": "2026-10-28T02:23:56Z",
+      "lastRecordedJobEnd": "2026-10-28T02:39:37Z",
+      "wallClockFirstJobToLastRecordedJob_s": 941,
+      "wallClockFirstJobToFinalVerdict_s": 1031,
+      "browserJobShareOfJobSeconds": 0.481,
+      "jobs": [
+        {
+          "name": "wasm-smoke",
+          "layer": "wasm",
+          "conclusion": "success",
+          "startedAt": "2026-10-28T02:23:56Z",
+          "completedAt": "2026-10-28T02:25:01Z",
+          "seconds": 65
+        },
+        {
+          "name": "preservation-gate",
+          "layer": "requirements",
+          "conclusion": "success",
+          "startedAt": "2026-10-28T02:23:56Z",
+          "completedAt": "2026-10-28T02:24:22Z",
+          "seconds": 26
+        },
+        {
+          "name": "preservation-adversarial",
+          "layer": "requirements",
+          "conclusion": "success",
+          "startedAt": "2026-10-28T02:23:56Z",
+          "completedAt": "2026-10-28T02:24:29Z",
+          "seconds": 33
+        },
+        {
+          "name": "reuse",
+          "layer": "reuse",
+          "conclusion": "success",
+          "startedAt": "2026-10-28T02:23:56Z",
+          "completedAt": "2026-10-28T02:24:24Z",
+          "seconds": 28
+        },
+        {
+          "name": "provider-conformance",
+          "layer": "provider-conformance",
+          "conclusion": "success",
+          "startedAt": "2026-10-28T02:23:56Z",
+          "completedAt": "2026-10-28T02:24:54Z",
+          "seconds": 58
+        },
+        {
+          "name": "site",
+          "layer": "build",
+          "conclusion": "success",
+          "startedAt": "2026-10-28T02:24:27Z",
+          "completedAt": "2026-10-28T02:26:35Z",
+          "seconds": 128
+        },
+        {
+          "name": "lock-gate",
+          "layer": "dependencies",
+          "conclusion": "success",
+          "startedAt": "2026-10-28T02:24:27Z",
+          "completedAt": "2026-10-28T02:25:32Z",
+          "seconds": 65
+        },
+        {
+          "name": "core",
+          "layer": "domain",
+          "conclusion": "success",
+          "startedAt": "2026-10-28T02:24:27Z",
+          "completedAt": "2026-10-28T02:25:29Z",
+          "seconds": 62
+        },
+        {
+          "name": "browser",
+          "layer": "ui",
+          "conclusion": "success",
+          "startedAt": "2026-10-28T02:26:38Z",
+          "completedAt": "2026-10-28T02:38:23Z",
+          "seconds": 705
+        },
+        {
+          "name": "percepta",
+          "layer": "ui-contracts",
+          "conclusion": "success",
+          "startedAt": "2026-10-28T02:26:38Z",
+          "completedAt": "2026-10-28T02:28:44Z",
+          "seconds": 126
+        },
+        {
+          "name": "live",
+          "layer": "live-integration",
+          "conclusion": "success",
+          "startedAt": "2026-10-28T02:26:38Z",
+          "completedAt": "2026-10-28T02:28:23Z",
+          "seconds": 105
+        },
+        {
+          "name": "build-and-test",
+          "layer": "required-check",
+          "conclusion": "success",
+          "startedAt": "2026-10-28T02:38:25Z",
+          "completedAt": "2026-10-28T02:38:28Z",
+          "seconds": 3
+        },
+        {
+          "name": "deploy",
+          "layer": "deploy",
+          "conclusion": "success",
+          "startedAt": "2026-10-28T02:38:31Z",
+          "completedAt": "2026-10-28T02:38:45Z",
+          "seconds": 14
+        },
+        {
+          "name": "deployed-smoke",
+          "layer": "deployed",
+          "conclusion": "success",
+          "startedAt": "2026-10-28T02:38:48Z",
+          "completedAt": "2026-10-28T02:39:37Z",
+          "seconds": 49
+        }
+      ]
+    },
+    "otherWorkflows": "Echelon foundations and Praxis validation also trigger on push; no in-repo timing record exists for them."
+  },
+  "m3_repeatedBuilds": {
+    "status": "UNAVAILABLE",
+    "reason": "GitHub Actions API not reachable from this session: mcp__github__actions_list returned 'Access denied: repository ... is not configured for this session'; anonymous api.github.com via the session proxy returned 403 ('GitHub access to this repository is not enabled for this session'); gh CLI token invalid; add_repo(access:push) to attach API credentials was denied by the auto-mode permission classifier. add_repo(access:read) only grants git reads. run_attempt and head_sha per run are only in the API.",
+    "partial": "final run layer-timings.json records run '40620099844-1' (run_attempt 1). Two failing runs (40613071150, 40613496969) are quoted for the same ux.spec failure; whether they share a head_sha is not recorded in the repo."
+  },
+  "m4_failedBrowserTestRuns": {
+    "status": "UNAVAILABLE as a census",
+    "reason": "GitHub Actions API not reachable from this session: mcp__github__actions_list returned 'Access denied: repository ... is not configured for this session'; anonymous api.github.com via the session proxy returned 403 ('GitHub access to this repository is not enabled for this session'); gh CLI token invalid; add_repo(access:push) to attach API credentials was denied by the auto-mode permission classifier. add_repo(access:read) only grants git reads.",
+    "lowerBoundFromRepository": 5,
+    "runs": [
+      40586028131,
+      40599949953,
+      40613071150,
+      40613496969,
+      40615430960
+    ],
+    "method": "runs whose failure is stated in commit bodies or reviews to be in browser/ux Playwright specs; all 5 trace to test-harness issues (WebKit load wait x1, hardcoded test-site port x4), not product defects."
+  },
+  "m5_mergesAndIntegrationRepairs": {
+    "status": "MEASURED",
+    "source": "git, origin/main fetched with --depth=1000 (285 commits reachable, root 52e9a74 present, so history is complete)",
+    "windowFilter": "committer date in [start, finalVerdict]",
+    "commitsInWindow": 279,
+    "mergesInWindow": 92,
+    "nonMergesInWindow": 187,
+    "conflictedMerges": 17,
+    "conflictMethod": "git merge-tree --write-tree --name-only <p1> <p2> for every 2-parent merge (no octopus merges); exit 1 = conflicted",
+    "conflictedMergeList": [
+      {
+        "sha": "a3eead3",
+        "time": "2026-10-28T01:29:18+00:00",
+        "subject": "Merge r5/ux (over-tagging fixes) into main",
+        "files": [
+          "tests/browser/live-persistence.spec.js"
+        ]
+      },
+      {
+        "sha": "c42523b",
+        "time": "2026-10-28T00:55:31+00:00",
+        "subject": "Merge r5/ux (stream ux) into main",
+        "files": [
+          ".percepta/bindings.json"
+        ]
+      },
+      {
+        "sha": "5cd0f42",
+        "time": "2026-10-28T00:28:23+00:00",
+        "subject": "Merge remote-tracking branch 'origin/r5/core' into r5/ux",
+        "files": [
+          "src/app/EngineView.fs"
+        ]
+      },
+      {
+        "sha": "4c8f204",
+        "time": "2026-10-28T00:07:10+00:00",
+        "subject": "Merge remote-tracking branch 'origin/r5/shell' into r5/ux",
+        "files": [
+          ".percepta/bindings.json",
+          "src/app/Causa.App.fsproj",
+          "src/app/Shell.fs",
+          "src/app/View.fs"
+        ]
+      },
+      {
+        "sha": "e980ee4",
+        "time": "2026-10-28T00:05:58+00:00",
+        "subject": "Merge remote-tracking branch 'origin/main' into r5/ux",
+        "files": [
+          "src/kernel/causa.css",
+          "tests/browser/fixture-mode.spec.js",
+          "tests/browser/graph-navigation.spec.js"
+        ]
+      },
+      {
+        "sha": "dff3a4f",
+        "time": "2026-10-27T23:49:56+00:00",
+        "subject": "Merge origin/r5/core (bindings and graph work); keep main's test-port fixes",
+        "files": [
+          "tests/browser/fixture-mode.spec.js",
+          "tests/browser/graph-navigation.spec.js"
+        ]
+      },
+      {
+        "sha": "2ccb548",
+        "time": "2026-10-27T23:46:53+00:00",
+        "subject": "Merge remote-tracking branch 'origin/r5/core' into r5/ux",
+        "files": [
+          "src/app/Adapter.fs",
+          "src/app/EngineView.fs",
+          "src/app/TestState.fs",
+          "src/kernel/index.html",
+          "tests/Causa.App.Tests/GraphTests.fs"
+        ]
+      },
+      {
+        "sha": "70f58be",
+        "time": "2026-10-27T23:46:09+00:00",
+        "subject": "Merge remote-tracking branch 'origin/main' into r5/core",
+        "files": [
+          "tests/browser/fixture-mode.spec.js",
+          "tests/browser/graph-navigation.spec.js"
+        ]
+      },
+      {
+        "sha": "5968ba5",
+        "time": "2026-10-27T23:45:44+00:00",
+        "subject": "Merge remote-tracking branch 'origin/main' into r5/ux",
+        "files": [
+          "src/app/View.fs"
+        ]
+      },
+      {
+        "sha": "d23060f",
+        "time": "2026-10-27T23:28:12+00:00",
+        "subject": "Merge r5/persist into main (fixture-mode.spec.js resolved to r5/persist's version; port fix follows)",
+        "files": [
+          "tests/browser/fixture-mode.spec.js"
+        ]
+      },
+      {
+        "sha": "3858417",
+        "time": "2026-10-27T23:03:05+00:00",
+        "subject": "Merge origin/main: keep the per-area projection split; persist's data.fixture key lives in navKeys",
+        "files": [
+          "src/app/View.fs"
+        ]
+      },
+      {
+        "sha": "9927c91",
+        "time": "2026-10-27T22:56:35+00:00",
+        "subject": "Merge origin/r5/shell; ux: header/failure/ownership tests, timeline details label",
+        "files": [
+          "src/app/Shell.fs",
+          "src/kernel/causa.css"
+        ]
+      },
+      {
+        "sha": "80a0476",
+        "time": "2026-10-27T22:20:32+00:00",
+        "subject": "Merge origin/main and origin/r5/shell into r5/persist (keep shell's placement of the persistence inputs; data.fixture beside shell's connection fields)",
+        "files": [
+          "src/app/Adapter.fs",
+          "src/app/EnginePort.fs",
+          "src/app/View.fs"
+        ]
+      },
+      {
+        "sha": "6b1239e",
+        "time": "2026-10-27T22:03:42+00:00",
+        "subject": "Merge main (persist's DiscardLocal/ReloadRemote/Boot and ConnectionState); wire them in the shell",
+        "files": [
+          "src/app/Adapter.fs",
+          "src/app/EnginePort.fs"
+        ]
+      },
+      {
+        "sha": "85c9d68",
+        "time": "2026-10-27T22:03:07+00:00",
+        "subject": "Merge origin/main and origin/r5/shell into r5/persist (EnginePort/Adapter: persistence inputs alongside shell's AI inputs)",
+        "files": [
+          "src/app/Adapter.fs",
+          "src/app/EnginePort.fs"
+        ]
+      },
+      {
+        "sha": "826b01a",
+        "time": "2026-10-27T21:03:51+00:00",
+        "subject": "Merge r5/persist (stream persist) into main",
+        "files": [
+          "App.slnx"
+        ]
+      },
+      {
+        "sha": "7abed91",
+        "time": "2026-10-27T20:47:22+00:00",
+        "subject": "Merge r5/acc (stream acc: T11 stack lock gate and acceptance pipeline) into main",
+        "files": [
+          ".github/workflows/build-and-test.yml"
+        ]
+      }
+    ],
+    "conflictedMergesWhoseMessageMentionsResolution": 15,
+    "conflictFileHotspots": {
+      "src/app/Adapter.fs": 4,
+      "src/app/View.fs": 4,
+      "tests/browser/fixture-mode.spec.js": 4,
+      "src/app/EnginePort.fs": 3,
+      "tests/browser/graph-navigation.spec.js": 3,
+      ".percepta/bindings.json": 2,
+      "src/app/EngineView.fs": 2,
+      "src/app/Shell.fs": 2,
+      "src/kernel/causa.css": 2
+    },
+    "mergeTargets": {
+      "r5/persist": 14,
+      "HEAD": 23,
+      "main": 5,
+      "r5/ux": 11,
+      "r5/core": 14,
+      "r5/shell": 12,
+      "r5/acc": 7,
+      "other": 6
+    },
+    "mergesIntoMain": 28,
+    "mergesIntoStreams": 58,
+    "praxisReconcileCommits": 26,
+    "praxisCommitsAll": 30,
+    "reverts": 0,
+    "explicitIntegrationRepairCommits": [
+      {
+        "sha": "805b7a9",
+        "time": "2026-10-27T21:03:51Z",
+        "subject": "App.slnx: add the persistence projects alongside the app projects",
+        "repairs": "826b01a (merge message: 'App.slnx conflict resolved to main's side; the persistence projects are added ... in the next commit')"
+      },
+      {
+        "sha": "b6238ad",
+        "time": "2026-10-27T23:28:18Z",
+        "subject": "fixture-mode.spec.js: default test-site port matches playwright.config.js (4822)",
+        "repairs": "d23060f (merge subject: 'fixture-mode.spec.js resolved to r5/persist's version; port fix follows')"
+      }
+    ],
+    "repairMethod": "subjects/bodies searched for revert|merge|conflict|resolved|restore|follow; only commits that a merge message names as its follow-up are counted. Keyword hits on 'conflict' in the persistence domain (save-conflict feature work) are not repairs."
+  },
+  "m6_acceptanceEvidenceTime": {
+    "status": "MEASURED (git) / PARTIAL (CI)",
+    "gitMethod": "git log --no-merges origin/main -- acceptance/ evidence/ tools/acceptance/, committer date in window",
+    "combined": {
+      "countInWindow": 35,
+      "first": {
+        "sha": "7334318",
+        "time": "2026-10-27T20:13:38+00:00",
+        "subject": "R5 T+0: record the clock start; reconcile the bootstrap under ROS-INSTALL-3-22-0"
+      },
+      "last": {
+        "sha": "59ba814",
+        "time": "2026-10-28T02:12:36+00:00",
+        "subject": "R5 re-review at 543ddc2: R2-F1/R2-F2 fixes, DC-003 and DCT-LIVE-A closed, R3-F1/R3-F2"
+      },
+      "countAllHistory": 38,
+      "postWindow": [
+        {
+          "sha": "14bee79",
+          "time": "2026-10-28T06:16:27+00:00",
+          "subject": "Rehearsal 5 final results: verdict evidence of run 40620099844 (1b9fb56) and the final record"
+        }
+      ]
+    },
+    "acceptance": {
+      "countInWindow": 16,
+      "first": {
+        "sha": "822b130",
+        "time": "2026-10-27T20:24:47+00:00",
+        "subject": "T11 + acceptance: causa-acceptance tool (lock gate, VPO binding, ledger/evidence bundle, Dokimos reuse glue)"
+      },
+      "last": {
+        "sha": "59ba814",
+        "time": "2026-10-28T02:12:36+00:00",
+        "subject": "R5 re-review at 543ddc2: R2-F1/R2-F2 fixes, DC-003 and DCT-LIVE-A closed, R3-F1/R3-F2"
+      },
+      "countAllHistory": 16,
+      "postWindow": []
+    },
+    "evidence": {
+      "countInWindow": 3,
+      "first": {
+        "sha": "7334318",
+        "time": "2026-10-27T20:13:38+00:00",
+        "subject": "R5 T+0: record the clock start; reconcile the bootstrap under ROS-INSTALL-3-22-0"
+      },
+      "last": {
+        "sha": "6bc0e13",
+        "time": "2026-10-27T20:36:45+00:00",
+        "subject": "T11 gate: committed package-lock only, all host tools installed from the channel; first computed verdict recorded"
+      },
+      "countAllHistory": 6,
+      "postWindow": [
+        {
+          "sha": "14bee79",
+          "time": "2026-10-28T06:16:27+00:00",
+          "subject": "Rehearsal 5 final results: verdict evidence of run 40620099844 (1b9fb56) and the final record"
+        }
+      ]
+    },
+    "tools_acceptance": {
+      "countInWindow": 27,
+      "first": {
+        "sha": "822b130",
+        "time": "2026-10-27T20:24:47+00:00",
+        "subject": "T11 + acceptance: causa-acceptance tool (lock gate, VPO binding, ledger/evidence bundle, Dokimos reuse glue)"
+      },
+      "last": {
+        "sha": "ea06376",
+        "time": "2026-10-28T01:33:39+00:00",
+        "subject": "Pipeline test (AR-028): no browser spec hardcodes a host port, and every CAUSA_PORT / CAUSA_TEST_PORT default equals playwright.config.js"
+      },
+      "countAllHistory": 27,
+      "postWindow": []
+    },
+    "spanFirstToLastMinutes": 359.0,
+    "ciAcceptanceJobMinutes": {
+      "status": "UNAVAILABLE",
+      "reason": "GitHub Actions API not reachable from this session: mcp__github__actions_list returned 'Access denied: repository ... is not configured for this session'; anonymous api.github.com via the session proxy returned 403 ('GitHub access to this repository is not enabled for this session'); gh CLI token invalid; add_repo(access:push) to attach API credentials was denied by the auto-mode permission classifier. add_repo(access:read) only grants git reads. The final run's layer-timings.json omits the acceptance job. No job named verdict or traceability exists in build-and-test.yml; traceability/verdict are steps of the acceptance job."
+    }
+  },
+  "m7_timeToFirstWorkingApplication": {
+    "status": "UNAVAILABLE (exact); BOUNDED",
+    "reason": "GitHub Actions API not reachable from this session: mcp__github__actions_list returned 'Access denied: repository ... is not configured for this session'; anonymous api.github.com via the session proxy returned 403 ('GitHub access to this repository is not enabled for this session'); gh CLI token invalid; add_repo(access:push) to attach API credentials was denied by the auto-mode permission classifier. add_repo(access:read) only grants git reads. The first successful deployed-smoke job cannot be identified without the run list.",
+    "job": "build-and-test.yml job deployed-smoke (needs deploy; deploy runs only on push to main with all of build-and-test green). No start-smoke job exists.",
+    "lowerBound": {
+      "utc": "2026-10-27T20:47:22Z",
+      "tPlusMinutes": 38.7,
+      "basis": "deployed-smoke job first reached main in merge 7abed91 (introduced in 9aaa99a on r5/acc 20:29:47Z); no main run could deploy before it existed"
+    },
+    "earliestDocumentedDeploy": {
+      "utc": "2026-10-28T00:47:00Z",
+      "tPlusMinutes": 278.4,
+      "basis": "R5-independent-review.md: deployed version.json reported e086147 (run 40606127778) at 00:47Z; deployed-smoke result for that run not stated"
+    },
+    "upperBoundCIConfirmedDeployedSmoke": {
+      "utc": "2026-10-28T00:56:00Z",
+      "tPlusMinutes": 287.4,
+      "run": 40610187284,
+      "basis": "R5-independent-review.md: run completed success, all 16 jobs including deploy and deployed-smoke; version.json showed fbe4d87/run 40610187284 at 00:56Z"
+    },
+    "finalCandidateDeployedSmokeSuccess": {
+      "utc": "2026-10-28T02:39:37Z",
+      "tPlusMinutes": 391.0,
+      "run": 40620099844
+    }
+  },
+  "m8_agentTokensAndToolCalls": {
+    "status": "UNAVAILABLE (supported-unavailable)",
+    "source": ".ros/telemetry/executions/*.json (8 files: WI-0002..WI-0009)",
+    "finding": "Every file reports tokens.input, tokens.output, tokens.cache_read, tokens.cache_write, tool.calls, tool.failures, tool.duration_ms, time.model_ms, time.active_ms as 'supported-unavailable' ('runtime family can expose this metric, but no observation has been ingested'); tokens.total and all tool.* breakdowns 'unknown'. Per file: 14 supported-unavailable, 104 unknown, 20 derived. rawTelemetry is [] in all 8. Recorded metrics are git-derived only (baseline_dirty_files in all 8; wall/blocked time, commits, files and lines changed, tests added/modified only in the one finalized execution, WI-0002 20:14:10Z-20:20:45Z). 7 of 8 executions remain status 'active' (never finalized). model is null in identity."
+  }
+}

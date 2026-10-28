@@ -35,17 +35,18 @@ let private gapJson (g: Gap) =
 
 let private contract (o: Json) = field "acceptanceContract" o |> Option.defaultValue (JObj [])
 
-/// A process or owner binding must name a record kind the process verifier knows.
+/// A binding the verifiers can check: a process or owner binding names a known Praxis record kind (owner evidence
+/// only `praxis:owner-approval`), a Praxis id with kind `review` is only `praxis:independent-review`, and no other
+/// kind may use a Praxis id. The same rules compilation applies; the gate repeats them for a plan it is handed.
 let private validProducer (t: Json) =
+    let id = strOpt "id" t |> Option.defaultValue ""
+    let praxis = id.StartsWith(ProcessVerification.bindingPrefix, StringComparison.Ordinal)
+    let kind = if praxis then id.Substring ProcessVerification.bindingPrefix.Length else ""
     match strOpt "kind" t with
-    | Some "process"
-    | Some "owner" ->
-        match strOpt "id" t with
-        | Some id when id.StartsWith(ProcessVerification.bindingPrefix, StringComparison.Ordinal) ->
-            List.contains (id.Substring ProcessVerification.bindingPrefix.Length) ProcessVerification.recordKinds
-            && (strOpt "kind" t <> Some "owner" || id = ProcessVerification.bindingPrefix + "owner-approval")
-        | _ -> false
-    | _ -> true
+    | Some "process" -> praxis && List.contains kind ProcessVerification.recordKinds
+    | Some "owner" -> kind = "owner-approval"
+    | Some "review" when praxis -> kind = "independent-review"
+    | _ -> not praxis
 
 /// Every unresolved (obligation, category) of the plan's mandatory scope.
 let gaps (plan: Json) : Gap list =
@@ -98,9 +99,22 @@ let private permitted (rules: Json option) (g: Gap) =
     |> Option.defaultValue []
     |> List.tryFind (fun p -> strOpt "obligation" p = Some g.Obligation && strOpt "category" p = Some g.Category)
 
-let assess (plan: Json) (rules: Json option) (rulesSha256: string option) : Json =
+/// `expectedDigest` is the plan digest frozen at kickoff, `rules` the frozen readiness rules with their actual and
+/// frozen SHA-256. The plan must recompute to the frozen digest, and the rules must hash to theirs: a gate that read
+/// an edited plan or self-supplied rules would not be a gate.
+let assess (plan: Json) (expectedDigest: string) (rules: (Json * string * string) option) : Json =
     let all = gaps plan
-    let problems = ruleProblems rules all
+    let recomputed = VerificationPlan.digestOf plan
+    let rulesDocument = rules |> Option.map (fun (r, _, _) -> r)
+    let rulesSha256 = rules |> Option.map (fun (_, sha, _) -> sha)
+    let problems =
+        [ if recomputed <> expectedDigest then yield sprintf "the plan recomputes to digest %s, not the frozen %s" recomputed expectedDigest
+          if field "planIdentity" plan |> Option.bind (strOpt "digest") <> Some recomputed then yield "the plan's planIdentity does not match its content"
+          match rules with
+          | Some(_, actual, frozen) when actual <> frozen -> yield sprintf "the readiness rules hash to %s, not the frozen %s" actual frozen
+          | _ -> ()
+          yield! ruleProblems rulesDocument all ]
+    let rules = rulesDocument
     let permits = all |> List.choose (fun g -> permitted rules g |> Option.map (fun p -> g, p))
     let unresolved = all |> List.filter (fun g -> (permitted rules g).IsNone)
     let checks =
@@ -113,7 +127,7 @@ let assess (plan: Json) (rules: Json option) (rulesSha256: string option) : Json
 
     JObj
         [ "schema", JStr schemaId
-          "plan", JObj [ "planId", jopt JStr (strOpt "planId" identity); "digest", jopt JStr (strOpt "digest" identity) ]
+          "plan", JObj [ "planId", jopt JStr (strOpt "planId" identity); "digest", JStr recomputed ]
           "rules", JObj [ "sha256", jopt JStr rulesSha256 ]
           "verdict", JStr(if problems.IsEmpty && unresolved.IsEmpty then "READY" else "BLOCKED")
           "rule", JStr "Implementation may begin only when every mandatory obligation names, for each required evidence category, a bound application test or a praxis:<record kind> producer, or the rehearsal's frozen readiness rules permit the gap with a reason and a decision. A permitted gap is still unverified at acceptance."

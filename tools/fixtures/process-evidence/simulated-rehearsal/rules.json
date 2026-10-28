@@ -2,7 +2,9 @@
   "schema": "indy-init.process-evidence-rules/1",
   "description": "Frozen process-evidence rules of the simulated rehearsal: who may act, who the owner is, and which execution roles are review roles.",
   "owners": [ { "login": "kemiller2002", "actorIds": ["kemiller2002"] } ],
-  "agents": ["example/implementing-agent", "example/review-agent"],
+  "repository": "simulated-rehearsal",
+  "agents": ["example/implementing-agent"],
+  "reviewers": ["example/review-agent"],
   "automation": ["github/github-actions"],
   "reviewRoles": ["review"]
 }

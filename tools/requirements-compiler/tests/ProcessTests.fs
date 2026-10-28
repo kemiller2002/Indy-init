@@ -17,7 +17,11 @@ type Fixture =
       Candidate: string
       Ancestry: Set<string>
       /// The CI run that observed the attestations, as the acceptance job passes it; never read from a mutated file.
-      TrustedRunId: string }
+      TrustedRunId: string
+      /// The frozen plan digest when a control edits the plan; None pins the plan under test as it is.
+      PlanPin: string option
+      /// The frozen rules hash.
+      RulesPin: string }
 
 let fixtureDir (source: string) = Path.Combine(source, "tools", "fixtures", "process-evidence", "simulated-rehearsal")
 
@@ -34,10 +38,16 @@ let load (dir: string) : Fixture =
       Attestations = parseFile (Path.Combine(dir, "attestations.json"))
       Candidate = (lines "candidate.txt").[0]
       Ancestry = lines "ancestry.txt" |> Set.ofArray
-      TrustedRunId = parseFile (Path.Combine(dir, "attestations.json")) |> str "runId" }
+      TrustedRunId = parseFile (Path.Combine(dir, "attestations.json")) |> str "runId"
+      PlanPin = None
+      RulesPin = Git.sha256Hex rules }
 
 let inputs (plan: Json) (f: Fixture) : ProcessVerification.Inputs =
     { Plan = plan
+      // The frozen pins are the committed plan's own digest and the fixture rules' hash; a control that edits the
+      // plan or the rules therefore fails the pin, exactly as an edited copy would at acceptance.
+      ExpectedPlanDigest = f.PlanPin |> Option.defaultValue (VerificationPlan.digestOf plan)
+      ExpectedRulesSha256 = f.RulesPin
       Events = f.Events
       Executions = f.Executions
       Rules = f.Rules
@@ -66,39 +76,67 @@ let private otherSha = String.replicate 40 "e"
 let private executionOfKind (k: string) (f: Fixture) =
     f.Events |> List.find (isKind k) |> field "observed" |> Option.bind (strOpt "execution") |> Option.defaultValue ""
 
-/// (name, the diagnostic it must produce, the mutated fixture)
-let controls (f: Fixture) : (string * string * Fixture) list =
+let private append (p: Json -> bool) (g: Json -> Json) (f: Fixture) = { f with Events = f.Events @ (f.Events |> List.filter p |> List.map g) }
+
+/// (name, the diagnostic it must produce, the mutated fixture, the change to the plan under test)
+let controls (plan: Json) (f: Fixture) : (string * string * Fixture * Json) list =
     let implementer = "example/implementing-agent"
     let parent = f.Ancestry |> Set.remove f.Candidate |> Set.toList |> List.head
-    [ "missing approval", "MISSING-APPROVAL", drop (isKind "owner-approval") f
-      "incorrect agent identity", "INCORRECT-AGENT-IDENTITY", mapWhere (isKind "release-selection") (setPath [ "actor"; "id" ] (JStr "example/impostor")) f
-      "missing checkpoint", "MISSING-CHECKPOINT", drop (isType "work.checkpointed") f
-      "unapproved scope change", "UNAPPROVED-SCOPE-CHANGE", mapWhere (isKind "scope-change") (setPath [ "statement"; "decision" ] (JStr "DEC-NEVER-APPROVED")) f
-      "self-acceptance",
-      "SELF-ACCEPTANCE",
-      mapWhere
-          (isKind "independent-review")
-          (setPath [ "actor"; "id" ] (JStr implementer)
-           >> setPath [ "observed"; "execution" ] (JStr(executionOfKind "assignment" f))
-           >> setPath [ "observed"; "executionRole" ] (JStr "implementation"))
-          f
-      "stale review", "STALE-REVIEW", mapWhere (isKind "independent-review") (setPath [ "statement"; "candidate" ] (JStr parent)) f
-      "incorrect commit identity", "INCORRECT-COMMIT-IDENTITY", mapWhere (isKind "release-selection") (setPath [ "observed"; "commit" ] (JStr otherSha)) f
-      "missing release selection", "MISSING-RELEASE-SELECTION", drop (isKind "release-selection") f
-      "evidence reused from another candidate", "EVIDENCE-OTHER-CANDIDATE", mapWhere (isKind "release-selection") (setPath [ "statement"; "candidate" ] (JStr otherSha)) f
-      // Beyond the nine required controls: the owner's decision only counts when it is the owner's and attested.
-      "owner decision transcribed by an agent",
-      "TRANSCRIBED-DECISION",
-      mapWhere (isKind "owner-approval") (setPath [ "provenance"; "class" ] (JStr "agent-assertion") >> setPath [ "actor"; "id" ] (JStr implementer)) f
-      "owner attestation not observed by CI", "UNATTESTED-OWNER-DECISION", { f with Attestations = setPath [ "runId" ] (JStr "another-run") f.Attestations }
-      "a log line claiming verified-acceptance", "TRANSCRIBED-DECISION", mapWhere (isKind "owner-approval") (setPath [ "provenance"; "class" ] (JStr "verified-acceptance")) f ]
+    let reviewExecution = f.Events |> List.find (isKind "independent-review") |> field "observed" |> Option.bind (strOpt "execution") |> Option.defaultValue ""
+    let one name code fixture = name, code, fixture, plan
+    [ // The nine required controls.
+      one "missing approval" "MISSING-APPROVAL" (drop (isKind "owner-approval") f)
+      one "incorrect agent identity" "INCORRECT-AGENT-IDENTITY" (mapWhere (isKind "release-selection") (setPath [ "actor"; "id" ] (JStr "example/impostor")) f)
+      one "missing checkpoint" "MISSING-CHECKPOINT" (drop (isType "work.checkpointed") f)
+      one "unapproved scope change" "UNAPPROVED-SCOPE-CHANGE" (mapWhere (isKind "scope-change") (setPath [ "statement"; "decision" ] (JStr "DEC-NEVER-APPROVED")) f)
+      one "self-acceptance" "SELF-ACCEPTANCE" (mapWhere (isKind "independent-review") (setPath [ "actor"; "id" ] (JStr implementer) >> setPath [ "observed"; "execution" ] (JStr(executionOfKind "assignment" f))) f)
+      one "stale review" "STALE-REVIEW" (mapWhere (isKind "independent-review") (setPath [ "statement"; "candidate" ] (JStr parent)) f)
+      one "incorrect commit identity" "INCORRECT-COMMIT-IDENTITY" (mapWhere (isKind "release-selection") (setPath [ "observed"; "commit" ] (JStr otherSha)) f)
+      one "missing release selection" "MISSING-RELEASE-SELECTION" (drop (isKind "release-selection") f)
+      one "evidence reused from another candidate" "EVIDENCE-OTHER-CANDIDATE" (mapWhere (isKind "release-selection") (setPath [ "statement"; "candidate" ] (JStr otherSha)) f)
+      // Owner decisions count only when they are the owner's, attested by CI in the trusted run, for what they decide.
+      one "owner decision transcribed by an agent" "TRANSCRIBED-DECISION" (mapWhere (isKind "owner-approval") (setPath [ "provenance"; "class" ] (JStr "agent-assertion") >> setPath [ "actor"; "id" ] (JStr implementer)) f)
+      one "owner attestation not observed by CI" "UNATTESTED-OWNER-DECISION" { f with Attestations = setPath [ "runId" ] (JStr "another-run") f.Attestations }
+      one "a log line claiming verified-acceptance" "TRANSCRIBED-DECISION" (mapWhere (isKind "owner-approval") (setPath [ "provenance"; "class" ] (JStr "verified-acceptance")) f)
+      one
+          "a real attestation reused for another decision"
+          "UNAPPROVED-SCOPE-CHANGE"
+          (append (isKind "owner-approval") (setPath [ "statement"; "subjects" ] (jstrs [ "DEC-EVIL" ])) f
+           |> mapWhere (isKind "scope-change") (setPath [ "statement"; "decision" ] (JStr "DEC-EVIL")))
+      one "a later owner rejection withdraws the approval" "UNAPPROVED-SCOPE-CHANGE" (append (isKind "owner-approval") (setPath [ "statement"; "outcome" ] (JStr "rejected")) f)
+      // CI records count only from the trusted run, and a failed test never proves anything.
+      one "a failed test result" "TEST-NOT-PASSED" (mapWhere (isKind "test-result") (setPath [ "statement"; "outcome" ] (JStr "fail")) f)
+      one "a test result from another CI run" "UNTRUSTED-TEST-RESULT" (mapWhere (isKind "test-result") (setPath [ "observed"; "identity"; "runId" ] (JStr "1")) f)
+      one
+          "a test result asserted by the implementing agent"
+          "UNTRUSTED-TEST-RESULT"
+          (mapWhere (isKind "test-result") (setPath [ "provenance"; "class" ] (JStr "agent-assertion") >> setPath [ "actor"; "id" ] (JStr implementer)) f)
+      // A reviewer comes from the frozen roster and implemented nothing, whatever role it chose for itself.
+      one
+          "the implementer reviewing under a review role"
+          "SELF-ACCEPTANCE"
+          ({ mapWhere (isKind "independent-review") (setPath [ "actor"; "id" ] (JStr implementer)) f with
+               Executions = f.Executions |> Map.map (fun k v -> if k = reviewExecution then setPath [ "actor"; "id" ] (JStr implementer) v else v) })
+      one "a later review rejects the candidate" "REVIEW-NOT-APPROVED" (append (isKind "independent-review") (setPath [ "statement"; "outcome" ] (JStr "rejected")) f)
+      one "a checkpoint Praxis did not verify" "UNVERIFIED-CHECKPOINT" (mapWhere (isType "work.checkpointed") (setPath [ "checkpoint"; "verification"; "status" ] (JStr "unverified")) f)
+      one "a record without an observed commit" "INCORRECT-COMMIT-IDENTITY" (mapWhere (isKind "release-selection") (setPath [ "observed"; "commit" ] JNull) f)
+      one "a record from another repository" "INCORRECT-REPOSITORY" (mapWhere (isKind "release-selection") (setPath [ "repository" ] (JStr "another-repository")) f)
+      // The plan and the rules are the frozen ones.
+      "a plan edited after freezing (producers rebound)",
+      "INVALID",
+      { f with PlanPin = Some(VerificationPlan.digestOf plan) },
+      (match plan with
+       | JObj ps -> JObj(ps @ [ "edited", JBool true ])
+       | p -> p)
+      one "self-supplied process rules" "INVALID" { f with Rules = setPath [ "reviewers" ] (jstrs [ implementer ]) f.Rules; RulesSha256 = "0" } ]
 
 let private codesOf (assessment: Json) =
-    arr "obligations" assessment
+    (if str "verdict" assessment = "INVALID" then [ "INVALID" ] else [])
+    @ (arr "obligations" assessment
     |> List.collect (arr "categories")
     |> List.filter (fun c -> strOpt "status" c <> Some "verified")
     |> List.collect (arr "diagnostics")
-    |> List.map (str "code")
+    |> List.map (str "code"))
     |> List.distinct
 
 let private unverified (assessment: Json) =
@@ -114,11 +152,12 @@ let simulation (source: string) (buildPlan: Json -> Json) : Json * string list =
     let positive = ProcessVerification.assess (inputs proposedPlan f)
     let noBindings = ProcessVerification.assess (inputs committedPlan f)
     let results =
-        controls f
-        |> List.map (fun (name, code, mutated) ->
-            let a = ProcessVerification.assess (inputs proposedPlan mutated)
+        controls proposedPlan f
+        |> List.map (fun (name, code, mutated, plan) ->
+            let a = ProcessVerification.assess (inputs plan mutated)
             name, code, a)
-    let readiness plan = PlanReadiness.assess plan None None
+    let readiness plan = PlanReadiness.assess plan (VerificationPlan.digestOf plan) None
+    let withRules plan rules = PlanReadiness.assess plan (VerificationPlan.digestOf plan) (Some(rules, "pinned", "pinned"))
     let summaryOf (a: Json) = field "summary" a |> Option.defaultValue JNull
 
     let failures =
@@ -140,13 +179,21 @@ let simulation (source: string) (buildPlan: Json -> Json) : Json * string list =
               let permit reason decision obligation =
                   JObj [ "schema", JStr PlanReadiness.rulesSchemaId
                          "permitUnresolved", JArr [ JObj [ "obligation", JStr obligation; "category", JStr(str "category" g); "reason", JStr reason; "decision", JStr decision ] ] ]
-              let permitted = PlanReadiness.assess proposedPlan (Some(permit "deferred to the release checkpoint" "DF-TEST-1" (str "obligation" g))) None
+              let permitted = withRules proposedPlan (permit "deferred to the release checkpoint" "DF-TEST-1" (str "obligation" g))
               if intOpt "permitted" (summaryOf permitted) <> Some 1L then yield "readiness: a valid permit was not applied"
               if intOpt "unresolved" (summaryOf permitted) <> Some(int64 ((arr "unresolved" gate).Length - 1)) then yield "readiness: a permit removed more than its own gap"
-              let stale = PlanReadiness.assess proposedPlan (Some(permit "x" "DF-TEST-1" "NO-SUCH-O1")) None
+              let stale = withRules proposedPlan (permit "x" "DF-TEST-1" "NO-SUCH-O1")
               if strs "problems" stale |> List.exists (fun p -> p.Contains "matches no unresolved") |> not then yield "readiness: a stale permit was accepted"
-              let reasonless = PlanReadiness.assess proposedPlan (Some(permit "" "" (str "obligation" g))) None
+              let reasonless = withRules proposedPlan (permit "" "" (str "obligation" g))
               if (strs "problems" reasonless).Length < 2 || str "verdict" reasonless <> "BLOCKED" then yield "readiness: a permit without reason and decision was accepted"
+              let unpinned = PlanReadiness.assess proposedPlan (VerificationPlan.digestOf proposedPlan) (Some(permit "x" "DF-TEST-1" (str "obligation" g), "self-supplied", "frozen"))
+              if str "verdict" unpinned <> "BLOCKED" then yield "readiness: rules that do not hash to the frozen value were accepted"
+          // A plan edited after freezing, even one that binds everything, is BLOCKED.
+          let edited =
+              match proposedPlan with
+              | JObj ps -> JObj(ps @ [ "edited", JBool true ])
+              | p -> p
+          if str "verdict" (PlanReadiness.assess edited (VerificationPlan.digestOf proposedPlan) None) <> "BLOCKED" then yield "readiness: an edited plan was not BLOCKED"
           if str "verdict" (readiness committedPlan) <> "BLOCKED" then yield "readiness: the committed plan, which binds nothing, is not BLOCKED" ]
 
     let evidence =
@@ -227,7 +274,8 @@ let readinessReplay (source: string) (r5: string) (buildPlan: Json -> Json) : Js
         |> List.map (fun o ->
             JObj [ "obligation", JStr o; "tests", JArr((app.TryFind o |> Option.defaultValue []) @ (producers.TryFind o |> Option.defaultValue [])) ])
 
-    let gate plan = PlanReadiness.assess plan None None
+    // Each plan is pinned as it is: the replay asks what the gate says about it, not whether it was frozen.
+    let gate plan = PlanReadiness.assess plan (VerificationPlan.digestOf plan) None
     let atKickoff = gate kickoffPlan
     let asBound = gate (buildPlan (JArr r5Bindings))
     let upperBound = gate (buildPlan (JArr generous))

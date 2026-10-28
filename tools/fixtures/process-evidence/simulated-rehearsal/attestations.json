@@ -1,8 +1,8 @@
 {
   "schema": "indy-init.owner-attestations/1",
   "runId": "9000000001",
-  "candidate": "4b915da0cfd0ee06291f91c2b6d7271b84a8add1",
+  "candidate": "b2fb0bbe782ccaf10ccdc032fa57d86ddf77d08a",
   "attestations": [
-    { "type": "github-review", "reference": "kemiller2002/simulated-rehearsal#1@1001", "login": "kemiller2002", "state": "APPROVED", "submittedAt": "2026-10-28T06:51:47.701Z" }
+    { "type": "github-review", "reference": "kemiller2002/simulated-rehearsal#1@1001", "login": "kemiller2002", "state": "APPROVED", "decisions": ["DEC-SIM-001"], "submittedAt": "2026-10-28T07:20:43.519Z" }
   ]
 }

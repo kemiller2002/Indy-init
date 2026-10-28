@@ -125,8 +125,9 @@ The Rehearsal 4 replay against revision 2 is recorded in `requirements-compiled/
 
 `praxis:<record kind>` bindings (kinds `process`, `owner`, and `review` for `praxis:independent-review`) are producers,
 not ledger tests: `verify-plan` never expects them in a ledger row. They are decided by
-`requirements-compiler verify-process` from the rehearsal's Praxis log, and `verify-plan --process-assessment FILE`
-counts the categories that assessment verified for the same plan digest and candidate. See
+`requirements-compiler verify-process` from the rehearsal's Praxis log. `verify-plan` takes the same inputs with a
+`--process-` prefix, computes that assessment itself for its own plan and trusted candidate, and counts the categories
+it verified; it never reads an assessment file. See
 [PROCESS-EVIDENCE-AND-READINESS.md](PROCESS-EVIDENCE-AND-READINESS.md).
 
 ## Consuming the plan before implementation

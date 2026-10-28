@@ -83,14 +83,15 @@ done
 echo "$candidate" > "$out/candidate.txt"
 g rev-list "$candidate" > "$out/ancestry.txt"
 
-# What CI would observe from the GitHub API in the trusted run: the owner's approving review.
+# What CI would observe from the GitHub API in the trusted run: the owner's approving review, with the decision ids
+# the reviewed pull request carries (an attestation proves only the decisions it names).
 cat > "$out/attestations.json" <<JSON
 {
   "schema": "indy-init.owner-attestations/1",
   "runId": "9000000001",
   "candidate": "$candidate",
   "attestations": [
-    { "type": "github-review", "reference": "kemiller2002/simulated-rehearsal#1@1001", "login": "kemiller2002", "state": "APPROVED", "submittedAt": "$(now)" }
+    { "type": "github-review", "reference": "kemiller2002/simulated-rehearsal#1@1001", "login": "kemiller2002", "state": "APPROVED", "decisions": ["DEC-SIM-001"], "submittedAt": "$(now)" }
   ]
 }
 JSON
@@ -100,7 +101,9 @@ cat > "$out/rules.json" <<'JSON'
   "schema": "indy-init.process-evidence-rules/1",
   "description": "Frozen process-evidence rules of the simulated rehearsal: who may act, who the owner is, and which execution roles are review roles.",
   "owners": [ { "login": "kemiller2002", "actorIds": ["kemiller2002"] } ],
-  "agents": ["example/implementing-agent", "example/review-agent"],
+  "repository": "simulated-rehearsal",
+  "agents": ["example/implementing-agent"],
+  "reviewers": ["example/review-agent"],
   "automation": ["github/github-actions"],
   "reviewRoles": ["review"]
 }
