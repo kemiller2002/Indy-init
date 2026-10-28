@@ -4,13 +4,19 @@
 ///   dotnet run --project tools/requirements-compiler/tests -- --offline --source .
 ///     - the F# baseline port reproduces the committed Python-generated baseline byte for byte;
 ///     - unit cases ported from tools/test-requirements-baseline.py;
-///     - the preflight verdict rule.
+///     - the preflight verdict rule;
+///     - the verification plan, and the EII-C acceptance-contract negative controls (missing obligation, incorrect
+///       test mapping, altered values, swapped requirement and obligation identities, stale evidence,
+///       unauthorized exclusion, related-test-is-not-proof, unclassified obligations).
 ///
 /// Full (needs the checkouts named in curation/sources.json):
 ///   dotnet run --project tools/requirements-compiler/tests -- <the compiler's own arguments>
 ///     - offline tests, plus negative controls: each case copies the curation into a temporary directory,
 ///       injects one defect, compiles, and asserts the named check fails and the compiler exits as expected;
 ///     - determinism (two compilations are byte-identical) and `--check` against the committed package.
+///
+/// EII-C validation against the Rehearsal 4 and 5 baselines (see RehearsalBaselines.fs):
+///   dotnet run --project tools/requirements-compiler/tests -- --rehearsal-baselines --source . --r4 DIR --r5 DIR --out FILE
 module Tests
 
 open System
@@ -141,6 +147,17 @@ let private cases: Case list =
       case "plan-binding-unknown-obligation" (fun d ->
           mutateList (cur "verification-plan.json" d) "testBindings" (fun _ ->
               [ JObj [ "obligation", JStr "PF-999-O1"; "tests", JArr [ JObj [ "id", JStr "core: invented"; "kind", JStr "deterministic" ] ] ] ])) 3 [ "V18" ]
+      // Evidence categories (EII-C): a rule assigning an undeclared category, and a binding that declares no
+      // category or one its kind cannot provide, each fail compilation.
+      case "plan-category-undeclared" (fun d ->
+          mutateList (cur "evidence-categories.json" d) "rules" (fun rs ->
+              rs @ [ JObj [ "id", JStr "EC-INVENTED"; "category", JStr "performance"; "when", JObj [ "rules", jstrs [ "VR-UI" ] ]; "source", JStr "injected" ] ])) 3 [ "V18" ]
+      case "plan-binding-without-category" (fun d ->
+          mutateList (cur "verification-plan.json" d) "testBindings" (fun _ ->
+              [ JObj [ "obligation", JStr "PF-015-O1"; "tests", JArr [ JObj [ "id", JStr "live: injected"; "kind", JStr "live" ] ] ] ])) 3 [ "V18" ]
+      case "plan-binding-kind-cannot-provide" (fun d ->
+          mutateList (cur "verification-plan.json" d) "testBindings" (fun _ ->
+              [ JObj [ "obligation", JStr "PF-015-O1"; "tests", JArr [ JObj [ "id", JStr "core: injected"; "kind", JStr "deterministic"; "categories", jstrs [ "live-provider" ] ] ] ] ])) 3 [ "V18" ]
       { case "baseline-obligation-tampered" ignore 3 [ "V01" ] with
           SuppliedBaseline = Some(fun text -> text.Replace("Use these initial canonical palette values:", "Use these optional palette values:")) } ]
 
@@ -151,8 +168,9 @@ let private r4BaselineSha256 = "621e2f960038dcfb0daa2a9fe18a0c1c350faed297ba2856
 
 /// Plan inputs from committed files only, so CI can build the plan without the other checkouts.
 let planInputs (source: string) (baselineText: string) : VerificationPlan.Inputs =
-    let v1 = Path.Combine(source, "requirements-compiled", "v1")
-    let spec = parseFile (Path.Combine(v1, "curation", "verification-plan.json"))
+    let v2 = Path.Combine(source, "requirements-compiled", "v2")
+    let spec = parseFile (Path.Combine(v2, "curation", "verification-plan.json"))
+    let categoriesPath = Path.Combine(v2, "curation", "evidence-categories.json")
     let a = field "approvals" spec |> Option.defaultValue JNull
     let approvals =
         match Git.showFile source (str "commit" a) (str "path" a) with
@@ -167,7 +185,7 @@ let planInputs (source: string) (baselineText: string) : VerificationPlan.Inputs
       BaselineId = str "id" baseline
       BaselineSha256 = Git.sha256Hex baselineBytes
       Baseline = baseline
-      Manifest = parseFile (Path.Combine(v1, "verification-manifest.json"))
+      Manifest = parseFile (Path.Combine(v2, "verification-manifest.json"))
       Spec = spec
       Approvals =
         { Repository = "kemiller2002/indy-init"
@@ -175,7 +193,8 @@ let planInputs (source: string) (baselineText: string) : VerificationPlan.Inputs
           Path = str "path" a
           Sha256 = Git.sha256Hex approvals
           TrustedOperators = strs "trustedOperators" a
-          Document = parseBytes approvals } }
+          Document = parseBytes approvals }
+      Categories = { Path = "curation/evidence-categories.json"; Sha256 = Git.sha256Hex (File.ReadAllBytes categoriesPath); Table = parseFile categoriesPath } }
 
 let private withSpec (i: VerificationPlan.Inputs) (key: string) (value: Json) =
     match i.Spec with
@@ -191,6 +210,8 @@ let private setIn (key: string) (value: Json) (j: Json) =
     match j with
     | JObj ps -> JObj(ps |> List.map (fun (k, v) -> if k = key then k, value else k, v))
     | j -> j
+
+let private mutateJsonList (key: string) (f: Json list -> Json list) (j: Json) = setIn key (JArr(f (arr key j))) j
 
 /// Re-seals a mutated plan with a correct identity, so a preservation failure cannot hide behind a digest failure.
 let private reseal (plan: Json) =
@@ -211,7 +232,7 @@ let private planTests (source: string) : string list =
 
     // Determinism: built twice from the same inputs, byte-identical, and equal to the committed artifact.
     let determinism =
-        let committedPlan = Path.Combine(source, "requirements-compiled", "v1", "verification-plan.json")
+        let committedPlan = Path.Combine(source, "requirements-compiled", "v2", "verification-plan.json")
         [ if serialize (VerificationPlan.build i) <> text then yield "determinism: two builds differ"
           if File.Exists committedPlan && File.ReadAllText committedPlan <> text then yield "determinism: committed verification-plan.json differs from a rebuild" ]
 
@@ -229,7 +250,7 @@ let private planTests (source: string) : string list =
     // Stable obligation ids: a fixed value, independent of bindings and order, and sensitive to the text.
     let stableIds =
         let text1 = "Every run must pin authoritative requirements and their source repository, commit, and content digest."
-        let bound = withSpec i "testBindings" (JArr [ JObj [ "obligation", JStr "AR-001-O2"; "tests", JArr [ JObj [ "id", JStr "t"; "kind", JStr "deterministic" ] ] ] ])
+        let bound = withSpec i "testBindings" (JArr [ JObj [ "obligation", JStr "AR-001-O2"; "tests", JArr [ JObj [ "id", JStr "t"; "kind", JStr "deterministic"; "categories", jstrs [ "unit" ] ] ] ] ])
         let ids (p: Json) = arr "requirements" p |> List.collect (arr "obligations") |> List.map (str "id")
         [ if VerificationPlan.obligationId "AR-001" "AR-001-O1" text1 <> "VPO-a5795f29e0de763c" then yield "stable ids: AR-001-O1 id changed"
           if str "id" (obligation "AR-001-O1" (entryOf "AR-001" plan)) <> "VPO-a5795f29e0de763c" then yield "stable ids: plan AR-001-O1 id changed"
@@ -240,7 +261,7 @@ let private planTests (source: string) : string list =
     // Missing-test detection: unbound obligations are 'missing'; a binding makes exactly that one 'bound'.
     let missingTests =
         let binding o tests = JObj [ "obligation", JStr o; "tests", JArr tests ]
-        let t id kind = JObj [ "id", JStr id; "kind", JStr kind ]
+        let t id kind = JObj [ "id", JStr id; "kind", JStr kind; "categories", jstrs [ (if kind = "review" then "independent-acceptance" else "integration") ] ]
         let one = withSpec i "testBindings" (JArr [ binding "AR-001-O1" [ t "core: AR-001 pins the baseline" "deterministic" ] ])
         let p1 = VerificationPlan.build one
         let liveOne = VerificationPlan.build (withSpec i "testBindings" (JArr [ binding "AR-001-O1" [ t "live: AR-001" "live" ] ]))
@@ -263,7 +284,7 @@ let private planTests (source: string) : string list =
             else setIn "obligations" (JArr(arr "obligations" e |> List.mapi (fun k o -> if k = 0 then setIn "text" (JStr "Weakened text.") o else o))) e
         [ if not (pp (reseal (mapRequirements (List.filter (fun e -> str "requirement" e <> "PF-005")) plan)) |> hasProblem "missing P0 requirement: PF-005") then yield "preservation: a dropped P0 requirement is not detected"
           if not (pp (reseal (mapRequirements (List.map (fun e -> if str "requirement" e = "PF-005" then setIn "priority" (JStr "P1") e else e)) plan)) |> hasProblem "priority changed") then yield "preservation: a downgraded priority is not detected"
-          if not (pp (reseal (mapRequirements (List.map tamperObligation) plan)) |> hasProblem "obligations differ") then yield "preservation: an altered obligation is not detected"
+          if not (pp (reseal (mapRequirements (List.map tamperObligation) plan)) |> List.exists (fun p -> p.Contains("[ALTERED-VALUE] PF-005-O1", StringComparison.Ordinal) && p.Contains("text differs", StringComparison.Ordinal))) then yield "preservation: an altered obligation is not detected"
           if not (pp (mapRequirements (List.filter (fun e -> str "requirement" e <> "PF-005")) plan) |> hasProblem "digest does not match") then yield "preservation: an unsealed edit is not detected by the plan identity"
           if not (pp (reseal (mapRequirements (fun es -> es @ [ setIn "requirement" (JStr "PF-999") es.Head ]) plan)) |> hasProblem "not a baseline P0 requirement") then yield "preservation: an invented requirement is not detected" ]
 
@@ -294,6 +315,269 @@ let private planTests (source: string) : string list =
           if (arr "requirements" (VerificationPlan.build authorized)).Length <> 108 then yield "exclusion: an excluded requirement left the plan" ]
 
     determinism @ completeness @ stableIds @ missingTests @ preservation @ exclusions |> List.map (sprintf "verification plan: %s")
+
+// ---- executable acceptance contracts (EII-C): negative controls over the plan and the checker ----------------
+
+/// A synthetic candidate for the checker: ledger, evidence manifest and evidence files held in memory. Test ids
+/// here are fixtures of this test, never bindings of the committed plan.
+type private Candidate =
+    { Plan: Json
+      Ledger: Json
+      Manifest: Json
+      Evidence: Map<string, Json> }
+
+let private candidateSha = "1111111111111111111111111111111111111111"
+let private runId = "run-eii-c-1"
+
+let private assessCandidate (i: VerificationPlan.Inputs) (approvalsRaw: byte[]) (c: Candidate) =
+    let files = c.Evidence |> Map.map (fun _ j -> Text.Encoding.UTF8.GetBytes(serialize j))
+    let manifestRaw = Text.Encoding.UTF8.GetBytes(serialize c.Manifest)
+    PlanVerification.assess
+        { Plan = c.Plan
+          Baseline = i.Baseline
+          BaselineSha256 = i.BaselineSha256
+          Ledger = c.Ledger
+          ManifestRaw = manifestRaw
+          ExpectedManifestSha256 = Git.sha256Hex manifestRaw
+          ReadEvidence = fun p -> files.TryFind p
+          TrustedSourceSha = candidateSha
+          ApprovalsRaw = approvalsRaw
+          TrustedOperators = [ "kemiller2002" ] }
+
+/// Re-pins every manifest entry to the evidence as it now is (a producer that re-hashed what it wrote).
+let private repinAll (c: Candidate) =
+    let entries = c.Evidence |> Map.toList |> List.map (fun (p, j) -> JObj [ "path", JStr p; "sha256", JStr(Git.sha256Hex (Text.Encoding.UTF8.GetBytes(serialize j))) ])
+    { c with Manifest = setIn "entries" (JArr entries) c.Manifest }
+
+let private contractTests (source: string) : string list =
+    let committedBaseline = File.ReadAllText(Path.Combine(source, "requirements", "causa-requirements-baseline.json"))
+    let i0 = planInputs source committedBaseline
+    let approvalsRaw =
+        let a = field "approvals" i0.Spec |> Option.defaultValue JNull
+        match Git.showFile source (str "commit" a) (str "path" a) with
+        | Ok b -> b
+        | Error e -> failwithf "approvals unreadable: %s" e
+    let hasCode (code: string) (subject: string) (ds: string list) =
+        ds |> List.exists (fun d -> d.StartsWith("[" + code + "] " + subject, StringComparison.Ordinal))
+    let codesOf (a: Json) = arr "diagnostics" a |> List.map (str "code") |> List.distinct
+    let entryOf rid (p: Json) = arr "requirements" p |> List.find (fun e -> str "requirement" e = rid)
+    let obligationsOf rid (p: Json) = arr "obligations" (entryOf rid p)
+    let contract (o: Json) = field "acceptanceContract" o |> Option.defaultValue JNull
+    let pp (p: Json) = VerificationPlan.preservationProblems i0.Baseline p
+    let plain = VerificationPlan.build i0
+
+    // -- the plan carries a complete, derived acceptance contract on every obligation --------------------------
+    let fields =
+        let os = arr "requirements" plain |> List.collect (arr "obligations")
+        let keys = [ "requirement"; "obligation"; "obligationId"; "priority"; "verificationMethod"; "requiredEvidenceCategories"; "categoryDerivation"; "testIdentity"; "dependencies"; "freshness"; "verificationStatus"; "missingCoverage" ]
+        [ if os.Length <> 326 then yield sprintf "contract: expected 326 obligations, found %d" os.Length
+          for o in os do
+              let c = contract o
+              for k in keys do
+                  if (field k c).IsNone then yield sprintf "contract: %s lacks %s" (str "sourceObligation" o) k
+              if strOpt "verificationStatus" c = Some "verified" then yield sprintf "contract: %s is verified in the plan" (str "sourceObligation" o)
+              if field "testIdentity" c |> Option.bind (strOpt "status") <> Some "unbound" then yield sprintf "contract: %s test identity is not explicitly unbound" (str "sourceObligation" o)
+              for c' in strs "requiredEvidenceCategories" c do
+                  if not (List.contains c' EvidenceCategories.vocabulary) then yield sprintf "contract: %s has category %s outside the vocabulary" (str "sourceObligation" o) c'
+              let derived = arr "categoryDerivation" c |> List.map (str "category")
+              if derived <> strs "requiredEvidenceCategories" c then yield sprintf "contract: %s categories are not each derived by a declared rule" (str "sourceObligation" o)
+          let ui011 = contract (obligationsOf "UI-011" plain).Head
+          if strs "requiredEvidenceCategories" ui011 <> [ "browser"; "accessibility" ] then yield sprintf "contract: UI-011-O1 categories %A" (strs "requiredEvidenceCategories" ui011)
+          let pf015 = contract (obligationsOf "PF-015" plain).Head
+          if strs "requiredEvidenceCategories" pf015 <> [ "integration"; "live-provider"; "security" ] then yield sprintf "contract: PF-015-O1 categories %A" (strs "requiredEvidenceCategories" pf015)
+          if field "freshness" pf015 |> Option.bind (strOpt "policy") <> Some "FP-LIVE-PER-COMMIT" then yield "contract: PF-015-O1 freshness is not live per commit"
+          if not (pp plain).IsEmpty then yield sprintf "contract: the committed-input plan fails preservation %A" (pp plain |> List.truncate 3) ]
+
+    // -- unclassified: an obligation no declared rule reaches is reported, never assigned ---------------------
+    let unclassified =
+        let table = i0.Categories.Table
+        let stripped = mutateJsonList "rules" (List.filter (fun r -> not ((str "id" r).StartsWith("EC-UI-", StringComparison.Ordinal)))) table
+        let p = VerificationPlan.build { i0 with Categories = { i0.Categories with Table = stripped } }
+        let c = contract (obligationsOf "UI-001" p).Head
+        let scopeInt k = field "scope" p |> Option.bind (intOpt k) |> Option.defaultValue -1L
+        [ if strOpt "verificationStatus" c <> Some "unclassified" then yield "unclassified: UI-001-O1 is not unclassified when no rule reaches it"
+          if arr "missingCoverage" c |> List.map (str "category") <> [ "unclassified" ] then yield "unclassified: missing coverage does not name 'unclassified'"
+          if not (strs "requiredEvidenceCategories" c).IsEmpty then yield "unclassified: a category was assigned without a rule"
+          if scopeInt "unclassifiedObligations" <= 0L then yield "unclassified: the scope does not count unclassified obligations" ]
+
+    // -- compile-time binding and table checks ----------------------------------------------------------------
+    let bindingChecks =
+        let bind o (tests: Json list) = withSpec i0 "testBindings" (JArr [ JObj [ "obligation", JStr o; "tests", JArr tests ] ])
+        let t id kind cats = JObj [ "id", JStr id; "kind", JStr kind; "categories", jstrs cats ]
+        let hasProblem (needle: string) (ps: string list) = ps |> List.exists (fun p -> p.Contains(needle, StringComparison.Ordinal))
+        let withTable f = { i0 with Categories = { i0.Categories with Table = f i0.Categories.Table } }
+        let addRule r = mutateJsonList "rules" (fun rs -> rs @ [ r ])
+        [ if not (VerificationPlan.problems (bind "PF-015-O1" [ JObj [ "id", JStr "x"; "kind", JStr "live" ] ]) |> hasProblem "declares no evidence category") then yield "binding: a test without categories is accepted"
+          if not (VerificationPlan.problems (bind "PF-015-O1" [ t "x" "deterministic" [ "live-provider" ] ]) |> hasProblem "cannot provide live-provider") then yield "binding: a deterministic test claiming live-provider evidence is accepted"
+          if not (VerificationPlan.problems (bind "PF-015-O1" [ t "x" "live" [ "magic" ] ]) |> hasProblem "unknown evidence category") then yield "binding: an unknown category is accepted"
+          if not (VerificationPlan.problems (withTable (addRule (JObj [ "id", JStr "EC-X"; "category", JStr "magic"; "when", JObj [ "rules", jstrs [ "VR-UI" ] ]; "source", JStr "x" ]))) |> hasProblem "not a declared category") then yield "table: a rule with an undeclared category is accepted"
+          if not (VerificationPlan.problems (withTable (addRule (JObj [ "id", JStr "EC-X"; "category", JStr "unit"; "when", JObj []; "source", JStr "x" ]))) |> hasProblem "states no condition") then yield "table: an unconditional rule is accepted"
+          if not (VerificationPlan.problems (withTable (addRule (JObj [ "id", JStr "EC-X"; "category", JStr "unit"; "when", JObj [ "rules", jstrs [ "VR-NONE" ] ]; "source", JStr "x" ]))) |> hasProblem "unknown verification rule") then yield "table: a rule naming an unknown verification rule is accepted"
+          if not (VerificationPlan.problems (withTable (addRule (JObj [ "id", JStr "EC-X"; "category", JStr "unit"; "when", JObj [ "rules", jstrs [ "VR-UI" ] ]; "source", JStr "" ]))) |> hasProblem "cites no source") then yield "table: a rule without a source is accepted" ]
+
+    // -- negative controls over a re-sealed plan: each yields its own diagnostic code --------------------------
+    let mapEntry rid (f: Json -> Json) (p: Json) = mapRequirements (List.map (fun e -> if str "requirement" e = rid then f e else e)) p
+    let mapObligations (f: Json list -> Json list) (e: Json) = setIn "obligations" (JArr(f (arr "obligations" e))) e
+    let mapObligation oid (f: Json -> Json) = mapObligations (List.map (fun o -> if str "sourceObligation" o = oid then f o else o))
+    let swapField key (a: Json) (b: Json) = setIn key (field key b |> Option.get) a, setIn key (field key a |> Option.get) b
+    let swapObligations keys (e: Json) =
+        mapObligations (fun os ->
+            match os with
+            | a :: b :: rest ->
+                let a', b' = keys |> List.fold (fun (x, y) k -> swapField k x y) (a, b)
+                a' :: b' :: rest
+            | os -> os) e
+
+    let planControls =
+        let expect name code subject (p: Json) =
+            let ds = pp (reseal p)
+            if hasCode code subject ds then [] else [ sprintf "control %s: expected [%s] %s, got %A" name code subject (ds |> List.truncate 4) ]
+        let swapRequirementIds (p: Json) =
+            mapRequirements (fun es ->
+                es
+                |> List.map (fun e ->
+                    match str "requirement" e with
+                    | "AR-001" -> setIn "requirement" (JStr "AR-002") e
+                    | "AR-002" -> setIn "requirement" (JStr "AR-001") e
+                    | _ -> e)
+                |> List.sortBy (str "requirement")) p
+        let ui016Swap (o: Json) =
+            o
+            |> setIn "text" (JStr "Ensure WCAG AA contrast for normal text (3:1), large text (4.5:1), and relevant non-text indicators (3:1).")
+        let roleSwap (o: Json) =
+            o |> setIn "text" (JStr((str "text" o).Replace("A reviewer distinct from the implementer", "A implementer distinct from the reviewer")))
+        [ yield! expect "missing-obligation" "MISSING-OBLIGATION" "PF-005-O1" (mapEntry "PF-005" (mapObligations List.tail) plain)
+          yield! expect "missing-requirement" "MISSING-REQUIREMENT" "PF-005" (mapRequirements (List.filter (fun e -> str "requirement" e <> "PF-005")) plain)
+          yield! expect "altered-title" "ALTERED-VALUE" "PF-005" (mapEntry "PF-005" (setIn "title" (JStr "Provider convenience")) plain)
+          yield! expect "altered-section-hash" "ALTERED-VALUE" "PF-005" (mapEntry "PF-005" (setIn "sectionSha256" (JStr(String('0', 64)))) plain)
+          yield! expect "altered-priority" "ALTERED-VALUE" "PF-005" (mapEntry "PF-005" (setIn "priority" (JStr "P1")) plain)
+          yield! expect "altered-kind" "ALTERED-VALUE" "PF-005-O1" (mapEntry "PF-005" (mapObligation "PF-005-O1" (setIn "kind" (JStr "guidance"))) plain)
+          yield! expect "altered-value-tokens" "ALTERED-VALUE" "UI-011-O2" (mapEntry "UI-011" (mapObligation "UI-011-O2" (setIn "tokens" (jstrs [ "150%" ]))) plain)
+          yield! expect "swapped-value-tokens" "ALTERED-VALUE" "UI-016-O11" (mapEntry "UI-016" (mapObligation "UI-016-O11" (setIn "tokens" (jstrs [ "3:1"; "4.5:1" ]))) plain)
+          yield! expect "altered-text" "ALTERED-VALUE" "PF-005-O1" (mapEntry "PF-005" (mapObligation "PF-005-O1" (setIn "text" (JStr "UI and domain tests should avoid depending on GitHub."))) plain)
+          yield! expect "value-swap-in-text" "ALTERED-VALUE" "UI-016-O11" (mapEntry "UI-016" (mapObligation "UI-016-O11" ui016Swap) plain)
+          yield! expect "role-swap-in-text" "ALTERED-VALUE" "AR-008-O1" (mapEntry "AR-008" (mapObligation "AR-008-O1" roleSwap) plain)
+          yield! expect "swapped-requirement-ids" "SWAPPED-REQUIREMENT-IDENTITY" "AR-001" (swapRequirementIds plain)
+          yield! expect "swapped-requirement-ids" "SWAPPED-REQUIREMENT-IDENTITY" "AR-002" (swapRequirementIds plain)
+          yield! expect "swapped-obligation-ids" "SWAPPED-OBLIGATION-IDENTITY" "AR-002-O1" (mapEntry "AR-002" (swapObligations [ "text"; "textSha256"; "kind"; "tokens"; "id" ]) plain)
+          yield! expect "swapped-obligation-vpo-ids" "SWAPPED-OBLIGATION-IDENTITY" "AR-002-O1" (mapEntry "AR-002" (swapObligations [ "id" ]) plain)
+          yield! expect "contract-categories-edited" "CONTRACT-INCONSISTENT" "UI-011-O1" (mapEntry "UI-011" (mapObligation "UI-011-O1" (fun o -> setIn "acceptanceContract" (setIn "requiredEvidenceCategories" (jstrs [ "browser" ]) (contract o)) o)) plain)
+          yield! expect "contract-verified-forged" "CONTRACT-INCONSISTENT" "UI-011-O1" (mapEntry "UI-011" (mapObligation "UI-011-O1" (fun o -> setIn "acceptanceContract" (setIn "verificationStatus" (JStr "verified") (contract o)) o)) plain)
+          // The swap controls must name the swap, not only a difference.
+          let swapped = pp (reseal (mapEntry "AR-002" (swapObligations [ "text"; "textSha256"; "kind"; "tokens"; "id" ]) plain))
+          if not (hasCode "SWAPPED-OBLIGATION-IDENTITY" "AR-002-O2" swapped) then yield "control swapped-obligation-ids: AR-002-O2 is not named as swapped" ]
+
+    // -- the checker over a synthetic candidate ---------------------------------------------------------------
+    let checker =
+        let ver001 = obligationsOf "VER-001" plain |> List.map (str "sourceObligation")
+        let ui011 = obligationsOf "UI-011" plain |> List.map (str "sourceObligation")
+        let testId (o: string) = sprintf "fixture: %s proven (integration)" o
+        let unitId (o: string) = sprintf "fixture: %s engine test (unit only)" o
+        let binding o (tests: Json list) = JObj [ "obligation", JStr o; "tests", JArr tests ]
+        let t id kind cats = JObj [ "id", JStr id; "kind", JStr kind; "categories", jstrs cats ]
+        let spec =
+            (ver001 |> List.map (fun o -> binding o [ t (testId o) "deterministic" [ "integration" ] ]))
+            @ (ui011 |> List.map (fun o -> binding o [ t (unitId o) "deterministic" [ "unit" ] ]))
+        let i = withSpec i0 "testBindings" (JArr spec)
+        let plan = VerificationPlan.build i
+        let vpo rid o = obligationsOf rid plan |> List.find (fun x -> str "sourceObligation" x = o) |> str "id"
+        let evidenceFor rid (entries: (string * string list) list) =
+            JObj
+                [ "schema", JStr "causa.acceptance-evidence/1"
+                  "run_id", JStr runId
+                  "source_sha", JStr candidateSha
+                  "subject_type", JStr "requirement"
+                  "subject_id", JStr rid
+                  "status", JStr "PASS"
+                  "exit_code", JInt 0L
+                  "obligations",
+                  entries
+                  |> List.map (fun (o, tests) ->
+                      JObj [ "id", JStr(vpo rid o); "verification", JStr "PASS"; "tests", tests |> List.map (fun x -> JObj [ "testId", JStr x; "outcome", JStr "passed" ]) |> JArr ])
+                  |> JArr ]
+        let row rid status (tests: string list) (paths: string list) =
+            JObj [ "id", JStr rid; "priority", JStr "P0"; "tests", jstrs tests; "evidence_paths", jstrs paths; "status", JStr status; "reason", JStr "" ]
+        let rows =
+            arr "requirements" plan
+            |> List.map (fun e ->
+                match str "requirement" e with
+                | "VER-001" -> row "VER-001" "PASS" (ver001 |> List.map testId) [ "evidence/VER-001.json" ]
+                | "UI-011" -> row "UI-011" "PASS" (ui011 |> List.map unitId) [ "evidence/UI-011.json" ]
+                | rid -> row rid "NOT_RUN" [] [])
+        let baseCandidate =
+            repinAll
+                { Plan = plan
+                  Ledger =
+                    JObj
+                        [ "schema", JStr "causa.acceptance-ledger/2"
+                          "run_id", JStr runId
+                          "source_commit_sha", JStr candidateSha
+                          "requirements_baseline", JObj [ "id", JStr i.BaselineId; "sha256", JStr i.BaselineSha256 ]
+                          "scope_changes", JArr []
+                          "requirements", JArr rows ]
+                  Manifest = JObj [ "schema", JStr "causa.acceptance-evidence-manifest/1"; "run_id", JStr runId; "source_sha", JStr candidateSha; "entries", JArr [] ]
+                  Evidence =
+                    Map.ofList
+                        [ "evidence/VER-001.json", evidenceFor "VER-001" (ver001 |> List.map (fun o -> o, [ testId o ]))
+                          "evidence/UI-011.json", evidenceFor "UI-011" (ui011 |> List.map (fun o -> o, [ unitId o ])) ] }
+        let run c = assessCandidate i approvalsRaw c
+        let statusOf rid (a: Json) = arr "requirements" a |> List.find (fun r -> str "requirement" r = rid) |> str "status"
+        let obligationOf rid o (a: Json) = arr "requirements" a |> List.find (fun r -> str "requirement" r = rid) |> arr "obligations" |> List.find (fun x -> str "sourceObligation" x = o)
+        let mapRow rid (f: Json -> Json option) (c: Candidate) = { c with Ledger = setIn "requirements" (JArr(arr "requirements" c.Ledger |> List.choose (fun r -> if str "id" r = rid then f r else Some r))) c.Ledger }
+        let mapEvidence path (f: Json -> Json) (c: Candidate) = { c with Evidence = c.Evidence |> Map.map (fun p j -> if p = path then f j else j) }
+        let expectCode name code (a: Json) = if List.contains code (codesOf a) then [] else [ sprintf "checker %s: expected diagnostic %s, got %A" name code (codesOf a) ]
+        let notAccepted name (a: Json) = if str "verdict" a = "ACCEPTED" then [ sprintf "checker %s: candidate accepted" name ] else []
+
+        let positive = run baseCandidate
+        let related = positive
+        let ledgerUnbound = run (mapRow "VER-001" (fun r -> Some(setIn "tests" (jstrs (strs "tests" r @ [ "fixture: unplanned test" ])) r)) baseCandidate)
+        let boundAbsent = run (mapRow "VER-001" (fun r -> Some(setIn "tests" (jstrs (strs "tests" r |> List.tail)) r)) baseCandidate)
+        let crossClaim =
+            let ev = evidenceFor "VER-001" (ver001 |> List.mapi (fun k o -> o, [ testId (if k = 1 then ver001.Head else o) ]))
+            run (repinAll (mapEvidence "evidence/VER-001.json" (fun _ -> ev) baseCandidate))
+        let stale = run (repinAll (mapEvidence "evidence/VER-001.json" (setIn "source_sha" (JStr "2222222222222222222222222222222222222222")) baseCandidate))
+        let unauthorized =
+            let c = mapRow "UI-011" (fun _ -> None) baseCandidate
+            run { c with Ledger = setIn "scope_changes" (JArr [ JObj [ "requirement_id", JStr "UI-011"; "action", JStr "exclude"; "approval_id", JStr "APR-INVENTED" ] ]) c.Ledger }
+        let missingObligationPlan = run { baseCandidate with Plan = reseal (mapEntry "VER-001" (mapObligations List.tail) plan) }
+        let swappedPlan = run { baseCandidate with Plan = reseal (mapEntry "AR-002" (swapObligations [ "id" ]) plan) }
+        let noObligationEntries = run (repinAll (mapEvidence "evidence/VER-001.json" (setIn "obligations" (JArr [])) baseCandidate))
+
+        [ // positive control: every obligation of VER-001 verified from tests bound to it
+          if statusOf "VER-001" positive <> "PASS" then yield sprintf "checker positive: VER-001 is %s, expected PASS" (statusOf "VER-001" positive)
+          for o in ver001 do
+              if obligationOf "VER-001" o positive |> str "verificationStatus" <> "verified" then yield sprintf "checker positive: %s not verified" o
+          if not (codesOf positive).IsEmpty then yield sprintf "checker positive: unexpected diagnostics %A" (codesOf positive)
+          if str "verdict" positive <> "INCOMPLETE" then yield sprintf "checker positive: verdict %s, expected INCOMPLETE (other rows NOT_RUN)" (str "verdict" positive)
+          // R5 5dcb91e: a passing unit test bound to a UI obligation does not verify it
+          if statusOf "UI-011" related <> "UNVERIFIED" then yield sprintf "checker related-test: UI-011 is %s, expected UNVERIFIED" (statusOf "UI-011" related)
+          for o in ui011 do
+              let r = obligationOf "UI-011" o related
+              if str "verificationStatus" r <> "unverified" then yield sprintf "checker related-test: %s is %s" o (str "verificationStatus" r)
+              if arr "missingCoverage" r |> List.map (str "category") |> List.sort <> [ "accessibility"; "browser" ] then yield sprintf "checker related-test: %s missing coverage %A" o (arr "missingCoverage" r |> List.map (str "category"))
+          // incorrect test mappings
+          yield! expectCode "ledger-test-unbound" "TEST-MAPPING" ledgerUnbound
+          if str "verdict" ledgerUnbound <> "INVALID" || statusOf "VER-001" ledgerUnbound <> "INVALID" then yield "checker ledger-test-unbound: not INVALID"
+          yield! expectCode "bound-test-absent" "TEST-MAPPING" boundAbsent
+          if str "verdict" boundAbsent <> "INVALID" then yield "checker bound-test-absent: not INVALID"
+          yield! expectCode "evidence-cross-claim" "TEST-MAPPING" crossClaim
+          if obligationOf "VER-001" ver001.[1] crossClaim |> str "verificationStatus" = "verified" then yield "checker evidence-cross-claim: an obligation was verified by a test bound to another"
+          // stale evidence
+          yield! expectCode "stale-evidence" "STALE-EVIDENCE" stale
+          if statusOf "VER-001" stale <> "STALE" || str "verdict" stale <> "INVALID" then yield "checker stale-evidence: not STALE/INVALID"
+          if obligationOf "VER-001" ver001.Head stale |> arr "missingCoverage" |> List.map (str "reason") <> [ "evidence-not-fresh" ] then yield "checker stale-evidence: missing coverage is not evidence-not-fresh"
+          // unauthorized exclusion
+          yield! expectCode "unauthorized-exclusion" "UNAUTHORIZED-EXCLUSION" unauthorized
+          if str "verdict" unauthorized <> "INVALID" then yield "checker unauthorized-exclusion: not INVALID"
+          // plan tampering seen by the checker
+          yield! expectCode "missing-obligation" "MISSING-OBLIGATION" missingObligationPlan
+          yield! expectCode "swapped-obligation" "SWAPPED-OBLIGATION-IDENTITY" swappedPlan
+          // requirement-level PASS without per-obligation results verifies nothing
+          if statusOf "VER-001" noObligationEntries <> "UNVERIFIED" then yield sprintf "checker no-obligation-entries: VER-001 is %s, expected UNVERIFIED" (statusOf "VER-001" noObligationEntries)
+          for (name, a) in [ "ledger-test-unbound", ledgerUnbound; "bound-test-absent", boundAbsent; "evidence-cross-claim", crossClaim; "stale-evidence", stale; "unauthorized-exclusion", unauthorized; "missing-obligation", missingObligationPlan; "swapped-obligation", swappedPlan ] do
+              yield! notAccepted name a ]
+
+    fields @ unclassified @ bindingChecks @ planControls @ checker |> List.map (sprintf "acceptance contract: %s")
 
 // ---- offline tests -----------------------------------------------------------------------------
 
@@ -334,8 +618,9 @@ let private offline (source: string) : string list =
         |> List.map (sprintf "preflight verdict: %s")
 
     let plan = try planTests source with ex -> [ "verification plan: " + ex.Message ]
+    let contracts = try contractTests source with ex -> [ "acceptance contract: " + ex.Message ]
 
-    equivalence @ units @ verdicts @ plan
+    equivalence @ units @ verdicts @ plan @ contracts
 
 [<EntryPoint>]
 let main argv =
@@ -360,12 +645,40 @@ let main argv =
         | _ ->
             eprintfn "usage: --replay --source DIR --evidence-root DIR --candidate-repo DIR --trusted-source-sha SHA --out FILE"
             2
+    | "--rehearsal-baselines" :: rest ->
+        let rec go (xs: string list) (o: RehearsalBaselines.Options) =
+            match xs with
+            | "--source" :: v :: r -> go r { o with Source = v }
+            | "--r4" :: v :: r -> go r { o with R4 = v }
+            | "--r5" :: v :: r -> go r { o with R5 = v }
+            | "--out" :: v :: r -> go r { o with Out = v }
+            | [] -> Some o
+            | _ -> None
+        match go rest { Source = "."; R4 = ""; R5 = ""; Out = "" } with
+        | Some o when o.R4 <> "" && o.R5 <> "" && o.Out <> "" ->
+            let committed = File.ReadAllText(Path.Combine(o.Source, "requirements", "causa-requirements-baseline.json"))
+            let template = planInputs o.Source committed
+            let build (baselineText: string) =
+                let bytes = Text.Encoding.UTF8.GetBytes baselineText
+                let baseline = parseBytes bytes
+                let src = field "source" baseline |> Option.defaultValue JNull
+                VerificationPlan.build
+                    { template with
+                        Repository = str "repository" src
+                        Commit = str "commit" src
+                        BaselineId = str "id" baseline
+                        BaselineSha256 = Git.sha256Hex bytes
+                        Baseline = baseline }
+            RehearsalBaselines.run o build
+        | _ ->
+            eprintfn "usage: --rehearsal-baselines --source DIR --r4 DIR --r5 DIR --out FILE"
+            2
     | "--offline" :: rest ->
         match Program.parseArgs rest Program.defaults with
         | Error e ->
             eprintfn "%s" e
             2
-        | Ok o -> report (offline o.Source) "offline tests (baseline equivalence, baseline units, preflight verdict, verification plan)"
+        | Ok o -> report (offline o.Source) "offline tests (baseline equivalence, baseline units, preflight verdict, verification plan, acceptance contracts)"
     | args ->
         match Program.parseArgs args Program.defaults with
         | Error e ->

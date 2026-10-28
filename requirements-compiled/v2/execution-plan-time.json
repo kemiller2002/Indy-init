@@ -1,0 +1,855 @@
+{
+  "schema": "indy-init.execution-plan/1",
+  "plan": "A-time-optimized",
+  "name": "Plan A: time optimized",
+  "objective": "Minimize elapsed steps: one lane per owner role, critical-path-first list scheduling, integration checkpoints as early as their prerequisites allow",
+  "scope": {
+    "tasks": 35,
+    "requirementsCovered": 467,
+    "acceptance": "identical for both plans: every entry of verification-manifest.json; no requirement is dropped or weakened"
+  },
+  "lanes": [
+    "coordinator",
+    "domain",
+    "integration",
+    "operator",
+    "persistence",
+    "reviewer",
+    "ui",
+    "upstream"
+  ],
+  "assumptions": [
+    "Each owner role (domain, ui, persistence, integration, coordinator, reviewer) runs in its own lane; operator and upstream lanes do not constrain concurrency.",
+    "Every task is one unit step: no task duration is known from evidence, so steps order work and do not estimate time.",
+    "One CI run per merged task (implementation, checkpoint and verification kinds) is the planned upper bound.",
+    "Ready tasks are started longest-remaining-chain first, so the critical path is never delayed by a shorter branch."
+  ],
+  "operatorDecisionsRequired": [
+    "Approve parallel agent fan-out: REHEARSAL-004-WRITE-PATH-PLAN R4-03 and AR-021 prefer one continuous lead agent (finding F-007).",
+    "All readiness blockers in requirements-validation-report.json."
+  ],
+  "plannedStructure": {
+    "steps": 18,
+    "maxConcurrentTasks": 4,
+    "crossLaneHandoffs": 41,
+    "plannedCiRunsUpperBound": 25,
+    "ciTriggerKinds": [
+      "implementation",
+      "integration-checkpoint",
+      "verification"
+    ],
+    "note": "Structural counts derived from the graph. They are not measurements and not time estimates."
+  },
+  "integrationCheckpoints": [
+    {
+      "task": "T17",
+      "step": 9,
+      "gates": [
+        "G2",
+        "G5"
+      ]
+    },
+    {
+      "task": "T21",
+      "step": 11,
+      "gates": [
+        "G6"
+      ]
+    },
+    {
+      "task": "T31",
+      "step": 15,
+      "gates": [
+        "G5",
+        "G8",
+        "G9"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "tasks": [
+        {
+          "task": "T00",
+          "lane": "operator"
+        },
+        {
+          "task": "T02",
+          "lane": "upstream"
+        },
+        {
+          "task": "T05",
+          "lane": "operator"
+        },
+        {
+          "task": "T06",
+          "lane": "operator"
+        }
+      ]
+    },
+    {
+      "step": 2,
+      "tasks": [
+        {
+          "task": "T01",
+          "lane": "coordinator"
+        },
+        {
+          "task": "T03",
+          "lane": "upstream"
+        },
+        {
+          "task": "T04",
+          "lane": "upstream"
+        }
+      ]
+    },
+    {
+      "step": 3,
+      "tasks": [
+        {
+          "task": "T07",
+          "lane": "coordinator"
+        },
+        {
+          "task": "T10",
+          "lane": "integration"
+        }
+      ]
+    },
+    {
+      "step": 4,
+      "tasks": [
+        {
+          "task": "T09",
+          "lane": "operator"
+        },
+        {
+          "task": "T11",
+          "lane": "integration"
+        }
+      ]
+    },
+    {
+      "step": 5,
+      "tasks": [
+        {
+          "task": "T08",
+          "lane": "coordinator"
+        },
+        {
+          "task": "T24",
+          "lane": "integration"
+        }
+      ]
+    },
+    {
+      "step": 6,
+      "tasks": [
+        {
+          "task": "T12",
+          "lane": "domain"
+        },
+        {
+          "task": "T16",
+          "lane": "ui"
+        },
+        {
+          "task": "T18",
+          "lane": "persistence"
+        }
+      ]
+    },
+    {
+      "step": 7,
+      "tasks": [
+        {
+          "task": "T13",
+          "lane": "domain"
+        }
+      ]
+    },
+    {
+      "step": 8,
+      "tasks": [
+        {
+          "task": "T14",
+          "lane": "domain"
+        }
+      ]
+    },
+    {
+      "step": 9,
+      "tasks": [
+        {
+          "task": "T15",
+          "lane": "domain"
+        },
+        {
+          "task": "T17",
+          "lane": "integration"
+        },
+        {
+          "task": "T19",
+          "lane": "persistence"
+        }
+      ]
+    },
+    {
+      "step": 10,
+      "tasks": [
+        {
+          "task": "T20",
+          "lane": "persistence"
+        },
+        {
+          "task": "T22",
+          "lane": "ui"
+        },
+        {
+          "task": "T27",
+          "lane": "domain"
+        }
+      ]
+    },
+    {
+      "step": 11,
+      "tasks": [
+        {
+          "task": "T21",
+          "lane": "integration"
+        },
+        {
+          "task": "T23",
+          "lane": "ui"
+        },
+        {
+          "task": "T25",
+          "lane": "persistence"
+        }
+      ]
+    },
+    {
+      "step": 12,
+      "tasks": [
+        {
+          "task": "T26",
+          "lane": "ui"
+        },
+        {
+          "task": "T30",
+          "lane": "reviewer"
+        }
+      ]
+    },
+    {
+      "step": 13,
+      "tasks": [
+        {
+          "task": "T28",
+          "lane": "ui"
+        }
+      ]
+    },
+    {
+      "step": 14,
+      "tasks": [
+        {
+          "task": "T29",
+          "lane": "ui"
+        }
+      ]
+    },
+    {
+      "step": 15,
+      "tasks": [
+        {
+          "task": "T31",
+          "lane": "integration"
+        }
+      ]
+    },
+    {
+      "step": 16,
+      "tasks": [
+        {
+          "task": "T32",
+          "lane": "integration"
+        }
+      ]
+    },
+    {
+      "step": 17,
+      "tasks": [
+        {
+          "task": "T33",
+          "lane": "reviewer"
+        }
+      ]
+    },
+    {
+      "step": 18,
+      "tasks": [
+        {
+          "task": "T34",
+          "lane": "integration"
+        }
+      ]
+    }
+  ],
+  "tasks": [
+    {
+      "id": "T00",
+      "lane": "operator",
+      "step": 1,
+      "dependsOn": [],
+      "completion": [
+        "F-008, F-009, F-011, F-012, F-013 and F-019 each carry an owner decision recorded outside agent authorship (AR-003); F-001 was decided by the owner's merge of PR #18",
+        "Every requirement edit the decisions imply is committed by the owner to indy-init"
+      ],
+      "gates": [
+        "G0"
+      ]
+    },
+    {
+      "id": "T01",
+      "lane": "coordinator",
+      "step": 2,
+      "dependsOn": [
+        "T00"
+      ],
+      "completion": [
+        "requirements/causa-requirements-baseline.json source.commit equals the kickoff commit (R4 P2)",
+        "tools/test-requirements-baseline.py passes",
+        "this package recompiled against the new baseline with compilation PASS"
+      ],
+      "gates": [
+        "G0"
+      ]
+    },
+    {
+      "id": "T02",
+      "lane": "upstream",
+      "step": 1,
+      "dependsOn": [],
+      "completion": [
+        "a tagged Praxis release whose CLI has `requirements preservation verify` and the REQ-PRES-001 R1-R5 refusals",
+        "or an owner-approved, time-bounded VER-005 exception for a named build"
+      ],
+      "gates": [
+        "G1"
+      ]
+    },
+    {
+      "id": "T03",
+      "lane": "upstream",
+      "step": 2,
+      "dependsOn": [
+        "T02"
+      ],
+      "completion": [
+        "set registered with percepta-semantic, Dokimos 0.7.0, a Conditor release with SD-1 fixed, folio 0.4.1 assessed (F-015)",
+        "Conditor qualification run passes",
+        "owner approval recorded in the Registry (R4 P1)"
+      ],
+      "gates": [
+        "G1"
+      ]
+    },
+    {
+      "id": "T04",
+      "lane": "upstream",
+      "step": 2,
+      "dependsOn": [
+        "T00"
+      ],
+      "completion": [
+        "causa-data contract revision (STORAGE-003 process) or owner exception naming the conforming primitive",
+        "causa gate passes for the unchanged v1.0.0 fixtures"
+      ],
+      "gates": [
+        "G4"
+      ]
+    },
+    {
+      "id": "T05",
+      "lane": "operator",
+      "step": 1,
+      "dependsOn": [],
+      "completion": [
+        "secret present with contents write on the test repository only (R4 P4); value never read by the agent",
+        "a no-op authenticated read from CI succeeds before kickoff (R3 failed on a missing secret)"
+      ],
+      "gates": [
+        "G6"
+      ]
+    },
+    {
+      "id": "T06",
+      "lane": "operator",
+      "step": 1,
+      "dependsOn": [],
+      "completion": [
+        "recorded organizer answer covering causa-data, the historical catalog and this package (ADRP readiness checklist)"
+      ],
+      "gates": [
+        "G0"
+      ]
+    },
+    {
+      "id": "T07",
+      "lane": "coordinator",
+      "step": 3,
+      "dependsOn": [
+        "T01"
+      ],
+      "completion": [
+        "praxis.requirements-disposition/1 gives every baseline requirement exactly one disposition",
+        "every obligation mapped or marked for an operator approval request; no approval written by the agent (RDP-003)"
+      ],
+      "gates": [
+        "G0"
+      ]
+    },
+    {
+      "id": "T09",
+      "lane": "operator",
+      "step": 4,
+      "dependsOn": [
+        "T07"
+      ],
+      "completion": [
+        "praxis.requirements-approvals/1 written by the operator (or produced from an Ordo decision); none by an agent",
+        "the same approvals are supplied to the acceptance verifier as an externally pinned file (SHA-256) with the operator named by --trusted-operator-id; inline or agent-authored approvals are invalid (REHEARSAL-ACCEPTANCE-LEDGER, PR #16)"
+      ],
+      "gates": [
+        "G0"
+      ]
+    },
+    {
+      "id": "T08",
+      "lane": "coordinator",
+      "step": 5,
+      "dependsOn": [
+        "T07",
+        "T09",
+        "T02"
+      ],
+      "completion": [
+        "gate exit 0 against the pinned baseline, derived package, disposition and approvals",
+        "evidence JSON and exact command committed (RDP-004)"
+      ],
+      "gates": [
+        "G0"
+      ]
+    },
+    {
+      "id": "T10",
+      "lane": "integration",
+      "step": 3,
+      "dependsOn": [
+        "T03"
+      ],
+      "completion": [
+        "bootstrap commit recorded; SD-1 workaround not applied by hand (R4 P3)",
+        "global.json with SDK 10.0.402 exists before any workflow names it (R3 D-02/D-06)",
+        "first green CI on the bootstrap commit; timer starts (R4 P5)"
+      ],
+      "gates": [
+        "G1"
+      ]
+    },
+    {
+      "id": "T11",
+      "lane": "integration",
+      "step": 4,
+      "dependsOn": [
+        "T10"
+      ],
+      "completion": [
+        "CI fails when installed versions differ from the lock (VER-008)",
+        "Limen startup, Forma render, Folio print and frozen golden replay smoke pass on the locked set (DEP-CURRENT-004)"
+      ],
+      "gates": [
+        "G1"
+      ]
+    },
+    {
+      "id": "T12",
+      "lane": "domain",
+      "step": 6,
+      "dependsOn": [
+        "T08",
+        "T10"
+      ],
+      "completion": [
+        "each R2 defect class DC-001..DC-006 and R1 M4 / R3 M1 request-identity class has a failing-first test (R4-01)",
+        "negative controls demonstrably fail on injected defects (AR-022)"
+      ],
+      "gates": [
+        "G3",
+        "G7"
+      ]
+    },
+    {
+      "id": "T13",
+      "lane": "domain",
+      "step": 7,
+      "dependsOn": [
+        "T12"
+      ],
+      "completion": [
+        "decide/evolve for the lifecycle tables; illegal-transition and forged-history variants rejected (G3)",
+        "capabilities derived in F# with reasons for blocked actions"
+      ],
+      "gates": [
+        "G3"
+      ]
+    },
+    {
+      "id": "T14",
+      "lane": "domain",
+      "step": 8,
+      "dependsOn": [
+        "T13",
+        "T00"
+      ],
+      "completion": [
+        "one manifest with types, request/response examples, error variants and contract tests; its SHA recorded in the ledger",
+        "mandatory negative cases implemented as tests"
+      ],
+      "gates": [
+        "G2"
+      ]
+    },
+    {
+      "id": "T15",
+      "lane": "domain",
+      "step": 9,
+      "dependsOn": [
+        "T13"
+      ],
+      "completion": [
+        "three identities match (STORAGE-007)",
+        "five golden scenarios reproduce expected projections; 90 negative fixtures refused",
+        "seed hashes unchanged after the run"
+      ],
+      "gates": [
+        "G4"
+      ]
+    },
+    {
+      "id": "T16",
+      "lane": "ui",
+      "step": 6,
+      "dependsOn": [
+        "T08",
+        "T11"
+      ],
+      "completion": [
+        "HTML/CSS shell before WASM; transport failure shows a recoverable error; retry works after a 503 (R2 DC-006)",
+        "route codec round-trip tests; deep links survive reload",
+        "UI-016 palette via Forma tokens with contrast checks"
+      ],
+      "gates": [
+        "G5"
+      ]
+    },
+    {
+      "id": "T17",
+      "lane": "integration",
+      "step": 9,
+      "dependsOn": [
+        "T14",
+        "T16"
+      ],
+      "completion": [
+        "a typed command crosses Limen, returns events or a typed fault, and every dependent view refreshes from one projection version (ADRP-004)",
+        "runs in WebKit in CI"
+      ],
+      "gates": [
+        "G2",
+        "G5"
+      ]
+    },
+    {
+      "id": "T18",
+      "lane": "persistence",
+      "step": 6,
+      "dependsOn": [
+        "T05",
+        "T04",
+        "T08",
+        "T10"
+      ],
+      "completion": [
+        "recorded responses include write, conflict (expected-version mismatch), 422 missing branch, cache headers on mutable reads, installation-token permissions (R2 DC-004/005, R3 H1, D-07)",
+        "fakes served only from recordings"
+      ],
+      "gates": [
+        "G6"
+      ]
+    },
+    {
+      "id": "T19",
+      "lane": "persistence",
+      "step": 9,
+      "dependsOn": [
+        "T14"
+      ],
+      "completion": [
+        "pending, sending, conflicted, unknown and synced remain distinct (CONTRACT 9.4.3; D-009)",
+        "offline edits survive reload"
+      ],
+      "gates": [
+        "G6"
+      ]
+    },
+    {
+      "id": "T20",
+      "lane": "persistence",
+      "step": 10,
+      "dependsOn": [
+        "T18",
+        "T19",
+        "T00"
+      ],
+      "completion": [
+        "no mutation on connect or read; explicit create; no overwrite of unread history (EXT-DATA-006)",
+        "eight connection states distinguished (EXT-DATA-007)",
+        "credentials never leave memory or the Authorization header"
+      ],
+      "gates": [
+        "G6"
+      ]
+    },
+    {
+      "id": "T21",
+      "lane": "integration",
+      "step": 11,
+      "dependsOn": [
+        "T20",
+        "T17"
+      ],
+      "completion": [
+        "create, write, reload, conflict and rejected-token pass live, backed by independent SHA reads (R4-02)",
+        "first verified remote write and first verified conflict handling times recorded (R4 measurements)"
+      ],
+      "gates": [
+        "G6"
+      ]
+    },
+    {
+      "id": "T22",
+      "lane": "ui",
+      "step": 10,
+      "dependsOn": [
+        "T17"
+      ],
+      "completion": [
+        "each implemented screen satisfies its Percepta contract at the deployed SHA",
+        "unimplemented P1/experimental screens recorded as NOT_RUN, not passed (ADRP-002)"
+      ],
+      "gates": [
+        "G5"
+      ]
+    },
+    {
+      "id": "T24",
+      "lane": "integration",
+      "step": 5,
+      "dependsOn": [
+        "T11"
+      ],
+      "completion": [
+        "owner repository, package, API, version and license recorded with a working example (WDL-001), or an owner decision on WDL scope"
+      ],
+      "gates": [
+        "G1"
+      ]
+    },
+    {
+      "id": "T23",
+      "lane": "ui",
+      "step": 11,
+      "dependsOn": [
+        "T24",
+        "T17"
+      ],
+      "completion": [
+        "deterministic layout seeded by stable ids with a textual alternative (ADRP-007)",
+        "no duplicate layout engine (WDL-002)"
+      ],
+      "gates": [
+        "G5"
+      ]
+    },
+    {
+      "id": "T25",
+      "lane": "persistence",
+      "step": 11,
+      "dependsOn": [
+        "T20",
+        "T15"
+      ],
+      "completion": [
+        "three cases load from kemiller2002/causa-data workspace historical-v1 and replay to the manifest's expectedStateSha256",
+        "historical_catalog.py verify --app passes (no bundling)"
+      ],
+      "gates": [
+        "G4",
+        "G6"
+      ]
+    },
+    {
+      "id": "T26",
+      "lane": "ui",
+      "step": 12,
+      "dependsOn": [
+        "T17"
+      ],
+      "completion": [
+        "incomplete investigations render as incomplete (R12.3)",
+        "print output verified at the deployed SHA"
+      ],
+      "gates": [
+        "G8"
+      ]
+    },
+    {
+      "id": "T27",
+      "lane": "domain",
+      "step": 10,
+      "dependsOn": [
+        "T13",
+        "T00"
+      ],
+      "completion": [
+        "proposals enter as proposals; external evidence cannot redefine instructions (R11.4)",
+        "or an owner-approved exclusion"
+      ],
+      "gates": [
+        "G3"
+      ]
+    },
+    {
+      "id": "T28",
+      "lane": "ui",
+      "step": 13,
+      "dependsOn": [
+        "T22",
+        "T00"
+      ],
+      "completion": [
+        "history renders from canonical sequence, never wall-clock alone (ADRP-007)",
+        "or an owner-approved exclusion"
+      ],
+      "gates": [
+        "G5"
+      ]
+    },
+    {
+      "id": "T29",
+      "lane": "ui",
+      "step": 14,
+      "dependsOn": [
+        "T11",
+        "T17"
+      ],
+      "completion": [
+        "versions shown only in Administration and equal to loaded components (VER-007)"
+      ],
+      "gates": [
+        "G5"
+      ]
+    },
+    {
+      "id": "T30",
+      "lane": "reviewer",
+      "step": 12,
+      "dependsOn": [
+        "T21",
+        "T22",
+        "T25"
+      ],
+      "completion": [
+        "fresh reviewer receives code, requirements and constraints only (R4-03)",
+        "findings recorded per defect class"
+      ],
+      "gates": [
+        "G7"
+      ]
+    },
+    {
+      "id": "T31",
+      "lane": "integration",
+      "step": 15,
+      "dependsOn": [
+        "T30",
+        "T23",
+        "T26",
+        "T27",
+        "T28",
+        "T29"
+      ],
+      "completion": [
+        "browser, accessibility, integration, security and report suites pass on the deployed exact SHA",
+        "Percepta evidence from the registered release"
+      ],
+      "gates": [
+        "G5",
+        "G8",
+        "G9"
+      ]
+    },
+    {
+      "id": "T32",
+      "lane": "integration",
+      "step": 16,
+      "dependsOn": [
+        "T31"
+      ],
+      "completion": [
+        "original reproduction, adversarial variants, invariant enforcement and SHA-bound proof per class (DCC-005)"
+      ],
+      "gates": [
+        "G7"
+      ]
+    },
+    {
+      "id": "T33",
+      "lane": "reviewer",
+      "step": 17,
+      "dependsOn": [
+        "T32"
+      ],
+      "completion": [
+        "no open critical defect class (release acceptance predicate)"
+      ],
+      "gates": [
+        "G7"
+      ]
+    },
+    {
+      "id": "T34",
+      "lane": "integration",
+      "step": 18,
+      "dependsOn": [
+        "T33",
+        "T08"
+      ],
+      "completion": [
+        "preservation gate exit 0 at acceptance with evidence committed",
+        "ledger in causa.acceptance-ledger/2 with every PASS evidence path in a causa.acceptance-evidence-manifest/1 bundle",
+        "compute-acceptance-verdict.py run with the pinned baseline and SHA-256, approvals file and SHA-256, trusted operator ids and evidence manifest SHA-256; its verdict is the report's only verdict line",
+        "R4 measurements recorded; unavailable values recorded as unavailable"
+      ],
+      "gates": [
+        "G0",
+        "G9",
+        "G10"
+      ]
+    }
+  ]
+}

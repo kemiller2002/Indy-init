@@ -1,0 +1,296 @@
+{
+  "schema": "indy-init.rc-preflight-checks/1",
+  "description": "Rehearsal 4 preflight (untimed; ends at the first green bootstrap CI, R4 P5). Each check has an executable type run by `requirements-compiler preflight`, which writes evidence; nothing passes without being executed. Types: package-state (evaluated from the compiled package), baseline-pinned, sdk-pinned, secret-scan, git-ref-contains, registry-set-contains, env-present, github-auth-contract, manual (an owner or organizer record; never passes automatically).",
+  "checks": [
+    {
+      "id": "PRE-DEC-01",
+      "category": "owner-decisions",
+      "type": "package-state",
+      "params": {
+        "condition": "no-unresolved-decisions"
+      },
+      "title": "Every decision the run depends on is decided by the owner",
+      "tasks": [
+        "T00"
+      ],
+      "refs": [
+        "DEC-006",
+        "DEC-022",
+        "DEC-023",
+        "DEC-024",
+        "DEC-025"
+      ]
+    },
+    {
+      "id": "PRE-DEC-02",
+      "category": "owner-decisions",
+      "type": "package-state",
+      "params": {
+        "condition": "no-open-critical-findings"
+      },
+      "title": "No critical material finding is unresolved",
+      "tasks": [
+        "T00"
+      ],
+      "refs": [
+        "F-001",
+        "F-003",
+        "F-004",
+        "F-005",
+        "F-008",
+        "F-009"
+      ]
+    },
+    {
+      "id": "PRE-REQ-01",
+      "category": "requirements-baseline",
+      "type": "baseline-pinned",
+      "params": {
+        "baseline": "requirements/causa-requirements-baseline.json"
+      },
+      "title": "Committed baseline is pinned at the source commit and equals the generator's output there",
+      "tasks": [
+        "T01"
+      ],
+      "refs": [
+        "F-003",
+        "AR-001"
+      ]
+    },
+    {
+      "id": "PRE-REQ-02",
+      "category": "requirements-preservation",
+      "type": "package-state",
+      "params": {
+        "condition": "compilation-pass"
+      },
+      "title": "Compiled package passes every critical check (V01-V13, V15-V16)",
+      "tasks": [
+        "T07"
+      ],
+      "refs": [
+        "AR-002"
+      ]
+    },
+    {
+      "id": "PRE-REQ-03",
+      "category": "requirements-preservation",
+      "type": "git-ref-contains",
+      "params": {
+        "repo": "praxis",
+        "ref": "latest-tag:v",
+        "path": "src/Praxis.Cli",
+        "pattern": "preservation"
+      },
+      "title": "A released Praxis carries `requirements preservation verify` (RDP-004 without a VER-005 exception)",
+      "tasks": [
+        "T02",
+        "T08"
+      ],
+      "refs": [
+        "F-004",
+        "CT-013"
+      ]
+    },
+    {
+      "id": "PRE-REQ-04",
+      "category": "requirements-preservation",
+      "type": "manual",
+      "params": {
+        "record": "praxis requirements preservation verify exit 0, evidence committed in the rehearsal repository (RDP-004)"
+      },
+      "title": "Preservation gate PASS on the derived package, disposition and operator approvals",
+      "tasks": [
+        "T08",
+        "T09"
+      ],
+      "refs": [
+        "AR-004"
+      ]
+    },
+    {
+      "id": "PRE-DEP-01",
+      "category": "dependency-release",
+      "type": "registry-set-contains",
+      "params": {
+        "repo": "echelon-registry",
+        "set": "echelon-current",
+        "systems": "percepta-semantic,dokimos,praxis,limen,forma,folio,ordo,aegis",
+        "status": "approved"
+      },
+      "title": "The newest approved echelon-current set contains every required system, including percepta-semantic",
+      "tasks": [
+        "T03"
+      ],
+      "refs": [
+        "F-005",
+        "CT-012",
+        "CT-016"
+      ]
+    },
+    {
+      "id": "PRE-DEP-02",
+      "category": "contract-compatibility",
+      "type": "package-state",
+      "params": {
+        "condition": "no-blocked-contracts"
+      },
+      "title": "No contract the run consumes is blocked (write primitive, Percepta, Praxis gate, release set)",
+      "tasks": [
+        "T03",
+        "T04"
+      ],
+      "refs": [
+        "CT-007",
+        "CT-012",
+        "CT-013",
+        "CT-016"
+      ]
+    },
+    {
+      "id": "PRE-DEP-03",
+      "category": "contract-compatibility",
+      "type": "package-state",
+      "params": {
+        "condition": "identities-match"
+      },
+      "title": "Storage contract and historical catalog identities match (CT-006, CT-008)",
+      "tasks": [
+        "T15",
+        "T25"
+      ],
+      "refs": [
+        "CT-006",
+        "CT-008"
+      ]
+    },
+    {
+      "id": "PRE-AUTH-01",
+      "category": "authentication",
+      "type": "env-present",
+      "params": {
+        "variables": "CAUSA_GITHUB_TOKEN,CAUSA_TEST_REPO"
+      },
+      "title": "Live-job secret and test repository are configured (values never read into evidence)",
+      "tasks": [
+        "T05"
+      ],
+      "refs": [
+        "PF-015",
+        "DEC-019"
+      ]
+    },
+    {
+      "id": "PRE-AUTH-02",
+      "category": "authentication",
+      "type": "github-auth-contract",
+      "params": {
+        "tokenVariable": "CAUSA_GITHUB_TOKEN",
+        "repoVariable": "CAUSA_TEST_REPO"
+      },
+      "title": "Token reads the test repository and is not a broad classic token (no 'repo'/'admin' X-OAuth-Scopes)",
+      "tasks": [
+        "T05"
+      ],
+      "refs": [
+        "EXT-DATA-004",
+        "R11.2",
+        "CT-017"
+      ]
+    },
+    {
+      "id": "PRE-SEC-01",
+      "category": "authentication",
+      "type": "secret-scan",
+      "params": {
+        "repo": "indy-init"
+      },
+      "title": "No GitHub credential is committed in the planning repository",
+      "tasks": [
+        "T05"
+      ],
+      "refs": [
+        "EXT-DATA-004",
+        "R11.3"
+      ]
+    },
+    {
+      "id": "PRE-TOOL-01",
+      "category": "toolchain",
+      "type": "sdk-pinned",
+      "params": {
+        "globalJson": "global.json"
+      },
+      "title": "The installed .NET SDK equals the pinned SDK (10.0.402, rollForward disable)",
+      "tasks": [
+        "T10"
+      ],
+      "refs": [
+        "DEC-027"
+      ]
+    },
+    {
+      "id": "PRE-TOOL-02",
+      "category": "toolchain",
+      "type": "git-ref-contains",
+      "params": {
+        "repo": "conditor",
+        "ref": "latest-tag:v",
+        "path": "src/Conditor.Core",
+        "pattern": "CON-367"
+      },
+      "title": "The latest Conditor release carries the SD-1 fix (CON-367: scaffold pins web packages through their Registry distribution)",
+      "tasks": [
+        "T03",
+        "T10"
+      ],
+      "refs": [
+        "AR-023"
+      ]
+    },
+    {
+      "id": "PRE-ORG-01",
+      "category": "owner-decisions",
+      "type": "manual",
+      "params": {
+        "record": "organizer confirmation covering causa-data, the historical catalog and this package (ADRP readiness checklist)"
+      },
+      "title": "Organizer confirmation for prepared data and requirements (event only; not required for Rehearsal 4)",
+      "tasks": [
+        "T06"
+      ],
+      "refs": [
+        "ADRP-016"
+      ]
+    },
+    {
+      "id": "PRE-VER-01",
+      "category": "verification-planning",
+      "type": "package-state",
+      "params": {
+        "condition": "manifests-valid"
+      },
+      "title": "Preflight and timed-execution manifests are complete and consistent (V16)",
+      "tasks": [
+        "T07"
+      ],
+      "refs": []
+    },
+    {
+      "id": "PRE-TOOL-03",
+      "category": "toolchain",
+      "type": "manual",
+      "params": {
+        "record": "bootstrap commit in the rehearsal repository produced by Conditor on the kickoff set without the SD-1 hand workaround, first green CI (R4 P3, P5)"
+      },
+      "title": "Bootstrap without the SD-1 workaround reaches first green CI",
+      "tasks": [
+        "T10"
+      ],
+      "refs": [
+        "AR-023",
+        "DEC-027"
+      ]
+    }
+  ]
+}

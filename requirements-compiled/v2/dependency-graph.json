@@ -1,0 +1,4547 @@
+{
+  "schema": "indy-init.dependency-graph/1",
+  "edgePolicy": "dependsOn edges are genuine prerequisites (data, contract or evidence flows from the prerequisite); preferenceAfter edges are ordering preferences and are never scheduled",
+  "acyclic": true,
+  "summary": {
+    "tasks": 35,
+    "genuineEdges": 56,
+    "preferenceEdges": 2,
+    "criticalPathLength": 16,
+    "maxDepth": 16,
+    "bySatisfiedBy": {
+      "existing-capability": 9,
+      "new-implementation": 11,
+      "operator-action": 5,
+      "upstream-release": 2,
+      "verification": 8
+    },
+    "byOwner": {
+      "coordinator": 3,
+      "domain": 5,
+      "integration": 8,
+      "operator": 4,
+      "persistence": 4,
+      "reviewer": 2,
+      "ui": 6,
+      "upstream": 3
+    }
+  },
+  "nodes": [
+    {
+      "id": "T00",
+      "title": "Owner decisions on the readiness blockers",
+      "owner": "operator",
+      "kind": "precondition",
+      "satisfiedBy": "operator-action",
+      "capability": null,
+      "depth": 1,
+      "onCriticalPath": true,
+      "covers": [
+        "UI-001",
+        "UI-015",
+        "EXT-DATA-002",
+        "AR-024",
+        "AR-003",
+        "UI-037"
+      ],
+      "coveredRequirementCount": 6,
+      "contracts": [
+        "CT-007",
+        "CT-017"
+      ],
+      "decisions": [
+        "DEC-006",
+        "DEC-022",
+        "DEC-023",
+        "DEC-025"
+      ],
+      "gates": [
+        "G0"
+      ],
+      "completion": [
+        "F-008, F-009, F-011, F-012, F-013 and F-019 each carry an owner decision recorded outside agent authorship (AR-003); F-001 was decided by the owner's merge of PR #18",
+        "Every requirement edit the decisions imply is committed by the owner to indy-init"
+      ]
+    },
+    {
+      "id": "T01",
+      "title": "Regenerate and pin the baseline at the kickoff commit",
+      "owner": "coordinator",
+      "kind": "precondition",
+      "satisfiedBy": "existing-capability",
+      "capability": "indy-init tools/build-requirements-baseline.py",
+      "depth": 2,
+      "onCriticalPath": true,
+      "covers": [
+        "AR-001",
+        "REHEARSAL-ACCEPTANCE-LEDGER\u00a7preamble"
+      ],
+      "coveredRequirementCount": 2,
+      "contracts": [],
+      "decisions": [
+        "DEC-017"
+      ],
+      "gates": [
+        "G0"
+      ],
+      "completion": [
+        "requirements/causa-requirements-baseline.json source.commit equals the kickoff commit (R4 P2)",
+        "tools/test-requirements-baseline.py passes",
+        "this package recompiled against the new baseline with compilation PASS"
+      ]
+    },
+    {
+      "id": "T02",
+      "title": "Release a Praxis version carrying the hardened preservation gate",
+      "owner": "upstream",
+      "kind": "precondition",
+      "satisfiedBy": "upstream-release",
+      "capability": "praxis#292 + REQ-PRES-001",
+      "depth": 1,
+      "onCriticalPath": false,
+      "covers": [
+        "AR-004"
+      ],
+      "coveredRequirementCount": 1,
+      "contracts": [
+        "CT-013"
+      ],
+      "decisions": [
+        "DEC-017"
+      ],
+      "gates": [
+        "G1"
+      ],
+      "completion": [
+        "a tagged Praxis release whose CLI has `requirements preservation verify` and the REQ-PRES-001 R1-R5 refusals",
+        "or an owner-approved, time-bounded VER-005 exception for a named build"
+      ]
+    },
+    {
+      "id": "T03",
+      "title": "Cut, qualify and approve the kickoff release set (echelon-current 1.28.0)",
+      "owner": "upstream",
+      "kind": "precondition",
+      "satisfiedBy": "upstream-release",
+      "capability": "echelon-registry + Conditor qualification",
+      "depth": 2,
+      "onCriticalPath": false,
+      "covers": [
+        "AR-023",
+        "VER-002"
+      ],
+      "coveredRequirementCount": 2,
+      "contracts": [
+        "CT-016",
+        "CT-012"
+      ],
+      "decisions": [
+        "DEC-013",
+        "DEC-018"
+      ],
+      "gates": [
+        "G1"
+      ],
+      "completion": [
+        "set registered with percepta-semantic, Dokimos 0.7.0, a Conditor release with SD-1 fixed, folio 0.4.1 assessed (F-015)",
+        "Conditor qualification run passes",
+        "owner approval recorded in the Registry (R4 P1)"
+      ]
+    },
+    {
+      "id": "T04",
+      "title": "Version or except the storage contract's GitHub write primitive",
+      "owner": "upstream",
+      "kind": "precondition",
+      "satisfiedBy": "operator-action",
+      "capability": null,
+      "depth": 2,
+      "onCriticalPath": false,
+      "covers": [
+        "STORAGE-003"
+      ],
+      "coveredRequirementCount": 1,
+      "contracts": [
+        "CT-006",
+        "CT-007"
+      ],
+      "decisions": [
+        "DEC-006",
+        "DEC-005"
+      ],
+      "gates": [
+        "G4"
+      ],
+      "completion": [
+        "causa-data contract revision (STORAGE-003 process) or owner exception naming the conforming primitive",
+        "causa gate passes for the unchanged v1.0.0 fixtures"
+      ]
+    },
+    {
+      "id": "T05",
+      "title": "Provision the write-capable test data repository and CAUSA_GITHUB_TOKEN",
+      "owner": "operator",
+      "kind": "precondition",
+      "satisfiedBy": "operator-action",
+      "capability": null,
+      "depth": 1,
+      "onCriticalPath": false,
+      "covers": [
+        "PF-015"
+      ],
+      "coveredRequirementCount": 1,
+      "contracts": [
+        "CT-017"
+      ],
+      "decisions": [
+        "DEC-019"
+      ],
+      "gates": [
+        "G6"
+      ],
+      "completion": [
+        "secret present with contents write on the test repository only (R4 P4); value never read by the agent",
+        "a no-op authenticated read from CI succeeds before kickoff (R3 failed on a missing secret)"
+      ]
+    },
+    {
+      "id": "T06",
+      "title": "Organizer confirmation for prepared requirements, data and tooling",
+      "owner": "operator",
+      "kind": "precondition",
+      "satisfiedBy": "operator-action",
+      "capability": null,
+      "depth": 1,
+      "onCriticalPath": false,
+      "covers": [
+        "ADRP-016",
+        "STORAGE-008",
+        "R0.2"
+      ],
+      "coveredRequirementCount": 3,
+      "contracts": [],
+      "decisions": [
+        "DEC-023"
+      ],
+      "gates": [
+        "G0"
+      ],
+      "completion": [
+        "recorded organizer answer covering causa-data, the historical catalog and this package (ADRP readiness checklist)"
+      ]
+    },
+    {
+      "id": "T07",
+      "title": "Derive the requirements package and dispositions in the rehearsal repository",
+      "owner": "coordinator",
+      "kind": "precondition",
+      "satisfiedBy": "existing-capability",
+      "capability": "Praxis intake (.praxis/inbox/documents) + this package's normalized requirements and source map",
+      "depth": 3,
+      "onCriticalPath": true,
+      "covers": [
+        "AR-002",
+        "AR-012",
+        "AR-017",
+        "VER-010",
+        "WDL-015",
+        "ADRP-001",
+        "ADRP-002",
+        "ADRP-013",
+        "CAUSA-UI-EXPERIENCE\u00a7praxis-intake-and-implementation",
+        "PROVIDER-FIXTURE-AND-INTEGRATION\u00a7rehearsal-intake",
+        "REHEARSAL-EXTERNAL-DATA-BOUNDARY\u00a7implementation-intake",
+        "DEFECT-CLASS-CLOSURE-AND-RELEASE-GATES\u00a7implementation-intake",
+        "WORKFLOW-DIAGRAM-INTEGRATION\u00a7rehearsal-preparation",
+        "FROZEN-DEMO-STORAGE\u00a7implementation-work",
+        "CAUSA-UI-EXPERIENCE\u00a7delivery-priority-and-boundaries"
+      ],
+      "coveredRequirementCount": 15,
+      "contracts": [
+        "CT-013"
+      ],
+      "decisions": [
+        "DEC-029",
+        "DEC-017"
+      ],
+      "gates": [
+        "G0"
+      ],
+      "completion": [
+        "praxis.requirements-disposition/1 gives every baseline requirement exactly one disposition",
+        "every obligation mapped or marked for an operator approval request; no approval written by the agent (RDP-003)"
+      ]
+    },
+    {
+      "id": "T08",
+      "title": "Preservation gate PASS before implementation",
+      "owner": "coordinator",
+      "kind": "verification",
+      "satisfiedBy": "verification",
+      "capability": "praxis requirements preservation verify",
+      "depth": 5,
+      "onCriticalPath": true,
+      "covers": [
+        "AR-004",
+        "AGENT-DECISION-REDUCTION-PROFILE\u00a7pre-experiment-readiness-checklist"
+      ],
+      "coveredRequirementCount": 2,
+      "contracts": [
+        "CT-013"
+      ],
+      "decisions": [
+        "DEC-017"
+      ],
+      "gates": [
+        "G0"
+      ],
+      "completion": [
+        "gate exit 0 against the pinned baseline, derived package, disposition and approvals",
+        "evidence JSON and exact command committed (RDP-004)"
+      ]
+    },
+    {
+      "id": "T09",
+      "title": "Operator approval records for exclusions, supersessions and conflicts",
+      "owner": "operator",
+      "kind": "precondition",
+      "satisfiedBy": "operator-action",
+      "capability": null,
+      "depth": 4,
+      "onCriticalPath": true,
+      "covers": [
+        "AR-003"
+      ],
+      "coveredRequirementCount": 1,
+      "contracts": [],
+      "decisions": [],
+      "gates": [
+        "G0"
+      ],
+      "completion": [
+        "praxis.requirements-approvals/1 written by the operator (or produced from an Ordo decision); none by an agent",
+        "the same approvals are supplied to the acceptance verifier as an externally pinned file (SHA-256) with the operator named by --trusted-operator-id; inline or agent-authored approvals are invalid (REHEARSAL-ACCEPTANCE-LEDGER, PR #16)"
+      ]
+    },
+    {
+      "id": "T10",
+      "title": "Blank repository bootstrap on the kickoff set; first green CI",
+      "owner": "integration",
+      "kind": "precondition",
+      "satisfiedBy": "existing-capability",
+      "capability": "Conditor bootstrap on echelon-current; Praxis init",
+      "depth": 3,
+      "onCriticalPath": false,
+      "covers": [
+        "regex:^R0\\.",
+        "KICKOFF-EXECUTION-PACKET\u00a71-9-30-baseline",
+        "KICKOFF-EXECUTION-PACKET\u00a72-canonical-contract-entry",
+        "KICKOFF-EXECUTION-PACKET\u00a7preamble",
+        "DEP-CURRENT-001",
+        "DEP-CURRENT-002",
+        "DEP-CURRENT-003",
+        "VER-001",
+        "VER-002",
+        "VER-003",
+        "VER-005",
+        "AR-023",
+        "regex:^R13\\."
+      ],
+      "coveredRequirementCount": 23,
+      "contracts": [
+        "CT-016"
+      ],
+      "decisions": [
+        "DEC-013",
+        "DEC-027"
+      ],
+      "gates": [
+        "G1"
+      ],
+      "completion": [
+        "bootstrap commit recorded; SD-1 workaround not applied by hand (R4 P3)",
+        "global.json with SDK 10.0.402 exists before any workflow names it (R3 D-02/D-06)",
+        "first green CI on the bootstrap commit; timer starts (R4 P5)"
+      ]
+    },
+    {
+      "id": "T11",
+      "title": "Stack lock and compatibility gate",
+      "owner": "integration",
+      "kind": "verification",
+      "satisfiedBy": "existing-capability",
+      "capability": "Conditor verify/doctor; registry release manifests",
+      "depth": 4,
+      "onCriticalPath": false,
+      "covers": [
+        "DEP-CURRENT-004",
+        "DEP-CURRENT-005",
+        "DEP-CURRENT-006",
+        "DEP-CURRENT-007",
+        "DEP-CURRENT-008",
+        "REHEARSAL-DEPENDENCY-LOCK\u00a7preflight-acceptance",
+        "VER-004",
+        "VER-006",
+        "VER-008",
+        "VER-009",
+        "SYSTEM-VERSION-AND-COMPATIBILITY\u00a7acceptance",
+        "AR-011",
+        "REQUIREMENTS\u00a7version-and-integration-baseline"
+      ],
+      "coveredRequirementCount": 13,
+      "contracts": [
+        "CT-016",
+        "CT-009",
+        "CT-010",
+        "CT-011",
+        "CT-014"
+      ],
+      "decisions": [
+        "DEC-018"
+      ],
+      "gates": [
+        "G1"
+      ],
+      "completion": [
+        "CI fails when installed versions differ from the lock (VER-008)",
+        "Limen startup, Forma render, Folio print and frozen golden replay smoke pass on the locked set (DEP-CURRENT-004)"
+      ]
+    },
+    {
+      "id": "T12",
+      "title": "Invariant inventory and write-invariant tests first (DC-001..DC-006)",
+      "owner": "domain",
+      "kind": "implementation",
+      "satisfiedBy": "new-implementation",
+      "capability": null,
+      "depth": 6,
+      "onCriticalPath": true,
+      "covers": [
+        "DCC-001",
+        "DCC-003",
+        "ADRP-009",
+        "AR-009",
+        "AR-022",
+        "AGENT-RELIABILITY\u00a7required-adversarial-acceptance-cases"
+      ],
+      "coveredRequirementCount": 6,
+      "contracts": [],
+      "decisions": [
+        "DEC-021",
+        "DEC-030"
+      ],
+      "gates": [
+        "G3",
+        "G7"
+      ],
+      "completion": [
+        "each R2 defect class DC-001..DC-006 and R1 M4 / R3 M1 request-identity class has a failing-first test (R4-01)",
+        "negative controls demonstrably fail on injected defects (AR-022)"
+      ]
+    },
+    {
+      "id": "T13",
+      "title": "F# semantic kernel and policy/capabilities",
+      "owner": "domain",
+      "kind": "implementation",
+      "satisfiedBy": "new-implementation",
+      "capability": null,
+      "depth": 7,
+      "onCriticalPath": true,
+      "covers": [
+        "doc:docs/STATE-TRANSITION-TABLES.md",
+        "regex:^R[1-8]\\.\\d+$",
+        "regex:^R15\\.",
+        "AR-006",
+        "ADRP-004",
+        "CAUSA-UI-EXPERIENCE\u00a7preamble",
+        "CAUSA-UI-EXPERIENCE\u00a7architectural-principles"
+      ],
+      "coveredRequirementCount": 60,
+      "contracts": [
+        "CT-001",
+        "CT-003",
+        "CT-018"
+      ],
+      "decisions": [
+        "DEC-001",
+        "DEC-021",
+        "DEC-026"
+      ],
+      "gates": [
+        "G3"
+      ],
+      "completion": [
+        "decide/evolve for the lifecycle tables; illegal-transition and forged-history variants rejected (G3)",
+        "capabilities derived in F# with reasons for blocked actions"
+      ]
+    },
+    {
+      "id": "T14",
+      "title": "Interface freeze: versioned manifest for boundaries A-E",
+      "owner": "domain",
+      "kind": "implementation",
+      "satisfiedBy": "new-implementation",
+      "capability": null,
+      "depth": 8,
+      "onCriticalPath": true,
+      "covers": [
+        "doc:docs/REHEARSAL-AGENT-INTERFACE-FREEZE.md",
+        "ADRP-008",
+        "KICKOFF-EXECUTION-PACKET\u00a74-parallel-ownership-after-kernel-stabilizes",
+        "KICKOFF-EXECUTION-PACKET\u00a7domain-agent",
+        "KICKOFF-EXECUTION-PACKET\u00a7ui-agent",
+        "KICKOFF-EXECUTION-PACKET\u00a7persistence-agent",
+        "KICKOFF-EXECUTION-PACKET\u00a7factory-proof-agent"
+      ],
+      "coveredRequirementCount": 16,
+      "contracts": [
+        "CT-001",
+        "CT-002",
+        "CT-003",
+        "CT-004",
+        "CT-005",
+        "CT-018"
+      ],
+      "decisions": [
+        "DEC-023"
+      ],
+      "gates": [
+        "G2"
+      ],
+      "completion": [
+        "one manifest with types, request/response examples, error variants and contract tests; its SHA recorded in the ledger",
+        "mandatory negative cases implemented as tests"
+      ]
+    },
+    {
+      "id": "T15",
+      "title": "Frozen fixture replay against the storage contract",
+      "owner": "domain",
+      "kind": "implementation",
+      "satisfiedBy": "existing-capability",
+      "capability": "causa-data causa gate + golden states",
+      "depth": 8,
+      "onCriticalPath": false,
+      "covers": [
+        "doc:docs/FROZEN-DEMO-STORAGE-REQUIREMENTS.md",
+        "doc:docs/CAUSA-STORAGE-RELEASE-v1.0.0.md",
+        "EXT-DATA-011",
+        "ADRP-005"
+      ],
+      "coveredRequirementCount": 19,
+      "contracts": [
+        "CT-006",
+        "CT-003"
+      ],
+      "decisions": [
+        "DEC-005"
+      ],
+      "gates": [
+        "G4"
+      ],
+      "completion": [
+        "three identities match (STORAGE-007)",
+        "five golden scenarios reproduce expected projections; 90 negative fixtures refused",
+        "seed hashes unchanged after the run"
+      ]
+    },
+    {
+      "id": "T16",
+      "title": "Application shell, loading experience, routes and visual identity",
+      "owner": "ui",
+      "kind": "implementation",
+      "satisfiedBy": "new-implementation",
+      "capability": null,
+      "depth": 6,
+      "onCriticalPath": false,
+      "covers": [
+        "doc:docs/WASM-LOADING-EXPERIENCE-REQUIREMENTS.md",
+        "UI-011",
+        "UI-014",
+        "UI-016",
+        "UI-020",
+        "UI-029",
+        "R9.1",
+        "R9.2",
+        "R9.6",
+        "R9.7",
+        "R9.8",
+        "R9.9",
+        "R9.10",
+        "SCREEN-CONTRACTS\u00a7url-contract",
+        "SCREEN-CONTRACTS\u00a7responsive-contract",
+        "ADRP-003"
+      ],
+      "coveredRequirementCount": 24,
+      "contracts": [
+        "CT-009",
+        "CT-010"
+      ],
+      "decisions": [
+        "DEC-002",
+        "DEC-003",
+        "DEC-011",
+        "DEC-020"
+      ],
+      "gates": [
+        "G5"
+      ],
+      "completion": [
+        "HTML/CSS shell before WASM; transport failure shows a recoverable error; retry works after a 503 (R2 DC-006)",
+        "route codec round-trip tests; deep links survive reload",
+        "UI-016 palette via Forma tokens with contrast checks"
+      ]
+    },
+    {
+      "id": "T17",
+      "title": "Integration checkpoint 1: a legal command end to end in the browser",
+      "owner": "integration",
+      "kind": "integration-checkpoint",
+      "satisfiedBy": "verification",
+      "capability": null,
+      "depth": 9,
+      "onCriticalPath": false,
+      "covers": [
+        "ADRP-012",
+        "KICKOFF-EXECUTION-PACKET\u00a75-integration-rule"
+      ],
+      "coveredRequirementCount": 2,
+      "contracts": [
+        "CT-001",
+        "CT-002",
+        "CT-009"
+      ],
+      "decisions": [],
+      "gates": [
+        "G2",
+        "G5"
+      ],
+      "completion": [
+        "a typed command crosses Limen, returns events or a typed fault, and every dependent view refreshes from one projection version (ADRP-004)",
+        "runs in WebKit in CI"
+      ]
+    },
+    {
+      "id": "T18",
+      "title": "Provider conformance: record real GitHub behaviour and build fakes from it",
+      "owner": "persistence",
+      "kind": "implementation",
+      "satisfiedBy": "new-implementation",
+      "capability": null,
+      "depth": 6,
+      "onCriticalPath": false,
+      "covers": [
+        "prefix:PF-",
+        "PROVIDER-FIXTURE-AND-INTEGRATION\u00a7preamble",
+        "PROVIDER-FIXTURE-AND-INTEGRATION\u00a7acceptance-scenarios",
+        "AR-010",
+        "AR-014",
+        "AR-026"
+      ],
+      "coveredRequirementCount": 26,
+      "contracts": [
+        "CT-007",
+        "CT-017",
+        "CT-004"
+      ],
+      "decisions": [
+        "DEC-014"
+      ],
+      "gates": [
+        "G6"
+      ],
+      "completion": [
+        "recorded responses include write, conflict (expected-version mismatch), 422 missing branch, cache headers on mutable reads, installation-token permissions (R2 DC-004/005, R3 H1, D-07)",
+        "fakes served only from recordings"
+      ]
+    },
+    {
+      "id": "T19",
+      "title": "Local durability and persistence truth",
+      "owner": "persistence",
+      "kind": "implementation",
+      "satisfiedBy": "new-implementation",
+      "capability": null,
+      "depth": 9,
+      "onCriticalPath": true,
+      "covers": [
+        "R10.5",
+        "R10.6",
+        "R10.7",
+        "UI-006"
+      ],
+      "coveredRequirementCount": 4,
+      "contracts": [
+        "CT-004",
+        "CT-018"
+      ],
+      "decisions": [
+        "DEC-021"
+      ],
+      "gates": [
+        "G6"
+      ],
+      "completion": [
+        "pending, sending, conflicted, unknown and synced remain distinct (CONTRACT 9.4.3; D-009)",
+        "offline edits survive reload"
+      ]
+    },
+    {
+      "id": "T20",
+      "title": "Connect flow and GitHub provider: read, create, write, conflict",
+      "owner": "persistence",
+      "kind": "implementation",
+      "satisfiedBy": "new-implementation",
+      "capability": null,
+      "depth": 10,
+      "onCriticalPath": true,
+      "covers": [
+        "prefix:EXT-DATA-",
+        "REHEARSAL-EXTERNAL-DATA-BOUNDARY\u00a7preamble",
+        "REHEARSAL-EXTERNAL-DATA-BOUNDARY\u00a7goal",
+        "REHEARSAL-EXTERNAL-DATA-BOUNDARY\u00a7acceptance",
+        "REHEARSAL-EXTERNAL-DATA-BOUNDARY\u00a7design-note",
+        "R10.1",
+        "R10.2",
+        "R10.3",
+        "R10.4",
+        "regex:^R11\\.",
+        "STORAGE-004",
+        "STORAGE-006"
+      ],
+      "coveredRequirementCount": 27,
+      "contracts": [
+        "CT-004",
+        "CT-006",
+        "CT-007",
+        "CT-017"
+      ],
+      "decisions": [
+        "DEC-004A",
+        "DEC-004B",
+        "DEC-008",
+        "DEC-019",
+        "DEC-025"
+      ],
+      "gates": [
+        "G6"
+      ],
+      "completion": [
+        "no mutation on connect or read; explicit create; no overwrite of unread history (EXT-DATA-006)",
+        "eight connection states distinguished (EXT-DATA-007)",
+        "credentials never leave memory or the Authorization header"
+      ]
+    },
+    {
+      "id": "T21",
+      "title": "Integration checkpoint 2: live write path against the real test repository",
+      "owner": "integration",
+      "kind": "integration-checkpoint",
+      "satisfiedBy": "verification",
+      "capability": null,
+      "depth": 11,
+      "onCriticalPath": true,
+      "covers": [
+        "EXT-DATA-009",
+        "EXT-DATA-010",
+        "PF-013",
+        "PF-014"
+      ],
+      "coveredRequirementCount": 4,
+      "contracts": [
+        "CT-007",
+        "CT-004",
+        "CT-017"
+      ],
+      "decisions": [
+        "DEC-008"
+      ],
+      "gates": [
+        "G6"
+      ],
+      "completion": [
+        "create, write, reload, conflict and rejected-token pass live, backed by independent SHA reads (R4-02)",
+        "first verified remote write and first verified conflict handling times recorded (R4 measurements)"
+      ]
+    },
+    {
+      "id": "T22",
+      "title": "Investigation workspace views",
+      "owner": "ui",
+      "kind": "implementation",
+      "satisfiedBy": "new-implementation",
+      "capability": null,
+      "depth": 10,
+      "onCriticalPath": false,
+      "covers": [
+        "doc:docs/CAUSA-UI-EXPERIENCE-REQUIREMENTS.md",
+        "doc:docs/SCREEN-CONTRACTS.md",
+        "R9.3",
+        "R9.4",
+        "R9.5",
+        "ADRP-011",
+        "ADRP-002"
+      ],
+      "coveredRequirementCount": 79,
+      "contracts": [
+        "CT-002",
+        "CT-010",
+        "CT-012"
+      ],
+      "decisions": [
+        "DEC-001",
+        "DEC-002",
+        "DEC-024"
+      ],
+      "gates": [
+        "G5"
+      ],
+      "completion": [
+        "each implemented screen satisfies its Percepta contract at the deployed SHA",
+        "unimplemented P1/experimental screens recorded as NOT_RUN, not passed (ADRP-002)"
+      ]
+    },
+    {
+      "id": "T23",
+      "title": "Causal graph with the existing workflow layout engine",
+      "owner": "ui",
+      "kind": "implementation",
+      "satisfiedBy": "existing-capability",
+      "capability": "workflow layout engine identified by T24",
+      "depth": 10,
+      "onCriticalPath": false,
+      "covers": [
+        "doc:docs/WORKFLOW-DIAGRAM-INTEGRATION-REQUIREMENTS.md",
+        "UI-002",
+        "ADRP-007"
+      ],
+      "coveredRequirementCount": 21,
+      "contracts": [
+        "CT-002"
+      ],
+      "decisions": [
+        "DEC-030"
+      ],
+      "gates": [
+        "G5"
+      ],
+      "completion": [
+        "deterministic layout seeded by stable ids with a textual alternative (ADRP-007)",
+        "no duplicate layout engine (WDL-002)"
+      ]
+    },
+    {
+      "id": "T24",
+      "title": "Discover the workflow layout engine and existing capabilities",
+      "owner": "integration",
+      "kind": "implementation",
+      "satisfiedBy": "existing-capability",
+      "capability": "capability registry / echelon-registry",
+      "depth": 5,
+      "onCriticalPath": false,
+      "covers": [
+        "WDL-001",
+        "WDL-002",
+        "AR-005",
+        "ADRP-006"
+      ],
+      "coveredRequirementCount": 4,
+      "contracts": [],
+      "decisions": [
+        "DEC-030"
+      ],
+      "gates": [
+        "G1"
+      ],
+      "completion": [
+        "owner repository, package, API, version and license recorded with a working example (WDL-001), or an owner decision on WDL scope"
+      ]
+    },
+    {
+      "id": "T25",
+      "title": "Load the active historical catalog after Connect",
+      "owner": "persistence",
+      "kind": "implementation",
+      "satisfiedBy": "existing-capability",
+      "capability": "causa-data historical-v1 catalog",
+      "depth": 11,
+      "onCriticalPath": false,
+      "covers": [
+        "origin:external",
+        "EXT-DATA-013"
+      ],
+      "coveredRequirementCount": 7,
+      "contracts": [
+        "CT-008",
+        "CT-006"
+      ],
+      "decisions": [
+        "DEC-007"
+      ],
+      "gates": [
+        "G4",
+        "G6"
+      ],
+      "completion": [
+        "three cases load from kemiller2002/causa-data workspace historical-v1 and replay to the manifest's expectedStateSha256",
+        "historical_catalog.py verify --app passes (no bundling)"
+      ]
+    },
+    {
+      "id": "T26",
+      "title": "Report preview and Folio export",
+      "owner": "ui",
+      "kind": "implementation",
+      "satisfiedBy": "existing-capability",
+      "capability": "Folio print components",
+      "depth": 10,
+      "onCriticalPath": false,
+      "covers": [
+        "regex:^R12\\.",
+        "UI-009"
+      ],
+      "coveredRequirementCount": 4,
+      "contracts": [
+        "CT-005",
+        "CT-011"
+      ],
+      "decisions": [],
+      "gates": [
+        "G8"
+      ],
+      "completion": [
+        "incomplete investigations render as incomplete (R12.3)",
+        "print output verified at the deployed SHA"
+      ]
+    },
+    {
+      "id": "T27",
+      "title": "Structured AI proposal loop (excluded from Rehearsal 4 by OD-INDY-11)",
+      "owner": "domain",
+      "kind": "implementation",
+      "satisfiedBy": "new-implementation",
+      "capability": null,
+      "depth": 8,
+      "onCriticalPath": false,
+      "covers": [
+        "KICKOFF-EXECUTION-PACKET\u00a7ai-tool-agent",
+        "KICKOFF-EXECUTION-PACKET\u00a712-45",
+        "R11.4"
+      ],
+      "coveredRequirementCount": 3,
+      "contracts": [
+        "CT-001"
+      ],
+      "decisions": [
+        "DEC-022",
+        "DEC-021"
+      ],
+      "gates": [
+        "G3"
+      ],
+      "completion": [
+        "proposals enter as proposals; external evidence cannot redefine instructions (R11.4)",
+        "or an owner-approved exclusion"
+      ]
+    },
+    {
+      "id": "T28",
+      "title": "History, time travel and semantic diff (excluded from Rehearsal 4 by OD-INDY-11)",
+      "owner": "ui",
+      "kind": "implementation",
+      "satisfiedBy": "new-implementation",
+      "capability": null,
+      "depth": 11,
+      "onCriticalPath": false,
+      "covers": [
+        "S14",
+        "S15",
+        "KICKOFF-EXECUTION-PACKET\u00a72-45"
+      ],
+      "coveredRequirementCount": 3,
+      "contracts": [
+        "CT-002"
+      ],
+      "decisions": [
+        "DEC-022"
+      ],
+      "gates": [
+        "G5"
+      ],
+      "completion": [
+        "history renders from canonical sequence, never wall-clock alone (ADRP-007)",
+        "or an owner-approved exclusion"
+      ]
+    },
+    {
+      "id": "T29",
+      "title": "Administration and Settings pages with actual loaded versions",
+      "owner": "ui",
+      "kind": "implementation",
+      "satisfiedBy": "new-implementation",
+      "capability": null,
+      "depth": 10,
+      "onCriticalPath": false,
+      "covers": [
+        "UI-018",
+        "UI-019",
+        "VER-007"
+      ],
+      "coveredRequirementCount": 3,
+      "contracts": [
+        "CT-016"
+      ],
+      "decisions": [
+        "DEC-018"
+      ],
+      "gates": [
+        "G5"
+      ],
+      "completion": [
+        "versions shown only in Administration and equal to loaded components (VER-007)"
+      ]
+    },
+    {
+      "id": "T30",
+      "title": "Independent architecture and invariant review before the first release candidate",
+      "owner": "reviewer",
+      "kind": "verification",
+      "satisfiedBy": "verification",
+      "capability": null,
+      "depth": 12,
+      "onCriticalPath": true,
+      "covers": [
+        "doc:docs/DESIGN-DECISION-BOUNDARIES.md",
+        "DCC-002",
+        "AR-008"
+      ],
+      "coveredRequirementCount": 73,
+      "contracts": [],
+      "decisions": [
+        "DEC-016",
+        "DEC-021"
+      ],
+      "gates": [
+        "G7"
+      ],
+      "completion": [
+        "fresh reviewer receives code, requirements and constraints only (R4-03)",
+        "findings recorded per defect class"
+      ]
+    },
+    {
+      "id": "T31",
+      "title": "Release candidate: full applicable matrix at the deployed SHA",
+      "owner": "integration",
+      "kind": "integration-checkpoint",
+      "satisfiedBy": "verification",
+      "capability": null,
+      "depth": 13,
+      "onCriticalPath": true,
+      "covers": [
+        "UI-040",
+        "ADRP-010",
+        "DCC-007",
+        "DCC-009",
+        "AR-013",
+        "KICKOFF-EXECUTION-PACKET\u00a78-stop-the-line",
+        "PF-020"
+      ],
+      "coveredRequirementCount": 7,
+      "contracts": [
+        "CT-012",
+        "CT-010",
+        "CT-011"
+      ],
+      "decisions": [
+        "DEC-009"
+      ],
+      "gates": [
+        "G5",
+        "G8",
+        "G9"
+      ],
+      "completion": [
+        "browser, accessibility, integration, security and report suites pass on the deployed exact SHA",
+        "Percepta evidence from the registered release"
+      ]
+    },
+    {
+      "id": "T32",
+      "title": "Defect-class closure",
+      "owner": "integration",
+      "kind": "verification",
+      "satisfiedBy": "verification",
+      "capability": null,
+      "depth": 14,
+      "onCriticalPath": true,
+      "covers": [
+        "DCC-004",
+        "DCC-005",
+        "DCC-006",
+        "DCC-008",
+        "DCC-012",
+        "DEFECT-CLASS-CLOSURE-AND-RELEASE-GATES\u00a7preamble",
+        "DEFECT-CLASS-CLOSURE-AND-RELEASE-GATES\u00a7acceptance-matrix"
+      ],
+      "coveredRequirementCount": 7,
+      "contracts": [
+        "CT-014"
+      ],
+      "decisions": [
+        "DEC-028"
+      ],
+      "gates": [
+        "G7"
+      ],
+      "completion": [
+        "original reproduction, adversarial variants, invariant enforcement and SHA-bound proof per class (DCC-005)"
+      ]
+    },
+    {
+      "id": "T33",
+      "title": "Fresh reviewer before the final verdict",
+      "owner": "reviewer",
+      "kind": "verification",
+      "satisfiedBy": "verification",
+      "capability": null,
+      "depth": 15,
+      "onCriticalPath": true,
+      "covers": [
+        "AR-008"
+      ],
+      "coveredRequirementCount": 1,
+      "contracts": [],
+      "decisions": [
+        "DEC-016"
+      ],
+      "gates": [
+        "G7"
+      ],
+      "completion": [
+        "no open critical defect class (release acceptance predicate)"
+      ]
+    },
+    {
+      "id": "T34",
+      "title": "Acceptance: preservation gate re-run, ledger, computed verdict, measurements",
+      "owner": "integration",
+      "kind": "verification",
+      "satisfiedBy": "verification",
+      "capability": null,
+      "depth": 16,
+      "onCriticalPath": true,
+      "covers": [
+        "doc:docs/REHEARSAL-ACCEPTANCE-LEDGER.md",
+        "doc:docs/AGENT-RELIABILITY-REQUIREMENTS.md",
+        "doc:docs/KICKOFF-EXECUTION-PACKET.md",
+        "doc:docs/AGENT-DECISION-REDUCTION-PROFILE.md",
+        "doc:docs/DEFECT-CLASS-CLOSURE-AND-RELEASE-GATES.md",
+        "regex:^R16\\.",
+        "regex:^R14\\.",
+        "REQUIREMENTS\u00a7preamble"
+      ],
+      "coveredRequirementCount": 106,
+      "contracts": [
+        "CT-013",
+        "CT-015",
+        "CT-014"
+      ],
+      "decisions": [
+        "DEC-010",
+        "DEC-017"
+      ],
+      "gates": [
+        "G0",
+        "G9",
+        "G10"
+      ],
+      "completion": [
+        "preservation gate exit 0 at acceptance with evidence committed",
+        "ledger in causa.acceptance-ledger/2 with every PASS evidence path in a causa.acceptance-evidence-manifest/1 bundle",
+        "compute-acceptance-verdict.py run with the pinned baseline and SHA-256, approvals file and SHA-256, trusted operator ids and evidence manifest SHA-256; its verdict is the report's only verdict line",
+        "R4 measurements recorded; unavailable values recorded as unavailable"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "from": "T00",
+      "to": "T01",
+      "reason": "owner requirement edits from T00 change the source documents the baseline pins (RDP-001)"
+    },
+    {
+      "from": "T02",
+      "to": "T03",
+      "reason": "the kickoff set must pin the Praxis release that carries the gate (RDP-004 with VER-005)"
+    },
+    {
+      "from": "T00",
+      "to": "T04",
+      "reason": "the owner chooses between a contract version and an exception (F-009, DEC-006)"
+    },
+    {
+      "from": "T01",
+      "to": "T07",
+      "reason": "derivation must use the pinned baseline (RDP-001)"
+    },
+    {
+      "from": "T07",
+      "to": "T08",
+      "reason": "the gate checks the derived package and disposition"
+    },
+    {
+      "from": "T09",
+      "to": "T08",
+      "reason": "exclusions and conflicts need operator approval records before the gate can pass (RDP-003)"
+    },
+    {
+      "from": "T02",
+      "to": "T08",
+      "reason": "the gate command must exist in a usable Praxis build"
+    },
+    {
+      "from": "T07",
+      "to": "T09",
+      "reason": "approvals cover the dispositions the derivation requests"
+    },
+    {
+      "from": "T03",
+      "to": "T10",
+      "reason": "bootstrap runs on the approved kickoff set (R4 P1, P3)"
+    },
+    {
+      "from": "T10",
+      "to": "T11",
+      "reason": "the lock is verified against the installed bootstrap"
+    },
+    {
+      "from": "T08",
+      "to": "T12",
+      "reason": "implementation work items must not begin before the preservation gate passes (RDP-004)"
+    },
+    {
+      "from": "T10",
+      "to": "T12",
+      "reason": "tests need the bootstrapped repository and CI"
+    },
+    {
+      "from": "T12",
+      "to": "T13",
+      "reason": "R4-01 requires the invariant tests before the first write code; the kernel is written against them"
+    },
+    {
+      "from": "T13",
+      "to": "T14",
+      "reason": "the manifest is extracted from actual kernel source, not fabricated (interface-freeze status line)"
+    },
+    {
+      "from": "T00",
+      "to": "T14",
+      "reason": "whether R001-derived interfaces may be used is an owner decision (F-013)"
+    },
+    {
+      "from": "T13",
+      "to": "T15",
+      "reason": "replay runs through the application's engine (Boundary C)"
+    },
+    {
+      "from": "T08",
+      "to": "T16",
+      "reason": "implementation must not begin before the preservation gate passes (RDP-004)"
+    },
+    {
+      "from": "T11",
+      "to": "T16",
+      "reason": "Limen and Forma versions come from the verified lock"
+    },
+    {
+      "from": "T14",
+      "to": "T17",
+      "reason": "uses the frozen Boundary A/B contract"
+    },
+    {
+      "from": "T16",
+      "to": "T17",
+      "reason": "needs the Limen host and shell"
+    },
+    {
+      "from": "T05",
+      "to": "T18",
+      "reason": "recording needs the real test repository and secret"
+    },
+    {
+      "from": "T04",
+      "to": "T18",
+      "reason": "the write primitive to record must be the conforming one (F-009)"
+    },
+    {
+      "from": "T08",
+      "to": "T18",
+      "reason": "implementation must not begin before the preservation gate passes (RDP-004)"
+    },
+    {
+      "from": "T10",
+      "to": "T18",
+      "reason": "runs in the rehearsal repository's CI"
+    },
+    {
+      "from": "T14",
+      "to": "T19",
+      "reason": "implements Boundary D from the frozen manifest"
+    },
+    {
+      "from": "T18",
+      "to": "T20",
+      "reason": "built and tested against the recorded provider behaviour"
+    },
+    {
+      "from": "T19",
+      "to": "T20",
+      "reason": "remote acknowledgment layers on local persistence truth"
+    },
+    {
+      "from": "T00",
+      "to": "T20",
+      "reason": "the authentication mechanism and public-read credential rule are owner decisions (F-019, F-012)"
+    },
+    {
+      "from": "T20",
+      "to": "T21",
+      "reason": "exercises the provider"
+    },
+    {
+      "from": "T17",
+      "to": "T21",
+      "reason": "the write is issued as a legal command through the browser path"
+    },
+    {
+      "from": "T17",
+      "to": "T22",
+      "reason": "views consume the verified projection path"
+    },
+    {
+      "from": "T24",
+      "to": "T23",
+      "reason": "WDL-001 requires the engine to be identified before implementation"
+    },
+    {
+      "from": "T17",
+      "to": "T23",
+      "reason": "graph edges come only from projected relationships"
+    },
+    {
+      "from": "T11",
+      "to": "T24",
+      "reason": "the engine must be part of the verified lock"
+    },
+    {
+      "from": "T20",
+      "to": "T25",
+      "reason": "uses the connect flow and read path"
+    },
+    {
+      "from": "T15",
+      "to": "T25",
+      "reason": "catalog records are v1.0.0 file sets replayed through the engine"
+    },
+    {
+      "from": "T17",
+      "to": "T26",
+      "reason": "renders the versioned report projection"
+    },
+    {
+      "from": "T13",
+      "to": "T27",
+      "reason": "proposals are validated by the kernel and never authoritative by generation (D-004)"
+    },
+    {
+      "from": "T00",
+      "to": "T27",
+      "reason": "scope is an owner decision (F-008)"
+    },
+    {
+      "from": "T22",
+      "to": "T28",
+      "reason": "uses the workspace views and inspector"
+    },
+    {
+      "from": "T00",
+      "to": "T28",
+      "reason": "scope is an owner decision (F-008)"
+    },
+    {
+      "from": "T11",
+      "to": "T29",
+      "reason": "shows the versions of the verified lock as actually loaded"
+    },
+    {
+      "from": "T17",
+      "to": "T29",
+      "reason": "needs the running shell"
+    },
+    {
+      "from": "T21",
+      "to": "T30",
+      "reason": "reviews the live write path"
+    },
+    {
+      "from": "T22",
+      "to": "T30",
+      "reason": "reviews the views it releases"
+    },
+    {
+      "from": "T25",
+      "to": "T30",
+      "reason": "reviews catalog loading"
+    },
+    {
+      "from": "T30",
+      "to": "T31",
+      "reason": "review precedes the first candidate (DCC-002)"
+    },
+    {
+      "from": "T23",
+      "to": "T31",
+      "reason": "candidate includes the graph"
+    },
+    {
+      "from": "T26",
+      "to": "T31",
+      "reason": "candidate includes reporting"
+    },
+    {
+      "from": "T27",
+      "to": "T31",
+      "reason": "candidate includes the AI loop or its approved exclusion"
+    },
+    {
+      "from": "T28",
+      "to": "T31",
+      "reason": "candidate includes time travel or its approved exclusion"
+    },
+    {
+      "from": "T29",
+      "to": "T31",
+      "reason": "candidate includes administration"
+    },
+    {
+      "from": "T31",
+      "to": "T32",
+      "reason": "closes the classes the candidate exposed"
+    },
+    {
+      "from": "T32",
+      "to": "T33",
+      "reason": "reviews the closed candidate"
+    },
+    {
+      "from": "T33",
+      "to": "T34",
+      "reason": "final review precedes the verdict (R4-03)"
+    },
+    {
+      "from": "T08",
+      "to": "T34",
+      "reason": "acceptance re-runs the same gate against the same pinned baseline (RDP-004)"
+    }
+  ],
+  "preferenceEdges": [
+    {
+      "after": "T06",
+      "task": "T10",
+      "reason": "organizer confirmation is needed for the event, not for a rehearsal bootstrap"
+    },
+    {
+      "after": "T21",
+      "task": "T22",
+      "reason": "write-path first is the R4 priority; views do not consume its output"
+    }
+  ],
+  "topologicalOrder": [
+    "T00",
+    "T01",
+    "T02",
+    "T03",
+    "T04",
+    "T05",
+    "T06",
+    "T07",
+    "T09",
+    "T08",
+    "T10",
+    "T11",
+    "T12",
+    "T13",
+    "T14",
+    "T15",
+    "T16",
+    "T17",
+    "T18",
+    "T19",
+    "T20",
+    "T21",
+    "T22",
+    "T24",
+    "T23",
+    "T25",
+    "T26",
+    "T27",
+    "T28",
+    "T29",
+    "T30",
+    "T31",
+    "T32",
+    "T33",
+    "T34"
+  ],
+  "criticalPath": [
+    "T00",
+    "T01",
+    "T07",
+    "T09",
+    "T08",
+    "T12",
+    "T13",
+    "T14",
+    "T19",
+    "T20",
+    "T21",
+    "T30",
+    "T31",
+    "T32",
+    "T33",
+    "T34"
+  ],
+  "parallelLevels": [
+    {
+      "depth": 1,
+      "parallelizable": [
+        "T00",
+        "T02",
+        "T05",
+        "T06"
+      ]
+    },
+    {
+      "depth": 2,
+      "parallelizable": [
+        "T01",
+        "T03",
+        "T04"
+      ]
+    },
+    {
+      "depth": 3,
+      "parallelizable": [
+        "T07",
+        "T10"
+      ]
+    },
+    {
+      "depth": 4,
+      "parallelizable": [
+        "T09",
+        "T11"
+      ]
+    },
+    {
+      "depth": 5,
+      "parallelizable": [
+        "T08",
+        "T24"
+      ]
+    },
+    {
+      "depth": 6,
+      "parallelizable": [
+        "T12",
+        "T16",
+        "T18"
+      ]
+    },
+    {
+      "depth": 7,
+      "parallelizable": [
+        "T13"
+      ]
+    },
+    {
+      "depth": 8,
+      "parallelizable": [
+        "T14",
+        "T15",
+        "T27"
+      ]
+    },
+    {
+      "depth": 9,
+      "parallelizable": [
+        "T17",
+        "T19"
+      ]
+    },
+    {
+      "depth": 10,
+      "parallelizable": [
+        "T20",
+        "T22",
+        "T23",
+        "T26",
+        "T29"
+      ]
+    },
+    {
+      "depth": 11,
+      "parallelizable": [
+        "T21",
+        "T25",
+        "T28"
+      ]
+    },
+    {
+      "depth": 12,
+      "parallelizable": [
+        "T30"
+      ]
+    },
+    {
+      "depth": 13,
+      "parallelizable": [
+        "T31"
+      ]
+    },
+    {
+      "depth": 14,
+      "parallelizable": [
+        "T32"
+      ]
+    },
+    {
+      "depth": 15,
+      "parallelizable": [
+        "T33"
+      ]
+    },
+    {
+      "depth": 16,
+      "parallelizable": [
+        "T34"
+      ]
+    }
+  ],
+  "requirementCoverage": [
+    {
+      "requirement": "ADRP-001",
+      "tasks": [
+        "T07",
+        "T34"
+      ]
+    },
+    {
+      "requirement": "ADRP-002",
+      "tasks": [
+        "T07",
+        "T22",
+        "T34"
+      ]
+    },
+    {
+      "requirement": "ADRP-003",
+      "tasks": [
+        "T16",
+        "T34"
+      ]
+    },
+    {
+      "requirement": "ADRP-004",
+      "tasks": [
+        "T13",
+        "T34"
+      ]
+    },
+    {
+      "requirement": "ADRP-005",
+      "tasks": [
+        "T15",
+        "T34"
+      ]
+    },
+    {
+      "requirement": "ADRP-006",
+      "tasks": [
+        "T24",
+        "T34"
+      ]
+    },
+    {
+      "requirement": "ADRP-007",
+      "tasks": [
+        "T23",
+        "T34"
+      ]
+    },
+    {
+      "requirement": "ADRP-008",
+      "tasks": [
+        "T14",
+        "T34"
+      ]
+    },
+    {
+      "requirement": "ADRP-009",
+      "tasks": [
+        "T12",
+        "T34"
+      ]
+    },
+    {
+      "requirement": "ADRP-010",
+      "tasks": [
+        "T31",
+        "T34"
+      ]
+    },
+    {
+      "requirement": "ADRP-011",
+      "tasks": [
+        "T22",
+        "T34"
+      ]
+    },
+    {
+      "requirement": "ADRP-012",
+      "tasks": [
+        "T17",
+        "T34"
+      ]
+    },
+    {
+      "requirement": "ADRP-013",
+      "tasks": [
+        "T07",
+        "T34"
+      ]
+    },
+    {
+      "requirement": "ADRP-014",
+      "tasks": [
+        "T34"
+      ]
+    },
+    {
+      "requirement": "ADRP-015",
+      "tasks": [
+        "T34"
+      ]
+    },
+    {
+      "requirement": "ADRP-016",
+      "tasks": [
+        "T06",
+        "T34"
+      ]
+    },
+    {
+      "requirement": "AGENT-DECISION-REDUCTION-PROFILE\u00a7pre-experiment-readiness-checklist",
+      "tasks": [
+        "T08",
+        "T34"
+      ]
+    },
+    {
+      "requirement": "AGENT-DECISION-REDUCTION-PROFILE\u00a7preamble",
+      "tasks": [
+        "T34"
+      ]
+    },
+    {
+      "requirement": "AGENT-RELIABILITY\u00a7adoption",
+      "tasks": [
+        "T34"
+      ]
+    },
+    {
+      "requirement": "AGENT-RELIABILITY\u00a7evidence-driven-refinement-october-2026",
+      "tasks": [
+        "T34"
+      ]
+    },
+    {
+      "requirement": "AGENT-RELIABILITY\u00a7reconciliation",
+      "tasks": [
+        "T34"
+      ]
+    },
+    {
+      "requirement": "AGENT-RELIABILITY\u00a7required-adversarial-acceptance-cases",
+      "tasks": [
+        "T12",
+        "T34"
+      ]
+    },
+    {
+      "requirement": "AR-001",
+      "tasks": [
+        "T01",
+        "T34"
+      ]
+    },
+    {
+      "requirement": "AR-002",
+      "tasks": [
+        "T07",
+        "T34"
+      ]
+    },
+    {
+      "requirement": "AR-003",
+      "tasks": [
+        "T00",
+        "T09",
+        "T34"
+      ]
+    },
+    {
+      "requirement": "AR-004",
+      "tasks": [
+        "T02",
+        "T08",
+        "T34"
+      ]
+    },
+    {
+      "requirement": "AR-005",
+      "tasks": [
+        "T24",
+        "T34"
+      ]
+    },
+    {
+      "requirement": "AR-006",
+      "tasks": [
+        "T13",
+        "T34"
+      ]
+    },
+    {
+      "requirement": "AR-007",
+      "tasks": [
+        "T34"
+      ]
+    },
+    {
+      "requirement": "AR-008",
+      "tasks": [
+        "T30",
+        "T33",
+        "T34"
+      ]
+    },
+    {
+      "requirement": "AR-009",
+      "tasks": [
+        "T12",
+        "T34"
+      ]
+    },
+    {
+      "requirement": "AR-010",
+      "tasks": [
+        "T18",
+        "T34"
+      ]
+    },
+    {
+      "requirement": "AR-011",
+      "tasks": [
+        "T11",
+        "T34"
+      ]
+    },
+    {
+      "requirement": "AR-012",
+      "tasks": [
+        "T07",
+        "T34"
+      ]
+    },
+    {
+      "requirement": "AR-013",
+      "tasks": [
+        "T31",
+        "T34"
+      ]
+    },
+    {
+      "requirement": "AR-014",
+      "tasks": [
+        "T18",
+        "T34"
+      ]
+    },
+    {
+      "requirement": "AR-015",
+      "tasks": [
+        "T34"
+      ]
+    },
+    {
+      "requirement": "AR-016",
+      "tasks": [
+        "T34"
+      ]
+    },
+    {
+      "requirement": "AR-017",
+      "tasks": [
+        "T07",
+        "T34"
+      ]
+    },
+    {
+      "requirement": "AR-018",
+      "tasks": [
+        "T34"
+      ]
+    },
+    {
+      "requirement": "AR-019",
+      "tasks": [
+        "T34"
+      ]
+    },
+    {
+      "requirement": "AR-020",
+      "tasks": [
+        "T34"
+      ]
+    },
+    {
+      "requirement": "AR-021",
+      "tasks": [
+        "T34"
+      ]
+    },
+    {
+      "requirement": "AR-022",
+      "tasks": [
+        "T12",
+        "T34"
+      ]
+    },
+    {
+      "requirement": "AR-023",
+      "tasks": [
+        "T03",
+        "T10",
+        "T34"
+      ]
+    },
+    {
+      "requirement": "AR-024",
+      "tasks": [
+        "T00",
+        "T34"
+      ]
+    },
+    {
+      "requirement": "AR-025",
+      "tasks": [
+        "T34"
+      ]
+    },
+    {
+      "requirement": "AR-026",
+      "tasks": [
+        "T18",
+        "T34"
+      ]
+    },
+    {
+      "requirement": "CAUSA-STORAGE-RELEASE\u00a7authority",
+      "tasks": [
+        "T15"
+      ]
+    },
+    {
+      "requirement": "CAUSA-STORAGE-RELEASE\u00a7contents",
+      "tasks": [
+        "T15"
+      ]
+    },
+    {
+      "requirement": "CAUSA-STORAGE-RELEASE\u00a7how-r002-and-the-competition-consume-it",
+      "tasks": [
+        "T15"
+      ]
+    },
+    {
+      "requirement": "CAUSA-STORAGE-RELEASE\u00a7identities",
+      "tasks": [
+        "T15"
+      ]
+    },
+    {
+      "requirement": "CAUSA-STORAGE-RELEASE\u00a7preamble",
+      "tasks": [
+        "T15"
+      ]
+    },
+    {
+      "requirement": "CAUSA-UI-EXPERIENCE\u00a7architectural-principles",
+      "tasks": [
+        "T13",
+        "T22"
+      ]
+    },
+    {
+      "requirement": "CAUSA-UI-EXPERIENCE\u00a7delivery-priority-and-boundaries",
+      "tasks": [
+        "T07",
+        "T22"
+      ]
+    },
+    {
+      "requirement": "CAUSA-UI-EXPERIENCE\u00a7praxis-intake-and-implementation",
+      "tasks": [
+        "T07",
+        "T22"
+      ]
+    },
+    {
+      "requirement": "CAUSA-UI-EXPERIENCE\u00a7preamble",
+      "tasks": [
+        "T13",
+        "T22"
+      ]
+    },
+    {
+      "requirement": "CAUSA-UI-EXPERIENCE\u00a7rehearsal-reconciliation-for-ui-022-ui-031",
+      "tasks": [
+        "T22"
+      ]
+    },
+    {
+      "requirement": "CAUSA-UI-EXPERIENCE\u00a7required-evidence",
+      "tasks": [
+        "T22"
+      ]
+    },
+    {
+      "requirement": "D-001",
+      "tasks": [
+        "T30"
+      ]
+    },
+    {
+      "requirement": "D-002",
+      "tasks": [
+        "T30"
+      ]
+    },
+    {
+      "requirement": "D-003",
+      "tasks": [
+        "T30"
+      ]
+    },
+    {
+      "requirement": "D-004",
+      "tasks": [
+        "T30"
+      ]
+    },
+    {
+      "requirement": "D-005",
+      "tasks": [
+        "T30"
+      ]
+    },
+    {
+      "requirement": "D-006",
+      "tasks": [
+        "T30"
+      ]
+    },
+    {
+      "requirement": "D-007",
+      "tasks": [
+        "T30"
+      ]
+    },
+    {
+      "requirement": "D-008",
+      "tasks": [
+        "T30"
+      ]
+    },
+    {
+      "requirement": "D-009",
+      "tasks": [
+        "T30"
+      ]
+    },
+    {
+      "requirement": "D-010",
+      "tasks": [
+        "T30"
+      ]
+    },
+    {
+      "requirement": "D-011",
+      "tasks": [
+        "T30"
+      ]
+    },
+    {
+      "requirement": "D-012",
+      "tasks": [
+        "T30"
+      ]
+    },
+    {
+      "requirement": "D-013",
+      "tasks": [
+        "T30"
+      ]
+    },
+    {
+      "requirement": "D-014",
+      "tasks": [
+        "T30"
+      ]
+    },
+    {
+      "requirement": "D-015",
+      "tasks": [
+        "T30"
+      ]
+    },
+    {
+      "requirement": "D-101",
+      "tasks": [
+        "T30"
+      ]
+    },
+    {
+      "requirement": "D-102",
+      "tasks": [
+        "T30"
+      ]
+    },
+    {
+      "requirement": "D-103",
+      "tasks": [
+        "T30"
+      ]
+    },
+    {
+      "requirement": "D-104",
+      "tasks": [
+        "T30"
+      ]
+    },
+    {
+      "requirement": "D-105",
+      "tasks": [
+        "T30"
+      ]
+    },
+    {
+      "requirement": "D-106",
+      "tasks": [
+        "T30"
+      ]
+    },
+    {
+      "requirement": "D-107",
+      "tasks": [
+        "T30"
+      ]
+    },
+    {
+      "requirement": "D-108",
+      "tasks": [
+        "T30"
+      ]
+    },
+    {
+      "requirement": "D-109",
+      "tasks": [
+        "T30"
+      ]
+    },
+    {
+      "requirement": "D-110",
+      "tasks": [
+        "T30"
+      ]
+    },
+    {
+      "requirement": "D-201",
+      "tasks": [
+        "T30"
+      ]
+    },
+    {
+      "requirement": "D-202",
+      "tasks": [
+        "T30"
+      ]
+    },
+    {
+      "requirement": "D-203",
+      "tasks": [
+        "T30"
+      ]
+    },
+    {
+      "requirement": "D-204",
+      "tasks": [
+        "T30"
+      ]
+    },
+    {
+      "requirement": "D-205",
+      "tasks": [
+        "T30"
+      ]
+    },
+    {
+      "requirement": "D-206",
+      "tasks": [
+        "T30"
+      ]
+    },
+    {
+      "requirement": "D-207",
+      "tasks": [
+        "T30"
+      ]
+    },
+    {
+      "requirement": "D-208",
+      "tasks": [
+        "T30"
+      ]
+    },
+    {
+      "requirement": "D-209",
+      "tasks": [
+        "T30"
+      ]
+    },
+    {
+      "requirement": "D-210",
+      "tasks": [
+        "T30"
+      ]
+    },
+    {
+      "requirement": "D-211",
+      "tasks": [
+        "T30"
+      ]
+    },
+    {
+      "requirement": "D-212",
+      "tasks": [
+        "T30"
+      ]
+    },
+    {
+      "requirement": "D-301",
+      "tasks": [
+        "T30"
+      ]
+    },
+    {
+      "requirement": "D-302",
+      "tasks": [
+        "T30"
+      ]
+    },
+    {
+      "requirement": "D-303",
+      "tasks": [
+        "T30"
+      ]
+    },
+    {
+      "requirement": "D-304",
+      "tasks": [
+        "T30"
+      ]
+    },
+    {
+      "requirement": "D-305",
+      "tasks": [
+        "T30"
+      ]
+    },
+    {
+      "requirement": "D-306",
+      "tasks": [
+        "T30"
+      ]
+    },
+    {
+      "requirement": "D-307",
+      "tasks": [
+        "T30"
+      ]
+    },
+    {
+      "requirement": "D-308",
+      "tasks": [
+        "T30"
+      ]
+    },
+    {
+      "requirement": "D-309",
+      "tasks": [
+        "T30"
+      ]
+    },
+    {
+      "requirement": "D-310",
+      "tasks": [
+        "T30"
+      ]
+    },
+    {
+      "requirement": "D-311",
+      "tasks": [
+        "T30"
+      ]
+    },
+    {
+      "requirement": "D-312",
+      "tasks": [
+        "T30"
+      ]
+    },
+    {
+      "requirement": "D-401",
+      "tasks": [
+        "T30"
+      ]
+    },
+    {
+      "requirement": "D-402",
+      "tasks": [
+        "T30"
+      ]
+    },
+    {
+      "requirement": "D-403",
+      "tasks": [
+        "T30"
+      ]
+    },
+    {
+      "requirement": "D-404",
+      "tasks": [
+        "T30"
+      ]
+    },
+    {
+      "requirement": "D-405",
+      "tasks": [
+        "T30"
+      ]
+    },
+    {
+      "requirement": "D-406",
+      "tasks": [
+        "T30"
+      ]
+    },
+    {
+      "requirement": "D-407",
+      "tasks": [
+        "T30"
+      ]
+    },
+    {
+      "requirement": "D-408",
+      "tasks": [
+        "T30"
+      ]
+    },
+    {
+      "requirement": "D-409",
+      "tasks": [
+        "T30"
+      ]
+    },
+    {
+      "requirement": "D-410",
+      "tasks": [
+        "T30"
+      ]
+    },
+    {
+      "requirement": "D-411",
+      "tasks": [
+        "T30"
+      ]
+    },
+    {
+      "requirement": "D-412",
+      "tasks": [
+        "T30"
+      ]
+    },
+    {
+      "requirement": "DCC-001",
+      "tasks": [
+        "T12",
+        "T34"
+      ]
+    },
+    {
+      "requirement": "DCC-002",
+      "tasks": [
+        "T30",
+        "T34"
+      ]
+    },
+    {
+      "requirement": "DCC-003",
+      "tasks": [
+        "T12",
+        "T34"
+      ]
+    },
+    {
+      "requirement": "DCC-004",
+      "tasks": [
+        "T32",
+        "T34"
+      ]
+    },
+    {
+      "requirement": "DCC-005",
+      "tasks": [
+        "T32",
+        "T34"
+      ]
+    },
+    {
+      "requirement": "DCC-006",
+      "tasks": [
+        "T32",
+        "T34"
+      ]
+    },
+    {
+      "requirement": "DCC-007",
+      "tasks": [
+        "T31",
+        "T34"
+      ]
+    },
+    {
+      "requirement": "DCC-008",
+      "tasks": [
+        "T32",
+        "T34"
+      ]
+    },
+    {
+      "requirement": "DCC-009",
+      "tasks": [
+        "T31",
+        "T34"
+      ]
+    },
+    {
+      "requirement": "DCC-010",
+      "tasks": [
+        "T34"
+      ]
+    },
+    {
+      "requirement": "DCC-011",
+      "tasks": [
+        "T34"
+      ]
+    },
+    {
+      "requirement": "DCC-012",
+      "tasks": [
+        "T32",
+        "T34"
+      ]
+    },
+    {
+      "requirement": "DEFECT-CLASS-CLOSURE-AND-RELEASE-GATES\u00a7acceptance-matrix",
+      "tasks": [
+        "T32",
+        "T34"
+      ]
+    },
+    {
+      "requirement": "DEFECT-CLASS-CLOSURE-AND-RELEASE-GATES\u00a7implementation-intake",
+      "tasks": [
+        "T07",
+        "T34"
+      ]
+    },
+    {
+      "requirement": "DEFECT-CLASS-CLOSURE-AND-RELEASE-GATES\u00a7preamble",
+      "tasks": [
+        "T32",
+        "T34"
+      ]
+    },
+    {
+      "requirement": "DEP-CURRENT-001",
+      "tasks": [
+        "T10"
+      ]
+    },
+    {
+      "requirement": "DEP-CURRENT-002",
+      "tasks": [
+        "T10"
+      ]
+    },
+    {
+      "requirement": "DEP-CURRENT-003",
+      "tasks": [
+        "T10"
+      ]
+    },
+    {
+      "requirement": "DEP-CURRENT-004",
+      "tasks": [
+        "T11"
+      ]
+    },
+    {
+      "requirement": "DEP-CURRENT-005",
+      "tasks": [
+        "T11"
+      ]
+    },
+    {
+      "requirement": "DEP-CURRENT-006",
+      "tasks": [
+        "T11"
+      ]
+    },
+    {
+      "requirement": "DEP-CURRENT-007",
+      "tasks": [
+        "T11"
+      ]
+    },
+    {
+      "requirement": "DEP-CURRENT-008",
+      "tasks": [
+        "T11"
+      ]
+    },
+    {
+      "requirement": "DESIGN-DECISION-BOUNDARIES\u00a71-lockedinvariant",
+      "tasks": [
+        "T30"
+      ]
+    },
+    {
+      "requirement": "DESIGN-DECISION-BOUNDARIES\u00a72-stabledirection",
+      "tasks": [
+        "T30"
+      ]
+    },
+    {
+      "requirement": "DESIGN-DECISION-BOUNDARIES\u00a73-reversiblechoice",
+      "tasks": [
+        "T30"
+      ]
+    },
+    {
+      "requirement": "DESIGN-DECISION-BOUNDARIES\u00a74-experimental",
+      "tasks": [
+        "T30"
+      ]
+    },
+    {
+      "requirement": "DESIGN-DECISION-BOUNDARIES\u00a75-deferred",
+      "tasks": [
+        "T30"
+      ]
+    },
+    {
+      "requirement": "DESIGN-DECISION-BOUNDARIES\u00a76-change-rule",
+      "tasks": [
+        "T30"
+      ]
+    },
+    {
+      "requirement": "DESIGN-DECISION-BOUNDARIES\u00a77-promotion-test",
+      "tasks": [
+        "T30"
+      ]
+    },
+    {
+      "requirement": "DESIGN-DECISION-BOUNDARIES\u00a78-agent-rule",
+      "tasks": [
+        "T30"
+      ]
+    },
+    {
+      "requirement": "DESIGN-DECISION-BOUNDARIES\u00a79-completion-rule",
+      "tasks": [
+        "T30"
+      ]
+    },
+    {
+      "requirement": "DESIGN-DECISION-BOUNDARIES\u00a7preamble",
+      "tasks": [
+        "T30"
+      ]
+    },
+    {
+      "requirement": "EXT-DATA-001",
+      "tasks": [
+        "T20"
+      ]
+    },
+    {
+      "requirement": "EXT-DATA-002",
+      "tasks": [
+        "T00",
+        "T20"
+      ]
+    },
+    {
+      "requirement": "EXT-DATA-003",
+      "tasks": [
+        "T20"
+      ]
+    },
+    {
+      "requirement": "EXT-DATA-004",
+      "tasks": [
+        "T20"
+      ]
+    },
+    {
+      "requirement": "EXT-DATA-005",
+      "tasks": [
+        "T20"
+      ]
+    },
+    {
+      "requirement": "EXT-DATA-006",
+      "tasks": [
+        "T20"
+      ]
+    },
+    {
+      "requirement": "EXT-DATA-007",
+      "tasks": [
+        "T20"
+      ]
+    },
+    {
+      "requirement": "EXT-DATA-008",
+      "tasks": [
+        "T20"
+      ]
+    },
+    {
+      "requirement": "EXT-DATA-009",
+      "tasks": [
+        "T20",
+        "T21"
+      ]
+    },
+    {
+      "requirement": "EXT-DATA-010",
+      "tasks": [
+        "T20",
+        "T21"
+      ]
+    },
+    {
+      "requirement": "EXT-DATA-011",
+      "tasks": [
+        "T15",
+        "T20"
+      ]
+    },
+    {
+      "requirement": "EXT-DATA-012",
+      "tasks": [
+        "T20"
+      ]
+    },
+    {
+      "requirement": "EXT-DATA-013",
+      "tasks": [
+        "T20",
+        "T25"
+      ]
+    },
+    {
+      "requirement": "FROZEN-DEMO-STORAGE\u00a7implementation-work",
+      "tasks": [
+        "T07",
+        "T15"
+      ]
+    },
+    {
+      "requirement": "FROZEN-DEMO-STORAGE\u00a7preamble",
+      "tasks": [
+        "T15"
+      ]
+    },
+    {
+      "requirement": "FROZEN-DEMO-STORAGE\u00a7required-evidence",
+      "tasks": [
+        "T15"
+      ]
+    },
+    {
+      "requirement": "HISTORICAL-CASE-CATALOG\u00a7case-a-apollo-1-as-204-january-27-1967",
+      "tasks": [
+        "T25"
+      ]
+    },
+    {
+      "requirement": "HISTORICAL-CASE-CATALOG\u00a7case-b-apollo-11-july-1969",
+      "tasks": [
+        "T25"
+      ]
+    },
+    {
+      "requirement": "HISTORICAL-CASE-CATALOG\u00a7case-c-challenger-sts-51-l-january-28-1986",
+      "tasks": [
+        "T25"
+      ]
+    },
+    {
+      "requirement": "HISTORICAL-CASE-CATALOG\u00a7catalog-policy",
+      "tasks": [
+        "T25"
+      ]
+    },
+    {
+      "requirement": "HISTORICAL-CASE-CATALOG\u00a7completion-gate",
+      "tasks": [
+        "T25"
+      ]
+    },
+    {
+      "requirement": "HISTORICAL-CASE-CATALOG\u00a7evidence-and-modeling-requirements",
+      "tasks": [
+        "T25"
+      ]
+    },
+    {
+      "requirement": "KICKOFF-EXECUTION-PACKET\u00a71-9-30-baseline",
+      "tasks": [
+        "T10",
+        "T34"
+      ]
+    },
+    {
+      "requirement": "KICKOFF-EXECUTION-PACKET\u00a710-30",
+      "tasks": [
+        "T34"
+      ]
+    },
+    {
+      "requirement": "KICKOFF-EXECUTION-PACKET\u00a710-final-freeze",
+      "tasks": [
+        "T34"
+      ]
+    },
+    {
+      "requirement": "KICKOFF-EXECUTION-PACKET\u00a711-15",
+      "tasks": [
+        "T34"
+      ]
+    },
+    {
+      "requirement": "KICKOFF-EXECUTION-PACKET\u00a712-00",
+      "tasks": [
+        "T34"
+      ]
+    },
+    {
+      "requirement": "KICKOFF-EXECUTION-PACKET\u00a712-45",
+      "tasks": [
+        "T27",
+        "T34"
+      ]
+    },
+    {
+      "requirement": "KICKOFF-EXECUTION-PACKET\u00a72-00",
+      "tasks": [
+        "T34"
+      ]
+    },
+    {
+      "requirement": "KICKOFF-EXECUTION-PACKET\u00a72-45",
+      "tasks": [
+        "T28",
+        "T34"
+      ]
+    },
+    {
+      "requirement": "KICKOFF-EXECUTION-PACKET\u00a72-canonical-contract-entry",
+      "tasks": [
+        "T10",
+        "T34"
+      ]
+    },
+    {
+      "requirement": "KICKOFF-EXECUTION-PACKET\u00a73-30",
+      "tasks": [
+        "T34"
+      ]
+    },
+    {
+      "requirement": "KICKOFF-EXECUTION-PACKET\u00a73-work-order",
+      "tasks": [
+        "T34"
+      ]
+    },
+    {
+      "requirement": "KICKOFF-EXECUTION-PACKET\u00a74-00",
+      "tasks": [
+        "T34"
+      ]
+    },
+    {
+      "requirement": "KICKOFF-EXECUTION-PACKET\u00a74-25",
+      "tasks": [
+        "T34"
+      ]
+    },
+    {
+      "requirement": "KICKOFF-EXECUTION-PACKET\u00a74-40",
+      "tasks": [
+        "T34"
+      ]
+    },
+    {
+      "requirement": "KICKOFF-EXECUTION-PACKET\u00a74-55",
+      "tasks": [
+        "T34"
+      ]
+    },
+    {
+      "requirement": "KICKOFF-EXECUTION-PACKET\u00a74-parallel-ownership-after-kernel-stabilizes",
+      "tasks": [
+        "T14",
+        "T34"
+      ]
+    },
+    {
+      "requirement": "KICKOFF-EXECUTION-PACKET\u00a75-integration-rule",
+      "tasks": [
+        "T17",
+        "T34"
+      ]
+    },
+    {
+      "requirement": "KICKOFF-EXECUTION-PACKET\u00a76-cut-order",
+      "tasks": [
+        "T34"
+      ]
+    },
+    {
+      "requirement": "KICKOFF-EXECUTION-PACKET\u00a77-checkpoints",
+      "tasks": [
+        "T34"
+      ]
+    },
+    {
+      "requirement": "KICKOFF-EXECUTION-PACKET\u00a78-stop-the-line",
+      "tasks": [
+        "T31",
+        "T34"
+      ]
+    },
+    {
+      "requirement": "KICKOFF-EXECUTION-PACKET\u00a79-completion-definition",
+      "tasks": [
+        "T34"
+      ]
+    },
+    {
+      "requirement": "KICKOFF-EXECUTION-PACKET\u00a7ai-tool-agent",
+      "tasks": [
+        "T27",
+        "T34"
+      ]
+    },
+    {
+      "requirement": "KICKOFF-EXECUTION-PACKET\u00a7domain-agent",
+      "tasks": [
+        "T14",
+        "T34"
+      ]
+    },
+    {
+      "requirement": "KICKOFF-EXECUTION-PACKET\u00a7factory-proof-agent",
+      "tasks": [
+        "T14",
+        "T34"
+      ]
+    },
+    {
+      "requirement": "KICKOFF-EXECUTION-PACKET\u00a7persistence-agent",
+      "tasks": [
+        "T14",
+        "T34"
+      ]
+    },
+    {
+      "requirement": "KICKOFF-EXECUTION-PACKET\u00a7preamble",
+      "tasks": [
+        "T10",
+        "T34"
+      ]
+    },
+    {
+      "requirement": "KICKOFF-EXECUTION-PACKET\u00a7ui-agent",
+      "tasks": [
+        "T14",
+        "T34"
+      ]
+    },
+    {
+      "requirement": "PF-001",
+      "tasks": [
+        "T18"
+      ]
+    },
+    {
+      "requirement": "PF-002",
+      "tasks": [
+        "T18"
+      ]
+    },
+    {
+      "requirement": "PF-003",
+      "tasks": [
+        "T18"
+      ]
+    },
+    {
+      "requirement": "PF-004",
+      "tasks": [
+        "T18"
+      ]
+    },
+    {
+      "requirement": "PF-005",
+      "tasks": [
+        "T18"
+      ]
+    },
+    {
+      "requirement": "PF-006",
+      "tasks": [
+        "T18"
+      ]
+    },
+    {
+      "requirement": "PF-007",
+      "tasks": [
+        "T18"
+      ]
+    },
+    {
+      "requirement": "PF-008",
+      "tasks": [
+        "T18"
+      ]
+    },
+    {
+      "requirement": "PF-009",
+      "tasks": [
+        "T18"
+      ]
+    },
+    {
+      "requirement": "PF-010",
+      "tasks": [
+        "T18"
+      ]
+    },
+    {
+      "requirement": "PF-011",
+      "tasks": [
+        "T18"
+      ]
+    },
+    {
+      "requirement": "PF-012",
+      "tasks": [
+        "T18"
+      ]
+    },
+    {
+      "requirement": "PF-013",
+      "tasks": [
+        "T18",
+        "T21"
+      ]
+    },
+    {
+      "requirement": "PF-014",
+      "tasks": [
+        "T18",
+        "T21"
+      ]
+    },
+    {
+      "requirement": "PF-015",
+      "tasks": [
+        "T05",
+        "T18"
+      ]
+    },
+    {
+      "requirement": "PF-016",
+      "tasks": [
+        "T18"
+      ]
+    },
+    {
+      "requirement": "PF-017",
+      "tasks": [
+        "T18"
+      ]
+    },
+    {
+      "requirement": "PF-018",
+      "tasks": [
+        "T18"
+      ]
+    },
+    {
+      "requirement": "PF-019",
+      "tasks": [
+        "T18"
+      ]
+    },
+    {
+      "requirement": "PF-020",
+      "tasks": [
+        "T18",
+        "T31"
+      ]
+    },
+    {
+      "requirement": "PF-021",
+      "tasks": [
+        "T18"
+      ]
+    },
+    {
+      "requirement": "PROVIDER-FIXTURE-AND-INTEGRATION\u00a7acceptance-scenarios",
+      "tasks": [
+        "T18"
+      ]
+    },
+    {
+      "requirement": "PROVIDER-FIXTURE-AND-INTEGRATION\u00a7preamble",
+      "tasks": [
+        "T18"
+      ]
+    },
+    {
+      "requirement": "PROVIDER-FIXTURE-AND-INTEGRATION\u00a7rehearsal-intake",
+      "tasks": [
+        "T07"
+      ]
+    },
+    {
+      "requirement": "R0.1",
+      "tasks": [
+        "T10"
+      ]
+    },
+    {
+      "requirement": "R0.2",
+      "tasks": [
+        "T06",
+        "T10"
+      ]
+    },
+    {
+      "requirement": "R0.3",
+      "tasks": [
+        "T10"
+      ]
+    },
+    {
+      "requirement": "R0.4",
+      "tasks": [
+        "T10"
+      ]
+    },
+    {
+      "requirement": "R1.1",
+      "tasks": [
+        "T13"
+      ]
+    },
+    {
+      "requirement": "R1.2",
+      "tasks": [
+        "T13"
+      ]
+    },
+    {
+      "requirement": "R1.3",
+      "tasks": [
+        "T13"
+      ]
+    },
+    {
+      "requirement": "R10.1",
+      "tasks": [
+        "T20"
+      ]
+    },
+    {
+      "requirement": "R10.2",
+      "tasks": [
+        "T20"
+      ]
+    },
+    {
+      "requirement": "R10.3",
+      "tasks": [
+        "T20"
+      ]
+    },
+    {
+      "requirement": "R10.4",
+      "tasks": [
+        "T20"
+      ]
+    },
+    {
+      "requirement": "R10.5",
+      "tasks": [
+        "T19"
+      ]
+    },
+    {
+      "requirement": "R10.6",
+      "tasks": [
+        "T19"
+      ]
+    },
+    {
+      "requirement": "R10.7",
+      "tasks": [
+        "T19"
+      ]
+    },
+    {
+      "requirement": "R11.1",
+      "tasks": [
+        "T20"
+      ]
+    },
+    {
+      "requirement": "R11.2",
+      "tasks": [
+        "T20"
+      ]
+    },
+    {
+      "requirement": "R11.3",
+      "tasks": [
+        "T20"
+      ]
+    },
+    {
+      "requirement": "R11.4",
+      "tasks": [
+        "T20",
+        "T27"
+      ]
+    },
+    {
+      "requirement": "R12.1",
+      "tasks": [
+        "T26"
+      ]
+    },
+    {
+      "requirement": "R12.2",
+      "tasks": [
+        "T26"
+      ]
+    },
+    {
+      "requirement": "R12.3",
+      "tasks": [
+        "T26"
+      ]
+    },
+    {
+      "requirement": "R13.1",
+      "tasks": [
+        "T10"
+      ]
+    },
+    {
+      "requirement": "R13.2",
+      "tasks": [
+        "T10"
+      ]
+    },
+    {
+      "requirement": "R13.3",
+      "tasks": [
+        "T10"
+      ]
+    },
+    {
+      "requirement": "R13.4",
+      "tasks": [
+        "T10"
+      ]
+    },
+    {
+      "requirement": "R13.5",
+      "tasks": [
+        "T10"
+      ]
+    },
+    {
+      "requirement": "R13.6",
+      "tasks": [
+        "T10"
+      ]
+    },
+    {
+      "requirement": "R13.7",
+      "tasks": [
+        "T10"
+      ]
+    },
+    {
+      "requirement": "R13.8",
+      "tasks": [
+        "T10"
+      ]
+    },
+    {
+      "requirement": "R14.1",
+      "tasks": [
+        "T34"
+      ]
+    },
+    {
+      "requirement": "R14.2",
+      "tasks": [
+        "T34"
+      ]
+    },
+    {
+      "requirement": "R14.3",
+      "tasks": [
+        "T34"
+      ]
+    },
+    {
+      "requirement": "R15.1",
+      "tasks": [
+        "T13"
+      ]
+    },
+    {
+      "requirement": "R15.2",
+      "tasks": [
+        "T13"
+      ]
+    },
+    {
+      "requirement": "R15.3",
+      "tasks": [
+        "T13"
+      ]
+    },
+    {
+      "requirement": "R15.4",
+      "tasks": [
+        "T13"
+      ]
+    },
+    {
+      "requirement": "R15.5",
+      "tasks": [
+        "T13"
+      ]
+    },
+    {
+      "requirement": "R16.1",
+      "tasks": [
+        "T34"
+      ]
+    },
+    {
+      "requirement": "R16.2",
+      "tasks": [
+        "T34"
+      ]
+    },
+    {
+      "requirement": "R16.3",
+      "tasks": [
+        "T34"
+      ]
+    },
+    {
+      "requirement": "R16.4",
+      "tasks": [
+        "T34"
+      ]
+    },
+    {
+      "requirement": "R16.5",
+      "tasks": [
+        "T34"
+      ]
+    },
+    {
+      "requirement": "R2.1",
+      "tasks": [
+        "T13"
+      ]
+    },
+    {
+      "requirement": "R2.2",
+      "tasks": [
+        "T13"
+      ]
+    },
+    {
+      "requirement": "R2.3",
+      "tasks": [
+        "T13"
+      ]
+    },
+    {
+      "requirement": "R2.4",
+      "tasks": [
+        "T13"
+      ]
+    },
+    {
+      "requirement": "R2.5",
+      "tasks": [
+        "T13"
+      ]
+    },
+    {
+      "requirement": "R3.1",
+      "tasks": [
+        "T13"
+      ]
+    },
+    {
+      "requirement": "R3.2",
+      "tasks": [
+        "T13"
+      ]
+    },
+    {
+      "requirement": "R3.3",
+      "tasks": [
+        "T13"
+      ]
+    },
+    {
+      "requirement": "R3.4",
+      "tasks": [
+        "T13"
+      ]
+    },
+    {
+      "requirement": "R3.5",
+      "tasks": [
+        "T13"
+      ]
+    },
+    {
+      "requirement": "R4.1",
+      "tasks": [
+        "T13"
+      ]
+    },
+    {
+      "requirement": "R4.2",
+      "tasks": [
+        "T13"
+      ]
+    },
+    {
+      "requirement": "R4.3",
+      "tasks": [
+        "T13"
+      ]
+    },
+    {
+      "requirement": "R4.4",
+      "tasks": [
+        "T13"
+      ]
+    },
+    {
+      "requirement": "R5.1",
+      "tasks": [
+        "T13"
+      ]
+    },
+    {
+      "requirement": "R5.2",
+      "tasks": [
+        "T13"
+      ]
+    },
+    {
+      "requirement": "R5.3",
+      "tasks": [
+        "T13"
+      ]
+    },
+    {
+      "requirement": "R5.4",
+      "tasks": [
+        "T13"
+      ]
+    },
+    {
+      "requirement": "R6.1",
+      "tasks": [
+        "T13"
+      ]
+    },
+    {
+      "requirement": "R6.2",
+      "tasks": [
+        "T13"
+      ]
+    },
+    {
+      "requirement": "R6.3",
+      "tasks": [
+        "T13"
+      ]
+    },
+    {
+      "requirement": "R6.4",
+      "tasks": [
+        "T13"
+      ]
+    },
+    {
+      "requirement": "R7.1",
+      "tasks": [
+        "T13"
+      ]
+    },
+    {
+      "requirement": "R7.2",
+      "tasks": [
+        "T13"
+      ]
+    },
+    {
+      "requirement": "R7.3",
+      "tasks": [
+        "T13"
+      ]
+    },
+    {
+      "requirement": "R7.4",
+      "tasks": [
+        "T13"
+      ]
+    },
+    {
+      "requirement": "R8.1",
+      "tasks": [
+        "T13"
+      ]
+    },
+    {
+      "requirement": "R8.2",
+      "tasks": [
+        "T13"
+      ]
+    },
+    {
+      "requirement": "R8.3",
+      "tasks": [
+        "T13"
+      ]
+    },
+    {
+      "requirement": "R8.4",
+      "tasks": [
+        "T13"
+      ]
+    },
+    {
+      "requirement": "R9.1",
+      "tasks": [
+        "T16"
+      ]
+    },
+    {
+      "requirement": "R9.10",
+      "tasks": [
+        "T16"
+      ]
+    },
+    {
+      "requirement": "R9.2",
+      "tasks": [
+        "T16"
+      ]
+    },
+    {
+      "requirement": "R9.3",
+      "tasks": [
+        "T22"
+      ]
+    },
+    {
+      "requirement": "R9.4",
+      "tasks": [
+        "T22"
+      ]
+    },
+    {
+      "requirement": "R9.5",
+      "tasks": [
+        "T22"
+      ]
+    },
+    {
+      "requirement": "R9.6",
+      "tasks": [
+        "T16"
+      ]
+    },
+    {
+      "requirement": "R9.7",
+      "tasks": [
+        "T16"
+      ]
+    },
+    {
+      "requirement": "R9.8",
+      "tasks": [
+        "T16"
+      ]
+    },
+    {
+      "requirement": "R9.9",
+      "tasks": [
+        "T16"
+      ]
+    },
+    {
+      "requirement": "REHEARSAL-ACCEPTANCE-LEDGER\u00a7gate-matrix",
+      "tasks": [
+        "T34"
+      ]
+    },
+    {
+      "requirement": "REHEARSAL-ACCEPTANCE-LEDGER\u00a7next-implementation-step",
+      "tasks": [
+        "T34"
+      ]
+    },
+    {
+      "requirement": "REHEARSAL-ACCEPTANCE-LEDGER\u00a7preamble",
+      "tasks": [
+        "T01",
+        "T34"
+      ]
+    },
+    {
+      "requirement": "REHEARSAL-ACCEPTANCE-LEDGER\u00a7release-acceptance-predicate",
+      "tasks": [
+        "T34"
+      ]
+    },
+    {
+      "requirement": "REHEARSAL-ACCEPTANCE-LEDGER\u00a7release-batching-and-evidence",
+      "tasks": [
+        "T34"
+      ]
+    },
+    {
+      "requirement": "REHEARSAL-ACCEPTANCE-LEDGER\u00a7requirement-coverage",
+      "tasks": [
+        "T34"
+      ]
+    },
+    {
+      "requirement": "REHEARSAL-ACCEPTANCE-LEDGER\u00a7single-ledger-format",
+      "tasks": [
+        "T34"
+      ]
+    },
+    {
+      "requirement": "REHEARSAL-AGENT-INTERFACE-FREEZE\u00a7boundary-a-command-submission",
+      "tasks": [
+        "T14"
+      ]
+    },
+    {
+      "requirement": "REHEARSAL-AGENT-INTERFACE-FREEZE\u00a7boundary-b-versioned-projection",
+      "tasks": [
+        "T14"
+      ]
+    },
+    {
+      "requirement": "REHEARSAL-AGENT-INTERFACE-FREEZE\u00a7boundary-c-replay",
+      "tasks": [
+        "T14"
+      ]
+    },
+    {
+      "requirement": "REHEARSAL-AGENT-INTERFACE-FREEZE\u00a7boundary-d-persistence",
+      "tasks": [
+        "T14"
+      ]
+    },
+    {
+      "requirement": "REHEARSAL-AGENT-INTERFACE-FREEZE\u00a7boundary-e-report",
+      "tasks": [
+        "T14"
+      ]
+    },
+    {
+      "requirement": "REHEARSAL-AGENT-INTERFACE-FREEZE\u00a7completion-evidence",
+      "tasks": [
+        "T14"
+      ]
+    },
+    {
+      "requirement": "REHEARSAL-AGENT-INTERFACE-FREEZE\u00a7contract-freeze-procedure",
+      "tasks": [
+        "T14"
+      ]
+    },
+    {
+      "requirement": "REHEARSAL-AGENT-INTERFACE-FREEZE\u00a7mandatory-negative-cases",
+      "tasks": [
+        "T14"
+      ]
+    },
+    {
+      "requirement": "REHEARSAL-AGENT-INTERFACE-FREEZE\u00a7ownership",
+      "tasks": [
+        "T14"
+      ]
+    },
+    {
+      "requirement": "REHEARSAL-AGENT-INTERFACE-FREEZE\u00a7preamble",
+      "tasks": [
+        "T14"
+      ]
+    },
+    {
+      "requirement": "REHEARSAL-DEPENDENCY-LOCK\u00a7preflight-acceptance",
+      "tasks": [
+        "T11"
+      ]
+    },
+    {
+      "requirement": "REHEARSAL-EXTERNAL-DATA-BOUNDARY\u00a7acceptance",
+      "tasks": [
+        "T20"
+      ]
+    },
+    {
+      "requirement": "REHEARSAL-EXTERNAL-DATA-BOUNDARY\u00a7design-note",
+      "tasks": [
+        "T20"
+      ]
+    },
+    {
+      "requirement": "REHEARSAL-EXTERNAL-DATA-BOUNDARY\u00a7goal",
+      "tasks": [
+        "T20"
+      ]
+    },
+    {
+      "requirement": "REHEARSAL-EXTERNAL-DATA-BOUNDARY\u00a7implementation-intake",
+      "tasks": [
+        "T07"
+      ]
+    },
+    {
+      "requirement": "REHEARSAL-EXTERNAL-DATA-BOUNDARY\u00a7preamble",
+      "tasks": [
+        "T20"
+      ]
+    },
+    {
+      "requirement": "REQUIREMENTS\u00a7preamble",
+      "tasks": [
+        "T34"
+      ]
+    },
+    {
+      "requirement": "REQUIREMENTS\u00a7version-and-integration-baseline",
+      "tasks": [
+        "T11"
+      ]
+    },
+    {
+      "requirement": "S01",
+      "tasks": [
+        "T22"
+      ]
+    },
+    {
+      "requirement": "S02",
+      "tasks": [
+        "T22"
+      ]
+    },
+    {
+      "requirement": "S03",
+      "tasks": [
+        "T22"
+      ]
+    },
+    {
+      "requirement": "S04",
+      "tasks": [
+        "T22"
+      ]
+    },
+    {
+      "requirement": "S05",
+      "tasks": [
+        "T22"
+      ]
+    },
+    {
+      "requirement": "S06",
+      "tasks": [
+        "T22"
+      ]
+    },
+    {
+      "requirement": "S07",
+      "tasks": [
+        "T22"
+      ]
+    },
+    {
+      "requirement": "S08",
+      "tasks": [
+        "T22"
+      ]
+    },
+    {
+      "requirement": "S09",
+      "tasks": [
+        "T22"
+      ]
+    },
+    {
+      "requirement": "S10",
+      "tasks": [
+        "T22"
+      ]
+    },
+    {
+      "requirement": "S11",
+      "tasks": [
+        "T22"
+      ]
+    },
+    {
+      "requirement": "S12",
+      "tasks": [
+        "T22"
+      ]
+    },
+    {
+      "requirement": "S13",
+      "tasks": [
+        "T22"
+      ]
+    },
+    {
+      "requirement": "S14",
+      "tasks": [
+        "T22",
+        "T28"
+      ]
+    },
+    {
+      "requirement": "S15",
+      "tasks": [
+        "T22",
+        "T28"
+      ]
+    },
+    {
+      "requirement": "S16",
+      "tasks": [
+        "T22"
+      ]
+    },
+    {
+      "requirement": "S17",
+      "tasks": [
+        "T22"
+      ]
+    },
+    {
+      "requirement": "S18",
+      "tasks": [
+        "T22"
+      ]
+    },
+    {
+      "requirement": "S19",
+      "tasks": [
+        "T22"
+      ]
+    },
+    {
+      "requirement": "S20",
+      "tasks": [
+        "T22"
+      ]
+    },
+    {
+      "requirement": "S21",
+      "tasks": [
+        "T22"
+      ]
+    },
+    {
+      "requirement": "S22",
+      "tasks": [
+        "T22"
+      ]
+    },
+    {
+      "requirement": "S23",
+      "tasks": [
+        "T22"
+      ]
+    },
+    {
+      "requirement": "S24",
+      "tasks": [
+        "T22"
+      ]
+    },
+    {
+      "requirement": "S25",
+      "tasks": [
+        "T22"
+      ]
+    },
+    {
+      "requirement": "SCREEN-CONTRACTS\u00a7preamble",
+      "tasks": [
+        "T22"
+      ]
+    },
+    {
+      "requirement": "SCREEN-CONTRACTS\u00a7responsive-contract",
+      "tasks": [
+        "T16",
+        "T22"
+      ]
+    },
+    {
+      "requirement": "SCREEN-CONTRACTS\u00a7url-contract",
+      "tasks": [
+        "T16",
+        "T22"
+      ]
+    },
+    {
+      "requirement": "STATE-TRANSITION-TABLES\u00a71-investigation-lifecycle",
+      "tasks": [
+        "T13"
+      ]
+    },
+    {
+      "requirement": "STATE-TRANSITION-TABLES\u00a710-causal-assertion-lifecycle",
+      "tasks": [
+        "T13"
+      ]
+    },
+    {
+      "requirement": "STATE-TRANSITION-TABLES\u00a711-corrective-action-lifecycle",
+      "tasks": [
+        "T13"
+      ]
+    },
+    {
+      "requirement": "STATE-TRANSITION-TABLES\u00a712-proposal-lifecycle",
+      "tasks": [
+        "T13"
+      ]
+    },
+    {
+      "requirement": "STATE-TRANSITION-TABLES\u00a713-review-lifecycle",
+      "tasks": [
+        "T13"
+      ]
+    },
+    {
+      "requirement": "STATE-TRANSITION-TABLES\u00a714-conclusion-behavior",
+      "tasks": [
+        "T13"
+      ]
+    },
+    {
+      "requirement": "STATE-TRANSITION-TABLES\u00a715-domain-pack-and-policy-version-behavior",
+      "tasks": [
+        "T13"
+      ]
+    },
+    {
+      "requirement": "STATE-TRANSITION-TABLES\u00a716-transition-evaluation-order",
+      "tasks": [
+        "T13"
+      ]
+    },
+    {
+      "requirement": "STATE-TRANSITION-TABLES\u00a717-implementation-rule",
+      "tasks": [
+        "T13"
+      ]
+    },
+    {
+      "requirement": "STATE-TRANSITION-TABLES\u00a72-hypothesis-lifecycle",
+      "tasks": [
+        "T13"
+      ]
+    },
+    {
+      "requirement": "STATE-TRANSITION-TABLES\u00a73-assumption-lifecycle",
+      "tasks": [
+        "T13"
+      ]
+    },
+    {
+      "requirement": "STATE-TRANSITION-TABLES\u00a74-evidence-lifecycle",
+      "tasks": [
+        "T13"
+      ]
+    },
+    {
+      "requirement": "STATE-TRANSITION-TABLES\u00a75-investigation-action-lifecycle",
+      "tasks": [
+        "T13"
+      ]
+    },
+    {
+      "requirement": "STATE-TRANSITION-TABLES\u00a76-unknown-lifecycle",
+      "tasks": [
+        "T13"
+      ]
+    },
+    {
+      "requirement": "STATE-TRANSITION-TABLES\u00a77-negative-knowledge-lifecycle",
+      "tasks": [
+        "T13"
+      ]
+    },
+    {
+      "requirement": "STATE-TRANSITION-TABLES\u00a78-contradiction-lifecycle",
+      "tasks": [
+        "T13"
+      ]
+    },
+    {
+      "requirement": "STATE-TRANSITION-TABLES\u00a79-obligation-lifecycle",
+      "tasks": [
+        "T13"
+      ]
+    },
+    {
+      "requirement": "STATE-TRANSITION-TABLES\u00a7preamble",
+      "tasks": [
+        "T13"
+      ]
+    },
+    {
+      "requirement": "STORAGE-001",
+      "tasks": [
+        "T15"
+      ]
+    },
+    {
+      "requirement": "STORAGE-002",
+      "tasks": [
+        "T15"
+      ]
+    },
+    {
+      "requirement": "STORAGE-003",
+      "tasks": [
+        "T04",
+        "T15"
+      ]
+    },
+    {
+      "requirement": "STORAGE-004",
+      "tasks": [
+        "T15",
+        "T20"
+      ]
+    },
+    {
+      "requirement": "STORAGE-005",
+      "tasks": [
+        "T15"
+      ]
+    },
+    {
+      "requirement": "STORAGE-006",
+      "tasks": [
+        "T15",
+        "T20"
+      ]
+    },
+    {
+      "requirement": "STORAGE-007",
+      "tasks": [
+        "T15"
+      ]
+    },
+    {
+      "requirement": "STORAGE-008",
+      "tasks": [
+        "T06",
+        "T15"
+      ]
+    },
+    {
+      "requirement": "STORAGE-009",
+      "tasks": [
+        "T15"
+      ]
+    },
+    {
+      "requirement": "SYSTEM-VERSION-AND-COMPATIBILITY\u00a7acceptance",
+      "tasks": [
+        "T11"
+      ]
+    },
+    {
+      "requirement": "UI-001",
+      "tasks": [
+        "T00",
+        "T22"
+      ]
+    },
+    {
+      "requirement": "UI-002",
+      "tasks": [
+        "T22",
+        "T23"
+      ]
+    },
+    {
+      "requirement": "UI-003",
+      "tasks": [
+        "T22"
+      ]
+    },
+    {
+      "requirement": "UI-004",
+      "tasks": [
+        "T22"
+      ]
+    },
+    {
+      "requirement": "UI-005",
+      "tasks": [
+        "T22"
+      ]
+    },
+    {
+      "requirement": "UI-006",
+      "tasks": [
+        "T19",
+        "T22"
+      ]
+    },
+    {
+      "requirement": "UI-007",
+      "tasks": [
+        "T22"
+      ]
+    },
+    {
+      "requirement": "UI-008",
+      "tasks": [
+        "T22"
+      ]
+    },
+    {
+      "requirement": "UI-009",
+      "tasks": [
+        "T22",
+        "T26"
+      ]
+    },
+    {
+      "requirement": "UI-010",
+      "tasks": [
+        "T22"
+      ]
+    },
+    {
+      "requirement": "UI-011",
+      "tasks": [
+        "T16",
+        "T22"
+      ]
+    },
+    {
+      "requirement": "UI-012",
+      "tasks": [
+        "T22"
+      ]
+    },
+    {
+      "requirement": "UI-013",
+      "tasks": [
+        "T22"
+      ]
+    },
+    {
+      "requirement": "UI-014",
+      "tasks": [
+        "T16",
+        "T22"
+      ]
+    },
+    {
+      "requirement": "UI-015",
+      "tasks": [
+        "T00",
+        "T22"
+      ]
+    },
+    {
+      "requirement": "UI-016",
+      "tasks": [
+        "T16",
+        "T22"
+      ]
+    },
+    {
+      "requirement": "UI-017",
+      "tasks": [
+        "T22"
+      ]
+    },
+    {
+      "requirement": "UI-018",
+      "tasks": [
+        "T22",
+        "T29"
+      ]
+    },
+    {
+      "requirement": "UI-019",
+      "tasks": [
+        "T22",
+        "T29"
+      ]
+    },
+    {
+      "requirement": "UI-020",
+      "tasks": [
+        "T16",
+        "T22"
+      ]
+    },
+    {
+      "requirement": "UI-021",
+      "tasks": [
+        "T22"
+      ]
+    },
+    {
+      "requirement": "UI-022",
+      "tasks": [
+        "T22"
+      ]
+    },
+    {
+      "requirement": "UI-023",
+      "tasks": [
+        "T22"
+      ]
+    },
+    {
+      "requirement": "UI-024",
+      "tasks": [
+        "T22"
+      ]
+    },
+    {
+      "requirement": "UI-025",
+      "tasks": [
+        "T22"
+      ]
+    },
+    {
+      "requirement": "UI-026",
+      "tasks": [
+        "T22"
+      ]
+    },
+    {
+      "requirement": "UI-027",
+      "tasks": [
+        "T22"
+      ]
+    },
+    {
+      "requirement": "UI-028",
+      "tasks": [
+        "T22"
+      ]
+    },
+    {
+      "requirement": "UI-029",
+      "tasks": [
+        "T16",
+        "T22"
+      ]
+    },
+    {
+      "requirement": "UI-030",
+      "tasks": [
+        "T22"
+      ]
+    },
+    {
+      "requirement": "UI-031",
+      "tasks": [
+        "T22"
+      ]
+    },
+    {
+      "requirement": "UI-032",
+      "tasks": [
+        "T22"
+      ]
+    },
+    {
+      "requirement": "UI-033",
+      "tasks": [
+        "T22"
+      ]
+    },
+    {
+      "requirement": "UI-034",
+      "tasks": [
+        "T22"
+      ]
+    },
+    {
+      "requirement": "UI-035",
+      "tasks": [
+        "T22"
+      ]
+    },
+    {
+      "requirement": "UI-036",
+      "tasks": [
+        "T22"
+      ]
+    },
+    {
+      "requirement": "UI-037",
+      "tasks": [
+        "T00",
+        "T22"
+      ]
+    },
+    {
+      "requirement": "UI-038",
+      "tasks": [
+        "T22"
+      ]
+    },
+    {
+      "requirement": "UI-039",
+      "tasks": [
+        "T22"
+      ]
+    },
+    {
+      "requirement": "UI-040",
+      "tasks": [
+        "T22",
+        "T31"
+      ]
+    },
+    {
+      "requirement": "VER-001",
+      "tasks": [
+        "T10"
+      ]
+    },
+    {
+      "requirement": "VER-002",
+      "tasks": [
+        "T03",
+        "T10"
+      ]
+    },
+    {
+      "requirement": "VER-003",
+      "tasks": [
+        "T10"
+      ]
+    },
+    {
+      "requirement": "VER-004",
+      "tasks": [
+        "T11"
+      ]
+    },
+    {
+      "requirement": "VER-005",
+      "tasks": [
+        "T10"
+      ]
+    },
+    {
+      "requirement": "VER-006",
+      "tasks": [
+        "T11"
+      ]
+    },
+    {
+      "requirement": "VER-007",
+      "tasks": [
+        "T29"
+      ]
+    },
+    {
+      "requirement": "VER-008",
+      "tasks": [
+        "T11"
+      ]
+    },
+    {
+      "requirement": "VER-009",
+      "tasks": [
+        "T11"
+      ]
+    },
+    {
+      "requirement": "VER-010",
+      "tasks": [
+        "T07"
+      ]
+    },
+    {
+      "requirement": "WASM-LOAD-001",
+      "tasks": [
+        "T16"
+      ]
+    },
+    {
+      "requirement": "WASM-LOAD-002",
+      "tasks": [
+        "T16"
+      ]
+    },
+    {
+      "requirement": "WASM-LOAD-003",
+      "tasks": [
+        "T16"
+      ]
+    },
+    {
+      "requirement": "WASM-LOAD-004",
+      "tasks": [
+        "T16"
+      ]
+    },
+    {
+      "requirement": "WASM-LOAD-005",
+      "tasks": [
+        "T16"
+      ]
+    },
+    {
+      "requirement": "WASM-LOAD-006",
+      "tasks": [
+        "T16"
+      ]
+    },
+    {
+      "requirement": "WASM-LOAD-007",
+      "tasks": [
+        "T16"
+      ]
+    },
+    {
+      "requirement": "WASM-LOAD-008",
+      "tasks": [
+        "T16"
+      ]
+    },
+    {
+      "requirement": "WASM-LOADING-EXPERIENCE\u00a7implementation",
+      "tasks": [
+        "T16"
+      ]
+    },
+    {
+      "requirement": "WDL-001",
+      "tasks": [
+        "T23",
+        "T24"
+      ]
+    },
+    {
+      "requirement": "WDL-002",
+      "tasks": [
+        "T23",
+        "T24"
+      ]
+    },
+    {
+      "requirement": "WDL-003",
+      "tasks": [
+        "T23"
+      ]
+    },
+    {
+      "requirement": "WDL-004",
+      "tasks": [
+        "T23"
+      ]
+    },
+    {
+      "requirement": "WDL-005",
+      "tasks": [
+        "T23"
+      ]
+    },
+    {
+      "requirement": "WDL-006",
+      "tasks": [
+        "T23"
+      ]
+    },
+    {
+      "requirement": "WDL-007",
+      "tasks": [
+        "T23"
+      ]
+    },
+    {
+      "requirement": "WDL-008",
+      "tasks": [
+        "T23"
+      ]
+    },
+    {
+      "requirement": "WDL-009",
+      "tasks": [
+        "T23"
+      ]
+    },
+    {
+      "requirement": "WDL-010",
+      "tasks": [
+        "T23"
+      ]
+    },
+    {
+      "requirement": "WDL-011",
+      "tasks": [
+        "T23"
+      ]
+    },
+    {
+      "requirement": "WDL-012",
+      "tasks": [
+        "T23"
+      ]
+    },
+    {
+      "requirement": "WDL-013",
+      "tasks": [
+        "T23"
+      ]
+    },
+    {
+      "requirement": "WDL-014",
+      "tasks": [
+        "T23"
+      ]
+    },
+    {
+      "requirement": "WDL-015",
+      "tasks": [
+        "T07",
+        "T23"
+      ]
+    },
+    {
+      "requirement": "WORKFLOW-DIAGRAM-INTEGRATION\u00a7acceptance-scenarios",
+      "tasks": [
+        "T23"
+      ]
+    },
+    {
+      "requirement": "WORKFLOW-DIAGRAM-INTEGRATION\u00a7design-rule",
+      "tasks": [
+        "T23"
+      ]
+    },
+    {
+      "requirement": "WORKFLOW-DIAGRAM-INTEGRATION\u00a7preamble",
+      "tasks": [
+        "T23"
+      ]
+    },
+    {
+      "requirement": "WORKFLOW-DIAGRAM-INTEGRATION\u00a7rehearsal-preparation",
+      "tasks": [
+        "T07",
+        "T23"
+      ]
+    }
+  ]
+}

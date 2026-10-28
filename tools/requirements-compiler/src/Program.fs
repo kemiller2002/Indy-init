@@ -367,7 +367,11 @@ let buildPackage (o: Options) : Built =
               Path = str "path" a
               Sha256 = Git.sha256Hex bytes
               TrustedOperators = strs "trustedOperators" a
-              Document = parseBytes bytes } }
+              Document = parseBytes bytes }
+          Categories =
+            let path = Path.Combine(o.Curation, "evidence-categories.json")
+            if not (File.Exists path) then failwithf "the evidence-categories table %s is missing" path
+            { Path = "curation/evidence-categories.json"; Sha256 = fileSha path; Table = parseFile path } }
 
     let outputs0 = outputs0 @ [ "verification-plan.json", VerificationPlan.build planInputs ]
 
@@ -391,9 +395,12 @@ let buildPackage (o: Options) : Built =
 
     let planCheck: Validate.Check =
         { Id = "V18"
-          Title = "The verification plan preserves every baseline P0 requirement and obligation; exclusions are operator-authorized and test bindings resolve"
+          Title = "The verification plan preserves every baseline P0 requirement and obligation; exclusions are operator-authorized; test bindings resolve and declare valid evidence categories; every obligation carries its derived acceptance contract"
           Critical = true
-          Problems = VerificationPlan.problems planInputs @ VerificationPlan.preservationProblems baseline reparsed.["verification-plan.json"] }
+          Problems =
+            VerificationPlan.problems planInputs
+            @ VerificationPlan.preservationProblems baseline reparsed.["verification-plan.json"]
+            @ VerificationPlan.categoriesTableProblems planInputs reparsed.["verification-plan.json"] }
 
     let checks = Validate.run inputs @ [ planCheck ]
     let report = Validate.report inputs checks
@@ -413,7 +420,8 @@ let buildPackage (o: Options) : Built =
     let manifest =
         JObj
             [ "schema", JStr "indy-init.requirements-package/1"
-              "package", JStr "requirements-compiled/v1"
+              // The package version is the directory that holds the curation (requirements-compiled/<version>/curation).
+              "package", JStr("requirements-compiled/" + Path.GetFileName(Path.GetDirectoryName(Path.TrimEndingDirectorySeparator(Path.GetFullPath o.Curation))))
               "source",
               JObj
                   [ "repository", JStr(str "repository" source)
@@ -487,8 +495,8 @@ let defaults =
     { Source = "."
       Baseline = ""
       CommittedBaseline = "requirements/causa-requirements-baseline.json"
-      Curation = "requirements-compiled/v1/curation"
-      Out = "requirements-compiled/v1"
+      Curation = "requirements-compiled/v2/curation"
+      Out = "requirements-compiled/v2"
       Repos = Map.empty
       Check = false
       Evidence = "" }
