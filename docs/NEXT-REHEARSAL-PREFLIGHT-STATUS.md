@@ -29,3 +29,19 @@ R001 .echelon/foundations.json pins Forma 0.5.0, Folio 0.3.0, Limen 0.9.0, Ordo 
 
 ## No-go conditions
 Do not start the timed experiment with an unverified dependency upgrade, inconsistent schema, uncompiled interface, unvalidated golden fixtures, or a fabricated acceptance PASS.
+
+## 2026-10-28 addendum: isolated Causa workspace initialization
+
+No new rehearsal has started. CHT-001 is recorded in the legacy Praxis intake at `input-documents/2026-10-28-CHT-001-causa-historical-workspace-initialization.md`, and the prospective workflow is documented in `CAUSA-REHEARSAL-WORKSPACE-PREFLIGHT.md`.
+
+| Check | Status | Evidence |
+|---|---|---|
+| Immutable three-investigation template and digest | IMPLEMENTED ON FEATURE BRANCH, NOT MERGED | `causa-data` branch `codex/immutable-historical-rehearsal-workspaces`, commits `d213361`, `2600a44` |
+| Independent workspace creation and isolation | VERIFIED ON FEATURE BRANCH | Causa 25-test suite; two-workspace append isolation |
+| Conditor ordered fail-closed initialization | IMPLEMENTED ON FEATURE BRANCH, NOT MERGED | `conditor` branch `codex/causa-rehearsal-preflight`, commit `581ba80` |
+| GitHub publication, remote readback and application load | VERIFIED ON DISPOSABLE BRANCH | `causa-data` branch `codex/causa-workspace-e2e-20261028`, `rehearsal-900001`, commit `c3101ec32521482b5a939fd43dde0e8676fb4d93` |
+| CHT-001 Praxis derivation | NOT RUN | Intake document exists; Indy Init has no Praxis installation |
+| Event workspace selection | NOT RUN | Operator must select the next rehearsal id after merge/release |
+| Timed execution | NOT RUN | READY initialization is preparation only; explicit start remains required |
+
+The next rehearsal remains blocked until the feature changes are reviewed and merged, CHT-001 is ingested with derived records, an operator selects a new unique id, and the real preflight receipt is READY. The disposable `rehearsal-900001` workspace is integration-test evidence and must not be reused as the event workspace.
