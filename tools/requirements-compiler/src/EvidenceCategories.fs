@@ -13,12 +13,24 @@ open Json
 let schemaId = "indy-init.evidence-categories/1"
 
 /// The closed vocabulary, in the order the plan lists categories.
-let vocabulary = [ "unit"; "integration"; "browser"; "live-provider"; "security"; "accessibility"; "independent-acceptance" ]
+let vocabulary =
+    [ "unit"; "integration"; "browser"; "live-provider"; "security"; "accessibility"; "independent-acceptance"; "process-record"; "owner-decision" ]
 
 let unclassified = "unclassified"
 
 /// Test kinds of the verification plan (a binding's `kind`).
-let testKinds = [ "live"; "deterministic"; "review" ]
+let testKinds = [ "live"; "deterministic"; "review"; "process"; "owner" ]
+
+/// Who produces a category's evidence. Application tests prove product behaviour; reviewer, process and owner
+/// evidence is about how the work was done and is never satisfied by an application test (and the reverse).
+let evidenceClasses = [ "application-test"; "reviewer"; "process"; "owner" ]
+
+/// The test kinds a category of each evidence class may name.
+let private kindsOfClass =
+    function
+    | "process" -> [ "process" ]
+    | "owner" -> [ "owner" ]
+    | _ -> [ "live"; "deterministic"; "review" ]
 
 /// What a rule can see about one obligation: existing requirement data only.
 type Subject =
@@ -86,6 +98,14 @@ let private categoryEntry (table: Json) (c: string) =
 let kindsFor (table: Json) (c: string) =
     categoryEntry table c |> Option.map (strs "testKinds") |> Option.defaultValue []
 
+/// The evidence class of a category (application-test, reviewer, process or owner).
+let classFor (table: Json) (c: string) =
+    categoryEntry table c |> Option.bind (strOpt "evidenceClass") |> Option.defaultValue ""
+
+/// The producer a category's evidence is expected to come from.
+let producerFor (table: Json) (c: string) =
+    categoryEntry table c |> Option.bind (strOpt "producer") |> Option.defaultValue ""
+
 /// The freshness policy a category imposes on its evidence, if any.
 let policyFor (table: Json) (c: string) =
     categoryEntry table c |> Option.bind (strOpt "freshnessPolicy")
@@ -106,6 +126,13 @@ let problems (table: Json) (knownRules: Set<string>) (knownPolicies: Set<string>
           if ks.IsEmpty then yield sprintf "category %s names no test kind" id
           for k in ks do
               if not (List.contains k testKinds) then yield sprintf "category %s names unknown test kind '%s'" id k
+          match strOpt "evidenceClass" c with
+          | Some k when List.contains k evidenceClasses ->
+              for kind in ks do
+                  if List.contains kind testKinds && not (List.contains kind (kindsOfClass k)) then
+                      yield sprintf "category %s of evidence class %s cannot be proven by test kind '%s'" id k kind
+          | k -> yield sprintf "category %s has evidence class %A, expected one of %s" id k (String.concat ", " evidenceClasses)
+          if String.IsNullOrWhiteSpace(strOpt "producer" c |> Option.defaultValue "") then yield sprintf "category %s names no evidence producer" id
           match strOpt "freshnessPolicy" c with
           | Some p when not (knownPolicies.Contains p) -> yield sprintf "category %s names unknown freshness policy %s" id p
           | _ -> ()
@@ -153,7 +180,9 @@ let embedded (path: string) (sha256: string) (table: Json) =
                   [ "id", JStr(str "id" c)
                     "definition", JStr(str "definition" c)
                     "testKinds", jstrs (strs "testKinds" c)
-                    "freshnessPolicy", jopt JStr (strOpt "freshnessPolicy" c) ])
+                    "freshnessPolicy", jopt JStr (strOpt "freshnessPolicy" c)
+                    "evidenceClass", JStr(str "evidenceClass" c)
+                    "producer", JStr(str "producer" c) ])
           |> JArr
           "rules",
           arr "rules" table

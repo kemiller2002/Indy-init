@@ -573,7 +573,7 @@ let verifyPlanCommand (args: string list) : int =
         eprintfn "%s" e
         2
     | Ok m when required |> List.exists (m.ContainsKey >> not) ->
-        eprintfn "usage: requirements-compiler verify-plan %s [--out FILE]" (required |> List.map (fun k -> k + " V") |> String.concat " ")
+        eprintfn "usage: requirements-compiler verify-plan %s [--process-assessment FILE] [--out FILE]" (required |> List.map (fun k -> k + " V") |> String.concat " ")
         2
     | Ok m ->
         try
@@ -599,7 +599,11 @@ let verifyPlanCommand (args: string list) : int =
                       ReadEvidence = readEvidence
                       TrustedSourceSha = one "--trusted-source-sha"
                       ApprovalsRaw = File.ReadAllBytes(one "--approvals")
-                      TrustedOperators = m.["--trusted-operator-id"] }
+                      TrustedOperators = m.["--trusted-operator-id"]
+                      ProcessCovered =
+                        match m.TryFind "--process-assessment" with
+                        | Some [ path ] -> ProcessVerification.coveredBy (parseFile (one "--plan")) (one "--trusted-source-sha") (parseFile path)
+                        | _ -> Map.empty }
 
             let text = serialize assessment
             match m.TryFind "--out" with
@@ -610,11 +614,119 @@ let verifyPlanCommand (args: string list) : int =
             eprintfn "input error: %s" ex.Message
             2
 
+let private optionMap (args: string list) =
+    let rec go (xs: string list) (m: Map<string, string list>) =
+        match xs with
+        | k :: v :: rest when k.StartsWith("--", StringComparison.Ordinal) -> go rest (m.Add(k, (m.TryFind k |> Option.defaultValue []) @ [ v ]))
+        | [] -> Ok m
+        | x :: _ -> Error(sprintf "unexpected argument '%s'" x)
+    go args Map.empty
+
+let private writeOut (m: Map<string, string list>) (j: Json) =
+    let text = serialize j
+    match m.TryFind "--out" with
+    | Some [ out ] -> File.WriteAllText(out, text)
+    | _ -> printf "%s" text
+
+/// `verify-process`: Priority One. Decides the process, reviewer and owner obligations of the plan for one candidate
+/// from the rehearsal repository's Praxis event log (see ProcessVerification). The candidate repository is read only
+/// for commit ancestry. Exit 0 VERIFIED, 3 not verified, 2 unusable input.
+let verifyProcessCommand (args: string list) : int =
+    let required = [ "--plan"; "--rules"; "--candidate" ]
+    let source (m: Map<string, string list>) = m.ContainsKey "--repo" || (m.ContainsKey "--events" && m.ContainsKey "--ancestry")
+    match optionMap args with
+    | Error e ->
+        eprintfn "%s" e
+        2
+    | Ok m when required |> List.exists (m.ContainsKey >> not) || not (source m) ->
+        eprintfn "usage: requirements-compiler verify-process --plan FILE --rules FILE --candidate SHA (--repo DIR | --events FILE [--executions DIR] --ancestry FILE) [--attestations FILE --trusted-run-id ID] [--out FILE]"
+        2
+    | Ok m ->
+        try
+            let one k = m.[k] |> List.last
+            let repo = m.TryFind "--repo" |> Option.map (List.last >> Path.GetFullPath)
+            let eventsPath =
+                match m.TryFind "--events", repo with
+                | Some p, _ -> List.last p
+                | None, Some r -> Path.Combine(r, ".ros", "events", "events.jsonl")
+                | None, None -> ""
+            let events =
+                if File.Exists eventsPath then
+                    File.ReadAllLines eventsPath |> Array.filter (fun l -> l.Trim() <> "") |> Array.map (Text.Encoding.UTF8.GetBytes >> parseBytes) |> List.ofArray
+                else []
+            // Envelopes as Praxis stores them (.ros/executions/<id>/envelope.json) or exported flat (<id>.json).
+            let executionsDir =
+                match m.TryFind "--executions", repo with
+                | Some d, _ -> List.last d
+                | None, Some r -> Path.Combine(r, ".ros", "executions")
+                | None, None -> ""
+            let executions =
+                if Directory.Exists executionsDir then
+                    let nested =
+                        Directory.GetDirectories executionsDir
+                        |> Array.choose (fun dir ->
+                            let envelope = Path.Combine(dir, "envelope.json")
+                            if File.Exists envelope then Some(Path.GetFileName dir, parseFile envelope) else None)
+                    let flat = Directory.GetFiles(executionsDir, "*.json") |> Array.map (fun f -> Path.GetFileNameWithoutExtension f, parseFile f)
+                    Array.append nested flat |> Map.ofArray
+                else Map.empty
+            let rulesBytes = File.ReadAllBytes(one "--rules")
+            // Ancestry from the candidate repository, or from an exported `git rev-list CANDIDATE` listing.
+            let ancestry = m.TryFind "--ancestry" |> Option.map (List.last >> File.ReadAllLines >> Array.map (fun l -> l.Trim()) >> Set.ofArray)
+            let isAncestor (commit: string) (candidate: string) =
+                commit = candidate
+                || (match ancestry, repo with
+                    | Some listed, _ -> candidate = one "--candidate" && listed.Contains commit
+                    | None, Some r -> Git.run r [ "merge-base"; "--is-ancestor"; commit; candidate ] |> Result.isOk
+                    | None, None -> false)
+            let assessment =
+                ProcessVerification.assess
+                    { Plan = parseFile (one "--plan")
+                      Events = events
+                      Executions = executions
+                      Rules = parseBytes rulesBytes
+                      RulesSha256 = Git.sha256Hex rulesBytes
+                      Attestations = m.TryFind "--attestations" |> Option.map (List.last >> parseFile)
+                      TrustedRunId = m.TryFind "--trusted-run-id" |> Option.map List.last
+                      Candidate = one "--candidate"
+                      IsAncestor = isAncestor }
+            writeOut m assessment
+            match str "verdict" assessment with
+            | "VERIFIED" -> 0
+            | "INVALID" -> 2
+            | _ -> 3
+        with ex ->
+            eprintfn "input error: %s" ex.Message
+            2
+
+/// `plan-readiness`: Priority Two, the implementation-start gate (see PlanReadiness). Exit 0 READY, 3 BLOCKED,
+/// 2 unusable input.
+let planReadinessCommand (args: string list) : int =
+    match optionMap args with
+    | Error e ->
+        eprintfn "%s" e
+        2
+    | Ok m when not (m.ContainsKey "--plan") ->
+        eprintfn "usage: requirements-compiler plan-readiness --plan FILE [--rules FILE] [--out FILE]"
+        2
+    | Ok m ->
+        try
+            let rules = m.TryFind "--rules" |> Option.map (List.last >> File.ReadAllBytes)
+            let report =
+                PlanReadiness.assess (parseFile (m.["--plan"] |> List.last)) (rules |> Option.map parseBytes) (rules |> Option.map Git.sha256Hex)
+            writeOut m report
+            if str "verdict" report = "READY" then 0 else 3
+        with ex ->
+            eprintfn "input error: %s" ex.Message
+            2
+
 [<EntryPoint>]
 let main argv =
     match List.ofArray argv with
     | [ "baseline"; root; commit ] -> baselineCommand root commit
     | "verify-plan" :: rest -> verifyPlanCommand rest
+    | "verify-process" :: rest -> verifyProcessCommand rest
+    | "plan-readiness" :: rest -> planReadinessCommand rest
     | "preflight" :: rest ->
         match parseArgs rest defaults with
         | Error e ->

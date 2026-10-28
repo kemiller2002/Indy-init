@@ -24,6 +24,13 @@
       "reuseCondition": "not reused by the verifier; a re-review (or a reviewer's no-change attestation) is new evidence"
     },
     {
+      "id": "FP-PROCESS-THIS-RUN",
+      "testKinds": ["process", "owner"],
+      "rule": "Process and owner evidence is a record written to the run's own Praxis event log during the run (or a CI-observed owner attestation from the run), bound to the exact candidate commit; records about another candidate or another run do not count.",
+      "reusable": false,
+      "reuseCondition": "never reused: each candidate needs its own records; verify-process rejects evidence bound to another candidate"
+    },
+    {
       "id": "FP-DETERMINISTIC-INPUT-DIGEST",
       "testKinds": ["deterministic"],
       "rule": "Evidence comes from a deterministic test (unit, property, fixture replay, offline browser) whose result depends only on its declared inputs.",

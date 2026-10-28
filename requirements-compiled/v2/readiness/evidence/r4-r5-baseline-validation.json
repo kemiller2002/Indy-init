@@ -57,8 +57,8 @@
       ]
     },
     "plan": {
-      "planId": "VP-6b0f59cee664",
-      "digest": "6b0f59cee66487a9d1b61851e8e12ec4584af11d4b443825df5cc596ab37a2f9",
+      "planId": "VP-06f6d4ef5deb",
+      "digest": "06f6d4ef5deb3f36ef55d5dde7f7d1b7ab0e6ca807ab769f606d5bb3754872a4",
       "requirements": 108,
       "obligations": 326,
       "obligationsWithAcceptanceContract": 326,
@@ -72,7 +72,9 @@
         "live-provider": 91,
         "security": 6,
         "accessibility": 166,
-        "independent-acceptance": 62
+        "independent-acceptance": 62,
+        "process-record": 25,
+        "owner-decision": 3
       }
     },
     "preservationProblems": []
@@ -80,7 +82,7 @@
   "rehearsal5": {
     "checkout": {
       "repository": "kemiller2002/indy-init-rehearsal-005",
-      "head": "e086147bc93142c1d97917f2f2fd3a3d08f66dfc"
+      "head": "b972cb446de543018a65d8726cae6f8283821791"
     },
     "baseline": {
       "source": "kemiller2002/indy-init 459f65ac1aa5569d05c0e7a4096ada277dbabc91:requirements/causa-requirements-baseline.json (the INDY_INIT_REF of R5's .github/workflows/build-and-test.yml)",
@@ -109,6 +111,11 @@
       },
       {
         "where": "evidence/acceptance/run-40579006057-8d15492/bundle/ledger.json requirements_baseline.sha256",
+        "sha256": "621e2f960038dcfb0daa2a9fe18a0c1c350faed297ba2856da1236a0360857b9",
+        "matches": true
+      },
+      {
+        "where": "evidence/acceptance/run-40620099844-1b9fb56/bundle/ledger.json requirements_baseline.sha256",
         "sha256": "621e2f960038dcfb0daa2a9fe18a0c1c350faed297ba2856da1236a0360857b9",
         "matches": true
       }
@@ -145,8 +152,8 @@
       "differenceDetail": []
     },
     "plan": {
-      "planId": "VP-6b0f59cee664",
-      "digest": "6b0f59cee66487a9d1b61851e8e12ec4584af11d4b443825df5cc596ab37a2f9",
+      "planId": "VP-06f6d4ef5deb",
+      "digest": "06f6d4ef5deb3f36ef55d5dde7f7d1b7ab0e6ca807ab769f606d5bb3754872a4",
       "requirements": 108,
       "obligations": 326,
       "obligationsWithAcceptanceContract": 326,
@@ -160,7 +167,9 @@
         "live-provider": 91,
         "security": 6,
         "accessibility": 166,
-        "independent-acceptance": 62
+        "independent-acceptance": 62,
+        "process-record": 25,
+        "owner-decision": 3
       }
     },
     "preservationProblems": []

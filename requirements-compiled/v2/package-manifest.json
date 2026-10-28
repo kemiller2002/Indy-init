@@ -177,7 +177,7 @@
     },
     {
       "path": "curation/evidence-categories.json",
-      "sha256": "74fab12205a201f81a73e98ec3c5f8178d7839f2223170459a1e1983f19501d2"
+      "sha256": "c6ddbe052b76b20c4443ed9b6acab3d2eaae383ebd2c767b90ba3143dffbd5c5"
     },
     {
       "path": "curation/experiment.json",
@@ -205,7 +205,7 @@
     },
     {
       "path": "curation/verification-plan.json",
-      "sha256": "933d7c3467405fed5d495ecb3956f60fbdecd15aa73ce8bf4562b699fa94cdbc"
+      "sha256": "e5649accd1513cb191d956943272e82f21b1d809018ad3c044578a40fb6d638f"
     },
     {
       "path": "curation/verification-rules.json",
@@ -219,7 +219,7 @@
     },
     {
       "path": "verification-plan.schema.json",
-      "sha256": "616396a6a13ff5805e6b6f135fa4fe877de5f27f946b7d17dedfb64b0a26c0d3"
+      "sha256": "12aa39ce8e5dc19a933138b620b722331dfd37d7e24c81fa7d20a393e3b00e47"
     }
   ],
   "generated": [
@@ -277,7 +277,7 @@
     },
     {
       "path": "verification-plan.json",
-      "sha256": "3caf9e3e068223c4653300f79ceeaba875f478ed784d7a43c43b958758901d27"
+      "sha256": "1d90137b03e0bfd5deeb0742d3f83349b477ca6395e7e7c3cb4ca04d7862dcf0"
     }
   ],
   "compilationVerdict": "PASS",

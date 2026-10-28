@@ -78,6 +78,12 @@ let obligationId (requirementId: string) (sourceObligation: string) (text: strin
 
 let testKinds = EvidenceCategories.testKinds
 
+/// Record kinds of the Praxis work log a `praxis:<kind>` binding may name (kept equal to ProcessVerification.recordKinds,
+/// which a test asserts; that module compiles after this one).
+let processRecordKinds =
+    [ "execution-start"; "checkpoint"; "assignment"; "dependency-decision"; "scope-change"; "owner-approval"
+      "independent-review"; "release-selection"; "test-result"; "acceptance-reference"; "final-disposition" ]
+
 /// Baseline P0 requirements, in id order. These are the plan's mandatory scope.
 let p0Of (baseline: Json) =
     arr "requirements" baseline |> List.filter (fun r -> strOpt "priority" r = Some "P0") |> List.sortBy (str "id")
@@ -140,6 +146,18 @@ let problems (i: Inputs) : string list =
           for t in tests do
               if String.IsNullOrWhiteSpace t.Id then yield sprintf "test binding for %s has an empty test id" o
               if not (List.contains t.Kind testKinds) then yield sprintf "test binding for %s has unknown kind '%s'" o t.Kind
+              // A process, owner or Praxis review producer names one record kind of the run's Praxis log; anything else
+              // could not be checked by verify-process and must not be bound as if it could.
+              let producer = t.Id.StartsWith("praxis:", StringComparison.Ordinal)
+              if (t.Kind = "process" || t.Kind = "owner") && not producer then
+                  yield sprintf "test binding for %s: a %s binding must name a producer 'praxis:<record kind>', not '%s'" o t.Kind t.Id
+              if producer then
+                  let kind = t.Id.Substring 7
+                  if not (List.contains kind processRecordKinds) then yield sprintf "test binding for %s names unknown Praxis record kind '%s'" o kind
+                  if t.Kind = "owner" && kind <> "owner-approval" then yield sprintf "test binding for %s: owner evidence comes only from praxis:owner-approval" o
+                  if t.Kind = "review" && kind <> "independent-review" then yield sprintf "test binding for %s: review evidence from Praxis comes only from praxis:independent-review" o
+                  if t.Kind <> "process" && t.Kind <> "owner" && t.Kind <> "review" then
+                      yield sprintf "test binding for %s: producer '%s' cannot have kind '%s'" o t.Id t.Kind
               if t.Categories.IsEmpty then
                   yield sprintf "test binding for %s: test '%s' declares no evidence category (state what it proves; categories are never inferred)" o t.Id
               for c in t.Categories do
@@ -225,6 +243,14 @@ let contractFor (categories: Json) (policyOrder: string list) (entry: Json) (o: 
           "verificationMethod", JObj [ "gates", jstrs gates; "rules", jstrs rules ]
           "requiredEvidenceCategories", jstrs requiredIds
           "categoryDerivation", required |> List.map (fun (c, ids) -> JObj [ "category", JStr c; "rules", jstrs ids ]) |> JArr
+          "evidenceProducers",
+          requiredIds
+          |> List.map (fun c ->
+              JObj
+                  [ "category", JStr c
+                    "evidenceClass", JStr(EvidenceCategories.classFor categories c)
+                    "producer", JStr(EvidenceCategories.producerFor categories c) ])
+          |> JArr
           "testIdentity",
           JObj
               [ "status", JStr(if tests.IsEmpty then "unbound" else "bound")

@@ -1,0 +1,308 @@
+{
+  "schema": "indy-init.process-bindings-proposal/1",
+  "status": "proposed",
+  "approval": "NOT APPROVED. This file is an agent proposal for the owner. Bindings take effect only when the owner copies approved entries into curation/verification-plan.json testBindings and the plan is recompiled (RDP-003). Nothing reads this file as approved.",
+  "description": "Proposed producer bindings for the process-record and owner-decision categories of the v2 plan, and for independent-acceptance where a Praxis independent-review record is the producer. Each binding names one Praxis record kind (praxis:<kind>) that requirements-compiler verify-process can check for a candidate. A process record proves that the step was recorded as it happened; where the obligation also requires independent-acceptance, a reviewer still judges its adequacy, so no binding here proves an obligation alone. Where several producers are bound to one category, every one of them must deliver a qualifying record.",
+  "testBindings": [
+    {
+      "obligation": "AR-005-O1",
+      "tests": [
+        {
+          "id": "praxis:dependency-decision",
+          "kind": "process",
+          "categories": ["process-record"]
+        }
+      ]
+    },
+    {
+      "obligation": "AR-005-O2",
+      "tests": [
+        {
+          "id": "praxis:dependency-decision",
+          "kind": "process",
+          "categories": ["process-record"]
+        }
+      ]
+    },
+    {
+      "obligation": "AR-008-O1",
+      "tests": [
+        {
+          "id": "praxis:independent-review",
+          "kind": "review",
+          "categories": ["independent-acceptance"]
+        }
+      ]
+    },
+    {
+      "obligation": "AR-008-O2",
+      "tests": [
+        {
+          "id": "praxis:owner-approval",
+          "kind": "owner",
+          "categories": ["owner-decision"]
+        },
+        {
+          "id": "praxis:independent-review",
+          "kind": "review",
+          "categories": ["independent-acceptance"]
+        }
+      ]
+    },
+    {
+      "obligation": "AR-012-O1",
+      "tests": [
+        {
+          "id": "praxis:assignment",
+          "kind": "process",
+          "categories": ["process-record"]
+        }
+      ]
+    },
+    {
+      "obligation": "AR-012-O2",
+      "tests": [
+        {
+          "id": "praxis:scope-change",
+          "kind": "process",
+          "categories": ["process-record"]
+        }
+      ]
+    },
+    {
+      "obligation": "AR-015-O1",
+      "tests": [
+        {
+          "id": "praxis:checkpoint",
+          "kind": "process",
+          "categories": ["process-record"]
+        }
+      ]
+    },
+    {
+      "obligation": "AR-017-O1",
+      "tests": [
+        {
+          "id": "praxis:execution-start",
+          "kind": "process",
+          "categories": ["process-record"]
+        }
+      ]
+    },
+    {
+      "obligation": "AR-017-O2",
+      "tests": [
+        {
+          "id": "praxis:execution-start",
+          "kind": "process",
+          "categories": ["process-record"]
+        }
+      ]
+    },
+    {
+      "obligation": "AR-021-O1",
+      "tests": [
+        {
+          "id": "praxis:checkpoint",
+          "kind": "process",
+          "categories": ["process-record"]
+        }
+      ]
+    },
+    {
+      "obligation": "AR-021-O2",
+      "tests": [
+        {
+          "id": "praxis:checkpoint",
+          "kind": "process",
+          "categories": ["process-record"]
+        }
+      ]
+    },
+    {
+      "obligation": "AR-021-O3",
+      "tests": [
+        {
+          "id": "praxis:independent-review",
+          "kind": "process",
+          "categories": ["process-record"]
+        }
+      ]
+    },
+    {
+      "obligation": "AR-024-O1",
+      "tests": [
+        {
+          "id": "praxis:owner-approval",
+          "kind": "owner",
+          "categories": ["owner-decision"]
+        }
+      ]
+    },
+    {
+      "obligation": "AR-024-O2",
+      "tests": [
+        {
+          "id": "praxis:owner-approval",
+          "kind": "owner",
+          "categories": ["owner-decision"]
+        }
+      ]
+    },
+    {
+      "obligation": "PF-019-O1",
+      "tests": [
+        {
+          "id": "praxis:test-result",
+          "kind": "process",
+          "categories": ["process-record"]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-021-O3",
+      "tests": [
+        {
+          "id": "praxis:execution-start",
+          "kind": "process",
+          "categories": ["process-record"]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-030-O3",
+      "tests": [
+        {
+          "id": "praxis:acceptance-reference",
+          "kind": "process",
+          "categories": ["process-record"]
+        },
+        {
+          "id": "praxis:release-selection",
+          "kind": "process",
+          "categories": ["process-record"]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-040-O2",
+      "tests": [
+        {
+          "id": "praxis:execution-start",
+          "kind": "process",
+          "categories": ["process-record"]
+        }
+      ]
+    },
+    {
+      "obligation": "VER-001-O1",
+      "tests": [
+        {
+          "id": "praxis:dependency-decision",
+          "kind": "process",
+          "categories": ["process-record"]
+        }
+      ]
+    },
+    {
+      "obligation": "VER-001-O2",
+      "tests": [
+        {
+          "id": "praxis:dependency-decision",
+          "kind": "process",
+          "categories": ["process-record"]
+        }
+      ]
+    },
+    {
+      "obligation": "VER-001-O3",
+      "tests": [
+        {
+          "id": "praxis:dependency-decision",
+          "kind": "process",
+          "categories": ["process-record"]
+        }
+      ]
+    },
+    {
+      "obligation": "VER-002-O1",
+      "tests": [
+        {
+          "id": "praxis:dependency-decision",
+          "kind": "process",
+          "categories": ["process-record"]
+        }
+      ]
+    },
+    {
+      "obligation": "VER-002-O2",
+      "tests": [
+        {
+          "id": "praxis:dependency-decision",
+          "kind": "process",
+          "categories": ["process-record"]
+        }
+      ]
+    },
+    {
+      "obligation": "VER-002-O3",
+      "tests": [
+        {
+          "id": "praxis:dependency-decision",
+          "kind": "process",
+          "categories": ["process-record"]
+        }
+      ]
+    },
+    {
+      "obligation": "VER-003-O1",
+      "tests": [
+        {
+          "id": "praxis:dependency-decision",
+          "kind": "process",
+          "categories": ["process-record"]
+        }
+      ]
+    },
+    {
+      "obligation": "VER-003-O2",
+      "tests": [
+        {
+          "id": "praxis:dependency-decision",
+          "kind": "process",
+          "categories": ["process-record"]
+        }
+      ]
+    },
+    {
+      "obligation": "VER-004-O3",
+      "tests": [
+        {
+          "id": "praxis:dependency-decision",
+          "kind": "process",
+          "categories": ["process-record"]
+        }
+      ]
+    },
+    {
+      "obligation": "VER-010-O1",
+      "tests": [
+        {
+          "id": "praxis:acceptance-reference",
+          "kind": "process",
+          "categories": ["process-record"]
+        }
+      ]
+    },
+    {
+      "obligation": "VER-010-O2",
+      "tests": [
+        {
+          "id": "praxis:execution-start",
+          "kind": "process",
+          "categories": ["process-record"]
+        }
+      ]
+    }
+  ]
+}

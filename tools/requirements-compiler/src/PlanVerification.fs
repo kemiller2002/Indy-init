@@ -26,7 +26,10 @@ type Trust =
       ReadEvidence: string -> byte[] option
       TrustedSourceSha: string
       ApprovalsRaw: byte[]
-      TrustedOperators: string list }
+      TrustedOperators: string list
+      /// Process and owner categories verified per VPO id by `verify-process` for this plan and candidate
+      /// (ProcessVerification.coveredBy); empty when no process assessment is supplied.
+      ProcessCovered: Map<string, Set<string>> }
 
 type ObligationResult =
     { Id: string
@@ -113,13 +116,19 @@ let private boundTests (o: Json) =
 
 let private requiredOf (o: Json) = strs "requiredEvidenceCategories" (contractOf o)
 
+/// A `praxis:<record kind>` binding names a producer of process, reviewer or owner records, not a test the ledger
+/// runs; it is proven by the process assessment, never by a ledger row.
+let private isProducer (t: TestRef) = t.Id.StartsWith(ProcessVerification.bindingPrefix, StringComparison.Ordinal)
+
+let private ledgerTests (o: Json) = boundTests o |> List.filter (isProducer >> not)
+
 let private mappingAction =
     "bind the test to the obligation it fully proves in curation/verification-plan.json testBindings (with the evidence categories it provides) and recompile the plan, or remove the claim"
 
 /// Incorrect test mappings for one requirement: ledger claims and evidence claims that the plan does not bind,
 /// and bound tests the ledger leaves out. `evidence` is every parseable evidence document the row names.
 let private mappingDiagnostics (rid: string) (obligations: Json list) (row: Json option) (evidence: Json list) =
-    let boundBy = obligations |> List.collect (fun o -> boundTests o |> List.map (fun t -> t.Id, str "sourceObligation" o)) |> List.distinct
+    let boundBy = obligations |> List.collect (fun o -> ledgerTests o |> List.map (fun t -> t.Id, str "sourceObligation" o)) |> List.distinct
     let boundIds = boundBy |> List.map fst |> Set.ofList
     let byVpo = obligations |> List.map (fun o -> str "id" o, o) |> Map.ofList
 
@@ -151,7 +160,7 @@ let private mappingDiagnostics (rid: string) (obligations: Json list) (row: Json
                           (sprintf "evidence claims obligation %s, which is not an obligation of %s in the plan" vid rid)
                           "report results only under the VPO ids the plan gives this requirement"
               | Some o ->
-                  let bound = boundTests o |> List.map (fun t -> t.Id) |> Set.ofList
+                  let bound = ledgerTests o |> List.map (fun t -> t.Id) |> Set.ofList
                   for test in arr "tests" entry do
                       let tid = ledgerString "testId" test
                       if not (bound.Contains tid) then
@@ -163,10 +172,11 @@ let private mappingDiagnostics (rid: string) (obligations: Json list) (row: Json
                                   mappingAction ]
 
 /// Coverage of one obligation. `verifiedEvidence` holds only documents that passed every requirement-level check.
-let private coverage (evidenceStatus: string) (verifiedEvidence: Json list) (o: Json) =
+let private coverage (processCovered: Map<string, Set<string>>) (evidenceStatus: string) (verifiedEvidence: Json list) (o: Json) =
     let vid = str "id" o
     let required = requiredOf o
-    let tests = boundTests o
+    let producers = boundTests o |> List.filter isProducer
+    let tests = ledgerTests o
     let passed =
         verifiedEvidence
         |> List.collect (arr "obligations")
@@ -175,7 +185,9 @@ let private coverage (evidenceStatus: string) (verifiedEvidence: Json list) (o: 
         |> List.filter (fun t -> ledgerString "outcome" t = "passed")
         |> List.map (ledgerString "testId")
         |> Set.ofList
-    let covered = tests |> List.filter (fun t -> passed.Contains t.Id) |> List.collect (fun t -> t.Categories) |> Set.ofList
+    let produced = producers |> List.collect (fun t -> t.Categories) |> Set.ofList
+    let byProcess = processCovered.TryFind vid |> Option.defaultValue Set.empty |> Set.intersect produced
+    let covered = tests |> List.filter (fun t -> passed.Contains t.Id) |> List.collect (fun t -> t.Categories) |> Set.ofList |> Set.union byProcess
     let declared = tests |> List.collect (fun t -> t.Categories) |> Set.ofList
     let missing =
         if required.IsEmpty then [ EvidenceCategories.unclassified, "unclassified" ]
@@ -184,7 +196,8 @@ let private coverage (evidenceStatus: string) (verifiedEvidence: Json list) (o: 
             |> List.filter (covered.Contains >> not)
             |> List.map (fun c ->
                 c,
-                if not (declared.Contains c) then "no-bound-test"
+                if produced.Contains c && not (declared.Contains c) then "no-process-evidence"
+                elif not (declared.Contains c) then "no-bound-test"
                 else
                     match evidenceStatus with
                     | "STALE" -> "evidence-not-fresh"
@@ -306,7 +319,7 @@ let assess (t: Trust) : Json =
                 obligations
                 |> List.map (fun o ->
                     // A row that does not claim PASS verifies nothing, whatever its evidence says.
-                    let required, covered, missing = coverage coverageStatus (if rowStatus = "PASS" then verifiedEvidence else []) o
+                    let required, covered, missing = coverage t.ProcessCovered coverageStatus (if rowStatus = "PASS" then verifiedEvidence else []) o
                     let verified = not excludedByPlan && not required.IsEmpty && missing.IsEmpty && mapping.IsEmpty
                     { Id = str "id" o
                       Source = str "sourceObligation" o
