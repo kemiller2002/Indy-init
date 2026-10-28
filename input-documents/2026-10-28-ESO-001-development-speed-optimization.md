@@ -16,7 +16,7 @@ Rehearsal 5 (`kemiller2002/indy-init-rehearsal-005`, read only) ended **INCOMPLE
 (final candidate `1b9fb56873fe7a98dffd5172066d909449c17eae`, CI run 40620099844): 108 P0 requirements, 77 PASS,
 31 NOT_RUN, 0 FAIL; 326 obligations, 277 PASS, 49 NOT_RUN; gates G0–G7 PASS, G8–G9 NOT_RUN. About 35 of the 49 needed
 evidence about how the rehearsal was run. Its plan began implementation with no test identity; the curated plan
-(Indy-init PR #32, VP-5d1202ddec1e) was closed unmerged and is not approved. Measurements and findings:
+(Indy-init PR #32, VP-5d1202ddec1e) was merged after the run and does not change its pinned plan or verdict. Measurements and findings:
 `docs/engineering-improvement/SPEED-OPTIMIZATION-REPORT.md`.
 
 ## Proposed requirements (implemented on the initiative's branches, pending owner merge)

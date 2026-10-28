@@ -44,9 +44,10 @@ Sources: `docs/REHEARSAL-005-RESULTS.md`; R5 `evidence/rehearsal/final.json`; R5
   (`tools/compute-acceptance-verdict.py`) counts 77 requirements PASS. The plan verifier (`requirements-compiler
   verify-plan`) checks against the plan Rehearsal 5 pinned (`VP-e77a2134e1b0`), which binds no test, so it reports
   the same 77 as UNBOUND.
-- With the curated plan `VP-5d1202ddec1e` they are PASS. That plan was proposed in **Indy-init PR #32, which was
-  closed unmerged**.
-- It is not approved and is not treated as approved here. Rehearsal 5's historical verdict is unchanged.
+- With the curated plan `VP-5d1202ddec1e` they are PASS. That plan was curated after the run in **Indy-init PR #32,
+  merged on 2026-10-28 (`cf328bb`)**.
+- The merge approves the curated plan for later use, not retroactively for Rehearsal 5: that rehearsal pinned
+  `VP-e77a2134e1b0` at kickoff, and its historical verdict is unchanged.
 
 ## 2. Changes
 

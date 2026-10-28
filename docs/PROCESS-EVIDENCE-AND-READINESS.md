@@ -6,7 +6,7 @@ Echelon development speed optimization, Priorities One and Two. Intake:
 Rehearsal 5 ended INCOMPLETE with 49 of 326 P0 obligations unproven. About 35 of them could only be proven by
 evidence about how the rehearsal was run (reviewer conduct, agent scope and checkpoints, owner decisions, release
 selection), and that evidence was assembled late or not at all. Its plan also began implementation with no test
-identity for any obligation, so bindings were curated at the end (Indy-init PR #32, closed unmerged). Two changes
+identity for any obligation, so bindings were curated only after the run (Indy-init PR #32, merged after the run ended). Two changes
 address this:
 
 1. **Process evidence is recorded as the work happens**, in the rehearsal's own Praxis event log, and verified per
