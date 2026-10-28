@@ -1,11 +1,11 @@
 {
   "schema": "indy-init.verification-plan-curation/1",
-  "description": "Inputs to verification-plan.json that are not in the baseline or the verification rules. Freshness policies are listed strictest first; a requirement takes the strictest policy among the default, its gates' policies and its bound tests' kinds. testBindings name exact test identities per baseline obligation id, each {id, kind, categories}: categories are the evidence categories (curation/evidence-categories.json) the test fully proves for that obligation, never inferred; an unbound obligation is reported missing (contract: unbound), never guessed. exclusions must each name an authenticated operator approval in the pinned approvals file. obligationAmendments each name an authenticated operator amendment {obligation_id, action: amend, criterion, rationale} in the pinned approvals file and the owner decision it applies; the baseline text is kept verbatim beside it. derivedObligations name obligations that restate others (R5A-001-05): each clause is verbatim in the obligation text and names the obligations that verify it, or none (a residual clause, proven by the obligation's own bound tests); connectives are the remaining words of the text.",
+  "description": "Inputs to verification-plan.json that are not in the baseline or the verification rules. Freshness policies are listed strictest first; a requirement takes the strictest policy among the default, its gates' policies and its bound tests' kinds. testBindings name exact test identities per baseline obligation id, each {id, kind, categories}: categories are the evidence categories (curation/evidence-categories.json) the test fully proves for that obligation, never inferred; an unbound obligation is reported missing (contract: unbound), never guessed. exclusions must each name an authenticated operator approval in the pinned approvals file. obligationAmendments each name an authenticated operator amendment {obligation_id, action: amend, criterion, rationale} in the pinned approvals file and the owner decision it applies; the baseline text is kept verbatim beside it. derivedObligations name obligations that restate others (R5A-001-05): each clause is a whole verbatim phrase of the obligation text and names the obligations that must be verified for it; a clause with none, or marked direct because its constituents prove less than it states, is also proven by the obligation's own bound tests; connectives are the remaining words of the text, from the compiler's fixed vocabulary.",
   "approvals": {
     "repo": "indy-init",
-    "commit": "1865da2e87a0eb2a86cf9c9be16f46d96c52d818",
+    "commit": "efa5a330e18ee4fd6841eaecf5d521e3f45d4282",
     "path": "kickoff/rehearsal-006/approvals.causa.json",
-    "sha256": "a9260104fd28b9f28a82e090b6cf7e76a5b89c943f5068ce292ad955f6608518",
+    "sha256": "a69618f5bc34b1eabb98c79ecd4b98a7bf560e619f7b9d500988320940dcec39",
     "trustedOperators": [
       "kemiller2002"
     ]
@@ -4923,18 +4923,7 @@
     }
   ],
   "exclusions": [],
-  "obligationAmendments": [
-    {
-      "obligation": "AR-019-O3",
-      "approval": "APR-R6-004",
-      "decision": "DEC-R6-004"
-    },
-    {
-      "obligation": "UI-031-O5",
-      "approval": "APR-R6-003",
-      "decision": "DEC-R6-003"
-    }
-  ],
+  "obligationAmendments": [],
   "derivedObligations": [
     {
       "obligation": "UI-015-O2",
@@ -4949,7 +4938,8 @@
           "clause": "the three active-catalog investigations (EXT-DATA-013) load from the connected repository and replay",
           "constituents": [
             "EXT-DATA-013-O2"
-          ]
+          ],
+          "direct": true
         },
         {
           "clause": "the five frozen v1.0.0 fixtures replay as the storage contract's test corpus",
@@ -4971,14 +4961,21 @@
         },
         {
           "clause": "timeline ordering",
-          "constituents": []
+          "constituents": [
+            "UI-003-O1",
+            "UI-003-O3"
+          ],
+          "direct": true
         },
         {
           "clause": "legal command enforcement",
           "constituents": [
+            "AR-006-O2",
             "UI-004-O1",
+            "UI-004-O4",
             "UI-004-O6"
-          ]
+          ],
+          "direct": true
         },
         {
           "clause": "save/sync truthfulness",
@@ -4992,7 +4989,8 @@
           "constituents": [
             "UI-006-O4",
             "UI-010-O1"
-          ]
+          ],
+          "direct": true
         },
         {
           "clause": "responsive reflow",

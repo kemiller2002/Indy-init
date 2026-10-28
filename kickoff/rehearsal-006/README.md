@@ -10,8 +10,8 @@ Prepared on 2026-10-28 for ESO-R6-02, ESO-R6-03 and ESO-R6-05
 |---|---|
 | Stack | `echelon-current` **1.32.0** (echelon-registry#103, approved by the owner on 2026-10-28): Praxis 3.23.0, Ordo 1.19.0, Dokimos 0.9.0, Limen 0.9.1, Forma 0.11.0, Arca 0.6.0, qualified by Conditor 0.10.17 |
 | Requirements baseline | `requirements/causa-requirements-baseline-r6.json`, `BL-CAUSA-INDY-INIT-856157a78d47`, SHA-256 `40599abe92724dae6796ee0d6a9bf5711c4db882fc79c77b38a43d0f0960befd`: 471 requirements, 115 P0, re-pinned at Indy-init `856157a` to add AR-027..AR-035 (owner decision DEC-R6-005). The Rehearsal 4/5 baseline `requirements/causa-requirements-baseline.json` is unchanged |
-| Verification plan | `requirements-compiled/v3/verification-plan.json`, `VP-13516e0d5930`, digest `13516e0d5930d30c89e02cbd2aea895afaea1f08358c02538702aea7bcd8a66c`. It replaces `VP-0eb9c791dd0b` (v2, unchanged) |
-| Scope decisions | [`owner-decisions.json`](owner-decisions.json) (DEC-R6-001..008), applied through [`approvals.causa.json`](approvals.causa.json) (amendments of UI-031-O5 and AR-019-O3) and the v3 curation (UI-015-O2 derived from its constituents) |
+| Verification plan | `requirements-compiled/v3/verification-plan.json`, `VP-8ef1c8dca656`, digest `8ef1c8dca656e515f63ff287d560a9b76ffbaffc0e5fa27d81f6637b3aa46e41`. It replaces `VP-0eb9c791dd0b` (v2, unchanged) |
+| Scope decisions | [`owner-decisions.json`](owner-decisions.json) (DEC-R6-001..010), applied in the v3 curation (UI-015-O2 derived from its constituents). [`approvals.causa.json`](approvals.causa.json) holds no approval records: the amendments of UI-031-O5 and AR-019-O3 (DEC-R6-003, -004) wait for records the owner writes (RDP-003) |
 | Process-evidence rules | `process-evidence-rules.json`, SHA-256 `6f16435369a046e534e4787903ea96c4a9f7e0adcf7b5b51d4ea15ac156be17c` |
 | Readiness rules | none: `plan-readiness` is READY with no permitted gap |
 
@@ -19,7 +19,7 @@ Check the gate before implementation begins:
 
 ```bash
 requirements-compiler plan-readiness --plan requirements-compiled/v3/verification-plan.json \
-  --plan-digest 13516e0d5930d30c89e02cbd2aea895afaea1f08358c02538702aea7bcd8a66c
+  --plan-digest 8ef1c8dca656e515f63ff287d560a9b76ffbaffc0e5fa27d81f6637b3aa46e41
 ```
 
 ## Test bindings (ESO-R6-02)
@@ -83,7 +83,7 @@ The job then:
 2. converts them with `requirements-compiler review-attestations`;
 3. runs `verify-process` against the candidate's Praxis log, trusting only its own run id.
 
-The full acceptance verdict passes the same inputs to `verify-plan`, which computes the process assessment itself:
+The full acceptance verdict passes the same inputs to `verify-plan`, which computes the process assessment itself. It must also pass the review records of tags removed from obligations, `--review-tag-changes review-tag-changes.json` (`indy-init.review-tag-changes/1`, R5A-001-04). The file is the reviewer's, committed in the rehearsal repository. Without it, a test a review removed would still count:
 
 ```
 --process-plan-digest <plan digest> --process-rules <rules> --process-rules-sha256 <rules sha>

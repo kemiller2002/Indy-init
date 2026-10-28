@@ -5,19 +5,21 @@
   "indyInitCommit": "856157a78d47946d264ec49ee8325fcf996ae9b9",
   "overall": "BLOCKED",
   "blockingStages": [
-    1,
-    4,
-    15,
-    17
+    17,
+    18
   ],
   "ownerDecisions": [
     {
       "date": "2026-10-28",
-      "decision": "Waive the causa-data four-case requirement (lightbulb, everyday-v1, demonstration-v1, Conditor workspace initialization of rehearsal-006)."
+      "decision": "Four-case causa-data requirement waived; historical-v1 used in place (\"Ok let's pass on the causa-data requirement of the four cases\")"
     },
     {
       "date": "2026-10-28",
-      "decision": "Rehearsal 6 loads the existing published historical-v1 workspace (Apollo 1, Apollo 11, Challenger) and writes only to isolated workspaces/demo/<runId>/."
+      "decision": "CI and deployment are kickoff work (\"1 counts as kickoff\")"
+    },
+    {
+      "date": "2026-10-28",
+      "decision": "DEC-R6-001..010, recorded in kickoff/rehearsal-006/owner-decisions.json (\"Do what you recommend to get it started\"; Q7 \"Keep three cases (Recommended)\"; \"I approve all recommendations and necessary merges going forward\"). Agent transcriptions; effective on the merge of the pull request that adds them"
     }
   ],
   "timedRehearsalStarted": false,
@@ -25,7 +27,7 @@
     {
       "stage": 1,
       "name": "Repository readiness",
-      "result": "BLOCKED",
+      "result": "PASS",
       "mandatory": true,
       "evidence": [
         "git ls-remote https://github.com/kemiller2002/indy-init-rehearsal-006 -> 65e346ee70c04d2bf6d4935d06484eb95c8cfae6 HEAD, refs/heads/main (only ref)",
@@ -56,14 +58,10 @@
         "Aegis 1.0.0 IS in the 1.32.0 set (EchelonFoundry.Aegis.Core, nuget, Apache-2.0). Aegis 2.0.0 is assessed 'pending' (outside profile range <2.0.0)",
         "The set's actual versions differ from the brief's shorthand: Percepta = percepta-repo 0.1.0 (lifecycle) + percepta-semantic 0.3.0 (host CLI); Folio 0.4.1. The set also contains visual-engineering 1.0.1, communication-engineering 1.0.0, tutela 0.1.0, strata 0.1.1 (no linux-arm64), fides 0.2.0, summa-contracts 0.1.0. Conditor is not a set component; it qualifies the set",
         "License notes recorded in the set: Limen 0.9.1, Forma 0.11.0 and Arca 0.6.0 are PolyForm-Noncommercial-1.0.0 (owner accepted)",
-        "The owner's preflight script text was not available in this session; its rule 'Block readiness if any mandatory prerequisite is missing' is applied as given. Neither KICKOFF-EXECUTION-PACKET.md nor NEXT-REHEARSAL-PREFLIGHT-STATUS.md in indy-init says that CI is established at kickoff. If the owner treats CI and Pages as kickoff deliverables, items 5 to 7 become kickoff obligations rather than blockers. That is an owner decision, not something this preflight can establish"
+        "The owner's preflight script text was not available in this session; its rule 'Block readiness if any mandatory prerequisite is missing' is applied as given. Neither KICKOFF-EXECUTION-PACKET.md nor NEXT-REHEARSAL-PREFLIGHT-STATUS.md in indy-init says that CI is established at kickoff. If the owner treats CI and Pages as kickoff deliverables, items 5 to 7 become kickoff obligations rather than blockers. That is an owner decision, not something this preflight can establish",
+        "Re-evaluated 2026-10-28: items 5-7 (CI, deployment, secrets) are kickoff obligations by the owner's decision; every preflight item passes"
       ],
-      "blockers": [
-        "No CI workflow in R6",
-        "No deployment configuration in R6 (Pages not serving; settings unreadable)",
-        "Required secrets/variables (CAUSA_GITHUB_TOKEN, CAUSA_TEST_REPO, DEPLOY_TARGET) unverifiable and presumed absent on a fresh repo",
-        "Session holds no push credential for R6 (read-only anonymous lane)"
-      ],
+      "blockers": [],
       "whatIsNeeded": [
         "Owner: enable Pages for R6 with source 'GitHub Actions'; set repo variable DEPLOY_TARGET=github-pages (and confirm the custom-domain redirect to kevinmmiller.us/indy-init-rehearsal-006/ is intended)",
         "Owner: add secret CAUSA_GITHUB_TOKEN (fine-grained, contents write on the test repo only) and secret or variable CAUSA_TEST_REPO (for example kemiller2002/causa-write-test) if R6 keeps R5's live and provider-conformance jobs",
@@ -71,6 +69,14 @@
         "Add a global.json (10.0.402, rollForward disable) or keep setup-dotnet 10.0.x consistently; R5 had none",
         "Attach R6 to the session with add_repo access=push at kickoff (and to the GitHub MCP allowed list if API/Actions reads are required); confirm branch protection required checks (R5 used 'foundations / verify-foundations')",
         "Owner confirmation of whether CI and deployment are preflight prerequisites or kickoff deliverables"
+      ],
+      "kickoffObligations": [
+        "CI workflows (R5's set re-pinned to 1.32.0 and Praxis 3.23.0, conditor.test-environment.json, limen wasm-check) and the minimal-artifact deploy and deployed smoke (owner: CI and deployment are kickoff work)",
+        "Pages enabled with source GitHub Actions; DEPLOY_TARGET=github-pages",
+        "Secrets set by the owner before the clock (AR-033, P1; DEC-R6-010): CAUSA_GITHUB_TOKEN (read-only), CAUSA_WRITE_TOKEN (contents:write on the test repository only), CAUSA_TEST_REPO; not verifiable from this session",
+        "A push credential for the rehearsal repository (add_repo access=push at kickoff)",
+        "R5A-001-01, -02, -03 and -06 (DEC-R6-008, DEC-R6-009)",
+        "These count against the seven-hour window; moving them to kickoff does not remove their risk"
       ]
     },
     {
@@ -95,7 +101,8 @@
         "Owner-controlled decisions in the plan: 3 owner-decision obligations (AR-008-O2, AR-024-O1, AR-024-O2), mapped to DEC-R6-KICKOFF by kickoff/rehearsal-006/process-evidence-rules.json. 62 obligations require independent-acceptance via praxis:independent-review.",
         "No silent exclusion: V18 PASS, the exclusion list is empty, and the excluded counts are 0 for both requirements and obligations.",
         "Lightbulb / everyday investigation, demonstration-v1 template, Conditor workspace initialization: NONE found in the baseline JSON, the normalized requirements, input-documents/, docs/ or kickoff/. The patterns searched were lightbulb, light bulb, everyday investigation, demonstration-v1, demonstration v1 and workspace init. Conditor appears in the baseline only as a named Echelon system in a version-currency obligation, and in input-documents only as a tooling target (test-env, scaffold). The frozen baseline does not include any of these. If the owner wants them, they are new requirements and need a new baseline/plan version.",
-        "AR-027..AR-035 are NOT in the frozen baseline. The baseline's AGENT-RELIABILITY section lists AR-001..AR-026 only; AR-027..AR-033 were added in b7e7623 and AR-034/AR-035 in 6665928, both after aab8f80."
+        "AR-027..AR-035 are NOT in the frozen baseline. The baseline's AGENT-RELIABILITY section lists AR-001..AR-026 only; AR-027..AR-033 were added in b7e7623 and AR-034/AR-035 in 6665928, both after aab8f80.",
+        "v3 (DEC-R6-005): baseline BL-CAUSA-INDY-INIT-856157a78d47, requirements/causa-requirements-baseline-r6.json, sha256 40599abe92724dae6796ee0d6a9bf5711c4db882fc79c77b38a43d0f0960befd: 471 requirements, 115 P0, 355 P0 obligations. Regenerated at 856157a it is byte-identical (independent review check 4). The frozen baseline 621e2f96...57b9 is unchanged"
       ],
       "blockers": []
     },
@@ -189,7 +196,7 @@
     {
       "stage": 4,
       "name": "Corrective actions",
-      "result": "FAIL",
+      "result": "PASS",
       "mandatory": true,
       "mandatoryBasis": "input-documents/2026-10-28-R5A-001-rehearsal-5-audit-follow-ups.md: 'Priority: P0 before Rehearsal 6 starts'. ESO-001 lists ESO-R6-01..11 as the owner-approved R6 kickoff requirements. NO document designates AR-027..AR-035 themselves as mandatory for R6 readiness, and none of them is in the frozen baseline.",
       "evidence": [
@@ -385,12 +392,24 @@
         "R5A-001 (P0 before R6) status: -01, -02, -03 (scaffold: deployed-origin guard, pinned fixtures, SDK pin): not found implemented. -04 (unbound-after-review): not implemented. -05 (aggregate UI-015-O2 derived): not implemented, UI-015-O2 is still bound directly. -06 (preflight records as bindable producers): partially (VER-004-O3 binds praxis:dependency-decision; AR-023-O3 is review-only). -07 (review on the candidate, reviewer identity in Praxis): implemented in tooling. -08, -10, -11 (owner decisions): NOT recorded. -09 (UI-011-O4 focus): R6 app work. No routing of R5A-001 items into the target repositories' Praxis inboxes was found in the local checkouts.",
         "There is a plan conflict that plan-readiness does not detect. PF-015-O1 (integration/live/security, catalog without PAT) and EXT-DATA-005-O1 remain in the plan unchanged, while owner decision DEC-025 forbids anonymous mode. R6 will hit the same unresolvable obligations unless the owner decides first."
       ],
-      "blockers": [
-        "Owner decisions R5A-001-08/-10/-11 (DEC-025 vs PF-015-O1/O2 and EXT-DATA-005-O1; UI-016-O11 amber indicators; UI-031-O5 roles; AR-019-O3 wording) are not recorded.",
-        "R5A-001-01..-05 are not implemented.",
-        "AR-030 production test-hook protection and AR-031 screen-contract scope decisions have no implementation or record.",
-        "If the owner intends AR-027..AR-035 to be gated in R6, a new baseline and plan version is required. Today the frozen plan excludes them."
-      ]
+      "blockers": [],
+      "reEvaluation": {
+        "rule": "Passes only if every R5A-001 item ('P0 before Rehearsal 6 starts') is implemented or decided by a Decision Record",
+        "items": {
+          "R5A-001-01": "decided: DEC-R6-008 (kickoff)",
+          "R5A-001-02": "decided: DEC-R6-008 (kickoff)",
+          "R5A-001-03": "decided: DEC-R6-008 (kickoff)",
+          "R5A-001-04": "implemented: verify-plan --review-tag-changes (R6ScopeTests); the acceptance job must pass the reviewer's file",
+          "R5A-001-05": "implemented: UI-015-O2 derived in v3",
+          "R5A-001-06": "decided: DEC-R6-009 (kickoff)",
+          "R5A-001-07": "implemented in tooling",
+          "R5A-001-08": "decided: DEC-R6-001",
+          "R5A-001-09": "decided: DEC-R6-009 (application work, UI-011-O4)",
+          "R5A-001-10": "decided: DEC-R6-002",
+          "R5A-001-11": "decided: DEC-R6-003 and DEC-R6-004 (their amendments still need operator approval records; see stage 17)"
+        },
+        "ar027to035": "Gated in plan v3 (DEC-R6-005); implemented and proven during Rehearsal 6. AR-031 decided by DEC-R6-006"
+      }
     },
     {
       "stage": 5,
@@ -430,7 +449,17 @@
         "Semantic weakness: several process obligations are proven by the existence of a correctly attributed record, not by its correctness. Examples: VER-001-O1 'newest available stable release' is proven by a dependency-decision record, and AR-021-O2 by a checkpoint record.",
         "PF-015-O1 and EXT-DATA-005-O1 are READY by binding but conflict with owner decision DEC-025 (see stage 4). READY does not mean satisfiable."
       ],
-      "blockers": []
+      "blockers": [],
+      "v3": {
+        "plan": "VP-8ef1c8dca656",
+        "digest": "8ef1c8dca656e515f63ff287d560a9b76ffbaffc0e5fa27d81f6637b3aa46e41",
+        "obligations": 355,
+        "categoryChecks": "671/671 bound, plan-readiness READY, 0 permits",
+        "schema": "validates against requirements-compiled/v3/verification-plan.schema.json (revision 3)",
+        "derived": "UI-015-O2",
+        "amended": "none (DEC-R6-003/004 await operator records)",
+        "bindings": "29 producer bindings + 372 proposed tests, regenerated from VP-d6bcf95e2ebd"
+      }
     },
     {
       "stage": 6,
@@ -667,8 +696,8 @@
     {
       "stage": 15,
       "name": "CI and deployment",
-      "result": "BLOCKED",
-      "mandatory": true,
+      "result": "NOT_RUN",
+      "mandatory": false,
       "evidence": [
         "R5 build-and-test.yml: triggers pull_request, push to main and r5/**, workflow_dispatch; permissions contents: read; main runs never cancelled",
         "Deployment target: GitHub Pages. The deploy job runs on push to main when vars.DEPLOY_TARGET=='github-pages' and build-and-test succeeded; permissions pages: write and id-token: write; environment github-pages; actions/upload-pages-artifact@v3 + actions/deploy-pages@v4; concurrency group pages",
@@ -685,15 +714,13 @@
         "Gaps to close when adopting it: re-pin lock-gate to 1.32.0 and praxis_ref to Praxis 3.23.0; add conditor.test-environment.json and use 'conditor test-env resolve --shell' in place of hard-coded 4821/4822 ports; add a limen wasm-check step",
         "Infrastructure smoke with a minimal artifact: NOT RUN. R6 has no CI, and pushing a workflow is out of scope"
       ],
-      "blockers": [
-        "R6 has no CI workflow and no Pages deployment, so the infrastructure smoke cannot run",
-        "GitHub Actions/Pages settings for R6 cannot be read from this session"
-      ],
+      "blockers": [],
       "whatIsNeeded": [
         "At kickoff: commit R5's workflow set as infrastructure only (re-pinned to 1.32.0), plus Pages enablement and DEPLOY_TARGET, then run a minimal-artifact deploy and deployed-smoke on main to prove version.json == SHA",
         "A conditor.test-environment.json for independent test-server ports and artifact digest",
         "Secrets CAUSA_GITHUB_TOKEN and CAUSA_TEST_REPO if the live jobs are kept"
-      ]
+      ],
+      "waiver": "owner 2026-10-28 (\"1 counts as kickoff\"): CI and deployment are kickoff obligations; see stage 1 kickoffObligations"
     },
     {
       "stage": 16,
@@ -777,7 +804,8 @@
       },
       "findings": [
         "Exact counts: 24 compilation cases; 17 plan tampering controls (+1 assertion); 10 checker scenarios; 47 process controls + 3 record controls; 7 R4 replay cases; 19 + 11 Python tests. All pass.",
-        "Capabilities without a dedicated self-test in the plan-level verifier: defect-class closure (only the Python verdict tool covers it), 'unbound after review' (R5A-001-04, not implemented), Dokimos reuse attestation (the verifier treats any reuse claim as STALE; no positive path), and an end-to-end acceptance-process.yml run (the workflow template has never executed)."
+        "Capabilities without a dedicated self-test in the plan-level verifier: defect-class closure (only the Python verdict tool covers it), 'unbound after review' (R5A-001-04, not implemented), Dokimos reuse attestation (the verifier treats any reuse claim as STALE; no positive path), and an end-to-end acceptance-process.yml run (the workflow template has never executed).",
+        "R6ScopeTests add negative controls for amendments (invented, non-operator, cross-obligation, edited and forged), derivations (paraphrase, omission, self, unknown constituent, connective outside the fixed vocabulary, VPO edit, dropped clause; readiness BLOCKED) and the checker (constituent unverified, open and resolved review removals, inadmissible rebinding, forged amendment INVALID)"
       ],
       "blockers": []
     },
@@ -788,10 +816,45 @@
       "mandatory": true,
       "evidence": [],
       "findings": [
-        "Values that would be frozen are recorded under records, but nothing is frozen while mandatory stages [1, 4, 15] are not PASS."
+        "Values that would be frozen are under records.freeze; nothing is frozen while stage 18 is BLOCKED and the operator approval records for DEC-R6-003/004 are missing"
       ],
       "blockers": [
-        "Mandatory stages [1, 4, 15] are not PASS."
+        "Stage 18: the owner's attestation of the independent scope review",
+        "Operator approval records for the UI-031-O5 and AR-019-O3 amendments (DEC-R6-003, DEC-R6-004). An agent may not write them (RDP-003). Without them the plan verifies both obligations as written, and AR-019-O3's literal BLOCKED cannot be met by the current verifier"
+      ]
+    },
+    {
+      "stage": 18,
+      "name": "Independent scope review",
+      "result": "BLOCKED",
+      "mandatory": true,
+      "mandatoryBasis": "Owner's script, section 20: READY only when the independent scope review is complete",
+      "review": {
+        "reviewer": "anthropic/claude-code-reviewer: a fresh-context subagent spawned by the implementing session; it did not author the reviewed commits",
+        "range": "856157a..f8b1a2c",
+        "verdict": "NO_BLOCKING_FINDINGS (4 major, 11 minor)",
+        "record": "docs/rehearsal-006/scope-review.json, SCOPE-REVIEW.md",
+        "attestation": "NOT_ATTESTED: it counts as the independent review only when kemiller2002 attests it with a GitHub review of the pull request"
+      },
+      "findingDispositions": {
+        "SR-01": "fixed: agent-written approvals withdrawn (efa5a33); amendments not applied until the operator writes them",
+        "SR-02": "fixed: constituents added (UI-004-O4, AR-006-O2, UI-003-O1/O3); weak clauses marked direct",
+        "SR-03": "fixed in part: connectives from a fixed vocabulary; whether a constituent states its clause stays a review judgement, and direct marking keeps the own test's duty",
+        "SR-04": "fixed: revision-3 schema; the v3 plan validates",
+        "SR-05": "fixed: kickoff README requires --review-tag-changes in the acceptance verify-plan; status reworded",
+        "SR-06": "accepted: digest pins are the control for a resealed plan (plan-readiness --plan-digest, acceptance-process.yml)",
+        "SR-07": "fixed: the second owner script committed verbatim (R6-OWNER-DECISIONS-SCRIPT-2.txt)",
+        "SR-08": "no change: the quoted words are the owner's, given earlier in this session; the reviewer was not given them",
+        "SR-09": "fixed: residual reasons corrected",
+        "SR-10": "fixed: DEC-R6-010",
+        "SR-11": "addressed: merge with a merge commit",
+        "SR-12": "fixed: R6ScopeTests checks every curated decision id against owner-decisions.json",
+        "SR-13": "fixed: this re-evaluation",
+        "SR-14": "accepted: AR-031-O2 is proven by independent acceptance; its decision exists before kickoff (DEC-R6-006)",
+        "SR-15": "noted: commits after f8b1a2c are covered by this disposition list, not by the review"
+      },
+      "blockers": [
+        "The owner's GitHub review attesting the scope review is missing"
       ]
     }
   ],
@@ -987,6 +1050,41 @@
       },
       "scratchLogs": "/tmp/claude-0/-home-user/39ad7b23-c1af-5e90-a30a-399aa26ff3ce/scratchpad/pf/",
       "repositoriesModified": false
+    },
+    "freeze": {
+      "baseline": "BL-CAUSA-INDY-INIT-856157a78d47 (sha256 40599abe92724dae6796ee0d6a9bf5711c4db882fc79c77b38a43d0f0960befd)",
+      "plan": "VP-8ef1c8dca656 (digest 8ef1c8dca656e515f63ff287d560a9b76ffbaffc0e5fa27d81f6637b3aa46e41); it changes once the operator approval records are applied",
+      "processRules": "sha256 6f16435369a046e534e4787903ea96c4a9f7e0adcf7b5b51d4ea15ac156be17c",
+      "stack": "echelon-current 1.32.0",
+      "rehearsalRepository": "initial 65e346e",
+      "dataset": "historical-v1 at causa-data dcb8cb9 (DEC-R6-007)",
+      "ownerDecisions": "kickoff/rehearsal-006/owner-decisions.json (DEC-R6-001..010)",
+      "acceptanceJobPin": "the Indy-init merge commit of this pull request"
     }
+  },
+  "revision": {
+    "reEvaluated": "2026-10-28, after owner decisions DEC-R6-001..010 (kickoff/rehearsal-006/owner-decisions.json) and the independent scope review (docs/rehearsal-006/scope-review.json)",
+    "stagesReEvaluated": [
+      1,
+      2,
+      4,
+      5,
+      15,
+      16,
+      17,
+      18
+    ],
+    "unchanged": [
+      3,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14
+    ]
   }
 }

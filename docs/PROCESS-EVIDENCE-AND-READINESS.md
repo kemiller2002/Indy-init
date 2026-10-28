@@ -57,7 +57,7 @@ convention stated in the file: independent acceptance by `praxis:independent-rev
 whose kind they all admit (`live` when live-provider evidence is required), named
 `playwright:<acceptance|live>/<REQ>.spec.js > <OBLIGATION> [chromium]` or
 `dotnet:Causa.Acceptance.<Deterministic|Live>.<REQ>Tests.<OBLIGATION>`. Applied to the curation, the plan is
-`VP-0eb9c791dd0b` and `plan-readiness` is READY with no permitted gap. Rehearsal 6 pins its successor, v3 `VP-13516e0d5930` (AR-027..AR-035 added, DEC-R6-005), bound by the same convention: READY with 671 of 671 checks and no permitted gap. The rehearsal's tests must carry exactly those
+`VP-0eb9c791dd0b` and `plan-readiness` is READY with no permitted gap. Rehearsal 6 pins its successor, v3 `VP-8ef1c8dca656` (AR-027..AR-035 added, DEC-R6-005), bound by the same convention: READY with 671 of 671 checks and no permitted gap. The rehearsal's tests must carry exactly those
 identities. A Praxis producer may appear twice on one obligation only with two kinds
 (`praxis:independent-review` as a process record and as the independent review, AR-021-O3); an application test id
 stays unique. Kickoff records: [`kickoff/rehearsal-006/`](../kickoff/rehearsal-006/README.md).

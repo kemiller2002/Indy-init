@@ -136,7 +136,16 @@ let authorizedAmendments (a: Approvals) : Map<string * string, string * string> 
 let scopeDiagnosticCodes = [ "UNAUTHORIZED-AMENDMENT"; "DERIVATION-INCONSISTENT" ]
 let scopeMissingCoverageReasons = [ "constituent-unverified"; "unbound-after-review"; "removed-by-review" ]
 
-type Clause = { Text: string; Constituents: string list }
+/// A clause of a derived obligation. Its constituents must each be verified. The derived obligation's own bound tests
+/// prove the clause too when it is residual: it has no constituent, or it is marked `direct` because its constituents
+/// prove less than the clause states.
+type Clause = { Text: string; Constituents: string list; Direct: bool }
+
+let isResidual (c: Clause) = c.Constituents.IsEmpty || c.Direct
+
+/// The only words a derivation may leave unaccounted for. The curation cannot extend this list, so it cannot drop a
+/// clause by declaring its words connectives.
+let connectiveVocabulary = [ "Verify"; "verify"; "and"; "or"; "the"; "a"; "an"; "of"; "to" ]
 
 type Derivation = { Obligation: string; Decision: string; Connectives: string list; Clauses: Clause list }
 
@@ -148,7 +157,8 @@ let derivationOf (d: Json) =
         arr "clauses" d
         |> List.map (fun c ->
             { Text = strOpt "clause" c |> Option.defaultValue ""
-              Constituents = arr "constituents" c |> List.map (function JStr k -> k | j -> str "obligation" j) }) }
+              Constituents = arr "constituents" c |> List.map (function JStr k -> k | j -> str "obligation" j)
+              Direct = boolOr "direct" false c }) }
 
 let private amendmentsOf (spec: Json) = arr "obligationAmendments" spec
 let private derivationsOf (spec: Json) = arr "derivedObligations" spec |> List.map derivationOf
@@ -188,7 +198,8 @@ let derivationJson (vpo: string -> string) (d: Derivation) =
           |> List.map (fun c ->
               JObj
                   [ "clause", JStr c.Text
-                    "residual", JBool c.Constituents.IsEmpty
+                    "residual", JBool(isResidual c)
+                    "direct", JBool c.Direct
                     "constituents", c.Constituents |> List.map (fun k -> JObj [ "obligation", JStr k; "obligationId", JStr(vpo k) ]) |> JArr ])
           |> JArr ]
 
@@ -199,7 +210,8 @@ let derivationProblems (text: string) (inScope: Set<string>) (derived: Set<strin
     [ if d.Clauses.IsEmpty then yield "names no clause"
       if String.IsNullOrWhiteSpace d.Decision then yield "names no decision"
       for w in d.Connectives do
-          if not (derivationResidue text [] |> List.contains w) then yield sprintf "declares connective '%s', which is not a word of its text" w
+          if not (List.contains w connectiveVocabulary) then yield sprintf "declares connective '%s', which is not in the fixed connective vocabulary" w
+          elif not (derivationResidue text [] |> List.contains w) then yield sprintf "declares connective '%s', which is not a word of its text" w
       for c in d.Clauses do
           if String.IsNullOrWhiteSpace c.Text || (phraseIndex text c.Text).IsNone then
               yield sprintf "clause \"%s\" is not verbatim in the obligation text" c.Text
@@ -567,7 +579,7 @@ let build (i: Inputs) : Json =
                         "An obligation's acceptance criterion is amended only by an authenticated operator change {obligation_id, action: amend, criterion, rationale} in the pinned approvals file, listed in curation obligationAmendments with the owner decision it applies. The baseline text stays verbatim beside the amendment. An amendment changes what the bound tests must prove; it never verifies the obligation and never removes it from scope. Any other amendment fails compilation (V18) and makes verify-plan INVALID (UNAUTHORIZED-AMENDMENT)."
                     "derivationRule",
                     JStr
-                        "A derived obligation restates other obligations. Each clause is verbatim in its text, and the clauses account for all of it except the declared connectives. A clause names the in-scope P0 obligations that verify it; a residual clause names none and is proven by the derived obligation's own bound tests. The derived obligation is verified only when its own required categories are covered and every constituent obligation is verified (constituent-unverified otherwise)."
+                        "A derived obligation restates other obligations. Each clause is verbatim in its text, and the clauses account for all of it except the declared connectives. A clause names the in-scope P0 obligations that must be verified for it; a residual clause (one that names none, or is marked direct because its constituents prove less than it states) is also proven by the derived obligation's own bound tests. Connectives come from a fixed vocabulary. Which obligation states a clause is a review judgement (AR-034-O2), not something the compiler can decide. The derived obligation is verified only when its own required categories are covered and every constituent obligation is verified (constituent-unverified otherwise)."
                     "amendedObligations", jstrs (amendments |> List.map fst |> List.distinct |> List.sort)
                     "derivedObligations", jstrs (derivations |> List.map fst |> List.sort)
                     "diagnostics", jstrs scopeDiagnosticCodes
@@ -879,7 +891,7 @@ let derivationDiagnostics (plan: Json) : Diagnostic list =
           for p in derivationProblems (str "text" o) inScope derived { derivationOf d with Obligation = oid } do
               yield diag "DERIVATION-INCONSISTENT" oid p action
           for c in arr "clauses" d do
-              if boolOr "residual" false c <> (arr "constituents" c).IsEmpty then
+              if boolOr "residual" false c <> ((arr "constituents" c).IsEmpty || boolOr "direct" false c) then
                   yield diag "DERIVATION-INCONSISTENT" oid (sprintf "derived obligation %s marks clause \"%s\" residual inconsistently" oid (str "clause" c)) action
               for k in arr "constituents" c do
                   if vpoOf.TryFind(str "obligation" k) <> Some(str "obligationId" k) then

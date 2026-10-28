@@ -1,6 +1,7 @@
-/// Rehearsal 6 scope decisions (owner decisions DEC-R6-001..008): the v3 package re-pins the baseline at 856157a
-/// (AR-027..AR-035), applies two operator-authorized obligation amendments (UI-031-O5, AR-019-O3) and compiles
-/// UI-015-O2 as derived from its constituents (R5A-001-05); verify-plan honours review tag removals (R5A-001-04).
+/// Rehearsal 6 scope decisions (owner decisions DEC-R6-001..010): the v3 package re-pins the baseline at 856157a
+/// (AR-027..AR-035) and compiles UI-015-O2 as derived from its constituents (R5A-001-05); verify-plan honours review
+/// tag removals (R5A-001-04). Obligation amendments apply only through operator-written approval records (RDP-003);
+/// the pinned file holds none yet, so UI-031-O5 and AR-019-O3 stay as written.
 /// Every scope decision has a negative control: an unauthorized, altered or inconsistent one is refused, never applied.
 module R6ScopeTests
 
@@ -98,44 +99,64 @@ let package (source: string) : string list =
           yield "v3: the curation's testBindings are not exactly the process proposal extended by the r6 proposal"
       if VerificationPlan.digestOf v2Plan <> v2PlanDigest then yield "frozen: the v2 plan changed"
       if Git.sha256Hex frozenBaseline <> frozenBaselineSha then yield "frozen: requirements/causa-requirements-baseline.json changed"
-      // Amendments keep the baseline text verbatim and carry the approved criterion beside it.
+      // No agent-written approval exists (RDP-003), so nothing is amended: the two owner-requested amendments wait for
+      // operator-written records, and the obligations stay as written.
+      if not (arr "approvals" i.Approvals.Document).IsEmpty then yield "v3: the pinned approvals file holds approval records; only the operator may write them (RDP-003)"
       for oid in [ "UI-031-O5"; "AR-019-O3" ] do
-          let o = obligation oid
-          if str "text" o <> baselineText oid then yield sprintf "v3: %s text is not the baseline text" oid
-          match field "amendment" o with
-          | None -> yield sprintf "v3: %s carries no amendment" oid
-          | Some a -> if String.IsNullOrWhiteSpace(str "criterion" a) || str "approval" a = "" then yield sprintf "v3: %s amendment is incomplete" oid
-          if field "acceptanceContract" o |> Option.bind (field "amendment") |> Option.isNone then yield sprintf "v3: %s contract omits its amendment" oid
+          if str "text" (obligation oid) <> baselineText oid then yield sprintf "v3: %s text is not the baseline text" oid
+          if (field "amendment" (obligation oid)).IsSome then yield sprintf "v3: %s is amended without an operator approval record" oid
+      // Every decision the curation applies is a recorded owner decision.
+      let recorded = arr "decisions" (parseFile (Path.Combine(source, "kickoff", "rehearsal-006", "owner-decisions.json"))) |> List.map (str "id") |> Set.ofList
+      for d in arr "derivedObligations" i.Spec @ arr "obligationAmendments" i.Spec do
+          if not (recorded.Contains(str "decision" d)) then yield sprintf "v3: %s cites decision %s, which owner-decisions.json does not record" (str "obligation" d) (str "decision" d)
       if not (VerificationPlan.amendmentDiagnostics plan i.Approvals).IsEmpty then yield sprintf "v3: amendments refused %A" (VerificationPlan.amendmentDiagnostics plan i.Approvals)
       if not (VerificationPlan.derivationDiagnostics plan).IsEmpty then yield sprintf "v3: derivation refused %A" (VerificationPlan.derivationDiagnostics plan)
       match field "derivation" (obligation "UI-015-O2") with
       | None -> yield "v3: UI-015-O2 is not derived"
       | Some d ->
           let residual = arr "clauses" d |> List.filter (boolOr "residual" false) |> List.map (str "clause")
-          if residual <> [ "the five frozen v1.0.0 fixtures replay as the storage contract's test corpus"; "timeline ordering"; "report fidelity"; "startup failure" ] then
+          if residual
+             <> [ "the three active-catalog investigations (EXT-DATA-013) load from the connected repository and replay"
+                  "the five frozen v1.0.0 fixtures replay as the storage contract's test corpus"
+                  "timeline ordering"
+                  "legal command enforcement"
+                  "offline/conflict recovery"
+                  "report fidelity"
+                  "startup failure" ] then
               yield sprintf "v3: UI-015-O2 residual clauses %A" residual ]
 
-/// Amendments: only an operator change in the pinned file applies; any other is refused and never applied.
+/// Amendments: only an operator change in the pinned file applies; any other is refused and never applied. The
+/// approvals here are test fixtures in memory: the committed file holds none, because only the operator writes them.
 let amendments (source: string) : string list =
-    let i, _ = inputs source
-    let amend o approval = JArr [ JObj [ "obligation", JStr o; "approval", JStr approval; "decision", JStr "DEC-TEST" ] ]
+    let i0, _ = inputs source
+    let change o = JObj [ "action", JStr "amend"; "obligation_id", JStr o; "criterion", JStr "fixture criterion"; "rationale", JStr "fixture" ]
+    let approval id kind (o: string) =
+        JObj [ "id", JStr id; "authority", JObj [ "kind", JStr kind; "id", JStr(if kind = "operator" then "kemiller2002" else "claude") ]; "changes", JArr [ change o ] ]
+    let withApprovals (aps: Json list) (x: VerificationPlan.Inputs) = { x with Approvals = { x.Approvals with Document = setIn "approvals" (JArr aps) x.Approvals.Document } }
+    let amend o approval = JArr [ JObj [ "obligation", JStr o; "approval", JStr approval; "decision", JStr "DEC-R6-003" ] ]
     let amended oid (p: Json) = arr "requirements" p |> List.collect (arr "obligations") |> List.exists (fun o -> str "sourceObligation" o = oid && (field "amendment" o).IsSome)
-    let withApprovals (f: Json -> Json) (x: VerificationPlan.Inputs) = { x with Approvals = { x.Approvals with Document = f x.Approvals.Document } }
-    let mapApprovals (f: Json -> Json) (doc: Json) = setIn "approvals" (JArr(arr "approvals" doc |> List.map f)) doc
-    let untrusted = withApprovals (mapApprovals (setIn "authority" (JObj [ "kind", JStr "agent"; "id", JStr "claude" ]))) i
+    let i = withSpec (withApprovals [ approval "APR-FIX" "operator" "UI-031-O5" ] i0) "obligationAmendments" (amend "UI-031-O5" "APR-FIX")
+    let untrusted = withSpec (withApprovals [ approval "APR-FIX" "agent" "UI-031-O5" ] i0) "obligationAmendments" (amend "UI-031-O5" "APR-FIX")
     let invented = withSpec i "obligationAmendments" (amend "UI-031-O5" "APR-INVENTED")
-    let otherObligation = withSpec i "obligationAmendments" (amend "UI-016-O11" "APR-R6-003")
+    let otherObligation = withSpec i "obligationAmendments" (amend "UI-016-O11" "APR-FIX")
     let plan = VerificationPlan.build i
+    let o = arr "requirements" plan |> List.collect (arr "obligations") |> List.find (fun o -> str "sourceObligation" o = "UI-031-O5")
     let tampered = plan |> mapObligation "UI-031-O5" (fun o -> setIn "amendment" (field "amendment" o |> Option.get |> setIn "criterion" (JStr "Never expose credentials.")) o) |> reseal
-    let forged = plan |> mapObligation "UI-016-O11" (setIn "amendment" (JObj [ "approval", JStr "APR-R6-003"; "decision", JStr "DEC-R6-002"; "criterion", JStr "Text contrast only."; "rationale", JStr "" ])) |> reseal
+    let forged = plan |> mapObligation "UI-016-O11" (setIn "amendment" (JObj [ "approval", JStr "APR-FIX"; "decision", JStr "DEC-R6-002"; "criterion", JStr "Text contrast only."; "rationale", JStr "" ])) |> reseal
     let diagnose p = VerificationPlan.amendmentDiagnostics p i.Approvals |> List.map VerificationPlan.render
-    [ if not (VerificationPlan.problems invented |> hasProblem "unauthorized amendment of P0 obligation UI-031-O5") then yield "amendment: an invented approval is accepted"
+    [ if not (VerificationPlan.problems i).IsEmpty then yield sprintf "amendment: an operator amendment is refused %A" (VerificationPlan.problems i)
+      if not (amended "UI-031-O5" plan) then yield "amendment: an operator amendment is not applied"
+      if str "text" o <> str "text" (arr "requirements" (VerificationPlan.build i0) |> List.collect (arr "obligations") |> List.find (fun x -> str "sourceObligation" x = "UI-031-O5")) then
+          yield "amendment: the amended obligation lost its verbatim text"
+      if field "acceptanceContract" o |> Option.bind (field "amendment") |> Option.isNone then yield "amendment: the contract omits the amendment"
+      if not (diagnose plan).IsEmpty then yield sprintf "amendment: the checker refuses an operator amendment %A" (diagnose plan)
+      if not (VerificationPlan.problems invented |> hasProblem "unauthorized amendment of P0 obligation UI-031-O5") then yield "amendment: an invented approval is accepted"
       if amended "UI-031-O5" (VerificationPlan.build invented) then yield "amendment: an invented approval was applied"
       if not (VerificationPlan.problems untrusted |> hasProblem "unauthorized amendment") then yield "amendment: a non-operator approval is accepted"
-      if amended "AR-019-O3" (VerificationPlan.build untrusted) then yield "amendment: a non-operator approval was applied"
+      if amended "UI-031-O5" (VerificationPlan.build untrusted) then yield "amendment: a non-operator approval was applied"
       if not (VerificationPlan.problems otherObligation |> hasProblem "unauthorized amendment of P0 obligation UI-016-O11") then
           yield "amendment: an approval for one obligation amends another"
-      if not (VerificationPlan.problems (withSpec i "obligationAmendments" (amend "UI-999-O1" "APR-R6-003")) |> hasProblem "unknown or non-P0 obligation") then
+      if not (VerificationPlan.problems (withSpec i "obligationAmendments" (amend "UI-999-O1" "APR-FIX")) |> hasProblem "unknown or non-P0 obligation") then
           yield "amendment: an amendment of an unknown obligation is accepted"
       if not (diagnose tampered |> hasProblem "[UNAUTHORIZED-AMENDMENT] UI-031-O5") then yield "amendment: an edited criterion in the plan is not refused"
       if not (diagnose forged |> hasProblem "[UNAUTHORIZED-AMENDMENT] UI-016-O11") then yield "amendment: an amendment forged into the plan is not refused"
@@ -173,7 +194,7 @@ let derivations (source: string) : string list =
       yield! refused "omitted clause" (mapClauses (List.filter (fun c -> str "clause" c <> "report fidelity"))) "no clause accounts for: report fidelity"
       yield! refused "self constituent" (mapClause "responsive reflow" (setIn "constituents" (jstrs [ "UI-015-O2" ]))) "names the obligation itself"
       yield! refused "unknown constituent" (mapClause "responsive reflow" (setIn "constituents" (jstrs [ "UI-011-O9" ]))) "constituent UI-011-O9 is not an in-scope P0 obligation"
-      yield! refused "invented connective" (withSpec i "derivedObligations" (JArr [ setIn "connectives" (jstrs [ "Verify"; "verify"; "and"; "fidelity" ]) spec |> setIn "clauses" (JArr(arr "clauses" spec |> List.filter (fun c -> str "clause" c <> "report fidelity"))) ])) "no clause accounts for: report"
+      yield! refused "invented connective" (withSpec i "derivedObligations" (JArr [ setIn "connectives" (jstrs [ "Verify"; "verify"; "and"; "fidelity" ]) spec |> setIn "clauses" (JArr(arr "clauses" spec |> List.filter (fun c -> str "clause" c <> "report fidelity"))) ])) "not in the fixed connective vocabulary"
       yield! refused "no decision" (withSpec i "derivedObligations" (JArr [ setIn "decision" (JStr "") spec ])) "names no decision"
       if not (renders edited |> hasProblem "[DERIVATION-INCONSISTENT] UI-015-O2") then yield "derivation: a constituent's VPO id edited in the plan is not refused"
       if not (renders dropped |> hasProblem "no clause accounts for: timeline ordering") then yield "derivation: a clause dropped from the plan is not refused"
@@ -279,7 +300,10 @@ let checker (source: string) : string list =
     let openRemoval = assess Set.empty (removal []) plan
     let notRebound = assess Set.empty (removal [ "resolution", JObj [ "kind", JStr "not-rebound"; "reason", JStr "the fix's tests are not bound in the frozen plan"; "review", JStr "fixture review 2" ] ]) plan
     let badRebound = assess Set.empty (removal [ "resolution", JObj [ "kind", JStr "rebound"; "tests", jstrs [ "fixture: unbound replacement" ]; "review", JStr "fixture review 2" ] ]) plan
-    let tamperedPlan = plan |> mapObligation "AR-019-O3" (fun o -> setIn "amendment" (field "amendment" o |> Option.get |> setIn "criterion" (JStr "Any verdict is acceptable.")) o) |> reseal
+    let tamperedPlan =
+        plan
+        |> mapObligation "AR-019-O3" (setIn "amendment" (JObj [ "approval", JStr "APR-R6-004"; "decision", JStr "DEC-R6-004"; "criterion", JStr "Any verdict is acceptable."; "rationale", JStr "" ]))
+        |> reseal
     let tampered = assess Set.empty JNull tamperedPlan
     [ for oid in targets do
           if verification oid positive <> "verified" then yield sprintf "checker: %s is %s on the positive candidate (%A)" oid (verification oid positive) (reasons oid positive)

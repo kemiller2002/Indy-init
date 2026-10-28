@@ -1,9 +1,9 @@
 {
   "schema": "indy-init.verification-plan/1",
   "planIdentity": {
-    "planId": "VP-13516e0d5930",
+    "planId": "VP-8ef1c8dca656",
     "algorithm": "sha256",
-    "digest": "13516e0d5930d30c89e02cbd2aea895afaea1f08358c02538702aea7bcd8a66c",
+    "digest": "8ef1c8dca656e515f63ff287d560a9b76ffbaffc0e5fa27d81f6637b3aa46e41",
     "covers": "sha256 of the plan serialized by the compiler's canonical writer (ASCII JSON, two-space indent, trailing newline) with planIdentity removed"
   },
   "source": {
@@ -13,9 +13,9 @@
     "baselineSha256": "40599abe92724dae6796ee0d6a9bf5711c4db882fc79c77b38a43d0f0960befd",
     "approvals": {
       "repository": "kemiller2002/indy-init",
-      "commit": "1865da2e87a0eb2a86cf9c9be16f46d96c52d818",
+      "commit": "efa5a330e18ee4fd6841eaecf5d521e3f45d4282",
       "path": "kickoff/rehearsal-006/approvals.causa.json",
-      "sha256": "a9260104fd28b9f28a82e090b6cf7e76a5b89c943f5068ce292ad955f6608518",
+      "sha256": "a69618f5bc34b1eabb98c79ecd4b98a7bf560e619f7b9d500988320940dcec39",
       "trustedOperators": [
         "kemiller2002"
       ]
@@ -562,11 +562,8 @@
   },
   "scopeDecisions": {
     "amendmentRule": "An obligation's acceptance criterion is amended only by an authenticated operator change {obligation_id, action: amend, criterion, rationale} in the pinned approvals file, listed in curation obligationAmendments with the owner decision it applies. The baseline text stays verbatim beside the amendment. An amendment changes what the bound tests must prove; it never verifies the obligation and never removes it from scope. Any other amendment fails compilation (V18) and makes verify-plan INVALID (UNAUTHORIZED-AMENDMENT).",
-    "derivationRule": "A derived obligation restates other obligations. Each clause is verbatim in its text, and the clauses account for all of it except the declared connectives. A clause names the in-scope P0 obligations that verify it; a residual clause names none and is proven by the derived obligation's own bound tests. The derived obligation is verified only when its own required categories are covered and every constituent obligation is verified (constituent-unverified otherwise).",
-    "amendedObligations": [
-      "AR-019-O3",
-      "UI-031-O5"
-    ],
+    "derivationRule": "A derived obligation restates other obligations. Each clause is verbatim in its text, and the clauses account for all of it except the declared connectives. A clause names the in-scope P0 obligations that must be verified for it; a residual clause (one that names none, or is marked direct because its constituents prove less than it states) is also proven by the derived obligation's own bound tests. Connectives come from a fixed vocabulary. Which obligation states a clause is a review judgement (AR-034-O2), not something the compiler can decide. The derived obligation is verified only when its own required categories are covered and every constituent obligation is verified (constituent-unverified otherwise).",
+    "amendedObligations": [],
     "derivedObligations": [
       "UI-015-O2"
     ],
@@ -5713,12 +5710,6 @@
             ]
           },
           "tokens": [],
-          "amendment": {
-            "approval": "APR-R6-004",
-            "decision": "DEC-R6-004",
-            "criterion": "Original Rehearsal 3 must yield an authoritative non-accepting verdict (INVALID, FAIL or BLOCKED), and the report must state the exact verdict and its diagnostic classification without merging INVALID, FAIL and BLOCKED into one outcome; Rehearsal 2 candidate 45644a7 should yield ACCEPTED only if its actual ledger and evidence meet the frozen contract.",
-            "rationale": "DEC-R6-004, option A. The safety property is that the original Rehearsal 3 is never accepted. The verifier refuses it as INVALID or FAIL, which are stronger refusals than BLOCKED. AR-007-O2 and AR-018-O1, which keep the verdict categories distinct, are unchanged."
-          },
           "acceptanceContract": {
             "requirement": "AR-019",
             "obligation": "AR-019-O3",
@@ -5790,13 +5781,7 @@
                 "reason": "no-evidence",
                 "detail": "a bound test declares this category; only an assessed evidence bundle can verify it"
               }
-            ],
-            "amendment": {
-              "approval": "APR-R6-004",
-              "decision": "DEC-R6-004",
-              "criterion": "Original Rehearsal 3 must yield an authoritative non-accepting verdict (INVALID, FAIL or BLOCKED), and the report must state the exact verdict and its diagnostic classification without merging INVALID, FAIL and BLOCKED into one outcome; Rehearsal 2 candidate 45644a7 should yield ACCEPTED only if its actual ledger and evidence meet the frozen contract.",
-              "rationale": "DEC-R6-004, option A. The safety property is that the original Rehearsal 3 is never accepted. The verifier refuses it as INVALID or FAIL, which are stronger refusals than BLOCKED. AR-007-O2 and AR-018-O1, which keep the verdict categories distinct, are unchanged."
-            }
+            ]
           }
         },
         {
@@ -30087,7 +30072,8 @@
             "clauses": [
               {
                 "clause": "the three active-catalog investigations (EXT-DATA-013) load from the connected repository and replay",
-                "residual": false,
+                "residual": true,
+                "direct": true,
                 "constituents": [
                   {
                     "obligation": "EXT-DATA-013-O2",
@@ -30098,11 +30084,13 @@
               {
                 "clause": "the five frozen v1.0.0 fixtures replay as the storage contract's test corpus",
                 "residual": true,
+                "direct": false,
                 "constituents": []
               },
               {
                 "clause": "keyboard/touch paths",
                 "residual": false,
+                "direct": false,
                 "constituents": [
                   {
                     "obligation": "UI-004-O5",
@@ -30121,6 +30109,7 @@
               {
                 "clause": "graph textual equivalent",
                 "residual": false,
+                "direct": false,
                 "constituents": [
                   {
                     "obligation": "UI-011-O5",
@@ -30131,15 +30120,34 @@
               {
                 "clause": "timeline ordering",
                 "residual": true,
-                "constituents": []
+                "direct": true,
+                "constituents": [
+                  {
+                    "obligation": "UI-003-O1",
+                    "obligationId": "VPO-33324aeb860bce06"
+                  },
+                  {
+                    "obligation": "UI-003-O3",
+                    "obligationId": "VPO-7fe0d0f0d00df8a0"
+                  }
+                ]
               },
               {
                 "clause": "legal command enforcement",
-                "residual": false,
+                "residual": true,
+                "direct": true,
                 "constituents": [
+                  {
+                    "obligation": "AR-006-O2",
+                    "obligationId": "VPO-199103f9166730e7"
+                  },
                   {
                     "obligation": "UI-004-O1",
                     "obligationId": "VPO-be99a964783c59b5"
+                  },
+                  {
+                    "obligation": "UI-004-O4",
+                    "obligationId": "VPO-be22751d9b5b8098"
                   },
                   {
                     "obligation": "UI-004-O6",
@@ -30150,6 +30158,7 @@
               {
                 "clause": "save/sync truthfulness",
                 "residual": false,
+                "direct": false,
                 "constituents": [
                   {
                     "obligation": "UI-006-O1",
@@ -30163,7 +30172,8 @@
               },
               {
                 "clause": "offline/conflict recovery",
-                "residual": false,
+                "residual": true,
+                "direct": true,
                 "constituents": [
                   {
                     "obligation": "UI-006-O4",
@@ -30178,6 +30188,7 @@
               {
                 "clause": "responsive reflow",
                 "residual": false,
+                "direct": false,
                 "constituents": [
                   {
                     "obligation": "UI-011-O2",
@@ -30188,11 +30199,13 @@
               {
                 "clause": "report fidelity",
                 "residual": true,
+                "direct": false,
                 "constituents": []
               },
               {
                 "clause": "startup failure",
                 "residual": true,
+                "direct": false,
                 "constituents": []
               }
             ]
@@ -30327,7 +30340,8 @@
               "clauses": [
                 {
                   "clause": "the three active-catalog investigations (EXT-DATA-013) load from the connected repository and replay",
-                  "residual": false,
+                  "residual": true,
+                  "direct": true,
                   "constituents": [
                     {
                       "obligation": "EXT-DATA-013-O2",
@@ -30338,11 +30352,13 @@
                 {
                   "clause": "the five frozen v1.0.0 fixtures replay as the storage contract's test corpus",
                   "residual": true,
+                  "direct": false,
                   "constituents": []
                 },
                 {
                   "clause": "keyboard/touch paths",
                   "residual": false,
+                  "direct": false,
                   "constituents": [
                     {
                       "obligation": "UI-004-O5",
@@ -30361,6 +30377,7 @@
                 {
                   "clause": "graph textual equivalent",
                   "residual": false,
+                  "direct": false,
                   "constituents": [
                     {
                       "obligation": "UI-011-O5",
@@ -30371,15 +30388,34 @@
                 {
                   "clause": "timeline ordering",
                   "residual": true,
-                  "constituents": []
+                  "direct": true,
+                  "constituents": [
+                    {
+                      "obligation": "UI-003-O1",
+                      "obligationId": "VPO-33324aeb860bce06"
+                    },
+                    {
+                      "obligation": "UI-003-O3",
+                      "obligationId": "VPO-7fe0d0f0d00df8a0"
+                    }
+                  ]
                 },
                 {
                   "clause": "legal command enforcement",
-                  "residual": false,
+                  "residual": true,
+                  "direct": true,
                   "constituents": [
+                    {
+                      "obligation": "AR-006-O2",
+                      "obligationId": "VPO-199103f9166730e7"
+                    },
                     {
                       "obligation": "UI-004-O1",
                       "obligationId": "VPO-be99a964783c59b5"
+                    },
+                    {
+                      "obligation": "UI-004-O4",
+                      "obligationId": "VPO-be22751d9b5b8098"
                     },
                     {
                       "obligation": "UI-004-O6",
@@ -30390,6 +30426,7 @@
                 {
                   "clause": "save/sync truthfulness",
                   "residual": false,
+                  "direct": false,
                   "constituents": [
                     {
                       "obligation": "UI-006-O1",
@@ -30403,7 +30440,8 @@
                 },
                 {
                   "clause": "offline/conflict recovery",
-                  "residual": false,
+                  "residual": true,
+                  "direct": true,
                   "constituents": [
                     {
                       "obligation": "UI-006-O4",
@@ -30418,6 +30456,7 @@
                 {
                   "clause": "responsive reflow",
                   "residual": false,
+                  "direct": false,
                   "constituents": [
                     {
                       "obligation": "UI-011-O2",
@@ -30428,11 +30467,13 @@
                 {
                   "clause": "report fidelity",
                   "residual": true,
+                  "direct": false,
                   "constituents": []
                 },
                 {
                   "clause": "startup failure",
                   "residual": true,
+                  "direct": false,
                   "constituents": []
                 }
               ]
@@ -40393,12 +40434,6 @@
             ]
           },
           "tokens": [],
-          "amendment": {
-            "approval": "APR-R6-003",
-            "decision": "DEC-R6-003",
-            "criterion": "Never expose credentials. Application-level role management does not apply to Causa's approved single-user scope. Credential protection, authorization of every repository operation against the provider's actual permissions, workspace data isolation and secure handling of operational information still apply and must be verified.",
-            "rationale": "DEC-R6-003, option A. Causa is a single-user browser application with no user roles, so a role model would be invented scope. The obligation's credential clause is unchanged, and authentication, authorization and isolation are kept explicitly, because a single-user application is not exempt from them."
-          },
           "acceptanceContract": {
             "requirement": "UI-031",
             "obligation": "UI-031-O5",
@@ -40483,13 +40518,7 @@
                 "reason": "no-evidence",
                 "detail": "a bound test declares this category; only an assessed evidence bundle can verify it"
               }
-            ],
-            "amendment": {
-              "approval": "APR-R6-003",
-              "decision": "DEC-R6-003",
-              "criterion": "Never expose credentials. Application-level role management does not apply to Causa's approved single-user scope. Credential protection, authorization of every repository operation against the provider's actual permissions, workspace data isolation and secure handling of operational information still apply and must be verified.",
-              "rationale": "DEC-R6-003, option A. Causa is a single-user browser application with no user roles, so a role model would be invented scope. The obligation's credential clause is unchanged, and authentication, authorization and isolation are kept explicitly, because a single-user application is not exempt from them."
-            }
+            ]
           }
         }
       ],
