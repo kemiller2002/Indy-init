@@ -1,0 +1,265 @@
+{
+  "Contract": "dokimos.experiment.incremental-verification",
+  "Strategies": [
+    {
+      "CacheHitRate": null,
+      "DefectSteps": 0,
+      "DefectStepsMasked": 0,
+      "DefectStepsWithFailureReported": 0,
+      "Defects": [],
+      "IncorrectReuseAccepted": 0,
+      "IncorrectReuseAcceptedByCase": {},
+      "IncorrectReuseAttempts": 0,
+      "Label": "clean-full",
+      "PlanSeconds": 5.1529992,
+      "PositiveControls": 0,
+      "PositiveControlsReused": 0,
+      "ProjectRuns": 36,
+      "RecordSeconds": 0,
+      "ReleaseSteps": [],
+      "RepeatedProjectRuns": 26,
+      "RepeatedTests": 3760,
+      "ReuseDecisions": 0,
+      "ReusesContradictedByFullRun": 0,
+      "ReusesWithoutFullRunAtSameCommit": 0,
+      "Steps": 12,
+      "TestSeconds": 1725.6892727999998,
+      "TestsExecuted": 5790,
+      "UnitDecisions": 36,
+      "WallClockSeconds": 1726.1309982
+    },
+    {
+      "CacheHitRate": null,
+      "DefectSteps": 0,
+      "DefectStepsMasked": 0,
+      "DefectStepsWithFailureReported": 0,
+      "Defects": [],
+      "IncorrectReuseAccepted": 0,
+      "IncorrectReuseAcceptedByCase": {},
+      "IncorrectReuseAttempts": 0,
+      "Label": "clean-select",
+      "PlanSeconds": 5.458263199999999,
+      "PositiveControls": 0,
+      "PositiveControlsReused": 0,
+      "ProjectRuns": 11,
+      "RecordSeconds": 0,
+      "ReleaseSteps": [
+        {
+          "ProjectRuns": 3,
+          "Seconds": 123.7078788,
+          "Step": 12,
+          "Tests": 535
+        }
+      ],
+      "RepeatedProjectRuns": 1,
+      "RepeatedTests": 4,
+      "ReuseDecisions": 0,
+      "ReusesContradictedByFullRun": 0,
+      "ReusesWithoutFullRunAtSameCommit": 0,
+      "Steps": 12,
+      "TestSeconds": 529.1293436999999,
+      "TestsExecuted": 2034,
+      "UnitDecisions": 36,
+      "WallClockSeconds": 534.8288118
+    },
+    {
+      "CacheHitRate": 0.6944444444444444,
+      "DefectSteps": 0,
+      "DefectStepsMasked": 0,
+      "DefectStepsWithFailureReported": 0,
+      "Defects": [],
+      "IncorrectReuseAccepted": 0,
+      "IncorrectReuseAcceptedByCase": {
+        "changed-source": {
+          "Accepted": 0,
+          "Attempts": 36
+        },
+        "conflicting-failure": {
+          "Accepted": 0,
+          "Attempts": 36
+        },
+        "failed-only": {
+          "Accepted": 0,
+          "Attempts": 36
+        },
+        "incomplete-provenance": {
+          "Accepted": 0,
+          "Attempts": 36
+        },
+        "independent-acceptance": {
+          "Accepted": 0,
+          "Attempts": 36
+        },
+        "live": {
+          "Accepted": 0,
+          "Attempts": 36
+        },
+        "other-runtime": {
+          "Accepted": 0,
+          "Attempts": 36
+        },
+        "other-tool-version": {
+          "Accepted": 0,
+          "Attempts": 36
+        },
+        "per-commit-other-revision": {
+          "Accepted": 0,
+          "Attempts": 36
+        },
+        "security": {
+          "Accepted": 0,
+          "Attempts": 36
+        },
+        "tampered-identity": {
+          "Accepted": 0,
+          "Attempts": 36
+        }
+      },
+      "IncorrectReuseAttempts": 396,
+      "Label": "clean-reuse",
+      "PlanSeconds": 7.595022899999999,
+      "PositiveControls": 36,
+      "PositiveControlsReused": 36,
+      "ProjectRuns": 11,
+      "RecordSeconds": 2.6678296,
+      "ReleaseSteps": [
+        {
+          "ProjectRuns": 3,
+          "Seconds": 115.9348931,
+          "Step": 12,
+          "Tests": 535
+        }
+      ],
+      "RepeatedProjectRuns": 1,
+      "RepeatedTests": 4,
+      "ReuseDecisions": 25,
+      "ReusesContradictedByFullRun": 0,
+      "ReusesWithoutFullRunAtSameCommit": 0,
+      "Steps": 12,
+      "TestSeconds": 509.1197444999999,
+      "TestsExecuted": 2034,
+      "UnitDecisions": 36,
+      "WallClockSeconds": 519.6376310999999
+    },
+    {
+      "CacheHitRate": null,
+      "DefectSteps": 8,
+      "DefectStepsMasked": 0,
+      "DefectStepsWithFailureReported": 8,
+      "Defects": [
+        {
+          "Defect": "D3",
+          "DetectedAtIntroduction": true,
+          "Escaped": false,
+          "FirstDetectedStep": 2,
+          "SecondsToDetect": 112.8394049,
+          "Steps": [
+            2,
+            3
+          ],
+          "StepsWithFailureReported": [
+            2,
+            3
+          ]
+        },
+        {
+          "Defect": "D1",
+          "DetectedAtIntroduction": true,
+          "Escaped": false,
+          "FirstDetectedStep": 5,
+          "SecondsToDetect": 109.3205708,
+          "Steps": [
+            5,
+            6,
+            7
+          ],
+          "StepsWithFailureReported": [
+            5,
+            6,
+            7
+          ]
+        },
+        {
+          "Defect": "D2",
+          "DetectedAtIntroduction": true,
+          "Escaped": false,
+          "FirstDetectedStep": 9,
+          "SecondsToDetect": 121.355998,
+          "Steps": [
+            9,
+            10,
+            11
+          ],
+          "StepsWithFailureReported": [
+            9,
+            10,
+            11
+          ]
+        }
+      ],
+      "IncorrectReuseAccepted": 0,
+      "IncorrectReuseAcceptedByCase": {},
+      "IncorrectReuseAttempts": 0,
+      "Label": "defects-full",
+      "PlanSeconds": 3.4745546,
+      "PositiveControls": 0,
+      "PositiveControlsReused": 0,
+      "ProjectRuns": 24,
+      "RecordSeconds": 0,
+      "ReleaseSteps": [],
+      "RepeatedProjectRuns": 9,
+      "RepeatedTests": 453,
+      "ReuseDecisions": 0,
+      "ReusesContradictedByFullRun": 0,
+      "ReusesWithoutFullRunAtSameCommit": 0,
+      "Steps": 8,
+      "TestSeconds": 960.7422889,
+      "TestsExecuted": 3848,
+      "UnitDecisions": 24,
+      "WallClockSeconds": 961.0223379
+    },
+    {
+      "CacheHitRate": null,
+      "DefectSteps": 2,
+      "DefectStepsMasked": 1,
+      "DefectStepsWithFailureReported": 1,
+      "Defects": [
+        {
+          "Defect": "D3",
+          "DetectedAtIntroduction": true,
+          "Escaped": false,
+          "FirstDetectedStep": 2,
+          "SecondsToDetect": 119.46150970000001,
+          "Steps": [
+            2,
+            3
+          ],
+          "StepsWithFailureReported": [
+            2
+          ]
+        }
+      ],
+      "IncorrectReuseAccepted": 0,
+      "IncorrectReuseAcceptedByCase": {},
+      "IncorrectReuseAttempts": 0,
+      "Label": "defects-select",
+      "PlanSeconds": 1.1147206,
+      "PositiveControls": 0,
+      "PositiveControlsReused": 0,
+      "ProjectRuns": 5,
+      "RecordSeconds": 0,
+      "ReleaseSteps": [],
+      "RepeatedProjectRuns": 0,
+      "RepeatedTests": 0,
+      "ReuseDecisions": 0,
+      "ReusesContradictedByFullRun": 0,
+      "ReusesWithoutFullRunAtSameCommit": 0,
+      "Steps": 3,
+      "TestSeconds": 243.6601447,
+      "TestsExecuted": 934,
+      "UnitDecisions": 9,
+      "WallClockSeconds": 244.9856222
+    }
+  ],
+  "TokenConsumption": "unavailable: the replay runs no model; agent token use was not measured"
+}

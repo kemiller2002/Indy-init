@@ -94,7 +94,8 @@ let private planAssessment (o: Options) (dir: string) =
           ReadEvidence = read
           TrustedSourceSha = o.TrustedSourceSha
           ApprovalsRaw = File.ReadAllBytes(Path.Combine(o.Source, "kickoff", "rehearsal-004", "approvals.causa.json"))
-          TrustedOperators = [ "kemiller2002" ] }
+          TrustedOperators = [ "kemiller2002" ]
+          ProcessCovered = Map.empty }
 
 let private statusOf (rid: string) (a: Json) =
     arr "requirements" a |> List.tryFind (fun r -> str "requirement" r = rid) |> Option.map (str "status") |> Option.defaultValue "?"

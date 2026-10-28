@@ -8,7 +8,7 @@ The verification plan is the per-requirement statement of what acceptance must p
 | Schema | `requirements-compiled/v2/verification-plan.schema.json` (JSON Schema 2020-12, `schema: "indy-init.verification-plan/1"`, revision 2) |
 | Generator | `tools/requirements-compiler` (F#), in the same run as the rest of the package. It is listed in `package-manifest.json` under `generated`. |
 | Curated input | `requirements-compiled/v2/curation/verification-plan.json`: freshness policies, the gate-to-policy map, test bindings (with evidence categories), exclusions and the pinned approvals source. `requirements-compiled/v2/curation/evidence-categories.json`: the declared evidence-category rules |
-| Current identity | `planId` `VP-6b0f59cee664`, digest `6b0f59cee66487a9d1b61851e8e12ec4584af11d4b443825df5cc596ab37a2f9` (baseline `BL-CAUSA-INDY-INIT-aab8f80c7743`: 108 P0 requirements, 326 obligations, 0 bound test identities, 0 unclassified) |
+| Current identity | `planId` `VP-06f6d4ef5deb`, digest `06f6d4ef5deb3f36ef55d5dde7f7d1b7ab0e6ca807ab769f606d5bb3754872a4` (baseline `BL-CAUSA-INDY-INIT-aab8f80c7743`: 108 P0 requirements, 326 obligations, 0 bound test identities, 0 unclassified). Process and owner evidence classes: [PROCESS-EVIDENCE-AND-READINESS.md](PROCESS-EVIDENCE-AND-READINESS.md) |
 
 **Revision 2 is additive.** Every revision-1 member keeps its name, type and meaning; the only change to an existing member is the value `UNVERIFIED` appended to `statusVocabulary.verification`. Ordo's reader (`VerificationPlanWire.readPlan`, which ignores unknown members) reads the v2 plan: 108 requirements, 326 obligations. The v1 schema document is closed (`additionalProperties: false`), so a strict validator of that document rejects a revision-2 plan; validate against the v2 schema.
 
@@ -43,6 +43,7 @@ The verification plan is the per-requirement statement of what acceptance must p
 7. **Freshness.** Each requirement has one `freshness.policy`: the strictest of the default policy, its gates' policies (`gatePolicies`) and its bound tests' kinds.
    - `FP-LIVE-PER-COMMIT` (gates G6 and G9, or a `live` test): the evidence must come from the candidate commit's own run. It is never reused.
    - `FP-REVIEW-PER-COMMIT` (gate G7, or a `review` test): the evidence is bound to the reviewed commit. Any reuse needs a new reviewer attestation.
+   - `FP-PROCESS-THIS-RUN` (a `process` or `owner` producer): the record must be in the run's own Praxis log (or, for an owner attestation, observed by the run's CI) and bound to the exact candidate. It is never reused.
    - `FP-DETERMINISTIC-INPUT-DIGEST` (the default, or a `deterministic` test): the evidence is reusable only when the test identity and every input digest are unchanged and Dokimos reports `Reusable:true`. It is never reused from an earlier rehearsal.
    - `boundTo` and `invalidatedBy` are the manifest defaults plus the rules' own entries.
 8. **Dependencies.** `dependencies.requirements` and `dependencies.contracts` are the requirements and contracts whose change invalidates the evidence.
@@ -54,6 +55,7 @@ The verification plan is the per-requirement statement of what acceptance must p
    - Each obligation carries `tokens` (its baseline value tokens, verbatim) and an `acceptanceContract` with these members:
      - `requirement`, `obligation`, `obligationId`, `priority` and `verificationMethod` (gates and rule ids);
      - `requiredEvidenceCategories` and `categoryDerivation`;
+     - `evidenceProducers`: each required category's evidence class (`application-test`, `reviewer`, `process`, `owner`) and expected producer;
      - `testIdentity` (`bound` or `unbound`, with each test's categories);
      - `dependencies`;
      - `freshness` (the strictest of the requirement policy and the category policies);
@@ -118,6 +120,15 @@ A requirement-level PASS, or a passing test bound to another obligation, verifie
 **Verdict precedence:** INVALID (also forced by any integrity problem or any `TEST-MAPPING` diagnostic), then FAILED, then BLOCKED, then INCOMPLETE (including UNBOUND and UNVERIFIED), then ACCEPTED.
 
 The Rehearsal 4 replay against revision 2 is recorded in `requirements-compiled/v2/readiness/evidence/r4-verification-plan-replay.json`; the v1 replay stays in `requirements-compiled/v1/readiness/evidence/`. Validation against the R4 and R5 baselines is in `requirements-compiled/v2/readiness/evidence/r4-r5-baseline-validation.json`.
+
+## Process, reviewer and owner evidence
+
+`praxis:<record kind>` bindings (kinds `process`, `owner`, and `review` for `praxis:independent-review`) are producers,
+not ledger tests: `verify-plan` never expects them in a ledger row. They are decided by
+`requirements-compiler verify-process` from the rehearsal's Praxis log. `verify-plan` takes the same inputs with a
+`--process-` prefix, computes that assessment itself for its own plan and trusted candidate, and counts the categories
+it verified; it never reads an assessment file. See
+[PROCESS-EVIDENCE-AND-READINESS.md](PROCESS-EVIDENCE-AND-READINESS.md).
 
 ## Consuming the plan before implementation
 

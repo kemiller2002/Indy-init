@@ -5,8 +5,8 @@ Version 2 of the compiled requirements package. It is cut for one change, **exec
 |   |   |
 |---|---|
 | Source | kemiller2002/indy-init `aab8f80c7743392e794b3b631542903ed4ed6f64`, baseline `BL-CAUSA-INDY-INIT-aab8f80c7743` (sha256 `621e2f96…57b9`), the same as v1 |
-| Curation | v1's curation, unchanged except the description in `curation/verification-plan.json`, plus the new table `curation/evidence-categories.json` |
-| Verification plan | `VP-6b0f59cee664` (digest `6b0f59ce…a2f9`): 108 P0 requirements, 326 obligations, each with an acceptance contract; 0 unclassified, 0 bound, 0 verified |
+| Curation | v1's curation, unchanged except the description and the freshness policy `FP-PROCESS-THIS-RUN` in `curation/verification-plan.json`, plus the table `curation/evidence-categories.json` |
+| Verification plan | `VP-06f6d4ef5deb` (digest `06f6d4ef…72a4`): 108 P0 requirements, 326 obligations, each with an acceptance contract; 0 unclassified, 0 bound, 0 verified. Earlier v2 identity: `VP-6b0f59cee664`, before the process and owner evidence classes (see below) |
 | Schema | `indy-init.verification-plan/1`, revision 2 (additive; see below) |
 | Compilation verdict | PASS (V01–V18). Rehearsal readiness: READY, as in v1 |
 
@@ -36,7 +36,7 @@ Each obligation in `verification-plan.json` keeps every revision-1 member. It al
 
 ### Categories come from a table, not from code
 
-`curation/evidence-categories.json` lists 14 rules. Each one names the existing requirement data it rests on: a verification rule id, a gate, a document, a requirement selector, a title pattern, an obligation kind, an obligation id or a freshness policy. Each rule also cites its source verbatim. An obligation requires the union of the categories of every rule that applies to it.
+`curation/evidence-categories.json` lists 22 rules. Each one names the existing requirement data it rests on: a verification rule id, a gate, a document, a requirement selector, a title pattern, an obligation kind, an obligation id or a freshness policy. Each rule also cites its source verbatim. An obligation requires the union of the categories of every rule that applies to it.
 
 An obligation that no rule reaches is `unclassified`. It is reported as missing coverage and is never given a default.
 
@@ -52,12 +52,27 @@ At this baseline the measured distribution, by obligation, is:
 | live-provider | 91 |
 | independent-acceptance | 62 |
 | security | 6 |
+| process-record | 25 |
+| owner-decision | 3 |
 | unit | 0 |
 
 No P0 obligation is satisfied by unit evidence alone. This is the Rehearsal 5 `5dcb91e` lesson: engine tests do not prove UI, provider or live obligations.
 
+### Evidence classes (Priority One and Two of the development speed optimization)
+
+Every category also states its **evidence class** and **producer** (`evidenceProducers` in each contract):
+application-test (unit, integration, browser, live-provider, security, accessibility), reviewer
+(independent-acceptance), process (`process-record`) and owner (`owner-decision`). The two new categories, their eight
+rules and the policy `FP-PROCESS-THIS-RUN` were added to v2 in place: no rehearsal freeze record names v2 (Rehearsal 5
+froze v1), so the rule above does not require a v3. No existing rule changed; the change only adds required categories.
+Process and owner categories are proven by Praxis records through `verify-process`, never by an application test, and
+`plan-readiness` blocks implementation while any mandatory mapping is unresolved. See
+[`docs/PROCESS-EVIDENCE-AND-READINESS.md`](../../docs/PROCESS-EVIDENCE-AND-READINESS.md).
+`proposals/process-bindings.proposed.json` is an agent proposal for the owner, not part of the compiled curation.
+
 ## How agents consume the plan before implementation
 
+0. **Run the gate.** `requirements-compiler plan-readiness --plan … [--rules FROZEN-READINESS-RULES]` must be READY before implementation starts.
 1. **Pin the plan.** Pin it by `planIdentity.digest`; Ordo reads it unchanged (it ignores unknown members).
 2. **Read each obligation's contract before writing code.** `requiredEvidenceCategories` is what the obligation's tests must prove, and `freshness.policy` is how fresh that proof must be.
 3. **Bind tests before claiming them.** For each obligation, the owner adds a binding to `curation/verification-plan.json` `testBindings` and recompiles; agents do not write approvals (RDP-003). A binding has the form `{obligation, tests: [{id, kind, categories}]}` and names only the categories the test fully proves for that obligation. A test that proves only part of an obligation is bound with only those categories; it is not tagged as proving the whole obligation.

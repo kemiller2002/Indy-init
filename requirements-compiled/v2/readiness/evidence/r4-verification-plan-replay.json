@@ -2,9 +2,9 @@
   "schema": "indy-init.verification-replay-evidence/1",
   "purpose": "Phase Eight: the verifier pipeline (compute-acceptance-verdict.py unmodified, plus the verification-plan assessment against requirements-compiled/v2) re-run over the frozen Rehearsal 4 candidate evidence, with negative controls on temporary copies",
   "plan": {
-    "planId": "VP-6b0f59cee664",
+    "planId": "VP-06f6d4ef5deb",
     "algorithm": "sha256",
-    "digest": "6b0f59cee66487a9d1b61851e8e12ec4584af11d4b443825df5cc596ab37a2f9",
+    "digest": "06f6d4ef5deb3f36ef55d5dde7f7d1b7ab0e6ca807ab769f606d5bb3754872a4",
     "covers": "sha256 of the plan serialized by the compiler's canonical writer (ASCII JSON, two-space indent, trailing newline) with planIdentity removed"
   },
   "candidate": {
@@ -379,8 +379,8 @@
   "publishedAssessment": {
     "schema": "indy-init.verification-plan-assessment/1",
     "plan": {
-      "planId": "VP-6b0f59cee664",
-      "digest": "6b0f59cee66487a9d1b61851e8e12ec4584af11d4b443825df5cc596ab37a2f9"
+      "planId": "VP-06f6d4ef5deb",
+      "digest": "06f6d4ef5deb3f36ef55d5dde7f7d1b7ab0e6ca807ab769f606d5bb3754872a4"
     },
     "candidate": {
       "sourceSha": "ab08b764daddde9e978a78fef957d9ae01505c6a",
@@ -4152,12 +4152,17 @@
             "status": "NOT_RUN",
             "verificationStatus": "unverified",
             "requiredEvidenceCategories": [
-              "independent-acceptance"
+              "independent-acceptance",
+              "process-record"
             ],
             "coveredEvidenceCategories": [],
             "missingCoverage": [
               {
                 "category": "independent-acceptance",
+                "reason": "no-bound-test"
+              },
+              {
+                "category": "process-record",
                 "reason": "no-bound-test"
               }
             ]
@@ -4168,12 +4173,17 @@
             "status": "NOT_RUN",
             "verificationStatus": "unverified",
             "requiredEvidenceCategories": [
-              "independent-acceptance"
+              "independent-acceptance",
+              "process-record"
             ],
             "coveredEvidenceCategories": [],
             "missingCoverage": [
               {
                 "category": "independent-acceptance",
+                "reason": "no-bound-test"
+              },
+              {
+                "category": "process-record",
                 "reason": "no-bound-test"
               }
             ]
@@ -4300,12 +4310,17 @@
             "status": "NOT_RUN",
             "verificationStatus": "unverified",
             "requiredEvidenceCategories": [
-              "independent-acceptance"
+              "independent-acceptance",
+              "owner-decision"
             ],
             "coveredEvidenceCategories": [],
             "missingCoverage": [
               {
                 "category": "independent-acceptance",
+                "reason": "no-bound-test"
+              },
+              {
+                "category": "owner-decision",
                 "reason": "no-bound-test"
               }
             ]
@@ -4459,12 +4474,17 @@
             "status": "NOT_RUN",
             "verificationStatus": "unverified",
             "requiredEvidenceCategories": [
-              "independent-acceptance"
+              "independent-acceptance",
+              "process-record"
             ],
             "coveredEvidenceCategories": [],
             "missingCoverage": [
               {
                 "category": "independent-acceptance",
+                "reason": "no-bound-test"
+              },
+              {
+                "category": "process-record",
                 "reason": "no-bound-test"
               }
             ]
@@ -4475,12 +4495,17 @@
             "status": "NOT_RUN",
             "verificationStatus": "unverified",
             "requiredEvidenceCategories": [
-              "independent-acceptance"
+              "independent-acceptance",
+              "process-record"
             ],
             "coveredEvidenceCategories": [],
             "missingCoverage": [
               {
                 "category": "independent-acceptance",
+                "reason": "no-bound-test"
+              },
+              {
+                "category": "process-record",
                 "reason": "no-bound-test"
               }
             ]
@@ -4600,12 +4625,17 @@
             "status": "NOT_RUN",
             "verificationStatus": "unverified",
             "requiredEvidenceCategories": [
-              "independent-acceptance"
+              "independent-acceptance",
+              "process-record"
             ],
             "coveredEvidenceCategories": [],
             "missingCoverage": [
               {
                 "category": "independent-acceptance",
+                "reason": "no-bound-test"
+              },
+              {
+                "category": "process-record",
                 "reason": "no-bound-test"
               }
             ]
@@ -4628,12 +4658,17 @@
             "status": "NOT_RUN",
             "verificationStatus": "unverified",
             "requiredEvidenceCategories": [
-              "independent-acceptance"
+              "independent-acceptance",
+              "process-record"
             ],
             "coveredEvidenceCategories": [],
             "missingCoverage": [
               {
                 "category": "independent-acceptance",
+                "reason": "no-bound-test"
+              },
+              {
+                "category": "process-record",
                 "reason": "no-bound-test"
               }
             ]
@@ -4644,12 +4679,17 @@
             "status": "NOT_RUN",
             "verificationStatus": "unverified",
             "requiredEvidenceCategories": [
-              "independent-acceptance"
+              "independent-acceptance",
+              "process-record"
             ],
             "coveredEvidenceCategories": [],
             "missingCoverage": [
               {
                 "category": "independent-acceptance",
+                "reason": "no-bound-test"
+              },
+              {
+                "category": "process-record",
                 "reason": "no-bound-test"
               }
             ]
@@ -4852,12 +4892,17 @@
             "status": "NOT_RUN",
             "verificationStatus": "unverified",
             "requiredEvidenceCategories": [
-              "independent-acceptance"
+              "independent-acceptance",
+              "process-record"
             ],
             "coveredEvidenceCategories": [],
             "missingCoverage": [
               {
                 "category": "independent-acceptance",
+                "reason": "no-bound-test"
+              },
+              {
+                "category": "process-record",
                 "reason": "no-bound-test"
               }
             ]
@@ -4868,12 +4913,17 @@
             "status": "NOT_RUN",
             "verificationStatus": "unverified",
             "requiredEvidenceCategories": [
-              "independent-acceptance"
+              "independent-acceptance",
+              "process-record"
             ],
             "coveredEvidenceCategories": [],
             "missingCoverage": [
               {
                 "category": "independent-acceptance",
+                "reason": "no-bound-test"
+              },
+              {
+                "category": "process-record",
                 "reason": "no-bound-test"
               }
             ]
@@ -4884,12 +4934,17 @@
             "status": "NOT_RUN",
             "verificationStatus": "unverified",
             "requiredEvidenceCategories": [
-              "independent-acceptance"
+              "independent-acceptance",
+              "process-record"
             ],
             "coveredEvidenceCategories": [],
             "missingCoverage": [
               {
                 "category": "independent-acceptance",
+                "reason": "no-bound-test"
+              },
+              {
+                "category": "process-record",
                 "reason": "no-bound-test"
               }
             ]
@@ -5047,12 +5102,17 @@
             "status": "NOT_RUN",
             "verificationStatus": "unverified",
             "requiredEvidenceCategories": [
-              "independent-acceptance"
+              "independent-acceptance",
+              "owner-decision"
             ],
             "coveredEvidenceCategories": [],
             "missingCoverage": [
               {
                 "category": "independent-acceptance",
+                "reason": "no-bound-test"
+              },
+              {
+                "category": "owner-decision",
                 "reason": "no-bound-test"
               }
             ]
@@ -5063,12 +5123,17 @@
             "status": "NOT_RUN",
             "verificationStatus": "unverified",
             "requiredEvidenceCategories": [
-              "independent-acceptance"
+              "independent-acceptance",
+              "owner-decision"
             ],
             "coveredEvidenceCategories": [],
             "missingCoverage": [
               {
                 "category": "independent-acceptance",
+                "reason": "no-bound-test"
+              },
+              {
+                "category": "owner-decision",
                 "reason": "no-bound-test"
               }
             ]
@@ -7178,7 +7243,8 @@
             "verificationStatus": "unverified",
             "requiredEvidenceCategories": [
               "integration",
-              "live-provider"
+              "live-provider",
+              "process-record"
             ],
             "coveredEvidenceCategories": [],
             "missingCoverage": [
@@ -7188,6 +7254,10 @@
               },
               {
                 "category": "live-provider",
+                "reason": "no-bound-test"
+              },
+              {
+                "category": "process-record",
                 "reason": "no-bound-test"
               }
             ]
@@ -9383,7 +9453,8 @@
             "verificationStatus": "unverified",
             "requiredEvidenceCategories": [
               "browser",
-              "accessibility"
+              "accessibility",
+              "process-record"
             ],
             "coveredEvidenceCategories": [],
             "missingCoverage": [
@@ -9393,6 +9464,10 @@
               },
               {
                 "category": "accessibility",
+                "reason": "no-bound-test"
+              },
+              {
+                "category": "process-record",
                 "reason": "no-bound-test"
               }
             ]
@@ -10118,7 +10193,8 @@
             "verificationStatus": "unverified",
             "requiredEvidenceCategories": [
               "browser",
-              "accessibility"
+              "accessibility",
+              "process-record"
             ],
             "coveredEvidenceCategories": [],
             "missingCoverage": [
@@ -10128,6 +10204,10 @@
               },
               {
                 "category": "accessibility",
+                "reason": "no-bound-test"
+              },
+              {
+                "category": "process-record",
                 "reason": "no-bound-test"
               }
             ]
@@ -10607,7 +10687,8 @@
             "requiredEvidenceCategories": [
               "browser",
               "accessibility",
-              "independent-acceptance"
+              "independent-acceptance",
+              "process-record"
             ],
             "coveredEvidenceCategories": [],
             "missingCoverage": [
@@ -10621,6 +10702,10 @@
               },
               {
                 "category": "independent-acceptance",
+                "reason": "no-bound-test"
+              },
+              {
+                "category": "process-record",
                 "reason": "no-bound-test"
               }
             ]
@@ -10643,12 +10728,17 @@
             "status": "NOT_RUN",
             "verificationStatus": "unverified",
             "requiredEvidenceCategories": [
-              "integration"
+              "integration",
+              "process-record"
             ],
             "coveredEvidenceCategories": [],
             "missingCoverage": [
               {
                 "category": "integration",
+                "reason": "no-bound-test"
+              },
+              {
+                "category": "process-record",
                 "reason": "no-bound-test"
               }
             ]
@@ -10659,12 +10749,17 @@
             "status": "NOT_RUN",
             "verificationStatus": "unverified",
             "requiredEvidenceCategories": [
-              "integration"
+              "integration",
+              "process-record"
             ],
             "coveredEvidenceCategories": [],
             "missingCoverage": [
               {
                 "category": "integration",
+                "reason": "no-bound-test"
+              },
+              {
+                "category": "process-record",
                 "reason": "no-bound-test"
               }
             ]
@@ -10675,12 +10770,17 @@
             "status": "NOT_RUN",
             "verificationStatus": "unverified",
             "requiredEvidenceCategories": [
-              "integration"
+              "integration",
+              "process-record"
             ],
             "coveredEvidenceCategories": [],
             "missingCoverage": [
               {
                 "category": "integration",
+                "reason": "no-bound-test"
+              },
+              {
+                "category": "process-record",
                 "reason": "no-bound-test"
               }
             ]
@@ -10703,12 +10803,17 @@
             "status": "NOT_RUN",
             "verificationStatus": "unverified",
             "requiredEvidenceCategories": [
-              "integration"
+              "integration",
+              "process-record"
             ],
             "coveredEvidenceCategories": [],
             "missingCoverage": [
               {
                 "category": "integration",
+                "reason": "no-bound-test"
+              },
+              {
+                "category": "process-record",
                 "reason": "no-bound-test"
               }
             ]
@@ -10719,12 +10824,17 @@
             "status": "NOT_RUN",
             "verificationStatus": "unverified",
             "requiredEvidenceCategories": [
-              "integration"
+              "integration",
+              "process-record"
             ],
             "coveredEvidenceCategories": [],
             "missingCoverage": [
               {
                 "category": "integration",
+                "reason": "no-bound-test"
+              },
+              {
+                "category": "process-record",
                 "reason": "no-bound-test"
               }
             ]
@@ -10735,12 +10845,17 @@
             "status": "NOT_RUN",
             "verificationStatus": "unverified",
             "requiredEvidenceCategories": [
-              "integration"
+              "integration",
+              "process-record"
             ],
             "coveredEvidenceCategories": [],
             "missingCoverage": [
               {
                 "category": "integration",
+                "reason": "no-bound-test"
+              },
+              {
+                "category": "process-record",
                 "reason": "no-bound-test"
               }
             ]
@@ -10762,12 +10877,17 @@
             "status": "FAIL",
             "verificationStatus": "unverified",
             "requiredEvidenceCategories": [
-              "integration"
+              "integration",
+              "process-record"
             ],
             "coveredEvidenceCategories": [],
             "missingCoverage": [
               {
                 "category": "integration",
+                "reason": "no-bound-test"
+              },
+              {
+                "category": "process-record",
                 "reason": "no-bound-test"
               }
             ]
@@ -10778,12 +10898,17 @@
             "status": "FAIL",
             "verificationStatus": "unverified",
             "requiredEvidenceCategories": [
-              "integration"
+              "integration",
+              "process-record"
             ],
             "coveredEvidenceCategories": [],
             "missingCoverage": [
               {
                 "category": "integration",
+                "reason": "no-bound-test"
+              },
+              {
+                "category": "process-record",
                 "reason": "no-bound-test"
               }
             ]
@@ -10854,12 +10979,17 @@
             "status": "NOT_RUN",
             "verificationStatus": "unverified",
             "requiredEvidenceCategories": [
-              "integration"
+              "integration",
+              "process-record"
             ],
             "coveredEvidenceCategories": [],
             "missingCoverage": [
               {
                 "category": "integration",
+                "reason": "no-bound-test"
+              },
+              {
+                "category": "process-record",
                 "reason": "no-bound-test"
               }
             ]
@@ -11073,12 +11203,17 @@
             "status": "NOT_RUN",
             "verificationStatus": "unverified",
             "requiredEvidenceCategories": [
-              "integration"
+              "integration",
+              "process-record"
             ],
             "coveredEvidenceCategories": [],
             "missingCoverage": [
               {
                 "category": "integration",
+                "reason": "no-bound-test"
+              },
+              {
+                "category": "process-record",
                 "reason": "no-bound-test"
               }
             ]
@@ -11089,12 +11224,17 @@
             "status": "NOT_RUN",
             "verificationStatus": "unverified",
             "requiredEvidenceCategories": [
-              "integration"
+              "integration",
+              "process-record"
             ],
             "coveredEvidenceCategories": [],
             "missingCoverage": [
               {
                 "category": "integration",
+                "reason": "no-bound-test"
+              },
+              {
+                "category": "process-record",
                 "reason": "no-bound-test"
               }
             ]

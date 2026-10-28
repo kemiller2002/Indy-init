@@ -1,0 +1,11 @@
+{
+  "schema": "indy-init.owner-attestations/1",
+  "runId": "9000000001",
+  "candidate": "fad440a5f2752a1eca67f9d4d02e9cc1dddcb1c2",
+  "attestations": [
+    { "type": "github-review", "reference": "kemiller2002/simulated-rehearsal#1@1001", "login": "kemiller2002", "state": "APPROVED", "decisions": [ { "id": "DEC-SIM-001", "paths": ["src/engine/Replay.fs"] } ], "commit": "fad440a5f2752a1eca67f9d4d02e9cc1dddcb1c2", "submittedAt": "2026-10-28T08:02:29.352Z" },
+    { "type": "github-review", "reference": "kemiller2002/simulated-rehearsal#4@4001", "login": "kemiller2002", "state": "APPROVED", "decisions": ["DEC-SIM-KICKOFF"], "commit": "fad440a5f2752a1eca67f9d4d02e9cc1dddcb1c2", "submittedAt": "2026-10-28T08:02:29.354Z" },
+    { "type": "github-review", "reference": "kemiller2002/simulated-rehearsal#2@2001", "login": "example-reviewer", "state": "APPROVED", "commit": "fad440a5f2752a1eca67f9d4d02e9cc1dddcb1c2", "submittedAt": "2026-10-28T08:02:29.356Z" },
+    { "type": "github-review", "reference": "kemiller2002/simulated-rehearsal#3@3001", "login": "kemiller2002", "state": "APPROVED", "decisions": ["final-disposition"], "commit": "fad440a5f2752a1eca67f9d4d02e9cc1dddcb1c2", "submittedAt": "2026-10-28T08:02:29.358Z" }
+  ]
+}

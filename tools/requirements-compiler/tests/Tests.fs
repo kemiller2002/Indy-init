@@ -326,7 +326,8 @@ type private Candidate =
     { Plan: Json
       Ledger: Json
       Manifest: Json
-      Evidence: Map<string, Json> }
+      Evidence: Map<string, Json>
+      Process: Map<string, Set<string>> }
 
 let private candidateSha = "1111111111111111111111111111111111111111"
 let private runId = "run-eii-c-1"
@@ -344,7 +345,8 @@ let private assessCandidate (i: VerificationPlan.Inputs) (approvalsRaw: byte[]) 
           ReadEvidence = fun p -> files.TryFind p
           TrustedSourceSha = candidateSha
           ApprovalsRaw = approvalsRaw
-          TrustedOperators = [ "kemiller2002" ] }
+          TrustedOperators = [ "kemiller2002" ]
+          ProcessCovered = c.Process }
 
 /// Re-pins every manifest entry to the evidence as it now is (a producer that re-hashed what it wrote).
 let private repinAll (c: Candidate) =
@@ -478,7 +480,7 @@ let private contractTests (source: string) : string list =
         let binding o (tests: Json list) = JObj [ "obligation", JStr o; "tests", JArr tests ]
         let t id kind cats = JObj [ "id", JStr id; "kind", JStr kind; "categories", jstrs cats ]
         let spec =
-            (ver001 |> List.map (fun o -> binding o [ t (testId o) "deterministic" [ "integration" ] ]))
+            (ver001 |> List.map (fun o -> binding o [ t (testId o) "deterministic" [ "integration" ]; t "praxis:release-selection" "process" [ "process-record" ] ]))
             @ (ui011 |> List.map (fun o -> binding o [ t (unitId o) "deterministic" [ "unit" ] ]))
         let i = withSpec i0 "testBindings" (JArr spec)
         let plan = VerificationPlan.build i
@@ -521,7 +523,9 @@ let private contractTests (source: string) : string list =
                   Evidence =
                     Map.ofList
                         [ "evidence/VER-001.json", evidenceFor "VER-001" (ver001 |> List.map (fun o -> o, [ testId o ]))
-                          "evidence/UI-011.json", evidenceFor "UI-011" (ui011 |> List.map (fun o -> o, [ unitId o ])) ] }
+                          "evidence/UI-011.json", evidenceFor "UI-011" (ui011 |> List.map (fun o -> o, [ unitId o ])) ]
+                  // verify-process found a qualifying release selection for the candidate (decided by ProcessVerification)
+                  Process = ver001 |> List.map (fun o -> vpo "VER-001" o, set [ "process-record" ]) |> Map.ofList }
         let run c = assessCandidate i approvalsRaw c
         let statusOf rid (a: Json) = arr "requirements" a |> List.find (fun r -> str "requirement" r = rid) |> str "status"
         let obligationOf rid o (a: Json) = arr "requirements" a |> List.find (fun r -> str "requirement" r = rid) |> arr "obligations" |> List.find (fun x -> str "sourceObligation" x = o)
@@ -582,6 +586,18 @@ let private contractTests (source: string) : string list =
     fields @ unclassified @ bindingChecks @ planControls @ checker |> List.map (sprintf "acceptance contract: %s")
 
 // ---- offline tests -----------------------------------------------------------------------------
+
+/// The plan compiled from the committed curation with other testBindings (for proposals that are not approved).
+let private planWithBindings (source: string) (bindings: Json) =
+    let committed = File.ReadAllText(Path.Combine(source, "requirements", "causa-requirements-baseline.json"))
+    VerificationPlan.build (withSpec (planInputs source committed) "testBindings" bindings)
+
+let private processSimulation (source: string) = ProcessTests.simulation source (planWithBindings source)
+
+let private producerBindings (source: string) =
+    let committed = File.ReadAllText(Path.Combine(source, "requirements", "causa-requirements-baseline.json"))
+    let i = planInputs source committed
+    ProcessTests.producerBindingControls (fun bindings -> VerificationPlan.problems (withSpec i "testBindings" bindings))
 
 let private offline (source: string) : string list =
     let committedPath = Path.Combine(source, "requirements", "causa-requirements-baseline.json")
@@ -680,7 +696,27 @@ let main argv =
         | Error e ->
             eprintfn "%s" e
             2
-        | Ok o -> report (offline o.Source) "offline tests (baseline equivalence, baseline units, preflight verdict, verification plan, acceptance contracts)"
+        | Ok o ->
+            let processFailures = snd (processSimulation o.Source) @ producerBindings o.Source
+            report (offline o.Source @ processFailures) "offline tests (baseline equivalence, baseline units, preflight verdict, verification plan, acceptance contracts, process evidence)"
+    | "--readiness-replay" :: rest ->
+        match rest with
+        | [ "--source"; source; "--r5"; r5; "--out"; out ] ->
+            let evidence, failures = ProcessTests.readinessReplay source r5 (planWithBindings source)
+            File.WriteAllText(out, serialize evidence)
+            report failures "readiness replay"
+        | _ ->
+            eprintfn "usage: --readiness-replay --source DIR --r5 DIR --out FILE"
+            2
+    | "--process-simulation" :: rest ->
+        match rest with
+        | [ "--source"; source; "--out"; out ] ->
+            let evidence, failures = processSimulation source
+            File.WriteAllText(out, serialize evidence)
+            report failures "process evidence simulation"
+        | _ ->
+            eprintfn "usage: --process-simulation --source DIR --out FILE"
+            2
     | args ->
         match Program.parseArgs args Program.defaults with
         | Error e ->
