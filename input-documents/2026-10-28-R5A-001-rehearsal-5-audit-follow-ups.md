@@ -33,3 +33,25 @@ Evidence: [`docs/rehearsal-005-implementation-audit/`](../docs/rehearsal-005-imp
 - Each item has a derived record that names this input in `derived_from`.
 - Owner decisions (R5A-001-11) are recorded by the owner, not transcribed by an agent (RDP-003).
 - Items for other repositories are routed through each owner's documented Praxis input path.
+
+## Decision records (2026-10-28)
+
+The owner's answers are recorded in [`kickoff/rehearsal-006/owner-decisions.json`](../kickoff/rehearsal-006/owner-decisions.json), readable copy [`OWNER-DECISIONS.md`](../kickoff/rehearsal-006/OWNER-DECISIONS.md).
+
+- **Provenance:** an agent transcribed the owner's instruction ("Do what you recommend to get it started"). Under RDP-003 the decisions take effect only when the owner merges the pull request that adds them.
+- **Not a pass:** recording a decision does not mark any obligation passed.
+
+| Item | Decision record | Effect |
+|---|---|---|
+| R5A-001-01, -02, -03 | DEC-R6-008 | Kickoff work in the Rehearsal 6 repository |
+| R5A-001-04 | DEC-R6-008 | Preflight work. Implemented: `verify-plan --review-tag-changes` |
+| R5A-001-05 | DEC-R6-008 | Preflight work. Implemented: UI-015-O2 is derived in plan v3 |
+| R5A-001-08 | DEC-R6-001 | DEC-025 revised. PF-015-O1/O2 and EXT-DATA-005-O1 stay as written. Rehearsal 6 implements anonymous read-only catalog access and real permission checks |
+| R5A-001-10 | DEC-R6-002 | UI-016-O11's 3:1 applies to amber indicators |
+| R5A-001-11 | DEC-R6-003, DEC-R6-004 | UI-031-O5 and AR-019-O3 are amended by operator approvals APR-R6-003 and APR-R6-004 |
+| AR-031 | DEC-R6-006 | S16 NOT-APPLICABLE; S01–S15 and S17–S25 in scope |
+
+No decision record covers R5A-001-06, -07 or -09:
+
+- **-07:** implemented in tooling.
+- **-06 and -09:** still need a disposition. See `docs/rehearsal-006/PREFLIGHT.md`.
