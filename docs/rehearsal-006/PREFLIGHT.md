@@ -1,6 +1,6 @@
 # Rehearsal 006 preflight
 
-First run on 2026-10-28 against Indy-init `856157a`, echelon-current **1.32.0** and `kemiller2002/indy-init-rehearsal-006` at `65e346e`. Re-evaluated the same day after the owner decisions (DEC-R6-001..010) and the independent scope review.
+First run on 2026-10-28 against Indy-init `856157a`, echelon-current **1.32.0** and `kemiller2002/indy-init-rehearsal-006` at `65e346e`. Re-evaluated the same day after the owner decisions (DEC-R6-001..013) and the independent scope review.
 
 Machine-readable results, with every stage's evidence, findings and blockers: [`preflight.json`](preflight.json).
 
@@ -24,9 +24,9 @@ Engineering toolchain:             PASS
 WebAssembly diagnostics:           PASS
 CI and deployment:                 NOT_RUN (kickoff obligation, by the owner's decision)
 Acceptance infrastructure:         PASS
-Baseline freeze:                   BLOCKED
-Independent scope review:          BLOCKED (performed, no blocking findings; not attested)
-Overall readiness:                 BLOCKED
+Baseline freeze:                   PASS (frozen 2026-10-28)
+Independent scope review:          DEVIATION (performed, no blocking findings; not attested, DEC-R6-012)
+Overall readiness:                 READY WITH DEVIATION (start authorized, DEC-R6-013)
 ```
 
 ## Owner decisions
@@ -36,17 +36,13 @@ Recorded in [`kickoff/rehearsal-006/OWNER-DECISIONS.md`](../../kickoff/rehearsal
 - **Provenance:** an agent transcribed them on the owner's instruction. The owner did not edit those files.
 - **When they take effect:** when the pull request that adds them merges.
 
-## What still blocks readiness
+## How the last blockers were settled (owner, 2026-10-28)
 
-1. **Operator approval records for DEC-R6-003 and DEC-R6-004.** The owner decided to amend UI-031-O5 (no role model in a single-user application) and AR-019-O3 (any authoritative non-accepting verdict). Under RDP-003 only the operator may write the approval records that apply an amendment.
-   - An agent-written file did exist, but it violated RDP-003 (review finding SR-01) and has been withdrawn.
-   - Until the owner writes the records, the plan verifies both obligations as written. The current verifier cannot meet AR-019-O3's literal "BLOCKED".
-   - Once the records exist, the plan is recompiled and the kickoff pins move.
-2. **The owner's attestation of the independent scope review.**
-   - The reviewer was a fresh-context agent that did not author the work. It found no blocking issue: 4 major and 11 minor findings, each dispositioned in `preflight.json` stage 18.
-   - It counts as the independent review only when `kemiller2002` attests it with a GitHub review of the pull request.
-
-Stage 17, the freeze, waits on both.
+- **DEC-R6-011, "Proceed as written":** no approval records are written, so the UI-031-O5 and AR-019-O3 amendments are not applied and both obligations stay as written.
+  - The current verifier refuses Rehearsal 3 as INVALID or FAIL, not with the literal BLOCKED, so AR-019-O3 is expected not to verify.
+- **DEC-R6-012, "Proceed unattested":** the independent scope review was performed and found no blocking issue, but it is not attested by the owner.
+  - This is recorded as a deviation from the readiness rule, not a PASS.
+- **DEC-R6-013, "Start the rehearsal":** the owner authorizes the timed rehearsal.
 
 ## Kickoff obligations
 
@@ -77,12 +73,12 @@ These count against the seven-hour window. Moving them to kickoff does not remov
 | What | Value |
 |---|---|
 | Baseline | `BL-CAUSA-INDY-INIT-856157a78d47`, sha256 `40599abe…befd` (`requirements/causa-requirements-baseline-r6.json`) |
-| Plan | `VP-8ef1c8dca656`. It changes once the operator approval records are applied |
+| Plan | `VP-8ef1c8dca656` (UI-031-O5 and AR-019-O3 as written, DEC-R6-011) |
 | Process rules | sha256 `6f164353…e17c` |
 | Stack | echelon-current 1.32.0 |
 | Rehearsal repository | initial `65e346e` |
 | Data | `historical-v1` at causa-data `dcb8cb9` (DEC-R6-007) |
-| Owner decisions | DEC-R6-001..010 |
+| Owner decisions | DEC-R6-001..013 |
 | Acceptance job pin | the Indy-init merge commit of this pull request |
 | Deployment target | GitHub Pages, configured at kickoff |
 

@@ -3,11 +3,8 @@
   "rehearsal": "006",
   "generatedAt": "2026-10-28",
   "indyInitCommit": "856157a78d47946d264ec49ee8325fcf996ae9b9",
-  "overall": "BLOCKED",
-  "blockingStages": [
-    17,
-    18
-  ],
+  "overall": "READY_WITH_DEVIATION",
+  "blockingStages": [],
   "ownerDecisions": [
     {
       "date": "2026-10-28",
@@ -812,21 +809,18 @@
     {
       "stage": 17,
       "name": "Freeze the baseline",
-      "result": "BLOCKED",
+      "result": "PASS",
       "mandatory": true,
       "evidence": [],
       "findings": [
-        "Values that would be frozen are under records.freeze; nothing is frozen while stage 18 is BLOCKED and the operator approval records for DEC-R6-003/004 are missing"
+        "Frozen on 2026-10-28 under DEC-R6-011 (amendments not applied; plan VP-8ef1c8dca656 as built) and DEC-R6-012 (review unattested, deviation). Values: records.freeze"
       ],
-      "blockers": [
-        "Stage 18: the owner's attestation of the independent scope review",
-        "Operator approval records for the UI-031-O5 and AR-019-O3 amendments (DEC-R6-003, DEC-R6-004). An agent may not write them (RDP-003). Without them the plan verifies both obligations as written, and AR-019-O3's literal BLOCKED cannot be met by the current verifier"
-      ]
+      "blockers": []
     },
     {
       "stage": 18,
       "name": "Independent scope review",
-      "result": "BLOCKED",
+      "result": "DEVIATION",
       "mandatory": true,
       "mandatoryBasis": "Owner's script, section 20: READY only when the independent scope review is complete",
       "review": {
@@ -853,9 +847,8 @@
         "SR-14": "accepted: AR-031-O2 is proven by independent acceptance; its decision exists before kickoff (DEC-R6-006)",
         "SR-15": "noted: commits after f8b1a2c are covered by this disposition list, not by the review"
       },
-      "blockers": [
-        "The owner's GitHub review attesting the scope review is missing"
-      ]
+      "blockers": [],
+      "deviation": "Owner decision DEC-R6-012 (\"Proceed unattested\"): the review was performed (NO_BLOCKING_FINDINGS) but is NOT_ATTESTED. That is a deviation from the readiness rule (owner script section 20, item 5), not a PASS."
     }
   ],
   "records": {
@@ -1053,12 +1046,12 @@
     },
     "freeze": {
       "baseline": "BL-CAUSA-INDY-INIT-856157a78d47 (sha256 40599abe92724dae6796ee0d6a9bf5711c4db882fc79c77b38a43d0f0960befd)",
-      "plan": "VP-8ef1c8dca656 (digest 8ef1c8dca656e515f63ff287d560a9b76ffbaffc0e5fa27d81f6637b3aa46e41); it changes once the operator approval records are applied",
+      "plan": "VP-8ef1c8dca656 (digest 8ef1c8dca656e515f63ff287d560a9b76ffbaffc0e5fa27d81f6637b3aa46e41); UI-031-O5 and AR-019-O3 as written (DEC-R6-011)",
       "processRules": "sha256 6f16435369a046e534e4787903ea96c4a9f7e0adcf7b5b51d4ea15ac156be17c",
       "stack": "echelon-current 1.32.0",
       "rehearsalRepository": "initial 65e346e",
       "dataset": "historical-v1 at causa-data dcb8cb9 (DEC-R6-007)",
-      "ownerDecisions": "kickoff/rehearsal-006/owner-decisions.json (DEC-R6-001..010)",
+      "ownerDecisions": "kickoff/rehearsal-006/owner-decisions.json (DEC-R6-001..013)",
       "acceptanceJobPin": "the Indy-init merge commit of this pull request"
     }
   },
@@ -1086,5 +1079,14 @@
       13,
       14
     ]
+  },
+  "deviations": [
+    "Stage 18: independent scope review not attested by the owner (DEC-R6-012)",
+    "AR-019-O3 is expected not to verify: the verifier yields INVALID or FAIL for Rehearsal 3, not the literal BLOCKED (DEC-R6-011)"
+  ],
+  "startAuthorization": {
+    "decision": "DEC-R6-013",
+    "ownerWords": "Start the rehearsal",
+    "date": "2026-10-28"
   }
 }

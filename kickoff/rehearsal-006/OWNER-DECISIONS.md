@@ -31,6 +31,9 @@ The machine-readable record is [`owner-decisions.json`](owner-decisions.json). T
 | DEC-R6-007 | Four investigations or three | **B**, three (`historical-v1`) | The waiver stands. Preflight stages 7–10 stay waived. |
 | DEC-R6-008 | R5A-001-01..05 dispositions | As recommended | 01–03 are kickoff work. 04 and 05 are preflight work, now implemented. |
 | DEC-R6-010 | PF-015-O2's read-only token against the live write tests (scope review SR-10) | As recommended ("I approve all recommendations and necessary merges going forward") | Two secrets. `CAUSA_GITHUB_TOKEN` is read-only and least-privilege, as PF-015-O2 says, for the authenticated read tests. `CAUSA_WRITE_TOKEN` is fine-grained to `contents:write` on the test repository only, for the live write tests. No obligation changes. |
+| DEC-R6-011 | Write the amendment approval records, or proceed as written? | **"Proceed as written"** | DEC-R6-003 and DEC-R6-004 are not applied. UI-031-O5 and AR-019-O3 are verified as written. AR-019-O3 is expected not to verify with the current verifier. |
+| DEC-R6-012 | Attest the scope review, or proceed unattested? | **"Proceed unattested"** | The review is recorded as performed but not attested: a deviation, not a PASS. |
+| DEC-R6-013 | Does "go" start the rehearsal? | **"Start the rehearsal"** (after "Go as soon as you are ready") | The timed Rehearsal 6 is authorized. |
 | DEC-R6-009 | R5A-001-06 and -09 dispositions | As recommended ("I approve all recommendations and necessary merges going forward") | 06 is kickoff work: record the preflight result and the registry pin as Praxis records. 09 is application work, proven by UI-011-O4. |
 
 ### DEC-R6-001: the token question, settled by DEC-R6-010

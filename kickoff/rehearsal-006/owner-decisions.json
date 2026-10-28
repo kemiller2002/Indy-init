@@ -511,6 +511,63 @@
       ],
       "verificationChanges": "None.",
       "approvalStatus": "APPROVAL_PENDING_MERGE"
+    },
+    {
+      "date": "2026-10-28",
+      "evidenceSource": "Owner's answers to structured questions in session https://claude.ai/code/session_01G1iECgGEzEnCXsPBoE8bH3; option labels quoted as selected",
+      "approvalStatus": "APPROVAL_PENDING_MERGE",
+      "id": "DEC-R6-011",
+      "question": "The UI-031-O5 and AR-019-O3 amendments (DEC-R6-003, DEC-R6-004) need approval records only the operator may write (RDP-003). Write the records, or proceed with both obligations as written?",
+      "options": {
+        "write": "The owner writes the two operator approvals; the plan is recompiled and re-pinned.",
+        "as-written": "Rehearsal 6 runs with both obligations unamended (stricter). AR-019-O3's literal BLOCKED cannot be met by the current verifier, so that obligation will not verify."
+      },
+      "recommendation": "None stated; both consequences were given.",
+      "selected": "as-written",
+      "ownerWords": "Proceed as written",
+      "affectedObligations": [
+        {
+          "obligation": "UI-031-O5",
+          "status": "in scope, as written (role/access controls and credential protection)"
+        },
+        {
+          "obligation": "AR-019-O3",
+          "status": "in scope, as written (literal BLOCKED); expected not to verify with the current verifier"
+        }
+      ],
+      "resultingScope": "DEC-R6-003 and DEC-R6-004 are not applied in Rehearsal 6. No approval record is written; the plan stays VP-8ef1c8dca656."
+    },
+    {
+      "date": "2026-10-28",
+      "evidenceSource": "Owner's answers to structured questions in session https://claude.ai/code/session_01G1iECgGEzEnCXsPBoE8bH3; option labels quoted as selected",
+      "approvalStatus": "APPROVAL_PENDING_MERGE",
+      "id": "DEC-R6-012",
+      "question": "The independent scope review counts only when the owner attests it with a GitHub review on PR #37. Post the review, or proceed unattested?",
+      "options": {
+        "review": "The owner posts a GitHub review on PR #37.",
+        "unattested": "The preflight records the review as performed but NOT_ATTESTED, a deviation from the readiness rule, reported as one."
+      },
+      "recommendation": "None stated; both consequences were given.",
+      "selected": "unattested",
+      "ownerWords": "Proceed unattested",
+      "affectedObligations": [],
+      "resultingScope": "Preflight stage 18 is a recorded deviation, not a PASS. The review record is unchanged."
+    },
+    {
+      "date": "2026-10-28",
+      "evidenceSource": "Owner's answers to structured questions in session https://claude.ai/code/session_01G1iECgGEzEnCXsPBoE8bH3; option labels quoted as selected",
+      "approvalStatus": "APPROVAL_PENDING_MERGE",
+      "id": "DEC-R6-013",
+      "question": "Does \"go\" authorize starting the timed Rehearsal 6, or only merging PR #37?",
+      "options": {
+        "start": "Authorize the timed Rehearsal 6 to start once the preflight is READY.",
+        "merge": "Merge and finish preflight only."
+      },
+      "recommendation": "None stated.",
+      "selected": "start",
+      "ownerWords": "Go as soon as you are ready; then, to the structured question, \"Start the rehearsal\"",
+      "affectedObligations": [],
+      "resultingScope": "The owner authorizes the timed Rehearsal 6 to start once the preflight is READY."
     }
   ]
 }
