@@ -45,6 +45,7 @@ The causes and the measured facts are in praxis `docs/autonomous-execution/GITHU
 | UAE-R7-08 | **Verification evidence bound to the candidate.** When Dokimos runs as a pull-request check, the quality gate receives `revision: ${{ github.event.pull_request.head.sha }}`, so its evidence names the candidate Praxis authorizes, not GitHub's test merge commit. |
 | UAE-R7-09 | **Revocation.** The owner can stop the run at any time. Any one of these is enough: committing a `praxis.run-revocation/1` under `.praxis/autonomy/revocations/`, adding the run id to the trust store's `revokedRunIds`, or removing their key. Every later evaluation is DENY (`authorization-revoked`). |
 | UAE-R7-10 | **Owner decisions are unchanged.** Kickoff decisions, acceptance, exclusions and waivers stay owner decisions under OD-INDY-7, with the rehearsal-006 attestation mechanism: approving reviews on pull requests opened by `github-actions[bot]`, observed by CI. The run authorization authorizes routine merges only. It is never an owner decision on anything else. |
+| UAE-R7-12 | **The gate is enforced, not advisory.** Praxis's merge decision runs as a GitHub Actions job (`praxis autonomy evaluate … --trust-store-env`), with the owner's trust store in an Actions secret. A ruleset on `main` requires that job's check, the CI check and `independent-review`, with no human review required (praxis diagnosis D-2 and D-7). Without this, an agent-run executor can be pointed at a trust store the agent wrote (praxis SECURITY-REVIEW.md F1), and the rehearsal report must say the gate was advisory. |
 | UAE-R7-11 | **Measurements.** Record the measurements below during the run. Report "unavailable" where a source is missing; never zero. |
 
 ## Rehearsal 7 execution expectations
@@ -71,6 +72,6 @@ The causes and the measured facts are in praxis `docs/autonomous-execution/GITHU
 
 ## Owner decisions this intake needs
 
-1. Approve or amend UAE-R7-01 to UAE-R7-11 for Rehearsal 7, through the owner's merge of the PR that records them.
+1. Approve or amend UAE-R7-01 to UAE-R7-12 for Rehearsal 7, through the owner's merge of the PR that records them.
 2. Generate the owner's P-256 key and keep its trust store outside every repository (praxis `EXECUTION-POLICY.md` §2).
-3. Optionally, add a ruleset on the rehearsal repository's `main` requiring the CI and `independent-review` checks, with no human review, and blocking force pushes. This turns Praxis's gate from advisory into enforced (diagnosis D-2). It stays compatible with unattended merging.
+3. For UAE-R7-12: put the trust store in an Actions secret, and add a ruleset on the rehearsal repository's `main` requiring the CI and `independent-review` checks, with no human review, and blocking force pushes. This turns Praxis's gate from advisory into enforced (diagnosis D-2). It stays compatible with unattended merging.
