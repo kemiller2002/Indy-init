@@ -201,7 +201,7 @@
     },
     {
       "path": "curation/verification-plan.json",
-      "sha256": "3847f8ddea1b0edb2bc305ba1f45ef2379796a09a6bef253294d6d0f43211572"
+      "sha256": "3e4b049c5c64f9a69f6aa0d2b6d5fbcc383c1717e54032f2307cd8e3eedd37b0"
     },
     {
       "path": "curation/verification-rules.json",
@@ -297,7 +297,7 @@
     },
     {
       "path": "verification-plan.json",
-      "sha256": "f79efdfacb0167ec4e089c40a46279165d451ac8d5478e60ad938f94805e3356"
+      "sha256": "cbb938362a4f03d79cacdd14c4e6324f5a544a0bb295cdd7cdd82372fc0418e6"
     }
   ],
   "compilationVerdict": "PASS",
