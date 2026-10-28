@@ -187,7 +187,10 @@ let private coverage (processCovered: Map<string, Set<string>>) (evidenceStatus:
         |> Set.ofList
     let produced = producers |> List.collect (fun t -> t.Categories) |> Set.ofList
     let byProcess = processCovered.TryFind vid |> Option.defaultValue Set.empty |> Set.intersect produced
-    let covered = tests |> List.filter (fun t -> passed.Contains t.Id) |> List.collect (fun t -> t.Categories) |> Set.ofList |> Set.union byProcess
+    // A category with a bound Praxis producer is covered only by the process assessment: a passing ledger test never
+    // stands in for a producer that did not deliver (every bound producer must deliver).
+    let byTests = tests |> List.filter (fun t -> passed.Contains t.Id) |> List.collect (fun t -> t.Categories) |> Set.ofList
+    let covered = Set.union (Set.difference byTests produced) byProcess
     let declared = tests |> List.collect (fun t -> t.Categories) |> Set.ofList
     let missing =
         if required.IsEmpty then [ EvidenceCategories.unclassified, "unclassified" ]

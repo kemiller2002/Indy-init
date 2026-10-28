@@ -95,8 +95,9 @@ process), so the verifier trusts nothing a record says about itself:
   only when their `runId` equals the `--trusted-run-id` the job passes and they name this candidate, and only the
   latest review state of each login on each pull request counts: a later CHANGES_REQUESTED or DISMISSED review voids
   the earlier approval. An attestation
-  proves only what it names: an owner-approval record that decides anything else is unattested, and a scope change
-  stands only when the standing owner decision names both its decision id and every path or requirement it adds.
+  proves only what it names. An owner approval names one decision id (`--decision`) and what it covers
+  (`--subject`), all of which its attestation must name; a scope change stands only on the standing decision it cites,
+  and only for the paths and requirements that decision covers.
 - **Reviews** are anchored the same way: a review record must cite the reviewer's own approving review of the exact
   candidate commit, observed by CI. A review written into the log, under any identity, without it is unattested.
 - **Final disposition** is the owner's: a human owner record attested by CI for the candidate commit as the final
@@ -104,6 +105,9 @@ process), so the verifier trusts nothing a record says about itself:
 - **CI records**: a test result or acceptance reference counts only when it is tool-observed **and** names the trusted
   run (`observed.identity.runId`); a CI claim from any other run is treated as an agent assertion. A test result must
   pass.
+- **CI-observed withdrawals**: a non-approving latest review state that CI observed for an owner or frozen reviewer,
+  on any pull request, withdraws what it names (an owner's decisions, `final-disposition`; a reviewer's approval of the
+  candidate), whether or not the log records it.
 - **Withdrawals always count, wherever they sit in the log**: any owner rejection of a decision, any frozen reviewer's
   non-approving review of the candidate, any owner disposition other than accepted, any failing trusted test result,
   and any selection of another candidate after this one was selected withdraws the approval, review, acceptance, pass
@@ -142,14 +146,16 @@ decisions, and every obligation they serve also requires a reviewer category.
 `--process-rules-sha256`, `--process-repo` or `--process-events`/`--process-executions`/`--process-ancestry`,
 `--process-attestations`, `--process-trusted-run-id`), computes the process assessment itself for its own plan and
 trusted candidate, and counts the verified process, owner and review categories as covered, only for categories a
-`praxis:` producer is bound to. It never reads an assessment file. Application-test categories still need the evidence bundle. `praxis:` producers are not ledger tests and are
+`praxis:` producer is bound to. A category with a bound producer is covered only by the producer, never by a passing
+ledger test, and compilation refuses a binding that mixes producers and ledger tests for one category. It never reads
+an assessment file. Application-test categories still need the evidence bundle. `praxis:` producers are not ledger tests and are
 not expected in ledger rows.
 
 ## Evidence
 
 | File | What it shows |
 |---|---|
-| `requirements-compiled/v2/readiness/evidence/process-evidence-simulation.json` | A simulated rehearsal recorded by the real Praxis CLI (`tools/process-evidence/simulate-rehearsal.sh`, fixture `tools/fixtures/process-evidence/simulated-rehearsal/`): implementer, reviewer, owner and CI each act under their own identity. With the proposed bindings, all 30 process, owner and review categories are VERIFIED from 12 records captured as the work happened. 39 negative controls, each a change to the recorded log, the attestations, the frozen inputs or the plan, fail closed with the named diagnostic, and 3 record-level controls refuse the record: the nine required ones (missing approval, incorrect agent identity, missing checkpoint, unapproved scope change, self-acceptance, stale review, incorrect commit identity, missing release selection, evidence from another candidate) and 33 more found by three independent reviews (among them: a transcribed or unattested owner decision, an attestation reused for another decision or a broader scope change, an owner rejection with or without attestation, failed, untrusted or later-failed test results, the implementer reviewing under a review role or a reviewer identity, a review without its attestation or attested for an older commit, a later review rejection (attested or not) or release selection, a replayed approval after a rejection, a later CHANGES_REQUESTED review, an owner approval of an unrelated decision, a disposition citing another attestation, an unverified checkpoint, a missing commit, another repository, a mis-kinded binding, the implementer's own final disposition, an edited plan, self-supplied rules). |
+| `requirements-compiled/v2/readiness/evidence/process-evidence-simulation.json` | A simulated rehearsal recorded by the real Praxis CLI (`tools/process-evidence/simulate-rehearsal.sh`, fixture `tools/fixtures/process-evidence/simulated-rehearsal/`): implementer, reviewer, owner and CI each act under their own identity. With the proposed bindings, all 30 process, owner and review categories are VERIFIED from 12 records captured as the work happened. 43 negative controls, each a change to the recorded log, the attestations, the frozen inputs or the plan, fail closed with the named diagnostic, and 3 record-level controls refuse the record: the nine required ones (missing approval, incorrect agent identity, missing checkpoint, unapproved scope change, self-acceptance, stale review, incorrect commit identity, missing release selection, evidence from another candidate) and 37 more found by four independent reviews (among them: a transcribed or unattested owner decision, an attestation reused for another decision or a broader scope change, an owner rejection with or without attestation, failed, untrusted or later-failed test results, the implementer reviewing under a review role or a reviewer identity, a review without its attestation or attested for an older commit, a later review rejection (attested or not) or release selection, a replayed approval after a rejection, a later CHANGES_REQUESTED review, an owner approval of an unrelated decision, a disposition citing another attestation, non-approving reviews CI observed on other pull requests, a scope change citing an unrelated or rejected decision, an unverified checkpoint, a missing commit, another repository, a mis-kinded binding, the implementer's own final disposition, an edited plan, self-supplied rules). |
 | `requirements-compiled/v2/readiness/evidence/r5-readiness-replay.json` | Rehearsal 5's binding problem replayed through the gate (read only; R5's verdict is unchanged). Its kickoff plan `VP-e77a2134e1b0` is BLOCKED on all 326 obligations. Its 277 final bindings declare no evidence categories. Even granting each of them every application-test category its test kind can provide, 140 obligations stay unresolved before implementation (many R5 bindings name a test kind that cannot provide the category, for example a deterministic test for live-provider evidence), among them all 49 R5 left unproven; 37 of those 49 need process, owner or reviewer evidence. |
 
 Both are regenerated by the compiler tests (`--process-simulation`, `--readiness-replay`); the offline suite (CI) runs

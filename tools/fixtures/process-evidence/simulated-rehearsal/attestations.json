@@ -1,11 +1,11 @@
 {
   "schema": "indy-init.owner-attestations/1",
   "runId": "9000000001",
-  "candidate": "ed010fcc50a8c1e2e65350a675c7e3b0f522bf0f",
+  "candidate": "89612596072d973b413f20767b42c7cbbe57890b",
   "attestations": [
-    { "type": "github-review", "reference": "kemiller2002/simulated-rehearsal#1@1001", "login": "kemiller2002", "state": "APPROVED", "decisions": ["DEC-SIM-001", "src/engine/Replay.fs"], "commit": "ed010fcc50a8c1e2e65350a675c7e3b0f522bf0f", "submittedAt": "2026-10-28T07:44:50.480Z" },
-    { "type": "github-review", "reference": "kemiller2002/simulated-rehearsal#4@4001", "login": "kemiller2002", "state": "APPROVED", "decisions": ["DEC-SIM-KICKOFF"], "commit": "ed010fcc50a8c1e2e65350a675c7e3b0f522bf0f", "submittedAt": "2026-10-28T07:44:50.483Z" },
-    { "type": "github-review", "reference": "kemiller2002/simulated-rehearsal#2@2001", "login": "example-reviewer", "state": "APPROVED", "commit": "ed010fcc50a8c1e2e65350a675c7e3b0f522bf0f", "submittedAt": "2026-10-28T07:44:50.484Z" },
-    { "type": "github-review", "reference": "kemiller2002/simulated-rehearsal#3@3001", "login": "kemiller2002", "state": "APPROVED", "decisions": ["final-disposition"], "commit": "ed010fcc50a8c1e2e65350a675c7e3b0f522bf0f", "submittedAt": "2026-10-28T07:44:50.486Z" }
+    { "type": "github-review", "reference": "kemiller2002/simulated-rehearsal#1@1001", "login": "kemiller2002", "state": "APPROVED", "decisions": ["DEC-SIM-001", "src/engine/Replay.fs"], "commit": "89612596072d973b413f20767b42c7cbbe57890b", "submittedAt": "2026-10-28T07:54:07.949Z" },
+    { "type": "github-review", "reference": "kemiller2002/simulated-rehearsal#4@4001", "login": "kemiller2002", "state": "APPROVED", "decisions": ["DEC-SIM-KICKOFF"], "commit": "89612596072d973b413f20767b42c7cbbe57890b", "submittedAt": "2026-10-28T07:54:07.950Z" },
+    { "type": "github-review", "reference": "kemiller2002/simulated-rehearsal#2@2001", "login": "example-reviewer", "state": "APPROVED", "commit": "89612596072d973b413f20767b42c7cbbe57890b", "submittedAt": "2026-10-28T07:54:07.952Z" },
+    { "type": "github-review", "reference": "kemiller2002/simulated-rehearsal#3@3001", "login": "kemiller2002", "state": "APPROVED", "decisions": ["final-disposition"], "commit": "89612596072d973b413f20767b42c7cbbe57890b", "submittedAt": "2026-10-28T07:54:07.953Z" }
   ]
 }

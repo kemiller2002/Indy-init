@@ -165,6 +165,13 @@ let problems (i: Inputs) : string list =
                       yield sprintf "test binding for %s: test '%s' declares unknown evidence category '%s'" o t.Id c
                   elif not (List.contains t.Kind (EvidenceCategories.kindsFor i.Categories.Table c)) then
                       yield sprintf "test binding for %s: test '%s' of kind '%s' cannot provide %s evidence" o t.Id t.Kind c
+      // A category is proven either by Praxis producers or by ledger tests, never by a mix: otherwise one could stand
+      // in for the other.
+      for (o, tests) in bindings do
+          let producerCats = tests |> List.filter (fun t -> t.Id.StartsWith("praxis:", StringComparison.Ordinal)) |> List.collect (fun t -> t.Categories) |> Set.ofList
+          let testCats = tests |> List.filter (fun t -> not (t.Id.StartsWith("praxis:", StringComparison.Ordinal))) |> List.collect (fun t -> t.Categories) |> Set.ofList
+          for c in Set.intersect producerCats testCats do
+              yield sprintf "test binding for %s binds both a Praxis producer and a ledger test to %s; bind one kind of evidence per category" o c
       for (g, p) in (match field "gatePolicies" i.Spec with Some(JObj ps) -> ps |> List.map (fun (k, v) -> k, asStr v) | _ -> []) do
           if not (known.Contains p) then yield sprintf "gate %s maps to unknown freshness policy %s" g p
       if not (known.Contains(str "defaultPolicy" i.Spec)) then yield "defaultPolicy is not a declared freshness policy"

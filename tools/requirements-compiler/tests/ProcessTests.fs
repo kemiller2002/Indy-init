@@ -95,6 +95,15 @@ let private rebind (obligation: string) (tests: Json list) (plan: Json) =
         if strOpt "sourceObligation" o = Some obligation then setPath [ "acceptanceContract"; "testIdentity"; "tests" ] (JArr tests) o else o))
     |> reseal
 
+let private addAttestation (reference: string) (login: string) (state: string) (decisions: string list) (commit: string option) (f: Fixture) =
+    let entry =
+        JObj(
+            [ "type", JStr "github-review"; "reference", JStr reference; "login", JStr login; "state", JStr state; "decisions", jstrs decisions ]
+            @ (commit |> Option.map (fun c -> [ "commit", JStr c ]) |> Option.defaultValue [])
+            @ [ "submittedAt", JStr "9999-12-31T00:00:00Z" ]
+        )
+    { f with Attestations = setPath [ "attestations" ] (JArr(arr "attestations" f.Attestations @ [ entry ])) f.Attestations }
+
 let private mapAttestation (reference: string) (g: Json -> Json) (f: Fixture) =
     let mapped = arr "attestations" f.Attestations |> List.map (fun a -> if strOpt "reference" a = Some reference then g a else a)
     { f with Attestations = setPath [ "attestations" ] (JArr mapped) f.Attestations }
@@ -192,7 +201,7 @@ let controls (plan: Json) (f: Fixture) : (string * string * Fixture * Json) list
       one
           "the owner approved only an unrelated decision"
           "MISSING-APPROVAL"
-          (drop (fun e -> isKind "owner-approval" e && (field "statement" e |> Option.map (strs "subjects") |> Option.defaultValue []) |> List.contains "DEC-SIM-KICKOFF") f)
+          (drop (fun e -> isKind "owner-approval" e && (field "statement" e |> Option.bind (strOpt "decision")) = Some "DEC-SIM-KICKOFF") f)
       one
           "a trusted test failure followed by a replayed pass"
           "TEST-NOT-PASSED"
@@ -205,6 +214,20 @@ let controls (plan: Json) (f: Fixture) : (string * string * Fixture * Json) list
       "DISPOSITION-NOT-ACCEPTED",
       append (isKind "final-disposition") (setPath [ "statement"; "outcome" ] (JStr "not-accepted") >> setPath [ "statement"; "attestation" ] JNull) f,
       rebind "UI-030-O3" [ for k in [ "acceptance-reference"; "release-selection"; "final-disposition" ] -> JObj [ "id", JStr("praxis:" + k); "kind", JStr "process"; "categories", jstrs [ "process-record" ] ] ] plan
+      // Fourth independent review: non-approving reviews CI observed withdraw on any pull request, and a scope change
+      // stands only on the decision that approved its paths.
+      one "the reviewer requested changes on another pull request" "REVIEW-NOT-APPROVED" (addAttestation "kemiller2002/simulated-rehearsal#5@5001" "example-reviewer" "CHANGES_REQUESTED" [] (Some f.Candidate) f)
+      one "the owner requested changes on the kickoff decision elsewhere" "MISSING-APPROVAL" (addAttestation "kemiller2002/simulated-rehearsal#6@6001" "kemiller2002" "CHANGES_REQUESTED" [ "DEC-SIM-KICKOFF" ] None f)
+      one
+          "a scope change citing an unrelated standing decision"
+          "UNAPPROVED-SCOPE-CHANGE"
+          (mapWhere (isKind "scope-change") (setPath [ "statement"; "decision" ] (JStr "DEC-SIM-KICKOFF")) f)
+      one
+          "a scope change resting on a rejected decision's path"
+          "UNAPPROVED-SCOPE-CHANGE"
+          (f
+           |> mapWhere (isKind "scope-change") (setPath [ "statement"; "decision" ] (JStr "DEC-SIM-KICKOFF"))
+           |> append (fun e -> isKind "owner-approval" e && (field "statement" e |> Option.bind (strOpt "decision")) = Some "DEC-SIM-001") (setPath [ "statement"; "outcome" ] (JStr "rejected")))
       "an owner-decision category bound to a record kind that cannot provide it",
       "UNBOUND-PROCESS-EVIDENCE",
       drop (isKind "owner-approval") f,
@@ -443,5 +466,12 @@ let producerBindingControls (problemsWith: Json -> string list) : string list =
       yield! refused "owner evidence from a non-approval record" "only from praxis:owner-approval" (binding "AR-024-O1" "praxis:release-selection" "owner" [ "owner-decision" ])
       yield! refused "an application test kind claiming process evidence" "cannot provide process-record" (binding "AR-012-O1" "praxis:assignment" "deterministic" [ "process-record" ])
       yield! refused "a process record claiming application evidence" "cannot provide integration" (binding "VER-001-O1" "praxis:dependency-decision" "process" [ "integration" ])
+      yield!
+          refused
+              "a Praxis producer and a ledger test bound to the same category"
+              "binds both a Praxis producer and a ledger test"
+              (JObj [ "obligation", JStr "AR-008-O1"
+                      "tests", JArr [ JObj [ "id", JStr "praxis:independent-review"; "kind", JStr "review"; "categories", jstrs [ "independent-acceptance" ] ]
+                                      JObj [ "id", JStr "review:T33"; "kind", JStr "review"; "categories", jstrs [ "independent-acceptance" ] ] ] ])
       if not (problemsWith (JArr [ binding "AR-012-O1" "praxis:assignment" "process" [ "process-record" ] ])).IsEmpty then
           yield sprintf "producer binding control: a valid producer binding is refused: %A" (problemsWith (JArr [ binding "AR-012-O1" "praxis:assignment" "process" [ "process-record" ] ])) ]

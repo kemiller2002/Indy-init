@@ -57,9 +57,9 @@ run_as impl work checkpoint --id WI-0001 --summary "Engine slice pushed" --next-
 run_as impl work evidence --id WI-0001 --kind scope-change --summary "Add src/engine/Replay.fs to the owned paths" \
   --subject src/engine/Replay.fs --decision DEC-SIM-001 --occurred-at "$(now)"
 run_as owner work evidence --id WI-0001 --kind owner-approval --summary "Owner approves the scope change" \
-  --subject DEC-SIM-001 --subject src/engine/Replay.fs --outcome approved --attestation "github-review:kemiller2002/simulated-rehearsal#1@1001" --occurred-at "$(now)"
+  --decision DEC-SIM-001 --subject src/engine/Replay.fs --outcome approved --attestation "github-review:kemiller2002/simulated-rehearsal#1@1001" --occurred-at "$(now)"
 run_as owner work evidence --id WI-0001 --kind owner-approval --summary "Owner resolves the kickoff decisions (write scope, release set, frozen requirements)" \
-  --subject DEC-SIM-KICKOFF --outcome approved --attestation "github-review:kemiller2002/simulated-rehearsal#4@4001" --occurred-at "$(now)"
+  --decision DEC-SIM-KICKOFF --outcome approved --attestation "github-review:kemiller2002/simulated-rehearsal#4@4001" --occurred-at "$(now)"
 commit_push "praxis state"
 candidate=$(g rev-parse HEAD)
 

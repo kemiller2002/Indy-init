@@ -104,6 +104,8 @@ See [Hackathon Boundaries](docs/HACKATHON-BOUNDARIES.md).
 - [Rehearsal 3 Results](docs/REHEARSAL-003-RESULTS.md) (outcome, reusable designs, lessons; machine-readable summary linked)
 - [Rehearsal 4 Results](docs/REHEARSAL-004-RESULTS.md) (computed NOT ACCEPTED; key facts, reusable designs, lessons; verdict and ledger linked)
 - [Rehearsal 5 Results](docs/REHEARSAL-005-RESULTS.md) (computed INCOMPLETE, NOT ACCEPTED: G0–G7 pass, 0 FAIL, 49 obligations without proving tests; findings AR-027..AR-035)
+- [Process Evidence and the Implementation-Start Gate](docs/PROCESS-EVIDENCE-AND-READINESS.md) (`verify-process`, `plan-readiness`: process and owner evidence recorded in Praxis as work happens, verified per candidate; implementation blocked while mandatory mappings are unresolved)
+- [Development Speed Optimization Report](docs/engineering-improvement/SPEED-OPTIMIZATION-REPORT.md) (Rehearsal 5 baseline, changes, measurements and Rehearsal 6 preparation)
 - [Verification Plan Consumer Contract](docs/VERIFICATION-PLAN-CONTRACT.md) (`requirements-compiled/v2/verification-plan.json`, schema `indy-init.verification-plan/1` revision 2: per-obligation executable acceptance contracts; [package v2](requirements-compiled/v2/README.md))
 - [Rehearsal Derivation Policy](docs/REHEARSAL-DERIVATION-POLICY.md) and the [Causa requirements baseline](requirements/README.md)
 - [Architecture](docs/ARCHITECTURE.md)
