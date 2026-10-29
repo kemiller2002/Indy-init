@@ -1,15 +1,22 @@
 {
-  "schema": "indy-init.assertion-ratchet/1",
-  "base": "0ff0100",
+  "schema": "indy-init.assertion-ratchet/2",
+  "base": "0ff0100a3bf8dc2eef9757ede1b1e8eb8f6b32ec",
   "candidate": "46d5e1129a798549dcf37c2a6460c4f623298761",
+  "baseVerified": true,
+  "kickoff": {
+    "source": "r6-adhoc-kickoff.json",
+    "field": "base",
+    "recordedBase": "0ff0100",
+    "recordedCommit": "0ff0100a3bf8dc2eef9757ede1b1e8eb8f6b32ec"
+  },
   "roots": [
     "tests/browser/acceptance"
   ],
   "commitsWalked": 13,
   "verdict": "FAIL",
   "summary": {
-    "removed": 35,
-    "unrecorded": 35
+    "removed": 38,
+    "unrecorded": 38
   },
   "removed": [
     {
@@ -18,7 +25,26 @@
       "obligation": "AR-035-O1",
       "assertion": "await expect(syncStatus(tabA)).toContainText(/someone else changed the repository|Saved to GitHub/, { timeout: 90_000 });",
       "lastSeenAt": "a35c40849ebab6aeac85869dfdbeb46bfcca8c91",
-      "state": "UNRECORDED"
+      "state": "UNRECORDED",
+      "tagChange": null
+    },
+    {
+      "path": "tests/browser/acceptance/AR-035.spec.js",
+      "test": "AR-035-O1",
+      "obligation": "AR-035-O1",
+      "assertion": "for (const text of [\"Tab B: an observation from the second tab.\", \"Device 2: an observation from another device.\", \"Tab A: decided before the others' saves.\", \"Device 2: the write whose answer was lost.\"]) expect(count(events, text), text).toBe(1);",
+      "lastSeenAt": "a35c40849ebab6aeac85869dfdbeb46bfcca8c91",
+      "state": "UNRECORDED",
+      "tagChange": null
+    },
+    {
+      "path": "tests/browser/acceptance/AR-035.spec.js",
+      "test": "AR-035-O4",
+      "obligation": "AR-035-O4",
+      "assertion": "await expect .poll(() => ids.map((id, i) => count(gh.filesAt(`workspaces/demo/${ws}/investigations/${id}`)[\"events.ndjson\"] ?? \"\", `Unsaved change 1 in tab ${i + 1}.`)), { timeout: 90_000 }) .toEqual([1, 1, 1]);",
+      "lastSeenAt": "56a34d897a12efe196b3866bd76fc0055d65847c",
+      "state": "UNRECORDED",
+      "tagChange": null
     },
     {
       "path": "tests/browser/acceptance/AR-035.spec.js",
@@ -26,7 +52,8 @@
       "obligation": "AR-035-O4",
       "assertion": "await expect(syncStatus(after)).not.toContainText(/Saving|checking the branch/, { timeout: 60_000 });",
       "lastSeenAt": "4c67fb68d3ac09e5ee8d20ea59933d724c992d1d",
-      "state": "UNRECORDED"
+      "state": "UNRECORDED",
+      "tagChange": null
     },
     {
       "path": "tests/browser/acceptance/AR-035.spec.js",
@@ -34,15 +61,17 @@
       "obligation": "AR-035-O4",
       "assertion": "await expect(syncStatus(first)).toContainText(\"Saved to GitHub\", { timeout: 90_000 });",
       "lastSeenAt": "4c67fb68d3ac09e5ee8d20ea59933d724c992d1d",
-      "state": "UNRECORDED"
+      "state": "UNRECORDED",
+      "tagChange": null
     },
     {
       "path": "tests/browser/acceptance/AR-035.spec.js",
       "test": "AR-035-O4",
       "obligation": "AR-035-O4",
-      "assertion": "expect(gh.head()).toBe(head); // nothing was written while the provider was unreachable",
+      "assertion": "expect(gh.head()).toBe(head);",
       "lastSeenAt": "4c67fb68d3ac09e5ee8d20ea59933d724c992d1d",
-      "state": "UNRECORDED"
+      "state": "UNRECORDED",
+      "tagChange": null
     },
     {
       "path": "tests/browser/acceptance/AR-035.spec.js",
@@ -50,7 +79,8 @@
       "obligation": "AR-035-O4",
       "assertion": "expect(lost, \"device-local changes lost after the tabs closed\").toEqual([]);",
       "lastSeenAt": "4c67fb68d3ac09e5ee8d20ea59933d724c992d1d",
-      "state": "UNRECORDED"
+      "state": "UNRECORDED",
+      "tagChange": null
     },
     {
       "path": "tests/browser/acceptance/AR-035.spec.js",
@@ -58,7 +88,8 @@
       "obligation": "AR-035-O4",
       "assertion": "expect(missing, `changes missing from the shared store (tab statuses: ${statuses.join(\" | \")})`).toEqual([]);",
       "lastSeenAt": "4c67fb68d3ac09e5ee8d20ea59933d724c992d1d",
-      "state": "UNRECORDED"
+      "state": "UNRECORDED",
+      "tagChange": null
     },
     {
       "path": "tests/browser/acceptance/AR-035.spec.js",
@@ -66,7 +97,17 @@
       "obligation": "AR-035-O4",
       "assertion": "for (const tab of tabs) await expect(syncStatus(tab)).not.toContainText(\"Saving\", { timeout: 60_000 });",
       "lastSeenAt": "4c67fb68d3ac09e5ee8d20ea59933d724c992d1d",
-      "state": "UNRECORDED"
+      "state": "UNRECORDED",
+      "tagChange": null
+    },
+    {
+      "path": "tests/browser/acceptance/UI-011.spec.js",
+      "test": "UI-011-O4",
+      "obligation": "UI-011-O4",
+      "assertion": "await expect.poll(focusName).not.toBe(\"body\");",
+      "lastSeenAt": "0ff0100a3bf8dc2eef9757ede1b1e8eb8f6b32ec",
+      "state": "UNRECORDED",
+      "tagChange": null
     },
     {
       "path": "tests/browser/acceptance/UI-011.spec.js",
@@ -74,191 +115,215 @@
       "obligation": "UI-011-O4",
       "assertion": "expect(Math.abs(after - before), \"scroll context kept\").toBeLessThanOrEqual(Math.max(200, before));",
       "lastSeenAt": "de111db966e6196c55a9a8141376f718dd417bac",
-      "state": "UNRECORDED"
+      "state": "UNRECORDED",
+      "tagChange": null
     },
     {
       "path": "tests/browser/acceptance/UI-011.spec.js",
       "test": "UI-011-O4",
       "obligation": "UI-011-O4",
       "assertion": "expect([\"causa-main\", \"settings-heading\", \"H1\"]).toContain(settingsFocus);",
-      "lastSeenAt": "0ff0100",
-      "state": "UNRECORDED"
+      "lastSeenAt": "0ff0100a3bf8dc2eef9757ede1b1e8eb8f6b32ec",
+      "state": "UNRECORDED",
+      "tagChange": null
     },
     {
       "path": "tests/browser/acceptance/UI-016.spec.js",
       "test": "UI-016-O12",
       "obligation": "UI-016-O12",
       "assertion": "await expect(page.locator(\"[data-percepta-region=persistence-state], .causa-sync\").first()).toContainText(/\\w+/);",
-      "lastSeenAt": "0ff0100",
-      "state": "UNRECORDED"
+      "lastSeenAt": "0ff0100a3bf8dc2eef9757ede1b1e8eb8f6b32ec",
+      "state": "UNRECORDED",
+      "tagChange": null
     },
     {
       "path": "tests/browser/acceptance/UI-016.spec.js",
       "test": "UI-016-O17",
       "obligation": "UI-016-O17",
       "assertion": "expect(gray).toBe(0);",
-      "lastSeenAt": "0ff0100",
-      "state": "UNRECORDED"
+      "lastSeenAt": "0ff0100a3bf8dc2eef9757ede1b1e8eb8f6b32ec",
+      "state": "UNRECORDED",
+      "tagChange": null
     },
     {
       "path": "tests/browser/acceptance/UI-017.spec.js",
       "test": "UI-017-O2",
       "obligation": "UI-017-O2",
       "assertion": "expect(text).not.toMatch(/[0-9a-f]{40}/);",
-      "lastSeenAt": "0ff0100",
-      "state": "UNRECORDED"
+      "lastSeenAt": "0ff0100a3bf8dc2eef9757ede1b1e8eb8f6b32ec",
+      "state": "UNRECORDED",
+      "tagChange": null
     },
     {
       "path": "tests/browser/acceptance/UI-018.spec.js",
       "test": "UI-018-O2",
       "obligation": "UI-018-O2",
       "assertion": "await expect(admin(page)).toContainText(/credential|authenticat|token/i);",
-      "lastSeenAt": "0ff0100",
-      "state": "UNRECORDED"
+      "lastSeenAt": "0ff0100a3bf8dc2eef9757ede1b1e8eb8f6b32ec",
+      "state": "UNRECORDED",
+      "tagChange": null
     },
     {
       "path": "tests/browser/acceptance/UI-018.spec.js",
       "test": "UI-018-O2",
       "obligation": "UI-018-O2",
       "assertion": "await expect(admin(page)).toContainText(/diagnos|error|Unknown means/i);",
-      "lastSeenAt": "0ff0100",
-      "state": "UNRECORDED"
+      "lastSeenAt": "0ff0100a3bf8dc2eef9757ede1b1e8eb8f6b32ec",
+      "state": "UNRECORDED",
+      "tagChange": null
     },
     {
       "path": "tests/browser/acceptance/UI-018.spec.js",
       "test": "UI-018-O2",
       "obligation": "UI-018-O2",
       "assertion": "await expect(admin(page)).toContainText(/storage|schema|contract/i);",
-      "lastSeenAt": "0ff0100",
-      "state": "UNRECORDED"
+      "lastSeenAt": "0ff0100a3bf8dc2eef9757ede1b1e8eb8f6b32ec",
+      "state": "UNRECORDED",
+      "tagChange": null
     },
     {
       "path": "tests/browser/acceptance/UI-018.spec.js",
       "test": "UI-018-O2",
       "obligation": "UI-018-O2",
       "assertion": "await expect(admin(page)).toContainText(manifest.formatVersion ?? \"1.0.0\");",
-      "lastSeenAt": "0ff0100",
-      "state": "UNRECORDED"
+      "lastSeenAt": "0ff0100a3bf8dc2eef9757ede1b1e8eb8f6b32ec",
+      "state": "UNRECORDED",
+      "tagChange": null
     },
     {
       "path": "tests/browser/acceptance/UI-018.spec.js",
       "test": "UI-018-O2",
       "obligation": "UI-018-O2",
       "assertion": "await expect(row(page, /Connection/)).toBeVisible();",
-      "lastSeenAt": "0ff0100",
-      "state": "UNRECORDED"
+      "lastSeenAt": "0ff0100a3bf8dc2eef9757ede1b1e8eb8f6b32ec",
+      "state": "UNRECORDED",
+      "tagChange": null
     },
     {
       "path": "tests/browser/acceptance/UI-019.spec.js",
       "test": "UI-019-O4",
       "obligation": "UI-019-O4",
       "assertion": "expect(await page.evaluate(() => parseFloat(getComputedStyle(document.body).fontSize))).toBeLessThan(size);",
-      "lastSeenAt": "0ff0100",
-      "state": "UNRECORDED"
+      "lastSeenAt": "0ff0100a3bf8dc2eef9757ede1b1e8eb8f6b32ec",
+      "state": "UNRECORDED",
+      "tagChange": null
     },
     {
       "path": "tests/browser/acceptance/UI-021.spec.js",
       "test": "UI-021-O1",
       "obligation": "UI-021-O1",
       "assertion": "expect(list).not.toContain(\"The active catalog historical-v1\");",
-      "lastSeenAt": "0ff0100",
-      "state": "UNRECORDED"
+      "lastSeenAt": "0ff0100a3bf8dc2eef9757ede1b1e8eb8f6b32ec",
+      "state": "UNRECORDED",
+      "tagChange": null
     },
     {
       "path": "tests/browser/acceptance/UI-021.spec.js",
       "test": "UI-021-O1",
       "obligation": "UI-021-O1",
       "assertion": "for (const t of TECHNICAL) expect(await main(page).innerText(), `${s} ${t}`).not.toMatch(t);",
-      "lastSeenAt": "0ff0100",
-      "state": "UNRECORDED"
+      "lastSeenAt": "0ff0100a3bf8dc2eef9757ede1b1e8eb8f6b32ec",
+      "state": "UNRECORDED",
+      "tagChange": null
     },
     {
       "path": "tests/browser/acceptance/UI-021.spec.js",
       "test": "UI-021-O2",
       "obligation": "UI-021-O2",
       "assertion": "await expect(main(page).locator(\"button, form\")).toHaveCount(0);",
-      "lastSeenAt": "0ff0100",
-      "state": "UNRECORDED"
+      "lastSeenAt": "0ff0100a3bf8dc2eef9757ede1b1e8eb8f6b32ec",
+      "state": "UNRECORDED",
+      "tagChange": null
     },
     {
       "path": "tests/browser/acceptance/UI-023.spec.js",
       "test": "UI-023-O2",
       "obligation": "UI-023-O2",
       "assertion": "expect(await main(page).innerText(), s).not.toMatch(integrity);",
-      "lastSeenAt": "0ff0100",
-      "state": "UNRECORDED"
+      "lastSeenAt": "0ff0100a3bf8dc2eef9757ede1b1e8eb8f6b32ec",
+      "state": "UNRECORDED",
+      "tagChange": null
     },
     {
       "path": "tests/browser/acceptance/UI-024.spec.js",
       "test": "UI-024-O3",
       "obligation": "UI-024-O3",
       "assertion": "expect(opening).toContain('<h1 id=\"opening-heading\">Opening investigation</h1>');",
-      "lastSeenAt": "0ff0100",
-      "state": "UNRECORDED"
+      "lastSeenAt": "0ff0100a3bf8dc2eef9757ede1b1e8eb8f6b32ec",
+      "state": "UNRECORDED",
+      "tagChange": null
     },
     {
       "path": "tests/browser/acceptance/UI-025.spec.js",
       "test": "UI-025-O1",
       "obligation": "UI-025-O1",
       "assertion": "await expect(page.locator(\".causa-findings\")).toContainText(\"No cause is confirmed.\");",
-      "lastSeenAt": "0ff0100",
-      "state": "UNRECORDED"
+      "lastSeenAt": "0ff0100a3bf8dc2eef9757ede1b1e8eb8f6b32ec",
+      "state": "UNRECORDED",
+      "tagChange": null
     },
     {
       "path": "tests/browser/acceptance/UI-025.spec.js",
       "test": "UI-025-O1",
       "obligation": "UI-025-O1",
       "assertion": "await expect(page.locator(\".causa-findings\")).toContainText(\"Not resolved.\");",
-      "lastSeenAt": "0ff0100",
-      "state": "UNRECORDED"
+      "lastSeenAt": "0ff0100a3bf8dc2eef9757ede1b1e8eb8f6b32ec",
+      "state": "UNRECORDED",
+      "tagChange": null
     },
     {
       "path": "tests/browser/acceptance/UI-025.spec.js",
       "test": "UI-025-O2",
       "obligation": "UI-025-O2",
       "assertion": "await expect(page.locator(\".causa-findings\")).toContainText(\"No cause is confirmed.\");",
-      "lastSeenAt": "0ff0100",
-      "state": "UNRECORDED"
+      "lastSeenAt": "0ff0100a3bf8dc2eef9757ede1b1e8eb8f6b32ec",
+      "state": "UNRECORDED",
+      "tagChange": null
     },
     {
       "path": "tests/browser/acceptance/UI-025.spec.js",
       "test": "UI-025-O4",
       "obligation": "UI-025-O4",
       "assertion": "await expect(page.locator(\".causa-findings\")).toContainText(\"No cause is confirmed.\");",
-      "lastSeenAt": "0ff0100",
-      "state": "UNRECORDED"
+      "lastSeenAt": "0ff0100a3bf8dc2eef9757ede1b1e8eb8f6b32ec",
+      "state": "UNRECORDED",
+      "tagChange": null
     },
     {
       "path": "tests/browser/acceptance/UI-025.spec.js",
       "test": "UI-025-O4",
       "obligation": "UI-025-O4",
       "assertion": "expect(text).not.toMatch(/\\bthe (root )?cause (is|was)\\b|\\bconcluded\\b|\\bconfirmed cause\\b/i);",
-      "lastSeenAt": "0ff0100",
-      "state": "UNRECORDED"
+      "lastSeenAt": "0ff0100a3bf8dc2eef9757ede1b1e8eb8f6b32ec",
+      "state": "UNRECORDED",
+      "tagChange": null
     },
     {
       "path": "tests/browser/acceptance/UI-034.spec.js",
       "test": "UI-034-O1",
       "obligation": "UI-034-O1",
       "assertion": "await expect(box.locator(\"dl.ef-key-value-list\"), where).toHaveCount(1);",
-      "lastSeenAt": "0ff0100",
-      "state": "UNRECORDED"
+      "lastSeenAt": "0ff0100a3bf8dc2eef9757ede1b1e8eb8f6b32ec",
+      "state": "UNRECORDED",
+      "tagChange": null
     },
     {
       "path": "tests/browser/acceptance/UI-034.spec.js",
       "test": "UI-034-O2",
       "obligation": "UI-034-O2",
       "assertion": "await expect(other).toHaveAttribute(\"data-selected\", \"true\");",
-      "lastSeenAt": "0ff0100",
-      "state": "UNRECORDED"
+      "lastSeenAt": "0ff0100a3bf8dc2eef9757ede1b1e8eb8f6b32ec",
+      "state": "UNRECORDED",
+      "tagChange": null
     },
     {
       "path": "tests/browser/acceptance/WDL-001.spec.js",
       "test": "WDL-001-O1",
       "obligation": "WDL-001-O1",
       "assertion": "if (served) expect(served.version).toBe(pkg.version);",
-      "lastSeenAt": "0ff0100",
-      "state": "UNRECORDED"
+      "lastSeenAt": "0ff0100a3bf8dc2eef9757ede1b1e8eb8f6b32ec",
+      "state": "UNRECORDED",
+      "tagChange": null
     },
     {
       "path": "tests/browser/acceptance/WDL-008.spec.js",
@@ -266,7 +331,8 @@
       "obligation": "WDL-008-O1",
       "assertion": "for (const [k, v] of Object.entries(palette)) expect(String(doc.palette[k]).toLowerCase(), k).toBe(v);",
       "lastSeenAt": "dfb21d95457a744880b9e440b2de7759c83dae35",
-      "state": "UNRECORDED"
+      "state": "UNRECORDED",
+      "tagChange": null
     },
     {
       "path": "tests/browser/acceptance/WDL-008.spec.js",
@@ -274,7 +340,8 @@
       "obligation": "WDL-008-O2",
       "assertion": "expect(b.nodes.map((n) => [n.id, n.stroke])).toEqual(a.nodes.map((n) => [n.id, n.stroke]));",
       "lastSeenAt": "9a69d5801f8448f29464c07a55bacec101cbb207",
-      "state": "UNRECORDED"
+      "state": "UNRECORDED",
+      "tagChange": null
     },
     {
       "path": "tests/browser/acceptance/WDL-008.spec.js",
@@ -282,15 +349,17 @@
       "obligation": "WDL-008-O2",
       "assertion": "expect(n.stroke.toLowerCase(), `${n.id}`).toBe(strokeOf(slot));",
       "lastSeenAt": "dfb21d95457a744880b9e440b2de7759c83dae35",
-      "state": "UNRECORDED"
+      "state": "UNRECORDED",
+      "tagChange": null
     },
     {
       "path": "tests/browser/acceptance/WDL-012.spec.js",
       "test": "WDL-012-O2",
       "obligation": "WDL-012-O2",
       "assertion": "expect(m.objects.length).toBe(doc.nodes.length);",
-      "lastSeenAt": "0ff0100",
-      "state": "UNRECORDED"
+      "lastSeenAt": "0ff0100a3bf8dc2eef9757ede1b1e8eb8f6b32ec",
+      "state": "UNRECORDED",
+      "tagChange": null
     }
   ]
 }
