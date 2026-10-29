@@ -250,6 +250,8 @@ let assess (inputs: Inputs) : Json =
         match inputs.Base, derived with
         | Some rev, _ -> full rev
         | None, Some b -> b
+        // An unusable kickoff record refuses the run; the report still says why (nothing is walked).
+        | None, None when kickoff.IsSome -> candidate
         | None, None -> failwith "no --base, and no kickoff record in the candidate's history to derive it from"
 
     let baseVerified = derived = Some baseCommit
