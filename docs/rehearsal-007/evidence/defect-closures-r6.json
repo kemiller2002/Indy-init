@@ -1,6 +1,15 @@
 {
-  "schema": "indy-init.defect-closure-verification/3",
-  "base": "65e346ee70c04d2bf6d4935d06484eb95c8cfae6",
+  "schema": "indy-init.defect-closure-verification/4",
+  "base": "c80f35e468fb2d1a38ce467f9bec860d52837b23",
+  "baseVerified": true,
+  "kickoff": {
+    "path": "kickoff/indy-init.kickoff.json",
+    "addedAt": "c80f35e468fb2d1a38ce467f9bec860d52837b23",
+    "field": null,
+    "recordedBase": null,
+    "base": "c80f35e468fb2d1a38ce467f9bec860d52837b23"
+  },
+  "baseProblem": null,
   "candidate": "46d5e1129a798549dcf37c2a6460c4f623298761",
   "records": "bf190b6b315bf25a0eb3c8b006d9da7c24c19e4b",
   "closures": {
@@ -12,11 +21,14 @@
   "verdict": "REFUSED",
   "incomplete": [],
   "unparseable": [],
+  "unsupported": [],
   "limits": [
     "a fix commit is shown to descend from the base and to change something, not to fix the class: an unrelated commit can be named",
     "review evidence is checked for a review record's structure, not for who wrote it: without a signed review or reviewer attestation the implementing agent can write it, in the candidate or a records commit",
-    "the base is the caller's --base: history rewritten before the run is not detected unless the kickoff commit is pinned outside the candidate (an owner record or tag)",
-    "tests are read lexically: whether a declared, unskipped test's body actually exercises the fix is not checked"
+    "the base is the commit that first added kickoff/indy-init.kickoff.json in the candidate's first-parent history: history rewritten before the run moves it, unless the kickoff commit is pinned outside the candidate (an owner record or tag)",
+    "tests are read lexically: whether a declared, unskipped test's body actually exercises the fix is not checked",
+    "the JavaScript/TypeScript scanner is a heuristic lexer that fails closed where it detects ambiguity; an adversarially written file may still desynchronise it undetected, so the independent review must inspect the test files a closure relies on",
+    "JSX/TSX files are not read: a test declared only in one is refused"
   ],
   "summary": {
     "verified": 0,
