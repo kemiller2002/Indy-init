@@ -29,3 +29,21 @@ R001 .echelon/foundations.json pins Forma 0.5.0, Folio 0.3.0, Limen 0.9.0, Ordo 
 
 ## No-go conditions
 Do not start the timed experiment with an unverified dependency upgrade, inconsistent schema, uncompiled interface, unvalidated golden fixtures, or a fabricated acceptance PASS.
+
+## 2026-10-28 addendum: isolated Causa workspace initialization
+
+No new rehearsal has started. CHT-001 is recorded in the legacy Praxis intake at `input-documents/2026-10-28-CHT-001-causa-historical-workspace-initialization.md`, and the prospective workflow is documented in `CAUSA-REHEARSAL-WORKSPACE-PREFLIGHT.md`.
+
+| Check | Status | Evidence |
+|---|---|---|
+| Immutable historical, everyday and combined templates | IMPLEMENTED ON FEATURE BRANCH, NOT MERGED | `causa-data` branch `codex/immutable-historical-rehearsal-workspaces`, commit `626be63`; digests and source commits recorded in each manifest |
+| Deterministic lightbulb reasoning and negative control | VERIFIED ON FEATURE BRANCH | Engine-authored 48-event successful history; engine-driven failed-replacement scenario; Causa 32-test suite |
+| Independent workspace creation and isolation | VERIFIED ON FEATURE BRANCH | Two-workspace append isolation; template and canonical-source byte checks |
+| Conditor ordered fail-closed initialization | IMPLEMENTED ON FEATURE BRANCH, NOT MERGED | `conditor` branch `codex/causa-rehearsal-preflight-v2`, commit `822f0ca`; Praxis work item `WI-0062` complete |
+| GitHub publication, remote readback and application load | VERIFIED ON DISPOSABLE BRANCH | `causa-data` branch `codex/causa-workspace-e2e-20261028`, `rehearsal-900001`, commit `c3101ec32521482b5a939fd43dde0e8676fb4d93` |
+| Four-case combined publication and frozen-application compatibility | VERIFIED ON DISPOSABLE BRANCH | `causa-data` branch `codex/causa-demonstration-e2e-20261028`, `rehearsal-900003`, commit `8d52ec9e02200977d4621ef4bf1aa429c6c788db`; READY receipt and frozen Rehearsal 5 provider harness |
+| CHT-001 / ELB-001 Praxis derivation | NOT RUN | Intake documents exist; Indy Init has no Praxis installation |
+| Event workspace selection | NOT RUN | Operator must select the next rehearsal id after merge/release |
+| Timed execution | NOT RUN | READY initialization is preparation only; explicit start remains required |
+
+The next rehearsal remains blocked until the feature changes are reviewed and merged, CHT-001 and ELB-001 are ingested with derived records, an operator selects a new unique id and template, and the real preflight receipt is READY. Disposable integration-test workspaces must not be reused as the event workspace.
