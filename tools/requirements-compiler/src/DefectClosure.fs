@@ -14,13 +14,19 @@
 ///   occurs on word boundaries in a test title (JS `test(`/`it(`, F# ``let ``...`` ``), never in a comment, a string
 ///   elsewhere, a skipped form (`test.skip`, `test.fixme`, `it.skip`, `xit`, `[<Fact(Skip = ...)>]`, or a skip call
 ///   anywhere in the body or on the declaration line: `test.skip()`, `testInfo.skip()`, `test.info().skip()`, a
-///   name bound to one; see TestBlocks), or as the prefix of a longer id (DCT-004-A is not DCT-004-AX);
+///   name bound to one; see TestBlocks), or as the prefix of a longer id (DCT-004-A is not DCT-004-AX). A test file
+///   TestBlocks cannot read consistently (UNPARSEABLE: it ends inside a literal or comment, a string runs past its
+///   line, brackets do not balance) declares nothing: a test named only there is refused, and any such file under the
+///   tests path makes the verdict at best INCOMPLETE;
 /// - DCL-006 a records commit, when given, descends from the candidate;
 /// - DCL-007 the review evidence exists (in the records commit when given, else the candidate), is not the closures
-///   record itself (compared as normalised repository paths, `./` and `a//b` and `x/../` collapsed, a path leaving
-///   the root refused, and by blob identity, so a copy of the record is refused too), and was added or changed by a
-///   commit that descends from the fix commit;
-/// - DCL-008 the review evidence names the class and its fix commit;
+///   record itself (compared as normalised repository paths: `./`, `a//b` and `x/../` collapsed, a path leaving the
+///   root refused), is a review record (ReviewRecord: an `indy-init.independent-review/1` document naming a reviewer
+///   and a verdict, not shaped like a closures record, so an edited copy of the closures is refused), and was added or
+///   changed by a commit that descends from the fix commit;
+/// - DCL-008 the review records the closure in a field, not in prose: a `defectClasses[]` entry with the class id
+///   (`defectClass`), the full fix SHA (`fixSha`) and `verdict: "CLOSED"` (Rehearsal 6's final review lists the classes
+///   it checked the same way, without closing any);
 /// - DCL-009 with a freeze time, `closedAt` is no later than the freeze and no earlier than the fix commit;
 /// - DCL-010 the fix commit descends from the base (kickoff) commit and is not the base: a commit from before the
 ///   rehearsal (the initial commit) fixes nothing in it;
@@ -34,11 +40,12 @@
 /// curation and a freeze time were supplied and there is at least one class, else INCOMPLETE: a gate never passes on
 /// checks it was not given the inputs to make.
 ///
-/// Inherent limits (history shows what changed, not why): any commit that descends from the base and changes
-/// something can be named as a class's fix, though it fixed something else; and review evidence the implementing
-/// agent wrote itself, including in a records commit, cannot be told from an independent reviewer's without reviewer
-/// identity or an attestation (a signed review, a pull-request review fetched by trusted CI). Both remain for the
-/// independent review.
+/// Inherent limits (history shows what changed, not why; also in every report's `limits`): any commit that descends
+/// from the base and changes something can be named as a class's fix, though it fixed something else; review evidence
+/// the implementing agent wrote itself in a review record's shape, including in a records commit, cannot be told from
+/// an independent reviewer's without reviewer identity or an attestation (a signed review, a pull-request review
+/// fetched by trusted CI); and the base is the caller's, so history rewritten before the run goes unnoticed unless the
+/// kickoff commit is pinned outside the candidate (an owner record or tag). They remain for the independent review.
 module DefectClosure
 
 open System
@@ -85,29 +92,36 @@ let private isAncestor (repo: string) (ancestor: string) (descendant: string) =
 let resolveCommit (repo: string) (rev: string) =
     Git.run repo [ "rev-parse"; "--verify"; "--quiet"; rev + "^{commit}" ] |> Result.map (fun b -> (text b).Trim()) |> Result.toOption
 
-/// The titles of the tests declared, and not skipped, under `path` at `commit`. Only spec files hold JS tests a runner
-/// collects; every F# file under the path may declare tests.
-let declaredTests (repo: string) (commit: string) (path: string) : string list =
+/// The tests under `path` at `commit`: the titles declared and not skipped, and the files that could not be read
+/// consistently (UNPARSEABLE: path, problem, text), whose tests are known neither to be declared nor to run. Only spec
+/// files hold JS tests a runner collects; every F# file under the path may declare tests.
+type TestTree = { Declared: string list; Unparseable: (string * string * string) list }
+
+let declaredTests (repo: string) (commit: string) (path: string) : TestTree =
     let prefix = path.TrimEnd('/') + "/"
 
     match Git.listFiles repo commit with
     | Error e -> failwithf "cannot list %s: %s" commit e
     | Ok files ->
-        files
-        |> List.filter (fun f ->
-            f.StartsWith(prefix, StringComparison.Ordinal)
-            && (match TestBlocks.languageOf f with
-                | Some TestBlocks.Js -> TestBlocks.isSpec f
-                | Some TestBlocks.FSharp -> true
-                | None -> false))
-        |> List.collect (fun f ->
-            match Git.showFile repo commit f with
-            | Ok bytes ->
-                TestBlocks.parse f (text bytes)
-                |> Option.defaultValue []
-                |> List.filter (fun b -> b.Kind = TestBlocks.Test && not b.Skipped)
-                |> List.map _.Title
-            | Error _ -> [])
+        let readings =
+            files
+            |> List.filter (fun f ->
+                f.StartsWith(prefix, StringComparison.Ordinal)
+                && (match TestBlocks.languageOf f with
+                    | Some TestBlocks.Js -> TestBlocks.isSpec f
+                    | Some TestBlocks.FSharp -> true
+                    | None -> false))
+            |> List.choose (fun f ->
+                match Git.showFile repo commit f with
+                | Ok bytes -> TestBlocks.parse f (text bytes) |> Option.map (fun r -> f, text bytes, r)
+                | Error _ -> None)
+
+        { Declared =
+            readings
+            |> List.collect (function
+                | _, _, Ok blocks -> blocks |> List.filter (fun b -> b.Kind = TestBlocks.Test && not b.Skipped) |> List.map _.Title
+                | _ -> [])
+          Unparseable = readings |> List.choose (function f, body, Error problem -> Some(f, problem, body) | _ -> None) }
 
 /// True when `id` occurs in `title` as a whole id: not inside, or as the prefix of, a longer one.
 let namesTest (id: string) (title: string) =
@@ -122,35 +136,6 @@ let private curatedClasses (curation: Json option) =
     curation
     |> Option.map (arr "tests" >> List.choose (strOpt "defectClass") >> List.distinct)
     |> Option.defaultValue []
-
-/// A path as the repository names it: `.` segments and repeated slashes dropped, `..` collapsed. None for an absolute
-/// path or one that leaves the repository root, which names no file of the repository.
-let repositoryPath (path: string) : string option =
-    if path.StartsWith("/", StringComparison.Ordinal) then
-        None
-    else
-        path.Split('/')
-        |> Array.fold
-            (fun (acc: string list option) segment ->
-                match acc, segment with
-                | None, _ -> None
-                | Some acc, ("" | ".") -> Some acc
-                | Some [], ".." -> None
-                | Some(_ :: rest), ".." -> Some rest
-                | Some acc, segment -> Some(segment :: acc))
-            (Some [])
-        |> Option.filter (List.isEmpty >> not)
-        |> Option.map (List.rev >> String.concat "/")
-
-/// The repository path a review-evidence reference (`path#anchor`) names.
-let private evidencePath (reference: string) = repositoryPath (reference.Split('#').[0])
-
-let private evidenceText (repo: string) (commit: string) (path: string) =
-    Git.showFile repo commit path |> Result.map text |> Result.toOption
-
-/// The object id of the blob at `path` in `commit`, if there is one.
-let private blobAt (repo: string) (commit: string) (path: string) =
-    Git.run repo [ "rev-parse"; "--verify"; "--quiet"; sprintf "%s:%s" commit path ] |> Result.map (fun b -> (text b).Trim()) |> Result.toOption
 
 /// True when a commit that descends from `fix` (and is in `commit`'s history) added or changed `path`.
 let private changedAfter (repo: string) (fix: string) (commit: string) (path: string) =
@@ -182,7 +167,7 @@ let private closedAt (closure: Json) =
         | _ -> None)
 
 /// The problems of one claimed (PASS) closure.
-let private problemsOf (inputs: Inputs) (baseCommit: string option) (declared: string list) (recordsValid: bool) (closure: Json) : string list =
+let private problemsOf (inputs: Inputs) (baseCommit: string option) (tree: TestTree) (recordsValid: bool) (closure: Json) : string list =
     let id = strOpt "id" closure |> Option.defaultValue ""
     let fix = strOpt "fixSha" closure |> Option.defaultValue ""
     let tests = strs "tests" closure
@@ -215,29 +200,27 @@ let private problemsOf (inputs: Inputs) (baseCommit: string option) (declared: s
               yield sprintf "DCL-004 %s: curated regression test %s is not part of the closure" id test
 
       for test in tests do
-          if not (declared |> List.exists (namesTest test)) then
-              yield sprintf "DCL-005 %s: regression test %s is not declared as a (not skipped) test under %s/ in the candidate" id test inputs.TestsPath
+          if not (tree.Declared |> List.exists (namesTest test)) then
+              match tree.Unparseable |> List.filter (fun (_, _, body) -> namesTest test body) with
+              | [] -> yield sprintf "DCL-005 %s: regression test %s is not declared as a (not skipped) test under %s/ in the candidate" id test inputs.TestsPath
+              | files ->
+                  for f, problem, _ in files do
+                      yield sprintf "DCL-005 %s: regression test %s is named only in %s, which is UNPARSEABLE (%s), so it is not shown to be declared and run" id test f problem
 
-      let closuresPath = repositoryPath inputs.ClosuresPath |> Option.defaultValue inputs.ClosuresPath
-
-      match evidence, evidencePath evidence with
-      | "", _ -> yield sprintf "DCL-007 %s: no review evidence is recorded" id
-      | reference, None -> yield sprintf "DCL-007 %s: review evidence %s does not name a path inside the repository" id reference
-      | reference, Some path when path = closuresPath ->
-          yield sprintf "DCL-007 %s: review evidence %s is the closures record itself" id reference
-      | reference, Some path when (blobAt inputs.Repo evidenceCommit path).IsSome && blobAt inputs.Repo evidenceCommit path = blobAt inputs.Repo evidenceCommit closuresPath ->
-          yield sprintf "DCL-007 %s: review evidence %s is a copy of the closures record" id reference
-      | reference, Some path ->
-          match evidenceText inputs.Repo evidenceCommit path with
-          | None -> yield sprintf "DCL-007 %s: review evidence %s does not exist at %s" id reference evidenceCommit
-          | Some body ->
+      match evidence with
+      | "" -> yield sprintf "DCL-007 %s: no review evidence is recorded" id
+      | reference ->
+          match ReviewRecord.read inputs.Repo evidenceCommit [ inputs.ClosuresPath ] reference with
+          | Error why -> yield sprintf "DCL-007 %s: review evidence %s" id why
+          | Ok(path, review) ->
               if fixUsable && not (changedAfter inputs.Repo fix evidenceCommit path) then
                   yield sprintf "DCL-007 %s: review evidence %s was not added or changed by any commit after the fix %s" id reference fix
 
-              let namesFix = isFullSha fix && body.Contains(fix.Substring(0, 7), StringComparison.Ordinal)
+              let closes (entry: Json) =
+                  strOpt "defectClass" entry = Some id && strOpt "fixSha" entry = Some fix && strOpt "verdict" entry = Some "CLOSED"
 
-              if not (body.Contains(id, StringComparison.Ordinal) && namesFix) then
-                  yield sprintf "DCL-008 %s: review evidence %s does not name the class and its fix commit" id reference
+              if not (arr "defectClasses" review |> List.exists closes) then
+                  yield sprintf "DCL-008 %s: review %s records no `defectClasses[]` entry closing it (defectClass %s, fixSha %s, verdict CLOSED)" id reference id fix
 
       match inputs.FreezeAt with
       | None -> ()
@@ -251,7 +234,14 @@ let private problemsOf (inputs: Inputs) (baseCommit: string option) (declared: s
                   yield sprintf "DCL-009 %s: closed at %s, before its fix commit was made (%s)" id (at.ToString("o")) (fixedAt.ToString("o"))
               | _ -> () ]
 
-/// The `indy-init.defect-closure-verification/2` report.
+/// What this verification cannot establish, stated in every report.
+let limits =
+    [ "a fix commit is shown to descend from the base and to change something, not to fix the class: an unrelated commit can be named"
+      "review evidence is checked for a review record's structure, not for who wrote it: without a signed review or reviewer attestation the implementing agent can write it, in the candidate or a records commit"
+      "the base is the caller's --base: history rewritten before the run is not detected unless the kickoff commit is pinned outside the candidate (an owner record or tag)"
+      "tests are read lexically: whether a declared, unskipped test's body actually exercises the fix is not checked" ]
+
+/// The `indy-init.defect-closure-verification/3` report.
 let assess (inputs: Inputs) : Json =
     let recordsProblems =
         match inputs.Records with
@@ -260,7 +250,7 @@ let assess (inputs: Inputs) : Json =
         | _ -> []
 
     let baseCommit = resolveCommit inputs.Repo inputs.Base
-    let declared = declaredTests inputs.Repo inputs.Candidate inputs.TestsPath
+    let tree = declaredTests inputs.Repo inputs.Candidate inputs.TestsPath
 
     let claimed =
         arr "defectClasses" inputs.Closures
@@ -269,7 +259,7 @@ let assess (inputs: Inputs) : Json =
 
             match strOpt "status" closure with
             | Some "PASS" ->
-                let problems = recordsProblems @ problemsOf inputs baseCommit declared recordsProblems.IsEmpty closure
+                let problems = recordsProblems @ problemsOf inputs baseCommit tree recordsProblems.IsEmpty closure
                 id, (if problems.IsEmpty then "VERIFIED" else "REFUSED"), problems
             | Some status when knownStatuses.Contains status -> id, "OPEN", []
             | status ->
@@ -290,7 +280,9 @@ let assess (inputs: Inputs) : Json =
     let incomplete =
         [ if inputs.Curation.IsNone then yield "no curation was supplied, so no class is known to be required"
           if inputs.FreezeAt.IsNone then yield "no freeze time was supplied, so no closure is shown to precede the freeze"
-          if claimed.IsEmpty then yield "the closures record holds no defect class" ]
+          if claimed.IsEmpty then yield "the closures record holds no defect class"
+          for f, problem, _ in tree.Unparseable do
+              yield sprintf "%s is UNPARSEABLE (%s): which tests it declares, and whether they run, is unknown" f problem ]
 
     let verdict =
         if refused > 0 then "REFUSED"
@@ -298,7 +290,7 @@ let assess (inputs: Inputs) : Json =
         else "VERIFIED"
 
     JObj
-        [ "schema", JStr "indy-init.defect-closure-verification/2"
+        [ "schema", JStr "indy-init.defect-closure-verification/3"
           "base", JStr(baseCommit |> Option.defaultValue inputs.Base)
           "candidate", JStr(resolveCommit inputs.Repo inputs.Candidate |> Option.defaultValue inputs.Candidate)
           "records", jopt JStr inputs.Records
@@ -307,6 +299,8 @@ let assess (inputs: Inputs) : Json =
           "freezeAt", jopt (fun (at: DateTimeOffset) -> JStr(at.ToString("o"))) inputs.FreezeAt
           "verdict", JStr verdict
           "incomplete", jstrs incomplete
+          "unparseable", JArr(tree.Unparseable |> List.map (fun (f, problem, _) -> JObj [ "path", JStr f; "problem", JStr problem ]))
+          "limits", jstrs limits
           "summary",
           JObj
               [ "verified", jint (count "VERIFIED")

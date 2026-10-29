@@ -142,6 +142,17 @@ let all () : string list =
           JObj [ "components", JArr(arr "components" distinct @ [ JObj [ "systemId", JStr "praxis"; "version", JStr "3.23.0"; "tag", JStr "v3.23.0"; "repository", JStr "kemiller2002/dokimos"; "distribution", JObj [ "mechanism", JStr "github-release" ] ] ]) ]
       if selectedSystems twoPrefixes |> List.exists (fun s -> statusOf s.System (assessOf twoPrefixes [] []) = "AMBIGUOUS_COMPONENT") then
           yield "components of one repository with different tag prefixes are AMBIGUOUS_COMPONENT"
+      // Third review (N5 low): the limen npm package beside limen-fsharp's GitHub releases has its own source.
+      let mixedSources =
+          JObj
+              [ "components",
+                JArr
+                    [ JObj [ "systemId", JStr "limen-fsharp"; "version", JStr "0.9.0"; "tag", JStr "v0.9.0"; "repository", JStr "kemiller2002/limen"; "distribution", JObj [ "mechanism", JStr "github-release" ] ]
+                      JObj [ "systemId", JStr "limen-npm"; "version", JStr "0.9.0"; "tag", JStr "v0.9.0"; "repository", JStr "kemiller2002/limen"; "distribution", JObj [ "mechanism", JStr "npm"; "package", JStr "@echelon-foundry/limen" ] ] ] ]
+      if selectedSystems mixedSources |> List.exists (fun s -> statusOf s.System (assessOf mixedSources [] []) = "AMBIGUOUS_COMPONENT") then
+          yield "a component read from npm is AMBIGUOUS_COMPONENT beside a GitHub-release component of the same repository"
+      if strs "limits" current |> List.isEmpty then
+          yield "the report does not state its inherent limits"
       // N4 is inherent: the report says the observations are not attested.
       if not ((strOpt "attestation" current |> Option.defaultValue "").StartsWith("none:", StringComparison.Ordinal)) then
           yield "the report does not state that its observations carry no attestation"

@@ -831,16 +831,18 @@ let releaseComparisonCommand (args: string list) : int =
         2
 
 /// `assertion-ratchet`: no assertion a bound test held since the base disappears from the candidate without a
-/// resolved tag change (see AssertionRatchet, R7-REM-011). The base is derived from the kickoff record in the
-/// candidate's history (`--kickoff-path`, default kickoff/indy-init.kickoff.json); a `--base` is checked against it.
-/// Exit 0 PASS, 3 FAIL, REFUSED or INCOMPLETE, 2 unusable input.
+/// resolved tag change (see AssertionRatchet, R7-REM-011). The base is derived from kickoff/indy-init.kickoff.json in
+/// the candidate's history (`--kickoff-path` may only name that path; any other is REFUSED); a `--base` is checked
+/// against it. Review tag changes are read from acceptance/reviews/final/review-tag-changes.json at `--records` (or
+/// the candidate); `--tag-changes FILE` from disk leaves the verdict at best INCOMPLETE. Exit 0 PASS, 3 FAIL, REFUSED
+/// or INCOMPLETE, 2 unusable input.
 let assertionRatchetCommand (args: string list) : int =
     match optionMap args with
     | Error e ->
         eprintfn "%s" e
         2
     | Ok m when not (m.ContainsKey "--repo" && m.ContainsKey "--candidate") ->
-        eprintfn "usage: requirements-compiler assertion-ratchet --repo DIR --candidate SHA [--kickoff-path PATH] [--base SHA] [--path DIR]... [--tag-changes FILE] [--plan FILE] [--out FILE]"
+        eprintfn "usage: requirements-compiler assertion-ratchet --repo DIR --candidate SHA [--base SHA] [--records SHA] [--path DIR]... [--plan FILE] [--tag-changes FILE (INCOMPLETE at best)] [--out FILE]"
         2
     | Ok m ->
         try
@@ -853,7 +855,8 @@ let assertionRatchetCommand (args: string list) : int =
                       Base = last "--base"
                       Candidate = one "--candidate"
                       Roots = m.TryFind "--path" |> Option.defaultValue [ "tests" ]
-                      TagChanges = last "--tag-changes" |> Option.map parseFile
+                      TagChangesFile = last "--tag-changes" |> Option.map parseFile
+                      Records = last "--records"
                       Plan = last "--plan" |> Option.map parseFile
                       KickoffPath = last "--kickoff-path" |> Option.defaultValue AssertionRatchet.defaultKickoffPath |> Some }
 

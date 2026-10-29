@@ -13,16 +13,19 @@
 ///
 /// `observe` is the only I/O. It stores each raw answer with its sha256; `assess` is pure over its inputs and
 /// re-checks every observation: the answer's digest, the source URL the selected set implies, and the newest release
-/// re-derived from the answer. A mismatch is TAMPERED. Two selected components of one repository whose tags carry the
-/// same prefix (`v` for both limen-fsharp and the limen npm package) cannot be told apart in that repository's
-/// release list, so both are AMBIGUOUS_COMPONENT (not PASS) until their tag prefixes differ.
+/// re-derived from the answer. A mismatch is TAMPERED. Two selected components read from one repository's release
+/// list whose tags carry the same prefix (`v` for both) cannot be told apart there, so both are AMBIGUOUS_COMPONENT
+/// (not PASS) until their tag prefixes differ; a component read from npm or NuGet (the limen npm package beside
+/// limen-fsharp's GitHub releases) has its own source and is not ambiguous.
 ///
 /// Inherent limits (stated in every report's `attestation`): the observations are caller-supplied. The digest proves
 /// the record is consistent with the answer it carries, not that the source sent that answer: a forged answer with
 /// its own digest re-derives cleanly. `observedAt` is the observer's clock, and the lock record, the deviations'
 /// `approvedBy` and the deviations file are written by whoever runs `assess`. Proof needs `observe` run in trusted CI
-/// with signed output (or the CI run's own logs); this module does not provide it. Only the first 100 GitHub releases
-/// (the newest) are read.
+/// with signed output (or the CI run's own logs); this module does not provide it. npm's newest release is its
+/// `dist-tags.latest`, which the publisher sets (a mismatch with the highest stable version is reported, not
+/// resolved). GitHub release lists are paged (100 a page, at most 10 pages: the newest 1000 releases); the stored
+/// answer is the pages' releases combined into one array.
 module ReleaseComparison
 
 open System
@@ -227,13 +230,29 @@ let observe (http: HttpClient) (now: unit -> DateTimeOffset) (s: Selected) : Obs
             if response.IsSuccessStatusCode then Ok body else Error(sprintf "HTTP %d" (int response.StatusCode))
         with ex -> Error ex.Message
 
+    // A GitHub release list, page by page until a short page (at most 10), combined into one array.
+    let fetchAll (url: string) =
+        if not (url.StartsWith("https://api.github.com/", StringComparison.Ordinal)) then
+            fetch url
+        else
+            let rec pages page (acc: Json list) =
+                match fetch (sprintf "%s&page=%d" url page) with
+                | Error e -> Error e
+                | Ok body ->
+                    match (try parseBytes (Encoding.UTF8.GetBytes body) with _ -> JNull) with
+                    | JArr items when items.Length = 100 && page < 10 -> pages (page + 1) (acc @ items)
+                    | JArr items -> Ok(serialize (JArr(acc @ items)))
+                    | _ -> Ok body
+
+            pages 1 []
+
     let at = now ()
     let failed source e = { System = s.System; Source = source; Latest = None; PublishedAt = None; ObservedAt = at; AnswerSha256 = None; Answer = None; Error = Some e }
 
     match sourceOf s with
     | None -> failed "" "no documented release source"
     | Some source ->
-        match fetch source with
+        match fetchAll source with
         | Error e -> failed source e
         | Ok body ->
             let derived = derive s body
@@ -350,7 +369,8 @@ let assess
 
     let selected = selectedSystems releaseSet
 
-    // Components that share a repository and a tag prefix (no prefix, `` and `v` read the same tags).
+    // Components read from one release list (the same GitHub repository) with one tag prefix (no prefix, `` and `v`
+    // read the same tags). A component read from npm or NuGet has its own source and is not confused with them.
     let prefixKey (s: Selected) =
         match s.TagPrefix with
         | Some p when p <> "" && p <> "v" -> p
@@ -358,7 +378,7 @@ let assess
 
     let sharing (s: Selected) =
         selected
-        |> List.filter (fun o -> o.System <> s.System && o.Repository.IsSome && o.Repository = s.Repository && prefixKey o = prefixKey s)
+        |> List.filter (fun o -> o.System <> s.System && (sourceOf s).IsSome && sourceOf o = sourceOf s && prefixKey o = prefixKey s)
         |> List.map _.System
 
     let rows =
@@ -397,9 +417,14 @@ let assess
     let failing = rows |> List.filter (fun r -> not (passing.Contains(str "status" r)))
 
     JObj
-        [ "schema", JStr "indy-init.release-comparison/3"
+        [ "schema", JStr "indy-init.release-comparison/4"
           "lockedAt", JStr(lockedAt.ToString("o", CultureInfo.InvariantCulture))
           "maxObservationAge", JStr(string maxAge)
+          "limits",
+          jstrs
+              [ "observations, observedAt, the lock record, approvedBy and the deviations are caller-supplied; a forged answer with its own digest re-derives cleanly"
+                "npm's newest release is dist-tags.latest as the publisher set it"
+                "GitHub release lists are read to at most 1000 releases (10 pages of 100)" ]
           "attestation",
           JStr "none: observations, observedAt, the lock record, approvedBy and the deviations are caller-supplied; the digest shows the record matches the answer it carries, not that the source sent it. Run observe in trusted CI with signed output for proof"
           "deviations", JObj [ "count", jint deviations.Length; "sha256", jopt JStr deviationsSha256 ]

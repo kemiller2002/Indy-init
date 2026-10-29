@@ -53,23 +53,48 @@ let private withRepo (f: string -> 'a) =
 let private tagChange obligation (resolution: Json) =
     JObj [ "changes", JArr [ JObj [ "obligation", JStr obligation; "resolution", resolution ] ] ]
 
+let private reviewPath = "acceptance/reviews/final-review.json"
+
+/// A review record (ReviewRecord) whose finding names the UI-034 obligations.
+let private reviewRef = reviewPath + "#RF-F-8"
+
+let private reviewDoc (obligations: string list) =
+    serialize (
+        JObj
+            [ "schema", JStr "indy-init.independent-review/1"
+              "reviewer", JStr "independent-reviewer"
+              "role", JStr "review"
+              "verdict", JStr "BLOCKING_FINDINGS"
+              "findings", JArr [ JObj [ "id", JStr "RF-F-8"; "obligations", jstrs obligations ] ] ]
+    )
+
 /// A tag change that names its review, as PlanVerification requires.
 let private reviewedTagChange obligation (resolution: Json) =
-    JObj [ "changes", JArr [ JObj [ "obligation", JStr obligation; "review", JStr "R7-final"; "resolution", resolution ] ] ]
+    JObj [ "changes", JArr [ JObj [ "obligation", JStr obligation; "review", JStr reviewRef; "resolution", resolution ] ] ]
+
+/// A records commit (after everything so far) holding the tag changes at their fixed path, the review record, and an
+/// unrelated review that names another obligation.
+let private recordsWith repo (tags: Json) =
+    Directory.CreateDirectory(Path.Combine(repo, "acceptance/reviews/final")) |> ignore
+    File.WriteAllText(Path.Combine(repo, reviewPath), reviewDoc [ "UI-034-O1"; "UI-034-O2" ])
+    File.WriteAllText(Path.Combine(repo, "acceptance/reviews/unrelated.json"), reviewDoc [ "UI-999-O1" ])
+    commitFile repo AssertionRatchet.tagChangesPath (serialize tags)
 
 /// The base as the caller states it (abbreviated, as a person would write it), checked against the kickoff record.
-let private assessWith repo (baseCommit: string option) candidate tags (kickoff: string option) =
+let private assessWith repo (baseCommit: string option) candidate (tagFile: Json option) (records: string option) (kickoff: string option) =
     AssertionRatchet.assess
         { Repo = repo
           Base = baseCommit |> Option.map (fun b -> b.Substring(0, 7))
           Candidate = candidate
           Roots = [ "tests" ]
-          TagChanges = tags
+          TagChangesFile = tagFile
+          Records = records
           Plan = None
           KickoffPath = kickoff }
 
-let private assess repo (baseCommit: string) candidate tags =
-    assessWith repo (Some baseCommit) candidate tags (Some kickoffPath)
+/// With tag changes, they are committed in a records commit (see recordsWith) and read from it.
+let private assess repo (baseCommit: string) candidate (tags: Json option) =
+    assessWith repo (Some baseCommit) candidate None (tags |> Option.map (recordsWith repo)) (Some kickoffPath)
 
 let private verdict repo baseCommit candidate = str "verdict" (assess repo baseCommit candidate None)
 
@@ -120,7 +145,12 @@ let private bypasses =
       "a module-level `const { skip } = test` alias called in the test",
       zz [ "  skip();"; held "a" ] [ held "b" ] [ held "c" ] [ "  await expect(page.locator(\"d\"))"; "    .toHaveCount(1);" ] [ held "e" ] [] (readyHelper + "\nconst { skip } = test;")
       "a `test.info().skip()` in the test",
-      zz [ "  test.info().skip();"; held "a" ] [ held "b" ] [ held "c" ] [ "  await expect(page.locator(\"d\"))"; "    .toHaveCount(1);" ] [ held "e" ] [] readyHelper ]
+      zz [ "  test.info().skip();"; held "a" ] [ held "b" ] [ held "c" ] [ "  await expect(page.locator(\"d\"))"; "    .toHaveCount(1);" ] [ held "e" ] [] readyHelper
+      // The third review: /tmp/claude-0/syn/repo ZZW.spec.js and r6c fake3's dct4c.spec.js.
+      "an assertion inside a template whose ${...} holds a string with } and a backtick",
+      zz [ "  const dead = `${\"}\" + \"`\"}"; held "a"; "  `; const q = \"`\";" ] [ held "b" ] [ held "c" ] [ "  await expect(page.locator(\"d\"))"; "    .toHaveCount(1);" ] [ held "e" ] [] readyHelper
+      "a `test.skip()` hidden behind a regular expression after an `if (...)` head",
+      zz [ "  if (true) /`/.test(\"\");"; "  test.skip();"; "  // `"; held "a" ] [ held "b" ] [ held "c" ] [ "  await expect(page.locator(\"d\"))"; "    .toHaveCount(1);" ] [ held "e" ] [] readyHelper ]
 
 let all () : string list =
     [ withRepo (fun repo ->
@@ -142,31 +172,46 @@ let all () : string list =
             for text in [ "ok"; "owner decision DEC-R7-009" ] do
                 if str "verdict" (assess repo base' removedOne (Some(reviewedTagChange "UI-034-O2" (JStr text)))) <> "FAIL" then
                     yield sprintf "a free-text resolution `%s` excuses a removed assertion" text
-            let review = JObj [ "kind", JStr "not-rebound"; "reason", JStr "superseded by UI-034-O3"; "review", JStr "R7-final" ]
+            let review = JObj [ "kind", JStr "not-rebound"; "reason", JStr "superseded by UI-034-O3"; "review", JStr reviewRef ]
             if str "verdict" (assess repo base' removedOne (Some(tagChange "UI-034-O2" review))) <> "FAIL" then
                 yield "a tag change that names no review of its own (PlanVerification REVIEW-TAG-CHANGE) excuses a removed assertion"
             let resolved = assess repo base' removedOne (Some(reviewedTagChange "UI-034-O2" review))
             if str "verdict" resolved <> "PASS" || (arr "removed" resolved |> List.map (str "state")) <> [ "RESOLVED_TAG_CHANGE" ] then
                 yield "a PlanVerification `not-rebound` review resolution is not honoured"
-            let byTitle = JObj [ "changes", JArr [ JObj [ "test", JStr "tests/UI-034.spec.js > UI-034-O2"; "review", JStr "R7-final"; "resolution", review ] ] ]
+            let byTitle = JObj [ "changes", JArr [ JObj [ "test", JStr "tests/UI-034.spec.js > UI-034-O2"; "review", JStr reviewRef; "resolution", review ] ] ]
             if str "verdict" (assess repo base' removedOne (Some byTitle)) <> "PASS" then
                 yield "a tag change keyed on the full test title is not honoured"
-            let otherTitle = JObj [ "changes", JArr [ JObj [ "test", JStr "UI-034-O1"; "obligation", JStr "UI-034-O2"; "review", JStr "R7-final"; "resolution", review ] ] ]
+            let otherTitle = JObj [ "changes", JArr [ JObj [ "test", JStr "UI-034-O1"; "obligation", JStr "UI-034-O2"; "review", JStr reviewRef; "resolution", review ] ] ]
             if str "verdict" (assess repo base' removedOne (Some otherTitle)) <> "FAIL" then
                 yield "a tag change naming another test excuses this test's removal through its obligation"
-            let unbound = assessWith repo (Some base') base' None None
+            // D4 (third review, tc3.json): a review that is free text, the tag-change record itself, or a review that
+            // does not name the obligation does not stand; tag changes from disk never PASS.
+            let selfReview = JObj [ "kind", JStr "not-rebound"; "reason", JStr "looser is fine"; "review", JStr "agent-self-review" ]
+            let withReview (reference: string) (resolution: Json) =
+                JObj [ "changes", JArr [ JObj [ "obligation", JStr "UI-034-O2"; "test", JStr "UI-034-O2"; "review", JStr reference; "resolution", resolution ] ] ]
+            for label, tags in
+                [ "a free-text review (agent-self-review)", withReview "agent-self-review" selfReview
+                  "the tag-change record as its own review", withReview (AssertionRatchet.tagChangesPath + "#self") (JObj [ "kind", JStr "not-rebound"; "reason", JStr "r"; "review", JStr(AssertionRatchet.tagChangesPath + "#self") ])
+                  "a review that does not name the obligation", withReview "acceptance/reviews/unrelated.json" (JObj [ "kind", JStr "not-rebound"; "reason", JStr "r"; "review", JStr "acceptance/reviews/unrelated.json" ]) ] do
+                if str "verdict" (assess repo base' removedOne (Some tags)) <> "FAIL" then
+                    yield sprintf "a tag change whose review is %s excuses a removed assertion" label
+            let records = recordsWith repo (reviewedTagChange "UI-034-O2" review)
+            let fromDisk = assessWith repo (Some base') removedOne (Some(reviewedTagChange "UI-034-O2" review)) (Some records) (Some kickoffPath)
+            if str "verdict" fromDisk <> "INCOMPLETE" then
+                yield sprintf "tag changes supplied from a file on disk leave the verdict %s, not INCOMPLETE" (str "verdict" fromDisk)
+            let unbound = assessWith repo (Some base') base' None None None
             if str "verdict" unbound <> "INCOMPLETE" || field "baseVerified" unbound <> Some(JBool false) then
                 yield "a ratchet with no kickoff record binding the base is not INCOMPLETE"
             // N2: the second review forged a kickoff file naming the candidate's parent; the base is now read from git.
-            let parent = assessWith repo (Some base') removedOne None (Some kickoffPath)
-            if str "verdict" (assessWith repo (Some removedOne) removedOne None (Some kickoffPath)) <> "REFUSED" then
+            let parent = assessWith repo (Some base') removedOne None None (Some kickoffPath)
+            if str "verdict" (assessWith repo (Some removedOne) removedOne None None (Some kickoffPath)) <> "REFUSED" then
                 yield "a --base other than the commit that added the kickoff record is not REFUSED"
             if str "verdict" parent <> "FAIL" || field "baseVerified" parent <> Some(JBool true) then
                 yield "the commit that added the kickoff record does not bind the base"
-            let derived = assessWith repo None removedOne None (Some kickoffPath)
+            let derived = assessWith repo None removedOne None None (Some kickoffPath)
             if str "base" derived <> base' || field "baseVerified" derived <> Some(JBool true) then
                 yield "with no --base the base is not derived from the kickoff record"
-            if str "verdict" (assessWith repo (Some base') removedOne None (Some "kickoff/elsewhere.json")) <> "REFUSED" then
+            if str "verdict" (assessWith repo (Some base') removedOne None None (Some "kickoff/elsewhere.json")) <> "REFUSED" then
                 yield "a kickoff record the candidate's history does not hold is not REFUSED"
             if str "base" report <> base' then
                 yield "the report does not echo the full base SHA" ])
@@ -178,11 +223,11 @@ let all () : string list =
           let edited = commitFile repo kickoffPath (serialize (JObj [ "base", JStr receipt ]))
           let candidate = commitFile repo "tests/UI-034.spec.js" (spec [])
 
-          [ if str "verdict" (assessWith repo (Some start) candidate None (Some kickoffPath)) <> "FAIL" then
+          [ if str "verdict" (assessWith repo (Some start) candidate None None (Some kickoffPath)) <> "FAIL" then
                 yield "a kickoff receipt's initialRepository.head does not bind the base"
-            if str "verdict" (assessWith repo (Some receipt) candidate None (Some kickoffPath)) <> "REFUSED" then
+            if str "verdict" (assessWith repo (Some receipt) candidate None None (Some kickoffPath)) <> "REFUSED" then
                 yield "a later edit of the kickoff record moves the base"
-            if str "base" (assessWith repo None edited None (Some kickoffPath)) <> start then
+            if str "base" (assessWith repo None edited None None (Some kickoffPath)) <> start then
                 yield "the base derived from a kickoff receipt is not its initialRepository.head" ])
       withRepo (fun repo ->
           File.Delete(Path.Combine(repo, kickoffPath))
@@ -190,8 +235,46 @@ let all () : string list =
           let candidate = commitFile repo kickoffPath (serialize (JObj [ "base", JStr "HEAD" ]))
           commitFile repo "README.md" "later\n" |> ignore
 
-          [ if str "verdict" (assessWith repo (Some start) candidate None (Some kickoffPath)) <> "REFUSED" then
+          [ if str "verdict" (assessWith repo (Some start) candidate None None (Some kickoffPath)) <> "REFUSED" then
                 yield "a kickoff record naming a commit that is not its ancestor binds a base" ])
+      withRepo (fun repo ->
+          // D2: only kickoff/indy-init.kickoff.json binds the base; another file the history adds (an ROS envelope) does not.
+          let envelope = commitFile repo ".ros/executions/x/envelope.json" "{}\n"
+          let candidate = commitFile repo "tests/UI-034.spec.js" (spec [ selected ])
+
+          [ if str "verdict" (assessWith repo (Some envelope) candidate None None (Some ".ros/executions/x/envelope.json")) <> "REFUSED" then
+                yield "a caller-chosen kickoff path (an ROS envelope) binds the base" ])
+      withRepo (fun repo ->
+          // D1: a file the lexer cannot read consistently is never trusted: the verdict is not PASS.
+          let base' = commitFile repo "tests/acceptance/ZZZ.spec.js" zzBase
+          let broken = commitFile repo "tests/acceptance/ZZZ.spec.js" (zzBase + "const t = `\n")
+          let mended = commitFile repo "tests/acceptance/ZZZ.spec.js" zzBase
+          let report = assess repo base' mended None
+
+          [ if verdict repo base' broken = "PASS" then
+                yield "an UNPARSEABLE candidate file passes"
+            if str "verdict" report <> "INCOMPLETE" || arr "unparseable" report |> List.isEmpty then
+                yield sprintf "an UNPARSEABLE version in the history leaves the verdict %s, not INCOMPLETE" (str "verdict" report) ])
+      withRepo (fun repo ->
+          // D5: a base test skipped only conditionally may run, so its assertions are held; an unconditionally skipped
+          // base test holds nothing, and what it excluded is reported.
+          let conditional = commitFile repo "tests/UI-034.spec.js" (spec [ "  test.skip(isMobile, \"no hover\");"; selected ])
+          let dropped = commitFile repo "tests/UI-034.spec.js" (spec [ "  test.skip(isMobile, \"no hover\");" ])
+
+          [ if verdict repo conditional dropped <> "FAIL" then
+                yield "an assertion of a conditionally skipped base test is removed without failing" ])
+      withRepo (fun repo ->
+          let skipped = commitFile repo "tests/UI-034.spec.js" (spec [ "  test.skip();"; selected ])
+          let dropped = commitFile repo "tests/UI-034.spec.js" (spec [ "  test.skip();" ])
+          let report = assess repo skipped dropped None
+          let counts = field "skippedBeforeCandidate" report |> Option.defaultValue JNull
+
+          [ if str "verdict" report <> "PASS" then
+                yield "an unconditionally skipped base test is held to its assertions"
+            if intOpt "testsExcluded" counts <> Some 1L || intOpt "assertionsExcluded" counts <> Some 1L then
+                yield sprintf "the report does not count the skipped base test and its excluded assertion: %s" (serialize counts)
+            if strs "limits" report |> List.isEmpty then
+                yield "the report does not state the ratchet's inherent limits" ])
       withRepo (fun repo ->
           let base' = commitFile repo "tests/UI-034.spec.js" (spec [ selected ])
           let loosened = commitFile repo "tests/UI-034.spec.js" ((spec [ selected ]).Replace("toHaveCount(1)", "count() >= 1 && expect(true)"))

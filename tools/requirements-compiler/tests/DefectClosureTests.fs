@@ -35,6 +35,8 @@ type private History =
       Candidate: string
       Records: string
       Side: string
+      /// A descendant of the records commit that adds an UNPARSEABLE spec.
+      Broken: string
       FixedAt: DateTimeOffset }
 
 let private specs =
@@ -69,53 +71,13 @@ let private specs =
           ");"
           "" ]
 
-let private history () =
-    let repo = Path.Combine(Path.GetTempPath(), $"defect-closure-{Guid.NewGuid():N}")
-    Directory.CreateDirectory repo |> ignore
-    git repo [ "init"; "-q"; "-b"; "main" ] |> ignore
-    write repo "README.md" "initial\n"
-    write repo "acceptance/reviews/old.md" "## DC-T\nreviewed long ago\n"
-    let root = commit repo "root"
-
-    write
-        repo
-        "tests/Regression.fs"
-        "module Regression\n// DCT-T-B is described here only in a comment\nlet ``DCT-T-A a held conflict keeps the change`` () = ()\n[<Fact(Skip = \"later\")>]\nlet ``DCT-T-S a skipped fact`` () = ()\n"
-
-    write repo "tests/ids.spec.js" specs
-    let base' = commit repo "base (kickoff)"
-    write repo "src/Store.fs" "let fixed = true\n"
-    let fix = commit repo "fix the class"
-    write repo "acceptance/defect-classes.json" "{}\n"
-    let closuresOnly = commit repo "closures only"
-    write repo "src/Other.fs" "let more = 1\n"
-    let candidate = commit repo "candidate"
-    write repo "acceptance/reviews/final.md" $"## DC-T\nClosed by {fix.Substring(0, 10)}; regression DCT-T-A.\nOld review updated after {fix.Substring(0, 10)}.\n"
-    write repo "acceptance/reviews/old.md" $"## DC-T\nreviewed long ago; DC-T closed by {fix.Substring(0, 10)}\n"
-    write repo "acceptance/copy.json" "{}\n"
-    let records = commit repo "records only"
-    git repo [ "checkout"; "-q"; "-b"; "side"; fix ] |> ignore
-    write repo "src/Side.fs" "let side = 1\n"
-    let side = commit repo "side"
-    git repo [ "checkout"; "-q"; "main" ] |> ignore
-
-    { Repo = repo
-      Root = root
-      Base = base'
-      Fix = fix
-      ClosuresOnly = closuresOnly
-      Candidate = candidate
-      Records = records
-      Side = side
-      FixedAt = DateTimeOffset.Parse(git repo [ "show"; "-s"; "--format=%cI"; fix ], Globalization.CultureInfo.InvariantCulture) }
-
 let private closureOf (fields: (string * Json) list) =
     let defaults =
         [ "id", JStr "DC-T"
           "status", JStr "PASS"
           "fixSha", JNull
           "tests", jstrs [ "DCT-T-A" ]
-          "reviewerEvidence", JStr "acceptance/reviews/final.md#dc-t" ]
+          "reviewerEvidence", JStr "acceptance/reviews/final.json#dc-t" ]
 
     let overridden = defaults |> List.map (fun (k, v) -> k, (fields |> List.tryFind (fst >> (=) k) |> Option.map snd |> Option.defaultValue v))
     let extra = fields |> List.filter (fun (k, _) -> not (List.exists (fst >> (=) k) defaults)) |> List.distinctBy fst
@@ -126,6 +88,70 @@ let private closures (classes: Json list) =
 
 let private closure fields = closures [ closureOf fields ]
 
+/// A review record (ReviewRecord) closing the classes given as (class, fix) pairs.
+let private reviewRecord (closes: (string * string) list) =
+    serialize (
+        JObj
+            [ "schema", JStr "indy-init.independent-review/1"
+              "reviewer", JStr "independent-reviewer"
+              "role", JStr "review"
+              "verdict", JStr "NO_BLOCKING_FINDINGS"
+              "defectClasses", JArr(closes |> List.map (fun (cls, fix) -> JObj [ "defectClass", JStr cls; "fixSha", JStr fix; "verdict", JStr "CLOSED" ])) ]
+    )
+
+/// Rehearsal 7's third review (r6c fake3, dct4c.spec.js): a `/` after an `if (...)` head read as division opened a
+/// phantom template literal that hid the `test.skip()`.
+let private sneaky =
+    "import { test, expect } from \"@playwright/test\";\ntest(\"DCT-T-R regex after an if head\", async () => {\n  if (true) /`/.test(\"\");\n  test.skip();\n  // `\n});\n"
+
+let private history () =
+    let repo = Path.Combine(Path.GetTempPath(), $"defect-closure-{Guid.NewGuid():N}")
+    Directory.CreateDirectory repo |> ignore
+    git repo [ "init"; "-q"; "-b"; "main" ] |> ignore
+    write repo "README.md" "initial\n"
+    write repo "acceptance/reviews/old.json" (reviewRecord [ "DC-T", "0000000" ])
+    let root = commit repo "root"
+
+    write
+        repo
+        "tests/Regression.fs"
+        "module Regression\n// DCT-T-B is described here only in a comment\nlet ``DCT-T-A a held conflict keeps the change`` () = ()\n[<Fact(Skip = \"later\")>]\nlet ``DCT-T-S a skipped fact`` () = ()\n"
+
+    write repo "tests/ids.spec.js" specs
+    write repo "tests/sneaky.spec.js" sneaky
+    let base' = commit repo "base (kickoff)"
+    write repo "src/Store.fs" "let fixed = true\n"
+    let fix = commit repo "fix the class"
+    write repo "acceptance/defect-classes.json" "{}\n"
+    let closuresOnly = commit repo "closures only"
+    write repo "src/Other.fs" "let more = 1\n"
+    let candidate = commit repo "candidate"
+    write repo "acceptance/reviews/final.json" (reviewRecord [ "DC-T", fix ])
+    write repo "acceptance/reviews/prose.md" $"## DC-T\nreviewer: someone\nverdict: closed by {fix}; regression DCT-T-A.\n"
+    // fake3: the closures record, lightly edited, offered as review evidence.
+    write repo "acceptance/reviews/copy.json" ((serialize (closures [ closureOf [ "fixSha", JStr fix; "reviewerEvidence", JStr "acceptance/reviews/copy.json#self" ] ])) + "\n")
+    write repo "acceptance/reviews/unsigned.json" ((reviewRecord [ "DC-T", fix ]).Replace("\"independent-reviewer\"", "\"\""))
+    let records = commit repo "records only"
+    git repo [ "checkout"; "-q"; "-b"; "side"; fix ] |> ignore
+    write repo "src/Side.fs" "let side = 1\n"
+    let side = commit repo "side"
+    git repo [ "checkout"; "-q"; "-b"; "broken"; records ] |> ignore
+    // A spec the lexer cannot read consistently: it ends inside a template literal.
+    write repo "tests/broken.spec.js" "import { test } from \"@playwright/test\";\nconst t = `\ntest(\"DCT-T-U declared in an unparseable file\", async () => {});\n"
+    let broken = commit repo "broken"
+    git repo [ "checkout"; "-q"; "main" ] |> ignore
+
+    { Repo = repo
+      Broken = broken
+      Root = root
+      Base = base'
+      Fix = fix
+      ClosuresOnly = closuresOnly
+      Candidate = candidate
+      Records = records
+      Side = side
+      FixedAt = DateTimeOffset.Parse(git repo [ "show"; "-s"; "--format=%cI"; fix ], Globalization.CultureInfo.InvariantCulture) }
+
 let private curationOf (pairs: (string * string) list) =
     JObj [ "tests", JArr(pairs |> List.map (fun (test, cls) -> JObj [ "id", JStr test; "defectClass", JStr cls ])) ]
 
@@ -135,13 +161,14 @@ type private Run =
     { Records: string option
       Freeze: DateTimeOffset option
       Curation: Json option
-      Base: string option }
+      Base: string option
+      Candidate: string option }
 
 let private assessWith (h: History) (run: Run) (doc: Json) =
     DefectClosure.assess
         { Repo = h.Repo
           Base = run.Base |> Option.defaultValue h.Base
-          Candidate = h.Candidate
+          Candidate = run.Candidate |> Option.defaultValue h.Candidate
           Records = run.Records
           Closures = doc
           ClosuresSource = "test"
@@ -164,7 +191,7 @@ let all () : string list =
         let fix = JStr h.Fix
         let freeze = h.FixedAt.AddHours 2.0
         let closedAt = JStr(h.FixedAt.AddHours(1.0).ToString("o"))
-        let full = { Records = Some h.Records; Freeze = Some freeze; Curation = Some curation; Base = None }
+        let full = { Records = Some h.Records; Freeze = Some freeze; Curation = Some curation; Base = None; Candidate = None }
         let assess = assessWith h full
         let ok = assess (closure [ "fixSha", fix; "closedAt", closedAt ])
         let good extra = closure (extra @ [ "fixSha", fix; "closedAt", closedAt ])
@@ -186,7 +213,7 @@ let all () : string list =
           if not (has "DCL-005" (assess (good [ "tests", jstrs [ "DCT-T-A"; "DCT-T-Z" ] ]))) then
               yield "DCL-005: an absent regression test is accepted"
 
-          for skipped in [ "DCT-T-X"; "DCT-T-F"; "DCT-T-S"; "DCT-T-K"; "DCT-T-I"; "DCT-T-O"; "DCT-T-N"; "DCT-T-L" ] do
+          for skipped in [ "DCT-T-X"; "DCT-T-F"; "DCT-T-S"; "DCT-T-K"; "DCT-T-I"; "DCT-T-O"; "DCT-T-N"; "DCT-T-L"; "DCT-T-R" ] do
               if not (has "DCL-005" (assess (good [ "tests", jstrs [ "DCT-T-A"; skipped ] ]))) then
                   yield sprintf "DCL-005: %s, declared only in a skipped form or a block comment, is accepted" skipped
 
@@ -200,16 +227,40 @@ let all () : string list =
               yield "DCL-007: the closures record cited as its own review evidence is accepted"
 
           // The Rehearsal 7 second review's `./acceptance/defect-classes.json#self` and its variants.
-          for spelled in [ "./acceptance/defect-classes.json#self"; "acceptance//defect-classes.json"; "acceptance/reviews/../defect-classes.json"; "acceptance/copy.json" ] do
+          for spelled in [ "./acceptance/defect-classes.json#self"; "acceptance//defect-classes.json"; "acceptance/reviews/../defect-classes.json" ] do
               let report = assess (good [ "reviewerEvidence", JStr spelled ])
 
-              if not (has "DCL-007" report && problems report |> List.exists (fun p -> p.Contains "closures record")) then
+              if not (has "DCL-007" report && problems report |> List.exists (fun p -> p.Contains "record under review itself")) then
                   yield sprintf "DCL-007: the closures record cited as its own review evidence as `%s` is accepted" spelled
+
+          // D3 (third review, fake3): review evidence must be a review record, not a closures copy or prose.
+          for label, reference, expected in
+              [ "a lightly edited copy of the closures record", "acceptance/reviews/copy.json#self", "shaped like a defect-closures record"
+                "a prose review that names the class and fix only in text", "acceptance/reviews/prose.md#dc-t", "not JSON"
+                "a review record that names no reviewer", "acceptance/reviews/unsigned.json", "names no reviewer" ] do
+              let report = assess (good [ "reviewerEvidence", JStr reference ])
+
+              if not (has "DCL-007" report && problems report |> List.exists (fun p -> p.Contains expected)) then
+                  yield sprintf "DCL-007: %s is accepted as review evidence: %A" label (problems report)
+
+          if strs "limits" ok |> List.isEmpty then
+              yield "the report does not state the verification's inherent limits"
+
+          // D1: a spec the lexer cannot read declares nothing, and makes the verdict at best INCOMPLETE.
+          let broken = assessWith h { full with Candidate = Some h.Broken; Records = None } (good [ "tests", jstrs [ "DCT-T-A"; "DCT-T-U" ] ])
+
+          if not (has "DCL-005" broken && problems broken |> List.exists (fun p -> p.Contains "UNPARSEABLE")) then
+              yield sprintf "DCL-005: a regression test declared only in an UNPARSEABLE spec is accepted: %A" (problems broken)
+
+          let brokenOk = assessWith h { full with Candidate = Some h.Broken; Records = Some h.Broken } (good [])
+
+          if str "verdict" brokenOk <> "INCOMPLETE" || arr "unparseable" brokenOk |> List.isEmpty then
+              yield sprintf "an UNPARSEABLE spec under the tests path leaves the verdict %s, not INCOMPLETE" (str "verdict" brokenOk)
 
           if not (has "DCL-007" (assess (good [ "reviewerEvidence", JStr "../outside/review.md" ]))) then
               yield "DCL-007: review evidence outside the repository root is accepted"
 
-          let oldReview = assessWith h { full with Records = Some h.Candidate } (good [ "reviewerEvidence", JStr "acceptance/reviews/old.md" ])
+          let oldReview = assessWith h { full with Records = Some h.Candidate } (good [ "reviewerEvidence", JStr "acceptance/reviews/old.json" ])
 
           if not (has "DCL-007" oldReview) then
               yield "DCL-007: review evidence that no commit after the fix added or changed is accepted"

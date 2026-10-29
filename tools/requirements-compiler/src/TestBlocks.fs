@@ -52,6 +52,8 @@ type Block =
       /// Markers reached any other way (passed as an argument, wrapped in a helper defined in another file, read
       /// through a computed property) are not seen: an inherent limit of a lexical reading.
       Skipped: bool
+      /// Skipped only by conditional skip calls (`test.skip(cond, ...)`): it may run.
+      SkipConditional: bool
       /// Every statement of the block, comment-free and whitespace-collapsed, in order.
       Statements: string list
       /// The same statements with string, template and regex literal contents masked (`_`): what the code does, not
@@ -70,83 +72,153 @@ type private Mode =
     | RegexLit of inClass: bool
     | Backticks
 
+/// A literal context: its contents are masked.
+let private isLiteral =
+    function
+    | Quoted _
+    | Verbatim
+    | Triple
+    | Template
+    | TemplateExpr _
+    | RegexLit _
+    | Backticks -> true
+    | Code
+    | LineComment
+    | BlockComment _ -> false
+
+let private describeMode =
+    function
+    | Code -> "code"
+    | LineComment -> "a line comment"
+    | BlockComment _ -> "a block comment"
+    | Quoted q -> sprintf "a %c-quoted string" q
+    | Verbatim -> "a verbatim string"
+    | Triple -> "a triple-quoted string"
+    | Template -> "a template literal"
+    | TemplateExpr _ -> "a template literal's ${...}"
+    | RegexLit _ -> "a regular expression literal"
+    | Backticks -> "a ``...`` identifier"
+
+/// Words after which a JavaScript `/` begins a regular expression, not a division.
+let private jsRegexKeywords = set [ "return"; "typeof"; "case"; "do"; "else"; "in"; "of"; "new"; "delete"; "void"; "throw"; "instanceof"; "yield"; "await" ]
+
+/// Statement heads whose closing `)` may be followed by a regular expression (`if (x) /re/.test(s)`).
+let private jsHeadKeywords = set [ "if"; "while"; "for"; "with" ]
+
+/// The scanner's state: the stack of open contexts (the innermost first; Code at the bottom), the JavaScript
+/// parentheses open (each: whether it opened a statement head), and the previous significant code character.
+type private ScanState = { Stack: Mode list; Parens: bool list; Prev: char; Problem: string option }
+
 /// The text with comments blanked (`code`) and the same text with literal contents blanked as well (`mask`). Both keep
-/// the length and every newline, so line i of one is line i of the other.
-let scan (lang: Language) (text: string) : string * string =
+/// the length and every newline, so line i of one is line i of the other. Strings, templates and comments inside a
+/// template's `${...}` are read as code is, recursively. The third value is why the text could not be read
+/// consistently, if it could not: it ends inside a literal or comment, a JavaScript string or regular expression runs
+/// past its line, or the parentheses do not balance. A reading with a problem is not to be trusted at all (fail
+/// closed): an early mistake hides everything after it.
+let scan (lang: Language) (text: string) : string * string * string option =
     let n = text.Length
     let at i = if i < n then text.[i] else '\000'
     let regexMayFollow (prev: char) = prev = '\000' || "(,=:[!&|?{};+-*%<>~^".IndexOf prev >= 0
     let blank c = if c = '\n' then '\n' else ' '
     let lit c = if c = '\n' then '\n' else '_'
 
-    let finish (code: char list) (mask: char list) =
-        String(List.rev code |> Array.ofList), String(List.rev mask |> Array.ofList)
+    /// The identifier that ends just before position i (whitespace skipped), or "".
+    let wordBefore i =
+        let rec skipSpace j = if j >= 0 && Char.IsWhiteSpace text.[j] then skipSpace (j - 1) else j
+        let stop = skipSpace (i - 1)
+        let rec start j = if j >= 0 && (Char.IsLetterOrDigit text.[j] || text.[j] = '_' || text.[j] = '$') then start (j - 1) else j
+        let first = start stop
+        if stop < 0 || first = stop then "" else text.Substring(first + 1, stop - first)
 
-    // At position i in `mode`: how many characters to take, the next mode and previous significant character, and how
-    // the taken characters appear in the code and in the mask.
-    let decide i mode (prev: char) : int * Mode * char * (char -> char) * (char -> char) =
+    let fail (s: ScanState) why = { s with Problem = s.Problem |> Option.orElse (Some why) }
+
+    // At position i: how many characters to take, the next state, and how the taken characters appear in the code
+    // (comments blanked) and the mask (literal contents blanked too).
+    let decide i (s: ScanState) : int * ScanState * (char -> char) * (char -> char) =
         let c = text.[i]
         let next = at (i + 1)
+        let mode, outer = List.head s.Stack, List.tail s.Stack
+        let push m = { s with Stack = m :: s.Stack }
+        let pop = { s with Stack = outer }
+        let replace m = { s with Stack = m :: outer }
+
+        // Code, or the code inside a template's `${...}`.
+        let code () =
+            match lang with
+            | _ when c = '/' && next = '/' -> 2, push LineComment, blank, blank
+            | Js when c = '/' && next = '*' -> 2, push (BlockComment 1), blank, blank
+            | FSharp when c = '(' && next = '*' && at (i + 2) <> ')' -> 2, push (BlockComment 1), blank, blank
+            | Js when c = '"' || c = '\'' -> 1, { push (Quoted c) with Prev = c }, id, id
+            | Js when c = '`' -> 1, { push Template with Prev = c }, id, id
+            | Js when c = '/' && (regexMayFollow s.Prev || (Char.IsLetter s.Prev && jsRegexKeywords.Contains(wordBefore i))) ->
+                1, { push (RegexLit false) with Prev = c }, id, id
+            | Js when c = '(' -> 1, { s with Parens = jsHeadKeywords.Contains(wordBefore i) :: s.Parens; Prev = c }, id, id
+            | Js when c = ')' ->
+                match s.Parens with
+                | [] -> 1, fail { s with Prev = c } (sprintf "an unmatched `)` at offset %d" i), id, id
+                | head :: rest -> 1, { s with Parens = rest; Prev = (if head then '(' else ')') }, id, id
+            | FSharp when c = '"' && next = '"' && at (i + 2) = '"' -> 3, { push Triple with Prev = c }, id, id
+            | FSharp when c = '@' && next = '"' -> 2, { push Verbatim with Prev = c }, id, id
+            | FSharp when c = '"' -> 1, { push (Quoted '"') with Prev = c }, id, id
+            | FSharp when c = '`' && next = '`' -> 2, { push Backticks with Prev = c }, id, id
+            | FSharp when c = '\'' && next <> '\n' && (next = '\\' || at (i + 2) = '\'') -> 1, { push (Quoted '\'') with Prev = c }, id, id
+            | _ -> 1, { s with Prev = (if Char.IsWhiteSpace c then s.Prev else c) }, id, id
 
         match mode with
-        | Code ->
-            match lang with
-            | _ when c = '/' && next = '/' -> 2, LineComment, prev, blank, blank
-            | Js when c = '/' && next = '*' -> 2, BlockComment 1, prev, blank, blank
-            | FSharp when c = '(' && next = '*' && at (i + 2) <> ')' -> 2, BlockComment 1, prev, blank, blank
-            | Js when c = '"' || c = '\'' -> 1, Quoted c, c, id, id
-            | Js when c = '`' -> 1, Template, c, id, id
-            | Js when c = '/' && regexMayFollow prev -> 1, RegexLit false, c, id, id
-            | FSharp when c = '"' && next = '"' && at (i + 2) = '"' -> 3, Triple, c, id, id
-            | FSharp when c = '@' && next = '"' -> 2, Verbatim, c, id, id
-            | FSharp when c = '"' -> 1, Quoted '"', c, id, id
-            | FSharp when c = '`' && next = '`' -> 2, Backticks, c, id, id
-            | FSharp when c = '\'' && next <> '\n' && (next = '\\' || at (i + 2) = '\'') -> 1, Quoted '\'', c, id, id
-            | _ -> 1, Code, (if Char.IsWhiteSpace c then prev else c), id, id
-        | LineComment -> if c = '\n' then 1, Code, prev, id, id else 1, LineComment, prev, blank, blank
+        | Code -> code ()
+        | TemplateExpr depth when c = '{' -> 1, { replace (TemplateExpr(depth + 1)) with Prev = c }, id, id
+        | TemplateExpr depth when c = '}' -> 1, { (if depth = 1 then pop else replace (TemplateExpr(depth - 1))) with Prev = 'a' }, id, id
+        | TemplateExpr _ -> code ()
+        | LineComment -> if c = '\n' then 1, pop, id, id else 1, s, blank, blank
         | BlockComment depth ->
             match lang with
-            | Js when c = '*' && next = '/' -> 2, Code, prev, blank, blank
-            | FSharp when c = '*' && next = ')' -> 2, (if depth = 1 then Code else BlockComment(depth - 1)), prev, blank, blank
-            | FSharp when c = '(' && next = '*' -> 2, BlockComment(depth + 1), prev, blank, blank
-            | _ -> 1, mode, prev, blank, blank
+            | Js when c = '*' && next = '/' -> 2, pop, blank, blank
+            | FSharp when c = '*' && next = ')' -> 2, (if depth = 1 then pop else replace (BlockComment(depth - 1))), blank, blank
+            | FSharp when c = '(' && next = '*' -> 2, replace (BlockComment(depth + 1)), blank, blank
+            | _ -> 1, s, blank, blank
         | Quoted q ->
-            if c = '\\' then 2, mode, prev, id, lit
-            elif c = q then 1, Code, 'a', id, id
-            elif c = '\n' && lang = Js then 1, Code, 'a', id, id
-            else 1, mode, prev, id, lit
+            if c = '\\' then 2, s, id, lit
+            elif c = q then 1, { pop with Prev = 'a' }, id, id
+            elif c = '\n' && lang = Js then 1, fail { pop with Prev = 'a' } (sprintf "a string runs past its line at offset %d" i), id, id
+            else 1, s, id, lit
         | Verbatim ->
-            if c = '"' && next = '"' then 2, Verbatim, prev, id, lit
-            elif c = '"' then 1, Code, 'a', id, id
-            else 1, Verbatim, prev, id, lit
-        | Triple -> if c = '"' && next = '"' && at (i + 2) = '"' then 3, Code, 'a', id, id else 1, Triple, prev, id, lit
+            if c = '"' && next = '"' then 2, s, id, lit
+            elif c = '"' then 1, { pop with Prev = 'a' }, id, id
+            else 1, s, id, lit
+        | Triple -> if c = '"' && next = '"' && at (i + 2) = '"' then 3, { pop with Prev = 'a' }, id, id else 1, s, id, lit
         | Template ->
-            if c = '\\' then 2, Template, prev, id, lit
-            elif c = '`' then 1, Code, 'a', id, id
-            elif c = '$' && next = '{' then 2, TemplateExpr 1, prev, id, lit
-            else 1, Template, prev, id, lit
-        | TemplateExpr depth ->
-            if c = '{' then 1, TemplateExpr(depth + 1), prev, id, lit
-            elif c = '}' then 1, (if depth = 1 then Template else TemplateExpr(depth - 1)), prev, id, lit
-            else 1, mode, prev, id, lit
+            if c = '\\' then 2, s, id, lit
+            elif c = '`' then 1, { pop with Prev = 'a' }, id, id
+            elif c = '$' && next = '{' then 2, push (TemplateExpr 1), id, lit
+            else 1, s, id, lit
         | RegexLit inClass ->
-            if c = '\\' then 2, mode, prev, id, lit
-            elif c = '\n' then 1, Code, 'a', id, id
-            elif c = '[' then 1, RegexLit true, prev, id, lit
-            elif c = ']' then 1, RegexLit false, prev, id, lit
-            elif c = '/' && not inClass then 1, Code, 'a', id, id
-            else 1, mode, prev, id, lit
-        | Backticks -> if c = '`' && next = '`' then 2, Code, 'a', id, id else 1, Backticks, prev, id, lit
+            if c = '\\' then 2, s, id, lit
+            elif c = '\n' then 1, fail { pop with Prev = 'a' } (sprintf "a regular expression runs past its line at offset %d" i), id, id
+            elif c = '[' then 1, replace (RegexLit true), id, lit
+            elif c = ']' then 1, replace (RegexLit false), id, lit
+            elif c = '/' && not inClass then 1, { pop with Prev = 'a' }, id, id
+            else 1, s, id, lit
+        | Backticks -> if c = '`' && next = '`' then 2, { pop with Prev = 'a' }, id, id else 1, s, id, lit
 
-    let rec go i mode (prev: char) (code: char list) (mask: char list) =
+    let rec go i (s: ScanState) (code: char list) (mask: char list) =
         if i >= n then
-            finish code mask
-        else
-            let k, mode', prev', toCode, toMask = decide i mode prev
-            let taken = [ for j in i .. min (n - 1) (i + k - 1) -> text.[j] ]
-            go (i + k) mode' prev' (List.fold (fun acc ch -> toCode ch :: acc) code taken) (List.fold (fun acc ch -> toMask ch :: acc) mask taken)
+            let problem =
+                s.Problem
+                |> Option.orElse (match s.Stack with [ Code ] -> None | m :: _ -> Some(sprintf "the text ends inside %s" (describeMode m)) | [] -> Some "the scanner lost its context")
+                |> Option.orElse (if s.Parens.IsEmpty then None else Some(sprintf "%d `(` never closed" s.Parens.Length))
 
-    go 0 Code '\000' [] []
+            String(List.rev code |> Array.ofList), String(List.rev mask |> Array.ofList), problem
+        else
+            let k, s', toCode, toMask = decide i s
+            // A character inside a literal both before and after it is the literal's content; its delimiters stay.
+            let isComment = function LineComment | BlockComment _ -> true | _ -> false
+            let comment = isComment (List.head s.Stack) || isComment (List.head s'.Stack)
+            let literal = List.exists isLiteral s.Stack && List.exists isLiteral s'.Stack
+            let maskOf ch = if comment then blank ch elif literal then lit ch else toMask ch
+            let taken = [ for j in i .. min (n - 1) (i + k - 1) -> text.[j] ]
+            go (i + k) s' (List.fold (fun acc ch -> toCode ch :: acc) code taken) (List.fold (fun acc ch -> maskOf ch :: acc) mask taken)
+
+    go 0 { Stack = [ Code ]; Parens = []; Prev = '\000'; Problem = None } [] []
 
 let private collapse (s: string) = Regex.Replace(s, @"\s+", " ").Trim()
 
@@ -205,11 +277,18 @@ let private statementsOf (lang: Language) (lines: (string * string) list) : (str
 
     go lines [] 0 []
 
+/// How a block is marked: not at all, by a conditional skip call only (`test.skip(isMobile, "...")`: whether it
+/// runs depends on its argument), or unconditionally. Ordered, so the stronger of two marks is their `max`.
+type Mark =
+    | Unmarked
+    | Conditional
+    | Unconditional
+
 /// One block while reading a file: its owner index is its position in the list.
 type private Draft =
     { Title: string
       Kind: Kind
-      Marked: bool
+      Marked: Mark
       Parent: int }
 
 let private jsStart = Regex(@"^\s*((?:test|it|describe|xit|xtest|xdescribe|fit)(?:\.[A-Za-z]+)*)\s*\(\s*(?:[""'`]|$)", RegexOptions.Compiled)
@@ -244,12 +323,20 @@ let private jsMarkerAliases (mask: string) : string list =
 let private readJs (code: string[]) (mask: string[]) =
     let pairs = Array.zip code mask
 
-    let marks =
+    let markers =
         match jsMarkerAliases (String.concat "\n" mask) with
-        | [] -> fun (m: string) -> jsBodyMarker.IsMatch(m)
-        | aliases ->
-            let aliased = Regex(sprintf @"(?<![\w$.])(?:%s)\s*\(" (aliases |> List.map Regex.Escape |> String.concat "|"))
-            fun (m: string) -> jsBodyMarker.IsMatch m || aliased.IsMatch(m)
+        | [] -> [ jsBodyMarker ]
+        | aliases -> [ jsBodyMarker; Regex(sprintf @"(?<![\w$.])(?:%s)\s*\(" (aliases |> List.map Regex.Escape |> String.concat "|")) ]
+
+    // The strongest mark a masked line carries: a marker call with no argument (or `.only`) is unconditional.
+    let marks (m: string) : Mark =
+        markers
+        |> List.collect (fun rx -> [ for hit in rx.Matches m -> hit ])
+        |> List.fold
+            (fun acc hit ->
+                let after = m.Substring(hit.Index + hit.Length).TrimStart()
+                max acc (if hit.Value.Contains "only" || after.StartsWith ")" then Unconditional else Conditional))
+            Unmarked
 
     // Each line with the next non-blank line: a declaration may put its title on the line after `test(`.
     let following =
@@ -257,7 +344,7 @@ let private readJs (code: string[]) (mask: string[]) =
 
     let lines = List.zip (List.ofArray pairs) following
 
-    let step (depth: int, stack: (int * int) list, drafts: Draft list, owned: (int * string * string) list, fileMarked: bool) ((c: string, m: string), next: (string * string) option) =
+    let step (depth: int, stack: (int * int) list, drafts: Draft list, owned: (int * string * string) list, fileMarked: Mark) ((c: string, m: string), next: (string * string) option) =
         let owner = match stack with (b, _) :: _ -> b | [] -> -1
         let start = jsStart.Match m
         let head = if start.Success then start.Groups.[1].Value.Split('.') |> List.ofArray else []
@@ -275,7 +362,7 @@ let private readJs (code: string[]) (mask: string[]) =
                 | true, Some t -> t.Groups.[2].Value
                 | _ -> let t = jsTitle.Match c in if t.Success then t.Groups.[2].Value else ""
             let kind = if head |> List.exists (fun p -> p = "describe" || p = "xdescribe") then Describe else Test
-            let marked = head |> List.exists jsMarkers.Contains || head.Head.StartsWith "x"
+            let marked = if head |> List.exists jsMarkers.Contains || head.Head.StartsWith "x" then Unconditional else Unmarked
             // The body may begin on the declaration line, after the function's opening brace.
             let arrow = m.LastIndexOf "=>"
             let brace = if arrow >= 0 then m.IndexOf('{', arrow) else m.LastIndexOf '{'
@@ -283,17 +370,18 @@ let private readJs (code: string[]) (mask: string[]) =
 
             depth',
             pop ((id, depth) :: stack),
-            drafts @ [ { Title = title; Kind = kind; Marked = marked || marks (snd rest); Parent = owner } ],
+            drafts @ [ { Title = title; Kind = kind; Marked = max marked (marks (snd rest)); Parent = owner } ],
             (id, fst rest, snd rest) :: owned,
-            fileMarked || only
+            (if only then Unconditional else fileMarked)
         else
+            let mark = marks m
             let drafts' =
-                if marks m && owner >= 0 then drafts |> List.mapi (fun i d -> if i = owner then { d with Marked = true } else d)
+                if mark <> Unmarked && owner >= 0 then drafts |> List.mapi (fun i d -> if i = owner then { d with Marked = max d.Marked mark } else d)
                 else drafts
 
-            depth', pop stack, drafts', (owner, c, m) :: owned, fileMarked || only || (marks m && owner < 0)
+            depth', pop stack, drafts', (owner, c, m) :: owned, max fileMarked (if only then Unconditional elif owner < 0 then mark else Unmarked)
 
-    let _, _, drafts, owned, fileMarked = lines |> List.fold step (0, [], [], [], false)
+    let _, _, drafts, owned, fileMarked = lines |> List.fold step (0, [], [], [], Unmarked)
     drafts, List.rev owned, fileMarked
 
 let private fsStart = Regex(@"^(\s*)(?:let|member\s+[\w.]+)\s+``(.+?)``", RegexOptions.Compiled)
@@ -309,7 +397,8 @@ let private readFSharp (code: string[]) (mask: string[]) =
             current, pendingSkip, drafts, ((current |> Option.map fst |> Option.defaultValue -1), c, m) :: owned
         elif start.Success then
             let id = drafts.Length
-            Some(id, indent c), false, drafts @ [ { Title = start.Groups.[2].Value; Kind = Test; Marked = pendingSkip || fsSkip.IsMatch c; Parent = -1 } ], (id, "", "") :: owned
+            let marked = if pendingSkip || fsSkip.IsMatch c then Unconditional else Unmarked
+            Some(id, indent c), false, drafts @ [ { Title = start.Groups.[2].Value; Kind = Test; Marked = marked; Parent = -1 } ], (id, "", "") :: owned
         else
             match current with
             | Some(id, ind) when indent c > ind -> current, pendingSkip, drafts, (id, c, m) :: owned
@@ -318,7 +407,7 @@ let private readFSharp (code: string[]) (mask: string[]) =
                 None, (attribute && (pendingSkip || fsSkip.IsMatch c)), drafts, (-1, c, m) :: owned
 
     let _, _, drafts, owned = Array.zip code mask |> Array.fold step (None, false, [], [])
-    drafts, List.rev owned, false
+    drafts, List.rev owned, Unmarked
 
 /// The module name a file's out-of-test lines are tracked under: the F# `module`, else the file name.
 let private moduleName (lang: Language) (path: string) (code: string[]) =
@@ -330,22 +419,34 @@ let private moduleName (lang: Language) (path: string) (code: string[]) =
     sprintf "%s::%s" (Path.GetFileName path) (declared |> Option.defaultValue "module")
 
 /// The blocks of one file: each test and describe block, then the file's module block. None for a file in no
-/// language this module reads.
-let parse (path: string) (text: string) : Block list option =
+/// language this module reads; Error (UNPARSEABLE) when the file could not be read consistently (see scan): its
+/// blocks are not reported at all, so no caller can mistake a desynchronised reading for the file's tests.
+let parse (path: string) (text: string) : Result<Block list, string> option =
     languageOf path
     |> Option.map (fun lang ->
-        let code, mask = scan lang (text.Replace("\r\n", "\n"))
-        let codeLines, maskLines = code.Split('\n'), mask.Split('\n')
-        let drafts, owned, fileMarked = (match lang with Js -> readJs | FSharp -> readFSharp) codeLines maskLines
-        let byIndex = Array.ofList drafts
-        let rec skipped i = i >= 0 && (byIndex.[i].Marked || skipped byIndex.[i].Parent)
-        let statements owner = owned |> List.filter (fun (o, _, _) -> o = owner) |> List.map (fun (_, c, m) -> c, m) |> statementsOf lang
-        let block title kind skipped owner =
-            let pairs = statements owner
-            { Title = title; Kind = kind; Skipped = skipped; Statements = List.map fst pairs; Masked = List.map snd pairs }
+        match scan lang (text.Replace("\r\n", "\n")) with
+        | _, _, Some problem -> Error problem
+        | code, mask, None ->
+            let codeLines, maskLines = code.Split('\n'), mask.Split('\n')
+            let drafts, owned, fileMarked = (match lang with Js -> readJs | FSharp -> readFSharp) codeLines maskLines
+            let byIndex = Array.ofList drafts
+            let rec markOf i = if i < 0 then Unmarked else max byIndex.[i].Marked (markOf byIndex.[i].Parent)
+            let statements owner = owned |> List.filter (fun (o, _, _) -> o = owner) |> List.map (fun (_, c, m) -> c, m) |> statementsOf lang
 
-        (drafts |> List.mapi (fun i d -> block d.Title d.Kind (fileMarked || skipped i) i))
-        @ [ block (moduleName lang path codeLines) Module false -1 ])
+            let block title kind (mark: Mark) owner =
+                let pairs = statements owner
+
+                { Title = title
+                  Kind = kind
+                  Skipped = mark <> Unmarked
+                  SkipConditional = mark = Conditional
+                  Statements = List.map fst pairs
+                  Masked = List.map snd pairs }
+
+            Ok(
+                (drafts |> List.mapi (fun i d -> block d.Title d.Kind (max fileMarked (markOf i)) i))
+                @ [ block (moduleName lang path codeLines) Module Unmarked -1 ]
+            ))
 
 let private jsAssertion = Regex(@"(?<![\w$.])(?:expect|assert)\b\s*(?:\.\s*\w+\s*)?\(", RegexOptions.Compiled)
 let private fsAssertion = Regex(@"\bAssert\.|\bExpect\.|\btest\s*<@|\|>\s*should\b|\bshould\s*\(", RegexOptions.Compiled)
