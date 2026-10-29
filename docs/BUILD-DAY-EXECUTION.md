@@ -97,6 +97,8 @@ Exit criteria:
 
 ## 11:15–12:00 — Local durability + GitHub provider
 
+> **Superseded for Causa (ADR-R7-001).** From Rehearsal 7, Causa keeps investigation state only in each tab's memory, saves only by confirmed GitHub commits, and has no offline queue or local crash recovery. [CAUSA-PERSISTENCE-REQUIREMENTS.md](CAUSA-PERSISTENCE-REQUIREMENTS.md) governs; this section remains long-term platform direction only.
+
 Implement:
 
 - local durable state

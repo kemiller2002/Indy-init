@@ -47,7 +47,7 @@
     { "order": 2, "id": "semantic-kernel", "goal": "typed generic investigation state, commands, events, decide/evolve", "cutPolicy": "never-cut" },
     { "order": 3, "id": "policy-capabilities", "goal": "deterministic blockers, legal actions, cause and resolution gates", "cutPolicy": "never-cut" },
     { "order": 4, "id": "workspace", "goal": "one complete accessible investigation workspace", "cutPolicy": "never-cut" },
-    { "order": 5, "id": "local-persistence", "goal": "durable local work and honest pending/synced state", "cutPolicy": "never-cut" },
+    { "order": 5, "id": "session-state", "goal": "session-local investigation state in each tab and honest save state (docs/CAUSA-PERSISTENCE-REQUIREMENTS.md)", "cutPolicy": "never-cut" },
     { "order": 6, "id": "github-provider", "goal": "provider-independent remote persistence with optimistic concurrency", "cutPolicy": "cut-last" },
     { "order": 7, "id": "ai-proposals", "goal": "bounded context and proof-carrying structured AI proposals", "cutPolicy": "never-cut" },
     { "order": 8, "id": "investigation-loop", "goal": "prediction, action, finding, cause, correction, verification, resolution", "cutPolicy": "never-cut" },

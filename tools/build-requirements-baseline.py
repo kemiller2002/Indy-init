@@ -57,7 +57,14 @@ DOCUMENTS = [
     # Normative rehearsal contracts without requirement ids.
     ("docs/REHEARSAL-AGENT-INTERFACE-FREEZE.md", "REHEARSAL-AGENT-INTERFACE-FREEZE", None),
     ("docs/REHEARSAL-ACCEPTANCE-LEDGER.md", "REHEARSAL-ACCEPTANCE-LEDGER", None),
+    # Added 2026-10-29 (owner decision ADR-R7-001, docs/rehearsal-007/PERSISTENCE-ARCHITECTURE-DECISION.md).
+    ("docs/CAUSA-PERSISTENCE-REQUIREMENTS.md", "CAUSA-PERSISTENCE", r"^## (PERSIST-\d{3}):"),
 ]
+
+# Documents added after earlier baselines were pinned. Each is in the baseline of every commit that has it; a
+# commit from before it was added has no such file, so that commit's baseline is unchanged. Every other document
+# is required.
+INTRODUCED_DOCUMENTS = {"docs/CAUSA-PERSISTENCE-REQUIREMENTS.md"}
 
 # Un-identified sections that pass the normative-language test but state no
 # obligation for an implementation; excluded by name so the choice is reviewable.
@@ -155,6 +162,8 @@ def slug(text):
 def build(root, commit):
     documents, requirements, seen_ids = [], [], set()
     for path, key, pattern in DOCUMENTS:
+        if path in INTRODUCED_DOCUMENTS and not (root / path).is_file():
+            continue
         text = normalize((root / path).read_text(encoding="utf-8"))
         lines = [line.rstrip() for line in text.split("\n")]
         regex = re.compile(pattern if pattern else r"(?!x)x")

@@ -34,6 +34,8 @@ Software creation under governance
 
 ### Band A: durable core
 
+> **Superseded for Causa (ADR-R7-001).** From Rehearsal 7, Causa keeps investigation state only in each tab's memory, saves only by confirmed GitHub commits, and has no offline queue or local crash recovery. [CAUSA-PERSISTENCE-REQUIREMENTS.md](CAUSA-PERSISTENCE-REQUIREMENTS.md) governs; this section remains long-term platform direction only.
+
 Must remain useful after competition:
 
 - explicit investigation semantics

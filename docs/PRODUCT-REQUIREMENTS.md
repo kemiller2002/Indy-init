@@ -715,6 +715,9 @@ Authoritative events must preserve the policy/version references under which the
 Legal actions and blocking reasons should be projected by the domain engine for UI consumption rather than duplicated in presentation logic.
 
 ### P31.9 Offline revalidation
+
+> **Superseded for Causa (ADR-R7-001).** From Rehearsal 7, Causa keeps investigation state only in each tab's memory, saves only by confirmed GitHub commits, and has no offline queue or local crash recovery. [CAUSA-PERSISTENCE-REQUIREMENTS.md](CAUSA-PERSISTENCE-REQUIREMENTS.md) governs; this section remains long-term platform direction only.
+
 Offline queued commands must be revalidated against current authoritative state and policy before remote application.
 
 ### P31.10 Idempotency
@@ -756,6 +759,8 @@ Providers must support or emulate conflict detection sufficient to prevent silen
 Conflicts must be reconciled at command/domain-state level rather than blindly merging serialized text.
 
 ### P32.8 Local durability
+> **Superseded for Causa (ADR-R7-001).** From Rehearsal 7, Causa keeps investigation state only in each tab's memory, saves only by confirmed GitHub commits, and has no offline queue or local crash recovery. [CAUSA-PERSISTENCE-REQUIREMENTS.md](CAUSA-PERSISTENCE-REQUIREMENTS.md) governs; this section remains long-term platform direction only.
+
 Active offline work and queued commands should survive browser/application restart.
 
 ### P32.9 Explicit local versus remote truth
@@ -1452,6 +1457,8 @@ Limen/WASM should perform deterministic event replay, semantic diff, capability 
 Before AI disclosure, local processing should identify relevant entities and minimize/redact context according to policy.
 
 ### P44.3 Offline analytical capability
+> **Superseded for Causa (ADR-R7-001).** From Rehearsal 7, Causa keeps investigation state only in each tab's memory, saves only by confirmed GitHub commits, and has no offline queue or local crash recovery. [CAUSA-PERSISTENCE-REQUIREMENTS.md](CAUSA-PERSISTENCE-REQUIREMENTS.md) governs; this section remains long-term platform direction only.
+
 Without network, the product should retain time travel, semantic diff, counterfactual branches, evidence graph, local hashing, capability projection, and queued command workflows where locally available.
 
 ### P44.4 Large-data prefilter

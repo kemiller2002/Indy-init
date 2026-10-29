@@ -207,6 +207,8 @@ Completion evidence:
 
 ## Slice 4: Durable local-first persistence
 
+> **Superseded for Causa (ADR-R7-001).** From Rehearsal 7, Causa keeps investigation state only in each tab's memory, saves only by confirmed GitHub commits, and has no offline queue or local crash recovery. [CAUSA-PERSISTENCE-REQUIREMENTS.md](CAUSA-PERSISTENCE-REQUIREMENTS.md) governs; this section remains long-term platform direction only.
+
 Goal: work safely through refresh/offline conditions.
 
 Implement:
@@ -734,6 +736,8 @@ Implementation stops for correction if:
 - a security shortcut starts becoming a core dependency
 
 ## Minimum viable durable product
+
+> **Superseded for Causa (ADR-R7-001).** From Rehearsal 7, Causa keeps investigation state only in each tab's memory, saves only by confirmed GitHub commits, and has no offline queue or local crash recovery. [CAUSA-PERSISTENCE-REQUIREMENTS.md](CAUSA-PERSISTENCE-REQUIREMENTS.md) governs; this section remains long-term platform direction only.
 
 If time is constrained, the minimum product worth keeping is:
 

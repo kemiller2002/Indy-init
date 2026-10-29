@@ -17,6 +17,17 @@ rehearsal must use it is defined in
 | Regenerate | `python3 -I tools/build-requirements-baseline.py . <commit> > requirements/causa-requirements-baseline.json` |
 | Tests | `python3 tools/test-requirements-baseline.py` (run by the preflight-tooling workflow) |
 
+## Rehearsal 6 and Rehearsal 7 baselines
+
+Later rehearsals pin their own baseline file beside this one; the file above stays the frozen Rehearsal 4/5 baseline.
+
+| File | Baseline id | Pinned commit | Content |
+|---|---|---|---|
+| `causa-requirements-baseline-r6.json` | `BL-CAUSA-INDY-INIT-856157a78d47` | `856157a78d47946d264ec49ee8325fcf996ae9b9` | 19 documents, 471 requirements: adds AR-027..AR-035 (DEC-R6-005) |
+| `causa-requirements-baseline-r7.json` | `BL-CAUSA-INDY-INIT-7d44f5546bcd` | `7d44f5546bcd89fe7225e30147dfb2a9eee99a98` | 20 documents, 517 requirements (161 P0), 2593 obligations. Adds `docs/CAUSA-PERSISTENCE-REQUIREMENTS.md` (PERSIST-001..PERSIST-055) and amends 22 requirements, under ADR-R7-001 ([`docs/rehearsal-007/`](../docs/rehearsal-007/)) |
+
+Regenerate the Rehearsal 7 file with `python3 -I tools/build-requirements-baseline.py . 7d44f5546bcd89fe7225e30147dfb2a9eee99a98` on a checkout of that commit. The offline compiler suite checks that the F# port reproduces it at the pinned commit. `tools/validate-r7-persistence-requirements.fsx` checks its persistence requirements and their traceability to the Rehearsal 6 baseline.
+
 The script is deterministic: run twice, it produces byte-identical output.
 Against this checkout at the pinned commit, the Praxis gate reports no
 `baseline-invalid` and no drift findings, and one `disposition-missing`
@@ -50,6 +61,7 @@ inventoried is reported as drift (`uninventoried-requirement`).
 | `docs/WORKFLOW-DIAGRAM-INTEGRATION-REQUIREMENTS.md` | WDL-001..015 | `^\*\*(WDL-\d{3}) ` |
 | `docs/SYSTEM-VERSION-AND-COMPATIBILITY-REQUIREMENTS.md` | VER-001..010 | `^\*\*(VER-\d{3}) ` |
 | `docs/AGENT-RELIABILITY-REQUIREMENTS.md` | AR-001..018 | `^\*\*(AR-\d{3}) ` |
+| `docs/CAUSA-PERSISTENCE-REQUIREMENTS.md` | PERSIST-001..055 (from the Rehearsal 7 baseline; ADR-R7-001) | `^## (PERSIST-\d{3}):` |
 
 ### Why these documents
 
@@ -65,6 +77,8 @@ for example `SCREEN-CONTRACTS§url-contract`. For documents with no id pattern,
 a new section is detected through the document hash, not by id.
 
 ## Mechanical rules (no obligation is invented)
+
+- **Introduced documents.** A document in `INTRODUCED_DOCUMENTS` (Python) or `Baseline.introducedDocuments` (F#) enters the baseline at every commit that has it. A commit from before it was added has no such file, so that commit's baseline is unchanged. Every other document is required, and its absence is an error. `docs/CAUSA-PERSISTENCE-REQUIREMENTS.md` is the only introduced document.
 
 These rules are implemented in `tools/build-requirements-baseline.py`.
 

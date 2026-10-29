@@ -119,9 +119,9 @@ The product may later use service-backed deployment without changing domain sema
 Because static hosting cannot answer arbitrary paths, routes are hash-based (`index.html#/...`), with relative links and no `<base href>`. A reloaded or pasted deep link therefore never 404s (R9.7, P34.18; Limen DF-LIMEN-2026-0006; Praxis SAF-URL-6). A later service-backed deployment may move to path routes only if it keeps every hash link working through legacy redirects.
 
 ### D-204 Local browser durability mechanism
-IndexedDB or another browser store may be used.
+Decided for Causa by ADR-R7-001: there is none. Investigation documents and unsaved changes are never written to a browser store (PERSIST-003); GitHub is the only durable store (PERSIST-005).
 
-The domain model must not depend on its API.
+The domain model must not depend on any browser storage API.
 
 ### D-205 Event storage representation
 Semantic events are required conceptually.

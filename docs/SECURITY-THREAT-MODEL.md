@@ -23,6 +23,8 @@ Protect:
 
 ## 2. Trust boundaries
 
+> **Causa (ADR-R7-001):** the "Local durable store" boundary below does not exist in Causa from Rehearsal 7; investigation state is held only in each tab's memory ([CAUSA-PERSISTENCE-REQUIREMENTS.md](CAUSA-PERSISTENCE-REQUIREMENTS.md)). The rest of the diagram stands.
+
 Primary trust boundaries:
 
 ```text
@@ -266,6 +268,8 @@ Browser-only bearer-token deployments need different protections but remain vuln
 Where appropriate, prevent the application from being framed by untrusted origins through CSP/frame-ancestors or equivalent.
 
 ## 21. Local durable data
+
+> **Superseded for Causa (ADR-R7-001).** From Rehearsal 7, Causa keeps investigation state only in each tab's memory, saves only by confirmed GitHub commits, and has no offline queue or local crash recovery. [CAUSA-PERSISTENCE-REQUIREMENTS.md](CAUSA-PERSISTENCE-REQUIREMENTS.md) governs; this section remains long-term platform direction only.
 
 Offline storage may contain sensitive investigation state.
 

@@ -16,6 +16,8 @@
 
 ## Logical architecture
 
+> **Causa (ADR-R7-001):** the "Local durable queue/cache" node below is superseded. From Rehearsal 7, Causa holds investigation state only in each tab's memory and talks to the GitHub API directly ([CAUSA-PERSISTENCE-REQUIREMENTS.md](CAUSA-PERSISTENCE-REQUIREMENTS.md)). The rest of the diagram stands.
+
 ```text
 iPad Safari
     |
@@ -83,6 +85,8 @@ The architecture should distinguish:
 The application should not require replaying the entire Git history for normal rendering, but history should remain available for audit and reconstruction.
 
 ## Local-first behavior
+
+> **Superseded for Causa (ADR-R7-001).** From Rehearsal 7, Causa keeps investigation state only in each tab's memory, saves only by confirmed GitHub commits, and has no offline queue or local crash recovery. [CAUSA-PERSISTENCE-REQUIREMENTS.md](CAUSA-PERSISTENCE-REQUIREMENTS.md) governs; this section remains long-term platform direction only.
 
 The browser should maintain enough durable local state to continue an active investigation during temporary network loss.
 

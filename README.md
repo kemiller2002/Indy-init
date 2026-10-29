@@ -34,7 +34,7 @@ The hackathon tests two nested systems:
 
 The primary demonstration target is **iPad Safari**.
 
-The application must be usable without a desktop development environment. GitHub will act as the remote persistence layer. Active investigation state should remain usable during transient connectivity loss, with remote writes represented as pending rather than falsely reported as complete.
+The application must be usable without a desktop development environment. GitHub is the only durable store: every save is an atomic, expected-head commit that is confirmed before the interface says Saved. Each browser tab keeps its own investigation state in memory; an investigation already loaded stays visible during transient connectivity loss, and changes made then remain unsaved in that tab, never falsely reported as saved ([Causa Persistence Requirements](docs/CAUSA-PERSISTENCE-REQUIREMENTS.md)).
 
 ## Repository intent before kickoff
 
@@ -73,6 +73,7 @@ See [Hackathon Boundaries](docs/HACKATHON-BOUNDARIES.md).
 - [Engineering Proof Bundle](docs/ENGINEERING-PROOF-BUNDLE.md)
 - [Screen Contracts](docs/SCREEN-CONTRACTS.md)
 - [Persistence, Portability, and Recovery](docs/PERSISTENCE-CONTRACT.md)
+- [Causa Persistence Requirements (Rehearsal 7 onward)](docs/CAUSA-PERSISTENCE-REQUIREMENTS.md)
 - [AI Investigation Orchestration](docs/AI-ORCHESTRATION.md)
 - [Proof-Carrying AI Proposals](docs/PROOF-CARRYING-PROPOSALS.md)
 - [Investigation Planner](docs/INVESTIGATION-PLANNER.md)
