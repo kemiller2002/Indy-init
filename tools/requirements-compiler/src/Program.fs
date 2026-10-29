@@ -769,12 +769,18 @@ let verifyDefectClosuresCommand (args: string list) : int =
             2
 
 /// `release-comparison`: the pre-lock newest-release record (see ReleaseComparison, R7-REM-010).
-///   observe --selected SET --out FILE        queries every selected system's release source now
-///   assess  --selected SET --observations FILE --locked-at ISO [--deviations FILE] [--max-age-hours N] [--out FILE]
+///   observe --selected SET --out FILE        queries every selected system's release source now, keeping each answer
+///   assess  --selected SET --observations FILE (--lock-record FILE | --locked-at ISO-with-offset) [--deviations FILE]
+///           [--max-age-hours N (<= 24)] [--out FILE]
 /// Exit 0 PASS (or observed), 3 FAIL, 2 unusable input.
 let releaseComparisonCommand (args: string list) : int =
     let usage =
-        "usage: requirements-compiler release-comparison (observe --selected FILE --out FILE | assess --selected FILE --observations FILE --locked-at ISO-8601 [--deviations FILE] [--max-age-hours N] [--out FILE])"
+        "usage: requirements-compiler release-comparison (observe --selected FILE --out FILE | assess --selected FILE --observations FILE (--lock-record FILE | --locked-at ISO-8601-WITH-OFFSET) [--deviations FILE] [--max-age-hours N<=24] [--out FILE])"
+
+    let orFail =
+        function
+        | Ok x -> x
+        | Error(e: string) -> failwith e
 
     let run (sub: string) (rest: string list) =
         match optionMap rest with
@@ -791,16 +797,24 @@ let releaseComparisonCommand (args: string list) : int =
 
                     let observations =
                         ReleaseComparison.selectedSystems (parseFile selected)
-                        |> List.map (fun s -> ReleaseComparison.observe http (fun () -> DateTimeOffset.UtcNow) s.System s.Repository s.Mechanism s.Package)
+                        |> List.map (ReleaseComparison.observe http (fun () -> DateTimeOffset.UtcNow))
 
-                    writeOut m (JObj [ "schema", JStr "indy-init.release-observations/1"; "observations", JArr(observations |> List.map ReleaseComparison.observationToJson) ])
+                    writeOut m (JObj [ "schema", JStr "indy-init.release-observations/2"; "observations", JArr(observations |> List.map ReleaseComparison.observationToJson) ])
                     0
-                | "assess", Some selected when (one "--observations").IsSome && (one "--locked-at").IsSome ->
+                | "assess", Some selected when (one "--observations").IsSome && ((one "--locked-at").IsSome || (one "--lock-record").IsSome) ->
                     let observations = parseFile (one "--observations").Value |> arr "observations" |> List.map ReleaseComparison.observationOfJson
-                    let deviations = one "--deviations" |> Option.map (parseFile >> arr "deviations") |> Option.defaultValue []
-                    let lockedAt = DateTimeOffset.Parse((one "--locked-at").Value, Globalization.CultureInfo.InvariantCulture)
-                    let maxAge = one "--max-age-hours" |> Option.map (float >> TimeSpan.FromHours) |> Option.defaultValue (TimeSpan.FromHours 6.0)
-                    let report = ReleaseComparison.assess (parseFile selected) observations deviations lockedAt maxAge
+                    let deviationsBytes = one "--deviations" |> Option.map File.ReadAllBytes
+                    let deviations = deviationsBytes |> Option.map (parseBytes >> arr "deviations") |> Option.defaultValue []
+
+                    // A lock record (the lock's own `lockedAt`) is preferred to a time typed on the command line.
+                    let lockedAtText =
+                        match one "--lock-record" with
+                        | Some file -> parseFile file |> strOpt "lockedAt" |> Option.defaultWith (fun () -> failwithf "%s has no lockedAt" file)
+                        | None -> (one "--locked-at").Value
+
+                    let lockedAt = ReleaseComparison.parseLockedAt lockedAtText |> orFail
+                    let maxAge = one "--max-age-hours" |> Option.map (fun h -> Double.Parse(h, Globalization.CultureInfo.InvariantCulture)) |> Option.defaultValue 6.0 |> ReleaseComparison.maxAgeOf |> orFail
+                    let report = ReleaseComparison.assess (parseFile selected) observations deviations (deviationsBytes |> Option.map Git.sha256Hex) lockedAt maxAge
                     writeOut m report
                     if str "verdict" report = "PASS" then 0 else 3
                 | _ ->

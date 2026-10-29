@@ -6,8 +6,16 @@
 /// its documented source before the lock, compares it with the selected version, and requires an owner-approved
 /// deviation for anything behind (or ahead of) it.
 ///
-/// The comparison is pure; `observe` is the only I/O (GitHub releases/latest, the npm registry), and its raw answers
-/// are digested so the record can be re-checked.
+/// Sources: a GitHub repository's release list (`/releases?per_page=100`, drafts and prereleases skipped, only tags
+/// with the component's own prefix, e.g. `dokimos-v` for `dokimos-v0.9.0`, the highest stable semver taken), an npm
+/// package (`dist-tags.latest`, which must also be the highest stable version published), or a NuGet package (the
+/// flat-container version index, highest stable). Never the newest commit (VER-002-O3).
+///
+/// `observe` is the only I/O. It stores each raw answer with its sha256; `assess` is pure over its inputs and
+/// re-checks every observation: the answer's digest, the source URL the selected set implies, and the newest release
+/// re-derived from the answer. A mismatch is TAMPERED. Limits: the digest proves the record is consistent with the
+/// answer it carries, not that the source sent that answer; `observedAt` is the observer's clock; only the first 100
+/// GitHub releases (the newest) are read.
 module ReleaseComparison
 
 open System
@@ -15,70 +23,188 @@ open System.Globalization
 open System.Net.Http
 open System.Security.Cryptography
 open System.Text
+open System.Text.RegularExpressions
 open Json
 
 /// One query of a system's release source.
 type Observation =
     { System: string
       Source: string
-      /// The newest stable release the source reported, normalized (no leading `v`).
+      /// The newest stable release the source reported, normalized (no tag prefix).
       Latest: string option
       PublishedAt: string option
       ObservedAt: DateTimeOffset
-      /// sha256 of the raw answer, so the record can be re-checked against it.
+      /// sha256 of the raw answer.
       AnswerSha256: string option
+      /// The raw answer, kept so the record can be re-derived from it.
+      Answer: string option
       Error: string option }
+
+/// One selected system of a resolved release set.
+type Selected =
+    { System: string
+      Version: string
+      Repository: string option
+      Mechanism: string
+      Package: string option
+      /// What precedes the version in the component's release tag (`v`, `dokimos-v`), from the set's `tag`.
+      TagPrefix: string option
+      Role: string }
 
 let normalize (version: string) =
     let v = version.Trim()
     if v.StartsWith("v", StringComparison.OrdinalIgnoreCase) then v.Substring 1 else v
 
-/// -1, 0 or 1 when both versions are numeric dotted versions (a prerelease suffix sorts first); None otherwise.
+/// The version a release tag names, read with the component's prefix (`dokimos-v0.9.0` -> `0.9.0`). Without a known
+/// prefix only plain tags (`1.2.3`, `v1.2.3`) are read. None when the tag is not this component's.
+let versionOfTag (prefix: string option) (tag: string) : string option =
+    match prefix with
+    | Some p when p <> "" -> if tag.StartsWith(p, StringComparison.Ordinal) then Some(tag.Substring p.Length) else None
+    | _ -> if Regex.IsMatch(tag, @"^v?\d") then Some(normalize tag) else None
+
+/// The tag prefix of a selected component: everything before the version in its `tag`.
+let tagPrefixOf (tag: string option) (version: string) : string option =
+    tag
+    |> Option.filter (fun t -> t.Length > version.Length && t.EndsWith(version, StringComparison.Ordinal))
+    |> Option.map (fun t -> t.Substring(0, t.Length - version.Length))
+
+type private Parsed = { Core: int list; Pre: string list option }
+
+let private parseVersion (v: string) : Parsed option =
+    let noBuild = (normalize v).Split('+').[0]
+
+    let core, pre =
+        match noBuild.Split('-', 2) with
+        | [| core; pre |] -> core, Some pre
+        | parts -> parts.[0], None
+
+    let numbers = core.Split('.') |> Array.map (fun part -> Int32.TryParse(part, NumberStyles.None, CultureInfo.InvariantCulture))
+
+    if core <> "" && numbers |> Array.forall fst && pre <> Some "" then
+        Some { Core = numbers |> Array.map snd |> List.ofArray; Pre = pre |> Option.map (fun p -> p.Split('.') |> List.ofArray) }
+    else
+        None
+
+/// Semver precedence of prerelease identifier lists: numeric identifiers compare numerically and sort before
+/// alphanumeric ones; a shorter list that is a prefix sorts first.
+let rec private comparePre (a: string list) (b: string list) =
+    match a, b with
+    | [], [] -> 0
+    | [], _ -> -1
+    | _, [] -> 1
+    | x :: xs, y :: ys ->
+        let c =
+            match Int64.TryParse x, Int64.TryParse y with
+            | (true, m), (true, n) -> compare m n
+            | (true, _), _ -> -1
+            | _, (true, _) -> 1
+            | _ -> String.CompareOrdinal(x, y)
+
+        if c <> 0 then sign c else comparePre xs ys
+
+/// -1, 0 or 1 by semver precedence when both versions are numeric dotted versions (a prerelease sorts before its
+/// release; build metadata is ignored); None otherwise.
 let compareVersions (a: string) (b: string) : int option =
-    let parse (v: string) =
-        let core, pre =
-            match (normalize v).Split('-', 2) with
-            | [| core; pre |] -> core, Some pre
-            | parts -> parts.[0], None
-
-        let numbers = core.Split('.') |> Array.map (fun part -> Int32.TryParse part)
-
-        if numbers |> Array.forall fst then Some(numbers |> Array.map snd |> List.ofArray, pre) else None
-
-    match parse a, parse b with
-    | Some(x, px), Some(y, py) ->
-        let width = max x.Length y.Length
+    match parseVersion a, parseVersion b with
+    | Some x, Some y ->
+        let width = max x.Core.Length y.Core.Length
         let pad (xs: int list) = xs @ List.replicate (width - xs.Length) 0
 
-        match compare (pad x) (pad y) with
+        match compare (pad x.Core) (pad y.Core) with
         | 0 ->
-            match px, py with
+            match x.Pre, y.Pre with
             | None, None -> Some 0
             | Some _, None -> Some -1
             | None, Some _ -> Some 1
-            | Some p, Some q -> Some(sign (String.CompareOrdinal(p, q)))
+            | Some p, Some q -> Some(comparePre p q)
         | c -> Some(sign c)
     | _ -> None
 
-/// The selected systems of a resolved release set: id, version, repository and distribution.
-let selectedSystems (releaseSet: Json) =
+let isStable (version: string) =
+    parseVersion version |> Option.exists (fun p -> p.Pre.IsNone)
+
+/// The highest stable version among `versions` (each with its payload).
+let private highest (versions: (string * 'a) list) : (string * 'a) option =
+    versions
+    |> List.filter (fst >> isStable)
+    |> List.fold
+        (fun best (v, x) ->
+            match best with
+            | Some(b, _) when compareVersions v b <> Some 1 -> best
+            | _ -> Some(v, x))
+        None
+
+/// The selected systems of a resolved release set.
+let selectedSystems (releaseSet: Json) : Selected list =
     arr "components" releaseSet
     |> List.map (fun c ->
         let distribution = field "distribution" c |> Option.defaultValue (JObj [])
+        let version = normalize (str "version" c)
 
-        {| System = str "systemId" c
-           Version = normalize (str "version" c)
-           Repository = strOpt "repository" c
-           Mechanism = strOpt "mechanism" distribution |> Option.defaultValue ""
-           Package = strOpt "package" distribution
-           Role = strOpt "role" c |> Option.defaultValue "" |})
+        { System = str "systemId" c
+          Version = version
+          Repository = strOpt "repository" c
+          Mechanism = strOpt "mechanism" distribution |> Option.defaultValue ""
+          Package = strOpt "package" distribution
+          TagPrefix = tagPrefixOf (strOpt "tag" c) version
+          Role = strOpt "role" c |> Option.defaultValue "" })
 
-let private sha256 (text: string) =
+/// The documented release source of a selected system, as a URL.
+let sourceOf (s: Selected) : string option =
+    match s.Mechanism, s.Package, s.Repository with
+    | "npm", Some pkg, _ -> Some(sprintf "https://registry.npmjs.org/%s" (Uri.EscapeDataString(pkg).Replace("%40", "@")))
+    | "nuget", Some pkg, _ -> Some(sprintf "https://api.nuget.org/v3-flatcontainer/%s/index.json" (pkg.ToLowerInvariant()))
+    | _, _, Some repo -> Some(sprintf "https://api.github.com/repos/%s/releases?per_page=100" repo)
+    | _ -> None
+
+/// What an answer says: the release the source calls newest, the highest stable version it lists, and when the
+/// newest was published.
+type Derived =
+    { Latest: string option
+      Highest: string option
+      PublishedAt: string option }
+
+/// Re-derives the newest release from a raw answer of `s`'s source. Pure.
+let derive (s: Selected) (answer: string) : Result<Derived, string> =
+    try
+        let doc = parseBytes (Encoding.UTF8.GetBytes answer)
+
+        match s.Mechanism, s.Package, s.Repository with
+        | "npm", Some _, _ ->
+            let latest = field "dist-tags" doc |> Option.bind (strOpt "latest")
+
+            let versions =
+                match field "versions" doc with
+                | Some(JObj props) -> props |> List.map (fun (v, _) -> v, ())
+                | _ -> []
+
+            Ok
+                { Latest = latest
+                  Highest = highest versions |> Option.map fst
+                  PublishedAt = latest |> Option.bind (fun v -> field "time" doc |> Option.bind (strOpt v)) }
+        | "nuget", Some _, _ ->
+            let top = highest (strs "versions" doc |> List.map (fun v -> v, ())) |> Option.map fst
+            Ok { Latest = top; Highest = top; PublishedAt = None }
+        | _, _, Some _ ->
+            match doc with
+            | JArr releases ->
+                let candidates =
+                    releases
+                    |> List.filter (fun r -> not (boolOr "draft" false r) && not (boolOr "prerelease" false r))
+                    |> List.choose (fun r -> strOpt "tag_name" r |> Option.bind (versionOfTag s.TagPrefix) |> Option.map (fun v -> v, strOpt "published_at" r))
+
+                let top = highest candidates
+                Ok { Latest = top |> Option.map fst; Highest = top |> Option.map fst; PublishedAt = top |> Option.bind snd }
+            | _ -> Error "the answer is not a release list"
+        | _ -> Error "no documented release source"
+    with ex ->
+        Error(sprintf "the answer is not readable JSON (%s)" ex.Message)
+
+let sha256 (text: string) =
     SHA256.HashData(Encoding.UTF8.GetBytes text) |> Array.map (fun b -> b.ToString("x2")) |> String.concat ""
 
-/// Queries one system's documented release source: an npm package's `latest` dist-tag, otherwise the GitHub
-/// repository's latest (non-prerelease, non-draft) release. Never the newest commit (VER-002-O3).
-let observe (http: HttpClient) (now: unit -> DateTimeOffset) (system: string) (repository: string option) (mechanism: string) (package: string option) =
+/// Queries one system's documented release source now and keeps the raw answer.
+let observe (http: HttpClient) (now: unit -> DateTimeOffset) (s: Selected) : Observation =
     let fetch (url: string) =
         try
             use request = new HttpRequestMessage(HttpMethod.Get, url)
@@ -94,37 +220,29 @@ let observe (http: HttpClient) (now: unit -> DateTimeOffset) (system: string) (r
             if response.IsSuccessStatusCode then Ok body else Error(sprintf "HTTP %d" (int response.StatusCode))
         with ex -> Error ex.Message
 
-    let source, read =
-        match mechanism, package, repository with
-        | "npm", Some pkg, _ ->
-            sprintf "https://registry.npmjs.org/%s" (Uri.EscapeDataString(pkg).Replace("%40", "@")),
-            fun (doc: Json) ->
-                field "dist-tags" doc |> Option.bind (strOpt "latest"),
-                field "dist-tags" doc
-                |> Option.bind (strOpt "latest")
-                |> Option.bind (fun v -> field "time" doc |> Option.bind (strOpt v))
-        | _, _, Some repo ->
-            sprintf "https://api.github.com/repos/%s/releases/latest" repo,
-            fun (doc: Json) -> strOpt "tag_name" doc, strOpt "published_at" doc
-        | _ -> "", fun _ -> None, None
-
     let at = now ()
+    let failed source e = { System = s.System; Source = source; Latest = None; PublishedAt = None; ObservedAt = at; AnswerSha256 = None; Answer = None; Error = Some e }
 
-    if source = "" then
-        { System = system; Source = ""; Latest = None; PublishedAt = None; ObservedAt = at; AnswerSha256 = None; Error = Some "no documented release source" }
-    else
+    match sourceOf s with
+    | None -> failed "" "no documented release source"
+    | Some source ->
         match fetch source with
+        | Error e -> failed source e
         | Ok body ->
-            let latest, published = read (parseBytes (Encoding.UTF8.GetBytes body))
+            let derived = derive s body
 
-            { System = system
+            { System = s.System
               Source = source
-              Latest = latest |> Option.map normalize
-              PublishedAt = published
+              Latest = derived |> Result.toOption |> Option.bind _.Latest
+              PublishedAt = derived |> Result.toOption |> Option.bind _.PublishedAt
               ObservedAt = at
               AnswerSha256 = Some(sha256 body)
-              Error = if latest.IsNone then Some "the source named no release" else None }
-        | Error e -> { System = system; Source = source; Latest = None; PublishedAt = None; ObservedAt = at; AnswerSha256 = None; Error = Some e }
+              Answer = Some body
+              Error =
+                match derived with
+                | Error e -> Some e
+                | Ok { Latest = None } -> Some "the source named no stable release"
+                | Ok _ -> None }
 
 let observationToJson (o: Observation) =
     JObj
@@ -134,59 +252,119 @@ let observationToJson (o: Observation) =
           "publishedAt", jopt JStr o.PublishedAt
           "observedAt", JStr(o.ObservedAt.ToString("o", CultureInfo.InvariantCulture))
           "answerSha256", jopt JStr o.AnswerSha256
-          "error", jopt JStr o.Error ]
+          "error", jopt JStr o.Error
+          "answer", jopt JStr o.Answer ]
 
-let observationOfJson (j: Json) =
+let observationOfJson (j: Json) : Observation =
     { System = str "system" j
-      Source = str "source" j
+      Source = strOpt "source" j |> Option.defaultValue ""
       Latest = strOpt "latest" j
       PublishedAt = strOpt "publishedAt" j
       ObservedAt = DateTimeOffset.Parse(str "observedAt" j, CultureInfo.InvariantCulture)
       AnswerSha256 = strOpt "answerSha256" j
+      Answer = strOpt "answer" j
       Error = strOpt "error" j }
 
+/// A lock time with an explicit UTC offset (`Z` or `+hh:mm`): a bare local time is ambiguous and refused.
+let parseLockedAt (text: string) : Result<DateTimeOffset, string> =
+    let t = text.Trim()
+
+    if not (Regex.IsMatch(t, @"(Z|[+-]\d{2}:?\d{2})$", RegexOptions.IgnoreCase)) then
+        Error(sprintf "the lock time '%s' has no explicit UTC offset" text)
+    else
+        match DateTimeOffset.TryParse(t, CultureInfo.InvariantCulture, DateTimeStyles.None) with
+        | true, at -> Ok at
+        | _ -> Error(sprintf "the lock time '%s' is not an ISO-8601 time" text)
+
+/// The longest an observation may precede the lock: more than 0 and at most 24 hours.
+let maxAgeOf (hours: float) : Result<TimeSpan, string> =
+    if Double.IsNaN hours || hours <= 0.0 || hours > 24.0 then Error(sprintf "--max-age-hours %g is not in (0, 24]" hours)
+    else Ok(TimeSpan.FromHours hours)
+
 /// The comparison of the selected set with the observations, made against the lock time. Deviations are the
-/// owner's approval records (`{system, decision, selected, latest}`); an agent never writes them (RDP-003).
-let assess (releaseSet: Json) (observations: Observation list) (deviations: Json list) (lockedAt: DateTimeOffset) (maxAge: TimeSpan) : Json =
+/// owner's approval records (`{system, decision, approvedBy, selected, latest}`); an agent never writes them
+/// (RDP-003). A deviation without a decision id or an approver approves nothing.
+let assess
+    (releaseSet: Json)
+    (observations: Observation list)
+    (deviations: Json list)
+    (deviationsSha256: string option)
+    (lockedAt: DateTimeOffset)
+    (maxAge: TimeSpan)
+    : Json =
+    let nonEmpty key d = strOpt key d |> Option.map (fun s -> s.Trim()) |> Option.filter ((<>) "")
+
     let approved (system: string) (selected: string) (latest: string) =
         deviations
         |> List.tryFind (fun d ->
             str "system" d = system
             && strOpt "selected" d |> Option.map normalize = Some selected
-            && strOpt "latest" d |> Option.map normalize = Some latest)
-        |> Option.map (str "decision")
+            && strOpt "latest" d |> Option.map normalize = Some latest
+            && (nonEmpty "decision" d).IsSome
+            && (nonEmpty "approvedBy" d).IsSome)
+        |> Option.map (fun d -> (nonEmpty "decision" d).Value, (nonEmpty "approvedBy" d).Value)
+
+    let compareWith (s: Selected) (latest: string) =
+        match compareVersions s.Version latest with
+        | Some 0 -> "CURRENT", "the selected version is the newest stable release", None
+        | Some c ->
+            let relation = if c < 0 then "behind" else "ahead of"
+
+            match approved s.System s.Version latest with
+            | Some(decision, by) -> "DEVIATION_APPROVED", sprintf "%s the newest release %s under %s (approved by %s)" relation latest decision by, Some(decision, by)
+            | None -> "DEVIATION_UNAPPROVED", sprintf "%s the newest release %s, with no owner-approved deviation (decision and approver)" relation latest, None
+        | None -> "INCOMPARABLE", sprintf "cannot compare %s with %s" s.Version latest, None
+
+    /// Status, reason, the re-derived newest release and the approving deviation.
+    let check (s: Selected) (o: Observation) =
+        let tampered why = "TAMPERED", why, None, None
+
+        match o with
+        | o when o.ObservedAt > lockedAt -> "OBSERVED_AFTER_LOCK", "queried after the baseline lock; it cannot prove the lock's choice", None, None
+        | o when lockedAt - o.ObservedAt > maxAge ->
+            "STALE_OBSERVATION", sprintf "queried %s before the lock (more than %s)" (string (lockedAt - o.ObservedAt)) (string maxAge), None, None
+        | { Error = Some e } -> "NOT_OBSERVED", e, None, None
+        | o when Some o.Source <> sourceOf s ->
+            tampered (sprintf "recorded source %s is not the documented source %s" o.Source (sourceOf s |> Option.defaultValue "(none)"))
+        | { Answer = None } -> tampered "no raw answer is stored, so the observation cannot be re-checked"
+        | { Answer = Some answer } when Some(sha256 answer) <> o.AnswerSha256 ->
+            tampered (sprintf "the stored answer's sha256 is %s, not the recorded %s" (sha256 answer) (o.AnswerSha256 |> Option.defaultValue "(none)"))
+        | { Answer = Some answer } ->
+            match derive s answer with
+            | Error e -> tampered (sprintf "the stored answer cannot be read: %s" e)
+            | Ok d when d.Latest <> o.Latest ->
+                tampered (sprintf "recorded newest release %s, but the stored answer says %s" (o.Latest |> Option.defaultValue "(none)") (d.Latest |> Option.defaultValue "(none)"))
+            | Ok { Latest = None } -> "NOT_OBSERVED", "the source named no stable release", None, None
+            | Ok { Latest = Some latest; Highest = top } when s.Mechanism = "npm" && top <> Some latest ->
+                "NPM_LATEST_NOT_HIGHEST", sprintf "dist-tags.latest is %s but the highest stable version published is %s" latest (top |> Option.defaultValue "(none)"), Some latest, None
+            | Ok { Latest = Some latest } ->
+                let status, why, deviation = compareWith s latest
+                status, why, Some latest, deviation
 
     let rows =
         selectedSystems releaseSet
         |> List.map (fun s ->
-            let o = observations |> List.tryFind (fun o -> o.System = s.System)
+            let mine = observations |> List.filter (fun o -> o.System = s.System)
 
-            let status, why =
-                match o with
-                | None -> "NOT_OBSERVED", "no pre-lock query of the release source"
-                | Some o when o.ObservedAt > lockedAt -> "OBSERVED_AFTER_LOCK", "queried after the baseline lock; it cannot prove the lock's choice"
-                | Some o when lockedAt - o.ObservedAt > maxAge -> "STALE_OBSERVATION", sprintf "queried %s before the lock (more than %s)" (string (lockedAt - o.ObservedAt)) (string maxAge)
-                | Some { Error = Some e } -> "NOT_OBSERVED", e
-                | Some { Latest = Some latest } ->
-                    match compareVersions s.Version latest with
-                    | Some 0 -> "CURRENT", "the selected version is the newest stable release"
-                    | Some c ->
-                        let relation = if c < 0 then "behind" else "ahead of"
+            let status, why, latest, deviation =
+                match mine with
+                | [] -> "NOT_OBSERVED", "no pre-lock query of the release source", None, None
+                | [ o ] -> check s o
+                | many -> "DUPLICATE_OBSERVATION", sprintf "%d observations of one system: which one the lock relied on is ambiguous" many.Length, None, None
 
-                        match approved s.System s.Version latest with
-                        | Some decision -> "DEVIATION_APPROVED", sprintf "%s the newest release %s under %s" relation latest decision
-                        | None -> "DEVIATION_UNAPPROVED", sprintf "%s the newest release %s, with no owner-approved deviation" relation latest
-                    | None -> "INCOMPARABLE", sprintf "cannot compare %s with %s" s.Version latest
-                | Some _ -> "NOT_OBSERVED", "the source named no release"
+            let o = match mine with [ o ] -> Some o | _ -> None
 
             JObj
                 [ "system", JStr s.System
                   "role", JStr s.Role
                   "selected", JStr s.Version
-                  "latest", o |> Option.bind _.Latest |> jopt JStr
+                  "tagPrefix", jopt JStr s.TagPrefix
+                  "latest", jopt JStr latest
                   "source", o |> Option.map (fun o -> JStr o.Source) |> Option.defaultValue JNull
                   "observedAt", o |> Option.map (fun o -> JStr(o.ObservedAt.ToString("o", CultureInfo.InvariantCulture))) |> Option.defaultValue JNull
                   "answerSha256", o |> Option.bind _.AnswerSha256 |> jopt JStr
+                  "decision", deviation |> Option.map fst |> jopt JStr
+                  "approvedBy", deviation |> Option.map snd |> jopt JStr
                   "status", JStr status
                   "why", JStr why ])
 
@@ -194,10 +372,11 @@ let assess (releaseSet: Json) (observations: Observation list) (deviations: Json
     let failing = rows |> List.filter (fun r -> not (passing.Contains(str "status" r)))
 
     JObj
-        [ "schema", JStr "indy-init.release-comparison/1"
+        [ "schema", JStr "indy-init.release-comparison/2"
           "lockedAt", JStr(lockedAt.ToString("o", CultureInfo.InvariantCulture))
           "maxObservationAge", JStr(string maxAge)
-          "verdict", JStr(if failing.IsEmpty then "PASS" else "FAIL")
+          "deviations", JObj [ "count", jint deviations.Length; "sha256", jopt JStr deviationsSha256 ]
+          "verdict", JStr(if failing.IsEmpty && not rows.IsEmpty then "PASS" else "FAIL")
           "summary",
           JObj(
               rows
