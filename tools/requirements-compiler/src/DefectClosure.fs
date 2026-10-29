@@ -103,7 +103,9 @@ type TestTree =
     { Declared: string list
       Unparseable: (string * string * string) list
       /// JSX/TSX specs (path, reason, text): not read, so a test declared only there is not shown to run.
-      Unsupported: (string * string * string) list }
+      Unsupported: (string * string * string) list
+      /// Files the independent review should read (path, why): see TestBlocks.parseWithAttention.
+      Attention: (string * string list) list }
 
 let declaredTests (repo: string) (commit: string) (path: string) : TestTree =
     let prefix = path.TrimEnd('/') + "/"
@@ -121,8 +123,13 @@ let declaredTests (repo: string) (commit: string) (path: string) : TestTree =
                     | None -> TestBlocks.isUnsupported f && TestBlocks.isSpec f))
             |> List.choose (fun f ->
                 match Git.showFile repo commit f with
-                | Ok bytes -> TestBlocks.parse f (text bytes) |> Option.map (fun r -> f, text bytes, r)
+                | Ok bytes ->
+                    let parsed, attention = TestBlocks.parseWithAttention f (text bytes)
+                    parsed |> Option.map (fun r -> (f, text bytes, r), (f, attention))
                 | Error _ -> None)
+
+        let attention = readings |> List.map snd |> List.filter (snd >> List.isEmpty >> not)
+        let readings = readings |> List.map fst
 
         { Declared =
             readings
@@ -130,7 +137,8 @@ let declaredTests (repo: string) (commit: string) (path: string) : TestTree =
                 | _, _, TestBlocks.Blocks blocks -> blocks |> List.filter (fun b -> b.Kind = TestBlocks.Test && not b.Skipped) |> List.map _.Title
                 | _ -> [])
           Unparseable = readings |> List.choose (function f, body, TestBlocks.Unparseable problem -> Some(f, problem, body) | _ -> None)
-          Unsupported = readings |> List.choose (function f, body, TestBlocks.Unsupported reason -> Some(f, reason, body) | _ -> None) }
+          Unsupported = readings |> List.choose (function f, body, TestBlocks.Unsupported reason -> Some(f, reason, body) | _ -> None)
+          Attention = attention }
 
 /// True when `id` occurs in `title` as a whole id: not inside, or as the prefix of, a longer one.
 let namesTest (id: string) (title: string) =
@@ -255,10 +263,10 @@ let limits =
       "review evidence is checked for a review record's structure, not for who wrote it: without a signed review or reviewer attestation the implementing agent can write it, in the candidate or a records commit"
       "the base is the commit that first added kickoff/indy-init.kickoff.json in the candidate's first-parent history: history rewritten before the run moves it, unless the kickoff commit is pinned outside the candidate (an owner record or tag)"
       "tests are read lexically: whether a declared, unskipped test's body actually exercises the fix is not checked"
-      "the JavaScript/TypeScript scanner is a heuristic lexer that fails closed where it detects ambiguity; an adversarially written file may still desynchronise it undetected, so the independent review must inspect the test files a closure relies on"
+      "the JavaScript/TypeScript scanner is a heuristic lexer that fails closed where it detects ambiguity; an adversarially written file may still desynchronise it undetected, so the independent review must inspect the test files a closure relies on, starting with every file in reviewAttention (a backtick in a comment, a quote or backtick in a regular expression literal, a `/` right after a `}`)"
       "JSX/TSX files are not read: a test declared only in one is refused" ]
 
-/// The `indy-init.defect-closure-verification/4` report.
+/// The `indy-init.defect-closure-verification/5` report.
 let assess (given: Inputs) : Json =
     let full rev = resolveCommit given.Repo rev |> Option.defaultValue rev
     let candidate = full given.Candidate
@@ -313,7 +321,7 @@ let assess (given: Inputs) : Json =
         else "VERIFIED"
 
     JObj
-        [ "schema", JStr "indy-init.defect-closure-verification/4"
+        [ "schema", JStr "indy-init.defect-closure-verification/5"
           "base", JStr(baseCommit |> Option.defaultValue baseText)
           "baseVerified", JBool baseVerified
           "kickoff", Kickoff.toJson Kickoff.defaultPath kickoff
@@ -327,6 +335,7 @@ let assess (given: Inputs) : Json =
           "incomplete", jstrs incomplete
           "unparseable", JArr(tree.Unparseable |> List.map (fun (f, problem, _) -> JObj [ "path", JStr f; "problem", JStr problem ]))
           "unsupported", JArr(tree.Unsupported |> List.map (fun (f, reason, _) -> JObj [ "path", JStr f; "reason", JStr reason ]))
+          "reviewAttention", JArr(tree.Attention |> List.map (fun (f, why) -> JObj [ "file", JStr(sprintf "%s@%s" f candidate); "why", jstrs why ]))
           "limits", jstrs limits
           "summary",
           JObj

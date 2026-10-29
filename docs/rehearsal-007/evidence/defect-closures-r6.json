@@ -1,5 +1,5 @@
 {
-  "schema": "indy-init.defect-closure-verification/4",
+  "schema": "indy-init.defect-closure-verification/5",
   "base": "c80f35e468fb2d1a38ce467f9bec860d52837b23",
   "baseVerified": true,
   "kickoff": {
@@ -22,12 +22,164 @@
   "incomplete": [],
   "unparseable": [],
   "unsupported": [],
+  "reviewAttention": [
+    {
+      "file": "tests/App.Engine.Tests/FixtureReplayTests.fs@46d5e1129a798549dcf37c2a6460c4f623298761",
+      "why": [
+        "a backtick inside a comment"
+      ]
+    },
+    {
+      "file": "tests/App.Engine.Tests/HistoryAndProposalTests.fs@46d5e1129a798549dcf37c2a6460c4f623298761",
+      "why": [
+        "a backtick inside a comment"
+      ]
+    },
+    {
+      "file": "tests/App.Engine.Tests/WriteInvariantTests.fs@46d5e1129a798549dcf37c2a6460c4f623298761",
+      "why": [
+        "a backtick inside a comment"
+      ]
+    },
+    {
+      "file": "tests/Causa.Acceptance.Deterministic/AR030Tests.fs@46d5e1129a798549dcf37c2a6460c4f623298761",
+      "why": [
+        "a backtick inside a comment"
+      ]
+    },
+    {
+      "file": "tests/Causa.Acceptance.Deterministic/Support.fs@46d5e1129a798549dcf37c2a6460c4f623298761",
+      "why": [
+        "a backtick inside a comment"
+      ]
+    },
+    {
+      "file": "tests/Causa.Acceptance.Deterministic/VERTests.fs@46d5e1129a798549dcf37c2a6460c4f623298761",
+      "why": [
+        "a backtick inside a comment"
+      ]
+    },
+    {
+      "file": "tests/Causa.Acceptance.Live/Pf007Fixtures.fs@46d5e1129a798549dcf37c2a6460c4f623298761",
+      "why": [
+        "a backtick inside a comment"
+      ]
+    },
+    {
+      "file": "tests/Causa.Acceptance.Live/PfTests.fs@46d5e1129a798549dcf37c2a6460c4f623298761",
+      "why": [
+        "a backtick inside a comment"
+      ]
+    },
+    {
+      "file": "tests/Causa.Acceptance.Live/Repo.fs@46d5e1129a798549dcf37c2a6460c4f623298761",
+      "why": [
+        "a backtick inside a comment"
+      ]
+    },
+    {
+      "file": "tests/Causa.Acceptance.Live/Support.fs@46d5e1129a798549dcf37c2a6460c4f623298761",
+      "why": [
+        "a backtick inside a comment"
+      ]
+    },
+    {
+      "file": "tests/Persistence.Tests/CatalogAppTests.fs@46d5e1129a798549dcf37c2a6460c4f623298761",
+      "why": [
+        "a backtick inside a comment"
+      ]
+    },
+    {
+      "file": "tests/Persistence.Tests/Synthetic.fs@46d5e1129a798549dcf37c2a6460c4f623298761",
+      "why": [
+        "a backtick inside a comment"
+      ]
+    },
+    {
+      "file": "tests/browser/acceptance/AR-035.spec.js@46d5e1129a798549dcf37c2a6460c4f623298761",
+      "why": [
+        "a backtick inside a comment"
+      ]
+    },
+    {
+      "file": "tests/browser/acceptance/UI-001.spec.js@46d5e1129a798549dcf37c2a6460c4f623298761",
+      "why": [
+        "a regular expression literal holding a quote or backtick"
+      ]
+    },
+    {
+      "file": "tests/browser/acceptance/UI-010.spec.js@46d5e1129a798549dcf37c2a6460c4f623298761",
+      "why": [
+        "a regular expression literal holding a quote or backtick"
+      ]
+    },
+    {
+      "file": "tests/browser/acceptance/UI-015.spec.js@46d5e1129a798549dcf37c2a6460c4f623298761",
+      "why": [
+        "a regular expression literal holding a quote or backtick"
+      ]
+    },
+    {
+      "file": "tests/browser/acceptance/UI-024.spec.js@46d5e1129a798549dcf37c2a6460c4f623298761",
+      "why": [
+        "a regular expression literal holding a quote or backtick"
+      ]
+    },
+    {
+      "file": "tests/browser/acceptance/UI-026.spec.js@46d5e1129a798549dcf37c2a6460c4f623298761",
+      "why": [
+        "a regular expression literal holding a quote or backtick"
+      ]
+    },
+    {
+      "file": "tests/browser/acceptance/UI-031.spec.js@46d5e1129a798549dcf37c2a6460c4f623298761",
+      "why": [
+        "a regular expression literal holding a quote or backtick"
+      ]
+    },
+    {
+      "file": "tests/browser/acceptance/WDL-002.spec.js@46d5e1129a798549dcf37c2a6460c4f623298761",
+      "why": [
+        "a regular expression literal holding a quote or backtick"
+      ]
+    },
+    {
+      "file": "tests/browser/acceptance/WDL-005.spec.js@46d5e1129a798549dcf37c2a6460c4f623298761",
+      "why": [
+        "a regular expression literal holding a quote or backtick"
+      ]
+    },
+    {
+      "file": "tests/browser/fixture-mode.spec.js@46d5e1129a798549dcf37c2a6460c4f623298761",
+      "why": [
+        "a backtick inside a comment"
+      ]
+    },
+    {
+      "file": "tests/browser/graph-layout.spec.js@46d5e1129a798549dcf37c2a6460c4f623298761",
+      "why": [
+        "a regular expression literal holding a quote or backtick"
+      ]
+    },
+    {
+      "file": "tests/browser/graph-navigation.spec.js@46d5e1129a798549dcf37c2a6460c4f623298761",
+      "why": [
+        "a backtick inside a comment"
+      ]
+    },
+    {
+      "file": "tests/browser/percepta.spec.js@46d5e1129a798549dcf37c2a6460c4f623298761",
+      "why": [
+        "a backtick inside a comment"
+      ]
+    }
+  ],
   "limits": [
     "a fix commit is shown to descend from the base and to change something, not to fix the class: an unrelated commit can be named",
     "review evidence is checked for a review record's structure, not for who wrote it: without a signed review or reviewer attestation the implementing agent can write it, in the candidate or a records commit",
     "the base is the commit that first added kickoff/indy-init.kickoff.json in the candidate's first-parent history: history rewritten before the run moves it, unless the kickoff commit is pinned outside the candidate (an owner record or tag)",
     "tests are read lexically: whether a declared, unskipped test's body actually exercises the fix is not checked",
-    "the JavaScript/TypeScript scanner is a heuristic lexer that fails closed where it detects ambiguity; an adversarially written file may still desynchronise it undetected, so the independent review must inspect the test files a closure relies on",
+    "the JavaScript/TypeScript scanner is a heuristic lexer that fails closed where it detects ambiguity; an adversarially written file may still desynchronise it undetected, so the independent review must inspect the test files a closure relies on, starting with every file in reviewAttention (a backtick in a comment, a quote or backtick in a regular expression literal, a `/` right after a `}`)",
     "JSX/TSX files are not read: a test declared only in one is refused"
   ],
   "summary": {

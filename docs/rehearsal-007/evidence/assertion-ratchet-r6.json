@@ -1,5 +1,5 @@
 {
-  "schema": "indy-init.assertion-ratchet/5",
+  "schema": "indy-init.assertion-ratchet/6",
   "base": "c80f35e468fb2d1a38ce467f9bec860d52837b23",
   "candidate": "46d5e1129a798549dcf37c2a6460c4f623298761",
   "baseVerified": true,
@@ -60,6 +60,206 @@
   "incomplete": [],
   "unparseable": [],
   "unsupported": [],
+  "reviewAttention": [
+    {
+      "file": "tests/browser/acceptance/UI-001.spec.js@0022852b4538149a71051bfbc716a21b7c87bfe9",
+      "why": [
+        "a regular expression literal holding a quote or backtick"
+      ]
+    },
+    {
+      "file": "tests/browser/acceptance/UI-010.spec.js@0022852b4538149a71051bfbc716a21b7c87bfe9",
+      "why": [
+        "a regular expression literal holding a quote or backtick"
+      ]
+    },
+    {
+      "file": "tests/browser/acceptance/UI-015.spec.js@0022852b4538149a71051bfbc716a21b7c87bfe9",
+      "why": [
+        "a regular expression literal holding a quote or backtick"
+      ]
+    },
+    {
+      "file": "tests/browser/acceptance/_data-repository.js@0022852b4538149a71051bfbc716a21b7c87bfe9",
+      "why": [
+        "a backtick inside a comment"
+      ]
+    },
+    {
+      "file": "tests/browser/acceptance/_lib.js@0022852b4538149a71051bfbc716a21b7c87bfe9",
+      "why": [
+        "a backtick inside a comment"
+      ]
+    },
+    {
+      "file": "tests/browser/acceptance/UI-010.spec.js@0ff0100a3bf8dc2eef9757ede1b1e8eb8f6b32ec",
+      "why": [
+        "a regular expression literal holding a quote or backtick"
+      ]
+    },
+    {
+      "file": "tests/browser/acceptance/UI-024.spec.js@0ff0100a3bf8dc2eef9757ede1b1e8eb8f6b32ec",
+      "why": [
+        "a regular expression literal holding a quote or backtick"
+      ]
+    },
+    {
+      "file": "tests/browser/acceptance/UI-026.spec.js@0ff0100a3bf8dc2eef9757ede1b1e8eb8f6b32ec",
+      "why": [
+        "a regular expression literal holding a quote or backtick"
+      ]
+    },
+    {
+      "file": "tests/browser/acceptance/UI-031.spec.js@0ff0100a3bf8dc2eef9757ede1b1e8eb8f6b32ec",
+      "why": [
+        "a regular expression literal holding a quote or backtick"
+      ]
+    },
+    {
+      "file": "tests/browser/acceptance/WDL-002.spec.js@0ff0100a3bf8dc2eef9757ede1b1e8eb8f6b32ec",
+      "why": [
+        "a regular expression literal holding a quote or backtick"
+      ]
+    },
+    {
+      "file": "tests/browser/acceptance/WDL-005.spec.js@0ff0100a3bf8dc2eef9757ede1b1e8eb8f6b32ec",
+      "why": [
+        "a regular expression literal holding a quote or backtick"
+      ]
+    },
+    {
+      "file": "tests/browser/acceptance/_lib.js@7440f7c4219151c070b896df6fb8a872670e23c3",
+      "why": [
+        "a backtick inside a comment"
+      ]
+    },
+    {
+      "file": "tests/browser/acceptance/AR-035.spec.js@56a34d897a12efe196b3866bd76fc0055d65847c",
+      "why": [
+        "a backtick inside a comment"
+      ]
+    },
+    {
+      "file": "tests/browser/acceptance/AR-035.spec.js@a35c40849ebab6aeac85869dfdbeb46bfcca8c91",
+      "why": [
+        "a backtick inside a comment"
+      ]
+    },
+    {
+      "file": "tests/browser/acceptance/UI-024.spec.js@e79f0a430a78f65ba40aabdcfec8f7d06abb7bcd",
+      "why": [
+        "a regular expression literal holding a quote or backtick"
+      ]
+    },
+    {
+      "file": "tests/browser/acceptance/UI-031.spec.js@85b1b3366ed05b21f10b82cb9e50dc4df39d40de",
+      "why": [
+        "a regular expression literal holding a quote or backtick"
+      ]
+    },
+    {
+      "file": "tests/browser/acceptance/AR-035.spec.js@4c67fb68d3ac09e5ee8d20ea59933d724c992d1d",
+      "why": [
+        "a backtick inside a comment"
+      ]
+    },
+    {
+      "file": "tests/browser/acceptance/AR-035.spec.js@b352140a24a96e649fc9e888b2af9ba8b844482b",
+      "why": [
+        "a backtick inside a comment"
+      ]
+    },
+    {
+      "file": "tests/browser/acceptance/UI-010.spec.js@3f0ce2392a7197b87dc0fac7c6dcc67738a2a4e0",
+      "why": [
+        "a regular expression literal holding a quote or backtick"
+      ]
+    },
+    {
+      "file": "tests/browser/acceptance/UI-024.spec.js@3f0ce2392a7197b87dc0fac7c6dcc67738a2a4e0",
+      "why": [
+        "a regular expression literal holding a quote or backtick"
+      ]
+    },
+    {
+      "file": "tests/browser/acceptance/_stateful-github.js@3f0ce2392a7197b87dc0fac7c6dcc67738a2a4e0",
+      "why": [
+        "a backtick inside a comment"
+      ]
+    },
+    {
+      "file": "tests/browser/acceptance/AR-035.spec.js@46d5e1129a798549dcf37c2a6460c4f623298761",
+      "why": [
+        "a backtick inside a comment"
+      ]
+    },
+    {
+      "file": "tests/browser/acceptance/UI-001.spec.js@46d5e1129a798549dcf37c2a6460c4f623298761",
+      "why": [
+        "a regular expression literal holding a quote or backtick"
+      ]
+    },
+    {
+      "file": "tests/browser/acceptance/UI-010.spec.js@46d5e1129a798549dcf37c2a6460c4f623298761",
+      "why": [
+        "a regular expression literal holding a quote or backtick"
+      ]
+    },
+    {
+      "file": "tests/browser/acceptance/UI-015.spec.js@46d5e1129a798549dcf37c2a6460c4f623298761",
+      "why": [
+        "a regular expression literal holding a quote or backtick"
+      ]
+    },
+    {
+      "file": "tests/browser/acceptance/UI-024.spec.js@46d5e1129a798549dcf37c2a6460c4f623298761",
+      "why": [
+        "a regular expression literal holding a quote or backtick"
+      ]
+    },
+    {
+      "file": "tests/browser/acceptance/UI-026.spec.js@46d5e1129a798549dcf37c2a6460c4f623298761",
+      "why": [
+        "a regular expression literal holding a quote or backtick"
+      ]
+    },
+    {
+      "file": "tests/browser/acceptance/UI-031.spec.js@46d5e1129a798549dcf37c2a6460c4f623298761",
+      "why": [
+        "a regular expression literal holding a quote or backtick"
+      ]
+    },
+    {
+      "file": "tests/browser/acceptance/WDL-002.spec.js@46d5e1129a798549dcf37c2a6460c4f623298761",
+      "why": [
+        "a regular expression literal holding a quote or backtick"
+      ]
+    },
+    {
+      "file": "tests/browser/acceptance/WDL-005.spec.js@46d5e1129a798549dcf37c2a6460c4f623298761",
+      "why": [
+        "a regular expression literal holding a quote or backtick"
+      ]
+    },
+    {
+      "file": "tests/browser/acceptance/_data-repository.js@46d5e1129a798549dcf37c2a6460c4f623298761",
+      "why": [
+        "a backtick inside a comment"
+      ]
+    },
+    {
+      "file": "tests/browser/acceptance/_lib.js@46d5e1129a798549dcf37c2a6460c4f623298761",
+      "why": [
+        "a backtick inside a comment"
+      ]
+    },
+    {
+      "file": "tests/browser/acceptance/_stateful-github.js@46d5e1129a798549dcf37c2a6460c4f623298761",
+      "why": [
+        "a backtick inside a comment"
+      ]
+    }
+  ],
   "skippedBeforeCandidate": {
     "testsExcluded": 0,
     "assertionsExcluded": 0,
@@ -76,7 +276,7 @@
     "skip markers reached through a helper in another file, an argument or a computed property are not seen; a conditional skip's condition is not evaluated",
     "the base is the commit that first added kickoff/indy-init.kickoff.json in the candidate's first-parent history: history rewritten before the run moves it, unless the kickoff commit is pinned outside the candidate (an owner record or tag)",
     "a tag change's review is checked for a review record's structure, not for who wrote it: without a signed review or reviewer attestation the implementing agent can write it",
-    "the JavaScript/TypeScript scanner is a heuristic lexer that fails closed where it detects ambiguity; an adversarially written file may still desynchronise it undetected, so the independent review must inspect the test files it relies on",
+    "the JavaScript/TypeScript scanner is a heuristic lexer that fails closed where it detects ambiguity; an adversarially written file may still desynchronise it undetected, so the independent review must inspect the test files it relies on, starting with every file in reviewAttention (a backtick in a comment, a quote or backtick in a regular expression literal, a `/` right after a `}`)",
     "JSX/TSX files are not read (unsupported): a tracked path holding one leaves the verdict at best INCOMPLETE"
   ],
   "removed": [

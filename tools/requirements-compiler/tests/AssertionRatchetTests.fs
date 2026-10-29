@@ -180,6 +180,11 @@ let private scannerCases =
       inTest [ "  const half = (await page.evaluate(() => 4)) / 2;"; "  const ratio = items.length / total / 3;"; "  await expect(page).toHaveTitle(\"b\");" ], LiveX
       "a final line comment without a newline (eof.spec.js)", "a.spec.js",
       (inTest [ "  await expect(page).toHaveTitle(\"a\");" ]) + "// end", LiveX
+      // G1 (fifth review: r6c fake5, syn/repo4): a block's `}` inside a template's ${...}, then `/`.
+      "a block's `}` then `/` inside a template's ${...} (fake5)", "a.spec.js",
+      inTest [ "  const label = `${(function () {"; "    if (true) {} /\"/.test(\"\"); const z = \"`\";"; "    test.skip();"; "    // `"; "    return \"x\";"; "  })()}`;" ], Unreadable
+      "an object literal inside a template's ${...}", "a.spec.js",
+      inTest [ "  const t = `${ {a: 1}.a } and ${ [1].map((x) => { return x; }) }`;"; "  test.skip();" ], SkippedX
       "a TSX spec", "a.spec.tsx", inTest [ "  render(<p>Don't</p>);"; "  await expect(page).toHaveTitle(\"a\");" ], NotRead ]
 
 let private scannerFailures () =
@@ -207,6 +212,15 @@ let all () : string list =
 
           [ if str "verdict" report <> "INCOMPLETE" || arr "unsupported" report |> List.isEmpty then
                 yield sprintf "a tracked TSX file leaves the verdict %s, not INCOMPLETE with it listed as unsupported" (str "verdict" report) ])
+      withRepo (fun repo ->
+          // Hardening: a file holding a backtick in a comment is listed for the independent review.
+          let base' = commitFile repo "tests/UI-034.spec.js" (spec [ selected ])
+          let noted = commitFile repo "tests/UI-034.spec.js" (spec [ selected; "  // a stray `" ])
+          let report = assess repo base' noted None
+          let listed = arr "reviewAttention" report |> List.map (str "file")
+
+          [ if not (listed |> List.contains $"tests/UI-034.spec.js@{noted}") || listed |> List.contains $"tests/UI-034.spec.js@{base'}" then
+                yield sprintf "reviewAttention does not list exactly the version with a backtick in a comment: %A" listed ])
       withRepo (fun repo ->
           // E4: an UNPARSEABLE candidate file is listed once.
           let base' = commitFile repo "tests/UI-034.spec.js" (spec [ selected ])
