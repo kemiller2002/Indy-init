@@ -13,10 +13,10 @@ Generated from [`work-packages.json`](work-packages.json); the JSON is authorita
 | R7-REM-005 | Unattended PR execution | praxis, conditor | praxis WI-0104, conditor WI-0062 | — | **PASS_ADVISORY** |
 | R7-REM-006 | Automated acceptance evidence | indy-init, rehearsal repository | — | — | **PLANNED** |
 | R7-REM-007 | Candidate and deployment gates | conditor, rehearsal repository | conditor WI-0063 | conditor#122 | **PARTIAL** |
-| R7-REM-008 | Defect-class closure | indy-init | — | indy-init (this branch) | **IMPLEMENTED_IN_REVIEW** |
+| R7-REM-008 | Defect-class closure | indy-init | — | indy-init (this branch) | **IMPLEMENTED** |
 | R7-REM-009 | Forma accessibility corrections | forma | forma WI-0041 | forma#173 | **IMPLEMENTED_IN_REVIEW** |
-| R7-REM-010 | Release provenance | indy-init | — | indy-init (this branch) | **IMPLEMENTED_IN_REVIEW** |
-| R7-REM-011 | Independent-review corrections | indy-init, arca | — | indy-init (this branch), arca#47 | **IMPLEMENTED_IN_REVIEW** |
+| R7-REM-010 | Release provenance | indy-init | — | indy-init (this branch) | **IMPLEMENTED** |
+| R7-REM-011 | Independent-review corrections | indy-init, arca | — | indy-init (this branch), arca#47 | **IMPLEMENTED** |
 | R7-REM-012 | Rehearsal 7 readiness | indy-init | — | indy-init (this branch) | **IMPLEMENTED** |
 
 ## R7-REM-001: Cross-tab persistence correctness
@@ -183,7 +183,7 @@ Generated from [`work-packages.json`](work-packages.json); the JSON is authorita
 
 ## R7-REM-008: Defect-class closure
 
-**Addresses:** G7, D-11, RF-F-6. **Depends on:** nothing. **Status:** IMPLEMENTED_IN_REVIEW.
+**Addresses:** G7, D-11, RF-F-6. **Depends on:** nothing. **Status:** IMPLEMENTED.
 
 **Plan.** requirements-compiler verify-defect-closures checks each claimed closure against the rehearsal's own history (DCL-001..009).
 
@@ -196,14 +196,14 @@ Generated from [`work-packages.json`](work-packages.json); the JSON is authorita
 - Run before the candidate freeze
 
 **Evidence.**
-- Offline test suite passes at c33dc29
+- Offline test suite passes at 2e4b561
 - evidence/defect-closures-r6.json: Rehearsal 6 (46d5e11, records bf190b6, base c80f35e bound by the kickoff record): REFUSED, 8/8 closures
 
 **Remaining.**
-- Fifth independent review verdict
 - Wire into the Rehearsal 7 acceptance job before the freeze, with --base set to the kickoff commit
+- Merge indy-init#42 (owner)
 
-**Independent review.** Independent review: BLOCKING (F1: closures could be satisfied by tests outside the rehearsal, comment mentions, evidence older than the fix, closedAt before the fix, and unknown statuses). Fixed in 6bde211 (required --base, word-boundary test titles excluding skipped forms, evidence changed after the fix, closedAt >= fix time, curated classes MISSING, unknown status refused, INCOMPLETE without curation or freeze, closures source and sha256). Re-review at 41ff524: F1 FIXED; new BLOCKING N1 (a `./` path prefix let the closures record serve as its own review evidence; skips via testInfo.skip() or on the declaration line went undetected). Fixed in 6d05613 (normalised paths and blob-identity against the closures record; skip detection shared in TestBlocks). Documented limits: an unrelated commit descending from the base can be named as the fix; agent-written review evidence cannot be told from a reviewer's without identity or attestation. Third review at eb978e2: N1 FIXED; new BLOCKING D1 (a regex literal after `)` desynchronises the test lexer and hides a skip: false VERIFIED) and D3 (a lightly edited copy of the closures record passes as review evidence). Fixed in e05c776: the test lexer fails closed (UNPARSEABLE files are not read and keep the verdict at best INCOMPLETE); review evidence must be an indy-init.independent-review/1 record naming the class, the full fix SHA and verdict CLOSED. Fourth review at c08c23e: all earlier reproductions caught; Rehearsal 6's whole tests/ tree (144 files) parses; BLOCKING E1 (a `}` closing an object literal followed by division still desynchronises the lexer: false VERIFIED and false PASS), E2 (a file ending in a line comment without a newline is wrongly UNPARSEABLE), E3 (JSX/TSX), E4 (reporting nits). Fixed at c33dc29 (0f9816d, 7f1c0a2): brace-kind tracking, ambiguous cases UNPARSEABLE, end of input closes a line comment (0 of 3113 real files UNPARSEABLE), .jsx/.tsx reported as unsupported, and the base is now bound to the kickoff record like the ratchet's. Fifth review in progress.
+**Independent review.** Independent review: BLOCKING (F1: closures could be satisfied by tests outside the rehearsal, comment mentions, evidence older than the fix, closedAt before the fix, and unknown statuses). Fixed in 6bde211 (required --base, word-boundary test titles excluding skipped forms, evidence changed after the fix, closedAt >= fix time, curated classes MISSING, unknown status refused, INCOMPLETE without curation or freeze, closures source and sha256). Re-review at 41ff524: F1 FIXED; new BLOCKING N1 (a `./` path prefix let the closures record serve as its own review evidence; skips via testInfo.skip() or on the declaration line went undetected). Fixed in 6d05613 (normalised paths and blob-identity against the closures record; skip detection shared in TestBlocks). Documented limits: an unrelated commit descending from the base can be named as the fix; agent-written review evidence cannot be told from a reviewer's without identity or attestation. Third review at eb978e2: N1 FIXED; new BLOCKING D1 (a regex literal after `)` desynchronises the test lexer and hides a skip: false VERIFIED) and D3 (a lightly edited copy of the closures record passes as review evidence). Fixed in e05c776: the test lexer fails closed (UNPARSEABLE files are not read and keep the verdict at best INCOMPLETE); review evidence must be an indy-init.independent-review/1 record naming the class, the full fix SHA and verdict CLOSED. Fourth review at c08c23e: all earlier reproductions caught; Rehearsal 6's whole tests/ tree (144 files) parses; BLOCKING E1 (a `}` closing an object literal followed by division still desynchronises the lexer: false VERIFIED and false PASS), E2 (a file ending in a line comment without a newline is wrongly UNPARSEABLE), E3 (JSX/TSX), E4 (reporting nits). Fixed at c33dc29 (0f9816d, 7f1c0a2): brace-kind tracking, ambiguous cases UNPARSEABLE, end of input closes a line comment (0 of 3113 real files UNPARSEABLE), .jsx/.tsx reported as unsupported, and the base is now bound to the kickoff record like the ratchet's. Fifth review at c33dc29: PASS_WITH_FINDINGS; G1 (braces inside a template's ${...}) fixed at 1c3a7d0 with a reviewAttention list of files the independent review must read; confirmation at 1c3a7d0: PASS_WITH_FINDINGS, H1 (postfix ++/-- before /) and H2 (noisy attention list) fixed at 2e4b561. Final: the reviewer judges the residual risk of the heuristic lexer adequately documented in each report's limits, provided the review reads every reviewAttention file.
 
 ## R7-REM-009: Forma accessibility corrections
 
@@ -231,7 +231,7 @@ Generated from [`work-packages.json`](work-packages.json); the JSON is authorita
 
 ## R7-REM-010: Release provenance
 
-**Addresses:** VER-001-O1, VER-002-O2. **Depends on:** nothing. **Status:** IMPLEMENTED_IN_REVIEW.
+**Addresses:** VER-001-O1, VER-002-O2. **Depends on:** nothing. **Status:** IMPLEMENTED.
 
 **Plan.** requirements-compiler release-comparison observe/assess: query each selected system's release source immediately before the lock, digest the answers, compare, and require owner-approved deviations.
 
@@ -248,12 +248,13 @@ Generated from [`work-packages.json`](work-packages.json); the JSON is authorita
 
 **Remaining.**
 - Run at Rehearsal 7 preflight against the kickoff set, before the lock
+- Merge indy-init#42 (owner)
 
 **Independent review.** Independent review: BLOCKING (F4/F5: hand-edited observations accepted, duplicates, wrong tag prefixes, npm latest-vs-highest, prerelease order, unapproved deviations, unbounded age). Fixed in afe7485 (answers stored, re-hashed and re-parsed, TAMPERED otherwise; recomputed source URL; duplicates refused; per-component tag prefixes; NuGet; semver prerelease order; deviations need decision and approvedBy; --locked-at with offset; max age <= 24 h). Re-review at 41ff524: F4 FIXED for inconsistent edits, F5 mostly FIXED; N5 fixed in 07be4f2 (AMBIGUOUS_COMPONENT, not a PASS status); N4 stated in the report's attestation field; N4 inherent: a recomputed digest over a forged answer is not proof, and observedAt, the lock record, approvedBy and deviations are caller-written. Proof needs observe to run in trusted CI with signed output. Third review at eb978e2: N5 FIXED; N4 documented; npm-versus-GitHub-releases ambiguity refinement and release paging in progress. Fixed in f29edf3: AMBIGUOUS only for the same GitHub release list and prefix; releases paged; limits stated in the report. Fourth review: N5 FIXED, N4 limit stated; no new release-comparison finding.
 
 ## R7-REM-011: Independent-review corrections
 
-**Addresses:** RF-F-1..9, R1-F-3/4/5, 7 final tag changes, UI-034-O1 unflagged loosening. **Depends on:** R7-REM-001, R7-REM-002. **Status:** IMPLEMENTED_IN_REVIEW.
+**Addresses:** RF-F-1..9, R1-F-3/4/5, 7 final tag changes, UI-034-O1 unflagged loosening. **Depends on:** R7-REM-001, R7-REM-002. **Status:** IMPLEMENTED.
 
 **Plan.** RF-F-1/2 are R6-D-002/003. RF-F-3 is handled in Arca's classification. RF-F-8: requirements-compiler assertion-ratchet makes a removed or loosened assertion fail unless a resolved tag change covers it.
 
@@ -265,14 +266,14 @@ Generated from [`work-packages.json`](work-packages.json); the JSON is authorita
 - Weakening is detected before review
 
 **Evidence.**
-- Offline test suite passes at c33dc29
+- Offline test suite passes at 2e4b561
 - evidence/assertion-ratchet-r6.json: Rehearsal 6 c80f35e..46d5e11, base read from the real kickoff record: FAIL, 45 unrecorded removals including UI-034-O1 and UI-034-O2
 
 **Remaining.**
-- Fifth independent review verdict
 - RF-F-4..7, RF-F-9 are process items carried into EXECUTION-PLAN.md
+- Merge indy-init#42 (owner)
 
-**Independent review.** Independent review: BLOCKING (F2/F3: skip/fixme/only markers, block comments, multi-line statements and helper pseudo-tests evaded the count; the base was caller-chosen). Fixed in ddc18bb (per-statement counting, markers, comments, test.* blocks, tag-change exemption through PlanVerification rules, required --kickoff binding the base, full SHAs). Re-review at 41ff524: F2 FIXED, F3 PARTIAL (any non-empty resolution accepted); new N2 (the kickoff record was any file on disk, so the base was still self-asserted) and N3 (assertions hidden in template literals; testInfo.skip(), test.info().skip(), aliased skip). Fixed in 865d443: the base is the commit that first added the kickoff record in the candidate's first-parent history (a mismatching --base is REFUSED); assertions matched on string- and template-masked text; skip markers anywhere including aliases in the file; a tag change needs PlanVerification.tagChangeAdmissible. Third review at eb978e2: N2, N3, F3 FIXED; new BLOCKING D1 (lexer desync counts a dead assertion as live), D2 (a caller-chosen --kickoff-path gave PASS on Rehearsal 6) and D4 (tag-change reviews are free text in a file outside the repository); D5 low (over-broad base skip exclusion). Fixed in 7675e38 and 6edade9: UNPARSEABLE files block PASS; only kickoff/indy-init.kickoff.json binds the base; tag changes are read from the records commit and must point to review records there (a file from disk is at best INCOMPLETE); conditional base skips count as live and exclusions are reported. Fourth review at c08c23e: all earlier reproductions caught; Rehearsal 6's whole tests/ tree (144 files) parses; BLOCKING E1 (a `}` closing an object literal followed by division still desynchronises the lexer: false VERIFIED and false PASS), E2 (a file ending in a line comment without a newline is wrongly UNPARSEABLE), E3 (JSX/TSX), E4 (reporting nits). Fixed at c33dc29 (7f1c0a2). Fifth review in progress.
+**Independent review.** Independent review: BLOCKING (F2/F3: skip/fixme/only markers, block comments, multi-line statements and helper pseudo-tests evaded the count; the base was caller-chosen). Fixed in ddc18bb (per-statement counting, markers, comments, test.* blocks, tag-change exemption through PlanVerification rules, required --kickoff binding the base, full SHAs). Re-review at 41ff524: F2 FIXED, F3 PARTIAL (any non-empty resolution accepted); new N2 (the kickoff record was any file on disk, so the base was still self-asserted) and N3 (assertions hidden in template literals; testInfo.skip(), test.info().skip(), aliased skip). Fixed in 865d443: the base is the commit that first added the kickoff record in the candidate's first-parent history (a mismatching --base is REFUSED); assertions matched on string- and template-masked text; skip markers anywhere including aliases in the file; a tag change needs PlanVerification.tagChangeAdmissible. Third review at eb978e2: N2, N3, F3 FIXED; new BLOCKING D1 (lexer desync counts a dead assertion as live), D2 (a caller-chosen --kickoff-path gave PASS on Rehearsal 6) and D4 (tag-change reviews are free text in a file outside the repository); D5 low (over-broad base skip exclusion). Fixed in 7675e38 and 6edade9: UNPARSEABLE files block PASS; only kickoff/indy-init.kickoff.json binds the base; tag changes are read from the records commit and must point to review records there (a file from disk is at best INCOMPLETE); conditional base skips count as live and exclusions are reported. Fourth review at c08c23e: all earlier reproductions caught; Rehearsal 6's whole tests/ tree (144 files) parses; BLOCKING E1 (a `}` closing an object literal followed by division still desynchronises the lexer: false VERIFIED and false PASS), E2 (a file ending in a line comment without a newline is wrongly UNPARSEABLE), E3 (JSX/TSX), E4 (reporting nits). Fixed at c33dc29 (7f1c0a2). Fifth review at c33dc29: PASS_WITH_FINDINGS; G1 (braces inside a template's ${...}) fixed at 1c3a7d0 with a reviewAttention list of files the independent review must read; confirmation at 1c3a7d0: PASS_WITH_FINDINGS, H1 (postfix ++/-- before /) and H2 (noisy attention list) fixed at 2e4b561. Final: the reviewer judges the residual risk of the heuristic lexer adequately documented in each report's limits, provided the review reads every reviewAttention file.
 
 ## R7-REM-012: Rehearsal 7 readiness
 

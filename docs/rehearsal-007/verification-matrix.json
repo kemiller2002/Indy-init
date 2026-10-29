@@ -213,7 +213,7 @@
       "obligation": "Defect closures bound to fix commits in the rehearsal's own history",
       "package": "R7-REM-008",
       "verification": "verify-defect-closures DCL-001..014 (base read from git: the commit that added the kickoff record)",
-      "evidence": "Offline tests at c33dc29; R6 run REFUSED 8/8 (evidence/defect-closures-r6.json); fifth review in progress",
+      "evidence": "Offline tests at 2e4b561; R6 run REFUSED 8/8 (evidence/defect-closures-r6.json); independent review PASS_WITH_FINDINGS, findings fixed",
       "state": "PASS_LOCAL"
     },
     {
@@ -229,7 +229,7 @@
       "obligation": "Pre-lock newest-release comparison recorded",
       "package": "R7-REM-010",
       "verification": "release-comparison observe/assess",
-      "evidence": "Offline tests at c08c23e; live demonstration 2026-10-29T11:08Z PASS (evidence/release-comparison-demo.json); fourth review: no open finding, N4 limit stated",
+      "evidence": "Offline tests at c08c23e; live demonstration 2026-10-29T11:08Z PASS (evidence/release-comparison-demo.json); independent review: no open finding, N4 limit stated",
       "state": "PASS_LOCAL"
     },
     {
@@ -237,7 +237,7 @@
       "obligation": "Weakened tests detected (RF-F-8)",
       "package": "R7-REM-011",
       "verification": "assertion-ratchet (base read from git: the commit that added the kickoff record)",
-      "evidence": "Offline tests at c33dc29; R6 run FAIL, 45 unrecorded removals incl. both UI-034 weakenings, base c80f35e from the real kickoff record (evidence/assertion-ratchet-r6.json); fifth review in progress",
+      "evidence": "Offline tests at 2e4b561; R6 run FAIL, 45 unrecorded removals incl. both UI-034 weakenings, base c80f35e from the real kickoff record (evidence/assertion-ratchet-r6.json); independent review PASS_WITH_FINDINGS, findings fixed",
       "state": "PASS_LOCAL"
     },
     {
