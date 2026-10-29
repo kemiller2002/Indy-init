@@ -8,6 +8,12 @@
 /// statements: an assertion's continuation lines (open brackets, a leading `.`, a trailing operator, an `if`/`for`
 /// head without braces) are joined, so a `.not` added on a continuation line, or an `if (false)` put in front of an
 /// assertion, changes the statement.
+///
+/// The JavaScript/TypeScript scanner is a heuristic lexer, not a parser. It decides what a `/` is from the token
+/// before it (a `)` closing a statement head, a `}` closing a block, an operator: a regular expression; an operand,
+/// a `}` closing an object literal: division) and fails closed (UNPARSEABLE) where it cannot tell or its reading is
+/// inconsistent. An adversarially written file may still desynchronise it in a way it does not detect, so the
+/// independent review must inspect the test files it relies on. JSX/TSX files are not read at all (unsupported).
 module TestBlocks
 
 open System
@@ -25,12 +31,18 @@ let languageOf (path: string) =
     | ".cjs"
     | ".ts"
     | ".mts"
-    | ".cts"
-    | ".jsx"
-    | ".tsx" -> Some Js
+    | ".cts" -> Some Js
     | ".fs"
     | ".fsx" -> Some FSharp
     | _ -> None
+
+/// JSX/TSX: markup with its own quoting (`<p>Don't</p>`), which this lexer does not read. Such a file is reported as
+/// unsupported, never read as JavaScript.
+let isUnsupported (path: string) =
+    match Path.GetExtension(path).ToLowerInvariant() with
+    | ".jsx"
+    | ".tsx" -> true
+    | _ -> false
 
 /// A file a test runner collects tests from (a Playwright/Mocha spec, an F# test module).
 let isSpec (path: string) =
@@ -103,11 +115,27 @@ let private describeMode =
 let private jsRegexKeywords = set [ "return"; "typeof"; "case"; "do"; "else"; "in"; "of"; "new"; "delete"; "void"; "throw"; "instanceof"; "yield"; "await" ]
 
 /// Statement heads whose closing `)` may be followed by a regular expression (`if (x) /re/.test(s)`).
-let private jsHeadKeywords = set [ "if"; "while"; "for"; "with" ]
+let private jsHeadKeywords = set [ "if"; "while"; "for"; "with"; "catch"; "switch" ]
+
+/// Words after which a JavaScript `{` opens a block.
+let private jsBlockKeywords = set [ "else"; "try"; "finally"; "do" ]
+
+/// What a JavaScript `{` opened, which decides what a `/` after its `}` is: after an expression (an object literal)
+/// it is division, after a block a regular expression may follow. Where the reading cannot tell (after a `)` that is
+/// not a statement head: a function declaration or expression, a method; after an identifier: a class body; after a
+/// `:`: an object value or a label), the brace is Ambiguous, and a `/` after its `}` makes the file UNPARSEABLE.
+type private Brace =
+    | ExprBrace
+    | BlockBrace
+    | AmbiguousBrace
+
+// Previous-character sentinels: after the `)` of a statement head; after the `}` of an ambiguous brace.
+let private afterHead = '\001'
+let private afterAmbiguous = '\002'
 
 /// The scanner's state: the stack of open contexts (the innermost first; Code at the bottom), the JavaScript
 /// parentheses open (each: whether it opened a statement head), and the previous significant code character.
-type private ScanState = { Stack: Mode list; Parens: bool list; Prev: char; Problem: string option }
+type private ScanState = { Stack: Mode list; Parens: bool list; Braces: Brace list; Prev: char; Problem: string option }
 
 /// The text with comments blanked (`code`) and the same text with literal contents blanked as well (`mask`). Both keep
 /// the length and every newline, so line i of one is line i of the other. Strings, templates and comments inside a
@@ -118,7 +146,13 @@ type private ScanState = { Stack: Mode list; Parens: bool list; Prev: char; Prob
 let scan (lang: Language) (text: string) : string * string * string option =
     let n = text.Length
     let at i = if i < n then text.[i] else '\000'
-    let regexMayFollow (prev: char) = prev = '\000' || "(,=:[!&|?{};+-*%<>~^".IndexOf prev >= 0
+    let regexMayFollow (prev: char) = prev = '\000' || prev = afterHead || "(,=:[!&|?{};+-*%<>~^".IndexOf prev >= 0
+
+    /// Whether the code just before position i (whitespace skipped) ends with `=>`.
+    let arrowBefore i =
+        let rec skipSpace j = if j >= 0 && Char.IsWhiteSpace text.[j] then skipSpace (j - 1) else j
+        let j = skipSpace (i - 1)
+        j >= 1 && text.[j] = '>' && text.[j - 1] = '='
     let blank c = if c = '\n' then '\n' else ' '
     let lit c = if c = '\n' then '\n' else '_'
 
@@ -150,13 +184,41 @@ let scan (lang: Language) (text: string) : string * string * string option =
             | FSharp when c = '(' && next = '*' && at (i + 2) <> ')' -> 2, push (BlockComment 1), blank, blank
             | Js when c = '"' || c = '\'' -> 1, { push (Quoted c) with Prev = c }, id, id
             | Js when c = '`' -> 1, { push Template with Prev = c }, id, id
+            | Js when c = '/' && s.Prev = afterAmbiguous ->
+                1, fail { s with Prev = c } (sprintf "a `/` at offset %d follows a `}` that may close a block or an expression: division or a regular expression cannot be told" i), id, id
             | Js when c = '/' && (regexMayFollow s.Prev || (Char.IsLetter s.Prev && jsRegexKeywords.Contains(wordBefore i))) ->
                 1, { push (RegexLit false) with Prev = c }, id, id
             | Js when c = '(' -> 1, { s with Parens = jsHeadKeywords.Contains(wordBefore i) :: s.Parens; Prev = c }, id, id
             | Js when c = ')' ->
                 match s.Parens with
                 | [] -> 1, fail { s with Prev = c } (sprintf "an unmatched `)` at offset %d" i), id, id
-                | head :: rest -> 1, { s with Parens = rest; Prev = (if head then '(' else ')') }, id, id
+                | head :: rest -> 1, { s with Parens = rest; Prev = (if head then afterHead else ')') }, id, id
+            | Js when c = '{' ->
+                let kind =
+                    match s.Prev with
+                    | '\000' | ';' | '{' | '}' -> BlockBrace
+                    | p when p = afterHead || p = afterAmbiguous -> BlockBrace
+                    | '>' when arrowBefore i -> BlockBrace
+                    | p when "(,=[?!&|+-*%<>~^/".IndexOf p >= 0 -> ExprBrace
+                    | p when Char.IsLetter p || p = '_' || p = '$' ->
+                        let word = wordBefore i
+                        if jsBlockKeywords.Contains word then BlockBrace
+                        elif jsRegexKeywords.Contains word then ExprBrace
+                        else AmbiguousBrace
+                    | _ -> AmbiguousBrace
+
+                1, { s with Braces = kind :: s.Braces; Prev = c }, id, id
+            | Js when c = '}' ->
+                match s.Braces with
+                | [] -> 1, fail { s with Prev = c } (sprintf "an unmatched `}` at offset %d" i), id, id
+                | kind :: rest ->
+                    let prev =
+                        match kind with
+                        | ExprBrace -> 'a'
+                        | BlockBrace -> '}'
+                        | AmbiguousBrace -> afterAmbiguous
+
+                    1, { s with Braces = rest; Prev = prev }, id, id
             | FSharp when c = '"' && next = '"' && at (i + 2) = '"' -> 3, { push Triple with Prev = c }, id, id
             | FSharp when c = '@' && next = '"' -> 2, { push Verbatim with Prev = c }, id, id
             | FSharp when c = '"' -> 1, { push (Quoted '"') with Prev = c }, id, id
@@ -189,7 +251,7 @@ let scan (lang: Language) (text: string) : string * string * string option =
         | Template ->
             if c = '\\' then 2, s, id, lit
             elif c = '`' then 1, { pop with Prev = 'a' }, id, id
-            elif c = '$' && next = '{' then 2, push (TemplateExpr 1), id, lit
+            elif c = '$' && next = '{' then 2, { push (TemplateExpr 1) with Prev = '(' }, id, lit
             else 1, s, id, lit
         | RegexLit inClass ->
             if c = '\\' then 2, s, id, lit
@@ -202,10 +264,14 @@ let scan (lang: Language) (text: string) : string * string * string option =
 
     let rec go i (s: ScanState) (code: char list) (mask: char list) =
         if i >= n then
+            // Input may end inside a line comment (no final newline): that closes it.
+            let stack = match s.Stack with LineComment :: rest -> rest | stack -> stack
+
             let problem =
                 s.Problem
-                |> Option.orElse (match s.Stack with [ Code ] -> None | m :: _ -> Some(sprintf "the text ends inside %s" (describeMode m)) | [] -> Some "the scanner lost its context")
+                |> Option.orElse (match stack with [ Code ] -> None | m :: _ -> Some(sprintf "the text ends inside %s" (describeMode m)) | [] -> Some "the scanner lost its context")
                 |> Option.orElse (if s.Parens.IsEmpty then None else Some(sprintf "%d `(` never closed" s.Parens.Length))
+                |> Option.orElse (if s.Braces.IsEmpty then None else Some(sprintf "%d `{` never closed" s.Braces.Length))
 
             String(List.rev code |> Array.ofList), String(List.rev mask |> Array.ofList), problem
         else
@@ -218,7 +284,7 @@ let scan (lang: Language) (text: string) : string * string * string option =
             let taken = [ for j in i .. min (n - 1) (i + k - 1) -> text.[j] ]
             go (i + k) s' (List.fold (fun acc ch -> toCode ch :: acc) code taken) (List.fold (fun acc ch -> maskOf ch :: acc) mask taken)
 
-    go 0 { Stack = [ Code ]; Parens = []; Prev = '\000'; Problem = None } [] []
+    go 0 { Stack = [ Code ]; Parens = []; Braces = []; Prev = '\000'; Problem = None } [] []
 
 let private collapse (s: string) = Regex.Replace(s, @"\s+", " ").Trim()
 
@@ -418,35 +484,45 @@ let private moduleName (lang: Language) (path: string) (code: string[]) =
 
     sprintf "%s::%s" (Path.GetFileName path) (declared |> Option.defaultValue "module")
 
-/// The blocks of one file: each test and describe block, then the file's module block. None for a file in no
-/// language this module reads; Error (UNPARSEABLE) when the file could not be read consistently (see scan): its
-/// blocks are not reported at all, so no caller can mistake a desynchronised reading for the file's tests.
-let parse (path: string) (text: string) : Result<Block list, string> option =
-    languageOf path
-    |> Option.map (fun lang ->
-        match scan lang (text.Replace("\r\n", "\n")) with
-        | _, _, Some problem -> Error problem
-        | code, mask, None ->
-            let codeLines, maskLines = code.Split('\n'), mask.Split('\n')
-            let drafts, owned, fileMarked = (match lang with Js -> readJs | FSharp -> readFSharp) codeLines maskLines
-            let byIndex = Array.ofList drafts
-            let rec markOf i = if i < 0 then Unmarked else max byIndex.[i].Marked (markOf byIndex.[i].Parent)
-            let statements owner = owned |> List.filter (fun (o, _, _) -> o = owner) |> List.map (fun (_, c, m) -> c, m) |> statementsOf lang
+/// What a file holds: its blocks; or that it could not be read consistently (UNPARSEABLE, see scan); or that it is
+/// in a language this module does not read (JSX/TSX). Neither of the last two reports any block, so no caller can
+/// mistake a desynchronised or unsupported reading for the file's tests.
+type Reading =
+    | Blocks of Block list
+    | Unparseable of problem: string
+    | Unsupported of reason: string
 
-            let block title kind (mark: Mark) owner =
-                let pairs = statements owner
+/// The blocks of one file: each test and describe block, then the file's module block. None for a file that is not
+/// source code at all.
+let parse (path: string) (text: string) : Reading option =
+    if isUnsupported path then
+        Some(Unsupported "JSX/TSX is not read: its markup quoting is not lexed")
+    else
+        languageOf path
+        |> Option.map (fun lang ->
+            match scan lang (text.Replace("\r\n", "\n")) with
+            | _, _, Some problem -> Unparseable problem
+            | code, mask, None ->
+                let codeLines, maskLines = code.Split('\n'), mask.Split('\n')
+                let drafts, owned, fileMarked = (match lang with Js -> readJs | FSharp -> readFSharp) codeLines maskLines
+                let byIndex = Array.ofList drafts
+                let rec markOf i = if i < 0 then Unmarked else max byIndex.[i].Marked (markOf byIndex.[i].Parent)
+                let statements owner = owned |> List.filter (fun (o, _, _) -> o = owner) |> List.map (fun (_, c, m) -> c, m) |> statementsOf lang
 
-                { Title = title
-                  Kind = kind
-                  Skipped = mark <> Unmarked
-                  SkipConditional = mark = Conditional
-                  Statements = List.map fst pairs
-                  Masked = List.map snd pairs }
+                let block title kind (mark: Mark) owner =
+                    let pairs = statements owner
 
-            Ok(
-                (drafts |> List.mapi (fun i d -> block d.Title d.Kind (max fileMarked (markOf i)) i))
-                @ [ block (moduleName lang path codeLines) Module Unmarked -1 ]
-            ))
+                    { Title = title
+                      Kind = kind
+                      Skipped = mark <> Unmarked
+                      SkipConditional = mark = Conditional
+                      Statements = List.map fst pairs
+                      Masked = List.map snd pairs }
+
+                Blocks(
+                    (drafts |> List.mapi (fun i d -> block d.Title d.Kind (max fileMarked (markOf i)) i))
+                    @ [ block (moduleName lang path codeLines) Module Unmarked -1 ]
+                ))
 
 let private jsAssertion = Regex(@"(?<![\w$.])(?:expect|assert)\b\s*(?:\.\s*\w+\s*)?\(", RegexOptions.Compiled)
 let private fsAssertion = Regex(@"\bAssert\.|\bExpect\.|\btest\s*<@|\|>\s*should\b|\bshould\s*\(", RegexOptions.Compiled)

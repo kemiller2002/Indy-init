@@ -120,6 +120,7 @@ let private history () =
     write repo "tests/ids.spec.js" specs
     write repo "tests/sneaky.spec.js" sneaky
     write repo "kickoff/indy-init.kickoff.json" "{}\n"
+    write repo "tests/widget.spec.tsx" "import { test } from \"@playwright/test\";\ntest(\"DCT-T-J declared in TSX\", async () => { render(<p>Don't</p>); });\n"
     let base' = commit repo "base (kickoff)"
     write repo "src/Store.fs" "let fixed = true\n"
     let fix = commit repo "fix the class"
@@ -252,6 +253,12 @@ let all () : string list =
 
           if not (has "DCL-005" broken && problems broken |> List.exists (fun p -> p.Contains "UNPARSEABLE")) then
               yield sprintf "DCL-005: a regression test declared only in an UNPARSEABLE spec is accepted: %A" (problems broken)
+
+          // E3: JSX/TSX is not read; a test declared only there is refused with that reason.
+          let tsx = assess (good [ "tests", jstrs [ "DCT-T-A"; "DCT-T-J" ] ])
+
+          if not (has "DCL-005" tsx && problems tsx |> List.exists (fun p -> p.Contains "unsupported")) || arr "unsupported" ok |> List.isEmpty then
+              yield sprintf "DCL-005: a regression test declared only in a TSX spec is not refused as unsupported: %A" (problems tsx)
 
           let brokenOk = assessWith h { full with Candidate = Some h.Broken; Records = Some h.Broken } (good [])
 
