@@ -17,7 +17,8 @@
 ///   name bound to one; see TestBlocks), or as the prefix of a longer id (DCT-004-A is not DCT-004-AX). A test file
 ///   TestBlocks cannot read consistently (UNPARSEABLE: it ends inside a literal or comment, a string runs past its
 ///   line, brackets do not balance) declares nothing: a test named only there is refused, and any such file under the
-///   tests path makes the verdict at best INCOMPLETE;
+///   tests path makes the verdict at best INCOMPLETE. JSX/TSX specs are not read (`unsupported`): a test named only in
+///   one is refused;
 /// - DCL-006 a records commit, when given, descends from the candidate;
 /// - DCL-007 the review evidence exists (in the records commit when given, else the candidate), is not the closures
 ///   record itself (compared as normalised repository paths: `./`, `a//b` and `x/../` collapsed, a path leaving the
@@ -29,7 +30,9 @@
 ///   it checked the same way, without closing any);
 /// - DCL-009 with a freeze time, `closedAt` is no later than the freeze and no earlier than the fix commit;
 /// - DCL-010 the fix commit descends from the base (kickoff) commit and is not the base: a commit from before the
-///   rehearsal (the initial commit) fixes nothing in it;
+///   rehearsal (the initial commit) fixes nothing in it. The base is bound by the kickoff record exactly as the
+///   assertion ratchet's is (Kickoff): `--base` is optional, and one that is not the bound base REFUSES the run
+///   (`baseVerified` false), as does a history without the record;
 /// - DCL-011 the fix commit changes something other than the closures record;
 /// - DCL-012 the closure names at least one regression test;
 /// - DCL-013 the status is one of the known statuses (an unknown status is refused, not treated as open);
@@ -44,8 +47,8 @@
 /// from the base and changes something can be named as a class's fix, though it fixed something else; review evidence
 /// the implementing agent wrote itself in a review record's shape, including in a records commit, cannot be told from
 /// an independent reviewer's without reviewer identity or an attestation (a signed review, a pull-request review
-/// fetched by trusted CI); and the base is the caller's, so history rewritten before the run goes unnoticed unless the
-/// kickoff commit is pinned outside the candidate (an owner record or tag). They remain for the independent review.
+/// fetched by trusted CI); and history rewritten before the run moves the kickoff-bound base unless the kickoff commit
+/// is pinned outside the candidate (an owner record or tag). They remain for the independent review.
 module DefectClosure
 
 open System
@@ -56,8 +59,9 @@ open Json
 
 type Inputs =
     { Repo: string
-      /// The kickoff commit: every fix is made after it.
-      Base: string
+      /// The base the caller expects; the kickoff record binds it (Kickoff): None takes the bound base, another one is
+      /// REFUSED. Every fix is made after it.
+      Base: string option
       Candidate: string
       /// A records-only descendant of the candidate holding the review evidence (D-12), if any.
       Records: string option
@@ -95,7 +99,11 @@ let resolveCommit (repo: string) (rev: string) =
 /// The tests under `path` at `commit`: the titles declared and not skipped, and the files that could not be read
 /// consistently (UNPARSEABLE: path, problem, text), whose tests are known neither to be declared nor to run. Only spec
 /// files hold JS tests a runner collects; every F# file under the path may declare tests.
-type TestTree = { Declared: string list; Unparseable: (string * string * string) list }
+type TestTree =
+    { Declared: string list
+      Unparseable: (string * string * string) list
+      /// JSX/TSX specs (path, reason, text): not read, so a test declared only there is not shown to run.
+      Unsupported: (string * string * string) list }
 
 let declaredTests (repo: string) (commit: string) (path: string) : TestTree =
     let prefix = path.TrimEnd('/') + "/"
@@ -110,7 +118,7 @@ let declaredTests (repo: string) (commit: string) (path: string) : TestTree =
                 && (match TestBlocks.languageOf f with
                     | Some TestBlocks.Js -> TestBlocks.isSpec f
                     | Some TestBlocks.FSharp -> true
-                    | None -> false))
+                    | None -> TestBlocks.isUnsupported f && TestBlocks.isSpec f))
             |> List.choose (fun f ->
                 match Git.showFile repo commit f with
                 | Ok bytes -> TestBlocks.parse f (text bytes) |> Option.map (fun r -> f, text bytes, r)
@@ -119,9 +127,10 @@ let declaredTests (repo: string) (commit: string) (path: string) : TestTree =
         { Declared =
             readings
             |> List.collect (function
-                | _, _, Ok blocks -> blocks |> List.filter (fun b -> b.Kind = TestBlocks.Test && not b.Skipped) |> List.map _.Title
+                | _, _, TestBlocks.Blocks blocks -> blocks |> List.filter (fun b -> b.Kind = TestBlocks.Test && not b.Skipped) |> List.map _.Title
                 | _ -> [])
-          Unparseable = readings |> List.choose (function f, body, Error problem -> Some(f, problem, body) | _ -> None) }
+          Unparseable = readings |> List.choose (function f, body, TestBlocks.Unparseable problem -> Some(f, problem, body) | _ -> None)
+          Unsupported = readings |> List.choose (function f, body, TestBlocks.Unsupported reason -> Some(f, reason, body) | _ -> None) }
 
 /// True when `id` occurs in `title` as a whole id: not inside, or as the prefix of, a longer one.
 let namesTest (id: string) (title: string) =
@@ -184,7 +193,7 @@ let private problemsOf (inputs: Inputs) (baseCommit: string option) (tree: TestT
               yield sprintf "DCL-003 %s: fix commit %s is not the candidate or one of its ancestors" id fix
 
           match baseCommit with
-          | None -> yield sprintf "DCL-010 %s: the base commit %s is not in this repository, so the fix cannot be shown to follow it" id inputs.Base
+          | None -> yield sprintf "DCL-010 %s: the base commit %s is not in this repository, so the fix cannot be shown to follow it" id (inputs.Base |> Option.defaultValue "(none)")
           | Some b when b = fix || not (isAncestor inputs.Repo b fix) ->
               yield sprintf "DCL-010 %s: fix commit %s does not descend from the base %s (it predates the rehearsal or is the base itself)" id fix b
           | Some _ -> ()
@@ -201,11 +210,17 @@ let private problemsOf (inputs: Inputs) (baseCommit: string option) (tree: TestT
 
       for test in tests do
           if not (tree.Declared |> List.exists (namesTest test)) then
-              match tree.Unparseable |> List.filter (fun (_, _, body) -> namesTest test body) with
-              | [] -> yield sprintf "DCL-005 %s: regression test %s is not declared as a (not skipped) test under %s/ in the candidate" id test inputs.TestsPath
-              | files ->
-                  for f, problem, _ in files do
-                      yield sprintf "DCL-005 %s: regression test %s is named only in %s, which is UNPARSEABLE (%s), so it is not shown to be declared and run" id test f problem
+              let unparseable = tree.Unparseable |> List.filter (fun (_, _, body) -> namesTest test body)
+              let unsupported = tree.Unsupported |> List.filter (fun (_, _, body) -> namesTest test body)
+
+              if unparseable.IsEmpty && unsupported.IsEmpty then
+                  yield sprintf "DCL-005 %s: regression test %s is not declared as a (not skipped) test under %s/ in the candidate" id test inputs.TestsPath
+
+              for f, problem, _ in unparseable do
+                  yield sprintf "DCL-005 %s: regression test %s is named only in %s, which is UNPARSEABLE (%s), so it is not shown to be declared and run" id test f problem
+
+              for f, reason, _ in unsupported do
+                  yield sprintf "DCL-005 %s: regression test %s is named only in %s, which is unsupported (%s), so it is not shown to be declared and run" id test f reason
 
       match evidence with
       | "" -> yield sprintf "DCL-007 %s: no review evidence is recorded" id
@@ -238,18 +253,26 @@ let private problemsOf (inputs: Inputs) (baseCommit: string option) (tree: TestT
 let limits =
     [ "a fix commit is shown to descend from the base and to change something, not to fix the class: an unrelated commit can be named"
       "review evidence is checked for a review record's structure, not for who wrote it: without a signed review or reviewer attestation the implementing agent can write it, in the candidate or a records commit"
-      "the base is the caller's --base: history rewritten before the run is not detected unless the kickoff commit is pinned outside the candidate (an owner record or tag)"
-      "tests are read lexically: whether a declared, unskipped test's body actually exercises the fix is not checked" ]
+      "the base is the commit that first added kickoff/indy-init.kickoff.json in the candidate's first-parent history: history rewritten before the run moves it, unless the kickoff commit is pinned outside the candidate (an owner record or tag)"
+      "tests are read lexically: whether a declared, unskipped test's body actually exercises the fix is not checked"
+      "the JavaScript/TypeScript scanner is a heuristic lexer that fails closed where it detects ambiguity; an adversarially written file may still desynchronise it undetected, so the independent review must inspect the test files a closure relies on"
+      "JSX/TSX files are not read: a test declared only in one is refused" ]
 
-/// The `indy-init.defect-closure-verification/3` report.
-let assess (inputs: Inputs) : Json =
+/// The `indy-init.defect-closure-verification/4` report.
+let assess (given: Inputs) : Json =
+    let full rev = resolveCommit given.Repo rev |> Option.defaultValue rev
+    let candidate = full given.Candidate
+    let baseText, kickoff, baseVerified, baseProblem = Kickoff.bind given.Repo candidate Kickoff.defaultPath given.Base candidate
+    // Every commit as a full SHA from here on, so the report echoes full SHAs.
+    let inputs = { given with Candidate = candidate; Records = given.Records |> Option.map full; Base = Some baseText }
+
     let recordsProblems =
         match inputs.Records with
         | Some records when not (Git.hasCommit inputs.Repo records && isAncestor inputs.Repo inputs.Candidate records) ->
             [ sprintf "DCL-006 records commit %s does not descend from the candidate %s" records inputs.Candidate ]
         | _ -> []
 
-    let baseCommit = resolveCommit inputs.Repo inputs.Base
+    let baseCommit = resolveCommit inputs.Repo baseText
     let tree = declaredTests inputs.Repo inputs.Candidate inputs.TestsPath
 
     let claimed =
@@ -285,14 +308,17 @@ let assess (inputs: Inputs) : Json =
               yield sprintf "%s is UNPARSEABLE (%s): which tests it declares, and whether they run, is unknown" f problem ]
 
     let verdict =
-        if refused > 0 then "REFUSED"
+        if refused > 0 || not baseVerified then "REFUSED"
         elif not incomplete.IsEmpty then "INCOMPLETE"
         else "VERIFIED"
 
     JObj
-        [ "schema", JStr "indy-init.defect-closure-verification/3"
-          "base", JStr(baseCommit |> Option.defaultValue inputs.Base)
-          "candidate", JStr(resolveCommit inputs.Repo inputs.Candidate |> Option.defaultValue inputs.Candidate)
+        [ "schema", JStr "indy-init.defect-closure-verification/4"
+          "base", JStr(baseCommit |> Option.defaultValue baseText)
+          "baseVerified", JBool baseVerified
+          "kickoff", Kickoff.toJson Kickoff.defaultPath kickoff
+          "baseProblem", jopt JStr baseProblem
+          "candidate", JStr candidate
           "records", jopt JStr inputs.Records
           "closures", JObj [ "source", JStr inputs.ClosuresSource; "sha256", JStr inputs.ClosuresSha256 ]
           "curationSupplied", JBool inputs.Curation.IsSome
@@ -300,6 +326,7 @@ let assess (inputs: Inputs) : Json =
           "verdict", JStr verdict
           "incomplete", jstrs incomplete
           "unparseable", JArr(tree.Unparseable |> List.map (fun (f, problem, _) -> JObj [ "path", JStr f; "problem", JStr problem ]))
+          "unsupported", JArr(tree.Unsupported |> List.map (fun (f, reason, _) -> JObj [ "path", JStr f; "reason", JStr reason ]))
           "limits", jstrs limits
           "summary",
           JObj

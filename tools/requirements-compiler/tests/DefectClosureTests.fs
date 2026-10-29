@@ -119,6 +119,8 @@ let private history () =
 
     write repo "tests/ids.spec.js" specs
     write repo "tests/sneaky.spec.js" sneaky
+    write repo "kickoff/indy-init.kickoff.json" "{}\n"
+    write repo "tests/widget.spec.tsx" "import { test } from \"@playwright/test\";\ntest(\"DCT-T-J declared in TSX\", async () => { render(<p>Don't</p>); });\n"
     let base' = commit repo "base (kickoff)"
     write repo "src/Store.fs" "let fixed = true\n"
     let fix = commit repo "fix the class"
@@ -167,7 +169,7 @@ type private Run =
 let private assessWith (h: History) (run: Run) (doc: Json) =
     DefectClosure.assess
         { Repo = h.Repo
-          Base = run.Base |> Option.defaultValue h.Base
+          Base = run.Base
           Candidate = run.Candidate |> Option.defaultValue h.Candidate
           Records = run.Records
           Closures = doc
@@ -252,6 +254,12 @@ let all () : string list =
           if not (has "DCL-005" broken && problems broken |> List.exists (fun p -> p.Contains "UNPARSEABLE")) then
               yield sprintf "DCL-005: a regression test declared only in an UNPARSEABLE spec is accepted: %A" (problems broken)
 
+          // E3: JSX/TSX is not read; a test declared only there is refused with that reason.
+          let tsx = assess (good [ "tests", jstrs [ "DCT-T-A"; "DCT-T-J" ] ])
+
+          if not (has "DCL-005" tsx && problems tsx |> List.exists (fun p -> p.Contains "unsupported")) || arr "unsupported" ok |> List.isEmpty then
+              yield sprintf "DCL-005: a regression test declared only in a TSX spec is not refused as unsupported: %A" (problems tsx)
+
           let brokenOk = assessWith h { full with Candidate = Some h.Broken; Records = Some h.Broken } (good [])
 
           if str "verdict" brokenOk <> "INCOMPLETE" || arr "unparseable" brokenOk |> List.isEmpty then
@@ -303,8 +311,16 @@ let all () : string list =
               yield "an unclaimed (FAIL) class is not reported OPEN without refusing the verdict"
           if (field "closures" ok |> Option.map (str "sha256")) <> Some "00" then
               yield "the report does not record the closures' source digest"
-          if str "base" ok <> h.Base then
-              yield "the report does not echo the full base SHA" ]
+          if str "base" ok <> h.Base || field "baseVerified" ok <> Some(JBool true) then
+              yield "the base is not the commit that added the kickoff record"
+          // The base is bound like the ratchet's: a caller's --base other than the kickoff commit is refused.
+          let rebased = assessWith h { full with Base = Some(h.Root.Substring(0, 7)) } (good [])
+          if str "verdict" rebased <> "REFUSED" || field "baseVerified" rebased <> Some(JBool false) then
+              yield sprintf "a --base other than the kickoff commit leaves the verdict %s, not REFUSED" (str "verdict" rebased)
+          if str "verdict" (assessWith h { full with Base = Some(h.Base.Substring(0, 7)) } (good [])) <> "VERIFIED" then
+              yield "the kickoff commit given as --base (abbreviated) is not accepted"
+          if strOpt "records" (assessWith h { full with Records = Some(h.Records.Substring(0, 7)) } (good [])) <> Some h.Records then
+              yield "the report does not echo the records commit as a full SHA" ]
         |> List.map (sprintf "defect closure: %s")
     finally
         try

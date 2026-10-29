@@ -152,8 +152,70 @@ let private bypasses =
       "a `test.skip()` hidden behind a regular expression after an `if (...)` head",
       zz [ "  if (true) /`/.test(\"\");"; "  test.skip();"; "  // `"; held "a" ] [ held "b" ] [ held "c" ] [ "  await expect(page.locator(\"d\"))"; "    .toHaveCount(1);" ] [ held "e" ] [] readyHelper ]
 
+/// What the scanner should make of a spec: its test X read and skipped, read and live, UNPARSEABLE, or unsupported.
+type private Expect =
+    | SkippedX
+    | LiveX
+    | Unreadable
+    | NotRead
+
+/// The fourth review's lexer cases (E1-E3): an object literal's `}` before a division (r6c fake4, syn/repo3), and the
+/// shapes around it; a final line comment without a newline (syn/repo2 eof.spec.js); JSX/TSX.
+let private scannerCases =
+    let inTest (body: string list) = String.concat "\n" ([ "import { test, expect } from \"x\";"; "test(\"X\", async ({ page }) => {" ] @ body @ [ "});"; "" ])
+
+    [ "an object literal's `}` before a division hides no skip (fake4)", "a.spec.js",
+      inTest [ "  const v = {valueOf(){return 4}} / 2; const q = \"/\"; const r = \"`\";"; "  test.skip();"; "  // `" ], SkippedX
+      "a template inside an object literal before a division", "a.spec.js",
+      inTest [ "  const o = { t: `a ${1} b` } / 2; const q = \"`\";"; "  test.skip();"; "  // `" ], SkippedX
+      "an arrow returning an object literal, then divisions", "a.spec.js",
+      inTest [ "  const f = () => ({ a: 1 });"; "  const g = items.length / total / 3;"; "  const h = (await page.evaluate(() => 4)) / 2;"; "  test.skip();" ], SkippedX
+      "a block's `}` before a regular expression", "a.spec.js",
+      inTest [ "  if (ready) { go(); }"; "  /`/.test(\"\");"; "  test.skip();"; "  // `" ], SkippedX
+      "a class body's `}` before a `/` (cannot be told)", "a.spec.js",
+      inTest [ "  class A { m() { return 1 } }"; "  /`/.test(\"\");"; "  test.skip();"; "  // `" ], Unreadable
+      "a function expression's `}` before a `/` (cannot be told)", "a.spec.js",
+      inTest [ "  const h = function () { return 1 } / 2; const q = \"/\"; const r = \"`\";"; "  test.skip();"; "  // `" ], Unreadable
+      "divisions after parenthesised expressions (syn/repo2 div.spec.js)", "a.spec.js",
+      inTest [ "  const half = (await page.evaluate(() => 4)) / 2;"; "  const ratio = items.length / total / 3;"; "  await expect(page).toHaveTitle(\"b\");" ], LiveX
+      "a final line comment without a newline (eof.spec.js)", "a.spec.js",
+      (inTest [ "  await expect(page).toHaveTitle(\"a\");" ]) + "// end", LiveX
+      "a TSX spec", "a.spec.tsx", inTest [ "  render(<p>Don't</p>);"; "  await expect(page).toHaveTitle(\"a\");" ], NotRead ]
+
+let private scannerFailures () =
+    [ for label, path, text, expected in scannerCases do
+          let actual =
+              match TestBlocks.parse path text with
+              | Some(TestBlocks.Blocks blocks) ->
+                  match blocks |> List.tryFind (fun b -> b.Title = "X") with
+                  | Some b when b.Skipped -> Some SkippedX
+                  | Some _ -> Some LiveX
+                  | None -> None
+              | Some(TestBlocks.Unparseable _) -> Some Unreadable
+              | Some(TestBlocks.Unsupported _) -> Some NotRead
+              | None -> None
+
+          if actual <> Some expected then
+              yield sprintf "scanner: %s is read as %A, not %A" label actual expected ]
+
 let all () : string list =
     [ withRepo (fun repo ->
+          // E3: a tracked JSX/TSX file is not read, so the ratchet is at best INCOMPLETE.
+          let base' = commitFile repo "tests/UI-034.spec.js" (spec [ selected ])
+          let tsx = commitFile repo "tests/Widget.spec.tsx" "test(\"W\", () => { expect(1).toBe(1); });\n"
+          let report = assess repo base' tsx None
+
+          [ if str "verdict" report <> "INCOMPLETE" || arr "unsupported" report |> List.isEmpty then
+                yield sprintf "a tracked TSX file leaves the verdict %s, not INCOMPLETE with it listed as unsupported" (str "verdict" report) ])
+      withRepo (fun repo ->
+          // E4: an UNPARSEABLE candidate file is listed once.
+          let base' = commitFile repo "tests/UI-034.spec.js" (spec [ selected ])
+          let broken = commitFile repo "tests/Broken.spec.js" "const t = `\n"
+          let report = assess repo base' broken None
+
+          [ if arr "unparseable" report |> List.length <> 1 then
+                yield sprintf "an UNPARSEABLE file is listed %d times" (arr "unparseable" report |> List.length) ])
+      withRepo (fun repo ->
           let base' = commitFile repo "tests/UI-034.spec.js" (spec [ selected; "  await page.keyboard.press(\"Escape\");"; selected ])
           let removedOne = commitFile repo "tests/UI-034.spec.js" (spec [ selected; "  await page.keyboard.press(\"Escape\");" ])
           let report = assess repo base' removedOne None
@@ -337,4 +399,5 @@ let all () : string list =
           [ if verdict repo base' unrelated <> "PASS" then
                 yield "a change that keeps every assertion fails" ]) ]
     |> List.concat
+    |> List.append (scannerFailures ())
     |> List.map (sprintf "assertion ratchet: %s")

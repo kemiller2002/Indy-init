@@ -1,5 +1,5 @@
 {
-  "schema": "indy-init.assertion-ratchet/4",
+  "schema": "indy-init.assertion-ratchet/5",
   "base": "c80f35e468fb2d1a38ce467f9bec860d52837b23",
   "candidate": "46d5e1129a798549dcf37c2a6460c4f623298761",
   "baseVerified": true,
@@ -59,6 +59,7 @@
   "verdict": "FAIL",
   "incomplete": [],
   "unparseable": [],
+  "unsupported": [],
   "skippedBeforeCandidate": {
     "testsExcluded": 0,
     "assertionsExcluded": 0,
@@ -74,7 +75,9 @@
     "dead code is not seen: an unchanged assertion after an early return, inside a braced if (false) { ... }, or reached through a helper in another file whose argument or fixture changed still counts as held",
     "skip markers reached through a helper in another file, an argument or a computed property are not seen; a conditional skip's condition is not evaluated",
     "the base is the commit that first added kickoff/indy-init.kickoff.json in the candidate's first-parent history: history rewritten before the run moves it, unless the kickoff commit is pinned outside the candidate (an owner record or tag)",
-    "a tag change's review is checked for a review record's structure, not for who wrote it: without a signed review or reviewer attestation the implementing agent can write it"
+    "a tag change's review is checked for a review record's structure, not for who wrote it: without a signed review or reviewer attestation the implementing agent can write it",
+    "the JavaScript/TypeScript scanner is a heuristic lexer that fails closed where it detects ambiguity; an adversarially written file may still desynchronise it undetected, so the independent review must inspect the test files it relies on",
+    "JSX/TSX files are not read (unsupported): a tracked path holding one leaves the verdict at best INCOMPLETE"
   ],
   "removed": [
     {

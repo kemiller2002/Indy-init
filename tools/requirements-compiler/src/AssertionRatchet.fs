@@ -27,7 +27,8 @@
 /// - a file the lexer cannot read consistently (UNPARSEABLE: it ends inside a literal or comment, a string or regular
 ///   expression runs past its line, parentheses do not balance) holds nothing, and the verdict is at best INCOMPLETE:
 ///   a desynchronised reading (a `/` misread as a regular expression or division, an unbalanced `${...}`) can hide a
-///   skip or show a dead assertion as live, so it is never trusted.
+///   skip or show a dead assertion as live, so it is never trusted. JSX/TSX files are not read at all (`unsupported`),
+///   with the same effect.
 ///
 /// The base is read from the repository, never asserted: the kickoff record, only ever `kickoff/indy-init.kickoff.json`
 /// (any other path is REFUSED: a caller-chosen path, such as an ROS execution envelope, would bind whatever commit
@@ -72,74 +73,22 @@ type Inputs =
       /// candidate's first-parent history.
       KickoffPath: string option }
 
-/// The only kickoff record that binds the base. Any other path is refused: a caller could otherwise name any file
-/// the history happens to add (an ROS envelope) and bind whatever base it was added at.
-let defaultKickoffPath = "kickoff/indy-init.kickoff.json"
+/// The only kickoff record that binds the base (Kickoff.defaultPath).
+let defaultKickoffPath = Kickoff.defaultPath
 
 /// Where the review tag changes are read from, in the records commit when given, else the candidate (Rehearsal 6's
 /// final review wrote them there).
 let tagChangesPath = "acceptance/reviews/final/review-tag-changes.json"
 
-/// The base commit a kickoff record names, and the field it is in: `base`, `baseCommit`, `ratchetBase`, or a
-/// kickoff receipt's `initialRepository.head`.
-let kickoffBase (kickoff: Json) : (string * string) option =
-    [ "base"; "baseCommit"; "ratchetBase" ]
-    |> List.tryPick (fun k -> strOpt k kickoff |> Option.map (fun v -> k, v))
-    |> Option.orElse (field "initialRepository" kickoff |> Option.bind (strOpt "head") |> Option.map (fun v -> "initialRepository.head", v))
-
-let private resolve (repo: string) (rev: string) =
-    match Git.run repo [ "rev-parse"; "--verify"; "--quiet"; rev + "^{commit}" ] with
-    | Ok bytes -> Some(Encoding.UTF8.GetString(bytes).Trim())
-    | Error _ -> None
-
-let private isAncestor (repo: string) (ancestor: string) (descendant: string) =
-    Git.run repo [ "merge-base"; "--is-ancestor"; ancestor; descendant ] |> Result.isOk
-
-/// The kickoff record as the candidate's history holds it: the commit that first added `path` in the candidate's
-/// first-parent history, the record as added, and the base it binds (that commit, or an ancestor the record names).
-/// Error when the history holds no such record, or the record names a base that is not an ancestor of it.
-type Kickoff =
-    { Path: string
-      AddedAt: string
-      Field: string option
-      RecordedBase: string option
-      BoundBase: string }
-
-let private kickoffAt (repo: string) (candidate: string) (path: string) : Result<Kickoff, string> =
-    let added =
-        match Git.run repo [ "log"; "--first-parent"; "--diff-filter=A"; "--format=%H"; candidate; "--"; path ] with
-        | Ok bytes -> Encoding.UTF8.GetString(bytes).Split('\n', StringSplitOptions.RemoveEmptyEntries) |> Array.tryLast
-        | Error _ -> None
-
-    match added with
-    | None -> Error(sprintf "no commit in %s's first-parent history adds the kickoff record %s" candidate path)
-    | Some addedAt ->
-        let record =
-            Git.showFile repo addedAt path |> Result.toOption |> Option.bind (fun bytes -> try Some(parseBytes bytes) with _ -> None)
-
-        match record with
-        | None -> Error(sprintf "the kickoff record %s as added at %s is not JSON" path addedAt)
-        | Some record ->
-            match kickoffBase record with
-            | None -> Ok { Path = path; AddedAt = addedAt; Field = None; RecordedBase = None; BoundBase = addedAt }
-            | Some(key, value) ->
-                match resolve repo value with
-                | Some named when isAncestor repo named addedAt ->
-                    Ok { Path = path; AddedAt = addedAt; Field = Some key; RecordedBase = Some value; BoundBase = named }
-                | _ -> Error(sprintf "the kickoff record %s as added at %s names %s `%s`, which is not an ancestor of that commit" path addedAt key value)
-
-/// The kickoff record of the candidate's history (see kickoffAt). Only defaultKickoffPath is read.
-let kickoffIn (repo: string) (candidate: string) (path: string) : Result<Kickoff, string> =
-    if path <> defaultKickoffPath then
-        Error(sprintf "only %s binds the base; %s is not the kickoff record" defaultKickoffPath path)
-    else
-        kickoffAt repo candidate path
+let private resolve = Kickoff.resolve
+let private isAncestor = Kickoff.isAncestor
+let kickoffIn = Kickoff.find
 
 let private underRoots (roots: string list) (path: string) =
     roots |> List.exists (fun r -> path.StartsWith(r.TrimEnd('/') + "/", StringComparison.Ordinal))
 
 let private tracked (roots: string list) (path: string) =
-    underRoots roots path && (TestBlocks.languageOf path).IsSome
+    underRoots roots path && ((TestBlocks.languageOf path).IsSome || TestBlocks.isUnsupported path)
 
 /// Which side of the ratchet a version is read for. The candidate is read fail-closed: any skipped block holds
 /// nothing. An earlier version (the base or a later commit before the candidate) is read for what it held: a block
@@ -152,20 +101,21 @@ type Side =
 /// One version of one file: title -> each assertion statement and how many times the block holds it (counted,
 /// because a test may repeat an assertion and lose one copy, as UI-034-O2 held its selection check twice); the
 /// blocks skipped unconditionally with the assertions they would hold; the conditionally skipped blocks counted as
-/// live. Error when the file is UNPARSEABLE.
+/// live. Error (`UNPARSEABLE` or `unsupported`, and why) when the file is not read.
 type Reading =
     { Held: Map<string, Map<string, int>>
       Excluded: (string * string list) list
       TreatedLive: string list }
 
-let read (side: Side) (path: string) (text: string) : Result<Reading, string> =
+let read (side: Side) (path: string) (text: string) : Result<Reading, string * string> =
     let count (held: Map<string, int>) (assertions: string list) =
         assertions |> List.fold (fun (m: Map<string, int>) key -> m.Add(key, (m.TryFind key |> Option.defaultValue 0) + 1)) held
 
     match TestBlocks.parse path text with
     | None -> Ok { Held = Map.empty; Excluded = []; TreatedLive = [] }
-    | Some(Error problem) -> Error problem
-    | Some(Ok parsed) ->
+    | Some(TestBlocks.Unparseable problem) -> Error("UNPARSEABLE", problem)
+    | Some(TestBlocks.Unsupported reason) -> Error("unsupported", reason)
+    | Some(TestBlocks.Blocks parsed) ->
         parsed
         |> List.fold
             (fun (r: Reading) block ->
@@ -235,9 +185,11 @@ let limits =
     [ "dead code is not seen: an unchanged assertion after an early return, inside a braced if (false) { ... }, or reached through a helper in another file whose argument or fixture changed still counts as held"
       "skip markers reached through a helper in another file, an argument or a computed property are not seen; a conditional skip's condition is not evaluated"
       "the base is the commit that first added kickoff/indy-init.kickoff.json in the candidate's first-parent history: history rewritten before the run moves it, unless the kickoff commit is pinned outside the candidate (an owner record or tag)"
-      "a tag change's review is checked for a review record's structure, not for who wrote it: without a signed review or reviewer attestation the implementing agent can write it" ]
+      "a tag change's review is checked for a review record's structure, not for who wrote it: without a signed review or reviewer attestation the implementing agent can write it"
+      "the JavaScript/TypeScript scanner is a heuristic lexer that fails closed where it detects ambiguity; an adversarially written file may still desynchronise it undetected, so the independent review must inspect the test files it relies on"
+      "JSX/TSX files are not read (unsupported): a tracked path holding one leaves the verdict at best INCOMPLETE" ]
 
-/// The `indy-init.assertion-ratchet/4` report.
+/// The `indy-init.assertion-ratchet/5` report.
 let assess (inputs: Inputs) : Json =
     let repo = inputs.Repo
     let roots = inputs.Roots
@@ -304,8 +256,14 @@ let assess (inputs: Inputs) : Json =
     let final = testsOf candidateReadings |> Map.ofList
     let allReadings = (earlier |> List.collect snd) @ candidateReadings
 
-    let unparseable =
-        allReadings |> List.choose (function commit, path, Error problem -> Some(commit, path, problem) | _ -> None)
+    // Each file not read, once per version (the candidate is read both as the last commit walked and as the candidate).
+    let notRead kind =
+        allReadings
+        |> List.choose (function commit, path, Error(k, why) when k = kind -> Some(commit, path, why) | _ -> None)
+        |> List.distinct
+
+    let unparseable = notRead "UNPARSEABLE"
+    let unsupported = notRead "unsupported"
 
     let earlierReadings = earlier |> List.collect snd |> List.choose (function _, path, Ok r -> Some(path, r) | _ -> None)
     let excluded = earlierReadings |> List.collect (fun (path, r) -> r.Excluded |> List.map (fun (title, assertions) -> path, title, assertions))
@@ -360,6 +318,8 @@ let assess (inputs: Inputs) : Json =
 
     let incomplete =
         [ if kickoff.IsNone then yield "no kickoff record binds the base"
+          for commit, path, reason in unsupported do
+              yield sprintf "%s at %s is unsupported (%s): what it holds is unknown" path commit reason
           for commit, path, problem in unparseable do
               yield sprintf "%s at %s is UNPARSEABLE (%s): what it holds is unknown" path commit problem
           if tagSource = "file" then yield "the review tag changes came from a file on disk, not from the candidate or records commit"
@@ -374,7 +334,7 @@ let assess (inputs: Inputs) : Json =
         else "PASS"
 
     JObj
-        [ "schema", JStr "indy-init.assertion-ratchet/4"
+        [ "schema", JStr "indy-init.assertion-ratchet/5"
           "base", JStr baseCommit
           "candidate", JStr candidate
           "baseVerified", JBool baseVerified
@@ -409,6 +369,7 @@ let assess (inputs: Inputs) : Json =
           "verdict", JStr verdict
           "incomplete", jstrs incomplete
           "unparseable", JArr(unparseable |> List.map (fun (commit, path, problem) -> JObj [ "commit", JStr commit; "path", JStr path; "problem", JStr problem ]))
+          "unsupported", JArr(unsupported |> List.map (fun (commit, path, reason) -> JObj [ "commit", JStr commit; "path", JStr path; "reason", JStr reason ]))
           "skippedBeforeCandidate",
           JObj
               [ "testsExcluded", jint excludedTests.Length

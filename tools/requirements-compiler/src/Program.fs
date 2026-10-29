@@ -716,17 +716,18 @@ let verifyProcessCommand (args: string list) : int =
             2
 
 /// `verify-defect-closures`: defect-class closures checked against the rehearsal's own history (see DefectClosure,
-/// R7-REM-008). Closures are read from the candidate's tree unless `--closures-file` is given. Exit 0 VERIFIED,
+/// R7-REM-008). Closures are read from the candidate's tree unless `--closures-file` is given. The base is bound by
+/// kickoff/indy-init.kickoff.json in the candidate's history (see Kickoff); a different `--base` is REFUSED. Exit 0 VERIFIED,
 /// 3 REFUSED or INCOMPLETE, 2 unusable input.
 let verifyDefectClosuresCommand (args: string list) : int =
     let usage =
-        "usage: requirements-compiler verify-defect-closures --repo DIR --base SHA --candidate SHA [--closures PATH | --closures-file FILE] [--records SHA] [--curation FILE] [--tests-path DIR] [--freeze-at ISO-8601] [--out FILE]"
+        "usage: requirements-compiler verify-defect-closures --repo DIR --candidate SHA [--base SHA] [--closures PATH | --closures-file FILE] [--records SHA] [--curation FILE] [--tests-path DIR] [--freeze-at ISO-8601] [--out FILE]"
 
     match optionMap args with
     | Error e ->
         eprintfn "%s" e
         2
-    | Ok m when not (m.ContainsKey "--repo" && m.ContainsKey "--candidate" && m.ContainsKey "--base") ->
+    | Ok m when not (m.ContainsKey "--repo" && m.ContainsKey "--candidate") ->
         eprintfn "%s" usage
         2
     | Ok m ->
@@ -751,7 +752,7 @@ let verifyDefectClosuresCommand (args: string list) : int =
             let report =
                 DefectClosure.assess
                     { Repo = repo
-                      Base = (one "--base").Value
+                      Base = one "--base"
                       Candidate = candidate
                       Records = one "--records"
                       Closures = parseBytes bytes
