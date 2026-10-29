@@ -817,20 +817,31 @@ let releaseComparisonCommand (args: string list) : int =
         2
 
 /// `assertion-ratchet`: no assertion a bound test held since the base disappears from the candidate without a
-/// resolved tag change (see AssertionRatchet, R7-REM-011). Exit 0 PASS, 3 FAIL, 2 unusable input.
+/// resolved tag change (see AssertionRatchet, R7-REM-011). The base is bound by `--kickoff` (a kickoff record naming
+/// it). Exit 0 PASS, 3 FAIL or INCOMPLETE, 2 unusable input.
 let assertionRatchetCommand (args: string list) : int =
     match optionMap args with
     | Error e ->
         eprintfn "%s" e
         2
     | Ok m when not (m.ContainsKey "--repo" && m.ContainsKey "--base" && m.ContainsKey "--candidate") ->
-        eprintfn "usage: requirements-compiler assertion-ratchet --repo DIR --base SHA --candidate SHA [--path DIR]... [--tag-changes FILE] [--out FILE]"
+        eprintfn "usage: requirements-compiler assertion-ratchet --repo DIR --base SHA --candidate SHA --kickoff FILE [--path DIR]... [--tag-changes FILE] [--plan FILE] [--out FILE]"
         2
     | Ok m ->
         try
             let one k = m.[k] |> List.last
-            let roots = m.TryFind "--path" |> Option.defaultValue [ "tests" ]
-            let report = AssertionRatchet.assess (one "--repo") (one "--base") (one "--candidate") roots (m.TryFind "--tag-changes" |> Option.map (List.last >> parseFile))
+            let last k = m.TryFind k |> Option.map List.last
+
+            let report =
+                AssertionRatchet.assess
+                    { Repo = one "--repo"
+                      Base = one "--base"
+                      Candidate = one "--candidate"
+                      Roots = m.TryFind "--path" |> Option.defaultValue [ "tests" ]
+                      TagChanges = last "--tag-changes" |> Option.map parseFile
+                      Plan = last "--plan" |> Option.map parseFile
+                      Kickoff = last "--kickoff" |> Option.map (fun file -> file, parseFile file) }
+
             writeOut m report
             if str "verdict" report = "PASS" then 0 else 3
         with ex ->

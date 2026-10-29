@@ -179,30 +179,38 @@ let reviewTagChangesSchema = "indy-init.review-tag-changes/1"
 /// What reviews removed from one obligation: the removed test ids, and whether every removal is resolved.
 type Removal = { Tests: Set<string>; Open: bool }
 
+/// The ledger tests the plan binds to each source obligation.
+let boundByObligation (plan: Json) : Map<string, Set<string>> =
+    arr "requirements" plan
+    |> List.collect (arr "obligations")
+    |> List.map (fun o -> str "sourceObligation" o, ledgerTests o |> List.map (fun t -> t.Id) |> Set.ofList)
+    |> Map.ofList
+
+/// Whether one review tag change (an entry of `entries`) is resolved: `rebound` to tests `bound` binds to the same
+/// obligation that no review removed, or `not-rebound` with a stated reason, each naming the review. Shared with the
+/// assertion ratchet, which honours a removed assertion only under a resolved tag change.
+let tagChangeResolved (bound: Map<string, Set<string>>) (entries: Json list) (c: Json) =
+    let r = field "resolution" c |> Option.defaultValue JNull
+    let oid = ledgerString "obligation" c
+    let removedOf oid = entries |> List.filter (fun c -> ledgerString "obligation" c = oid) |> List.map (ledgerString "test") |> Set.ofList
+    match strOpt "kind" r with
+    | Some "rebound" ->
+        let tests = strs "tests" r
+        not tests.IsEmpty
+        && ledgerString "review" r <> ""
+        && tests |> List.forall (fun t -> (bound.TryFind oid |> Option.defaultValue Set.empty).Contains t && not ((removedOf oid).Contains t))
+    | Some "not-rebound" -> ledgerString "reason" r <> "" && ledgerString "review" r <> ""
+    | _ -> false
+
 /// Removals per source obligation, with diagnostics for changes that cannot be honoured as written. A removal names a
 /// test the plan binds to the obligation and the review that removed it. It is resolved by `rebound` (tests the plan
 /// binds to the same obligation and no review removed) or `not-rebound` (a stated reason); anything else stays open.
 /// A removed test never counts for that obligation again, whatever the resolution.
 let reviewRemovals (plan: Json) (changes: Json) : Map<string, Removal> * Diagnostic list =
-    let bound =
-        arr "requirements" plan
-        |> List.collect (arr "obligations")
-        |> List.map (fun o -> str "sourceObligation" o, ledgerTests o |> List.map (fun t -> t.Id) |> Set.ofList)
-        |> Map.ofList
+    let bound = boundByObligation plan
     let action = "record the review that removed the tag and resolve it: re-bind to tests the plan binds to the obligation, or state why not"
     let entries = arr "changes" changes
-    let removedOf oid = entries |> List.filter (fun c -> ledgerString "obligation" c = oid) |> List.map (ledgerString "test") |> Set.ofList
-    let resolved (c: Json) =
-        let r = field "resolution" c |> Option.defaultValue JNull
-        let oid = ledgerString "obligation" c
-        match strOpt "kind" r with
-        | Some "rebound" ->
-            let tests = strs "tests" r
-            not tests.IsEmpty
-            && ledgerString "review" r <> ""
-            && tests |> List.forall (fun t -> (bound.TryFind oid |> Option.defaultValue Set.empty).Contains t && not ((removedOf oid).Contains t))
-        | Some "not-rebound" -> ledgerString "reason" r <> "" && ledgerString "review" r <> ""
-        | _ -> false
+    let resolved = tagChangeResolved bound entries
     let diagnostics =
         [ if changes <> JNull && strOpt "schema" changes <> Some reviewTagChangesSchema then
               yield diag "REVIEW-TAG-CHANGE" "review-tag-changes" (sprintf "review tag changes have schema %A, expected %s" (strOpt "schema" changes) reviewTagChangesSchema) action
