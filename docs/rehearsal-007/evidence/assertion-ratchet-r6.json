@@ -1,5 +1,5 @@
 {
-  "schema": "indy-init.assertion-ratchet/3",
+  "schema": "indy-init.assertion-ratchet/4",
   "base": "c80f35e468fb2d1a38ce467f9bec860d52837b23",
   "candidate": "46d5e1129a798549dcf37c2a6460c4f623298761",
   "baseVerified": true,
@@ -15,11 +15,67 @@
     "tests/browser/acceptance"
   ],
   "commitsWalked": 15,
+  "tagChanges": {
+    "source": "bf190b6b315bf25a0eb3c8b006d9da7c24c19e4b:acceptance/reviews/final/review-tag-changes.json",
+    "changes": 7,
+    "reviewProblems": [
+      {
+        "obligation": "UI-031-O5",
+        "test": "playwright:acceptance/UI-031.spec.js > UI-031-O5 [chromium]",
+        "problem": "review FINAL-REVIEW spot-check UI-031-O5 (partial) does not exist at bf190b6b315bf25a0eb3c8b006d9da7c24c19e4b"
+      },
+      {
+        "obligation": "UI-006-O1",
+        "test": "playwright:live/UI-006.spec.js > UI-006-O1 [chromium]",
+        "problem": "review FINAL-REVIEW spot-check UI-006-O1 (partial) does not exist at bf190b6b315bf25a0eb3c8b006d9da7c24c19e4b"
+      },
+      {
+        "obligation": "UI-010-O2",
+        "test": "playwright:acceptance/UI-010.spec.js > UI-010-O2 [chromium]",
+        "problem": "review FINAL-REVIEW RF-F-9 (partial) does not exist at bf190b6b315bf25a0eb3c8b006d9da7c24c19e4b"
+      },
+      {
+        "obligation": "WDL-001-O1",
+        "test": "playwright:acceptance/WDL-001.spec.js > WDL-001-O1 [chromium]",
+        "problem": "review FINAL-REVIEW spot-check WDL-001-O1 (partial) does not exist at bf190b6b315bf25a0eb3c8b006d9da7c24c19e4b"
+      },
+      {
+        "obligation": "UI-016-O15",
+        "test": "playwright:acceptance/UI-016.spec.js > UI-016-O15 [chromium]",
+        "problem": "review FINAL-REVIEW RF-F-4 (partial) does not exist at bf190b6b315bf25a0eb3c8b006d9da7c24c19e4b"
+      },
+      {
+        "obligation": "UI-034-O2",
+        "test": "playwright:acceptance/UI-034.spec.js > UI-034-O2 [chromium]",
+        "problem": "review FINAL-REVIEW RF-F-8 (partial) does not exist at bf190b6b315bf25a0eb3c8b006d9da7c24c19e4b"
+      },
+      {
+        "obligation": "AR-014-O1",
+        "test": "dotnet:Causa.Acceptance.Deterministic.AR014Tests.AR-014-O1",
+        "problem": "review FINAL-REVIEW RF-F-5 (partial) does not exist at bf190b6b315bf25a0eb3c8b006d9da7c24c19e4b"
+      }
+    ]
+  },
   "verdict": "FAIL",
+  "incomplete": [],
+  "unparseable": [],
+  "skippedBeforeCandidate": {
+    "testsExcluded": 0,
+    "assertionsExcluded": 0,
+    "conditionalSkipsTreatedAsLive": 0,
+    "tests": [],
+    "treatedAsLive": []
+  },
   "summary": {
     "removed": 45,
     "unrecorded": 45
   },
+  "limits": [
+    "dead code is not seen: an unchanged assertion after an early return, inside a braced if (false) { ... }, or reached through a helper in another file whose argument or fixture changed still counts as held",
+    "skip markers reached through a helper in another file, an argument or a computed property are not seen; a conditional skip's condition is not evaluated",
+    "the base is the commit that first added kickoff/indy-init.kickoff.json in the candidate's first-parent history: history rewritten before the run moves it, unless the kickoff commit is pinned outside the candidate (an owner record or tag)",
+    "a tag change's review is checked for a review record's structure, not for who wrote it: without a signed review or reviewer attestation the implementing agent can write it"
+  ],
   "removed": [
     {
       "path": "tests/browser/acceptance/AR-035.spec.js",

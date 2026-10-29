@@ -1,5 +1,5 @@
 {
-  "schema": "indy-init.defect-closure-verification/2",
+  "schema": "indy-init.defect-closure-verification/3",
   "base": "65e346ee70c04d2bf6d4935d06484eb95c8cfae6",
   "candidate": "46d5e1129a798549dcf37c2a6460c4f623298761",
   "records": "bf190b6b315bf25a0eb3c8b006d9da7c24c19e4b",
@@ -11,6 +11,13 @@
   "freezeAt": "2026-10-29T00:50:13.0000000+00:00",
   "verdict": "REFUSED",
   "incomplete": [],
+  "unparseable": [],
+  "limits": [
+    "a fix commit is shown to descend from the base and to change something, not to fix the class: an unrelated commit can be named",
+    "review evidence is checked for a review record's structure, not for who wrote it: without a signed review or reviewer attestation the implementing agent can write it, in the candidate or a records commit",
+    "the base is the caller's --base: history rewritten before the run is not detected unless the kickoff commit is pinned outside the candidate (an owner record or tag)",
+    "tests are read lexically: whether a declared, unskipped test's body actually exercises the fix is not checked"
+  ],
   "summary": {
     "verified": 0,
     "refused": 8,
