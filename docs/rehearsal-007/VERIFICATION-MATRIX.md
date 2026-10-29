@@ -3,7 +3,7 @@
 Each obligation of the remediation script, the mechanism that verifies it, and its state. Machine-readable: [`verification-matrix.json`](verification-matrix.json). States:
 
 - **PASS**: run and passed on the system of record (GitHub)
-- **PASS_LOCAL**: run and passed in this session's sandbox (and, where noted, in the PR's CI); not yet merged and released
+- **PASS_LOCAL**: run and passed in this session's sandbox (and, where noted, in CI); merged on 2026-10-29 but not yet released
 - **NOT_RUN**: not executed
 - **BLOCKED**: needs an owner action
 - **IN_PROGRESS**: running

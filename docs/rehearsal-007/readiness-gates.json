@@ -12,8 +12,8 @@
   "summary": {
     "PASS": 0,
     "FAIL": 0,
-    "BLOCKED": 6,
-    "NOT_RUN": 8
+    "BLOCKED": 5,
+    "NOT_RUN": 9
   },
   "gates": [
     {
@@ -75,9 +75,9 @@
         "praxis#300 CI green (26 checks): starter workflow one run per ref, cancel-in-progress, 15-minute timeout",
         "evidence/r6-workflow-runs.tsv: the 22:22-23:54 history"
       ],
-      "why": "The static regression test passes on the pull requests, which are not merged or released. The live load test (Experiment B: bursts of 5 and 15 commits, concurrent streams, a candidate during development) was not run; it needs a disposable repository. The MSB3030 parallel-build race was assessed, not reproduced.",
+      "why": "The static regression test passes; conditor#122 and praxis#300 are merged (9241290, 4e9993e) but not yet released. The live load test (Experiment B: bursts of 5 and 15 commits, concurrent streams, a candidate during development) was not run; it needs a disposable repository. The MSB3030 parallel-build race was assessed, not reproduced.",
       "needs": [
-        "Owner: merge and release conditor#122 and praxis#300",
+        "Owner: release Conditor and Praxis with these changes",
         "Owner: provide a disposable repository for Experiment B"
       ]
     },
@@ -113,21 +113,21 @@
       ],
       "why": "The candidate-acceptance template has not run on GitHub (Experiment E not run).",
       "needs": [
-        "Owner: merge and release conditor#122"
+        "Owner: release Conditor"
       ]
     },
     {
       "id": "R7-PF-09",
       "requirement": "Defect classes closed correctly",
-      "state": "BLOCKED",
+      "state": "NOT_RUN",
       "evidence": [
-        "indy-init#42 at 2e4b561: verify-defect-closures DCL-001..014; offline tests pass",
-        "evidence/defect-closures-r6.json: Rehearsal 6 REFUSED, 8/8 closures"
+        "indy-init main (merged with #42): verify-defect-closures DCL-001..014; offline tests pass in CI",
+        "evidence/defect-closures-r6.json: Rehearsal 6 REFUSED, 8/8 closures",
+        "Independent review: five rounds; final PASS_WITH_FINDINGS with every finding fixed at 2e4b561; the heuristic-lexer limit is stated (reviewAttention files must be read by the independent review)"
       ],
-      "why": "The verifier correctly refuses Rehearsal 6's closures. Its first independent review was BLOCKING; the re-review found a new false VERIFIED (N1), fixed in 6d05613; a third review found a lexer desync (D1) giving a false VERIFIED, fixed in e05c776; five review rounds; the final verdict is PASS_WITH_FINDINGS with every finding fixed at 2e4b561 and the heuristic-lexer limit stated (reviewAttention files must be read by the independent review). The Indy-init branch is not merged.",
+      "why": "The verifier is merged, reviewed, and correctly refuses Rehearsal 6's closures. Rehearsal 7's own defect classes can only be closed, and this gate passed, against fix commits in Rehearsal 7's history before its freeze.",
       "needs": [
-        "Independent re-review verdict",
-        "Owner: merge the Indy-init pull request"
+        "Rehearsal 7: verify-defect-closures VERIFIED before the freeze"
       ]
     },
     {
@@ -139,9 +139,9 @@
         "Independent review PASS after fixes (fef95fc, af8903b)",
         "Rehearsal 6 outline 1.95:1 now reported by the rule"
       ],
-      "why": "CI green on ac34a55. Not merged or released.",
+      "why": "Merged as 6c344f6 (forma#173); not yet in a Forma release.",
       "needs": [
-        "Owner: merge and release forma#173"
+        "Owner: release Forma with this change"
       ]
     },
     {

@@ -1,6 +1,6 @@
 # Rehearsal 6 remediation: results
 
-**Rehearsal 7 is NOT READY and was not started.** Gates R7-PF-01..14: 0 PASS, 6 BLOCKED, 8 NOT_RUN ([READINESS.md](READINESS.md)). The initiative is **not complete** against its completion criteria (below). Every code change is on a draft pull request, none is merged, and the readiness gates wait on owner actions or on Rehearsal 7 itself.
+**Rehearsal 7 is NOT READY and was not started.** Gates R7-PF-01..14: 0 PASS, 5 BLOCKED, 9 NOT_RUN ([READINESS.md](READINESS.md)). The initiative is **not complete** against its completion criteria (below). Every code change was merged on the owner's instruction on 2026-10-29 (merge commits, so the commits cited here stay reachable). The components are not yet released, and the remaining gates wait on owner actions or on Rehearsal 7 itself.
 
 This report states results only. Plans are in [REMEDIATION-PLAN.md](REMEDIATION-PLAN.md), and verification states are in [VERIFICATION-MATRIX.md](VERIFICATION-MATRIX.md).
 
@@ -8,19 +8,19 @@ This report states results only. Plans are in [REMEDIATION-PLAN.md](REMEDIATION-
 
 | Package | Repository | Work item | Commit | Pull request | Verification evidence | Independent review | Final status |
 |---|---|---|---|---|---|---|---|
-| R7-REM-001 Cross-tab persistence (Arca library) | kemiller2002/arca | WI-0038 | ac585ba | arca#47 (draft) | Browser specs 14/14 on Chromium and WebKit in CI; seeded three-tab interleavings, no Web Locks, restart; 0 acknowledged saves lost | No loss found, including a concurrent save-versus-steal experiment (6/6) | IMPLEMENTED_IN_REVIEW; for Causa superseded by ADR-R7-001 |
-| R7-REM-002 Offline retry and save state (Arca library) | kemiller2002/arca | WI-0037 | ac585ba | arca#47 (draft) | 415/415 tests; CI green. Storm reproduction: a naive host sends more than 50 POSTs in 60 s, the schedule at most 5. Adapter tests over FakeGitHub | Three rounds: BLOCKING, then findings, then PASS_WITH_FINDINGS (low); all fixed; the ac585ba fixes had no fourth review | IMPLEMENTED_IN_REVIEW; for Causa superseded by ADR-R7-001 |
+| R7-REM-001 Cross-tab persistence (Arca library) | kemiller2002/arca | WI-0038 | ac585ba | arca#47 (merged 916d0ca) | Browser specs 14/14 on Chromium and WebKit in CI; seeded three-tab interleavings, no Web Locks, restart; 0 acknowledged saves lost | No loss found, including a concurrent save-versus-steal experiment (6/6) | IMPLEMENTED_IN_REVIEW; for Causa superseded by ADR-R7-001 |
+| R7-REM-002 Offline retry and save state (Arca library) | kemiller2002/arca | WI-0037 | ac585ba | arca#47 (merged 916d0ca) | 415/415 tests; CI green. Storm reproduction: a naive host sends more than 50 POSTs in 60 s, the schedule at most 5. Adapter tests over FakeGitHub | Three rounds: BLOCKING, then findings, then PASS_WITH_FINDINGS (low); all fixed; the ac585ba fixes had no fourth review | IMPLEMENTED_IN_REVIEW; for Causa superseded by ADR-R7-001 |
 | R7-REM-003 Credential separation | owner | none | none | none | Probe workflow written (SECURITY-REVIEW §1), not run | none | BLOCKED (owner credentials) |
-| R7-REM-004 CI concurrency (starvation guard) | kemiller2002/conditor | WI-0063 | 9916fa9 | conditor#122 (draft) | `ci-policy check` CIP-000..008 flags Rehearsal 6's workflows and passes the corrected scaffold; 1398 checks; CI green (24 checks) | PASS_WITH_FINDINGS; F1–F8 fixed, not re-reviewed | PARTIAL: Experiment B not run |
-| R7-REM-004 Starter workflow | kemiller2002/praxis | WI-0106 | 0b1ee23 | praxis#300 (draft) | CI green (26 checks) | Covered by the CIP rules | IMPLEMENTED |
+| R7-REM-004 CI concurrency (starvation guard) | kemiller2002/conditor | WI-0063 | 9916fa9 | conditor#122 (merged 9241290) | `ci-policy check` CIP-000..008 flags Rehearsal 6's workflows and passes the corrected scaffold; 1398 checks; CI green (24 checks) | PASS_WITH_FINDINGS; F1–F8 fixed, not re-reviewed | PARTIAL: Experiment B not run |
+| R7-REM-004 Starter workflow | kemiller2002/praxis | WI-0106 | 0b1ee23 | praxis#300 (merged 4e9993e) | CI green (26 checks) | Covered by the CIP rules | IMPLEMENTED |
 | R7-REM-005 Unattended PR execution | praxis, conditor | WI-0104, WI-0062 | earlier work | earlier work | Readiness receipt: READY; PR #20 merged as 9c3aaf6 (cited) | Praxis SECURITY-REVIEW F1 accepted by the owner | PASS_ADVISORY: no enforced gate (UAE-R7-12) |
 | R7-REM-006 Automated evidence | rehearsal repository | none | none | none | Experiment D not run | none | PLANNED |
-| R7-REM-007 Candidate and deployment gates | kemiller2002/conditor | WI-0063 | 9916fa9 | conditor#122 (draft) | Template only; not run on GitHub | Pinning and ancestry check judged sound | PARTIAL |
-| R7-REM-008 Defect-class closure | kemiller2002/indy-init | intake | see #42 | indy-init#42 (draft) | Offline tests; Rehearsal 6: REFUSED 8/8 | Round 1 BLOCKING, fixed; round 2 BLOCKING (N1), fixed in 6d05613; round 3 BLOCKING (D1-D4), fixed at c08c23e; round 4 BLOCKING (E1), fixed at c33dc29; round 5 PASS_WITH_FINDINGS, fixed at 2e4b561 | IMPLEMENTED (review PASS_WITH_FINDINGS, fixed); not merged |
-| R7-REM-009 Forma non-text contrast | kemiller2002/forma | WI-0041 | ac34a55 | forma#173 (draft) | Rule plus Chromium spec (light, dark, forced colours); the Rehearsal 6 outline (1.95:1) is reported | PASS after fixes | IMPLEMENTED_IN_REVIEW |
-| R7-REM-010 Release comparison | kemiller2002/indy-init | intake | see #42 | indy-init#42 (draft) | Offline tests; live demonstration PASS (praxis 3.23.0, forma 0.11.0, arca 0.6.0) | Round 1 BLOCKING, fixed; round 2: N5 fixed, N4 inherent and stated in the report; round 4: no open release-comparison finding | IMPLEMENTED (review PASS_WITH_FINDINGS, fixed); not merged |
-| R7-REM-011 Assertion ratchet (RF-F-8) | kemiller2002/indy-init | intake | see #42 | indy-init#42 (draft) | Offline tests; Rehearsal 6: FAIL, 45 unrecorded removals including both UI-034 weakenings (base read from the real kickoff record) | Round 1 BLOCKING, fixed; round 2 BLOCKING (N2, N3, F3 partial), fixed in 865d443; round 3 BLOCKING (D1-D4), fixed at c08c23e; round 4 BLOCKING (E1), fixed at c33dc29; round 5 PASS_WITH_FINDINGS, fixed at 2e4b561 | IMPLEMENTED (review PASS_WITH_FINDINGS, fixed); not merged |
-| R7-REM-012 Readiness package | kemiller2002/indy-init | intake | see #42 | indy-init#42 (draft) | This directory | none | NOT READY |
+| R7-REM-007 Candidate and deployment gates | kemiller2002/conditor | WI-0063 | 9916fa9 | conditor#122 (merged 9241290) | Template only; not run on GitHub | Pinning and ancestry check judged sound | PARTIAL |
+| R7-REM-008 Defect-class closure | kemiller2002/indy-init | intake | see #42 | indy-init#42 | Offline tests; Rehearsal 6: REFUSED 8/8 | Round 1 BLOCKING, fixed; round 2 BLOCKING (N1), fixed in 6d05613; round 3 BLOCKING (D1-D4), fixed at c08c23e; round 4 BLOCKING (E1), fixed at c33dc29; round 5 PASS_WITH_FINDINGS, fixed at 2e4b561 | IMPLEMENTED (review PASS_WITH_FINDINGS, fixed) |
+| R7-REM-009 Forma non-text contrast | kemiller2002/forma | WI-0041 | ac34a55 | forma#173 (merged 6c344f6) | Rule plus Chromium spec (light, dark, forced colours); the Rehearsal 6 outline (1.95:1) is reported | PASS after fixes | IMPLEMENTED_IN_REVIEW |
+| R7-REM-010 Release comparison | kemiller2002/indy-init | intake | see #42 | indy-init#42 | Offline tests; live demonstration PASS (praxis 3.23.0, forma 0.11.0, arca 0.6.0) | Round 1 BLOCKING, fixed; round 2: N5 fixed, N4 inherent and stated in the report; round 4: no open release-comparison finding | IMPLEMENTED (review PASS_WITH_FINDINGS, fixed) |
+| R7-REM-011 Assertion ratchet (RF-F-8) | kemiller2002/indy-init | intake | see #42 | indy-init#42 | Offline tests; Rehearsal 6: FAIL, 45 unrecorded removals including both UI-034 weakenings (base read from the real kickoff record) | Round 1 BLOCKING, fixed; round 2 BLOCKING (N2, N3, F3 partial), fixed in 865d443; round 3 BLOCKING (D1-D4), fixed at c08c23e; round 4 BLOCKING (E1), fixed at c33dc29; round 5 PASS_WITH_FINDINGS, fixed at 2e4b561 | IMPLEMENTED (review PASS_WITH_FINDINGS, fixed) |
+| R7-REM-012 Readiness package | kemiller2002/indy-init | intake | see #42 | indy-init#42 | This directory | none | NOT READY |
 
 ## Verification results
 
@@ -65,7 +65,7 @@ Separately, arca#47 corrects the same failure modes in Arca as a library: a cros
 A real pull request merged without routine owner intervention:
 - **Run:** probe PR #20, merged as 9c3aaf6 (Experiment A, recorded by an earlier session; cited, not re-observed).
 - **Advisory, not enforced:** the agent holds the signing key, and no ruleset requires the evaluate job (UAE-R7-12).
-- **Remediation PRs:** none was merged by this session (see [AUTONOMOUS-EXECUTION.md](AUTONOMOUS-EXECUTION.md)).
+- **Remediation PRs:** merged by this session on the owner's instruction, an owner-approved merge rather than the unattended path (see [AUTONOMOUS-EXECUTION.md](AUTONOMOUS-EXECUTION.md)).
 
 ## Evidence
 
@@ -96,12 +96,12 @@ A real pull request merged without routine owner intervention:
 | 2 | R6-D-003 independently verified as corrected | Not met: same |
 | 3 | Remaining critical application findings resolved | Not met: in requirements (ADR-R7-001); verified only in Rehearsal 7 |
 | 4 | Credential permissions verified | Not met: owner credentials |
-| 5 | CI starvation regression tests pass | Met in PR CI; not merged; live load not run |
+| 5 | CI starvation regression tests pass | Met in CI; merged, not released; live load not run |
 | 6 | Unattended PR merging demonstrated | Met, advisory |
 | 7 | Evidence generation automated | Not met |
 | 8 | Candidate and deployment gates work | Not met: template not exercised |
-| 9 | Defect closure tied to actual fix commits | Verifier built and independently reviewed (PASS_WITH_FINDINGS, fixed); not merged; first real use is Rehearsal 7 |
-| 10 | Forma contrast failures corrected | On forma#173; not merged or released |
+| 9 | Defect closure tied to actual fix commits | Verifier merged and independently reviewed (PASS_WITH_FINDINGS, fixed); first real use is Rehearsal 7 |
+| 10 | Forma contrast failures corrected | Merged (forma#173); not yet released |
 | 11 | Release-selection evidence before freeze | Producer built; kickoff record not made |
 | 12 | Independent security review passes | Not met |
 | 13 | Rehearsal 7 preflight gates pass | Not met |
@@ -110,10 +110,7 @@ A real pull request merged without routine owner intervention:
 
 ## Remaining owner decisions
 
-1. **Merges:**
-   - forma#173, conditor#122, praxis#300, indy-init#42;
-   - arca#47, a library fix.
-   - Then releases of Forma, Conditor and Praxis, so that Rehearsal 7's release set contains them.
+1. **Releases:** the merges are done (2026-10-29, on the owner's instruction). Cut releases of Forma, Conditor and Praxis (and Arca) that contain them, so that Rehearsal 7's release set includes the changes; the pre-lock release comparison then records them.
 2. **Credentials:**
    - `CAUSA_GITHUB_TOKEN`, read-only on the data repository;
    - `CAUSA_WRITE_TOKEN`, write to `causa-write-test` only;

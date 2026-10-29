@@ -43,14 +43,14 @@ The ruleset and the secret are **owner actions**. Until they exist, the Rehearsa
 
 ## How the remediation work in this initiative was merged
 
-None of the remediation pull requests was merged by this session:
-- arca#47
-- conditor#122
-- praxis#300
-- forma#173
-- the Indy-init pull request
+The remediation pull requests were merged by this session on the owner's instruction in chat ("Merge please", 2026-10-29), through the API, with merge commits, after CI was green on each head and each head SHA was pinned:
+- arca#47 as 916d0ca
+- conditor#122 as 9241290
+- praxis#300 as 4e9993e
+- forma#173 as 6c344f6
+- the Indy-init pull request (#42)
 
-These repositories have no Praxis run authorization for this initiative and no ruleset. The policy-controlled merge path therefore does not apply to them. This session's instructions also treat a merge as an outward-facing action that the owner confirms. They stay as draft pull requests for the owner, with CI and independent review on each.
+These repositories have no Praxis run authorization for this initiative and no ruleset, so the policy-controlled merge path did not apply. This was an owner-approved merge, not the unattended, policy-controlled path, and it is not evidence for Experiment A.
 
 For comparison, Indy-init #41 (ADR-R7-001, from another session) was merged by an agent through the API after the owner approved it in chat. GitHub attributes that merge to the owner's account. That is an owner-approved merge, not the unattended, policy-controlled path. It is not evidence for Experiment A.
 

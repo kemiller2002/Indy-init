@@ -1,8 +1,8 @@
 # Rehearsal 7 readiness
 
-**Verdict: NOT READY.** Gates: PASS 0, FAIL 0, BLOCKED 6, NOT_RUN 8. Machine-readable: [`readiness-gates.json`](readiness-gates.json).
+**Verdict: NOT READY.** Gates: PASS 0, FAIL 0, BLOCKED 5, NOT_RUN 9. Machine-readable: [`readiness-gates.json`](readiness-gates.json).
 
-**Rule.** PASS only on executed evidence for what Rehearsal 7 will consume; planned or unmerged work is never PASS. Both critical Rehearsal 6 defects are closed in the requirements by the owner-approved ADR-R7-001; they can be verified only by Rehearsal 7's PAT tests, so their gates are NOT_RUN. The remediation pull requests are not merged: merging is an owner action in these repositories (see AUTONOMOUS-EXECUTION.md). This assessment complements the persistence-requirements [READINESS-ASSESSMENT.md](READINESS-ASSESSMENT.md) (K1-K6), which it does not repeat. Rehearsal 7 has not been started.
+**Rule.** PASS only on executed evidence for what Rehearsal 7 will consume; planned or unmerged work is never PASS. Both critical Rehearsal 6 defects are closed in the requirements by the owner-approved ADR-R7-001; they can be verified only by Rehearsal 7's PAT tests, so their gates are NOT_RUN. The remediation pull requests were merged on the owner's instruction on 2026-10-29; the components are not yet released. This assessment complements the persistence-requirements [READINESS-ASSESSMENT.md](READINESS-ASSESSMENT.md) (K1-K6), which it does not repeat. Rehearsal 7 has not been started.
 
 | Gate | Requirement | State | Why |
 |---|---|---|---|
@@ -10,12 +10,12 @@
 | R7-PF-02 | Persistence concurrency verified | **NOT_RUN** | Run during Rehearsal 7. The Arca multi-tab browser evidence (arca#47) verifies the library, which Causa no longer uses for investigations. |
 | R7-PF-03 | Offline retry behavior verified | **NOT_RUN** | Run during Rehearsal 7. Arca's SyncSchedule (arca#47) bounds retries for Arca's own queue; Causa has no queue. |
 | R7-PF-04 | GitHub credential separation verified | **BLOCKED** | The probe cannot run until the credentials exist. Rehearsal 6's CAUSA_GITHUB_TOKEN could write (D-09). |
-| R7-PF-05 | CI starvation regression test passed | **BLOCKED** | The static regression test passes on the pull requests, which are not merged or released. The live load test (Experiment B: bursts of 5 and 15 commits, concurrent streams, a candidate during development) was not run; it needs a disposable repository. The MSB3030 parallel-build race was assessed, not reproduced. |
+| R7-PF-05 | CI starvation regression test passed | **BLOCKED** | The static regression test passes; conditor#122 and praxis#300 are merged (9241290, 4e9993e) but not yet released. The live load test (Experiment B: bursts of 5 and 15 commits, concurrent streams, a candidate during development) was not run; it needs a disposable repository. The MSB3030 parallel-build race was assessed, not reproduced. |
 | R7-PF-06 | Unattended PR lifecycle verified | **BLOCKED** | A real merge without routine owner intervention was demonstrated, but the merge gate is advisory: the agent holds the signing key and the evaluate job is not required by a ruleset (UAE-R7-12). It must be re-run with the kickoff authorization (UAE-R7-06). |
 | R7-PF-07 | Evidence-generation pipeline verified | **NOT_RUN** | Experiment D (a representative workflow producing its evidence automatically) was not run. The producers exist (verify-defect-closures, assertion-ratchet, release-comparison, conditor candidate-verification) but are not yet wired into a rehearsal pipeline (R7-AMD-04). |
 | R7-PF-08 | Candidate verification gates passed | **NOT_RUN** | The candidate-acceptance template has not run on GitHub (Experiment E not run). |
-| R7-PF-09 | Defect classes closed correctly | **BLOCKED** | The verifier correctly refuses Rehearsal 6's closures. Its first independent review was BLOCKING; the re-review found a new false VERIFIED (N1), fixed in 6d05613; a third review found a lexer desync (D1) giving a false VERIFIED, fixed in e05c776; five review rounds; the final verdict is PASS_WITH_FINDINGS with every finding fixed at 2e4b561 and the heuristic-lexer limit stated (reviewAttention files must be read by the independent review). The Indy-init branch is not merged. |
-| R7-PF-10 | Forma contrast verified | **BLOCKED** | CI green on ac34a55. Not merged or released. |
+| R7-PF-09 | Defect classes closed correctly | **NOT_RUN** | The verifier is merged, reviewed, and correctly refuses Rehearsal 6's closures. Rehearsal 7's own defect classes can only be closed, and this gate passed, against fix commits in Rehearsal 7's history before its freeze. |
+| R7-PF-10 | Forma contrast verified | **BLOCKED** | Merged as 6c344f6 (forma#173); not yet in a Forma release. |
 | R7-PF-11 | Release comparison recorded | **NOT_RUN** | The record must be made at preflight against the kickoff set, immediately before the lock. The demonstration predates the releases this remediation needs (Arca, Forma, Conditor, Praxis), so it is not the record. |
 | R7-PF-12 | Independent adversarial review passed | **NOT_RUN** | The Indy-init tools' final review is PASS_WITH_FINDINGS with every finding fixed, Arca's PASS_WITH_FINDINGS (low, fixed) and Forma's PASS. Conditor's fixes were not re-reviewed, and the security review depends on the credential probe. |
 | R7-PF-13 | No unresolved critical defects | **NOT_RUN** | No Rehearsal 7 candidate exists. The defect-closure verifier must record each closure against a fix commit in Rehearsal 7's history. |
@@ -59,7 +59,7 @@ Needs:
 - evidence/r6-workflow-runs.tsv: the 22:22-23:54 history
 
 Needs:
-- Owner: merge and release conditor#122 and praxis#300
+- Owner: release Conditor and Praxis with these changes
 - Owner: provide a disposable repository for Experiment B
 
 ### R7-PF-06: Unattended PR lifecycle verified (BLOCKED)
@@ -82,16 +82,16 @@ Needs:
 - Rehearsal 6 deployed-smoke proved served SHA = candidate
 
 Needs:
-- Owner: merge and release conditor#122
+- Owner: release Conditor
 
-### R7-PF-09: Defect classes closed correctly (BLOCKED)
+### R7-PF-09: Defect classes closed correctly (NOT_RUN)
 
-- indy-init#42 at 2e4b561: verify-defect-closures DCL-001..014; offline tests pass
+- indy-init main (merged with #42): verify-defect-closures DCL-001..014; offline tests pass in CI
 - evidence/defect-closures-r6.json: Rehearsal 6 REFUSED, 8/8 closures
+- Independent review: five rounds; final PASS_WITH_FINDINGS with every finding fixed at 2e4b561; the heuristic-lexer limit is stated (reviewAttention files must be read by the independent review)
 
 Needs:
-- Independent re-review verdict
-- Owner: merge the Indy-init pull request
+- Rehearsal 7: verify-defect-closures VERIFIED before the freeze
 
 ### R7-PF-10: Forma contrast verified (BLOCKED)
 
@@ -100,7 +100,7 @@ Needs:
 - Rehearsal 6 outline 1.95:1 now reported by the rule
 
 Needs:
-- Owner: merge and release forma#173
+- Owner: release Forma with this change
 
 ### R7-PF-11: Release comparison recorded (NOT_RUN)
 
@@ -138,7 +138,7 @@ Needs:
 
 ## Owner actions that unblock the gates
 
-1. Merge and release forma#173, conditor#122, praxis#300 and the Indy-init pull request (R7-PF-05, 08, 09, 10); arca#47 is a library fix that no gate depends on after ADR-R7-001.
+1. Done on 2026-10-29 on the owner's instruction: arca#47, conditor#122, praxis#300, forma#173 and indy-init#42 merged. Remaining: release Forma, Conditor and Praxis (and Arca) so Rehearsal 7's release set contains the changes (R7-PF-05, 08, 10).
 2. Decide K2 and K4 of READINESS-ASSESSMENT.md, approve or decline R7-AMD-03..05, and approve the v4 cut (R7-PF-07, 14).
 3. Create `CAUSA_GITHUB_TOKEN` (read-only) and `CAUSA_WRITE_TOKEN` (write to `causa-write-test` only) (R7-PF-02, 04, 12; K6).
 4. UAE-R7-12: a ruleset on `main` requiring CI, `independent-review` and the Praxis evaluate job, and the trust store in an Actions secret (R7-PF-06).

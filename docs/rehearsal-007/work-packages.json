@@ -31,7 +31,7 @@
         }
       ],
       "pullRequests": [
-        "kemiller2002/arca#47"
+        "kemiller2002/arca#47 (merged 916d0ca)"
       ],
       "dependsOn": [],
       "plan": "Do not build another cross-tab store. Rehearsal 6 kept one localStorage record read-merge-written by every tab (src/persistence/Sync.fs:179, main.ts:110 skips exclusion without navigator.locks). localStorage has no compare-and-swap, so no lease on it is correct (both R6 lease trials failed). Arca.Limen already provides one owner per namespace through a Web Lock, a fencing epoch raised by compare-and-put inside an IndexedDB transaction, and refusal of a stale owner's save; without Web Locks it refuses durable ownership. Prove that in a real browser and require Rehearsal 7 to adopt it (D-07 was the deviation that bypassed it).",
@@ -52,7 +52,7 @@
       "status": "IMPLEMENTED_IN_REVIEW",
       "review": "Independent review (agent, not the implementer): R6-D-002 corrected with Web Locks; no loss found, including a concurrent save-versus-steal experiment (6/6). Finding 5: with QueueOptions.standard (MemoryOnly declared) and no Web Locks the queue is per-tab memory-only: no cross-tab loss, but unsent changes do not survive closing the tab, and SaveState does not show durability.",
       "remaining": [
-        "Merge and release arca#47 (owner): a library fix for Arca's other consumers",
+        "Release Arca with arca#47 (owner): a library fix for Arca's other consumers",
         "For Causa: PAT-01, PAT-02, PAT-11, PAT-13 during Rehearsal 7 (DEFECT-TRACEABILITY.md)"
       ],
       "scope": "ADR-R7-001 (owner-approved, merged in Indy-init #41) closes R6-D-002 and R6-D-003 for Causa in the requirements: no browser storage, no offline queue, no cross-tab locking, GitHub expected-head commits only. They are verified only when Rehearsal 7's candidate passes PAT-01..15. This package remains a correctness fix to Arca as a library (Arca stays in the release set); Causa may not use its offline queue or IndexedDB bridge (PERSIST-026)."
@@ -75,7 +75,7 @@
         }
       ],
       "pullRequests": [
-        "kemiller2002/arca#47"
+        "kemiller2002/arca#47 (merged 916d0ca)"
       ],
       "dependsOn": [],
       "plan": "Root cause (R6, verified in code): Limen reports an aborted POST as an unknown outcome while navigator.onLine stays true; reconciliation finds it not landed; the host re-runs synchronization at once (151 POSTs in 60 s, about 5,000 per tab in 5 minutes). Arca's OfflineSync returned an untyped Deferred and left timing to every host. Add to Arca's pure core: typed deferrals, a validated retry policy (exponential backoff with jitter), a schedule that only a provider-confirmed entry resets, and a save state derived from queue and schedule.",
@@ -98,7 +98,7 @@
       "status": "IMPLEMENTED_IN_REVIEW",
       "review": "Three independent review rounds. Round 1 BLOCKING (5xx misclassified; repeated online events reset backoff; edits retried a revoked credential; checking-outcome hid waiting-for-connection), fixed in 2c265c2. Round 2 confirmed three fixes and found 5xx in identity resolution, a ref-update resend burst (N1), connectivity never restored, and the Aborted label, fixed in 3ac5652. Round 3 PASS_WITH_FINDINGS (low): L2 NOT_LANDED code and L3 Online only from provider answers fixed in ac585ba; L1 (up to 36 write requests in the first minute when every ref update fails, decaying; R6 sent 151) documented in the CHANGELOG. The ac585ba fixes have tests but no fourth review.",
       "remaining": [
-        "Merge and release arca#47 (owner)",
+        "Release Arca with arca#47 (owner)",
         "For Causa: PAT-03, PAT-05..08, PAT-15 during Rehearsal 7 (RF-F-3 is PERSIST-008, PERSIST-012, PERSIST-015, PERSIST-024)"
       ],
       "scope": "ADR-R7-001 (owner-approved, merged in Indy-init #41) closes R6-D-002 and R6-D-003 for Causa in the requirements: no browser storage, no offline queue, no cross-tab locking, GitHub expected-head commits only. They are verified only when Rehearsal 7's candidate passes PAT-01..15. This package remains a correctness fix to Arca as a library (Arca stays in the release set); Causa may not use its offline queue or IndexedDB bridge (PERSIST-026). Arca.GitHub's fixes (5xx is transient, a 5xx or unreadable write answer is an unknown outcome reconciled by key, NOT_LANDED) apply if Rehearsal 7 uses Arca.GitHub for GitHub access, which ADR-R7-001 permits."
@@ -155,8 +155,8 @@
         }
       ],
       "pullRequests": [
-        "kemiller2002/conditor#122",
-        "kemiller2002/praxis#300"
+        "kemiller2002/conditor#122 (merged 9241290)",
+        "kemiller2002/praxis#300 (merged 4e9993e)"
       ],
       "dependsOn": [],
       "plan": "Measured cause: an agent-edited pipeline imported from R5 used a per-commit concurrency group on main (still at build-and-test.yml:39), job-level always() started cancelled runs' jobs, and validation ran twice per push on every branch. Conditor's own template was safe; nothing checked its replacement. Add conditor ci-policy check (CIP-000..008) that fails closed, a tier-3 candidate-acceptance template nothing can cancel, foundations and Praxis validation workflows that run once per ref, and timeouts.",
@@ -276,7 +276,7 @@
         }
       ],
       "pullRequests": [
-        "kemiller2002/conditor#122"
+        "kemiller2002/conditor#122 (merged 9241290)"
       ],
       "dependsOn": [
         "R7-REM-004"
@@ -310,7 +310,7 @@
       ],
       "workItems": [],
       "pullRequests": [
-        "kemiller2002/indy-init (this branch)"
+        "kemiller2002/indy-init#42"
       ],
       "dependsOn": [],
       "plan": "requirements-compiler verify-defect-closures checks each claimed closure against the rehearsal's own history (DCL-001..009).",
@@ -329,8 +329,7 @@
       "status": "IMPLEMENTED",
       "review": "Independent review: BLOCKING (F1: closures could be satisfied by tests outside the rehearsal, comment mentions, evidence older than the fix, closedAt before the fix, and unknown statuses). Fixed in 6bde211 (required --base, word-boundary test titles excluding skipped forms, evidence changed after the fix, closedAt >= fix time, curated classes MISSING, unknown status refused, INCOMPLETE without curation or freeze, closures source and sha256). Re-review at 41ff524: F1 FIXED; new BLOCKING N1 (a `./` path prefix let the closures record serve as its own review evidence; skips via testInfo.skip() or on the declaration line went undetected). Fixed in 6d05613 (normalised paths and blob-identity against the closures record; skip detection shared in TestBlocks). Documented limits: an unrelated commit descending from the base can be named as the fix; agent-written review evidence cannot be told from a reviewer's without identity or attestation. Third review at eb978e2: N1 FIXED; new BLOCKING D1 (a regex literal after `)` desynchronises the test lexer and hides a skip: false VERIFIED) and D3 (a lightly edited copy of the closures record passes as review evidence). Fixed in e05c776: the test lexer fails closed (UNPARSEABLE files are not read and keep the verdict at best INCOMPLETE); review evidence must be an indy-init.independent-review/1 record naming the class, the full fix SHA and verdict CLOSED. Fourth review at c08c23e: all earlier reproductions caught; Rehearsal 6's whole tests/ tree (144 files) parses; BLOCKING E1 (a `}` closing an object literal followed by division still desynchronises the lexer: false VERIFIED and false PASS), E2 (a file ending in a line comment without a newline is wrongly UNPARSEABLE), E3 (JSX/TSX), E4 (reporting nits). Fixed at c33dc29 (0f9816d, 7f1c0a2): brace-kind tracking, ambiguous cases UNPARSEABLE, end of input closes a line comment (0 of 3113 real files UNPARSEABLE), .jsx/.tsx reported as unsupported, and the base is now bound to the kickoff record like the ratchet's. Fifth review at c33dc29: PASS_WITH_FINDINGS; G1 (braces inside a template's ${...}) fixed at 1c3a7d0 with a reviewAttention list of files the independent review must read; confirmation at 1c3a7d0: PASS_WITH_FINDINGS, H1 (postfix ++/-- before /) and H2 (noisy attention list) fixed at 2e4b561. Final: the reviewer judges the residual risk of the heuristic lexer adequately documented in each report's limits, provided the review reads every reviewAttention file.",
       "remaining": [
-        "Wire into the Rehearsal 7 acceptance job before the freeze, with --base set to the kickoff commit",
-        "Merge indy-init#42 (owner)"
+        "Wire into the Rehearsal 7 acceptance job before the freeze, with --base set to the kickoff commit"
       ]
     },
     {
@@ -350,7 +349,7 @@
         }
       ],
       "pullRequests": [
-        "kemiller2002/forma#173"
+        "kemiller2002/forma#173 (merged 6c344f6)"
       ],
       "dependsOn": [],
       "plan": "Causa outlined a Forma diagram node with #e9a23b on #f5f3ed (1.95:1). Forma's workflow validation checked only text contrast and its diagram vocabulary had no status tokens. Add token:status-* to the vocabulary and A11Y-NONTEXT-CONTRAST to validation; prove token pairs per theme and the rendered result in a browser.",
@@ -369,7 +368,7 @@
       "status": "IMPLEMENTED_IN_REVIEW",
       "review": "Independent review: PASS_WITH_FINDINGS (false positive on borderless filled nodes; dark mode and legend swatches unchecked; app-CSS path undocumented; browser spec used hand-written markup). Fixed in fef95fc and af8903b; re-review PASS.",
       "remaining": [
-        "Merge and release forma#173 (owner); CI green on ac34a55",
+        "Release Forma with forma#173 (owner)",
         "Percepta screen contracts verified in the Rehearsal 7 app"
       ]
     },
@@ -385,7 +384,7 @@
       ],
       "workItems": [],
       "pullRequests": [
-        "kemiller2002/indy-init (this branch)"
+        "kemiller2002/indy-init#42"
       ],
       "dependsOn": [],
       "plan": "requirements-compiler release-comparison observe/assess: query each selected system's release source immediately before the lock, digest the answers, compare, and require owner-approved deviations.",
@@ -403,8 +402,7 @@
       "status": "IMPLEMENTED",
       "review": "Independent review: BLOCKING (F4/F5: hand-edited observations accepted, duplicates, wrong tag prefixes, npm latest-vs-highest, prerelease order, unapproved deviations, unbounded age). Fixed in afe7485 (answers stored, re-hashed and re-parsed, TAMPERED otherwise; recomputed source URL; duplicates refused; per-component tag prefixes; NuGet; semver prerelease order; deviations need decision and approvedBy; --locked-at with offset; max age <= 24 h). Re-review at 41ff524: F4 FIXED for inconsistent edits, F5 mostly FIXED; N5 fixed in 07be4f2 (AMBIGUOUS_COMPONENT, not a PASS status); N4 stated in the report's attestation field; N4 inherent: a recomputed digest over a forged answer is not proof, and observedAt, the lock record, approvedBy and deviations are caller-written. Proof needs observe to run in trusted CI with signed output. Third review at eb978e2: N5 FIXED; N4 documented; npm-versus-GitHub-releases ambiguity refinement and release paging in progress. Fixed in f29edf3: AMBIGUOUS only for the same GitHub release list and prefix; releases paged; limits stated in the report. Fourth review: N5 FIXED, N4 limit stated; no new release-comparison finding.",
       "remaining": [
-        "Run at Rehearsal 7 preflight against the kickoff set, before the lock",
-        "Merge indy-init#42 (owner)"
+        "Run at Rehearsal 7 preflight against the kickoff set, before the lock"
       ]
     },
     {
@@ -422,8 +420,8 @@
       ],
       "workItems": [],
       "pullRequests": [
-        "kemiller2002/indy-init (this branch)",
-        "kemiller2002/arca#47"
+        "kemiller2002/indy-init#42",
+        "kemiller2002/arca#47 (merged 916d0ca)"
       ],
       "dependsOn": [
         "R7-REM-001",
@@ -444,8 +442,7 @@
       "status": "IMPLEMENTED",
       "review": "Independent review: BLOCKING (F2/F3: skip/fixme/only markers, block comments, multi-line statements and helper pseudo-tests evaded the count; the base was caller-chosen). Fixed in ddc18bb (per-statement counting, markers, comments, test.* blocks, tag-change exemption through PlanVerification rules, required --kickoff binding the base, full SHAs). Re-review at 41ff524: F2 FIXED, F3 PARTIAL (any non-empty resolution accepted); new N2 (the kickoff record was any file on disk, so the base was still self-asserted) and N3 (assertions hidden in template literals; testInfo.skip(), test.info().skip(), aliased skip). Fixed in 865d443: the base is the commit that first added the kickoff record in the candidate's first-parent history (a mismatching --base is REFUSED); assertions matched on string- and template-masked text; skip markers anywhere including aliases in the file; a tag change needs PlanVerification.tagChangeAdmissible. Third review at eb978e2: N2, N3, F3 FIXED; new BLOCKING D1 (lexer desync counts a dead assertion as live), D2 (a caller-chosen --kickoff-path gave PASS on Rehearsal 6) and D4 (tag-change reviews are free text in a file outside the repository); D5 low (over-broad base skip exclusion). Fixed in 7675e38 and 6edade9: UNPARSEABLE files block PASS; only kickoff/indy-init.kickoff.json binds the base; tag changes are read from the records commit and must point to review records there (a file from disk is at best INCOMPLETE); conditional base skips count as live and exclusions are reported. Fourth review at c08c23e: all earlier reproductions caught; Rehearsal 6's whole tests/ tree (144 files) parses; BLOCKING E1 (a `}` closing an object literal followed by division still desynchronises the lexer: false VERIFIED and false PASS), E2 (a file ending in a line comment without a newline is wrongly UNPARSEABLE), E3 (JSX/TSX), E4 (reporting nits). Fixed at c33dc29 (7f1c0a2). Fifth review at c33dc29: PASS_WITH_FINDINGS; G1 (braces inside a template's ${...}) fixed at 1c3a7d0 with a reviewAttention list of files the independent review must read; confirmation at 1c3a7d0: PASS_WITH_FINDINGS, H1 (postfix ++/-- before /) and H2 (noisy attention list) fixed at 2e4b561. Final: the reviewer judges the residual risk of the heuristic lexer adequately documented in each report's limits, provided the review reads every reviewAttention file.",
       "remaining": [
-        "RF-F-4..7, RF-F-9 are process items carried into EXECUTION-PLAN.md",
-        "Merge indy-init#42 (owner)"
+        "RF-F-4..7, RF-F-9 are process items carried into EXECUTION-PLAN.md"
       ]
     },
     {
@@ -459,7 +456,7 @@
       ],
       "workItems": [],
       "pullRequests": [
-        "kemiller2002/indy-init (this branch)"
+        "kemiller2002/indy-init#42"
       ],
       "dependsOn": [
         "R7-REM-001",
