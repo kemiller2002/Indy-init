@@ -121,10 +121,10 @@
       "requirement": "Defect classes closed correctly",
       "state": "BLOCKED",
       "evidence": [
-        "indy-init#42 at eb978e2: verify-defect-closures DCL-001..014; offline tests pass",
+        "indy-init#42 at c08c23e: verify-defect-closures DCL-001..014; offline tests pass",
         "evidence/defect-closures-r6.json: Rehearsal 6 REFUSED, 8/8 closures"
       ],
-      "why": "The verifier correctly refuses Rehearsal 6's closures. Its first independent review was BLOCKING; the re-review found a new false VERIFIED (N1), fixed in 6d05613; a third review found a lexer desync (D1) giving a false VERIFIED; its fix is in progress. The Indy-init branch is not merged.",
+      "why": "The verifier correctly refuses Rehearsal 6's closures. Its first independent review was BLOCKING; the re-review found a new false VERIFIED (N1), fixed in 6d05613; a third review found a lexer desync (D1) giving a false VERIFIED, fixed in e05c776 (the lexer fails closed); a fourth review is in progress. The Indy-init branch is not merged.",
       "needs": [
         "Independent re-review verdict",
         "Owner: merge the Indy-init pull request"
@@ -162,10 +162,10 @@
         "Arca: three rounds, final PASS_WITH_FINDINGS (low), fixed",
         "Conditor: PASS_WITH_FINDINGS, F1-F8 fixed (not re-reviewed)",
         "Forma: PASS after fixes",
-        "Indy-init tools: first review BLOCKING (F1-F5), fixed; re-review BLOCKING (N1-N3, F3 partial, N5), fixed at eb978e2; third review BLOCKING (D1-D4), fixes in progress; N4 documented as an inherent limit",
+        "Indy-init tools: first review BLOCKING (F1-F5), fixed; re-review BLOCKING (N1-N3, F3 partial, N5), fixed at eb978e2; third review BLOCKING (D1-D4), fixed at c08c23e; fourth review in progress; N4 documented as an inherent limit",
         "Security: SECURITY-REVIEW.md; the credential probe is not run"
       ],
-      "why": "Not every package has a passing final review: the tools' third review was BLOCKING (fixes in progress), Conditor's fixes were not re-reviewed, and the security review depends on the credential probe.",
+      "why": "Not every package has a passing final review: the tools' fourth review is pending, Conditor's fixes were not re-reviewed, and the security review depends on the credential probe.",
       "needs": [
         "Independent re-review verdicts",
         "Owner: credentials for the probe (R7-PF-04)"
