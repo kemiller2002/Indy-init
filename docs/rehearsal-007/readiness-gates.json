@@ -139,7 +139,7 @@
         "Independent review PASS after fixes (fef95fc, af8903b)",
         "Rehearsal 6 outline 1.95:1 now reported by the rule"
       ],
-      "why": "Not merged or released. CI on ac34a55 (inventory regeneration after a validate failure) must be green.",
+      "why": "CI green on ac34a55. Not merged or released.",
       "needs": [
         "Owner: merge and release forma#173"
       ]

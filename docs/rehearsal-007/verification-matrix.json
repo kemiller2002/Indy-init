@@ -221,7 +221,7 @@
       "obligation": "Non-text indicators >= 3:1 (rendered), high contrast supported",
       "package": "R7-REM-009",
       "verification": "A11Y-NONTEXT-CONTRAST; token test (30 contexts); Chromium spec light/dark/forced colors on renderer output",
-      "evidence": "forma#173 (review PASS; CI re-running on ac34a55)",
+      "evidence": "forma#173 (review PASS; CI green on ac34a55)",
       "state": "PASS_LOCAL"
     },
     {

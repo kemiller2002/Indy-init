@@ -224,7 +224,7 @@ Generated from [`work-packages.json`](work-packages.json); the JSON is authorita
 - forma#173: rule, tokens, Chromium spec light/dark/forced colors; inventory regenerated in ac34a55 after CI validate failed on it
 
 **Remaining.**
-- CI green on ac34a55, then merge and release (owner)
+- Merge and release forma#173 (owner); CI green on ac34a55
 - Percepta screen contracts verified in the Rehearsal 7 app
 
 **Independent review.** Independent review: PASS_WITH_FINDINGS (false positive on borderless filled nodes; dark mode and legend swatches unchecked; app-CSS path undocumented; browser spec used hand-written markup). Fixed in fef95fc and af8903b; re-review PASS.
