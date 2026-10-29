@@ -715,6 +715,158 @@ let verifyProcessCommand (args: string list) : int =
             eprintfn "input error: %s" ex.Message
             2
 
+/// `verify-defect-closures`: defect-class closures checked against the rehearsal's own history (see DefectClosure,
+/// R7-REM-008). Closures are read from the candidate's tree unless `--closures-file` is given. The base is bound by
+/// kickoff/indy-init.kickoff.json in the candidate's history (see Kickoff); a different `--base` is REFUSED. Exit 0 VERIFIED,
+/// 3 REFUSED or INCOMPLETE, 2 unusable input.
+let verifyDefectClosuresCommand (args: string list) : int =
+    let usage =
+        "usage: requirements-compiler verify-defect-closures --repo DIR --candidate SHA [--base SHA] [--closures PATH | --closures-file FILE] [--records SHA] [--curation FILE] [--tests-path DIR] [--freeze-at ISO-8601] [--out FILE]"
+
+    match optionMap args with
+    | Error e ->
+        eprintfn "%s" e
+        2
+    | Ok m when not (m.ContainsKey "--repo" && m.ContainsKey "--candidate") ->
+        eprintfn "%s" usage
+        2
+    | Ok m ->
+        try
+            let one k = m.TryFind k |> Option.map List.last
+            let repo = (one "--repo").Value
+            let candidate = DefectClosure.resolveCommit repo (one "--candidate").Value |> Option.defaultValue (one "--candidate").Value
+            let path = one "--closures" |> Option.defaultValue "acceptance/defect-classes.json"
+
+            let source, bytes =
+                match one "--closures-file" with
+                | Some file -> sprintf "file:%s" file, File.ReadAllBytes file
+                | None ->
+                    match Git.showFile repo candidate path with
+                    | Ok bytes -> sprintf "%s:%s" candidate path, bytes
+                    | Error e -> failwithf "%s is not readable at %s: %s" path candidate e
+
+            let freezeAt =
+                one "--freeze-at"
+                |> Option.map (fun text -> DateTimeOffset.Parse(text, Globalization.CultureInfo.InvariantCulture, Globalization.DateTimeStyles.AssumeUniversal))
+
+            let report =
+                DefectClosure.assess
+                    { Repo = repo
+                      Base = one "--base"
+                      Candidate = candidate
+                      Records = one "--records"
+                      Closures = parseBytes bytes
+                      ClosuresSource = source
+                      ClosuresSha256 = Git.sha256Hex bytes
+                      ClosuresPath = path
+                      Curation = one "--curation" |> Option.map parseFile
+                      FreezeAt = freezeAt
+                      TestsPath = one "--tests-path" |> Option.defaultValue "tests" }
+
+            writeOut m report
+            if str "verdict" report = "VERIFIED" then 0 else 3
+        with ex ->
+            eprintfn "input error: %s" ex.Message
+            2
+
+/// `release-comparison`: the pre-lock newest-release record (see ReleaseComparison, R7-REM-010).
+///   observe --selected SET --out FILE        queries every selected system's release source now, keeping each answer
+///   assess  --selected SET --observations FILE (--lock-record FILE | --locked-at ISO-with-offset) [--deviations FILE]
+///           [--max-age-hours N (<= 24)] [--out FILE]
+/// Exit 0 PASS (or observed), 3 FAIL, 2 unusable input.
+let releaseComparisonCommand (args: string list) : int =
+    let usage =
+        "usage: requirements-compiler release-comparison (observe --selected FILE --out FILE | assess --selected FILE --observations FILE (--lock-record FILE | --locked-at ISO-8601-WITH-OFFSET) [--deviations FILE] [--max-age-hours N<=24] [--out FILE])"
+
+    let orFail =
+        function
+        | Ok x -> x
+        | Error(e: string) -> failwith e
+
+    let run (sub: string) (rest: string list) =
+        match optionMap rest with
+        | Error e ->
+            eprintfn "%s" e
+            2
+        | Ok m ->
+            let one k = m.TryFind k |> Option.map List.last
+
+            try
+                match sub, one "--selected" with
+                | "observe", Some selected when (one "--out").IsSome ->
+                    use http = new Net.Http.HttpClient(Timeout = TimeSpan.FromSeconds 30.0)
+
+                    let observations =
+                        ReleaseComparison.selectedSystems (parseFile selected)
+                        |> List.map (ReleaseComparison.observe http (fun () -> DateTimeOffset.UtcNow))
+
+                    writeOut m (JObj [ "schema", JStr "indy-init.release-observations/2"; "observations", JArr(observations |> List.map ReleaseComparison.observationToJson) ])
+                    0
+                | "assess", Some selected when (one "--observations").IsSome && ((one "--locked-at").IsSome || (one "--lock-record").IsSome) ->
+                    let observations = parseFile (one "--observations").Value |> arr "observations" |> List.map ReleaseComparison.observationOfJson
+                    let deviationsBytes = one "--deviations" |> Option.map File.ReadAllBytes
+                    let deviations = deviationsBytes |> Option.map (parseBytes >> arr "deviations") |> Option.defaultValue []
+
+                    // A lock record (the lock's own `lockedAt`) is preferred to a time typed on the command line.
+                    let lockedAtText =
+                        match one "--lock-record" with
+                        | Some file -> parseFile file |> strOpt "lockedAt" |> Option.defaultWith (fun () -> failwithf "%s has no lockedAt" file)
+                        | None -> (one "--locked-at").Value
+
+                    let lockedAt = ReleaseComparison.parseLockedAt lockedAtText |> orFail
+                    let maxAge = one "--max-age-hours" |> Option.map (fun h -> Double.Parse(h, Globalization.CultureInfo.InvariantCulture)) |> Option.defaultValue 6.0 |> ReleaseComparison.maxAgeOf |> orFail
+                    let report = ReleaseComparison.assess (parseFile selected) observations deviations (deviationsBytes |> Option.map Git.sha256Hex) lockedAt maxAge
+                    writeOut m report
+                    if str "verdict" report = "PASS" then 0 else 3
+                | _ ->
+                    eprintfn "%s" usage
+                    2
+            with ex ->
+                eprintfn "input error: %s" ex.Message
+                2
+
+    match args with
+    | sub :: rest -> run sub rest
+    | [] ->
+        eprintfn "%s" usage
+        2
+
+/// `assertion-ratchet`: no assertion a bound test held since the base disappears from the candidate without a
+/// resolved tag change (see AssertionRatchet, R7-REM-011). The base is derived from kickoff/indy-init.kickoff.json in
+/// the candidate's history (`--kickoff-path` may only name that path; any other is REFUSED); a `--base` is checked
+/// against it. Review tag changes are read from acceptance/reviews/final/review-tag-changes.json at `--records` (or
+/// the candidate); `--tag-changes FILE` from disk leaves the verdict at best INCOMPLETE. Exit 0 PASS, 3 FAIL, REFUSED
+/// or INCOMPLETE, 2 unusable input.
+let assertionRatchetCommand (args: string list) : int =
+    match optionMap args with
+    | Error e ->
+        eprintfn "%s" e
+        2
+    | Ok m when not (m.ContainsKey "--repo" && m.ContainsKey "--candidate") ->
+        eprintfn "usage: requirements-compiler assertion-ratchet --repo DIR --candidate SHA [--base SHA] [--records SHA] [--path DIR]... [--plan FILE] [--tag-changes FILE (INCOMPLETE at best)] [--out FILE]"
+        2
+    | Ok m ->
+        try
+            let one k = m.[k] |> List.last
+            let last k = m.TryFind k |> Option.map List.last
+
+            let report =
+                AssertionRatchet.assess
+                    { Repo = one "--repo"
+                      Base = last "--base"
+                      Candidate = one "--candidate"
+                      Roots = m.TryFind "--path" |> Option.defaultValue [ "tests" ]
+                      TagChangesFile = last "--tag-changes" |> Option.map parseFile
+                      Records = last "--records"
+                      Plan = last "--plan" |> Option.map parseFile
+                      KickoffPath = last "--kickoff-path" |> Option.defaultValue AssertionRatchet.defaultKickoffPath |> Some }
+
+            writeOut m report
+            if str "verdict" report = "PASS" then 0 else 3
+        with ex ->
+            eprintfn "input error: %s" ex.Message
+            2
+
 /// `plan-readiness`: Priority Two, the implementation-start gate (see PlanReadiness). Exit 0 READY, 3 BLOCKED,
 /// 2 unusable input.
 let planReadinessCommand (args: string list) : int =
@@ -782,6 +934,9 @@ let main argv =
     | [ "baseline"; root; commit ] -> baselineCommand root commit
     | "verify-plan" :: rest -> verifyPlanCommand rest
     | "verify-process" :: rest -> verifyProcessCommand rest
+    | "verify-defect-closures" :: rest -> verifyDefectClosuresCommand rest
+    | "release-comparison" :: rest -> releaseComparisonCommand rest
+    | "assertion-ratchet" :: rest -> assertionRatchetCommand rest
     | "plan-readiness" :: rest -> planReadinessCommand rest
     | "propose-test-bindings" :: rest -> proposeTestBindingsCommand rest
     | "review-attestations" :: rest -> reviewAttestationsCommand rest

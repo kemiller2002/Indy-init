@@ -1,0 +1,194 @@
+{
+  "schema": "indy-init.defect-closure-verification/5",
+  "base": "c80f35e468fb2d1a38ce467f9bec860d52837b23",
+  "baseVerified": true,
+  "kickoff": {
+    "path": "kickoff/indy-init.kickoff.json",
+    "addedAt": "c80f35e468fb2d1a38ce467f9bec860d52837b23",
+    "field": null,
+    "recordedBase": null,
+    "base": "c80f35e468fb2d1a38ce467f9bec860d52837b23"
+  },
+  "baseProblem": null,
+  "candidate": "46d5e1129a798549dcf37c2a6460c4f623298761",
+  "records": "bf190b6b315bf25a0eb3c8b006d9da7c24c19e4b",
+  "closures": {
+    "source": "46d5e1129a798549dcf37c2a6460c4f623298761:acceptance/defect-classes.json",
+    "sha256": "575437a4f57fcd181caecb3b55ec64ed54f2279d26bd39a0c71758b93d435da0"
+  },
+  "curationSupplied": true,
+  "freezeAt": "2026-10-29T00:50:13.0000000+00:00",
+  "verdict": "REFUSED",
+  "incomplete": [],
+  "unparseable": [],
+  "unsupported": [],
+  "reviewAttention": [
+    {
+      "file": "tests/browser/acceptance/AR-035.spec.js@46d5e1129a798549dcf37c2a6460c4f623298761",
+      "why": [
+        "a backtick inside a comment"
+      ]
+    },
+    {
+      "file": "tests/browser/acceptance/UI-001.spec.js@46d5e1129a798549dcf37c2a6460c4f623298761",
+      "why": [
+        "a regular expression literal holding a quote or backtick"
+      ]
+    },
+    {
+      "file": "tests/browser/acceptance/UI-010.spec.js@46d5e1129a798549dcf37c2a6460c4f623298761",
+      "why": [
+        "a regular expression literal holding a quote or backtick"
+      ]
+    },
+    {
+      "file": "tests/browser/acceptance/UI-015.spec.js@46d5e1129a798549dcf37c2a6460c4f623298761",
+      "why": [
+        "a regular expression literal holding a quote or backtick"
+      ]
+    },
+    {
+      "file": "tests/browser/acceptance/UI-024.spec.js@46d5e1129a798549dcf37c2a6460c4f623298761",
+      "why": [
+        "a regular expression literal holding a quote or backtick"
+      ]
+    },
+    {
+      "file": "tests/browser/acceptance/UI-026.spec.js@46d5e1129a798549dcf37c2a6460c4f623298761",
+      "why": [
+        "a regular expression literal holding a quote or backtick"
+      ]
+    },
+    {
+      "file": "tests/browser/acceptance/UI-031.spec.js@46d5e1129a798549dcf37c2a6460c4f623298761",
+      "why": [
+        "a regular expression literal holding a quote or backtick"
+      ]
+    },
+    {
+      "file": "tests/browser/acceptance/WDL-002.spec.js@46d5e1129a798549dcf37c2a6460c4f623298761",
+      "why": [
+        "a regular expression literal holding a quote or backtick"
+      ]
+    },
+    {
+      "file": "tests/browser/acceptance/WDL-005.spec.js@46d5e1129a798549dcf37c2a6460c4f623298761",
+      "why": [
+        "a regular expression literal holding a quote or backtick"
+      ]
+    },
+    {
+      "file": "tests/browser/fixture-mode.spec.js@46d5e1129a798549dcf37c2a6460c4f623298761",
+      "why": [
+        "a backtick inside a comment"
+      ]
+    },
+    {
+      "file": "tests/browser/graph-layout.spec.js@46d5e1129a798549dcf37c2a6460c4f623298761",
+      "why": [
+        "a regular expression literal holding a quote or backtick"
+      ]
+    },
+    {
+      "file": "tests/browser/graph-navigation.spec.js@46d5e1129a798549dcf37c2a6460c4f623298761",
+      "why": [
+        "a backtick inside a comment"
+      ]
+    },
+    {
+      "file": "tests/browser/percepta.spec.js@46d5e1129a798549dcf37c2a6460c4f623298761",
+      "why": [
+        "a backtick inside a comment"
+      ]
+    }
+  ],
+  "limits": [
+    "a fix commit is shown to descend from the base and to change something, not to fix the class: an unrelated commit can be named",
+    "review evidence is checked for a review record's structure, not for who wrote it: without a signed review or reviewer attestation the implementing agent can write it, in the candidate or a records commit",
+    "the base is the commit that first added kickoff/indy-init.kickoff.json in the candidate's first-parent history: history rewritten before the run moves it, unless the kickoff commit is pinned outside the candidate (an owner record or tag)",
+    "tests are read lexically: whether a declared, unskipped test's body actually exercises the fix is not checked",
+    "the JavaScript/TypeScript scanner is a heuristic lexer that fails closed where it detects ambiguity; an adversarially written file may still desynchronise it undetected, so the independent review must inspect the test files a closure relies on, starting with every file in reviewAttention (a backtick in a comment, a quote or backtick in a regular expression literal, a `/` right after a `}`)",
+    "JSX/TSX files are not read: a test declared only in one is refused"
+  ],
+  "summary": {
+    "verified": 0,
+    "refused": 8,
+    "missing": 0,
+    "open": 0
+  },
+  "classes": [
+    {
+      "id": "DC-001",
+      "state": "REFUSED",
+      "problems": [
+        "DCL-002 DC-001: fix commit 5336ec40372323dbdbbb821878ad87c51597af7a is not in this repository's history",
+        "DCL-007 DC-001: review evidence acceptance/reviews/R5-final-review.md#dc-001 does not exist at bf190b6b315bf25a0eb3c8b006d9da7c24c19e4b",
+        "DCL-009 DC-001: no valid closedAt, so the closure cannot be shown to precede the freeze"
+      ]
+    },
+    {
+      "id": "DC-002",
+      "state": "REFUSED",
+      "problems": [
+        "DCL-002 DC-002: fix commit e8e32c1ebf6db77344cb8e8bc5bd30b422cdd379 is not in this repository's history",
+        "DCL-007 DC-002: review evidence acceptance/reviews/R5-independent-review.md#dc-002 does not exist at bf190b6b315bf25a0eb3c8b006d9da7c24c19e4b",
+        "DCL-009 DC-002: no valid closedAt, so the closure cannot be shown to precede the freeze"
+      ]
+    },
+    {
+      "id": "DC-003",
+      "state": "REFUSED",
+      "problems": [
+        "DCL-002 DC-003: fix commit b07d2a5def150e1cd741f0540667eac31b78330e is not in this repository's history",
+        "DCL-007 DC-003: review evidence acceptance/reviews/R5-final-review.md#dc-003-543ddc2 does not exist at bf190b6b315bf25a0eb3c8b006d9da7c24c19e4b",
+        "DCL-009 DC-003: no valid closedAt, so the closure cannot be shown to precede the freeze"
+      ]
+    },
+    {
+      "id": "DC-004",
+      "state": "REFUSED",
+      "problems": [
+        "DCL-002 DC-004: fix commit 895fb6da3031da689cd3a6f54b4005f17f07edbe is not in this repository's history",
+        "DCL-005 DC-004: regression test DCT-004-A is not declared as a (not skipped) test under tests/ in the candidate",
+        "DCL-007 DC-004: review evidence acceptance/reviews/R5-independent-review.md#dc-004 does not exist at bf190b6b315bf25a0eb3c8b006d9da7c24c19e4b",
+        "DCL-009 DC-004: no valid closedAt, so the closure cannot be shown to precede the freeze"
+      ]
+    },
+    {
+      "id": "DC-005",
+      "state": "REFUSED",
+      "problems": [
+        "DCL-002 DC-005: fix commit 895fb6da3031da689cd3a6f54b4005f17f07edbe is not in this repository's history",
+        "DCL-007 DC-005: review evidence acceptance/reviews/R5-independent-review.md#dc-005 does not exist at bf190b6b315bf25a0eb3c8b006d9da7c24c19e4b",
+        "DCL-009 DC-005: no valid closedAt, so the closure cannot be shown to precede the freeze"
+      ]
+    },
+    {
+      "id": "DC-006",
+      "state": "REFUSED",
+      "problems": [
+        "DCL-002 DC-006: fix commit 578ebd3b0bbc99862dc2da945e9c3b9e3f719bba is not in this repository's history",
+        "DCL-007 DC-006: review evidence acceptance/reviews/R5-independent-review.md#dc-006 does not exist at bf190b6b315bf25a0eb3c8b006d9da7c24c19e4b",
+        "DCL-009 DC-006: no valid closedAt, so the closure cannot be shown to precede the freeze"
+      ]
+    },
+    {
+      "id": "R3-LESSON-3",
+      "state": "REFUSED",
+      "problems": [
+        "DCL-002 R3-LESSON-3: fix commit 578ebd3b0bbc99862dc2da945e9c3b9e3f719bba is not in this repository's history",
+        "DCL-007 R3-LESSON-3: review evidence acceptance/reviews/R5-independent-review.md#r3-lesson-3 does not exist at bf190b6b315bf25a0eb3c8b006d9da7c24c19e4b",
+        "DCL-009 R3-LESSON-3: no valid closedAt, so the closure cannot be shown to precede the freeze"
+      ]
+    },
+    {
+      "id": "DC-001..DC-005",
+      "state": "REFUSED",
+      "problems": [
+        "DCL-002 DC-001..DC-005: fix commit b07d2a5def150e1cd741f0540667eac31b78330e is not in this repository's history",
+        "DCL-007 DC-001..DC-005: review evidence acceptance/reviews/R5-final-review.md#dct-live-a-543ddc2 does not exist at bf190b6b315bf25a0eb3c8b006d9da7c24c19e4b",
+        "DCL-009 DC-001..DC-005: no valid closedAt, so the closure cannot be shown to precede the freeze"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,260 @@
+{
+  "schema": "indy-init.rehearsal-007.verification-matrix/1",
+  "states": {
+    "PASS": "run and passed on the system of record (GitHub)",
+    "PASS_LOCAL": "run and passed in this session's sandbox (and, where noted, in CI); merged on 2026-10-29 but not yet released",
+    "NOT_RUN": "not executed",
+    "BLOCKED": "needs an owner action",
+    "IN_PROGRESS": "running"
+  },
+  "rows": [
+    {
+      "id": "VM-001",
+      "obligation": "Two/three tabs writing the same investigation without silent loss",
+      "package": "R7-REM-001",
+      "verification": "arca multi-tab-safety.spec.mjs random interleavings (3 tabs, seeds 1-3)",
+      "evidence": "arca#47; local Chromium 5/5",
+      "state": "PASS_LOCAL"
+    },
+    {
+      "id": "VM-002",
+      "obligation": "Tabs writing different investigations",
+      "package": "R7-REM-001",
+      "verification": "Same queue per namespace: entries from all tabs in one fenced queue (interleavings)",
+      "evidence": "arca#47 (CI green at ac585ba)",
+      "state": "PASS_LOCAL"
+    },
+    {
+      "id": "VM-003",
+      "obligation": "Web Locks unavailable / denied",
+      "package": "R7-REM-001",
+      "verification": "multi-tab-safety: navigator.locks removed -> ownership refused, nothing written",
+      "evidence": "arca#47 (CI green at ac585ba)",
+      "state": "PASS_LOCAL"
+    },
+    {
+      "id": "VM-004",
+      "obligation": "Lock-holder termination",
+      "package": "R7-REM-001",
+      "verification": "limen-queue.spec (hand-over at higher epoch) + interleavings closing the owner",
+      "evidence": "arca#47 (CI green at ac585ba)",
+      "state": "PASS_LOCAL"
+    },
+    {
+      "id": "VM-005",
+      "obligation": "Browser restart / storage restoration",
+      "package": "R7-REM-001",
+      "verification": "multi-tab-safety restart: storageState with IndexedDB into a new context",
+      "evidence": "arca#47 (CI green at ac585ba)",
+      "state": "PASS_LOCAL"
+    },
+    {
+      "id": "VM-006",
+      "obligation": "Conflicting remote GitHub updates",
+      "package": "R7-REM-001",
+      "verification": "Arca ConcurrencyTests / GitHubStorageTests (conditioned commits, conflicts surfaced)",
+      "evidence": "arca main (existing)",
+      "state": "PASS_LOCAL"
+    },
+    {
+      "id": "VM-007",
+      "obligation": "Interrupted writes",
+      "package": "R7-REM-002",
+      "verification": "AdapterScheduleTests: lost answer, applied-then-502; GitHubStorageTests unknown outcome",
+      "evidence": "arca#47 (CI green at ac585ba)",
+      "state": "PASS_LOCAL"
+    },
+    {
+      "id": "VM-008",
+      "obligation": "Bounded exponential backoff with jitter; no tight loop",
+      "package": "R7-REM-002",
+      "verification": "SyncScheduleTests (naive host >50 POSTs vs <=5; mutation 76) + adapter tests (<=2 ref updates/attempt, decaying)",
+      "evidence": "arca#47 (CI green at ac585ba)",
+      "state": "PASS_LOCAL"
+    },
+    {
+      "id": "VM-009",
+      "obligation": "No retry of permanent authorization failures",
+      "package": "R7-REM-002",
+      "verification": "Adapter tests: 401 once despite edits; 403 once",
+      "evidence": "arca#47 (CI green at ac585ba)",
+      "state": "PASS_LOCAL"
+    },
+    {
+      "id": "VM-010",
+      "obligation": "No duplicate logical writes",
+      "package": "R7-REM-002",
+      "verification": "Idempotency keys + reconciliation; applied-then-502 lands exactly once",
+      "evidence": "arca#47 (CI green at ac585ba)",
+      "state": "PASS_LOCAL"
+    },
+    {
+      "id": "VM-011",
+      "obligation": "Network restoration",
+      "package": "R7-REM-002",
+      "verification": "Adapter tests: recovery after outage (one ref update, confirmed); drain without online event",
+      "evidence": "arca#47 (CI green at ac585ba)",
+      "state": "PASS_LOCAL"
+    },
+    {
+      "id": "VM-012",
+      "obligation": "Durable preservation of unsent changes",
+      "package": "R7-REM-001/002",
+      "verification": "IndexedDB queue fenced saves; restart spec",
+      "evidence": "arca#47 (CI green at ac585ba)",
+      "state": "PASS_LOCAL"
+    },
+    {
+      "id": "VM-013",
+      "obligation": "UI distinguishes saved locally / waiting / sending / confirmed / conflict / permanent failure",
+      "package": "R7-REM-002",
+      "verification": "SaveState.ofQueue (9 states) + tests; application rendering is Rehearsal 7 work",
+      "evidence": "arca#47 (CI green at ac585ba)",
+      "state": "PASS_LOCAL"
+    },
+    {
+      "id": "VM-014",
+      "obligation": "Never report remote persistence before confirmation",
+      "package": "R7-REM-002",
+      "verification": "Property: confirmed iff synchronized (real synchronized queue)",
+      "evidence": "arca#47 (CI green at ac585ba)",
+      "state": "PASS_LOCAL"
+    },
+    {
+      "id": "VM-015",
+      "obligation": "Network failure never presented as a conflict (RF-F-3)",
+      "package": "R7-REM-002",
+      "verification": "Deferral classification; 5xx/unreadable write answers reconciled",
+      "evidence": "arca#47 (CI green at ac585ba)",
+      "state": "PASS_LOCAL"
+    },
+    {
+      "id": "VM-016",
+      "obligation": "Read credential cannot write; write credential scoped",
+      "package": "R7-REM-003",
+      "verification": "Credential probe workflow (SECURITY-REVIEW \u00a71)",
+      "evidence": "\u2014",
+      "state": "BLOCKED"
+    },
+    {
+      "id": "VM-017",
+      "obligation": "Superseded development runs cancelled; cancelled runs start no jobs",
+      "package": "R7-REM-004",
+      "verification": "ci-policy CIP-001..004, CIP-008; scaffold guard tests",
+      "evidence": "conditor#122 (CI green)",
+      "state": "PASS_LOCAL"
+    },
+    {
+      "id": "VM-018",
+      "obligation": "Candidate verification not cancelled by development commits",
+      "package": "R7-REM-004",
+      "verification": "ci-policy CIP-007; candidate-acceptance.yml template",
+      "evidence": "conditor#122",
+      "state": "PASS_LOCAL"
+    },
+    {
+      "id": "VM-019",
+      "obligation": "Controlled commit bursts (5, 15, concurrent, candidate during development) measured",
+      "package": "R7-REM-004",
+      "verification": "Experiment B procedure (CI-PERFORMANCE \u00a74)",
+      "evidence": "\u2014",
+      "state": "NOT_RUN"
+    },
+    {
+      "id": "VM-020",
+      "obligation": "Parallel build isolation (MSB3030)",
+      "package": "R7-REM-004",
+      "verification": "Source assessment only",
+      "evidence": "CI-PERFORMANCE \u00a75",
+      "state": "NOT_RUN"
+    },
+    {
+      "id": "VM-021",
+      "obligation": "Real PR merged without routine owner intervention",
+      "package": "R7-REM-005",
+      "verification": "conditor unattended-readiness",
+      "evidence": "praxis evidence 2026-10-29 readiness receipt (READY, PR #20 -> 9c3aaf6)",
+      "state": "PASS"
+    },
+    {
+      "id": "VM-022",
+      "obligation": "Merge gate enforced by GitHub, not advisory (UAE-R7-12)",
+      "package": "R7-REM-005",
+      "verification": "Ruleset + Actions secret",
+      "evidence": "\u2014",
+      "state": "BLOCKED"
+    },
+    {
+      "id": "VM-023",
+      "obligation": "Evidence generated by the operation that produces it; no avoidable NOT_RUN",
+      "package": "R7-REM-006",
+      "verification": "Experiment D",
+      "evidence": "\u2014",
+      "state": "NOT_RUN"
+    },
+    {
+      "id": "VM-024",
+      "obligation": "Candidate selected only from green core verification of its SHA",
+      "package": "R7-REM-007",
+      "verification": "candidate-acceptance.yml pin + verify jobs",
+      "evidence": "conditor#122 (template; not exercised on GitHub)",
+      "state": "NOT_RUN"
+    },
+    {
+      "id": "VM-025",
+      "obligation": "Served SHA equals candidate SHA",
+      "package": "R7-REM-007",
+      "verification": "deployed-smoke (proven in Rehearsal 6)",
+      "evidence": "R6 final acceptance",
+      "state": "PASS"
+    },
+    {
+      "id": "VM-026",
+      "obligation": "Defect closures bound to fix commits in the rehearsal's own history",
+      "package": "R7-REM-008",
+      "verification": "verify-defect-closures DCL-001..014 (base read from git: the commit that added the kickoff record)",
+      "evidence": "Offline tests at 2e4b561; R6 run REFUSED 8/8 (evidence/defect-closures-r6.json); independent review PASS_WITH_FINDINGS, findings fixed",
+      "state": "PASS_LOCAL"
+    },
+    {
+      "id": "VM-027",
+      "obligation": "Non-text indicators >= 3:1 (rendered), high contrast supported",
+      "package": "R7-REM-009",
+      "verification": "A11Y-NONTEXT-CONTRAST; token test (30 contexts); Chromium spec light/dark/forced colors on renderer output",
+      "evidence": "forma#173 (review PASS; CI green on ac34a55)",
+      "state": "PASS_LOCAL"
+    },
+    {
+      "id": "VM-028",
+      "obligation": "Pre-lock newest-release comparison recorded",
+      "package": "R7-REM-010",
+      "verification": "release-comparison observe/assess",
+      "evidence": "Offline tests at c08c23e; live demonstration 2026-10-29T11:08Z PASS (evidence/release-comparison-demo.json); independent review: no open finding, N4 limit stated",
+      "state": "PASS_LOCAL"
+    },
+    {
+      "id": "VM-029",
+      "obligation": "Weakened tests detected (RF-F-8)",
+      "package": "R7-REM-011",
+      "verification": "assertion-ratchet (base read from git: the commit that added the kickoff record)",
+      "evidence": "Offline tests at 2e4b561; R6 run FAIL, 45 unrecorded removals incl. both UI-034 weakenings, base c80f35e from the real kickoff record (evidence/assertion-ratchet-r6.json); independent review PASS_WITH_FINDINGS, findings fixed",
+      "state": "PASS_LOCAL"
+    },
+    {
+      "id": "VM-031",
+      "obligation": "Causa persistence under ADR-R7-001: independent tabs, expected-head commits, no queue, bounded retries, truthful seven save states",
+      "package": "ADR-R7-001",
+      "verification": "PAT-01..15 (PERSIST-040..054), PAT-02/04/10 live (PERSIST-025)",
+      "evidence": "Rehearsal 7 run",
+      "state": "NOT_RUN"
+    },
+    {
+      "id": "VM-030",
+      "obligation": "Independent adversarial review of each work package",
+      "package": "R7-REM-011",
+      "verification": "Independent agent reviews (SECURITY-REVIEW \u00a74)",
+      "evidence": "See READINESS R7-PF-12",
+      "state": "IN_PROGRESS"
+    }
+  ]
+}

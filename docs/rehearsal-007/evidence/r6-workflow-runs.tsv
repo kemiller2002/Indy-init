@@ -1,0 +1,427 @@
+40803997371	Echelon foundations	push	main	41fb6d6	completed	success	2026-10-29T02:02:40Z	2026-10-29T02:02:40Z	2026-10-29T02:02:56Z	1
+40803996763	Praxis validation	push	main	41fb6d6	completed	success	2026-10-29T02:02:39Z	2026-10-29T02:02:39Z	2026-10-29T02:03:01Z	1
+40803996784	Build and test	push	main	41fb6d6	completed	failure	2026-10-29T02:02:39Z	2026-10-29T02:02:39Z	2026-10-29T02:38:15Z	1
+40803128103	Acceptance (final)	workflow_dispatch	main	bf190b6	completed	failure	2026-10-29T01:53:38Z	2026-10-29T01:53:38Z	2026-10-29T01:55:26Z	1
+40800349145	Build and test	push	main	bf190b6	completed	cancelled	2026-10-29T01:25:34Z	2026-10-29T01:25:34Z	2026-10-29T01:26:40Z	1
+40800349271	Echelon foundations	push	main	bf190b6	completed	success	2026-10-29T01:25:34Z	2026-10-29T01:25:34Z	2026-10-29T01:27:19Z	1
+40800348878	Praxis validation	push	main	bf190b6	completed	success	2026-10-29T01:25:34Z	2026-10-29T01:25:34Z	2026-10-29T01:25:53Z	1
+40800260910	Echelon foundations	push	main	f64a287	completed	success	2026-10-29T01:24:43Z	2026-10-29T01:24:43Z	2026-10-29T01:26:11Z	1
+40800260380	Praxis validation	push	main	f64a287	completed	success	2026-10-29T01:24:43Z	2026-10-29T01:24:43Z	2026-10-29T01:25:04Z	1
+40800260257	Build and test	push	main	f64a287	completed	cancelled	2026-10-29T01:24:43Z	2026-10-29T01:24:43Z	2026-10-29T01:25:15Z	1
+40798638546	Echelon foundations	push	main	46d5e11	completed	success	2026-10-29T01:09:10Z	2026-10-29T01:09:10Z	2026-10-29T01:18:00Z	1
+40798638092	Build and test	push	main	46d5e11	completed	failure	2026-10-29T01:09:09Z	2026-10-29T01:09:09Z	2026-10-29T01:49:45Z	1
+40798638113	Praxis validation	push	main	46d5e11	completed	success	2026-10-29T01:09:09Z	2026-10-29T01:09:09Z	2026-10-29T01:16:53Z	1
+40798610826	Build and test	push	main	5169ded	completed	cancelled	2026-10-29T01:08:54Z	2026-10-29T01:08:54Z	2026-10-29T01:09:37Z	1
+40798610821	Praxis validation	push	main	5169ded	completed	success	2026-10-29T01:08:54Z	2026-10-29T01:08:54Z	2026-10-29T01:16:39Z	1
+40798611251	Echelon foundations	push	main	5169ded	completed	success	2026-10-29T01:08:54Z	2026-10-29T01:08:54Z	2026-10-29T01:16:50Z	1
+40798427936	Echelon foundations	push	main	90b7b19	completed	success	2026-10-29T01:07:07Z	2026-10-29T01:07:07Z	2026-10-29T01:12:03Z	1
+40798427353	Praxis validation	push	main	90b7b19	completed	success	2026-10-29T01:07:07Z	2026-10-29T01:07:07Z	2026-10-29T01:07:55Z	1
+40798427562	Build and test	push	main	90b7b19	completed	cancelled	2026-10-29T01:07:07Z	2026-10-29T01:07:07Z	2026-10-29T01:10:40Z	1
+40796685144	Echelon foundations	push	r6/attest-base-review	e7766df	completed	success	2026-10-29T00:50:47Z	2026-10-29T00:50:47Z	2026-10-29T00:53:01Z	1
+40796684730	Praxis validation	push	r6/attest-base-review	e7766df	completed	success	2026-10-29T00:50:47Z	2026-10-29T00:50:47Z	2026-10-29T00:51:23Z	1
+40796684320	Praxis validation	push	r6/attest-base-final	e7766df	completed	success	2026-10-29T00:50:47Z	2026-10-29T00:50:47Z	2026-10-29T00:51:25Z	1
+40796684983	Echelon foundations	push	r6/attest-base-final	e7766df	completed	success	2026-10-29T00:50:47Z	2026-10-29T00:50:47Z	2026-10-29T00:51:26Z	1
+40796684723	Praxis validation	push	r6/candidate	02c37d1	completed	success	2026-10-29T00:50:47Z	2026-10-29T00:50:47Z	2026-10-29T00:51:21Z	1
+40796685081	Echelon foundations	push	r6/candidate	02c37d1	completed	success	2026-10-29T00:50:47Z	2026-10-29T00:50:47Z	2026-10-29T00:52:34Z	1
+40796631052	Praxis validation	push	main	02c37d1	completed	success	2026-10-29T00:50:17Z	2026-10-29T00:50:17Z	2026-10-29T00:51:01Z	1
+40796631951	Echelon foundations	push	main	02c37d1	completed	success	2026-10-29T00:50:17Z	2026-10-29T00:50:17Z	2026-10-29T00:52:35Z	1
+40796631060	Build and test	push	main	02c37d1	completed	cancelled	2026-10-29T00:50:17Z	2026-10-29T00:50:17Z	2026-10-29T01:07:44Z	1
+40796451094	Praxis validation	push	main	e7766df	completed	success	2026-10-29T00:48:31Z	2026-10-29T00:48:31Z	2026-10-29T00:49:55Z	1
+40796451379	Echelon foundations	push	main	e7766df	completed	success	2026-10-29T00:48:31Z	2026-10-29T00:48:31Z	2026-10-29T00:51:13Z	1
+40796450940	Build and test	push	main	e7766df	completed	cancelled	2026-10-29T00:48:31Z	2026-10-29T00:48:31Z	2026-10-29T00:51:32Z	1
+40796377487	Echelon foundations	push	main	934c952	completed	success	2026-10-29T00:47:49Z	2026-10-29T00:47:49Z	2026-10-29T00:49:59Z	1
+40796377344	Build and test	push	main	934c952	completed	cancelled	2026-10-29T00:47:49Z	2026-10-29T00:47:49Z	2026-10-29T00:50:52Z	1
+40796377175	Praxis validation	push	main	934c952	completed	success	2026-10-29T00:47:48Z	2026-10-29T00:47:48Z	2026-10-29T00:48:10Z	1
+40796312709	Praxis validation	push	main	90967e4	completed	success	2026-10-29T00:47:11Z	2026-10-29T00:47:11Z	2026-10-29T00:47:29Z	1
+40796313284	Echelon foundations	push	main	90967e4	completed	success	2026-10-29T00:47:11Z	2026-10-29T00:47:11Z	2026-10-29T00:49:22Z	1
+40796312688	Build and test	push	main	90967e4	completed	cancelled	2026-10-29T00:47:11Z	2026-10-29T00:47:11Z	2026-10-29T00:51:44Z	1
+40794603636	Echelon foundations	push	main	93c764c	completed	success	2026-10-29T00:31:22Z	2026-10-29T00:31:22Z	2026-10-29T00:32:59Z	1
+40794603194	Praxis validation	push	main	93c764c	completed	success	2026-10-29T00:31:22Z	2026-10-29T00:31:22Z	2026-10-29T00:31:43Z	1
+40794603232	Build and test	push	main	93c764c	completed	cancelled	2026-10-29T00:31:22Z	2026-10-29T00:31:22Z	2026-10-29T00:50:56Z	1
+40792489985	Praxis validation	push	main	e12979d	completed	success	2026-10-29T00:12:14Z	2026-10-29T00:12:14Z	2026-10-29T00:12:55Z	1
+40792490344	Echelon foundations	push	main	e12979d	completed	success	2026-10-29T00:12:14Z	2026-10-29T00:12:14Z	2026-10-29T00:14:34Z	1
+40792489980	Build and test	push	main	e12979d	completed	failure	2026-10-29T00:12:14Z	2026-10-29T00:12:14Z	2026-10-29T00:49:14Z	1
+40792405029	Praxis validation	push	main	085d8ff	completed	success	2026-10-29T00:11:27Z	2026-10-29T00:11:27Z	2026-10-29T00:11:44Z	1
+40792405312	Echelon foundations	push	main	085d8ff	completed	success	2026-10-29T00:11:27Z	2026-10-29T00:11:27Z	2026-10-29T00:13:09Z	1
+40792404891	Build and test	push	main	085d8ff	completed	cancelled	2026-10-29T00:11:27Z	2026-10-29T00:11:27Z	2026-10-29T00:30:50Z	1
+40792115163	Echelon foundations	push	main	ed8ca00	completed	success	2026-10-29T00:08:50Z	2026-10-29T00:08:50Z	2026-10-29T00:10:42Z	1
+40792114710	Build and test	push	main	ed8ca00	completed	cancelled	2026-10-29T00:08:50Z	2026-10-29T00:08:50Z	2026-10-29T00:31:14Z	1
+40792114563	Praxis validation	push	main	ed8ca00	completed	success	2026-10-29T00:08:50Z	2026-10-29T00:08:50Z	2026-10-29T00:09:08Z	1
+40791896909	Build and test	push	main	daad1e5	completed	cancelled	2026-10-29T00:06:55Z	2026-10-29T00:06:55Z	2026-10-29T00:30:06Z	1
+40791896984	Praxis validation	push	main	daad1e5	completed	success	2026-10-29T00:06:55Z	2026-10-29T00:06:55Z	2026-10-29T00:07:13Z	1
+40791897418	Echelon foundations	push	main	daad1e5	completed	success	2026-10-29T00:06:55Z	2026-10-29T00:06:55Z	2026-10-29T00:08:30Z	1
+40790534132	Build and test	push	main	c658496	completed	cancelled	2026-10-28T23:54:36Z	2026-10-28T23:54:36Z	2026-10-28T23:55:41Z	1
+40790534191	Praxis validation	push	main	c658496	completed	success	2026-10-28T23:54:36Z	2026-10-28T23:54:36Z	2026-10-28T23:54:55Z	1
+40790534508	Echelon foundations	push	main	c658496	completed	success	2026-10-28T23:54:36Z	2026-10-28T23:54:36Z	2026-10-28T23:56:46Z	1
+40790413626	Cancel superseded runs	workflow_dispatch	main	6646ef2	completed	success	2026-10-28T23:53:30Z	2026-10-28T23:53:30Z	2026-10-28T23:53:56Z	1
+40790397684	Build and test	push	main	6646ef2	completed	failure	2026-10-28T23:53:21Z	2026-10-28T23:53:21Z	2026-10-29T00:35:04Z	1
+40790398121	Echelon foundations	push	main	6646ef2	completed	success	2026-10-28T23:53:21Z	2026-10-28T23:53:21Z	2026-10-28T23:55:15Z	1
+40790397548	Praxis validation	push	main	6646ef2	completed	success	2026-10-28T23:53:21Z	2026-10-28T23:53:21Z	2026-10-28T23:54:03Z	1
+40790291299	Echelon foundations	push	main	9d26248	completed	success	2026-10-28T23:52:21Z	2026-10-28T23:52:21Z	2026-10-28T23:55:31Z	1
+40790290820	Build and test	push	main	9d26248	completed	cancelled	2026-10-28T23:52:21Z	2026-10-28T23:52:21Z	2026-10-28T23:53:55Z	1
+40790290775	Praxis validation	push	main	9d26248	completed	success	2026-10-28T23:52:21Z	2026-10-28T23:52:21Z	2026-10-28T23:54:06Z	1
+40790219931	Echelon foundations	push	main	d3cfe92	completed	success	2026-10-28T23:51:40Z	2026-10-28T23:51:40Z	2026-10-28T23:55:24Z	1
+40790219438	Build and test	push	main	d3cfe92	completed	cancelled	2026-10-28T23:51:40Z	2026-10-28T23:51:40Z	2026-10-28T23:53:53Z	1
+40790219256	Praxis validation	push	main	d3cfe92	completed	success	2026-10-28T23:51:40Z	2026-10-28T23:51:40Z	2026-10-28T23:54:05Z	1
+40788025181	Echelon foundations	push	main	8a13e6a	completed	success	2026-10-28T23:32:06Z	2026-10-28T23:32:06Z	2026-10-28T23:55:36Z	1
+40788024471	Build and test	push	main	8a13e6a	completed	cancelled	2026-10-28T23:32:05Z	2026-10-28T23:32:05Z	2026-10-28T23:53:45Z	1
+40788024465	Praxis validation	push	main	8a13e6a	completed	success	2026-10-28T23:32:05Z	2026-10-28T23:32:05Z	2026-10-28T23:53:52Z	1
+40787741383	Build and test	push	main	743021a	completed	cancelled	2026-10-28T23:29:40Z	2026-10-28T23:29:40Z	2026-10-28T23:32:26Z	1
+40787741387	Praxis validation	push	main	743021a	completed	success	2026-10-28T23:29:40Z	2026-10-28T23:29:40Z	2026-10-28T23:52:34Z	1
+40787741908	Echelon foundations	push	main	743021a	completed	success	2026-10-28T23:29:40Z	2026-10-28T23:29:40Z	2026-10-28T23:53:56Z	1
+40787712701	Build and test	push	main	b9665b7	completed	cancelled	2026-10-28T23:29:25Z	2026-10-28T23:29:25Z	2026-10-28T23:32:26Z	1
+40787712747	Praxis validation	push	main	b9665b7	completed	success	2026-10-28T23:29:25Z	2026-10-28T23:29:25Z	2026-10-28T23:50:22Z	1
+40787712951	Echelon foundations	push	main	b9665b7	completed	success	2026-10-28T23:29:25Z	2026-10-28T23:29:25Z	2026-10-28T23:53:56Z	1
+40787588543	Praxis validation	push	main	f6b77c7	completed	success	2026-10-28T23:28:18Z	2026-10-28T23:28:18Z	2026-10-28T23:49:39Z	1
+40787588557	Build and test	push	main	f6b77c7	completed	cancelled	2026-10-28T23:28:18Z	2026-10-28T23:28:18Z	2026-10-28T23:53:45Z	1
+40787588850	Echelon foundations	push	main	f6b77c7	completed	success	2026-10-28T23:28:18Z	2026-10-28T23:28:18Z	2026-10-28T23:53:51Z	1
+40787474173	Praxis validation	push	main	3d86462	completed	success	2026-10-28T23:27:17Z	2026-10-28T23:27:17Z	2026-10-28T23:49:29Z	1
+40787474181	Build and test	push	main	3d86462	completed	cancelled	2026-10-28T23:27:17Z	2026-10-28T23:27:17Z	2026-10-28T23:53:44Z	1
+40787474658	Echelon foundations	push	main	3d86462	completed	success	2026-10-28T23:27:17Z	2026-10-28T23:27:17Z	2026-10-28T23:53:52Z	1
+40787448753	Echelon foundations	push	main	e692c29	completed	success	2026-10-28T23:27:03Z	2026-10-28T23:27:03Z	2026-10-28T23:53:50Z	1
+40787448098	Build and test	push	main	e692c29	completed	cancelled	2026-10-28T23:27:03Z	2026-10-28T23:27:03Z	2026-10-28T23:53:44Z	1
+40787448107	Praxis validation	push	main	e692c29	completed	success	2026-10-28T23:27:03Z	2026-10-28T23:27:03Z	2026-10-28T23:40:54Z	1
+40787374910	Echelon foundations	push	main	ca4ecef	completed	success	2026-10-28T23:26:25Z	2026-10-28T23:26:25Z	2026-10-28T23:53:50Z	1
+40787374560	Build and test	push	main	ca4ecef	completed	cancelled	2026-10-28T23:26:25Z	2026-10-28T23:26:25Z	2026-10-28T23:53:43Z	1
+40787374559	Praxis validation	push	main	ca4ecef	completed	success	2026-10-28T23:26:25Z	2026-10-28T23:26:25Z	2026-10-28T23:39:53Z	1
+40787326881	Echelon foundations	push	main	b352140	completed	success	2026-10-28T23:26:01Z	2026-10-28T23:26:01Z	2026-10-28T23:53:42Z	1
+40787326315	Build and test	push	main	b352140	completed	cancelled	2026-10-28T23:26:00Z	2026-10-28T23:26:00Z	2026-10-28T23:53:43Z	1
+40787326265	Praxis validation	push	main	b352140	completed	success	2026-10-28T23:26:00Z	2026-10-28T23:26:00Z	2026-10-28T23:37:47Z	1
+40783919709	Praxis validation	push	main	9104c74	completed	success	2026-10-28T22:58:07Z	2026-10-28T22:58:07Z	2026-10-28T23:12:03Z	1
+40783920273	Echelon foundations	push	main	9104c74	completed	success	2026-10-28T22:58:07Z	2026-10-28T22:58:07Z	2026-10-28T23:29:04Z	1
+40783919665	Build and test	push	main	9104c74	completed	cancelled	2026-10-28T22:58:07Z	2026-10-28T22:58:07Z	2026-10-28T23:53:42Z	1
+40783679673	Echelon foundations	push	main	5a846fe	completed	success	2026-10-28T22:56:05Z	2026-10-28T22:56:05Z	2026-10-28T23:17:00Z	1
+40783679173	Praxis validation	push	main	5a846fe	completed	success	2026-10-28T22:56:05Z	2026-10-28T22:56:05Z	2026-10-28T22:57:35Z	1
+40783679165	Build and test	push	main	5a846fe	completed	cancelled	2026-10-28T22:56:05Z	2026-10-28T22:56:05Z	2026-10-28T23:53:42Z	1
+40783635660	Echelon foundations	push	main	d51e503	completed	success	2026-10-28T22:55:43Z	2026-10-28T22:55:43Z	2026-10-28T23:02:29Z	1
+40783635250	Praxis validation	push	main	d51e503	completed	success	2026-10-28T22:55:43Z	2026-10-28T22:55:43Z	2026-10-28T22:56:48Z	1
+40783635245	Build and test	push	main	d51e503	completed	cancelled	2026-10-28T22:55:43Z	2026-10-28T22:55:43Z	2026-10-28T23:53:41Z	1
+40783622937	Echelon foundations	push	main	2409d86	completed	success	2026-10-28T22:55:37Z	2026-10-28T22:55:37Z	2026-10-28T23:11:56Z	1
+40783622456	Praxis validation	push	main	2409d86	completed	success	2026-10-28T22:55:36Z	2026-10-28T22:55:36Z	2026-10-28T22:56:38Z	1
+40783622537	Build and test	push	main	2409d86	completed	cancelled	2026-10-28T22:55:36Z	2026-10-28T22:55:36Z	2026-10-28T23:53:40Z	1
+40783530996	Echelon foundations	push	main	81556d0	completed	success	2026-10-28T22:54:51Z	2026-10-28T22:54:51Z	2026-10-28T22:58:49Z	1
+40783530414	Praxis validation	push	main	81556d0	completed	success	2026-10-28T22:54:51Z	2026-10-28T22:54:51Z	2026-10-28T22:55:33Z	1
+40783530432	Build and test	push	main	81556d0	completed	cancelled	2026-10-28T22:54:51Z	2026-10-28T22:54:51Z	2026-10-28T23:53:40Z	1
+40783421239	Praxis validation	push	main	efece86	completed	success	2026-10-28T22:53:57Z	2026-10-28T22:53:57Z	2026-10-28T22:55:26Z	1
+40783421777	Echelon foundations	push	main	efece86	completed	success	2026-10-28T22:53:57Z	2026-10-28T22:53:57Z	2026-10-28T22:57:49Z	1
+40783421170	Build and test	push	main	efece86	completed	cancelled	2026-10-28T22:53:57Z	2026-10-28T22:53:57Z	2026-10-28T23:53:38Z	1
+40783047450	Echelon foundations	push	main	78595b1	completed	success	2026-10-28T22:50:53Z	2026-10-28T22:50:53Z	2026-10-28T22:55:20Z	1
+40783046843	Praxis validation	push	main	78595b1	completed	success	2026-10-28T22:50:52Z	2026-10-28T22:50:52Z	2026-10-28T22:53:37Z	1
+40783046832	Build and test	push	main	78595b1	completed	cancelled	2026-10-28T22:50:52Z	2026-10-28T22:50:52Z	2026-10-28T23:53:38Z	1
+40782862264	Echelon foundations	push	main	2ce412e	completed	success	2026-10-28T22:49:22Z	2026-10-28T22:49:22Z	2026-10-28T22:56:57Z	1
+40782861614	Praxis validation	push	main	2ce412e	completed	success	2026-10-28T22:49:22Z	2026-10-28T22:49:22Z	2026-10-28T22:53:26Z	1
+40782861628	Build and test	push	main	2ce412e	completed	cancelled	2026-10-28T22:49:22Z	2026-10-28T22:49:22Z	2026-10-28T23:53:38Z	1
+40782642471	Echelon foundations	push	main	4c67fb6	completed	success	2026-10-28T22:47:33Z	2026-10-28T22:47:33Z	2026-10-28T22:55:02Z	1
+40782641934	Praxis validation	push	main	4c67fb6	completed	success	2026-10-28T22:47:33Z	2026-10-28T22:47:33Z	2026-10-28T22:52:55Z	1
+40782642227	Build and test	push	main	4c67fb6	completed	cancelled	2026-10-28T22:47:33Z	2026-10-28T22:47:33Z	2026-10-28T23:53:36Z	1
+40782090903	Praxis validation	push	main	ed24249	completed	success	2026-10-28T22:43:07Z	2026-10-28T22:43:07Z	2026-10-28T22:51:34Z	1
+40782091099	Echelon foundations	push	main	ed24249	completed	success	2026-10-28T22:43:07Z	2026-10-28T22:43:07Z	2026-10-28T22:53:52Z	1
+40782090986	Build and test	push	main	ed24249	completed	cancelled	2026-10-28T22:43:07Z	2026-10-28T22:43:07Z	2026-10-28T23:53:36Z	1
+40781903520	Praxis validation	push	main	330bcf5	completed	success	2026-10-28T22:41:35Z	2026-10-28T22:41:35Z	2026-10-28T22:51:30Z	1
+40781904144	Echelon foundations	push	main	330bcf5	completed	success	2026-10-28T22:41:35Z	2026-10-28T22:41:35Z	2026-10-28T22:54:02Z	1
+40781903540	Build and test	push	main	330bcf5	completed	cancelled	2026-10-28T22:41:35Z	2026-10-28T22:41:35Z	2026-10-28T23:53:36Z	1
+40781855442	Praxis validation	push	main	a6fa285	completed	success	2026-10-28T22:41:11Z	2026-10-28T22:41:11Z	2026-10-28T22:51:22Z	1
+40781855869	Echelon foundations	push	main	a6fa285	completed	success	2026-10-28T22:41:11Z	2026-10-28T22:41:11Z	2026-10-28T22:53:46Z	1
+40781855456	Build and test	push	main	a6fa285	completed	cancelled	2026-10-28T22:41:11Z	2026-10-28T22:41:11Z	2026-10-28T23:53:35Z	1
+40781827051	Praxis validation	push	main	b55743e	completed	success	2026-10-28T22:40:57Z	2026-10-28T22:40:57Z	2026-10-28T22:50:49Z	1
+40781827707	Echelon foundations	push	main	b55743e	completed	success	2026-10-28T22:40:57Z	2026-10-28T22:40:57Z	2026-10-28T22:53:37Z	1
+40781827069	Build and test	push	main	b55743e	completed	cancelled	2026-10-28T22:40:57Z	2026-10-28T22:40:57Z	2026-10-28T23:53:34Z	1
+40781642357	Praxis validation	push	main	0a3c8cc	completed	success	2026-10-28T22:39:29Z	2026-10-28T22:39:29Z	2026-10-28T22:50:10Z	1
+40781642747	Echelon foundations	push	main	0a3c8cc	completed	success	2026-10-28T22:39:29Z	2026-10-28T22:39:29Z	2026-10-28T22:53:32Z	1
+40781642320	Build and test	push	main	0a3c8cc	completed	cancelled	2026-10-28T22:39:29Z	2026-10-28T22:39:29Z	2026-10-28T23:53:34Z	1
+40781621747	Echelon foundations	push	main	4de9689	completed	success	2026-10-28T22:39:19Z	2026-10-28T22:39:19Z	2026-10-28T22:53:26Z	1
+40781621261	Praxis validation	push	main	4de9689	completed	success	2026-10-28T22:39:19Z	2026-10-28T22:39:19Z	2026-10-28T22:49:50Z	1
+40781621277	Build and test	push	main	4de9689	completed	cancelled	2026-10-28T22:39:19Z	2026-10-28T22:39:19Z	2026-10-28T23:53:33Z	1
+40781574837	Praxis validation	pull_request	r6/review-1	93fc1f8	completed	success	2026-10-28T22:38:56Z	2026-10-28T22:38:56Z	2026-10-28T22:39:38Z	1
+40781575268	Echelon foundations	pull_request	r6/review-1	93fc1f8	completed	success	2026-10-28T22:38:56Z	2026-10-28T22:38:56Z	2026-10-28T22:50:40Z	1
+40781574844	Build and test	pull_request	r6/review-1	93fc1f8	completed	cancelled	2026-10-28T22:38:56Z	2026-10-28T22:38:56Z	2026-10-28T23:53:33Z	1
+40781568392	Echelon foundations	push	r6/review-1	93fc1f8	completed	success	2026-10-28T22:38:53Z	2026-10-28T22:38:53Z	2026-10-28T22:51:02Z	1
+40781567773	Praxis validation	push	r6/review-1	93fc1f8	completed	success	2026-10-28T22:38:52Z	2026-10-28T22:38:52Z	2026-10-28T22:41:45Z	1
+40781472108	Echelon foundations	push	main	78088ad	completed	success	2026-10-28T22:38:07Z	2026-10-28T22:38:07Z	2026-10-28T22:51:49Z	1
+40781470667	Praxis validation	push	main	78088ad	completed	success	2026-10-28T22:38:06Z	2026-10-28T22:38:06Z	2026-10-28T22:49:28Z	1
+40781470646	Build and test	push	main	78088ad	completed	cancelled	2026-10-28T22:38:06Z	2026-10-28T22:38:06Z	2026-10-28T23:53:32Z	1
+40781344901	Echelon foundations	push	main	565ff1f	completed	success	2026-10-28T22:37:06Z	2026-10-28T22:37:06Z	2026-10-28T22:53:00Z	1
+40781344364	Praxis validation	push	main	565ff1f	completed	success	2026-10-28T22:37:06Z	2026-10-28T22:37:06Z	2026-10-28T22:48:09Z	1
+40781344369	Build and test	push	main	565ff1f	completed	cancelled	2026-10-28T22:37:06Z	2026-10-28T22:37:06Z	2026-10-28T23:53:32Z	1
+40781316768	Echelon foundations	push	main	5957bd0	completed	success	2026-10-28T22:36:53Z	2026-10-28T22:36:53Z	2026-10-28T22:52:10Z	1
+40781316560	Praxis validation	push	main	5957bd0	completed	success	2026-10-28T22:36:53Z	2026-10-28T22:36:53Z	2026-10-28T22:48:07Z	1
+40781316561	Build and test	push	main	5957bd0	completed	cancelled	2026-10-28T22:36:53Z	2026-10-28T22:36:53Z	2026-10-28T23:53:31Z	1
+40781294029	Echelon foundations	push	main	a2f609f	completed	success	2026-10-28T22:36:43Z	2026-10-28T22:36:43Z	2026-10-28T22:52:32Z	1
+40781293516	Praxis validation	push	main	a2f609f	completed	success	2026-10-28T22:36:42Z	2026-10-28T22:36:42Z	2026-10-28T22:47:27Z	1
+40781293491	Build and test	push	main	a2f609f	completed	cancelled	2026-10-28T22:36:42Z	2026-10-28T22:36:42Z	2026-10-28T23:53:30Z	1
+40781239473	Praxis validation	push	main	323e436	completed	success	2026-10-28T22:36:17Z	2026-10-28T22:36:17Z	2026-10-28T22:46:42Z	1
+40781240087	Echelon foundations	push	main	323e436	completed	success	2026-10-28T22:36:17Z	2026-10-28T22:36:17Z	2026-10-28T22:52:00Z	1
+40781239477	Build and test	push	main	323e436	completed	cancelled	2026-10-28T22:36:17Z	2026-10-28T22:36:17Z	2026-10-28T23:53:30Z	1
+40781213951	Praxis validation	push	main	8ce8241	completed	success	2026-10-28T22:36:05Z	2026-10-28T22:36:05Z	2026-10-28T22:46:33Z	1
+40781214591	Echelon foundations	push	main	8ce8241	completed	success	2026-10-28T22:36:05Z	2026-10-28T22:36:05Z	2026-10-28T22:51:10Z	1
+40781213957	Build and test	push	main	8ce8241	completed	cancelled	2026-10-28T22:36:05Z	2026-10-28T22:36:05Z	2026-10-28T23:53:30Z	1
+40781152238	Echelon foundations	push	main	4a99a0d	completed	success	2026-10-28T22:35:36Z	2026-10-28T22:35:36Z	2026-10-28T22:50:56Z	1
+40781151396	Praxis validation	push	main	4a99a0d	completed	success	2026-10-28T22:35:35Z	2026-10-28T22:35:35Z	2026-10-28T22:45:50Z	1
+40781151561	Build and test	push	main	4a99a0d	completed	cancelled	2026-10-28T22:35:35Z	2026-10-28T22:35:35Z	2026-10-28T23:53:29Z	1
+40781102971	Praxis validation	push	main	72a46ee	completed	success	2026-10-28T22:35:13Z	2026-10-28T22:35:13Z	2026-10-28T22:45:39Z	1
+40781103360	Echelon foundations	push	main	72a46ee	completed	success	2026-10-28T22:35:13Z	2026-10-28T22:35:13Z	2026-10-28T22:48:26Z	1
+40781102764	Build and test	push	main	72a46ee	completed	cancelled	2026-10-28T22:35:13Z	2026-10-28T22:35:13Z	2026-10-28T23:53:28Z	1
+40781088718	Praxis validation	push	main	9956868	completed	success	2026-10-28T22:35:07Z	2026-10-28T22:35:07Z	2026-10-28T22:45:23Z	1
+40781089383	Echelon foundations	push	main	9956868	completed	success	2026-10-28T22:35:07Z	2026-10-28T22:35:07Z	2026-10-28T22:50:50Z	1
+40781088642	Build and test	push	main	9956868	completed	cancelled	2026-10-28T22:35:07Z	2026-10-28T22:35:07Z	2026-10-28T23:53:28Z	1
+40781039876	Praxis validation	push	main	85b1b33	completed	success	2026-10-28T22:34:44Z	2026-10-28T22:34:44Z	2026-10-28T22:44:47Z	1
+40781040274	Echelon foundations	push	main	85b1b33	completed	success	2026-10-28T22:34:44Z	2026-10-28T22:34:44Z	2026-10-28T22:48:31Z	1
+40781039882	Build and test	push	main	85b1b33	completed	cancelled	2026-10-28T22:34:44Z	2026-10-28T22:34:44Z	2026-10-28T23:53:27Z	1
+40780987419	Echelon foundations	push	main	e235c4a	completed	success	2026-10-28T22:34:21Z	2026-10-28T22:34:21Z	2026-10-28T22:47:58Z	1
+40780986894	Praxis validation	push	main	e235c4a	completed	success	2026-10-28T22:34:20Z	2026-10-28T22:34:20Z	2026-10-28T22:43:54Z	1
+40780986924	Build and test	push	main	e235c4a	completed	cancelled	2026-10-28T22:34:20Z	2026-10-28T22:34:20Z	2026-10-28T23:53:27Z	1
+40780916317	Echelon foundations	push	main	fafa8be	completed	success	2026-10-28T22:33:48Z	2026-10-28T22:33:48Z	2026-10-28T22:47:04Z	1
+40780915785	Praxis validation	push	main	fafa8be	completed	success	2026-10-28T22:33:47Z	2026-10-28T22:33:47Z	2026-10-28T22:41:21Z	1
+40780915777	Build and test	push	main	fafa8be	completed	cancelled	2026-10-28T22:33:47Z	2026-10-28T22:33:47Z	2026-10-28T23:53:26Z	1
+40780889181	Praxis validation	pull_request	r6/review-1	9ab9416	completed	success	2026-10-28T22:33:35Z	2026-10-28T22:33:35Z	2026-10-28T22:37:29Z	1
+40780884287	Echelon foundations	pull_request	r6/review-1	9ab9416	completed	success	2026-10-28T22:33:33Z	2026-10-28T22:33:33Z	2026-10-28T22:40:31Z	1
+40780883673	Build and test	pull_request	r6/review-1	9ab9416	completed	cancelled	2026-10-28T22:33:33Z	2026-10-28T22:33:33Z	2026-10-28T23:29:44Z	1
+40780874679	Echelon foundations	push	r6/review-1	9ab9416	completed	success	2026-10-28T22:33:29Z	2026-10-28T22:33:29Z	2026-10-28T22:37:48Z	1
+40780874048	Praxis validation	push	r6/review-1	9ab9416	completed	success	2026-10-28T22:33:28Z	2026-10-28T22:33:28Z	2026-10-28T22:35:09Z	1
+40780759324	Praxis validation	push	main	8701d31	completed	success	2026-10-28T22:32:36Z	2026-10-28T22:32:36Z	2026-10-28T22:39:31Z	1
+40780759883	Echelon foundations	push	main	8701d31	completed	success	2026-10-28T22:32:36Z	2026-10-28T22:32:36Z	2026-10-28T22:43:05Z	1
+40780759453	Build and test	push	main	8701d31	completed	cancelled	2026-10-28T22:32:36Z	2026-10-28T22:32:36Z	2026-10-28T23:53:25Z	1
+40779884316	Praxis validation	push	main	4efb3af	completed	success	2026-10-28T22:25:41Z	2026-10-28T22:25:41Z	2026-10-28T22:26:17Z	1
+40779884894	Echelon foundations	push	main	4efb3af	completed	success	2026-10-28T22:25:41Z	2026-10-28T22:25:41Z	2026-10-28T22:28:11Z	1
+40779884325	Build and test	push	main	4efb3af	completed	cancelled	2026-10-28T22:25:41Z	2026-10-28T22:25:41Z	2026-10-28T23:53:25Z	1
+40779780509	Praxis validation	push	main	f44b230	completed	success	2026-10-28T22:24:54Z	2026-10-28T22:24:54Z	2026-10-28T22:25:14Z	1
+40779781100	Echelon foundations	push	main	f44b230	completed	success	2026-10-28T22:24:54Z	2026-10-28T22:24:54Z	2026-10-28T22:27:10Z	1
+40779780371	Build and test	push	main	f44b230	completed	cancelled	2026-10-28T22:24:54Z	2026-10-28T22:24:54Z	2026-10-28T23:53:24Z	1
+40779754889	Praxis validation	push	main	4b0d434	completed	success	2026-10-28T22:24:42Z	2026-10-28T22:24:42Z	2026-10-28T22:25:00Z	1
+40779755217	Echelon foundations	push	main	4b0d434	completed	success	2026-10-28T22:24:42Z	2026-10-28T22:24:42Z	2026-10-28T22:27:03Z	1
+40779754891	Build and test	push	main	4b0d434	completed	cancelled	2026-10-28T22:24:42Z	2026-10-28T22:24:42Z	2026-10-28T23:52:23Z	1
+40779744151	Echelon foundations	pull_request	r6/review-1	e2579d2	completed	failure	2026-10-28T22:24:37Z	2026-10-28T22:24:37Z	2026-10-28T22:39:17Z	1
+40779743591	Praxis validation	pull_request	r6/review-1	e2579d2	completed	failure	2026-10-28T22:24:37Z	2026-10-28T22:24:37Z	2026-10-28T22:39:17Z	1
+40779743622	Build and test	pull_request	r6/review-1	e2579d2	completed	failure	2026-10-28T22:24:37Z	2026-10-28T22:24:37Z	2026-10-28T22:39:17Z	1
+40779722564	Open decision pull request	workflow_dispatch	main	5d02836	completed	success	2026-10-28T22:24:27Z	2026-10-28T22:24:27Z	2026-10-28T22:24:37Z	1
+40779598246	Praxis validation	push	r6/review-1	e2579d2	completed	success	2026-10-28T22:23:30Z	2026-10-28T22:23:30Z	2026-10-28T22:23:55Z	1
+40779598590	Echelon foundations	push	r6/review-1	e2579d2	completed	success	2026-10-28T22:23:30Z	2026-10-28T22:23:30Z	2026-10-28T22:25:38Z	1
+40779505067	Echelon foundations	push	main	5d02836	completed	success	2026-10-28T22:22:46Z	2026-10-28T22:22:46Z	2026-10-28T22:24:27Z	1
+40779504293	Praxis validation	push	main	5d02836	completed	success	2026-10-28T22:22:45Z	2026-10-28T22:22:45Z	2026-10-28T22:23:06Z	1
+40779504403	Build and test	push	main	5d02836	completed	cancelled	2026-10-28T22:22:45Z	2026-10-28T22:22:45Z	2026-10-28T23:41:41Z	1
+40779383819	Echelon foundations	push	main	a6cee61	completed	success	2026-10-28T22:21:50Z	2026-10-28T22:21:50Z	2026-10-28T22:23:47Z	1
+40779382328	Praxis validation	push	main	a6cee61	completed	success	2026-10-28T22:21:49Z	2026-10-28T22:21:49Z	2026-10-28T22:22:10Z	1
+40779382354	Build and test	push	main	a6cee61	completed	cancelled	2026-10-28T22:21:49Z	2026-10-28T22:21:49Z	2026-10-28T23:53:24Z	1
+40779295014	Praxis validation	push	main	e79f0a4	completed	success	2026-10-28T22:21:09Z	2026-10-28T22:21:09Z	2026-10-28T22:21:26Z	1
+40779294960	Build and test	push	main	e79f0a4	completed	cancelled	2026-10-28T22:21:09Z	2026-10-28T22:21:09Z	2026-10-28T22:21:51Z	1
+40779295598	Echelon foundations	push	main	e79f0a4	completed	success	2026-10-28T22:21:09Z	2026-10-28T22:21:09Z	2026-10-28T22:23:05Z	1
+40778777341	Echelon foundations	push	main	e1d946c	completed	success	2026-10-28T22:17:12Z	2026-10-28T22:17:12Z	2026-10-28T22:18:51Z	1
+40778776720	Praxis validation	push	main	e1d946c	completed	success	2026-10-28T22:17:11Z	2026-10-28T22:17:11Z	2026-10-28T22:17:34Z	1
+40778776670	Build and test	push	main	e1d946c	completed	cancelled	2026-10-28T22:17:11Z	2026-10-28T22:17:11Z	2026-10-28T22:21:10Z	1
+40778214403	Echelon foundations	push	main	db52257	completed	success	2026-10-28T22:12:55Z	2026-10-28T22:12:55Z	2026-10-28T22:14:51Z	1
+40778213859	Build and test	push	main	db52257	completed	cancelled	2026-10-28T22:12:55Z	2026-10-28T22:12:55Z	2026-10-28T22:17:13Z	1
+40778213908	Praxis validation	push	main	db52257	completed	success	2026-10-28T22:12:55Z	2026-10-28T22:12:55Z	2026-10-28T22:13:13Z	1
+40778171036	Build and test	push	main	23ac222	completed	cancelled	2026-10-28T22:12:35Z	2026-10-28T22:12:35Z	2026-10-28T22:12:56Z	1
+40778171522	Echelon foundations	push	main	23ac222	completed	success	2026-10-28T22:12:35Z	2026-10-28T22:12:35Z	2026-10-28T22:14:18Z	1
+40778171007	Praxis validation	push	main	23ac222	completed	success	2026-10-28T22:12:34Z	2026-10-28T22:12:34Z	2026-10-28T22:12:56Z	1
+40778035424	Echelon foundations	push	main	2bd9021	completed	success	2026-10-28T22:11:33Z	2026-10-28T22:11:33Z	2026-10-28T22:13:34Z	1
+40778034973	Build and test	push	main	2bd9021	completed	cancelled	2026-10-28T22:11:33Z	2026-10-28T22:11:33Z	2026-10-28T22:12:36Z	1
+40778034862	Praxis validation	push	main	2bd9021	completed	success	2026-10-28T22:11:32Z	2026-10-28T22:11:32Z	2026-10-28T22:11:52Z	1
+40778012334	Build and test	push	main	03a03df	completed	cancelled	2026-10-28T22:11:22Z	2026-10-28T22:11:22Z	2026-10-28T22:11:34Z	1
+40778012055	Praxis validation	push	main	03a03df	completed	success	2026-10-28T22:11:22Z	2026-10-28T22:11:22Z	2026-10-28T22:11:43Z	1
+40778012637	Echelon foundations	push	main	03a03df	completed	success	2026-10-28T22:11:22Z	2026-10-28T22:11:22Z	2026-10-28T22:13:00Z	1
+40777974562	Echelon foundations	push	main	8cb7270	completed	success	2026-10-28T22:11:05Z	2026-10-28T22:11:05Z	2026-10-28T22:13:08Z	1
+40777974052	Build and test	push	main	8cb7270	completed	cancelled	2026-10-28T22:11:04Z	2026-10-28T22:11:04Z	2026-10-28T22:11:24Z	1
+40777974038	Praxis validation	push	main	8cb7270	completed	success	2026-10-28T22:11:04Z	2026-10-28T22:11:04Z	2026-10-28T22:11:26Z	1
+40777891863	Echelon foundations	push	main	a72bc6a	completed	success	2026-10-28T22:10:28Z	2026-10-28T22:10:28Z	2026-10-28T22:12:33Z	1
+40777890733	Praxis validation	push	main	a72bc6a	completed	success	2026-10-28T22:10:27Z	2026-10-28T22:10:27Z	2026-10-28T22:10:51Z	1
+40777890624	Build and test	push	main	a72bc6a	completed	cancelled	2026-10-28T22:10:27Z	2026-10-28T22:10:27Z	2026-10-28T22:11:06Z	1
+40777245321	Echelon foundations	push	main	f91d2c5	completed	success	2026-10-28T22:05:36Z	2026-10-28T22:05:36Z	2026-10-28T22:07:17Z	1
+40777244834	Praxis validation	push	main	f91d2c5	completed	success	2026-10-28T22:05:36Z	2026-10-28T22:05:36Z	2026-10-28T22:05:53Z	1
+40777244818	Build and test	push	main	f91d2c5	completed	failure	2026-10-28T22:05:36Z	2026-10-28T22:05:36Z	2026-10-28T22:31:48Z	1
+40776245342	Build and test	push	main	f79feac	completed	cancelled	2026-10-28T21:58:10Z	2026-10-28T21:58:10Z	2026-10-28T22:05:37Z	1
+40776245370	Praxis validation	push	main	f79feac	completed	success	2026-10-28T21:58:10Z	2026-10-28T21:58:10Z	2026-10-28T21:58:30Z	1
+40776245826	Echelon foundations	push	main	f79feac	completed	success	2026-10-28T21:58:10Z	2026-10-28T21:58:10Z	2026-10-28T21:59:56Z	1
+40776162782	Praxis validation	push	main	8117ad5	completed	success	2026-10-28T21:57:30Z	2026-10-28T21:57:30Z	2026-10-28T21:57:50Z	1
+40776162811	Build and test	push	main	8117ad5	completed	cancelled	2026-10-28T21:57:30Z	2026-10-28T21:57:30Z	2026-10-28T21:58:11Z	1
+40776163820	Echelon foundations	push	main	8117ad5	completed	success	2026-10-28T21:57:30Z	2026-10-28T21:57:30Z	2026-10-28T21:58:49Z	1
+40776026720	Praxis validation	push	main	24a30ee	completed	success	2026-10-28T21:56:26Z	2026-10-28T21:56:26Z	2026-10-28T21:56:48Z	1
+40776026786	Build and test	push	main	24a30ee	completed	cancelled	2026-10-28T21:56:26Z	2026-10-28T21:56:26Z	2026-10-28T21:57:31Z	1
+40776027267	Echelon foundations	push	main	24a30ee	completed	success	2026-10-28T21:56:26Z	2026-10-28T21:56:26Z	2026-10-28T21:58:02Z	1
+40775984694	Echelon foundations	push	main	bbef67b	completed	success	2026-10-28T21:56:07Z	2026-10-28T21:56:07Z	2026-10-28T21:58:22Z	1
+40775984242	Praxis validation	push	main	bbef67b	completed	success	2026-10-28T21:56:06Z	2026-10-28T21:56:06Z	2026-10-28T21:56:26Z	1
+40775984253	Build and test	push	main	bbef67b	completed	cancelled	2026-10-28T21:56:06Z	2026-10-28T21:56:06Z	2026-10-28T21:56:27Z	1
+40775851334	Praxis validation	push	main	963e9bc	completed	success	2026-10-28T21:55:06Z	2026-10-28T21:55:06Z	2026-10-28T21:55:26Z	1
+40775851315	Build and test	push	main	963e9bc	completed	cancelled	2026-10-28T21:55:06Z	2026-10-28T21:55:06Z	2026-10-28T21:56:08Z	1
+40775851776	Echelon foundations	push	main	963e9bc	completed	success	2026-10-28T21:55:06Z	2026-10-28T21:55:06Z	2026-10-28T21:57:04Z	1
+40775675661	Praxis validation	push	main	e9e271c	completed	success	2026-10-28T21:53:47Z	2026-10-28T21:53:47Z	2026-10-28T21:54:07Z	1
+40775675698	Build and test	push	main	e9e271c	completed	cancelled	2026-10-28T21:53:47Z	2026-10-28T21:53:47Z	2026-10-28T21:55:07Z	1
+40775676221	Echelon foundations	push	main	e9e271c	completed	success	2026-10-28T21:53:47Z	2026-10-28T21:53:47Z	2026-10-28T21:55:46Z	1
+40775657760	Build and test	push	main	9a69d58	completed	cancelled	2026-10-28T21:53:39Z	2026-10-28T21:53:39Z	2026-10-28T21:53:49Z	1
+40775657784	Praxis validation	push	main	9a69d58	completed	success	2026-10-28T21:53:39Z	2026-10-28T21:53:39Z	2026-10-28T21:53:59Z	1
+40775658323	Echelon foundations	push	main	9a69d58	completed	success	2026-10-28T21:53:39Z	2026-10-28T21:53:39Z	2026-10-28T21:55:23Z	1
+40775527783	Praxis validation	push	main	fa30c4a	completed	success	2026-10-28T21:52:40Z	2026-10-28T21:52:40Z	2026-10-28T21:53:00Z	1
+40775527609	Build and test	push	main	fa30c4a	completed	cancelled	2026-10-28T21:52:40Z	2026-10-28T21:52:40Z	2026-10-28T21:53:41Z	1
+40775527837	Echelon foundations	push	main	fa30c4a	completed	success	2026-10-28T21:52:40Z	2026-10-28T21:52:40Z	2026-10-28T21:54:48Z	1
+40775382662	Praxis validation	push	main	16d0618	completed	success	2026-10-28T21:51:33Z	2026-10-28T21:51:33Z	2026-10-28T21:51:54Z	1
+40775382463	Build and test	push	main	16d0618	completed	cancelled	2026-10-28T21:51:33Z	2026-10-28T21:51:33Z	2026-10-28T21:52:41Z	1
+40775383003	Echelon foundations	push	main	16d0618	completed	success	2026-10-28T21:51:33Z	2026-10-28T21:51:33Z	2026-10-28T21:53:36Z	1
+40775077271	Praxis validation	push	main	dac1d33	completed	success	2026-10-28T21:49:16Z	2026-10-28T21:49:16Z	2026-10-28T21:49:35Z	1
+40775077020	Build and test	push	main	dac1d33	completed	cancelled	2026-10-28T21:49:16Z	2026-10-28T21:49:16Z	2026-10-28T21:51:34Z	1
+40775077551	Echelon foundations	push	main	dac1d33	completed	success	2026-10-28T21:49:16Z	2026-10-28T21:49:16Z	2026-10-28T21:51:30Z	1
+40775036189	Build and test	push	main	a35c408	completed	cancelled	2026-10-28T21:48:59Z	2026-10-28T21:48:59Z	2026-10-28T21:49:17Z	1
+40775036152	Praxis validation	push	main	a35c408	completed	success	2026-10-28T21:48:59Z	2026-10-28T21:48:59Z	2026-10-28T21:49:20Z	1
+40775036839	Echelon foundations	push	main	a35c408	completed	success	2026-10-28T21:48:59Z	2026-10-28T21:48:59Z	2026-10-28T21:50:52Z	1
+40774973807	Echelon foundations	push	main	ef934ab	completed	success	2026-10-28T21:48:31Z	2026-10-28T21:48:31Z	2026-10-28T21:49:56Z	1
+40774973387	Build and test	push	main	ef934ab	completed	cancelled	2026-10-28T21:48:30Z	2026-10-28T21:48:30Z	2026-10-28T21:49:00Z	1
+40774973234	Praxis validation	push	main	ef934ab	completed	success	2026-10-28T21:48:30Z	2026-10-28T21:48:30Z	2026-10-28T21:48:51Z	1
+40774840686	Echelon foundations	push	main	2a21f4c	completed	success	2026-10-28T21:47:31Z	2026-10-28T21:47:31Z	2026-10-28T21:49:07Z	1
+40774840259	Build and test	push	main	2a21f4c	completed	cancelled	2026-10-28T21:47:31Z	2026-10-28T21:47:31Z	2026-10-28T21:48:32Z	1
+40774840133	Praxis validation	push	main	2a21f4c	completed	success	2026-10-28T21:47:31Z	2026-10-28T21:47:31Z	2026-10-28T21:47:51Z	1
+40774635227	Echelon foundations	push	main	c329f7f	completed	success	2026-10-28T21:45:59Z	2026-10-28T21:45:59Z	2026-10-28T21:47:33Z	1
+40774634499	Praxis validation	push	main	c329f7f	completed	success	2026-10-28T21:45:58Z	2026-10-28T21:45:58Z	2026-10-28T21:46:19Z	1
+40774634405	Build and test	push	main	c329f7f	completed	cancelled	2026-10-28T21:45:58Z	2026-10-28T21:45:58Z	2026-10-28T21:47:32Z	1
+40774384724	Praxis validation	push	main	58b0893	completed	success	2026-10-28T21:44:09Z	2026-10-28T21:44:09Z	2026-10-28T21:44:28Z	1
+40774384735	Build and test	push	main	58b0893	completed	cancelled	2026-10-28T21:44:09Z	2026-10-28T21:44:09Z	2026-10-28T21:46:00Z	1
+40774385469	Echelon foundations	push	main	58b0893	completed	success	2026-10-28T21:44:09Z	2026-10-28T21:44:09Z	2026-10-28T21:45:53Z	1
+40774204598	Echelon foundations	push	main	1b2d7c7	completed	success	2026-10-28T21:42:48Z	2026-10-28T21:42:48Z	2026-10-28T21:44:22Z	1
+40774203602	Build and test	push	main	1b2d7c7	completed	cancelled	2026-10-28T21:42:47Z	2026-10-28T21:42:47Z	2026-10-28T21:44:10Z	1
+40774203582	Praxis validation	push	main	1b2d7c7	completed	success	2026-10-28T21:42:47Z	2026-10-28T21:42:47Z	2026-10-28T21:43:09Z	1
+40774110917	Echelon foundations	push	main	83fcd77	completed	success	2026-10-28T21:42:06Z	2026-10-28T21:42:06Z	2026-10-28T21:43:55Z	1
+40774110241	Praxis validation	push	main	83fcd77	completed	success	2026-10-28T21:42:06Z	2026-10-28T21:42:06Z	2026-10-28T21:42:26Z	1
+40774110108	Build and test	push	main	83fcd77	completed	cancelled	2026-10-28T21:42:06Z	2026-10-28T21:42:06Z	2026-10-28T21:42:49Z	1
+40774003127	Praxis validation	push	main	240a894	completed	success	2026-10-28T21:41:18Z	2026-10-28T21:41:18Z	2026-10-28T21:41:37Z	1
+40774003155	Build and test	push	main	240a894	completed	cancelled	2026-10-28T21:41:18Z	2026-10-28T21:41:18Z	2026-10-28T21:42:07Z	1
+40774003705	Echelon foundations	push	main	240a894	completed	success	2026-10-28T21:41:18Z	2026-10-28T21:41:18Z	2026-10-28T21:43:26Z	1
+40773784700	Praxis validation	push	main	881ca98	completed	success	2026-10-28T21:39:42Z	2026-10-28T21:39:42Z	2026-10-28T21:40:04Z	1
+40773784885	Echelon foundations	push	main	881ca98	completed	success	2026-10-28T21:39:42Z	2026-10-28T21:39:42Z	2026-10-28T21:41:46Z	1
+40773784587	Build and test	push	main	881ca98	completed	failure	2026-10-28T21:39:42Z	2026-10-28T21:39:42Z	2026-10-28T22:05:57Z	1
+40773690667	Praxis validation	push	main	0fa05ee	completed	success	2026-10-28T21:39:00Z	2026-10-28T21:39:00Z	2026-10-28T21:39:18Z	1
+40773690151	Build and test	push	main	0fa05ee	completed	cancelled	2026-10-28T21:39:00Z	2026-10-28T21:39:00Z	2026-10-28T21:39:43Z	1
+40773690834	Echelon foundations	push	main	0fa05ee	completed	success	2026-10-28T21:39:00Z	2026-10-28T21:39:00Z	2026-10-28T21:40:30Z	1
+40773585159	Echelon foundations	push	main	8755052	completed	success	2026-10-28T21:38:13Z	2026-10-28T21:38:13Z	2026-10-28T21:40:18Z	1
+40773584182	Praxis validation	push	main	8755052	completed	success	2026-10-28T21:38:12Z	2026-10-28T21:38:12Z	2026-10-28T21:38:32Z	1
+40773583809	Build and test	push	main	8755052	completed	cancelled	2026-10-28T21:38:12Z	2026-10-28T21:38:12Z	2026-10-28T21:39:01Z	1
+40773463367	Echelon foundations	push	main	959a5dd	completed	success	2026-10-28T21:37:20Z	2026-10-28T21:37:20Z	2026-10-28T21:39:06Z	1
+40773462070	Praxis validation	push	main	959a5dd	completed	success	2026-10-28T21:37:19Z	2026-10-28T21:37:19Z	2026-10-28T21:37:44Z	1
+40773462558	Build and test	push	main	959a5dd	completed	cancelled	2026-10-28T21:37:19Z	2026-10-28T21:37:19Z	2026-10-28T21:38:14Z	1
+40773432563	Build and test	push	main	3cfc06f	completed	cancelled	2026-10-28T21:37:06Z	2026-10-28T21:37:06Z	2026-10-28T21:37:21Z	1
+40773432647	Praxis validation	push	main	3cfc06f	completed	success	2026-10-28T21:37:06Z	2026-10-28T21:37:06Z	2026-10-28T21:37:26Z	1
+40773433126	Echelon foundations	push	main	3cfc06f	completed	success	2026-10-28T21:37:06Z	2026-10-28T21:37:06Z	2026-10-28T21:39:09Z	1
+40773330072	Praxis validation	push	main	54d065f	completed	success	2026-10-28T21:36:21Z	2026-10-28T21:36:21Z	2026-10-28T21:36:38Z	1
+40773330140	Build and test	push	main	54d065f	completed	cancelled	2026-10-28T21:36:21Z	2026-10-28T21:36:21Z	2026-10-28T21:37:07Z	1
+40773331090	Echelon foundations	push	main	54d065f	completed	success	2026-10-28T21:36:21Z	2026-10-28T21:36:21Z	2026-10-28T21:37:54Z	1
+40773172928	Build and test	push	main	56a34d8	completed	cancelled	2026-10-28T21:35:13Z	2026-10-28T21:35:13Z	2026-10-28T21:36:22Z	1
+40773172902	Praxis validation	push	main	56a34d8	completed	success	2026-10-28T21:35:13Z	2026-10-28T21:35:13Z	2026-10-28T21:35:30Z	1
+40773173686	Echelon foundations	push	main	56a34d8	completed	success	2026-10-28T21:35:13Z	2026-10-28T21:35:13Z	2026-10-28T21:37:20Z	1
+40772504705	Praxis validation	push	main	807048d	completed	success	2026-10-28T21:30:28Z	2026-10-28T21:30:28Z	2026-10-28T21:30:47Z	1
+40772505081	Echelon foundations	push	main	807048d	completed	success	2026-10-28T21:30:28Z	2026-10-28T21:30:28Z	2026-10-28T21:31:53Z	1
+40772504531	Build and test	push	main	807048d	completed	cancelled	2026-10-28T21:30:28Z	2026-10-28T21:30:28Z	2026-10-28T21:35:14Z	1
+40772454359	Echelon foundations	push	main	99d4332	completed	success	2026-10-28T21:30:07Z	2026-10-28T21:30:07Z	2026-10-28T21:32:02Z	1
+40772453949	Build and test	push	main	99d4332	completed	cancelled	2026-10-28T21:30:06Z	2026-10-28T21:30:06Z	2026-10-28T21:30:29Z	1
+40772454035	Praxis validation	push	main	99d4332	completed	success	2026-10-28T21:30:06Z	2026-10-28T21:30:06Z	2026-10-28T21:30:28Z	1
+40771906917	Praxis validation	push	main	aedf07f	completed	success	2026-10-28T21:26:02Z	2026-10-28T21:26:02Z	2026-10-28T21:26:23Z	1
+40771907812	Echelon foundations	push	main	aedf07f	completed	success	2026-10-28T21:26:02Z	2026-10-28T21:26:02Z	2026-10-28T21:28:10Z	1
+40771906937	Build and test	push	main	aedf07f	completed	cancelled	2026-10-28T21:26:02Z	2026-10-28T21:26:02Z	2026-10-28T21:30:08Z	1
+40771584842	Echelon foundations	push	main	dfb21d9	completed	success	2026-10-28T21:23:46Z	2026-10-28T21:23:46Z	2026-10-28T21:25:10Z	1
+40771584123	Praxis validation	push	main	dfb21d9	completed	success	2026-10-28T21:23:45Z	2026-10-28T21:23:45Z	2026-10-28T21:24:07Z	1
+40771584063	Build and test	push	main	dfb21d9	completed	cancelled	2026-10-28T21:23:45Z	2026-10-28T21:23:45Z	2026-10-28T21:26:03Z	1
+40771144229	Praxis validation	pull_request	r6/dec-kickoff-accept	6362429	completed	success	2026-10-28T21:20:36Z	2026-10-28T21:29:57Z	2026-10-28T21:30:17Z	2
+40771144919	Echelon foundations	pull_request	r6/dec-kickoff-accept	6362429	completed	success	2026-10-28T21:20:36Z	2026-10-28T21:29:57Z	2026-10-28T21:31:52Z	2
+40771144261	Build and test	pull_request	r6/dec-kickoff-accept	6362429	completed	failure	2026-10-28T21:20:36Z	2026-10-28T21:29:57Z	2026-10-28T22:04:55Z	2
+40771105643	Open decision pull request	workflow_dispatch	main	ceac193	completed	success	2026-10-28T21:20:20Z	2026-10-28T21:20:20Z	2026-10-28T21:20:35Z	1
+40771095054	Praxis validation	push	r6/dec-kickoff-accept	6362429	completed	success	2026-10-28T21:20:15Z	2026-10-28T21:20:15Z	2026-10-28T21:20:38Z	1
+40771095644	Echelon foundations	push	r6/dec-kickoff-accept	6362429	completed	success	2026-10-28T21:20:15Z	2026-10-28T21:20:15Z	2026-10-28T21:22:09Z	1
+40771032742	Praxis validation	push	main	ceac193	completed	success	2026-10-28T21:19:50Z	2026-10-28T21:19:50Z	2026-10-28T21:20:09Z	1
+40771033745	Echelon foundations	push	main	ceac193	completed	success	2026-10-28T21:19:50Z	2026-10-28T21:19:50Z	2026-10-28T21:21:50Z	1
+40771032806	Build and test	push	main	ceac193	completed	cancelled	2026-10-28T21:19:50Z	2026-10-28T21:19:50Z	2026-10-28T21:23:47Z	1
+40770774226	Build and test	push	main	7440f7c	completed	cancelled	2026-10-28T21:17:58Z	2026-10-28T21:17:58Z	2026-10-28T21:19:51Z	1
+40770774712	Echelon foundations	push	main	7440f7c	completed	success	2026-10-28T21:17:58Z	2026-10-28T21:17:58Z	2026-10-28T21:20:24Z	1
+40770774140	Praxis validation	push	main	7440f7c	completed	success	2026-10-28T21:17:58Z	2026-10-28T21:17:58Z	2026-10-28T21:18:17Z	1
+40769836128	Echelon foundations	push	main	5b8009f	completed	success	2026-10-28T21:11:23Z	2026-10-28T21:11:23Z	2026-10-28T21:13:03Z	1
+40769835327	Build and test	push	main	5b8009f	completed	cancelled	2026-10-28T21:11:23Z	2026-10-28T21:11:23Z	2026-10-28T21:17:59Z	1
+40769835274	Praxis validation	push	main	5b8009f	completed	success	2026-10-28T21:11:23Z	2026-10-28T21:11:23Z	2026-10-28T21:11:46Z	1
+40769825270	Echelon foundations	push	main	a700ce9	completed	success	2026-10-28T21:11:19Z	2026-10-28T21:11:19Z	2026-10-28T21:13:26Z	1
+40769824661	Build and test	push	main	a700ce9	completed	cancelled	2026-10-28T21:11:18Z	2026-10-28T21:11:18Z	2026-10-28T21:11:24Z	1
+40769824713	Praxis validation	push	main	a700ce9	completed	success	2026-10-28T21:11:18Z	2026-10-28T21:11:18Z	2026-10-28T21:11:39Z	1
+40769742465	Echelon foundations	push	main	0f0a00d	completed	success	2026-10-28T21:10:42Z	2026-10-28T21:10:42Z	2026-10-28T21:12:39Z	1
+40769741844	Praxis validation	push	main	0f0a00d	completed	success	2026-10-28T21:10:42Z	2026-10-28T21:10:42Z	2026-10-28T21:11:04Z	1
+40769741780	Build and test	push	main	0f0a00d	completed	cancelled	2026-10-28T21:10:42Z	2026-10-28T21:10:42Z	2026-10-28T21:11:21Z	1
+40769455589	Echelon foundations	push	main	de111db	completed	success	2026-10-28T21:08:43Z	2026-10-28T21:08:43Z	2026-10-28T21:09:59Z	1
+40769454907	Praxis validation	push	main	de111db	completed	success	2026-10-28T21:08:42Z	2026-10-28T21:08:42Z	2026-10-28T21:09:10Z	1
+40769454973	Build and test	push	main	de111db	completed	cancelled	2026-10-28T21:08:42Z	2026-10-28T21:08:42Z	2026-10-28T21:10:43Z	1
+40769378551	Echelon foundations	push	main	118b869	completed	success	2026-10-28T21:08:11Z	2026-10-28T21:08:11Z	2026-10-28T21:10:14Z	1
+40769378090	Praxis validation	push	main	118b869	completed	success	2026-10-28T21:08:10Z	2026-10-28T21:08:10Z	2026-10-28T21:08:29Z	1
+40769378008	Build and test	push	main	118b869	completed	cancelled	2026-10-28T21:08:10Z	2026-10-28T21:08:10Z	2026-10-28T21:08:43Z	1
+40769006699	Echelon foundations	push	main	1ad7b6a	completed	success	2026-10-28T21:05:35Z	2026-10-28T21:05:35Z	2026-10-28T21:07:42Z	1
+40769005971	Build and test	push	main	1ad7b6a	completed	cancelled	2026-10-28T21:05:35Z	2026-10-28T21:05:35Z	2026-10-28T21:08:12Z	1
+40769005910	Praxis validation	push	main	1ad7b6a	completed	success	2026-10-28T21:05:35Z	2026-10-28T21:05:35Z	2026-10-28T21:06:22Z	1
+40768848192	Praxis validation	push	main	0ff0100	completed	success	2026-10-28T21:04:31Z	2026-10-28T21:04:31Z	2026-10-28T21:05:02Z	1
+40768847925	Echelon foundations	push	main	0ff0100	completed	success	2026-10-28T21:04:31Z	2026-10-28T21:04:31Z	2026-10-28T21:06:36Z	1
+40768847624	Build and test	push	main	0ff0100	completed	failure	2026-10-28T21:04:31Z	2026-10-28T21:04:31Z	2026-10-28T21:40:34Z	1
+40768732939	Echelon foundations	pull_request	r6/dec-kickoff	f93c9f8	completed	failure	2026-10-28T21:03:44Z	2026-10-28T21:03:44Z	2026-10-28T21:03:47Z	1
+40768731820	Build and test	pull_request	r6/dec-kickoff	f93c9f8	completed	failure	2026-10-28T21:03:43Z	2026-10-28T21:03:43Z	2026-10-28T21:03:47Z	1
+40768731936	Praxis validation	pull_request	r6/dec-kickoff	f93c9f8	completed	failure	2026-10-28T21:03:43Z	2026-10-28T21:03:43Z	2026-10-28T21:03:47Z	1
+40768700409	Open decision pull request	workflow_dispatch	main	abeb7fb	completed	success	2026-10-28T21:03:30Z	2026-10-28T21:03:30Z	2026-10-28T21:03:43Z	1
+40768688606	Praxis validation	push	r6/dec-kickoff	f93c9f8	completed	success	2026-10-28T21:03:25Z	2026-10-28T21:03:25Z	2026-10-28T21:03:45Z	1
+40768689189	Echelon foundations	push	r6/dec-kickoff	f93c9f8	completed	success	2026-10-28T21:03:25Z	2026-10-28T21:03:25Z	2026-10-28T21:05:30Z	1
+40768683325	Echelon foundations	push	main	abeb7fb	completed	success	2026-10-28T21:03:23Z	2026-10-28T21:03:23Z	2026-10-28T21:05:32Z	1
+40768682608	Praxis validation	push	main	abeb7fb	completed	success	2026-10-28T21:03:22Z	2026-10-28T21:03:22Z	2026-10-28T21:03:42Z	1
+40768682612	Build and test	push	main	abeb7fb	completed	cancelled	2026-10-28T21:03:22Z	2026-10-28T21:03:22Z	2026-10-28T21:04:32Z	1
+40767392502	Build and test	push	main	3e52766	completed	cancelled	2026-10-28T20:54:22Z	2026-10-28T20:54:22Z	2026-10-28T21:03:24Z	1
+40767392534	Praxis validation	push	main	3e52766	completed	success	2026-10-28T20:54:22Z	2026-10-28T20:54:22Z	2026-10-28T20:54:45Z	1
+40767393024	Echelon foundations	push	main	3e52766	completed	success	2026-10-28T20:54:22Z	2026-10-28T20:54:22Z	2026-10-28T20:56:46Z	1
+40766807096	Praxis validation	push	main	4d8fbff	completed	success	2026-10-28T20:50:19Z	2026-10-28T20:50:19Z	2026-10-28T20:50:38Z	1
+40766807876	Echelon foundations	push	main	4d8fbff	completed	success	2026-10-28T20:50:19Z	2026-10-28T20:50:19Z	2026-10-28T20:52:02Z	1
+40766807130	Build and test	push	main	4d8fbff	completed	cancelled	2026-10-28T20:50:19Z	2026-10-28T20:50:19Z	2026-10-28T20:54:24Z	1
+40766564536	Praxis validation	push	main	e29b6d6	completed	success	2026-10-28T20:48:38Z	2026-10-28T20:48:38Z	2026-10-28T20:48:57Z	1
+40766564963	Echelon foundations	push	main	e29b6d6	completed	success	2026-10-28T20:48:38Z	2026-10-28T20:48:38Z	2026-10-28T20:50:25Z	1
+40766564541	Build and test	push	main	e29b6d6	completed	cancelled	2026-10-28T20:48:38Z	2026-10-28T20:48:38Z	2026-10-28T20:50:20Z	1
+40766515736	Echelon foundations	push	main	7ace2ce	completed	success	2026-10-28T20:48:18Z	2026-10-28T20:48:18Z	2026-10-28T20:50:07Z	1
+40766514431	Build and test	push	main	7ace2ce	completed	cancelled	2026-10-28T20:48:17Z	2026-10-28T20:48:17Z	2026-10-28T20:48:39Z	1
+40766514387	Praxis validation	push	main	7ace2ce	completed	success	2026-10-28T20:48:17Z	2026-10-28T20:48:17Z	2026-10-28T20:48:36Z	1
+40766292863	Build and test	pull_request	r6/kickoff-decisions	f93c9f8	completed	failure	2026-10-28T20:46:46Z	2026-10-28T20:46:46Z	2026-10-28T21:38:18Z	1
+40766292894	Praxis validation	pull_request	r6/kickoff-decisions	f93c9f8	completed	success	2026-10-28T20:46:46Z	2026-10-28T20:46:46Z	2026-10-28T20:47:08Z	1
+40766293938	Echelon foundations	pull_request	r6/kickoff-decisions	f93c9f8	completed	success	2026-10-28T20:46:46Z	2026-10-28T20:46:46Z	2026-10-28T20:48:40Z	1
+40766282998	Echelon foundations	push	r6/kickoff-decisions	f93c9f8	completed	success	2026-10-28T20:46:42Z	2026-10-28T20:46:42Z	2026-10-28T20:48:34Z	1
+40766282470	Praxis validation	push	r6/kickoff-decisions	f93c9f8	completed	success	2026-10-28T20:46:41Z	2026-10-28T20:46:41Z	2026-10-28T20:47:03Z	1
+40766258168	Echelon foundations	push	main	0022852	completed	success	2026-10-28T20:46:32Z	2026-10-28T20:46:32Z	2026-10-28T20:48:15Z	1
+40766257402	Praxis validation	push	main	0022852	completed	success	2026-10-28T20:46:31Z	2026-10-28T20:46:31Z	2026-10-28T20:46:54Z	1
+40766257437	Build and test	push	main	0022852	completed	cancelled	2026-10-28T20:46:31Z	2026-10-28T20:46:31Z	2026-10-28T20:48:18Z	1
+40766071824	Praxis validation	push	main	c0ce897	completed	success	2026-10-28T20:45:16Z	2026-10-28T20:45:16Z	2026-10-28T20:45:36Z	1
+40766072616	Echelon foundations	push	main	c0ce897	completed	success	2026-10-28T20:45:16Z	2026-10-28T20:45:16Z	2026-10-28T20:47:27Z	1
+40766071624	Build and test	push	main	c0ce897	completed	failure	2026-10-28T20:45:16Z	2026-10-28T20:45:16Z	2026-10-28T21:05:22Z	1
+40764016678	Echelon foundations	pull_request	r6/kickoff-decisions	f9dec66	completed	success	2026-10-28T20:31:17Z	2026-10-28T20:31:17Z	2026-10-28T20:33:27Z	1
+40764015956	Praxis validation	pull_request	r6/kickoff-decisions	f9dec66	completed	success	2026-10-28T20:31:16Z	2026-10-28T20:31:16Z	2026-10-28T20:31:41Z	1
+40764015961	Build and test	pull_request	r6/kickoff-decisions	f9dec66	completed	cancelled	2026-10-28T20:31:16Z	2026-10-28T20:31:16Z	2026-10-28T21:03:20Z	1
+40764010629	Echelon foundations	push	r6/kickoff-decisions	f9dec66	completed	success	2026-10-28T20:31:14Z	2026-10-28T20:31:14Z	2026-10-28T20:32:41Z	1
+40764009552	Praxis validation	push	r6/kickoff-decisions	f9dec66	completed	success	2026-10-28T20:31:14Z	2026-10-28T20:31:14Z	2026-10-28T20:31:36Z	1
+40764007969	Echelon foundations	push	main	d49b688	completed	success	2026-10-28T20:31:13Z	2026-10-28T20:31:13Z	2026-10-28T20:33:16Z	1
+40764007383	Build and test	push	main	d49b688	completed	cancelled	2026-10-28T20:31:13Z	2026-10-28T20:31:13Z	2026-10-28T20:45:17Z	1
+40764007568	Praxis validation	push	main	d49b688	completed	success	2026-10-28T20:31:13Z	2026-10-28T20:31:13Z	2026-10-28T20:31:35Z	1
+40763838462	Praxis validation	pull_request	r6/kickoff-decisions	538f239	completed	failure	2026-10-28T20:30:07Z	2026-10-28T20:30:07Z	2026-10-28T20:30:32Z	1
+40763838394	Build and test	pull_request	r6/kickoff-decisions	538f239	completed	cancelled	2026-10-28T20:30:07Z	2026-10-28T20:30:07Z	2026-10-28T20:31:18Z	1
+40763839275	Echelon foundations	pull_request	r6/kickoff-decisions	538f239	completed	success	2026-10-28T20:30:07Z	2026-10-28T20:30:07Z	2026-10-28T20:32:17Z	1
+40763829821	Echelon foundations	push	r6/kickoff-decisions	538f239	completed	success	2026-10-28T20:30:04Z	2026-10-28T20:30:04Z	2026-10-28T20:31:27Z	1
+40763828736	Praxis validation	push	r6/kickoff-decisions	538f239	completed	failure	2026-10-28T20:30:03Z	2026-10-28T20:30:03Z	2026-10-28T20:30:23Z	1
+40763659363	Praxis validation	push	main	b209d01	completed	success	2026-10-28T20:28:53Z	2026-10-28T20:28:53Z	2026-10-28T20:29:13Z	1
+40763658857	Echelon foundations	push	main	b209d01	completed	success	2026-10-28T20:28:52Z	2026-10-28T20:28:52Z	2026-10-28T20:30:37Z	1
+40763658213	Build and test	push	main	b209d01	completed	cancelled	2026-10-28T20:28:52Z	2026-10-28T20:28:52Z	2026-10-28T20:31:14Z	1
+40763555672	Build and test	push	main	8570dba	completed	failure	2026-10-28T20:28:11Z	2026-10-28T20:28:11Z	2026-10-28T20:45:18Z	1
+40763556102	Echelon foundations	push	main	8570dba	completed	success	2026-10-28T20:28:11Z	2026-10-28T20:28:11Z	2026-10-28T20:29:52Z	1
+40763555682	Praxis validation	push	main	8570dba	completed	failure	2026-10-28T20:28:11Z	2026-10-28T20:28:11Z	2026-10-28T20:28:36Z	1
+40763509689	Echelon foundations	pull_request	r6/kickoff-decisions	d2b11dd	completed	success	2026-10-28T20:27:52Z	2026-10-28T20:27:52Z	2026-10-28T20:29:54Z	1
+40763509026	Build and test	pull_request	r6/kickoff-decisions	d2b11dd	completed	cancelled	2026-10-28T20:27:51Z	2026-10-28T20:27:51Z	2026-10-28T20:45:21Z	1
+40763507528	Echelon foundations	push	main	bb7a0cc	completed	success	2026-10-28T20:27:51Z	2026-10-28T20:27:51Z	2026-10-28T20:29:45Z	1
+40763506900	Praxis validation	push	main	bb7a0cc	completed	failure	2026-10-28T20:27:51Z	2026-10-28T20:27:51Z	2026-10-28T20:28:10Z	1
+40763508918	Praxis validation	pull_request	r6/kickoff-decisions	d2b11dd	completed	failure	2026-10-28T20:27:51Z	2026-10-28T20:27:51Z	2026-10-28T20:28:15Z	1
+40763506832	Build and test	push	main	bb7a0cc	completed	cancelled	2026-10-28T20:27:51Z	2026-10-28T20:27:51Z	2026-10-28T20:28:12Z	1
+40763467841	Echelon foundations	push	r6/kickoff-decisions	d2b11dd	completed	success	2026-10-28T20:27:35Z	2026-10-28T20:27:35Z	2026-10-28T20:27:50Z	1
+40763467109	Praxis validation	push	r6/kickoff-decisions	d2b11dd	completed	failure	2026-10-28T20:27:35Z	2026-10-28T20:27:35Z	2026-10-28T20:27:55Z	1
+40763161644	Echelon foundations	push	main	23ed658	completed	success	2026-10-28T20:25:33Z	2026-10-28T20:25:33Z	2026-10-28T20:27:27Z	1
+40763160863	Praxis validation	push	main	23ed658	completed	failure	2026-10-28T20:25:32Z	2026-10-28T20:25:32Z	2026-10-28T20:25:53Z	1
+40763160877	Build and test	push	main	23ed658	completed	cancelled	2026-10-28T20:25:32Z	2026-10-28T20:25:32Z	2026-10-28T20:27:52Z	1
+40763066495	Praxis validation	push	main	9e5a88b	completed	failure	2026-10-28T20:24:56Z	2026-10-28T20:24:56Z	2026-10-28T20:25:13Z	1
+40763066530	Build and test	push	main	9e5a88b	completed	cancelled	2026-10-28T20:24:56Z	2026-10-28T20:24:56Z	2026-10-28T20:25:34Z	1
+40763067211	Echelon foundations	push	main	9e5a88b	completed	success	2026-10-28T20:24:56Z	2026-10-28T20:24:56Z	2026-10-28T20:26:35Z	1
+40762872573	Praxis validation	push	main	9aaf817	completed	failure	2026-10-28T20:23:39Z	2026-10-28T20:23:39Z	2026-10-28T20:23:57Z	1
+40762873198	Echelon foundations	push	main	9aaf817	completed	success	2026-10-28T20:23:39Z	2026-10-28T20:23:39Z	2026-10-28T20:25:14Z	1
+40762872655	Build and test	push	main	9aaf817	completed	failure	2026-10-28T20:23:39Z	2026-10-28T20:23:39Z	2026-10-28T20:28:31Z	1
+40760676314	Build and test	push	main	506cd8c	completed	failure	2026-10-28T20:09:05Z	2026-10-28T20:09:05Z	2026-10-28T20:14:04Z	1
+40760676351	Praxis validation	push	main	506cd8c	completed	failure	2026-10-28T20:09:05Z	2026-10-28T20:09:05Z	2026-10-28T20:09:24Z	1
+40760677036	Echelon foundations	push	main	506cd8c	completed	failure	2026-10-28T20:09:05Z	2026-10-28T20:09:05Z	2026-10-28T20:10:42Z	1
+40760676343	Deploy to GitHub Pages	push	main	506cd8c	completed	success	2026-10-28T20:09:05Z	2026-10-28T20:09:05Z	2026-10-28T20:10:49Z	1
+40760547267	Praxis validation	push	main	c80f35e	completed	failure	2026-10-28T20:08:13Z	2026-10-28T20:08:13Z	2026-10-28T20:08:25Z	1
+40760547250	Deploy to GitHub Pages	push	main	c80f35e	completed	failure	2026-10-28T20:08:13Z	2026-10-28T20:08:13Z	2026-10-28T20:08:28Z	1
+40760547246	Build and test	push	main	c80f35e	completed	success	2026-10-28T20:08:13Z	2026-10-28T20:08:13Z	2026-10-28T20:09:16Z	1
+40760548664	Echelon foundations	push	main	c80f35e	completed	success	2026-10-28T20:08:13Z	2026-10-28T20:08:13Z	2026-10-28T20:09:45Z	1
