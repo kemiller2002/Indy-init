@@ -118,6 +118,7 @@ let private tracked (roots: string list) (path: string) =
 /// its selection check twice). A skipped block holds nothing.
 let blocks (path: string) (text: string) : Map<string, Map<string, int>> =
     TestBlocks.parse path text
+    |> Option.bind Result.toOption
     |> Option.defaultValue []
     |> List.fold
         (fun (acc: Map<string, Map<string, int>>) block ->
