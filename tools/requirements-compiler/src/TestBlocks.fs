@@ -46,10 +46,17 @@ type Block =
     { Title: string
       Kind: Kind
       /// Declared with, or containing, a skip/fixme/fail/only marker (or inside a skipped block, or in a file with an
-      /// `.only`): what it asserts does not run as a held check.
+      /// `.only`): what it asserts does not run as a held check. A body marker is any `.skip(`/`.fixme(`/`.fail(`
+      /// call anywhere in the block, its declaration line included (`test.skip()`, `testInfo.skip()`,
+      /// `test.info().skip()`), or a call of a name the file binds to one (`const { skip } = test; skip();`).
+      /// Markers reached any other way (passed as an argument, wrapped in a helper defined in another file, read
+      /// through a computed property) are not seen: an inherent limit of a lexical reading.
       Skipped: bool
       /// Every statement of the block, comment-free and whitespace-collapsed, in order.
-      Statements: string list }
+      Statements: string list
+      /// The same statements with string, template and regex literal contents masked (`_`): what the code does, not
+      /// what it quotes.
+      Masked: string list }
 
 type private Mode =
     | Code
@@ -146,8 +153,8 @@ let private collapse (s: string) = Regex.Replace(s, @"\s+", " ").Trim()
 let private delta (opening: char list) (closing: char list) (s: string) =
     s |> Seq.sumBy (fun c -> if List.contains c opening then 1 elif List.contains c closing then -1 else 0)
 
-/// Splits the lines of one block, (code, mask) pairs in order, into whole statements.
-let private statementsOf (lang: Language) (lines: (string * string) list) : string list =
+/// Splits the lines of one block, (code, mask) pairs in order, into whole statements (code, mask).
+let private statementsOf (lang: Language) (lines: (string * string) list) : (string * string) list =
     let indent (s: string) = s.Length - s.TrimStart().Length
 
     let continues (first: string) (joinedMask: string) (depth: int) (next: string option) =
@@ -170,11 +177,14 @@ let private statementsOf (lang: Language) (lines: (string * string) list) : stri
             elif endsWith [ "="; "->"; " do"; " then"; " else"; " with"; " try"; " finally" ] then false
             else next.IsSome && indent (Option.get next) > indent first
 
-    let rec go (rest: (string * string) list) (current: (string * string) list) (depth: int) (out: string list) =
+    let rec go (rest: (string * string) list) (current: (string * string) list) (depth: int) (out: (string * string) list) =
+        let joinedPair (lines: (string * string) list) =
+            collapse (lines |> List.map fst |> String.concat " "), collapse (lines |> List.map snd |> String.concat " ")
+
         let flush () =
             match current with
             | [] -> out
-            | lines -> collapse (lines |> List.rev |> List.map fst |> String.concat " ") :: out
+            | lines -> joinedPair (List.rev lines) :: out
 
         match rest with
         | [] -> List.rev (flush ())
@@ -190,7 +200,7 @@ let private statementsOf (lang: Language) (lines: (string * string) list) : stri
             if continues first joined depth' next then
                 go tail current' depth' out
             else
-                let out' = collapse (ordered |> List.map fst |> String.concat " ") :: out
+                let out' = joinedPair ordered :: out
                 go tail [] 0 out'
 
     go lines [] 0 []
@@ -208,12 +218,38 @@ let private jsTitle = Regex(@"^\s*[\w.]+\s*\(\s*([""'`])((?:\\.|(?!\1).)*)\1", R
 let private jsMarkers = set [ "skip"; "fixme"; "fail"; "only" ]
 let private jsNotBlocks = set [ "step"; "beforeEach"; "afterEach"; "beforeAll"; "afterAll"; "use"; "extend"; "info" ]
 
+/// A call that skips (or expects to fail) the test or block it runs in, anywhere in a masked line: any member call
+/// `.skip(`, `.fixme(`, `.fail(` (`test.skip()`, `testInfo.skip()` whatever the fixture parameter is named,
+/// `test.info().skip()`, `this.skip()`), and `test.only(`/`describe.only(`.
 let private jsBodyMarker =
-    Regex(@"^\s*(?:await\s+)?(?:(?:test|it|describe)(?:\.describe)?\.(?:skip|fixme|fail|only)\s*\(|this\.skip\s*\()", RegexOptions.Compiled)
+    Regex(@"\.\s*(?:skip|fixme|fail)\s*\(|(?<![\w$.])(?:test|it|describe)(?:\.describe)?\.only\s*\(", RegexOptions.Compiled)
+
+let private jsDestructured = Regex(@"\b(?:const|let|var)\s*\{([^{}]*)\}\s*=", RegexOptions.Compiled)
+let private jsBoundMarker = Regex(@"\b(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*[\w$.()]*\.(?:skip|fixme|fail)\b(?!\s*\()", RegexOptions.Compiled)
+
+/// The local names a file binds to a skip marker: `const { skip } = test`, `const { fixme: later } = test`,
+/// `const skip = test.skip`. A call of one marks its scope as a call of the marker would.
+let private jsMarkerAliases (mask: string) : string list =
+    let destructured =
+        [ for m in jsDestructured.Matches mask do
+              for entry in m.Groups.[1].Value.Split(',') do
+                  match entry.Split(':') |> Array.map _.Trim() with
+                  | [| key |] when jsMarkers.Contains key && key <> "only" -> yield key
+                  | [| key; local |] when jsMarkers.Contains key && key <> "only" && Regex.IsMatch(local, @"^[A-Za-z_$][\w$]*$") -> yield local
+                  | _ -> () ]
+
+    destructured @ [ for m in jsBoundMarker.Matches mask -> m.Groups.[1].Value ] |> List.distinct
 
 /// (blocks, owner of each line (-1 = module), whether the whole file is marked)
 let private readJs (code: string[]) (mask: string[]) =
     let pairs = Array.zip code mask
+
+    let marks =
+        match jsMarkerAliases (String.concat "\n" mask) with
+        | [] -> fun (m: string) -> jsBodyMarker.IsMatch(m)
+        | aliases ->
+            let aliased = Regex(sprintf @"(?<![\w$.])(?:%s)\s*\(" (aliases |> List.map Regex.Escape |> String.concat "|"))
+            fun (m: string) -> jsBodyMarker.IsMatch m || aliased.IsMatch(m)
 
     // Each line with the next non-blank line: a declaration may put its title on the line after `test(`.
     let following =
@@ -247,15 +283,15 @@ let private readJs (code: string[]) (mask: string[]) =
 
             depth',
             pop ((id, depth) :: stack),
-            drafts @ [ { Title = title; Kind = kind; Marked = marked; Parent = owner } ],
+            drafts @ [ { Title = title; Kind = kind; Marked = marked || marks (snd rest); Parent = owner } ],
             (id, fst rest, snd rest) :: owned,
             fileMarked || only
         else
             let drafts' =
-                if jsBodyMarker.IsMatch m && owner >= 0 then drafts |> List.mapi (fun i d -> if i = owner then { d with Marked = true } else d)
+                if marks m && owner >= 0 then drafts |> List.mapi (fun i d -> if i = owner then { d with Marked = true } else d)
                 else drafts
 
-            depth', pop stack, drafts', (owner, c, m) :: owned, fileMarked || only || (jsBodyMarker.IsMatch m && owner < 0)
+            depth', pop stack, drafts', (owner, c, m) :: owned, fileMarked || only || (marks m && owner < 0)
 
     let _, _, drafts, owned, fileMarked = lines |> List.fold step (0, [], [], [], false)
     drafts, List.rev owned, fileMarked
@@ -304,19 +340,18 @@ let parse (path: string) (text: string) : Block list option =
         let byIndex = Array.ofList drafts
         let rec skipped i = i >= 0 && (byIndex.[i].Marked || skipped byIndex.[i].Parent)
         let statements owner = owned |> List.filter (fun (o, _, _) -> o = owner) |> List.map (fun (_, c, m) -> c, m) |> statementsOf lang
+        let block title kind skipped owner =
+            let pairs = statements owner
+            { Title = title; Kind = kind; Skipped = skipped; Statements = List.map fst pairs; Masked = List.map snd pairs }
 
-        (drafts
-         |> List.mapi (fun i d ->
-             { Title = d.Title
-               Kind = d.Kind
-               Skipped = fileMarked || skipped i
-               Statements = statements i }))
-        @ [ { Title = moduleName lang path codeLines; Kind = Module; Skipped = false; Statements = statements -1 } ])
+        (drafts |> List.mapi (fun i d -> block d.Title d.Kind (fileMarked || skipped i) i))
+        @ [ block (moduleName lang path codeLines) Module false -1 ])
 
 let private jsAssertion = Regex(@"(?<![\w$.])(?:expect|assert)\b\s*(?:\.\s*\w+\s*)?\(", RegexOptions.Compiled)
 let private fsAssertion = Regex(@"\bAssert\.|\bExpect\.|\btest\s*<@|\|>\s*should\b|\bshould\s*\(", RegexOptions.Compiled)
 
-/// The statements of a block that assert.
+/// The statements of a block that assert. The assertion is looked for in the masked statement, so an assertion
+/// quoted in a string or template literal asserts nothing.
 let assertions (path: string) (block: Block) : string list =
     let rx = match languageOf path with Some FSharp -> fsAssertion | _ -> jsAssertion
-    block.Statements |> List.filter rx.IsMatch
+    List.zip block.Statements block.Masked |> List.filter (snd >> rx.IsMatch) |> List.map fst

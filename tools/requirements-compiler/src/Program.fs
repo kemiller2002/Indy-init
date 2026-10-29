@@ -831,15 +831,16 @@ let releaseComparisonCommand (args: string list) : int =
         2
 
 /// `assertion-ratchet`: no assertion a bound test held since the base disappears from the candidate without a
-/// resolved tag change (see AssertionRatchet, R7-REM-011). The base is bound by `--kickoff` (a kickoff record naming
-/// it). Exit 0 PASS, 3 FAIL or INCOMPLETE, 2 unusable input.
+/// resolved tag change (see AssertionRatchet, R7-REM-011). The base is derived from the kickoff record in the
+/// candidate's history (`--kickoff-path`, default kickoff/indy-init.kickoff.json); a `--base` is checked against it.
+/// Exit 0 PASS, 3 FAIL, REFUSED or INCOMPLETE, 2 unusable input.
 let assertionRatchetCommand (args: string list) : int =
     match optionMap args with
     | Error e ->
         eprintfn "%s" e
         2
-    | Ok m when not (m.ContainsKey "--repo" && m.ContainsKey "--base" && m.ContainsKey "--candidate") ->
-        eprintfn "usage: requirements-compiler assertion-ratchet --repo DIR --base SHA --candidate SHA --kickoff FILE [--path DIR]... [--tag-changes FILE] [--plan FILE] [--out FILE]"
+    | Ok m when not (m.ContainsKey "--repo" && m.ContainsKey "--candidate") ->
+        eprintfn "usage: requirements-compiler assertion-ratchet --repo DIR --candidate SHA [--kickoff-path PATH] [--base SHA] [--path DIR]... [--tag-changes FILE] [--plan FILE] [--out FILE]"
         2
     | Ok m ->
         try
@@ -849,12 +850,12 @@ let assertionRatchetCommand (args: string list) : int =
             let report =
                 AssertionRatchet.assess
                     { Repo = one "--repo"
-                      Base = one "--base"
+                      Base = last "--base"
                       Candidate = one "--candidate"
                       Roots = m.TryFind "--path" |> Option.defaultValue [ "tests" ]
                       TagChanges = last "--tag-changes" |> Option.map parseFile
                       Plan = last "--plan" |> Option.map parseFile
-                      Kickoff = last "--kickoff" |> Option.map (fun file -> file, parseFile file) }
+                      KickoffPath = last "--kickoff-path" |> Option.defaultValue AssertionRatchet.defaultKickoffPath |> Some }
 
             writeOut m report
             if str "verdict" report = "PASS" then 0 else 3

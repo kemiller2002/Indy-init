@@ -13,9 +13,16 @@
 ///
 /// `observe` is the only I/O. It stores each raw answer with its sha256; `assess` is pure over its inputs and
 /// re-checks every observation: the answer's digest, the source URL the selected set implies, and the newest release
-/// re-derived from the answer. A mismatch is TAMPERED. Limits: the digest proves the record is consistent with the
-/// answer it carries, not that the source sent that answer; `observedAt` is the observer's clock; only the first 100
-/// GitHub releases (the newest) are read.
+/// re-derived from the answer. A mismatch is TAMPERED. Two selected components of one repository whose tags carry the
+/// same prefix (`v` for both limen-fsharp and the limen npm package) cannot be told apart in that repository's
+/// release list, so both are AMBIGUOUS_COMPONENT (not PASS) until their tag prefixes differ.
+///
+/// Inherent limits (stated in every report's `attestation`): the observations are caller-supplied. The digest proves
+/// the record is consistent with the answer it carries, not that the source sent that answer: a forged answer with
+/// its own digest re-derives cleanly. `observedAt` is the observer's clock, and the lock record, the deviations'
+/// `approvedBy` and the deviations file are written by whoever runs `assess`. Proof needs `observe` run in trusted CI
+/// with signed output (or the CI run's own logs); this module does not provide it. Only the first 100 GitHub releases
+/// (the newest) are read.
 module ReleaseComparison
 
 open System
@@ -341,16 +348,34 @@ let assess
                 let status, why, deviation = compareWith s latest
                 status, why, Some latest, deviation
 
+    let selected = selectedSystems releaseSet
+
+    // Components that share a repository and a tag prefix (no prefix, `` and `v` read the same tags).
+    let prefixKey (s: Selected) =
+        match s.TagPrefix with
+        | Some p when p <> "" && p <> "v" -> p
+        | _ -> "v"
+
+    let sharing (s: Selected) =
+        selected
+        |> List.filter (fun o -> o.System <> s.System && o.Repository.IsSome && o.Repository = s.Repository && prefixKey o = prefixKey s)
+        |> List.map _.System
+
     let rows =
-        selectedSystems releaseSet
+        selected
         |> List.map (fun s ->
             let mine = observations |> List.filter (fun o -> o.System = s.System)
 
             let status, why, latest, deviation =
-                match mine with
-                | [] -> "NOT_OBSERVED", "no pre-lock query of the release source", None, None
-                | [ o ] -> check s o
-                | many -> "DUPLICATE_OBSERVATION", sprintf "%d observations of one system: which one the lock relied on is ambiguous" many.Length, None, None
+                match mine, sharing s with
+                | _, (_ :: _ as others) ->
+                    "AMBIGUOUS_COMPONENT",
+                    sprintf "shares repository %s and tag prefix `%s` with %s: its releases cannot be told apart from theirs" s.Repository.Value (prefixKey s) (String.Join(", ", others)),
+                    None,
+                    None
+                | [], _ -> "NOT_OBSERVED", "no pre-lock query of the release source", None, None
+                | [ o ], _ -> check s o
+                | many, _ -> "DUPLICATE_OBSERVATION", sprintf "%d observations of one system: which one the lock relied on is ambiguous" many.Length, None, None
 
             let o = match mine with [ o ] -> Some o | _ -> None
 
@@ -372,9 +397,11 @@ let assess
     let failing = rows |> List.filter (fun r -> not (passing.Contains(str "status" r)))
 
     JObj
-        [ "schema", JStr "indy-init.release-comparison/2"
+        [ "schema", JStr "indy-init.release-comparison/3"
           "lockedAt", JStr(lockedAt.ToString("o", CultureInfo.InvariantCulture))
           "maxObservationAge", JStr(string maxAge)
+          "attestation",
+          JStr "none: observations, observedAt, the lock record, approvedBy and the deviations are caller-supplied; the digest shows the record matches the answer it carries, not that the source sent it. Run observe in trusted CI with signed output for proof"
           "deviations", JObj [ "count", jint deviations.Length; "sha256", jopt JStr deviationsSha256 ]
           "verdict", JStr(if failing.IsEmpty && not rows.IsEmpty then "PASS" else "FAIL")
           "summary",

@@ -1,22 +1,24 @@
 {
-  "schema": "indy-init.assertion-ratchet/2",
-  "base": "0ff0100a3bf8dc2eef9757ede1b1e8eb8f6b32ec",
+  "schema": "indy-init.assertion-ratchet/3",
+  "base": "c80f35e468fb2d1a38ce467f9bec860d52837b23",
   "candidate": "46d5e1129a798549dcf37c2a6460c4f623298761",
   "baseVerified": true,
   "kickoff": {
-    "source": "r6-adhoc-kickoff.json",
-    "field": "base",
-    "recordedBase": "0ff0100",
-    "recordedCommit": "0ff0100a3bf8dc2eef9757ede1b1e8eb8f6b32ec"
+    "path": "kickoff/indy-init.kickoff.json",
+    "addedAt": "c80f35e468fb2d1a38ce467f9bec860d52837b23",
+    "field": null,
+    "recordedBase": null,
+    "base": "c80f35e468fb2d1a38ce467f9bec860d52837b23"
   },
+  "baseProblem": null,
   "roots": [
     "tests/browser/acceptance"
   ],
-  "commitsWalked": 13,
+  "commitsWalked": 15,
   "verdict": "FAIL",
   "summary": {
-    "removed": 38,
-    "unrecorded": 38
+    "removed": 45,
+    "unrecorded": 45
   },
   "removed": [
     {
@@ -101,6 +103,60 @@
       "tagChange": null
     },
     {
+      "path": "tests/browser/acceptance/UI-010.spec.js",
+      "test": "UI-010-O1",
+      "obligation": "UI-010-O1",
+      "assertion": "await expect(page.locator(\".causa-card\")).toHaveCount(2, { timeout: 90_000 });",
+      "lastSeenAt": "0022852b4538149a71051bfbc716a21b7c87bfe9",
+      "state": "UNRECORDED",
+      "tagChange": null
+    },
+    {
+      "path": "tests/browser/acceptance/UI-010.spec.js",
+      "test": "UI-010-O2",
+      "obligation": "UI-010-O2",
+      "assertion": "await expect(page.locator(\".causa-card\")).toHaveCount(2, { timeout: 90_000 });",
+      "lastSeenAt": "0022852b4538149a71051bfbc716a21b7c87bfe9",
+      "state": "UNRECORDED",
+      "tagChange": null
+    },
+    {
+      "path": "tests/browser/acceptance/UI-010.spec.js",
+      "test": "UI-010-O4",
+      "obligation": "UI-010-O4",
+      "assertion": "await expect(page.getByRole(\"heading\", { level: 1 })).toHaveText(/could not be opened|not found/i, { timeout: 60_000 });",
+      "lastSeenAt": "0022852b4538149a71051bfbc716a21b7c87bfe9",
+      "state": "UNRECORDED",
+      "tagChange": null
+    },
+    {
+      "path": "tests/browser/acceptance/UI-010.spec.js",
+      "test": "UI-010-O4",
+      "obligation": "UI-010-O4",
+      "assertion": "await expect(page.locator(\".causa-card\")).toHaveCount(2);",
+      "lastSeenAt": "0022852b4538149a71051bfbc716a21b7c87bfe9",
+      "state": "UNRECORDED",
+      "tagChange": null
+    },
+    {
+      "path": "tests/browser/acceptance/UI-010.spec.js",
+      "test": "UI-010-O4",
+      "obligation": "UI-010-O4",
+      "assertion": "await expect(page.locator(\".causa-card\")).toHaveCount(2, { timeout: 90_000 });",
+      "lastSeenAt": "0022852b4538149a71051bfbc716a21b7c87bfe9",
+      "state": "UNRECORDED",
+      "tagChange": null
+    },
+    {
+      "path": "tests/browser/acceptance/UI-010.spec.js",
+      "test": "UI-010-O4",
+      "obligation": "UI-010-O4",
+      "assertion": "await expect(page.locator(\".causa-card\").filter({ hasText: c.title })).toHaveCount(0);",
+      "lastSeenAt": "0022852b4538149a71051bfbc716a21b7c87bfe9",
+      "state": "UNRECORDED",
+      "tagChange": null
+    },
+    {
       "path": "tests/browser/acceptance/UI-011.spec.js",
       "test": "UI-011-O4",
       "obligation": "UI-011-O4",
@@ -124,6 +180,15 @@
       "obligation": "UI-011-O4",
       "assertion": "expect([\"causa-main\", \"settings-heading\", \"H1\"]).toContain(settingsFocus);",
       "lastSeenAt": "0ff0100a3bf8dc2eef9757ede1b1e8eb8f6b32ec",
+      "state": "UNRECORDED",
+      "tagChange": null
+    },
+    {
+      "path": "tests/browser/acceptance/UI-011.spec.js",
+      "test": "UI-011-O5",
+      "obligation": "UI-011-O5",
+      "assertion": "if (await link.count()) { await link.focus(); await page.keyboard.press(\"Enter\"); await expect(page.locator(\"[data-percepta-region=inspector]\")).toBeVisible(); }",
+      "lastSeenAt": "0022852b4538149a71051bfbc716a21b7c87bfe9",
       "state": "UNRECORDED",
       "tagChange": null
     },

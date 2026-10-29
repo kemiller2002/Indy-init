@@ -202,6 +202,11 @@ let tagChangeResolved (bound: Map<string, Set<string>>) (entries: Json list) (c:
     | Some "not-rebound" -> ledgerString "reason" r <> "" && ledgerString "review" r <> ""
     | _ -> false
 
+/// Whether one review tag change stands with no REVIEW-TAG-CHANGE diagnostic of its own: it names the review that
+/// removed the tag, and its resolution is admissible (tagChangeResolved). The assertion ratchet honours exactly these.
+let tagChangeAdmissible (bound: Map<string, Set<string>>) (entries: Json list) (c: Json) =
+    ledgerString "review" c <> "" && tagChangeResolved bound entries c
+
 /// Removals per source obligation, with diagnostics for changes that cannot be honoured as written. A removal names a
 /// test the plan binds to the obligation and the review that removed it. It is resolved by `rebound` (tests the plan
 /// binds to the same obligation and no review removed) or `not-rebound` (a stated reason); anything else stays open.

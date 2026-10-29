@@ -49,6 +49,18 @@ let private specs =
           "  expect(1).toBe(1);"
           "});"
           "/* test(\"DCT-T-K in a block comment\", async () => {}); */"
+          "test(\"DCT-T-I skipped through its fixture\", async ({ page }, info) => {"
+          "  info.skip();"
+          "  expect(1).toBe(1);"
+          "});"
+          "test(\"DCT-T-O skipped on its declaration line\", async () => { test.skip(); expect(1).toBe(1); });"
+          "test(\"DCT-T-N skipped through test.info()\", async () => {"
+          "  test.info().fixme();"
+          "});"
+          "const { skip: later } = test;"
+          "test(\"DCT-T-L skipped through an alias\", async () => {"
+          "  later();"
+          "});"
           "test("
           "  \"DCT-T-M declared with its title on the next line\","
           "  async () => {"
@@ -80,6 +92,7 @@ let private history () =
     let candidate = commit repo "candidate"
     write repo "acceptance/reviews/final.md" $"## DC-T\nClosed by {fix.Substring(0, 10)}; regression DCT-T-A.\nOld review updated after {fix.Substring(0, 10)}.\n"
     write repo "acceptance/reviews/old.md" $"## DC-T\nreviewed long ago; DC-T closed by {fix.Substring(0, 10)}\n"
+    write repo "acceptance/copy.json" "{}\n"
     let records = commit repo "records only"
     git repo [ "checkout"; "-q"; "-b"; "side"; fix ] |> ignore
     write repo "src/Side.fs" "let side = 1\n"
@@ -173,7 +186,7 @@ let all () : string list =
           if not (has "DCL-005" (assess (good [ "tests", jstrs [ "DCT-T-A"; "DCT-T-Z" ] ]))) then
               yield "DCL-005: an absent regression test is accepted"
 
-          for skipped in [ "DCT-T-X"; "DCT-T-F"; "DCT-T-S"; "DCT-T-K" ] do
+          for skipped in [ "DCT-T-X"; "DCT-T-F"; "DCT-T-S"; "DCT-T-K"; "DCT-T-I"; "DCT-T-O"; "DCT-T-N"; "DCT-T-L" ] do
               if not (has "DCL-005" (assess (good [ "tests", jstrs [ "DCT-T-A"; skipped ] ]))) then
                   yield sprintf "DCL-005: %s, declared only in a skipped form or a block comment, is accepted" skipped
 
@@ -185,6 +198,16 @@ let all () : string list =
               yield "DCL-007: review evidence absent from the candidate (and no records commit) is accepted"
           if not (has "DCL-007" (assess (good [ "reviewerEvidence", JStr "acceptance/defect-classes.json" ]))) then
               yield "DCL-007: the closures record cited as its own review evidence is accepted"
+
+          // The Rehearsal 7 second review's `./acceptance/defect-classes.json#self` and its variants.
+          for spelled in [ "./acceptance/defect-classes.json#self"; "acceptance//defect-classes.json"; "acceptance/reviews/../defect-classes.json"; "acceptance/copy.json" ] do
+              let report = assess (good [ "reviewerEvidence", JStr spelled ])
+
+              if not (has "DCL-007" report && problems report |> List.exists (fun p -> p.Contains "closures record")) then
+                  yield sprintf "DCL-007: the closures record cited as its own review evidence as `%s` is accepted" spelled
+
+          if not (has "DCL-007" (assess (good [ "reviewerEvidence", JStr "../outside/review.md" ]))) then
+              yield "DCL-007: review evidence outside the repository root is accepted"
 
           let oldReview = assessWith h { full with Records = Some h.Candidate } (good [ "reviewerEvidence", JStr "acceptance/reviews/old.md" ])
 
