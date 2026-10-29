@@ -29,7 +29,9 @@
 ///   it checked the same way, without closing any);
 /// - DCL-009 with a freeze time, `closedAt` is no later than the freeze and no earlier than the fix commit;
 /// - DCL-010 the fix commit descends from the base (kickoff) commit and is not the base: a commit from before the
-///   rehearsal (the initial commit) fixes nothing in it;
+///   rehearsal (the initial commit) fixes nothing in it. The base is bound by the kickoff record exactly as the
+///   assertion ratchet's is (Kickoff): `--base` is optional, and one that is not the bound base REFUSES the run
+///   (`baseVerified` false), as does a history without the record;
 /// - DCL-011 the fix commit changes something other than the closures record;
 /// - DCL-012 the closure names at least one regression test;
 /// - DCL-013 the status is one of the known statuses (an unknown status is refused, not treated as open);
@@ -44,8 +46,8 @@
 /// from the base and changes something can be named as a class's fix, though it fixed something else; review evidence
 /// the implementing agent wrote itself in a review record's shape, including in a records commit, cannot be told from
 /// an independent reviewer's without reviewer identity or an attestation (a signed review, a pull-request review
-/// fetched by trusted CI); and the base is the caller's, so history rewritten before the run goes unnoticed unless the
-/// kickoff commit is pinned outside the candidate (an owner record or tag). They remain for the independent review.
+/// fetched by trusted CI); and history rewritten before the run moves the kickoff-bound base unless the kickoff commit
+/// is pinned outside the candidate (an owner record or tag). They remain for the independent review.
 module DefectClosure
 
 open System
@@ -56,8 +58,9 @@ open Json
 
 type Inputs =
     { Repo: string
-      /// The kickoff commit: every fix is made after it.
-      Base: string
+      /// The base the caller expects; the kickoff record binds it (Kickoff): None takes the bound base, another one is
+      /// REFUSED. Every fix is made after it.
+      Base: string option
       Candidate: string
       /// A records-only descendant of the candidate holding the review evidence (D-12), if any.
       Records: string option
@@ -184,7 +187,7 @@ let private problemsOf (inputs: Inputs) (baseCommit: string option) (tree: TestT
               yield sprintf "DCL-003 %s: fix commit %s is not the candidate or one of its ancestors" id fix
 
           match baseCommit with
-          | None -> yield sprintf "DCL-010 %s: the base commit %s is not in this repository, so the fix cannot be shown to follow it" id inputs.Base
+          | None -> yield sprintf "DCL-010 %s: the base commit %s is not in this repository, so the fix cannot be shown to follow it" id (inputs.Base |> Option.defaultValue "(none)")
           | Some b when b = fix || not (isAncestor inputs.Repo b fix) ->
               yield sprintf "DCL-010 %s: fix commit %s does not descend from the base %s (it predates the rehearsal or is the base itself)" id fix b
           | Some _ -> ()
@@ -238,18 +241,24 @@ let private problemsOf (inputs: Inputs) (baseCommit: string option) (tree: TestT
 let limits =
     [ "a fix commit is shown to descend from the base and to change something, not to fix the class: an unrelated commit can be named"
       "review evidence is checked for a review record's structure, not for who wrote it: without a signed review or reviewer attestation the implementing agent can write it, in the candidate or a records commit"
-      "the base is the caller's --base: history rewritten before the run is not detected unless the kickoff commit is pinned outside the candidate (an owner record or tag)"
+      "the base is the commit that first added kickoff/indy-init.kickoff.json in the candidate's first-parent history: history rewritten before the run moves it, unless the kickoff commit is pinned outside the candidate (an owner record or tag)"
       "tests are read lexically: whether a declared, unskipped test's body actually exercises the fix is not checked" ]
 
-/// The `indy-init.defect-closure-verification/3` report.
-let assess (inputs: Inputs) : Json =
+/// The `indy-init.defect-closure-verification/4` report.
+let assess (given: Inputs) : Json =
+    let full rev = resolveCommit given.Repo rev |> Option.defaultValue rev
+    let candidate = full given.Candidate
+    let baseText, kickoff, baseVerified, baseProblem = Kickoff.bind given.Repo candidate Kickoff.defaultPath given.Base candidate
+    // Every commit as a full SHA from here on, so the report echoes full SHAs.
+    let inputs = { given with Candidate = candidate; Records = given.Records |> Option.map full; Base = Some baseText }
+
     let recordsProblems =
         match inputs.Records with
         | Some records when not (Git.hasCommit inputs.Repo records && isAncestor inputs.Repo inputs.Candidate records) ->
             [ sprintf "DCL-006 records commit %s does not descend from the candidate %s" records inputs.Candidate ]
         | _ -> []
 
-    let baseCommit = resolveCommit inputs.Repo inputs.Base
+    let baseCommit = resolveCommit inputs.Repo baseText
     let tree = declaredTests inputs.Repo inputs.Candidate inputs.TestsPath
 
     let claimed =
@@ -285,14 +294,17 @@ let assess (inputs: Inputs) : Json =
               yield sprintf "%s is UNPARSEABLE (%s): which tests it declares, and whether they run, is unknown" f problem ]
 
     let verdict =
-        if refused > 0 then "REFUSED"
+        if refused > 0 || not baseVerified then "REFUSED"
         elif not incomplete.IsEmpty then "INCOMPLETE"
         else "VERIFIED"
 
     JObj
-        [ "schema", JStr "indy-init.defect-closure-verification/3"
-          "base", JStr(baseCommit |> Option.defaultValue inputs.Base)
-          "candidate", JStr(resolveCommit inputs.Repo inputs.Candidate |> Option.defaultValue inputs.Candidate)
+        [ "schema", JStr "indy-init.defect-closure-verification/4"
+          "base", JStr(baseCommit |> Option.defaultValue baseText)
+          "baseVerified", JBool baseVerified
+          "kickoff", Kickoff.toJson Kickoff.defaultPath kickoff
+          "baseProblem", jopt JStr baseProblem
+          "candidate", JStr candidate
           "records", jopt JStr inputs.Records
           "closures", JObj [ "source", JStr inputs.ClosuresSource; "sha256", JStr inputs.ClosuresSha256 ]
           "curationSupplied", JBool inputs.Curation.IsSome

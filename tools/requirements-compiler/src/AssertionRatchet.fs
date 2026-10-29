@@ -72,68 +72,16 @@ type Inputs =
       /// candidate's first-parent history.
       KickoffPath: string option }
 
-/// The only kickoff record that binds the base. Any other path is refused: a caller could otherwise name any file
-/// the history happens to add (an ROS envelope) and bind whatever base it was added at.
-let defaultKickoffPath = "kickoff/indy-init.kickoff.json"
+/// The only kickoff record that binds the base (Kickoff.defaultPath).
+let defaultKickoffPath = Kickoff.defaultPath
 
 /// Where the review tag changes are read from, in the records commit when given, else the candidate (Rehearsal 6's
 /// final review wrote them there).
 let tagChangesPath = "acceptance/reviews/final/review-tag-changes.json"
 
-/// The base commit a kickoff record names, and the field it is in: `base`, `baseCommit`, `ratchetBase`, or a
-/// kickoff receipt's `initialRepository.head`.
-let kickoffBase (kickoff: Json) : (string * string) option =
-    [ "base"; "baseCommit"; "ratchetBase" ]
-    |> List.tryPick (fun k -> strOpt k kickoff |> Option.map (fun v -> k, v))
-    |> Option.orElse (field "initialRepository" kickoff |> Option.bind (strOpt "head") |> Option.map (fun v -> "initialRepository.head", v))
-
-let private resolve (repo: string) (rev: string) =
-    match Git.run repo [ "rev-parse"; "--verify"; "--quiet"; rev + "^{commit}" ] with
-    | Ok bytes -> Some(Encoding.UTF8.GetString(bytes).Trim())
-    | Error _ -> None
-
-let private isAncestor (repo: string) (ancestor: string) (descendant: string) =
-    Git.run repo [ "merge-base"; "--is-ancestor"; ancestor; descendant ] |> Result.isOk
-
-/// The kickoff record as the candidate's history holds it: the commit that first added `path` in the candidate's
-/// first-parent history, the record as added, and the base it binds (that commit, or an ancestor the record names).
-/// Error when the history holds no such record, or the record names a base that is not an ancestor of it.
-type Kickoff =
-    { Path: string
-      AddedAt: string
-      Field: string option
-      RecordedBase: string option
-      BoundBase: string }
-
-let private kickoffAt (repo: string) (candidate: string) (path: string) : Result<Kickoff, string> =
-    let added =
-        match Git.run repo [ "log"; "--first-parent"; "--diff-filter=A"; "--format=%H"; candidate; "--"; path ] with
-        | Ok bytes -> Encoding.UTF8.GetString(bytes).Split('\n', StringSplitOptions.RemoveEmptyEntries) |> Array.tryLast
-        | Error _ -> None
-
-    match added with
-    | None -> Error(sprintf "no commit in %s's first-parent history adds the kickoff record %s" candidate path)
-    | Some addedAt ->
-        let record =
-            Git.showFile repo addedAt path |> Result.toOption |> Option.bind (fun bytes -> try Some(parseBytes bytes) with _ -> None)
-
-        match record with
-        | None -> Error(sprintf "the kickoff record %s as added at %s is not JSON" path addedAt)
-        | Some record ->
-            match kickoffBase record with
-            | None -> Ok { Path = path; AddedAt = addedAt; Field = None; RecordedBase = None; BoundBase = addedAt }
-            | Some(key, value) ->
-                match resolve repo value with
-                | Some named when isAncestor repo named addedAt ->
-                    Ok { Path = path; AddedAt = addedAt; Field = Some key; RecordedBase = Some value; BoundBase = named }
-                | _ -> Error(sprintf "the kickoff record %s as added at %s names %s `%s`, which is not an ancestor of that commit" path addedAt key value)
-
-/// The kickoff record of the candidate's history (see kickoffAt). Only defaultKickoffPath is read.
-let kickoffIn (repo: string) (candidate: string) (path: string) : Result<Kickoff, string> =
-    if path <> defaultKickoffPath then
-        Error(sprintf "only %s binds the base; %s is not the kickoff record" defaultKickoffPath path)
-    else
-        kickoffAt repo candidate path
+let private resolve = Kickoff.resolve
+let private isAncestor = Kickoff.isAncestor
+let kickoffIn = Kickoff.find
 
 let private underRoots (roots: string list) (path: string) =
     roots |> List.exists (fun r -> path.StartsWith(r.TrimEnd('/') + "/", StringComparison.Ordinal))
