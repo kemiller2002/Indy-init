@@ -14,10 +14,10 @@
 | R7-PF-06 | Unattended PR lifecycle verified | **BLOCKED** | A real merge without routine owner intervention was demonstrated, but the merge gate is advisory: the agent holds the signing key and the evaluate job is not required by a ruleset (UAE-R7-12). It must be re-run with the kickoff authorization (UAE-R7-06). |
 | R7-PF-07 | Evidence-generation pipeline verified | **NOT_RUN** | Experiment D (a representative workflow producing its evidence automatically) was not run. The producers exist (verify-defect-closures, assertion-ratchet, release-comparison, conditor candidate-verification) but are not yet wired into a rehearsal pipeline (R7-AMD-04). |
 | R7-PF-08 | Candidate verification gates passed | **NOT_RUN** | The candidate-acceptance template has not run on GitHub (Experiment E not run). |
-| R7-PF-09 | Defect classes closed correctly | **BLOCKED** | The verifier correctly refuses Rehearsal 6's closures. Its first independent review was BLOCKING; the re-review found a new false VERIFIED (N1), fixed in 6d05613; a third review is in progress. The Indy-init branch is not merged. |
+| R7-PF-09 | Defect classes closed correctly | **BLOCKED** | The verifier correctly refuses Rehearsal 6's closures. Its first independent review was BLOCKING; the re-review found a new false VERIFIED (N1), fixed in 6d05613; a third review found a lexer desync (D1) giving a false VERIFIED; its fix is in progress. The Indy-init branch is not merged. |
 | R7-PF-10 | Forma contrast verified | **BLOCKED** | Not merged or released. CI on ac34a55 (inventory regeneration after a validate failure) must be green. |
 | R7-PF-11 | Release comparison recorded | **NOT_RUN** | The record must be made at preflight against the kickoff set, immediately before the lock. The demonstration predates the releases this remediation needs (Arca, Forma, Conditor, Praxis), so it is not the record. |
-| R7-PF-12 | Independent adversarial review passed | **NOT_RUN** | Not every package has a passing final review: the tools' third review is pending, Conditor's fixes were not re-reviewed, and the security review depends on the credential probe. |
+| R7-PF-12 | Independent adversarial review passed | **NOT_RUN** | Not every package has a passing final review: the tools' third review was BLOCKING (fixes in progress), Conditor's fixes were not re-reviewed, and the security review depends on the credential probe. |
 | R7-PF-13 | No unresolved critical defects | **NOT_RUN** | No Rehearsal 7 candidate exists. The defect-closure verifier must record each closure against a fix commit in Rehearsal 7's history. |
 | R7-PF-14 | Frozen requirements and verification plan ready | **BLOCKED** | The compiled package v4 is not cut (K3: the R7 compile with the v3 curation fails V09, V11, V17, V18), K2 and K4 owner decisions are open, and R7-AMD-03..05 are undecided. Approvals are owner records (RDP-003). |
 
@@ -111,7 +111,7 @@ Needs:
 - Arca: three rounds, final PASS_WITH_FINDINGS (low), fixed
 - Conditor: PASS_WITH_FINDINGS, F1-F8 fixed (not re-reviewed)
 - Forma: PASS after fixes
-- Indy-init tools: first review BLOCKING (F1-F5), fixed; re-review BLOCKING (N1-N3, F3 partial, N5), fixed at eb978e2; third review in progress; N4 documented as an inherent limit
+- Indy-init tools: first review BLOCKING (F1-F5), fixed; re-review BLOCKING (N1-N3, F3 partial, N5), fixed at eb978e2; third review BLOCKING (D1-D4), fixes in progress; N4 documented as an inherent limit
 - Security: SECURITY-REVIEW.md; the credential probe is not run
 
 Needs:
