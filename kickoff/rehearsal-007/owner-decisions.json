@@ -1,0 +1,257 @@
+{
+  "schema": "indy-init.owner-decisions/1",
+  "rehearsal": "007",
+  "owner": "kemiller2002",
+  "recorded": "2026-10-29",
+  "provenance": {
+    "recordedBy": "agent (Claude Code), on the owner's instruction; the owner did not edit this file",
+    "session": "https://claude.ai/code/session_01G1iECgFKAqjRxZ1hWEGsRf",
+    "questions": "Asked in chat: each Rehearsal 6 scope decision that the v3 curation applies was put to the owner with its Rehearsal 6 choice and the agent's recommendation; two answers were clarified by a follow-up question.",
+    "ownerInstruction": "These decisions are getting saved as part of the Indy init requirements",
+    "effective": "RDP-003: an agent's transcription takes effect only when the owner merges the pull request that adds this file. Until then every decision below is APPROVAL_PENDING_MERGE, except DEC-R7-005, which is still open.",
+    "notProof": "A decision changes scope. It never verifies an obligation, and nothing here marks one verified."
+  },
+  "context": [
+    {
+      "decision": "ADR-R7-001: session-local investigation state, GitHub as the only durable store (docs/rehearsal-007/PERSISTENCE-ARCHITECTURE-DECISION.md); merged as pull request #41",
+      "ownerWords": "I approve",
+      "date": "2026-10-29"
+    }
+  ],
+  "decisions": [
+    {
+      "id": "DEC-R7-001",
+      "question": "Rehearsal 6 (DEC-R6-001) allowed anonymous read-only access to public catalogs and required a login only for writes. Keep that for Rehearsal 7?",
+      "options": {
+        "A": "Keep DEC-R6-001: anonymous reads of public catalogs, authenticated writes.",
+        "B": "Require a GitHub login for reads and for writes; no anonymous mode."
+      },
+      "recommendation": "A (carry over)",
+      "selected": "B",
+      "ownerWords": [
+        "001- we need a login for both"
+      ],
+      "date": "2026-10-29",
+      "evidenceSource": "Owner message in session https://claude.ai/code/session_01G1iECgFKAqjRxZ1hWEGsRf, transcribed by the agent",
+      "affectedRequirements": [
+        "PF-015",
+        "EXT-DATA-005"
+      ],
+      "affectedObligations": [
+        {
+          "obligation": "PF-015-O1",
+          "status": "amended in the requirement text: every catalog read and every write requires an authenticated credential; no anonymous mode"
+        }
+      ],
+      "resultingScope": "Every connection needs a credential, as OD-INDY-10 already said. EXT-DATA-005's repository and branch permission checks still apply.",
+      "implementationWork": [
+        "Connect refuses a blank credential for reads as well as writes.",
+        "Write permission is never inferred from a successful read."
+      ],
+      "approvalStatus": "APPROVAL_PENDING_MERGE",
+      "replaces": "DEC-R6-001"
+    },
+    {
+      "id": "DEC-R7-002",
+      "question": "Rehearsal 6 (DEC-R6-002) required amber #E9A23B indicators to reach 3:1 as non-text indicators; the graph's amber outline measured 1.95:1 and failed. What applies for Rehearsal 7?",
+      "options": {
+        "A": "Text-paired amber indicators are not relevant non-text indicators; #E9A23B stays as it is.",
+        "B": "Keep the 3:1 rule for amber indicators and accept that UI-016-O11 fails again unless Forma adds an outline token."
+      },
+      "recommendation": "Keep the rule (B) or get a Forma outline token first",
+      "selected": "A",
+      "ownerWords": [
+        "002 - the color is fine for the next run",
+        "2 a"
+      ],
+      "date": "2026-10-29",
+      "evidenceSource": "Owner message in session https://claude.ai/code/session_01G1iECgFKAqjRxZ1hWEGsRf, transcribed by the agent",
+      "affectedRequirements": [
+        "UI-016",
+        "PF-016"
+      ],
+      "affectedObligations": [
+        {
+          "obligation": "UI-016-O11",
+          "status": "unchanged; a new UI-016 sentence states that, for Rehearsal 7, a text-paired amber #E9A23B indicator is not a relevant non-text indicator, and amber that is the only cue still needs 3:1"
+        }
+      ],
+      "resultingScope": "For Rehearsal 7 only. Amber used as the only cue still needs 3:1; text still needs 4.5:1 (normal) or 3:1 (large).",
+      "implementationWork": [
+        "Every amber indicator carries a text label or another non-colour cue; tests check that pairing, and measure 3:1 wherever amber is the only cue."
+      ],
+      "approvalStatus": "APPROVAL_PENDING_MERGE",
+      "replaces": "DEC-R6-002"
+    },
+    {
+      "id": "DEC-R7-003",
+      "question": "Does an application-level role model apply to Causa (UI-031-O5)?",
+      "options": {
+        "A": "No user roles: single-user scope; credential protection, provider permissions, data isolation and secure handling of operational information still apply.",
+        "B": "Require a full application-level role model."
+      },
+      "recommendation": "A",
+      "selected": "A",
+      "ownerWords": [
+        "003 a no user roles"
+      ],
+      "date": "2026-10-29",
+      "evidenceSource": "Owner message in session https://claude.ai/code/session_01G1iECgFKAqjRxZ1hWEGsRf, transcribed by the agent",
+      "affectedRequirements": [
+        "UI-031"
+      ],
+      "affectedObligations": [
+        {
+          "obligation": "UI-031-O5",
+          "status": "amended in the requirement text to the single-user wording of DEC-R6-003's criterion"
+        }
+      ],
+      "resultingScope": "No role model. In Rehearsal 6 the amendment waited for an operator approval record and was never applied (DEC-R6-011); here it is written into the requirement itself.",
+      "implementationWork": [
+        "Authorization of every repository operation against the provider's actual permissions; no secret in any view."
+      ],
+      "approvalStatus": "APPROVAL_PENDING_MERGE",
+      "replaces": "DEC-R6-003"
+    },
+    {
+      "id": "DEC-R7-004",
+      "question": "AR-019-O3 (the Rehearsal 3 verdict) was verified as written in Rehearsal 6 (DEC-R6-004 not applied, DEC-R6-011). Amend it for Rehearsal 7, or leave it?",
+      "options": {
+        "A": "Leave AR-019-O3 as written.",
+        "B": "Amend AR-019-O3 to accept any authoritative non-accepting verdict, through an operator-written approval record."
+      },
+      "recommendation": "A",
+      "selected": "A",
+      "ownerWords": [
+        "3 leave it as you recommend"
+      ],
+      "date": "2026-10-29",
+      "evidenceSource": "Owner message in session https://claude.ai/code/session_01G1iECgFKAqjRxZ1hWEGsRf, transcribed by the agent",
+      "affectedRequirements": [
+        "AR-019"
+      ],
+      "affectedObligations": [
+        {
+          "obligation": "AR-019-O3",
+          "status": "in scope, unchanged"
+        }
+      ],
+      "resultingScope": "No scope change. INVALID, FAIL and BLOCKED stay distinct in reports.",
+      "implementationWork": [],
+      "approvalStatus": "APPROVAL_PENDING_MERGE",
+      "replaces": "DEC-R6-004"
+    },
+    {
+      "id": "DEC-R7-005",
+      "question": "AR-031: for each of the 25 generic screen contracts, IN SCOPE or NOT-APPLICABLE for Rehearsal 7?",
+      "options": {
+        "A": "As Rehearsal 6: S16 (counterfactual branching) NOT-APPLICABLE, S01-S15 and S17-S25 IN SCOPE.",
+        "B": "A different split, named by the owner."
+      },
+      "recommendation": "A",
+      "selected": "not yet answered",
+      "ownerWords": [
+        "006 - what is this one"
+      ],
+      "date": "2026-10-29",
+      "evidenceSource": "Owner message in session https://claude.ai/code/session_01G1iECgFKAqjRxZ1hWEGsRf, transcribed by the agent",
+      "affectedRequirements": [
+        "AR-031",
+        "S01..S25"
+      ],
+      "affectedObligations": [],
+      "resultingScope": "Open. The question was explained to the owner; no selection has been made. AR-031 requires a recorded decision before the clock starts.",
+      "implementationWork": [],
+      "approvalStatus": "OPEN_AWAITING_OWNER",
+      "replaces": "DEC-R6-006"
+    },
+    {
+      "id": "DEC-R7-006",
+      "question": "Rehearsal 6 (DEC-R6-007) kept three historical investigations (historical-v1) and waived the four-case causa-data requirement. How many for Rehearsal 7?",
+      "options": {
+        "A": "Four: Apollo 1, Apollo 11, Space Shuttle Challenger and the burned-out lightbulb.",
+        "B": "Keep three (historical-v1) and the waiver."
+      },
+      "recommendation": "B (carry over) unless the four-case dataset is verified before kickoff",
+      "selected": "A",
+      "ownerWords": [
+        "007 - there should be 4 now",
+        "1 yes"
+      ],
+      "date": "2026-10-29",
+      "evidenceSource": "Owner message in session https://claude.ai/code/session_01G1iECgFKAqjRxZ1hWEGsRf, transcribed by the agent",
+      "affectedRequirements": [
+        "EXT-DATA-013",
+        "UI-001",
+        "UI-015",
+        "PF-014",
+        "PROVIDER-FIXTURE-AND-INTEGRATION§acceptance-scenarios"
+      ],
+      "affectedObligations": [
+        {
+          "obligation": "EXT-DATA-013-O1",
+          "status": "amended: exactly four investigations including the burned-out lightbulb"
+        },
+        {
+          "obligation": "UI-001-O1",
+          "status": "amended"
+        },
+        {
+          "obligation": "UI-015-O2",
+          "status": "amended: four active-catalog investigations"
+        },
+        {
+          "obligation": "PF-014-O2",
+          "status": "amended: four catalog investigation reconstructions"
+        },
+        {
+          "obligation": "PROVIDER-FIXTURE-AND-INTEGRATION§acceptance-scenarios-O8",
+          "status": "amended: all four digests"
+        }
+      ],
+      "resultingScope": "The four-case waiver ends. causa-data must publish a catalog with all four investigations, named by catalog/active.json, and its workspace initialization must be verified before kickoff. causa-data main today holds only historical-v1 (three cases), so this is a kickoff blocker.",
+      "implementationWork": [
+        "causa-data: the lightbulb investigation, a four-case catalog and catalog/active.json pointing at it, verified by causa-data's own gates (preparation outside Indy-init).",
+        "Preflight stages 7-10 are no longer waived."
+      ],
+      "approvalStatus": "APPROVAL_PENDING_MERGE",
+      "replaces": "DEC-R6-007"
+    },
+    {
+      "id": "DEC-R7-007",
+      "question": "How are the GitHub test secrets split?",
+      "options": {
+        "A": "Two secrets: CAUSA_GITHUB_TOKEN read-only for authenticated read tests; CAUSA_WRITE_TOKEN with contents write on the test repository only, for live write tests.",
+        "B": "One write-capable token for all live tests."
+      },
+      "recommendation": "A",
+      "selected": "A",
+      "ownerWords": [
+        "010 -  well create read and a write"
+      ],
+      "date": "2026-10-29",
+      "evidenceSource": "Owner message in session https://claude.ai/code/session_01G1iECgFKAqjRxZ1hWEGsRf, transcribed by the agent",
+      "affectedRequirements": [
+        "PF-015",
+        "PF-014",
+        "AR-033"
+      ],
+      "affectedObligations": [
+        {
+          "obligation": "PF-015-O2",
+          "status": "in scope; PF-015 now names both secrets"
+        },
+        {
+          "obligation": "AR-033-O1",
+          "status": "amended: preflight checks CAUSA_WRITE_TOKEN too"
+        }
+      ],
+      "resultingScope": "No scope change beyond naming the second secret. Rehearsal 6 ran with a write-capable read token (D-09); that must not recur.",
+      "implementationWork": [
+        "Owner: create both secrets before kickoff; preflight verifies both are set without exposing values (AR-033)."
+      ],
+      "approvalStatus": "APPROVAL_PENDING_MERGE",
+      "replaces": "DEC-R6-010"
+    }
+  ]
+}
