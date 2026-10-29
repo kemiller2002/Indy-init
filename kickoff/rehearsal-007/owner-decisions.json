@@ -8,7 +8,7 @@
     "session": "https://claude.ai/code/session_01G1iECgFKAqjRxZ1hWEGsRf",
     "questions": "Asked in chat: each Rehearsal 6 scope decision that the v3 curation applies was put to the owner with its Rehearsal 6 choice and the agent's recommendation; two answers were clarified by a follow-up question.",
     "ownerInstruction": "These decisions are getting saved as part of the Indy init requirements",
-    "effective": "RDP-003: an agent's transcription takes effect only when the owner merges the pull request that adds this file. Until then every decision below is APPROVAL_PENDING_MERGE, except DEC-R7-005, which is still open.",
+    "effective": "RDP-003: an agent's transcription takes effect only when the owner merges the pull request that adds this file. Until then every decision below is APPROVAL_PENDING_MERGE.",
     "notProof": "A decision changes scope. It never verifies an obligation, and nothing here marks one verified."
   },
   "context": [
@@ -149,9 +149,10 @@
         "B": "A different split, named by the owner."
       },
       "recommendation": "A",
-      "selected": "not yet answered",
+      "selected": "A: S16 NOT-APPLICABLE; S01-S15 and S17-S25 IN SCOPE",
       "ownerWords": [
-        "006 - what is this one"
+        "006 - what is this one",
+        "Agreed"
       ],
       "date": "2026-10-29",
       "evidenceSource": "Owner message in session https://claude.ai/code/session_01G1iECgFKAqjRxZ1hWEGsRf, transcribed by the agent",
@@ -160,10 +161,165 @@
         "S01..S25"
       ],
       "affectedObligations": [],
-      "resultingScope": "Open. The question was explained to the owner; no selection has been made. AR-031 requires a recorded decision before the clock starts.",
-      "implementationWork": [],
-      "approvalStatus": "OPEN_AWAITING_OWNER",
-      "replaces": "DEC-R6-006"
+      "resultingScope": "24 screen contracts in scope, as in Rehearsal 6. S16 (counterfactual branching) may be bound NOT-APPLICABLE only by citing DEC-R7-005; the Causa engine has no counterfactual capability and no requirement asks for one.",
+      "implementationWork": [
+        "Every in-scope screen satisfies its semantic contract (ADRP-002); S16 is reported NOT-APPLICABLE, never PASS."
+      ],
+      "approvalStatus": "APPROVAL_PENDING_MERGE",
+      "replaces": "DEC-R6-006",
+      "screens": [
+        {
+          "id": "S01",
+          "contract": "s01-investigation-start",
+          "description": "Investigation Start",
+          "scope": "IN SCOPE"
+        },
+        {
+          "id": "S02",
+          "contract": "s02-investigation-workspace",
+          "description": "Investigation Workspace",
+          "scope": "IN SCOPE"
+        },
+        {
+          "id": "S03",
+          "contract": "s03-hypothesis-battlefield",
+          "description": "Hypothesis Battlefield",
+          "scope": "IN SCOPE"
+        },
+        {
+          "id": "S04",
+          "contract": "s04-hypothesis-detail",
+          "description": "Hypothesis Detail",
+          "scope": "IN SCOPE"
+        },
+        {
+          "id": "S05",
+          "contract": "s05-evidence-capture",
+          "description": "Evidence Capture",
+          "scope": "IN SCOPE"
+        },
+        {
+          "id": "S06",
+          "contract": "s06-evidence-detail",
+          "description": "Evidence Detail",
+          "scope": "IN SCOPE"
+        },
+        {
+          "id": "S07",
+          "contract": "s07-evidence-dependency",
+          "description": "Evidence Dependency",
+          "scope": "IN SCOPE"
+        },
+        {
+          "id": "S08",
+          "contract": "s08-epistemic-blocker-detail",
+          "description": "Unknown / Assumption / Contradiction",
+          "scope": "IN SCOPE"
+        },
+        {
+          "id": "S09",
+          "contract": "s09-action-experiment-designer",
+          "description": "Action / Experiment Designer",
+          "scope": "IN SCOPE"
+        },
+        {
+          "id": "S10",
+          "contract": "s10-finding-result-capture",
+          "description": "Finding / Result Capture",
+          "scope": "IN SCOPE"
+        },
+        {
+          "id": "S11",
+          "contract": "s11-cause-review",
+          "description": "Cause Review",
+          "scope": "IN SCOPE"
+        },
+        {
+          "id": "S12",
+          "contract": "s12-corrective-action",
+          "description": "Corrective Action",
+          "scope": "IN SCOPE"
+        },
+        {
+          "id": "S13",
+          "contract": "s13-verification",
+          "description": "Verification",
+          "scope": "IN SCOPE"
+        },
+        {
+          "id": "S14",
+          "contract": "s14-history-time-travel",
+          "description": "History / Time Travel",
+          "scope": "IN SCOPE"
+        },
+        {
+          "id": "S15",
+          "contract": "s15-semantic-diff",
+          "description": "Semantic Diff",
+          "scope": "IN SCOPE"
+        },
+        {
+          "id": "S16",
+          "contract": "s16-counterfactual-sandbox",
+          "description": "Counterfactual Sandbox",
+          "scope": "NOT-APPLICABLE",
+          "reason": "The Causa engine has no counterfactual capability, and no Causa requirement beyond the generic contract asks for one."
+        },
+        {
+          "id": "S17",
+          "contract": "s17-multi-agent-panel",
+          "description": "Multi-Agent Panel",
+          "scope": "IN SCOPE"
+        },
+        {
+          "id": "S18",
+          "contract": "s18-research-tournament",
+          "description": "Research Tournament",
+          "scope": "IN SCOPE"
+        },
+        {
+          "id": "S19",
+          "contract": "s19-replay-spectator",
+          "description": "Replay / Spectator",
+          "scope": "IN SCOPE"
+        },
+        {
+          "id": "S20",
+          "contract": "s20-factory-view",
+          "description": "Factory View",
+          "scope": "IN SCOPE"
+        },
+        {
+          "id": "S21",
+          "contract": "s21-requirements-proof",
+          "description": "Requirements Proof",
+          "scope": "IN SCOPE"
+        },
+        {
+          "id": "S22",
+          "contract": "s22-report-preview",
+          "description": "Report Preview",
+          "scope": "IN SCOPE"
+        },
+        {
+          "id": "S23",
+          "contract": "s23-persistence-conflict-recovery",
+          "description": "Persistence / Conflict Recovery",
+          "scope": "IN SCOPE"
+        },
+        {
+          "id": "S24",
+          "contract": "s24-settings-semantic-manifest",
+          "description": "Settings / Semantic Manifest",
+          "scope": "IN SCOPE"
+        },
+        {
+          "id": "S25",
+          "contract": "s25-demo-health",
+          "description": "Demo Health",
+          "scope": "IN SCOPE"
+        }
+      ]
     },
     {
       "id": "DEC-R7-006",

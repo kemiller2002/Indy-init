@@ -2,13 +2,13 @@
 
 **Requirements: READY.** The persistence requirements are written, validated and committed, and the baseline is pinned ([validation report](REQUIREMENTS-VALIDATION-REPORT.md)).
 
-**Kickoff: NOT READY.** The open steps below must happen before Rehearsal 7 starts. None of them is application work, and Rehearsal 7 has not started. The main blockers are the four-case causa-data catalog (K7), the v4 package (K3), the screen-contract decision DEC-R7-005 and the two tokens (K6).
+**Kickoff: NOT READY.** The open steps below must happen before Rehearsal 7 starts. None of them is application work, and Rehearsal 7 has not started. The main blockers are the four-case causa-data catalog (K7), the v4 package (K3) and the two tokens (K6).
 
 | | |
 |---|---|
 | Decision | [ADR-R7-001](PERSISTENCE-ARCHITECTURE-DECISION.md), effective on the owner's merge (RDP-003) |
 | Requirements | [`docs/CAUSA-PERSISTENCE-REQUIREMENTS.md`](../CAUSA-PERSISTENCE-REQUIREMENTS.md), PERSIST-001 to PERSIST-055, plus 30 amended Rehearsal 6 requirements |
-| Owner decisions | [`kickoff/rehearsal-007/OWNER-DECISIONS.md`](../../kickoff/rehearsal-007/OWNER-DECISIONS.md), DEC-R7-001 to DEC-R7-007 (DEC-R7-005 still open) |
+| Owner decisions | [`kickoff/rehearsal-007/OWNER-DECISIONS.md`](../../kickoff/rehearsal-007/OWNER-DECISIONS.md), DEC-R7-001 to DEC-R7-007 |
 | Baseline | `BL-CAUSA-INDY-INIT-8445ca11986f`, re-pinned after the owner decisions ([`requirements/causa-requirements-baseline-r7.json`](../../requirements/causa-requirements-baseline-r7.json)) |
 | Traceability | [`DEFECT-TRACEABILITY.md`](DEFECT-TRACEABILITY.md), [`traceability.json`](traceability.json) |
 | Validator | `tools/validate-r7-persistence-requirements.fsx`, run in CI by `preflight-tooling.yml` together with its negative controls |
@@ -27,7 +27,7 @@
 |---|---|---|---|
 | K1 | Merge ADR-R7-001 and the persistence requirements | Owner | **Done.** Approved ("I approve") and merged as pull request #41 (`8d01613`) |
 | K2 | Confirm the values chosen in writing the requirements ([ADR table](PERSISTENCE-ARCHITECTURE-DECISION.md#choices-made-in-writing-the-requirements)) | Owner | **Done**, with the approval of #41 |
-| K4 | Record the Rehearsal 7 owner decisions for the scope carried from Rehearsal 6 | Owner | **Done except DEC-R7-005.** DEC-R7-001 to -004, -006 and -007 are recorded and applied to the requirement texts, effective on the owner's merge of the pull request that adds them (RDP-003). DEC-R7-005, the screen-contract scope, is still open; the recommendation is S16 NOT-APPLICABLE and the other 24 IN SCOPE |
+| K4 | Record the Rehearsal 7 owner decisions for the scope carried from Rehearsal 6 | Owner | **Done.** DEC-R7-001 to DEC-R7-007 are recorded, and those that change a requirement are applied to its text. They take effect on the owner's merge of the pull request that adds them (RDP-003). DEC-R7-005 keeps Rehearsal 6's screen scope: S16 NOT-APPLICABLE and the other 24 IN SCOPE |
 | K7 | **Publish the four-case catalog in causa-data (DEC-R7-006).** causa-data `main` holds only `historical-v1` (Apollo 1, Apollo 11, Challenger). Before kickoff it needs four things, verified by causa-data's own gates: the burned-out lightbulb investigation, a catalog with all four investigations, `catalog/active.json` naming that catalog, and its workspace initialization. Rehearsal 6's preflight stages 7 to 10 are no longer waived | Owner, or an agent in causa-data | **Blocker.** EXT-DATA-013, UI-001, UI-015 and PF-014 require four |
 | K3 | Cut compiled package **v4** from `BL-CAUSA-INDY-INIT-8445ca11986f`. The steps are K3a to K3f below, and the compiler must report PASS with plan-readiness READY and no permits | Agent, then owner | Open. The R7 compile with the v3 curation fails V09, V11, V17 and V18 for curation reasons only |
 | K5 | Close the Rehearsal 6 report's other recommendations, in preflight: G7 defect classes re-closed with fix SHAs in R7's own history; deploy gated on a green core job with visible test output; owner attestation through approving GitHub reviews; a pre-lock newest-release comparison (VER-001/002); the tooling gaps D-03 and attestation types | Agent and owner | Open. The amber outline item is settled by DEC-R7-002, and the read-only token by DEC-R7-007 and K6 |
