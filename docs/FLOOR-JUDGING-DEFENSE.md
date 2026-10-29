@@ -207,9 +207,9 @@ manual/offline demo or test.
 
 Answer structure:
 
-- local durable commands/state remain
-- remote status becomes Pending/Offline
-- reconnect triggers semantic revalidation
+- the loaded investigation stays visible in the tab's memory; edits stay unsaved in that tab
+- save state becomes Offline, never Saved (ADR-R7-001)
+- after reconnect, the user saves; stale heads rebase or become explicit conflicts
 - no fake synced state
 
 Evidence:

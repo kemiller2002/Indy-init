@@ -156,6 +156,8 @@ This reduces hand-crafted UI state gaps.
 
 ## 10. Offline chaos testing
 
+> **Superseded for Causa (ADR-R7-001).** From Rehearsal 7, Causa keeps investigation state only in each tab's memory, saves only by confirmed GitHub commits, and has no offline queue or local crash recovery. [CAUSA-PERSISTENCE-REQUIREMENTS.md](CAUSA-PERSISTENCE-REQUIREMENTS.md) governs; this section remains long-term platform direction only.
+
 Simulate:
 
 - network drops before append

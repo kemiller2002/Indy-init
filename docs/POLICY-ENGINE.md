@@ -480,6 +480,8 @@ A pending command/proposal requires revalidation when any relevant input changed
 
 ## 31. Offline command queue
 
+> **Superseded for Causa (ADR-R7-001).** From Rehearsal 7, Causa keeps investigation state only in each tab's memory, saves only by confirmed GitHub commits, and has no offline queue or local crash recovery. [CAUSA-PERSISTENCE-REQUIREMENTS.md](CAUSA-PERSISTENCE-REQUIREMENTS.md) governs; this section remains long-term platform direction only.
+
 Offline operation may stage commands locally.
 
 A queued command records:

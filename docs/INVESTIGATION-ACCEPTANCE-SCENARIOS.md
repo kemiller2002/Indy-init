@@ -564,6 +564,8 @@ And no duplicate semantic event is appended.
 
 ## A65. Stale offline command is revalidated
 
+> **Superseded for Causa (ADR-R7-001).** From Rehearsal 7, Causa keeps investigation state only in each tab's memory, saves only by confirmed GitHub commits, and has no offline queue or local crash recovery. [CAUSA-PERSISTENCE-REQUIREMENTS.md](CAUSA-PERSISTENCE-REQUIREMENTS.md) governs; this section remains long-term platform direction only.
+
 Given command C was queued offline against aggregate version 20
 And remote state changes to version 24
 When the client reconnects
@@ -599,6 +601,8 @@ Then its InvestigationId and semantic AggregateVersion remain meaningful
 And no core entity requires the former GitHub SHA to retain identity.
 
 ## A70. Offline restart preserves pending work
+
+> **Superseded for Causa (ADR-R7-001).** From Rehearsal 7, Causa keeps investigation state only in each tab's memory, saves only by confirmed GitHub commits, and has no offline queue or local crash recovery. [CAUSA-PERSISTENCE-REQUIREMENTS.md](CAUSA-PERSISTENCE-REQUIREMENTS.md) governs; this section remains long-term platform direction only.
 
 Given the user records evidence offline
 And the application is closed before synchronization
@@ -1389,6 +1393,8 @@ And the build is not considered semantically verified.
 
 ## A184. Offline acknowledgement-loss retry is idempotent
 
+> **Superseded for Causa (ADR-R7-001).** From Rehearsal 7, Causa keeps investigation state only in each tab's memory, saves only by confirmed GitHub commits, and has no offline queue or local crash recovery. [CAUSA-PERSISTENCE-REQUIREMENTS.md](CAUSA-PERSISTENCE-REQUIREMENTS.md) governs; this section remains long-term platform direction only.
+
 Given remote append succeeds
 And acknowledgement is lost
 When client retries the same idempotent command
@@ -1396,6 +1402,8 @@ Then no duplicate semantic event is created
 And local queue converges to Applied.
 
 ## A185. Auth expiry preserves local queue
+
+> **Superseded for Causa (ADR-R7-001).** From Rehearsal 7, Causa keeps investigation state only in each tab's memory, saves only by confirmed GitHub commits, and has no offline queue or local crash recovery. [CAUSA-PERSISTENCE-REQUIREMENTS.md](CAUSA-PERSISTENCE-REQUIREMENTS.md) governs; this section remains long-term platform direction only.
 
 Given pending commands exist
 And authentication expires during synchronization

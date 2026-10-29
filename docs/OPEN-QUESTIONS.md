@@ -100,6 +100,8 @@ Simple current snapshot after successful semantic commit for first release.
 Question:
 IndexedDB versus another durable local mechanism?
 
+Answered for Causa by ADR-R7-001: neither. Investigation state is held only in each tab's memory and GitHub is the only durable store ([CAUSA-PERSISTENCE-REQUIREMENTS.md](CAUSA-PERSISTENCE-REQUIREMENTS.md)).
+
 Current posture:
 ReversibleChoice.
 

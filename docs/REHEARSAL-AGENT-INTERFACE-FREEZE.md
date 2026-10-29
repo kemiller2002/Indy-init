@@ -1,11 +1,11 @@
 # Next Rehearsal Agent Handoff Contract
 
-Status: normative boundary and acceptance contract. The actual source-level F# signatures MUST be extracted and pinned before fan-out; these are not fabricated compile-ready interfaces.
+Status: normative boundary and acceptance contract. The F# signatures MUST be authored from the requirements at kickoff and pinned before fan-out; these are not fabricated compile-ready interfaces.
 
 ## Ownership
 - Domain owner: F# command/decision/event semantics, policy and capability derivation.
 - UI owner: Forma shell, Limen host, screen projections, accessibility and loading experience.
-- Persistence owner: provider-neutral adapter, frozen contract mapping, local queue, optimistic concurrency and remote acknowledgment.
+- Persistence owner: provider-neutral adapter, frozen contract mapping, session-local unsaved changes held in memory, expected-head commits, rebase, reconciliation and confirmed save state.
 - Integration owner: dependency lock, contract tests, CI, review, deployed-SHA proof, release-candidate batching.
 - Coordinator: interface change control, escalations and requirements ledger.
 
@@ -19,13 +19,13 @@ A single immutable projection identifies investigation, aggregate version, lifec
 Given an immutable canonical ordered history and semantic/policy version, replay validates every event through the authoritative engine and either yields a projection or a typed invalid-history fault. No alternative browser-only validator. Frozen fixtures are read-only.
 
 ## Boundary D: persistence
-Provider-neutral operations: load, append with expected version, acknowledge remote persistence, surface conflict, and recover local edits. Separate local-durable from remotely-synced status. Storage adapter alone maps to causa-data v1.0.0 paths/serialization. No secrets in browser bundles.
+Provider-neutral operations: load at a branch head, commit with an expected head, confirm by read-back, reconcile an unknown outcome, rebase over unrelated changes, surface a genuine conflict, and reapply unsaved commands after one (CAUSA-PERSISTENCE-REQUIREMENTS.md). Unsaved changes live only in the tab's memory; there is no local-durable status. Storage adapter alone maps to causa-data v1.0.0 paths/serialization. No secrets in browser bundles.
 
 ## Boundary E: report
 Folio receives a read-only, versioned report projection with provenance, unresolved uncertainties, conclusions and verification status as present. Report rendering cannot elevate an unverified hypothesis to a confirmed cause.
 
 ## Contract freeze procedure
-1. Extract actual types and exported interfaces from accepted R001 F# source and Limen adapter.
+1. Author the types and exported interfaces at kickoff from these requirements, the command/event catalog, the frozen storage contract and the published Limen API. Earlier rehearsal source is not an input (PERSIST-026).
 2. Publish one versioned interface manifest including module/type names, request/response examples, error variants and contract tests.
 3. Run golden replay of all five frozen scenarios and negative-history cases.
 4. Each owner signs off against the exact interface-manifest SHA before parallel work.
@@ -33,7 +33,7 @@ Folio receives a read-only, versioned report projection with provenance, unresol
 6. An interface not extracted and validated is BLOCKED, not frozen.
 
 ## Mandatory negative cases
-Stale aggregate version; forged/illegal history; unknown required semantic extension; unauthorized command; duplicate submission; conflicting remote write; offline queue; mismatched frozen schema; incomplete verification; incorrect deployed SHA.
+Stale aggregate version; forged/illegal history; unknown required semantic extension; unauthorized command; duplicate submission; conflicting remote write; stale head over unrelated changes; unknown commit outcome; save requested while offline; mismatched frozen schema; incomplete verification; incorrect deployed SHA.
 
 ## Completion evidence
 Interface manifest SHA, owner matrix, producer/consumer tests, negative-case results, and decision log. Integrate defect-class closure from DEFECT-CLASS-CLOSURE-AND-RELEASE-GATES.md.

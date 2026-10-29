@@ -398,9 +398,9 @@ Required:
 
 Required:
 
-- local version
-- remote version
-- pending commands
+- this tab's version
+- GitHub version (branch head)
+- unsaved commands held in this tab
 - semantic conflict explanation
 - revalidation result
 - safe resolution choices

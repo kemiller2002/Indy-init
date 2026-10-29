@@ -27,7 +27,21 @@ let documents: (string * string * string option) list =
       "docs/SYSTEM-VERSION-AND-COMPATIBILITY-REQUIREMENTS.md", "SYSTEM-VERSION-AND-COMPATIBILITY", Some @"^\*\*(VER-\d{3}) "
       "docs/AGENT-RELIABILITY-REQUIREMENTS.md", "AGENT-RELIABILITY", Some @"^\*\*(AR-\d{3}) "
       "docs/REHEARSAL-AGENT-INTERFACE-FREEZE.md", "REHEARSAL-AGENT-INTERFACE-FREEZE", None
-      "docs/REHEARSAL-ACCEPTANCE-LEDGER.md", "REHEARSAL-ACCEPTANCE-LEDGER", None ]
+      "docs/REHEARSAL-ACCEPTANCE-LEDGER.md", "REHEARSAL-ACCEPTANCE-LEDGER", None
+      "docs/CAUSA-PERSISTENCE-REQUIREMENTS.md", "CAUSA-PERSISTENCE", Some @"^## (PERSIST-\d{3}):" ]
+
+/// Documents added after earlier baselines were pinned (ADR-R7-001). Each is in the baseline of every commit that has
+/// it; a commit from before it was added has no such file, so that commit's baseline is unchanged. Every other
+/// document is required.
+let introducedDocuments = set [ "docs/CAUSA-PERSISTENCE-REQUIREMENTS.md" ]
+
+let private present (read: string -> string) (path: string) =
+    not (introducedDocuments.Contains path)
+    || (try
+            read path |> ignore
+            true
+        with _ ->
+            false)
 
 let private excludedSections =
     set
@@ -216,7 +230,8 @@ let build (read: string -> string) (commit: string) : Json =
 
         document :: docs, docReqs, seen'
 
-    let docs, reqs, _ = documents |> List.fold folder ([], [], Set.empty)
+    let docs, reqs, _ =
+        documents |> List.filter (fun (path, _, _) -> present read path) |> List.fold folder ([], [], Set.empty)
 
     JObj
         [ "schema", JStr "praxis.requirements-baseline/1"

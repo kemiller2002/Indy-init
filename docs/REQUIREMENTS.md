@@ -164,7 +164,7 @@ Natural-language interaction may be central, but the structured investigation st
 Every screen and every addressable thing has a URL, and pasting that URL into another browser opens the same view. Addressable things are investigations, hypotheses, evidence items, unknowns, assumptions, contradictions, actions and experiments, findings, causes, corrective actions, verifications, counterfactual branches, historical versions and reports. The URL also carries the view's navigable state: the selected version or comparison pair, filters, sort, search, tab and page. This is the portfolio deep-linking standard (Praxis SAF-URL-1..10), and the route table is in [Screen Contracts](SCREEN-CONTRACTS.md#url-contract).
 
 ### R9.7 Deep links survive reload, sign-in and offline
-Routes are hash-based (`index.html#/...`), with relative links and no `<base href>`. A reloaded or pasted deep link therefore never 404s on GitHub Pages (D-203; Limen DF-LIMEN-2026-0006). When GitHub sign-in is needed, the application keeps the target, returns to it afterwards, and never returns outside the application. A deep link to state that is already held locally opens offline, and its persistence state is shown truthfully.
+Routes are hash-based (`index.html#/...`), with relative links and no `<base href>`. A reloaded or pasted deep link therefore never 404s on GitHub Pages (D-203; Limen DF-LIMEN-2026-0006). When GitHub sign-in is needed, the application keeps the target, returns to it afterwards, and never returns outside the application. A deep link to an investigation already loaded in the current tab opens offline, and its save state is shown truthfully (PERSIST-017).
 
 ### R9.8 Missing, superseded or forbidden targets
 A URL naming an entity that does not exist, or a repository the user cannot read, shows a not-found or not-permitted state with a way back to the investigation or home. It never shows a blank page and never shows a different investigation or record. A superseded or rejected entity is still shown as such, because history is never deleted (R2.4).
@@ -190,14 +190,14 @@ Changes to remote investigation state should result in auditable repository hist
 ### R10.4 Conflict detection
 The application must detect stale writes or conflicting remote changes and must not silently overwrite them.
 
-### R10.5 Offline tolerance
-The active investigation must remain usable during temporary loss of network access.
+### R10.5 Offline visibility
+An investigation already loaded in a tab must remain visible during temporary loss of network access. Edits made while disconnected exist only in that tab's memory; they are not durable and are not queued for later synchronization (PERSIST-017, PERSIST-018).
 
-### R10.6 Pending remote state
-A remote write that has not completed must be represented as pending, not successful.
+### R10.6 Unconfirmed remote state
+A save that GitHub has not confirmed must be represented as not saved, never as successful (PERSIST-007, PERSIST-031).
 
-### R10.7 Recovery
-Pending writes must be recoverable after application restart when practical.
+### R10.7 Restart behaviour
+Unsaved changes are not recovered after the tab is closed, reloaded or terminated. The application warns before leaving with unsaved changes where the browser supports it, and reopening loads the last confirmed state from GitHub (PERSIST-019 to PERSIST-021).
 
 ## R11. Authentication and security
 

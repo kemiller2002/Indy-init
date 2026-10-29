@@ -39,7 +39,7 @@ Agents must not infer architecture from README summaries when a normative contra
 2. policy/capabilities;
 3. semantic compiler structural checks;
 4. workspace;
-5. local durability;
+5. session-local investigation state and truthful save state;
 6. GitHub provider;
 7. AI proposals;
 8. complete investigation/correction/verification loop;
@@ -78,7 +78,7 @@ May not:
 ### Persistence agent
 Owns:
 
-- local durable store;
+- session-local investigation state, in memory only (CAUSA-PERSISTENCE-REQUIREMENTS.md);
 - GitHub provider;
 - synchronization/conflict;
 - canonical serialization.
@@ -155,7 +155,7 @@ Domain kernel and protected-transition test working.
 Manual local investigation UI works.
 
 ### 12:00
-Durable local + GitHub persistence path established or explicit fallback active.
+Session-local state and the confirmed GitHub save path established (PERSIST-006, PERSIST-007).
 
 ### 12:45
 Structured AI proposal loop works.
