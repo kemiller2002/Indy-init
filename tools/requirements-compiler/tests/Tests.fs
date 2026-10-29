@@ -621,6 +621,16 @@ let private offline (source: string) : string list =
             [ if rebuilt <> committed then yield sprintf "baseline port: output at %s differs from the committed Python-generated baseline" pinned ]
         with ex -> [ "baseline port: " + ex.Message ]
 
+    // Rehearsal 7 (ADR-R7-001): the committed r7 baseline is the port's output at the commit it pins, so the
+    // persistence document is in it and every earlier document is read at that same commit.
+    let r7 =
+        let text = File.ReadAllText(Path.Combine(source, "requirements", "causa-requirements-baseline-r7.json"))
+        let commit = parseBytes (Text.Encoding.UTF8.GetBytes text) |> field "source" |> Option.map (str "commit") |> Option.defaultValue ""
+        try
+            [ if buildBaselineAt source commit <> text then
+                  yield sprintf "r7 baseline: the port's output at %s differs from requirements/causa-requirements-baseline-r7.json" commit ]
+        with ex -> [ "r7 baseline: " + ex.Message ]
+
     // Cases ported from tools/test-requirements-baseline.py.
     let units =
         let lines =
@@ -655,7 +665,7 @@ let private offline (source: string) : string list =
 
     let ratchet = try AssertionRatchetTests.all () with ex -> [ "assertion ratchet: " + ex.Message ]
 
-    equivalence @ units @ verdicts @ plan @ contracts @ closures @ releases @ ratchet
+    equivalence @ r7 @ units @ verdicts @ plan @ contracts @ closures @ releases @ ratchet
 
 [<EntryPoint>]
 let main argv =

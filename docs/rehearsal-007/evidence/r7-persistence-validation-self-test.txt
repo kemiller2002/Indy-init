@@ -1,0 +1,16 @@
+CAUGHT R7-02: offline durability restored
+CAUGHT R7-02: offline queue required
+CAUGHT R7-03: shared storage required
+CAUGHT R7-03: storage prohibition removed
+CAUGHT R7-04: Web Locks required
+CAUGHT R7-05: rebase limit removed
+CAUGHT R7-05: reconcile-before-retry removed
+CAUGHT R7-06: acceptance obligation removed
+CAUGHT R7-06: PAT test removed
+CAUGHT R7-07: copy instruction planted
+CAUGHT R7-08: requirement removed
+CAUGHT R7-08: obligation changed without trace
+CAUGHT R7-08: supersession entry dropped
+CAUGHT R7-09: R6-D-002 untraced
+CAUGHT R7-09: R6-D-003 untraced
+unmutated inputs: PASS

@@ -2,6 +2,8 @@
 
 Status: normative persistence architecture direction.
 
+> **Superseded for Causa (ADR-R7-001).** From Rehearsal 7, Causa keeps investigation state only in each tab's memory, saves only by confirmed GitHub commits, and has no offline queue or local crash recovery. [CAUSA-PERSISTENCE-REQUIREMENTS.md](CAUSA-PERSISTENCE-REQUIREMENTS.md) governs; this document's offline-store, local-truth, restart-recovery and queue sections (§19 to §22) remain long-term platform direction only.
+
 The product must preserve investigation meaning independently of any storage provider. GitHub is the first provider and is useful because it gives auditable history, but GitHub must not become the semantic model.
 
 ## 1. Three layers of persisted information
@@ -264,6 +266,8 @@ Changed external content must not silently replace what was originally evaluated
 
 ## 19. Offline local store
 
+> **Superseded for Causa (ADR-R7-001).** From Rehearsal 7, Causa keeps investigation state only in each tab's memory, saves only by confirmed GitHub commits, and has no offline queue or local crash recovery. [CAUSA-PERSISTENCE-REQUIREMENTS.md](CAUSA-PERSISTENCE-REQUIREMENTS.md) governs; this section remains long-term platform direction only.
+
 The browser local store should contain:
 
 - last confirmed authoritative snapshot
@@ -290,6 +294,8 @@ A user should be able to tell whether a change exists only on the device.
 
 ## 21. Restart recovery
 
+> **Superseded for Causa (ADR-R7-001).** From Rehearsal 7, Causa keeps investigation state only in each tab's memory, saves only by confirmed GitHub commits, and has no offline queue or local crash recovery. [CAUSA-PERSISTENCE-REQUIREMENTS.md](CAUSA-PERSISTENCE-REQUIREMENTS.md) governs; this section remains long-term platform direction only.
+
 After application restart:
 
 1. load last durable local state
@@ -303,6 +309,8 @@ After application restart:
 Unsynced work must not disappear merely because the browser restarted.
 
 ## 22. Queue durability
+
+> **Superseded for Causa (ADR-R7-001).** From Rehearsal 7, Causa keeps investigation state only in each tab's memory, saves only by confirmed GitHub commits, and has no offline queue or local crash recovery. [CAUSA-PERSISTENCE-REQUIREMENTS.md](CAUSA-PERSISTENCE-REQUIREMENTS.md) governs; this section remains long-term platform direction only.
 
 A queued command should not be removed until:
 
@@ -603,7 +611,7 @@ The hackathon implementation may choose:
 
 - GitHub as only remote provider
 - current snapshot + append event file
-- IndexedDB/local browser persistence
+- IndexedDB/local browser persistence (not for Causa: ADR-R7-001)
 - URL-referenced external artifacts
 - simple export package
 
@@ -614,7 +622,7 @@ provided it preserves the boundaries required to add another provider later.
 Persistence architecture is healthy when:
 
 - an investigation can move providers without changing its ID/meaning
-- offline work survives restart
+- offline work survives restart (not for Causa: ADR-R7-001)
 - stale writes never silently overwrite
 - semantic conflicts are not reduced to text merge
 - unknown extensions survive compatible round trips

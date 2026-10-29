@@ -491,7 +491,7 @@ State changes should expose semantic announcements such as:
 
 - "Hypothesis H2 changed to Falsified."
 - "Confirm Cause unavailable: two blockers."
-- "Evidence saved locally; synchronization pending."
+- "Evidence recorded in this tab; not saved to GitHub yet."
 
 Do not rely on icon/color alone.
 

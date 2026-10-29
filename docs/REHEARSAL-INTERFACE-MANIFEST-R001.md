@@ -2,6 +2,8 @@
 
 Status: **EXTRACTED / NOT YET COMPILE-VERIFIED**. These symbols were read from kemiller2002/indy-init-rehearsal-001 default-branch source on 2026-10-23. This document is an interface baseline, NOT proof of compatible binary artifacts or a frozen new implementation.
 
+> **Not an input to Rehearsal 7 (PERSIST-026).** Rehearsal 7 authors its interfaces at kickoff from the requirements and the frozen storage contract (REHEARSAL-AGENT-INTERFACE-FREEZE.md). This manifest is historical evidence of Rehearsal 1.
+
 ## Source identity (Git blob SHAs)
 - src/engine/Commands.fs: e9308672885b710cc8459bf1aa006bed7e79e92b
 - src/engine/Decide.fs: da3a0d0706df27e32110d036e7e63fd859a9d123

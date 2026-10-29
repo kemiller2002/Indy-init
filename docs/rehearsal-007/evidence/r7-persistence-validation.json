@@ -1,0 +1,350 @@
+{
+  "schema": "indy-init.r7-persistence-validation/1",
+  "baseline": "BL-CAUSA-INDY-INIT-7d44f5546bcd",
+  "verdict": "PASS",
+  "checks": [
+    {
+      "id": "R7-01",
+      "title": "The persistence requirements are pinned in the baseline",
+      "status": "PASS",
+      "findings": [],
+      "permittedForReview": []
+    },
+    {
+      "id": "R7-02",
+      "title": "No contradictory offline-persistence requirement remains",
+      "status": "PASS",
+      "findings": [],
+      "permittedForReview": [
+        {
+          "subject": "AR-035-O5",
+          "detail": "Rehearsal 5 found and fixed the first three during the run (review findings F-1, F-2, R2-F1); its fourth, device-local durable state shared by several tabs (R2-F2), is superseded by ADR-R7-001 after Rehearsal 6's R6-D-002."
+        },
+        {
+          "subject": "REHEARSAL-AGENT-INTERFACE-FREEZE§preamble-O17",
+          "detail": "Unsaved changes live only in the tab's memory; there is no local-durable status."
+        },
+        {
+          "subject": "REHEARSAL-AGENT-INTERFACE-FREEZE§boundary-d-persistence-O2",
+          "detail": "Unsaved changes live only in the tab's memory; there is no local-durable status."
+        },
+        {
+          "subject": "PERSIST-001-O2",
+          "detail": "For Causa it takes precedence over, and supersedes, any persistence, offline, local-durability, synchronization-queue or cross-tab statement in the documents ranked (4) to (7) by ADRP-001, and over the long-term platform documents listed in [docs/rehearsal-007/DEFECT-TRACEABILITY.md](rehearsal-007/DEFECT-TRACEABILITY.md)."
+        },
+        {
+          "subject": "PERSIST-018-O3",
+          "detail": "There is no offline synchronization queue: after the connection returns, the application MUST NOT replay or send saves automatically, and the changes are saved only by a new save request."
+        },
+        {
+          "subject": "PERSIST-020-O2",
+          "detail": "The application provides no local crash recovery of investigation content, and MUST NOT imply that it does."
+        },
+        {
+          "subject": "PERSIST-032-O2",
+          "detail": "The interface MUST NOT say that a change is saved locally, saved on this device, queued, or will be saved later."
+        }
+      ]
+    },
+    {
+      "id": "R7-03",
+      "title": "No shared investigation-storage requirement remains",
+      "status": "PASS",
+      "findings": [],
+      "permittedForReview": [
+        {
+          "subject": "EXT-DATA-004-O1",
+          "detail": "Credentials MUST never be committed, bundled, logged, embedded in URLs, exposed in error text, stored in localStorage, or written into domain event files."
+        },
+        {
+          "subject": "D-204-O2",
+          "detail": "Investigation documents and unsaved changes are never written to a browser store (PERSIST-003); GitHub is the only durable store (PERSIST-005)."
+        },
+        {
+          "subject": "PERSIST-003-O1",
+          "detail": "Investigation documents, events, snapshots, manifests, unsaved changes, pending commands, save state, branch heads and write markers MUST NOT be written to localStorage, sessionStorage, IndexedDB, Cache Storage, the Origin Private File System, cookies, a service worker, a shared worker or a BroadcastChannel."
+        },
+        {
+          "subject": "PERSIST-003-O5",
+          "detail": "Acceptance: PAT-01 inspects every browser store after edits and saves and verifies that none holds investigation content, and PAT-13 verifies that the production artifact contains no call that writes investigation content to a browser store."
+        },
+        {
+          "subject": "PERSIST-040-O3",
+          "detail": "The test MUST verify that neither tab shows the other's change, that each tab's indicator is Unsaved, and that every browser store holds no investigation content."
+        },
+        {
+          "subject": "PERSIST-052-O2",
+          "detail": "The check MUST verify that the artifact contains no Web Locks call and no write of investigation content to a browser store."
+        }
+      ]
+    },
+    {
+      "id": "R7-04",
+      "title": "No Web Locks dependency remains",
+      "status": "PASS",
+      "findings": [],
+      "permittedForReview": [
+        {
+          "subject": "PERSIST-004-O1",
+          "detail": "Correctness MUST NOT depend on cross-tab locking or messaging."
+        },
+        {
+          "subject": "PERSIST-004-O2",
+          "detail": "The application MUST NOT use `navigator.locks` (Web Locks), a storage lease or a cross-tab message channel to coordinate investigation writes."
+        },
+        {
+          "subject": "PERSIST-004-O4",
+          "detail": "Acceptance: PAT-11 verifies that every persistence test passes with `navigator.locks` removed from the page, and PAT-13 verifies that the production artifact references no Web Locks API."
+        },
+        {
+          "subject": "PERSIST-050-O1",
+          "detail": "The Rehearsal 7 agent MUST run PAT-01, PAT-02, PAT-04 and PAT-05 a second time with `navigator.locks` deleted from the page before the application starts."
+        },
+        {
+          "subject": "PERSIST-050-O2",
+          "detail": "The test MUST verify identical outcomes, and that the application never calls a Web Locks API in either run."
+        },
+        {
+          "subject": "PERSIST-052-O2",
+          "detail": "The check MUST verify that the artifact contains no Web Locks call and no write of investigation content to a browser store."
+        }
+      ]
+    },
+    {
+      "id": "R7-05",
+      "title": "GitHub conflict handling is fully specified",
+      "status": "PASS",
+      "findings": [],
+      "permittedForReview": []
+    },
+    {
+      "id": "R7-06",
+      "title": "Every new requirement has an independently verifiable acceptance obligation",
+      "status": "PASS",
+      "findings": [],
+      "permittedForReview": []
+    },
+    {
+      "id": "R7-07",
+      "title": "No requirement instructs the agent to copy Causa implementation code",
+      "status": "PASS",
+      "findings": [],
+      "permittedForReview": [
+        {
+          "subject": "PERSIST-026-O2",
+          "detail": "It MUST NOT copy, vendor, translate or adapt application source code, tests or scripts from Causa or any earlier rehearsal repository (indy-init-rehearsal-001 to indy-init-rehearsal-006)."
+        },
+        {
+          "subject": "docs/VERIFICATION-PLAN-CONTRACT.md:47",
+          "detail": "- `FP-DETERMINISTIC-INPUT-DIGEST` (the default, or a `deterministic` test): the evidence is reusable only when the test identity and every input digest are unchanged and Dokimos reports `Reusable:true`. It is never reused from an earlier rehearsal."
+        }
+      ]
+    },
+    {
+      "id": "R7-08",
+      "title": "All affected requirement identifiers remain traceable",
+      "status": "PASS",
+      "findings": [],
+      "permittedForReview": []
+    },
+    {
+      "id": "R7-09",
+      "title": "Historical defects link to requirements and tests",
+      "status": "PASS",
+      "findings": [],
+      "permittedForReview": []
+    },
+    {
+      "id": "R7-10",
+      "title": "Long-term documents mark every contradicted persistence statement as superseded",
+      "status": "PASS",
+      "findings": [],
+      "permittedForReview": [
+        {
+          "subject": "docs/ARCHITECTURE.md:19",
+          "detail": "> **Causa (ADR-R7-001):** the \"Local durable queue/cache\" node below is superseded. From Rehearsal 7, Causa holds investigation state only in each tab's memory and talks to the GitHub API directly ([CAUSA-PERSISTENCE-REQUIREMENTS.md](CAUSA-PERSISTENCE-REQUIREMENTS.md)). The rest of the diagram stands."
+        },
+        {
+          "subject": "docs/ARCHITECTURE.md:39",
+          "detail": "+--> Local durable queue/cache"
+        },
+        {
+          "subject": "docs/ARCHITECTURE.md:89",
+          "detail": "> **Superseded for Causa (ADR-R7-001).** From Rehearsal 7, Causa keeps investigation state only in each tab's memory, saves only by confirmed GitHub commits, and has no offline queue or local crash recovery. [CAUSA-PERSISTENCE-REQUIREMENTS.md](CAUSA-PERSISTENCE-REQUIREMENTS.md) governs; this section remains long-term platform direction only."
+        },
+        {
+          "subject": "docs/ARCHITECTURE.md:91",
+          "detail": "The browser should maintain enough durable local state to continue an active investigation during temporary network loss."
+        },
+        {
+          "subject": "docs/ARCHITECTURE.md:122",
+          "detail": "- no credentials in LocalStorage when a safer supported mechanism is practical"
+        },
+        {
+          "subject": "docs/BUILD-DAY-EXECUTION.md:98",
+          "detail": "## 11:15–12:00 — Local durability + GitHub provider"
+        },
+        {
+          "subject": "docs/BUILD-DAY-EXECUTION.md:100",
+          "detail": "> **Superseded for Causa (ADR-R7-001).** From Rehearsal 7, Causa keeps investigation state only in each tab's memory, saves only by confirmed GitHub commits, and has no offline queue or local crash recovery. [CAUSA-PERSISTENCE-REQUIREMENTS.md](CAUSA-PERSISTENCE-REQUIREMENTS.md) governs; this section remains long-term platform direction only."
+        },
+        {
+          "subject": "docs/BUILD-DAY-EXECUTION.md:104",
+          "detail": "- local durable state"
+        },
+        {
+          "subject": "docs/COMPETITION-AMBITION.md:37",
+          "detail": "> **Superseded for Causa (ADR-R7-001).** From Rehearsal 7, Causa keeps investigation state only in each tab's memory, saves only by confirmed GitHub commits, and has no offline queue or local crash recovery. [CAUSA-PERSISTENCE-REQUIREMENTS.md](CAUSA-PERSISTENCE-REQUIREMENTS.md) governs; this section remains long-term platform direction only."
+        },
+        {
+          "subject": "docs/COMPETITION-AMBITION.md:46",
+          "detail": "- offline/local durability"
+        },
+        {
+          "subject": "docs/CORE-DOMAIN-MODEL.md:700",
+          "detail": "- local IndexedDB keys"
+        },
+        {
+          "subject": "docs/FORMAL-VALIDATION.md:159",
+          "detail": "> **Superseded for Causa (ADR-R7-001).** From Rehearsal 7, Causa keeps investigation state only in each tab's memory, saves only by confirmed GitHub commits, and has no offline queue or local crash recovery. [CAUSA-PERSISTENCE-REQUIREMENTS.md](CAUSA-PERSISTENCE-REQUIREMENTS.md) governs; this section remains long-term platform direction only."
+        },
+        {
+          "subject": "docs/FORMAL-VALIDATION.md:171",
+          "detail": "- corrupted local queue item"
+        },
+        {
+          "subject": "docs/IMPLEMENTATION-SLICES.md:208",
+          "detail": "## Slice 4: Durable local-first persistence"
+        },
+        {
+          "subject": "docs/IMPLEMENTATION-SLICES.md:210",
+          "detail": "> **Superseded for Causa (ADR-R7-001).** From Rehearsal 7, Causa keeps investigation state only in each tab's memory, saves only by confirmed GitHub commits, and has no offline queue or local crash recovery. [CAUSA-PERSISTENCE-REQUIREMENTS.md](CAUSA-PERSISTENCE-REQUIREMENTS.md) governs; this section remains long-term platform direction only."
+        },
+        {
+          "subject": "docs/IMPLEMENTATION-SLICES.md:216",
+          "detail": "- local durable store"
+        },
+        {
+          "subject": "docs/IMPLEMENTATION-SLICES.md:740",
+          "detail": "> **Superseded for Causa (ADR-R7-001).** From Rehearsal 7, Causa keeps investigation state only in each tab's memory, saves only by confirmed GitHub commits, and has no offline queue or local crash recovery. [CAUSA-PERSISTENCE-REQUIREMENTS.md](CAUSA-PERSISTENCE-REQUIREMENTS.md) governs; this section remains long-term platform direction only."
+        },
+        {
+          "subject": "docs/IMPLEMENTATION-SLICES.md:747",
+          "detail": "- local durability"
+        },
+        {
+          "subject": "docs/INVESTIGATION-ACCEPTANCE-SCENARIOS.md:567",
+          "detail": "> **Superseded for Causa (ADR-R7-001).** From Rehearsal 7, Causa keeps investigation state only in each tab's memory, saves only by confirmed GitHub commits, and has no offline queue or local crash recovery. [CAUSA-PERSISTENCE-REQUIREMENTS.md](CAUSA-PERSISTENCE-REQUIREMENTS.md) governs; this section remains long-term platform direction only."
+        },
+        {
+          "subject": "docs/INVESTIGATION-ACCEPTANCE-SCENARIOS.md:569",
+          "detail": "Given command C was queued offline against aggregate version 20"
+        },
+        {
+          "subject": "docs/INVESTIGATION-ACCEPTANCE-SCENARIOS.md:605",
+          "detail": "> **Superseded for Causa (ADR-R7-001).** From Rehearsal 7, Causa keeps investigation state only in each tab's memory, saves only by confirmed GitHub commits, and has no offline queue or local crash recovery. [CAUSA-PERSISTENCE-REQUIREMENTS.md](CAUSA-PERSISTENCE-REQUIREMENTS.md) governs; this section remains long-term platform direction only."
+        },
+        {
+          "subject": "docs/INVESTIGATION-ACCEPTANCE-SCENARIOS.md:1396",
+          "detail": "> **Superseded for Causa (ADR-R7-001).** From Rehearsal 7, Causa keeps investigation state only in each tab's memory, saves only by confirmed GitHub commits, and has no offline queue or local crash recovery. [CAUSA-PERSISTENCE-REQUIREMENTS.md](CAUSA-PERSISTENCE-REQUIREMENTS.md) governs; this section remains long-term platform direction only."
+        },
+        {
+          "subject": "docs/INVESTIGATION-ACCEPTANCE-SCENARIOS.md:1402",
+          "detail": "And local queue converges to Applied."
+        },
+        {
+          "subject": "docs/INVESTIGATION-ACCEPTANCE-SCENARIOS.md:1404",
+          "detail": "## A185. Auth expiry preserves local queue"
+        },
+        {
+          "subject": "docs/INVESTIGATION-ACCEPTANCE-SCENARIOS.md:1406",
+          "detail": "> **Superseded for Causa (ADR-R7-001).** From Rehearsal 7, Causa keeps investigation state only in each tab's memory, saves only by confirmed GitHub commits, and has no offline queue or local crash recovery. [CAUSA-PERSISTENCE-REQUIREMENTS.md](CAUSA-PERSISTENCE-REQUIREMENTS.md) governs; this section remains long-term platform direction only."
+        },
+        {
+          "subject": "docs/OPEN-QUESTIONS.md:101",
+          "detail": "IndexedDB versus another durable local mechanism?"
+        },
+        {
+          "subject": "docs/PERSISTENCE-CONTRACT.md:5",
+          "detail": "> **Superseded for Causa (ADR-R7-001).** From Rehearsal 7, Causa keeps investigation state only in each tab's memory, saves only by confirmed GitHub commits, and has no offline queue or local crash recovery. [CAUSA-PERSISTENCE-REQUIREMENTS.md](CAUSA-PERSISTENCE-REQUIREMENTS.md) governs; this document's offline-store, local-truth, restart-recovery and queue sections (§19 to §22) remain long-term platform direction only."
+        },
+        {
+          "subject": "docs/PERSISTENCE-CONTRACT.md:269",
+          "detail": "> **Superseded for Causa (ADR-R7-001).** From Rehearsal 7, Causa keeps investigation state only in each tab's memory, saves only by confirmed GitHub commits, and has no offline queue or local crash recovery. [CAUSA-PERSISTENCE-REQUIREMENTS.md](CAUSA-PERSISTENCE-REQUIREMENTS.md) governs; this section remains long-term platform direction only."
+        },
+        {
+          "subject": "docs/PERSISTENCE-CONTRACT.md:275",
+          "detail": "- local queued commands"
+        },
+        {
+          "subject": "docs/PERSISTENCE-CONTRACT.md:279",
+          "detail": "- minimal metadata required to recover after restart"
+        },
+        {
+          "subject": "docs/PERSISTENCE-CONTRACT.md:297",
+          "detail": "> **Superseded for Causa (ADR-R7-001).** From Rehearsal 7, Causa keeps investigation state only in each tab's memory, saves only by confirmed GitHub commits, and has no offline queue or local crash recovery. [CAUSA-PERSISTENCE-REQUIREMENTS.md](CAUSA-PERSISTENCE-REQUIREMENTS.md) governs; this section remains long-term platform direction only."
+        },
+        {
+          "subject": "docs/PERSISTENCE-CONTRACT.md:301",
+          "detail": "1. load last durable local state"
+        },
+        {
+          "subject": "docs/PERSISTENCE-CONTRACT.md:313",
+          "detail": "> **Superseded for Causa (ADR-R7-001).** From Rehearsal 7, Causa keeps investigation state only in each tab's memory, saves only by confirmed GitHub commits, and has no offline queue or local crash recovery. [CAUSA-PERSISTENCE-REQUIREMENTS.md](CAUSA-PERSISTENCE-REQUIREMENTS.md) governs; this section remains long-term platform direction only."
+        },
+        {
+          "subject": "docs/PERSISTENCE-CONTRACT.md:614",
+          "detail": "- IndexedDB/local browser persistence (not for Causa: ADR-R7-001)"
+        },
+        {
+          "subject": "docs/PERSISTENCE-CONTRACT.md:625",
+          "detail": "- offline work survives restart (not for Causa: ADR-R7-001)"
+        },
+        {
+          "subject": "docs/POLICY-ENGINE.md:483",
+          "detail": "> **Superseded for Causa (ADR-R7-001).** From Rehearsal 7, Causa keeps investigation state only in each tab's memory, saves only by confirmed GitHub commits, and has no offline queue or local crash recovery. [CAUSA-PERSISTENCE-REQUIREMENTS.md](CAUSA-PERSISTENCE-REQUIREMENTS.md) governs; this section remains long-term platform direction only."
+        },
+        {
+          "subject": "docs/PRODUCT-REQUIREMENTS.md:719",
+          "detail": "> **Superseded for Causa (ADR-R7-001).** From Rehearsal 7, Causa keeps investigation state only in each tab's memory, saves only by confirmed GitHub commits, and has no offline queue or local crash recovery. [CAUSA-PERSISTENCE-REQUIREMENTS.md](CAUSA-PERSISTENCE-REQUIREMENTS.md) governs; this section remains long-term platform direction only."
+        },
+        {
+          "subject": "docs/PRODUCT-REQUIREMENTS.md:721",
+          "detail": "Offline queued commands must be revalidated against current authoritative state and policy before remote application."
+        },
+        {
+          "subject": "docs/PRODUCT-REQUIREMENTS.md:761",
+          "detail": "### P32.8 Local durability"
+        },
+        {
+          "subject": "docs/PRODUCT-REQUIREMENTS.md:762",
+          "detail": "> **Superseded for Causa (ADR-R7-001).** From Rehearsal 7, Causa keeps investigation state only in each tab's memory, saves only by confirmed GitHub commits, and has no offline queue or local crash recovery. [CAUSA-PERSISTENCE-REQUIREMENTS.md](CAUSA-PERSISTENCE-REQUIREMENTS.md) governs; this section remains long-term platform direction only."
+        },
+        {
+          "subject": "docs/PRODUCT-REQUIREMENTS.md:1460",
+          "detail": "> **Superseded for Causa (ADR-R7-001).** From Rehearsal 7, Causa keeps investigation state only in each tab's memory, saves only by confirmed GitHub commits, and has no offline queue or local crash recovery. [CAUSA-PERSISTENCE-REQUIREMENTS.md](CAUSA-PERSISTENCE-REQUIREMENTS.md) governs; this section remains long-term platform direction only."
+        },
+        {
+          "subject": "docs/SECURITY-THREAT-MODEL.md:26",
+          "detail": "> **Causa (ADR-R7-001):** the \"Local durable store\" boundary below does not exist in Causa from Rehearsal 7; investigation state is held only in each tab's memory ([CAUSA-PERSISTENCE-REQUIREMENTS.md](CAUSA-PERSISTENCE-REQUIREMENTS.md)). The rest of the diagram stands."
+        },
+        {
+          "subject": "docs/SECURITY-THREAT-MODEL.md:37",
+          "detail": "Local durable store"
+        },
+        {
+          "subject": "docs/SECURITY-THREAT-MODEL.md:104",
+          "detail": "If browser-only architecture cannot safely retain a credential long-term, prefer reauthentication or a minimal backend/token-exchange design over pretending LocalStorage is secure."
+        },
+        {
+          "subject": "docs/SECURITY-THREAT-MODEL.md:270",
+          "detail": "## 21. Local durable data"
+        },
+        {
+          "subject": "docs/SECURITY-THREAT-MODEL.md:272",
+          "detail": "> **Superseded for Causa (ADR-R7-001).** From Rehearsal 7, Causa keeps investigation state only in each tab's memory, saves only by confirmed GitHub commits, and has no offline queue or local crash recovery. [CAUSA-PERSISTENCE-REQUIREMENTS.md](CAUSA-PERSISTENCE-REQUIREMENTS.md) governs; this section remains long-term platform direction only."
+        }
+      ]
+    }
+  ]
+}

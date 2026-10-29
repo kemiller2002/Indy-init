@@ -36,10 +36,10 @@ Before fan-out, list critical invariants and known R001 defect classes, especial
 F# compile/unit and targeted invariant checks run during implementation. Integration/browser/accessibility tests may be batched to reduce queue overhead but cannot be suppressed when needed to validate a risky boundary. First full candidate runs the complete applicable matrix. Avoid repeated deployments for individual fixes; batch related changes. A release is Accepted only when the deployed exact SHA has a successful deployed acceptance job. Never claim elapsed-time savings until measured.
 
 ## ADRP-011: No-decision defaults for common UI states
-No data: explicit empty-state action; loading: HTML/CSS shell before WASM; failure: visible recoverable error; offline: preserve local changes and label unsynced; version conflict: no overwrite, preserve edits and show reconciliation; unauthorized action: disabled/explained by F# capability; historical mode: visibly read-only; unknown semantics: preserve and block unsafe writes; reduced motion: disable nonessential animation. No invented progress percentage or confidence score.
+No data: explicit empty-state action; loading: HTML/CSS shell before WASM; failure: visible recoverable error; offline: keep unsaved changes in the tab's memory and label them not saved (PERSIST-018); version conflict: no overwrite, preserve edits and show reconciliation; unauthorized action: disabled/explained by F# capability; historical mode: visibly read-only; unknown semantics: preserve and block unsafe writes; reduced motion: disable nonessential animation. No invented progress percentage or confidence score.
 
 ## ADRP-012: Build order and cut strategy
-Order: freeze contract and interface pins; F# kernel and invariants; frozen fixture replay; shell/loading/navigation; end-to-end legal action; local persistence truth; GitHub adapter; timeline/evidence/hypotheses; causal graph/comparison/report; proof and deployed acceptance. If time constrained, cut experimental/advanced features according to KICKOFF-EXECUTION-PACKET.md, but do not silently cut P0 scope or essential invariants. Any P0 incompletion must be reported as FAIL/BLOCKED, never PASS.
+Order: freeze contract and interface pins; F# kernel and invariants; frozen fixture replay; shell/loading/navigation; end-to-end legal action; session-local save-state truth; GitHub adapter; timeline/evidence/hypotheses; causal graph/comparison/report; proof and deployed acceptance. If time constrained, cut experimental/advanced features according to KICKOFF-EXECUTION-PACKET.md, but do not silently cut P0 scope or essential invariants. Any P0 incompletion must be reported as FAIL/BLOCKED, never PASS.
 
 ## ADRP-013: Decision escalation
 Agents may decide local naming, refactoring, and visual details within this profile. Escalate: new dependency; schema or event changes; domain policy semantics; auth/security shortcuts; breaking interface; cutting P0; new release candidate after a failed gate; changing frozen fixtures. Escalations require options, impact, recommendation, and recorded decision. Do not poll the coordinator for reversible local details.
@@ -55,7 +55,7 @@ Preserve blank-application kickoff rules and provenance. Prepared requirements, 
 
 ## Still deliberately open
 - Universal causal DAG, confidence/calibration formulas, EDF-specific experimental semantics, automated causal inference, third-party plugin marketplace, enterprise RBAC, and future storage providers remain experimental/deferred.
-- Exact production OAuth/Fides integration, provider deployment topology, and physical local browser durability require capability/security checks before selecting a concrete adapter.
+- Exact production OAuth/Fides integration and provider deployment topology require capability/security checks before selecting a concrete adapter. Local browser durability is decided: there is none (ADR-R7-001).
 - Pixel-level appearance and component composition inside the locked hierarchy remain reversible.
 These are not invitations for each agent to invent a new architecture during the rehearsal.
 

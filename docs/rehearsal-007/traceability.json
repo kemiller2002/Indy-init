@@ -1,0 +1,1031 @@
+{
+  "schema": "indy-init.r7-persistence-traceability/1",
+  "decision": "ADR-R7-001",
+  "description": "Rehearsal 7 persistence requirements: historical defects linked to the requirements and tests that close them, and every Rehearsal 6 baseline obligation the change supersedes. Checked by tools/validate-r7-persistence-requirements.fsx.",
+  "previousBaseline": {
+    "path": "requirements/causa-requirements-baseline-r6.json",
+    "id": "BL-CAUSA-INDY-INIT-856157a78d47"
+  },
+  "defects": [
+    {
+      "id": "R6-D-002",
+      "title": "Cross-tab lost updates",
+      "severity": "critical",
+      "stateAtRehearsal6": "open",
+      "group": "cross-tab",
+      "summary": "Without navigator.locks, several tabs read, merged and wrote one shared device store without exclusion; the changes of one or two tabs were lost on every run (AR-035-O4, no-locks half).",
+      "evidence": [
+        "docs/REHEARSAL-006-RESULTS.md",
+        "https://github.com/kemiller2002/indy-init-rehearsal-006/blob/main/docs/r6/reviews/FINAL-REVIEW.md (RF-F-1)",
+        "https://github.com/kemiller2002/indy-init-rehearsal-006/blob/main/docs/r6/DEVIATIONS.md (D-07)"
+      ],
+      "rootCause": "A device-local store shared by every tab of the origin needs cross-tab exclusion that the browser does not guarantee.",
+      "resolution": "Removed by design: no shared browser storage for investigations, no cross-tab locking, and tabs are independent GitHub writers resolved by expected-head commits.",
+      "requirements": [
+        "PERSIST-002",
+        "PERSIST-003",
+        "PERSIST-004",
+        "PERSIST-006",
+        "PERSIST-013",
+        "AR-035"
+      ],
+      "tests": [
+        "PAT-01",
+        "PAT-02",
+        "PAT-11",
+        "PAT-13"
+      ]
+    },
+    {
+      "id": "R6-D-003",
+      "title": "Offline retry loop",
+      "severity": "critical",
+      "stateAtRehearsal6": "open",
+      "group": "offline",
+      "summary": "A save that could not be sent was retried with no backoff, 151 POSTs in 60 s for one change, while the page said 'Saving to GitHub'.",
+      "evidence": [
+        "docs/REHEARSAL-006-RESULTS.md",
+        "https://github.com/kemiller2002/indy-init-rehearsal-006/blob/main/docs/r6/reviews/FINAL-REVIEW.md (RF-F-2)"
+      ],
+      "rootCause": "An offline synchronization queue retried unsendable writes automatically, and its state was projected as Saving.",
+      "resolution": "No offline queue; a save requested offline sends nothing and shows Offline; automatic mutations and reconciliation reads are capped per save request.",
+      "requirements": [
+        "PERSIST-010",
+        "PERSIST-016",
+        "PERSIST-018",
+        "PERSIST-024",
+        "PERSIST-031",
+        "PERSIST-032"
+      ],
+      "tests": [
+        "PAT-07",
+        "PAT-08",
+        "PAT-15"
+      ]
+    },
+    {
+      "id": "R1-F-2",
+      "title": "Spurious conflict for a single writer",
+      "severity": "major",
+      "stateAtRehearsal6": "fixed in the run (a72bc6a)",
+      "group": "github-conflict-rebase",
+      "summary": "After saving investigation B, a change to investigation A in the same tab was refused as a conflict and left unsaved, because the branch head had moved for an unrelated investigation.",
+      "evidence": [
+        "https://github.com/kemiller2002/indy-init-rehearsal-006/blob/main/docs/r6/reviews/REVIEW-1.md (R1-F-2)"
+      ],
+      "rootCause": "A stale head was treated as a conflict without checking whether the investigation's own files had changed.",
+      "resolution": "A stale head over unrelated changes rebases automatically, within a limit.",
+      "requirements": [
+        "PERSIST-008",
+        "PERSIST-009",
+        "PERSIST-010"
+      ],
+      "tests": [
+        "PAT-03",
+        "PAT-04"
+      ]
+    },
+    {
+      "id": "RF-F-3",
+      "title": "Network failure on the rebase path reported as a conflict",
+      "severity": "major",
+      "stateAtRehearsal6": "open",
+      "group": "github-conflict-rebase",
+      "summary": "When the write could not be sent on the rebase path, the page said another writer had changed the repository and offered Discard; no other writer existed.",
+      "evidence": [
+        "https://github.com/kemiller2002/indy-init-rehearsal-006/blob/main/docs/r6/reviews/FINAL-REVIEW.md (RF-F-3)"
+      ],
+      "rootCause": "Failure classification did not separate a network failure from a stale head, and the conflict path offered a destructive recovery.",
+      "resolution": "Provider answers are classified from typed content; a network failure is never a conflict; Discard is offered only in a genuine conflict and after confirmation.",
+      "requirements": [
+        "PERSIST-008",
+        "PERSIST-012",
+        "PERSIST-015",
+        "PERSIST-024"
+      ],
+      "tests": [
+        "PAT-03",
+        "PAT-05",
+        "PAT-07"
+      ]
+    },
+    {
+      "id": "RF-F-9",
+      "title": "Acceptance judge accepts a false cause",
+      "severity": "minor",
+      "stateAtRehearsal6": "open",
+      "group": "github-conflict-rebase",
+      "summary": "UI-010-O2's test judge checked only that a message was long and mentioned preservation and a next step, so the false conflict text of RF-F-3 passed.",
+      "evidence": [
+        "https://github.com/kemiller2002/indy-init-rehearsal-006/blob/main/docs/r6/reviews/FINAL-REVIEW.md (RF-F-9)"
+      ],
+      "rootCause": "The test did not compare the stated cause with the determined cause.",
+      "resolution": "Messages must state the determined cause, and PAT-07 and PAT-14 check the cause, not only the message shape.",
+      "requirements": [
+        "PERSIST-024",
+        "PERSIST-053"
+      ],
+      "tests": [
+        "PAT-07",
+        "PAT-14"
+      ]
+    },
+    {
+      "id": "R6-D-001",
+      "title": "Restore claimed Saved for device-only changes",
+      "severity": "critical",
+      "stateAtRehearsal6": "fixed in the run (f91d2c5, a72bc6a, 23ac222)",
+      "group": "github-conflict-rebase",
+      "summary": "After all tabs closed, a restore adopted only the page's own writer record and showed 'Saved to GitHub (confirmed …)' for other writers' changes that existed only on the device.",
+      "evidence": [
+        "docs/REHEARSAL-006-RESULTS.md"
+      ],
+      "rootCause": "Save state was restored from browser storage rather than derived from a GitHub confirmation.",
+      "resolution": "Nothing is restored from browser storage; Saved is constructible only from a read-back confirmation; reopening loads from GitHub.",
+      "requirements": [
+        "PERSIST-003",
+        "PERSIST-007",
+        "PERSIST-021",
+        "PERSIST-023"
+      ],
+      "tests": [
+        "PAT-10",
+        "PAT-12"
+      ]
+    },
+    {
+      "id": "R1-F-1",
+      "title": "Another investigation's save state shown",
+      "severity": "critical",
+      "stateAtRehearsal6": "fixed in the run (23ac222)",
+      "group": "github-conflict-rebase",
+      "summary": "An investigation's page showed another investigation's save state, so a change that never reached GitHub read 'Saved to GitHub'.",
+      "evidence": [
+        "docs/REHEARSAL-006-RESULTS.md",
+        "https://github.com/kemiller2002/indy-init-rehearsal-006/blob/main/docs/r6/reviews/REVIEW-1.md (R1-F-1)"
+      ],
+      "rootCause": "One workspace-level sync state was rendered on every investigation page.",
+      "resolution": "Each investigation has its own save state, and the workspace summary may not contradict it.",
+      "requirements": [
+        "PERSIST-022",
+        "PERSIST-033"
+      ],
+      "tests": [
+        "PAT-02",
+        "PAT-05",
+        "PAT-15"
+      ]
+    },
+    {
+      "id": "RF-F-7",
+      "title": "Header contradicts the workspace",
+      "severity": "minor",
+      "stateAtRehearsal6": "open",
+      "group": "github-conflict-rebase",
+      "summary": "The header said the workspace had no investigation while it held investigations saved to GitHub.",
+      "evidence": [
+        "https://github.com/kemiller2002/indy-init-rehearsal-006/blob/main/docs/r6/reviews/FINAL-REVIEW.md (RF-F-7)"
+      ],
+      "rootCause": "The header's connection label was not derived from the investigations it summarized.",
+      "resolution": "The workspace summary is derived from the investigations' save states.",
+      "requirements": [
+        "PERSIST-033"
+      ],
+      "tests": [
+        "PAT-15"
+      ]
+    },
+    {
+      "id": "R6-DEVIATION-D-07",
+      "title": "Web Locks used instead of a cross-tab library (deviation D-07)",
+      "severity": "deviation",
+      "stateAtRehearsal6": "recorded deviation",
+      "group": "cross-tab",
+      "summary": "AR-035-O4 was met with a Web Locks exclusive section and a fallback that did not hold without Web Locks; Arca 0.6.0 stayed unused.",
+      "evidence": [
+        "https://github.com/kemiller2002/indy-init-rehearsal-006/blob/main/docs/r6/DEVIATIONS.md (D-07)"
+      ],
+      "rootCause": "The requirement demanded a shared durable device store, which needs cross-tab exclusion.",
+      "resolution": "The requirement for a shared device store is superseded, so no cross-tab exclusion mechanism, Web Locks or library, is needed.",
+      "requirements": [
+        "PERSIST-003",
+        "PERSIST-004",
+        "AR-035"
+      ],
+      "tests": [
+        "PAT-11",
+        "PAT-13"
+      ]
+    }
+  ],
+  "tests": [
+    {
+      "id": "PAT-01",
+      "requirement": "PERSIST-040",
+      "name": "Independent browser-tab state"
+    },
+    {
+      "id": "PAT-02",
+      "requirement": "PERSIST-041",
+      "name": "Concurrent GitHub commits"
+    },
+    {
+      "id": "PAT-03",
+      "requirement": "PERSIST-042",
+      "name": "Stale HEAD rejection"
+    },
+    {
+      "id": "PAT-04",
+      "requirement": "PERSIST-043",
+      "name": "Automatic rebase of unrelated changes"
+    },
+    {
+      "id": "PAT-05",
+      "requirement": "PERSIST-044",
+      "name": "Same-investigation conflict preservation"
+    },
+    {
+      "id": "PAT-06",
+      "requirement": "PERSIST-045",
+      "name": "Unknown commit reconciliation"
+    },
+    {
+      "id": "PAT-07",
+      "requirement": "PERSIST-046",
+      "name": "Offline save failure"
+    },
+    {
+      "id": "PAT-08",
+      "requirement": "PERSIST-047",
+      "name": "No uncontrolled retry loops"
+    },
+    {
+      "id": "PAT-09",
+      "requirement": "PERSIST-048",
+      "name": "Navigation with unsaved changes"
+    },
+    {
+      "id": "PAT-10",
+      "requirement": "PERSIST-049",
+      "name": "Successful reopening from GitHub"
+    },
+    {
+      "id": "PAT-11",
+      "requirement": "PERSIST-050",
+      "name": "Operation without Web Locks"
+    },
+    {
+      "id": "PAT-12",
+      "requirement": "PERSIST-051",
+      "name": "Save-state machine model test"
+    },
+    {
+      "id": "PAT-13",
+      "requirement": "PERSIST-052",
+      "name": "Production artifact and provenance scan"
+    },
+    {
+      "id": "PAT-14",
+      "requirement": "PERSIST-053",
+      "name": "Requirements and copy consistency"
+    },
+    {
+      "id": "PAT-15",
+      "requirement": "PERSIST-054",
+      "name": "Save-state indicator acceptance"
+    }
+  ],
+  "changedRequirements": [
+    {
+      "requirement": "UI-006",
+      "document": "docs/CAUSA-UI-EXPERIENCE-REQUIREMENTS.md",
+      "priority": "P0",
+      "disposition": "amended",
+      "reason": "The nine-state local/remote model (saving locally, saved locally, queued offline, syncing remotely) assumed a device-local durable store. Replaced by the seven session-local save states.",
+      "replacedBy": [
+        "PERSIST-007",
+        "PERSIST-030",
+        "PERSIST-031",
+        "PERSIST-011",
+        "PERSIST-012"
+      ]
+    },
+    {
+      "requirement": "UI-010",
+      "document": "docs/CAUSA-UI-EXPERIENCE-REQUIREMENTS.md",
+      "priority": "P0",
+      "disposition": "amended",
+      "reason": "States where unsaved changes are preserved: only in the tab memory.",
+      "replacedBy": [
+        "PERSIST-020"
+      ]
+    },
+    {
+      "requirement": "ADRP-011",
+      "document": "docs/AGENT-DECISION-REDUCTION-PROFILE.md",
+      "priority": "unstated",
+      "disposition": "amended",
+      "reason": "The offline default no longer preserves changes durably; they stay unsaved in the tab.",
+      "replacedBy": [
+        "PERSIST-018"
+      ]
+    },
+    {
+      "requirement": "ADRP-012",
+      "document": "docs/AGENT-DECISION-REDUCTION-PROFILE.md",
+      "priority": "unstated",
+      "disposition": "amended",
+      "reason": "Build order step renamed from local persistence truth to session-local save-state truth.",
+      "replacedBy": [
+        "PERSIST-023"
+      ]
+    },
+    {
+      "requirement": "R9.7",
+      "document": "docs/REQUIREMENTS.md",
+      "priority": "unstated",
+      "disposition": "amended",
+      "reason": "Offline deep links open only investigations already loaded in the tab; no locally held store exists.",
+      "replacedBy": [
+        "PERSIST-017"
+      ]
+    },
+    {
+      "requirement": "R10.5",
+      "document": "docs/REQUIREMENTS.md",
+      "priority": "unstated",
+      "disposition": "amended",
+      "reason": "Offline tolerance narrowed to visibility of loaded investigations; offline edits are session-only.",
+      "replacedBy": [
+        "PERSIST-017",
+        "PERSIST-018"
+      ]
+    },
+    {
+      "requirement": "R10.6",
+      "document": "docs/REQUIREMENTS.md",
+      "priority": "unstated",
+      "disposition": "amended",
+      "reason": "Pending remote state restated as unconfirmed, never successful.",
+      "replacedBy": [
+        "PERSIST-007",
+        "PERSIST-031"
+      ]
+    },
+    {
+      "requirement": "R10.7",
+      "document": "docs/REQUIREMENTS.md",
+      "priority": "unstated",
+      "disposition": "amended",
+      "reason": "Restart recovery of pending writes removed: no local crash recovery.",
+      "replacedBy": [
+        "PERSIST-019",
+        "PERSIST-020",
+        "PERSIST-021"
+      ]
+    },
+    {
+      "requirement": "S23",
+      "document": "docs/SCREEN-CONTRACTS.md",
+      "priority": "unstated",
+      "disposition": "amended",
+      "reason": "Conflict recovery screen shows the tab version, the GitHub version and unsaved commands held in the tab.",
+      "replacedBy": [
+        "PERSIST-011",
+        "PERSIST-012"
+      ]
+    },
+    {
+      "requirement": "D-204",
+      "document": "docs/DESIGN-DECISION-BOUNDARIES.md",
+      "priority": "unstated",
+      "disposition": "amended",
+      "reason": "Reversible choice of a browser durability store closed: none.",
+      "replacedBy": [
+        "PERSIST-003",
+        "PERSIST-005"
+      ]
+    },
+    {
+      "requirement": "KICKOFF-EXECUTION-PACKET§preamble",
+      "document": "docs/KICKOFF-EXECUTION-PACKET.md",
+      "priority": "unstated",
+      "disposition": "amended",
+      "reason": "Local durable store replaced by session-local state; the 12:00 checkpoint no longer allows a fallback.",
+      "replacedBy": [
+        "PERSIST-002",
+        "PERSIST-006",
+        "PERSIST-007"
+      ]
+    },
+    {
+      "requirement": "KICKOFF-EXECUTION-PACKET§3-work-order",
+      "document": "docs/KICKOFF-EXECUTION-PACKET.md",
+      "priority": "unstated",
+      "disposition": "amended",
+      "reason": "Local durability step replaced by session-local state and truthful save state.",
+      "replacedBy": [
+        "PERSIST-002",
+        "PERSIST-031"
+      ]
+    },
+    {
+      "requirement": "KICKOFF-EXECUTION-PACKET§4-parallel-ownership-after-kernel-stabilizes",
+      "document": "docs/KICKOFF-EXECUTION-PACKET.md",
+      "priority": "unstated",
+      "disposition": "amended",
+      "reason": "Persistence agent owns session-local state, not a local durable store.",
+      "replacedBy": [
+        "PERSIST-002"
+      ]
+    },
+    {
+      "requirement": "KICKOFF-EXECUTION-PACKET§persistence-agent",
+      "document": "docs/KICKOFF-EXECUTION-PACKET.md",
+      "priority": "unstated",
+      "disposition": "amended",
+      "reason": "Persistence agent owns session-local state, not a local durable store.",
+      "replacedBy": [
+        "PERSIST-002"
+      ]
+    },
+    {
+      "requirement": "KICKOFF-EXECUTION-PACKET§7-checkpoints",
+      "document": "docs/KICKOFF-EXECUTION-PACKET.md",
+      "priority": "unstated",
+      "disposition": "amended",
+      "reason": "12:00 checkpoint is the confirmed GitHub save path; no durable-local fallback.",
+      "replacedBy": [
+        "PERSIST-006",
+        "PERSIST-007"
+      ]
+    },
+    {
+      "requirement": "KICKOFF-EXECUTION-PACKET§12-00",
+      "document": "docs/KICKOFF-EXECUTION-PACKET.md",
+      "priority": "unstated",
+      "disposition": "amended",
+      "reason": "12:00 checkpoint is the confirmed GitHub save path; no durable-local fallback.",
+      "replacedBy": [
+        "PERSIST-006",
+        "PERSIST-007"
+      ]
+    },
+    {
+      "requirement": "AR-035",
+      "document": "docs/AGENT-RELIABILITY-REQUIREMENTS.md",
+      "priority": "P0",
+      "disposition": "amended",
+      "reason": "Device-local durable state shared by several tabs is the design that produced R6-D-002; tabs now share only GitHub.",
+      "replacedBy": [
+        "PERSIST-002",
+        "PERSIST-003",
+        "PERSIST-004"
+      ]
+    },
+    {
+      "requirement": "REHEARSAL-AGENT-INTERFACE-FREEZE§preamble",
+      "document": "docs/REHEARSAL-AGENT-INTERFACE-FREEZE.md",
+      "priority": "unstated",
+      "disposition": "amended",
+      "reason": "Boundary D restated for expected-head commits, reconciliation and rebase; the local queue and local-durable status removed; interfaces authored from requirements, not extracted from R001 source.",
+      "replacedBy": [
+        "PERSIST-006",
+        "PERSIST-009",
+        "PERSIST-015",
+        "PERSIST-026"
+      ]
+    },
+    {
+      "requirement": "REHEARSAL-AGENT-INTERFACE-FREEZE§ownership",
+      "document": "docs/REHEARSAL-AGENT-INTERFACE-FREEZE.md",
+      "priority": "unstated",
+      "disposition": "amended",
+      "reason": "Persistence owner holds session-local unsaved changes, not a local queue.",
+      "replacedBy": [
+        "PERSIST-002",
+        "PERSIST-006"
+      ]
+    },
+    {
+      "requirement": "REHEARSAL-AGENT-INTERFACE-FREEZE§boundary-d-persistence",
+      "document": "docs/REHEARSAL-AGENT-INTERFACE-FREEZE.md",
+      "priority": "unstated",
+      "disposition": "amended",
+      "reason": "Boundary D restated; no local-durable status.",
+      "replacedBy": [
+        "PERSIST-005",
+        "PERSIST-006",
+        "PERSIST-007",
+        "PERSIST-009",
+        "PERSIST-012",
+        "PERSIST-015"
+      ]
+    },
+    {
+      "requirement": "REHEARSAL-AGENT-INTERFACE-FREEZE§contract-freeze-procedure",
+      "document": "docs/REHEARSAL-AGENT-INTERFACE-FREEZE.md",
+      "priority": "unstated",
+      "disposition": "amended",
+      "reason": "Interfaces are authored at kickoff from requirements; earlier rehearsal source is not an input.",
+      "replacedBy": [
+        "PERSIST-026"
+      ]
+    },
+    {
+      "requirement": "REHEARSAL-AGENT-INTERFACE-FREEZE§mandatory-negative-cases",
+      "document": "docs/REHEARSAL-AGENT-INTERFACE-FREEZE.md",
+      "priority": "unstated",
+      "disposition": "amended",
+      "reason": "Offline-queue negative case replaced by stale head over unrelated changes, unknown commit outcome and save requested offline.",
+      "replacedBy": [
+        "PERSIST-009",
+        "PERSIST-015",
+        "PERSIST-018"
+      ]
+    }
+  ],
+  "supersededObligations": [
+    {
+      "previous": "UI-006-O1",
+      "previousText": "Expose distinct states: clean, unsaved, saving locally, saved locally, queued offline, syncing remotely, remotely synced, conflict, failed.",
+      "disposition": "superseded",
+      "supersededBy": [
+        "UI-006-O1",
+        "UI-006-O2",
+        "PERSIST-007",
+        "PERSIST-030",
+        "PERSIST-031",
+        "PERSIST-011",
+        "PERSIST-012"
+      ]
+    },
+    {
+      "previous": "UI-006-O2",
+      "previousText": "Only claim remote synchronization after confirmed provider acknowledgement.",
+      "disposition": "superseded",
+      "supersededBy": [
+        "UI-006-O3",
+        "PERSIST-007",
+        "PERSIST-030",
+        "PERSIST-031",
+        "PERSIST-011",
+        "PERSIST-012"
+      ]
+    },
+    {
+      "previous": "UI-006-O3",
+      "previousText": "Show last successful sync time when known.",
+      "disposition": "superseded",
+      "supersededBy": [
+        "UI-006-O4",
+        "PERSIST-007",
+        "PERSIST-030",
+        "PERSIST-031",
+        "PERSIST-011",
+        "PERSIST-012"
+      ]
+    },
+    {
+      "previous": "UI-006-O4",
+      "previousText": "On expected-version conflict, preserve local edits and provide a recoverable compare/retry flow; do not overwrite remote history.",
+      "disposition": "superseded",
+      "supersededBy": [
+        "UI-006-O5",
+        "PERSIST-007",
+        "PERSIST-030",
+        "PERSIST-031",
+        "PERSIST-011",
+        "PERSIST-012"
+      ]
+    },
+    {
+      "previous": "UI-010-O2",
+      "previousText": "Every error MUST describe what happened, what data was preserved, and a safe next step.",
+      "disposition": "superseded",
+      "supersededBy": [
+        "UI-010-O2",
+        "PERSIST-020"
+      ]
+    },
+    {
+      "previous": "ADRP-011-O1",
+      "previousText": "No data: explicit empty-state action; loading: HTML/CSS shell before WASM; failure: visible recoverable error; offline: preserve local changes and label unsynced; version conflict: no overwrite, preserve edits and show reconciliation; unauthorized action: disabled/explained by F# capability; historical mode: visibly read-only; unknown semantics: preserve and block unsafe writes; reduced motion: disable nonessential animation.",
+      "disposition": "superseded",
+      "supersededBy": [
+        "ADRP-011-O1",
+        "PERSIST-018"
+      ]
+    },
+    {
+      "previous": "ADRP-012-O1",
+      "previousText": "Order: freeze contract and interface pins; F# kernel and invariants; frozen fixture replay; shell/loading/navigation; end-to-end legal action; local persistence truth; GitHub adapter; timeline/evidence/hypotheses; causal graph/comparison/report; proof and deployed acceptance.",
+      "disposition": "superseded",
+      "supersededBy": [
+        "ADRP-012-O1",
+        "PERSIST-023"
+      ]
+    },
+    {
+      "previous": "R9.7-O4",
+      "previousText": "A deep link to state that is already held locally opens offline, and its persistence state is shown truthfully.",
+      "disposition": "superseded",
+      "supersededBy": [
+        "R9.7-O4",
+        "PERSIST-017"
+      ]
+    },
+    {
+      "previous": "R10.5-O1",
+      "previousText": "The active investigation must remain usable during temporary loss of network access.",
+      "disposition": "superseded",
+      "supersededBy": [
+        "R10.5-O1",
+        "PERSIST-017",
+        "PERSIST-018"
+      ]
+    },
+    {
+      "previous": "R10.6-O1",
+      "previousText": "A remote write that has not completed must be represented as pending, not successful.",
+      "disposition": "superseded",
+      "supersededBy": [
+        "R10.6-O1",
+        "PERSIST-007",
+        "PERSIST-031"
+      ]
+    },
+    {
+      "previous": "R10.7-O1",
+      "previousText": "Pending writes must be recoverable after application restart when practical.",
+      "disposition": "superseded",
+      "supersededBy": [
+        "R10.7-O1",
+        "PERSIST-019",
+        "PERSIST-020",
+        "PERSIST-021"
+      ]
+    },
+    {
+      "previous": "S23-O2",
+      "previousText": "local version",
+      "disposition": "superseded",
+      "supersededBy": [
+        "S23-O2",
+        "PERSIST-011",
+        "PERSIST-012"
+      ]
+    },
+    {
+      "previous": "S23-O3",
+      "previousText": "remote version",
+      "disposition": "superseded",
+      "supersededBy": [
+        "S23-O3",
+        "PERSIST-011",
+        "PERSIST-012"
+      ]
+    },
+    {
+      "previous": "S23-O4",
+      "previousText": "pending commands",
+      "disposition": "superseded",
+      "supersededBy": [
+        "S23-O4",
+        "PERSIST-011",
+        "PERSIST-012"
+      ]
+    },
+    {
+      "previous": "D-204-O1",
+      "previousText": "IndexedDB or another browser store may be used.",
+      "disposition": "superseded",
+      "supersededBy": [
+        "D-204-O1",
+        "D-204-O2",
+        "PERSIST-003",
+        "PERSIST-005"
+      ]
+    },
+    {
+      "previous": "D-204-O2",
+      "previousText": "The domain model must not depend on its API.",
+      "disposition": "superseded",
+      "supersededBy": [
+        "D-204-O3",
+        "PERSIST-003",
+        "PERSIST-005"
+      ]
+    },
+    {
+      "previous": "KICKOFF-EXECUTION-PACKET§preamble-O25",
+      "previousText": "local durability;",
+      "disposition": "superseded",
+      "supersededBy": [
+        "KICKOFF-EXECUTION-PACKET§preamble-O25",
+        "PERSIST-002",
+        "PERSIST-006",
+        "PERSIST-007"
+      ]
+    },
+    {
+      "previous": "KICKOFF-EXECUTION-PACKET§preamble-O49",
+      "previousText": "local durable store;",
+      "disposition": "superseded",
+      "supersededBy": [
+        "KICKOFF-EXECUTION-PACKET§preamble-O49",
+        "PERSIST-002",
+        "PERSIST-006",
+        "PERSIST-007"
+      ]
+    },
+    {
+      "previous": "KICKOFF-EXECUTION-PACKET§preamble-O98",
+      "previousText": "Durable local + GitHub persistence path established or explicit fallback active.",
+      "disposition": "superseded",
+      "supersededBy": [
+        "KICKOFF-EXECUTION-PACKET§preamble-O98",
+        "PERSIST-002",
+        "PERSIST-006",
+        "PERSIST-007"
+      ]
+    },
+    {
+      "previous": "KICKOFF-EXECUTION-PACKET§3-work-order-O5",
+      "previousText": "local durability;",
+      "disposition": "superseded",
+      "supersededBy": [
+        "KICKOFF-EXECUTION-PACKET§3-work-order-O5",
+        "PERSIST-002",
+        "PERSIST-031"
+      ]
+    },
+    {
+      "previous": "KICKOFF-EXECUTION-PACKET§4-parallel-ownership-after-kernel-stabilizes-O18",
+      "previousText": "local durable store;",
+      "disposition": "superseded",
+      "supersededBy": [
+        "KICKOFF-EXECUTION-PACKET§4-parallel-ownership-after-kernel-stabilizes-O18",
+        "PERSIST-002"
+      ]
+    },
+    {
+      "previous": "KICKOFF-EXECUTION-PACKET§persistence-agent-O2",
+      "previousText": "local durable store;",
+      "disposition": "superseded",
+      "supersededBy": [
+        "KICKOFF-EXECUTION-PACKET§persistence-agent-O2",
+        "PERSIST-002"
+      ]
+    },
+    {
+      "previous": "KICKOFF-EXECUTION-PACKET§7-checkpoints-O3",
+      "previousText": "Durable local + GitHub persistence path established or explicit fallback active.",
+      "disposition": "superseded",
+      "supersededBy": [
+        "KICKOFF-EXECUTION-PACKET§7-checkpoints-O3",
+        "PERSIST-006",
+        "PERSIST-007"
+      ]
+    },
+    {
+      "previous": "KICKOFF-EXECUTION-PACKET§12-00-O1",
+      "previousText": "Durable local + GitHub persistence path established or explicit fallback active.",
+      "disposition": "superseded",
+      "supersededBy": [
+        "KICKOFF-EXECUTION-PACKET§12-00-O1",
+        "PERSIST-006",
+        "PERSIST-007"
+      ]
+    },
+    {
+      "previous": "AR-035-O4",
+      "previousText": "Device-local durable state MUST survive several tabs sharing one store.",
+      "disposition": "superseded",
+      "supersededBy": [
+        "AR-035-O4",
+        "PERSIST-002",
+        "PERSIST-003",
+        "PERSIST-004"
+      ]
+    },
+    {
+      "previous": "AR-035-O5",
+      "previousText": "Rehearsal 5 found and fixed all four during the run (review findings F-1, F-2, R2-F1, R2-F2).",
+      "disposition": "superseded",
+      "supersededBy": [
+        "AR-035-O5",
+        "PERSIST-002",
+        "PERSIST-003",
+        "PERSIST-004"
+      ]
+    },
+    {
+      "previous": "REHEARSAL-AGENT-INTERFACE-FREEZE§preamble-O3",
+      "previousText": "Persistence owner: provider-neutral adapter, frozen contract mapping, local queue, optimistic concurrency and remote acknowledgment.",
+      "disposition": "superseded",
+      "supersededBy": [
+        "REHEARSAL-AGENT-INTERFACE-FREEZE§preamble-O3",
+        "PERSIST-006",
+        "PERSIST-009",
+        "PERSIST-015",
+        "PERSIST-026"
+      ]
+    },
+    {
+      "previous": "REHEARSAL-AGENT-INTERFACE-FREEZE§preamble-O16",
+      "previousText": "Provider-neutral operations: load, append with expected version, acknowledge remote persistence, surface conflict, and recover local edits.",
+      "disposition": "superseded",
+      "supersededBy": [
+        "REHEARSAL-AGENT-INTERFACE-FREEZE§preamble-O16",
+        "PERSIST-006",
+        "PERSIST-009",
+        "PERSIST-015",
+        "PERSIST-026"
+      ]
+    },
+    {
+      "previous": "REHEARSAL-AGENT-INTERFACE-FREEZE§preamble-O17",
+      "previousText": "Separate local-durable from remotely-synced status.",
+      "disposition": "superseded",
+      "supersededBy": [
+        "REHEARSAL-AGENT-INTERFACE-FREEZE§preamble-O17",
+        "PERSIST-006",
+        "PERSIST-009",
+        "PERSIST-015",
+        "PERSIST-026"
+      ]
+    },
+    {
+      "previous": "REHEARSAL-AGENT-INTERFACE-FREEZE§preamble-O22",
+      "previousText": "Extract actual types and exported interfaces from accepted R001 F# source and Limen adapter.",
+      "disposition": "superseded",
+      "supersededBy": [
+        "REHEARSAL-AGENT-INTERFACE-FREEZE§preamble-O22",
+        "REHEARSAL-AGENT-INTERFACE-FREEZE§preamble-O23",
+        "PERSIST-006",
+        "PERSIST-009",
+        "PERSIST-015",
+        "PERSIST-026"
+      ]
+    },
+    {
+      "previous": "REHEARSAL-AGENT-INTERFACE-FREEZE§preamble-O29",
+      "previousText": "Stale aggregate version; forged/illegal history; unknown required semantic extension; unauthorized command; duplicate submission; conflicting remote write; offline queue; mismatched frozen schema; incomplete verification; incorrect deployed SHA.",
+      "disposition": "superseded",
+      "supersededBy": [
+        "REHEARSAL-AGENT-INTERFACE-FREEZE§preamble-O30",
+        "PERSIST-006",
+        "PERSIST-009",
+        "PERSIST-015",
+        "PERSIST-026"
+      ]
+    },
+    {
+      "previous": "REHEARSAL-AGENT-INTERFACE-FREEZE§ownership-O3",
+      "previousText": "Persistence owner: provider-neutral adapter, frozen contract mapping, local queue, optimistic concurrency and remote acknowledgment.",
+      "disposition": "superseded",
+      "supersededBy": [
+        "REHEARSAL-AGENT-INTERFACE-FREEZE§ownership-O3",
+        "PERSIST-002",
+        "PERSIST-006"
+      ]
+    },
+    {
+      "previous": "REHEARSAL-AGENT-INTERFACE-FREEZE§boundary-d-persistence-O1",
+      "previousText": "Provider-neutral operations: load, append with expected version, acknowledge remote persistence, surface conflict, and recover local edits.",
+      "disposition": "superseded",
+      "supersededBy": [
+        "REHEARSAL-AGENT-INTERFACE-FREEZE§boundary-d-persistence-O1",
+        "PERSIST-005",
+        "PERSIST-006",
+        "PERSIST-007",
+        "PERSIST-009",
+        "PERSIST-012",
+        "PERSIST-015"
+      ]
+    },
+    {
+      "previous": "REHEARSAL-AGENT-INTERFACE-FREEZE§boundary-d-persistence-O2",
+      "previousText": "Separate local-durable from remotely-synced status.",
+      "disposition": "superseded",
+      "supersededBy": [
+        "REHEARSAL-AGENT-INTERFACE-FREEZE§boundary-d-persistence-O2",
+        "PERSIST-005",
+        "PERSIST-006",
+        "PERSIST-007",
+        "PERSIST-009",
+        "PERSIST-012",
+        "PERSIST-015"
+      ]
+    },
+    {
+      "previous": "REHEARSAL-AGENT-INTERFACE-FREEZE§contract-freeze-procedure-O1",
+      "previousText": "Extract actual types and exported interfaces from accepted R001 F# source and Limen adapter.",
+      "disposition": "superseded",
+      "supersededBy": [
+        "REHEARSAL-AGENT-INTERFACE-FREEZE§contract-freeze-procedure-O1",
+        "REHEARSAL-AGENT-INTERFACE-FREEZE§contract-freeze-procedure-O2",
+        "PERSIST-026"
+      ]
+    },
+    {
+      "previous": "REHEARSAL-AGENT-INTERFACE-FREEZE§mandatory-negative-cases-O1",
+      "previousText": "Stale aggregate version; forged/illegal history; unknown required semantic extension; unauthorized command; duplicate submission; conflicting remote write; offline queue; mismatched frozen schema; incomplete verification; incorrect deployed SHA.",
+      "disposition": "superseded",
+      "supersededBy": [
+        "REHEARSAL-AGENT-INTERFACE-FREEZE§mandatory-negative-cases-O1",
+        "PERSIST-009",
+        "PERSIST-015",
+        "PERSIST-018"
+      ]
+    }
+  ],
+  "supersededLongTermSections": [
+    {
+      "document": "docs/PERSISTENCE-CONTRACT.md",
+      "sections": [
+        "§19 Offline local store",
+        "§20 Local truth distinction",
+        "§21 Restart recovery",
+        "§22 Queue durability",
+        "§46 IndexedDB/local browser persistence",
+        "§47 offline work survives restart"
+      ]
+    },
+    {
+      "document": "docs/POLICY-ENGINE.md",
+      "sections": [
+        "§31 Offline command queue"
+      ]
+    },
+    {
+      "document": "docs/PRODUCT-REQUIREMENTS.md",
+      "sections": [
+        "P32.8 Local durability",
+        "P44.3 Offline analytical capability"
+      ]
+    },
+    {
+      "document": "docs/ARCHITECTURE.md",
+      "sections": [
+        "Local-first behavior"
+      ]
+    },
+    {
+      "document": "docs/IMPLEMENTATION-SLICES.md",
+      "sections": [
+        "Slice 4: Durable local-first persistence"
+      ]
+    },
+    {
+      "document": "docs/BUILD-DAY-EXECUTION.md",
+      "sections": [
+        "11:15–12:00 Local durability + GitHub provider"
+      ]
+    },
+    {
+      "document": "docs/INVESTIGATION-ACCEPTANCE-SCENARIOS.md",
+      "sections": [
+        "A70 Offline restart preserves pending work",
+        "A185 Auth expiry preserves local queue"
+      ]
+    },
+    {
+      "document": "docs/SECURITY-THREAT-MODEL.md",
+      "sections": [
+        "§21 Local durable data"
+      ]
+    },
+    {
+      "document": "docs/OPEN-QUESTIONS.md",
+      "sections": [
+        "OQ-008 Local browser storage (answered)"
+      ]
+    },
+    {
+      "document": "docs/REHEARSAL-INTERFACE-MANIFEST-R001.md",
+      "sections": [
+        "whole document: not an input to Rehearsal 7"
+      ]
+    },
+    {
+      "document": "kickoff/indy-init.kickoff.json",
+      "sections": [
+        "prioritySlices order 5: local-persistence renamed session-state"
+      ]
+    }
+  ],
+  "permittedMentions": [
+    {
+      "document": "docs/CORE-DOMAIN-MODEL.md",
+      "contains": "local IndexedDB keys",
+      "reason": "Listed among the things the aggregate must not know; a prohibition stated on the list's lead-in line."
+    },
+    {
+      "document": "docs/SECURITY-THREAT-MODEL.md",
+      "contains": "over pretending LocalStorage is secure",
+      "reason": "Argues against keeping credentials in LocalStorage; consistent with PERSIST-003 and EXT-DATA-004."
+    }
+  ]
+}
