@@ -715,6 +715,56 @@ let verifyProcessCommand (args: string list) : int =
             eprintfn "input error: %s" ex.Message
             2
 
+/// `verify-defect-closures`: defect-class closures checked against the rehearsal's own history (see DefectClosure,
+/// R7-REM-008). Closures are read from the candidate's tree unless `--closures-file` is given. Exit 0 VERIFIED,
+/// 3 REFUSED, 2 unusable input.
+let verifyDefectClosuresCommand (args: string list) : int =
+    let usage =
+        "usage: requirements-compiler verify-defect-closures --repo DIR --candidate SHA [--closures PATH | --closures-file FILE] [--records SHA] [--curation FILE] [--tests-path DIR] [--freeze-at ISO-8601] [--out FILE]"
+
+    match optionMap args with
+    | Error e ->
+        eprintfn "%s" e
+        2
+    | Ok m when not (m.ContainsKey "--repo" && m.ContainsKey "--candidate") ->
+        eprintfn "%s" usage
+        2
+    | Ok m ->
+        try
+            let one k = m.TryFind k |> Option.map List.last
+            let repo = (one "--repo").Value
+            let candidate = (one "--candidate").Value
+
+            let closures =
+                match one "--closures-file" with
+                | Some file -> parseFile file
+                | None ->
+                    let path = one "--closures" |> Option.defaultValue "acceptance/defect-classes.json"
+
+                    match Git.showFile repo candidate path with
+                    | Ok bytes -> parseBytes bytes
+                    | Error e -> failwithf "%s is not readable at %s: %s" path candidate e
+
+            let freezeAt =
+                one "--freeze-at"
+                |> Option.map (fun text -> DateTimeOffset.Parse(text, Globalization.CultureInfo.InvariantCulture, Globalization.DateTimeStyles.AssumeUniversal))
+
+            let report =
+                DefectClosure.assess
+                    { Repo = repo
+                      Candidate = candidate
+                      Records = one "--records"
+                      Closures = closures
+                      Curation = one "--curation" |> Option.map parseFile
+                      FreezeAt = freezeAt
+                      TestsPath = one "--tests-path" |> Option.defaultValue "tests" }
+
+            writeOut m report
+            if str "verdict" report = "VERIFIED" then 0 else 3
+        with ex ->
+            eprintfn "input error: %s" ex.Message
+            2
+
 /// `plan-readiness`: Priority Two, the implementation-start gate (see PlanReadiness). Exit 0 READY, 3 BLOCKED,
 /// 2 unusable input.
 let planReadinessCommand (args: string list) : int =
@@ -782,6 +832,7 @@ let main argv =
     | [ "baseline"; root; commit ] -> baselineCommand root commit
     | "verify-plan" :: rest -> verifyPlanCommand rest
     | "verify-process" :: rest -> verifyProcessCommand rest
+    | "verify-defect-closures" :: rest -> verifyDefectClosuresCommand rest
     | "plan-readiness" :: rest -> planReadinessCommand rest
     | "propose-test-bindings" :: rest -> proposeTestBindingsCommand rest
     | "review-attestations" :: rest -> reviewAttestationsCommand rest

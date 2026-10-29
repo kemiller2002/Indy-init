@@ -5,6 +5,7 @@
 ///     - the F# baseline port reproduces the committed Python-generated baseline byte for byte;
 ///     - unit cases ported from tools/test-requirements-baseline.py;
 ///     - the preflight verdict rule;
+///     - defect-class closures checked against a throwaway git history (R7-REM-008);
 ///     - the verification plan, and the EII-C acceptance-contract negative controls (missing obligation, incorrect
 ///       test mapping, altered values, swapped requirement and obligation identities, stale evidence,
 ///       unauthorized exclusion, related-test-is-not-proof, unclassified obligations).
@@ -646,7 +647,9 @@ let private offline (source: string) : string list =
     let plan = try planTests source with ex -> [ "verification plan: " + ex.Message ]
     let contracts = try contractTests source with ex -> [ "acceptance contract: " + ex.Message ]
 
-    equivalence @ units @ verdicts @ plan @ contracts
+    let closures = try DefectClosureTests.all () with ex -> [ "defect closure: " + ex.Message ]
+
+    equivalence @ units @ verdicts @ plan @ contracts @ closures
 
 [<EntryPoint>]
 let main argv =

@@ -26,6 +26,7 @@
     <Compile Include="TestBindingProposal.fs" />
     <Compile Include="ReviewAttestations.fs" />
     <Compile Include="PlanVerification.fs" />
+    <Compile Include="DefectClosure.fs" />
     <Compile Include="Preflight.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
