@@ -408,6 +408,137 @@
       ],
       "approvalStatus": "APPROVAL_PENDING_MERGE",
       "replaces": "DEC-R6-010"
+    },
+    {
+      "id": "DEC-R7-008",
+      "question": "Approve requirement amendment R7-AMD-03 (input-documents/2026-10-29-R7-REM-rehearsal-6-remediation.md)? Request: `conditor ci-policy check` passes on the rehearsal repository at kickoff and on every candidate.",
+      "options": {
+        "A": "Approve R7-AMD-03.",
+        "B": "Decline R7-AMD-03."
+      },
+      "recommendation": "A",
+      "selected": "A",
+      "ownerWords": [
+        "1 approve"
+      ],
+      "date": "2026-10-29",
+      "evidenceSource": "Owner message in session https://claude.ai/code/session_01G1iECf8ug6ANP6x5UETHWw, transcribed by the agent; asked as item 1 of the readiness audit's owner decisions (\"Approve or reject R7-AMD-03, R7-AMD-04 and R7-AMD-05\")",
+      "affectedRequirements": [
+        "AR-033"
+      ],
+      "affectedObligations": [],
+      "resultingScope": "R7-AMD-03 becomes a Rehearsal 7 requirement. Reason given in the intake: The R6 starvation came from a pipeline that nothing checked.",
+      "implementationWork": [
+        "Agent: write R7-AMD-03 into the requirement text and re-pin the baseline as part of the v4 package cut (READINESS-ASSESSMENT.md K3); until then the approved text lives only in input-documents/2026-10-29-R7-REM-rehearsal-6-remediation.md."
+      ],
+      "approvalStatus": "APPROVAL_PENDING_MERGE",
+      "amends": "R7-AMD-03"
+    },
+    {
+      "id": "DEC-R7-009",
+      "question": "Approve requirement amendment R7-AMD-04 (input-documents/2026-10-29-R7-REM-rehearsal-6-remediation.md)? Request: Acceptance runs three producers before the candidate freeze: `requirements-compiler verify-defect-closures`, `assertion-ratchet` (base = kickoff) and the preflight's `release-comparison` record.",
+      "options": {
+        "A": "Approve R7-AMD-04.",
+        "B": "Decline R7-AMD-04."
+      },
+      "recommendation": "A",
+      "selected": "A",
+      "ownerWords": [
+        "1 approve"
+      ],
+      "date": "2026-10-29",
+      "evidenceSource": "Owner message in session https://claude.ai/code/session_01G1iECf8ug6ANP6x5UETHWw, transcribed by the agent; asked as item 1 of the readiness audit's owner decisions (\"Approve or reject R7-AMD-03, R7-AMD-04 and R7-AMD-05\")",
+      "affectedRequirements": [
+        "VER-001",
+        "VER-002"
+      ],
+      "affectedObligations": [],
+      "resultingScope": "R7-AMD-04 becomes a Rehearsal 7 requirement. Reason given in the intake: G7, RF-F-8 and VER-001/002 failed for lack of these checks.",
+      "implementationWork": [
+        "Agent: write R7-AMD-04 into the requirement text and re-pin the baseline as part of the v4 package cut (READINESS-ASSESSMENT.md K3); until then the approved text lives only in input-documents/2026-10-29-R7-REM-rehearsal-6-remediation.md."
+      ],
+      "approvalStatus": "APPROVAL_PENDING_MERGE",
+      "amends": "R7-AMD-04"
+    },
+    {
+      "id": "DEC-R7-010",
+      "question": "Approve requirement amendment R7-AMD-05 (input-documents/2026-10-29-R7-REM-rehearsal-6-remediation.md)? Request: Every CI job that runs bound tests sets `CAUSA_PLAN`. Test fixtures that look like storage records are declared in a fixture manifest, which the credential scan honours, without weakening the scan.",
+      "options": {
+        "A": "Approve R7-AMD-05.",
+        "B": "Decline R7-AMD-05."
+      },
+      "recommendation": "A",
+      "selected": "A",
+      "ownerWords": [
+        "1 approve"
+      ],
+      "date": "2026-10-29",
+      "evidenceSource": "Owner message in session https://claude.ai/code/session_01G1iECf8ug6ANP6x5UETHWw, transcribed by the agent; asked as item 1 of the readiness audit's owner decisions (\"Approve or reject R7-AMD-03, R7-AMD-04 and R7-AMD-05\")",
+      "affectedRequirements": [
+        "UI-015",
+        "UI-021",
+        "UI-040",
+        "WDL-015",
+        "EXT-DATA-004",
+        "PF-015"
+      ],
+      "affectedObligations": [],
+      "resultingScope": "R7-AMD-05 becomes a Rehearsal 7 requirement. Reason given in the intake: Four FAIL requirements (UI-015, UI-021, UI-040, WDL-015) failed only because the browser shards could not find the plan; EXT-DATA-004-O1 and PF-015-O3 failed on fixtures.",
+      "implementationWork": [
+        "Agent: write R7-AMD-05 into the requirement text and re-pin the baseline as part of the v4 package cut (READINESS-ASSESSMENT.md K3); until then the approved text lives only in input-documents/2026-10-29-R7-REM-rehearsal-6-remediation.md."
+      ],
+      "approvalStatus": "APPROVAL_PENDING_MERGE",
+      "amends": "R7-AMD-05"
+    },
+    {
+      "id": "DEC-R7-011",
+      "question": "Which Echelon release set does Rehearsal 7 kick off on? echelon-current 1.32.0 (approved, lacks arca#47, conditor#122, praxis#300, forma#173) or 1.33.0 (contains them)?",
+      "options": {
+        "A": "echelon-current 1.33.0: Praxis 3.24.0, Forma 0.12.0, Arca 0.7.0, qualified by Conditor 0.10.18.",
+        "B": "echelon-current 1.32.0, with the four fixes absent and the 0.10.18-only preflight commands removed from the plan."
+      },
+      "recommendation": "A",
+      "selected": "A",
+      "ownerWords": [
+        "2 use 1.33"
+      ],
+      "date": "2026-10-29",
+      "evidenceSource": "Owner message in session https://claude.ai/code/session_01G1iECf8ug6ANP6x5UETHWw, transcribed by the agent",
+      "affectedRequirements": [
+        "DEP-CURRENT-002",
+        "DEP-CURRENT-006",
+        "AR-032"
+      ],
+      "affectedObligations": [],
+      "resultingScope": "The kickoff set is echelon-current 1.33.0. The Registry approval is recorded in kemiller2002/echelon-registry sets/echelon-current/1.33.0.json (commit 7e7e170, PR #104, merged as 7a2c27a); channels/echelon-current/channel.json on main names profile 1.33.0 (sha256 0ba5baeb04b8ddbde16e5b62391c44ccd37683bd74954ee060fed8e2b27922b7).",
+      "implementationWork": [
+        "Agent: write the kickoff lock (DEP-CURRENT-006) against 1.33.0 and record the release comparison (R7-PF-11).",
+        "Agent: replace requirements-compiled/v3's pin of 1.27.0 when v4 is cut."
+      ],
+      "approvalStatus": "APPROVAL_PENDING_MERGE"
+    },
+    {
+      "id": "DEC-R7-012",
+      "question": "What is the starting state of kemiller2002/indy-init-rehearsal-007? Its main is 22b0826 (Initial commit) -> df336cd (#19, Praxis unattended-execution policy, workflow and verify script) -> 9c3aaf6 (#20, readiness probe file), with 23 probe and negative-suite branches.",
+      "options": {
+        "A": "Reset main to 22b0826 (README only).",
+        "B": "Accept the #19 Praxis setup as the starting state: the tree of df336cd. Remove the #20 probe file and the leftover branches."
+      },
+      "recommendation": "either; B keeps the owner-approved Praxis bootstrap",
+      "selected": "B",
+      "ownerWords": [
+        "3 accept"
+      ],
+      "date": "2026-10-29",
+      "evidenceSource": "Owner message in session https://claude.ai/code/session_01G1iECf8ug6ANP6x5UETHWw, transcribed by the agent; the question offered \"accept the #19 Praxis setup as the starting state\" and said the 23 leftover branches go either way",
+      "affectedRequirements": [],
+      "affectedObligations": [],
+      "resultingScope": "The Rehearsal 7 starting tree is df336cd122e385ca26e5ad5860c01eee93f88f26: README.md, .github/workflows/praxis-autonomy.yml, .praxis/autonomy/policy.json, tests/verify.sh. Anything else present at kickoff is a deviation. The original repository start remains 22b08266049bef4a5f672005510af38c3762053d.",
+      "implementationWork": [
+        "Agent: remove readiness/praxis-autonomy-readiness-20261029-01.md from main through a pull request, and delete the 23 non-main branches.",
+        "Agent: record this tree in the machine-readable starting-state manifest (R7-SOURCE-PROVENANCE-SCRIPT.md)."
+      ],
+      "approvalStatus": "APPROVAL_PENDING_MERGE"
     }
   ]
 }
