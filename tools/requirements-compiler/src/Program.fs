@@ -765,6 +765,54 @@ let verifyDefectClosuresCommand (args: string list) : int =
             eprintfn "input error: %s" ex.Message
             2
 
+/// `release-comparison`: the pre-lock newest-release record (see ReleaseComparison, R7-REM-010).
+///   observe --selected SET --out FILE        queries every selected system's release source now
+///   assess  --selected SET --observations FILE --locked-at ISO [--deviations FILE] [--max-age-hours N] [--out FILE]
+/// Exit 0 PASS (or observed), 3 FAIL, 2 unusable input.
+let releaseComparisonCommand (args: string list) : int =
+    let usage =
+        "usage: requirements-compiler release-comparison (observe --selected FILE --out FILE | assess --selected FILE --observations FILE --locked-at ISO-8601 [--deviations FILE] [--max-age-hours N] [--out FILE])"
+
+    let run (sub: string) (rest: string list) =
+        match optionMap rest with
+        | Error e ->
+            eprintfn "%s" e
+            2
+        | Ok m ->
+            let one k = m.TryFind k |> Option.map List.last
+
+            try
+                match sub, one "--selected" with
+                | "observe", Some selected when (one "--out").IsSome ->
+                    use http = new Net.Http.HttpClient(Timeout = TimeSpan.FromSeconds 30.0)
+
+                    let observations =
+                        ReleaseComparison.selectedSystems (parseFile selected)
+                        |> List.map (fun s -> ReleaseComparison.observe http (fun () -> DateTimeOffset.UtcNow) s.System s.Repository s.Mechanism s.Package)
+
+                    writeOut m (JObj [ "schema", JStr "indy-init.release-observations/1"; "observations", JArr(observations |> List.map ReleaseComparison.observationToJson) ])
+                    0
+                | "assess", Some selected when (one "--observations").IsSome && (one "--locked-at").IsSome ->
+                    let observations = parseFile (one "--observations").Value |> arr "observations" |> List.map ReleaseComparison.observationOfJson
+                    let deviations = one "--deviations" |> Option.map (parseFile >> arr "deviations") |> Option.defaultValue []
+                    let lockedAt = DateTimeOffset.Parse((one "--locked-at").Value, Globalization.CultureInfo.InvariantCulture)
+                    let maxAge = one "--max-age-hours" |> Option.map (float >> TimeSpan.FromHours) |> Option.defaultValue (TimeSpan.FromHours 6.0)
+                    let report = ReleaseComparison.assess (parseFile selected) observations deviations lockedAt maxAge
+                    writeOut m report
+                    if str "verdict" report = "PASS" then 0 else 3
+                | _ ->
+                    eprintfn "%s" usage
+                    2
+            with ex ->
+                eprintfn "input error: %s" ex.Message
+                2
+
+    match args with
+    | sub :: rest -> run sub rest
+    | [] ->
+        eprintfn "%s" usage
+        2
+
 /// `plan-readiness`: Priority Two, the implementation-start gate (see PlanReadiness). Exit 0 READY, 3 BLOCKED,
 /// 2 unusable input.
 let planReadinessCommand (args: string list) : int =
@@ -833,6 +881,7 @@ let main argv =
     | "verify-plan" :: rest -> verifyPlanCommand rest
     | "verify-process" :: rest -> verifyProcessCommand rest
     | "verify-defect-closures" :: rest -> verifyDefectClosuresCommand rest
+    | "release-comparison" :: rest -> releaseComparisonCommand rest
     | "plan-readiness" :: rest -> planReadinessCommand rest
     | "propose-test-bindings" :: rest -> proposeTestBindingsCommand rest
     | "review-attestations" :: rest -> reviewAttestationsCommand rest

@@ -1,0 +1,44 @@
+{
+  "schema": "indy-init.release-comparison/1",
+  "lockedAt": "2026-10-29T10:20:30.0000000+00:00",
+  "maxObservationAge": "06:00:00",
+  "verdict": "PASS",
+  "summary": {
+    "CURRENT": 3
+  },
+  "systems": [
+    {
+      "system": "praxis",
+      "role": "host-tool",
+      "selected": "3.23.0",
+      "latest": "3.23.0",
+      "source": "https://api.github.com/repos/kemiller2002/praxis/releases/latest",
+      "observedAt": "2026-10-29T10:19:28.8215657+00:00",
+      "answerSha256": "e6bc1c772c6a689450109aade4aa981ad4cbd180ba9ab99f584eaaa9105dabe0",
+      "status": "CURRENT",
+      "why": "the selected version is the newest stable release"
+    },
+    {
+      "system": "forma",
+      "role": "project-binding",
+      "selected": "0.11.0",
+      "latest": "0.11.0",
+      "source": "https://api.github.com/repos/kemiller2002/forma/releases/latest",
+      "observedAt": "2026-10-29T10:19:29.5811988+00:00",
+      "answerSha256": "efff4969b886d2453fc765158f29f91ab59e6ceaf6fc09dc5ae53c212770c8ed",
+      "status": "CURRENT",
+      "why": "the selected version is the newest stable release"
+    },
+    {
+      "system": "arca",
+      "role": "project-binding",
+      "selected": "0.6.0",
+      "latest": "0.6.0",
+      "source": "https://api.github.com/repos/kemiller2002/arca/releases/latest",
+      "observedAt": "2026-10-29T10:19:29.9262217+00:00",
+      "answerSha256": "bafeda083f35a9f82a1b307fa5630d474296d9fd49cd62fea70cbeb718f64a2b",
+      "status": "CURRENT",
+      "why": "the selected version is the newest stable release"
+    }
+  ]
+}

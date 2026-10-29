@@ -14,6 +14,7 @@
     <Compile Include="R6ReadinessTests.fs" />
     <Compile Include="R6ScopeTests.fs" />
     <Compile Include="DefectClosureTests.fs" />
+    <Compile Include="ReleaseComparisonTests.fs" />
     <Compile Include="Tests.fs" />
   </ItemGroup>
   <ItemGroup>

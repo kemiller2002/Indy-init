@@ -1,0 +1,32 @@
+{
+  "schema": "indy-init.release-observations/1",
+  "observations": [
+    {
+      "system": "praxis",
+      "source": "https://api.github.com/repos/kemiller2002/praxis/releases/latest",
+      "latest": "3.23.0",
+      "publishedAt": "2026-10-28T12:59:46Z",
+      "observedAt": "2026-10-29T10:19:28.8215657+00:00",
+      "answerSha256": "e6bc1c772c6a689450109aade4aa981ad4cbd180ba9ab99f584eaaa9105dabe0",
+      "error": null
+    },
+    {
+      "system": "forma",
+      "source": "https://api.github.com/repos/kemiller2002/forma/releases/latest",
+      "latest": "0.11.0",
+      "publishedAt": "2026-10-28T17:25:19Z",
+      "observedAt": "2026-10-29T10:19:29.5811988+00:00",
+      "answerSha256": "efff4969b886d2453fc765158f29f91ab59e6ceaf6fc09dc5ae53c212770c8ed",
+      "error": null
+    },
+    {
+      "system": "arca",
+      "source": "https://api.github.com/repos/kemiller2002/arca/releases/latest",
+      "latest": "0.6.0",
+      "publishedAt": "2026-10-28T06:18:46Z",
+      "observedAt": "2026-10-29T10:19:29.9262217+00:00",
+      "answerSha256": "bafeda083f35a9f82a1b307fa5630d474296d9fd49cd62fea70cbeb718f64a2b",
+      "error": null
+    }
+  ]
+}
