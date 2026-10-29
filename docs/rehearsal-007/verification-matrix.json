@@ -212,8 +212,8 @@
       "id": "VM-026",
       "obligation": "Defect closures bound to fix commits in the rehearsal's own history",
       "package": "R7-REM-008",
-      "verification": "verify-defect-closures DCL-001..014 (--base = kickoff commit)",
-      "evidence": "Offline tests at c08c23e; R6 run REFUSED 8/8 (evidence/defect-closures-r6.json); fourth review BLOCKING (E1 lexer desync), fixes in progress",
+      "verification": "verify-defect-closures DCL-001..014 (base read from git: the commit that added the kickoff record)",
+      "evidence": "Offline tests at c33dc29; R6 run REFUSED 8/8 (evidence/defect-closures-r6.json); fifth review in progress",
       "state": "PASS_LOCAL"
     },
     {
@@ -237,7 +237,7 @@
       "obligation": "Weakened tests detected (RF-F-8)",
       "package": "R7-REM-011",
       "verification": "assertion-ratchet (base read from git: the commit that added the kickoff record)",
-      "evidence": "Offline tests at c08c23e; R6 run FAIL, 45 unrecorded removals incl. both UI-034 weakenings, base c80f35e from the real kickoff record (evidence/assertion-ratchet-r6.json); fourth review BLOCKING (E1 lexer desync), fixes in progress",
+      "evidence": "Offline tests at c33dc29; R6 run FAIL, 45 unrecorded removals incl. both UI-034 weakenings, base c80f35e from the real kickoff record (evidence/assertion-ratchet-r6.json); fifth review in progress",
       "state": "PASS_LOCAL"
     },
     {
