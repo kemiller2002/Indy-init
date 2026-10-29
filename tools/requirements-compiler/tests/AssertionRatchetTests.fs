@@ -185,6 +185,9 @@ let private scannerCases =
       inTest [ "  const label = `${(function () {"; "    if (true) {} /\"/.test(\"\"); const z = \"`\";"; "    test.skip();"; "    // `"; "    return \"x\";"; "  })()}`;" ], Unreadable
       "an object literal inside a template's ${...}", "a.spec.js",
       inTest [ "  const t = `${ {a: 1}.a } and ${ [1].map((x) => { return x; }) }`;"; "  test.skip();" ], SkippedX
+      // H1 (final review: r6c fake6, dct4g.spec.js): a postfix `++` before a division.
+      "a `/` after a postfix `++` (fake6)", "a.spec.js",
+      inTest [ "  let i = 0;"; "  const v = i++ / 2; const q = \"/\"; const r = \"`\";"; "  test.skip();"; "  // `" ], Unreadable
       "a TSX spec", "a.spec.tsx", inTest [ "  render(<p>Don't</p>);"; "  await expect(page).toHaveTitle(\"a\");" ], NotRead ]
 
 let private scannerFailures () =
@@ -212,6 +215,12 @@ let all () : string list =
 
           [ if str "verdict" report <> "INCOMPLETE" || arr "unsupported" report |> List.isEmpty then
                 yield sprintf "a tracked TSX file leaves the verdict %s, not INCOMPLETE with it listed as unsupported" (str "verdict" report) ])
+      withRepo (fun repo ->
+          // H2: an F# file's backticks in comments (``identifiers``) are not listed.
+          let fs = commitFile repo "tests/Support.fs" "module Support\n// see ``held`` below\nlet held = 1\n"
+
+          [ if arr "reviewAttention" (assess repo fs fs None) |> List.exists (fun f -> (str "file" f).StartsWith("tests/Support.fs@", StringComparison.Ordinal)) then
+                yield "reviewAttention lists an F# file for a backtick in a comment" ])
       withRepo (fun repo ->
           // Hardening: a file holding a backtick in a comment is listed for the independent review.
           let base' = commitFile repo "tests/UI-034.spec.js" (spec [ selected ])

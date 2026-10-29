@@ -164,6 +164,12 @@ let scan (lang: Language) (text: string) : string * string * string option * str
         let j = skipSpace (i - 1)
         if j >= 0 then text.[j] else '\000'
 
+    /// Whether the code just before position i (whitespace skipped) ends with `++` or `--`.
+    let incrementBefore i =
+        let rec skipSpace j = if j >= 0 && Char.IsWhiteSpace text.[j] then skipSpace (j - 1) else j
+        let j = skipSpace (i - 1)
+        j >= 1 && (text.[j] = '+' || text.[j] = '-') && text.[j - 1] = text.[j]
+
     /// Whether the code just before position i (whitespace skipped) ends with `=>`.
     let arrowBefore i =
         let rec skipSpace j = if j >= 0 && Char.IsWhiteSpace text.[j] then skipSpace (j - 1) else j
@@ -200,6 +206,10 @@ let scan (lang: Language) (text: string) : string * string * string option * str
             | FSharp when c = '(' && next = '*' && at (i + 2) <> ')' -> 2, push (BlockComment 1), blank, blank
             | Js when c = '"' || c = '\'' -> 1, { push (Quoted c) with Prev = c }, id, id
             | Js when c = '`' -> 1, { push Template with Prev = c }, id, id
+            // `i++ / 2` is division, `x = ++/re/.lastIndex` nonsense, but a `+`/`-` reads as an operator: after `++` or
+            // `--` the reading cannot tell a postfix operand from a prefix operator, so it does not guess.
+            | Js when c = '/' && incrementBefore i ->
+                1, fail { s with Prev = c } (sprintf "a `/` at offset %d follows `++` or `--`: division or a regular expression cannot be told" i), id, id
             | Js when c = '/' && s.Prev = afterAmbiguous ->
                 1, fail { s with Prev = c } (sprintf "a `/` at offset %d follows a `}` that may close a block or an expression: division or a regular expression cannot be told" i), id, id
             | Js when c = '/' && (regexMayFollow s.Prev || (Char.IsLetter s.Prev && jsRegexKeywords.Contains(wordBefore i))) ->
@@ -302,7 +312,7 @@ let scan (lang: Language) (text: string) : string * string * string option * str
             let noted =
                 [ match List.head s.Stack with
                   | LineComment
-                  | BlockComment _ when c = '`' -> yield "a backtick inside a comment"
+                  | BlockComment _ when lang = Js && c = '`' -> yield "a backtick inside a comment"
                   | RegexLit _ when c = '"' || c = '\'' || c = '`' -> yield "a regular expression literal holding a quote or backtick"
                   | Code
                   | TemplateExpr _ when lang = Js && c = '/' && at (i + 1) <> '/' && at (i + 1) <> '*' && charBefore i = '}' ->
