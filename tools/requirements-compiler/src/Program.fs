@@ -813,6 +813,27 @@ let releaseComparisonCommand (args: string list) : int =
         eprintfn "%s" usage
         2
 
+/// `assertion-ratchet`: no assertion a bound test held since the base disappears from the candidate without a
+/// resolved tag change (see AssertionRatchet, R7-REM-011). Exit 0 PASS, 3 FAIL, 2 unusable input.
+let assertionRatchetCommand (args: string list) : int =
+    match optionMap args with
+    | Error e ->
+        eprintfn "%s" e
+        2
+    | Ok m when not (m.ContainsKey "--repo" && m.ContainsKey "--base" && m.ContainsKey "--candidate") ->
+        eprintfn "usage: requirements-compiler assertion-ratchet --repo DIR --base SHA --candidate SHA [--path DIR]... [--tag-changes FILE] [--out FILE]"
+        2
+    | Ok m ->
+        try
+            let one k = m.[k] |> List.last
+            let roots = m.TryFind "--path" |> Option.defaultValue [ "tests" ]
+            let report = AssertionRatchet.assess (one "--repo") (one "--base") (one "--candidate") roots (m.TryFind "--tag-changes" |> Option.map (List.last >> parseFile))
+            writeOut m report
+            if str "verdict" report = "PASS" then 0 else 3
+        with ex ->
+            eprintfn "input error: %s" ex.Message
+            2
+
 /// `plan-readiness`: Priority Two, the implementation-start gate (see PlanReadiness). Exit 0 READY, 3 BLOCKED,
 /// 2 unusable input.
 let planReadinessCommand (args: string list) : int =
@@ -882,6 +903,7 @@ let main argv =
     | "verify-process" :: rest -> verifyProcessCommand rest
     | "verify-defect-closures" :: rest -> verifyDefectClosuresCommand rest
     | "release-comparison" :: rest -> releaseComparisonCommand rest
+    | "assertion-ratchet" :: rest -> assertionRatchetCommand rest
     | "plan-readiness" :: rest -> planReadinessCommand rest
     | "propose-test-bindings" :: rest -> proposeTestBindingsCommand rest
     | "review-attestations" :: rest -> reviewAttestationsCommand rest

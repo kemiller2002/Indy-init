@@ -7,6 +7,7 @@
 ///     - the preflight verdict rule;
 ///     - defect-class closures checked against a throwaway git history (R7-REM-008);
 ///     - the pre-lock release comparison (R7-REM-010);
+///     - the assertion ratchet over a throwaway git history (R7-REM-011, RF-F-8);
 ///     - the verification plan, and the EII-C acceptance-contract negative controls (missing obligation, incorrect
 ///       test mapping, altered values, swapped requirement and obligation identities, stale evidence,
 ///       unauthorized exclusion, related-test-is-not-proof, unclassified obligations).
@@ -652,7 +653,9 @@ let private offline (source: string) : string list =
 
     let releases = try ReleaseComparisonTests.all () with ex -> [ "release comparison: " + ex.Message ]
 
-    equivalence @ units @ verdicts @ plan @ contracts @ closures @ releases
+    let ratchet = try AssertionRatchetTests.all () with ex -> [ "assertion ratchet: " + ex.Message ]
+
+    equivalence @ units @ verdicts @ plan @ contracts @ closures @ releases @ ratchet
 
 [<EntryPoint>]
 let main argv =

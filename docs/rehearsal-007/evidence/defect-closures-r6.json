@@ -1,0 +1,79 @@
+{
+  "schema": "indy-init.defect-closure-verification/1",
+  "candidate": "46d5e1129a798549dcf37c2a6460c4f623298761",
+  "records": "bf190b6b315bf25a0eb3c8b006d9da7c24c19e4b",
+  "freezeAt": null,
+  "verdict": "REFUSED",
+  "summary": {
+    "verified": 0,
+    "refused": 8,
+    "open": 0
+  },
+  "classes": [
+    {
+      "id": "DC-001",
+      "state": "REFUSED",
+      "problems": [
+        "DCL-002 DC-001: fix commit 5336ec40372323dbdbbb821878ad87c51597af7a is not in this repository's history",
+        "DCL-007 DC-001: review evidence acceptance/reviews/R5-final-review.md#dc-001 does not exist at bf190b6b315bf25a0eb3c8b006d9da7c24c19e4b"
+      ]
+    },
+    {
+      "id": "DC-002",
+      "state": "REFUSED",
+      "problems": [
+        "DCL-002 DC-002: fix commit e8e32c1ebf6db77344cb8e8bc5bd30b422cdd379 is not in this repository's history",
+        "DCL-007 DC-002: review evidence acceptance/reviews/R5-independent-review.md#dc-002 does not exist at bf190b6b315bf25a0eb3c8b006d9da7c24c19e4b"
+      ]
+    },
+    {
+      "id": "DC-003",
+      "state": "REFUSED",
+      "problems": [
+        "DCL-002 DC-003: fix commit b07d2a5def150e1cd741f0540667eac31b78330e is not in this repository's history",
+        "DCL-007 DC-003: review evidence acceptance/reviews/R5-final-review.md#dc-003-543ddc2 does not exist at bf190b6b315bf25a0eb3c8b006d9da7c24c19e4b"
+      ]
+    },
+    {
+      "id": "DC-004",
+      "state": "REFUSED",
+      "problems": [
+        "DCL-002 DC-004: fix commit 895fb6da3031da689cd3a6f54b4005f17f07edbe is not in this repository's history",
+        "DCL-005 DC-004: regression test DCT-004-A is not present under tests/ in the candidate",
+        "DCL-007 DC-004: review evidence acceptance/reviews/R5-independent-review.md#dc-004 does not exist at bf190b6b315bf25a0eb3c8b006d9da7c24c19e4b"
+      ]
+    },
+    {
+      "id": "DC-005",
+      "state": "REFUSED",
+      "problems": [
+        "DCL-002 DC-005: fix commit 895fb6da3031da689cd3a6f54b4005f17f07edbe is not in this repository's history",
+        "DCL-007 DC-005: review evidence acceptance/reviews/R5-independent-review.md#dc-005 does not exist at bf190b6b315bf25a0eb3c8b006d9da7c24c19e4b"
+      ]
+    },
+    {
+      "id": "DC-006",
+      "state": "REFUSED",
+      "problems": [
+        "DCL-002 DC-006: fix commit 578ebd3b0bbc99862dc2da945e9c3b9e3f719bba is not in this repository's history",
+        "DCL-007 DC-006: review evidence acceptance/reviews/R5-independent-review.md#dc-006 does not exist at bf190b6b315bf25a0eb3c8b006d9da7c24c19e4b"
+      ]
+    },
+    {
+      "id": "R3-LESSON-3",
+      "state": "REFUSED",
+      "problems": [
+        "DCL-002 R3-LESSON-3: fix commit 578ebd3b0bbc99862dc2da945e9c3b9e3f719bba is not in this repository's history",
+        "DCL-007 R3-LESSON-3: review evidence acceptance/reviews/R5-independent-review.md#r3-lesson-3 does not exist at bf190b6b315bf25a0eb3c8b006d9da7c24c19e4b"
+      ]
+    },
+    {
+      "id": "DC-001..DC-005",
+      "state": "REFUSED",
+      "problems": [
+        "DCL-002 DC-001..DC-005: fix commit b07d2a5def150e1cd741f0540667eac31b78330e is not in this repository's history",
+        "DCL-007 DC-001..DC-005: review evidence acceptance/reviews/R5-final-review.md#dct-live-a-543ddc2 does not exist at bf190b6b315bf25a0eb3c8b006d9da7c24c19e4b"
+      ]
+    }
+  ]
+}
