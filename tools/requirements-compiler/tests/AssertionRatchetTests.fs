@@ -34,10 +34,14 @@ let private spec (o2: string list) =
 
 let private selected = "  await expect(other).toHaveAttribute(\"data-selected\", \"true\");"
 
+let private kickoffPath = "kickoff/indy-init.kickoff.json"
+
+/// A throwaway repository whose first commit adds the kickoff record (`{}`), so the first commit binds the base.
 let private withRepo (f: string -> 'a) =
     let repo = Path.Combine(Path.GetTempPath(), $"ratchet-{Guid.NewGuid():N}")
-    Directory.CreateDirectory repo |> ignore
+    Directory.CreateDirectory(Path.Combine(repo, "kickoff")) |> ignore
     git repo [ "init"; "-q"; "-b"; "main" ] |> ignore
+    File.WriteAllText(Path.Combine(repo, kickoffPath), "{}\n")
 
     try
         f repo
@@ -49,19 +53,23 @@ let private withRepo (f: string -> 'a) =
 let private tagChange obligation (resolution: Json) =
     JObj [ "changes", JArr [ JObj [ "obligation", JStr obligation; "resolution", resolution ] ] ]
 
-/// The base bound by a kickoff record naming it (abbreviated, as a person would write it).
-let private assessWith repo (baseCommit: string) candidate tags (kickoff: Json option) =
+/// A tag change that names its review, as PlanVerification requires.
+let private reviewedTagChange obligation (resolution: Json) =
+    JObj [ "changes", JArr [ JObj [ "obligation", JStr obligation; "review", JStr "R7-final"; "resolution", resolution ] ] ]
+
+/// The base as the caller states it (abbreviated, as a person would write it), checked against the kickoff record.
+let private assessWith repo (baseCommit: string option) candidate tags (kickoff: string option) =
     AssertionRatchet.assess
         { Repo = repo
-          Base = baseCommit.Substring(0, 7)
+          Base = baseCommit |> Option.map (fun b -> b.Substring(0, 7))
           Candidate = candidate
           Roots = [ "tests" ]
           TagChanges = tags
           Plan = None
-          Kickoff = kickoff |> Option.map (fun k -> "kickoff.json", k) }
+          KickoffPath = kickoff }
 
 let private assess repo (baseCommit: string) candidate tags =
-    assessWith repo baseCommit candidate tags (Some(JObj [ "base", JStr(baseCommit.Substring(0, 7)) ]))
+    assessWith repo (Some baseCommit) candidate tags (Some kickoffPath)
 
 let private verdict repo baseCommit candidate = str "verdict" (assess repo baseCommit candidate None)
 
@@ -101,7 +109,18 @@ let private bypasses =
       "a `test.fixme` declaration", (zzBase.Replace("test(\"ZZ-001-O1", "test.fixme(\"ZZ-001-O1"))
       "a `test.describe.skip` around the tests",
       (zzBase.Replace("test(\"ZZ-001-O1", "test.describe.skip(\"all\", () => {\ntest(\"ZZ-001-O1").Replace("test(\"ZZ-001-O2", "});\ntest(\"ZZ-001-O2"))
-      "a `test.only` elsewhere in the file", zzBase + "test.only(\"ZZ-ONLY\", async () => {});\n" ]
+      "a `test.only` elsewhere in the file", zzBase + "test.only(\"ZZ-ONLY\", async () => {});\n"
+      // The second review's branch bypass3 (b685d20..dbdb5e4).
+      "an assertion moved into a template literal", zz [ "  const unused = `"; held "a"; "  `;" ] [ held "b" ] [ held "c" ] [ "  await expect(page.locator(\"d\"))"; "    .toHaveCount(1);" ] [ held "e" ] [] readyHelper
+      "a `testInfo.skip()` through the fixture argument",
+      (zz [ "  testInfo.skip();"; held "a" ] [ held "b" ] [ held "c" ] [ "  await expect(page.locator(\"d\"))"; "    .toHaveCount(1);" ] [ held "e" ] [] readyHelper)
+          .Replace("\"ZZ-001-O1 skip inside\", async ({ page }) =>", "\"ZZ-001-O1 skip inside\", async ({ page }, testInfo) =>")
+      "a `test.skip()` on a one-line test's declaration line",
+      zzBase.Replace("test(\"ZZ-001-O1 skip inside\", async ({ page }) => {\n" + held "a", "test(\"ZZ-001-O1 skip inside\", async ({ page }) => { test.skip();" + held "a" + " });\ntest(\"ZZ-001-O1b\", async () => {")
+      "a module-level `const { skip } = test` alias called in the test",
+      zz [ "  skip();"; held "a" ] [ held "b" ] [ held "c" ] [ "  await expect(page.locator(\"d\"))"; "    .toHaveCount(1);" ] [ held "e" ] [] (readyHelper + "\nconst { skip } = test;")
+      "a `test.info().skip()` in the test",
+      zz [ "  test.info().skip();"; held "a" ] [ held "b" ] [ held "c" ] [ "  await expect(page.locator(\"d\"))"; "    .toHaveCount(1);" ] [ held "e" ] [] readyHelper ]
 
 let all () : string list =
     [ withRepo (fun repo ->
@@ -119,28 +138,60 @@ let all () : string list =
                 yield "a review resolution that names no review (PlanVerification semantics) excuses a removed assertion"
             if str "verdict" (assess repo base' removedOne (Some(tagChange "UI-034-O2" (JObj [ "kind", JStr "rebound"; "tests", jstrs [ "x" ]; "review", JStr "R-1" ])))) <> "FAIL" then
                 yield "a `rebound` resolution to tests no plan binds excuses a removed assertion"
-            let resolved = assess repo base' removedOne (Some(tagChange "UI-034-O2" (JStr "owner decision DEC-R7-009")))
-            if str "verdict" resolved <> "PASS" || (arr "removed" resolved |> List.map (str "state")) <> [ "RESOLVED_TAG_CHANGE" ] then
-                yield "a resolved tag change is not honoured"
+            // F3: only PlanVerification's rule resolves a tag change; free text (the second review's `"ok"`) does not.
+            for text in [ "ok"; "owner decision DEC-R7-009" ] do
+                if str "verdict" (assess repo base' removedOne (Some(reviewedTagChange "UI-034-O2" (JStr text)))) <> "FAIL" then
+                    yield sprintf "a free-text resolution `%s` excuses a removed assertion" text
             let review = JObj [ "kind", JStr "not-rebound"; "reason", JStr "superseded by UI-034-O3"; "review", JStr "R7-final" ]
-            if str "verdict" (assess repo base' removedOne (Some(tagChange "UI-034-O2" review))) <> "PASS" then
+            if str "verdict" (assess repo base' removedOne (Some(tagChange "UI-034-O2" review))) <> "FAIL" then
+                yield "a tag change that names no review of its own (PlanVerification REVIEW-TAG-CHANGE) excuses a removed assertion"
+            let resolved = assess repo base' removedOne (Some(reviewedTagChange "UI-034-O2" review))
+            if str "verdict" resolved <> "PASS" || (arr "removed" resolved |> List.map (str "state")) <> [ "RESOLVED_TAG_CHANGE" ] then
                 yield "a PlanVerification `not-rebound` review resolution is not honoured"
-            let byTitle = JObj [ "changes", JArr [ JObj [ "test", JStr "tests/UI-034.spec.js > UI-034-O2"; "resolution", JStr "DEC-R7-010" ] ] ]
+            let byTitle = JObj [ "changes", JArr [ JObj [ "test", JStr "tests/UI-034.spec.js > UI-034-O2"; "review", JStr "R7-final"; "resolution", review ] ] ]
             if str "verdict" (assess repo base' removedOne (Some byTitle)) <> "PASS" then
                 yield "a tag change keyed on the full test title is not honoured"
-            let otherTitle = JObj [ "changes", JArr [ JObj [ "test", JStr "UI-034-O1"; "obligation", JStr "UI-034-O2"; "resolution", JStr "DEC-R7-010" ] ] ]
+            let otherTitle = JObj [ "changes", JArr [ JObj [ "test", JStr "UI-034-O1"; "obligation", JStr "UI-034-O2"; "review", JStr "R7-final"; "resolution", review ] ] ]
             if str "verdict" (assess repo base' removedOne (Some otherTitle)) <> "FAIL" then
                 yield "a tag change naming another test excuses this test's removal through its obligation"
-            let unbound = assessWith repo base' base' None None
+            let unbound = assessWith repo (Some base') base' None None
             if str "verdict" unbound <> "INCOMPLETE" || field "baseVerified" unbound <> Some(JBool false) then
                 yield "a ratchet with no kickoff record binding the base is not INCOMPLETE"
-            let wrongBase = assessWith repo base' base' None (Some(JObj [ "base", JStr removedOne ]))
-            if str "verdict" wrongBase <> "INCOMPLETE" then
-                yield "a kickoff record naming another base does not make the ratchet INCOMPLETE"
-            if str "verdict" (assessWith repo base' base' None (Some(JObj [ "initialRepository", JObj [ "head", JStr base' ] ]))) <> "PASS" then
-                yield "a kickoff receipt's initialRepository.head does not bind the base"
+            // N2: the second review forged a kickoff file naming the candidate's parent; the base is now read from git.
+            let parent = assessWith repo (Some base') removedOne None (Some kickoffPath)
+            if str "verdict" (assessWith repo (Some removedOne) removedOne None (Some kickoffPath)) <> "REFUSED" then
+                yield "a --base other than the commit that added the kickoff record is not REFUSED"
+            if str "verdict" parent <> "FAIL" || field "baseVerified" parent <> Some(JBool true) then
+                yield "the commit that added the kickoff record does not bind the base"
+            let derived = assessWith repo None removedOne None (Some kickoffPath)
+            if str "base" derived <> base' || field "baseVerified" derived <> Some(JBool true) then
+                yield "with no --base the base is not derived from the kickoff record"
+            if str "verdict" (assessWith repo (Some base') removedOne None (Some "kickoff/elsewhere.json")) <> "REFUSED" then
+                yield "a kickoff record the candidate's history does not hold is not REFUSED"
             if str "base" report <> base' then
                 yield "the report does not echo the full base SHA" ])
+      withRepo (fun repo ->
+          // A record that names an earlier commit binds it; a later edit of the record does not move the base.
+          File.Delete(Path.Combine(repo, kickoffPath))
+          let start = commitFile repo "tests/UI-034.spec.js" (spec [ selected ])
+          let receipt = commitFile repo kickoffPath (serialize (JObj [ "initialRepository", JObj [ "head", JStr start ] ]))
+          let edited = commitFile repo kickoffPath (serialize (JObj [ "base", JStr receipt ]))
+          let candidate = commitFile repo "tests/UI-034.spec.js" (spec [])
+
+          [ if str "verdict" (assessWith repo (Some start) candidate None (Some kickoffPath)) <> "FAIL" then
+                yield "a kickoff receipt's initialRepository.head does not bind the base"
+            if str "verdict" (assessWith repo (Some receipt) candidate None (Some kickoffPath)) <> "REFUSED" then
+                yield "a later edit of the kickoff record moves the base"
+            if str "base" (assessWith repo None edited None (Some kickoffPath)) <> start then
+                yield "the base derived from a kickoff receipt is not its initialRepository.head" ])
+      withRepo (fun repo ->
+          File.Delete(Path.Combine(repo, kickoffPath))
+          let start = commitFile repo "README.md" "start\n"
+          let candidate = commitFile repo kickoffPath (serialize (JObj [ "base", JStr "HEAD" ]))
+          commitFile repo "README.md" "later\n" |> ignore
+
+          [ if str "verdict" (assessWith repo (Some start) candidate None (Some kickoffPath)) <> "REFUSED" then
+                yield "a kickoff record naming a commit that is not its ancestor binds a base" ])
       withRepo (fun repo ->
           let base' = commitFile repo "tests/UI-034.spec.js" (spec [ selected ])
           let loosened = commitFile repo "tests/UI-034.spec.js" ((spec [ selected ]).Replace("toHaveCount(1)", "count() >= 1 && expect(true)"))
@@ -158,25 +209,31 @@ let all () : string list =
           let fsTest = "module T\n[<Fact>]\nlet ``DCT-001-A held conflict`` () =\n    Assert.Equal(1, held)\n    Assert.True(kept)\n"
           let base' = commitFile repo "tests/StoreTests.fs" fsTest
           let weakened = commitFile repo "tests/StoreTests.fs" (fsTest.Replace("    Assert.True(kept)\n", ""))
-          let skipped = commitFile repo "tests/StoreTests.fs" (fsTest.Replace("[<Fact>]", "[<Fact(Skip = \"later\")>]"))
           let commented = commitFile repo "tests/StoreTests.fs" (fsTest.Replace("    Assert.True(kept)\n", "    (* Assert.True(kept) *)\n"))
 
           [ if verdict repo base' weakened <> "FAIL" then
                 yield "a removed F# Assert is not caught"
-            if verdict repo weakened skipped <> "FAIL" then
-                yield "an F# test given [<Fact(Skip = ...)>] keeps its assertions"
             if verdict repo base' commented <> "FAIL" then
                 yield "an F# Assert put in a (* ... *) comment is not caught" ])
+      withRepo (fun repo ->
+          let fsTest = "module T\n[<Fact>]\nlet ``DCT-001-A held conflict`` () =\n    Assert.Equal(1, held)\n"
+          let base' = commitFile repo "tests/StoreTests.fs" fsTest
+          let skipped = commitFile repo "tests/StoreTests.fs" (fsTest.Replace("[<Fact>]", "[<Fact(Skip = \"later\")>]"))
+
+          [ if verdict repo base' skipped <> "FAIL" then
+                yield "an F# test given [<Fact(Skip = ...)>] keeps its assertions" ])
       withRepo (fun repo ->
           let helper = "export const settled = async (page) => {\n  await expect(page.locator(\"#boot\")).toHaveCount(0);\n};\n"
           let base' = commitFile repo "tests/_lib.js" helper
           let weakened = commitFile repo "tests/_lib.js" (helper.Replace("toHaveCount(0)", "toHaveCount(0).catch(() => {})"))
+
+          [ if verdict repo base' weakened <> "FAIL" then
+                yield "a weakened assertion in a helper file (_lib.js) is not caught" ])
+      withRepo (fun repo ->
           let fsHelper = commitFile repo "tests/Support.fs" "module Support\nlet held x =\n    Assert.True(x)\n"
           let fsWeakened = commitFile repo "tests/Support.fs" "module Support\nlet held x =\n    ignore x\n"
 
-          [ if verdict repo base' weakened <> "FAIL" then
-                yield "a weakened assertion in a helper file (_lib.js) is not caught"
-            if verdict repo fsHelper fsWeakened <> "FAIL" then
+          [ if verdict repo fsHelper fsWeakened <> "FAIL" then
                 yield "a weakened assertion in an F# helper module is not caught" ])
       withRepo (fun repo ->
           let base' = commitFile repo "tests/acceptance/ZZZ.spec.js" zzBase
