@@ -16,10 +16,10 @@ This report states results only. Plans are in [REMEDIATION-PLAN.md](REMEDIATION-
 | R7-REM-005 Unattended PR execution | praxis, conditor | WI-0104, WI-0062 | earlier work | earlier work | Readiness receipt: READY; PR #20 merged as 9c3aaf6 (cited) | Praxis SECURITY-REVIEW F1 accepted by the owner | PASS_ADVISORY: no enforced gate (UAE-R7-12) |
 | R7-REM-006 Automated evidence | rehearsal repository | none | none | none | Experiment D not run | none | PLANNED |
 | R7-REM-007 Candidate and deployment gates | kemiller2002/conditor | WI-0063 | 9916fa9 | conditor#122 (draft) | Template only; not run on GitHub | Pinning and ancestry check judged sound | PARTIAL |
-| R7-REM-008 Defect-class closure | kemiller2002/indy-init | intake | see #42 | indy-init#42 (draft) | Offline tests; Rehearsal 6: REFUSED 8/8 | Round 1 BLOCKING, fixed; round 2 BLOCKING (N1), fixed in 6d05613; round 3 BLOCKING (D1-D4), fixed at c08c23e; round 4 in progress | IMPLEMENTED_IN_REVIEW |
+| R7-REM-008 Defect-class closure | kemiller2002/indy-init | intake | see #42 | indy-init#42 (draft) | Offline tests; Rehearsal 6: REFUSED 8/8 | Round 1 BLOCKING, fixed; round 2 BLOCKING (N1), fixed in 6d05613; round 3 BLOCKING (D1-D4), fixed at c08c23e; round 4 BLOCKING (E1 lexer desync), fix in progress | IMPLEMENTED_IN_REVIEW |
 | R7-REM-009 Forma non-text contrast | kemiller2002/forma | WI-0041 | ac34a55 | forma#173 (draft) | Rule plus Chromium spec (light, dark, forced colours); the Rehearsal 6 outline (1.95:1) is reported | PASS after fixes | IMPLEMENTED_IN_REVIEW |
-| R7-REM-010 Release comparison | kemiller2002/indy-init | intake | see #42 | indy-init#42 (draft) | Offline tests; live demonstration PASS (praxis 3.23.0, forma 0.11.0, arca 0.6.0) | Round 1 BLOCKING, fixed; round 2: N5 fixed in 07be4f2, N4 inherent and stated in the report; round 3 BLOCKING (D1-D4), fixed at c08c23e; round 4 in progress | IMPLEMENTED_IN_REVIEW |
-| R7-REM-011 Assertion ratchet (RF-F-8) | kemiller2002/indy-init | intake | see #42 | indy-init#42 (draft) | Offline tests; Rehearsal 6: FAIL, 45 unrecorded removals including both UI-034 weakenings (base read from the real kickoff record) | Round 1 BLOCKING, fixed; round 2 BLOCKING (N2, N3, F3 partial), fixed in 865d443; round 3 BLOCKING (D1-D4), fixed at c08c23e; round 4 in progress | IMPLEMENTED_IN_REVIEW |
+| R7-REM-010 Release comparison | kemiller2002/indy-init | intake | see #42 | indy-init#42 (draft) | Offline tests; live demonstration PASS (praxis 3.23.0, forma 0.11.0, arca 0.6.0) | Round 1 BLOCKING, fixed; round 2: N5 fixed, N4 inherent and stated in the report; round 4: no open release-comparison finding | IMPLEMENTED_IN_REVIEW |
+| R7-REM-011 Assertion ratchet (RF-F-8) | kemiller2002/indy-init | intake | see #42 | indy-init#42 (draft) | Offline tests; Rehearsal 6: FAIL, 45 unrecorded removals including both UI-034 weakenings (base read from the real kickoff record) | Round 1 BLOCKING, fixed; round 2 BLOCKING (N2, N3, F3 partial), fixed in 865d443; round 3 BLOCKING (D1-D4), fixed at c08c23e; round 4 BLOCKING (E1 lexer desync), fix in progress | IMPLEMENTED_IN_REVIEW |
 | R7-REM-012 Readiness package | kemiller2002/indy-init | intake | see #42 | indy-init#42 (draft) | This directory | none | NOT READY |
 
 ## Verification results
@@ -80,7 +80,7 @@ A real pull request merged without routine owner intervention:
 - **Arca:** final round PASS_WITH_FINDINGS (low), fixed.
 - **Forma:** PASS.
 - **Conditor:** PASS_WITH_FINDINGS, fixed, not re-reviewed.
-- **Indy-init verifiers:** the second review was BLOCKING; fixed at eb978e2; the third review was BLOCKING (D1 lexer desync, D2 caller-chosen kickoff path, D3 edited copy as review evidence, D4 free-text tag-change reviews); fixed at c08c23e; fourth review in progress.
+- **Indy-init verifiers:** the second review was BLOCKING; fixed at eb978e2; the third review was BLOCKING (D1 lexer desync, D2 caller-chosen kickoff path, D3 edited copy as review evidence, D4 free-text tag-change reviews); fixed at c08c23e; the fourth review was BLOCKING on one more lexer desync (E1), fix in progress.
 - **Credentials:** the separation is unverified until the owner creates the tokens and the probe runs.
 - **Release observations:** documented limit N4. They are caller-supplied; proof needs `observe` running in trusted CI with signed output.
 
@@ -100,7 +100,7 @@ A real pull request merged without routine owner intervention:
 | 6 | Unattended PR merging demonstrated | Met, advisory |
 | 7 | Evidence generation automated | Not met |
 | 8 | Candidate and deployment gates work | Not met: template not exercised |
-| 9 | Defect closure tied to actual fix commits | Verifier built; fourth review pending |
+| 9 | Defect closure tied to actual fix commits | Verifier built; fourth review BLOCKING (E1), fix in progress |
 | 10 | Forma contrast failures corrected | On forma#173; not merged or released |
 | 11 | Release-selection evidence before freeze | Producer built; kickoff record not made |
 | 12 | Independent security review passes | Not met |
