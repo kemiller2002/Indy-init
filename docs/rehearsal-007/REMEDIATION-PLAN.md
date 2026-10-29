@@ -196,14 +196,14 @@ Generated from [`work-packages.json`](work-packages.json); the JSON is authorita
 - Run before the candidate freeze
 
 **Evidence.**
-- Offline test suite passes at 41ff524
-- evidence/defect-closures-r6.json: Rehearsal 6 (46d5e11, records bf190b6, base 65e346e): REFUSED, 8/8 closures refused
+- Offline test suite passes at eb978e2
+- evidence/defect-closures-r6.json: Rehearsal 6 (46d5e11, records bf190b6): REFUSED, 8/8 closures
 
 **Remaining.**
-- Fixes for the re-review findings, then a further independent review
+- Third independent review verdict
 - Wire into the Rehearsal 7 acceptance job before the freeze, with --base set to the kickoff commit
 
-**Independent review.** Independent review: BLOCKING (F1: closures could be satisfied by tests outside the rehearsal, comment mentions, evidence older than the fix, closedAt before the fix, and unknown statuses). Fixed in 6bde211 (required --base, word-boundary test titles excluding skipped forms, evidence changed after the fix, closedAt >= fix time, curated classes MISSING, unknown status refused, INCOMPLETE without curation or freeze, closures source and sha256). Re-review at 41ff524: F1 FIXED; new BLOCKING N1 (a `./` path prefix let the closures record serve as its own review evidence; skips via testInfo.skip() or on the declaration line went undetected), fixes in progress. Documented limits: an unrelated commit descending from the base can be named as the fix; agent-written review evidence cannot be told from a reviewer's without identity or attestation.
+**Independent review.** Independent review: BLOCKING (F1: closures could be satisfied by tests outside the rehearsal, comment mentions, evidence older than the fix, closedAt before the fix, and unknown statuses). Fixed in 6bde211 (required --base, word-boundary test titles excluding skipped forms, evidence changed after the fix, closedAt >= fix time, curated classes MISSING, unknown status refused, INCOMPLETE without curation or freeze, closures source and sha256). Re-review at 41ff524: F1 FIXED; new BLOCKING N1 (a `./` path prefix let the closures record serve as its own review evidence; skips via testInfo.skip() or on the declaration line went undetected). Fixed in 6d05613 (normalised paths and blob-identity against the closures record; skip detection shared in TestBlocks). Third review in progress. Documented limits: an unrelated commit descending from the base can be named as the fix; agent-written review evidence cannot be told from a reviewer's without identity or attestation.
 
 ## R7-REM-009: Forma accessibility corrections
 
@@ -243,14 +243,14 @@ Generated from [`work-packages.json`](work-packages.json); the JSON is authorita
 - The record exists before the baseline is frozen
 
 **Evidence.**
-- Offline test suite passes at 41ff524
+- Offline test suite passes at eb978e2
 - evidence/release-observation-demo.json and release-comparison-demo.json: live observation of praxis 3.23.0, forma 0.11.0, arca 0.6.0 at 2026-10-29T11:08Z, PASS (demonstration only, not the kickoff set)
 
 **Remaining.**
-- Fixes for the re-review findings, then a further independent review
+- Third independent review verdict
 - Run at Rehearsal 7 preflight against the kickoff set, before the lock
 
-**Independent review.** Independent review: BLOCKING (F4/F5: hand-edited observations accepted, duplicates, wrong tag prefixes, npm latest-vs-highest, prerelease order, unapproved deviations, unbounded age). Fixed in afe7485 (answers stored, re-hashed and re-parsed, TAMPERED otherwise; recomputed source URL; duplicates refused; per-component tag prefixes; NuGet; semver prerelease order; deviations need decision and approvedBy; --locked-at with offset; max age <= 24 h). Re-review at 41ff524: F4 FIXED for inconsistent edits, F5 mostly FIXED; N5 (two components sharing a repository and tag prefix) fix in progress; N4 inherent: a recomputed digest over a forged answer is not proof, and observedAt, the lock record, approvedBy and deviations are caller-written. Proof needs observe to run in trusted CI with signed output.
+**Independent review.** Independent review: BLOCKING (F4/F5: hand-edited observations accepted, duplicates, wrong tag prefixes, npm latest-vs-highest, prerelease order, unapproved deviations, unbounded age). Fixed in afe7485 (answers stored, re-hashed and re-parsed, TAMPERED otherwise; recomputed source URL; duplicates refused; per-component tag prefixes; NuGet; semver prerelease order; deviations need decision and approvedBy; --locked-at with offset; max age <= 24 h). Re-review at 41ff524: F4 FIXED for inconsistent edits, F5 mostly FIXED; N5 fixed in 07be4f2 (AMBIGUOUS_COMPONENT, not a PASS status); N4 stated in the report's attestation field; N4 inherent: a recomputed digest over a forged answer is not proof, and observedAt, the lock record, approvedBy and deviations are caller-written. Proof needs observe to run in trusted CI with signed output. Third review in progress.
 
 ## R7-REM-011: Independent-review corrections
 
@@ -260,20 +260,20 @@ Generated from [`work-packages.json`](work-packages.json); the JSON is authorita
 
 **Tests.**
 - AssertionRatchetTests (duplicates, loosening, add-then-remove, F#, tag changes; set-semantics mutation fails 3)
-- Run against R6 0ff0100..46d5e11: both UI-034 weakenings plus 33 more unrecorded removals
+- Run against R6 c80f35e..46d5e11 (base bound by the commit that added kickoff/indy-init.kickoff.json): both UI-034 weakenings plus 43 more unrecorded removals
 
 **Acceptance.**
 - Weakening is detected before review
 
 **Evidence.**
-- Offline test suite passes at 41ff524
-- evidence/assertion-ratchet-r6.json: Rehearsal 6 0ff0100..46d5e11: FAIL, 38 removed assertions unrecorded, including both UI-034 weakenings
+- Offline test suite passes at eb978e2
+- evidence/assertion-ratchet-r6.json: Rehearsal 6 c80f35e..46d5e11, base read from the real kickoff record: FAIL, 45 unrecorded removals including UI-034-O1 and UI-034-O2
 
 **Remaining.**
-- Fixes for the re-review findings, then a further independent review
+- Third independent review verdict
 - RF-F-4..7, RF-F-9 are process items carried into EXECUTION-PLAN.md
 
-**Independent review.** Independent review: BLOCKING (F2/F3: skip/fixme/only markers, block comments, multi-line statements and helper pseudo-tests evaded the count; the base was caller-chosen). Fixed in ddc18bb (per-statement counting, markers, comments, test.* blocks, tag-change exemption through PlanVerification rules, required --kickoff binding the base, full SHAs). Re-review at 41ff524: F2 FIXED, F3 PARTIAL (any non-empty resolution accepted); new N2 (the kickoff record was any file on disk, so the base was still self-asserted) and N3 (assertions hidden in template literals; testInfo.skip(), test.info().skip(), aliased skip), fixes in progress.
+**Independent review.** Independent review: BLOCKING (F2/F3: skip/fixme/only markers, block comments, multi-line statements and helper pseudo-tests evaded the count; the base was caller-chosen). Fixed in ddc18bb (per-statement counting, markers, comments, test.* blocks, tag-change exemption through PlanVerification rules, required --kickoff binding the base, full SHAs). Re-review at 41ff524: F2 FIXED, F3 PARTIAL (any non-empty resolution accepted); new N2 (the kickoff record was any file on disk, so the base was still self-asserted) and N3 (assertions hidden in template literals; testInfo.skip(), test.info().skip(), aliased skip). Fixed in 865d443: the base is the commit that first added the kickoff record in the candidate's first-parent history (a mismatching --base is REFUSED); assertions matched on string- and template-masked text; skip markers anywhere including aliases in the file; a tag change needs PlanVerification.tagChangeAdmissible. Third review in progress.
 
 ## R7-REM-012: Rehearsal 7 readiness
 

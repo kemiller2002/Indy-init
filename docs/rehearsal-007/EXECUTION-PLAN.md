@@ -24,7 +24,7 @@
 | T+180 | Core workflows implemented | Bound tests green in CI |
 | T+240 | Integration and adversarial verification complete (§3) | Reviewer reports |
 | T+300 | Candidate selected **from a green core run of its exact SHA**; `candidate-acceptance.yml` dispatched | `conditor.candidate-verification/1` |
-| T+360 | Independent review; defect-class closures and the assertion ratchet run **before the freeze** | `verify-defect-closures --base <kickoff SHA> --candidate <SHA> --records <SHA> --curation <file> --freeze-at <time>` VERIFIED; `assertion-ratchet --base <kickoff SHA> --candidate <SHA> --kickoff <kickoff record>` PASS |
+| T+360 | Independent review; defect-class closures and the assertion ratchet run **before the freeze** | `verify-defect-closures --base <kickoff SHA> --candidate <SHA> --records <SHA> --curation <file> --freeze-at <time>` VERIFIED; `assertion-ratchet --candidate <SHA>` PASS (the base is read from git: the commit that added `kickoff/indy-init.kickoff.json`) |
 | T+420 | Final deadline: computed verdict | Frozen verifiers |
 
 ## 3. Early adversarial verification (risk-based)
