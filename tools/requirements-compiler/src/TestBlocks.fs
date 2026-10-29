@@ -12,8 +12,10 @@
 /// The JavaScript/TypeScript scanner is a heuristic lexer, not a parser. It decides what a `/` is from the token
 /// before it (a `)` closing a statement head, a `}` closing a block, an operator: a regular expression; an operand,
 /// a `}` closing an object literal: division) and fails closed (UNPARSEABLE) where it cannot tell or its reading is
-/// inconsistent. An adversarially written file may still desynchronise it in a way it does not detect, so the
-/// independent review must inspect the test files it relies on. JSX/TSX files are not read at all (unsupported).
+/// inconsistent. Inside a template's `${...}` braces are classified as in code, and a `/` right after a `}` there is
+/// never guessed at (UNPARSEABLE). An adversarially written file may still desynchronise it in a way it does not
+/// detect, so the independent review must inspect the test files it relies on; parseWithAttention names the files
+/// with the shapes every desynchronisation so far was built from. JSX/TSX files are not read at all (unsupported).
 module TestBlocks
 
 open System
@@ -80,7 +82,8 @@ type private Mode =
     | Verbatim
     | Triple
     | Template
-    | TemplateExpr of depth: int
+    /// A template literal's `${...}`; `braces` is how many braces were open when it began.
+    | TemplateExpr of braces: int
     | RegexLit of inClass: bool
     | Backticks
 
@@ -135,7 +138,14 @@ let private afterAmbiguous = '\002'
 
 /// The scanner's state: the stack of open contexts (the innermost first; Code at the bottom), the JavaScript
 /// parentheses open (each: whether it opened a statement head), and the previous significant code character.
-type private ScanState = { Stack: Mode list; Parens: bool list; Braces: Brace list; Prev: char; Problem: string option }
+type private ScanState =
+    { Stack: Mode list
+      Parens: bool list
+      Braces: Brace list
+      Prev: char
+      Problem: string option
+      /// Why the independent review should read this file even though it scanned (see reviewAttention).
+      Attention: Set<string> }
 
 /// The text with comments blanked (`code`) and the same text with literal contents blanked as well (`mask`). Both keep
 /// the length and every newline, so line i of one is line i of the other. Strings, templates and comments inside a
@@ -143,10 +153,16 @@ type private ScanState = { Stack: Mode list; Parens: bool list; Braces: Brace li
 /// consistently, if it could not: it ends inside a literal or comment, a JavaScript string or regular expression runs
 /// past its line, or the parentheses do not balance. A reading with a problem is not to be trusted at all (fail
 /// closed): an early mistake hides everything after it.
-let scan (lang: Language) (text: string) : string * string * string option =
+let scan (lang: Language) (text: string) : string * string * string option * string list =
     let n = text.Length
     let at i = if i < n then text.[i] else '\000'
     let regexMayFollow (prev: char) = prev = '\000' || prev = afterHead || "(,=:[!&|?{};+-*%<>~^".IndexOf prev >= 0
+
+    /// The character just before position i, whitespace skipped ('\000' at the start).
+    let charBefore i =
+        let rec skipSpace j = if j >= 0 && Char.IsWhiteSpace text.[j] then skipSpace (j - 1) else j
+        let j = skipSpace (i - 1)
+        if j >= 0 then text.[j] else '\000'
 
     /// Whether the code just before position i (whitespace skipped) ends with `=>`.
     let arrowBefore i =
@@ -228,8 +244,11 @@ let scan (lang: Language) (text: string) : string * string * string option =
 
         match mode with
         | Code -> code ()
-        | TemplateExpr depth when c = '{' -> 1, { replace (TemplateExpr(depth + 1)) with Prev = c }, id, id
-        | TemplateExpr depth when c = '}' -> 1, { (if depth = 1 then pop else replace (TemplateExpr(depth - 1))) with Prev = 'a' }, id, id
+        // Inside `${...}` braces are classified exactly as in code; the `}` that matches no brace opened inside closes it.
+        | TemplateExpr braces when c = '}' && s.Braces.Length <= braces -> 1, { pop with Prev = 'a' }, id, id
+        // Belt and braces: a `/` right after a `}` inside `${...}` is not guessed at.
+        | TemplateExpr _ when c = '/' && next <> '/' && next <> '*' && charBefore i = '}' ->
+            1, fail { s with Prev = c } (sprintf "a `/` at offset %d follows a `}` inside a template's ${...}" i), id, id
         | TemplateExpr _ -> code ()
         | LineComment -> if c = '\n' then 1, pop, id, id else 1, s, blank, blank
         | BlockComment depth ->
@@ -251,7 +270,7 @@ let scan (lang: Language) (text: string) : string * string * string option =
         | Template ->
             if c = '\\' then 2, s, id, lit
             elif c = '`' then 1, { pop with Prev = 'a' }, id, id
-            elif c = '$' && next = '{' then 2, { push (TemplateExpr 1) with Prev = '(' }, id, lit
+            elif c = '$' && next = '{' then 2, { push (TemplateExpr s.Braces.Length) with Prev = '(' }, id, lit
             else 1, s, id, lit
         | RegexLit inClass ->
             if c = '\\' then 2, s, id, lit
@@ -273,9 +292,24 @@ let scan (lang: Language) (text: string) : string * string * string option =
                 |> Option.orElse (if s.Parens.IsEmpty then None else Some(sprintf "%d `(` never closed" s.Parens.Length))
                 |> Option.orElse (if s.Braces.IsEmpty then None else Some(sprintf "%d `{` never closed" s.Braces.Length))
 
-            String(List.rev code |> Array.ofList), String(List.rev mask |> Array.ofList), problem
+            String(List.rev code |> Array.ofList), String(List.rev mask |> Array.ofList), problem, Set.toList s.Attention
         else
-            let k, s', toCode, toMask = decide i s
+            let k, decided, toCode, toMask = decide i s
+            let c = text.[i]
+
+            // What a reader should look at: a backtick in a comment, a quote or backtick in a regular expression
+            // literal, a `/` (not a comment) right after a `}`.
+            let noted =
+                [ match List.head s.Stack with
+                  | LineComment
+                  | BlockComment _ when c = '`' -> yield "a backtick inside a comment"
+                  | RegexLit _ when c = '"' || c = '\'' || c = '`' -> yield "a regular expression literal holding a quote or backtick"
+                  | Code
+                  | TemplateExpr _ when lang = Js && c = '/' && at (i + 1) <> '/' && at (i + 1) <> '*' && charBefore i = '}' ->
+                      yield "a `/` right after a `}`"
+                  | _ -> () ]
+
+            let s' = { decided with Attention = noted |> List.fold (fun acc why -> Set.add why acc) decided.Attention }
             // A character inside a literal both before and after it is the literal's content; its delimiters stay.
             let isComment = function LineComment | BlockComment _ -> true | _ -> false
             let comment = isComment (List.head s.Stack) || isComment (List.head s'.Stack)
@@ -284,7 +318,7 @@ let scan (lang: Language) (text: string) : string * string * string option =
             let taken = [ for j in i .. min (n - 1) (i + k - 1) -> text.[j] ]
             go (i + k) s' (List.fold (fun acc ch -> toCode ch :: acc) code taken) (List.fold (fun acc ch -> maskOf ch :: acc) mask taken)
 
-    go 0 { Stack = [ Code ]; Parens = []; Braces = []; Prev = '\000'; Problem = None } [] []
+    go 0 { Stack = [ Code ]; Parens = []; Braces = []; Prev = '\000'; Problem = None; Attention = Set.empty } [] []
 
 let private collapse (s: string) = Regex.Replace(s, @"\s+", " ").Trim()
 
@@ -492,17 +526,20 @@ type Reading =
     | Unparseable of problem: string
     | Unsupported of reason: string
 
-/// The blocks of one file: each test and describe block, then the file's module block. None for a file that is not
-/// source code at all.
-let parse (path: string) (text: string) : Reading option =
+/// The blocks of one file: each test and describe block, then the file's module block (None for a file that is not
+/// source code at all); and why the independent review should read the file even so (`reviewAttention`): a backtick
+/// inside a comment, a quote or backtick in a regular expression literal, a `/` right after a `}`. Those are the
+/// shapes every desynchronisation found so far was built from; a file without them can still be adversarial.
+let parseWithAttention (path: string) (text: string) : Reading option * string list =
     if isUnsupported path then
-        Some(Unsupported "JSX/TSX is not read: its markup quoting is not lexed")
+        Some(Unsupported "JSX/TSX is not read: its markup quoting is not lexed"), []
     else
-        languageOf path
-        |> Option.map (fun lang ->
+        match languageOf path with
+        | None -> None, []
+        | Some lang ->
             match scan lang (text.Replace("\r\n", "\n")) with
-            | _, _, Some problem -> Unparseable problem
-            | code, mask, None ->
+            | _, _, Some problem, attention -> Some(Unparseable problem), attention
+            | code, mask, None, attention ->
                 let codeLines, maskLines = code.Split('\n'), mask.Split('\n')
                 let drafts, owned, fileMarked = (match lang with Js -> readJs | FSharp -> readFSharp) codeLines maskLines
                 let byIndex = Array.ofList drafts
@@ -519,10 +556,16 @@ let parse (path: string) (text: string) : Reading option =
                       Statements = List.map fst pairs
                       Masked = List.map snd pairs }
 
-                Blocks(
-                    (drafts |> List.mapi (fun i d -> block d.Title d.Kind (max fileMarked (markOf i)) i))
-                    @ [ block (moduleName lang path codeLines) Module Unmarked -1 ]
-                ))
+                Some(
+                    Blocks(
+                        (drafts |> List.mapi (fun i d -> block d.Title d.Kind (max fileMarked (markOf i)) i))
+                        @ [ block (moduleName lang path codeLines) Module Unmarked -1 ]
+                    )
+                ),
+                attention
+
+/// The blocks of one file (see parseWithAttention).
+let parse (path: string) (text: string) : Reading option = parseWithAttention path text |> fst
 
 let private jsAssertion = Regex(@"(?<![\w$.])(?:expect|assert)\b\s*(?:\.\s*\w+\s*)?\(", RegexOptions.Compiled)
 let private fsAssertion = Regex(@"\bAssert\.|\bExpect\.|\btest\s*<@|\|>\s*should\b|\bshould\s*\(", RegexOptions.Compiled)

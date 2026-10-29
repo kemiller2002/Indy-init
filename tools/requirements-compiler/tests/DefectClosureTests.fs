@@ -245,6 +245,8 @@ let all () : string list =
               if not (has "DCL-007" report && problems report |> List.exists (fun p -> p.Contains expected)) then
                   yield sprintf "DCL-007: %s is accepted as review evidence: %A" label (problems report)
 
+          if not (arr "reviewAttention" ok |> List.exists (fun f -> (str "file" f).StartsWith("tests/sneaky.spec.js@", StringComparison.Ordinal))) then
+              yield "reviewAttention does not list the spec with a backtick in a comment"
           if strs "limits" ok |> List.isEmpty then
               yield "the report does not state the verification's inherent limits"
 

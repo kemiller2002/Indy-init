@@ -107,11 +107,12 @@ type Reading =
       Excluded: (string * string list) list
       TreatedLive: string list }
 
-let read (side: Side) (path: string) (text: string) : Result<Reading, string * string> =
+/// A file's reading (see `read`) from its TestBlocks parse.
+let private readParsed (side: Side) (path: string) (parsed: TestBlocks.Reading option) : Result<Reading, string * string> =
     let count (held: Map<string, int>) (assertions: string list) =
         assertions |> List.fold (fun (m: Map<string, int>) key -> m.Add(key, (m.TryFind key |> Option.defaultValue 0) + 1)) held
 
-    match TestBlocks.parse path text with
+    match parsed with
     | None -> Ok { Held = Map.empty; Excluded = []; TreatedLive = [] }
     | Some(TestBlocks.Unparseable problem) -> Error("UNPARSEABLE", problem)
     | Some(TestBlocks.Unsupported reason) -> Error("unsupported", reason)
@@ -128,6 +129,9 @@ let read (side: Side) (path: string) (text: string) : Result<Reading, string * s
                   TreatedLive = (if block.Skipped && live then block.Title :: r.TreatedLive else r.TreatedLive) })
             { Held = Map.empty; Excluded = []; TreatedLive = [] }
         |> Ok
+
+let read (side: Side) (path: string) (text: string) : Result<Reading, string * string> =
+    readParsed side path (TestBlocks.parse path text)
 
 /// What each block of one file holds, read as the candidate is (see `read`); an UNPARSEABLE file holds nothing.
 let blocks (path: string) (text: string) : Map<string, Map<string, int>> =
@@ -186,10 +190,10 @@ let limits =
       "skip markers reached through a helper in another file, an argument or a computed property are not seen; a conditional skip's condition is not evaluated"
       "the base is the commit that first added kickoff/indy-init.kickoff.json in the candidate's first-parent history: history rewritten before the run moves it, unless the kickoff commit is pinned outside the candidate (an owner record or tag)"
       "a tag change's review is checked for a review record's structure, not for who wrote it: without a signed review or reviewer attestation the implementing agent can write it"
-      "the JavaScript/TypeScript scanner is a heuristic lexer that fails closed where it detects ambiguity; an adversarially written file may still desynchronise it undetected, so the independent review must inspect the test files it relies on"
+      "the JavaScript/TypeScript scanner is a heuristic lexer that fails closed where it detects ambiguity; an adversarially written file may still desynchronise it undetected, so the independent review must inspect the test files it relies on, starting with every file in reviewAttention (a backtick in a comment, a quote or backtick in a regular expression literal, a `/` right after a `}`)"
       "JSX/TSX files are not read (unsupported): a tracked path holding one leaves the verdict at best INCOMPLETE" ]
 
-/// The `indy-init.assertion-ratchet/5` report.
+/// The `indy-init.assertion-ratchet/6` report.
 let assess (inputs: Inputs) : Json =
     let repo = inputs.Repo
     let roots = inputs.Roots
@@ -222,9 +226,16 @@ let assess (inputs: Inputs) : Json =
         | Ok bytes -> lines bytes |> List.filter (tracked roots) |> List.distinct
         | Error e -> failwithf "cannot read %s: %s" commit e
 
-    // Each file's reading at a commit: (commit, path, reading or the UNPARSEABLE problem).
-    let readingsOf side commit (paths: string list) =
-        paths |> List.choose (fun path -> textAt repo commit path |> Option.map (fun text -> commit, path, read side path text))
+    // Each file's reading at a commit: (commit, path, reading or the UNPARSEABLE problem), and the files the
+    // independent review should read (commit, path, why).
+    let parsedOf side commit (paths: string list) =
+        paths
+        |> List.choose (fun path ->
+            textAt repo commit path
+            |> Option.map (fun text ->
+                let parsed, attention = TestBlocks.parseWithAttention path text
+                (commit, path, readParsed side path parsed), (commit, path, attention)))
+
 
     let testsOf readings =
         readings
@@ -249,12 +260,16 @@ let assess (inputs: Inputs) : Json =
     // The base's files, then each changed file of each later commit, read for what they held.
     let earlier =
         (baseCommit, filesAt repo baseCommit roots) :: (history |> List.map (fun commit -> commit, changedIn commit))
-        |> List.map (fun (commit, paths) -> commit, readingsOf Earlier commit paths)
+        |> List.map (fun (commit, paths) -> commit, parsedOf Earlier commit paths)
 
-    let seen = earlier |> List.fold (fun acc (commit, readings) -> testsOf readings |> remember commit acc) Map.empty
-    let candidateReadings = readingsOf Candidate candidate (filesAt repo candidate roots)
-    let final = testsOf candidateReadings |> Map.ofList
-    let allReadings = (earlier |> List.collect snd) @ candidateReadings
+    let seen = earlier |> List.fold (fun acc (commit, parsed) -> testsOf (List.map fst parsed) |> remember commit acc) Map.empty
+    let candidateParsed = parsedOf Candidate candidate (filesAt repo candidate roots)
+    let final = testsOf (List.map fst candidateParsed) |> Map.ofList
+    let allParsed = (earlier |> List.collect snd) @ candidateParsed
+    let allReadings = allParsed |> List.map fst
+
+    let reviewAttention =
+        allParsed |> List.map snd |> List.filter (fun (_, _, why) -> not why.IsEmpty) |> List.distinct
 
     // Each file not read, once per version (the candidate is read both as the last commit walked and as the candidate).
     let notRead kind =
@@ -265,7 +280,7 @@ let assess (inputs: Inputs) : Json =
     let unparseable = notRead "UNPARSEABLE"
     let unsupported = notRead "unsupported"
 
-    let earlierReadings = earlier |> List.collect snd |> List.choose (function _, path, Ok r -> Some(path, r) | _ -> None)
+    let earlierReadings = earlier |> List.collect snd |> List.map fst |> List.choose (function _, path, Ok r -> Some(path, r) | _ -> None)
     let excluded = earlierReadings |> List.collect (fun (path, r) -> r.Excluded |> List.map (fun (title, assertions) -> path, title, assertions))
     let excludedTests = excluded |> List.map (fun (path, title, _) -> path, title) |> List.distinct
     let excludedAssertions = excluded |> List.collect (fun (path, title, assertions) -> assertions |> List.map (fun a -> path, title, a)) |> List.distinct
@@ -334,7 +349,7 @@ let assess (inputs: Inputs) : Json =
         else "PASS"
 
     JObj
-        [ "schema", JStr "indy-init.assertion-ratchet/5"
+        [ "schema", JStr "indy-init.assertion-ratchet/6"
           "base", JStr baseCommit
           "candidate", JStr candidate
           "baseVerified", JBool baseVerified
@@ -370,6 +385,7 @@ let assess (inputs: Inputs) : Json =
           "incomplete", jstrs incomplete
           "unparseable", JArr(unparseable |> List.map (fun (commit, path, problem) -> JObj [ "commit", JStr commit; "path", JStr path; "problem", JStr problem ]))
           "unsupported", JArr(unsupported |> List.map (fun (commit, path, reason) -> JObj [ "commit", JStr commit; "path", JStr path; "reason", JStr reason ]))
+          "reviewAttention", JArr(reviewAttention |> List.map (fun (commit, path, why) -> JObj [ "file", JStr(sprintf "%s@%s" path commit); "why", jstrs why ]))
           "skippedBeforeCandidate",
           JObj
               [ "testsExcluded", jint excludedTests.Length
