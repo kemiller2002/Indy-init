@@ -127,6 +127,25 @@ let all () : string list =
       if arr "systems" dokimosReport |> List.exists (fun r -> strOpt "latest" r <> Some "0.9.1") then
           yield sprintf "the newest dokimos release is not 0.9.1 among other components' tags, drafts and prereleases: %A" (arr "systems" dokimosReport |> List.map (strOpt "latest"))
 
+      // N5: two components of one repository with one tag prefix (limen-fsharp and the limen npm package, both `v`).
+      let shared =
+          JObj
+              [ "components",
+                JArr
+                    [ JObj [ "systemId", JStr "limen-fsharp"; "version", JStr "0.9.0"; "tag", JStr "v0.9.0"; "repository", JStr "kemiller2002/limen"; "distribution", JObj [ "mechanism", JStr "github-release" ] ]
+                      JObj [ "systemId", JStr "limen-npm"; "version", JStr "0.9.0"; "tag", JStr "v0.9.0"; "repository", JStr "kemiller2002/limen"; "distribution", JObj [ "mechanism", JStr "github-release" ] ] ] ]
+      let sharedReport = assessOf shared (selectedSystems shared |> List.map (fun s -> honest s (releases "v" "0.9.0") before)) []
+      if str "verdict" sharedReport = "PASS" || [ "limen-fsharp"; "limen-npm" ] |> List.exists (fun s -> statusOf s sharedReport <> "AMBIGUOUS_COMPONENT") then
+          yield "two components sharing a repository and a tag prefix are not AMBIGUOUS_COMPONENT"
+      let distinct = set [ "dokimos", "0.9.0", "dokimos-v0.9.0" ]
+      let twoPrefixes =
+          JObj [ "components", JArr(arr "components" distinct @ [ JObj [ "systemId", JStr "praxis"; "version", JStr "3.23.0"; "tag", JStr "v3.23.0"; "repository", JStr "kemiller2002/dokimos"; "distribution", JObj [ "mechanism", JStr "github-release" ] ] ]) ]
+      if selectedSystems twoPrefixes |> List.exists (fun s -> statusOf s.System (assessOf twoPrefixes [] []) = "AMBIGUOUS_COMPONENT") then
+          yield "components of one repository with different tag prefixes are AMBIGUOUS_COMPONENT"
+      // N4 is inherent: the report says the observations are not attested.
+      if not ((strOpt "attestation" current |> Option.defaultValue "").StartsWith("none:", StringComparison.Ordinal)) then
+          yield "the report does not state that its observations carry no attestation"
+
       // npm: dist-tags.latest must be the highest stable version.
       let npmSet =
           JObj [ "components", JArr [ JObj [ "systemId", JStr "limen"; "version", JStr "0.9.1"; "distribution", JObj [ "mechanism", JStr "npm"; "package", JStr "@echelon-foundry/limen" ] ] ] ]
