@@ -717,32 +717,31 @@ let verifyProcessCommand (args: string list) : int =
 
 /// `verify-defect-closures`: defect-class closures checked against the rehearsal's own history (see DefectClosure,
 /// R7-REM-008). Closures are read from the candidate's tree unless `--closures-file` is given. Exit 0 VERIFIED,
-/// 3 REFUSED, 2 unusable input.
+/// 3 REFUSED or INCOMPLETE, 2 unusable input.
 let verifyDefectClosuresCommand (args: string list) : int =
     let usage =
-        "usage: requirements-compiler verify-defect-closures --repo DIR --candidate SHA [--closures PATH | --closures-file FILE] [--records SHA] [--curation FILE] [--tests-path DIR] [--freeze-at ISO-8601] [--out FILE]"
+        "usage: requirements-compiler verify-defect-closures --repo DIR --base SHA --candidate SHA [--closures PATH | --closures-file FILE] [--records SHA] [--curation FILE] [--tests-path DIR] [--freeze-at ISO-8601] [--out FILE]"
 
     match optionMap args with
     | Error e ->
         eprintfn "%s" e
         2
-    | Ok m when not (m.ContainsKey "--repo" && m.ContainsKey "--candidate") ->
+    | Ok m when not (m.ContainsKey "--repo" && m.ContainsKey "--candidate" && m.ContainsKey "--base") ->
         eprintfn "%s" usage
         2
     | Ok m ->
         try
             let one k = m.TryFind k |> Option.map List.last
             let repo = (one "--repo").Value
-            let candidate = (one "--candidate").Value
+            let candidate = DefectClosure.resolveCommit repo (one "--candidate").Value |> Option.defaultValue (one "--candidate").Value
+            let path = one "--closures" |> Option.defaultValue "acceptance/defect-classes.json"
 
-            let closures =
+            let source, bytes =
                 match one "--closures-file" with
-                | Some file -> parseFile file
+                | Some file -> sprintf "file:%s" file, File.ReadAllBytes file
                 | None ->
-                    let path = one "--closures" |> Option.defaultValue "acceptance/defect-classes.json"
-
                     match Git.showFile repo candidate path with
-                    | Ok bytes -> parseBytes bytes
+                    | Ok bytes -> sprintf "%s:%s" candidate path, bytes
                     | Error e -> failwithf "%s is not readable at %s: %s" path candidate e
 
             let freezeAt =
@@ -752,9 +751,13 @@ let verifyDefectClosuresCommand (args: string list) : int =
             let report =
                 DefectClosure.assess
                     { Repo = repo
+                      Base = (one "--base").Value
                       Candidate = candidate
                       Records = one "--records"
-                      Closures = closures
+                      Closures = parseBytes bytes
+                      ClosuresSource = source
+                      ClosuresSha256 = Git.sha256Hex bytes
+                      ClosuresPath = path
                       Curation = one "--curation" |> Option.map parseFile
                       FreezeAt = freezeAt
                       TestsPath = one "--tests-path" |> Option.defaultValue "tests" }
