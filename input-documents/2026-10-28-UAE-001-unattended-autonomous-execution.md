@@ -7,7 +7,25 @@ Intake: Praxis document ingestion. This document is source material, not a canon
 
 Indy-init has no Praxis installation (no `.praxis/`). As with ESO-001, this file therefore uses the legacy `input-documents/` path, which Praxis still reads. No Praxis state is written or implied by this file.
 
-**Status: proposed.** Every requirement below is an *owner-controlled* change to Rehearsal 7's engineering requirements, so it needs the owner's approval. Under RDP-003, that approval takes effect through the owner's own merge of the pull request that records it. Rehearsal 7 is not started by this document, and starting it stays the owner's decision.
+**Status: approved, with an amendment.** The owner approved this intake on 2026-10-29 (PR #38). Rehearsal 7 is not started by this document; starting it stays the owner's decision.
+
+**Amendment, owner decision of 2026-10-29: owner-delegated agent authority.** The owner chose not to hold the signing key. In UAE-R7-01, "the owner signs" and "no agent … signs the authorization or the trust store" are replaced as follows:
+
+- The run authorization is signed by the **owner-delegated agent authority**, a session-scoped P-256 key the agent generates and holds.
+- Its trust store is outside every repository.
+- The private key is never committed.
+
+Everything else in UAE-R7-01 still holds: scope, Category A operations, protected-class reservation, expiry, and policy digest.
+
+Consequence: the signature records the delegation, not the owner's intent for each run. Praxis security finding F1 is **accepted**, not closed (praxis SECURITY-REVIEW.md). Until UAE-R7-12 is met, the rehearsal report must state that the gate was advisory *and* that the agent held the key.
+
+UAE-R7-06 has been satisfied once in advance:
+
+- `conditor unattended-readiness` reported **READY** against rehearsal-007 `main` on 2026-10-29.
+- The run was `RUN-R7-READINESS-20261029-01`, and probe PR #20 merged as `9c3aaf6`.
+- Receipt: praxis `docs/autonomous-execution/evidence/2026-10-29/`.
+
+Re-run it with the kickoff authorization at kickoff.
 
 ## Evidence
 
@@ -73,5 +91,5 @@ The causes and the measured facts are in praxis `docs/autonomous-execution/GITHU
 ## Owner decisions this intake needs
 
 1. Approve or amend UAE-R7-01 to UAE-R7-12 for Rehearsal 7, through the owner's merge of the PR that records them.
-2. Generate the owner's P-256 key and keep its trust store outside every repository (praxis `EXECUTION-POLICY.md` §2).
+2. ~~Generate the owner's P-256 key and keep its trust store outside every repository (praxis `EXECUTION-POLICY.md` §2).~~ Resolved 2026-10-29: owner-delegated agent authority (see the amendment above).
 3. For UAE-R7-12: put the trust store in an Actions secret, and add a ruleset on the rehearsal repository's `main` requiring the CI and `independent-review` checks, with no human review, and blocking force pushes. This turns Praxis's gate from advisory into enforced (diagnosis D-2). It stays compatible with unattended merging.
