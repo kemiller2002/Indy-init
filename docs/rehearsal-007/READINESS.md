@@ -19,14 +19,14 @@
 | R7-PF-11 | Release comparison recorded | **NOT_RUN** | The record must be made at preflight against the kickoff set, immediately before the lock. The demonstration predates the releases this remediation needs (Arca, Forma, Conditor, Praxis), so it is not the record. |
 | R7-PF-12 | Independent adversarial review passed | **NOT_RUN** | The Indy-init tools' final review is PASS_WITH_FINDINGS with every finding fixed, Arca's PASS_WITH_FINDINGS (low, fixed) and Forma's PASS. Conditor's fixes were not re-reviewed, and the security review depends on the credential probe. |
 | R7-PF-13 | No unresolved critical defects | **NOT_RUN** | No Rehearsal 7 candidate exists. The defect-closure verifier must record each closure against a fix commit in Rehearsal 7's history. |
-| R7-PF-14 | Frozen requirements and verification plan ready | **BLOCKED** | The compiled package v4 is not cut (K3: the R7 compile with the v3 curation fails V09, V11, V17, V18), K2 and K4 owner decisions are open, and R7-AMD-03..05 are undecided. Approvals are owner records (RDP-003). |
+| R7-PF-14 | Frozen requirements and verification plan ready | **BLOCKED** | The compiled package v4 is not cut (K3: the R7 compile with the v3 curation fails V09, V11, V17, V18), the four-case causa-data catalog that DEC-R7-006 requires is not published (K7), and R7-AMD-03..05 are undecided. Approvals are owner records (RDP-003). |
 
 ## Evidence per gate
 
 ### R7-PF-01: R6 critical defects corrected (NOT_RUN)
 
 - ADR-R7-001 (owner-approved, Indy-init #41): R6-D-002 and R6-D-003 removed by design: no shared browser store, no offline queue, no cross-tab locking (DEFECT-TRACEABILITY.md)
-- Baseline BL-CAUSA-INDY-INIT-7d44f5546bcd pinned; tools/validate-r7-persistence-requirements.fsx PASS 10/10 with 15/15 planted defects caught (re-run on this branch: PASS)
+- Baseline re-pinned as BL-CAUSA-INDY-INIT-8445ca11986f after the owner decisions DEC-R7-001..007; tools/validate-r7-persistence-requirements.fsx PASS 10/10 with 15/15 planted defects caught (re-run on this branch: PASS)
 - Library fixes in arca#47 (CI green at ac585ba) for Arca's other consumers; not used by Causa
 
 Needs:
@@ -128,19 +128,20 @@ Needs:
 
 ### R7-PF-14: Frozen requirements and verification plan ready (BLOCKED)
 
-- Baseline BL-CAUSA-INDY-INIT-7d44f5546bcd pinned and validated (READINESS-ASSESSMENT.md: requirements READY)
+- Baseline BL-CAUSA-INDY-INIT-8445ca11986f pinned after DEC-R7-001..007 (K1, K2, K4 done; READINESS-ASSESSMENT.md)
 - VERIFICATION-MATRIX.md, EXECUTION-PLAN.md
 - Requested amendments R7-AMD-03..05 (R7-AMD-01/02 withdrawn as superseded by ADR-R7-001)
 
 Needs:
-- Owner: K2 and K4 decisions; approve or decline R7-AMD-03..05
+- Owner: approve or decline R7-AMD-03..05
 - Agent then owner: K3 v4 cut
+- K7: publish the four-case catalog in causa-data (DEC-R7-006)
 
 ## Owner actions that unblock the gates
 
-1. Done on 2026-10-29 on the owner's instruction: arca#47, conditor#122, praxis#300, forma#173 and indy-init#42 merged. Remaining: release Forma, Conditor and Praxis (and Arca) so Rehearsal 7's release set contains the changes (R7-PF-05, 08, 10).
-2. Decide K2 and K4 of READINESS-ASSESSMENT.md, approve or decline R7-AMD-03..05, and approve the v4 cut (R7-PF-07, 14).
-3. Create `CAUSA_GITHUB_TOKEN` (read-only) and `CAUSA_WRITE_TOKEN` (write to `causa-write-test` only) (R7-PF-02, 04, 12; K6).
+1. Done on 2026-10-29 on the owner's instruction: arca#47, conditor#122, praxis#300, forma#173 and indy-init#42 merged; releases of Arca, Forma, Praxis and Conditor and the echelon-registry update are in progress on the owner's instruction (R7-PF-05, 08, 10).
+2. Approve or decline R7-AMD-03..05, approve the v4 cut (K3), and publish the four-case causa-data catalog (K7, DEC-R7-006); K1, K2 and K4 are done (R7-PF-07, 14).
+3. Create `CAUSA_GITHUB_TOKEN` (read-only) and `CAUSA_WRITE_TOKEN` (write to `causa-write-test` only) (R7-PF-02, 04, 12; K6; DEC-R7-007 confirms the two-token split).
 4. UAE-R7-12: a ruleset on `main` requiring CI, `independent-review` and the Praxis evaluate job, and the trust store in an Actions secret (R7-PF-06).
 5. A disposable repository for Experiment B (R7-PF-05).
 

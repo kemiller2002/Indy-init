@@ -7,7 +7,7 @@
 | Step | Who | Tool | Blocks the start if |
 |---|---|---|---|
 | Requirements baseline re-pinned; derived package, disposition and approvals pass `praxis requirements preservation verify` | Agent; owner for approvals | Praxis (RDP-001..004) | It does not pass |
-| Owner decisions K2 and K4 ([READINESS-ASSESSMENT.md](READINESS-ASSESSMENT.md)), R7-AMD-03..05, and the v4 package cut (K3) | Owner; agent for K3 | Approval records | Undecided items stay BLOCKED |
+| Owner decisions R7-AMD-03..05, the v4 package cut (K3) and the four-case catalog (K7) ([READINESS-ASSESSMENT.md](READINESS-ASSESSMENT.md); K1, K2, K4 done) | Owner; agent for K3 | Approval records | Undecided items stay BLOCKED |
 | **Release comparison recorded before the stack lock** | Agent | `requirements-compiler release-comparison observe --selected <set>` then `assess --observations <file> --locked-at <lock, with offset>` (observations at most 6 h old by default, 24 h maximum; deviations need an owner `approvedBy`) | The verdict is not PASS (VER-001-O1, VER-002-O2) |
 | Credential probe | Owner creates the secrets; the agent dispatches | `SECURITY-REVIEW.md` §1 | Any probe expectation fails (D-09) |
 | CI policy on the scaffolded repository | Agent | `conditor ci-policy check` | Any finding (R7-AMD-03) |

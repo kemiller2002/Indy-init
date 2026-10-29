@@ -110,7 +110,7 @@ A real pull request merged without routine owner intervention:
 
 ## Remaining owner decisions
 
-1. **Releases:** the merges are done (2026-10-29, on the owner's instruction). Cut releases of Forma, Conditor and Praxis (and Arca) that contain them, so that Rehearsal 7's release set includes the changes; the pre-lock release comparison then records them.
+1. **Releases:** the merges are done (2026-10-29, on the owner's instruction). Releases of Arca, Forma, Praxis and Conditor containing them, and the echelon-registry update, are in progress on the owner's instruction; the pre-lock release comparison then records them.
 2. **Credentials:**
    - `CAUSA_GITHUB_TOKEN`, read-only on the data repository;
    - `CAUSA_WRITE_TOKEN`, write to `causa-write-test` only;
@@ -119,7 +119,7 @@ A real pull request merged without routine owner intervention:
    - a ruleset on the rehearsal repository's `main` requiring CI, `independent-review` and the Praxis evaluate job;
    - the trust store in an Actions secret.
 4. **Requirements:**
-   - K2 and K4 of READINESS-ASSESSMENT.md;
+   - K7 of READINESS-ASSESSMENT.md: publish the four-case causa-data catalog (DEC-R7-006); K1, K2 and K4 are done;
    - approve or decline R7-AMD-03..05;
    - approve the v4 package cut (K3).
 5. **Experiment B:** a disposable repository.

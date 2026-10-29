@@ -95,36 +95,44 @@ Every functional, nonfunctional and interface requirement names at least one tes
 
 ## Amended Rehearsal 6 requirements
 
-No Rehearsal 6 requirement identifier is removed. These 22 requirements keep their identifiers and are amended.
+No Rehearsal 6 requirement identifier is removed. These 30 requirements keep their identifiers and are amended by ADR-R7-001 or by a Rehearsal 7 owner decision ([kickoff/rehearsal-007/OWNER-DECISIONS.md](../../kickoff/rehearsal-007/OWNER-DECISIONS.md)).
 
-| Requirement | Document | Priority | Why | Replaced by |
-|---|---|---|---|---|
-| UI-006 | CAUSA-UI-EXPERIENCE-REQUIREMENTS.md | P0 | The nine-state local/remote model (saving locally, saved locally, queued offline, syncing remotely) assumed a device-local durable store. Replaced by the seven session-local save states. | PERSIST-007, PERSIST-030, PERSIST-031, PERSIST-011, PERSIST-012 |
-| UI-010 | CAUSA-UI-EXPERIENCE-REQUIREMENTS.md | P0 | States where unsaved changes are preserved: only in the tab memory. | PERSIST-020 |
-| ADRP-011 | AGENT-DECISION-REDUCTION-PROFILE.md | unstated | The offline default no longer preserves changes durably; they stay unsaved in the tab. | PERSIST-018 |
-| ADRP-012 | AGENT-DECISION-REDUCTION-PROFILE.md | unstated | Build order step renamed from local persistence truth to session-local save-state truth. | PERSIST-023 |
-| R9.7 | REQUIREMENTS.md | unstated | Offline deep links open only investigations already loaded in the tab; no locally held store exists. | PERSIST-017 |
-| R10.5 | REQUIREMENTS.md | unstated | Offline tolerance narrowed to visibility of loaded investigations; offline edits are session-only. | PERSIST-017, PERSIST-018 |
-| R10.6 | REQUIREMENTS.md | unstated | Pending remote state restated as unconfirmed, never successful. | PERSIST-007, PERSIST-031 |
-| R10.7 | REQUIREMENTS.md | unstated | Restart recovery of pending writes removed: no local crash recovery. | PERSIST-019, PERSIST-020, PERSIST-021 |
-| S23 | SCREEN-CONTRACTS.md | unstated | Conflict recovery screen shows the tab version, the GitHub version and unsaved commands held in the tab. | PERSIST-011, PERSIST-012 |
-| D-204 | DESIGN-DECISION-BOUNDARIES.md | unstated | Reversible choice of a browser durability store closed: none. | PERSIST-003, PERSIST-005 |
-| KICKOFF-EXECUTION-PACKET§preamble | KICKOFF-EXECUTION-PACKET.md | unstated | Local durable store replaced by session-local state; the 12:00 checkpoint no longer allows a fallback. | PERSIST-002, PERSIST-006, PERSIST-007 |
-| KICKOFF-EXECUTION-PACKET§3-work-order | KICKOFF-EXECUTION-PACKET.md | unstated | Local durability step replaced by session-local state and truthful save state. | PERSIST-002, PERSIST-031 |
-| KICKOFF-EXECUTION-PACKET§4-parallel-ownership-after-kernel-stabilizes | KICKOFF-EXECUTION-PACKET.md | unstated | Persistence agent owns session-local state, not a local durable store. | PERSIST-002 |
-| KICKOFF-EXECUTION-PACKET§persistence-agent | KICKOFF-EXECUTION-PACKET.md | unstated | Persistence agent owns session-local state, not a local durable store. | PERSIST-002 |
-| KICKOFF-EXECUTION-PACKET§7-checkpoints | KICKOFF-EXECUTION-PACKET.md | unstated | 12:00 checkpoint is the confirmed GitHub save path; no durable-local fallback. | PERSIST-006, PERSIST-007 |
-| KICKOFF-EXECUTION-PACKET§12-00 | KICKOFF-EXECUTION-PACKET.md | unstated | 12:00 checkpoint is the confirmed GitHub save path; no durable-local fallback. | PERSIST-006, PERSIST-007 |
-| AR-035 | AGENT-RELIABILITY-REQUIREMENTS.md | P0 | Device-local durable state shared by several tabs is the design that produced R6-D-002; tabs now share only GitHub. | PERSIST-002, PERSIST-003, PERSIST-004 |
-| REHEARSAL-AGENT-INTERFACE-FREEZE§preamble | REHEARSAL-AGENT-INTERFACE-FREEZE.md | unstated | Boundary D restated for expected-head commits, reconciliation and rebase; the local queue and local-durable status removed; interfaces authored from requirements, not extracted from R001 source. | PERSIST-006, PERSIST-009, PERSIST-015, PERSIST-026 |
-| REHEARSAL-AGENT-INTERFACE-FREEZE§ownership | REHEARSAL-AGENT-INTERFACE-FREEZE.md | unstated | Persistence owner holds session-local unsaved changes, not a local queue. | PERSIST-002, PERSIST-006 |
-| REHEARSAL-AGENT-INTERFACE-FREEZE§boundary-d-persistence | REHEARSAL-AGENT-INTERFACE-FREEZE.md | unstated | Boundary D restated; no local-durable status. | PERSIST-005, PERSIST-006, PERSIST-007, PERSIST-009, PERSIST-012, PERSIST-015 |
-| REHEARSAL-AGENT-INTERFACE-FREEZE§contract-freeze-procedure | REHEARSAL-AGENT-INTERFACE-FREEZE.md | unstated | Interfaces are authored at kickoff from requirements; earlier rehearsal source is not an input. | PERSIST-026 |
-| REHEARSAL-AGENT-INTERFACE-FREEZE§mandatory-negative-cases | REHEARSAL-AGENT-INTERFACE-FREEZE.md | unstated | Offline-queue negative case replaced by stale head over unrelated changes, unknown commit outcome and save requested offline. | PERSIST-009, PERSIST-015, PERSIST-018 |
+| Requirement | Document | Priority | Decision | Why | Replaced by |
+|---|---|---|---|---|---|
+| UI-006 | CAUSA-UI-EXPERIENCE-REQUIREMENTS.md | P0 | ADR-R7-001 | The nine-state local/remote model (saving locally, saved locally, queued offline, syncing remotely) assumed a device-local durable store. Replaced by the seven session-local save states. | PERSIST-007, PERSIST-030, PERSIST-031, PERSIST-011, PERSIST-012 |
+| UI-010 | CAUSA-UI-EXPERIENCE-REQUIREMENTS.md | P0 | ADR-R7-001 | States where unsaved changes are preserved: only in the tab memory. | PERSIST-020 |
+| ADRP-011 | AGENT-DECISION-REDUCTION-PROFILE.md | unstated | ADR-R7-001 | The offline default no longer preserves changes durably; they stay unsaved in the tab. | PERSIST-018 |
+| ADRP-012 | AGENT-DECISION-REDUCTION-PROFILE.md | unstated | ADR-R7-001 | Build order step renamed from local persistence truth to session-local save-state truth. | PERSIST-023 |
+| R9.7 | REQUIREMENTS.md | unstated | ADR-R7-001 | Offline deep links open only investigations already loaded in the tab; no locally held store exists. | PERSIST-017 |
+| R10.5 | REQUIREMENTS.md | unstated | ADR-R7-001 | Offline tolerance narrowed to visibility of loaded investigations; offline edits are session-only. | PERSIST-017, PERSIST-018 |
+| R10.6 | REQUIREMENTS.md | unstated | ADR-R7-001 | Pending remote state restated as unconfirmed, never successful. | PERSIST-007, PERSIST-031 |
+| R10.7 | REQUIREMENTS.md | unstated | ADR-R7-001 | Restart recovery of pending writes removed: no local crash recovery. | PERSIST-019, PERSIST-020, PERSIST-021 |
+| S23 | SCREEN-CONTRACTS.md | unstated | ADR-R7-001 | Conflict recovery screen shows the tab version, the GitHub version and unsaved commands held in the tab. | PERSIST-011, PERSIST-012 |
+| D-204 | DESIGN-DECISION-BOUNDARIES.md | unstated | ADR-R7-001 | Reversible choice of a browser durability store closed: none. | PERSIST-003, PERSIST-005 |
+| KICKOFF-EXECUTION-PACKET§preamble | KICKOFF-EXECUTION-PACKET.md | unstated | ADR-R7-001 | Local durable store replaced by session-local state; the 12:00 checkpoint no longer allows a fallback. | PERSIST-002, PERSIST-006, PERSIST-007 |
+| KICKOFF-EXECUTION-PACKET§3-work-order | KICKOFF-EXECUTION-PACKET.md | unstated | ADR-R7-001 | Local durability step replaced by session-local state and truthful save state. | PERSIST-002, PERSIST-031 |
+| KICKOFF-EXECUTION-PACKET§4-parallel-ownership-after-kernel-stabilizes | KICKOFF-EXECUTION-PACKET.md | unstated | ADR-R7-001 | Persistence agent owns session-local state, not a local durable store. | PERSIST-002 |
+| KICKOFF-EXECUTION-PACKET§persistence-agent | KICKOFF-EXECUTION-PACKET.md | unstated | ADR-R7-001 | Persistence agent owns session-local state, not a local durable store. | PERSIST-002 |
+| KICKOFF-EXECUTION-PACKET§7-checkpoints | KICKOFF-EXECUTION-PACKET.md | unstated | ADR-R7-001 | 12:00 checkpoint is the confirmed GitHub save path; no durable-local fallback. | PERSIST-006, PERSIST-007 |
+| KICKOFF-EXECUTION-PACKET§12-00 | KICKOFF-EXECUTION-PACKET.md | unstated | ADR-R7-001 | 12:00 checkpoint is the confirmed GitHub save path; no durable-local fallback. | PERSIST-006, PERSIST-007 |
+| AR-035 | AGENT-RELIABILITY-REQUIREMENTS.md | P0 | ADR-R7-001 | Device-local durable state shared by several tabs is the design that produced R6-D-002; tabs now share only GitHub. | PERSIST-002, PERSIST-003, PERSIST-004 |
+| REHEARSAL-AGENT-INTERFACE-FREEZE§preamble | REHEARSAL-AGENT-INTERFACE-FREEZE.md | unstated | ADR-R7-001 | Boundary D restated for expected-head commits, reconciliation and rebase; the local queue and local-durable status removed; interfaces authored from requirements, not extracted from R001 source. | PERSIST-006, PERSIST-009, PERSIST-015, PERSIST-026 |
+| REHEARSAL-AGENT-INTERFACE-FREEZE§ownership | REHEARSAL-AGENT-INTERFACE-FREEZE.md | unstated | ADR-R7-001 | Persistence owner holds session-local unsaved changes, not a local queue. | PERSIST-002, PERSIST-006 |
+| REHEARSAL-AGENT-INTERFACE-FREEZE§boundary-d-persistence | REHEARSAL-AGENT-INTERFACE-FREEZE.md | unstated | ADR-R7-001 | Boundary D restated; no local-durable status. | PERSIST-005, PERSIST-006, PERSIST-007, PERSIST-009, PERSIST-012, PERSIST-015 |
+| REHEARSAL-AGENT-INTERFACE-FREEZE§contract-freeze-procedure | REHEARSAL-AGENT-INTERFACE-FREEZE.md | unstated | ADR-R7-001 | Interfaces are authored at kickoff from requirements; earlier rehearsal source is not an input. | PERSIST-026 |
+| REHEARSAL-AGENT-INTERFACE-FREEZE§mandatory-negative-cases | REHEARSAL-AGENT-INTERFACE-FREEZE.md | unstated | ADR-R7-001 | Offline-queue negative case replaced by stale head over unrelated changes, unknown commit outcome and save requested offline. | PERSIST-009, PERSIST-015, PERSIST-018 |
+| UI-001 | CAUSA-UI-EXPERIENCE-REQUIREMENTS.md | P0 | DEC-R7-006 | Four active-catalog investigations, including the burned-out lightbulb (DEC-R7-006). | EXT-DATA-013 |
+| UI-015 | CAUSA-UI-EXPERIENCE-REQUIREMENTS.md | P0 | DEC-R7-006 | Four active-catalog investigations (DEC-R7-006). | EXT-DATA-013 |
+| UI-031 | CAUSA-UI-EXPERIENCE-REQUIREMENTS.md | P0 | DEC-R7-003 | No user roles: the single-user criterion replaces role/access controls (DEC-R7-003). | (text amended in place) |
+| PF-014 | PROVIDER-FIXTURE-AND-INTEGRATION-REQUIREMENTS.md | P0 | DEC-R7-006 | Four catalog investigation reconstructions (DEC-R7-006). | EXT-DATA-013 |
+| PF-015 | PROVIDER-FIXTURE-AND-INTEGRATION-REQUIREMENTS.md | P0 | DEC-R7-001, DEC-R7-007 | A login is required for reads and writes, with no anonymous mode (DEC-R7-001); separate read and write secrets (DEC-R7-007). | (text amended in place) |
+| PROVIDER-FIXTURE-AND-INTEGRATION§acceptance-scenarios | PROVIDER-FIXTURE-AND-INTEGRATION-REQUIREMENTS.md | unstated | DEC-R7-006 | All four catalog investigation digests (DEC-R7-006). | EXT-DATA-013 |
+| EXT-DATA-013 | REHEARSAL-EXTERNAL-DATA-BOUNDARY.md | P0 | DEC-R7-006 | Four investigations, including the burned-out lightbulb; the three-case historical-v1 catalog and its waiver end (DEC-R7-006). | (text amended in place) |
+| AR-033 | AGENT-RELIABILITY-REQUIREMENTS.md | P1 | DEC-R7-007 | Preflight checks CAUSA_WRITE_TOKEN too (DEC-R7-007). | PF-015 |
 
 ## Superseded Rehearsal 6 obligations
 
-Every Rehearsal 6 obligation whose text no longer appears in its requirement, with its Rehearsal 6 text and what replaces it. Obligation ids are those of each baseline: Rehearsal 6 `BL-CAUSA-INDY-INIT-856157a78d47`, and the Rehearsal 7 baseline for the replacements.
+Every Rehearsal 6 obligation whose text no longer appears in its requirement (46), with its Rehearsal 6 text and what replaces it. Obligation ids are those of each baseline: Rehearsal 6 `BL-CAUSA-INDY-INIT-856157a78d47`, and the Rehearsal 7 baseline for the replacements.
 
 | Rehearsal 6 obligation | Rehearsal 6 text | Superseded by |
 |---|---|---|
@@ -164,6 +172,16 @@ Every Rehearsal 6 obligation whose text no longer appears in its requirement, wi
 | REHEARSAL-AGENT-INTERFACE-FREEZE§boundary-d-persistence-O2 | Separate local-durable from remotely-synced status. | REHEARSAL-AGENT-INTERFACE-FREEZE§boundary-d-persistence-O2, PERSIST-005, PERSIST-006, PERSIST-007, PERSIST-009, PERSIST-012, PERSIST-015 |
 | REHEARSAL-AGENT-INTERFACE-FREEZE§contract-freeze-procedure-O1 | Extract actual types and exported interfaces from accepted R001 F# source and Limen adapter. | REHEARSAL-AGENT-INTERFACE-FREEZE§contract-freeze-procedure-O1, REHEARSAL-AGENT-INTERFACE-FREEZE§contract-freeze-procedure-O2, PERSIST-026 |
 | REHEARSAL-AGENT-INTERFACE-FREEZE§mandatory-negative-cases-O1 | Stale aggregate version; forged/illegal history; unknown required semantic extension; unauthorized command; duplicate submission; conflicting remote write; offline queue; mismatched frozen schema; incomplete verification; incorrect deployed SHA. | REHEARSAL-AGENT-INTERFACE-FREEZE§mandatory-negative-cases-O1, PERSIST-009, PERSIST-015, PERSIST-018 |
+| UI-001-O1 | Before Connect, show an accessible, empty, disconnected workspace with the explicit Connect data repository action (EXT-DATA-002); after Connect, show the connected repository's investigations and the user's working copies, which for the active demonstration catalog (causa-data historical-v1, EXT-DATA-013) are exactly Apollo 1 (AS-204), Apollo 11 and Space Shuttle Challenger (STS-51-L). | UI-001-O1, EXT-DATA-013 |
+| UI-015-O2 | Verify the three active-catalog investigations (EXT-DATA-013) load from the connected repository and replay, verify the five frozen v1.0.0 fixtures replay as the storage contract's test corpus, keyboard/touch paths, graph textual equivalent, timeline ordering, legal command enforcement, save/sync truthfulness, offline/conflict recovery, responsive reflow, report fidelity, and startup failure. | UI-015-O2, EXT-DATA-013 |
+| UI-031-O5 | Apply role/access controls to sensitive operational information and never expose credentials. | UI-031-O5 |
+| PF-014-O2 | Confirm actual network communication, correct request-to-response association, three historical investigation reconstructions, expected versions/digests, and deployed application behavior. | PF-014-O2, EXT-DATA-013 |
+| PF-015-O1 | Public read-only catalog tests should not require a PAT when anonymous access is sufficient. | PF-015-O1 |
+| PF-015-O2 | Authenticated integration tests use an approved secret such as `CAUSA_GITHUB_TOKEN` when explicitly required, with least-privilege read-only permissions. | PF-015-O2 |
+| PROVIDER-FIXTURE-AND-INTEGRATION§acceptance-scenarios-O8 | Real integration: approved GitHub repository and pinned catalog are fetched over the network; all three historical investigation digests match. | PROVIDER-FIXTURE-AND-INTEGRATION§acceptance-scenarios-O8, EXT-DATA-013 |
+| EXT-DATA-013-O1 | The active demonstration catalog is the one named by causa-data `catalog/active.json` (historical-v1): exactly three historical investigations, Apollo 1 (AS-204), Apollo 11 and Space Shuttle Challenger (STS-51-L). | EXT-DATA-013-O1 |
+| EXT-DATA-013-O2 | After an explicit Connect to that repository and workspace, the application MUST load all three through the full contract validation and F# replay pipeline to the states recorded in the catalog manifest, MUST NOT present any synthetic investigation as a catalog case, and MUST NOT bundle any of their records. | EXT-DATA-013-O2 |
+| AR-033-O1 | Preflight MUST verify, without exposing values, that every repository secret and variable the pipeline reads is set: `CAUSA_GITHUB_TOKEN`, `CAUSA_TEST_REPO` and `DEPLOY_TARGET`. | AR-033-O1, PF-015 |
 
 ## Long-term documents marked superseded for Causa
 

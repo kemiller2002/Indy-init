@@ -24,9 +24,9 @@ Later rehearsals pin their own baseline file beside this one; the file above sta
 | File | Baseline id | Pinned commit | Content |
 |---|---|---|---|
 | `causa-requirements-baseline-r6.json` | `BL-CAUSA-INDY-INIT-856157a78d47` | `856157a78d47946d264ec49ee8325fcf996ae9b9` | 19 documents, 471 requirements: adds AR-027..AR-035 (DEC-R6-005) |
-| `causa-requirements-baseline-r7.json` | `BL-CAUSA-INDY-INIT-7d44f5546bcd` | `7d44f5546bcd89fe7225e30147dfb2a9eee99a98` | 20 documents, 517 requirements (161 P0), 2593 obligations. Adds `docs/CAUSA-PERSISTENCE-REQUIREMENTS.md` (PERSIST-001..PERSIST-055) and amends 22 requirements, under ADR-R7-001 ([`docs/rehearsal-007/`](../docs/rehearsal-007/)) |
+| `causa-requirements-baseline-r7.json` | `BL-CAUSA-INDY-INIT-8445ca11986f` | `8445ca11986f7808190e4e33e30a4fe2d37981cd` | 20 documents, 517 requirements (161 P0), 2595 obligations. Adds `docs/CAUSA-PERSISTENCE-REQUIREMENTS.md` (PERSIST-001..PERSIST-055) and amends 30 requirements, under ADR-R7-001 and owner decisions DEC-R7-001..007 ([`docs/rehearsal-007/`](../docs/rehearsal-007/), [`kickoff/rehearsal-007/`](../kickoff/rehearsal-007/)). Re-pinned from `7d44f55`, which preceded the owner decisions |
 
-Regenerate the Rehearsal 7 file with `python3 -I tools/build-requirements-baseline.py . 7d44f5546bcd89fe7225e30147dfb2a9eee99a98` on a checkout of that commit. The offline compiler suite checks that the F# port reproduces it at the pinned commit. `tools/validate-r7-persistence-requirements.fsx` checks its persistence requirements and their traceability to the Rehearsal 6 baseline.
+Regenerate the Rehearsal 7 file with `python3 -I tools/build-requirements-baseline.py . 8445ca11986f7808190e4e33e30a4fe2d37981cd` on a checkout of that commit. The offline compiler suite checks that the F# port reproduces it at the pinned commit. `tools/validate-r7-persistence-requirements.fsx` checks its persistence requirements and their traceability to the Rehearsal 6 baseline.
 
 The script is deterministic: run twice, it produces byte-identical output.
 Against this checkout at the pinned commit, the Praxis gate reports no
