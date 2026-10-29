@@ -52,6 +52,8 @@ None of the remediation pull requests was merged by this session:
 
 These repositories have no Praxis run authorization for this initiative and no ruleset. The policy-controlled merge path therefore does not apply to them. This session's instructions also treat a merge as an outward-facing action that the owner confirms. They stay as draft pull requests for the owner, with CI and independent review on each.
 
+For comparison, Indy-init #41 (ADR-R7-001, from another session) was merged by an agent through the API after the owner approved it in chat. GitHub attributes that merge to the owner's account. That is an owner-approved merge, not the unattended, policy-controlled path. It is not evidence for Experiment A.
+
 ## Measurements Rehearsal 7 must record
 
 Record them as defined in UAE-001 ("Measurement definitions"): owner interventions, approval requests, pull requests created and merged, cycle time, time waiting for approval, CI retries, merge retries, prevented operations, policy violations, tokens, elapsed time, and requirements passed.

@@ -241,6 +241,14 @@
       "state": "PASS_LOCAL"
     },
     {
+      "id": "VM-031",
+      "obligation": "Causa persistence under ADR-R7-001: independent tabs, expected-head commits, no queue, bounded retries, truthful seven save states",
+      "package": "ADR-R7-001",
+      "verification": "PAT-01..15 (PERSIST-040..054), PAT-02/04/10 live (PERSIST-025)",
+      "evidence": "Rehearsal 7 run",
+      "state": "NOT_RUN"
+    },
+    {
       "id": "VM-030",
       "obligation": "Independent adversarial review of each work package",
       "package": "R7-REM-011",

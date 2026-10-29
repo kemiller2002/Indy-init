@@ -35,6 +35,8 @@
 
 Rehearsal 7 builds the application from zero source code ([HACKATHON-BOUNDARIES](../HACKATHON-BOUNDARIES.md)). An application defect therefore stays corrected only where its behaviour is owned by a reusable component (Arca, Forma, Conditor, Praxis) or by a frozen requirement and test that Rehearsal 7 must pass. The plan follows that rule.
 
+**Update, 2026-10-29.** For persistence, the owner chose the second route: ADR-R7-001 ([PERSISTENCE-ARCHITECTURE-DECISION.md](PERSISTENCE-ARCHITECTURE-DECISION.md)) removes the shared browser store and the offline queue that R6-D-002 and R6-D-003 lived in, and binds Rehearsal 7 to PAT-01..15. The Rehearsal 6 findings recorded below are unchanged.
+
 
 Built from original evidence, not from the summary. Primary sources:
 - Final-acceptance artifact `acceptance-final-46d5e1129a798549dcf37c2a6460c4f623298761` of run 40803128103 (ledger.json, traceability.json, plan-assessment.json, verdict.json, producers, gate records, acceptance-run TRX)

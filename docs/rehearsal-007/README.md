@@ -13,3 +13,20 @@ Requirements-only preparation for Rehearsal 7 under owner decision ADR-R7-001. R
 | 7 | Rehearsal 7 readiness assessment | [READINESS-ASSESSMENT.md](READINESS-ASSESSMENT.md) |
 
 The baseline is [`requirements/causa-requirements-baseline-r7.json`](../../requirements/causa-requirements-baseline-r7.json) (`BL-CAUSA-INDY-INIT-7d44f5546bcd`). The validator is `tools/validate-r7-persistence-requirements.fsx`.
+
+## Rehearsal 6 remediation and Rehearsal 7 readiness
+
+The remediation initiative (R7-REM, intake [`input-documents/2026-10-29-R7-REM-rehearsal-6-remediation.md`](../../input-documents/2026-10-29-R7-REM-rehearsal-6-remediation.md)) covers everything outside persistence that Rehearsal 6 left open: CI starvation, credentials, unattended merging, evidence, candidate gates, defect-class closure, Forma contrast and release comparison. It also covers library fixes in Arca.
+
+| Deliverable | Where |
+|---|---|
+| Final report | [REMEDIATION-RESULTS.md](REMEDIATION-RESULTS.md) |
+| Rehearsal 6 findings and their evidence | [REMEDIATION-BASELINE.md](REMEDIATION-BASELINE.md), [remediation-baseline.json](remediation-baseline.json) |
+| Work packages R7-REM-001..012 | [REMEDIATION-PLAN.md](REMEDIATION-PLAN.md), generated from [work-packages.json](work-packages.json) |
+| Preflight gates R7-PF-01..14 | [READINESS.md](READINESS.md), [readiness-gates.json](readiness-gates.json) |
+| Timed-run plan and early adversarial testing | [EXECUTION-PLAN.md](EXECUTION-PLAN.md) |
+| Verification matrix | [VERIFICATION-MATRIX.md](VERIFICATION-MATRIX.md), [verification-matrix.json](verification-matrix.json) |
+| Credentials and tool security | [SECURITY-REVIEW.md](SECURITY-REVIEW.md) |
+| CI starvation analysis | [CI-PERFORMANCE.md](CI-PERFORMANCE.md) |
+| Unattended execution (Experiment A) | [AUTONOMOUS-EXECUTION.md](AUTONOMOUS-EXECUTION.md) |
+| Verifier outputs on Rehearsal 6 and the release demonstration | [evidence/](evidence/) |

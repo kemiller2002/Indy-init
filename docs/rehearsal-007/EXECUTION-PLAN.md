@@ -7,7 +7,7 @@
 | Step | Who | Tool | Blocks the start if |
 |---|---|---|---|
 | Requirements baseline re-pinned; derived package, disposition and approvals pass `praxis requirements preservation verify` | Agent; owner for approvals | Praxis (RDP-001..004) | It does not pass |
-| Owner decisions on R7-AMD-01..05 | Owner | Approval records | Undecided items stay BLOCKED |
+| Owner decisions K2 and K4 ([READINESS-ASSESSMENT.md](READINESS-ASSESSMENT.md)), R7-AMD-03..05, and the v4 package cut (K3) | Owner; agent for K3 | Approval records | Undecided items stay BLOCKED |
 | **Release comparison recorded before the stack lock** | Agent | `requirements-compiler release-comparison observe --selected <set>` then `assess --observations <file> --locked-at <lock, with offset>` (observations at most 6 h old by default, 24 h maximum; deviations need an owner `approvedBy`) | The verdict is not PASS (VER-001-O1, VER-002-O2) |
 | Credential probe | Owner creates the secrets; the agent dispatches | `SECURITY-REVIEW.md` §1 | Any probe expectation fails (D-09) |
 | CI policy on the scaffolded repository | Agent | `conditor ci-policy check` | Any finding (R7-AMD-03) |
@@ -20,7 +20,7 @@
 |---|---|---|
 | T+0 | Authorized kickoff (signed run authorization, frozen policy digest) | Kickoff record |
 | T+30 | Environment and baseline verified: CI green on the scaffold, ci-policy PASS, plan-readiness READY | CI run, reports |
-| T+90 | First deployed vertical slice **on Arca's queue** (R7-AMD-01): one investigation saved, confirmed and shown with `SaveState` | Deployed SHA = source SHA |
+| T+90 | First deployed vertical slice under ADR-R7-001: one investigation saved by an expected-head commit, confirmed by read-back, and shown with the seven save states | Deployed SHA = source SHA |
 | T+180 | Core workflows implemented | Bound tests green in CI |
 | T+240 | Integration and adversarial verification complete (§3) | Reviewer reports |
 | T+300 | Candidate selected **from a green core run of its exact SHA**; `candidate-acceptance.yml` dispatched | `conditor.candidate-verification/1` |
@@ -33,12 +33,12 @@ Each risk is tested when its capability first becomes executable, not at final a
 
 | Priority | Risk | First executable at | Test |
 |---|---|---|---|
-| 1 | Data loss across tabs | First persisted save (≈T+90) | The Arca multi-tab spec scenarios against the app: no Web Locks, random interleavings, restart |
-| 2 | False remote-save confirmation | First remote save | Writes lost with `onLine` true; `SaveState` never confirmed before a receipt |
-| 3 | Authorization failures | First remote save | Revoked or read-only credential: one attempt, needs-credential or failed state |
-| 4 | Unsafe concurrency | Second writer (another tab, device or commit) | A conflicting GitHub update gives a conflict, never a silent overwrite; a network failure is never shown as a conflict (RF-F-3) |
+| 1 | Data loss across tabs | First persisted save (≈T+90) | PAT-01, PAT-02 (live), PAT-11: independent tabs as GitHub writers, without Web Locks; no other writer's commit overwritten |
+| 2 | False remote-save confirmation | First remote save | PAT-06, PAT-12, PAT-15: Saved only after read-back; lost answers become Unknown commit outcome and are reconciled |
+| 3 | Authorization failures | First remote save | Revoked or read-only credential: one attempt, Save failed with the stated cause (PERSIST-024) |
+| 4 | Unsafe concurrency | Second writer (another tab, device or commit) | A conflicting GitHub update gives a conflict, never a silent overwrite; a network failure is never shown as a conflict (RF-F-3; PAT-03, PAT-05, PAT-07) |
 | 5 | Test-only code in production | First deploy | Production artifact scan (AR-030) |
-| 6 | Persistence corruption | First reload | Restart and storage restoration |
+| 6 | Persistence corruption | First reload | PAT-10: reopening loads from GitHub; nothing is restored from browser storage |
 | 7 | Missing deployment identity | First deploy | deployed-smoke: served SHA = candidate |
 | 8 | Critical accessibility failures | First graph render | Forma `A11Y-NONTEXT-CONTRAST` on the app's diagram documents; computed contrast in light and dark |
 
@@ -48,7 +48,7 @@ Each risk is tested when its capability first becomes executable, not at final a
 
 | Stream | Work | Shared files |
 |---|---|---|
-| A, application | Persistence on Arca, offline UI, error classification | `src/persistence`, owned by A |
+| A, application | Persistence under ADR-R7-001 (PERSIST-001..055), save states, error classification | `src/persistence`, owned by A |
 | B, infrastructure | CI tiers, candidate and deploy gates | `.github/workflows`, owned by B; checked by ci-policy |
 | C, governance | Praxis authorization, receipts, attestation pull requests | `.praxis/`, `evidence/` |
 | D, UI and provenance | Forma diagrams, Percepta contracts, the release record | `src/app` views |

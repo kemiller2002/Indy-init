@@ -25,6 +25,8 @@ Generated from [`work-packages.json`](work-packages.json); the JSON is authorita
 
 **Plan.** Do not build another cross-tab store. Rehearsal 6 kept one localStorage record read-merge-written by every tab (src/persistence/Sync.fs:179, main.ts:110 skips exclusion without navigator.locks). localStorage has no compare-and-swap, so no lease on it is correct (both R6 lease trials failed). Arca.Limen already provides one owner per namespace through a Web Lock, a fencing epoch raised by compare-and-put inside an IndexedDB transaction, and refusal of a stale owner's save; without Web Locks it refuses durable ownership. Prove that in a real browser and require Rehearsal 7 to adopt it (D-07 was the deviation that bypassed it).
 
+**Scope after ADR-R7-001.** ADR-R7-001 (owner-approved, merged in Indy-init #41) closes R6-D-002 and R6-D-003 for Causa in the requirements: no browser storage, no offline queue, no cross-tab locking, GitHub expected-head commits only. They are verified only when Rehearsal 7's candidate passes PAT-01..15. This package remains a correctness fix to Arca as a library (Arca stays in the release set); Causa may not use its offline queue or IndexedDB bridge (PERSIST-026).
+
 **Tests.**
 - arca verification/browser/tests/multi-tab-safety.spec.mjs: no Web Locks (three tabs refused durable ownership, nothing written); seeded random three-tab interleavings (enqueue, save, steal, late save from a fenced tab, owner close, reopen) losing no acknowledged key; storage restored into a new context
 - existing arca limen-queue.spec.mjs: hand-over and fencing
@@ -40,9 +42,8 @@ Generated from [`work-packages.json`](work-packages.json); the JSON is authorita
 - Local Chromium: 14/14 browser specs; seeds 1-3 covered 31 acknowledged saves, 5 fenced saves, 19 steals, 10 owner closes
 
 **Remaining.**
-- Rehearsal 7 requirement: Causa uses LimenQueue with Order=[IndexedDb] (fail closed) or shows the memory-only mode (owner decision R7-AMD-01, see READINESS)
-- AR-035-O4 as written expects every tab to keep offline changes durably without Web Locks; the corrected design refuses that. Requirement interpretation needs an owner decision
-- Close R6-D-002 only after arca#47 merges and is released
+- Merge and release arca#47 (owner): a library fix for Arca's other consumers
+- For Causa: PAT-01, PAT-02, PAT-11, PAT-13 during Rehearsal 7 (DEFECT-TRACEABILITY.md)
 
 **Independent review.** Independent review (agent, not the implementer): R6-D-002 corrected with Web Locks; no loss found, including a concurrent save-versus-steal experiment (6/6). Finding 5: with QueueOptions.standard (MemoryOnly declared) and no Web Locks the queue is per-tab memory-only: no cross-tab loss, but unsent changes do not survive closing the tab, and SaveState does not show durability.
 
@@ -51,6 +52,8 @@ Generated from [`work-packages.json`](work-packages.json); the JSON is authorita
 **Addresses:** R6-D-003, UI-010-O2, RF-F-3. **Depends on:** nothing. **Status:** IMPLEMENTED_IN_REVIEW.
 
 **Plan.** Root cause (R6, verified in code): Limen reports an aborted POST as an unknown outcome while navigator.onLine stays true; reconciliation finds it not landed; the host re-runs synchronization at once (151 POSTs in 60 s, about 5,000 per tab in 5 minutes). Arca's OfflineSync returned an untyped Deferred and left timing to every host. Add to Arca's pure core: typed deferrals, a validated retry policy (exponential backoff with jitter), a schedule that only a provider-confirmed entry resets, and a save state derived from queue and schedule.
+
+**Scope after ADR-R7-001.** ADR-R7-001 (owner-approved, merged in Indy-init #41) closes R6-D-002 and R6-D-003 for Causa in the requirements: no browser storage, no offline queue, no cross-tab locking, GitHub expected-head commits only. They are verified only when Rehearsal 7's candidate passes PAT-01..15. This package remains a correctness fix to Arca as a library (Arca stays in the release set); Causa may not use its offline queue or IndexedDB bridge (PERSIST-026). Arca.GitHub's fixes (5xx is transient, a 5xx or unreadable write answer is an unknown outcome reconciled by key, NOT_LANDED) apply if Rehearsal 7 uses Arca.GitHub for GitHub access, which ADR-R7-001 permits.
 
 **Tests.**
 - SyncScheduleTests: a naive host reproduces the storm (>50 POSTs); the schedule bounds it to <=5 in 60 s; mutation (reset on any progress) gives 76
@@ -70,8 +73,7 @@ Generated from [`work-packages.json`](work-packages.json); the JSON is authorita
 
 **Remaining.**
 - Merge and release arca#47 (owner)
-- Rehearsal 7 requirement: the app's persistence uses OfflineSync.attempt + SyncSchedule and shows SaveState (R7-AMD-01)
-- Live GitHub behaviour (rather than FakeGitHub) is first observed in Rehearsal 7's early adversarial verification
+- For Causa: PAT-03, PAT-05..08, PAT-15 during Rehearsal 7 (RF-F-3 is PERSIST-008, PERSIST-012, PERSIST-015, PERSIST-024)
 
 **Independent review.** Three independent review rounds. Round 1 BLOCKING (5xx misclassified; repeated online events reset backoff; edits retried a revoked credential; checking-outcome hid waiting-for-connection), fixed in 2c265c2. Round 2 confirmed three fixes and found 5xx in identity resolution, a ref-update resend burst (N1), connectivity never restored, and the Aborted label, fixed in 3ac5652. Round 3 PASS_WITH_FINDINGS (low): L2 NOT_LANDED code and L3 Online only from provider answers fixed in ac585ba; L1 (up to 36 write requests in the first minute when every ref update fails, decaying; R6 sent 151) documented in the CHANGELOG. The ac585ba fixes have tests but no fourth review.
 

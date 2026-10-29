@@ -8,6 +8,8 @@ Each obligation of the remediation script, the mechanism that verifies it, and i
 - **BLOCKED**: needs an owner action
 - **IN_PROGRESS**: running
 
+**Scope of VM-001 to VM-015.** They verify Arca as a library (arca#47). For Causa, the owner-approved [ADR-R7-001](PERSISTENCE-ARCHITECTURE-DECISION.md) removes the shared browser store and the offline queue; the corresponding obligations are verified by PAT-01..15 during Rehearsal 7 (VM-031; [DEFECT-TRACEABILITY.md](DEFECT-TRACEABILITY.md)).
+
 | ID | Obligation | Package | Verification | Evidence | State |
 |---|---|---|---|---|---|
 | VM-001 | Two/three tabs writing the same investigation without silent loss | R7-REM-001 | arca multi-tab-safety.spec.mjs random interleavings (3 tabs, seeds 1-3) | arca#47; local Chromium 5/5 | **PASS_LOCAL** |
@@ -39,6 +41,7 @@ Each obligation of the remediation script, the mechanism that verifies it, and i
 | VM-027 | Non-text indicators >= 3:1 (rendered), high contrast supported | R7-REM-009 | A11Y-NONTEXT-CONTRAST; token test (30 contexts); Chromium spec light/dark/forced colors on renderer output | forma#173 (review PASS; CI re-running on ac34a55) | **PASS_LOCAL** |
 | VM-028 | Pre-lock newest-release comparison recorded | R7-REM-010 | release-comparison observe/assess | Offline tests at 41ff524; live demonstration 2026-10-29T11:08Z PASS (evidence/release-comparison-demo.json); re-review BLOCKING, fixes in progress | **PASS_LOCAL** |
 | VM-029 | Weakened tests detected (RF-F-8) | R7-REM-011 | assertion-ratchet --kickoff (base bound to the kickoff record) | Offline tests at 41ff524; R6 run FAIL, 38 unrecorded removals incl. both UI-034 weakenings (evidence/assertion-ratchet-r6.json); re-review BLOCKING, fixes in progress | **PASS_LOCAL** |
+| VM-031 | Causa persistence under ADR-R7-001: independent tabs, expected-head commits, no queue, bounded retries, truthful seven save states | ADR-R7-001 | PAT-01..15 (PERSIST-040..054), PAT-02/04/10 live (PERSIST-025) | Rehearsal 7 run | **NOT_RUN** |
 | VM-030 | Independent adversarial review of each work package | R7-REM-011 | Independent agent reviews (SECURITY-REVIEW §4) | See READINESS R7-PF-12 | **IN_PROGRESS** |
 
 **PASS_LOCAL is not PASS.** It becomes PASS when the owning PR's CI is green on the same commit and the change is merged and released.
