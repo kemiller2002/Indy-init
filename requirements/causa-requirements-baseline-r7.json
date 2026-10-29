@@ -1,13 +1,13 @@
 {
   "schema": "praxis.requirements-baseline/1",
-  "id": "BL-CAUSA-INDY-INIT-7d44f5546bcd",
+  "id": "BL-CAUSA-INDY-INIT-8445ca11986f",
   "source": {
     "repository": "kemiller2002/indy-init",
-    "commit": "7d44f5546bcd89fe7225e30147dfb2a9eee99a98",
+    "commit": "8445ca11986f7808190e4e33e30a4fe2d37981cd",
     "documents": [
       {
         "path": "docs/CAUSA-UI-EXPERIENCE-REQUIREMENTS.md",
-        "sha256": "f094657929e33e5d4d0474aff145debd0a2e6c0df685c91e10395621ba8b18b3",
+        "sha256": "3cc1e477d1c48156c15a7de5ad75b0f8ca900a9380dc9521fc331ee4079a836c",
         "requirementPattern": "^## (UI-\\d{3}):"
       },
       {
@@ -17,12 +17,12 @@
       },
       {
         "path": "docs/PROVIDER-FIXTURE-AND-INTEGRATION-REQUIREMENTS.md",
-        "sha256": "3ffa3610c929391bbec50e8fb010fccdc9546989ede9110907338d0f8925a564",
+        "sha256": "b43c6cbe1e8d9b32d61a3c05f6130ae3f895a726cbee9ddc1d26335916768a7d",
         "requirementPattern": "^\\*\\*(PF-\\d{3}) "
       },
       {
         "path": "docs/REHEARSAL-EXTERNAL-DATA-BOUNDARY.md",
-        "sha256": "a1b487a928709dab8d88b367caf522b16da4602459eca5d62457663cffe4ccc7",
+        "sha256": "59b748380f725658a2470bea96a758c610e8b854c12ea8f3beb92b4e350e66ec",
         "requirementPattern": "^- (EXT-DATA-\\d{3}) "
       },
       {
@@ -84,7 +84,7 @@
       },
       {
         "path": "docs/AGENT-RELIABILITY-REQUIREMENTS.md",
-        "sha256": "1c2b5188125b9c448edae0ecaeaf75dcbab7a5e6c857af9fa288205d861e0fe3",
+        "sha256": "24e47507cd7cf846561b02f10a77e57ed00f03faa34509c00375daa3af81802c",
         "requirementPattern": "^\\*\\*(AR-\\d{3}) "
       },
       {
@@ -240,12 +240,15 @@
       "priority": "P0",
       "document": "docs/CAUSA-UI-EXPERIENCE-REQUIREMENTS.md",
       "heading": "## UI-001: Investigation dashboard [P0]",
-      "sectionSha256": "dc5ca3c2e4680ccc4ad3d97f4ec4cfbc86caddf0188ccf2820145d296a487591",
+      "sectionSha256": "757d35a89ba81f831e5a12f8c0dcebd326bb5234843f6895c42da8d79090f3d0",
       "obligations": [
         {
           "id": "UI-001-O1",
-          "kind": "constraint",
-          "text": "Before Connect, show an accessible, empty, disconnected workspace with the explicit Connect data repository action (EXT-DATA-002); after Connect, show the connected repository's investigations and the user's working copies, which for the active demonstration catalog (causa-data historical-v1, EXT-DATA-013) are exactly Apollo 1 (AS-204), Apollo 11 and Space Shuttle Challenger (STS-51-L)."
+          "kind": "value",
+          "text": "Before Connect, show an accessible, empty, disconnected workspace with the explicit Connect data repository action (EXT-DATA-002); after Connect, show the connected repository's investigations and the user's working copies, which for the active demonstration catalog (EXT-DATA-013) are exactly four: Apollo 1 (AS-204), Apollo 11, Space Shuttle Challenger (STS-51-L) and the burned-out lightbulb.",
+          "tokens": [
+            "four"
+          ]
         },
         {
           "id": "UI-001-O2",
@@ -734,7 +737,7 @@
       "priority": "P0",
       "document": "docs/CAUSA-UI-EXPERIENCE-REQUIREMENTS.md",
       "heading": "## UI-016: Causa semantic color system [P0]",
-      "sectionSha256": "53e5178f38722dcbcbabb33bf6fbbacba8e91e4db0330bbb9aaf80d4600f5685",
+      "sectionSha256": "4985897d961a69e67e78506d2774c85a28611aeba00ab0d4285136f42b5aa492",
       "obligations": [
         {
           "id": "UI-016-O1",
@@ -815,31 +818,40 @@
         },
         {
           "id": "UI-016-O12",
-          "kind": "constraint",
-          "text": "Do not convey lifecycle, confidence, danger, verification or sync status through color alone: pair color with text and/or icons, and distinguish causal semantics from decorative accents."
+          "kind": "value",
+          "text": "For Rehearsal 7 (owner decision DEC-R7-002), an amber `#E9A23B` indicator paired with a text label is not a relevant non-text indicator; amber that is the only cue still needs 3:1.",
+          "tokens": [
+            "#E9A23B",
+            "3:1"
+          ]
         },
         {
           "id": "UI-016-O13",
           "kind": "constraint",
-          "text": "Use the same token semantics across dashboard, investigation views, timeline, causal graph, evidence inspector, report and startup shell."
+          "text": "Do not convey lifecycle, confidence, danger, verification or sync status through color alone: pair color with text and/or icons, and distinguish causal semantics from decorative accents."
         },
         {
           "id": "UI-016-O14",
           "kind": "constraint",
-          "text": "Print/Folio output MUST remain legible in grayscale."
+          "text": "Use the same token semantics across dashboard, investigation views, timeline, causal graph, evidence inspector, report and startup shell."
         },
         {
           "id": "UI-016-O15",
-          "kind": "acceptance",
-          "text": "Acceptance MUST include actual screenshots from the deployed exact SHA at desktop, iPad portrait/landscape and mobile sizes, plus automated token presence and contrast checks, keyboard focus checks, reduced-motion checks and independent visual review."
+          "kind": "constraint",
+          "text": "Print/Folio output MUST remain legible in grayscale."
         },
         {
           "id": "UI-016-O16",
           "kind": "acceptance",
-          "text": "Verify that navy, teal, amber, coral and ivory appear in appropriate populated states; absence of data must not force a misleading status color."
+          "text": "Acceptance MUST include actual screenshots from the deployed exact SHA at desktop, iPad portrait/landscape and mobile sizes, plus automated token presence and contrast checks, keyboard focus checks, reduced-motion checks and independent visual review."
         },
         {
           "id": "UI-016-O17",
+          "kind": "acceptance",
+          "text": "Verify that navy, teal, amber, coral and ivory appear in appropriate populated states; absence of data must not force a misleading status color."
+        },
+        {
+          "id": "UI-016-O18",
           "kind": "acceptance",
           "text": "A grayscale-only interface is a failed UI-016 acceptance even if functional tests pass."
         }
@@ -851,7 +863,7 @@
       "priority": "P0",
       "document": "docs/CAUSA-UI-EXPERIENCE-REQUIREMENTS.md",
       "heading": "## UI-015: Acceptance and traceability [P0]",
-      "sectionSha256": "f6cc6b7fc08f7bd96452ce01c8c76614522a072d92fdc605f1bf6a469b2fc7a5",
+      "sectionSha256": "309d927fc951457fae9844e187494a34348e36f509558f75897ac15b469316e4",
       "obligations": [
         {
           "id": "UI-015-O1",
@@ -861,10 +873,10 @@
         {
           "id": "UI-015-O2",
           "kind": "acceptance",
-          "text": "Verify the three active-catalog investigations (EXT-DATA-013) load from the connected repository and replay, verify the five frozen v1.0.0 fixtures replay as the storage contract's test corpus, keyboard/touch paths, graph textual equivalent, timeline ordering, legal command enforcement, save/sync truthfulness, offline/conflict recovery, responsive reflow, report fidelity, and startup failure.",
+          "text": "Verify the four active-catalog investigations (EXT-DATA-013) load from the connected repository and replay, verify the five frozen v1.0.0 fixtures replay as the storage contract's test corpus, keyboard/touch paths, graph textual equivalent, timeline ordering, legal command enforcement, save/sync truthfulness, offline/conflict recovery, responsive reflow, report fidelity, and startup failure.",
           "tokens": [
             "v1.0.0",
-            "three",
+            "four",
             "five"
           ]
         },
@@ -1452,7 +1464,7 @@
       "priority": "P0",
       "document": "docs/CAUSA-UI-EXPERIENCE-REQUIREMENTS.md",
       "heading": "## UI-031: Preserve system detail without exposing it in the workflow [P0]",
-      "sectionSha256": "6fffa3ac7d3bd79dc1d58ddd28a3f4cb720103965dd1d98604c0a7686d7aa9ad",
+      "sectionSha256": "683bfd655372a125089447e196aef1023bcb025c090b47b852babd07cf8cac8d",
       "obligations": [
         {
           "id": "UI-031-O1",
@@ -1477,7 +1489,7 @@
         {
           "id": "UI-031-O5",
           "kind": "constraint",
-          "text": "Apply role/access controls to sensitive operational information and never expose credentials."
+          "text": "Application-level role management does not apply to Causa's single-user scope (owner decision DEC-R7-003); credential protection, authorization of every repository operation against the provider's actual permissions, workspace data isolation and secure handling of operational information still apply, and credentials are never exposed."
         }
       ]
     },
@@ -2279,8 +2291,8 @@
       "title": "Live integration acceptance",
       "priority": "P0",
       "document": "docs/PROVIDER-FIXTURE-AND-INTEGRATION-REQUIREMENTS.md",
-      "heading": "**PF-014 [P0] Live integration acceptance.** At defined integration checkpoints and before release acceptance, run a real GitHub provider test against the approved repository and pinned catalog. Confirm actual network communication, correct request-to-response association, three historical investigation reconstructions, expected versions/digests, and deployed application behavior. Record repository ref, source SHA, run ID, and provider mode. Never claim live success from mocks.",
-      "sectionSha256": "6285cf3cf902fab5f326a121f3461df9307ac0c7595068cbc4bea84d226e9b9e",
+      "heading": "**PF-014 [P0] Live integration acceptance.** At defined integration checkpoints and before release acceptance, run a real GitHub provider test against the approved repository and pinned catalog. Confirm actual network communication, correct request-to-response association, four catalog investigation reconstructions, expected versions/digests, and deployed application behavior. Record repository ref, source SHA, run ID, and provider mode. Never claim live success from mocks.",
+      "sectionSha256": "29c3bf7d60c9375aba7cccbdb065fe84a189df029b557e446105814d63b5e806",
       "obligations": [
         {
           "id": "PF-014-O1",
@@ -2290,9 +2302,9 @@
         {
           "id": "PF-014-O2",
           "kind": "acceptance",
-          "text": "Confirm actual network communication, correct request-to-response association, three historical investigation reconstructions, expected versions/digests, and deployed application behavior.",
+          "text": "Confirm actual network communication, correct request-to-response association, four catalog investigation reconstructions, expected versions/digests, and deployed application behavior.",
           "tokens": [
-            "three"
+            "four"
           ]
         },
         {
@@ -2312,26 +2324,31 @@
       "title": "Credentials and security",
       "priority": "P0",
       "document": "docs/PROVIDER-FIXTURE-AND-INTEGRATION-REQUIREMENTS.md",
-      "heading": "**PF-015 [P0] Credentials and security.** Public read-only catalog tests should not require a PAT when anonymous access is sufficient. Authenticated integration tests use an approved secret such as `CAUSA_GITHUB_TOKEN` when explicitly required, with least-privilege read-only permissions. Never embed or print credentials, put them in URLs, or include them in screenshots, traces, logs, or artifacts. A missing secret yields BLOCKED, not PASS.",
-      "sectionSha256": "21e5cbb63b07c9d9e5baa3e416d78d400731881d3c123da5c2e464e9203799d0",
+      "heading": "**PF-015 [P0] Credentials and security.** Every catalog read and every write requires an authenticated GitHub credential; there is no anonymous mode (owner decision DEC-R7-001). Authenticated read tests use the approved secret `CAUSA_GITHUB_TOKEN`, with least-privilege read-only permissions. Live write tests use the separate secret `CAUSA_WRITE_TOKEN`, limited to contents write on the test repository; neither secret falls back to the other (DEC-R7-007). Never embed or print credentials, put them in URLs, or include them in screenshots, traces, logs, or artifacts. A missing secret yields BLOCKED, not PASS.",
+      "sectionSha256": "455289dd00afdbeb8a600aa3c9ecc577803e34274cc9eb02b6f33f58217ab913",
       "obligations": [
         {
           "id": "PF-015-O1",
-          "kind": "acceptance",
-          "text": "Public read-only catalog tests should not require a PAT when anonymous access is sufficient."
+          "kind": "constraint",
+          "text": "Every catalog read and every write requires an authenticated GitHub credential; there is no anonymous mode (owner decision DEC-R7-001)."
         },
         {
           "id": "PF-015-O2",
           "kind": "acceptance",
-          "text": "Authenticated integration tests use an approved secret such as `CAUSA_GITHUB_TOKEN` when explicitly required, with least-privilege read-only permissions."
+          "text": "Authenticated read tests use the approved secret `CAUSA_GITHUB_TOKEN`, with least-privilege read-only permissions."
         },
         {
           "id": "PF-015-O3",
           "kind": "acceptance",
-          "text": "Never embed or print credentials, put them in URLs, or include them in screenshots, traces, logs, or artifacts."
+          "text": "Live write tests use the separate secret `CAUSA_WRITE_TOKEN`, limited to contents write on the test repository; neither secret falls back to the other (DEC-R7-007)."
         },
         {
           "id": "PF-015-O4",
+          "kind": "acceptance",
+          "text": "Never embed or print credentials, put them in URLs, or include them in screenshots, traces, logs, or artifacts."
+        },
+        {
+          "id": "PF-015-O5",
           "kind": "constraint",
           "text": "A missing secret yields BLOCKED, not PASS."
         }
@@ -2463,7 +2480,7 @@
       "priority": "unstated",
       "document": "docs/PROVIDER-FIXTURE-AND-INTEGRATION-REQUIREMENTS.md",
       "heading": "## Acceptance scenarios",
-      "sectionSha256": "27704f09419f61a1fa5bffd409a2154ec385fa364b8d1e5eb8e09713a4bd375f",
+      "sectionSha256": "871766a8d7c36ab25b6b6072c667a634a836ea39e929abde3b00026e2d34d2e4",
       "obligations": [
         {
           "id": "PROVIDER-FIXTURE-AND-INTEGRATION§acceptance-scenarios-O1",
@@ -2509,9 +2526,9 @@
         {
           "id": "PROVIDER-FIXTURE-AND-INTEGRATION§acceptance-scenarios-O8",
           "kind": "acceptance",
-          "text": "Real integration: approved GitHub repository and pinned catalog are fetched over the network; all three historical investigation digests match.",
+          "text": "Real integration: approved GitHub repository and pinned catalog are fetched over the network; all four catalog investigation digests match.",
           "tokens": [
-            "three"
+            "four"
           ]
         },
         {
@@ -2859,23 +2876,23 @@
       "title": "EXT-DATA-013",
       "priority": "P0",
       "document": "docs/REHEARSAL-EXTERNAL-DATA-BOUNDARY.md",
-      "heading": "- EXT-DATA-013 [P0] The active demonstration catalog is the one named by causa-data `catalog/active.json` (historical-v1): exactly three historical investigations, Apollo 1 (AS-204), Apollo 11 and Space Shuttle Challenger (STS-51-L). After an explicit Connect to that repository and workspace, the application MUST load all three through the full contract validation and F# replay pipeline to the states recorded in the catalog manifest, MUST NOT present any synthetic investigation as a catalog case, and MUST NOT bundle any of their records. The five synthetic v1.0.0 fixtures remain the storage contract's test corpus only (STORAGE-005, STORAGE-007).",
-      "sectionSha256": "3fee33f51d7d05a2a74a7b10947a15055c8d71e0819273b3a03fcbf3220891f6",
+      "heading": "- EXT-DATA-013 [P0] The active demonstration catalog is the one named by causa-data `catalog/active.json`: exactly four investigations, Apollo 1 (AS-204), Apollo 11, Space Shuttle Challenger (STS-51-L) and the burned-out lightbulb (owner decision DEC-R7-006). After an explicit Connect to that repository and workspace, the application MUST load all four through the full contract validation and F# replay pipeline to the states recorded in the catalog manifest, MUST NOT present any synthetic investigation as a catalog case, and MUST NOT bundle any of their records. The five synthetic v1.0.0 fixtures remain the storage contract's test corpus only (STORAGE-005, STORAGE-007).",
+      "sectionSha256": "d53e9be8ab9d7a1ca83cd69d079c39bc8d5b4fcf269c6b63bece74ef927fa12e",
       "obligations": [
         {
           "id": "EXT-DATA-013-O1",
           "kind": "value",
-          "text": "The active demonstration catalog is the one named by causa-data `catalog/active.json` (historical-v1): exactly three historical investigations, Apollo 1 (AS-204), Apollo 11 and Space Shuttle Challenger (STS-51-L).",
+          "text": "The active demonstration catalog is the one named by causa-data `catalog/active.json`: exactly four investigations, Apollo 1 (AS-204), Apollo 11, Space Shuttle Challenger (STS-51-L) and the burned-out lightbulb (owner decision DEC-R7-006).",
           "tokens": [
-            "three"
+            "four"
           ]
         },
         {
           "id": "EXT-DATA-013-O2",
           "kind": "value",
-          "text": "After an explicit Connect to that repository and workspace, the application MUST load all three through the full contract validation and F# replay pipeline to the states recorded in the catalog manifest, MUST NOT present any synthetic investigation as a catalog case, and MUST NOT bundle any of their records.",
+          "text": "After an explicit Connect to that repository and workspace, the application MUST load all four through the full contract validation and F# replay pipeline to the states recorded in the catalog manifest, MUST NOT present any synthetic investigation as a catalog case, and MUST NOT bundle any of their records.",
           "tokens": [
-            "three"
+            "four"
           ]
         },
         {
@@ -15569,13 +15586,13 @@
       "title": "Owner settings and secrets ready before kickoff",
       "priority": "P1",
       "document": "docs/AGENT-RELIABILITY-REQUIREMENTS.md",
-      "heading": "**AR-033 [P1] Owner settings and secrets ready before kickoff.** Preflight MUST verify, without exposing values, that every repository secret and variable the pipeline reads is set: `CAUSA_GITHUB_TOKEN`, `CAUSA_TEST_REPO` and `DEPLOY_TARGET`. Pipelines MUST NOT fall back to a hard-coded write target. In Rehearsal 5, `CAUSA_TEST_REPO` was empty and `DEPLOY_TARGET` unset at kickoff.",
-      "sectionSha256": "44d1ed7923a0c6f50d229d533ef27ba6acb901dfed3cb8e9fb1639dfd1eeb3f8",
+      "heading": "**AR-033 [P1] Owner settings and secrets ready before kickoff.** Preflight MUST verify, without exposing values, that every repository secret and variable the pipeline reads is set: `CAUSA_GITHUB_TOKEN`, `CAUSA_WRITE_TOKEN`, `CAUSA_TEST_REPO` and `DEPLOY_TARGET`. Pipelines MUST NOT fall back to a hard-coded write target. In Rehearsal 5, `CAUSA_TEST_REPO` was empty and `DEPLOY_TARGET` unset at kickoff.",
+      "sectionSha256": "bd8f77079250c29d6b3df08b96651434582d325c0f09c685932bbb472a754fc4",
       "obligations": [
         {
           "id": "AR-033-O1",
           "kind": "acceptance",
-          "text": "Preflight MUST verify, without exposing values, that every repository secret and variable the pipeline reads is set: `CAUSA_GITHUB_TOKEN`, `CAUSA_TEST_REPO` and `DEPLOY_TARGET`."
+          "text": "Preflight MUST verify, without exposing values, that every repository secret and variable the pipeline reads is set: `CAUSA_GITHUB_TOKEN`, `CAUSA_WRITE_TOKEN`, `CAUSA_TEST_REPO` and `DEPLOY_TARGET`."
         },
         {
           "id": "AR-033-O2",

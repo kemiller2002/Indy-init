@@ -2,13 +2,14 @@
 
 **Requirements: READY.** The persistence requirements are written, validated and committed, and the baseline is pinned ([validation report](REQUIREMENTS-VALIDATION-REPORT.md)).
 
-**Kickoff: NOT READY.** The steps below must happen before Rehearsal 7 starts. None of them is application work, and none of them was done here: this task stops at validated requirements, and Rehearsal 7 is not started.
+**Kickoff: NOT READY.** The open steps below must happen before Rehearsal 7 starts. None of them is application work, and Rehearsal 7 has not started. The main blockers are the four-case causa-data catalog (K7), the v4 package (K3), the screen-contract decision DEC-R7-005 and the two tokens (K6).
 
 | | |
 |---|---|
 | Decision | [ADR-R7-001](PERSISTENCE-ARCHITECTURE-DECISION.md), effective on the owner's merge (RDP-003) |
-| Requirements | [`docs/CAUSA-PERSISTENCE-REQUIREMENTS.md`](../CAUSA-PERSISTENCE-REQUIREMENTS.md), PERSIST-001 to PERSIST-055, plus 22 amended Rehearsal 6 requirements |
-| Baseline | `BL-CAUSA-INDY-INIT-7d44f5546bcd` ([`requirements/causa-requirements-baseline-r7.json`](../../requirements/causa-requirements-baseline-r7.json)) |
+| Requirements | [`docs/CAUSA-PERSISTENCE-REQUIREMENTS.md`](../CAUSA-PERSISTENCE-REQUIREMENTS.md), PERSIST-001 to PERSIST-055, plus 30 amended Rehearsal 6 requirements |
+| Owner decisions | [`kickoff/rehearsal-007/OWNER-DECISIONS.md`](../../kickoff/rehearsal-007/OWNER-DECISIONS.md), DEC-R7-001 to DEC-R7-007 (DEC-R7-005 still open) |
+| Baseline | `BL-CAUSA-INDY-INIT-8445ca11986f`, re-pinned after the owner decisions ([`requirements/causa-requirements-baseline-r7.json`](../../requirements/causa-requirements-baseline-r7.json)) |
 | Traceability | [`DEFECT-TRACEABILITY.md`](DEFECT-TRACEABILITY.md), [`traceability.json`](traceability.json) |
 | Validator | `tools/validate-r7-persistence-requirements.fsx`, run in CI by `preflight-tooling.yml` together with its negative controls |
 
@@ -22,23 +23,24 @@
 
 ## Before kickoff
 
-| # | Step | Who | Why |
+| # | Step | Who | State |
 |---|---|---|---|
-| K1 | Review and merge the pull request that adds ADR-R7-001 and these requirements. Use a merge commit, so `7d44f55` stays reachable for the baseline pin | Owner | RDP-003: the decision takes effect on the owner's merge |
-| K2 | Confirm or change the values the agent chose in writing the requirements: three rebases, the reconciliation backoff, the conflict actions, no automatic save on reconnect, the marker format, one save in flight per tab, the copy-check threshold, and interfaces authored at kickoff ([ADR table](PERSISTENCE-ARCHITECTURE-DECISION.md#choices-made-in-writing-the-requirements)). A change means editing the requirements, re-pinning the baseline, and re-running the validator | Owner | These are engineering choices the instruction left open |
-| K3 | Cut compiled package **v4** from `BL-CAUSA-INDY-INIT-7d44f5546bcd`. The steps are K3a to K3f below, and the compiler must report PASS with plan-readiness READY and no permits | Agent, then owner | The R7 compile with the v3 curation fails V09, V11, V17 and V18 for curation reasons only |
-| K4 | Record Rehearsal 7 owner decisions for the scope carried from Rehearsal 6: DEC-R6-001 (read access), -002 (amber 3:1), -003/-004 and -011 (amendments), -006 (screen contracts), -007 (catalog), -010 (two tokens) | Owner | v3's curation applies them; v4 must not inherit them silently |
-| K5 | Close the Rehearsal 6 report's other recommendations, in preflight: G7 defect classes re-closed with fix SHAs in R7's own history; deploy gated on a green core job with visible test output; owner attestation through approving GitHub reviews; a truly read-only `CAUSA_GITHUB_TOKEN`; a Forma graph-outline token that measures at least 3:1 (UI-016-O11); a pre-lock newest-release comparison (VER-001/002); the tooling gaps D-03 and attestation types | Agent and owner | Item 5 of that list, R6-D-002 and R6-D-003, is closed by these requirements; the rest is not persistence work |
-| K6 | Confirm that the live test repository and `CAUSA_WRITE_TOKEN` exist. PAT-02, PAT-04 and PAT-10 must run live (PERSIST-025) | Owner | A fake-only pass is not live verification |
+| K1 | Merge ADR-R7-001 and the persistence requirements | Owner | **Done.** Approved ("I approve") and merged as pull request #41 (`8d01613`) |
+| K2 | Confirm the values chosen in writing the requirements ([ADR table](PERSISTENCE-ARCHITECTURE-DECISION.md#choices-made-in-writing-the-requirements)) | Owner | **Done**, with the approval of #41 |
+| K4 | Record the Rehearsal 7 owner decisions for the scope carried from Rehearsal 6 | Owner | **Done except DEC-R7-005.** DEC-R7-001 to -004, -006 and -007 are recorded and applied to the requirement texts, effective on the owner's merge of the pull request that adds them (RDP-003). DEC-R7-005, the screen-contract scope, is still open; the recommendation is S16 NOT-APPLICABLE and the other 24 IN SCOPE |
+| K7 | **Publish the four-case catalog in causa-data (DEC-R7-006).** causa-data `main` holds only `historical-v1` (Apollo 1, Apollo 11, Challenger). Before kickoff it needs four things, verified by causa-data's own gates: the burned-out lightbulb investigation, a catalog with all four investigations, `catalog/active.json` naming that catalog, and its workspace initialization. Rehearsal 6's preflight stages 7 to 10 are no longer waived | Owner, or an agent in causa-data | **Blocker.** EXT-DATA-013, UI-001, UI-015 and PF-014 require four |
+| K3 | Cut compiled package **v4** from `BL-CAUSA-INDY-INIT-8445ca11986f`. The steps are K3a to K3f below, and the compiler must report PASS with plan-readiness READY and no permits | Agent, then owner | Open. The R7 compile with the v3 curation fails V09, V11, V17 and V18 for curation reasons only |
+| K5 | Close the Rehearsal 6 report's other recommendations, in preflight: G7 defect classes re-closed with fix SHAs in R7's own history; deploy gated on a green core job with visible test output; owner attestation through approving GitHub reviews; a pre-lock newest-release comparison (VER-001/002); the tooling gaps D-03 and attestation types | Agent and owner | Open. The amber outline item is settled by DEC-R7-002, and the read-only token by DEC-R7-007 and K6 |
+| K6 | Create `CAUSA_GITHUB_TOKEN` (read-only) and `CAUSA_WRITE_TOKEN` (contents write on the test repository only), and confirm the live test repository exists. PAT-02, PAT-04 and PAT-10 must run live (PERSIST-025) | Owner | Open. The owner said both tokens will be created (DEC-R7-007) |
 
 The v4 cut (K3) has six parts:
 
 - **K3a:** a verification rule and evidence-category rules for `docs/CAUSA-PERSISTENCE-REQUIREMENTS.md`, so the 255 PERSIST obligations are classified. They should be integration, browser and live-provider for PAT-02 to PAT-11, unit for PAT-12, and accessibility for PAT-15.
 - **K3b:** a work item covering PERSIST-001 to PERSIST-055 (V09, V17).
-- **K3c:** the three v3 citations of replaced text re-cited (V11).
+- **K3c:** the four v3 citations of replaced text re-cited, and UI-015-O2's derived-obligation map rewritten for its four-investigation wording (V11, V18).
 - **K3d:** a `kickoff/rehearsal-007/approvals.causa.json` bound to the R7 baseline, with no records (V18, RDP-003).
-- **K3e:** test bindings regenerated by `propose-test-bindings`, including re-bindings for the superseded UI-006, UI-010-O2 and AR-035 obligations.
-- **K3f:** an R7 scope test in the compiler suite, as `R6ScopeTests` is for v3.
+- **K3e:** test bindings regenerated by `propose-test-bindings`, including re-bindings for every superseded P0 obligation.
+- **K3f:** an R7 scope test in the compiler suite, as `R6ScopeTests` is for v3. Its negative controls cover DEC-R7-001 to DEC-R7-007.
 
 ## Risks the timed build will meet
 

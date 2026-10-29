@@ -12,4 +12,4 @@ Requirements-only preparation for Rehearsal 7 under owner decision ADR-R7-001. R
 | 6 | Requirements validation report | [REQUIREMENTS-VALIDATION-REPORT.md](REQUIREMENTS-VALIDATION-REPORT.md), with machine output in [evidence/](evidence/) |
 | 7 | Rehearsal 7 readiness assessment | [READINESS-ASSESSMENT.md](READINESS-ASSESSMENT.md) |
 
-The baseline is [`requirements/causa-requirements-baseline-r7.json`](../../requirements/causa-requirements-baseline-r7.json) (`BL-CAUSA-INDY-INIT-7d44f5546bcd`). The validator is `tools/validate-r7-persistence-requirements.fsx`.
+The baseline is [`requirements/causa-requirements-baseline-r7.json`](../../requirements/causa-requirements-baseline-r7.json) (`BL-CAUSA-INDY-INIT-8445ca11986f`). The Rehearsal 7 owner decisions are in [`kickoff/rehearsal-007/`](../../kickoff/rehearsal-007/OWNER-DECISIONS.md). The validator is `tools/validate-r7-persistence-requirements.fsx`.
