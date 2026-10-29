@@ -12,11 +12,14 @@
 /// - DCL-004 every regression test the curation names for the class is part of the closure;
 /// - DCL-005 every regression test of the closure is declared, and not skipped, in the candidate's test tree: its id
 ///   occurs on word boundaries in a test title (JS `test(`/`it(`, F# ``let ``...`` ``), never in a comment, a string
-///   elsewhere, a skipped form (`test.skip`, `test.fixme`, `it.skip`, `xit`, `[<Fact(Skip = ...)>]`, a body
-///   `test.skip()`), or as the prefix of a longer id (DCT-004-A is not DCT-004-AX);
+///   elsewhere, a skipped form (`test.skip`, `test.fixme`, `it.skip`, `xit`, `[<Fact(Skip = ...)>]`, or a skip call
+///   anywhere in the body or on the declaration line: `test.skip()`, `testInfo.skip()`, `test.info().skip()`, a
+///   name bound to one; see TestBlocks), or as the prefix of a longer id (DCT-004-A is not DCT-004-AX);
 /// - DCL-006 a records commit, when given, descends from the candidate;
 /// - DCL-007 the review evidence exists (in the records commit when given, else the candidate), is not the closures
-///   record itself, and was added or changed by a commit that descends from the fix commit;
+///   record itself (compared as normalised repository paths, `./` and `a//b` and `x/../` collapsed, a path leaving
+///   the root refused, and by blob identity, so a copy of the record is refused too), and was added or changed by a
+///   commit that descends from the fix commit;
 /// - DCL-008 the review evidence names the class and its fix commit;
 /// - DCL-009 with a freeze time, `closedAt` is no later than the freeze and no earlier than the fix commit;
 /// - DCL-010 the fix commit descends from the base (kickoff) commit and is not the base: a commit from before the
@@ -30,6 +33,12 @@
 /// The verdict is REFUSED when any closure is refused or a curated class is missing; otherwise VERIFIED only when the
 /// curation and a freeze time were supplied and there is at least one class, else INCOMPLETE: a gate never passes on
 /// checks it was not given the inputs to make.
+///
+/// Inherent limits (history shows what changed, not why): any commit that descends from the base and changes
+/// something can be named as a class's fix, though it fixed something else; and review evidence the implementing
+/// agent wrote itself, including in a records commit, cannot be told from an independent reviewer's without reviewer
+/// identity or an attestation (a signed review, a pull-request review fetched by trusted CI). Both remain for the
+/// independent review.
 module DefectClosure
 
 open System
@@ -114,10 +123,34 @@ let private curatedClasses (curation: Json option) =
     |> Option.map (arr "tests" >> List.choose (strOpt "defectClass") >> List.distinct)
     |> Option.defaultValue []
 
-let private evidencePath (reference: string) = reference.Split('#').[0]
+/// A path as the repository names it: `.` segments and repeated slashes dropped, `..` collapsed. None for an absolute
+/// path or one that leaves the repository root, which names no file of the repository.
+let repositoryPath (path: string) : string option =
+    if path.StartsWith("/", StringComparison.Ordinal) then
+        None
+    else
+        path.Split('/')
+        |> Array.fold
+            (fun (acc: string list option) segment ->
+                match acc, segment with
+                | None, _ -> None
+                | Some acc, ("" | ".") -> Some acc
+                | Some [], ".." -> None
+                | Some(_ :: rest), ".." -> Some rest
+                | Some acc, segment -> Some(segment :: acc))
+            (Some [])
+        |> Option.filter (List.isEmpty >> not)
+        |> Option.map (List.rev >> String.concat "/")
 
-let private evidenceText (repo: string) (commit: string) (reference: string) =
-    Git.showFile repo commit (evidencePath reference) |> Result.map text |> Result.toOption
+/// The repository path a review-evidence reference (`path#anchor`) names.
+let private evidencePath (reference: string) = repositoryPath (reference.Split('#').[0])
+
+let private evidenceText (repo: string) (commit: string) (path: string) =
+    Git.showFile repo commit path |> Result.map text |> Result.toOption
+
+/// The object id of the blob at `path` in `commit`, if there is one.
+let private blobAt (repo: string) (commit: string) (path: string) =
+    Git.run repo [ "rev-parse"; "--verify"; "--quiet"; sprintf "%s:%s" commit path ] |> Result.map (fun b -> (text b).Trim()) |> Result.toOption
 
 /// True when a commit that descends from `fix` (and is in `commit`'s history) added or changed `path`.
 let private changedAfter (repo: string) (fix: string) (commit: string) (path: string) =
@@ -185,15 +218,20 @@ let private problemsOf (inputs: Inputs) (baseCommit: string option) (declared: s
           if not (declared |> List.exists (namesTest test)) then
               yield sprintf "DCL-005 %s: regression test %s is not declared as a (not skipped) test under %s/ in the candidate" id test inputs.TestsPath
 
-      match evidence with
-      | "" -> yield sprintf "DCL-007 %s: no review evidence is recorded" id
-      | reference when evidencePath reference = inputs.ClosuresPath ->
+      let closuresPath = repositoryPath inputs.ClosuresPath |> Option.defaultValue inputs.ClosuresPath
+
+      match evidence, evidencePath evidence with
+      | "", _ -> yield sprintf "DCL-007 %s: no review evidence is recorded" id
+      | reference, None -> yield sprintf "DCL-007 %s: review evidence %s does not name a path inside the repository" id reference
+      | reference, Some path when path = closuresPath ->
           yield sprintf "DCL-007 %s: review evidence %s is the closures record itself" id reference
-      | reference ->
-          match evidenceText inputs.Repo evidenceCommit reference with
+      | reference, Some path when (blobAt inputs.Repo evidenceCommit path).IsSome && blobAt inputs.Repo evidenceCommit path = blobAt inputs.Repo evidenceCommit closuresPath ->
+          yield sprintf "DCL-007 %s: review evidence %s is a copy of the closures record" id reference
+      | reference, Some path ->
+          match evidenceText inputs.Repo evidenceCommit path with
           | None -> yield sprintf "DCL-007 %s: review evidence %s does not exist at %s" id reference evidenceCommit
           | Some body ->
-              if fixUsable && not (changedAfter inputs.Repo fix evidenceCommit (evidencePath reference)) then
+              if fixUsable && not (changedAfter inputs.Repo fix evidenceCommit path) then
                   yield sprintf "DCL-007 %s: review evidence %s was not added or changed by any commit after the fix %s" id reference fix
 
               let namesFix = isFullSha fix && body.Contains(fix.Substring(0, 7), StringComparison.Ordinal)
