@@ -1,0 +1,206 @@
+{
+  "schema": "indy-init.rehearsal-007.readiness-gates/1",
+  "assessedAt": "2026-10-29",
+  "states": {
+    "PASS": "verified on the system of record and available to Rehearsal 7 (merged and released where code is involved)",
+    "FAIL": "verified and failed",
+    "BLOCKED": "waits on an owner action or a pending verification named in 'needs'",
+    "NOT_RUN": "not executed"
+  },
+  "rule": "PASS only on executed evidence for what Rehearsal 7 will consume; planned or unmerged work is never PASS.",
+  "verdict": "NOT_READY",
+  "summary": {
+    "PASS": 0,
+    "FAIL": 0,
+    "BLOCKED": 10,
+    "NOT_RUN": 4
+  },
+  "gates": [
+    {
+      "id": "R7-PF-01",
+      "requirement": "R6 critical defects corrected",
+      "state": "BLOCKED",
+      "evidence": [
+        "arca#47 at ac585ba: CI green (build-and-test, browser on Chromium and WebKit, validate, foundations)",
+        "R6-D-002: multi-tab-safety.spec.mjs (no Web Locks, seeded interleavings, restart)",
+        "R6-D-003: SyncScheduleTests storm reproduction (naive host >50 POSTs in 60 s; schedule <=5); AdapterScheduleTests over the real GitHubStorage provider"
+      ],
+      "why": "The fixes are verified on the pull request head but not merged or released, so Rehearsal 7 cannot consume them; Rehearsal 7 must also be required to use them (R7-AMD-01).",
+      "needs": [
+        "Owner: merge and release arca#47",
+        "Owner: decide R7-AMD-01"
+      ]
+    },
+    {
+      "id": "R7-PF-02",
+      "requirement": "Persistence concurrency verified",
+      "state": "BLOCKED",
+      "evidence": [
+        "arca#47 CI browser job green at ac585ba",
+        "Independent review: no acknowledged save lost, including a concurrent save-versus-steal experiment (6/6)",
+        "Local Chromium: seeds 1-3, 31 acknowledged saves, 5 fenced saves, 19 steals, 10 owner closes, 0 lost"
+      ],
+      "why": "Verified in real browsers on the PR head; not merged or released. AR-035-O4's no-Web-Locks half conflicts with the fail-closed design until R7-AMD-02 is decided.",
+      "needs": [
+        "Owner: merge and release arca#47",
+        "Owner: decide R7-AMD-02"
+      ]
+    },
+    {
+      "id": "R7-PF-03",
+      "requirement": "Offline retry behavior verified",
+      "state": "BLOCKED",
+      "evidence": [
+        "arca#47 CI green at ac585ba; 415/415 tests locally",
+        "Offline: 0 writes; lost writes with onLine true: bounded and never confirmed; 401/403 attempted once; 5xx retried with backoff; recovery confirmed with one ref update",
+        "Three independent review rounds; round 3 PASS_WITH_FINDINGS (low), fixed in ac585ba; L1 documented (<=36 write requests in the first minute when every ref update fails, then decaying)"
+      ],
+      "why": "Verified against FakeGitHub and in the pure core; not merged or released; behaviour against live GitHub is first observed in Rehearsal 7's early adversarial verification. The ac585ba fixes were not given a fourth review.",
+      "needs": [
+        "Owner: merge and release arca#47"
+      ]
+    },
+    {
+      "id": "R7-PF-04",
+      "requirement": "GitHub credential separation verified",
+      "state": "BLOCKED",
+      "evidence": [
+        "SECURITY-REVIEW.md \u00a71: probe workflow and expectations"
+      ],
+      "why": "The probe cannot run until the credentials exist. Rehearsal 6's CAUSA_GITHUB_TOKEN could write (D-09).",
+      "needs": [
+        "Owner: create CAUSA_GITHUB_TOKEN (read-only on the data repository) and CAUSA_WRITE_TOKEN (write to kemiller2002/causa-write-test only) as repository secrets; the agent then dispatches the probe"
+      ]
+    },
+    {
+      "id": "R7-PF-05",
+      "requirement": "CI starvation regression test passed",
+      "state": "BLOCKED",
+      "evidence": [
+        "conditor#122 CI green (24 checks): ci-policy rules CIP-000..008 reproduce the Rehearsal 6 starvation on its workflows and pass the corrected scaffold",
+        "praxis#300 CI green (26 checks): starter workflow one run per ref, cancel-in-progress, 15-minute timeout",
+        "evidence/r6-workflow-runs.tsv: the 22:22-23:54 history"
+      ],
+      "why": "The static regression test passes on the pull requests, which are not merged or released. The live load test (Experiment B: bursts of 5 and 15 commits, concurrent streams, a candidate during development) was not run; it needs a disposable repository. The MSB3030 parallel-build race was assessed, not reproduced.",
+      "needs": [
+        "Owner: merge and release conditor#122 and praxis#300",
+        "Owner: provide a disposable repository for Experiment B"
+      ]
+    },
+    {
+      "id": "R7-PF-06",
+      "requirement": "Unattended PR lifecycle verified",
+      "state": "BLOCKED",
+      "evidence": [
+        "praxis docs/autonomous-execution/evidence/2026-10-29/readiness-receipt.json: conditor unattended-readiness READY, probe PR #20 merged as 9c3aaf6 (cited; this session could not re-observe the repository)"
+      ],
+      "why": "A real merge without routine owner intervention was demonstrated, but the merge gate is advisory: the agent holds the signing key and the evaluate job is not required by a ruleset (UAE-R7-12). It must be re-run with the kickoff authorization (UAE-R7-06).",
+      "needs": [
+        "Owner: UAE-R7-12 ruleset on main and trust store in an Actions secret"
+      ]
+    },
+    {
+      "id": "R7-PF-07",
+      "requirement": "Evidence-generation pipeline verified",
+      "state": "NOT_RUN",
+      "evidence": [],
+      "why": "Experiment D (a representative workflow producing its evidence automatically) was not run. The producers exist (verify-defect-closures, assertion-ratchet, release-comparison, conditor candidate-verification) but are not yet wired into a rehearsal pipeline (R7-AMD-04).",
+      "needs": [
+        "Owner: decide R7-AMD-04 and R7-AMD-05"
+      ]
+    },
+    {
+      "id": "R7-PF-08",
+      "requirement": "Candidate verification gates passed",
+      "state": "NOT_RUN",
+      "evidence": [
+        "conditor#122: candidate-acceptance.yml template (pinned SHA, ancestry check); reviewed",
+        "Rehearsal 6 deployed-smoke proved served SHA = candidate"
+      ],
+      "why": "The candidate-acceptance template has not run on GitHub (Experiment E not run).",
+      "needs": [
+        "Owner: merge and release conditor#122"
+      ]
+    },
+    {
+      "id": "R7-PF-09",
+      "requirement": "Defect classes closed correctly",
+      "state": "BLOCKED",
+      "evidence": [
+        "indy-init claude/rehearsal-007-remediation 41ff524: verify-defect-closures DCL-001..014; offline tests pass",
+        "evidence/defect-closures-r6.json: Rehearsal 6 REFUSED, 8/8 closures"
+      ],
+      "why": "The verifier correctly refuses Rehearsal 6's closures. Its first independent review was BLOCKING; the re-review of the fixes found a new false VERIFIED (N1), whose fix is in progress. The Indy-init branch is not merged.",
+      "needs": [
+        "Independent re-review verdict",
+        "Owner: merge the Indy-init pull request"
+      ]
+    },
+    {
+      "id": "R7-PF-10",
+      "requirement": "Forma contrast verified",
+      "state": "BLOCKED",
+      "evidence": [
+        "forma#173: A11Y-NONTEXT-CONTRAST (WCAG 1.4.11, 3:1), status tokens, Chromium spec light/dark/forced colors on renderer output",
+        "Independent review PASS after fixes (fef95fc, af8903b)",
+        "Rehearsal 6 outline 1.95:1 now reported by the rule"
+      ],
+      "why": "Not merged or released. CI on ac34a55 (inventory regeneration after a validate failure) must be green.",
+      "needs": [
+        "Owner: merge and release forma#173"
+      ]
+    },
+    {
+      "id": "R7-PF-11",
+      "requirement": "Release comparison recorded",
+      "state": "NOT_RUN",
+      "evidence": [
+        "evidence/release-comparison-demo.json: live demonstration 2026-10-29T11:08Z, praxis 3.23.0, forma 0.11.0, arca 0.6.0 CURRENT, PASS"
+      ],
+      "why": "The record must be made at preflight against the kickoff set, immediately before the lock. The demonstration predates the releases this remediation needs (Arca, Forma, Conditor, Praxis), so it is not the record.",
+      "needs": []
+    },
+    {
+      "id": "R7-PF-12",
+      "requirement": "Independent adversarial review passed",
+      "state": "NOT_RUN",
+      "evidence": [
+        "Arca: three rounds, final PASS_WITH_FINDINGS (low), fixed",
+        "Conditor: PASS_WITH_FINDINGS, F1-F8 fixed (not re-reviewed)",
+        "Forma: PASS after fixes",
+        "Indy-init tools: first review BLOCKING (F1-F5), fixed; re-review at 41ff524 BLOCKING (N1-N3, F3 partial, N5), fixes in progress; N4 documented as an inherent limit",
+        "Security: SECURITY-REVIEW.md; the credential probe is not run"
+      ],
+      "why": "Not every package has a passing final review: the tools re-review was BLOCKING (fixes in progress), Conditor's fixes were not re-reviewed, and the security review depends on the credential probe.",
+      "needs": [
+        "Independent re-review verdicts",
+        "Owner: credentials for the probe (R7-PF-04)"
+      ]
+    },
+    {
+      "id": "R7-PF-13",
+      "requirement": "No unresolved critical defects",
+      "state": "BLOCKED",
+      "evidence": [
+        "R6-D-002 and R6-D-003 fixed on arca#47 (see R7-PF-01)"
+      ],
+      "why": "Both critical defects stay open until the fix is merged and released, and the defect-closure verifier records a closure bound to its fix commit in Rehearsal 7.",
+      "needs": [
+        "Owner: merge and release arca#47"
+      ]
+    },
+    {
+      "id": "R7-PF-14",
+      "requirement": "Frozen requirements and verification plan ready",
+      "state": "BLOCKED",
+      "evidence": [
+        "input-documents/2026-10-29-R7-REM-rehearsal-6-remediation.md: requested amendments R7-AMD-01..05",
+        "VERIFICATION-MATRIX.md, EXECUTION-PLAN.md"
+      ],
+      "why": "The requirements baseline cannot be re-pinned and frozen until the owner decides the amendments; approvals are owner records (RDP-003).",
+      "needs": [
+        "Owner: approve or decline R7-AMD-01..05"
+      ]
+    }
+  ]
+}

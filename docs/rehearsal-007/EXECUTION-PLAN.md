@@ -8,7 +8,7 @@
 |---|---|---|---|
 | Requirements baseline re-pinned; derived package, disposition and approvals pass `praxis requirements preservation verify` | Agent; owner for approvals | Praxis (RDP-001..004) | It does not pass |
 | Owner decisions on R7-AMD-01..05 | Owner | Approval records | Undecided items stay BLOCKED |
-| **Release comparison recorded before the stack lock** | Agent | `requirements-compiler release-comparison observe` then `assess --locked-at <lock>` | The verdict is not PASS (VER-001-O1, VER-002-O2) |
+| **Release comparison recorded before the stack lock** | Agent | `requirements-compiler release-comparison observe --selected <set>` then `assess --observations <file> --locked-at <lock, with offset>` (observations at most 6 h old by default, 24 h maximum; deviations need an owner `approvedBy`) | The verdict is not PASS (VER-001-O1, VER-002-O2) |
 | Credential probe | Owner creates the secrets; the agent dispatches | `SECURITY-REVIEW.md` §1 | Any probe expectation fails (D-09) |
 | CI policy on the scaffolded repository | Agent | `conditor ci-policy check` | Any finding (R7-AMD-03) |
 | Unattended readiness with the kickoff authorization | Agent | `conditor unattended-readiness` | Not READY (UAE-R7-06) |
@@ -24,7 +24,7 @@
 | T+180 | Core workflows implemented | Bound tests green in CI |
 | T+240 | Integration and adversarial verification complete (§3) | Reviewer reports |
 | T+300 | Candidate selected **from a green core run of its exact SHA**; `candidate-acceptance.yml` dispatched | `conditor.candidate-verification/1` |
-| T+360 | Independent review; defect-class closures and the assertion ratchet run **before the freeze** | `verify-defect-closures` VERIFIED, `assertion-ratchet` PASS |
+| T+360 | Independent review; defect-class closures and the assertion ratchet run **before the freeze** | `verify-defect-closures --base <kickoff SHA> --candidate <SHA> --records <SHA> --curation <file> --freeze-at <time>` VERIFIED; `assertion-ratchet --base <kickoff SHA> --candidate <SHA> --kickoff <kickoff record>` PASS |
 | T+420 | Final deadline: computed verdict | Frozen verifiers |
 
 ## 3. Early adversarial verification (risk-based)

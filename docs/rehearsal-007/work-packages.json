@@ -46,15 +46,15 @@
         "Independent reviewer reproduces the R6 scenario against Arca and finds no loss"
       ],
       "evidence": [
-        "arca#47 CI browser job (Chromium and WebKit)",
+        "arca#47 CI at ac585ba: build-and-test, browser (Chromium and WebKit), validate, foundations all green",
         "Local Chromium: 14/14 browser specs; seeds 1-3 covered 31 acknowledged saves, 5 fenced saves, 19 steals, 10 owner closes"
       ],
       "status": "IMPLEMENTED_IN_REVIEW",
       "review": "Independent review (agent, not the implementer): R6-D-002 corrected with Web Locks; no loss found, including a concurrent save-versus-steal experiment (6/6). Finding 5: with QueueOptions.standard (MemoryOnly declared) and no Web Locks the queue is per-tab memory-only: no cross-tab loss, but unsent changes do not survive closing the tab, and SaveState does not show durability.",
       "remaining": [
-        "Rehearsal 7 requirement: Causa uses LimenQueue with Order=[IndexedDb] (fail closed) or shows the memory-only mode (owner decision, see READINESS)",
+        "Rehearsal 7 requirement: Causa uses LimenQueue with Order=[IndexedDb] (fail closed) or shows the memory-only mode (owner decision R7-AMD-01, see READINESS)",
         "AR-035-O4 as written expects every tab to keep offline changes durably without Web Locks; the corrected design refuses that. Requirement interpretation needs an owner decision",
-        "Close R6-D-002 only after arca#47 merges with CI green and the re-review passes"
+        "Close R6-D-002 only after arca#47 merges and is released"
       ]
     },
     {
@@ -92,14 +92,15 @@
         "Independent verification"
       ],
       "evidence": [
-        "arca#47; 410/410 Arca tests locally"
+        "arca#47 CI green at ac585ba",
+        "415/415 Arca tests locally; 14/14 browser specs"
       ],
       "status": "IMPLEMENTED_IN_REVIEW",
-      "review": "First independent review: BLOCKING (5xx misclassified as offline or permanent; repeated online events reset backoff; edits retried a revoked credential; checking-outcome hid waiting-for-connection). All four fixed in 2c265c2 with tests that fail on the old code. Re-review in progress.",
+      "review": "Three independent review rounds. Round 1 BLOCKING (5xx misclassified; repeated online events reset backoff; edits retried a revoked credential; checking-outcome hid waiting-for-connection), fixed in 2c265c2. Round 2 confirmed three fixes and found 5xx in identity resolution, a ref-update resend burst (N1), connectivity never restored, and the Aborted label, fixed in 3ac5652. Round 3 PASS_WITH_FINDINGS (low): L2 NOT_LANDED code and L3 Online only from provider answers fixed in ac585ba; L1 (up to 36 write requests in the first minute when every ref update fails, decaying; R6 sent 151) documented in the CHANGELOG. The ac585ba fixes have tests but no fourth review.",
       "remaining": [
-        "Re-review verdict",
-        "Rehearsal 7 requirement: the app's persistence uses OfflineSync.attempt + SyncSchedule and shows SaveState",
-        "RF-F-3 at the application layer: Arca never presents a network failure as a conflict (Conflicted comes only from the provider); a 5xx or unreadable answer to a write is now an unknown outcome reconciled by idempotency key"
+        "Merge and release arca#47 (owner)",
+        "Rehearsal 7 requirement: the app's persistence uses OfflineSync.attempt + SyncSchedule and shows SaveState (R7-AMD-01)",
+        "Live GitHub behaviour (rather than FakeGitHub) is first observed in Rehearsal 7's early adversarial verification"
       ]
     },
     {
@@ -169,11 +170,13 @@
         "Measured queue depth, time to first result, cancellation latency, workflow minutes"
       ],
       "evidence": [
-        "conditor#122 CI green (24 checks) at 8337b35; 1398 checks locally after the review fixes",
-        "praxis#300: starter workflow PASSES the policy"
+        "conditor#122 CI green (24 checks)",
+        "praxis#300 CI green (26 checks)",
+        "conditor ci-policy check reproduces the Rehearsal 6 starvation on the R6 workflows (tests/fixtures/ci-policy/rehearsal-006) and passes the corrected scaffold",
+        "evidence/r6-workflow-runs.tsv: the 22:22-23:54 run history"
       ],
       "status": "PARTIAL",
-      "review": "Independent review: PASS_WITH_FINDINGS; findings F1-F8 fixed in 9916fa9 with regression checks.",
+      "review": "Independent review of conditor#122: PASS_WITH_FINDINGS; F1-F8 fixed in 9916fa9 with regression checks (not re-reviewed). praxis#300 is a three-line template change covered by CIP rules.",
       "remaining": [
         "Experiment B (live commit bursts of 5 and 15, concurrent streams, a candidate during development) needs a disposable repository with these workflows: NOT_RUN",
         "MSB3030: analysis only (CI-PERFORMANCE.md); the R6 fix isolates IntermediateOutputPath per configuration; no parallel-build reproduction was run"
@@ -291,7 +294,7 @@
       "status": "PARTIAL",
       "review": "Template reviewed in the conditor#122 review (pinning and ancestry check judged sound).",
       "remaining": [
-        "Not yet exercised on GitHub"
+        "Not yet exercised on GitHub: first exercised at Rehearsal 7 T+300"
       ]
     },
     {
@@ -320,12 +323,14 @@
         "Run before the candidate freeze"
       ],
       "evidence": [
-        "docs/rehearsal-007/evidence/defect-closures-r6.json"
+        "Offline test suite passes at 41ff524",
+        "evidence/defect-closures-r6.json: Rehearsal 6 (46d5e11, records bf190b6, base 65e346e): REFUSED, 8/8 closures refused"
       ],
-      "status": "IMPLEMENTED",
-      "review": "Not yet independently reviewed.",
+      "status": "IMPLEMENTED_IN_REVIEW",
+      "review": "Independent review: BLOCKING (F1: closures could be satisfied by tests outside the rehearsal, comment mentions, evidence older than the fix, closedAt before the fix, and unknown statuses). Fixed in 6bde211 (required --base, word-boundary test titles excluding skipped forms, evidence changed after the fix, closedAt >= fix time, curated classes MISSING, unknown status refused, INCOMPLETE without curation or freeze, closures source and sha256). Re-review at 41ff524: F1 FIXED; new BLOCKING N1 (a `./` path prefix let the closures record serve as its own review evidence; skips via testInfo.skip() or on the declaration line went undetected), fixes in progress. Documented limits: an unrelated commit descending from the base can be named as the fix; agent-written review evidence cannot be told from a reviewer's without identity or attestation.",
       "remaining": [
-        "Wire into the Rehearsal 7 acceptance job before the freeze"
+        "Fixes for the re-review findings, then a further independent review",
+        "Wire into the Rehearsal 7 acceptance job before the freeze, with --base set to the kickoff commit"
       ]
     },
     {
@@ -359,12 +364,12 @@
         "High contrast supported"
       ],
       "evidence": [
-        "forma#173"
+        "forma#173: rule, tokens, Chromium spec light/dark/forced colors; inventory regenerated in ac34a55 after CI validate failed on it"
       ],
       "status": "IMPLEMENTED_IN_REVIEW",
-      "review": "Independent review: PASS_WITH_FINDINGS (false positive on borderless filled nodes; dark mode and legend swatches unchecked; app-CSS path undocumented; browser spec used hand-written markup). Fixes in progress.",
+      "review": "Independent review: PASS_WITH_FINDINGS (false positive on borderless filled nodes; dark mode and legend swatches unchecked; app-CSS path undocumented; browser spec used hand-written markup). Fixed in fef95fc and af8903b; re-review PASS.",
       "remaining": [
-        "Review fixes",
+        "CI green on ac34a55, then merge and release (owner)",
         "Percepta screen contracts verified in the Rehearsal 7 app"
       ]
     },
@@ -392,11 +397,13 @@
         "The record exists before the baseline is frozen"
       ],
       "evidence": [
-        "docs/rehearsal-007/evidence/release-comparison-demo.json (demonstration only)"
+        "Offline test suite passes at 41ff524",
+        "evidence/release-observation-demo.json and release-comparison-demo.json: live observation of praxis 3.23.0, forma 0.11.0, arca 0.6.0 at 2026-10-29T11:08Z, PASS (demonstration only, not the kickoff set)"
       ],
-      "status": "IMPLEMENTED",
-      "review": "Not yet independently reviewed.",
+      "status": "IMPLEMENTED_IN_REVIEW",
+      "review": "Independent review: BLOCKING (F4/F5: hand-edited observations accepted, duplicates, wrong tag prefixes, npm latest-vs-highest, prerelease order, unapproved deviations, unbounded age). Fixed in afe7485 (answers stored, re-hashed and re-parsed, TAMPERED otherwise; recomputed source URL; duplicates refused; per-component tag prefixes; NuGet; semver prerelease order; deviations need decision and approvedBy; --locked-at with offset; max age <= 24 h). Re-review at 41ff524: F4 FIXED for inconsistent edits, F5 mostly FIXED; N5 (two components sharing a repository and tag prefix) fix in progress; N4 inherent: a recomputed digest over a forged answer is not proof, and observedAt, the lock record, approvedBy and deviations are caller-written. Proof needs observe to run in trusted CI with signed output.",
       "remaining": [
+        "Fixes for the re-review findings, then a further independent review",
         "Run at Rehearsal 7 preflight against the kickoff set, before the lock"
       ]
     },
@@ -431,11 +438,13 @@
         "Weakening is detected before review"
       ],
       "evidence": [
-        "docs/rehearsal-007/evidence/assertion-ratchet-r6.json"
+        "Offline test suite passes at 41ff524",
+        "evidence/assertion-ratchet-r6.json: Rehearsal 6 0ff0100..46d5e11: FAIL, 38 removed assertions unrecorded, including both UI-034 weakenings"
       ],
-      "status": "IMPLEMENTED",
-      "review": "Not yet independently reviewed.",
+      "status": "IMPLEMENTED_IN_REVIEW",
+      "review": "Independent review: BLOCKING (F2/F3: skip/fixme/only markers, block comments, multi-line statements and helper pseudo-tests evaded the count; the base was caller-chosen). Fixed in ddc18bb (per-statement counting, markers, comments, test.* blocks, tag-change exemption through PlanVerification rules, required --kickoff binding the base, full SHAs). Re-review at 41ff524: F2 FIXED, F3 PARTIAL (any non-empty resolution accepted); new N2 (the kickoff record was any file on disk, so the base was still self-asserted) and N3 (assertions hidden in template literals; testInfo.skip(), test.info().skip(), aliased skip), fixes in progress.",
       "remaining": [
+        "Fixes for the re-review findings, then a further independent review",
         "RF-F-4..7, RF-F-9 are process items carried into EXECUTION-PLAN.md"
       ]
     },
@@ -473,8 +482,8 @@
       "evidence": [
         "READINESS.md"
       ],
-      "status": "IN_PROGRESS",
-      "review": "n/a",
+      "status": "IMPLEMENTED",
+      "review": "See READINESS.md: overall NOT READY pending owner actions.",
       "remaining": [
         "See READINESS.md"
       ]

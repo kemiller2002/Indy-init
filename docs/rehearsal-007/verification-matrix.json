@@ -2,7 +2,7 @@
   "schema": "indy-init.rehearsal-007.verification-matrix/1",
   "states": {
     "PASS": "run and passed on the system of record (GitHub)",
-    "PASS_LOCAL": "run and passed in this session's sandbox; the PR's CI and merge are still pending",
+    "PASS_LOCAL": "run and passed in this session's sandbox (and, where noted, in the PR's CI); not yet merged and released",
     "NOT_RUN": "not executed",
     "BLOCKED": "needs an owner action",
     "IN_PROGRESS": "running"
@@ -21,7 +21,7 @@
       "obligation": "Tabs writing different investigations",
       "package": "R7-REM-001",
       "verification": "Same queue per namespace: entries from all tabs in one fenced queue (interleavings)",
-      "evidence": "arca#47",
+      "evidence": "arca#47 (CI green at ac585ba)",
       "state": "PASS_LOCAL"
     },
     {
@@ -29,7 +29,7 @@
       "obligation": "Web Locks unavailable / denied",
       "package": "R7-REM-001",
       "verification": "multi-tab-safety: navigator.locks removed -> ownership refused, nothing written",
-      "evidence": "arca#47",
+      "evidence": "arca#47 (CI green at ac585ba)",
       "state": "PASS_LOCAL"
     },
     {
@@ -37,7 +37,7 @@
       "obligation": "Lock-holder termination",
       "package": "R7-REM-001",
       "verification": "limen-queue.spec (hand-over at higher epoch) + interleavings closing the owner",
-      "evidence": "arca#47",
+      "evidence": "arca#47 (CI green at ac585ba)",
       "state": "PASS_LOCAL"
     },
     {
@@ -45,7 +45,7 @@
       "obligation": "Browser restart / storage restoration",
       "package": "R7-REM-001",
       "verification": "multi-tab-safety restart: storageState with IndexedDB into a new context",
-      "evidence": "arca#47",
+      "evidence": "arca#47 (CI green at ac585ba)",
       "state": "PASS_LOCAL"
     },
     {
@@ -61,7 +61,7 @@
       "obligation": "Interrupted writes",
       "package": "R7-REM-002",
       "verification": "AdapterScheduleTests: lost answer, applied-then-502; GitHubStorageTests unknown outcome",
-      "evidence": "arca#47",
+      "evidence": "arca#47 (CI green at ac585ba)",
       "state": "PASS_LOCAL"
     },
     {
@@ -69,7 +69,7 @@
       "obligation": "Bounded exponential backoff with jitter; no tight loop",
       "package": "R7-REM-002",
       "verification": "SyncScheduleTests (naive host >50 POSTs vs <=5; mutation 76) + adapter tests (<=2 ref updates/attempt, decaying)",
-      "evidence": "arca#47",
+      "evidence": "arca#47 (CI green at ac585ba)",
       "state": "PASS_LOCAL"
     },
     {
@@ -77,7 +77,7 @@
       "obligation": "No retry of permanent authorization failures",
       "package": "R7-REM-002",
       "verification": "Adapter tests: 401 once despite edits; 403 once",
-      "evidence": "arca#47",
+      "evidence": "arca#47 (CI green at ac585ba)",
       "state": "PASS_LOCAL"
     },
     {
@@ -85,7 +85,7 @@
       "obligation": "No duplicate logical writes",
       "package": "R7-REM-002",
       "verification": "Idempotency keys + reconciliation; applied-then-502 lands exactly once",
-      "evidence": "arca#47",
+      "evidence": "arca#47 (CI green at ac585ba)",
       "state": "PASS_LOCAL"
     },
     {
@@ -93,7 +93,7 @@
       "obligation": "Network restoration",
       "package": "R7-REM-002",
       "verification": "Adapter tests: recovery after outage (one ref update, confirmed); drain without online event",
-      "evidence": "arca#47",
+      "evidence": "arca#47 (CI green at ac585ba)",
       "state": "PASS_LOCAL"
     },
     {
@@ -101,7 +101,7 @@
       "obligation": "Durable preservation of unsent changes",
       "package": "R7-REM-001/002",
       "verification": "IndexedDB queue fenced saves; restart spec",
-      "evidence": "arca#47",
+      "evidence": "arca#47 (CI green at ac585ba)",
       "state": "PASS_LOCAL"
     },
     {
@@ -109,7 +109,7 @@
       "obligation": "UI distinguishes saved locally / waiting / sending / confirmed / conflict / permanent failure",
       "package": "R7-REM-002",
       "verification": "SaveState.ofQueue (9 states) + tests; application rendering is Rehearsal 7 work",
-      "evidence": "arca#47",
+      "evidence": "arca#47 (CI green at ac585ba)",
       "state": "PASS_LOCAL"
     },
     {
@@ -117,7 +117,7 @@
       "obligation": "Never report remote persistence before confirmation",
       "package": "R7-REM-002",
       "verification": "Property: confirmed iff synchronized (real synchronized queue)",
-      "evidence": "arca#47",
+      "evidence": "arca#47 (CI green at ac585ba)",
       "state": "PASS_LOCAL"
     },
     {
@@ -125,7 +125,7 @@
       "obligation": "Network failure never presented as a conflict (RF-F-3)",
       "package": "R7-REM-002",
       "verification": "Deferral classification; 5xx/unreadable write answers reconciled",
-      "evidence": "arca#47",
+      "evidence": "arca#47 (CI green at ac585ba)",
       "state": "PASS_LOCAL"
     },
     {
@@ -141,7 +141,7 @@
       "obligation": "Superseded development runs cancelled; cancelled runs start no jobs",
       "package": "R7-REM-004",
       "verification": "ci-policy CIP-001..004, CIP-008; scaffold guard tests",
-      "evidence": "conditor#122",
+      "evidence": "conditor#122 (CI green)",
       "state": "PASS_LOCAL"
     },
     {
@@ -212,8 +212,8 @@
       "id": "VM-026",
       "obligation": "Defect closures bound to fix commits in the rehearsal's own history",
       "package": "R7-REM-008",
-      "verification": "verify-defect-closures DCL-001..009",
-      "evidence": "Offline tests; R6 run REFUSED 8/8 (evidence/defect-closures-r6.json)",
+      "verification": "verify-defect-closures DCL-001..014 (--base = kickoff commit)",
+      "evidence": "Offline tests at 41ff524; R6 run REFUSED 8/8 (evidence/defect-closures-r6.json); re-review BLOCKING, fixes in progress",
       "state": "PASS_LOCAL"
     },
     {
@@ -221,7 +221,7 @@
       "obligation": "Non-text indicators >= 3:1 (rendered), high contrast supported",
       "package": "R7-REM-009",
       "verification": "A11Y-NONTEXT-CONTRAST; token test (30 contexts); Chromium spec light/dark/forced colors on renderer output",
-      "evidence": "forma#173",
+      "evidence": "forma#173 (review PASS; CI re-running on ac34a55)",
       "state": "PASS_LOCAL"
     },
     {
@@ -229,15 +229,15 @@
       "obligation": "Pre-lock newest-release comparison recorded",
       "package": "R7-REM-010",
       "verification": "release-comparison observe/assess",
-      "evidence": "Offline tests; demonstration (evidence/release-comparison-demo.json)",
+      "evidence": "Offline tests at 41ff524; live demonstration 2026-10-29T11:08Z PASS (evidence/release-comparison-demo.json); re-review BLOCKING, fixes in progress",
       "state": "PASS_LOCAL"
     },
     {
       "id": "VM-029",
       "obligation": "Weakened tests detected (RF-F-8)",
       "package": "R7-REM-011",
-      "verification": "assertion-ratchet",
-      "evidence": "Offline tests; R6 run finds both UI-034 weakenings (evidence/assertion-ratchet-r6.json)",
+      "verification": "assertion-ratchet --kickoff (base bound to the kickoff record)",
+      "evidence": "Offline tests at 41ff524; R6 run FAIL, 38 unrecorded removals incl. both UI-034 weakenings (evidence/assertion-ratchet-r6.json); re-review BLOCKING, fixes in progress",
       "state": "PASS_LOCAL"
     },
     {
