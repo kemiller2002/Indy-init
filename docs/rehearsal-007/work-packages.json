@@ -47,12 +47,12 @@
       ],
       "evidence": [
         "arca#47 CI at ac585ba: build-and-test, browser (Chromium and WebKit), validate, foundations all green",
-        "Local Chromium: 14/14 browser specs; seeds 1-3 covered 31 acknowledged saves, 5 fenced saves, 19 steals, 10 owner closes"
+        "Local Chromium: 14/14 browser specs; seeds 1-3 covered 31 acknowledged saves, 5 fenced saves, 19 steals, 10 owner closes",
+        "Released in Arca 0.7.0 (v0.7.0, 7e1f90d6), selected in echelon-current 1.33.0 (echelon-registry#104)"
       ],
-      "status": "IMPLEMENTED_IN_REVIEW",
+      "status": "VERIFIED",
       "review": "Independent review (agent, not the implementer): R6-D-002 corrected with Web Locks; no loss found, including a concurrent save-versus-steal experiment (6/6). Finding 5: with QueueOptions.standard (MemoryOnly declared) and no Web Locks the queue is per-tab memory-only: no cross-tab loss, but unsent changes do not survive closing the tab, and SaveState does not show durability.",
       "remaining": [
-        "Release Arca with arca#47 (owner): a library fix for Arca's other consumers",
         "For Causa: PAT-01, PAT-02, PAT-11, PAT-13 during Rehearsal 7 (DEFECT-TRACEABILITY.md)"
       ],
       "scope": "ADR-R7-001 (owner-approved, merged in Indy-init #41) closes R6-D-002 and R6-D-003 for Causa in the requirements: no browser storage, no offline queue, no cross-tab locking, GitHub expected-head commits only. They are verified only when Rehearsal 7's candidate passes PAT-01..15. This package remains a correctness fix to Arca as a library (Arca stays in the release set); Causa may not use its offline queue or IndexedDB bridge (PERSIST-026)."
@@ -93,12 +93,12 @@
       ],
       "evidence": [
         "arca#47 CI green at ac585ba",
-        "415/415 Arca tests locally; 14/14 browser specs"
+        "415/415 Arca tests locally; 14/14 browser specs",
+        "Released in Arca 0.7.0 (v0.7.0, 7e1f90d6), selected in echelon-current 1.33.0 (echelon-registry#104)"
       ],
-      "status": "IMPLEMENTED_IN_REVIEW",
+      "status": "VERIFIED",
       "review": "Three independent review rounds. Round 1 BLOCKING (5xx misclassified; repeated online events reset backoff; edits retried a revoked credential; checking-outcome hid waiting-for-connection), fixed in 2c265c2. Round 2 confirmed three fixes and found 5xx in identity resolution, a ref-update resend burst (N1), connectivity never restored, and the Aborted label, fixed in 3ac5652. Round 3 PASS_WITH_FINDINGS (low): L2 NOT_LANDED code and L3 Online only from provider answers fixed in ac585ba; L1 (up to 36 write requests in the first minute when every ref update fails, decaying; R6 sent 151) documented in the CHANGELOG. The ac585ba fixes have tests but no fourth review.",
       "remaining": [
-        "Release Arca with arca#47 (owner)",
         "For Causa: PAT-03, PAT-05..08, PAT-15 during Rehearsal 7 (RF-F-3 is PERSIST-008, PERSIST-012, PERSIST-015, PERSIST-024)"
       ],
       "scope": "ADR-R7-001 (owner-approved, merged in Indy-init #41) closes R6-D-002 and R6-D-003 for Causa in the requirements: no browser storage, no offline queue, no cross-tab locking, GitHub expected-head commits only. They are verified only when Rehearsal 7's candidate passes PAT-01..15. This package remains a correctness fix to Arca as a library (Arca stays in the release set); Causa may not use its offline queue or IndexedDB bridge (PERSIST-026). Arca.GitHub's fixes (5xx is transient, a 5xx or unreadable write answer is an unknown outcome reconciled by key, NOT_LANDED) apply if Rehearsal 7 uses Arca.GitHub for GitHub access, which ADR-R7-001 permits."
@@ -173,7 +173,8 @@
         "conditor#122 CI green (24 checks)",
         "praxis#300 CI green (26 checks)",
         "conditor ci-policy check reproduces the Rehearsal 6 starvation on the R6 workflows (tests/fixtures/ci-policy/rehearsal-006) and passes the corrected scaffold",
-        "evidence/r6-workflow-runs.tsv: the 22:22-23:54 run history"
+        "evidence/r6-workflow-runs.tsv: the 22:22-23:54 run history",
+        "Released in Conditor 0.10.18 (v0.10.18, 2d6ae48e) and Praxis 3.24.0 (v3.24.0, dccf8400), selected in echelon-current 1.33.0"
       ],
       "status": "PARTIAL",
       "review": "Independent review of conditor#122: PASS_WITH_FINDINGS; F1-F8 fixed in 9916fa9 with regression checks (not re-reviewed). praxis#300 is a three-line template change covered by CIP rules.",
@@ -289,7 +290,8 @@
         "Served SHA equals candidate SHA, checked on the served application"
       ],
       "evidence": [
-        "Template and policy in conditor#122"
+        "Template and policy in conditor#122",
+        "Template released in Conditor 0.10.18 (v0.10.18)"
       ],
       "status": "PARTIAL",
       "review": "Template reviewed in the conditor#122 review (pinning and ancestry check judged sound).",
@@ -324,12 +326,13 @@
       ],
       "evidence": [
         "Offline test suite passes at 2e4b561",
-        "evidence/defect-closures-r6.json: Rehearsal 6 (46d5e11, records bf190b6, base c80f35e bound by the kickoff record): REFUSED, 8/8 closures"
+        "evidence/defect-closures-r6.json: Rehearsal 6 (46d5e11, records bf190b6, base c80f35e bound by the kickoff record): REFUSED, 8/8 closures",
+        "Merged on Indy-init main (#42, e0e0574)"
       ],
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "review": "Independent review: BLOCKING (F1: closures could be satisfied by tests outside the rehearsal, comment mentions, evidence older than the fix, closedAt before the fix, and unknown statuses). Fixed in 6bde211 (required --base, word-boundary test titles excluding skipped forms, evidence changed after the fix, closedAt >= fix time, curated classes MISSING, unknown status refused, INCOMPLETE without curation or freeze, closures source and sha256). Re-review at 41ff524: F1 FIXED; new BLOCKING N1 (a `./` path prefix let the closures record serve as its own review evidence; skips via testInfo.skip() or on the declaration line went undetected). Fixed in 6d05613 (normalised paths and blob-identity against the closures record; skip detection shared in TestBlocks). Documented limits: an unrelated commit descending from the base can be named as the fix; agent-written review evidence cannot be told from a reviewer's without identity or attestation. Third review at eb978e2: N1 FIXED; new BLOCKING D1 (a regex literal after `)` desynchronises the test lexer and hides a skip: false VERIFIED) and D3 (a lightly edited copy of the closures record passes as review evidence). Fixed in e05c776: the test lexer fails closed (UNPARSEABLE files are not read and keep the verdict at best INCOMPLETE); review evidence must be an indy-init.independent-review/1 record naming the class, the full fix SHA and verdict CLOSED. Fourth review at c08c23e: all earlier reproductions caught; Rehearsal 6's whole tests/ tree (144 files) parses; BLOCKING E1 (a `}` closing an object literal followed by division still desynchronises the lexer: false VERIFIED and false PASS), E2 (a file ending in a line comment without a newline is wrongly UNPARSEABLE), E3 (JSX/TSX), E4 (reporting nits). Fixed at c33dc29 (0f9816d, 7f1c0a2): brace-kind tracking, ambiguous cases UNPARSEABLE, end of input closes a line comment (0 of 3113 real files UNPARSEABLE), .jsx/.tsx reported as unsupported, and the base is now bound to the kickoff record like the ratchet's. Fifth review at c33dc29: PASS_WITH_FINDINGS; G1 (braces inside a template's ${...}) fixed at 1c3a7d0 with a reviewAttention list of files the independent review must read; confirmation at 1c3a7d0: PASS_WITH_FINDINGS, H1 (postfix ++/-- before /) and H2 (noisy attention list) fixed at 2e4b561. Final: the reviewer judges the residual risk of the heuristic lexer adequately documented in each report's limits, provided the review reads every reviewAttention file.",
       "remaining": [
-        "Wire into the Rehearsal 7 acceptance job before the freeze, with --base set to the kickoff commit"
+        "Wire into the Rehearsal 7 acceptance job before the freeze (the base is read from the kickoff record)"
       ]
     },
     {
@@ -363,12 +366,12 @@
         "High contrast supported"
       ],
       "evidence": [
-        "forma#173: rule, tokens, Chromium spec light/dark/forced colors; inventory regenerated in ac34a55 after CI validate failed on it"
+        "forma#173: rule, tokens, Chromium spec light/dark/forced colors; inventory regenerated in ac34a55 after CI validate failed on it",
+        "Released in Forma 0.12.0 (v0.12.0, 38ba6701) and @echelon-foundry/forma-workflow 1.2.0 (forma#175), selected in echelon-current 1.33.0"
       ],
-      "status": "IMPLEMENTED_IN_REVIEW",
+      "status": "VERIFIED",
       "review": "Independent review: PASS_WITH_FINDINGS (false positive on borderless filled nodes; dark mode and legend swatches unchecked; app-CSS path undocumented; browser spec used hand-written markup). Fixed in fef95fc and af8903b; re-review PASS.",
       "remaining": [
-        "Release Forma with forma#173 (owner)",
         "Percepta screen contracts verified in the Rehearsal 7 app"
       ]
     },
@@ -397,9 +400,10 @@
       ],
       "evidence": [
         "Offline test suite passes at c08c23e",
-        "evidence/release-observation-demo.json and release-comparison-demo.json: live observation of praxis 3.23.0, forma 0.11.0, arca 0.6.0 at 2026-10-29T11:08Z, PASS (demonstration only, not the kickoff set)"
+        "evidence/release-observation-demo.json and release-comparison-demo.json: live observation of praxis 3.23.0, forma 0.11.0, arca 0.6.0 at 2026-10-29T11:08Z, PASS (demonstration only, not the kickoff set)",
+        "Merged on Indy-init main (#42, e0e0574)"
       ],
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "review": "Independent review: BLOCKING (F4/F5: hand-edited observations accepted, duplicates, wrong tag prefixes, npm latest-vs-highest, prerelease order, unapproved deviations, unbounded age). Fixed in afe7485 (answers stored, re-hashed and re-parsed, TAMPERED otherwise; recomputed source URL; duplicates refused; per-component tag prefixes; NuGet; semver prerelease order; deviations need decision and approvedBy; --locked-at with offset; max age <= 24 h). Re-review at 41ff524: F4 FIXED for inconsistent edits, F5 mostly FIXED; N5 fixed in 07be4f2 (AMBIGUOUS_COMPONENT, not a PASS status); N4 stated in the report's attestation field; N4 inherent: a recomputed digest over a forged answer is not proof, and observedAt, the lock record, approvedBy and deviations are caller-written. Proof needs observe to run in trusted CI with signed output. Third review at eb978e2: N5 FIXED; N4 documented; npm-versus-GitHub-releases ambiguity refinement and release paging in progress. Fixed in f29edf3: AMBIGUOUS only for the same GitHub release list and prefix; releases paged; limits stated in the report. Fourth review: N5 FIXED, N4 limit stated; no new release-comparison finding.",
       "remaining": [
         "Run at Rehearsal 7 preflight against the kickoff set, before the lock"
@@ -437,9 +441,10 @@
       ],
       "evidence": [
         "Offline test suite passes at 2e4b561",
-        "evidence/assertion-ratchet-r6.json: Rehearsal 6 c80f35e..46d5e11, base read from the real kickoff record: FAIL, 45 unrecorded removals including UI-034-O1 and UI-034-O2"
+        "evidence/assertion-ratchet-r6.json: Rehearsal 6 c80f35e..46d5e11, base read from the real kickoff record: FAIL, 45 unrecorded removals including UI-034-O1 and UI-034-O2",
+        "Merged on Indy-init main (#42, e0e0574)"
       ],
-      "status": "IMPLEMENTED",
+      "status": "VERIFIED",
       "review": "Independent review: BLOCKING (F2/F3: skip/fixme/only markers, block comments, multi-line statements and helper pseudo-tests evaded the count; the base was caller-chosen). Fixed in ddc18bb (per-statement counting, markers, comments, test.* blocks, tag-change exemption through PlanVerification rules, required --kickoff binding the base, full SHAs). Re-review at 41ff524: F2 FIXED, F3 PARTIAL (any non-empty resolution accepted); new N2 (the kickoff record was any file on disk, so the base was still self-asserted) and N3 (assertions hidden in template literals; testInfo.skip(), test.info().skip(), aliased skip). Fixed in 865d443: the base is the commit that first added the kickoff record in the candidate's first-parent history (a mismatching --base is REFUSED); assertions matched on string- and template-masked text; skip markers anywhere including aliases in the file; a tag change needs PlanVerification.tagChangeAdmissible. Third review at eb978e2: N2, N3, F3 FIXED; new BLOCKING D1 (lexer desync counts a dead assertion as live), D2 (a caller-chosen --kickoff-path gave PASS on Rehearsal 6) and D4 (tag-change reviews are free text in a file outside the repository); D5 low (over-broad base skip exclusion). Fixed in 7675e38 and 6edade9: UNPARSEABLE files block PASS; only kickoff/indy-init.kickoff.json binds the base; tag changes are read from the records commit and must point to review records there (a file from disk is at best INCOMPLETE); conditional base skips count as live and exclusions are reported. Fourth review at c08c23e: all earlier reproductions caught; Rehearsal 6's whole tests/ tree (144 files) parses; BLOCKING E1 (a `}` closing an object literal followed by division still desynchronises the lexer: false VERIFIED and false PASS), E2 (a file ending in a line comment without a newline is wrongly UNPARSEABLE), E3 (JSX/TSX), E4 (reporting nits). Fixed at c33dc29 (7f1c0a2). Fifth review at c33dc29: PASS_WITH_FINDINGS; G1 (braces inside a template's ${...}) fixed at 1c3a7d0 with a reviewAttention list of files the independent review must read; confirmation at 1c3a7d0: PASS_WITH_FINDINGS, H1 (postfix ++/-- before /) and H2 (noisy attention list) fixed at 2e4b561. Final: the reviewer judges the residual risk of the heuristic lexer adequately documented in each report's limits, provided the review reads every reviewAttention file.",
       "remaining": [
         "RF-F-4..7, RF-F-9 are process items carried into EXECUTION-PLAN.md"

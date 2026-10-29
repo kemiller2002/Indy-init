@@ -6,22 +6,22 @@ Generated from [`work-packages.json`](work-packages.json); the JSON is authorita
 
 | Package | Title | Owners | Work items | Pull requests | Status |
 |---|---|---|---|---|---|
-| R7-REM-001 | Cross-tab persistence correctness | arca, indy-init | arca WI-0038 | arca#47 (merged 916d0ca) | **IMPLEMENTED_IN_REVIEW** |
-| R7-REM-002 | Offline retry and save-state correctness | arca | arca WI-0037 | arca#47 (merged 916d0ca) | **IMPLEMENTED_IN_REVIEW** |
+| R7-REM-001 | Cross-tab persistence correctness | arca, indy-init | arca WI-0038 | arca#47 (merged 916d0ca) | **VERIFIED** |
+| R7-REM-002 | Offline retry and save-state correctness | arca | arca WI-0037 | arca#47 (merged 916d0ca) | **VERIFIED** |
 | R7-REM-003 | GitHub credential separation | owner (repository secrets), indy-init | — | — | **BLOCKED** |
 | R7-REM-004 | CI concurrency and scheduling | conditor, praxis | conditor WI-0063, praxis WI-0106 | conditor#122 (merged 9241290), praxis#300 (merged 4e9993e) | **PARTIAL** |
 | R7-REM-005 | Unattended PR execution | praxis, conditor | praxis WI-0104, conditor WI-0062 | — | **PASS_ADVISORY** |
 | R7-REM-006 | Automated acceptance evidence | indy-init, rehearsal repository | — | — | **PLANNED** |
 | R7-REM-007 | Candidate and deployment gates | conditor, rehearsal repository | conditor WI-0063 | conditor#122 (merged 9241290) | **PARTIAL** |
-| R7-REM-008 | Defect-class closure | indy-init | — | indy-init#42 | **IMPLEMENTED** |
-| R7-REM-009 | Forma accessibility corrections | forma | forma WI-0041 | forma#173 (merged 6c344f6) | **IMPLEMENTED_IN_REVIEW** |
-| R7-REM-010 | Release provenance | indy-init | — | indy-init#42 | **IMPLEMENTED** |
-| R7-REM-011 | Independent-review corrections | indy-init, arca | — | indy-init#42, arca#47 (merged 916d0ca) | **IMPLEMENTED** |
+| R7-REM-008 | Defect-class closure | indy-init | — | indy-init#42 | **VERIFIED** |
+| R7-REM-009 | Forma accessibility corrections | forma | forma WI-0041 | forma#173 (merged 6c344f6) | **VERIFIED** |
+| R7-REM-010 | Release provenance | indy-init | — | indy-init#42 | **VERIFIED** |
+| R7-REM-011 | Independent-review corrections | indy-init, arca | — | indy-init#42, arca#47 (merged 916d0ca) | **VERIFIED** |
 | R7-REM-012 | Rehearsal 7 readiness | indy-init | — | indy-init#42 | **IMPLEMENTED** |
 
 ## R7-REM-001: Cross-tab persistence correctness
 
-**Addresses:** R6-D-002, AR-035-O4, AR-035-O5. **Depends on:** nothing. **Status:** IMPLEMENTED_IN_REVIEW.
+**Addresses:** R6-D-002, AR-035-O4, AR-035-O5. **Depends on:** nothing. **Status:** VERIFIED.
 
 **Plan.** Do not build another cross-tab store. Rehearsal 6 kept one localStorage record read-merge-written by every tab (src/persistence/Sync.fs:179, main.ts:110 skips exclusion without navigator.locks). localStorage has no compare-and-swap, so no lease on it is correct (both R6 lease trials failed). Arca.Limen already provides one owner per namespace through a Web Lock, a fencing epoch raised by compare-and-put inside an IndexedDB transaction, and refusal of a stale owner's save; without Web Locks it refuses durable ownership. Prove that in a real browser and require Rehearsal 7 to adopt it (D-07 was the deviation that bypassed it).
 
@@ -40,16 +40,16 @@ Generated from [`work-packages.json`](work-packages.json); the JSON is authorita
 **Evidence.**
 - arca#47 CI at ac585ba: build-and-test, browser (Chromium and WebKit), validate, foundations all green
 - Local Chromium: 14/14 browser specs; seeds 1-3 covered 31 acknowledged saves, 5 fenced saves, 19 steals, 10 owner closes
+- Released in Arca 0.7.0 (v0.7.0, 7e1f90d6), selected in echelon-current 1.33.0 (echelon-registry#104)
 
 **Remaining.**
-- Release Arca with arca#47 (owner): a library fix for Arca's other consumers
 - For Causa: PAT-01, PAT-02, PAT-11, PAT-13 during Rehearsal 7 (DEFECT-TRACEABILITY.md)
 
 **Independent review.** Independent review (agent, not the implementer): R6-D-002 corrected with Web Locks; no loss found, including a concurrent save-versus-steal experiment (6/6). Finding 5: with QueueOptions.standard (MemoryOnly declared) and no Web Locks the queue is per-tab memory-only: no cross-tab loss, but unsent changes do not survive closing the tab, and SaveState does not show durability.
 
 ## R7-REM-002: Offline retry and save-state correctness
 
-**Addresses:** R6-D-003, UI-010-O2, RF-F-3. **Depends on:** nothing. **Status:** IMPLEMENTED_IN_REVIEW.
+**Addresses:** R6-D-003, UI-010-O2, RF-F-3. **Depends on:** nothing. **Status:** VERIFIED.
 
 **Plan.** Root cause (R6, verified in code): Limen reports an aborted POST as an unknown outcome while navigator.onLine stays true; reconciliation finds it not landed; the host re-runs synchronization at once (151 POSTs in 60 s, about 5,000 per tab in 5 minutes). Arca's OfflineSync returned an untyped Deferred and left timing to every host. Add to Arca's pure core: typed deferrals, a validated retry policy (exponential backoff with jitter), a schedule that only a provider-confirmed entry resets, and a save state derived from queue and schedule.
 
@@ -70,9 +70,9 @@ Generated from [`work-packages.json`](work-packages.json); the JSON is authorita
 **Evidence.**
 - arca#47 CI green at ac585ba
 - 415/415 Arca tests locally; 14/14 browser specs
+- Released in Arca 0.7.0 (v0.7.0, 7e1f90d6), selected in echelon-current 1.33.0 (echelon-registry#104)
 
 **Remaining.**
-- Release Arca with arca#47 (owner)
 - For Causa: PAT-03, PAT-05..08, PAT-15 during Rehearsal 7 (RF-F-3 is PERSIST-008, PERSIST-012, PERSIST-015, PERSIST-024)
 
 **Independent review.** Three independent review rounds. Round 1 BLOCKING (5xx misclassified; repeated online events reset backoff; edits retried a revoked credential; checking-outcome hid waiting-for-connection), fixed in 2c265c2. Round 2 confirmed three fixes and found 5xx in identity resolution, a ref-update resend burst (N1), connectivity never restored, and the Aborted label, fixed in 3ac5652. Round 3 PASS_WITH_FINDINGS (low): L2 NOT_LANDED code and L3 Online only from provider answers fixed in ac585ba; L1 (up to 36 write requests in the first minute when every ref update fails, decaying; R6 sent 151) documented in the CHANGELOG. The ac585ba fixes have tests but no fourth review.
@@ -114,6 +114,7 @@ Generated from [`work-packages.json`](work-packages.json); the JSON is authorita
 - praxis#300 CI green (26 checks)
 - conditor ci-policy check reproduces the Rehearsal 6 starvation on the R6 workflows (tests/fixtures/ci-policy/rehearsal-006) and passes the corrected scaffold
 - evidence/r6-workflow-runs.tsv: the 22:22-23:54 run history
+- Released in Conditor 0.10.18 (v0.10.18, 2d6ae48e) and Praxis 3.24.0 (v3.24.0, dccf8400), selected in echelon-current 1.33.0
 
 **Remaining.**
 - Experiment B (live commit bursts of 5 and 15, concurrent streams, a candidate during development) needs a disposable repository with these workflows: NOT_RUN
@@ -175,6 +176,7 @@ Generated from [`work-packages.json`](work-packages.json); the JSON is authorita
 
 **Evidence.**
 - Template and policy in conditor#122
+- Template released in Conditor 0.10.18 (v0.10.18)
 
 **Remaining.**
 - Not yet exercised on GitHub: first exercised at Rehearsal 7 T+300
@@ -183,7 +185,7 @@ Generated from [`work-packages.json`](work-packages.json); the JSON is authorita
 
 ## R7-REM-008: Defect-class closure
 
-**Addresses:** G7, D-11, RF-F-6. **Depends on:** nothing. **Status:** IMPLEMENTED.
+**Addresses:** G7, D-11, RF-F-6. **Depends on:** nothing. **Status:** VERIFIED.
 
 **Plan.** requirements-compiler verify-defect-closures checks each claimed closure against the rehearsal's own history (DCL-001..009).
 
@@ -198,15 +200,16 @@ Generated from [`work-packages.json`](work-packages.json); the JSON is authorita
 **Evidence.**
 - Offline test suite passes at 2e4b561
 - evidence/defect-closures-r6.json: Rehearsal 6 (46d5e11, records bf190b6, base c80f35e bound by the kickoff record): REFUSED, 8/8 closures
+- Merged on Indy-init main (#42, e0e0574)
 
 **Remaining.**
-- Wire into the Rehearsal 7 acceptance job before the freeze, with --base set to the kickoff commit
+- Wire into the Rehearsal 7 acceptance job before the freeze (the base is read from the kickoff record)
 
 **Independent review.** Independent review: BLOCKING (F1: closures could be satisfied by tests outside the rehearsal, comment mentions, evidence older than the fix, closedAt before the fix, and unknown statuses). Fixed in 6bde211 (required --base, word-boundary test titles excluding skipped forms, evidence changed after the fix, closedAt >= fix time, curated classes MISSING, unknown status refused, INCOMPLETE without curation or freeze, closures source and sha256). Re-review at 41ff524: F1 FIXED; new BLOCKING N1 (a `./` path prefix let the closures record serve as its own review evidence; skips via testInfo.skip() or on the declaration line went undetected). Fixed in 6d05613 (normalised paths and blob-identity against the closures record; skip detection shared in TestBlocks). Documented limits: an unrelated commit descending from the base can be named as the fix; agent-written review evidence cannot be told from a reviewer's without identity or attestation. Third review at eb978e2: N1 FIXED; new BLOCKING D1 (a regex literal after `)` desynchronises the test lexer and hides a skip: false VERIFIED) and D3 (a lightly edited copy of the closures record passes as review evidence). Fixed in e05c776: the test lexer fails closed (UNPARSEABLE files are not read and keep the verdict at best INCOMPLETE); review evidence must be an indy-init.independent-review/1 record naming the class, the full fix SHA and verdict CLOSED. Fourth review at c08c23e: all earlier reproductions caught; Rehearsal 6's whole tests/ tree (144 files) parses; BLOCKING E1 (a `}` closing an object literal followed by division still desynchronises the lexer: false VERIFIED and false PASS), E2 (a file ending in a line comment without a newline is wrongly UNPARSEABLE), E3 (JSX/TSX), E4 (reporting nits). Fixed at c33dc29 (0f9816d, 7f1c0a2): brace-kind tracking, ambiguous cases UNPARSEABLE, end of input closes a line comment (0 of 3113 real files UNPARSEABLE), .jsx/.tsx reported as unsupported, and the base is now bound to the kickoff record like the ratchet's. Fifth review at c33dc29: PASS_WITH_FINDINGS; G1 (braces inside a template's ${...}) fixed at 1c3a7d0 with a reviewAttention list of files the independent review must read; confirmation at 1c3a7d0: PASS_WITH_FINDINGS, H1 (postfix ++/-- before /) and H2 (noisy attention list) fixed at 2e4b561. Final: the reviewer judges the residual risk of the heuristic lexer adequately documented in each report's limits, provided the review reads every reviewAttention file.
 
 ## R7-REM-009: Forma accessibility corrections
 
-**Addresses:** UI-016-O11, PF-016-O1. **Depends on:** nothing. **Status:** IMPLEMENTED_IN_REVIEW.
+**Addresses:** UI-016-O11, PF-016-O1. **Depends on:** nothing. **Status:** VERIFIED.
 
 **Plan.** Causa outlined a Forma diagram node with #e9a23b on #f5f3ed (1.95:1). Forma's workflow validation checked only text contrast and its diagram vocabulary had no status tokens. Add token:status-* to the vocabulary and A11Y-NONTEXT-CONTRAST to validation; prove token pairs per theme and the rendered result in a browser.
 
@@ -221,16 +224,16 @@ Generated from [`work-packages.json`](work-packages.json); the JSON is authorita
 
 **Evidence.**
 - forma#173: rule, tokens, Chromium spec light/dark/forced colors; inventory regenerated in ac34a55 after CI validate failed on it
+- Released in Forma 0.12.0 (v0.12.0, 38ba6701) and @echelon-foundry/forma-workflow 1.2.0 (forma#175), selected in echelon-current 1.33.0
 
 **Remaining.**
-- Release Forma with forma#173 (owner)
 - Percepta screen contracts verified in the Rehearsal 7 app
 
 **Independent review.** Independent review: PASS_WITH_FINDINGS (false positive on borderless filled nodes; dark mode and legend swatches unchecked; app-CSS path undocumented; browser spec used hand-written markup). Fixed in fef95fc and af8903b; re-review PASS.
 
 ## R7-REM-010: Release provenance
 
-**Addresses:** VER-001-O1, VER-002-O2. **Depends on:** nothing. **Status:** IMPLEMENTED.
+**Addresses:** VER-001-O1, VER-002-O2. **Depends on:** nothing. **Status:** VERIFIED.
 
 **Plan.** requirements-compiler release-comparison observe/assess: query each selected system's release source immediately before the lock, digest the answers, compare, and require owner-approved deviations.
 
@@ -244,6 +247,7 @@ Generated from [`work-packages.json`](work-packages.json); the JSON is authorita
 **Evidence.**
 - Offline test suite passes at c08c23e
 - evidence/release-observation-demo.json and release-comparison-demo.json: live observation of praxis 3.23.0, forma 0.11.0, arca 0.6.0 at 2026-10-29T11:08Z, PASS (demonstration only, not the kickoff set)
+- Merged on Indy-init main (#42, e0e0574)
 
 **Remaining.**
 - Run at Rehearsal 7 preflight against the kickoff set, before the lock
@@ -252,7 +256,7 @@ Generated from [`work-packages.json`](work-packages.json); the JSON is authorita
 
 ## R7-REM-011: Independent-review corrections
 
-**Addresses:** RF-F-1..9, R1-F-3/4/5, 7 final tag changes, UI-034-O1 unflagged loosening. **Depends on:** R7-REM-001, R7-REM-002. **Status:** IMPLEMENTED.
+**Addresses:** RF-F-1..9, R1-F-3/4/5, 7 final tag changes, UI-034-O1 unflagged loosening. **Depends on:** R7-REM-001, R7-REM-002. **Status:** VERIFIED.
 
 **Plan.** RF-F-1/2 are R6-D-002/003. RF-F-3 is handled in Arca's classification. RF-F-8: requirements-compiler assertion-ratchet makes a removed or loosened assertion fail unless a resolved tag change covers it.
 
@@ -266,6 +270,7 @@ Generated from [`work-packages.json`](work-packages.json); the JSON is authorita
 **Evidence.**
 - Offline test suite passes at 2e4b561
 - evidence/assertion-ratchet-r6.json: Rehearsal 6 c80f35e..46d5e11, base read from the real kickoff record: FAIL, 45 unrecorded removals including UI-034-O1 and UI-034-O2
+- Merged on Indy-init main (#42, e0e0574)
 
 **Remaining.**
 - RF-F-4..7, RF-F-9 are process items carried into EXECUTION-PLAN.md

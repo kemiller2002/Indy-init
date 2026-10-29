@@ -1,8 +1,8 @@
 # Rehearsal 7 readiness
 
-**Verdict: NOT READY.** Gates: PASS 0, FAIL 0, BLOCKED 5, NOT_RUN 9. Machine-readable: [`readiness-gates.json`](readiness-gates.json).
+**Verdict: NOT READY.** Gates: PASS 2, FAIL 0, BLOCKED 3, NOT_RUN 9. Machine-readable: [`readiness-gates.json`](readiness-gates.json).
 
-**Rule.** PASS only on executed evidence for what Rehearsal 7 will consume; planned or unmerged work is never PASS. Both critical Rehearsal 6 defects are closed in the requirements by the owner-approved ADR-R7-001; they can be verified only by Rehearsal 7's PAT tests, so their gates are NOT_RUN. The remediation pull requests were merged on the owner's instruction on 2026-10-29; the components are not yet released. This assessment complements the persistence-requirements [READINESS-ASSESSMENT.md](READINESS-ASSESSMENT.md) (K1-K6), which it does not repeat. Rehearsal 7 has not been started.
+**Rule.** PASS only on executed evidence for what Rehearsal 7 will consume; planned or unmerged work is never PASS. Both critical Rehearsal 6 defects are closed in the requirements by the owner-approved ADR-R7-001; they can be verified only by Rehearsal 7's PAT tests, so their gates are NOT_RUN. The remediation pull requests were merged on the owner's instruction on 2026-10-29, and the components were released and selected in echelon-current 1.33.0 (owner-approved, echelon-registry#104). This assessment complements the persistence-requirements [READINESS-ASSESSMENT.md](READINESS-ASSESSMENT.md) (K1-K7), which it does not repeat. Rehearsal 7 has not been started.
 
 | Gate | Requirement | State | Why |
 |---|---|---|---|
@@ -10,12 +10,12 @@
 | R7-PF-02 | Persistence concurrency verified | **NOT_RUN** | Run during Rehearsal 7. The Arca multi-tab browser evidence (arca#47) verifies the library, which Causa no longer uses for investigations. |
 | R7-PF-03 | Offline retry behavior verified | **NOT_RUN** | Run during Rehearsal 7. Arca's SyncSchedule (arca#47) bounds retries for Arca's own queue; Causa has no queue. |
 | R7-PF-04 | GitHub credential separation verified | **BLOCKED** | The probe cannot run until the credentials exist. Rehearsal 6's CAUSA_GITHUB_TOKEN could write (D-09). |
-| R7-PF-05 | CI starvation regression test passed | **BLOCKED** | The static regression test passes; conditor#122 and praxis#300 are merged (9241290, 4e9993e) but not yet released. The live load test (Experiment B: bursts of 5 and 15 commits, concurrent streams, a candidate during development) was not run; it needs a disposable repository. The MSB3030 parallel-build race was assessed, not reproduced. |
+| R7-PF-05 | CI starvation regression test passed | **PASS** | The static regression test passes and is in released components that Rehearsal 7 consumes. Separately, the live load test (Experiment B, VM-019) was not run and stays NOT_RUN in the verification matrix; the MSB3030 parallel-build race was assessed, not reproduced. |
 | R7-PF-06 | Unattended PR lifecycle verified | **BLOCKED** | A real merge without routine owner intervention was demonstrated, but the merge gate is advisory: the agent holds the signing key and the evaluate job is not required by a ruleset (UAE-R7-12). It must be re-run with the kickoff authorization (UAE-R7-06). |
 | R7-PF-07 | Evidence-generation pipeline verified | **NOT_RUN** | Experiment D (a representative workflow producing its evidence automatically) was not run. The producers exist (verify-defect-closures, assertion-ratchet, release-comparison, conditor candidate-verification) but are not yet wired into a rehearsal pipeline (R7-AMD-04). |
 | R7-PF-08 | Candidate verification gates passed | **NOT_RUN** | The candidate-acceptance template has not run on GitHub (Experiment E not run). |
 | R7-PF-09 | Defect classes closed correctly | **NOT_RUN** | The verifier is merged, reviewed, and correctly refuses Rehearsal 6's closures. Rehearsal 7's own defect classes can only be closed, and this gate passed, against fix commits in Rehearsal 7's history before its freeze. |
-| R7-PF-10 | Forma contrast verified | **BLOCKED** | Merged as 6c344f6 (forma#173); not yet in a Forma release. |
+| R7-PF-10 | Forma contrast verified | **PASS** | Verified and released in the components Rehearsal 7 consumes. The Rehearsal 7 application must still pass its own UI-016 contrast obligations (DEC-R7-002 applies to text-paired amber). |
 | R7-PF-11 | Release comparison recorded | **NOT_RUN** | The record must be made at preflight against the kickoff set, immediately before the lock. The demonstration predates the releases this remediation needs (Arca, Forma, Conditor, Praxis), so it is not the record. |
 | R7-PF-12 | Independent adversarial review passed | **NOT_RUN** | The Indy-init tools' final review is PASS_WITH_FINDINGS with every finding fixed, Arca's PASS_WITH_FINDINGS (low, fixed) and Forma's PASS. Conditor's fixes were not re-reviewed, and the security review depends on the credential probe. |
 | R7-PF-13 | No unresolved critical defects | **NOT_RUN** | No Rehearsal 7 candidate exists. The defect-closure verifier must record each closure against a fix commit in Rehearsal 7's history. |
@@ -52,15 +52,15 @@ Needs:
 Needs:
 - Owner: create CAUSA_GITHUB_TOKEN (read-only on the data repository) and CAUSA_WRITE_TOKEN (write to kemiller2002/causa-write-test only) as repository secrets; the agent then dispatches the probe
 
-### R7-PF-05: CI starvation regression test passed (BLOCKED)
+### R7-PF-05: CI starvation regression test passed (PASS)
 
-- conditor#122 CI green (24 checks): ci-policy rules CIP-000..008 reproduce the Rehearsal 6 starvation on its workflows and pass the corrected scaffold
-- praxis#300 CI green (26 checks): starter workflow one run per ref, cancel-in-progress, 15-minute timeout
+- Released in Conditor 0.10.18 (v0.10.18, 2d6ae48e; conditor#122 merged as 9241290): `conditor ci-policy check` rules CIP-000..008 reproduce the Rehearsal 6 starvation on its workflows and pass the corrected scaffold; CI green
+- Released in Praxis 3.24.0 (v3.24.0, dccf8400; praxis#300 merged as 4e9993e): the starter workflow runs once per ref, cancels superseded runs, 15-minute timeout
+- Both in echelon-current 1.33.0, approved by the owner (echelon-registry#104, 7a2c27a)
 - evidence/r6-workflow-runs.tsv: the 22:22-23:54 history
 
 Needs:
-- Owner: release Conditor and Praxis with these changes
-- Owner: provide a disposable repository for Experiment B
+- Owner: a disposable repository for Experiment B (VM-019)
 
 ### R7-PF-06: Unattended PR lifecycle verified (BLOCKED)
 
@@ -78,11 +78,8 @@ Needs:
 
 ### R7-PF-08: Candidate verification gates passed (NOT_RUN)
 
-- conditor#122: candidate-acceptance.yml template (pinned SHA, ancestry check); reviewed
+- candidate-acceptance.yml template released in Conditor 0.10.18 (pinned SHA, ancestry check); reviewed
 - Rehearsal 6 deployed-smoke proved served SHA = candidate
-
-Needs:
-- Owner: release Conditor
 
 ### R7-PF-09: Defect classes closed correctly (NOT_RUN)
 
@@ -93,14 +90,13 @@ Needs:
 Needs:
 - Rehearsal 7: verify-defect-closures VERIFIED before the freeze
 
-### R7-PF-10: Forma contrast verified (BLOCKED)
+### R7-PF-10: Forma contrast verified (PASS)
 
-- forma#173: A11Y-NONTEXT-CONTRAST (WCAG 1.4.11, 3:1), status tokens, Chromium spec light/dark/forced colors on renderer output
+- Released in Forma 0.12.0 (v0.12.0, 38ba6701; forma#173 merged as 6c344f6): A11Y-NONTEXT-CONTRAST (WCAG 1.4.11, 3:1), status tokens, Chromium spec light/dark/forced colors on renderer output; CI green
 - Independent review PASS after fixes (fef95fc, af8903b)
 - Rehearsal 6 outline 1.95:1 now reported by the rule
-
-Needs:
-- Owner: release Forma with this change
+- npm consumers: @echelon-foundry/design-system 0.12.0 and @echelon-foundry/forma-workflow 1.2.0 (forma#175)
+- Forma 0.12.0 is in echelon-current 1.33.0, approved by the owner (echelon-registry#104, 7a2c27a)
 
 ### R7-PF-11: Release comparison recorded (NOT_RUN)
 
@@ -139,7 +135,7 @@ Needs:
 
 ## Owner actions that unblock the gates
 
-1. Done on 2026-10-29 on the owner's instruction: arca#47, conditor#122, praxis#300, forma#173 and indy-init#42 merged; releases of Arca, Forma, Praxis and Conditor and the echelon-registry update are in progress on the owner's instruction (R7-PF-05, 08, 10).
+1. Done on 2026-10-29 on the owner's instruction: the remediation PRs are merged; Arca 0.7.0, Forma 0.12.0 (and forma-workflow 1.2.0), Praxis 3.24.0 and Conditor 0.10.18 are released; echelon-current 1.33.0 selects them, approved by the owner (echelon-registry#104).
 2. Approve or decline R7-AMD-03..05, approve the v4 cut (K3), and publish the four-case causa-data catalog (K7, DEC-R7-006); K1, K2 and K4 are done (R7-PF-07, 14).
 3. Create `CAUSA_GITHUB_TOKEN` (read-only) and `CAUSA_WRITE_TOKEN` (write to `causa-write-test` only) (R7-PF-02, 04, 12; K6; DEC-R7-007 confirms the two-token split).
 4. UAE-R7-12: a ruleset on `main` requiring CI, `independent-review` and the Praxis evaluate job, and the trust store in an Actions secret (R7-PF-06).
