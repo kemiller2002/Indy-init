@@ -37,6 +37,11 @@ jobs:
           python3 -I tools/build-requirements-baseline.py . "$GITHUB_SHA" > "$RUNNER_TEMP/py.json"
           dotnet tools/requirements-compiler/src/bin/Release/net10.0/requirements-compiler.dll baseline . "$GITHUB_SHA" > "$RUNNER_TEMP/fs.json"
           cmp "$RUNNER_TEMP/py.json" "$RUNNER_TEMP/fs.json"
+      - name: Rehearsal 7 persistence requirements (ADR-R7-001) and the validator's negative controls
+        run: |
+          args="--root . --baseline requirements/causa-requirements-baseline-r7.json --previous requirements/causa-requirements-baseline-r6.json --trace docs/rehearsal-007/traceability.json"
+          dotnet fsi tools/validate-r7-persistence-requirements.fsx -- $args
+          dotnet fsi tools/validate-r7-persistence-requirements.fsx -- $args --self-test true
       - name: Check out the approved Causa GitHub adapter (indy-init-rehearsal-002 at its accepted commit)
         uses: actions/checkout@v4
         with:

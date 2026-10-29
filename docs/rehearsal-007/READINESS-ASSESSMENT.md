@@ -1,0 +1,63 @@
+# Rehearsal 7 readiness assessment (persistence requirements)
+
+**Requirements: READY.** The persistence requirements are written, validated and committed, and the baseline is pinned ([validation report](REQUIREMENTS-VALIDATION-REPORT.md)).
+
+**Kickoff: NOT READY.** The steps below must happen before Rehearsal 7 starts. None of them is application work, and none of them was done here: this task stops at validated requirements, and Rehearsal 7 is not started.
+
+| | |
+|---|---|
+| Decision | [ADR-R7-001](PERSISTENCE-ARCHITECTURE-DECISION.md), effective on the owner's merge (RDP-003) |
+| Requirements | [`docs/CAUSA-PERSISTENCE-REQUIREMENTS.md`](../CAUSA-PERSISTENCE-REQUIREMENTS.md), PERSIST-001 to PERSIST-055, plus 22 amended Rehearsal 6 requirements |
+| Baseline | `BL-CAUSA-INDY-INIT-7d44f5546bcd` ([`requirements/causa-requirements-baseline-r7.json`](../../requirements/causa-requirements-baseline-r7.json)) |
+| Traceability | [`DEFECT-TRACEABILITY.md`](DEFECT-TRACEABILITY.md), [`traceability.json`](traceability.json) |
+| Validator | `tools/validate-r7-persistence-requirements.fsx`, run in CI by `preflight-tooling.yml` together with its negative controls |
+
+## Still a from-requirements build
+
+- **Nothing to copy:** no application file was created, copied or migrated. Causa and every rehearsal repository are unchanged, and Rehearsal 6's results are unchanged.
+- **Copying is forbidden:** PERSIST-026 forbids copying, vendoring, translating or adapting application code, tests or scripts from Causa or Rehearsals 1 to 6. PAT-13 checks the candidate for byte-identical files.
+- **No extracted interfaces:** the interface freeze no longer extracts interfaces from R001 source. The R001 interface manifest is marked "not an input to Rehearsal 7".
+- **Behaviour only:** the requirements state behaviour, limits and tests, never an implementation.
+- **One existing link to old code, outside the build:** Indy-init's own preflight tooling still builds `tools/persistence-verification` against the Rehearsal 2 adapter, a Rehearsal 4 verifier (T05). It is not a Rehearsal 7 input, and no requirement points the agent at it. The owner may retire it with the v4 cut.
+
+## Before kickoff
+
+| # | Step | Who | Why |
+|---|---|---|---|
+| K1 | Review and merge the pull request that adds ADR-R7-001 and these requirements. Use a merge commit, so `7d44f55` stays reachable for the baseline pin | Owner | RDP-003: the decision takes effect on the owner's merge |
+| K2 | Confirm or change the values the agent chose in writing the requirements: three rebases, the reconciliation backoff, the conflict actions, no automatic save on reconnect, the marker format, one save in flight per tab, the copy-check threshold, and interfaces authored at kickoff ([ADR table](PERSISTENCE-ARCHITECTURE-DECISION.md#choices-made-in-writing-the-requirements)). A change means editing the requirements, re-pinning the baseline, and re-running the validator | Owner | These are engineering choices the instruction left open |
+| K3 | Cut compiled package **v4** from `BL-CAUSA-INDY-INIT-7d44f5546bcd`. The steps are K3a to K3f below, and the compiler must report PASS with plan-readiness READY and no permits | Agent, then owner | The R7 compile with the v3 curation fails V09, V11, V17 and V18 for curation reasons only |
+| K4 | Record Rehearsal 7 owner decisions for the scope carried from Rehearsal 6: DEC-R6-001 (read access), -002 (amber 3:1), -003/-004 and -011 (amendments), -006 (screen contracts), -007 (catalog), -010 (two tokens) | Owner | v3's curation applies them; v4 must not inherit them silently |
+| K5 | Close the Rehearsal 6 report's other recommendations, in preflight: G7 defect classes re-closed with fix SHAs in R7's own history; deploy gated on a green core job with visible test output; owner attestation through approving GitHub reviews; a truly read-only `CAUSA_GITHUB_TOKEN`; a Forma graph-outline token that measures at least 3:1 (UI-016-O11); a pre-lock newest-release comparison (VER-001/002); the tooling gaps D-03 and attestation types | Agent and owner | Item 5 of that list, R6-D-002 and R6-D-003, is closed by these requirements; the rest is not persistence work |
+| K6 | Confirm that the live test repository and `CAUSA_WRITE_TOKEN` exist. PAT-02, PAT-04 and PAT-10 must run live (PERSIST-025) | Owner | A fake-only pass is not live verification |
+
+The v4 cut (K3) has six parts:
+
+- **K3a:** a verification rule and evidence-category rules for `docs/CAUSA-PERSISTENCE-REQUIREMENTS.md`, so the 255 PERSIST obligations are classified. They should be integration, browser and live-provider for PAT-02 to PAT-11, unit for PAT-12, and accessibility for PAT-15.
+- **K3b:** a work item covering PERSIST-001 to PERSIST-055 (V09, V17).
+- **K3c:** the three v3 citations of replaced text re-cited (V11).
+- **K3d:** a `kickoff/rehearsal-007/approvals.causa.json` bound to the R7 baseline, with no records (V18, RDP-003).
+- **K3e:** test bindings regenerated by `propose-test-bindings`, including re-bindings for the superseded UI-006, UI-010-O2 and AR-035 obligations.
+- **K3f:** an R7 scope test in the compiler suite, as `R6ScopeTests` is for v3.
+
+## Risks the timed build will meet
+
+| Risk | Where the requirements handle it |
+|---|---|
+| Safari on iPad may not show a `beforeunload` warning | PERSIST-020 makes the save-state indicator the primary safeguard and requires the termination statement; PAT-09 checks the warning only where supported |
+| A failed `fetch` cannot always tell "not sent" from "sent and lost" | PERSIST-015: anything after sending is Unknown commit outcome and reconciled by marker and head; PERSIST-016: no automatic retry of a send that failed before sending |
+| The stale-head answer from `createCommitOnBranch` has to be recognised by its typed content | PERSIST-008 requires typed classification and a test of every class (PAT-03), live as well as fake |
+| Conflicts become visible when one investigation is open in two tabs | The intended consequence (ADR-R7-001). PERSIST-012's reapply re-decides through the engine, so the user keeps the work |
+| GitHub secondary rate limits during PAT-02 and PAT-08 | Rate limit is its own classification (PERSIST-008), and retries are bounded (PERSIST-016) |
+| Agents reintroduce browser storage through a library | PERSIST-003 and PERSIST-026 forbid it whatever the library; PAT-01 and PAT-13 inspect stores and the artifact |
+| Forma components | Status lozenge, operation status, conflict review and freshness exist at the Forma commit the current package pins (`28d1101`). The approved release set for R7 must still be resolved in preflight (DEP-CURRENT) |
+
+## Defects this change addresses
+
+| Defect | Closed by | Proven by |
+|---|---|---|
+| R6-D-002 cross-tab lost updates | No shared store and no cross-tab locking (PERSIST-002 to PERSIST-004); expected-head commits (PERSIST-006, PERSIST-013) | PAT-01, PAT-02, PAT-11, PAT-13 |
+| R6-D-003 offline retry loop | No offline queue (PERSIST-018); bounded mutations and reads (PERSIST-010, PERSIST-016); truthful Offline (PERSIST-031, PERSIST-032) | PAT-07, PAT-08, PAT-15 |
+| R6 GitHub conflict and rebase findings (R1-F-2, RF-F-3, RF-F-9, R6-D-001, R1-F-1, RF-F-7) | PERSIST-007 to PERSIST-012, PERSIST-015, PERSIST-021 to PERSIST-024, PERSIST-033 | PAT-03 to PAT-07, PAT-10, PAT-12, PAT-14, PAT-15 |
+
+These defects are closed in the requirements only. They are verified only when Rehearsal 7's candidate passes its PAT tests.
