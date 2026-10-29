@@ -1,6 +1,6 @@
 {
   "schema": "indy-init.r7-persistence-validation/1",
-  "baseline": "BL-CAUSA-INDY-INIT-7d44f5546bcd",
+  "baseline": "BL-CAUSA-INDY-INIT-8445ca11986f",
   "verdict": "PASS",
   "checks": [
     {

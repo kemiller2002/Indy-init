@@ -2,8 +2,8 @@
   "schema": "indy-init.requirements-validation-report/1",
   "source": {
     "repository": "kemiller2002/indy-init",
-    "commit": "7d44f5546bcd89fe7225e30147dfb2a9eee99a98",
-    "baselineSha256": "fa7600010f04e559b32a478e7e18df9d71ca75867eb1f7b7a9d097ad81827856"
+    "commit": "8445ca11986f7808190e4e33e30a4fe2d37981cd",
+    "baselineSha256": "579cd8f5953c4bd218332426e86cc87edb029ebc51968c8ad417ff50b0898dab"
   },
   "compilationVerdict": "FAIL",
   "compilationRule": "FAIL when any critical check reports a problem; the compiler then exits 3",
@@ -132,6 +132,7 @@
       "status": "FAIL",
       "problems": [
         "indy-init:docs/AGENT-DECISION-REDUCTION-PROFILE.md \"Exact production OAuth/Fides integration, provider deployment topology, and physical local browser durability require capability/security checks before selecting a concrete adapter.\" - quote not found",
+        "indy-init:docs/CAUSA-UI-EXPERIENCE-REQUIREMENTS.md \"Verify the three active-catalog investigations (EXT-DATA-013) load from the connected repository and replay\" - quote not found",
         "indy-init:docs/REHEARSAL-AGENT-INTERFACE-FREEZE.md \"Extract actual types and exported interfaces from accepted R001 F# source and Limen adapter.\" - quote not found",
         "indy-init:docs/REHEARSAL-AGENT-INTERFACE-FREEZE.md \"Provider-neutral operations: load, append with expected version, acknowledge remote persistence, surface conflict, and recover local edits.\" - quote not found"
       ]
@@ -231,7 +232,9 @@
       "critical": true,
       "status": "FAIL",
       "problems": [
-        "approvals file is bound to a different requirements baseline"
+        "approvals file is bound to a different requirements baseline",
+        "derived obligation UI-015-O2 clause \"the three active-catalog investigations (EXT-DATA-013) load from the connected repository and replay\" is not verbatim in the obligation text",
+        "derived obligation UI-015-O2 leaves obligation text that no clause accounts for: the four active-catalog investigations EXT-DATA-013 load from the connected repository replay"
       ]
     }
   ],

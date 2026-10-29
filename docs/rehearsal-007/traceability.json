@@ -1,7 +1,7 @@
 {
   "schema": "indy-init.r7-persistence-traceability/1",
   "decision": "ADR-R7-001",
-  "description": "Rehearsal 7 persistence requirements: historical defects linked to the requirements and tests that close them, and every Rehearsal 6 baseline obligation the change supersedes. Checked by tools/validate-r7-persistence-requirements.fsx.",
+  "description": "Rehearsal 7 requirements: historical defects linked to the requirements and tests that close them, and every Rehearsal 6 baseline obligation that ADR-R7-001 or a Rehearsal 7 owner decision (kickoff/rehearsal-007/owner-decisions.json) supersedes. Checked by tools/validate-r7-persistence-requirements.fsx.",
   "previousBaseline": {
     "path": "requirements/causa-requirements-baseline-r6.json",
     "id": "BL-CAUSA-INDY-INIT-856157a78d47"
@@ -308,6 +308,9 @@
         "PERSIST-031",
         "PERSIST-011",
         "PERSIST-012"
+      ],
+      "decision": [
+        "ADR-R7-001"
       ]
     },
     {
@@ -318,6 +321,9 @@
       "reason": "States where unsaved changes are preserved: only in the tab memory.",
       "replacedBy": [
         "PERSIST-020"
+      ],
+      "decision": [
+        "ADR-R7-001"
       ]
     },
     {
@@ -328,6 +334,9 @@
       "reason": "The offline default no longer preserves changes durably; they stay unsaved in the tab.",
       "replacedBy": [
         "PERSIST-018"
+      ],
+      "decision": [
+        "ADR-R7-001"
       ]
     },
     {
@@ -338,6 +347,9 @@
       "reason": "Build order step renamed from local persistence truth to session-local save-state truth.",
       "replacedBy": [
         "PERSIST-023"
+      ],
+      "decision": [
+        "ADR-R7-001"
       ]
     },
     {
@@ -348,6 +360,9 @@
       "reason": "Offline deep links open only investigations already loaded in the tab; no locally held store exists.",
       "replacedBy": [
         "PERSIST-017"
+      ],
+      "decision": [
+        "ADR-R7-001"
       ]
     },
     {
@@ -359,6 +374,9 @@
       "replacedBy": [
         "PERSIST-017",
         "PERSIST-018"
+      ],
+      "decision": [
+        "ADR-R7-001"
       ]
     },
     {
@@ -370,6 +388,9 @@
       "replacedBy": [
         "PERSIST-007",
         "PERSIST-031"
+      ],
+      "decision": [
+        "ADR-R7-001"
       ]
     },
     {
@@ -382,6 +403,9 @@
         "PERSIST-019",
         "PERSIST-020",
         "PERSIST-021"
+      ],
+      "decision": [
+        "ADR-R7-001"
       ]
     },
     {
@@ -393,6 +417,9 @@
       "replacedBy": [
         "PERSIST-011",
         "PERSIST-012"
+      ],
+      "decision": [
+        "ADR-R7-001"
       ]
     },
     {
@@ -404,6 +431,9 @@
       "replacedBy": [
         "PERSIST-003",
         "PERSIST-005"
+      ],
+      "decision": [
+        "ADR-R7-001"
       ]
     },
     {
@@ -416,6 +446,9 @@
         "PERSIST-002",
         "PERSIST-006",
         "PERSIST-007"
+      ],
+      "decision": [
+        "ADR-R7-001"
       ]
     },
     {
@@ -427,6 +460,9 @@
       "replacedBy": [
         "PERSIST-002",
         "PERSIST-031"
+      ],
+      "decision": [
+        "ADR-R7-001"
       ]
     },
     {
@@ -437,6 +473,9 @@
       "reason": "Persistence agent owns session-local state, not a local durable store.",
       "replacedBy": [
         "PERSIST-002"
+      ],
+      "decision": [
+        "ADR-R7-001"
       ]
     },
     {
@@ -447,6 +486,9 @@
       "reason": "Persistence agent owns session-local state, not a local durable store.",
       "replacedBy": [
         "PERSIST-002"
+      ],
+      "decision": [
+        "ADR-R7-001"
       ]
     },
     {
@@ -458,6 +500,9 @@
       "replacedBy": [
         "PERSIST-006",
         "PERSIST-007"
+      ],
+      "decision": [
+        "ADR-R7-001"
       ]
     },
     {
@@ -469,6 +514,9 @@
       "replacedBy": [
         "PERSIST-006",
         "PERSIST-007"
+      ],
+      "decision": [
+        "ADR-R7-001"
       ]
     },
     {
@@ -481,6 +529,9 @@
         "PERSIST-002",
         "PERSIST-003",
         "PERSIST-004"
+      ],
+      "decision": [
+        "ADR-R7-001"
       ]
     },
     {
@@ -494,6 +545,9 @@
         "PERSIST-009",
         "PERSIST-015",
         "PERSIST-026"
+      ],
+      "decision": [
+        "ADR-R7-001"
       ]
     },
     {
@@ -505,6 +559,9 @@
       "replacedBy": [
         "PERSIST-002",
         "PERSIST-006"
+      ],
+      "decision": [
+        "ADR-R7-001"
       ]
     },
     {
@@ -520,6 +577,9 @@
         "PERSIST-009",
         "PERSIST-012",
         "PERSIST-015"
+      ],
+      "decision": [
+        "ADR-R7-001"
       ]
     },
     {
@@ -530,6 +590,9 @@
       "reason": "Interfaces are authored at kickoff from requirements; earlier rehearsal source is not an input.",
       "replacedBy": [
         "PERSIST-026"
+      ],
+      "decision": [
+        "ADR-R7-001"
       ]
     },
     {
@@ -542,6 +605,108 @@
         "PERSIST-009",
         "PERSIST-015",
         "PERSIST-018"
+      ],
+      "decision": [
+        "ADR-R7-001"
+      ]
+    },
+    {
+      "requirement": "UI-001",
+      "document": "docs/CAUSA-UI-EXPERIENCE-REQUIREMENTS.md",
+      "priority": "P0",
+      "disposition": "amended",
+      "reason": "Four active-catalog investigations, including the burned-out lightbulb (DEC-R7-006).",
+      "replacedBy": [
+        "EXT-DATA-013"
+      ],
+      "decision": [
+        "DEC-R7-006"
+      ]
+    },
+    {
+      "requirement": "UI-015",
+      "document": "docs/CAUSA-UI-EXPERIENCE-REQUIREMENTS.md",
+      "priority": "P0",
+      "disposition": "amended",
+      "reason": "Four active-catalog investigations (DEC-R7-006).",
+      "replacedBy": [
+        "EXT-DATA-013"
+      ],
+      "decision": [
+        "DEC-R7-006"
+      ]
+    },
+    {
+      "requirement": "UI-031",
+      "document": "docs/CAUSA-UI-EXPERIENCE-REQUIREMENTS.md",
+      "priority": "P0",
+      "disposition": "amended",
+      "reason": "No user roles: the single-user criterion replaces role/access controls (DEC-R7-003).",
+      "replacedBy": [],
+      "decision": [
+        "DEC-R7-003"
+      ]
+    },
+    {
+      "requirement": "PF-014",
+      "document": "docs/PROVIDER-FIXTURE-AND-INTEGRATION-REQUIREMENTS.md",
+      "priority": "P0",
+      "disposition": "amended",
+      "reason": "Four catalog investigation reconstructions (DEC-R7-006).",
+      "replacedBy": [
+        "EXT-DATA-013"
+      ],
+      "decision": [
+        "DEC-R7-006"
+      ]
+    },
+    {
+      "requirement": "PF-015",
+      "document": "docs/PROVIDER-FIXTURE-AND-INTEGRATION-REQUIREMENTS.md",
+      "priority": "P0",
+      "disposition": "amended",
+      "reason": "A login is required for reads and writes, with no anonymous mode (DEC-R7-001); separate read and write secrets (DEC-R7-007).",
+      "replacedBy": [],
+      "decision": [
+        "DEC-R7-001",
+        "DEC-R7-007"
+      ]
+    },
+    {
+      "requirement": "PROVIDER-FIXTURE-AND-INTEGRATION§acceptance-scenarios",
+      "document": "docs/PROVIDER-FIXTURE-AND-INTEGRATION-REQUIREMENTS.md",
+      "priority": "unstated",
+      "disposition": "amended",
+      "reason": "All four catalog investigation digests (DEC-R7-006).",
+      "replacedBy": [
+        "EXT-DATA-013"
+      ],
+      "decision": [
+        "DEC-R7-006"
+      ]
+    },
+    {
+      "requirement": "EXT-DATA-013",
+      "document": "docs/REHEARSAL-EXTERNAL-DATA-BOUNDARY.md",
+      "priority": "P0",
+      "disposition": "amended",
+      "reason": "Four investigations, including the burned-out lightbulb; the three-case historical-v1 catalog and its waiver end (DEC-R7-006).",
+      "replacedBy": [],
+      "decision": [
+        "DEC-R7-006"
+      ]
+    },
+    {
+      "requirement": "AR-033",
+      "document": "docs/AGENT-RELIABILITY-REQUIREMENTS.md",
+      "priority": "P1",
+      "disposition": "amended",
+      "reason": "Preflight checks CAUSA_WRITE_TOKEN too (DEC-R7-007).",
+      "replacedBy": [
+        "PF-015"
+      ],
+      "decision": [
+        "DEC-R7-007"
       ]
     }
   ],
@@ -938,6 +1103,91 @@
         "PERSIST-009",
         "PERSIST-015",
         "PERSIST-018"
+      ]
+    },
+    {
+      "previous": "UI-001-O1",
+      "previousText": "Before Connect, show an accessible, empty, disconnected workspace with the explicit Connect data repository action (EXT-DATA-002); after Connect, show the connected repository's investigations and the user's working copies, which for the active demonstration catalog (causa-data historical-v1, EXT-DATA-013) are exactly Apollo 1 (AS-204), Apollo 11 and Space Shuttle Challenger (STS-51-L).",
+      "disposition": "superseded",
+      "supersededBy": [
+        "UI-001-O1",
+        "EXT-DATA-013"
+      ]
+    },
+    {
+      "previous": "UI-015-O2",
+      "previousText": "Verify the three active-catalog investigations (EXT-DATA-013) load from the connected repository and replay, verify the five frozen v1.0.0 fixtures replay as the storage contract's test corpus, keyboard/touch paths, graph textual equivalent, timeline ordering, legal command enforcement, save/sync truthfulness, offline/conflict recovery, responsive reflow, report fidelity, and startup failure.",
+      "disposition": "superseded",
+      "supersededBy": [
+        "UI-015-O2",
+        "EXT-DATA-013"
+      ]
+    },
+    {
+      "previous": "UI-031-O5",
+      "previousText": "Apply role/access controls to sensitive operational information and never expose credentials.",
+      "disposition": "superseded",
+      "supersededBy": [
+        "UI-031-O5"
+      ]
+    },
+    {
+      "previous": "PF-014-O2",
+      "previousText": "Confirm actual network communication, correct request-to-response association, three historical investigation reconstructions, expected versions/digests, and deployed application behavior.",
+      "disposition": "superseded",
+      "supersededBy": [
+        "PF-014-O2",
+        "EXT-DATA-013"
+      ]
+    },
+    {
+      "previous": "PF-015-O1",
+      "previousText": "Public read-only catalog tests should not require a PAT when anonymous access is sufficient.",
+      "disposition": "superseded",
+      "supersededBy": [
+        "PF-015-O1"
+      ]
+    },
+    {
+      "previous": "PF-015-O2",
+      "previousText": "Authenticated integration tests use an approved secret such as `CAUSA_GITHUB_TOKEN` when explicitly required, with least-privilege read-only permissions.",
+      "disposition": "superseded",
+      "supersededBy": [
+        "PF-015-O2"
+      ]
+    },
+    {
+      "previous": "PROVIDER-FIXTURE-AND-INTEGRATION§acceptance-scenarios-O8",
+      "previousText": "Real integration: approved GitHub repository and pinned catalog are fetched over the network; all three historical investigation digests match.",
+      "disposition": "superseded",
+      "supersededBy": [
+        "PROVIDER-FIXTURE-AND-INTEGRATION§acceptance-scenarios-O8",
+        "EXT-DATA-013"
+      ]
+    },
+    {
+      "previous": "EXT-DATA-013-O1",
+      "previousText": "The active demonstration catalog is the one named by causa-data `catalog/active.json` (historical-v1): exactly three historical investigations, Apollo 1 (AS-204), Apollo 11 and Space Shuttle Challenger (STS-51-L).",
+      "disposition": "superseded",
+      "supersededBy": [
+        "EXT-DATA-013-O1"
+      ]
+    },
+    {
+      "previous": "EXT-DATA-013-O2",
+      "previousText": "After an explicit Connect to that repository and workspace, the application MUST load all three through the full contract validation and F# replay pipeline to the states recorded in the catalog manifest, MUST NOT present any synthetic investigation as a catalog case, and MUST NOT bundle any of their records.",
+      "disposition": "superseded",
+      "supersededBy": [
+        "EXT-DATA-013-O2"
+      ]
+    },
+    {
+      "previous": "AR-033-O1",
+      "previousText": "Preflight MUST verify, without exposing values, that every repository secret and variable the pipeline reads is set: `CAUSA_GITHUB_TOKEN`, `CAUSA_TEST_REPO` and `DEPLOY_TARGET`.",
+      "disposition": "superseded",
+      "supersededBy": [
+        "AR-033-O1",
+        "PF-015"
       ]
     }
   ],

@@ -42,9 +42,9 @@ Each level must have an independently executable command, CI outcome, and eviden
 
 **PF-013 [P0] Real-provider conformance.** Maintain sanitized, versioned observations of actual GitHub status codes, response bodies, relevant headers, branch behavior, pagination, cache behavior, and retry semantics. Tests must detect fake/real divergence. Do not capture secrets, private payloads, or sensitive headers. Refresh observations when the provider contract changes.
 
-**PF-014 [P0] Live integration acceptance.** At defined integration checkpoints and before release acceptance, run a real GitHub provider test against the approved repository and pinned catalog. Confirm actual network communication, correct request-to-response association, three historical investigation reconstructions, expected versions/digests, and deployed application behavior. Record repository ref, source SHA, run ID, and provider mode. Never claim live success from mocks.
+**PF-014 [P0] Live integration acceptance.** At defined integration checkpoints and before release acceptance, run a real GitHub provider test against the approved repository and pinned catalog. Confirm actual network communication, correct request-to-response association, four catalog investigation reconstructions, expected versions/digests, and deployed application behavior. Record repository ref, source SHA, run ID, and provider mode. Never claim live success from mocks.
 
-**PF-015 [P0] Credentials and security.** Public read-only catalog tests should not require a PAT when anonymous access is sufficient. Authenticated integration tests use an approved secret such as `CAUSA_GITHUB_TOKEN` when explicitly required, with least-privilege read-only permissions. Never embed or print credentials, put them in URLs, or include them in screenshots, traces, logs, or artifacts. A missing secret yields BLOCKED, not PASS.
+**PF-015 [P0] Credentials and security.** Every catalog read and every write requires an authenticated GitHub credential; there is no anonymous mode (owner decision DEC-R7-001). Authenticated read tests use the approved secret `CAUSA_GITHUB_TOKEN`, with least-privilege read-only permissions. Live write tests use the separate secret `CAUSA_WRITE_TOKEN`, limited to contents write on the test repository; neither secret falls back to the other (DEC-R7-007). Never embed or print credentials, put them in URLs, or include them in screenshots, traces, logs, or artifacts. A missing secret yields BLOCKED, not PASS.
 
 **PF-016 [P0] Visual verification.** Fixture scenarios must exercise navy, teal, amber, coral, and ivory per UI-016, with textual state labels and contrast checks. Capture deployed exact-SHA screenshots at required desktop, iPad, and mobile sizes for final acceptance; local fixture screenshots alone do not satisfy deployed acceptance.
 
@@ -68,7 +68,7 @@ Each level must have an independently executable command, CI outcome, and eviden
 - Stale-response regression: request B supersedes A; B completes first; late A cannot replace B. Reverse completion order also tested.
 - Cache/auth regression: changing credentials invalidates relevant cached responses; an unauthorized request cannot be satisfied by stale cached success.
 - Visual checks: populated fixtures expose the complete UI-016 palette and labels; contrast and responsive checks pass.
-- Real integration: approved GitHub repository and pinned catalog are fetched over the network; all three historical investigation digests match.
+- Real integration: approved GitHub repository and pinned catalog are fetched over the network; all four catalog investigation digests match.
 - Gate honesty: disconnected integration or missing secret reports BLOCKED, not PASS, while deterministic offline checks remain independently green.
 - Traceability: each PF requirement is mapped to an implementation test and evidence record; no future rehearsal may silently omit an applicable P0 requirement.
 
