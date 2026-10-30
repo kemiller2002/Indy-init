@@ -244,4 +244,4 @@ At the owner's direction (2026-10-30), both sections now carry ADR-R7-001 supers
 | 9 | FAIL | 1 major, 4 minor |
 | 10 | FAIL | 1 major, 4 minor |
 
-This revision addresses all ten rounds; see [independent-review.md](independent-review.md).
+Review was closed after round 10 at the owner's direction, accepting the limitations R41-11 discloses; the round-10 remediation was not re-reviewed. This revision addresses all ten rounds; see [independent-review.md](independent-review.md).

@@ -6,6 +6,10 @@
 | Record | [analysis/independent-review.json](analysis/independent-review.json): every finding, its remediation and its status |
 | Caveat | The reviewer and the author of this record are both agents. The record is not an authenticated attestation; the owner's GitHub review of the pull request is the authentication |
 
+## Closure
+
+Review closed after round 10 at the owner's direction (2026-10-30): the owner accepted the known limitations disclosed in R41-11 and asked for the package to be merged. A round-11 review was started on 08cacfd and stopped before it reported, so the round-10 remediation (and the later font-dependent classification, dbdcc80) has not been independently re-reviewed.
+
 ## Rounds
 
 | Round | Reviewed | Verdict | Findings |

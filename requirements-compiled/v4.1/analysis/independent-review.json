@@ -717,5 +717,10 @@
         }
       ]
     }
-  ]
+  ],
+  "closure": {
+    "date": "2026-10-30",
+    "basis": "owner direction in the session",
+    "note": "Review closed after round 10 at the owner's direction (2026-10-30): the owner accepted the known limitations disclosed in R41-11 and asked for the package to be merged. A round-11 review was started on 08cacfd and stopped before it reported, so the round-10 remediation (and the later font-dependent classification, dbdcc80) has not been independently re-reviewed."
+  }
 }
