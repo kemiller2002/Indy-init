@@ -1,0 +1,106 @@
+{
+  "schema": "indy-init.v41-task-adjustments/1",
+  "description": "Changes v4.1 makes to v4's timed work items (requirements-compiled/v4/curation/tasks.json), with the reason for each. Every number is a planning estimate by the package author; none is measured. No work item is removed and no requirement leaves a work item: the compiler checks both. The DAG changes come from freezing interfaces before kickoff: consumers wait for the contracts (T14), not for the producer's implementation.",
+  "adjustments": [
+    {
+      "task": "T10",
+      "estimateMinutes": 25,
+      "rationale": "Preflight, before T0 (v4 gives it no estimate; 25 minutes is outside the timed window and not scheduled). Bootstrap now also writes every project file with its complete Compile list and an empty module per planned file (agent-file-ownership.json compileLists), so no agent edits a project file after the interface freeze.",
+      "evidence": "estimated"
+    },
+    {
+      "task": "T12",
+      "estimateMinutes": 15,
+      "rationale": "Invariants, state machines and the error matrix are already compiled (v4 invariants.json, state-machine-contracts.json, github-error-matrix.json); the task is writing the named failing-first tests, not deriving them.",
+      "evidence": "estimated"
+    },
+    {
+      "task": "T14",
+      "estimateMinutes": 5,
+      "dependsOn": [
+        {
+          "task": "T10",
+          "reason": "the frozen contracts (interface-specifications.json) are copied into each project's Contracts file and typechecked; they need the empty projects, not the kernel's implementation"
+        }
+      ],
+      "rationale": "The interfaces are specified and typechecked before kickoff, so the freeze is a copy and a build, not a negotiation. T14 no longer waits for the kernel (T13): the contracts fix the types, and the kernel implements them.",
+      "evidence": "estimated"
+    },
+    {
+      "task": "T13",
+      "estimateMinutes": 45,
+      "dependsOn": [
+        {
+          "task": "T12",
+          "reason": "decisions are implemented against the invariant tests written first"
+        },
+        {
+          "task": "T14",
+          "reason": "the kernel implements the frozen IF41-DOMAIN contract"
+        }
+      ],
+      "rationale": "Unchanged estimate; now implements the frozen kernel contract.",
+      "evidence": "estimated"
+    },
+    {
+      "task": "T18",
+      "estimateMinutes": 35,
+      "rationale": "The provider-conformance probe records live answers against a prepared classification (github-error-matrix.json) instead of discovering the classes: 15 rows, each with its detection evidence and test.",
+      "evidence": "estimated"
+    },
+    {
+      "task": "T19",
+      "estimateMinutes": 50,
+      "dependsOn": [
+        {
+          "task": "T14",
+          "reason": "implements the frozen IF41-SAVE contract"
+        },
+        {
+          "task": "T18",
+          "reason": "tested against the stateful fake built from the live recordings"
+        }
+      ],
+      "rationale": "Every transition of SM-SAVE and SM-CONFLICT, its guard, effects and fault are enumerated (state-machine-contracts.json); the agent implements a table instead of interpreting prose. In v4, T19 waited for the kernel through T14 (T14 depended on T13); with the contracts frozen before the kernel, it does not. Replay verification against the real kernel is exercised at integration (T21).",
+      "evidence": "estimated"
+    },
+    {
+      "task": "T21",
+      "estimateMinutes": 25,
+      "dependsOn": [
+        {
+          "task": "T20",
+          "reason": "exercises the GitHub provider"
+        },
+        {
+          "task": "T17",
+          "reason": "builds on the first end-to-end path"
+        },
+        {
+          "task": "T13",
+          "reason": "live replay verification needs the real kernel"
+        }
+      ],
+      "rationale": "Unchanged estimate; now explicitly joins the kernel and the persistence lane.",
+      "evidence": "estimated"
+    },
+    {
+      "task": "T16",
+      "estimateMinutes": 30,
+      "rationale": "The Forma layout contract names the patterns, tokens, breakpoints and viewports; the shell composes Forma patterns rather than inventing layout. Rehearsal 7 spent time after the deadline on nonexistent Forma tokens.",
+      "evidence": "estimated"
+    },
+    {
+      "task": "T22",
+      "estimateMinutes": 60,
+      "rationale": "Same basis as T16: the reuse list maps each view to Forma patterns, and FL-01..FL-10 state the layout assertions up front.",
+      "evidence": "estimated"
+    },
+    {
+      "task": "T31",
+      "estimateMinutes": 40,
+      "rationale": "The verification execution plan groups the release-candidate suites by environment with one shared fixture per suite, so the candidate run sets up the deployed app and the live provider once per suite instead of once per test.",
+      "evidence": "estimated"
+    }
+  ]
+}

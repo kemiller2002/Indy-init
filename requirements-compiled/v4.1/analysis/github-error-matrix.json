@@ -1,0 +1,504 @@
+{
+  "schema": "indy-init.v41-github-error-matrix/1",
+  "description": "Normative classification of every GitHub answer the event build handles, restating PERSIST-008, -010, -015, -016 and -024 with the answer forms recorded so far. Each row says how the class is detected (never by HTTP status alone where GitHub gives a status several meanings), the typed error of interfaces IF41-ERRORS, the state-machine transition, what the user sees, the retry policy and its maximum, reconciliation, recovery and the bound tests that prove it. The provider-conformance task T18 records the live forms; a form not in this matrix is GH-UNKNOWN-OUTCOME for a mutation and a failed read otherwise until the matrix is amended through the coordinator.",
+  "bounds": {
+    "mutationsPerSaveRequest": 4,
+    "automaticRebases": 3,
+    "automaticReconciliationReads": 3,
+    "source": "PERSIST-010, PERSIST-016"
+  },
+  "classes": [
+    {
+      "id": "GH-AUTH",
+      "class": "Authentication failure",
+      "operations": [
+        "graphql:createCommitOnBranch",
+        "rest:ref",
+        "rest:contents",
+        "rest:compare",
+        "rest:commit"
+      ],
+      "httpStatuses": [
+        401
+      ],
+      "detection": "HTTP 401 on any request (bad, expired or revoked token). No other class uses 401.",
+      "nonStatusEvidence": [
+        "status:401"
+      ],
+      "typedError": "AuthenticationFailed",
+      "transition": "SM-SAVE CredentialRefused (T-S18); SM-CONNECTION AuthFailed (T-N04); SM-LOAD LoadRejected (T-L04)",
+      "userVisible": "Save failed: 'GitHub refused the credential; your changes are kept in this tab.' Action: Reconnect (PERSIST-031-O22).",
+      "retry": "none",
+      "maxAttempts": 0,
+      "reconciliation": "none: nothing was written",
+      "recovery": "Reconnect with a new credential (re-authentication keeping work is proposed in ODR-V4-04)",
+      "tests": [
+        "dotnet:Causa.Acceptance.Live.PERSIST042Tests.PERSIST-042-O3",
+        "dotnet:Causa.Acceptance.Live.PF015Tests.PF-015-O1"
+      ],
+      "requirements": [
+        "PERSIST-008",
+        "PERSIST-031",
+        "PF-015"
+      ]
+    },
+    {
+      "id": "GH-PERMISSION",
+      "class": "Permission denied",
+      "operations": [
+        "graphql:createCommitOnBranch",
+        "rest:contents",
+        "rest:ref"
+      ],
+      "httpStatuses": [
+        403,
+        404
+      ],
+      "detection": "HTTP 403 with no rate-limit evidence (x-ratelimit-remaining is not 0, no retry-after header, message names neither a rate limit nor abuse) and, for GraphQL, an error of type FORBIDDEN whose message is not the moved-head form; or HTTP 404 on the repository endpoint during Connect, where GitHub hides repositories the token cannot read.",
+      "nonStatusEvidence": [
+        "header:x-ratelimit-remaining!=0",
+        "header:retry-after absent",
+        "message names no rate limit or abuse",
+        "404: repository or branch access not confirmed by Connect"
+      ],
+      "typedError": "PermissionDenied",
+      "transition": "SM-SAVE ProviderRefused (T-S17); SM-CONNECTION ConnectRefused (T-N03)",
+      "userVisible": "Save failed: 'This credential cannot write to the repository; your changes are kept in this tab.' Retry is not offered.",
+      "retry": "none",
+      "maxAttempts": 0,
+      "reconciliation": "none",
+      "recovery": "Connect with a credential that has contents write (PF-015-O3); write permission is never inferred from a read (DEC-R7-001)",
+      "tests": [
+        "dotnet:Causa.Acceptance.Live.PERSIST042Tests.PERSIST-042-O3",
+        "dotnet:Causa.Acceptance.Live.PF015Tests.PF-015-O3"
+      ],
+      "requirements": [
+        "PERSIST-008",
+        "EXT-DATA-005",
+        "PF-015"
+      ]
+    },
+    {
+      "id": "GH-RATE-PRIMARY",
+      "class": "Primary rate limit",
+      "operations": [
+        "graphql:createCommitOnBranch",
+        "rest:ref",
+        "rest:contents",
+        "rest:compare",
+        "rest:commit"
+      ],
+      "httpStatuses": [
+        403,
+        429
+      ],
+      "detection": "HTTP 403 or 429 with x-ratelimit-remaining: 0; x-ratelimit-reset gives the reset time.",
+      "nonStatusEvidence": [
+        "header:x-ratelimit-remaining=0",
+        "header:x-ratelimit-reset"
+      ],
+      "typedError": "RateLimited (Primary)",
+      "transition": "SM-SAVE ProviderRefused (T-S17); during reconciliation the read counts as ReconcileReadFailed (T-S29)",
+      "userVisible": "Save failed: 'GitHub's rate limit was reached; try again after <reset time>. Your changes are kept in this tab.' Retry after the reset.",
+      "retry": "no automatic mutation retry; a reconciliation read counts against its three automatic reads",
+      "maxAttempts": 3,
+      "reconciliation": "an unknown outcome stays Unknown until a read succeeds",
+      "recovery": "Retry after x-ratelimit-reset",
+      "tests": [
+        "dotnet:Causa.Acceptance.Live.PERSIST042Tests.PERSIST-042-O3",
+        "dotnet:Causa.Invariants.Negative.INV22.RecordedGitHubAnswerForms"
+      ],
+      "requirements": [
+        "PERSIST-008",
+        "PERSIST-016",
+        "PERSIST-024"
+      ]
+    },
+    {
+      "id": "GH-RATE-SECONDARY",
+      "class": "Secondary rate limit or abuse detection",
+      "operations": [
+        "graphql:createCommitOnBranch",
+        "rest:contents"
+      ],
+      "httpStatuses": [
+        403,
+        429
+      ],
+      "detection": "HTTP 403 or 429 with a retry-after header, or a message that mentions a secondary rate limit, 'too quickly' or abuse detection; GraphQL errors of type RATE_LIMITED. Rehearsal 7 observed the 403 form during concurrent live writers (KD-020).",
+      "nonStatusEvidence": [
+        "header:retry-after present",
+        "message: secondary rate limit, 'too quickly' or abuse",
+        "graphql error type RATE_LIMITED"
+      ],
+      "typedError": "RateLimited (Secondary)",
+      "transition": "SM-SAVE ProviderRefused (T-S17)",
+      "userVisible": "Save failed: 'GitHub asked us to slow down; try again in <retry-after> seconds. Your changes are kept in this tab.' Never worded as a permission problem.",
+      "retry": "no automatic mutation retry",
+      "maxAttempts": 0,
+      "reconciliation": "none: GitHub refused before writing",
+      "recovery": "Retry after retry-after seconds",
+      "tests": [
+        "dotnet:Causa.Invariants.Negative.INV22.RecordedGitHubAnswerForms",
+        "dotnet:Causa.Acceptance.Live.PERSIST042Tests.PERSIST-042-O3"
+      ],
+      "requirements": [
+        "PERSIST-008",
+        "PERSIST-024"
+      ]
+    },
+    {
+      "id": "GH-STALE-HEAD",
+      "class": "Stale expected head",
+      "operations": [
+        "graphql:createCommitOnBranch"
+      ],
+      "httpStatuses": [
+        200
+      ],
+      "detection": "GraphQL response with errors whose type is STALE_DATA, or whose message has the form 'is at <oid> but expected <oid>' (returned with type FORBIDDEN; observed live in Rehearsal 7, KD-022), or 'Expected branch to point to <oid>'. Classified from the error content, never from the HTTP status (GraphQL answers 200).",
+      "nonStatusEvidence": [
+        "graphql error type STALE_DATA",
+        "graphql FORBIDDEN message 'is at <oid> but expected <oid>'",
+        "message 'Expected branch to point to'"
+      ],
+      "typedError": "StaleHead",
+      "transition": "SM-SAVE StaleHeadUnrelated (T-S14/T-S15) or StaleHeadSameInvestigation (T-S16) after a fresh head read and file comparison",
+      "userVisible": "Saving continues during an automatic rebase; Conflict only when the investigation's own files differ (PERSIST-011).",
+      "retry": "automatic rebase after a fresh head read",
+      "maxAttempts": 3,
+      "reconciliation": "none: nothing was written",
+      "recovery": "Rebase (unrelated) or the three conflict actions (same investigation)",
+      "tests": [
+        "dotnet:Causa.Acceptance.Live.PERSIST042Tests.PERSIST-042-O2",
+        "dotnet:Causa.Acceptance.Live.PERSIST008Tests.PERSIST-008-O1",
+        "dotnet:Causa.Invariants.Live.INV22.ThreeSimultaneousCommits",
+        "dotnet:Causa.Acceptance.Deterministic.PERSIST047Tests.PERSIST-047-O3"
+      ],
+      "requirements": [
+        "PERSIST-008",
+        "PERSIST-009",
+        "PERSIST-010",
+        "PERSIST-011"
+      ]
+    },
+    {
+      "id": "GH-VALIDATION",
+      "class": "Validation failure",
+      "operations": [
+        "graphql:createCommitOnBranch",
+        "rest:contents"
+      ],
+      "httpStatuses": [
+        200,
+        422
+      ],
+      "detection": "REST 422; GraphQL errors whose type is UNPROCESSABLE or an input-validation type other than STALE_DATA (for example a path outside the investigation prefix, which the adapter must refuse before sending, PERSIST-006).",
+      "nonStatusEvidence": [
+        "REST 422",
+        "graphql error type UNPROCESSABLE or input validation other than STALE_DATA"
+      ],
+      "typedError": "ValidationFailed",
+      "transition": "SM-SAVE ProviderRefused (T-S17)",
+      "userVisible": "Save failed: 'GitHub refused the change as invalid: <message>. Your changes are kept in this tab.' Retry is not offered.",
+      "retry": "none",
+      "maxAttempts": 0,
+      "reconciliation": "none",
+      "recovery": "None automatic; the defect is in the change and is reported",
+      "tests": [
+        "dotnet:Causa.Acceptance.Live.PERSIST042Tests.PERSIST-042-O3"
+      ],
+      "requirements": [
+        "PERSIST-006",
+        "PERSIST-008"
+      ]
+    },
+    {
+      "id": "GH-NOT-FOUND",
+      "class": "Missing resource",
+      "operations": [
+        "rest:contents",
+        "rest:ref",
+        "graphql:createCommitOnBranch"
+      ],
+      "httpStatuses": [
+        404,
+        200
+      ],
+      "detection": "REST 404 on a file or ref read at a named commit, after Connect confirmed repository access; GraphQL errors of type NOT_FOUND (branch missing).",
+      "nonStatusEvidence": [
+        "REST 404 on a file or ref read at a named commit after Connect confirmed access",
+        "graphql error type NOT_FOUND"
+      ],
+      "typedError": "NotFound",
+      "transition": "Save path: the investigation was deleted, so StaleHeadSameInvestigation (T-S16) and Conflict (PERSIST-011); conflict re-read: RemoteMissingOrInvalid (T-C03); load: LoadRejected (T-L04)",
+      "userVisible": "Conflict: 'This investigation was deleted or rewritten on GitHub; your changes are kept.' Load: 'not found in the repository'.",
+      "retry": "none",
+      "maxAttempts": 0,
+      "reconciliation": "none",
+      "recovery": "Conflict actions; export of unsaved commands is proposed in ODR-V4-05",
+      "tests": [
+        "dotnet:Causa.Acceptance.Deterministic.PERSIST011Tests.PERSIST-011-O5"
+      ],
+      "requirements": [
+        "PERSIST-011",
+        "PERSIST-021"
+      ]
+    },
+    {
+      "id": "GH-HISTORY-REWRITTEN",
+      "class": "Rewritten history",
+      "operations": [
+        "rest:compare"
+      ],
+      "httpStatuses": [
+        200,
+        404
+      ],
+      "detection": "The compare base...head reports status 'diverged' or 'behind' for the expected head, or the expected head commit is no longer reachable (compare 404), during reconciliation.",
+      "nonStatusEvidence": [
+        "compare status diverged or behind",
+        "compare 404 for the expected head commit"
+      ],
+      "typedError": "HistoryRewritten",
+      "transition": "SM-SAVE ReconcileHistoryRewritten (T-S28)",
+      "userVisible": "Save failed: 'The branch history on GitHub was rewritten; nothing is reported as saved. Your changes are kept in this tab.'",
+      "retry": "none",
+      "maxAttempts": 0,
+      "reconciliation": "reconciliation stops",
+      "recovery": "Reload from GitHub after the user decides",
+      "tests": [
+        "dotnet:Causa.Acceptance.Deterministic.PERSIST015Tests.PERSIST-015-O9",
+        "dotnet:Causa.Acceptance.Deterministic.PERSIST045Tests.PERSIST-045-O6"
+      ],
+      "requirements": [
+        "PERSIST-015"
+      ]
+    },
+    {
+      "id": "GH-NETWORK-BEFORE",
+      "class": "Network failure before sending",
+      "operations": [
+        "graphql:createCommitOnBranch",
+        "rest:ref",
+        "rest:contents",
+        "rest:compare",
+        "rest:commit"
+      ],
+      "httpStatuses": [],
+      "detection": "The browser reports offline, or fetch fails before the request was sent (NotAnswered FailedBeforeSending). No HTTP status exists.",
+      "nonStatusEvidence": [
+        "transport: FailedBeforeSending",
+        "browser offline"
+      ],
+      "typedError": "NetworkUnavailable (FailedBeforeSending)",
+      "transition": "SM-SAVE FailedBeforeSending (T-S20) -> Offline; SM-NETWORK OfflineObserved (T-W01); a rebase-path read: RebaseReadFailed (T-S57 offline)",
+      "userVisible": "Offline: 'Your changes exist only in this tab and cannot be saved until the connection returns.' Never Conflict.",
+      "retry": "none: a save that failed before sending is never retried automatically",
+      "maxAttempts": 0,
+      "reconciliation": "none: nothing was sent",
+      "recovery": "Save again after the connection returns",
+      "tests": [
+        "playwright:acceptance/PERSIST-046.spec.js > PERSIST-046-O3 [chromium]",
+        "playwright:acceptance/PERSIST-046.spec.js > PERSIST-046-O3 [webkit]",
+        "dotnet:Causa.Acceptance.Deterministic.PERSIST047Tests.PERSIST-047-O2",
+        "playwright:acceptance/PERSIST-046.spec.js > PERSIST-046-O1 [chromium]",
+        "playwright:acceptance/PERSIST-046.spec.js > PERSIST-046-O1 [webkit]"
+      ],
+      "requirements": [
+        "PERSIST-016",
+        "PERSIST-018",
+        "PERSIST-024"
+      ]
+    },
+    {
+      "id": "GH-NETWORK-AFTER",
+      "class": "Network failure after sending or timeout",
+      "operations": [
+        "graphql:createCommitOnBranch",
+        "rest:ref",
+        "rest:contents",
+        "rest:compare",
+        "rest:commit"
+      ],
+      "httpStatuses": [],
+      "detection": "NotAnswered LostAfterSending or TimedOut. For a mutation this is an unknown outcome; for a read it is a failed read.",
+      "nonStatusEvidence": [
+        "transport: LostAfterSending",
+        "transport: TimedOut"
+      ],
+      "typedError": "NetworkUnavailable (LostAfterSending | TimedOut)",
+      "transition": "Mutation: AnswerLost (T-S19) -> Unknown commit outcome. Reconciliation read: ReconcileReadFailed (T-S29). Rebase-path read while online: RebaseReadFailed (T-S59). Read-back: ReadBackReadFailed (T-S58). Conflict re-read: RemoteReadFailed (T-C02)",
+      "userVisible": "Unknown commit outcome: 'The save may or may not have reached GitHub; checking.' Check again after the automatic reads.",
+      "retry": "reconciliation reads at least 2, 4 and 8 seconds apart, plus one per offline-to-online change",
+      "maxAttempts": 3,
+      "reconciliation": "PERSIST-015: marker and head decide before any resend",
+      "recovery": "Check again; resend only when reconciliation proves nothing was written",
+      "tests": [
+        "dotnet:Causa.Acceptance.Deterministic.PERSIST045Tests.PERSIST-045-O2",
+        "dotnet:Causa.Acceptance.Deterministic.PERSIST047Tests.PERSIST-047-O3",
+        "dotnet:Causa.Invariants.Property.INV03.LostAnswerNeverConflictOrFailure",
+        "playwright:acceptance/PERSIST-046.spec.js > PERSIST-046-O4 [chromium]",
+        "playwright:acceptance/PERSIST-046.spec.js > PERSIST-046-O4 [webkit]",
+        "dotnet:Causa.Acceptance.Deterministic.PERSIST015Tests.PERSIST-015-O10"
+      ],
+      "requirements": [
+        "PERSIST-015",
+        "PERSIST-016"
+      ]
+    },
+    {
+      "id": "GH-UNKNOWN-OUTCOME",
+      "class": "Unrecognised or server-error answer to a mutation",
+      "operations": [
+        "graphql:createCommitOnBranch"
+      ],
+      "httpStatuses": [
+        500,
+        502,
+        503,
+        504,
+        200
+      ],
+      "detection": "HTTP 5xx on the mutation, or a 200 GraphQL answer with an error type the classifier does not recognise. PERSIST-015 counts any unrecognised answer as unknown.",
+      "nonStatusEvidence": [
+        "status 5xx on a mutation",
+        "graphql error type not recognised by the classifier"
+      ],
+      "typedError": "Unrecognised",
+      "transition": "SM-SAVE AnswerLost (T-S19) -> Unknown commit outcome",
+      "userVisible": "Unknown commit outcome (as GH-NETWORK-AFTER).",
+      "retry": "as GH-NETWORK-AFTER",
+      "maxAttempts": 3,
+      "reconciliation": "PERSIST-015 reconciliation",
+      "recovery": "As GH-NETWORK-AFTER",
+      "tests": [
+        "dotnet:Causa.Acceptance.Deterministic.PERSIST045Tests.PERSIST-045-O1",
+        "dotnet:Causa.Acceptance.Deterministic.PERSIST015Tests.PERSIST-015-O2"
+      ],
+      "requirements": [
+        "PERSIST-015"
+      ]
+    },
+    {
+      "id": "GH-MALFORMED",
+      "class": "Malformed response",
+      "operations": [
+        "graphql:createCommitOnBranch",
+        "rest:contents",
+        "rest:compare",
+        "rest:commit"
+      ],
+      "httpStatuses": [
+        200
+      ],
+      "detection": "A 2xx answer whose body does not decode, or lacks a required field (the commit oid of a mutation, the content of a file). For a mutation this is unknown; for a read it is a failed read.",
+      "nonStatusEvidence": [
+        "2xx body does not decode",
+        "required field missing"
+      ],
+      "typedError": "Malformed",
+      "transition": "Mutation: AnswerLost (T-S19); read: the read-failure event of the path (T-S29, T-S58, T-S59, T-C02, T-L04)",
+      "userVisible": "As the path's state: Unknown commit outcome for a mutation, the read's failure state for a read.",
+      "retry": "as the path",
+      "maxAttempts": 3,
+      "reconciliation": "PERSIST-015 for a mutation",
+      "recovery": "As the path",
+      "tests": [
+        "dotnet:Causa.Acceptance.Deterministic.PERSIST015Tests.PERSIST-015-O2",
+        "dotnet:Causa.Invariants.Negative.INV22.RecordedGitHubAnswerForms"
+      ],
+      "requirements": [
+        "PERSIST-015",
+        "PERSIST-024"
+      ]
+    },
+    {
+      "id": "GH-READBACK-MISMATCH",
+      "class": "Failed read-back verification",
+      "operations": [
+        "rest:contents"
+      ],
+      "httpStatuses": [
+        200
+      ],
+      "detection": "The re-read at the returned commit decodes but its bytes differ from the written bytes, or the reconciliation finds this save's marker on a commit whose bytes differ.",
+      "nonStatusEvidence": [
+        "re-read bytes differ from written bytes",
+        "marker found on a commit whose bytes differ"
+      ],
+      "typedError": "ReadBackMismatch",
+      "transition": "SM-SAVE ReadBackMismatched (T-S13) or ReconcileMarkerBytesDiffer (T-S23)",
+      "userVisible": "Save failed: 'GitHub holds different bytes than this save wrote; nothing is reported as saved. Your changes are kept in this tab.'",
+      "retry": "none",
+      "maxAttempts": 0,
+      "reconciliation": "none",
+      "recovery": "Retry after review",
+      "tests": [
+        "dotnet:Causa.Acceptance.Deterministic.PERSIST007Tests.PERSIST-007-O1",
+        "dotnet:Causa.Acceptance.Deterministic.PERSIST015Tests.PERSIST-015-O6",
+        "dotnet:Causa.Acceptance.Deterministic.PERSIST045Tests.PERSIST-045-O6"
+      ],
+      "requirements": [
+        "PERSIST-007",
+        "PERSIST-015"
+      ]
+    },
+    {
+      "id": "GH-LARGE-FILE",
+      "class": "File too large for the contents API",
+      "operations": [
+        "rest:contents"
+      ],
+      "httpStatuses": [
+        200,
+        403
+      ],
+      "detection": "The contents API answers encoding 'none' or a 403 too_large error for a file over 1 MB. Not an error for the user: the read is repeated once through the Git blobs API.",
+      "nonStatusEvidence": [
+        "contents API encoding 'none'",
+        "403 error code too_large"
+      ],
+      "typedError": "none (re-read through the blobs API)",
+      "transition": "no transition; the read continues",
+      "userVisible": "none",
+      "retry": "one re-read through the Git blobs API",
+      "maxAttempts": 1,
+      "reconciliation": "none",
+      "recovery": "Read through the Git blobs API (Rehearsal 7 F11)",
+      "tests": [
+        "dotnet:Causa.Acceptance.Live.PERSIST007Tests.ReadBackOfFileOver1MB"
+      ],
+      "requirements": [
+        "PERSIST-007"
+      ]
+    },
+    {
+      "id": "GH-TRUNCATED-LIST",
+      "class": "Truncated commit listing",
+      "operations": [
+        "rest:compare"
+      ],
+      "httpStatuses": [
+        200
+      ],
+      "detection": "A compare answer reports more commits than it lists (GitHub lists at most 250). Not an error: reconciliation pages through the commits after the expected head.",
+      "nonStatusEvidence": [
+        "compare total_commits greater than commits listed"
+      ],
+      "typedError": "none (paged read)",
+      "transition": "no transition; reconciliation continues",
+      "userVisible": "none",
+      "retry": "page until every commit after the expected head is read; each page is a reconciliation read",
+      "maxAttempts": 3,
+      "reconciliation": "PERSIST-015 needs every commit after the expected head",
+      "recovery": "Page through the commits list (Rehearsal 7 F10)",
+      "tests": [
+        "dotnet:Causa.Acceptance.Deterministic.PERSIST015Tests.ReconcileBeyond250Commits"
+      ],
+      "requirements": [
+        "PERSIST-015"
+      ]
+    }
+  ]
+}

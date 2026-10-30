@@ -1107,6 +1107,113 @@ let v4Command (args: string list) : int =
             eprintfn "input error: %s" ex.Message
             2
 
+/// Reads the Forma npm tarball in memory (it is never extracted to disk) and returns its SHA-256, dist/all.css and
+/// figma/component-contracts.json.
+let formaFromTarball (path: string) : string * string * Json =
+    let bytes = File.ReadAllBytes path
+    use gz = new IO.Compression.GZipStream(new MemoryStream(bytes), IO.Compression.CompressionMode.Decompress)
+    use tar = new Formats.Tar.TarReader(gz)
+    let rec read (acc: Map<string, byte[]>) =
+        match tar.GetNextEntry() with
+        | null -> acc
+        | e when (e.Name = "package/dist/all.css" || e.Name = "package/figma/component-contracts.json") && not (isNull e.DataStream) ->
+            use ms = new MemoryStream()
+            e.DataStream.CopyTo ms
+            read (acc.Add(e.Name, ms.ToArray()))
+        | _ -> read acc
+    let entries = read Map.empty
+    let get n = match entries.TryFind n with Some b -> b | None -> failwithf "%s is not in the Forma tarball" n
+    Git.sha256Hex bytes, Text.Encoding.UTF8.GetString(get "package/dist/all.css"), parseBytes (get "package/figma/component-contracts.json")
+
+/// Reads every input of the v4.1 stage: v4's plan, manifest, machines, tasks and policy, and the authored v4.1 inputs.
+let v41Inputs (source: string) (package: string) (basePackage: string) (formaTarball: string option) : V41Package.Inputs =
+    let a n = Path.Combine(package, "analysis", n)
+    let authored = [ "interface-specifications.json"; "project-structure.json"; "github-error-matrix.json"; "forma-layout-contract.json"; "task-adjustments.json"; "conflict-telemetry.json" ]
+    let forma = parseFile (a "forma-layout-contract.json")
+    let formaSpec = field "forma" forma |> Option.defaultValue JNull
+    let inventoryPath = Path.Combine(package, str "inventory" formaSpec)
+    let extract =
+        formaTarball |> Option.map (fun t ->
+            let sha, css, contracts = formaFromTarball t
+            if sha <> str "tarballSha256" formaSpec then failwithf "the Forma tarball has sha256 %s, the layout contract names %s" sha (str "tarballSha256" formaSpec)
+            V41Package.formaInventory (str "version" formaSpec) sha css contracts)
+    let planBytes = File.ReadAllBytes(Path.Combine(basePackage, "verification-plan.json"))
+    { PlanBytes = planBytes
+      Plan = parseBytes planBytes
+      BaseManifest = parseFile (Path.Combine(basePackage, "freeze-manifest.json"))
+      Baseline = parseFile (Path.Combine(source, "requirements", "causa-requirements-baseline-v4.json"))
+      StateMachines = parseFile (Path.Combine(basePackage, "state-machines.json"))
+      Tasks = parseFile (Path.Combine(basePackage, "curation", "tasks.json")) |> arr "tasks" |> List.map taskOf
+      Policy = parseFile (Path.Combine(basePackage, "analysis", "execution-policy.json"))
+      Interfaces = parseFile (a "interface-specifications.json")
+      Structure = parseFile (a "project-structure.json")
+      ErrorMatrix = parseFile (a "github-error-matrix.json")
+      Forma = forma
+      Adjustments = parseFile (a "task-adjustments.json")
+      Telemetry = parseFile (a "conflict-telemetry.json")
+      FormaInventory =
+        if File.Exists inventoryPath then parseFile inventoryPath
+        else match extract with Some x -> x | None -> failwithf "%s is missing; generate it with --forma-tarball" inventoryPath
+      FormaExtract = extract
+      AuthoredText =
+        (authored |> List.map (fun n -> "analysis/" + n, File.ReadAllText(a n)))
+        @ [ "proposals/owner-decision-requests.json", File.ReadAllText(Path.Combine(package, "proposals", "owner-decision-requests.json")) ] }
+
+/// `v41`: generates the v4.1 artifacts and validation report from v4 and the authored v4.1 inputs. Exit 0 validation
+/// PASS (the package stays a CANDIDATE), 3 a check failed, 4 --check found files that differ, 2 unusable input.
+let v41Command (args: string list) : int =
+    let rec go (xs: string list) (m: Map<string, string>) (check: bool) =
+        match xs with
+        | "--check" :: rest -> go rest m true
+        | k :: v :: rest when k.StartsWith("--", StringComparison.Ordinal) -> go rest (m.Add(k, v)) check
+        | [] -> Ok(m, check)
+        | a :: _ -> Error(sprintf "unknown argument '%s'" a)
+    match go args Map.empty false with
+    | Error e ->
+        eprintfn "%s" e
+        2
+    | Ok(m, _) when not (m.ContainsKey "--source" && m.ContainsKey "--package" && m.ContainsKey "--base") ->
+        eprintfn "usage: requirements-compiler v41 --source DIR --package DIR --base DIR [--forma-tarball FILE] [--check]"
+        2
+    | Ok(m, check) ->
+        try
+            let package = m.["--package"]
+            let i = v41Inputs m.["--source"] package m.["--base"] (m.TryFind "--forma-tarball")
+            let built = V41Package.build i
+            let report = V41Package.validationReport built.Checks
+            let verdict = str "verdict" report
+            let inventory =
+                match i.FormaExtract with
+                | Some x -> [ str "inventory" (field "forma" i.Forma |> Option.defaultValue JNull), serialize x ]
+                | None -> []
+            let generated = built.Files @ inventory @ [ "validation-report.json", serialize report ]
+            let sha (text: string) = Text.Encoding.UTF8.GetBytes text |> Git.sha256Hex
+            let authored = i.AuthoredText |> List.map (fun (n, t) -> n, sha t)
+            // The inventory is generated only when the tarball is supplied; otherwise the committed one is pinned.
+            let inventoryPin =
+                match inventory with
+                | [] -> let n = str "inventory" (field "forma" i.Forma |> Option.defaultValue JNull) in [ n, sha (File.ReadAllText(Path.Combine(package, n))) ]
+                | _ -> []
+            let manifest = V41Package.packageManifest i (authored @ inventoryPin @ (generated |> List.map (fun (n, t) -> n, sha t))) verdict |> serialize
+            let all = generated @ [ "package-manifest.json", manifest ]
+            built.Checks |> List.iter (fun c ->
+                printfn "%s %s  %s" (if c.Problems.IsEmpty then "PASS" else "FAIL") c.Id c.Title
+                c.Problems |> List.truncate 10 |> List.iter (printfn "      - %s"))
+            printfn "v4.1 validation: %s; status: CANDIDATE" verdict
+            if check then
+                let differing = all |> List.filter (fun (n, t) -> let p = Path.Combine(package, n) in not (File.Exists p) || File.ReadAllText p <> t) |> List.map fst
+                differing |> List.iter (eprintfn "differs from the package: %s")
+                if not differing.IsEmpty then 4 elif verdict = "PASS" then 0 else 3
+            else
+                for (n, t) in all do
+                    let p = Path.Combine(package, n)
+                    Directory.CreateDirectory(Path.GetDirectoryName p) |> ignore
+                    File.WriteAllText(p, t)
+                if verdict = "PASS" then 0 else 3
+        with ex ->
+            eprintfn "input error: %s" ex.Message
+            2
+
 [<EntryPoint>]
 let main argv =
     match List.ofArray argv with
@@ -1120,6 +1227,7 @@ let main argv =
     | "propose-test-bindings" :: rest -> proposeTestBindingsCommand rest
     | "review-attestations" :: rest -> reviewAttestationsCommand rest
     | "v4" :: rest -> v4Command rest
+    | "v41" :: rest -> v41Command rest
     | "preflight" :: rest ->
         match parseArgs rest defaults with
         | Error e ->

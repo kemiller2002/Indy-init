@@ -1,0 +1,42 @@
+{
+  "schema": "indy-init.v41-package-manifest/1",
+  "packageVersion": "4.1.0",
+  "status": "CANDIDATE",
+  "statusMeaning": "Compiled and validated by requirements-compiler v41. Not approved and not frozen: only the owner's approval of ODR-V41-01 and the freeze tag make it frozen (FREEZE.md). The compiler never reports frozen.",
+  "base": {
+    "package": "requirements-compiled/v4",
+    "verificationPlan": {
+      "planId": "VP-9817d9814482",
+      "fileSha256": "6d132d6ac0758e625b3295bde8f07fc5ef12907c9552a6c515e4aa786906434d",
+      "contentDigest": "53af6eb2be8d1bf54474032df8c57bfad0ec9d377eb9ee77afc3277126e2bad8"
+    }
+  },
+  "validation": "PASS",
+  "files": {
+    "agent-file-ownership.json": "bb52c9a5280ad141bd88455a0c3068a957e2ff5b5432daa87c3b962dc1b81989",
+    "analysis/conflict-telemetry.json": "b316d8580bab4e31634411d5033b3f07bdd60d2be0b8198dd2aa7ee2d556f4cb",
+    "analysis/forma-0.12.0-inventory.json": "81de2f285ebf95d6ef9236e841d7af25ebde8f68205c24e526f4ac1b853404a3",
+    "analysis/forma-layout-contract.json": "14ea19187046fdccd74e9b2f8f605568f9b889f570868c3cad7db3798f96b6b8",
+    "analysis/github-error-matrix.json": "dbd36dbefb8f04773f0b55492dfbbbcca6e188e356af4eefecd0fec9669f6b40",
+    "analysis/interface-specifications.json": "80e5d606e16a3e3ee359e6a61a7d0b5dd51752d7c2761dff8c54b91a32de83aa",
+    "analysis/project-structure.json": "5ebc171787465bbe6d8bf8fc1bdaa7ef2c05932071c7acd70af8f27fe915d226",
+    "analysis/task-adjustments.json": "ed1d95404a20aec4cbe27cf622a9ff58c73f8396d998c6f5b0ca7437f014c1f2",
+    "contracts/00-DOMAIN-STUBS.fs": "59b80124ff6eabf69db6e31792fae103bb7b8213ea8dd7a35b09272bb8704ac1",
+    "contracts/01-IF41-DOMAIN.fs": "815aec410e3dba0f7d8d8232ed8476515f0ab2d237c96170f5aaedb64e286e00",
+    "contracts/02-IF41-STORAGE.fs": "bdf4ef23a006c3280ee67c94145fcecad01286bd2da0da1afd803f2edd064e9d",
+    "contracts/03-IF41-WIRE.fs": "9446248d25d6993d23a3185c3805d9547d74f6430eac666dd1c793d8d4557577",
+    "contracts/04-IF41-ERRORS.fs": "1fa3f16e63becc417464335338ac3a4e0bab6c2641760fcbd7ded1c6af84b431",
+    "contracts/05-IF41-SAVE.fs": "81c0f67752d0e648b4d140f420907f33bb964137f8bc7b955f729997e8b6747c",
+    "contracts/06-IF41-APP.fs": "4b3b5219ba481aa4d9ae5138bbaf5a7353e2844e65609a08acd4f81ec8e4b4a0",
+    "contracts/07-IF41-VIEW.fs": "9862db56c83e06c3e12956d9c3097ece3ca984cbc1bade4941cc1e978502dfad",
+    "contracts/08-IF41-REPORT.fs": "ab62fa82f92d140dfe64dc3fa225ff547118a481faaf3ccb13445291d9a7e33c",
+    "contracts/ContractCheck.fsproj": "ccabfc8064c695eb5fc1b4a52dba092dc8f7c15848b67fe8ac1f1b55ba68e128",
+    "execution-dag.json": "6cf0102a239917bae5578b5ea4488644c7ba6ce853401e288fd8494191f8ec27",
+    "preservation-report.json": "8ffdfe64c4842076dd24d24fa6eed6f1ee42fff515a4f45d7bbd389711afe855",
+    "proposals/owner-decision-requests.json": "631f054bc56321bc113a6457e492b76c2af39e85e5784c230071d858847f00ef",
+    "schedule.json": "4ce06993f2f62d189c773c8be9f06ed9179936cf51ec1a693c13c3faff0f9e47",
+    "state-machine-contracts.json": "63ad45a7328c41a12a9bd222ba184653f84fd009c087241b7133233308fd6858",
+    "validation-report.json": "46e442b8a1c9f2510b2409d83f558b087173e6665d2c94b25c0e53eac985102b",
+    "verification-execution-plan.json": "0f6213109f5db474378509fd0e072f1b21daa4e9010de698f7281e4dd2ad9a81"
+  }
+}

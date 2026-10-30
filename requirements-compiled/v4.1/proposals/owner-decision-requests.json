@@ -1,0 +1,56 @@
+{
+  "schema": "indy-init.v41-owner-decision-requests/1",
+  "status": "pending: no record exists; only the operator writes records (RDP-003)",
+  "requests": [
+    {
+      "id": "ODR-V41-01",
+      "kind": "package-approval",
+      "title": "Approve compiled package v4.1 as the implementation plan for November 7",
+      "question": "Approve requirements-compiled/v4.1 (on top of package v4, whose verification plan it uses unchanged) as the plan the event build follows: interface contracts, file ownership, state-machine tables, GitHub error matrix, Forma layout contract, verification execution plan and schedule?",
+      "options": [
+        "A: approve v4.1, after v4 is approved (ODR-V4-01)",
+        "B: request changes",
+        "C: decline; build from v4 alone"
+      ],
+      "recommendation": "A. v4.1 changes no requirement, obligation or test binding (preservation-report.json); it removes decisions the team would otherwise make inside the timed window.",
+      "rationale": "Only the owner approves a package (RDP-003). v4.1 depends on v4: approving v4.1 without v4 leaves the requirements unfrozen.",
+      "impact": "Until approved, v4.1 is a CANDIDATE. The event build may follow it as guidance but must report it unapproved.",
+      "approvalRecord": {
+        "how": "A change in an operator approval (v4 recordFormat): {\"decision_id\": \"ODR-V41-01\", \"action\": \"approve-package\", \"package\": \"requirements-compiled/v4.1\", \"manifest_sha256\": \"<sha256 of requirements-compiled/v4.1/package-manifest.json>\", \"review_sha256\": \"<sha256 of requirements-compiled/v4.1/analysis/independent-review.json>\"}. Written and committed by the owner only."
+      }
+    },
+    {
+      "id": "ODR-V41-02",
+      "kind": "interface-freeze",
+      "title": "Freeze the v4.1 interface contracts at T14, superseding FSHARP-TYPE-SHAPES sections 42 and 46 for Causa",
+      "question": "docs/FSHARP-TYPE-SHAPES.md section 42 (IInvestigationStore with ProviderConflict) and section 46 (LocalStore.fs) contradict ADR-R7-001 and PERSIST-003 (finding F41-01), and docs/rehearsal-007/traceability.json does not list them as superseded. Should the v4.1 contracts (IF41-STORAGE, IF41-SAVE) be the frozen Causa boundary in their place?",
+      "options": [
+        "A: yes; record sections 42 and 46 as superseded for Causa",
+        "B: no; reconcile FSHARP-TYPE-SHAPES first"
+      ],
+      "recommendation": "A. PERSIST-001 gives the persistence requirements precedence over older type shapes; the v4.1 contracts typecheck and implement the seven-state machine of SM-SAVE without a new state.",
+      "rationale": "An agent may not edit a superseded design document on its own; the contradiction must be decided.",
+      "impact": "With B, the interface freeze at T14 waits for the reconciliation, and the schedule gain from interface-first work is lost.",
+      "approvalRecord": {
+        "how": "{\"decision_id\": \"ODR-V41-02\", \"action\": \"select\", \"option\": \"A\" | \"B\"}"
+      }
+    },
+    {
+      "id": "ODR-V41-03",
+      "kind": "schedule",
+      "title": "Accept the interface-first dependency changes of the v4.1 DAG",
+      "question": "v4.1 lets the interface freeze (T14) and the save machine (T19) start before the domain kernel (T13), because the frozen contracts fix the types; replay verification against the real kernel moves to integration (T21). Accept this for the event schedule?",
+      "options": [
+        "A: accept (critical path estimated 270 minutes)",
+        "B: keep v4's dependencies (critical path estimated 340 minutes)"
+      ],
+      "recommendation": "A, together with ODR-V4-07's topology choice. Under A both role-lane topologies fit the window by the estimates: A-role-lanes 405 and C-role-lanes-two-ui 345 of 420 minutes.",
+      "rationale": "The change moves integration risk from T19 to T21 (optimization-report.md, risks R41-02 and R41-03); the owner decides whether that trade is acceptable.",
+      "impact": "With B, v4.1's other artifacts still apply; only execution-dag.json and schedule.json revert to v4's dependencies.",
+      "approvalRecord": {
+        "how": "{\"decision_id\": \"ODR-V41-03\", \"action\": \"select\", \"option\": \"A\" | \"B\"}"
+      }
+    }
+  ],
+  "recordFormat": "As package v4 (requirements-compiled/v4/proposals/owner-decision-requests.json recordFormat): one operator approval in kickoff/rehearsal-007/approvals.causa.json, one change per decision, committed by the owner without agent trailers."
+}

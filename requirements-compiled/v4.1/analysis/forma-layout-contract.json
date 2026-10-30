@@ -1,0 +1,329 @@
+{
+  "schema": "indy-init.v41-forma-layout-contract/1",
+  "description": "Layout and presentation contract for the event build, using only the published Forma 0.12.0 package (dependency-lock.json; npm @echelon-foundry/design-system 0.12.0, sha256 b824568d528562658ded3d53ecd06504e907f7d42129facd86a8f298d1cb7aae, equal to the registry artifact). Every token, class and pattern named here exists in forma-0.12.0-inventory.json, which the compiler extracts from that tarball. No new CSS framework: web/causa.css composes Forma classes and sets layout only through Forma custom properties. An agent that needs something not listed asks the coordinator; it does not invent a token.",
+  "forma": {
+    "package": "@echelon-foundry/design-system",
+    "version": "0.12.0",
+    "tarballSha256": "b824568d528562658ded3d53ecd06504e907f7d42129facd86a8f298d1cb7aae",
+    "stylesheet": "dist/all.css",
+    "inventory": "analysis/forma-0.12.0-inventory.json"
+  },
+  "viewports": [
+    {
+      "id": "VP-320",
+      "width": 320,
+      "height": 640,
+      "purpose": "narrow phone; PERSIST-030 reflow minimum"
+    },
+    {
+      "id": "VP-IPAD-PORTRAIT",
+      "width": 820,
+      "height": 1180,
+      "purpose": "iPad Air portrait (DEC-020 primary target)"
+    },
+    {
+      "id": "VP-IPAD-LANDSCAPE",
+      "width": 1180,
+      "height": 820,
+      "purpose": "iPad Air landscape"
+    },
+    {
+      "id": "VP-DESKTOP",
+      "width": 1440,
+      "height": 900,
+      "purpose": "desktop"
+    },
+    {
+      "id": "VP-200-TEXT",
+      "width": 1280,
+      "height": 800,
+      "textZoom": 2.0,
+      "purpose": "200% text size (WCAG 1.4.4, PERSIST-030)"
+    }
+  ],
+  "breakpoints": {
+    "source": "Forma 0.12.0 dist/all.css media-query widths (min-width and max-width), as listed by the generated inventory",
+    "values": [
+      "30rem",
+      "36rem",
+      "40rem",
+      "44rem",
+      "48rem",
+      "64rem"
+    ],
+    "rule": "web/causa.css uses only these widths in media queries; container queries only where a Forma pattern defines them. Height and preference queries (reduced motion, forced colours, print) follow Forma."
+  },
+  "reuse": [
+    {
+      "need": "Workspace shell, navigation and header",
+      "patterns": [
+        "workspace-shell",
+        "navigation-shell",
+        "site-header",
+        "skip-link",
+        "landmark-region"
+      ],
+      "requirements": [
+        "UI-014",
+        "UI-020",
+        "UI-029",
+        "PERSIST-033"
+      ]
+    },
+    {
+      "need": "Save-state indicator",
+      "patterns": [
+        "status-lozenge",
+        "operation-status",
+        "freshness"
+      ],
+      "requirements": [
+        "PERSIST-030",
+        "PERSIST-031"
+      ]
+    },
+    {
+      "need": "Conflict review and discard confirmation",
+      "patterns": [
+        "conflict-review",
+        "dialog",
+        "diff-viewer",
+        "recovery-actions"
+      ],
+      "requirements": [
+        "PERSIST-012",
+        "PERSIST-019"
+      ]
+    },
+    {
+      "need": "Errors, empty and loading states",
+      "patterns": [
+        "fault-banner",
+        "fault-inline",
+        "fault-details",
+        "empty-state",
+        "skeleton",
+        "spinner",
+        "validation-message",
+        "validation-summary"
+      ],
+      "requirements": [
+        "UI-010",
+        "WASM-LOAD-001"
+      ]
+    },
+    {
+      "need": "Investigation overview, timeline, evidence inspector, records",
+      "patterns": [
+        "record-header",
+        "timeline",
+        "master-detail",
+        "key-value-list",
+        "evidence-relationship",
+        "provenance-trail",
+        "facts"
+      ],
+      "requirements": [
+        "UI-003",
+        "UI-005",
+        "UI-025",
+        "UI-033",
+        "UI-034"
+      ]
+    },
+    {
+      "need": "Causal graph textual equivalent and hierarchy",
+      "patterns": [
+        "diagram",
+        "hierarchy-tree",
+        "relationship-index"
+      ],
+      "requirements": [
+        "UI-026",
+        "UI-011",
+        "WDL-007"
+      ]
+    },
+    {
+      "need": "Forms and commands",
+      "patterns": [
+        "form",
+        "form-row",
+        "text-field",
+        "textarea",
+        "select",
+        "button",
+        "command-group"
+      ],
+      "requirements": [
+        "UI-004",
+        "UI-032"
+      ]
+    },
+    {
+      "need": "Layout primitives",
+      "patterns": [
+        "stack",
+        "cluster",
+        "grid",
+        "split",
+        "sidebar",
+        "container",
+        "measure"
+      ],
+      "requirements": [
+        "UI-011",
+        "UI-029"
+      ]
+    }
+  ],
+  "tokens": {
+    "required": [
+      "--ef-layout-target-min",
+      "--ef-layout-measure",
+      "--ef-layout-stack-space",
+      "--ef-layout-block-space",
+      "--ef-layout-section-space",
+      "--ef-focus-ring-width",
+      "--ef-focus-ring-offset",
+      "--ef-color-focus-ring",
+      "--ef-color-status-success",
+      "--ef-color-status-warning",
+      "--ef-color-status-danger",
+      "--ef-color-status-info",
+      "--ef-color-surface-primary",
+      "--ef-color-surface-secondary",
+      "--ef-color-text-primary",
+      "--ef-color-text-secondary",
+      "--ef-motion-base-duration"
+    ],
+    "rule": "web/causa.css may read any --ef-* property in the inventory and must not declare a new --ef-* property; colours come only from semantic tokens (UI-016), never from primitives or literals."
+  },
+  "rules": [
+    {
+      "id": "FL-01",
+      "rule": "Every interactive control is at least --ef-layout-target-min (2.75rem, 44px) in both dimensions.",
+      "requirements": [
+        "UI-011"
+      ],
+      "assertion": "browser: bounding box of every button, link and form control >= 44x44 CSS px at every viewport",
+      "tests": [
+        "playwright:acceptance/UI-011.spec.js > UI-011-O1 [chromium]",
+        "playwright:acceptance/UI-011.spec.js > UI-011-O1 [webkit]"
+      ]
+    },
+    {
+      "id": "FL-02",
+      "rule": "No horizontal scrolling of the page at any viewport; wide content (tables, diagrams, diffs) scrolls inside its own Forma container with a visible scroll affordance.",
+      "requirements": [
+        "UI-011",
+        "PERSIST-030"
+      ],
+      "assertion": "browser: document.scrollingElement.scrollWidth <= innerWidth at every viewport; screenshot per screen",
+      "tests": [
+        "playwright:acceptance/UI-011.spec.js > UI-011-O2 [chromium]",
+        "playwright:acceptance/UI-011.spec.js > UI-011-O2 [webkit]"
+      ]
+    },
+    {
+      "id": "FL-03",
+      "rule": "Text wraps; nothing is truncated without an accessible full value; line length is limited by --ef-layout-measure (72ch).",
+      "requirements": [
+        "UI-011",
+        "UI-024"
+      ],
+      "assertion": "browser: no element with overflow hidden clips text without a title or accessible description; the 200% text viewport shows every save-state word",
+      "tests": [
+        "playwright:acceptance/PERSIST-030.spec.js > PERSIST-030-O7 [chromium]",
+        "playwright:acceptance/PERSIST-030.spec.js > PERSIST-030-O7 [webkit]"
+      ]
+    },
+    {
+      "id": "FL-04",
+      "rule": "Keyboard: every action reachable in DOM order; skip link first; visible focus ring from --ef-focus-ring-width, --ef-focus-ring-offset and --ef-color-focus-ring; dialogs trap and return focus.",
+      "requirements": [
+        "UI-011",
+        "PERSIST-012"
+      ],
+      "assertion": "browser: tab through each screen and dialog; every focused element has a visible outline at least the ring width; focus returns to the invoking control after a dialog closes",
+      "tests": [
+        "playwright:acceptance/UI-011.spec.js > UI-011-O1 [chromium]",
+        "playwright:invariants/INV-24.spec.js > save-state and conflict actions by keyboard and screen reader [webkit]"
+      ]
+    },
+    {
+      "id": "FL-05",
+      "rule": "Reduced motion: honour prefers-reduced-motion as Forma does; no essential information conveyed by motion.",
+      "requirements": [
+        "UI-011"
+      ],
+      "assertion": "browser: with reducedMotion 'reduce', computed transition and animation durations of animated Forma components are 0s or Forma's reduced values",
+      "tests": [
+        "playwright:acceptance/UI-011.spec.js > UI-011-O2 [chromium]",
+        "playwright:acceptance/UI-011.spec.js > UI-011-O2 [webkit]"
+      ]
+    },
+    {
+      "id": "FL-06",
+      "rule": "Contrast: text 4.5:1 (3:1 large), non-text marks 3:1 in light, dark and forced-colors modes; amber #E9A23B only with a text label (DEC-R7-002).",
+      "requirements": [
+        "UI-016",
+        "PERSIST-030"
+      ],
+      "assertion": "browser: axe WCAG 2.1 AA in light and dark; forced-colors emulation keeps every save state distinguishable",
+      "tests": [
+        "playwright:acceptance/PERSIST-030.spec.js > PERSIST-030-O6 [chromium]",
+        "playwright:acceptance/PERSIST-030.spec.js > PERSIST-030-O6 [webkit]"
+      ]
+    },
+    {
+      "id": "FL-07",
+      "rule": "Save-state indicator: Forma status lozenge plus operation status or conflict review plus freshness, in the investigation header, visible without scrolling at every viewport.",
+      "requirements": [
+        "PERSIST-030",
+        "PERSIST-031"
+      ],
+      "assertion": "browser: the indicator's bounding box intersects the initial viewport at every viewport and state; screenshot per state from the deployed SHA",
+      "tests": [
+        "playwright:acceptance/PERSIST-054.spec.js > PERSIST-054-O2 [chromium]",
+        "playwright:acceptance/PERSIST-054.spec.js > PERSIST-054-O2 [webkit]"
+      ]
+    },
+    {
+      "id": "FL-08",
+      "rule": "Loading and errors: the HTML/CSS shell renders before WASM with a Forma skeleton; failures use Forma fault patterns stating what happened, what was preserved and a safe next step.",
+      "requirements": [
+        "UI-010",
+        "WASM-LOAD-001"
+      ],
+      "assertion": "browser: shell visible before the runtime boots; an injected boot failure shows a fault pattern with a working retry",
+      "tests": [
+        "playwright:acceptance/UI-010.spec.js > UI-010-O2 [chromium]"
+      ]
+    },
+    {
+      "id": "FL-09",
+      "rule": "Navigation: two levels (workspace, investigation) with the Forma navigation shell; under 48rem the navigation collapses through Forma's own pattern, never a custom menu.",
+      "requirements": [
+        "UI-020",
+        "UI-029"
+      ],
+      "assertion": "browser: at VP-320 the navigation is reachable and operable by keyboard and touch",
+      "tests": [
+        "playwright:acceptance/UI-029.spec.js > UI-029-O1 [chromium]"
+      ]
+    },
+    {
+      "id": "FL-10",
+      "rule": "Only tokens in the inventory: a stylesheet reference to an --ef-* property the inventory lacks fails the build.",
+      "requirements": [
+        "PERSIST-030",
+        "UI-016"
+      ],
+      "assertion": "build: dotnet:Causa.Invariants.Negative.INV24.FormaTokensExist scans web/causa.css against the inventory",
+      "tests": [
+        "dotnet:Causa.Invariants.Negative.INV24.FormaTokensExist"
+      ]
+    }
+  ]
+}

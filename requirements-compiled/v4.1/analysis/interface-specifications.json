@@ -1,0 +1,235 @@
+{
+  "schema": "indy-init.v41-interface-specifications/1",
+  "description": "Authoritative boundary contracts between the event build's agents, frozen at T14 once the owner approves v4.1 (ODR-V41-01). Domain types follow docs/FSHARP-TYPE-SHAPES.md; the stubs below fix only the names the boundaries need. Each block is valid F#; the compiler emits them in compile order and CI typechecks the result with dotnet fsi. Records of functions describe operations so they can be checked without an implementation. No nullable values: absence is an option. Nothing here is application code: implementations are written at kickoff.",
+  "compileOrder": [
+    "DOMAIN-STUBS",
+    "IF41-DOMAIN",
+    "IF41-STORAGE",
+    "IF41-WIRE",
+    "IF41-ERRORS",
+    "IF41-SAVE",
+    "IF41-APP",
+    "IF41-VIEW",
+    "IF41-REPORT"
+  ],
+  "domainStubs": {
+    "id": "DOMAIN-STUBS",
+    "fsharp": "namespace Causa.Domain\n\nopen System\n\n/// Abbreviated from docs/FSHARP-TYPE-SHAPES.md (sections 2, 30-38) for the contract typecheck only. The domain owner\n/// implements the full shapes; these stubs fix only the names the boundaries use.\ntype InvestigationId = InvestigationId of Guid\ntype EventId = EventId of Guid\ntype AggregateVersion = AggregateVersion of int64\ntype Investigation = { Id: InvestigationId; Version: AggregateVersion }\ntype CommandEnvelope = { CommandId: Guid; Investigation: InvestigationId; ExpectedVersion: AggregateVersion option }\ntype EventPayload = EventPayload of kind: string\ntype EventEnvelope = { EventId: EventId; Investigation: InvestigationId; Version: AggregateVersion; Payload: EventPayload }\ntype Blocker = { Code: string; Message: string }\ntype Decision =\n    | Allowed of EventPayload list\n    | Blocked of Blocker list\n    | RequiresReview of string list\n    | UnsupportedSemantics of string list\n    | Conflict of expected: AggregateVersion * actual: AggregateVersion\n    | Duplicate of EventId list\ntype PolicySet = { Id: string }\ntype ActorContext = { ActorId: string }\ntype ProjectionError = { At: AggregateVersion; Reason: string }",
+    "source": "docs/FSHARP-TYPE-SHAPES.md"
+  },
+  "interfaces": [
+    {
+      "id": "IF41-DOMAIN",
+      "title": "Domain kernel: decide, evolve, replay, project (Boundaries A, B, C)",
+      "producer": "domain",
+      "consumers": [
+        "persistence",
+        "ui",
+        "ui-2",
+        "integration"
+      ],
+      "file": "src/Causa.Domain/Kernel.fs",
+      "fsharp": "namespace Causa.Domain\n\n/// IF41-DOMAIN: the F# kernel (Boundaries A-C). Pure: no network, clock, randomness, GitHub or browser types.\ntype ReplayError =\n    | EmptyHistory\n    | NonContiguousVersion of expected: AggregateVersion * found: AggregateVersion\n    | IllegalEvent of ProjectionError\n    | UnknownEventKind of string\n\ntype InvestigationProjection =\n    { Investigation: Investigation\n      Timeline: EventEnvelope list\n      Capabilities: string list }\n\ntype DomainKernel =\n    { Decide: PolicySet -> ActorContext -> Investigation option -> CommandEnvelope -> Decision\n      Evolve: Investigation option -> EventEnvelope -> Result<Investigation, ProjectionError>\n      Replay: EventEnvelope list -> Result<Investigation, ReplayError>\n      Project: Investigation -> InvestigationProjection }",
+      "concurrency": "Pure functions; no ordering constraint beyond history order. Replay applies events in version order and refuses a gap.",
+      "versioning": "Additive cases only after T14; any removed or changed case is a coordinator-controlled breaking change (interface-freeze procedure step 5).",
+      "producerTests": [
+        "dotnet:Causa.Contract.Tests.Domain.DecideIsTotalOverCommands",
+        "dotnet:Causa.Contract.Tests.Domain.ReplayRefusesGaps",
+        "dotnet:Causa.Contract.Tests.Domain.FrozenFixturesReplay"
+      ],
+      "consumerTests": [
+        "dotnet:Causa.Contract.Tests.Persistence.ReplayVerifiesSnapshot",
+        "dotnet:Causa.Contract.Tests.App.DecisionDrivesCommandForms"
+      ],
+      "requirements": [
+        "AR-006",
+        "REHEARSAL-AGENT-INTERFACE-FREEZE§boundary-a-command-submission",
+        "REHEARSAL-AGENT-INTERFACE-FREEZE§boundary-b-versioned-projection",
+        "REHEARSAL-AGENT-INTERFACE-FREEZE§boundary-c-replay"
+      ],
+      "typeShapes": [
+        "FSHARP-TYPE-SHAPES §30-§38"
+      ]
+    },
+    {
+      "id": "IF41-STORAGE",
+      "title": "causa-storage v1.0.0 file sets: path, encode, verify (Boundary D, storage half)",
+      "producer": "persistence",
+      "consumers": [
+        "persistence"
+      ],
+      "file": "src/Causa.Persistence/Storage.fs",
+      "fsharp": "namespace Causa.Persistence\n\nopen Causa.Domain\n\n/// IF41-STORAGE: causa-storage v1.0.0 file sets (CONTRACT.md wins over docs/CAUSA-DATA-CONTRACT-v1.md).\ntype CommitOid = CommitOid of string\ntype RepoPath = RepoPath of string\n\ntype FileSet =\n    { Manifest: byte[]\n      Events: byte[]\n      Snapshot: byte[] }\n\ntype VerificationFailure =\n    | SchemaInvalid of file: string * detail: string\n    | DigestMismatch of field: string\n    | ContractValueMismatch of field: string * expected: string * actual: string\n    | SnapshotDiffersFromReplay of paths: string list\n    | MissingRequiredField of file: string * field: string\n    | ReplayRejected of ReplayError\n\ntype VerifiedInvestigation =\n    { Investigation: Investigation\n      History: EventEnvelope list\n      ReadAt: CommitOid\n      Bytes: FileSet }\n\ntype StorageCodec =\n    { PathOf: InvestigationId -> RepoPath\n      Encode: VerifiedInvestigation -> EventEnvelope list -> FileSet\n      Verify: CommitOid -> FileSet -> Result<VerifiedInvestigation, VerificationFailure list> }",
+      "concurrency": "Verify is pure and total over bytes; Encode is deterministic (canonical JSON, RFC 8785).",
+      "versioning": "Pinned to causa-storage v1.0.0; a contract change needs STORAGE-003 versioning.",
+      "producerTests": [
+        "dotnet:Causa.Contract.Tests.Storage.GoldenFixturesRoundTrip",
+        "dotnet:Causa.Contract.Tests.Storage.EachIntegrityCheckRefusesItsForgery"
+      ],
+      "consumerTests": [
+        "dotnet:Causa.Contract.Tests.Storage.CatalogCasesVerifyAndReplay"
+      ],
+      "requirements": [
+        "PERSIST-005",
+        "EXT-DATA-011",
+        "STORAGE-007"
+      ],
+      "typeShapes": [
+        "FSHARP-TYPE-SHAPES §44"
+      ]
+    },
+    {
+      "id": "IF41-WIRE",
+      "title": "HTTP as data between persistence and the browser host",
+      "producer": "persistence",
+      "consumers": [
+        "ui",
+        "integration"
+      ],
+      "file": "src/Causa.Persistence/Wire.fs",
+      "fsharp": "namespace Causa.Persistence\n\n/// IF41-WIRE: HTTP as data. Persistence builds requests and decodes answers; the App runtime only executes them\n/// through Limen and returns the raw result (ODR-V4-06 proposes that decoding stays inside persistence).\ntype RequestId = RequestId of int64\n\ntype HttpRequest =\n    { Id: RequestId\n      Method: string\n      Url: string\n      Headers: (string * string) list\n      Body: string option }\n\ntype TransportFailure =\n    | FailedBeforeSending\n    | LostAfterSending\n    | TimedOut\n\ntype HttpOutcome =\n    | Answered of RequestId * status: int * headers: (string * string) list * body: string\n    | NotAnswered of RequestId * TransportFailure",
+      "concurrency": "Every request carries a RequestId; every outcome names it. The host executes requests in the order given and never retries.",
+      "versioning": "Additive only after T14.",
+      "producerTests": [
+        "dotnet:Causa.Contract.Tests.Wire.RequestsCarryIdentity"
+      ],
+      "consumerTests": [
+        "dotnet:Causa.Contract.Tests.App.HostReturnsRawOutcome"
+      ],
+      "requirements": [
+        "PERSIST-006",
+        "PERSIST-015",
+        "PERSIST-025"
+      ],
+      "typeShapes": []
+    },
+    {
+      "id": "IF41-ERRORS",
+      "title": "GitHub answer classification (github-error-matrix.json)",
+      "producer": "persistence",
+      "consumers": [
+        "persistence",
+        "ui"
+      ],
+      "file": "src/Causa.Persistence/Classify.fs",
+      "fsharp": "namespace Causa.Persistence\n\n/// IF41-ERRORS: the classification of github-error-matrix.json. Every provider answer maps to exactly one case.\ntype RateLimitKind =\n    | Primary of resetAtEpochSeconds: int64 option\n    | Secondary of retryAfterSeconds: int option\n\ntype ProviderError =\n    | AuthenticationFailed\n    | PermissionDenied of operation: string\n    | RateLimited of RateLimitKind\n    | StaleHead of expected: CommitOid * actual: CommitOid option\n    | ValidationFailed of messages: string list\n    | NotFound of what: string\n    | HistoryRewritten of expected: CommitOid\n    | NetworkUnavailable of TransportFailure\n    | Malformed of detail: string\n    | ReadBackMismatch of commit: CommitOid\n    | Unrecognised of status: int\n\ntype Classifier = HttpOutcome -> Result<string, ProviderError>",
+      "concurrency": "Classification is a pure function of one outcome; it never consults timing or other requests.",
+      "versioning": "A new GitHub answer form is a new matrix row and a new recorded fixture; the DU changes only through the coordinator.",
+      "producerTests": [
+        "dotnet:Causa.Invariants.Negative.INV22.RecordedGitHubAnswerForms"
+      ],
+      "consumerTests": [
+        "dotnet:Causa.Contract.Tests.App.EveryProviderErrorHasAMessage"
+      ],
+      "requirements": [
+        "PERSIST-008",
+        "PERSIST-024"
+      ],
+      "typeShapes": []
+    },
+    {
+      "id": "IF41-SAVE",
+      "title": "Save-state machine and session (SM-SAVE, SM-CONFLICT)",
+      "producer": "persistence",
+      "consumers": [
+        "ui",
+        "ui-2",
+        "integration"
+      ],
+      "file": "src/Causa.Persistence/SaveMachine.fs",
+      "fsharp": "namespace Causa.Persistence\n\nopen Causa.Domain\n\n/// IF41-SAVE: the SM-SAVE / SM-CONFLICT machine (state-machines.json). Pure; effects are data.\n/// Confirmation has a private representation: only this assembly constructs it (PERSIST-023).\ntype Confirmation =\n    private\n        { Investigation: InvestigationId\n          Commit: CommitOid\n          CommittedAt: System.DateTimeOffset }\n    member c.InvestigationId = c.Investigation\n    member c.CommitOid = c.Commit\n    member c.CommitTime = c.CommittedAt\n\ntype WriteMarker = { Session: System.Guid; Sequence: int64 }\n\ntype SaveFailure =\n    | Refused of ProviderError\n    | RepositoryKeptChanging\n    | BytesDiffer of CommitOid\n    | HistoryWasRewritten\n    | CredentialRefused\n\ntype ConflictView =\n    | ReadingRemote\n    | Reviewable of remote: VerifiedInvestigation\n    | Reapplying\n    | ConfirmingDiscard of remote: VerifiedInvestigation\n    | RemoteUnavailable\n    | Unresolvable of reason: string\n\ntype SaveState =\n    | Saved of Confirmation\n    | Unsaved\n    | Saving\n    | Offline\n    | Conflict of ConflictView\n    | UnknownOutcome of automaticReadsLeft: int\n    | SaveFailed of SaveFailure\n\ntype SaveInput =\n    | Edit of EventPayload\n    | SaveRequested\n    | QueuedSaveStarted\n    | Reply of HttpOutcome\n    | WentOffline\n    | WentOnline\n    | CheckAgain\n    | TimerElapsed of RequestId\n    | ConflictAction of string\n\ntype SaveEffect =\n    | Send of HttpRequest\n    | StartTimer of RequestId * milliseconds: int\n    | Announce of politeness: string * text: string\n    | ExportCommands of EventPayload list\n\ntype SaveFault = { State: string; Input: string; Reason: string }\n\ntype InvestigationSession =\n    { Id: InvestigationId\n      BaseHead: CommitOid\n      State: SaveState\n      Unsaved: EventPayload list\n      AfterInFlight: EventPayload list\n      Outstanding: RequestId option\n      Mutations: int\n      RebaseAttempts: int }\n\ntype SaveMachine =\n    { Initial: VerifiedInvestigation -> Confirmation -> InvestigationSession\n      Step: InvestigationSession -> SaveInput -> Result<InvestigationSession * SaveEffect list, SaveFault> }",
+      "concurrency": "One Step per input, applied in arrival order on the single UI thread; at most one mutation in flight per tab (Outstanding); a reply whose RequestId is not Outstanding is inert (ODR-V4-03 proposal).",
+      "versioning": "SaveState cases are frozen by PERSIST-031 (seven states); adding a state requires an authorized requirement change.",
+      "producerTests": [
+        "dotnet:Causa.Acceptance.Deterministic.PERSIST051Tests.PERSIST-051-O1",
+        "dotnet:Causa.Contract.Tests.Save.ConfirmationNotConstructibleOutside"
+      ],
+      "consumerTests": [
+        "dotnet:Causa.Contract.Tests.App.IndicatorFollowsMachine"
+      ],
+      "requirements": [
+        "PERSIST-007",
+        "PERSIST-023",
+        "PERSIST-031",
+        "PERSIST-051"
+      ],
+      "typeShapes": [
+        "supersedes FSHARP-TYPE-SHAPES §42 for Causa (finding F41-01)"
+      ]
+    },
+    {
+      "id": "IF41-APP",
+      "title": "Limen engine: Model, Msg, effects to and from the browser host",
+      "producer": "ui",
+      "consumers": [
+        "integration"
+      ],
+      "file": "src/Causa.App/Engine.fs",
+      "fsharp": "namespace Causa.App\n\nopen Causa.Domain\nopen Causa.Persistence\n\n/// IF41-APP: the Limen engine boundary (App <-> browser host). The host relays only what the engine asks for.\ntype Credential =\n    private\n        | Credential of string\n    override _.ToString() = \"<credential>\"\n\ntype ConnectionState =\n    | Disconnected\n    | Connecting\n    | Connected of canWrite: bool\n    | CredentialRefused\n    | Reauthenticating\n\ntype NetworkState =\n    | Online\n    | OfflineKnown\n\ntype BrowserSignal =\n    | ConnectivityChanged of online: bool\n    | TimerFired of RequestId\n    | HttpCompleted of HttpOutcome\n    | LeaveAttempted\n\ntype HostEffect =\n    | Http of HttpRequest\n    | Timer of RequestId * milliseconds: int\n    | SetLeaveGuard of bool\n    | Download of fileName: string * content: string\n    | LiveAnnounce of politeness: string * text: string\n\ntype Route = Route of string\n\ntype Msg =\n    | Navigate of Route\n    | Browser of BrowserSignal\n    | ConnectSubmitted of repository: string * credential: string\n    | SessionInput of InvestigationId * SaveInput\n    | DomainCommand of CommandEnvelope\n\ntype Model =\n    { Connection: ConnectionState\n      Network: NetworkState\n      Route: Route\n      Sessions: Map<InvestigationId, InvestigationSession> }\n\ntype Engine =\n    { Init: Route -> Model * HostEffect list\n      Update: Msg -> Model -> Model * HostEffect list }",
+      "concurrency": "Update is pure; HostEffects run in list order; BrowserSignals arrive one at a time.",
+      "versioning": "Limen 0.9.1 legacy protocol; the C# host shim and boundary script are fixed at T10 by the integration owner.",
+      "producerTests": [
+        "dotnet:Causa.Contract.Tests.App.UpdateIsPure",
+        "dotnet:Causa.Contract.Tests.App.CredentialNeverRendered"
+      ],
+      "consumerTests": [
+        "dotnet:Causa.Contract.Tests.Host.ShimRoundTrip"
+      ],
+      "requirements": [
+        "R9.7",
+        "AR-029",
+        "EXT-DATA-004"
+      ],
+      "typeShapes": []
+    },
+    {
+      "id": "IF41-VIEW",
+      "title": "View projections for ui and ui-2",
+      "producer": "ui",
+      "consumers": [
+        "ui",
+        "ui-2"
+      ],
+      "file": "src/Causa.App/Projections.fs",
+      "fsharp": "namespace Causa.App\n\nopen Causa.Domain\nopen Causa.Persistence\n\n/// IF41-VIEW: projections the views render (ui and ui-2). Views read only these; they never decide legality.\ntype SaveAction =\n    | Save\n    | Retry\n    | Reconnect\n    | CheckAgainAction\n    | Review\n    | ReapplyMine\n    | DiscardMine\n    | ExportMine\n\ntype SaveIndicatorView =\n    { InvestigationId: InvestigationId\n      Label: string\n      Text: string\n      Glyph: string\n      Actions: SaveAction list\n      Politeness: string\n      LastSavedCommitTime: System.DateTimeOffset option }\n\ntype WorkspaceHeaderView =\n    { Connection: ConnectionState\n      Offline: bool\n      NotSaved: (InvestigationId * string) list }\n\ntype ScreenView =\n    { Route: Route\n      Title: string\n      Header: WorkspaceHeaderView\n      Indicator: SaveIndicatorView option }\n\ntype Projections =\n    { SaveIndicator: InvestigationSession -> SaveIndicatorView\n      Header: Model -> WorkspaceHeaderView\n      Screen: Model -> ScreenView }",
+      "concurrency": "Projections are pure functions of Model; views render only these.",
+      "versioning": "Additive fields only after T14.",
+      "producerTests": [
+        "dotnet:Causa.Contract.Tests.View.IndicatorTextMatchesPersist031"
+      ],
+      "consumerTests": [
+        "playwright:contract/views.spec.js > every screen renders its projection [chromium]"
+      ],
+      "requirements": [
+        "PERSIST-030",
+        "PERSIST-031",
+        "PERSIST-033",
+        "UI-004"
+      ],
+      "typeShapes": []
+    },
+    {
+      "id": "IF41-REPORT",
+      "title": "Report projection for Folio (Boundary E)",
+      "producer": "ui",
+      "consumers": [
+        "ui-2"
+      ],
+      "file": "src/Causa.App/Reporting.fs",
+      "fsharp": "namespace Causa.App\n\nopen Causa.Domain\n\n/// IF41-REPORT: Boundary E, the read-only report projection Folio renders.\ntype ReportSection = { Heading: string; Paragraphs: string list; Provenance: EventId list }\n\ntype ReportProjection =\n    { Investigation: InvestigationId\n      Version: AggregateVersion\n      Sections: ReportSection list\n      UnresolvedUncertainties: string list }\n\ntype Reporting = { Project: InvestigationProjection -> ReportProjection }",
+      "concurrency": "Pure; never elevates an unverified hypothesis.",
+      "versioning": "Additive only after T14.",
+      "producerTests": [
+        "dotnet:Causa.Contract.Tests.Report.UnverifiedNeverConfirmed"
+      ],
+      "consumerTests": [
+        "playwright:contract/report.spec.js > report renders projection [chromium]"
+      ],
+      "requirements": [
+        "UI-009",
+        "REHEARSAL-AGENT-INTERFACE-FREEZE§boundary-e-report"
+      ],
+      "typeShapes": []
+    }
+  ]
+}
