@@ -26,9 +26,9 @@ Package v4 holds the requirements for the November 7 Causa build, for Praxis to 
 |---|---|---|
 | `curation/` | authored | Inputs to the v3 pipeline. They are v3's curation re-pinned to the v4 baseline and the 1.33.0 release commits, with rehearsal repositories removed. They add a PERSIST verification rule and evidence categories, v4 work items with estimates, F-030, and the `timedRun` clock |
 | `analysis/` | authored | Inputs to the v4 stage: operational definitions, state machines, invariants, Rehearsal 7 lessons, interfaces, execution policy, risks, dependency-lock source and v4 source amendments. Also the compiler test record, the independent-review record and the freeze input |
-| `proposals/` | authored or `propose-test-bindings` | Owner decision requests ODR-V4-01..07 (not approved), and the test-binding proposal applied to the curation |
+| `proposals/` | authored or `propose-test-bindings` | Owner decision requests ODR-V4-01..10 (not approved); the r7 test-binding proposal (from `propose-test-bindings`) and the v4 strengthened-binding proposal (from the v4 stage), both applied to the curation |
 | `normalized-requirements.json`, `requirements-inventory.json`, `requirements-source-map.json`, `dependency-graph.json`, `decision-registry.json`, `contract-bindings.json`, `verification-manifest.json`, `verification-plan.json`, `execution-plan-time.json`, `execution-plan-resource.json`, `preflight-manifest.json`, `timed-execution-manifest.json`, `percepta-experiment.json`, `requirements-validation-report.json`, `package-manifest.json` | v3 pipeline (`requirements-compiler --source …`) | As in v3. The timed manifest adds minutes for both topologies and the absolute-deadline clock |
-| `baseline-reconciliation.json`, `dependency-lock.json`, `execution-plan.json`, `invariants.json`, `state-machines.json`, `interfaces.json`, `operational-definitions.json`, `r7-lessons-mapping.json`, `risk-register.json`, `acceptance/`, `package-validation-report.json`, `freeze-manifest.json` | v4 stage (`requirements-compiler v4`) | The v4 artifacts, checks W01–W15 and the freeze gate FG-01–FG-10 |
+| `baseline-reconciliation.json`, `dependency-lock.json`, `execution-plan.json`, `invariants.json`, `state-machines.json`, `interfaces.json`, `operational-definitions.json`, `r7-lessons-mapping.json`, `risk-register.json`, `acceptance/`, `package-validation-report.json`, `freeze-manifest.json` | v4 stage (`requirements-compiler v4`) | The v4 artifacts, checks W01–W16 and the freeze gate FG-01–FG-10 |
 
 `execution-plan-time.json` and `execution-plan-resource.json` are v3's step-only plans, kept so the pipeline stays unchanged. `execution-plan.json` is the minute-based plan for the event.
 
@@ -52,7 +52,7 @@ CI (`preflight-tooling.yml`) runs the offline suite and `requirements-compiler v
 ## How v4 freezes
 
 The package is frozen only when every condition in `freeze-manifest.json` `freezeGate` passes:
-- the owner's records for ODR-V4-01..07 are in the pinned approvals file, or the requests are declined and recompiled out;
+- the owner has written records for ODR-V4-01..10 in the pinned approvals file (each amendment exactly as proposed, the package approval naming the plan, review-record and test-record digests, and the selected topology), in a commit of their own on main;
 - the compiler test record matches the compiler tree;
 - the independent review passes;
 - the freeze commit is recorded.
