@@ -155,11 +155,11 @@
   "inputs": [
     {
       "path": "curation/contracts.json",
-      "sha256": "1e4b6bfd1af1f266e8077c82627161918db9fee3570df7f343283ca8b69575de"
+      "sha256": "a7c4f5b1d4f01a6ffb87e10ff73318d79642124ff9be98b557ea6f71cd4be4a3"
     },
     {
       "path": "curation/decisions.json",
-      "sha256": "8c8d6d03970eb6ec1a79ab5406d52f8d056b29cbc273949f20e2046e9db0e68f"
+      "sha256": "72ecf31778b4bad5db33a807fc2b4b87aaf0e4787edeeae15a2127c5be497854"
     },
     {
       "path": "curation/defect-class-tests.json",
@@ -187,15 +187,15 @@
     },
     {
       "path": "curation/sources.json",
-      "sha256": "ebcb13c3207eac49a4c3484161c707a1a2d8b97119e0e246713b584b2b865ac8"
+      "sha256": "bff58132e6fc9b3a901a8855a1e907dd334dae46f8f88db2d78f00a966dcf96d"
     },
     {
       "path": "curation/tasks.json",
-      "sha256": "c9ceed69a5d1629953dabe59da3e2d52adf0317287254b0f30db56bb8a87fc65"
+      "sha256": "47bb209e71255725e09cb00b98438c19ddcb7c9f5c425b2b7bd6c773bcd7dd1f"
     },
     {
       "path": "curation/verification-plan.json",
-      "sha256": "a320f55ebdf37ca4caf0f716c1de1eac8d8fda99b9a61414e44a3bce84896817"
+      "sha256": "abbd590ce4afe59c97f99e8c92cbb8560adb347e19b87158bb1d2716900caf95"
     },
     {
       "path": "curation/verification-rules.json",
@@ -215,23 +215,23 @@
   "generated": [
     {
       "path": "contract-bindings.json",
-      "sha256": "21a0efe38c06c6f83dca3533d78c3ced0ba928c87271600df951f874e6740af9"
+      "sha256": "c7a392ebef090b139c7a9153fae6c3ee6e286234d071686efce18cbfe980a76d"
     },
     {
       "path": "decision-registry.json",
-      "sha256": "abc725cf591732d433b90d443e35d03d2eb976a4e4e19c9bcf551c051ccd822f"
+      "sha256": "30c74eb009a187f0b85afa2ec8a88d82d6d30fd62ec769b55ad42a9a08ae8927"
     },
     {
       "path": "dependency-graph.json",
-      "sha256": "80f38ba773e775d54a5921f8beabea0e09793a79d5a1398cd07b67e4c11375c7"
+      "sha256": "8585cee6757630be7f5b5f6bde72bf294530a875c1946787db791968f5bf01d0"
     },
     {
       "path": "execution-plan-resource.json",
-      "sha256": "fd45485a4f5f7fa19615eee5cfee94f4877ac4ae7746409a0ad5f59ccf778499"
+      "sha256": "1bbd6ce9f3abf6724a5b26ce99aacd660a6d7c36738272e306005fcdf31d856b"
     },
     {
       "path": "execution-plan-time.json",
-      "sha256": "b41b1621a9927cb3cee4417b05db7be9287496f3ce6504d8c8a66c90b40615d9"
+      "sha256": "1fcc474ec2ac2e51490e7176ad1da4f1c9d63bf3d27054e8f605807992ddf256"
     },
     {
       "path": "normalized-requirements.json",
@@ -243,11 +243,11 @@
     },
     {
       "path": "preflight-manifest.json",
-      "sha256": "59fc0636d28d4c087b5068982af680ae13cdaa3ffc07ff957430d7e160ba2fc7"
+      "sha256": "692c28064e6b911264ade5188ec01a3f3130e4243254f3db10c317a1bcb8870a"
     },
     {
       "path": "requirements-inventory.json",
-      "sha256": "62611dc37d9d8b56440720a13d09762b81054e28d90b9fd348433ecc1d58cbfe"
+      "sha256": "9c6a8fc5a4c385e19acf500500ab6f5df626298cf506e3e6e70bb04765e32204"
     },
     {
       "path": "requirements-source-map.json",
@@ -259,7 +259,7 @@
     },
     {
       "path": "timed-execution-manifest.json",
-      "sha256": "7e52e1309020c0ef4a9ae78ac4a731b4242a52d44ae900dfa4a4aedb156a2282"
+      "sha256": "4f46104323e3c57f357518fa7a12407ae189b3e727a0f8c454113fa1bf95cbe8"
     },
     {
       "path": "verification-manifest.json",
@@ -267,7 +267,7 @@
     },
     {
       "path": "verification-plan.json",
-      "sha256": "c20e839f604580ebc17c88a3c53d4193830db504dddd3d835ab6f5fc0de51b63"
+      "sha256": "6d132d6ac0758e625b3295bde8f07fc5ef12907c9552a6c515e4aa786906434d"
     }
   ],
   "compilationVerdict": "PASS",

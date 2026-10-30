@@ -1,7 +1,7 @@
 {
   "schema": "indy-init.timed-execution-manifest/1",
   "run": "Indy Init event build, November 7, 2026 (compiled package v4)",
-  "plan": "B-resource-optimized steps (one lead agent, AR-021) with minutes for both topologies; A-role-lanes is the only topology that fits the window and needs owner approval (ODR-V4-07)",
+  "plan": "Steps as B-resource-optimized (v3 pipeline); minutes for topologies A, B and C. C (role lanes with two UI agents) is the only topology that fits 420 minutes and needs owner approval (ODR-V4-07)",
   "clock": {
     "t0": "the UTC instant written to the kickoff record when the timer starts (operator or kickoff workflow; never the implementing agent)",
     "deadline": "min(t0 + 420 minutes, 2026-11-07T22:00:00Z), written as an absolute UTC instant into the kickoff record at T0",
@@ -57,22 +57,23 @@
     ]
   },
   "summary": {
-    "tasks": 24,
+    "tasks": 26,
     "steps": 23,
-    "plannedCiRuns": 8,
+    "plannedCiRuns": 10,
     "byWorkstream": {
       "application-implementation": 5,
       "defect-correction": 1,
       "final-acceptance": 1,
-      "independent-review": 2,
+      "independent-review": 4,
       "integration-testing": 4,
       "live-provider-integration": 2,
       "persistence-implementation": 3,
       "ui-implementation": 6
     },
     "makespanMinutes": {
-      "A-role-lanes": 355,
-      "B-single-lead": 610
+      "A-role-lanes": 400,
+      "B-single-lead": 700,
+      "C-role-lanes-two-ui": 340
     }
   },
   "tasks": [
@@ -121,6 +122,11 @@
           "lane": "lead",
           "start": 0,
           "finish": 25
+        },
+        "C-role-lanes-two-ui": {
+          "lane": "domain",
+          "start": 0,
+          "finish": 25
         }
       }
     },
@@ -162,6 +168,11 @@
         },
         "B-single-lead": {
           "lane": "lead",
+          "start": 25,
+          "finish": 70
+        },
+        "C-role-lanes-two-ui": {
+          "lane": "domain",
           "start": 25,
           "finish": 70
         }
@@ -207,8 +218,13 @@
         },
         "B-single-lead": {
           "lane": "lead",
-          "start": 90,
-          "finish": 105
+          "start": 115,
+          "finish": 130
+        },
+        "C-role-lanes-two-ui": {
+          "lane": "integration",
+          "start": 0,
+          "finish": 15
         }
       }
     },
@@ -255,8 +271,112 @@
         },
         "B-single-lead": {
           "lane": "lead",
+          "start": 130,
+          "finish": 150
+        },
+        "C-role-lanes-two-ui": {
+          "lane": "domain",
           "start": 70,
           "finish": 90
+        }
+      }
+    },
+    {
+      "id": "T18",
+      "title": "Provider conformance first: probe real GitHub (stale head, moved-head FORBIDDEN form, secondary rate limit, lost answer) and build the stateful fake from what it answers",
+      "workstream": "live-provider-integration",
+      "lane": "lead",
+      "step": 5,
+      "kind": "implementation",
+      "dependsOn": [],
+      "preflightPrerequisites": [
+        "T05",
+        "T04",
+        "T08",
+        "T10"
+      ],
+      "conditionalOn": null,
+      "excludedBy": null,
+      "ciRun": false,
+      "requirementsCovered": 28,
+      "p0RequirementsCovered": 23,
+      "defectClassTests": [
+        "DCT-004-A",
+        "DCT-005-A"
+      ],
+      "contracts": [
+        "CT-007",
+        "CT-017",
+        "CT-004"
+      ],
+      "gates": [
+        "G6"
+      ],
+      "completion": [
+        "live probe of three simultaneous commits recorded: every refusal GitHub returns (STALE_DATA and the FORBIDDEN 'is at <oid> but expected <oid>' form) is captured (INV-22, R7L-10)",
+        "recorded responses include a stale head, a secondary rate limit if observed, 401, 403 permission, 422 validation, cache headers on mutable reads, and compare pagination beyond 250 commits (R7L-09, R7L-19)",
+        "the stateful fake enforces expectedHeadOid, real ancestry and lost answers before and after applying, and is built only from these recordings (PERSIST-025, PF-013)"
+      ],
+      "estimateMinutes": 45,
+      "minutes": {
+        "A-role-lanes": {
+          "lane": "persistence",
+          "start": 0,
+          "finish": 45
+        },
+        "B-single-lead": {
+          "lane": "lead",
+          "start": 70,
+          "finish": 115
+        },
+        "C-role-lanes-two-ui": {
+          "lane": "persistence",
+          "start": 0,
+          "finish": 45
+        }
+      }
+    },
+    {
+      "id": "T35",
+      "title": "Independent review checkpoint 1: interfaces and invariants (DCC-002, target T+90..120)",
+      "workstream": "independent-review",
+      "lane": "reviewer",
+      "step": 5,
+      "kind": "verification",
+      "dependsOn": [
+        "T14"
+      ],
+      "preflightPrerequisites": [],
+      "conditionalOn": null,
+      "excludedBy": null,
+      "ciRun": true,
+      "requirementsCovered": 1,
+      "p0RequirementsCovered": 0,
+      "defectClassTests": [],
+      "contracts": [],
+      "gates": [
+        "G7"
+      ],
+      "completion": [
+        "a fresh reviewer, given code and requirements but not the implementer's conclusions, records findings by defect class with reproductions (DCC-003)",
+        "every critical finding has an owner and is fixed or decided before the next checkpoint"
+      ],
+      "estimateMinutes": 15,
+      "minutes": {
+        "A-role-lanes": {
+          "lane": "reviewer",
+          "start": 90,
+          "finish": 105
+        },
+        "B-single-lead": {
+          "lane": "reviewer",
+          "start": 150,
+          "finish": 165
+        },
+        "C-role-lanes-two-ui": {
+          "lane": "reviewer",
+          "start": 90,
+          "finish": 105
         }
       }
     },
@@ -265,7 +385,7 @@
       "title": "Application shell, loading experience, routes and visual identity",
       "workstream": "ui-implementation",
       "lane": "lead",
-      "step": 5,
+      "step": 6,
       "kind": "implementation",
       "dependsOn": [
         "T11"
@@ -302,58 +422,13 @@
         },
         "B-single-lead": {
           "lane": "lead",
-          "start": 165,
-          "finish": 200
-        }
-      }
-    },
-    {
-      "id": "T18",
-      "title": "Provider conformance first: probe real GitHub (stale head, moved-head FORBIDDEN form, secondary rate limit, lost answer) and build the stateful fake from what it answers",
-      "workstream": "live-provider-integration",
-      "lane": "lead",
-      "step": 6,
-      "kind": "implementation",
-      "dependsOn": [],
-      "preflightPrerequisites": [
-        "T05",
-        "T04",
-        "T08",
-        "T10"
-      ],
-      "conditionalOn": null,
-      "excludedBy": null,
-      "ciRun": false,
-      "requirementsCovered": 28,
-      "p0RequirementsCovered": 23,
-      "defectClassTests": [
-        "DCT-004-A",
-        "DCT-005-A"
-      ],
-      "contracts": [
-        "CT-007",
-        "CT-017",
-        "CT-004"
-      ],
-      "gates": [
-        "G6"
-      ],
-      "completion": [
-        "live probe of three simultaneous commits recorded: every refusal GitHub returns (STALE_DATA and the FORBIDDEN 'is at <oid> but expected <oid>' form) is captured (INV-22, R7L-10)",
-        "recorded responses include a stale head, a secondary rate limit if observed, 401, 403 permission, 422 validation, cache headers on mutable reads, and compare pagination beyond 250 commits (R7L-09, R7L-19)",
-        "the stateful fake enforces expectedHeadOid, real ancestry and lost answers before and after applying, and is built only from these recordings (PERSIST-025, PF-013)"
-      ],
-      "estimateMinutes": 30,
-      "minutes": {
-        "A-role-lanes": {
-          "lane": "persistence",
-          "start": 0,
-          "finish": 30
+          "start": 150,
+          "finish": 185
         },
-        "B-single-lead": {
-          "lane": "lead",
-          "start": 200,
-          "finish": 230
+        "C-role-lanes-two-ui": {
+          "lane": "ui",
+          "start": 15,
+          "finish": 50
         }
       }
     },
@@ -365,7 +440,8 @@
       "step": 7,
       "kind": "implementation",
       "dependsOn": [
-        "T14"
+        "T14",
+        "T18"
       ],
       "preflightPrerequisites": [],
       "conditionalOn": null,
@@ -395,8 +471,13 @@
         },
         "B-single-lead": {
           "lane": "lead",
-          "start": 105,
-          "finish": 165
+          "start": 185,
+          "finish": 245
+        },
+        "C-role-lanes-two-ui": {
+          "lane": "persistence",
+          "start": 90,
+          "finish": 150
         }
       }
     },
@@ -438,8 +519,13 @@
         },
         "B-single-lead": {
           "lane": "lead",
-          "start": 355,
-          "finish": 375
+          "start": 370,
+          "finish": 390
+        },
+        "C-role-lanes-two-ui": {
+          "lane": "domain",
+          "start": 90,
+          "finish": 110
         }
       }
     },
@@ -483,8 +569,13 @@
         },
         "B-single-lead": {
           "lane": "lead",
-          "start": 230,
-          "finish": 245
+          "start": 245,
+          "finish": 260
+        },
+        "C-role-lanes-two-ui": {
+          "lane": "integration",
+          "start": 90,
+          "finish": 105
         }
       }
     },
@@ -531,8 +622,13 @@
         },
         "B-single-lead": {
           "lane": "lead",
-          "start": 315,
-          "finish": 355
+          "start": 330,
+          "finish": 370
+        },
+        "C-role-lanes-two-ui": {
+          "lane": "persistence",
+          "start": 150,
+          "finish": 190
         }
       }
     },
@@ -577,8 +673,13 @@
         },
         "B-single-lead": {
           "lane": "lead",
-          "start": 375,
-          "finish": 400
+          "start": 390,
+          "finish": 415
+        },
+        "C-role-lanes-two-ui": {
+          "lane": "integration",
+          "start": 190,
+          "finish": 215
         }
       }
     },
@@ -620,8 +721,57 @@
         },
         "B-single-lead": {
           "lane": "lead",
-          "start": 245,
-          "finish": 315
+          "start": 260,
+          "finish": 330
+        },
+        "C-role-lanes-two-ui": {
+          "lane": "ui",
+          "start": 105,
+          "finish": 175
+        }
+      }
+    },
+    {
+      "id": "T36",
+      "title": "Independent review checkpoint 2: live write path and conflict handling",
+      "workstream": "independent-review",
+      "lane": "reviewer",
+      "step": 12,
+      "kind": "verification",
+      "dependsOn": [
+        "T21"
+      ],
+      "preflightPrerequisites": [],
+      "conditionalOn": null,
+      "excludedBy": null,
+      "ciRun": true,
+      "requirementsCovered": 1,
+      "p0RequirementsCovered": 1,
+      "defectClassTests": [],
+      "contracts": [],
+      "gates": [
+        "G7"
+      ],
+      "completion": [
+        "a fresh reviewer, given code and requirements but not the implementer's conclusions, records findings by defect class with reproductions (DCC-003)",
+        "every critical finding has an owner and is fixed or decided before the next checkpoint"
+      ],
+      "estimateMinutes": 15,
+      "minutes": {
+        "A-role-lanes": {
+          "lane": "reviewer",
+          "start": 235,
+          "finish": 250
+        },
+        "B-single-lead": {
+          "lane": "reviewer",
+          "start": 415,
+          "finish": 430
+        },
+        "C-role-lanes-two-ui": {
+          "lane": "reviewer",
+          "start": 235,
+          "finish": 250
         }
       }
     },
@@ -658,8 +808,13 @@
         },
         "B-single-lead": {
           "lane": "lead",
-          "start": 400,
-          "finish": 410
+          "start": 460,
+          "finish": 470
+        },
+        "C-role-lanes-two-ui": {
+          "lane": "integration",
+          "start": 15,
+          "finish": 25
         }
       }
     },
@@ -702,8 +857,13 @@
         },
         "B-single-lead": {
           "lane": "lead",
-          "start": 410,
-          "finish": 430
+          "start": 470,
+          "finish": 490
+        },
+        "C-role-lanes-two-ui": {
+          "lane": "persistence",
+          "start": 190,
+          "finish": 210
         }
       }
     },
@@ -739,13 +899,18 @@
       "minutes": {
         "A-role-lanes": {
           "lane": "ui",
-          "start": 175,
-          "finish": 205
+          "start": 220,
+          "finish": 250
         },
         "B-single-lead": {
           "lane": "lead",
-          "start": 430,
-          "finish": 460
+          "start": 490,
+          "finish": 520
+        },
+        "C-role-lanes-two-ui": {
+          "lane": "ui-2",
+          "start": 105,
+          "finish": 135
         }
       }
     },
@@ -785,8 +950,13 @@
         },
         "B-single-lead": {
           "lane": "reviewer",
-          "start": 430,
-          "finish": 450
+          "start": 490,
+          "finish": 510
+        },
+        "C-role-lanes-two-ui": {
+          "lane": "reviewer",
+          "start": 215,
+          "finish": 235
         }
       }
     },
@@ -822,19 +992,24 @@
       "minutes": {
         "A-role-lanes": {
           "lane": "ui",
-          "start": 205,
-          "finish": 230
+          "start": 250,
+          "finish": 275
         },
         "B-single-lead": {
           "lane": "lead",
-          "start": 460,
-          "finish": 485
+          "start": 550,
+          "finish": 575
+        },
+        "C-role-lanes-two-ui": {
+          "lane": "ui-2",
+          "start": 135,
+          "finish": 160
         }
       }
     },
     {
       "id": "T27",
-      "title": "Structured AI proposal loop (excluded from Rehearsal 4 by OD-INDY-11)",
+      "title": "Prompt/data boundaries (R11.4) and the structured AI proposal loop, whose event scope DEC-022 left open",
       "workstream": "application-implementation",
       "lane": "lead",
       "step": 17,
@@ -846,7 +1021,7 @@
         "T00"
       ],
       "conditionalOn": "DEC-022",
-      "excludedBy": "DEC-022",
+      "excludedBy": null,
       "ciRun": false,
       "requirementsCovered": 3,
       "p0RequirementsCovered": 0,
@@ -861,23 +1036,28 @@
         "proposals enter as proposals; external evidence cannot redefine instructions (R11.4)",
         "or an owner-approved exclusion"
       ],
-      "estimateMinutes": 0,
+      "estimateMinutes": 30,
       "minutes": {
         "A-role-lanes": {
           "lane": "domain",
           "start": 110,
-          "finish": 110
+          "finish": 140
         },
         "B-single-lead": {
           "lane": "lead",
-          "start": 505,
-          "finish": 505
+          "start": 520,
+          "finish": 550
+        },
+        "C-role-lanes-two-ui": {
+          "lane": "domain",
+          "start": 110,
+          "finish": 140
         }
       }
     },
     {
       "id": "T28",
-      "title": "History, time travel and semantic diff (excluded from Rehearsal 4 by OD-INDY-11)",
+      "title": "History, time travel and semantic diff (S14, S15; in scope by DEC-R7-005)",
       "workstream": "ui-implementation",
       "lane": "lead",
       "step": 18,
@@ -885,11 +1065,9 @@
       "dependsOn": [
         "T22"
       ],
-      "preflightPrerequisites": [
-        "T00"
-      ],
-      "conditionalOn": "DEC-022",
-      "excludedBy": "DEC-022",
+      "preflightPrerequisites": [],
+      "conditionalOn": null,
+      "excludedBy": null,
       "ciRun": false,
       "requirementsCovered": 3,
       "p0RequirementsCovered": 0,
@@ -904,17 +1082,22 @@
         "history renders from canonical sequence, never wall-clock alone (ADRP-007)",
         "or an owner-approved exclusion"
       ],
-      "estimateMinutes": 0,
+      "estimateMinutes": 45,
       "minutes": {
         "A-role-lanes": {
           "lane": "ui",
-          "start": 250,
-          "finish": 250
+          "start": 175,
+          "finish": 220
         },
         "B-single-lead": {
           "lane": "lead",
-          "start": 505,
-          "finish": 505
+          "start": 415,
+          "finish": 460
+        },
+        "C-role-lanes-two-ui": {
+          "lane": "ui-2",
+          "start": 180,
+          "finish": 225
         }
       }
     },
@@ -949,13 +1132,18 @@
       "minutes": {
         "A-role-lanes": {
           "lane": "ui",
-          "start": 230,
-          "finish": 250
+          "start": 275,
+          "finish": 295
         },
         "B-single-lead": {
           "lane": "lead",
-          "start": 485,
-          "finish": 505
+          "start": 575,
+          "finish": 595
+        },
+        "C-role-lanes-two-ui": {
+          "lane": "ui-2",
+          "start": 160,
+          "finish": 180
         }
       }
     },
@@ -999,13 +1187,18 @@
       "minutes": {
         "A-role-lanes": {
           "lane": "integration",
-          "start": 250,
-          "finish": 295
+          "start": 295,
+          "finish": 340
         },
         "B-single-lead": {
           "lane": "lead",
-          "start": 505,
-          "finish": 550
+          "start": 595,
+          "finish": 640
+        },
+        "C-role-lanes-two-ui": {
+          "lane": "integration",
+          "start": 235,
+          "finish": 280
         }
       }
     },
@@ -1039,13 +1232,18 @@
       "minutes": {
         "A-role-lanes": {
           "lane": "integration",
-          "start": 295,
-          "finish": 315
+          "start": 340,
+          "finish": 360
         },
         "B-single-lead": {
           "lane": "lead",
-          "start": 550,
-          "finish": 570
+          "start": 640,
+          "finish": 660
+        },
+        "C-role-lanes-two-ui": {
+          "lane": "integration",
+          "start": 280,
+          "finish": 300
         }
       }
     },
@@ -1077,13 +1275,18 @@
       "minutes": {
         "A-role-lanes": {
           "lane": "reviewer",
-          "start": 315,
-          "finish": 335
+          "start": 360,
+          "finish": 380
         },
         "B-single-lead": {
           "lane": "reviewer",
-          "start": 570,
-          "finish": 590
+          "start": 660,
+          "finish": 680
+        },
+        "C-role-lanes-two-ui": {
+          "lane": "reviewer",
+          "start": 300,
+          "finish": 320
         }
       }
     },
@@ -1126,13 +1329,18 @@
       "minutes": {
         "A-role-lanes": {
           "lane": "integration",
-          "start": 335,
-          "finish": 355
+          "start": 380,
+          "finish": 400
         },
         "B-single-lead": {
           "lane": "lead",
-          "start": 590,
-          "finish": 610
+          "start": 680,
+          "finish": 700
+        },
+        "C-role-lanes-two-ui": {
+          "lane": "integration",
+          "start": 320,
+          "finish": 340
         }
       }
     }

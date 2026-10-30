@@ -11,12 +11,19 @@
       "evidence/DECISIONS.md",
       "evidence/traceability.json"
     ],
-    "notInputs": "Rehearsal 7's application, tests and scripts are not inputs to the event build; this file is a requirements analysis."
+    "notInputs": "Rehearsal 7's application, tests and scripts are not inputs to the event build; this file is a requirements analysis.",
+    "fileSha256": {
+      "evidence/FINAL-REPORT.md": "2e8494e54272277108aa4ab6b7fb8ca6ff77c2ba9ef9ed64270d81d8683840e0",
+      "evidence/provenance.md": "bf442e6b09684f2973c7c9d69a9a2fee3051d0514abd8aca694775381d614f4f",
+      "evidence/defects.md": "dcdea5cf0c69d6960ed0dff3c98d6f4720325b190f69099f83cc8c21004bfd67",
+      "evidence/DECISIONS.md": "b4216972a92a55a80041438281f55f2ae5f39d95036bd5825df3574f3a5f2169",
+      "evidence/traceability.json": "acc462daef909f28dac5ecaa47be6e7e177d19cc13fd3ae3312dac152bb5ba31"
+    }
   },
   "summary": {
-    "classes": 19,
+    "classes": 20,
     "covered": 10,
-    "gapProposed": 6,
+    "gapProposed": 7,
     "process": 3
   },
   "lessons": [
@@ -29,7 +36,7 @@
           "quote": "Saved could be shown without a read-back confirmation."
         }
       ],
-      "disposition": "covered",
+      "disposition": "gap-proposed",
       "requirements": [
         "PERSIST-007",
         "PERSIST-023",
@@ -38,8 +45,11 @@
       "invariants": [
         "INV-01"
       ],
-      "proposals": [],
-      "bindingStrengthened": "Property test over random reply sequences and a mutation check that removes the read-back comparison (INV-01)."
+      "proposals": [
+        "ODR-V4-06",
+        "ODR-V4-08"
+      ],
+      "bindingStrengthened": "Read-back property and mutation tests (INV-01) are bound to PERSIST-023-O2. Two routes to Saved remain open in the baseline: forged replies (ODR-V4-06) and Saved after a verified load, which Rehearsal 7's first review found exploitable (F1) and PERSIST-021 requires (ODR-V4-08)."
     },
     {
       "id": "R7L-02",
@@ -196,7 +206,7 @@
         "INV-07"
       ],
       "proposals": [],
-      "bindingStrengthened": "SM-SAVE T-S04 waiting-save rule and T-S08; INV-04 bounds."
+      "bindingStrengthened": "SM-SAVE T-S53..T-S55 model the waiting save and its offline failure (Rehearsal 7 L2, F13); INV-04 bounds."
     },
     {
       "id": "R7L-09",
@@ -461,9 +471,9 @@
           "obligation": "PERSIST-015-O4"
         },
         {
-          "id": "dotnet:Causa.Acceptance.Deterministic.PERSIST007Tests.ReadBackOfFileOver1MB",
-          "kind": "deterministic",
-          "category": "integration",
+          "id": "dotnet:Causa.Acceptance.Live.PERSIST007Tests.ReadBackOfFileOver1MB",
+          "kind": "live",
+          "category": "live-provider",
           "obligation": "PERSIST-007-O1"
         },
         {
@@ -473,6 +483,26 @@
           "obligation": "PERSIST-031-O3"
         }
       ]
+    },
+    {
+      "id": "R7L-20",
+      "class": "An unknown outcome blocking other investigations' saves",
+      "evidence": [
+        {
+          "file": "evidence/defects.md",
+          "quote": "an Unknown outcome awaiting Check again blocks other investigations' saves in the tab"
+        }
+      ],
+      "disposition": "covered",
+      "requirements": [
+        "PERSIST-006",
+        "PERSIST-015"
+      ],
+      "invariants": [
+        "INV-04"
+      ],
+      "proposals": [],
+      "bindingStrengthened": "Operational definition 'In flight' and SM-SAVE concurrentOperations: Unknown commit outcome blocks only its own investigation; INV-04's request-bound property covers other investigations saving meanwhile."
     }
   ]
 }

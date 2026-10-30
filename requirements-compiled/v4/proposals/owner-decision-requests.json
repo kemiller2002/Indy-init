@@ -8,12 +8,15 @@
       "kind": "package-approval",
       "title": "Approve compiled package v4 as the frozen requirements for November 7",
       "question": "Approve requirements-compiled/v4 (baseline BL-CAUSA-INDY-INIT-62df28a559c0, the verification plan named in freeze-manifest.json) as the frozen package, with or without the amendments ODR-V4-02..06?",
-      "options": ["A: approve v4 as compiled, after deciding ODR-V4-02..07", "B: request changes"],
+      "options": [
+        "A: approve v4 as compiled, after deciding ODR-V4-02..07",
+        "B: request changes"
+      ],
       "recommendation": "A, after deciding ODR-V4-02..07. K3 (READINESS-ASSESSMENT.md) is an agent-then-owner step: the agent cuts the package, the owner approves it.",
       "rationale": "The freeze gate requires every owner approval to exist. An agent cannot approve its own package (RDP-003, AR-003).",
       "impact": "Until approved, v4 is published as a CANDIDATE and the tag indy-init-requirements-v4.0.0 is not created.",
       "approvalRecord": {
-        "how": "An approving GitHub review by the owner on the freeze pull request, or a record in kickoff/rehearsal-007/approvals.causa.json: {\"decision_id\": \"ODR-V4-01\", \"action\": \"approve-package\", \"package\": \"requirements-compiled/v4\", \"plan_digest\": \"<verification plan digest from freeze-manifest.json>\", \"approved_by\": \"kemiller2002\", \"date\": \"<date>\"}"
+        "how": "An operator-written record in kickoff/rehearsal-007/approvals.causa.json, committed by the owner (not by an agent) and merged to main: {\"decision_id\": \"ODR-V4-01\", \"action\": \"approve-package\", \"package\": \"requirements-compiled/v4\", \"plan_digest\": \"<freeze-manifest verificationPlan.digest>\", \"review_sha256\": \"<sha256 of analysis/independent-review.json>\", \"test_record_sha256\": \"<sha256 of analysis/compiler-test-record.json>\", \"approved_by\": \"kemiller2002\", \"date\": \"<date>\"}. The record binds the owner's approval to the exact plan, review record and test record, which are agent-produced."
       },
       "affects": []
     },
@@ -21,7 +24,9 @@
       "id": "ODR-V4-02",
       "kind": "obligation-amendment",
       "title": "Extend the copy ban and the provenance scan to Rehearsal 7's repository",
-      "lessons": ["R7L-16"],
+      "lessons": [
+        "R7L-16"
+      ],
       "problem": "PERSIST-026 and PAT-13 name indy-init-rehearsal-001 to indy-init-rehearsal-006. Rehearsal 7 has since produced a complete persistence implementation in indy-init-rehearsal-007. Nothing in the baseline forbids the event build from copying it, and PAT-13 would not detect it.",
       "approvalRecord": [
         {
@@ -39,13 +44,19 @@
       ],
       "recommendation": "Approve both.",
       "impact": "No new implementation work for the build agent; the independent verifier's PAT-13 run gains one comparison repository.",
-      "affects": ["PERSIST-026", "PERSIST-052"]
+      "affects": [
+        "PERSIST-026",
+        "PERSIST-052"
+      ]
     },
     {
       "id": "ODR-V4-03",
       "kind": "obligation-amendment",
       "title": "Discard replies to superseded requests (stale refresh, late conflict re-read, reordered answers)",
-      "lessons": ["R7L-04", "R7L-05"],
+      "lessons": [
+        "R7L-04",
+        "R7L-05"
+      ],
       "problem": "Rehearsal 7's third independent review found that a late read of an older GitHub version overwrote another writer's change during conflict resolution (H1), and that a stale refresh could roll the tab back after a save moved it on (M1). The baseline requires Saved only from a matching read-back (PERSIST-007) but says nothing about replies to loads, refreshes, conflict re-reads or reconciliation reads that arrive after the tab has moved on.",
       "approvalRecord": [
         {
@@ -57,13 +68,19 @@
       ],
       "recommendation": "Approve.",
       "impact": "One additional property in PAT-12 and one invariant (INV-02); requires each request to carry an identity the machine checks. Small implementation cost, closes a defect class that survived two review rounds in Rehearsal 7.",
-      "affects": ["PERSIST-051", "PERSIST-007", "PERSIST-012"]
+      "affects": [
+        "PERSIST-051",
+        "PERSIST-007",
+        "PERSIST-012"
+      ]
     },
     {
       "id": "ODR-V4-04",
       "kind": "obligation-amendment",
       "title": "Re-authentication keeps the tab's unsaved work",
-      "lessons": ["R7L-06"],
+      "lessons": [
+        "R7L-06"
+      ],
       "problem": "PERSIST-031 offers Reconnect when the credential was refused, and PERSIST-019 asks for confirmation before disconnecting. In Rehearsal 7 Reconnect discarded all unsaved work after a confirmation (open finding M3). The baseline permits that, which contradicts the data-preservation intent of UI-010-O2 ('what data was preserved, and a safe next step') for an expired token.",
       "approvalRecord": [
         {
@@ -75,32 +92,46 @@
       ],
       "recommendation": "Approve.",
       "impact": "Connection state machine gains Reauthenticating (state-machines.json SM-CONNECTION); one PAT-15/PAT-07-style browser case. Moderate cost.",
-      "affects": ["PERSIST-031", "UI-010", "PERSIST-019"]
+      "affects": [
+        "PERSIST-031",
+        "UI-010",
+        "PERSIST-019"
+      ]
     },
     {
       "id": "ODR-V4-05",
       "kind": "obligation-amendment",
       "title": "A way out of a conflict whose GitHub version is deleted or unverifiable",
-      "lessons": ["R7L-07"],
+      "lessons": [
+        "R7L-07"
+      ],
       "problem": "PERSIST-011 makes a deleted or rewritten investigation a conflict, and PERSIST-012's reapply needs a verifiable GitHub version. In Rehearsal 7 a deleted or unverifiable GitHub version left the conflict with no resolution: the work was kept but could never be saved (open finding M4).",
       "approvalRecord": [
         {
           "obligation_id": "PERSIST-012-O2",
           "action": "amend",
-          "criterion": "The application MUST offer three actions: review the differences, reapply my changes to the GitHub version, and discard my changes and load the GitHub version; when the GitHub version was deleted or fails verification, reapply and load are shown as unavailable with that reason, and the application additionally offers to export the tab's unsaved commands as a file the user saves, without writing anything to GitHub or to browser storage.",
+          "criterion": "The application MUST offer three actions: review the differences, reapply my changes to the GitHub version, and discard my changes and load the GitHub version; when the GitHub version was deleted or fails verification, the application also states why reapply and load cannot complete and offers to export the tab's unsaved commands as a file the user saves, without writing anything to GitHub or to browser storage.",
           "rationale": "Every conflict must have a resolution that keeps the user's work without overwriting another writer (ODR-V4-05)."
         }
       ],
-      "alternatives": ["Export the unsaved commands (recommended: no write, no overwrite)", "Re-create the investigation from the tab's version as a new commit when the GitHub version was deleted (a write; needs its own PERSIST-013 analysis)"],
+      "alternatives": [
+        "Export the unsaved commands (recommended: no write, no overwrite)",
+        "Re-create the investigation from the tab's version as a new commit when the GitHub version was deleted (a write; needs its own PERSIST-013 analysis)"
+      ],
       "recommendation": "Approve the export criterion.",
       "impact": "One conflict sub-state (SM-CONFLICT Unresolvable) and one PAT-05 case. Small cost.",
-      "affects": ["PERSIST-012", "PERSIST-011"]
+      "affects": [
+        "PERSIST-012",
+        "PERSIST-011"
+      ]
     },
     {
       "id": "ODR-V4-06",
       "kind": "obligation-amendment",
       "title": "Forged provider replies cannot reach a confirmation",
-      "lessons": ["R7L-12"],
+      "lessons": [
+        "R7L-12"
+      ],
       "problem": "PERSIST-023 forbids adapters, view code and test fixtures from constructing Saved. Rehearsal 7 kept that, yet its save process and reply types were public, so in-process code that fabricated GitHub answers could drive the protocol to a confirmation (open findings H2/M2). The baseline does not say whether a confirmation built from fabricated replies is 'produced by the PERSIST-007 read-back'.",
       "approvalRecord": [
         {
@@ -112,22 +143,92 @@
       ],
       "recommendation": "Approve.",
       "impact": "Moves HTTP result decoding into the persistence module; one more PAT-12 negative project. Small to moderate cost.",
-      "affects": ["PERSIST-051", "PERSIST-023"]
+      "affects": [
+        "PERSIST-051",
+        "PERSIST-023"
+      ]
     },
     {
       "id": "ODR-V4-07",
       "kind": "scope-or-topology",
-      "title": "The single-lead schedule does not fit 420 minutes: approve parallel lanes, or decide scope",
-      "lessons": ["R7L-15", "R7L-17"],
-      "problem": "execution-plan.json computes the timed plan from the work-item estimates. With one continuous lead agent (Plan B; AR-021 prefers it, finding F-007) the lead's work exceeds 420 minutes; with role lanes (Plan A) the critical path fits. Rehearsal 7, run with one lead agent, left 32 P0 requirements unimplemented and 39 not run or not assessed (evidence/FINAL-REPORT.md). No P0 requirement is removed here.",
-      "options": [
-        "A: approve parallel role lanes (domain, ui, persistence, integration) after the T14 interface freeze, with one integration owner and a fresh reviewer lane (Plan A)",
-        "B: keep one lead agent and accept that P0 requirements will be reported NOT_RUN at the deadline",
-        "C: reprioritize named P0 requirements through operator approval records (RDP-002/003); the agent proposes no list"
+      "title": "Agent topology for the event: only the split-UI role-lane topology fits 420 minutes",
+      "lessons": [
+        "R7L-15",
+        "R7L-17"
       ],
-      "recommendation": "A. It is the only option that keeps every P0 requirement in scope with an estimated finish inside the window.",
-      "impact": "Changes agent topology (DEC-016) for the event; adds integration hand-offs that the plan schedules after T14 and T17.",
-      "affects": ["AR-021"]
+      "problem": "execution-plan.json schedules every timed work item from its dependencies and estimate. With one continuous lead agent (B, which AR-021 prefers; finding F-007) the plan needs 700 + 65 reserved minutes; with one lane per role (A) 400 + 65; with role lanes and a second UI agent (C) 340 + 65 = 405, which fits with 15 minutes of slack and equals the critical-path lower bound. Rehearsal 7, run with one lead agent, left 32 P0 requirements unimplemented and 39 not run or not assessed. No P0 requirement is removed here.",
+      "options": [
+        "C: role lanes (domain, ui, ui-2, persistence, integration) after the T14 interface freeze, one integration owner, a fresh reviewer lane (recommended; the only topology that fits)",
+        "A: role lanes with one UI agent (65 minutes over)",
+        "B: one lead agent (345 minutes over; P0 work will be reported NOT_RUN at the deadline)",
+        "Reprioritize named P0 requirements through operator approval records (RDP-002/003); the agent proposes no list"
+      ],
+      "recommendation": "C.",
+      "impact": "Changes the agent topology (DEC-016) for the event: six concurrent lanes after T14, with hand-offs at the integration checkpoints T17 and T21. The estimates are the package author's, not measured, so the 15-minute slack is thin.",
+      "affects": [
+        "AR-021"
+      ],
+      "approvalRecord": {
+        "how": "An operator-written record: {\"decision_id\": \"ODR-V4-07\", \"action\": \"select-topology\", \"topology\": \"A-role-lanes\" | \"B-single-lead\", \"approved_by\": \"kemiller2002\", \"date\": \"<date>\"}. FG-07 passes only if the selected topology fits the window."
+      }
+    },
+    {
+      "id": "ODR-V4-08",
+      "kind": "obligation-amendment",
+      "title": "Is a verified load a confirmation that may show Saved?",
+      "lessons": [
+        "R7L-01"
+      ],
+      "problem": "PERSIST-021 requires an investigation opened from GitHub to show Saved at that commit. PERSIST-007 says only a confirmed save may move it to Saved, and PERSIST-023 says Saved is constructible only from a confirmation produced by the PERSIST-007 read-back. Rehearsal 7's first review (F1) found a load path that confirmed bytes without full verification. The baseline does not say whether a verified load is a confirmation.",
+      "approvalRecord": [
+        {
+          "obligation_id": "PERSIST-023-O2",
+          "action": "amend",
+          "criterion": "Saved MUST be constructible only from a confirmation produced by the PERSIST-007 read-back. A load that reads the investigation at a named commit and verifies it as a reader would (PERSIST-005) also produces such a confirmation for that commit, constructed only inside the persistence module from the bytes it verified.",
+          "rationale": "Reconciles PERSIST-021 with PERSIST-007 and PERSIST-023 without opening a route to Saved for unverified bytes (ODR-V4-08)."
+        }
+      ],
+      "recommendation": "Approve.",
+      "impact": "None for scope; it makes T-S38 and SM-LOAD T-L03 normative and gives PAT-12 one more legal entry to Saved to check.",
+      "affects": [
+        "PERSIST-023",
+        "PERSIST-021",
+        "PERSIST-007"
+      ]
+    },
+    {
+      "id": "ODR-V4-09",
+      "kind": "scope",
+      "title": "Event scope of the structured AI proposal loop (DEC-022 left it to the Rehearsal 4 result)",
+      "problem": "DEC-022 (OD-INDY-11) excluded the AI proposal loop and time travel from Rehearsal 4 and left the event's scope to be decided later. DEC-R7-005 has since put S14 and S15 (history, time travel, semantic diff) in scope; the AI loop has no later decision. v4 schedules both (T27, T28) and keeps R11.4 in scope.",
+      "options": [
+        "A: keep the AI proposal loop in scope (T27 stays scheduled)",
+        "B: exclude the AI proposal loop from the event through an operator approval record; R11.4 and D-004 stay"
+      ],
+      "recommendation": "B if ODR-V4-07 keeps one lead agent; otherwise A.",
+      "impact": "30 minutes of T27",
+      "affects": [
+        "R11.4"
+      ]
+    },
+    {
+      "id": "ODR-V4-10",
+      "kind": "scope",
+      "title": "Acceptance of in-scope requirements without a stated priority",
+      "problem": "The verification plan carries the P0 requirements (161), as v3's did. 359 requirements state no priority, including S14 and S15 (in scope by DEC-R7-005) and DCC-001..DCC-015 (normative process requirements, DCC-013..015 newly approved). They have verification-manifest entries and gate-level checks (acceptance-gate AG-11, AG-12) but no per-obligation acceptance contract. Promoting them would change priorities, which is the owner's decision.",
+      "options": [
+        "A: keep the P0-only plan; non-P0 requirements are verified by their manifest rules and gates",
+        "B: assign P0 to named requirements (for example S14, S15, DCC-013..DCC-015) in the source documents and re-pin"
+      ],
+      "recommendation": "B for DCC-013..DCC-015 and the in-scope screen contracts S14 and S15; A for the rest.",
+      "impact": "Larger plan; S14/S15 already scheduled in T28",
+      "affects": [
+        "S14",
+        "S15",
+        "DCC-013",
+        "DCC-014",
+        "DCC-015"
+      ]
     }
   ]
 }

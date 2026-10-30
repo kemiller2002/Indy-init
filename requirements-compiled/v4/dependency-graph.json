@@ -3,8 +3,8 @@
   "edgePolicy": "dependsOn edges are genuine prerequisites (data, contract or evidence flows from the prerequisite); preferenceAfter edges are ordering preferences and are never scheduled",
   "acyclic": true,
   "summary": {
-    "tasks": 35,
-    "genuineEdges": 56,
+    "tasks": 37,
+    "genuineEdges": 58,
     "preferenceEdges": 2,
     "criticalPathLength": 16,
     "maxDepth": 16,
@@ -13,7 +13,7 @@
       "new-implementation": 11,
       "operator-action": 5,
       "upstream-release": 2,
-      "verification": 8
+      "verification": 10
     },
     "byOwner": {
       "coordinator": 3,
@@ -21,7 +21,7 @@
       "integration": 8,
       "operator": 4,
       "persistence": 4,
-      "reviewer": 2,
+      "reviewer": 4,
       "ui": 6,
       "upstream": 3
     }
@@ -954,7 +954,7 @@
     },
     {
       "id": "T27",
-      "title": "Structured AI proposal loop (excluded from Rehearsal 4 by OD-INDY-11)",
+      "title": "Prompt/data boundaries (R11.4) and the structured AI proposal loop, whose event scope DEC-022 left open",
       "owner": "domain",
       "kind": "implementation",
       "satisfiedBy": "new-implementation",
@@ -984,7 +984,7 @@
     },
     {
       "id": "T28",
-      "title": "History, time travel and semantic diff (excluded from Rehearsal 4 by OD-INDY-11)",
+      "title": "History, time travel and semantic diff (S14, S15; in scope by DEC-R7-005)",
       "owner": "ui",
       "kind": "implementation",
       "satisfiedBy": "new-implementation",
@@ -1000,9 +1000,7 @@
       "contracts": [
         "CT-002"
       ],
-      "decisions": [
-        "DEC-022"
-      ],
+      "decisions": [],
       "gates": [
         "G5"
       ],
@@ -1213,6 +1211,52 @@
         "compute-acceptance-verdict.py run with the pinned baseline and SHA-256, approvals file and SHA-256, trusted operator ids and evidence manifest SHA-256; its verdict is the report's only verdict line",
         "event measurements recorded (timed-execution-manifest measurements); unavailable values recorded as unavailable"
       ]
+    },
+    {
+      "id": "T35",
+      "title": "Independent review checkpoint 1: interfaces and invariants (DCC-002, target T+90..120)",
+      "owner": "reviewer",
+      "kind": "verification",
+      "satisfiedBy": "verification",
+      "capability": null,
+      "depth": 9,
+      "onCriticalPath": false,
+      "covers": [
+        "DCC-002"
+      ],
+      "coveredRequirementCount": 1,
+      "contracts": [],
+      "decisions": [],
+      "gates": [
+        "G7"
+      ],
+      "completion": [
+        "a fresh reviewer, given code and requirements but not the implementer's conclusions, records findings by defect class with reproductions (DCC-003)",
+        "every critical finding has an owner and is fixed or decided before the next checkpoint"
+      ]
+    },
+    {
+      "id": "T36",
+      "title": "Independent review checkpoint 2: live write path and conflict handling",
+      "owner": "reviewer",
+      "kind": "verification",
+      "satisfiedBy": "verification",
+      "capability": null,
+      "depth": 12,
+      "onCriticalPath": false,
+      "covers": [
+        "AR-034"
+      ],
+      "coveredRequirementCount": 1,
+      "contracts": [],
+      "decisions": [],
+      "gates": [
+        "G7"
+      ],
+      "completion": [
+        "a fresh reviewer, given code and requirements but not the implementer's conclusions, records findings by defect class with reproductions (DCC-003)",
+        "every critical finding has an owner and is fixed or decided before the next checkpoint"
+      ]
     }
   ],
   "edges": [
@@ -1284,12 +1328,12 @@
     {
       "from": "T13",
       "to": "T14",
-      "reason": "the manifest is extracted from actual kernel source, not fabricated (interface-freeze status line)"
+      "reason": "the manifest is authored from the kernel's actual types at kickoff (interface-freeze contract freeze procedure step 1)"
     },
     {
       "from": "T00",
       "to": "T14",
-      "reason": "whether R001-derived interfaces may be used is an owner decision (F-013)"
+      "reason": "the owner's v4 decisions (ODR-V4-03, -06) change what Boundary D must expose"
     },
     {
       "from": "T13",
@@ -1343,18 +1387,23 @@
     },
     {
       "from": "T18",
+      "to": "T19",
+      "reason": "the save process is tested against the stateful fake built from the live recordings (PERSIST-025, PF-013; Rehearsal 7 lesson R7L-10)"
+    },
+    {
+      "from": "T18",
       "to": "T20",
       "reason": "built and tested against the recorded provider behaviour"
     },
     {
       "from": "T19",
       "to": "T20",
-      "reason": "remote acknowledgment layers on local persistence truth"
+      "reason": "the connect flow drives the session-memory save process (ADR-R7-001)"
     },
     {
       "from": "T00",
       "to": "T20",
-      "reason": "the authentication mechanism and public-read credential rule are owner decisions (F-019, F-012)"
+      "reason": "re-authentication behaviour depends on ODR-V4-04; reads and writes both need a credential (DEC-R7-001)"
     },
     {
       "from": "T20",
@@ -1415,11 +1464,6 @@
       "from": "T22",
       "to": "T28",
       "reason": "uses the workspace views and inspector"
-    },
-    {
-      "from": "T00",
-      "to": "T28",
-      "reason": "scope is an owner decision (F-008)"
     },
     {
       "from": "T11",
@@ -1495,6 +1539,16 @@
       "from": "T08",
       "to": "T34",
       "reason": "acceptance re-runs the same gate against the same pinned baseline (RDP-004)"
+    },
+    {
+      "from": "T14",
+      "to": "T35",
+      "reason": "reviews the output of T14 before dependent work proceeds (DCC-002, AR-034)"
+    },
+    {
+      "from": "T21",
+      "to": "T36",
+      "reason": "reviews the output of T21 before dependent work proceeds (DCC-002, AR-034)"
     }
   ],
   "preferenceEdges": [
@@ -1544,7 +1598,9 @@
     "T31",
     "T32",
     "T33",
-    "T34"
+    "T34",
+    "T35",
+    "T36"
   ],
   "criticalPath": [
     "T00",
@@ -1629,7 +1685,8 @@
       "depth": 9,
       "parallelizable": [
         "T17",
-        "T19"
+        "T19",
+        "T35"
       ]
     },
     {
@@ -1653,7 +1710,8 @@
     {
       "depth": 12,
       "parallelizable": [
-        "T30"
+        "T30",
+        "T36"
       ]
     },
     {
@@ -2060,7 +2118,8 @@
     {
       "requirement": "AR-034",
       "tasks": [
-        "T34"
+        "T34",
+        "T36"
       ]
     },
     {
@@ -2516,7 +2575,8 @@
       "requirement": "DCC-002",
       "tasks": [
         "T30",
-        "T34"
+        "T34",
+        "T35"
       ]
     },
     {

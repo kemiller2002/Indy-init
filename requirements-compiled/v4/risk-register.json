@@ -34,6 +34,21 @@
       "exposure": 9
     },
     {
+      "id": "RISK-14",
+      "title": "The schedule's slack is 15 minutes on author estimates",
+      "likelihood": 3,
+      "impact": 3,
+      "trigger": "any timed task overruns its estimate",
+      "mitigation": "Topology C (ODR-V4-07); review checkpoints T35 and T36 catch defects early; reserves RES-INTEGRATION and RES-FINAL are kept",
+      "owner": "coordinator",
+      "links": [
+        "ODR-V4-07",
+        "T35",
+        "T36"
+      ],
+      "exposure": 9
+    },
+    {
       "id": "RISK-02",
       "title": "Owner decision requests ODR-V4-01..07 are not decided before kickoff",
       "likelihood": 2,
@@ -173,6 +188,20 @@
       "owner": "operator",
       "links": [
         "ADRP-016"
+      ],
+      "exposure": 3
+    },
+    {
+      "id": "RISK-13",
+      "title": "Approval records are text in a file; their authenticity rests on git attribution and main's protection",
+      "likelihood": 1,
+      "impact": 3,
+      "trigger": "a record written by someone other than the operator is merged",
+      "mitigation": "FG-05 refuses records from agent-attributed commits or off main and from untrusted approvers; the owner should require their own approving review on pull requests that change kickoff/*/approvals.causa.json",
+      "owner": "operator",
+      "links": [
+        "ODR-V4-01",
+        "AR-003"
       ],
       "exposure": 3
     }

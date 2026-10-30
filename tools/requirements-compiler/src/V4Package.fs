@@ -16,6 +16,7 @@ open System
 open System.Text.RegularExpressions
 open Json
 open Model
+open Text
 
 let schemaPrefix = "indy-init.v4-"
 
@@ -56,7 +57,21 @@ type Inputs =
       Review: Json
       FreezeInput: Json
       /// Paths of every file under the package directory, relative to it.
-      PackageFiles: string list }
+      PackageFiles: string list
+      /// Operator ids the curation trusts to write approval records (curation/verification-plan.json approvals).
+      TrustedOperators: string list
+      /// The last commit that changed the pinned approvals file carries an agent's attribution trailers.
+      ApprovalsAgentAuthored: bool
+      /// The pinned approvals commit is reachable from main.
+      ApprovalsOnMain: bool
+      /// freezeCommit is non-empty, reachable from HEAD, and its approvals file holds the package approval.
+      FreezeCommitVerified: bool
+      ReviewSha256: string
+      TestRecordSha256: string
+      /// v3's curation bindings extended by the r7 proposal: the bindings the v4 strengthening is applied to.
+      BaseBindings: Json list
+      /// curation/verification-plan.json testBindings as committed.
+      CurationBindings: Json list }
 
 type Check = { Id: string; Title: string; Critical: bool; Problems: string list }
 
@@ -345,7 +360,12 @@ let executionPlan (i: Inputs) : Json * string list =
     let missingEstimates = timed |> List.filter (fun t -> (TimedSchedule.estimate t).IsNone) |> List.map (fun t -> sprintf "execution plan: timed task %s has no estimateMinutes" t.Id)
     let path, pathMinutes = TimedSchedule.criticalPath i.Tasks
     let topology (id: string) =
-        let slots = TimedSchedule.schedule (TimedSchedule.laneOf id) i.Tasks
+        // A topology may start from another's lanes and move named tasks to other lanes (laneOverrides).
+        let spec = arr "topologies" i.Policy |> List.tryFind (fun t -> str "id" t = id) |> Option.defaultValue (JObj [])
+        let baseId = strOpt "base" spec |> Option.defaultValue id
+        let overrides = match field "laneOverrides" spec with Some(JObj ps) -> ps |> List.map (fun (k, v) -> k, asStr v) |> Map.ofList | _ -> Map.empty
+        let laneFor (t: WorkTask) = overrides.TryFind t.Id |> Option.defaultValue (TimedSchedule.laneOf baseId t)
+        let slots = TimedSchedule.schedule laneFor i.Tasks
         let makespan = slots |> List.map (fun s -> s.Finish) |> List.fold max 0
         let lanes = slots |> List.groupBy (fun s -> s.Lane) |> List.sortBy fst
         let fits = makespan + reserves <= window
@@ -364,9 +384,8 @@ let executionPlan (i: Inputs) : Json * string list =
     let topologies = arr "topologies" i.Policy |> List.map (str "id") |> List.map topology
     let anyFits = topologies |> List.exists (fun (_, _, f, _) -> f)
     let byId = i.Tasks |> List.map (fun t -> t.Id, t) |> Map.ofList
-    let problems =
-        missingEstimates
-        @ [ if not anyFits then yield sprintf "execution plan: no topology fits %d minutes with %d reserved" window reserves ]
+    // Whether a topology fits is a freeze condition (FG-07), reported in `fit`; it is not a defect of the plan.
+    let problems = missingEstimates
     JObj
         [ "schema", JStr(schemaPrefix + "execution-plan/1")
           "description", JStr "The timed plan for November 7, computed from curation/tasks.json (dependencies, estimateMinutes) and analysis/execution-policy.json. Every topology keeps every timed task and every requirement; a topology that does not fit is reported, never trimmed."
@@ -450,6 +469,12 @@ let acceptanceObligations (i: Inputs) : Json =
                       "passCondition", JStr(passCondition categories policy)
                       "failureConditions", failureConditions
                       "normative", JBool true ]))
+    let planBindings =
+        arr "requirements" i.Plan
+        |> List.collect (arr "obligations")
+        |> List.map (fun o -> str "sourceObligation" o, field "testIdentity" o |> Option.map (arr "tests") |> Option.defaultValue [] |> List.map (str "id"))
+        |> Map.ofList
+    let boundIn (obligation: string) (id: string) = planBindings.TryFind obligation |> Option.defaultValue [] |> List.contains id
     let extra (origin: string) (id: string) (sources: string list) (proposals: string list) (t: Json) =
         JObj
             [ "id", JStr id
@@ -462,10 +487,11 @@ let acceptanceObligations (i: Inputs) : Json =
               "passCondition", JStr(sprintf "The test has a PASS result in the evidence bundle for the exact final SHA (category %s)." (str "category" t))
               "failureConditions", failureConditions
               "normative", JBool proposals.IsEmpty
+              "boundInPlan", JBool(boundIn (sources |> List.tryHead |> Option.defaultValue "") (str "id" t))
               "status", JStr(if proposals.IsEmpty then "binding-strengthened (enforces existing obligations of the cited requirements)" else "proposed: normative only after the owner approves " + String.concat ", " proposals) ]
     let invariantOblig =
         arr "invariants" i.Invariants
-        |> List.collect (fun inv -> arr "tests" inv |> List.mapi (fun n t -> extra "invariant" (sprintf "AO-%s-%d" (str "id" inv) (n + 1)) (strs "sources" inv) (strs "proposals" inv) t))
+        |> List.collect (fun inv -> arr "tests" inv |> List.mapi (fun n t -> extra "invariant" (sprintf "AO-%s-%d" (str "id" inv) (n + 1)) ((strOpt "obligation" t |> Option.toList) @ strs "sources" inv) (strs "proposals" inv) t))
     let lessonOblig =
         arr "lessons" i.Lessons
         |> List.collect (fun l -> arr "tests" l |> List.mapi (fun n t -> extra "r7-lesson" (sprintf "AO-%s-%d" (str "id" l) (n + 1)) [ str "obligation" t ] (strs "proposals" l) t))
@@ -495,7 +521,7 @@ let acceptanceGate (i: Inputs) : Json =
           "conditions",
           JArr
               [ g "AG-01" "any P0 obligation of the frozen plan is unverified" "requirements-compiler verify-plan (verdict and missing coverage)"
-                g "AG-02" "a critical test (any test bound to a P0 obligation, any PAT test, any invariant test of a normative invariant) fails" "verify-plan over the evidence bundle; acceptance ledger"
+                g "AG-02" "a critical test fails: any test the plan binds to a P0 obligation, which includes every PAT test, the WebKit twins and the normative invariant and lesson tests v4 binds (proposals/v4-strengthened-bindings.proposed.json)" "verify-plan over the evidence bundle; acceptance ledger"
                 g "AG-03" "required evidence is missing, or is for another SHA, or from an earlier rehearsal" "verify-plan --trusted-source-sha; Dokimos completion verify"
                 g "AG-04" "the deployed artifact's SHA differs from the verified SHA, or the deployed acceptance job for that SHA did not conclude successfully" "deploy smoke (build.json equals the SHA) and the deployed-acceptance job conclusion (DCC-008)"
                 g "AG-05" "any bound test is NOT_RUN, skipped or quarantined (including browser suites that stopped after a failure)" "acceptance ledger and verify-plan (PERSIST-055)"
@@ -570,7 +596,7 @@ let invariantProblems (i: Inputs) =
     let categories = field "evidenceCategories" i.Plan |> Option.map (arr "categories") |> Option.defaultValue [] |> List.map (str "id") |> Set.ofList
     let invs = arr "invariants" i.Invariants
     let dupIds = invs |> List.countBy (str "id") |> List.filter (fun (_, n) -> n > 1) |> List.map (fst >> sprintf "invariants: %s is defined twice")
-    let required = [ "persistence-correctness"; "data-preservation"; "concurrency"; "domain-integrity"; "verification-integrity"; "security" ]
+    let required = [ "persistence-correctness"; "data-preservation"; "concurrency"; "domain-integrity"; "verification-integrity"; "security"; "accessibility" ]
     let groups = invs |> List.map (str "group") |> Set.ofList
     dupIds
     @ (required |> List.filter (groups.Contains >> not) |> List.map (sprintf "invariants: no invariant in group %s"))
@@ -602,7 +628,19 @@ let lessonsProblems (i: Inputs) =
           "Deadline and merge orchestration failures" ]
     let classes = arr "lessons" i.Lessons |> List.map (str "class") |> Set.ofList
     let texts = obligationText i
-    (required |> List.filter (classes.Contains >> not) |> List.map (sprintf "r7 lessons: required defect class '%s' is not mapped"))
+    let pinned = field "evidence" i.Lessons |> Option.bind (field "fileSha256") |> Option.map (function JObj ps -> ps |> List.map (fun (k, v) -> k, asStr v) | _ -> []) |> Option.defaultValue []
+    let evidenceProblems =
+        match i.R7Evidence with
+        | None -> [ "r7 lessons: the Rehearsal 7 evidence files were not supplied (--r7-evidence), so no quote was verified" ]
+        | Some read ->
+            [ for f in allowedFiles do
+                  match read f, pinned |> List.tryFind (fst >> (=) f) with
+                  | _, None -> yield sprintf "r7 lessons: %s has no pinned sha256" f
+                  | None, _ -> yield sprintf "r7 lessons: %s is unreadable" f
+                  | Some text, Some(_, sha) when sha256OfText text <> sha -> yield sprintf "r7 lessons: %s hashes to %s, pinned %s" f (sha256OfText text) sha
+                  | _ -> () ]
+    evidenceProblems
+    @ (required |> List.filter (classes.Contains >> not) |> List.map (sprintf "r7 lessons: required defect class '%s' is not mapped"))
     @ (arr "lessons" i.Lessons
        |> List.collect (fun l ->
            let where = "r7 lesson " + str "id" l
@@ -728,6 +766,73 @@ let treeSha256 (files: (string * byte[]) list) =
     |> Text.Encoding.UTF8.GetBytes
     |> Git.sha256Hex
 
+// ---- strengthened bindings --------------------------------------------------------------------------------
+
+let private ledgerCategories = set [ "unit"; "integration"; "browser"; "live-provider"; "security"; "accessibility" ]
+
+/// The plan's test kind for an analysis test kind: property, model, negative and mutation tests are deterministic.
+let private planKind (k: string) = if k = "live" then "live" else "deterministic"
+
+let private browserTargets = Regex(@"\b(WebKit|iPad|Safari)\b")
+
+/// Bindings v4 adds to the plan so verify-plan enforces them (Rehearsal 7 lessons, review RV-2/RV-3/RV-10):
+/// - every application-test of a normative invariant or lesson, on the obligation it names;
+/// - a WebKit twin of every Chromium browser test of a requirement whose text names WebKit, iPad or Safari.
+/// Tests already in the base bindings are not proposed again. Pure; order is the analysis order, then plan order.
+let strengthenedBindings (i: Inputs) : (string * Json list) list =
+    let baseOf = i.BaseBindings |> List.map (fun b -> str "obligation" b, arr "tests" b |> List.map (str "id")) |> Map.ofList
+    let already o id = baseOf.TryFind o |> Option.defaultValue [] |> List.contains id
+    let fromAnalysis (items: Json list) =
+        items
+        |> List.filter (fun x -> (strs "proposals" x).IsEmpty)
+        |> List.collect (arr "tests")
+        |> List.filter (fun t -> (strOpt "obligation" t).IsSome && ledgerCategories.Contains(str "category" t))
+        |> List.map (fun t -> str "obligation" t, JObj [ "id", JStr(str "id" t); "kind", JStr(planKind (str "kind" t)); "categories", jstrs [ str "category" t ] ])
+    let webkit =
+        let named = reqs i.Baseline |> List.filter (fun r -> arr "obligations" r |> List.exists (fun o -> browserTargets.IsMatch(str "text" o))) |> List.map (str "id") |> Set.ofList
+        arr "requirements" i.Plan
+        |> List.filter (fun e -> named.Contains(str "requirement" e))
+        |> List.collect (fun e ->
+            arr "obligations" e
+            |> List.collect (fun o ->
+                let tests = field "testIdentity" o |> Option.map (arr "tests") |> Option.defaultValue []
+                let contractTests = field "acceptanceContract" o |> Option.bind (field "testIdentity") |> Option.map (arr "tests") |> Option.defaultValue []
+                contractTests
+                |> List.filter (fun t -> (str "id" t).EndsWith(" [chromium]", StringComparison.Ordinal) && strs "categories" t |> List.contains "browser")
+                |> List.map (fun t ->
+                    let id = (str "id" t).Substring(0, (str "id" t).Length - " [chromium]".Length) + " [webkit]"
+                    ignore tests
+                    str "sourceObligation" o, JObj [ "id", JStr id; "kind", JStr(str "kind" t); "categories", jstrs (strs "categories" t) ])))
+    fromAnalysis (arr "invariants" i.Invariants) @ fromAnalysis (arr "lessons" i.Lessons) @ webkit
+    |> List.filter (fun (o, t) -> not (already o (str "id" t)))
+    |> List.groupBy fst
+    |> List.map (fun (o, xs) -> o, xs |> List.map snd |> List.distinctBy (str "id"))
+
+let strengthenedProposal (i: Inputs) : Json =
+    JObj
+        [ "schema", JStr TestBindingProposal.schemaId
+          "status", JStr "proposed"
+          "approval", JStr "Agent proposal (v4 stage). It binds tests to existing obligations only; it adds no obligation. It takes effect when it is in curation/verification-plan.json testBindings (check W16) and the owner merges the recompiled plan."
+          "convention", JStr "Invariant and lesson tests keep their identities from analysis/invariants.json and analysis/r7-lessons.json; WebKit twins replace ' [chromium]' with ' [webkit]' in the plan's own browser test identity."
+          "testBindings", JArr(strengthenedBindings i |> List.map (fun (o, ts) -> JObj [ "obligation", JStr o; "tests", JArr ts ])) ]
+
+let strengthenedProblems (i: Inputs) =
+    let required =
+        arr "requirements" i.Plan
+        |> List.collect (arr "obligations")
+        |> List.map (fun o -> str "sourceObligation" o, field "acceptanceContract" o |> Option.map (strs "requiredEvidenceCategories") |> Option.defaultValue [])
+        |> Map.ofList
+    let proposal = strengthenedProposal i
+    [ for (o, ts) in strengthenedBindings i do
+          match required.TryFind o with
+          | None -> yield sprintf "strengthened binding targets %s, which is not a P0 obligation of the plan" o
+          | Some cats ->
+              for t in ts do
+                  for c in strs "categories" t do
+                      if not (List.contains c cats) then yield sprintf "strengthened binding %s on %s declares %s, which the obligation does not require" (str "id" t) o c
+      if serialize (JArr i.CurationBindings) <> serialize (JArr(TestBindingProposal.applyTo i.BaseBindings proposal)) then
+          yield "curation testBindings are not exactly the base bindings extended by the v4 strengthened proposal (run requirements-compiler v4 --apply-bindings)" ]
+
 // ---- the package ---------------------------------------------------------------------------------------
 
 type Built = { Files: (string * Json) list; Checks: Check list; Lock: Json }
@@ -751,7 +856,11 @@ let build (i: Inputs) : Built =
         [ check "W01" "The authoritative baseline is reconciled: every requirement of the R6, R7 and v4 baselines has a disposition, every change has a recorded authority, and no requirement or P0 priority disappears" true (reconciliationProblems i)
           check "W02" "The legacy compilation (V01-V18) passes and its readiness is READY: no unresolved contradiction, valid DAG, complete coverage" true
               [ if not legacyPass then yield "requirements-validation-report.json: compilation verdict is not PASS"
-                if not legacyReady then yield "requirements-validation-report.json: rehearsal readiness is not READY" ]
+                if not legacyReady then yield "requirements-validation-report.json: rehearsal readiness is not READY"
+                if field "source" i.LegacyReport |> Option.map (str "baselineSha256") <> Some i.BaselineSha256 then yield "requirements-validation-report.json was produced from another baseline"
+                for c in arr "checks" i.LegacyReport do
+                    if str "status" c <> "PASS" then yield sprintf "requirements-validation-report.json: %s is %s" (str "id" c) (str "status" c)
+                if VerificationPlan.digestOf i.Plan <> (field "planIdentity" i.Plan |> Option.map (str "digest") |> Option.defaultValue "") then yield "verification-plan.json does not match its own planIdentity digest" ]
           check "W03" "Every P0 requirement of the baseline is in the verification plan and has acceptance obligations; plan-readiness is READY with no permit" true
               [ for r in Set.difference p0 planP0 do yield sprintf "P0 %s is not in the verification plan" r
                 for r in Set.difference p0 aoP0 do yield sprintf "P0 %s has no acceptance obligation" r
@@ -763,19 +872,22 @@ let build (i: Inputs) : Built =
           check "W07" "Every required Rehearsal 7 defect class is mapped; gaps carry an owner decision request; quotes are verbatim in the permitted evidence files" true (lessonsProblems i)
           check "W08" "The dependency lock is the approved release set: every component is a stable release of echelon-current at the recorded version and manifest digest; no forbidden framework" true lockProblems
           check "W09" "Interfaces name existing contracts and locked systems, with operations and a verification method" true (interfaceProblems i lock)
-          check "W10" "The execution plan schedules every timed task with an estimate and reports whether each topology fits the window" true
+          check "W10" "The execution plan schedules every timed task with an estimate and reports whether each topology fits the window (fit itself is freeze condition FG-07)" true
               (planProblems @ [ if not (snd timedCovered) then yield "execution plan: no topology was scheduled" ])
           check "W11" "Owner decision requests are well formed: every proposed amendment only adds to its obligation's baseline text" true (proposalProblems i)
           check "W12" "The risk register's ratings are in range and every link names something in the package" true (riskProblems i)
           check "W13" "No approval record was written by an agent: the pinned approvals file holds only operator records (RDP-003)" true
-              [ for a in arr "approvals" i.Approvals do
-                    if (strOpt "approved_by" a |> Option.orElse (strOpt "approver" a)) |> Option.exists (fun s -> s.Contains("agent", StringComparison.OrdinalIgnoreCase) || s.Contains("claude", StringComparison.OrdinalIgnoreCase)) then
-                        yield "approvals: a record names an agent as its approver" ]
+              [ let records = arr "approvals" i.Approvals
+                if not records.IsEmpty && i.ApprovalsAgentAuthored then yield "approvals: the pinned approvals file was last changed by an agent-attributed commit; only the operator writes records (RDP-003)"
+                for a in records do
+                    let by = sOr "approved_by" a
+                    if not (List.contains by i.TrustedOperators) then yield sprintf "approvals: record %s is approved by '%s', who is not a trusted operator" (sOr "decision_id" a + sOr "obligation_id" a) by ]
           check "W14" "The package contains no application implementation: no source file of an application language under requirements-compiled/v4" true
               (i.PackageFiles |> List.filter (fun f -> applicationExtensions |> List.exists (fun e -> f.EndsWith(e, StringComparison.OrdinalIgnoreCase))) |> List.map (sprintf "application source file in the package: %s"))
           check "W15" "The verification plan and the reconciliation are compiled from the committed v4 baseline" true
               [ let planSha = field "source" i.Plan |> Option.map (str "baselineSha256") |> Option.defaultValue ""
-                if planSha <> i.BaselineSha256 then yield sprintf "verification-plan.json was compiled from baseline sha256 %s, the committed v4 baseline is %s" planSha i.BaselineSha256 ] ]
+                if planSha <> i.BaselineSha256 then yield sprintf "verification-plan.json was compiled from baseline sha256 %s, the committed v4 baseline is %s" planSha i.BaselineSha256 ]
+          check "W16" "Every normative invariant and lesson test, and a WebKit twin of every Chromium test where the requirement names WebKit, iPad or Safari, is bound in the plan on an obligation that requires its category" true (strengthenedProblems i) ]
     let files =
         [ "baseline-reconciliation.json", reconciliation i
           "dependency-lock.json", lock
@@ -787,7 +899,8 @@ let build (i: Inputs) : Built =
           "r7-lessons-mapping.json", lessonsMapping i
           "risk-register.json", riskRegister i
           "acceptance/acceptance-obligations.json", acceptance
-          "acceptance/acceptance-gate.json", acceptanceGate i ]
+          "acceptance/acceptance-gate.json", acceptanceGate i
+          "proposals/v4-strengthened-bindings.proposed.json", strengthenedProposal i ]
     { Files = files; Checks = checks; Lock = lock }
 
 let validationReport (i: Inputs) (checks: Check list) : Json =
@@ -802,43 +915,73 @@ let validationReport (i: Inputs) (checks: Check list) : Json =
 
 type Gate = { Id: string; Condition: string; Pass: bool; Detail: string }
 
-/// Operator approval of the package itself (ODR-V4-01): a record in the pinned approvals file naming the plan digest.
-let private packageApproved (i: Inputs) (planDigest: string) =
-    arr "approvals" i.Approvals
-    |> List.exists (fun a -> sOr "decision_id" a = "ODR-V4-01" && sOr "action" a = "approve-package" && sOr "plan_digest" a = planDigest)
+/// Approval records the gate may count: written by a trusted operator, in a file whose last change is not
+/// agent-attributed, at a commit reachable from main (RDP-003). Anything else counts as no record.
+let validRecords (i: Inputs) =
+    if i.ApprovalsAgentAuthored || not i.ApprovalsOnMain then []
+    else arr "approvals" i.Approvals |> List.filter (fun a -> List.contains (sOr "approved_by" a) i.TrustedOperators)
 
-/// Owner decision requests still without an operator record (amendments) or decision.
+/// Operator approval of the package itself (ODR-V4-01): it must name the exact plan, review record and test record.
+let private packageApproved (i: Inputs) (planDigest: string) =
+    validRecords i
+    |> List.exists (fun a ->
+        sOr "decision_id" a = "ODR-V4-01" && sOr "action" a = "approve-package" && sOr "plan_digest" a = planDigest
+        && sOr "review_sha256" a = i.ReviewSha256 && sOr "test_record_sha256" a = i.TestRecordSha256)
+
+/// The topology the owner selected (ODR-V4-07), if any.
+let selectedTopology (i: Inputs) =
+    validRecords i |> List.tryFind (fun a -> sOr "decision_id" a = "ODR-V4-07" && sOr "action" a = "select-topology") |> Option.map (sOr "topology")
+
+/// Owner decision requests still without a valid operator record. An amendment counts only when the record carries
+/// exactly the proposed obligation, action and criterion, so a weaker text cannot clear it.
 let pendingDecisions (i: Inputs) (planDigest: string) =
-    let recorded = arr "approvals" i.Approvals |> List.map (fun a -> sOr "obligation_id" a, sOr "action" a) |> Set.ofList
-    let decided = arr "approvals" i.Approvals |> List.map (sOr "decision_id") |> Set.ofList
+    let records = validRecords i
+    let decided = records |> List.map (sOr "decision_id") |> Set.ofList
+    let amendRecorded (r: Json) =
+        records |> List.exists (fun a -> sOr "obligation_id" a = sOr "obligation_id" r && sOr "action" a = "amend" && sOr "criterion" a = sOr "criterion" r)
     arr "requests" i.Proposals
     |> List.filter (fun p ->
         match str "kind" p with
         | "package-approval" -> not (packageApproved i planDigest)
         | "obligation-amendment" ->
-            let records = match field "approvalRecord" p with Some(JArr xs) -> xs | _ -> []
-            not (decided.Contains(str "id" p)) && not (records |> List.forall (fun r -> recorded.Contains(sOr "obligation_id" r, "amend")))
+            let proposed = match field "approvalRecord" p with Some(JArr xs) -> xs | _ -> []
+            let declined = records |> List.exists (fun a -> sOr "decision_id" a = str "id" p && sOr "action" a = "decline")
+            not declined && not (proposed |> List.forall amendRecorded)
+        | "scope-or-topology" -> (selectedTopology i).IsNone
         | _ -> not (decided.Contains(str "id" p)))
     |> List.map (str "id")
+
+/// The review verdict computed from the record's findings, never taken from its own verdict field: PASS only when
+/// a named reviewer who is not the implementer reviewed at least once and no critical or major finding is open.
+let reviewPasses (i: Inputs) =
+    let findings = arr "findings" i.Review
+    sOr "reviewer" i.Review <> ""
+    && not (boolOr "reviewerIsImplementer" true i.Review)
+    && (intOpt "rounds" i.Review |> Option.defaultValue 0L) >= 1L
+    && sOr "finalVerdict" i.Review = "PASS"
+    && findings |> List.forall (fun f -> not ([ "critical"; "major" ] |> List.contains (sOr "severity" f)) || [ "fixed"; "decided-by-owner" ] |> List.contains (sOr "status" f))
 
 let gates (i: Inputs) (b: Built) (planDigest: string) : Gate list =
     let byId id = b.Checks |> List.find (fun c -> c.Id = id)
     let ok id = (byId id).Problems.IsEmpty
     let pending = pendingDecisions i planDigest
     let testsPass = sOr "result" i.CompilerTests = "PASS" && sOr "compilerTreeSha256" i.CompilerTests = i.CompilerTreeSha256
-    let reviewPass = sOr "verdict" i.Review = "PASS" && (arr "findings" i.Review |> List.forall (fun f -> not (sOr "severity" f = "critical" && sOr "status" f <> "resolved")))
-    let planFits = b.Files |> List.tryFind (fst >> (=) "execution-plan.json") |> Option.bind (snd >> field "fit") |> Option.map (boolOr "anyTopologyFits" false) |> Option.defaultValue false
-    let freezeCommit = strOpt "freezeCommit" i.FreezeInput |> Option.defaultValue ""
+    let topologies = b.Files |> List.tryFind (fst >> (=) "execution-plan.json") |> Option.map (snd >> arr "topologies") |> Option.defaultValue []
+    let selected = selectedTopology i
+    let selectedFits = selected |> Option.bind (fun s -> topologies |> List.tryFind (fun t -> str "id" t = s)) |> Option.map (boolOr "fits" false) |> Option.defaultValue false
     [ { Id = "FG-01"; Condition = "The authoritative baseline is reconciled"; Pass = ok "W01"; Detail = sprintf "W01 %d problem(s)" (byId "W01").Problems.Length }
       { Id = "FG-02"; Condition = "No mandatory requirement has disappeared"; Pass = ok "W01" && ok "W03"; Detail = "W01 (no removal, no P0 downgrade) and W03 (every P0 in the plan)" }
-      { Id = "FG-03"; Condition = "Every P0 requirement has acceptance coverage"; Pass = ok "W03"; Detail = "W03: plan-readiness READY, no permit, acceptance obligations for every P0" }
-      { Id = "FG-04"; Condition = "No unresolved critical contradiction remains"; Pass = ok "W02"; Detail = "W02: legacy V03 and readiness" }
+      { Id = "FG-03"; Condition = "Every P0 requirement has acceptance coverage"; Pass = ok "W03" && ok "W16"; Detail = "W03 (plan-readiness READY, no permit, acceptance obligations for every P0) and W16 (strengthened bindings in the plan)" }
+      { Id = "FG-04"; Condition = "No unresolved critical contradiction remains"; Pass = ok "W02"; Detail = "W02: legacy V01-V18 and readiness" }
       { Id = "FG-05"; Condition = "All required owner approvals exist"; Pass = pending.IsEmpty; Detail = (if pending.IsEmpty then "none pending" else "pending: " + String.concat ", " pending) }
       { Id = "FG-06"; Condition = "The dependency lock is valid"; Pass = ok "W08"; Detail = sprintf "W08 %d problem(s)" (byId "W08").Problems.Length }
-      { Id = "FG-07"; Condition = "The execution plan is complete"; Pass = ok "W10" && planFits; Detail = (if planFits then "complete; at least one topology fits (see execution-plan.json fit)" else "no topology fits the window") }
-      { Id = "FG-08"; Condition = "Compiler tests pass"; Pass = testsPass; Detail = sprintf "record: %s, tree %s (current tree %s)" (sOr "result" i.CompilerTests) (sOr "compilerTreeSha256" i.CompilerTests) i.CompilerTreeSha256 }
-      { Id = "FG-09"; Condition = "Independent review passes"; Pass = reviewPass; Detail = sprintf "review verdict %s (%s)" (sOr "verdict" i.Review) (sOr "reviewer" i.Review) }
-      { Id = "FG-10"; Condition = "The freeze commit is recorded"; Pass = freezeCommit <> ""; Detail = (if freezeCommit = "" then "no freeze commit: recorded only when every other condition passes" else freezeCommit) } ]
+      { Id = "FG-07"; Condition = "The execution plan is complete and the selected topology fits the window"; Pass = ok "W10" && selectedFits
+        Detail = (match selected with
+                  | None -> "no topology selected by the owner (ODR-V4-07)"
+                  | Some s -> sprintf "selected %s: %s" s (if selectedFits then "fits" else "does not fit")) }
+      { Id = "FG-08"; Condition = "Compiler tests pass"; Pass = testsPass; Detail = sprintf "record: %s, tree %s (current tree %s); CI re-runs the suite and compares (--verify-test-record)" (sOr "result" i.CompilerTests) (sOr "compilerTreeSha256" i.CompilerTests) i.CompilerTreeSha256 }
+      { Id = "FG-09"; Condition = "Independent review passes"; Pass = reviewPasses i; Detail = sprintf "computed from %d finding(s); reviewer %s; final round %s" (arr "findings" i.Review).Length (sOr "reviewer" i.Review) (sOr "finalVerdict" i.Review) }
+      { Id = "FG-10"; Condition = "The freeze commit is recorded"; Pass = i.FreezeCommitVerified; Detail = (if i.FreezeCommitVerified then sOr "freezeCommit" i.FreezeInput else "no verified freeze commit: it must be on main and hold the owner's package approval") } ]
 
 let freezeStatus (b: Built) (gs: Gate list) (legacyPass: bool) =
     let pass id = gs |> List.exists (fun g -> g.Id = id && g.Pass)

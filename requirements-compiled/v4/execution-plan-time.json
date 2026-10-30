@@ -4,7 +4,7 @@
   "name": "Plan A: time optimized",
   "objective": "Minimize elapsed steps: one lane per owner role, critical-path-first list scheduling, integration checkpoints as early as their prerequisites allow",
   "scope": {
-    "tasks": 35,
+    "tasks": 37,
     "requirementsCovered": 526,
     "acceptance": "identical for both plans: every entry of verification-manifest.json; no requirement is dropped or weakened"
   },
@@ -31,8 +31,8 @@
   "plannedStructure": {
     "steps": 18,
     "maxConcurrentTasks": 4,
-    "crossLaneHandoffs": 41,
-    "plannedCiRunsUpperBound": 25,
+    "crossLaneHandoffs": 42,
+    "plannedCiRunsUpperBound": 27,
     "ciTriggerKinds": [
       "implementation",
       "integration-checkpoint",
@@ -193,6 +193,10 @@
         {
           "task": "T19",
           "lane": "persistence"
+        },
+        {
+          "task": "T35",
+          "lane": "reviewer"
         }
       ]
     },
@@ -249,6 +253,10 @@
         {
           "task": "T28",
           "lane": "ui"
+        },
+        {
+          "task": "T36",
+          "lane": "reviewer"
         }
       ]
     },
@@ -596,7 +604,8 @@
       "lane": "persistence",
       "step": 9,
       "dependsOn": [
-        "T14"
+        "T14",
+        "T18"
       ],
       "completion": [
         "PAT-12 (PERSIST-051) passes: every state and input enumerated, Saved reachable only from a read-back confirmation, illegal inputs fail closed",
@@ -739,8 +748,7 @@
       "lane": "ui",
       "step": 13,
       "dependsOn": [
-        "T22",
-        "T00"
+        "T22"
       ],
       "completion": [
         "history renders from canonical sequence, never wall-clock alone (ADRP-007)",
@@ -850,6 +858,36 @@
         "G0",
         "G9",
         "G10"
+      ]
+    },
+    {
+      "id": "T35",
+      "lane": "reviewer",
+      "step": 9,
+      "dependsOn": [
+        "T14"
+      ],
+      "completion": [
+        "a fresh reviewer, given code and requirements but not the implementer's conclusions, records findings by defect class with reproductions (DCC-003)",
+        "every critical finding has an owner and is fixed or decided before the next checkpoint"
+      ],
+      "gates": [
+        "G7"
+      ]
+    },
+    {
+      "id": "T36",
+      "lane": "reviewer",
+      "step": 13,
+      "dependsOn": [
+        "T21"
+      ],
+      "completion": [
+        "a fresh reviewer, given code and requirements but not the implementer's conclusions, records findings by defect class with reproductions (DCC-003)",
+        "every critical finding has an owner and is fixed or decided before the next checkpoint"
+      ],
+      "gates": [
+        "G7"
       ]
     }
   ]

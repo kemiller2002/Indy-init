@@ -38,18 +38,27 @@
   "independentReviewCheckpoints": [
     {
       "id": "IRC-1",
+      "task": "T35",
       "after": "T14",
-      "purpose": "early adversarial review of interfaces and invariants before fan-out completes (DCC-002: target T+90 to T+120)"
+      "purpose": "early adversarial review of interfaces and invariants (DCC-002: target T+90 to T+120)"
     },
     {
       "id": "IRC-2",
+      "task": "T36",
       "after": "T21",
       "purpose": "review after the live write path, before UI completion"
     },
     {
       "id": "IRC-3",
-      "after": "T31",
-      "purpose": "review of the release candidate (T30 and T33 are the scheduled reviewer tasks)"
+      "task": "T30",
+      "after": "T21, T22, T25",
+      "purpose": "architecture and invariant review before the release candidate"
+    },
+    {
+      "id": "IRC-4",
+      "task": "T33",
+      "after": "T32",
+      "purpose": "fresh reviewer before the final verdict"
     }
   ],
   "ciRules": [
@@ -90,7 +99,7 @@
       "title": "Stack lock and compatibility gate",
       "owner": "integration",
       "estimateMinutes": 15,
-      "estimateBasis": "planning estimate from Rehearsal 7 observed elapsed times (evidence/FINAL-REPORT.md, provenance history) scaled to this task's scope; not measured for this task",
+      "estimateBasis": "planning estimate by the package author, informed by Rehearsal 7's outcome (most P0 work unfinished in 420 minutes with one lead agent); Rehearsal 7 recorded no per-task times, so no estimate is measured",
       "dependsOn": [],
       "conditionalOn": null
     },
@@ -99,7 +108,7 @@
       "title": "Invariant inventory and invariant tests first: requirements-compiled/v4/invariants.json, save-state and conflict machines (state-machines.json)",
       "owner": "domain",
       "estimateMinutes": 25,
-      "estimateBasis": "planning estimate from Rehearsal 7 observed elapsed times (evidence/FINAL-REPORT.md, provenance history) scaled to this task's scope; not measured for this task",
+      "estimateBasis": "planning estimate by the package author, informed by Rehearsal 7's outcome (most P0 work unfinished in 420 minutes with one lead agent); Rehearsal 7 recorded no per-task times, so no estimate is measured",
       "dependsOn": [],
       "conditionalOn": null
     },
@@ -108,7 +117,7 @@
       "title": "F# semantic kernel and policy/capabilities",
       "owner": "domain",
       "estimateMinutes": 45,
-      "estimateBasis": "planning estimate from Rehearsal 7 observed elapsed times (evidence/FINAL-REPORT.md, provenance history) scaled to this task's scope; not measured for this task",
+      "estimateBasis": "planning estimate by the package author, informed by Rehearsal 7's outcome (most P0 work unfinished in 420 minutes with one lead agent); Rehearsal 7 recorded no per-task times, so no estimate is measured",
       "dependsOn": [
         "T12"
       ],
@@ -119,7 +128,7 @@
       "title": "Interface freeze: versioned manifest for boundaries A-E",
       "owner": "domain",
       "estimateMinutes": 20,
-      "estimateBasis": "planning estimate from Rehearsal 7 observed elapsed times (evidence/FINAL-REPORT.md, provenance history) scaled to this task's scope; not measured for this task",
+      "estimateBasis": "planning estimate by the package author, informed by Rehearsal 7's outcome (most P0 work unfinished in 420 minutes with one lead agent); Rehearsal 7 recorded no per-task times, so no estimate is measured",
       "dependsOn": [
         "T13"
       ],
@@ -130,7 +139,7 @@
       "title": "Frozen fixture replay against the storage contract",
       "owner": "domain",
       "estimateMinutes": 20,
-      "estimateBasis": "planning estimate from Rehearsal 7 observed elapsed times (evidence/FINAL-REPORT.md, provenance history) scaled to this task's scope; not measured for this task",
+      "estimateBasis": "planning estimate by the package author, informed by Rehearsal 7's outcome (most P0 work unfinished in 420 minutes with one lead agent); Rehearsal 7 recorded no per-task times, so no estimate is measured",
       "dependsOn": [
         "T13"
       ],
@@ -141,7 +150,7 @@
       "title": "Application shell, loading experience, routes and visual identity",
       "owner": "ui",
       "estimateMinutes": 35,
-      "estimateBasis": "planning estimate from Rehearsal 7 observed elapsed times (evidence/FINAL-REPORT.md, provenance history) scaled to this task's scope; not measured for this task",
+      "estimateBasis": "planning estimate by the package author, informed by Rehearsal 7's outcome (most P0 work unfinished in 420 minutes with one lead agent); Rehearsal 7 recorded no per-task times, so no estimate is measured",
       "dependsOn": [
         "T11"
       ],
@@ -152,7 +161,7 @@
       "title": "Integration checkpoint 1: a legal command end to end in the browser",
       "owner": "integration",
       "estimateMinutes": 15,
-      "estimateBasis": "planning estimate from Rehearsal 7 observed elapsed times (evidence/FINAL-REPORT.md, provenance history) scaled to this task's scope; not measured for this task",
+      "estimateBasis": "planning estimate by the package author, informed by Rehearsal 7's outcome (most P0 work unfinished in 420 minutes with one lead agent); Rehearsal 7 recorded no per-task times, so no estimate is measured",
       "dependsOn": [
         "T14",
         "T16"
@@ -163,8 +172,8 @@
       "id": "T18",
       "title": "Provider conformance first: probe real GitHub (stale head, moved-head FORBIDDEN form, secondary rate limit, lost answer) and build the stateful fake from what it answers",
       "owner": "persistence",
-      "estimateMinutes": 30,
-      "estimateBasis": "planning estimate from Rehearsal 7 observed elapsed times (evidence/FINAL-REPORT.md, provenance history) scaled to this task's scope; not measured for this task",
+      "estimateMinutes": 45,
+      "estimateBasis": "planning estimate by the package author, informed by Rehearsal 7's outcome (most P0 work unfinished in 420 minutes with one lead agent); Rehearsal 7 recorded no per-task times, so no estimate is measured",
       "dependsOn": [],
       "conditionalOn": null
     },
@@ -173,9 +182,10 @@
       "title": "Session-memory save-state machine and save process: one commit per save, read-back confirmation, rebase, conflict, reconciliation, bounds (ADR-R7-001)",
       "owner": "persistence",
       "estimateMinutes": 60,
-      "estimateBasis": "planning estimate from Rehearsal 7 observed elapsed times (evidence/FINAL-REPORT.md, provenance history) scaled to this task's scope; not measured for this task",
+      "estimateBasis": "planning estimate by the package author, informed by Rehearsal 7's outcome (most P0 work unfinished in 420 minutes with one lead agent); Rehearsal 7 recorded no per-task times, so no estimate is measured",
       "dependsOn": [
-        "T14"
+        "T14",
+        "T18"
       ],
       "conditionalOn": null
     },
@@ -184,7 +194,7 @@
       "title": "Connect flow and GitHub provider: read, create, write, conflict",
       "owner": "persistence",
       "estimateMinutes": 40,
-      "estimateBasis": "planning estimate from Rehearsal 7 observed elapsed times (evidence/FINAL-REPORT.md, provenance history) scaled to this task's scope; not measured for this task",
+      "estimateBasis": "planning estimate by the package author, informed by Rehearsal 7's outcome (most P0 work unfinished in 420 minutes with one lead agent); Rehearsal 7 recorded no per-task times, so no estimate is measured",
       "dependsOn": [
         "T18",
         "T19"
@@ -196,7 +206,7 @@
       "title": "Integration checkpoint 2: live write path against the real test repository",
       "owner": "integration",
       "estimateMinutes": 25,
-      "estimateBasis": "planning estimate from Rehearsal 7 observed elapsed times (evidence/FINAL-REPORT.md, provenance history) scaled to this task's scope; not measured for this task",
+      "estimateBasis": "planning estimate by the package author, informed by Rehearsal 7's outcome (most P0 work unfinished in 420 minutes with one lead agent); Rehearsal 7 recorded no per-task times, so no estimate is measured",
       "dependsOn": [
         "T20",
         "T17"
@@ -208,7 +218,7 @@
       "title": "Investigation workspace views",
       "owner": "ui",
       "estimateMinutes": 70,
-      "estimateBasis": "planning estimate from Rehearsal 7 observed elapsed times (evidence/FINAL-REPORT.md, provenance history) scaled to this task's scope; not measured for this task",
+      "estimateBasis": "planning estimate by the package author, informed by Rehearsal 7's outcome (most P0 work unfinished in 420 minutes with one lead agent); Rehearsal 7 recorded no per-task times, so no estimate is measured",
       "dependsOn": [
         "T17"
       ],
@@ -219,7 +229,7 @@
       "title": "Causal graph with the existing workflow layout engine",
       "owner": "ui",
       "estimateMinutes": 30,
-      "estimateBasis": "planning estimate from Rehearsal 7 observed elapsed times (evidence/FINAL-REPORT.md, provenance history) scaled to this task's scope; not measured for this task",
+      "estimateBasis": "planning estimate by the package author, informed by Rehearsal 7's outcome (most P0 work unfinished in 420 minutes with one lead agent); Rehearsal 7 recorded no per-task times, so no estimate is measured",
       "dependsOn": [
         "T24",
         "T17"
@@ -231,7 +241,7 @@
       "title": "Discover the workflow layout engine and existing capabilities",
       "owner": "integration",
       "estimateMinutes": 10,
-      "estimateBasis": "planning estimate from Rehearsal 7 observed elapsed times (evidence/FINAL-REPORT.md, provenance history) scaled to this task's scope; not measured for this task",
+      "estimateBasis": "planning estimate by the package author, informed by Rehearsal 7's outcome (most P0 work unfinished in 420 minutes with one lead agent); Rehearsal 7 recorded no per-task times, so no estimate is measured",
       "dependsOn": [
         "T11"
       ],
@@ -242,7 +252,7 @@
       "title": "Load the active historical catalog after Connect",
       "owner": "persistence",
       "estimateMinutes": 20,
-      "estimateBasis": "planning estimate from Rehearsal 7 observed elapsed times (evidence/FINAL-REPORT.md, provenance history) scaled to this task's scope; not measured for this task",
+      "estimateBasis": "planning estimate by the package author, informed by Rehearsal 7's outcome (most P0 work unfinished in 420 minutes with one lead agent); Rehearsal 7 recorded no per-task times, so no estimate is measured",
       "dependsOn": [
         "T20",
         "T15"
@@ -254,7 +264,7 @@
       "title": "Report preview and Folio export",
       "owner": "ui",
       "estimateMinutes": 25,
-      "estimateBasis": "planning estimate from Rehearsal 7 observed elapsed times (evidence/FINAL-REPORT.md, provenance history) scaled to this task's scope; not measured for this task",
+      "estimateBasis": "planning estimate by the package author, informed by Rehearsal 7's outcome (most P0 work unfinished in 420 minutes with one lead agent); Rehearsal 7 recorded no per-task times, so no estimate is measured",
       "dependsOn": [
         "T17"
       ],
@@ -262,10 +272,10 @@
     },
     {
       "id": "T27",
-      "title": "Structured AI proposal loop (excluded from Rehearsal 4 by OD-INDY-11)",
+      "title": "Prompt/data boundaries (R11.4) and the structured AI proposal loop, whose event scope DEC-022 left open",
       "owner": "domain",
-      "estimateMinutes": 0,
-      "estimateBasis": "0: conditional on DEC-022 and excluded unless the owner decides otherwise",
+      "estimateMinutes": 30,
+      "estimateBasis": "planning estimate by the package author; DEC-022 left the AI loop's event scope open, so it stays scheduled unless the owner excludes it (ODR-V4-09); R11.4 stays in scope",
       "dependsOn": [
         "T13"
       ],
@@ -273,21 +283,21 @@
     },
     {
       "id": "T28",
-      "title": "History, time travel and semantic diff (excluded from Rehearsal 4 by OD-INDY-11)",
+      "title": "History, time travel and semantic diff (S14, S15; in scope by DEC-R7-005)",
       "owner": "ui",
-      "estimateMinutes": 0,
+      "estimateMinutes": 45,
       "estimateBasis": "0: conditional on DEC-022 and excluded unless the owner decides otherwise",
       "dependsOn": [
         "T22"
       ],
-      "conditionalOn": "DEC-022"
+      "conditionalOn": null
     },
     {
       "id": "T29",
       "title": "Administration and Settings pages with actual loaded versions",
       "owner": "ui",
       "estimateMinutes": 20,
-      "estimateBasis": "planning estimate from Rehearsal 7 observed elapsed times (evidence/FINAL-REPORT.md, provenance history) scaled to this task's scope; not measured for this task",
+      "estimateBasis": "planning estimate by the package author, informed by Rehearsal 7's outcome (most P0 work unfinished in 420 minutes with one lead agent); Rehearsal 7 recorded no per-task times, so no estimate is measured",
       "dependsOn": [
         "T11",
         "T17"
@@ -299,7 +309,7 @@
       "title": "Independent architecture and invariant review before the first release candidate",
       "owner": "reviewer",
       "estimateMinutes": 20,
-      "estimateBasis": "planning estimate from Rehearsal 7 observed elapsed times (evidence/FINAL-REPORT.md, provenance history) scaled to this task's scope; not measured for this task",
+      "estimateBasis": "planning estimate by the package author, informed by Rehearsal 7's outcome (most P0 work unfinished in 420 minutes with one lead agent); Rehearsal 7 recorded no per-task times, so no estimate is measured",
       "dependsOn": [
         "T21",
         "T22",
@@ -312,7 +322,7 @@
       "title": "Release candidate: full applicable matrix at the deployed SHA",
       "owner": "integration",
       "estimateMinutes": 45,
-      "estimateBasis": "planning estimate from Rehearsal 7 observed elapsed times (evidence/FINAL-REPORT.md, provenance history) scaled to this task's scope; not measured for this task",
+      "estimateBasis": "planning estimate by the package author, informed by Rehearsal 7's outcome (most P0 work unfinished in 420 minutes with one lead agent); Rehearsal 7 recorded no per-task times, so no estimate is measured",
       "dependsOn": [
         "T30",
         "T23",
@@ -328,7 +338,7 @@
       "title": "Defect-class closure",
       "owner": "integration",
       "estimateMinutes": 20,
-      "estimateBasis": "planning estimate from Rehearsal 7 observed elapsed times (evidence/FINAL-REPORT.md, provenance history) scaled to this task's scope; not measured for this task",
+      "estimateBasis": "planning estimate by the package author, informed by Rehearsal 7's outcome (most P0 work unfinished in 420 minutes with one lead agent); Rehearsal 7 recorded no per-task times, so no estimate is measured",
       "dependsOn": [
         "T31"
       ],
@@ -339,7 +349,7 @@
       "title": "Fresh reviewer before the final verdict",
       "owner": "reviewer",
       "estimateMinutes": 20,
-      "estimateBasis": "planning estimate from Rehearsal 7 observed elapsed times (evidence/FINAL-REPORT.md, provenance history) scaled to this task's scope; not measured for this task",
+      "estimateBasis": "planning estimate by the package author, informed by Rehearsal 7's outcome (most P0 work unfinished in 420 minutes with one lead agent); Rehearsal 7 recorded no per-task times, so no estimate is measured",
       "dependsOn": [
         "T32"
       ],
@@ -350,9 +360,31 @@
       "title": "Acceptance: preservation gate re-run, ledger, computed verdict, measurements",
       "owner": "integration",
       "estimateMinutes": 20,
-      "estimateBasis": "planning estimate from Rehearsal 7 observed elapsed times (evidence/FINAL-REPORT.md, provenance history) scaled to this task's scope; not measured for this task",
+      "estimateBasis": "planning estimate by the package author, informed by Rehearsal 7's outcome (most P0 work unfinished in 420 minutes with one lead agent); Rehearsal 7 recorded no per-task times, so no estimate is measured",
       "dependsOn": [
         "T33"
+      ],
+      "conditionalOn": null
+    },
+    {
+      "id": "T35",
+      "title": "Independent review checkpoint 1: interfaces and invariants (DCC-002, target T+90..120)",
+      "owner": "reviewer",
+      "estimateMinutes": 15,
+      "estimateBasis": "planning estimate by the package author",
+      "dependsOn": [
+        "T14"
+      ],
+      "conditionalOn": null
+    },
+    {
+      "id": "T36",
+      "title": "Independent review checkpoint 2: live write path and conflict handling",
+      "owner": "reviewer",
+      "estimateMinutes": 15,
+      "estimateBasis": "planning estimate by the package author",
+      "dependsOn": [
+        "T21"
       ],
       "conditionalOn": null
     }
@@ -361,16 +393,16 @@
     {
       "id": "A-role-lanes",
       "description": "One lane per owner role (domain, ui, persistence, integration, coordinator, reviewer); operator and upstream lanes are preflight-only. Needs owner approval (ODR-V4-07, F-007).",
-      "makespanMinutes": 355,
+      "makespanMinutes": 400,
       "reservedMinutes": 65,
-      "totalMinutes": 420,
+      "totalMinutes": 465,
       "windowMinutes": 420,
-      "fits": true,
-      "overrunMinutes": 0,
+      "fits": false,
+      "overrunMinutes": 45,
       "lanes": [
         {
           "lane": "domain",
-          "busyMinutes": 110,
+          "busyMinutes": 140,
           "tasks": [
             "T12",
             "T13",
@@ -394,7 +426,7 @@
         },
         {
           "lane": "persistence",
-          "busyMinutes": 150,
+          "busyMinutes": 165,
           "tasks": [
             "T18",
             "T19",
@@ -404,22 +436,24 @@
         },
         {
           "lane": "reviewer",
-          "busyMinutes": 40,
+          "busyMinutes": 70,
           "tasks": [
+            "T35",
             "T30",
+            "T36",
             "T33"
           ]
         },
         {
           "lane": "ui",
-          "busyMinutes": 180,
+          "busyMinutes": 225,
           "tasks": [
             "T16",
             "T22",
+            "T28",
             "T23",
             "T26",
-            "T29",
-            "T28"
+            "T29"
           ]
         }
       ],
@@ -440,7 +474,7 @@
           "task": "T18",
           "lane": "persistence",
           "startMinute": 0,
-          "finishMinute": 30
+          "finishMinute": 45
         },
         {
           "task": "T16",
@@ -485,6 +519,12 @@
           "finishMinute": 150
         },
         {
+          "task": "T35",
+          "lane": "reviewer",
+          "startMinute": 90,
+          "finishMinute": 105
+        },
+        {
           "task": "T22",
           "lane": "ui",
           "startMinute": 105,
@@ -494,7 +534,7 @@
           "task": "T27",
           "lane": "domain",
           "startMinute": 110,
-          "finishMinute": 110
+          "finishMinute": 140
         },
         {
           "task": "T20",
@@ -503,10 +543,10 @@
           "finishMinute": 190
         },
         {
-          "task": "T23",
+          "task": "T28",
           "lane": "ui",
           "startMinute": 175,
-          "finishMinute": 205
+          "finishMinute": 220
         },
         {
           "task": "T21",
@@ -521,88 +561,94 @@
           "finishMinute": 210
         },
         {
-          "task": "T26",
-          "lane": "ui",
-          "startMinute": 205,
-          "finishMinute": 230
-        },
-        {
           "task": "T30",
           "lane": "reviewer",
           "startMinute": 215,
           "finishMinute": 235
         },
         {
-          "task": "T29",
+          "task": "T23",
           "lane": "ui",
-          "startMinute": 230,
+          "startMinute": 220,
           "finishMinute": 250
         },
         {
-          "task": "T28",
+          "task": "T36",
+          "lane": "reviewer",
+          "startMinute": 235,
+          "finishMinute": 250
+        },
+        {
+          "task": "T26",
           "lane": "ui",
           "startMinute": 250,
-          "finishMinute": 250
+          "finishMinute": 275
+        },
+        {
+          "task": "T29",
+          "lane": "ui",
+          "startMinute": 275,
+          "finishMinute": 295
         },
         {
           "task": "T31",
           "lane": "integration",
-          "startMinute": 250,
-          "finishMinute": 295
+          "startMinute": 295,
+          "finishMinute": 340
         },
         {
           "task": "T32",
           "lane": "integration",
-          "startMinute": 295,
-          "finishMinute": 315
+          "startMinute": 340,
+          "finishMinute": 360
         },
         {
           "task": "T33",
           "lane": "reviewer",
-          "startMinute": 315,
-          "finishMinute": 335
+          "startMinute": 360,
+          "finishMinute": 380
         },
         {
           "task": "T34",
           "lane": "integration",
-          "startMinute": 335,
-          "finishMinute": 355
+          "startMinute": 380,
+          "finishMinute": 400
         }
       ]
     },
     {
       "id": "B-single-lead",
       "description": "One continuous lead agent for domain, ui, persistence, integration and coordinator work (AR-021); reviewer is a separate lane.",
-      "makespanMinutes": 610,
+      "makespanMinutes": 700,
       "reservedMinutes": 65,
-      "totalMinutes": 675,
+      "totalMinutes": 765,
       "windowMinutes": 420,
       "fits": false,
-      "overrunMinutes": 255,
+      "overrunMinutes": 345,
       "lanes": [
         {
           "lane": "lead",
-          "busyMinutes": 590,
+          "busyMinutes": 680,
           "tasks": [
             "T12",
             "T13",
-            "T14",
-            "T11",
-            "T19",
-            "T16",
             "T18",
+            "T11",
+            "T14",
+            "T16",
+            "T19",
             "T17",
             "T22",
             "T20",
             "T15",
             "T21",
+            "T28",
             "T24",
             "T25",
             "T23",
+            "T27",
             "T26",
             "T29",
-            "T27",
-            "T28",
             "T31",
             "T32",
             "T34"
@@ -610,8 +656,10 @@
         },
         {
           "lane": "reviewer",
-          "busyMinutes": 40,
+          "busyMinutes": 70,
           "tasks": [
+            "T35",
+            "T36",
             "T30",
             "T33"
           ]
@@ -631,136 +679,380 @@
           "finishMinute": 70
         },
         {
-          "task": "T14",
+          "task": "T18",
           "lane": "lead",
           "startMinute": 70,
-          "finishMinute": 90
+          "finishMinute": 115
         },
         {
           "task": "T11",
           "lane": "lead",
+          "startMinute": 115,
+          "finishMinute": 130
+        },
+        {
+          "task": "T14",
+          "lane": "lead",
+          "startMinute": 130,
+          "finishMinute": 150
+        },
+        {
+          "task": "T16",
+          "lane": "lead",
+          "startMinute": 150,
+          "finishMinute": 185
+        },
+        {
+          "task": "T35",
+          "lane": "reviewer",
+          "startMinute": 150,
+          "finishMinute": 165
+        },
+        {
+          "task": "T19",
+          "lane": "lead",
+          "startMinute": 185,
+          "finishMinute": 245
+        },
+        {
+          "task": "T17",
+          "lane": "lead",
+          "startMinute": 245,
+          "finishMinute": 260
+        },
+        {
+          "task": "T22",
+          "lane": "lead",
+          "startMinute": 260,
+          "finishMinute": 330
+        },
+        {
+          "task": "T20",
+          "lane": "lead",
+          "startMinute": 330,
+          "finishMinute": 370
+        },
+        {
+          "task": "T15",
+          "lane": "lead",
+          "startMinute": 370,
+          "finishMinute": 390
+        },
+        {
+          "task": "T21",
+          "lane": "lead",
+          "startMinute": 390,
+          "finishMinute": 415
+        },
+        {
+          "task": "T28",
+          "lane": "lead",
+          "startMinute": 415,
+          "finishMinute": 460
+        },
+        {
+          "task": "T36",
+          "lane": "reviewer",
+          "startMinute": 415,
+          "finishMinute": 430
+        },
+        {
+          "task": "T24",
+          "lane": "lead",
+          "startMinute": 460,
+          "finishMinute": 470
+        },
+        {
+          "task": "T25",
+          "lane": "lead",
+          "startMinute": 470,
+          "finishMinute": 490
+        },
+        {
+          "task": "T23",
+          "lane": "lead",
+          "startMinute": 490,
+          "finishMinute": 520
+        },
+        {
+          "task": "T30",
+          "lane": "reviewer",
+          "startMinute": 490,
+          "finishMinute": 510
+        },
+        {
+          "task": "T27",
+          "lane": "lead",
+          "startMinute": 520,
+          "finishMinute": 550
+        },
+        {
+          "task": "T26",
+          "lane": "lead",
+          "startMinute": 550,
+          "finishMinute": 575
+        },
+        {
+          "task": "T29",
+          "lane": "lead",
+          "startMinute": 575,
+          "finishMinute": 595
+        },
+        {
+          "task": "T31",
+          "lane": "lead",
+          "startMinute": 595,
+          "finishMinute": 640
+        },
+        {
+          "task": "T32",
+          "lane": "lead",
+          "startMinute": 640,
+          "finishMinute": 660
+        },
+        {
+          "task": "T33",
+          "lane": "reviewer",
+          "startMinute": 660,
+          "finishMinute": 680
+        },
+        {
+          "task": "T34",
+          "lane": "lead",
+          "startMinute": 680,
+          "finishMinute": 700
+        }
+      ]
+    },
+    {
+      "id": "C-role-lanes-two-ui",
+      "description": "As A-role-lanes, with a second UI agent for the report, history/semantic diff, administration and causal graph views (T23, T26, T28, T29) after the integration checkpoint T17. Needs owner approval (ODR-V4-07).",
+      "makespanMinutes": 340,
+      "reservedMinutes": 65,
+      "totalMinutes": 405,
+      "windowMinutes": 420,
+      "fits": true,
+      "overrunMinutes": 0,
+      "lanes": [
+        {
+          "lane": "domain",
+          "busyMinutes": 140,
+          "tasks": [
+            "T12",
+            "T13",
+            "T14",
+            "T15",
+            "T27"
+          ]
+        },
+        {
+          "lane": "integration",
+          "busyMinutes": 150,
+          "tasks": [
+            "T11",
+            "T24",
+            "T17",
+            "T21",
+            "T31",
+            "T32",
+            "T34"
+          ]
+        },
+        {
+          "lane": "persistence",
+          "busyMinutes": 165,
+          "tasks": [
+            "T18",
+            "T19",
+            "T20",
+            "T25"
+          ]
+        },
+        {
+          "lane": "reviewer",
+          "busyMinutes": 70,
+          "tasks": [
+            "T35",
+            "T30",
+            "T36",
+            "T33"
+          ]
+        },
+        {
+          "lane": "ui",
+          "busyMinutes": 105,
+          "tasks": [
+            "T16",
+            "T22"
+          ]
+        },
+        {
+          "lane": "ui-2",
+          "busyMinutes": 120,
+          "tasks": [
+            "T23",
+            "T26",
+            "T29",
+            "T28"
+          ]
+        }
+      ],
+      "schedule": [
+        {
+          "task": "T11",
+          "lane": "integration",
+          "startMinute": 0,
+          "finishMinute": 15
+        },
+        {
+          "task": "T12",
+          "lane": "domain",
+          "startMinute": 0,
+          "finishMinute": 25
+        },
+        {
+          "task": "T18",
+          "lane": "persistence",
+          "startMinute": 0,
+          "finishMinute": 45
+        },
+        {
+          "task": "T16",
+          "lane": "ui",
+          "startMinute": 15,
+          "finishMinute": 50
+        },
+        {
+          "task": "T24",
+          "lane": "integration",
+          "startMinute": 15,
+          "finishMinute": 25
+        },
+        {
+          "task": "T13",
+          "lane": "domain",
+          "startMinute": 25,
+          "finishMinute": 70
+        },
+        {
+          "task": "T14",
+          "lane": "domain",
+          "startMinute": 70,
+          "finishMinute": 90
+        },
+        {
+          "task": "T15",
+          "lane": "domain",
+          "startMinute": 90,
+          "finishMinute": 110
+        },
+        {
+          "task": "T17",
+          "lane": "integration",
           "startMinute": 90,
           "finishMinute": 105
         },
         {
           "task": "T19",
-          "lane": "lead",
-          "startMinute": 105,
-          "finishMinute": 165
+          "lane": "persistence",
+          "startMinute": 90,
+          "finishMinute": 150
         },
         {
-          "task": "T16",
-          "lane": "lead",
-          "startMinute": 165,
-          "finishMinute": 200
-        },
-        {
-          "task": "T18",
-          "lane": "lead",
-          "startMinute": 200,
-          "finishMinute": 230
-        },
-        {
-          "task": "T17",
-          "lane": "lead",
-          "startMinute": 230,
-          "finishMinute": 245
+          "task": "T35",
+          "lane": "reviewer",
+          "startMinute": 90,
+          "finishMinute": 105
         },
         {
           "task": "T22",
-          "lane": "lead",
-          "startMinute": 245,
-          "finishMinute": 315
-        },
-        {
-          "task": "T20",
-          "lane": "lead",
-          "startMinute": 315,
-          "finishMinute": 355
-        },
-        {
-          "task": "T15",
-          "lane": "lead",
-          "startMinute": 355,
-          "finishMinute": 375
-        },
-        {
-          "task": "T21",
-          "lane": "lead",
-          "startMinute": 375,
-          "finishMinute": 400
-        },
-        {
-          "task": "T24",
-          "lane": "lead",
-          "startMinute": 400,
-          "finishMinute": 410
-        },
-        {
-          "task": "T25",
-          "lane": "lead",
-          "startMinute": 410,
-          "finishMinute": 430
+          "lane": "ui",
+          "startMinute": 105,
+          "finishMinute": 175
         },
         {
           "task": "T23",
-          "lane": "lead",
-          "startMinute": 430,
-          "finishMinute": 460
+          "lane": "ui-2",
+          "startMinute": 105,
+          "finishMinute": 135
+        },
+        {
+          "task": "T27",
+          "lane": "domain",
+          "startMinute": 110,
+          "finishMinute": 140
+        },
+        {
+          "task": "T26",
+          "lane": "ui-2",
+          "startMinute": 135,
+          "finishMinute": 160
+        },
+        {
+          "task": "T20",
+          "lane": "persistence",
+          "startMinute": 150,
+          "finishMinute": 190
+        },
+        {
+          "task": "T29",
+          "lane": "ui-2",
+          "startMinute": 160,
+          "finishMinute": 180
+        },
+        {
+          "task": "T28",
+          "lane": "ui-2",
+          "startMinute": 180,
+          "finishMinute": 225
+        },
+        {
+          "task": "T21",
+          "lane": "integration",
+          "startMinute": 190,
+          "finishMinute": 215
+        },
+        {
+          "task": "T25",
+          "lane": "persistence",
+          "startMinute": 190,
+          "finishMinute": 210
         },
         {
           "task": "T30",
           "lane": "reviewer",
-          "startMinute": 430,
-          "finishMinute": 450
-        },
-        {
-          "task": "T26",
-          "lane": "lead",
-          "startMinute": 460,
-          "finishMinute": 485
-        },
-        {
-          "task": "T29",
-          "lane": "lead",
-          "startMinute": 485,
-          "finishMinute": 505
-        },
-        {
-          "task": "T27",
-          "lane": "lead",
-          "startMinute": 505,
-          "finishMinute": 505
-        },
-        {
-          "task": "T28",
-          "lane": "lead",
-          "startMinute": 505,
-          "finishMinute": 505
+          "startMinute": 215,
+          "finishMinute": 235
         },
         {
           "task": "T31",
-          "lane": "lead",
-          "startMinute": 505,
-          "finishMinute": 550
+          "lane": "integration",
+          "startMinute": 235,
+          "finishMinute": 280
+        },
+        {
+          "task": "T36",
+          "lane": "reviewer",
+          "startMinute": 235,
+          "finishMinute": 250
         },
         {
           "task": "T32",
-          "lane": "lead",
-          "startMinute": 550,
-          "finishMinute": 570
+          "lane": "integration",
+          "startMinute": 280,
+          "finishMinute": 300
         },
         {
           "task": "T33",
           "lane": "reviewer",
-          "startMinute": 570,
-          "finishMinute": 590
+          "startMinute": 300,
+          "finishMinute": 320
         },
         {
           "task": "T34",
-          "lane": "lead",
-          "startMinute": 590,
-          "finishMinute": 610
+          "lane": "integration",
+          "startMinute": 320,
+          "finishMinute": 340
         }
       ]
     }
@@ -768,11 +1060,12 @@
   "fit": {
     "anyTopologyFits": true,
     "fitting": [
-      "A-role-lanes"
+      "C-role-lanes-two-ui"
     ],
     "notFitting": [
+      "A-role-lanes",
       "B-single-lead"
     ],
-    "conflict": "B-single-lead (610 + 65 reserved) exceed the 420-minute window; no P0 requirement is removed to make them fit (ODR-V4-07)"
+    "conflict": "A-role-lanes (400 + 65 reserved), B-single-lead (700 + 65 reserved) exceed the 420-minute window; no P0 requirement is removed to make them fit (ODR-V4-07)"
   }
 }

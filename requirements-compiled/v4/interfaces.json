@@ -341,7 +341,7 @@
         "UI-030",
         "UI-015"
       ],
-      "status": "identity-verified",
+      "status": "pinned-unverified",
       "notes": "v4 pins the 1.33.0 release (0.3.0); CT-012's identity is the earlier released schema and must be re-checked against 0.3.0 in T11."
     },
     {

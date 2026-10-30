@@ -4,7 +4,7 @@
   "name": "Plan B: resource optimized",
   "objective": "Minimize agents, handoffs, repeated reasoning and CI runs: one continuous lead agent, one fresh reviewer at release candidates, CI batched at checkpoints",
   "scope": {
-    "tasks": 35,
+    "tasks": 37,
     "requirementsCovered": 526,
     "acceptance": "identical for both plans: every entry of verification-manifest.json; no requirement is dropped or weakened"
   },
@@ -26,8 +26,8 @@
   "plannedStructure": {
     "steps": 28,
     "maxConcurrentTasks": 4,
-    "crossLaneHandoffs": 18,
-    "plannedCiRunsUpperBound": 9,
+    "crossLaneHandoffs": 19,
+    "plannedCiRunsUpperBound": 11,
     "ciTriggerKinds": [
       "integration-checkpoint",
       "verification"
@@ -170,8 +170,12 @@
       "step": 10,
       "tasks": [
         {
-          "task": "T16",
+          "task": "T18",
           "lane": "lead"
+        },
+        {
+          "task": "T35",
+          "lane": "reviewer"
         }
       ]
     },
@@ -179,7 +183,7 @@
       "step": 11,
       "tasks": [
         {
-          "task": "T18",
+          "task": "T16",
           "lane": "lead"
         }
       ]
@@ -235,6 +239,10 @@
         {
           "task": "T22",
           "lane": "lead"
+        },
+        {
+          "task": "T36",
+          "lane": "reviewer"
         }
       ]
     },
@@ -586,7 +594,7 @@
     {
       "id": "T16",
       "lane": "lead",
-      "step": 10,
+      "step": 11,
       "dependsOn": [
         "T08",
         "T11"
@@ -619,7 +627,7 @@
     {
       "id": "T18",
       "lane": "lead",
-      "step": 11,
+      "step": 10,
       "dependsOn": [
         "T05",
         "T04",
@@ -640,7 +648,8 @@
       "lane": "lead",
       "step": 12,
       "dependsOn": [
-        "T14"
+        "T14",
+        "T18"
       ],
       "completion": [
         "PAT-12 (PERSIST-051) passes: every state and input enumerated, Saved reachable only from a read-back confirmation, illegal inputs fail closed",
@@ -783,8 +792,7 @@
       "lane": "lead",
       "step": 23,
       "dependsOn": [
-        "T22",
-        "T00"
+        "T22"
       ],
       "completion": [
         "history renders from canonical sequence, never wall-clock alone (ADRP-007)",
@@ -894,6 +902,36 @@
         "G0",
         "G9",
         "G10"
+      ]
+    },
+    {
+      "id": "T35",
+      "lane": "reviewer",
+      "step": 10,
+      "dependsOn": [
+        "T14"
+      ],
+      "completion": [
+        "a fresh reviewer, given code and requirements but not the implementer's conclusions, records findings by defect class with reproductions (DCC-003)",
+        "every critical finding has an owner and is fixed or decided before the next checkpoint"
+      ],
+      "gates": [
+        "G7"
+      ]
+    },
+    {
+      "id": "T36",
+      "lane": "reviewer",
+      "step": 17,
+      "dependsOn": [
+        "T21"
+      ],
+      "completion": [
+        "a fresh reviewer, given code and requirements but not the implementer's conclusions, records findings by defect class with reproductions (DCC-003)",
+        "every critical finding has an owner and is fixed or decided before the next checkpoint"
+      ],
+      "gates": [
+        "G7"
       ]
     }
   ]

@@ -430,7 +430,7 @@
       ],
       "phase": "timed",
       "estimateMinutes": 15,
-      "estimateBasis": "planning estimate from Rehearsal 7 observed elapsed times (evidence/FINAL-REPORT.md, provenance history) scaled to this task's scope; not measured for this task"
+      "estimateBasis": "planning estimate by the package author, informed by Rehearsal 7's outcome (most P0 work unfinished in 420 minutes with one lead agent); Rehearsal 7 recorded no per-task times, so no estimate is measured"
     },
     {
       "id": "T12",
@@ -475,7 +475,7 @@
       ],
       "phase": "timed",
       "estimateMinutes": 25,
-      "estimateBasis": "planning estimate from Rehearsal 7 observed elapsed times (evidence/FINAL-REPORT.md, provenance history) scaled to this task's scope; not measured for this task"
+      "estimateBasis": "planning estimate by the package author, informed by Rehearsal 7's outcome (most P0 work unfinished in 420 minutes with one lead agent); Rehearsal 7 recorded no per-task times, so no estimate is measured"
     },
     {
       "id": "T13",
@@ -518,7 +518,7 @@
       ],
       "phase": "timed",
       "estimateMinutes": 45,
-      "estimateBasis": "planning estimate from Rehearsal 7 observed elapsed times (evidence/FINAL-REPORT.md, provenance history) scaled to this task's scope; not measured for this task"
+      "estimateBasis": "planning estimate by the package author, informed by Rehearsal 7's outcome (most P0 work unfinished in 420 minutes with one lead agent); Rehearsal 7 recorded no per-task times, so no estimate is measured"
     },
     {
       "id": "T14",
@@ -538,11 +538,11 @@
       "dependsOn": [
         {
           "task": "T13",
-          "reason": "the manifest is extracted from actual kernel source, not fabricated (interface-freeze status line)"
+          "reason": "the manifest is authored from the kernel's actual types at kickoff (interface-freeze contract freeze procedure step 1)"
         },
         {
           "task": "T00",
-          "reason": "whether R001-derived interfaces may be used is an owner decision (F-013)"
+          "reason": "the owner's v4 decisions (ODR-V4-03, -06) change what Boundary D must expose"
         }
       ],
       "preferenceAfter": [],
@@ -566,7 +566,7 @@
       ],
       "phase": "timed",
       "estimateMinutes": 20,
-      "estimateBasis": "planning estimate from Rehearsal 7 observed elapsed times (evidence/FINAL-REPORT.md, provenance history) scaled to this task's scope; not measured for this task"
+      "estimateBasis": "planning estimate by the package author, informed by Rehearsal 7's outcome (most P0 work unfinished in 420 minutes with one lead agent); Rehearsal 7 recorded no per-task times, so no estimate is measured"
     },
     {
       "id": "T15",
@@ -605,7 +605,7 @@
       ],
       "phase": "timed",
       "estimateMinutes": 20,
-      "estimateBasis": "planning estimate from Rehearsal 7 observed elapsed times (evidence/FINAL-REPORT.md, provenance history) scaled to this task's scope; not measured for this task"
+      "estimateBasis": "planning estimate by the package author, informed by Rehearsal 7's outcome (most P0 work unfinished in 420 minutes with one lead agent); Rehearsal 7 recorded no per-task times, so no estimate is measured"
     },
     {
       "id": "T16",
@@ -661,7 +661,7 @@
       ],
       "phase": "timed",
       "estimateMinutes": 35,
-      "estimateBasis": "planning estimate from Rehearsal 7 observed elapsed times (evidence/FINAL-REPORT.md, provenance history) scaled to this task's scope; not measured for this task"
+      "estimateBasis": "planning estimate by the package author, informed by Rehearsal 7's outcome (most P0 work unfinished in 420 minutes with one lead agent); Rehearsal 7 recorded no per-task times, so no estimate is measured"
     },
     {
       "id": "T17",
@@ -700,7 +700,7 @@
       ],
       "phase": "timed",
       "estimateMinutes": 15,
-      "estimateBasis": "planning estimate from Rehearsal 7 observed elapsed times (evidence/FINAL-REPORT.md, provenance history) scaled to this task's scope; not measured for this task"
+      "estimateBasis": "planning estimate by the package author, informed by Rehearsal 7's outcome (most P0 work unfinished in 420 minutes with one lead agent); Rehearsal 7 recorded no per-task times, so no estimate is measured"
     },
     {
       "id": "T18",
@@ -754,8 +754,8 @@
         "the stateful fake enforces expectedHeadOid, real ancestry and lost answers before and after applying, and is built only from these recordings (PERSIST-025, PF-013)"
       ],
       "phase": "timed",
-      "estimateMinutes": 30,
-      "estimateBasis": "planning estimate from Rehearsal 7 observed elapsed times (evidence/FINAL-REPORT.md, provenance history) scaled to this task's scope; not measured for this task"
+      "estimateMinutes": 45,
+      "estimateBasis": "planning estimate by the package author, informed by Rehearsal 7's outcome (most P0 work unfinished in 420 minutes with one lead agent); Rehearsal 7 recorded no per-task times, so no estimate is measured"
     },
     {
       "id": "T19",
@@ -794,6 +794,10 @@
         {
           "task": "T14",
           "reason": "implements Boundary D from the frozen manifest"
+        },
+        {
+          "task": "T18",
+          "reason": "the save process is tested against the stateful fake built from the live recordings (PERSIST-025, PF-013; Rehearsal 7 lesson R7L-10)"
         }
       ],
       "preferenceAfter": [],
@@ -814,7 +818,7 @@
       ],
       "phase": "timed",
       "estimateMinutes": 60,
-      "estimateBasis": "planning estimate from Rehearsal 7 observed elapsed times (evidence/FINAL-REPORT.md, provenance history) scaled to this task's scope; not measured for this task"
+      "estimateBasis": "planning estimate by the package author, informed by Rehearsal 7's outcome (most P0 work unfinished in 420 minutes with one lead agent); Rehearsal 7 recorded no per-task times, so no estimate is measured"
     },
     {
       "id": "T20",
@@ -843,11 +847,11 @@
         },
         {
           "task": "T19",
-          "reason": "remote acknowledgment layers on local persistence truth"
+          "reason": "the connect flow drives the session-memory save process (ADR-R7-001)"
         },
         {
           "task": "T00",
-          "reason": "the authentication mechanism and public-read credential rule are owner decisions (F-019, F-012)"
+          "reason": "re-authentication behaviour depends on ODR-V4-04; reads and writes both need a credential (DEC-R7-001)"
         }
       ],
       "preferenceAfter": [],
@@ -874,7 +878,7 @@
       ],
       "phase": "timed",
       "estimateMinutes": 40,
-      "estimateBasis": "planning estimate from Rehearsal 7 observed elapsed times (evidence/FINAL-REPORT.md, provenance history) scaled to this task's scope; not measured for this task"
+      "estimateBasis": "planning estimate by the package author, informed by Rehearsal 7's outcome (most P0 work unfinished in 420 minutes with one lead agent); Rehearsal 7 recorded no per-task times, so no estimate is measured"
     },
     {
       "id": "T21",
@@ -922,7 +926,7 @@
       ],
       "phase": "timed",
       "estimateMinutes": 25,
-      "estimateBasis": "planning estimate from Rehearsal 7 observed elapsed times (evidence/FINAL-REPORT.md, provenance history) scaled to this task's scope; not measured for this task"
+      "estimateBasis": "planning estimate by the package author, informed by Rehearsal 7's outcome (most P0 work unfinished in 420 minutes with one lead agent); Rehearsal 7 recorded no per-task times, so no estimate is measured"
     },
     {
       "id": "T22",
@@ -974,7 +978,7 @@
       ],
       "phase": "timed",
       "estimateMinutes": 70,
-      "estimateBasis": "planning estimate from Rehearsal 7 observed elapsed times (evidence/FINAL-REPORT.md, provenance history) scaled to this task's scope; not measured for this task"
+      "estimateBasis": "planning estimate by the package author, informed by Rehearsal 7's outcome (most P0 work unfinished in 420 minutes with one lead agent); Rehearsal 7 recorded no per-task times, so no estimate is measured"
     },
     {
       "id": "T23",
@@ -1014,7 +1018,7 @@
       ],
       "phase": "timed",
       "estimateMinutes": 30,
-      "estimateBasis": "planning estimate from Rehearsal 7 observed elapsed times (evidence/FINAL-REPORT.md, provenance history) scaled to this task's scope; not measured for this task"
+      "estimateBasis": "planning estimate by the package author, informed by Rehearsal 7's outcome (most P0 work unfinished in 420 minutes with one lead agent); Rehearsal 7 recorded no per-task times, so no estimate is measured"
     },
     {
       "id": "T24",
@@ -1048,7 +1052,7 @@
       ],
       "phase": "timed",
       "estimateMinutes": 10,
-      "estimateBasis": "planning estimate from Rehearsal 7 observed elapsed times (evidence/FINAL-REPORT.md, provenance history) scaled to this task's scope; not measured for this task"
+      "estimateBasis": "planning estimate by the package author, informed by Rehearsal 7's outcome (most P0 work unfinished in 420 minutes with one lead agent); Rehearsal 7 recorded no per-task times, so no estimate is measured"
     },
     {
       "id": "T25",
@@ -1089,7 +1093,7 @@
       ],
       "phase": "timed",
       "estimateMinutes": 20,
-      "estimateBasis": "planning estimate from Rehearsal 7 observed elapsed times (evidence/FINAL-REPORT.md, provenance history) scaled to this task's scope; not measured for this task"
+      "estimateBasis": "planning estimate by the package author, informed by Rehearsal 7's outcome (most P0 work unfinished in 420 minutes with one lead agent); Rehearsal 7 recorded no per-task times, so no estimate is measured"
     },
     {
       "id": "T26",
@@ -1123,11 +1127,11 @@
       ],
       "phase": "timed",
       "estimateMinutes": 25,
-      "estimateBasis": "planning estimate from Rehearsal 7 observed elapsed times (evidence/FINAL-REPORT.md, provenance history) scaled to this task's scope; not measured for this task"
+      "estimateBasis": "planning estimate by the package author, informed by Rehearsal 7's outcome (most P0 work unfinished in 420 minutes with one lead agent); Rehearsal 7 recorded no per-task times, so no estimate is measured"
     },
     {
       "id": "T27",
-      "title": "Structured AI proposal loop (excluded from Rehearsal 4 by OD-INDY-11)",
+      "title": "Prompt/data boundaries (R11.4) and the structured AI proposal loop, whose event scope DEC-022 left open",
       "owner": "domain",
       "kind": "implementation",
       "satisfiedBy": "new-implementation",
@@ -1163,13 +1167,12 @@
       ],
       "phase": "timed",
       "conditionalOn": "DEC-022",
-      "excludedBy": "DEC-022",
-      "estimateMinutes": 0,
-      "estimateBasis": "0: conditional on DEC-022 and excluded unless the owner decides otherwise"
+      "estimateMinutes": 30,
+      "estimateBasis": "planning estimate by the package author; DEC-022 left the AI loop's event scope open, so it stays scheduled unless the owner excludes it (ODR-V4-09); R11.4 stays in scope"
     },
     {
       "id": "T28",
-      "title": "History, time travel and semantic diff (excluded from Rehearsal 4 by OD-INDY-11)",
+      "title": "History, time travel and semantic diff (S14, S15; in scope by DEC-R7-005)",
       "owner": "ui",
       "kind": "implementation",
       "satisfiedBy": "new-implementation",
@@ -1182,16 +1185,10 @@
         {
           "task": "T22",
           "reason": "uses the workspace views and inspector"
-        },
-        {
-          "task": "T00",
-          "reason": "scope is an owner decision (F-008)"
         }
       ],
       "preferenceAfter": [],
-      "decisions": [
-        "DEC-022"
-      ],
+      "decisions": [],
       "contracts": [
         "CT-002"
       ],
@@ -1203,9 +1200,7 @@
         "or an owner-approved exclusion"
       ],
       "phase": "timed",
-      "conditionalOn": "DEC-022",
-      "excludedBy": "DEC-022",
-      "estimateMinutes": 0,
+      "estimateMinutes": 45,
       "estimateBasis": "0: conditional on DEC-022 and excluded unless the owner decides otherwise"
     },
     {
@@ -1244,7 +1239,7 @@
       ],
       "phase": "timed",
       "estimateMinutes": 20,
-      "estimateBasis": "planning estimate from Rehearsal 7 observed elapsed times (evidence/FINAL-REPORT.md, provenance history) scaled to this task's scope; not measured for this task"
+      "estimateBasis": "planning estimate by the package author, informed by Rehearsal 7's outcome (most P0 work unfinished in 420 minutes with one lead agent); Rehearsal 7 recorded no per-task times, so no estimate is measured"
     },
     {
       "id": "T30",
@@ -1286,7 +1281,7 @@
       ],
       "phase": "timed",
       "estimateMinutes": 20,
-      "estimateBasis": "planning estimate from Rehearsal 7 observed elapsed times (evidence/FINAL-REPORT.md, provenance history) scaled to this task's scope; not measured for this task"
+      "estimateBasis": "planning estimate by the package author, informed by Rehearsal 7's outcome (most P0 work unfinished in 420 minutes with one lead agent); Rehearsal 7 recorded no per-task times, so no estimate is measured"
     },
     {
       "id": "T31",
@@ -1358,7 +1353,7 @@
       ],
       "phase": "timed",
       "estimateMinutes": 45,
-      "estimateBasis": "planning estimate from Rehearsal 7 observed elapsed times (evidence/FINAL-REPORT.md, provenance history) scaled to this task's scope; not measured for this task"
+      "estimateBasis": "planning estimate by the package author, informed by Rehearsal 7's outcome (most P0 work unfinished in 420 minutes with one lead agent); Rehearsal 7 recorded no per-task times, so no estimate is measured"
     },
     {
       "id": "T32",
@@ -1397,7 +1392,7 @@
       ],
       "phase": "timed",
       "estimateMinutes": 20,
-      "estimateBasis": "planning estimate from Rehearsal 7 observed elapsed times (evidence/FINAL-REPORT.md, provenance history) scaled to this task's scope; not measured for this task"
+      "estimateBasis": "planning estimate by the package author, informed by Rehearsal 7's outcome (most P0 work unfinished in 420 minutes with one lead agent); Rehearsal 7 recorded no per-task times, so no estimate is measured"
     },
     {
       "id": "T33",
@@ -1427,7 +1422,7 @@
       ],
       "phase": "timed",
       "estimateMinutes": 20,
-      "estimateBasis": "planning estimate from Rehearsal 7 observed elapsed times (evidence/FINAL-REPORT.md, provenance history) scaled to this task's scope; not measured for this task"
+      "estimateBasis": "planning estimate by the package author, informed by Rehearsal 7's outcome (most P0 work unfinished in 420 minutes with one lead agent); Rehearsal 7 recorded no per-task times, so no estimate is measured"
     },
     {
       "id": "T34",
@@ -1481,7 +1476,65 @@
       ],
       "phase": "timed",
       "estimateMinutes": 20,
-      "estimateBasis": "planning estimate from Rehearsal 7 observed elapsed times (evidence/FINAL-REPORT.md, provenance history) scaled to this task's scope; not measured for this task"
+      "estimateBasis": "planning estimate by the package author, informed by Rehearsal 7's outcome (most P0 work unfinished in 420 minutes with one lead agent); Rehearsal 7 recorded no per-task times, so no estimate is measured"
+    },
+    {
+      "id": "T35",
+      "title": "Independent review checkpoint 1: interfaces and invariants (DCC-002, target T+90..120)",
+      "owner": "reviewer",
+      "kind": "verification",
+      "satisfiedBy": "verification",
+      "covers": [
+        "DCC-002"
+      ],
+      "dependsOn": [
+        {
+          "task": "T14",
+          "reason": "reviews the output of T14 before dependent work proceeds (DCC-002, AR-034)"
+        }
+      ],
+      "preferenceAfter": [],
+      "decisions": [],
+      "contracts": [],
+      "gates": [
+        "G7"
+      ],
+      "completion": [
+        "a fresh reviewer, given code and requirements but not the implementer's conclusions, records findings by defect class with reproductions (DCC-003)",
+        "every critical finding has an owner and is fixed or decided before the next checkpoint"
+      ],
+      "phase": "timed",
+      "estimateMinutes": 15,
+      "estimateBasis": "planning estimate by the package author"
+    },
+    {
+      "id": "T36",
+      "title": "Independent review checkpoint 2: live write path and conflict handling",
+      "owner": "reviewer",
+      "kind": "verification",
+      "satisfiedBy": "verification",
+      "covers": [
+        "AR-034"
+      ],
+      "dependsOn": [
+        {
+          "task": "T21",
+          "reason": "reviews the output of T21 before dependent work proceeds (DCC-002, AR-034)"
+        }
+      ],
+      "preferenceAfter": [],
+      "decisions": [],
+      "contracts": [],
+      "gates": [
+        "G7"
+      ],
+      "completion": [
+        "a fresh reviewer, given code and requirements but not the implementer's conclusions, records findings by defect class with reproductions (DCC-003)",
+        "every critical finding has an owner and is fixed or decided before the next checkpoint"
+      ],
+      "phase": "timed",
+      "estimateMinutes": 15,
+      "estimateBasis": "planning estimate by the package author"
     }
   ]
 }

@@ -623,7 +623,14 @@ let timedExecutionManifest (c: Compiled) (plan: PlanSpec) =
         let timedRun = field "timedRun" c.Curation.Sources
         let topologySlots =
             timedRun
-            |> Option.map (strs "topologies" >> List.map (fun k -> k, TimedSchedule.schedule (TimedSchedule.laneOf k) c.Curation.Tasks))
+            |> Option.map (arr "topologies" >> List.map (fun spec ->
+                // A topology is a name (A-role-lanes, B-single-lead) or {id, base, laneOverrides}.
+                match spec with
+                | JStr k -> k, TimedSchedule.schedule (TimedSchedule.laneOf k) c.Curation.Tasks
+                | _ ->
+                    let overrides = match field "laneOverrides" spec with Some(JObj ps) -> ps |> List.map (fun (k, v) -> k, asStr v) |> Map.ofList | _ -> Map.empty
+                    let laneFor (t: WorkTask) = overrides.TryFind t.Id |> Option.defaultValue (TimedSchedule.laneOf (str "base" spec) t)
+                    str "id" spec, TimedSchedule.schedule laneFor c.Curation.Tasks))
             |> Option.defaultValue []
 
         let task (s: Graph.Slot) =

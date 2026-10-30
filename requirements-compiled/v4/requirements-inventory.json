@@ -4166,7 +4166,8 @@
       "dependencies": {
         "referencedRequirements": [],
         "workItems": [
-          "T34"
+          "T34",
+          "T36"
         ]
       },
       "ambiguities": {
@@ -8538,7 +8539,8 @@
         "referencedRequirements": [],
         "workItems": [
           "T30",
-          "T34"
+          "T34",
+          "T35"
         ]
       },
       "ambiguities": {

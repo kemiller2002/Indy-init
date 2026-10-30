@@ -156,7 +156,7 @@
       "verificationMethod": "identities (checked here) + `causa gate . --anchor causa-storage-v1.0.0` + application replay and round-trip tests (G4)",
       "dependencyVersions": [
         ".NET SDK 10.0.402",
-        "engine indy-init-rehearsal-001@55f49f61c939a3a780cee592f36f732a1328f981"
+        "causa-storage-v1.0.0 (tag -> c947c7e3); the reference engine is causa-data's own pinned engine, used only by causa-data's gates, never as an input to the event build"
       ],
       "evidenceIdentity": "schema, dataset and release SHA-256 identities listed below",
       "status": "identity-verified",
@@ -547,11 +547,11 @@
       "name": "Kickoff release-set lock",
       "provider": "echelon-registry (echelon-current) qualified by Conditor",
       "consumer": "rehearsal bootstrap and CI version gate",
-      "contractVersion": "echelon.release-set/v1; echelon-current 1.28.0 (approved 2026-10-26, Registry e6d8a734)",
+      "contractVersion": "echelon.release-set/v1; echelon-current 1.33.0 (approved, registry #104 merged 7a2c27a; DEC-R7-011)",
       "requiredCompatibility": "installed and loaded versions equal the lock (VER-008)",
       "verificationMethod": "Conditor bootstrap verify/doctor; CI gate comparing installed artifacts to the lock (DEP-CURRENT-008)",
       "dependencyVersions": [
-        "see package-manifest.json dependencyVersions"
+        "see requirements-compiled/v4/dependency-lock.json"
       ],
       "evidenceIdentity": "release set file digest + Conditor qualification run",
       "status": "identity-verified",
@@ -563,43 +563,31 @@
       ],
       "identity": [
         {
-          "label": "release-set record (sets/echelon-current/1.28.0.json, approved)",
+          "label": "release-set record (sets/echelon-current/1.33.0.json, approved)",
           "repo": "echelon-registry",
-          "rev": "e6d8a734aadb8697c59d46376d1a358db98ca19e",
-          "path": "sets/echelon-current/1.28.0.json",
-          "expectedSha256": "0b75dc5a6d4b3595e0190f9986e3d34a8d9e702da495bc287e69ca57cd2adfa6"
+          "rev": "7a2c27a3db7cab4337ea47536f3e1fc22d257f03",
+          "path": "sets/echelon-current/1.33.0.json",
+          "expectedSha256": "7b0793e10ee4021f2ae637116ea53018c571b03045bc7d99ca7d1388d83a7822"
         },
         {
           "label": "channel index (channels/echelon-current/channel.json)",
           "repo": "echelon-registry",
-          "rev": "e6d8a734aadb8697c59d46376d1a358db98ca19e",
+          "rev": "7a2c27a3db7cab4337ea47536f3e1fc22d257f03",
           "path": "channels/echelon-current/channel.json",
-          "expectedSha256": "a02a8c779ba5f69bc67466416755d1cecefc6d2d4dd8e1aff680f4c0842520f9"
+          "expectedSha256": "5b31ea9da675c11e16b0b72750210ecd76adf20413fa5c858c93a6f4f88912e2"
         },
         {
           "label": "linux-x64 resolved set (channels/echelon-current/linux-x64.json)",
           "repo": "echelon-registry",
-          "rev": "e6d8a734aadb8697c59d46376d1a358db98ca19e",
+          "rev": "7a2c27a3db7cab4337ea47536f3e1fc22d257f03",
           "path": "channels/echelon-current/linux-x64.json",
-          "expectedSha256": "5aee6c3c355dbb1b556d7a1dba9db80ece9c88862f31239c3558c441bb7abc67"
-        },
-        {
-          "label": "qualifying Conditor release record (releases/conditor/0.10.12.release.json)",
-          "repo": "echelon-registry",
-          "rev": "e6d8a734aadb8697c59d46376d1a358db98ca19e",
-          "path": "releases/conditor/0.10.12.release.json",
-          "expectedSha256": "4aab4ad7bdf9da0b0b34fa691ffcb84b266c9d7eb58b602807312efd6eff822a"
+          "expectedSha256": "de658f5aba301b7c588787d1ff3ca9fd64aad01852af53d8915eb43804401ac7"
         }
       ],
       "citations": [
         {
           "repo": "echelon-registry",
-          "path": "sets/echelon-current/1.27.0.json",
-          "quote": "cut echelon-current 1.28.0"
-        },
-        {
-          "repo": "echelon-registry",
-          "path": "sets/echelon-current/1.28.0.json",
+          "path": "sets/echelon-current/1.33.0.json",
           "quote": "\"status\": \"approved\""
         }
       ],

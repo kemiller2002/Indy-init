@@ -1,9 +1,9 @@
 {
   "schema": "indy-init.verification-plan/1",
   "planIdentity": {
-    "planId": "VP-e61f097b469e",
+    "planId": "VP-9817d9814482",
     "algorithm": "sha256",
-    "digest": "e61f097b469ebfb0f68d5437740362f16c9ed460229da1a5138d5abc26b879de",
+    "digest": "9817d98144822dcc810aa383fde9ff16f8ebb9931f5bf6aeca76256dbe7061c4",
     "covers": "sha256 of the plan serialized by the compiler's canonical writer (ASCII JSON, two-space indent, trailing newline) with planIdentity removed"
   },
   "source": {
@@ -17220,6 +17220,10 @@
               {
                 "id": "playwright:acceptance/PERSIST-002.spec.js > PERSIST-002-O3 [chromium]",
                 "kind": "deterministic"
+              },
+              {
+                "id": "playwright:invariants/INV-10.spec.js > tabs independent with and without navigator.locks [chromium]",
+                "kind": "deterministic"
               }
             ]
           },
@@ -17280,6 +17284,13 @@
                   "kind": "deterministic",
                   "categories": [
                     "integration",
+                    "browser"
+                  ]
+                },
+                {
+                  "id": "playwright:invariants/INV-10.spec.js > tabs independent with and without navigator.locks [chromium]",
+                  "kind": "deterministic",
+                  "categories": [
                     "browser"
                   ]
                 }
@@ -17621,6 +17632,10 @@
               {
                 "id": "playwright:acceptance/PERSIST-003.spec.js > PERSIST-003-O1 [chromium]",
                 "kind": "deterministic"
+              },
+              {
+                "id": "playwright:invariants/INV-06.spec.js > every store empty of investigation content [chromium]",
+                "kind": "deterministic"
               }
             ]
           },
@@ -17693,6 +17708,13 @@
                     "integration",
                     "browser",
                     "security"
+                  ]
+                },
+                {
+                  "id": "playwright:invariants/INV-06.spec.js > every store empty of investigation content [chromium]",
+                  "kind": "deterministic",
+                  "categories": [
+                    "browser"
                   ]
                 }
               ]
@@ -19034,6 +19056,14 @@
               {
                 "id": "dotnet:Causa.Acceptance.Live.PERSIST005Tests.PERSIST-005-O2",
                 "kind": "live"
+              },
+              {
+                "id": "dotnet:Causa.Invariants.Negative.INV11.EachIntegrityCheckHasAMutant",
+                "kind": "deterministic"
+              },
+              {
+                "id": "dotnet:Causa.Invariants.Property.INV11.WrittenFileSetsReplay",
+                "kind": "deterministic"
               }
             ]
           },
@@ -19095,6 +19125,20 @@
                   "categories": [
                     "integration",
                     "live-provider"
+                  ]
+                },
+                {
+                  "id": "dotnet:Causa.Invariants.Negative.INV11.EachIntegrityCheckHasAMutant",
+                  "kind": "deterministic",
+                  "categories": [
+                    "integration"
+                  ]
+                },
+                {
+                  "id": "dotnet:Causa.Invariants.Property.INV11.WrittenFileSetsReplay",
+                  "kind": "deterministic",
+                  "categories": [
+                    "integration"
                   ]
                 }
               ]
@@ -19778,6 +19822,10 @@
               {
                 "id": "dotnet:Causa.Acceptance.Live.PERSIST006Tests.PERSIST-006-O3",
                 "kind": "live"
+              },
+              {
+                "id": "dotnet:Causa.Invariants.Property.INV05.MutationShape",
+                "kind": "deterministic"
               }
             ]
           },
@@ -19837,6 +19885,13 @@
                   "categories": [
                     "integration",
                     "live-provider"
+                  ]
+                },
+                {
+                  "id": "dotnet:Causa.Invariants.Property.INV05.MutationShape",
+                  "kind": "deterministic",
+                  "categories": [
+                    "integration"
                   ]
                 }
               ]
@@ -20427,6 +20482,10 @@
               {
                 "id": "dotnet:Causa.Acceptance.Live.PERSIST007Tests.PERSIST-007-O1",
                 "kind": "live"
+              },
+              {
+                "id": "dotnet:Causa.Acceptance.Live.PERSIST007Tests.ReadBackOfFileOver1MB",
+                "kind": "live"
               }
             ]
           },
@@ -20507,6 +20566,13 @@
                   "kind": "live",
                   "categories": [
                     "integration",
+                    "live-provider"
+                  ]
+                },
+                {
+                  "id": "dotnet:Causa.Acceptance.Live.PERSIST007Tests.ReadBackOfFileOver1MB",
+                  "kind": "live",
+                  "categories": [
                     "live-provider"
                   ]
                 }
@@ -21169,6 +21235,14 @@
               {
                 "id": "dotnet:Causa.Acceptance.Live.PERSIST008Tests.PERSIST-008-O2",
                 "kind": "live"
+              },
+              {
+                "id": "dotnet:Causa.Invariants.Live.INV22.ThreeSimultaneousCommits",
+                "kind": "live"
+              },
+              {
+                "id": "dotnet:Causa.Invariants.Negative.INV22.RecordedGitHubAnswerForms",
+                "kind": "deterministic"
               }
             ]
           },
@@ -21228,6 +21302,20 @@
                   "categories": [
                     "integration",
                     "live-provider"
+                  ]
+                },
+                {
+                  "id": "dotnet:Causa.Invariants.Live.INV22.ThreeSimultaneousCommits",
+                  "kind": "live",
+                  "categories": [
+                    "live-provider"
+                  ]
+                },
+                {
+                  "id": "dotnet:Causa.Invariants.Negative.INV22.RecordedGitHubAnswerForms",
+                  "kind": "deterministic",
+                  "categories": [
+                    "integration"
                   ]
                 }
               ]
@@ -22908,6 +22996,10 @@
               {
                 "id": "dotnet:Causa.Acceptance.Deterministic.PERSIST011Tests.PERSIST-011-O4",
                 "kind": "deterministic"
+              },
+              {
+                "id": "dotnet:Causa.Invariants.Negative.INV07.RefreshNeverReplacesWork",
+                "kind": "deterministic"
               }
             ]
           },
@@ -22951,6 +23043,13 @@
               "tests": [
                 {
                   "id": "dotnet:Causa.Acceptance.Deterministic.PERSIST011Tests.PERSIST-011-O4",
+                  "kind": "deterministic",
+                  "categories": [
+                    "integration"
+                  ]
+                },
+                {
+                  "id": "dotnet:Causa.Invariants.Negative.INV07.RefreshNeverReplacesWork",
                   "kind": "deterministic",
                   "categories": [
                     "integration"
@@ -23425,6 +23524,10 @@
               {
                 "id": "dotnet:Causa.Acceptance.Deterministic.PERSIST012Tests.PERSIST-012-O3",
                 "kind": "deterministic"
+              },
+              {
+                "id": "dotnet:Causa.Invariants.Property.INV12.ReapplyEqualsEngineFold",
+                "kind": "deterministic"
               }
             ]
           },
@@ -23468,6 +23571,13 @@
               "tests": [
                 {
                   "id": "dotnet:Causa.Acceptance.Deterministic.PERSIST012Tests.PERSIST-012-O3",
+                  "kind": "deterministic",
+                  "categories": [
+                    "integration"
+                  ]
+                },
+                {
+                  "id": "dotnet:Causa.Invariants.Property.INV12.ReapplyEqualsEngineFold",
                   "kind": "deterministic",
                   "categories": [
                     "integration"
@@ -23765,6 +23875,10 @@
               {
                 "id": "dotnet:Causa.Acceptance.Deterministic.PERSIST012Tests.PERSIST-012-O7",
                 "kind": "deterministic"
+              },
+              {
+                "id": "dotnet:Causa.Invariants.Model.INV08.ConflictActionsNeverOverwrite",
+                "kind": "deterministic"
               }
             ]
           },
@@ -23808,6 +23922,13 @@
               "tests": [
                 {
                   "id": "dotnet:Causa.Acceptance.Deterministic.PERSIST012Tests.PERSIST-012-O7",
+                  "kind": "deterministic",
+                  "categories": [
+                    "integration"
+                  ]
+                },
+                {
+                  "id": "dotnet:Causa.Invariants.Model.INV08.ConflictActionsNeverOverwrite",
                   "kind": "deterministic",
                   "categories": [
                     "integration"
@@ -24242,6 +24363,10 @@
               {
                 "id": "dotnet:Causa.Acceptance.Live.PERSIST013Tests.PERSIST-013-O3",
                 "kind": "live"
+              },
+              {
+                "id": "dotnet:Causa.Invariants.Property.INV09.AllCommitsReachable",
+                "kind": "deterministic"
               }
             ]
           },
@@ -24301,6 +24426,13 @@
                   "categories": [
                     "integration",
                     "live-provider"
+                  ]
+                },
+                {
+                  "id": "dotnet:Causa.Invariants.Property.INV09.AllCommitsReachable",
+                  "kind": "deterministic",
+                  "categories": [
+                    "integration"
                   ]
                 }
               ]
@@ -25247,6 +25379,10 @@
               {
                 "id": "dotnet:Causa.Acceptance.Deterministic.PERSIST015Tests.PERSIST-015-O3",
                 "kind": "deterministic"
+              },
+              {
+                "id": "dotnet:Causa.Invariants.Property.INV03.LostAnswerNeverConflictOrFailure",
+                "kind": "deterministic"
               }
             ]
           },
@@ -25294,6 +25430,13 @@
                   "categories": [
                     "integration"
                   ]
+                },
+                {
+                  "id": "dotnet:Causa.Invariants.Property.INV03.LostAnswerNeverConflictOrFailure",
+                  "kind": "deterministic",
+                  "categories": [
+                    "integration"
+                  ]
                 }
               ]
             },
@@ -25333,6 +25476,10 @@
             "tests": [
               {
                 "id": "dotnet:Causa.Acceptance.Deterministic.PERSIST015Tests.PERSIST-015-O4",
+                "kind": "deterministic"
+              },
+              {
+                "id": "dotnet:Causa.Acceptance.Deterministic.PERSIST015Tests.ReconcileBeyond250Commits",
                 "kind": "deterministic"
               }
             ]
@@ -25381,6 +25528,13 @@
                   "categories": [
                     "integration"
                   ]
+                },
+                {
+                  "id": "dotnet:Causa.Acceptance.Deterministic.PERSIST015Tests.ReconcileBeyond250Commits",
+                  "kind": "deterministic",
+                  "categories": [
+                    "integration"
+                  ]
                 }
               ]
             },
@@ -25420,6 +25574,10 @@
             "tests": [
               {
                 "id": "dotnet:Causa.Acceptance.Deterministic.PERSIST015Tests.PERSIST-015-O5",
+                "kind": "deterministic"
+              },
+              {
+                "id": "dotnet:Causa.Invariants.Negative.INV03.AppliedButNotYetVisible",
                 "kind": "deterministic"
               }
             ]
@@ -25464,6 +25622,13 @@
               "tests": [
                 {
                   "id": "dotnet:Causa.Acceptance.Deterministic.PERSIST015Tests.PERSIST-015-O5",
+                  "kind": "deterministic",
+                  "categories": [
+                    "integration"
+                  ]
+                },
+                {
+                  "id": "dotnet:Causa.Invariants.Negative.INV03.AppliedButNotYetVisible",
                   "kind": "deterministic",
                   "categories": [
                     "integration"
@@ -26475,6 +26640,10 @@
               {
                 "id": "dotnet:Causa.Acceptance.Deterministic.PERSIST016Tests.PERSIST-016-O5",
                 "kind": "deterministic"
+              },
+              {
+                "id": "dotnet:Causa.Invariants.Property.INV04.RequestBounds",
+                "kind": "deterministic"
               }
             ]
           },
@@ -26521,6 +26690,13 @@
               "tests": [
                 {
                   "id": "dotnet:Causa.Acceptance.Deterministic.PERSIST016Tests.PERSIST-016-O5",
+                  "kind": "deterministic",
+                  "categories": [
+                    "integration"
+                  ]
+                },
+                {
+                  "id": "dotnet:Causa.Invariants.Property.INV04.RequestBounds",
                   "kind": "deterministic",
                   "categories": [
                     "integration"
@@ -28149,6 +28325,10 @@
               {
                 "id": "playwright:acceptance/PERSIST-020.spec.js > PERSIST-020-O1 [chromium]",
                 "kind": "deterministic"
+              },
+              {
+                "id": "playwright:acceptance/PERSIST-020.spec.js > PERSIST-020-O1 [webkit]",
+                "kind": "deterministic"
               }
             ]
           },
@@ -28222,6 +28402,15 @@
                     "browser",
                     "accessibility"
                   ]
+                },
+                {
+                  "id": "playwright:acceptance/PERSIST-020.spec.js > PERSIST-020-O1 [webkit]",
+                  "kind": "deterministic",
+                  "categories": [
+                    "integration",
+                    "browser",
+                    "accessibility"
+                  ]
                 }
               ]
             },
@@ -28269,6 +28458,10 @@
             "tests": [
               {
                 "id": "playwright:acceptance/PERSIST-020.spec.js > PERSIST-020-O2 [chromium]",
+                "kind": "deterministic"
+              },
+              {
+                "id": "playwright:acceptance/PERSIST-020.spec.js > PERSIST-020-O2 [webkit]",
                 "kind": "deterministic"
               }
             ]
@@ -28343,6 +28536,15 @@
                     "browser",
                     "accessibility"
                   ]
+                },
+                {
+                  "id": "playwright:acceptance/PERSIST-020.spec.js > PERSIST-020-O2 [webkit]",
+                  "kind": "deterministic",
+                  "categories": [
+                    "integration",
+                    "browser",
+                    "accessibility"
+                  ]
                 }
               ]
             },
@@ -28390,6 +28592,10 @@
             "tests": [
               {
                 "id": "playwright:acceptance/PERSIST-020.spec.js > PERSIST-020-O3 [chromium]",
+                "kind": "deterministic"
+              },
+              {
+                "id": "playwright:acceptance/PERSIST-020.spec.js > PERSIST-020-O3 [webkit]",
                 "kind": "deterministic"
               }
             ]
@@ -28464,6 +28670,15 @@
                     "browser",
                     "accessibility"
                   ]
+                },
+                {
+                  "id": "playwright:acceptance/PERSIST-020.spec.js > PERSIST-020-O3 [webkit]",
+                  "kind": "deterministic",
+                  "categories": [
+                    "integration",
+                    "browser",
+                    "accessibility"
+                  ]
                 }
               ]
             },
@@ -28511,6 +28726,10 @@
             "tests": [
               {
                 "id": "playwright:acceptance/PERSIST-020.spec.js > PERSIST-020-O4 [chromium]",
+                "kind": "deterministic"
+              },
+              {
+                "id": "playwright:acceptance/PERSIST-020.spec.js > PERSIST-020-O4 [webkit]",
                 "kind": "deterministic"
               }
             ]
@@ -28585,6 +28804,15 @@
                     "browser",
                     "accessibility"
                   ]
+                },
+                {
+                  "id": "playwright:acceptance/PERSIST-020.spec.js > PERSIST-020-O4 [webkit]",
+                  "kind": "deterministic",
+                  "categories": [
+                    "integration",
+                    "browser",
+                    "accessibility"
+                  ]
                 }
               ]
             },
@@ -28632,6 +28860,10 @@
             "tests": [
               {
                 "id": "playwright:acceptance/PERSIST-020.spec.js > PERSIST-020-O5 [chromium]",
+                "kind": "deterministic"
+              },
+              {
+                "id": "playwright:acceptance/PERSIST-020.spec.js > PERSIST-020-O5 [webkit]",
                 "kind": "deterministic"
               }
             ]
@@ -28706,6 +28938,15 @@
                     "browser",
                     "accessibility"
                   ]
+                },
+                {
+                  "id": "playwright:acceptance/PERSIST-020.spec.js > PERSIST-020-O5 [webkit]",
+                  "kind": "deterministic",
+                  "categories": [
+                    "integration",
+                    "browser",
+                    "accessibility"
+                  ]
                 }
               ]
             },
@@ -28753,6 +28994,10 @@
             "tests": [
               {
                 "id": "playwright:acceptance/PERSIST-020.spec.js > PERSIST-020-O6 [chromium]",
+                "kind": "deterministic"
+              },
+              {
+                "id": "playwright:acceptance/PERSIST-020.spec.js > PERSIST-020-O6 [webkit]",
                 "kind": "deterministic"
               }
             ]
@@ -28821,6 +29066,15 @@
               "tests": [
                 {
                   "id": "playwright:acceptance/PERSIST-020.spec.js > PERSIST-020-O6 [chromium]",
+                  "kind": "deterministic",
+                  "categories": [
+                    "integration",
+                    "browser",
+                    "accessibility"
+                  ]
+                },
+                {
+                  "id": "playwright:acceptance/PERSIST-020.spec.js > PERSIST-020-O6 [webkit]",
                   "kind": "deterministic",
                   "categories": [
                     "integration",
@@ -29591,6 +29845,10 @@
               {
                 "id": "playwright:acceptance/PERSIST-022.spec.js > PERSIST-022-O2 [chromium]",
                 "kind": "deterministic"
+              },
+              {
+                "id": "playwright:invariants/INV-13.spec.js > indicator equals machine projection [chromium]",
+                "kind": "deterministic"
               }
             ]
           },
@@ -29649,6 +29907,13 @@
                   "kind": "deterministic",
                   "categories": [
                     "integration",
+                    "browser"
+                  ]
+                },
+                {
+                  "id": "playwright:invariants/INV-13.spec.js > indicator equals machine projection [chromium]",
+                  "kind": "deterministic",
+                  "categories": [
                     "browser"
                   ]
                 }
@@ -30094,6 +30359,14 @@
               {
                 "id": "dotnet:Causa.Acceptance.Deterministic.PERSIST023Tests.PERSIST-023-O2",
                 "kind": "deterministic"
+              },
+              {
+                "id": "dotnet:Causa.Invariants.Mutation.INV01.ReadBackSkipped",
+                "kind": "deterministic"
+              },
+              {
+                "id": "dotnet:Causa.Invariants.Property.INV01.NoSavedWithoutMatchingReadBack",
+                "kind": "deterministic"
               }
             ]
           },
@@ -30153,6 +30426,20 @@
                   "categories": [
                     "unit",
                     "integration"
+                  ]
+                },
+                {
+                  "id": "dotnet:Causa.Invariants.Mutation.INV01.ReadBackSkipped",
+                  "kind": "deterministic",
+                  "categories": [
+                    "unit"
+                  ]
+                },
+                {
+                  "id": "dotnet:Causa.Invariants.Property.INV01.NoSavedWithoutMatchingReadBack",
+                  "kind": "deterministic",
+                  "categories": [
+                    "unit"
                   ]
                 }
               ]
@@ -31994,6 +32281,10 @@
               {
                 "id": "praxis:independent-review",
                 "kind": "review"
+              },
+              {
+                "id": "verifier:Causa.Acceptance.Independent.PERSIST026Provenance",
+                "kind": "deterministic"
               }
             ]
           },
@@ -32072,6 +32363,13 @@
                   "kind": "review",
                   "categories": [
                     "independent-acceptance"
+                  ]
+                },
+                {
+                  "id": "verifier:Causa.Acceptance.Independent.PERSIST026Provenance",
+                  "kind": "deterministic",
+                  "categories": [
+                    "security"
                   ]
                 }
               ]
@@ -32630,6 +32928,10 @@
               {
                 "id": "playwright:acceptance/PERSIST-030.spec.js > PERSIST-030-O1 [chromium]",
                 "kind": "deterministic"
+              },
+              {
+                "id": "playwright:acceptance/PERSIST-030.spec.js > PERSIST-030-O1 [webkit]",
+                "kind": "deterministic"
               }
             ]
           },
@@ -32703,6 +33005,15 @@
                     "browser",
                     "accessibility"
                   ]
+                },
+                {
+                  "id": "playwright:acceptance/PERSIST-030.spec.js > PERSIST-030-O1 [webkit]",
+                  "kind": "deterministic",
+                  "categories": [
+                    "integration",
+                    "browser",
+                    "accessibility"
+                  ]
                 }
               ]
             },
@@ -32752,7 +33063,15 @@
             "status": "bound",
             "tests": [
               {
+                "id": "dotnet:Causa.Invariants.Negative.INV24.FormaTokensExist",
+                "kind": "deterministic"
+              },
+              {
                 "id": "playwright:acceptance/PERSIST-030.spec.js > PERSIST-030-O2 [chromium]",
+                "kind": "deterministic"
+              },
+              {
+                "id": "playwright:acceptance/PERSIST-030.spec.js > PERSIST-030-O2 [webkit]",
                 "kind": "deterministic"
               }
             ]
@@ -32820,7 +33139,23 @@
               "status": "bound",
               "tests": [
                 {
+                  "id": "dotnet:Causa.Invariants.Negative.INV24.FormaTokensExist",
+                  "kind": "deterministic",
+                  "categories": [
+                    "integration"
+                  ]
+                },
+                {
                   "id": "playwright:acceptance/PERSIST-030.spec.js > PERSIST-030-O2 [chromium]",
+                  "kind": "deterministic",
+                  "categories": [
+                    "integration",
+                    "browser",
+                    "accessibility"
+                  ]
+                },
+                {
+                  "id": "playwright:acceptance/PERSIST-030.spec.js > PERSIST-030-O2 [webkit]",
                   "kind": "deterministic",
                   "categories": [
                     "integration",
@@ -32877,6 +33212,10 @@
             "tests": [
               {
                 "id": "playwright:acceptance/PERSIST-030.spec.js > PERSIST-030-O3 [chromium]",
+                "kind": "deterministic"
+              },
+              {
+                "id": "playwright:acceptance/PERSIST-030.spec.js > PERSIST-030-O3 [webkit]",
                 "kind": "deterministic"
               }
             ]
@@ -32953,6 +33292,15 @@
                     "browser",
                     "accessibility"
                   ]
+                },
+                {
+                  "id": "playwright:acceptance/PERSIST-030.spec.js > PERSIST-030-O3 [webkit]",
+                  "kind": "deterministic",
+                  "categories": [
+                    "integration",
+                    "browser",
+                    "accessibility"
+                  ]
                 }
               ]
             },
@@ -33003,6 +33351,10 @@
             "tests": [
               {
                 "id": "playwright:acceptance/PERSIST-030.spec.js > PERSIST-030-O4 [chromium]",
+                "kind": "deterministic"
+              },
+              {
+                "id": "playwright:acceptance/PERSIST-030.spec.js > PERSIST-030-O4 [webkit]",
                 "kind": "deterministic"
               }
             ]
@@ -33077,6 +33429,15 @@
                     "browser",
                     "accessibility"
                   ]
+                },
+                {
+                  "id": "playwright:acceptance/PERSIST-030.spec.js > PERSIST-030-O4 [webkit]",
+                  "kind": "deterministic",
+                  "categories": [
+                    "integration",
+                    "browser",
+                    "accessibility"
+                  ]
                 }
               ]
             },
@@ -33127,6 +33488,10 @@
             "tests": [
               {
                 "id": "playwright:acceptance/PERSIST-030.spec.js > PERSIST-030-O5 [chromium]",
+                "kind": "deterministic"
+              },
+              {
+                "id": "playwright:acceptance/PERSIST-030.spec.js > PERSIST-030-O5 [webkit]",
                 "kind": "deterministic"
               }
             ]
@@ -33204,6 +33569,15 @@
                     "browser",
                     "accessibility"
                   ]
+                },
+                {
+                  "id": "playwright:acceptance/PERSIST-030.spec.js > PERSIST-030-O5 [webkit]",
+                  "kind": "deterministic",
+                  "categories": [
+                    "integration",
+                    "browser",
+                    "accessibility"
+                  ]
                 }
               ]
             },
@@ -33254,6 +33628,10 @@
             "tests": [
               {
                 "id": "playwright:acceptance/PERSIST-030.spec.js > PERSIST-030-O6 [chromium]",
+                "kind": "deterministic"
+              },
+              {
+                "id": "playwright:acceptance/PERSIST-030.spec.js > PERSIST-030-O6 [webkit]",
                 "kind": "deterministic"
               }
             ]
@@ -33328,6 +33706,15 @@
                     "browser",
                     "accessibility"
                   ]
+                },
+                {
+                  "id": "playwright:acceptance/PERSIST-030.spec.js > PERSIST-030-O6 [webkit]",
+                  "kind": "deterministic",
+                  "categories": [
+                    "integration",
+                    "browser",
+                    "accessibility"
+                  ]
                 }
               ]
             },
@@ -33378,6 +33765,10 @@
             "tests": [
               {
                 "id": "playwright:acceptance/PERSIST-030.spec.js > PERSIST-030-O7 [chromium]",
+                "kind": "deterministic"
+              },
+              {
+                "id": "playwright:acceptance/PERSIST-030.spec.js > PERSIST-030-O7 [webkit]",
                 "kind": "deterministic"
               }
             ]
@@ -33455,6 +33846,15 @@
                     "browser",
                     "accessibility"
                   ]
+                },
+                {
+                  "id": "playwright:acceptance/PERSIST-030.spec.js > PERSIST-030-O7 [webkit]",
+                  "kind": "deterministic",
+                  "categories": [
+                    "integration",
+                    "browser",
+                    "accessibility"
+                  ]
                 }
               ]
             },
@@ -33505,6 +33905,10 @@
             "tests": [
               {
                 "id": "playwright:acceptance/PERSIST-030.spec.js > PERSIST-030-O8 [chromium]",
+                "kind": "deterministic"
+              },
+              {
+                "id": "playwright:acceptance/PERSIST-030.spec.js > PERSIST-030-O8 [webkit]",
                 "kind": "deterministic"
               }
             ]
@@ -33573,6 +33977,15 @@
               "tests": [
                 {
                   "id": "playwright:acceptance/PERSIST-030.spec.js > PERSIST-030-O8 [chromium]",
+                  "kind": "deterministic",
+                  "categories": [
+                    "integration",
+                    "browser",
+                    "accessibility"
+                  ]
+                },
+                {
+                  "id": "playwright:acceptance/PERSIST-030.spec.js > PERSIST-030-O8 [webkit]",
                   "kind": "deterministic",
                   "categories": [
                     "integration",
@@ -33979,6 +34392,10 @@
               {
                 "id": "playwright:acceptance/PERSIST-031.spec.js > PERSIST-031-O3 [chromium]",
                 "kind": "deterministic"
+              },
+              {
+                "id": "playwright:acceptance/PERSIST-031.spec.js > freshness shows commit time [chromium]",
+                "kind": "deterministic"
               }
             ]
           },
@@ -34050,6 +34467,13 @@
                   "categories": [
                     "unit",
                     "integration",
+                    "browser"
+                  ]
+                },
+                {
+                  "id": "playwright:acceptance/PERSIST-031.spec.js > freshness shows commit time [chromium]",
+                  "kind": "deterministic",
+                  "categories": [
                     "browser"
                   ]
                 }
@@ -36265,6 +36689,10 @@
             "status": "bound",
             "tests": [
               {
+                "id": "dotnet:Causa.Invariants.Property.INV07.WorkSurvivesRecoverableFailures",
+                "kind": "deterministic"
+              },
+              {
                 "id": "playwright:acceptance/PERSIST-031.spec.js > PERSIST-031-O21 [chromium]",
                 "kind": "deterministic"
               }
@@ -36332,6 +36760,13 @@
             "testIdentity": {
               "status": "bound",
               "tests": [
+                {
+                  "id": "dotnet:Causa.Invariants.Property.INV07.WorkSurvivesRecoverableFailures",
+                  "kind": "deterministic",
+                  "categories": [
+                    "unit"
+                  ]
+                },
                 {
                   "id": "playwright:acceptance/PERSIST-031.spec.js > PERSIST-031-O21 [chromium]",
                   "kind": "deterministic",
@@ -37905,6 +38340,10 @@
               {
                 "id": "playwright:acceptance/PERSIST-040.spec.js > PERSIST-040-O1 [chromium]",
                 "kind": "deterministic"
+              },
+              {
+                "id": "playwright:acceptance/PERSIST-040.spec.js > PERSIST-040-O1 [webkit]",
+                "kind": "deterministic"
               }
             ]
           },
@@ -37967,6 +38406,14 @@
                     "integration",
                     "browser"
                   ]
+                },
+                {
+                  "id": "playwright:acceptance/PERSIST-040.spec.js > PERSIST-040-O1 [webkit]",
+                  "kind": "deterministic",
+                  "categories": [
+                    "integration",
+                    "browser"
+                  ]
                 }
               ]
             },
@@ -38013,6 +38460,10 @@
             "tests": [
               {
                 "id": "playwright:acceptance/PERSIST-040.spec.js > PERSIST-040-O2 [chromium]",
+                "kind": "deterministic"
+              },
+              {
+                "id": "playwright:acceptance/PERSIST-040.spec.js > PERSIST-040-O2 [webkit]",
                 "kind": "deterministic"
               }
             ]
@@ -38074,6 +38525,14 @@
                     "integration",
                     "browser"
                   ]
+                },
+                {
+                  "id": "playwright:acceptance/PERSIST-040.spec.js > PERSIST-040-O2 [webkit]",
+                  "kind": "deterministic",
+                  "categories": [
+                    "integration",
+                    "browser"
+                  ]
                 }
               ]
             },
@@ -38120,6 +38579,10 @@
             "tests": [
               {
                 "id": "playwright:acceptance/PERSIST-040.spec.js > PERSIST-040-O3 [chromium]",
+                "kind": "deterministic"
+              },
+              {
+                "id": "playwright:acceptance/PERSIST-040.spec.js > PERSIST-040-O3 [webkit]",
                 "kind": "deterministic"
               }
             ]
@@ -38181,6 +38644,14 @@
                     "integration",
                     "browser"
                   ]
+                },
+                {
+                  "id": "playwright:acceptance/PERSIST-040.spec.js > PERSIST-040-O3 [webkit]",
+                  "kind": "deterministic",
+                  "categories": [
+                    "integration",
+                    "browser"
+                  ]
                 }
               ]
             },
@@ -38227,6 +38698,10 @@
             "tests": [
               {
                 "id": "playwright:acceptance/PERSIST-040.spec.js > PERSIST-040-O4 [chromium]",
+                "kind": "deterministic"
+              },
+              {
+                "id": "playwright:acceptance/PERSIST-040.spec.js > PERSIST-040-O4 [webkit]",
                 "kind": "deterministic"
               }
             ]
@@ -38288,6 +38763,14 @@
                     "integration",
                     "browser"
                   ]
+                },
+                {
+                  "id": "playwright:acceptance/PERSIST-040.spec.js > PERSIST-040-O4 [webkit]",
+                  "kind": "deterministic",
+                  "categories": [
+                    "integration",
+                    "browser"
+                  ]
                 }
               ]
             },
@@ -38334,6 +38817,10 @@
             "tests": [
               {
                 "id": "playwright:acceptance/PERSIST-040.spec.js > PERSIST-040-O5 [chromium]",
+                "kind": "deterministic"
+              },
+              {
+                "id": "playwright:acceptance/PERSIST-040.spec.js > PERSIST-040-O5 [webkit]",
                 "kind": "deterministic"
               }
             ]
@@ -38395,6 +38882,14 @@
                     "integration",
                     "browser"
                   ]
+                },
+                {
+                  "id": "playwright:acceptance/PERSIST-040.spec.js > PERSIST-040-O5 [webkit]",
+                  "kind": "deterministic",
+                  "categories": [
+                    "integration",
+                    "browser"
+                  ]
                 }
               ]
             },
@@ -38441,6 +38936,10 @@
             "tests": [
               {
                 "id": "playwright:acceptance/PERSIST-040.spec.js > PERSIST-040-O6 [chromium]",
+                "kind": "deterministic"
+              },
+              {
+                "id": "playwright:acceptance/PERSIST-040.spec.js > PERSIST-040-O6 [webkit]",
                 "kind": "deterministic"
               }
             ]
@@ -38497,6 +38996,14 @@
               "tests": [
                 {
                   "id": "playwright:acceptance/PERSIST-040.spec.js > PERSIST-040-O6 [chromium]",
+                  "kind": "deterministic",
+                  "categories": [
+                    "integration",
+                    "browser"
+                  ]
+                },
+                {
+                  "id": "playwright:acceptance/PERSIST-040.spec.js > PERSIST-040-O6 [webkit]",
                   "kind": "deterministic",
                   "categories": [
                     "integration",
@@ -38913,6 +39420,10 @@
             "status": "bound",
             "tests": [
               {
+                "id": "dotnet:Causa.Acceptance.Live.PERSIST041Tests.PERSIST-041-O3",
+                "kind": "live"
+              },
+              {
                 "id": "playwright:live/PERSIST-041.spec.js > PERSIST-041-O3 [chromium]",
                 "kind": "live"
               }
@@ -38980,6 +39491,13 @@
             "testIdentity": {
               "status": "bound",
               "tests": [
+                {
+                  "id": "dotnet:Causa.Acceptance.Live.PERSIST041Tests.PERSIST-041-O3",
+                  "kind": "live",
+                  "categories": [
+                    "live-provider"
+                  ]
+                },
                 {
                   "id": "playwright:live/PERSIST-041.spec.js > PERSIST-041-O3 [chromium]",
                   "kind": "live",
@@ -42279,6 +42797,10 @@
               {
                 "id": "playwright:acceptance/PERSIST-046.spec.js > PERSIST-046-O1 [chromium]",
                 "kind": "deterministic"
+              },
+              {
+                "id": "playwright:acceptance/PERSIST-046.spec.js > PERSIST-046-O1 [webkit]",
+                "kind": "deterministic"
               }
             ]
           },
@@ -42339,6 +42861,14 @@
                     "integration",
                     "browser"
                   ]
+                },
+                {
+                  "id": "playwright:acceptance/PERSIST-046.spec.js > PERSIST-046-O1 [webkit]",
+                  "kind": "deterministic",
+                  "categories": [
+                    "integration",
+                    "browser"
+                  ]
                 }
               ]
             },
@@ -42386,6 +42916,10 @@
             "tests": [
               {
                 "id": "playwright:acceptance/PERSIST-046.spec.js > PERSIST-046-O2 [chromium]",
+                "kind": "deterministic"
+              },
+              {
+                "id": "playwright:acceptance/PERSIST-046.spec.js > PERSIST-046-O2 [webkit]",
                 "kind": "deterministic"
               }
             ]
@@ -42447,6 +42981,14 @@
                     "integration",
                     "browser"
                   ]
+                },
+                {
+                  "id": "playwright:acceptance/PERSIST-046.spec.js > PERSIST-046-O2 [webkit]",
+                  "kind": "deterministic",
+                  "categories": [
+                    "integration",
+                    "browser"
+                  ]
                 }
               ]
             },
@@ -42494,6 +43036,10 @@
             "tests": [
               {
                 "id": "playwright:acceptance/PERSIST-046.spec.js > PERSIST-046-O3 [chromium]",
+                "kind": "deterministic"
+              },
+              {
+                "id": "playwright:acceptance/PERSIST-046.spec.js > PERSIST-046-O3 [webkit]",
                 "kind": "deterministic"
               }
             ]
@@ -42555,6 +43101,14 @@
                     "integration",
                     "browser"
                   ]
+                },
+                {
+                  "id": "playwright:acceptance/PERSIST-046.spec.js > PERSIST-046-O3 [webkit]",
+                  "kind": "deterministic",
+                  "categories": [
+                    "integration",
+                    "browser"
+                  ]
                 }
               ]
             },
@@ -42602,6 +43156,10 @@
             "tests": [
               {
                 "id": "playwright:acceptance/PERSIST-046.spec.js > PERSIST-046-O4 [chromium]",
+                "kind": "deterministic"
+              },
+              {
+                "id": "playwright:acceptance/PERSIST-046.spec.js > PERSIST-046-O4 [webkit]",
                 "kind": "deterministic"
               }
             ]
@@ -42663,6 +43221,14 @@
                     "integration",
                     "browser"
                   ]
+                },
+                {
+                  "id": "playwright:acceptance/PERSIST-046.spec.js > PERSIST-046-O4 [webkit]",
+                  "kind": "deterministic",
+                  "categories": [
+                    "integration",
+                    "browser"
+                  ]
                 }
               ]
             },
@@ -42710,6 +43276,10 @@
             "tests": [
               {
                 "id": "playwright:acceptance/PERSIST-046.spec.js > PERSIST-046-O5 [chromium]",
+                "kind": "deterministic"
+              },
+              {
+                "id": "playwright:acceptance/PERSIST-046.spec.js > PERSIST-046-O5 [webkit]",
                 "kind": "deterministic"
               }
             ]
@@ -42771,6 +43341,14 @@
                     "integration",
                     "browser"
                   ]
+                },
+                {
+                  "id": "playwright:acceptance/PERSIST-046.spec.js > PERSIST-046-O5 [webkit]",
+                  "kind": "deterministic",
+                  "categories": [
+                    "integration",
+                    "browser"
+                  ]
                 }
               ]
             },
@@ -42818,6 +43396,10 @@
             "tests": [
               {
                 "id": "playwright:acceptance/PERSIST-046.spec.js > PERSIST-046-O6 [chromium]",
+                "kind": "deterministic"
+              },
+              {
+                "id": "playwright:acceptance/PERSIST-046.spec.js > PERSIST-046-O6 [webkit]",
                 "kind": "deterministic"
               }
             ]
@@ -42874,6 +43456,14 @@
               "tests": [
                 {
                   "id": "playwright:acceptance/PERSIST-046.spec.js > PERSIST-046-O6 [chromium]",
+                  "kind": "deterministic",
+                  "categories": [
+                    "integration",
+                    "browser"
+                  ]
+                },
+                {
+                  "id": "playwright:acceptance/PERSIST-046.spec.js > PERSIST-046-O6 [webkit]",
                   "kind": "deterministic",
                   "categories": [
                     "integration",
@@ -43669,6 +44259,10 @@
               {
                 "id": "playwright:acceptance/PERSIST-048.spec.js > PERSIST-048-O1 [chromium]",
                 "kind": "deterministic"
+              },
+              {
+                "id": "playwright:acceptance/PERSIST-048.spec.js > PERSIST-048-O1 [webkit]",
+                "kind": "deterministic"
               }
             ]
           },
@@ -43729,6 +44323,14 @@
                     "integration",
                     "browser"
                   ]
+                },
+                {
+                  "id": "playwright:acceptance/PERSIST-048.spec.js > PERSIST-048-O1 [webkit]",
+                  "kind": "deterministic",
+                  "categories": [
+                    "integration",
+                    "browser"
+                  ]
                 }
               ]
             },
@@ -43775,6 +44377,10 @@
             "tests": [
               {
                 "id": "playwright:acceptance/PERSIST-048.spec.js > PERSIST-048-O2 [chromium]",
+                "kind": "deterministic"
+              },
+              {
+                "id": "playwright:acceptance/PERSIST-048.spec.js > PERSIST-048-O2 [webkit]",
                 "kind": "deterministic"
               }
             ]
@@ -43836,6 +44442,14 @@
                     "integration",
                     "browser"
                   ]
+                },
+                {
+                  "id": "playwright:acceptance/PERSIST-048.spec.js > PERSIST-048-O2 [webkit]",
+                  "kind": "deterministic",
+                  "categories": [
+                    "integration",
+                    "browser"
+                  ]
                 }
               ]
             },
@@ -43882,6 +44496,10 @@
             "tests": [
               {
                 "id": "playwright:acceptance/PERSIST-048.spec.js > PERSIST-048-O3 [chromium]",
+                "kind": "deterministic"
+              },
+              {
+                "id": "playwright:acceptance/PERSIST-048.spec.js > PERSIST-048-O3 [webkit]",
                 "kind": "deterministic"
               }
             ]
@@ -43943,6 +44561,14 @@
                     "integration",
                     "browser"
                   ]
+                },
+                {
+                  "id": "playwright:acceptance/PERSIST-048.spec.js > PERSIST-048-O3 [webkit]",
+                  "kind": "deterministic",
+                  "categories": [
+                    "integration",
+                    "browser"
+                  ]
                 }
               ]
             },
@@ -43989,6 +44615,10 @@
             "tests": [
               {
                 "id": "playwright:acceptance/PERSIST-048.spec.js > PERSIST-048-O4 [chromium]",
+                "kind": "deterministic"
+              },
+              {
+                "id": "playwright:acceptance/PERSIST-048.spec.js > PERSIST-048-O4 [webkit]",
                 "kind": "deterministic"
               }
             ]
@@ -44050,6 +44680,14 @@
                     "integration",
                     "browser"
                   ]
+                },
+                {
+                  "id": "playwright:acceptance/PERSIST-048.spec.js > PERSIST-048-O4 [webkit]",
+                  "kind": "deterministic",
+                  "categories": [
+                    "integration",
+                    "browser"
+                  ]
                 }
               ]
             },
@@ -44096,6 +44734,10 @@
             "tests": [
               {
                 "id": "playwright:acceptance/PERSIST-048.spec.js > PERSIST-048-O5 [chromium]",
+                "kind": "deterministic"
+              },
+              {
+                "id": "playwright:acceptance/PERSIST-048.spec.js > PERSIST-048-O5 [webkit]",
                 "kind": "deterministic"
               }
             ]
@@ -44152,6 +44794,14 @@
               "tests": [
                 {
                   "id": "playwright:acceptance/PERSIST-048.spec.js > PERSIST-048-O5 [chromium]",
+                  "kind": "deterministic",
+                  "categories": [
+                    "integration",
+                    "browser"
+                  ]
+                },
+                {
+                  "id": "playwright:acceptance/PERSIST-048.spec.js > PERSIST-048-O5 [webkit]",
                   "kind": "deterministic",
                   "categories": [
                     "integration",
@@ -46476,6 +47126,10 @@
               {
                 "id": "praxis:independent-review",
                 "kind": "review"
+              },
+              {
+                "id": "verifier:Causa.Acceptance.Independent.PAT13ProvenanceComparison",
+                "kind": "deterministic"
               }
             ]
           },
@@ -46554,6 +47208,13 @@
                   "kind": "review",
                   "categories": [
                     "independent-acceptance"
+                  ]
+                },
+                {
+                  "id": "verifier:Causa.Acceptance.Independent.PAT13ProvenanceComparison",
+                  "kind": "deterministic",
+                  "categories": [
+                    "security"
                   ]
                 }
               ]
@@ -47099,6 +47760,10 @@
               {
                 "id": "dotnet:Causa.Acceptance.Deterministic.PERSIST053Tests.PERSIST-053-O2",
                 "kind": "deterministic"
+              },
+              {
+                "id": "dotnet:Causa.Invariants.Negative.INV14.ForbiddenPhrases",
+                "kind": "deterministic"
               }
             ]
           },
@@ -47158,6 +47823,13 @@
                   "categories": [
                     "unit",
                     "integration"
+                  ]
+                },
+                {
+                  "id": "dotnet:Causa.Invariants.Negative.INV14.ForbiddenPhrases",
+                  "kind": "deterministic",
+                  "categories": [
+                    "unit"
                   ]
                 }
               ]
@@ -47518,6 +48190,10 @@
               {
                 "id": "playwright:acceptance/PERSIST-054.spec.js > PERSIST-054-O1 [chromium]",
                 "kind": "deterministic"
+              },
+              {
+                "id": "playwright:acceptance/PERSIST-054.spec.js > PERSIST-054-O1 [webkit]",
+                "kind": "deterministic"
               }
             ]
           },
@@ -47593,6 +48269,15 @@
                     "browser",
                     "accessibility"
                   ]
+                },
+                {
+                  "id": "playwright:acceptance/PERSIST-054.spec.js > PERSIST-054-O1 [webkit]",
+                  "kind": "deterministic",
+                  "categories": [
+                    "integration",
+                    "browser",
+                    "accessibility"
+                  ]
                 }
               ]
             },
@@ -47644,6 +48329,10 @@
             "tests": [
               {
                 "id": "playwright:acceptance/PERSIST-054.spec.js > PERSIST-054-O2 [chromium]",
+                "kind": "deterministic"
+              },
+              {
+                "id": "playwright:acceptance/PERSIST-054.spec.js > PERSIST-054-O2 [webkit]",
                 "kind": "deterministic"
               }
             ]
@@ -47718,6 +48407,15 @@
                     "browser",
                     "accessibility"
                   ]
+                },
+                {
+                  "id": "playwright:acceptance/PERSIST-054.spec.js > PERSIST-054-O2 [webkit]",
+                  "kind": "deterministic",
+                  "categories": [
+                    "integration",
+                    "browser",
+                    "accessibility"
+                  ]
                 }
               ]
             },
@@ -47769,6 +48467,10 @@
             "tests": [
               {
                 "id": "playwright:acceptance/PERSIST-054.spec.js > PERSIST-054-O3 [chromium]",
+                "kind": "deterministic"
+              },
+              {
+                "id": "playwright:acceptance/PERSIST-054.spec.js > PERSIST-054-O3 [webkit]",
                 "kind": "deterministic"
               }
             ]
@@ -47843,6 +48545,15 @@
                     "browser",
                     "accessibility"
                   ]
+                },
+                {
+                  "id": "playwright:acceptance/PERSIST-054.spec.js > PERSIST-054-O3 [webkit]",
+                  "kind": "deterministic",
+                  "categories": [
+                    "integration",
+                    "browser",
+                    "accessibility"
+                  ]
                 }
               ]
             },
@@ -47894,6 +48605,10 @@
             "tests": [
               {
                 "id": "playwright:acceptance/PERSIST-054.spec.js > PERSIST-054-O4 [chromium]",
+                "kind": "deterministic"
+              },
+              {
+                "id": "playwright:acceptance/PERSIST-054.spec.js > PERSIST-054-O4 [webkit]",
                 "kind": "deterministic"
               }
             ]
@@ -47962,6 +48677,15 @@
               "tests": [
                 {
                   "id": "playwright:acceptance/PERSIST-054.spec.js > PERSIST-054-O4 [chromium]",
+                  "kind": "deterministic",
+                  "categories": [
+                    "integration",
+                    "browser",
+                    "accessibility"
+                  ]
+                },
+                {
+                  "id": "playwright:acceptance/PERSIST-054.spec.js > PERSIST-054-O4 [webkit]",
                   "kind": "deterministic",
                   "categories": [
                     "integration",
@@ -54672,6 +55396,14 @@
               {
                 "id": "dotnet:Causa.Acceptance.Live.PF015Tests.PF-015-O4",
                 "kind": "live"
+              },
+              {
+                "id": "dotnet:Causa.Invariants.Negative.INV21.CredentialDestinations",
+                "kind": "deterministic"
+              },
+              {
+                "id": "playwright:invariants/INV-21.spec.js > no credential in storage, URL or artifact [chromium]",
+                "kind": "deterministic"
               }
             ]
           },
@@ -54743,6 +55475,20 @@
                   "categories": [
                     "integration",
                     "live-provider",
+                    "security"
+                  ]
+                },
+                {
+                  "id": "dotnet:Causa.Invariants.Negative.INV21.CredentialDestinations",
+                  "kind": "deterministic",
+                  "categories": [
+                    "security"
+                  ]
+                },
+                {
+                  "id": "playwright:invariants/INV-21.spec.js > no credential in storage, URL or artifact [chromium]",
+                  "kind": "deterministic",
+                  "categories": [
                     "security"
                   ]
                 }
@@ -61044,6 +61790,14 @@
               {
                 "id": "playwright:acceptance/UI-011.spec.js > UI-011-O1 [chromium]",
                 "kind": "deterministic"
+              },
+              {
+                "id": "playwright:acceptance/UI-011.spec.js > UI-011-O1 [webkit]",
+                "kind": "deterministic"
+              },
+              {
+                "id": "playwright:invariants/INV-24.spec.js > save-state and conflict actions by keyboard and screen reader [webkit]",
+                "kind": "deterministic"
               }
             ]
           },
@@ -61104,6 +61858,21 @@
                     "browser",
                     "accessibility"
                   ]
+                },
+                {
+                  "id": "playwright:acceptance/UI-011.spec.js > UI-011-O1 [webkit]",
+                  "kind": "deterministic",
+                  "categories": [
+                    "browser",
+                    "accessibility"
+                  ]
+                },
+                {
+                  "id": "playwright:invariants/INV-24.spec.js > save-state and conflict actions by keyboard and screen reader [webkit]",
+                  "kind": "deterministic",
+                  "categories": [
+                    "accessibility"
+                  ]
                 }
               ]
             },
@@ -61148,6 +61917,10 @@
             "tests": [
               {
                 "id": "playwright:acceptance/UI-011.spec.js > UI-011-O2 [chromium]",
+                "kind": "deterministic"
+              },
+              {
+                "id": "playwright:acceptance/UI-011.spec.js > UI-011-O2 [webkit]",
                 "kind": "deterministic"
               }
             ]
@@ -61211,6 +61984,14 @@
                     "browser",
                     "accessibility"
                   ]
+                },
+                {
+                  "id": "playwright:acceptance/UI-011.spec.js > UI-011-O2 [webkit]",
+                  "kind": "deterministic",
+                  "categories": [
+                    "browser",
+                    "accessibility"
+                  ]
                 }
               ]
             },
@@ -61255,6 +62036,10 @@
             "tests": [
               {
                 "id": "playwright:acceptance/UI-011.spec.js > UI-011-O3 [chromium]",
+                "kind": "deterministic"
+              },
+              {
+                "id": "playwright:acceptance/UI-011.spec.js > UI-011-O3 [webkit]",
                 "kind": "deterministic"
               }
             ]
@@ -61316,6 +62101,14 @@
                     "browser",
                     "accessibility"
                   ]
+                },
+                {
+                  "id": "playwright:acceptance/UI-011.spec.js > UI-011-O3 [webkit]",
+                  "kind": "deterministic",
+                  "categories": [
+                    "browser",
+                    "accessibility"
+                  ]
                 }
               ]
             },
@@ -61360,6 +62153,10 @@
             "tests": [
               {
                 "id": "playwright:acceptance/UI-011.spec.js > UI-011-O4 [chromium]",
+                "kind": "deterministic"
+              },
+              {
+                "id": "playwright:acceptance/UI-011.spec.js > UI-011-O4 [webkit]",
                 "kind": "deterministic"
               }
             ]
@@ -61421,6 +62218,14 @@
                     "browser",
                     "accessibility"
                   ]
+                },
+                {
+                  "id": "playwright:acceptance/UI-011.spec.js > UI-011-O4 [webkit]",
+                  "kind": "deterministic",
+                  "categories": [
+                    "browser",
+                    "accessibility"
+                  ]
                 }
               ]
             },
@@ -61465,6 +62270,10 @@
             "tests": [
               {
                 "id": "playwright:acceptance/UI-011.spec.js > UI-011-O5 [chromium]",
+                "kind": "deterministic"
+              },
+              {
+                "id": "playwright:acceptance/UI-011.spec.js > UI-011-O5 [webkit]",
                 "kind": "deterministic"
               }
             ]
@@ -61521,6 +62330,14 @@
               "tests": [
                 {
                   "id": "playwright:acceptance/UI-011.spec.js > UI-011-O5 [chromium]",
+                  "kind": "deterministic",
+                  "categories": [
+                    "browser",
+                    "accessibility"
+                  ]
+                },
+                {
+                  "id": "playwright:acceptance/UI-011.spec.js > UI-011-O5 [webkit]",
                   "kind": "deterministic",
                   "categories": [
                     "browser",
@@ -63573,6 +64390,10 @@
               {
                 "id": "playwright:acceptance/UI-016.spec.js > UI-016-O1 [chromium]",
                 "kind": "deterministic"
+              },
+              {
+                "id": "playwright:acceptance/UI-016.spec.js > UI-016-O1 [webkit]",
+                "kind": "deterministic"
               }
             ]
           },
@@ -63633,6 +64454,14 @@
                     "browser",
                     "accessibility"
                   ]
+                },
+                {
+                  "id": "playwright:acceptance/UI-016.spec.js > UI-016-O1 [webkit]",
+                  "kind": "deterministic",
+                  "categories": [
+                    "browser",
+                    "accessibility"
+                  ]
                 }
               ]
             },
@@ -63677,6 +64506,10 @@
             "tests": [
               {
                 "id": "playwright:acceptance/UI-016.spec.js > UI-016-O2 [chromium]",
+                "kind": "deterministic"
+              },
+              {
+                "id": "playwright:acceptance/UI-016.spec.js > UI-016-O2 [webkit]",
                 "kind": "deterministic"
               }
             ]
@@ -63738,6 +64571,14 @@
                     "browser",
                     "accessibility"
                   ]
+                },
+                {
+                  "id": "playwright:acceptance/UI-016.spec.js > UI-016-O2 [webkit]",
+                  "kind": "deterministic",
+                  "categories": [
+                    "browser",
+                    "accessibility"
+                  ]
                 }
               ]
             },
@@ -63782,6 +64623,10 @@
             "tests": [
               {
                 "id": "playwright:acceptance/UI-016.spec.js > UI-016-O3 [chromium]",
+                "kind": "deterministic"
+              },
+              {
+                "id": "playwright:acceptance/UI-016.spec.js > UI-016-O3 [webkit]",
                 "kind": "deterministic"
               }
             ]
@@ -63845,6 +64690,14 @@
                     "browser",
                     "accessibility"
                   ]
+                },
+                {
+                  "id": "playwright:acceptance/UI-016.spec.js > UI-016-O3 [webkit]",
+                  "kind": "deterministic",
+                  "categories": [
+                    "browser",
+                    "accessibility"
+                  ]
                 }
               ]
             },
@@ -63889,6 +64742,10 @@
             "tests": [
               {
                 "id": "playwright:acceptance/UI-016.spec.js > UI-016-O4 [chromium]",
+                "kind": "deterministic"
+              },
+              {
+                "id": "playwright:acceptance/UI-016.spec.js > UI-016-O4 [webkit]",
                 "kind": "deterministic"
               }
             ]
@@ -63952,6 +64809,14 @@
                     "browser",
                     "accessibility"
                   ]
+                },
+                {
+                  "id": "playwright:acceptance/UI-016.spec.js > UI-016-O4 [webkit]",
+                  "kind": "deterministic",
+                  "categories": [
+                    "browser",
+                    "accessibility"
+                  ]
                 }
               ]
             },
@@ -63996,6 +64861,10 @@
             "tests": [
               {
                 "id": "playwright:acceptance/UI-016.spec.js > UI-016-O5 [chromium]",
+                "kind": "deterministic"
+              },
+              {
+                "id": "playwright:acceptance/UI-016.spec.js > UI-016-O5 [webkit]",
                 "kind": "deterministic"
               }
             ]
@@ -64059,6 +64928,14 @@
                     "browser",
                     "accessibility"
                   ]
+                },
+                {
+                  "id": "playwright:acceptance/UI-016.spec.js > UI-016-O5 [webkit]",
+                  "kind": "deterministic",
+                  "categories": [
+                    "browser",
+                    "accessibility"
+                  ]
                 }
               ]
             },
@@ -64103,6 +64980,10 @@
             "tests": [
               {
                 "id": "playwright:acceptance/UI-016.spec.js > UI-016-O6 [chromium]",
+                "kind": "deterministic"
+              },
+              {
+                "id": "playwright:acceptance/UI-016.spec.js > UI-016-O6 [webkit]",
                 "kind": "deterministic"
               }
             ]
@@ -64166,6 +65047,14 @@
                     "browser",
                     "accessibility"
                   ]
+                },
+                {
+                  "id": "playwright:acceptance/UI-016.spec.js > UI-016-O6 [webkit]",
+                  "kind": "deterministic",
+                  "categories": [
+                    "browser",
+                    "accessibility"
+                  ]
                 }
               ]
             },
@@ -64210,6 +65099,10 @@
             "tests": [
               {
                 "id": "playwright:acceptance/UI-016.spec.js > UI-016-O7 [chromium]",
+                "kind": "deterministic"
+              },
+              {
+                "id": "playwright:acceptance/UI-016.spec.js > UI-016-O7 [webkit]",
                 "kind": "deterministic"
               }
             ]
@@ -64273,6 +65166,14 @@
                     "browser",
                     "accessibility"
                   ]
+                },
+                {
+                  "id": "playwright:acceptance/UI-016.spec.js > UI-016-O7 [webkit]",
+                  "kind": "deterministic",
+                  "categories": [
+                    "browser",
+                    "accessibility"
+                  ]
                 }
               ]
             },
@@ -64317,6 +65218,10 @@
             "tests": [
               {
                 "id": "playwright:acceptance/UI-016.spec.js > UI-016-O8 [chromium]",
+                "kind": "deterministic"
+              },
+              {
+                "id": "playwright:acceptance/UI-016.spec.js > UI-016-O8 [webkit]",
                 "kind": "deterministic"
               }
             ]
@@ -64378,6 +65283,14 @@
                     "browser",
                     "accessibility"
                   ]
+                },
+                {
+                  "id": "playwright:acceptance/UI-016.spec.js > UI-016-O8 [webkit]",
+                  "kind": "deterministic",
+                  "categories": [
+                    "browser",
+                    "accessibility"
+                  ]
                 }
               ]
             },
@@ -64422,6 +65335,10 @@
             "tests": [
               {
                 "id": "playwright:acceptance/UI-016.spec.js > UI-016-O9 [chromium]",
+                "kind": "deterministic"
+              },
+              {
+                "id": "playwright:acceptance/UI-016.spec.js > UI-016-O9 [webkit]",
                 "kind": "deterministic"
               }
             ]
@@ -64483,6 +65400,14 @@
                     "browser",
                     "accessibility"
                   ]
+                },
+                {
+                  "id": "playwright:acceptance/UI-016.spec.js > UI-016-O9 [webkit]",
+                  "kind": "deterministic",
+                  "categories": [
+                    "browser",
+                    "accessibility"
+                  ]
                 }
               ]
             },
@@ -64527,6 +65452,10 @@
             "tests": [
               {
                 "id": "playwright:acceptance/UI-016.spec.js > UI-016-O10 [chromium]",
+                "kind": "deterministic"
+              },
+              {
+                "id": "playwright:acceptance/UI-016.spec.js > UI-016-O10 [webkit]",
                 "kind": "deterministic"
               }
             ]
@@ -64590,6 +65519,14 @@
                     "browser",
                     "accessibility"
                   ]
+                },
+                {
+                  "id": "playwright:acceptance/UI-016.spec.js > UI-016-O10 [webkit]",
+                  "kind": "deterministic",
+                  "categories": [
+                    "browser",
+                    "accessibility"
+                  ]
                 }
               ]
             },
@@ -64634,6 +65571,10 @@
             "tests": [
               {
                 "id": "playwright:acceptance/UI-016.spec.js > UI-016-O11 [chromium]",
+                "kind": "deterministic"
+              },
+              {
+                "id": "playwright:acceptance/UI-016.spec.js > UI-016-O11 [webkit]",
                 "kind": "deterministic"
               }
             ]
@@ -64698,6 +65639,14 @@
                     "browser",
                     "accessibility"
                   ]
+                },
+                {
+                  "id": "playwright:acceptance/UI-016.spec.js > UI-016-O11 [webkit]",
+                  "kind": "deterministic",
+                  "categories": [
+                    "browser",
+                    "accessibility"
+                  ]
                 }
               ]
             },
@@ -64742,6 +65691,10 @@
             "tests": [
               {
                 "id": "playwright:acceptance/UI-016.spec.js > UI-016-O12 [chromium]",
+                "kind": "deterministic"
+              },
+              {
+                "id": "playwright:acceptance/UI-016.spec.js > UI-016-O12 [webkit]",
                 "kind": "deterministic"
               }
             ]
@@ -64806,6 +65759,14 @@
                     "browser",
                     "accessibility"
                   ]
+                },
+                {
+                  "id": "playwright:acceptance/UI-016.spec.js > UI-016-O12 [webkit]",
+                  "kind": "deterministic",
+                  "categories": [
+                    "browser",
+                    "accessibility"
+                  ]
                 }
               ]
             },
@@ -64850,6 +65811,10 @@
             "tests": [
               {
                 "id": "playwright:acceptance/UI-016.spec.js > UI-016-O13 [chromium]",
+                "kind": "deterministic"
+              },
+              {
+                "id": "playwright:acceptance/UI-016.spec.js > UI-016-O13 [webkit]",
                 "kind": "deterministic"
               }
             ]
@@ -64911,6 +65876,14 @@
                     "browser",
                     "accessibility"
                   ]
+                },
+                {
+                  "id": "playwright:acceptance/UI-016.spec.js > UI-016-O13 [webkit]",
+                  "kind": "deterministic",
+                  "categories": [
+                    "browser",
+                    "accessibility"
+                  ]
                 }
               ]
             },
@@ -64955,6 +65928,10 @@
             "tests": [
               {
                 "id": "playwright:acceptance/UI-016.spec.js > UI-016-O14 [chromium]",
+                "kind": "deterministic"
+              },
+              {
+                "id": "playwright:acceptance/UI-016.spec.js > UI-016-O14 [webkit]",
                 "kind": "deterministic"
               }
             ]
@@ -65016,6 +65993,14 @@
                     "browser",
                     "accessibility"
                   ]
+                },
+                {
+                  "id": "playwright:acceptance/UI-016.spec.js > UI-016-O14 [webkit]",
+                  "kind": "deterministic",
+                  "categories": [
+                    "browser",
+                    "accessibility"
+                  ]
                 }
               ]
             },
@@ -65060,6 +66045,10 @@
             "tests": [
               {
                 "id": "playwright:acceptance/UI-016.spec.js > UI-016-O15 [chromium]",
+                "kind": "deterministic"
+              },
+              {
+                "id": "playwright:acceptance/UI-016.spec.js > UI-016-O15 [webkit]",
                 "kind": "deterministic"
               }
             ]
@@ -65121,6 +66110,14 @@
                     "browser",
                     "accessibility"
                   ]
+                },
+                {
+                  "id": "playwright:acceptance/UI-016.spec.js > UI-016-O15 [webkit]",
+                  "kind": "deterministic",
+                  "categories": [
+                    "browser",
+                    "accessibility"
+                  ]
                 }
               ]
             },
@@ -65165,6 +66162,10 @@
             "tests": [
               {
                 "id": "playwright:acceptance/UI-016.spec.js > UI-016-O16 [chromium]",
+                "kind": "deterministic"
+              },
+              {
+                "id": "playwright:acceptance/UI-016.spec.js > UI-016-O16 [webkit]",
                 "kind": "deterministic"
               }
             ]
@@ -65226,6 +66227,14 @@
                     "browser",
                     "accessibility"
                   ]
+                },
+                {
+                  "id": "playwright:acceptance/UI-016.spec.js > UI-016-O16 [webkit]",
+                  "kind": "deterministic",
+                  "categories": [
+                    "browser",
+                    "accessibility"
+                  ]
                 }
               ]
             },
@@ -65270,6 +66279,10 @@
             "tests": [
               {
                 "id": "playwright:acceptance/UI-016.spec.js > UI-016-O17 [chromium]",
+                "kind": "deterministic"
+              },
+              {
+                "id": "playwright:acceptance/UI-016.spec.js > UI-016-O17 [webkit]",
                 "kind": "deterministic"
               }
             ]
@@ -65331,6 +66344,14 @@
                     "browser",
                     "accessibility"
                   ]
+                },
+                {
+                  "id": "playwright:acceptance/UI-016.spec.js > UI-016-O17 [webkit]",
+                  "kind": "deterministic",
+                  "categories": [
+                    "browser",
+                    "accessibility"
+                  ]
                 }
               ]
             },
@@ -65375,6 +66396,10 @@
             "tests": [
               {
                 "id": "playwright:acceptance/UI-016.spec.js > UI-016-O18 [chromium]",
+                "kind": "deterministic"
+              },
+              {
+                "id": "playwright:acceptance/UI-016.spec.js > UI-016-O18 [webkit]",
                 "kind": "deterministic"
               }
             ]
@@ -65431,6 +66456,14 @@
               "tests": [
                 {
                   "id": "playwright:acceptance/UI-016.spec.js > UI-016-O18 [chromium]",
+                  "kind": "deterministic",
+                  "categories": [
+                    "browser",
+                    "accessibility"
+                  ]
+                },
+                {
+                  "id": "playwright:acceptance/UI-016.spec.js > UI-016-O18 [webkit]",
                   "kind": "deterministic",
                   "categories": [
                     "browser",
@@ -67648,6 +68681,10 @@
               {
                 "id": "playwright:acceptance/UI-020.spec.js > UI-020-O1 [chromium]",
                 "kind": "deterministic"
+              },
+              {
+                "id": "playwright:acceptance/UI-020.spec.js > UI-020-O1 [webkit]",
+                "kind": "deterministic"
               }
             ]
           },
@@ -67708,6 +68745,14 @@
                     "browser",
                     "accessibility"
                   ]
+                },
+                {
+                  "id": "playwright:acceptance/UI-020.spec.js > UI-020-O1 [webkit]",
+                  "kind": "deterministic",
+                  "categories": [
+                    "browser",
+                    "accessibility"
+                  ]
                 }
               ]
             },
@@ -67752,6 +68797,10 @@
             "tests": [
               {
                 "id": "playwright:acceptance/UI-020.spec.js > UI-020-O2 [chromium]",
+                "kind": "deterministic"
+              },
+              {
+                "id": "playwright:acceptance/UI-020.spec.js > UI-020-O2 [webkit]",
                 "kind": "deterministic"
               }
             ]
@@ -67813,6 +68862,14 @@
                     "browser",
                     "accessibility"
                   ]
+                },
+                {
+                  "id": "playwright:acceptance/UI-020.spec.js > UI-020-O2 [webkit]",
+                  "kind": "deterministic",
+                  "categories": [
+                    "browser",
+                    "accessibility"
+                  ]
                 }
               ]
             },
@@ -67857,6 +68914,10 @@
             "tests": [
               {
                 "id": "playwright:acceptance/UI-020.spec.js > UI-020-O3 [chromium]",
+                "kind": "deterministic"
+              },
+              {
+                "id": "playwright:acceptance/UI-020.spec.js > UI-020-O3 [webkit]",
                 "kind": "deterministic"
               }
             ]
@@ -67918,6 +68979,14 @@
                     "browser",
                     "accessibility"
                   ]
+                },
+                {
+                  "id": "playwright:acceptance/UI-020.spec.js > UI-020-O3 [webkit]",
+                  "kind": "deterministic",
+                  "categories": [
+                    "browser",
+                    "accessibility"
+                  ]
                 }
               ]
             },
@@ -67962,6 +69031,10 @@
             "tests": [
               {
                 "id": "playwright:acceptance/UI-020.spec.js > UI-020-O4 [chromium]",
+                "kind": "deterministic"
+              },
+              {
+                "id": "playwright:acceptance/UI-020.spec.js > UI-020-O4 [webkit]",
                 "kind": "deterministic"
               }
             ]
@@ -68018,6 +69091,14 @@
               "tests": [
                 {
                   "id": "playwright:acceptance/UI-020.spec.js > UI-020-O4 [chromium]",
+                  "kind": "deterministic",
+                  "categories": [
+                    "browser",
+                    "accessibility"
+                  ]
+                },
+                {
+                  "id": "playwright:acceptance/UI-020.spec.js > UI-020-O4 [webkit]",
                   "kind": "deterministic",
                   "categories": [
                     "browser",
@@ -71671,6 +72752,10 @@
               {
                 "id": "playwright:acceptance/UI-029.spec.js > UI-029-O1 [chromium]",
                 "kind": "deterministic"
+              },
+              {
+                "id": "playwright:acceptance/UI-029.spec.js > UI-029-O1 [webkit]",
+                "kind": "deterministic"
               }
             ]
           },
@@ -71731,6 +72816,14 @@
                     "browser",
                     "accessibility"
                   ]
+                },
+                {
+                  "id": "playwright:acceptance/UI-029.spec.js > UI-029-O1 [webkit]",
+                  "kind": "deterministic",
+                  "categories": [
+                    "browser",
+                    "accessibility"
+                  ]
                 }
               ]
             },
@@ -71777,6 +72870,10 @@
             "tests": [
               {
                 "id": "playwright:acceptance/UI-029.spec.js > UI-029-O2 [chromium]",
+                "kind": "deterministic"
+              },
+              {
+                "id": "playwright:acceptance/UI-029.spec.js > UI-029-O2 [webkit]",
                 "kind": "deterministic"
               }
             ]
@@ -71838,6 +72935,14 @@
                     "browser",
                     "accessibility"
                   ]
+                },
+                {
+                  "id": "playwright:acceptance/UI-029.spec.js > UI-029-O2 [webkit]",
+                  "kind": "deterministic",
+                  "categories": [
+                    "browser",
+                    "accessibility"
+                  ]
                 }
               ]
             },
@@ -71884,6 +72989,10 @@
             "tests": [
               {
                 "id": "playwright:acceptance/UI-029.spec.js > UI-029-O3 [chromium]",
+                "kind": "deterministic"
+              },
+              {
+                "id": "playwright:acceptance/UI-029.spec.js > UI-029-O3 [webkit]",
                 "kind": "deterministic"
               }
             ]
@@ -71945,6 +73054,14 @@
                     "browser",
                     "accessibility"
                   ]
+                },
+                {
+                  "id": "playwright:acceptance/UI-029.spec.js > UI-029-O3 [webkit]",
+                  "kind": "deterministic",
+                  "categories": [
+                    "browser",
+                    "accessibility"
+                  ]
                 }
               ]
             },
@@ -71991,6 +73108,10 @@
             "tests": [
               {
                 "id": "playwright:acceptance/UI-029.spec.js > UI-029-O4 [chromium]",
+                "kind": "deterministic"
+              },
+              {
+                "id": "playwright:acceptance/UI-029.spec.js > UI-029-O4 [webkit]",
                 "kind": "deterministic"
               }
             ]
@@ -72047,6 +73168,14 @@
               "tests": [
                 {
                   "id": "playwright:acceptance/UI-029.spec.js > UI-029-O4 [chromium]",
+                  "kind": "deterministic",
+                  "categories": [
+                    "browser",
+                    "accessibility"
+                  ]
+                },
+                {
+                  "id": "playwright:acceptance/UI-029.spec.js > UI-029-O4 [webkit]",
                   "kind": "deterministic",
                   "categories": [
                     "browser",
@@ -74019,6 +75148,10 @@
               {
                 "id": "playwright:acceptance/UI-034.spec.js > UI-034-O1 [chromium]",
                 "kind": "deterministic"
+              },
+              {
+                "id": "playwright:acceptance/UI-034.spec.js > UI-034-O1 [webkit]",
+                "kind": "deterministic"
               }
             ]
           },
@@ -74079,6 +75212,14 @@
                     "browser",
                     "accessibility"
                   ]
+                },
+                {
+                  "id": "playwright:acceptance/UI-034.spec.js > UI-034-O1 [webkit]",
+                  "kind": "deterministic",
+                  "categories": [
+                    "browser",
+                    "accessibility"
+                  ]
                 }
               ]
             },
@@ -74122,6 +75263,10 @@
             "tests": [
               {
                 "id": "playwright:acceptance/UI-034.spec.js > UI-034-O2 [chromium]",
+                "kind": "deterministic"
+              },
+              {
+                "id": "playwright:acceptance/UI-034.spec.js > UI-034-O2 [webkit]",
                 "kind": "deterministic"
               }
             ]
@@ -74183,6 +75328,14 @@
                     "browser",
                     "accessibility"
                   ]
+                },
+                {
+                  "id": "playwright:acceptance/UI-034.spec.js > UI-034-O2 [webkit]",
+                  "kind": "deterministic",
+                  "categories": [
+                    "browser",
+                    "accessibility"
+                  ]
                 }
               ]
             },
@@ -74226,6 +75379,10 @@
             "tests": [
               {
                 "id": "playwright:acceptance/UI-034.spec.js > UI-034-O3 [chromium]",
+                "kind": "deterministic"
+              },
+              {
+                "id": "playwright:acceptance/UI-034.spec.js > UI-034-O3 [webkit]",
                 "kind": "deterministic"
               }
             ]
@@ -74282,6 +75439,14 @@
               "tests": [
                 {
                   "id": "playwright:acceptance/UI-034.spec.js > UI-034-O3 [chromium]",
+                  "kind": "deterministic",
+                  "categories": [
+                    "browser",
+                    "accessibility"
+                  ]
+                },
+                {
+                  "id": "playwright:acceptance/UI-034.spec.js > UI-034-O3 [webkit]",
                   "kind": "deterministic",
                   "categories": [
                     "browser",
@@ -80462,6 +81627,10 @@
               {
                 "id": "playwright:acceptance/WDL-007.spec.js > WDL-007-O1 [chromium]",
                 "kind": "deterministic"
+              },
+              {
+                "id": "playwright:acceptance/WDL-007.spec.js > WDL-007-O1 [webkit]",
+                "kind": "deterministic"
               }
             ]
           },
@@ -80522,6 +81691,14 @@
                     "browser",
                     "accessibility"
                   ]
+                },
+                {
+                  "id": "playwright:acceptance/WDL-007.spec.js > WDL-007-O1 [webkit]",
+                  "kind": "deterministic",
+                  "categories": [
+                    "browser",
+                    "accessibility"
+                  ]
                 }
               ]
             },
@@ -80563,6 +81740,10 @@
             "tests": [
               {
                 "id": "playwright:acceptance/WDL-007.spec.js > WDL-007-O2 [chromium]",
+                "kind": "deterministic"
+              },
+              {
+                "id": "playwright:acceptance/WDL-007.spec.js > WDL-007-O2 [webkit]",
                 "kind": "deterministic"
               }
             ]
@@ -80619,6 +81800,14 @@
               "tests": [
                 {
                   "id": "playwright:acceptance/WDL-007.spec.js > WDL-007-O2 [chromium]",
+                  "kind": "deterministic",
+                  "categories": [
+                    "browser",
+                    "accessibility"
+                  ]
+                },
+                {
+                  "id": "playwright:acceptance/WDL-007.spec.js > WDL-007-O2 [webkit]",
                   "kind": "deterministic",
                   "categories": [
                     "browser",

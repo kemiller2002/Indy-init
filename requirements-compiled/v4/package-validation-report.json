@@ -73,7 +73,7 @@
     },
     {
       "id": "W10",
-      "title": "The execution plan schedules every timed task with an estimate and reports whether each topology fits the window",
+      "title": "The execution plan schedules every timed task with an estimate and reports whether each topology fits the window (fit itself is freeze condition FG-07)",
       "critical": true,
       "status": "PASS",
       "problems": []
@@ -109,6 +109,13 @@
     {
       "id": "W15",
       "title": "The verification plan and the reconciliation are compiled from the committed v4 baseline",
+      "critical": true,
+      "status": "PASS",
+      "problems": []
+    },
+    {
+      "id": "W16",
+      "title": "Every normative invariant and lesson test, and a WebKit twin of every Chromium test where the requirement names WebKit, iPad or Safari, is bound in the plan on an obligation that requires its category",
       "critical": true,
       "status": "PASS",
       "problems": []

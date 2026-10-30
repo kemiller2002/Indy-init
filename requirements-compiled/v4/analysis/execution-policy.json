@@ -6,7 +6,10 @@
     "date": "2026-11-07",
     "timeZone": "America/Indiana/Indianapolis",
     "publishedBuildWindowLocal": "09:30-17:00",
-    "publishedBuildWindowUtc": { "start": "2026-11-07T14:30:00Z", "end": "2026-11-07T22:00:00Z" },
+    "publishedBuildWindowUtc": {
+      "start": "2026-11-07T14:30:00Z",
+      "end": "2026-11-07T22:00:00Z"
+    },
     "source": "docs/HACKATHON-BOUNDARIES.md: 'the build window is currently published as 9:30 AM to 5:00 PM on November 7, 2026.' Eastern Standard Time applies on 2026-11-07 (UTC-5)."
   },
   "clock": {
@@ -21,17 +24,65 @@
     ]
   },
   "reserves": [
-    { "id": "RES-INTEGRATION", "minutes": 20, "purpose": "integration of parallel lanes and CI queue time not inside task estimates" },
-    { "id": "RES-FINAL", "minutes": 45, "purpose": "final verification and delivery window: independent acceptance on the exact SHA, deployment, evidence collection, delivery (after the merge freeze)" }
+    {
+      "id": "RES-INTEGRATION",
+      "minutes": 20,
+      "purpose": "integration of parallel lanes and CI queue time not inside task estimates"
+    },
+    {
+      "id": "RES-FINAL",
+      "minutes": 45,
+      "purpose": "final verification and delivery window: independent acceptance on the exact SHA, deployment, evidence collection, delivery (after the merge freeze)"
+    }
   ],
   "independentReviewCheckpoints": [
-    { "id": "IRC-1", "after": "T14", "purpose": "early adversarial review of interfaces and invariants before fan-out completes (DCC-002: target T+90 to T+120)" },
-    { "id": "IRC-2", "after": "T21", "purpose": "review after the live write path, before UI completion" },
-    { "id": "IRC-3", "after": "T31", "purpose": "review of the release candidate (T30 and T33 are the scheduled reviewer tasks)" }
+    {
+      "id": "IRC-1",
+      "task": "T35",
+      "after": "T14",
+      "purpose": "early adversarial review of interfaces and invariants (DCC-002: target T+90 to T+120)"
+    },
+    {
+      "id": "IRC-2",
+      "task": "T36",
+      "after": "T21",
+      "purpose": "review after the live write path, before UI completion"
+    },
+    {
+      "id": "IRC-3",
+      "task": "T30",
+      "after": "T21, T22, T25",
+      "purpose": "architecture and invariant review before the release candidate"
+    },
+    {
+      "id": "IRC-4",
+      "task": "T33",
+      "after": "T32",
+      "purpose": "fresh reviewer before the final verdict"
+    }
   ],
   "topologies": [
-    { "id": "A-role-lanes", "laneOf": "owner", "description": "One lane per owner role (domain, ui, persistence, integration, coordinator, reviewer); operator and upstream lanes are preflight-only. Needs owner approval (ODR-V4-07, F-007)." },
-    { "id": "B-single-lead", "laneOf": "lead", "description": "One continuous lead agent for domain, ui, persistence, integration and coordinator work (AR-021); reviewer is a separate lane." }
+    {
+      "id": "A-role-lanes",
+      "laneOf": "owner",
+      "description": "One lane per owner role (domain, ui, persistence, integration, coordinator, reviewer); operator and upstream lanes are preflight-only. Needs owner approval (ODR-V4-07, F-007)."
+    },
+    {
+      "id": "B-single-lead",
+      "laneOf": "lead",
+      "description": "One continuous lead agent for domain, ui, persistence, integration and coordinator work (AR-021); reviewer is a separate lane."
+    },
+    {
+      "id": "C-role-lanes-two-ui",
+      "base": "A-role-lanes",
+      "laneOverrides": {
+        "T26": "ui-2",
+        "T28": "ui-2",
+        "T29": "ui-2",
+        "T23": "ui-2"
+      },
+      "description": "As A-role-lanes, with a second UI agent for the report, history/semantic diff, administration and causal graph views (T23, T26, T28, T29) after the integration checkpoint T17. Needs owner approval (ODR-V4-07)."
+    }
   ],
   "ciRules": [
     "Every CI step runs with errexit and pipefail; conditor ci-policy check passes at kickoff and on every candidate (DCC-013).",

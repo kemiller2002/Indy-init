@@ -5,144 +5,369 @@
     {
       "id": "IF-DOMAIN-PERSIST",
       "boundary": "Causa domain engine <-> persistence (Boundary D)",
-      "provider": "F# persistence module (session memory + GitHub)", "consumer": "F# application/update loop",
-      "systems": ["dotnet-sdk"], "contracts": ["CT-004", "CT-018"],
-      "operations": ["load at a branch head", "commit with an expected head", "confirm by read-back", "reconcile an unknown outcome", "rebase over unrelated changes", "surface a genuine conflict", "reapply unsaved commands"],
-      "failureTypes": ["StaleHead", "Network", "Authentication", "Permission", "RateLimit", "Validation", "UnknownOutcome", "HistoryRewritten", "VerificationFailed"],
+      "provider": "F# persistence module (session memory + GitHub)",
+      "consumer": "F# application/update loop",
+      "systems": [
+        "dotnet-sdk"
+      ],
+      "contracts": [
+        "CT-004",
+        "CT-018"
+      ],
+      "operations": [
+        "load at a branch head",
+        "commit with an expected head",
+        "confirm by read-back",
+        "reconcile an unknown outcome",
+        "rebase over unrelated changes",
+        "surface a genuine conflict",
+        "reapply unsaved commands"
+      ],
+      "failureTypes": [
+        "StaleHead",
+        "Network",
+        "Authentication",
+        "Permission",
+        "RateLimit",
+        "Validation",
+        "UnknownOutcome",
+        "HistoryRewritten",
+        "VerificationFailed"
+      ],
       "verification": "interface manifest authored at kickoff (T14); producer/consumer contract tests; PAT-03..PAT-08 against the stateful fake and live",
-      "requirements": ["PERSIST-025", "PERSIST-008", "REHEARSAL-AGENT-INTERFACE-FREEZE§boundary-d-persistence"],
+      "requirements": [
+        "PERSIST-025",
+        "PERSIST-008",
+        "REHEARSAL-AGENT-INTERFACE-FREEZE§boundary-d-persistence"
+      ],
       "status": "to-author-at-kickoff",
       "notes": "Confirmations are constructible only inside the persistence module (PERSIST-023); ODR-V4-06 proposes that provider replies also be decoded only there."
     },
     {
       "id": "IF-STORAGE",
       "boundary": "persistence <-> causa-storage v1.0.0 file sets",
-      "provider": "kemiller2002/causa-data contract/v1.0.0 (tag causa-storage-v1.0.0)", "consumer": "storage adapter and reader",
-      "systems": ["causa-storage"], "contracts": ["CT-006"],
-      "operations": ["paths and file set (manifest.json, events.ndjson, snapshot.json)", "canonical serialization", "digests", "reader verification (section 11)", "atomic publication via createCommitOnBranch (OD-INDY-9)"],
-      "failureTypes": ["schema invalid", "digest mismatch", "contract-fixed value mismatch", "snapshot differs from replay"],
+      "provider": "kemiller2002/causa-data contract/v1.0.0 (tag causa-storage-v1.0.0)",
+      "consumer": "storage adapter and reader",
+      "systems": [
+        "causa-storage"
+      ],
+      "contracts": [
+        "CT-006"
+      ],
+      "operations": [
+        "paths and file set (manifest.json, events.ndjson, snapshot.json)",
+        "canonical serialization",
+        "digests",
+        "reader verification (section 11)",
+        "atomic publication via createCommitOnBranch (OD-INDY-9)"
+      ],
+      "failureTypes": [
+        "schema invalid",
+        "digest mismatch",
+        "contract-fixed value mismatch",
+        "snapshot differs from replay"
+      ],
       "verification": "identities CT-006; golden replay of the five frozen fixtures; negative fixtures refused; INV-11 mutants",
-      "requirements": ["EXT-DATA-011", "STORAGE-007", "PERSIST-005"],
+      "requirements": [
+        "EXT-DATA-011",
+        "STORAGE-007",
+        "PERSIST-005"
+      ],
       "status": "identity-verified",
       "notes": "CONTRACT.md wins over docs/CAUSA-DATA-CONTRACT-v1.md where they differ (CAUSA-STORAGE-RELEASE); Rehearsal 7 built against the candidate first and lost time (D-02)."
     },
     {
       "id": "IF-CATALOG",
       "boundary": "application <-> active demonstration catalog",
-      "provider": "kemiller2002/causa-data catalog/active.json -> demonstration-v1", "consumer": "connect flow, dashboard",
-      "systems": ["causa-data-catalog"], "contracts": ["CT-008"],
-      "operations": ["read active.json", "read the four investigations at a head", "full contract validation and replay to the catalog's state digests"],
-      "failureTypes": ["missing case", "digest mismatch", "replay mismatch"],
+      "provider": "kemiller2002/causa-data catalog/active.json -> demonstration-v1",
+      "consumer": "connect flow, dashboard",
+      "systems": [
+        "causa-data-catalog"
+      ],
+      "contracts": [
+        "CT-008"
+      ],
+      "operations": [
+        "read active.json",
+        "read the four investigations at a head",
+        "full contract validation and replay to the catalog's state digests"
+      ],
+      "failureTypes": [
+        "missing case",
+        "digest mismatch",
+        "replay mismatch"
+      ],
       "verification": "causa template-verify --template demonstration-v1 (preflight); application load-and-replay of four cases after Connect (UI-015-O2)",
-      "requirements": ["EXT-DATA-013", "UI-015", "PF-014"],
+      "requirements": [
+        "EXT-DATA-013",
+        "UI-015",
+        "PF-014"
+      ],
       "status": "identity-verified",
       "notes": "causa-data's HISTORICAL-CASE-CATALOG.md still says three (finding F-030, resolved by DEC-R7-006)."
     },
     {
       "id": "IF-GITHUB-GRAPHQL",
       "boundary": "persistence <-> GitHub GraphQL createCommitOnBranch",
-      "provider": "GitHub API (api.github.com/graphql)", "consumer": "GitHub adapter",
-      "systems": ["github-api"], "contracts": ["CT-007", "CT-017"],
-      "operations": ["createCommitOnBranch with expectedHeadOid, fileChanges (additions only under the investigation prefix), message with write-marker trailer"],
-      "failureTypes": ["STALE_DATA error (stale head)", "FORBIDDEN 'is at <oid> but expected <oid>' (stale head, observed live in Rehearsal 7)", "FORBIDDEN/HTTP 403 with rate-limit or abuse wording (secondary rate limit)", "authentication 401", "permission 403", "validation errors", "network/timeout (unknown outcome after sending)"],
+      "provider": "GitHub API (api.github.com/graphql)",
+      "consumer": "GitHub adapter",
+      "systems": [
+        "github-api"
+      ],
+      "contracts": [
+        "CT-007",
+        "CT-017"
+      ],
+      "operations": [
+        "createCommitOnBranch with expectedHeadOid, fileChanges (additions only under the investigation prefix), message with write-marker trailer"
+      ],
+      "failureTypes": [
+        "STALE_DATA error (stale head)",
+        "FORBIDDEN 'is at <oid> but expected <oid>' (stale head, observed live in Rehearsal 7)",
+        "FORBIDDEN/HTTP 403 with rate-limit or abuse wording (secondary rate limit)",
+        "authentication 401",
+        "permission 403",
+        "validation errors",
+        "network/timeout (unknown outcome after sending)"
+      ],
       "verification": "T18 live probe of three simultaneous commits and recorded answer forms; PAT-03 live; INV-22",
-      "requirements": ["PERSIST-006", "PERSIST-008", "STORAGE-006"],
+      "requirements": [
+        "PERSIST-006",
+        "PERSIST-008",
+        "STORAGE-006"
+      ],
       "status": "unverified-until-live-probe",
       "notes": "GitHub's answer forms are not a published typed contract; the fake must be built from recorded live answers (PF-013), never from assumption."
     },
     {
       "id": "IF-GITHUB-REST",
       "boundary": "persistence <-> GitHub REST reads",
-      "provider": "GitHub API (api.github.com)", "consumer": "GitHub adapter",
-      "systems": ["github-api"], "contracts": ["CT-007", "CT-017"],
-      "operations": ["branch head read (cache-bypassing)", "file read at a named commit (contents API; Git blobs API for files over 1 MB)", "compare base...head (paginated beyond 250 commits) for reconciliation", "commit read for marker and tree"],
-      "failureTypes": ["404 deleted", "403 permission or rate limit", "401", "network"],
+      "provider": "GitHub API (api.github.com)",
+      "consumer": "GitHub adapter",
+      "systems": [
+        "github-api"
+      ],
+      "contracts": [
+        "CT-007",
+        "CT-017"
+      ],
+      "operations": [
+        "branch head read (cache-bypassing)",
+        "file read at a named commit (contents API; Git blobs API for files over 1 MB)",
+        "compare base...head (paginated beyond 250 commits) for reconciliation",
+        "commit read for marker and tree"
+      ],
+      "failureTypes": [
+        "404 deleted",
+        "403 permission or rate limit",
+        "401",
+        "network"
+      ],
       "verification": "PAT-06, PAT-10; AO-R7L-19-1..3",
-      "requirements": ["PERSIST-005", "PERSIST-015", "PERSIST-007"],
+      "requirements": [
+        "PERSIST-005",
+        "PERSIST-015",
+        "PERSIST-007"
+      ],
       "status": "unverified-until-live-probe",
       "notes": "Rehearsal 7 F10/F11: the compare and contents APIs have limits the requirements' 'the commits after the expected head' and 'a re-read' must not silently truncate."
     },
     {
       "id": "IF-LIMEN",
       "boundary": "F# WebAssembly engine <-> browser (Limen)",
-      "provider": "@echelon-foundry/limen 0.9.1 and limen-fsharp 0.9.0", "consumer": "Causa application",
-      "systems": ["limen", "limen-fsharp"], "contracts": ["CT-009"],
-      "operations": ["boot the .NET WASM runtime", "dispatch user events to the F# update loop", "apply view projections through data-* bindings", "HTTP effects"],
-      "failureTypes": ["boot failure (WASM-LOAD)", "missing effect capability"],
+      "provider": "@echelon-foundry/limen 0.9.1 and limen-fsharp 0.9.0",
+      "consumer": "Causa application",
+      "systems": [
+        "limen",
+        "limen-fsharp"
+      ],
+      "contracts": [
+        "CT-009"
+      ],
+      "operations": [
+        "boot the .NET WASM runtime",
+        "dispatch user events to the F# update loop",
+        "apply view projections through data-* bindings",
+        "HTTP effects"
+      ],
+      "failureTypes": [
+        "boot failure (WASM-LOAD)",
+        "missing effect capability"
+      ],
       "verification": "AR-029 start smoke on every primary route in a real browser; compatibility smoke in T11",
-      "requirements": ["R9.7", "AR-029", "WASM-LOAD-001"],
+      "requirements": [
+        "R9.7",
+        "AR-029",
+        "WASM-LOAD-001"
+      ],
       "status": "pinned-unverified",
       "notes": "Rehearsal 7 KD-007: F# does not run the JSExport source generator, so one small C# [JSExport] host shim is a documented interoperability boundary. KD-010: Limen 0.9.1's protocol has no timer or beforeunload effect, so a small browser-boundary script relays connectivity, timers and the leave warning; it holds no application state. Both are permitted by DEC-003/DEC-030 (smallest isolated adapter) and must be declared in the interface manifest."
     },
     {
       "id": "IF-FORMA",
       "boundary": "application views <-> Forma design system",
-      "provider": "@echelon-foundry/design-system 0.12.0 (Forma)", "consumer": "Causa views",
-      "systems": ["forma"], "contracts": ["CT-010"],
-      "operations": ["status lozenge", "operation status", "conflict review", "freshness", "semantic theme tokens", "form, navigation and inspector components"],
-      "failureTypes": ["missing token (falls back to browser defaults)", "contrast below 4.5:1 / 3:1"],
+      "provider": "@echelon-foundry/design-system 0.12.0 (Forma)",
+      "consumer": "Causa views",
+      "systems": [
+        "forma"
+      ],
+      "contracts": [
+        "CT-010"
+      ],
+      "operations": [
+        "status lozenge",
+        "operation status",
+        "conflict review",
+        "freshness",
+        "semantic theme tokens",
+        "form, navigation and inspector components"
+      ],
+      "failureTypes": [
+        "missing token (falls back to browser defaults)",
+        "contrast below 4.5:1 / 3:1"
+      ],
       "verification": "PAT-15 per state; axe scans; token-existence check of every Forma token the CSS references",
-      "requirements": ["PERSIST-030", "UI-016", "UI-034", "WDL-008"],
+      "requirements": [
+        "PERSIST-030",
+        "UI-016",
+        "UI-034",
+        "WDL-008"
+      ],
       "status": "pinned-unverified",
       "notes": "Rehearsal 7 found after the deadline that four Forma token names in its CSS did not exist, so five properties fell back to system colours; the token-existence check catches this class."
     },
     {
       "id": "IF-FOLIO",
       "boundary": "report projection <-> Folio print components (Boundary E)",
-      "provider": "@echelon-foundry/print-components 0.4.1 (github-release)", "consumer": "report preview and export",
-      "systems": ["folio"], "contracts": ["CT-005", "CT-011"],
-      "operations": ["read-only versioned report projection rendered for print"],
-      "failureTypes": ["projection elevates an unverified hypothesis (forbidden)"],
+      "provider": "@echelon-foundry/print-components 0.4.1 (github-release)",
+      "consumer": "report preview and export",
+      "systems": [
+        "folio"
+      ],
+      "contracts": [
+        "CT-005",
+        "CT-011"
+      ],
+      "operations": [
+        "read-only versioned report projection rendered for print"
+      ],
+      "failureTypes": [
+        "projection elevates an unverified hypothesis (forbidden)"
+      ],
       "verification": "report fidelity and print rendering at the deployed SHA (G8)",
-      "requirements": ["UI-009", "REHEARSAL-AGENT-INTERFACE-FREEZE§boundary-e-report"],
+      "requirements": [
+        "UI-009",
+        "REHEARSAL-AGENT-INTERFACE-FREEZE§boundary-e-report"
+      ],
       "status": "pinned-unverified",
       "notes": "Folio is not published on npm; it is consumed from its GitHub release tarball with the registry's SHA-256."
     },
     {
       "id": "IF-PRAXIS",
       "boundary": "rehearsal repository <-> Praxis (requirements preservation, work items)",
-      "provider": "Praxis 3.24.0", "consumer": "coordinator and acceptance job",
-      "systems": ["praxis"], "contracts": ["CT-013"],
-      "operations": ["requirements preservation verify", "work-item ledger", "independent-review producer"],
-      "failureTypes": ["baseline-invalid", "drift", "disposition-missing"],
+      "provider": "Praxis 3.24.0",
+      "consumer": "coordinator and acceptance job",
+      "systems": [
+        "praxis"
+      ],
+      "contracts": [
+        "CT-013"
+      ],
+      "operations": [
+        "requirements preservation verify",
+        "work-item ledger",
+        "independent-review producer"
+      ],
+      "failureTypes": [
+        "baseline-invalid",
+        "drift",
+        "disposition-missing"
+      ],
       "verification": "preservation gate PASS before implementation and at acceptance (RDP-004)",
-      "requirements": ["AR-004", "AR-017"],
+      "requirements": [
+        "AR-004",
+        "AR-017"
+      ],
       "status": "identity-verified",
       "notes": ""
     },
     {
       "id": "IF-DOKIMOS",
       "boundary": "acceptance job <-> Dokimos verified completion",
-      "provider": "Dokimos 0.9.0", "consumer": "acceptance job",
-      "systems": ["dokimos"], "contracts": ["CT-014"],
-      "operations": ["evidence bundle assessment", "verified completion with attestations"],
-      "failureTypes": ["evidence for another SHA", "missing evidence", "open defect class"],
+      "provider": "Dokimos 0.9.0",
+      "consumer": "acceptance job",
+      "systems": [
+        "dokimos"
+      ],
+      "contracts": [
+        "CT-014"
+      ],
+      "operations": [
+        "evidence bundle assessment",
+        "verified completion with attestations"
+      ],
+      "failureTypes": [
+        "evidence for another SHA",
+        "missing evidence",
+        "open defect class"
+      ],
       "verification": "acceptance gate AG-01..AG-12",
-      "requirements": ["DCC-006", "AR-019"],
+      "requirements": [
+        "DCC-006",
+        "AR-019"
+      ],
       "status": "pinned-unverified",
       "notes": ""
     },
     {
       "id": "IF-PERCEPTA",
       "boundary": "browser verification <-> Percepta semantic contracts",
-      "provider": "percepta-semantic 0.3.0", "consumer": "browser acceptance",
-      "systems": ["percepta-semantic"], "contracts": ["CT-012"],
-      "operations": ["semantic contract verification of populated states at the deployed SHA"],
-      "failureTypes": ["contract mismatch"],
+      "provider": "percepta-semantic 0.3.0",
+      "consumer": "browser acceptance",
+      "systems": [
+        "percepta-semantic"
+      ],
+      "contracts": [
+        "CT-012"
+      ],
+      "operations": [
+        "semantic contract verification of populated states at the deployed SHA"
+      ],
+      "failureTypes": [
+        "contract mismatch"
+      ],
       "verification": "VR-UI (G5)",
-      "requirements": ["UI-030", "UI-015"],
-      "status": "identity-verified",
+      "requirements": [
+        "UI-030",
+        "UI-015"
+      ],
+      "status": "pinned-unverified",
       "notes": "v4 pins the 1.33.0 release (0.3.0); CT-012's identity is the earlier released schema and must be re-checked against 0.3.0 in T11."
     },
     {
       "id": "IF-CONDITOR",
       "boundary": "rehearsal repository bootstrap and CI policy <-> Conditor",
-      "provider": "Conditor 0.10.18", "consumer": "kickoff bootstrap, every candidate",
-      "systems": ["conditor"], "contracts": ["CT-016"],
-      "operations": ["scaffold on the kickoff release set", "ci-policy check (DCC-013)", "candidate verification"],
-      "failureTypes": ["policy finding"],
+      "provider": "Conditor 0.10.18",
+      "consumer": "kickoff bootstrap, every candidate",
+      "systems": [
+        "conditor"
+      ],
+      "contracts": [
+        "CT-016"
+      ],
+      "operations": [
+        "scaffold on the kickoff release set",
+        "ci-policy check (DCC-013)",
+        "candidate verification"
+      ],
+      "failureTypes": [
+        "policy finding"
+      ],
       "verification": "conditor ci-policy check at kickoff and on every candidate",
-      "requirements": ["DCC-013", "AR-023"],
+      "requirements": [
+        "DCC-013",
+        "AR-023"
+      ],
       "status": "pinned-unverified",
       "notes": "Conditor is named by DEC-R7-011 but is not a component of the echelon-current set file; its version is pinned by tag."
     }

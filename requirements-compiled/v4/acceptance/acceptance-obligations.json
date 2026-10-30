@@ -2,16 +2,16 @@
   "schema": "indy-init.v4-acceptance-obligations/1",
   "description": "Every P0 obligation of the verification plan as an acceptance obligation (required tests, producer, consumer, method, pass and failure conditions), plus the invariant and Rehearsal 7 lesson tests that strengthen the binding of existing obligations. The implementing agent cannot change this file: it is regenerated from the frozen plan and analysis, and its digest is in freeze-manifest.json.",
   "plan": {
-    "planId": "VP-e61f097b469e",
-    "digest": "e61f097b469ebfb0f68d5437740362f16c9ed460229da1a5138d5abc26b879de"
+    "planId": "VP-9817d9814482",
+    "digest": "9817d98144822dcc810aa383fde9ff16f8ebb9931f5bf6aeca76256dbe7061c4"
   },
   "summary": {
-    "total": 650,
+    "total": 655,
     "fromPlan": 613,
-    "fromInvariants": 34,
+    "fromInvariants": 39,
     "fromLessons": 3,
-    "normative": 644,
-    "proposed": 6,
+    "normative": 650,
+    "proposed": 5,
     "p0RequirementsCovered": 161
   },
   "obligations": [
@@ -6307,6 +6307,13 @@
             "integration",
             "browser"
           ]
+        },
+        {
+          "id": "playwright:invariants/INV-10.spec.js > tabs independent with and without navigator.locks [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser"
+          ]
         }
       ],
       "requiredEvidenceCategories": [
@@ -6472,6 +6479,13 @@
             "integration",
             "browser",
             "security"
+          ]
+        },
+        {
+          "id": "playwright:invariants/INV-06.spec.js > every store empty of investigation content [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser"
           ]
         }
       ],
@@ -7085,6 +7099,20 @@
             "integration",
             "live-provider"
           ]
+        },
+        {
+          "id": "dotnet:Causa.Invariants.Negative.INV11.EachIntegrityCheckHasAMutant",
+          "kind": "deterministic",
+          "categories": [
+            "integration"
+          ]
+        },
+        {
+          "id": "dotnet:Causa.Invariants.Property.INV11.WrittenFileSetsReplay",
+          "kind": "deterministic",
+          "categories": [
+            "integration"
+          ]
         }
       ],
       "requiredEvidenceCategories": [
@@ -7415,6 +7443,13 @@
             "integration",
             "live-provider"
           ]
+        },
+        {
+          "id": "dotnet:Causa.Invariants.Property.INV05.MutationShape",
+          "kind": "deterministic",
+          "categories": [
+            "integration"
+          ]
         }
       ],
       "requiredEvidenceCategories": [
@@ -7695,6 +7730,13 @@
           "kind": "live",
           "categories": [
             "integration",
+            "live-provider"
+          ]
+        },
+        {
+          "id": "dotnet:Causa.Acceptance.Live.PERSIST007Tests.ReadBackOfFileOver1MB",
+          "kind": "live",
+          "categories": [
             "live-provider"
           ]
         }
@@ -8016,6 +8058,20 @@
           "categories": [
             "integration",
             "live-provider"
+          ]
+        },
+        {
+          "id": "dotnet:Causa.Invariants.Live.INV22.ThreeSimultaneousCommits",
+          "kind": "live",
+          "categories": [
+            "live-provider"
+          ]
+        },
+        {
+          "id": "dotnet:Causa.Invariants.Negative.INV22.RecordedGitHubAnswerForms",
+          "kind": "deterministic",
+          "categories": [
+            "integration"
           ]
         }
       ],
@@ -8792,6 +8848,13 @@
           "categories": [
             "integration"
           ]
+        },
+        {
+          "id": "dotnet:Causa.Invariants.Negative.INV07.RefreshNeverReplacesWork",
+          "kind": "deterministic",
+          "categories": [
+            "integration"
+          ]
         }
       ],
       "requiredEvidenceCategories": [
@@ -9032,6 +9095,13 @@
           "categories": [
             "integration"
           ]
+        },
+        {
+          "id": "dotnet:Causa.Invariants.Property.INV12.ReapplyEqualsEngineFold",
+          "kind": "deterministic",
+          "categories": [
+            "integration"
+          ]
         }
       ],
       "requiredEvidenceCategories": [
@@ -9220,6 +9290,13 @@
       "requiredTests": [
         {
           "id": "dotnet:Causa.Acceptance.Deterministic.PERSIST012Tests.PERSIST-012-O7",
+          "kind": "deterministic",
+          "categories": [
+            "integration"
+          ]
+        },
+        {
+          "id": "dotnet:Causa.Invariants.Model.INV08.ConflictActionsNeverOverwrite",
           "kind": "deterministic",
           "categories": [
             "integration"
@@ -9430,6 +9507,13 @@
           "categories": [
             "integration",
             "live-provider"
+          ]
+        },
+        {
+          "id": "dotnet:Causa.Invariants.Property.INV09.AllCommitsReachable",
+          "kind": "deterministic",
+          "categories": [
+            "integration"
           ]
         }
       ],
@@ -9856,6 +9940,13 @@
           "categories": [
             "integration"
           ]
+        },
+        {
+          "id": "dotnet:Causa.Invariants.Property.INV03.LostAnswerNeverConflictOrFailure",
+          "kind": "deterministic",
+          "categories": [
+            "integration"
+          ]
         }
       ],
       "requiredEvidenceCategories": [
@@ -9904,6 +9995,13 @@
           "categories": [
             "integration"
           ]
+        },
+        {
+          "id": "dotnet:Causa.Acceptance.Deterministic.PERSIST015Tests.ReconcileBeyond250Commits",
+          "kind": "deterministic",
+          "categories": [
+            "integration"
+          ]
         }
       ],
       "requiredEvidenceCategories": [
@@ -9948,6 +10046,13 @@
       "requiredTests": [
         {
           "id": "dotnet:Causa.Acceptance.Deterministic.PERSIST015Tests.PERSIST-015-O5",
+          "kind": "deterministic",
+          "categories": [
+            "integration"
+          ]
+        },
+        {
+          "id": "dotnet:Causa.Invariants.Negative.INV03.AppliedButNotYetVisible",
           "kind": "deterministic",
           "categories": [
             "integration"
@@ -10476,6 +10581,13 @@
       "requiredTests": [
         {
           "id": "dotnet:Causa.Acceptance.Deterministic.PERSIST016Tests.PERSIST-016-O5",
+          "kind": "deterministic",
+          "categories": [
+            "integration"
+          ]
+        },
+        {
+          "id": "dotnet:Causa.Invariants.Property.INV04.RequestBounds",
           "kind": "deterministic",
           "categories": [
             "integration"
@@ -11183,6 +11295,15 @@
             "browser",
             "accessibility"
           ]
+        },
+        {
+          "id": "playwright:acceptance/PERSIST-020.spec.js > PERSIST-020-O1 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "integration",
+            "browser",
+            "accessibility"
+          ]
         }
       ],
       "requiredEvidenceCategories": [
@@ -11239,6 +11360,15 @@
       "requiredTests": [
         {
           "id": "playwright:acceptance/PERSIST-020.spec.js > PERSIST-020-O2 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "integration",
+            "browser",
+            "accessibility"
+          ]
+        },
+        {
+          "id": "playwright:acceptance/PERSIST-020.spec.js > PERSIST-020-O2 [webkit]",
           "kind": "deterministic",
           "categories": [
             "integration",
@@ -11307,6 +11437,15 @@
             "browser",
             "accessibility"
           ]
+        },
+        {
+          "id": "playwright:acceptance/PERSIST-020.spec.js > PERSIST-020-O3 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "integration",
+            "browser",
+            "accessibility"
+          ]
         }
       ],
       "requiredEvidenceCategories": [
@@ -11363,6 +11502,15 @@
       "requiredTests": [
         {
           "id": "playwright:acceptance/PERSIST-020.spec.js > PERSIST-020-O4 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "integration",
+            "browser",
+            "accessibility"
+          ]
+        },
+        {
+          "id": "playwright:acceptance/PERSIST-020.spec.js > PERSIST-020-O4 [webkit]",
           "kind": "deterministic",
           "categories": [
             "integration",
@@ -11431,6 +11579,15 @@
             "browser",
             "accessibility"
           ]
+        },
+        {
+          "id": "playwright:acceptance/PERSIST-020.spec.js > PERSIST-020-O5 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "integration",
+            "browser",
+            "accessibility"
+          ]
         }
       ],
       "requiredEvidenceCategories": [
@@ -11487,6 +11644,15 @@
       "requiredTests": [
         {
           "id": "playwright:acceptance/PERSIST-020.spec.js > PERSIST-020-O6 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "integration",
+            "browser",
+            "accessibility"
+          ]
+        },
+        {
+          "id": "playwright:acceptance/PERSIST-020.spec.js > PERSIST-020-O6 [webkit]",
           "kind": "deterministic",
           "categories": [
             "integration",
@@ -11829,6 +11995,13 @@
             "integration",
             "browser"
           ]
+        },
+        {
+          "id": "playwright:invariants/INV-13.spec.js > indicator equals machine projection [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser"
+          ]
         }
       ],
       "requiredEvidenceCategories": [
@@ -12048,6 +12221,20 @@
           "categories": [
             "unit",
             "integration"
+          ]
+        },
+        {
+          "id": "dotnet:Causa.Invariants.Mutation.INV01.ReadBackSkipped",
+          "kind": "deterministic",
+          "categories": [
+            "unit"
+          ]
+        },
+        {
+          "id": "dotnet:Causa.Invariants.Property.INV01.NoSavedWithoutMatchingReadBack",
+          "kind": "deterministic",
+          "categories": [
+            "unit"
           ]
         }
       ],
@@ -12894,6 +13081,13 @@
           "categories": [
             "independent-acceptance"
           ]
+        },
+        {
+          "id": "verifier:Causa.Acceptance.Independent.PERSIST026Provenance",
+          "kind": "deterministic",
+          "categories": [
+            "security"
+          ]
         }
       ],
       "requiredEvidenceCategories": [
@@ -13160,6 +13354,15 @@
             "browser",
             "accessibility"
           ]
+        },
+        {
+          "id": "playwright:acceptance/PERSIST-030.spec.js > PERSIST-030-O1 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "integration",
+            "browser",
+            "accessibility"
+          ]
         }
       ],
       "requiredEvidenceCategories": [
@@ -13215,7 +13418,23 @@
       "text": "Colours MUST come from semantic Forma theme tokens (UI-016).",
       "requiredTests": [
         {
+          "id": "dotnet:Causa.Invariants.Negative.INV24.FormaTokensExist",
+          "kind": "deterministic",
+          "categories": [
+            "integration"
+          ]
+        },
+        {
           "id": "playwright:acceptance/PERSIST-030.spec.js > PERSIST-030-O2 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "integration",
+            "browser",
+            "accessibility"
+          ]
+        },
+        {
+          "id": "playwright:acceptance/PERSIST-030.spec.js > PERSIST-030-O2 [webkit]",
           "kind": "deterministic",
           "categories": [
             "integration",
@@ -13284,6 +13503,15 @@
             "browser",
             "accessibility"
           ]
+        },
+        {
+          "id": "playwright:acceptance/PERSIST-030.spec.js > PERSIST-030-O3 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "integration",
+            "browser",
+            "accessibility"
+          ]
         }
       ],
       "requiredEvidenceCategories": [
@@ -13340,6 +13568,15 @@
       "requiredTests": [
         {
           "id": "playwright:acceptance/PERSIST-030.spec.js > PERSIST-030-O4 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "integration",
+            "browser",
+            "accessibility"
+          ]
+        },
+        {
+          "id": "playwright:acceptance/PERSIST-030.spec.js > PERSIST-030-O4 [webkit]",
           "kind": "deterministic",
           "categories": [
             "integration",
@@ -13408,6 +13645,15 @@
             "browser",
             "accessibility"
           ]
+        },
+        {
+          "id": "playwright:acceptance/PERSIST-030.spec.js > PERSIST-030-O5 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "integration",
+            "browser",
+            "accessibility"
+          ]
         }
       ],
       "requiredEvidenceCategories": [
@@ -13464,6 +13710,15 @@
       "requiredTests": [
         {
           "id": "playwright:acceptance/PERSIST-030.spec.js > PERSIST-030-O6 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "integration",
+            "browser",
+            "accessibility"
+          ]
+        },
+        {
+          "id": "playwright:acceptance/PERSIST-030.spec.js > PERSIST-030-O6 [webkit]",
           "kind": "deterministic",
           "categories": [
             "integration",
@@ -13532,6 +13787,15 @@
             "browser",
             "accessibility"
           ]
+        },
+        {
+          "id": "playwright:acceptance/PERSIST-030.spec.js > PERSIST-030-O7 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "integration",
+            "browser",
+            "accessibility"
+          ]
         }
       ],
       "requiredEvidenceCategories": [
@@ -13588,6 +13852,15 @@
       "requiredTests": [
         {
           "id": "playwright:acceptance/PERSIST-030.spec.js > PERSIST-030-O8 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "integration",
+            "browser",
+            "accessibility"
+          ]
+        },
+        {
+          "id": "playwright:acceptance/PERSIST-030.spec.js > PERSIST-030-O8 [webkit]",
           "kind": "deterministic",
           "categories": [
             "integration",
@@ -13778,6 +14051,13 @@
           "categories": [
             "unit",
             "integration",
+            "browser"
+          ]
+        },
+        {
+          "id": "playwright:acceptance/PERSIST-031.spec.js > freshness shows commit time [chromium]",
+          "kind": "deterministic",
+          "categories": [
             "browser"
           ]
         }
@@ -14889,6 +15169,13 @@
       "text": "The text names the cause and says the changes are kept in this tab.",
       "requiredTests": [
         {
+          "id": "dotnet:Causa.Invariants.Property.INV07.WorkSurvivesRecoverableFailures",
+          "kind": "deterministic",
+          "categories": [
+            "unit"
+          ]
+        },
+        {
           "id": "playwright:acceptance/PERSIST-031.spec.js > PERSIST-031-O21 [chromium]",
           "kind": "deterministic",
           "categories": [
@@ -15583,6 +15870,14 @@
             "integration",
             "browser"
           ]
+        },
+        {
+          "id": "playwright:acceptance/PERSIST-040.spec.js > PERSIST-040-O1 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "integration",
+            "browser"
+          ]
         }
       ],
       "requiredEvidenceCategories": [
@@ -15633,6 +15928,14 @@
       "requiredTests": [
         {
           "id": "playwright:acceptance/PERSIST-040.spec.js > PERSIST-040-O2 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "integration",
+            "browser"
+          ]
+        },
+        {
+          "id": "playwright:acceptance/PERSIST-040.spec.js > PERSIST-040-O2 [webkit]",
           "kind": "deterministic",
           "categories": [
             "integration",
@@ -15693,6 +15996,14 @@
             "integration",
             "browser"
           ]
+        },
+        {
+          "id": "playwright:acceptance/PERSIST-040.spec.js > PERSIST-040-O3 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "integration",
+            "browser"
+          ]
         }
       ],
       "requiredEvidenceCategories": [
@@ -15743,6 +16054,14 @@
       "requiredTests": [
         {
           "id": "playwright:acceptance/PERSIST-040.spec.js > PERSIST-040-O4 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "integration",
+            "browser"
+          ]
+        },
+        {
+          "id": "playwright:acceptance/PERSIST-040.spec.js > PERSIST-040-O4 [webkit]",
           "kind": "deterministic",
           "categories": [
             "integration",
@@ -15803,6 +16122,14 @@
             "integration",
             "browser"
           ]
+        },
+        {
+          "id": "playwright:acceptance/PERSIST-040.spec.js > PERSIST-040-O5 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "integration",
+            "browser"
+          ]
         }
       ],
       "requiredEvidenceCategories": [
@@ -15853,6 +16180,14 @@
       "requiredTests": [
         {
           "id": "playwright:acceptance/PERSIST-040.spec.js > PERSIST-040-O6 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "integration",
+            "browser"
+          ]
+        },
+        {
+          "id": "playwright:acceptance/PERSIST-040.spec.js > PERSIST-040-O6 [webkit]",
           "kind": "deterministic",
           "categories": [
             "integration",
@@ -16030,6 +16365,13 @@
       "planObligation": "VPO-6a079630d2bb1f79",
       "text": "It also verifies that every mutation is one `createCommitOnBranch` with an expected head and paths inside its investigation, that markers are unique, and that every commit stays reachable from the branch head.",
       "requiredTests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Live.PERSIST041Tests.PERSIST-041-O3",
+          "kind": "live",
+          "categories": [
+            "live-provider"
+          ]
+        },
         {
           "id": "playwright:live/PERSIST-041.spec.js > PERSIST-041-O3 [chromium]",
           "kind": "live",
@@ -17487,6 +17829,14 @@
             "integration",
             "browser"
           ]
+        },
+        {
+          "id": "playwright:acceptance/PERSIST-046.spec.js > PERSIST-046-O1 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "integration",
+            "browser"
+          ]
         }
       ],
       "requiredEvidenceCategories": [
@@ -17537,6 +17887,14 @@
       "requiredTests": [
         {
           "id": "playwright:acceptance/PERSIST-046.spec.js > PERSIST-046-O2 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "integration",
+            "browser"
+          ]
+        },
+        {
+          "id": "playwright:acceptance/PERSIST-046.spec.js > PERSIST-046-O2 [webkit]",
           "kind": "deterministic",
           "categories": [
             "integration",
@@ -17597,6 +17955,14 @@
             "integration",
             "browser"
           ]
+        },
+        {
+          "id": "playwright:acceptance/PERSIST-046.spec.js > PERSIST-046-O3 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "integration",
+            "browser"
+          ]
         }
       ],
       "requiredEvidenceCategories": [
@@ -17647,6 +18013,14 @@
       "requiredTests": [
         {
           "id": "playwright:acceptance/PERSIST-046.spec.js > PERSIST-046-O4 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "integration",
+            "browser"
+          ]
+        },
+        {
+          "id": "playwright:acceptance/PERSIST-046.spec.js > PERSIST-046-O4 [webkit]",
           "kind": "deterministic",
           "categories": [
             "integration",
@@ -17707,6 +18081,14 @@
             "integration",
             "browser"
           ]
+        },
+        {
+          "id": "playwright:acceptance/PERSIST-046.spec.js > PERSIST-046-O5 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "integration",
+            "browser"
+          ]
         }
       ],
       "requiredEvidenceCategories": [
@@ -17757,6 +18139,14 @@
       "requiredTests": [
         {
           "id": "playwright:acceptance/PERSIST-046.spec.js > PERSIST-046-O6 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "integration",
+            "browser"
+          ]
+        },
+        {
+          "id": "playwright:acceptance/PERSIST-046.spec.js > PERSIST-046-O6 [webkit]",
           "kind": "deterministic",
           "categories": [
             "integration",
@@ -18105,6 +18495,14 @@
             "integration",
             "browser"
           ]
+        },
+        {
+          "id": "playwright:acceptance/PERSIST-048.spec.js > PERSIST-048-O1 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "integration",
+            "browser"
+          ]
         }
       ],
       "requiredEvidenceCategories": [
@@ -18155,6 +18553,14 @@
       "requiredTests": [
         {
           "id": "playwright:acceptance/PERSIST-048.spec.js > PERSIST-048-O2 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "integration",
+            "browser"
+          ]
+        },
+        {
+          "id": "playwright:acceptance/PERSIST-048.spec.js > PERSIST-048-O2 [webkit]",
           "kind": "deterministic",
           "categories": [
             "integration",
@@ -18215,6 +18621,14 @@
             "integration",
             "browser"
           ]
+        },
+        {
+          "id": "playwright:acceptance/PERSIST-048.spec.js > PERSIST-048-O3 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "integration",
+            "browser"
+          ]
         }
       ],
       "requiredEvidenceCategories": [
@@ -18270,6 +18684,14 @@
             "integration",
             "browser"
           ]
+        },
+        {
+          "id": "playwright:acceptance/PERSIST-048.spec.js > PERSIST-048-O4 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "integration",
+            "browser"
+          ]
         }
       ],
       "requiredEvidenceCategories": [
@@ -18320,6 +18742,14 @@
       "requiredTests": [
         {
           "id": "playwright:acceptance/PERSIST-048.spec.js > PERSIST-048-O5 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "integration",
+            "browser"
+          ]
+        },
+        {
+          "id": "playwright:acceptance/PERSIST-048.spec.js > PERSIST-048-O5 [webkit]",
           "kind": "deterministic",
           "categories": [
             "integration",
@@ -19328,6 +19758,13 @@
           "categories": [
             "independent-acceptance"
           ]
+        },
+        {
+          "id": "verifier:Causa.Acceptance.Independent.PAT13ProvenanceComparison",
+          "kind": "deterministic",
+          "categories": [
+            "security"
+          ]
         }
       ],
       "requiredEvidenceCategories": [
@@ -19580,6 +20017,13 @@
             "unit",
             "integration"
           ]
+        },
+        {
+          "id": "dotnet:Causa.Invariants.Negative.INV14.ForbiddenPhrases",
+          "kind": "deterministic",
+          "categories": [
+            "unit"
+          ]
         }
       ],
       "requiredEvidenceCategories": [
@@ -19746,6 +20190,15 @@
             "browser",
             "accessibility"
           ]
+        },
+        {
+          "id": "playwright:acceptance/PERSIST-054.spec.js > PERSIST-054-O1 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "integration",
+            "browser",
+            "accessibility"
+          ]
         }
       ],
       "requiredEvidenceCategories": [
@@ -19802,6 +20255,15 @@
       "requiredTests": [
         {
           "id": "playwright:acceptance/PERSIST-054.spec.js > PERSIST-054-O2 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "integration",
+            "browser",
+            "accessibility"
+          ]
+        },
+        {
+          "id": "playwright:acceptance/PERSIST-054.spec.js > PERSIST-054-O2 [webkit]",
           "kind": "deterministic",
           "categories": [
             "integration",
@@ -19870,6 +20332,15 @@
             "browser",
             "accessibility"
           ]
+        },
+        {
+          "id": "playwright:acceptance/PERSIST-054.spec.js > PERSIST-054-O3 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "integration",
+            "browser",
+            "accessibility"
+          ]
         }
       ],
       "requiredEvidenceCategories": [
@@ -19926,6 +20397,15 @@
       "requiredTests": [
         {
           "id": "playwright:acceptance/PERSIST-054.spec.js > PERSIST-054-O4 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "integration",
+            "browser",
+            "accessibility"
+          ]
+        },
+        {
+          "id": "playwright:acceptance/PERSIST-054.spec.js > PERSIST-054-O4 [webkit]",
           "kind": "deterministic",
           "categories": [
             "integration",
@@ -22624,6 +23104,20 @@
             "live-provider",
             "security"
           ]
+        },
+        {
+          "id": "dotnet:Causa.Invariants.Negative.INV21.CredentialDestinations",
+          "kind": "deterministic",
+          "categories": [
+            "security"
+          ]
+        },
+        {
+          "id": "playwright:invariants/INV-21.spec.js > no credential in storage, URL or artifact [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "security"
+          ]
         }
       ],
       "requiredEvidenceCategories": [
@@ -25212,6 +25706,21 @@
             "browser",
             "accessibility"
           ]
+        },
+        {
+          "id": "playwright:acceptance/UI-011.spec.js > UI-011-O1 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        },
+        {
+          "id": "playwright:invariants/INV-24.spec.js > save-state and conflict actions by keyboard and screen reader [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "accessibility"
+          ]
         }
       ],
       "requiredEvidenceCategories": [
@@ -25262,6 +25771,14 @@
       "requiredTests": [
         {
           "id": "playwright:acceptance/UI-011.spec.js > UI-011-O2 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        },
+        {
+          "id": "playwright:acceptance/UI-011.spec.js > UI-011-O2 [webkit]",
           "kind": "deterministic",
           "categories": [
             "browser",
@@ -25322,6 +25839,14 @@
             "browser",
             "accessibility"
           ]
+        },
+        {
+          "id": "playwright:acceptance/UI-011.spec.js > UI-011-O3 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
         }
       ],
       "requiredEvidenceCategories": [
@@ -25377,6 +25902,14 @@
             "browser",
             "accessibility"
           ]
+        },
+        {
+          "id": "playwright:acceptance/UI-011.spec.js > UI-011-O4 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
         }
       ],
       "requiredEvidenceCategories": [
@@ -25427,6 +25960,14 @@
       "requiredTests": [
         {
           "id": "playwright:acceptance/UI-011.spec.js > UI-011-O5 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        },
+        {
+          "id": "playwright:acceptance/UI-011.spec.js > UI-011-O5 [webkit]",
           "kind": "deterministic",
           "categories": [
             "browser",
@@ -26152,6 +26693,14 @@
             "browser",
             "accessibility"
           ]
+        },
+        {
+          "id": "playwright:acceptance/UI-016.spec.js > UI-016-O1 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
         }
       ],
       "requiredEvidenceCategories": [
@@ -26202,6 +26751,14 @@
       "requiredTests": [
         {
           "id": "playwright:acceptance/UI-016.spec.js > UI-016-O2 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        },
+        {
+          "id": "playwright:acceptance/UI-016.spec.js > UI-016-O2 [webkit]",
           "kind": "deterministic",
           "categories": [
             "browser",
@@ -26262,6 +26819,14 @@
             "browser",
             "accessibility"
           ]
+        },
+        {
+          "id": "playwright:acceptance/UI-016.spec.js > UI-016-O3 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
         }
       ],
       "requiredEvidenceCategories": [
@@ -26312,6 +26877,14 @@
       "requiredTests": [
         {
           "id": "playwright:acceptance/UI-016.spec.js > UI-016-O4 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        },
+        {
+          "id": "playwright:acceptance/UI-016.spec.js > UI-016-O4 [webkit]",
           "kind": "deterministic",
           "categories": [
             "browser",
@@ -26372,6 +26945,14 @@
             "browser",
             "accessibility"
           ]
+        },
+        {
+          "id": "playwright:acceptance/UI-016.spec.js > UI-016-O5 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
         }
       ],
       "requiredEvidenceCategories": [
@@ -26422,6 +27003,14 @@
       "requiredTests": [
         {
           "id": "playwright:acceptance/UI-016.spec.js > UI-016-O6 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        },
+        {
+          "id": "playwright:acceptance/UI-016.spec.js > UI-016-O6 [webkit]",
           "kind": "deterministic",
           "categories": [
             "browser",
@@ -26482,6 +27071,14 @@
             "browser",
             "accessibility"
           ]
+        },
+        {
+          "id": "playwright:acceptance/UI-016.spec.js > UI-016-O7 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
         }
       ],
       "requiredEvidenceCategories": [
@@ -26532,6 +27129,14 @@
       "requiredTests": [
         {
           "id": "playwright:acceptance/UI-016.spec.js > UI-016-O8 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        },
+        {
+          "id": "playwright:acceptance/UI-016.spec.js > UI-016-O8 [webkit]",
           "kind": "deterministic",
           "categories": [
             "browser",
@@ -26592,6 +27197,14 @@
             "browser",
             "accessibility"
           ]
+        },
+        {
+          "id": "playwright:acceptance/UI-016.spec.js > UI-016-O9 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
         }
       ],
       "requiredEvidenceCategories": [
@@ -26642,6 +27255,14 @@
       "requiredTests": [
         {
           "id": "playwright:acceptance/UI-016.spec.js > UI-016-O10 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        },
+        {
+          "id": "playwright:acceptance/UI-016.spec.js > UI-016-O10 [webkit]",
           "kind": "deterministic",
           "categories": [
             "browser",
@@ -26702,6 +27323,14 @@
             "browser",
             "accessibility"
           ]
+        },
+        {
+          "id": "playwright:acceptance/UI-016.spec.js > UI-016-O11 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
         }
       ],
       "requiredEvidenceCategories": [
@@ -26752,6 +27381,14 @@
       "requiredTests": [
         {
           "id": "playwright:acceptance/UI-016.spec.js > UI-016-O12 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        },
+        {
+          "id": "playwright:acceptance/UI-016.spec.js > UI-016-O12 [webkit]",
           "kind": "deterministic",
           "categories": [
             "browser",
@@ -26812,6 +27449,14 @@
             "browser",
             "accessibility"
           ]
+        },
+        {
+          "id": "playwright:acceptance/UI-016.spec.js > UI-016-O13 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
         }
       ],
       "requiredEvidenceCategories": [
@@ -26862,6 +27507,14 @@
       "requiredTests": [
         {
           "id": "playwright:acceptance/UI-016.spec.js > UI-016-O14 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        },
+        {
+          "id": "playwright:acceptance/UI-016.spec.js > UI-016-O14 [webkit]",
           "kind": "deterministic",
           "categories": [
             "browser",
@@ -26922,6 +27575,14 @@
             "browser",
             "accessibility"
           ]
+        },
+        {
+          "id": "playwright:acceptance/UI-016.spec.js > UI-016-O15 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
         }
       ],
       "requiredEvidenceCategories": [
@@ -26972,6 +27633,14 @@
       "requiredTests": [
         {
           "id": "playwright:acceptance/UI-016.spec.js > UI-016-O16 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        },
+        {
+          "id": "playwright:acceptance/UI-016.spec.js > UI-016-O16 [webkit]",
           "kind": "deterministic",
           "categories": [
             "browser",
@@ -27032,6 +27701,14 @@
             "browser",
             "accessibility"
           ]
+        },
+        {
+          "id": "playwright:acceptance/UI-016.spec.js > UI-016-O17 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
         }
       ],
       "requiredEvidenceCategories": [
@@ -27082,6 +27759,14 @@
       "requiredTests": [
         {
           "id": "playwright:acceptance/UI-016.spec.js > UI-016-O18 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        },
+        {
+          "id": "playwright:acceptance/UI-016.spec.js > UI-016-O18 [webkit]",
           "kind": "deterministic",
           "categories": [
             "browser",
@@ -28077,6 +28762,14 @@
             "browser",
             "accessibility"
           ]
+        },
+        {
+          "id": "playwright:acceptance/UI-020.spec.js > UI-020-O1 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
         }
       ],
       "requiredEvidenceCategories": [
@@ -28127,6 +28820,14 @@
       "requiredTests": [
         {
           "id": "playwright:acceptance/UI-020.spec.js > UI-020-O2 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        },
+        {
+          "id": "playwright:acceptance/UI-020.spec.js > UI-020-O2 [webkit]",
           "kind": "deterministic",
           "categories": [
             "browser",
@@ -28187,6 +28888,14 @@
             "browser",
             "accessibility"
           ]
+        },
+        {
+          "id": "playwright:acceptance/UI-020.spec.js > UI-020-O3 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
         }
       ],
       "requiredEvidenceCategories": [
@@ -28237,6 +28946,14 @@
       "requiredTests": [
         {
           "id": "playwright:acceptance/UI-020.spec.js > UI-020-O4 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        },
+        {
+          "id": "playwright:acceptance/UI-020.spec.js > UI-020-O4 [webkit]",
           "kind": "deterministic",
           "categories": [
             "browser",
@@ -29795,6 +30512,14 @@
             "browser",
             "accessibility"
           ]
+        },
+        {
+          "id": "playwright:acceptance/UI-029.spec.js > UI-029-O1 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
         }
       ],
       "requiredEvidenceCategories": [
@@ -29845,6 +30570,14 @@
       "requiredTests": [
         {
           "id": "playwright:acceptance/UI-029.spec.js > UI-029-O2 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        },
+        {
+          "id": "playwright:acceptance/UI-029.spec.js > UI-029-O2 [webkit]",
           "kind": "deterministic",
           "categories": [
             "browser",
@@ -29905,6 +30638,14 @@
             "browser",
             "accessibility"
           ]
+        },
+        {
+          "id": "playwright:acceptance/UI-029.spec.js > UI-029-O3 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
         }
       ],
       "requiredEvidenceCategories": [
@@ -29955,6 +30696,14 @@
       "requiredTests": [
         {
           "id": "playwright:acceptance/UI-029.spec.js > UI-029-O4 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        },
+        {
+          "id": "playwright:acceptance/UI-029.spec.js > UI-029-O4 [webkit]",
           "kind": "deterministic",
           "categories": [
             "browser",
@@ -30750,6 +31499,14 @@
             "browser",
             "accessibility"
           ]
+        },
+        {
+          "id": "playwright:acceptance/UI-034.spec.js > UI-034-O1 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
         }
       ],
       "requiredEvidenceCategories": [
@@ -30805,6 +31562,14 @@
             "browser",
             "accessibility"
           ]
+        },
+        {
+          "id": "playwright:acceptance/UI-034.spec.js > UI-034-O2 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
         }
       ],
       "requiredEvidenceCategories": [
@@ -30855,6 +31620,14 @@
       "requiredTests": [
         {
           "id": "playwright:acceptance/UI-034.spec.js > UI-034-O3 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        },
+        {
+          "id": "playwright:acceptance/UI-034.spec.js > UI-034-O3 [webkit]",
           "kind": "deterministic",
           "categories": [
             "browser",
@@ -33195,6 +33968,14 @@
             "browser",
             "accessibility"
           ]
+        },
+        {
+          "id": "playwright:acceptance/WDL-007.spec.js > WDL-007-O1 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
         }
       ],
       "requiredEvidenceCategories": [
@@ -33245,6 +34026,14 @@
       "requiredTests": [
         {
           "id": "playwright:acceptance/WDL-007.spec.js > WDL-007-O2 [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        },
+        {
+          "id": "playwright:acceptance/WDL-007.spec.js > WDL-007-O2 [webkit]",
           "kind": "deterministic",
           "categories": [
             "browser",
@@ -34064,6 +34853,7 @@
       "id": "AO-INV-01-1",
       "origin": "invariant",
       "requirements": [
+        "PERSIST-023-O2",
         "PERSIST-007",
         "PERSIST-015",
         "PERSIST-023",
@@ -34089,12 +34879,14 @@
         "the obligation's binding, amendment or exclusion differs from the frozen plan without an operator approval record"
       ],
       "normative": true,
+      "boundInPlan": true,
       "status": "binding-strengthened (enforces existing obligations of the cited requirements)"
     },
     {
       "id": "AO-INV-01-2",
       "origin": "invariant",
       "requirements": [
+        "PERSIST-023-O2",
         "PERSIST-007",
         "PERSIST-015",
         "PERSIST-023",
@@ -34120,12 +34912,14 @@
         "the obligation's binding, amendment or exclusion differs from the frozen plan without an operator approval record"
       ],
       "normative": true,
+      "boundInPlan": true,
       "status": "binding-strengthened (enforces existing obligations of the cited requirements)"
     },
     {
       "id": "AO-INV-02-1",
       "origin": "invariant",
       "requirements": [
+        "PERSIST-051-O2",
         "PERSIST-007",
         "PERSIST-013"
       ],
@@ -34151,12 +34945,14 @@
         "the obligation's binding, amendment or exclusion differs from the frozen plan without an operator approval record"
       ],
       "normative": false,
+      "boundInPlan": false,
       "status": "proposed: normative only after the owner approves ODR-V4-03"
     },
     {
       "id": "AO-INV-02-2",
       "origin": "invariant",
       "requirements": [
+        "PERSIST-051-O2",
         "PERSIST-007",
         "PERSIST-013"
       ],
@@ -34182,12 +34978,14 @@
         "the obligation's binding, amendment or exclusion differs from the frozen plan without an operator approval record"
       ],
       "normative": false,
+      "boundInPlan": false,
       "status": "proposed: normative only after the owner approves ODR-V4-03"
     },
     {
       "id": "AO-INV-02-3",
       "origin": "invariant",
       "requirements": [
+        "PERSIST-051-O2",
         "PERSIST-007",
         "PERSIST-013"
       ],
@@ -34213,12 +35011,14 @@
         "the obligation's binding, amendment or exclusion differs from the frozen plan without an operator approval record"
       ],
       "normative": false,
+      "boundInPlan": false,
       "status": "proposed: normative only after the owner approves ODR-V4-03"
     },
     {
       "id": "AO-INV-03-1",
       "origin": "invariant",
       "requirements": [
+        "PERSIST-015-O3",
         "PERSIST-008",
         "PERSIST-015",
         "PERSIST-024"
@@ -34243,12 +35043,14 @@
         "the obligation's binding, amendment or exclusion differs from the frozen plan without an operator approval record"
       ],
       "normative": true,
+      "boundInPlan": true,
       "status": "binding-strengthened (enforces existing obligations of the cited requirements)"
     },
     {
       "id": "AO-INV-03-2",
       "origin": "invariant",
       "requirements": [
+        "PERSIST-015-O5",
         "PERSIST-008",
         "PERSIST-015",
         "PERSIST-024"
@@ -34273,12 +35075,14 @@
         "the obligation's binding, amendment or exclusion differs from the frozen plan without an operator approval record"
       ],
       "normative": true,
+      "boundInPlan": true,
       "status": "binding-strengthened (enforces existing obligations of the cited requirements)"
     },
     {
       "id": "AO-INV-04-1",
       "origin": "invariant",
       "requirements": [
+        "PERSIST-016-O5",
         "PERSIST-006",
         "PERSIST-010",
         "PERSIST-016"
@@ -34303,12 +35107,14 @@
         "the obligation's binding, amendment or exclusion differs from the frozen plan without an operator approval record"
       ],
       "normative": true,
+      "boundInPlan": true,
       "status": "binding-strengthened (enforces existing obligations of the cited requirements)"
     },
     {
       "id": "AO-INV-05-1",
       "origin": "invariant",
       "requirements": [
+        "PERSIST-006-O3",
         "PERSIST-006",
         "PERSIST-013",
         "PERSIST-014"
@@ -34333,12 +35139,14 @@
         "the obligation's binding, amendment or exclusion differs from the frozen plan without an operator approval record"
       ],
       "normative": true,
+      "boundInPlan": true,
       "status": "binding-strengthened (enforces existing obligations of the cited requirements)"
     },
     {
       "id": "AO-INV-06-1",
       "origin": "invariant",
       "requirements": [
+        "PERSIST-003-O1",
         "PERSIST-003",
         "PERSIST-004",
         "EXT-DATA-004"
@@ -34363,12 +35171,14 @@
         "the obligation's binding, amendment or exclusion differs from the frozen plan without an operator approval record"
       ],
       "normative": true,
+      "boundInPlan": true,
       "status": "binding-strengthened (enforces existing obligations of the cited requirements)"
     },
     {
       "id": "AO-INV-07-1",
       "origin": "invariant",
       "requirements": [
+        "PERSIST-031-O21",
         "PERSIST-008",
         "PERSIST-010",
         "PERSIST-011",
@@ -34377,10 +35187,7 @@
         "PERSIST-031",
         "UI-010"
       ],
-      "proposals": [
-        "ODR-V4-04",
-        "ODR-V4-05"
-      ],
+      "proposals": [],
       "requiredTests": [
         {
           "id": "dotnet:Causa.Invariants.Property.INV07.WorkSurvivesRecoverableFailures",
@@ -34399,13 +35206,15 @@
         "a required evidence category is not covered, or its freshness policy is violated",
         "the obligation's binding, amendment or exclusion differs from the frozen plan without an operator approval record"
       ],
-      "normative": false,
-      "status": "proposed: normative only after the owner approves ODR-V4-04, ODR-V4-05"
+      "normative": true,
+      "boundInPlan": true,
+      "status": "binding-strengthened (enforces existing obligations of the cited requirements)"
     },
     {
       "id": "AO-INV-07-2",
       "origin": "invariant",
       "requirements": [
+        "PERSIST-011-O4",
         "PERSIST-008",
         "PERSIST-010",
         "PERSIST-011",
@@ -34414,10 +35223,7 @@
         "PERSIST-031",
         "UI-010"
       ],
-      "proposals": [
-        "ODR-V4-04",
-        "ODR-V4-05"
-      ],
+      "proposals": [],
       "requiredTests": [
         {
           "id": "dotnet:Causa.Invariants.Negative.INV07.RefreshNeverReplacesWork",
@@ -34436,13 +35242,15 @@
         "a required evidence category is not covered, or its freshness policy is violated",
         "the obligation's binding, amendment or exclusion differs from the frozen plan without an operator approval record"
       ],
-      "normative": false,
-      "status": "proposed: normative only after the owner approves ODR-V4-04, ODR-V4-05"
+      "normative": true,
+      "boundInPlan": true,
+      "status": "binding-strengthened (enforces existing obligations of the cited requirements)"
     },
     {
       "id": "AO-INV-08-1",
       "origin": "invariant",
       "requirements": [
+        "PERSIST-012-O7",
         "PERSIST-012",
         "PERSIST-013"
       ],
@@ -34452,13 +35260,13 @@
           "id": "dotnet:Causa.Invariants.Model.INV08.ConflictActionsNeverOverwrite",
           "kind": "model",
           "categories": [
-            "unit"
+            "integration"
           ]
         }
       ],
       "checks": "every reachable SM-CONFLICT state offers no overwrite action",
       "evidenceConsumer": "requirements-compiler verify-plan in the acceptance job, run by a verifier independent of the implementing agent, against the exact final SHA (AR-008, AR-019)",
-      "passCondition": "The test has a PASS result in the evidence bundle for the exact final SHA (category unit).",
+      "passCondition": "The test has a PASS result in the evidence bundle for the exact final SHA (category integration).",
       "failureConditions": [
         "any listed test is FAIL, NOT_RUN, skipped, quarantined or missing",
         "evidence was produced from another SHA, an earlier rehearsal, or a fake where live evidence is required",
@@ -34466,12 +35274,14 @@
         "the obligation's binding, amendment or exclusion differs from the frozen plan without an operator approval record"
       ],
       "normative": true,
+      "boundInPlan": true,
       "status": "binding-strengthened (enforces existing obligations of the cited requirements)"
     },
     {
       "id": "AO-INV-09-1",
       "origin": "invariant",
       "requirements": [
+        "PERSIST-013-O3",
         "PERSIST-013",
         "AR-035"
       ],
@@ -34495,12 +35305,14 @@
         "the obligation's binding, amendment or exclusion differs from the frozen plan without an operator approval record"
       ],
       "normative": true,
+      "boundInPlan": true,
       "status": "binding-strengthened (enforces existing obligations of the cited requirements)"
     },
     {
       "id": "AO-INV-09-2",
       "origin": "invariant",
       "requirements": [
+        "PERSIST-041-O3",
         "PERSIST-013",
         "AR-035"
       ],
@@ -34524,12 +35336,14 @@
         "the obligation's binding, amendment or exclusion differs from the frozen plan without an operator approval record"
       ],
       "normative": true,
+      "boundInPlan": true,
       "status": "binding-strengthened (enforces existing obligations of the cited requirements)"
     },
     {
       "id": "AO-INV-10-1",
       "origin": "invariant",
       "requirements": [
+        "PERSIST-002-O3",
         "PERSIST-002",
         "PERSIST-004"
       ],
@@ -34553,12 +35367,14 @@
         "the obligation's binding, amendment or exclusion differs from the frozen plan without an operator approval record"
       ],
       "normative": true,
+      "boundInPlan": true,
       "status": "binding-strengthened (enforces existing obligations of the cited requirements)"
     },
     {
       "id": "AO-INV-11-1",
       "origin": "invariant",
       "requirements": [
+        "PERSIST-005-O2",
         "PERSIST-005",
         "EXT-DATA-011",
         "STORAGE-007",
@@ -34570,13 +35386,13 @@
           "id": "dotnet:Causa.Invariants.Negative.INV11.EachIntegrityCheckHasAMutant",
           "kind": "mutation",
           "categories": [
-            "unit"
+            "integration"
           ]
         }
       ],
       "checks": "for each check (schema, each digest including eventsSha256, each contract-fixed value, snapshot-equals-replay, required fields) a forged file set that only that check rejects is refused; removing the check makes the test fail (Rehearsal 7 surviving eventsSha256 mutant)",
       "evidenceConsumer": "requirements-compiler verify-plan in the acceptance job, run by a verifier independent of the implementing agent, against the exact final SHA (AR-008, AR-019)",
-      "passCondition": "The test has a PASS result in the evidence bundle for the exact final SHA (category unit).",
+      "passCondition": "The test has a PASS result in the evidence bundle for the exact final SHA (category integration).",
       "failureConditions": [
         "any listed test is FAIL, NOT_RUN, skipped, quarantined or missing",
         "evidence was produced from another SHA, an earlier rehearsal, or a fake where live evidence is required",
@@ -34584,12 +35400,14 @@
         "the obligation's binding, amendment or exclusion differs from the frozen plan without an operator approval record"
       ],
       "normative": true,
+      "boundInPlan": true,
       "status": "binding-strengthened (enforces existing obligations of the cited requirements)"
     },
     {
       "id": "AO-INV-11-2",
       "origin": "invariant",
       "requirements": [
+        "PERSIST-005-O2",
         "PERSIST-005",
         "EXT-DATA-011",
         "STORAGE-007",
@@ -34615,12 +35433,14 @@
         "the obligation's binding, amendment or exclusion differs from the frozen plan without an operator approval record"
       ],
       "normative": true,
+      "boundInPlan": true,
       "status": "binding-strengthened (enforces existing obligations of the cited requirements)"
     },
     {
       "id": "AO-INV-12-1",
       "origin": "invariant",
       "requirements": [
+        "PERSIST-012-O3",
         "PERSIST-012",
         "AR-006",
         "DCC-012"
@@ -34631,13 +35451,13 @@
           "id": "dotnet:Causa.Invariants.Property.INV12.ReapplyEqualsEngineFold",
           "kind": "property",
           "categories": [
-            "unit"
+            "integration"
           ]
         }
       ],
       "checks": "reapply result equals folding the unsaved commands through decide/evolve at the GitHub version; refused commands carry the engine's reason",
       "evidenceConsumer": "requirements-compiler verify-plan in the acceptance job, run by a verifier independent of the implementing agent, against the exact final SHA (AR-008, AR-019)",
-      "passCondition": "The test has a PASS result in the evidence bundle for the exact final SHA (category unit).",
+      "passCondition": "The test has a PASS result in the evidence bundle for the exact final SHA (category integration).",
       "failureConditions": [
         "any listed test is FAIL, NOT_RUN, skipped, quarantined or missing",
         "evidence was produced from another SHA, an earlier rehearsal, or a fake where live evidence is required",
@@ -34645,12 +35465,14 @@
         "the obligation's binding, amendment or exclusion differs from the frozen plan without an operator approval record"
       ],
       "normative": true,
+      "boundInPlan": true,
       "status": "binding-strengthened (enforces existing obligations of the cited requirements)"
     },
     {
       "id": "AO-INV-13-1",
       "origin": "invariant",
       "requirements": [
+        "PERSIST-022-O2",
         "PERSIST-022",
         "PERSIST-030",
         "PERSIST-033"
@@ -34675,12 +35497,14 @@
         "the obligation's binding, amendment or exclusion differs from the frozen plan without an operator approval record"
       ],
       "normative": true,
+      "boundInPlan": true,
       "status": "binding-strengthened (enforces existing obligations of the cited requirements)"
     },
     {
       "id": "AO-INV-14-1",
       "origin": "invariant",
       "requirements": [
+        "PERSIST-053-O2",
         "PERSIST-032",
         "PERSIST-053"
       ],
@@ -34704,6 +35528,7 @@
         "the obligation's binding, amendment or exclusion differs from the frozen plan without an operator approval record"
       ],
       "normative": true,
+      "boundInPlan": true,
       "status": "binding-strengthened (enforces existing obligations of the cited requirements)"
     },
     {
@@ -34734,6 +35559,7 @@
         "the obligation's binding, amendment or exclusion differs from the frozen plan without an operator approval record"
       ],
       "normative": true,
+      "boundInPlan": false,
       "status": "binding-strengthened (enforces existing obligations of the cited requirements)"
     },
     {
@@ -34764,6 +35590,7 @@
         "the obligation's binding, amendment or exclusion differs from the frozen plan without an operator approval record"
       ],
       "normative": true,
+      "boundInPlan": false,
       "status": "binding-strengthened (enforces existing obligations of the cited requirements)"
     },
     {
@@ -34794,6 +35621,7 @@
         "the obligation's binding, amendment or exclusion differs from the frozen plan without an operator approval record"
       ],
       "normative": true,
+      "boundInPlan": false,
       "status": "binding-strengthened (enforces existing obligations of the cited requirements)"
     },
     {
@@ -34825,6 +35653,7 @@
         "the obligation's binding, amendment or exclusion differs from the frozen plan without an operator approval record"
       ],
       "normative": true,
+      "boundInPlan": false,
       "status": "binding-strengthened (enforces existing obligations of the cited requirements)"
     },
     {
@@ -34855,6 +35684,7 @@
         "the obligation's binding, amendment or exclusion differs from the frozen plan without an operator approval record"
       ],
       "normative": true,
+      "boundInPlan": false,
       "status": "binding-strengthened (enforces existing obligations of the cited requirements)"
     },
     {
@@ -34885,6 +35715,7 @@
         "the obligation's binding, amendment or exclusion differs from the frozen plan without an operator approval record"
       ],
       "normative": true,
+      "boundInPlan": false,
       "status": "binding-strengthened (enforces existing obligations of the cited requirements)"
     },
     {
@@ -34915,29 +35746,29 @@
         "the obligation's binding, amendment or exclusion differs from the frozen plan without an operator approval record"
       ],
       "normative": true,
+      "boundInPlan": false,
       "status": "binding-strengthened (enforces existing obligations of the cited requirements)"
     },
     {
       "id": "AO-INV-20-1",
       "origin": "invariant",
       "requirements": [
+        "PERSIST-052-O3",
         "PERSIST-026",
         "PERSIST-052",
         "R0.1"
       ],
-      "proposals": [
-        "ODR-V4-02"
-      ],
+      "proposals": [],
       "requiredTests": [
         {
-          "id": "dotnet:Causa.Acceptance.Deterministic.PERSIST052Tests.PERSIST-052-O3",
+          "id": "verifier:Causa.Acceptance.Independent.PAT13ProvenanceComparison",
           "kind": "deterministic",
           "categories": [
             "security"
           ]
         }
       ],
-      "checks": "PAT-13 comparison, run by a verifier permitted to read the prior repositories",
+      "checks": "PAT-13 comparison against indy-init-rehearsal-001..006, run and recorded by the independent verifier at the exact final SHA",
       "evidenceConsumer": "requirements-compiler verify-plan in the acceptance job, run by a verifier independent of the implementing agent, against the exact final SHA (AR-008, AR-019)",
       "passCondition": "The test has a PASS result in the evidence bundle for the exact final SHA (category security).",
       "failureConditions": [
@@ -34946,13 +35777,47 @@
         "a required evidence category is not covered, or its freshness policy is violated",
         "the obligation's binding, amendment or exclusion differs from the frozen plan without an operator approval record"
       ],
-      "normative": false,
-      "status": "proposed: normative only after the owner approves ODR-V4-02"
+      "normative": true,
+      "boundInPlan": true,
+      "status": "binding-strengthened (enforces existing obligations of the cited requirements)"
+    },
+    {
+      "id": "AO-INV-20-2",
+      "origin": "invariant",
+      "requirements": [
+        "PERSIST-026-O2",
+        "PERSIST-026",
+        "PERSIST-052",
+        "R0.1"
+      ],
+      "proposals": [],
+      "requiredTests": [
+        {
+          "id": "verifier:Causa.Acceptance.Independent.PERSIST026Provenance",
+          "kind": "deterministic",
+          "categories": [
+            "security"
+          ]
+        }
+      ],
+      "checks": "the same comparison recorded for PERSIST-026's copy ban by the independent verifier",
+      "evidenceConsumer": "requirements-compiler verify-plan in the acceptance job, run by a verifier independent of the implementing agent, against the exact final SHA (AR-008, AR-019)",
+      "passCondition": "The test has a PASS result in the evidence bundle for the exact final SHA (category security).",
+      "failureConditions": [
+        "any listed test is FAIL, NOT_RUN, skipped, quarantined or missing",
+        "evidence was produced from another SHA, an earlier rehearsal, or a fake where live evidence is required",
+        "a required evidence category is not covered, or its freshness policy is violated",
+        "the obligation's binding, amendment or exclusion differs from the frozen plan without an operator approval record"
+      ],
+      "normative": true,
+      "boundInPlan": true,
+      "status": "binding-strengthened (enforces existing obligations of the cited requirements)"
     },
     {
       "id": "AO-INV-21-1",
       "origin": "invariant",
       "requirements": [
+        "PF-015-O4",
         "EXT-DATA-004",
         "EXT-DATA-005",
         "PF-015"
@@ -34977,12 +35842,14 @@
         "the obligation's binding, amendment or exclusion differs from the frozen plan without an operator approval record"
       ],
       "normative": true,
+      "boundInPlan": true,
       "status": "binding-strengthened (enforces existing obligations of the cited requirements)"
     },
     {
       "id": "AO-INV-21-2",
       "origin": "invariant",
       "requirements": [
+        "PF-015-O4",
         "EXT-DATA-004",
         "EXT-DATA-005",
         "PF-015"
@@ -35007,12 +35874,14 @@
         "the obligation's binding, amendment or exclusion differs from the frozen plan without an operator approval record"
       ],
       "normative": true,
+      "boundInPlan": true,
       "status": "binding-strengthened (enforces existing obligations of the cited requirements)"
     },
     {
       "id": "AO-INV-22-1",
       "origin": "invariant",
       "requirements": [
+        "PERSIST-008-O2",
         "PERSIST-008",
         "PERSIST-024"
       ],
@@ -35036,12 +35905,14 @@
         "the obligation's binding, amendment or exclusion differs from the frozen plan without an operator approval record"
       ],
       "normative": true,
+      "boundInPlan": true,
       "status": "binding-strengthened (enforces existing obligations of the cited requirements)"
     },
     {
       "id": "AO-INV-22-2",
       "origin": "invariant",
       "requirements": [
+        "PERSIST-008-O2",
         "PERSIST-008",
         "PERSIST-024"
       ],
@@ -35065,6 +35936,7 @@
         "the obligation's binding, amendment or exclusion differs from the frozen plan without an operator approval record"
       ],
       "normative": true,
+      "boundInPlan": true,
       "status": "binding-strengthened (enforces existing obligations of the cited requirements)"
     },
     {
@@ -35095,7 +35967,146 @@
         "the obligation's binding, amendment or exclusion differs from the frozen plan without an operator approval record"
       ],
       "normative": true,
+      "boundInPlan": false,
       "status": "binding-strengthened (enforces existing obligations of the cited requirements)"
+    },
+    {
+      "id": "AO-INV-24-1",
+      "origin": "invariant",
+      "requirements": [
+        "UI-011-O1",
+        "UI-011",
+        "PERSIST-030",
+        "PERSIST-012",
+        "PERSIST-019",
+        "UI-016"
+      ],
+      "proposals": [],
+      "requiredTests": [
+        {
+          "id": "playwright:invariants/INV-24.spec.js > save-state and conflict actions by keyboard and screen reader [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "accessibility"
+          ]
+        }
+      ],
+      "checks": "keyboard-only operation, accessible names, focus into and back from the discard confirmation and Reconnect, live-region announcements, in WebKit (iPad target)",
+      "evidenceConsumer": "requirements-compiler verify-plan in the acceptance job, run by a verifier independent of the implementing agent, against the exact final SHA (AR-008, AR-019)",
+      "passCondition": "The test has a PASS result in the evidence bundle for the exact final SHA (category accessibility).",
+      "failureConditions": [
+        "any listed test is FAIL, NOT_RUN, skipped, quarantined or missing",
+        "evidence was produced from another SHA, an earlier rehearsal, or a fake where live evidence is required",
+        "a required evidence category is not covered, or its freshness policy is violated",
+        "the obligation's binding, amendment or exclusion differs from the frozen plan without an operator approval record"
+      ],
+      "normative": true,
+      "boundInPlan": true,
+      "status": "binding-strengthened (enforces existing obligations of the cited requirements)"
+    },
+    {
+      "id": "AO-INV-24-2",
+      "origin": "invariant",
+      "requirements": [
+        "PERSIST-030-O2",
+        "UI-011",
+        "PERSIST-030",
+        "PERSIST-012",
+        "PERSIST-019",
+        "UI-016"
+      ],
+      "proposals": [],
+      "requiredTests": [
+        {
+          "id": "dotnet:Causa.Invariants.Negative.INV24.FormaTokensExist",
+          "kind": "negative",
+          "categories": [
+            "integration"
+          ]
+        }
+      ],
+      "checks": "every Forma custom property the stylesheet references exists in Forma 0.12.0's published token set (Rehearsal 7 post-deadline finding: four nonexistent token names)",
+      "evidenceConsumer": "requirements-compiler verify-plan in the acceptance job, run by a verifier independent of the implementing agent, against the exact final SHA (AR-008, AR-019)",
+      "passCondition": "The test has a PASS result in the evidence bundle for the exact final SHA (category integration).",
+      "failureConditions": [
+        "any listed test is FAIL, NOT_RUN, skipped, quarantined or missing",
+        "evidence was produced from another SHA, an earlier rehearsal, or a fake where live evidence is required",
+        "a required evidence category is not covered, or its freshness policy is violated",
+        "the obligation's binding, amendment or exclusion differs from the frozen plan without an operator approval record"
+      ],
+      "normative": true,
+      "boundInPlan": true,
+      "status": "binding-strengthened (enforces existing obligations of the cited requirements)"
+    },
+    {
+      "id": "AO-INV-25-1",
+      "origin": "invariant",
+      "requirements": [
+        "PERSIST-031-O22",
+        "PERSIST-031",
+        "PERSIST-012",
+        "UI-010"
+      ],
+      "proposals": [
+        "ODR-V4-04",
+        "ODR-V4-05"
+      ],
+      "requiredTests": [
+        {
+          "id": "playwright:invariants/INV-25.spec.js > reconnect keeps unsaved work [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser"
+          ]
+        }
+      ],
+      "checks": "a revoked token followed by Reconnect with a new token keeps every unsaved change and saves it",
+      "evidenceConsumer": "requirements-compiler verify-plan in the acceptance job, run by a verifier independent of the implementing agent, against the exact final SHA (AR-008, AR-019)",
+      "passCondition": "The test has a PASS result in the evidence bundle for the exact final SHA (category browser).",
+      "failureConditions": [
+        "any listed test is FAIL, NOT_RUN, skipped, quarantined or missing",
+        "evidence was produced from another SHA, an earlier rehearsal, or a fake where live evidence is required",
+        "a required evidence category is not covered, or its freshness policy is violated",
+        "the obligation's binding, amendment or exclusion differs from the frozen plan without an operator approval record"
+      ],
+      "normative": false,
+      "boundInPlan": false,
+      "status": "proposed: normative only after the owner approves ODR-V4-04, ODR-V4-05"
+    },
+    {
+      "id": "AO-INV-25-2",
+      "origin": "invariant",
+      "requirements": [
+        "PERSIST-012-O2",
+        "PERSIST-031",
+        "PERSIST-012",
+        "UI-010"
+      ],
+      "proposals": [
+        "ODR-V4-04",
+        "ODR-V4-05"
+      ],
+      "requiredTests": [
+        {
+          "id": "dotnet:Causa.Invariants.Negative.INV25.UnresolvableConflictExports",
+          "kind": "negative",
+          "categories": [
+            "integration"
+          ]
+        }
+      ],
+      "checks": "a deleted or unverifiable GitHub version leaves the conflict with an export action and the work kept",
+      "evidenceConsumer": "requirements-compiler verify-plan in the acceptance job, run by a verifier independent of the implementing agent, against the exact final SHA (AR-008, AR-019)",
+      "passCondition": "The test has a PASS result in the evidence bundle for the exact final SHA (category integration).",
+      "failureConditions": [
+        "any listed test is FAIL, NOT_RUN, skipped, quarantined or missing",
+        "evidence was produced from another SHA, an earlier rehearsal, or a fake where live evidence is required",
+        "a required evidence category is not covered, or its freshness policy is violated",
+        "the obligation's binding, amendment or exclusion differs from the frozen plan without an operator approval record"
+      ],
+      "normative": false,
+      "boundInPlan": false,
+      "status": "proposed: normative only after the owner approves ODR-V4-04, ODR-V4-05"
     },
     {
       "id": "AO-R7L-19-1",
@@ -35123,6 +36134,7 @@
         "the obligation's binding, amendment or exclusion differs from the frozen plan without an operator approval record"
       ],
       "normative": true,
+      "boundInPlan": true,
       "status": "binding-strengthened (enforces existing obligations of the cited requirements)"
     },
     {
@@ -35134,16 +36146,16 @@
       "proposals": [],
       "requiredTests": [
         {
-          "id": "dotnet:Causa.Acceptance.Deterministic.PERSIST007Tests.ReadBackOfFileOver1MB",
-          "kind": "deterministic",
+          "id": "dotnet:Causa.Acceptance.Live.PERSIST007Tests.ReadBackOfFileOver1MB",
+          "kind": "live",
           "categories": [
-            "integration"
+            "live-provider"
           ]
         }
       ],
       "checks": "",
       "evidenceConsumer": "requirements-compiler verify-plan in the acceptance job, run by a verifier independent of the implementing agent, against the exact final SHA (AR-008, AR-019)",
-      "passCondition": "The test has a PASS result in the evidence bundle for the exact final SHA (category integration).",
+      "passCondition": "The test has a PASS result in the evidence bundle for the exact final SHA (category live-provider).",
       "failureConditions": [
         "any listed test is FAIL, NOT_RUN, skipped, quarantined or missing",
         "evidence was produced from another SHA, an earlier rehearsal, or a fake where live evidence is required",
@@ -35151,6 +36163,7 @@
         "the obligation's binding, amendment or exclusion differs from the frozen plan without an operator approval record"
       ],
       "normative": true,
+      "boundInPlan": true,
       "status": "binding-strengthened (enforces existing obligations of the cited requirements)"
     },
     {
@@ -35179,6 +36192,7 @@
         "the obligation's binding, amendment or exclusion differs from the frozen plan without an operator approval record"
       ],
       "normative": true,
+      "boundInPlan": true,
       "status": "binding-strengthened (enforces existing obligations of the cited requirements)"
     }
   ]

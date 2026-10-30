@@ -942,6 +942,15 @@ let compilerSources (compilerDir: string) : (string * byte[]) list =
             |> List.ofArray
         else [])
 
+/// A commit message an agent wrote: it carries the attribution trailers agents add (RDP-003 evidence).
+let private agentAttributed (message: string) =
+    message.Contains("Claude-Session:", StringComparison.Ordinal) || message.Contains("Co-Authored-By: Claude", StringComparison.Ordinal)
+
+/// True when the commit is reachable from main (origin/main when the remote ref exists, else main).
+let private onMain (repo: string) (commit: string) =
+    let reachable r = Git.run repo [ "merge-base"; "--is-ancestor"; commit; r ] |> Result.isOk
+    reachable "origin/main" || reachable "main"
+
 /// Reads every input of the v4 stage from the source checkout and the package directory.
 let v4Inputs (source: string) (package: string) (registry: string option) (r7Evidence: string option) : V4Package.Inputs =
     let pkg (rel: string) = Path.Combine(package, rel)
@@ -998,7 +1007,28 @@ let v4Inputs (source: string) (package: string) (registry: string option) (r7Evi
       CompilerTreeSha256 = V4Package.treeSha256 (compilerSources (src "tools/requirements-compiler"))
       Review = orEmpty (pkg "analysis/independent-review.json")
       FreezeInput = orEmpty (pkg "analysis/freeze-input.json")
-      PackageFiles = packageFiles }
+      PackageFiles = packageFiles
+      TrustedOperators = strs "trustedOperators" approvalsPin
+      ApprovalsAgentAuthored =
+          match Git.run source [ "log"; "-1"; "--format=%B"; str "commit" approvalsPin; "--"; str "path" approvalsPin ] with
+          | Ok b -> agentAttributed (utf8 b)
+          | Error _ -> true
+      ApprovalsOnMain = onMain source (str "commit" approvalsPin)
+      FreezeCommitVerified =
+          let fc = (orEmpty (pkg "analysis/freeze-input.json")) |> strOpt "freezeCommit" |> Option.defaultValue ""
+          fc <> ""
+          && Git.run source [ "merge-base"; "--is-ancestor"; fc; "HEAD" ] |> Result.isOk
+          && onMain source fc
+          && (match Git.showFile source fc (str "path" approvalsPin) with
+              | Ok b -> arr "approvals" (parseBytes b) |> List.exists (fun a -> strOpt "decision_id" a = Some "ODR-V4-01" && strOpt "action" a = Some "approve-package")
+              | Error _ -> false)
+      ReviewSha256 = (let f = pkg "analysis/independent-review.json" in if File.Exists f then fileSha f else "")
+      TestRecordSha256 = (let f = pkg "analysis/compiler-test-record.json" in if File.Exists f then fileSha f else "")
+      BaseBindings =
+          TestBindingProposal.applyTo
+              (arr "testBindings" (parseFile (src "requirements-compiled/v3/curation/verification-plan.json")))
+              (parseFile (pkg "proposals/r7-test-bindings.proposed.json"))
+      CurationBindings = arr "testBindings" (parseFile (pkg "curation/verification-plan.json")) }
 
 /// Files of the v3 pipeline that the freeze manifest pins by digest, read as committed.
 let private legacyPinned =
@@ -1021,13 +1051,31 @@ let v4Command (args: string list) : int =
         eprintfn "%s" e
         2
     | Ok(m, _) when not (m.ContainsKey "--source" && m.ContainsKey "--package") ->
-        eprintfn "usage: requirements-compiler v4 --source DIR --package DIR [--registry DIR] [--r7-evidence DIR] [--check]"
+        eprintfn "usage: requirements-compiler v4 --source DIR --package DIR --registry DIR --r7-evidence DIR [--check] [--apply-bindings true] [--verify-test-record FILE]"
         2
     | Ok(m, check) ->
         try
             let source = m.["--source"]
             let package = m.["--package"]
             let i = v4Inputs source package (m.TryFind "--registry") (m.TryFind "--r7-evidence")
+            // --apply-bindings: writes the curation's testBindings as the base bindings extended by the strengthened
+            // proposal (check W16); the v3 pipeline must then be re-run so the plan carries them.
+            if m.TryFind "--apply-bindings" = Some "true" then
+                let curationPath = Path.Combine(package, "curation", "verification-plan.json")
+                let curation = parseFile curationPath
+                let bindings = JArr(TestBindingProposal.applyTo i.BaseBindings (V4Package.strengthenedProposal i))
+                let updated = match curation with JObj ps -> JObj(ps |> List.map (fun (k, v) -> if k = "testBindings" then k, bindings else k, v)) | j -> j
+                File.WriteAllText(curationPath, serialize updated + "\n")
+                printfn "curation testBindings updated; re-run the v3 pipeline, then v4"
+            // --verify-test-record: a record the CI job produced in this run must agree with the committed one.
+            let freshProblems =
+                match m.TryFind "--verify-test-record" with
+                | None -> []
+                | Some f ->
+                    let fresh = parseFile f
+                    [ if strOpt "result" fresh <> Some "PASS" then yield "the compiler tests did not pass in this run"
+                      if strOpt "compilerTreeSha256" fresh <> strOpt "compilerTreeSha256" i.CompilerTests then yield "the committed compiler test record is for another compiler tree than the one tested in this run" ]
+            freshProblems |> List.iter (eprintfn "test record: %s")
             let built = V4Package.build i
             let report = V4Package.validationReport i built.Checks
             let generated = built.Files @ [ "package-validation-report.json", report ] |> List.map (fun (n, j) -> n, serialize j)
@@ -1045,7 +1093,7 @@ let v4Command (args: string list) : int =
             if check then
                 let differing = all |> List.filter (fun (n, t) -> let p = Path.Combine(package, n) in not (File.Exists p) || File.ReadAllText p <> t) |> List.map fst
                 differing |> List.iter (eprintfn "differs from the package: %s")
-                if differing.IsEmpty then (if str "verdict" (parseBytes (Text.Encoding.UTF8.GetBytes (serialize report))) = "PASS" then 0 else 3) else 4
+                if not differing.IsEmpty then 4 elif str "verdict" (parseBytes (Text.Encoding.UTF8.GetBytes (serialize report))) = "PASS" && freshProblems.IsEmpty then 0 else 3
             else
                 for (n, t) in all do
                     let p = Path.Combine(package, n)

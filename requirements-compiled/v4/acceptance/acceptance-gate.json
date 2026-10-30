@@ -10,7 +10,7 @@
     },
     {
       "id": "AG-02",
-      "acceptanceFailsWhen": "a critical test (any test bound to a P0 obligation, any PAT test, any invariant test of a normative invariant) fails",
+      "acceptanceFailsWhen": "a critical test fails: any test the plan binds to a P0 obligation, which includes every PAT test, the WebKit twins and the normative invariant and lesson tests v4 binds (proposals/v4-strengthened-bindings.proposed.json)",
       "checkedBy": "verify-plan over the evidence bundle; acceptance ledger"
     },
     {

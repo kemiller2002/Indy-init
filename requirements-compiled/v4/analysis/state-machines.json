@@ -194,6 +194,18 @@
         {
           "id": "SupersededReply",
           "meaning": "Any reply whose request identity or base head is not the current one."
+        },
+        {
+          "id": "QueuedSaveStarted",
+          "meaning": "The tab's in-flight mutation settled and this investigation's waiting save request is next."
+        },
+        {
+          "id": "RebaseReadFailed",
+          "meaning": "After a stale head, the fresh head read or the file comparison failed for a network reason (nothing of this save was written)."
+        },
+        {
+          "id": "ReadBackReadFailed",
+          "meaning": "GitHub returned the new commit but the re-read at that commit failed, so the written bytes are unconfirmed."
         }
       ],
       "transitions": [
@@ -251,7 +263,6 @@
             "new write marker (session id, sequence)",
             "send createCommitOnBranch"
           ],
-          "failure": "If another mutation is in flight in the tab, the request waits in memory and the state stays Unsaved with a waiting notice (it is not Saving).",
           "sources": [
             "PERSIST-006",
             "PERSIST-014",
@@ -741,6 +752,9 @@
             "PERSIST-012",
             "PERSIST-005",
             "PERSIST-021"
+          ],
+          "proposals": [
+            "ODR-V4-08"
           ]
         },
         {
@@ -918,6 +932,88 @@
           "sources": [
             "PERSIST-018"
           ]
+        },
+        {
+          "id": "T-S53",
+          "from": "Unsaved",
+          "event": "SaveRequested",
+          "to": "Unsaved",
+          "guard": "online and another mutation is in flight in this tab",
+          "effects": [
+            "hold the request in memory; show a waiting notice; nothing is sent and the state is not Saving (Rehearsal 7 L2)"
+          ],
+          "sources": [
+            "PERSIST-006"
+          ]
+        },
+        {
+          "id": "T-S54",
+          "from": "Unsaved",
+          "event": "QueuedSaveStarted",
+          "to": "Saving",
+          "guard": "online and a save request is waiting",
+          "effects": [
+            "send the waiting save as in T-S04"
+          ],
+          "sources": [
+            "PERSIST-006"
+          ]
+        },
+        {
+          "id": "T-S55",
+          "from": "Unsaved",
+          "event": "QueuedSaveStarted",
+          "to": "Offline",
+          "guard": "known offline and a save request is waiting",
+          "effects": [
+            "send nothing; the waiting request fails as Offline (Rehearsal 7 F13)"
+          ],
+          "sources": [
+            "PERSIST-018"
+          ]
+        },
+        {
+          "id": "T-S56",
+          "from": "UnknownOutcome",
+          "event": "ReconcileNothingWrittenHeadMoved",
+          "to": "SaveFailed",
+          "guard": "current; investigation files unchanged; rebase limit reached",
+          "effects": [
+            "keep changes",
+            "cause: the repository kept changing"
+          ],
+          "sources": [
+            "PERSIST-015",
+            "PERSIST-010"
+          ]
+        },
+        {
+          "id": "T-S57",
+          "from": "Saving",
+          "event": "RebaseReadFailed",
+          "to": "Offline",
+          "guard": "current",
+          "effects": [
+            "nothing of this save was written; never Conflict, never Discard (PAT-07 second case)"
+          ],
+          "sources": [
+            "PERSIST-024",
+            "PERSIST-046"
+          ]
+        },
+        {
+          "id": "T-S58",
+          "from": "Saving",
+          "event": "ReadBackReadFailed",
+          "to": "UnknownOutcome",
+          "guard": "current",
+          "effects": [
+            "the commit may hold the bytes; reconcile by marker and head before anything else is sent"
+          ],
+          "sources": [
+            "PERSIST-015",
+            "PERSIST-007"
+          ]
         }
       ],
       "entersSavedOnlyBy": [
@@ -926,8 +1022,9 @@
         "ConflictResolvedDiscarded"
       ],
       "staleAndReorderedReplies": "Every reply is matched against the outstanding request identity and base head before it is applied (guard 'current'). A reply that is not current is SupersededReply: discarded, state unchanged (T-S39, T-S40, proposed by ODR-V4-03; the baseline already forbids such a reply from reaching Saved, PERSIST-007).",
-      "concurrentOperations": "At most one mutation in flight per tab (PERSIST-006); other saves wait in memory without entering Saving. Different tabs are independent writers resolved only by GitHub's expected-head rule (PERSIST-004, PERSIST-013).",
-      "uncertainRemoteOutcomes": "AnswerLost always leads to UnknownOutcome, never to SaveFailed or Conflict directly; only reconciliation results move it on (PERSIST-015)."
+      "concurrentOperations": "At most one mutation in flight per tab (PERSIST-006). A save requested while another is in flight waits in memory with a notice and stays Unsaved (T-S53); it starts when the in-flight mutation settles (T-S54) or fails as Offline if the tab knows it is offline (T-S55). A mutation whose answer was lost has settled for this purpose: Unknown commit outcome blocks only its own investigation (PERSIST-015), not other investigations' saves (operational definition 'In flight'). Different tabs are independent writers resolved only by GitHub's expected-head rule (PERSIST-004, PERSIST-013).",
+      "uncertainRemoteOutcomes": "AnswerLost always leads to UnknownOutcome, never to SaveFailed or Conflict directly; only reconciliation results move it on (PERSIST-015).",
+      "savedFromVerifiedLoad": "PERSIST-021 requires an investigation opened from GitHub to 'show Saved at that commit', and SM-LOAD starts SM-SAVE at Saved; PERSIST-007 and PERSIST-023 say only a save confirmed by read-back may reach Saved. The baseline does not say whether a verified load at a named commit is such a confirmation. ODR-V4-08 asks the owner; until then T-S38 and SM-LOAD T-L03's 'initial Saved' are marked proposed, and an implementation must construct the load's Saved only inside the persistence module from bytes it verified at that commit."
     },
     {
       "id": "SM-CONFLICT",
@@ -1636,6 +1733,9 @@
           "sources": [
             "PERSIST-005",
             "PERSIST-021"
+          ],
+          "proposals": [
+            "ODR-V4-08"
           ]
         },
         {

@@ -21,13 +21,15 @@
           "id": "dotnet:Causa.Invariants.Property.INV01.NoSavedWithoutMatchingReadBack",
           "kind": "property",
           "category": "unit",
-          "checks": "for random sequences of edits, saves and fake replies (including forged commit oids and mismatched read-backs), Saved occurs only immediately after a matching read-back or marker reconciliation"
+          "checks": "for random sequences of edits, saves and fake replies (including forged commit oids and mismatched read-backs), Saved occurs only immediately after a matching read-back or marker reconciliation",
+          "obligation": "PERSIST-023-O2"
         },
         {
           "id": "dotnet:Causa.Invariants.Mutation.INV01.ReadBackSkipped",
           "kind": "mutation",
           "category": "unit",
-          "checks": "with the read-back comparison removed (compare with itself) a named test fails"
+          "checks": "with the read-back comparison removed (compare with itself) a named test fails",
+          "obligation": "PERSIST-023-O2"
         }
       ]
     },
@@ -52,19 +54,22 @@
           "id": "dotnet:Causa.Invariants.Property.INV02.ReorderedRepliesAreInert",
           "kind": "property",
           "category": "unit",
-          "checks": "permuting the delivery order of replies to superseded loads, refreshes, conflict re-reads and reconciliation reads leaves the final state equal to delivering only the current replies"
+          "checks": "permuting the delivery order of replies to superseded loads, refreshes, conflict re-reads and reconciliation reads leaves the final state equal to delivering only the current replies",
+          "obligation": "PERSIST-051-O2"
         },
         {
           "id": "dotnet:Causa.Invariants.Negative.INV02.LateConflictReReadKeepsOtherWriter",
           "kind": "negative",
           "category": "integration",
-          "checks": "Rehearsal 7 third-review E1: a late read of head h1 after a re-read at h2 is dropped and the other writer's change survives reapply"
+          "checks": "Rehearsal 7 third-review E1: a late read of head h1 after a re-read at h2 is dropped and the other writer's change survives reapply",
+          "obligation": "PERSIST-051-O2"
         },
         {
           "id": "dotnet:Causa.Invariants.Negative.INV02.StaleRefreshDropped",
           "kind": "negative",
           "category": "integration",
-          "checks": "Rehearsal 7 third-review E2: a refresh requested at base b1 that completes after a save moved the tab to b2 is dropped"
+          "checks": "Rehearsal 7 third-review E2: a refresh requested at base b1 that completes after a save moved the tab to b2 is dropped",
+          "obligation": "PERSIST-051-O2"
         }
       ]
     },
@@ -85,13 +90,15 @@
           "id": "dotnet:Causa.Invariants.Property.INV03.LostAnswerNeverConflictOrFailure",
           "kind": "property",
           "category": "integration",
-          "checks": "losing the answer at any point (before or after the fake applies the mutation) never yields Conflict or Save failed without a reconciliation result that justifies it"
+          "checks": "losing the answer at any point (before or after the fake applies the mutation) never yields Conflict or Save failed without a reconciliation result that justifies it",
+          "obligation": "PERSIST-015-O3"
         },
         {
           "id": "dotnet:Causa.Invariants.Negative.INV03.AppliedButNotYetVisible",
           "kind": "negative",
           "category": "integration",
-          "checks": "Rehearsal 7 KD-018: an applied commit whose answer was lost and that reconciliation does not yet see is never reported as a conflict caused by this save's own commit"
+          "checks": "Rehearsal 7 KD-018: an applied commit whose answer was lost and that reconciliation does not yet see is never reported as a conflict caused by this save's own commit",
+          "obligation": "PERSIST-015-O5"
         }
       ]
     },
@@ -112,7 +119,8 @@
           "id": "dotnet:Causa.Invariants.Property.INV04.RequestBounds",
           "kind": "property",
           "category": "integration",
-          "checks": "request counts and spacing under random failure schedules, with a virtual clock"
+          "checks": "request counts and spacing under random failure schedules, with a virtual clock",
+          "obligation": "PERSIST-016-O5"
         }
       ]
     },
@@ -133,7 +141,8 @@
           "id": "dotnet:Causa.Invariants.Property.INV05.MutationShape",
           "kind": "property",
           "category": "integration",
-          "checks": "every mutation the fake records satisfies the shape; markers never repeat across simulated tabs, reloads and reconnects (Rehearsal 7 F5)"
+          "checks": "every mutation the fake records satisfies the shape; markers never repeat across simulated tabs, reloads and reconnects (Rehearsal 7 F5)",
+          "obligation": "PERSIST-006-O3"
         }
       ]
     },
@@ -152,14 +161,15 @@
           "id": "playwright:invariants/INV-06.spec.js > every store empty of investigation content [chromium]",
           "kind": "negative",
           "category": "browser",
-          "checks": "after edits, saves, conflicts and offline periods every browser store is inspected"
+          "checks": "after edits, saves, conflicts and offline periods every browser store is inspected",
+          "obligation": "PERSIST-003-O1"
         }
       ]
     },
     {
       "id": "INV-07",
       "group": "data-preservation",
-      "statement": "Unsaved user changes remain in tab memory, visible and saveable by a new request through every recoverable failure: offline, stale head, rebase limit, conflict (including a deleted or unverifiable GitHub version), unknown outcome, provider refusal and refused credential. They are dropped only by an explicit, confirmed discard or by the tab ending.",
+      "statement": "Unsaved user changes remain in tab memory, visible and saveable by a new request through every recoverable failure the baseline names: offline, stale head, rebase limit, conflict, unknown outcome and provider refusal. They are dropped only by an explicit, confirmed discard or by the tab ending.",
       "sources": [
         "PERSIST-008",
         "PERSIST-010",
@@ -169,27 +179,25 @@
         "PERSIST-031",
         "UI-010"
       ],
-      "proposals": [
-        "ODR-V4-04",
-        "ODR-V4-05"
-      ],
+      "proposals": [],
       "machines": [
         "SM-SAVE",
-        "SM-CONFLICT",
-        "SM-CONNECTION"
+        "SM-CONFLICT"
       ],
       "tests": [
         {
           "id": "dotnet:Causa.Invariants.Property.INV07.WorkSurvivesRecoverableFailures",
           "kind": "property",
           "category": "unit",
-          "checks": "for random failure sequences the multiset of unsaved commands is unchanged except by confirmed discard or a confirmation that saved them"
+          "checks": "for random failure sequences the multiset of unsaved commands is unchanged except by confirmed discard or a confirmation that saved them",
+          "obligation": "PERSIST-031-O21"
         },
         {
           "id": "dotnet:Causa.Invariants.Negative.INV07.RefreshNeverReplacesWork",
           "kind": "negative",
           "category": "integration",
-          "checks": "Rehearsal 7 F2: refresh is refused, and a completing load is dropped, while the investigation holds unsaved changes, a save in flight or a conflict"
+          "checks": "Rehearsal 7 F2: refresh is refused, and a completing load is dropped, while the investigation holds unsaved changes, a save in flight or a conflict",
+          "obligation": "PERSIST-011-O4"
         }
       ]
     },
@@ -208,8 +216,9 @@
         {
           "id": "dotnet:Causa.Invariants.Model.INV08.ConflictActionsNeverOverwrite",
           "kind": "model",
-          "category": "unit",
-          "checks": "every reachable SM-CONFLICT state offers no overwrite action"
+          "category": "integration",
+          "checks": "every reachable SM-CONFLICT state offers no overwrite action",
+          "obligation": "PERSIST-012-O7"
         }
       ]
     },
@@ -230,13 +239,15 @@
           "id": "dotnet:Causa.Invariants.Property.INV09.AllCommitsReachable",
           "kind": "property",
           "category": "integration",
-          "checks": "random interleavings of three simulated tabs and an external writer against the stateful fake"
+          "checks": "random interleavings of three simulated tabs and an external writer against the stateful fake",
+          "obligation": "PERSIST-013-O3"
         },
         {
           "id": "dotnet:Causa.Acceptance.Live.PERSIST041Tests.PERSIST-041-O3",
           "kind": "live",
           "category": "live-provider",
-          "checks": "live PAT-02 reachability check (already bound by the plan)"
+          "checks": "live PAT-02 reachability check (already bound by the plan)",
+          "obligation": "PERSIST-041-O3"
         }
       ]
     },
@@ -254,7 +265,8 @@
           "id": "playwright:invariants/INV-10.spec.js > tabs independent with and without navigator.locks [chromium]",
           "kind": "negative",
           "category": "browser",
-          "checks": "PAT-01 and PAT-11 shape with random edit orders"
+          "checks": "PAT-01 and PAT-11 shape with random edit orders",
+          "obligation": "PERSIST-002-O3"
         }
       ]
     },
@@ -275,14 +287,16 @@
         {
           "id": "dotnet:Causa.Invariants.Negative.INV11.EachIntegrityCheckHasAMutant",
           "kind": "mutation",
-          "category": "unit",
-          "checks": "for each check (schema, each digest including eventsSha256, each contract-fixed value, snapshot-equals-replay, required fields) a forged file set that only that check rejects is refused; removing the check makes the test fail (Rehearsal 7 surviving eventsSha256 mutant)"
+          "category": "integration",
+          "checks": "for each check (schema, each digest including eventsSha256, each contract-fixed value, snapshot-equals-replay, required fields) a forged file set that only that check rejects is refused; removing the check makes the test fail (Rehearsal 7 surviving eventsSha256 mutant)",
+          "obligation": "PERSIST-005-O2"
         },
         {
           "id": "dotnet:Causa.Invariants.Property.INV11.WrittenFileSetsReplay",
           "kind": "property",
           "category": "integration",
-          "checks": "every file set the application writes re-reads and replays to its snapshot"
+          "checks": "every file set the application writes re-reads and replays to its snapshot",
+          "obligation": "PERSIST-005-O2"
         }
       ]
     },
@@ -302,8 +316,9 @@
         {
           "id": "dotnet:Causa.Invariants.Property.INV12.ReapplyEqualsEngineFold",
           "kind": "property",
-          "category": "unit",
-          "checks": "reapply result equals folding the unsaved commands through decide/evolve at the GitHub version; refused commands carry the engine's reason"
+          "category": "integration",
+          "checks": "reapply result equals folding the unsaved commands through decide/evolve at the GitHub version; refused commands carry the engine's reason",
+          "obligation": "PERSIST-012-O3"
         }
       ]
     },
@@ -324,7 +339,8 @@
           "id": "playwright:invariants/INV-13.spec.js > indicator equals machine projection [chromium]",
           "kind": "model",
           "category": "browser",
-          "checks": "for two investigations driven into different states the header, page and summary agree with the machine"
+          "checks": "for two investigations driven into different states the header, page and summary agree with the machine",
+          "obligation": "PERSIST-022-O2"
         }
       ]
     },
@@ -344,7 +360,8 @@
           "id": "dotnet:Causa.Invariants.Negative.INV14.ForbiddenPhrases",
           "kind": "negative",
           "category": "unit",
-          "checks": "every message the save-state projection can produce, for every state and cause, is scanned"
+          "checks": "every message the save-state projection can produce, for every state and cause, is scanned",
+          "obligation": "PERSIST-053-O2"
         }
       ]
     },
@@ -459,22 +476,28 @@
     {
       "id": "INV-20",
       "group": "verification-integrity",
-      "statement": "The candidate contains no application source, test or script copied from Causa or an earlier rehearsal repository.",
+      "statement": "The candidate contains no application source, test or script copied from Causa or an earlier rehearsal repository (indy-init-rehearsal-001 to indy-init-rehearsal-006 in the baseline; ODR-V4-02 proposes adding indy-init-rehearsal-007). The comparison is run by a verifier permitted to read those repositories, never by the implementing agent (Rehearsal 7 KD-009).",
       "sources": [
         "PERSIST-026",
         "PERSIST-052",
         "R0.1"
       ],
-      "proposals": [
-        "ODR-V4-02"
-      ],
+      "proposals": [],
       "machines": [],
       "tests": [
         {
-          "id": "dotnet:Causa.Acceptance.Deterministic.PERSIST052Tests.PERSIST-052-O3",
+          "id": "verifier:Causa.Acceptance.Independent.PAT13ProvenanceComparison",
           "kind": "deterministic",
           "category": "security",
-          "checks": "PAT-13 comparison, run by a verifier permitted to read the prior repositories"
+          "obligation": "PERSIST-052-O3",
+          "checks": "PAT-13 comparison against indy-init-rehearsal-001..006, run and recorded by the independent verifier at the exact final SHA"
+        },
+        {
+          "id": "verifier:Causa.Acceptance.Independent.PERSIST026Provenance",
+          "kind": "deterministic",
+          "category": "security",
+          "obligation": "PERSIST-026-O2",
+          "checks": "the same comparison recorded for PERSIST-026's copy ban by the independent verifier"
         }
       ]
     },
@@ -495,13 +518,15 @@
           "id": "dotnet:Causa.Invariants.Negative.INV21.CredentialDestinations",
           "kind": "negative",
           "category": "security",
-          "checks": "Rehearsal 7 F14: the credential is never sent to a plaintext or other host"
+          "checks": "Rehearsal 7 F14: the credential is never sent to a plaintext or other host",
+          "obligation": "PF-015-O4"
         },
         {
           "id": "playwright:invariants/INV-21.spec.js > no credential in storage, URL or artifact [chromium]",
           "kind": "negative",
           "category": "security",
-          "checks": "stores, URLs, console, screenshots and traces scanned for the test token"
+          "checks": "stores, URLs, console, screenshots and traces scanned for the test token",
+          "obligation": "PF-015-O4"
         }
       ]
     },
@@ -521,13 +546,15 @@
           "id": "dotnet:Causa.Invariants.Negative.INV22.RecordedGitHubAnswerForms",
           "kind": "negative",
           "category": "integration",
-          "checks": "classification of every recorded GitHub answer form, including STALE_DATA, FORBIDDEN 'is at <oid> but expected <oid>' (Rehearsal 7 KD-022) and HTTP 403 secondary rate-limit messages (KD-020)"
+          "checks": "classification of every recorded GitHub answer form, including STALE_DATA, FORBIDDEN 'is at <oid> but expected <oid>' (Rehearsal 7 KD-022) and HTTP 403 secondary rate-limit messages (KD-020)",
+          "obligation": "PERSIST-008-O2"
         },
         {
           "id": "dotnet:Causa.Invariants.Live.INV22.ThreeSimultaneousCommits",
           "kind": "live",
           "category": "live-provider",
-          "checks": "three simultaneous live commits to the test repository; every refusal GitHub returns is classified as a stale head"
+          "checks": "three simultaneous live commits to the test repository; every refusal GitHub returns is classified as a stale head",
+          "obligation": "PERSIST-008-O2"
         }
       ]
     },
@@ -547,6 +574,73 @@
           "kind": "deterministic",
           "category": "process-record",
           "checks": "conditor ci-policy check on the rehearsal repository at kickoff and on every candidate (DCC-013); Rehearsal 7 D-01 pipefail defect and WebKit stop-after-first-failure (9 NOT_RUN)"
+        }
+      ]
+    },
+    {
+      "id": "INV-24",
+      "group": "accessibility",
+      "statement": "Every save-state action and recovery path (Save, Retry, Check again, Reconnect, conflict review, reapply, discard and its confirmation) is operable by keyboard alone, has an accessible name, moves focus into any dialog it opens and returns focus when the dialog closes, and announces its result through the live regions PERSIST-030 requires; every colour comes from a Forma 0.12.0 token that exists.",
+      "sources": [
+        "UI-011",
+        "PERSIST-030",
+        "PERSIST-012",
+        "PERSIST-019",
+        "UI-016"
+      ],
+      "machines": [
+        "SM-SAVE",
+        "SM-CONFLICT",
+        "SM-CONNECTION"
+      ],
+      "tests": [
+        {
+          "id": "playwright:invariants/INV-24.spec.js > save-state and conflict actions by keyboard and screen reader [webkit]",
+          "kind": "deterministic",
+          "category": "accessibility",
+          "obligation": "UI-011-O1",
+          "checks": "keyboard-only operation, accessible names, focus into and back from the discard confirmation and Reconnect, live-region announcements, in WebKit (iPad target)"
+        },
+        {
+          "id": "dotnet:Causa.Invariants.Negative.INV24.FormaTokensExist",
+          "kind": "negative",
+          "category": "integration",
+          "obligation": "PERSIST-030-O2",
+          "checks": "every Forma custom property the stylesheet references exists in Forma 0.12.0's published token set (Rehearsal 7 post-deadline finding: four nonexistent token names)"
+        }
+      ]
+    },
+    {
+      "id": "INV-25",
+      "group": "data-preservation",
+      "statement": "A refused credential and a conflict whose GitHub version is deleted or unverifiable are also recoverable: re-authentication keeps every unsaved change, and an unresolvable conflict offers an export of the unsaved commands without writing to GitHub or browser storage.",
+      "sources": [
+        "PERSIST-031",
+        "PERSIST-012",
+        "UI-010"
+      ],
+      "proposals": [
+        "ODR-V4-04",
+        "ODR-V4-05"
+      ],
+      "machines": [
+        "SM-CONNECTION",
+        "SM-CONFLICT"
+      ],
+      "tests": [
+        {
+          "id": "playwright:invariants/INV-25.spec.js > reconnect keeps unsaved work [chromium]",
+          "kind": "deterministic",
+          "category": "browser",
+          "obligation": "PERSIST-031-O22",
+          "checks": "a revoked token followed by Reconnect with a new token keeps every unsaved change and saves it"
+        },
+        {
+          "id": "dotnet:Causa.Invariants.Negative.INV25.UnresolvableConflictExports",
+          "kind": "negative",
+          "category": "integration",
+          "obligation": "PERSIST-012-O2",
+          "checks": "a deleted or unverifiable GitHub version leaves the conflict with an export action and the work kept"
         }
       ]
     }

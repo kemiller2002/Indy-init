@@ -688,7 +688,7 @@
       "title": "AI proposal loop and time travel in Rehearsal 4 / event scope",
       "classification": "runtime-situational",
       "home": "ordo",
-      "statement": "Owner-approved in docs/OWNER-DECISIONS-2026-10-26.md (indy-init PR #20, OD-INDY-11). The structured AI proposal loop and time travel / semantic diff (T27, T28) are excluded from Rehearsal 4. The proposal-authority invariant (D-004) and prompt/data boundaries (R11.4) stay in scope. The event's scope for these features is decided from the Rehearsal 4 result (R4 section 6). The tasks leave the run only once the operator's approvals file (T09) covers the exclusion.",
+      "statement": "Owner-approved in docs/OWNER-DECISIONS-2026-10-26.md (indy-init PR #20, OD-INDY-11). The structured AI proposal loop and time travel / semantic diff (T27, T28) are excluded from Rehearsal 4. The proposal-authority invariant (D-004) and prompt/data boundaries (R11.4) stay in scope. The event's scope for these features is decided from the Rehearsal 4 result (R4 section 6). The tasks leave the run only once the operator's approvals file (T09) covers the exclusion. v4: DEC-R7-005 has since put S14 and S15 (time travel, semantic diff) in scope, so T28 is scheduled; the AI proposal loop's event scope is still undecided and is asked as ODR-V4-09 (T27 stays scheduled until then).",
       "constraints": [
         "D-004 and R11.4 stay in scope",
         "The exclusion reaches the verifier only through the operator's pinned approvals file (T09)"

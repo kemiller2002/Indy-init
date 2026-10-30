@@ -313,10 +313,20 @@
   },
   "timedRun": {
     "run": "Indy Init event build, November 7, 2026 (compiled package v4)",
-    "plan": "B-resource-optimized steps (one lead agent, AR-021) with minutes for both topologies; A-role-lanes is the only topology that fits the window and needs owner approval (ODR-V4-07)",
+    "plan": "Steps as B-resource-optimized (v3 pipeline); minutes for topologies A, B and C. C (role lanes with two UI agents) is the only topology that fits 420 minutes and needs owner approval (ODR-V4-07)",
     "topologies": [
       "A-role-lanes",
-      "B-single-lead"
+      "B-single-lead",
+      {
+        "id": "C-role-lanes-two-ui",
+        "base": "A-role-lanes",
+        "laneOverrides": {
+          "T26": "ui-2",
+          "T28": "ui-2",
+          "T29": "ui-2",
+          "T23": "ui-2"
+        }
+      }
     ],
     "clock": {
       "t0": "the UTC instant written to the kickoff record when the timer starts (operator or kickoff workflow; never the implementing agent)",
