@@ -1107,6 +1107,8 @@ The final interface should avoid raw obj, likely using an internal registry/code
 
 ## 42. Persistence port
 
+> **Superseded for Causa (ADR-R7-001, PERSIST-001).** From Rehearsal 7, Causa has no provider-version store port and no `ProviderConflict` result. A save is one GitHub commit made against an expected head and confirmed only when the committed bytes are read back. A stale head, a lost answer or a refusal is a typed event of the save state machine, never a store result. Causa's persistence boundary is the frozen v4.1 contracts IF41-STORAGE, IF41-WIRE, IF41-ERRORS and IF41-SAVE ([interface specifications](../requirements-compiled/v4.1/analysis/interface-specifications.json)), and [CAUSA-PERSISTENCE-REQUIREMENTS.md](CAUSA-PERSISTENCE-REQUIREMENTS.md) governs. This section remains long-term platform direction only.
+
 ```fsharp
 type ProviderVersion = private ProviderVersion of string
 
@@ -1178,6 +1180,8 @@ Property tests are useful for:
 - no Resolved when verification gate fails
 
 ## 46. Module boundary recommendation
+
+> **Superseded for Causa (ADR-R7-001).** Causa's project split for the event build is [project-structure.json](../requirements-compiled/v4.1/analysis/project-structure.json): Causa.Domain, Causa.Persistence, Causa.App and Causa.Host. It has no `LocalStore.fs` and no other browser store. An AI project is outside that split; its scope is owner decision ODR-V4-09. The dependency direction below is superseded too: Causa merges the application layer into Causa.App, which references Causa.Persistence, which references only Causa.Domain (App → Persistence → Domain); Domain still depends on nothing. [CAUSA-PERSISTENCE-REQUIREMENTS.md](CAUSA-PERSISTENCE-REQUIREMENTS.md) governs persistence. This section remains long-term platform direction only.
 
 Initial solution structure:
 

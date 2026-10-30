@@ -37,7 +37,7 @@ jobs:
           git -C "$RUNNER_TEMP/r7" sparse-checkout set --no-cone /evidence/FINAL-REPORT.md /evidence/provenance.md /evidence/defects.md /evidence/DECISIONS.md /evidence/traceability.json
           git -C "$RUNNER_TEMP/r7" checkout --quiet 9b307aa1d3d7d5e6fe1737680d03bf74fd90c1a9
           echo "CAUSA_R7_EVIDENCE=$RUNNER_TEMP/r7" >> "$GITHUB_ENV"
-      - name: Offline tests (baseline port reproduces the committed baseline, units, preflight verdict, v4 scope and controls)
+      - name: Offline tests (baseline port reproduces the committed baseline, units, preflight verdict, v4 and v4.1 scope and controls)
         run: dotnet run -c Release --no-build --project tools/requirements-compiler/tests -- --offline --source . --record "$RUNNER_TEMP/compiler-test-record.json"
       - name: F# and Python baseline generators agree byte for byte at this commit
         run: |
@@ -58,6 +58,39 @@ jobs:
           persist-credentials: false
       - name: Compiled package v4 is reproduced byte for byte and its checks W01-W16 pass
         run: dotnet tools/requirements-compiler/src/bin/Release/net10.0/requirements-compiler.dll v4 --source . --package requirements-compiled/v4 --registry .echelon-registry --r7-evidence "$CAUSA_R7_EVIDENCE" --verify-test-record "$RUNNER_TEMP/compiler-test-record.json" --check
+      - name: Download the Forma 0.12.0 npm tarball compiled package v4.1 pins, and verify its SHA-256
+        run: |
+          curl -fsSL -o "$RUNNER_TEMP/forma.tgz" https://registry.npmjs.org/@echelon-foundry/design-system/-/design-system-0.12.0.tgz
+          echo "b824568d528562658ded3d53ecd06504e907f7d42129facd86a8f298d1cb7aae  $RUNNER_TEMP/forma.tgz" | sha256sum -c -
+      - name: Compiled package v4.1 is reproduced byte for byte, its Forma inventory matches the published package, and its checks X01-X15 pass
+        run: dotnet tools/requirements-compiler/src/bin/Release/net10.0/requirements-compiler.dll v41 --source . --package requirements-compiled/v4.1 --base requirements-compiled/v4 --forma-tarball "$RUNNER_TEMP/forma.tgz" --check
+      - name: The frozen v4.1 interface contracts typecheck, and each negative control (forged Confirmation, credential read) is refused (built outside the checkout)
+        run: |
+          cp -r requirements-compiled/v4.1/contracts "$RUNNER_TEMP/contracts"
+          cp global.json "$RUNNER_TEMP/contracts/"
+          dotnet build "$RUNNER_TEMP/contracts/ContractCheck.fsproj" -c Release
+          for negative in "$RUNNER_TEMP"/contracts/negative/*.fs; do
+            name=$(basename "$negative")
+            cp "$RUNNER_TEMP/contracts/ContractCheck.fsproj" "$RUNNER_TEMP/contracts/Negative.fsproj"
+            sed -i "s|</ItemGroup>|  <Compile Include=\"negative/$name\" />\n  </ItemGroup>|" "$RUNNER_TEMP/contracts/Negative.fsproj"
+            if dotnet build "$RUNNER_TEMP/contracts/Negative.fsproj" -c Release > "$RUNNER_TEMP/negative.log" 2>&1; then echo "$name compiled but must not"; exit 1; fi
+            grep -q FS1093 "$RUNNER_TEMP/negative.log" || { echo "$name failed for another reason"; cat "$RUNNER_TEMP/negative.log"; exit 1; }
+            rm "$RUNNER_TEMP/contracts/Negative.fsproj"
+          done
+      - name: The predefined project structure bootstraps into an empty repository and builds
+        run: |
+          git init --quiet "$RUNNER_TEMP/app"
+          dotnet tools/requirements-compiler/src/bin/Release/net10.0/requirements-compiler.dll v41 --source . --package requirements-compiled/v4.1 --base requirements-compiled/v4 --bootstrap "$RUNNER_TEMP/app"
+          dotnet build "$RUNNER_TEMP/app/Causa.slnx" -c Release
+      - name: Executable Forma layout assertions pass on Forma 0.12.0 patterns and fail on broken fixtures (Chromium and WebKit)
+        run: |
+          mkdir -p "$RUNNER_TEMP/forma" "$RUNNER_TEMP/layout"
+          tar -xzf "$RUNNER_TEMP/forma.tgz" -C "$RUNNER_TEMP/forma"
+          cd "$RUNNER_TEMP/layout" && npm init -y > /dev/null && npm install --no-audit --no-fund playwright@1.63.0 axe-core@4.14.0 > /dev/null && npx playwright install --with-deps chromium webkit > /dev/null
+          cd "$GITHUB_WORKSPACE"
+          cp -r requirements-compiled/v4.1/layout-tests/. "$RUNNER_TEMP/layout/"
+          node "$RUNNER_TEMP/layout/run.mjs" --forma "$RUNNER_TEMP/forma/package" --contract requirements-compiled/v4.1/analysis/forma-layout-contract.json --inventory requirements-compiled/v4.1/analysis/forma-0.12.0-inventory.json --axe "$RUNNER_TEMP/layout/node_modules/axe-core/axe.min.js" --browsers chromium,webkit
+          node "$RUNNER_TEMP/layout/run.mjs" --forma "$RUNNER_TEMP/forma/package" --contract requirements-compiled/v4.1/analysis/forma-layout-contract.json --inventory requirements-compiled/v4.1/analysis/forma-0.12.0-inventory.json --axe "$RUNNER_TEMP/layout/node_modules/axe-core/axe.min.js" --catch-rate
       - name: Check out maintained Causa Data tooling
         uses: actions/checkout@v4
         with:

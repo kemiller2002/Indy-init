@@ -145,15 +145,15 @@
   ],
   "compiler": {
     "name": "requirements-compiler",
-    "treeSha256": "c1c620f13dc10943508daaf03a21a572f271bd9211225a226fb88cd862c41167",
+    "treeSha256": "9ac027489d492d3cac564c229363bcf13dd0b6553272517a156d250c30b5a5e5",
     "sdk": "10.0.402"
   },
   "compilerTests": {
     "schema": "indy-init.v4-compiler-test-record/1",
     "result": "PASS",
     "failures": 0,
-    "summary": "offline tests (baseline equivalence, baseline units, preflight verdict, verification plan, acceptance contracts, process evidence, v4 scope and controls): all passed",
-    "compilerTreeSha256": "c1c620f13dc10943508daaf03a21a572f271bd9211225a226fb88cd862c41167",
+    "summary": "offline tests (baseline equivalence, baseline units, preflight verdict, verification plan, acceptance contracts, process evidence, v4 scope and controls, v4.1 scope and controls): all passed",
+    "compilerTreeSha256": "9ac027489d492d3cac564c229363bcf13dd0b6553272517a156d250c30b5a5e5",
     "command": "dotnet run -c Release --project tools/requirements-compiler/tests -- --offline --source ."
   },
   "independentReview": {
@@ -217,7 +217,7 @@
       "condition": "Compiler tests pass",
       "status": "PASS",
       "evidence": "repository record (unauthenticated; see statesMeaning)",
-      "detail": "record: PASS, tree c1c620f13dc10943508daaf03a21a572f271bd9211225a226fb88cd862c41167 (current tree c1c620f13dc10943508daaf03a21a572f271bd9211225a226fb88cd862c41167); CI re-runs the suite and compares (--verify-test-record)"
+      "detail": "record: PASS, tree 9ac027489d492d3cac564c229363bcf13dd0b6553272517a156d250c30b5a5e5 (current tree 9ac027489d492d3cac564c229363bcf13dd0b6553272517a156d250c30b5a5e5); CI re-runs the suite and compares (--verify-test-record)"
     },
     {
       "id": "FG-09",
