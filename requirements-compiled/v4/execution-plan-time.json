@@ -328,7 +328,8 @@
         "T00"
       ],
       "completion": [
-        "requirements/causa-requirements-baseline-v4.json is the baseline the kickoff pins (BL-CAUSA-INDY-INIT-62df28a559c0), or a re-pin is recorded with an operator decision (RDP-001)"
+        "requirements/causa-requirements-baseline-v4.json is the baseline the kickoff pins (BL-CAUSA-INDY-INIT-62df28a559c0), or a re-pin is recorded with an operator decision (RDP-001)",
+        "the kickoff checks that tag indy-init-requirements-v4.0.0 exists, resolves to a commit on main whose requirements-compiled/v4/freeze-manifest.json reports READY-FOR-OWNER-FREEZE, and that the owner's approving review of that freeze pull request exists; otherwise the run uses the candidate and reports it as unfrozen"
       ],
       "gates": [
         "G0"

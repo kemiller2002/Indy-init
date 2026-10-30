@@ -56,6 +56,17 @@ let planInputs (source: string) : VerificationPlan.Inputs =
           Document = parseBytes approvals }
       Categories = { Path = "curation/evidence-categories.json"; Sha256 = Git.sha256Hex (File.ReadAllBytes categoriesPath); Table = parseFile categoriesPath } }
 
+/// RV3-1, end to end: writing the owner's records changes the approvals file, its pin and the plan digest, but not
+/// the content digest the package approval names, so the approval can name the plan that pins it.
+let approvalDigestControl (source: string) : string list =
+    let i = planInputs source
+    let withRecord = JObj [ "schema", JStr "causa.requirements-approvals/1"; "approvals", JArr [ JObj [ "decision_id", JStr "ODR-V4-01"; "action", JStr "approve-package" ] ] ]
+    let bytes = Text.Encoding.UTF8.GetBytes(serialize withRecord)
+    let approved = { i with Approvals = { i.Approvals with Commit = String('a', 40); Sha256 = Git.sha256Hex bytes; Document = withRecord } }
+    let before, after = VerificationPlan.build i, VerificationPlan.build approved
+    [ if VerificationPlan.digestOf before = VerificationPlan.digestOf after then yield "approval digest control: the plan digest did not change with the approvals pin (control is vacuous)"
+      if V4Package.planContentDigest before <> V4Package.planContentDigest after then yield "approval digest control: writing an approval record changes the content digest the record must name (RV3-1)" ]
+
 let scope (source: string) : string list =
     let i = planInputs source
     let plan = VerificationPlan.build i
@@ -150,7 +161,7 @@ let controls (source: string) : string list =
     let base0 = Program.v4Inputs source (v4 source) None evidence
     let i0 = { base0 with Registry = Some(syntheticRegistry base0.LockSource "approved") }
     let built0 = V4Package.build i0
-    let planDigest = field "planIdentity" i0.Plan |> Option.map (str "digest") |> Option.defaultValue ""
+    let planDigest = V4Package.planContentDigest i0.Plan
     let expectFail label (id: string) (i: V4Package.Inputs) =
         let b = V4Package.build i
         [ if (problemsOf b id).IsEmpty then yield sprintf "control %s: %s accepted a package it must reject" label id ]
@@ -170,7 +181,7 @@ let controls (source: string) : string list =
             match str "kind" p, field "approvalRecord" p with
             | "obligation-amendment", Some(JArr rs) -> rs |> List.map (setIn "approved_by" (JStr operator))
             | "package-approval", _ ->
-                [ JObj [ "decision_id", JStr "ODR-V4-01"; "action", JStr "approve-package"; "plan_digest", JStr planDigest
+                [ JObj [ "decision_id", JStr "ODR-V4-01"; "action", JStr "approve-package"; "plan_content_digest", JStr planDigest
                          "review_sha256", JStr reviewSha; "test_record_sha256", JStr testSha; "approved_by", JStr operator ] ]
             | "scope-or-topology", _ -> [ JObj [ "decision_id", JStr(str "id" p); "action", JStr "select-topology"; "topology", JStr "C-role-lanes-two-ui"; "approved_by", JStr operator ] ]
             | "scope", _ -> [ JObj [ "decision_id", JStr(str "id" p); "action", JStr "decide"; "option", JStr "A"; "approved_by", JStr operator ] ]
@@ -204,7 +215,7 @@ let controls (source: string) : string list =
           yield! blocked "an approver is not a trusted operator" { allRecorded with Approvals = withRecords (approvalRecords |> List.map (setIn "approved_by" (JStr "someone-else"))) }
           yield! blocked "an amendment approval carries a weaker criterion"
               { allRecorded with Approvals = withRecords (mapRecord (fun r -> strOpt "obligation_id" r = Some "PERSIST-031-O22") (setIn "criterion" (JStr "The action is Retry."))) }
-          yield! blocked "the package approval names another plan" { allRecorded with Approvals = withRecords (mapRecord (fun r -> strOpt "decision_id" r = Some "ODR-V4-01") (setIn "plan_digest" (JStr(String('e', 64))))) }
+          yield! blocked "the package approval names another plan" { allRecorded with Approvals = withRecords (mapRecord (fun r -> strOpt "decision_id" r = Some "ODR-V4-01") (setIn "plan_content_digest" (JStr(String('e', 64))))) }
           yield! blocked "the package approval names another review record" { allRecorded with ReviewSha256 = String('1', 64) }
           yield! blocked "the selected topology does not fit" { allRecorded with Approvals = withRecords (mapRecord (fun r -> strOpt "decision_id" r = Some "ODR-V4-07") (setIn "topology" (JStr "B-single-lead"))) }
           yield! blocked "no topology was selected" { allRecorded with Approvals = withRecords (approvalRecords |> List.filter (fun r -> strOpt "decision_id" r <> Some "ODR-V4-07")) }
@@ -213,6 +224,7 @@ let controls (source: string) : string list =
           yield! blocked "the reviewer is the implementer" { allRecorded with Review = setIn "reviewerIsImplementer" (JBool true) review }
           yield! blocked "the review record only claims PASS" { allRecorded with Review = JObj [ "verdict", JStr "PASS" ] }
           yield! blocked "the reviewer's last round failed although the author marked findings fixed" { allRecorded with Review = setIn "roundVerdicts" (JArr [ JObj [ "round", JInt 1L; "verdict", JStr "FAIL" ] ]) review }
+          yield! blocked "a scope decision names an option the request does not list" { allRecorded with Approvals = withRecords (mapRecord (fun r -> strOpt "decision_id" r = Some "ODR-V4-10") (setIn "option" (JStr "Z"))) }
           yield! blocked "a scope decision names no option" { allRecorded with Approvals = withRecords (mapRecord (fun r -> strOpt "decision_id" r = Some "ODR-V4-10") (fun r -> match r with JObj ps -> JObj(ps |> List.filter (fst >> (<>) "option")) | j -> j)) }
           yield! blocked "the freeze commit is not verified" { allRecorded with FreezeCommitVerified = false }
           yield! blocked "the window is too small for the selected topology" { allRecorded with Policy = setIn "clock" (JObj [ "timedMinutes", JInt 100L ]) allRecorded.Policy }
@@ -280,4 +292,4 @@ let verifyPlanControls () : string list =
       if covered (evidence [ "t [chromium]", "passed"; "t [webkit]", "passed" ]) <> [ "browser" ] then yield "verify-plan: both twins passed but the category is not covered (positive control)" ]
 
 let all (source: string) : string list =
-    (try scope source with ex -> [ "v4 scope: " + ex.Message ]) @ (try controls source with ex -> [ "v4 controls: " + ex.Message ]) @ verifyPlanControls ()
+    (try scope source with ex -> [ "v4 scope: " + ex.Message ]) @ (try approvalDigestControl source with ex -> [ "v4 approval digest: " + ex.Message ]) @ (try controls source with ex -> [ "v4 controls: " + ex.Message ]) @ verifyPlanControls ()

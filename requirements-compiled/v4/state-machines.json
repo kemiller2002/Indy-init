@@ -1031,7 +1031,8 @@
             "PERSIST-024",
             "PERSIST-046",
             "PERSIST-015"
-          ]
+          ],
+          "residual": "After a known stale head nothing was written, so Unknown commit outcome's fixed words ('may or may not have reached GitHub') overstate the uncertainty. PAT-07 (PERSIST-046-O4) allows only Offline or Unknown commit outcome here, and Offline is untrue while online. Recorded as a residual for the owner, not resolved."
         },
         {
           "id": "T-S60",

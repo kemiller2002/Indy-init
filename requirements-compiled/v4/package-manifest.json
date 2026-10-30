@@ -191,7 +191,7 @@
     },
     {
       "path": "curation/tasks.json",
-      "sha256": "47bb209e71255725e09cb00b98438c19ddcb7c9f5c425b2b7bd6c773bcd7dd1f"
+      "sha256": "8ba260d43e2dda88029548c6e064b0b6a9542a2529e92bfac6a233b0c65f53d9"
     },
     {
       "path": "curation/verification-plan.json",
@@ -223,15 +223,15 @@
     },
     {
       "path": "dependency-graph.json",
-      "sha256": "8585cee6757630be7f5b5f6bde72bf294530a875c1946787db791968f5bf01d0"
+      "sha256": "614ec49779e5863da773aa1237a638e58dc8bf5bcd9d0922a34ca0218a26689b"
     },
     {
       "path": "execution-plan-resource.json",
-      "sha256": "1bbd6ce9f3abf6724a5b26ce99aacd660a6d7c36738272e306005fcdf31d856b"
+      "sha256": "3750156b7d2ce064dd8769ad8f0d0d236c8b359bd7ca2b669713f66a2120f8e0"
     },
     {
       "path": "execution-plan-time.json",
-      "sha256": "1fcc474ec2ac2e51490e7176ad1da4f1c9d63bf3d27054e8f605807992ddf256"
+      "sha256": "27043a9d47f46f18afd04f9383ce9b062142f52ee724a0d363ebf5284525bbb7"
     },
     {
       "path": "normalized-requirements.json",
@@ -243,7 +243,7 @@
     },
     {
       "path": "preflight-manifest.json",
-      "sha256": "692c28064e6b911264ade5188ec01a3f3130e4243254f3db10c317a1bcb8870a"
+      "sha256": "d9deba3a10c024d3b5f5418cbad22a59f8af9efe03624584a73b45e93b286a18"
     },
     {
       "path": "requirements-inventory.json",

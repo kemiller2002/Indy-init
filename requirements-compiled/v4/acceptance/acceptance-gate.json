@@ -62,6 +62,11 @@
       "id": "AG-12",
       "acceptanceFailsWhen": "conditor ci-policy check fails on the final SHA, or a CI job running bound tests lacks CAUSA_PLAN",
       "checkedBy": "conditor ci-policy check (DCC-013); CI configuration (DCC-015)"
+    },
+    {
+      "id": "AG-13",
+      "acceptanceFailsWhen": "the requirements package the run used is not the frozen one: tag indy-init-requirements-v4.0.0 is missing, is not on main, or names a freeze-manifest whose verification-plan digest differs from the plan verify-plan used, or the owner's approving review of the freeze pull request is missing",
+      "checkedBy": "git (tag, merge-base, freeze-manifest digests) and the GitHub reviews API, at kickoff (T01) and at acceptance"
     }
   ]
 }

@@ -16,7 +16,7 @@
       "rationale": "The freeze gate requires every owner approval to exist. An agent cannot approve its own package (RDP-003, AR-003).",
       "impact": "Until approved, v4 is published as a CANDIDATE and the tag indy-init-requirements-v4.0.0 is not created.",
       "approvalRecord": {
-        "how": "An operator-written record in kickoff/rehearsal-007/approvals.causa.json, committed by the owner (not by an agent) and merged to main: {\"decision_id\": \"ODR-V4-01\", \"action\": \"approve-package\", \"package\": \"requirements-compiled/v4\", \"plan_digest\": \"<freeze-manifest verificationPlan.digest>\", \"review_sha256\": \"<sha256 of analysis/independent-review.json>\", \"test_record_sha256\": \"<sha256 of analysis/compiler-test-record.json>\", \"approved_by\": \"kemiller2002\", \"date\": \"<date>\"}. The record binds the owner's approval to the exact plan, review record and test record, which are agent-produced."
+        "how": "An operator-written record in kickoff/rehearsal-007/approvals.causa.json, committed by the owner (not by an agent) and merged to main: {\"decision_id\": \"ODR-V4-01\", \"action\": \"approve-package\", \"package\": \"requirements-compiled/v4\", \"plan_content_digest\": \"<freeze-manifest verificationPlan.contentDigest>\", \"review_sha256\": \"<sha256 of analysis/independent-review.json>\", \"test_record_sha256\": \"<sha256 of analysis/compiler-test-record.json>\", \"approved_by\": \"kemiller2002\", \"date\": \"<date>\"}. The record binds the owner's approval to the exact plan, review record and test record, which are agent-produced. The content digest leaves out the approvals pin, so writing this record does not invalidate it. The owner's approving GitHub review of the freeze pull request is also required; the compiler cannot authenticate the record by itself."
       },
       "affects": []
     },
@@ -63,7 +63,8 @@
           "obligation_id": "PERSIST-051-O2",
           "action": "amend",
           "criterion": "The test MUST verify that each legal transition reaches the state PERSIST-031 defines, that every illegal input fails closed with a typed fault, and that Saved is reached only from a read-back confirmation; it also verifies that a reply to a request the tab has superseded (an older load, refresh, conflict re-read or reconciliation read, or any reply whose base head or request identity no longer matches the tab's current one) is discarded without changing the state, the base head or the unsaved changes.",
-          "rationale": "Closes the stale-reply defect class found by Rehearsal 7's third review (ODR-V4-03)."
+          "rationale": "Closes the stale-reply defect class found by Rehearsal 7's third review (ODR-V4-03).",
+          "combinedCriterion": "The test MUST verify that each legal transition reaches the state PERSIST-031 defines, that every illegal input fails closed with a typed fault, and that Saved is reached only from a read-back confirmation, or from the verified-load confirmation of the amended PERSIST-023-O2, and from no other input; it also verifies that a reply to a request the tab has superseded (an older load, refresh, conflict re-read or reconciliation read, or any reply whose base head or request identity no longer matches the tab's current one) is discarded without changing the state, the base head or the unsaved changes."
         }
       ],
       "recommendation": "Approve.",
@@ -198,10 +199,17 @@
           "action": "amend",
           "criterion": "Acceptance: PAT-02 and PAT-10 verify that Saved appears only after the read-back, and PAT-12 verifies that no other transition reaches Saved, other than the verified-load confirmation of the amended PERSIST-023-O2, which PAT-12 verifies separately.",
           "rationale": "PAT-12 must check both legal entries to Saved and no third (ODR-V4-08)."
+        },
+        {
+          "obligation_id": "PERSIST-051-O2",
+          "action": "amend",
+          "criterion": "The test MUST verify that each legal transition reaches the state PERSIST-031 defines, that every illegal input fails closed with a typed fault, and that Saved is reached only from a read-back confirmation, or from the verified-load confirmation of the amended PERSIST-023-O2, and from no other input.",
+          "combinedCriterion": "The test MUST verify that each legal transition reaches the state PERSIST-031 defines, that every illegal input fails closed with a typed fault, and that Saved is reached only from a read-back confirmation, or from the verified-load confirmation of the amended PERSIST-023-O2, and from no other input; it also verifies that a reply to a request the tab has superseded (an older load, refresh, conflict re-read or reconciliation read, or any reply whose base head or request identity no longer matches the tab's current one) is discarded without changing the state, the base head or the unsaved changes.",
+          "rationale": "PAT-12 must accept the verified-load route to Saved once PERSIST-023-O2 is amended (ODR-V4-08). If ODR-V4-03 is also approved, write combinedCriterion once for both: an obligation can carry only one amendment."
         }
       ],
       "recommendation": "Approve.",
-      "impact": "Makes T-S38 and SM-LOAD T-L03 normative. PERSIST-051-O2's 'read-back confirmation' then includes the verified-load confirmation, because the amended PERSIST-023-O2 defines it as one; if ODR-V4-03 is also approved, its PERSIST-051-O2 criterion is read with that definition.",
+      "impact": "Makes T-S38 and SM-LOAD T-L03 normative. PAT-12 then checks two legal entries to Saved and no third.",
       "affects": [
         "PERSIST-023",
         "PERSIST-021",

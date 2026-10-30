@@ -5,8 +5,8 @@
   "states": {
     "compiled": true,
     "validated": true,
-    "independentlyReviewed": false,
-    "approvalRecorded": false,
+    "independentReviewRecordPasses": false,
+    "ownerApprovalRecordsComplete": false,
     "frozen": false
   },
   "sourceCommit": "62df28a559c054226dd4022e9744cf1db06e954f",
@@ -30,6 +30,8 @@
   "verificationPlan": {
     "planId": "VP-9817d9814482",
     "digest": "9817d98144822dcc810aa383fde9ff16f8ebb9931f5bf6aeca76256dbe7061c4",
+    "contentDigest": "53af6eb2be8d1bf54474032df8c57bfad0ec9d377eb9ee77afc3277126e2bad8",
+    "contentDigestCovers": "the plan without planIdentity and source.approvals; the owner's package approval names it (ODR-V4-01)",
     "fileSha256": "6d132d6ac0758e625b3295bde8f07fc5ef12907c9552a6c515e4aa786906434d"
   },
   "dependencyLockSha256": "f9a7b9883a27cf7f1f6f22e0c31efd939611fa24f5e5f08d09abfe34cf858147",
@@ -37,12 +39,12 @@
   "executionPlanSha256": "d5aea873582bd3a533f52894b0651e8bf36bbb6d9ac929703941fef92a9c4f85",
   "acceptanceSha256": {
     "acceptance-obligations.json": "f0c5130f4658530cf9c3b39ee33d872d6a256da571d46dc96140fbdbfc71818c",
-    "acceptance-gate.json": "19ef5a5dbccc62112e250c328055be9c383fc994965a89d09125b8cc42ef3fb6"
+    "acceptance-gate.json": "035741e18b41b03ca09b13a7818705cad2d276ac03d5fa61e968b0115bf32c65"
   },
   "files": [
     {
       "path": "acceptance/acceptance-gate.json",
-      "sha256": "19ef5a5dbccc62112e250c328055be9c383fc994965a89d09125b8cc42ef3fb6"
+      "sha256": "035741e18b41b03ca09b13a7818705cad2d276ac03d5fa61e968b0115bf32c65"
     },
     {
       "path": "acceptance/acceptance-obligations.json",
@@ -62,7 +64,7 @@
     },
     {
       "path": "dependency-graph.json",
-      "sha256": "8585cee6757630be7f5b5f6bde72bf294530a875c1946787db791968f5bf01d0"
+      "sha256": "614ec49779e5863da773aa1237a638e58dc8bf5bcd9d0922a34ca0218a26689b"
     },
     {
       "path": "dependency-lock.json",
@@ -90,7 +92,7 @@
     },
     {
       "path": "package-manifest.json",
-      "sha256": "29cfee09a1695b4963730bda58b94223cf6167eb6e3f023d73fde4ae66487dbb"
+      "sha256": "3d2bdf7dc1223a9e381529b9282d4b1cf2e4d5ba60295ada365752a9aaa186e7"
     },
     {
       "path": "package-validation-report.json",
@@ -98,7 +100,7 @@
     },
     {
       "path": "preflight-manifest.json",
-      "sha256": "692c28064e6b911264ade5188ec01a3f3130e4243254f3db10c317a1bcb8870a"
+      "sha256": "d9deba3a10c024d3b5f5418cbad22a59f8af9efe03624584a73b45e93b286a18"
     },
     {
       "path": "proposals/v4-strengthened-bindings.proposed.json",
@@ -126,7 +128,7 @@
     },
     {
       "path": "state-machines.json",
-      "sha256": "b0e3e14ec6d11ebbcfec8689cf6e9cce1aafd1f82ddb448c4ac7424a6efd2c4c"
+      "sha256": "504a26a0bb8ae4afeedfb7f4cabec53cbace7cdf634e044bb770a3b0e66d3b2e"
     },
     {
       "path": "timed-execution-manifest.json",
@@ -143,7 +145,7 @@
   ],
   "compiler": {
     "name": "requirements-compiler",
-    "treeSha256": "c5a3a18f34790505ad9bc9f33684ac5f23f74ab8a6c9386357bf7258946ad1d2",
+    "treeSha256": "89ed8e4c53f8d731ecf507b0921de033599537a7c3a94382d9a110366313ed58",
     "sdk": "10.0.402"
   },
   "compilerTests": {
@@ -151,13 +153,13 @@
     "result": "PASS",
     "failures": 0,
     "summary": "offline tests (baseline equivalence, baseline units, preflight verdict, verification plan, acceptance contracts, process evidence, v4 scope and controls): all passed",
-    "compilerTreeSha256": "c5a3a18f34790505ad9bc9f33684ac5f23f74ab8a6c9386357bf7258946ad1d2",
+    "compilerTreeSha256": "89ed8e4c53f8d731ecf507b0921de033599537a7c3a94382d9a110366313ed58",
     "command": "dotnet run -c Release --project tools/requirements-compiler/tests -- --offline --source ."
   },
   "independentReview": {
     "verdict": "",
     "reviewer": "independent read-only Claude Code subagent (fresh context; not the package author)",
-    "rounds": 2,
+    "rounds": 3,
     "record": "independent-review.md"
   },
   "freezeGate": [
@@ -207,13 +209,13 @@
       "id": "FG-08",
       "condition": "Compiler tests pass",
       "status": "PASS",
-      "detail": "record: PASS, tree c5a3a18f34790505ad9bc9f33684ac5f23f74ab8a6c9386357bf7258946ad1d2 (current tree c5a3a18f34790505ad9bc9f33684ac5f23f74ab8a6c9386357bf7258946ad1d2); CI re-runs the suite and compares (--verify-test-record)"
+      "detail": "record: PASS, tree 89ed8e4c53f8d731ecf507b0921de033599537a7c3a94382d9a110366313ed58 (current tree 89ed8e4c53f8d731ecf507b0921de033599537a7c3a94382d9a110366313ed58); CI re-runs the suite and compares (--verify-test-record)"
     },
     {
       "id": "FG-09",
       "condition": "Independent review passes",
       "status": "FAIL",
-      "detail": "computed from 22 finding(s) and the reviewer's last round verdict (FAIL); reviewer independent read-only Claude Code subagent (fresh context; not the package author)"
+      "detail": "computed from 28 finding(s) and the reviewer's last round verdict (FAIL); reviewer independent read-only Claude Code subagent (fresh context; not the package author)"
     },
     {
       "id": "FG-10",
@@ -245,6 +247,12 @@
     "review RV2-6 (minor): fixed",
     "review RV2-7 (minor): fixed",
     "review RV2-8 (minor): accepted",
+    "review RV3-1 (major): fixed",
+    "review RV3-2 (major): decided-by-owner",
+    "review RV3-3 (minor): fixed",
+    "review RV3-4 (minor): fixed",
+    "review RV3-5 (minor): accepted",
+    "review RV3-6 (minor): fixed",
     "owner decision ODR-V4-01 pending",
     "owner decision ODR-V4-02 pending",
     "owner decision ODR-V4-03 pending",
@@ -259,6 +267,7 @@
   ],
   "freezeTimestamp": "2026-10-30T00:00:00Z",
   "freezeTimestampMeaning": "the time this package was compiled; the compiler never freezes a package",
+  "statesMeaning": "compiled and validated are computed by the compiler. independentReviewRecordPasses and ownerApprovalRecordsComplete are read from repository records whose authors the compiler cannot authenticate (the review record is written by the package author from the reviewer's report; approval records are checked for a trusted approver name, a commit without agent trailers, and origin/main, all of which a local actor can forge). frozen is never computed.",
   "frozenBy": "the owner's approving review of the freeze pull request on GitHub, then the tag indy-init-requirements-v4.0.0 on its merge commit; neither is computed from repository files",
   "tag": "none: every gate must pass first"
 }

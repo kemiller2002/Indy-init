@@ -532,7 +532,8 @@ let acceptanceGate (i: Inputs) : Json =
                 g "AG-09" "an acceptance obligation, binding or amendment differs from the frozen package without an operator approval record" "verify-plan (UNAUTHORIZED-AMENDMENT); requirements-compiler v4 --check against freeze-manifest.json"
                 g "AG-10" "the independent review of the final SHA is missing, or authored by the implementing agent, or reports an unresolved critical finding" "praxis:independent-review record; verify-plan review attestations"
                 g "AG-11" "an in-scope critical defect class is open or lacks SHA-bound closure evidence" "requirements-compiler verify-defect-closures and assertion-ratchet (base = kickoff) before the candidate freeze (DCC-014)"
-                g "AG-12" "conditor ci-policy check fails on the final SHA, or a CI job running bound tests lacks CAUSA_PLAN" "conditor ci-policy check (DCC-013); CI configuration (DCC-015)" ] ]
+                g "AG-12" "conditor ci-policy check fails on the final SHA, or a CI job running bound tests lacks CAUSA_PLAN" "conditor ci-policy check (DCC-013); CI configuration (DCC-015)"
+                g "AG-13" "the requirements package the run used is not the frozen one: tag indy-init-requirements-v4.0.0 is missing, is not on main, or names a freeze-manifest whose verification-plan digest differs from the plan verify-plan used, or the owner's approving review of the freeze pull request is missing" "git (tag, merge-base, freeze-manifest digests) and the GitHub reviews API, at kickoff (T01) and at acceptance" ] ]
 
 // ---- analysis validation -----------------------------------------------------------------------------
 
@@ -920,6 +921,23 @@ let validationReport (i: Inputs) (checks: Check list) : Json =
 
 type Gate = { Id: string; Condition: string; Pass: bool; Detail: string }
 
+/// The digest the owner's package approval names: the plan without its planIdentity and without source.approvals.
+/// The approvals pin must be left out, because writing the approval changes the approvals file and so the pin; a
+/// digest that covered it could never be named by the record it pins (v4 review RV3-1).
+let planContentDigest (plan: Json) =
+    let strip (j: Json) =
+        match j with
+        | JObj ps ->
+            JObj(
+                ps
+                |> List.filter (fst >> (<>) "planIdentity")
+                |> List.map (fun (k, v) ->
+                    match k, v with
+                    | "source", JObj sp -> k, JObj(sp |> List.filter (fst >> (<>) "approvals"))
+                    | _ -> k, v))
+        | j -> j
+    strip plan |> serialize |> Text.Encoding.UTF8.GetBytes |> Git.sha256Hex
+
 /// Approval records the gate may count: written by a trusted operator, in a file whose last change is not
 /// agent-attributed, at a commit reachable from main (RDP-003). Anything else counts as no record.
 let validRecords (i: Inputs) =
@@ -930,7 +948,7 @@ let validRecords (i: Inputs) =
 let private packageApproved (i: Inputs) (planDigest: string) =
     validRecords i
     |> List.exists (fun a ->
-        sOr "decision_id" a = "ODR-V4-01" && sOr "action" a = "approve-package" && sOr "plan_digest" a = planDigest
+        sOr "decision_id" a = "ODR-V4-01" && sOr "action" a = "approve-package" && sOr "plan_content_digest" a = planDigest
         && sOr "review_sha256" a = i.ReviewSha256 && sOr "test_record_sha256" a = i.TestRecordSha256)
 
 /// The topology the owner selected (ODR-V4-07), if any.
@@ -940,10 +958,15 @@ let selectedTopology (i: Inputs) =
 /// Owner decision requests still without a valid operator record. An amendment counts only when the record carries
 /// exactly the proposed obligation, action and criterion, so a weaker text cannot clear it.
 let pendingDecisions (i: Inputs) (planDigest: string) =
+    // planDigest is the plan content digest (planContentDigest).
     let records = validRecords i
     let decided = records |> List.map (sOr "decision_id") |> Set.ofList
+    // A proposed record may name a combined criterion to use when another request amends the same obligation.
     let amendRecorded (r: Json) =
-        records |> List.exists (fun a -> sOr "obligation_id" a = sOr "obligation_id" r && sOr "action" a = "amend" && sOr "criterion" a = sOr "criterion" r)
+        let accepted = [ sOr "criterion" r; sOr "combinedCriterion" r ] |> List.filter ((<>) "")
+        records |> List.exists (fun a -> sOr "obligation_id" a = sOr "obligation_id" r && sOr "action" a = "amend" && List.contains (sOr "criterion" a) accepted)
+    // A scope option is the letter before ':' of one of the request's options.
+    let letters (p: Json) = strs "options" p |> List.choose (fun o -> match o.IndexOf(':') with n when n > 0 -> Some(o.Substring(0, n).Trim()) | _ -> None)
     arr "requests" i.Proposals
     |> List.filter (fun p ->
         match str "kind" p with
@@ -955,7 +978,7 @@ let pendingDecisions (i: Inputs) (planDigest: string) =
         | "scope-or-topology" -> (selectedTopology i).IsNone
         | "scope" ->
             // A scope decision names the option chosen (its letter, as in the request's options).
-            not (records |> List.exists (fun a -> sOr "decision_id" a = str "id" p && sOr "option" a <> ""))
+            not (records |> List.exists (fun a -> sOr "decision_id" a = str "id" p && List.contains (sOr "option" a) (letters p)))
         | _ -> not (decided.Contains(str "id" p)))
     |> List.map (str "id")
 
@@ -1001,13 +1024,15 @@ let freezeStatus (b: Built) (gs: Gate list) (legacyPass: bool) =
     let reviewed = pass "FG-09"
     let approved = pass "FG-05"
     let allPass = gs |> List.forall (fun g -> g.Pass)
-    [ "compiled", legacyPass; "validated", validated; "independentlyReviewed", reviewed; "approvalRecorded", approved; "frozen", false ],
+    // compiled and validated are computed; the review and approval states rest on repository records the compiler
+    // cannot authenticate (v4 review RV3-2), so they are named as records; frozen is never computed.
+    [ "compiled", legacyPass; "validated", validated; "independentReviewRecordPasses", reviewed; "ownerApprovalRecordsComplete", approved; "frozen", false ],
     (if allPass then "READY-FOR-OWNER-FREEZE" else "CANDIDATE")
 
 let freezeManifest (i: Inputs) (b: Built) (digests: (string * string) list) (legacyPass: bool) : Json =
     let planIdentity = field "planIdentity" i.Plan |> Option.defaultValue JNull
     let planDigest = str "digest" planIdentity
-    let gs = gates i b planDigest
+    let gs = gates i b (planContentDigest i.Plan)
     let states, status = freezeStatus b gs legacyPass
     let digest name = digests |> List.tryFind (fst >> (=) name) |> Option.map snd |> Option.defaultValue ""
     let acceptance = b.Files |> List.find (fst >> (=) "acceptance/acceptance-obligations.json") |> snd
@@ -1035,7 +1060,7 @@ let freezeManifest (i: Inputs) (b: Built) (digests: (string * string) list) (leg
                 "stateMachines", jint (arr "machines" i.StateMachines).Length
                 "r7Lessons", jint (arr "lessons" i.Lessons).Length
                 "ownerDecisionRequests", jint (arr "requests" i.Proposals).Length ]
-          "verificationPlan", JObj [ "planId", JStr(str "planId" planIdentity); "digest", JStr planDigest; "fileSha256", JStr(digest "verification-plan.json") ]
+          "verificationPlan", JObj [ "planId", JStr(str "planId" planIdentity); "digest", JStr planDigest; "contentDigest", JStr(planContentDigest i.Plan); "contentDigestCovers", JStr "the plan without planIdentity and source.approvals; the owner's package approval names it (ODR-V4-01)"; "fileSha256", JStr(digest "verification-plan.json") ]
           "dependencyLockSha256", JStr(digest "dependency-lock.json")
           "executionManifestSha256", JStr(digest "timed-execution-manifest.json")
           "executionPlanSha256", JStr(digest "execution-plan.json")
@@ -1048,5 +1073,6 @@ let freezeManifest (i: Inputs) (b: Built) (digests: (string * string) list) (leg
           "unresolvedFindings", jstrs unresolved
           "freezeTimestamp", JStr(sOr "compiledAt" i.FreezeInput)
           "freezeTimestampMeaning", JStr "the time this package was compiled; the compiler never freezes a package"
+          "statesMeaning", JStr "compiled and validated are computed by the compiler. independentReviewRecordPasses and ownerApprovalRecordsComplete are read from repository records whose authors the compiler cannot authenticate (the review record is written by the package author from the reviewer's report; approval records are checked for a trusted approver name, a commit without agent trailers, and origin/main, all of which a local actor can forge). frozen is never computed."
           "frozenBy", JStr "the owner's approving review of the freeze pull request on GitHub, then the tag indy-init-requirements-v4.0.0 on its merge commit; neither is computed from repository files"
           "tag", JStr(if status = "READY-FOR-OWNER-FREEZE" then "indy-init-requirements-v4.0.0 may be created after the owner's approving review" else "none: every gate must pass first") ]

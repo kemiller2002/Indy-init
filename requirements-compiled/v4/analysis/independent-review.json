@@ -3,7 +3,7 @@
   "description": "Record of the independent adversarial review of package v4. The reviewer was a fresh, read-only Claude Code subagent. It received the sources, the artifacts and the compiler, but not the compiler author's conclusions. Its verdicts are copied as given. The status of each finding is the remediation the package author made; the reviewer's next round verifies it. FG-09 computes its result from this record, not from any verdict field. The owner's package approval (ODR-V4-01) must name this file's SHA-256. This record is agent-produced: the reviewer is an agent, and so is the author of this file.",
   "reviewer": "independent read-only Claude Code subagent (fresh context; not the package author)",
   "reviewerIsImplementer": false,
-  "rounds": 2,
+  "rounds": 3,
   "roundVerdicts": [
     {
       "round": 1,
@@ -16,6 +16,12 @@
       "verdict": "FAIL",
       "reviewedState": "claude/requirements-v4 at 7cd70c6",
       "summary": "RV-1, RV-2, RV-3, RV-6, RV-10, RV-11, RV-14 partly resolved; RV-4, RV-5, RV-8, RV-9, RV-12, RV-13 resolved; new: 2 critical, 3 major, 3 minor"
+    },
+    {
+      "round": 3,
+      "verdict": "FAIL",
+      "reviewedState": "claude/requirements-v4 at 67886ee",
+      "summary": "no critical finding open; RV2-2, -3, -4, -6, -7 resolved; RV2-1 and RV2-5 partly resolved; new: 2 major (RV3-1, RV3-2), 4 minor"
     }
   ],
   "findings": [
@@ -133,7 +139,8 @@
       "status": "fixed",
       "title": "A forged set of inputs reached FROZEN",
       "remediation": "The compiler no longer declares FROZEN under any input. When every gate passes, it reports READY-FOR-OWNER-FREEZE. Freezing is the owner's act on GitHub: their approving review of the freeze pull request, then the tag. Only origin/main counts. FG-09 reads the reviewer's last round verdict, not fields the author writes. Negative controls cover the forged review and the frozen flag.",
-      "residual": "The gate's records are still repository files. The compiler only reports readiness, and authenticity is established by the owner's GitHub review."
+      "residual": "The gate's records are still repository files. The compiler only reports readiness, and authenticity is established by the owner's GitHub review.",
+      "round3": "partly resolved (reviewer): see RV3-2"
     },
     {
       "id": "RV2-2",
@@ -162,7 +169,8 @@
       "severity": "major",
       "status": "fixed",
       "title": "ODR-V4-08 left PERSIST-007-O2 and -O4 contradicting the Saved-from-load route",
-      "remediation": "ODR-V4-08 now amends PERSIST-023-O2, PERSIST-007-O2 and PERSIST-007-O4, and is labelled a relaxation."
+      "remediation": "ODR-V4-08 now amends PERSIST-023-O2, PERSIST-007-O2 and PERSIST-007-O4, and is labelled a relaxation.",
+      "round3": "partly resolved (reviewer): see RV3-4"
     },
     {
       "id": "RV2-6",
@@ -185,6 +193,50 @@
       "title": "FG-08 trusts the committed test record locally",
       "remediation": "CI re-runs the suite and compares the record (--verify-test-record). Because the compiler no longer declares FROZEN, a stale local record cannot freeze the package.",
       "residual": "Freshness outside CI is not checked."
+    },
+    {
+      "id": "RV3-1",
+      "severity": "major",
+      "status": "fixed",
+      "title": "The package approval could never match: writing it changed the approvals pin and so the plan digest",
+      "remediation": "The approval now names verificationPlan.contentDigest: the plan without planIdentity and source.approvals (V4Package.planContentDigest). An end-to-end control (V4Tests.approvalDigestControl) adds an approval record, recompiles the plan, and checks that the plan digest changes and the content digest does not."
+    },
+    {
+      "id": "RV3-2",
+      "severity": "major",
+      "status": "decided-by-owner",
+      "title": "FG-09 and FG-05/FG-10 rest on records an agent or local actor can write",
+      "remediation": "This is not fixed in the compiler, and cannot be offline. The manifest states are renamed independentReviewRecordPasses and ownerApprovalRecordsComplete, and statesMeaning says they are unauthenticated. The compiler never computes frozen. The freeze is authenticated only by the owner's approving GitHub review and the tag, which T01 and acceptance gate AG-13 check. The owner's approval of the package (ODR-V4-01) is the decision that accepts this residual.",
+      "residual": "Unauthenticated records; mitigated by the owner's GitHub review (RISK-13). Status 'decided-by-owner' means routed to ODR-V4-01; it is not yet decided."
+    },
+    {
+      "id": "RV3-3",
+      "severity": "minor",
+      "status": "fixed",
+      "title": "FREEZE.md missing and the freeze never checked",
+      "remediation": "FREEZE.md was added. T01's completion conditions and AG-13 check the tag, its commit on main, the manifest digests and the owner's review."
+    },
+    {
+      "id": "RV3-4",
+      "severity": "minor",
+      "status": "fixed",
+      "title": "PERSIST-051-O2 still forbade the verified-load route",
+      "remediation": "ODR-V4-08 now also amends PERSIST-051-O2. Because one obligation takes one amendment, ODR-V4-03 and ODR-V4-08 share a combinedCriterion for it, and the gate accepts either the single or the combined text."
+    },
+    {
+      "id": "RV3-5",
+      "severity": "minor",
+      "status": "accepted",
+      "title": "T-S59 shows Unknown outcome after a known stale head",
+      "remediation": "Recorded as a residual on T-S59. PAT-07 allows only Offline or Unknown commit outcome, and Offline is untrue while online.",
+      "residual": "Unknown outcome's fixed words overstate the uncertainty in this case."
+    },
+    {
+      "id": "RV3-6",
+      "severity": "minor",
+      "status": "fixed",
+      "title": "Scope option accepted any string",
+      "remediation": "The option must be the letter of one of the request's listed options (negative control)."
     }
   ]
 }
