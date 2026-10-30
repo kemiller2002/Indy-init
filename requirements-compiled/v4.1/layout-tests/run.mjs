@@ -6,7 +6,10 @@
 //   the pattern with the gap's remedy CSS, which may use only Forma tokens, must pass.
 // Usage: node run.mjs --forma <extracted Forma package dir> --contract <forma-layout-contract.json>
 //                     --inventory <forma inventory json> [--axe axe.min.js] [--browsers chromium,webkit] [--out results.json]
+//                     [--catch-rate]
 // Exit 0 when every positive run passes and every negative run fails; 1 otherwise; 2 for unusable input.
+// --catch-rate instead measures the kit against the review defect pages (catch-rate.mjs): it prints the catch rate
+// and exits 1 when a violation is missed without an R41-11 disclosure or a conforming page fails.
 
 import { readFileSync, writeFileSync, mkdtempSync } from 'node:fs';
 import { join, resolve } from 'node:path';
@@ -15,6 +18,7 @@ import { pathToFileURL } from 'node:url';
 import { createRequire } from 'node:module';
 import { assertions } from './assertions.mjs';
 import { brokenFixtures, conformingFixtures } from './fixtures.mjs';
+import { cases as reviewCases } from './catch-rate.mjs';
 
 const require = createRequire(import.meta.url);
 const playwright = require('playwright');
@@ -93,7 +97,28 @@ const execute = browser => async run => {
 
 const sequence = (xs, f) => xs.reduce((acc, x) => acc.then(rs => f(x).then(r => [...rs, r])), Promise.resolve([]));
 
+// A failure that only says a page element is missing does not show the defect was found.
+const absence = /^(no (element received focus|dialog invoker|status indicator|save-state indicator|loading placeholder|fault on the page|navigation landmark|Forma navigation shell)|error: )/;
+const catchRate = async () => {
+  const runs = reviewCases.flatMap(c => c.vps.map(vp => ({ rule: c.id, assertion: c.assertion, emulate: c.forced ? { forcedColors: 'active' } : {}, kind: 'catch', target: c.id, body: typeof c.body === 'function' ? c.body(pattern) : c.body, vp, scheme: c.scheme || 'light', case: c })));
+  const browser = await playwright.chromium.launch();
+  const done = await sequence(runs, run => execute(browser)(run).then(r => ({ ...r, case: run.case, found: r.violations.filter(v => !absence.test(v)) })));
+  await browser.close();
+  const of = verdict => done.filter(r => (verdict === 'other' ? !['violation', 'conforming'].includes(r.case.verdict) : r.case.verdict === verdict));
+  const violations = of('violation');
+  const caught = violations.filter(r => r.found.length > 0);
+  const missed = violations.filter(r => r.found.length === 0);
+  const undisclosed = missed.filter(r => !r.case.disclosed);
+  const conformingFailed = of('conforming').filter(r => r.violations.length > 0);
+  console.log(`catch rate (Chromium, own assertion): ${caught.length} of ${violations.length} violation runs caught; ${missed.length - undisclosed.length} disclosed misses; ${of('other').length} runs of pages that are not violations; ${of('conforming').length - conformingFailed.length} of ${of('conforming').length} conforming runs pass`);
+  missed.forEach(r => console.log(`  ${r.case.disclosed ? 'DISCLOSED' : 'MISSED'} round ${r.case.round} ${r.case.id} ${r.assertion} ${r.vp}${r.case.disclosed ? ': ' + r.case.disclosed : ''}`));
+  conformingFailed.forEach(r => console.log(`  FALSE FAILURE round ${r.case.round} ${r.case.id} ${r.assertion} ${r.vp}: ${r.violations.slice(0, 3).join('; ')}`));
+  if (args.out) writeFileSync(args.out, JSON.stringify(done.map(r => ({ id: r.case.id, round: r.case.round, verdict: r.case.verdict, assertion: r.assertion, vp: r.vp, violations: r.violations })), null, 2) + '\n');
+  process.exit(undisclosed.length === 0 && conformingFailed.length === 0 ? 0 : 1);
+};
+
 const main = async () => {
+  if ('catch-rate' in args) return catchRate();
   const unknown = contract.rules.flatMap(r => (r.executable || []).filter(x => !assertions[x.assertion] || !brokenFixtures[x.assertion] || (x.fixtures || []).some(f => !conformingFixtures[f])).map(x => `${r.id}: ${x.assertion}`));
   if (unknown.length > 0) {
     console.error(`unknown assertions or missing fixtures: ${unknown.join(', ')}`);

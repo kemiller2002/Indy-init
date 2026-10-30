@@ -5,6 +5,7 @@
 module V41Tests
 
 open System.IO
+open System.Text.RegularExpressions
 open Json
 
 let private setIn (key: string) (value: Json) (j: Json) =
@@ -162,6 +163,10 @@ let controls (source: string) : string list =
       yield! expectFail "missing conforming fixture" "X15" (formaRule "FL-08" (setIn "executable" (JArr [ JObj [ "assertion", JStr "faultStatesPreserved"; "fixtures", jstrs [ "noSuchFixture" ]; "viewports", JStr "all" ] ])))
       yield! expectFail "unknown composed pattern" "X15" (formaRule "FL-07" (setIn "executable" (JArr [ JObj [ "assertion", JStr "indicatorComposed"; "composed", JArr [ jstrs [ "record-header"; "causa-banner" ] ]; "viewports", JStr "all" ] ])))
       yield! expectFail "event-build copy unowned" "X15" (structure (mapArr "testHelpers" (List.filter (fun h -> strOpt "path" h <> Some "tests/browser/support/layout-assertions.mjs"))))
+      // X15 round 7 (RV41-7-7): the report's stated coverage must equal the contract's and the kit's.
+      let report f = { i0 with AuthoredText = i0.AuthoredText |> List.map (fun (n, t) -> if n = "optimization-report.md" then n, f t else n, t) }
+      yield! expectFail "stale stated coverage" "X15" (report (fun t -> Regex.Replace(t, @"(\d+) broken pages", "1 broken pages")))
+      yield! expectFail "stated coverage missing" "X15" (report (fun t -> Regex.Replace(t, @"\d+ of \d+ rules, ", "")))
       yield! expectFail "kit without broken fixtures" "X15" { i0 with AuthoredText = i0.AuthoredText |> List.map (fun (n, t) -> if n = "layout-tests/fixtures.mjs" then n, "export const conformingFixtures = {\n};" else n, t) }
       // X04 round 5 (RV41-5-2): a case name shared by two unqualified unions.
       yield! expectFail "ambiguous union case" "X04" (editSource "IF41-SAVE" "[<RequireQualifiedAccess>]\ntype SaveState =" "type SaveState =")

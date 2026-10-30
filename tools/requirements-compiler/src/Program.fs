@@ -1132,7 +1132,7 @@ let v41Inputs (source: string) (package: string) (basePackage: string) (formaTar
     // Documents and records the owner approves with the package; the review record exists once a review has run.
     let documents =
         [ "README.md"; "AGENT-RULES.md"; "FREEZE.md"; "optimization-report.md"; "independent-review.md"; "proposals/owner-decision-requests.json"; "analysis/independent-review.json"
-          "layout-tests/assertions.mjs"; "layout-tests/fixtures.mjs"; "layout-tests/run.mjs" ]
+          "layout-tests/assertions.mjs"; "layout-tests/fixtures.mjs"; "layout-tests/run.mjs"; "layout-tests/catch-rate.mjs" ]
     let forma = parseFile (a "forma-layout-contract.json")
     let formaSpec = field "forma" forma |> Option.defaultValue JNull
     let inventoryPath = Path.Combine(package, str "inventory" formaSpec)

@@ -1091,6 +1091,19 @@ let layoutKitCheck (i: Inputs) : Check =
           let copy = field "executableTests" i.Forma |> Option.map (sOr "eventBuildCopy") |> Option.defaultValue ""
           if copy = "" || not (arr "testHelpers" i.Structure |> List.exists (fun h -> sOr "path" h = copy && sOr "owner" h = "integration")) then
               yield sprintf "the event-build copy of the layout assertions (%s) is not an integration-owned test helper" copy
+          // The coverage the optimization report states is the coverage the contract and the kit have.
+          let rules = arr "rules" i.Forma
+          let invariantCount = rules |> List.sumBy (arr "invariants" >> List.length)
+          let assertionCount = rules |> List.collect (arr "invariants" >> List.collect (strs "assertions")) |> List.distinct |> List.length
+          let brokenPages = Regex.Matches(section fixturesText "export const brokenFixtures" "export const conformingFixtures", @"(?m)^    '").Count
+          let report = text "optimization-report.md"
+          let stated = Regex.Match(report, @"(\d+) of (\d+) rules, (\d+) listed invariants, (\d+) assertions, (\d+) broken pages")
+          let actual = [ rules.Length; rules.Length; invariantCount; assertionCount; brokenPages ]
+          if not stated.Success then yield "optimization-report.md does not state the layout kit's coverage (N of N rules, N listed invariants, N assertions, N broken pages)"
+          elif [ 1..5 ] |> List.map (fun k -> int stated.Groups.[k].Value) <> actual then
+              yield sprintf "optimization-report.md states '%s'; the contract and kit have %d of %d rules, %d listed invariants, %d assertions, %d broken pages" stated.Value rules.Length rules.Length invariantCount assertionCount brokenPages
+          for m in Regex.Matches(report, @"must fail in CI \((\d+)\)") do
+              if int m.Groups.[1].Value <> brokenPages then yield sprintf "optimization-report.md states %s broken pages; the kit has %d" m.Groups.[1].Value brokenPages
           for r in arr "rules" i.Forma do
               let id = sOr "id" r
               // Every layout rule is critical: none may opt out of executable assertions.

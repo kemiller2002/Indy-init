@@ -447,6 +447,87 @@
           "status": "remediated, pending re-review"
         }
       ]
+    },
+    {
+      "round": 7,
+      "reviewedCommit": "05d671a",
+      "verdict": "FAIL",
+      "counts": {
+        "critical": 0,
+        "major": 7,
+        "minor": 2
+      },
+      "ownerAdjustments": {
+        "review": "not achieved: major findings in the round-6 remediation",
+        "typeShapeReconciliation": "achieved",
+        "executableLayoutTests": "not achieved under the owner's bar: false failures (RV41-7-1, -2), undisclosed misses (-3, -5, -6), unreproducible catch rate (-4)",
+        "bootstrap": "achieved"
+      },
+      "findings": [
+        {
+          "id": "RV41-7-1",
+          "severity": "major",
+          "finding": "faultStatesPreserved failed correct pages with the copy PERSIST-031 requires (\"could not save\", \"cannot be saved\", a diff line saying another writer removed something)",
+          "remediation": "It reads only the fault's own message (not actions, diffs, code or tables), split into sentences per block. \"Exists only in this tab\" and \"nothing of this tab's change was written\" count as preservation; loss is an explicit loss word, \"kept nothing\", \"nothing was kept\", \"could not keep\", or the user's changes being deleted, removed or overwritten. PERSIST-031's copy for save failed, offline, unsaved and conflict (with a diff) are conforming fixtures; Forma's fault-banner, whose copy says \"queued\", is no longer a positive page for this assertion",
+          "status": "remediated, pending re-review"
+        },
+        {
+          "id": "RV41-7-2",
+          "severity": "major",
+          "finding": "navigationCollapses treated navigation carried by other Forma patterns (site header, landmark region, workspace shell) as a custom menu",
+          "remediation": "Navigation inside a Forma pattern that carries navigation is not custom (listed in the assertion and disclosed in R41-11). Composed positive pages: site-header + navigation-shell, navigation-shell + landmark-region, workspace-shell + navigation-shell, navigation-shell + record-header + sidebar. A custom menu is reported even on a page without the shell",
+          "status": "remediated, pending re-review"
+        },
+        {
+          "id": "RV41-7-3",
+          "severity": "major",
+          "finding": "statusVisible passed an indicator clipped out of sight by a container (hit test accepted an ancestor)",
+          "remediation": "Shared helpers shownRect (the part inside the viewport and every clipping ancestor) and onTop (the element at the centre of that part is the indicator or inside it). The indicator's full width and first 48 px must be shown; indicatorComposed uses the same test. D53, D54 and a clipped record header are broken pages",
+          "status": "remediated, pending re-review"
+        },
+        {
+          "id": "RV41-7-4",
+          "severity": "major",
+          "finding": "The published catch rate did not reproduce and counted failures of unrelated assertions",
+          "remediation": "layout-tests/catch-rate.mjs holds every review defect page from rounds 5-7 with its classification and reason; run.mjs --catch-rate counts a run as caught only when the defect's own assertion reports something other than a missing page element, and fails on an undisclosed miss or a failing conforming page. CI runs it. Measured: 224 of 230 violation runs caught; the 6 others are disclosed in R41-11. The stricter count exposed and fixed further misses: dialogs opened from click handlers or with role=dialog, danger callouts as faults, \"gone\" as loss, a custom menu on a page without the shell, text-only containers that clip instead of scrolling",
+          "status": "remediated, pending re-review"
+        },
+        {
+          "id": "RV41-7-5",
+          "severity": "major",
+          "finding": "touchTargets missed small controls with widget roles (option, radio, treeitem and others) using roving tabindex or activedescendant",
+          "remediation": "The selector includes option, radio, treeitem, menuitemradio, menuitemcheckbox, link and focusable gridcell whatever their tabindex; the listbox and roving radio group are broken pages",
+          "status": "remediated, pending re-review"
+        },
+        {
+          "id": "RV41-7-6",
+          "severity": "major",
+          "finding": "The contract's link remedy (inline-flex) switched lineLength off for paragraphs with links",
+          "remediation": "inline-flex, inline-grid and inline-table children count as inline; the remedied paragraph is a broken page",
+          "status": "remediated, pending re-review"
+        },
+        {
+          "id": "RV41-7-7",
+          "severity": "major",
+          "finding": "The optimization report stated stale coverage counts and stopped at round 5",
+          "remediation": "Counts corrected (23 invariants, 23 assertions, 88 broken pages) and rounds 6 and 7 added. X15 now fails when the report's stated coverage differs from the contract and kit, with negative controls",
+          "status": "remediated, pending re-review"
+        },
+        {
+          "id": "RV41-7-8",
+          "severity": "minor",
+          "finding": "faultStatesPreserved accepted \"queued\", which PERSIST-032 forbids",
+          "remediation": "\"Queued\" is not preservation; a queued message is a broken page",
+          "status": "remediated, pending re-review"
+        },
+        {
+          "id": "RV41-7-9",
+          "severity": "minor",
+          "finding": "statusVisible and indicatorComposed took the first operation status anywhere on the page as the indicator",
+          "remediation": "The indicator is found in the header region: the header and the two elements after it (or, without a header, the first on the page)",
+          "status": "remediated, pending re-review"
+        }
+      ]
     }
   ]
 }

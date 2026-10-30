@@ -82,7 +82,27 @@ const helpers = () => {
   };
   // The boxes of ancestors that clip their content (overflow hidden or clip).
   const clipBoxes = e => { const out = []; for (let a = e.parentElement; a && a !== document.documentElement; a = a.parentElement) { const s = getComputedStyle(a); if (['hidden', 'clip'].includes(s.overflowX) || ['hidden', 'clip'].includes(s.overflowY)) out.push(a.getBoundingClientRect()); } return out; };
-  window.__ef = { rgba, over, ratio, opacityOf, backgroundAt, hidden, visibleText, clipBoxes };
+  // The part of an element's box a user can see: inside the viewport and every clipping ancestor. Null when none.
+  const shownRect = e => {
+    const r = e.getBoundingClientRect();
+    const b = [...clipBoxes(e), { left: 0, top: 0, right: window.innerWidth, bottom: window.innerHeight }]
+      .reduce((a, c) => ({ left: Math.max(a.left, c.left), top: Math.max(a.top, c.top), right: Math.min(a.right, c.right), bottom: Math.min(a.bottom, c.bottom) }), { left: r.left, top: r.top, right: r.right, bottom: r.bottom });
+    return b.right - b.left > 1 && b.bottom - b.top > 1 ? b : null;
+  };
+  // Painted on top where it is shown: the element at the centre of its shown part is the element or inside it (an
+  // ancestor there means the element is clipped or not painted at that point).
+  const onTop = e => { const b = shownRect(e); if (!b) return false; const t = document.elementFromPoint((b.left + b.right) / 2, (b.top + b.bottom) / 2); return !!t && (t === e || e.contains(t)); };
+  // The save-state indicator (FL-07): the status lozenge of the header (or, on a page without one, the first lozenge),
+  // and the operation status or conflict review in the header region (the header and the two elements after it).
+  const indicator = () => {
+    const header = [...document.querySelectorAll('.ef-record-header, header')].find(h => h.querySelector('.ef-status-lozenge'));
+    const lozenge = header ? header.querySelector('.ef-status-lozenge') : document.querySelector('.ef-status-lozenge');
+    const sel = '.ef-operation-status, .ef-conflict-review';
+    const region = header ? [header, header.nextElementSibling, header.nextElementSibling && header.nextElementSibling.nextElementSibling].filter(Boolean) : [];
+    const operation = header ? region.map(n => (n.matches(sel) ? n : n.querySelector(sel))).find(Boolean) || null : document.querySelector(sel);
+    return { header, lozenge, operation };
+  };
+  window.__ef = { rgba, over, ratio, opacityOf, backgroundAt, hidden, visibleText, clipBoxes, shownRect, onTop, indicator };
 };
 const install = page => inPage(page, `(${helpers.toString()})()`);
 
@@ -92,7 +112,7 @@ const install = page => inPage(page, `(${helpers.toString()})()`);
 export const touchTargets = page =>
   inPage(page, () => {
     const describe = e => `${e.tagName.toLowerCase()} "${(e.textContent || '').trim().slice(0, 30)}"`;
-    const selector = 'button, a[href], input:not([type=hidden]), select, textarea, summary, [role=button], [role=tab], [role=menuitem], [role=checkbox], [role=switch], [onclick], [tabindex]:not([tabindex="-1"])';
+    const selector = 'button, a[href], input:not([type=hidden]), select, textarea, summary, [role=button], [role=tab], [role=menuitem], [role=menuitemradio], [role=menuitemcheckbox], [role=checkbox], [role=switch], [role=radio], [role=option], [role=treeitem], [role=gridcell][tabindex], [role=link], [onclick], [tabindex]:not([tabindex="-1"])';
     const visible = e => { const r = e.getBoundingClientRect(); return r.width > 0 && r.height > 0 && getComputedStyle(e).visibility !== 'hidden'; };
     // Every element, including those inside open shadow roots (custom elements).
     const deep = root => [...root.querySelectorAll('*')].flatMap(e => [e, ...(e.shadowRoot ? deep(e.shadowRoot) : [])]);
@@ -135,7 +155,7 @@ export const scrollRegionsAccessible = page =>
       const s = getComputedStyle(e);
       if (!['hidden', 'clip'].includes(s.overflowX)) return false;
       if (e === document.documentElement || e === document.body) return document.scrollingElement.scrollWidth > window.innerWidth + 0.5 || [...document.body.querySelectorAll('*')].some(c => c.getBoundingClientRect().right > window.innerWidth + 0.5);
-      return e.scrollWidth > e.clientWidth + 1 && e.children.length > 0;
+      return e.scrollWidth > e.clientWidth + 1 && (e.children.length > 0 || (e.textContent || "").trim() !== "");
     };
     const named = e => ['aria-label', 'title'].some(k => (e.getAttribute(k) || '').trim() !== '') || (e.getAttribute('aria-labelledby') || '').split(/\s+/).some(id => { const l = id && document.getElementById(id); return l && l.textContent.trim() !== ''; });
     // Keyboard users can scroll a region that is focusable itself or holds focusable content (as axe's
@@ -149,11 +169,13 @@ export const scrollRegionsAccessible = page =>
     // scrollbar-color with a transparent thumb paints an invisible bar.
     const invisibleThumb = e => { const c = getComputedStyle(e).scrollbarColor || 'auto'; return c !== 'auto' && /^(transparent|rgba\([^)]*,\s*0\))/.test(c.trim()); };
     const webkitHidden = e => rules.filter(hidesBar).some(r => r.selectorText.split(',').map(x => x.trim().replace(/::-webkit-scrollbar.*$/, '') || '*').some(sel => { try { return e.matches(sel); } catch (err) { return false; } }));
+    // The visually-hidden pattern (a 1 px box, clipped to nothing) clips on purpose: its text is for screen readers.
+    const visuallyHidden = e => { const r = e.getBoundingClientRect(); const st = getComputedStyle(e); return r.width <= 1 || r.height <= 1 || /inset\(\s*(50%|100%)/.test(st.clipPath) || /rect\(\s*0(px)?[ ,]+0(px)?[ ,]+0(px)?[ ,]+0(px)?\s*\)/.test(st.clip || ''); };
     const all = [document.documentElement, document.body, ...document.body.querySelectorAll('*')];
     return [
       ...all.filter(scrolls).filter(e => e !== document.documentElement && e !== document.body).filter(e => !(reachable(e) && (named(e) || e.tabIndex < 0))).map(e => `${e.className || e.tagName} scrolls but cannot be reached by keyboard or has no name`),
       ...all.filter(scrolls).filter(e => getComputedStyle(e).scrollbarWidth === 'none' || webkitHidden(e) || invisibleThumb(e)).map(e => `${e.className || e.tagName} hides its scroll bar, so its scrolling is not visible`),
-      ...all.filter(clipped).filter(e => !e.closest('[aria-hidden=true]')).map(e => `${e.className || e.tagName} hides overflowing content instead of scrolling it`),
+      ...all.filter(clipped).filter(e => !e.closest('[aria-hidden=true], .ef-visually-hidden') && !visuallyHidden(e)).map(e => `${e.className || e.tagName} hides overflowing content instead of scrolling it`),
     ];
   });
 
@@ -225,8 +247,8 @@ export const lineLength = page =>
       return Math.max(0, ...lines.map(l => l.right - l.left));
     };
     // Running text is any block whose children are all inline and whose text runs to at least 80 characters.
-    const inlineOnly = e => [...e.children].every(c => ['inline', 'inline-block', 'contents'].includes(getComputedStyle(c).display) || c.tagName === 'BR');
-    const block = e => !['inline', 'inline-block', 'contents', 'none'].includes(getComputedStyle(e).display);
+    const inlineOnly = e => [...e.children].every(c => ['inline', 'inline-block', 'inline-flex', 'inline-grid', 'inline-table', 'contents'].includes(getComputedStyle(c).display) || c.tagName === 'BR');
+    const block = e => !['inline', 'inline-block', 'inline-flex', 'inline-grid', 'inline-table', 'contents', 'none'].includes(getComputedStyle(e).display);
     return [...document.body.querySelectorAll('*')]
       .filter(e => block(e) && inlineOnly(e) && (e.textContent || '').trim().length >= 80 && !e.closest('.ef-visually-hidden, [aria-hidden=true], pre, code') && !['SCRIPT', 'STYLE', 'PRE', 'CODE'].includes(e.tagName))
       .map(e => [e, lineWidth(e) / chWidth(e)])
@@ -361,10 +383,15 @@ export const skipLinkFirst = async page => {
 
 // Opening a dialog moves focus into it, Tab stays inside it, and Escape closes it and returns focus to its invoker.
 export const dialogFocus = async page => {
-  const invokers = await inPage(page, () =>
-    [...document.querySelectorAll('button[commandfor]:not([command=close]):not([command=request-close]), [aria-haspopup=dialog][aria-controls]')]
-      .map((b, k) => { b.dataset.efInvoker = String(k); return { key: String(k), dialog: b.getAttribute('commandfor') || b.getAttribute('aria-controls') }; })
-      .filter(x => { const d = document.getElementById(x.dialog); return d && d.tagName === 'DIALOG'; }));
+  // Invokers: declared commands, aria-controls pointing at a dialog, and controls whose click handler names a dialog
+  // by id. A dialog is a <dialog> or an element with role=dialog.
+  const invokers = await inPage(page, () => {
+    const dialogs = [...document.querySelectorAll('dialog[id], [role=dialog][id], [role=alertdialog][id]')];
+    const target = b => b.getAttribute('commandfor') || b.getAttribute('aria-controls') || (dialogs.find(d => new RegExp(`\\b${d.id}\\b`).test(b.getAttribute('onclick') || '')) || {}).id;
+    return [...document.querySelectorAll('button[commandfor]:not([command=close]):not([command=request-close]), [aria-controls], button[onclick], [role=button][onclick]')]
+      .filter(b => dialogs.some(d => d.id === target(b)) && !dialogs.some(d => d.contains(b)))
+      .map((b, k) => { b.dataset.efInvoker = String(k); return { key: String(k), dialog: target(b) }; });
+  });
   if (invokers.length === 0) return ['no dialog invoker on the page'];
   const open = async (key, dialog) => {
     await page.focus(`[data-ef-invoker="${key}"]`);
@@ -375,25 +402,26 @@ export const dialogFocus = async page => {
       const d = document.getElementById(id);
       const b = document.querySelector(`[data-ef-invoker="${k}"]`);
       const supported = 'command' in HTMLButtonElement.prototype;
-      if (!d.open && !supported && b.getAttribute('commandfor') === id && ['show-modal', 'show'].includes(b.getAttribute('command'))) (b.getAttribute('command') === 'show' ? d.show() : d.showModal());
+      if (d.tagName === 'DIALOG' && !d.open && !supported && b.getAttribute('commandfor') === id && ['show-modal', 'show'].includes(b.getAttribute('command'))) (b.getAttribute('command') === 'show' ? d.show() : d.showModal());
     }, { id: dialog, k: key });
   };
   // Focus may leave a native modal dialog for the browser's own interface (activeElement becomes body); it must never
   // land on page content outside the dialog.
   const contained = dialog => inPage(page, id => { const a = document.activeElement; return !a || a === document.body || document.getElementById(id).contains(a); }, dialog);
+  const shown = dialog => inPage(page, id => { const d = document.getElementById(id); return d.tagName === 'DIALOG' ? d.open : !d.hidden && getComputedStyle(d).display !== 'none' && getComputedStyle(d).visibility !== 'hidden'; }, dialog);
   const check = async ({ key, dialog }) => {
     await open(key, dialog);
-    const isOpen = await inPage(page, id => document.getElementById(id).open, dialog);
+    const isOpen = await shown(dialog);
     if (!isOpen) return [`the invoker does not open #${dialog}`];
     const opened = await inPage(page, id => document.getElementById(id).contains(document.activeElement), dialog);
     await page.keyboard.press('Escape');
-    const closed = await inPage(page, id => !document.getElementById(id).open, dialog);
+    const closed = !(await shown(dialog));
     // Give scripts that move focus after closing a moment, then require focus still on the invoker.
     await page.waitForTimeout(1000);
     const returned = await inPage(page, k => document.activeElement && document.activeElement.dataset.efInvoker === k, key);
     await open(key, dialog);
     const trapped = await Array.from({ length: 8 }).reduce(async (acc) => { const ok = await acc; await page.keyboard.press('Tab'); return ok && (await contained(dialog)); }, Promise.resolve(true));
-    await inPage(page, id => document.getElementById(id).close(), dialog);
+    await inPage(page, id => { const d = document.getElementById(id); if (d.tagName === 'DIALOG') d.close(); else d.hidden = true; }, dialog);
     return [
       ...(opened ? [] : [`opening #${dialog} does not move focus into it`]),
       ...(closed ? [] : [`Escape does not close #${dialog}`]),
@@ -614,42 +642,42 @@ export const statusVisible = async page => {
     // The save-state indicator: the status lozenge of the header (or, on a page without one, the first lozenge) and
     // the operation status or conflict review. Other lozenges on the page (timeline, grid) and empty live regions are
     // not the indicator.
-    const header = [...document.querySelectorAll('.ef-record-header, header')].find(h => h.querySelector('.ef-status-lozenge'));
-    const lozenge = header ? header.querySelector('.ef-status-lozenge') : document.querySelector('.ef-status-lozenge');
-    const operation = document.querySelector('.ef-operation-status, .ef-conflict-review');
+    const { lozenge, operation } = window.__ef.indicator();
     const indicators = [lozenge, operation].filter(Boolean).filter(e => !e.closest('.ef-visually-hidden'));
-    const inView = r => r.width > 0 && r.height > 0 && r.top < window.innerHeight && r.bottom > 0 && r.left < window.innerWidth && r.right > 0;
-    const covered = e => { const r = e.getBoundingClientRect(); const x = Math.min(Math.max(r.left + r.width / 2, 0), window.innerWidth - 1); const y = Math.min(Math.max(r.top + Math.min(r.height / 2, 12), 0), window.innerHeight - 1); const top = document.elementFromPoint(x, y); return !!top && top !== e && !e.contains(top) && !top.contains(e); };
+    // Shown means inside the viewport and every clipping container, and painted on top there.
+    // Its start is shown uncut: the full width and the first 48 px (all of a lozenge; a lozenge cut by its container
+    // cannot be read). A tall operation status may continue below the fold.
+    const shown = e => { const b = window.__ef.shownRect(e); const r = e.getBoundingClientRect(); return b !== null && b.left <= r.left + 1 && b.right >= r.right - 1 && b.top <= r.top + 1 && b.bottom >= r.top + Math.min(r.height, 48) - 1; };
     const label = e => e.className || e.getAttribute('role');
     return indicators.length === 0
       ? ['no save-state indicator (status lozenge, operation status or conflict review) on the page']
       : indicators.flatMap(e => [
           ...(window.__ef.visibleText(e) === '' ? [`${label(e)} shows no visible text`] : []),
-          ...(inView(e.getBoundingClientRect()) ? [] : [`${label(e)} is not visible in the initial viewport`]),
-          ...(inView(e.getBoundingClientRect()) && covered(e) ? [`${label(e)} is covered by another element`] : []),
+          ...(shown(e) ? [] : [`${label(e)} is not visible in the initial viewport (outside it or clipped by a container)`]),
+          ...(shown(e) && !window.__ef.onTop(e) ? [`${label(e)} is covered by another element or not painted`] : []),
         ]);
   });
 };
 
 // The indicator is composed as FL-07 states: a status lozenge, an operation status or conflict review, and a
 // freshness line, together in the header region, each visible without scrolling.
-export const indicatorComposed = page =>
-  inPage(page, () => {
-    const inView = e => { const r = e.getBoundingClientRect(); return r.width > 0 && r.height > 0 && r.top < window.innerHeight && r.bottom > 0; };
-    const header = [...document.querySelectorAll('.ef-record-header, header')].find(h => h.querySelector('.ef-status-lozenge'));
+export const indicatorComposed = async page => {
+  await install(page);
+  return inPage(page, () => {
+    const inView = e => window.__ef.shownRect(e) !== null;
+    const { header, lozenge, operation } = window.__ef.indicator();
     if (!header) return ['no header carries a status lozenge'];
-    const lozenge = header.querySelector('.ef-status-lozenge');
     // The freshness line is in the header or directly after it; the operation status or conflict review follows.
     const freshness = header.querySelector('.ef-freshness') || (header.nextElementSibling && (header.nextElementSibling.matches('.ef-freshness') ? header.nextElementSibling : header.nextElementSibling.querySelector('.ef-freshness')));
-    const operation = document.querySelector('.ef-operation-status, .ef-conflict-review');
     const after = (a, b) => !!(a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING);
     return [
       ...(inView(lozenge) ? [] : ['the status lozenge is not visible without scrolling']),
       ...(freshness ? (inView(freshness) && !freshness.closest('.ef-visually-hidden') && window.getComputedStyle(freshness).visibility !== 'hidden' ? [] : ['the freshness line is not visible without scrolling']) : ['no freshness line in or directly after the header']),
-      ...(operation ? (inView(operation) ? [] : ['the operation status or conflict review is not visible without scrolling']) : ['no operation status or conflict review']),
+      ...(operation ? (inView(operation) ? [] : ['the operation status or conflict review is not visible without scrolling']) : ['no operation status or conflict review in the header region']),
       ...(freshness && operation && !after(freshness, operation) ? ['the operation status or conflict review comes before the freshness line'] : []),
     ];
   });
+};
 
 // ---- FL-08 loading and failures --------------------------------------------------------------------------------
 
@@ -676,7 +704,7 @@ export const faultActionable = async page => {
   await settle(page);
   await install(page);
   return inPage(page, () => {
-    const faults = [...document.querySelectorAll('[class*="ef-fault"], [role=alert]')].filter(e => !e.parentElement.closest('[class*="ef-fault"], [role=alert]'));
+    const faults = [...document.querySelectorAll('[class*="ef-fault"], [role=alert], .ef-alert[data-tone=danger], .ef-callout[data-tone=danger]')].filter(e => !e.parentElement.closest('[class*="ef-fault"], [role=alert], .ef-alert[data-tone=danger], .ef-callout[data-tone=danger]'));
     // A next step is a visible, enabled control that takes pointer input and is not covered by another element.
     const onTop = c => {
       const r = c.getBoundingClientRect();
@@ -698,14 +726,37 @@ export const faultActionable = async page => {
 // A fault also says what was preserved (FL-08: "what happened, what was preserved and a safe next step").
 export const faultStatesPreserved = page =>
   inPage(page, () => {
-    const faults = [...document.querySelectorAll('[class*="ef-fault"], [role=alert], .ef-conflict-review')].filter(e => !e.parentElement.closest('[class*="ef-fault"], [role=alert], .ef-conflict-review'));
-    // A wording check: a sentence saying something was kept, and none saying it was lost. The plan tests check the
-    // exact PERSIST-031 copy; this catches a fault that omits or contradicts the preservation statement.
-    const sentences = e => (e.textContent || '').split(/(?<=[.!?])\s+/);
-    const preserved = /\b(kept|preserved|queued|not lost|unchanged|no changes were (applied|made)|still (in|on)|remains? (in|on))\b/i;
-    const negated = /\b(nothing|not|never|no longer|couldn't|could not|can't|cannot|unable to|failed to)\b[^.]*\b(kept|keep|preserved|preserve|saved|save|queued)\b|\b(kept|preserved|saved|queued)\s+(nothing|none)\b|\b(lost|discarded|deleted|removed|erased|overwritten|gone|wiped)\b(?![^.]*\bnot\b)/i;
-    const states = e => sentences(e).some(t => preserved.test(t) && !negated.test(t.replace(/not lost/i, '')));
-    const denies = e => sentences(e).some(t => negated.test(t.replace(/not lost/i, '')));
+    const faults = [...document.querySelectorAll('[class*="ef-fault"], [role=alert], .ef-alert[data-tone=danger], .ef-callout[data-tone=danger], .ef-conflict-review')].filter(e => !e.parentElement.closest('[class*="ef-fault"], [role=alert], .ef-alert[data-tone=danger], .ef-callout[data-tone=danger], .ef-conflict-review'));
+    // A wording check on the fault's own message: its text outside actions, diffs and code, split into sentences per
+    // block. Some sentence says what was kept (PERSIST-031's copy: "exist only in this tab", "the tab's changes are
+    // kept"), and none says the user's work was lost. "Queued" and "saved later" are not preservation (PERSIST-032).
+    // The plan tests check the exact PERSIST-031 copy; this catches a fault that omits or contradicts it.
+    const excluded = 'button, a, [role=group], [class*="actions"], [class*="diff"], pre, code, del, ins, table';
+    const sentences = e => {
+      const blocks = new Map();
+      const walker = document.createTreeWalker(e, NodeFilter.SHOW_TEXT);
+      for (let n = walker.nextNode(); n; n = walker.nextNode()) {
+        const host = n.parentElement;
+        if (host.closest(excluded) && e.contains(host.closest(excluded))) continue;
+        let block = host;
+        while (block !== e && ['inline', 'inline-block', 'contents'].includes(getComputedStyle(block).display)) block = block.parentElement;
+        blocks.set(block, (blocks.get(block) || '') + n.textContent);
+      }
+      return [...blocks.values()].flatMap(t => t.split(/(?<=[.!?])\s+/)).map(t => t.trim()).filter(Boolean);
+    };
+    const preserved = /\b(kept|preserved|not lost|unchanged|no changes? (was|were) (applied|made|written)|nothing of this tab's changes? was written)\b|\b(exists?|remains?|stays?|held|still)\s+(only\s+)?(in|on)\s+this\s+(browser\s+)?tab\b/i;
+    const notLost = /\b(not|never|won't be|will not be|nothing (is|was|has been))\s+lost\b/gi;
+    const lost = [
+      /\b(lost|discarded|erased|wiped|gone)\b/i,
+      /\b(kept|preserved)\s+(nothing|none)\b/i,
+      /\bnothing\s+(was|is|has been|were|could be)\s+(kept|preserved)\b/i,
+      /\b(not|never|no longer)\s+(been\s+)?(kept|preserved)\b/i,
+      /\b(could not|couldn't|cannot|can't|unable to|failed to|did not|didn't)\s+(keep|preserve)\b/i,
+      /\b(your|the tab's|this tab's)\s+(changes?|work|edits?)\s+(was|were|have been|has been)\s+(deleted|removed|overwritten|discarded)\b/i,
+    ];
+    const says = t => lost.some(r => r.test(t.replace(notLost, '')));
+    const states = e => sentences(e).some(t => preserved.test(t) && !says(t));
+    const denies = e => sentences(e).some(says);
     return faults.length === 0
       ? ['no fault on the page']
       : faults.flatMap(e => [...(states(e) ? [] : [`${e.className || 'alert'} does not say what was preserved`]), ...(denies(e) ? [`${e.className || 'alert'} says work was lost`] : [])]);
@@ -754,17 +805,21 @@ export const navigationReachable = async (page, { maxTabs = 15 } = {}) => {
 export const navigationCollapses = page =>
   inPage(page, () => {
     const shell = document.querySelector('.ef-navigation-shell');
-    if (!shell) return ['no Forma navigation shell on the page'];
-    const shows = sel => { const e = shell.querySelector(sel); if (!e) return false; const r = e.getBoundingClientRect(); return r.width > 0 && r.height > 0 && getComputedStyle(e).display !== 'none'; };
+    const shows = sel => { const e = shell && shell.querySelector(sel); if (!e) return false; const r = e.getBoundingClientRect(); return r.width > 0 && r.height > 0 && getComputedStyle(e).display !== 'none'; };
     // The same media query Forma's stylesheet uses, so the browser decides exactly as it applies the pattern.
     const narrow = window.matchMedia('(max-width: 48rem)').matches;
     const compact = shows('.ef-navigation-shell__compact');
     const persistent = shows('.ef-navigation-shell__persistent');
-    // Never a custom menu: no other visible navigation or menu toggle outside the Forma shell.
+    // Never a custom menu: no visible navigation or menu toggle outside the Forma shell, except the navigation that
+    // other Forma patterns carry (site header, workspace shell, landmark region, breadcrumb, hierarchy tree, sidebar,
+    // pagination, scope trail and the rest), which the contract's reuse list composes with the shell.
+    const formaNavigation = ['ef-site-header', 'ef-site-nav', 'ef-site-footer', 'ef-marketing-shell', 'ef-workspace-shell', 'ef-landmark-region', 'ef-record-header', 'ef-hierarchy-tree', 'ef-doc', 'ef-master-detail', 'ef-mobile-action-bar', 'ef-pagination', 'ef-scope-trail', 'ef-sidebar', 'ef-spatial-canvas'].map(c => `[class*="${c}"]`).concat('[aria-label=Breadcrumb]').join(', ');
     const visible = e => { const r = e.getBoundingClientRect(); return r.width > 0 && r.height > 0 && getComputedStyle(e).visibility !== 'hidden' && getComputedStyle(e).display !== 'none'; };
-    const custom = [...document.querySelectorAll('nav, button[aria-expanded], [role=button][aria-expanded], [aria-haspopup=menu], [role=menu], [role=menubar], details:has(a[href] ~ a[href], li a[href])')].filter(e => !shell.contains(e) && visible(e) && !e.closest('[aria-label=Breadcrumb]') && e.getAttribute('aria-label') !== 'Breadcrumb');
+    const custom = [...document.querySelectorAll('nav, button[aria-expanded], [role=button][aria-expanded], [aria-haspopup=menu], [role=menu], [role=menubar], details:has(a[href] ~ a[href], li a[href])')].filter(e => !(shell && shell.contains(e)) && visible(e) && !e.closest(formaNavigation));
     const customs = custom.map(e => `a custom ${e.tagName.toLowerCase() === 'nav' ? 'navigation' : 'menu control'} sits outside the Forma navigation shell`);
-    return customs.length ? customs : narrow
+    if (customs.length) return customs;
+    if (!shell) return ['no Forma navigation shell on the page'];
+    return narrow
       ? [...(compact ? [] : ['at 48rem or narrower the compact navigation is not shown']), ...(persistent ? ['at 48rem or narrower the persistent navigation still shows'] : [])]
       : [...(persistent ? [] : ['wider than 48rem the persistent navigation is not shown']), ...(compact ? ['wider than 48rem the compact navigation still shows'] : [])];
   });

@@ -1069,11 +1069,14 @@
         {
           "assertion": "faultStatesPreserved",
           "patterns": [
-            "fault-banner",
             "conflict-review"
           ],
           "fixtures": [
-            "faultStatesPreserved"
+            "faultStatesPreserved",
+            "faultSaveFailed",
+            "faultOffline",
+            "faultUnsaved",
+            "conflictWithDiff"
           ],
           "viewports": [
             "VP-320",
@@ -1124,7 +1127,26 @@
           "patterns": [
             "navigation-shell"
           ],
-          "viewports": "all"
+          "viewports": "all",
+          "composed": [
+            [
+              "site-header",
+              "navigation-shell"
+            ],
+            [
+              "navigation-shell",
+              "landmark-region"
+            ],
+            [
+              "workspace-shell",
+              "navigation-shell"
+            ],
+            [
+              "navigation-shell",
+              "record-header",
+              "sidebar"
+            ]
+          ]
         }
       ]
     },

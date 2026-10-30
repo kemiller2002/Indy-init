@@ -11,6 +11,8 @@ export const brokenFixtures = {
     '<button style="all:unset;display:inline-block;width:20px;height:20px">x</button>',
     '<div onclick="void 0" style="width:10px;height:10px;background:#000"></div>',
     '<x-close></x-close><script>customElements.define("x-close",class extends HTMLElement{connectedCallback(){this.attachShadow({mode:"open"}).innerHTML="<button style=\'all:unset;width:16px;height:16px;display:inline-block\'>x</button>"}})</script>',
+    '<div role="listbox" tabindex="0" aria-label="Branch" aria-activedescendant="o1" style="padding:12px"><div role="option" id="o1" aria-selected="true" style="height:18px">main</div><div role="option" id="o2" style="height:18px">dev</div></div>',
+    '<div role="radiogroup" aria-label="Severity"><span role="radio" aria-checked="true" tabindex="0" style="display:inline-block;padding:12px">High</span><span role="radio" aria-checked="false" tabindex="-1" style="display:inline-block;height:18px">Low</span></div>',
   ],
   noHorizontalScroll: [
     '<div style="width:2400px">A row wider than any viewport.</div>',
@@ -35,6 +37,7 @@ export const brokenFixtures = {
   lineLength: [
     '<article class="ef-prose" style="max-width:none"><p style="max-width:none;width:120ch">' + 'Unbounded line length makes long text hard to read. '.repeat(6) + '</p></article>',
     '<p style="max-inline-size:none;max-width:none;width:120ch">' + 'Running text outside any reading region is still running text. '.repeat(6) + '</p>',
+    '<style>a[href]{display:inline-flex;align-items:center;min-block-size:var(--ef-layout-target-min);min-inline-size:var(--ef-layout-target-min)}</style><p style="max-inline-size:none;max-width:none;width:130ch">Investigation notes describe what changed in the repository and why the reviewer accepted it, see <a href="#e">the evidence</a> for the full timeline of the regression and every hypothesis that was considered and rejected along the way.</p>',
   ],
   focusVisible: [
     '<style>*:focus,*:focus-visible{outline:2px solid transparent!important;box-shadow:0 1px 2px rgba(0,0,0,.4)!important}button,a{box-shadow:0 1px 2px rgba(0,0,0,.4)}</style><button>Save</button><a href="#x">Details</a>',
@@ -88,6 +91,9 @@ export const brokenFixtures = {
     '<span class="ef-status-lozenge" style="color:transparent">Saved</span>',
     '<span class="ef-status-lozenge"><span class="ef-visually-hidden">Saved</span></span>',
     '<span class="ef-status-lozenge" style="position:absolute;top:10px;left:10px">Saved</span><div style="position:fixed;top:0;left:0;right:0;height:120px;background:#fff;z-index:5">Cookie banner</div>',
+    '<div style="max-height:0;overflow:hidden"><span class="ef-status-lozenge">Saved</span></div><p>Content</p>',
+    '<div style="display:flex;width:320px;overflow:hidden"><h1 style="flex:none;width:300px">Investigation</h1><span class="ef-status-lozenge" style="flex:none">Saved</span></div>',
+    '<style>.ef-record-header{max-block-size:1.5rem;overflow:hidden}</style><header class="ef-record-header"><h2 style="display:block">Checkout latency regression after the cache change</h2><span class="ef-status-lozenge">Saved</span></header><section class="ef-operation-status"><p>Saved to GitHub</p></section>',
   ],
   indicatorComposed: [
     '<header class="ef-record-header"><h2>Investigation</h2><span class="ef-status-lozenge" data-state="saved">Saved</span></header>',
@@ -112,6 +118,7 @@ export const brokenFixtures = {
     '<div role="alert"><p>Save failed. We could not keep your changes.</p><button type="button">Retry</button></div>',
     '<div role="alert"><p>Save failed. Your changes were overwritten.</p><button type="button">Retry</button></div>',
     '<div role="alert"><p>Save failed. We kept nothing from this session.</p><button>Retry</button></div>',
+    '<aside class="ef-alert ef-fault-banner" role="status"><h2 class="ef-alert__title">Save failed.</h2><p>Your change is queued and will be saved later.</p><div class="ef-recovery-actions" role="group" aria-label="Recovery actions"><button type="button">Retry</button></div></aside>',
   ],
   navigationReachable: [
     '<div><a href="#a">Somewhere</a></div>',
@@ -139,4 +146,9 @@ export const brokenFixtures = {
 export const conformingFixtures = {
   amberLabelled: '<span class="ef-status-lozenge" style="background:#E9A23B;color:#1b1b1b">Pending review</span>',
   faultStatesPreserved: '<aside class="ef-alert ef-fault-banner" role="status"><h2 class="ef-alert__title">Save failed</h2><p>GitHub refused the change. Your changes are kept in this tab.</p><div class="ef-recovery-actions" role="group" aria-label="Recovery actions"><button type="button">Retry</button></div></aside>',
+  // PERSIST-031's copy for each fault state (the event build's plan tests check it word for word).
+  faultSaveFailed: '<aside class="ef-alert ef-fault-banner" role="status"><h2 class="ef-alert__title">Save failed.</h2><p>GitHub could not save this investigation because the credential was refused. Your changes are kept in this tab.</p><div class="ef-recovery-actions" role="group" aria-label="Recovery actions"><button type="button">Reconnect</button></div></aside>',
+  faultOffline: '<aside class="ef-alert ef-fault-banner" role="status"><h2 class="ef-alert__title">Offline.</h2><p>Your changes exist only in this tab and cannot be saved until the connection returns.</p><div class="ef-recovery-actions" role="group" aria-label="Recovery actions"><button type="button">Check connection</button></div></aside>',
+  faultUnsaved: '<aside class="ef-alert ef-fault-banner" role="status"><h2 class="ef-alert__title">Unsaved.</h2><p>These changes exist only in this tab.</p><div class="ef-recovery-actions" role="group" aria-label="Recovery actions"><button type="button">Save</button></div></aside>',
+  conflictWithDiff: '<article class="ef-conflict-review" aria-labelledby="cr-t"><header class="ef-conflict-review__header"><span class="ef-status-lozenge" data-state="attention">Conflict</span><h3 id="cr-t">Another writer changed this investigation on GitHub.</h3><p>Nothing of this tab\'s change was written. The tab\'s changes are kept.</p></header><div class="ef-diff-viewer"><div class="ef-diff-viewer__grid"><section class="ef-diff-viewer__side"><h4>This tab</h4><p>Hypothesis H2: cache eviction</p></section><section class="ef-diff-viewer__side"><h4>On GitHub</h4><p>Hypothesis H2 removed by the other writer</p></section></div></div><footer class="ef-conflict-review__actions"><button type="button">Keep mine</button><button type="button">Take theirs</button><button type="button">Review differences</button></footer></article>',
 };

@@ -90,6 +90,7 @@ jobs:
           cd "$GITHUB_WORKSPACE"
           cp -r requirements-compiled/v4.1/layout-tests/. "$RUNNER_TEMP/layout/"
           node "$RUNNER_TEMP/layout/run.mjs" --forma "$RUNNER_TEMP/forma/package" --contract requirements-compiled/v4.1/analysis/forma-layout-contract.json --inventory requirements-compiled/v4.1/analysis/forma-0.12.0-inventory.json --axe "$RUNNER_TEMP/layout/node_modules/axe-core/axe.min.js" --browsers chromium,webkit
+          node "$RUNNER_TEMP/layout/run.mjs" --forma "$RUNNER_TEMP/forma/package" --contract requirements-compiled/v4.1/analysis/forma-layout-contract.json --inventory requirements-compiled/v4.1/analysis/forma-0.12.0-inventory.json --axe "$RUNNER_TEMP/layout/node_modules/axe-core/axe.min.js" --catch-rate
       - name: Check out maintained Causa Data tooling
         uses: actions/checkout@v4
         with:

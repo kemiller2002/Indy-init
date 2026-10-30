@@ -26,7 +26,7 @@ CI does six things:
 3. Builds `contracts/` to typecheck the interface contracts.
 4. Checks that each negative control in `contracts/negative/` (a forged `Confirmation`, a read of the credential's token) is refused (FS1093).
 5. Runs `v41 --bootstrap` into a git-initialised empty directory and builds the generated .NET skeleton of the application repository (solution, projects, compile lists, contracts, layout-assertion module; package references and integration's other shared files are added at T10).
-6. Runs the executable layout assertions (`layout-tests/run.mjs`, with axe-core 4.14.0 for `axeClean`) in Chromium and WebKit against Forma's pattern pages and the broken fixtures.
+6. Runs the executable layout assertions (`layout-tests/run.mjs`, with axe-core 4.14.0 for `axeClean`) in Chromium and WebKit against Forma's pattern pages and the broken fixtures. It then measures the catch rate on every review defect page (`run.mjs --catch-rate`, [layout-tests/catch-rate.mjs](layout-tests/catch-rate.mjs)) and fails on a miss that R41-11 does not disclose or on a conforming page that fails.
 
 The offline test suite also runs the v4.1 negative controls in [V41Tests.fs](../../tools/requirements-compiler/tests/V41Tests.fs).
 
