@@ -724,7 +724,7 @@ export const faultActionable = async page => {
   return inPage(page, () => {
     const faults = [...document.querySelectorAll('[class*="ef-fault"], [role=alert], .ef-alert[data-tone=danger], .ef-callout[data-tone=danger]')].filter(e => !e.parentElement.closest('[class*="ef-fault"], [role=alert], .ef-alert[data-tone=danger], .ef-callout[data-tone=danger]'))
       // Unknown commit outcome while the automatic reads run is a status, not a fault: PERSIST-031 offers no action yet.
-      .filter(e => !(e.closest('.ef-operation-status') && /may or may not|checking/i.test(e.textContent || '')));
+      .filter(e => !(e.closest('.ef-operation-status') && /unknown commit outcome/i.test(`${(e.closest('.ef-operation-status').querySelector('h1, h2, h3, h4, h5, h6') || {}).textContent || ''} ${(document.querySelector('.ef-record-header .ef-status-lozenge') || {}).textContent || ''}`) && /may or may not/i.test(e.textContent || '')));
     // A next step is a visible, enabled control that takes pointer input and is not covered by another element.
     const onTop = c => {
       const r = c.getBoundingClientRect();
@@ -747,7 +747,7 @@ export const faultActionable = async page => {
 export const faultStatesPreserved = page =>
   inPage(page, () => {
     const faults = [...document.querySelectorAll('[class*="ef-fault"], [role=alert], .ef-alert[data-tone=danger], .ef-callout[data-tone=danger], .ef-conflict-review')].filter(e => !e.parentElement.closest('[class*="ef-fault"], [role=alert], .ef-alert[data-tone=danger], .ef-callout[data-tone=danger], .ef-conflict-review'))
-      .filter(e => !(e.closest('.ef-operation-status') && /may or may not|checking/i.test(e.textContent || '')));
+      .filter(e => !(e.closest('.ef-operation-status') && /unknown commit outcome/i.test(`${(e.closest('.ef-operation-status').querySelector('h1, h2, h3, h4, h5, h6') || {}).textContent || ''} ${(document.querySelector('.ef-record-header .ef-status-lozenge') || {}).textContent || ''}`) && /may or may not/i.test(e.textContent || '')));
     // A wording check on the fault's own message: its text outside actions, diffs and code, split into sentences per
     // block. Some sentence says what was kept (PERSIST-031's copy: "exist only in this tab", "the tab's changes are
     // kept"), and none says the user's work was lost. "Queued" and "saved later" are not preservation (PERSIST-032).
@@ -767,12 +767,16 @@ export const faultStatesPreserved = page =>
     };
     const preserved = /\b(kept|preserved|not lost|unchanged|no changes? (was|were) (applied|made|written)|nothing of this tab's changes? was written)\b|\b(exists?|remains?|stays?|held|still)\s+(only\s+)?(in|on)\s+this\s+(browser\s+)?tab\b/i;
     const notLost = /\b(not|never|won't be|will not be|nothing (is|was|has been))\s+lost\b/gi;
-    // Loss is said of the user's work (a lost connection or a discarded commit is not lost work).
+    // Loss is a past or present statement about this tab's own work: "your" (some, all, the last) changes, edits,
+    // work, draft, attachments or notes. A lost connection, a discarded commit, another writer's change and a consequence
+    // stated as a condition ("if you choose Discard", "when it closes", "will") are not lost work.
     const work = '(changes?|work|edits?|drafts?|attachments?|notes)';
+    const own = "(your|the tab's|this tab's)";
+    const subject = "(your|the tab's|this tab's|some|all|these|the last|some of (your|the|these))";
     const gone = '(lost|discarded|erased|wiped|gone|dropped|reverted|reset|deleted|removed|overwritten|thrown away)';
     const lost = [
-      new RegExp(`\\b${work}\\b[^.!?]{0,40}?\\b(was|were|is|are|have been|has been|got)\\s+${gone}\\b`, 'i'),
-      new RegExp(`\\b(lost|discarded|erased|wiped|dropped|reverted|deleted|removed|overwrote|threw away)\\s+(your|the tab's|this tab's|these|all|the)\\s+(\\w+\\s+)?${work}\\b`, 'i'),
+      new RegExp(`\\b${subject}\\s+(\\w+\\s+){0,3}?${work}\\b[^.!?]{0,40}?\\b(was|were|is|are|have been|has been|got)\\s+${gone}\\b`, 'i'),
+      new RegExp(`\\b(lost|discarded|erased|wiped|dropped|reverted|deleted|removed|overwrote|threw away)\\s+${own}\\s+(\\w+\\s+)?${work}\\b`, 'i'),
       /\b(kept|preserved)\s+(nothing|none)\b/i,
       /\bnothing\s+(was|is|has been|were|could be)\s+(kept|preserved)\b/i,
       /\b(not|never|no longer)\s+(been\s+)?(kept|preserved)\b/i,
@@ -780,7 +784,9 @@ export const faultStatesPreserved = page =>
     ];
     // PERSIST-032: never "saved locally", "on this device", "queued" or "saved later".
     const forbidden = /\b(queued|(saved|stored|kept) locally|(saved|stored|kept) on (this|your) device|(saved|synced|sync|uploaded) later|will (be )?(saved|synced|sync|uploaded|upload)|sync(s|ed)? (automatically|when))\b/i;
-    const says = t => lost.some(r => r.test(t.replace(notLost, '')));
+    const conditional = /\b(if|unless|would|will|once|whenever)\b|\bwhen\s+(it|the tab|this tab|you|the browser)\b/i;
+    const otherWriter = /\b(another|the other|a different)\s+(writer|person|user|session|tab)\b/i;
+    const says = t => !conditional.test(t) && !otherWriter.test(t) && lost.some(r => r.test(t.replace(notLost, '')));
     const states = e => sentences(e).some(t => preserved.test(t) && !says(t) && !forbidden.test(t));
     const denies = e => sentences(e).some(says);
     const claims = e => sentences(e).some(t => forbidden.test(t));

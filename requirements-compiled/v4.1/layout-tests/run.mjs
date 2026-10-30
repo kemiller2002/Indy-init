@@ -109,9 +109,12 @@ const catchRate = async () => {
   const caught = violations.filter(r => r.found.length > 0);
   const missed = violations.filter(r => r.found.length === 0);
   const undisclosed = missed.filter(r => !r.case.disclosed);
-  // A conforming page may lack the element an assertion judges (a status that is not a fault); it must not fail.
-  const conformingFailed = of('conforming').filter(r => r.found.length > 0);
-  console.log(`catch rate (Chromium, own assertion): ${caught.length} of ${violations.length} violation runs caught; ${missed.length - undisclosed.length} disclosed misses; ${of('other').length} runs of pages that are not violations; ${of('conforming').length - conformingFailed.length} of ${of('conforming').length} conforming runs pass`);
+  // A conforming page may lack the element an assertion judges (a status that is not a fault): it then returns only a
+  // missing-element result, which is reported, and a plan test does not run that assertion on such a page. Any other
+  // violation, or an error, fails.
+  const conformingFailed = of('conforming').filter(r => r.found.length > 0 || r.violations.some(v => v.startsWith('error: ')));
+  const absenceOnly = of('conforming').filter(r => r.found.length === 0 && r.violations.length > 0 && !r.violations.some(v => v.startsWith('error: ')));
+  console.log(`catch rate (Chromium, own assertion): ${caught.length} of ${violations.length} violation runs caught; ${missed.length - undisclosed.length} disclosed misses; ${of('other').length} runs of pages that are not violations; ${of('conforming').length - conformingFailed.length} of ${of('conforming').length} conforming runs pass (${absenceOnly.length} of them return only a missing-element result)`);
   missed.forEach(r => console.log(`  ${r.case.disclosed ? 'DISCLOSED' : 'MISSED'} round ${r.case.round} ${r.case.id} ${r.assertion} ${r.vp}${r.case.disclosed ? ': ' + r.case.disclosed : ''}`));
   conformingFailed.forEach(r => console.log(`  FALSE FAILURE round ${r.case.round} ${r.case.id} ${r.assertion} ${r.vp}: ${r.violations.slice(0, 3).join('; ')}`));
   if (args.out) writeFileSync(args.out, JSON.stringify(done.map(r => ({ id: r.case.id, round: r.case.round, verdict: r.case.verdict, assertion: r.assertion, vp: r.vp, violations: r.violations })), null, 2) + '\n');

@@ -610,6 +610,59 @@
         }
       ],
       "note": "All of the reviewer's round-8 pages are in catch-rate.mjs. One of them, the full Save failed screen at VP-200-TEXT, is classified as a violation by the page: its record header alone is 796 px tall in the 800 px screen, so the freshness line and operation status start below it, which PERSIST-030 does not allow at 200% text. Running all pages also found and fixed: fixed-position text cut by the viewport (textNotClipped) and \"kept locally and will sync\" (faultStatesPreserved)"
+    },
+    {
+      "round": 9,
+      "reviewedCommit": "63f6efc",
+      "verdict": "FAIL",
+      "counts": {
+        "critical": 0,
+        "major": 1,
+        "minor": 4
+      },
+      "ownerAdjustments": {
+        "review": "not achieved: one major false failure",
+        "typeShapeReconciliation": "achieved",
+        "executableLayoutTests": "coverage achieved; merge bar not met (RV41-9-1)",
+        "bootstrap": "achieved"
+      },
+      "findings": [
+        {
+          "id": "RV41-9-1",
+          "severity": "major",
+          "finding": "faultStatesPreserved called correct sentences lost work: PERSIST-020's \"are lost when it closes\", \"If you choose Discard, your changes are discarded\", and another writer's deletions in a conflict review; R41-11 no longer disclosed false failures",
+          "remediation": "Loss is a past or present statement about the tab's own work (your, some, all or the last changes, edits, work, draft, attachments or notes); a sentence with a condition (if, unless, will, would, once, when it or you) or about another writer is not loss. The reviewer's pages are conforming cases. R41-11 again says wording outside the vocabulary may be misjudged either way",
+          "status": "remediated, pending re-review"
+        },
+        {
+          "id": "RV41-9-2",
+          "severity": "minor",
+          "finding": "The not-a-fault exclusion skipped any operation status mentioning \"checking\", Save failed included",
+          "remediation": "Only an operation status headed Unknown commit outcome (or under a lozenge saying so) that says the save may or may not have reached GitHub is skipped; the reviewer's Save failed pages are caught",
+          "status": "remediated, pending re-review"
+        },
+        {
+          "id": "RV41-9-3",
+          "severity": "minor",
+          "finding": "\"All conforming runs pass\" counted runs that return an absence result, and would have hidden an error",
+          "remediation": "An error on a conforming page fails; the summary and R41-11 state how many conforming runs return only a missing-element result (6) and why",
+          "status": "remediated, pending re-review"
+        },
+        {
+          "id": "RV41-9-4",
+          "severity": "minor",
+          "finding": "FL-07 \"lozenge and freshness only\" could be read as excluding PERSIST-031's words and actions",
+          "remediation": "Reworded: no operation status or conflict review; their PERSIST-031 words and actions still appear",
+          "status": "remediated, pending re-review"
+        },
+        {
+          "id": "RV41-9-5",
+          "severity": "minor",
+          "finding": "At 200% text a long title can push the indicator out of view, with no guidance",
+          "remediation": "FL-07 says the title uses Forma's heading size and a title that would push the indicator out is clamped with its full value in an accessible name",
+          "status": "remediated, pending re-review"
+        }
+      ]
     }
   ]
 }

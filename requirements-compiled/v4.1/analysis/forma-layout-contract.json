@@ -936,7 +936,7 @@
     },
     {
       "id": "FL-07",
-      "rule": "Save-state indicator (PERSIST-030): Forma status lozenge naming the state plus freshness in the investigation header, with Forma operation status for Unknown commit outcome and Save failed and Forma conflict review for Conflict; Saved, Unsaved, Saving and Offline show the lozenge and freshness only. Visible without scrolling at every viewport. Order: the header line (record header with its status lozenge) and the freshness line come first, then the operation status or conflict review, so the lozenge and freshness stay in the first screen at 320 px and 200% text.",
+      "rule": "Save-state indicator (PERSIST-030): Forma status lozenge naming the state plus freshness in the investigation header, with Forma operation status for Unknown commit outcome and Save failed and Forma conflict review for Conflict; Saved, Unsaved, Saving and Offline have no operation status or conflict review; their PERSIST-031 words and actions (for example \"exist only in this tab\" and Save) still appear. Visible without scrolling at every viewport. Order: the header line (record header with its status lozenge) and the freshness line come first, then the operation status or conflict review, so the lozenge and freshness stay in the first screen at 320 px and 200% text. At 200% text a long investigation title must not push the indicator out of the first screen: the title uses Forma's heading size, and a title that would is clamped with its full value in an accessible name.",
       "requirements": [
         "PERSIST-030",
         "PERSIST-031"

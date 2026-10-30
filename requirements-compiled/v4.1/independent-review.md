@@ -18,6 +18,7 @@
 | 6 | `659e9dd` | FAIL | 0 critical, 4 major, 1 minor. Round-5 findings fixed except 5-1 (still open), completed by the round-6 remediation. Owner adjustments: type-shape reconciliation and bootstrap achieved; layout tests partly. At the owner's direction, the remediation fixes false failures and real bugs, adds axe-core, and publishes the measured catch rate and every known miss (R41-11) |
 | 7 | `05d671a` | FAIL | 0 critical, 7 major, 2 minor. Round-6 findings fixed except 6-1 (partly), completed by the round-7 remediation. Graded on the owner's bar (false failures, undisclosed claims and undisclosed plain misses are major; disclosed misses at most minor). Owner adjustments: type-shape reconciliation and bootstrap achieved; layout tests not yet |
 | 8 | `aa792a6` | FAIL | 0 critical, 5 major, 4 minor, all in the layout assertions (false failures on pages PERSIST-030, -031 and -033 call for). Round-7 findings fixed except 7-1, 7-8 and 7-9 (partly), completed by the round-8 remediation. The catch rate reproduced exactly. Owner adjustments: type-shape reconciliation and bootstrap achieved; layout tests not yet |
+| 9 | `63f6efc` | FAIL | 0 critical, 1 major, 4 minor. All round-8 findings fixed. The catch rate reproduced exactly and the round-8 reclassification at 200% text was confirmed by measurement. Owner adjustments: type-shape reconciliation and bootstrap achieved; layout-test coverage achieved, merge bar not met (one false failure) |
 
 ## Round 1 findings and remediation
 
@@ -128,3 +129,13 @@
 | RV41-8-9 | minor | The fault-banner paragraph split the Forma gap list | Moved after the list |
 
 All of the reviewer's round-8 pages are in catch-rate.mjs. One of them, the full Save failed screen at VP-200-TEXT, is classified as a violation by the page: its record header alone is 796 px tall in the 800 px screen, so the freshness line and operation status start below it, which PERSIST-030 does not allow at 200% text. Running all pages also found and fixed: fixed-position text cut by the viewport (textNotClipped) and "kept locally and will sync" (faultStatesPreserved).
+
+## Round 9 findings and remediation
+
+| Id | Severity | Finding | Remediation |
+|---|---|---|---|
+| RV41-9-1 | major | faultStatesPreserved called correct sentences lost work: PERSIST-020's "are lost when it closes", "If you choose Discard, your changes are discarded", and another writer's deletions in a conflict review; R41-11 no longer disclosed false failures | Loss is a past or present statement about the tab's own work (your, some, all or the last changes, edits, work, draft, attachments or notes); a sentence with a condition (if, unless, will, would, once, when it or you) or about another writer is not loss. The reviewer's pages are conforming cases. R41-11 again says wording outside the vocabulary may be misjudged either way |
+| RV41-9-2 | minor | The not-a-fault exclusion skipped any operation status mentioning "checking", Save failed included | Only an operation status headed Unknown commit outcome (or under a lozenge saying so) that says the save may or may not have reached GitHub is skipped; the reviewer's Save failed pages are caught |
+| RV41-9-3 | minor | "All conforming runs pass" counted runs that return an absence result, and would have hidden an error | An error on a conforming page fails; the summary and R41-11 state how many conforming runs return only a missing-element result (6) and why |
+| RV41-9-4 | minor | FL-07 "lozenge and freshness only" could be read as excluding PERSIST-031's words and actions | Reworded: no operation status or conflict review; their PERSIST-031 words and actions still appear |
+| RV41-9-5 | minor | At 200% text a long title can push the indicator out of view, with no guidance | FL-07 says the title uses Forma's heading size and a title that would push the indicator out is clamped with its full value in an accessible name |
