@@ -208,6 +208,15 @@
         "UI-011"
       ],
       "assertion": "browser: bounding box of every button, link and form control >= 44x44 CSS px at every viewport",
+      "invariants": [
+        {
+          "id": "FL-01a",
+          "invariant": "every interactive or clickable control is at least 44x44 CSS px",
+          "assertions": [
+            "touchTargets"
+          ]
+        }
+      ],
       "tests": [
         "playwright:acceptance/UI-011.spec.js > UI-011-O1 [chromium]",
         "playwright:acceptance/UI-011.spec.js > UI-011-O1 [webkit]"
@@ -236,6 +245,22 @@
         "PERSIST-030"
       ],
       "assertion": "browser: document.scrollingElement.scrollWidth <= innerWidth at every viewport; screenshot per screen",
+      "invariants": [
+        {
+          "id": "FL-02a",
+          "invariant": "the page never scrolls or clips sideways",
+          "assertions": [
+            "noHorizontalScroll"
+          ]
+        },
+        {
+          "id": "FL-02b",
+          "invariant": "wide content scrolls inside its own container, focusable, named and with a visible scroll bar",
+          "assertions": [
+            "scrollRegionsAccessible"
+          ]
+        }
+      ],
       "tests": [
         "playwright:acceptance/UI-011.spec.js > UI-011-O2 [chromium]",
         "playwright:acceptance/UI-011.spec.js > UI-011-O2 [webkit]"
@@ -277,6 +302,22 @@
         "UI-024"
       ],
       "assertion": "browser: no element with overflow hidden clips text without a title or accessible description; the 200% text viewport shows every save-state word",
+      "invariants": [
+        {
+          "id": "FL-03a",
+          "invariant": "text is never clipped or truncated without an accessible full value",
+          "assertions": [
+            "textNotClipped"
+          ]
+        },
+        {
+          "id": "FL-03b",
+          "invariant": "running text stays within the 72ch measure",
+          "assertions": [
+            "lineLength"
+          ]
+        }
+      ],
       "tests": [
         "playwright:acceptance/PERSIST-030.spec.js > PERSIST-030-O7 [chromium]",
         "playwright:acceptance/PERSIST-030.spec.js > PERSIST-030-O7 [webkit]"
@@ -313,6 +354,36 @@
         "PERSIST-012"
       ],
       "assertion": "browser: tab through each screen and dialog; every focused element has a visible outline at least the ring width; focus returns to the invoking control after a dialog closes",
+      "invariants": [
+        {
+          "id": "FL-04a",
+          "invariant": "the skip link is first and visible when focused",
+          "assertions": [
+            "skipLinkFirst"
+          ]
+        },
+        {
+          "id": "FL-04b",
+          "invariant": "Tab follows document order",
+          "assertions": [
+            "focusOrder"
+          ]
+        },
+        {
+          "id": "FL-04c",
+          "invariant": "every focused element shows a contrasting focus ring of the ring width",
+          "assertions": [
+            "focusVisible"
+          ]
+        },
+        {
+          "id": "FL-04d",
+          "invariant": "dialogs take focus, keep it, close on Escape and return it",
+          "assertions": [
+            "dialogFocus"
+          ]
+        }
+      ],
       "tests": [
         "playwright:acceptance/UI-011.spec.js > UI-011-O1 [chromium]",
         "playwright:invariants/INV-24.spec.js > save-state and conflict actions by keyboard and screen reader [webkit]"
@@ -376,6 +447,15 @@
         "UI-011"
       ],
       "assertion": "browser: with reducedMotion 'reduce', computed transition and animation durations of animated Forma components are 0s or Forma's reduced values",
+      "invariants": [
+        {
+          "id": "FL-05a",
+          "invariant": "no animation or transition outlasts 10 ms under reduced motion",
+          "assertions": [
+            "reducedMotion"
+          ]
+        }
+      ],
       "tests": [
         "playwright:acceptance/UI-011.spec.js > UI-011-O2 [chromium]",
         "playwright:acceptance/UI-011.spec.js > UI-011-O2 [webkit]"
@@ -405,6 +485,36 @@
         "PERSIST-030"
       ],
       "assertion": "browser: axe WCAG 2.1 AA in light and dark; forced-colors emulation keeps every save state distinguishable Text over a background image or gradient is judged by the axe run of the plan test, not by textContrast.",
+      "invariants": [
+        {
+          "id": "FL-06a",
+          "invariant": "text contrast 4.5:1 (3:1 large) in light and dark",
+          "assertions": [
+            "textContrast"
+          ]
+        },
+        {
+          "id": "FL-06b",
+          "invariant": "non-text marks and focus rings 3:1",
+          "assertions": [
+            "nonTextContrast"
+          ]
+        },
+        {
+          "id": "FL-06c",
+          "invariant": "states stay distinguishable under forced colours",
+          "assertions": [
+            "forcedColorsDistinct"
+          ]
+        },
+        {
+          "id": "FL-06d",
+          "invariant": "amber only with a text label",
+          "assertions": [
+            "amberLabelled"
+          ]
+        }
+      ],
       "tests": [
         "playwright:acceptance/PERSIST-030.spec.js > PERSIST-030-O6 [chromium]",
         "playwright:acceptance/PERSIST-030.spec.js > PERSIST-030-O6 [webkit]"
@@ -493,6 +603,22 @@
         "PERSIST-031"
       ],
       "assertion": "browser: the indicator's bounding box intersects the initial viewport at every viewport and state; screenshot per state from the deployed SHA",
+      "invariants": [
+        {
+          "id": "FL-07a",
+          "invariant": "the indicator carries text and is visible without scrolling",
+          "assertions": [
+            "statusVisible"
+          ]
+        },
+        {
+          "id": "FL-07b",
+          "invariant": "lozenge in the header, freshness with it, then operation status or conflict review",
+          "assertions": [
+            "indicatorComposed"
+          ]
+        }
+      ],
       "tests": [
         "playwright:acceptance/PERSIST-054.spec.js > PERSIST-054-O2 [chromium]",
         "playwright:acceptance/PERSIST-054.spec.js > PERSIST-054-O2 [webkit]"
@@ -534,6 +660,29 @@
         "WASM-LOAD-001"
       ],
       "assertion": "browser: shell visible before the runtime boots; an injected boot failure shows a fault pattern with a working retry",
+      "invariants": [
+        {
+          "id": "FL-08a",
+          "invariant": "loading placeholders are announced",
+          "assertions": [
+            "loadingAnnounced"
+          ]
+        },
+        {
+          "id": "FL-08b",
+          "invariant": "faults state what happened and offer a next step",
+          "assertions": [
+            "faultActionable"
+          ]
+        },
+        {
+          "id": "FL-08c",
+          "invariant": "faults state what was preserved and never that work was lost",
+          "assertions": [
+            "faultStatesPreserved"
+          ]
+        }
+      ],
       "tests": [
         "playwright:acceptance/UI-010.spec.js > UI-010-O2 [chromium]"
       ],
@@ -585,6 +734,22 @@
         "UI-029"
       ],
       "assertion": "browser: at VP-320 the navigation is reachable and operable by keyboard and touch",
+      "invariants": [
+        {
+          "id": "FL-09a",
+          "invariant": "navigation is labelled, operable and reachable by keyboard",
+          "assertions": [
+            "navigationReachable"
+          ]
+        },
+        {
+          "id": "FL-09b",
+          "invariant": "at 48rem and narrower it collapses through Forma's own pattern",
+          "assertions": [
+            "navigationCollapses"
+          ]
+        }
+      ],
       "tests": [
         "playwright:acceptance/UI-029.spec.js > UI-029-O1 [chromium]"
       ],
@@ -615,6 +780,15 @@
         "UI-016"
       ],
       "assertion": "build: dotnet:Causa.Invariants.Negative.INV24.FormaTokensExist scans web/causa.css against the inventory",
+      "invariants": [
+        {
+          "id": "FL-10a",
+          "invariant": "no stylesheet or style attribute declares or uses an --ef-* property Forma lacks",
+          "assertions": [
+            "onlyFormaTokens"
+          ]
+        }
+      ],
       "tests": [
         "dotnet:Causa.Invariants.Negative.INV24.FormaTokensExist"
       ],
@@ -636,7 +810,7 @@
     "module": "layout-tests/assertions.mjs",
     "brokenFixtures": "layout-tests/fixtures.mjs",
     "runner": "layout-tests/run.mjs",
-    "meaning": "Every rule is critical and names executable assertions for each invariant it states. CI runs each against the listed Forma 0.12.0 pattern pages, pages composed from several patterns, and conforming fixtures, at the listed viewports and colour schemes (and forced colours where named), in Chromium and WebKit; every run must pass. It also runs each against its broken fixture, where every run must fail. In the event build, the bootstrap copies assertions.mjs to tests/browser/support/layout-assertions.mjs (integration), and the plan-bound browser tests each rule names import it and run it against Causa's screens (T16, T22).",
+    "meaning": "Every rule is critical and lists the invariants it states; each invariant names the assertions that test it, and every assertion a rule runs tests one of its invariants (X15). CI runs each against the listed Forma 0.12.0 pattern pages, pages composed from several patterns, and conforming fixtures, at the listed viewports and colour schemes (and forced colours where named), in Chromium and WebKit; every run must pass. It also runs each against its broken fixture, where every run must fail. In the event build, the bootstrap copies assertions.mjs to tests/browser/support/layout-assertions.mjs (integration), and the plan-bound browser tests each rule names import it and run it against Causa's screens (T16, T22).",
     "eventBuildCopy": "tests/browser/support/layout-assertions.mjs"
   },
   "formaGaps": [

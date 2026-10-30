@@ -60,7 +60,7 @@ const runsOf = rule =>
       ),
       ...(x.composed || []).flatMap(ps => cell('positive', ps.join('+'), ps.map(pattern).join('\n'))),
       ...(x.fixtures || []).flatMap(f => cell('positive', `conforming:${f}`, conformingFixtures[f])),
-      ...cell('negative', `broken:${x.assertion}`, brokenFixtures[x.assertion]),
+      ...[].concat(brokenFixtures[x.assertion]).flatMap((body, k) => cell('negative', `broken:${x.assertion}#${k + 1}`, body)),
     ];
   });
 

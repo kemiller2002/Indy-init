@@ -9,12 +9,13 @@ open Causa.Persistence
 /// SM-CONNECTION states.
 type ConnectionState =
     | Disconnected
-    | Connecting
+    | Connecting of RequestId
     | Connected of canWrite: bool
     | CredentialRefused
     | Reauthenticating
 
 /// SM-CONNECTION events.
+[<RequireQualifiedAccess>]
 type ConnectionInput =
     | ConnectSubmitted of Repository * Credential.T
     | ConnectSucceeded of canWrite: bool
@@ -24,11 +25,13 @@ type ConnectionInput =
     | DisconnectConfirmed
 
 /// SM-NETWORK states.
+[<RequireQualifiedAccess>]
 type NetworkState =
     | Online
     | Offline
 
 /// SM-NETWORK events.
+[<RequireQualifiedAccess>]
 type NetworkInput =
     | OfflineObserved
     | OnlineObserved

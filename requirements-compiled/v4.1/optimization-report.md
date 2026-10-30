@@ -23,10 +23,11 @@ Nothing here is measured. No build has run against v4.1. A check verifies only w
 
 ## What v4.1 changes in v4, and what it does not
 
-v4.1 changes no requirement text, obligation or test binding (X10). It does ask the owner to set aside two procedural clauses for November 7 (ODR-V41-06):
+v4.1 changes no requirement text, obligation or test binding (X10). It does ask the owner to set aside three groups of clauses for November 7 (ODR-V41-06):
 
 - REHEARSAL-AGENT-INTERFACE-FREEZE says F# signatures are authored at kickoff;
-- KICKOFF-EXECUTION-PACKET §4 says parallel ownership starts after the kernel stabilizes.
+- KICKOFF-EXECUTION-PACKET §4 says parallel ownership starts after the kernel stabilizes;
+- HACKATHON-BOUNDARIES quotes the published event rules, "the repository starts empty" and "code starts at kickoff". It also says to confirm with the organizers before producing scaffolding and to keep application source out until then. The T10 bootstrap makes the application repository non-empty before kickoff.
 
 The owner stated in session on 2026-10-30 that the organizers allow pre-kickoff scaffolding. The owner's own record makes that authoritative.
 
@@ -35,12 +36,12 @@ The owner stated in session on 2026-10-30 that the organizers allow pre-kickoff 
 | Gap in v4 | Effect during a timed build | v4.1 answer |
 |---|---|---|
 | Interfaces described as 12 boundaries, with no types | Producers and consumers negotiate types at T14, and consumers wait for implementations | Typechecked F# contracts for 8 interfaces, each with operations, success and failure. Each state and input union equals its v4 machine (X05). The contracts drive every multi-request flow:<br>• save, read-back and stale-head reads;<br>• automatic reconciliation reads (`ReconcileDue`);<br>• load reads (`InterpretLoad`) and conflict reads (`InterpretConflict`).<br>Every request carries the connection context (repository and opaque credential) and a tab-unique request id. CI refuses a forged `Confirmation` and a read of the credential's token |
-| No file-level ownership; project files edited by whoever adds a file | Project-file and shared-file merge conflicts | 265 files, one owner each, including every contract, state-machine and unit test file. Integration writes every project file once, at bootstrap. Shared test support (stateful fake, recordings) is its own project |
+| No file-level ownership; project files edited by whoever adds a file | Project-file and shared-file merge conflicts | 266 files, one owner each, including every contract, state-machine and unit test file. Integration writes every project file once, at bootstrap. Shared test support (stateful fake, recordings) is its own project |
 | No generated starting point | The first hour is spent creating projects | `v41 --bootstrap` writes the .NET skeleton of the application repository and CI builds it from an empty directory. It covers:<br>• the solution, every project, the references and the full compile lists;<br>• the contracts in their producers' files;<br>• the layout-assertion module.<br>It does not write package references (ODR-V41-07), integration's other shared files (`package.json`, `Directory.Packages.props`, `build.fsx`, CI, `web/`) or test-framework wiring; integration adds those at T10 |
 | State machines given as transition lists | Each agent works out which pairs are illegal and how to fail | Every (state, event) pair is decided (84 legal, 270 fail closed). The 11 multi-transition pairs match reviewed guard partitions. Unused events are listed for the owner (ODR-V41-08) |
 | GitHub failure behaviour spread across PERSIST-008..016 | Errors diagnosed during the build | 15 error classes, each with:<br>• evidence that distinguishes it;<br>• a precedence rule;<br>• a typed error and a transition;<br>• UI text;<br>• a retry bound of its own kind;<br>• plan tests for its requirements |
 | Forma named, not inventoried, layout untested | Rehearsal 7 used Forma tokens that do not exist; layout bugs found by eye | The layout contract is checked against the published 0.12.0 tarball. Every rule (FL-01..FL-10) has executable browser assertions for each invariant it states (22 assertions). CI runs them in Chromium and WebKit against:<br>• Forma's own pattern pages;<br>• pages composed from several patterns;<br>• conforming and broken fixtures.<br>The bootstrap puts the same module in the application repository for the plan's browser tests |
-| 655 tests bound, with no run order; contract and machine tests unnamed | Setup decided ad hoc; conformance tests never written | 11 suites by environment. Each plan binding and each of the 138 contract, state-machine and unit tests is in exactly one suite, budgeted in a named task |
+| 655 tests bound, with no run order; contract and machine tests unnamed | Setup decided ad hoc; conformance tests never written | 11 suites by environment. Each plan binding and each of the 139 contract, state-machine and unit tests is in exactly one suite, budgeted in a named task |
 
 ## v4 versus v4.1
 
@@ -50,11 +51,11 @@ The owner stated in session on 2026-10-30 that the organizers allow pre-kickoff 
 | Verification plan | `VP-9817d9814482` | same file, same SHA-256 | checked (X10) |
 | Plan tests / bindings | 655 / 779 | same; each binding in exactly one suite | checked (X09) |
 | Interfaces with typechecked contracts | 0 | 8, plus domain stubs | checked (CI; X04, X05) |
-| Empty application repository (.NET skeleton) builds | not defined | 172 generated files build | checked (CI bootstrap step) |
-| Files with a single owner | not defined | 265 | checked (X01–X03, X14) |
+| Empty application repository (.NET skeleton) builds | not defined | 173 generated files, written into an empty or git-initialised directory, build | checked (CI bootstrap step) |
+| Files with a single owner | not defined | 266 | checked (X01–X03, X14) |
 | State-machine pairs decided | 96 transitions listed | 354 pairs; 11 reviewed partitions; 1 unused event raised | checked (X12) |
 | GitHub error classes | not enumerated | 15 | checked (X06) |
-| Layout rules with executable assertions for each stated invariant | 0 | 10 of 10 (22 assertions) | checked (X15; CI runs them) |
+| Layout rules with executable assertions for each stated invariant | 0 | 10 of 10 rules, 22 listed invariants, 22 assertions, 46 broken pages | checked (X15 maps every invariant to its assertions; CI runs them) |
 | Dependency critical path | 340 min | 300 min | estimated |
 | B-single-lead (one lead agent) total, with 65 min reserves | 765 (does not fit 420) | 745 (does not fit) | estimated |
 | A-role-lanes (one UI agent) total | 465 (does not fit) | 455 (does not fit) | estimated |
@@ -213,6 +214,7 @@ The telemetry spec ([analysis/conflict-telemetry.json](analysis/conflict-telemet
 | R41-08 | UI-016's amber `#E9A23B` is not a Forma value | ODR-V41-05 |
 | R41-09 | No test framework or Playwright version is locked, so the bootstrap builds test projects without one | ODR-V41-07 |
 | R41-10 | `Confirmation.ofReadBack` can still be called with the same bytes twice | The plan's INV-01 tests (Mutation.INV01.ReadBackSkipped, Property.INV01) guard that path |
+| R41-11 | Some layout assertions approximate their invariant:<br>• `faultStatesPreserved` checks wording;<br>• `textContrast` skips text over images and gradients;<br>• `touchTargets` treats a pointer cursor as a sign of a control.<br>Review rounds 3 and 4 probed 30 defective pages; all are caught except cases the rule assigns elsewhere | The plan tests check the exact PERSIST-031 copy and run axe for contrast over images; each assertion has broken pages for the defects found |
 
 ## Finding F41-01 (resolved at the owner's direction)
 
@@ -230,5 +232,6 @@ At the owner's direction (2026-10-30), both sections now carry ADR-R7-001 supers
 | 1 | FAIL | 1 critical, 7 major, 8 minor |
 | 2 | FAIL | 5 major, 6 minor |
 | 3 | FAIL | 3 major, 6 minor |
+| 4 | FAIL | 1 major, 6 minor |
 
-This revision addresses all three rounds; see [independent-review.md](independent-review.md).
+This revision addresses all four rounds; see [independent-review.md](independent-review.md).

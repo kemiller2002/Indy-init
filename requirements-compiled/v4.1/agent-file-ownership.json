@@ -15,15 +15,15 @@
     "A change to a frozen interface (interface-specifications.json) goes through the coordinator and is versioned; consumers are notified before merge.",
     "F# compile order is the order of each project's files list; a file may depend only on earlier files of its project or on referenced projects.",
     "ui and ui-2 never own the same file; Shell.fs is ui's and ui-2 consumes it read-only.",
-    "Integration alone writes: every project and solution file, Directory.*.props and .targets, NuGet.config, global.json, package.json, package-lock.json, playwright.config.ts, *.runsettings, build.fsx, README.md, .github/, .echelon/, tests/fixtures/, tests/browser/support/, web/boundary.js, src/Causa.Host/, src/Causa.App/View.fs and src/Causa.App/Program.fs (check X02). web/index.html and web/causa.css are ui's (T16)."
+    "Integration alone writes: .gitignore, every project and solution file, Directory.*.props and .targets, NuGet.config, global.json, package.json, package-lock.json, playwright.config.ts, *.runsettings, build.fsx, README.md, .github/, .echelon/, tests/fixtures/, tests/browser/support/, web/boundary.js, src/Causa.Host/, src/Causa.App/View.fs and src/Causa.App/Program.fs (check X02). web/index.html and web/causa.css are ui's (T16)."
   ],
   "counts": {
-    "files": 265,
+    "files": 266,
     "domain": 32,
     "persistence": 51,
     "ui": 70,
     "ui-2": 11,
-    "integration": 98,
+    "integration": 99,
     "coordinator": 1,
     "reviewer": 2
   },
@@ -570,6 +570,11 @@
       "path": "tests/Causa.App.Tests/Causa.App.Tests.fsproj",
       "owner": "integration",
       "kind": "project-file"
+    },
+    {
+      "path": ".gitignore",
+      "owner": "integration",
+      "kind": "shared"
     },
     {
       "path": "Causa.slnx",
@@ -1859,7 +1864,8 @@
       "project": "Causa.Contract.Tests",
       "tests": [
         "dotnet:Causa.Contract.Tests.Errors.Producer.EveryMatrixRowClassifiesItsRecordedAnswer",
-        "dotnet:Causa.Contract.Tests.Errors.Producer.SharedStatusesNeedOtherEvidence"
+        "dotnet:Causa.Contract.Tests.Errors.Producer.SharedStatusesNeedOtherEvidence",
+        "dotnet:Causa.Contract.Tests.Errors.Producer.WriteAccessOnlyFromPermissions"
       ],
       "requirements": []
     },

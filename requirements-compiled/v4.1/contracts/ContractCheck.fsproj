@@ -16,5 +16,6 @@
     <Compile Include="06-IF41-APP.fs" />
     <Compile Include="07-IF41-VIEW.fs" />
     <Compile Include="08-IF41-REPORT.fs" />
+    <Compile Include="99-Usage.fs" />
   </ItemGroup>
 </Project>

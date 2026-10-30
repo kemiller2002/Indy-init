@@ -79,8 +79,8 @@ jobs:
           done
       - name: The predefined project structure bootstraps into an empty repository and builds
         run: |
+          git init --quiet "$RUNNER_TEMP/app"
           dotnet tools/requirements-compiler/src/bin/Release/net10.0/requirements-compiler.dll v41 --source . --package requirements-compiled/v4.1 --base requirements-compiled/v4 --bootstrap "$RUNNER_TEMP/app"
-          git -C "$RUNNER_TEMP/app" init --quiet
           dotnet build "$RUNNER_TEMP/app/Causa.slnx" -c Release
       - name: Executable Forma layout assertions pass on Forma 0.12.0 patterns and fail on broken fixtures (Chromium and WebKit)
         run: |

@@ -1188,7 +1188,10 @@ let v41Command (args: string list) : int =
             let built = V41Package.build i
             // --bootstrap: write the empty application repository into a new or empty directory (never the package).
             match m.TryFind "--bootstrap" with
-            | Some dir when Directory.Exists dir && Directory.EnumerateFileSystemEntries dir |> Seq.isEmpty |> not -> failwithf "--bootstrap needs a new or empty directory; %s is not empty" dir
+            // An empty application repository may already hold its .git directory (git init, or a clone of an empty
+            // repository); anything else is refused, so the bootstrap never overwrites work.
+            | Some dir when Directory.Exists dir && Directory.EnumerateFileSystemEntries dir |> Seq.exists (fun e -> Path.GetFileName e <> ".git") ->
+                failwithf "--bootstrap needs a new or empty directory (a .git directory is allowed); %s holds other files" dir
             | Some dir ->
                 let files = V41Package.bootstrapFiles i (V41Package.ownedFiles i) (File.ReadAllText(Path.Combine(m.["--source"], "global.json")))
                 for (n, t) in files do

@@ -35,7 +35,7 @@
     "bindings": 779,
     "planTests": 655,
     "obligations": 613,
-    "ownTests": 138,
+    "ownTests": 139,
     "suites": 11
   },
   "categoryBindings": {
@@ -71,7 +71,7 @@
       "planTests": false,
       "sha": "runs on the exact candidate SHA; every result records it",
       "counts": {
-        "tests": 135,
+        "tests": 136,
         "bindings": 0,
         "obligations": 0,
         "files": 27,
@@ -158,6 +158,9 @@
         },
         {
           "id": "dotnet:Causa.Contract.Tests.Errors.Producer.SharedStatusesNeedOtherEvidence"
+        },
+        {
+          "id": "dotnet:Causa.Contract.Tests.Errors.Producer.WriteAccessOnlyFromPermissions"
         },
         {
           "id": "dotnet:Causa.Contract.Tests.Report.Producer.UnverifiedNeverConfirmed"

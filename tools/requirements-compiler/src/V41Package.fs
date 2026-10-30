@@ -722,7 +722,7 @@ let integrationExclusive (path: string) =
     || String.Equals(name, "nuget.config", StringComparison.OrdinalIgnoreCase)
     || [ ".github/"; ".echelon/"; "src/Causa.Host/"; "tests/fixtures/"; "tests/browser/support/" ] |> List.exists (fun p -> starts p path)
     || List.contains path
-        [ "global.json"; "package.json"; "package-lock.json"; "playwright.config.ts"; "build.fsx"; "README.md"; "web/boundary.js"
+        [ ".gitignore"; "global.json"; "package.json"; "package-lock.json"; "playwright.config.ts"; "build.fsx"; "README.md"; "web/boundary.js"
           "src/Causa.App/View.fs"; "src/Causa.App/Program.fs" ]
 
 let ownershipCheck (i: Inputs) (files: OwnedFile list) : Check list =
@@ -741,7 +741,7 @@ let ownershipCheck (i: Inputs) (files: OwnedFile list) : Check list =
                 if integrationExclusive f.Path && f.Owner <> "integration" then yield sprintf "%s is integration's alone but owned by %s" f.Path f.Owner
                 if integrationExclusive f.Path && not f.Contributors.IsEmpty then yield sprintf "%s is integration's alone but lists contributors %s" f.Path (String.concat ", " f.Contributors)
             // The shared files the event build cannot do without must be in the manifest, owned by integration.
-            for required in [ "Causa.slnx"; "global.json"; "Directory.Build.props"; "Directory.Packages.props"; "package.json"; "package-lock.json"; "playwright.config.ts"; ".github/workflows/ci.yml"; "web/boundary.js"; "tests/browser/support/layout-assertions.mjs" ] do
+            for required in [ ".gitignore"; "Causa.slnx"; "global.json"; "Directory.Build.props"; "Directory.Packages.props"; "package.json"; "package-lock.json"; "playwright.config.ts"; ".github/workflows/ci.yml"; "web/boundary.js"; "tests/browser/support/layout-assertions.mjs" ] do
                 if not (files |> List.exists (fun f -> f.Path = required)) then yield sprintf "%s is missing from the manifest" required ]
       check "X03" "Compile order is predefined: each file depends only on earlier files of its project or on referenced projects, project references (source and test) are acyclic, and every test file is in a declared test project"
           [ let refs = allProjects |> List.map (fun p -> str "id" p, strs "references" p) |> Map.ofList
@@ -1062,7 +1062,7 @@ let layoutKitCheck (i: Inputs) : Check =
     let section (src: string) (start: string) (stop: string) =
         let a = src.IndexOf start
         if a < 0 then "" else let b = src.IndexOf(stop, a + start.Length) in if b < 0 then src.Substring a else src.Substring(a, b - a)
-    let keys (src: string) = Regex.Matches(src, @"(?m)^\s+([A-Za-z0-9]+):\s*'") |> Seq.map (fun m -> m.Groups.[1].Value) |> Set.ofSeq
+    let keys (src: string) = Regex.Matches(src, @"(?m)^\s+([A-Za-z0-9]+):\s*['\[]") |> Seq.map (fun m -> m.Groups.[1].Value) |> Set.ofSeq
     let fixturesText = text "layout-tests/fixtures.mjs"
     let fixtures = keys (section fixturesText "export const brokenFixtures" "export const conformingFixtures")
     let conforming = keys (section fixturesText "export const conformingFixtures" "\n};")
@@ -1080,6 +1080,17 @@ let layoutKitCheck (i: Inputs) : Check =
               // Every layout rule is critical: none may opt out of executable assertions.
               if not (boolOr "critical" false r) then yield sprintf "%s is not marked critical; every layout rule is" id
               if (arr "executable" r).IsEmpty then yield sprintf "%s names no executable assertion" id
+              // Every stated invariant names assertions the rule runs, and every assertion it runs tests an invariant.
+              let runs = arr "executable" r |> List.map (sOr "assertion") |> Set.ofList
+              let invariants = arr "invariants" r
+              if invariants.IsEmpty then yield sprintf "%s lists no invariants" id
+              for v in invariants do
+                  if (strs "assertions" v).IsEmpty then yield sprintf "%s: invariant %s names no assertion" id (sOr "id" v)
+                  for a in strs "assertions" v do
+                      if not (runs.Contains a) then yield sprintf "%s: invariant %s needs assertion %s, which the rule does not run" id (sOr "id" v) a
+              let covering = invariants |> List.collect (strs "assertions") |> Set.ofList
+              for a in runs do
+                  if not (covering.Contains a) then yield sprintf "%s: assertion %s tests none of the rule's invariants" id a
               for x in arr "executable" r do
                   let a = sOr "assertion" x
                   if not (exported.Contains a) then yield sprintf "%s: assertion %s is not exported by layout-tests/assertions.mjs" id a
@@ -1161,7 +1172,8 @@ let bootstrapFiles (i: Inputs) (files: OwnedFile list) (globalJson: string) : (s
         match field "executableTests" i.Forma |> Option.map (sOr "eventBuildCopy"), i.AuthoredText |> List.tryFind (fst >> (=) "layout-tests/assertions.mjs") with
         | Some path, Some(_, text) when path <> "" -> [ path, text ]
         | _ -> []
-    [ "Causa.slnx", slnx; "Directory.Build.props", props; "global.json", globalJson ] @ projectFiles @ fsFiles @ host @ layoutCopy
+    let gitignore = String.concat "\n" [ "bin/"; "obj/"; "node_modules/"; "test-results/"; "playwright-report/"; "*.trx"; "" ]
+    [ ".gitignore", gitignore; "Causa.slnx", slnx; "Directory.Build.props", props; "global.json", globalJson ] @ projectFiles @ fsFiles @ host @ layoutCopy
 
 // ---- contracts ---------------------------------------------------------------------------------------------------
 
@@ -1170,7 +1182,28 @@ let bootstrapFiles (i: Inputs) (files: OwnedFile list) (globalJson: string) : (s
 let contractFiles (i: Inputs) : (string * string) list =
     let stubs = field "domainStubs" i.Interfaces |> Option.defaultValue JNull
     let blocks = (sOr "id" stubs, sOr "fsharp" stubs) :: (arr "interfaces" i.Interfaces |> List.map (fun x -> str "id" x, str "fsharp" x))
-    let named = blocks |> List.mapi (fun n (id, src) -> sprintf "%02d-%s.fs" n id, src.TrimEnd() + "\n")
+    // A positive control after the contracts: names that occur in several unions resolve without ambiguity, because
+    // the machines' input unions and NetworkState require qualified access (review RV41-4-6).
+    let usage =
+        "99-Usage.fs",
+        String.concat "\n"
+            [ "// Generated by requirements-compiler v41. Positive control: these uses must compile unambiguously."
+              "namespace Causa.App"
+              ""
+              "module ContractUsage ="
+              "    open Causa.Persistence"
+              ""
+              "    let lostBeforeSending (outcome: HttpOutcome) ="
+              "        match outcome with"
+              "        | NotAnswered(_, FailedBeforeSending) -> true"
+              "        | _ -> false"
+              ""
+              "    let saveInput = SaveInput.FailedBeforeSending"
+              "    let networkOffline = NetworkState.Offline"
+              "    let saveOffline = SaveState.Offline"
+              "    let connection = ConnectionState.CredentialRefused"
+              "" ]
+    let named = (blocks |> List.mapi (fun n (id, src) -> sprintf "%02d-%s.fs" n id, src.TrimEnd() + "\n")) @ [ usage ]
     let fsproj =
         let compiles = named |> List.map (fun (f, _) -> sprintf "    <Compile Include=\"%s\" />" f) |> String.concat "\n"
         String.concat "\n"

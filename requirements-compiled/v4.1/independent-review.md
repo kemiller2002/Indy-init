@@ -13,6 +13,7 @@
 | 1 | `88d09ea` | FAIL | 1 critical, 7 major, 8 minor |
 | 2 | `7ec98d9` | FAIL | 0 critical, 5 major, 6 minor. All round-1 findings fixed or partly fixed; the partly fixed ones are completed by the round-2 remediation |
 | 3 | `7e189f9` | FAIL | 0 critical, 3 major, 6 minor. Round-2 findings fixed except 2-1, 2-2 and 2-6 (partly), completed by the round-3 remediation. Owner adjustments: bootstrap largely achieved; layout tests and type-shape reconciliation partly |
+| 4 | `5c6adda` | FAIL | 0 critical, 1 major, 6 minor. Round-3 findings fixed except 3-1 (partly), completed by the round-4 remediation. Owner adjustments: type-shape reconciliation achieved; bootstrap achieved; layout tests partly |
 
 ## Round 1 findings and remediation
 
@@ -64,3 +65,15 @@
 | RV41-3-7 | minor | X02 accepted contributors on integration files and a dropped boundary script; X04 trivial outcomes; X15 without controls; CI step name | X02 rejects contributors on integration-exclusive files and requires the essential shared files in the manifest; X04 requires stated outcomes; X15 controls added; the step names X01-X15 |
 | RV41-3-8 | minor | The bootstrap's scope was described more broadly than it is | README, the report and AGENT-RULES state it is the .NET skeleton (plus the layout module); package references, integration's other shared files and test-framework wiring come at T10 (ODR-V41-07) |
 | RV41-3-9 | minor | T19 and T22 estimate basis | T22 restored to 70 (dependency critical path now 300; the experimental target is reported as not met); T19's rationale states why 60 minutes holds and that it is off the critical path |
+
+## Round 4 findings and remediation
+
+| Id | Severity | Finding | Remediation |
+|---|---|---|---|
+| RV41-4-1 | major | The layout assertions missed common violations of their invariants | Overflow checks include html and body and any content past the viewport; clipping compares each text range with its clipping ancestors; line length measures running text anywhere; dialogFocus fails when the invoker does not open the dialog (only a declared show-modal command is carried out in a browser without invoker commands); indicatorComposed is scoped to the header carrying the lozenge and checks order; faultStatesPreserved rejects statements that work was lost; contrast accounts for ancestor opacity and waits for entry animations; also skip link visible on focus, ring contrast, hidden scroll bars, late animations, empty navs, clickable non-controls, colour-only lozenges, unreadable linked stylesheets. 46 broken pages; the reviewer's 18 defect pages are all caught except two that do not violate the rule at that viewport or with Forma's ring |
+| RV41-4-2 | minor | X15 did not enforce per-invariant coverage | Each rule lists its invariants and the assertions that test each; X15 fails if an invariant's assertion is not run or a run assertion tests no invariant; negative controls added |
+| RV41-4-3 | minor | No frozen contract drove SM-CONNECTION | IF41-ERRORS Connector (ConnectRequest, InterpretConnect -> ConnectResult; write access only from stated permissions, EXT-DATA-005); ConnectionState Connecting of RequestId; producer test WriteAccessOnlyFromPermissions |
+| RV41-4-4 | minor | --bootstrap refused a git-initialised repository | A .git directory is allowed; CI now runs git init before the bootstrap |
+| RV41-4-5 | minor | The report summarised ODR-V41-06 as two clauses | The report names all three groups, including the published event rules |
+| RV41-4-6 | minor | Duplicate union-case names caused type errors | The machines' input unions and NetworkState require qualified access; contracts/99-Usage.fs is a positive control CI compiles |
+| RV41-4-7 | minor | .gitignore unowned and not bootstrapped; onlyFormaTokens exempted any forma*.css | `.gitignore` is integration's (X02) and written by the bootstrap; only Forma's own stylesheet (default /dist/all.css, configurable) is exempt |

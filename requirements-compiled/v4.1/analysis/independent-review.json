@@ -236,62 +236,129 @@
           "severity": "major",
           "finding": "Layout assertions tested less than the FL rules state and were not wired into the event build",
           "remediation": "New assertions for each stated invariant: scroll regions accessible, line length, focus order, skip link first, dialog focus (open, trap, Escape, return), non-text contrast, forced colours, amber with a label, indicator composition, fault states what was preserved, navigation collapse; focusVisible requires a non-transparent ring of the focus-ring width that the blurred element lacks; textNotClipped detects vertical clipping and line-clamp; onlyFormaTokens reads document.styleSheets and style attributes. The reviewer's 12 defective pages are all detected except text over a gradient, which FL-06 assigns to the plan's axe run. The bootstrap writes the module to tests/browser/support/layout-assertions.mjs (integration). X15 requires every rule critical and executable, checks fixtures and composed patterns and the event-build copy, and has negative controls",
-          "status": "remediated, pending re-review"
+          "status": "partly fixed in round 4; completed by round-4 remediation (RV41-4-1, RV41-4-2)"
         },
         {
           "id": "RV41-3-2",
           "severity": "major",
           "finding": "IF41-SAVE could not drive automatic reconciliation reads, load reads or conflict reads; request bookkeeping unspecified",
           "remediation": "ReconcileDue sends automatic reconciliation reads on the ScheduleReconcileRead timer (TimerKey); InterpretLoad and InterpretConflict with awaited-read state (LoadAwaiting, ReadingRemote of RequestId); RequestContext carries the tab-unique NextId (the engine advances it, at most one request per operation) and MutationInFlightElsewhere for T-S04/T-S53; operations record Outstanding; producer contract tests named for each",
-          "status": "remediated, pending re-review"
+          "status": "verified fixed in round 4"
         },
         {
           "id": "RV41-3-3",
           "severity": "major",
           "finding": "No frozen type kept the repository and credential after Connect",
           "remediation": "IF41-WIRE ConnectionContext (repository, branch, opaque credential) kept in Model.Context and passed in RequestContext; persistence adds the Authorization header with Credential.authorization; producer test CredentialOnlyInAuthorizationHeader",
-          "status": "remediated, pending re-review"
+          "status": "verified fixed in round 4"
         },
         {
           "id": "RV41-3-4",
           "severity": "minor",
           "finding": "The §46 note asserted a dependency direction v4.1 inverts",
           "remediation": "The note and project-structure.json state App -> Persistence -> Domain and mark §46's direction superseded; the R7 validator passes",
-          "status": "remediated, pending re-review"
+          "status": "verified fixed in round 4"
         },
         {
           "id": "RV41-3-5",
           "severity": "minor",
           "finding": "ODR-V41-06 omitted the published organizer rules",
           "remediation": "ODR-V41-06 quotes 'the repository starts empty', 'code starts at kickoff' and 'keep competition application source code out of it', and says the T10 bootstrap makes the repository non-empty before kickoff",
-          "status": "remediated, pending re-review"
+          "status": "verified fixed in round 4"
         },
         {
           "id": "RV41-3-6",
           "severity": "minor",
           "finding": "Credential readable from any Causa.App file; Saved after a load needed a forged Confirmation",
           "remediation": "Credential is a module type with private representation (CI negative ReadCredential.fs refused with FS1093); Saved carries SavedBasis (Confirmed of Confirmation.T, or VerifiedAt for a load or confirmed discard, subject to ODR-V4-08)",
-          "status": "remediated, pending re-review"
+          "status": "verified fixed in round 4"
         },
         {
           "id": "RV41-3-7",
           "severity": "minor",
           "finding": "X02 accepted contributors on integration files and a dropped boundary script; X04 trivial outcomes; X15 without controls; CI step name",
           "remediation": "X02 rejects contributors on integration-exclusive files and requires the essential shared files in the manifest; X04 requires stated outcomes; X15 controls added; the step names X01-X15",
-          "status": "remediated, pending re-review"
+          "status": "verified fixed in round 4"
         },
         {
           "id": "RV41-3-8",
           "severity": "minor",
           "finding": "The bootstrap's scope was described more broadly than it is",
           "remediation": "README, the report and AGENT-RULES state it is the .NET skeleton (plus the layout module); package references, integration's other shared files and test-framework wiring come at T10 (ODR-V41-07)",
-          "status": "remediated, pending re-review"
+          "status": "verified fixed in round 4"
         },
         {
           "id": "RV41-3-9",
           "severity": "minor",
           "finding": "T19 and T22 estimate basis",
           "remediation": "T22 restored to 70 (dependency critical path now 300; the experimental target is reported as not met); T19's rationale states why 60 minutes holds and that it is off the critical path",
+          "status": "verified fixed in round 4"
+        }
+      ]
+    },
+    {
+      "round": 4,
+      "reviewedCommit": "5c6adda",
+      "verdict": "FAIL",
+      "counts": {
+        "critical": 0,
+        "major": 1,
+        "minor": 6
+      },
+      "ownerAdjustments": {
+        "review": "not yet: RV41-4-1 open",
+        "typeShapeReconciliation": "achieved",
+        "executableLayoutTests": "partly: common defects missed (RV41-4-1)",
+        "bootstrap": "achieved for an empty directory; git-initialised directory refused (RV41-4-4)"
+      },
+      "findings": [
+        {
+          "id": "RV41-4-1",
+          "severity": "major",
+          "finding": "The layout assertions missed common violations of their invariants",
+          "remediation": "Overflow checks include html and body and any content past the viewport; clipping compares each text range with its clipping ancestors; line length measures running text anywhere; dialogFocus fails when the invoker does not open the dialog (only a declared show-modal command is carried out in a browser without invoker commands); indicatorComposed is scoped to the header carrying the lozenge and checks order; faultStatesPreserved rejects statements that work was lost; contrast accounts for ancestor opacity and waits for entry animations; also skip link visible on focus, ring contrast, hidden scroll bars, late animations, empty navs, clickable non-controls, colour-only lozenges, unreadable linked stylesheets. 46 broken pages; the reviewer's 18 defect pages are all caught except two that do not violate the rule at that viewport or with Forma's ring",
+          "status": "remediated, pending re-review"
+        },
+        {
+          "id": "RV41-4-2",
+          "severity": "minor",
+          "finding": "X15 did not enforce per-invariant coverage",
+          "remediation": "Each rule lists its invariants and the assertions that test each; X15 fails if an invariant's assertion is not run or a run assertion tests no invariant; negative controls added",
+          "status": "remediated, pending re-review"
+        },
+        {
+          "id": "RV41-4-3",
+          "severity": "minor",
+          "finding": "No frozen contract drove SM-CONNECTION",
+          "remediation": "IF41-ERRORS Connector (ConnectRequest, InterpretConnect -> ConnectResult; write access only from stated permissions, EXT-DATA-005); ConnectionState Connecting of RequestId; producer test WriteAccessOnlyFromPermissions",
+          "status": "remediated, pending re-review"
+        },
+        {
+          "id": "RV41-4-4",
+          "severity": "minor",
+          "finding": "--bootstrap refused a git-initialised repository",
+          "remediation": "A .git directory is allowed; CI now runs git init before the bootstrap",
+          "status": "remediated, pending re-review"
+        },
+        {
+          "id": "RV41-4-5",
+          "severity": "minor",
+          "finding": "The report summarised ODR-V41-06 as two clauses",
+          "remediation": "The report names all three groups, including the published event rules",
+          "status": "remediated, pending re-review"
+        },
+        {
+          "id": "RV41-4-6",
+          "severity": "minor",
+          "finding": "Duplicate union-case names caused type errors",
+          "remediation": "The machines' input unions and NetworkState require qualified access; contracts/99-Usage.fs is a positive control CI compiles",
+          "status": "remediated, pending re-review"
+        },
+        {
+          "id": "RV41-4-7",
+          "severity": "minor",
+          "finding": ".gitignore unowned and not bootstrapped; onlyFormaTokens exempted any forma*.css",
+          "remediation": "`.gitignore` is integration's (X02) and written by the bootstrap; only Forma's own stylesheet (default /dist/all.css, configurable) is exempt",
           "status": "remediated, pending re-review"
         }
       ]

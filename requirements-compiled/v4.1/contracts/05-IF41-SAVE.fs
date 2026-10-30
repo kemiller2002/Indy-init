@@ -48,6 +48,7 @@ type ConflictView =
     | Unresolvable of reason: string
 
 /// SM-CONFLICT events.
+[<RequireQualifiedAccess>]
 type ConflictInput =
     | RemoteVerified of VerifiedInvestigation
     | RemoteReadFailed of TransportFailure
@@ -80,6 +81,7 @@ type SaveState =
 
 /// SM-SAVE events. Persistence produces every reply event from an HttpOutcome with SaveMachine.Interpret; the App
 /// produces only Edit, SaveRequested, CheckAgain, WentOffline, WentOnline and QueuedSaveStarted.
+[<RequireQualifiedAccess>]
 type SaveInput =
     | Edit of CommandEnvelope
     | SaveRequested
@@ -129,6 +131,7 @@ type LoadState =
     | UnavailableOffline
 
 /// SM-LOAD events.
+[<RequireQualifiedAccess>]
 type LoadInput =
     | OpenRequested of InvestigationId
     | LoadVerified of VerifiedInvestigation

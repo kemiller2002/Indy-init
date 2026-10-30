@@ -22,3 +22,15 @@ type ProviderError =
 type ProviderAnswer = { Request: RequestId; Status: int; Body: string }
 
 type Classifier = HttpOutcome -> Result<ProviderAnswer, ProviderError>
+
+/// The answer to Connect (EXT-DATA-005): write access comes only from the permissions GitHub states for the
+/// repository, never from a successful read.
+type ConnectResult =
+    | ConnectAccepted of canWrite: bool
+    | ConnectRejected of ProviderError
+    | ConnectSuperseded
+
+/// Persistence builds the Connect request and decodes its answer; the App maps ConnectResult to SM-CONNECTION's events.
+type Connector =
+    { ConnectRequest: RequestId -> ConnectionContext -> HttpRequest
+      InterpretConnect: RequestId -> HttpOutcome -> ConnectResult }

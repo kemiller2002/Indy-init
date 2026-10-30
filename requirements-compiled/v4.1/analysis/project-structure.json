@@ -525,6 +525,15 @@
   ],
   "sharedFiles": [
     {
+      "path": ".gitignore",
+      "owner": "integration",
+      "contributors": [],
+      "dependsOn": [],
+      "implements": [],
+      "requiredTests": [],
+      "note": "bin/, obj/, node_modules/, test output; written by the bootstrap"
+    },
+    {
       "path": "Causa.slnx",
       "owner": "integration",
       "contributors": [],
@@ -735,7 +744,7 @@
     "A change to a frozen interface (interface-specifications.json) goes through the coordinator and is versioned; consumers are notified before merge.",
     "F# compile order is the order of each project's files list; a file may depend only on earlier files of its project or on referenced projects.",
     "ui and ui-2 never own the same file; Shell.fs is ui's and ui-2 consumes it read-only.",
-    "Integration alone writes: every project and solution file, Directory.*.props and .targets, NuGet.config, global.json, package.json, package-lock.json, playwright.config.ts, *.runsettings, build.fsx, README.md, .github/, .echelon/, tests/fixtures/, tests/browser/support/, web/boundary.js, src/Causa.Host/, src/Causa.App/View.fs and src/Causa.App/Program.fs (check X02). web/index.html and web/causa.css are ui's (T16)."
+    "Integration alone writes: .gitignore, every project and solution file, Directory.*.props and .targets, NuGet.config, global.json, package.json, package-lock.json, playwright.config.ts, *.runsettings, build.fsx, README.md, .github/, .echelon/, tests/fixtures/, tests/browser/support/, web/boundary.js, src/Causa.Host/, src/Causa.App/View.fs and src/Causa.App/Program.fs (check X02). web/index.html and web/causa.css are ui's (T16)."
   ],
   "testProjects": [
     {
