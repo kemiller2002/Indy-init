@@ -1,0 +1,233 @@
+{
+  "schema": "indy-init.v4-freeze-manifest/1",
+  "packageVersion": "4.0.0",
+  "status": "CANDIDATE",
+  "states": {
+    "compiled": true,
+    "validated": true,
+    "independentlyReviewed": false,
+    "approved": false,
+    "frozen": false
+  },
+  "sourceCommit": "62df28a559c054226dd4022e9744cf1db06e954f",
+  "baseline": {
+    "id": "BL-CAUSA-INDY-INIT-62df28a559c0",
+    "path": "requirements/causa-requirements-baseline-v4.json",
+    "sha256": "f86a3539e48ee8dda7d99d5f4f5546a18e2397a82d308a277c8f346edb2a8f1a"
+  },
+  "counts": {
+    "requirements": 520,
+    "p0Requirements": 161,
+    "obligations": 2599,
+    "p0Obligations": 613,
+    "acceptanceObligations": 650,
+    "normativeAcceptanceObligations": 644,
+    "invariants": 23,
+    "stateMachines": 5,
+    "r7Lessons": 19,
+    "ownerDecisionRequests": 7
+  },
+  "verificationPlan": {
+    "planId": "VP-e61f097b469e",
+    "digest": "e61f097b469ebfb0f68d5437740362f16c9ed460229da1a5138d5abc26b879de",
+    "fileSha256": "c20e839f604580ebc17c88a3c53d4193830db504dddd3d835ab6f5fc0de51b63"
+  },
+  "dependencyLockSha256": "f9a7b9883a27cf7f1f6f22e0c31efd939611fa24f5e5f08d09abfe34cf858147",
+  "executionManifestSha256": "7e52e1309020c0ef4a9ae78ac4a731b4242a52d44ae900dfa4a4aedb156a2282",
+  "executionPlanSha256": "312a7c0b86a56bc601dba09b00f341ed41e754d5585269d8669aed162e435cf6",
+  "acceptanceSha256": {
+    "acceptance-obligations.json": "2a898cad28a9a93d535916bbd30357ad2cd2ac53f788a513d6a0408d937fe37e",
+    "acceptance-gate.json": "e6bb5ae31996089bd3aa2e579795659d2a18f1fe97bf77bb68ae17d1d7a9d95a"
+  },
+  "files": [
+    {
+      "path": "acceptance/acceptance-gate.json",
+      "sha256": "e6bb5ae31996089bd3aa2e579795659d2a18f1fe97bf77bb68ae17d1d7a9d95a"
+    },
+    {
+      "path": "acceptance/acceptance-obligations.json",
+      "sha256": "2a898cad28a9a93d535916bbd30357ad2cd2ac53f788a513d6a0408d937fe37e"
+    },
+    {
+      "path": "baseline-reconciliation.json",
+      "sha256": "ece6ed885b70b7a7c268354a77162eeec5d71d5c04c8e1fb7051be9b7e8b3df5"
+    },
+    {
+      "path": "contract-bindings.json",
+      "sha256": "21a0efe38c06c6f83dca3533d78c3ced0ba928c87271600df951f874e6740af9"
+    },
+    {
+      "path": "decision-registry.json",
+      "sha256": "abc725cf591732d433b90d443e35d03d2eb976a4e4e19c9bcf551c051ccd822f"
+    },
+    {
+      "path": "dependency-graph.json",
+      "sha256": "80f38ba773e775d54a5921f8beabea0e09793a79d5a1398cd07b67e4c11375c7"
+    },
+    {
+      "path": "dependency-lock.json",
+      "sha256": "f9a7b9883a27cf7f1f6f22e0c31efd939611fa24f5e5f08d09abfe34cf858147"
+    },
+    {
+      "path": "execution-plan.json",
+      "sha256": "312a7c0b86a56bc601dba09b00f341ed41e754d5585269d8669aed162e435cf6"
+    },
+    {
+      "path": "interfaces.json",
+      "sha256": "700e234096672123dc07907c36d092cd1b57d971350f233be3bad223a91d5ade"
+    },
+    {
+      "path": "invariants.json",
+      "sha256": "090f35b38e1f07c7dda7274aea338cc136c43fd776cb8d618c10d9f08aa0a5bd"
+    },
+    {
+      "path": "normalized-requirements.json",
+      "sha256": "788cff29802c571e767ba8e27123eaf2d0c1f4e6e1098caaad6aaf4255e70fa9"
+    },
+    {
+      "path": "operational-definitions.json",
+      "sha256": "30875f802f6b556b5ceacba16bcc037382338e06b73cc53f4dadd2733dd0b0cb"
+    },
+    {
+      "path": "package-manifest.json",
+      "sha256": "4f12a8f4e4af9fc895609e14c216d6f732df6e568cc788f5a08a20baf491c411"
+    },
+    {
+      "path": "package-validation-report.json",
+      "sha256": "d7130cf58ff0b8ecbb5dc87e0064da42bebe76975cbecdcffe886cb013744ffd"
+    },
+    {
+      "path": "preflight-manifest.json",
+      "sha256": "59fc0636d28d4c087b5068982af680ae13cdaa3ffc07ff957430d7e160ba2fc7"
+    },
+    {
+      "path": "r7-lessons-mapping.json",
+      "sha256": "a2ebeccd915a08ad5ef0eac406ebf30c2058d7a2874faa6603a8d61eb335f97c"
+    },
+    {
+      "path": "requirements-inventory.json",
+      "sha256": "62611dc37d9d8b56440720a13d09762b81054e28d90b9fd348433ecc1d58cbfe"
+    },
+    {
+      "path": "requirements-source-map.json",
+      "sha256": "bad1db613615a8c6dfd97a9f7c7982e4f343a2ba7a689557ea3770069d866b49"
+    },
+    {
+      "path": "requirements-validation-report.json",
+      "sha256": "723cdaeaa9519457f68d2b0560ad964b40cfd3e42d1ec785523a98dced126c17"
+    },
+    {
+      "path": "risk-register.json",
+      "sha256": "e19f57c48fde28b9c7983f794541bb8d5139e8602bd562e6ffd6748970274699"
+    },
+    {
+      "path": "state-machines.json",
+      "sha256": "17f0af64f251992171ef266fa9ccad1cdab96098ee5e2cc2befcf4c1aa55b730"
+    },
+    {
+      "path": "timed-execution-manifest.json",
+      "sha256": "7e52e1309020c0ef4a9ae78ac4a731b4242a52d44ae900dfa4a4aedb156a2282"
+    },
+    {
+      "path": "verification-manifest.json",
+      "sha256": "24866304ba1f1995d569717273c59af2fb563297814d9aa59cee295f0a557f91"
+    },
+    {
+      "path": "verification-plan.json",
+      "sha256": "c20e839f604580ebc17c88a3c53d4193830db504dddd3d835ab6f5fc0de51b63"
+    }
+  ],
+  "compiler": {
+    "name": "requirements-compiler",
+    "treeSha256": "ec2e4c55c7c885446948421403dc7a65f828b87f663ab0b45569b6355bc0cce2",
+    "sdk": "10.0.402"
+  },
+  "compilerTests": {
+    "schema": "indy-init.v4-compiler-test-record/1",
+    "result": "PASS",
+    "failures": 0,
+    "summary": "offline tests (baseline equivalence, baseline units, preflight verdict, verification plan, acceptance contracts, process evidence, v4 scope and controls): all passed",
+    "compilerTreeSha256": "ec2e4c55c7c885446948421403dc7a65f828b87f663ab0b45569b6355bc0cce2",
+    "command": "dotnet run -c Release --project tools/requirements-compiler/tests -- --offline --source ."
+  },
+  "independentReview": {
+    "verdict": "",
+    "reviewer": "",
+    "rounds": null,
+    "record": "independent-review.md"
+  },
+  "freezeGate": [
+    {
+      "id": "FG-01",
+      "condition": "The authoritative baseline is reconciled",
+      "status": "PASS",
+      "detail": "W01 0 problem(s)"
+    },
+    {
+      "id": "FG-02",
+      "condition": "No mandatory requirement has disappeared",
+      "status": "PASS",
+      "detail": "W01 (no removal, no P0 downgrade) and W03 (every P0 in the plan)"
+    },
+    {
+      "id": "FG-03",
+      "condition": "Every P0 requirement has acceptance coverage",
+      "status": "PASS",
+      "detail": "W03: plan-readiness READY, no permit, acceptance obligations for every P0"
+    },
+    {
+      "id": "FG-04",
+      "condition": "No unresolved critical contradiction remains",
+      "status": "PASS",
+      "detail": "W02: legacy V03 and readiness"
+    },
+    {
+      "id": "FG-05",
+      "condition": "All required owner approvals exist",
+      "status": "FAIL",
+      "detail": "pending: ODR-V4-01, ODR-V4-02, ODR-V4-03, ODR-V4-04, ODR-V4-05, ODR-V4-06, ODR-V4-07"
+    },
+    {
+      "id": "FG-06",
+      "condition": "The dependency lock is valid",
+      "status": "PASS",
+      "detail": "W08 0 problem(s)"
+    },
+    {
+      "id": "FG-07",
+      "condition": "The execution plan is complete",
+      "status": "PASS",
+      "detail": "complete; at least one topology fits (see execution-plan.json fit)"
+    },
+    {
+      "id": "FG-08",
+      "condition": "Compiler tests pass",
+      "status": "PASS",
+      "detail": "record: PASS, tree ec2e4c55c7c885446948421403dc7a65f828b87f663ab0b45569b6355bc0cce2 (current tree ec2e4c55c7c885446948421403dc7a65f828b87f663ab0b45569b6355bc0cce2)"
+    },
+    {
+      "id": "FG-09",
+      "condition": "Independent review passes",
+      "status": "FAIL",
+      "detail": "review verdict  ()"
+    },
+    {
+      "id": "FG-10",
+      "condition": "The freeze commit is recorded",
+      "status": "FAIL",
+      "detail": "no freeze commit: recorded only when every other condition passes"
+    }
+  ],
+  "unresolvedFindings": [
+    "owner decision ODR-V4-01 pending",
+    "owner decision ODR-V4-02 pending",
+    "owner decision ODR-V4-03 pending",
+    "owner decision ODR-V4-04 pending",
+    "owner decision ODR-V4-05 pending",
+    "owner decision ODR-V4-06 pending",
+    "owner decision ODR-V4-07 pending"
+  ],
+  "freezeTimestamp": "2026-10-30T00:00:00Z",
+  "freezeTimestampMeaning": "the time this candidate was compiled; the package is not frozen",
+  "tag": "none: the tag is created only for a FROZEN package"
+}

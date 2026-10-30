@@ -1,0 +1,337 @@
+{
+  "schema": "indy-init.rc-sources/1",
+  "description": "Revisions, classification tables, verification defaults and plan assumptions used by requirements-compiler. Every repository below is read at exactly the recorded commit.",
+  "repositories": [
+    {
+      "name": "indy-init",
+      "commit": "62df28a559c054226dd4022e9744cf1db06e954f",
+      "role": "primary: authoritative requirements (source commit of this package; baseline BL-CAUSA-INDY-INIT-62df28a559c0)"
+    },
+    {
+      "name": "causa-data",
+      "commit": "e8259df74add723765c57a5b1a5888d9c3f707af",
+      "role": "storage contract, active four-case demonstration catalog (DEC-R7-006) and its requirements"
+    },
+    {
+      "name": "praxis",
+      "commit": "dccf840061723627b64fb625fc8c16e74635fc10",
+      "role": "requirements intake contract (release v3.24.0, echelon-current 1.33.0)"
+    },
+    {
+      "name": "ordo",
+      "commit": "1e8a95780813ed0520f9b0719b14e4052958ca20",
+      "role": "decision authority (release v1.19.0, echelon-current 1.33.0)"
+    },
+    {
+      "name": "dokimos",
+      "commit": "2dab315ba10c8eef652562ffa4543eee10942a51",
+      "role": "verification and completion evidence (release dokimos-v0.9.0, echelon-current 1.33.0)"
+    },
+    {
+      "name": "percepta",
+      "commit": "c9747c2632074fc2cac94c1ad44ed22f5c2a251b",
+      "role": "semantic UI verification and telemetry metric vocabulary (release percepta-semantic-v0.3.0, echelon-current 1.33.0)"
+    },
+    {
+      "name": "forma",
+      "commit": "38ba6701e6e6adf1d87f33868b86321d14453f0e",
+      "role": "design system (release v0.12.0, echelon-current 1.33.0)"
+    },
+    {
+      "name": "limen",
+      "commit": "743cdb9be8971c0a3a250906a6e2e112170dfae0",
+      "role": "browser/WASM boundary (release v0.9.1, echelon-current 1.33.0)"
+    },
+    {
+      "name": "folio",
+      "commit": "a94cea73dd4b4c5409fb0d4399ba65f7dbc51f5e",
+      "role": "print/report components (release v0.4.1, echelon-current 1.33.0)"
+    },
+    {
+      "name": "echelon-registry",
+      "commit": "7a2c27a3db7cab4337ea47536f3e1fc22d257f03",
+      "role": "approved release sets (release main after echelon-registry #104 (echelon-current 1.33.0, DEC-R7-011), echelon-current 1.33.0)"
+    },
+    {
+      "name": "conditor",
+      "commit": "84d4847d996ac3f9fb64e20747468e28447ee7d1",
+      "role": "bootstrap tool (SD-1 fix status)"
+    }
+  ],
+  "dependencyVersions": [
+    {
+      "system": "echelon-current release set",
+      "version": "1.33.0",
+      "source": "echelon-registry sets/echelon-current/1.33.0.json at 7a2c27a (approved by kemiller2002, registry #104; DEC-R7-011)"
+    },
+    {
+      "system": "praxis",
+      "version": "3.24.0",
+      "source": "tag v3.24.0 -> dccf8400; set 1.33.0"
+    },
+    {
+      "system": "ordo",
+      "version": "1.19.0",
+      "source": "tag v1.19.0 -> 1e8a9578; set 1.33.0"
+    },
+    {
+      "system": "dokimos",
+      "version": "0.9.0",
+      "source": "tag dokimos-v0.9.0 -> 2dab315b; set 1.33.0"
+    },
+    {
+      "system": "percepta (repository lifecycle)",
+      "version": "0.1.0",
+      "source": "set 1.33.0"
+    },
+    {
+      "system": "percepta-semantic",
+      "version": "0.3.0",
+      "source": "set 1.33.0"
+    },
+    {
+      "system": "limen",
+      "version": "0.9.1",
+      "source": "tag v0.9.1 -> 743cdb9b; set 1.33.0; npm @echelon-foundry/limen 0.9.1"
+    },
+    {
+      "system": "limen-fsharp",
+      "version": "0.9.0",
+      "source": "tag v0.9.0 -> 96eb75fb; set 1.33.0"
+    },
+    {
+      "system": "forma",
+      "version": "0.12.0",
+      "source": "tag v0.12.0 -> 38ba6701; set 1.33.0; npm @echelon-foundry/design-system 0.12.0"
+    },
+    {
+      "system": "folio",
+      "version": "0.4.1",
+      "source": "tag v0.4.1 -> a94cea73; set 1.33.0; github-release @echelon-foundry/print-components 0.4.1"
+    },
+    {
+      "system": "aegis",
+      "version": "1.0.0",
+      "source": "set 1.33.0"
+    },
+    {
+      "system": "arca",
+      "version": "0.7.0",
+      "source": "set 1.33.0"
+    },
+    {
+      "system": "causa storage contract",
+      "version": "1.0.0",
+      "source": "tag causa-storage-v1.0.0 -> c947c7e3"
+    },
+    {
+      "system": "causa demonstration catalog",
+      "version": "demonstration-v1 (catalogVersion 1.0.0)",
+      "source": "causa-data catalog/active.json at e8259df (DEC-R7-006)"
+    },
+    {
+      "system": ".NET SDK",
+      "version": "10.0.402",
+      "source": "indy-init global.json (rollForward disable)"
+    },
+    {
+      "system": "conditor",
+      "version": "0.10.18",
+      "source": "tag v0.10.18 -> 2d6ae48e; named by DEC-R7-011 for the 1.33.0 kickoff set; not a component of the set file (bootstrap tool)"
+    }
+  ],
+  "implementationStatusBasis": "No implementation evidence is attributed to this requirement. kemiller2002/indy-init is the planning repository and contains no application source at the source commit (validation check V10). Rehearsal results are not carried forward as evidence: Rehearsal 2's ledger is INVALID under tools/validate-acceptance-ledger.py and Rehearsal 3 is NOT ACCEPTED (docs/OWNER-DECISIONS-2026-10-24.md, Consequences).",
+  "nearDuplicateThreshold": "0.6",
+  "categories": [
+    {
+      "match": "origin:external",
+      "category": "data-content"
+    },
+    {
+      "match": "doc:docs/CAUSA-UI-EXPERIENCE-REQUIREMENTS.md",
+      "category": "ui"
+    },
+    {
+      "match": "doc:docs/WASM-LOADING-EXPERIENCE-REQUIREMENTS.md",
+      "category": "ui-loading"
+    },
+    {
+      "match": "doc:docs/PROVIDER-FIXTURE-AND-INTEGRATION-REQUIREMENTS.md",
+      "category": "integration-testing"
+    },
+    {
+      "match": "doc:docs/REHEARSAL-EXTERNAL-DATA-BOUNDARY.md",
+      "category": "data-boundary"
+    },
+    {
+      "match": "doc:docs/FROZEN-DEMO-STORAGE-REQUIREMENTS.md",
+      "category": "storage-contract"
+    },
+    {
+      "match": "doc:docs/CAUSA-STORAGE-RELEASE-v1.0.0.md",
+      "category": "storage-contract"
+    },
+    {
+      "match": "doc:docs/DEFECT-CLASS-CLOSURE-AND-RELEASE-GATES.md",
+      "category": "quality-process"
+    },
+    {
+      "match": "doc:docs/AGENT-DECISION-REDUCTION-PROFILE.md",
+      "category": "implementation-profile"
+    },
+    {
+      "match": "doc:docs/REHEARSAL-DEPENDENCY-LOCK.md",
+      "category": "dependency-management"
+    },
+    {
+      "match": "doc:docs/SYSTEM-VERSION-AND-COMPATIBILITY-REQUIREMENTS.md",
+      "category": "dependency-management"
+    },
+    {
+      "match": "regex:^R0\\.",
+      "category": "competition-integrity"
+    },
+    {
+      "match": "regex:^R[1-8]\\.\\d+$",
+      "category": "domain"
+    },
+    {
+      "match": "regex:^R9\\.",
+      "category": "ui"
+    },
+    {
+      "match": "regex:^R10\\.",
+      "category": "persistence"
+    },
+    {
+      "match": "regex:^R11\\.",
+      "category": "security"
+    },
+    {
+      "match": "regex:^R12\\.",
+      "category": "reporting"
+    },
+    {
+      "match": "regex:^R1[34]\\.",
+      "category": "engineering-factory"
+    },
+    {
+      "match": "regex:^R15\\.",
+      "category": "epistemic"
+    },
+    {
+      "match": "regex:^R16\\.",
+      "category": "demonstration"
+    },
+    {
+      "match": "doc:docs/REQUIREMENTS.md",
+      "category": "release-profile"
+    },
+    {
+      "match": "doc:docs/SCREEN-CONTRACTS.md",
+      "category": "ui-screen"
+    },
+    {
+      "match": "doc:docs/DESIGN-DECISION-BOUNDARIES.md",
+      "category": "architecture-decision"
+    },
+    {
+      "match": "doc:docs/STATE-TRANSITION-TABLES.md",
+      "category": "domain"
+    },
+    {
+      "match": "doc:docs/KICKOFF-EXECUTION-PACKET.md",
+      "category": "execution-process"
+    },
+    {
+      "match": "doc:docs/WORKFLOW-DIAGRAM-INTEGRATION-REQUIREMENTS.md",
+      "category": "ui-visualization"
+    },
+    {
+      "match": "doc:docs/AGENT-RELIABILITY-REQUIREMENTS.md",
+      "category": "agent-reliability"
+    },
+    {
+      "match": "doc:docs/REHEARSAL-AGENT-INTERFACE-FREEZE.md",
+      "category": "interface-contract"
+    },
+    {
+      "match": "doc:docs/REHEARSAL-ACCEPTANCE-LEDGER.md",
+      "category": "verification-evidence"
+    }
+  ],
+  "verificationDefaults": {
+    "freshness": [
+      "bound to the exact application source commit SHA under test (and the deployed SHA for deployed checks, G9)",
+      "bound to the requirements baseline id and its sha256 used by the run (RDP-001)",
+      "bound to the dependency lock digest of the run (VER-004, DEP-CURRENT-006)",
+      "bound to the interface manifest SHA when the requirement crosses a boundary (G2)"
+    ],
+    "invalidatedBy": [
+      "any change to the application source commit under test",
+      "baseline re-pin, or drift reported by the preservation gate (RDP-001, RDP-004)",
+      "any change to the dependency lock (VER-004)",
+      "evidence produced by an unreleased or unregistered tool build (VER-005)",
+      "a digest, revision or id that does not match the host observation (dokimos completion verify)"
+    ],
+    "evidenceReuse": "Reuse is permitted only when Dokimos reports the evidence Reusable:true with matching id, SHA-256 digest and immutable revision, and no invalidatedBy condition has occurred since; otherwise the check is re-run. Evidence from earlier rehearsals is never reused for this run."
+  },
+  "plans": [
+    {
+      "key": "A-time-optimized",
+      "assumptions": [
+        "Each owner role (domain, ui, persistence, integration, coordinator, reviewer) runs in its own lane; operator and upstream lanes do not constrain concurrency.",
+        "Every task is one unit step: no task duration is known from evidence, so steps order work and do not estimate time.",
+        "One CI run per merged task (implementation, checkpoint and verification kinds) is the planned upper bound.",
+        "Ready tasks are started longest-remaining-chain first, so the critical path is never delayed by a shorter branch."
+      ],
+      "operatorDecisionsRequired": [
+        "Approve parallel agent fan-out: REHEARSAL-004-WRITE-PATH-PLAN R4-03 and AR-021 prefer one continuous lead agent (finding F-007).",
+        "All readiness blockers in requirements-validation-report.json."
+      ]
+    },
+    {
+      "key": "B-resource-optimized",
+      "assumptions": [
+        "All implementation roles are held by one continuous lead agent (R4-03, AR-021); the fresh reviewer is a separate lane used at T30 and T33 only.",
+        "Every task is one unit step: no task duration is known from evidence.",
+        "CI is batched: a CI run is planned at each integration checkpoint and verification task, not per task (ADRP-010, AR-022: batching may not suppress a required check).",
+        "Repository reads are limited to the compiled package plus the files a task names; the package replaces rediscovery of decisions and contracts."
+      ],
+      "operatorDecisionsRequired": [
+        "All readiness blockers in requirements-validation-report.json."
+      ]
+    }
+  ],
+  "blockerClasses": {
+    "requirement-conflict": "Indy-init requirement conflict",
+    "owner-decision": "Owner decision",
+    "external-dependency": "External dependency (upstream release or registration)",
+    "contract-incompatibility": "Contract incompatibility",
+    "environment": "Environment or configuration issue",
+    "verification-deficiency": "Verification deficiency"
+  },
+  "timedRun": {
+    "run": "Indy Init event build, November 7, 2026 (compiled package v4)",
+    "plan": "B-resource-optimized steps (one lead agent, AR-021) with minutes for both topologies; A-role-lanes is the only topology that fits the window and needs owner approval (ODR-V4-07)",
+    "topologies": [
+      "A-role-lanes",
+      "B-single-lead"
+    ],
+    "clock": {
+      "t0": "the UTC instant written to the kickoff record when the timer starts (operator or kickoff workflow; never the implementing agent)",
+      "deadline": "min(t0 + 420 minutes, 2026-11-07T22:00:00Z), written as an absolute UTC instant into the kickoff record at T0",
+      "ceilingMinutes": 420,
+      "clockRule": "every resumption and every time-based decision reads the wall clock (date -u) and computes remaining time from the recorded absolute deadline, never from remembered timestamps",
+      "mergeRule": "merge each pull request as soon as its required checks are green and its gates permit; merge freeze at deadline - 45 minutes",
+      "stopRule": "stop at the deadline; the timed result is main and its evidence at the deadline instant; later work is reported separately and never alters it"
+    },
+    "measurements": [
+      "wall-clock milestones relative to the recorded T0 (first green CI, first verified live write, first deployed candidate, accepted verdict)",
+      "CI runs created, executed and failed; queue time",
+      "tokens per agent",
+      "defect classes, recurrence against the Rehearsal 7 lesson classes (analysis/r7-lessons.json), fix-induced defects",
+      "unavailable values are recorded as unavailable"
+    ]
+  }
+}

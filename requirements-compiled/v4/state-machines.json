@@ -1,0 +1,1861 @@
+{
+  "schema": "indy-init.v4-state-machines/1",
+  "description": "Explicit models of the application states the persistence and connection requirements imply. They specify behaviour, not an implementation: any implementation whose observable behaviour matches each table is conforming. Every transition cites the baseline requirements that require it, or the owner decision request (ODR) that proposes it; a transition backed only by a proposal is not normative until the owner approves it. Pairs of state and event that no transition lists are illegal: the machine fails closed with a typed fault and leaves the state unchanged (PERSIST-023). Every asynchronous reply carries the identity of the request it answers (request id and the base head it was issued at); the guard 'current' means that identity equals the machine's outstanding request.",
+  "illegalInputPolicy": {
+    "rule": "Any (state, event) pair not listed fails closed with a typed fault naming the state and the event; state, base head and unsaved changes are unchanged.",
+    "sources": [
+      "PERSIST-023",
+      "PERSIST-051"
+    ]
+  },
+  "machines": [
+    {
+      "id": "SM-SAVE",
+      "title": "Save state of one investigation in one tab",
+      "scope": "One per loaded investigation per tab (PERSIST-022). Its projection is the only source of the save-state indicator (PERSIST-023, PERSIST-030).",
+      "initial": "Saved",
+      "states": [
+        {
+          "id": "Saved",
+          "meaning": "Last save confirmed under PERSIST-007; no unsaved change.",
+          "invariants": [
+            "INV-01",
+            "INV-13"
+          ],
+          "sources": [
+            "PERSIST-031"
+          ]
+        },
+        {
+          "id": "Unsaved",
+          "meaning": "Changes not yet sent; online.",
+          "invariants": [
+            "INV-07"
+          ],
+          "sources": [
+            "PERSIST-031"
+          ]
+        },
+        {
+          "id": "Saving",
+          "meaning": "A mutation is prepared or in flight, or an automatic rebase or reconciliation read runs.",
+          "invariants": [
+            "INV-04",
+            "INV-05"
+          ],
+          "sources": [
+            "PERSIST-031",
+            "PERSIST-006"
+          ]
+        },
+        {
+          "id": "Offline",
+          "meaning": "Known offline with unsaved changes.",
+          "invariants": [
+            "INV-07"
+          ],
+          "sources": [
+            "PERSIST-031",
+            "PERSIST-018"
+          ]
+        },
+        {
+          "id": "Conflict",
+          "meaning": "Same investigation changed remotely; nothing written; changes kept. Its resolution is SM-CONFLICT.",
+          "invariants": [
+            "INV-07",
+            "INV-08",
+            "INV-09"
+          ],
+          "sources": [
+            "PERSIST-011",
+            "PERSIST-012",
+            "PERSIST-031"
+          ]
+        },
+        {
+          "id": "UnknownOutcome",
+          "meaning": "Unknown commit outcome: the mutation may have reached GitHub.",
+          "invariants": [
+            "INV-03",
+            "INV-04"
+          ],
+          "sources": [
+            "PERSIST-015",
+            "PERSIST-031"
+          ]
+        },
+        {
+          "id": "SaveFailed",
+          "meaning": "Refused for a reason other than a stale head, rebase limit reached, or reconciliation found a mismatch or rewritten history; changes kept.",
+          "invariants": [
+            "INV-07"
+          ],
+          "sources": [
+            "PERSIST-031",
+            "PERSIST-010",
+            "PERSIST-015"
+          ]
+        }
+      ],
+      "events": [
+        {
+          "id": "Edit",
+          "meaning": "A command accepted by the F# engine adds an unsaved change."
+        },
+        {
+          "id": "SaveRequested",
+          "meaning": "The user chose Save or Retry."
+        },
+        {
+          "id": "MutationSent",
+          "meaning": "The single in-flight createCommitOnBranch was sent (current request)."
+        },
+        {
+          "id": "ReadBackMatched",
+          "meaning": "GitHub returned the new commit and the re-read at that commit returned the written bytes (current request)."
+        },
+        {
+          "id": "ReadBackMismatched",
+          "meaning": "The re-read at the returned commit differs from the written bytes (current request)."
+        },
+        {
+          "id": "StaleHeadUnrelated",
+          "meaning": "Stale head; a fresh head read shows the investigation's files unchanged between base and new head."
+        },
+        {
+          "id": "StaleHeadSameInvestigation",
+          "meaning": "Stale head; the investigation's files differ, or it was deleted or rewritten."
+        },
+        {
+          "id": "ProviderRefused",
+          "meaning": "Typed refusal: permission, validation or rate limit (not a stale head, not authentication)."
+        },
+        {
+          "id": "CredentialRefused",
+          "meaning": "Typed authentication failure (expired, revoked or invalid credential)."
+        },
+        {
+          "id": "AnswerLost",
+          "meaning": "Timeout, lost response, dropped connection after sending, or unrecognised answer."
+        },
+        {
+          "id": "FailedBeforeSending",
+          "meaning": "The request failed before it was sent (offline)."
+        },
+        {
+          "id": "ReconcileMarkerBytesMatch",
+          "meaning": "A commit after the expected head carries this save's marker and holds the written bytes."
+        },
+        {
+          "id": "ReconcileMarkerBytesDiffer",
+          "meaning": "A commit carries the marker but its bytes differ."
+        },
+        {
+          "id": "ReconcileNothingWrittenHeadUnchanged",
+          "meaning": "Head equals the expected head and no commit carries the marker."
+        },
+        {
+          "id": "ReconcileNothingWrittenHeadMoved",
+          "meaning": "Head moved and no commit carries the marker."
+        },
+        {
+          "id": "ReconcileHistoryRewritten",
+          "meaning": "The expected head is no longer an ancestor of the branch head."
+        },
+        {
+          "id": "ReconcileReadFailed",
+          "meaning": "A reconciliation read failed."
+        },
+        {
+          "id": "ReconcileReadsSpent",
+          "meaning": "Three automatic reconciliation reads (2, 4, 8 s apart) are spent."
+        },
+        {
+          "id": "CheckAgain",
+          "meaning": "The user chose Check again."
+        },
+        {
+          "id": "WentOffline",
+          "meaning": "The application learned the browser is offline."
+        },
+        {
+          "id": "WentOnline",
+          "meaning": "The browser went from offline to online."
+        },
+        {
+          "id": "ConflictResolvedReapplied",
+          "meaning": "SM-CONFLICT finished Reapply: accepted commands are unsaved changes on the new base head."
+        },
+        {
+          "id": "ConflictResolvedDiscarded",
+          "meaning": "SM-CONFLICT finished a confirmed Discard: the GitHub version is loaded and verified."
+        },
+        {
+          "id": "SupersededReply",
+          "meaning": "Any reply whose request identity or base head is not the current one."
+        }
+      ],
+      "transitions": [
+        {
+          "id": "T-S01",
+          "from": "Saved",
+          "event": "Edit",
+          "to": "Unsaved",
+          "guard": "online",
+          "effects": [
+            "record unsaved change in tab memory only"
+          ],
+          "sources": [
+            "PERSIST-031",
+            "PERSIST-002",
+            "PERSIST-003"
+          ]
+        },
+        {
+          "id": "T-S02",
+          "from": "Saved",
+          "event": "Edit",
+          "to": "Offline",
+          "guard": "known offline",
+          "effects": [
+            "record unsaved change in tab memory only"
+          ],
+          "sources": [
+            "PERSIST-018",
+            "PERSIST-031"
+          ]
+        },
+        {
+          "id": "T-S03",
+          "from": "Unsaved",
+          "event": "Edit",
+          "to": "Unsaved",
+          "guard": "online",
+          "effects": [
+            "append unsaved change"
+          ],
+          "sources": [
+            "PERSIST-031"
+          ]
+        },
+        {
+          "id": "T-S04",
+          "from": "Unsaved",
+          "event": "SaveRequested",
+          "to": "Saving",
+          "guard": "online and no other mutation in flight in this tab",
+          "effects": [
+            "build one commit (events append, manifest, snapshot) under the investigation's path prefix",
+            "expectedHeadOid = base head",
+            "new write marker (session id, sequence)",
+            "send createCommitOnBranch"
+          ],
+          "failure": "If another mutation is in flight in the tab, the request waits in memory and the state stays Unsaved with a waiting notice (it is not Saving).",
+          "sources": [
+            "PERSIST-006",
+            "PERSIST-014",
+            "PERSIST-031"
+          ]
+        },
+        {
+          "id": "T-S05",
+          "from": "Unsaved",
+          "event": "SaveRequested",
+          "to": "Offline",
+          "guard": "known offline",
+          "effects": [
+            "send nothing"
+          ],
+          "sources": [
+            "PERSIST-018"
+          ]
+        },
+        {
+          "id": "T-S06",
+          "from": "Unsaved",
+          "event": "WentOffline",
+          "to": "Offline",
+          "guard": "true",
+          "effects": [],
+          "sources": [
+            "PERSIST-031"
+          ]
+        },
+        {
+          "id": "T-S07",
+          "from": "Offline",
+          "event": "Edit",
+          "to": "Offline",
+          "guard": "true",
+          "effects": [
+            "append unsaved change"
+          ],
+          "sources": [
+            "PERSIST-018"
+          ]
+        },
+        {
+          "id": "T-S08",
+          "from": "Offline",
+          "event": "SaveRequested",
+          "to": "Offline",
+          "guard": "still offline",
+          "effects": [
+            "send nothing"
+          ],
+          "sources": [
+            "PERSIST-018",
+            "PERSIST-046"
+          ]
+        },
+        {
+          "id": "T-S09",
+          "from": "Offline",
+          "event": "WentOnline",
+          "to": "Unsaved",
+          "guard": "true",
+          "effects": [
+            "send nothing: no replay, no queue; Save offered again"
+          ],
+          "sources": [
+            "PERSIST-018",
+            "PERSIST-031"
+          ]
+        },
+        {
+          "id": "T-S10",
+          "from": "Saving",
+          "event": "Edit",
+          "to": "Saving",
+          "guard": "true",
+          "effects": [
+            "record change as made after the in-flight save; it stays unsaved after confirmation"
+          ],
+          "sources": [
+            "PERSIST-007"
+          ]
+        },
+        {
+          "id": "T-S11",
+          "from": "Saving",
+          "event": "ReadBackMatched",
+          "to": "Saved",
+          "guard": "current and no change made during the save",
+          "effects": [
+            "advance base head to the confirmed commit",
+            "freshness = commit time"
+          ],
+          "sources": [
+            "PERSIST-007",
+            "PERSIST-023",
+            "PERSIST-031"
+          ]
+        },
+        {
+          "id": "T-S12",
+          "from": "Saving",
+          "event": "ReadBackMatched",
+          "to": "Unsaved",
+          "guard": "current and changes were made during the save",
+          "effects": [
+            "advance base head",
+            "changes made during the save stay unsaved"
+          ],
+          "sources": [
+            "PERSIST-007"
+          ]
+        },
+        {
+          "id": "T-S13",
+          "from": "Saving",
+          "event": "ReadBackMismatched",
+          "to": "SaveFailed",
+          "guard": "current",
+          "effects": [
+            "keep changes",
+            "cause: GitHub holds different bytes"
+          ],
+          "sources": [
+            "PERSIST-007",
+            "PERSIST-031"
+          ]
+        },
+        {
+          "id": "T-S14",
+          "from": "Saving",
+          "event": "StaleHeadUnrelated",
+          "to": "Saving",
+          "guard": "current and fewer than three rebase attempts made",
+          "effects": [
+            "fresh head read",
+            "re-verify remote history",
+            "resend same events, manifest and snapshot with expectedHeadOid = new head"
+          ],
+          "sources": [
+            "PERSIST-009",
+            "PERSIST-010"
+          ]
+        },
+        {
+          "id": "T-S15",
+          "from": "Saving",
+          "event": "StaleHeadUnrelated",
+          "to": "SaveFailed",
+          "guard": "current and three rebase attempts already made",
+          "effects": [
+            "keep changes",
+            "cause: the repository kept changing"
+          ],
+          "sources": [
+            "PERSIST-010"
+          ]
+        },
+        {
+          "id": "T-S16",
+          "from": "Saving",
+          "event": "StaleHeadSameInvestigation",
+          "to": "Conflict",
+          "guard": "current",
+          "effects": [
+            "send nothing more",
+            "keep every unsaved change visible",
+            "start SM-CONFLICT"
+          ],
+          "sources": [
+            "PERSIST-011"
+          ]
+        },
+        {
+          "id": "T-S17",
+          "from": "Saving",
+          "event": "ProviderRefused",
+          "to": "SaveFailed",
+          "guard": "current",
+          "effects": [
+            "keep changes",
+            "cause named from the typed answer (permission, validation or rate limit)"
+          ],
+          "sources": [
+            "PERSIST-008",
+            "PERSIST-024",
+            "PERSIST-031"
+          ]
+        },
+        {
+          "id": "T-S18",
+          "from": "Saving",
+          "event": "CredentialRefused",
+          "to": "SaveFailed",
+          "guard": "current",
+          "effects": [
+            "keep changes",
+            "offer Reconnect",
+            "SM-CONNECTION: CredentialRefused"
+          ],
+          "sources": [
+            "PERSIST-031",
+            "UI-010"
+          ]
+        },
+        {
+          "id": "T-S19",
+          "from": "Saving",
+          "event": "AnswerLost",
+          "to": "UnknownOutcome",
+          "guard": "current",
+          "effects": [
+            "send no mutation",
+            "schedule reconciliation read 1 after at least 2 s"
+          ],
+          "sources": [
+            "PERSIST-015",
+            "PERSIST-016"
+          ]
+        },
+        {
+          "id": "T-S20",
+          "from": "Saving",
+          "event": "FailedBeforeSending",
+          "to": "Offline",
+          "guard": "current",
+          "effects": [
+            "no automatic retry"
+          ],
+          "sources": [
+            "PERSIST-016",
+            "PERSIST-018"
+          ]
+        },
+        {
+          "id": "T-S21",
+          "from": "UnknownOutcome",
+          "event": "ReconcileMarkerBytesMatch",
+          "to": "Saved",
+          "guard": "current and no change made during the save",
+          "effects": [
+            "advance base head to the marked commit"
+          ],
+          "sources": [
+            "PERSIST-015",
+            "PERSIST-007"
+          ]
+        },
+        {
+          "id": "T-S22",
+          "from": "UnknownOutcome",
+          "event": "ReconcileMarkerBytesMatch",
+          "to": "Unsaved",
+          "guard": "current and changes were made during the save",
+          "effects": [
+            "advance base head",
+            "later changes stay unsaved"
+          ],
+          "sources": [
+            "PERSIST-015",
+            "PERSIST-007"
+          ]
+        },
+        {
+          "id": "T-S23",
+          "from": "UnknownOutcome",
+          "event": "ReconcileMarkerBytesDiffer",
+          "to": "SaveFailed",
+          "guard": "current",
+          "effects": [
+            "never report saved",
+            "keep changes"
+          ],
+          "sources": [
+            "PERSIST-015"
+          ]
+        },
+        {
+          "id": "T-S24",
+          "from": "UnknownOutcome",
+          "event": "ReconcileNothingWrittenHeadUnchanged",
+          "to": "Saving",
+          "guard": "current and mutation limit not reached",
+          "effects": [
+            "resend with a new marker sequence, same expected head"
+          ],
+          "sources": [
+            "PERSIST-015",
+            "PERSIST-010"
+          ]
+        },
+        {
+          "id": "T-S25",
+          "from": "UnknownOutcome",
+          "event": "ReconcileNothingWrittenHeadUnchanged",
+          "to": "SaveFailed",
+          "guard": "current and mutation limit reached",
+          "effects": [
+            "keep changes",
+            "cause: limit reached"
+          ],
+          "sources": [
+            "PERSIST-010",
+            "PERSIST-016"
+          ]
+        },
+        {
+          "id": "T-S26",
+          "from": "UnknownOutcome",
+          "event": "ReconcileNothingWrittenHeadMoved",
+          "to": "Saving",
+          "guard": "current; investigation files unchanged; rebase limit not reached",
+          "effects": [
+            "stale-head rules: rebase"
+          ],
+          "sources": [
+            "PERSIST-015",
+            "PERSIST-009"
+          ]
+        },
+        {
+          "id": "T-S27",
+          "from": "UnknownOutcome",
+          "event": "StaleHeadSameInvestigation",
+          "to": "Conflict",
+          "guard": "current, after a reconciliation found nothing written by this save",
+          "effects": [
+            "stale-head rules: conflict"
+          ],
+          "sources": [
+            "PERSIST-015",
+            "PERSIST-011"
+          ]
+        },
+        {
+          "id": "T-S28",
+          "from": "UnknownOutcome",
+          "event": "ReconcileHistoryRewritten",
+          "to": "SaveFailed",
+          "guard": "current",
+          "effects": [
+            "cause: branch history was rewritten",
+            "keep changes"
+          ],
+          "sources": [
+            "PERSIST-015"
+          ]
+        },
+        {
+          "id": "T-S29",
+          "from": "UnknownOutcome",
+          "event": "ReconcileReadFailed",
+          "to": "UnknownOutcome",
+          "guard": "fewer than three automatic reads made",
+          "effects": [
+            "schedule next read at 4 s, then 8 s"
+          ],
+          "sources": [
+            "PERSIST-015",
+            "PERSIST-016"
+          ]
+        },
+        {
+          "id": "T-S30",
+          "from": "UnknownOutcome",
+          "event": "ReconcileReadsSpent",
+          "to": "UnknownOutcome",
+          "guard": "true",
+          "effects": [
+            "offer Check again",
+            "no further automatic reads except one per offline-to-online change"
+          ],
+          "sources": [
+            "PERSIST-016",
+            "PERSIST-031"
+          ]
+        },
+        {
+          "id": "T-S31",
+          "from": "UnknownOutcome",
+          "event": "CheckAgain",
+          "to": "UnknownOutcome",
+          "guard": "automatic reads spent",
+          "effects": [
+            "one reconciliation read"
+          ],
+          "sources": [
+            "PERSIST-016",
+            "PERSIST-031"
+          ]
+        },
+        {
+          "id": "T-S32",
+          "from": "UnknownOutcome",
+          "event": "WentOnline",
+          "to": "UnknownOutcome",
+          "guard": "true",
+          "effects": [
+            "one reconciliation read"
+          ],
+          "sources": [
+            "PERSIST-016"
+          ]
+        },
+        {
+          "id": "T-S33",
+          "from": "UnknownOutcome",
+          "event": "Edit",
+          "to": "UnknownOutcome",
+          "guard": "true",
+          "effects": [
+            "record change as made after the in-flight save"
+          ],
+          "sources": [
+            "PERSIST-007",
+            "PERSIST-015"
+          ]
+        },
+        {
+          "id": "T-S34",
+          "from": "SaveFailed",
+          "event": "Edit",
+          "to": "SaveFailed",
+          "guard": "true",
+          "effects": [
+            "append unsaved change"
+          ],
+          "sources": [
+            "PERSIST-031"
+          ]
+        },
+        {
+          "id": "T-S35",
+          "from": "SaveFailed",
+          "event": "SaveRequested",
+          "to": "Saving",
+          "guard": "online, Retry can succeed, credential accepted",
+          "effects": [
+            "new save request with fresh bounds"
+          ],
+          "sources": [
+            "PERSIST-010",
+            "PERSIST-031"
+          ]
+        },
+        {
+          "id": "T-S36",
+          "from": "Conflict",
+          "event": "Edit",
+          "to": "Conflict",
+          "guard": "true",
+          "effects": [
+            "append unsaved change; still nothing is sent"
+          ],
+          "sources": [
+            "PERSIST-011",
+            "PERSIST-012"
+          ]
+        },
+        {
+          "id": "T-S37",
+          "from": "Conflict",
+          "event": "ConflictResolvedReapplied",
+          "to": "Unsaved",
+          "guard": "SM-CONFLICT reached Reapplied",
+          "effects": [
+            "base head = verified GitHub version",
+            "accepted commands are unsaved changes",
+            "nothing is saved"
+          ],
+          "sources": [
+            "PERSIST-012"
+          ]
+        },
+        {
+          "id": "T-S38",
+          "from": "Conflict",
+          "event": "ConflictResolvedDiscarded",
+          "to": "Saved",
+          "guard": "SM-CONFLICT reached Discarded with a verified load",
+          "effects": [
+            "base head = verified GitHub version",
+            "confirmation from the verified load"
+          ],
+          "sources": [
+            "PERSIST-012",
+            "PERSIST-005",
+            "PERSIST-021"
+          ]
+        },
+        {
+          "id": "T-S39",
+          "from": "Saving",
+          "event": "SupersededReply",
+          "to": "Saving",
+          "guard": "reply is not current",
+          "effects": [
+            "discard the reply; nothing changes"
+          ],
+          "sources": [
+            "PERSIST-007"
+          ],
+          "proposals": [
+            "ODR-V4-03"
+          ]
+        },
+        {
+          "id": "T-S40",
+          "from": "UnknownOutcome",
+          "event": "SupersededReply",
+          "to": "UnknownOutcome",
+          "guard": "reply is not current",
+          "effects": [
+            "discard the reply; nothing changes"
+          ],
+          "sources": [
+            "PERSIST-015"
+          ],
+          "proposals": [
+            "ODR-V4-03"
+          ]
+        },
+        {
+          "id": "T-S41",
+          "from": "Saved",
+          "event": "WentOffline",
+          "to": "Saved",
+          "guard": "true",
+          "effects": [
+            "header shows offline; indicator stays Saved"
+          ],
+          "sources": [
+            "PERSIST-031"
+          ]
+        },
+        {
+          "id": "T-S42",
+          "from": "Saved",
+          "event": "WentOnline",
+          "to": "Saved",
+          "guard": "true",
+          "effects": [],
+          "sources": [
+            "PERSIST-031"
+          ]
+        },
+        {
+          "id": "T-S43",
+          "from": "Unsaved",
+          "event": "WentOnline",
+          "to": "Unsaved",
+          "guard": "true",
+          "effects": [],
+          "sources": [
+            "PERSIST-031"
+          ]
+        },
+        {
+          "id": "T-S44",
+          "from": "Offline",
+          "event": "WentOffline",
+          "to": "Offline",
+          "guard": "true",
+          "effects": [],
+          "sources": [
+            "PERSIST-031"
+          ]
+        },
+        {
+          "id": "T-S45",
+          "from": "Saving",
+          "event": "WentOffline",
+          "to": "Saving",
+          "guard": "true",
+          "effects": [
+            "the in-flight request resolves as AnswerLost or FailedBeforeSending; nothing new is sent"
+          ],
+          "sources": [
+            "PERSIST-015",
+            "PERSIST-018"
+          ]
+        },
+        {
+          "id": "T-S46",
+          "from": "Saving",
+          "event": "WentOnline",
+          "to": "Saving",
+          "guard": "true",
+          "effects": [],
+          "sources": [
+            "PERSIST-031"
+          ]
+        },
+        {
+          "id": "T-S47",
+          "from": "UnknownOutcome",
+          "event": "WentOffline",
+          "to": "UnknownOutcome",
+          "guard": "true",
+          "effects": [
+            "automatic reads pause; one read on return"
+          ],
+          "sources": [
+            "PERSIST-016"
+          ]
+        },
+        {
+          "id": "T-S48",
+          "from": "Conflict",
+          "event": "WentOffline",
+          "to": "Conflict",
+          "guard": "true",
+          "effects": [],
+          "sources": [
+            "PERSIST-011"
+          ]
+        },
+        {
+          "id": "T-S49",
+          "from": "Conflict",
+          "event": "WentOnline",
+          "to": "Conflict",
+          "guard": "true",
+          "effects": [
+            "SM-CONFLICT ReadAgain if RemoteUnavailable"
+          ],
+          "sources": [
+            "PERSIST-011",
+            "PERSIST-012"
+          ]
+        },
+        {
+          "id": "T-S50",
+          "from": "SaveFailed",
+          "event": "WentOffline",
+          "to": "SaveFailed",
+          "guard": "true",
+          "effects": [],
+          "sources": [
+            "PERSIST-031"
+          ]
+        },
+        {
+          "id": "T-S51",
+          "from": "SaveFailed",
+          "event": "WentOnline",
+          "to": "SaveFailed",
+          "guard": "true",
+          "effects": [],
+          "sources": [
+            "PERSIST-031"
+          ]
+        },
+        {
+          "id": "T-S52",
+          "from": "SaveFailed",
+          "event": "SaveRequested",
+          "to": "Offline",
+          "guard": "known offline",
+          "effects": [
+            "known offline: send nothing"
+          ],
+          "sources": [
+            "PERSIST-018"
+          ]
+        }
+      ],
+      "entersSavedOnlyBy": [
+        "ReadBackMatched",
+        "ReconcileMarkerBytesMatch",
+        "ConflictResolvedDiscarded"
+      ],
+      "staleAndReorderedReplies": "Every reply is matched against the outstanding request identity and base head before it is applied (guard 'current'). A reply that is not current is SupersededReply: discarded, state unchanged (T-S39, T-S40, proposed by ODR-V4-03; the baseline already forbids such a reply from reaching Saved, PERSIST-007).",
+      "concurrentOperations": "At most one mutation in flight per tab (PERSIST-006); other saves wait in memory without entering Saving. Different tabs are independent writers resolved only by GitHub's expected-head rule (PERSIST-004, PERSIST-013).",
+      "uncertainRemoteOutcomes": "AnswerLost always leads to UnknownOutcome, never to SaveFailed or Conflict directly; only reconciliation results move it on (PERSIST-015)."
+    },
+    {
+      "id": "SM-CONFLICT",
+      "title": "Resolution of one genuine conflict",
+      "scope": "Runs while SM-SAVE is Conflict.",
+      "initial": "ReadingRemote",
+      "states": [
+        {
+          "id": "ReadingRemote",
+          "meaning": "Reading and verifying the GitHub version at the branch's current head.",
+          "invariants": [
+            "INV-02",
+            "INV-07"
+          ],
+          "sources": [
+            "PERSIST-012"
+          ]
+        },
+        {
+          "id": "Reviewable",
+          "meaning": "Both versions available; review, reapply and discard offered.",
+          "invariants": [
+            "INV-07",
+            "INV-08"
+          ],
+          "sources": [
+            "PERSIST-012"
+          ]
+        },
+        {
+          "id": "Reapplying",
+          "meaning": "Re-deciding each unsaved command in order through the engine at the GitHub version.",
+          "invariants": [
+            "INV-12"
+          ],
+          "sources": [
+            "PERSIST-012"
+          ]
+        },
+        {
+          "id": "Reapplied",
+          "meaning": "Accepted commands are unsaved changes on the new base head; refused ones listed with reasons.",
+          "invariants": [
+            "INV-07"
+          ],
+          "sources": [
+            "PERSIST-012"
+          ]
+        },
+        {
+          "id": "ConfirmingDiscard",
+          "meaning": "Discard asked; awaiting confirmation.",
+          "invariants": [
+            "INV-07"
+          ],
+          "sources": [
+            "PERSIST-012",
+            "PERSIST-019"
+          ]
+        },
+        {
+          "id": "Discarded",
+          "meaning": "GitHub version loaded and verified; unsaved changes dropped by the user's confirmed choice.",
+          "invariants": [],
+          "sources": [
+            "PERSIST-012"
+          ]
+        },
+        {
+          "id": "RemoteUnavailable",
+          "meaning": "The GitHub version could not be read (network); changes kept; re-read offered and done again when the connection returns.",
+          "invariants": [
+            "INV-07"
+          ],
+          "sources": [
+            "PERSIST-011",
+            "PERSIST-024"
+          ]
+        },
+        {
+          "id": "Unresolvable",
+          "meaning": "The GitHub version was deleted or fails verification; changes kept; reapply and load unavailable with that reason; export of unsaved commands offered.",
+          "invariants": [
+            "INV-07"
+          ],
+          "sources": [
+            "PERSIST-011"
+          ],
+          "proposals": [
+            "ODR-V4-05"
+          ]
+        }
+      ],
+      "events": [
+        {
+          "id": "RemoteVerified",
+          "meaning": "The current re-read at the current head returned a verified file set."
+        },
+        {
+          "id": "RemoteReadFailed",
+          "meaning": "The re-read failed for a network reason."
+        },
+        {
+          "id": "RemoteMissingOrInvalid",
+          "meaning": "The investigation is deleted at the head, or its file set fails verification."
+        },
+        {
+          "id": "ReadAgain",
+          "meaning": "The user chose to read the GitHub version again, or the connection returned."
+        },
+        {
+          "id": "ReviewChosen",
+          "meaning": "Show both versions."
+        },
+        {
+          "id": "ReapplyChosen",
+          "meaning": "Reapply my changes."
+        },
+        {
+          "id": "ReapplyDone",
+          "meaning": "Every command re-decided."
+        },
+        {
+          "id": "DiscardChosen",
+          "meaning": "Discard my changes."
+        },
+        {
+          "id": "DiscardConfirmed",
+          "meaning": "The user confirmed."
+        },
+        {
+          "id": "DiscardCancelled",
+          "meaning": "The user cancelled."
+        },
+        {
+          "id": "ExportChosen",
+          "meaning": "Export the unsaved commands as a file the user saves."
+        },
+        {
+          "id": "SupersededReply",
+          "meaning": "A re-read answer for an older head or an earlier request."
+        }
+      ],
+      "transitions": [
+        {
+          "id": "T-C01",
+          "from": "ReadingRemote",
+          "event": "RemoteVerified",
+          "to": "Reviewable",
+          "guard": "current",
+          "effects": [
+            "hold the verified GitHub version and its commit"
+          ],
+          "sources": [
+            "PERSIST-012"
+          ]
+        },
+        {
+          "id": "T-C02",
+          "from": "ReadingRemote",
+          "event": "RemoteReadFailed",
+          "to": "RemoteUnavailable",
+          "guard": "current",
+          "effects": [
+            "keep changes; never Discard-only"
+          ],
+          "sources": [
+            "PERSIST-024"
+          ]
+        },
+        {
+          "id": "T-C03",
+          "from": "ReadingRemote",
+          "event": "RemoteMissingOrInvalid",
+          "to": "Unresolvable",
+          "guard": "current",
+          "effects": [
+            "keep changes"
+          ],
+          "sources": [
+            "PERSIST-011"
+          ],
+          "proposals": [
+            "ODR-V4-05"
+          ]
+        },
+        {
+          "id": "T-C04",
+          "from": "RemoteUnavailable",
+          "event": "ReadAgain",
+          "to": "ReadingRemote",
+          "guard": "online",
+          "effects": [
+            "read at the branch's current head with a new request identity"
+          ],
+          "sources": [
+            "PERSIST-012"
+          ]
+        },
+        {
+          "id": "T-C05",
+          "from": "Reviewable",
+          "event": "ReviewChosen",
+          "to": "Reviewable",
+          "guard": "true",
+          "effects": [
+            "show both versions"
+          ],
+          "sources": [
+            "PERSIST-012"
+          ]
+        },
+        {
+          "id": "T-C06",
+          "from": "Reviewable",
+          "event": "ReapplyChosen",
+          "to": "Reapplying",
+          "guard": "true",
+          "effects": [
+            "re-decide each unsaved command in original order through the F# engine at the GitHub version"
+          ],
+          "sources": [
+            "PERSIST-012"
+          ]
+        },
+        {
+          "id": "T-C07",
+          "from": "Reapplying",
+          "event": "ReapplyDone",
+          "to": "Reapplied",
+          "guard": "true",
+          "effects": [
+            "accepted commands become unsaved changes on the GitHub version's commit (taken from the verified file set, never from a later head)",
+            "refused commands listed with the engine's reason",
+            "nothing saved"
+          ],
+          "sources": [
+            "PERSIST-012"
+          ]
+        },
+        {
+          "id": "T-C08",
+          "from": "Reviewable",
+          "event": "DiscardChosen",
+          "to": "ConfirmingDiscard",
+          "guard": "true",
+          "effects": [
+            "ask for confirmation"
+          ],
+          "sources": [
+            "PERSIST-012",
+            "PERSIST-019"
+          ]
+        },
+        {
+          "id": "T-C09",
+          "from": "ConfirmingDiscard",
+          "event": "DiscardConfirmed",
+          "to": "Discarded",
+          "guard": "true",
+          "effects": [
+            "load the verified GitHub version"
+          ],
+          "sources": [
+            "PERSIST-012"
+          ]
+        },
+        {
+          "id": "T-C10",
+          "from": "ConfirmingDiscard",
+          "event": "DiscardCancelled",
+          "to": "Reviewable",
+          "guard": "true",
+          "effects": [],
+          "sources": [
+            "PERSIST-012"
+          ]
+        },
+        {
+          "id": "T-C11",
+          "from": "Reviewable",
+          "event": "ReadAgain",
+          "to": "ReadingRemote",
+          "guard": "true",
+          "effects": [
+            "re-read at the branch's current head"
+          ],
+          "sources": [
+            "PERSIST-012"
+          ]
+        },
+        {
+          "id": "T-C12",
+          "from": "Unresolvable",
+          "event": "ExportChosen",
+          "to": "Unresolvable",
+          "guard": "true",
+          "effects": [
+            "offer the unsaved commands as a file the user saves; nothing written to GitHub or browser storage"
+          ],
+          "sources": [
+            "PERSIST-003"
+          ],
+          "proposals": [
+            "ODR-V4-05"
+          ]
+        },
+        {
+          "id": "T-C13",
+          "from": "Unresolvable",
+          "event": "ReadAgain",
+          "to": "ReadingRemote",
+          "guard": "online",
+          "effects": [
+            "re-read at the branch's current head"
+          ],
+          "sources": [
+            "PERSIST-012"
+          ]
+        },
+        {
+          "id": "T-C14",
+          "from": "ReadingRemote",
+          "event": "SupersededReply",
+          "to": "ReadingRemote",
+          "guard": "reply is not current",
+          "effects": [
+            "discard the reply"
+          ],
+          "sources": [
+            "PERSIST-013"
+          ],
+          "proposals": [
+            "ODR-V4-03"
+          ]
+        },
+        {
+          "id": "T-C15",
+          "from": "Reviewable",
+          "event": "SupersededReply",
+          "to": "Reviewable",
+          "guard": "reply is not current",
+          "effects": [
+            "discard the reply; the held GitHub version is unchanged"
+          ],
+          "sources": [
+            "PERSIST-013"
+          ],
+          "proposals": [
+            "ODR-V4-03"
+          ]
+        }
+      ],
+      "terminal": [
+        "Reapplied",
+        "Discarded"
+      ],
+      "noOverwrite": "No transition offers an action that replaces the GitHub version with the tab's version (PERSIST-012-O7, PERSIST-013)."
+    },
+    {
+      "id": "SM-CONNECTION",
+      "title": "Workspace connection and authentication",
+      "scope": "One per tab. Credentials are memory-only (EXT-DATA-004, PERSIST-003).",
+      "initial": "Disconnected",
+      "states": [
+        {
+          "id": "Disconnected",
+          "meaning": "Empty, disconnected workspace with the Connect action.",
+          "invariants": [
+            "INV-21"
+          ],
+          "sources": [
+            "EXT-DATA-002",
+            "UI-001"
+          ]
+        },
+        {
+          "id": "Connecting",
+          "meaning": "Checking the credential, repository and branch permissions.",
+          "invariants": [
+            "INV-21"
+          ],
+          "sources": [
+            "EXT-DATA-005",
+            "PF-015"
+          ]
+        },
+        {
+          "id": "Connected",
+          "meaning": "Credential accepted; read and (if permitted) write capabilities known from the provider.",
+          "invariants": [
+            "INV-21"
+          ],
+          "sources": [
+            "EXT-DATA-005",
+            "EXT-DATA-007"
+          ]
+        },
+        {
+          "id": "CredentialRefused",
+          "meaning": "A request was refused for authentication; loaded investigations and unsaved changes stay in memory.",
+          "invariants": [
+            "INV-07"
+          ],
+          "sources": [
+            "PERSIST-031",
+            "UI-010"
+          ]
+        },
+        {
+          "id": "Reauthenticating",
+          "meaning": "A new credential for the same repository is being checked; nothing in memory is dropped.",
+          "invariants": [
+            "INV-07",
+            "INV-21"
+          ],
+          "sources": [
+            "PERSIST-031"
+          ],
+          "proposals": [
+            "ODR-V4-04"
+          ]
+        }
+      ],
+      "events": [
+        {
+          "id": "ConnectSubmitted",
+          "meaning": "The user submitted a credential and repository."
+        },
+        {
+          "id": "ConnectSucceeded",
+          "meaning": "Provider confirmed authentication and the actual permissions."
+        },
+        {
+          "id": "ConnectRefused",
+          "meaning": "Blank credential, authentication failure or missing permission."
+        },
+        {
+          "id": "AuthFailed",
+          "meaning": "Any later request was refused for authentication."
+        },
+        {
+          "id": "ReconnectSubmitted",
+          "meaning": "The user submitted a new credential while refused."
+        },
+        {
+          "id": "DisconnectConfirmed",
+          "meaning": "The user confirmed disconnecting (which drops unsaved changes)."
+        }
+      ],
+      "transitions": [
+        {
+          "id": "T-N01",
+          "from": "Disconnected",
+          "event": "ConnectSubmitted",
+          "to": "Connecting",
+          "guard": "credential not blank",
+          "effects": [
+            "credential kept in memory only, sent only in the Authorization header to the GitHub API over HTTPS"
+          ],
+          "failure": "A blank credential is refused for reads and writes (DEC-R7-001).",
+          "sources": [
+            "PF-015",
+            "EXT-DATA-004"
+          ]
+        },
+        {
+          "id": "T-N02",
+          "from": "Connecting",
+          "event": "ConnectSucceeded",
+          "to": "Connected",
+          "guard": "true",
+          "effects": [
+            "record actual permissions; write never inferred from a successful read"
+          ],
+          "sources": [
+            "EXT-DATA-005",
+            "PF-015"
+          ]
+        },
+        {
+          "id": "T-N03",
+          "from": "Connecting",
+          "event": "ConnectRefused",
+          "to": "Disconnected",
+          "guard": "true",
+          "effects": [
+            "state the cause; no secret in any message"
+          ],
+          "sources": [
+            "EXT-DATA-005",
+            "UI-010"
+          ]
+        },
+        {
+          "id": "T-N04",
+          "from": "Connected",
+          "event": "AuthFailed",
+          "to": "CredentialRefused",
+          "guard": "true",
+          "effects": [
+            "keep every loaded investigation and unsaved change",
+            "affected saves go to SaveFailed with Reconnect"
+          ],
+          "sources": [
+            "PERSIST-031",
+            "UI-010"
+          ]
+        },
+        {
+          "id": "T-N05",
+          "from": "CredentialRefused",
+          "event": "ReconnectSubmitted",
+          "to": "Reauthenticating",
+          "guard": "credential not blank",
+          "effects": [
+            "check the new credential for the same repository"
+          ],
+          "sources": [
+            "PERSIST-031"
+          ],
+          "proposals": [
+            "ODR-V4-04"
+          ]
+        },
+        {
+          "id": "T-N06",
+          "from": "Reauthenticating",
+          "event": "ConnectSucceeded",
+          "to": "Connected",
+          "guard": "same repository",
+          "effects": [
+            "keep all investigations and unsaved changes; user may save again"
+          ],
+          "sources": [
+            "PERSIST-031"
+          ],
+          "proposals": [
+            "ODR-V4-04"
+          ]
+        },
+        {
+          "id": "T-N07",
+          "from": "Reauthenticating",
+          "event": "ConnectRefused",
+          "to": "CredentialRefused",
+          "guard": "true",
+          "effects": [
+            "keep everything in memory"
+          ],
+          "sources": [
+            "PERSIST-031"
+          ],
+          "proposals": [
+            "ODR-V4-04"
+          ]
+        },
+        {
+          "id": "T-N08",
+          "from": "Connected",
+          "event": "DisconnectConfirmed",
+          "to": "Disconnected",
+          "guard": "confirmation was asked when anything is not Saved",
+          "effects": [
+            "drop credential and tab state"
+          ],
+          "sources": [
+            "PERSIST-019"
+          ]
+        },
+        {
+          "id": "T-N09",
+          "from": "CredentialRefused",
+          "event": "DisconnectConfirmed",
+          "to": "Disconnected",
+          "guard": "confirmation was asked when anything is not Saved",
+          "effects": [
+            "drop credential and tab state"
+          ],
+          "sources": [
+            "PERSIST-019"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "SM-LOAD",
+      "title": "Loading one investigation into a tab",
+      "scope": "One per investigation route per tab.",
+      "initial": "NotLoaded",
+      "states": [
+        {
+          "id": "NotLoaded",
+          "meaning": "Not in tab memory.",
+          "invariants": [],
+          "sources": [
+            "PERSIST-017"
+          ]
+        },
+        {
+          "id": "Loading",
+          "meaning": "Reading at a branch head with cache-bypassing reads.",
+          "invariants": [
+            "INV-11"
+          ],
+          "sources": [
+            "PERSIST-005"
+          ]
+        },
+        {
+          "id": "Loaded",
+          "meaning": "Verified as a reader would; base head recorded; SM-SAVE starts at Saved.",
+          "invariants": [
+            "INV-11"
+          ],
+          "sources": [
+            "PERSIST-005",
+            "PERSIST-021"
+          ]
+        },
+        {
+          "id": "LoadFailed",
+          "meaning": "Read refused or file set failed verification; fails closed, nothing partial rendered as authoritative.",
+          "invariants": [
+            "INV-11"
+          ],
+          "sources": [
+            "UI-010",
+            "PERSIST-005"
+          ]
+        },
+        {
+          "id": "UnavailableOffline",
+          "meaning": "Not loaded and offline: shown as unavailable offline, never empty or missing.",
+          "invariants": [],
+          "sources": [
+            "PERSIST-017"
+          ]
+        }
+      ],
+      "events": [
+        {
+          "id": "OpenRequested",
+          "meaning": "Route or refresh asks for the investigation."
+        },
+        {
+          "id": "LoadVerified",
+          "meaning": "Current read verified at a named head."
+        },
+        {
+          "id": "LoadRejected",
+          "meaning": "Current read refused, failed or did not verify."
+        },
+        {
+          "id": "WentOffline",
+          "meaning": "Offline."
+        },
+        {
+          "id": "WentOnline",
+          "meaning": "Online again."
+        },
+        {
+          "id": "RefreshRequested",
+          "meaning": "The user asked to load the latest GitHub version of a loaded investigation."
+        },
+        {
+          "id": "SupersededReply",
+          "meaning": "A load or refresh answer for an earlier request or base."
+        }
+      ],
+      "transitions": [
+        {
+          "id": "T-L01",
+          "from": "NotLoaded",
+          "event": "OpenRequested",
+          "to": "Loading",
+          "guard": "online and connected",
+          "effects": [
+            "read head bypassing caches; read files at that commit"
+          ],
+          "sources": [
+            "PERSIST-005"
+          ]
+        },
+        {
+          "id": "T-L02",
+          "from": "NotLoaded",
+          "event": "OpenRequested",
+          "to": "UnavailableOffline",
+          "guard": "offline",
+          "effects": [],
+          "sources": [
+            "PERSIST-017"
+          ]
+        },
+        {
+          "id": "T-L03",
+          "from": "Loading",
+          "event": "LoadVerified",
+          "to": "Loaded",
+          "guard": "current",
+          "effects": [
+            "record base head",
+            "SM-SAVE initial Saved at that commit"
+          ],
+          "sources": [
+            "PERSIST-005",
+            "PERSIST-021"
+          ]
+        },
+        {
+          "id": "T-L04",
+          "from": "Loading",
+          "event": "LoadRejected",
+          "to": "LoadFailed",
+          "guard": "current",
+          "effects": [
+            "state the cause and a safe next step"
+          ],
+          "sources": [
+            "UI-010"
+          ]
+        },
+        {
+          "id": "T-L05",
+          "from": "Loaded",
+          "event": "WentOffline",
+          "to": "Loaded",
+          "guard": "true",
+          "effects": [
+            "views keep rendering from tab memory"
+          ],
+          "sources": [
+            "PERSIST-017"
+          ]
+        },
+        {
+          "id": "T-L06",
+          "from": "UnavailableOffline",
+          "event": "WentOnline",
+          "to": "NotLoaded",
+          "guard": "true",
+          "effects": [],
+          "sources": [
+            "PERSIST-017"
+          ]
+        },
+        {
+          "id": "T-L07",
+          "from": "Loaded",
+          "event": "RefreshRequested",
+          "to": "Loading",
+          "guard": "SM-SAVE is Saved (no unsaved change, no save in flight, no conflict)",
+          "effects": [
+            "read the latest head"
+          ],
+          "failure": "Refused while the investigation holds work; the message says why (Rehearsal 7 F2).",
+          "sources": [
+            "PERSIST-002",
+            "PERSIST-011"
+          ]
+        },
+        {
+          "id": "T-L08",
+          "from": "LoadFailed",
+          "event": "OpenRequested",
+          "to": "Loading",
+          "guard": "online and connected",
+          "effects": [
+            "new request identity"
+          ],
+          "sources": [
+            "UI-010"
+          ]
+        },
+        {
+          "id": "T-L09",
+          "from": "Loading",
+          "event": "SupersededReply",
+          "to": "Loading",
+          "guard": "reply is not current",
+          "effects": [
+            "discard the reply"
+          ],
+          "sources": [
+            "PERSIST-002"
+          ],
+          "proposals": [
+            "ODR-V4-03"
+          ]
+        },
+        {
+          "id": "T-L10",
+          "from": "Loaded",
+          "event": "SupersededReply",
+          "to": "Loaded",
+          "guard": "reply is not current (a refresh whose base a save has since moved on)",
+          "effects": [
+            "discard the reply; tab state unchanged"
+          ],
+          "sources": [
+            "PERSIST-002"
+          ],
+          "proposals": [
+            "ODR-V4-03"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "SM-NETWORK",
+      "title": "Network knowledge of one tab",
+      "scope": "One per tab; drives Offline in SM-SAVE and SM-LOAD.",
+      "initial": "Online",
+      "states": [
+        {
+          "id": "Online",
+          "meaning": "No evidence of being offline.",
+          "invariants": [],
+          "sources": [
+            "PERSIST-031"
+          ]
+        },
+        {
+          "id": "Offline",
+          "meaning": "navigator.onLine is false or a request failed before sending.",
+          "invariants": [
+            "INV-07"
+          ],
+          "sources": [
+            "PERSIST-018",
+            "PERSIST-031"
+          ]
+        }
+      ],
+      "events": [
+        {
+          "id": "OfflineObserved",
+          "meaning": "Browser offline event or a failure before sending."
+        },
+        {
+          "id": "OnlineObserved",
+          "meaning": "Browser online event."
+        }
+      ],
+      "transitions": [
+        {
+          "id": "T-W01",
+          "from": "Online",
+          "event": "OfflineObserved",
+          "to": "Offline",
+          "guard": "true",
+          "effects": [
+            "SM-SAVE WentOffline for each investigation",
+            "header shows offline"
+          ],
+          "sources": [
+            "PERSIST-031",
+            "PERSIST-033"
+          ]
+        },
+        {
+          "id": "T-W02",
+          "from": "Offline",
+          "event": "OnlineObserved",
+          "to": "Online",
+          "guard": "true",
+          "effects": [
+            "SM-SAVE WentOnline: no save sent automatically; one reconciliation read per UnknownOutcome"
+          ],
+          "sources": [
+            "PERSIST-016",
+            "PERSIST-018"
+          ]
+        }
+      ]
+    }
+  ],
+  "summary": [
+    {
+      "machine": "SM-SAVE",
+      "states": 7,
+      "events": 24,
+      "transitions": 52,
+      "proposedTransitions": [
+        "T-S39",
+        "T-S40"
+      ]
+    },
+    {
+      "machine": "SM-CONFLICT",
+      "states": 8,
+      "events": 12,
+      "transitions": 15,
+      "proposedTransitions": [
+        "T-C03",
+        "T-C12",
+        "T-C14",
+        "T-C15"
+      ]
+    },
+    {
+      "machine": "SM-CONNECTION",
+      "states": 5,
+      "events": 6,
+      "transitions": 9,
+      "proposedTransitions": [
+        "T-N05",
+        "T-N06",
+        "T-N07"
+      ]
+    },
+    {
+      "machine": "SM-LOAD",
+      "states": 5,
+      "events": 7,
+      "transitions": 10,
+      "proposedTransitions": [
+        "T-L09",
+        "T-L10"
+      ]
+    },
+    {
+      "machine": "SM-NETWORK",
+      "states": 2,
+      "events": 2,
+      "transitions": 2,
+      "proposedTransitions": []
+    }
+  ]
+}

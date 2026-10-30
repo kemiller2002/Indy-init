@@ -42,6 +42,15 @@ jobs:
           args="--root . --baseline requirements/causa-requirements-baseline-r7.json --previous requirements/causa-requirements-baseline-r6.json --trace docs/rehearsal-007/traceability.json"
           dotnet fsi tools/validate-r7-persistence-requirements.fsx -- $args
           dotnet fsi tools/validate-r7-persistence-requirements.fsx -- $args --self-test true
+      - name: Check out echelon-registry at the release-set commit compiled package v4 pins
+        uses: actions/checkout@v4
+        with:
+          repository: kemiller2002/echelon-registry
+          ref: 7a2c27a3db7cab4337ea47536f3e1fc22d257f03
+          path: .echelon-registry
+          persist-credentials: false
+      - name: Compiled package v4 is reproduced byte for byte and its checks W01-W15 pass
+        run: dotnet tools/requirements-compiler/src/bin/Release/net10.0/requirements-compiler.dll v4 --source . --package requirements-compiled/v4 --registry .echelon-registry --check
       - name: Check out maintained Causa Data tooling
         uses: actions/checkout@v4
         with:

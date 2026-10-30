@@ -719,13 +719,34 @@ let main argv =
             eprintfn "usage: --rehearsal-baselines --source DIR --r4 DIR --r5 DIR --out FILE"
             2
     | "--offline" :: rest ->
-        match Program.parseArgs rest Program.defaults with
+        // --record FILE writes the compiler test record the v4 freeze gate reads (FG-08): the result and the digest of
+        // the compiler tree it ran on, so a record from another tree is never accepted.
+        let record, rest' =
+            match rest |> List.tryFindIndex ((=) "--record") with
+            | Some n when n + 1 < rest.Length -> Some rest.[n + 1], (rest |> List.removeAt n |> List.removeAt n)
+            | _ -> None, rest
+        match Program.parseArgs rest' Program.defaults with
         | Error e ->
             eprintfn "%s" e
             2
         | Ok o ->
-            let processFailures = snd (processSimulation o.Source) @ producerBindings o.Source @ r6Readiness o.Source @ R6ScopeTests.all o.Source
-            report (offline o.Source @ processFailures) "offline tests (baseline equivalence, baseline units, preflight verdict, verification plan, acceptance contracts, process evidence)"
+            let processFailures = snd (processSimulation o.Source) @ producerBindings o.Source @ r6Readiness o.Source @ R6ScopeTests.all o.Source @ V4Tests.all o.Source
+            let failures = offline o.Source @ processFailures
+            let label = "offline tests (baseline equivalence, baseline units, preflight verdict, verification plan, acceptance contracts, process evidence, v4 scope and controls)"
+            let code = report failures label
+            record
+            |> Option.iter (fun path ->
+                let tree = V4Package.treeSha256 (Program.compilerSources (Path.Combine(o.Source, "tools", "requirements-compiler")))
+                JObj
+                    [ "schema", JStr "indy-init.v4-compiler-test-record/1"
+                      "result", JStr(if failures.IsEmpty then "PASS" else "FAIL")
+                      "failures", jint failures.Length
+                      "summary", JStr(sprintf "%s: %s" label (if failures.IsEmpty then "all passed" else sprintf "%d failure(s)" failures.Length))
+                      "compilerTreeSha256", JStr tree
+                      "command", JStr "dotnet run -c Release --project tools/requirements-compiler/tests -- --offline --source ." ]
+                |> serialize
+                |> fun t -> File.WriteAllText(path, t))
+            code
     | "--readiness-replay" :: rest ->
         match rest with
         | [ "--source"; source; "--r5"; r5; "--out"; out ] ->

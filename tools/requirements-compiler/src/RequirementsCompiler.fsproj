@@ -17,6 +17,7 @@
     <Compile Include="Inventory.fs" />
     <Compile Include="Normalize.fs" />
     <Compile Include="Graph.fs" />
+    <Compile Include="TimedSchedule.fs" />
     <Compile Include="Artifacts.fs" />
     <Compile Include="Validate.fs" />
     <Compile Include="EvidenceCategories.fs" />
@@ -33,6 +34,7 @@
     <Compile Include="ReleaseComparison.fs" />
     <Compile Include="AssertionRatchet.fs" />
     <Compile Include="Preflight.fs" />
+    <Compile Include="V4Package.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 </Project>

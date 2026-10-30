@@ -928,6 +928,134 @@ let reviewAttestationsCommand (args: string list) : int =
             eprintfn "input error: %s" ex.Message
             2
 
+
+/// The F# source files that make up the compiler and its tests, relative to the compiler directory, for the tree
+/// digest the compiler test record and the freeze manifest carry.
+let compilerSources (compilerDir: string) : (string * byte[]) list =
+    [ "src"; "tests" ]
+    |> List.collect (fun d ->
+        let dir = Path.Combine(compilerDir, d)
+        if Directory.Exists dir then
+            Directory.GetFiles(dir)
+            |> Array.filter (fun f -> f.EndsWith(".fs", StringComparison.Ordinal) || f.EndsWith(".fsproj", StringComparison.Ordinal))
+            |> Array.map (fun f -> sprintf "%s/%s" d (Path.GetFileName f), File.ReadAllBytes f)
+            |> List.ofArray
+        else [])
+
+/// Reads every input of the v4 stage from the source checkout and the package directory.
+let v4Inputs (source: string) (package: string) (registry: string option) (r7Evidence: string option) : V4Package.Inputs =
+    let pkg (rel: string) = Path.Combine(package, rel)
+    let src (rel: string) = Path.Combine(source, rel)
+    let orEmpty (path: string) = if File.Exists path then parseFile path else JObj []
+    let sources = parseFile (pkg "curation/sources.json")
+    let commitOf name = arr "repositories" sources |> List.tryFind (fun r -> str "name" r = name) |> Option.map (str "commit") |> Option.defaultValue ""
+    let baselineBytes = File.ReadAllBytes(src "requirements/causa-requirements-baseline-v4.json")
+    let baseline = parseBytes baselineBytes
+    let approvalsPin = parseFile (pkg "curation/verification-plan.json") |> field "approvals" |> Option.defaultValue JNull
+    let approvals =
+        match Git.showFile source (str "commit" approvalsPin) (str "path" approvalsPin) with
+        | Ok b -> parseBytes b
+        | Error e -> failwithf "approvals file %s unreadable at %s: %s" (str "path" approvalsPin) (str "commit" approvalsPin) e
+    let ownerDecisions =
+        Directory.GetDirectories(src "kickoff")
+        |> Array.sort
+        |> Array.map (fun d -> Path.Combine(d, "owner-decisions.json"))
+        |> Array.filter File.Exists
+        |> Array.toList
+        |> List.collect (parseFile >> arr "decisions")
+    let registryCommit = commitOf "echelon-registry"
+    let packageFiles =
+        Directory.GetFiles(package, "*", SearchOption.AllDirectories)
+        |> Array.map (fun f -> Path.GetRelativePath(package, f).Replace('\\', '/'))
+        |> Array.sort
+        |> List.ofArray
+    { SourceRepository = field "source" baseline |> Option.map (str "repository") |> Option.defaultValue ""
+      SourceCommit = field "source" baseline |> Option.map (str "commit") |> Option.defaultValue ""
+      Baseline = baseline
+      BaselineSha256 = Git.sha256Hex baselineBytes
+      Previous = [ "r6", parseFile (src "requirements/causa-requirements-baseline-r6.json"); "r7", parseFile (src "requirements/causa-requirements-baseline-r7.json") ]
+      R7Trace = parseFile (src "docs/rehearsal-007/traceability.json")
+      OwnerDecisions = ownerDecisions
+      Amendments = parseFile (pkg "analysis/amendments.json")
+      Plan = parseFile (pkg "verification-plan.json")
+      Tasks = arr "tasks" (parseFile (pkg "curation/tasks.json")) |> List.map taskOf
+      Contracts = arr "contracts" (parseFile (pkg "curation/contracts.json"))
+      Definitions = parseFile (pkg "analysis/operational-definitions.json")
+      StateMachines = parseFile (pkg "analysis/state-machines.json")
+      Invariants = parseFile (pkg "analysis/invariants.json")
+      Lessons = parseFile (pkg "analysis/r7-lessons.json")
+      Interfaces = parseFile (pkg "analysis/interfaces.json")
+      Policy = parseFile (pkg "analysis/execution-policy.json")
+      Risks = parseFile (pkg "analysis/risk-register.json")
+      LockSource = parseFile (pkg "analysis/dependency-lock.source.json")
+      Proposals = parseFile (pkg "proposals/owner-decision-requests.json")
+      Approvals = approvals
+      Registry = registry |> Option.map (fun dir -> fun path -> match Git.showFile dir registryCommit path with Ok b -> Some b | Error _ -> None)
+      RegistryCommit = registryCommit
+      R7Evidence = r7Evidence |> Option.map (fun dir -> fun rel -> let f = Path.Combine(dir, rel) in if File.Exists f then Some(File.ReadAllText f) else None)
+      LegacyReport = parseFile (pkg "requirements-validation-report.json")
+      CompilerTests = orEmpty (pkg "analysis/compiler-test-record.json")
+      CompilerTreeSha256 = V4Package.treeSha256 (compilerSources (src "tools/requirements-compiler"))
+      Review = orEmpty (pkg "analysis/independent-review.json")
+      FreezeInput = orEmpty (pkg "analysis/freeze-input.json")
+      PackageFiles = packageFiles }
+
+/// Files of the v3 pipeline that the freeze manifest pins by digest, read as committed.
+let private legacyPinned =
+    [ "verification-plan.json"; "verification-manifest.json"; "timed-execution-manifest.json"; "dependency-graph.json"
+      "normalized-requirements.json"; "requirements-validation-report.json"; "requirements-inventory.json"; "requirements-source-map.json"
+      "decision-registry.json"; "contract-bindings.json"; "preflight-manifest.json"; "package-manifest.json" ]
+
+/// `v4`: generates the v4 artifacts, the package validation report and the freeze manifest from the v3-pipeline
+/// output already in the package directory. Exit 0 validation PASS (the package may still be a CANDIDATE), 3 a
+/// critical check failed, 4 --check found files that differ, 2 unusable input.
+let v4Command (args: string list) : int =
+    let rec go (xs: string list) (m: Map<string, string>) (check: bool) =
+        match xs with
+        | "--check" :: rest -> go rest m true
+        | k :: v :: rest when k.StartsWith("--", StringComparison.Ordinal) -> go rest (m.Add(k, v)) check
+        | [] -> Ok(m, check)
+        | a :: _ -> Error(sprintf "unknown argument '%s'" a)
+    match go args Map.empty false with
+    | Error e ->
+        eprintfn "%s" e
+        2
+    | Ok(m, _) when not (m.ContainsKey "--source" && m.ContainsKey "--package") ->
+        eprintfn "usage: requirements-compiler v4 --source DIR --package DIR [--registry DIR] [--r7-evidence DIR] [--check]"
+        2
+    | Ok(m, check) ->
+        try
+            let source = m.["--source"]
+            let package = m.["--package"]
+            let i = v4Inputs source package (m.TryFind "--registry") (m.TryFind "--r7-evidence")
+            let built = V4Package.build i
+            let report = V4Package.validationReport i built.Checks
+            let generated = built.Files @ [ "package-validation-report.json", report ] |> List.map (fun (n, j) -> n, serialize j)
+            let sha (text: string) = Text.Encoding.UTF8.GetBytes text |> Git.sha256Hex
+            let legacy = legacyPinned |> List.map (fun n -> n, fileSha (Path.Combine(package, n)))
+            let digests = legacy @ (generated |> List.map (fun (n, t) -> n, sha t))
+            let legacyPass = str "compilationVerdict" i.LegacyReport = "PASS"
+            let manifest = V4Package.freezeManifest i built digests legacyPass |> serialize
+            let all = generated @ [ "freeze-manifest.json", manifest ]
+            built.Checks |> List.iter (fun c ->
+                printfn "%s %s  %s" (if c.Problems.IsEmpty then "PASS" else "FAIL") c.Id c.Title
+                c.Problems |> List.truncate 10 |> List.iter (printfn "      - %s"))
+            let status = parseBytes (Text.Encoding.UTF8.GetBytes manifest) |> str "status"
+            printfn "package validation: %s; freeze status: %s" (str "verdict" (parseBytes (Text.Encoding.UTF8.GetBytes (serialize report)))) status
+            if check then
+                let differing = all |> List.filter (fun (n, t) -> let p = Path.Combine(package, n) in not (File.Exists p) || File.ReadAllText p <> t) |> List.map fst
+                differing |> List.iter (eprintfn "differs from the package: %s")
+                if differing.IsEmpty then (if str "verdict" (parseBytes (Text.Encoding.UTF8.GetBytes (serialize report))) = "PASS" then 0 else 3) else 4
+            else
+                for (n, t) in all do
+                    let p = Path.Combine(package, n)
+                    Directory.CreateDirectory(Path.GetDirectoryName p) |> ignore
+                    File.WriteAllText(p, t)
+                if str "verdict" (parseBytes (Text.Encoding.UTF8.GetBytes (serialize report))) = "PASS" then 0 else 3
+        with ex ->
+            eprintfn "input error: %s" ex.Message
+            2
+
 [<EntryPoint>]
 let main argv =
     match List.ofArray argv with
@@ -940,6 +1068,7 @@ let main argv =
     | "plan-readiness" :: rest -> planReadinessCommand rest
     | "propose-test-bindings" :: rest -> proposeTestBindingsCommand rest
     | "review-attestations" :: rest -> reviewAttestationsCommand rest
+    | "v4" :: rest -> v4Command rest
     | "preflight" :: rest ->
         match parseArgs rest defaults with
         | Error e ->

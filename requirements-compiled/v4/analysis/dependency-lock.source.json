@@ -1,0 +1,27 @@
+{
+  "schema": "indy-init.v4-dependency-lock-source/1",
+  "description": "The dependencies the event build may use, selected from the approved release set. The compiler reads each registry component's version, commit, distribution and artifact SHA-256 from echelon-registry at the pinned commit (release manifests named by the set file) and fails if a selected version is not the set's version. Systems outside the set (the SDK, the storage contract, the catalog, the GitHub API, Conditor) are pinned by the identities stated here and checked where a checkout is available.",
+  "releaseSet": { "channel": "echelon-current", "version": "1.33.0", "registryRepo": "echelon-registry", "path": "sets/echelon-current/1.33.0.json", "decision": "DEC-R7-011" },
+  "approvedStack": ["F#", ".NET", "Limen", "Forma", "Folio", "GitHub-backed persistence"],
+  "forbiddenFrameworks": ["Bolero", "React", "Angular", "Vue", "Blazor"],
+  "interopBoundaries": [
+    { "language": "C#", "scope": "a single [JSExport] host entry point, because F# does not run the JSExport source generator", "source": "Rehearsal 7 KD-007 (finding, not code)" },
+    { "language": "JavaScript", "scope": "a browser-boundary script relaying connectivity, timers and the leave warning that Limen 0.9.1 does not expose; holds no application state", "source": "Rehearsal 7 KD-010 (finding, not code)" }
+  ],
+  "systems": [
+    { "id": "limen", "kind": "registry-component", "systemId": "limen", "use": "runtime", "runtimeCompatibility": ".NET 10 WebAssembly; browsers Chromium and WebKit (iPad Safari)" },
+    { "id": "limen-fsharp", "kind": "registry-component", "systemId": "limen-fsharp", "use": "runtime", "runtimeCompatibility": ".NET 10, F#" },
+    { "id": "forma", "kind": "registry-component", "systemId": "forma", "use": "runtime", "runtimeCompatibility": "evergreen browsers; CSS custom properties" },
+    { "id": "folio", "kind": "registry-component", "systemId": "folio", "use": "runtime", "runtimeCompatibility": "evergreen browsers; print CSS" },
+    { "id": "praxis", "kind": "registry-component", "systemId": "praxis", "use": "process", "runtimeCompatibility": "linux-x64 CI" },
+    { "id": "dokimos", "kind": "registry-component", "systemId": "dokimos", "use": "process", "runtimeCompatibility": "linux-x64 CI" },
+    { "id": "ordo", "kind": "registry-component", "systemId": "ordo", "use": "process", "runtimeCompatibility": "linux-x64 CI" },
+    { "id": "percepta-semantic", "kind": "registry-component", "systemId": "percepta-semantic", "use": "verification", "runtimeCompatibility": "linux-x64 CI" },
+    { "id": "aegis", "kind": "registry-component", "systemId": "aegis", "use": "runtime", "runtimeCompatibility": ".NET 10" },
+    { "id": "dotnet-sdk", "kind": "sdk", "version": "10.0.402", "source": "global.json (rollForward disable)", "use": "toolchain", "runtimeCompatibility": "wasm-tools workload from the same SDK feed" },
+    { "id": "conditor", "kind": "tag-pinned", "version": "0.10.18", "repo": "conditor", "tag": "v0.10.18", "commit": "2d6ae48ee5017379a866fd09df86ff325e0ba4e7", "use": "bootstrap and CI policy", "runtimeCompatibility": ".NET 10" },
+    { "id": "causa-storage", "kind": "tag-pinned", "version": "1.0.0", "repo": "causa-data", "tag": "causa-storage-v1.0.0", "commit": "c947c7e354be80766573a782546c8186336774cc", "use": "wire contract", "runtimeCompatibility": "any reader implementing section 11" },
+    { "id": "causa-data-catalog", "kind": "data", "version": "demonstration-v1 (catalogVersion 1.0.0)", "repo": "causa-data", "commit": "e8259df74add723765c57a5b1a5888d9c3f707af", "path": "catalog/demonstration-v1/manifest.json", "sha256": "32badb6df8ce8b9ada765bf3d62ab3d107075c3f139361917a91f094e87af4fd", "use": "demonstration data, read at runtime", "runtimeCompatibility": "causa-storage 1.0.0" },
+    { "id": "github-api", "kind": "external-api", "version": "GraphQL API and REST API version 2022-11-28", "use": "persistence provider", "runtimeCompatibility": "HTTPS from the browser with a fine-grained token (CT-017)" }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "schema": "indy-init.v4-execution-policy/1",
+  "description": "Inputs to execution-plan.json and the timed-execution manifest. The compiler schedules the timed work items of curation/tasks.json from their dependencies and estimateMinutes; nothing here removes or reprioritizes a requirement.",
+  "event": {
+    "name": "Indy Init 2026",
+    "date": "2026-11-07",
+    "timeZone": "America/Indiana/Indianapolis",
+    "publishedBuildWindowLocal": "09:30-17:00",
+    "publishedBuildWindowUtc": { "start": "2026-11-07T14:30:00Z", "end": "2026-11-07T22:00:00Z" },
+    "source": "docs/HACKATHON-BOUNDARIES.md: 'the build window is currently published as 9:30 AM to 5:00 PM on November 7, 2026.' Eastern Standard Time applies on 2026-11-07 (UTC-5)."
+  },
+  "clock": {
+    "timedMinutes": 420,
+    "t0": "The UTC instant written to the kickoff record (kickoff/<run>/t0.json, field t0) by the operator or the kickoff workflow when the timer starts; never chosen or edited by the implementing agent.",
+    "deadline": "min(t0 + 420 minutes, publishedBuildWindowUtc.end), written as an absolute UTC instant into the same kickoff record at T0.",
+    "rules": [
+      "Every resumption and every time-based decision begins by reading the wall clock (date -u) and computing remaining = deadline - now from the recorded absolute deadline; never from timestamps remembered in the conversation (Rehearsal 7 lesson R7L-15).",
+      "Merge every pull request whose required checks are green and whose gates permit it immediately; never leave green work unmerged while idle.",
+      "Merge freeze at deadline - 45 minutes: after it only the final acceptance, deployment of the frozen SHA, evidence collection and delivery run.",
+      "Work after the deadline is never part of the timed result: the timed result is the state of main and the evidence at the deadline instant, and anything later is reported separately."
+    ]
+  },
+  "reserves": [
+    { "id": "RES-INTEGRATION", "minutes": 20, "purpose": "integration of parallel lanes and CI queue time not inside task estimates" },
+    { "id": "RES-FINAL", "minutes": 45, "purpose": "final verification and delivery window: independent acceptance on the exact SHA, deployment, evidence collection, delivery (after the merge freeze)" }
+  ],
+  "independentReviewCheckpoints": [
+    { "id": "IRC-1", "after": "T14", "purpose": "early adversarial review of interfaces and invariants before fan-out completes (DCC-002: target T+90 to T+120)" },
+    { "id": "IRC-2", "after": "T21", "purpose": "review after the live write path, before UI completion" },
+    { "id": "IRC-3", "after": "T31", "purpose": "review of the release candidate (T30 and T33 are the scheduled reviewer tasks)" }
+  ],
+  "topologies": [
+    { "id": "A-role-lanes", "laneOf": "owner", "description": "One lane per owner role (domain, ui, persistence, integration, coordinator, reviewer); operator and upstream lanes are preflight-only. Needs owner approval (ODR-V4-07, F-007)." },
+    { "id": "B-single-lead", "laneOf": "lead", "description": "One continuous lead agent for domain, ui, persistence, integration and coordinator work (AR-021); reviewer is a separate lane." }
+  ],
+  "ciRules": [
+    "Every CI step runs with errexit and pipefail; conditor ci-policy check passes at kickoff and on every candidate (DCC-013).",
+    "Browser and PAT suites run to completion: no stop after the first failure, so every test yields PASS or FAIL (PERSIST-055).",
+    "Each CI run's live tests use their own branch of the test repository; live writers of different runs never share a branch (Rehearsal 7 R7L-18).",
+    "Every CI job that runs bound tests sets CAUSA_PLAN (DCC-015)."
+  ]
+}

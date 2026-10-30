@@ -1,0 +1,8 @@
+{
+  "schema": "indy-init.v4-compiler-test-record/1",
+  "result": "PASS",
+  "failures": 0,
+  "summary": "offline tests (baseline equivalence, baseline units, preflight verdict, verification plan, acceptance contracts, process evidence, v4 scope and controls): all passed",
+  "compilerTreeSha256": "ec2e4c55c7c885446948421403dc7a65f828b87f663ab0b45569b6355bc0cce2",
+  "command": "dotnet run -c Release --project tools/requirements-compiler/tests -- --offline --source ."
+}

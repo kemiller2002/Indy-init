@@ -1,0 +1,91 @@
+{
+  "schema": "indy-init.v4-operational-definitions/1",
+  "description": "Operational definitions of the status words that Rehearsal 7 showed can be read in materially different ways. Each definition says what must have happened, and what evidence decides it. It restates the cited requirements; it adds no obligation. Where a definition goes beyond the baseline text it names the owner decision request that would make it normative, and until then it is guidance only.",
+  "terms": [
+    {
+      "term": "Save requested",
+      "definition": "The user chose Save (or Retry) for one investigation in one tab. A save request is not a save: nothing is claimed until a confirmation exists.",
+      "decidedBy": "The save-state machine receives SaveRequested; while the tab knows it is offline no mutation is sent and the state becomes Offline.",
+      "sources": ["PERSIST-006", "PERSIST-018", "PERSIST-031"]
+    },
+    {
+      "term": "Saving",
+      "definition": "A commit mutation for this investigation is being prepared or is in flight, or an automatic rebase or reconciliation read for it is running. A save waiting behind another save in the same tab is not Saving.",
+      "decidedBy": "The machine state Saving, entered only from Unsaved by SaveRequested while online, or from Unknown commit outcome when reconciliation permits a resend.",
+      "sources": ["PERSIST-006", "PERSIST-031"]
+    },
+    {
+      "term": "Saved / confirmed save",
+      "definition": "GitHub returned the new commit for this exact mutation and a re-read at that commit returned exactly the bytes the save wrote (events append, manifest and snapshot), or reconciliation found a commit carrying this save's write marker whose tree holds exactly the written bytes. Only then may the investigation show Saved and its base head advance. Changes made while the save was in flight stay unsaved.",
+      "decidedBy": "A Confirmation value that only the persistence module can construct, from a read-back whose bytes equal the written bytes (PAT-12 model test and compile-time negative check; PAT-02 and PAT-10).",
+      "sources": ["PERSIST-007", "PERSIST-015", "PERSIST-023", "PERSIST-031", "PERSIST-051"]
+    },
+    {
+      "term": "Confirmed (any UI claim)",
+      "definition": "The words saved, synced, stored and safe describe an investigation only in Saved. No interface text may say saved locally, saved on this device, queued, or will be saved later.",
+      "decidedBy": "PAT-15 text check per state and PAT-14 forbidden-phrase scan of the candidate.",
+      "sources": ["PERSIST-032", "PERSIST-053", "PERSIST-054"]
+    },
+    {
+      "term": "Stale head",
+      "definition": "GitHub refused a mutation because the branch head is no longer the expected head; nothing was written. Classified from GitHub's answer, never inferred from a network failure. Every form GitHub uses for this refusal counts, including the GraphQL STALE_DATA error and the FORBIDDEN 'is at <oid> but expected <oid>' form Rehearsal 7 observed live (KD-022).",
+      "decidedBy": "PAT-03 against the stateful fake and the live repository.",
+      "sources": ["PERSIST-008", "PERSIST-042"]
+    },
+    {
+      "term": "Conflict",
+      "definition": "After a stale head, the investigation's own files differ between the base head and the new head (another writer, possibly another tab of the same user, saved the same investigation), or the investigation was deleted or rewritten on the branch. A network failure, a rate limit, an authentication failure or a lost answer is never a conflict.",
+      "decidedBy": "File comparison at the base and new heads after a fresh head read (PERSIST-009, PERSIST-011); PAT-05 and PAT-07's rebase-path network case.",
+      "sources": ["PERSIST-011", "PERSIST-024", "PERSIST-044", "PERSIST-046"]
+    },
+    {
+      "term": "Unknown commit outcome",
+      "definition": "A mutation may have reached GitHub but no recognised answer came back (timeout, lost response, dropped connection after sending, unrecognised answer). It is neither success nor failure until reconciliation decides it from the branch head, the commits after the expected head and the write marker. It is never automatically classified as failure or conflict.",
+      "decidedBy": "Reconciliation outcomes of PERSIST-015, each with its own PAT-06 case.",
+      "sources": ["PERSIST-015", "PERSIST-016", "PERSIST-045"]
+    },
+    {
+      "term": "Recovered",
+      "definition": "After a recoverable failure (offline, stale head, conflict, unknown outcome, save failed, refused credential), every unsaved change of the tab is still in the tab's memory, visible, and can still be saved by a new save request once the cause is gone. Recovery never means local crash recovery: closing, reloading or discarding the tab destroys unsaved changes, and the application must say so. Recovery after a refused credential that keeps the tab's work is proposed in ODR-V4-04; until it is approved, the baseline requires only that Reconnect is offered and that dropping unsaved changes asks for confirmation.",
+      "decidedBy": "PAT-05, PAT-06, PAT-07, PAT-08 (work kept in each final state); PAT-09 (confirmation before dropping).",
+      "sources": ["PERSIST-011", "PERSIST-018", "PERSIST-019", "PERSIST-020", "PERSIST-031", "UI-010"],
+      "proposals": ["ODR-V4-04"]
+    },
+    {
+      "term": "Loaded / opened",
+      "definition": "An investigation was read from GitHub at a named branch head with cache-bypassing reads, verified as a reader would (causa-data v1.0.0 section 11: contract validation, digests, snapshot state equal to replay), and the tab recorded that commit as its base head. A file set that fails verification is not loaded; it fails closed and is never rendered as partial authoritative state.",
+      "decidedBy": "PAT-10 (reopen equals last confirmed commit) and the catalog load-and-replay of the four active investigations (UI-015-O2, EXT-DATA-013).",
+      "sources": ["PERSIST-005", "PERSIST-021", "UI-010", "EXT-DATA-013", "UI-015"]
+    },
+    {
+      "term": "Verified (obligation)",
+      "definition": "An obligation is verified only when an assessed evidence bundle for the exact candidate SHA contains a passing result for every bound test of every required evidence category, within the category's freshness policy, as computed by requirements-compiler verify-plan. A test that was not run, is missing, or ran on another SHA leaves the obligation unverified.",
+      "decidedBy": "verify-plan against requirements-compiled/v4/verification-plan.json; acceptance/acceptance-obligations.json pass and failure conditions.",
+      "sources": ["AR-007", "AR-018", "AR-019", "PERSIST-055", "DCC-008"]
+    },
+    {
+      "term": "Complete (work item)",
+      "definition": "A work item is complete when every completion condition listed for it in curation/tasks.json holds and its evidence is recorded in the Praxis work-item ledger at a named commit. Completion of a work item is never acceptance of a requirement.",
+      "decidedBy": "Praxis work records (VR-PROCESS) and the task's completion list.",
+      "sources": ["AR-015", "AR-017"]
+    },
+    {
+      "term": "Accepted (release)",
+      "definition": "Accepted only when the verdict computed from the evidence ledger, frozen baseline, gates, coverage, approved decisions, defect closures and deployed SHA is ACCEPTED; the deployed artifact identifies the exact CI-verified SHA; the deployment acceptance job for that SHA concluded successfully; and an independent verifier (not the implementing agent) produced or checked the evidence. A green build, a green local run or an agent's statement is not acceptance.",
+      "decidedBy": "acceptance/acceptance-gate.json conditions AG-01..AG-12.",
+      "sources": ["AR-008", "AR-019", "DCC-008", "PF-020", "UI-015"]
+    },
+    {
+      "term": "Offline",
+      "definition": "The application knows the browser is offline (navigator.onLine false or the last request failed before sending) and the tab holds unsaved changes. With no unsaved change the indicator stays Saved and only the workspace header shows offline.",
+      "decidedBy": "PAT-07 and PAT-15.",
+      "sources": ["PERSIST-017", "PERSIST-018", "PERSIST-031", "PERSIST-046"]
+    },
+    {
+      "term": "The Rehearsal 7 agent / Rehearsal 7 (in PERSIST-026 and PERSIST-040..055)",
+      "definition": "The persistence document is normative for Rehearsal 7 and every later Causa build, including the event (its Status line). In the event build, 'the Rehearsal 7 agent' means the implementing agent of the event build and 'Rehearsal 7' means the event's timed build. The obligations are not discharged by Rehearsal 7's historical evidence (EXT-DATA, PERSIST-026).",
+      "decidedBy": "Document status line of docs/CAUSA-PERSISTENCE-REQUIREMENTS.md.",
+      "sources": ["PERSIST-001", "PERSIST-026", "PERSIST-055"]
+    }
+  ]
+}

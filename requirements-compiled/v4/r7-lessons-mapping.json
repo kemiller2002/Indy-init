@@ -1,0 +1,478 @@
+{
+  "schema": "indy-init.v4-r7-lessons-mapping/1",
+  "description": "Defect classes extracted from Rehearsal 7's evidence (kemiller2002/indy-init-rehearsal-007 at the commit in 'evidence', files evidence/FINAL-REPORT.md, provenance.md, defects.md, DECISIONS.md, traceability.json only). No implementation was read or copied. For each class: whether the v4 requirements already prevent it, the requirements that do, how its test binding is strengthened (invariant tests in invariants.json; acceptance obligations in acceptance/), and the owner decision request where the requirements do not prevent it. Dispositions: covered (requirements prevent it; binding strengthened by invariant tests), gap-proposed (requirements do not prevent it; an amendment is proposed and is not applied), process (handled by the execution plan and acceptance gate, which enforce existing requirements).",
+  "evidence": {
+    "repository": "kemiller2002/indy-init-rehearsal-007",
+    "commit": "9b307aa1d3d7d5e6fe1737680d03bf74fd90c1a9",
+    "files": [
+      "evidence/FINAL-REPORT.md",
+      "evidence/provenance.md",
+      "evidence/defects.md",
+      "evidence/DECISIONS.md",
+      "evidence/traceability.json"
+    ],
+    "notInputs": "Rehearsal 7's application, tests and scripts are not inputs to the event build; this file is a requirements analysis."
+  },
+  "summary": {
+    "classes": 19,
+    "covered": 10,
+    "gapProposed": 6,
+    "process": 3
+  },
+  "lessons": [
+    {
+      "id": "R7L-01",
+      "class": "False save confirmation",
+      "evidence": [
+        {
+          "file": "evidence/FINAL-REPORT.md",
+          "quote": "Saved could be shown without a read-back confirmation."
+        }
+      ],
+      "disposition": "covered",
+      "requirements": [
+        "PERSIST-007",
+        "PERSIST-023",
+        "PERSIST-051"
+      ],
+      "invariants": [
+        "INV-01"
+      ],
+      "proposals": [],
+      "bindingStrengthened": "Property test over random reply sequences and a mutation check that removes the read-back comparison (INV-01)."
+    },
+    {
+      "id": "R7L-02",
+      "class": "Lost responses after successful commits",
+      "evidence": [
+        {
+          "file": "evidence/DECISIONS.md",
+          "quote": "a commit GitHub applied, whose answer was lost, could end in Conflict"
+        }
+      ],
+      "disposition": "covered",
+      "requirements": [
+        "PERSIST-015",
+        "PERSIST-045"
+      ],
+      "invariants": [
+        "INV-03"
+      ],
+      "proposals": [],
+      "bindingStrengthened": "Negative case 'applied but not yet visible to reconciliation' (INV-03)."
+    },
+    {
+      "id": "R7L-03",
+      "class": "Concurrent GitHub writes",
+      "evidence": [
+        {
+          "file": "evidence/FINAL-REPORT.md",
+          "quote": "PAT-02, three tabs saving at once, passes live in both browsers. It had failed in every earlier deployed run until KD-022."
+        }
+      ],
+      "disposition": "covered",
+      "requirements": [
+        "PERSIST-006",
+        "PERSIST-013",
+        "PERSIST-014",
+        "PERSIST-041"
+      ],
+      "invariants": [
+        "INV-05",
+        "INV-09"
+      ],
+      "proposals": [],
+      "bindingStrengthened": "Random three-tab interleavings against the fake; live reachability already bound (INV-09)."
+    },
+    {
+      "id": "R7L-04",
+      "class": "Stale refreshes",
+      "evidence": [
+        {
+          "file": "evidence/FINAL-REPORT.md",
+          "quote": "A stale refresh could roll the tab back (#28)."
+        }
+      ],
+      "disposition": "gap-proposed",
+      "requirements": [
+        "PERSIST-002",
+        "PERSIST-007"
+      ],
+      "invariants": [
+        "INV-02",
+        "INV-07"
+      ],
+      "proposals": [
+        "ODR-V4-03"
+      ],
+      "bindingStrengthened": "INV-02 stale-refresh negative case; normative only after ODR-V4-03."
+    },
+    {
+      "id": "R7L-05",
+      "class": "Conflict-resolution races",
+      "evidence": [
+        {
+          "file": "evidence/FINAL-REPORT.md",
+          "quote": "A conflict re-read race could overwrite another writer's change (#28)."
+        }
+      ],
+      "disposition": "gap-proposed",
+      "requirements": [
+        "PERSIST-012",
+        "PERSIST-013"
+      ],
+      "invariants": [
+        "INV-02",
+        "INV-08",
+        "INV-09"
+      ],
+      "proposals": [
+        "ODR-V4-03"
+      ],
+      "bindingStrengthened": "INV-02 late-re-read negative case (the reviewer's E1 scenario restated as a requirement-level test)."
+    },
+    {
+      "id": "R7L-06",
+      "class": "Reauthentication without data loss",
+      "evidence": [
+        {
+          "file": "evidence/FINAL-REPORT.md",
+          "quote": "A revoked or expired token offers only Reconnect, which discards the tab's unsaved work after a confirmation prompt."
+        }
+      ],
+      "disposition": "gap-proposed",
+      "requirements": [
+        "PERSIST-031",
+        "UI-010",
+        "PERSIST-019"
+      ],
+      "invariants": [
+        "INV-07"
+      ],
+      "proposals": [
+        "ODR-V4-04"
+      ],
+      "bindingStrengthened": "SM-CONNECTION Reauthenticating; INV-07 property covers a refused credential once approved."
+    },
+    {
+      "id": "R7L-07",
+      "class": "Unresolvable conflicts",
+      "evidence": [
+        {
+          "file": "evidence/FINAL-REPORT.md",
+          "quote": "A deleted or unverifiable GitHub version leaves the conflict without a resolution."
+        }
+      ],
+      "disposition": "gap-proposed",
+      "requirements": [
+        "PERSIST-011",
+        "PERSIST-012"
+      ],
+      "invariants": [
+        "INV-07"
+      ],
+      "proposals": [
+        "ODR-V4-05"
+      ],
+      "bindingStrengthened": "SM-CONFLICT Unresolvable with export."
+    },
+    {
+      "id": "R7L-08",
+      "class": "Offline recovery",
+      "evidence": [
+        {
+          "file": "evidence/defects.md",
+          "quote": "a queued save is not started while the tab knows it is offline; it waits as Offline"
+        }
+      ],
+      "disposition": "covered",
+      "requirements": [
+        "PERSIST-017",
+        "PERSIST-018",
+        "PERSIST-046"
+      ],
+      "invariants": [
+        "INV-04",
+        "INV-07"
+      ],
+      "proposals": [],
+      "bindingStrengthened": "SM-SAVE T-S04 waiting-save rule and T-S08; INV-04 bounds."
+    },
+    {
+      "id": "R7L-09",
+      "class": "GitHub rate-limit classification",
+      "evidence": [
+        {
+          "file": "evidence/defects.md",
+          "quote": "GitHub secondary rate limits reported as a permission refusal"
+        }
+      ],
+      "disposition": "covered",
+      "requirements": [
+        "PERSIST-008",
+        "PERSIST-024",
+        "PERSIST-042"
+      ],
+      "invariants": [
+        "INV-22"
+      ],
+      "proposals": [],
+      "bindingStrengthened": "Recorded-answer classification test including HTTP 403 secondary rate-limit messages (INV-22)."
+    },
+    {
+      "id": "R7L-10",
+      "class": "GitHub moved-head responses",
+      "evidence": [
+        {
+          "file": "evidence/DECISIONS.md",
+          "quote": "GitHub's ref-update race (`FORBIDDEN: is at <oid> but expected <oid>`) was classified as a permission refusal"
+        }
+      ],
+      "disposition": "covered",
+      "requirements": [
+        "PERSIST-008",
+        "PERSIST-042"
+      ],
+      "invariants": [
+        "INV-22"
+      ],
+      "proposals": [],
+      "bindingStrengthened": "Live three-simultaneous-commit probe in the first provider-conformance task (T18) and classification of every recorded form (INV-22)."
+    },
+    {
+      "id": "R7L-11",
+      "class": "Contract and snapshot integrity",
+      "evidence": [
+        {
+          "file": "evidence/defects.md",
+          "quote": "Registry and snapshot projection followed the candidate contract, not the frozen causa-storage v1.0.0 data"
+        },
+        {
+          "file": "evidence/FINAL-REPORT.md",
+          "quote": "one test gap: removing the `eventsSha256` check is not caught."
+        }
+      ],
+      "disposition": "covered",
+      "requirements": [
+        "PERSIST-005",
+        "EXT-DATA-011",
+        "STORAGE-007",
+        "EXT-DATA-013"
+      ],
+      "invariants": [
+        "INV-11"
+      ],
+      "proposals": [],
+      "bindingStrengthened": "One mutant per integrity check including eventsSha256 (INV-11); the live four-case catalog check is scheduled early (T25 after T15, before UI work completes)."
+    },
+    {
+      "id": "R7L-12",
+      "class": "Forged persistence responses",
+      "evidence": [
+        {
+          "file": "evidence/FINAL-REPORT.md",
+          "quote": "`SaveProcess`, `Load` and `Reply` are public, so in-process code that fabricates GitHub answers can reach a confirmation."
+        }
+      ],
+      "disposition": "gap-proposed",
+      "requirements": [
+        "PERSIST-023",
+        "PERSIST-051"
+      ],
+      "invariants": [
+        "INV-01"
+      ],
+      "proposals": [
+        "ODR-V4-06"
+      ],
+      "bindingStrengthened": "PAT-12 negative project driving the save process with forged replies, once approved."
+    },
+    {
+      "id": "R7L-13",
+      "class": "Missing regression coverage",
+      "evidence": [
+        {
+          "file": "evidence/FINAL-REPORT.md",
+          "quote": "Each review round found real defects that the author's own suites, including the mutation checks, had missed."
+        }
+      ],
+      "disposition": "covered",
+      "requirements": [
+        "DCC-005",
+        "AR-009",
+        "DCC-014"
+      ],
+      "invariants": [
+        "INV-01",
+        "INV-11"
+      ],
+      "proposals": [],
+      "bindingStrengthened": "DCC-014 assertion-ratchet and verify-defect-closures before the candidate freeze; mutation checks named per invariant."
+    },
+    {
+      "id": "R7L-14",
+      "class": "Incomplete deployed-browser acceptance",
+      "evidence": [
+        {
+          "file": "evidence/FINAL-REPORT.md",
+          "quote": "WebKit stopped after the failure, so 9 tests did not run"
+        }
+      ],
+      "disposition": "process",
+      "requirements": [
+        "PERSIST-055",
+        "UI-015",
+        "DCC-008",
+        "PF-020"
+      ],
+      "invariants": [
+        "INV-18",
+        "INV-23"
+      ],
+      "proposals": [],
+      "bindingStrengthened": "Acceptance gate AG-05 fails on any NOT_RUN; execution plan requires suites to run to completion (no stop after first failure)."
+    },
+    {
+      "id": "R7L-15",
+      "class": "Deadline and merge orchestration failures",
+      "evidence": [
+        {
+          "file": "evidence/FINAL-REPORT.md",
+          "quote": "the agent projected the time from earlier timestamps instead of reading the clock"
+        },
+        {
+          "file": "evidence/FINAL-REPORT.md",
+          "quote": "PR #28 went green at 03:51Z."
+        }
+      ],
+      "disposition": "process",
+      "requirements": [
+        "AR-015",
+        "AR-021",
+        "DCC-007"
+      ],
+      "invariants": [],
+      "proposals": [
+        "ODR-V4-07"
+      ],
+      "bindingStrengthened": "Execution plan clock rule (read the wall clock at every resumption; absolute deadline), merge-on-green rule, merge freeze before the delivery window."
+    },
+    {
+      "id": "R7L-16",
+      "class": "Rehearsal 7 implementation not covered by the copy ban",
+      "evidence": [
+        {
+          "file": "evidence/provenance.md",
+          "quote": "PAT-13 comparison with Rehearsals 1\u20136: BLOCKED for this agent (KD-009)."
+        }
+      ],
+      "disposition": "gap-proposed",
+      "requirements": [
+        "PERSIST-026",
+        "PERSIST-052"
+      ],
+      "invariants": [
+        "INV-20"
+      ],
+      "proposals": [
+        "ODR-V4-02"
+      ],
+      "bindingStrengthened": "PAT-13 extended to indy-init-rehearsal-007 and assigned to the independent verifier, once approved."
+    },
+    {
+      "id": "R7L-17",
+      "class": "P0 scope not delivered in the window",
+      "evidence": [
+        {
+          "file": "evidence/FINAL-REPORT.md",
+          "quote": "73 VERIFIED, 17 PARTIAL, 32 NOT_IMPLEMENTED, 9 NOT_RUN, 30 NOT_ASSESSED of 161 P0"
+        }
+      ],
+      "disposition": "process",
+      "requirements": [
+        "AR-021",
+        "AR-024"
+      ],
+      "invariants": [],
+      "proposals": [
+        "ODR-V4-07"
+      ],
+      "bindingStrengthened": "execution-plan.json computes both topologies against 420 minutes and reports the single-lead overrun instead of dropping scope."
+    },
+    {
+      "id": "R7L-18",
+      "class": "CI could not fail (no pipefail) and live CI writers overlapped",
+      "evidence": [
+        {
+          "file": "evidence/defects.md",
+          "quote": "CI steps piped through `tee` could not fail (no `pipefail`)"
+        },
+        {
+          "file": "evidence/FINAL-REPORT.md",
+          "quote": "live CI jobs from different runs wrote to the same test repository at once"
+        }
+      ],
+      "disposition": "covered",
+      "requirements": [
+        "DCC-013",
+        "DCC-009",
+        "PF-017"
+      ],
+      "invariants": [
+        "INV-23"
+      ],
+      "proposals": [],
+      "bindingStrengthened": "conditor ci-policy check at kickoff and on every candidate (DCC-013); execution plan: one live branch per CI run."
+    },
+    {
+      "id": "R7L-19",
+      "class": "Reconciliation and read-back limits of the GitHub API (compare pagination, files over 1 MB, commit time)",
+      "evidence": [
+        {
+          "file": "evidence/FINAL-REPORT.md",
+          "quote": "compare results are not paginated;"
+        },
+        {
+          "file": "evidence/FINAL-REPORT.md",
+          "quote": "files over 1 MB cannot be read back;"
+        },
+        {
+          "file": "evidence/FINAL-REPORT.md",
+          "quote": "\"Last saved\" shows the confirmation time, not the commit time;"
+        }
+      ],
+      "disposition": "covered",
+      "requirements": [
+        "PERSIST-007",
+        "PERSIST-015",
+        "PERSIST-031"
+      ],
+      "invariants": [
+        "INV-01",
+        "INV-03"
+      ],
+      "proposals": [],
+      "bindingStrengthened": "Acceptance obligations AO-R7L-19-1..3 bind three tests to existing obligations: reconciliation with more than 250 commits after the expected head (PERSIST-015-O4), read-back of a file over 1 MB (PERSIST-007-O1), freshness equal to the commit time (PERSIST-031-O3).",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Deterministic.PERSIST015Tests.ReconcileBeyond250Commits",
+          "kind": "deterministic",
+          "category": "integration",
+          "obligation": "PERSIST-015-O4"
+        },
+        {
+          "id": "dotnet:Causa.Acceptance.Deterministic.PERSIST007Tests.ReadBackOfFileOver1MB",
+          "kind": "deterministic",
+          "category": "integration",
+          "obligation": "PERSIST-007-O1"
+        },
+        {
+          "id": "playwright:acceptance/PERSIST-031.spec.js > freshness shows commit time [chromium]",
+          "kind": "deterministic",
+          "category": "browser",
+          "obligation": "PERSIST-031-O3"
+        }
+      ]
+    }
+  ]
+}
