@@ -12,4 +12,10 @@ module ContractUsage =
     let saveInput = SaveInput.FailedBeforeSending
     let networkOffline = NetworkState.Offline
     let saveOffline = SaveState.Offline
+    let saveConflict (view: ConflictView) = SaveState.Conflict view
+
+    let versionClash (decision: Causa.Domain.Decision) =
+        match decision with
+        | Causa.Domain.Conflict(expected, actual) -> Some(expected, actual)
+        | _ -> None
     let connection = ConnectionState.CredentialRefused

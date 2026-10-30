@@ -70,6 +70,7 @@ type SavedBasis =
     | VerifiedAt of VerifiedInvestigation
 
 /// SM-SAVE states (PERSIST-031: exactly seven).
+[<RequireQualifiedAccess>]
 type SaveState =
     | Saved of SavedBasis
     | Unsaved

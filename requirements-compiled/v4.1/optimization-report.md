@@ -55,7 +55,7 @@ The owner stated in session on 2026-10-30 that the organizers allow pre-kickoff 
 | Files with a single owner | not defined | 266 | checked (X01–X03, X14) |
 | State-machine pairs decided | 96 transitions listed | 354 pairs; 11 reviewed partitions; 1 unused event raised | checked (X12) |
 | GitHub error classes | not enumerated | 15 | checked (X06) |
-| Layout rules with executable assertions for each stated invariant | 0 | 10 of 10 rules, 22 listed invariants, 22 assertions, 46 broken pages | checked (X15 maps every invariant to its assertions; CI runs them) |
+| Layout rules with executable assertions for each stated invariant | 0 | 10 of 10 rules, 22 listed invariants, 22 assertions, 69 broken pages | checked (X15 maps every invariant to its assertions; CI runs them) |
 | Dependency critical path | 340 min | 300 min | estimated |
 | B-single-lead (one lead agent) total, with 65 min reserves | 765 (does not fit 420) | 745 (does not fit) | estimated |
 | A-role-lanes (one UI agent) total | 465 (does not fit) | 455 (does not fit) | estimated |
@@ -214,7 +214,7 @@ The telemetry spec ([analysis/conflict-telemetry.json](analysis/conflict-telemet
 | R41-08 | UI-016's amber `#E9A23B` is not a Forma value | ODR-V41-05 |
 | R41-09 | No test framework or Playwright version is locked, so the bootstrap builds test projects without one | ODR-V41-07 |
 | R41-10 | `Confirmation.ofReadBack` can still be called with the same bytes twice | The plan's INV-01 tests (Mutation.INV01.ReadBackSkipped, Property.INV01) guard that path |
-| R41-11 | Some layout assertions approximate their invariant:<br>• `faultStatesPreserved` checks wording;<br>• `textContrast` skips text over images and gradients;<br>• `touchTargets` treats a pointer cursor as a sign of a control.<br>Review rounds 3 and 4 probed 30 defective pages; all are caught except cases the rule assigns elsewhere | The plan tests check the exact PERSIST-031 copy and run axe for contrast over images; each assertion has broken pages for the defects found |
+| R41-11 | The layout assertions are DOM checks in a real browser, not proofs. Known limits:<br>• `textContrast` skips text over images and gradients;<br>• `faultStatesPreserved` checks wording against a fixed vocabulary;<br>• `touchTargets` treats a pointer cursor as a sign of a control;<br>• `reducedMotion` samples the page between 1.5 s and 1.9 s after load;<br>• `focusOrder` requires every control to be reached only on pages with at most 25;<br>• `amberLabelled` accepts visible text in the amber element's parent as its label.<br>Round 5's 110 defect runs were all caught except 13 that do not violate the rule (Forma wraps the text, or its global reduced-motion rule already applies) and the gradient case | The plan tests check the exact PERSIST-031 copy and run axe, which covers contrast over images. Every defect found in review is a broken page that must fail in CI (69) |
 
 ## Finding F41-01 (resolved at the owner's direction)
 
@@ -233,5 +233,6 @@ At the owner's direction (2026-10-30), both sections now carry ADR-R7-001 supers
 | 2 | FAIL | 5 major, 6 minor |
 | 3 | FAIL | 3 major, 6 minor |
 | 4 | FAIL | 1 major, 6 minor |
+| 5 | FAIL | 1 major, 1 minor |
 
-This revision addresses all four rounds; see [independent-review.md](independent-review.md).
+This revision addresses all five rounds; see [independent-review.md](independent-review.md).

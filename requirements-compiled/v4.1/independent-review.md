@@ -14,6 +14,7 @@
 | 2 | `7ec98d9` | FAIL | 0 critical, 5 major, 6 minor. All round-1 findings fixed or partly fixed; the partly fixed ones are completed by the round-2 remediation |
 | 3 | `7e189f9` | FAIL | 0 critical, 3 major, 6 minor. Round-2 findings fixed except 2-1, 2-2 and 2-6 (partly), completed by the round-3 remediation. Owner adjustments: bootstrap largely achieved; layout tests and type-shape reconciliation partly |
 | 4 | `5c6adda` | FAIL | 0 critical, 1 major, 6 minor. Round-3 findings fixed except 3-1 (partly), completed by the round-4 remediation. Owner adjustments: type-shape reconciliation achieved; bootstrap achieved; layout tests partly |
+| 5 | `a6d5904` | FAIL | 0 critical, 1 major, 1 minor. Round-4 findings fixed except 4-1 (not fixed) and 4-6 (partly), completed by the round-5 remediation. Owner adjustments: type-shape reconciliation and bootstrap achieved; layout tests partly. Note: the round-4 remediation text for RV41-4-1 overstated coverage at the time |
 
 ## Round 1 findings and remediation
 
@@ -77,3 +78,10 @@
 | RV41-4-5 | minor | The report summarised ODR-V41-06 as two clauses | The report names all three groups, including the published event rules |
 | RV41-4-6 | minor | Duplicate union-case names caused type errors | The machines' input unions and NetworkState require qualified access; contracts/99-Usage.fs is a positive control CI compiles |
 | RV41-4-7 | minor | .gitignore unowned and not bootstrapped; onlyFormaTokens exempted any forma*.css | `.gitignore` is integration's (X02) and written by the bootstrap; only Forma's own stylesheet (default /dist/all.css, configurable) is exempt |
+
+## Round 5 findings and remediation
+
+| Id | Severity | Finding | Remediation |
+|---|---|---|---|
+| RV41-5-1 | major | The layout assertions still missed about half of a wider set of real defects (50 of 95), and the round-4 record overstated coverage ('measures running text anywhere' was then false) | Shared in-page helpers judge what is actually painted (the background beneath an element on screen, real visibility, visible text, clipping ancestors). The assertions now cover:<br>• line length for any element with 80+ characters of its own text;<br>• focus rings clipped by a container and rings without contrast;<br>• all border sides, switch tracks and SVG icons for non-text contrast;<br>• loaders announced by their own name or a live region;<br>• visible, uncovered lozenge text;<br>• amber in SVG fill, shadows and gradients;<br>• `::-webkit-scrollbar` hiding, skip links hidden by clip-path or transparent text, and controls skipped by script;<br>• script-driven motion, sampled over time;<br>• async focus moves after a dialog closes;<br>• disabled or hidden fault actions;<br>• text over sibling backgrounds, input values and placeholders;<br>• contain: paint and clip-path clipping;<br>• colour-only markers, covered indicators, and off-screen, aria-hidden or unlabelled navs;<br>• custom menus beside the Forma shell;<br>• adopted stylesheets and @property.<br>On the reviewer's 110 runs, 96 are caught; the 14 others are 13 non-violations and the disclosed gradient case. 69 broken pages. R41-11 lists the remaining limits |
+| RV41-5-2 | minor | Conflict was still an ambiguous union case (Decision and SaveState) | SaveState requires qualified access; 99-Usage.fs matches Decision.Conflict and builds SaveState.Conflict; X04 rejects any case name shared by two unqualified unions across the contracts, with a negative control |

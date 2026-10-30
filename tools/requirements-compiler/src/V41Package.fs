@@ -839,6 +839,18 @@ let interfaceCheck (i: Inputs) (files: OwnedFile list) : Check list =
             for f in files do
                 for impl in f.Implements do
                     if not (List.contains impl ids) then yield sprintf "%s implements unknown interface %s" f.Path impl
+            // Case names shared by two unions that do not require qualified access are ambiguous in any file that opens
+            // both namespaces (review RV41-4-6, RV41-5-2).
+            let stubs = field "domainStubs" i.Interfaces |> Option.map (sOr "fsharp") |> Option.defaultValue ""
+            let unions =
+                stubs :: (interfaces |> List.map (sOr "fsharp"))
+                |> List.collect (fun src ->
+                    Regex.Matches(src, @"(\[<RequireQualifiedAccess>\]\s*\n)?[ \t]*type (\w+) =\s*\n((?:[ \t]*\|[^\n]*(?:\n|$))+)")
+                    |> Seq.filter (fun m -> not m.Groups.[1].Success)
+                    |> Seq.collect (fun m -> Regex.Matches(m.Groups.[3].Value, @"\|\s*([A-Z][A-Za-z0-9]*)") |> Seq.map (fun c -> c.Groups.[1].Value, m.Groups.[2].Value))
+                    |> List.ofSeq)
+            for (case, owners) in unions |> List.groupBy fst |> List.map (fun (c, xs) -> c, xs |> List.map snd |> List.distinct) do
+                if owners.Length > 1 then yield sprintf "union case %s is declared by %s without qualified access" case (String.concat " and " owners)
             let positions = interfaces |> List.map (fun x -> sourceOrder.TryFind (sOr "file" x) |> Option.defaultValue -1)
             if positions <> List.sort positions then yield "the interface compile order disagrees with the project file order" ]
       check "X05" "Each state machine's states and events are exactly the cases of the state and input unions of one interface (no new state, no unmapped event)"
@@ -1201,6 +1213,12 @@ let contractFiles (i: Inputs) : (string * string) list =
               "    let saveInput = SaveInput.FailedBeforeSending"
               "    let networkOffline = NetworkState.Offline"
               "    let saveOffline = SaveState.Offline"
+              "    let saveConflict (view: ConflictView) = SaveState.Conflict view"
+              ""
+              "    let versionClash (decision: Causa.Domain.Decision) ="
+              "        match decision with"
+              "        | Causa.Domain.Conflict(expected, actual) -> Some(expected, actual)"
+              "        | _ -> None"
               "    let connection = ConnectionState.CredentialRefused"
               "" ]
     let named = (blocks |> List.mapi (fun n (id, src) -> sprintf "%02d-%s.fs" n id, src.TrimEnd() + "\n")) @ [ usage ]

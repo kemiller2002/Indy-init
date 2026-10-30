@@ -163,6 +163,8 @@ let controls (source: string) : string list =
       yield! expectFail "unknown composed pattern" "X15" (formaRule "FL-07" (setIn "executable" (JArr [ JObj [ "assertion", JStr "indicatorComposed"; "composed", JArr [ jstrs [ "record-header"; "causa-banner" ] ]; "viewports", JStr "all" ] ])))
       yield! expectFail "event-build copy unowned" "X15" (structure (mapArr "testHelpers" (List.filter (fun h -> strOpt "path" h <> Some "tests/browser/support/layout-assertions.mjs"))))
       yield! expectFail "kit without broken fixtures" "X15" { i0 with AuthoredText = i0.AuthoredText |> List.map (fun (n, t) -> if n = "layout-tests/fixtures.mjs" then n, "export const conformingFixtures = {\n};" else n, t) }
+      // X04 round 5 (RV41-5-2): a case name shared by two unqualified unions.
+      yield! expectFail "ambiguous union case" "X04" (editSource "IF41-SAVE" "[<RequireQualifiedAccess>]\ntype SaveState =" "type SaveState =")
       // X15 round 4 (RV41-4-2): an assertion dropped from a rule whose invariant needs it; an assertion that tests no
       // invariant.
       yield! expectFail "invariant's assertion dropped" "X15" (formaRule "FL-04" (mapArr "executable" (List.filter (fun x -> strOpt "assertion" x <> Some "dialogFocus"))))

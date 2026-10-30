@@ -317,48 +317,80 @@
           "severity": "major",
           "finding": "The layout assertions missed common violations of their invariants",
           "remediation": "Overflow checks include html and body and any content past the viewport; clipping compares each text range with its clipping ancestors; line length measures running text anywhere; dialogFocus fails when the invoker does not open the dialog (only a declared show-modal command is carried out in a browser without invoker commands); indicatorComposed is scoped to the header carrying the lozenge and checks order; faultStatesPreserved rejects statements that work was lost; contrast accounts for ancestor opacity and waits for entry animations; also skip link visible on focus, ring contrast, hidden scroll bars, late animations, empty navs, clickable non-controls, colour-only lozenges, unreadable linked stylesheets. 46 broken pages; the reviewer's 18 defect pages are all caught except two that do not violate the rule at that viewport or with Forma's ring",
-          "status": "remediated, pending re-review"
+          "status": "not fixed in round 5; completed by round-5 remediation (RV41-5-1)"
         },
         {
           "id": "RV41-4-2",
           "severity": "minor",
           "finding": "X15 did not enforce per-invariant coverage",
           "remediation": "Each rule lists its invariants and the assertions that test each; X15 fails if an invariant's assertion is not run or a run assertion tests no invariant; negative controls added",
-          "status": "remediated, pending re-review"
+          "status": "verified fixed in round 5"
         },
         {
           "id": "RV41-4-3",
           "severity": "minor",
           "finding": "No frozen contract drove SM-CONNECTION",
           "remediation": "IF41-ERRORS Connector (ConnectRequest, InterpretConnect -> ConnectResult; write access only from stated permissions, EXT-DATA-005); ConnectionState Connecting of RequestId; producer test WriteAccessOnlyFromPermissions",
-          "status": "remediated, pending re-review"
+          "status": "verified fixed in round 5"
         },
         {
           "id": "RV41-4-4",
           "severity": "minor",
           "finding": "--bootstrap refused a git-initialised repository",
           "remediation": "A .git directory is allowed; CI now runs git init before the bootstrap",
-          "status": "remediated, pending re-review"
+          "status": "verified fixed in round 5"
         },
         {
           "id": "RV41-4-5",
           "severity": "minor",
           "finding": "The report summarised ODR-V41-06 as two clauses",
           "remediation": "The report names all three groups, including the published event rules",
-          "status": "remediated, pending re-review"
+          "status": "verified fixed in round 5"
         },
         {
           "id": "RV41-4-6",
           "severity": "minor",
           "finding": "Duplicate union-case names caused type errors",
           "remediation": "The machines' input unions and NetworkState require qualified access; contracts/99-Usage.fs is a positive control CI compiles",
-          "status": "remediated, pending re-review"
+          "status": "partly fixed in round 5; completed by round-5 remediation (RV41-5-2)"
         },
         {
           "id": "RV41-4-7",
           "severity": "minor",
           "finding": ".gitignore unowned and not bootstrapped; onlyFormaTokens exempted any forma*.css",
           "remediation": "`.gitignore` is integration's (X02) and written by the bootstrap; only Forma's own stylesheet (default /dist/all.css, configurable) is exempt",
+          "status": "verified fixed in round 5"
+        }
+      ]
+    },
+    {
+      "round": 5,
+      "reviewedCommit": "a6d5904",
+      "verdict": "FAIL",
+      "counts": {
+        "critical": 0,
+        "major": 1,
+        "minor": 1
+      },
+      "ownerAdjustments": {
+        "review": "partly: RV41-4-1 open, RV41-4-6 partly",
+        "typeShapeReconciliation": "achieved",
+        "executableLayoutTests": "partly: about half of common real defects missed (RV41-5-1)",
+        "bootstrap": "achieved"
+      },
+      "findings": [
+        {
+          "id": "RV41-5-1",
+          "severity": "major",
+          "finding": "The layout assertions still missed about half of a wider set of real defects (50 of 95), and the round-4 record overstated coverage ('measures running text anywhere' was then false)",
+          "remediation": "Shared in-page helpers judge what is actually painted (the background beneath an element on screen, real visibility, visible text, clipping ancestors). The assertions now cover:<br>• line length for any element with 80+ characters of its own text;<br>• focus rings clipped by a container and rings without contrast;<br>• all border sides, switch tracks and SVG icons for non-text contrast;<br>• loaders announced by their own name or a live region;<br>• visible, uncovered lozenge text;<br>• amber in SVG fill, shadows and gradients;<br>• `::-webkit-scrollbar` hiding, skip links hidden by clip-path or transparent text, and controls skipped by script;<br>• script-driven motion, sampled over time;<br>• async focus moves after a dialog closes;<br>• disabled or hidden fault actions;<br>• text over sibling backgrounds, input values and placeholders;<br>• contain: paint and clip-path clipping;<br>• colour-only markers, covered indicators, and off-screen, aria-hidden or unlabelled navs;<br>• custom menus beside the Forma shell;<br>• adopted stylesheets and @property.<br>On the reviewer's 110 runs, 96 are caught; the 14 others are 13 non-violations and the disclosed gradient case. 69 broken pages. R41-11 lists the remaining limits",
+          "status": "remediated, pending re-review"
+        },
+        {
+          "id": "RV41-5-2",
+          "severity": "minor",
+          "finding": "Conflict was still an ambiguous union case (Decision and SaveState)",
+          "remediation": "SaveState requires qualified access; 99-Usage.fs matches Decision.Conflict and builds SaveState.Conflict; X04 rejects any case name shared by two unqualified unions across the contracts, with a negative control",
           "status": "remediated, pending re-review"
         }
       ]
