@@ -12,7 +12,7 @@
           "decision_id": "ODR-V41-06",
           "action": "select",
           "option": "A",
-          "organizer_confirmation": "<who confirmed it, and when, e.g. 'Jane Doe, Indy Init organizers, email 2026-10-28'>"
+          "organizer_confirmation": "I approved it."
         }
       ]
     }
