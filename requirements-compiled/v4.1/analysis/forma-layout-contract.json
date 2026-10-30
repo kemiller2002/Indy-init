@@ -274,6 +274,13 @@
       "tests": [
         "playwright:acceptance/PERSIST-030.spec.js > PERSIST-030-O6 [chromium]",
         "playwright:acceptance/PERSIST-030.spec.js > PERSIST-030-O6 [webkit]"
+      ],
+      "literals": [
+        {
+          "value": "#E9A23B",
+          "source": "docs/CAUSA-UI-EXPERIENCE-REQUIREMENTS.md, UI-016 colour table: 'Amber | Amber | `#E9A23B`'",
+          "note": "A requirement identity colour, not a Forma value (Forma 0.12.0 has no such colour); mapping it to a Forma semantic token is ODR-V41-05."
+        }
       ]
     },
     {

@@ -16,7 +16,7 @@
       "rationale": "Only the owner approves a package (RDP-003). v4.1 depends on v4: approving v4.1 without v4 leaves the requirements unfrozen.",
       "impact": "Until approved, v4.1 is a CANDIDATE. The event build may follow it as guidance but must report it unapproved.",
       "approvalRecord": {
-        "how": "A change in an operator approval (v4 recordFormat): {\"decision_id\": \"ODR-V41-01\", \"action\": \"approve-package\", \"package\": \"requirements-compiled/v4.1\", \"manifest_sha256\": \"<sha256 of requirements-compiled/v4.1/package-manifest.json>\", \"review_sha256\": \"<sha256 of requirements-compiled/v4.1/analysis/independent-review.json>\"}. Written and committed by the owner only."
+        "how": "A change in an operator approval (v4 recordFormat): {\"decision_id\": \"ODR-V41-01\", \"action\": \"approve-package\", \"package\": \"requirements-compiled/v4.1\", \"manifest_sha256\": \"<sha256 of requirements-compiled/v4.1/package-manifest.json>\", \"review_sha256\": \"<sha256 of requirements-compiled/v4.1/analysis/independent-review.json>\"}. The manifest digests every authored input and document (including AGENT-RULES.md and this file) and every generated file. Written and committed by the owner only."
       }
     },
     {
@@ -38,17 +38,50 @@
     {
       "id": "ODR-V41-03",
       "kind": "schedule",
-      "title": "Accept the interface-first dependency changes of the v4.1 DAG",
-      "question": "v4.1 lets the interface freeze (T14) and the save machine (T19) start before the domain kernel (T13), because the frozen contracts fix the types; replay verification against the real kernel moves to integration (T21). Accept this for the event schedule?",
+      "title": "Accept the interface-first ordering changes of the v4.1 DAG",
+      "question": "v4.1 lets the interface freeze (T14) start before the kernel (T13) and the invariant tests (T12), and the save machine (T19) and GitHub provider (T20) start before the kernel, because the frozen contracts fix the types. It keeps the invariant tests before the save machine (T12 before T19, R4-01) and the kernel before integration checkpoint 1 (T13 before T17) and before live integration (T13 before T21). The six v4 orderings it drops are listed with reasons in analysis/task-adjustments.json waivedPrecedences: T12 before T14, T13 before T14, T13 before T19, T13 before T20, T12 before T35, T13 before T35. Accept them?",
       "options": [
-        "A: accept (critical path estimated 270 minutes)",
-        "B: keep v4's dependencies (critical path estimated 340 minutes)"
+        "A: accept the ordering changes",
+        "B: keep v4's orderings"
       ],
-      "recommendation": "A, together with ODR-V4-07's topology choice. Under A both role-lane topologies fit the window by the estimates: A-role-lanes 405 and C-role-lanes-two-ui 345 of 420 minutes.",
+      "recommendation": "A. With v4's estimates, the ordering changes alone shorten the critical path from 340 to 305 minutes and topology C from 405 to 395 (schedule.json scenarios). Neither alone nor with ODR-V41-04 does topology A fit the 420-minute window; C fits in every scenario.",
       "rationale": "The change moves integration risk from T19 to T21 (optimization-report.md, risks R41-02 and R41-03); the owner decides whether that trade is acceptable.",
-      "impact": "With B, v4.1's other artifacts still apply; only execution-dag.json and schedule.json revert to v4's dependencies.",
+      "impact": "With B, the agent removes the dependency changes from task-adjustments.json and recompiles; the other v4.1 artifacts still apply.",
       "approvalRecord": {
         "how": "{\"decision_id\": \"ODR-V41-03\", \"action\": \"select\", \"option\": \"A\" | \"B\"}"
+      }
+    },
+    {
+      "id": "ODR-V41-04",
+      "kind": "schedule",
+      "title": "Accept the v4.1 estimate changes",
+      "question": "v4.1 lowers five timed estimates (minutes): T12 25 to 15, T14 20 to 15, T16 35 to 30, T18 45 to 35, T22 70 to 60. It also gives preflight T10 an estimate of 25 outside the window. Each reason is in analysis/task-adjustments.json; all are the package author's estimates, not measurements. Accept them for planning?",
+      "options": [
+        "A: accept the estimate changes",
+        "B: keep v4's estimates"
+      ],
+      "recommendation": "A only if the reasons convince you: with v4's dependencies, the estimate changes alone take the critical path from 340 to 325 minutes and C from 405 to 390; with ODR-V41-03 also accepted, 285 and 380.",
+      "rationale": "Lower estimates move the schedule without moving the work; only the owner accepts them.",
+      "impact": "With B, the agent restores v4's estimates and recompiles; reserves are unchanged either way.",
+      "approvalRecord": {
+        "how": "{\"decision_id\": \"ODR-V41-04\", \"action\": \"select\", \"option\": \"A\" | \"B\"}"
+      }
+    },
+    {
+      "id": "ODR-V41-05",
+      "kind": "requirement-conflict",
+      "title": "Map UI-016's amber #E9A23B to a Forma token",
+      "question": "UI-016 (docs/CAUSA-UI-EXPERIENCE-REQUIREMENTS.md) names the identity colour amber #E9A23B and requires every colour to map to a named semantic Forma theme token. Forma 0.12.0 defines no such value (its ambers differ), and v4.1 forbids declaring new --ef-* properties. Which applies?",
+      "options": [
+        "A: use Forma's warning-status token for amber, keeping text labels (DEC-R7-002)",
+        "B: allow web/causa.css to declare one theme token for #E9A23B, outside the --ef-* namespace, after measuring contrast",
+        "C: ask Forma for a release with the identity colours"
+      ],
+      "recommendation": "A for November 7: it uses only published tokens; B or C if the exact hex is required.",
+      "rationale": "A requirement value and the no-invented-token rule conflict; an agent may not resolve that by itself.",
+      "impact": "Until decided, FL-06 cites #E9A23B as the requirement's value (check X07 accepts a literal only with its requirement source).",
+      "approvalRecord": {
+        "how": "{\"decision_id\": \"ODR-V41-05\", \"action\": \"select\", \"option\": \"A\" | \"B\" | \"C\"}"
       }
     }
   ],

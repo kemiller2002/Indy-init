@@ -18,4 +18,7 @@ type ProviderError =
     | ReadBackMismatch of commit: CommitOid
     | Unrecognised of status: int
 
-type Classifier = HttpOutcome -> Result<string, ProviderError>
+/// A 2xx answer that decoded: the request it answers and its body, for the caller to decode further.
+type ProviderAnswer = { Request: RequestId; Status: int; Body: string }
+
+type Classifier = HttpOutcome -> Result<ProviderAnswer, ProviderError>

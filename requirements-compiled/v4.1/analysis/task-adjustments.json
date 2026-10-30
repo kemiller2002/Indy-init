@@ -1,6 +1,6 @@
 {
   "schema": "indy-init.v41-task-adjustments/1",
-  "description": "Changes v4.1 makes to v4's timed work items (requirements-compiled/v4/curation/tasks.json), with the reason for each. Every number is a planning estimate by the package author; none is measured. No work item is removed and no requirement leaves a work item: the compiler checks both. The DAG changes come from freezing interfaces before kickoff: consumers wait for the contracts (T14), not for the producer's implementation.",
+  "description": "Changes v4.1 makes to v4's work items (requirements-compiled/v4/curation/tasks.json), each with its reason. Every number is a planning estimate by the package author; none is measured. No work item is removed and no requirement leaves a work item. Every ordering v4 implied (its transitive dependencies) is kept unless listed in waivedPrecedences with its reason; no estimate falls below half of v4's. The compiler checks all of this (X13). The ordering changes need the owner's decision ODR-V41-03, the estimate changes ODR-V41-04.",
   "adjustments": [
     {
       "task": "T10",
@@ -16,14 +16,14 @@
     },
     {
       "task": "T14",
-      "estimateMinutes": 5,
+      "estimateMinutes": 15,
       "dependsOn": [
         {
           "task": "T10",
           "reason": "the frozen contracts (interface-specifications.json) are copied into each project's Contracts file and typechecked; they need the empty projects, not the kernel's implementation"
         }
       ],
-      "rationale": "The interfaces are specified and typechecked before kickoff, so the freeze is a copy and a build, not a negotiation. T14 no longer waits for the kernel (T13): the contracts fix the types, and the kernel implements them.",
+      "rationale": "The interface types are written and typechecked before kickoff (contracts/), so the freeze is not a negotiation: each producer commits its contract block into the file it owns, integration builds, and the producers write the contract tests named in interface-specifications.json. v4's 20 minutes covered deriving the types as well. T14 no longer waits for the kernel (T13): the contracts fix the types, and the kernel implements them.",
       "evidence": "estimated"
     },
     {
@@ -43,6 +43,25 @@
       "evidence": "estimated"
     },
     {
+      "task": "T17",
+      "dependsOn": [
+        {
+          "task": "T13",
+          "reason": "integration checkpoint 1 sends a typed command through Limen and needs a real decide (kept from v4, where T17 reached T13 through T14)"
+        },
+        {
+          "task": "T14",
+          "reason": "the frozen contracts"
+        },
+        {
+          "task": "T16",
+          "reason": "the workspace shell"
+        }
+      ],
+      "rationale": "No estimate change. Keeps v4's kernel-before-checkpoint order explicitly, since T14 no longer implies it.",
+      "evidence": "estimated"
+    },
+    {
       "task": "T18",
       "estimateMinutes": 35,
       "rationale": "The provider-conformance probe records live answers against a prepared classification (github-error-matrix.json) instead of discovering the classes: 15 rows, each with its detection evidence and test.",
@@ -50,8 +69,12 @@
     },
     {
       "task": "T19",
-      "estimateMinutes": 50,
+      "estimateMinutes": 60,
       "dependsOn": [
+        {
+          "task": "T12",
+          "reason": "R4-01 and AR-022: the invariant tests are written and failing before the first write code (kept from v4, where T19 reached T12 through T14 and T13)"
+        },
         {
           "task": "T14",
           "reason": "implements the frozen IF41-SAVE contract"
@@ -61,7 +84,7 @@
           "reason": "tested against the stateful fake built from the live recordings"
         }
       ],
-      "rationale": "Every transition of SM-SAVE and SM-CONFLICT, its guard, effects and fault are enumerated (state-machine-contracts.json); the agent implements a table instead of interpreting prose. In v4, T19 waited for the kernel through T14 (T14 depended on T13); with the contracts frozen before the kernel, it does not. Replay verification against the real kernel is exercised at integration (T21).",
+      "rationale": "Unchanged estimate: the decision table (state-machine-contracts.json) replaces reading prose, but the 84 transition tests and the illegal-pair tests are written in this task. In v4, T19 waited for the kernel through T14 (T14 depended on T13); with the contracts frozen before the kernel it does not, but it still waits for the invariant tests (T12). Replay verification against the real kernel is exercised at integration (T21).",
       "evidence": "estimated"
     },
     {
@@ -98,9 +121,47 @@
     },
     {
       "task": "T31",
-      "estimateMinutes": 40,
-      "rationale": "The verification execution plan groups the release-candidate suites by environment with one shared fixture per suite, so the candidate run sets up the deployed app and the live provider once per suite instead of once per test.",
+      "estimateMinutes": 45,
+      "rationale": "Unchanged estimate. (An earlier draft cut it to 40 on a claimed setup saving that the suite fixtures do not support; withdrawn after review RV41-1-8.)",
       "evidence": "estimated"
+    }
+  ],
+  "waivedPrecedences": [
+    {
+      "before": "T12",
+      "after": "T14",
+      "reason": "The interface freeze copies contracts typechecked before kickoff; it does not use the invariant tests. T19, the first write code, still follows T12.",
+      "decision": "ODR-V41-03"
+    },
+    {
+      "before": "T13",
+      "after": "T14",
+      "reason": "The contracts fix the kernel's types before the kernel exists; the kernel (T13) now implements IF41-DOMAIN after the freeze.",
+      "decision": "ODR-V41-03"
+    },
+    {
+      "before": "T13",
+      "after": "T19",
+      "reason": "The save machine is written against IF41-DOMAIN's frozen types and the stateful fake; replay verification against the real kernel is exercised at T21, which depends on T13 (risk R41-03).",
+      "decision": "ODR-V41-03"
+    },
+    {
+      "before": "T13",
+      "after": "T20",
+      "reason": "As T13 before T19: the GitHub provider path builds on the save machine and the frozen types, and meets the real kernel at T21.",
+      "decision": "ODR-V41-03"
+    },
+    {
+      "before": "T12",
+      "after": "T35",
+      "reason": "Review checkpoint T35 reviews the interface freeze, which no longer includes the kernel or the invariant tests; T36 reviews after T21.",
+      "decision": "ODR-V41-03"
+    },
+    {
+      "before": "T13",
+      "after": "T35",
+      "reason": "As T12 before T35.",
+      "decision": "ODR-V41-03"
     }
   ]
 }

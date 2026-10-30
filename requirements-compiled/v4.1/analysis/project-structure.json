@@ -1,6 +1,6 @@
 {
   "schema": "indy-init.v41-project-structure/1",
-  "description": "Project structure and file ownership for the event build, derived from the dependency direction Web/Persistence -> Application -> Domain (FSHARP-TYPE-SHAPES section 46, a reversible choice) and from the interface specifications. Each file has one primary owner. After the T14 interface freeze, only integration edits shared files and project files; every project file's Compile list is written once, complete, at T14, so no agent adds a file to a project later. Test files for bound test identities are generated from the verification plan (agent-file-ownership.json).",
+  "description": "Project structure and file ownership for the event build, derived from the dependency direction Web/Persistence -> Application -> Domain (FSHARP-TYPE-SHAPES section 46, a reversible choice) and from the interface specifications. Each file has one primary owner. After the T14 interface freeze, only integration edits shared files and project files; every project file's Compile list is written once, complete, at T14, so no agent adds a file to a project later. Test files for bound test identities are generated from the verification plan (agent-file-ownership.json). Contract tests (one file per interface and side), state-machine tests (one file per machine, in its owner's test project) and the unit-test files named by requiredTests are generated with their owners, so every Compile list is complete at bootstrap.",
   "roles": [
     {
       "id": "domain",
@@ -20,7 +20,8 @@
     {
       "id": "ui-2",
       "lane": "ui-2",
-      "description": "second UI agent (topology C): causal graph, report, history and semantic diff, administration and settings views"
+      "description": "second UI agent (topology C): causal graph, report, history and semantic diff, administration and settings views In a topology without a ui-2 lane (A-role-lanes, B-single-lead) these files belong to ui.",
+      "fallback": "ui"
     },
     {
       "id": "integration",
@@ -149,7 +150,7 @@
             "IF41-DOMAIN"
           ],
           "requiredTests": [
-            "dotnet:Causa.Contract.Tests.Domain.DecideIsTotalOverCommands"
+            "dotnet:Causa.Contract.Tests.Domain.Producer.DecideIsTotalOverCommands"
           ]
         }
       ]
@@ -659,51 +660,6 @@
       "note": "storage-like fixtures declared for the credential scan (DCC-015)"
     },
     {
-      "path": "tests/Causa.Acceptance/Causa.Acceptance.fsproj",
-      "owner": "integration",
-      "contributors": [],
-      "dependsOn": [],
-      "implements": [],
-      "requiredTests": [],
-      "note": "acceptance test project; Compile list fixed at T14"
-    },
-    {
-      "path": "tests/Causa.Invariants/Causa.Invariants.fsproj",
-      "owner": "integration",
-      "contributors": [],
-      "dependsOn": [],
-      "implements": [],
-      "requiredTests": [],
-      "note": "invariant test project"
-    },
-    {
-      "path": "tests/Causa.Contract.Tests/Causa.Contract.Tests.fsproj",
-      "owner": "integration",
-      "contributors": [],
-      "dependsOn": [],
-      "implements": [],
-      "requiredTests": [],
-      "note": "cross-component contract tests"
-    },
-    {
-      "path": "tests/Causa.Domain.Tests/Causa.Domain.Tests.fsproj",
-      "owner": "integration",
-      "contributors": [],
-      "dependsOn": [],
-      "implements": [],
-      "requiredTests": [],
-      "note": "domain tests"
-    },
-    {
-      "path": "tests/Causa.Persistence.Tests/Causa.Persistence.Tests.fsproj",
-      "owner": "integration",
-      "contributors": [],
-      "dependsOn": [],
-      "implements": [],
-      "requiredTests": [],
-      "note": "persistence tests and the stateful fake"
-    },
-    {
       "path": "playwright.config.ts",
       "owner": "integration",
       "contributors": [],
@@ -755,86 +711,6 @@
       "note": "recorded GitHub answers (T18)"
     },
     {
-      "path": "tests/Causa.Contract.Tests/Domain.fs",
-      "owner": "domain",
-      "contributors": [],
-      "dependsOn": [],
-      "implements": [],
-      "requiredTests": []
-    },
-    {
-      "path": "tests/Causa.Contract.Tests/Storage.fs",
-      "owner": "persistence",
-      "contributors": [],
-      "dependsOn": [],
-      "implements": [],
-      "requiredTests": []
-    },
-    {
-      "path": "tests/Causa.Contract.Tests/Wire.fs",
-      "owner": "persistence",
-      "contributors": [],
-      "dependsOn": [],
-      "implements": [],
-      "requiredTests": []
-    },
-    {
-      "path": "tests/Causa.Contract.Tests/Save.fs",
-      "owner": "persistence",
-      "contributors": [],
-      "dependsOn": [],
-      "implements": [],
-      "requiredTests": []
-    },
-    {
-      "path": "tests/Causa.Contract.Tests/App.fs",
-      "owner": "ui",
-      "contributors": [],
-      "dependsOn": [],
-      "implements": [],
-      "requiredTests": []
-    },
-    {
-      "path": "tests/Causa.Contract.Tests/View.fs",
-      "owner": "ui",
-      "contributors": [],
-      "dependsOn": [],
-      "implements": [],
-      "requiredTests": []
-    },
-    {
-      "path": "tests/Causa.Contract.Tests/Report.fs",
-      "owner": "ui-2",
-      "contributors": [],
-      "dependsOn": [],
-      "implements": [],
-      "requiredTests": []
-    },
-    {
-      "path": "tests/Causa.Contract.Tests/Host.fs",
-      "owner": "integration",
-      "contributors": [],
-      "dependsOn": [],
-      "implements": [],
-      "requiredTests": []
-    },
-    {
-      "path": "tests/browser/contract/views.spec.js",
-      "owner": "ui",
-      "contributors": [],
-      "dependsOn": [],
-      "implements": [],
-      "requiredTests": []
-    },
-    {
-      "path": "tests/browser/contract/report.spec.js",
-      "owner": "ui-2",
-      "contributors": [],
-      "dependsOn": [],
-      "implements": [],
-      "requiredTests": []
-    },
-    {
       "path": "tests/browser/support/fixtures.js",
       "owner": "integration",
       "contributors": [],
@@ -846,9 +722,95 @@
   ],
   "rules": [
     "A file has exactly one primary owner; contributors may edit only through a pull request the owner approves, never concurrently.",
-    "Project files, the solution, package manifests, CI, deployment, the host shim, the boundary script, the stylesheet and src/Causa.App/View.fs are integration's alone after T14.",
     "A change to a frozen interface (interface-specifications.json) goes through the coordinator and is versioned; consumers are notified before merge.",
     "F# compile order is the order of each project's files list; a file may depend only on earlier files of its project or on referenced projects.",
-    "ui and ui-2 never own the same file; Shell.fs is ui's and ui-2 consumes it read-only."
+    "ui and ui-2 never own the same file; Shell.fs is ui's and ui-2 consumes it read-only.",
+    "Integration alone writes: every project and solution file, Directory.*.props, global.json, package.json, package-lock.json, playwright.config.ts, build.fsx, README.md, .github/, web/, .echelon/, tests/fixtures/manifest.json, src/Causa.Host/, src/Causa.App/View.fs and src/Causa.App/Program.fs (check X02)."
+  ],
+  "testProjects": [
+    {
+      "id": "Causa.Acceptance",
+      "path": "tests/Causa.Acceptance/Causa.Acceptance.fsproj",
+      "owner": "integration",
+      "references": [
+        "Causa.Domain",
+        "Causa.Persistence",
+        "Causa.App"
+      ]
+    },
+    {
+      "id": "Causa.Invariants",
+      "path": "tests/Causa.Invariants/Causa.Invariants.fsproj",
+      "owner": "integration",
+      "references": [
+        "Causa.Domain",
+        "Causa.Persistence",
+        "Causa.App"
+      ]
+    },
+    {
+      "id": "Causa.Contract.Tests",
+      "path": "tests/Causa.Contract.Tests/Causa.Contract.Tests.fsproj",
+      "owner": "integration",
+      "references": [
+        "Causa.Domain",
+        "Causa.Persistence",
+        "Causa.App"
+      ]
+    },
+    {
+      "id": "Causa.Domain.Tests",
+      "path": "tests/Causa.Domain.Tests/Causa.Domain.Tests.fsproj",
+      "owner": "integration",
+      "references": [
+        "Causa.Domain"
+      ]
+    },
+    {
+      "id": "Causa.Persistence.Tests",
+      "path": "tests/Causa.Persistence.Tests/Causa.Persistence.Tests.fsproj",
+      "owner": "integration",
+      "references": [
+        "Causa.Domain",
+        "Causa.Persistence"
+      ]
+    },
+    {
+      "id": "Causa.App.Tests",
+      "path": "tests/Causa.App.Tests/Causa.App.Tests.fsproj",
+      "owner": "integration",
+      "references": [
+        "Causa.Domain",
+        "Causa.Persistence",
+        "Causa.App"
+      ]
+    }
+  ],
+  "stateMachines": [
+    {
+      "machine": "SM-SAVE",
+      "owner": "persistence",
+      "project": "Causa.Persistence.Tests"
+    },
+    {
+      "machine": "SM-CONFLICT",
+      "owner": "persistence",
+      "project": "Causa.Persistence.Tests"
+    },
+    {
+      "machine": "SM-LOAD",
+      "owner": "persistence",
+      "project": "Causa.Persistence.Tests"
+    },
+    {
+      "machine": "SM-CONNECTION",
+      "owner": "ui",
+      "project": "Causa.App.Tests"
+    },
+    {
+      "machine": "SM-NETWORK",
+      "owner": "ui",
+      "project": "Causa.App.Tests"
+    }
   ]
 }

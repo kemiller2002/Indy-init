@@ -1128,7 +1128,9 @@ let formaFromTarball (path: string) : string * string * Json =
 /// Reads every input of the v4.1 stage: v4's plan, manifest, machines, tasks and policy, and the authored v4.1 inputs.
 let v41Inputs (source: string) (package: string) (basePackage: string) (formaTarball: string option) : V41Package.Inputs =
     let a n = Path.Combine(package, "analysis", n)
-    let authored = [ "interface-specifications.json"; "project-structure.json"; "github-error-matrix.json"; "forma-layout-contract.json"; "task-adjustments.json"; "conflict-telemetry.json" ]
+    let authored = [ "interface-specifications.json"; "project-structure.json"; "github-error-matrix.json"; "forma-layout-contract.json"; "task-adjustments.json"; "conflict-telemetry.json"; "guard-partitions.json" ]
+    // Documents and records the owner approves with the package; the review record exists once a review has run.
+    let documents = [ "README.md"; "AGENT-RULES.md"; "FREEZE.md"; "optimization-report.md"; "independent-review.md"; "proposals/owner-decision-requests.json"; "analysis/independent-review.json" ]
     let forma = parseFile (a "forma-layout-contract.json")
     let formaSpec = field "forma" forma |> Option.defaultValue JNull
     let inventoryPath = Path.Combine(package, str "inventory" formaSpec)
@@ -1151,13 +1153,14 @@ let v41Inputs (source: string) (package: string) (basePackage: string) (formaTar
       Forma = forma
       Adjustments = parseFile (a "task-adjustments.json")
       Telemetry = parseFile (a "conflict-telemetry.json")
+      GuardPartitions = parseFile (a "guard-partitions.json")
       FormaInventory =
         if File.Exists inventoryPath then parseFile inventoryPath
         else match extract with Some x -> x | None -> failwithf "%s is missing; generate it with --forma-tarball" inventoryPath
       FormaExtract = extract
       AuthoredText =
         (authored |> List.map (fun n -> "analysis/" + n, File.ReadAllText(a n)))
-        @ [ "proposals/owner-decision-requests.json", File.ReadAllText(Path.Combine(package, "proposals", "owner-decision-requests.json")) ] }
+        @ (documents |> List.filter (fun n -> File.Exists(Path.Combine(package, n))) |> List.map (fun n -> n, File.ReadAllText(Path.Combine(package, n)))) }
 
 /// `v41`: generates the v4.1 artifacts and validation report from v4 and the authored v4.1 inputs. Exit 0 validation
 /// PASS (the package stays a CANDIDATE), 3 a check failed, 4 --check found files that differ, 2 unusable input.
@@ -1203,7 +1206,12 @@ let v41Command (args: string list) : int =
             if check then
                 let differing = all |> List.filter (fun (n, t) -> let p = Path.Combine(package, n) in not (File.Exists p) || File.ReadAllText p <> t) |> List.map fst
                 differing |> List.iter (eprintfn "differs from the package: %s")
-                if not differing.IsEmpty then 4 elif verdict = "PASS" then 0 else 3
+                // A file in the package that the compiler neither generates nor reads is stale or foreign.
+                let expected = (all |> List.map fst) @ (i.AuthoredText |> List.map fst) @ (inventoryPin |> List.map fst) |> Set.ofList
+                let present = Directory.GetFiles(package, "*", SearchOption.AllDirectories) |> Array.map (fun f -> Path.GetRelativePath(package, f).Replace('\\', '/')) |> Array.sort |> List.ofArray
+                let stray = present |> List.filter (expected.Contains >> not)
+                stray |> List.iter (eprintfn "not generated or read by the compiler: %s")
+                if not differing.IsEmpty || not stray.IsEmpty then 4 elif verdict = "PASS" then 0 else 3
             else
                 for (n, t) in all do
                     let p = Path.Combine(package, n)

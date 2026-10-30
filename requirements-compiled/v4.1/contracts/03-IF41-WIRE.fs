@@ -4,9 +4,15 @@ namespace Causa.Persistence
 /// through Limen and returns the raw result (ODR-V4-06 proposes that decoding stays inside persistence).
 type RequestId = RequestId of int64
 
+type HttpMethod =
+    | Get
+    | Post
+    | Put
+    | Patch
+
 type HttpRequest =
     { Id: RequestId
-      Method: string
+      Method: HttpMethod
       Url: string
       Headers: (string * string) list
       Body: string option }

@@ -10,49 +10,49 @@
     },
     {
       "id": "X02",
-      "title": "Project files, the solution, dependency manifests, CI and deployment are owned by integration",
+      "title": "Project files, the solution, composition, shared configuration, dependency manifests, CI and deployment are owned by integration",
       "result": "PASS",
       "problems": []
     },
     {
       "id": "X03",
-      "title": "Compile order is predefined: a file depends only on earlier files of its project or on referenced projects, and project references are acyclic",
+      "title": "Compile order is predefined: each file depends only on earlier files of its project or on referenced projects, project references (source and test) are acyclic, and every test file is in a declared test project",
       "result": "PASS",
       "problems": []
     },
     {
       "id": "X04",
-      "title": "Every interface has a complete contract implemented by one file its producer owns, and the compile order lists each once in file order",
+      "title": "Every interface has a complete contract implemented by one file its producer owns, in file order; its producer tests are in files the producer owns and every consumer has a contract test in a file it owns",
       "result": "PASS",
       "problems": []
     },
     {
       "id": "X05",
-      "title": "The save-state interface has exactly the states of SM-SAVE (no new persistence state)",
+      "title": "Each state machine's states and events are exactly the cases of the state and input unions of one interface (no new state, no unmapped event)",
       "result": "PASS",
       "problems": []
     },
     {
       "id": "X06",
-      "title": "The GitHub error matrix covers every required class completely; a shared HTTP status is never the only evidence; retries stay within the PERSIST-010/016 bounds; every test exists in the plan",
+      "title": "The GitHub error matrix covers every required class and timeouts; a shared HTTP status is never the only evidence and no two such classes share evidence; each class retries within its own bound; every test exists in the plan and belongs to the class's requirements",
       "result": "PASS",
       "problems": []
     },
     {
       "id": "X07",
-      "title": "The Forma layout contract uses only tokens, patterns and breakpoints of the published Forma release, and the committed inventory equals the one extracted from the package",
+      "title": "The Forma layout contract uses only custom properties, classes, patterns and breakpoints of the published Forma release, names no colour literal without a requirement source, and the committed inventory equals the one extracted from the package",
       "result": "PASS",
       "problems": []
     },
     {
       "id": "X08",
-      "title": "Coordination telemetry defines every required metric with a source, keeps textual conflicts apart from semantic failures, and records unavailable metrics instead of estimating them",
+      "title": "Coordination telemetry defines every required metric with a source, keeps textual conflicts apart from semantic failures, and records an unavailable metric as null with a reason, never inferred",
       "result": "PASS",
       "problems": []
     },
     {
       "id": "X09",
-      "title": "The verification execution plan places every (obligation, test) binding of the plan in exactly one suite, keeping each test and its assertions",
+      "title": "The verification execution plan places every (obligation, test) binding of the plan, and every contract, state-machine and unit test, in exactly one suite, keeping each test and its assertions",
       "result": "PASS",
       "problems": []
     },
@@ -64,25 +64,25 @@
     },
     {
       "id": "X11",
-      "title": "No v4.1 input imports or names application source from an earlier rehearsal",
+      "title": "No v4.1 input or document imports or names application source from an earlier rehearsal (Rehearsals 1-6)",
       "result": "PASS",
       "problems": []
     },
     {
       "id": "X12",
-      "title": "Every state machine is deterministic and complete: each (state, event) pair is legal with distinct guards or fails closed, every state is reachable, no state is added",
+      "title": "Every state machine is deterministic by reviewed guard partitions, every pair is decided (listed or fail-closed), every transition is sourced, every state is reachable, and no state is added",
       "result": "PASS",
       "problems": []
     },
     {
       "id": "X13",
-      "title": "The adjusted DAG is acyclic, keeps every v4 task with its requirements and estimate, and every adjustment is a labelled estimate with a rationale",
+      "title": "The adjusted DAG is acyclic, keeps every v4 task with its requirements and every v4 ordering not explicitly waived, keeps every estimate at least half of v4's, and labels every change an estimate with a rationale",
       "result": "PASS",
       "problems": []
     },
     {
       "id": "X14",
-      "title": "Every bound test identity names an owned test file, or is a Praxis record that is not code",
+      "title": "Every test identity (plan, contract, state-machine, unit) names an owned test file, or is a Praxis record that is not code",
       "result": "PASS",
       "problems": []
     }

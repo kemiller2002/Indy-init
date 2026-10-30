@@ -1,7 +1,13 @@
 {
   "schema": "indy-init.v41-conflict-telemetry/1",
   "description": "Coordination telemetry the event build records, so v4.1's ownership plan can be judged by observation rather than assertion. Textual merge conflicts (git could not merge) are kept apart from semantic integration failures (merged, then a contract or integration test failed). A metric whose source was not recorded is reported as unavailable with the reason; it is never estimated or back-filled.",
-  "unavailablePolicy": "Record {metric, value: null, unavailable: true, reason}. Do not infer a value from other metrics.",
+  "unavailablePolicy": {
+    "value": null,
+    "unavailable": true,
+    "reasonRequired": true,
+    "inferenceAllowed": false,
+    "rule": "Record {metric, value: null, unavailable: true, reason}. Never infer a value from other metrics or estimate it."
+  },
   "metrics": [
     {
       "id": "merge-conflicts",

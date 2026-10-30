@@ -1,0 +1,128 @@
+{
+  "schema": "indy-init.v41-guard-partitions/1",
+  "description": "Every (state, event) pair of the v4 machines that has more than one transition, with its guards and why they are mutually exclusive. Guards are prose in v4, so the compiler cannot decide overlap itself; it checks instead that each such pair has exactly the guards reviewed here (X12), so adding, removing or changing a guard fails until this file is reviewed again. 'exhaustive' says whether the guards cover every case; where they do not, the remaining case fails closed.",
+  "groups": [
+    {
+      "machine": "SM-SAVE",
+      "state": "Saved",
+      "event": "Edit",
+      "guards": [
+        "online",
+        "known offline"
+      ],
+      "exhaustive": true,
+      "exclusiveBecause": "network state is online or known offline"
+    },
+    {
+      "machine": "SM-SAVE",
+      "state": "Unsaved",
+      "event": "SaveRequested",
+      "guards": [
+        "online and no other mutation in flight in this tab",
+        "known offline",
+        "online and another mutation is in flight in this tab"
+      ],
+      "exhaustive": true,
+      "exclusiveBecause": "offline; or online with or without another mutation in flight"
+    },
+    {
+      "machine": "SM-SAVE",
+      "state": "Saving",
+      "event": "ReadBackMatched",
+      "guards": [
+        "current and no change made during the save",
+        "current and changes were made during the save"
+      ],
+      "exhaustive": false,
+      "exclusiveBecause": "a reply that is not current is SupersededReply, a different event; among current replies, changes were or were not made"
+    },
+    {
+      "machine": "SM-SAVE",
+      "state": "Saving",
+      "event": "StaleHeadUnrelated",
+      "guards": [
+        "current and fewer than three rebase attempts made",
+        "current and three rebase attempts already made"
+      ],
+      "exhaustive": false,
+      "exclusiveBecause": "current replies only (as above); rebase attempts are fewer than three or exactly three"
+    },
+    {
+      "machine": "SM-SAVE",
+      "state": "UnknownOutcome",
+      "event": "ReconcileMarkerBytesMatch",
+      "guards": [
+        "current and no change made during the save",
+        "current and changes were made during the save"
+      ],
+      "exhaustive": false,
+      "exclusiveBecause": "current replies only; changes were or were not made"
+    },
+    {
+      "machine": "SM-SAVE",
+      "state": "UnknownOutcome",
+      "event": "ReconcileNothingWrittenHeadUnchanged",
+      "guards": [
+        "current and mutation limit not reached",
+        "current and mutation limit reached"
+      ],
+      "exhaustive": false,
+      "exclusiveBecause": "current replies only; the four-mutation limit is reached or not"
+    },
+    {
+      "machine": "SM-SAVE",
+      "state": "UnknownOutcome",
+      "event": "ReconcileNothingWrittenHeadMoved",
+      "guards": [
+        "current; investigation files unchanged; rebase limit not reached",
+        "current; investigation files unchanged; rebase limit reached"
+      ],
+      "exhaustive": false,
+      "exclusiveBecause": "current replies with unchanged files; if the files changed the event is a conflict path, which fails closed here"
+    },
+    {
+      "machine": "SM-SAVE",
+      "state": "SaveFailed",
+      "event": "SaveRequested",
+      "guards": [
+        "online, Retry can succeed, credential accepted",
+        "known offline"
+      ],
+      "exhaustive": false,
+      "exclusiveBecause": "online with Retry impossible or a refused credential is not listed: Retry is not offered (PERSIST-031) and a request fails closed"
+    },
+    {
+      "machine": "SM-SAVE",
+      "state": "Unsaved",
+      "event": "QueuedSaveStarted",
+      "guards": [
+        "online and a save request is waiting",
+        "known offline and a save request is waiting"
+      ],
+      "exhaustive": false,
+      "exclusiveBecause": "without a waiting request the event cannot occur and fails closed"
+    },
+    {
+      "machine": "SM-SAVE",
+      "state": "Saving",
+      "event": "RebaseReadFailed",
+      "guards": [
+        "current and known offline",
+        "current and online"
+      ],
+      "exhaustive": false,
+      "exclusiveBecause": "current replies only; online or known offline"
+    },
+    {
+      "machine": "SM-LOAD",
+      "state": "NotLoaded",
+      "event": "OpenRequested",
+      "guards": [
+        "online and connected",
+        "offline"
+      ],
+      "exhaustive": false,
+      "exclusiveBecause": "online but not connected is not listed: Open is not offered before Connect, and a request fails closed"
+    }
+  ]
+}

@@ -5,7 +5,8 @@
     "mutationsPerSaveRequest": 4,
     "automaticRebases": 3,
     "automaticReconciliationReads": 3,
-    "source": "PERSIST-010, PERSIST-016"
+    "source": "PERSIST-010, PERSIST-016; largeFileRereads: one re-read through the Git blobs API (GH-LARGE-FILE)",
+    "largeFileRereads": 1
   },
   "classes": [
     {
@@ -30,6 +31,7 @@
       "userVisible": "Save failed: 'GitHub refused the credential; your changes are kept in this tab.' Action: Reconnect (PERSIST-031-O22).",
       "retry": "none",
       "maxAttempts": 0,
+      "boundedBy": null,
       "reconciliation": "none: nothing was written",
       "recovery": "Reconnect with a new credential (re-authentication keeping work is proposed in ODR-V4-04)",
       "tests": [
@@ -39,7 +41,8 @@
       "requirements": [
         "PERSIST-008",
         "PERSIST-031",
-        "PF-015"
+        "PF-015",
+        "PERSIST-042"
       ]
     },
     {
@@ -66,6 +69,7 @@
       "userVisible": "Save failed: 'This credential cannot write to the repository; your changes are kept in this tab.' Retry is not offered.",
       "retry": "none",
       "maxAttempts": 0,
+      "boundedBy": null,
       "reconciliation": "none",
       "recovery": "Connect with a credential that has contents write (PF-015-O3); write permission is never inferred from a read (DEC-R7-001)",
       "tests": [
@@ -75,7 +79,8 @@
       "requirements": [
         "PERSIST-008",
         "EXT-DATA-005",
-        "PF-015"
+        "PF-015",
+        "PERSIST-042"
       ]
     },
     {
@@ -102,6 +107,7 @@
       "userVisible": "Save failed: 'GitHub's rate limit was reached; try again after <reset time>. Your changes are kept in this tab.' Retry after the reset.",
       "retry": "no automatic mutation retry; a reconciliation read counts against its three automatic reads",
       "maxAttempts": 3,
+      "boundedBy": "automaticReconciliationReads",
       "reconciliation": "an unknown outcome stays Unknown until a read succeeds",
       "recovery": "Retry after x-ratelimit-reset",
       "tests": [
@@ -111,7 +117,8 @@
       "requirements": [
         "PERSIST-008",
         "PERSIST-016",
-        "PERSIST-024"
+        "PERSIST-024",
+        "PERSIST-042"
       ]
     },
     {
@@ -127,8 +134,8 @@
       ],
       "detection": "HTTP 403 or 429 with a retry-after header, or a message that mentions a secondary rate limit, 'too quickly' or abuse detection; GraphQL errors of type RATE_LIMITED. Rehearsal 7 observed the 403 form during concurrent live writers (KD-020).",
       "nonStatusEvidence": [
-        "header:retry-after present",
-        "message: secondary rate limit, 'too quickly' or abuse",
+        "header:retry-after present, or message: secondary rate limit, 'too quickly' or abuse",
+        "header:x-ratelimit-remaining is not 0",
         "graphql error type RATE_LIMITED"
       ],
       "typedError": "RateLimited (Secondary)",
@@ -136,6 +143,7 @@
       "userVisible": "Save failed: 'GitHub asked us to slow down; try again in <retry-after> seconds. Your changes are kept in this tab.' Never worded as a permission problem.",
       "retry": "no automatic mutation retry",
       "maxAttempts": 0,
+      "boundedBy": null,
       "reconciliation": "none: GitHub refused before writing",
       "recovery": "Retry after retry-after seconds",
       "tests": [
@@ -144,7 +152,8 @@
       ],
       "requirements": [
         "PERSIST-008",
-        "PERSIST-024"
+        "PERSIST-024",
+        "PERSIST-042"
       ]
     },
     {
@@ -167,6 +176,7 @@
       "userVisible": "Saving continues during an automatic rebase; Conflict only when the investigation's own files differ (PERSIST-011).",
       "retry": "automatic rebase after a fresh head read",
       "maxAttempts": 3,
+      "boundedBy": "automaticRebases",
       "reconciliation": "none: nothing was written",
       "recovery": "Rebase (unrelated) or the three conflict actions (same investigation)",
       "tests": [
@@ -179,7 +189,9 @@
         "PERSIST-008",
         "PERSIST-009",
         "PERSIST-010",
-        "PERSIST-011"
+        "PERSIST-011",
+        "PERSIST-042",
+        "PERSIST-047"
       ]
     },
     {
@@ -203,6 +215,7 @@
       "userVisible": "Save failed: 'GitHub refused the change as invalid: <message>. Your changes are kept in this tab.' Retry is not offered.",
       "retry": "none",
       "maxAttempts": 0,
+      "boundedBy": null,
       "reconciliation": "none",
       "recovery": "None automatic; the defect is in the change and is reported",
       "tests": [
@@ -210,7 +223,8 @@
       ],
       "requirements": [
         "PERSIST-006",
-        "PERSIST-008"
+        "PERSIST-008",
+        "PERSIST-042"
       ]
     },
     {
@@ -235,6 +249,7 @@
       "userVisible": "Conflict: 'This investigation was deleted or rewritten on GitHub; your changes are kept.' Load: 'not found in the repository'.",
       "retry": "none",
       "maxAttempts": 0,
+      "boundedBy": null,
       "reconciliation": "none",
       "recovery": "Conflict actions; export of unsaved commands is proposed in ODR-V4-05",
       "tests": [
@@ -265,6 +280,7 @@
       "userVisible": "Save failed: 'The branch history on GitHub was rewritten; nothing is reported as saved. Your changes are kept in this tab.'",
       "retry": "none",
       "maxAttempts": 0,
+      "boundedBy": null,
       "reconciliation": "reconciliation stops",
       "recovery": "Reload from GitHub after the user decides",
       "tests": [
@@ -272,7 +288,8 @@
         "dotnet:Causa.Acceptance.Deterministic.PERSIST045Tests.PERSIST-045-O6"
       ],
       "requirements": [
-        "PERSIST-015"
+        "PERSIST-015",
+        "PERSIST-045"
       ]
     },
     {
@@ -296,6 +313,7 @@
       "userVisible": "Offline: 'Your changes exist only in this tab and cannot be saved until the connection returns.' Never Conflict.",
       "retry": "none: a save that failed before sending is never retried automatically",
       "maxAttempts": 0,
+      "boundedBy": null,
       "reconciliation": "none: nothing was sent",
       "recovery": "Save again after the connection returns",
       "tests": [
@@ -308,7 +326,9 @@
       "requirements": [
         "PERSIST-016",
         "PERSIST-018",
-        "PERSIST-024"
+        "PERSIST-024",
+        "PERSIST-046",
+        "PERSIST-047"
       ]
     },
     {
@@ -325,13 +345,14 @@
       "detection": "NotAnswered LostAfterSending or TimedOut. For a mutation this is an unknown outcome; for a read it is a failed read.",
       "nonStatusEvidence": [
         "transport: LostAfterSending",
-        "transport: TimedOut"
+        "transport: TimedOut (the request timeout)"
       ],
       "typedError": "NetworkUnavailable (LostAfterSending | TimedOut)",
       "transition": "Mutation: AnswerLost (T-S19) -> Unknown commit outcome. Reconciliation read: ReconcileReadFailed (T-S29). Rebase-path read while online: RebaseReadFailed (T-S59). Read-back: ReadBackReadFailed (T-S58). Conflict re-read: RemoteReadFailed (T-C02)",
       "userVisible": "Unknown commit outcome: 'The save may or may not have reached GitHub; checking.' Check again after the automatic reads.",
-      "retry": "reconciliation reads at least 2, 4 and 8 seconds apart, plus one per offline-to-online change",
+      "retry": "automatic reconciliation reads at least 2, 4 and 8 seconds apart (three), plus one read per offline-to-online change, never more than four reads in any 60 seconds (PERSIST-016); further reads only by Check again",
       "maxAttempts": 3,
+      "boundedBy": "automaticReconciliationReads",
       "reconciliation": "PERSIST-015: marker and head decide before any resend",
       "recovery": "Check again; resend only when reconciliation proves nothing was written",
       "tests": [
@@ -344,7 +365,10 @@
       ],
       "requirements": [
         "PERSIST-015",
-        "PERSIST-016"
+        "PERSIST-016",
+        "PERSIST-045",
+        "PERSIST-046",
+        "PERSIST-047"
       ]
     },
     {
@@ -370,6 +394,7 @@
       "userVisible": "Unknown commit outcome (as GH-NETWORK-AFTER).",
       "retry": "as GH-NETWORK-AFTER",
       "maxAttempts": 3,
+      "boundedBy": "automaticReconciliationReads",
       "reconciliation": "PERSIST-015 reconciliation",
       "recovery": "As GH-NETWORK-AFTER",
       "tests": [
@@ -377,7 +402,8 @@
         "dotnet:Causa.Acceptance.Deterministic.PERSIST015Tests.PERSIST-015-O2"
       ],
       "requirements": [
-        "PERSIST-015"
+        "PERSIST-015",
+        "PERSIST-045"
       ]
     },
     {
@@ -402,6 +428,7 @@
       "userVisible": "As the path's state: Unknown commit outcome for a mutation, the read's failure state for a read.",
       "retry": "as the path",
       "maxAttempts": 3,
+      "boundedBy": "automaticReconciliationReads",
       "reconciliation": "PERSIST-015 for a mutation",
       "recovery": "As the path",
       "tests": [
@@ -410,7 +437,8 @@
       ],
       "requirements": [
         "PERSIST-015",
-        "PERSIST-024"
+        "PERSIST-024",
+        "PERSIST-008"
       ]
     },
     {
@@ -432,6 +460,7 @@
       "userVisible": "Save failed: 'GitHub holds different bytes than this save wrote; nothing is reported as saved. Your changes are kept in this tab.'",
       "retry": "none",
       "maxAttempts": 0,
+      "boundedBy": null,
       "reconciliation": "none",
       "recovery": "Retry after review",
       "tests": [
@@ -441,7 +470,8 @@
       ],
       "requirements": [
         "PERSIST-007",
-        "PERSIST-015"
+        "PERSIST-015",
+        "PERSIST-045"
       ]
     },
     {
@@ -464,6 +494,7 @@
       "userVisible": "none",
       "retry": "one re-read through the Git blobs API",
       "maxAttempts": 1,
+      "boundedBy": "largeFileRereads",
       "reconciliation": "none",
       "recovery": "Read through the Git blobs API (Rehearsal 7 F11)",
       "tests": [
@@ -489,10 +520,11 @@
       "typedError": "none (paged read)",
       "transition": "no transition; reconciliation continues",
       "userVisible": "none",
-      "retry": "page until every commit after the expected head is read; each page is a reconciliation read",
+      "retry": "page through the commits after the expected head; each page is one reconciliation read and counts against the three automatic reads",
       "maxAttempts": 3,
+      "boundedBy": "automaticReconciliationReads",
       "reconciliation": "PERSIST-015 needs every commit after the expected head",
-      "recovery": "Page through the commits list (Rehearsal 7 F10)",
+      "recovery": "If the three automatic reads are spent before the marker is found or ruled out, ReconcileReadsSpent: the save stays Unknown commit outcome and the user may choose Check again (each Check again is one further read, PERSIST-016).",
       "tests": [
         "dotnet:Causa.Acceptance.Deterministic.PERSIST015Tests.ReconcileBeyond250Commits"
       ],
@@ -500,5 +532,6 @@
         "PERSIST-015"
       ]
     }
-  ]
+  ],
+  "precedence": "When one answer matches several classes, the first class in this order wins: GH-AUTH, GH-RATE-PRIMARY (x-ratelimit-remaining is 0), GH-RATE-SECONDARY (retry-after or a secondary-limit message, with x-ratelimit-remaining not 0), GH-STALE-HEAD, GH-LARGE-FILE, GH-PERMISSION, GH-VALIDATION, GH-NOT-FOUND, then the rest."
 }
