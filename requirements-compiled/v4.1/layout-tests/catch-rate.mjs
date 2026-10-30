@@ -2,7 +2,8 @@
 // classification. Run with `run.mjs --catch-rate` (Chromium). A case is caught when its own assertion (the one the
 // contract maps to the defect's invariant) reports a violation other than a missing page element ("no fault on the
 // page"). The run fails when a violation is missed and not disclosed in R41-11, or when a conforming page fails.
-// verdict: 'violation' | 'conforming' | 'not a violation: <reason>'; disclosed: the R41-11 entry naming a known miss.
+// verdict: 'violation' | 'conforming' | 'not a violation: <reason>' | 'not judged: <reason>'; disclosed: the R41-11 entry
+// naming a known miss.
 // body: the page body, or a function of P (a Forma pattern's HTML by name).
 
 const remedy = '<style>a[href]{display:inline-flex;align-items:center;min-block-size:var(--ef-layout-target-min);min-inline-size:var(--ef-layout-target-min)}</style>';
@@ -309,7 +310,7 @@ const V = ['VP-200-TEXT'];
 
 return P => P('record-header') + P('freshness') + P('operation-status');
 })()},
-  {"id":"B-nav+A","round":9,"assertion":"statusVisible","vps":["VP-200-TEXT"],"verdict":"conforming","body":(() => {
+  {"id":"B-nav+A","round":9,"assertion":"statusVisible","vps":["VP-200-TEXT"],"verdict":"not judged: at 200% text the operation status starts at 724 px of the 800 px screen with one machine's fonts and below the fold with CI's fonts, so whether the page meets PERSIST-030 there depends on the installed fonts","body":(() => {
 const nav = (P, inner) => P('navigation-shell').replace('<main class="ef-navigation-shell__content" id="overview"><h1>Overview</h1></main>', `<main class="ef-navigation-shell__content" id="overview">${inner}</main>`);
 const A = P => P('record-header') + P('freshness') + P('operation-status');
 const minimalHdr = `<header class="ef-record-header"><div class="ef-record-header__main"><div class="ef-record-header__title"><div><h2>INV-1042</h2></div><span class="ef-status-lozenge" data-state="blocked">Save failed</span></div></div></header>`;
