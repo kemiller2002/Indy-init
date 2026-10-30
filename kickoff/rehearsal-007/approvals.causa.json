@@ -2,5 +2,20 @@
   "schema": "causa.requirements-approvals/1",
   "baseline_sha256": "f86a3539e48ee8dda7d99d5f4f5546a18e2397a82d308a277c8f346edb2a8f1a",
   "description": "Operator approvals for baseline BL-CAUSA-INDY-INIT-62df28a559c0 (requirements/causa-requirements-baseline-v4.json), the source of compiled package v4. It holds none. Under RDP-003 only the operator writes approval records; an agent must not write, edit, generate or infer one. Owner decisions that change requirement text (DEC-R7-001..003, DEC-R7-008..010) are written into the requirements themselves and need no record here. The obligation amendments proposed in requirements-compiled/v4/proposals/owner-decision-requests.json are NOT applied until the operator writes their records in this file.",
-  "approvals": []
+    "approvals": [
+    {
+      "id": "APR-V41-OWNER-1",
+      "authority": { "kind": "operator", "id": "kemiller2002" },
+      "date": "2026-10-30",
+      "changes": [
+        {
+          "decision_id": "ODR-V41-06",
+          "action": "select",
+          "option": "A",
+          "organizer_confirmation": "<who confirmed it, and when, e.g. 'Jane Doe, Indy Init organizers, email 2026-10-28'>"
+        }
+      ]
+    }
+  ]
+
 }
