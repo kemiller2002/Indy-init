@@ -1020,7 +1020,7 @@ let v4Inputs (source: string) (package: string) (registry: string option) (r7Evi
           && Git.run source [ "merge-base"; "--is-ancestor"; fc; "HEAD" ] |> Result.isOk
           && onMain source fc
           && (match Git.showFile source fc (str "path" approvalsPin) with
-              | Ok b -> arr "approvals" (parseBytes b) |> List.exists (fun a -> strOpt "decision_id" a = Some "ODR-V4-01" && strOpt "action" a = Some "approve-package")
+              | Ok b -> V4Package.freezeCommitHoldsApproval (strs "trustedOperators" approvalsPin) (parseBytes b)
               | Error _ -> false)
       ReviewSha256 = (let f = pkg "analysis/independent-review.json" in if File.Exists f then fileSha f else "")
       TestRecordSha256 = (let f = pkg "analysis/compiler-test-record.json" in if File.Exists f then fileSha f else "")

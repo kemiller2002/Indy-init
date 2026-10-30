@@ -199,21 +199,32 @@ let controls (source: string) : string list =
         JObj [ "schema", JStr "causa.requirements-approvals/1"
                "approvals", JArr [ JObj [ "id", JStr "APR-V4-OWNER"; "authority", JObj [ "kind", JStr "operator"; "id", JStr authority ]; "date", JStr "2026-11-01"; "changes", JArr changes ] ] ]
     let pi = planInputs source
-    let compiledWith (doc: Json) (amends: Json list) =
+    let compiledWithBindings (doc: Json) (amends: Json list) (bindings: Json list) =
         let bytes = Text.Encoding.UTF8.GetBytes(serialize doc)
         let commit = String('a', 40)
-        let spec = setIn "obligationAmendments" (JArr(amends |> List.map (fun c -> JObj [ "obligation", JStr(str "obligation_id" c); "approval", JStr "APR-V4-OWNER"; "decision", JStr(str "decision_id" c) ]))) pi.Spec
+        let spec =
+            pi.Spec
+            |> setIn "obligationAmendments" (JArr(amends |> List.map (fun c -> JObj [ "obligation", JStr(str "obligation_id" c); "approval", JStr "APR-V4-OWNER"; "decision", JStr(str "decision_id" c) ])))
+            |> setIn "testBindings" (JArr bindings)
         let plan = VerificationPlan.build { pi with Spec = spec; Approvals = { pi.Approvals with Commit = commit; Sha256 = Git.sha256Hex bytes; Document = doc } }
         plan, (commit, pi.Approvals.Path, Git.sha256Hex bytes)
+    let compiledWith (doc: Json) (amends: Json list) = compiledWithBindings doc amends i0.CurationBindings
     let allAmends = amendChanges (fun _ -> true)
-    let plan0, _ = compiledWith (approvalDoc operator (allAmends @ decisionChanges)) allAmends
-    let contentDigest = V4Package.planContentDigest plan0
-    let packageChange = JObj [ "decision_id", JStr "ODR-V4-01"; "action", JStr "approve-package"; "plan_content_digest", JStr contentDigest; "review_sha256", JStr reviewSha; "test_record_sha256", JStr testSha ]
-    let allChanges = allAmends @ decisionChanges @ [ packageChange ]
+
+    // Two passes, as the real workflow: compile the amendments, then bind the clauses the approvals made normative
+    // (v4 --apply-bindings) and compile again.
     let scenario (authority: string) (changes: Json list) (amends: Json list) (i: V4Package.Inputs) =
         let doc = approvalDoc authority changes
-        let plan, pin = compiledWith doc amends
-        { i with Approvals = doc; Plan = plan; ApprovalsPin = pin }
+        let plan1, pin = compiledWith doc amends
+        let pass1 = { i with Approvals = doc; Plan = plan1; ApprovalsPin = pin }
+        let bindings = TestBindingProposal.applyTo i0.BaseBindings (V4Package.strengthenedProposal pass1)
+        let plan2, _ = compiledWithBindings doc amends bindings
+        { pass1 with Plan = plan2; CurationBindings = bindings }
+    // The owner approves the plan as finally compiled (amendments applied, approved clauses bound).
+    let trustedBase = { i0 with ApprovalsAgentAuthored = false; ApprovalsOnMain = true }
+    let contentDigest = V4Package.planContentDigest (scenario operator (allAmends @ decisionChanges) allAmends trustedBase).Plan
+    let packageChange = JObj [ "decision_id", JStr "ODR-V4-01"; "action", JStr "approve-package"; "plan_content_digest", JStr contentDigest; "review_sha256", JStr reviewSha; "test_record_sha256", JStr testSha ]
+    let allChanges = allAmends @ decisionChanges @ [ packageChange ]
     let allRecorded =
         scenario operator allChanges allAmends
             { i0 with
@@ -236,7 +247,12 @@ let controls (source: string) : string list =
               let b = V4Package.build allRecorded
               let failing = V4Package.gates allRecorded b (V4Package.planContentDigest allRecorded.Plan) |> List.filter (fun g -> not g.Pass) |> List.map (fun g -> g.Id + ": " + g.Detail)
               let checks = b.Checks |> List.filter (fun c -> not c.Problems.IsEmpty) |> List.map (fun c -> c.Id + ": " + List.head c.Problems)
-              yield sprintf "freeze: every condition recorded, but the package is not READY-FOR-OWNER-FREEZE (positive control): %A %A" failing checks
+              let pre = (scenario operator (allAmends @ decisionChanges) allAmends trustedBase).Plan
+              let diff =
+                  match pre, allRecorded.Plan with
+                  | JObj a, JObj b -> a |> List.filter (fun (k, v) -> b |> List.tryFind (fst >> (=) k) |> Option.map (snd >> serialize) <> Some(serialize v)) |> List.map fst
+                  | _ -> []
+              yield sprintf "freeze: every condition recorded, but the package is not READY-FOR-OWNER-FREEZE (positive control): %A %A; plan keys that differ: %A" failing checks diff
           // No combination of repository inputs makes the compiler declare FROZEN (RV2-1).
           let frozenFlag (i: V4Package.Inputs) = let b = V4Package.build i in V4Package.freezeStatus b (V4Package.gates i b (V4Package.planContentDigest i.Plan)) true |> fst |> List.contains ("frozen", true)
           if frozenFlag allRecorded then yield "freeze: the compiler declared frozen from repository inputs"
@@ -263,6 +279,17 @@ let controls (source: string) : string list =
           yield! blocked "the reviewer's last round failed although the author marked findings fixed" { allRecorded with Review = setIn "roundVerdicts" (JArr [ JObj [ "round", JInt 1L; "verdict", JStr "FAIL" ] ]) review }
           yield! blocked "the freeze commit is not verified" { allRecorded with FreezeCommitVerified = false }
           yield! blocked "the window is too small for the selected topology" { allRecorded with Policy = setIn "clock" (JObj [ "timedMinutes", JInt 100L ]) allRecorded.Policy }
+          // RV5-2: clauses the owner approved are bound in the plan, so verify-plan enforces them.
+          let unboundNormative =
+              (V4Package.build allRecorded).Files |> List.find (fst >> (=) "acceptance/acceptance-obligations.json") |> snd |> arr "obligations"
+              |> List.filter (fun o -> strOpt "origin" o <> Some "verification-plan" && boolOr "normative" false o && not (boolOr "boundInPlan" false o)
+                                       && (arr "requiredTests" o |> List.exists (fun t -> strs "categories" t |> List.exists (fun c -> [ "unit"; "integration"; "browser"; "live-provider"; "security"; "accessibility" ] |> List.contains c))))
+              |> List.map (str "id")
+          if not unboundNormative.IsEmpty then yield sprintf "freeze: approved clauses are normative but not bound in the plan: %A" unboundNormative
+          // RV5-1: FG-10 reads the package approval in the same schema as every other record.
+          if not (V4Package.freezeCommitHoldsApproval [ operator ] allRecorded.Approvals) then yield "freeze: the freeze-commit check does not find a package approval written in the approvals schema"
+          if V4Package.freezeCommitHoldsApproval [ operator ] (approvalDoc "someone-else" allChanges) then yield "freeze: the freeze-commit check accepts a package approval by an untrusted authority"
+          if V4Package.freezeCommitHoldsApproval [ operator ] (approvalDoc operator allAmends) then yield "freeze: the freeze-commit check accepts approvals without the package approval"
           let proposedCount (i: V4Package.Inputs) =
               (V4Package.build i).Files |> List.find (fst >> (=) "acceptance/acceptance-obligations.json") |> snd |> field "summary" |> Option.bind (intOpt "proposed")
           if proposedCount allRecorded <> Some 0L then yield "freeze: approved and applied amendments did not make their acceptance obligations normative (RV4-1)"

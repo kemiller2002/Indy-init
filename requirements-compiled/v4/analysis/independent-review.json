@@ -3,7 +3,7 @@
   "description": "Record of the independent adversarial review of package v4. The reviewer was a fresh, read-only Claude Code subagent. It received the sources, the artifacts and the compiler, but not the compiler author's conclusions. Its verdicts are copied as given. The status of each finding is the remediation the package author made; the reviewer's next round verifies it. FG-09 computes its result from this record, not from any verdict field. The owner's package approval (ODR-V4-01) must name this file's SHA-256. This record is agent-produced: the reviewer is an agent, and so is the author of this file.",
   "reviewer": "independent read-only Claude Code subagent (fresh context; not the package author)",
   "reviewerIsImplementer": false,
-  "rounds": 4,
+  "rounds": 5,
   "roundVerdicts": [
     {
       "round": 1,
@@ -28,6 +28,12 @@
       "verdict": "FAIL",
       "reviewedState": "claude/requirements-v4 at 3dda420",
       "summary": "no critical finding; RV3-1, -3, -4, -6 resolved; RV3-2 and RV3-5 accepted as recorded residuals; new: 1 major (RV4-1), 2 minor"
+    },
+    {
+      "round": 5,
+      "verdict": "FAIL",
+      "reviewedState": "claude/requirements-v4 at 8b80c69",
+      "summary": "no critical finding; RV4-1, -2, -3 resolved; new: 2 major (RV5-1, RV5-2)"
     }
   ],
   "findings": [
@@ -266,6 +272,20 @@
       "status": "fixed",
       "title": "Gate rows read as verified",
       "remediation": "Each freezeGate row now states its evidence: computed by the compiler, or a repository record (unauthenticated)."
+    },
+    {
+      "id": "RV5-1",
+      "severity": "major",
+      "status": "fixed",
+      "title": "FG-10 read the old approvals schema, so a real approval could never reach READY-FOR-OWNER-FREEZE",
+      "remediation": "FG-10's content check is now V4Package.freezeCommitHoldsApproval. It reads the approvals file at the freeze commit with the same flatRecords as FG-05 and requires a trusted authority. Pure controls cover the new schema, an untrusted authority and a missing package approval."
+    },
+    {
+      "id": "RV5-2",
+      "severity": "major",
+      "status": "fixed",
+      "title": "Invariant tests made normative by an owner approval were never bound in the plan",
+      "remediation": "strengthenedBindings now binds an invariant or lesson whose proposals the owner approved and the plan applies. The approval scenario in V4Tests runs the real two-pass workflow (amendments, then apply-bindings, then recompile) and asserts that every normative application-test obligation is boundInPlan. The owner's package approval names the plan as finally compiled."
     }
   ]
 }

@@ -791,7 +791,7 @@ let planContentDigest (plan: Json) =
 /// (causa.requirements-approvals/1): approvals [{id, authority: {kind: "operator", id}, date, changes: [...]}]. Each
 /// change becomes one record carrying approval_id and approved_by (the authority id). A change is an obligation
 /// amendment {obligation_id, action: "amend", criterion, rationale} or a decision {decision_id, action, ...}.
-let private flatRecords (approvals: Json) =
+let flatRecords (approvals: Json) =
     arr "approvals" approvals
     |> List.collect (fun ap ->
         let auth = field "authority" ap |> Option.defaultValue JNull
@@ -801,6 +801,12 @@ let private flatRecords (approvals: Json) =
             match c with
             | JObj ps -> JObj(ps @ [ "approval_id", JStr(sOr "id" ap); "approved_by", JStr by ])
             | j -> j))
+
+/// FG-10's content check: the approvals file at the freeze commit holds the operator's package approval
+/// (ODR-V4-01, approve-package), read in the same schema as every other record (v4 review RV5-1).
+let freezeCommitHoldsApproval (trustedOperators: string list) (approvalsAtFreezeCommit: Json) =
+    flatRecords approvalsAtFreezeCommit
+    |> List.exists (fun a -> sOr "decision_id" a = "ODR-V4-01" && sOr "action" a = "approve-package" && List.contains (sOr "approved_by" a) trustedOperators)
 
 /// Approval records the gate may count: written by a trusted operator, in a file whose last change is not
 /// agent-attributed, at a commit reachable from origin/main (RDP-003). Anything else counts as no record.
@@ -892,9 +898,12 @@ let private browserTargets = Regex(@"\b(WebKit|iPad|Safari)\b")
 let strengthenedBindings (i: Inputs) : (string * Json list) list =
     let baseOf = i.BaseBindings |> List.map (fun b -> str "obligation" b, arr "tests" b |> List.map (str "id")) |> Map.ofList
     let already o id = baseOf.TryFind o |> Option.defaultValue [] |> List.contains id
+    // A clause proposed by an owner decision request is bound once the owner approved it and the plan applies it
+    // (v4 review RV5-2); until then it stays out of the plan.
+    let approved = approvedRequests i
     let fromAnalysis (items: Json list) =
         items
-        |> List.filter (fun x -> (strs "proposals" x).IsEmpty)
+        |> List.filter (fun x -> strs "proposals" x |> List.forall approved.Contains)
         |> List.collect (arr "tests")
         |> List.filter (fun t -> (strOpt "obligation" t).IsSome && ledgerCategories.Contains(str "category" t))
         |> List.map (fun t -> str "obligation" t, JObj [ "id", JStr(str "id" t); "kind", JStr(planKind (str "kind" t)); "categories", jstrs [ str "category" t ] ])

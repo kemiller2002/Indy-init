@@ -145,7 +145,7 @@
   ],
   "compiler": {
     "name": "requirements-compiler",
-    "treeSha256": "dbb0aab92ab95ffa782775e56bf02805aa6e0d07b3986357a014b6e2d90be9a1",
+    "treeSha256": "16b09ee419757694574649d345413c82f5079a2ae8f41bbee0f255aee1ebeb90",
     "sdk": "10.0.402"
   },
   "compilerTests": {
@@ -153,13 +153,13 @@
     "result": "PASS",
     "failures": 0,
     "summary": "offline tests (baseline equivalence, baseline units, preflight verdict, verification plan, acceptance contracts, process evidence, v4 scope and controls): all passed",
-    "compilerTreeSha256": "dbb0aab92ab95ffa782775e56bf02805aa6e0d07b3986357a014b6e2d90be9a1",
+    "compilerTreeSha256": "16b09ee419757694574649d345413c82f5079a2ae8f41bbee0f255aee1ebeb90",
     "command": "dotnet run -c Release --project tools/requirements-compiler/tests -- --offline --source ."
   },
   "independentReview": {
     "verdict": "",
     "reviewer": "independent read-only Claude Code subagent (fresh context; not the package author)",
-    "rounds": 4,
+    "rounds": 5,
     "record": "independent-review.md"
   },
   "freezeGate": [
@@ -217,14 +217,14 @@
       "condition": "Compiler tests pass",
       "status": "PASS",
       "evidence": "repository record (unauthenticated; see statesMeaning)",
-      "detail": "record: PASS, tree dbb0aab92ab95ffa782775e56bf02805aa6e0d07b3986357a014b6e2d90be9a1 (current tree dbb0aab92ab95ffa782775e56bf02805aa6e0d07b3986357a014b6e2d90be9a1); CI re-runs the suite and compares (--verify-test-record)"
+      "detail": "record: PASS, tree 16b09ee419757694574649d345413c82f5079a2ae8f41bbee0f255aee1ebeb90 (current tree 16b09ee419757694574649d345413c82f5079a2ae8f41bbee0f255aee1ebeb90); CI re-runs the suite and compares (--verify-test-record)"
     },
     {
       "id": "FG-09",
       "condition": "Independent review passes",
       "status": "FAIL",
       "evidence": "repository record (unauthenticated; see statesMeaning)",
-      "detail": "computed from 31 finding(s) and the reviewer's last round verdict (FAIL); reviewer independent read-only Claude Code subagent (fresh context; not the package author)"
+      "detail": "computed from 33 finding(s) and the reviewer's last round verdict (FAIL); reviewer independent read-only Claude Code subagent (fresh context; not the package author)"
     },
     {
       "id": "FG-10",
@@ -266,6 +266,8 @@
     "review RV4-1 (major): fixed",
     "review RV4-2 (minor): fixed",
     "review RV4-3 (minor): fixed",
+    "review RV5-1 (major): fixed",
+    "review RV5-2 (major): fixed",
     "owner decision ODR-V4-01 pending",
     "owner decision ODR-V4-02 pending",
     "owner decision ODR-V4-03 pending",
