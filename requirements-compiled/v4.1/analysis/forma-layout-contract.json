@@ -992,19 +992,16 @@
         {
           "assertion": "indicatorComposed",
           "patterns": [],
-          "composed": [
-            [
-              "record-header",
-              "freshness",
-              "operation-status"
-            ],
-            [
-              "record-header",
-              "freshness",
-              "conflict-review"
-            ]
-          ],
-          "viewports": "all"
+          "viewports": "all",
+          "fixtures": [
+            "stateSaved",
+            "stateUnsaved",
+            "stateSaving",
+            "stateOffline",
+            "stateConflict",
+            "stateUnknown",
+            "stateSaveFailed"
+          ]
         }
       ]
     },
@@ -1064,6 +1061,11 @@
           "viewports": [
             "VP-320",
             "VP-DESKTOP"
+          ],
+          "fixtures": [
+            "faultOffline",
+            "faultSaveFailed",
+            "stateSaveFailed"
           ]
         },
         {

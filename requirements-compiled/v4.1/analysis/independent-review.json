@@ -663,6 +663,59 @@
           "status": "remediated, pending re-review"
         }
       ]
+    },
+    {
+      "round": 10,
+      "reviewedCommit": "e009065",
+      "verdict": "FAIL",
+      "counts": {
+        "critical": 0,
+        "major": 1,
+        "minor": 4
+      },
+      "ownerAdjustments": {
+        "review": "not achieved: one major",
+        "typeShapeReconciliation": "achieved",
+        "executableLayoutTests": "not achieved under the merge bar: FL-07b did not check FL-07's prohibition (RV41-10-1)",
+        "bootstrap": "achieved"
+      },
+      "findings": [
+        {
+          "id": "RV41-10-1",
+          "severity": "major",
+          "finding": "indicatorComposed did not check FL-07's prohibition: an operation status in Saving, Saved or Offline, a conflict review in Saved or Save failed passed",
+          "remediation": "The state is read from the lozenge. Saved, Unsaved, Saving and Offline fail with an operation status or conflict review in the header region; Unknown commit outcome and Save failed need an operation status and fail with a conflict review; Conflict needs a conflict review. The reviewer's pages are caught and are broken pages. Forma's raw composed pages (record header lozenge \"Overdue\") are replaced by one conforming page per save state built from Forma markup with PERSIST-031 words",
+          "status": "remediated, pending re-review"
+        },
+        {
+          "id": "RV41-10-2",
+          "severity": "minor",
+          "finding": "The lozenge was not checked to name one of the seven states, nor the header to show exactly one",
+          "remediation": "indicatorComposed fails a lozenge naming no save state and a header with more than one save-state lozenge; disclosed in R41-11 that the state is read from the lozenge text. Round 9's page built from Forma's sample header (\"Overdue\") is reclassified as a violation with that reason",
+          "status": "remediated, pending re-review"
+        },
+        {
+          "id": "RV41-10-3",
+          "severity": "minor",
+          "finding": "A Save failed operation status announced without role=alert was never judged by the fault assertions",
+          "remediation": "A Save failed operation status (by its heading, or the indicator's under a Save failed lozenge) is a fault however it is announced; the fault assertions share one finder. A conflict review is judged by faultActionable too, so one without actions fails",
+          "status": "remediated, pending re-review"
+        },
+        {
+          "id": "RV41-10-4",
+          "severity": "minor",
+          "finding": "faultActionable failed an Offline banner with PERSIST-031's exact copy and no action; the faultOffline fixture added an undefined button",
+          "remediation": "An Offline fault needs no action (PERSIST-031); faultOffline has PERSIST-031's copy and no button and is a conforming page for faultActionable; disclosed in R41-11",
+          "status": "remediated, pending re-review"
+        },
+        {
+          "id": "RV41-10-5",
+          "severity": "minor",
+          "finding": "A loss worded outside the vocabulary is missed (disclosed)",
+          "remediation": "The page is in catch-rate.mjs as a disclosed miss under the existing R41-11 entry",
+          "status": "remediated, pending re-review"
+        }
+      ]
     }
   ]
 }

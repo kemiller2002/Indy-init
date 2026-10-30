@@ -19,6 +19,7 @@
 | 7 | `05d671a` | FAIL | 0 critical, 7 major, 2 minor. Round-6 findings fixed except 6-1 (partly), completed by the round-7 remediation. Graded on the owner's bar (false failures, undisclosed claims and undisclosed plain misses are major; disclosed misses at most minor). Owner adjustments: type-shape reconciliation and bootstrap achieved; layout tests not yet |
 | 8 | `aa792a6` | FAIL | 0 critical, 5 major, 4 minor, all in the layout assertions (false failures on pages PERSIST-030, -031 and -033 call for). Round-7 findings fixed except 7-1, 7-8 and 7-9 (partly), completed by the round-8 remediation. The catch rate reproduced exactly. Owner adjustments: type-shape reconciliation and bootstrap achieved; layout tests not yet |
 | 9 | `63f6efc` | FAIL | 0 critical, 1 major, 4 minor. All round-8 findings fixed. The catch rate reproduced exactly and the round-8 reclassification at 200% text was confirmed by measurement. Owner adjustments: type-shape reconciliation and bootstrap achieved; layout-test coverage achieved, merge bar not met (one false failure) |
+| 10 | `e009065` | FAIL | 0 critical, 1 major, 4 minor. All round-9 findings fixed. Catch rate reproduced; classifications checked and found honest. Owner adjustments: type-shape reconciliation and bootstrap achieved; layout tests not yet (FL-07b) |
 
 ## Round 1 findings and remediation
 
@@ -139,3 +140,13 @@ All of the reviewer's round-8 pages are in catch-rate.mjs. One of them, the full
 | RV41-9-3 | minor | "All conforming runs pass" counted runs that return an absence result, and would have hidden an error | An error on a conforming page fails; the summary and R41-11 state how many conforming runs return only a missing-element result (6) and why |
 | RV41-9-4 | minor | FL-07 "lozenge and freshness only" could be read as excluding PERSIST-031's words and actions | Reworded: no operation status or conflict review; their PERSIST-031 words and actions still appear |
 | RV41-9-5 | minor | At 200% text a long title can push the indicator out of view, with no guidance | FL-07 says the title uses Forma's heading size and a title that would push the indicator out is clamped with its full value in an accessible name |
+
+## Round 10 findings and remediation
+
+| Id | Severity | Finding | Remediation |
+|---|---|---|---|
+| RV41-10-1 | major | indicatorComposed did not check FL-07's prohibition: an operation status in Saving, Saved or Offline, a conflict review in Saved or Save failed passed | The state is read from the lozenge. Saved, Unsaved, Saving and Offline fail with an operation status or conflict review in the header region; Unknown commit outcome and Save failed need an operation status and fail with a conflict review; Conflict needs a conflict review. The reviewer's pages are caught and are broken pages. Forma's raw composed pages (record header lozenge "Overdue") are replaced by one conforming page per save state built from Forma markup with PERSIST-031 words |
+| RV41-10-2 | minor | The lozenge was not checked to name one of the seven states, nor the header to show exactly one | indicatorComposed fails a lozenge naming no save state and a header with more than one save-state lozenge; disclosed in R41-11 that the state is read from the lozenge text. Round 9's page built from Forma's sample header ("Overdue") is reclassified as a violation with that reason |
+| RV41-10-3 | minor | A Save failed operation status announced without role=alert was never judged by the fault assertions | A Save failed operation status (by its heading, or the indicator's under a Save failed lozenge) is a fault however it is announced; the fault assertions share one finder. A conflict review is judged by faultActionable too, so one without actions fails |
+| RV41-10-4 | minor | faultActionable failed an Offline banner with PERSIST-031's exact copy and no action; the faultOffline fixture added an undefined button | An Offline fault needs no action (PERSIST-031); faultOffline has PERSIST-031's copy and no button and is a conforming page for faultActionable; disclosed in R41-11 |
+| RV41-10-5 | minor | A loss worded outside the vocabulary is missed (disclosed) | The page is in catch-rate.mjs as a disclosed miss under the existing R41-11 entry |

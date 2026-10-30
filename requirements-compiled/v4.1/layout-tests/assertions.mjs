@@ -105,7 +105,21 @@ const helpers = () => {
     const operation = header ? region.map(n => (n.matches(sel) ? n : n.querySelector(sel))).find(Boolean) || null : document.querySelector(sel);
     return { header, lozenge, operation };
   };
-  window.__ef = { rgba, over, ratio, opacityOf, backgroundAt, hidden, visibleText, clipBoxes, shownRect, onTop, indicator };
+  // The seven save states (PERSIST-030), named by the record header's lozenge.
+  const headingOf = e => ((e.querySelector('h1, h2, h3, h4, h5, h6, .ef-alert__title') || {}).textContent || '').trim();
+  const recordState = () => ((indicator().lozenge || {}).textContent || '').trim();
+  // Faults: alerts, Forma fault patterns and danger alerts or callouts, and the Save failed operation status however it
+  // is announced (PERSIST-030 asks only for an assertive announcement). Unknown commit outcome while the automatic
+  // reads run is a status, not a fault: PERSIST-031 offers no action yet.
+  const faults = withConflict => {
+    const base = '[class*="ef-fault"], [role=alert], .ef-alert[data-tone=danger], .ef-callout[data-tone=danger]' + (withConflict ? ', .ef-conflict-review' : '');
+    const op = indicator().operation;
+    const saveFailed = [...document.querySelectorAll('.ef-operation-status')].filter(o => /save failed/i.test(headingOf(o)) || (o === op && /^save failed$/i.test(recordState())));
+    const all = [...new Set([...document.querySelectorAll(base), ...saveFailed])];
+    return all.filter(e => !all.some(o => o !== e && o.contains(e)))
+      .filter(e => !(e.closest('.ef-operation-status') && /unknown commit outcome/i.test(`${headingOf(e.closest('.ef-operation-status'))} ${recordState()}`) && /may or may not/i.test(e.textContent || '')));
+  };
+  window.__ef = { rgba, over, ratio, opacityOf, backgroundAt, hidden, visibleText, clipBoxes, shownRect, onTop, indicator, headingOf, recordState, faults };
 };
 const install = page => inPage(page, `(${helpers.toString()})()`);
 
@@ -678,21 +692,35 @@ export const indicatorComposed = async page => {
   await install(page);
   return inPage(page, () => {
     const inView = e => window.__ef.shownRect(e) !== null;
-    const { header, lozenge, operation } = window.__ef.indicator();
+    const { header, lozenge } = window.__ef.indicator();
     if (!header) return ['no header carries a status lozenge'];
     // The freshness line is in the header or directly after it; the operation status or conflict review follows.
     const freshness = header.querySelector('.ef-freshness') || (header.nextElementSibling && (header.nextElementSibling.matches('.ef-freshness') ? header.nextElementSibling : header.nextElementSibling.querySelector('.ef-freshness')));
     const after = (a, b) => !!(a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING);
-    const state = (lozenge.textContent || '').trim();
-    const needs = /unknown commit outcome|save failed|conflict/i.test(state);
+    // PERSIST-030: the lozenge names exactly one of seven states. An operation status explains Unknown commit outcome
+    // and Save failed, a conflict review shows Conflict, and Saved, Unsaved, Saving and Offline show neither.
+    const states = ['Saved', 'Unsaved', 'Saving', 'Offline', 'Conflict', 'Unknown commit outcome', 'Save failed'];
+    const named = (lozenge.textContent || '').trim();
+    const state = states.find(x => x.toLowerCase() === named.toLowerCase());
+    const headerLozenges = [...header.querySelectorAll('.ef-status-lozenge')].filter(l => !l.closest('.ef-operation-status, .ef-conflict-review'));
+    const region = [header, header.nextElementSibling, header.nextElementSibling && header.nextElementSibling.nextElementSibling].filter(Boolean);
+    const within = sel => region.flatMap(n => [...(n.matches(sel) ? [n] : []), ...n.querySelectorAll(sel)]).filter((e, k, xs) => xs.indexOf(e) === k && !xs.some(o => o !== e && o.contains(e)));
+    const operations = within('.ef-operation-status');
+    const reviews = within('.ef-conflict-review');
+    const shown = [...operations, ...reviews];
+    const wants = state === 'Conflict' ? 'conflict review' : ['Unknown commit outcome', 'Save failed'].includes(state) ? 'operation status' : null;
     return [
+      ...(state ? [] : [`the lozenge says "${named}", which is not one of the seven save states`]),
+      ...(headerLozenges.length > 1 ? [`the header shows ${headerLozenges.length} save-state lozenges; it shows exactly one`] : []),
       ...(inView(lozenge) ? [] : ['the status lozenge is not visible without scrolling']),
       ...(freshness ? (inView(freshness) && !freshness.closest('.ef-visually-hidden') && window.getComputedStyle(freshness).visibility !== 'hidden' ? [] : ['the freshness line is not visible without scrolling']) : ['no freshness line in or directly after the header']),
-      // PERSIST-030: an operation status explains Unknown commit outcome and Save failed, a conflict review shows
-      // Conflict; the other four states have the lozenge and freshness only. The lozenge names the state in text.
-      ...(operation ? (inView(operation) ? [] : ['the operation status or conflict review is not visible without scrolling']) : needs ? [`the lozenge says "${state}" but no ${/conflict/i.test(state) ? 'conflict review' : 'operation status'} is in the header region`] : []),
-      ...(operation && /conflict/i.test(state) && !operation.matches('.ef-conflict-review') ? ['in Conflict the header region shows an operation status instead of a conflict review'] : []),
-      ...(freshness && operation && !after(freshness, operation) ? ['the operation status or conflict review comes before the freshness line'] : []),
+      ...(state && !wants && shown.length > 0 ? [`${state} shows ${reviews.length ? 'a conflict review' : 'an operation status'}; PERSIST-030 gives it neither`] : []),
+      ...(wants === 'operation status' && operations.length === 0 ? [`the lozenge says "${state}" but no operation status is in the header region`] : []),
+      ...(wants === 'operation status' && reviews.length > 0 ? [`${state} shows a conflict review; only Conflict does`] : []),
+      ...(wants === 'conflict review' && reviews.length === 0 ? ['the lozenge says "Conflict" but no conflict review is in the header region'] : []),
+      ...(wants === 'conflict review' && operations.length > 0 && reviews.length === 0 ? ['in Conflict the header region shows an operation status instead of a conflict review'] : []),
+      ...shown.filter(e => !inView(e)).map(() => 'the operation status or conflict review is not visible without scrolling'),
+      ...(freshness ? shown.filter(e => !after(freshness, e)).map(() => 'the operation status or conflict review comes before the freshness line') : []),
     ];
   });
 };
@@ -722,9 +750,10 @@ export const faultActionable = async page => {
   await settle(page);
   await install(page);
   return inPage(page, () => {
-    const faults = [...document.querySelectorAll('[class*="ef-fault"], [role=alert], .ef-alert[data-tone=danger], .ef-callout[data-tone=danger]')].filter(e => !e.parentElement.closest('[class*="ef-fault"], [role=alert], .ef-alert[data-tone=danger], .ef-callout[data-tone=danger]'))
-      // Unknown commit outcome while the automatic reads run is a status, not a fault: PERSIST-031 offers no action yet.
-      .filter(e => !(e.closest('.ef-operation-status') && /unknown commit outcome/i.test(`${(e.closest('.ef-operation-status').querySelector('h1, h2, h3, h4, h5, h6') || {}).textContent || ''} ${(document.querySelector('.ef-record-header .ef-status-lozenge') || {}).textContent || ''}`) && /may or may not/i.test(e.textContent || '')));
+    // A conflict review is a fault that needs its actions too (PERSIST-012).
+    const faults = window.__ef.faults(true);
+    // Offline offers no action until the connection returns (PERSIST-031): an Offline fault needs no next step.
+    const offline = e => /\boffline\b/i.test(window.__ef.headingOf(e)) || /^offline$/i.test(window.__ef.recordState());
     // A next step is a visible, enabled control that takes pointer input and is not covered by another element.
     const onTop = c => {
       const r = c.getBoundingClientRect();
@@ -738,16 +767,16 @@ export const faultActionable = async page => {
       ? ['no fault on the page']
       : faults.flatMap(e => [
           ...(window.__ef.visibleText(e).length < 10 ? [`${e.className || 'alert'} does not say visibly what happened`] : []),
-          ...([...e.querySelectorAll('button, a[href]')].some(usable) ? [] : [`${e.className || 'alert'} offers no visible, enabled next step`]),
+          ...(offline(e) || [...e.querySelectorAll('button, a[href]')].some(usable) ? [] : [`${e.className || 'alert'} offers no visible, enabled next step`]),
         ]);
   });
 };
 
 // A fault also says what was preserved (FL-08: "what happened, what was preserved and a safe next step").
-export const faultStatesPreserved = page =>
-  inPage(page, () => {
-    const faults = [...document.querySelectorAll('[class*="ef-fault"], [role=alert], .ef-alert[data-tone=danger], .ef-callout[data-tone=danger], .ef-conflict-review')].filter(e => !e.parentElement.closest('[class*="ef-fault"], [role=alert], .ef-alert[data-tone=danger], .ef-callout[data-tone=danger], .ef-conflict-review'))
-      .filter(e => !(e.closest('.ef-operation-status') && /unknown commit outcome/i.test(`${(e.closest('.ef-operation-status').querySelector('h1, h2, h3, h4, h5, h6') || {}).textContent || ''} ${(document.querySelector('.ef-record-header .ef-status-lozenge') || {}).textContent || ''}`) && /may or may not/i.test(e.textContent || '')));
+export const faultStatesPreserved = async page => {
+  await install(page);
+  return inPage(page, () => {
+    const faults = window.__ef.faults(true);
     // A wording check on the fault's own message: its text outside actions, diffs and code, split into sentences per
     // block. Some sentence says what was kept (PERSIST-031's copy: "exist only in this tab", "the tab's changes are
     // kept"), and none says the user's work was lost. "Queued" and "saved later" are not preservation (PERSIST-032).
@@ -798,6 +827,7 @@ export const faultStatesPreserved = page =>
           ...(claims(e) ? [`${e.className || 'alert'} uses a persistence claim PERSIST-032 forbids (queued, saved or kept locally or on the device, saved or synced later)`] : []),
         ]);
   });
+};
 
 // ---- FL-09 navigation ----------------------------------------------------------------------------------------------
 
