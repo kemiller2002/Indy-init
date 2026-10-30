@@ -1,0 +1,124 @@
+{
+  "schema": "indy-init.v4-package-validation-report/1",
+  "source": {
+    "repository": "kemiller2002/indy-init",
+    "commit": "62df28a559c054226dd4022e9744cf1db06e954f",
+    "baselineSha256": "f86a3539e48ee8dda7d99d5f4f5546a18e2397a82d308a277c8f346edb2a8f1a"
+  },
+  "verdict": "PASS",
+  "rule": "FAIL when any critical check reports a problem. The legacy checks V01-V18 are in requirements-validation-report.json and are summarised by W02.",
+  "checks": [
+    {
+      "id": "W01",
+      "title": "The authoritative baseline is reconciled: every requirement of the R6, R7 and v4 baselines has a disposition, every change has a recorded authority, and no requirement or P0 priority disappears",
+      "critical": true,
+      "status": "PASS",
+      "problems": []
+    },
+    {
+      "id": "W02",
+      "title": "The legacy compilation (V01-V18) passes and its readiness is READY: no unresolved contradiction, valid DAG, complete coverage",
+      "critical": true,
+      "status": "PASS",
+      "problems": []
+    },
+    {
+      "id": "W03",
+      "title": "Every P0 requirement of the baseline is in the verification plan and has acceptance obligations; plan-readiness is READY with no permit",
+      "critical": true,
+      "status": "PASS",
+      "problems": []
+    },
+    {
+      "id": "W04",
+      "title": "Operational definitions cite real requirements and name their deciding evidence",
+      "critical": true,
+      "status": "PASS",
+      "problems": []
+    },
+    {
+      "id": "W05",
+      "title": "State machines are well formed: declared states and events, sourced transitions, reachable states, deterministic guards, Saved entered only by a confirmation",
+      "critical": true,
+      "status": "PASS",
+      "problems": []
+    },
+    {
+      "id": "W06",
+      "title": "Invariants cover every required group, cite real requirements and name tests of known kinds and evidence categories",
+      "critical": true,
+      "status": "PASS",
+      "problems": []
+    },
+    {
+      "id": "W07",
+      "title": "Every required Rehearsal 7 defect class is mapped; gaps carry an owner decision request; quotes are verbatim in the permitted evidence files",
+      "critical": true,
+      "status": "PASS",
+      "problems": []
+    },
+    {
+      "id": "W08",
+      "title": "The dependency lock is the approved release set: every component is a stable release of echelon-current at the recorded version and manifest digest; no forbidden framework",
+      "critical": true,
+      "status": "PASS",
+      "problems": []
+    },
+    {
+      "id": "W09",
+      "title": "Interfaces name existing contracts and locked systems, with operations and a verification method",
+      "critical": true,
+      "status": "PASS",
+      "problems": []
+    },
+    {
+      "id": "W10",
+      "title": "The execution plan schedules every timed task with an estimate and reports whether each topology fits the window (fit itself is freeze condition FG-07)",
+      "critical": true,
+      "status": "PASS",
+      "problems": []
+    },
+    {
+      "id": "W11",
+      "title": "Owner decision requests are well formed: every proposed amendment only adds to its obligation's baseline text",
+      "critical": true,
+      "status": "PASS",
+      "problems": []
+    },
+    {
+      "id": "W12",
+      "title": "The risk register's ratings are in range and every link names something in the package",
+      "critical": true,
+      "status": "PASS",
+      "problems": []
+    },
+    {
+      "id": "W13",
+      "title": "No approval record was written by an agent: the pinned approvals file holds only operator records (RDP-003)",
+      "critical": true,
+      "status": "PASS",
+      "problems": []
+    },
+    {
+      "id": "W14",
+      "title": "The package contains no application implementation: no source file of an application language under requirements-compiled/v4",
+      "critical": true,
+      "status": "PASS",
+      "problems": []
+    },
+    {
+      "id": "W15",
+      "title": "The verification plan and the reconciliation are compiled from the committed v4 baseline",
+      "critical": true,
+      "status": "PASS",
+      "problems": []
+    },
+    {
+      "id": "W16",
+      "title": "Every normative invariant and lesson test, and a WebKit twin of every Chromium test where the requirement names WebKit, iPad or Safari, is bound in the plan on an obligation that requires its category",
+      "critical": true,
+      "status": "PASS",
+      "problems": []
+    }
+  ]
+}

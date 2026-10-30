@@ -619,38 +619,66 @@ let timedExecutionManifest (c: Compiled) (plan: PlanSpec) =
         let p0InTimed =
             p0 |> List.filter (fun r -> c.Coverage.TryFind r |> Option.defaultValue [] |> List.exists (fun t -> byId.[t].Phase = "timed"))
 
+        // Compiled package v4 and later: sources.json `timedRun` adds minutes per topology and an absolute-deadline clock.
+        let timedRun = field "timedRun" c.Curation.Sources
+        let topologySlots =
+            timedRun
+            |> Option.map (arr "topologies" >> List.map (fun spec ->
+                // A topology is a name (A-role-lanes, B-single-lead) or {id, base, laneOverrides}.
+                match spec with
+                | JStr k -> k, TimedSchedule.schedule (TimedSchedule.laneOf k) c.Curation.Tasks
+                | _ ->
+                    let overrides = match field "laneOverrides" spec with Some(JObj ps) -> ps |> List.map (fun (k, v) -> k, asStr v) |> Map.ofList | _ -> Map.empty
+                    let laneFor (t: WorkTask) = overrides.TryFind t.Id |> Option.defaultValue (TimedSchedule.laneOf (str "base" spec) t)
+                    str "id" spec, TimedSchedule.schedule laneFor c.Curation.Tasks))
+            |> Option.defaultValue []
+
         let task (s: Graph.Slot) =
             let t = byId.[s.Task]
             let reqs = covered.TryFind t.Id |> Option.defaultValue []
 
-            JObj
-                [ "id", JStr t.Id
-                  "title", JStr t.Title
-                  "workstream", JStr(workstream t)
-                  "lane", JStr s.Lane
-                  "step", jint stepRank.[s.Step]
-                  "kind", JStr t.Kind
-                  "dependsOn", jstrs (t.DependsOn |> List.filter (fun d -> byId.[d.Task].Phase = "timed") |> List.map (fun d -> d.Task))
-                  "preflightPrerequisites", jstrs (t.DependsOn |> List.filter (fun d -> byId.[d.Task].Phase <> "timed") |> List.map (fun d -> d.Task))
-                  "conditionalOn", jopt JStr t.ConditionalOn
-                  "excludedBy", jopt JStr t.ExcludedBy
-                  "ciRun", JBool(plan.CiTriggerKinds.Contains t.Kind)
-                  "requirementsCovered", jint reqs.Length
-                  "p0RequirementsCovered", jint (reqs |> List.filter (fun r -> priority.[r] = "P0") |> List.length)
-                  "defectClassTests", jstrs (tests.TryFind t.Id |> Option.defaultValue [] |> List.map (str "id"))
-                  "contracts", jstrs t.Contracts
-                  "gates", jstrs t.Gates
-                  "completion", jstrs t.Completion ]
+            [ "id", JStr t.Id
+              "title", JStr t.Title
+              "workstream", JStr(workstream t)
+              "lane", JStr s.Lane
+              "step", jint stepRank.[s.Step]
+              "kind", JStr t.Kind
+              "dependsOn", jstrs (t.DependsOn |> List.filter (fun d -> byId.[d.Task].Phase = "timed") |> List.map (fun d -> d.Task))
+              "preflightPrerequisites", jstrs (t.DependsOn |> List.filter (fun d -> byId.[d.Task].Phase <> "timed") |> List.map (fun d -> d.Task))
+              "conditionalOn", jopt JStr t.ConditionalOn
+              "excludedBy", jopt JStr t.ExcludedBy
+              "ciRun", JBool(plan.CiTriggerKinds.Contains t.Kind)
+              "requirementsCovered", jint reqs.Length
+              "p0RequirementsCovered", jint (reqs |> List.filter (fun r -> priority.[r] = "P0") |> List.length)
+              "defectClassTests", jstrs (tests.TryFind t.Id |> Option.defaultValue [] |> List.map (str "id"))
+              "contracts", jstrs t.Contracts
+              "gates", jstrs t.Gates
+              "completion", jstrs t.Completion ]
+            @ (match timedRun with
+               | None -> []
+               | Some _ ->
+                   [ "estimateMinutes", jopt jint (TimedSchedule.estimate t)
+                     "minutes",
+                     JObj(topologySlots |> List.map (fun (k, slots) ->
+                         k, (slots |> List.tryFind (fun x -> x.Task = t.Id) |> Option.map (fun x -> JObj [ "lane", JStr x.Lane; "start", jint x.Start; "finish", jint x.Finish ]) |> Option.defaultValue JNull))) ])
+            |> JObj
+
+        let runLabel, planLabel, clock =
+            match timedRun with
+            | Some tr -> str "run" tr, str "plan" tr, (field "clock" tr |> Option.defaultValue JNull)
+            | None ->
+                "Rehearsal 4 (write-path dress rehearsal)",
+                plan.Key + " (default; Plan A's parallel lanes need owner approval, F-007)",
+                JObj
+                    [ "startsAt", JStr "first green bootstrap CI (task T10, REHEARSAL-004-WRITE-PATH-PLAN P5)"
+                      "ceilingMinutes", jint 420
+                      "stopRule", JStr "stop when the computed verdict is ACCEPTED, or at 420 minutes (R4-07)" ]
 
         JObj
             [ "schema", JStr "indy-init.timed-execution-manifest/1"
-              "run", JStr "Rehearsal 4 (write-path dress rehearsal)"
-              "plan", JStr(plan.Key + " (default; Plan A's parallel lanes need owner approval, F-007)")
-              "clock",
-              JObj
-                  [ "startsAt", JStr "first green bootstrap CI (task T10, REHEARSAL-004-WRITE-PATH-PLAN P5)"
-                    "ceilingMinutes", jint 420
-                    "stopRule", JStr "stop when the computed verdict is ACCEPTED, or at 420 minutes (R4-07)" ]
+              "run", JStr runLabel
+              "plan", JStr planLabel
+              "clock", clock
               "preconditions", JStr "Every check in preflight-manifest.json is PASS, or NOT_RUN only for PRE-ORG-01 (event-only)."
               "exclusions", JStr "A task with excludedBy stays on the plan until the operator's approvals file (T09) covers the exclusion; agents do not write that file (AR-003, RDP-003)."
               "milestones",
@@ -662,11 +690,14 @@ let timedExecutionManifest (c: Compiled) (plan: PlanSpec) =
                     JObj [ "milestone", JStr "reviewer findings per round"; "task", JStr "T30, T33" ]
                     JObj [ "milestone", JStr "computed verdict and time to it"; "task", JStr "T34" ] ]
               "measurements",
-              jstrs
-                  [ "CI runs created, executed and failed"
-                    "tokens per agent (Praxis >= 3.17 attribution)"
-                    "defect classes, recurrence against R2 and R3, fix-induced defects"
-                    "unavailable values are recorded as unavailable (R4 section 5)" ]
+              (match timedRun |> Option.bind (field "measurements") with
+               | Some m -> m
+               | None ->
+                   jstrs
+                       [ "CI runs created, executed and failed"
+                         "tokens per agent (Praxis >= 3.17 attribution)"
+                         "defect classes, recurrence against R2 and R3, fix-induced defects"
+                         "unavailable values are recorded as unavailable (R4 section 5)" ])
               "coverage",
               JObj
                   [ "p0Requirements", jint p0.Length
@@ -678,4 +709,9 @@ let timedExecutionManifest (c: Compiled) (plan: PlanSpec) =
                     "steps", jint stepRank.Count
                     "plannedCiRuns", jint (timed |> List.filter (fun s -> plan.CiTriggerKinds.Contains byId.[s.Task].Kind) |> List.length)
                     "byWorkstream", countBy (fun (s: Graph.Slot) -> workstream byId.[s.Task]) timed ]
+              |> fun summary ->
+                  match summary, timedRun with
+                  | JObj ps, Some _ ->
+                      JObj(ps @ [ "makespanMinutes", JObj(topologySlots |> List.map (fun (k, slots) -> k, jint (slots |> List.map (fun x -> x.Finish) |> List.fold max 0))) ])
+                  | j, _ -> j
               "tasks", timed |> List.sortBy (fun s -> s.Step, s.Task) |> List.map task |> JArr ]

@@ -1,0 +1,306 @@
+{
+  "schema": "indy-init.v4-independent-review/1",
+  "description": "Record of the independent adversarial review of package v4. The reviewer was a fresh, read-only Claude Code subagent. It received the sources, the artifacts and the compiler, but not the compiler author's conclusions. Its verdicts are copied as given. The status of each finding is the remediation the package author made; the reviewer's next round verifies it. FG-09 computes its result from this record, not from any verdict field. The owner's package approval (ODR-V4-01) must name this file's SHA-256. This record is agent-produced: the reviewer is an agent, and so is the author of this file.",
+  "reviewer": "independent read-only Claude Code subagent (fresh context; not the package author)",
+  "reviewerIsImplementer": false,
+  "rounds": 6,
+  "roundVerdicts": [
+    {
+      "round": 1,
+      "verdict": "FAIL",
+      "reviewedState": "branch claude/requirements-v4 at fd68ab1 (working tree)",
+      "summary": "5 critical, 6 major, 3 minor findings"
+    },
+    {
+      "round": 2,
+      "verdict": "FAIL",
+      "reviewedState": "claude/requirements-v4 at 7cd70c6",
+      "summary": "RV-1, RV-2, RV-3, RV-6, RV-10, RV-11, RV-14 partly resolved; RV-4, RV-5, RV-8, RV-9, RV-12, RV-13 resolved; new: 2 critical, 3 major, 3 minor"
+    },
+    {
+      "round": 3,
+      "verdict": "FAIL",
+      "reviewedState": "claude/requirements-v4 at 67886ee",
+      "summary": "no critical finding open; RV2-2, -3, -4, -6, -7 resolved; RV2-1 and RV2-5 partly resolved; new: 2 major (RV3-1, RV3-2), 4 minor"
+    },
+    {
+      "round": 4,
+      "verdict": "FAIL",
+      "reviewedState": "claude/requirements-v4 at 3dda420",
+      "summary": "no critical finding; RV3-1, -3, -4, -6 resolved; RV3-2 and RV3-5 accepted as recorded residuals; new: 1 major (RV4-1), 2 minor"
+    },
+    {
+      "round": 5,
+      "verdict": "FAIL",
+      "reviewedState": "claude/requirements-v4 at 8b80c69",
+      "summary": "no critical finding; RV4-1, -2, -3 resolved; new: 2 major (RV5-1, RV5-2)"
+    },
+    {
+      "round": 6,
+      "verdict": "PASS",
+      "reviewedState": "claude/requirements-v4 at dbc9a5f",
+      "summary": "RV5-1 and RV5-2 resolved and confirmed end to end; no critical or major finding open; residuals RV3-2, RV2-2/RV-10, RV2-8 and RV3-5 are recorded and not critical"
+    }
+  ],
+  "findings": [
+    {
+      "id": "RV-1",
+      "severity": "critical",
+      "status": "fixed",
+      "title": "The freeze gate could reach FROZEN from agent-writable files",
+      "remediation": "FG-05 now counts only records whose approved_by is a trusted operator, in an approvals file whose last change has no agent attribution trailers and whose commit is on main. Amendment records must match the proposed criterion exactly. The package approval must name the plan digest, this record's SHA-256 and the test record's SHA-256. FG-09 is computed from findings and the final round, never from a verdict field. FG-08's record is re-produced and compared in CI (--verify-test-record). FG-10 requires a freeze commit on main whose approvals file holds the package approval. Each condition has a negative control in V4Tests.",
+      "residual": "approved_by is still text in a file. Its authenticity rests on git attribution and on main's branch protection, not on a GitHub identity check (RISK-13).",
+      "round2": "partly resolved (reviewer); see RV2-*"
+    },
+    {
+      "id": "RV-2",
+      "severity": "critical",
+      "status": "fixed",
+      "title": "Invariant and lesson tests were not bound in the plan",
+      "remediation": "Every application-test of a normative invariant or lesson now names its obligation. The v4 stage generates proposals/v4-strengthened-bindings.proposed.json, which the curation applies. W16 checks that the plan carries it and that each category is one the obligation requires. AO entries record boundInPlan.",
+      "round2": "partly resolved (reviewer); see RV2-*"
+    },
+    {
+      "id": "RV-3",
+      "severity": "critical",
+      "status": "fixed",
+      "title": "No obligation was bound to WebKit",
+      "remediation": "W16 requires a WebKit twin of every Chromium browser test of a requirement whose text names WebKit, iPad or Safari. 72 twins are bound.",
+      "round2": "partly resolved (reviewer); see RV2-*"
+    },
+    {
+      "id": "RV-4",
+      "severity": "critical",
+      "status": "fixed",
+      "title": "T28 (S14/S15) was scheduled at zero minutes against DEC-R7-005",
+      "remediation": "The DEC-022 exclusion was removed from T28 and T27, and both are estimated and scheduled. T27's AI loop scope is asked as ODR-V4-09. The P0-only scope of the plan, inherited from v3, is asked as ODR-V4-10 (S14, S15, DCC-013..015), because promoting a priority is the owner's decision."
+    },
+    {
+      "id": "RV-5",
+      "severity": "critical",
+      "status": "fixed",
+      "title": "FG-07 passed when any topology fit, not the selected one",
+      "remediation": "ODR-V4-07 now requires a select-topology record naming a topology. FG-07 passes only if that topology fits. Choosing B blocks the freeze (negative control)."
+    },
+    {
+      "id": "RV-6",
+      "severity": "major",
+      "status": "fixed",
+      "title": "State machines contradicted PERSIST requirements",
+      "remediation": "Added transitions for the waiting save and its start or offline failure (T-S53..55), the limit-reached reconciliation (T-S56), the rebase-path read failure leading to Offline (T-S57) and the read-back read failure leading to Unknown outcome (T-S58). Saved after a verified load or discard is marked proposed and asked as ODR-V4-08 (PERSIST-021 against PERSIST-007/023).",
+      "round2": "partly resolved (reviewer); see RV2-*"
+    },
+    {
+      "id": "RV-7",
+      "severity": "major",
+      "status": "fixed",
+      "title": "Lessons misclassified",
+      "remediation": "R7L-01 is now gap-proposed (ODR-V4-06, ODR-V4-08). R7L-08 cites the new waiting-save transitions. R7L-20 adds the third review's L3, with an operational definition of 'in flight'."
+    },
+    {
+      "id": "RV-8",
+      "severity": "major",
+      "status": "fixed",
+      "title": "Schedule assumptions unsupported or wrong",
+      "remediation": "Added the edge T19 -> T18 and the review-checkpoint tasks T35 (after T14) and T36 (after T21). T18 is now 45 minutes. Estimate bases now say they are the author's planning estimates, not measured. With the corrections, A and B no longer fit; C (two UI lanes) fits at 405 minutes and is the recommendation in ODR-V4-07."
+    },
+    {
+      "id": "RV-9",
+      "severity": "major",
+      "status": "fixed",
+      "title": "Stale curation tied to earlier rehearsals",
+      "remediation": "Removed CT-006's rehearsal-001 engine. Restated the dependency reasons of T14 and T20. Retitled T27 and T28. CT-016 now pins echelon-current 1.33.0."
+    },
+    {
+      "id": "RV-10",
+      "severity": "major",
+      "status": "fixed",
+      "title": "The copy ban was proven by the implementing agent's own test",
+      "remediation": "PERSIST-052-O3 and PERSIST-026-O2 now also bind verifier:… tests in the security category (INV-20). verify-plan requires every bound test in the ledger, so the verifier's run is mandatory.",
+      "round2": "partly resolved (reviewer); see RV2-*",
+      "residual": "verify-plan has no notion of who produced a ledger row. The verifier: rows must now pass (RV2-2 fix), but their independence still rests on the acceptance job being run by the independent verifier (acceptance gate AG-07, AG-10)."
+    },
+    {
+      "id": "RV-11",
+      "severity": "major",
+      "status": "fixed",
+      "title": "Validation checks weaker than their titles",
+      "remediation": "W02 now also checks that every legacy check is PASS, that the report's baseline digest is v4's, and the plan's self-digest. W07 requires the evidence files, pins their SHA-256 and verifies every quote (CI checks out the five files). Approvals must match exactly. ODR-V4-05 was rewritten so it only adds to its obligation.",
+      "round2": "partly resolved (reviewer); see RV2-*"
+    },
+    {
+      "id": "RV-12",
+      "severity": "minor",
+      "status": "fixed",
+      "title": "Labels claiming verification",
+      "remediation": "IF-PERCEPTA is now pinned-unverified, and CT-016 is re-pinned to 1.33.0."
+    },
+    {
+      "id": "RV-13",
+      "severity": "minor",
+      "status": "fixed",
+      "title": "Package out of step with the compiler",
+      "remediation": "Regenerated. v4 --check and the legacy --check both exit 0. CI runs v4 --check with --verify-test-record."
+    },
+    {
+      "id": "RV-14",
+      "severity": "minor",
+      "status": "fixed",
+      "title": "Accessibility and API-limit gaps",
+      "remediation": "INV-24 adds an accessibility group: keyboard operation, focus into and back from dialogs, and live regions, in WebKit, plus a Forma token-existence test. The read-back of a file over 1 MB is now a live test.",
+      "residual": "Compare pagination beyond 250 commits stays deterministic (against the fake): PERSIST-015's categories do not include live-provider.",
+      "round2": "partly resolved (reviewer); see RV2-*"
+    },
+    {
+      "id": "RV2-1",
+      "severity": "critical",
+      "status": "fixed",
+      "title": "A forged set of inputs reached FROZEN",
+      "remediation": "The compiler no longer declares FROZEN under any input. When every gate passes, it reports READY-FOR-OWNER-FREEZE. Freezing is the owner's act on GitHub: their approving review of the freeze pull request, then the tag. Only origin/main counts. FG-09 reads the reviewer's last round verdict, not fields the author writes. Negative controls cover the forged review and the frozen flag.",
+      "residual": "The gate's records are still repository files. The compiler only reports readiness, and authenticity is established by the owner's GitHub review.",
+      "round3": "partly resolved (reviewer): see RV3-2"
+    },
+    {
+      "id": "RV2-2",
+      "severity": "critical",
+      "status": "fixed",
+      "title": "Added bindings were checked for presence, not for passing",
+      "remediation": "verify-plan now covers a category only when every bound ledger test declaring it passed (PlanVerification.coverage). A control shows that a failed or missing WebKit twin blocks coverage.",
+      "residual": "verifier: rows are ordinary ledger rows; their independence rests on AG-07/AG-10 (see RV-10)."
+    },
+    {
+      "id": "RV2-3",
+      "severity": "major",
+      "status": "fixed",
+      "title": "T-S57 sent a failed rebase-path read to Offline while online",
+      "remediation": "T-S57 now applies only when the tab knows it is offline. Online, T-S59 goes to Unknown outcome with Check again, never Conflict or Discard (PERSIST-024, PERSIST-046)."
+    },
+    {
+      "id": "RV2-4",
+      "severity": "major",
+      "status": "fixed",
+      "title": "A waiting save survived going offline and was later sent automatically",
+      "remediation": "T-S05 and T-S06 drop the waiting request. T-S60 handles QueuedSaveStarted while Offline and sends nothing (PERSIST-018)."
+    },
+    {
+      "id": "RV2-5",
+      "severity": "major",
+      "status": "fixed",
+      "title": "ODR-V4-08 left PERSIST-007-O2 and -O4 contradicting the Saved-from-load route",
+      "remediation": "ODR-V4-08 now amends PERSIST-023-O2, PERSIST-007-O2 and PERSIST-007-O4, and is labelled a relaxation.",
+      "round3": "partly resolved (reviewer): see RV3-4"
+    },
+    {
+      "id": "RV2-6",
+      "severity": "minor",
+      "status": "fixed",
+      "title": "The 'in flight' reading reinterpreted PERSIST-006 without the owner",
+      "remediation": "Asked as ODR-V4-11. The definition is marked as a proposal, and R7L-20 is now gap-proposed."
+    },
+    {
+      "id": "RV2-7",
+      "severity": "minor",
+      "status": "fixed",
+      "title": "Loose decision templates",
+      "remediation": "The ODR-V4-07 template names C. Scope decisions (ODR-V4-09..11) count only with a named option (negative control)."
+    },
+    {
+      "id": "RV2-8",
+      "severity": "minor",
+      "status": "accepted",
+      "title": "FG-08 trusts the committed test record locally",
+      "remediation": "CI re-runs the suite and compares the record (--verify-test-record). Because the compiler no longer declares FROZEN, a stale local record cannot freeze the package.",
+      "residual": "Freshness outside CI is not checked."
+    },
+    {
+      "id": "RV3-1",
+      "severity": "major",
+      "status": "fixed",
+      "title": "The package approval could never match: writing it changed the approvals pin and so the plan digest",
+      "remediation": "The approval now names verificationPlan.contentDigest: the plan without planIdentity and source.approvals (V4Package.planContentDigest). An end-to-end control (V4Tests.approvalDigestControl) adds an approval record, recompiles the plan, and checks that the plan digest changes and the content digest does not."
+    },
+    {
+      "id": "RV3-2",
+      "severity": "major",
+      "status": "accepted-residual",
+      "title": "FG-09 and FG-05/FG-10 rest on records an agent or local actor can write",
+      "remediation": "This is not fixed in the compiler, and cannot be offline. The manifest states are renamed independentReviewRecordPasses and ownerApprovalRecordsComplete, and statesMeaning says they are unauthenticated. The compiler never computes frozen. The freeze is authenticated only by the owner's approving GitHub review and the tag, which T01 and acceptance gate AG-13 check. The owner's approval of the package (ODR-V4-01) is the decision that accepts this residual.",
+      "residual": "Unauthenticated records; mitigated by the owner's GitHub review (RISK-13). Status 'decided-by-owner' means routed to ODR-V4-01; it is not yet decided.",
+      "round4": "accepted by the reviewer as an honest, recorded residual (not critical)",
+      "round6": "accepted by the reviewer as a recorded, non-critical residual; acceptable because the compiler never computes frozen"
+    },
+    {
+      "id": "RV3-3",
+      "severity": "minor",
+      "status": "fixed",
+      "title": "FREEZE.md missing and the freeze never checked",
+      "remediation": "FREEZE.md was added. T01's completion conditions and AG-13 check the tag, its commit on main, the manifest digests and the owner's review."
+    },
+    {
+      "id": "RV3-4",
+      "severity": "minor",
+      "status": "fixed",
+      "title": "PERSIST-051-O2 still forbade the verified-load route",
+      "remediation": "ODR-V4-08 now also amends PERSIST-051-O2. Because one obligation takes one amendment, ODR-V4-03 and ODR-V4-08 share a combinedCriterion for it, and the gate accepts either the single or the combined text."
+    },
+    {
+      "id": "RV3-5",
+      "severity": "minor",
+      "status": "accepted",
+      "title": "T-S59 shows Unknown outcome after a known stale head",
+      "remediation": "Recorded as a residual on T-S59. PAT-07 allows only Offline or Unknown commit outcome, and Offline is untrue while online.",
+      "residual": "Unknown outcome's fixed words overstate the uncertainty in this case.",
+      "round4": "accepted residual (reviewer)"
+    },
+    {
+      "id": "RV3-6",
+      "severity": "minor",
+      "status": "fixed",
+      "title": "Scope option accepted any string",
+      "remediation": "The option must be the letter of one of the request's listed options (negative control)."
+    },
+    {
+      "id": "RV4-1",
+      "severity": "major",
+      "status": "fixed",
+      "title": "Approvals counted as complete although the approved amendments were never applied to the plan",
+      "remediation": "An amendment request is approved only when every proposed change is written by the operator exactly as proposed and the compiled plan applies it with that criterion. A declined request must leave its criteria out of the plan. Acceptance obligations become normative only for approved, applied requests. While fixing this, the author found that the gate and its templates used a flat record format, whereas verify-plan authorizes only {id, authority: {kind: operator, id}, changes: [...]}; an owner following the old templates could not have applied any amendment. The gate now reads that schema, and the templates were rewritten (proposals recordFormat). The positive control compiles a really amended plan through VerificationPlan.build, and negative controls cover 'recorded but not applied', 'combined text with partner declined', an untrusted authority and a weaker criterion."
+    },
+    {
+      "id": "RV4-2",
+      "severity": "minor",
+      "status": "fixed",
+      "title": "Combined criterion accepted with the partner declined",
+      "remediation": "The combined criterion counts only when the partner request (combinedWith) is not declined and its own changes are recorded and applied (negative control)."
+    },
+    {
+      "id": "RV4-3",
+      "severity": "minor",
+      "status": "fixed",
+      "title": "Gate rows read as verified",
+      "remediation": "Each freezeGate row now states its evidence: computed by the compiler, or a repository record (unauthenticated)."
+    },
+    {
+      "id": "RV5-1",
+      "severity": "major",
+      "status": "fixed",
+      "title": "FG-10 read the old approvals schema, so a real approval could never reach READY-FOR-OWNER-FREEZE",
+      "remediation": "FG-10's content check is now V4Package.freezeCommitHoldsApproval. It reads the approvals file at the freeze commit with the same flatRecords as FG-05 and requires a trusted authority. Pure controls cover the new schema, an untrusted authority and a missing package approval."
+    },
+    {
+      "id": "RV5-2",
+      "severity": "major",
+      "status": "fixed",
+      "title": "Invariant tests made normative by an owner approval were never bound in the plan",
+      "remediation": "strengthenedBindings now binds an invariant or lesson whose proposals the owner approved and the plan applies. The approval scenario in V4Tests runs the real two-pass workflow (amendments, then apply-bindings, then recompile) and asserts that every normative application-test obligation is boundInPlan. The owner's package approval names the plan as finally compiled."
+    },
+    {
+      "id": "RV6-1",
+      "severity": "minor",
+      "status": "accepted-residual",
+      "title": "Process-record invariant tests (INV-15..INV-19, INV-23) are not bound in the plan",
+      "remediation": "None in v4. These tests are verify-plan, freeze and conditor negative controls run by their own producers (the compiler suite, CI policy). Process-record categories are proven by run records, not ledger tests, so plan bindings do not apply.",
+      "residual": "Their enforcement rests on the compiler suite and CI, not on verify-plan."
+    }
+  ]
+}

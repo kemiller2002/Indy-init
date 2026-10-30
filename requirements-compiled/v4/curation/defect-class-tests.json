@@ -1,0 +1,204 @@
+{
+  "schema": "indy-init.rc-defect-class-tests/1",
+  "description": "Failing-first test specifications for the recurring defect classes of Rehearsals 1-3 (R4-01: they become tests before the first write code). Each is written against the application's F# engine and providers in the rehearsal repository; 'task' is where it must exist and fail before the fix exists. Levels follow PF-011: domain, fixture, conformance (recorded real responses), live (real GitHub test repository), browser.",
+  "tests": [
+    {
+      "id": "DCT-001-A",
+      "defectClass": "DC-001",
+      "level": "domain",
+      "task": "T12",
+      "invariant": "A publication is parented by the exact commit its decision was read at; it never fast-forwards over history it did not read.",
+      "given": "A decision read at commit A; another writer advanced the branch to B, changing the same investigation",
+      "when": "The pending change is published",
+      "then": "The publication is refused as a conflict (non-fast-forward), the other writer's events remain, and the local change is kept pending",
+      "requirements": [
+        "EXT-DATA-006",
+        "STORAGE-006",
+        "R10.4",
+        "D-009"
+      ],
+      "reuse": "none: rehearsal code, tests and reproductions are not inputs (PERSIST-026); the test is written from the stated invariant",
+      "citations": []
+    },
+    {
+      "id": "DCT-001-B",
+      "defectClass": "DC-001",
+      "level": "domain",
+      "task": "T12",
+      "invariant": "Reconciliation compares commits by ancestry, never by ref equality.",
+      "given": "A remote head that descends from the local base through another writer's commit",
+      "when": "The provider reconciles after a reload",
+      "then": "The change is classified as concurrent, not as already applied",
+      "requirements": [
+        "EXT-DATA-006",
+        "R10.4"
+      ],
+      "reuse": "none: rehearsal code, tests and reproductions are not inputs (PERSIST-026); the test is written from the stated invariant",
+      "citations": []
+    },
+    {
+      "id": "DCT-002-A",
+      "defectClass": "DC-002",
+      "level": "domain",
+      "task": "T12",
+      "invariant": "A provider answer applies only to the request instance (generation) that asked it, and only while that write is still in flight.",
+      "given": "Write W1 in flight; W1 is replaced by W2 before W1's answers arrive",
+      "when": "A late answer for W1 arrives",
+      "then": "It is discarded; W2's state and published bytes are unaffected",
+      "requirements": [
+        "EXT-DATA-006",
+        "UI-006",
+        "D-009"
+      ],
+      "reuse": "none: rehearsal code, tests and reproductions are not inputs (PERSIST-026); the test is written from the stated invariant",
+      "citations": [
+        {
+          "repo": "indy-init",
+          "path": "docs/REHEARSAL-003-RESULTS.md",
+          "quote": "Typed request book: a response applies only to its own request (DC-002)"
+        }
+      ]
+    },
+    {
+      "id": "DCT-002-B",
+      "defectClass": "DC-002",
+      "level": "domain",
+      "task": "T12",
+      "invariant": "Every user event is legal only in its source states (write from Idle/Held, reapply from Idle, discard from Held, connect from Disconnected/Refused); a resubmitted unchanged command keeps its target (R3 D-04).",
+      "given": "Each event delivered in every state of the sync machine",
+      "when": "The event is handled",
+      "then": "Events outside their legal states are refused with a typed fault and change nothing",
+      "requirements": [
+        "R8.1",
+        "R8.2",
+        "D-006"
+      ],
+      "reuse": "none: rehearsal code, tests and reproductions are not inputs (PERSIST-026); the test is written from the stated invariant",
+      "citations": []
+    },
+    {
+      "id": "DCT-003-A",
+      "defectClass": "DC-003",
+      "level": "fixture",
+      "task": "T12",
+      "invariant": "Once the publication request has been sent, any failure (network error, cancellation, read-back mismatch) is 'unknown', never 'not written'.",
+      "given": "A write whose publication was sent and whose response was lost",
+      "when": "The failure is classified",
+      "then": "State is unknown (may have applied): no Retry is offered, reconciliation re-reads the head first",
+      "requirements": [
+        "UI-006",
+        "D-009",
+        "R10.6"
+      ],
+      "reuse": "none: rehearsal code, tests and reproductions are not inputs (PERSIST-026); the test is written from the stated invariant",
+      "citations": [
+        {
+          "repo": "causa-data",
+          "path": "contract/v1.0.0/CONTRACT.md",
+          "quote": "Pending, sending, conflicted and unknown remain distinct states."
+        }
+      ]
+    },
+    {
+      "id": "DCT-004-A",
+      "defectClass": "DC-004",
+      "level": "conformance",
+      "task": "T18",
+      "invariant": "Advisory provider fields never authorize: an absent permissions/role field is not denial; only GitHub's answer to the write decides.",
+      "given": "A repository response without a permissions field (installation or fine-grained token), recorded from the real API",
+      "when": "The workspace computes whether saving is offered",
+      "then": "Saving is offered; a refused write is held as write-denied with a renewable credential",
+      "requirements": [
+        "EXT-DATA-005",
+        "R11.2",
+        "PF-004"
+      ],
+      "reuse": "none: rehearsal code, tests and reproductions are not inputs (PERSIST-026); the test is written from the stated invariant",
+      "citations": []
+    },
+    {
+      "id": "DCT-005-A",
+      "defectClass": "DC-005",
+      "level": "browser",
+      "task": "T18",
+      "invariant": "Reads of mutable state (refs, repository) are never answerable from any cache; content-addressed reads may be cached.",
+      "given": "GitHub answers with Cache-Control: private, max-age=60",
+      "when": "The branch head is re-read after a write and after a page reload",
+      "then": "Every mutable read has a URL unique across sessions and page loads; the new head is observed",
+      "requirements": [
+        "EXT-DATA-007",
+        "R10.6",
+        "AR-026"
+      ],
+      "reuse": "none: rehearsal code, tests and reproductions are not inputs (PERSIST-026); the test is written from the stated invariant",
+      "citations": [
+        {
+          "repo": "indy-init",
+          "path": "docs/REHEARSAL-003-RESULTS.md",
+          "quote": "Freshness nonce for mutable reads (DC-005)"
+        }
+      ]
+    },
+    {
+      "id": "DCT-006-A",
+      "defectClass": "DC-006",
+      "level": "browser",
+      "task": "T16",
+      "invariant": "A failed framework download ends the start promptly with the recoverable failure, and Retry reaches ready.",
+      "given": "One framework .wasm answers 503 during boot",
+      "when": "The application starts",
+      "then": "The recoverable failure is shown well before the start timeout, focus is on Retry, and Retry loads to ready",
+      "requirements": [
+        "WASM-LOAD-005",
+        "WASM-LOAD-003"
+      ],
+      "reuse": "none: rehearsal code, tests and reproductions are not inputs (PERSIST-026); the test is written from the stated invariant",
+      "citations": []
+    },
+    {
+      "id": "DCT-INPUT-A",
+      "defectClass": "R3-LESSON-3",
+      "level": "browser",
+      "task": "T16",
+      "invariant": "Editable bound inputs declare data-on=\"input\" so a projection never overwrites typed text.",
+      "given": "A user typing in a bound field while a projection arrives",
+      "when": "The projection re-renders",
+      "then": "The typed text is preserved",
+      "requirements": [
+        "UI-004",
+        "UI-013"
+      ],
+      "reuse": "Limen DOM vocabulary data-on / data-bind-*",
+      "citations": [
+        {
+          "repo": "indy-init",
+          "path": "docs/REHEARSAL-003-RESULTS.md",
+          "quote": "Bind editable inputs on"
+        }
+      ]
+    },
+    {
+      "id": "DCT-LIVE-A",
+      "defectClass": "DC-001..DC-005",
+      "level": "live",
+      "task": "T21",
+      "invariant": "Create, write, reload, conflict (expected-version mismatch) and rejected token behave as specified against the real test repository, with independent SHA re-reads.",
+      "given": "The write-capable test repository and CAUSA_GITHUB_TOKEN (T05)",
+      "when": "The live job runs at the first persistence checkpoint",
+      "then": "All five scenarios pass; evidence records run id and commit SHAs; no token appears in any artifact (R3 N1)",
+      "requirements": [
+        "EXT-DATA-009",
+        "EXT-DATA-010",
+        "PF-014"
+      ],
+      "reuse": "none: rehearsal code, tests and reproductions are not inputs (PERSIST-026); the test is written from the stated invariant",
+      "citations": [
+        {
+          "repo": "indy-init",
+          "path": "docs/REHEARSAL-004-WRITE-PATH-PLAN.md",
+          "quote": "They run against the real GitHub test repository: create, write, reload, conflict (expected-version mismatch), rejected token."
+        }
+      ]
+    }
+  ]
+}

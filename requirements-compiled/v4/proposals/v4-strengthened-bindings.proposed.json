@@ -1,0 +1,1267 @@
+{
+  "schema": "indy-init.test-bindings-proposal/1",
+  "status": "proposed",
+  "approval": "Agent proposal (v4 stage). It binds tests to existing obligations only; it adds no obligation. It takes effect when it is in curation/verification-plan.json testBindings (check W16) and the owner merges the recompiled plan.",
+  "convention": "Invariant and lesson tests keep their identities from analysis/invariants.json and analysis/r7-lessons.json; WebKit twins replace ' [chromium]' with ' [webkit]' in the plan's own browser test identity.",
+  "testBindings": [
+    {
+      "obligation": "PERSIST-023-O2",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Invariants.Property.INV01.NoSavedWithoutMatchingReadBack",
+          "kind": "deterministic",
+          "categories": [
+            "unit"
+          ]
+        },
+        {
+          "id": "dotnet:Causa.Invariants.Mutation.INV01.ReadBackSkipped",
+          "kind": "deterministic",
+          "categories": [
+            "unit"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PERSIST-015-O3",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Invariants.Property.INV03.LostAnswerNeverConflictOrFailure",
+          "kind": "deterministic",
+          "categories": [
+            "integration"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PERSIST-015-O5",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Invariants.Negative.INV03.AppliedButNotYetVisible",
+          "kind": "deterministic",
+          "categories": [
+            "integration"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PERSIST-016-O5",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Invariants.Property.INV04.RequestBounds",
+          "kind": "deterministic",
+          "categories": [
+            "integration"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PERSIST-006-O3",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Invariants.Property.INV05.MutationShape",
+          "kind": "deterministic",
+          "categories": [
+            "integration"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PERSIST-003-O1",
+      "tests": [
+        {
+          "id": "playwright:invariants/INV-06.spec.js > every store empty of investigation content [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PERSIST-031-O21",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Invariants.Property.INV07.WorkSurvivesRecoverableFailures",
+          "kind": "deterministic",
+          "categories": [
+            "unit"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PERSIST-011-O4",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Invariants.Negative.INV07.RefreshNeverReplacesWork",
+          "kind": "deterministic",
+          "categories": [
+            "integration"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PERSIST-012-O7",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Invariants.Model.INV08.ConflictActionsNeverOverwrite",
+          "kind": "deterministic",
+          "categories": [
+            "integration"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PERSIST-013-O3",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Invariants.Property.INV09.AllCommitsReachable",
+          "kind": "deterministic",
+          "categories": [
+            "integration"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PERSIST-041-O3",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Live.PERSIST041Tests.PERSIST-041-O3",
+          "kind": "live",
+          "categories": [
+            "live-provider"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PERSIST-002-O3",
+      "tests": [
+        {
+          "id": "playwright:invariants/INV-10.spec.js > tabs independent with and without navigator.locks [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PERSIST-005-O2",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Invariants.Negative.INV11.EachIntegrityCheckHasAMutant",
+          "kind": "deterministic",
+          "categories": [
+            "integration"
+          ]
+        },
+        {
+          "id": "dotnet:Causa.Invariants.Property.INV11.WrittenFileSetsReplay",
+          "kind": "deterministic",
+          "categories": [
+            "integration"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PERSIST-012-O3",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Invariants.Property.INV12.ReapplyEqualsEngineFold",
+          "kind": "deterministic",
+          "categories": [
+            "integration"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PERSIST-022-O2",
+      "tests": [
+        {
+          "id": "playwright:invariants/INV-13.spec.js > indicator equals machine projection [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PERSIST-053-O2",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Invariants.Negative.INV14.ForbiddenPhrases",
+          "kind": "deterministic",
+          "categories": [
+            "unit"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PERSIST-052-O3",
+      "tests": [
+        {
+          "id": "verifier:Causa.Acceptance.Independent.PAT13ProvenanceComparison",
+          "kind": "deterministic",
+          "categories": [
+            "security"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PERSIST-026-O2",
+      "tests": [
+        {
+          "id": "verifier:Causa.Acceptance.Independent.PERSIST026Provenance",
+          "kind": "deterministic",
+          "categories": [
+            "security"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PF-015-O4",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Invariants.Negative.INV21.CredentialDestinations",
+          "kind": "deterministic",
+          "categories": [
+            "security"
+          ]
+        },
+        {
+          "id": "playwright:invariants/INV-21.spec.js > no credential in storage, URL or artifact [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "security"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PERSIST-008-O2",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Invariants.Negative.INV22.RecordedGitHubAnswerForms",
+          "kind": "deterministic",
+          "categories": [
+            "integration"
+          ]
+        },
+        {
+          "id": "dotnet:Causa.Invariants.Live.INV22.ThreeSimultaneousCommits",
+          "kind": "live",
+          "categories": [
+            "live-provider"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-011-O1",
+      "tests": [
+        {
+          "id": "playwright:invariants/INV-24.spec.js > save-state and conflict actions by keyboard and screen reader [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "accessibility"
+          ]
+        },
+        {
+          "id": "playwright:acceptance/UI-011.spec.js > UI-011-O1 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PERSIST-030-O2",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Invariants.Negative.INV24.FormaTokensExist",
+          "kind": "deterministic",
+          "categories": [
+            "integration"
+          ]
+        },
+        {
+          "id": "playwright:acceptance/PERSIST-030.spec.js > PERSIST-030-O2 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "integration",
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PERSIST-015-O4",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Deterministic.PERSIST015Tests.ReconcileBeyond250Commits",
+          "kind": "deterministic",
+          "categories": [
+            "integration"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PERSIST-007-O1",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Acceptance.Live.PERSIST007Tests.ReadBackOfFileOver1MB",
+          "kind": "live",
+          "categories": [
+            "live-provider"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PERSIST-031-O3",
+      "tests": [
+        {
+          "id": "playwright:acceptance/PERSIST-031.spec.js > freshness shows commit time [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PERSIST-020-O1",
+      "tests": [
+        {
+          "id": "playwright:acceptance/PERSIST-020.spec.js > PERSIST-020-O1 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "integration",
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PERSIST-020-O2",
+      "tests": [
+        {
+          "id": "playwright:acceptance/PERSIST-020.spec.js > PERSIST-020-O2 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "integration",
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PERSIST-020-O3",
+      "tests": [
+        {
+          "id": "playwright:acceptance/PERSIST-020.spec.js > PERSIST-020-O3 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "integration",
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PERSIST-020-O4",
+      "tests": [
+        {
+          "id": "playwright:acceptance/PERSIST-020.spec.js > PERSIST-020-O4 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "integration",
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PERSIST-020-O5",
+      "tests": [
+        {
+          "id": "playwright:acceptance/PERSIST-020.spec.js > PERSIST-020-O5 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "integration",
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PERSIST-020-O6",
+      "tests": [
+        {
+          "id": "playwright:acceptance/PERSIST-020.spec.js > PERSIST-020-O6 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "integration",
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PERSIST-030-O1",
+      "tests": [
+        {
+          "id": "playwright:acceptance/PERSIST-030.spec.js > PERSIST-030-O1 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "integration",
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PERSIST-030-O3",
+      "tests": [
+        {
+          "id": "playwright:acceptance/PERSIST-030.spec.js > PERSIST-030-O3 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "integration",
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PERSIST-030-O4",
+      "tests": [
+        {
+          "id": "playwright:acceptance/PERSIST-030.spec.js > PERSIST-030-O4 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "integration",
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PERSIST-030-O5",
+      "tests": [
+        {
+          "id": "playwright:acceptance/PERSIST-030.spec.js > PERSIST-030-O5 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "integration",
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PERSIST-030-O6",
+      "tests": [
+        {
+          "id": "playwright:acceptance/PERSIST-030.spec.js > PERSIST-030-O6 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "integration",
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PERSIST-030-O7",
+      "tests": [
+        {
+          "id": "playwright:acceptance/PERSIST-030.spec.js > PERSIST-030-O7 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "integration",
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PERSIST-030-O8",
+      "tests": [
+        {
+          "id": "playwright:acceptance/PERSIST-030.spec.js > PERSIST-030-O8 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "integration",
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PERSIST-040-O1",
+      "tests": [
+        {
+          "id": "playwright:acceptance/PERSIST-040.spec.js > PERSIST-040-O1 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "integration",
+            "browser"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PERSIST-040-O2",
+      "tests": [
+        {
+          "id": "playwright:acceptance/PERSIST-040.spec.js > PERSIST-040-O2 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "integration",
+            "browser"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PERSIST-040-O3",
+      "tests": [
+        {
+          "id": "playwright:acceptance/PERSIST-040.spec.js > PERSIST-040-O3 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "integration",
+            "browser"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PERSIST-040-O4",
+      "tests": [
+        {
+          "id": "playwright:acceptance/PERSIST-040.spec.js > PERSIST-040-O4 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "integration",
+            "browser"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PERSIST-040-O5",
+      "tests": [
+        {
+          "id": "playwright:acceptance/PERSIST-040.spec.js > PERSIST-040-O5 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "integration",
+            "browser"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PERSIST-040-O6",
+      "tests": [
+        {
+          "id": "playwright:acceptance/PERSIST-040.spec.js > PERSIST-040-O6 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "integration",
+            "browser"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PERSIST-046-O1",
+      "tests": [
+        {
+          "id": "playwright:acceptance/PERSIST-046.spec.js > PERSIST-046-O1 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "integration",
+            "browser"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PERSIST-046-O2",
+      "tests": [
+        {
+          "id": "playwright:acceptance/PERSIST-046.spec.js > PERSIST-046-O2 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "integration",
+            "browser"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PERSIST-046-O3",
+      "tests": [
+        {
+          "id": "playwright:acceptance/PERSIST-046.spec.js > PERSIST-046-O3 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "integration",
+            "browser"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PERSIST-046-O4",
+      "tests": [
+        {
+          "id": "playwright:acceptance/PERSIST-046.spec.js > PERSIST-046-O4 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "integration",
+            "browser"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PERSIST-046-O5",
+      "tests": [
+        {
+          "id": "playwright:acceptance/PERSIST-046.spec.js > PERSIST-046-O5 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "integration",
+            "browser"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PERSIST-046-O6",
+      "tests": [
+        {
+          "id": "playwright:acceptance/PERSIST-046.spec.js > PERSIST-046-O6 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "integration",
+            "browser"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PERSIST-048-O1",
+      "tests": [
+        {
+          "id": "playwright:acceptance/PERSIST-048.spec.js > PERSIST-048-O1 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "integration",
+            "browser"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PERSIST-048-O2",
+      "tests": [
+        {
+          "id": "playwright:acceptance/PERSIST-048.spec.js > PERSIST-048-O2 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "integration",
+            "browser"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PERSIST-048-O3",
+      "tests": [
+        {
+          "id": "playwright:acceptance/PERSIST-048.spec.js > PERSIST-048-O3 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "integration",
+            "browser"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PERSIST-048-O4",
+      "tests": [
+        {
+          "id": "playwright:acceptance/PERSIST-048.spec.js > PERSIST-048-O4 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "integration",
+            "browser"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PERSIST-048-O5",
+      "tests": [
+        {
+          "id": "playwright:acceptance/PERSIST-048.spec.js > PERSIST-048-O5 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "integration",
+            "browser"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PERSIST-054-O1",
+      "tests": [
+        {
+          "id": "playwright:acceptance/PERSIST-054.spec.js > PERSIST-054-O1 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "integration",
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PERSIST-054-O2",
+      "tests": [
+        {
+          "id": "playwright:acceptance/PERSIST-054.spec.js > PERSIST-054-O2 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "integration",
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PERSIST-054-O3",
+      "tests": [
+        {
+          "id": "playwright:acceptance/PERSIST-054.spec.js > PERSIST-054-O3 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "integration",
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PERSIST-054-O4",
+      "tests": [
+        {
+          "id": "playwright:acceptance/PERSIST-054.spec.js > PERSIST-054-O4 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "integration",
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-011-O2",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-011.spec.js > UI-011-O2 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-011-O3",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-011.spec.js > UI-011-O3 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-011-O4",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-011.spec.js > UI-011-O4 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-011-O5",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-011.spec.js > UI-011-O5 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-016-O1",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-016.spec.js > UI-016-O1 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-016-O2",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-016.spec.js > UI-016-O2 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-016-O3",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-016.spec.js > UI-016-O3 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-016-O4",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-016.spec.js > UI-016-O4 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-016-O5",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-016.spec.js > UI-016-O5 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-016-O6",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-016.spec.js > UI-016-O6 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-016-O7",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-016.spec.js > UI-016-O7 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-016-O8",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-016.spec.js > UI-016-O8 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-016-O9",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-016.spec.js > UI-016-O9 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-016-O10",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-016.spec.js > UI-016-O10 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-016-O11",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-016.spec.js > UI-016-O11 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-016-O12",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-016.spec.js > UI-016-O12 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-016-O13",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-016.spec.js > UI-016-O13 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-016-O14",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-016.spec.js > UI-016-O14 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-016-O15",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-016.spec.js > UI-016-O15 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-016-O16",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-016.spec.js > UI-016-O16 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-016-O17",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-016.spec.js > UI-016-O17 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-016-O18",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-016.spec.js > UI-016-O18 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-020-O1",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-020.spec.js > UI-020-O1 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-020-O2",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-020.spec.js > UI-020-O2 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-020-O3",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-020.spec.js > UI-020-O3 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-020-O4",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-020.spec.js > UI-020-O4 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-029-O1",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-029.spec.js > UI-029-O1 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-029-O2",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-029.spec.js > UI-029-O2 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-029-O3",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-029.spec.js > UI-029-O3 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-029-O4",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-029.spec.js > UI-029-O4 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-034-O1",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-034.spec.js > UI-034-O1 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-034-O2",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-034.spec.js > UI-034-O2 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "UI-034-O3",
+      "tests": [
+        {
+          "id": "playwright:acceptance/UI-034.spec.js > UI-034-O3 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "WDL-007-O1",
+      "tests": [
+        {
+          "id": "playwright:acceptance/WDL-007.spec.js > WDL-007-O1 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "WDL-007-O2",
+      "tests": [
+        {
+          "id": "playwright:acceptance/WDL-007.spec.js > WDL-007-O2 [webkit]",
+          "kind": "deterministic",
+          "categories": [
+            "browser",
+            "accessibility"
+          ]
+        }
+      ]
+    }
+  ]
+}

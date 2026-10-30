@@ -1,0 +1,72 @@
+{
+  "schema": "indy-init.v4-acceptance-gate/1",
+  "description": "Conditions under which the event build's acceptance fails, whatever any agent reports. Each is checked by an existing tool run by the acceptance job at the exact final SHA; none is checked by the implementing agent's own assertion.",
+  "finalSha": "The SHA of main at the deadline instant (execution-plan clock). Every condition is evaluated against that SHA and the deployment of that SHA.",
+  "conditions": [
+    {
+      "id": "AG-01",
+      "acceptanceFailsWhen": "any P0 obligation of the frozen plan is unverified",
+      "checkedBy": "requirements-compiler verify-plan (verdict and missing coverage)"
+    },
+    {
+      "id": "AG-02",
+      "acceptanceFailsWhen": "a critical test fails: any test the plan binds to a P0 obligation, which includes every PAT test, the WebKit twins and the normative invariant and lesson tests v4 binds (proposals/v4-strengthened-bindings.proposed.json)",
+      "checkedBy": "verify-plan over the evidence bundle; acceptance ledger"
+    },
+    {
+      "id": "AG-03",
+      "acceptanceFailsWhen": "required evidence is missing, or is for another SHA, or from an earlier rehearsal",
+      "checkedBy": "verify-plan --trusted-source-sha; Dokimos completion verify"
+    },
+    {
+      "id": "AG-04",
+      "acceptanceFailsWhen": "the deployed artifact's SHA differs from the verified SHA, or the deployed acceptance job for that SHA did not conclude successfully",
+      "checkedBy": "deploy smoke (build.json equals the SHA) and the deployed-acceptance job conclusion (DCC-008)"
+    },
+    {
+      "id": "AG-05",
+      "acceptanceFailsWhen": "any bound test is NOT_RUN, skipped or quarantined (including browser suites that stopped after a failure)",
+      "checkedBy": "acceptance ledger and verify-plan (PERSIST-055)"
+    },
+    {
+      "id": "AG-06",
+      "acceptanceFailsWhen": "a required security check fails: credential scan, PAT-13 artifact scan, CSP and credential-destination checks",
+      "checkedBy": "credential scan with the fixture manifest (DCC-015); PAT-13; INV-21 tests"
+    },
+    {
+      "id": "AG-07",
+      "acceptanceFailsWhen": "provenance is violated: a candidate file matches a rehearsal file (PAT-13 comparison by the independent verifier) or commits lack work-item trailers",
+      "checkedBy": "PAT-13 provenance comparison; Praxis work records"
+    },
+    {
+      "id": "AG-08",
+      "acceptanceFailsWhen": "a required pull request remains unmerged at the deadline, or main differs from the verified SHA",
+      "checkedBy": "git: main at the deadline instant equals the verified SHA"
+    },
+    {
+      "id": "AG-09",
+      "acceptanceFailsWhen": "an acceptance obligation, binding or amendment differs from the frozen package without an operator approval record",
+      "checkedBy": "verify-plan (UNAUTHORIZED-AMENDMENT); requirements-compiler v4 --check against freeze-manifest.json"
+    },
+    {
+      "id": "AG-10",
+      "acceptanceFailsWhen": "the independent review of the final SHA is missing, or authored by the implementing agent, or reports an unresolved critical finding",
+      "checkedBy": "praxis:independent-review record; verify-plan review attestations"
+    },
+    {
+      "id": "AG-11",
+      "acceptanceFailsWhen": "an in-scope critical defect class is open or lacks SHA-bound closure evidence",
+      "checkedBy": "requirements-compiler verify-defect-closures and assertion-ratchet (base = kickoff) before the candidate freeze (DCC-014)"
+    },
+    {
+      "id": "AG-12",
+      "acceptanceFailsWhen": "conditor ci-policy check fails on the final SHA, or a CI job running bound tests lacks CAUSA_PLAN",
+      "checkedBy": "conditor ci-policy check (DCC-013); CI configuration (DCC-015)"
+    },
+    {
+      "id": "AG-13",
+      "acceptanceFailsWhen": "the requirements package the run used is not the frozen one: tag indy-init-requirements-v4.0.0 is missing, is not on main, or names a freeze-manifest whose verification-plan digest differs from the plan verify-plan used, or the owner's approving review of the freeze pull request is missing",
+      "checkedBy": "git (tag, merge-base, freeze-manifest digests) and the GitHub reviews API, at kickoff (T01) and at acceptance"
+    }
+  ]
+}

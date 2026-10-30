@@ -1,0 +1,1348 @@
+{
+  "schema": "indy-init.timed-execution-manifest/1",
+  "run": "Indy Init event build, November 7, 2026 (compiled package v4)",
+  "plan": "Steps as B-resource-optimized (v3 pipeline); minutes for topologies A, B and C. C (role lanes with two UI agents) is the only topology that fits 420 minutes and needs owner approval (ODR-V4-07)",
+  "clock": {
+    "t0": "the UTC instant written to the kickoff record when the timer starts (operator or kickoff workflow; never the implementing agent)",
+    "deadline": "min(t0 + 420 minutes, 2026-11-07T22:00:00Z), written as an absolute UTC instant into the kickoff record at T0",
+    "ceilingMinutes": 420,
+    "clockRule": "every resumption and every time-based decision reads the wall clock (date -u) and computes remaining time from the recorded absolute deadline, never from remembered timestamps",
+    "mergeRule": "merge each pull request as soon as its required checks are green and its gates permit; merge freeze at deadline - 45 minutes",
+    "stopRule": "stop at the deadline; the timed result is main and its evidence at the deadline instant; later work is reported separately and never alters it"
+  },
+  "preconditions": "Every check in preflight-manifest.json is PASS, or NOT_RUN only for PRE-ORG-01 (event-only).",
+  "exclusions": "A task with excludedBy stays on the plan until the operator's approvals file (T09) covers the exclusion; agents do not write that file (AR-003, RDP-003).",
+  "milestones": [
+    {
+      "milestone": "first green CI",
+      "task": "T10"
+    },
+    {
+      "milestone": "first verified remote write",
+      "task": "T21"
+    },
+    {
+      "milestone": "first verified conflict handling",
+      "task": "T21"
+    },
+    {
+      "milestone": "first deployed candidate",
+      "task": "T31"
+    },
+    {
+      "milestone": "reviewer findings per round",
+      "task": "T30, T33"
+    },
+    {
+      "milestone": "computed verdict and time to it",
+      "task": "T34"
+    }
+  ],
+  "measurements": [
+    "wall-clock milestones relative to the recorded T0 (first green CI, first verified live write, first deployed candidate, accepted verdict)",
+    "CI runs created, executed and failed; queue time",
+    "tokens per agent",
+    "defect classes, recurrence against the Rehearsal 7 lesson classes (analysis/r7-lessons.json), fix-induced defects",
+    "unavailable values are recorded as unavailable"
+  ],
+  "coverage": {
+    "p0Requirements": 161,
+    "p0CoveredByTimedTasks": 156,
+    "p0CoveredOnlyByPreflight": [
+      "VER-001",
+      "VER-002",
+      "VER-003",
+      "VER-005",
+      "VER-010"
+    ]
+  },
+  "summary": {
+    "tasks": 26,
+    "steps": 23,
+    "plannedCiRuns": 10,
+    "byWorkstream": {
+      "application-implementation": 5,
+      "defect-correction": 1,
+      "final-acceptance": 1,
+      "independent-review": 4,
+      "integration-testing": 4,
+      "live-provider-integration": 2,
+      "persistence-implementation": 3,
+      "ui-implementation": 6
+    },
+    "makespanMinutes": {
+      "A-role-lanes": 400,
+      "B-single-lead": 700,
+      "C-role-lanes-two-ui": 340
+    }
+  },
+  "tasks": [
+    {
+      "id": "T12",
+      "title": "Invariant inventory and invariant tests first: requirements-compiled/v4/invariants.json, save-state and conflict machines (state-machines.json)",
+      "workstream": "application-implementation",
+      "lane": "lead",
+      "step": 1,
+      "kind": "implementation",
+      "dependsOn": [],
+      "preflightPrerequisites": [
+        "T08",
+        "T10"
+      ],
+      "conditionalOn": null,
+      "excludedBy": null,
+      "ciRun": false,
+      "requirementsCovered": 8,
+      "p0RequirementsCovered": 4,
+      "defectClassTests": [
+        "DCT-001-A",
+        "DCT-001-B",
+        "DCT-002-A",
+        "DCT-002-B",
+        "DCT-003-A"
+      ],
+      "contracts": [],
+      "gates": [
+        "G3",
+        "G7"
+      ],
+      "completion": [
+        "each invariant in requirements-compiled/v4/invariants.json bound to this task has its named property, model or negative test written and failing first",
+        "each mutation check named in invariants.json demonstrably fails on its injected defect (AR-022, DCC-005)",
+        "the domain defect-class tests DCT-001..DCT-003 are written from their stated invariants, not from earlier rehearsal code (PERSIST-026)"
+      ],
+      "estimateMinutes": 25,
+      "minutes": {
+        "A-role-lanes": {
+          "lane": "domain",
+          "start": 0,
+          "finish": 25
+        },
+        "B-single-lead": {
+          "lane": "lead",
+          "start": 0,
+          "finish": 25
+        },
+        "C-role-lanes-two-ui": {
+          "lane": "domain",
+          "start": 0,
+          "finish": 25
+        }
+      }
+    },
+    {
+      "id": "T13",
+      "title": "F# semantic kernel and policy/capabilities",
+      "workstream": "application-implementation",
+      "lane": "lead",
+      "step": 2,
+      "kind": "implementation",
+      "dependsOn": [
+        "T12"
+      ],
+      "preflightPrerequisites": [],
+      "conditionalOn": null,
+      "excludedBy": null,
+      "ciRun": false,
+      "requirementsCovered": 60,
+      "p0RequirementsCovered": 1,
+      "defectClassTests": [],
+      "contracts": [
+        "CT-001",
+        "CT-003",
+        "CT-018"
+      ],
+      "gates": [
+        "G3"
+      ],
+      "completion": [
+        "decide/evolve for the lifecycle tables; illegal-transition and forged-history variants rejected (G3)",
+        "capabilities derived in F# with reasons for blocked actions"
+      ],
+      "estimateMinutes": 45,
+      "minutes": {
+        "A-role-lanes": {
+          "lane": "domain",
+          "start": 25,
+          "finish": 70
+        },
+        "B-single-lead": {
+          "lane": "lead",
+          "start": 25,
+          "finish": 70
+        },
+        "C-role-lanes-two-ui": {
+          "lane": "domain",
+          "start": 25,
+          "finish": 70
+        }
+      }
+    },
+    {
+      "id": "T11",
+      "title": "Stack lock and compatibility gate",
+      "workstream": "integration-testing",
+      "lane": "lead",
+      "step": 3,
+      "kind": "verification",
+      "dependsOn": [],
+      "preflightPrerequisites": [
+        "T10"
+      ],
+      "conditionalOn": null,
+      "excludedBy": null,
+      "ciRun": true,
+      "requirementsCovered": 13,
+      "p0RequirementsCovered": 4,
+      "defectClassTests": [],
+      "contracts": [
+        "CT-016",
+        "CT-009",
+        "CT-010",
+        "CT-011",
+        "CT-014"
+      ],
+      "gates": [
+        "G1"
+      ],
+      "completion": [
+        "CI fails when installed versions differ from the lock (VER-008)",
+        "Limen startup, Forma render, Folio print and frozen golden replay smoke pass on the locked set (DEP-CURRENT-004)"
+      ],
+      "estimateMinutes": 15,
+      "minutes": {
+        "A-role-lanes": {
+          "lane": "integration",
+          "start": 0,
+          "finish": 15
+        },
+        "B-single-lead": {
+          "lane": "lead",
+          "start": 115,
+          "finish": 130
+        },
+        "C-role-lanes-two-ui": {
+          "lane": "integration",
+          "start": 0,
+          "finish": 15
+        }
+      }
+    },
+    {
+      "id": "T14",
+      "title": "Interface freeze: versioned manifest for boundaries A-E",
+      "workstream": "application-implementation",
+      "lane": "lead",
+      "step": 4,
+      "kind": "implementation",
+      "dependsOn": [
+        "T13"
+      ],
+      "preflightPrerequisites": [
+        "T00"
+      ],
+      "conditionalOn": null,
+      "excludedBy": null,
+      "ciRun": false,
+      "requirementsCovered": 16,
+      "p0RequirementsCovered": 0,
+      "defectClassTests": [],
+      "contracts": [
+        "CT-001",
+        "CT-002",
+        "CT-003",
+        "CT-004",
+        "CT-005",
+        "CT-018"
+      ],
+      "gates": [
+        "G2"
+      ],
+      "completion": [
+        "one manifest with types, request/response examples, error variants and contract tests; its SHA recorded in the ledger",
+        "mandatory negative cases implemented as tests"
+      ],
+      "estimateMinutes": 20,
+      "minutes": {
+        "A-role-lanes": {
+          "lane": "domain",
+          "start": 70,
+          "finish": 90
+        },
+        "B-single-lead": {
+          "lane": "lead",
+          "start": 130,
+          "finish": 150
+        },
+        "C-role-lanes-two-ui": {
+          "lane": "domain",
+          "start": 70,
+          "finish": 90
+        }
+      }
+    },
+    {
+      "id": "T18",
+      "title": "Provider conformance first: probe real GitHub (stale head, moved-head FORBIDDEN form, secondary rate limit, lost answer) and build the stateful fake from what it answers",
+      "workstream": "live-provider-integration",
+      "lane": "lead",
+      "step": 5,
+      "kind": "implementation",
+      "dependsOn": [],
+      "preflightPrerequisites": [
+        "T05",
+        "T04",
+        "T08",
+        "T10"
+      ],
+      "conditionalOn": null,
+      "excludedBy": null,
+      "ciRun": false,
+      "requirementsCovered": 28,
+      "p0RequirementsCovered": 23,
+      "defectClassTests": [
+        "DCT-004-A",
+        "DCT-005-A"
+      ],
+      "contracts": [
+        "CT-007",
+        "CT-017",
+        "CT-004"
+      ],
+      "gates": [
+        "G6"
+      ],
+      "completion": [
+        "live probe of three simultaneous commits recorded: every refusal GitHub returns (STALE_DATA and the FORBIDDEN 'is at <oid> but expected <oid>' form) is captured (INV-22, R7L-10)",
+        "recorded responses include a stale head, a secondary rate limit if observed, 401, 403 permission, 422 validation, cache headers on mutable reads, and compare pagination beyond 250 commits (R7L-09, R7L-19)",
+        "the stateful fake enforces expectedHeadOid, real ancestry and lost answers before and after applying, and is built only from these recordings (PERSIST-025, PF-013)"
+      ],
+      "estimateMinutes": 45,
+      "minutes": {
+        "A-role-lanes": {
+          "lane": "persistence",
+          "start": 0,
+          "finish": 45
+        },
+        "B-single-lead": {
+          "lane": "lead",
+          "start": 70,
+          "finish": 115
+        },
+        "C-role-lanes-two-ui": {
+          "lane": "persistence",
+          "start": 0,
+          "finish": 45
+        }
+      }
+    },
+    {
+      "id": "T35",
+      "title": "Independent review checkpoint 1: interfaces and invariants (DCC-002, target T+90..120)",
+      "workstream": "independent-review",
+      "lane": "reviewer",
+      "step": 5,
+      "kind": "verification",
+      "dependsOn": [
+        "T14"
+      ],
+      "preflightPrerequisites": [],
+      "conditionalOn": null,
+      "excludedBy": null,
+      "ciRun": true,
+      "requirementsCovered": 1,
+      "p0RequirementsCovered": 0,
+      "defectClassTests": [],
+      "contracts": [],
+      "gates": [
+        "G7"
+      ],
+      "completion": [
+        "a fresh reviewer, given code and requirements but not the implementer's conclusions, records findings by defect class with reproductions (DCC-003)",
+        "every critical finding has an owner and is fixed or decided before the next checkpoint"
+      ],
+      "estimateMinutes": 15,
+      "minutes": {
+        "A-role-lanes": {
+          "lane": "reviewer",
+          "start": 90,
+          "finish": 105
+        },
+        "B-single-lead": {
+          "lane": "reviewer",
+          "start": 150,
+          "finish": 165
+        },
+        "C-role-lanes-two-ui": {
+          "lane": "reviewer",
+          "start": 90,
+          "finish": 105
+        }
+      }
+    },
+    {
+      "id": "T16",
+      "title": "Application shell, loading experience, routes and visual identity",
+      "workstream": "ui-implementation",
+      "lane": "lead",
+      "step": 6,
+      "kind": "implementation",
+      "dependsOn": [
+        "T11"
+      ],
+      "preflightPrerequisites": [
+        "T08"
+      ],
+      "conditionalOn": null,
+      "excludedBy": null,
+      "ciRun": false,
+      "requirementsCovered": 24,
+      "p0RequirementsCovered": 5,
+      "defectClassTests": [
+        "DCT-006-A",
+        "DCT-INPUT-A"
+      ],
+      "contracts": [
+        "CT-009",
+        "CT-010"
+      ],
+      "gates": [
+        "G5"
+      ],
+      "completion": [
+        "HTML/CSS shell before WASM; transport failure shows a recoverable error; retry works after a 503 (WASM-LOAD)",
+        "AR-029 start smoke passes on every primary route in Chromium and WebKit"
+      ],
+      "estimateMinutes": 35,
+      "minutes": {
+        "A-role-lanes": {
+          "lane": "ui",
+          "start": 15,
+          "finish": 50
+        },
+        "B-single-lead": {
+          "lane": "lead",
+          "start": 150,
+          "finish": 185
+        },
+        "C-role-lanes-two-ui": {
+          "lane": "ui",
+          "start": 15,
+          "finish": 50
+        }
+      }
+    },
+    {
+      "id": "T19",
+      "title": "Session-memory save-state machine and save process: one commit per save, read-back confirmation, rebase, conflict, reconciliation, bounds (ADR-R7-001)",
+      "workstream": "persistence-implementation",
+      "lane": "lead",
+      "step": 7,
+      "kind": "implementation",
+      "dependsOn": [
+        "T14",
+        "T18"
+      ],
+      "preflightPrerequisites": [],
+      "conditionalOn": null,
+      "excludedBy": null,
+      "ciRun": false,
+      "requirementsCovered": 25,
+      "p0RequirementsCovered": 22,
+      "defectClassTests": [],
+      "contracts": [
+        "CT-004",
+        "CT-018"
+      ],
+      "gates": [
+        "G6"
+      ],
+      "completion": [
+        "PAT-12 (PERSIST-051) passes: every state and input enumerated, Saved reachable only from a read-back confirmation, illegal inputs fail closed",
+        "PAT-03, PAT-04, PAT-05, PAT-06 and PAT-08 pass against the stateful fake",
+        "Every invariant in requirements-compiled/v4/invariants.json bound to this task has its named test passing"
+      ],
+      "estimateMinutes": 60,
+      "minutes": {
+        "A-role-lanes": {
+          "lane": "persistence",
+          "start": 90,
+          "finish": 150
+        },
+        "B-single-lead": {
+          "lane": "lead",
+          "start": 185,
+          "finish": 245
+        },
+        "C-role-lanes-two-ui": {
+          "lane": "persistence",
+          "start": 90,
+          "finish": 150
+        }
+      }
+    },
+    {
+      "id": "T15",
+      "title": "Frozen fixture replay against the storage contract",
+      "workstream": "application-implementation",
+      "lane": "lead",
+      "step": 8,
+      "kind": "implementation",
+      "dependsOn": [
+        "T13"
+      ],
+      "preflightPrerequisites": [],
+      "conditionalOn": null,
+      "excludedBy": null,
+      "ciRun": false,
+      "requirementsCovered": 19,
+      "p0RequirementsCovered": 1,
+      "defectClassTests": [],
+      "contracts": [
+        "CT-006",
+        "CT-003"
+      ],
+      "gates": [
+        "G4"
+      ],
+      "completion": [
+        "three identities match (STORAGE-007)",
+        "five golden scenarios reproduce expected projections; 90 negative fixtures refused",
+        "seed hashes unchanged after the run"
+      ],
+      "estimateMinutes": 20,
+      "minutes": {
+        "A-role-lanes": {
+          "lane": "domain",
+          "start": 90,
+          "finish": 110
+        },
+        "B-single-lead": {
+          "lane": "lead",
+          "start": 370,
+          "finish": 390
+        },
+        "C-role-lanes-two-ui": {
+          "lane": "domain",
+          "start": 90,
+          "finish": 110
+        }
+      }
+    },
+    {
+      "id": "T17",
+      "title": "Integration checkpoint 1: a legal command end to end in the browser",
+      "workstream": "integration-testing",
+      "lane": "lead",
+      "step": 9,
+      "kind": "integration-checkpoint",
+      "dependsOn": [
+        "T14",
+        "T16"
+      ],
+      "preflightPrerequisites": [],
+      "conditionalOn": null,
+      "excludedBy": null,
+      "ciRun": true,
+      "requirementsCovered": 2,
+      "p0RequirementsCovered": 0,
+      "defectClassTests": [],
+      "contracts": [
+        "CT-001",
+        "CT-002",
+        "CT-009"
+      ],
+      "gates": [
+        "G2",
+        "G5"
+      ],
+      "completion": [
+        "a typed command crosses Limen, returns events or a typed fault, and every dependent view refreshes from one projection version (ADRP-004)",
+        "runs in WebKit in CI"
+      ],
+      "estimateMinutes": 15,
+      "minutes": {
+        "A-role-lanes": {
+          "lane": "integration",
+          "start": 90,
+          "finish": 105
+        },
+        "B-single-lead": {
+          "lane": "lead",
+          "start": 245,
+          "finish": 260
+        },
+        "C-role-lanes-two-ui": {
+          "lane": "integration",
+          "start": 90,
+          "finish": 105
+        }
+      }
+    },
+    {
+      "id": "T20",
+      "title": "Connect flow and GitHub provider: read, create, write, conflict",
+      "workstream": "persistence-implementation",
+      "lane": "lead",
+      "step": 10,
+      "kind": "implementation",
+      "dependsOn": [
+        "T18",
+        "T19"
+      ],
+      "preflightPrerequisites": [
+        "T00"
+      ],
+      "conditionalOn": null,
+      "excludedBy": null,
+      "ciRun": false,
+      "requirementsCovered": 27,
+      "p0RequirementsCovered": 13,
+      "defectClassTests": [],
+      "contracts": [
+        "CT-004",
+        "CT-006",
+        "CT-007",
+        "CT-017"
+      ],
+      "gates": [
+        "G6"
+      ],
+      "completion": [
+        "no mutation on connect or read; explicit create; no overwrite of unread history (EXT-DATA-006)",
+        "eight connection states distinguished (EXT-DATA-007)",
+        "credentials never leave memory or the Authorization header"
+      ],
+      "estimateMinutes": 40,
+      "minutes": {
+        "A-role-lanes": {
+          "lane": "persistence",
+          "start": 150,
+          "finish": 190
+        },
+        "B-single-lead": {
+          "lane": "lead",
+          "start": 330,
+          "finish": 370
+        },
+        "C-role-lanes-two-ui": {
+          "lane": "persistence",
+          "start": 150,
+          "finish": 190
+        }
+      }
+    },
+    {
+      "id": "T21",
+      "title": "Integration checkpoint 2: live write path against the real test repository",
+      "workstream": "live-provider-integration",
+      "lane": "lead",
+      "step": 11,
+      "kind": "integration-checkpoint",
+      "dependsOn": [
+        "T20",
+        "T17"
+      ],
+      "preflightPrerequisites": [],
+      "conditionalOn": null,
+      "excludedBy": null,
+      "ciRun": true,
+      "requirementsCovered": 10,
+      "p0RequirementsCovered": 10,
+      "defectClassTests": [
+        "DCT-LIVE-A"
+      ],
+      "contracts": [
+        "CT-007",
+        "CT-004",
+        "CT-017"
+      ],
+      "gates": [
+        "G6"
+      ],
+      "completion": [
+        "PAT-02, PAT-03, PAT-04 and PAT-10 pass live against the test repository on their own CI-run branch, with the real commits named in the evidence (PERSIST-025)",
+        "first verified live save and first verified conflict times recorded relative to T0"
+      ],
+      "estimateMinutes": 25,
+      "minutes": {
+        "A-role-lanes": {
+          "lane": "integration",
+          "start": 190,
+          "finish": 215
+        },
+        "B-single-lead": {
+          "lane": "lead",
+          "start": 390,
+          "finish": 415
+        },
+        "C-role-lanes-two-ui": {
+          "lane": "integration",
+          "start": 190,
+          "finish": 215
+        }
+      }
+    },
+    {
+      "id": "T22",
+      "title": "Investigation workspace views",
+      "workstream": "ui-implementation",
+      "lane": "lead",
+      "step": 12,
+      "kind": "implementation",
+      "dependsOn": [
+        "T17"
+      ],
+      "preflightPrerequisites": [],
+      "conditionalOn": null,
+      "excludedBy": null,
+      "ciRun": false,
+      "requirementsCovered": 83,
+      "p0RequirementsCovered": 34,
+      "defectClassTests": [],
+      "contracts": [
+        "CT-002",
+        "CT-010",
+        "CT-012"
+      ],
+      "gates": [
+        "G5"
+      ],
+      "completion": [
+        "each implemented screen satisfies its Percepta contract at the deployed SHA",
+        "unimplemented P1/experimental screens recorded as NOT_RUN, not passed (ADRP-002)"
+      ],
+      "estimateMinutes": 70,
+      "minutes": {
+        "A-role-lanes": {
+          "lane": "ui",
+          "start": 105,
+          "finish": 175
+        },
+        "B-single-lead": {
+          "lane": "lead",
+          "start": 260,
+          "finish": 330
+        },
+        "C-role-lanes-two-ui": {
+          "lane": "ui",
+          "start": 105,
+          "finish": 175
+        }
+      }
+    },
+    {
+      "id": "T36",
+      "title": "Independent review checkpoint 2: live write path and conflict handling",
+      "workstream": "independent-review",
+      "lane": "reviewer",
+      "step": 12,
+      "kind": "verification",
+      "dependsOn": [
+        "T21"
+      ],
+      "preflightPrerequisites": [],
+      "conditionalOn": null,
+      "excludedBy": null,
+      "ciRun": true,
+      "requirementsCovered": 1,
+      "p0RequirementsCovered": 1,
+      "defectClassTests": [],
+      "contracts": [],
+      "gates": [
+        "G7"
+      ],
+      "completion": [
+        "a fresh reviewer, given code and requirements but not the implementer's conclusions, records findings by defect class with reproductions (DCC-003)",
+        "every critical finding has an owner and is fixed or decided before the next checkpoint"
+      ],
+      "estimateMinutes": 15,
+      "minutes": {
+        "A-role-lanes": {
+          "lane": "reviewer",
+          "start": 235,
+          "finish": 250
+        },
+        "B-single-lead": {
+          "lane": "reviewer",
+          "start": 415,
+          "finish": 430
+        },
+        "C-role-lanes-two-ui": {
+          "lane": "reviewer",
+          "start": 235,
+          "finish": 250
+        }
+      }
+    },
+    {
+      "id": "T24",
+      "title": "Discover the workflow layout engine and existing capabilities",
+      "workstream": "integration-testing",
+      "lane": "lead",
+      "step": 13,
+      "kind": "implementation",
+      "dependsOn": [
+        "T11"
+      ],
+      "preflightPrerequisites": [],
+      "conditionalOn": null,
+      "excludedBy": null,
+      "ciRun": false,
+      "requirementsCovered": 4,
+      "p0RequirementsCovered": 3,
+      "defectClassTests": [],
+      "contracts": [],
+      "gates": [
+        "G1"
+      ],
+      "completion": [
+        "owner repository, package, API, version and license recorded with a working example (WDL-001), or an owner decision on WDL scope"
+      ],
+      "estimateMinutes": 10,
+      "minutes": {
+        "A-role-lanes": {
+          "lane": "integration",
+          "start": 15,
+          "finish": 25
+        },
+        "B-single-lead": {
+          "lane": "lead",
+          "start": 460,
+          "finish": 470
+        },
+        "C-role-lanes-two-ui": {
+          "lane": "integration",
+          "start": 15,
+          "finish": 25
+        }
+      }
+    },
+    {
+      "id": "T25",
+      "title": "Load the active historical catalog after Connect",
+      "workstream": "persistence-implementation",
+      "lane": "lead",
+      "step": 14,
+      "kind": "implementation",
+      "dependsOn": [
+        "T20",
+        "T15"
+      ],
+      "preflightPrerequisites": [],
+      "conditionalOn": null,
+      "excludedBy": null,
+      "ciRun": false,
+      "requirementsCovered": 7,
+      "p0RequirementsCovered": 1,
+      "defectClassTests": [],
+      "contracts": [
+        "CT-008",
+        "CT-006"
+      ],
+      "gates": [
+        "G4",
+        "G6"
+      ],
+      "completion": [
+        "three cases load from kemiller2002/causa-data workspace historical-v1 and replay to the manifest's expectedStateSha256",
+        "historical_catalog.py verify --app passes (no bundling)"
+      ],
+      "estimateMinutes": 20,
+      "minutes": {
+        "A-role-lanes": {
+          "lane": "persistence",
+          "start": 190,
+          "finish": 210
+        },
+        "B-single-lead": {
+          "lane": "lead",
+          "start": 470,
+          "finish": 490
+        },
+        "C-role-lanes-two-ui": {
+          "lane": "persistence",
+          "start": 190,
+          "finish": 210
+        }
+      }
+    },
+    {
+      "id": "T23",
+      "title": "Causal graph with the existing workflow layout engine",
+      "workstream": "ui-implementation",
+      "lane": "lead",
+      "step": 15,
+      "kind": "implementation",
+      "dependsOn": [
+        "T24",
+        "T17"
+      ],
+      "preflightPrerequisites": [],
+      "conditionalOn": null,
+      "excludedBy": null,
+      "ciRun": false,
+      "requirementsCovered": 21,
+      "p0RequirementsCovered": 14,
+      "defectClassTests": [],
+      "contracts": [
+        "CT-002"
+      ],
+      "gates": [
+        "G5"
+      ],
+      "completion": [
+        "deterministic layout seeded by stable ids with a textual alternative (ADRP-007)",
+        "no duplicate layout engine (WDL-002)"
+      ],
+      "estimateMinutes": 30,
+      "minutes": {
+        "A-role-lanes": {
+          "lane": "ui",
+          "start": 220,
+          "finish": 250
+        },
+        "B-single-lead": {
+          "lane": "lead",
+          "start": 490,
+          "finish": 520
+        },
+        "C-role-lanes-two-ui": {
+          "lane": "ui-2",
+          "start": 105,
+          "finish": 135
+        }
+      }
+    },
+    {
+      "id": "T30",
+      "title": "Independent architecture and invariant review before the first release candidate",
+      "workstream": "independent-review",
+      "lane": "reviewer",
+      "step": 15,
+      "kind": "verification",
+      "dependsOn": [
+        "T21",
+        "T22",
+        "T25"
+      ],
+      "preflightPrerequisites": [],
+      "conditionalOn": null,
+      "excludedBy": null,
+      "ciRun": true,
+      "requirementsCovered": 73,
+      "p0RequirementsCovered": 1,
+      "defectClassTests": [],
+      "contracts": [],
+      "gates": [
+        "G7"
+      ],
+      "completion": [
+        "a fresh reviewer receives code, requirements and constraints only, never the implementer's conclusions (AR-008)",
+        "findings are classified by defect class with a reproduction (DCC-003); fixes are reviewed again by a reviewer who did not see their rationale (R7L-13)"
+      ],
+      "estimateMinutes": 20,
+      "minutes": {
+        "A-role-lanes": {
+          "lane": "reviewer",
+          "start": 215,
+          "finish": 235
+        },
+        "B-single-lead": {
+          "lane": "reviewer",
+          "start": 490,
+          "finish": 510
+        },
+        "C-role-lanes-two-ui": {
+          "lane": "reviewer",
+          "start": 215,
+          "finish": 235
+        }
+      }
+    },
+    {
+      "id": "T26",
+      "title": "Report preview and Folio export",
+      "workstream": "ui-implementation",
+      "lane": "lead",
+      "step": 16,
+      "kind": "implementation",
+      "dependsOn": [
+        "T17"
+      ],
+      "preflightPrerequisites": [],
+      "conditionalOn": null,
+      "excludedBy": null,
+      "ciRun": false,
+      "requirementsCovered": 4,
+      "p0RequirementsCovered": 0,
+      "defectClassTests": [],
+      "contracts": [
+        "CT-005",
+        "CT-011"
+      ],
+      "gates": [
+        "G8"
+      ],
+      "completion": [
+        "incomplete investigations render as incomplete (R12.3)",
+        "print output verified at the deployed SHA"
+      ],
+      "estimateMinutes": 25,
+      "minutes": {
+        "A-role-lanes": {
+          "lane": "ui",
+          "start": 250,
+          "finish": 275
+        },
+        "B-single-lead": {
+          "lane": "lead",
+          "start": 550,
+          "finish": 575
+        },
+        "C-role-lanes-two-ui": {
+          "lane": "ui-2",
+          "start": 135,
+          "finish": 160
+        }
+      }
+    },
+    {
+      "id": "T27",
+      "title": "Prompt/data boundaries (R11.4) and the structured AI proposal loop, whose event scope DEC-022 left open",
+      "workstream": "application-implementation",
+      "lane": "lead",
+      "step": 17,
+      "kind": "implementation",
+      "dependsOn": [
+        "T13"
+      ],
+      "preflightPrerequisites": [
+        "T00"
+      ],
+      "conditionalOn": "DEC-022",
+      "excludedBy": null,
+      "ciRun": false,
+      "requirementsCovered": 3,
+      "p0RequirementsCovered": 0,
+      "defectClassTests": [],
+      "contracts": [
+        "CT-001"
+      ],
+      "gates": [
+        "G3"
+      ],
+      "completion": [
+        "proposals enter as proposals; external evidence cannot redefine instructions (R11.4)",
+        "or an owner-approved exclusion"
+      ],
+      "estimateMinutes": 30,
+      "minutes": {
+        "A-role-lanes": {
+          "lane": "domain",
+          "start": 110,
+          "finish": 140
+        },
+        "B-single-lead": {
+          "lane": "lead",
+          "start": 520,
+          "finish": 550
+        },
+        "C-role-lanes-two-ui": {
+          "lane": "domain",
+          "start": 110,
+          "finish": 140
+        }
+      }
+    },
+    {
+      "id": "T28",
+      "title": "History, time travel and semantic diff (S14, S15; in scope by DEC-R7-005)",
+      "workstream": "ui-implementation",
+      "lane": "lead",
+      "step": 18,
+      "kind": "implementation",
+      "dependsOn": [
+        "T22"
+      ],
+      "preflightPrerequisites": [],
+      "conditionalOn": null,
+      "excludedBy": null,
+      "ciRun": false,
+      "requirementsCovered": 3,
+      "p0RequirementsCovered": 0,
+      "defectClassTests": [],
+      "contracts": [
+        "CT-002"
+      ],
+      "gates": [
+        "G5"
+      ],
+      "completion": [
+        "history renders from canonical sequence, never wall-clock alone (ADRP-007)",
+        "or an owner-approved exclusion"
+      ],
+      "estimateMinutes": 45,
+      "minutes": {
+        "A-role-lanes": {
+          "lane": "ui",
+          "start": 175,
+          "finish": 220
+        },
+        "B-single-lead": {
+          "lane": "lead",
+          "start": 415,
+          "finish": 460
+        },
+        "C-role-lanes-two-ui": {
+          "lane": "ui-2",
+          "start": 180,
+          "finish": 225
+        }
+      }
+    },
+    {
+      "id": "T29",
+      "title": "Administration and Settings pages with actual loaded versions",
+      "workstream": "ui-implementation",
+      "lane": "lead",
+      "step": 19,
+      "kind": "implementation",
+      "dependsOn": [
+        "T11",
+        "T17"
+      ],
+      "preflightPrerequisites": [],
+      "conditionalOn": null,
+      "excludedBy": null,
+      "ciRun": false,
+      "requirementsCovered": 3,
+      "p0RequirementsCovered": 3,
+      "defectClassTests": [],
+      "contracts": [
+        "CT-016"
+      ],
+      "gates": [
+        "G5"
+      ],
+      "completion": [
+        "versions shown only in Administration and equal to loaded components (VER-007)"
+      ],
+      "estimateMinutes": 20,
+      "minutes": {
+        "A-role-lanes": {
+          "lane": "ui",
+          "start": 275,
+          "finish": 295
+        },
+        "B-single-lead": {
+          "lane": "lead",
+          "start": 575,
+          "finish": 595
+        },
+        "C-role-lanes-two-ui": {
+          "lane": "ui-2",
+          "start": 160,
+          "finish": 180
+        }
+      }
+    },
+    {
+      "id": "T31",
+      "title": "Release candidate: full applicable matrix at the deployed SHA",
+      "workstream": "integration-testing",
+      "lane": "lead",
+      "step": 20,
+      "kind": "integration-checkpoint",
+      "dependsOn": [
+        "T30",
+        "T23",
+        "T26",
+        "T27",
+        "T28",
+        "T29"
+      ],
+      "preflightPrerequisites": [],
+      "conditionalOn": null,
+      "excludedBy": null,
+      "ciRun": true,
+      "requirementsCovered": 16,
+      "p0RequirementsCovered": 11,
+      "defectClassTests": [],
+      "contracts": [
+        "CT-012",
+        "CT-010",
+        "CT-011"
+      ],
+      "gates": [
+        "G5",
+        "G8",
+        "G9"
+      ],
+      "completion": [
+        "browser, accessibility, integration, security and report suites pass on the deployed exact SHA",
+        "Percepta evidence from the registered release"
+      ],
+      "estimateMinutes": 45,
+      "minutes": {
+        "A-role-lanes": {
+          "lane": "integration",
+          "start": 295,
+          "finish": 340
+        },
+        "B-single-lead": {
+          "lane": "lead",
+          "start": 595,
+          "finish": 640
+        },
+        "C-role-lanes-two-ui": {
+          "lane": "integration",
+          "start": 235,
+          "finish": 280
+        }
+      }
+    },
+    {
+      "id": "T32",
+      "title": "Defect-class closure",
+      "workstream": "defect-correction",
+      "lane": "lead",
+      "step": 21,
+      "kind": "verification",
+      "dependsOn": [
+        "T31"
+      ],
+      "preflightPrerequisites": [],
+      "conditionalOn": null,
+      "excludedBy": null,
+      "ciRun": true,
+      "requirementsCovered": 8,
+      "p0RequirementsCovered": 0,
+      "defectClassTests": [],
+      "contracts": [
+        "CT-014"
+      ],
+      "gates": [
+        "G7"
+      ],
+      "completion": [
+        "original reproduction, adversarial variants, invariant enforcement and SHA-bound proof per class (DCC-005)"
+      ],
+      "estimateMinutes": 20,
+      "minutes": {
+        "A-role-lanes": {
+          "lane": "integration",
+          "start": 340,
+          "finish": 360
+        },
+        "B-single-lead": {
+          "lane": "lead",
+          "start": 640,
+          "finish": 660
+        },
+        "C-role-lanes-two-ui": {
+          "lane": "integration",
+          "start": 280,
+          "finish": 300
+        }
+      }
+    },
+    {
+      "id": "T33",
+      "title": "Fresh reviewer before the final verdict",
+      "workstream": "independent-review",
+      "lane": "reviewer",
+      "step": 22,
+      "kind": "verification",
+      "dependsOn": [
+        "T32"
+      ],
+      "preflightPrerequisites": [],
+      "conditionalOn": null,
+      "excludedBy": null,
+      "ciRun": true,
+      "requirementsCovered": 1,
+      "p0RequirementsCovered": 1,
+      "defectClassTests": [],
+      "contracts": [],
+      "gates": [
+        "G7"
+      ],
+      "completion": [
+        "no open critical defect class (release acceptance predicate)"
+      ],
+      "estimateMinutes": 20,
+      "minutes": {
+        "A-role-lanes": {
+          "lane": "reviewer",
+          "start": 360,
+          "finish": 380
+        },
+        "B-single-lead": {
+          "lane": "reviewer",
+          "start": 660,
+          "finish": 680
+        },
+        "C-role-lanes-two-ui": {
+          "lane": "reviewer",
+          "start": 300,
+          "finish": 320
+        }
+      }
+    },
+    {
+      "id": "T34",
+      "title": "Acceptance: preservation gate re-run, ledger, computed verdict, measurements",
+      "workstream": "final-acceptance",
+      "lane": "lead",
+      "step": 23,
+      "kind": "verification",
+      "dependsOn": [
+        "T33"
+      ],
+      "preflightPrerequisites": [
+        "T08"
+      ],
+      "conditionalOn": null,
+      "excludedBy": null,
+      "ciRun": true,
+      "requirementsCovered": 122,
+      "p0RequirementsCovered": 33,
+      "defectClassTests": [],
+      "contracts": [
+        "CT-013",
+        "CT-015",
+        "CT-014"
+      ],
+      "gates": [
+        "G0",
+        "G9",
+        "G10"
+      ],
+      "completion": [
+        "preservation gate exit 0 at acceptance with evidence committed",
+        "ledger in causa.acceptance-ledger/2 with every PASS evidence path in a causa.acceptance-evidence-manifest/1 bundle",
+        "compute-acceptance-verdict.py run with the pinned baseline and SHA-256, approvals file and SHA-256, trusted operator ids and evidence manifest SHA-256; its verdict is the report's only verdict line",
+        "event measurements recorded (timed-execution-manifest measurements); unavailable values recorded as unavailable"
+      ],
+      "estimateMinutes": 20,
+      "minutes": {
+        "A-role-lanes": {
+          "lane": "integration",
+          "start": 380,
+          "finish": 400
+        },
+        "B-single-lead": {
+          "lane": "lead",
+          "start": 680,
+          "finish": 700
+        },
+        "C-role-lanes-two-ui": {
+          "lane": "integration",
+          "start": 320,
+          "finish": 340
+        }
+      }
+    }
+  ]
+}

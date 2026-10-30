@@ -1,0 +1,9 @@
+{
+  "schema": "indy-init.v4-amendments/1",
+  "description": "Requirement changes made in the v4 source cut (commit 62df28a), each with the owner decision that authorizes it. Checked by W01: a change between the R7 and v4 baselines that is not listed here, or that cites an unrecorded decision, fails.",
+  "requirements": [
+    { "requirement": "DCC-013", "change": "added", "decisions": ["DEC-R7-008"], "reason": "R7-AMD-03 approved: conditor ci-policy check passes on the rehearsal repository at kickoff and on every candidate. Text copied verbatim from input-documents/2026-10-29-R7-REM-rehearsal-6-remediation.md." },
+    { "requirement": "DCC-014", "change": "added", "decisions": ["DEC-R7-009"], "reason": "R7-AMD-04 approved: acceptance runs verify-defect-closures, assertion-ratchet (base = kickoff) and the release-comparison record before the candidate freeze." },
+    { "requirement": "DCC-015", "change": "added", "decisions": ["DEC-R7-010"], "reason": "R7-AMD-05 approved: CI jobs running bound tests set CAUSA_PLAN; storage-like fixtures declared in a manifest the credential scan honours." }
+  ]
+}

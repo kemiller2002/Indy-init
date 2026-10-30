@@ -30,8 +30,15 @@ jobs:
           global-json-file: global.json
       - name: Build the F# requirements compiler and its tests
         run: dotnet build tools/requirements-compiler/tests -c Release
-      - name: Offline tests (baseline port reproduces the committed baseline, units, preflight verdict)
-        run: dotnet run -c Release --no-build --project tools/requirements-compiler/tests -- --offline --source .
+      - name: Check out the five Rehearsal 7 evidence files the v4 lesson analysis quotes (evidence only, never a build input)
+        run: |
+          git clone --quiet --depth 1 --filter=blob:none --no-checkout https://github.com/kemiller2002/indy-init-rehearsal-007 "$RUNNER_TEMP/r7"
+          git -C "$RUNNER_TEMP/r7" fetch --quiet --depth 1 origin 9b307aa1d3d7d5e6fe1737680d03bf74fd90c1a9
+          git -C "$RUNNER_TEMP/r7" sparse-checkout set --no-cone /evidence/FINAL-REPORT.md /evidence/provenance.md /evidence/defects.md /evidence/DECISIONS.md /evidence/traceability.json
+          git -C "$RUNNER_TEMP/r7" checkout --quiet 9b307aa1d3d7d5e6fe1737680d03bf74fd90c1a9
+          echo "CAUSA_R7_EVIDENCE=$RUNNER_TEMP/r7" >> "$GITHUB_ENV"
+      - name: Offline tests (baseline port reproduces the committed baseline, units, preflight verdict, v4 scope and controls)
+        run: dotnet run -c Release --no-build --project tools/requirements-compiler/tests -- --offline --source . --record "$RUNNER_TEMP/compiler-test-record.json"
       - name: F# and Python baseline generators agree byte for byte at this commit
         run: |
           python3 -I tools/build-requirements-baseline.py . "$GITHUB_SHA" > "$RUNNER_TEMP/py.json"
@@ -42,6 +49,15 @@ jobs:
           args="--root . --baseline requirements/causa-requirements-baseline-r7.json --previous requirements/causa-requirements-baseline-r6.json --trace docs/rehearsal-007/traceability.json"
           dotnet fsi tools/validate-r7-persistence-requirements.fsx -- $args
           dotnet fsi tools/validate-r7-persistence-requirements.fsx -- $args --self-test true
+      - name: Check out echelon-registry at the release-set commit compiled package v4 pins
+        uses: actions/checkout@v4
+        with:
+          repository: kemiller2002/echelon-registry
+          ref: 7a2c27a3db7cab4337ea47536f3e1fc22d257f03
+          path: .echelon-registry
+          persist-credentials: false
+      - name: Compiled package v4 is reproduced byte for byte and its checks W01-W16 pass
+        run: dotnet tools/requirements-compiler/src/bin/Release/net10.0/requirements-compiler.dll v4 --source . --package requirements-compiled/v4 --registry .echelon-registry --r7-evidence "$CAUSA_R7_EVIDENCE" --verify-test-record "$RUNNER_TEMP/compiler-test-record.json" --check
       - name: Check out maintained Causa Data tooling
         uses: actions/checkout@v4
         with:

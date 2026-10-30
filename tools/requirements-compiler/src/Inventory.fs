@@ -102,10 +102,10 @@ let tagsOf (r: Requirement) =
 // ---- explicit references -------------------------------------------------------
 
 let private idPattern =
-    @"(?:UI|WASM-LOAD|PF|EXT-DATA|STORAGE|DCC|ADRP|DEP-CURRENT|WDL|VER|AR|D)-\d{3}|R\d{1,2}\.\d{1,2}|S\d{2}"
+    @"(?:UI|WASM-LOAD|PF|EXT-DATA|STORAGE|DCC|ADRP|DEP-CURRENT|WDL|VER|AR|PERSIST|D)-\d{3}|R\d{1,2}\.\d{1,2}|S\d{2}"
 
 let private rangePattern =
-    Regex(@"\b((?:UI|WASM-LOAD|PF|EXT-DATA|STORAGE|DCC|ADRP|DEP-CURRENT|WDL|VER|AR)-)(\d{3})\s*(?:\.\.|–)\s*(?:\1)?(\d{3})\b")
+    Regex(@"\b((?:UI|WASM-LOAD|PF|EXT-DATA|STORAGE|DCC|ADRP|DEP-CURRENT|WDL|VER|AR|PERSIST)-)(\d{3})\s*(?:\.\.|–)\s*(?:\1)?(\d{3})\b")
 
 let private singlePattern = Regex(sprintf @"(?<![A-Za-z0-9\-])(%s)(?![0-9])" idPattern)
 

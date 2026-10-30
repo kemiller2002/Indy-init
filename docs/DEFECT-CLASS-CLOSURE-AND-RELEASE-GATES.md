@@ -41,6 +41,15 @@ Use R001 as historical baseline: first green CI T+88.3 min, accepted release T+2
 ## DCC-012: Responsibility boundaries
 Ordo defines decision/invariant boundaries; Praxis manages requirement and defect-class state; Dokimos enforces verified evidence; Percepta measures outcomes; the F# engine enforces domain policy. Preserve existing contracts and minimize framework changes.
 
+## DCC-013: CI policy on the rehearsal repository
+`conditor ci-policy check` passes on the rehearsal repository at kickoff and on every candidate (R7-AMD-03, approved by owner decision DEC-R7-008).
+
+## DCC-014: Closure, ratchet and release-comparison producers before the candidate freeze
+Acceptance runs three producers before the candidate freeze: `requirements-compiler verify-defect-closures`, `assertion-ratchet` (base = kickoff) and the preflight's `release-comparison` record (R7-AMD-04, approved by owner decision DEC-R7-009).
+
+## DCC-015: Plan identity in CI and declared storage-like fixtures
+Every CI job that runs bound tests sets `CAUSA_PLAN`. Test fixtures that look like storage records are declared in a fixture manifest, which the credential scan honours, without weakening the scan (R7-AMD-05, approved by owner decision DEC-R7-010).
+
 ## Acceptance matrix
 - Every critical invariant has an owner and proof obligation before implementation fan-out.
 - An independent architecture/invariant review occurs before the first release candidate.
