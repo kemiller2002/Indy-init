@@ -1,5 +1,6 @@
 // Runs every executable layout assertion the Forma layout contract names:
-//   positive: against each listed Forma pattern page, at each listed viewport and colour scheme; every run must pass;
+//   positive: against each listed Forma pattern page, each page composed from several patterns (composed), and each
+//   named conforming fixture (fixtures.mjs), at each listed viewport and colour scheme; every run must pass;
 //   negative: against the assertion's broken fixture (fixtures.mjs); every run must fail;
 //   Forma gaps (contract formaGaps): the unmodified pattern must still fail (so a fixed Forma release is noticed) and
 //   the pattern with the gap's remedy CSS, which may use only Forma tokens, must pass.
@@ -13,7 +14,7 @@ import { tmpdir } from 'node:os';
 import { pathToFileURL } from 'node:url';
 import { createRequire } from 'node:module';
 import { assertions } from './assertions.mjs';
-import { brokenFixtures } from './fixtures.mjs';
+import { brokenFixtures, conformingFixtures } from './fixtures.mjs';
 
 const require = createRequire(import.meta.url);
 const playwright = require('playwright');
@@ -46,17 +47,19 @@ const runsOf = rule =>
   (rule.executable || []).flatMap(x => {
     const vps = x.viewports === 'all' || !x.viewports ? contract.viewports.map(v => v.id) : x.viewports;
     const schemes = x.colorSchemes || ['light'];
-    const cell = (kind, target, body) => vps.flatMap(vp => schemes.map(scheme => ({ rule: rule.id, assertion: x.assertion, kind, target, body, vp, scheme })));
+    const one = (kind, target, body, vp) => schemes.map(scheme => ({ rule: rule.id, assertion: x.assertion, emulate: x.emulate || {}, kind, target, body, vp, scheme }));
+    const cell = (kind, target, body) => vps.flatMap(vp => one(kind, target, body, vp));
     return [
-      ...x.patterns.flatMap(p =>
+      ...(x.patterns || []).flatMap(p =>
         vps.flatMap(vp => {
           const gap = gapOf(x.assertion, p, vp);
-          const one = (kind, target, body) => schemes.map(scheme => ({ rule: rule.id, assertion: x.assertion, kind, target, body, vp, scheme }));
           return gap
-            ? [...one('gap', p, pattern(p)), ...one('positive', `${p}+remedy`, `<style>${gap.remedyCss}</style>${pattern(p)}`)]
-            : one('positive', p, pattern(p));
+            ? [...one('gap', p, pattern(p), vp), ...one('positive', `${p}+remedy`, `<style>${gap.remedyCss}</style>${pattern(p)}`, vp)]
+            : one('positive', p, pattern(p), vp);
         }),
       ),
+      ...(x.composed || []).flatMap(ps => cell('positive', ps.join('+'), ps.map(pattern).join('\n'))),
+      ...(x.fixtures || []).flatMap(f => cell('positive', `conforming:${f}`, conformingFixtures[f])),
       ...cell('negative', `broken:${x.assertion}`, brokenFixtures[x.assertion]),
     ];
   });
@@ -67,6 +70,7 @@ const execute = browser => async run => {
     viewport: { width: vp.width, height: vp.height },
     colorScheme: run.scheme,
     reducedMotion: run.assertion === 'reducedMotion' ? 'reduce' : 'no-preference',
+    forcedColors: run.emulate.forcedColors || 'none',
   });
   const tab = await context.newPage();
   try {
@@ -86,7 +90,7 @@ const execute = browser => async run => {
 const sequence = (xs, f) => xs.reduce((acc, x) => acc.then(rs => f(x).then(r => [...rs, r])), Promise.resolve([]));
 
 const main = async () => {
-  const unknown = contract.rules.flatMap(r => (r.executable || []).filter(x => !assertions[x.assertion] || !brokenFixtures[x.assertion]).map(x => `${r.id}: ${x.assertion}`));
+  const unknown = contract.rules.flatMap(r => (r.executable || []).filter(x => !assertions[x.assertion] || !brokenFixtures[x.assertion] || (x.fixtures || []).some(f => !conformingFixtures[f])).map(x => `${r.id}: ${x.assertion}`));
   if (unknown.length > 0) {
     console.error(`unknown assertions or missing fixtures: ${unknown.join(', ')}`);
     process.exit(2);

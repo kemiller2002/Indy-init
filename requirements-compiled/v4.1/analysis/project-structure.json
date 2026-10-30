@@ -1,6 +1,6 @@
 {
   "schema": "indy-init.v41-project-structure/1",
-  "description": "Project structure and file ownership for the event build, derived from the dependency direction Web/Persistence -> Application -> Domain (FSHARP-TYPE-SHAPES section 46, a reversible choice) and from the interface specifications. Each file has one primary owner. After the T14 interface freeze, only integration edits shared files and project files; every project file's Compile list is written once, complete, at T14, so no agent adds a file to a project later. Test files for bound test identities are generated from the verification plan (agent-file-ownership.json). Contract tests (one file per interface and side), state-machine tests (one file per machine, in its owner's test project) and the unit-test files named by requiredTests are generated with their owners, so every Compile list is complete at bootstrap.",
+  "description": "Project structure and file ownership for the event build, with the dependency direction App -> Persistence -> Domain: Causa.App holds the web and application layers and references Causa.Persistence, which references only Causa.Domain. This supersedes the direction of FSHARP-TYPE-SHAPES section 46 (Web/Persistence -> Application -> Domain) for Causa; Domain depends on nothing in both. Each file has one primary owner. After the T14 interface freeze, only integration edits shared files and project files; every project file's Compile list is written once, complete, at T14, so no agent adds a file to a project later. Test files for bound test identities are generated from the verification plan (agent-file-ownership.json). Contract tests (one file per interface and side), state-machine tests (one file per machine, in its owner's test project) and the unit-test files named by requiredTests are generated with their owners, so every Compile list is complete at bootstrap.",
   "roles": [
     {
       "id": "domain",
@@ -719,6 +719,15 @@
       "implements": [],
       "requiredTests": [],
       "note": "shared Playwright fixtures"
+    },
+    {
+      "path": "tests/browser/support/layout-assertions.mjs",
+      "owner": "integration",
+      "contributors": [],
+      "dependsOn": [],
+      "implements": [],
+      "requiredTests": [],
+      "note": "copy of requirements-compiled/v4.1/layout-tests/assertions.mjs written by the bootstrap (T10); the plan's browser tests for FL-01..FL-10 import it (T16, T22)"
     }
   ],
   "rules": [

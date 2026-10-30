@@ -18,12 +18,12 @@
     "Integration alone writes: every project and solution file, Directory.*.props and .targets, NuGet.config, global.json, package.json, package-lock.json, playwright.config.ts, *.runsettings, build.fsx, README.md, .github/, .echelon/, tests/fixtures/, tests/browser/support/, web/boundary.js, src/Causa.Host/, src/Causa.App/View.fs and src/Causa.App/Program.fs (check X02). web/index.html and web/causa.css are ui's (T16)."
   ],
   "counts": {
-    "files": 264,
+    "files": 265,
     "domain": 32,
     "persistence": 51,
     "ui": 70,
     "ui-2": 11,
-    "integration": 97,
+    "integration": 98,
     "coordinator": 1,
     "reviewer": 2
   },
@@ -675,6 +675,11 @@
     },
     {
       "path": "tests/browser/support/fixtures.js",
+      "owner": "integration",
+      "kind": "test-helper"
+    },
+    {
+      "path": "tests/browser/support/layout-assertions.mjs",
       "owner": "integration",
       "kind": "test-helper"
     },
@@ -1909,7 +1914,10 @@
       "project": "Causa.Contract.Tests",
       "tests": [
         "dotnet:Causa.Contract.Tests.Save.Producer.ConfirmationNotConstructibleOutside",
+        "dotnet:Causa.Contract.Tests.Save.Producer.EveryAwaitedReadIsInterpreted",
         "dotnet:Causa.Contract.Tests.Save.Producer.InterpretCoversEveryReplyEvent",
+        "dotnet:Causa.Contract.Tests.Save.Producer.ReconcileDueStaysWithinBudget",
+        "dotnet:Causa.Contract.Tests.Save.Producer.RequestIdsAreUniqueAndRecorded",
         "dotnet:Causa.Contract.Tests.Save.Producer.SupersededReplyNeverChangesState"
       ],
       "requirements": []
@@ -1971,6 +1979,7 @@
       "kind": "test",
       "project": "Causa.Contract.Tests",
       "tests": [
+        "dotnet:Causa.Contract.Tests.Wire.Producer.CredentialOnlyInAuthorizationHeader",
         "dotnet:Causa.Contract.Tests.Wire.Producer.OutcomeNamesItsRequest",
         "dotnet:Causa.Contract.Tests.Wire.Producer.RequestsCarryIdentity"
       ],

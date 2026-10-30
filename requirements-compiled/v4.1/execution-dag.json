@@ -13,7 +13,7 @@
       "T33",
       "T34"
     ],
-    "minutes": 290
+    "minutes": 300
   },
   "waivedPrecedences": [
     {
@@ -147,8 +147,8 @@
         "T13"
       ],
       "earliestStart": 65,
-      "latestStart": 125,
-      "slackMinutes": 60,
+      "latestStart": 135,
+      "slackMinutes": 70,
       "adjusted": false,
       "covers": [
         "doc:docs/FROZEN-DEMO-STORAGE-REQUIREMENTS.md",
@@ -217,8 +217,8 @@
       "v4EstimateMinutes": 45,
       "dependsOn": [],
       "earliestStart": 0,
-      "latestStart": 5,
-      "slackMinutes": 5,
+      "latestStart": 15,
+      "slackMinutes": 15,
       "adjusted": true,
       "covers": [
         "prefix:PF-",
@@ -243,8 +243,8 @@
         "T18"
       ],
       "earliestStart": 35,
-      "latestStart": 40,
-      "slackMinutes": 5,
+      "latestStart": 50,
+      "slackMinutes": 15,
       "adjusted": true,
       "covers": [
         "R10.5",
@@ -285,8 +285,8 @@
         "T19"
       ],
       "earliestStart": 95,
-      "latestStart": 100,
-      "slackMinutes": 5,
+      "latestStart": 110,
+      "slackMinutes": 15,
       "adjusted": true,
       "covers": [
         "prefix:EXT-DATA-",
@@ -315,8 +315,8 @@
         "T13"
       ],
       "earliestStart": 135,
-      "latestStart": 140,
-      "slackMinutes": 5,
+      "latestStart": 150,
+      "slackMinutes": 15,
       "adjusted": true,
       "covers": [
         "EXT-DATA-009",
@@ -335,7 +335,7 @@
       "id": "T22",
       "title": "Investigation workspace views",
       "owner": "ui",
-      "estimateMinutes": 60,
+      "estimateMinutes": 70,
       "v4EstimateMinutes": 70,
       "dependsOn": [
         "T17"
@@ -343,7 +343,7 @@
       "earliestStart": 80,
       "latestStart": 80,
       "slackMinutes": 0,
-      "adjusted": true,
+      "adjusted": false,
       "covers": [
         "doc:docs/CAUSA-UI-EXPERIENCE-REQUIREMENTS.md",
         "doc:docs/SCREEN-CONTRACTS.md",
@@ -369,8 +369,8 @@
         "T17"
       ],
       "earliestStart": 80,
-      "latestStart": 155,
-      "slackMinutes": 75,
+      "latestStart": 165,
+      "slackMinutes": 85,
       "adjusted": false,
       "covers": [
         "doc:docs/WORKFLOW-DIAGRAM-INTEGRATION-REQUIREMENTS.md",
@@ -388,8 +388,8 @@
         "T11"
       ],
       "earliestStart": 15,
-      "latestStart": 145,
-      "slackMinutes": 130,
+      "latestStart": 155,
+      "slackMinutes": 140,
       "adjusted": false,
       "covers": [
         "WDL-001",
@@ -409,8 +409,8 @@
         "T15"
       ],
       "earliestStart": 135,
-      "latestStart": 145,
-      "slackMinutes": 10,
+      "latestStart": 155,
+      "slackMinutes": 20,
       "adjusted": false,
       "covers": [
         "origin:external",
@@ -427,8 +427,8 @@
         "T17"
       ],
       "earliestStart": 80,
-      "latestStart": 160,
-      "slackMinutes": 80,
+      "latestStart": 170,
+      "slackMinutes": 90,
       "adjusted": false,
       "covers": [
         "regex:^R12\\.",
@@ -445,8 +445,8 @@
         "T13"
       ],
       "earliestStart": 65,
-      "latestStart": 155,
-      "slackMinutes": 90,
+      "latestStart": 165,
+      "slackMinutes": 100,
       "adjusted": false,
       "covers": [
         "KICKOFF-EXECUTION-PACKET\u00a7ai-tool-agent",
@@ -463,8 +463,8 @@
       "dependsOn": [
         "T22"
       ],
-      "earliestStart": 140,
-      "latestStart": 140,
+      "earliestStart": 150,
+      "latestStart": 150,
       "slackMinutes": 0,
       "adjusted": false,
       "covers": [
@@ -484,8 +484,8 @@
         "T17"
       ],
       "earliestStart": 80,
-      "latestStart": 165,
-      "slackMinutes": 85,
+      "latestStart": 175,
+      "slackMinutes": 95,
       "adjusted": false,
       "covers": [
         "UI-018",
@@ -505,8 +505,8 @@
         "T25"
       ],
       "earliestStart": 160,
-      "latestStart": 165,
-      "slackMinutes": 5,
+      "latestStart": 175,
+      "slackMinutes": 15,
       "adjusted": false,
       "covers": [
         "doc:docs/DESIGN-DECISION-BOUNDARIES.md",
@@ -528,8 +528,8 @@
         "T28",
         "T29"
       ],
-      "earliestStart": 185,
-      "latestStart": 185,
+      "earliestStart": 195,
+      "latestStart": 195,
       "slackMinutes": 0,
       "adjusted": true,
       "covers": [
@@ -560,8 +560,8 @@
       "dependsOn": [
         "T31"
       ],
-      "earliestStart": 230,
-      "latestStart": 230,
+      "earliestStart": 240,
+      "latestStart": 240,
       "slackMinutes": 0,
       "adjusted": false,
       "covers": [
@@ -584,8 +584,8 @@
       "dependsOn": [
         "T32"
       ],
-      "earliestStart": 250,
-      "latestStart": 250,
+      "earliestStart": 260,
+      "latestStart": 260,
       "slackMinutes": 0,
       "adjusted": false,
       "covers": [
@@ -601,8 +601,8 @@
       "dependsOn": [
         "T33"
       ],
-      "earliestStart": 270,
-      "latestStart": 270,
+      "earliestStart": 280,
+      "latestStart": 280,
       "slackMinutes": 0,
       "adjusted": false,
       "covers": [
@@ -630,8 +630,8 @@
         "T14"
       ],
       "earliestStart": 20,
-      "latestStart": 275,
-      "slackMinutes": 255,
+      "latestStart": 285,
+      "slackMinutes": 265,
       "adjusted": true,
       "covers": [
         "DCC-002"
@@ -647,8 +647,8 @@
         "T21"
       ],
       "earliestStart": 160,
-      "latestStart": 275,
-      "slackMinutes": 115,
+      "latestStart": 285,
+      "slackMinutes": 125,
       "adjusted": false,
       "covers": [
         "AR-034"

@@ -141,76 +141,157 @@
           "severity": "major",
           "finding": "Pre-written contracts and the kernel waivers contradict REHEARSAL-AGENT-INTERFACE-FREEZE (author at kickoff), KICKOFF-EXECUTION-PACKET §4 and HACKATHON-BOUNDARIES (confirm organizers); the owner was not asked",
           "remediation": "The owner was asked in session and stated that the organizers allow pre-kickoff scaffolding; ODR-V41-06 records it for the owner's own record and names the clauses set aside; ODR-V41-03 and the waivers cite it; the report no longer says v4.1 changes nothing but states the procedural clauses",
-          "status": "remediated, pending re-review"
+          "status": "partly fixed in round 3; completed by round-3 remediation"
         },
         {
           "id": "RV41-2-2",
           "severity": "major",
           "finding": "The frozen save machine could not run multi-request save flows; MutationSent illegal everywhere",
           "remediation": "The session records what it awaits (Awaiting: mutation answer, read-back, fresh head, file comparison, reconciliation head/pages/files); Interpret returns MachineEvent or NextRequest, so intermediate reads need no new state; X12 requires every unused event to be listed with a decision, and MutationSent goes to the owner (ODR-V41-08)",
-          "status": "remediated, pending re-review"
+          "status": "partly fixed in round 3; completed by round-3 remediation"
         },
         {
           "id": "RV41-2-3",
           "severity": "major",
           "finding": "Interface types dropped commands, refusal reasons, per-investigation load state and load failure causes",
           "remediation": "Unsaved changes and reapply carry CommandEnvelope; RefusedCommand carries the engine's reason; Model.Loads is keyed by investigation; LoadFailure distinguishes unverifiable files from provider failures",
-          "status": "remediated, pending re-review"
+          "status": "verified fixed in round 3"
         },
         {
           "id": "RV41-2-4",
           "severity": "major",
           "finding": "Test projects could not reach the stateful fake and recordings; helper order wrong; X03 ignored helpers",
           "remediation": "New Causa.TestSupport project (Recordings before StatefulFake) referenced by every test project that needs it; X03 checks helper dependencies; the bootstrap builds it",
-          "status": "remediated, pending re-review"
+          "status": "verified fixed in round 3"
         },
         {
           "id": "RV41-2-5",
           "severity": "major",
           "finding": "X02, X06, X07 and X13 still passed inputs their titles reject",
           "remediation": "X02 covers Directory.* build files, NuGet configuration, runsettings, tests/fixtures/ and tests/browser/support/; X06 rejects reason phrases as evidence, requires distinguishing evidence per class and bounds of the class's own kind; X07 rejects rgb/hsl colours, unhyphenated classes and foreign property families, and accepts a literal only if the cited document contains it; X13 requires waivers to name an existing decision request; each probe is a negative control",
-          "status": "remediated, pending re-review"
+          "status": "verified fixed in round 3"
         },
         {
           "id": "RV41-2-6",
           "severity": "minor",
           "finding": "Contract and machine test work not budgeted; transition count wrong",
           "remediation": "T14 and T16 keep v4's estimates (contract tests; SM-CONNECTION/NETWORK tests); T19 (75 transitions) and T20 (SM-LOAD) carry the machine tests; the counts are corrected",
-          "status": "remediated, pending re-review"
+          "status": "partly fixed in round 3; completed by round-3 remediation"
         },
         {
           "id": "RV41-2-7",
           "severity": "minor",
           "finding": "Only a lane-free critical path was reported",
           "remediation": "Every topology reports its binding chain; the report distinguishes the dependency critical path (290) from topology C's makespan (320)",
-          "status": "remediated, pending re-review"
+          "status": "verified fixed in round 3"
         },
         {
           "id": "RV41-2-8",
           "severity": "minor",
           "finding": "Confirmation constructible from any file in the persistence namespace",
           "remediation": "Confirmation's representation is private to its module, with a byte-comparing constructor; CI compiles a forging file and requires FS1093",
-          "status": "remediated, pending re-review"
+          "status": "verified fixed in round 3"
         },
         {
           "id": "RV41-2-9",
           "severity": "minor",
           "finding": "web/ funnelled to integration; R41-06 understated the integration test load",
           "remediation": "web/index.html and web/causa.css are ui's (T16); R41-06 states the actual split",
-          "status": "remediated, pending re-review"
+          "status": "verified fixed in round 3"
         },
         {
           "id": "RV41-2-10",
           "severity": "minor",
           "finding": "The T35 waiver reason contradicted the task",
           "remediation": "T35 depends on T12 again (invariant review kept); only T13 before T35 is waived, with a corrected reason",
-          "status": "remediated, pending re-review"
+          "status": "verified fixed in round 3"
         },
         {
           "id": "RV41-2-11",
           "severity": "minor",
           "finding": "Interface specs had no explicit operations, success or failure",
           "remediation": "Each interface lists operations with signature, success and failure; X04 requires them, checks each name is in the contract, and rejects empty concurrency or versioning rules",
+          "status": "verified fixed in round 3"
+        }
+      ]
+    },
+    {
+      "round": 3,
+      "reviewedCommit": "7e189f9",
+      "verdict": "FAIL",
+      "counts": {
+        "critical": 0,
+        "major": 3,
+        "minor": 6
+      },
+      "ownerAdjustments": {
+        "review": "not yet: findings open",
+        "typeShapeReconciliation": "partly: §46 direction note wrong (RV41-3-4)",
+        "executableLayoutTests": "partly: invariants untested, not wired (RV41-3-1)",
+        "bootstrap": "largely: .NET skeleton builds; scope overstated (RV41-3-8)"
+      },
+      "findings": [
+        {
+          "id": "RV41-3-1",
+          "severity": "major",
+          "finding": "Layout assertions tested less than the FL rules state and were not wired into the event build",
+          "remediation": "New assertions for each stated invariant: scroll regions accessible, line length, focus order, skip link first, dialog focus (open, trap, Escape, return), non-text contrast, forced colours, amber with a label, indicator composition, fault states what was preserved, navigation collapse; focusVisible requires a non-transparent ring of the focus-ring width that the blurred element lacks; textNotClipped detects vertical clipping and line-clamp; onlyFormaTokens reads document.styleSheets and style attributes. The reviewer's 12 defective pages are all detected except text over a gradient, which FL-06 assigns to the plan's axe run. The bootstrap writes the module to tests/browser/support/layout-assertions.mjs (integration). X15 requires every rule critical and executable, checks fixtures and composed patterns and the event-build copy, and has negative controls",
+          "status": "remediated, pending re-review"
+        },
+        {
+          "id": "RV41-3-2",
+          "severity": "major",
+          "finding": "IF41-SAVE could not drive automatic reconciliation reads, load reads or conflict reads; request bookkeeping unspecified",
+          "remediation": "ReconcileDue sends automatic reconciliation reads on the ScheduleReconcileRead timer (TimerKey); InterpretLoad and InterpretConflict with awaited-read state (LoadAwaiting, ReadingRemote of RequestId); RequestContext carries the tab-unique NextId (the engine advances it, at most one request per operation) and MutationInFlightElsewhere for T-S04/T-S53; operations record Outstanding; producer contract tests named for each",
+          "status": "remediated, pending re-review"
+        },
+        {
+          "id": "RV41-3-3",
+          "severity": "major",
+          "finding": "No frozen type kept the repository and credential after Connect",
+          "remediation": "IF41-WIRE ConnectionContext (repository, branch, opaque credential) kept in Model.Context and passed in RequestContext; persistence adds the Authorization header with Credential.authorization; producer test CredentialOnlyInAuthorizationHeader",
+          "status": "remediated, pending re-review"
+        },
+        {
+          "id": "RV41-3-4",
+          "severity": "minor",
+          "finding": "The §46 note asserted a dependency direction v4.1 inverts",
+          "remediation": "The note and project-structure.json state App -> Persistence -> Domain and mark §46's direction superseded; the R7 validator passes",
+          "status": "remediated, pending re-review"
+        },
+        {
+          "id": "RV41-3-5",
+          "severity": "minor",
+          "finding": "ODR-V41-06 omitted the published organizer rules",
+          "remediation": "ODR-V41-06 quotes 'the repository starts empty', 'code starts at kickoff' and 'keep competition application source code out of it', and says the T10 bootstrap makes the repository non-empty before kickoff",
+          "status": "remediated, pending re-review"
+        },
+        {
+          "id": "RV41-3-6",
+          "severity": "minor",
+          "finding": "Credential readable from any Causa.App file; Saved after a load needed a forged Confirmation",
+          "remediation": "Credential is a module type with private representation (CI negative ReadCredential.fs refused with FS1093); Saved carries SavedBasis (Confirmed of Confirmation.T, or VerifiedAt for a load or confirmed discard, subject to ODR-V4-08)",
+          "status": "remediated, pending re-review"
+        },
+        {
+          "id": "RV41-3-7",
+          "severity": "minor",
+          "finding": "X02 accepted contributors on integration files and a dropped boundary script; X04 trivial outcomes; X15 without controls; CI step name",
+          "remediation": "X02 rejects contributors on integration-exclusive files and requires the essential shared files in the manifest; X04 requires stated outcomes; X15 controls added; the step names X01-X15",
+          "status": "remediated, pending re-review"
+        },
+        {
+          "id": "RV41-3-8",
+          "severity": "minor",
+          "finding": "The bootstrap's scope was described more broadly than it is",
+          "remediation": "README, the report and AGENT-RULES state it is the .NET skeleton (plus the layout module); package references, integration's other shared files and test-framework wiring come at T10 (ODR-V41-07)",
+          "status": "remediated, pending re-review"
+        },
+        {
+          "id": "RV41-3-9",
+          "severity": "minor",
+          "finding": "T19 and T22 estimate basis",
+          "remediation": "T22 restored to 70 (dependency critical path now 300; the experimental target is reported as not met); T19's rationale states why 60 minutes holds and that it is off the critical path",
           "status": "remediated, pending re-review"
         }
       ]

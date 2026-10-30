@@ -34,13 +34,13 @@ The owner stated in session on 2026-10-30 that the organizers allow pre-kickoff 
 
 | Gap in v4 | Effect during a timed build | v4.1 answer |
 |---|---|---|
-| Interfaces described as 12 boundaries, with no types | Producers and consumers negotiate types at T14, and consumers wait for implementations | Typechecked F# contracts for 8 interfaces, each with operations, success and failure. Each state and input union equals its v4 machine (X05). The save contract models multi-request flows (`Awaiting`, `Interpretation`). A `Confirmation` cannot be built outside its module (CI forge check) |
-| No file-level ownership; project files edited by whoever adds a file | Project-file and shared-file merge conflicts | 264 files, one owner each, including every contract, state-machine and unit test file. Integration writes every project file once, at bootstrap. Shared test support (stateful fake, recordings) is its own project |
-| No generated starting point | The first hour is spent creating projects | `v41 --bootstrap` writes the empty application repository: solution, projects, references, compile lists, contracts. CI builds it from an empty directory |
+| Interfaces described as 12 boundaries, with no types | Producers and consumers negotiate types at T14, and consumers wait for implementations | Typechecked F# contracts for 8 interfaces, each with operations, success and failure. Each state and input union equals its v4 machine (X05). The contracts drive every multi-request flow:<br>• save, read-back and stale-head reads;<br>• automatic reconciliation reads (`ReconcileDue`);<br>• load reads (`InterpretLoad`) and conflict reads (`InterpretConflict`).<br>Every request carries the connection context (repository and opaque credential) and a tab-unique request id. CI refuses a forged `Confirmation` and a read of the credential's token |
+| No file-level ownership; project files edited by whoever adds a file | Project-file and shared-file merge conflicts | 265 files, one owner each, including every contract, state-machine and unit test file. Integration writes every project file once, at bootstrap. Shared test support (stateful fake, recordings) is its own project |
+| No generated starting point | The first hour is spent creating projects | `v41 --bootstrap` writes the .NET skeleton of the application repository and CI builds it from an empty directory. It covers:<br>• the solution, every project, the references and the full compile lists;<br>• the contracts in their producers' files;<br>• the layout-assertion module.<br>It does not write package references (ODR-V41-07), integration's other shared files (`package.json`, `Directory.Packages.props`, `build.fsx`, CI, `web/`) or test-framework wiring; integration adds those at T10 |
 | State machines given as transition lists | Each agent works out which pairs are illegal and how to fail | Every (state, event) pair is decided (84 legal, 270 fail closed). The 11 multi-transition pairs match reviewed guard partitions. Unused events are listed for the owner (ODR-V41-08) |
 | GitHub failure behaviour spread across PERSIST-008..016 | Errors diagnosed during the build | 15 error classes, each with:<br>• evidence that distinguishes it;<br>• a precedence rule;<br>• a typed error and a transition;<br>• UI text;<br>• a retry bound of its own kind;<br>• plan tests for its requirements |
-| Forma named, not inventoried, layout untested | Rehearsal 7 used Forma tokens that do not exist; layout bugs found by eye | The layout contract is checked against the published 0.12.0 tarball. Each critical rule (FL-01..FL-10) has executable browser assertions, which CI runs in Chromium and WebKit against Forma's own pattern pages and against broken fixtures |
-| 655 tests bound, with no run order; contract and machine tests unnamed | Setup decided ad hoc; conformance tests never written | 11 suites by environment. Each plan binding and each of the 134 contract, state-machine and unit tests is in exactly one suite, budgeted in a named task |
+| Forma named, not inventoried, layout untested | Rehearsal 7 used Forma tokens that do not exist; layout bugs found by eye | The layout contract is checked against the published 0.12.0 tarball. Every rule (FL-01..FL-10) has executable browser assertions for each invariant it states (22 assertions). CI runs them in Chromium and WebKit against:<br>• Forma's own pattern pages;<br>• pages composed from several patterns;<br>• conforming and broken fixtures.<br>The bootstrap puts the same module in the application repository for the plan's browser tests |
+| 655 tests bound, with no run order; contract and machine tests unnamed | Setup decided ad hoc; conformance tests never written | 11 suites by environment. Each plan binding and each of the 138 contract, state-machine and unit tests is in exactly one suite, budgeted in a named task |
 
 ## v4 versus v4.1
 
@@ -50,18 +50,18 @@ The owner stated in session on 2026-10-30 that the organizers allow pre-kickoff 
 | Verification plan | `VP-9817d9814482` | same file, same SHA-256 | checked (X10) |
 | Plan tests / bindings | 655 / 779 | same; each binding in exactly one suite | checked (X09) |
 | Interfaces with typechecked contracts | 0 | 8, plus domain stubs | checked (CI; X04, X05) |
-| Empty application repository builds | not defined | 171 generated files build | checked (CI bootstrap step) |
-| Files with a single owner | not defined | 264 | checked (X01–X03, X14) |
+| Empty application repository (.NET skeleton) builds | not defined | 172 generated files build | checked (CI bootstrap step) |
+| Files with a single owner | not defined | 265 | checked (X01–X03, X14) |
 | State-machine pairs decided | 96 transitions listed | 354 pairs; 11 reviewed partitions; 1 unused event raised | checked (X12) |
 | GitHub error classes | not enumerated | 15 | checked (X06) |
-| Critical layout rules with executable assertions | 0 | 10 of 10 (11 assertions) | checked (X15; CI runs them) |
-| Dependency critical path | 340 min | 290 min | estimated |
-| B-single-lead (one lead agent) total, with 65 min reserves | 765 (does not fit 420) | 735 (does not fit) | estimated |
-| A-role-lanes (one UI agent) total | 465 (does not fit) | 445 (does not fit) | estimated |
+| Layout rules with executable assertions for each stated invariant | 0 | 10 of 10 (22 assertions) | checked (X15; CI runs them) |
+| Dependency critical path | 340 min | 300 min | estimated |
+| B-single-lead (one lead agent) total, with 65 min reserves | 765 (does not fit 420) | 745 (does not fit) | estimated |
+| A-role-lanes (one UI agent) total | 465 (does not fit) | 455 (does not fit) | estimated |
 | C-role-lanes-two-ui (two UI agents) total | 405 (fits) | 385 (fits, 35 min slack); makespan 320 | estimated |
 | Test setup | — | not claimed: v4 has no run plan to compare with | — |
 
-The experimental target, a critical path under 300 minutes, is met on the lane-free dependency critical path (290). Topology C's makespan, which includes waiting for busy lanes, is 320. Neither number is an acceptance condition.
+The experimental target, a critical path under 300 minutes, is **not met**: the lane-free dependency critical path is 300 minutes, and topology C's makespan, which includes waiting for busy lanes, is 320. Earlier drafts reached 270–290 only with dependency drops and estimate cuts that review rejected. The target is not an acceptance condition.
 
 ### What each change contributes (schedule.json scenarios; estimated minutes)
 
@@ -69,8 +69,8 @@ The experimental target, a critical path under 300 minutes, is met on the lane-f
 |---|---|---|---|---|
 | v4 | 340 | 465 | 765 | 405 |
 | v4.1 orderings only (ODR-V41-03) | 305 | 465 | 765 | 395 |
-| v4.1 estimates only (ODR-V41-04) | 330 | 445 | 735 | 395 |
-| v4.1 | 290 | 445 | 735 | 385 |
+| v4.1 estimates only (ODR-V41-04) | 330 | 455 | 745 | 395 |
+| v4.1 | 300 | 455 | 745 | 385 |
 
 ## What changed in the schedule, and why
 
@@ -101,7 +101,6 @@ Each change and its rationale is in [analysis/task-adjustments.json](analysis/ta
 |---|---|---|
 | T12 | 25 → 15 | Invariants and machine tables are already compiled |
 | T18 | 45 → 35 | The probe confirms a prepared classification |
-| T22 | 70 → 60 | Forma patterns and executable layout assertions are named |
 
 Unchanged, because each now carries named test work:
 
@@ -111,6 +110,7 @@ Unchanged, because each now carries named test work:
 | T16 | 35 | SM-CONNECTION and SM-NETWORK tests |
 | T19 | 60 | SM-SAVE and SM-CONFLICT tests, 75 transitions |
 | T20 | 40 | SM-LOAD tests |
+| T22 | 70 | Restored after review RV41-3-9: the layout assertions do not shorten the views' work by a known amount |
 | T31 | 45 | — |
 
 Preflight T10 gets 25 minutes outside the window.
@@ -120,7 +120,7 @@ Preflight T10 gets 25 minutes outside the window.
 | Topology | Chain | Note |
 |---|---|---|
 | C | T14 → T12 → T13 → T17 → T23 → T26 → T29 → T28 → T31 → T32 → T33 → T34 | The ui-2 lane, with T23, T26, T29 and T28 back to back, sets the makespan |
-| A | Same start, with the whole UI queue on one lane | 445, which does not fit |
+| A | Same start, with the whole UI queue on one lane | 455, which does not fit |
 
 The lane-free dependency critical path is T14 → T13 → T17 → T22 → T28 → T31 → T32 → T33 → T34.
 
@@ -131,7 +131,7 @@ These are verified on every commit, each with negative controls.
 **Contracts:**
 
 - The interface contracts compile together (CI).
-- A forged `Confirmation` in another file does not compile (CI, FS1093).
+- A forged `Confirmation` and a read of the credential's token in another file do not compile (CI, FS1093).
 - Each machine's state and input unions equal its states and events (X05).
 - Each interface (X04):
   - has operations with success and failure stated, and real concurrency and versioning rules;
@@ -140,7 +140,7 @@ These are verified on every commit, each with negative controls.
 
 **Project structure:**
 
-- The predefined project structure bootstraps into an empty repository and builds (CI).
+- The predefined project structure bootstraps into an empty repository and builds (CI). This covers the .NET skeleton only: package references and integration's other shared files come at T10.
 - Every file has exactly one owner (X01), and no file holds two owners' tests.
 - Integration owns (X02, a fixed rule in the compiler):
   - project and solution files;
@@ -166,7 +166,7 @@ These are verified on every commit, each with negative controls.
 
 - The contract names only published custom properties, classes, patterns and breakpoints, and a colour only when it appears in the requirement document cited as its source (X07).
 - The inventory equals what CI extracts from the tarball.
-- Every critical layout rule has executable assertions (X15). CI runs them in Chromium and WebKit:
+- Every layout rule is critical and has executable assertions for each invariant it states (X15), and the event-build copy of the module is an integration-owned file the bootstrap writes. CI runs them in Chromium and WebKit:
   - each passes on the listed Forma patterns at the listed viewports and colour schemes;
   - each fails on its broken fixture.
 - One Forma gap is recorded with a remedy that uses only Forma tokens (below).
@@ -229,5 +229,6 @@ At the owner's direction (2026-10-30), both sections now carry ADR-R7-001 supers
 |---|---|---|
 | 1 | FAIL | 1 critical, 7 major, 8 minor |
 | 2 | FAIL | 5 major, 6 minor |
+| 3 | FAIL | 3 major, 6 minor |
 
-This revision addresses both rounds; see [independent-review.md](independent-review.md).
+This revision addresses all three rounds; see [independent-review.md](independent-review.md).

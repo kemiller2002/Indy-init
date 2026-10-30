@@ -12,6 +12,7 @@
 |---|---|---|---|
 | 1 | `88d09ea` | FAIL | 1 critical, 7 major, 8 minor |
 | 2 | `7ec98d9` | FAIL | 0 critical, 5 major, 6 minor. All round-1 findings fixed or partly fixed; the partly fixed ones are completed by the round-2 remediation |
+| 3 | `7e189f9` | FAIL | 0 critical, 3 major, 6 minor. Round-2 findings fixed except 2-1, 2-2 and 2-6 (partly), completed by the round-3 remediation. Owner adjustments: bootstrap largely achieved; layout tests and type-shape reconciliation partly |
 
 ## Round 1 findings and remediation
 
@@ -49,3 +50,17 @@
 | RV41-2-9 | minor | web/ funnelled to integration; R41-06 understated the integration test load | web/index.html and web/causa.css are ui's (T16); R41-06 states the actual split |
 | RV41-2-10 | minor | The T35 waiver reason contradicted the task | T35 depends on T12 again (invariant review kept); only T13 before T35 is waived, with a corrected reason |
 | RV41-2-11 | minor | Interface specs had no explicit operations, success or failure | Each interface lists operations with signature, success and failure; X04 requires them, checks each name is in the contract, and rejects empty concurrency or versioning rules |
+
+## Round 3 findings and remediation
+
+| Id | Severity | Finding | Remediation |
+|---|---|---|---|
+| RV41-3-1 | major | Layout assertions tested less than the FL rules state and were not wired into the event build | New assertions for each stated invariant: scroll regions accessible, line length, focus order, skip link first, dialog focus (open, trap, Escape, return), non-text contrast, forced colours, amber with a label, indicator composition, fault states what was preserved, navigation collapse; focusVisible requires a non-transparent ring of the focus-ring width that the blurred element lacks; textNotClipped detects vertical clipping and line-clamp; onlyFormaTokens reads document.styleSheets and style attributes. The reviewer's 12 defective pages are all detected except text over a gradient, which FL-06 assigns to the plan's axe run. The bootstrap writes the module to tests/browser/support/layout-assertions.mjs (integration). X15 requires every rule critical and executable, checks fixtures and composed patterns and the event-build copy, and has negative controls |
+| RV41-3-2 | major | IF41-SAVE could not drive automatic reconciliation reads, load reads or conflict reads; request bookkeeping unspecified | ReconcileDue sends automatic reconciliation reads on the ScheduleReconcileRead timer (TimerKey); InterpretLoad and InterpretConflict with awaited-read state (LoadAwaiting, ReadingRemote of RequestId); RequestContext carries the tab-unique NextId (the engine advances it, at most one request per operation) and MutationInFlightElsewhere for T-S04/T-S53; operations record Outstanding; producer contract tests named for each |
+| RV41-3-3 | major | No frozen type kept the repository and credential after Connect | IF41-WIRE ConnectionContext (repository, branch, opaque credential) kept in Model.Context and passed in RequestContext; persistence adds the Authorization header with Credential.authorization; producer test CredentialOnlyInAuthorizationHeader |
+| RV41-3-4 | minor | The §46 note asserted a dependency direction v4.1 inverts | The note and project-structure.json state App -> Persistence -> Domain and mark §46's direction superseded; the R7 validator passes |
+| RV41-3-5 | minor | ODR-V41-06 omitted the published organizer rules | ODR-V41-06 quotes 'the repository starts empty', 'code starts at kickoff' and 'keep competition application source code out of it', and says the T10 bootstrap makes the repository non-empty before kickoff |
+| RV41-3-6 | minor | Credential readable from any Causa.App file; Saved after a load needed a forged Confirmation | Credential is a module type with private representation (CI negative ReadCredential.fs refused with FS1093); Saved carries SavedBasis (Confirmed of Confirmation.T, or VerifiedAt for a load or confirmed discard, subject to ODR-V4-08) |
+| RV41-3-7 | minor | X02 accepted contributors on integration files and a dropped boundary script; X04 trivial outcomes; X15 without controls; CI step name | X02 rejects contributors on integration-exclusive files and requires the essential shared files in the manifest; X04 requires stated outcomes; X15 controls added; the step names X01-X15 |
+| RV41-3-8 | minor | The bootstrap's scope was described more broadly than it is | README, the report and AGENT-RULES state it is the .NET skeleton (plus the layout module); package references, integration's other shared files and test-framework wiring come at T10 (ODR-V41-07) |
+| RV41-3-9 | minor | T19 and T22 estimate basis | T22 restored to 70 (dependency critical path now 300; the experimental target is reported as not met); T19's rationale states why 60 minutes holds and that it is off the critical path |

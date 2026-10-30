@@ -38,7 +38,8 @@
       "width": 1280,
       "height": 800,
       "textZoom": 2.0,
-      "purpose": "200% text size (WCAG 1.4.4, PERSIST-030)"
+      "purpose": "200% text size (WCAG 1.4.4, PERSIST-030)",
+      "emulation": "the runner sets the root font size to 200% (WCAG 1.4.4 resize text); media queries keep their 16 px rem, as with a browser's text-only zoom"
     }
   ],
   "breakpoints": {
@@ -251,7 +252,18 @@
             "record-header",
             "key-value-list",
             "timeline",
-            "fault-banner"
+            "fault-banner",
+            "data-grid"
+          ],
+          "viewports": "all"
+        },
+        {
+          "assertion": "scrollRegionsAccessible",
+          "patterns": [
+            "data-grid",
+            "diff-viewer",
+            "conflict-review",
+            "workspace-shell"
           ],
           "viewports": "all"
         }
@@ -280,6 +292,14 @@
             "operation-status",
             "freshness",
             "timeline"
+          ],
+          "viewports": "all"
+        },
+        {
+          "assertion": "lineLength",
+          "patterns": [
+            "prose",
+            "measure"
           ],
           "viewports": "all"
         }
@@ -312,6 +332,40 @@
             "VP-320",
             "VP-DESKTOP"
           ]
+        },
+        {
+          "assertion": "focusOrder",
+          "patterns": [
+            "navigation-shell",
+            "conflict-review",
+            "recovery-actions",
+            "record-header"
+          ],
+          "viewports": [
+            "VP-320",
+            "VP-DESKTOP"
+          ]
+        },
+        {
+          "assertion": "skipLinkFirst",
+          "patterns": [
+            "skip-link"
+          ],
+          "viewports": [
+            "VP-320",
+            "VP-DESKTOP"
+          ]
+        },
+        {
+          "assertion": "dialogFocus",
+          "patterns": [
+            "dialog",
+            "fault-blocking"
+          ],
+          "viewports": [
+            "VP-320",
+            "VP-DESKTOP"
+          ]
         }
       ]
     },
@@ -334,7 +388,8 @@
             "skeleton",
             "spinner",
             "operation-status",
-            "dialog"
+            "dialog",
+            "toast"
           ],
           "viewports": [
             "VP-DESKTOP"
@@ -349,7 +404,7 @@
         "UI-016",
         "PERSIST-030"
       ],
-      "assertion": "browser: axe WCAG 2.1 AA in light and dark; forced-colors emulation keeps every save state distinguishable",
+      "assertion": "browser: axe WCAG 2.1 AA in light and dark; forced-colors emulation keeps every save state distinguishable Text over a background image or gradient is judged by the axe run of the plan test, not by textContrast.",
       "tests": [
         "playwright:acceptance/PERSIST-030.spec.js > PERSIST-030-O6 [chromium]",
         "playwright:acceptance/PERSIST-030.spec.js > PERSIST-030-O6 [webkit]"
@@ -382,12 +437,57 @@
             "light",
             "dark"
           ]
+        },
+        {
+          "assertion": "nonTextContrast",
+          "patterns": [
+            "text-field",
+            "button",
+            "select"
+          ],
+          "viewports": [
+            "VP-320",
+            "VP-DESKTOP"
+          ],
+          "colorSchemes": [
+            "light",
+            "dark"
+          ]
+        },
+        {
+          "assertion": "forcedColorsDistinct",
+          "patterns": [
+            "status-lozenge",
+            "operation-status",
+            "record-header"
+          ],
+          "viewports": [
+            "VP-DESKTOP"
+          ],
+          "emulate": {
+            "forcedColors": "active"
+          }
+        },
+        {
+          "assertion": "amberLabelled",
+          "patterns": [
+            "status-lozenge",
+            "record-header",
+            "operation-status"
+          ],
+          "fixtures": [
+            "amberLabelled"
+          ],
+          "viewports": [
+            "VP-320",
+            "VP-DESKTOP"
+          ]
         }
       ]
     },
     {
       "id": "FL-07",
-      "rule": "Save-state indicator: Forma status lozenge plus operation status or conflict review plus freshness, in the investigation header, visible without scrolling at every viewport.",
+      "rule": "Save-state indicator: Forma status lozenge plus operation status or conflict review plus freshness, in the investigation header, visible without scrolling at every viewport. Order: the header line (record header with its status lozenge) and the freshness line come first, then the operation status or conflict review, so the lozenge and freshness stay in the first screen at 320 px and 200% text.",
       "requirements": [
         "PERSIST-030",
         "PERSIST-031"
@@ -404,6 +504,23 @@
           "patterns": [
             "status-lozenge",
             "operation-status"
+          ],
+          "viewports": "all"
+        },
+        {
+          "assertion": "indicatorComposed",
+          "patterns": [],
+          "composed": [
+            [
+              "record-header",
+              "freshness",
+              "operation-status"
+            ],
+            [
+              "record-header",
+              "freshness",
+              "conflict-review"
+            ]
           ],
           "viewports": "all"
         }
@@ -443,6 +560,20 @@
             "VP-320",
             "VP-DESKTOP"
           ]
+        },
+        {
+          "assertion": "faultStatesPreserved",
+          "patterns": [
+            "fault-banner",
+            "conflict-review"
+          ],
+          "fixtures": [
+            "faultStatesPreserved"
+          ],
+          "viewports": [
+            "VP-320",
+            "VP-DESKTOP"
+          ]
         }
       ]
     },
@@ -464,6 +595,13 @@
           "patterns": [
             "navigation-shell",
             "workspace-shell"
+          ],
+          "viewports": "all"
+        },
+        {
+          "assertion": "navigationCollapses",
+          "patterns": [
+            "navigation-shell"
           ],
           "viewports": "all"
         }
@@ -498,7 +636,8 @@
     "module": "layout-tests/assertions.mjs",
     "brokenFixtures": "layout-tests/fixtures.mjs",
     "runner": "layout-tests/run.mjs",
-    "meaning": "Every critical rule names executable assertions. CI runs each against the listed Forma 0.12.0 pattern pages, at the listed viewports and colour schemes, in Chromium and WebKit; every run must pass. It also runs each against its broken fixture, where every run must fail, so the assertion is shown to work. In the event build, the plan-bound browser tests the rule names import the same module and run it against Causa's screens."
+    "meaning": "Every rule is critical and names executable assertions for each invariant it states. CI runs each against the listed Forma 0.12.0 pattern pages, pages composed from several patterns, and conforming fixtures, at the listed viewports and colour schemes (and forced colours where named), in Chromium and WebKit; every run must pass. It also runs each against its broken fixture, where every run must fail. In the event build, the bootstrap copies assertions.mjs to tests/browser/support/layout-assertions.mjs (integration), and the plan-bound browser tests each rule names import it and run it against Causa's screens (T16, T22).",
+    "eventBuildCopy": "tests/browser/support/layout-assertions.mjs"
   },
   "formaGaps": [
     {

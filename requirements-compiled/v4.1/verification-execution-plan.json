@@ -35,7 +35,7 @@
     "bindings": 779,
     "planTests": 655,
     "obligations": 613,
-    "ownTests": 134,
+    "ownTests": 138,
     "suites": 11
   },
   "categoryBindings": {
@@ -71,7 +71,7 @@
       "planTests": false,
       "sha": "runs on the exact candidate SHA; every result records it",
       "counts": {
-        "tests": 131,
+        "tests": 135,
         "bindings": 0,
         "obligations": 0,
         "files": 27,
@@ -175,7 +175,16 @@
           "id": "dotnet:Causa.Contract.Tests.Save.Producer.ConfirmationNotConstructibleOutside"
         },
         {
+          "id": "dotnet:Causa.Contract.Tests.Save.Producer.EveryAwaitedReadIsInterpreted"
+        },
+        {
           "id": "dotnet:Causa.Contract.Tests.Save.Producer.InterpretCoversEveryReplyEvent"
+        },
+        {
+          "id": "dotnet:Causa.Contract.Tests.Save.Producer.ReconcileDueStaysWithinBudget"
+        },
+        {
+          "id": "dotnet:Causa.Contract.Tests.Save.Producer.RequestIdsAreUniqueAndRecorded"
         },
         {
           "id": "dotnet:Causa.Contract.Tests.Save.Producer.SupersededReplyNeverChangesState"
@@ -197,6 +206,9 @@
         },
         {
           "id": "dotnet:Causa.Contract.Tests.Wire.ConsumerUi.HostReturnsRawOutcome"
+        },
+        {
+          "id": "dotnet:Causa.Contract.Tests.Wire.Producer.CredentialOnlyInAuthorizationHeader"
         },
         {
           "id": "dotnet:Causa.Contract.Tests.Wire.Producer.OutcomeNamesItsRequest"

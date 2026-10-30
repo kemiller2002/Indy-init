@@ -4,13 +4,8 @@ open Causa.Domain
 open Causa.Persistence
 
 /// IF41-APP: the Limen engine boundary (App <-> browser host). The host relays only what the engine asks for.
-/// The credential is opaque: it is created once from the Connect form and never rendered, logged or stored.
-type Credential =
-    private
-        | Credential of string
-    static member Create(token: string) = Credential token
-    override _.ToString() = "<credential>"
-
+/// The credential is opaque (IF41-WIRE Credential): created once from the Connect form, kept only in the model's
+/// connection context, never rendered, logged or stored.
 /// SM-CONNECTION states.
 type ConnectionState =
     | Disconnected
@@ -21,11 +16,11 @@ type ConnectionState =
 
 /// SM-CONNECTION events.
 type ConnectionInput =
-    | ConnectSubmitted of repository: string * Credential
+    | ConnectSubmitted of Repository * Credential.T
     | ConnectSucceeded of canWrite: bool
     | ConnectRefused of ProviderError
     | AuthFailed
-    | ReconnectSubmitted of Credential
+    | ReconnectSubmitted of Credential.T
     | DisconnectConfirmed
 
 /// SM-NETWORK states.
@@ -38,15 +33,18 @@ type NetworkInput =
     | OfflineObserved
     | OnlineObserved
 
+/// What a host timer is for.
+type TimerKey = ReconcileTimer of InvestigationId
+
 type BrowserSignal =
     | ConnectivityChanged of online: bool
-    | TimerFired of RequestId
+    | TimerFired of TimerKey
     | HttpCompleted of HttpOutcome
     | LeaveAttempted
 
 type HostEffect =
     | Http of HttpRequest
-    | Timer of RequestId * milliseconds: int
+    | Timer of TimerKey * milliseconds: int
     | SetLeaveGuard of bool
     | Download of fileName: string * content: string
     | LiveAnnounce of Politeness * text: string
@@ -63,8 +61,11 @@ type Msg =
     | LoadStep of InvestigationId * LoadInput
     | DomainCommand of CommandEnvelope
 
+/// The model keeps the connection context after Connect succeeds and the next request identity of the tab.
 type Model =
     { Connection: ConnectionState
+      Context: ConnectionContext option
+      NextRequestId: RequestId
       Network: NetworkState
       Route: Route
       Loads: Map<InvestigationId, LoadState>

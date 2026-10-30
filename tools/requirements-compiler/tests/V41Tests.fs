@@ -154,6 +154,20 @@ let controls (source: string) : string list =
       yield! expectFail "unlisted unused event" "X12" { i0 with GuardPartitions = setIn "unusedEvents" (JArr []) i0.GuardPartitions }
       // X13 round 2 (RV41-2-5): a waiver naming no owner decision request.
       yield! expectFail "waiver without a real decision" "X13" { i0 with Adjustments = mapArr "waivedPrecedences" (List.map (setIn "decision" (JStr "x"))) i0.Adjustments }
+      // X15 executable layout kit (RV41-3-1, RV41-3-7): a rule without assertions or opted out; an assertion the kit
+      // does not export; a missing conforming fixture; an unknown composed pattern; the event-build copy unowned.
+      yield! expectFail "rule without assertions" "X15" (formaRule "FL-04" (setIn "executable" (JArr [])))
+      yield! expectFail "rule opted out of critical" "X15" (formaRule "FL-04" (setIn "critical" (JBool false)))
+      yield! expectFail "assertion not exported" "X15" (formaRule "FL-04" (setIn "executable" (JArr [ JObj [ "assertion", JStr "focusTrapMagic"; "patterns", jstrs [ "dialog" ]; "viewports", JStr "all" ] ])))
+      yield! expectFail "missing conforming fixture" "X15" (formaRule "FL-08" (setIn "executable" (JArr [ JObj [ "assertion", JStr "faultStatesPreserved"; "fixtures", jstrs [ "noSuchFixture" ]; "viewports", JStr "all" ] ])))
+      yield! expectFail "unknown composed pattern" "X15" (formaRule "FL-07" (setIn "executable" (JArr [ JObj [ "assertion", JStr "indicatorComposed"; "composed", JArr [ jstrs [ "record-header"; "causa-banner" ] ]; "viewports", JStr "all" ] ])))
+      yield! expectFail "event-build copy unowned" "X15" (structure (mapArr "testHelpers" (List.filter (fun h -> strOpt "path" h <> Some "tests/browser/support/layout-assertions.mjs"))))
+      yield! expectFail "kit without broken fixtures" "X15" { i0 with AuthoredText = i0.AuthoredText |> List.map (fun (n, t) -> if n = "layout-tests/fixtures.mjs" then n, "export const conformingFixtures = {\n};" else n, t) }
+      // X02 / X04 round 3 (RV41-3-7): contributors on an integration file; a required shared file dropped; trivial
+      // operation outcomes.
+      yield! expectFail "contributors on package.json" "X02" (structure (mapArr "sharedFiles" (List.map (fun f -> if strOpt "path" f = Some "package.json" then setIn "contributors" (jstrs [ "ui"; "persistence" ]) f else f))))
+      yield! expectFail "boundary script dropped" "X02" (structure (mapArr "sharedFiles" (List.filter (fun f -> strOpt "path" f <> Some "web/boundary.js"))))
+      yield! expectFail "trivial operation outcome" "X04" (iface "IF41-WIRE" (mapArr "operations" (List.map (setIn "success" (JStr "ok") >> setIn "failure" (JStr "-")))))
       // X13 DAG (RV41-1-1, RV41-1-7): a cycle; a measured label; a dropped v4 ordering; a gutted estimate; a stale waiver.
       yield! expectFail "cyclic DAG" "X13" (adjust "T12" (setIn "dependsOn" (JArr [ JObj [ "task", JStr "T21"; "reason", JStr "x" ] ])))
       yield! expectFail "estimate labelled measured" "X13" (adjust "T16" (setIn "evidence" (JStr "measured")))

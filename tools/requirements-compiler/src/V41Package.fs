@@ -197,10 +197,11 @@ type OwnedFile =
       Tests: string list
       Requirements: string list
       /// Owners claimed by other tests placed in the same file (a file with two owners).
-      Conflicts: string list }
+      Conflicts: string list
+      Contributors: string list }
 
 let private ownedOf (kind: string) (project: string option) (j: Json) =
-    { Path = str "path" j; Owner = str "owner" j; Kind = kind; Project = project; DependsOn = strs "dependsOn" j; Implements = strs "implements" j; Tests = []; Requirements = []; Conflicts = [] }
+    { Path = str "path" j; Owner = str "owner" j; Kind = kind; Project = project; DependsOn = strs "dependsOn" j; Implements = strs "implements" j; Tests = []; Requirements = []; Conflicts = []; Contributors = strs "contributors" j }
 
 let private projectOf (file: string) =
     match file.Split('/') |> List.ofArray with
@@ -237,7 +238,8 @@ let ownedFiles (i: Inputs) : OwnedFile list =
               Implements = []
               Tests = entries |> List.map (fun (_, (t, _, _)) -> t) |> List.distinct |> List.sort
               Requirements = entries |> List.choose (fun (_, (_, _, r)) -> r) |> List.distinct |> List.sort
-              Conflicts = List.tail owners })
+              Conflicts = List.tail owners
+              Contributors = [] })
     sourceFiles @ testProjectFiles @ shared @ helpers @ generated
 
 /// The topologies that staff a role with a fallback (ui-2): those whose lane overrides name it.
@@ -737,7 +739,10 @@ let ownershipCheck (i: Inputs) (files: OwnedFile list) : Check list =
       check "X02" "Project files, the solution, composition, shared configuration, dependency manifests, CI and deployment are owned by integration"
           [ for f in files do
                 if integrationExclusive f.Path && f.Owner <> "integration" then yield sprintf "%s is integration's alone but owned by %s" f.Path f.Owner
-            () ]
+                if integrationExclusive f.Path && not f.Contributors.IsEmpty then yield sprintf "%s is integration's alone but lists contributors %s" f.Path (String.concat ", " f.Contributors)
+            // The shared files the event build cannot do without must be in the manifest, owned by integration.
+            for required in [ "Causa.slnx"; "global.json"; "Directory.Build.props"; "Directory.Packages.props"; "package.json"; "package-lock.json"; "playwright.config.ts"; ".github/workflows/ci.yml"; "web/boundary.js"; "tests/browser/support/layout-assertions.mjs" ] do
+                if not (files |> List.exists (fun f -> f.Path = required)) then yield sprintf "%s is missing from the manifest" required ]
       check "X03" "Compile order is predefined: each file depends only on earlier files of its project or on referenced projects, project references (source and test) are acyclic, and every test file is in a declared test project"
           [ let refs = allProjects |> List.map (fun p -> str "id" p, strs "references" p) |> Map.ofList
             let rec closure (seen: Set<string>) (p: string) =
@@ -797,8 +802,10 @@ let interfaceCheck (i: Inputs) (files: OwnedFile list) : Check list =
                     if (sOr k x).Trim().Length < 30 then yield sprintf "%s: %s is missing or too short to state a rule" id k
                 if (arr "operations" x).IsEmpty then yield sprintf "%s: no operations" id
                 for o in arr "operations" x do
-                    for k in [ "name"; "signature"; "success"; "failure" ] do
+                    for k in [ "name"; "signature" ] do
                         if String.IsNullOrWhiteSpace (sOr k o) then yield sprintf "%s: operation %s has no %s" id (sOr "name" o) k
+                    for k in [ "success"; "failure" ] do
+                        if (sOr k o).Trim().Length < 5 then yield sprintf "%s: operation %s does not state its %s" id (sOr "name" o) k
                     let name = (sOr "name" o).Split('.') |> Array.last
                     if name <> "" && not (Regex.IsMatch(str "fsharp" x, sprintf @"\b%s\b" (Regex.Escape name))) then yield sprintf "%s: operation %s is not in the contract" id (sOr "name" o)
                 for t in strs "producerTests" x do
@@ -1052,21 +1059,36 @@ let testIdentityCheck (i: Inputs) (files: OwnedFile list) : Check =
 let layoutKitCheck (i: Inputs) : Check =
     let text name = i.AuthoredText |> List.tryFind (fst >> (=) name) |> Option.map snd |> Option.defaultValue ""
     let exported = Regex.Matches(text "layout-tests/assertions.mjs", @"(?m)^export const ([A-Za-z0-9]+)\s*=") |> Seq.map (fun m -> m.Groups.[1].Value) |> Set.ofSeq
-    let fixtures = Regex.Matches(text "layout-tests/fixtures.mjs", @"(?m)^\s+([A-Za-z0-9]+):\s*'") |> Seq.map (fun m -> m.Groups.[1].Value) |> Set.ofSeq
+    let section (src: string) (start: string) (stop: string) =
+        let a = src.IndexOf start
+        if a < 0 then "" else let b = src.IndexOf(stop, a + start.Length) in if b < 0 then src.Substring a else src.Substring(a, b - a)
+    let keys (src: string) = Regex.Matches(src, @"(?m)^\s+([A-Za-z0-9]+):\s*'") |> Seq.map (fun m -> m.Groups.[1].Value) |> Set.ofSeq
+    let fixturesText = text "layout-tests/fixtures.mjs"
+    let fixtures = keys (section fixturesText "export const brokenFixtures" "export const conformingFixtures")
+    let conforming = keys (section fixturesText "export const conformingFixtures" "\n};")
     let patterns = strs "patterns" i.FormaInventory |> Set.ofList
     let properties = strs "customProperties" i.FormaInventory |> Set.ofList
     let viewports = arr "viewports" i.Forma |> List.map (sOr "id") |> Set.ofList
     let pairs = arr "rules" i.Forma |> List.collect (fun r -> arr "executable" r |> List.collect (fun x -> strs "patterns" x |> List.map (fun p -> sOr "assertion" x, p)))
     check "X15" "Every critical Forma layout rule has executable browser assertions, each exported by the layout kit with a broken fixture that must fail, run against published Forma patterns at contract viewports; every Forma gap has a remedy that uses only Forma tokens"
         [ if String.IsNullOrWhiteSpace (text "layout-tests/run.mjs") then yield "the layout kit runner is missing"
+          let copy = field "executableTests" i.Forma |> Option.map (sOr "eventBuildCopy") |> Option.defaultValue ""
+          if copy = "" || not (arr "testHelpers" i.Structure |> List.exists (fun h -> sOr "path" h = copy && sOr "owner" h = "integration")) then
+              yield sprintf "the event-build copy of the layout assertions (%s) is not an integration-owned test helper" copy
           for r in arr "rules" i.Forma do
               let id = sOr "id" r
-              if boolOr "critical" false r && (arr "executable" r).IsEmpty then yield sprintf "%s is critical but names no executable assertion" id
+              // Every layout rule is critical: none may opt out of executable assertions.
+              if not (boolOr "critical" false r) then yield sprintf "%s is not marked critical; every layout rule is" id
+              if (arr "executable" r).IsEmpty then yield sprintf "%s names no executable assertion" id
               for x in arr "executable" r do
                   let a = sOr "assertion" x
                   if not (exported.Contains a) then yield sprintf "%s: assertion %s is not exported by layout-tests/assertions.mjs" id a
                   if not (fixtures.Contains a) then yield sprintf "%s: assertion %s has no broken fixture" id a
-                  if (strs "patterns" x).IsEmpty then yield sprintf "%s: assertion %s runs against no Forma pattern" id a
+                  if (strs "patterns" x).IsEmpty && (arr "composed" x).IsEmpty && (strs "fixtures" x).IsEmpty then yield sprintf "%s: assertion %s runs against no page" id a
+                  for f in strs "fixtures" x do
+                      if not (conforming.Contains f) then yield sprintf "%s: conforming fixture %s does not exist" id f
+                  for p in arr "composed" x |> List.collect (fun c -> match c with JArr ps -> ps |> List.map asStr | _ -> []) do
+                      if not (patterns.Contains p) then yield sprintf "%s: composed pattern %s is not a Forma pattern" id p
                   for p in strs "patterns" x do
                       if not (patterns.Contains p) then yield sprintf "%s: %s is not a Forma pattern" id p
                   match field "viewports" x with
@@ -1135,7 +1157,11 @@ let bootstrapFiles (i: Inputs) (files: OwnedFile list) (globalJson: string) : (s
     let slnx =
         String.concat "\n" ([ "<Solution>" ] @ (projects |> List.map (fun (p, _) -> sprintf "  <Project Path=\"%s\" />" (str "path" p))) @ [ "</Solution>"; "" ])
     let props = String.concat "\n" [ "<Project>"; "  <PropertyGroup>"; "    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>"; "    <Nullable>enable</Nullable>"; "  </PropertyGroup>"; "</Project>"; "" ]
-    [ "Causa.slnx", slnx; "Directory.Build.props", props; "global.json", globalJson ] @ projectFiles @ fsFiles @ host
+    let layoutCopy =
+        match field "executableTests" i.Forma |> Option.map (sOr "eventBuildCopy"), i.AuthoredText |> List.tryFind (fst >> (=) "layout-tests/assertions.mjs") with
+        | Some path, Some(_, text) when path <> "" -> [ path, text ]
+        | _ -> []
+    [ "Causa.slnx", slnx; "Directory.Build.props", props; "global.json", globalJson ] @ projectFiles @ fsFiles @ host @ layoutCopy
 
 // ---- contracts ---------------------------------------------------------------------------------------------------
 
@@ -1175,7 +1201,19 @@ let contractFiles (i: Inputs) : (string * string) list =
               "          Commit = CommitOid \"forged\""
               "          CommittedAt = System.DateTimeOffset.MinValue }"
               "" ]
-    (named |> List.map (fun (f, t) -> "contracts/" + f, t)) @ [ "contracts/ContractCheck.fsproj", fsproj; "contracts/negative/ForgeConfirmation.fs", forge ]
+    let readCredential =
+        String.concat "\n"
+            [ "// Generated by requirements-compiler v41. Negative control: this file must NOT compile (FS1093). CI adds it to"
+              "// ContractCheck.fsproj and expects the build to fail, proving that no file can read a credential's token."
+              "namespace Causa.App"
+              ""
+              "module ReadCredential ="
+              "    let token (c: Causa.Persistence.Credential.T) ="
+              "        match c with"
+              "        | Causa.Persistence.Credential.Token t -> t"
+              "" ]
+    (named |> List.map (fun (f, t) -> "contracts/" + f, t))
+    @ [ "contracts/ContractCheck.fsproj", fsproj; "contracts/negative/ForgeConfirmation.fs", forge; "contracts/negative/ReadCredential.fs", readCredential ]
 
 // ---- build -------------------------------------------------------------------------------------------------------
 

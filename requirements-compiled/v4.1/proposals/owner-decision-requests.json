@@ -55,12 +55,12 @@
       "id": "ODR-V41-04",
       "kind": "schedule",
       "title": "Accept the v4.1 estimate changes",
-      "question": "v4.1 lowers three timed estimates (minutes): T12 25 to 15, T18 45 to 35, T22 70 to 60. It also gives preflight T10 an estimate of 25 outside the window. Each reason is in analysis/task-adjustments.json; all are the package author's estimates, not measurements. Accept them for planning?",
+      "question": "v4.1 lowers two timed estimates (minutes): T12 25 to 15 and T18 45 to 35. It also gives preflight T10 an estimate of 25 outside the window. Each reason is in analysis/task-adjustments.json; both are the package author's estimates, not measurements. Accept them for planning?",
       "options": [
         "A: accept the estimate changes",
         "B: keep v4's estimates"
       ],
-      "recommendation": "A only if the reasons convince you: with v4's orderings, the estimate changes alone take the dependency critical path from 340 to 330 minutes and C from 405 to 395; with ODR-V41-03 also accepted, 290 and 385 (C's makespan 320 plus 65 minutes of reserves).",
+      "recommendation": "A only if the reasons convince you: with v4's orderings, the estimate changes alone take the dependency critical path from 340 to 330 minutes and C from 405 to 395; with ODR-V41-03 also accepted, 300 and 385 (C's makespan 320 plus 65 minutes of reserves).",
       "rationale": "Lower estimates move the schedule without moving the work; only the owner accepts them.",
       "impact": "With B, the agent restores v4's estimates and recompiles; reserves are unchanged either way.",
       "approvalRecord": {
@@ -88,7 +88,7 @@
       "id": "ODR-V41-06",
       "kind": "requirement-conflict",
       "title": "Pre-kickoff contracts and scaffolding for November 7",
-      "question": "Two baseline clauses conflict with v4.1. (1) docs/REHEARSAL-AGENT-INTERFACE-FREEZE.md preamble and contract-freeze step 1: F# signatures 'MUST be authored from the requirements at kickoff'; 'these are not fabricated compile-ready interfaces'. (2) docs/HACKATHON-BOUNDARIES.md: 'Before producing application-specific executable/generated scaffolding from it before kickoff, confirm organizer interpretation.' v4.1 ships compile-ready interface contracts (contracts/) and generates the empty application repository (v41 --bootstrap). On 2026-10-30 the owner told the package author in session that the organizers allow pre-kickoff scaffolding. Record that, and set the interface-freeze clauses aside for this event?",
+      "question": "Baseline and event clauses conflict with v4.1. (1) docs/REHEARSAL-AGENT-INTERFACE-FREEZE.md preamble and contract-freeze step 1: F# signatures 'MUST be authored from the requirements at kickoff'; 'these are not fabricated compile-ready interfaces'. (2) KICKOFF-EXECUTION-PACKET §4: parallel ownership after the kernel stabilizes. (3) docs/HACKATHON-BOUNDARIES.md, quoting the published event page: 'the repository starts empty' and 'code starts at kickoff'; and its own rules: 'Before producing application-specific executable/generated scaffolding from it before kickoff, confirm organizer interpretation' and 'Until clarified, keep this repository specification-heavy and keep competition application source code out of it.' v4.1 ships compile-ready interface contracts (contracts/), and its bootstrap (T10, before T0) makes the application repository non-empty before kickoff. On 2026-10-30 the owner told the package author in session that the organizers allow pre-kickoff scaffolding. Record that, and set these clauses aside for November 7?",
       "options": [
         "A: the organizers allow it; for November 7 the v4.1 contracts are authored before kickoff and committed at T14, and the bootstrap may be generated at T10",
         "B: keep the kickoff-authoring clauses; the contracts become reference text and the bootstrap is not used"

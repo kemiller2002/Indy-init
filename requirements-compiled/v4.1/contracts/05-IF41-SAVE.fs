@@ -38,7 +38,7 @@ type RefusedCommand = { Command: CommandEnvelope; Reason: string }
 
 /// SM-CONFLICT states.
 type ConflictView =
-    | ReadingRemote
+    | ReadingRemote of RequestId
     | Reviewable of remote: VerifiedInvestigation
     | Reapplying of remote: VerifiedInvestigation
     | Reapplied of remote: VerifiedInvestigation * refused: RefusedCommand list
@@ -62,9 +62,15 @@ type ConflictInput =
     | ExportChosen
     | SupersededReply of RequestId
 
+/// What a Saved state rests on: a save confirmed by read-back (PERSIST-023), or a verified read at a named commit after
+/// a load or a confirmed discard. Whether the second may show as Saved is owner decision ODR-V4-08.
+type SavedBasis =
+    | Confirmed of Confirmation.T
+    | VerifiedAt of VerifiedInvestigation
+
 /// SM-SAVE states (PERSIST-031: exactly seven).
 type SaveState =
-    | Saved of Confirmation.T
+    | Saved of SavedBasis
     | Unsaved
     | Saving
     | Offline
@@ -97,7 +103,7 @@ type SaveInput =
     | WentOffline
     | WentOnline
     | ConflictResolvedReapplied of CommandEnvelope list
-    | ConflictResolvedDiscarded of Confirmation.T
+    | ConflictResolvedDiscarded of VerifiedInvestigation
     | SupersededReply of RequestId
     | QueuedSaveStarted
     | RebaseReadFailed
@@ -109,10 +115,15 @@ type LoadFailure =
     | Unverifiable of VerificationFailure list
     | ProviderFailed of ProviderError
 
+/// The read a load is waiting for.
+type LoadAwaiting =
+    | LoadHead
+    | LoadFilesAt of CommitOid
+
 /// SM-LOAD states.
 type LoadState =
     | NotLoaded
-    | Loading of RequestId
+    | Loading of RequestId * LoadAwaiting
     | Loaded of VerifiedInvestigation
     | LoadFailed of LoadFailure
     | UnavailableOffline
@@ -133,7 +144,7 @@ type Politeness =
 
 type SaveEffect =
     | Send of HttpRequest
-    | ScheduleReconcileRead of RequestId * afterMilliseconds: int
+    | ScheduleReconcileRead of InvestigationId * afterMilliseconds: int
     | Announce of Politeness * text: string
     | ExportCommands of CommandEnvelope list
 
@@ -151,14 +162,6 @@ type Awaiting =
     | ReconcileCommits of page: int
     | ReconcileFilesAt of CommitOid
 
-/// What one answer means for a session.
-type Interpretation =
-    /// The answer completes a step: apply this event with SaveMachine.Step.
-    | MachineEvent of SaveInput
-    /// The answer leads to the next read of the same step (read-back after the mutation, file comparison after a
-    /// fresh head, the next reconciliation page); the state does not change.
-    | NextRequest of HttpRequest * Awaiting
-
 type InvestigationSession =
     { Id: InvestigationId
       BaseHead: CommitOid
@@ -170,12 +173,36 @@ type InvestigationSession =
       RebaseAttempts: int
       ReconcileReads: int }
 
+/// What one answer means for a session.
+type Interpretation =
+    /// The answer completes a step: apply this event with SaveMachine.Step.
+    | MachineEvent of SaveInput
+    /// The answer leads to the next read of the same step (read-back after the mutation, file comparison after a
+    /// fresh head, the next reconciliation page): send the request; the session, whose Outstanding now names it, keeps
+    /// its state.
+    | NextRequest of InvestigationSession * HttpRequest
+
+/// What one answer means for a load.
+type LoadInterpretation =
+    | LoadEvent of LoadInput
+    | LoadNextRequest of LoadState * HttpRequest
+
+/// What one answer means for a conflict review.
+type ConflictInterpretation =
+    | ConflictEvent of ConflictInput
+    | ConflictNextRequest of ConflictView * HttpRequest
+
+/// Every operation that emits a request uses RequestContext.NextId for it (at most one per call) and records it as
+/// Outstanding; an answer whose RequestId is not Outstanding is SupersededReply.
 type SaveMachine =
-    { Initial: VerifiedInvestigation -> Confirmation.T -> InvestigationSession
-      /// Classifies and verifies one answer (IF41-ERRORS, read-back, reconciliation) against what the session awaits:
-      /// a machine event, or the next request of the same step. An answer to a request that is not Outstanding is
-      /// MachineEvent SupersededReply.
-      Interpret: InvestigationSession -> HttpOutcome -> Interpretation
-      Step: InvestigationSession -> SaveInput -> Result<InvestigationSession * SaveEffect list, SaveFault>
-      StepConflict: ConflictView -> ConflictInput -> Result<ConflictView * SaveEffect list, SaveFault>
-      StepLoad: LoadState -> LoadInput -> Result<LoadState * SaveEffect list, SaveFault> }
+    { Initial: VerifiedInvestigation -> InvestigationSession
+      /// Classifies and verifies one answer (IF41-ERRORS, read-back, reconciliation) against what the session awaits.
+      Interpret: RequestContext -> InvestigationSession -> HttpOutcome -> Interpretation
+      Step: RequestContext -> InvestigationSession -> SaveInput -> Result<InvestigationSession * SaveEffect list, SaveFault>
+      /// The timer of ScheduleReconcileRead fired: in UnknownOutcome with automatic reads left, send the next
+      /// reconciliation read (state unchanged); with none left, Step ReconcileReadsSpent.
+      ReconcileDue: RequestContext -> InvestigationSession -> Result<InvestigationSession * SaveEffect list, SaveFault>
+      InterpretConflict: RequestContext -> ConflictView -> HttpOutcome -> ConflictInterpretation
+      StepConflict: RequestContext -> ConflictView -> ConflictInput -> Result<ConflictView * SaveEffect list, SaveFault>
+      InterpretLoad: RequestContext -> LoadState -> HttpOutcome -> LoadInterpretation
+      StepLoad: RequestContext -> LoadState -> LoadInput -> Result<LoadState * SaveEffect list, SaveFault> }

@@ -83,7 +83,7 @@
           "reason": "tested against the stateful fake built from the live recordings"
         }
       ],
-      "rationale": "Unchanged estimate: the decision table (state-machine-contracts.json) replaces reading prose, but this task writes the transition tests of SM-SAVE and SM-CONFLICT (75 transitions) and their illegal-pair tests. In v4, T19 waited for the kernel through T14 (T14 depended on T13); with the contracts frozen before the kernel it does not, but it still waits for the invariant tests (T12). Replay verification against the real kernel is exercised at integration (T21).",
+      "rationale": "Unchanged estimate: the decision table (state-machine-contracts.json) replaces reading prose, but this task writes the transition tests of SM-SAVE and SM-CONFLICT (75 transitions) and their illegal-pair tests. In v4, T19 waited for the kernel through T14 (T14 depended on T13); with the contracts frozen before the kernel it does not, but it still waits for the invariant tests (T12). Replay verification against the real kernel is exercised at integration (T21). The transition tests are generated from one table (each a call to Step with the listed input and an assertion on the listed next state and effects), which is what makes 60 minutes plausible; it is an estimate, and T19 is not on the dependency critical path.",
       "evidence": "estimated"
     },
     {
@@ -109,12 +109,6 @@
     {
       "task": "T16",
       "rationale": "No estimate change: the Forma layout contract names the patterns, tokens, breakpoints and viewports, and its executable assertions (layout-tests/) check them, but T16 also writes the SM-CONNECTION and SM-NETWORK state-machine tests (11 transitions), which v4 did not list.",
-      "evidence": "estimated"
-    },
-    {
-      "task": "T22",
-      "estimateMinutes": 60,
-      "rationale": "Same basis as T16: the reuse list maps each view to Forma patterns, and FL-01..FL-10 state the layout assertions up front.",
       "evidence": "estimated"
     },
     {

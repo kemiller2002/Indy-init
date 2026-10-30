@@ -1181,7 +1181,7 @@ Property tests are useful for:
 
 ## 46. Module boundary recommendation
 
-> **Superseded for Causa (ADR-R7-001).** Causa's project split for the event build is [project-structure.json](../requirements-compiled/v4.1/analysis/project-structure.json): Causa.Domain, Causa.Persistence, Causa.App and Causa.Host. It has no `LocalStore.fs` and no other browser store. An AI project is outside that split; its scope is owner decision ODR-V4-09. The dependency direction below still holds. [CAUSA-PERSISTENCE-REQUIREMENTS.md](CAUSA-PERSISTENCE-REQUIREMENTS.md) governs persistence. This section remains long-term platform direction only.
+> **Superseded for Causa (ADR-R7-001).** Causa's project split for the event build is [project-structure.json](../requirements-compiled/v4.1/analysis/project-structure.json): Causa.Domain, Causa.Persistence, Causa.App and Causa.Host. It has no `LocalStore.fs` and no other browser store. An AI project is outside that split; its scope is owner decision ODR-V4-09. The dependency direction below is superseded too: Causa merges the application layer into Causa.App, which references Causa.Persistence, which references only Causa.Domain (App → Persistence → Domain); Domain still depends on nothing. [CAUSA-PERSISTENCE-REQUIREMENTS.md](CAUSA-PERSISTENCE-REQUIREMENTS.md) governs persistence. This section remains long-term platform direction only.
 
 Initial solution structure:
 
