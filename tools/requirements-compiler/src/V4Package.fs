@@ -1042,14 +1042,15 @@ let validationReport (i: Inputs) (checks: Check list) : Json =
 type Gate = { Id: string; Condition: string; Pass: bool; Detail: string }
 
 /// The review verdict computed from the record's findings, never taken from its own verdict field: PASS only when
-/// a named reviewer who is not the implementer reviewed at least once and no critical or major finding is open.
+/// a named reviewer who is not the implementer reviewed at least once, the reviewer's last round is PASS, and every
+/// critical or major finding is fixed, decided by the owner, or a residual the reviewer accepted in a PASS round.
 let reviewPasses (i: Inputs) =
     let findings = arr "findings" i.Review
     sOr "reviewer" i.Review <> ""
     && not (boolOr "reviewerIsImplementer" true i.Review)
     && (intOpt "rounds" i.Review |> Option.defaultValue 0L) >= 1L
     && (arr "roundVerdicts" i.Review |> List.tryLast |> Option.map (sOr "verdict")) = Some "PASS"
-    && findings |> List.forall (fun f -> not ([ "critical"; "major" ] |> List.contains (sOr "severity" f)) || [ "fixed"; "decided-by-owner" ] |> List.contains (sOr "status" f))
+    && findings |> List.forall (fun f -> not ([ "critical"; "major" ] |> List.contains (sOr "severity" f)) || [ "fixed"; "decided-by-owner"; "accepted-residual" ] |> List.contains (sOr "status" f))
 
 let gates (i: Inputs) (b: Built) (planDigest: string) : Gate list =
     let byId id = b.Checks |> List.find (fun c -> c.Id = id)

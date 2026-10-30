@@ -54,7 +54,7 @@ The legacy normalizer also flags 56 requirements for vague terms and 149 non-P0 
 
 ## D. State-machine analysis
 
-`state-machines.json` defines five machines: SM-SAVE (7 states, 58 transitions), SM-CONFLICT, SM-CONNECTION, SM-LOAD and SM-NETWORK. For each state they give events, guards, results, effects, failure behaviour and invariants. The illegal-input policy comes from PERSIST-023: any pair not listed fails closed and changes nothing.
+`state-machines.json` defines five machines: SM-SAVE (7 states, 60 transitions), SM-CONFLICT, SM-CONNECTION, SM-LOAD and SM-NETWORK. For each state they give events, guards, results, effects, failure behaviour and invariants. The illegal-input policy comes from PERSIST-023: any pair not listed fails closed and changes nothing.
 
 Check W05 verifies that:
 - states and events are declared;
@@ -101,8 +101,8 @@ Every P0 obligation has an acceptance obligation (`acceptance/acceptance-obligat
 ## Rehearsal 7 findings
 
 There are 20 lesson classes (`r7-lessons-mapping.json`):
-- **covered (10):** the requirements already prevent the class; the binding is strengthened by invariant or lesson tests that are bound in the plan.
-- **gap-proposed (7):** false save confirmation (forged replies and Saved after a verified load), stale refresh, conflict re-read race, re-authentication, unresolvable conflict, forged replies, and the copy ban for Rehearsal 7's code. Each is an exact operator approval record in `proposals/owner-decision-requests.json`.
+- **covered (9):** the requirements already prevent the class; the binding is strengthened by invariant or lesson tests that are bound in the plan.
+- **gap-proposed (8):** false save confirmation (forged replies and Saved after a verified load), stale refresh, conflict re-read race, re-authentication, unresolvable conflict, forged replies, the copy ban for Rehearsal 7's code, and whether an unknown outcome blocks other saves (ODR-V4-11). Each is an exact operator approval record in `proposals/owner-decision-requests.json`.
 - **process (3):** incomplete deployed acceptance, deadline and merge orchestration, and undelivered P0 scope; enforced through the execution plan and acceptance gate.
 
 Every quote is checked verbatim against the five permitted evidence files when `--r7-evidence` is supplied (W07).
@@ -110,5 +110,5 @@ Every quote is checked verbatim against the five permitted evidence files when `
 ## What was not optimized, and why
 
 - **The 420-minute fit with one lead agent or one UI agent:** it cannot be reached without removing P0 scope. ODR-V4-07 asks the owner to choose.
-- **The proposed amendments (ODR-V4-02..06, ODR-V4-08) and scope questions (ODR-V4-09, ODR-V4-10):** they wait for operator records (RDP-003). Until then they are labelled non-normative in every artifact.
+- **The proposed amendments (ODR-V4-02..06, ODR-V4-08) and scope questions (ODR-V4-09..11):** they wait for operator records (RDP-003). Until then they are labelled non-normative in every artifact.
 - **Non-P0 requirements:** 359 requirements state no priority and are verified by manifest rules and gates, not by per-obligation contracts. This is the v3 design; ODR-V4-10 asks whether S14, S15 and DCC-013..015 should become P0.
