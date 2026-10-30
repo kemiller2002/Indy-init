@@ -175,61 +175,100 @@ let controls (source: string) : string list =
         JObj [ "reviewer", JStr "independent reviewer"; "reviewerIsImplementer", JBool false; "rounds", JInt 1L; "roundVerdicts", JArr [ JObj [ "round", JInt 1L; "verdict", JStr "PASS" ] ]; "findings", JArr [] ]
     let reviewSha = Git.sha256Hex (Text.Encoding.UTF8.GetBytes(serialize review))
     let testSha = String('f', 64)
-    let approvalRecords =
+    // Operator decisions in the approvals schema verify-plan authorizes: one approval with an operator authority and
+    // its changes. Amendments are compiled into the plan through obligationAmendments, exactly as the owner's would be.
+    let amendChanges (pick: Json -> bool) =
+        arr "requests" i0.Proposals
+        |> List.filter (fun p -> str "kind" p = "obligation-amendment" && pick p)
+        |> List.collect (fun p ->
+            match field "approvalRecord" p with
+            | Some(JArr rs) ->
+                rs |> List.map (fun r ->
+                    JObj [ "decision_id", JStr(str "id" p); "obligation_id", JStr(str "obligation_id" r); "action", JStr "amend"
+                           "criterion", JStr(strOpt "combinedCriterion" r |> Option.defaultValue (str "criterion" r)); "rationale", JStr(str "rationale" r) ])
+            | _ -> [])
+        |> List.distinctBy (str "obligation_id")
+    let decisionChanges =
         arr "requests" i0.Proposals
         |> List.collect (fun p ->
-            match str "kind" p, field "approvalRecord" p with
-            | "obligation-amendment", Some(JArr rs) -> rs |> List.map (setIn "approved_by" (JStr operator))
-            | "package-approval", _ ->
-                [ JObj [ "decision_id", JStr "ODR-V4-01"; "action", JStr "approve-package"; "plan_content_digest", JStr planDigest
-                         "review_sha256", JStr reviewSha; "test_record_sha256", JStr testSha; "approved_by", JStr operator ] ]
-            | "scope-or-topology", _ -> [ JObj [ "decision_id", JStr(str "id" p); "action", JStr "select-topology"; "topology", JStr "C-role-lanes-two-ui"; "approved_by", JStr operator ] ]
-            | "scope", _ -> [ JObj [ "decision_id", JStr(str "id" p); "action", JStr "decide"; "option", JStr "A"; "approved_by", JStr operator ] ]
-            | _ -> [ JObj [ "decision_id", JStr(str "id" p); "action", JStr "decide"; "approved_by", JStr operator ] ])
-    let withRecords (rs: Json list) = setIn "approvals" (JArr rs) i0.Approvals
+            match str "kind" p with
+            | "scope-or-topology" -> [ JObj [ "decision_id", JStr(str "id" p); "action", JStr "select-topology"; "topology", JStr "C-role-lanes-two-ui" ] ]
+            | "scope" -> [ JObj [ "decision_id", JStr(str "id" p); "action", JStr "decide"; "option", JStr "A" ] ]
+            | _ -> [])
+    let approvalDoc (authority: string) (changes: Json list) =
+        JObj [ "schema", JStr "causa.requirements-approvals/1"
+               "approvals", JArr [ JObj [ "id", JStr "APR-V4-OWNER"; "authority", JObj [ "kind", JStr "operator"; "id", JStr authority ]; "date", JStr "2026-11-01"; "changes", JArr changes ] ] ]
+    let pi = planInputs source
+    let compiledWith (doc: Json) (amends: Json list) =
+        let bytes = Text.Encoding.UTF8.GetBytes(serialize doc)
+        let commit = String('a', 40)
+        let spec = setIn "obligationAmendments" (JArr(amends |> List.map (fun c -> JObj [ "obligation", JStr(str "obligation_id" c); "approval", JStr "APR-V4-OWNER"; "decision", JStr(str "decision_id" c) ]))) pi.Spec
+        let plan = VerificationPlan.build { pi with Spec = spec; Approvals = { pi.Approvals with Commit = commit; Sha256 = Git.sha256Hex bytes; Document = doc } }
+        plan, (commit, pi.Approvals.Path, Git.sha256Hex bytes)
+    let allAmends = amendChanges (fun _ -> true)
+    let plan0, _ = compiledWith (approvalDoc operator (allAmends @ decisionChanges)) allAmends
+    let contentDigest = V4Package.planContentDigest plan0
+    let packageChange = JObj [ "decision_id", JStr "ODR-V4-01"; "action", JStr "approve-package"; "plan_content_digest", JStr contentDigest; "review_sha256", JStr reviewSha; "test_record_sha256", JStr testSha ]
+    let allChanges = allAmends @ decisionChanges @ [ packageChange ]
+    let scenario (authority: string) (changes: Json list) (amends: Json list) (i: V4Package.Inputs) =
+        let doc = approvalDoc authority changes
+        let plan, pin = compiledWith doc amends
+        { i with Approvals = doc; Plan = plan; ApprovalsPin = pin }
     let allRecorded =
-        { i0 with
-            Approvals = withRecords approvalRecords
-            ApprovalsAgentAuthored = false
-            ApprovalsOnMain = true
-            CompilerTests = JObj [ "result", JStr "PASS"; "compilerTreeSha256", JStr i0.CompilerTreeSha256 ]
-            TestRecordSha256 = testSha
-            Review = review
-            ReviewSha256 = reviewSha
-            FreezeCommitVerified = true }
+        scenario operator allChanges allAmends
+            { i0 with
+                ApprovalsAgentAuthored = false
+                ApprovalsOnMain = true
+                CompilerTests = JObj [ "result", JStr "PASS"; "compilerTreeSha256", JStr i0.CompilerTreeSha256 ]
+                TestRecordSha256 = testSha
+                Review = review
+                ReviewSha256 = reviewSha
+                FreezeCommitVerified = true }
     let statusOf (i: V4Package.Inputs) =
         let b = V4Package.build i
-        let _, status = V4Package.freezeStatus b (V4Package.gates i b planDigest) true
+        let _, status = V4Package.freezeStatus b (V4Package.gates i b (V4Package.planContentDigest i.Plan)) true
         status
-    let mapRecord (pred: Json -> bool) (f: Json -> Json) = approvalRecords |> List.map (fun r -> if pred r then f r else r)
+    let mapChange (pred: Json -> bool) (f: Json -> Json) (cs: Json list) = cs |> List.map (fun c -> if pred c then f c else c)
+    let byDecision id (c: Json) = strOpt "decision_id" c = Some id
     let freezeControls =
         [ if statusOf i0 <> "CANDIDATE" then yield "freeze: the committed package is not a CANDIDATE"
-          if statusOf allRecorded <> "READY-FOR-OWNER-FREEZE" then yield "freeze: every condition recorded, but the package is not READY-FOR-OWNER-FREEZE (positive control)"
+          if statusOf allRecorded <> "READY-FOR-OWNER-FREEZE" then
+              let b = V4Package.build allRecorded
+              let failing = V4Package.gates allRecorded b (V4Package.planContentDigest allRecorded.Plan) |> List.filter (fun g -> not g.Pass) |> List.map (fun g -> g.Id + ": " + g.Detail)
+              let checks = b.Checks |> List.filter (fun c -> not c.Problems.IsEmpty) |> List.map (fun c -> c.Id + ": " + List.head c.Problems)
+              yield sprintf "freeze: every condition recorded, but the package is not READY-FOR-OWNER-FREEZE (positive control): %A %A" failing checks
           // No combination of repository inputs makes the compiler declare FROZEN (RV2-1).
-          let frozenFlag (i: V4Package.Inputs) = let b = V4Package.build i in V4Package.freezeStatus b (V4Package.gates i b planDigest) true |> fst |> List.contains ("frozen", true)
+          let frozenFlag (i: V4Package.Inputs) = let b = V4Package.build i in V4Package.freezeStatus b (V4Package.gates i b (V4Package.planContentDigest i.Plan)) true |> fst |> List.contains ("frozen", true)
           if frozenFlag allRecorded then yield "freeze: the compiler declared frozen from repository inputs"
           let blocked label (i: V4Package.Inputs) = [ if statusOf i <> "CANDIDATE" then yield sprintf "freeze: ready although %s" label ]
-          yield! blocked "no approvals" { allRecorded with Approvals = i0.Approvals }
+          yield! blocked "no approvals" { allRecorded with Approvals = i0.Approvals; Plan = i0.Plan; ApprovalsPin = i0.ApprovalsPin }
+          yield! blocked "approved amendments were never applied to the plan (RV4-1)" (scenario operator allChanges [] allRecorded)
+          let without08 = allAmends |> List.filter (fun c -> not (List.contains (strOpt "obligation_id" c) [ Some "PERSIST-023-O2"; Some "PERSIST-007-O2"; Some "PERSIST-007-O4" ]))
+          let declined08 = without08 @ decisionChanges @ [ packageChange; JObj [ "decision_id", JStr "ODR-V4-08"; "action", JStr "decline" ] ]
+          yield! blocked "the combined criterion stands although its partner was declined (RV4-2)" (scenario operator declined08 without08 allRecorded)
           yield! blocked "the approvals file was last changed by an agent" { allRecorded with ApprovalsAgentAuthored = true }
-          yield! blocked "the approvals commit is not on main" { allRecorded with ApprovalsOnMain = false }
-          yield! blocked "an approver is not a trusted operator" { allRecorded with Approvals = withRecords (approvalRecords |> List.map (setIn "approved_by" (JStr "someone-else"))) }
-          yield! blocked "an amendment approval carries a weaker criterion"
-              { allRecorded with Approvals = withRecords (mapRecord (fun r -> strOpt "obligation_id" r = Some "PERSIST-031-O22") (setIn "criterion" (JStr "The action is Retry."))) }
-          yield! blocked "the package approval names another plan" { allRecorded with Approvals = withRecords (mapRecord (fun r -> strOpt "decision_id" r = Some "ODR-V4-01") (setIn "plan_content_digest" (JStr(String('e', 64))))) }
+          yield! blocked "the approvals commit is not on origin/main" { allRecorded with ApprovalsOnMain = false }
+          yield! blocked "the authority is not a trusted operator" (scenario "someone-else" allChanges allAmends allRecorded)
+          let weaker = allChanges |> mapChange (fun c -> strOpt "obligation_id" c = Some "PERSIST-031-O22") (setIn "criterion" (JStr "The action is Retry."))
+          yield! blocked "an amendment approval carries a weaker criterion" (scenario operator weaker (weaker |> List.filter (fun c -> strOpt "action" c = Some "amend")) allRecorded)
+          yield! blocked "the package approval names another plan" (scenario operator (allChanges |> mapChange (byDecision "ODR-V4-01") (setIn "plan_content_digest" (JStr(String('e', 64))))) allAmends allRecorded)
           yield! blocked "the package approval names another review record" { allRecorded with ReviewSha256 = String('1', 64) }
-          yield! blocked "the selected topology does not fit" { allRecorded with Approvals = withRecords (mapRecord (fun r -> strOpt "decision_id" r = Some "ODR-V4-07") (setIn "topology" (JStr "B-single-lead"))) }
-          yield! blocked "no topology was selected" { allRecorded with Approvals = withRecords (approvalRecords |> List.filter (fun r -> strOpt "decision_id" r <> Some "ODR-V4-07")) }
+          yield! blocked "the selected topology does not fit" (scenario operator (allChanges |> mapChange (byDecision "ODR-V4-07") (setIn "topology" (JStr "B-single-lead"))) allAmends allRecorded)
+          yield! blocked "no topology was selected" (scenario operator (allChanges |> List.filter (byDecision "ODR-V4-07" >> not)) allAmends allRecorded)
+          yield! blocked "a scope decision names an option the request does not list" (scenario operator (allChanges |> mapChange (byDecision "ODR-V4-10") (setIn "option" (JStr "Z"))) allAmends allRecorded)
           yield! blocked "the test record is for another compiler tree" { allRecorded with CompilerTests = JObj [ "result", JStr "PASS"; "compilerTreeSha256", JStr(String('d', 64)) ] }
           yield! blocked "the review has an open major finding" { allRecorded with Review = setIn "findings" (JArr [ JObj [ "id", JStr "F1"; "severity", JStr "major"; "status", JStr "open" ] ]) review }
           yield! blocked "the reviewer is the implementer" { allRecorded with Review = setIn "reviewerIsImplementer" (JBool true) review }
           yield! blocked "the review record only claims PASS" { allRecorded with Review = JObj [ "verdict", JStr "PASS" ] }
           yield! blocked "the reviewer's last round failed although the author marked findings fixed" { allRecorded with Review = setIn "roundVerdicts" (JArr [ JObj [ "round", JInt 1L; "verdict", JStr "FAIL" ] ]) review }
-          yield! blocked "a scope decision names an option the request does not list" { allRecorded with Approvals = withRecords (mapRecord (fun r -> strOpt "decision_id" r = Some "ODR-V4-10") (setIn "option" (JStr "Z"))) }
-          yield! blocked "a scope decision names no option" { allRecorded with Approvals = withRecords (mapRecord (fun r -> strOpt "decision_id" r = Some "ODR-V4-10") (fun r -> match r with JObj ps -> JObj(ps |> List.filter (fst >> (<>) "option")) | j -> j)) }
           yield! blocked "the freeze commit is not verified" { allRecorded with FreezeCommitVerified = false }
           yield! blocked "the window is too small for the selected topology" { allRecorded with Policy = setIn "clock" (JObj [ "timedMinutes", JInt 100L ]) allRecorded.Policy }
-          yield! expectFail "untrusted approver" "W13" { i0 with Approvals = withRecords [ JObj [ "decision_id", JStr "ODR-V4-01"; "approved_by", JStr "someone-else" ] ] }
-          yield! expectFail "agent-authored approvals with records" "W13" { i0 with Approvals = withRecords approvalRecords; ApprovalsAgentAuthored = true } ]
+          let proposedCount (i: V4Package.Inputs) =
+              (V4Package.build i).Files |> List.find (fst >> (=) "acceptance/acceptance-obligations.json") |> snd |> field "summary" |> Option.bind (intOpt "proposed")
+          if proposedCount allRecorded <> Some 0L then yield "freeze: approved and applied amendments did not make their acceptance obligations normative (RV4-1)"
+          if proposedCount i0 = Some 0L then yield "freeze: proposed acceptance obligations are normative without the owner's approval"
+          yield! expectFail "untrusted authority" "W13" (scenario "someone-else" allChanges allAmends i0)
+          yield! expectFail "agent-authored approvals with records" "W13" { allRecorded with ApprovalsAgentAuthored = true } ]
     [ // The committed inputs pass every check with a valid registry.
       for c in built0.Checks do
           if not c.Problems.IsEmpty && not (c.Id = "W07" && evidence.IsNone) then yield sprintf "v4 stage: %s fails on the committed package: %A" c.Id (List.truncate 3 c.Problems)

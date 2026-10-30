@@ -38,7 +38,7 @@
   "executionManifestSha256": "4f46104323e3c57f357518fa7a12407ae189b3e727a0f8c454113fa1bf95cbe8",
   "executionPlanSha256": "d5aea873582bd3a533f52894b0651e8bf36bbb6d9ac929703941fef92a9c4f85",
   "acceptanceSha256": {
-    "acceptance-obligations.json": "f0c5130f4658530cf9c3b39ee33d872d6a256da571d46dc96140fbdbfc71818c",
+    "acceptance-obligations.json": "9deed2b613c27f2bb4d96fcca5bd3670389518795e0ba360d6df630949609f9a",
     "acceptance-gate.json": "035741e18b41b03ca09b13a7818705cad2d276ac03d5fa61e968b0115bf32c65"
   },
   "files": [
@@ -48,7 +48,7 @@
     },
     {
       "path": "acceptance/acceptance-obligations.json",
-      "sha256": "f0c5130f4658530cf9c3b39ee33d872d6a256da571d46dc96140fbdbfc71818c"
+      "sha256": "9deed2b613c27f2bb4d96fcca5bd3670389518795e0ba360d6df630949609f9a"
     },
     {
       "path": "baseline-reconciliation.json",
@@ -145,7 +145,7 @@
   ],
   "compiler": {
     "name": "requirements-compiler",
-    "treeSha256": "89ed8e4c53f8d731ecf507b0921de033599537a7c3a94382d9a110366313ed58",
+    "treeSha256": "dbb0aab92ab95ffa782775e56bf02805aa6e0d07b3986357a014b6e2d90be9a1",
     "sdk": "10.0.402"
   },
   "compilerTests": {
@@ -153,13 +153,13 @@
     "result": "PASS",
     "failures": 0,
     "summary": "offline tests (baseline equivalence, baseline units, preflight verdict, verification plan, acceptance contracts, process evidence, v4 scope and controls): all passed",
-    "compilerTreeSha256": "89ed8e4c53f8d731ecf507b0921de033599537a7c3a94382d9a110366313ed58",
+    "compilerTreeSha256": "dbb0aab92ab95ffa782775e56bf02805aa6e0d07b3986357a014b6e2d90be9a1",
     "command": "dotnet run -c Release --project tools/requirements-compiler/tests -- --offline --source ."
   },
   "independentReview": {
     "verdict": "",
     "reviewer": "independent read-only Claude Code subagent (fresh context; not the package author)",
-    "rounds": 3,
+    "rounds": 4,
     "record": "independent-review.md"
   },
   "freezeGate": [
@@ -167,60 +167,70 @@
       "id": "FG-01",
       "condition": "The authoritative baseline is reconciled",
       "status": "PASS",
+      "evidence": "computed by the compiler",
       "detail": "W01 0 problem(s)"
     },
     {
       "id": "FG-02",
       "condition": "No mandatory requirement has disappeared",
       "status": "PASS",
+      "evidence": "computed by the compiler",
       "detail": "W01 (no removal, no P0 downgrade) and W03 (every P0 in the plan)"
     },
     {
       "id": "FG-03",
       "condition": "Every P0 requirement has acceptance coverage",
       "status": "PASS",
+      "evidence": "computed by the compiler",
       "detail": "W03 (plan-readiness READY, no permit, acceptance obligations for every P0) and W16 (strengthened bindings in the plan)"
     },
     {
       "id": "FG-04",
       "condition": "No unresolved critical contradiction remains",
       "status": "PASS",
+      "evidence": "computed by the compiler",
       "detail": "W02: legacy V01-V18 and readiness"
     },
     {
       "id": "FG-05",
       "condition": "All required owner approvals exist",
       "status": "FAIL",
+      "evidence": "repository record (unauthenticated; see statesMeaning)",
       "detail": "pending: ODR-V4-01, ODR-V4-02, ODR-V4-03, ODR-V4-04, ODR-V4-05, ODR-V4-06, ODR-V4-07, ODR-V4-08, ODR-V4-09, ODR-V4-10, ODR-V4-11"
     },
     {
       "id": "FG-06",
       "condition": "The dependency lock is valid",
       "status": "PASS",
+      "evidence": "computed by the compiler",
       "detail": "W08 0 problem(s)"
     },
     {
       "id": "FG-07",
       "condition": "The execution plan is complete and the selected topology fits the window",
       "status": "FAIL",
+      "evidence": "computed by the compiler",
       "detail": "no topology selected by the owner (ODR-V4-07)"
     },
     {
       "id": "FG-08",
       "condition": "Compiler tests pass",
       "status": "PASS",
-      "detail": "record: PASS, tree 89ed8e4c53f8d731ecf507b0921de033599537a7c3a94382d9a110366313ed58 (current tree 89ed8e4c53f8d731ecf507b0921de033599537a7c3a94382d9a110366313ed58); CI re-runs the suite and compares (--verify-test-record)"
+      "evidence": "repository record (unauthenticated; see statesMeaning)",
+      "detail": "record: PASS, tree dbb0aab92ab95ffa782775e56bf02805aa6e0d07b3986357a014b6e2d90be9a1 (current tree dbb0aab92ab95ffa782775e56bf02805aa6e0d07b3986357a014b6e2d90be9a1); CI re-runs the suite and compares (--verify-test-record)"
     },
     {
       "id": "FG-09",
       "condition": "Independent review passes",
       "status": "FAIL",
-      "detail": "computed from 28 finding(s) and the reviewer's last round verdict (FAIL); reviewer independent read-only Claude Code subagent (fresh context; not the package author)"
+      "evidence": "repository record (unauthenticated; see statesMeaning)",
+      "detail": "computed from 31 finding(s) and the reviewer's last round verdict (FAIL); reviewer independent read-only Claude Code subagent (fresh context; not the package author)"
     },
     {
       "id": "FG-10",
       "condition": "The freeze commit is recorded",
       "status": "FAIL",
+      "evidence": "repository record (unauthenticated; see statesMeaning)",
       "detail": "no verified freeze commit: it must be on main and hold the owner's package approval"
     }
   ],
@@ -253,6 +263,9 @@
     "review RV3-4 (minor): fixed",
     "review RV3-5 (minor): accepted",
     "review RV3-6 (minor): fixed",
+    "review RV4-1 (major): fixed",
+    "review RV4-2 (minor): fixed",
+    "review RV4-3 (minor): fixed",
     "owner decision ODR-V4-01 pending",
     "owner decision ODR-V4-02 pending",
     "owner decision ODR-V4-03 pending",

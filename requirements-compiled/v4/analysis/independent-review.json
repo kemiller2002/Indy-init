@@ -3,7 +3,7 @@
   "description": "Record of the independent adversarial review of package v4. The reviewer was a fresh, read-only Claude Code subagent. It received the sources, the artifacts and the compiler, but not the compiler author's conclusions. Its verdicts are copied as given. The status of each finding is the remediation the package author made; the reviewer's next round verifies it. FG-09 computes its result from this record, not from any verdict field. The owner's package approval (ODR-V4-01) must name this file's SHA-256. This record is agent-produced: the reviewer is an agent, and so is the author of this file.",
   "reviewer": "independent read-only Claude Code subagent (fresh context; not the package author)",
   "reviewerIsImplementer": false,
-  "rounds": 3,
+  "rounds": 4,
   "roundVerdicts": [
     {
       "round": 1,
@@ -22,6 +22,12 @@
       "verdict": "FAIL",
       "reviewedState": "claude/requirements-v4 at 67886ee",
       "summary": "no critical finding open; RV2-2, -3, -4, -6, -7 resolved; RV2-1 and RV2-5 partly resolved; new: 2 major (RV3-1, RV3-2), 4 minor"
+    },
+    {
+      "round": 4,
+      "verdict": "FAIL",
+      "reviewedState": "claude/requirements-v4 at 3dda420",
+      "summary": "no critical finding; RV3-1, -3, -4, -6 resolved; RV3-2 and RV3-5 accepted as recorded residuals; new: 1 major (RV4-1), 2 minor"
     }
   ],
   "findings": [
@@ -207,7 +213,8 @@
       "status": "decided-by-owner",
       "title": "FG-09 and FG-05/FG-10 rest on records an agent or local actor can write",
       "remediation": "This is not fixed in the compiler, and cannot be offline. The manifest states are renamed independentReviewRecordPasses and ownerApprovalRecordsComplete, and statesMeaning says they are unauthenticated. The compiler never computes frozen. The freeze is authenticated only by the owner's approving GitHub review and the tag, which T01 and acceptance gate AG-13 check. The owner's approval of the package (ODR-V4-01) is the decision that accepts this residual.",
-      "residual": "Unauthenticated records; mitigated by the owner's GitHub review (RISK-13). Status 'decided-by-owner' means routed to ODR-V4-01; it is not yet decided."
+      "residual": "Unauthenticated records; mitigated by the owner's GitHub review (RISK-13). Status 'decided-by-owner' means routed to ODR-V4-01; it is not yet decided.",
+      "round4": "accepted by the reviewer as an honest, recorded residual (not critical)"
     },
     {
       "id": "RV3-3",
@@ -229,7 +236,8 @@
       "status": "accepted",
       "title": "T-S59 shows Unknown outcome after a known stale head",
       "remediation": "Recorded as a residual on T-S59. PAT-07 allows only Offline or Unknown commit outcome, and Offline is untrue while online.",
-      "residual": "Unknown outcome's fixed words overstate the uncertainty in this case."
+      "residual": "Unknown outcome's fixed words overstate the uncertainty in this case.",
+      "round4": "accepted residual (reviewer)"
     },
     {
       "id": "RV3-6",
@@ -237,6 +245,27 @@
       "status": "fixed",
       "title": "Scope option accepted any string",
       "remediation": "The option must be the letter of one of the request's listed options (negative control)."
+    },
+    {
+      "id": "RV4-1",
+      "severity": "major",
+      "status": "fixed",
+      "title": "Approvals counted as complete although the approved amendments were never applied to the plan",
+      "remediation": "An amendment request is approved only when every proposed change is written by the operator exactly as proposed and the compiled plan applies it with that criterion. A declined request must leave its criteria out of the plan. Acceptance obligations become normative only for approved, applied requests. While fixing this, the author found that the gate and its templates used a flat record format, whereas verify-plan authorizes only {id, authority: {kind: operator, id}, changes: [...]}; an owner following the old templates could not have applied any amendment. The gate now reads that schema, and the templates were rewritten (proposals recordFormat). The positive control compiles a really amended plan through VerificationPlan.build, and negative controls cover 'recorded but not applied', 'combined text with partner declined', an untrusted authority and a weaker criterion."
+    },
+    {
+      "id": "RV4-2",
+      "severity": "minor",
+      "status": "fixed",
+      "title": "Combined criterion accepted with the partner declined",
+      "remediation": "The combined criterion counts only when the partner request (combinedWith) is not declined and its own changes are recorded and applied (negative control)."
+    },
+    {
+      "id": "RV4-3",
+      "severity": "minor",
+      "status": "fixed",
+      "title": "Gate rows read as verified",
+      "remediation": "Each freezeGate row now states its evidence: computed by the compiler, or a repository record (unauthenticated)."
     }
   ]
 }

@@ -16,7 +16,7 @@
       "rationale": "The freeze gate requires every owner approval to exist. An agent cannot approve its own package (RDP-003, AR-003).",
       "impact": "Until approved, v4 is published as a CANDIDATE and the tag indy-init-requirements-v4.0.0 is not created.",
       "approvalRecord": {
-        "how": "An operator-written record in kickoff/rehearsal-007/approvals.causa.json, committed by the owner (not by an agent) and merged to main: {\"decision_id\": \"ODR-V4-01\", \"action\": \"approve-package\", \"package\": \"requirements-compiled/v4\", \"plan_content_digest\": \"<freeze-manifest verificationPlan.contentDigest>\", \"review_sha256\": \"<sha256 of analysis/independent-review.json>\", \"test_record_sha256\": \"<sha256 of analysis/compiler-test-record.json>\", \"approved_by\": \"kemiller2002\", \"date\": \"<date>\"}. The record binds the owner's approval to the exact plan, review record and test record, which are agent-produced. The content digest leaves out the approvals pin, so writing this record does not invalidate it. The owner's approving GitHub review of the freeze pull request is also required; the compiler cannot authenticate the record by itself."
+        "how": "A change in an operator approval (see recordFormat): {\"decision_id\": \"ODR-V4-01\", \"action\": \"approve-package\", \"package\": \"requirements-compiled/v4\", \"plan_content_digest\": \"<freeze-manifest verificationPlan.contentDigest>\", \"review_sha256\": \"<sha256 of analysis/independent-review.json>\", \"test_record_sha256\": \"<sha256 of analysis/compiler-test-record.json>\"}. The record binds the owner's approval to the exact plan, review record and test record, which are agent-produced. The content digest leaves out the approvals pin, so writing this record does not invalidate it. The owner's approving GitHub review of the freeze pull request is also required; the compiler cannot authenticate the record by itself."
       },
       "affects": []
     },
@@ -64,7 +64,8 @@
           "action": "amend",
           "criterion": "The test MUST verify that each legal transition reaches the state PERSIST-031 defines, that every illegal input fails closed with a typed fault, and that Saved is reached only from a read-back confirmation; it also verifies that a reply to a request the tab has superseded (an older load, refresh, conflict re-read or reconciliation read, or any reply whose base head or request identity no longer matches the tab's current one) is discarded without changing the state, the base head or the unsaved changes.",
           "rationale": "Closes the stale-reply defect class found by Rehearsal 7's third review (ODR-V4-03).",
-          "combinedCriterion": "The test MUST verify that each legal transition reaches the state PERSIST-031 defines, that every illegal input fails closed with a typed fault, and that Saved is reached only from a read-back confirmation, or from the verified-load confirmation of the amended PERSIST-023-O2, and from no other input; it also verifies that a reply to a request the tab has superseded (an older load, refresh, conflict re-read or reconciliation read, or any reply whose base head or request identity no longer matches the tab's current one) is discarded without changing the state, the base head or the unsaved changes."
+          "combinedCriterion": "The test MUST verify that each legal transition reaches the state PERSIST-031 defines, that every illegal input fails closed with a typed fault, and that Saved is reached only from a read-back confirmation, or from the verified-load confirmation of the amended PERSIST-023-O2, and from no other input; it also verifies that a reply to a request the tab has superseded (an older load, refresh, conflict re-read or reconciliation read, or any reply whose base head or request identity no longer matches the tab's current one) is discarded without changing the state, the base head or the unsaved changes.",
+          "combinedWith": "ODR-V4-08"
         }
       ],
       "recommendation": "Approve.",
@@ -170,7 +171,7 @@
         "AR-021"
       ],
       "approvalRecord": {
-        "how": "An operator-written record: {\"decision_id\": \"ODR-V4-07\", \"action\": \"select-topology\", \"topology\": \"C-role-lanes-two-ui\" | \"A-role-lanes\" | \"B-single-lead\", \"approved_by\": \"kemiller2002\", \"date\": \"<date>\"}. FG-07 passes only if the selected topology fits the window; today only C does."
+        "how": "A change in an operator approval (see recordFormat): {\"decision_id\": \"ODR-V4-07\", \"action\": \"select-topology\", \"topology\": \"C-role-lanes-two-ui\" | \"A-role-lanes\" | \"B-single-lead\"}. FG-07 passes only if the selected topology fits the window; today only C does."
       }
     },
     {
@@ -205,7 +206,8 @@
           "action": "amend",
           "criterion": "The test MUST verify that each legal transition reaches the state PERSIST-031 defines, that every illegal input fails closed with a typed fault, and that Saved is reached only from a read-back confirmation, or from the verified-load confirmation of the amended PERSIST-023-O2, and from no other input.",
           "combinedCriterion": "The test MUST verify that each legal transition reaches the state PERSIST-031 defines, that every illegal input fails closed with a typed fault, and that Saved is reached only from a read-back confirmation, or from the verified-load confirmation of the amended PERSIST-023-O2, and from no other input; it also verifies that a reply to a request the tab has superseded (an older load, refresh, conflict re-read or reconciliation read, or any reply whose base head or request identity no longer matches the tab's current one) is discarded without changing the state, the base head or the unsaved changes.",
-          "rationale": "PAT-12 must accept the verified-load route to Saved once PERSIST-023-O2 is amended (ODR-V4-08). If ODR-V4-03 is also approved, write combinedCriterion once for both: an obligation can carry only one amendment."
+          "rationale": "PAT-12 must accept the verified-load route to Saved once PERSIST-023-O2 is amended (ODR-V4-08). If ODR-V4-03 is also approved, write combinedCriterion once for both: an obligation can carry only one amendment.",
+          "combinedWith": "ODR-V4-03"
         }
       ],
       "recommendation": "Approve.",
@@ -232,7 +234,7 @@
         "R11.4"
       ],
       "approvalRecord": {
-        "how": "An operator-written record naming the option chosen: {\"decision_id\": \"ODR-V4-09\", \"action\": \"decide\", \"option\": \"A\" | \"B\", \"approved_by\": \"kemiller2002\", \"date\": \"<date>\"}. A record without an option does not count."
+        "how": "A change in an operator approval (see recordFormat) naming the option chosen: {\"decision_id\": \"ODR-V4-09\", \"action\": \"decide\", \"option\": \"A\" | \"B\"}. A record without an option does not count."
       }
     },
     {
@@ -254,7 +256,7 @@
         "DCC-015"
       ],
       "approvalRecord": {
-        "how": "An operator-written record naming the option chosen: {\"decision_id\": \"ODR-V4-10\", \"action\": \"decide\", \"option\": \"A\" | \"B\", \"approved_by\": \"kemiller2002\", \"date\": \"<date>\"}. A record without an option does not count."
+        "how": "A change in an operator approval (see recordFormat) naming the option chosen: {\"decision_id\": \"ODR-V4-10\", \"action\": \"decide\", \"option\": \"A\" | \"B\"}. A record without an option does not count."
       }
     },
     {
@@ -271,12 +273,20 @@
       ],
       "recommendation": "A. Reconciliation already guards the uncertain investigation, and B lets one lost answer block the whole tab for up to 14 seconds plus a user action.",
       "approvalRecord": {
-        "how": "{\"decision_id\": \"ODR-V4-11\", \"action\": \"decide\", \"option\": \"A\" | \"B\", \"approved_by\": \"kemiller2002\", \"date\": \"<date>\"}"
+        "how": "{\"decision_id\": \"ODR-V4-11\", \"action\": \"decide\", \"option\": \"A\" | \"B\"}"
       },
       "affects": [
         "PERSIST-006",
         "PERSIST-015"
       ]
     }
-  ]
+  ],
+  "recordFormat": {
+    "file": "kickoff/rehearsal-007/approvals.causa.json (schema causa.requirements-approvals/1, the schema verify-plan authorizes)",
+    "envelope": "{\"approvals\": [{\"id\": \"APR-V4-OWNER-1\", \"authority\": {\"kind\": \"operator\", \"id\": \"kemiller2002\"}, \"date\": \"<date>\", \"changes\": [ ...one change per record below... ]}]}",
+    "amendmentChange": "Each 'approvalRecord' entry of an obligation-amendment request is one change, written as given: {\"obligation_id\", \"action\": \"amend\", \"criterion\", \"rationale\"}. Where two approved requests amend the same obligation, write its combinedCriterion once. To decline a request, add {\"decision_id\": \"ODR-V4-0n\", \"action\": \"decline\"}.",
+    "decisionChange": "Other requests are one change each: {\"decision_id\", \"action\", ...} as described in the request's approvalRecord.how.",
+    "applying": "An approved amendment counts only when the plan applies it: curation/verification-plan.json obligationAmendments gets {\"obligation\": \"<obligation_id>\", \"approval\": \"<approval id>\", \"decision\": \"<ODR id>\"}, the approvals pin is updated, and both compiler stages are re-run. The agent may make this curation change; it writes no record.",
+    "authority": "The file must be changed only in a commit without agent attribution trailers and merged to main. The compiler checks this, but cannot authenticate the person; the owner's approving GitHub review of the freeze pull request is the authentication."
+  }
 }

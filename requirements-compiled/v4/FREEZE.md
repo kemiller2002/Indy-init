@@ -12,7 +12,7 @@ Each state is established differently. Only the first two are computed by the co
 |---|---|---|
 | Compiled | **yes** | The v3 pipeline returns compilation PASS (V01–V18), and the v4 stage generates every artifact |
 | Validated | **yes** | Checks W01–W16 pass (`package-validation-report.json`), and plan-readiness is READY with 1211 of 1211 category checks and no permits |
-| Independently reviewed | **no** | Three review rounds were run, all FAIL as given (`independent-review.md`). Round 3 found no critical finding. FG-09 passes only when the reviewer's last round verdict is PASS and no critical or major finding is open. The record is written by the package author from the reviewer's report, so it is a record, not an authenticated attestation |
+| Independently reviewed | **no** | Four review rounds were run, all FAIL as given (`independent-review.md`). Rounds 3 and 4 found no critical finding. FG-09 passes only when the reviewer's last round verdict is PASS and no critical or major finding is open. The record is written by the package author from the reviewer's report, so it is a record, not an authenticated attestation |
 | Approved | **no** | Owner decision requests ODR-V4-01..11 have no operator records (`proposals/owner-decision-requests.json`). Under RDP-003 only the operator writes them. The compiler checks that each record has a trusted approver, sits in a commit without agent trailers, is on origin/main and matches the proposal exactly. It cannot authenticate the person behind the record |
 | Frozen | **no** | Never computed. The package is frozen only when the owner approves the freeze pull request on GitHub, and then the tag `indy-init-requirements-v4.0.0` is created on its merge commit. The kickoff (T01) and acceptance gate AG-13 check the tag, its manifest digests and the owner's review |
 
@@ -45,12 +45,14 @@ Each state is established differently. Only the first two are computed by the co
 
 ## What the owner does to freeze v4
 
-1. Decide ODR-V4-02..11 in `proposals/owner-decision-requests.json`. For each, write the given record into `kickoff/rehearsal-007/approvals.causa.json`, in a commit of your own, through a pull request you merge.
-   - Write amendments exactly as proposed. Where two requests amend PERSIST-051-O2, write its `combinedCriterion` once.
+1. Decide ODR-V4-02..11 in `proposals/owner-decision-requests.json`.
+   - Write each decision as a change in one operator approval in `kickoff/rehearsal-007/approvals.causa.json`: `{"id", "authority": {"kind": "operator", "id": "kemiller2002"}, "date", "changes": [...]}`. This is the schema verify-plan authorizes (see `recordFormat`).
+   - Make the commit yourself and merge it through a pull request.
+   - Write amendments exactly as proposed. Where two approved requests amend PERSIST-051-O2, write its `combinedCriterion` once.
    - Scope decisions name an option letter.
    - ODR-V4-07 names a topology. Only `C-role-lanes-two-ui` fits.
-   - A declined amendment is a record with `"action": "decline"`.
-2. Re-pin the approvals commit in `curation/verification-plan.json`. Put each approved amendment into `obligationAmendments`, then recompile both stages. The agent can do this step, because it applies the operator's records and writes none.
+   - A declined request is `{"decision_id", "action": "decline"}`.
+2. Re-pin the approvals commit in `curation/verification-plan.json`. Add each approved amendment to `obligationAmendments` as `{obligation, approval, decision}`, then recompile both stages. The agent can do this step, because it applies the operator's records and writes none. FG-05 counts an amendment only once the compiled plan applies it, with exactly the recorded criterion.
 3. Run a fresh independent review of the recompiled package and record it. FG-09 needs a last round verdict of PASS.
 4. Write the ODR-V4-01 record. It names `verificationPlan.contentDigest` and the SHA-256 of `analysis/independent-review.json` and `analysis/compiler-test-record.json`. Approve the freeze pull request on GitHub.
 5. After merge, set `analysis/freeze-input.json` `freezeCommit` to the merge commit and recompile. When the status reads READY-FOR-OWNER-FREEZE, tag that commit `indy-init-requirements-v4.0.0`.

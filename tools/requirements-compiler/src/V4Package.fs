@@ -444,7 +444,7 @@ let private failureConditions =
           "a required evidence category is not covered, or its freshness policy is violated"
           "the obligation's binding, amendment or exclusion differs from the frozen plan without an operator approval record" ]
 
-let acceptanceObligations (i: Inputs) : Json =
+let acceptanceObligations (approved: Set<string>) (i: Inputs) : Json =
     let planOblig =
         arr "requirements" i.Plan
         |> List.collect (fun e ->
@@ -487,9 +487,9 @@ let acceptanceObligations (i: Inputs) : Json =
               "evidenceConsumer", JStr consumer
               "passCondition", JStr(sprintf "The test has a PASS result in the evidence bundle for the exact final SHA (category %s)." (str "category" t))
               "failureConditions", failureConditions
-              "normative", JBool proposals.IsEmpty
+              "normative", JBool(proposals |> List.forall approved.Contains)
               "boundInPlan", JBool(boundIn (sources |> List.tryHead |> Option.defaultValue "") (str "id" t))
-              "status", JStr(if proposals.IsEmpty then "binding-strengthened (enforces existing obligations of the cited requirements)" else "proposed: normative only after the owner approves " + String.concat ", " proposals) ]
+              "status", JStr(if proposals |> List.forall approved.Contains then "binding-strengthened (enforces existing obligations of the cited requirements, or obligations the owner amended: " + String.concat ", " proposals + ")" else "proposed: normative only after the owner approves and the plan applies " + String.concat ", " proposals) ]
     let invariantOblig =
         arr "invariants" i.Invariants
         |> List.collect (fun inv -> arr "tests" inv |> List.mapi (fun n t -> extra "invariant" (sprintf "AO-%s-%d" (str "id" inv) (n + 1)) ((strOpt "obligation" t |> Option.toList) @ strs "sources" inv) (strs "proposals" inv) t))
@@ -768,6 +768,114 @@ let treeSha256 (files: (string * byte[]) list) =
     |> Text.Encoding.UTF8.GetBytes
     |> Git.sha256Hex
 
+// ---- owner decisions ------------------------------------------------------------------------------------
+
+/// The digest the owner's package approval names: the plan without its planIdentity and without source.approvals.
+/// The approvals pin must be left out, because writing the approval changes the approvals file and so the pin; a
+/// digest that covered it could never be named by the record it pins (v4 review RV3-1).
+let planContentDigest (plan: Json) =
+    let strip (j: Json) =
+        match j with
+        | JObj ps ->
+            JObj(
+                ps
+                |> List.filter (fst >> (<>) "planIdentity")
+                |> List.map (fun (k, v) ->
+                    match k, v with
+                    | "source", JObj sp -> k, JObj(sp |> List.filter (fst >> (<>) "approvals"))
+                    | _ -> k, v))
+        | j -> j
+    strip plan |> serialize |> Text.Encoding.UTF8.GetBytes |> Git.sha256Hex
+
+/// The operator's decisions as flat records. The approvals file uses the schema verify-plan authorizes
+/// (causa.requirements-approvals/1): approvals [{id, authority: {kind: "operator", id}, date, changes: [...]}]. Each
+/// change becomes one record carrying approval_id and approved_by (the authority id). A change is an obligation
+/// amendment {obligation_id, action: "amend", criterion, rationale} or a decision {decision_id, action, ...}.
+let private flatRecords (approvals: Json) =
+    arr "approvals" approvals
+    |> List.collect (fun ap ->
+        let auth = field "authority" ap |> Option.defaultValue JNull
+        let by = if sOr "kind" auth = "operator" then sOr "id" auth else ""
+        arr "changes" ap
+        |> List.map (fun c ->
+            match c with
+            | JObj ps -> JObj(ps @ [ "approval_id", JStr(sOr "id" ap); "approved_by", JStr by ])
+            | j -> j))
+
+/// Approval records the gate may count: written by a trusted operator, in a file whose last change is not
+/// agent-attributed, at a commit reachable from origin/main (RDP-003). Anything else counts as no record.
+let validRecords (i: Inputs) =
+    if i.ApprovalsAgentAuthored || not i.ApprovalsOnMain then []
+    else flatRecords i.Approvals |> List.filter (fun a -> List.contains (sOr "approved_by" a) i.TrustedOperators)
+
+/// The topology the owner selected (ODR-V4-07), if any.
+let selectedTopology (i: Inputs) =
+    validRecords i |> List.tryFind (fun a -> sOr "decision_id" a = "ODR-V4-07" && sOr "action" a = "select-topology") |> Option.map (sOr "topology")
+
+/// Amendments the compiled plan applies: obligation -> criterion.
+let private planAmendments (plan: Json) =
+    arr "requirements" plan
+    |> List.collect (arr "obligations")
+    |> List.choose (fun o -> field "amendment" o |> Option.map (fun a -> str "sourceObligation" o, sOr "criterion" a))
+    |> Map.ofList
+
+/// The state of each owner decision request. An amendment request is approved only when every record it proposes is
+/// written by the operator exactly as proposed AND the compiled plan applies it with that criterion, so an approval
+/// that never reached the plan does not count (v4 review RV4-1). A combined criterion counts only when its partner
+/// request is approved too (RV4-2). A declined request must leave its single criteria out of the plan.
+type private RequestState = Approved | Declined | Pending
+
+let private requestStates (i: Inputs) (planDigest: string) : (Json * RequestState) list =
+    let records = validRecords i
+    let applied = planAmendments i.Plan
+    let requests = arr "requests" i.Proposals
+    let byId = requests |> List.map (fun p -> str "id" p, p) |> Map.ofList
+    let proposedOf (p: Json) = match field "approvalRecord" p with Some(JArr xs) -> xs | _ -> []
+    let declined (id: string) = records |> List.exists (fun a -> sOr "decision_id" a = id && sOr "action" a = "decline")
+    let recordedWith (r: Json) (criterion: string) =
+        criterion <> "" && records |> List.exists (fun a -> sOr "obligation_id" a = sOr "obligation_id" r && sOr "action" a = "amend" && sOr "criterion" a = criterion)
+    // Single criteria of a request, other than any it shares with a partner, are recorded and applied.
+    let ownApproved (p: Json) =
+        proposedOf p
+        |> List.filter (fun r -> sOr "combinedCriterion" r = "")
+        |> List.forall (fun r -> recordedWith r (sOr "criterion" r) && applied.TryFind(sOr "obligation_id" r) = Some(sOr "criterion" r))
+    let letters (p: Json) = strs "options" p |> List.choose (fun o -> match o.IndexOf(':') with n when n > 0 -> Some(o.Substring(0, n).Trim()) | _ -> None)
+    requests
+    |> List.map (fun p ->
+        let id = str "id" p
+        let state =
+            match str "kind" p with
+            | "package-approval" ->
+                if records |> List.exists (fun a ->
+                    sOr "decision_id" a = "ODR-V4-01" && sOr "action" a = "approve-package" && sOr "plan_content_digest" a = planDigest
+                    && sOr "review_sha256" a = i.ReviewSha256 && sOr "test_record_sha256" a = i.TestRecordSha256) then Approved else Pending
+            | "obligation-amendment" when declined id ->
+                let leaked = proposedOf p |> List.exists (fun r -> applied.TryFind(sOr "obligation_id" r) = Some(sOr "criterion" r))
+                if leaked then Pending else Declined
+            | "obligation-amendment" ->
+                let shared r =
+                    // Either the single criterion (partner not approved) or the combined one (partner approved).
+                    let partner = byId.TryFind(sOr "combinedWith" r)
+                    let partnerApproved = partner |> Option.exists (fun q -> not (declined (str "id" q)) && ownApproved q)
+                    let wanted = if partnerApproved then sOr "combinedCriterion" r else sOr "criterion" r
+                    recordedWith r wanted && applied.TryFind(sOr "obligation_id" r) = Some wanted
+                let allOk = proposedOf p |> List.forall (fun r -> if sOr "combinedCriterion" r = "" then recordedWith r (sOr "criterion" r) && applied.TryFind(sOr "obligation_id" r) = Some(sOr "criterion" r) else shared r)
+                if allOk then Approved else Pending
+            | "scope-or-topology" ->
+                if records |> List.exists (fun a -> sOr "decision_id" a = id && sOr "action" a = "select-topology" && sOr "topology" a <> "") then Approved else Pending
+            | "scope" ->
+                if records |> List.exists (fun a -> sOr "decision_id" a = id && List.contains (sOr "option" a) (letters p)) then Approved else Pending
+            | _ -> if records |> List.exists (fun a -> sOr "decision_id" a = id) then Approved else Pending
+        p, state)
+
+/// Owner decision requests still without a valid, applied operator decision.
+let pendingDecisions (i: Inputs) (planDigest: string) =
+    requestStates i planDigest |> List.filter (fun (_, s) -> s = Pending) |> List.map (fst >> str "id")
+
+/// Requests the owner approved and the plan applies: clauses proposed by them become normative.
+let approvedRequests (i: Inputs) =
+    requestStates i (planContentDigest i.Plan) |> List.filter (fun (_, s) -> s = Approved) |> List.map (fst >> str "id") |> Set.ofList
+
 // ---- strengthened bindings --------------------------------------------------------------------------------
 
 let private ledgerCategories = set [ "unit"; "integration"; "browser"; "live-provider"; "security"; "accessibility" ]
@@ -848,7 +956,7 @@ let build (i: Inputs) : Built =
     let legacyReady = field "rehearsalReadiness" i.LegacyReport |> Option.map (str "verdict") = Some "READY"
     let p0 = p0Ids i.Baseline |> Set.ofList
     let planP0 = arr "requirements" i.Plan |> List.map (str "requirement") |> Set.ofList
-    let acceptance = acceptanceObligations i
+    let acceptance = acceptanceObligations (approvedRequests i) i
     let aoP0 = arr "obligations" acceptance |> List.choose (fun o -> strOpt "requirement" o) |> Set.ofList
     let timedCovered =
         let timed = i.Tasks |> List.filter (fun t -> t.Phase = "timed") |> List.map (fun t -> t.Id) |> Set.ofList
@@ -883,11 +991,14 @@ let build (i: Inputs) : Built =
           check "W11" "Owner decision requests are well formed: every proposed amendment only adds to its obligation's baseline text" true (proposalProblems i)
           check "W12" "The risk register's ratings are in range and every link names something in the package" true (riskProblems i)
           check "W13" "No approval record was written by an agent: the pinned approvals file holds only operator records (RDP-003)" true
-              [ let records = arr "approvals" i.Approvals
-                if not records.IsEmpty && i.ApprovalsAgentAuthored then yield "approvals: the pinned approvals file was last changed by an agent-attributed commit; only the operator writes records (RDP-003)"
-                for a in records do
-                    let by = sOr "approved_by" a
-                    if not (List.contains by i.TrustedOperators) then yield sprintf "approvals: record %s is approved by '%s', who is not a trusted operator" (sOr "decision_id" a + sOr "obligation_id" a) by ]
+              [ let records = flatRecords i.Approvals
+                if not (arr "approvals" i.Approvals).IsEmpty && i.ApprovalsAgentAuthored then yield "approvals: the pinned approvals file was last changed by an agent-attributed commit; only the operator writes records (RDP-003)"
+                for ap in arr "approvals" i.Approvals do
+                    let auth = field "authority" ap |> Option.defaultValue JNull
+                    if sOr "kind" auth <> "operator" || not (List.contains (sOr "id" auth) i.TrustedOperators) then
+                        yield sprintf "approvals: approval %s has authority %s/%s, not a trusted operator" (sOr "id" ap) (sOr "kind" auth) (sOr "id" auth)
+                    if (arr "changes" ap).IsEmpty then yield sprintf "approvals: approval %s records no change" (sOr "id" ap)
+                ignore records ]
           check "W14" "The package contains no application implementation: no source file of an application language under requirements-compiled/v4" true
               (i.PackageFiles |> List.filter (fun f -> applicationExtensions |> List.exists (fun e -> f.EndsWith(e, StringComparison.OrdinalIgnoreCase))) |> List.map (sprintf "application source file in the package: %s"))
           check "W15" "The verification plan and the reconciliation are compiled from the committed v4 baseline" true
@@ -920,67 +1031,6 @@ let validationReport (i: Inputs) (checks: Check list) : Json =
 // ---- freeze ----------------------------------------------------------------------------------------------
 
 type Gate = { Id: string; Condition: string; Pass: bool; Detail: string }
-
-/// The digest the owner's package approval names: the plan without its planIdentity and without source.approvals.
-/// The approvals pin must be left out, because writing the approval changes the approvals file and so the pin; a
-/// digest that covered it could never be named by the record it pins (v4 review RV3-1).
-let planContentDigest (plan: Json) =
-    let strip (j: Json) =
-        match j with
-        | JObj ps ->
-            JObj(
-                ps
-                |> List.filter (fst >> (<>) "planIdentity")
-                |> List.map (fun (k, v) ->
-                    match k, v with
-                    | "source", JObj sp -> k, JObj(sp |> List.filter (fst >> (<>) "approvals"))
-                    | _ -> k, v))
-        | j -> j
-    strip plan |> serialize |> Text.Encoding.UTF8.GetBytes |> Git.sha256Hex
-
-/// Approval records the gate may count: written by a trusted operator, in a file whose last change is not
-/// agent-attributed, at a commit reachable from main (RDP-003). Anything else counts as no record.
-let validRecords (i: Inputs) =
-    if i.ApprovalsAgentAuthored || not i.ApprovalsOnMain then []
-    else arr "approvals" i.Approvals |> List.filter (fun a -> List.contains (sOr "approved_by" a) i.TrustedOperators)
-
-/// Operator approval of the package itself (ODR-V4-01): it must name the exact plan, review record and test record.
-let private packageApproved (i: Inputs) (planDigest: string) =
-    validRecords i
-    |> List.exists (fun a ->
-        sOr "decision_id" a = "ODR-V4-01" && sOr "action" a = "approve-package" && sOr "plan_content_digest" a = planDigest
-        && sOr "review_sha256" a = i.ReviewSha256 && sOr "test_record_sha256" a = i.TestRecordSha256)
-
-/// The topology the owner selected (ODR-V4-07), if any.
-let selectedTopology (i: Inputs) =
-    validRecords i |> List.tryFind (fun a -> sOr "decision_id" a = "ODR-V4-07" && sOr "action" a = "select-topology") |> Option.map (sOr "topology")
-
-/// Owner decision requests still without a valid operator record. An amendment counts only when the record carries
-/// exactly the proposed obligation, action and criterion, so a weaker text cannot clear it.
-let pendingDecisions (i: Inputs) (planDigest: string) =
-    // planDigest is the plan content digest (planContentDigest).
-    let records = validRecords i
-    let decided = records |> List.map (sOr "decision_id") |> Set.ofList
-    // A proposed record may name a combined criterion to use when another request amends the same obligation.
-    let amendRecorded (r: Json) =
-        let accepted = [ sOr "criterion" r; sOr "combinedCriterion" r ] |> List.filter ((<>) "")
-        records |> List.exists (fun a -> sOr "obligation_id" a = sOr "obligation_id" r && sOr "action" a = "amend" && List.contains (sOr "criterion" a) accepted)
-    // A scope option is the letter before ':' of one of the request's options.
-    let letters (p: Json) = strs "options" p |> List.choose (fun o -> match o.IndexOf(':') with n when n > 0 -> Some(o.Substring(0, n).Trim()) | _ -> None)
-    arr "requests" i.Proposals
-    |> List.filter (fun p ->
-        match str "kind" p with
-        | "package-approval" -> not (packageApproved i planDigest)
-        | "obligation-amendment" ->
-            let proposed = match field "approvalRecord" p with Some(JArr xs) -> xs | _ -> []
-            let declined = records |> List.exists (fun a -> sOr "decision_id" a = str "id" p && sOr "action" a = "decline")
-            not declined && not (proposed |> List.forall amendRecorded)
-        | "scope-or-topology" -> (selectedTopology i).IsNone
-        | "scope" ->
-            // A scope decision names the option chosen (its letter, as in the request's options).
-            not (records |> List.exists (fun a -> sOr "decision_id" a = str "id" p && List.contains (sOr "option" a) (letters p)))
-        | _ -> not (decided.Contains(str "id" p)))
-    |> List.map (str "id")
 
 /// The review verdict computed from the record's findings, never taken from its own verdict field: PASS only when
 /// a named reviewer who is not the implementer reviewed at least once and no critical or major finding is open.
@@ -1069,7 +1119,16 @@ let freezeManifest (i: Inputs) (b: Built) (digests: (string * string) list) (leg
           "compiler", JObj [ "name", JStr "requirements-compiler"; "treeSha256", JStr i.CompilerTreeSha256; "sdk", JStr(sOr "sdk" i.FreezeInput) ]
           "compilerTests", i.CompilerTests
           "independentReview", JObj [ "verdict", JStr(sOr "verdict" i.Review); "reviewer", JStr(sOr "reviewer" i.Review); "rounds", (intOpt "rounds" i.Review |> Option.map JInt |> Option.defaultValue JNull); "record", JStr "independent-review.md" ]
-          "freezeGate", JArr(gs |> List.map (fun g -> JObj [ "id", JStr g.Id; "condition", JStr g.Condition; "status", JStr(if g.Pass then "PASS" else "FAIL"); "detail", JStr g.Detail ]))
+          "freezeGate",
+          JArr(
+              gs
+              |> List.map (fun g ->
+                  JObj
+                      [ "id", JStr g.Id
+                        "condition", JStr g.Condition
+                        "status", JStr(if g.Pass then "PASS" else "FAIL")
+                        "evidence", JStr(if List.contains g.Id [ "FG-05"; "FG-08"; "FG-09"; "FG-10" ] then "repository record (unauthenticated; see statesMeaning)" else "computed by the compiler")
+                        "detail", JStr g.Detail ]))
           "unresolvedFindings", jstrs unresolved
           "freezeTimestamp", JStr(sOr "compiledAt" i.FreezeInput)
           "freezeTimestampMeaning", JStr "the time this package was compiled; the compiler never freezes a package"

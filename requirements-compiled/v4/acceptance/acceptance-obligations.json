@@ -34880,7 +34880,7 @@
       ],
       "normative": true,
       "boundInPlan": true,
-      "status": "binding-strengthened (enforces existing obligations of the cited requirements)"
+      "status": "binding-strengthened (enforces existing obligations of the cited requirements, or obligations the owner amended: )"
     },
     {
       "id": "AO-INV-01-2",
@@ -34913,7 +34913,7 @@
       ],
       "normative": true,
       "boundInPlan": true,
-      "status": "binding-strengthened (enforces existing obligations of the cited requirements)"
+      "status": "binding-strengthened (enforces existing obligations of the cited requirements, or obligations the owner amended: )"
     },
     {
       "id": "AO-INV-02-1",
@@ -34946,7 +34946,7 @@
       ],
       "normative": false,
       "boundInPlan": false,
-      "status": "proposed: normative only after the owner approves ODR-V4-03"
+      "status": "proposed: normative only after the owner approves and the plan applies ODR-V4-03"
     },
     {
       "id": "AO-INV-02-2",
@@ -34979,7 +34979,7 @@
       ],
       "normative": false,
       "boundInPlan": false,
-      "status": "proposed: normative only after the owner approves ODR-V4-03"
+      "status": "proposed: normative only after the owner approves and the plan applies ODR-V4-03"
     },
     {
       "id": "AO-INV-02-3",
@@ -35012,7 +35012,7 @@
       ],
       "normative": false,
       "boundInPlan": false,
-      "status": "proposed: normative only after the owner approves ODR-V4-03"
+      "status": "proposed: normative only after the owner approves and the plan applies ODR-V4-03"
     },
     {
       "id": "AO-INV-03-1",
@@ -35044,7 +35044,7 @@
       ],
       "normative": true,
       "boundInPlan": true,
-      "status": "binding-strengthened (enforces existing obligations of the cited requirements)"
+      "status": "binding-strengthened (enforces existing obligations of the cited requirements, or obligations the owner amended: )"
     },
     {
       "id": "AO-INV-03-2",
@@ -35076,7 +35076,7 @@
       ],
       "normative": true,
       "boundInPlan": true,
-      "status": "binding-strengthened (enforces existing obligations of the cited requirements)"
+      "status": "binding-strengthened (enforces existing obligations of the cited requirements, or obligations the owner amended: )"
     },
     {
       "id": "AO-INV-04-1",
@@ -35108,7 +35108,7 @@
       ],
       "normative": true,
       "boundInPlan": true,
-      "status": "binding-strengthened (enforces existing obligations of the cited requirements)"
+      "status": "binding-strengthened (enforces existing obligations of the cited requirements, or obligations the owner amended: )"
     },
     {
       "id": "AO-INV-05-1",
@@ -35140,7 +35140,7 @@
       ],
       "normative": true,
       "boundInPlan": true,
-      "status": "binding-strengthened (enforces existing obligations of the cited requirements)"
+      "status": "binding-strengthened (enforces existing obligations of the cited requirements, or obligations the owner amended: )"
     },
     {
       "id": "AO-INV-06-1",
@@ -35172,7 +35172,7 @@
       ],
       "normative": true,
       "boundInPlan": true,
-      "status": "binding-strengthened (enforces existing obligations of the cited requirements)"
+      "status": "binding-strengthened (enforces existing obligations of the cited requirements, or obligations the owner amended: )"
     },
     {
       "id": "AO-INV-07-1",
@@ -35208,7 +35208,7 @@
       ],
       "normative": true,
       "boundInPlan": true,
-      "status": "binding-strengthened (enforces existing obligations of the cited requirements)"
+      "status": "binding-strengthened (enforces existing obligations of the cited requirements, or obligations the owner amended: )"
     },
     {
       "id": "AO-INV-07-2",
@@ -35244,7 +35244,7 @@
       ],
       "normative": true,
       "boundInPlan": true,
-      "status": "binding-strengthened (enforces existing obligations of the cited requirements)"
+      "status": "binding-strengthened (enforces existing obligations of the cited requirements, or obligations the owner amended: )"
     },
     {
       "id": "AO-INV-08-1",
@@ -35275,7 +35275,7 @@
       ],
       "normative": true,
       "boundInPlan": true,
-      "status": "binding-strengthened (enforces existing obligations of the cited requirements)"
+      "status": "binding-strengthened (enforces existing obligations of the cited requirements, or obligations the owner amended: )"
     },
     {
       "id": "AO-INV-09-1",
@@ -35306,7 +35306,7 @@
       ],
       "normative": true,
       "boundInPlan": true,
-      "status": "binding-strengthened (enforces existing obligations of the cited requirements)"
+      "status": "binding-strengthened (enforces existing obligations of the cited requirements, or obligations the owner amended: )"
     },
     {
       "id": "AO-INV-09-2",
@@ -35337,7 +35337,7 @@
       ],
       "normative": true,
       "boundInPlan": true,
-      "status": "binding-strengthened (enforces existing obligations of the cited requirements)"
+      "status": "binding-strengthened (enforces existing obligations of the cited requirements, or obligations the owner amended: )"
     },
     {
       "id": "AO-INV-10-1",
@@ -35368,7 +35368,7 @@
       ],
       "normative": true,
       "boundInPlan": true,
-      "status": "binding-strengthened (enforces existing obligations of the cited requirements)"
+      "status": "binding-strengthened (enforces existing obligations of the cited requirements, or obligations the owner amended: )"
     },
     {
       "id": "AO-INV-11-1",
@@ -35401,7 +35401,7 @@
       ],
       "normative": true,
       "boundInPlan": true,
-      "status": "binding-strengthened (enforces existing obligations of the cited requirements)"
+      "status": "binding-strengthened (enforces existing obligations of the cited requirements, or obligations the owner amended: )"
     },
     {
       "id": "AO-INV-11-2",
@@ -35434,7 +35434,7 @@
       ],
       "normative": true,
       "boundInPlan": true,
-      "status": "binding-strengthened (enforces existing obligations of the cited requirements)"
+      "status": "binding-strengthened (enforces existing obligations of the cited requirements, or obligations the owner amended: )"
     },
     {
       "id": "AO-INV-12-1",
@@ -35466,7 +35466,7 @@
       ],
       "normative": true,
       "boundInPlan": true,
-      "status": "binding-strengthened (enforces existing obligations of the cited requirements)"
+      "status": "binding-strengthened (enforces existing obligations of the cited requirements, or obligations the owner amended: )"
     },
     {
       "id": "AO-INV-13-1",
@@ -35498,7 +35498,7 @@
       ],
       "normative": true,
       "boundInPlan": true,
-      "status": "binding-strengthened (enforces existing obligations of the cited requirements)"
+      "status": "binding-strengthened (enforces existing obligations of the cited requirements, or obligations the owner amended: )"
     },
     {
       "id": "AO-INV-14-1",
@@ -35529,7 +35529,7 @@
       ],
       "normative": true,
       "boundInPlan": true,
-      "status": "binding-strengthened (enforces existing obligations of the cited requirements)"
+      "status": "binding-strengthened (enforces existing obligations of the cited requirements, or obligations the owner amended: )"
     },
     {
       "id": "AO-INV-15-1",
@@ -35560,7 +35560,7 @@
       ],
       "normative": true,
       "boundInPlan": false,
-      "status": "binding-strengthened (enforces existing obligations of the cited requirements)"
+      "status": "binding-strengthened (enforces existing obligations of the cited requirements, or obligations the owner amended: )"
     },
     {
       "id": "AO-INV-15-2",
@@ -35591,7 +35591,7 @@
       ],
       "normative": true,
       "boundInPlan": false,
-      "status": "binding-strengthened (enforces existing obligations of the cited requirements)"
+      "status": "binding-strengthened (enforces existing obligations of the cited requirements, or obligations the owner amended: )"
     },
     {
       "id": "AO-INV-16-1",
@@ -35622,7 +35622,7 @@
       ],
       "normative": true,
       "boundInPlan": false,
-      "status": "binding-strengthened (enforces existing obligations of the cited requirements)"
+      "status": "binding-strengthened (enforces existing obligations of the cited requirements, or obligations the owner amended: )"
     },
     {
       "id": "AO-INV-17-1",
@@ -35654,7 +35654,7 @@
       ],
       "normative": true,
       "boundInPlan": false,
-      "status": "binding-strengthened (enforces existing obligations of the cited requirements)"
+      "status": "binding-strengthened (enforces existing obligations of the cited requirements, or obligations the owner amended: )"
     },
     {
       "id": "AO-INV-18-1",
@@ -35685,7 +35685,7 @@
       ],
       "normative": true,
       "boundInPlan": false,
-      "status": "binding-strengthened (enforces existing obligations of the cited requirements)"
+      "status": "binding-strengthened (enforces existing obligations of the cited requirements, or obligations the owner amended: )"
     },
     {
       "id": "AO-INV-19-1",
@@ -35716,7 +35716,7 @@
       ],
       "normative": true,
       "boundInPlan": false,
-      "status": "binding-strengthened (enforces existing obligations of the cited requirements)"
+      "status": "binding-strengthened (enforces existing obligations of the cited requirements, or obligations the owner amended: )"
     },
     {
       "id": "AO-INV-19-2",
@@ -35747,7 +35747,7 @@
       ],
       "normative": true,
       "boundInPlan": false,
-      "status": "binding-strengthened (enforces existing obligations of the cited requirements)"
+      "status": "binding-strengthened (enforces existing obligations of the cited requirements, or obligations the owner amended: )"
     },
     {
       "id": "AO-INV-20-1",
@@ -35779,7 +35779,7 @@
       ],
       "normative": true,
       "boundInPlan": true,
-      "status": "binding-strengthened (enforces existing obligations of the cited requirements)"
+      "status": "binding-strengthened (enforces existing obligations of the cited requirements, or obligations the owner amended: )"
     },
     {
       "id": "AO-INV-20-2",
@@ -35811,7 +35811,7 @@
       ],
       "normative": true,
       "boundInPlan": true,
-      "status": "binding-strengthened (enforces existing obligations of the cited requirements)"
+      "status": "binding-strengthened (enforces existing obligations of the cited requirements, or obligations the owner amended: )"
     },
     {
       "id": "AO-INV-21-1",
@@ -35843,7 +35843,7 @@
       ],
       "normative": true,
       "boundInPlan": true,
-      "status": "binding-strengthened (enforces existing obligations of the cited requirements)"
+      "status": "binding-strengthened (enforces existing obligations of the cited requirements, or obligations the owner amended: )"
     },
     {
       "id": "AO-INV-21-2",
@@ -35875,7 +35875,7 @@
       ],
       "normative": true,
       "boundInPlan": true,
-      "status": "binding-strengthened (enforces existing obligations of the cited requirements)"
+      "status": "binding-strengthened (enforces existing obligations of the cited requirements, or obligations the owner amended: )"
     },
     {
       "id": "AO-INV-22-1",
@@ -35906,7 +35906,7 @@
       ],
       "normative": true,
       "boundInPlan": true,
-      "status": "binding-strengthened (enforces existing obligations of the cited requirements)"
+      "status": "binding-strengthened (enforces existing obligations of the cited requirements, or obligations the owner amended: )"
     },
     {
       "id": "AO-INV-22-2",
@@ -35937,7 +35937,7 @@
       ],
       "normative": true,
       "boundInPlan": true,
-      "status": "binding-strengthened (enforces existing obligations of the cited requirements)"
+      "status": "binding-strengthened (enforces existing obligations of the cited requirements, or obligations the owner amended: )"
     },
     {
       "id": "AO-INV-23-1",
@@ -35968,7 +35968,7 @@
       ],
       "normative": true,
       "boundInPlan": false,
-      "status": "binding-strengthened (enforces existing obligations of the cited requirements)"
+      "status": "binding-strengthened (enforces existing obligations of the cited requirements, or obligations the owner amended: )"
     },
     {
       "id": "AO-INV-24-1",
@@ -36002,7 +36002,7 @@
       ],
       "normative": true,
       "boundInPlan": true,
-      "status": "binding-strengthened (enforces existing obligations of the cited requirements)"
+      "status": "binding-strengthened (enforces existing obligations of the cited requirements, or obligations the owner amended: )"
     },
     {
       "id": "AO-INV-24-2",
@@ -36036,7 +36036,7 @@
       ],
       "normative": true,
       "boundInPlan": true,
-      "status": "binding-strengthened (enforces existing obligations of the cited requirements)"
+      "status": "binding-strengthened (enforces existing obligations of the cited requirements, or obligations the owner amended: )"
     },
     {
       "id": "AO-INV-25-1",
@@ -36071,7 +36071,7 @@
       ],
       "normative": false,
       "boundInPlan": false,
-      "status": "proposed: normative only after the owner approves ODR-V4-04, ODR-V4-05"
+      "status": "proposed: normative only after the owner approves and the plan applies ODR-V4-04, ODR-V4-05"
     },
     {
       "id": "AO-INV-25-2",
@@ -36106,7 +36106,7 @@
       ],
       "normative": false,
       "boundInPlan": false,
-      "status": "proposed: normative only after the owner approves ODR-V4-04, ODR-V4-05"
+      "status": "proposed: normative only after the owner approves and the plan applies ODR-V4-04, ODR-V4-05"
     },
     {
       "id": "AO-R7L-19-1",
@@ -36135,7 +36135,7 @@
       ],
       "normative": true,
       "boundInPlan": true,
-      "status": "binding-strengthened (enforces existing obligations of the cited requirements)"
+      "status": "binding-strengthened (enforces existing obligations of the cited requirements, or obligations the owner amended: )"
     },
     {
       "id": "AO-R7L-19-2",
@@ -36164,7 +36164,7 @@
       ],
       "normative": true,
       "boundInPlan": true,
-      "status": "binding-strengthened (enforces existing obligations of the cited requirements)"
+      "status": "binding-strengthened (enforces existing obligations of the cited requirements, or obligations the owner amended: )"
     },
     {
       "id": "AO-R7L-19-3",
@@ -36193,7 +36193,7 @@
       ],
       "normative": true,
       "boundInPlan": true,
-      "status": "binding-strengthened (enforces existing obligations of the cited requirements)"
+      "status": "binding-strengthened (enforces existing obligations of the cited requirements, or obligations the owner amended: )"
     }
   ]
 }
