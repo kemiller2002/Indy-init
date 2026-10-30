@@ -15,22 +15,32 @@ It must do this without removing a requirement or weakening acceptance.
 
 Every claim below is labelled:
 
-- **checked** means a compiler check or CI step verifies the stated property on every commit, and a negative control in `V41Tests.fs` shows that the check rejects a broken input;
+- **checked** means a compiler check or CI step verifies the stated property on every commit, and a negative control (in `V41Tests.fs` or CI) shows it rejects a broken input;
 - **estimated** means the package author's planning estimate;
 - **hypothesis** means only the event build can show it.
 
 Nothing here is measured. No build has run against v4.1. A check verifies only what its title says. For example, X12 checks that a pair with several transitions has exactly the reviewed guards; it cannot decide whether two prose guards overlap.
 
+## What v4.1 changes in v4, and what it does not
+
+v4.1 changes no requirement text, obligation or test binding (X10). It does ask the owner to set aside two procedural clauses for November 7 (ODR-V41-06):
+
+- REHEARSAL-AGENT-INTERFACE-FREEZE says F# signatures are authored at kickoff;
+- KICKOFF-EXECUTION-PACKET §4 says parallel ownership starts after the kernel stabilizes.
+
+The owner stated in session on 2026-10-30 that the organizers allow pre-kickoff scaffolding. The owner's own record makes that authoritative.
+
 ## Where v4 left time on the table
 
 | Gap in v4 | Effect during a timed build | v4.1 answer |
 |---|---|---|
-| Interfaces described as 12 boundaries, with no types | Producers and consumers negotiate types at T14, and consumers wait for implementations | Typechecked F# contracts for 8 interfaces. Their state and input unions are exactly the v4 machines' states and events (X05) |
-| No file-level ownership; project files edited by whoever adds a file | Project-file and shared-file merge conflicts | 263 files, one owner each, including every contract, state-machine and unit test file. Integration writes every project file once, at bootstrap |
-| State machines given as transition lists | Each agent works out which pairs are illegal and how to fail | Every (state, event) pair is decided (84 legal, 270 fail closed). The 11 pairs with several transitions match a reviewed guard partition |
-| GitHub failure behaviour spread across PERSIST-008..016 | Errors diagnosed during the build | 15 error classes. Each has detection evidence, a precedence rule, a typed error, a transition, UI text, a per-class retry bound and plan tests |
-| Forma named, not inventoried | Rehearsal 7 used Forma tokens that do not exist | Layout contract checked against the published 0.12.0 tarball: tokens, classes, patterns, breakpoints and colour literals |
-| 655 tests bound, with no run order; contract and machine tests unnamed | Setup decided ad hoc; conformance tests never written | 11 suites by environment. Each plan binding and each of the 134 contract, state-machine and unit tests is in exactly one suite |
+| Interfaces described as 12 boundaries, with no types | Producers and consumers negotiate types at T14, and consumers wait for implementations | Typechecked F# contracts for 8 interfaces, each with operations, success and failure. Each state and input union equals its v4 machine (X05). The save contract models multi-request flows (`Awaiting`, `Interpretation`). A `Confirmation` cannot be built outside its module (CI forge check) |
+| No file-level ownership; project files edited by whoever adds a file | Project-file and shared-file merge conflicts | 264 files, one owner each, including every contract, state-machine and unit test file. Integration writes every project file once, at bootstrap. Shared test support (stateful fake, recordings) is its own project |
+| No generated starting point | The first hour is spent creating projects | `v41 --bootstrap` writes the empty application repository: solution, projects, references, compile lists, contracts. CI builds it from an empty directory |
+| State machines given as transition lists | Each agent works out which pairs are illegal and how to fail | Every (state, event) pair is decided (84 legal, 270 fail closed). The 11 multi-transition pairs match reviewed guard partitions. Unused events are listed for the owner (ODR-V41-08) |
+| GitHub failure behaviour spread across PERSIST-008..016 | Errors diagnosed during the build | 15 error classes, each with:<br>• evidence that distinguishes it;<br>• a precedence rule;<br>• a typed error and a transition;<br>• UI text;<br>• a retry bound of its own kind;<br>• plan tests for its requirements |
+| Forma named, not inventoried, layout untested | Rehearsal 7 used Forma tokens that do not exist; layout bugs found by eye | The layout contract is checked against the published 0.12.0 tarball. Each critical rule (FL-01..FL-10) has executable browser assertions, which CI runs in Chromium and WebKit against Forma's own pattern pages and against broken fixtures |
+| 655 tests bound, with no run order; contract and machine tests unnamed | Setup decided ad hoc; conformance tests never written | 11 suites by environment. Each plan binding and each of the 134 contract, state-machine and unit tests is in exactly one suite, budgeted in a named task |
 
 ## v4 versus v4.1
 
@@ -39,18 +49,19 @@ Nothing here is measured. No build has run against v4.1. A check verifies only w
 | Requirements / P0 / obligations / P0 obligations | 520 / 161 / 2599 / 613 | same | checked (X10) |
 | Verification plan | `VP-9817d9814482` | same file, same SHA-256 | checked (X10) |
 | Plan tests / bindings | 655 / 779 | same; each binding in exactly one suite | checked (X09) |
-| Interfaces with typechecked contracts | 0 | 8, plus domain stubs | checked (CI build of `contracts/`; X04, X05) |
-| Files with a single owner | not defined | 263 | checked (X01–X03, X14) |
-| State-machine pairs decided | 96 transitions listed | 354 pairs; 11 multi-transition pairs match reviewed partitions | checked (X12) |
+| Interfaces with typechecked contracts | 0 | 8, plus domain stubs | checked (CI; X04, X05) |
+| Empty application repository builds | not defined | 171 generated files build | checked (CI bootstrap step) |
+| Files with a single owner | not defined | 264 | checked (X01–X03, X14) |
+| State-machine pairs decided | 96 transitions listed | 354 pairs; 11 reviewed partitions; 1 unused event raised | checked (X12) |
 | GitHub error classes | not enumerated | 15 | checked (X06) |
-| Forma names or colours outside the published release | not checked | 0 (one requirement colour cited with its source, ODR-V41-05) | checked (X07) |
-| Critical path | 340 min | 285 min | estimated |
-| B-single-lead (one lead agent), total with 65 min reserves | 765 (does not fit 420) | 725 (does not fit) | estimated |
-| A-role-lanes (one UI agent) | 465 (does not fit) | 440 (does not fit) | estimated |
-| C-role-lanes-two-ui (two UI agents) | 405 (fits) | 380 (fits, 40 min slack) | estimated |
+| Critical layout rules with executable assertions | 0 | 10 of 10 (11 assertions) | checked (X15; CI runs them) |
+| Dependency critical path | 340 min | 290 min | estimated |
+| B-single-lead (one lead agent) total, with 65 min reserves | 765 (does not fit 420) | 735 (does not fit) | estimated |
+| A-role-lanes (one UI agent) total | 465 (does not fit) | 445 (does not fit) | estimated |
+| C-role-lanes-two-ui (two UI agents) total | 405 (fits) | 385 (fits, 35 min slack); makespan 320 | estimated |
 | Test setup | — | not claimed: v4 has no run plan to compare with | — |
 
-The experimental target, a critical path under 300 minutes, is met by the estimates (285). It is not an acceptance condition.
+The experimental target, a critical path under 300 minutes, is met on the lane-free dependency critical path (290). Topology C's makespan, which includes waiting for busy lanes, is 320. Neither number is an acceptance condition.
 
 ### What each change contributes (schedule.json scenarios; estimated minutes)
 
@@ -58,69 +69,119 @@ The experimental target, a critical path under 300 minutes, is met by the estima
 |---|---|---|---|---|
 | v4 | 340 | 465 | 765 | 405 |
 | v4.1 orderings only (ODR-V41-03) | 305 | 465 | 765 | 395 |
-| v4.1 estimates only (ODR-V41-04) | 325 | 440 | 725 | 390 |
-| v4.1 | 285 | 440 | 725 | 380 |
+| v4.1 estimates only (ODR-V41-04) | 330 | 445 | 735 | 395 |
+| v4.1 | 290 | 445 | 735 | 385 |
 
 ## What changed in the schedule, and why
 
-Each change and its rationale is in [analysis/task-adjustments.json](analysis/task-adjustments.json). Check X13 verifies four things:
+Each change and its rationale is in [analysis/task-adjustments.json](analysis/task-adjustments.json). X13 checks the following:
 
-- every ordering v4 implied (its transitive dependencies) is kept, unless a waiver names it with a reason and an owner decision;
+- every ordering v4 implied (its transitive dependencies) is kept, unless a waiver names it with a reason and an existing owner decision request;
 - no estimate falls below half of v4's;
 - every change is labelled an estimate.
 
 **Orderings kept explicitly.** These held in v4 through T14 → T13:
 
 - T12 (invariant tests) before T19 (first write code), as R4-01 and AR-022 require;
-- T13 (kernel) before T17 (integration checkpoint 1);
+- T12 before review checkpoint T35;
+- T13 (kernel) before T17 (checkpoint 1);
 - T13 (kernel) before T21 (live integration).
 
-**Orderings waived (ODR-V41-03).** Each has its reason in the adjustments file:
+**Orderings waived (ODR-V41-03, which depends on ODR-V41-06):**
 
 | Ordering dropped | Why |
 |---|---|
 | T12 before T14, and T13 before T14 | The contracts are typechecked before kickoff, so the freeze needs neither the invariant tests nor the kernel |
 | T13 before T19, and T13 before T20 | The save machine and the GitHub provider build on the frozen types and the stateful fake. They meet the real kernel at T21 |
-| T12 before T35, and T13 before T35 | Checkpoint T35 reviews the interface freeze only |
+| T13 before T35 | T35 reviews contracts and invariant tests; the kernel is reviewed at T30 and T36 |
 
-**Estimates (ODR-V41-04):**
+**Estimates (ODR-V41-04).** Reductions:
 
 | Task | Minutes (v4 → v4.1) | Reason |
 |---|---|---|
 | T12 | 25 → 15 | Invariants and machine tables are already compiled |
-| T14 | 20 → 15 | The types exist; producers commit them and write the contract tests |
-| T16 | 35 → 30 | Forma patterns are named |
 | T18 | 45 → 35 | The probe confirms a prepared classification |
-| T22 | 70 → 60 | Forma patterns are named |
-| T19 | 60 (unchanged) | Its transition tests are written there |
-| T31 | 45 (unchanged) | An earlier cut rested on a setup saving the fixtures do not support (RV41-1-8) |
-| T10 (preflight) | 25, outside the window | It writes every project file with its full Compile list |
+| T22 | 70 → 60 | Forma patterns and executable layout assertions are named |
 
-**Topology C schedule (estimated minutes from T0):** see `schedule.json` `topologies`. The critical path is T12 → T13 → T17 → T22 → T28 → T31 → T32 → T33 → T34, which runs through the kernel, checkpoint 1 and the UI lane. These zero-slack edges are the riskiest dependencies. Any overrun on them moves the deadline minute for minute.
+Unchanged, because each now carries named test work:
+
+| Task | Minutes | Work it carries |
+|---|---|---|
+| T14 | 20 | Producer and consumer contract tests |
+| T16 | 35 | SM-CONNECTION and SM-NETWORK tests |
+| T19 | 60 | SM-SAVE and SM-CONFLICT tests, 75 transitions |
+| T20 | 40 | SM-LOAD tests |
+| T31 | 45 | — |
+
+Preflight T10 gets 25 minutes outside the window.
+
+**Binding chains (estimated).** These are the riskiest dependencies, and any overrun on them moves the deadline. Each topology's chain is in `schedule.json` `topologies[].bindingChain`.
+
+| Topology | Chain | Note |
+|---|---|---|
+| C | T14 → T12 → T13 → T17 → T23 → T26 → T29 → T28 → T31 → T32 → T33 → T34 | The ui-2 lane, with T23, T26, T29 and T28 back to back, sets the makespan |
+| A | Same start, with the whole UI queue on one lane | 445, which does not fit |
+
+The lane-free dependency critical path is T14 → T13 → T17 → T22 → T28 → T31 → T32 → T33 → T34.
 
 ## Checked improvements
 
-These are verified on every commit, and each check has negative controls:
+These are verified on every commit, each with negative controls.
 
-- **The interface contracts compile together** (CI). Each state and input union equals its machine's states and events (X05). Each interface is implemented by one file its producer owns. Its producer tests are in files the producer owns, and every consumer has a contract test in a file it owns (X04).
-- **Every file of the planned build has exactly one owner, and no file holds two owners' tests** (X01).
-  - Integration owns:
-    - project files and manifests;
-    - CI and deployment;
-    - composition (`View.fs`, `Program.fs`, the host);
-    - `web/`.
+**Contracts:**
 
-    This is a fixed rule in the compiler, not an input (X02).
-  - Source and test project references are acyclic, and compile order is fixed (X03).
-  - Every test identity names an owned file (X14).
-- **Every state machine pair is decided.** Each pair with several transitions matches a reviewed guard partition, and every state is reachable (X12).
-- **The error matrix covers every required class and timeouts (X06):**
-  - where a status is shared, each class names non-status evidence that differs from every other class sharing that status;
-  - retries stay within each class's own bound;
-  - each test verifies one of the class's requirements.
-- **The Forma contract names only published custom properties, classes, patterns and breakpoints**, and no colour without a requirement source (X07). The inventory equals what CI extracts from the tarball.
-- **Nothing in v4 was removed or weakened (X10).** Every binding is in exactly one suite (X09).
-- **The package manifest digests every authored input and document**, including AGENT-RULES.md. `--check` fails on a file in the package that the compiler neither generates nor reads.
+- The interface contracts compile together (CI).
+- A forged `Confirmation` in another file does not compile (CI, FS1093).
+- Each machine's state and input unions equal its states and events (X05).
+- Each interface (X04):
+  - has operations with success and failure stated, and real concurrency and versioning rules;
+  - is implemented by one file its producer owns;
+  - has contract-test identities: producer tests in the producer's files, and a test for every consumer in that consumer's files.
+
+**Project structure:**
+
+- The predefined project structure bootstraps into an empty repository and builds (CI).
+- Every file has exactly one owner (X01), and no file holds two owners' tests.
+- Integration owns (X02, a fixed rule in the compiler):
+  - project and solution files;
+  - `Directory.*` build files and NuGet configuration;
+  - package manifests, CI and deployment;
+  - shared test fixtures;
+  - composition (`View.fs`, `Program.fs`, the host and `web/boundary.js`).
+
+  ui owns `web/causa.css` and `web/index.html` (T16).
+- Source and test project references are acyclic, and compile order and helper order are fixed (X03).
+- Every test identity names an owned file (X14).
+
+**State machines (X12):** every pair is decided; multi-transition pairs match reviewed guard partitions; every state is reachable; unused events are listed with a decision.
+
+**Error matrix (X06):**
+
+- it covers every required class and timeouts;
+- each class sharing a status names evidence the others lack, and a status or reason phrase does not count;
+- each class's bound is of its own kind;
+- each test verifies one of the class's requirements.
+
+**Forma (X07, X15, CI):**
+
+- The contract names only published custom properties, classes, patterns and breakpoints, and a colour only when it appears in the requirement document cited as its source (X07).
+- The inventory equals what CI extracts from the tarball.
+- Every critical layout rule has executable assertions (X15). CI runs them in Chromium and WebKit:
+  - each passes on the listed Forma patterns at the listed viewports and colour schemes;
+  - each fails on its broken fixture.
+- One Forma gap is recorded with a remedy that uses only Forma tokens (below).
+
+**Preservation:** nothing in v4 was removed or weakened (X10), and every binding is in exactly one suite (X09).
+
+**Package integrity:** the package manifest digests every authored input and document, including AGENT-RULES.md and the layout kit. `--check` fails on a file in the package that the compiler neither generates nor reads.
+
+## Found by the executable layout tests
+
+**Forma 0.12.0's `navigation-shell` links are 26 px tall** at 320 px, both iPad sizes and desktop. That is below `--ef-layout-target-min` (44 px); at 200% text they reach 52 px.
+
+- **Remedy (in `formaGaps`):** `web/causa.css` sets `min-block-size: var(--ef-layout-target-min)` on those links, using only the Forma token.
+- **CI behaviour:** CI checks that the raw pattern still fails, so a Forma fix is noticed, and that the remedied pattern passes.
+- **Next step:** report the gap to Forma's owner.
 
 ## Estimated improvements
 
@@ -129,13 +190,11 @@ These are planning estimates:
 - the critical path and the topology minutes above;
 - each suite's fixture set-up count (`counts.fixtureSetups`), which is a planning count, not a saving.
 
-The estimates depend on the task estimates in `task-adjustments.json`. These are the author's judgement, informed by Rehearsal 7's evidence files but not derived from measurements.
-
 ## Hypotheses (only the event build can test them)
 
-- **H41-01:** Writing project files once at bootstrap, and having integration as the single writer of shared files, reduces textual merge conflicts. Measured by `merge-conflicts`, `overlapping-files` and `ownership-violations`.
+- **H41-01:** Bootstrapped project files and integration as the single writer of shared files reduce textual merge conflicts. Measured by `merge-conflicts`, `overlapping-files` and `ownership-violations`.
 - **H41-02:** Frozen typechecked contracts, with producer and consumer contract tests, reduce semantic integration failures. Measured by `contract-test-failures`, `integration-test-failures` and `reverted-integrations`.
-- **H41-03:** The error matrix shortens diagnosis of GitHub failures, and the Forma contract avoids layout rework. Measured by the defect log and the CI timings of the event build.
+- **H41-03:** The error matrix shortens diagnosis of GitHub failures, and the executable layout assertions avoid layout rework. Measured by the defect log and CI timings.
 - **H41-04:** Waiting time between agents falls because consumers wait for contracts, not implementations. Measured by `waiting-time`.
 
 The telemetry spec ([analysis/conflict-telemetry.json](analysis/conflict-telemetry.json)) records each metric, or records it as null with a reason. It never infers a value.
@@ -144,24 +203,31 @@ The telemetry spec ([analysis/conflict-telemetry.json](analysis/conflict-telemet
 
 | Id | Risk | Mitigation |
 |---|---|---|
-| R41-01 | Task estimates are wrong, and the critical path has no slack | Reserves (RES-INTEGRATION 20 min, RES-FINAL 45 min) are unchanged. Topology C keeps 40 min of slack by the estimates. Topology A does not fit in any scenario |
-| R41-02 | A contract frozen before the kernel exists needs to change | Change control through the coordinator. Every change to a union is treated as breaking, and consumers' contract tests change in the same pull request (AGENT-RULES.md) |
-| R41-03 | Replay integration problems surface at T21 instead of T19 | T21 depends on T13. Reviewer checkpoint T36 follows T21 |
+| R41-01 | Task estimates are wrong. Topology C has 35 minutes of slack by the estimates | Reserves (RES-INTEGRATION 20 min, RES-FINAL 45 min) are unchanged. Topology A does not fit in any scenario |
+| R41-02 | A contract frozen before the kernel exists needs to change | Change control through the coordinator. Every change to a union is breaking, and consumers' contract tests change in the same pull request |
+| R41-03 | Replay integration problems surface at T21 instead of T19 | T21 depends on T13; checkpoint T36 follows T21 |
 | R41-04 | The error matrix comes from documentation and Rehearsal 7 evidence, not a fresh live probe | T18 records live answers against the matrix. A mismatch is a matrix defect, fixed before T19 builds on it |
-| R41-05 | FSHARP-TYPE-SHAPES §42 and §46 contradict the contracts (finding F41-01) | ODR-V41-02 asks the owner. The document was not edited |
-| R41-06 | Test files go to the implementation role of the first covering task. Requirements covered only by integration tasks (mostly PF, EXT-DATA, AR) give integration 67 test files, on a lane that also does every merge | The owner may re-split before T0 by recompiling. Integration's timed estimates are unchanged |
+| R41-05 | Pre-kickoff scaffolding rests on the organizers' interpretation | ODR-V41-06 records the owner's statement; the owner's record names who confirmed it |
+| R41-06 | Integration owns 67 test files, on a lane that also does every merge. These are tests of requirements only integration tasks cover: 19 PF, 18 PERSIST (including P0 PERSIST-044, -045, -047 and -054), 11 EXT-DATA, 8 VER, 4 AR, 2 WDL, 1 UI, and 4 contract tests | The owner may re-split before T0 by recompiling. Integration's timed estimates are unchanged |
 | R41-07 | The compiler changed, so v4's compiler test record and freeze manifest were regenerated (only `compilerTreeSha256` and the summary changed) | v4's requirement artifacts and plan are unchanged. An owner record naming the old manifest SHA must be rewritten (FREEZE.md) |
-| R41-08 | UI-016's amber #E9A23B is not a Forma value | ODR-V41-05 |
+| R41-08 | UI-016's amber `#E9A23B` is not a Forma value | ODR-V41-05 |
+| R41-09 | No test framework or Playwright version is locked, so the bootstrap builds test projects without one | ODR-V41-07 |
+| R41-10 | `Confirmation.ofReadBack` can still be called with the same bytes twice | The plan's INV-01 tests (Mutation.INV01.ReadBackSkipped, Property.INV01) guard that path |
 
-## Finding F41-01
+## Finding F41-01 (resolved at the owner's direction)
 
-`docs/FSHARP-TYPE-SHAPES.md` contradicts ADR-R7-001 and PERSIST-003 in two places:
+`docs/FSHARP-TYPE-SHAPES.md` contradicted ADR-R7-001 and PERSIST-003 in two places:
 
-- §42 defines `IInvestigationStore` with a `ProviderConflict`;
-- §46 lists `LocalStore.fs`.
+- §42 defined a store port with `ProviderConflict`;
+- §46 listed `LocalStore.fs`.
 
-`docs/rehearsal-007/traceability.json` does not list either section as superseded. PERSIST-001 gives the persistence requirements precedence, so v4.1's IF41-STORAGE and IF41-SAVE are the Causa boundary. The document is unchanged, and ODR-V41-02 asks the owner to decide.
+At the owner's direction (2026-10-30), both sections now carry ADR-R7-001 supersession notes pointing to the v4.1 contracts and project structure, and `docs/rehearsal-007/traceability.json` lists them. The R7 persistence validator passes. ODR-V41-02 asks the owner to confirm.
 
 ## Review
 
-Independent review round 1 returned FAIL, with 1 critical, 7 major and 8 minor findings. This revision addresses them; see [independent-review.md](independent-review.md).
+| Round | Verdict | Findings |
+|---|---|---|
+| 1 | FAIL | 1 critical, 7 major, 8 minor |
+| 2 | FAIL | 5 major, 6 minor |
+
+This revision addresses both rounds; see [independent-review.md](independent-review.md).

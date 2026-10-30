@@ -20,7 +20,7 @@ type SaveIndicatorView =
       Text: string
       Glyph: string
       Actions: SaveAction list
-      Politeness: string
+      Politeness: Politeness
       LastSavedCommitTime: System.DateTimeOffset option }
 
 type WorkspaceHeaderView =

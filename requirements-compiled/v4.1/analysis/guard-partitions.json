@@ -1,6 +1,6 @@
 {
   "schema": "indy-init.v41-guard-partitions/1",
-  "description": "Every (state, event) pair of the v4 machines that has more than one transition, with its guards and why they are mutually exclusive. Guards are prose in v4, so the compiler cannot decide overlap itself; it checks instead that each such pair has exactly the guards reviewed here (X12), so adding, removing or changing a guard fails until this file is reviewed again. 'exhaustive' says whether the guards cover every case; where they do not, the remaining case fails closed.",
+  "description": "Every (state, event) pair of the v4 machines that has more than one transition, with its guards and why they are mutually exclusive. Guards are prose in v4, so the compiler cannot decide overlap itself; it checks instead that each such pair has exactly the guards reviewed here (X12), so adding, removing or changing a guard fails until this file is reviewed again. 'exhaustive' says whether the guards cover every case; where they do not, the remaining case fails closed. 'unusedEvents' lists events no transition accepts (check X12 requires each to be listed with an owner decision).",
   "groups": [
     {
       "machine": "SM-SAVE",
@@ -123,6 +123,14 @@
       ],
       "exhaustive": false,
       "exclusiveBecause": "online but not connected is not listed: Open is not offered before Connect, and a request fails closed"
+    }
+  ],
+  "unusedEvents": [
+    {
+      "machine": "SM-SAVE",
+      "event": "MutationSent",
+      "finding": "The event is declared by v4 but no transition accepts it, so it fails closed in every state.",
+      "decision": "ODR-V41-08"
     }
   ]
 }

@@ -1130,7 +1130,9 @@ let v41Inputs (source: string) (package: string) (basePackage: string) (formaTar
     let a n = Path.Combine(package, "analysis", n)
     let authored = [ "interface-specifications.json"; "project-structure.json"; "github-error-matrix.json"; "forma-layout-contract.json"; "task-adjustments.json"; "conflict-telemetry.json"; "guard-partitions.json" ]
     // Documents and records the owner approves with the package; the review record exists once a review has run.
-    let documents = [ "README.md"; "AGENT-RULES.md"; "FREEZE.md"; "optimization-report.md"; "independent-review.md"; "proposals/owner-decision-requests.json"; "analysis/independent-review.json" ]
+    let documents =
+        [ "README.md"; "AGENT-RULES.md"; "FREEZE.md"; "optimization-report.md"; "independent-review.md"; "proposals/owner-decision-requests.json"; "analysis/independent-review.json"
+          "layout-tests/assertions.mjs"; "layout-tests/fixtures.mjs"; "layout-tests/run.mjs" ]
     let forma = parseFile (a "forma-layout-contract.json")
     let formaSpec = field "forma" forma |> Option.defaultValue JNull
     let inventoryPath = Path.Combine(package, str "inventory" formaSpec)
@@ -1158,6 +1160,7 @@ let v41Inputs (source: string) (package: string) (basePackage: string) (formaTar
         if File.Exists inventoryPath then parseFile inventoryPath
         else match extract with Some x -> x | None -> failwithf "%s is missing; generate it with --forma-tarball" inventoryPath
       FormaExtract = extract
+      ReadSource = fun p -> let f = Path.Combine(source, p) in if File.Exists f then Some(File.ReadAllText f) else None
       AuthoredText =
         (authored |> List.map (fun n -> "analysis/" + n, File.ReadAllText(a n)))
         @ (documents |> List.filter (fun n -> File.Exists(Path.Combine(package, n))) |> List.map (fun n -> n, File.ReadAllText(Path.Combine(package, n)))) }
@@ -1176,13 +1179,24 @@ let v41Command (args: string list) : int =
         eprintfn "%s" e
         2
     | Ok(m, _) when not (m.ContainsKey "--source" && m.ContainsKey "--package" && m.ContainsKey "--base") ->
-        eprintfn "usage: requirements-compiler v41 --source DIR --package DIR --base DIR [--forma-tarball FILE] [--check]"
+        eprintfn "usage: requirements-compiler v41 --source DIR --package DIR --base DIR [--forma-tarball FILE] [--check] [--bootstrap EMPTY-DIR]"
         2
     | Ok(m, check) ->
         try
             let package = m.["--package"]
             let i = v41Inputs m.["--source"] package m.["--base"] (m.TryFind "--forma-tarball")
             let built = V41Package.build i
+            // --bootstrap: write the empty application repository into a new or empty directory (never the package).
+            match m.TryFind "--bootstrap" with
+            | Some dir when Directory.Exists dir && Directory.EnumerateFileSystemEntries dir |> Seq.isEmpty |> not -> failwithf "--bootstrap needs a new or empty directory; %s is not empty" dir
+            | Some dir ->
+                let files = V41Package.bootstrapFiles i (V41Package.ownedFiles i) (File.ReadAllText(Path.Combine(m.["--source"], "global.json")))
+                for (n, t) in files do
+                    let p = Path.Combine(dir, n)
+                    Directory.CreateDirectory(Path.GetDirectoryName p) |> ignore
+                    File.WriteAllText(p, t)
+                printfn "bootstrap: %d files written to %s" files.Length dir
+            | None -> ()
             let report = V41Package.validationReport built.Checks
             let verdict = str "verdict" report
             let inventory =

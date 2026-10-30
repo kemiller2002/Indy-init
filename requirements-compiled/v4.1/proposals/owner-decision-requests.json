@@ -22,15 +22,15 @@
     {
       "id": "ODR-V41-02",
       "kind": "interface-freeze",
-      "title": "Freeze the v4.1 interface contracts at T14, superseding FSHARP-TYPE-SHAPES sections 42 and 46 for Causa",
-      "question": "docs/FSHARP-TYPE-SHAPES.md section 42 (IInvestigationStore with ProviderConflict) and section 46 (LocalStore.fs) contradict ADR-R7-001 and PERSIST-003 (finding F41-01), and docs/rehearsal-007/traceability.json does not list them as superseded. Should the v4.1 contracts (IF41-STORAGE, IF41-SAVE) be the frozen Causa boundary in their place?",
+      "title": "Confirm the reconciliation of FSHARP-TYPE-SHAPES sections 42 and 46",
+      "question": "At the owner's direction (2026-10-30), docs/FSHARP-TYPE-SHAPES.md §42 (persistence port with ProviderConflict) and §46 (module split with LocalStore.fs) now carry ADR-R7-001 supersession notes pointing to the v4.1 contracts and project structure, and docs/rehearsal-007/traceability.json lists both sections as superseded (the R7 persistence validator passes). Confirm?",
       "options": [
-        "A: yes; record sections 42 and 46 as superseded for Causa",
-        "B: no; reconcile FSHARP-TYPE-SHAPES first"
+        "A: confirm the reconciliation",
+        "B: request changes"
       ],
-      "recommendation": "A. PERSIST-001 gives the persistence requirements precedence over older type shapes; the v4.1 contracts typecheck and implement the seven-state machine of SM-SAVE without a new state.",
-      "rationale": "An agent may not edit a superseded design document on its own; the contradiction must be decided.",
-      "impact": "With B, the interface freeze at T14 waits for the reconciliation, and the schedule gain from interface-first work is lost.",
+      "recommendation": "A.",
+      "rationale": "The edit follows the owner's instruction; the owner's record makes it authoritative.",
+      "impact": "With B, the notes are revised before v4.1 is approved.",
       "approvalRecord": {
         "how": "{\"decision_id\": \"ODR-V41-02\", \"action\": \"select\", \"option\": \"A\" | \"B\"}"
       }
@@ -39,12 +39,12 @@
       "id": "ODR-V41-03",
       "kind": "schedule",
       "title": "Accept the interface-first ordering changes of the v4.1 DAG",
-      "question": "v4.1 lets the interface freeze (T14) start before the kernel (T13) and the invariant tests (T12), and the save machine (T19) and GitHub provider (T20) start before the kernel, because the frozen contracts fix the types. It keeps the invariant tests before the save machine (T12 before T19, R4-01) and the kernel before integration checkpoint 1 (T13 before T17) and before live integration (T13 before T21). The six v4 orderings it drops are listed with reasons in analysis/task-adjustments.json waivedPrecedences: T12 before T14, T13 before T14, T13 before T19, T13 before T20, T12 before T35, T13 before T35. Accept them?",
+      "question": "v4.1 lets the interface freeze (T14) start before the kernel (T13) and the invariant tests (T12), and the save machine (T19) and GitHub provider (T20) start before the kernel, because the frozen contracts fix the types. It keeps the invariant tests before the save machine (T12 before T19, R4-01) and the kernel before integration checkpoint 1 (T13 before T17) and before live integration (T13 before T21). It also keeps the invariant tests before review checkpoint T35. The five v4 orderings it drops are listed with reasons in analysis/task-adjustments.json waivedPrecedences: T12 before T14, T13 before T14, T13 before T19, T13 before T20, T13 before T35. Dropping T13 before T14, T19 and T20 sets aside KICKOFF-EXECUTION-PACKET §4 ('parallel ownership after the kernel stabilizes'), which T14 covers; it depends on ODR-V41-06. Accept them?",
       "options": [
         "A: accept the ordering changes",
         "B: keep v4's orderings"
       ],
-      "recommendation": "A. With v4's estimates, the ordering changes alone shorten the critical path from 340 to 305 minutes and topology C from 405 to 395 (schedule.json scenarios). Neither alone nor with ODR-V41-04 does topology A fit the 420-minute window; C fits in every scenario.",
+      "recommendation": "A, if ODR-V41-06 is A. With v4's estimates, the ordering changes alone shorten the dependency critical path from 340 to 305 minutes and topology C's total from 405 to 395 (schedule.json scenarios). Topology A does not fit the 420-minute window in any scenario; C fits in every scenario.",
       "rationale": "The change moves integration risk from T19 to T21 (optimization-report.md, risks R41-02 and R41-03); the owner decides whether that trade is acceptable.",
       "impact": "With B, the agent removes the dependency changes from task-adjustments.json and recompiles; the other v4.1 artifacts still apply.",
       "approvalRecord": {
@@ -55,12 +55,12 @@
       "id": "ODR-V41-04",
       "kind": "schedule",
       "title": "Accept the v4.1 estimate changes",
-      "question": "v4.1 lowers five timed estimates (minutes): T12 25 to 15, T14 20 to 15, T16 35 to 30, T18 45 to 35, T22 70 to 60. It also gives preflight T10 an estimate of 25 outside the window. Each reason is in analysis/task-adjustments.json; all are the package author's estimates, not measurements. Accept them for planning?",
+      "question": "v4.1 lowers three timed estimates (minutes): T12 25 to 15, T18 45 to 35, T22 70 to 60. It also gives preflight T10 an estimate of 25 outside the window. Each reason is in analysis/task-adjustments.json; all are the package author's estimates, not measurements. Accept them for planning?",
       "options": [
         "A: accept the estimate changes",
         "B: keep v4's estimates"
       ],
-      "recommendation": "A only if the reasons convince you: with v4's dependencies, the estimate changes alone take the critical path from 340 to 325 minutes and C from 405 to 390; with ODR-V41-03 also accepted, 285 and 380.",
+      "recommendation": "A only if the reasons convince you: with v4's orderings, the estimate changes alone take the dependency critical path from 340 to 330 minutes and C from 405 to 395; with ODR-V41-03 also accepted, 290 and 385 (C's makespan 320 plus 65 minutes of reserves).",
       "rationale": "Lower estimates move the schedule without moving the work; only the owner accepts them.",
       "impact": "With B, the agent restores v4's estimates and recompiles; reserves are unchanged either way.",
       "approvalRecord": {
@@ -82,6 +82,56 @@
       "impact": "Until decided, FL-06 cites #E9A23B as the requirement's value (check X07 accepts a literal only with its requirement source).",
       "approvalRecord": {
         "how": "{\"decision_id\": \"ODR-V41-05\", \"action\": \"select\", \"option\": \"A\" | \"B\" | \"C\"}"
+      }
+    },
+    {
+      "id": "ODR-V41-06",
+      "kind": "requirement-conflict",
+      "title": "Pre-kickoff contracts and scaffolding for November 7",
+      "question": "Two baseline clauses conflict with v4.1. (1) docs/REHEARSAL-AGENT-INTERFACE-FREEZE.md preamble and contract-freeze step 1: F# signatures 'MUST be authored from the requirements at kickoff'; 'these are not fabricated compile-ready interfaces'. (2) docs/HACKATHON-BOUNDARIES.md: 'Before producing application-specific executable/generated scaffolding from it before kickoff, confirm organizer interpretation.' v4.1 ships compile-ready interface contracts (contracts/) and generates the empty application repository (v41 --bootstrap). On 2026-10-30 the owner told the package author in session that the organizers allow pre-kickoff scaffolding. Record that, and set the interface-freeze clauses aside for this event?",
+      "options": [
+        "A: the organizers allow it; for November 7 the v4.1 contracts are authored before kickoff and committed at T14, and the bootstrap may be generated at T10",
+        "B: keep the kickoff-authoring clauses; the contracts become reference text and the bootstrap is not used"
+      ],
+      "recommendation": "A, as the owner stated; the owner's own record is what makes it authoritative (the package author may not write it).",
+      "rationale": "Only the owner can set aside a baseline clause, and only the organizers can interpret the event rules.",
+      "impact": "With B, T14 returns to authoring at kickoff and ODR-V41-03's waivers of T13 before T14, T19 and T20 fall away.",
+      "approvalRecord": {
+        "how": "{\"decision_id\": \"ODR-V41-06\", \"action\": \"select\", \"option\": \"A\" | \"B\", \"organizer_confirmation\": \"<who confirmed, and when>\"}"
+      }
+    },
+    {
+      "id": "ODR-V41-07",
+      "kind": "dependency-lock",
+      "title": "Lock the test tooling",
+      "question": "requirements-compiled/v4/dependency-lock.json locks no .NET test framework and no Playwright version, yet the plan binds 'dotnet:' and 'playwright:' tests. The bootstrap (v41 --bootstrap) therefore builds the test projects without a test framework, and the layout tests run on the Playwright the CI runner provides. Which test tooling is locked?",
+      "options": [
+        "A: xUnit with Microsoft.NET.Test.Sdk, and Playwright 1.63.0 (the version this package's layout tests ran on)",
+        "B: Expecto, and Playwright 1.63.0",
+        "C: another set the owner names"
+      ],
+      "recommendation": "A, or whatever Dokimos 0.9.0 documents as its supported runner; the lock entry is added to the dependency lock by the owner's decision, not chosen by an agent.",
+      "rationale": "Adding a framework needs a verified requirement or an owner decision (v4.1 brief).",
+      "impact": "Until decided, T10 cannot write the test projects' package references.",
+      "approvalRecord": {
+        "how": "{\"decision_id\": \"ODR-V41-07\", \"action\": \"select\", \"option\": \"A\" | \"B\" | \"C\", \"packages\": [\"<id>@<version>\"]}"
+      }
+    },
+    {
+      "id": "ODR-V41-08",
+      "kind": "state-machine-amendment",
+      "title": "Amend two v4 state-machine gaps",
+      "question": "(1) SM-SAVE declares MutationSent, but no transition accepts it, so it fails closed in every state (analysis/guard-partitions.json unusedEvents). (2) SM-LOAD has no transport-failure event; v4.1 routes provider refusals and lost answers through LoadRejected of LoadFailure.ProviderFailed (IF41-SAVE). Amend v4?",
+      "options": [
+        "A: add a Saving + MutationSent transition that records the outstanding request and stays Saving, and accept LoadRejected carrying ProviderFailed for transport failures",
+        "B: remove MutationSent from SM-SAVE, and keep SM-LOAD as is",
+        "C: leave both as they are"
+      ],
+      "recommendation": "A: it changes no state and makes the declared event usable.",
+      "rationale": "v4.1 may not add transitions or states to v4's machines on its own.",
+      "impact": "Until decided, MutationSent stays declared and illegal everywhere, so the implementation never emits it.",
+      "approvalRecord": {
+        "how": "{\"decision_id\": \"ODR-V41-08\", \"action\": \"select\", \"option\": \"A\" | \"B\" | \"C\"}"
       }
     }
   ],

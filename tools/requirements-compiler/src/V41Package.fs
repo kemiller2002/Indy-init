@@ -36,7 +36,9 @@ type Inputs =
       FormaInventory: Json
       FormaExtract: Json option
       /// Every authored input and document as text, for the provenance check and the package manifest.
-      AuthoredText: (string * string) list }
+      AuthoredText: (string * string) list
+      /// Reads a file of the source checkout (for literals cited from requirement documents).
+      ReadSource: string -> string option }
 
 type Check = { Id: string; Title: string; Problems: string list }
 
@@ -323,7 +325,16 @@ let stateMachineContracts (i: Inputs) : Json * string list =
                           go (Set.union seen (Set.ofList next)) (rest @ next)
                   go (Set.singleton (str "initial" m)) [ str "initial" m ]
               for s in states do
-                  if not (reachable.Contains s) then yield sprintf "%s: state %s is not reachable from %s" mid s (str "initial" m) ]
+                  if not (reachable.Contains s) then yield sprintf "%s: state %s is not reachable from %s" mid s (str "initial" m)
+              // An event no transition accepts is a gap in the machine; it must be listed with an owner decision.
+              let listed = arr "unusedEvents" i.GuardPartitions |> List.filter (fun u -> sOr "machine" u = mid)
+              for e in events do
+                  let used = transitions |> List.exists (fun t -> str "event" t = e)
+                  match used, listed |> List.tryFind (fun u -> sOr "event" u = e) with
+                  | false, None -> yield sprintf "%s: event %s is accepted by no transition and is not listed as unused" mid e
+                  | false, Some u when String.IsNullOrWhiteSpace (sOr "decision" u) -> yield sprintf "%s: unused event %s names no decision" mid e
+                  | true, Some _ -> yield sprintf "%s: event %s is listed as unused but a transition accepts it" mid e
+                  | _ -> () ]
         let pairs =
             [ for s in states do
                   for e in events do
@@ -557,8 +568,20 @@ let private topologyJson (policy: Json) (tasks: WorkTask list) (id: string) : Js
     let integrationMinutes = slots |> List.filter (fun s -> s.Lane = "integration" || byId.[s.Task].Owner = "integration") |> List.sumBy (fun s -> s.Finish - s.Start)
     let lanes = slots |> List.groupBy (fun s -> s.Lane) |> List.sortBy fst
     let total = makespan + reserves
+    // The binding chain: from the last task back, each step is the prerequisite or the earlier task on the same lane
+    // that the task waited for (whichever finished exactly when it started).
+    let bySlot = slots |> List.map (fun s -> s.Task, s) |> Map.ofList
+    let rec chain (s: TimedSchedule.Slot) (acc: (string * string) list) =
+        let viaDependency = byId.[s.Task].DependsOn |> List.choose (fun d -> bySlot.TryFind d.Task) |> List.filter (fun p -> p.Finish = s.Start) |> List.sortBy (fun p -> p.Task) |> List.tryHead
+        let viaLane = slots |> List.filter (fun p -> p.Lane = s.Lane && p.Finish = s.Start && p.Task <> s.Task) |> List.sortBy (fun p -> p.Task) |> List.tryHead
+        match viaDependency, viaLane with
+        | Some p, _ when s.Start > 0 -> chain p ((s.Task, "dependency on " + p.Task) :: acc)
+        | None, Some p when s.Start > 0 -> chain p ((s.Task, "lane " + s.Lane + " after " + p.Task) :: acc)
+        | _ -> (s.Task, "start") :: acc
+    let binding = slots |> List.sortBy (fun s -> -s.Finish, s.Task) |> List.tryHead |> Option.map (fun last -> chain last []) |> Option.defaultValue []
     JObj
         [ "id", JStr id
+          "bindingChain", JArr(binding |> List.map (fun (t, why) -> JObj [ "task", JStr t; "startsAfter", JStr why ]))
           "makespanMinutes", jint makespan
           "reservedMinutes", jint reserves
           "totalMinutes", jint total
@@ -615,8 +638,12 @@ let schedule (i: Inputs) : Json * Json * string list =
               | None -> yield sprintf "v4 ordered %s before %s; the adjusted DAG drops it without a waiver" a b
               | Some(_, w) ->
                   if String.IsNullOrWhiteSpace (sOr "reason" w) || String.IsNullOrWhiteSpace (sOr "decision" w) then yield sprintf "the waiver of %s before %s needs a reason and a decision" a b
-          for ((a, b), _) in waivers do
+          let requests =
+              i.AuthoredText |> List.tryFind (fst >> (=) "proposals/owner-decision-requests.json")
+              |> Option.map (snd >> Text.Encoding.UTF8.GetBytes >> parseBytes >> arr "requests" >> List.map (str "id")) |> Option.defaultValue []
+          for ((a, b), w) in waivers do
               if not (lost.Contains(a, b)) then yield sprintf "the waiver of %s before %s waives an ordering the adjusted DAG keeps (or v4 never had)" a b
+              if not (List.contains (sOr "decision" w) requests) then yield sprintf "the waiver of %s before %s names decision %s, which is not an owner decision request" a b (sOr "decision" w)
           // Work is preserved: the same tasks, each covering the same requirements, each with an estimate.
           if (tasks |> List.map (fun t -> t.Id)) <> (i.Tasks |> List.map (fun t -> t.Id)) then yield "the adjusted task list differs from v4's"
           for (a, b) in List.zip tasks i.Tasks do
@@ -669,7 +696,7 @@ let schedule (i: Inputs) : Json * Json * string list =
             [ "schema", JStr "indy-init.v41-schedule/1"
               "description", JStr "The v4.1 timed schedule for one lead agent (B-single-lead), role lanes with one UI agent (A-role-lanes) and role lanes with two UI agents (C-role-lanes-two-ui), computed by the same scheduler as v4 (TimedSchedule) over execution-dag.json, with v4's reserves and window. All minutes are estimates. 'scenarios' separates the effect of the dependency changes (ODR-V41-03) from the estimate changes (ODR-V41-04)."
               "evidence", JStr "estimated"
-              "experimentalTarget", JObj [ "criticalPathMinutes", jint 300; "meets", JBool(pathMinutes < 300); "note", JStr "an experimental goal of the v4.1 brief, not an acceptance condition" ]
+              "experimentalTarget", JObj [ "criticalPathMinutes", jint 300; "meets", JBool(pathMinutes < 300); "note", JStr "an experimental goal of the v4.1 brief, not an acceptance condition. It is measured on the lane-free dependency critical path; each topology's makespan, which adds waiting for a busy lane, is in topologies (makespanMinutes, bindingChain)." ]
               "criticalPath", JObj [ "v4", JObj [ "tasks", jstrs basePath; "minutes", jint baseMinutes ]; "v41", JObj [ "tasks", jstrs path; "minutes", jint pathMinutes ] ]
               "scenarios", JArr [ scenario "v4" false false; scenario "v4.1 dependencies only" true false; scenario "v4.1 estimates only" false true; scenario "v4.1" true true ]
               "riskiestDependencies",
@@ -687,11 +714,14 @@ let schedule (i: Inputs) : Json * Json * string list =
 /// Files only integration writes (the brief: project files, solution, composition, shared configuration, dependency
 /// manifests, CI and deployment), whatever the authored structure says.
 let integrationExclusive (path: string) =
-    [ ".fsproj"; ".csproj"; ".slnx"; ".sln" ] |> List.exists (fun s -> path.EndsWith(s, StringComparison.Ordinal))
-    || [ ".github/"; "web/"; ".echelon/"; "src/Causa.Host/" ] |> List.exists (fun p -> starts p path)
+    let name = path.Substring(path.LastIndexOf '/' + 1)
+    [ ".fsproj"; ".csproj"; ".slnx"; ".sln"; ".runsettings" ] |> List.exists (fun s -> path.EndsWith(s, StringComparison.Ordinal))
+    || (starts "Directory." name && (name.EndsWith(".props", StringComparison.Ordinal) || name.EndsWith(".targets", StringComparison.Ordinal)))
+    || String.Equals(name, "nuget.config", StringComparison.OrdinalIgnoreCase)
+    || [ ".github/"; ".echelon/"; "src/Causa.Host/"; "tests/fixtures/"; "tests/browser/support/" ] |> List.exists (fun p -> starts p path)
     || List.contains path
-        [ "Directory.Build.props"; "Directory.Packages.props"; "global.json"; "package.json"; "package-lock.json"; "playwright.config.ts"; "build.fsx"; "README.md"
-          "tests/fixtures/manifest.json"; "src/Causa.App/View.fs"; "src/Causa.App/Program.fs" ]
+        [ "global.json"; "package.json"; "package-lock.json"; "playwright.config.ts"; "build.fsx"; "README.md"; "web/boundary.js"
+          "src/Causa.App/View.fs"; "src/Causa.App/Program.fs" ]
 
 let ownershipCheck (i: Inputs) (files: OwnedFile list) : Check list =
     let roles = arr "roles" i.Structure |> List.map (str "id") |> Set.ofList
@@ -707,8 +737,7 @@ let ownershipCheck (i: Inputs) (files: OwnedFile list) : Check list =
       check "X02" "Project files, the solution, composition, shared configuration, dependency manifests, CI and deployment are owned by integration"
           [ for f in files do
                 if integrationExclusive f.Path && f.Owner <> "integration" then yield sprintf "%s is integration's alone but owned by %s" f.Path f.Owner
-            for f in arr "sharedFiles" i.Structure do
-                if str "path" f <> "evidence/" && str "owner" f <> "integration" then yield sprintf "shared file %s is owned by %s, not integration" (str "path" f) (str "owner" f) ]
+            () ]
       check "X03" "Compile order is predefined: each file depends only on earlier files of its project or on referenced projects, project references (source and test) are acyclic, and every test file is in a declared test project"
           [ let refs = allProjects |> List.map (fun p -> str "id" p, strs "references" p) |> Map.ofList
             let rec closure (seen: Set<string>) (p: string) =
@@ -733,7 +762,16 @@ let ownershipCheck (i: Inputs) (files: OwnedFile list) : Check list =
                 match f.Project with
                 | Some p when (f.Kind = "test" || f.Kind = "test-helper") && not (starts "verifier/" f.Path) && not (declared.Contains p) ->
                     yield sprintf "%s is in test project %s, which is not declared" f.Path p
-                | _ -> () ] ]
+                | _ -> ()
+            // A test helper depends only on earlier helpers of its project or on files of projects it references.
+            let helpers = files |> List.filter (fun f -> f.Kind = "test-helper")
+            let filesOf (p: string) = files |> List.filter (fun f -> f.Project = Some p && f.Kind <> "test") |> List.map (fun f -> f.Path)
+            for (n, h) in List.indexed helpers do
+                let earlier = helpers |> List.take n |> List.filter (fun x -> x.Project = h.Project) |> List.map (fun x -> x.Path)
+                let visible = match h.Project with Some p -> closure Set.empty p |> Set.toList |> List.collect filesOf | None -> []
+                for d in h.DependsOn do
+                    if not (List.contains d earlier || List.contains d visible) then
+                        yield sprintf "test helper %s depends on %s, which is neither an earlier helper of its project nor in a referenced project" h.Path d ] ]
 
 let interfaceCheck (i: Inputs) (files: OwnedFile list) : Check list =
     let interfaces = arr "interfaces" i.Interfaces
@@ -753,8 +791,20 @@ let interfaceCheck (i: Inputs) (files: OwnedFile list) : Check list =
             for x in interfaces do
                 let id = str "id" x
                 let producer = sOr "producer" x
-                for k in [ "producer"; "file"; "fsharp"; "concurrency"; "versioning" ] do
+                for k in [ "producer"; "file"; "fsharp" ] do
                     if String.IsNullOrWhiteSpace (sOr k x) then yield sprintf "%s: %s is missing" id k
+                for k in [ "concurrency"; "versioning" ] do
+                    if (sOr k x).Trim().Length < 30 then yield sprintf "%s: %s is missing or too short to state a rule" id k
+                if (arr "operations" x).IsEmpty then yield sprintf "%s: no operations" id
+                for o in arr "operations" x do
+                    for k in [ "name"; "signature"; "success"; "failure" ] do
+                        if String.IsNullOrWhiteSpace (sOr k o) then yield sprintf "%s: operation %s has no %s" id (sOr "name" o) k
+                    let name = (sOr "name" o).Split('.') |> Array.last
+                    if name <> "" && not (Regex.IsMatch(str "fsharp" x, sprintf @"\b%s\b" (Regex.Escape name))) then yield sprintf "%s: operation %s is not in the contract" id (sOr "name" o)
+                for t in strs "producerTests" x do
+                    if not (Regex.IsMatch(t, @"^dotnet:Causa\.Contract\.Tests\.[A-Za-z0-9]+\.Producer\.")) then yield sprintf "%s: producer test %s is not a contract test identity" id t
+                for t in strs "consumerTests" x do
+                    if not (Regex.IsMatch(t, @"^(dotnet:Causa\.Contract\.Tests\.[A-Za-z0-9]+\.Consumer[A-Za-z0-9]+\.|playwright:contract/)")) then yield sprintf "%s: consumer test %s is not a contract test identity" id t
                 for k in [ "consumers"; "producerTests"; "consumerTests"; "requirements" ] do
                     if (arr k x).IsEmpty then yield sprintf "%s: %s is empty" id k
                 for t in strs "producerTests" x do
@@ -815,16 +865,18 @@ let errorMatrixCheck (i: Inputs) : Check =
     let tests = allTestIds i.Plan
     let testRequirements = boundTests i.Plan |> List.groupBy (fun b -> b.Test) |> List.map (fun (t, bs) -> t, bs |> List.map (fun b -> b.Requirement) |> Set.ofList) |> Map.ofList
     let errorCases = providerErrorCases i
-    let statusOnly = Regex(@"^\s*(status\s*:?\s*|http\s*)?[0-9]{3}\s*$", RegexOptions.IgnoreCase)
+    // Evidence that is only a status (with or without "HTTP", "status" or its reason phrase) is not other evidence.
+    let reasonPhrases = Regex(@"(?i)\b(http|status|code|forbidden|not found|unauthorized|too many requests|unprocessable( entity)?|internal server error|bad gateway|service unavailable|gateway timeout|ok|[0-9x]{3})\b")
+    let isStatusOnly (e: string) = Regex.Replace(reasonPhrases.Replace(e, ""), @"[^A-Za-z]", "").Length < 4
     let shared =
         classes |> List.collect (fun c -> arr "httpStatuses" c |> List.choose (function JInt n -> Some(n, str "id" c) | _ -> None))
         |> List.groupBy fst |> List.filter (fun (_, xs) -> xs.Length > 1) |> List.collect (snd >> List.map snd) |> Set.ofList
-    let evidence (c: Json) = strs "nonStatusEvidence" c |> List.filter (statusOnly.IsMatch >> not)
+    let evidence (c: Json) = strs "nonStatusEvidence" c |> List.filter (isStatusOnly >> not)
     check "X06" "The GitHub error matrix covers every required class and timeouts; a shared HTTP status is never the only evidence and no two such classes share evidence; each class retries within its own bound; every test exists in the plan and belongs to the class's requirements"
         [ let ids = classes |> List.map (str "id")
           for r in requiredErrorClasses do
               if not (List.contains r ids) then yield sprintf "required error class %s is missing" r
-          if not (classes |> List.exists (fun c -> strs "nonStatusEvidence" c |> List.exists (fun e -> e.Contains "TimedOut"))) then yield "no class detects a request timeout (TimedOut)"
+          if not (classes |> List.exists (fun c -> strs "nonStatusEvidence" c |> List.exists (fun e -> starts "transport:" e && e.Contains "TimedOut"))) then yield "no class detects a request timeout (transport: TimedOut)"
           if String.IsNullOrWhiteSpace (sOr "precedence" i.ErrorMatrix) then yield "no precedence rule for an answer matching several classes"
           for d in duplicates ids do
               yield sprintf "error class %s is defined twice" d
@@ -834,13 +886,23 @@ let errorMatrixCheck (i: Inputs) : Check =
                   if String.IsNullOrWhiteSpace (sOr k c) then yield sprintf "%s: %s is missing" id k
               for k in [ "operations"; "tests"; "requirements" ] do
                   if (arr k c).IsEmpty then yield sprintf "%s: %s is empty" id k
+              // Each bound belongs to one kind of retry: rebases to the stale-head class, re-reads of a large file to the
+              // large-file class, reconciliation reads to classes that reconcile. A class that does not retry has none.
+              let reconciles = not (starts "none" ((sOr "reconciliation" c).Trim().ToLowerInvariant()))
+              let noRetry = starts "none" ((sOr "retry" c).Trim().ToLowerInvariant())
               match intOpt "maxAttempts" c, strOpt "boundedBy" c with
               | None, _ -> yield sprintf "%s: maxAttempts is missing" id
               | Some n, None when n <> 0L -> yield sprintf "%s: %d attempts with no bound named (boundedBy)" id n
+              | Some n, Some _ when noRetry && n <> 0L -> yield sprintf "%s: retry is none but maxAttempts is %d" id n
               | Some n, Some b ->
                   match intOpt b bounds with
                   | None -> yield sprintf "%s: bound %s is not defined" id b
                   | Some limit when n < 0L || n > limit -> yield sprintf "%s: maxAttempts %d exceeds its bound %s (%d)" id n b limit
+                  | _ -> ()
+                  match b with
+                  | "automaticRebases" when not (starts "StaleHead" (sOr "typedError" c)) -> yield sprintf "%s: only the stale-head class is bounded by automaticRebases" id
+                  | "largeFileRereads" when id <> "GH-LARGE-FILE" -> yield sprintf "%s: only the large-file class is bounded by largeFileRereads" id
+                  | "automaticReconciliationReads" when not reconciles -> yield sprintf "%s: bounded by reconciliation reads but does not reconcile" id
                   | _ -> ()
               | _ -> ()
               let head = (sOr "typedError" c).Split(' ').[0]
@@ -855,11 +917,13 @@ let errorMatrixCheck (i: Inputs) : Check =
           let used = classes |> List.map (fun c -> (sOr "typedError" c).Split(' ').[0]) |> Set.ofList
           for case in errorCases do
               if not (used.Contains case) then yield sprintf "ProviderError.%s is produced by no error class" case
+          // Each class sharing a status names evidence that every other class with that status lacks.
           let sharing = classes |> List.filter (fun c -> shared.Contains (str "id" c))
-          for (n, a) in List.indexed sharing do
-              for b in List.skip (n + 1) sharing do
-                  let statusesMeet = Set.intersect (arr "httpStatuses" a |> Set.ofList) (arr "httpStatuses" b |> Set.ofList) |> Set.isEmpty |> not
-                  if statusesMeet && Set.ofList (evidence a) = Set.ofList (evidence b) then yield sprintf "%s and %s share a status and the same evidence" (str "id" a) (str "id" b) ]
+          for a in sharing do
+              let rivals = sharing |> List.filter (fun b -> str "id" b <> str "id" a && not (Set.intersect (arr "httpStatuses" a |> Set.ofList) (arr "httpStatuses" b |> Set.ofList) |> Set.isEmpty))
+              let others = rivals |> List.collect evidence |> Set.ofList
+              if not rivals.IsEmpty && evidence a |> List.forall others.Contains then
+                  yield sprintf "%s names no evidence that distinguishes it from %s" (str "id" a) (rivals |> List.map (str "id") |> String.concat ", ") ]
 
 let formaCheck (i: Inputs) : Check =
     let inv = i.FormaInventory
@@ -877,18 +941,24 @@ let formaCheck (i: Inputs) : Check =
               if not (has "customProperties" t) then yield sprintf "token %s is not defined by Forma %s" t (sOr "version" forma)
           for r in arr "rules" i.Forma do
               let id = sOr "id" r
-              // A name followed by '*' is a family (--ef-*), not a property.
-              let properties =
-                  Regex.Matches(text r, @"--[a-z][a-z0-9-]*") |> Seq.filter (fun m -> not ((text r).Length > m.Index + m.Length && (text r).[m.Index + m.Length] = '*'))
-                  |> Seq.map (fun m -> m.Value.TrimEnd('-')) |> Seq.distinct |> List.ofSeq
-              for p in properties do
-                  if not (has "customProperties" p) then yield sprintf "%s names custom property %s, which Forma does not define" id p
+              // A name followed by '*' is a family: only the --ef- family is Forma's.
+              let named = Regex.Matches(text r, @"--[a-z][a-z0-9-]*") |> Seq.map (fun m -> m.Value, (text r).Length > m.Index + m.Length && (text r).[m.Index + m.Length] = '*') |> Seq.distinct |> List.ofSeq
+              for (p, family) in named |> List.filter (fun (p, family) -> family && p.TrimEnd('-') <> "--ef") do
+                  yield sprintf "%s names custom property family %s*, which is not Forma's" id p
+              for (p, _) in named |> List.filter (fun (p, family) -> not family && not (has "customProperties" (p.TrimEnd('-')))) do
+                  yield sprintf "%s names custom property %s, which Forma does not define" id p
               for c in found @"(?<![\w-])\.?ef-[a-z0-9_-]*[a-z0-9]" r |> List.map (fun c -> c.TrimStart('.')) |> List.distinct do
                   if not (has "classes" c) then yield sprintf "%s names class %s, which Forma does not style" id c
-              for c in found @"(?<![\w/])\.[a-z][a-z0-9]*(?:-[a-z0-9]+)+" r |> List.distinct do
+              for c in found @"(?<![\w/.])\.[a-z][a-z0-9_-]*[a-z0-9]" r |> List.distinct do
                   if not (starts ".ef-" c) then yield sprintf "%s names class %s, which is not a Forma class" id c
-              let literals = arr "literals" r |> List.filter (fun l -> not (String.IsNullOrWhiteSpace (sOr "source" l))) |> List.map (sOr "value")
-              for h in found @"#[0-9A-Fa-f]{3,8}\b" r |> List.distinct do
+              // A colour literal is allowed only when its source names a requirement document that contains it.
+              let sourced (l: Json) =
+                  let m = Regex.Match(sOr "source" l, @"docs/[A-Za-z0-9_./-]+\.md")
+                  m.Success && (i.ReadSource m.Value |> Option.map (fun t -> t.Contains(sOr "value" l)) |> Option.defaultValue false)
+              let literals = arr "literals" r |> List.filter sourced |> List.map (sOr "value")
+              for l in arr "literals" r do
+                  if not (sourced l) then yield sprintf "%s: literal %s does not appear in the document its source names" id (sOr "value" l)
+              for h in found @"#[0-9A-Fa-f]{3,8}\b|\b(?:rgb|rgba|hsl|hsla)\([^)]*\)" r |> List.distinct do
                   if not (List.contains h literals) then yield sprintf "%s names colour %s with no requirement source" id h
               if (arr "tests" r).IsEmpty then yield sprintf "%s has no test" id
               for t in strs "tests" r do
@@ -976,6 +1046,97 @@ let testIdentityCheck (i: Inputs) (files: OwnedFile list) : Check =
               | None when not (starts "praxis:" t) -> yield sprintf "%s names no test file" t
               | _ -> () ]
 
+/// The executable layout kit: every critical Forma rule names assertions the kit exports, each with a broken fixture,
+/// run against Forma patterns at contract viewports; every Forma gap names an executable pair and a remedy using only
+/// Forma tokens. CI runs the kit (layout-tests/run.mjs) in Chromium and WebKit.
+let layoutKitCheck (i: Inputs) : Check =
+    let text name = i.AuthoredText |> List.tryFind (fst >> (=) name) |> Option.map snd |> Option.defaultValue ""
+    let exported = Regex.Matches(text "layout-tests/assertions.mjs", @"(?m)^export const ([A-Za-z0-9]+)\s*=") |> Seq.map (fun m -> m.Groups.[1].Value) |> Set.ofSeq
+    let fixtures = Regex.Matches(text "layout-tests/fixtures.mjs", @"(?m)^\s+([A-Za-z0-9]+):\s*'") |> Seq.map (fun m -> m.Groups.[1].Value) |> Set.ofSeq
+    let patterns = strs "patterns" i.FormaInventory |> Set.ofList
+    let properties = strs "customProperties" i.FormaInventory |> Set.ofList
+    let viewports = arr "viewports" i.Forma |> List.map (sOr "id") |> Set.ofList
+    let pairs = arr "rules" i.Forma |> List.collect (fun r -> arr "executable" r |> List.collect (fun x -> strs "patterns" x |> List.map (fun p -> sOr "assertion" x, p)))
+    check "X15" "Every critical Forma layout rule has executable browser assertions, each exported by the layout kit with a broken fixture that must fail, run against published Forma patterns at contract viewports; every Forma gap has a remedy that uses only Forma tokens"
+        [ if String.IsNullOrWhiteSpace (text "layout-tests/run.mjs") then yield "the layout kit runner is missing"
+          for r in arr "rules" i.Forma do
+              let id = sOr "id" r
+              if boolOr "critical" false r && (arr "executable" r).IsEmpty then yield sprintf "%s is critical but names no executable assertion" id
+              for x in arr "executable" r do
+                  let a = sOr "assertion" x
+                  if not (exported.Contains a) then yield sprintf "%s: assertion %s is not exported by layout-tests/assertions.mjs" id a
+                  if not (fixtures.Contains a) then yield sprintf "%s: assertion %s has no broken fixture" id a
+                  if (strs "patterns" x).IsEmpty then yield sprintf "%s: assertion %s runs against no Forma pattern" id a
+                  for p in strs "patterns" x do
+                      if not (patterns.Contains p) then yield sprintf "%s: %s is not a Forma pattern" id p
+                  match field "viewports" x with
+                  | Some(JStr "all") -> ()
+                  | Some(JArr vs) -> for v in vs |> List.map asStr do if not (viewports.Contains v) then yield sprintf "%s: viewport %s is not in the contract" id v
+                  | _ -> yield sprintf "%s: assertion %s names no viewports" id a
+                  for c in strs "colorSchemes" x do
+                      if c <> "light" && c <> "dark" then yield sprintf "%s: colour scheme %s is not light or dark" id c
+          for g in arr "formaGaps" i.Forma do
+              let key = sOr "assertion" g, sOr "pattern" g
+              if not (List.contains key pairs) then yield sprintf "Forma gap %s on %s names no executable run" (fst key) (snd key)
+              if String.IsNullOrWhiteSpace (sOr "finding" g) || String.IsNullOrWhiteSpace (sOr "remedyCss" g) then yield sprintf "Forma gap %s on %s needs a finding and a remedy" (fst key) (snd key)
+              if Regex.IsMatch(sOr "remedyCss" g, @"--ef-[a-z0-9-]+\s*:") then yield sprintf "Forma gap %s on %s: the remedy declares an --ef-* property" (fst key) (snd key)
+              for m in Regex.Matches(sOr "remedyCss" g, @"--[a-z][a-z0-9-]*") do
+                  if not (properties.Contains m.Value) then yield sprintf "Forma gap %s on %s: the remedy uses %s, which Forma does not define" (fst key) (snd key) m.Value
+              for v in strs "viewports" g do
+                  if not (viewports.Contains v) then yield sprintf "Forma gap %s on %s: viewport %s is not in the contract" (fst key) (snd key) v ]
+
+// ---- bootstrap ---------------------------------------------------------------------------------------------------
+
+let private projectNamespace (path: string) =
+    // src/Causa.App/Views/Shell.fs -> Causa.App.Views; tests/Causa.Acceptance/Live/X.fs -> Causa.Acceptance.Live
+    let parts = path.Split('/')
+    parts.[1 .. parts.Length - 2] |> Array.map (fun p -> p.Replace("-", "")) |> String.concat "."
+
+/// The empty application repository as integration writes it at bootstrap (T10): the solution, every source and test
+/// project with its complete Compile list and references, every planned file as an empty namespace, the domain stubs
+/// and each interface contract in the file that implements it. No third-party package and no behaviour: package
+/// references come from the dependency lock at T10, and every module is written by its owner. Building it proves the
+/// project graph, the compile order and the contract placement.
+let bootstrapFiles (i: Inputs) (files: OwnedFile list) (globalJson: string) : (string * string) list =
+    let lists = compileLists i files |> Map.ofList
+    let interfaces = arr "interfaces" i.Interfaces |> List.map (fun x -> sOr "file" x, x) |> Map.ofList
+    let stubs = field "domainStubs" i.Interfaces |> Option.map (sOr "fsharp") |> Option.defaultValue ""
+    let projects = (arr "projects" i.Structure |> List.map (fun p -> p, false)) @ (arr "testProjects" i.Structure |> List.map (fun p -> p, true))
+    let pathOf id = projects |> List.tryFind (fun (p, _) -> str "id" p = id) |> Option.map (fst >> str "path") |> Option.defaultValue ""
+    let dirOf (path: string) = path.Substring(0, path.LastIndexOf '/')
+    let relative (fromDir: string) (path: string) =
+        let a = fromDir.Split('/') |> List.ofArray
+        let b = path.Split('/') |> List.ofArray
+        let common = List.zip (List.truncate (min a.Length b.Length) a) (List.truncate (min a.Length b.Length) b) |> List.takeWhile (fun (x, y) -> x = y) |> List.length
+        (List.replicate (a.Length - common) ".." @ List.skip common b) |> String.concat "/"
+    let fsproj (p: Json) =
+        let dir = dirOf (str "path" p)
+        let compiles = lists.TryFind (str "id" p) |> Option.defaultValue [] |> List.map (fun f -> sprintf "    <Compile Include=\"%s\" />" (relative dir f))
+        let refs = strs "references" p |> List.map (fun r -> sprintf "    <ProjectReference Include=\"%s\" />" (relative dir (pathOf r)))
+        String.concat "\n"
+            ([ "<Project Sdk=\"Microsoft.NET.Sdk\">"; "  <PropertyGroup>"; "    <TargetFramework>net10.0</TargetFramework>"; "  </PropertyGroup>"; "  <ItemGroup>" ]
+             @ compiles @ [ "  </ItemGroup>" ]
+             @ (if refs.IsEmpty then [] else [ "  <ItemGroup>" ] @ refs @ [ "  </ItemGroup>" ])
+             @ [ "</Project>"; "" ])
+    let csproj (p: Json) =
+        let dir = dirOf (str "path" p)
+        let refs = strs "references" p |> List.map (fun r -> sprintf "    <ProjectReference Include=\"%s\" />" (relative dir (pathOf r)))
+        String.concat "\n" ([ "<Project Sdk=\"Microsoft.NET.Sdk\">"; "  <PropertyGroup>"; "    <TargetFramework>net10.0</TargetFramework>"; "  </PropertyGroup>"; "  <ItemGroup>" ] @ refs @ [ "  </ItemGroup>"; "</Project>"; "" ])
+    let firstDomainFile = lists.TryFind "Causa.Domain" |> Option.bind List.tryHead
+    let source (f: OwnedFile) =
+        let header = sprintf "// Owner: %s. Written at bootstrap by requirements-compiler v41; the owner replaces this content." f.Owner
+        match interfaces.TryFind f.Path with
+        | Some x -> f.Path, header + "\n" + (str "fsharp" x).TrimEnd() + "\n"
+        | None when Some f.Path = firstDomainFile -> f.Path, header + "\n// The domain stubs of the interface contracts; the domain owner implements the full shapes.\n" + stubs.TrimEnd() + "\n"
+        | None -> f.Path, sprintf "%s\nnamespace %s\n" header (projectNamespace f.Path)
+    let fsFiles = files |> List.filter (fun f -> f.Path.EndsWith(".fs", StringComparison.Ordinal) && not (starts "verifier/" f.Path) && f.Project.IsSome) |> List.map source
+    let host = files |> List.filter (fun f -> f.Path.EndsWith(".cs", StringComparison.Ordinal)) |> List.map (fun f -> f.Path, sprintf "// Owner: %s. Written at bootstrap by requirements-compiler v41.\nnamespace Causa.Host;\n\ninternal static class HostShim\n{\n}\n" f.Owner)
+    let projectFiles = projects |> List.map (fun (p, _) -> str "path" p, (if (str "path" p).EndsWith(".csproj", StringComparison.Ordinal) then csproj p else fsproj p))
+    let slnx =
+        String.concat "\n" ([ "<Solution>" ] @ (projects |> List.map (fun (p, _) -> sprintf "  <Project Path=\"%s\" />" (str "path" p))) @ [ "</Solution>"; "" ])
+    let props = String.concat "\n" [ "<Project>"; "  <PropertyGroup>"; "    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>"; "    <Nullable>enable</Nullable>"; "  </PropertyGroup>"; "</Project>"; "" ]
+    [ "Causa.slnx", slnx; "Directory.Build.props", props; "global.json", globalJson ] @ projectFiles @ fsFiles @ host
+
 // ---- contracts ---------------------------------------------------------------------------------------------------
 
 /// The frozen interface contracts as an F# library, one file per block in compile order, so CI can typecheck them
@@ -1000,7 +1161,21 @@ let contractFiles (i: Inputs) : (string * string) list =
               "  </ItemGroup>"
               "</Project>"
               "" ]
-    (named |> List.map (fun (f, t) -> "contracts/" + f, t)) @ [ "contracts/ContractCheck.fsproj", fsproj ]
+    // A negative control CI compiles after the contracts: it must be refused, because Confirmation's representation is
+    // private to its module (PERSIST-023).
+    let forge =
+        String.concat "\n"
+            [ "// Generated by requirements-compiler v41. Negative control: this file must NOT compile (FS1093). CI adds it to"
+              "// ContractCheck.fsproj and expects the build to fail, proving that no file can forge a Confirmation."
+              "namespace Causa.Persistence"
+              ""
+              "module ForgeConfirmation ="
+              "    let forged : Confirmation.T ="
+              "        { Investigation = Causa.Domain.InvestigationId System.Guid.Empty"
+              "          Commit = CommitOid \"forged\""
+              "          CommittedAt = System.DateTimeOffset.MinValue }"
+              "" ]
+    (named |> List.map (fun (f, t) -> "contracts/" + f, t)) @ [ "contracts/ContractCheck.fsproj", fsproj; "contracts/negative/ForgeConfirmation.fs", forge ]
 
 // ---- build -------------------------------------------------------------------------------------------------------
 
@@ -1023,7 +1198,8 @@ let build (i: Inputs) : Built =
             provenanceCheck i
             check "X12" "Every state machine is deterministic by reviewed guard partitions, every pair is decided (listed or fail-closed), every transition is sourced, every state is reachable, and no state is added" smProblems
             check "X13" "The adjusted DAG is acyclic, keeps every v4 task with its requirements and every v4 ordering not explicitly waived, keeps every estimate at least half of v4's, and labels every change an estimate with a rationale" schedProblems
-            testIdentityCheck i files ]
+            testIdentityCheck i files
+            layoutKitCheck i ]
     let json (n: string) (j: Json) = n, serialize j
     { Files =
         [ json "agent-file-ownership.json" (ownershipJson i files)

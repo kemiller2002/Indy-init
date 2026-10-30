@@ -25,3 +25,6 @@ type TransportFailure =
 type HttpOutcome =
     | Answered of RequestId * status: int * headers: (string * string) list * body: string
     | NotAnswered of RequestId * TransportFailure
+
+/// The host's only network operation: execute one request exactly once and return its raw outcome; it never retries.
+type Execute = HttpRequest -> HttpOutcome

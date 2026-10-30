@@ -210,6 +210,21 @@
       "tests": [
         "playwright:acceptance/UI-011.spec.js > UI-011-O1 [chromium]",
         "playwright:acceptance/UI-011.spec.js > UI-011-O1 [webkit]"
+      ],
+      "critical": true,
+      "executable": [
+        {
+          "assertion": "touchTargets",
+          "patterns": [
+            "button",
+            "navigation-shell",
+            "recovery-actions",
+            "conflict-review",
+            "dialog",
+            "skip-link"
+          ],
+          "viewports": "all"
+        }
       ]
     },
     {
@@ -223,6 +238,23 @@
       "tests": [
         "playwright:acceptance/UI-011.spec.js > UI-011-O2 [chromium]",
         "playwright:acceptance/UI-011.spec.js > UI-011-O2 [webkit]"
+      ],
+      "critical": true,
+      "executable": [
+        {
+          "assertion": "noHorizontalScroll",
+          "patterns": [
+            "workspace-shell",
+            "navigation-shell",
+            "conflict-review",
+            "diff-viewer",
+            "record-header",
+            "key-value-list",
+            "timeline",
+            "fault-banner"
+          ],
+          "viewports": "all"
+        }
       ]
     },
     {
@@ -236,6 +268,21 @@
       "tests": [
         "playwright:acceptance/PERSIST-030.spec.js > PERSIST-030-O7 [chromium]",
         "playwright:acceptance/PERSIST-030.spec.js > PERSIST-030-O7 [webkit]"
+      ],
+      "critical": true,
+      "executable": [
+        {
+          "assertion": "textNotClipped",
+          "patterns": [
+            "record-header",
+            "key-value-list",
+            "status-lozenge",
+            "operation-status",
+            "freshness",
+            "timeline"
+          ],
+          "viewports": "all"
+        }
       ]
     },
     {
@@ -249,6 +296,23 @@
       "tests": [
         "playwright:acceptance/UI-011.spec.js > UI-011-O1 [chromium]",
         "playwright:invariants/INV-24.spec.js > save-state and conflict actions by keyboard and screen reader [webkit]"
+      ],
+      "critical": true,
+      "executable": [
+        {
+          "assertion": "focusVisible",
+          "patterns": [
+            "button",
+            "navigation-shell",
+            "conflict-review",
+            "recovery-actions",
+            "skip-link"
+          ],
+          "viewports": [
+            "VP-320",
+            "VP-DESKTOP"
+          ]
+        }
       ]
     },
     {
@@ -261,6 +325,21 @@
       "tests": [
         "playwright:acceptance/UI-011.spec.js > UI-011-O2 [chromium]",
         "playwright:acceptance/UI-011.spec.js > UI-011-O2 [webkit]"
+      ],
+      "critical": true,
+      "executable": [
+        {
+          "assertion": "reducedMotion",
+          "patterns": [
+            "skeleton",
+            "spinner",
+            "operation-status",
+            "dialog"
+          ],
+          "viewports": [
+            "VP-DESKTOP"
+          ]
+        }
       ]
     },
     {
@@ -281,6 +360,29 @@
           "source": "docs/CAUSA-UI-EXPERIENCE-REQUIREMENTS.md, UI-016 colour table: 'Amber | Amber | `#E9A23B`'",
           "note": "A requirement identity colour, not a Forma value (Forma 0.12.0 has no such colour); mapping it to a Forma semantic token is ODR-V41-05."
         }
+      ],
+      "critical": true,
+      "executable": [
+        {
+          "assertion": "textContrast",
+          "patterns": [
+            "status-lozenge",
+            "operation-status",
+            "fault-banner",
+            "freshness",
+            "record-header",
+            "conflict-review",
+            "button"
+          ],
+          "viewports": [
+            "VP-320",
+            "VP-DESKTOP"
+          ],
+          "colorSchemes": [
+            "light",
+            "dark"
+          ]
+        }
       ]
     },
     {
@@ -294,6 +396,17 @@
       "tests": [
         "playwright:acceptance/PERSIST-054.spec.js > PERSIST-054-O2 [chromium]",
         "playwright:acceptance/PERSIST-054.spec.js > PERSIST-054-O2 [webkit]"
+      ],
+      "critical": true,
+      "executable": [
+        {
+          "assertion": "statusVisible",
+          "patterns": [
+            "status-lozenge",
+            "operation-status"
+          ],
+          "viewports": "all"
+        }
       ]
     },
     {
@@ -306,6 +419,31 @@
       "assertion": "browser: shell visible before the runtime boots; an injected boot failure shows a fault pattern with a working retry",
       "tests": [
         "playwright:acceptance/UI-010.spec.js > UI-010-O2 [chromium]"
+      ],
+      "critical": true,
+      "executable": [
+        {
+          "assertion": "loadingAnnounced",
+          "patterns": [
+            "skeleton",
+            "spinner"
+          ],
+          "viewports": [
+            "VP-320",
+            "VP-DESKTOP"
+          ]
+        },
+        {
+          "assertion": "faultActionable",
+          "patterns": [
+            "fault-banner",
+            "fault-blocking"
+          ],
+          "viewports": [
+            "VP-320",
+            "VP-DESKTOP"
+          ]
+        }
       ]
     },
     {
@@ -318,6 +456,17 @@
       "assertion": "browser: at VP-320 the navigation is reachable and operable by keyboard and touch",
       "tests": [
         "playwright:acceptance/UI-029.spec.js > UI-029-O1 [chromium]"
+      ],
+      "critical": true,
+      "executable": [
+        {
+          "assertion": "navigationReachable",
+          "patterns": [
+            "navigation-shell",
+            "workspace-shell"
+          ],
+          "viewports": "all"
+        }
       ]
     },
     {
@@ -330,7 +479,41 @@
       "assertion": "build: dotnet:Causa.Invariants.Negative.INV24.FormaTokensExist scans web/causa.css against the inventory",
       "tests": [
         "dotnet:Causa.Invariants.Negative.INV24.FormaTokensExist"
+      ],
+      "critical": true,
+      "executable": [
+        {
+          "assertion": "onlyFormaTokens",
+          "patterns": [
+            "workspace-shell"
+          ],
+          "viewports": [
+            "VP-DESKTOP"
+          ]
+        }
       ]
+    }
+  ],
+  "executableTests": {
+    "module": "layout-tests/assertions.mjs",
+    "brokenFixtures": "layout-tests/fixtures.mjs",
+    "runner": "layout-tests/run.mjs",
+    "meaning": "Every critical rule names executable assertions. CI runs each against the listed Forma 0.12.0 pattern pages, at the listed viewports and colour schemes, in Chromium and WebKit; every run must pass. It also runs each against its broken fixture, where every run must fail, so the assertion is shown to work. In the event build, the plan-bound browser tests the rule names import the same module and run it against Causa's screens."
+  },
+  "formaGaps": [
+    {
+      "assertion": "touchTargets",
+      "pattern": "navigation-shell",
+      "viewports": [
+        "VP-320",
+        "VP-IPAD-PORTRAIT",
+        "VP-IPAD-LANDSCAPE",
+        "VP-DESKTOP"
+      ],
+      "rule": "FL-01",
+      "finding": "Forma 0.12.0's navigation-shell links are 26 px tall at VP-320, both iPad viewports and VP-DESKTOP, below --ef-layout-target-min (44 px); at 200% text they reach 52 px. Found by the executable FL-01 assertion.",
+      "remedyCss": ".ef-navigation-shell nav a{display:flex;align-items:center;min-block-size:var(--ef-layout-target-min)}",
+      "remedy": "web/causa.css applies the remedy, which reads only the Forma token --ef-layout-target-min; report the gap to Forma's owner."
     }
   ]
 }

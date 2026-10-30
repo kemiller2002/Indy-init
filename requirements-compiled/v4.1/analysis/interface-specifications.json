@@ -30,6 +30,32 @@
       ],
       "file": "src/Causa.Domain/Kernel.fs",
       "fsharp": "namespace Causa.Domain\n\n/// IF41-DOMAIN: the F# kernel (Boundaries A-C). Pure: no network, clock, randomness, GitHub or browser types.\ntype ReplayError =\n    | EmptyHistory\n    | NonContiguousVersion of expected: AggregateVersion * found: AggregateVersion\n    | IllegalEvent of ProjectionError\n    | UnknownEventKind of string\n\ntype InvestigationProjection =\n    { Investigation: Investigation\n      Timeline: EventEnvelope list\n      Capabilities: string list }\n\ntype DomainKernel =\n    { Decide: PolicySet -> ActorContext -> Investigation option -> CommandEnvelope -> Decision\n      Evolve: Investigation option -> EventEnvelope -> Result<Investigation, ProjectionError>\n      Replay: EventEnvelope list -> Result<Investigation, ReplayError>\n      Project: Investigation -> InvestigationProjection }",
+      "operations": [
+        {
+          "name": "Decide",
+          "signature": "PolicySet -> ActorContext -> Investigation option -> CommandEnvelope -> Decision",
+          "success": "Allowed with the events to append",
+          "failure": "Blocked, RequiresReview, UnsupportedSemantics, Conflict or Duplicate, each with its reasons"
+        },
+        {
+          "name": "Evolve",
+          "signature": "Investigation option -> EventEnvelope -> Result<Investigation, ProjectionError>",
+          "success": "the next state",
+          "failure": "ProjectionError: the event is illegal in this state"
+        },
+        {
+          "name": "Replay",
+          "signature": "EventEnvelope list -> Result<Investigation, ReplayError>",
+          "success": "the replayed investigation",
+          "failure": "EmptyHistory, NonContiguousVersion, IllegalEvent or UnknownEventKind"
+        },
+        {
+          "name": "Project",
+          "signature": "Investigation -> InvestigationProjection",
+          "success": "the projection the views and report read",
+          "failure": "total"
+        }
+      ],
       "concurrency": "Pure functions; no ordering constraint beyond history order. Replay applies events in version order and refuses a gap.",
       "versioning": "Frozen at T14. Any change to a union or record, including an added case, is breaking (incomplete matches are errors under TreatWarningsAsErrors): it goes through the coordinator as a new contract version, with every consumer's contract tests changed and passing in the same pull request.",
       "producerTests": [
@@ -62,6 +88,20 @@
       ],
       "file": "src/Causa.Persistence/Storage.fs",
       "fsharp": "namespace Causa.Persistence\n\nopen Causa.Domain\n\n/// IF41-STORAGE: causa-storage v1.0.0 file sets (CONTRACT.md wins over docs/CAUSA-DATA-CONTRACT-v1.md).\ntype CommitOid = CommitOid of string\ntype RepoPath = RepoPath of string\n\ntype FileSet =\n    { Manifest: byte[]\n      Events: byte[]\n      Snapshot: byte[] }\n\ntype VerificationFailure =\n    | SchemaInvalid of file: string * detail: string\n    | DigestMismatch of field: string\n    | ContractValueMismatch of field: string * expected: string * actual: string\n    | SnapshotDiffersFromReplay of paths: string list\n    | MissingRequiredField of file: string * field: string\n    | ReplayRejected of ReplayError\n\ntype VerifiedInvestigation =\n    { Investigation: Investigation\n      History: EventEnvelope list\n      ReadAt: CommitOid\n      Bytes: FileSet }\n\ntype StorageCodec =\n    { PathOf: InvestigationId -> RepoPath\n      Encode: VerifiedInvestigation -> EventEnvelope list -> FileSet\n      Verify: CommitOid -> FileSet -> Result<VerifiedInvestigation, VerificationFailure list> }",
+      "operations": [
+        {
+          "name": "Encode",
+          "signature": "VerifiedInvestigation -> EventEnvelope list -> FileSet",
+          "success": "the canonical file set (RFC 8785)",
+          "failure": "total: no failure"
+        },
+        {
+          "name": "Verify",
+          "signature": "CommitOid -> FileSet -> Result<VerifiedInvestigation, VerificationFailure list>",
+          "success": "the verified investigation",
+          "failure": "every integrity check that failed"
+        }
+      ],
       "concurrency": "Verify is pure and total over bytes; Encode is deterministic (canonical JSON, RFC 8785).",
       "versioning": "Pinned to causa-storage v1.0.0; a contract change needs STORAGE-003 versioning and, as for every interface, every consumer's contract tests in the same pull request.",
       "producerTests": [
@@ -89,7 +129,15 @@
         "integration"
       ],
       "file": "src/Causa.Persistence/Wire.fs",
-      "fsharp": "namespace Causa.Persistence\n\n/// IF41-WIRE: HTTP as data. Persistence builds requests and decodes answers; the App runtime only executes them\n/// through Limen and returns the raw result (ODR-V4-06 proposes that decoding stays inside persistence).\ntype RequestId = RequestId of int64\n\ntype HttpMethod =\n    | Get\n    | Post\n    | Put\n    | Patch\n\ntype HttpRequest =\n    { Id: RequestId\n      Method: HttpMethod\n      Url: string\n      Headers: (string * string) list\n      Body: string option }\n\ntype TransportFailure =\n    | FailedBeforeSending\n    | LostAfterSending\n    | TimedOut\n\ntype HttpOutcome =\n    | Answered of RequestId * status: int * headers: (string * string) list * body: string\n    | NotAnswered of RequestId * TransportFailure",
+      "fsharp": "namespace Causa.Persistence\n\n/// IF41-WIRE: HTTP as data. Persistence builds requests and decodes answers; the App runtime only executes them\n/// through Limen and returns the raw result (ODR-V4-06 proposes that decoding stays inside persistence).\ntype RequestId = RequestId of int64\n\ntype HttpMethod =\n    | Get\n    | Post\n    | Put\n    | Patch\n\ntype HttpRequest =\n    { Id: RequestId\n      Method: HttpMethod\n      Url: string\n      Headers: (string * string) list\n      Body: string option }\n\ntype TransportFailure =\n    | FailedBeforeSending\n    | LostAfterSending\n    | TimedOut\n\ntype HttpOutcome =\n    | Answered of RequestId * status: int * headers: (string * string) list * body: string\n    | NotAnswered of RequestId * TransportFailure\n\n/// The host's only network operation: execute one request exactly once and return its raw outcome; it never retries.\ntype Execute = HttpRequest -> HttpOutcome\n",
+      "operations": [
+        {
+          "name": "Execute",
+          "signature": "HttpRequest -> HttpOutcome",
+          "success": "Answered with status, headers and body",
+          "failure": "NotAnswered with FailedBeforeSending, LostAfterSending or TimedOut"
+        }
+      ],
       "concurrency": "Every request carries a RequestId; every outcome names it. The host executes requests in the order given and never retries.",
       "versioning": "Frozen at T14. Any change to a union or record, including an added case, is breaking (incomplete matches are errors under TreatWarningsAsErrors): it goes through the coordinator as a new contract version, with every consumer's contract tests changed and passing in the same pull request.",
       "producerTests": [
@@ -117,6 +165,14 @@
       ],
       "file": "src/Causa.Persistence/Classify.fs",
       "fsharp": "namespace Causa.Persistence\n\n/// IF41-ERRORS: the classification of github-error-matrix.json. Every provider answer maps to exactly one case.\ntype RateLimitKind =\n    | Primary of resetAtEpochSeconds: int64 option\n    | Secondary of retryAfterSeconds: int option\n\ntype ProviderError =\n    | AuthenticationFailed\n    | PermissionDenied of operation: string\n    | RateLimited of RateLimitKind\n    | StaleHead of expected: CommitOid * actual: CommitOid option\n    | ValidationFailed of messages: string list\n    | NotFound of what: string\n    | HistoryRewritten of expected: CommitOid\n    | NetworkUnavailable of TransportFailure\n    | Malformed of detail: string\n    | ReadBackMismatch of commit: CommitOid\n    | Unrecognised of status: int\n\n/// A 2xx answer that decoded: the request it answers and its body, for the caller to decode further.\ntype ProviderAnswer = { Request: RequestId; Status: int; Body: string }\n\ntype Classifier = HttpOutcome -> Result<ProviderAnswer, ProviderError>",
+      "operations": [
+        {
+          "name": "Classifier",
+          "signature": "HttpOutcome -> Result<ProviderAnswer, ProviderError>",
+          "success": "ProviderAnswer for a 2xx answer that decoded",
+          "failure": "one ProviderError case per github-error-matrix.json class"
+        }
+      ],
       "concurrency": "Classification is a pure function of one outcome; it never consults timing or other requests.",
       "versioning": "Frozen at T14. Any change to a union or record, including an added case, is breaking (incomplete matches are errors under TreatWarningsAsErrors): it goes through the coordinator as a new contract version, with every consumer's contract tests changed and passing in the same pull request.",
       "producerTests": [
@@ -146,8 +202,40 @@
         "integration"
       ],
       "file": "src/Causa.Persistence/SaveMachine.fs",
-      "fsharp": "namespace Causa.Persistence\n\nopen Causa.Domain\n\n/// IF41-SAVE: the SM-SAVE, SM-CONFLICT and SM-LOAD machines (requirements-compiled/v4/state-machines.json). Pure;\n/// effects are data. Each state union has exactly the machine's states and each input union exactly its events\n/// (check X05); state-machine-contracts.json decides every (state, input) pair.\n/// Confirmation has a private representation: only this assembly constructs it (PERSIST-023).\ntype Confirmation =\n    private\n        { Investigation: InvestigationId\n          Commit: CommitOid\n          CommittedAt: System.DateTimeOffset }\n    member c.InvestigationId = c.Investigation\n    member c.CommitOid = c.Commit\n    member c.CommitTime = c.CommittedAt\n\ntype WriteMarker = { Session: System.Guid; Sequence: int64 }\n\ntype SaveFailure =\n    | Refused of ProviderError\n    | RepositoryKeptChanging\n    | BytesDiffer of CommitOid\n    | HistoryWasRewritten\n    | CredentialNotAccepted\n\n/// SM-CONFLICT states.\ntype ConflictView =\n    | ReadingRemote\n    | Reviewable of remote: VerifiedInvestigation\n    | Reapplying of remote: VerifiedInvestigation\n    | Reapplied of remote: VerifiedInvestigation\n    | ConfirmingDiscard of remote: VerifiedInvestigation\n    | Discarded of remote: VerifiedInvestigation\n    | RemoteUnavailable\n    | Unresolvable of reason: string\n\n/// SM-CONFLICT events.\ntype ConflictInput =\n    | RemoteVerified of VerifiedInvestigation\n    | RemoteReadFailed of TransportFailure\n    | RemoteMissingOrInvalid of VerificationFailure option\n    | ReadAgain\n    | ReviewChosen\n    | ReapplyChosen\n    | ReapplyDone of EventPayload list\n    | DiscardChosen\n    | DiscardConfirmed\n    | DiscardCancelled\n    | ExportChosen\n    | SupersededReply of RequestId\n\n/// SM-SAVE states (PERSIST-031: exactly seven).\ntype SaveState =\n    | Saved of Confirmation\n    | Unsaved\n    | Saving\n    | Offline\n    | Conflict of ConflictView\n    | UnknownOutcome of automaticReadsLeft: int\n    | SaveFailed of SaveFailure\n\n/// SM-SAVE events. Persistence produces every reply event from an HttpOutcome with SaveMachine.Interpret; the App\n/// produces only Edit, SaveRequested, CheckAgain, WentOffline, WentOnline and QueuedSaveStarted.\ntype SaveInput =\n    | Edit of EventPayload\n    | SaveRequested\n    | MutationSent of RequestId\n    | ReadBackMatched of Confirmation\n    | ReadBackMismatched of CommitOid\n    | StaleHeadUnrelated of freshHead: CommitOid\n    | StaleHeadSameInvestigation of freshHead: CommitOid\n    | ProviderRefused of ProviderError\n    | CredentialRefused\n    | AnswerLost\n    | FailedBeforeSending\n    | ReconcileMarkerBytesMatch of Confirmation\n    | ReconcileMarkerBytesDiffer of CommitOid\n    | ReconcileNothingWrittenHeadUnchanged\n    | ReconcileNothingWrittenHeadMoved of head: CommitOid\n    | ReconcileHistoryRewritten\n    | ReconcileReadFailed\n    | ReconcileReadsSpent\n    | CheckAgain\n    | WentOffline\n    | WentOnline\n    | ConflictResolvedReapplied of EventPayload list\n    | ConflictResolvedDiscarded of Confirmation\n    | SupersededReply of RequestId\n    | QueuedSaveStarted\n    | RebaseReadFailed\n    | ReadBackReadFailed\n\n/// SM-LOAD states.\ntype LoadState =\n    | NotLoaded\n    | Loading of RequestId\n    | Loaded of VerifiedInvestigation\n    | LoadFailed of VerificationFailure\n    | UnavailableOffline\n\n/// SM-LOAD events.\ntype LoadInput =\n    | OpenRequested of InvestigationId\n    | LoadVerified of VerifiedInvestigation\n    | LoadRejected of VerificationFailure\n    | WentOffline\n    | WentOnline\n    | RefreshRequested\n    | SupersededReply of RequestId\n\ntype Politeness =\n    | Polite\n    | Assertive\n\ntype SaveEffect =\n    | Send of HttpRequest\n    | ScheduleReconcileRead of RequestId * afterMilliseconds: int\n    | Announce of Politeness * text: string\n    | ExportCommands of EventPayload list\n\n/// The fail-closed answer to an illegal (state, input) pair: state, base head and unsaved changes are unchanged.\ntype SaveFault = { Machine: string; State: string; Input: string; Reason: string }\n\ntype InvestigationSession =\n    { Id: InvestigationId\n      BaseHead: CommitOid\n      State: SaveState\n      Unsaved: EventPayload list\n      AfterInFlight: EventPayload list\n      Outstanding: RequestId option\n      Mutations: int\n      RebaseAttempts: int }\n\ntype SaveMachine =\n    { Initial: VerifiedInvestigation -> Confirmation -> InvestigationSession\n      /// Classifies and verifies one answer (IF41-ERRORS, reconciliation, read-back) into the event it means for this\n      /// session; an answer to a request that is not Outstanding becomes SupersededReply.\n      Interpret: InvestigationSession -> HttpOutcome -> SaveInput\n      Step: InvestigationSession -> SaveInput -> Result<InvestigationSession * SaveEffect list, SaveFault>\n      StepConflict: ConflictView -> ConflictInput -> Result<ConflictView * SaveEffect list, SaveFault>\n      StepLoad: LoadState -> LoadInput -> Result<LoadState * SaveEffect list, SaveFault> }\n",
-      "concurrency": "One Step per input, applied in arrival order on the single UI thread; at most one mutation in flight per tab (Outstanding). Interpret turns an answer whose RequestId is not Outstanding into SupersededReply, which is legal only where state-machine-contracts.json lists it (T-S39, T-S40: discarded, state unchanged, proposed by ODR-V4-03); in every other state it fails closed with SaveFault and changes nothing.",
+      "fsharp": "namespace Causa.Persistence\n\nopen Causa.Domain\n\n/// IF41-SAVE: the SM-SAVE, SM-CONFLICT and SM-LOAD machines (requirements-compiled/v4/state-machines.json). Pure;\n/// effects are data. Each state union has exactly the machine's states and each input union exactly its events\n/// (check X05); state-machine-contracts.json decides every (state, input) pair.\n/// Confirmation (PERSIST-023): the only proof that a save succeeded. Its representation is private to this module, so\n/// no other file, in this assembly or another, can build one; its only constructor requires the bytes re-read at the\n/// commit to equal the bytes written. (A caller can still pass the same bytes twice: the plan's INV-01 tests guard\n/// that path.)\n[<RequireQualifiedAccess>]\nmodule Confirmation =\n    type T =\n        private\n            { Investigation: InvestigationId\n              Commit: CommitOid\n              CommittedAt: System.DateTimeOffset }\n        member c.InvestigationId = c.Investigation\n        member c.CommitOid = c.Commit\n        member c.CommitTime = c.CommittedAt\n\n    let ofReadBack (investigation: InvestigationId) (commit: CommitOid) (committedAt: System.DateTimeOffset) (written: FileSet) (readBack: FileSet) : T option =\n        if written = readBack then Some { Investigation = investigation; Commit = commit; CommittedAt = committedAt } else None\n\ntype WriteMarker = { Session: System.Guid; Sequence: int64 }\n\ntype SaveFailure =\n    | Refused of ProviderError\n    | RepositoryKeptChanging\n    | BytesDiffer of CommitOid\n    | HistoryWasRewritten\n    | CredentialNotAccepted\n\n/// An unsaved command the engine refused when it was re-decided against the GitHub version, with the engine's reason\n/// (T-C07, PERSIST-012).\ntype RefusedCommand = { Command: CommandEnvelope; Reason: string }\n\n/// SM-CONFLICT states.\ntype ConflictView =\n    | ReadingRemote\n    | Reviewable of remote: VerifiedInvestigation\n    | Reapplying of remote: VerifiedInvestigation\n    | Reapplied of remote: VerifiedInvestigation * refused: RefusedCommand list\n    | ConfirmingDiscard of remote: VerifiedInvestigation\n    | Discarded of remote: VerifiedInvestigation\n    | RemoteUnavailable\n    | Unresolvable of reason: string\n\n/// SM-CONFLICT events.\ntype ConflictInput =\n    | RemoteVerified of VerifiedInvestigation\n    | RemoteReadFailed of TransportFailure\n    | RemoteMissingOrInvalid of VerificationFailure option\n    | ReadAgain\n    | ReviewChosen\n    | ReapplyChosen\n    | ReapplyDone of accepted: CommandEnvelope list * refused: RefusedCommand list\n    | DiscardChosen\n    | DiscardConfirmed\n    | DiscardCancelled\n    | ExportChosen\n    | SupersededReply of RequestId\n\n/// SM-SAVE states (PERSIST-031: exactly seven).\ntype SaveState =\n    | Saved of Confirmation.T\n    | Unsaved\n    | Saving\n    | Offline\n    | Conflict of ConflictView\n    | UnknownOutcome of automaticReadsLeft: int\n    | SaveFailed of SaveFailure\n\n/// SM-SAVE events. Persistence produces every reply event from an HttpOutcome with SaveMachine.Interpret; the App\n/// produces only Edit, SaveRequested, CheckAgain, WentOffline, WentOnline and QueuedSaveStarted.\ntype SaveInput =\n    | Edit of CommandEnvelope\n    | SaveRequested\n    | MutationSent of RequestId\n    | ReadBackMatched of Confirmation.T\n    | ReadBackMismatched of CommitOid\n    | StaleHeadUnrelated of freshHead: CommitOid\n    | StaleHeadSameInvestigation of freshHead: CommitOid\n    | ProviderRefused of ProviderError\n    | CredentialRefused\n    | AnswerLost\n    | FailedBeforeSending\n    | ReconcileMarkerBytesMatch of Confirmation.T\n    | ReconcileMarkerBytesDiffer of CommitOid\n    | ReconcileNothingWrittenHeadUnchanged\n    | ReconcileNothingWrittenHeadMoved of head: CommitOid\n    | ReconcileHistoryRewritten\n    | ReconcileReadFailed\n    | ReconcileReadsSpent\n    | CheckAgain\n    | WentOffline\n    | WentOnline\n    | ConflictResolvedReapplied of CommandEnvelope list\n    | ConflictResolvedDiscarded of Confirmation.T\n    | SupersededReply of RequestId\n    | QueuedSaveStarted\n    | RebaseReadFailed\n    | ReadBackReadFailed\n\n/// Why a load failed: the files did not verify, or the provider refused or did not answer (IF41-ERRORS), so the\n/// application can state the cause truthfully (PERSIST-024).\ntype LoadFailure =\n    | Unverifiable of VerificationFailure list\n    | ProviderFailed of ProviderError\n\n/// SM-LOAD states.\ntype LoadState =\n    | NotLoaded\n    | Loading of RequestId\n    | Loaded of VerifiedInvestigation\n    | LoadFailed of LoadFailure\n    | UnavailableOffline\n\n/// SM-LOAD events.\ntype LoadInput =\n    | OpenRequested of InvestigationId\n    | LoadVerified of VerifiedInvestigation\n    | LoadRejected of LoadFailure\n    | WentOffline\n    | WentOnline\n    | RefreshRequested\n    | SupersededReply of RequestId\n\ntype Politeness =\n    | Polite\n    | Assertive\n\ntype SaveEffect =\n    | Send of HttpRequest\n    | ScheduleReconcileRead of RequestId * afterMilliseconds: int\n    | Announce of Politeness * text: string\n    | ExportCommands of CommandEnvelope list\n\n/// The fail-closed answer to an illegal (state, input) pair: state, base head and unsaved changes are unchanged.\ntype SaveFault = { Machine: string; State: string; Input: string; Reason: string }\n\n/// The answer a session is waiting for, so Interpret knows what it means. These are steps inside Saving and\n/// UnknownOutcome; no machine state is added.\ntype Awaiting =\n    | MutationAnswer\n    | ReadBackAt of CommitOid\n    | FreshHead\n    | FileComparisonAt of freshHead: CommitOid\n    | ReconcileHead\n    | ReconcileCommits of page: int\n    | ReconcileFilesAt of CommitOid\n\n/// What one answer means for a session.\ntype Interpretation =\n    /// The answer completes a step: apply this event with SaveMachine.Step.\n    | MachineEvent of SaveInput\n    /// The answer leads to the next read of the same step (read-back after the mutation, file comparison after a\n    /// fresh head, the next reconciliation page); the state does not change.\n    | NextRequest of HttpRequest * Awaiting\n\ntype InvestigationSession =\n    { Id: InvestigationId\n      BaseHead: CommitOid\n      State: SaveState\n      Unsaved: CommandEnvelope list\n      AfterInFlight: CommandEnvelope list\n      Outstanding: (RequestId * Awaiting) option\n      Mutations: int\n      RebaseAttempts: int\n      ReconcileReads: int }\n\ntype SaveMachine =\n    { Initial: VerifiedInvestigation -> Confirmation.T -> InvestigationSession\n      /// Classifies and verifies one answer (IF41-ERRORS, read-back, reconciliation) against what the session awaits:\n      /// a machine event, or the next request of the same step. An answer to a request that is not Outstanding is\n      /// MachineEvent SupersededReply.\n      Interpret: InvestigationSession -> HttpOutcome -> Interpretation\n      Step: InvestigationSession -> SaveInput -> Result<InvestigationSession * SaveEffect list, SaveFault>\n      StepConflict: ConflictView -> ConflictInput -> Result<ConflictView * SaveEffect list, SaveFault>\n      StepLoad: LoadState -> LoadInput -> Result<LoadState * SaveEffect list, SaveFault> }\n",
+      "operations": [
+        {
+          "name": "Interpret",
+          "signature": "InvestigationSession -> HttpOutcome -> Interpretation",
+          "success": "MachineEvent, or NextRequest for the next read of the same step",
+          "failure": "total: every answer, including an unrecognised one, maps to an event (AnswerLost, ProviderRefused, SupersededReply)"
+        },
+        {
+          "name": "Step",
+          "signature": "InvestigationSession -> SaveInput -> Result<InvestigationSession * SaveEffect list, SaveFault>",
+          "success": "the next session and its effects (state-machine-contracts.json)",
+          "failure": "SaveFault for an illegal pair; nothing changes"
+        },
+        {
+          "name": "StepConflict",
+          "signature": "ConflictView -> ConflictInput -> Result<ConflictView * SaveEffect list, SaveFault>",
+          "success": "the next conflict view",
+          "failure": "SaveFault"
+        },
+        {
+          "name": "StepLoad",
+          "signature": "LoadState -> LoadInput -> Result<LoadState * SaveEffect list, SaveFault>",
+          "success": "the next load state",
+          "failure": "SaveFault"
+        },
+        {
+          "name": "Confirmation.ofReadBack",
+          "signature": "InvestigationId -> CommitOid -> DateTimeOffset -> FileSet -> FileSet -> Confirmation.T option",
+          "success": "Some when the re-read bytes equal the written bytes",
+          "failure": "None"
+        }
+      ],
+      "concurrency": "One Step per input, applied in arrival order on the single UI thread; at most one mutation in flight per tab, and each session awaits at most one answer (Outstanding, with the step it belongs to). Interpret turns an answer whose RequestId is not Outstanding into MachineEvent SupersededReply, which is legal only where state-machine-contracts.json lists it (T-S39, T-S40, proposed by ODR-V4-03); in every other state it fails closed with SaveFault and changes nothing.",
       "versioning": "Frozen at T14. Any change to a union or record, including an added case, is breaking (incomplete matches are errors under TreatWarningsAsErrors): it goes through the coordinator as a new contract version, with every consumer's contract tests changed and passing in the same pull request.",
       "producerTests": [
         "dotnet:Causa.Contract.Tests.Save.Producer.ConfirmationNotConstructibleOutside",
@@ -197,7 +285,21 @@
         "integration"
       ],
       "file": "src/Causa.App/Engine.fs",
-      "fsharp": "namespace Causa.App\n\nopen Causa.Domain\nopen Causa.Persistence\n\n/// IF41-APP: the Limen engine boundary (App <-> browser host). The host relays only what the engine asks for.\n/// The credential is opaque: it is created once from the Connect form and never rendered, logged or stored.\ntype Credential =\n    private\n        | Credential of string\n    static member Create(token: string) = Credential token\n    override _.ToString() = \"<credential>\"\n\n/// SM-CONNECTION states.\ntype ConnectionState =\n    | Disconnected\n    | Connecting\n    | Connected of canWrite: bool\n    | CredentialRefused\n    | Reauthenticating\n\n/// SM-CONNECTION events.\ntype ConnectionInput =\n    | ConnectSubmitted of repository: string * Credential\n    | ConnectSucceeded of canWrite: bool\n    | ConnectRefused of ProviderError\n    | AuthFailed\n    | ReconnectSubmitted of Credential\n    | DisconnectConfirmed\n\n/// SM-NETWORK states.\ntype NetworkState =\n    | Online\n    | Offline\n\n/// SM-NETWORK events.\ntype NetworkInput =\n    | OfflineObserved\n    | OnlineObserved\n\ntype BrowserSignal =\n    | ConnectivityChanged of online: bool\n    | TimerFired of RequestId\n    | HttpCompleted of HttpOutcome\n    | LeaveAttempted\n\ntype HostEffect =\n    | Http of HttpRequest\n    | Timer of RequestId * milliseconds: int\n    | SetLeaveGuard of bool\n    | Download of fileName: string * content: string\n    | LiveAnnounce of Politeness * text: string\n\ntype Route = Route of string\n\ntype Msg =\n    | Navigate of Route\n    | Browser of BrowserSignal\n    | Connection of ConnectionInput\n    | Network of NetworkInput\n    | SessionInput of InvestigationId * SaveInput\n    | ConflictStep of InvestigationId * ConflictInput\n    | LoadStep of LoadInput\n    | DomainCommand of CommandEnvelope\n\ntype Model =\n    { Connection: ConnectionState\n      Network: NetworkState\n      Route: Route\n      Load: LoadState\n      Sessions: Map<InvestigationId, InvestigationSession> }\n\ntype Engine =\n    { Init: Route -> Model * HostEffect list\n      Update: Msg -> Model -> Model * HostEffect list }\n",
+      "fsharp": "namespace Causa.App\n\nopen Causa.Domain\nopen Causa.Persistence\n\n/// IF41-APP: the Limen engine boundary (App <-> browser host). The host relays only what the engine asks for.\n/// The credential is opaque: it is created once from the Connect form and never rendered, logged or stored.\ntype Credential =\n    private\n        | Credential of string\n    static member Create(token: string) = Credential token\n    override _.ToString() = \"<credential>\"\n\n/// SM-CONNECTION states.\ntype ConnectionState =\n    | Disconnected\n    | Connecting\n    | Connected of canWrite: bool\n    | CredentialRefused\n    | Reauthenticating\n\n/// SM-CONNECTION events.\ntype ConnectionInput =\n    | ConnectSubmitted of repository: string * Credential\n    | ConnectSucceeded of canWrite: bool\n    | ConnectRefused of ProviderError\n    | AuthFailed\n    | ReconnectSubmitted of Credential\n    | DisconnectConfirmed\n\n/// SM-NETWORK states.\ntype NetworkState =\n    | Online\n    | Offline\n\n/// SM-NETWORK events.\ntype NetworkInput =\n    | OfflineObserved\n    | OnlineObserved\n\ntype BrowserSignal =\n    | ConnectivityChanged of online: bool\n    | TimerFired of RequestId\n    | HttpCompleted of HttpOutcome\n    | LeaveAttempted\n\ntype HostEffect =\n    | Http of HttpRequest\n    | Timer of RequestId * milliseconds: int\n    | SetLeaveGuard of bool\n    | Download of fileName: string * content: string\n    | LiveAnnounce of Politeness * text: string\n\ntype Route = Route of string\n\ntype Msg =\n    | Navigate of Route\n    | Browser of BrowserSignal\n    | Connection of ConnectionInput\n    | Network of NetworkInput\n    | SessionInput of InvestigationId * SaveInput\n    | ConflictStep of InvestigationId * ConflictInput\n    | LoadStep of InvestigationId * LoadInput\n    | DomainCommand of CommandEnvelope\n\ntype Model =\n    { Connection: ConnectionState\n      Network: NetworkState\n      Route: Route\n      Loads: Map<InvestigationId, LoadState>\n      Sessions: Map<InvestigationId, InvestigationSession> }\n\ntype Engine =\n    { Init: Route -> Model * HostEffect list\n      Update: Msg -> Model -> Model * HostEffect list }\n",
+      "operations": [
+        {
+          "name": "Init",
+          "signature": "Route -> Model * HostEffect list",
+          "success": "the initial model and effects",
+          "failure": "total"
+        },
+        {
+          "name": "Update",
+          "signature": "Msg -> Model -> Model * HostEffect list",
+          "success": "the next model and effects",
+          "failure": "total: an illegal machine input leaves the model unchanged and announces the SaveFault"
+        }
+      ],
       "concurrency": "Update is pure; HostEffects run in list order; BrowserSignals arrive one at a time.",
       "versioning": "Frozen at T14. Any change to a union or record, including an added case, is breaking (incomplete matches are errors under TreatWarningsAsErrors): it goes through the coordinator as a new contract version, with every consumer's contract tests changed and passing in the same pull request.",
       "producerTests": [
@@ -235,7 +337,27 @@
         "ui-2"
       ],
       "file": "src/Causa.App/Projections.fs",
-      "fsharp": "namespace Causa.App\n\nopen Causa.Domain\nopen Causa.Persistence\n\n/// IF41-VIEW: projections the views render (ui and ui-2). Views read only these; they never decide legality.\ntype SaveAction =\n    | Save\n    | Retry\n    | Reconnect\n    | CheckAgainAction\n    | Review\n    | ReapplyMine\n    | DiscardMine\n    | ExportMine\n\ntype SaveIndicatorView =\n    { InvestigationId: InvestigationId\n      Label: string\n      Text: string\n      Glyph: string\n      Actions: SaveAction list\n      Politeness: string\n      LastSavedCommitTime: System.DateTimeOffset option }\n\ntype WorkspaceHeaderView =\n    { Connection: ConnectionState\n      Offline: bool\n      NotSaved: (InvestigationId * string) list }\n\ntype ScreenView =\n    { Route: Route\n      Title: string\n      Header: WorkspaceHeaderView\n      Indicator: SaveIndicatorView option }\n\ntype Projections =\n    { SaveIndicator: InvestigationSession -> SaveIndicatorView\n      Header: Model -> WorkspaceHeaderView\n      Screen: Model -> ScreenView }",
+      "fsharp": "namespace Causa.App\n\nopen Causa.Domain\nopen Causa.Persistence\n\n/// IF41-VIEW: projections the views render (ui and ui-2). Views read only these; they never decide legality.\ntype SaveAction =\n    | Save\n    | Retry\n    | Reconnect\n    | CheckAgainAction\n    | Review\n    | ReapplyMine\n    | DiscardMine\n    | ExportMine\n\ntype SaveIndicatorView =\n    { InvestigationId: InvestigationId\n      Label: string\n      Text: string\n      Glyph: string\n      Actions: SaveAction list\n      Politeness: Politeness\n      LastSavedCommitTime: System.DateTimeOffset option }\n\ntype WorkspaceHeaderView =\n    { Connection: ConnectionState\n      Offline: bool\n      NotSaved: (InvestigationId * string) list }\n\ntype ScreenView =\n    { Route: Route\n      Title: string\n      Header: WorkspaceHeaderView\n      Indicator: SaveIndicatorView option }\n\ntype Projections =\n    { SaveIndicator: InvestigationSession -> SaveIndicatorView\n      Header: Model -> WorkspaceHeaderView\n      Screen: Model -> ScreenView }",
+      "operations": [
+        {
+          "name": "SaveIndicator",
+          "signature": "InvestigationSession -> SaveIndicatorView",
+          "success": "the indicator for the session's state (PERSIST-031 wording)",
+          "failure": "total"
+        },
+        {
+          "name": "Header",
+          "signature": "Model -> WorkspaceHeaderView",
+          "success": "the header",
+          "failure": "total"
+        },
+        {
+          "name": "Screen",
+          "signature": "Model -> ScreenView",
+          "success": "the screen",
+          "failure": "total"
+        }
+      ],
       "concurrency": "Projections are pure functions of Model; views render only these.",
       "versioning": "Frozen at T14. Any change to a union or record, including an added case, is breaking (incomplete matches are errors under TreatWarningsAsErrors): it goes through the coordinator as a new contract version, with every consumer's contract tests changed and passing in the same pull request.",
       "producerTests": [
@@ -262,6 +384,14 @@
       ],
       "file": "src/Causa.App/Reporting.fs",
       "fsharp": "namespace Causa.App\n\nopen Causa.Domain\n\n/// IF41-REPORT: Boundary E, the read-only report projection Folio renders.\ntype ReportSection = { Heading: string; Paragraphs: string list; Provenance: EventId list }\n\ntype ReportProjection =\n    { Investigation: InvestigationId\n      Version: AggregateVersion\n      Sections: ReportSection list\n      UnresolvedUncertainties: string list }\n\ntype Reporting = { Project: InvestigationProjection -> ReportProjection }",
+      "operations": [
+        {
+          "name": "Project",
+          "signature": "InvestigationProjection -> ReportProjection",
+          "success": "the report projection, with unresolved uncertainties listed",
+          "failure": "total: an unverified hypothesis is never presented as confirmed"
+        }
+      ],
       "concurrency": "Pure; never elevates an unverified hypothesis.",
       "versioning": "Frozen at T14. Any change to a union or record, including an added case, is breaking (incomplete matches are errors under TreatWarningsAsErrors): it goes through the coordinator as a new contract version, with every consumer's contract tests changed and passing in the same pull request.",
       "producerTests": [

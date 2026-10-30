@@ -15,15 +15,15 @@
     "A change to a frozen interface (interface-specifications.json) goes through the coordinator and is versioned; consumers are notified before merge.",
     "F# compile order is the order of each project's files list; a file may depend only on earlier files of its project or on referenced projects.",
     "ui and ui-2 never own the same file; Shell.fs is ui's and ui-2 consumes it read-only.",
-    "Integration alone writes: every project and solution file, Directory.*.props, global.json, package.json, package-lock.json, playwright.config.ts, build.fsx, README.md, .github/, web/, .echelon/, tests/fixtures/manifest.json, src/Causa.Host/, src/Causa.App/View.fs and src/Causa.App/Program.fs (check X02)."
+    "Integration alone writes: every project and solution file, Directory.*.props and .targets, NuGet.config, global.json, package.json, package-lock.json, playwright.config.ts, *.runsettings, build.fsx, README.md, .github/, .echelon/, tests/fixtures/, tests/browser/support/, web/boundary.js, src/Causa.Host/, src/Causa.App/View.fs and src/Causa.App/Program.fs (check X02). web/index.html and web/causa.css are ui's (T16)."
   ],
   "counts": {
-    "files": 263,
+    "files": 264,
     "domain": 32,
     "persistence": 51,
-    "ui": 68,
+    "ui": 70,
     "ui-2": 11,
-    "integration": 98,
+    "integration": 97,
     "coordinator": 1,
     "reviewer": 2
   },
@@ -85,6 +85,13 @@
       "project": "Causa.Host",
       "files": [
         "src/Causa.Host/Host.cs"
+      ]
+    },
+    {
+      "project": "Causa.TestSupport",
+      "files": [
+        "tests/Causa.TestSupport/Recordings.fs",
+        "tests/Causa.TestSupport/StatefulFake.fs"
       ]
     },
     {
@@ -221,8 +228,6 @@
     {
       "project": "Causa.Persistence.Tests",
       "files": [
-        "tests/Causa.Persistence.Tests/StatefulFake.fs",
-        "tests/Causa.Persistence.Tests/Recordings.fs",
         "tests/Causa.Persistence.Tests/StateMachines/SMCONFLICT.fs",
         "tests/Causa.Persistence.Tests/StateMachines/SMLOAD.fs",
         "tests/Causa.Persistence.Tests/StateMachines/SMSAVE.fs"
@@ -532,6 +537,11 @@
       "project": "Causa.Host"
     },
     {
+      "path": "tests/Causa.TestSupport/Causa.TestSupport.fsproj",
+      "owner": "integration",
+      "kind": "project-file"
+    },
+    {
       "path": "tests/Causa.Acceptance/Causa.Acceptance.fsproj",
       "owner": "integration",
       "kind": "project-file"
@@ -613,7 +623,7 @@
     },
     {
       "path": "web/index.html",
-      "owner": "integration",
+      "owner": "ui",
       "kind": "shared"
     },
     {
@@ -623,7 +633,7 @@
     },
     {
       "path": "web/causa.css",
-      "owner": "integration",
+      "owner": "ui",
       "kind": "shared"
     },
     {
@@ -652,16 +662,16 @@
       "kind": "shared"
     },
     {
-      "path": "tests/Causa.Persistence.Tests/StatefulFake.fs",
+      "path": "tests/Causa.TestSupport/Recordings.fs",
       "owner": "persistence",
       "kind": "test-helper",
-      "project": "Causa.Persistence.Tests"
+      "project": "Causa.TestSupport"
     },
     {
-      "path": "tests/Causa.Persistence.Tests/Recordings.fs",
+      "path": "tests/Causa.TestSupport/StatefulFake.fs",
       "owner": "persistence",
       "kind": "test-helper",
-      "project": "Causa.Persistence.Tests"
+      "project": "Causa.TestSupport"
     },
     {
       "path": "tests/browser/support/fixtures.js",

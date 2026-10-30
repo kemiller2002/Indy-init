@@ -85,6 +85,12 @@
       "title": "Every test identity (plan, contract, state-machine, unit) names an owned test file, or is a Praxis record that is not code",
       "result": "PASS",
       "problems": []
+    },
+    {
+      "id": "X15",
+      "title": "Every critical Forma layout rule has executable browser assertions, each exported by the layout kit with a broken fixture that must fail, run against published Forma patterns at contract viewports; every Forma gap has a remedy that uses only Forma tokens",
+      "result": "PASS",
+      "problems": []
     }
   ]
 }

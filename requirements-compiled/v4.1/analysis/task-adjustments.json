@@ -16,14 +16,13 @@
     },
     {
       "task": "T14",
-      "estimateMinutes": 15,
       "dependsOn": [
         {
           "task": "T10",
           "reason": "the frozen contracts (interface-specifications.json) are copied into each project's Contracts file and typechecked; they need the empty projects, not the kernel's implementation"
         }
       ],
-      "rationale": "The interface types are written and typechecked before kickoff (contracts/), so the freeze is not a negotiation: each producer commits its contract block into the file it owns, integration builds, and the producers write the contract tests named in interface-specifications.json. v4's 20 minutes covered deriving the types as well. T14 no longer waits for the kernel (T13): the contracts fix the types, and the kernel implements them.",
+      "rationale": "No estimate change: the types exist before kickoff, but each producer commits its contract block and writes its producer contract tests here, and the consumers start their consumer contract tests. T14 no longer waits for the kernel (T13): the contracts fix the types and the kernel implements them; IF41-DOMAIN's producer tests that need the kernel (DecideIsTotalOverCommands, FrozenFixturesReplay) are completed in T13 and T15. This rests on the owner's statement that the organizers allow pre-kickoff scaffolding (ODR-V41-06).",
       "evidence": "estimated"
     },
     {
@@ -84,7 +83,7 @@
           "reason": "tested against the stateful fake built from the live recordings"
         }
       ],
-      "rationale": "Unchanged estimate: the decision table (state-machine-contracts.json) replaces reading prose, but the 84 transition tests and the illegal-pair tests are written in this task. In v4, T19 waited for the kernel through T14 (T14 depended on T13); with the contracts frozen before the kernel it does not, but it still waits for the invariant tests (T12). Replay verification against the real kernel is exercised at integration (T21).",
+      "rationale": "Unchanged estimate: the decision table (state-machine-contracts.json) replaces reading prose, but this task writes the transition tests of SM-SAVE and SM-CONFLICT (75 transitions) and their illegal-pair tests. In v4, T19 waited for the kernel through T14 (T14 depended on T13); with the contracts frozen before the kernel it does not, but it still waits for the invariant tests (T12). Replay verification against the real kernel is exercised at integration (T21).",
       "evidence": "estimated"
     },
     {
@@ -109,8 +108,7 @@
     },
     {
       "task": "T16",
-      "estimateMinutes": 30,
-      "rationale": "The Forma layout contract names the patterns, tokens, breakpoints and viewports; the shell composes Forma patterns rather than inventing layout. Rehearsal 7 spent time after the deadline on nonexistent Forma tokens.",
+      "rationale": "No estimate change: the Forma layout contract names the patterns, tokens, breakpoints and viewports, and its executable assertions (layout-tests/) check them, but T16 also writes the SM-CONNECTION and SM-NETWORK state-machine tests (11 transitions), which v4 did not list.",
       "evidence": "estimated"
     },
     {
@@ -124,43 +122,57 @@
       "estimateMinutes": 45,
       "rationale": "Unchanged estimate. (An earlier draft cut it to 40 on a claimed setup saving that the suite fixtures do not support; withdrawn after review RV41-1-8.)",
       "evidence": "estimated"
+    },
+    {
+      "task": "T20",
+      "rationale": "No estimate change: this task also writes the SM-LOAD transition tests (10 transitions), alongside the Connect flow and provider read it already covers.",
+      "evidence": "estimated"
+    },
+    {
+      "task": "T35",
+      "dependsOn": [
+        {
+          "task": "T12",
+          "reason": "checkpoint 1 reviews the invariant tests (DCC-002 critical invariants), so it follows them"
+        },
+        {
+          "task": "T14",
+          "reason": "checkpoint 1 reviews the frozen interface contracts"
+        }
+      ],
+      "rationale": "No estimate change. Keeps the invariant review explicit now that T14 no longer implies T12; the kernel is reviewed at T30 and T36.",
+      "evidence": "estimated"
     }
   ],
   "waivedPrecedences": [
     {
       "before": "T12",
       "after": "T14",
-      "reason": "The interface freeze copies contracts typechecked before kickoff; it does not use the invariant tests. T19, the first write code, still follows T12.",
+      "reason": "The interface freeze copies contracts typechecked before kickoff; it does not use the invariant tests. T19, the first write code, still follows T12. It sets aside KICKOFF-EXECUTION-PACKET §4 (parallel ownership after the kernel stabilizes) and REHEARSAL-AGENT-INTERFACE-FREEZE's kickoff authoring (ODR-V41-06).",
       "decision": "ODR-V41-03"
     },
     {
       "before": "T13",
       "after": "T14",
-      "reason": "The contracts fix the kernel's types before the kernel exists; the kernel (T13) now implements IF41-DOMAIN after the freeze.",
+      "reason": "The contracts fix the kernel's types before the kernel exists; the kernel (T13) now implements IF41-DOMAIN after the freeze. It sets aside KICKOFF-EXECUTION-PACKET §4 (parallel ownership after the kernel stabilizes) and REHEARSAL-AGENT-INTERFACE-FREEZE's kickoff authoring (ODR-V41-06).",
       "decision": "ODR-V41-03"
     },
     {
       "before": "T13",
       "after": "T19",
-      "reason": "The save machine is written against IF41-DOMAIN's frozen types and the stateful fake; replay verification against the real kernel is exercised at T21, which depends on T13 (risk R41-03).",
+      "reason": "The save machine is written against IF41-DOMAIN's frozen types and the stateful fake; replay verification against the real kernel is exercised at T21, which depends on T13 (risk R41-03). It sets aside KICKOFF-EXECUTION-PACKET §4 (parallel ownership after the kernel stabilizes) and REHEARSAL-AGENT-INTERFACE-FREEZE's kickoff authoring (ODR-V41-06).",
       "decision": "ODR-V41-03"
     },
     {
       "before": "T13",
       "after": "T20",
-      "reason": "As T13 before T19: the GitHub provider path builds on the save machine and the frozen types, and meets the real kernel at T21.",
-      "decision": "ODR-V41-03"
-    },
-    {
-      "before": "T12",
-      "after": "T35",
-      "reason": "Review checkpoint T35 reviews the interface freeze, which no longer includes the kernel or the invariant tests; T36 reviews after T21.",
+      "reason": "As T13 before T19: the GitHub provider path builds on the save machine and the frozen types, and meets the real kernel at T21. It sets aside KICKOFF-EXECUTION-PACKET §4 (parallel ownership after the kernel stabilizes) and REHEARSAL-AGENT-INTERFACE-FREEZE's kickoff authoring (ODR-V41-06).",
       "decision": "ODR-V41-03"
     },
     {
       "before": "T13",
       "after": "T35",
-      "reason": "As T12 before T35.",
+      "reason": "Checkpoint T35 reviews the frozen interface contracts and the invariant tests (T12), before the kernel exists; the kernel is reviewed at T30 (architecture and invariant review) and T36. DCC-002's critical invariants are reviewed as tests at T35 and as implemented at T30.",
       "decision": "ODR-V41-03"
     }
   ]

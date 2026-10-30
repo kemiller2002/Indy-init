@@ -60,14 +60,14 @@ type Msg =
     | Network of NetworkInput
     | SessionInput of InvestigationId * SaveInput
     | ConflictStep of InvestigationId * ConflictInput
-    | LoadStep of LoadInput
+    | LoadStep of InvestigationId * LoadInput
     | DomainCommand of CommandEnvelope
 
 type Model =
     { Connection: ConnectionState
       Network: NetworkState
       Route: Route
-      Load: LoadState
+      Loads: Map<InvestigationId, LoadState>
       Sessions: Map<InvestigationId, InvestigationSession> }
 
 type Engine =

@@ -47,7 +47,7 @@ let scope (source: string) : string list =
           if (field k counts |> Option.bind (intOpt "v41")) <> Some n then yield sprintf "v4.1: %s is not %d" k n
       // RV41-1-1: the save machine (first write code) follows the invariant tests, and checkpoint 1 follows the kernel.
       let order = V41Package.precedences (V41Package.adjustedTasks i)
-      for (a, b) in [ "T12", "T19"; "T13", "T17"; "T13", "T21" ] do
+      for (a, b) in [ "T12", "T19"; "T13", "T17"; "T13", "T21"; "T12", "T35" ] do
           if not (order.Contains(a, b)) then yield sprintf "v4.1: %s no longer precedes %s" a b ]
 
 let controls (source: string) : string list =
@@ -79,15 +79,29 @@ let controls (source: string) : string list =
       yield! expectFail "project file owned by ui" "X02" (project "Causa.App" (setIn "owner" (JStr "ui")))
       yield! expectFail "CI workflow owned by persistence" "X02" (structure (mapArr "sharedFiles" (List.map (fun f -> if strOpt "path" f = Some ".github/workflows/ci.yml" then setIn "owner" (JStr "persistence") f else f))))
       yield! expectFail "View.fs owned by ui" "X02" (fileIn "Causa.App" "src/Causa.App/View.fs" (setIn "owner" (JStr "ui")))
-      yield! expectFail "stylesheet owned by ui" "X02" (structure (mapArr "sharedFiles" (List.map (fun f -> if strOpt "path" f = Some "web/causa.css" then setIn "owner" (JStr "ui") f else f))))
+      yield! expectFail "boundary script owned by ui" "X02" (structure (mapArr "sharedFiles" (List.map (fun f -> if strOpt "path" f = Some "web/boundary.js" then setIn "owner" (JStr "ui") f else f))))
+      // X02 round 2 (RV41-2-5): shared build configuration and browser fixtures declared as helpers of other roles.
+      let helper path owner = structure (mapArr "testHelpers" (fun hs -> hs @ [ JObj [ "path", JStr path; "owner", JStr owner ] ]))
+      yield! expectFail "NuGet.config owned by ui" "X02" (helper "NuGet.config" "ui")
+      yield! expectFail "Directory.Build.targets owned by persistence" "X02" (helper "Directory.Build.targets" "persistence")
+      yield! expectFail "browser fixtures owned by ui" "X02" (structure (mapArr "testHelpers" (List.map (fun h -> if strOpt "path" h = Some "tests/browser/support/fixtures.js" then setIn "owner" (JStr "ui") h else h))))
       // X03 compile order: a source reference cycle; a test project cycle; a file depending on a later file.
       yield! expectFail "cyclic project references" "X03" (project "Causa.Domain" (setIn "references" (jstrs [ "Causa.App" ])))
       yield! expectFail "cyclic test project references" "X03" (project "Causa.Domain" (setIn "references" (jstrs [ "Causa.Domain.Tests" ])))
       yield! expectFail "file depends on a later file" "X03" (fileIn "Causa.Domain" "src/Causa.Domain/Identity.fs" (setIn "dependsOn" (jstrs [ "src/Causa.Domain/Kernel.fs" ])))
+      // X03 round 2 (RV41-2-4): a helper depending on a later helper, or on a project its test project does not reference.
+      let helperDeps deps = structure (mapArr "testHelpers" (List.map (fun h -> if strOpt "path" h = Some "tests/Causa.TestSupport/Recordings.fs" then setIn "dependsOn" (jstrs deps) h else h)))
+      yield! expectFail "helper depends on a later helper" "X03" (helperDeps [ "tests/Causa.TestSupport/StatefulFake.fs" ])
+      yield! expectFail "helper depends on an unreferenced project" "X03" (helperDeps [ "src/Causa.App/Engine.fs" ])
       // X04 interfaces: wrong implementing file; contract tests that resolve nowhere; a consumer without a test.
       yield! expectFail "interface in a file the producer does not own" "X04" (iface "IF41-SAVE" (setIn "file" (JStr "src/Causa.App/Engine.fs")))
       yield! expectFail "producer tests that resolve nowhere" "X04" (iface "IF41-SAVE" (setIn "producerTests" (jstrs [ "nonexistent:x" ])))
       yield! expectFail "consumer without a contract test" "X04" (iface "IF41-SAVE" (mapArr "consumerTests" (List.filter (fun t -> not ((asStr t).Contains "ConsumerUi2")))))
+      // X04 round 2 (RV41-2-5, RV41-2-11): a non-contract test passed off as a producer test; empty rules; operations.
+      yield! expectFail "non-contract producer test" "X04" (iface "IF41-SAVE" (setIn "producerTests" (jstrs [ "dotnet:Causa.Persistence.Tests.Anything.Trivial" ])))
+      yield! expectFail "empty concurrency rule" "X04" (iface "IF41-SAVE" (setIn "concurrency" (JStr ".")))
+      yield! expectFail "no operations" "X04" (iface "IF41-WIRE" (setIn "operations" (JArr [])))
+      yield! expectFail "operation not in the contract" "X04" (iface "IF41-WIRE" (setIn "operations" (JArr [ JObj [ "name", JStr "Teleport"; "signature", JStr "a -> b"; "success", JStr "s"; "failure", JStr "f" ] ])))
       // X05 machine types: a new conflict state; a save event the input union lacks.
       yield! expectFail "new conflict state" "X05" (editSource "IF41-SAVE" "    | RemoteUnavailable\n" "    | RemoteUnavailable\n    | AwaitingOwner\n")
       yield! expectFail "new persistence state" "X05" (editSource "IF41-SAVE" "    | Saving\n" "    | Saving\n    | Syncing\n")
@@ -102,6 +116,10 @@ let controls (source: string) : string list =
       yield! expectFail "same evidence, non-adjacent classes" "X06" (errClass "GH-NOT-FOUND" (setIn "nonStatusEvidence" (jstrs permissionEvidence)))
       yield! expectFail "unrelated test" "X06" (errClass "GH-STALE-HEAD" (setIn "tests" (jstrs [ "dotnet:Causa.Acceptance.Deterministic.PERSIST051Tests.PERSIST-051-O1" ])))
       yield! expectFail "no timeout detection" "X06" (errClass "GH-NETWORK-AFTER" (setIn "nonStatusEvidence" (jstrs [ "transport: LostAfterSending" ])))
+      // X06 round 2 (RV41-2-5): a reason phrase passed off as evidence; evidence padded with junk; a bound of another kind.
+      yield! expectFail "reason phrase as evidence" "X06" (errClass "GH-PERMISSION" (setIn "nonStatusEvidence" (jstrs [ "HTTP 403 Forbidden" ])))
+      yield! expectFail "evidence padded with junk" "X06" (errClass "GH-NOT-FOUND" (setIn "nonStatusEvidence" (jstrs permissionEvidence)))
+      yield! expectFail "bound of another kind" "X06" (errClass "GH-AUTH" (setIn "maxAttempts" (JInt 3L) >> setIn "boundedBy" (JStr "automaticRebases")))
       // X07 Forma (RV41-1-7): an invented token, a foreign custom property, a foreign class, an unsourced colour.
       yield! expectFail "invented token" "X07" { i0 with Forma = setIn "tokens" (JObj [ "required", jstrs [ "--ef-causa-invented" ] ]) i0.Forma }
       yield! expectFail "foreign custom property" "X07" (formaRule "FL-01" (fun r -> setIn "rule" (JStr(str "rule" r + " Gaps use var(--causa-gap).")) r))
@@ -109,6 +127,11 @@ let controls (source: string) : string list =
       yield! expectFail "unsourced colour" "X07" (formaRule "FL-01" (fun r -> setIn "rule" (JStr(str "rule" r + " Borders are #123456.")) r))
       yield! expectFail "unknown pattern" "X07" { i0 with Forma = mapArr "reuse" (fun rs -> rs @ [ JObj [ "need", JStr "x"; "patterns", jstrs [ "causa-card" ] ] ]) i0.Forma }
       yield! expectFail "unknown breakpoint" "X07" { i0 with Forma = setIn "breakpoints" (JObj [ "values", jstrs [ "52rem" ] ]) i0.Forma }
+      // X07 round 2 (RV41-2-5): rgb() colours, unhyphenated classes, foreign property families, invented sources.
+      yield! expectFail "rgb colour" "X07" (formaRule "FL-01" (fun r -> setIn "rule" (JStr(str "rule" r + " Use rgb(233,162,59).")) r))
+      yield! expectFail "unhyphenated class" "X07" (formaRule "FL-01" (fun r -> setIn "rule" (JStr(str "rule" r + " Lay out with .mygrid here.")) r))
+      yield! expectFail "foreign property family" "X07" (formaRule "FL-01" (fun r -> setIn "rule" (JStr(str "rule" r + " Use var(--causa-*) tokens.")) r))
+      yield! expectFail "invented literal source" "X07" (formaRule "FL-06" (setIn "literals" (JArr [ JObj [ "value", JStr "#E9A23B"; "source", JStr "made up" ] ])))
       // X08 telemetry: a metric dropped; a policy that allows estimating.
       yield! expectFail "metric missing" "X08" { i0 with Telemetry = mapArr "metrics" (List.filter (fun m -> strOpt "id" m <> Some "ownership-violations")) i0.Telemetry }
       yield! expectFail "estimate-it policy" "X08" { i0 with Telemetry = setIn "unavailablePolicy" (JStr "estimate it") i0.Telemetry }
@@ -127,6 +150,10 @@ let controls (source: string) : string list =
       yield! expectFail "overlapping guard" "X12" (machine "SM-SAVE" (mapArr "transitions" (fun ts -> ts @ [ setIn "id" (JStr "T-S99") firstSave |> setIn "guard" (JStr "online and anything") ])))
       yield! expectFail "offline branch dropped" "X12" (machine "SM-SAVE" (mapArr "transitions" (List.filter (fun t -> strOpt "id" t <> Some "T-S05"))))
       yield! expectFail "unknown next state" "X12" (machine "SM-SAVE" (mapArr "transitions" (fun ts -> ts @ [ setIn "id" (JStr "T-S99") firstSave |> setIn "guard" (JStr "never") |> setIn "event" (JStr "CheckAgain") |> setIn "to" (JStr "Limbo") ])))
+      // X12 round 2 (RV41-2-2): an event no transition accepts, not listed with a decision.
+      yield! expectFail "unlisted unused event" "X12" { i0 with GuardPartitions = setIn "unusedEvents" (JArr []) i0.GuardPartitions }
+      // X13 round 2 (RV41-2-5): a waiver naming no owner decision request.
+      yield! expectFail "waiver without a real decision" "X13" { i0 with Adjustments = mapArr "waivedPrecedences" (List.map (setIn "decision" (JStr "x"))) i0.Adjustments }
       // X13 DAG (RV41-1-1, RV41-1-7): a cycle; a measured label; a dropped v4 ordering; a gutted estimate; a stale waiver.
       yield! expectFail "cyclic DAG" "X13" (adjust "T12" (setIn "dependsOn" (JArr [ JObj [ "task", JStr "T21"; "reason", JStr "x" ] ])))
       yield! expectFail "estimate labelled measured" "X13" (adjust "T16" (setIn "evidence" (JStr "measured")))

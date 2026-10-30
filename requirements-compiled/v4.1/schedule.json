@@ -5,7 +5,7 @@
   "experimentalTarget": {
     "criticalPathMinutes": 300,
     "meets": true,
-    "note": "an experimental goal of the v4.1 brief, not an acceptance condition"
+    "note": "an experimental goal of the v4.1 brief, not an acceptance condition. It is measured on the lane-free dependency critical path; each topology's makespan, which adds waiting for a busy lane, is in topologies (makespanMinutes, bindingChain)."
   },
   "criticalPath": {
     "v4": {
@@ -26,7 +26,7 @@
     },
     "v41": {
       "tasks": [
-        "T12",
+        "T14",
         "T13",
         "T17",
         "T22",
@@ -36,7 +36,7 @@
         "T33",
         "T34"
       ],
-      "minutes": 285
+      "minutes": 290
     }
   },
   "scenarios": [
@@ -90,21 +90,21 @@
       "scenario": "v4.1 estimates only",
       "dependencies": "v4",
       "estimates": "v4.1",
-      "criticalPathMinutes": 325,
+      "criticalPathMinutes": 330,
       "topologies": [
         {
           "id": "A-role-lanes",
-          "totalMinutes": 440,
+          "totalMinutes": 445,
           "fits": false
         },
         {
           "id": "B-single-lead",
-          "totalMinutes": 725,
+          "totalMinutes": 735,
           "fits": false
         },
         {
           "id": "C-role-lanes-two-ui",
-          "totalMinutes": 390,
+          "totalMinutes": 395,
           "fits": true
         }
       ]
@@ -113,21 +113,21 @@
       "scenario": "v4.1",
       "dependencies": "v4.1",
       "estimates": "v4.1",
-      "criticalPathMinutes": 285,
+      "criticalPathMinutes": 290,
       "topologies": [
         {
           "id": "A-role-lanes",
-          "totalMinutes": 440,
+          "totalMinutes": 445,
           "fits": false
         },
         {
           "id": "B-single-lead",
-          "totalMinutes": 725,
+          "totalMinutes": 735,
           "fits": false
         },
         {
           "id": "C-role-lanes-two-ui",
-          "totalMinutes": 380,
+          "totalMinutes": 385,
           "fits": true
         }
       ]
@@ -135,10 +135,10 @@
   ],
   "riskiestDependencies": [
     {
-      "from": "T12",
+      "from": "T14",
       "to": "T13",
       "slackMinutes": 0,
-      "reason": "decisions are implemented against the invariant tests written first"
+      "reason": "the kernel implements the frozen IF41-DOMAIN contract"
     },
     {
       "from": "T13",
@@ -186,13 +186,67 @@
   "topologies": [
     {
       "id": "A-role-lanes",
-      "makespanMinutes": 375,
+      "bindingChain": [
+        {
+          "task": "T14",
+          "startsAfter": "start"
+        },
+        {
+          "task": "T12",
+          "startsAfter": "lane domain after T14"
+        },
+        {
+          "task": "T13",
+          "startsAfter": "dependency on T12"
+        },
+        {
+          "task": "T17",
+          "startsAfter": "dependency on T13"
+        },
+        {
+          "task": "T22",
+          "startsAfter": "dependency on T17"
+        },
+        {
+          "task": "T28",
+          "startsAfter": "dependency on T22"
+        },
+        {
+          "task": "T23",
+          "startsAfter": "lane ui after T28"
+        },
+        {
+          "task": "T26",
+          "startsAfter": "lane ui after T23"
+        },
+        {
+          "task": "T29",
+          "startsAfter": "lane ui after T26"
+        },
+        {
+          "task": "T31",
+          "startsAfter": "dependency on T29"
+        },
+        {
+          "task": "T32",
+          "startsAfter": "dependency on T31"
+        },
+        {
+          "task": "T33",
+          "startsAfter": "dependency on T32"
+        },
+        {
+          "task": "T34",
+          "startsAfter": "dependency on T33"
+        }
+      ],
+      "makespanMinutes": 380,
       "reservedMinutes": 65,
-      "totalMinutes": 440,
+      "totalMinutes": 445,
       "windowMinutes": 420,
       "fits": false,
-      "slackMinutes": -20,
-      "contentionMinutes": 455,
+      "slackMinutes": -25,
+      "contentionMinutes": 460,
       "integrationMinutes": {
         "lane": 150,
         "reserve": 20
@@ -200,37 +254,37 @@
       "lanes": [
         {
           "lane": "domain",
-          "busyMinutes": 125,
-          "utilization": "0.33",
+          "busyMinutes": 130,
+          "utilization": "0.34",
           "slots": [
             {
-              "task": "T12",
+              "task": "T14",
               "start": 0,
-              "finish": 15,
+              "finish": 20,
               "waitedForLane": 0
             },
             {
-              "task": "T14",
-              "start": 15,
-              "finish": 30,
-              "waitedForLane": 15
+              "task": "T12",
+              "start": 20,
+              "finish": 35,
+              "waitedForLane": 20
             },
             {
               "task": "T13",
-              "start": 30,
-              "finish": 75,
+              "start": 35,
+              "finish": 80,
               "waitedForLane": 0
             },
             {
               "task": "T15",
-              "start": 75,
-              "finish": 95,
+              "start": 80,
+              "finish": 100,
               "waitedForLane": 0
             },
             {
               "task": "T27",
-              "start": 95,
-              "finish": 125,
+              "start": 100,
+              "finish": 130,
               "waitedForLane": 20
             }
           ]
@@ -238,7 +292,7 @@
         {
           "lane": "integration",
           "busyMinutes": 150,
-          "utilization": "0.40",
+          "utilization": "0.39",
           "slots": [
             {
               "task": "T11",
@@ -254,8 +308,8 @@
             },
             {
               "task": "T17",
-              "start": 75,
-              "finish": 90,
+              "start": 80,
+              "finish": 95,
               "waitedForLane": 0
             },
             {
@@ -266,20 +320,20 @@
             },
             {
               "task": "T31",
-              "start": 270,
-              "finish": 315,
+              "start": 275,
+              "finish": 320,
               "waitedForLane": 0
             },
             {
               "task": "T32",
-              "start": 315,
-              "finish": 335,
+              "start": 320,
+              "finish": 340,
               "waitedForLane": 0
             },
             {
               "task": "T34",
-              "start": 355,
-              "finish": 375,
+              "start": 360,
+              "finish": 380,
               "waitedForLane": 0
             }
           ]
@@ -318,12 +372,12 @@
         {
           "lane": "reviewer",
           "busyMinutes": 70,
-          "utilization": "0.19",
+          "utilization": "0.18",
           "slots": [
             {
               "task": "T35",
-              "start": 30,
-              "finish": 45,
+              "start": 35,
+              "finish": 50,
               "waitedForLane": 0
             },
             {
@@ -340,51 +394,51 @@
             },
             {
               "task": "T33",
-              "start": 335,
-              "finish": 355,
+              "start": 340,
+              "finish": 360,
               "waitedForLane": 0
             }
           ]
         },
         {
           "lane": "ui",
-          "busyMinutes": 210,
-          "utilization": "0.56",
+          "busyMinutes": 215,
+          "utilization": "0.57",
           "slots": [
             {
               "task": "T16",
               "start": 15,
-              "finish": 45,
+              "finish": 50,
               "waitedForLane": 0
             },
             {
               "task": "T22",
-              "start": 90,
-              "finish": 150,
+              "start": 95,
+              "finish": 155,
               "waitedForLane": 0
             },
             {
               "task": "T28",
-              "start": 150,
-              "finish": 195,
+              "start": 155,
+              "finish": 200,
               "waitedForLane": 0
             },
             {
               "task": "T23",
-              "start": 195,
-              "finish": 225,
+              "start": 200,
+              "finish": 230,
               "waitedForLane": 105
             },
             {
               "task": "T26",
-              "start": 225,
-              "finish": 250,
+              "start": 230,
+              "finish": 255,
               "waitedForLane": 135
             },
             {
               "task": "T29",
-              "start": 250,
-              "finish": 270,
+              "start": 255,
+              "finish": 275,
               "waitedForLane": 160
             }
           ]
@@ -393,13 +447,107 @@
     },
     {
       "id": "B-single-lead",
-      "makespanMinutes": 660,
+      "bindingChain": [
+        {
+          "task": "T14",
+          "startsAfter": "start"
+        },
+        {
+          "task": "T12",
+          "startsAfter": "lane lead after T14"
+        },
+        {
+          "task": "T18",
+          "startsAfter": "lane lead after T12"
+        },
+        {
+          "task": "T11",
+          "startsAfter": "lane lead after T18"
+        },
+        {
+          "task": "T13",
+          "startsAfter": "lane lead after T11"
+        },
+        {
+          "task": "T16",
+          "startsAfter": "lane lead after T13"
+        },
+        {
+          "task": "T19",
+          "startsAfter": "lane lead after T16"
+        },
+        {
+          "task": "T17",
+          "startsAfter": "lane lead after T19"
+        },
+        {
+          "task": "T22",
+          "startsAfter": "dependency on T17"
+        },
+        {
+          "task": "T20",
+          "startsAfter": "lane lead after T22"
+        },
+        {
+          "task": "T15",
+          "startsAfter": "lane lead after T20"
+        },
+        {
+          "task": "T21",
+          "startsAfter": "lane lead after T15"
+        },
+        {
+          "task": "T28",
+          "startsAfter": "lane lead after T21"
+        },
+        {
+          "task": "T24",
+          "startsAfter": "lane lead after T28"
+        },
+        {
+          "task": "T25",
+          "startsAfter": "lane lead after T24"
+        },
+        {
+          "task": "T23",
+          "startsAfter": "lane lead after T25"
+        },
+        {
+          "task": "T27",
+          "startsAfter": "lane lead after T23"
+        },
+        {
+          "task": "T26",
+          "startsAfter": "lane lead after T27"
+        },
+        {
+          "task": "T29",
+          "startsAfter": "lane lead after T26"
+        },
+        {
+          "task": "T31",
+          "startsAfter": "dependency on T29"
+        },
+        {
+          "task": "T32",
+          "startsAfter": "dependency on T31"
+        },
+        {
+          "task": "T33",
+          "startsAfter": "dependency on T32"
+        },
+        {
+          "task": "T34",
+          "startsAfter": "dependency on T33"
+        }
+      ],
+      "makespanMinutes": 670,
       "reservedMinutes": 65,
-      "totalMinutes": 725,
+      "totalMinutes": 735,
       "windowMinutes": 420,
       "fits": false,
-      "slackMinutes": -305,
-      "contentionMinutes": 2120,
+      "slackMinutes": -315,
+      "contentionMinutes": 2155,
       "integrationMinutes": {
         "lane": 150,
         "reserve": 20
@@ -407,139 +555,139 @@
       "lanes": [
         {
           "lane": "lead",
-          "busyMinutes": 640,
+          "busyMinutes": 650,
           "utilization": "0.97",
           "slots": [
             {
-              "task": "T12",
+              "task": "T14",
               "start": 0,
-              "finish": 15,
+              "finish": 20,
               "waitedForLane": 0
             },
             {
-              "task": "T14",
-              "start": 15,
-              "finish": 30,
-              "waitedForLane": 15
+              "task": "T12",
+              "start": 20,
+              "finish": 35,
+              "waitedForLane": 20
             },
             {
               "task": "T18",
-              "start": 30,
-              "finish": 65,
-              "waitedForLane": 30
+              "start": 35,
+              "finish": 70,
+              "waitedForLane": 35
             },
             {
               "task": "T11",
-              "start": 65,
-              "finish": 80,
-              "waitedForLane": 65
+              "start": 70,
+              "finish": 85,
+              "waitedForLane": 70
             },
             {
               "task": "T13",
-              "start": 80,
-              "finish": 125,
+              "start": 85,
+              "finish": 130,
               "waitedForLane": 50
             },
             {
               "task": "T16",
-              "start": 125,
-              "finish": 155,
+              "start": 130,
+              "finish": 165,
               "waitedForLane": 45
             },
             {
               "task": "T19",
-              "start": 155,
-              "finish": 215,
-              "waitedForLane": 90
+              "start": 165,
+              "finish": 225,
+              "waitedForLane": 95
             },
             {
               "task": "T17",
-              "start": 215,
-              "finish": 230,
+              "start": 225,
+              "finish": 240,
               "waitedForLane": 60
             },
             {
               "task": "T22",
-              "start": 230,
-              "finish": 290,
+              "start": 240,
+              "finish": 300,
               "waitedForLane": 0
             },
             {
               "task": "T20",
-              "start": 290,
-              "finish": 330,
+              "start": 300,
+              "finish": 340,
               "waitedForLane": 75
             },
             {
               "task": "T15",
-              "start": 330,
-              "finish": 350,
-              "waitedForLane": 205
+              "start": 340,
+              "finish": 360,
+              "waitedForLane": 210
             },
             {
               "task": "T21",
-              "start": 350,
-              "finish": 375,
+              "start": 360,
+              "finish": 385,
               "waitedForLane": 20
             },
             {
               "task": "T28",
-              "start": 375,
-              "finish": 420,
+              "start": 385,
+              "finish": 430,
               "waitedForLane": 85
             },
             {
               "task": "T24",
-              "start": 420,
-              "finish": 430,
-              "waitedForLane": 340
+              "start": 430,
+              "finish": 440,
+              "waitedForLane": 345
             },
             {
               "task": "T25",
-              "start": 430,
-              "finish": 450,
+              "start": 440,
+              "finish": 460,
               "waitedForLane": 80
             },
             {
               "task": "T23",
-              "start": 450,
-              "finish": 480,
+              "start": 460,
+              "finish": 490,
               "waitedForLane": 20
             },
             {
               "task": "T27",
-              "start": 480,
-              "finish": 510,
-              "waitedForLane": 355
+              "start": 490,
+              "finish": 520,
+              "waitedForLane": 360
             },
             {
               "task": "T26",
-              "start": 510,
-              "finish": 535,
+              "start": 520,
+              "finish": 545,
               "waitedForLane": 280
             },
             {
               "task": "T29",
-              "start": 535,
-              "finish": 555,
+              "start": 545,
+              "finish": 565,
               "waitedForLane": 305
             },
             {
               "task": "T31",
-              "start": 555,
-              "finish": 600,
+              "start": 565,
+              "finish": 610,
               "waitedForLane": 0
             },
             {
               "task": "T32",
-              "start": 600,
-              "finish": 620,
+              "start": 610,
+              "finish": 630,
               "waitedForLane": 0
             },
             {
               "task": "T34",
-              "start": 640,
-              "finish": 660,
+              "start": 650,
+              "finish": 670,
               "waitedForLane": 0
             }
           ]
@@ -547,30 +695,30 @@
         {
           "lane": "reviewer",
           "busyMinutes": 70,
-          "utilization": "0.11",
+          "utilization": "0.10",
           "slots": [
             {
               "task": "T35",
-              "start": 30,
-              "finish": 45,
+              "start": 35,
+              "finish": 50,
               "waitedForLane": 0
             },
             {
               "task": "T36",
-              "start": 375,
-              "finish": 390,
+              "start": 385,
+              "finish": 400,
               "waitedForLane": 0
             },
             {
               "task": "T30",
-              "start": 450,
-              "finish": 470,
+              "start": 460,
+              "finish": 480,
               "waitedForLane": 0
             },
             {
               "task": "T33",
-              "start": 620,
-              "finish": 640,
+              "start": 630,
+              "finish": 650,
               "waitedForLane": 0
             }
           ]
@@ -579,13 +727,63 @@
     },
     {
       "id": "C-role-lanes-two-ui",
-      "makespanMinutes": 315,
+      "bindingChain": [
+        {
+          "task": "T14",
+          "startsAfter": "start"
+        },
+        {
+          "task": "T12",
+          "startsAfter": "lane domain after T14"
+        },
+        {
+          "task": "T13",
+          "startsAfter": "dependency on T12"
+        },
+        {
+          "task": "T17",
+          "startsAfter": "dependency on T13"
+        },
+        {
+          "task": "T23",
+          "startsAfter": "dependency on T17"
+        },
+        {
+          "task": "T26",
+          "startsAfter": "lane ui-2 after T23"
+        },
+        {
+          "task": "T29",
+          "startsAfter": "lane ui-2 after T26"
+        },
+        {
+          "task": "T28",
+          "startsAfter": "lane ui-2 after T29"
+        },
+        {
+          "task": "T31",
+          "startsAfter": "dependency on T28"
+        },
+        {
+          "task": "T32",
+          "startsAfter": "dependency on T31"
+        },
+        {
+          "task": "T33",
+          "startsAfter": "dependency on T32"
+        },
+        {
+          "task": "T34",
+          "startsAfter": "dependency on T33"
+        }
+      ],
+      "makespanMinutes": 320,
       "reservedMinutes": 65,
-      "totalMinutes": 380,
+      "totalMinutes": 385,
       "windowMinutes": 420,
       "fits": true,
-      "slackMinutes": 40,
-      "contentionMinutes": 155,
+      "slackMinutes": 35,
+      "contentionMinutes": 160,
       "integrationMinutes": {
         "lane": 150,
         "reserve": 20
@@ -593,37 +791,37 @@
       "lanes": [
         {
           "lane": "domain",
-          "busyMinutes": 125,
-          "utilization": "0.40",
+          "busyMinutes": 130,
+          "utilization": "0.41",
           "slots": [
             {
-              "task": "T12",
+              "task": "T14",
               "start": 0,
-              "finish": 15,
+              "finish": 20,
               "waitedForLane": 0
             },
             {
-              "task": "T14",
-              "start": 15,
-              "finish": 30,
-              "waitedForLane": 15
+              "task": "T12",
+              "start": 20,
+              "finish": 35,
+              "waitedForLane": 20
             },
             {
               "task": "T13",
-              "start": 30,
-              "finish": 75,
+              "start": 35,
+              "finish": 80,
               "waitedForLane": 0
             },
             {
               "task": "T15",
-              "start": 75,
-              "finish": 95,
+              "start": 80,
+              "finish": 100,
               "waitedForLane": 0
             },
             {
               "task": "T27",
-              "start": 95,
-              "finish": 125,
+              "start": 100,
+              "finish": 130,
               "waitedForLane": 20
             }
           ]
@@ -631,7 +829,7 @@
         {
           "lane": "integration",
           "busyMinutes": 150,
-          "utilization": "0.48",
+          "utilization": "0.47",
           "slots": [
             {
               "task": "T11",
@@ -647,8 +845,8 @@
             },
             {
               "task": "T17",
-              "start": 75,
-              "finish": 90,
+              "start": 80,
+              "finish": 95,
               "waitedForLane": 0
             },
             {
@@ -659,20 +857,20 @@
             },
             {
               "task": "T31",
-              "start": 210,
-              "finish": 255,
+              "start": 215,
+              "finish": 260,
               "waitedForLane": 0
             },
             {
               "task": "T32",
-              "start": 255,
-              "finish": 275,
+              "start": 260,
+              "finish": 280,
               "waitedForLane": 0
             },
             {
               "task": "T34",
-              "start": 295,
-              "finish": 315,
+              "start": 300,
+              "finish": 320,
               "waitedForLane": 0
             }
           ]
@@ -680,7 +878,7 @@
         {
           "lane": "persistence",
           "busyMinutes": 155,
-          "utilization": "0.49",
+          "utilization": "0.48",
           "slots": [
             {
               "task": "T18",
@@ -715,8 +913,8 @@
           "slots": [
             {
               "task": "T35",
-              "start": 30,
-              "finish": 45,
+              "start": 35,
+              "finish": 50,
               "waitedForLane": 0
             },
             {
@@ -733,27 +931,27 @@
             },
             {
               "task": "T33",
-              "start": 275,
-              "finish": 295,
+              "start": 280,
+              "finish": 300,
               "waitedForLane": 0
             }
           ]
         },
         {
           "lane": "ui",
-          "busyMinutes": 90,
-          "utilization": "0.29",
+          "busyMinutes": 95,
+          "utilization": "0.30",
           "slots": [
             {
               "task": "T16",
               "start": 15,
-              "finish": 45,
+              "finish": 50,
               "waitedForLane": 0
             },
             {
               "task": "T22",
-              "start": 90,
-              "finish": 150,
+              "start": 95,
+              "finish": 155,
               "waitedForLane": 0
             }
           ]
@@ -765,26 +963,26 @@
           "slots": [
             {
               "task": "T23",
-              "start": 90,
-              "finish": 120,
+              "start": 95,
+              "finish": 125,
               "waitedForLane": 0
             },
             {
               "task": "T26",
-              "start": 120,
-              "finish": 145,
+              "start": 125,
+              "finish": 150,
               "waitedForLane": 30
             },
             {
               "task": "T29",
-              "start": 145,
-              "finish": 165,
+              "start": 150,
+              "finish": 170,
               "waitedForLane": 55
             },
             {
               "task": "T28",
-              "start": 165,
-              "finish": 210,
+              "start": 170,
+              "finish": 215,
               "waitedForLane": 15
             }
           ]

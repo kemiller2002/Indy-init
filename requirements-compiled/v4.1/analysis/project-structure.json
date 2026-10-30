@@ -616,12 +616,12 @@
     },
     {
       "path": "web/index.html",
-      "owner": "integration",
+      "owner": "ui",
       "contributors": [],
       "dependsOn": [],
       "implements": [],
       "requiredTests": [],
-      "note": "static shell before WASM"
+      "note": "loading shell and layout (T16); reads only Forma tokens (layout contract)"
     },
     {
       "path": "web/boundary.js",
@@ -634,12 +634,12 @@
     },
     {
       "path": "web/causa.css",
-      "owner": "integration",
+      "owner": "ui",
       "contributors": [],
       "dependsOn": [],
       "implements": [],
       "requiredTests": [],
-      "note": "the only stylesheet: Forma 0.12.0 tokens and components only (forma-layout-contract.json)"
+      "note": "loading shell and layout (T16); reads only Forma tokens (layout contract)"
     },
     {
       "path": ".echelon/routes.json",
@@ -691,24 +691,25 @@
   ],
   "testHelpers": [
     {
-      "path": "tests/Causa.Persistence.Tests/StatefulFake.fs",
-      "owner": "persistence",
-      "contributors": [],
-      "dependsOn": [
-        "src/Causa.Persistence/Wire.fs"
-      ],
-      "implements": [],
-      "requiredTests": [],
-      "note": "PERSIST-025 fake built from T18 recordings"
-    },
-    {
-      "path": "tests/Causa.Persistence.Tests/Recordings.fs",
+      "path": "tests/Causa.TestSupport/Recordings.fs",
       "owner": "persistence",
       "contributors": [],
       "dependsOn": [],
       "implements": [],
       "requiredTests": [],
-      "note": "recorded GitHub answers (T18)"
+      "note": "recorded GitHub answers from the provider-conformance probe (T18)"
+    },
+    {
+      "path": "tests/Causa.TestSupport/StatefulFake.fs",
+      "owner": "persistence",
+      "contributors": [],
+      "dependsOn": [
+        "tests/Causa.TestSupport/Recordings.fs",
+        "src/Causa.Persistence/Wire.fs"
+      ],
+      "implements": [],
+      "requiredTests": [],
+      "note": "PERSIST-025 stateful GitHub fake built from the recordings; the browser suites use it through the test build, which integration composes (build.fsx)"
     },
     {
       "path": "tests/browser/support/fixtures.js",
@@ -717,7 +718,7 @@
       "dependsOn": [],
       "implements": [],
       "requiredTests": [],
-      "note": "shared Playwright fixtures: one deployed or local app per worker, one provider per suite (verification-execution-plan.json)"
+      "note": "shared Playwright fixtures"
     }
   ],
   "rules": [
@@ -725,9 +726,18 @@
     "A change to a frozen interface (interface-specifications.json) goes through the coordinator and is versioned; consumers are notified before merge.",
     "F# compile order is the order of each project's files list; a file may depend only on earlier files of its project or on referenced projects.",
     "ui and ui-2 never own the same file; Shell.fs is ui's and ui-2 consumes it read-only.",
-    "Integration alone writes: every project and solution file, Directory.*.props, global.json, package.json, package-lock.json, playwright.config.ts, build.fsx, README.md, .github/, web/, .echelon/, tests/fixtures/manifest.json, src/Causa.Host/, src/Causa.App/View.fs and src/Causa.App/Program.fs (check X02)."
+    "Integration alone writes: every project and solution file, Directory.*.props and .targets, NuGet.config, global.json, package.json, package-lock.json, playwright.config.ts, *.runsettings, build.fsx, README.md, .github/, .echelon/, tests/fixtures/, tests/browser/support/, web/boundary.js, src/Causa.Host/, src/Causa.App/View.fs and src/Causa.App/Program.fs (check X02). web/index.html and web/causa.css are ui's (T16)."
   ],
   "testProjects": [
+    {
+      "id": "Causa.TestSupport",
+      "path": "tests/Causa.TestSupport/Causa.TestSupport.fsproj",
+      "owner": "integration",
+      "references": [
+        "Causa.Domain",
+        "Causa.Persistence"
+      ]
+    },
     {
       "id": "Causa.Acceptance",
       "path": "tests/Causa.Acceptance/Causa.Acceptance.fsproj",
@@ -735,7 +745,8 @@
       "references": [
         "Causa.Domain",
         "Causa.Persistence",
-        "Causa.App"
+        "Causa.App",
+        "Causa.TestSupport"
       ]
     },
     {
@@ -745,7 +756,8 @@
       "references": [
         "Causa.Domain",
         "Causa.Persistence",
-        "Causa.App"
+        "Causa.App",
+        "Causa.TestSupport"
       ]
     },
     {
@@ -755,7 +767,8 @@
       "references": [
         "Causa.Domain",
         "Causa.Persistence",
-        "Causa.App"
+        "Causa.App",
+        "Causa.TestSupport"
       ]
     },
     {
@@ -772,7 +785,8 @@
       "owner": "integration",
       "references": [
         "Causa.Domain",
-        "Causa.Persistence"
+        "Causa.Persistence",
+        "Causa.TestSupport"
       ]
     },
     {
@@ -782,7 +796,8 @@
       "references": [
         "Causa.Domain",
         "Causa.Persistence",
-        "Causa.App"
+        "Causa.App",
+        "Causa.TestSupport"
       ]
     }
   ],
@@ -790,27 +805,32 @@
     {
       "machine": "SM-SAVE",
       "owner": "persistence",
-      "project": "Causa.Persistence.Tests"
+      "project": "Causa.Persistence.Tests",
+      "task": "T19"
     },
     {
       "machine": "SM-CONFLICT",
       "owner": "persistence",
-      "project": "Causa.Persistence.Tests"
+      "project": "Causa.Persistence.Tests",
+      "task": "T19"
     },
     {
       "machine": "SM-LOAD",
       "owner": "persistence",
-      "project": "Causa.Persistence.Tests"
+      "project": "Causa.Persistence.Tests",
+      "task": "T20"
     },
     {
       "machine": "SM-CONNECTION",
       "owner": "ui",
-      "project": "Causa.App.Tests"
+      "project": "Causa.App.Tests",
+      "task": "T16"
     },
     {
       "machine": "SM-NETWORK",
       "owner": "ui",
-      "project": "Causa.App.Tests"
+      "project": "Causa.App.Tests",
+      "task": "T16"
     }
   ]
 }

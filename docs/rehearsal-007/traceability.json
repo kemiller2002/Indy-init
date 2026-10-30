@@ -1264,6 +1264,13 @@
       "sections": [
         "prioritySlices order 5: local-persistence renamed session-state"
       ]
+    },
+    {
+      "document": "docs/FSHARP-TYPE-SHAPES.md",
+      "sections": [
+        "§42 Persistence port",
+        "§46 Module boundary recommendation (Investigator.Persistence LocalStore.fs)"
+      ]
     }
   ],
   "permittedMentions": [
