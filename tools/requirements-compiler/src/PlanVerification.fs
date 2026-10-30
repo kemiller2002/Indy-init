@@ -235,7 +235,7 @@ let reviewRemovals (plan: Json) (changes: Json) : Map<string, Removal> * Diagnos
     diagnostics
 
 /// Coverage of one obligation. `verifiedEvidence` holds only documents that passed every requirement-level check.
-let private coverage (processCovered: Map<string, Set<string>>) (removal: Removal option) (evidenceStatus: string) (verifiedEvidence: Json list) (o: Json) =
+let coverage (processCovered: Map<string, Set<string>>) (removal: Removal option) (evidenceStatus: string) (verifiedEvidence: Json list) (o: Json) =
     let vid = str "id" o
     let required = requiredOf o
     let producers = boundTests o |> List.filter isProducer
@@ -254,7 +254,15 @@ let private coverage (processCovered: Map<string, Set<string>>) (removal: Remova
     let byProcess = processCovered.TryFind vid |> Option.defaultValue Set.empty |> Set.intersect produced
     // A category with a bound Praxis producer is covered only by the process assessment: a passing ledger test never
     // stands in for a producer that did not deliver (every bound producer must deliver).
-    let byTests = tests |> List.filter (fun t -> passed.Contains t.Id) |> List.collect (fun t -> t.Categories) |> Set.ofList
+    // ... and a category is covered by ledger tests only when every bound test declaring it passed: a failed, skipped
+    // or missing twin (a WebKit run beside a passing Chromium run, a verifier's run beside the implementer's) is never
+    // outvoted by another test of the same category (v4 independent review RV2-2).
+    let byTests =
+        tests
+        |> List.collect (fun t -> t.Categories)
+        |> List.distinct
+        |> List.filter (fun c -> tests |> List.filter (fun t -> List.contains c t.Categories) |> List.forall (fun t -> passed.Contains t.Id))
+        |> Set.ofList
     let covered = Set.union (Set.difference byTests produced) byProcess
     let declared = tests |> List.collect (fun t -> t.Categories) |> Set.ofList
     let missing =

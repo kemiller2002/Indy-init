@@ -6,7 +6,7 @@
     "compiled": true,
     "validated": true,
     "independentlyReviewed": false,
-    "approved": false,
+    "approvalRecorded": false,
     "frozen": false
   },
   "sourceCommit": "62df28a559c054226dd4022e9744cf1db06e954f",
@@ -25,7 +25,7 @@
     "invariants": 25,
     "stateMachines": 5,
     "r7Lessons": 20,
-    "ownerDecisionRequests": 10
+    "ownerDecisionRequests": 11
   },
   "verificationPlan": {
     "planId": "VP-9817d9814482",
@@ -86,7 +86,7 @@
     },
     {
       "path": "operational-definitions.json",
-      "sha256": "732bfc59c3ac287dac8d1355ecab63bdc12be800d4ababd6cd97f6de956be229"
+      "sha256": "95f4d4e2c4a67e34add072f89da47b95f93490be4bce948e190dccf88d471c25"
     },
     {
       "path": "package-manifest.json",
@@ -106,7 +106,7 @@
     },
     {
       "path": "r7-lessons-mapping.json",
-      "sha256": "ccb69a6d8b22baf1ae0c39a7260fdc4765b2aa8077a025a343ebe78564eac2f9"
+      "sha256": "95102e29ee475f1e4186839c44b1bbaf1c1cf134558e682485095c0ddb029e5f"
     },
     {
       "path": "requirements-inventory.json",
@@ -126,7 +126,7 @@
     },
     {
       "path": "state-machines.json",
-      "sha256": "2ef4a5507d9195c76eff8ee386560dff342d12ace70a97d315508dbc0c4c7c5e"
+      "sha256": "b0e3e14ec6d11ebbcfec8689cf6e9cce1aafd1f82ddb448c4ac7424a6efd2c4c"
     },
     {
       "path": "timed-execution-manifest.json",
@@ -143,7 +143,7 @@
   ],
   "compiler": {
     "name": "requirements-compiler",
-    "treeSha256": "bd8b916110a8450d4c8303dc59fed937d3c2ec44529b74509c326d3991d97333",
+    "treeSha256": "c5a3a18f34790505ad9bc9f33684ac5f23f74ab8a6c9386357bf7258946ad1d2",
     "sdk": "10.0.402"
   },
   "compilerTests": {
@@ -151,13 +151,13 @@
     "result": "PASS",
     "failures": 0,
     "summary": "offline tests (baseline equivalence, baseline units, preflight verdict, verification plan, acceptance contracts, process evidence, v4 scope and controls): all passed",
-    "compilerTreeSha256": "bd8b916110a8450d4c8303dc59fed937d3c2ec44529b74509c326d3991d97333",
+    "compilerTreeSha256": "c5a3a18f34790505ad9bc9f33684ac5f23f74ab8a6c9386357bf7258946ad1d2",
     "command": "dotnet run -c Release --project tools/requirements-compiler/tests -- --offline --source ."
   },
   "independentReview": {
     "verdict": "",
     "reviewer": "independent read-only Claude Code subagent (fresh context; not the package author)",
-    "rounds": 1,
+    "rounds": 2,
     "record": "independent-review.md"
   },
   "freezeGate": [
@@ -189,7 +189,7 @@
       "id": "FG-05",
       "condition": "All required owner approvals exist",
       "status": "FAIL",
-      "detail": "pending: ODR-V4-01, ODR-V4-02, ODR-V4-03, ODR-V4-04, ODR-V4-05, ODR-V4-06, ODR-V4-07, ODR-V4-08, ODR-V4-09, ODR-V4-10"
+      "detail": "pending: ODR-V4-01, ODR-V4-02, ODR-V4-03, ODR-V4-04, ODR-V4-05, ODR-V4-06, ODR-V4-07, ODR-V4-08, ODR-V4-09, ODR-V4-10, ODR-V4-11"
     },
     {
       "id": "FG-06",
@@ -207,13 +207,13 @@
       "id": "FG-08",
       "condition": "Compiler tests pass",
       "status": "PASS",
-      "detail": "record: PASS, tree bd8b916110a8450d4c8303dc59fed937d3c2ec44529b74509c326d3991d97333 (current tree bd8b916110a8450d4c8303dc59fed937d3c2ec44529b74509c326d3991d97333); CI re-runs the suite and compares (--verify-test-record)"
+      "detail": "record: PASS, tree c5a3a18f34790505ad9bc9f33684ac5f23f74ab8a6c9386357bf7258946ad1d2 (current tree c5a3a18f34790505ad9bc9f33684ac5f23f74ab8a6c9386357bf7258946ad1d2); CI re-runs the suite and compares (--verify-test-record)"
     },
     {
       "id": "FG-09",
       "condition": "Independent review passes",
       "status": "FAIL",
-      "detail": "computed from 14 finding(s); reviewer independent read-only Claude Code subagent (fresh context; not the package author); final round FAIL"
+      "detail": "computed from 22 finding(s) and the reviewer's last round verdict (FAIL); reviewer independent read-only Claude Code subagent (fresh context; not the package author)"
     },
     {
       "id": "FG-10",
@@ -237,6 +237,14 @@
     "review RV-12 (minor): fixed",
     "review RV-13 (minor): fixed",
     "review RV-14 (minor): fixed",
+    "review RV2-1 (critical): fixed",
+    "review RV2-2 (critical): fixed",
+    "review RV2-3 (major): fixed",
+    "review RV2-4 (major): fixed",
+    "review RV2-5 (major): fixed",
+    "review RV2-6 (minor): fixed",
+    "review RV2-7 (minor): fixed",
+    "review RV2-8 (minor): accepted",
     "owner decision ODR-V4-01 pending",
     "owner decision ODR-V4-02 pending",
     "owner decision ODR-V4-03 pending",
@@ -246,9 +254,11 @@
     "owner decision ODR-V4-07 pending",
     "owner decision ODR-V4-08 pending",
     "owner decision ODR-V4-09 pending",
-    "owner decision ODR-V4-10 pending"
+    "owner decision ODR-V4-10 pending",
+    "owner decision ODR-V4-11 pending"
   ],
   "freezeTimestamp": "2026-10-30T00:00:00Z",
-  "freezeTimestampMeaning": "the time this candidate was compiled; the package is not frozen",
-  "tag": "none: the tag is created only for a FROZEN package"
+  "freezeTimestampMeaning": "the time this package was compiled; the compiler never freezes a package",
+  "frozenBy": "the owner's approving review of the freeze pull request on GitHub, then the tag indy-init-requirements-v4.0.0 on its merge commit; neither is computed from repository files",
+  "tag": "none: every gate must pass first"
 }

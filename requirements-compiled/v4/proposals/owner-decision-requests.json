@@ -169,7 +169,7 @@
         "AR-021"
       ],
       "approvalRecord": {
-        "how": "An operator-written record: {\"decision_id\": \"ODR-V4-07\", \"action\": \"select-topology\", \"topology\": \"A-role-lanes\" | \"B-single-lead\", \"approved_by\": \"kemiller2002\", \"date\": \"<date>\"}. FG-07 passes only if the selected topology fits the window."
+        "how": "An operator-written record: {\"decision_id\": \"ODR-V4-07\", \"action\": \"select-topology\", \"topology\": \"C-role-lanes-two-ui\" | \"A-role-lanes\" | \"B-single-lead\", \"approved_by\": \"kemiller2002\", \"date\": \"<date>\"}. FG-07 passes only if the selected topology fits the window; today only C does."
       }
     },
     {
@@ -186,15 +186,28 @@
           "action": "amend",
           "criterion": "Saved MUST be constructible only from a confirmation produced by the PERSIST-007 read-back. A load that reads the investigation at a named commit and verifies it as a reader would (PERSIST-005) also produces such a confirmation for that commit, constructed only inside the persistence module from the bytes it verified.",
           "rationale": "Reconciles PERSIST-021 with PERSIST-007 and PERSIST-023 without opening a route to Saved for unverified bytes (ODR-V4-08)."
+        },
+        {
+          "obligation_id": "PERSIST-007-O2",
+          "action": "amend",
+          "criterion": "Only a confirmed save may move the investigation to Saved and advance its base head, except that a load verified at a named commit under the amended PERSIST-023-O2 shows Saved at that commit (PERSIST-021) and sets the base head to it.",
+          "rationale": "Reconciles PERSIST-007 with PERSIST-021 (ODR-V4-08)."
+        },
+        {
+          "obligation_id": "PERSIST-007-O4",
+          "action": "amend",
+          "criterion": "Acceptance: PAT-02 and PAT-10 verify that Saved appears only after the read-back, and PAT-12 verifies that no other transition reaches Saved, other than the verified-load confirmation of the amended PERSIST-023-O2, which PAT-12 verifies separately.",
+          "rationale": "PAT-12 must check both legal entries to Saved and no third (ODR-V4-08)."
         }
       ],
       "recommendation": "Approve.",
-      "impact": "None for scope; it makes T-S38 and SM-LOAD T-L03 normative and gives PAT-12 one more legal entry to Saved to check.",
+      "impact": "Makes T-S38 and SM-LOAD T-L03 normative. PERSIST-051-O2's 'read-back confirmation' then includes the verified-load confirmation, because the amended PERSIST-023-O2 defines it as one; if ODR-V4-03 is also approved, its PERSIST-051-O2 criterion is read with that definition.",
       "affects": [
         "PERSIST-023",
         "PERSIST-021",
         "PERSIST-007"
-      ]
+      ],
+      "nature": "relaxation: it opens a second, verified route to Saved that PERSIST-007 and PERSIST-023 do not allow as written; W11's add-only check does not make it a strengthening"
     },
     {
       "id": "ODR-V4-09",
@@ -209,7 +222,10 @@
       "impact": "30 minutes of T27",
       "affects": [
         "R11.4"
-      ]
+      ],
+      "approvalRecord": {
+        "how": "An operator-written record naming the option chosen: {\"decision_id\": \"ODR-V4-09\", \"action\": \"decide\", \"option\": \"A\" | \"B\", \"approved_by\": \"kemiller2002\", \"date\": \"<date>\"}. A record without an option does not count."
+      }
     },
     {
       "id": "ODR-V4-10",
@@ -228,6 +244,30 @@
         "DCC-013",
         "DCC-014",
         "DCC-015"
+      ],
+      "approvalRecord": {
+        "how": "An operator-written record naming the option chosen: {\"decision_id\": \"ODR-V4-10\", \"action\": \"decide\", \"option\": \"A\" | \"B\", \"approved_by\": \"kemiller2002\", \"date\": \"<date>\"}. A record without an option does not count."
+      }
+    },
+    {
+      "id": "ODR-V4-11",
+      "kind": "scope",
+      "title": "Does an unknown commit outcome keep other investigations' saves waiting? (PERSIST-006 'in flight')",
+      "lessons": [
+        "R7L-20"
+      ],
+      "problem": "PERSIST-006 allows at most one commit mutation in flight per tab. After a lost answer the mutation may still land, and PERSIST-015 blocks only that investigation. Rehearsal 7's third review (L3) found that an Unknown outcome awaiting Check again blocked every other investigation's save in the tab. The baseline does not say whether a mutation whose answer was lost is still in flight.",
+      "options": [
+        "A: a lost answer settles the mutation for PERSIST-006; other investigations may save while one is in Unknown commit outcome (the package's proposed reading)",
+        "B: the mutation stays in flight until reconciliation decides it; other saves wait"
+      ],
+      "recommendation": "A. Reconciliation already guards the uncertain investigation, and B lets one lost answer block the whole tab for up to 14 seconds plus a user action.",
+      "approvalRecord": {
+        "how": "{\"decision_id\": \"ODR-V4-11\", \"action\": \"decide\", \"option\": \"A\" | \"B\", \"approved_by\": \"kemiller2002\", \"date\": \"<date>\"}"
+      },
+      "affects": [
+        "PERSIST-006",
+        "PERSIST-015"
       ]
     }
   ]

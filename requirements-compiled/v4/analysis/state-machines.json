@@ -276,7 +276,7 @@
           "to": "Offline",
           "guard": "known offline",
           "effects": [
-            "send nothing"
+            "send nothing; any waiting request is dropped"
           ],
           "sources": [
             "PERSIST-018"
@@ -288,9 +288,12 @@
           "event": "WentOffline",
           "to": "Offline",
           "guard": "true",
-          "effects": [],
+          "effects": [
+            "a save request waiting behind another fails as Offline and is dropped: it is never sent later without a new request (PERSIST-018)"
+          ],
           "sources": [
-            "PERSIST-031"
+            "PERSIST-031",
+            "PERSIST-018"
           ]
         },
         {
@@ -992,7 +995,7 @@
           "from": "Saving",
           "event": "RebaseReadFailed",
           "to": "Offline",
-          "guard": "current",
+          "guard": "current and known offline",
           "effects": [
             "nothing of this save was written; never Conflict, never Discard (PAT-07 second case)"
           ],
@@ -1013,6 +1016,34 @@
           "sources": [
             "PERSIST-015",
             "PERSIST-007"
+          ]
+        },
+        {
+          "id": "T-S59",
+          "from": "Saving",
+          "event": "RebaseReadFailed",
+          "to": "UnknownOutcome",
+          "guard": "current and online",
+          "effects": [
+            "state the cause (GitHub could not be read after a stale head); reconciliation decides, Check again is offered after the automatic reads; never Conflict, never Discard"
+          ],
+          "sources": [
+            "PERSIST-024",
+            "PERSIST-046",
+            "PERSIST-015"
+          ]
+        },
+        {
+          "id": "T-S60",
+          "from": "Offline",
+          "event": "QueuedSaveStarted",
+          "to": "Offline",
+          "guard": "true",
+          "effects": [
+            "send nothing; the waiting request was already dropped when the tab went offline"
+          ],
+          "sources": [
+            "PERSIST-018"
           ]
         }
       ],

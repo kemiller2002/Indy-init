@@ -4,7 +4,7 @@
 /// keep every P0 of the v4 baseline, bind exactly the v3 bindings extended by the regenerated r7 proposal, apply no
 /// amendment (the pinned approvals file holds no record), and leave v3, the R6/R7 baselines and the frozen baseline
 /// untouched. Controls: each check of V4Package must reject a package broken in the way it guards against, and the
-/// freeze gate must reach FROZEN only when every recorded condition holds.
+/// freeze gate must reach READY-FOR-OWNER-FREEZE only when every recorded condition holds, and never declare FROZEN.
 module V4Tests
 
 open System
@@ -161,7 +161,7 @@ let controls (source: string) : string list =
         JObj [ "id", JStr "T-X"; "from", JStr from'; "event", JStr ev; "to", JStr to'; "guard", JStr "x"; "effects", JArr []; "sources", jstrs [ "PERSIST-031" ] ]
     let operator = i0.TrustedOperators |> List.tryHead |> Option.defaultValue "kemiller2002"
     let review =
-        JObj [ "reviewer", JStr "independent reviewer"; "reviewerIsImplementer", JBool false; "rounds", JInt 1L; "finalVerdict", JStr "PASS"; "findings", JArr [] ]
+        JObj [ "reviewer", JStr "independent reviewer"; "reviewerIsImplementer", JBool false; "rounds", JInt 1L; "roundVerdicts", JArr [ JObj [ "round", JInt 1L; "verdict", JStr "PASS" ] ]; "findings", JArr [] ]
     let reviewSha = Git.sha256Hex (Text.Encoding.UTF8.GetBytes(serialize review))
     let testSha = String('f', 64)
     let approvalRecords =
@@ -173,6 +173,7 @@ let controls (source: string) : string list =
                 [ JObj [ "decision_id", JStr "ODR-V4-01"; "action", JStr "approve-package"; "plan_digest", JStr planDigest
                          "review_sha256", JStr reviewSha; "test_record_sha256", JStr testSha; "approved_by", JStr operator ] ]
             | "scope-or-topology", _ -> [ JObj [ "decision_id", JStr(str "id" p); "action", JStr "select-topology"; "topology", JStr "C-role-lanes-two-ui"; "approved_by", JStr operator ] ]
+            | "scope", _ -> [ JObj [ "decision_id", JStr(str "id" p); "action", JStr "decide"; "option", JStr "A"; "approved_by", JStr operator ] ]
             | _ -> [ JObj [ "decision_id", JStr(str "id" p); "action", JStr "decide"; "approved_by", JStr operator ] ])
     let withRecords (rs: Json list) = setIn "approvals" (JArr rs) i0.Approvals
     let allRecorded =
@@ -192,8 +193,11 @@ let controls (source: string) : string list =
     let mapRecord (pred: Json -> bool) (f: Json -> Json) = approvalRecords |> List.map (fun r -> if pred r then f r else r)
     let freezeControls =
         [ if statusOf i0 <> "CANDIDATE" then yield "freeze: the committed package is not a CANDIDATE"
-          if statusOf allRecorded <> "FROZEN" then yield "freeze: every condition recorded, but the package is not FROZEN (positive control)"
-          let blocked label (i: V4Package.Inputs) = [ if statusOf i <> "CANDIDATE" then yield sprintf "freeze: FROZEN although %s" label ]
+          if statusOf allRecorded <> "READY-FOR-OWNER-FREEZE" then yield "freeze: every condition recorded, but the package is not READY-FOR-OWNER-FREEZE (positive control)"
+          // No combination of repository inputs makes the compiler declare FROZEN (RV2-1).
+          let frozenFlag (i: V4Package.Inputs) = let b = V4Package.build i in V4Package.freezeStatus b (V4Package.gates i b planDigest) true |> fst |> List.contains ("frozen", true)
+          if frozenFlag allRecorded then yield "freeze: the compiler declared frozen from repository inputs"
+          let blocked label (i: V4Package.Inputs) = [ if statusOf i <> "CANDIDATE" then yield sprintf "freeze: ready although %s" label ]
           yield! blocked "no approvals" { allRecorded with Approvals = i0.Approvals }
           yield! blocked "the approvals file was last changed by an agent" { allRecorded with ApprovalsAgentAuthored = true }
           yield! blocked "the approvals commit is not on main" { allRecorded with ApprovalsOnMain = false }
@@ -208,6 +212,8 @@ let controls (source: string) : string list =
           yield! blocked "the review has an open major finding" { allRecorded with Review = setIn "findings" (JArr [ JObj [ "id", JStr "F1"; "severity", JStr "major"; "status", JStr "open" ] ]) review }
           yield! blocked "the reviewer is the implementer" { allRecorded with Review = setIn "reviewerIsImplementer" (JBool true) review }
           yield! blocked "the review record only claims PASS" { allRecorded with Review = JObj [ "verdict", JStr "PASS" ] }
+          yield! blocked "the reviewer's last round failed although the author marked findings fixed" { allRecorded with Review = setIn "roundVerdicts" (JArr [ JObj [ "round", JInt 1L; "verdict", JStr "FAIL" ] ]) review }
+          yield! blocked "a scope decision names no option" { allRecorded with Approvals = withRecords (mapRecord (fun r -> strOpt "decision_id" r = Some "ODR-V4-10") (fun r -> match r with JObj ps -> JObj(ps |> List.filter (fst >> (<>) "option")) | j -> j)) }
           yield! blocked "the freeze commit is not verified" { allRecorded with FreezeCommitVerified = false }
           yield! blocked "the window is too small for the selected topology" { allRecorded with Policy = setIn "clock" (JObj [ "timedMinutes", JInt 100L ]) allRecorded.Policy }
           yield! expectFail "untrusted approver" "W13" { i0 with Approvals = withRecords [ JObj [ "decision_id", JStr "ODR-V4-01"; "approved_by", JStr "someone-else" ] ] }
@@ -259,5 +265,19 @@ let controls (source: string) : string list =
       yield! expectFail "plan from another baseline" "W15" { i0 with Plan = setIn "source" (JObj [ "baselineSha256", JStr(String('9', 64)) ]) i0.Plan }
       yield! freezeControls ]
 
+/// verify-plan: a category is covered only when every bound ledger test declaring it passed (RV2-2).
+let verifyPlanControls () : string list =
+    let test id = JObj [ "id", JStr id; "kind", JStr "deterministic"; "categories", jstrs [ "browser" ] ]
+    let o =
+        JObj
+            [ "id", JStr "VPO-control"
+              "acceptanceContract", JObj [ "requiredEvidenceCategories", jstrs [ "browser" ]; "testIdentity", JObj [ "tests", JArr [ test "t [chromium]"; test "t [webkit]" ] ] ] ]
+    let evidence outcomes =
+        [ JObj [ "obligations", JArr [ JObj [ "id", JStr "VPO-control"; "verification", JStr "PASS"; "tests", JArr(outcomes |> List.map (fun (t, r) -> JObj [ "testId", JStr t; "outcome", JStr r ])) ] ] ] ]
+    let covered ev = let _, c, _ = PlanVerification.coverage Map.empty None "PASS" ev o in c
+    [ if covered (evidence [ "t [chromium]", "passed"; "t [webkit]", "failed" ]) <> [] then yield "verify-plan: a failed WebKit twin was outvoted by a passing Chromium test"
+      if covered (evidence [ "t [chromium]", "passed" ]) <> [] then yield "verify-plan: a missing WebKit result was outvoted by a passing Chromium test"
+      if covered (evidence [ "t [chromium]", "passed"; "t [webkit]", "passed" ]) <> [ "browser" ] then yield "verify-plan: both twins passed but the category is not covered (positive control)" ]
+
 let all (source: string) : string list =
-    (try scope source with ex -> [ "v4 scope: " + ex.Message ]) @ (try controls source with ex -> [ "v4 controls: " + ex.Message ])
+    (try scope source with ex -> [ "v4 scope: " + ex.Message ]) @ (try controls source with ex -> [ "v4 controls: " + ex.Message ]) @ verifyPlanControls ()

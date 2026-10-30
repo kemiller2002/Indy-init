@@ -5,11 +5,10 @@
 /// v3 pipeline (Program.compile) must already have written the package's verification plan, verification manifest,
 /// dependency graph and timed manifest; this stage reads them back, so it checks what is actually committed.
 ///
-/// Nothing here approves, verifies or freezes by itself: the freeze gate reports each condition from recorded inputs
-/// (owner approval records, the compiler test record, the independent review record) and declares FROZEN only when
-/// every condition holds. An agent cannot satisfy a condition by writing to this module's inputs, because approvals
-/// must be operator records in the pinned approvals file (RDP-003) and the review record must name a reviewer who is
-/// not the compiler's author.
+/// Nothing here approves, verifies or freezes. The freeze gate reports each condition from recorded inputs (owner
+/// approval records, the compiler test record, the independent review record), and at best reports
+/// READY-FOR-OWNER-FREEZE: those inputs are repository files whose authors an offline compiler cannot authenticate, so
+/// the freeze itself is the owner's act on GitHub (see freezeStatus).
 module V4Package
 
 open System
@@ -71,7 +70,9 @@ type Inputs =
       /// v3's curation bindings extended by the r7 proposal: the bindings the v4 strengthening is applied to.
       BaseBindings: Json list
       /// curation/verification-plan.json testBindings as committed.
-      CurationBindings: Json list }
+      CurationBindings: Json list
+      /// The approvals file the v4 stage read: (commit, path, sha256 of its bytes).
+      ApprovalsPin: string * string * string }
 
 type Check = { Id: string; Title: string; Critical: bool; Problems: string list }
 
@@ -860,7 +861,11 @@ let build (i: Inputs) : Built =
                 if field "source" i.LegacyReport |> Option.map (str "baselineSha256") <> Some i.BaselineSha256 then yield "requirements-validation-report.json was produced from another baseline"
                 for c in arr "checks" i.LegacyReport do
                     if str "status" c <> "PASS" then yield sprintf "requirements-validation-report.json: %s is %s" (str "id" c) (str "status" c)
-                if VerificationPlan.digestOf i.Plan <> (field "planIdentity" i.Plan |> Option.map (str "digest") |> Option.defaultValue "") then yield "verification-plan.json does not match its own planIdentity digest" ]
+                if VerificationPlan.digestOf i.Plan <> (field "planIdentity" i.Plan |> Option.map (str "digest") |> Option.defaultValue "") then yield "verification-plan.json does not match its own planIdentity digest"
+                let commit, path, sha = i.ApprovalsPin
+                let planApprovals = field "source" i.Plan |> Option.bind (field "approvals") |> Option.defaultValue JNull
+                if (sOr "commit" planApprovals, sOr "path" planApprovals, sOr "sha256" planApprovals) <> (commit, path, sha) then
+                    yield "verification-plan.json was compiled against another approvals file than the one the curation pins" ]
           check "W03" "Every P0 requirement of the baseline is in the verification plan and has acceptance obligations; plan-readiness is READY with no permit" true
               [ for r in Set.difference p0 planP0 do yield sprintf "P0 %s is not in the verification plan" r
                 for r in Set.difference p0 aoP0 do yield sprintf "P0 %s has no acceptance obligation" r
@@ -948,6 +953,9 @@ let pendingDecisions (i: Inputs) (planDigest: string) =
             let declined = records |> List.exists (fun a -> sOr "decision_id" a = str "id" p && sOr "action" a = "decline")
             not declined && not (proposed |> List.forall amendRecorded)
         | "scope-or-topology" -> (selectedTopology i).IsNone
+        | "scope" ->
+            // A scope decision names the option chosen (its letter, as in the request's options).
+            not (records |> List.exists (fun a -> sOr "decision_id" a = str "id" p && sOr "option" a <> ""))
         | _ -> not (decided.Contains(str "id" p)))
     |> List.map (str "id")
 
@@ -958,7 +966,7 @@ let reviewPasses (i: Inputs) =
     sOr "reviewer" i.Review <> ""
     && not (boolOr "reviewerIsImplementer" true i.Review)
     && (intOpt "rounds" i.Review |> Option.defaultValue 0L) >= 1L
-    && sOr "finalVerdict" i.Review = "PASS"
+    && (arr "roundVerdicts" i.Review |> List.tryLast |> Option.map (sOr "verdict")) = Some "PASS"
     && findings |> List.forall (fun f -> not ([ "critical"; "major" ] |> List.contains (sOr "severity" f)) || [ "fixed"; "decided-by-owner" ] |> List.contains (sOr "status" f))
 
 let gates (i: Inputs) (b: Built) (planDigest: string) : Gate list =
@@ -980,17 +988,21 @@ let gates (i: Inputs) (b: Built) (planDigest: string) : Gate list =
                   | None -> "no topology selected by the owner (ODR-V4-07)"
                   | Some s -> sprintf "selected %s: %s" s (if selectedFits then "fits" else "does not fit")) }
       { Id = "FG-08"; Condition = "Compiler tests pass"; Pass = testsPass; Detail = sprintf "record: %s, tree %s (current tree %s); CI re-runs the suite and compares (--verify-test-record)" (sOr "result" i.CompilerTests) (sOr "compilerTreeSha256" i.CompilerTests) i.CompilerTreeSha256 }
-      { Id = "FG-09"; Condition = "Independent review passes"; Pass = reviewPasses i; Detail = sprintf "computed from %d finding(s); reviewer %s; final round %s" (arr "findings" i.Review).Length (sOr "reviewer" i.Review) (sOr "finalVerdict" i.Review) }
+      { Id = "FG-09"; Condition = "Independent review passes"; Pass = reviewPasses i; Detail = sprintf "computed from %d finding(s) and the reviewer's last round verdict (%s); reviewer %s" (arr "findings" i.Review).Length (arr "roundVerdicts" i.Review |> List.tryLast |> Option.map (sOr "verdict") |> Option.defaultValue "none") (sOr "reviewer" i.Review) }
       { Id = "FG-10"; Condition = "The freeze commit is recorded"; Pass = i.FreezeCommitVerified; Detail = (if i.FreezeCommitVerified then sOr "freezeCommit" i.FreezeInput else "no verified freeze commit: it must be on main and hold the owner's package approval") } ]
 
+/// The compiler never declares FROZEN. Approval records, the review record and the test record are files in the
+/// repository, and an offline compiler cannot authenticate who wrote them (v4 review RV2-1). When every gate passes,
+/// the status is READY-FOR-OWNER-FREEZE; the package is frozen only by the owner's own act on GitHub: an approving
+/// review of the freeze pull request and the tag indy-init-requirements-v4.0.0 on its merge commit (FREEZE.md).
 let freezeStatus (b: Built) (gs: Gate list) (legacyPass: bool) =
     let pass id = gs |> List.exists (fun g -> g.Id = id && g.Pass)
     let validated = legacyPass && b.Checks |> List.forall (fun c -> not c.Critical || c.Problems.IsEmpty)
     let reviewed = pass "FG-09"
     let approved = pass "FG-05"
-    let frozen = gs |> List.forall (fun g -> g.Pass)
-    [ "compiled", legacyPass; "validated", validated; "independentlyReviewed", reviewed; "approved", approved; "frozen", frozen ],
-    (if frozen then "FROZEN" else "CANDIDATE")
+    let allPass = gs |> List.forall (fun g -> g.Pass)
+    [ "compiled", legacyPass; "validated", validated; "independentlyReviewed", reviewed; "approvalRecorded", approved; "frozen", false ],
+    (if allPass then "READY-FOR-OWNER-FREEZE" else "CANDIDATE")
 
 let freezeManifest (i: Inputs) (b: Built) (digests: (string * string) list) (legacyPass: bool) : Json =
     let planIdentity = field "planIdentity" i.Plan |> Option.defaultValue JNull
@@ -1035,5 +1047,6 @@ let freezeManifest (i: Inputs) (b: Built) (digests: (string * string) list) (leg
           "freezeGate", JArr(gs |> List.map (fun g -> JObj [ "id", JStr g.Id; "condition", JStr g.Condition; "status", JStr(if g.Pass then "PASS" else "FAIL"); "detail", JStr g.Detail ]))
           "unresolvedFindings", jstrs unresolved
           "freezeTimestamp", JStr(sOr "compiledAt" i.FreezeInput)
-          "freezeTimestampMeaning", JStr(if status = "FROZEN" then "the time the package was frozen" else "the time this candidate was compiled; the package is not frozen")
-          "tag", JStr(if status = "FROZEN" then "indy-init-requirements-v4.0.0" else "none: the tag is created only for a FROZEN package") ]
+          "freezeTimestampMeaning", JStr "the time this package was compiled; the compiler never freezes a package"
+          "frozenBy", JStr "the owner's approving review of the freeze pull request on GitHub, then the tag indy-init-requirements-v4.0.0 on its merge commit; neither is computed from repository files"
+          "tag", JStr(if status = "READY-FOR-OWNER-FREEZE" then "indy-init-requirements-v4.0.0 may be created after the owner's approving review" else "none: every gate must pass first") ]

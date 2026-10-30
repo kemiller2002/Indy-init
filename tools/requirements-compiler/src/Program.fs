@@ -946,10 +946,10 @@ let compilerSources (compilerDir: string) : (string * byte[]) list =
 let private agentAttributed (message: string) =
     message.Contains("Claude-Session:", StringComparison.Ordinal) || message.Contains("Co-Authored-By: Claude", StringComparison.Ordinal)
 
-/// True when the commit is reachable from main (origin/main when the remote ref exists, else main).
+/// True when the commit is reachable from origin/main.
 let private onMain (repo: string) (commit: string) =
-    let reachable r = Git.run repo [ "merge-base"; "--is-ancestor"; commit; r ] |> Result.isOk
-    reachable "origin/main" || reachable "main"
+    // Only the remote-tracking ref fetched from GitHub counts; a local main can be moved by anyone (v4 review RV2-1).
+    Git.run repo [ "merge-base"; "--is-ancestor"; commit; "origin/main" ] |> Result.isOk
 
 /// Reads every input of the v4 stage from the source checkout and the package directory.
 let v4Inputs (source: string) (package: string) (registry: string option) (r7Evidence: string option) : V4Package.Inputs =
@@ -1028,7 +1028,10 @@ let v4Inputs (source: string) (package: string) (registry: string option) (r7Evi
           TestBindingProposal.applyTo
               (arr "testBindings" (parseFile (src "requirements-compiled/v3/curation/verification-plan.json")))
               (parseFile (pkg "proposals/r7-test-bindings.proposed.json"))
-      CurationBindings = arr "testBindings" (parseFile (pkg "curation/verification-plan.json")) }
+      CurationBindings = arr "testBindings" (parseFile (pkg "curation/verification-plan.json"))
+      ApprovalsPin =
+          str "commit" approvalsPin, str "path" approvalsPin,
+          (match Git.showFile source (str "commit" approvalsPin) (str "path" approvalsPin) with Ok b -> Git.sha256Hex b | Error _ -> "") }
 
 /// Files of the v3 pipeline that the freeze manifest pins by digest, read as committed.
 let private legacyPinned =

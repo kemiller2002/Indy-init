@@ -200,7 +200,7 @@
         "INV-07"
       ],
       "proposals": [],
-      "bindingStrengthened": "SM-SAVE T-S53..T-S55 model the waiting save and its offline failure (Rehearsal 7 L2, F13); INV-04 bounds."
+      "bindingStrengthened": "SM-SAVE T-S53..T-S55 and T-S60 model the waiting save; T-S05/T-S06 drop it when the tab goes offline, so it is never sent later without a new request (Rehearsal 7 L2, F13; PERSIST-018); INV-04 bounds."
     },
     {
       "id": "R7L-09",
@@ -487,7 +487,7 @@
           "quote": "an Unknown outcome awaiting Check again blocks other investigations' saves in the tab"
         }
       ],
-      "disposition": "covered",
+      "disposition": "gap-proposed",
       "requirements": [
         "PERSIST-006",
         "PERSIST-015"
@@ -495,8 +495,10 @@
       "invariants": [
         "INV-04"
       ],
-      "proposals": [],
-      "bindingStrengthened": "Operational definition 'In flight' and SM-SAVE concurrentOperations: Unknown commit outcome blocks only its own investigation; INV-04's request-bound property covers other investigations saving meanwhile."
+      "proposals": [
+        "ODR-V4-11"
+      ],
+      "bindingStrengthened": "The package's reading of 'in flight' (a mutation whose answer was lost has settled for PERSIST-006) reinterprets PERSIST-006-O6; it is asked as ODR-V4-11 and is not normative until decided."
     }
   ]
 }

@@ -157,11 +157,14 @@
     },
     {
       "term": "In flight (PERSIST-006)",
-      "definition": "A commit mutation is in flight from the moment it is sent until GitHub's answer, a recognised failure, or the loss of the answer is known. A mutation whose answer was lost has settled for PERSIST-006: its investigation is in Unknown commit outcome and sends nothing until reconciliation (PERSIST-015), but other investigations in the tab may save. This reading is the package author's; the owner may decide otherwise.",
+      "definition": "Proposed reading, not normative until the owner decides ODR-V4-11: a commit mutation is in flight from the moment it is sent until GitHub's answer, a recognised failure, or the loss of the answer is known. A mutation whose answer was lost has then settled for PERSIST-006: its investigation is in Unknown commit outcome and sends nothing until reconciliation (PERSIST-015), but other investigations in the tab may save. The alternative reading keeps every other save waiting until reconciliation decides.",
       "decidedBy": "SM-SAVE T-S53..T-S55 and PAT-08's request counts",
       "sources": [
         "PERSIST-006",
         "PERSIST-015"
+      ],
+      "proposals": [
+        "ODR-V4-11"
       ]
     }
   ]
