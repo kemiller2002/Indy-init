@@ -528,6 +528,88 @@
           "status": "remediated, pending re-review"
         }
       ]
+    },
+    {
+      "round": 8,
+      "reviewedCommit": "aa792a6",
+      "verdict": "FAIL",
+      "counts": {
+        "critical": 0,
+        "major": 5,
+        "minor": 4
+      },
+      "ownerAdjustments": {
+        "review": "not achieved: 5 major false failures",
+        "typeShapeReconciliation": "achieved",
+        "executableLayoutTests": "not achieved: false failures RV41-8-1..5; the catch rate reproduces with every miss disclosed",
+        "bootstrap": "achieved"
+      },
+      "findings": [
+        {
+          "id": "RV41-8-1",
+          "severity": "major",
+          "finding": "indicatorComposed required an operation status or conflict review in every save state, beyond PERSIST-030 (Saved, Unsaved, Saving and Offline have none)",
+          "remediation": "The lozenge names the state; an operation status is required in Unknown commit outcome and Save failed and a conflict review in Conflict, as PERSIST-030 says. FL-07's text and FL-07b are aligned with PERSIST-030. The Saved and Unsaved headers are conforming pages in catch-rate.mjs; round 5's and 6's \"operation status below the fold\" pages under a Saved lozenge are reclassified with that reason, and Save failed variants of both are caught",
+          "status": "remediated, pending re-review"
+        },
+        {
+          "id": "RV41-8-2",
+          "severity": "major",
+          "finding": "faultStatesPreserved called a lost connection, a gone commit or a discarded commit \"lost work\"",
+          "remediation": "Loss is counted only when its subject is the user's work (changes, edits, work, draft, attachments, notes), in either voice; the reviewer's pages are conforming cases",
+          "status": "remediated, pending re-review"
+        },
+        {
+          "id": "RV41-8-3",
+          "severity": "major",
+          "finding": "indicator() took the first header with a lozenge, so a workspace or site header with a connection lozenge (PERSIST-033) was judged instead of the investigation",
+          "remediation": "The record header with a lozenge is chosen first; a plain header only when there is none. The site-header and workspace-shell pages are conforming cases and the indicator-below-the-fold page is caught",
+          "status": "remediated, pending re-review"
+        },
+        {
+          "id": "RV41-8-4",
+          "severity": "major",
+          "finding": "Unknown commit outcome announced with role=alert while still checking was judged a fault without an action or preservation statement",
+          "remediation": "An operation status saying the save may or may not have reached GitHub (still checking) is not a fault; disclosed in R41-11; the pages are conforming cases (a conforming page may lack the element an assertion judges, but must not fail)",
+          "status": "remediated, pending re-review"
+        },
+        {
+          "id": "RV41-8-5",
+          "severity": "major",
+          "finding": "dialogFocus could not find a dialog invoker whose handler is attached by script",
+          "remediation": "AGENT-RULES requires every invoker to declare its dialog (commandfor, popovertarget or aria-controls); dialogFocus also takes { invokers: [{ invoker, dialog }] } for a plan test; popover dialogs are found. The script-opened dialog is a conforming case run with that option",
+          "status": "remediated, pending re-review"
+        },
+        {
+          "id": "RV41-8-6",
+          "severity": "minor",
+          "finding": "Two sibling navigation shells were reported as a custom navigation",
+          "remediation": "Every navigation shell is Forma's and each one's collapse is judged",
+          "status": "remediated, pending re-review"
+        },
+        {
+          "id": "RV41-8-7",
+          "severity": "minor",
+          "finding": "faultStatesPreserved missed \"dropped\", \"reverted\" and \"kept and queued\"",
+          "remediation": "dropped, reverted and reset are loss words; a sentence with a PERSIST-032 forbidden claim (queued, saved or kept locally or on the device, saved or synced later, will sync) never counts as preservation and is reported",
+          "status": "remediated, pending re-review"
+        },
+        {
+          "id": "RV41-8-8",
+          "severity": "minor",
+          "finding": "R41-11 said every review defect is a broken page",
+          "remediation": "Reworded: every defect page is checked in CI as a broken page (92) or through --catch-rate",
+          "status": "remediated, pending re-review"
+        },
+        {
+          "id": "RV41-8-9",
+          "severity": "minor",
+          "finding": "The fault-banner paragraph split the Forma gap list",
+          "remediation": "Moved after the list",
+          "status": "remediated, pending re-review"
+        }
+      ],
+      "note": "All of the reviewer's round-8 pages are in catch-rate.mjs. One of them, the full Save failed screen at VP-200-TEXT, is classified as a violation by the page: its record header alone is 796 px tall in the 800 px screen, so the freshness line and operation status start below it, which PERSIST-030 does not allow at 200% text. Running all pages also found and fixed: fixed-position text cut by the viewport (textNotClipped) and \"kept locally and will sync\" (faultStatesPreserved)"
     }
   ]
 }

@@ -95,7 +95,10 @@ const helpers = () => {
   // The save-state indicator (FL-07): the status lozenge of the header (or, on a page without one, the first lozenge),
   // and the operation status or conflict review in the header region (the header and the two elements after it).
   const indicator = () => {
-    const header = [...document.querySelectorAll('.ef-record-header, header')].find(h => h.querySelector('.ef-status-lozenge'));
+    // The investigation's record header; a plain header only when the page has no record header with a lozenge (a
+    // workspace or site header may carry its own lozenge for the connection state, PERSIST-033).
+    const withLozenge = sel => [...document.querySelectorAll(sel)].find(h => h.querySelector('.ef-status-lozenge'));
+    const header = withLozenge('.ef-record-header') || withLozenge('header');
     const lozenge = header ? header.querySelector('.ef-status-lozenge') : document.querySelector('.ef-status-lozenge');
     const sel = '.ef-operation-status, .ef-conflict-review';
     const region = header ? [header, header.nextElementSibling, header.nextElementSibling && header.nextElementSibling.nextElementSibling].filter(Boolean) : [];
@@ -210,6 +213,11 @@ export const textNotClipped = page =>
       const s = getComputedStyle(owner);
       const truncated = (s.textOverflow === 'ellipsis' && owner.scrollWidth > owner.clientWidth + 1) || (s.webkitLineClamp && s.webkitLineClamp !== 'none' && owner.scrollHeight > owner.clientHeight + 1);
       if (truncated) return !(labelled(owner) && [owner.getAttribute('title'), owner.getAttribute('aria-label')].some(v => v && v.includes(node.textContent.trim().slice(0, 40))));
+      // Text in a fixed element that runs past the viewport can never be scrolled into view.
+      const fixed = (() => { for (let a = owner; a && a !== document.documentElement; a = a.parentElement) if (getComputedStyle(a).position === 'fixed') return true; return false; })();
+      // Text wholly off screen is the reveal-on-focus pattern (a skip link), not clipping.
+      const onScreen = r => r.right > 0 && r.left < window.innerWidth && r.bottom > 0 && r.top < window.innerHeight;
+      if (fixed && rects.some(onScreen) && rects.some(r => r.right > window.innerWidth + 1 || r.left < -1 || r.bottom > window.innerHeight + 1 || r.top < -1)) return true;
       for (let a = owner; a && a !== document.documentElement; a = a.parentElement) {
         if (!clipsBox(getComputedStyle(a))) continue;
         if (a === owner && !/inset\(|paint|strict|content/.test(`${getComputedStyle(a).clipPath} ${getComputedStyle(a).contain}`) && !['hidden', 'clip'].includes(getComputedStyle(a).overflowX) && !['hidden', 'clip'].includes(getComputedStyle(a).overflowY)) continue;
@@ -382,16 +390,21 @@ export const skipLinkFirst = async page => {
 };
 
 // Opening a dialog moves focus into it, Tab stays inside it, and Escape closes it and returns focus to its invoker.
-export const dialogFocus = async page => {
+// invokers: [{ invoker: CSS selector, dialog: id }] names invokers whose handler is attached by script and that do not
+// declare their dialog (AGENT-RULES asks every invoker to declare it with commandfor or aria-controls).
+export const dialogFocus = async (page, { invokers: named = [] } = {}) => {
   // Invokers: declared commands, aria-controls pointing at a dialog, and controls whose click handler names a dialog
   // by id. A dialog is a <dialog> or an element with role=dialog.
-  const invokers = await inPage(page, () => {
+  const invokers = await inPage(page, named => {
     const dialogs = [...document.querySelectorAll('dialog[id], [role=dialog][id], [role=alertdialog][id]')];
-    const target = b => b.getAttribute('commandfor') || b.getAttribute('aria-controls') || (dialogs.find(d => new RegExp(`\\b${d.id}\\b`).test(b.getAttribute('onclick') || '')) || {}).id;
-    return [...document.querySelectorAll('button[commandfor]:not([command=close]):not([command=request-close]), [aria-controls], button[onclick], [role=button][onclick]')]
+    const target = b => b.getAttribute('commandfor') || b.getAttribute('popovertarget') || b.getAttribute('aria-controls') || (dialogs.find(d => new RegExp(`\\b${d.id}\\b`).test(b.getAttribute('onclick') || '')) || {}).id;
+    const declared = [...document.querySelectorAll('button[commandfor]:not([command=close]):not([command=request-close]), [popovertarget]:not([popovertargetaction=hide]), [aria-controls], button[onclick], [role=button][onclick]')]
       .filter(b => dialogs.some(d => d.id === target(b)) && !dialogs.some(d => d.contains(b)))
-      .map((b, k) => { b.dataset.efInvoker = String(k); return { key: String(k), dialog: target(b) }; });
-  });
+      .map(b => [b, target(b)]);
+    const given = named.flatMap(n => [...document.querySelectorAll(n.invoker)].map(b => [b, n.dialog]));
+    return [...declared, ...given.filter(([b]) => !declared.some(([d]) => d === b))]
+      .map(([b, dialog], k) => { b.dataset.efInvoker = String(k); return { key: String(k), dialog }; });
+  }, named);
   if (invokers.length === 0) return ['no dialog invoker on the page'];
   const open = async (key, dialog) => {
     await page.focus(`[data-ef-invoker="${key}"]`);
@@ -421,7 +434,7 @@ export const dialogFocus = async page => {
     const returned = await inPage(page, k => document.activeElement && document.activeElement.dataset.efInvoker === k, key);
     await open(key, dialog);
     const trapped = await Array.from({ length: 8 }).reduce(async (acc) => { const ok = await acc; await page.keyboard.press('Tab'); return ok && (await contained(dialog)); }, Promise.resolve(true));
-    await inPage(page, id => { const d = document.getElementById(id); if (d.tagName === 'DIALOG') d.close(); else d.hidden = true; }, dialog);
+    await inPage(page, id => { const d = document.getElementById(id); if (d.tagName === 'DIALOG') d.close(); else if (d.hasAttribute('popover')) d.hidePopover(); else d.hidden = true; }, dialog);
     return [
       ...(opened ? [] : [`opening #${dialog} does not move focus into it`]),
       ...(closed ? [] : [`Escape does not close #${dialog}`]),
@@ -670,10 +683,15 @@ export const indicatorComposed = async page => {
     // The freshness line is in the header or directly after it; the operation status or conflict review follows.
     const freshness = header.querySelector('.ef-freshness') || (header.nextElementSibling && (header.nextElementSibling.matches('.ef-freshness') ? header.nextElementSibling : header.nextElementSibling.querySelector('.ef-freshness')));
     const after = (a, b) => !!(a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING);
+    const state = (lozenge.textContent || '').trim();
+    const needs = /unknown commit outcome|save failed|conflict/i.test(state);
     return [
       ...(inView(lozenge) ? [] : ['the status lozenge is not visible without scrolling']),
       ...(freshness ? (inView(freshness) && !freshness.closest('.ef-visually-hidden') && window.getComputedStyle(freshness).visibility !== 'hidden' ? [] : ['the freshness line is not visible without scrolling']) : ['no freshness line in or directly after the header']),
-      ...(operation ? (inView(operation) ? [] : ['the operation status or conflict review is not visible without scrolling']) : ['no operation status or conflict review in the header region']),
+      // PERSIST-030: an operation status explains Unknown commit outcome and Save failed, a conflict review shows
+      // Conflict; the other four states have the lozenge and freshness only. The lozenge names the state in text.
+      ...(operation ? (inView(operation) ? [] : ['the operation status or conflict review is not visible without scrolling']) : needs ? [`the lozenge says "${state}" but no ${/conflict/i.test(state) ? 'conflict review' : 'operation status'} is in the header region`] : []),
+      ...(operation && /conflict/i.test(state) && !operation.matches('.ef-conflict-review') ? ['in Conflict the header region shows an operation status instead of a conflict review'] : []),
       ...(freshness && operation && !after(freshness, operation) ? ['the operation status or conflict review comes before the freshness line'] : []),
     ];
   });
@@ -704,7 +722,9 @@ export const faultActionable = async page => {
   await settle(page);
   await install(page);
   return inPage(page, () => {
-    const faults = [...document.querySelectorAll('[class*="ef-fault"], [role=alert], .ef-alert[data-tone=danger], .ef-callout[data-tone=danger]')].filter(e => !e.parentElement.closest('[class*="ef-fault"], [role=alert], .ef-alert[data-tone=danger], .ef-callout[data-tone=danger]'));
+    const faults = [...document.querySelectorAll('[class*="ef-fault"], [role=alert], .ef-alert[data-tone=danger], .ef-callout[data-tone=danger]')].filter(e => !e.parentElement.closest('[class*="ef-fault"], [role=alert], .ef-alert[data-tone=danger], .ef-callout[data-tone=danger]'))
+      // Unknown commit outcome while the automatic reads run is a status, not a fault: PERSIST-031 offers no action yet.
+      .filter(e => !(e.closest('.ef-operation-status') && /may or may not|checking/i.test(e.textContent || '')));
     // A next step is a visible, enabled control that takes pointer input and is not covered by another element.
     const onTop = c => {
       const r = c.getBoundingClientRect();
@@ -726,7 +746,8 @@ export const faultActionable = async page => {
 // A fault also says what was preserved (FL-08: "what happened, what was preserved and a safe next step").
 export const faultStatesPreserved = page =>
   inPage(page, () => {
-    const faults = [...document.querySelectorAll('[class*="ef-fault"], [role=alert], .ef-alert[data-tone=danger], .ef-callout[data-tone=danger], .ef-conflict-review')].filter(e => !e.parentElement.closest('[class*="ef-fault"], [role=alert], .ef-alert[data-tone=danger], .ef-callout[data-tone=danger], .ef-conflict-review'));
+    const faults = [...document.querySelectorAll('[class*="ef-fault"], [role=alert], .ef-alert[data-tone=danger], .ef-callout[data-tone=danger], .ef-conflict-review')].filter(e => !e.parentElement.closest('[class*="ef-fault"], [role=alert], .ef-alert[data-tone=danger], .ef-callout[data-tone=danger], .ef-conflict-review'))
+      .filter(e => !(e.closest('.ef-operation-status') && /may or may not|checking/i.test(e.textContent || '')));
     // A wording check on the fault's own message: its text outside actions, diffs and code, split into sentences per
     // block. Some sentence says what was kept (PERSIST-031's copy: "exist only in this tab", "the tab's changes are
     // kept"), and none says the user's work was lost. "Queued" and "saved later" are not preservation (PERSIST-032).
@@ -746,20 +767,30 @@ export const faultStatesPreserved = page =>
     };
     const preserved = /\b(kept|preserved|not lost|unchanged|no changes? (was|were) (applied|made|written)|nothing of this tab's changes? was written)\b|\b(exists?|remains?|stays?|held|still)\s+(only\s+)?(in|on)\s+this\s+(browser\s+)?tab\b/i;
     const notLost = /\b(not|never|won't be|will not be|nothing (is|was|has been))\s+lost\b/gi;
+    // Loss is said of the user's work (a lost connection or a discarded commit is not lost work).
+    const work = '(changes?|work|edits?|drafts?|attachments?|notes)';
+    const gone = '(lost|discarded|erased|wiped|gone|dropped|reverted|reset|deleted|removed|overwritten|thrown away)';
     const lost = [
-      /\b(lost|discarded|erased|wiped|gone)\b/i,
+      new RegExp(`\\b${work}\\b[^.!?]{0,40}?\\b(was|were|is|are|have been|has been|got)\\s+${gone}\\b`, 'i'),
+      new RegExp(`\\b(lost|discarded|erased|wiped|dropped|reverted|deleted|removed|overwrote|threw away)\\s+(your|the tab's|this tab's|these|all|the)\\s+(\\w+\\s+)?${work}\\b`, 'i'),
       /\b(kept|preserved)\s+(nothing|none)\b/i,
       /\bnothing\s+(was|is|has been|were|could be)\s+(kept|preserved)\b/i,
       /\b(not|never|no longer)\s+(been\s+)?(kept|preserved)\b/i,
       /\b(could not|couldn't|cannot|can't|unable to|failed to|did not|didn't)\s+(keep|preserve)\b/i,
-      /\b(your|the tab's|this tab's)\s+(changes?|work|edits?)\s+(was|were|have been|has been)\s+(deleted|removed|overwritten|discarded)\b/i,
     ];
+    // PERSIST-032: never "saved locally", "on this device", "queued" or "saved later".
+    const forbidden = /\b(queued|(saved|stored|kept) locally|(saved|stored|kept) on (this|your) device|(saved|synced|sync|uploaded) later|will (be )?(saved|synced|sync|uploaded|upload)|sync(s|ed)? (automatically|when))\b/i;
     const says = t => lost.some(r => r.test(t.replace(notLost, '')));
-    const states = e => sentences(e).some(t => preserved.test(t) && !says(t));
+    const states = e => sentences(e).some(t => preserved.test(t) && !says(t) && !forbidden.test(t));
     const denies = e => sentences(e).some(says);
+    const claims = e => sentences(e).some(t => forbidden.test(t));
     return faults.length === 0
       ? ['no fault on the page']
-      : faults.flatMap(e => [...(states(e) ? [] : [`${e.className || 'alert'} does not say what was preserved`]), ...(denies(e) ? [`${e.className || 'alert'} says work was lost`] : [])]);
+      : faults.flatMap(e => [
+          ...(states(e) ? [] : [`${e.className || 'alert'} does not say what was preserved`]),
+          ...(denies(e) ? [`${e.className || 'alert'} says work was lost`] : []),
+          ...(claims(e) ? [`${e.className || 'alert'} uses a persistence claim PERSIST-032 forbids (queued, saved or kept locally or on the device, saved or synced later)`] : []),
+        ]);
   });
 
 // ---- FL-09 navigation ----------------------------------------------------------------------------------------------
@@ -804,24 +835,30 @@ export const navigationReachable = async (page, { maxTabs = 15 } = {}) => {
 // list hides); at 48rem and wider the persistent list shows.
 export const navigationCollapses = page =>
   inPage(page, () => {
-    const shell = document.querySelector('.ef-navigation-shell');
-    const shows = sel => { const e = shell && shell.querySelector(sel); if (!e) return false; const r = e.getBoundingClientRect(); return r.width > 0 && r.height > 0 && getComputedStyle(e).display !== 'none'; };
+    // Every navigation shell is Forma's (FL-09 names a workspace level and an investigation level); each collapses.
+    const shells = [...document.querySelectorAll('.ef-navigation-shell')];
+    const shell = shells[0];
+    const inShell = e => shells.some(s => s.contains(e));
+    const showsIn = (sh, sel) => { const e = sh && [...sh.querySelectorAll(sel)].find(x => x.closest('.ef-navigation-shell') === sh); if (!e) return false; const r = e.getBoundingClientRect(); return r.width > 0 && r.height > 0 && getComputedStyle(e).display !== 'none'; };
     // The same media query Forma's stylesheet uses, so the browser decides exactly as it applies the pattern.
     const narrow = window.matchMedia('(max-width: 48rem)').matches;
-    const compact = shows('.ef-navigation-shell__compact');
-    const persistent = shows('.ef-navigation-shell__persistent');
     // Never a custom menu: no visible navigation or menu toggle outside the Forma shell, except the navigation that
     // other Forma patterns carry (site header, workspace shell, landmark region, breadcrumb, hierarchy tree, sidebar,
     // pagination, scope trail and the rest), which the contract's reuse list composes with the shell.
     const formaNavigation = ['ef-site-header', 'ef-site-nav', 'ef-site-footer', 'ef-marketing-shell', 'ef-workspace-shell', 'ef-landmark-region', 'ef-record-header', 'ef-hierarchy-tree', 'ef-doc', 'ef-master-detail', 'ef-mobile-action-bar', 'ef-pagination', 'ef-scope-trail', 'ef-sidebar', 'ef-spatial-canvas'].map(c => `[class*="${c}"]`).concat('[aria-label=Breadcrumb]').join(', ');
     const visible = e => { const r = e.getBoundingClientRect(); return r.width > 0 && r.height > 0 && getComputedStyle(e).visibility !== 'hidden' && getComputedStyle(e).display !== 'none'; };
-    const custom = [...document.querySelectorAll('nav, button[aria-expanded], [role=button][aria-expanded], [aria-haspopup=menu], [role=menu], [role=menubar], details:has(a[href] ~ a[href], li a[href])')].filter(e => !(shell && shell.contains(e)) && visible(e) && !e.closest(formaNavigation));
+    const custom = [...document.querySelectorAll('nav, button[aria-expanded], [role=button][aria-expanded], [aria-haspopup=menu], [role=menu], [role=menubar], details:has(a[href] ~ a[href], li a[href])')].filter(e => !inShell(e) && visible(e) && !e.closest(formaNavigation));
     const customs = custom.map(e => `a custom ${e.tagName.toLowerCase() === 'nav' ? 'navigation' : 'menu control'} sits outside the Forma navigation shell`);
     if (customs.length) return customs;
     if (!shell) return ['no Forma navigation shell on the page'];
-    return narrow
-      ? [...(compact ? [] : ['at 48rem or narrower the compact navigation is not shown']), ...(persistent ? ['at 48rem or narrower the persistent navigation still shows'] : [])]
-      : [...(persistent ? [] : ['wider than 48rem the persistent navigation is not shown']), ...(compact ? ['wider than 48rem the compact navigation still shows'] : [])];
+    return shells.flatMap((sh, k) => {
+      const c = showsIn(sh, '.ef-navigation-shell__compact');
+      const p = showsIn(sh, '.ef-navigation-shell__persistent');
+      const which = shells.length > 1 ? `navigation shell ${k + 1}: ` : '';
+      return narrow
+        ? [...(c ? [] : [`${which}at 48rem or narrower the compact navigation is not shown`]), ...(p ? [`${which}at 48rem or narrower the persistent navigation still shows`] : [])]
+        : [...(p ? [] : [`${which}wider than 48rem the persistent navigation is not shown`]), ...(c ? [`${which}wider than 48rem the compact navigation still shows`] : [])];
+    });
   });
 
 // ---- FL-10 tokens -------------------------------------------------------------------------------------------------

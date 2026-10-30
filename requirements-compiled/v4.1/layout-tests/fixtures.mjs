@@ -33,6 +33,7 @@ export const brokenFixtures = {
     '<p style="width:120px;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden">Saved changes are kept in this tab until you reconnect</p>',
     '<div style="contain:paint;height:1.2em;width:150px">A paragraph long enough to run onto a second line that paint containment then hides from view.</div>',
     '<div style="clip-path:inset(0 50% 0 0);width:300px">Half of this sentence is cut away by a clip path.</div>',
+    '<div style="position:fixed;bottom:0;left:calc(100vw - 120px);display:flex;gap:8px;white-space:nowrap;inline-size:max-content"><button>Keep this tab version</button><button>Take the GitHub version</button><button>Review differences</button><button>Discard the changes</button><button>Open the history</button></div><p>Body</p>',
   ],
   lineLength: [
     '<article class="ef-prose" style="max-width:none"><p style="max-width:none;width:120ch">' + 'Unbounded line length makes long text hard to read. '.repeat(6) + '</p></article>',
@@ -59,6 +60,7 @@ export const brokenFixtures = {
     '<dialog id="d2"><button>Close</button></dialog><button type="button" aria-haspopup="dialog" aria-controls="d2" onclick="document.getElementById(\'d2\').show()">Open non-modal</button><button>Outside</button>',
     '<dialog id="d3"><button>Close</button></dialog><button type="button" aria-haspopup="dialog" aria-controls="d3">Does nothing</button>',
     '<button type="button" commandfor="d1" command="show-modal">Open</button><div id="d1" role="dialog"><p>Not a dialog element</p><button>OK</button></div>',
+    '<button type="button" popovertarget="pd">Discard changes</button><div id="pd" role="dialog" aria-label="Discard" popover><p>Discard?</p><button type="button">Discard</button></div>',
   ],
   reducedMotion: [
     '<div class="spinning">Loading</div><script>document.querySelector(".spinning").animate([{transform:"rotate(0)"},{transform:"rotate(1turn)"}],{duration:2000,iterations:Infinity})</script>',
@@ -119,6 +121,8 @@ export const brokenFixtures = {
     '<div role="alert"><p>Save failed. Your changes were overwritten.</p><button type="button">Retry</button></div>',
     '<div role="alert"><p>Save failed. We kept nothing from this session.</p><button>Retry</button></div>',
     '<aside class="ef-alert ef-fault-banner" role="status"><h2 class="ef-alert__title">Save failed.</h2><p>Your change is queued and will be saved later.</p><div class="ef-recovery-actions" role="group" aria-label="Recovery actions"><button type="button">Retry</button></div></aside>',
+    '<div role="alert"><p>Save failed. Your last two edits were dropped.</p><button type="button">Retry</button></div>',
+    '<aside class="ef-alert ef-fault-banner" role="status"><h2 class="ef-alert__title">Offline.</h2><p>Your changes are kept locally and will sync when you reconnect.</p><div class="ef-recovery-actions" role="group" aria-label="Recovery actions"><button type="button">Check connection</button></div></aside>',
   ],
   navigationReachable: [
     '<div><a href="#a">Somewhere</a></div>',

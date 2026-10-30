@@ -83,7 +83,7 @@ const execute = browser => async run => {
   const tab = await context.newPage();
   try {
     await tab.goto(page(run.target, run.body, vp.textZoom || 1));
-    const violations = await assertions[run.assertion](tab, { inventory, hooks, axeSource });
+    const violations = await assertions[run.assertion](tab, { inventory, hooks, axeSource, ...(run.options || {}) });
     const ok = run.kind === 'positive' ? violations.length === 0 : violations.length > 0;
     // A gap run that passes means Forma fixed it: fail, so the gap entry is removed.
     if (run.kind === 'gap' && violations.length === 0) violations.push('the Forma gap is closed in this release; remove it from formaGaps');
@@ -100,7 +100,7 @@ const sequence = (xs, f) => xs.reduce((acc, x) => acc.then(rs => f(x).then(r => 
 // A failure that only says a page element is missing does not show the defect was found.
 const absence = /^(no (element received focus|dialog invoker|status indicator|save-state indicator|loading placeholder|fault on the page|navigation landmark|Forma navigation shell)|error: )/;
 const catchRate = async () => {
-  const runs = reviewCases.flatMap(c => c.vps.map(vp => ({ rule: c.id, assertion: c.assertion, emulate: c.forced ? { forcedColors: 'active' } : {}, kind: 'catch', target: c.id, body: typeof c.body === 'function' ? c.body(pattern) : c.body, vp, scheme: c.scheme || 'light', case: c })));
+  const runs = reviewCases.flatMap(c => c.vps.map(vp => ({ rule: c.id, assertion: c.assertion, emulate: c.forced ? { forcedColors: 'active' } : {}, kind: 'catch', target: c.id, options: c.options, body: typeof c.body === 'function' ? c.body(pattern) : c.body, vp, scheme: c.scheme || 'light', case: c })));
   const browser = await playwright.chromium.launch();
   const done = await sequence(runs, run => execute(browser)(run).then(r => ({ ...r, case: run.case, found: r.violations.filter(v => !absence.test(v)) })));
   await browser.close();
@@ -109,7 +109,8 @@ const catchRate = async () => {
   const caught = violations.filter(r => r.found.length > 0);
   const missed = violations.filter(r => r.found.length === 0);
   const undisclosed = missed.filter(r => !r.case.disclosed);
-  const conformingFailed = of('conforming').filter(r => r.violations.length > 0);
+  // A conforming page may lack the element an assertion judges (a status that is not a fault); it must not fail.
+  const conformingFailed = of('conforming').filter(r => r.found.length > 0);
   console.log(`catch rate (Chromium, own assertion): ${caught.length} of ${violations.length} violation runs caught; ${missed.length - undisclosed.length} disclosed misses; ${of('other').length} runs of pages that are not violations; ${of('conforming').length - conformingFailed.length} of ${of('conforming').length} conforming runs pass`);
   missed.forEach(r => console.log(`  ${r.case.disclosed ? 'DISCLOSED' : 'MISSED'} round ${r.case.round} ${r.case.id} ${r.assertion} ${r.vp}${r.case.disclosed ? ': ' + r.case.disclosed : ''}`));
   conformingFailed.forEach(r => console.log(`  FALSE FAILURE round ${r.case.round} ${r.case.id} ${r.assertion} ${r.vp}: ${r.violations.slice(0, 3).join('; ')}`));
