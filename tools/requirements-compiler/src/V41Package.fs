@@ -70,6 +70,9 @@ let formaInventory (version: string) (tarballSha256: string) (css: string) (cont
     let distinct (rx: string) =
         Regex.Matches(css, rx) |> Seq.map (fun m -> m.Groups.[1].Value) |> Seq.distinct |> Seq.sort |> List.ofSeq
     let properties = distinct @"(--ef-[a-z0-9-]+)\s*:"
+    // Hooks: properties the stylesheet reads (var(--ef-...)) but never defines, which authors set per instance
+    // (the diagram's --ef-diagram-* geometry, for example). Setting a hook is using Forma, not inventing a token.
+    let hooks = distinct @"var\(\s*(--ef-[a-z0-9-]+)" |> List.filter (fun p -> not (List.contains p properties))
     let classes = distinct @"\.(ef-[a-z0-9_-]+)"
     let patterns = arr "components" contracts |> List.map (str "id") |> List.distinct |> List.sort
     let breakpoints = distinct @"@media[^{]*?\(\s*(?:min|max)-width:\s*([0-9.]+rem)\s*\)"
@@ -80,10 +83,11 @@ let formaInventory (version: string) (tarballSha256: string) (css: string) (cont
           "version", JStr version
           "tarballSha256", JStr tarballSha256
           "customProperties", jstrs properties
+          "hookProperties", jstrs hooks
           "classes", jstrs classes
           "patterns", jstrs patterns
           "breakpoints", jstrs breakpoints
-          "counts", JObj [ "customProperties", jint properties.Length; "classes", jint classes.Length; "patterns", jint patterns.Length; "breakpoints", jint breakpoints.Length ] ]
+          "counts", JObj [ "customProperties", jint properties.Length; "hookProperties", jint hooks.Length; "classes", jint classes.Length; "patterns", jint patterns.Length; "breakpoints", jint breakpoints.Length ] ]
 
 // ---- tests -------------------------------------------------------------------------------------------------------
 

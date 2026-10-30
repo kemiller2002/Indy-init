@@ -17,11 +17,23 @@ const settle = page =>
 // Shared in-page helpers (window.__ef): colour arithmetic, the background actually painted behind an element (what is
 // beneath it on screen, not only its ancestors), whether an element is really visible, and its visible text.
 const helpers = () => {
-  const rgba = c => (c.match(/[\d.]+/g) || []).map(Number).concat([1]).slice(0, 4);
+  // Any CSS colour (rgb, color(srgb ...), oklch, color-mix results) normalised by painting it: sRGB 0-255 and alpha 0-1.
+  const rgba = c => {
+    const canvas = rgba.canvas || (rgba.canvas = Object.assign(document.createElement('canvas'), { width: 1, height: 1 }));
+    const ctx = rgba.ctx || (rgba.ctx = canvas.getContext('2d', { willReadFrequently: true }));
+    ctx.clearRect(0, 0, 1, 1);
+    ctx.fillStyle = 'rgba(0, 0, 0, 0)';
+    ctx.fillStyle = c || 'rgba(0, 0, 0, 0)';
+    ctx.fillRect(0, 0, 1, 1);
+    const [r, g, b, a] = ctx.getImageData(0, 0, 1, 1).data;
+    return [r, g, b, a / 255];
+  };
   const over = ([r, g, b, a], [R, G, B]) => [r * a + R * (1 - a), g * a + G * (1 - a), b * a + B * (1 - a), 1];
   const lum = ([r, g, b]) => [r, g, b].map(v => v / 255).map(v => (v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4)).reduce((acc, v, k) => acc + v * [0.2126, 0.7152, 0.0722][k], 0);
   const ratio = (a, b) => (Math.max(lum(a), lum(b)) + 0.05) / (Math.min(lum(a), lum(b)) + 0.05);
-  const opacityOf = e => { let o = 1; for (let n = e; n; n = n.parentElement) o *= parseFloat(getComputedStyle(n).opacity); return o; };
+  // Opacity and filter: opacity() both fade what an element paints.
+  const filterOpacity = f => (f.match(/opacity\(\s*([\d.]+)(%?)\s*\)/g) || []).map(x => x.match(/([\d.]+)(%?)/)).reduce((o, [, v, pct]) => o * (pct ? parseFloat(v) / 100 : parseFloat(v)), 1);
+  const opacityOf = e => { let o = 1; for (let n = e; n; n = n.parentElement) { const s = getComputedStyle(n); o *= parseFloat(s.opacity) * filterOpacity(s.filter || ''); } return o; };
   // The composited background under an element: the elements beneath its centre on screen, bottom first. Null when an
   // image or gradient is involved (judged by the plan's axe run instead).
   const backgroundAt = e => {
@@ -60,7 +72,7 @@ const helpers = () => {
     for (let n = walker.nextNode(); n; n = walker.nextNode()) {
       const t = n.textContent.trim();
       const host = n.parentElement;
-      if (!t || hidden(host)) continue;
+      if (!t || hidden(host) || parseFloat(getComputedStyle(host).fontSize) < 9) continue;
       const bg = backgroundAt(host);
       const [r, g, b, a] = rgba(getComputedStyle(host).color);
       if (bg && ratio(over([r, g, b, a * opacityOf(host)], bg), bg) < 3) continue;
@@ -82,9 +94,13 @@ export const touchTargets = page =>
     const describe = e => `${e.tagName.toLowerCase()} "${(e.textContent || '').trim().slice(0, 30)}"`;
     const selector = 'button, a[href], input:not([type=hidden]), select, textarea, summary, [role=button], [role=tab], [role=menuitem], [role=checkbox], [role=switch], [onclick], [tabindex]:not([tabindex="-1"])';
     const visible = e => { const r = e.getBoundingClientRect(); return r.width > 0 && r.height > 0 && getComputedStyle(e).visibility !== 'hidden'; };
+    // Every element, including those inside open shadow roots (custom elements).
+    const deep = root => [...root.querySelectorAll('*')].flatMap(e => [e, ...(e.shadowRoot ? deep(e.shadowRoot) : [])]);
+    const elements = deep(document.body);
+    const inControl = e => !!(e.parentElement && e.parentElement.closest(selector));
     // Anything that looks clickable (pointer cursor) and is not inside a control counts as a control too.
-    const pointerOnly = [...document.body.querySelectorAll('*')].filter(e => getComputedStyle(e).cursor === 'pointer' && !e.parentElement.closest(selector) && !e.matches(selector) && ![...e.children].some(c => getComputedStyle(c).cursor === 'pointer'));
-    return [...new Set([...document.querySelectorAll(selector), ...pointerOnly])]
+    const pointerOnly = elements.filter(e => getComputedStyle(e).cursor === 'pointer' && !inControl(e) && !e.matches(selector) && ![...e.children].some(c => getComputedStyle(c).cursor === 'pointer'));
+    return [...new Set([...elements.filter(e => e.matches(selector)), ...pointerOnly])]
       .filter(visible)
       .map(e => [e, e.getBoundingClientRect()])
       .filter(([, r]) => r.width < 43.5 || r.height < 43.5)
@@ -121,15 +137,22 @@ export const scrollRegionsAccessible = page =>
       if (e === document.documentElement || e === document.body) return document.scrollingElement.scrollWidth > window.innerWidth + 0.5 || [...document.body.querySelectorAll('*')].some(c => c.getBoundingClientRect().right > window.innerWidth + 0.5);
       return e.scrollWidth > e.clientWidth + 1 && e.children.length > 0;
     };
-    const named = e => e.getAttribute('aria-label') || e.getAttribute('aria-labelledby');
+    const named = e => ['aria-label', 'title'].some(k => (e.getAttribute(k) || '').trim() !== '') || (e.getAttribute('aria-labelledby') || '').split(/\s+/).some(id => { const l = id && document.getElementById(id); return l && l.textContent.trim() !== ''; });
+    // Keyboard users can scroll a region that is focusable itself or holds focusable content (as axe's
+    // scrollable-region-focusable rule accepts).
+    const reachable = e => e.tabIndex >= 0 || !!e.querySelector('a[href], button, input, select, textarea, [tabindex]:not([tabindex="-1"])');
     // ::-webkit-scrollbar { display: none } (or zero size) hides the bar in WebKit and Chromium.
     const rules = [...document.styleSheets].flatMap(sheet => { try { return [...sheet.cssRules]; } catch (err) { return []; } }).filter(r => r.selectorText && r.selectorText.includes('::-webkit-scrollbar'));
-    const hidesBar = r => r.style.display === 'none' || r.style.width === '0px' || r.style.height === '0px' || r.style.width === '0' || r.style.height === '0';
+    // A bar under 4 px is too thin to see or use.
+    const thin = v => v !== '' && parseFloat(v) < 4;
+    const hidesBar = r => r.style.display === 'none' || thin(r.style.width) || thin(r.style.height);
+    // scrollbar-color with a transparent thumb paints an invisible bar.
+    const invisibleThumb = e => { const c = getComputedStyle(e).scrollbarColor || 'auto'; return c !== 'auto' && /^(transparent|rgba\([^)]*,\s*0\))/.test(c.trim()); };
     const webkitHidden = e => rules.filter(hidesBar).some(r => r.selectorText.split(',').map(x => x.trim().replace(/::-webkit-scrollbar.*$/, '') || '*').some(sel => { try { return e.matches(sel); } catch (err) { return false; } }));
     const all = [document.documentElement, document.body, ...document.body.querySelectorAll('*')];
     return [
-      ...all.filter(scrolls).filter(e => e !== document.documentElement && e !== document.body).filter(e => !(e.tabIndex >= 0 && named(e))).map(e => `${e.className || e.tagName} scrolls but is not focusable and named`),
-      ...all.filter(scrolls).filter(e => getComputedStyle(e).scrollbarWidth === 'none' || webkitHidden(e)).map(e => `${e.className || e.tagName} hides its scroll bar, so its scrolling is not visible`),
+      ...all.filter(scrolls).filter(e => e !== document.documentElement && e !== document.body).filter(e => !(reachable(e) && (named(e) || e.tabIndex < 0))).map(e => `${e.className || e.tagName} scrolls but cannot be reached by keyboard or has no name`),
+      ...all.filter(scrolls).filter(e => getComputedStyle(e).scrollbarWidth === 'none' || webkitHidden(e) || invisibleThumb(e)).map(e => `${e.className || e.tagName} hides its scroll bar, so its scrolling is not visible`),
       ...all.filter(clipped).filter(e => !e.closest('[aria-hidden=true]')).map(e => `${e.className || e.tagName} hides overflowing content instead of scrolling it`),
     ];
   });
@@ -164,13 +187,15 @@ export const textNotClipped = page =>
       const rects = [...range.getClientRects()].filter(r => r.width > 0 && r.height > 0);
       const s = getComputedStyle(owner);
       const truncated = (s.textOverflow === 'ellipsis' && owner.scrollWidth > owner.clientWidth + 1) || (s.webkitLineClamp && s.webkitLineClamp !== 'none' && owner.scrollHeight > owner.clientHeight + 1);
-      if (truncated) return !labelled(owner);
+      if (truncated) return !(labelled(owner) && [owner.getAttribute('title'), owner.getAttribute('aria-label')].some(v => v && v.includes(node.textContent.trim().slice(0, 40))));
       for (let a = owner; a && a !== document.documentElement; a = a.parentElement) {
         if (!clipsBox(getComputedStyle(a))) continue;
         if (a === owner && !/inset\(|paint|strict|content/.test(`${getComputedStyle(a).clipPath} ${getComputedStyle(a).contain}`) && !['hidden', 'clip'].includes(getComputedStyle(a).overflowX) && !['hidden', 'clip'].includes(getComputedStyle(a).overflowY)) continue;
         const box = clipRect(a);
         const outside = rects.some(r => r.right > box.right + 1 || r.bottom > box.bottom + 1 || r.left < box.left - 1 || r.top < box.top - 1);
-        if (outside && !labelled(owner) && !labelled(a)) return true;
+        // A label excuses clipping only when it carries the clipped text itself.
+        const carries = el => el && [el.getAttribute('title'), el.getAttribute('aria-label')].some(v => v && v.includes(node.textContent.trim().slice(0, 40)));
+        if (outside && !carries(owner) && !carries(a)) return true;
       }
       return false;
     };
@@ -190,11 +215,20 @@ export const lineLength = page =>
       probe.remove();
       return w;
     };
-    // The line length is the width the text occupies, not its box: measure the widest line of the text itself.
-    const lineWidth = e => { const r = document.createRange(); r.selectNodeContents(e); return Math.max(0, ...[...r.getClientRects()].map(x => x.width)); };
-    const directText = e => [...e.childNodes].filter(n => n.nodeType === 3).map(n => n.textContent).join('').trim();
+    // A line is every text rectangle on the same baseline band: group the range's rectangles by line and measure each
+    // line's full extent, so links and emphasis inside a paragraph do not split it.
+    const lineWidth = e => {
+      const r = document.createRange();
+      r.selectNodeContents(e);
+      const rects = [...r.getClientRects()].filter(x => x.width > 0 && x.height > 0);
+      const lines = rects.reduce((acc, x) => { const line = acc.find(l => Math.abs(l.mid - (x.top + x.bottom) / 2) < x.height / 2); if (line) { line.left = Math.min(line.left, x.left); line.right = Math.max(line.right, x.right); } else acc.push({ mid: (x.top + x.bottom) / 2, left: x.left, right: x.right }); return acc; }, []);
+      return Math.max(0, ...lines.map(l => l.right - l.left));
+    };
+    // Running text is any block whose children are all inline and whose text runs to at least 80 characters.
+    const inlineOnly = e => [...e.children].every(c => ['inline', 'inline-block', 'contents'].includes(getComputedStyle(c).display) || c.tagName === 'BR');
+    const block = e => !['inline', 'inline-block', 'contents', 'none'].includes(getComputedStyle(e).display);
     return [...document.body.querySelectorAll('*')]
-      .filter(e => directText(e).length >= 80 && !e.closest('.ef-visually-hidden, [aria-hidden=true]') && !['SCRIPT', 'STYLE', 'PRE', 'CODE'].includes(e.tagName))
+      .filter(e => block(e) && inlineOnly(e) && (e.textContent || '').trim().length >= 80 && !e.closest('.ef-visually-hidden, [aria-hidden=true], pre, code') && !['SCRIPT', 'STYLE', 'PRE', 'CODE'].includes(e.tagName))
       .map(e => [e, lineWidth(e) / chWidth(e)])
       .filter(([, ch]) => ch > 72.5)
       .map(([e, ch]) => `"${e.textContent.trim().slice(0, 30)}" is ${ch.toFixed(0)}ch wide`);
@@ -228,7 +262,8 @@ const tabSequence = async (page, maxTabs) => {
 
 // Every element reached by Tab shows a focus ring it does not show when blurred: a non-transparent outline at least
 // --ef-focus-ring-width wide, or a box-shadow ring of at least that spread.
-export const focusVisible = async (page, { maxTabs = 25 } = {}) => {
+export const focusVisible = async (page, { maxTabs } = {}) => {
+  maxTabs = maxTabs || Math.min(200, 5 + (await inPage(page, () => document.querySelectorAll('a[href], button, input, select, textarea, summary, [tabindex]:not([tabindex="-1"])').length)));
   const ring = await ringWidth(page);
   await inPage(page, tools => { window.__efColour = eval(`(${tools})()`); }, colourTools.toString());
   await install(page);
@@ -271,14 +306,19 @@ export const focusVisible = async (page, { maxTabs = 25 } = {}) => {
       const band = area(ringBox) - area(r);
       const shownBand = area(meet(ringBox, clip)) - area(meet(r, clip));
       const unclipped = reach === 0 || band <= 0 || shownBand >= band * 0.25;
-      return { key: e.outerHTML.slice(0, 80), ok: focusedRing && focusedSignature !== blurredSignature && contrasting && unclipped, label: `${e.tagName.toLowerCase()} "${(e.textContent || '').trim().slice(0, 30)}"` };
+      // The focused element itself is not covered by another element (WCAG 2.4.11): its centre is on top.
+      const cx = Math.min(Math.max(r.left + r.width / 2, 0), window.innerWidth - 1);
+      const cy = Math.min(Math.max(r.top + r.height / 2, 0), window.innerHeight - 1);
+      const top = r.width > 0 && r.bottom > 0 && r.top < window.innerHeight ? document.elementFromPoint(cx, cy) : e;
+      const uncovered = !top || e.contains(top) || top.contains(e);
+      return { key: e.outerHTML.slice(0, 80), ok: focusedRing && focusedSignature !== blurredSignature && contrasting && unclipped && uncovered, label: `${e.tagName.toLowerCase()} "${(e.textContent || '').trim().slice(0, 30)}"` };
     }, ring);
     return v === null || seen.some(x => x.key === v.key) ? seen : [...seen, v];
   }, Promise.resolve([]));
   const interactive = await inPage(page, () => document.querySelectorAll('button, a[href], input, select, textarea, summary, [tabindex]').length);
   return [
     ...(interactive > 0 && visits.length === 0 ? ['no element received focus from the keyboard'] : []),
-    ...visits.filter(v => !v.ok).map(v => `${v.label} shows no focus ring of at least ${ring} px, at 3:1 against its background, unclipped by its container, that it lacks when blurred`),
+    ...visits.filter(v => !v.ok).map(v => `${v.label} shows no focus ring of at least ${ring} px, at 3:1 against its background, unclipped by its container and uncovered, that it lacks when blurred`),
   ];
 };
 
@@ -310,7 +350,7 @@ export const skipLinkFirst = async page => {
     const e = document.activeElement;
     const href = e && e.getAttribute && e.getAttribute('href');
     const target = href && href.startsWith('#') ? document.getElementById(href.slice(1)) : null;
-    if (!(e && e.tagName === 'A' && /skip/i.test(e.textContent) && target)) return ['the first Tab does not reach a skip link with an existing target'];
+    if (!(e && e.tagName === 'A' && /skip/i.test(e.textContent) && target && getComputedStyle(target).display !== 'none')) return ['the first Tab does not reach a skip link with a displayed target'];
     const r = e.getBoundingClientRect();
     const inView = r.width > 1 && r.height > 1 && r.right > 0 && r.bottom > 0 && r.left < window.innerWidth && r.top < window.innerHeight;
     // On screen and on top: the element at its centre is the link (not clipped away, not under a fixed header).
@@ -349,7 +389,7 @@ export const dialogFocus = async page => {
     await page.keyboard.press('Escape');
     const closed = await inPage(page, id => !document.getElementById(id).open, dialog);
     // Give scripts that move focus after closing a moment, then require focus still on the invoker.
-    await page.waitForTimeout(400);
+    await page.waitForTimeout(1000);
     const returned = await inPage(page, k => document.activeElement && document.activeElement.dataset.efInvoker === k, key);
     await open(key, dialog);
     const trapped = await Array.from({ length: 8 }).reduce(async (acc) => { const ok = await acc; await page.keyboard.press('Tab'); return ok && (await contained(dialog)); }, Promise.resolve(true));
@@ -388,10 +428,12 @@ export const reducedMotion = async page => {
       .filter(([, t]) => (typeof t.duration === 'number' ? t.duration : 0) > 10)
       .map(([a, t]) => `${label(a.effect && a.effect.target)} animates for ${t.duration} ms`);
     const transitions = [...document.querySelectorAll('*')]
-      .map(e => [e, getComputedStyle(e)])
+      .flatMap(e => [[e, getComputedStyle(e)], [e, getComputedStyle(e, '::before')], [e, getComputedStyle(e, '::after')]])
       .filter(([, s]) => s.transitionProperty !== 'none' && longest(seconds(s.transitionDuration)) > 0.01)
       .map(([e, s]) => `${label(e)} transitions for ${s.transitionDuration}`);
-    return [...animations, ...transitions];
+    // Smooth scrolling animates every in-page jump.
+    const smooth = [document.documentElement, document.body, ...document.body.querySelectorAll('*')].filter(e => getComputedStyle(e).scrollBehavior === 'smooth').map(e => `${label(e)} scrolls smoothly`);
+    return [...animations, ...transitions, ...smooth];
   });
   return [...found, ...(moving > 0 ? [`${moving} element(s) keep moving under reduced motion (script-driven animation)`] : [])];
 };
@@ -399,7 +441,17 @@ export const reducedMotion = async page => {
 // ---- FL-06 contrast, non-text contrast, forced colours, amber with a label --------------------------------------
 
 const colourTools = () => {
-  const rgba = c => (c.match(/[\d.]+/g) || []).map(Number).concat([1]).slice(0, 4);
+  // Any CSS colour (rgb, color(srgb ...), oklch, color-mix results) normalised by painting it: sRGB 0-255 and alpha 0-1.
+  const rgba = c => {
+    const canvas = rgba.canvas || (rgba.canvas = Object.assign(document.createElement('canvas'), { width: 1, height: 1 }));
+    const ctx = rgba.ctx || (rgba.ctx = canvas.getContext('2d', { willReadFrequently: true }));
+    ctx.clearRect(0, 0, 1, 1);
+    ctx.fillStyle = 'rgba(0, 0, 0, 0)';
+    ctx.fillStyle = c || 'rgba(0, 0, 0, 0)';
+    ctx.fillRect(0, 0, 1, 1);
+    const [r, g, b, a] = ctx.getImageData(0, 0, 1, 1).data;
+    return [r, g, b, a / 255];
+  };
   const over = ([r, g, b, a], [R, G, B]) => [r * a + R * (1 - a), g * a + G * (1 - a), b * a + B * (1 - a), 1];
   const background = e => {
     const layers = [];
@@ -436,7 +488,12 @@ export const textContrast = async page => {
     const fields = [...document.querySelectorAll('input:not([type=hidden]):not([type=checkbox]):not([type=radio]), textarea')].filter(e => !hidden(e));
     const values = fields.filter(e => e.value).flatMap(e => judge(e, getComputedStyle(e).color, e.value));
     const placeholders = fields.filter(e => e.placeholder && !e.value).flatMap(e => judge(e, getComputedStyle(e, '::placeholder').color, e.placeholder));
-    return [...texts, ...values, ...placeholders];
+    // Text generated by ::before and ::after (content: "...").
+    const generated = [...document.body.querySelectorAll('*')].filter(e => !hidden(e)).flatMap(e => ['::before', '::after'].map(p => [e, getComputedStyle(e, p)]))
+      .map(([e, s]) => [e, s, (s.content.match(/^"(.*)"$/) || [, ''])[1].trim()])
+      .filter(([, s, t]) => t !== '' && s.display !== 'none' && s.visibility !== 'hidden')
+      .flatMap(([e, s, t]) => judge(e, s.color, t));
+    return [...texts, ...values, ...placeholders, ...generated];
   });
 };
 
@@ -457,7 +514,7 @@ export const nonTextContrast = async page => {
       const fill = against(s.backgroundColor, outer);
       return Math.max(0, ...borders, ...(fill === null ? [] : [fill]));
     };
-    const controls = [...document.querySelectorAll('input:not([type=hidden]), select, textarea, [role=switch], [role=checkbox], .ef-switch, .ef-checkbox')]
+    const controls = [...document.querySelectorAll('input:not([type=hidden]), select, textarea, [role=switch], [role=checkbox], .ef-switch, .ef-checkbox, progress, meter, [role=progressbar], [role=meter]')]
       .filter(e => !hidden(e))
       .map(e => [e, boundary(e)])
       .filter(([, r]) => r < 2.995)
@@ -493,6 +550,18 @@ export const nonTextContrast = async page => {
 // Under forced colours every status indicator still carries text, and indicators of different states read differently.
 // The runner emulates forcedColors: 'active' for this assertion.
 export const forcedColorsDistinct = async page => {
+  // Markers that differ only by colour (by inline style or by class) are found from their author colours, read with
+  // forced colours off, then judged with forced colours on.
+  await page.emulateMedia({ forcedColors: 'none' });
+  await install(page);
+  const colourOnly = await inPage(page, () => {
+    const small = [...document.body.querySelectorAll('*')].filter(e => { const r = e.getBoundingClientRect(); return r.width > 0 && r.width <= 24 && r.height > 0 && r.height <= 24 && !/[A-Za-z]{2,}/.test(e.textContent || '') && !e.getAttribute('aria-label') && !e.closest('button, a, [role=img][aria-label]'); });
+    const paint = e => { const s = getComputedStyle(e); return [s.backgroundColor, s.color, s.borderTopColor, s.fill].map(c => window.__ef.rgba(c).join(',')).join('|'); };
+    const kinds = new Map();
+    small.filter(e => window.__ef.rgba(getComputedStyle(e).backgroundColor)[3] > 0 || getComputedStyle(e).fill !== 'rgb(0, 0, 0)').forEach(e => { const r = e.getBoundingClientRect(); const k = `${e.tagName}|${Math.round(r.width)}x${Math.round(r.height)}`; kinds.set(k, [...(kinds.get(k) || []), paint(e)]); });
+    return [...kinds.entries()].filter(([, ps]) => new Set(ps).size > 1).map(([k]) => `${k.split('|')[0].toLowerCase()} markers (${k.split('|')[1]}) differ only by colour and carry no text`);
+  });
+  await page.emulateMedia({ forcedColors: 'active' });
   await install(page);
   return inPage(page, () => {
     const lozenges = [...document.querySelectorAll('.ef-status-lozenge')];
@@ -514,7 +583,7 @@ export const forcedColorsDistinct = async page => {
       })(),
       ...states.flatMap(([st, ts], k) => states.slice(k + 1).filter(([, us]) => us.some(u => ts.includes(u))).map(([u]) => `states "${st}" and "${u}" read the same`)),
     ];
-  });
+  }).then(found => [...found, ...colourOnly]);
 };
 
 // Amber (#E9A23B and close shades) never stands alone: an amber element carries a text label (DEC-R7-002).
@@ -522,11 +591,13 @@ export const amberLabelled = async page => {
   await install(page);
   return inPage(page, () => {
     const amber = [233, 162, 59];
-    const near = c => { const v = (c.match(/[\d.]+/g) || []).map(Number); return v.length >= 3 && (v[3] === undefined || v[3] > 0) && Math.hypot(v[0] - amber[0], v[1] - amber[1], v[2] - amber[2]) < 40; };
-    const colours = s => [s.backgroundColor, ...(['Top', 'Right', 'Bottom', 'Left'].filter(k => parseFloat(s[`border${k}Width`]) > 0).map(k => s[`border${k}Color`])), s.fill, s.stroke, ...((s.boxShadow.match(/rgba?\([^)]*\)/g)) || []), ...((s.backgroundImage.match(/rgba?\([^)]*\)|#[0-9a-f]{6}\b/gi)) || []).map(c => c.startsWith('#') ? `rgb(${parseInt(c.slice(1, 3), 16)},${parseInt(c.slice(3, 5), 16)},${parseInt(c.slice(5, 7), 16)})` : c)];
+    const near = c => { if (!c || c === 'none' || c.startsWith('url')) return false; const v = window.__ef.rgba(c); return v[3] > 0 && Math.hypot(v[0] - amber[0], v[1] - amber[1], v[2] - amber[2]) < 40; };
+    const colours = s => [s.backgroundColor, s.color, ...(s.outlineStyle !== 'none' && parseFloat(s.outlineWidth) > 0 ? [s.outlineColor] : []), ...(['Top', 'Right', 'Bottom', 'Left'].filter(k => parseFloat(s[`border${k}Width`]) > 0).map(k => s[`border${k}Color`])), s.fill, s.stroke, ...((s.boxShadow.match(/rgba?\([^)]*\)/g)) || []), ...((s.backgroundImage.match(/rgba?\([^)]*\)|#[0-9a-f]{6}\b/gi)) || []).map(c => c.startsWith('#') ? `rgb(${parseInt(c.slice(1, 3), 16)},${parseInt(c.slice(3, 5), 16)},${parseInt(c.slice(5, 7), 16)})` : c)];
     const amberish = e => colours(getComputedStyle(e)).some(c => c && near(c));
     // The label is visible text in the amber element or beside it (its parent), never only a screen-reader text.
-    const labelled = e => window.__ef.visibleText(e) !== '' || (e.parentElement && window.__ef.visibleText(e.parentElement) !== '');
+    // A label is visible text with letters in it (a coloured glyph such as a dot is not a label).
+    const words = t => /[A-Za-z]{2,}/.test(t);
+    const labelled = e => words(window.__ef.visibleText(e)) || (e.parentElement && words(window.__ef.visibleText(e.parentElement)));
     const candidates = [...document.body.querySelectorAll('*')].filter(e => !window.__ef.hidden(e.closest('svg') || e) && amberish(e));
     // Report the outermost amber element only.
     return candidates.filter(e => !candidates.some(o => o !== e && o.contains(e))).filter(e => !labelled(e)).map(e => `${e.className && typeof e.className === 'string' ? e.className : e.tagName} is amber with no visible text label`);
@@ -540,16 +611,22 @@ export const statusVisible = async page => {
   await settle(page);
   await install(page);
   return inPage(page, () => {
-    const indicators = [...document.querySelectorAll('.ef-status-lozenge, .ef-operation-status, [role=status]')].filter(e => !e.closest('.ef-visually-hidden'));
+    // The save-state indicator: the status lozenge of the header (or, on a page without one, the first lozenge) and
+    // the operation status or conflict review. Other lozenges on the page (timeline, grid) and empty live regions are
+    // not the indicator.
+    const header = [...document.querySelectorAll('.ef-record-header, header')].find(h => h.querySelector('.ef-status-lozenge'));
+    const lozenge = header ? header.querySelector('.ef-status-lozenge') : document.querySelector('.ef-status-lozenge');
+    const operation = document.querySelector('.ef-operation-status, .ef-conflict-review');
+    const indicators = [lozenge, operation].filter(Boolean).filter(e => !e.closest('.ef-visually-hidden'));
     const inView = r => r.width > 0 && r.height > 0 && r.top < window.innerHeight && r.bottom > 0 && r.left < window.innerWidth && r.right > 0;
-    const covered = e => { const r = e.getBoundingClientRect(); const x = Math.min(Math.max(r.left + r.width / 2, 0), window.innerWidth - 1); const y = Math.min(Math.max(r.top + r.height / 2, 0), window.innerHeight - 1); const top = document.elementFromPoint(x, y); return !!top && top !== e && !e.contains(top) && !top.contains(e); };
+    const covered = e => { const r = e.getBoundingClientRect(); const x = Math.min(Math.max(r.left + r.width / 2, 0), window.innerWidth - 1); const y = Math.min(Math.max(r.top + Math.min(r.height / 2, 12), 0), window.innerHeight - 1); const top = document.elementFromPoint(x, y); return !!top && top !== e && !e.contains(top) && !top.contains(e); };
+    const label = e => e.className || e.getAttribute('role');
     return indicators.length === 0
-      ? ['no status indicator on the page']
+      ? ['no save-state indicator (status lozenge, operation status or conflict review) on the page']
       : indicators.flatMap(e => [
-          // Visible text: not screen-reader-only, not zero-sized, not invisible against its background.
-          ...(window.__ef.visibleText(e) === '' ? [`${e.className || e.getAttribute('role')} shows no visible text`] : []),
-          ...(inView(e.getBoundingClientRect()) ? [] : [`${e.className || e.getAttribute('role')} is not visible in the initial viewport`]),
-          ...(inView(e.getBoundingClientRect()) && covered(e) ? [`${e.className || e.getAttribute('role')} is covered by another element`] : []),
+          ...(window.__ef.visibleText(e) === '' ? [`${label(e)} shows no visible text`] : []),
+          ...(inView(e.getBoundingClientRect()) ? [] : [`${label(e)} is not visible in the initial viewport`]),
+          ...(inView(e.getBoundingClientRect()) && covered(e) ? [`${label(e)} is covered by another element`] : []),
         ]);
   });
 };
@@ -568,7 +645,7 @@ export const indicatorComposed = page =>
     const after = (a, b) => !!(a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING);
     return [
       ...(inView(lozenge) ? [] : ['the status lozenge is not visible without scrolling']),
-      ...(freshness ? (inView(freshness) ? [] : ['the freshness line is not visible without scrolling']) : ['no freshness line in or directly after the header']),
+      ...(freshness ? (inView(freshness) && !freshness.closest('.ef-visually-hidden') && window.getComputedStyle(freshness).visibility !== 'hidden' ? [] : ['the freshness line is not visible without scrolling']) : ['no freshness line in or directly after the header']),
       ...(operation ? (inView(operation) ? [] : ['the operation status or conflict review is not visible without scrolling']) : ['no operation status or conflict review']),
       ...(freshness && operation && !after(freshness, operation) ? ['the operation status or conflict review comes before the freshness line'] : []),
     ];
@@ -582,10 +659,14 @@ export const indicatorComposed = page =>
 export const loadingAnnounced = page =>
   inPage(page, () => {
     const loaders = [...document.querySelectorAll('.ef-skeleton, [aria-busy=true], .ef-spinner')];
-    const words = t => (t || '').replace(/[^A-Za-z]/g, '').length >= 3;
+    const words = t => /[A-Za-z]{3,}/.test(t || '');
     const ownName = e => !e.closest('[aria-hidden=true]') && (words(e.textContent) || words(e.getAttribute('aria-label')) || (e.getAttribute('aria-labelledby') || '').split(/\s+/).some(id => { const l = document.getElementById(id); return l && words(l.textContent); }));
-    const live = [...document.querySelectorAll('[role=status], [role=alert], [aria-live=polite], [aria-live=assertive]')].some(r => !r.closest('[aria-hidden=true]') && words(r.textContent));
-    return loaders.length === 0 ? ['no loading placeholder on the page'] : loaders.filter(e => !ownName(e) && !live).map(e => `${e.className || e.tagName} is not announced (no name of its own and no live region saying what is loading)`);
+    // A live region announces a loader only if it is tied to it: it describes the loader (aria-describedby), or it sits
+    // inside the same busy region, and its text says something is loading.
+    const loadingWords = /load|fetch|open|read|wait|sync|prepar|connect/i;
+    const describedBy = e => (e.getAttribute('aria-describedby') || '').split(/\s+/).some(id => { const l = id && document.getElementById(id); return l && words(l.textContent); });
+    const sameBusyRegion = e => { const region = e.closest('[aria-busy=true]') || e; return [...region.querySelectorAll('[role=status], [role=alert], [aria-live=polite], [aria-live=assertive]')].some(r => !r.closest('[aria-hidden=true]') && loadingWords.test(r.textContent || '')); };
+    return loaders.length === 0 ? ['no loading placeholder on the page'] : loaders.filter(e => !ownName(e) && !describedBy(e) && !sameBusyRegion(e)).map(e => `${e.className || e.tagName} is not announced (no name of its own and no live region tied to it saying what is loading)`);
   });
 
 // A fault states what happened in text and offers a next step (a control).
@@ -596,8 +677,15 @@ export const faultActionable = async page => {
   await install(page);
   return inPage(page, () => {
     const faults = [...document.querySelectorAll('[class*="ef-fault"], [role=alert]')].filter(e => !e.parentElement.closest('[class*="ef-fault"], [role=alert]'));
-    // A next step is a visible, enabled control.
-    const usable = c => !window.__ef.hidden(c) && !c.disabled && c.getAttribute('aria-disabled') !== 'true' && !c.inert;
+    // A next step is a visible, enabled control that takes pointer input and is not covered by another element.
+    const onTop = c => {
+      const r = c.getBoundingClientRect();
+      c.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+      const s = c.getBoundingClientRect();
+      const t = document.elementFromPoint(Math.min(Math.max(s.left + s.width / 2, 0), window.innerWidth - 1), Math.min(Math.max(s.top + s.height / 2, 0), window.innerHeight - 1));
+      return r.width > 0 && (!t || c.contains(t) || t.contains(c));
+    };
+    const usable = c => !window.__ef.hidden(c) && !c.disabled && c.getAttribute('aria-disabled') !== 'true' && !c.inert && getComputedStyle(c).pointerEvents !== 'none' && onTop(c);
     return faults.length === 0
       ? ['no fault on the page']
       : faults.flatMap(e => [
@@ -615,7 +703,7 @@ export const faultStatesPreserved = page =>
     // exact PERSIST-031 copy; this catches a fault that omits or contradicts the preservation statement.
     const sentences = e => (e.textContent || '').split(/(?<=[.!?])\s+/);
     const preserved = /\b(kept|preserved|queued|not lost|unchanged|no changes were (applied|made)|still (in|on)|remains? (in|on))\b/i;
-    const negated = /\b(nothing|not|never|no longer|couldn't|could not|can't|cannot|unable to|failed to)\b[^.]*\b(kept|keep|preserved|preserve|saved|save|queued)\b|\b(lost|discarded|deleted|removed|erased|overwritten|gone|wiped)\b(?![^.]*\bnot\b)/i;
+    const negated = /\b(nothing|not|never|no longer|couldn't|could not|can't|cannot|unable to|failed to)\b[^.]*\b(kept|keep|preserved|preserve|saved|save|queued)\b|\b(kept|preserved|saved|queued)\s+(nothing|none)\b|\b(lost|discarded|deleted|removed|erased|overwritten|gone|wiped)\b(?![^.]*\bnot\b)/i;
     const states = e => sentences(e).some(t => preserved.test(t) && !negated.test(t.replace(/not lost/i, '')));
     const denies = e => sentences(e).some(t => negated.test(t.replace(/not lost/i, '')));
     return faults.length === 0
@@ -674,7 +762,7 @@ export const navigationCollapses = page =>
     const persistent = shows('.ef-navigation-shell__persistent');
     // Never a custom menu: no other visible navigation or menu toggle outside the Forma shell.
     const visible = e => { const r = e.getBoundingClientRect(); return r.width > 0 && r.height > 0 && getComputedStyle(e).visibility !== 'hidden' && getComputedStyle(e).display !== 'none'; };
-    const custom = [...document.querySelectorAll('nav, [aria-expanded][aria-controls], [aria-haspopup=menu], [role=menu], [role=menubar]')].filter(e => !shell.contains(e) && visible(e) && !e.closest('[aria-label=Breadcrumb]') && e.getAttribute('aria-label') !== 'Breadcrumb');
+    const custom = [...document.querySelectorAll('nav, button[aria-expanded], [role=button][aria-expanded], [aria-haspopup=menu], [role=menu], [role=menubar], details:has(a[href] ~ a[href], li a[href])')].filter(e => !shell.contains(e) && visible(e) && !e.closest('[aria-label=Breadcrumb]') && e.getAttribute('aria-label') !== 'Breadcrumb');
     const customs = custom.map(e => `a custom ${e.tagName.toLowerCase() === 'nav' ? 'navigation' : 'menu control'} sits outside the Forma navigation shell`);
     return customs.length ? customs : narrow
       ? [...(compact ? [] : ['at 48rem or narrower the compact navigation is not shown']), ...(persistent ? ['at 48rem or narrower the persistent navigation still shows'] : [])]
@@ -687,7 +775,7 @@ export const navigationCollapses = page =>
 // define. Reads document.styleSheets (linked and inline) and every style attribute.
 // formaHref names Forma's own stylesheet; by default the published package's dist/all.css. A linked stylesheet the
 // page cannot read (file: URLs, other origins) is fetched from Node; one that cannot be read at all is a violation.
-export const onlyFormaTokens = async (page, { inventory, formaHref = '/dist/all.css' }) => {
+export const onlyFormaTokens = async (page, { inventory, hooks = [], formaHref = '/dist/all.css' }) => {
   const { readable, unreadable } = await inPage(page, forma => {
     const others = [...document.styleSheets, ...(document.adoptedStyleSheets || [])].filter(s => !(s.href && s.href.endsWith(forma)));
     const text = sheet => { try { return [...sheet.cssRules].map(r => r.cssText).join('\n'); } catch (e) { return null; } };
@@ -708,14 +796,34 @@ export const onlyFormaTokens = async (page, { inventory, formaHref = '/dist/all.
   const used = [...text.matchAll(/var\(\s*(--ef-[a-z0-9-]+)/g)].map(m => m[1]);
   return [
     ...fetched.filter(f => f.text === null).map(f => `stylesheet ${f.href} cannot be read`),
-    ...declared.map(p => `declares ${p}; only Forma defines --ef-* properties`),
-    ...used.filter(p => !inventory.includes(p)).map(p => `uses ${p}, which Forma does not define`),
+    // Setting one of Forma's hooks (a property its stylesheet reads but never defines) is using Forma's API.
+    ...declared.filter(p => !hooks.includes(p)).map(p => `declares ${p}; only Forma defines --ef-* properties`),
+    ...used.filter(p => !inventory.includes(p) && !hooks.includes(p)).map(p => `uses ${p}, which Forma does not define`),
   ];
+};
+
+// ---- FL-06e automated WCAG checks ---------------------------------------------------------------------------
+
+// axe-core's WCAG 2.0-2.2 A and AA rules report no violation. The axe source comes from the caller (axeSource), or
+// from the axe-core package installed beside this module (the event build adds it to package.json, ODR-V41-07).
+const loadAxe = async () => {
+  const { createRequire } = await import('node:module');
+  const { readFileSync } = await import('node:fs');
+  return readFileSync(createRequire(import.meta.url).resolve('axe-core/axe.min.js'), 'utf8');
+};
+
+export const axeClean = async (page, { axeSource } = {}) => {
+  await settle(page);
+  if (!(await inPage(page, () => typeof window.axe !== 'undefined'))) await page.addScriptTag({ content: axeSource || (await loadAxe()) });
+  return inPage(page, async () => {
+    const r = await window.axe.run(document, { runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'] } });
+    return r.violations.flatMap(v => v.nodes.slice(0, 3).map(n => `${v.id}: ${n.target.join(' ')}`));
+  });
 };
 
 export const assertions = {
   touchTargets, noHorizontalScroll, scrollRegionsAccessible, textNotClipped, lineLength, focusVisible, focusOrder,
   skipLinkFirst, dialogFocus, reducedMotion, textContrast, nonTextContrast, forcedColorsDistinct, amberLabelled,
   statusVisible, indicatorComposed, loadingAnnounced, faultActionable, faultStatesPreserved, navigationReachable,
-  navigationCollapses, onlyFormaTokens,
+  navigationCollapses, onlyFormaTokens, axeClean,
 };

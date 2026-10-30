@@ -5,7 +5,7 @@
 //   Forma gaps (contract formaGaps): the unmodified pattern must still fail (so a fixed Forma release is noticed) and
 //   the pattern with the gap's remedy CSS, which may use only Forma tokens, must pass.
 // Usage: node run.mjs --forma <extracted Forma package dir> --contract <forma-layout-contract.json>
-//                     --inventory <forma inventory json> [--browsers chromium,webkit] [--out results.json]
+//                     --inventory <forma inventory json> [--axe axe.min.js] [--browsers chromium,webkit] [--out results.json]
 // Exit 0 when every positive run passes and every negative run fails; 1 otherwise; 2 for unusable input.
 
 import { readFileSync, writeFileSync, mkdtempSync } from 'node:fs';
@@ -28,7 +28,11 @@ if (!args.forma || !args.contract || !args.inventory) {
 }
 
 const contract = JSON.parse(readFileSync(args.contract, 'utf8'));
-const inventory = JSON.parse(readFileSync(args.inventory, 'utf8')).customProperties;
+const inventoryFile = JSON.parse(readFileSync(args.inventory, 'utf8'));
+const inventory = inventoryFile.customProperties;
+const hooks = inventoryFile.hookProperties || [];
+// axe-core: --axe FILE, or the package resolved beside this runner.
+const axeSource = args.axe ? readFileSync(args.axe, 'utf8') : (() => { try { return readFileSync(require.resolve('axe-core/axe.min.js'), 'utf8'); } catch (e) { return undefined; } })();
 const css = pathToFileURL(resolve(args.forma, 'dist/all.css')).href;
 const scratch = mkdtempSync(join(tmpdir(), 'forma-layout-'));
 const viewports = Object.fromEntries(contract.viewports.map(v => [v.id, v]));
@@ -75,7 +79,7 @@ const execute = browser => async run => {
   const tab = await context.newPage();
   try {
     await tab.goto(page(run.target, run.body, vp.textZoom || 1));
-    const violations = await assertions[run.assertion](tab, { inventory });
+    const violations = await assertions[run.assertion](tab, { inventory, hooks, axeSource });
     const ok = run.kind === 'positive' ? violations.length === 0 : violations.length > 0;
     // A gap run that passes means Forma fixed it: fail, so the gap entry is removed.
     if (run.kind === 'gap' && violations.length === 0) violations.push('the Forma gap is closed in this release; remove it from formaGaps');

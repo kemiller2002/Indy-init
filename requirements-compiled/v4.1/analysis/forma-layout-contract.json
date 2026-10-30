@@ -37,7 +37,7 @@
       "id": "VP-200-TEXT",
       "width": 1280,
       "height": 800,
-      "textZoom": 2.0,
+      "textZoom": 2,
       "purpose": "200% text size (WCAG 1.4.4, PERSIST-030)",
       "emulation": "the runner sets the root font size to 200% (WCAG 1.4.4 resize text); media queries keep their 16 px rem, as with a browser's text-only zoom"
     }
@@ -234,6 +234,60 @@
             "skip-link"
           ],
           "viewports": "all"
+        },
+        {
+          "assertion": "touchTargets",
+          "patterns": [
+            "button",
+            "cluster",
+            "command-group",
+            "conflict-review",
+            "container",
+            "diagram",
+            "dialog",
+            "diff-viewer",
+            "empty-state",
+            "evidence-relationship",
+            "facts",
+            "fault-banner",
+            "fault-details",
+            "fault-inline",
+            "form",
+            "form-row",
+            "freshness",
+            "grid",
+            "hierarchy-tree",
+            "key-value-list",
+            "landmark-region",
+            "master-detail",
+            "measure",
+            "navigation-shell",
+            "operation-status",
+            "provenance-trail",
+            "record-header",
+            "recovery-actions",
+            "relationship-index",
+            "select",
+            "sidebar",
+            "site-header",
+            "skeleton",
+            "skip-link",
+            "spinner",
+            "split",
+            "stack",
+            "status-lozenge",
+            "text-field",
+            "textarea",
+            "timeline",
+            "validation-message",
+            "validation-summary",
+            "workspace-shell"
+          ],
+          "viewports": [
+            "VP-320",
+            "VP-DESKTOP"
+          ],
+          "scope": "every pattern the contract tells the team to reuse"
         }
       ]
     },
@@ -291,6 +345,114 @@
             "workspace-shell"
           ],
           "viewports": "all"
+        },
+        {
+          "assertion": "noHorizontalScroll",
+          "patterns": [
+            "button",
+            "cluster",
+            "command-group",
+            "conflict-review",
+            "container",
+            "diagram",
+            "dialog",
+            "diff-viewer",
+            "empty-state",
+            "evidence-relationship",
+            "facts",
+            "fault-banner",
+            "fault-details",
+            "fault-inline",
+            "form",
+            "form-row",
+            "freshness",
+            "grid",
+            "hierarchy-tree",
+            "key-value-list",
+            "landmark-region",
+            "master-detail",
+            "measure",
+            "navigation-shell",
+            "operation-status",
+            "provenance-trail",
+            "record-header",
+            "recovery-actions",
+            "relationship-index",
+            "select",
+            "sidebar",
+            "site-header",
+            "skeleton",
+            "skip-link",
+            "spinner",
+            "split",
+            "stack",
+            "status-lozenge",
+            "text-field",
+            "textarea",
+            "timeline",
+            "validation-message",
+            "validation-summary",
+            "workspace-shell"
+          ],
+          "viewports": [
+            "VP-320",
+            "VP-DESKTOP"
+          ],
+          "scope": "every pattern the contract tells the team to reuse"
+        },
+        {
+          "assertion": "scrollRegionsAccessible",
+          "patterns": [
+            "button",
+            "cluster",
+            "command-group",
+            "conflict-review",
+            "container",
+            "diagram",
+            "dialog",
+            "diff-viewer",
+            "empty-state",
+            "evidence-relationship",
+            "facts",
+            "fault-banner",
+            "fault-details",
+            "fault-inline",
+            "form",
+            "form-row",
+            "freshness",
+            "grid",
+            "hierarchy-tree",
+            "key-value-list",
+            "landmark-region",
+            "master-detail",
+            "measure",
+            "navigation-shell",
+            "operation-status",
+            "provenance-trail",
+            "record-header",
+            "recovery-actions",
+            "relationship-index",
+            "select",
+            "sidebar",
+            "site-header",
+            "skeleton",
+            "skip-link",
+            "spinner",
+            "split",
+            "stack",
+            "status-lozenge",
+            "text-field",
+            "textarea",
+            "timeline",
+            "validation-message",
+            "validation-summary",
+            "workspace-shell"
+          ],
+          "viewports": [
+            "VP-320",
+            "VP-DESKTOP"
+          ],
+          "scope": "every pattern the contract tells the team to reuse"
         }
       ]
     },
@@ -343,6 +505,60 @@
             "measure"
           ],
           "viewports": "all"
+        },
+        {
+          "assertion": "textNotClipped",
+          "patterns": [
+            "button",
+            "cluster",
+            "command-group",
+            "conflict-review",
+            "container",
+            "diagram",
+            "dialog",
+            "diff-viewer",
+            "empty-state",
+            "evidence-relationship",
+            "facts",
+            "fault-banner",
+            "fault-details",
+            "fault-inline",
+            "form",
+            "form-row",
+            "freshness",
+            "grid",
+            "hierarchy-tree",
+            "key-value-list",
+            "landmark-region",
+            "master-detail",
+            "measure",
+            "navigation-shell",
+            "operation-status",
+            "provenance-trail",
+            "record-header",
+            "recovery-actions",
+            "relationship-index",
+            "select",
+            "sidebar",
+            "site-header",
+            "skeleton",
+            "skip-link",
+            "spinner",
+            "split",
+            "stack",
+            "status-lozenge",
+            "text-field",
+            "textarea",
+            "timeline",
+            "validation-message",
+            "validation-summary",
+            "workspace-shell"
+          ],
+          "viewports": [
+            "VP-320",
+            "VP-DESKTOP"
+          ],
+          "scope": "every pattern the contract tells the team to reuse"
         }
       ]
     },
@@ -513,6 +729,13 @@
           "assertions": [
             "amberLabelled"
           ]
+        },
+        {
+          "id": "FL-06e",
+          "invariant": "automated WCAG 2.0-2.2 A and AA checks (axe-core) report no violation, in light and dark",
+          "assertions": [
+            "axeClean"
+          ]
         }
       ],
       "tests": [
@@ -592,6 +815,122 @@
             "VP-320",
             "VP-DESKTOP"
           ]
+        },
+        {
+          "assertion": "textContrast",
+          "patterns": [
+            "button",
+            "cluster",
+            "command-group",
+            "conflict-review",
+            "container",
+            "diagram",
+            "dialog",
+            "diff-viewer",
+            "empty-state",
+            "evidence-relationship",
+            "facts",
+            "fault-banner",
+            "fault-details",
+            "fault-inline",
+            "form",
+            "form-row",
+            "freshness",
+            "grid",
+            "hierarchy-tree",
+            "key-value-list",
+            "landmark-region",
+            "master-detail",
+            "measure",
+            "navigation-shell",
+            "operation-status",
+            "provenance-trail",
+            "record-header",
+            "recovery-actions",
+            "relationship-index",
+            "select",
+            "sidebar",
+            "site-header",
+            "skeleton",
+            "skip-link",
+            "spinner",
+            "split",
+            "stack",
+            "status-lozenge",
+            "text-field",
+            "textarea",
+            "timeline",
+            "validation-message",
+            "validation-summary",
+            "workspace-shell"
+          ],
+          "viewports": [
+            "VP-320",
+            "VP-DESKTOP"
+          ],
+          "colorSchemes": [
+            "light",
+            "dark"
+          ],
+          "scope": "every pattern the contract tells the team to reuse"
+        },
+        {
+          "assertion": "axeClean",
+          "patterns": [
+            "button",
+            "cluster",
+            "command-group",
+            "conflict-review",
+            "container",
+            "diagram",
+            "dialog",
+            "diff-viewer",
+            "empty-state",
+            "evidence-relationship",
+            "facts",
+            "fault-banner",
+            "fault-details",
+            "fault-inline",
+            "form",
+            "form-row",
+            "freshness",
+            "grid",
+            "hierarchy-tree",
+            "key-value-list",
+            "landmark-region",
+            "master-detail",
+            "measure",
+            "navigation-shell",
+            "operation-status",
+            "provenance-trail",
+            "record-header",
+            "recovery-actions",
+            "relationship-index",
+            "select",
+            "sidebar",
+            "site-header",
+            "skeleton",
+            "skip-link",
+            "spinner",
+            "split",
+            "stack",
+            "status-lozenge",
+            "text-field",
+            "textarea",
+            "timeline",
+            "validation-message",
+            "validation-summary",
+            "workspace-shell"
+          ],
+          "viewports": [
+            "VP-320",
+            "VP-DESKTOP"
+          ],
+          "colorSchemes": [
+            "light",
+            "dark"
+          ],
+          "scope": "every pattern the contract tells the team to reuse"
         }
       ]
     },
@@ -631,7 +970,24 @@
             "status-lozenge",
             "operation-status"
           ],
-          "viewports": "all"
+          "viewports": "all",
+          "composed": [
+            [
+              "record-header",
+              "operation-status",
+              "timeline"
+            ],
+            [
+              "record-header",
+              "operation-status",
+              "form"
+            ],
+            [
+              "record-header",
+              "conflict-review",
+              "data-grid"
+            ]
+          ]
         },
         {
           "assertion": "indicatorComposed",
@@ -802,6 +1158,59 @@
           "viewports": [
             "VP-DESKTOP"
           ]
+        },
+        {
+          "assertion": "onlyFormaTokens",
+          "patterns": [
+            "button",
+            "cluster",
+            "command-group",
+            "conflict-review",
+            "container",
+            "diagram",
+            "dialog",
+            "diff-viewer",
+            "empty-state",
+            "evidence-relationship",
+            "facts",
+            "fault-banner",
+            "fault-details",
+            "fault-inline",
+            "form",
+            "form-row",
+            "freshness",
+            "grid",
+            "hierarchy-tree",
+            "key-value-list",
+            "landmark-region",
+            "master-detail",
+            "measure",
+            "navigation-shell",
+            "operation-status",
+            "provenance-trail",
+            "record-header",
+            "recovery-actions",
+            "relationship-index",
+            "select",
+            "sidebar",
+            "site-header",
+            "skeleton",
+            "skip-link",
+            "spinner",
+            "split",
+            "stack",
+            "status-lozenge",
+            "text-field",
+            "textarea",
+            "timeline",
+            "validation-message",
+            "validation-summary",
+            "workspace-shell"
+          ],
+          "viewports": [
+            "VP-DESKTOP"
+          ],
+          "scope": "every pattern the contract tells the team to reuse"
         }
       ]
     }
@@ -824,9 +1233,104 @@
         "VP-DESKTOP"
       ],
       "rule": "FL-01",
-      "finding": "Forma 0.12.0's navigation-shell links are 26 px tall at VP-320, both iPad viewports and VP-DESKTOP, below --ef-layout-target-min (44 px); at 200% text they reach 52 px. Found by the executable FL-01 assertion.",
-      "remedyCss": ".ef-navigation-shell nav a{display:flex;align-items:center;min-block-size:var(--ef-layout-target-min)}",
-      "remedy": "web/causa.css applies the remedy, which reads only the Forma token --ef-layout-target-min; report the gap to Forma's owner."
+      "finding": "Forma 0.12.0's navigation-shell links are shorter (or narrower) than --ef-layout-target-min (44 px) at VP-320, VP-IPAD-PORTRAIT, VP-IPAD-LANDSCAPE, VP-DESKTOP. Found by running FL-01 on every reuse pattern.",
+      "remedyCss": "a[href]{display:inline-flex;align-items:center;min-block-size:var(--ef-layout-target-min);min-inline-size:var(--ef-layout-target-min)}",
+      "remedy": "web/causa.css gives every link the Forma target size: display:inline-flex with min-block-size and min-inline-size set to var(--ef-layout-target-min). FL-01 has no exception for links in running text, so the remedy covers them too."
+    },
+    {
+      "assertion": "touchTargets",
+      "pattern": "cluster",
+      "viewports": [
+        "VP-320",
+        "VP-DESKTOP"
+      ],
+      "rule": "FL-01",
+      "finding": "Forma 0.12.0's cluster links are shorter (or narrower) than --ef-layout-target-min (44 px) at VP-320, VP-DESKTOP. Found by running FL-01 on every reuse pattern.",
+      "remedyCss": "a[href]{display:inline-flex;align-items:center;min-block-size:var(--ef-layout-target-min);min-inline-size:var(--ef-layout-target-min)}",
+      "remedy": "web/causa.css gives every link the Forma target size: display:inline-flex with min-block-size and min-inline-size set to var(--ef-layout-target-min). FL-01 has no exception for links in running text, so the remedy covers them too."
+    },
+    {
+      "assertion": "touchTargets",
+      "pattern": "diagram",
+      "viewports": [
+        "VP-320",
+        "VP-DESKTOP"
+      ],
+      "rule": "FL-01",
+      "finding": "Forma 0.12.0's diagram links are shorter (or narrower) than --ef-layout-target-min (44 px) at VP-320, VP-DESKTOP. Found by running FL-01 on every reuse pattern.",
+      "remedyCss": "a[href]{display:inline-flex;align-items:center;min-block-size:var(--ef-layout-target-min);min-inline-size:var(--ef-layout-target-min)}",
+      "remedy": "web/causa.css gives every link the Forma target size: display:inline-flex with min-block-size and min-inline-size set to var(--ef-layout-target-min). FL-01 has no exception for links in running text, so the remedy covers them too."
+    },
+    {
+      "assertion": "touchTargets",
+      "pattern": "landmark-region",
+      "viewports": [
+        "VP-320",
+        "VP-DESKTOP"
+      ],
+      "rule": "FL-01",
+      "finding": "Forma 0.12.0's landmark-region links are shorter (or narrower) than --ef-layout-target-min (44 px) at VP-320, VP-DESKTOP. Found by running FL-01 on every reuse pattern.",
+      "remedyCss": "a[href]{display:inline-flex;align-items:center;min-block-size:var(--ef-layout-target-min);min-inline-size:var(--ef-layout-target-min)}",
+      "remedy": "web/causa.css gives every link the Forma target size: display:inline-flex with min-block-size and min-inline-size set to var(--ef-layout-target-min). FL-01 has no exception for links in running text, so the remedy covers them too."
+    },
+    {
+      "assertion": "touchTargets",
+      "pattern": "record-header",
+      "viewports": [
+        "VP-320",
+        "VP-DESKTOP"
+      ],
+      "rule": "FL-01",
+      "finding": "Forma 0.12.0's record-header links are shorter (or narrower) than --ef-layout-target-min (44 px) at VP-320, VP-DESKTOP. Found by running FL-01 on every reuse pattern.",
+      "remedyCss": "a[href]{display:inline-flex;align-items:center;min-block-size:var(--ef-layout-target-min);min-inline-size:var(--ef-layout-target-min)}",
+      "remedy": "web/causa.css gives every link the Forma target size: display:inline-flex with min-block-size and min-inline-size set to var(--ef-layout-target-min). FL-01 has no exception for links in running text, so the remedy covers them too."
+    },
+    {
+      "assertion": "touchTargets",
+      "pattern": "relationship-index",
+      "viewports": [
+        "VP-320",
+        "VP-DESKTOP"
+      ],
+      "rule": "FL-01",
+      "finding": "Forma 0.12.0's relationship-index links are shorter (or narrower) than --ef-layout-target-min (44 px) at VP-320, VP-DESKTOP. Found by running FL-01 on every reuse pattern.",
+      "remedyCss": "a[href]{display:inline-flex;align-items:center;min-block-size:var(--ef-layout-target-min);min-inline-size:var(--ef-layout-target-min)}",
+      "remedy": "web/causa.css gives every link the Forma target size: display:inline-flex with min-block-size and min-inline-size set to var(--ef-layout-target-min). FL-01 has no exception for links in running text, so the remedy covers them too."
+    },
+    {
+      "assertion": "touchTargets",
+      "pattern": "sidebar",
+      "viewports": [
+        "VP-320",
+        "VP-DESKTOP"
+      ],
+      "rule": "FL-01",
+      "finding": "Forma 0.12.0's sidebar links are shorter (or narrower) than --ef-layout-target-min (44 px) at VP-320, VP-DESKTOP. Found by running FL-01 on every reuse pattern.",
+      "remedyCss": "a[href]{display:inline-flex;align-items:center;min-block-size:var(--ef-layout-target-min);min-inline-size:var(--ef-layout-target-min)}",
+      "remedy": "web/causa.css gives every link the Forma target size: display:inline-flex with min-block-size and min-inline-size set to var(--ef-layout-target-min). FL-01 has no exception for links in running text, so the remedy covers them too."
+    },
+    {
+      "assertion": "touchTargets",
+      "pattern": "validation-summary",
+      "viewports": [
+        "VP-DESKTOP"
+      ],
+      "rule": "FL-01",
+      "finding": "Forma 0.12.0's validation-summary links are shorter (or narrower) than --ef-layout-target-min (44 px) at VP-DESKTOP. Found by running FL-01 on every reuse pattern.",
+      "remedyCss": "a[href]{display:inline-flex;align-items:center;min-block-size:var(--ef-layout-target-min);min-inline-size:var(--ef-layout-target-min)}",
+      "remedy": "web/causa.css gives every link the Forma target size: display:inline-flex with min-block-size and min-inline-size set to var(--ef-layout-target-min). FL-01 has no exception for links in running text, so the remedy covers them too."
+    },
+    {
+      "assertion": "touchTargets",
+      "pattern": "workspace-shell",
+      "viewports": [
+        "VP-320",
+        "VP-DESKTOP"
+      ],
+      "rule": "FL-01",
+      "finding": "Forma 0.12.0's workspace-shell links are shorter (or narrower) than --ef-layout-target-min (44 px) at VP-320, VP-DESKTOP. Found by running FL-01 on every reuse pattern.",
+      "remedyCss": "a[href]{display:inline-flex;align-items:center;min-block-size:var(--ef-layout-target-min);min-inline-size:var(--ef-layout-target-min)}",
+      "remedy": "web/causa.css gives every link the Forma target size: display:inline-flex with min-block-size and min-inline-size set to var(--ef-layout-target-min). FL-01 has no exception for links in running text, so the remedy covers them too."
     }
   ]
 }

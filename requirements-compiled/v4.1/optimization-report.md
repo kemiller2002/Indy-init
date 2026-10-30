@@ -170,7 +170,8 @@ These are verified on every commit, each with negative controls.
 - Every layout rule is critical and has executable assertions for each invariant it states (X15), and the event-build copy of the module is an integration-owned file the bootstrap writes. CI runs them in Chromium and WebKit:
   - each passes on the listed Forma patterns at the listed viewports and colour schemes;
   - each fails on its broken fixture.
-- One Forma gap is recorded with a remedy that uses only Forma tokens (below).
+- Nine Forma gaps are recorded, all with one remedy that uses only Forma tokens (below).
+- Every reuse pattern is also run for touch targets, horizontal scroll, scroll regions, clipping, contrast (light and dark), axe-core (light and dark) and tokens, at 320 px and desktop.
 
 **Preservation:** nothing in v4 was removed or weakened (X10), and every binding is in exactly one suite (X09).
 
@@ -178,10 +179,11 @@ These are verified on every commit, each with negative controls.
 
 ## Found by the executable layout tests
 
-**Forma 0.12.0's `navigation-shell` links are 26 px tall** at 320 px, both iPad sizes and desktop. That is below `--ef-layout-target-min` (44 px); at 200% text they reach 52 px.
+**Forma 0.12.0 links are shorter than `--ef-layout-target-min` (44 px) in nine reuse patterns:** `navigation-shell` (26 px tall, at 320 px, both iPad sizes and desktop), and `cluster`, `diagram`, `landmark-region`, `record-header`, `relationship-index`, `sidebar`, `validation-summary` and `workspace-shell`. FL-01 has no exception for links in running text.
 
-- **Remedy (in `formaGaps`):** `web/causa.css` sets `min-block-size: var(--ef-layout-target-min)` on those links, using only the Forma token.
-- **CI behaviour:** CI checks that the raw pattern still fails, so a Forma fix is noticed, and that the remedied pattern passes.
+- **Remedy (in `formaGaps`):** `web/causa.css` gives every link `display: inline-flex` with `min-block-size` and `min-inline-size` set to `var(--ef-layout-target-min)`, using only the Forma token.
+- **CI behaviour:** CI checks that each raw pattern still fails, so a Forma fix is noticed, and that each remedied pattern passes.
+- **Contrast and axe-core:** all 44 reuse patterns pass in light and dark.
 - **Next step:** report the gap to Forma's owner.
 
 ## Estimated improvements
@@ -214,7 +216,7 @@ The telemetry spec ([analysis/conflict-telemetry.json](analysis/conflict-telemet
 | R41-08 | UI-016's amber `#E9A23B` is not a Forma value | ODR-V41-05 |
 | R41-09 | No test framework or Playwright version is locked, so the bootstrap builds test projects without one | ODR-V41-07 |
 | R41-10 | `Confirmation.ofReadBack` can still be called with the same bytes twice | The plan's INV-01 tests (Mutation.INV01.ReadBackSkipped, Property.INV01) guard that path |
-| R41-11 | The layout assertions are DOM checks in a real browser, not proofs. Known limits:<br>• `textContrast` skips text over images and gradients;<br>• `faultStatesPreserved` checks wording against a fixed vocabulary;<br>• `touchTargets` treats a pointer cursor as a sign of a control;<br>• `reducedMotion` samples the page between 1.5 s and 1.9 s after load;<br>• `focusOrder` requires every control to be reached only on pages with at most 25;<br>• `amberLabelled` accepts visible text in the amber element's parent as its label.<br>Round 5's 110 defect runs were all caught except 13 that do not violate the rule (Forma wraps the text, or its global reduced-motion rule already applies) and the gradient case | The plan tests check the exact PERSIST-031 copy and run axe, which covers contrast over images. Every defect found in review is a broken page that must fail in CI (69) |
+| R41-11 | The layout assertions are DOM checks in a real browser, not proofs. Known limits:<br>• `textContrast` skips text over images and gradients;<br>• `faultStatesPreserved` checks wording against a fixed vocabulary;<br>• `touchTargets` treats a pointer cursor as a sign of a control;<br>• `reducedMotion` samples the page between 1.5 s and 1.9 s after load;<br>• `focusOrder` requires every control to be reached only on pages with at most 25;<br>• `amberLabelled` accepts visible text in the amber element's parent as its label;<br>• `focusOrder` compares Tab order with DOM order, not with visual order (a `flex-direction: row-reverse` row is missed);<br>• `touchTargets` cannot see a click handler added by script to an element with no role, tabindex, `onclick` attribute or pointer cursor;<br>• `textContrast` skips text over gradients and images (axe-core also leaves these for review).<br>**Measured catch rate** (Chromium, a defect counts as caught when any assertion of its rule fails):<br>• round 6's 127 defect runs: 114 caught; of the 13 others, 11 do not violate the rule on Forma (Forma wraps long words, or its reduced-motion rule already applies; a title names the region; the page says what was kept; the navigation matches Forma at that width) and 2 are the click-handler miss;<br>• round 5's 110 runs: 96 caught; of the 14 others, 12 do not violate the rule and 2 are the gradient and `row-reverse` misses | The plan tests check the exact PERSIST-031 copy and run axe, which covers contrast over images. Every defect found in review is a broken page that must fail in CI (81) |
 
 ## Finding F41-01 (resolved at the owner's direction)
 

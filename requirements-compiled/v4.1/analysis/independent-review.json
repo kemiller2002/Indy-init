@@ -394,6 +394,59 @@
           "status": "remediated, pending re-review"
         }
       ]
+    },
+    {
+      "round": 6,
+      "reviewedCommit": "659e9dd",
+      "verdict": "FAIL",
+      "counts": {
+        "critical": 0,
+        "major": 4,
+        "minor": 1
+      },
+      "ownerAdjustments": {
+        "review": "partly: RV41-5-1 still open",
+        "typeShapeReconciliation": "achieved",
+        "executableLayoutTests": "partly: undisclosed misses, colour misreads, hidden Forma gaps and false failures (RV41-6-1..4)",
+        "bootstrap": "achieved"
+      },
+      "findings": [
+        {
+          "id": "RV41-6-1",
+          "severity": "major",
+          "finding": "Common real defects were still missed and not disclosed (RV41-5-1 still open): line length measured per inline fragment, loaders accepted any live region, text clipping excused by any label, motion in pseudo-elements, and others",
+          "remediation": "lineLength groups a block's text rectangles by line; loadingAnnounced requires the loader's own name, aria-describedby or a live region with loading words in the same busy region; textNotClipped is excused only when a label carries the clipped text; reducedMotion reads ::before and ::after and smooth scrolling; focusVisible tabs through every focusable element and fails a covered focused element; dialogFocus waits 1000 ms; the skip link's target must be displayed; touchTargets looks inside open shadow roots; scroll regions fail transparent or under-4 px bars; contrast covers filter: opacity() and ::before/::after text; fault actions must take pointer input and not be covered; \"kept nothing\" counts as a loss; a <details> link menu beside the shell is a custom menu; axe-core 4.14.0 runs as axeClean (FL-06e) on every reuse pattern in light and dark. Measured (Chromium; a defect is caught when any assertion of its rule fails): round 6's 127 runs, 114 caught, 11 of the rest are not violations on Forma and 2 are the disclosed click-handler miss; round 5's 110 runs, 96 caught, 12 not violations, 2 disclosed (gradient, row-reverse). 81 broken pages. R41-11 lists every known miss",
+          "status": "remediated, pending re-review"
+        },
+        {
+          "id": "RV41-6-2",
+          "severity": "major",
+          "finding": "The colour parser misread color(srgb ...), oklch and color-mix results in both directions (wrong passes and wrong failures)",
+          "remediation": "Every colour is normalised by painting it on a 1x1 canvas and reading the pixel, in both helper copies; amberLabelled compares text, background, border and outline colours through the same function",
+          "status": "remediated, pending re-review"
+        },
+        {
+          "id": "RV41-6-3",
+          "severity": "major",
+          "finding": "Forma gaps were hidden because each assertion ran on a hand-picked pattern list, not the contract's reuse patterns",
+          "remediation": "touchTargets, noHorizontalScroll, scrollRegionsAccessible, textNotClipped, textContrast (light and dark), axeClean (light and dark) and onlyFormaTokens run on all 44 reuse patterns at VP-320 and VP-DESKTOP. Nine Forma gaps are recorded (links shorter than 44 px in navigation-shell, cluster, diagram, landmark-region, record-header, relationship-index, sidebar, validation-summary and workspace-shell) with one token-only remedy covering every link; CI checks each raw pattern still fails and each remedied pattern passes. Forma's documented hook properties (inline --ef-* on diagram nodes) are in the inventory and allowed",
+          "status": "remediated, pending re-review"
+        },
+        {
+          "id": "RV41-6-4",
+          "severity": "major",
+          "finding": "statusVisible failed correct Forma pages (any lozenge below the fold, an empty role=status in the form pattern)",
+          "remediation": "statusVisible judges only the save indicator: the record header's lozenge (or the first lozenge) and the operation status or conflict review. Composed positive pages: record-header + operation-status + timeline, + form, and record-header + conflict-review + data-grid",
+          "status": "remediated, pending re-review"
+        },
+        {
+          "id": "RV41-6-5",
+          "severity": "minor",
+          "finding": "Smaller false failures and misses: title-named scroll region rejected; shadow DOM, transparent and 1 px scroll bars, display:none skip target, filter: opacity and pseudo-element text, amber outline, late dialog focus moves, 1 px status text",
+          "remediation": "Each fixed as listed under RV41-6-1 and RV41-6-2; a title names a scroll region; master-detail's region with focusable content is accepted as axe does. Each defect is now a broken page that must fail in CI",
+          "status": "remediated, pending re-review"
+        }
+      ]
     }
   ]
 }
