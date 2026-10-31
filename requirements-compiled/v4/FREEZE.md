@@ -1,6 +1,6 @@
 # v4 freeze declaration
 
-**Status: CANDIDATE.** Package v4 is compiled and validated, the owner's decisions ODR-V4-02..11 are recorded and applied, and its independent review record passes for the plan as now compiled (rounds 7 and 8). It is not approved (ODR-V4-01 is pending) and not frozen.
+**Status: CANDIDATE.** Package v4 is compiled and validated, the owner's decisions ODR-V4-02..11 are recorded and applied, and its independent review record passes for the plan as now compiled (rounds 7 and 8). It is not approved and not frozen: the owner's package approval APR-V4-OWNER-2 (#56) names the compiler test record as it was before the test fix in #57, so ODR-V4-01 must be recorded again.
 
 This file explains the status. The authoritative values are in [`freeze-manifest.json`](freeze-manifest.json), which the compiler writes and CI reproduces byte for byte (`requirements-compiler v4 --check`).
 
@@ -13,7 +13,7 @@ Each state is established differently. Only the first two are computed by the co
 | Compiled | **yes** | The v3 pipeline returns compilation PASS (V01–V18), and the v4 stage generates every artifact |
 | Validated | **yes** | Checks W01–W16 pass (`package-validation-report.json`), and plan-readiness is READY with 1211 of 1211 category checks and no permits |
 | Independently reviewed | **record: yes** | Eight review rounds were run (`independent-review.md`): rounds 1 to 5 FAIL, round 6 PASS, round 7 PASS for the plan with the owner's amendments applied and round 8 PASS for its remediation, with no critical or major finding open and residuals recorded. FG-09 computes PASS from the record, and only when the last round names the content digest of the plan being frozen. The record is written by the package author from the reviewer's report, so it is a record, not an authenticated attestation |
-| Approved | **no** | The owner recorded ODR-V4-02..11 in operator approval APR-V4-OWNER-1 (`kickoff/rehearsal-007/approvals.causa.json`, commit `cbc752b`), and the plan applies them. The package approval ODR-V4-01 has no record yet. Under RDP-003 only the operator writes them. The compiler checks that each record has a trusted approver, sits in a commit without agent trailers, is on origin/main and matches the proposal exactly. It cannot authenticate the person behind the record |
+| Approved | **no** | The owner recorded ODR-V4-02..11 in operator approval APR-V4-OWNER-1 (`kickoff/rehearsal-007/approvals.causa.json`, commit `cbc752b`), and the plan applies them. The package approval ODR-V4-01 was recorded as APR-V4-OWNER-2 (commit `62a1699`, the pinned commit), but it names the test record `4f65dfd4…`, which the test fix in #57 replaced. It must be recorded again. Under RDP-003 only the operator writes them. The compiler checks that each record has a trusted approver, sits in a commit without agent trailers, is on origin/main and matches the proposal exactly. It cannot authenticate the person behind the record |
 | Frozen | **no** | Never computed. The package is frozen only when the owner approves the freeze pull request on GitHub, and then the tag `indy-init-requirements-v4.0.0` is created on its merge commit. The kickoff (T01) and acceptance gate AG-13 check the tag, its manifest digests and the owner's review |
 
 ## Freeze gate (from `freeze-manifest.json`)
@@ -24,7 +24,7 @@ Each state is established differently. Only the first two are computed by the co
 | FG-02 | No mandatory requirement disappeared | PASS |
 | FG-03 | Every P0 requirement has acceptance coverage | PASS |
 | FG-04 | No unresolved critical contradiction | PASS |
-| FG-05 | All required owner approvals exist | **FAIL**: pending ODR-V4-01 only |
+| FG-05 | All required owner approvals exist | **FAIL**: pending ODR-V4-01 only (APR-V4-OWNER-2 names the previous test record) |
 | FG-06 | Dependency lock valid | PASS |
 | FG-07 | Execution plan complete, and the selected topology fits | PASS: the owner selected C (role lanes with two UI agents), which fits at 405 of 420 minutes |
 | FG-08 | Compiler tests pass | PASS (the record matches the compiler tree; CI re-runs the suite and compares) |
@@ -45,7 +45,7 @@ Each state is established differently. Only the first two are computed by the co
 
 ## What the owner does to freeze v4
 
-Steps 1 to 3 are done: the owner's APR-V4-OWNER-1 (#51), and the curation, recompile and review rounds 7 and 8 (#52).
+Steps 1 to 3 are done: the owner's APR-V4-OWNER-1 (#51), and the curation, recompile and review rounds 7 and 8 (#52). Step 4 was done as APR-V4-OWNER-2 (#56). Step 5 found that a freeze control asserted that the committed package is always a CANDIDATE, so the suite could never pass once the approval was pinned. #57 fixes the control: READY-FOR-OWNER-FREEZE is allowed once the pinned approvals hold the package approval and the freeze commit is verified. The test files are part of the compiler tree, so the test record changed, and step 4 must be repeated with the new record's digest.
 
 1. Decide ODR-V4-02..11 in `proposals/owner-decision-requests.json`.
    - Write each decision as a change in one operator approval in `kickoff/rehearsal-007/approvals.causa.json`: `{"id", "authority": {"kind": "operator", "id": "kemiller2002"}, "date", "changes": [...]}`. This is the schema verify-plan authorizes (see `recordFormat`).

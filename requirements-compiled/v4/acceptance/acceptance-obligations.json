@@ -2,8 +2,8 @@
   "schema": "indy-init.v4-acceptance-obligations/1",
   "description": "Every P0 obligation of the verification plan as an acceptance obligation (required tests, producer, consumer, method, pass and failure conditions), plus the invariant and Rehearsal 7 lesson tests that strengthen the binding of existing obligations. The implementing agent cannot change this file: it is regenerated from the frozen plan and analysis, and its digest is in freeze-manifest.json.",
   "plan": {
-    "planId": "VP-a1999095ce0a",
-    "digest": "a1999095ce0ab5ac11bc3c66a055f8552ec73d03a2c75a8c7c4b983457ce4d78"
+    "planId": "VP-0ac7f60fc9e9",
+    "digest": "0ac7f60fc9e99c7d98403a0c2c78d3457942997a5cce38ca643cb4755b787c1a"
   },
   "summary": {
     "total": 655,
