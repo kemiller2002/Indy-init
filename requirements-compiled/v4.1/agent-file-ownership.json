@@ -18,10 +18,10 @@
     "Integration alone writes: .gitignore, every project and solution file, Directory.*.props and .targets, NuGet.config, global.json, package.json, package-lock.json, playwright.config.ts, *.runsettings, build.fsx, README.md, .github/, .echelon/, tests/fixtures/, tests/browser/support/, web/boundary.js, src/Causa.Host/, src/Causa.App/View.fs and src/Causa.App/Program.fs (check X02). web/index.html and web/causa.css are ui's (T16)."
   ],
   "counts": {
-    "files": 266,
-    "domain": 32,
+    "files": 270,
+    "domain": 35,
     "persistence": 51,
-    "ui": 70,
+    "ui": 71,
     "ui-2": 11,
     "integration": 99,
     "coordinator": 1,
@@ -176,6 +176,7 @@
         "tests/Causa.Invariants/Live/INV22.fs",
         "tests/Causa.Invariants/Model/INV08.fs",
         "tests/Causa.Invariants/Mutation/INV01.fs",
+        "tests/Causa.Invariants/Negative/INV02.fs",
         "tests/Causa.Invariants/Negative/INV03.fs",
         "tests/Causa.Invariants/Negative/INV07.fs",
         "tests/Causa.Invariants/Negative/INV11.fs",
@@ -183,7 +184,9 @@
         "tests/Causa.Invariants/Negative/INV21.fs",
         "tests/Causa.Invariants/Negative/INV22.fs",
         "tests/Causa.Invariants/Negative/INV24.fs",
+        "tests/Causa.Invariants/Negative/INV25.fs",
         "tests/Causa.Invariants/Property/INV01.fs",
+        "tests/Causa.Invariants/Property/INV02.fs",
         "tests/Causa.Invariants/Property/INV03.fs",
         "tests/Causa.Invariants/Property/INV04.fs",
         "tests/Causa.Invariants/Property/INV05.fs",
@@ -2038,6 +2041,19 @@
       ]
     },
     {
+      "path": "tests/Causa.Invariants/Negative/INV02.fs",
+      "owner": "domain",
+      "kind": "test",
+      "project": "Causa.Invariants",
+      "tests": [
+        "dotnet:Causa.Invariants.Negative.INV02.LateConflictReReadKeepsOtherWriter",
+        "dotnet:Causa.Invariants.Negative.INV02.StaleRefreshDropped"
+      ],
+      "requirements": [
+        "PERSIST-051"
+      ]
+    },
+    {
       "path": "tests/Causa.Invariants/Negative/INV03.fs",
       "owner": "domain",
       "kind": "test",
@@ -2122,6 +2138,18 @@
       ]
     },
     {
+      "path": "tests/Causa.Invariants/Negative/INV25.fs",
+      "owner": "domain",
+      "kind": "test",
+      "project": "Causa.Invariants",
+      "tests": [
+        "dotnet:Causa.Invariants.Negative.INV25.UnresolvableConflictExports"
+      ],
+      "requirements": [
+        "PERSIST-012"
+      ]
+    },
+    {
       "path": "tests/Causa.Invariants/Property/INV01.fs",
       "owner": "domain",
       "kind": "test",
@@ -2131,6 +2159,18 @@
       ],
       "requirements": [
         "PERSIST-023"
+      ]
+    },
+    {
+      "path": "tests/Causa.Invariants/Property/INV02.fs",
+      "owner": "domain",
+      "kind": "test",
+      "project": "Causa.Invariants",
+      "tests": [
+        "dotnet:Causa.Invariants.Property.INV02.ReorderedRepliesAreInert"
+      ],
+      "requirements": [
+        "PERSIST-051"
       ]
     },
     {
@@ -3415,6 +3455,17 @@
       ],
       "requirements": [
         "UI-011"
+      ]
+    },
+    {
+      "path": "tests/browser/invariants/INV-25.spec.js",
+      "owner": "ui",
+      "kind": "test",
+      "tests": [
+        "playwright:invariants/INV-25.spec.js > reconnect keeps unsaved work [chromium]"
+      ],
+      "requirements": [
+        "PERSIST-031"
       ]
     },
     {

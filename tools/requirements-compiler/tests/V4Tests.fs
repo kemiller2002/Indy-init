@@ -60,7 +60,12 @@ let planInputs (source: string) : VerificationPlan.Inputs =
 /// the content digest the package approval names, so the approval can name the plan that pins it.
 let approvalDigestControl (source: string) : string list =
     let i = planInputs source
-    let withRecord = JObj [ "schema", JStr "causa.requirements-approvals/1"; "approvals", JArr [ JObj [ "decision_id", JStr "ODR-V4-01"; "action", JStr "approve-package" ] ] ]
+    // The owner appends the package approval to the pinned file, after any records already there.
+    let packageApproval =
+        JObj [ "id", JStr "APR-CONTROL"
+               "authority", JObj [ "kind", JStr "operator"; "id", JStr(List.head i.Approvals.TrustedOperators) ]
+               "changes", JArr [ JObj [ "decision_id", JStr "ODR-V4-01"; "action", JStr "approve-package" ] ] ]
+    let withRecord = setIn "approvals" (JArr(arr "approvals" i.Approvals.Document @ [ packageApproval ])) i.Approvals.Document
     let bytes = Text.Encoding.UTF8.GetBytes(serialize withRecord)
     let approved = { i with Approvals = { i.Approvals with Commit = String('a', 40); Sha256 = Git.sha256Hex bytes; Document = withRecord } }
     let before, after = VerificationPlan.build i, VerificationPlan.build approved
@@ -112,9 +117,24 @@ let scope (source: string) : string list =
       let strengthened = parseFile (Path.Combine(v4 source, "proposals", "v4-strengthened-bindings.proposed.json"))
       if serialize (JArr(arr "testBindings" i.Spec)) <> serialize (JArr(TestBindingProposal.applyTo (TestBindingProposal.applyTo (arr "testBindings" v3Spec) r7Proposal) strengthened)) then
           yield "v4: the curation's testBindings are not exactly v3's bindings extended by the r7 proposal and then the v4 strengthened proposal"
-      // No agent-written approval (RDP-003): nothing is amended or excluded.
-      if not (arr "approvals" i.Approvals.Document).IsEmpty then yield "v4: the pinned approvals file holds approval records; only the operator may write them (RDP-003)"
-      if not (arr "obligationAmendments" i.Spec).IsEmpty || not (arr "exclusions" i.Spec).IsEmpty then yield "v4: the curation amends or excludes an obligation without an operator record"
+      // RDP-003: the pinned approvals file holds only trusted-operator records, last changed in a commit no agent
+      // wrote, and the curation amends only what such a record authorizes; nothing is excluded.
+      for ap in arr "approvals" i.Approvals.Document do
+          let auth = field "authority" ap |> Option.defaultValue JNull
+          if strOpt "kind" auth <> Some "operator" || not (List.contains (str "id" auth) i.Approvals.TrustedOperators) then
+              yield sprintf "v4: approval %s in the pinned approvals file is not by a trusted operator (RDP-003)" (str "id" ap)
+      if not (arr "approvals" i.Approvals.Document).IsEmpty then
+          match Git.run source [ "log"; "-1"; "--format=%B"; i.Approvals.Commit; "--"; i.Approvals.Path ] with
+          | Ok b ->
+              let message = Text.Encoding.UTF8.GetString b
+              if message.Contains("Claude-Session:", StringComparison.Ordinal) || message.Contains("Co-Authored-By: Claude", StringComparison.Ordinal) then
+                  yield "v4: the pinned approvals file was last changed in an agent commit (RDP-003)"
+          | Error e -> yield sprintf "v4: the pinned approvals commit is unreadable: %s" e
+      let authorizedAmend = VerificationPlan.authorizedAmendments i.Approvals
+      for a in arr "obligationAmendments" i.Spec do
+          if not (authorizedAmend.ContainsKey(str "approval" a, str "obligation" a)) then
+              yield sprintf "v4: the curation amends %s without an operator record" (str "obligation" a)
+      if not (arr "exclusions" i.Spec).IsEmpty then yield "v4: the curation excludes an obligation without an operator record"
       for d in arr "derivedObligations" i.Spec do
           if not (recorded.Contains(str "decision" d)) then yield sprintf "v4: %s cites decision %s, which no owner-decisions.json records" (str "obligation" d) (str "decision" d)
       if not (VerificationPlan.derivationDiagnostics plan).IsEmpty then yield sprintf "v4: derivation refused %A" (VerificationPlan.derivationDiagnostics plan)
@@ -293,7 +313,8 @@ let controls (source: string) : string list =
           let proposedCount (i: V4Package.Inputs) =
               (V4Package.build i).Files |> List.find (fst >> (=) "acceptance/acceptance-obligations.json") |> snd |> field "summary" |> Option.bind (intOpt "proposed")
           if proposedCount allRecorded <> Some 0L then yield "freeze: approved and applied amendments did not make their acceptance obligations normative (RV4-1)"
-          if proposedCount i0 = Some 0L then yield "freeze: proposed acceptance obligations are normative without the owner's approval"
+          let unapproved = { i0 with Approvals = setIn "approvals" (JArr []) i0.Approvals }
+          if proposedCount unapproved = Some 0L then yield "freeze: proposed acceptance obligations are normative without the owner's approval"
           yield! expectFail "untrusted authority" "W13" (scenario "someone-else" allChanges allAmends i0)
           yield! expectFail "agent-authored approvals with records" "W13" { allRecorded with ApprovalsAgentAuthored = true } ]
     [ // The committed inputs pass every check with a valid registry.

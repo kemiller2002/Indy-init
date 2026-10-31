@@ -1,9 +1,9 @@
 {
   "schema": "indy-init.verification-plan/1",
   "planIdentity": {
-    "planId": "VP-9817d9814482",
+    "planId": "VP-a1999095ce0a",
     "algorithm": "sha256",
-    "digest": "9817d98144822dcc810aa383fde9ff16f8ebb9931f5bf6aeca76256dbe7061c4",
+    "digest": "a1999095ce0ab5ac11bc3c66a055f8552ec73d03a2c75a8c7c4b983457ce4d78",
     "covers": "sha256 of the plan serialized by the compiler's canonical writer (ASCII JSON, two-space indent, trailing newline) with planIdentity removed"
   },
   "source": {
@@ -13,9 +13,9 @@
     "baselineSha256": "f86a3539e48ee8dda7d99d5f4f5546a18e2397a82d308a277c8f346edb2a8f1a",
     "approvals": {
       "repository": "kemiller2002/indy-init",
-      "commit": "245c70b4e9391c0c3422e119107507c92f28a354",
+      "commit": "cbc752b168d1240f018070ed57a4b0cac566f689",
       "path": "kickoff/rehearsal-007/approvals.causa.json",
-      "sha256": "d8098fb37fb6af881066092ae752ec23765decb201af956515a3109a8e5e3ebb",
+      "sha256": "58b8becdeb6fcbe79e9ab9a48d7d9ae171f82bd4e068de66b464c7e245f92c25",
       "trustedOperators": [
         "kemiller2002"
       ]
@@ -676,7 +676,17 @@
   "scopeDecisions": {
     "amendmentRule": "An obligation's acceptance criterion is amended only by an authenticated operator change {obligation_id, action: amend, criterion, rationale} in the pinned approvals file, listed in curation obligationAmendments with the owner decision it applies. The baseline text stays verbatim beside the amendment. An amendment changes what the bound tests must prove; it never verifies the obligation and never removes it from scope. Any other amendment fails compilation (V18) and makes verify-plan INVALID (UNAUTHORIZED-AMENDMENT).",
     "derivationRule": "A derived obligation restates other obligations. Each clause is verbatim in its text, and the clauses account for all of it except the declared connectives. A clause names the in-scope P0 obligations that must be verified for it; a residual clause (one that names none, or is marked direct because its constituents prove less than it states) is also proven by the derived obligation's own bound tests. Connectives come from a fixed vocabulary. Which obligation states a clause is a review judgement (AR-034-O2), not something the compiler can decide. The derived obligation is verified only when its own required categories are covered and every constituent obligation is verified (constituent-unverified otherwise).",
-    "amendedObligations": [],
+    "amendedObligations": [
+      "PERSIST-007-O2",
+      "PERSIST-007-O4",
+      "PERSIST-012-O2",
+      "PERSIST-023-O2",
+      "PERSIST-026-O2",
+      "PERSIST-031-O22",
+      "PERSIST-051-O2",
+      "PERSIST-051-O3",
+      "PERSIST-052-O3"
+    ],
     "derivedObligations": [
       "UI-015-O2"
     ],
@@ -20636,6 +20646,12 @@
             ]
           },
           "tokens": [],
+          "amendment": {
+            "approval": "APR-V4-OWNER-1",
+            "decision": "ODR-V4-08",
+            "criterion": "Only a confirmed save may move the investigation to Saved and advance its base head, except that a load verified at a named commit under the amended PERSIST-023-O2 shows Saved at that commit (PERSIST-021) and sets the base head to it.",
+            "rationale": "Reconciles PERSIST-007 with PERSIST-021 (ODR-V4-08)."
+          },
           "acceptanceContract": {
             "requirement": "PERSIST-007",
             "obligation": "PERSIST-007-O2",
@@ -20748,7 +20764,13 @@
                 "reason": "no-evidence",
                 "detail": "a bound test declares this category; only an assessed evidence bundle can verify it"
               }
-            ]
+            ],
+            "amendment": {
+              "approval": "APR-V4-OWNER-1",
+              "decision": "ODR-V4-08",
+              "criterion": "Only a confirmed save may move the investigation to Saved and advance its base head, except that a load verified at a named commit under the amended PERSIST-023-O2 shows Saved at that commit (PERSIST-021) and sets the base head to it.",
+              "rationale": "Reconciles PERSIST-007 with PERSIST-021 (ODR-V4-08)."
+            }
           }
         },
         {
@@ -20908,6 +20930,12 @@
             ]
           },
           "tokens": [],
+          "amendment": {
+            "approval": "APR-V4-OWNER-1",
+            "decision": "ODR-V4-08",
+            "criterion": "Acceptance: PAT-02 and PAT-10 verify that Saved appears only after the read-back, and PAT-12 verifies that no other transition reaches Saved, other than the verified-load confirmation of the amended PERSIST-023-O2, which PAT-12 verifies separately.",
+            "rationale": "PAT-12 must check both legal entries to Saved and no third (ODR-V4-08)."
+          },
           "acceptanceContract": {
             "requirement": "PERSIST-007",
             "obligation": "PERSIST-007-O4",
@@ -21020,7 +21048,13 @@
                 "reason": "no-evidence",
                 "detail": "a bound test declares this category; only an assessed evidence bundle can verify it"
               }
-            ]
+            ],
+            "amendment": {
+              "approval": "APR-V4-OWNER-1",
+              "decision": "ODR-V4-08",
+              "criterion": "Acceptance: PAT-02 and PAT-10 verify that Saved appears only after the read-back, and PAT-12 verifies that no other transition reaches Saved, other than the verified-load confirmation of the amended PERSIST-023-O2, which PAT-12 verifies separately.",
+              "rationale": "PAT-12 must check both legal entries to Saved and no third (ODR-V4-08)."
+            }
           }
         }
       ],
@@ -23437,12 +23471,22 @@
               {
                 "id": "dotnet:Causa.Acceptance.Deterministic.PERSIST012Tests.PERSIST-012-O2",
                 "kind": "deterministic"
+              },
+              {
+                "id": "dotnet:Causa.Invariants.Negative.INV25.UnresolvableConflictExports",
+                "kind": "deterministic"
               }
             ]
           },
           "tokens": [
             "three"
           ],
+          "amendment": {
+            "approval": "APR-V4-OWNER-1",
+            "decision": "ODR-V4-05",
+            "criterion": "The application MUST offer three actions: review the differences, reapply my changes to the GitHub version, and discard my changes and load the GitHub version; when the GitHub version was deleted or fails verification, the application also states why reapply and load cannot complete and offers to export the tab's unsaved commands as a file the user saves, without writing anything to GitHub or to browser storage.",
+            "rationale": "Every conflict must have a resolution that keeps the user's work without overwriting another writer (ODR-V4-05)."
+          },
           "acceptanceContract": {
             "requirement": "PERSIST-012",
             "obligation": "PERSIST-012-O2",
@@ -23486,6 +23530,13 @@
                   "categories": [
                     "integration"
                   ]
+                },
+                {
+                  "id": "dotnet:Causa.Invariants.Negative.INV25.UnresolvableConflictExports",
+                  "kind": "deterministic",
+                  "categories": [
+                    "integration"
+                  ]
                 }
               ]
             },
@@ -23508,7 +23559,13 @@
                 "reason": "no-evidence",
                 "detail": "a bound test declares this category; only an assessed evidence bundle can verify it"
               }
-            ]
+            ],
+            "amendment": {
+              "approval": "APR-V4-OWNER-1",
+              "decision": "ODR-V4-05",
+              "criterion": "The application MUST offer three actions: review the differences, reapply my changes to the GitHub version, and discard my changes and load the GitHub version; when the GitHub version was deleted or fails verification, the application also states why reapply and load cannot complete and offers to export the tab's unsaved commands as a file the user saves, without writing anything to GitHub or to browser storage.",
+              "rationale": "Every conflict must have a resolution that keeps the user's work without overwriting another writer (ODR-V4-05)."
+            }
           }
         },
         {
@@ -30371,6 +30428,12 @@
             ]
           },
           "tokens": [],
+          "amendment": {
+            "approval": "APR-V4-OWNER-1",
+            "decision": "ODR-V4-08",
+            "criterion": "Saved MUST be constructible only from a confirmation produced by the PERSIST-007 read-back. A load that reads the investigation at a named commit and verifies it as a reader would (PERSIST-005) also produces such a confirmation for that commit, constructed only inside the persistence module from the bytes it verified.",
+            "rationale": "Reconciles PERSIST-021 with PERSIST-007 and PERSIST-023 without opening a route to Saved for unverified bytes (ODR-V4-08)."
+          },
           "acceptanceContract": {
             "requirement": "PERSIST-023",
             "obligation": "PERSIST-023-O2",
@@ -30467,7 +30530,13 @@
                 "reason": "no-evidence",
                 "detail": "a bound test declares this category; only an assessed evidence bundle can verify it"
               }
-            ]
+            ],
+            "amendment": {
+              "approval": "APR-V4-OWNER-1",
+              "decision": "ODR-V4-08",
+              "criterion": "Saved MUST be constructible only from a confirmation produced by the PERSIST-007 read-back. A load that reads the investigation at a named commit and verifies it as a reader would (PERSIST-005) also produces such a confirmation for that commit, constructed only inside the persistence module from the bytes it verified.",
+              "rationale": "Reconciles PERSIST-021 with PERSIST-007 and PERSIST-023 without opening a route to Saved for unverified bytes (ODR-V4-08)."
+            }
           }
         },
         {
@@ -32289,6 +32358,12 @@
             ]
           },
           "tokens": [],
+          "amendment": {
+            "approval": "APR-V4-OWNER-1",
+            "decision": "ODR-V4-02",
+            "criterion": "It MUST NOT copy, vendor, translate or adapt application source code, tests or scripts from Causa or any earlier rehearsal repository (indy-init-rehearsal-001 to indy-init-rehearsal-006); the same applies to indy-init-rehearsal-007 and every later rehearsal repository.",
+            "rationale": "Rehearsal 7 built a persistence implementation after this list was written; the event must still be built from the requirements (ODR-V4-02)."
+          },
           "acceptanceContract": {
             "requirement": "PERSIST-026",
             "obligation": "PERSIST-026-O2",
@@ -32409,7 +32484,13 @@
                 "reason": "no-evidence",
                 "detail": "a bound test declares this category; only an assessed evidence bundle can verify it"
               }
-            ]
+            ],
+            "amendment": {
+              "approval": "APR-V4-OWNER-1",
+              "decision": "ODR-V4-02",
+              "criterion": "It MUST NOT copy, vendor, translate or adapt application source code, tests or scripts from Causa or any earlier rehearsal repository (indy-init-rehearsal-001 to indy-init-rehearsal-006); the same applies to indy-init-rehearsal-007 and every later rehearsal repository.",
+              "rationale": "Rehearsal 7 built a persistence implementation after this list was written; the event must still be built from the requirements (ODR-V4-02)."
+            }
           }
         },
         {
@@ -36829,10 +36910,20 @@
               {
                 "id": "playwright:acceptance/PERSIST-031.spec.js > PERSIST-031-O22 [chromium]",
                 "kind": "deterministic"
+              },
+              {
+                "id": "playwright:invariants/INV-25.spec.js > reconnect keeps unsaved work [chromium]",
+                "kind": "deterministic"
               }
             ]
           },
           "tokens": [],
+          "amendment": {
+            "approval": "APR-V4-OWNER-1",
+            "decision": "ODR-V4-04",
+            "criterion": "The action is Retry when a retry can succeed, or Reconnect when the credential was refused; Reconnect accepts a new credential for the same repository within the tab, keeps every investigation and every unsaved change in memory, re-checks the new credential's permissions, and then lets the user save again; unsaved changes are dropped only by an explicit, confirmed discard.",
+            "rationale": "An expired or revoked token is a recoverable failure; the user's work must survive it (ODR-V4-04)."
+          },
           "acceptanceContract": {
             "requirement": "PERSIST-031",
             "obligation": "PERSIST-031-O22",
@@ -36902,6 +36993,13 @@
                     "integration",
                     "browser"
                   ]
+                },
+                {
+                  "id": "playwright:invariants/INV-25.spec.js > reconnect keeps unsaved work [chromium]",
+                  "kind": "deterministic",
+                  "categories": [
+                    "browser"
+                  ]
                 }
               ]
             },
@@ -36940,7 +37038,13 @@
                 "reason": "no-evidence",
                 "detail": "a bound test declares this category; only an assessed evidence bundle can verify it"
               }
-            ]
+            ],
+            "amendment": {
+              "approval": "APR-V4-OWNER-1",
+              "decision": "ODR-V4-04",
+              "criterion": "The action is Retry when a retry can succeed, or Reconnect when the credential was refused; Reconnect accepts a new credential for the same repository within the tab, keeps every investigation and every unsaved change in memory, re-checks the new credential's permissions, and then lets the user save again; unsaved changes are dropped only by an explicit, confirmed discard.",
+              "rationale": "An expired or revoked token is a recoverable failure; the user's work must survive it (ODR-V4-04)."
+            }
           }
         },
         {
@@ -46331,10 +46435,28 @@
               {
                 "id": "dotnet:Causa.Acceptance.Deterministic.PERSIST051Tests.PERSIST-051-O2",
                 "kind": "deterministic"
+              },
+              {
+                "id": "dotnet:Causa.Invariants.Negative.INV02.LateConflictReReadKeepsOtherWriter",
+                "kind": "deterministic"
+              },
+              {
+                "id": "dotnet:Causa.Invariants.Negative.INV02.StaleRefreshDropped",
+                "kind": "deterministic"
+              },
+              {
+                "id": "dotnet:Causa.Invariants.Property.INV02.ReorderedRepliesAreInert",
+                "kind": "deterministic"
               }
             ]
           },
           "tokens": [],
+          "amendment": {
+            "approval": "APR-V4-OWNER-1",
+            "decision": "ODR-V4-03",
+            "criterion": "The test MUST verify that each legal transition reaches the state PERSIST-031 defines, that every illegal input fails closed with a typed fault, and that Saved is reached only from a read-back confirmation, or from the verified-load confirmation of the amended PERSIST-023-O2, and from no other input; it also verifies that a reply to a request the tab has superseded (an older load, refresh, conflict re-read or reconciliation read, or any reply whose base head or request identity no longer matches the tab's current one) is discarded without changing the state, the base head or the unsaved changes.",
+            "rationale": "Closes the stale-reply defect class found by Rehearsal 7's third review (ODR-V4-03)."
+          },
           "acceptanceContract": {
             "requirement": "PERSIST-051",
             "obligation": "PERSIST-051-O2",
@@ -46391,6 +46513,27 @@
                     "unit",
                     "integration"
                   ]
+                },
+                {
+                  "id": "dotnet:Causa.Invariants.Negative.INV02.LateConflictReReadKeepsOtherWriter",
+                  "kind": "deterministic",
+                  "categories": [
+                    "integration"
+                  ]
+                },
+                {
+                  "id": "dotnet:Causa.Invariants.Negative.INV02.StaleRefreshDropped",
+                  "kind": "deterministic",
+                  "categories": [
+                    "integration"
+                  ]
+                },
+                {
+                  "id": "dotnet:Causa.Invariants.Property.INV02.ReorderedRepliesAreInert",
+                  "kind": "deterministic",
+                  "categories": [
+                    "unit"
+                  ]
                 }
               ]
             },
@@ -46419,7 +46562,13 @@
                 "reason": "no-evidence",
                 "detail": "a bound test declares this category; only an assessed evidence bundle can verify it"
               }
-            ]
+            ],
+            "amendment": {
+              "approval": "APR-V4-OWNER-1",
+              "decision": "ODR-V4-03",
+              "criterion": "The test MUST verify that each legal transition reaches the state PERSIST-031 defines, that every illegal input fails closed with a typed fault, and that Saved is reached only from a read-back confirmation, or from the verified-load confirmation of the amended PERSIST-023-O2, and from no other input; it also verifies that a reply to a request the tab has superseded (an older load, refresh, conflict re-read or reconciliation read, or any reply whose base head or request identity no longer matches the tab's current one) is discarded without changing the state, the base head or the unsaved changes.",
+              "rationale": "Closes the stale-reply defect class found by Rehearsal 7's third review (ODR-V4-03)."
+            }
           }
         },
         {
@@ -46439,6 +46588,12 @@
             ]
           },
           "tokens": [],
+          "amendment": {
+            "approval": "APR-V4-OWNER-1",
+            "decision": "ODR-V4-06",
+            "criterion": "A compile-time negative check verifies that application code outside the persistence module cannot construct Saved, and also that it cannot construct a provider reply, a read-back result or a confirmation that the save process accepts: provider answers are decoded from the transport inside the persistence module only.",
+            "rationale": "Closes the forged-reply route to a confirmation that Rehearsal 7's reviews 2 and 3 left open (ODR-V4-06)."
+          },
           "acceptanceContract": {
             "requirement": "PERSIST-051",
             "obligation": "PERSIST-051-O3",
@@ -46523,7 +46678,13 @@
                 "reason": "no-evidence",
                 "detail": "a bound test declares this category; only an assessed evidence bundle can verify it"
               }
-            ]
+            ],
+            "amendment": {
+              "approval": "APR-V4-OWNER-1",
+              "decision": "ODR-V4-06",
+              "criterion": "A compile-time negative check verifies that application code outside the persistence module cannot construct Saved, and also that it cannot construct a provider reply, a read-back result or a confirmation that the save process accepts: provider answers are decoded from the transport inside the persistence module only.",
+              "rationale": "Closes the forged-reply route to a confirmation that Rehearsal 7's reviews 2 and 3 left open (ODR-V4-06)."
+            }
           }
         },
         {
@@ -47134,6 +47295,12 @@
             ]
           },
           "tokens": [],
+          "amendment": {
+            "approval": "APR-V4-OWNER-1",
+            "decision": "ODR-V4-02",
+            "criterion": "It verifies that no F#, C#, JavaScript, TypeScript, CSS, HTML or shell file of more than 20 lines in the candidate is byte-identical, after line-ending normalization, to a file of indy-init-rehearsal-001 to indy-init-rehearsal-006, other than files generated by a published Echelon tool; the same comparison also covers indy-init-rehearsal-007, and it is run by a verifier permitted to check out those repositories, never by the implementing agent.",
+            "rationale": "Extends PAT-13 to Rehearsal 7 and records who runs it (Rehearsal 7 KD-009: the implementing agent may not access prior rehearsals)."
+          },
           "acceptanceContract": {
             "requirement": "PERSIST-052",
             "obligation": "PERSIST-052-O3",
@@ -47258,7 +47425,13 @@
                 "reason": "no-evidence",
                 "detail": "a bound test declares this category; only an assessed evidence bundle can verify it"
               }
-            ]
+            ],
+            "amendment": {
+              "approval": "APR-V4-OWNER-1",
+              "decision": "ODR-V4-02",
+              "criterion": "It verifies that no F#, C#, JavaScript, TypeScript, CSS, HTML or shell file of more than 20 lines in the candidate is byte-identical, after line-ending normalization, to a file of indy-init-rehearsal-001 to indy-init-rehearsal-006, other than files generated by a published Echelon tool; the same comparison also covers indy-init-rehearsal-007, and it is run by a verifier permitted to check out those repositories, never by the implementing agent.",
+              "rationale": "Extends PAT-13 to Rehearsal 7 and records who runs it (Rehearsal 7 KD-009: the implementing agent may not access prior rehearsals)."
+            }
           }
         },
         {
