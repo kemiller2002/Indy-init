@@ -1,6 +1,6 @@
 {
   "schema": "indy-init.v41-owner-decision-requests/1",
-  "status": "pending: no record exists; only the operator writes records (RDP-003)",
+  "status": "decided: ODR-V41-06 (APR-V41-OWNER-1); ODR-V41-02, -03, -04, -05, -07 and -08, option A each (APR-V41-OWNER-2). Pending: ODR-V41-01 and ODR-V41-09. Only the operator writes records (RDP-003)",
   "requests": [
     {
       "id": "ODR-V41-01",
@@ -132,6 +132,22 @@
       "impact": "Until decided, MutationSent stays declared and illegal everywhere, so the implementation never emits it.",
       "approvalRecord": {
         "how": "{\"decision_id\": \"ODR-V41-08\", \"action\": \"select\", \"option\": \"A\" | \"B\" | \"C\"}"
+      }
+    },
+    {
+      "id": "ODR-V41-09",
+      "kind": "dependency-lock",
+      "title": "Lock axe-core for the accessibility assertion",
+      "question": "The event build copies the layout kit (layout-tests/assertions.mjs) as tests/browser/support/layout-assertions.mjs, and its axeClean assertion (FL-06e, bound through PERSIST-030-O6) loads axe-core from the event build's own node_modules. ODR-V41-07 locked the test runners (xUnit, Microsoft.NET.Test.Sdk, @playwright/test) but not axe-core, so T10 cannot add it to package.json. Which axe-core version is locked?",
+      "options": [
+        "A: axe-core 4.14.0 (the version this package's layout tests run with in CI)",
+        "B: another version the owner names"
+      ],
+      "recommendation": "A: it is the version the layout kit's catch rate and every conforming Forma pattern were measured with; the lock entry is added by the owner's decision, not chosen by an agent.",
+      "rationale": "Adding a library needs a verified requirement or an owner decision (v4.1 brief). FL-06e requires axe-core checks but names no version.",
+      "impact": "Until decided, the bootstrap writes no axe-core entry, and the event build's axeClean assertion has no axe-core to load.",
+      "approvalRecord": {
+        "how": "{\"decision_id\": \"ODR-V41-09\", \"action\": \"select\", \"option\": \"A\" | \"B\", \"packages\": [\"axe-core@<version>\"]}"
       }
     }
   ],

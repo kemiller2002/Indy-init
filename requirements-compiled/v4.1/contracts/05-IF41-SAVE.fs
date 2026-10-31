@@ -64,7 +64,7 @@ type ConflictInput =
     | SupersededReply of RequestId
 
 /// What a Saved state rests on: a save confirmed by read-back (PERSIST-023), or a verified read at a named commit after
-/// a load or a confirmed discard. Whether the second may show as Saved is owner decision ODR-V4-08.
+/// a load or a confirmed discard. The owner approved that the second shows as Saved (ODR-V4-08, APR-V4-OWNER-1).
 type SavedBasis =
     | Confirmed of Confirmation.T
     | VerifiedAt of VerifiedInvestigation
@@ -81,7 +81,9 @@ type SaveState =
     | SaveFailed of SaveFailure
 
 /// SM-SAVE events. Persistence produces every reply event from an HttpOutcome with SaveMachine.Interpret; the App
-/// produces only Edit, SaveRequested, CheckAgain, WentOffline, WentOnline and QueuedSaveStarted.
+/// produces only Edit, SaveRequested, CheckAgain, WentOffline, WentOnline, QueuedSaveStarted and MutationSent. Its runtime
+/// steps MutationSent with the request's RequestId when it hands the outstanding mutation (Awaiting MutationAnswer) to
+/// Execute; the session is unchanged (T-S61, ODR-V41-08).
 [<RequireQualifiedAccess>]
 type SaveInput =
     | Edit of CommandEnvelope

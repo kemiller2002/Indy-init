@@ -716,11 +716,84 @@
           "status": "remediated, pending re-review"
         }
       ]
+    },
+    {
+      "round": 11,
+      "reviewedCommit": "b43852e",
+      "verdict": "FAIL",
+      "counts": {
+        "critical": 0,
+        "major": 2,
+        "minor": 6
+      },
+      "scope": "The application of the owner's decisions ODR-V41-02..08 (APR-V41-OWNER-2) and the frozen-v4 CI job (#61)",
+      "findings": [
+        {
+          "id": "RV41-11-1",
+          "severity": "major",
+          "finding": "Amendments to v4's machines were not limited to what the owner approved, and v4's machine safety checks were not re-run on the amended machines: an amendment into Saved without a confirmation, a second amendment, an unknown source or a decision of another kind passed every check",
+          "remediation": "X12 applies v4's W05 rule (Saved entered only by a confirmation, entersSavedOnlyBy) to the amended machines, requires amendment sources to be baseline requirements, requires the decision to be a state-machine-amendment request, and validates the accepted entries. The offline suite pins each selected option to the transitions its text adds (ODR-V41-08 A: exactly SM-SAVE Saving + MutationSent -> Saving) and requires every selected option to be applied. Negative controls for each case",
+          "status": "fixed; to be verified in round 12"
+        },
+        {
+          "id": "RV41-11-2",
+          "severity": "major",
+          "finding": "T-S61 conflicted with IF41-SAVE and v4's definition of MutationSent: no component produced the event, its guard was 'true' (any RequestId could overwrite Outstanding and leave a save stuck), its effect restated existing bookkeeping, and its sources were weak",
+          "remediation": "IF41-SAVE names the producer: the App runtime steps MutationSent when it hands the outstanding mutation (Awaiting MutationAnswer) to Execute. T-S61's guard is 'current' (its RequestId is the Outstanding request awaiting MutationAnswer), its effect changes nothing else (state, base head, Outstanding, unsaved changes), and its sources are PERSIST-006 and PERSIST-031",
+          "status": "fixed; to be verified in round 12"
+        },
+        {
+          "id": "RV41-11-3",
+          "severity": "minor",
+          "finding": "amberLabelled matched Forma's light accent-primary (35.5 RGB units from the light warning token) and missed a nested dark theme, and its dark path was never run; the limits were not disclosed",
+          "remediation": "amberLabelled reads the warning token in each element's own theme and matches it within 12 RGB units (#E9A23B keeps 40); the conforming fixture adds unlabelled accent-primary and control-active marks; a broken fixture uses a nested dark theme; the assertion runs in light and dark; R41-11 discloses the tolerances. Mutation runs: without the token match the token fixtures pass; with a radius of 40 the accent mark fails",
+          "status": "fixed; to be verified in round 12"
+        },
+        {
+          "id": "RV41-11-4",
+          "severity": "minor",
+          "finding": "No check stops web/causa.css from using the literal #E9A23B, and the conforming fixture still painted the lozenge #E9A23B",
+          "remediation": "The conforming fixture draws amber with the warning token beside its label; R41-11 discloses that no automated check reads the stylesheet for the literal and that the T16 review checks it",
+          "status": "fixed; to be verified in round 12"
+        },
+        {
+          "id": "RV41-11-5",
+          "severity": "minor",
+          "finding": "X16 did not fix which projects take the test tooling, its title claimed a comparison with the owner's record it does not make, ownerRecords had no negative controls, and the ODR-V41-09 path would fail ownerRecords",
+          "remediation": "testTooling holds one lock per decision; X16 requires testProjects to be exactly the test projects that host .NET tests, checks each lock's decision kind and approval and packages locked twice across locks, and is retitled; ownerRecords compares each lock with its own record and has negative controls (another version, an extra or missing package, an unrecorded approval, a lock no approval records)",
+          "status": "fixed; to be verified in round 12"
+        },
+        {
+          "id": "RV41-11-6",
+          "severity": "minor",
+          "finding": "Inline package versions conflicted with the planned Directory.Packages.props (central package management: NU1008)",
+          "remediation": "The bootstrap writes Directory.Packages.props with ManagePackageVersionsCentrally and the locked PackageVersion items, and version-less references in the test projects; the bootstrap builds with 0 warnings",
+          "status": "fixed; to be verified in round 12"
+        },
+        {
+          "id": "RV41-11-7",
+          "severity": "minor",
+          "finding": "The frozen-v4 job trusted a mutable tag and installed the SDK from HEAD's global.json",
+          "remediation": "The job fails unless the tag names c9dc556, and installs the SDK from the tag's global.json",
+          "status": "fixed; to be verified in round 12"
+        },
+        {
+          "id": "RV41-11-8",
+          "severity": "minor",
+          "finding": "Stale counts and texts: 1 unused event, 75 transitions, 97 broken pages, the requests' status, and a doc comment above the wrong function",
+          "remediation": "No unused event; 76 transitions (report and task-adjustments); 99 broken pages; the requests' status names the decided and pending requests; the doc comment is back above machineProject",
+          "status": "fixed; to be verified in round 12"
+        }
+      ]
     }
   ],
   "closure": {
     "date": "2026-10-30",
     "basis": "owner direction in the session",
     "note": "Review closed after round 10 at the owner's direction (2026-10-30): the owner accepted the known limitations disclosed in R41-11 and asked for the package to be merged. A round-11 review was started on 08cacfd and stopped before it reported, so the round-10 remediation (and the later font-dependent classification, dbdcc80) has not been independently re-reviewed."
+  },
+  "reopened": {
+    "date": "2026-10-31",
+    "note": "Review reopened for the application of the owner's decisions (#61): rounds 11 and later review that change."
   }
 }

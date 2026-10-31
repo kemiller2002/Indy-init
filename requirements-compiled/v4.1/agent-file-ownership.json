@@ -2368,7 +2368,8 @@
         "dotnet:Causa.Persistence.Tests.StateMachines.SMSAVE.T-S57",
         "dotnet:Causa.Persistence.Tests.StateMachines.SMSAVE.T-S58",
         "dotnet:Causa.Persistence.Tests.StateMachines.SMSAVE.T-S59",
-        "dotnet:Causa.Persistence.Tests.StateMachines.SMSAVE.T-S60"
+        "dotnet:Causa.Persistence.Tests.StateMachines.SMSAVE.T-S60",
+        "dotnet:Causa.Persistence.Tests.StateMachines.SMSAVE.T-S61"
       ],
       "requirements": []
     },

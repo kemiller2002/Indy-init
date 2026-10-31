@@ -641,14 +641,35 @@ export const forcedColorsDistinct = async page => {
   }).then(found => [...found, ...colourOnly]);
 };
 
-// Amber (#E9A23B and close shades) never stands alone: an amber element carries a text label (DEC-R7-002).
+// Amber never stands alone: an amber element carries a text label (DEC-R7-002). Amber is UI-016's #E9A23B and close
+// shades, and, as the owner mapped it (ODR-V41-05), Forma's warning-status colour as it resolves in the element's own
+// theme (a nested dark region has its own value). The token is matched tightly, because other Forma colours sit near
+// it (light accent-primary is 35 RGB units from light warning); where the token is undefined it matches nothing.
 export const amberLabelled = async page => {
   await install(page);
   return inPage(page, () => {
-    const amber = [233, 162, 59];
-    const near = c => { if (!c || c === 'none' || c.startsWith('url')) return false; const v = window.__ef.rgba(c); return v[3] > 0 && Math.hypot(v[0] - amber[0], v[1] - amber[1], v[2] - amber[2]) < 40; };
+    const literal = [233, 162, 59];
+    const parsed = new Map();
+    const tokenOf = e => {
+      const value = getComputedStyle(e).getPropertyValue('--ef-color-status-warning').trim();
+      if (value === '') return null;
+      if (!parsed.has(value)) {
+        const probe = document.createElement('span');
+        probe.style.color = value;
+        document.body.appendChild(probe);
+        parsed.set(value, window.__ef.rgba(getComputedStyle(probe).color));
+        probe.remove();
+      }
+      const v = parsed.get(value);
+      return v[3] > 0 ? v : null;
+    };
+    const distance = (v, a) => Math.hypot(v[0] - a[0], v[1] - a[1], v[2] - a[2]);
+    const nearIn = e => {
+      const token = tokenOf(e);
+      return c => { if (!c || c === 'none' || c.startsWith('url')) return false; const v = window.__ef.rgba(c); return v[3] > 0 && (distance(v, literal) < 40 || (token !== null && distance(v, token) < 12)); };
+    };
     const colours = s => [s.backgroundColor, s.color, ...(s.outlineStyle !== 'none' && parseFloat(s.outlineWidth) > 0 ? [s.outlineColor] : []), ...(['Top', 'Right', 'Bottom', 'Left'].filter(k => parseFloat(s[`border${k}Width`]) > 0).map(k => s[`border${k}Color`])), s.fill, s.stroke, ...((s.boxShadow.match(/rgba?\([^)]*\)/g)) || []), ...((s.backgroundImage.match(/rgba?\([^)]*\)|#[0-9a-f]{6}\b/gi)) || []).map(c => c.startsWith('#') ? `rgb(${parseInt(c.slice(1, 3), 16)},${parseInt(c.slice(3, 5), 16)},${parseInt(c.slice(5, 7), 16)})` : c)];
-    const amberish = e => colours(getComputedStyle(e)).some(c => c && near(c));
+    const amberish = e => { const near = nearIn(e); return colours(getComputedStyle(e)).some(c => c && near(c)); };
     // The label is visible text in the amber element or beside it (its parent), never only a screen-reader text.
     // A label is visible text with letters in it (a coloured glyph such as a dot is not a label).
     const words = t => /[A-Za-z]{2,}/.test(t);
@@ -933,7 +954,8 @@ export const onlyFormaTokens = async (page, { inventory, hooks = [], formaHref =
 // ---- FL-06e automated WCAG checks ---------------------------------------------------------------------------
 
 // axe-core's WCAG 2.0-2.2 A and AA rules report no violation. The axe source comes from the caller (axeSource), or
-// from the axe-core package installed beside this module (the event build adds it to package.json, ODR-V41-07).
+// from the axe-core package installed beside this module (the event build adds it to package.json; its version is
+// owner decision ODR-V41-09, because ODR-V41-07 locked the test runners only).
 const loadAxe = async () => {
   const { createRequire } = await import('node:module');
   const { readFileSync } = await import('node:fs');

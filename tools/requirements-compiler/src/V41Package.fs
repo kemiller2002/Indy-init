@@ -32,6 +32,9 @@ type Inputs =
       Adjustments: Json
       Telemetry: Json
       GuardPartitions: Json
+      /// Owner-approved amendments of v4's state machines (analysis/state-machine-amendments.json). v4.1 applies them
+      /// over the frozen v4 machines; v4's files are never edited.
+      MachineAmendments: Json
       /// The committed Forma inventory, and the one extracted from the published package when it is supplied.
       FormaInventory: Json
       FormaExtract: Json option
@@ -135,6 +138,47 @@ let consumerRole (consumers: string list) (test: string) : string option =
     elif browser.Success then consumers |> List.tryFind ((=) browser.Groups.[1].Value)
     else None
 
+/// The owner decision requests of v4.1 (proposals/owner-decision-requests.json), as (id, kind).
+let private requests (i: Inputs) : (string * string) list =
+    i.AuthoredText |> List.tryFind (fst >> (=) "proposals/owner-decision-requests.json")
+    |> Option.map (snd >> Text.Encoding.UTF8.GetBytes >> parseBytes >> arr "requests" >> List.map (fun r -> str "id" r, sOr "kind" r)) |> Option.defaultValue []
+
+let private requestIds (i: Inputs) = requests i |> List.map fst
+
+/// Whether a decision is an owner decision request of the given kind.
+let private requestOfKind (i: Inputs) (kind: string) (decision: string) = List.contains (decision, kind) (requests i)
+
+/// The problems of the amendments themselves: each added transition, and each accepted machine left unchanged, names a
+/// v4 machine, a state-machine-amendment request and the operator approval that records it; an added transition's
+/// sources are baseline requirements. Whether a transition fits its machine (states, events, guards, Saved entered only
+/// by a confirmation) is checked with the amended machine; that the approval selects exactly these transitions is
+/// checked against the owner's record by the offline suite.
+let amendmentProblems (i: Inputs) : string list =
+    let v4Machines = arr "machines" i.StateMachines |> List.map (str "id")
+    let requirementIds = arr "requirements" i.Baseline |> List.map (str "id") |> Set.ofList
+    let cites (what: string) (x: Json) =
+        [ if not (List.contains (sOr "machine" x) v4Machines) then yield sprintf "%s names machine %s, which v4 does not define" what (sOr "machine" x)
+          if not (requestOfKind i "state-machine-amendment" (sOr "decision" x)) then yield sprintf "%s names decision '%s', which is not a state-machine-amendment request" what (sOr "decision" x)
+          if String.IsNullOrWhiteSpace (sOr "approval" x) then yield sprintf "%s names no operator approval" what ]
+    [ for t in arr "transitions" i.MachineAmendments do
+          let what = sprintf "amendment %s" (sOr "id" t)
+          yield! cites what t
+          for s in strs "sources" t do
+              if not (requirementIds.Contains s) then yield sprintf "%s: source %s is not a baseline requirement" what s
+      for a in arr "accepted" i.MachineAmendments do
+          yield! cites (sprintf "the accepted %s entry" (sOr "machine" a)) a ]
+
+/// v4's state machines with v4.1's owner-approved amendments applied: each added transition joins its machine, marked
+/// with its decision. No state or event is added, and v4's files are never edited (v4 is frozen at its tag).
+let amendedMachines (i: Inputs) : Json list =
+    let added = arr "transitions" i.MachineAmendments
+    let transitionOf (t: Json) = match t with JObj ps -> JObj(ps |> List.filter (fun (k, _) -> k <> "machine" && k <> "approval")) | j -> j
+    arr "machines" i.StateMachines
+    |> List.map (fun m ->
+        match added |> List.filter (fun t -> sOr "machine" t = str "id" m) with
+        | [] -> m
+        | ts -> setIn "transitions" (JArr(arr "transitions" m @ (ts |> List.map transitionOf))) m)
+
 /// The state-machine test ids of a machine: one per transition and one for its illegal pairs, in the test project of
 /// the machine's owner (analysis/project-structure.json stateMachines).
 let private machineProject (i: Inputs) (machine: string) =
@@ -153,7 +197,7 @@ let namedTests (i: Inputs) : (string * string * string) list =
             (strs "producerTests" x |> List.map (fun t -> t, sOr "producer" x, "contract"))
             @ (strs "consumerTests" x |> List.map (fun t -> t, consumerRole consumers t |> Option.defaultValue "", "contract")))
     let machines =
-        arr "machines" i.StateMachines
+        amendedMachines i
         |> List.collect (fun m ->
             let mid = str "id" m
             let owner = arr "stateMachines" i.Structure |> List.tryFind (fun s -> sOr "machine" s = mid) |> Option.map (sOr "owner") |> Option.defaultValue ""
@@ -286,9 +330,9 @@ let private ownershipJson (i: Inputs) (files: OwnedFile list) : Json =
 
 // ---- state-machine contracts -------------------------------------------------------------------------------------
 
-/// Every (state, event) pair of every v4 machine: the transitions that may fire (guard, next state, effects, a test
-/// case id each), or fail-closed behaviour. No state or event is added. Pairs with several transitions must have
-/// exactly the guards reviewed in analysis/guard-partitions.json.
+/// Every (state, event) pair of every v4 machine, with v4.1's owner-approved amendments: the transitions that may fire
+/// (guard, next state, effects, a test case id each), or fail-closed behaviour. No state or event is added. Pairs with
+/// several transitions must have exactly the guards reviewed in analysis/guard-partitions.json.
 let stateMachineContracts (i: Inputs) : Json * string list =
     let policy = field "illegalInputPolicy" i.StateMachines |> Option.map (sOr "rule") |> Option.defaultValue ""
     let partitions = arr "groups" i.GuardPartitions
@@ -332,6 +376,13 @@ let stateMachineContracts (i: Inputs) : Json * string list =
                   go (Set.singleton (str "initial" m)) [ str "initial" m ]
               for s in states do
                   if not (reachable.Contains s) then yield sprintf "%s: state %s is not reachable from %s" mid s (str "initial" m)
+              // v4's W05 rule holds for the amended machine too: Saved is entered only by a confirmation (PERSIST-007,
+              // PERSIST-023).
+              let confirmations = strs "entersSavedOnlyBy" m
+              if not confirmations.IsEmpty then
+                  for t in transitions do
+                      if str "to" t = "Saved" && str "from" t <> "Saved" && not (List.contains (str "event" t) confirmations) then
+                          yield sprintf "%s %s: Saved is entered by %s, which is not a confirmation (PERSIST-007, PERSIST-023)" mid (str "id" t) (str "event" t)
               // An event no transition accepts is a gap in the machine; it must be listed with an owner decision.
               let listed = arr "unusedEvents" i.GuardPartitions |> List.filter (fun u -> sOr "machine" u = mid)
               for e in events do
@@ -357,13 +408,14 @@ let stateMachineContracts (i: Inputs) : Json * string list =
                                     JArr(
                                         ts
                                         |> List.map (fun t ->
-                                            JObj
+                                            JObj(
                                                 [ "id", JStr(str "id" t)
                                                   "guard", JStr(sOr "guard" t)
                                                   "next", JStr(str "to" t)
                                                   "effects", JArr(arr "effects" t)
                                                   "sources", JArr(arr "sources" t)
-                                                  "test", JStr(machineTest i mid (str "id" t)) ])
+                                                  "test", JStr(machineTest i mid (str "id" t)) ]
+                                                @ (match strOpt "decision" t with Some d -> [ "amendedBy", JStr d ] | None -> [])))
                                     ) ] ]
         let legal = pairs |> List.filter (fun p -> sOr "outcome" p = "legal") |> List.length
         JObj
@@ -376,14 +428,14 @@ let stateMachineContracts (i: Inputs) : Json * string list =
               "illegalPairTest", JStr(machineTest i mid "EveryIllegalPairFailsClosed")
               "pairs", JArr pairs ],
         problems
-    let built = arr "machines" i.StateMachines |> List.map machine
+    let built = amendedMachines i |> List.map machine
     JObj
         [ "schema", JStr "indy-init.v41-state-machine-contracts/1"
-          "description", JStr "The implementation table of every v4 state machine (requirements-compiled/v4/state-machines.json), generated by requirements-compiler v41: each (state, event) pair is either legal, with its transitions (guard, next state, effects, test case), or illegal. No state, event or transition is added. Unlisted pairs are illegal by the v4 rule, so every pair is decided; where a pair has several transitions, its guards are the reviewed partition of analysis/guard-partitions.json. A transition's test drives the machine through it and asserts the next state and the effects; the illegal-pair test enumerates every illegal pair. Test files and owners are in agent-file-ownership.json."
+          "description", JStr "The implementation table of every v4 state machine (requirements-compiled/v4/state-machines.json, frozen), with the transitions the owner approved in analysis/state-machine-amendments.json, generated by requirements-compiler v41: each (state, event) pair is either legal, with its transitions (guard, next state, effects, test case; an amended transition names its decision in amendedBy), or illegal. No state or event is added. Unlisted pairs are illegal by the v4 rule, so every pair is decided; where a pair has several transitions, its guards are the reviewed partition of analysis/guard-partitions.json. A transition's test drives the machine through it and asserts the next state and the effects; the illegal-pair test enumerates every illegal pair. Test files and owners are in agent-file-ownership.json."
           "invalidTransition", JObj [ "rule", JStr policy; "behaviour", JStr "fail closed: return Error SaveFault { Machine; State; Input; Reason }, emit no effect, keep state, base head and unsaved changes"; "sources", JArr(field "illegalInputPolicy" i.StateMachines |> Option.map (arr "sources") |> Option.defaultValue []) ]
           "evidence", JStr "the state-machine tests' results in the CI test record of the commit (TRX), one result per transition test and one per machine for the illegal pairs"
           "machines", JArr(built |> List.map fst) ],
-    built |> List.collect snd
+    (built |> List.collect snd) @ amendmentProblems i
 
 // ---- verification execution plan --------------------------------------------------------------------------------
 
@@ -644,9 +696,7 @@ let schedule (i: Inputs) : Json * Json * string list =
               | None -> yield sprintf "v4 ordered %s before %s; the adjusted DAG drops it without a waiver" a b
               | Some(_, w) ->
                   if String.IsNullOrWhiteSpace (sOr "reason" w) || String.IsNullOrWhiteSpace (sOr "decision" w) then yield sprintf "the waiver of %s before %s needs a reason and a decision" a b
-          let requests =
-              i.AuthoredText |> List.tryFind (fst >> (=) "proposals/owner-decision-requests.json")
-              |> Option.map (snd >> Text.Encoding.UTF8.GetBytes >> parseBytes >> arr "requests" >> List.map (str "id")) |> Option.defaultValue []
+          let requests = requestIds i
           for ((a, b), w) in waivers do
               if not (lost.Contains(a, b)) then yield sprintf "the waiver of %s before %s waives an ordering the adjusted DAG keeps (or v4 never had)" a b
               if not (List.contains (sOr "decision" w) requests) then yield sprintf "the waiver of %s before %s names decision %s, which is not an owner decision request" a b (sOr "decision" w)
@@ -791,7 +841,7 @@ let interfaceCheck (i: Inputs) (files: OwnedFile list) : Check list =
         arr "projects" i.Structure |> List.collect (fun p -> arr "files" p |> List.map (str "path")) |> List.indexed |> List.map (fun (n, p) -> p, n) |> Map.ofList
     let roles = arr "roles" i.Structure |> List.map (str "id") |> Set.ofList
     let ownerOfTest (t: string) = testFile t |> Option.bind byPath.TryFind |> Option.map (fun f -> f.Owner)
-    let machineIds = arr "machines" i.StateMachines |> List.map (str "id")
+    let machineIds = amendedMachines i |> List.map (str "id")
     let machineTypes = interfaces |> List.collect (fun x -> arr "machineTypes" x |> List.map (fun mt -> x, mt))
     [ check "X04" "Every interface has a complete contract implemented by one file its producer owns, in file order; its producer tests are in files the producer owns and every consumer has a contract test in a file it owns"
           [ if strs "compileOrder" i.Interfaces |> List.filter ((<>) "DOMAIN-STUBS") <> ids then yield "compileOrder does not list the interfaces exactly, in order"
@@ -865,7 +915,7 @@ let interfaceCheck (i: Inputs) (files: OwnedFile list) : Check list =
                 | _ -> yield sprintf "%s is mapped to more than one interface type" m
             for (x, mt) in machineTypes do
                 let mid = sOr "machine" mt
-                match arr "machines" i.StateMachines |> List.tryFind (fun m -> str "id" m = mid) with
+                match amendedMachines i |> List.tryFind (fun m -> str "id" m = mid) with
                 | None -> yield sprintf "%s maps unknown machine %s" (str "id" x) mid
                 | Some m ->
                     for (kind, typeKey) in [ "states", "states"; "events", "events" ] do
@@ -1154,11 +1204,58 @@ let private projectNamespace (path: string) =
     let parts = path.Split('/')
     parts.[1 .. parts.Length - 2] |> Array.map (fun p -> p.Replace("-", "")) |> String.concat "."
 
+/// The test tooling the owner locked: analysis/project-structure.json testTooling, one lock per dependency-lock decision
+/// (ODR-V41-07, and any later one), as (id, version) pairs of NuGet packages for the test projects and npm packages for
+/// package.json.
+let private lockEntry (entry: string) =
+    match entry.LastIndexOf '@' with
+    | n when n > 0 -> Some(entry.Substring(0, n), entry.Substring(n + 1))
+    | _ -> None
+
+let testTooling (i: Inputs) =
+    let tooling = field "testTooling" i.Structure |> Option.defaultValue JNull
+    let entries key = arr "locks" tooling |> List.collect (strs key) |> List.choose lockEntry
+    entries "nuget", entries "npm", strs "testProjects" tooling
+
+/// The test projects that host .NET tests (one of their files holds a dotnet: test): exactly these take the NuGet test
+/// tooling; a helper library such as Causa.TestSupport takes none.
+let testHostProjects (i: Inputs) (files: OwnedFile list) : string list =
+    let testProjects = arr "testProjects" i.Structure |> List.map (str "id") |> Set.ofList
+    files
+    |> List.filter (fun f -> f.Tests |> List.exists (starts "dotnet:"))
+    |> List.choose (fun f -> f.Project)
+    |> List.filter testProjects.Contains
+    |> List.distinct
+    |> List.sort
+
+let testToolingCheck (i: Inputs) (files: OwnedFile list) : Check =
+    let tooling = field "testTooling" i.Structure |> Option.defaultValue JNull
+    let locks = arr "locks" tooling
+    let all key = locks |> List.collect (strs key)
+    let hosts = testHostProjects i files
+    check "X16" "The test tooling is a well-formed owner lock: each lock names a dependency-lock decision and its approval, each entry is an exact id@version, no package is locked twice, and the NuGet packages go to exactly the test projects that host .NET tests (the offline suite compares each lock with the owner's record)"
+        [ if locks.IsEmpty then yield "testTooling holds no lock"
+          for l in locks do
+              let d = sOr "decision" l
+              if not (requestOfKind i "dependency-lock" d) then yield sprintf "a testTooling lock names decision '%s', which is not a dependency-lock request" d
+              if String.IsNullOrWhiteSpace (sOr "approval" l) then yield sprintf "the testTooling lock of %s names no operator approval" d
+              for key in [ "nuget"; "npm" ] do
+                  for e in strs key l do
+                      if not (Regex.IsMatch(e, @"^(@[^@\s/]+/)?[^@\s/]+@[0-9]+(\.[0-9]+)+$")) then yield sprintf "testTooling %s entry '%s' is not an exact id@version" key e
+          for key in [ "nuget"; "npm" ] do
+              for d in duplicates (all key |> List.choose lockEntry |> List.map fst) do
+                  yield sprintf "testTooling locks %s package %s twice" key d
+          if (all "nuget").IsEmpty then yield "testTooling locks no NuGet test package"
+          if List.sort (strs "testProjects" tooling) <> hosts then
+              yield sprintf "testTooling applies to [%s]; the test projects that host .NET tests are [%s]" (String.concat ", " (List.sort (strs "testProjects" tooling))) (String.concat ", " hosts) ]
+
 /// The empty application repository as integration writes it at bootstrap (T10): the solution, every source and test
 /// project with its complete Compile list and references, every planned file as an empty namespace, the domain stubs
-/// and each interface contract in the file that implements it. No third-party package and no behaviour: package
-/// references come from the dependency lock at T10, and every module is written by its owner. Building it proves the
-/// project graph, the compile order and the contract placement.
+/// and each interface contract in the file that implements it. No behaviour, and no third-party package except the test
+/// tooling the owner locked (testTooling): its NuGet versions in Directory.Packages.props (central package management),
+/// a version-less reference in each test project that hosts .NET tests, and its npm packages in package.json. Every
+/// module is written by its owner. Building it proves the project graph, the compile order, the contract placement and
+/// the test tooling restore.
 let bootstrapFiles (i: Inputs) (files: OwnedFile list) (globalJson: string) : (string * string) list =
     let lists = compileLists i files |> Map.ofList
     let interfaces = arr "interfaces" i.Interfaces |> List.map (fun x -> sOr "file" x, x) |> Map.ofList
@@ -1171,14 +1268,18 @@ let bootstrapFiles (i: Inputs) (files: OwnedFile list) (globalJson: string) : (s
         let b = path.Split('/') |> List.ofArray
         let common = List.zip (List.truncate (min a.Length b.Length) a) (List.truncate (min a.Length b.Length) b) |> List.takeWhile (fun (x, y) -> x = y) |> List.length
         (List.replicate (a.Length - common) ".." @ List.skip common b) |> String.concat "/"
+    let nuget, npm, toolingProjects = testTooling i
     let fsproj (p: Json) =
         let dir = dirOf (str "path" p)
         let compiles = lists.TryFind (str "id" p) |> Option.defaultValue [] |> List.map (fun f -> sprintf "    <Compile Include=\"%s\" />" (relative dir f))
         let refs = strs "references" p |> List.map (fun r -> sprintf "    <ProjectReference Include=\"%s\" />" (relative dir (pathOf r)))
+        let packages =
+            if List.contains (str "id" p) toolingProjects then nuget |> List.map (fun (id, _) -> sprintf "    <PackageReference Include=\"%s\" />" id) else []
         String.concat "\n"
             ([ "<Project Sdk=\"Microsoft.NET.Sdk\">"; "  <PropertyGroup>"; "    <TargetFramework>net10.0</TargetFramework>"; "  </PropertyGroup>"; "  <ItemGroup>" ]
              @ compiles @ [ "  </ItemGroup>" ]
              @ (if refs.IsEmpty then [] else [ "  <ItemGroup>" ] @ refs @ [ "  </ItemGroup>" ])
+             @ (if packages.IsEmpty then [] else [ "  <ItemGroup>" ] @ packages @ [ "  </ItemGroup>" ])
              @ [ "</Project>"; "" ])
     let csproj (p: Json) =
         let dir = dirOf (str "path" p)
@@ -1202,7 +1303,17 @@ let bootstrapFiles (i: Inputs) (files: OwnedFile list) (globalJson: string) : (s
         | Some path, Some(_, text) when path <> "" -> [ path, text ]
         | _ -> []
     let gitignore = String.concat "\n" [ "bin/"; "obj/"; "node_modules/"; "test-results/"; "playwright-report/"; "*.trx"; "" ]
-    [ ".gitignore", gitignore; "Causa.slnx", slnx; "Directory.Build.props", props; "global.json", globalJson ] @ projectFiles @ fsFiles @ host @ layoutCopy
+    let packageJson =
+        serialize (JObj [ "name", JStr "causa"; "private", JBool true; "devDependencies", JObj(npm |> List.map (fun (id, v) -> id, JStr v)) ])
+    let centralVersions =
+        String.concat "\n"
+            ([ "<Project>"; "  <PropertyGroup>"; "    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>"; "  </PropertyGroup>"; "  <ItemGroup>" ]
+             @ (nuget |> List.map (fun (id, v) -> sprintf "    <PackageVersion Include=\"%s\" Version=\"%s\" />" id v))
+             @ [ "  </ItemGroup>"; "</Project>"; "" ])
+    [ ".gitignore", gitignore; "Causa.slnx", slnx; "Directory.Build.props", props; "global.json", globalJson ]
+    @ (if nuget.IsEmpty then [] else [ "Directory.Packages.props", centralVersions ])
+    @ (if npm.IsEmpty then [] else [ "package.json", packageJson ])
+    @ projectFiles @ fsFiles @ host @ layoutCopy
 
 // ---- contracts ---------------------------------------------------------------------------------------------------
 
@@ -1302,10 +1413,11 @@ let build (i: Inputs) : Built =
             check "X09" "The verification execution plan places every (obligation, test) binding of the plan, and every contract, state-machine and unit test, in exactly one suite, keeping each test and its assertions" vepProblems
             preservation
             provenanceCheck i
-            check "X12" "Every state machine is deterministic by reviewed guard partitions, every pair is decided (listed or fail-closed), every transition is sourced, every state is reachable, and no state is added" smProblems
+            check "X12" "Every state machine is deterministic by reviewed guard partitions, every pair is decided (listed or fail-closed), every transition is sourced, every state is reachable, no state is added, and every transition v4.1 adds to v4 names an owner decision and approval" smProblems
             check "X13" "The adjusted DAG is acyclic, keeps every v4 task with its requirements and every v4 ordering not explicitly waived, keeps every estimate at least half of v4's, and labels every change an estimate with a rationale" schedProblems
             testIdentityCheck i files
-            layoutKitCheck i ]
+            layoutKitCheck i
+            testToolingCheck i files ]
     let json (n: string) (j: Json) = n, serialize j
     { Files =
         [ json "agent-file-ownership.json" (ownershipJson i files)

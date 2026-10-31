@@ -695,7 +695,7 @@
     },
     {
       "id": "FL-06",
-      "rule": "Contrast: text 4.5:1 (3:1 large), non-text marks 3:1 in light, dark and forced-colors modes; amber #E9A23B only with a text label (DEC-R7-002).",
+      "rule": "Contrast: text 4.5:1 (3:1 large), non-text marks 3:1 in light, dark and forced-colors modes; amber (UI-016's #E9A23B, drawn with Forma's --ef-color-status-warning as the owner decided in ODR-V41-05) only with a text label (DEC-R7-002).",
       "requirements": [
         "UI-016",
         "PERSIST-030"
@@ -725,7 +725,7 @@
         },
         {
           "id": "FL-06d",
-          "invariant": "amber only with a text label",
+          "invariant": "amber (#E9A23B or Forma's warning-status colour) only with a text label",
           "assertions": [
             "amberLabelled"
           ]
@@ -746,7 +746,7 @@
         {
           "value": "#E9A23B",
           "source": "docs/CAUSA-UI-EXPERIENCE-REQUIREMENTS.md, UI-016 colour table: 'Amber | Amber | `#E9A23B`'",
-          "note": "A requirement identity colour, not a Forma value (Forma 0.12.0 has no such colour); mapping it to a Forma semantic token is ODR-V41-05."
+          "note": "A requirement identity colour, not a Forma value (Forma 0.12.0 has no such colour). The owner mapped it to Forma's warning-status token --ef-color-status-warning (ODR-V41-05, option A, APR-V41-OWNER-2): web/causa.css declares no amber of its own, and the hex is named here only because UI-016 names it."
         }
       ],
       "critical": true,
@@ -814,6 +814,10 @@
           "viewports": [
             "VP-320",
             "VP-DESKTOP"
+          ],
+          "colorSchemes": [
+            "light",
+            "dark"
           ]
         },
         {

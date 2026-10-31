@@ -19,6 +19,51 @@ jobs:
           python3 tools/test-requirements-baseline.py
       - name: Compile Python tooling
         run: python3 -m compileall -q tools
+  # Compiled package v4 is frozen at tag indy-init-requirements-v4.0.0 and is never recompiled with a later compiler:
+  # its files on this commit must equal the tagged ones, and the tagged compiler and test suite reproduce them.
+  frozen-v4:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Compiled package v4 on this commit is the frozen one (tag indy-init-requirements-v4.0.0 at c9dc556, the owner's freeze)
+        run: |
+          git fetch --quiet --force origin 'refs/tags/indy-init-requirements-v4.0.0:refs/tags/indy-init-requirements-v4.0.0'
+          # A moved tag must not silently become the baseline: it must still name the commit the owner froze.
+          test "$(git rev-parse 'indy-init-requirements-v4.0.0^{commit}')" = c9dc556ef2b0d389e8ccc07b729f00fccd19fba7 || { echo "tag indy-init-requirements-v4.0.0 no longer names c9dc556"; exit 1; }
+          if ! git diff --quiet indy-init-requirements-v4.0.0 HEAD -- requirements-compiled/v4; then
+            echo "requirements-compiled/v4 differs from the frozen tag indy-init-requirements-v4.0.0:"
+            git diff --stat indy-init-requirements-v4.0.0 HEAD -- requirements-compiled/v4
+            exit 1
+          fi
+          git worktree add --quiet --detach "$RUNNER_TEMP/v4-frozen" indy-init-requirements-v4.0.0
+      - name: Install the SDK the tagged compiler pins (the tag's global.json)
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: ${{ runner.temp }}/v4-frozen/global.json
+      - name: Check out the five Rehearsal 7 evidence files the v4 lesson analysis quotes (evidence only, never a build input)
+        run: |
+          git clone --quiet --depth 1 --filter=blob:none --no-checkout https://github.com/kemiller2002/indy-init-rehearsal-007 "$RUNNER_TEMP/r7"
+          git -C "$RUNNER_TEMP/r7" fetch --quiet --depth 1 origin 9b307aa1d3d7d5e6fe1737680d03bf74fd90c1a9
+          git -C "$RUNNER_TEMP/r7" sparse-checkout set --no-cone /evidence/FINAL-REPORT.md /evidence/provenance.md /evidence/defects.md /evidence/DECISIONS.md /evidence/traceability.json
+          git -C "$RUNNER_TEMP/r7" checkout --quiet 9b307aa1d3d7d5e6fe1737680d03bf74fd90c1a9
+          echo "CAUSA_R7_EVIDENCE=$RUNNER_TEMP/r7" >> "$GITHUB_ENV"
+      - name: Check out echelon-registry at the release-set commit compiled package v4 pins
+        uses: actions/checkout@v4
+        with:
+          repository: kemiller2002/echelon-registry
+          ref: 7a2c27a3db7cab4337ea47536f3e1fc22d257f03
+          path: .echelon-registry
+          persist-credentials: false
+      - name: The tagged compiler and its offline test suite pass at the tag
+        working-directory: ${{ runner.temp }}/v4-frozen
+        run: |
+          dotnet build tools/requirements-compiler/tests -c Release
+          dotnet run -c Release --no-build --project tools/requirements-compiler/tests -- --offline --source . --record "$RUNNER_TEMP/v4-frozen-record.json"
+      - name: The tagged compiler reproduces the frozen package v4 byte for byte (checks W01-W16, status READY-FOR-OWNER-FREEZE)
+        working-directory: ${{ runner.temp }}/v4-frozen
+        run: dotnet tools/requirements-compiler/src/bin/Release/net10.0/requirements-compiler.dll v4 --source . --package requirements-compiled/v4 --registry "$GITHUB_WORKSPACE/.echelon-registry" --r7-evidence "$CAUSA_R7_EVIDENCE" --verify-test-record "$RUNNER_TEMP/v4-frozen-record.json" --check
   fsharp-tooling:
     runs-on: ubuntu-latest
     steps:
@@ -38,7 +83,7 @@ jobs:
           git -C "$RUNNER_TEMP/r7" checkout --quiet 9b307aa1d3d7d5e6fe1737680d03bf74fd90c1a9
           echo "CAUSA_R7_EVIDENCE=$RUNNER_TEMP/r7" >> "$GITHUB_ENV"
       - name: Offline tests (baseline port reproduces the committed baseline, units, preflight verdict, v4 and v4.1 scope and controls)
-        run: dotnet run -c Release --no-build --project tools/requirements-compiler/tests -- --offline --source . --record "$RUNNER_TEMP/compiler-test-record.json"
+        run: dotnet run -c Release --no-build --project tools/requirements-compiler/tests -- --offline --source .
       - name: F# and Python baseline generators agree byte for byte at this commit
         run: |
           python3 -I tools/build-requirements-baseline.py . "$GITHUB_SHA" > "$RUNNER_TEMP/py.json"
@@ -49,20 +94,11 @@ jobs:
           args="--root . --baseline requirements/causa-requirements-baseline-r7.json --previous requirements/causa-requirements-baseline-r6.json --trace docs/rehearsal-007/traceability.json"
           dotnet fsi tools/validate-r7-persistence-requirements.fsx -- $args
           dotnet fsi tools/validate-r7-persistence-requirements.fsx -- $args --self-test true
-      - name: Check out echelon-registry at the release-set commit compiled package v4 pins
-        uses: actions/checkout@v4
-        with:
-          repository: kemiller2002/echelon-registry
-          ref: 7a2c27a3db7cab4337ea47536f3e1fc22d257f03
-          path: .echelon-registry
-          persist-credentials: false
-      - name: Compiled package v4 is reproduced byte for byte and its checks W01-W16 pass
-        run: dotnet tools/requirements-compiler/src/bin/Release/net10.0/requirements-compiler.dll v4 --source . --package requirements-compiled/v4 --registry .echelon-registry --r7-evidence "$CAUSA_R7_EVIDENCE" --verify-test-record "$RUNNER_TEMP/compiler-test-record.json" --check
       - name: Download the Forma 0.12.0 npm tarball compiled package v4.1 pins, and verify its SHA-256
         run: |
           curl -fsSL -o "$RUNNER_TEMP/forma.tgz" https://registry.npmjs.org/@echelon-foundry/design-system/-/design-system-0.12.0.tgz
           echo "b824568d528562658ded3d53ecd06504e907f7d42129facd86a8f298d1cb7aae  $RUNNER_TEMP/forma.tgz" | sha256sum -c -
-      - name: Compiled package v4.1 is reproduced byte for byte, its Forma inventory matches the published package, and its checks X01-X15 pass
+      - name: Compiled package v4.1 is reproduced byte for byte, its Forma inventory matches the published package, and its checks X01-X16 pass
         run: dotnet tools/requirements-compiler/src/bin/Release/net10.0/requirements-compiler.dll v41 --source . --package requirements-compiled/v4.1 --base requirements-compiled/v4 --forma-tarball "$RUNNER_TEMP/forma.tgz" --check
       - name: The frozen v4.1 interface contracts typecheck, and each negative control (forged Confirmation, credential read) is refused (built outside the checkout)
         run: |

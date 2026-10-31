@@ -70,7 +70,7 @@
     },
     {
       "id": "X12",
-      "title": "Every state machine is deterministic by reviewed guard partitions, every pair is decided (listed or fail-closed), every transition is sourced, every state is reachable, and no state is added",
+      "title": "Every state machine is deterministic by reviewed guard partitions, every pair is decided (listed or fail-closed), every transition is sourced, every state is reachable, no state is added, and every transition v4.1 adds to v4 names an owner decision and approval",
       "result": "PASS",
       "problems": []
     },
@@ -89,6 +89,12 @@
     {
       "id": "X15",
       "title": "Every critical Forma layout rule has executable browser assertions, each exported by the layout kit with a broken fixture that must fail, run against published Forma patterns at contract viewports; every Forma gap has a remedy that uses only Forma tokens",
+      "result": "PASS",
+      "problems": []
+    },
+    {
+      "id": "X16",
+      "title": "The test tooling is a well-formed owner lock: each lock names a dependency-lock decision and its approval, each entry is an exact id@version, no package is locked twice, and the NuGet packages go to exactly the test projects that host .NET tests (the offline suite compares each lock with the owner's record)",
       "result": "PASS",
       "problems": []
     }

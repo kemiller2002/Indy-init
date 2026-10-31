@@ -35,7 +35,7 @@
     "bindings": 784,
     "planTests": 660,
     "obligations": 613,
-    "ownTests": 139,
+    "ownTests": 140,
     "suites": 11
   },
   "categoryBindings": {
@@ -71,7 +71,7 @@
       "planTests": false,
       "sha": "runs on the exact candidate SHA; every result records it",
       "counts": {
-        "tests": 136,
+        "tests": 137,
         "bindings": 0,
         "obligations": 0,
         "files": 27,
@@ -485,6 +485,9 @@
         },
         {
           "id": "dotnet:Causa.Persistence.Tests.StateMachines.SMSAVE.T-S60"
+        },
+        {
+          "id": "dotnet:Causa.Persistence.Tests.StateMachines.SMSAVE.T-S61"
         }
       ]
     },

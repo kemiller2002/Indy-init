@@ -1,7 +1,7 @@
 namespace Causa.Persistence
 
 /// IF41-WIRE: HTTP as data. Persistence builds requests and decodes answers; the App runtime only executes them
-/// through Limen and returns the raw result (ODR-V4-06 proposes that decoding stays inside persistence).
+/// through Limen and returns the raw result (decoding stays inside persistence: ODR-V4-06, approved in APR-V4-OWNER-1).
 type RequestId = RequestId of int64
 
 type HttpMethod =

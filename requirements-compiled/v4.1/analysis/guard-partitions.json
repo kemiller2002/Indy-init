@@ -125,12 +125,5 @@
       "exclusiveBecause": "online but not connected is not listed: Open is not offered before Connect, and a request fails closed"
     }
   ],
-  "unusedEvents": [
-    {
-      "machine": "SM-SAVE",
-      "event": "MutationSent",
-      "finding": "The event is declared by v4 but no transition accepts it, so it fails closed in every state.",
-      "decision": "ODR-V41-08"
-    }
-  ]
+  "unusedEvents": []
 }

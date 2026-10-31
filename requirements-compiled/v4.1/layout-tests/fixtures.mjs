@@ -87,6 +87,8 @@ export const brokenFixtures = {
     '<span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#E9A23B"></span>',
     '<svg width="12" height="12" role="img"><circle cx="6" cy="6" r="6" fill="#E9A23B"/></svg>',
     '<span style="display:inline-block;width:12px;height:12px;background:#E9A23B"><span class="ef-visually-hidden">Pending</span></span>',
+    '<span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:var(--ef-color-status-warning)"></span>',
+    '<p>Saved</p><div data-ef-theme="dark"><span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:var(--ef-color-status-warning)"></span></div>',
   ],
   statusVisible: [
     '<div style="height:4000px"></div><span class="ef-status-lozenge"></span>',
@@ -153,7 +155,8 @@ export const brokenFixtures = {
 };
 
 export const conformingFixtures = {
-  amberLabelled: '<span class="ef-status-lozenge" style="background:#E9A23B;color:#1b1b1b">Pending review</span>',
+  // Amber drawn with Forma's warning token and labelled, beside an unlabelled accent-primary mark, which is not amber.
+  amberLabelled: '<span class="ef-status-lozenge"><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--ef-color-status-warning)"></span> Pending review</span><div><span style="display:inline-block;width:4px;height:24px;background:var(--ef-color-accent-primary)"></span><span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:var(--ef-color-control-active)"></span></div>',
   faultStatesPreserved: '<aside class="ef-alert ef-fault-banner" role="status"><h2 class="ef-alert__title">Save failed</h2><p>GitHub refused the change. Your changes are kept in this tab.</p><div class="ef-recovery-actions" role="group" aria-label="Recovery actions"><button type="button">Retry</button></div></aside>',
   // PERSIST-031's copy for each fault state (the event build's plan tests check it word for word).
   faultSaveFailed: '<aside class="ef-alert ef-fault-banner" role="status"><h2 class="ef-alert__title">Save failed.</h2><p>GitHub could not save this investigation because the credential was refused. Your changes are kept in this tab.</p><div class="ef-recovery-actions" role="group" aria-label="Recovery actions"><button type="button">Reconnect</button></div></aside>',
