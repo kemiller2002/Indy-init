@@ -87,6 +87,7 @@ export const brokenFixtures = {
     '<span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#E9A23B"></span>',
     '<svg width="12" height="12" role="img"><circle cx="6" cy="6" r="6" fill="#E9A23B"/></svg>',
     '<span style="display:inline-block;width:12px;height:12px;background:#E9A23B"><span class="ef-visually-hidden">Pending</span></span>',
+    '<span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:var(--ef-color-status-warning)"></span>',
   ],
   statusVisible: [
     '<div style="height:4000px"></div><span class="ef-status-lozenge"></span>',

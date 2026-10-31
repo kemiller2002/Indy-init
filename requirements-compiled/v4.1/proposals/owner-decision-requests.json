@@ -133,6 +133,22 @@
       "approvalRecord": {
         "how": "{\"decision_id\": \"ODR-V41-08\", \"action\": \"select\", \"option\": \"A\" | \"B\" | \"C\"}"
       }
+    },
+    {
+      "id": "ODR-V41-09",
+      "kind": "dependency-lock",
+      "title": "Lock axe-core for the accessibility assertion",
+      "question": "The event build copies the layout kit (layout-tests/assertions.mjs) as tests/browser/support/layout-assertions.mjs, and its axeClean assertion (FL-06e, bound through PERSIST-030-O6) loads axe-core from the event build's own node_modules. ODR-V41-07 locked the test runners (xUnit, Microsoft.NET.Test.Sdk, @playwright/test) but not axe-core, so T10 cannot add it to package.json. Which axe-core version is locked?",
+      "options": [
+        "A: axe-core 4.14.0 (the version this package's layout tests run with in CI)",
+        "B: another version the owner names"
+      ],
+      "recommendation": "A: it is the version the layout kit's catch rate and every conforming Forma pattern were measured with; the lock entry is added by the owner's decision, not chosen by an agent.",
+      "rationale": "Adding a library needs a verified requirement or an owner decision (v4.1 brief). FL-06e requires axe-core checks but names no version.",
+      "impact": "Until decided, the bootstrap writes no axe-core entry, and the event build's axeClean assertion has no axe-core to load.",
+      "approvalRecord": {
+        "how": "{\"decision_id\": \"ODR-V41-09\", \"action\": \"select\", \"option\": \"A\" | \"B\", \"packages\": [\"axe-core@<version>\"]}"
+      }
     }
   ],
   "recordFormat": "As package v4 (requirements-compiled/v4/proposals/owner-decision-requests.json recordFormat): one operator approval in kickoff/rehearsal-007/approvals.causa.json, one change per decision, committed by the owner without agent trailers."

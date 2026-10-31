@@ -70,7 +70,7 @@
     },
     {
       "id": "X12",
-      "title": "Every state machine is deterministic by reviewed guard partitions, every pair is decided (listed or fail-closed), every transition is sourced, every state is reachable, and no state is added",
+      "title": "Every state machine is deterministic by reviewed guard partitions, every pair is decided (listed or fail-closed), every transition is sourced, every state is reachable, no state is added, and every transition v4.1 adds to v4 names an owner decision and approval",
       "result": "PASS",
       "problems": []
     },
@@ -89,6 +89,12 @@
     {
       "id": "X15",
       "title": "Every critical Forma layout rule has executable browser assertions, each exported by the layout kit with a broken fixture that must fail, run against published Forma patterns at contract viewports; every Forma gap has a remedy that uses only Forma tokens",
+      "result": "PASS",
+      "problems": []
+    },
+    {
+      "id": "X16",
+      "title": "The test tooling the bootstrap writes is exactly the owner's lock (ODR-V41-07): each entry an exact id@version, the lock names its decision and approval, and it applies only to test projects",
       "result": "PASS",
       "problems": []
     }

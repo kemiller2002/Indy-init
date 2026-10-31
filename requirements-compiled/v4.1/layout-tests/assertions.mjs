@@ -641,12 +641,24 @@ export const forcedColorsDistinct = async page => {
   }).then(found => [...found, ...colourOnly]);
 };
 
-// Amber (#E9A23B and close shades) never stands alone: an amber element carries a text label (DEC-R7-002).
+// Amber never stands alone: an amber element carries a text label (DEC-R7-002). Amber is UI-016's #E9A23B and, as
+// the owner mapped it (ODR-V41-05), Forma's warning-status colour in the current theme; close shades of either count.
 export const amberLabelled = async page => {
   await install(page);
   return inPage(page, () => {
-    const amber = [233, 162, 59];
-    const near = c => { if (!c || c === 'none' || c.startsWith('url')) return false; const v = window.__ef.rgba(c); return v[3] > 0 && Math.hypot(v[0] - amber[0], v[1] - amber[1], v[2] - amber[2]) < 40; };
+    // The token's colour is read only when Forma defines it; an undefined var() would resolve to the text colour.
+    const defined = getComputedStyle(document.documentElement).getPropertyValue('--ef-color-status-warning').trim() !== '';
+    const tokenColour = () => {
+      const probe = document.createElement('span');
+      probe.style.color = 'var(--ef-color-status-warning)';
+      document.body.appendChild(probe);
+      const v = window.__ef.rgba(getComputedStyle(probe).color);
+      probe.remove();
+      return v;
+    };
+    const token = defined ? tokenColour() : [0, 0, 0, 0];
+    const ambers = [[233, 162, 59], ...(token[3] > 0 ? [token.slice(0, 3)] : [])];
+    const near = c => { if (!c || c === 'none' || c.startsWith('url')) return false; const v = window.__ef.rgba(c); return v[3] > 0 && ambers.some(a => Math.hypot(v[0] - a[0], v[1] - a[1], v[2] - a[2]) < 40); };
     const colours = s => [s.backgroundColor, s.color, ...(s.outlineStyle !== 'none' && parseFloat(s.outlineWidth) > 0 ? [s.outlineColor] : []), ...(['Top', 'Right', 'Bottom', 'Left'].filter(k => parseFloat(s[`border${k}Width`]) > 0).map(k => s[`border${k}Color`])), s.fill, s.stroke, ...((s.boxShadow.match(/rgba?\([^)]*\)/g)) || []), ...((s.backgroundImage.match(/rgba?\([^)]*\)|#[0-9a-f]{6}\b/gi)) || []).map(c => c.startsWith('#') ? `rgb(${parseInt(c.slice(1, 3), 16)},${parseInt(c.slice(3, 5), 16)},${parseInt(c.slice(5, 7), 16)})` : c)];
     const amberish = e => colours(getComputedStyle(e)).some(c => c && near(c));
     // The label is visible text in the amber element or beside it (its parent), never only a screen-reader text.
@@ -933,7 +945,8 @@ export const onlyFormaTokens = async (page, { inventory, hooks = [], formaHref =
 // ---- FL-06e automated WCAG checks ---------------------------------------------------------------------------
 
 // axe-core's WCAG 2.0-2.2 A and AA rules report no violation. The axe source comes from the caller (axeSource), or
-// from the axe-core package installed beside this module (the event build adds it to package.json, ODR-V41-07).
+// from the axe-core package installed beside this module (the event build adds it to package.json; its version is
+// owner decision ODR-V41-09, because ODR-V41-07 locked the test runners only).
 const loadAxe = async () => {
   const { createRequire } = await import('node:module');
   const { readFileSync } = await import('node:fs');

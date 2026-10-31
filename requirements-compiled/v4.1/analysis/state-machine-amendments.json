@@ -1,0 +1,31 @@
+{
+  "schema": "indy-init.v41-state-machine-amendments/1",
+  "description": "Amendments of v4's state machines that the owner approved (ODR-V41-08, APR-V41-OWNER-2). v4 is frozen at tag indy-init-requirements-v4.0.0 and its files are never edited: requirements-compiler v41 applies each transition over the frozen machines when it compiles state-machine-contracts.json, and check X12 requires each to name its owner decision and operator approval and to fit its machine (known states and events, deterministic guards). No state or event is added.",
+  "transitions": [
+    {
+      "machine": "SM-SAVE",
+      "id": "T-S61",
+      "from": "Saving",
+      "event": "MutationSent",
+      "to": "Saving",
+      "guard": "true",
+      "effects": [
+        "record the sent request as the session's outstanding request (its RequestId); an answer to any other request is SupersededReply"
+      ],
+      "sources": [
+        "PERSIST-007",
+        "PERSIST-051"
+      ],
+      "decision": "ODR-V41-08",
+      "approval": "APR-V41-OWNER-2"
+    }
+  ],
+  "accepted": [
+    {
+      "machine": "SM-LOAD",
+      "decision": "ODR-V41-08",
+      "approval": "APR-V41-OWNER-2",
+      "note": "SM-LOAD keeps no transport-failure event: a provider refusal, a transport failure or a lost answer during a load is LoadRejected carrying LoadFailure.ProviderFailed (IF41-SAVE), as the owner accepted. No transition is added."
+    }
+  ]
+}

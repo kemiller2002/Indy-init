@@ -1128,7 +1128,7 @@ let formaFromTarball (path: string) : string * string * Json =
 /// Reads every input of the v4.1 stage: v4's plan, manifest, machines, tasks and policy, and the authored v4.1 inputs.
 let v41Inputs (source: string) (package: string) (basePackage: string) (formaTarball: string option) : V41Package.Inputs =
     let a n = Path.Combine(package, "analysis", n)
-    let authored = [ "interface-specifications.json"; "project-structure.json"; "github-error-matrix.json"; "forma-layout-contract.json"; "task-adjustments.json"; "conflict-telemetry.json"; "guard-partitions.json" ]
+    let authored = [ "interface-specifications.json"; "project-structure.json"; "github-error-matrix.json"; "forma-layout-contract.json"; "task-adjustments.json"; "conflict-telemetry.json"; "guard-partitions.json"; "state-machine-amendments.json" ]
     // Documents and records the owner approves with the package; the review record exists once a review has run.
     let documents =
         [ "README.md"; "AGENT-RULES.md"; "FREEZE.md"; "optimization-report.md"; "independent-review.md"; "proposals/owner-decision-requests.json"; "analysis/independent-review.json"
@@ -1156,6 +1156,7 @@ let v41Inputs (source: string) (package: string) (basePackage: string) (formaTar
       Adjustments = parseFile (a "task-adjustments.json")
       Telemetry = parseFile (a "conflict-telemetry.json")
       GuardPartitions = parseFile (a "guard-partitions.json")
+      MachineAmendments = parseFile (a "state-machine-amendments.json")
       FormaInventory =
         if File.Exists inventoryPath then parseFile inventoryPath
         else match extract with Some x -> x | None -> failwithf "%s is missing; generate it with --forma-tarball" inventoryPath

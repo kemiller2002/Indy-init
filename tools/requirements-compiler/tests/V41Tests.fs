@@ -1,7 +1,8 @@
 /// Compiled package v4.1: the committed package is reproduced from its inputs, and each check of V41Package rejects
 /// inputs broken in the way it guards against (ownership violations, interface incompatibility, verification coverage
-/// drop, nondeterministic transitions, missing error classes, unverified Forma tokens, cyclic compile order), including
-/// every bypass independent review round 1 found (RV41-1-4, RV41-1-5, RV41-1-7).
+/// drop, nondeterministic transitions, missing error classes, unverified Forma tokens, cyclic compile order, amendments
+/// and test tooling without the owner's decision), including every bypass independent review round 1 found (RV41-1-4,
+/// RV41-1-5, RV41-1-7). The owner's decisions v4.1 applies are checked against the committed operator record.
 module V41Tests
 
 open System.IO
@@ -30,6 +31,30 @@ let private expectFail (name: string) (checkId: string) (i: V41Package.Inputs) :
         if List.contains checkId (failing i) then [] else [ sprintf "v4.1 control '%s': %s did not fail" name checkId ]
     with ex -> [ sprintf "v4.1 control '%s' threw: %s" name ex.Message ]
 
+/// The owner's decisions v4.1 applies match the committed operator record (RDP-003): the test-tooling lock is exactly
+/// the packages of ODR-V41-07, each amendment names an approval that selects its decision, the approvals file was last
+/// changed in a commit with no agent trailers, and every record v4.1 cites is an operator's.
+let ownerRecords (source: string) (i: V41Package.Inputs) : string list =
+    let path = "kickoff/rehearsal-007/approvals.causa.json"
+    let approvals = parseFile (Path.Combine(source, path)) |> arr "approvals"
+    let approval id = approvals |> List.tryFind (fun a -> strOpt "id" a = Some id)
+    let change (a: Json) (decision: string) = arr "changes" a |> List.tryFind (fun c -> strOpt "decision_id" c = Some decision)
+    let operator (a: Json) = (field "authority" a |> Option.bind (strOpt "kind")) = Some "operator"
+    let tooling = field "testTooling" i.Structure |> Option.defaultValue JNull
+    let lastChange = match Git.run source [ "log"; "-1"; "--format=%B"; "--"; path ] with Ok m -> System.Text.Encoding.UTF8.GetString m | Error e -> e
+    [ if lastChange.Contains "Claude-Session:" || lastChange.Contains "Co-Authored-By: Claude" then yield "v4.1: the approvals file was last changed by an agent commit"
+      match approval (str "approval" tooling) with
+      | None -> yield sprintf "v4.1: testTooling names approval %s, which the approvals file does not hold" (str "approval" tooling)
+      | Some a ->
+          if not (operator a) then yield "v4.1: the test-tooling approval is not an operator's"
+          match change a "ODR-V41-07" with
+          | None -> yield "v4.1: the test-tooling approval records no ODR-V41-07"
+          | Some c -> if List.sort (strs "packages" c) <> List.sort (strs "nuget" tooling @ strs "npm" tooling) then yield sprintf "v4.1: testTooling locks %A, the owner recorded %A" (strs "nuget" tooling @ strs "npm" tooling) (strs "packages" c)
+      for t in arr "transitions" i.MachineAmendments do
+          match approval (str "approval" t) with
+          | Some a when operator a && (change a (str "decision" t) |> Option.bind (strOpt "option")) = Some "A" -> ()
+          | _ -> yield sprintf "v4.1: amendment %s is not selected (option A) by an operator approval of %s" (str "id" t) (str "decision" t) ]
+
 /// The committed package equals a fresh build, and two builds are identical.
 let scope (source: string) : string list =
     let i = inputs source
@@ -49,7 +74,18 @@ let scope (source: string) : string list =
       // RV41-1-1: the save machine (first write code) follows the invariant tests, and checkpoint 1 follows the kernel.
       let order = V41Package.precedences (V41Package.adjustedTasks i)
       for (a, b) in [ "T12", "T19"; "T13", "T17"; "T13", "T21"; "T12", "T35" ] do
-          if not (order.Contains(a, b)) then yield sprintf "v4.1: %s no longer precedes %s" a b ]
+          if not (order.Contains(a, b)) then yield sprintf "v4.1: %s no longer precedes %s" a b
+      // ODR-V41-07: the bootstrap writes exactly the locked test tooling, into the listed test projects only.
+      let nuget, npm, toolingProjects = V41Package.testTooling i
+      let boot = V41Package.bootstrapFiles i (V41Package.ownedFiles i) "{}" |> Map.ofList
+      for tp in arr "testProjects" i.Structure do
+          let refs = Regex.Matches(boot.TryFind (str "path" tp) |> Option.defaultValue "", "<PackageReference Include=\"([^\"]+)\" Version=\"([^\"]+)\" />") |> Seq.map (fun m -> m.Groups[1].Value, m.Groups[2].Value) |> List.ofSeq
+          let expected = if List.contains (str "id" tp) toolingProjects then nuget else []
+          if refs <> expected then yield sprintf "v4.1: bootstrap writes %A into %s, not %A" refs (str "id" tp) expected
+      match boot.TryFind "package.json" |> Option.map (System.Text.Encoding.UTF8.GetBytes >> parseBytes) with
+      | Some pj -> if (field "devDependencies" pj |> Option.map (function JObj ps -> ps |> List.map (fun (k, v) -> k, asStr v) | _ -> []) |> Option.defaultValue []) <> npm then yield "v4.1: package.json does not hold exactly the locked npm packages"
+      | None -> yield "v4.1: the bootstrap writes no package.json"
+      yield! ownerRecords source i ]
 
 let controls (source: string) : string list =
     let i0 = inputs source
@@ -151,8 +187,28 @@ let controls (source: string) : string list =
       yield! expectFail "overlapping guard" "X12" (machine "SM-SAVE" (mapArr "transitions" (fun ts -> ts @ [ setIn "id" (JStr "T-S99") firstSave |> setIn "guard" (JStr "online and anything") ])))
       yield! expectFail "offline branch dropped" "X12" (machine "SM-SAVE" (mapArr "transitions" (List.filter (fun t -> strOpt "id" t <> Some "T-S05"))))
       yield! expectFail "unknown next state" "X12" (machine "SM-SAVE" (mapArr "transitions" (fun ts -> ts @ [ setIn "id" (JStr "T-S99") firstSave |> setIn "guard" (JStr "never") |> setIn "event" (JStr "CheckAgain") |> setIn "to" (JStr "Limbo") ])))
-      // X12 round 2 (RV41-2-2): an event no transition accepts, not listed with a decision.
-      yield! expectFail "unlisted unused event" "X12" { i0 with GuardPartitions = setIn "unusedEvents" (JArr []) i0.GuardPartitions }
+      // X12 round 2 (RV41-2-2): an event no transition accepts, not listed with a decision (MutationSent without the
+      // owner's amendment).
+      yield! expectFail "unlisted unused event" "X12" { i0 with GuardPartitions = setIn "unusedEvents" (JArr []) i0.GuardPartitions; MachineAmendments = setIn "transitions" (JArr []) i0.MachineAmendments }
+      // X12 (ODR-V41-08): an amendment without an owner decision or approval, one that adds a state, one on a machine v4
+      // does not have, and one that makes a pair nondeterministic.
+      let amendment f = { i0 with MachineAmendments = mapArr "transitions" (List.map f) i0.MachineAmendments }
+      let added = arr "transitions" i0.MachineAmendments |> List.head
+      yield! expectFail "amendment without a decision" "X12" (amendment (setIn "decision" (JStr "")))
+      yield! expectFail "amendment naming no request" "X12" (amendment (setIn "decision" (JStr "ODR-V41-99")))
+      yield! expectFail "amendment without an approval" "X12" (amendment (setIn "approval" (JStr "")))
+      yield! expectFail "amendment adding a state" "X12" (amendment (setIn "to" (JStr "Sending")))
+      yield! expectFail "amendment on an unknown machine" "X12" (amendment (setIn "machine" (JStr "SM-SYNC")))
+      yield! expectFail "amendment making a pair nondeterministic" "X12" { i0 with MachineAmendments = mapArr "transitions" (fun ts -> ts @ [ setIn "id" (JStr "T-S62") added |> setIn "to" (JStr "Offline") ]) i0.MachineAmendments }
+      // X16 (ODR-V41-07): another decision, a version range, a non-test project, a package locked twice, no NuGet entry.
+      let tooling f = structure (fun st -> setIn "testTooling" (f (field "testTooling" st |> Option.defaultValue JNull)) st)
+      yield! expectFail "tooling without its decision" "X16" (tooling (setIn "decision" (JStr "ODR-V41-03")))
+      yield! expectFail "tooling without an approval" "X16" (tooling (setIn "approval" (JStr "")))
+      yield! expectFail "version range" "X16" (tooling (setIn "nuget" (jstrs [ "xunit@^2.9.2" ])))
+      yield! expectFail "unversioned npm package" "X16" (tooling (setIn "npm" (jstrs [ "@playwright/test" ])))
+      yield! expectFail "test SDK on a source project" "X16" (tooling (mapArr "testProjects" (fun ps -> ps @ [ JStr "Causa.Domain" ])))
+      yield! expectFail "package locked twice" "X16" (tooling (mapArr "nuget" (fun ps -> ps @ [ JStr "xunit@2.9.3" ])))
+      yield! expectFail "no NuGet test package" "X16" (tooling (setIn "nuget" (JArr [])))
       // X13 round 2 (RV41-2-5): a waiver naming no owner decision request.
       yield! expectFail "waiver without a real decision" "X13" { i0 with Adjustments = mapArr "waivedPrecedences" (List.map (setIn "decision" (JStr "x"))) i0.Adjustments }
       // X15 executable layout kit (RV41-3-1, RV41-3-7): a rule without assertions or opted out; an assertion the kit

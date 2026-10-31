@@ -64,7 +64,7 @@ type ConflictInput =
     | SupersededReply of RequestId
 
 /// What a Saved state rests on: a save confirmed by read-back (PERSIST-023), or a verified read at a named commit after
-/// a load or a confirmed discard. Whether the second may show as Saved is owner decision ODR-V4-08.
+/// a load or a confirmed discard. The owner approved that the second shows as Saved (ODR-V4-08, APR-V4-OWNER-1).
 type SavedBasis =
     | Confirmed of Confirmation.T
     | VerifiedAt of VerifiedInvestigation
