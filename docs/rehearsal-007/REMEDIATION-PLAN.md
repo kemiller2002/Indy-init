@@ -8,7 +8,7 @@ Generated from [`work-packages.json`](work-packages.json); the JSON is authorita
 |---|---|---|---|---|---|
 | R7-REM-001 | Cross-tab persistence correctness | arca, indy-init | arca WI-0038 | arca#47 (merged 916d0ca) | **VERIFIED** |
 | R7-REM-002 | Offline retry and save-state correctness | arca | arca WI-0037 | arca#47 (merged 916d0ca) | **VERIFIED** |
-| R7-REM-003 | GitHub credential separation | owner (repository secrets), indy-init | — | — | **BLOCKED** |
+| R7-REM-003 | GitHub credential separation | owner (repository secrets), indy-init | — | — | **VERIFIED** |
 | R7-REM-004 | CI concurrency and scheduling | conditor, praxis | conditor WI-0063, praxis WI-0106 | conditor#122 (merged 9241290), praxis#300 (merged 4e9993e) | **PARTIAL** |
 | R7-REM-005 | Unattended PR execution | praxis, conditor | praxis WI-0104, conditor WI-0062 | — | **PASS_ADVISORY** |
 | R7-REM-006 | Automated acceptance evidence | indy-init, rehearsal repository | — | — | **PLANNED** |
@@ -79,7 +79,7 @@ Generated from [`work-packages.json`](work-packages.json); the JSON is authorita
 
 ## R7-REM-003: GitHub credential separation
 
-**Addresses:** D-09, PF-015-O2, EXT-DATA-004-O2, EXT-DATA-005-O1. **Depends on:** nothing. **Status:** BLOCKED.
+**Addresses:** D-09, PF-015-O2, EXT-DATA-004-O2, EXT-DATA-005-O1. **Depends on:** nothing. **Status:** VERIFIED.
 
 **Plan.** Rehearsal 6's CAUSA_GITHUB_TOKEN could write. Credentials are owner-held: create a fine-grained read-only token (or GitHub App installation) for the data repository and a write token limited to kemiller2002/causa-write-test, store them as CAUSA_GITHUB_TOKEN and CAUSA_WRITE_TOKEN, and prove the actual permissions with real requests (see SECURITY-REVIEW.md).
 
@@ -89,10 +89,10 @@ Generated from [`work-packages.json`](work-packages.json); the JSON is authorita
 **Acceptance.**
 - Both probes recorded against real GitHub before kickoff
 
-**Remaining.**
-- Owner action: create and store the two credentials; then the agent runs the probe
+**Evidence.**
+- indy-init-rehearsal-008 run 41185232453, artifact credential-probe
 
-**Independent review.** Not run.
+**Independent review.** Credential probe PASS against real GitHub (indy-init-rehearsal-008 run 41185232453): readGet 200, readWrite 403, writeTest 201, writeCleanup 204, writeElsewhere 403.
 
 ## R7-REM-004: CI concurrency and scheduling
 

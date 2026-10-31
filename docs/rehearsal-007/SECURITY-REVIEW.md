@@ -2,7 +2,7 @@
 
 Scope: the security-relevant changes and open risks of the Rehearsal 6 remediation. Statuses use PASS, FAIL, BLOCKED and NOT_RUN. Nothing here is PASS because it is planned.
 
-## 1. Credential separation (R7-REM-003): BLOCKED on the owner
+## 1. Credential separation (R7-REM-003): PASS
 
 **Rehearsal 6 finding (D-09).** `CAUSA_GITHUB_TOKEN`, the "read-only" credential, could write. That failed PF-015-O2, EXT-DATA-004-O2 ("GitHub accepted a write with the read-only credential") and EXT-DATA-005-O1 ("Expected Not WriteGranted, Actual WriteGranted").
 
@@ -64,7 +64,7 @@ jobs:
 - the cleanup returns 204;
 - write with the write token in the data repository is refused.
 
-**Status: BLOCKED.** It waits for the owner to create the two secrets. Then the agent dispatches the probe and records its artifact.
+**Status: PASS (2026-10-31).** The owner stored both secrets on `kemiller2002/indy-init-rehearsal-008`. The probe ran there as run [41185232453](https://github.com/kemiller2002/indy-init-rehearsal-008/actions/runs/41185232453) (artifact `credential-probe`): `readGet 200, readWrite 403, writeTest 201, writeCleanup 204, writeElsewhere 403`. To keep 008's `main` at its starting state, the workflow ran from a temporary `credential-probe` branch, triggered by a push to that branch instead of `workflow_dispatch`; the probe steps are unchanged.
 
 ## 2. Unattended merging (R7-REM-005): PASS (advisory), and an open, accepted risk
 
