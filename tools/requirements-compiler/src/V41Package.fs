@@ -1233,7 +1233,7 @@ let testToolingCheck (i: Inputs) (files: OwnedFile list) : Check =
     let locks = arr "locks" tooling
     let all key = locks |> List.collect (strs key)
     let hosts = testHostProjects i files
-    check "X16" "The test tooling is a well-formed owner lock: each lock names a dependency-lock decision and its approval, each entry is an exact id@version in its manager's list, no package is locked twice, and the NuGet packages go to exactly the test projects that host .NET tests (the offline suite compares each lock with the owner's record)"
+    check "X16" "The test tooling is a well-formed owner lock: each lock names a dependency-lock decision and its approval, each entry is an exact id@version, no scoped npm name is in the NuGet list, no package is locked twice, and the NuGet packages go to exactly the test projects that host .NET tests (the offline suite compares each lock, and each package's manager, with the owner's record)"
         [ if locks.IsEmpty then yield "testTooling holds no lock"
           for l in locks do
               let d = sOr "decision" l
@@ -1242,11 +1242,10 @@ let testToolingCheck (i: Inputs) (files: OwnedFile list) : Check =
               for key in [ "nuget"; "npm" ] do
                   for e in strs key l do
                       if not (Regex.IsMatch(e, @"^(@[^@\s/]+/)?[^@\s/]+@[0-9]+(\.[0-9]+)+$")) then yield sprintf "testTooling %s entry '%s' is not an exact id@version" key e
-              // Each package is in its manager's list: a scoped @x/y name is npm's, and npm names are lowercase.
+              // A scoped @x/y name is npm's: NuGet ids have no '@'. Which manager each recorded package belongs to is
+              // compared with the owner's record by the offline suite.
               for e in strs "nuget" l do
                   if e.StartsWith("@", StringComparison.Ordinal) then yield sprintf "testTooling nuget entry '%s' is an npm package" e
-              for e in strs "npm" l do
-                  if e <> e.ToLowerInvariant() then yield sprintf "testTooling npm entry '%s' is not an npm name (npm names are lowercase)" e
           for key in [ "nuget"; "npm" ] do
               for d in duplicates (all key |> List.choose lockEntry |> List.map fst) do
                   yield sprintf "testTooling locks %s package %s twice" key d

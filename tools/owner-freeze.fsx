@@ -400,6 +400,18 @@ let tag repo dryRun (p: Package) (commitArg: string option) =
         recordedChanges (atCommit repo full approvalsPath |> parse)
         |> List.exists (fun c -> str c "decision_id" = p.PackageApprovalId && str c "action" = "approve-package")
     if not holds then stop $"the approvals file at {full} has no {p.PackageApprovalId} approve-package record"
+    // v4.1: the approval counts only for the package it names. The tagged commit's manifest and review record must be
+    // the ones an ODR-V41-01 record binds (v4's compiler checks this itself, FG-05).
+    if p.Name <> "v4" then
+        let manifest = atCommit repo full $"{p.Dir}/package-manifest.json" |> sha256Hex
+        let review = atCommit repo full $"{p.Dir}/analysis/independent-review.json" |> sha256Hex
+        let bound =
+            recordedChanges (atCommit repo full approvalsPath |> parse)
+            |> List.exists (fun c ->
+                str c "decision_id" = p.PackageApprovalId && str c "action" = "approve-package"
+                && str c "manifest_sha256" = manifest && str c "review_sha256" = review)
+        if not bound then
+            stop $"no {p.PackageApprovalId} record at {full} names this commit's package-manifest.json ({manifest}) and independent-review.json ({review}): the package changed after the approval, or --commit names another commit"
     say $"""Tag {p.Tag} on {full} ({git repo [ "log"; "-1"; "--format=%s"; full ]})."""
     if choose "Type 'tag' to create and push it, or 'abort'" [ "tag"; "abort" ] = "abort" then say "Aborted; no tag created." else
     if dryRun then say $"DRY RUN: git tag -a {p.Tag} {full}; git push origin {p.Tag}" else

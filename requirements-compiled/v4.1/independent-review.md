@@ -8,7 +8,9 @@
 
 ## Closure
 
-Review closed after round 10 at the owner's direction (2026-10-30): the owner accepted the known limitations disclosed in R41-11 and asked for the package to be merged. A round-11 review was started on 08cacfd and stopped before it reported, so the round-10 remediation (and the later font-dependent classification, dbdcc80) has not been independently re-reviewed.
+Review closed after round 10 at the owner's direction (2026-10-30): the owner accepted the known limitations disclosed in R41-11 and asked for the package to be merged. An unnumbered review was started on 08cacfd and stopped before it reported (round 11 below is a later round, on b43852e), so the round-10 remediation (and the later font-dependent classification, dbdcc80) has not been independently re-reviewed.
+
+The review was reopened on 2026-10-31 for the application of the owner's decisions (#61, #63): rounds 11 and later review that change.
 
 ## Rounds
 
@@ -26,6 +28,7 @@ Review closed after round 10 at the owner's direction (2026-10-30): the owner ac
 | 10 | `e009065` | FAIL | 0 critical, 1 major, 4 minor. All round-9 findings fixed. Catch rate reproduced; classifications checked and found honest. Owner adjustments: type-shape reconciliation and bootstrap achieved; layout tests not yet (FL-07b) |
 | 11 | `b43852e` | FAIL | 0 critical, 2 major, 6 minor. Reviews the application of the owner's decisions ODR-V41-02..08 and the frozen-v4 CI job (#61): amendments not bounded by the owner's selection or v4's machine rules, and T-S61 inconsistent with IF41-SAVE. Verified: v4 unchanged and the frozen-v4 job not vacuous; the bootstrap, contracts and layout kit pass; the catch rate unchanged |
 | 12 | `951d641` | **PASS** | 0 critical, 0 major, 5 minor. Every round-11 finding verified fixed (about 40 mutations, the frozen-v4 job replicated, the ODR-V41-09 path simulated); minors: MutationSent's producer named imprecisely, two amber limits undisclosed, accepted entries not pinned, a package's manager unchecked, stale counts. #61 merged on this PASS |
+| 13 | `d97219d` | **PASS** | 0 critical, 0 major, 3 minor, 2 nits. RV41-12-1, -2, -3 and -5 verified fixed, -4 partly; the ODR-V41-09 lock matches the owner's record (every mutation of it caught); about 35 mutations, the bootstrap, contracts, layout kit and catch rate re-run. Minors: a package's manager checked only by name, `tag v4.1` not checking the approval's digests, ODR-V41-09 missing from three texts. All five fixed after the round, not re-reviewed |
 
 ## Round 1 findings and remediation
 
@@ -181,3 +184,15 @@ Round 11 reopened the review for the application of the owner's decisions (#61).
 | RV41-12-3 | minor | The accepted entries were not tied to the option: replacing SM-LOAD, adding SM-CONFLICT or dropping the entry passed | The offline suite pins the accepted machines per option (ODR-V41-08 A: exactly SM-LOAD), with negative controls for each case |
 | RV41-12-4 | minor | A package could sit in the other manager's list (npm in NuGet or the reverse), and a recorded dependency-lock decision with no lock passed | X16 rejects a scoped @x/y name in the NuGet list and an npm name that is not lowercase; the offline suite requires a lock for every operator-recorded dependency-lock decision (the ODR-V41-09 lock is now applied); negative controls for each |
 | RV41-12-5 | minor | Stale or inaccurate documentation: 173 generated files (178), 266 single-owner files (270), 'package references come at T10', and the Directory.Packages.props note claiming no project file is rewritten | The counts are corrected, the bootstrap line names the owner's test tooling, and the note says integration adds the dependency lock's other versions and their references in the source projects at T10 |
+
+## Round 13 findings and remediation
+
+Fixed after round 13 and verified by the offline suite and CI; not re-reviewed.
+
+| Id | Severity | Finding | Remediation |
+|---|---|---|---|
+| RV41-13-1 | minor | X16's package-manager check was a name heuristic: xunit moved into the npm list, or axe-core into the NuGet list, passed X16 and the owner-record comparison, and X16's title claimed more than it checked | The offline suite pins each package's manager per decision and option, as the option text names it (ODR-V41-07 A: xunit, xunit.runner.visualstudio, Microsoft.NET.Test.Sdk in NuGet, @playwright/test in npm; ODR-V41-09 A: axe-core in npm), with controls for both moves; X16 keeps only the exact rule (no scoped @x/y name in the NuGet list) and its title says so |
+| RV41-13-2 | minor | Nothing checked that the ODR-V41-01 record's digests match the package tagged: tag v4.1 only required that some approve-package record exist at the commit | owner-freeze.fsx tag v4.1 requires an ODR-V41-01 record at the tagged commit whose manifest_sha256 and review_sha256 equal that commit's package-manifest.json and analysis/independent-review.json |
+| RV41-13-3 | minor | Three texts did not name ODR-V41-09: the report's bootstrap row, FREEZE.md's Dependency on v4, and the README's CI step | All three name ODR-V41-09 and axe-core 4.14.0 |
+| RV41-13-4 | nit | The closure note's stopped 'round-11' attempt on 08cacfd collided with the round 11 recorded on b43852e, and the md Closure did not mention the reopening | The 08cacfd attempt is called unnumbered in both records, and the md Closure names the reopening |
+| RV41-13-5 | nit | T-S61's effect 'none' did not say why it satisfies option A's 'records the outstanding request', and 'handed to the host' was slightly early for a pure update | The amendment note states that the sending step already records the request as Outstanding and the guard admits only that request; the effect says Engine.Update returned the HostEffect.Http |

@@ -4,7 +4,7 @@
 
 ## Dependency on v4
 
-v4 is frozen at tag `indy-init-requirements-v4.0.0` (the merge of #59). `requirements-compiled/v4` is never edited after the freeze, and it is not recompiled with a later compiler: CI checks that it equals the tagged copy, and reproduces it with the tagged compiler and test suite. v4.1 applies the owner's amendments of v4 in its own inputs: the test-tooling lock (ODR-V41-07) in `analysis/project-structure.json` `testTooling` (check X16), and the state-machine amendment (ODR-V41-08) in `analysis/state-machine-amendments.json` (check X12).
+v4 is frozen at tag `indy-init-requirements-v4.0.0` (the merge of #59). `requirements-compiled/v4` is never edited after the freeze, and it is not recompiled with a later compiler: CI checks that it equals the tagged copy, and reproduces it with the tagged compiler and test suite. v4.1 applies the owner's amendments of v4 in its own inputs: the test-tooling locks (ODR-V41-07, and ODR-V41-09's axe-core) in `analysis/project-structure.json` `testTooling` (check X16), and the state-machine amendment (ODR-V41-08) in `analysis/state-machine-amendments.json` (check X12).
 
 v4.1 adds no requirement and uses v4's verification plan unchanged. It cannot be frozen before v4. The owner first completes [v4's freeze procedure](../v4/FREEZE.md). That covers ODR-V4-01..11, including the topology choice ODR-V4-07.
 

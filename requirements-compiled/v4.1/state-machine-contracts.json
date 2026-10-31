@@ -579,7 +579,7 @@
               "guard": "current: its RequestId is the session's Outstanding request, which awaits MutationAnswer",
               "next": "Saving",
               "effects": [
-                "none: the state, the base head, Outstanding (RequestId, MutationAnswer) and the unsaved changes are unchanged; the event confirms that the outstanding createCommitOnBranch was handed to the host"
+                "none: the state, the base head, Outstanding (RequestId, MutationAnswer) and the unsaved changes are unchanged; the event confirms that Engine.Update returned the HostEffect.Http of the outstanding createCommitOnBranch"
               ],
               "sources": [
                 "PERSIST-006",

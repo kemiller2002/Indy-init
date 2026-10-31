@@ -41,6 +41,13 @@ let private optionTransitions =
 let private optionAccepted =
     Map [ ("ODR-V41-08", "A"), Set.ofList [ "SM-LOAD" ] ]
 
+/// The package manager of each package a dependency-lock option names, as its option text states it (the owner's record
+/// lists packages without managers). ODR-V41-07 A: "xUnit with Microsoft.NET.Test.Sdk, and Playwright 1.63.0";
+/// ODR-V41-09 A: "axe-core 4.14.0".
+let private optionManagers =
+    Map [ ("ODR-V41-07", "A"), Map [ "xunit", "nuget"; "xunit.runner.visualstudio", "nuget"; "Microsoft.NET.Test.Sdk", "nuget"; "@playwright/test", "npm" ]
+          ("ODR-V41-09", "A"), Map [ "axe-core", "npm" ] ]
+
 /// The owner's decisions v4.1 applies match the committed operator record (RDP-003): each test-tooling lock is exactly
 /// the packages its decision records; the amendments citing a decision add exactly the transitions of the option its
 /// operator approval selects, and every selected option that adds transitions is applied; each accepted entry is an
@@ -68,6 +75,18 @@ let ownerRecords (source: string) (i: V41Package.Inputs) : string list =
           | Some c ->
               let locked = strs "nuget" l @ strs "npm" l
               if List.sort (strs "packages" c) <> List.sort locked then yield sprintf "v4.1: the %s lock holds %A; the owner recorded %A" (str "decision" l) locked (strs "packages" c)
+              // Each package is in its manager's list, as the selected option names it (RV41-13-1).
+              let idOf (e: string) = match e.LastIndexOf '@' with n when n > 0 -> e.Substring(0, n) | _ -> e
+              let option = strOpt "option" c |> Option.defaultValue ""
+              match optionManagers.TryFind((str "decision" l, option)) with
+              | None -> yield sprintf "v4.1: no package managers are pinned for option %s of %s" option (str "decision" l)
+              | Some managers ->
+                  for (manager, entries) in [ "nuget", strs "nuget" l; "npm", strs "npm" l ] do
+                      for e in entries do
+                          match managers.TryFind(idOf e) with
+                          | Some m when m = manager -> ()
+                          | Some m -> yield sprintf "v4.1: %s is in the %s list; option %s of %s names it a %s package" e manager option (str "decision" l) m
+                          | None -> yield sprintf "v4.1: option %s of %s names no package %s" option (str "decision" l) (idOf e)
       for (decision, ts) in amendments |> List.groupBy (str "decision") do
           match ts |> List.map (fun t -> recorded (str "approval" t) decision |> Option.bind (strOpt "option")) |> List.distinct with
           | [ Some option ] ->
@@ -297,7 +316,10 @@ let controls (source: string) : string list =
       yield! recordFails "accepted machine dropped" { i0 with MachineAmendments = setIn "accepted" (JArr []) i0.MachineAmendments }
       yield! recordFails "recorded lock decision without its lock" (tooling (mapArr "locks" (List.filter (fun l -> strOpt "decision" l <> Some "ODR-V41-09"))))
       yield! expectFail "npm package in the NuGet list" "X16" (lock0 (mapArr "nuget" (fun ps -> ps @ [ JStr "@playwright/test@1.63.0" ])))
-      yield! expectFail "NuGet package in the npm list" "X16" (lock0 (mapArr "npm" (fun ps -> ps @ [ JStr "Microsoft.NET.Test.Sdk@17.11.1" ])))
+      // Round 13 (RV41-13-1): a package moved to the other manager's list, which no name rule can tell.
+      yield! recordFails "xunit moved to npm" (lock0 (mapArr "nuget" (List.filter (fun e -> asStr e <> "xunit@2.9.2")) >> mapArr "npm" (fun ps -> ps @ [ JStr "xunit@2.9.2" ])))
+      let lockOf d f = tooling (mapArr "locks" (List.map (fun l -> if strOpt "decision" l = Some d then f l else l)))
+      yield! recordFails "axe-core moved to NuGet" (lockOf "ODR-V41-09" (setIn "npm" (JArr []) >> setIn "nuget" (jstrs [ "axe-core@4.14.0" ])))
       // X13 round 2 (RV41-2-5): a waiver naming no owner decision request.
       yield! expectFail "waiver without a real decision" "X13" { i0 with Adjustments = mapArr "waivedPrecedences" (List.map (setIn "decision" (JStr "x"))) i0.Adjustments }
       // X15 executable layout kit (RV41-3-1, RV41-3-7): a rule without assertions or opted out; an assertion the kit
