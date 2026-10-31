@@ -3,8 +3,8 @@
   "status": "proposed",
   "approval": "NOT APPROVED. An agent proposal for the owner. Bindings take effect only when they are in curation/verification-plan.json testBindings and the owner merges the recompiled plan (RDP-003).",
   "plan": {
-    "planId": "VP-f9f557c58fb5",
-    "digest": "f9f557c58fb52e0348cc8fa2ff435af7ed886a10cff42f1d6e1ebb6812ee325d"
+    "planId": "VP-18b554f4d1cc",
+    "digest": "18b554f4d1cc263d7a6dcd4abe1ce97c6277fd27b0dab9634a434541e23a05d9"
   },
   "convention": "independent-acceptance: praxis:independent-review. Other categories: one test of a kind every one admits (live when live-provider is required, else deterministic); a category that kind cannot provide gets its own deterministic test. Browser or accessibility: playwright:<acceptance|live>/<REQ>.spec.js > <OBLIGATION> [chromium]. Otherwise: dotnet:Causa.Acceptance.<Deterministic|Live>.<REQ without dashes>Tests.<OBLIGATION>. The rehearsal's tests must carry exactly these identities.",
   "testBindings": [

@@ -1,9 +1,9 @@
 /// Compiled package v4 (Indy Init event): the scope test (K3f) and the v4 stage's negative controls.
 ///
 /// Scope: the v4 plan is rebuilt from committed files only and must equal the committed plan, be READY with no permit,
-/// keep every P0 of the v4 baseline, bind exactly the v3 bindings extended by the regenerated r7 proposal, apply no
-/// amendment (the pinned approvals file holds no record), and leave v3, the R6/R7 baselines and the frozen baseline
-/// untouched. Controls: each check of V4Package must reject a package broken in the way it guards against, and the
+/// keep every P0 of the v4 baseline, bind exactly the v3 bindings extended by the regenerated r7 proposal, apply only
+/// amendments a trusted operator's record authorizes (the pinned approvals file is never last changed by an agent),
+/// and leave v3, the R6/R7 baselines and the frozen baseline untouched. Controls: each check of V4Package must reject a package broken in the way it guards against, and the
 /// freeze gate must reach READY-FOR-OWNER-FREEZE only when every recorded condition holds, and never declare FROZEN.
 module V4Tests
 
@@ -60,7 +60,12 @@ let planInputs (source: string) : VerificationPlan.Inputs =
 /// the content digest the package approval names, so the approval can name the plan that pins it.
 let approvalDigestControl (source: string) : string list =
     let i = planInputs source
-    let withRecord = JObj [ "schema", JStr "causa.requirements-approvals/1"; "approvals", JArr [ JObj [ "decision_id", JStr "ODR-V4-01"; "action", JStr "approve-package" ] ] ]
+    // The owner appends the package approval to the pinned file, after any records already there.
+    let packageApproval =
+        JObj [ "id", JStr "APR-CONTROL"
+               "authority", JObj [ "kind", JStr "operator"; "id", JStr(List.head i.Approvals.TrustedOperators) ]
+               "changes", JArr [ JObj [ "decision_id", JStr "ODR-V4-01"; "action", JStr "approve-package" ] ] ]
+    let withRecord = setIn "approvals" (JArr(arr "approvals" i.Approvals.Document @ [ packageApproval ])) i.Approvals.Document
     let bytes = Text.Encoding.UTF8.GetBytes(serialize withRecord)
     let approved = { i with Approvals = { i.Approvals with Commit = String('a', 40); Sha256 = Git.sha256Hex bytes; Document = withRecord } }
     let before, after = VerificationPlan.build i, VerificationPlan.build approved
@@ -112,9 +117,24 @@ let scope (source: string) : string list =
       let strengthened = parseFile (Path.Combine(v4 source, "proposals", "v4-strengthened-bindings.proposed.json"))
       if serialize (JArr(arr "testBindings" i.Spec)) <> serialize (JArr(TestBindingProposal.applyTo (TestBindingProposal.applyTo (arr "testBindings" v3Spec) r7Proposal) strengthened)) then
           yield "v4: the curation's testBindings are not exactly v3's bindings extended by the r7 proposal and then the v4 strengthened proposal"
-      // No agent-written approval (RDP-003): nothing is amended or excluded.
-      if not (arr "approvals" i.Approvals.Document).IsEmpty then yield "v4: the pinned approvals file holds approval records; only the operator may write them (RDP-003)"
-      if not (arr "obligationAmendments" i.Spec).IsEmpty || not (arr "exclusions" i.Spec).IsEmpty then yield "v4: the curation amends or excludes an obligation without an operator record"
+      // RDP-003: the pinned approvals file holds only trusted-operator records, last changed in a commit no agent
+      // wrote, and the curation amends only what such a record authorizes; nothing is excluded.
+      for ap in arr "approvals" i.Approvals.Document do
+          let auth = field "authority" ap |> Option.defaultValue JNull
+          if strOpt "kind" auth <> Some "operator" || not (List.contains (str "id" auth) i.Approvals.TrustedOperators) then
+              yield sprintf "v4: approval %s in the pinned approvals file is not by a trusted operator (RDP-003)" (str "id" ap)
+      if not (arr "approvals" i.Approvals.Document).IsEmpty then
+          match Git.run source [ "log"; "-1"; "--format=%B"; i.Approvals.Commit; "--"; i.Approvals.Path ] with
+          | Ok b ->
+              let message = Text.Encoding.UTF8.GetString b
+              if message.Contains("Claude-Session:", StringComparison.Ordinal) || message.Contains("Co-Authored-By: Claude", StringComparison.Ordinal) then
+                  yield "v4: the pinned approvals file was last changed in an agent commit (RDP-003)"
+          | Error e -> yield sprintf "v4: the pinned approvals commit is unreadable: %s" e
+      let authorizedAmend = VerificationPlan.authorizedAmendments i.Approvals
+      for a in arr "obligationAmendments" i.Spec do
+          if not (authorizedAmend.ContainsKey(str "approval" a, str "obligation" a)) then
+              yield sprintf "v4: the curation amends %s without an operator record" (str "obligation" a)
+      if not (arr "exclusions" i.Spec).IsEmpty then yield "v4: the curation excludes an obligation without an operator record"
       for d in arr "derivedObligations" i.Spec do
           if not (recorded.Contains(str "decision" d)) then yield sprintf "v4: %s cites decision %s, which no owner-decisions.json records" (str "obligation" d) (str "decision" d)
       if not (VerificationPlan.derivationDiagnostics plan).IsEmpty then yield sprintf "v4: derivation refused %A" (VerificationPlan.derivationDiagnostics plan)
@@ -171,9 +191,6 @@ let controls (source: string) : string list =
     let transition from' ev to' =
         JObj [ "id", JStr "T-X"; "from", JStr from'; "event", JStr ev; "to", JStr to'; "guard", JStr "x"; "effects", JArr []; "sources", jstrs [ "PERSIST-031" ] ]
     let operator = i0.TrustedOperators |> List.tryHead |> Option.defaultValue "kemiller2002"
-    let review =
-        JObj [ "reviewer", JStr "independent reviewer"; "reviewerIsImplementer", JBool false; "rounds", JInt 1L; "roundVerdicts", JArr [ JObj [ "round", JInt 1L; "verdict", JStr "PASS" ] ]; "findings", JArr [] ]
-    let reviewSha = Git.sha256Hex (Text.Encoding.UTF8.GetBytes(serialize review))
     let testSha = String('f', 64)
     // Operator decisions in the approvals schema verify-plan authorizes: one approval with an operator authority and
     // its changes. Amendments are compiled into the plan through obligationAmendments, exactly as the owner's would be.
@@ -223,6 +240,12 @@ let controls (source: string) : string list =
     // The owner approves the plan as finally compiled (amendments applied, approved clauses bound).
     let trustedBase = { i0 with ApprovalsAgentAuthored = false; ApprovalsOnMain = true }
     let contentDigest = V4Package.planContentDigest (scenario operator (allAmends @ decisionChanges) allAmends trustedBase).Plan
+    // The review record names the plan content digest its last round reviewed (RV7-3).
+    let reviewOf (digest: string) =
+        JObj [ "reviewer", JStr "independent reviewer"; "reviewerIsImplementer", JBool false; "rounds", JInt 1L
+               "roundVerdicts", JArr [ JObj [ "round", JInt 1L; "verdict", JStr "PASS"; "planContentDigest", JStr digest ] ]; "findings", JArr [] ]
+    let review = reviewOf contentDigest
+    let reviewSha = Git.sha256Hex (Text.Encoding.UTF8.GetBytes(serialize review))
     let packageChange = JObj [ "decision_id", JStr "ODR-V4-01"; "action", JStr "approve-package"; "plan_content_digest", JStr contentDigest; "review_sha256", JStr reviewSha; "test_record_sha256", JStr testSha ]
     let allChanges = allAmends @ decisionChanges @ [ packageChange ]
     let allRecorded =
@@ -257,7 +280,8 @@ let controls (source: string) : string list =
           let frozenFlag (i: V4Package.Inputs) = let b = V4Package.build i in V4Package.freezeStatus b (V4Package.gates i b (V4Package.planContentDigest i.Plan)) true |> fst |> List.contains ("frozen", true)
           if frozenFlag allRecorded then yield "freeze: the compiler declared frozen from repository inputs"
           let blocked label (i: V4Package.Inputs) = [ if statusOf i <> "CANDIDATE" then yield sprintf "freeze: ready although %s" label ]
-          yield! blocked "no approvals" { allRecorded with Approvals = i0.Approvals; Plan = i0.Plan; ApprovalsPin = i0.ApprovalsPin }
+          yield! blocked "the committed approvals hold no package approval" { allRecorded with Approvals = i0.Approvals; Plan = i0.Plan; ApprovalsPin = i0.ApprovalsPin }
+          yield! blocked "the approvals file holds no record at all" { allRecorded with Approvals = setIn "approvals" (JArr []) i0.Approvals; Plan = i0.Plan; ApprovalsPin = i0.ApprovalsPin }
           yield! blocked "approved amendments were never applied to the plan (RV4-1)" (scenario operator allChanges [] allRecorded)
           let without08 = allAmends |> List.filter (fun c -> not (List.contains (strOpt "obligation_id" c) [ Some "PERSIST-023-O2"; Some "PERSIST-007-O2"; Some "PERSIST-007-O4" ]))
           let declined08 = without08 @ decisionChanges @ [ packageChange; JObj [ "decision_id", JStr "ODR-V4-08"; "action", JStr "decline" ] ]
@@ -276,7 +300,10 @@ let controls (source: string) : string list =
           yield! blocked "the review has an open major finding" { allRecorded with Review = setIn "findings" (JArr [ JObj [ "id", JStr "F1"; "severity", JStr "major"; "status", JStr "open" ] ]) review }
           yield! blocked "the reviewer is the implementer" { allRecorded with Review = setIn "reviewerIsImplementer" (JBool true) review }
           yield! blocked "the review record only claims PASS" { allRecorded with Review = JObj [ "verdict", JStr "PASS" ] }
-          yield! blocked "the reviewer's last round failed although the author marked findings fixed" { allRecorded with Review = setIn "roundVerdicts" (JArr [ JObj [ "round", JInt 1L; "verdict", JStr "FAIL" ] ]) review }
+          yield! blocked "the reviewer's last round failed although the author marked findings fixed" { allRecorded with Review = setIn "roundVerdicts" (JArr [ JObj [ "round", JInt 1L; "verdict", JStr "FAIL"; "planContentDigest", JStr contentDigest ] ]) review }
+          // RV7-3: a PASS for an earlier plan does not count; the review record keeps its digest, so only FG-09 can fail.
+          yield! blocked "the last review round reviewed another plan (RV7-3)" { allRecorded with Review = reviewOf (String('e', 64)) }
+          yield! blocked "the last review round names no plan (RV7-3)" { allRecorded with Review = setIn "roundVerdicts" (JArr [ JObj [ "round", JInt 1L; "verdict", JStr "PASS" ] ]) review }
           yield! blocked "the freeze commit is not verified" { allRecorded with FreezeCommitVerified = false }
           yield! blocked "the window is too small for the selected topology" { allRecorded with Policy = setIn "clock" (JObj [ "timedMinutes", JInt 100L ]) allRecorded.Policy }
           // RV5-2: clauses the owner approved are bound in the plan, so verify-plan enforces them.
@@ -293,9 +320,13 @@ let controls (source: string) : string list =
           let proposedCount (i: V4Package.Inputs) =
               (V4Package.build i).Files |> List.find (fst >> (=) "acceptance/acceptance-obligations.json") |> snd |> field "summary" |> Option.bind (intOpt "proposed")
           if proposedCount allRecorded <> Some 0L then yield "freeze: approved and applied amendments did not make their acceptance obligations normative (RV4-1)"
-          if proposedCount i0 = Some 0L then yield "freeze: proposed acceptance obligations are normative without the owner's approval"
+          let unapproved = { i0 with Approvals = setIn "approvals" (JArr []) i0.Approvals }
+          if proposedCount unapproved = Some 0L then yield "freeze: proposed acceptance obligations are normative without the owner's approval"
           yield! expectFail "untrusted authority" "W13" (scenario "someone-else" allChanges allAmends i0)
-          yield! expectFail "agent-authored approvals with records" "W13" { allRecorded with ApprovalsAgentAuthored = true } ]
+          yield! expectFail "agent-authored approvals with records" "W13" { allRecorded with ApprovalsAgentAuthored = true }
+          // RV7-4: an applied amendment labelled with a decision that does not propose it.
+          let mislabelled = allAmends |> mapChange (fun c -> strOpt "obligation_id" c = Some "PERSIST-026-O2") (setIn "decision_id" (JStr "ODR-V4-05"))
+          yield! expectFail "an amendment names a decision that does not propose it (RV7-4)" "W13" (scenario operator allChanges mislabelled allRecorded) ]
     [ // The committed inputs pass every check with a valid registry.
       for c in built0.Checks do
           if not c.Problems.IsEmpty && not (c.Id = "W07" && evidence.IsNone) then yield sprintf "v4 stage: %s fails on the committed package: %A" c.Id (List.truncate 3 c.Problems)

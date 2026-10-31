@@ -24,6 +24,32 @@
       ]
     },
     {
+      "obligation": "PERSIST-051-O2",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Invariants.Property.INV02.ReorderedRepliesAreInert",
+          "kind": "deterministic",
+          "categories": [
+            "unit"
+          ]
+        },
+        {
+          "id": "dotnet:Causa.Invariants.Negative.INV02.LateConflictReReadKeepsOtherWriter",
+          "kind": "deterministic",
+          "categories": [
+            "integration"
+          ]
+        },
+        {
+          "id": "dotnet:Causa.Invariants.Negative.INV02.StaleRefreshDropped",
+          "kind": "deterministic",
+          "categories": [
+            "integration"
+          ]
+        }
+      ]
+    },
+    {
       "obligation": "PERSIST-015-O3",
       "tests": [
         {
@@ -309,6 +335,30 @@
             "integration",
             "browser",
             "accessibility"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PERSIST-031-O22",
+      "tests": [
+        {
+          "id": "playwright:invariants/INV-25.spec.js > reconnect keeps unsaved work [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser"
+          ]
+        }
+      ]
+    },
+    {
+      "obligation": "PERSIST-012-O2",
+      "tests": [
+        {
+          "id": "dotnet:Causa.Invariants.Negative.INV25.UnresolvableConflictExports",
+          "kind": "deterministic",
+          "categories": [
+            "integration"
           ]
         }
       ]

@@ -195,7 +195,7 @@
     },
     {
       "path": "curation/verification-plan.json",
-      "sha256": "abbd590ce4afe59c97f99e8c92cbb8560adb347e19b87158bb1d2716900caf95"
+      "sha256": "09005841e7c4f809ad8cdd7f7342e4a0a95e307df75ef3c974c2eeaccdaf7d4f"
     },
     {
       "path": "curation/verification-rules.json",
@@ -205,7 +205,7 @@
   "authored": [
     {
       "path": "README.md",
-      "sha256": "aba6ef4176fb6bc78363035d3a315c1fec768e0659bec794eeeb4432e38f9d0f"
+      "sha256": "cf13bc76148a94529b5cd09a8299ef31294d304a65277d07d0a21d53af11f219"
     },
     {
       "path": "verification-plan.schema.json",
@@ -267,7 +267,7 @@
     },
     {
       "path": "verification-plan.json",
-      "sha256": "6d132d6ac0758e625b3295bde8f07fc5ef12907c9552a6c515e4aa786906434d"
+      "sha256": "a7596a4b32af2f757e0e560eb83a192910c75db7a2f213126bf1848a3368c782"
     }
   ],
   "compilationVerdict": "PASS",

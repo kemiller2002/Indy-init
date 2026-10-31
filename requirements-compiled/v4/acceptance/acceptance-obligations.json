@@ -2,16 +2,16 @@
   "schema": "indy-init.v4-acceptance-obligations/1",
   "description": "Every P0 obligation of the verification plan as an acceptance obligation (required tests, producer, consumer, method, pass and failure conditions), plus the invariant and Rehearsal 7 lesson tests that strengthen the binding of existing obligations. The implementing agent cannot change this file: it is regenerated from the frozen plan and analysis, and its digest is in freeze-manifest.json.",
   "plan": {
-    "planId": "VP-9817d9814482",
-    "digest": "9817d98144822dcc810aa383fde9ff16f8ebb9931f5bf6aeca76256dbe7061c4"
+    "planId": "VP-a1999095ce0a",
+    "digest": "a1999095ce0ab5ac11bc3c66a055f8552ec73d03a2c75a8c7c4b983457ce4d78"
   },
   "summary": {
     "total": 655,
     "fromPlan": 613,
     "fromInvariants": 39,
     "fromLessons": 3,
-    "normative": 650,
-    "proposed": 5,
+    "normative": 655,
+    "proposed": 0,
     "p0RequirementsCovered": 161
   },
   "obligations": [
@@ -9047,6 +9047,13 @@
           "categories": [
             "integration"
           ]
+        },
+        {
+          "id": "dotnet:Causa.Invariants.Negative.INV25.UnresolvableConflictExports",
+          "kind": "deterministic",
+          "categories": [
+            "integration"
+          ]
         }
       ],
       "requiredEvidenceCategories": [
@@ -15245,6 +15252,13 @@
             "integration",
             "browser"
           ]
+        },
+        {
+          "id": "playwright:invariants/INV-25.spec.js > reconnect keeps unsaved work [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser"
+          ]
         }
       ],
       "requiredEvidenceCategories": [
@@ -19394,6 +19408,27 @@
           "categories": [
             "unit",
             "integration"
+          ]
+        },
+        {
+          "id": "dotnet:Causa.Invariants.Negative.INV02.LateConflictReReadKeepsOtherWriter",
+          "kind": "deterministic",
+          "categories": [
+            "integration"
+          ]
+        },
+        {
+          "id": "dotnet:Causa.Invariants.Negative.INV02.StaleRefreshDropped",
+          "kind": "deterministic",
+          "categories": [
+            "integration"
+          ]
+        },
+        {
+          "id": "dotnet:Causa.Invariants.Property.INV02.ReorderedRepliesAreInert",
+          "kind": "deterministic",
+          "categories": [
+            "unit"
           ]
         }
       ],
@@ -34944,9 +34979,9 @@
         "a required evidence category is not covered, or its freshness policy is violated",
         "the obligation's binding, amendment or exclusion differs from the frozen plan without an operator approval record"
       ],
-      "normative": false,
-      "boundInPlan": false,
-      "status": "proposed: normative only after the owner approves and the plan applies ODR-V4-03"
+      "normative": true,
+      "boundInPlan": true,
+      "status": "binding-strengthened (enforces existing obligations of the cited requirements, or obligations the owner amended: ODR-V4-03)"
     },
     {
       "id": "AO-INV-02-2",
@@ -34977,9 +35012,9 @@
         "a required evidence category is not covered, or its freshness policy is violated",
         "the obligation's binding, amendment or exclusion differs from the frozen plan without an operator approval record"
       ],
-      "normative": false,
-      "boundInPlan": false,
-      "status": "proposed: normative only after the owner approves and the plan applies ODR-V4-03"
+      "normative": true,
+      "boundInPlan": true,
+      "status": "binding-strengthened (enforces existing obligations of the cited requirements, or obligations the owner amended: ODR-V4-03)"
     },
     {
       "id": "AO-INV-02-3",
@@ -35010,9 +35045,9 @@
         "a required evidence category is not covered, or its freshness policy is violated",
         "the obligation's binding, amendment or exclusion differs from the frozen plan without an operator approval record"
       ],
-      "normative": false,
-      "boundInPlan": false,
-      "status": "proposed: normative only after the owner approves and the plan applies ODR-V4-03"
+      "normative": true,
+      "boundInPlan": true,
+      "status": "binding-strengthened (enforces existing obligations of the cited requirements, or obligations the owner amended: ODR-V4-03)"
     },
     {
       "id": "AO-INV-03-1",
@@ -36069,9 +36104,9 @@
         "a required evidence category is not covered, or its freshness policy is violated",
         "the obligation's binding, amendment or exclusion differs from the frozen plan without an operator approval record"
       ],
-      "normative": false,
-      "boundInPlan": false,
-      "status": "proposed: normative only after the owner approves and the plan applies ODR-V4-04, ODR-V4-05"
+      "normative": true,
+      "boundInPlan": true,
+      "status": "binding-strengthened (enforces existing obligations of the cited requirements, or obligations the owner amended: ODR-V4-04, ODR-V4-05)"
     },
     {
       "id": "AO-INV-25-2",
@@ -36104,9 +36139,9 @@
         "a required evidence category is not covered, or its freshness policy is violated",
         "the obligation's binding, amendment or exclusion differs from the frozen plan without an operator approval record"
       ],
-      "normative": false,
-      "boundInPlan": false,
-      "status": "proposed: normative only after the owner approves and the plan applies ODR-V4-04, ODR-V4-05"
+      "normative": true,
+      "boundInPlan": true,
+      "status": "binding-strengthened (enforces existing obligations of the cited requirements, or obligations the owner amended: ODR-V4-04, ODR-V4-05)"
     },
     {
       "id": "AO-R7L-19-1",

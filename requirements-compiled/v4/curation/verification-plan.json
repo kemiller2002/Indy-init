@@ -3,9 +3,9 @@
   "description": "Inputs to verification-plan.json that are not in the baseline or the verification rules. Freshness policies are listed strictest first; a requirement takes the strictest policy among the default, its gates' policies and its bound tests' kinds. testBindings name exact test identities per baseline obligation id, each {id, kind, categories}: categories are the evidence categories (curation/evidence-categories.json) the test fully proves for that obligation, never inferred; an unbound obligation is reported missing (contract: unbound), never guessed. exclusions must each name an authenticated operator approval in the pinned approvals file. obligationAmendments each name an authenticated operator amendment {obligation_id, action: amend, criterion, rationale} in the pinned approvals file and the owner decision it applies; the baseline text is kept verbatim beside it. derivedObligations name obligations that restate others (R5A-001-05): each clause is a whole verbatim phrase of the obligation text and names the obligations that must be verified for it; a clause with none, or marked direct because its constituents prove less than it states, is also proven by the obligation's own bound tests; connectives are the remaining words of the text, from the compiler's fixed vocabulary.",
   "approvals": {
     "repo": "indy-init",
-    "commit": "245c70b4e9391c0c3422e119107507c92f28a354",
+    "commit": "cbc752b168d1240f018070ed57a4b0cac566f689",
     "path": "kickoff/rehearsal-007/approvals.causa.json",
-    "sha256": "d8098fb37fb6af881066092ae752ec23765decb201af956515a3109a8e5e3ebb",
+    "sha256": "58b8becdeb6fcbe79e9ab9a48d7d9ae171f82bd4e068de66b464c7e245f92c25",
     "trustedOperators": [
       "kemiller2002"
     ]
@@ -6030,6 +6030,13 @@
           "categories": [
             "integration"
           ]
+        },
+        {
+          "id": "dotnet:Causa.Invariants.Negative.INV25.UnresolvableConflictExports",
+          "kind": "deterministic",
+          "categories": [
+            "integration"
+          ]
         }
       ]
     },
@@ -7680,6 +7687,13 @@
             "integration",
             "browser"
           ]
+        },
+        {
+          "id": "playwright:invariants/INV-25.spec.js > reconnect keeps unsaved work [chromium]",
+          "kind": "deterministic",
+          "categories": [
+            "browser"
+          ]
         }
       ]
     },
@@ -8770,6 +8784,27 @@
             "unit",
             "integration"
           ]
+        },
+        {
+          "id": "dotnet:Causa.Invariants.Property.INV02.ReorderedRepliesAreInert",
+          "kind": "deterministic",
+          "categories": [
+            "unit"
+          ]
+        },
+        {
+          "id": "dotnet:Causa.Invariants.Negative.INV02.LateConflictReReadKeepsOtherWriter",
+          "kind": "deterministic",
+          "categories": [
+            "integration"
+          ]
+        },
+        {
+          "id": "dotnet:Causa.Invariants.Negative.INV02.StaleRefreshDropped",
+          "kind": "deterministic",
+          "categories": [
+            "integration"
+          ]
         }
       ]
     },
@@ -9198,7 +9233,53 @@
     }
   ],
   "exclusions": [],
-  "obligationAmendments": [],
+  "obligationAmendments": [
+    {
+      "obligation": "PERSIST-026-O2",
+      "approval": "APR-V4-OWNER-1",
+      "decision": "ODR-V4-02"
+    },
+    {
+      "obligation": "PERSIST-052-O3",
+      "approval": "APR-V4-OWNER-1",
+      "decision": "ODR-V4-02"
+    },
+    {
+      "obligation": "PERSIST-051-O2",
+      "approval": "APR-V4-OWNER-1",
+      "decision": "ODR-V4-03"
+    },
+    {
+      "obligation": "PERSIST-031-O22",
+      "approval": "APR-V4-OWNER-1",
+      "decision": "ODR-V4-04"
+    },
+    {
+      "obligation": "PERSIST-012-O2",
+      "approval": "APR-V4-OWNER-1",
+      "decision": "ODR-V4-05"
+    },
+    {
+      "obligation": "PERSIST-051-O3",
+      "approval": "APR-V4-OWNER-1",
+      "decision": "ODR-V4-06"
+    },
+    {
+      "obligation": "PERSIST-023-O2",
+      "approval": "APR-V4-OWNER-1",
+      "decision": "ODR-V4-08"
+    },
+    {
+      "obligation": "PERSIST-007-O2",
+      "approval": "APR-V4-OWNER-1",
+      "decision": "ODR-V4-08"
+    },
+    {
+      "obligation": "PERSIST-007-O4",
+      "approval": "APR-V4-OWNER-1",
+      "decision": "ODR-V4-08"
+    }
+  ],
   "derivedObligations": [
     {
       "obligation": "UI-015-O2",

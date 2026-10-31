@@ -21,24 +21,24 @@
     "obligations": 2599,
     "p0Obligations": 613,
     "acceptanceObligations": 655,
-    "normativeAcceptanceObligations": 650,
+    "normativeAcceptanceObligations": 655,
     "invariants": 25,
     "stateMachines": 5,
     "r7Lessons": 20,
     "ownerDecisionRequests": 11
   },
   "verificationPlan": {
-    "planId": "VP-9817d9814482",
-    "digest": "9817d98144822dcc810aa383fde9ff16f8ebb9931f5bf6aeca76256dbe7061c4",
-    "contentDigest": "53af6eb2be8d1bf54474032df8c57bfad0ec9d377eb9ee77afc3277126e2bad8",
+    "planId": "VP-a1999095ce0a",
+    "digest": "a1999095ce0ab5ac11bc3c66a055f8552ec73d03a2c75a8c7c4b983457ce4d78",
+    "contentDigest": "1d2a6043388dc3ba4ace36195c550ba6e30caaade0b9caa84afda86172822640",
     "contentDigestCovers": "the plan without planIdentity and source.approvals; the owner's package approval names it (ODR-V4-01)",
-    "fileSha256": "6d132d6ac0758e625b3295bde8f07fc5ef12907c9552a6c515e4aa786906434d"
+    "fileSha256": "a7596a4b32af2f757e0e560eb83a192910c75db7a2f213126bf1848a3368c782"
   },
   "dependencyLockSha256": "f9a7b9883a27cf7f1f6f22e0c31efd939611fa24f5e5f08d09abfe34cf858147",
   "executionManifestSha256": "4f46104323e3c57f357518fa7a12407ae189b3e727a0f8c454113fa1bf95cbe8",
   "executionPlanSha256": "d5aea873582bd3a533f52894b0651e8bf36bbb6d9ac929703941fef92a9c4f85",
   "acceptanceSha256": {
-    "acceptance-obligations.json": "9deed2b613c27f2bb4d96fcca5bd3670389518795e0ba360d6df630949609f9a",
+    "acceptance-obligations.json": "b93097d201a333887e07ba8ae406145c2e89d52c66a67c3c9b1bb766b07c9f44",
     "acceptance-gate.json": "035741e18b41b03ca09b13a7818705cad2d276ac03d5fa61e968b0115bf32c65"
   },
   "files": [
@@ -48,7 +48,7 @@
     },
     {
       "path": "acceptance/acceptance-obligations.json",
-      "sha256": "9deed2b613c27f2bb4d96fcca5bd3670389518795e0ba360d6df630949609f9a"
+      "sha256": "b93097d201a333887e07ba8ae406145c2e89d52c66a67c3c9b1bb766b07c9f44"
     },
     {
       "path": "baseline-reconciliation.json",
@@ -92,7 +92,7 @@
     },
     {
       "path": "package-manifest.json",
-      "sha256": "3d2bdf7dc1223a9e381529b9282d4b1cf2e4d5ba60295ada365752a9aaa186e7"
+      "sha256": "2634c4eb9a6436ce77e704ef18e25034dcda18d599b89f79a81f37912bb017ed"
     },
     {
       "path": "package-validation-report.json",
@@ -104,7 +104,7 @@
     },
     {
       "path": "proposals/v4-strengthened-bindings.proposed.json",
-      "sha256": "5c442a13f5bc644ed6e0cbb8b18c348fe5a79f2eafb63d7273420d5ef9d1ab6b"
+      "sha256": "1b47845243c439a7fe2d72a28b577f6156f81c1feddb031f37e81f7acd24a559"
     },
     {
       "path": "r7-lessons-mapping.json",
@@ -140,12 +140,12 @@
     },
     {
       "path": "verification-plan.json",
-      "sha256": "6d132d6ac0758e625b3295bde8f07fc5ef12907c9552a6c515e4aa786906434d"
+      "sha256": "a7596a4b32af2f757e0e560eb83a192910c75db7a2f213126bf1848a3368c782"
     }
   ],
   "compiler": {
     "name": "requirements-compiler",
-    "treeSha256": "9ac027489d492d3cac564c229363bcf13dd0b6553272517a156d250c30b5a5e5",
+    "treeSha256": "0494fac0a499d16fe84cec72b1351d8b112e0cff36c588272404f09aea86808b",
     "sdk": "10.0.402"
   },
   "compilerTests": {
@@ -153,13 +153,13 @@
     "result": "PASS",
     "failures": 0,
     "summary": "offline tests (baseline equivalence, baseline units, preflight verdict, verification plan, acceptance contracts, process evidence, v4 scope and controls, v4.1 scope and controls): all passed",
-    "compilerTreeSha256": "9ac027489d492d3cac564c229363bcf13dd0b6553272517a156d250c30b5a5e5",
+    "compilerTreeSha256": "0494fac0a499d16fe84cec72b1351d8b112e0cff36c588272404f09aea86808b",
     "command": "dotnet run -c Release --project tools/requirements-compiler/tests -- --offline --source ."
   },
   "independentReview": {
     "verdict": "",
     "reviewer": "independent read-only Claude Code subagent (fresh context; not the package author)",
-    "rounds": 6,
+    "rounds": 8,
     "record": "independent-review.md"
   },
   "freezeGate": [
@@ -196,7 +196,7 @@
       "condition": "All required owner approvals exist",
       "status": "FAIL",
       "evidence": "repository record (unauthenticated; see statesMeaning)",
-      "detail": "pending: ODR-V4-01, ODR-V4-02, ODR-V4-03, ODR-V4-04, ODR-V4-05, ODR-V4-06, ODR-V4-07, ODR-V4-08, ODR-V4-09, ODR-V4-10, ODR-V4-11"
+      "detail": "pending: ODR-V4-01"
     },
     {
       "id": "FG-06",
@@ -208,23 +208,23 @@
     {
       "id": "FG-07",
       "condition": "The execution plan is complete and the selected topology fits the window",
-      "status": "FAIL",
+      "status": "PASS",
       "evidence": "computed by the compiler",
-      "detail": "no topology selected by the owner (ODR-V4-07)"
+      "detail": "selected C-role-lanes-two-ui: fits"
     },
     {
       "id": "FG-08",
       "condition": "Compiler tests pass",
       "status": "PASS",
       "evidence": "repository record (unauthenticated; see statesMeaning)",
-      "detail": "record: PASS, tree 9ac027489d492d3cac564c229363bcf13dd0b6553272517a156d250c30b5a5e5 (current tree 9ac027489d492d3cac564c229363bcf13dd0b6553272517a156d250c30b5a5e5); CI re-runs the suite and compares (--verify-test-record)"
+      "detail": "record: PASS, tree 0494fac0a499d16fe84cec72b1351d8b112e0cff36c588272404f09aea86808b (current tree 0494fac0a499d16fe84cec72b1351d8b112e0cff36c588272404f09aea86808b); CI re-runs the suite and compares (--verify-test-record)"
     },
     {
       "id": "FG-09",
       "condition": "Independent review passes",
       "status": "PASS",
       "evidence": "repository record (unauthenticated; see statesMeaning)",
-      "detail": "computed from 34 finding(s) and the reviewer's last round verdict (PASS); reviewer independent read-only Claude Code subagent (fresh context; not the package author)"
+      "detail": "computed from 40 finding(s) and the reviewer's last round verdict (PASS), which reviewed plan content digest 1d2a6043388dc3ba4ace36195c550ba6e30caaade0b9caa84afda86172822640 (the plan being frozen); reviewer independent read-only Claude Code subagent (fresh context; not the package author)"
     },
     {
       "id": "FG-10",
@@ -269,17 +269,13 @@
     "review RV5-1 (major): fixed",
     "review RV5-2 (major): fixed",
     "review RV6-1 (minor): accepted-residual",
-    "owner decision ODR-V4-01 pending",
-    "owner decision ODR-V4-02 pending",
-    "owner decision ODR-V4-03 pending",
-    "owner decision ODR-V4-04 pending",
-    "owner decision ODR-V4-05 pending",
-    "owner decision ODR-V4-06 pending",
-    "owner decision ODR-V4-07 pending",
-    "owner decision ODR-V4-08 pending",
-    "owner decision ODR-V4-09 pending",
-    "owner decision ODR-V4-10 pending",
-    "owner decision ODR-V4-11 pending"
+    "review RV7-1 (minor): fixed",
+    "review RV7-2 (minor): accepted-residual",
+    "review RV7-3 (minor): fixed",
+    "review RV7-4 (minor): fixed",
+    "review RV7-5 (minor): fixed",
+    "review RV8-1 (minor): fixed",
+    "owner decision ODR-V4-01 pending"
   ],
   "freezeTimestamp": "2026-10-30T00:00:00Z",
   "freezeTimestampMeaning": "the time this package was compiled; the compiler never freezes a package",

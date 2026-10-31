@@ -10,7 +10,7 @@ Package v4 holds the requirements for the November 7 Causa build, for Praxis to 
 | Scope | 520 requirements, 161 P0, 2599 obligations, of which 613 are P0 obligations in the plan |
 | Release set | echelon-current 1.33.0 (DEC-R7-011), resolved from echelon-registry `7a2c27a` into [`dependency-lock.json`](dependency-lock.json) |
 | Catalog | causa-data `demonstration-v1` at `e8259df`: four investigations (DEC-R7-006) |
-| Approvals | [`kickoff/rehearsal-007/approvals.causa.json`](../../kickoff/rehearsal-007/approvals.causa.json) at `245c70b`. It holds no records, because only the operator writes them (RDP-003) |
+| Approvals | [`kickoff/rehearsal-007/approvals.causa.json`](../../kickoff/rehearsal-007/approvals.causa.json) at `cbc752b`. It holds the owner's operator approvals: APR-V41-OWNER-1 (ODR-V41-06) and APR-V4-OWNER-1 (ODR-V4-02..11, applied through `curation/verification-plan.json` `obligationAmendments`). Only the operator writes records (RDP-003); ODR-V4-01 is pending |
 
 ## What to read
 
@@ -26,7 +26,7 @@ Package v4 holds the requirements for the November 7 Causa build, for Praxis to 
 |---|---|---|
 | `curation/` | authored | Inputs to the v3 pipeline. They are v3's curation re-pinned to the v4 baseline and the 1.33.0 release commits, with rehearsal repositories removed. They add a PERSIST verification rule and evidence categories, v4 work items with estimates, F-030, and the `timedRun` clock |
 | `analysis/` | authored | Inputs to the v4 stage: operational definitions, state machines, invariants, Rehearsal 7 lessons, interfaces, execution policy, risks, dependency-lock source and v4 source amendments. Also the compiler test record, the independent-review record and the freeze input |
-| `proposals/` | authored or `propose-test-bindings` | Owner decision requests ODR-V4-01..10 (not approved); the r7 test-binding proposal (from `propose-test-bindings`) and the v4 strengthened-binding proposal (from the v4 stage), both applied to the curation |
+| `proposals/` | authored or `propose-test-bindings` | Owner decision requests ODR-V4-01..11 (02..11 decided by the owner; 01 pending); the r7 test-binding proposal (from `propose-test-bindings`) and the v4 strengthened-binding proposal (from the v4 stage), both applied to the curation |
 | `normalized-requirements.json`, `requirements-inventory.json`, `requirements-source-map.json`, `dependency-graph.json`, `decision-registry.json`, `contract-bindings.json`, `verification-manifest.json`, `verification-plan.json`, `execution-plan-time.json`, `execution-plan-resource.json`, `preflight-manifest.json`, `timed-execution-manifest.json`, `percepta-experiment.json`, `requirements-validation-report.json`, `package-manifest.json` | v3 pipeline (`requirements-compiler --source …`) | As in v3. The timed manifest adds minutes for both topologies and the absolute-deadline clock |
 | `baseline-reconciliation.json`, `dependency-lock.json`, `execution-plan.json`, `invariants.json`, `state-machines.json`, `interfaces.json`, `operational-definitions.json`, `r7-lessons-mapping.json`, `risk-register.json`, `acceptance/`, `package-validation-report.json`, `freeze-manifest.json` | v4 stage (`requirements-compiler v4`) | The v4 artifacts, checks W01–W16 and the freeze gate FG-01–FG-10 |
 
@@ -52,11 +52,11 @@ CI (`preflight-tooling.yml`) runs the offline suite and `requirements-compiler v
 ## How v4 freezes
 
 The package is frozen only when every condition in `freeze-manifest.json` `freezeGate` passes:
-- the owner has written records for ODR-V4-01..10 in the pinned approvals file (each amendment exactly as proposed, the package approval naming the plan, review-record and test-record digests, and the selected topology), in a commit of their own on main;
+- the owner has written records for ODR-V4-01..11 in the pinned approvals file (each amendment exactly as proposed, the package approval naming the plan, review-record and test-record digests, and the selected topology), in a commit of their own on main;
 - the compiler test record matches the compiler tree;
 - the independent review passes;
 - the freeze commit is recorded.
 
 Then the package is recompiled, and `indy-init-requirements-v4.0.0` is tagged on the merged commit. An approved amendment is applied through `curation/verification-plan.json` `obligationAmendments` and checked by `verify-plan` (UNAUTHORIZED-AMENDMENT otherwise).
 
-**Merge with a merge commit, not a squash.** The baseline pins `62df28a` and the approvals file pins `245c70b`, and both must stay reachable from `main`.
+**Merge with a merge commit, not a squash.** The baseline pins `62df28a` and the approvals file pins `cbc752b`, and both must stay reachable from `main`.
