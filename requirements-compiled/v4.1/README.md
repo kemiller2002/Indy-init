@@ -1,6 +1,6 @@
 # Compiled package v4.1: implementation efficiency
 
-**Status: CANDIDATE.** v4.1 is compiled and validated (checks X01–X16 pass). The owner's decisions ODR-V41-02..08 are recorded (APR-V41-OWNER-2) and applied; ODR-V41-09 is pending. It has not been approved or frozen. See [FREEZE.md](FREEZE.md).
+**Status: CANDIDATE.** v4.1 is compiled and validated (checks X01–X16 pass). The owner's decisions ODR-V41-02..08 are recorded (APR-V41-OWNER-2) and applied; ODR-V41-09 is recorded (APR-V41-OWNER-3) and applied; only ODR-V41-01 is pending. It has not been approved or frozen. See [FREEZE.md](FREEZE.md).
 
 v4.1 sits on top of [package v4](../v4/README.md). It does not change any requirement, obligation or test binding: it uses v4's verification plan byte for byte, and [preservation-report.json](preservation-report.json) proves this. What v4.1 adds is the material a team would otherwise have to work out during the seven-hour build:
 
@@ -25,7 +25,7 @@ CI does six things:
 2. Runs `v41 --check` with that tarball. This regenerates every file, compares it byte for byte, and checks that the committed Forma inventory matches the published package.
 3. Builds `contracts/` to typecheck the interface contracts.
 4. Checks that each negative control in `contracts/negative/` (a forged `Confirmation`, a read of the credential's token) is refused (FS1093).
-5. Runs `v41 --bootstrap` into a git-initialised empty directory and builds the generated .NET skeleton of the application repository (solution, projects, compile lists, contracts, layout-assertion module, and the test tooling the owner locked in ODR-V41-07, restored from NuGet; integration's other shared files are added at T10).
+5. Runs `v41 --bootstrap` into a git-initialised empty directory and builds the generated .NET skeleton of the application repository (solution, projects, compile lists, contracts, layout-assertion module, and the NuGet test tooling the owner locked in ODR-V41-07, restored from NuGet; its `package.json` also pins the npm tooling of ODR-V41-07 and ODR-V41-09, which this step does not install; integration's other shared files are added at T10).
 6. Runs the executable layout assertions (`layout-tests/run.mjs`, with axe-core 4.14.0 for `axeClean`) in Chromium and WebKit against Forma's pattern pages and the broken fixtures. It then measures the catch rate on every review defect page (`run.mjs --catch-rate`, [layout-tests/catch-rate.mjs](layout-tests/catch-rate.mjs)) and fails on a miss that R41-11 does not disclose or on a conforming page that fails.
 
 The offline test suite also runs the v4.1 negative controls in [V41Tests.fs](../../tools/requirements-compiler/tests/V41Tests.fs).
