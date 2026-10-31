@@ -102,6 +102,24 @@
           "option": "A"
         }
       ]
+    },
+    {
+      "id": "APR-V4-OWNER-2",
+      "authority": {
+        "kind": "operator",
+        "id": "kemiller2002"
+      },
+      "date": "2026-10-31",
+      "changes": [
+        {
+          "decision_id": "ODR-V4-01",
+          "action": "approve-package",
+          "package": "requirements-compiled/v4",
+          "plan_content_digest": "1d2a6043388dc3ba4ace36195c550ba6e30caaade0b9caa84afda86172822640",
+          "review_sha256": "c77c09eb0e5076e4d182912ba2f1caab07632ef7b41a4f686e4f84c8e451b8ea",
+          "test_record_sha256": "4f65dfd4276a1cd1d6aa462001d35e6698ee1327ee826af3086abb333a77bf14"
+        }
+      ]
     }
   ]
 }
