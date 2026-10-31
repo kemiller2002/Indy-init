@@ -3,9 +3,9 @@
   "description": "Inputs to verification-plan.json that are not in the baseline or the verification rules. Freshness policies are listed strictest first; a requirement takes the strictest policy among the default, its gates' policies and its bound tests' kinds. testBindings name exact test identities per baseline obligation id, each {id, kind, categories}: categories are the evidence categories (curation/evidence-categories.json) the test fully proves for that obligation, never inferred; an unbound obligation is reported missing (contract: unbound), never guessed. exclusions must each name an authenticated operator approval in the pinned approvals file. obligationAmendments each name an authenticated operator amendment {obligation_id, action: amend, criterion, rationale} in the pinned approvals file and the owner decision it applies; the baseline text is kept verbatim beside it. derivedObligations name obligations that restate others (R5A-001-05): each clause is a whole verbatim phrase of the obligation text and names the obligations that must be verified for it; a clause with none, or marked direct because its constituents prove less than it states, is also proven by the obligation's own bound tests; connectives are the remaining words of the text, from the compiler's fixed vocabulary.",
   "approvals": {
     "repo": "indy-init",
-    "commit": "62a16992956b5ba87e265f2931794307e0297a38",
+    "commit": "1ce3854b4cc5f37b3bd655b0ee344759d4563e92",
     "path": "kickoff/rehearsal-007/approvals.causa.json",
-    "sha256": "a391607092cd4edcb5f37cdc5252fbf36076a7c91a764e6848a40ed4ddcb9ae5",
+    "sha256": "f91d46495eb8d74150f18a309deec30b24de90ed96e9666ee31fde5297aaca69",
     "trustedOperators": [
       "kemiller2002"
     ]

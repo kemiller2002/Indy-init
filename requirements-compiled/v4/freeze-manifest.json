@@ -1,12 +1,12 @@
 {
   "schema": "indy-init.v4-freeze-manifest/1",
   "packageVersion": "4.0.0",
-  "status": "CANDIDATE",
+  "status": "READY-FOR-OWNER-FREEZE",
   "states": {
     "compiled": true,
     "validated": true,
     "independentReviewRecordPasses": true,
-    "ownerApprovalRecordsComplete": false,
+    "ownerApprovalRecordsComplete": true,
     "frozen": false
   },
   "sourceCommit": "62df28a559c054226dd4022e9744cf1db06e954f",
@@ -28,17 +28,17 @@
     "ownerDecisionRequests": 11
   },
   "verificationPlan": {
-    "planId": "VP-0ac7f60fc9e9",
-    "digest": "0ac7f60fc9e99c7d98403a0c2c78d3457942997a5cce38ca643cb4755b787c1a",
+    "planId": "VP-1e3c66bcc958",
+    "digest": "1e3c66bcc958a60415811ffbe2795b5e7147360340749c16e1a0f43fc19c751d",
     "contentDigest": "1d2a6043388dc3ba4ace36195c550ba6e30caaade0b9caa84afda86172822640",
     "contentDigestCovers": "the plan without planIdentity and source.approvals; the owner's package approval names it (ODR-V4-01)",
-    "fileSha256": "b6726069fe0d1e4d9773d5031b7717bf6bcd4e53d8eb49344ee14b317560d033"
+    "fileSha256": "10ce16eb8d14514ed586d6695c10dda0e741ede719af9a03d855977ebdccb9e7"
   },
   "dependencyLockSha256": "f9a7b9883a27cf7f1f6f22e0c31efd939611fa24f5e5f08d09abfe34cf858147",
   "executionManifestSha256": "4f46104323e3c57f357518fa7a12407ae189b3e727a0f8c454113fa1bf95cbe8",
   "executionPlanSha256": "d5aea873582bd3a533f52894b0651e8bf36bbb6d9ac929703941fef92a9c4f85",
   "acceptanceSha256": {
-    "acceptance-obligations.json": "f9376938117b07e38e210fcf4d6f76574a481a8e9b60587c67b5411c242393f2",
+    "acceptance-obligations.json": "48fbf0abf4c5f1365dc532ea6ee40dd1624ae5391b6bc6bcccd67e55463811a5",
     "acceptance-gate.json": "035741e18b41b03ca09b13a7818705cad2d276ac03d5fa61e968b0115bf32c65"
   },
   "files": [
@@ -48,7 +48,7 @@
     },
     {
       "path": "acceptance/acceptance-obligations.json",
-      "sha256": "f9376938117b07e38e210fcf4d6f76574a481a8e9b60587c67b5411c242393f2"
+      "sha256": "48fbf0abf4c5f1365dc532ea6ee40dd1624ae5391b6bc6bcccd67e55463811a5"
     },
     {
       "path": "baseline-reconciliation.json",
@@ -92,7 +92,7 @@
     },
     {
       "path": "package-manifest.json",
-      "sha256": "f2b0c933ef3bb140a29075409b4167c6175b6247e3fd2a07a8aba48b703aa87b"
+      "sha256": "4d99cfcb0ae8145c2bd7bb2f94a3205e08408de65a17b765afee8984631028a4"
     },
     {
       "path": "package-validation-report.json",
@@ -140,7 +140,7 @@
     },
     {
       "path": "verification-plan.json",
-      "sha256": "b6726069fe0d1e4d9773d5031b7717bf6bcd4e53d8eb49344ee14b317560d033"
+      "sha256": "10ce16eb8d14514ed586d6695c10dda0e741ede719af9a03d855977ebdccb9e7"
     }
   ],
   "compiler": {
@@ -194,9 +194,9 @@
     {
       "id": "FG-05",
       "condition": "All required owner approvals exist",
-      "status": "FAIL",
+      "status": "PASS",
       "evidence": "repository record (unauthenticated; see statesMeaning)",
-      "detail": "pending: ODR-V4-01"
+      "detail": "none pending"
     },
     {
       "id": "FG-06",
@@ -229,9 +229,9 @@
     {
       "id": "FG-10",
       "condition": "The freeze commit is recorded",
-      "status": "FAIL",
+      "status": "PASS",
       "evidence": "repository record (unauthenticated; see statesMeaning)",
-      "detail": "no verified freeze commit: it must be on main and hold the owner's package approval"
+      "detail": "1716bbb319a5927c0eee08e5bbee5ad6fb93c32c"
     }
   ],
   "unresolvedFindings": [
@@ -281,5 +281,5 @@
   "freezeTimestampMeaning": "the time this package was compiled; the compiler never freezes a package",
   "statesMeaning": "compiled and validated are computed by the compiler. independentReviewRecordPasses and ownerApprovalRecordsComplete are read from repository records whose authors the compiler cannot authenticate (the review record is written by the package author from the reviewer's report; approval records are checked for a trusted approver name, a commit without agent trailers, and origin/main, all of which a local actor can forge). frozen is never computed.",
   "frozenBy": "the owner's approving review of the freeze pull request on GitHub, then the tag indy-init-requirements-v4.0.0 on its merge commit; neither is computed from repository files",
-  "tag": "none: every gate must pass first"
+  "tag": "indy-init-requirements-v4.0.0 may be created after the owner's approving review"
 }

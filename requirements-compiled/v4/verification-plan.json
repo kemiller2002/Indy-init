@@ -1,9 +1,9 @@
 {
   "schema": "indy-init.verification-plan/1",
   "planIdentity": {
-    "planId": "VP-0ac7f60fc9e9",
+    "planId": "VP-1e3c66bcc958",
     "algorithm": "sha256",
-    "digest": "0ac7f60fc9e99c7d98403a0c2c78d3457942997a5cce38ca643cb4755b787c1a",
+    "digest": "1e3c66bcc958a60415811ffbe2795b5e7147360340749c16e1a0f43fc19c751d",
     "covers": "sha256 of the plan serialized by the compiler's canonical writer (ASCII JSON, two-space indent, trailing newline) with planIdentity removed"
   },
   "source": {
@@ -13,9 +13,9 @@
     "baselineSha256": "f86a3539e48ee8dda7d99d5f4f5546a18e2397a82d308a277c8f346edb2a8f1a",
     "approvals": {
       "repository": "kemiller2002/indy-init",
-      "commit": "62a16992956b5ba87e265f2931794307e0297a38",
+      "commit": "1ce3854b4cc5f37b3bd655b0ee344759d4563e92",
       "path": "kickoff/rehearsal-007/approvals.causa.json",
-      "sha256": "a391607092cd4edcb5f37cdc5252fbf36076a7c91a764e6848a40ed4ddcb9ae5",
+      "sha256": "f91d46495eb8d74150f18a309deec30b24de90ed96e9666ee31fde5297aaca69",
       "trustedOperators": [
         "kemiller2002"
       ]
