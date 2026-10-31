@@ -78,4 +78,4 @@ Each check has negative controls in `V41Tests.fs`, which show it rejects a broke
 | X13 | The DAG is acyclic and keeps all of v4's work. Every v4 ordering is kept unless an owner decision waives it. Estimates stay at least half of v4's and are labelled as estimates |
 | X14 | Every test identity names an owned file, or is a Praxis record |
 | X15 | Every Forma layout rule is critical and lists its invariants. Each invariant names assertions the rule runs, and each assertion is exported by the kit with broken fixtures, run against published Forma patterns at contract viewports. Every Forma gap has a remedy that uses only Forma tokens |
-| X16 | The test tooling the bootstrap writes is exactly the owner's lock (ODR-V41-07): exact `id@version` entries that name the decision and approval, applied only to test projects |
+| X16 | The test tooling is a well-formed owner lock: each lock names a dependency-lock decision and its approval, each entry is an exact `id@version`, no package is locked twice, and the NuGet packages go to exactly the test projects that host .NET tests. The offline suite compares each lock with the owner's record |

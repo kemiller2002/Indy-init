@@ -94,7 +94,7 @@
     },
     {
       "id": "X16",
-      "title": "The test tooling the bootstrap writes is exactly the owner's lock (ODR-V41-07): each entry an exact id@version, the lock names its decision and approval, and it applies only to test projects",
+      "title": "The test tooling is a well-formed owner lock: each lock names a dependency-lock decision and its approval, each entry is an exact id@version, no package is locked twice, and the NuGet packages go to exactly the test projects that host .NET tests (the offline suite compares each lock with the owner's record)",
       "result": "PASS",
       "problems": []
     }

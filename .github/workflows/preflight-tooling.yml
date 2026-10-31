@@ -27,18 +27,21 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - uses: actions/setup-dotnet@v4
-        with:
-          global-json-file: global.json
-      - name: Compiled package v4 on this commit is the frozen one (tag indy-init-requirements-v4.0.0)
+      - name: Compiled package v4 on this commit is the frozen one (tag indy-init-requirements-v4.0.0 at c9dc556, the owner's freeze)
         run: |
           git fetch --quiet --force origin 'refs/tags/indy-init-requirements-v4.0.0:refs/tags/indy-init-requirements-v4.0.0'
+          # A moved tag must not silently become the baseline: it must still name the commit the owner froze.
+          test "$(git rev-parse 'indy-init-requirements-v4.0.0^{commit}')" = c9dc556ef2b0d389e8ccc07b729f00fccd19fba7 || { echo "tag indy-init-requirements-v4.0.0 no longer names c9dc556"; exit 1; }
           if ! git diff --quiet indy-init-requirements-v4.0.0 HEAD -- requirements-compiled/v4; then
             echo "requirements-compiled/v4 differs from the frozen tag indy-init-requirements-v4.0.0:"
             git diff --stat indy-init-requirements-v4.0.0 HEAD -- requirements-compiled/v4
             exit 1
           fi
           git worktree add --quiet --detach "$RUNNER_TEMP/v4-frozen" indy-init-requirements-v4.0.0
+      - name: Install the SDK the tagged compiler pins (the tag's global.json)
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: ${{ runner.temp }}/v4-frozen/global.json
       - name: Check out the five Rehearsal 7 evidence files the v4 lesson analysis quotes (evidence only, never a build input)
         run: |
           git clone --quiet --depth 1 --filter=blob:none --no-checkout https://github.com/kemiller2002/indy-init-rehearsal-007 "$RUNNER_TEMP/r7"

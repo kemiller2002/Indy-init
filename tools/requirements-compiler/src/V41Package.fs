@@ -138,24 +138,35 @@ let consumerRole (consumers: string list) (test: string) : string option =
     elif browser.Success then consumers |> List.tryFind ((=) browser.Groups.[1].Value)
     else None
 
-/// The state-machine test ids of a machine: one per transition and one for its illegal pairs, in the test project of
-/// the machine's owner (analysis/project-structure.json stateMachines).
-/// The owner decision requests of v4.1 (proposals/owner-decision-requests.json), by id.
-let private requestIds (i: Inputs) : string list =
+/// The owner decision requests of v4.1 (proposals/owner-decision-requests.json), as (id, kind).
+let private requests (i: Inputs) : (string * string) list =
     i.AuthoredText |> List.tryFind (fst >> (=) "proposals/owner-decision-requests.json")
-    |> Option.map (snd >> Text.Encoding.UTF8.GetBytes >> parseBytes >> arr "requests" >> List.map (str "id")) |> Option.defaultValue []
+    |> Option.map (snd >> Text.Encoding.UTF8.GetBytes >> parseBytes >> arr "requests" >> List.map (fun r -> str "id" r, sOr "kind" r)) |> Option.defaultValue []
 
-/// The problems of the amendments themselves: each adds one transition to a v4 machine and names the owner decision
-/// that approves it and the operator approval that records it. Whether the transition fits its machine is checked with
-/// the machine's own transitions.
+let private requestIds (i: Inputs) = requests i |> List.map fst
+
+/// Whether a decision is an owner decision request of the given kind.
+let private requestOfKind (i: Inputs) (kind: string) (decision: string) = List.contains (decision, kind) (requests i)
+
+/// The problems of the amendments themselves: each added transition, and each accepted machine left unchanged, names a
+/// v4 machine, a state-machine-amendment request and the operator approval that records it; an added transition's
+/// sources are baseline requirements. Whether a transition fits its machine (states, events, guards, Saved entered only
+/// by a confirmation) is checked with the amended machine; that the approval selects exactly these transitions is
+/// checked against the owner's record by the offline suite.
 let amendmentProblems (i: Inputs) : string list =
     let v4Machines = arr "machines" i.StateMachines |> List.map (str "id")
-    let requests = requestIds i
+    let requirementIds = arr "requirements" i.Baseline |> List.map (str "id") |> Set.ofList
+    let cites (what: string) (x: Json) =
+        [ if not (List.contains (sOr "machine" x) v4Machines) then yield sprintf "%s names machine %s, which v4 does not define" what (sOr "machine" x)
+          if not (requestOfKind i "state-machine-amendment" (sOr "decision" x)) then yield sprintf "%s names decision '%s', which is not a state-machine-amendment request" what (sOr "decision" x)
+          if String.IsNullOrWhiteSpace (sOr "approval" x) then yield sprintf "%s names no operator approval" what ]
     [ for t in arr "transitions" i.MachineAmendments do
-          let tid = sOr "id" t
-          if not (List.contains (sOr "machine" t) v4Machines) then yield sprintf "amendment %s names machine %s, which v4 does not define" tid (sOr "machine" t)
-          if not (List.contains (sOr "decision" t) requests) then yield sprintf "amendment %s names decision '%s', which is not an owner decision request" tid (sOr "decision" t)
-          if String.IsNullOrWhiteSpace (sOr "approval" t) then yield sprintf "amendment %s names no operator approval" tid ]
+          let what = sprintf "amendment %s" (sOr "id" t)
+          yield! cites what t
+          for s in strs "sources" t do
+              if not (requirementIds.Contains s) then yield sprintf "%s: source %s is not a baseline requirement" what s
+      for a in arr "accepted" i.MachineAmendments do
+          yield! cites (sprintf "the accepted %s entry" (sOr "machine" a)) a ]
 
 /// v4's state machines with v4.1's owner-approved amendments applied: each added transition joins its machine, marked
 /// with its decision. No state or event is added, and v4's files are never edited (v4 is frozen at its tag).
@@ -168,6 +179,8 @@ let amendedMachines (i: Inputs) : Json list =
         | [] -> m
         | ts -> setIn "transitions" (JArr(arr "transitions" m @ (ts |> List.map transitionOf))) m)
 
+/// The state-machine test ids of a machine: one per transition and one for its illegal pairs, in the test project of
+/// the machine's owner (analysis/project-structure.json stateMachines).
 let private machineProject (i: Inputs) (machine: string) =
     arr "stateMachines" i.Structure |> List.tryFind (fun m -> sOr "machine" m = machine) |> Option.map (sOr "project") |> Option.defaultValue "Causa.Persistence.Tests"
 
@@ -363,6 +376,13 @@ let stateMachineContracts (i: Inputs) : Json * string list =
                   go (Set.singleton (str "initial" m)) [ str "initial" m ]
               for s in states do
                   if not (reachable.Contains s) then yield sprintf "%s: state %s is not reachable from %s" mid s (str "initial" m)
+              // v4's W05 rule holds for the amended machine too: Saved is entered only by a confirmation (PERSIST-007,
+              // PERSIST-023).
+              let confirmations = strs "entersSavedOnlyBy" m
+              if not confirmations.IsEmpty then
+                  for t in transitions do
+                      if str "to" t = "Saved" && str "from" t <> "Saved" && not (List.contains (str "event" t) confirmations) then
+                          yield sprintf "%s %s: Saved is entered by %s, which is not a confirmation (PERSIST-007, PERSIST-023)" mid (str "id" t) (str "event" t)
               // An event no transition accepts is a gap in the machine; it must be listed with an owner decision.
               let listed = arr "unusedEvents" i.GuardPartitions |> List.filter (fun u -> sOr "machine" u = mid)
               for e in events do
@@ -1184,8 +1204,9 @@ let private projectNamespace (path: string) =
     let parts = path.Split('/')
     parts.[1 .. parts.Length - 2] |> Array.map (fun p -> p.Replace("-", "")) |> String.concat "."
 
-/// The test tooling the owner locked (ODR-V41-07): analysis/project-structure.json testTooling, as (id, version)
-/// pairs of NuGet packages for the listed test projects and npm packages for package.json.
+/// The test tooling the owner locked: analysis/project-structure.json testTooling, one lock per dependency-lock decision
+/// (ODR-V41-07, and any later one), as (id, version) pairs of NuGet packages for the test projects and npm packages for
+/// package.json.
 let private lockEntry (entry: string) =
     match entry.LastIndexOf '@' with
     | n when n > 0 -> Some(entry.Substring(0, n), entry.Substring(n + 1))
@@ -1193,31 +1214,48 @@ let private lockEntry (entry: string) =
 
 let testTooling (i: Inputs) =
     let tooling = field "testTooling" i.Structure |> Option.defaultValue JNull
-    let entries key = strs key tooling |> List.choose lockEntry
+    let entries key = arr "locks" tooling |> List.collect (strs key) |> List.choose lockEntry
     entries "nuget", entries "npm", strs "testProjects" tooling
 
-let testToolingCheck (i: Inputs) : Check =
+/// The test projects that host .NET tests (one of their files holds a dotnet: test): exactly these take the NuGet test
+/// tooling; a helper library such as Causa.TestSupport takes none.
+let testHostProjects (i: Inputs) (files: OwnedFile list) : string list =
+    let testProjects = arr "testProjects" i.Structure |> List.map (str "id") |> Set.ofList
+    files
+    |> List.filter (fun f -> f.Tests |> List.exists (starts "dotnet:"))
+    |> List.choose (fun f -> f.Project)
+    |> List.filter testProjects.Contains
+    |> List.distinct
+    |> List.sort
+
+let testToolingCheck (i: Inputs) (files: OwnedFile list) : Check =
     let tooling = field "testTooling" i.Structure |> Option.defaultValue JNull
-    let testProjects = arr "testProjects" i.Structure |> List.map (str "id")
-    check "X16" "The test tooling the bootstrap writes is exactly the owner's lock (ODR-V41-07): each entry an exact id@version, the lock names its decision and approval, and it applies only to test projects"
-        [ if sOr "decision" tooling <> "ODR-V41-07" then yield "testTooling does not name owner decision ODR-V41-07"
-          if not (List.contains (sOr "decision" tooling) (requestIds i)) then yield sprintf "testTooling names decision '%s', which is not an owner decision request" (sOr "decision" tooling)
-          if String.IsNullOrWhiteSpace (sOr "approval" tooling) then yield "testTooling names no operator approval"
+    let locks = arr "locks" tooling
+    let all key = locks |> List.collect (strs key)
+    let hosts = testHostProjects i files
+    check "X16" "The test tooling is a well-formed owner lock: each lock names a dependency-lock decision and its approval, each entry is an exact id@version, no package is locked twice, and the NuGet packages go to exactly the test projects that host .NET tests (the offline suite compares each lock with the owner's record)"
+        [ if locks.IsEmpty then yield "testTooling holds no lock"
+          for l in locks do
+              let d = sOr "decision" l
+              if not (requestOfKind i "dependency-lock" d) then yield sprintf "a testTooling lock names decision '%s', which is not a dependency-lock request" d
+              if String.IsNullOrWhiteSpace (sOr "approval" l) then yield sprintf "the testTooling lock of %s names no operator approval" d
+              for key in [ "nuget"; "npm" ] do
+                  for e in strs key l do
+                      if not (Regex.IsMatch(e, @"^(@[^@\s/]+/)?[^@\s/]+@[0-9]+(\.[0-9]+)+$")) then yield sprintf "testTooling %s entry '%s' is not an exact id@version" key e
           for key in [ "nuget"; "npm" ] do
-              for e in strs key tooling do
-                  if not (Regex.IsMatch(e, @"^(@[^@\s/]+/)?[^@\s/]+@[0-9]+(\.[0-9]+)+$")) then yield sprintf "testTooling %s entry '%s' is not an exact id@version" key e
-              for d in duplicates (strs key tooling |> List.choose lockEntry |> List.map fst) do
-                  yield sprintf "testTooling %s locks %s twice" key d
-          if (strs "nuget" tooling).IsEmpty then yield "testTooling locks no NuGet test package"
-          for p in strs "testProjects" tooling do
-              if not (List.contains p testProjects) then yield sprintf "testTooling names %s, which is not a test project" p ]
+              for d in duplicates (all key |> List.choose lockEntry |> List.map fst) do
+                  yield sprintf "testTooling locks %s package %s twice" key d
+          if (all "nuget").IsEmpty then yield "testTooling locks no NuGet test package"
+          if List.sort (strs "testProjects" tooling) <> hosts then
+              yield sprintf "testTooling applies to [%s]; the test projects that host .NET tests are [%s]" (String.concat ", " (List.sort (strs "testProjects" tooling))) (String.concat ", " hosts) ]
 
 /// The empty application repository as integration writes it at bootstrap (T10): the solution, every source and test
 /// project with its complete Compile list and references, every planned file as an empty namespace, the domain stubs
 /// and each interface contract in the file that implements it. No behaviour, and no third-party package except the test
-/// tooling the owner locked (ODR-V41-07): its NuGet packages in the test projects testTooling lists and its npm packages
-/// in package.json. Every module is written by its owner. Building it proves the project graph, the compile order, the
-/// contract placement and the test tooling restore.
+/// tooling the owner locked (testTooling): its NuGet versions in Directory.Packages.props (central package management),
+/// a version-less reference in each test project that hosts .NET tests, and its npm packages in package.json. Every
+/// module is written by its owner. Building it proves the project graph, the compile order, the contract placement and
+/// the test tooling restore.
 let bootstrapFiles (i: Inputs) (files: OwnedFile list) (globalJson: string) : (string * string) list =
     let lists = compileLists i files |> Map.ofList
     let interfaces = arr "interfaces" i.Interfaces |> List.map (fun x -> sOr "file" x, x) |> Map.ofList
@@ -1236,7 +1274,7 @@ let bootstrapFiles (i: Inputs) (files: OwnedFile list) (globalJson: string) : (s
         let compiles = lists.TryFind (str "id" p) |> Option.defaultValue [] |> List.map (fun f -> sprintf "    <Compile Include=\"%s\" />" (relative dir f))
         let refs = strs "references" p |> List.map (fun r -> sprintf "    <ProjectReference Include=\"%s\" />" (relative dir (pathOf r)))
         let packages =
-            if List.contains (str "id" p) toolingProjects then nuget |> List.map (fun (id, v) -> sprintf "    <PackageReference Include=\"%s\" Version=\"%s\" />" id v) else []
+            if List.contains (str "id" p) toolingProjects then nuget |> List.map (fun (id, _) -> sprintf "    <PackageReference Include=\"%s\" />" id) else []
         String.concat "\n"
             ([ "<Project Sdk=\"Microsoft.NET.Sdk\">"; "  <PropertyGroup>"; "    <TargetFramework>net10.0</TargetFramework>"; "  </PropertyGroup>"; "  <ItemGroup>" ]
              @ compiles @ [ "  </ItemGroup>" ]
@@ -1267,7 +1305,13 @@ let bootstrapFiles (i: Inputs) (files: OwnedFile list) (globalJson: string) : (s
     let gitignore = String.concat "\n" [ "bin/"; "obj/"; "node_modules/"; "test-results/"; "playwright-report/"; "*.trx"; "" ]
     let packageJson =
         serialize (JObj [ "name", JStr "causa"; "private", JBool true; "devDependencies", JObj(npm |> List.map (fun (id, v) -> id, JStr v)) ])
+    let centralVersions =
+        String.concat "\n"
+            ([ "<Project>"; "  <PropertyGroup>"; "    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>"; "  </PropertyGroup>"; "  <ItemGroup>" ]
+             @ (nuget |> List.map (fun (id, v) -> sprintf "    <PackageVersion Include=\"%s\" Version=\"%s\" />" id v))
+             @ [ "  </ItemGroup>"; "</Project>"; "" ])
     [ ".gitignore", gitignore; "Causa.slnx", slnx; "Directory.Build.props", props; "global.json", globalJson ]
+    @ (if nuget.IsEmpty then [] else [ "Directory.Packages.props", centralVersions ])
     @ (if npm.IsEmpty then [] else [ "package.json", packageJson ])
     @ projectFiles @ fsFiles @ host @ layoutCopy
 
@@ -1373,7 +1417,7 @@ let build (i: Inputs) : Built =
             check "X13" "The adjusted DAG is acyclic, keeps every v4 task with its requirements and every v4 ordering not explicitly waived, keeps every estimate at least half of v4's, and labels every change an estimate with a rationale" schedProblems
             testIdentityCheck i files
             layoutKitCheck i
-            testToolingCheck i ]
+            testToolingCheck i files ]
     let json (n: string) (j: Json) = n, serialize j
     { Files =
         [ json "agent-file-ownership.json" (ownershipJson i files)

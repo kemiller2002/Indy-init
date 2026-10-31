@@ -576,14 +576,14 @@
           "transitions": [
             {
               "id": "T-S61",
-              "guard": "true",
+              "guard": "current: its RequestId is the session's Outstanding request, which awaits MutationAnswer",
               "next": "Saving",
               "effects": [
-                "record the sent request as the session's outstanding request (its RequestId); an answer to any other request is SupersededReply"
+                "record that the outstanding createCommitOnBranch was handed to Execute; the state, the base head, Outstanding (RequestId, MutationAnswer) and the unsaved changes are unchanged"
               ],
               "sources": [
-                "PERSIST-007",
-                "PERSIST-051"
+                "PERSIST-006",
+                "PERSIST-031"
               ],
               "test": "dotnet:Causa.Persistence.Tests.StateMachines.SMSAVE.T-S61",
               "amendedBy": "ODR-V41-08"

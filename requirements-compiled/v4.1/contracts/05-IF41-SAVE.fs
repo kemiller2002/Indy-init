@@ -81,7 +81,9 @@ type SaveState =
     | SaveFailed of SaveFailure
 
 /// SM-SAVE events. Persistence produces every reply event from an HttpOutcome with SaveMachine.Interpret; the App
-/// produces only Edit, SaveRequested, CheckAgain, WentOffline, WentOnline and QueuedSaveStarted.
+/// produces only Edit, SaveRequested, CheckAgain, WentOffline, WentOnline, QueuedSaveStarted and MutationSent. Its runtime
+/// steps MutationSent with the request's RequestId when it hands the outstanding mutation (Awaiting MutationAnswer) to
+/// Execute; the session is unchanged (T-S61, ODR-V41-08).
 [<RequireQualifiedAccess>]
 type SaveInput =
     | Edit of CommandEnvelope
