@@ -159,7 +159,7 @@
   "independentReview": {
     "verdict": "",
     "reviewer": "independent read-only Claude Code subagent (fresh context; not the package author)",
-    "rounds": 7,
+    "rounds": 8,
     "record": "independent-review.md"
   },
   "freezeGate": [
@@ -224,7 +224,7 @@
       "condition": "Independent review passes",
       "status": "PASS",
       "evidence": "repository record (unauthenticated; see statesMeaning)",
-      "detail": "computed from 39 finding(s) and the reviewer's last round verdict (PASS), which reviewed plan content digest 1d2a6043388dc3ba4ace36195c550ba6e30caaade0b9caa84afda86172822640 (the plan being frozen); reviewer independent read-only Claude Code subagent (fresh context; not the package author)"
+      "detail": "computed from 40 finding(s) and the reviewer's last round verdict (PASS), which reviewed plan content digest 1d2a6043388dc3ba4ace36195c550ba6e30caaade0b9caa84afda86172822640 (the plan being frozen); reviewer independent read-only Claude Code subagent (fresh context; not the package author)"
     },
     {
       "id": "FG-10",
@@ -270,10 +270,11 @@
     "review RV5-2 (major): fixed",
     "review RV6-1 (minor): accepted-residual",
     "review RV7-1 (minor): fixed",
-    "review RV7-2 (minor): fixed",
+    "review RV7-2 (minor): accepted-residual",
     "review RV7-3 (minor): fixed",
     "review RV7-4 (minor): fixed",
     "review RV7-5 (minor): fixed",
+    "review RV8-1 (minor): fixed",
     "owner decision ODR-V4-01 pending"
   ],
   "freezeTimestamp": "2026-10-30T00:00:00Z",

@@ -3,7 +3,7 @@
   "description": "Record of the independent adversarial review of package v4. The reviewer was a fresh, read-only Claude Code subagent. It received the sources, the artifacts and the compiler, but not the compiler author's conclusions. Its verdicts are copied as given. The status of each finding is the remediation the package author made; the reviewer's next round verifies it. FG-09 computes its result from this record, not from any verdict field. The owner's package approval (ODR-V4-01) must name this file's SHA-256. This record is agent-produced: the reviewer is an agent, and so is the author of this file.",
   "reviewer": "independent read-only Claude Code subagent (fresh context; not the package author)",
   "reviewerIsImplementer": false,
-  "rounds": 7,
+  "rounds": 8,
   "roundVerdicts": [
     {
       "round": 1,
@@ -47,6 +47,13 @@
       "reviewedState": "claude/v4-apply-owner-decisions at cc434fc (the owner decisions APR-V4-OWNER-1 applied)",
       "planContentDigest": "1d2a6043388dc3ba4ace36195c550ba6e30caaade0b9caa84afda86172822640",
       "summary": "the nine amendments match the owner record exactly (PERSIST-051-O2 with the combined criterion); the approvals pin and its non-agent last change are correct; the changed V4Tests controls each still catch their defect (mutations M2-M5); FG-05 pends only ODR-V4-01, FG-07 passes; no critical or major finding; new: 5 minor (RV7-1..RV7-5)"
+    },
+    {
+      "round": 8,
+      "verdict": "PASS",
+      "reviewedState": "claude/v4-apply-owner-decisions at a055069 (round 7 remediation)",
+      "planContentDigest": "1d2a6043388dc3ba4ace36195c550ba6e30caaade0b9caa84afda86172822640",
+      "summary": "RV7-1..RV7-5 remediations verified; the RV7-3 and RV7-4 controls catch their mutations (reviewPasses ignoring planContentDigest; W13 label check removed); the plan, acceptance and v4.1 are byte-identical to round 7; RV7-2 accepted as a residual; new: 1 minor (RV8-1)"
     }
   ],
   "findings": [
@@ -319,9 +326,9 @@
     {
       "id": "RV7-2",
       "severity": "minor",
-      "status": "fixed",
+      "status": "accepted-residual",
       "title": "Generated texts still call decided clauses proposed (state-machines.json, operational-definitions.json, r7-lessons-mapping.json, timed-execution-manifest.json)",
-      "remediation": "FREEZE.md lists the requests the owner decided and states that a clause marked proposed whose request is listed there is normative; the interim rule now applies only to undecided requests.",
+      "remediation": "FREEZE.md lists the requests the owner decided and states that a clause marked proposed whose request is listed there is normative; the interim rule now applies only to undecided requests. The reviewer accepted the remaining generated wording as a residual in round 8.",
       "residual": "The generated texts keep their proposal wording; deriving the decided state into each generator is left out of this change."
     },
     {
@@ -345,6 +352,13 @@
       "title": "Stale V4Tests header comment and control label",
       "remediation": "The header now says amendments are applied only when a trusted operator record authorizes them. The control formerly labelled no approvals is renamed for what it tests (no package approval), and a control with no record at all is added.",
       "residual": "The description field inside kickoff/rehearsal-007/approvals.causa.json still says it holds none; only the operator edits that file."
+    },
+    {
+      "id": "RV8-1",
+      "severity": "minor",
+      "status": "fixed",
+      "title": "RV7-2 was recorded as fixed although its residual remains",
+      "remediation": "RV7-2 is recorded as accepted-residual, as the reviewer accepted it in round 8."
     }
   ]
 }

@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | Reviewer | A fresh, read-only Claude Code subagent. It received the sources, the artifacts and the compiler, but not the package author's conclusions. It wrote only to its own scratch directory |
-| Rounds | 7. Rounds 1 to 5 were FAIL, round 6 was PASS, and round 7 (the owner's amendments applied) was PASS. Each verdict is reported as the reviewer gave it |
+| Rounds | 8. Rounds 1 to 5 were FAIL, round 6 was PASS, round 7 (the owner's amendments applied) was PASS, and round 8 (its remediation) was PASS. Each verdict is reported as the reviewer gave it |
 | Record | [`analysis/independent-review.json`](analysis/independent-review.json): every finding with its severity, the author's remediation, and the reviewer's later status. FG-09 computes its result from this record. The owner's package approval names its SHA-256 |
 | Caveat | The reviewer is an agent, and so is the author of this record. The record is not an authenticated attestation (residual RV3-2). The owner's GitHub review of the freeze pull request is the authentication |
 
@@ -18,6 +18,7 @@
 | 5 | `8b80c69` | FAIL | 0 critical, 2 major | FG-10 read the old approvals schema. Approved invariant tests were not bound in the plan |
 | 6 | `dbc9a5f` | **PASS** | none open | RV5-1 and RV5-2 confirmed end to end. Residuals are recorded and none is critical |
 | 7 | `cc434fc` | **PASS** | 0 critical, 0 major, 5 minor | The owner's APR-V4-OWNER-1 applied exactly (plan content digest `1d2a6043…`); the changed test controls each still catch their defect. Minor: stale status documents (RV7-1), proposal wording in generated texts (RV7-2), FG-09 not bound to the reviewed plan (RV7-3), unchecked decision label (RV7-4), stale test comment (RV7-5); all remediated after the round |
+| 8 | `a055069` | **PASS** | 0 critical, 0 major, 1 minor | The RV7 remediations verified, and the new RV7-3 and RV7-4 controls catch their mutations. The plan is byte-identical to round 7's. RV7-2's generated wording accepted as a residual. Minor: RV7-2's status (RV8-1), fixed in the record |
 
 ## What the review changed
 
@@ -49,10 +50,10 @@
 | RV3-5 | After a known stale head, T-S59's "Unknown commit outcome" wording overstates the uncertainty | PAT-07 allows only Offline or Unknown outcome there. Recorded on T-S59 for the owner |
 | RV6-1 | Process-record invariant tests (INV-15..19, INV-23) are not plan-bound | Their producers (the compiler suite and CI policy) run them |
 
-## Round 7 remediation (after the round, not re-reviewed by it)
+## Round 7 remediation (verified by round 8)
 
 - **RV7-1:** FREEZE.md and README.md now state the state after APR-V4-OWNER-1.
-- **RV7-2:** FREEZE.md lists the decided requests. A clause marked proposed whose request is listed there is normative. The generated texts keep their proposal wording (residual).
+- **RV7-2:** FREEZE.md lists the decided requests. A clause marked proposed whose request is listed there is normative. The generated texts keep their proposal wording (residual, accepted by the reviewer in round 8).
 - **RV7-3:** each round verdict names the plan content digest it reviewed. FG-09 passes only when the last round is PASS and names the digest of the plan being frozen.
 - **RV7-4:** W13 checks that an applied amendment's decision is the request that proposes it.
 - **RV7-5:** the V4Tests header and control labels are corrected. A control with an approvals file holding no record is added.

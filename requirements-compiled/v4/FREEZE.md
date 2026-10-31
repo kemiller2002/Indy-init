@@ -1,6 +1,6 @@
 # v4 freeze declaration
 
-**Status: CANDIDATE.** Package v4 is compiled and validated, the owner's decisions ODR-V4-02..11 are recorded and applied, and its independent review record passes for the plan as now compiled (round 7). It is not approved (ODR-V4-01 is pending) and not frozen.
+**Status: CANDIDATE.** Package v4 is compiled and validated, the owner's decisions ODR-V4-02..11 are recorded and applied, and its independent review record passes for the plan as now compiled (rounds 7 and 8). It is not approved (ODR-V4-01 is pending) and not frozen.
 
 This file explains the status. The authoritative values are in [`freeze-manifest.json`](freeze-manifest.json), which the compiler writes and CI reproduces byte for byte (`requirements-compiler v4 --check`).
 
@@ -12,7 +12,7 @@ Each state is established differently. Only the first two are computed by the co
 |---|---|---|
 | Compiled | **yes** | The v3 pipeline returns compilation PASS (V01–V18), and the v4 stage generates every artifact |
 | Validated | **yes** | Checks W01–W16 pass (`package-validation-report.json`), and plan-readiness is READY with 1211 of 1211 category checks and no permits |
-| Independently reviewed | **record: yes** | Seven review rounds were run (`independent-review.md`): rounds 1 to 5 FAIL, round 6 PASS, and round 7 PASS for the plan with the owner's amendments applied, with no critical or major finding open and residuals recorded. FG-09 computes PASS from the record, and only when the last round names the content digest of the plan being frozen. The record is written by the package author from the reviewer's report, so it is a record, not an authenticated attestation |
+| Independently reviewed | **record: yes** | Eight review rounds were run (`independent-review.md`): rounds 1 to 5 FAIL, round 6 PASS, round 7 PASS for the plan with the owner's amendments applied and round 8 PASS for its remediation, with no critical or major finding open and residuals recorded. FG-09 computes PASS from the record, and only when the last round names the content digest of the plan being frozen. The record is written by the package author from the reviewer's report, so it is a record, not an authenticated attestation |
 | Approved | **no** | The owner recorded ODR-V4-02..11 in operator approval APR-V4-OWNER-1 (`kickoff/rehearsal-007/approvals.causa.json`, commit `cbc752b`), and the plan applies them. The package approval ODR-V4-01 has no record yet. Under RDP-003 only the operator writes them. The compiler checks that each record has a trusted approver, sits in a commit without agent trailers, is on origin/main and matches the proposal exactly. It cannot authenticate the person behind the record |
 | Frozen | **no** | Never computed. The package is frozen only when the owner approves the freeze pull request on GitHub, and then the tag `indy-init-requirements-v4.0.0` is created on its merge commit. The kickoff (T01) and acceptance gate AG-13 check the tag, its manifest digests and the owner's review |
 
@@ -28,7 +28,7 @@ Each state is established differently. Only the first two are computed by the co
 | FG-06 | Dependency lock valid | PASS |
 | FG-07 | Execution plan complete, and the selected topology fits | PASS: the owner selected C (role lanes with two UI agents), which fits at 405 of 420 minutes |
 | FG-08 | Compiler tests pass | PASS (the record matches the compiler tree; CI re-runs the suite and compares) |
-| FG-09 | Independent review passes | PASS (an unauthenticated record; round 7 PASS, naming the current plan content digest) |
+| FG-09 | Independent review passes | PASS (an unauthenticated record; round 8 PASS, naming the current plan content digest) |
 | FG-10 | Freeze commit recorded | **FAIL**: needs the owner's approval on main |
 
 ## Identity
@@ -45,7 +45,7 @@ Each state is established differently. Only the first two are computed by the co
 
 ## What the owner does to freeze v4
 
-Steps 1 to 3 are done: the owner's APR-V4-OWNER-1 (#51), and the curation, recompile and review round 7 (#52).
+Steps 1 to 3 are done: the owner's APR-V4-OWNER-1 (#51), and the curation, recompile and review rounds 7 and 8 (#52).
 
 1. Decide ODR-V4-02..11 in `proposals/owner-decision-requests.json`.
    - Write each decision as a change in one operator approval in `kickoff/rehearsal-007/approvals.causa.json`: `{"id", "authority": {"kind": "operator", "id": "kemiller2002"}, "date", "changes": [...]}`. This is the schema verify-plan authorizes (see `recordFormat`).
@@ -63,7 +63,7 @@ Until then, the November 7 build may use the candidate. It must report the packa
 
 ## Decided requests (APR-V4-OWNER-1)
 
-Some generated texts still use the wording of the proposals (`state-machines.json` `proposedTransitions`, the "in flight" reading in `operational-definitions.json`, the gap-proposed classes in `r7-lessons-mapping.json`, and the topology note in `timed-execution-manifest.json`; review residual RV7-2). A clause marked proposed whose request is listed here is decided and normative:
+Some generated texts still use the wording of the proposals (`state-machines.json` `proposedTransitions`, the "in flight" reading in `operational-definitions.json`, the gap-proposed classes in `r7-lessons-mapping.json`, and the topology note in `timed-execution-manifest.json`; review residual RV7-2, accepted in round 8). A clause marked proposed whose request is listed here is decided and normative:
 
 | Request | Decision |
 |---|---|
