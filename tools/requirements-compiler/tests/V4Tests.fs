@@ -264,8 +264,15 @@ let controls (source: string) : string list =
         status
     let mapChange (pred: Json -> bool) (f: Json -> Json) (cs: Json list) = cs |> List.map (fun c -> if pred c then f c else c)
     let byDecision id (c: Json) = strOpt "decision_id" c = Some id
+    let withoutPackageApproval = mapArr "approvals" (List.map (mapArr "changes" (List.filter (byDecision "ODR-V4-01" >> not))))
+    // The committed package reads READY-FOR-OWNER-FREEZE only once its pinned approvals hold the operator's package
+    // approval and its freeze commit is verified (FREEZE.md step 5); until then it is a CANDIDATE.
+    let committedMayBeReady = i0.FreezeCommitVerified && V4Package.freezeCommitHoldsApproval i0.TrustedOperators i0.Approvals
     let freezeControls =
-        [ if statusOf i0 <> "CANDIDATE" then yield "freeze: the committed package is not a CANDIDATE"
+        [ match statusOf i0 with
+          | "CANDIDATE" -> ()
+          | "READY-FOR-OWNER-FREEZE" when committedMayBeReady -> ()
+          | s -> yield sprintf "freeze: the committed package is %s without a pinned package approval and a verified freeze commit" s
           if statusOf allRecorded <> "READY-FOR-OWNER-FREEZE" then
               let b = V4Package.build allRecorded
               let failing = V4Package.gates allRecorded b (V4Package.planContentDigest allRecorded.Plan) |> List.filter (fun g -> not g.Pass) |> List.map (fun g -> g.Id + ": " + g.Detail)
@@ -280,7 +287,7 @@ let controls (source: string) : string list =
           let frozenFlag (i: V4Package.Inputs) = let b = V4Package.build i in V4Package.freezeStatus b (V4Package.gates i b (V4Package.planContentDigest i.Plan)) true |> fst |> List.contains ("frozen", true)
           if frozenFlag allRecorded then yield "freeze: the compiler declared frozen from repository inputs"
           let blocked label (i: V4Package.Inputs) = [ if statusOf i <> "CANDIDATE" then yield sprintf "freeze: ready although %s" label ]
-          yield! blocked "the committed approvals hold no package approval" { allRecorded with Approvals = i0.Approvals; Plan = i0.Plan; ApprovalsPin = i0.ApprovalsPin }
+          yield! blocked "the committed approvals hold no package approval" { allRecorded with Approvals = withoutPackageApproval i0.Approvals; Plan = i0.Plan; ApprovalsPin = i0.ApprovalsPin }
           yield! blocked "the approvals file holds no record at all" { allRecorded with Approvals = setIn "approvals" (JArr []) i0.Approvals; Plan = i0.Plan; ApprovalsPin = i0.ApprovalsPin }
           yield! blocked "approved amendments were never applied to the plan (RV4-1)" (scenario operator allChanges [] allRecorded)
           let without08 = allAmends |> List.filter (fun c -> not (List.contains (strOpt "obligation_id" c) [ Some "PERSIST-023-O2"; Some "PERSIST-007-O2"; Some "PERSIST-007-O4" ]))

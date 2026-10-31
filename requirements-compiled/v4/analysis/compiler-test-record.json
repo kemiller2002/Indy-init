@@ -3,6 +3,6 @@
   "result": "PASS",
   "failures": 0,
   "summary": "offline tests (baseline equivalence, baseline units, preflight verdict, verification plan, acceptance contracts, process evidence, v4 scope and controls, v4.1 scope and controls): all passed",
-  "compilerTreeSha256": "0494fac0a499d16fe84cec72b1351d8b112e0cff36c588272404f09aea86808b",
+  "compilerTreeSha256": "038c9efa4cdafe2d764b7636a20e189ec47c936b9cc102a1dcf7945edf7963fa",
   "command": "dotnet run -c Release --project tools/requirements-compiler/tests -- --offline --source ."
 }

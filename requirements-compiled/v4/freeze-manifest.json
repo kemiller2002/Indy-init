@@ -28,17 +28,17 @@
     "ownerDecisionRequests": 11
   },
   "verificationPlan": {
-    "planId": "VP-a1999095ce0a",
-    "digest": "a1999095ce0ab5ac11bc3c66a055f8552ec73d03a2c75a8c7c4b983457ce4d78",
+    "planId": "VP-0ac7f60fc9e9",
+    "digest": "0ac7f60fc9e99c7d98403a0c2c78d3457942997a5cce38ca643cb4755b787c1a",
     "contentDigest": "1d2a6043388dc3ba4ace36195c550ba6e30caaade0b9caa84afda86172822640",
     "contentDigestCovers": "the plan without planIdentity and source.approvals; the owner's package approval names it (ODR-V4-01)",
-    "fileSha256": "a7596a4b32af2f757e0e560eb83a192910c75db7a2f213126bf1848a3368c782"
+    "fileSha256": "b6726069fe0d1e4d9773d5031b7717bf6bcd4e53d8eb49344ee14b317560d033"
   },
   "dependencyLockSha256": "f9a7b9883a27cf7f1f6f22e0c31efd939611fa24f5e5f08d09abfe34cf858147",
   "executionManifestSha256": "4f46104323e3c57f357518fa7a12407ae189b3e727a0f8c454113fa1bf95cbe8",
   "executionPlanSha256": "d5aea873582bd3a533f52894b0651e8bf36bbb6d9ac929703941fef92a9c4f85",
   "acceptanceSha256": {
-    "acceptance-obligations.json": "b93097d201a333887e07ba8ae406145c2e89d52c66a67c3c9b1bb766b07c9f44",
+    "acceptance-obligations.json": "f9376938117b07e38e210fcf4d6f76574a481a8e9b60587c67b5411c242393f2",
     "acceptance-gate.json": "035741e18b41b03ca09b13a7818705cad2d276ac03d5fa61e968b0115bf32c65"
   },
   "files": [
@@ -48,7 +48,7 @@
     },
     {
       "path": "acceptance/acceptance-obligations.json",
-      "sha256": "b93097d201a333887e07ba8ae406145c2e89d52c66a67c3c9b1bb766b07c9f44"
+      "sha256": "f9376938117b07e38e210fcf4d6f76574a481a8e9b60587c67b5411c242393f2"
     },
     {
       "path": "baseline-reconciliation.json",
@@ -92,7 +92,7 @@
     },
     {
       "path": "package-manifest.json",
-      "sha256": "2634c4eb9a6436ce77e704ef18e25034dcda18d599b89f79a81f37912bb017ed"
+      "sha256": "f2b0c933ef3bb140a29075409b4167c6175b6247e3fd2a07a8aba48b703aa87b"
     },
     {
       "path": "package-validation-report.json",
@@ -140,12 +140,12 @@
     },
     {
       "path": "verification-plan.json",
-      "sha256": "a7596a4b32af2f757e0e560eb83a192910c75db7a2f213126bf1848a3368c782"
+      "sha256": "b6726069fe0d1e4d9773d5031b7717bf6bcd4e53d8eb49344ee14b317560d033"
     }
   ],
   "compiler": {
     "name": "requirements-compiler",
-    "treeSha256": "0494fac0a499d16fe84cec72b1351d8b112e0cff36c588272404f09aea86808b",
+    "treeSha256": "038c9efa4cdafe2d764b7636a20e189ec47c936b9cc102a1dcf7945edf7963fa",
     "sdk": "10.0.402"
   },
   "compilerTests": {
@@ -153,7 +153,7 @@
     "result": "PASS",
     "failures": 0,
     "summary": "offline tests (baseline equivalence, baseline units, preflight verdict, verification plan, acceptance contracts, process evidence, v4 scope and controls, v4.1 scope and controls): all passed",
-    "compilerTreeSha256": "0494fac0a499d16fe84cec72b1351d8b112e0cff36c588272404f09aea86808b",
+    "compilerTreeSha256": "038c9efa4cdafe2d764b7636a20e189ec47c936b9cc102a1dcf7945edf7963fa",
     "command": "dotnet run -c Release --project tools/requirements-compiler/tests -- --offline --source ."
   },
   "independentReview": {
@@ -217,7 +217,7 @@
       "condition": "Compiler tests pass",
       "status": "PASS",
       "evidence": "repository record (unauthenticated; see statesMeaning)",
-      "detail": "record: PASS, tree 0494fac0a499d16fe84cec72b1351d8b112e0cff36c588272404f09aea86808b (current tree 0494fac0a499d16fe84cec72b1351d8b112e0cff36c588272404f09aea86808b); CI re-runs the suite and compares (--verify-test-record)"
+      "detail": "record: PASS, tree 038c9efa4cdafe2d764b7636a20e189ec47c936b9cc102a1dcf7945edf7963fa (current tree 038c9efa4cdafe2d764b7636a20e189ec47c936b9cc102a1dcf7945edf7963fa); CI re-runs the suite and compares (--verify-test-record)"
     },
     {
       "id": "FG-09",

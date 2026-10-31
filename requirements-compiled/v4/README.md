@@ -10,7 +10,7 @@ Package v4 holds the requirements for the November 7 Causa build, for Praxis to 
 | Scope | 520 requirements, 161 P0, 2599 obligations, of which 613 are P0 obligations in the plan |
 | Release set | echelon-current 1.33.0 (DEC-R7-011), resolved from echelon-registry `7a2c27a` into [`dependency-lock.json`](dependency-lock.json) |
 | Catalog | causa-data `demonstration-v1` at `e8259df`: four investigations (DEC-R7-006) |
-| Approvals | [`kickoff/rehearsal-007/approvals.causa.json`](../../kickoff/rehearsal-007/approvals.causa.json) at `cbc752b`. It holds the owner's operator approvals: APR-V41-OWNER-1 (ODR-V41-06) and APR-V4-OWNER-1 (ODR-V4-02..11, applied through `curation/verification-plan.json` `obligationAmendments`). Only the operator writes records (RDP-003); ODR-V4-01 is pending |
+| Approvals | [`kickoff/rehearsal-007/approvals.causa.json`](../../kickoff/rehearsal-007/approvals.causa.json) at `62a1699`. It holds the owner's operator approvals: APR-V41-OWNER-1 (ODR-V41-06), APR-V4-OWNER-1 (ODR-V4-02..11, applied through `curation/verification-plan.json` `obligationAmendments`) and APR-V4-OWNER-2 (ODR-V4-01, naming the test record before #57, so it must be recorded again). Only the operator writes records (RDP-003) |
 
 ## What to read
 
@@ -59,4 +59,4 @@ The package is frozen only when every condition in `freeze-manifest.json` `freez
 
 Then the package is recompiled, and `indy-init-requirements-v4.0.0` is tagged on the merged commit. An approved amendment is applied through `curation/verification-plan.json` `obligationAmendments` and checked by `verify-plan` (UNAUTHORIZED-AMENDMENT otherwise).
 
-**Merge with a merge commit, not a squash.** The baseline pins `62df28a` and the approvals file pins `cbc752b`, and both must stay reachable from `main`.
+**Merge with a merge commit, not a squash.** The baseline pins `62df28a` and the approvals file pins `62a1699`, and both must stay reachable from `main`.
