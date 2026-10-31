@@ -242,8 +242,8 @@ let decideTopology (request: JsonNode) =
 let packageList (answer: string) =
     let parts = answer.Split(',', StringSplitOptions.RemoveEmptyEntries ||| StringSplitOptions.TrimEntries) |> List.ofArray
     if parts.IsEmpty then Some "Name at least one package as id@version."
-    elif parts |> List.forall (fun p -> Regex.IsMatch(p, @"^[^@\s]+@[0-9][^@\s]*$")) then None
-    else Some "Each entry must be id@version, for example Name.Of.Package@1.2.3 (comma-separated)."
+    elif parts |> List.forall (fun p -> Regex.IsMatch(p, @"^(@[^@\s/]+/)?[^@\s/]+@[0-9][^@\s]*$")) then None
+    else Some "Each entry must be id@version, for example Name.Of.Package@1.2.3 or @scope/name@1.2.3 (comma-separated)."
 
 let decideOption (action: string) (request: JsonNode) =
     let id = str request "id"
