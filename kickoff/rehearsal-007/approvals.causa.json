@@ -138,6 +138,52 @@
           "test_record_sha256": "02725a6061137813c466f87c9bfe179929d409fde6c70e9e96729048bf4d0b24"
         }
       ]
+    },
+    {
+      "id": "APR-V41-OWNER-2",
+      "authority": {
+        "kind": "operator",
+        "id": "kemiller2002"
+      },
+      "date": "2026-10-31",
+      "changes": [
+        {
+          "decision_id": "ODR-V41-02",
+          "action": "select",
+          "option": "A"
+        },
+        {
+          "decision_id": "ODR-V41-03",
+          "action": "select",
+          "option": "A"
+        },
+        {
+          "decision_id": "ODR-V41-04",
+          "action": "select",
+          "option": "A"
+        },
+        {
+          "decision_id": "ODR-V41-05",
+          "action": "select",
+          "option": "A"
+        },
+        {
+          "decision_id": "ODR-V41-07",
+          "action": "select",
+          "option": "A",
+          "packages": [
+            "xunit@2.9.2",
+            "xunit.runner.visualstudio@2.8.2",
+            "Microsoft.NET.Test.Sdk@17.11.1",
+            "@playwright/test@1.63.0"
+          ]
+        },
+        {
+          "decision_id": "ODR-V41-08",
+          "action": "select",
+          "option": "A"
+        }
+      ]
     }
   ]
 }
