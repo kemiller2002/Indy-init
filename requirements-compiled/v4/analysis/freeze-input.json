@@ -2,5 +2,5 @@
   "schema": "indy-init.v4-freeze-input/1",
   "compiledAt": "2026-10-30T00:00:00Z",
   "sdk": "10.0.402",
-  "freezeCommit": ""
+  "freezeCommit": "1716bbb319a5927c0eee08e5bbee5ad6fb93c32c"
 }
