@@ -184,6 +184,24 @@
           "option": "A"
         }
       ]
+    },
+    {
+      "id": "APR-V41-OWNER-3",
+      "authority": {
+        "kind": "operator",
+        "id": "kemiller2002"
+      },
+      "date": "2026-10-31",
+      "changes": [
+        {
+          "decision_id": "ODR-V41-09",
+          "action": "select",
+          "option": "A",
+          "packages": [
+            "axe-core@4.14.0"
+          ]
+        }
+      ]
     }
   ]
 }
