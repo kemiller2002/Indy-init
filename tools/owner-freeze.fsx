@@ -327,9 +327,6 @@ let decide repo dryRun (p: Package) =
 let approve repo dryRun (p: Package) =
     prepare repo
     let approvals = approvalsAtMain repo
-    if recordedChanges approvals |> List.exists (fun c -> str c "decision_id" = p.PackageApprovalId) then
-        say $"{p.PackageApprovalId} is already recorded on main."
-    else
     let pending =
         requestsOf repo p
         |> List.filter (fun r -> str r "kind" <> "package-approval" && not (isRecorded (recordedChanges approvals) r))
@@ -353,6 +350,13 @@ let approve repo dryRun (p: Package) =
             obj [ "decision_id", jstr "ODR-V41-01"; "action", jstr "approve-package"; "package", jstr p.Dir
                   "manifest_sha256", jstr manifest; "review_sha256", jstr review ],
             [ $"package-manifest.json sha256 {manifest}"; $"independent-review.json sha256 {review}" ]
+    // A record counts only while its digests match the package (FG-05); one naming an earlier state is stale, and the
+    // package is approved again by a new record beside it.
+    let earlier = recordedChanges approvals |> List.filter (fun c -> str c "decision_id" = p.PackageApprovalId)
+    let matchesChange (c: JsonNode) = change.AsObject() |> Seq.forall (fun kv -> str c kv.Key = str change kv.Key)
+    if earlier |> List.exists matchesChange then say $"{p.PackageApprovalId} is already recorded on main for the package as it now stands; nothing to do." else
+    if not earlier.IsEmpty then
+        say $"Note: {p.PackageApprovalId} was recorded earlier for other digests. That record no longer matches the package, so approving records it again."
     say $"""You are approving {p.Dir} as on origin/main ({git repo [ "rev-parse"; "--short"; "origin/main" ]}), bound to:"""
     shown |> List.iter (fun s -> say $"  {s}")
     say $"Read {p.Dir}/FREEZE.md and independent-review.md first. If you want changes instead, do not approve here."
