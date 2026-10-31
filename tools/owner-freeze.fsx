@@ -14,7 +14,7 @@
 //   dotnet fsi Indy-init/tools/owner-freeze.fsx -- decide v4 --repo Indy-init     # ODR-V4-02..11
 //   dotnet fsi Indy-init/tools/owner-freeze.fsx -- approve v4 --repo Indy-init    # ODR-V4-01, after the agent applied and recompiled
 //   dotnet fsi Indy-init/tools/owner-freeze.fsx -- tag v4 --repo Indy-init        # tags the first commit on main whose manifest reads READY-FOR-OWNER-FREEZE
-//   dotnet fsi Indy-init/tools/owner-freeze.fsx -- decide v4.1 --repo Indy-init   # ODR-V41-02..08 (after v4 is frozen)
+//   dotnet fsi Indy-init/tools/owner-freeze.fsx -- decide v4.1 --repo Indy-init   # ODR-V41-02..09, each asked once (after v4 is frozen)
 //   dotnet fsi Indy-init/tools/owner-freeze.fsx -- approve v4.1 --repo Indy-init  # ODR-V41-01
 //   dotnet fsi Indy-init/tools/owner-freeze.fsx -- tag v4.1 --repo Indy-init --commit <merge commit of the ODR-V41-01 pull request>
 //
@@ -251,9 +251,10 @@ let decideOption (action: string) (request: JsonNode) =
     | "skip" -> Skip
     | option ->
         let extra =
-            match id with
-            | "ODR-V41-06" -> [ ("organizer_confirmation", jstr (askText "  Who confirmed, and when" (fun s -> if s = "" then Some "This record needs it." else None))) ]
-            | "ODR-V41-07" ->
+            match id, str request "kind" with
+            | "ODR-V41-06", _ -> [ ("organizer_confirmation", jstr (askText "  Who confirmed, and when" (fun s -> if s = "" then Some "This record needs it." else None))) ]
+            // Every dependency-lock request (ODR-V41-07, ODR-V41-09) records the exact packages the owner locks.
+            | _, "dependency-lock" ->
                 let packages = askText "  Exact packages to lock, as id@version, comma-separated" packageList
                 [ ("packages", jarr (packages.Split(',', StringSplitOptions.RemoveEmptyEntries ||| StringSplitOptions.TrimEntries) |> Seq.map jstr |> List.ofSeq)) ]
             | _ -> []
