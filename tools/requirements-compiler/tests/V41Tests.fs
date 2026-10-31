@@ -36,10 +36,24 @@ let private expectFail (name: string) (checkId: string) (i: V41Package.Inputs) :
 let private optionTransitions =
     Map [ ("ODR-V41-08", "A"), Set.ofList [ "SM-SAVE", "Saving", "MutationSent", "Saving" ] ]
 
+/// The machines each option accepts unchanged, as its option text states them. ODR-V41-08 A: "accept LoadRejected
+/// carrying ProviderFailed for transport failures" (SM-LOAD).
+let private optionAccepted =
+    Map [ ("ODR-V41-08", "A"), Set.ofList [ "SM-LOAD" ] ]
+
+/// The package manager of each package a dependency-lock option names, as its option text states it (the owner's record
+/// lists packages without managers). ODR-V41-07 A: "xUnit with Microsoft.NET.Test.Sdk, and Playwright 1.63.0";
+/// ODR-V41-09 A: "axe-core 4.14.0".
+let private optionManagers =
+    Map [ ("ODR-V41-07", "A"), Map [ "xunit", "nuget"; "xunit.runner.visualstudio", "nuget"; "Microsoft.NET.Test.Sdk", "nuget"; "@playwright/test", "npm" ]
+          ("ODR-V41-09", "A"), Map [ "axe-core", "npm" ] ]
+
 /// The owner's decisions v4.1 applies match the committed operator record (RDP-003): each test-tooling lock is exactly
 /// the packages its decision records; the amendments citing a decision add exactly the transitions of the option its
 /// operator approval selects, and every selected option that adds transitions is applied; each accepted entry is an
-/// operator's record of its decision; and the approvals file was last changed in a commit with no agent trailers.
+/// operator's record of its decision, and the accepted machines are exactly those of the selected option; every
+/// recorded dependency-lock decision has its lock; and the approvals file was last changed in a commit with no agent
+/// trailers.
 let ownerRecords (source: string) (i: V41Package.Inputs) : string list =
     let path = "kickoff/rehearsal-007/approvals.causa.json"
     let approvals = parseFile (Path.Combine(source, path)) |> arr "approvals"
@@ -49,6 +63,10 @@ let ownerRecords (source: string) (i: V41Package.Inputs) : string list =
     let recorded (approvalId: string) (decision: string) = approval approvalId |> Option.bind (fun a -> change a decision)
     let tooling = field "testTooling" i.Structure |> Option.defaultValue JNull
     let amendments = arr "transitions" i.MachineAmendments
+    let accepted = arr "accepted" i.MachineAmendments
+    let requestKinds =
+        parseFile (Path.Combine(source, "requirements-compiled", "v4.1", "proposals", "owner-decision-requests.json"))
+        |> arr "requests" |> List.map (fun r -> str "id" r, str "kind" r) |> Map.ofList
     let lastChange = match Git.run source [ "log"; "-1"; "--format=%B"; "--"; path ] with Ok m -> System.Text.Encoding.UTF8.GetString m | Error e -> e
     [ if lastChange.Contains "Claude-Session:" || lastChange.Contains "Co-Authored-By: Claude" then yield "v4.1: the approvals file was last changed by an agent commit"
       for l in arr "locks" tooling do
@@ -57,6 +75,18 @@ let ownerRecords (source: string) (i: V41Package.Inputs) : string list =
           | Some c ->
               let locked = strs "nuget" l @ strs "npm" l
               if List.sort (strs "packages" c) <> List.sort locked then yield sprintf "v4.1: the %s lock holds %A; the owner recorded %A" (str "decision" l) locked (strs "packages" c)
+              // Each package is in its manager's list, as the selected option names it (RV41-13-1).
+              let idOf (e: string) = match e.LastIndexOf '@' with n when n > 0 -> e.Substring(0, n) | _ -> e
+              let option = strOpt "option" c |> Option.defaultValue ""
+              match optionManagers.TryFind((str "decision" l, option)) with
+              | None -> yield sprintf "v4.1: no package managers are pinned for option %s of %s" option (str "decision" l)
+              | Some managers ->
+                  for (manager, entries) in [ "nuget", strs "nuget" l; "npm", strs "npm" l ] do
+                      for e in entries do
+                          match managers.TryFind(idOf e) with
+                          | Some m when m = manager -> ()
+                          | Some m -> yield sprintf "v4.1: %s is in the %s list; option %s of %s names it a %s package" e manager option (str "decision" l) m
+                          | None -> yield sprintf "v4.1: option %s of %s names no package %s" option (str "decision" l) (idOf e)
       for (decision, ts) in amendments |> List.groupBy (str "decision") do
           match ts |> List.map (fun t -> recorded (str "approval" t) decision |> Option.bind (strOpt "option")) |> List.distinct with
           | [ Some option ] ->
@@ -72,9 +102,25 @@ let ownerRecords (source: string) (i: V41Package.Inputs) : string list =
               | Some d, Some o when optionTransitions.ContainsKey((d, o)) && not (amendments |> List.exists (fun t -> str "decision" t = d)) ->
                   yield sprintf "v4.1: %s selects option %s of %s, which adds transitions, but no amendment applies it" (str "id" a) o d
               | _ -> ()
-      for x in arr "accepted" i.MachineAmendments do
+      for x in accepted do
           if (recorded (str "approval" x) (str "decision" x)).IsNone then
-              yield sprintf "v4.1: the accepted %s entry cites %s, which operator approval %s does not record" (str "machine" x) (str "decision" x) (str "approval" x) ]
+              yield sprintf "v4.1: the accepted %s entry cites %s, which operator approval %s does not record" (str "machine" x) (str "decision" x) (str "approval" x)
+      // The accepted machines of each decision are exactly those of the option its approvals select (RV41-12-3).
+      for a in approvals |> List.filter operator do
+          for c in arr "changes" a do
+              match strOpt "decision_id" c, strOpt "option" c with
+              | Some d, Some o when optionAccepted.ContainsKey((d, o)) ->
+                  let listed = accepted |> List.filter (fun x -> str "decision" x = d) |> List.map (str "machine")
+                  if Set.ofList listed <> optionAccepted.[(d, o)] || listed.Length <> optionAccepted.[(d, o)].Count then
+                      yield sprintf "v4.1: the accepted entries of %s list %A; option %s accepts exactly %A" d listed o (Set.toList optionAccepted.[(d, o)])
+              | _ -> ()
+      // Every operator-recorded dependency-lock decision has its lock (RV41-12-4).
+      for a in approvals |> List.filter operator do
+          for c in arr "changes" a do
+              match strOpt "decision_id" c with
+              | Some d when requestKinds.TryFind d = Some "dependency-lock" && not (arr "locks" tooling |> List.exists (fun l -> str "decision" l = d)) ->
+                  yield sprintf "v4.1: %s records %s, a dependency lock, but testTooling holds no lock for it" (str "id" a) d
+              | _ -> () ]
 
 /// The committed package equals a fresh build, and two builds are identical.
 let scope (source: string) : string list =
@@ -263,6 +309,17 @@ let controls (source: string) : string list =
       yield! recordFails "selected option not applied" { i0 with MachineAmendments = setIn "transitions" (JArr []) i0.MachineAmendments }
       yield! recordFails "amendment citing another approval" (amendment (setIn "approval" (JStr "APR-V41-OWNER-1")))
       yield! recordFails "accepted entry citing an unrecorded approval" { i0 with MachineAmendments = mapArr "accepted" (List.map (setIn "approval" (JStr "FAKE"))) i0.MachineAmendments }
+      // Round 12 (RV41-12-3, RV41-12-4): accepted machines not the option's; a recorded lock decision left unapplied; a
+      // package in the other manager's list.
+      yield! recordFails "accepted machine replaced" { i0 with MachineAmendments = mapArr "accepted" (List.map (setIn "machine" (JStr "SM-SAVE"))) i0.MachineAmendments }
+      yield! recordFails "extra accepted machine" { i0 with MachineAmendments = mapArr "accepted" (fun xs -> xs @ (xs |> List.map (setIn "machine" (JStr "SM-CONFLICT")))) i0.MachineAmendments }
+      yield! recordFails "accepted machine dropped" { i0 with MachineAmendments = setIn "accepted" (JArr []) i0.MachineAmendments }
+      yield! recordFails "recorded lock decision without its lock" (tooling (mapArr "locks" (List.filter (fun l -> strOpt "decision" l <> Some "ODR-V41-09"))))
+      yield! expectFail "npm package in the NuGet list" "X16" (lock0 (mapArr "nuget" (fun ps -> ps @ [ JStr "@playwright/test@1.63.0" ])))
+      // Round 13 (RV41-13-1): a package moved to the other manager's list, which no name rule can tell.
+      yield! recordFails "xunit moved to npm" (lock0 (mapArr "nuget" (List.filter (fun e -> asStr e <> "xunit@2.9.2")) >> mapArr "npm" (fun ps -> ps @ [ JStr "xunit@2.9.2" ])))
+      let lockOf d f = tooling (mapArr "locks" (List.map (fun l -> if strOpt "decision" l = Some d then f l else l)))
+      yield! recordFails "axe-core moved to NuGet" (lockOf "ODR-V41-09" (setIn "npm" (JArr []) >> setIn "nuget" (jstrs [ "axe-core@4.14.0" ])))
       // X13 round 2 (RV41-2-5): a waiver naming no owner decision request.
       yield! expectFail "waiver without a real decision" "X13" { i0 with Adjustments = mapArr "waivedPrecedences" (List.map (setIn "decision" (JStr "x"))) i0.Adjustments }
       // X15 executable layout kit (RV41-3-1, RV41-3-7): a rule without assertions or opted out; an assertion the kit

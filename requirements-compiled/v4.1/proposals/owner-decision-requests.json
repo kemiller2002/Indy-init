@@ -1,6 +1,6 @@
 {
   "schema": "indy-init.v41-owner-decision-requests/1",
-  "status": "decided: ODR-V41-06 (APR-V41-OWNER-1); ODR-V41-02, -03, -04, -05, -07 and -08, option A each (APR-V41-OWNER-2). Pending: ODR-V41-01 and ODR-V41-09. Only the operator writes records (RDP-003)",
+  "status": "decided: ODR-V41-06 (APR-V41-OWNER-1); ODR-V41-02, -03, -04, -05, -07 and -08, option A each (APR-V41-OWNER-2); ODR-V41-09, option A (APR-V41-OWNER-3). Pending: ODR-V41-01, the package approval. Only the operator writes records (RDP-003)",
   "requests": [
     {
       "id": "ODR-V41-01",
