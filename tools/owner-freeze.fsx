@@ -13,7 +13,7 @@
 //   dotnet fsi Indy-init/tools/owner-freeze.fsx -- status --repo Indy-init
 //   dotnet fsi Indy-init/tools/owner-freeze.fsx -- decide v4 --repo Indy-init     # ODR-V4-02..11
 //   dotnet fsi Indy-init/tools/owner-freeze.fsx -- approve v4 --repo Indy-init    # ODR-V4-01, after the agent applied and recompiled
-//   dotnet fsi Indy-init/tools/owner-freeze.fsx -- tag v4 --repo Indy-init        # after freezeCommit is set and the status reads READY-FOR-OWNER-FREEZE
+//   dotnet fsi Indy-init/tools/owner-freeze.fsx -- tag v4 --repo Indy-init        # tags the first commit on main whose manifest reads READY-FOR-OWNER-FREEZE
 //   dotnet fsi Indy-init/tools/owner-freeze.fsx -- decide v4.1 --repo Indy-init   # ODR-V41-02..08 (after v4 is frozen)
 //   dotnet fsi Indy-init/tools/owner-freeze.fsx -- approve v4.1 --repo Indy-init  # ODR-V41-01
 //   dotnet fsi Indy-init/tools/owner-freeze.fsx -- tag v4.1 --repo Indy-init --commit <merge commit of the ODR-V41-01 pull request>
@@ -378,9 +378,19 @@ let tag repo dryRun (p: Package) (commitArg: string option) =
         if p.Name = "v4" then
             let manifest = atMain repo $"{p.Dir}/freeze-manifest.json" |> parse
             if str manifest "status" <> "READY-FOR-OWNER-FREEZE" then stop $"""v4 status on origin/main is {str manifest "status"}, not READY-FOR-OWNER-FREEZE; the agent's recompile step is not done"""
-            let c = str (atMain repo $"{p.Dir}/analysis/freeze-input.json" |> parse) "freezeCommit"
-            if c = "" then stop "analysis/freeze-input.json has no freezeCommit"
-            c
+            let freezeCommit = str (atMain repo $"{p.Dir}/analysis/freeze-input.json" |> parse) "freezeCommit"
+            if freezeCommit = "" then stop "analysis/freeze-input.json has no freezeCommit"
+            // The tag goes on the first commit on main whose freeze manifest reads READY-FOR-OWNER-FREEZE (the merge that
+            // recorded freezeCommit), because AG-13 reads the manifest at the tag; freezeCommit still carries the CANDIDATE one.
+            let readyAt (commit: string) = str (atCommit repo commit $"{p.Dir}/freeze-manifest.json" |> parse) "status" = "READY-FOR-OWNER-FREEZE"
+            let firstReady =
+                (git repo [ "log"; "--first-parent"; "--format=%H"; "origin/main"; "--"; $"{p.Dir}/freeze-manifest.json" ]).Split('\n', StringSplitOptions.RemoveEmptyEntries)
+                |> List.ofArray
+                |> List.takeWhile readyAt
+                |> List.tryLast
+                |> Option.defaultWith (fun () -> stop "no commit on main carries a READY-FOR-OWNER-FREEZE manifest")
+            if not (gitOk repo [ "merge-base"; "--is-ancestor"; freezeCommit; firstReady ]) then stop $"freezeCommit {freezeCommit} is not an ancestor of {firstReady}"
+            firstReady
         else commitArg |> Option.defaultWith (fun () -> stop "give --commit <merge commit of the pull request that carries ODR-V41-01>")
     let full = git repo [ "rev-parse"; $"{commit}^{{commit}}" ]
     if not (gitOk repo [ "merge-base"; "--is-ancestor"; full; "origin/main" ]) then stop $"{full} is not on origin/main"
