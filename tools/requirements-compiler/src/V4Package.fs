@@ -1007,7 +1007,17 @@ let build (i: Inputs) : Built =
                     if sOr "kind" auth <> "operator" || not (List.contains (sOr "id" auth) i.TrustedOperators) then
                         yield sprintf "approvals: approval %s has authority %s/%s, not a trusted operator" (sOr "id" ap) (sOr "kind" auth) (sOr "id" auth)
                     if (arr "changes" ap).IsEmpty then yield sprintf "approvals: approval %s records no change" (sOr "id" ap)
-                ignore records ]
+                ignore records
+                // The decision an applied amendment names must be the request that proposes that obligation (RV7-4).
+                let proposers =
+                    arr "requests" i.Proposals
+                    |> List.collect (fun p -> match field "approvalRecord" p with Some(JArr rs) -> rs |> List.map (fun r -> str "obligation_id" r, str "id" p) | _ -> [])
+                    |> Set.ofList
+                for o in arr "requirements" i.Plan |> List.collect (arr "obligations") do
+                    match field "amendment" o with
+                    | Some a when not (proposers.Contains(str "sourceObligation" o, sOr "decision" a)) ->
+                        yield sprintf "amendments: %s names decision %s, which does not propose an amendment of that obligation" (str "sourceObligation" o) (sOr "decision" a)
+                    | _ -> () ]
           check "W14" "The package contains no application implementation: no source file of an application language under requirements-compiled/v4" true
               (i.PackageFiles |> List.filter (fun f -> applicationExtensions |> List.exists (fun e -> f.EndsWith(e, StringComparison.OrdinalIgnoreCase))) |> List.map (sprintf "application source file in the package: %s"))
           check "W15" "The verification plan and the reconciliation are compiled from the committed v4 baseline" true
@@ -1042,14 +1052,17 @@ let validationReport (i: Inputs) (checks: Check list) : Json =
 type Gate = { Id: string; Condition: string; Pass: bool; Detail: string }
 
 /// The review verdict computed from the record's findings, never taken from its own verdict field: PASS only when
-/// a named reviewer who is not the implementer reviewed at least once, the reviewer's last round is PASS, and every
-/// critical or major finding is fixed, decided by the owner, or a residual the reviewer accepted in a PASS round.
-let reviewPasses (i: Inputs) =
+/// a named reviewer who is not the implementer reviewed at least once, the reviewer's last round is PASS and names
+/// the content digest of the plan being frozen (a review of an earlier plan does not count: v4 review RV7-3), and
+/// every critical or major finding is fixed, decided by the owner, or a residual the reviewer accepted in a PASS round.
+let reviewPasses (i: Inputs) (planDigest: string) =
     let findings = arr "findings" i.Review
+    let last = arr "roundVerdicts" i.Review |> List.tryLast
     sOr "reviewer" i.Review <> ""
     && not (boolOr "reviewerIsImplementer" true i.Review)
     && (intOpt "rounds" i.Review |> Option.defaultValue 0L) >= 1L
-    && (arr "roundVerdicts" i.Review |> List.tryLast |> Option.map (sOr "verdict")) = Some "PASS"
+    && (last |> Option.map (sOr "verdict")) = Some "PASS"
+    && (last |> Option.map (sOr "planContentDigest")) = Some planDigest
     && findings |> List.forall (fun f -> not ([ "critical"; "major" ] |> List.contains (sOr "severity" f)) || [ "fixed"; "decided-by-owner"; "accepted-residual" ] |> List.contains (sOr "status" f))
 
 let gates (i: Inputs) (b: Built) (planDigest: string) : Gate list =
@@ -1071,7 +1084,14 @@ let gates (i: Inputs) (b: Built) (planDigest: string) : Gate list =
                   | None -> "no topology selected by the owner (ODR-V4-07)"
                   | Some s -> sprintf "selected %s: %s" s (if selectedFits then "fits" else "does not fit")) }
       { Id = "FG-08"; Condition = "Compiler tests pass"; Pass = testsPass; Detail = sprintf "record: %s, tree %s (current tree %s); CI re-runs the suite and compares (--verify-test-record)" (sOr "result" i.CompilerTests) (sOr "compilerTreeSha256" i.CompilerTests) i.CompilerTreeSha256 }
-      { Id = "FG-09"; Condition = "Independent review passes"; Pass = reviewPasses i; Detail = sprintf "computed from %d finding(s) and the reviewer's last round verdict (%s); reviewer %s" (arr "findings" i.Review).Length (arr "roundVerdicts" i.Review |> List.tryLast |> Option.map (sOr "verdict") |> Option.defaultValue "none") (sOr "reviewer" i.Review) }
+      { Id = "FG-09"; Condition = "Independent review passes"; Pass = reviewPasses i planDigest
+        Detail =
+            let last = arr "roundVerdicts" i.Review |> List.tryLast
+            let reviewed = last |> Option.map (sOr "planContentDigest") |> Option.defaultValue ""
+            sprintf "computed from %d finding(s) and the reviewer's last round verdict (%s), which reviewed plan content digest %s (%s); reviewer %s"
+                (arr "findings" i.Review).Length (last |> Option.map (sOr "verdict") |> Option.defaultValue "none")
+                (if reviewed = "" then "none recorded" else reviewed) (if reviewed = planDigest then "the plan being frozen" else "NOT the plan being frozen")
+                (sOr "reviewer" i.Review) }
       { Id = "FG-10"; Condition = "The freeze commit is recorded"; Pass = i.FreezeCommitVerified; Detail = (if i.FreezeCommitVerified then sOr "freezeCommit" i.FreezeInput else "no verified freeze commit: it must be on main and hold the owner's package approval") } ]
 
 /// The compiler never declares FROZEN. Approval records, the review record and the test record are files in the
