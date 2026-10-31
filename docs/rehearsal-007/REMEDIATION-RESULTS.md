@@ -1,6 +1,6 @@
 # Rehearsal 6 remediation: results
 
-**Rehearsal 7 is NOT READY and was not started.** Gates R7-PF-01..14: 2 PASS, 3 BLOCKED, 9 NOT_RUN ([READINESS.md](READINESS.md)). The initiative is **not complete** against its completion criteria (below). Every code change was merged on the owner's instruction on 2026-10-29 (merge commits, so the commits cited here stay reachable). The components were then released (Arca 0.7.0, Forma 0.12.0, forma-workflow 1.2.0, Praxis 3.24.0, Conditor 0.10.18) and selected in echelon-current 1.33.0, which the owner approved (echelon-registry#104). The remaining gates wait on owner actions or on Rehearsal 7 itself.
+**Rehearsal 7 is NOT READY and was not started.** Gates R7-PF-01..14: 3 PASS, 2 BLOCKED, 9 NOT_RUN ([READINESS.md](READINESS.md)). The initiative is **not complete** against its completion criteria (below). Every code change was merged on the owner's instruction on 2026-10-29 (merge commits, so the commits cited here stay reachable). The components were then released (Arca 0.7.0, Forma 0.12.0, forma-workflow 1.2.0, Praxis 3.24.0, Conditor 0.10.18) and selected in echelon-current 1.33.0, which the owner approved (echelon-registry#104). The remaining gates wait on owner actions or on Rehearsal 7 itself.
 
 This report states results only. Plans are in [REMEDIATION-PLAN.md](REMEDIATION-PLAN.md), and verification states are in [VERIFICATION-MATRIX.md](VERIFICATION-MATRIX.md).
 
@@ -10,7 +10,7 @@ This report states results only. Plans are in [REMEDIATION-PLAN.md](REMEDIATION-
 |---|---|---|---|---|---|---|---|
 | R7-REM-001 Cross-tab persistence (Arca library) | kemiller2002/arca | WI-0038 | ac585ba | arca#47 (merged 916d0ca) | Browser specs 14/14 on Chromium and WebKit in CI; seeded three-tab interleavings, no Web Locks, restart; 0 acknowledged saves lost | No loss found, including a concurrent save-versus-steal experiment (6/6) | VERIFIED: released in Arca 0.7.0 (library); for Causa superseded by ADR-R7-001 |
 | R7-REM-002 Offline retry and save state (Arca library) | kemiller2002/arca | WI-0037 | ac585ba | arca#47 (merged 916d0ca) | 415/415 tests; CI green. Storm reproduction: a naive host sends more than 50 POSTs in 60 s, the schedule at most 5. Adapter tests over FakeGitHub | Three rounds: BLOCKING, then findings, then PASS_WITH_FINDINGS (low); all fixed; the ac585ba fixes had no fourth review | VERIFIED: released in Arca 0.7.0 (library); for Causa superseded by ADR-R7-001 |
-| R7-REM-003 Credential separation | owner | none | none | none | Probe workflow written (SECURITY-REVIEW §1), not run | none | BLOCKED (owner credentials) |
+| R7-REM-003 Credential separation | owner | none | none | none | Credential probe on indy-init-rehearsal-008, run 41185232453: readGet 200, readWrite 403, writeTest 201, writeCleanup 204, writeElsewhere 403 | none | VERIFIED |
 | R7-REM-004 CI concurrency (starvation guard) | kemiller2002/conditor | WI-0063 | 9916fa9 | conditor#122 (merged 9241290) | `ci-policy check` CIP-000..008 flags Rehearsal 6's workflows and passes the corrected scaffold; 1398 checks; CI green (24 checks) | PASS_WITH_FINDINGS; F1–F8 fixed, not re-reviewed | PARTIAL: released in Conditor 0.10.18; Experiment B not run |
 | R7-REM-004 Starter workflow | kemiller2002/praxis | WI-0106 | 0b1ee23 | praxis#300 (merged 4e9993e) | CI green (26 checks) | Covered by the CIP rules | IMPLEMENTED: released in Praxis 3.24.0 |
 | R7-REM-005 Unattended PR execution | praxis, conditor | WI-0104, WI-0062 | earlier work | earlier work | Readiness receipt: READY; PR #20 merged as 9c3aaf6 (cited) | Praxis SECURITY-REVIEW F1 accepted by the owner | PASS_ADVISORY: no enforced gate (UAE-R7-12) |
@@ -35,8 +35,9 @@ This report states results only. Plans are in [REMEDIATION-PLAN.md](REMEDIATION-
 - `verify-defect-closures`: REFUSED.
 - `assertion-ratchet`: FAIL.
 
+**Passed since:** the credential probe (indy-init-rehearsal-008 run 41185232453).
+
 **Not run:**
-- the credential probe;
 - Experiment B (CI load), which needs a disposable repository;
 - Experiment D (evidence completeness);
 - Experiment E (candidate acceptance);
@@ -81,7 +82,7 @@ A real pull request merged without routine owner intervention:
 - **Forma:** PASS.
 - **Conditor:** PASS_WITH_FINDINGS, fixed, not re-reviewed.
 - **Indy-init verifiers:** five review rounds (BLOCKING four times, each fixed); the final verdict is PASS_WITH_FINDINGS, with every finding fixed at 2e4b561. The reviewer accepts the stated limit of the heuristic JavaScript scanner, on condition that the independent review reads every file the reports list under `reviewAttention`. Agent-written review records are accepted unless signed; this is a stated limit, not fixed.
-- **Credentials:** the separation is unverified until the owner creates the tokens and the probe runs.
+- **Credentials:** verified. The read token cannot write and the write token is limited to `causa-write-test` (probe run 41185232453).
 - **Release observations:** documented limit N4. They are caller-supplied; proof needs `observe` running in trusted CI with signed output.
 
 ## Readiness
@@ -95,7 +96,7 @@ A real pull request merged without routine owner intervention:
 | 1 | R6-D-002 independently verified as corrected | Not met: closed in requirements; PAT tests pending |
 | 2 | R6-D-003 independently verified as corrected | Not met: same |
 | 3 | Remaining critical application findings resolved | Not met: in requirements (ADR-R7-001); verified only in Rehearsal 7 |
-| 4 | Credential permissions verified | Not met: owner credentials |
+| 4 | Credential permissions verified | Met: credential probe PASS (run 41185232453) |
 | 5 | CI starvation regression tests pass | Met: released in Conditor 0.10.18 and Praxis 3.24.0; the live load test (Experiment B) was not run |
 | 6 | Unattended PR merging demonstrated | Met, advisory |
 | 7 | Evidence generation automated | Not met |
@@ -111,10 +112,7 @@ A real pull request merged without routine owner intervention:
 ## Remaining owner decisions
 
 1. **Done:** merges, releases and echelon-current 1.33.0 (owner-approved, echelon-registry#104). The pre-lock release comparison records the kickoff set at preflight.
-2. **Credentials:**
-   - `CAUSA_GITHUB_TOKEN`, read-only on the data repository;
-   - `CAUSA_WRITE_TOKEN`, write to `causa-write-test` only;
-   - these unblock the probe and K6.
+2. **Credentials:** done. Both tokens are on `indy-init-rehearsal-008` and the probe passed (K6).
 3. **UAE-R7-12:**
    - a ruleset on the rehearsal repository's `main` requiring CI, `independent-review` and the Praxis evaluate job;
    - the trust store in an Actions secret.

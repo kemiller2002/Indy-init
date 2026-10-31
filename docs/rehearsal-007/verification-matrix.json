@@ -133,8 +133,8 @@
       "obligation": "Read credential cannot write; write credential scoped",
       "package": "R7-REM-003",
       "verification": "Credential probe workflow (SECURITY-REVIEW \u00a71)",
-      "evidence": "\u2014",
-      "state": "BLOCKED"
+      "evidence": "indy-init-rehearsal-008 run 41185232453: readGet 200, readWrite 403, writeTest 201, writeCleanup 204, writeElsewhere 403",
+      "state": "PASS"
     },
     {
       "id": "VM-017",
@@ -253,7 +253,7 @@
       "obligation": "Independent adversarial review of each work package",
       "package": "R7-REM-011",
       "verification": "Independent agent reviews (SECURITY-REVIEW \u00a74)",
-      "evidence": "Reviews done: Arca PASS_WITH_FINDINGS (fixed), Forma PASS, Indy-init verifiers PASS_WITH_FINDINGS (fixed, five rounds), Conditor PASS_WITH_FINDINGS (fixed, not re-reviewed); credential probe not run. See READINESS R7-PF-12",
+      "evidence": "Reviews done: Arca PASS_WITH_FINDINGS (fixed), Forma PASS, Indy-init verifiers PASS_WITH_FINDINGS (fixed, five rounds), Conditor PASS_WITH_FINDINGS (fixed, not re-reviewed); credential probe PASS (run 41185232453). See READINESS R7-PF-12",
       "state": "NOT_RUN"
     }
   ]

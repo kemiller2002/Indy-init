@@ -10,9 +10,9 @@
   "rule": "PASS only on executed evidence for what Rehearsal 7 will consume; planned or unmerged work is never PASS.",
   "verdict": "NOT_READY",
   "summary": {
-    "PASS": 2,
+    "PASS": 3,
     "FAIL": 0,
-    "BLOCKED": 3,
+    "BLOCKED": 2,
     "NOT_RUN": 9
   },
   "gates": [
@@ -39,9 +39,7 @@
         "PAT-01, PAT-02 (live, PERSIST-025), PAT-11 defined"
       ],
       "why": "Run during Rehearsal 7. The Arca multi-tab browser evidence (arca#47) verifies the library, which Causa no longer uses for investigations.",
-      "needs": [
-        "Owner: K6, the live test repository and CAUSA_WRITE_TOKEN"
-      ]
+      "needs": []
     },
     {
       "id": "R7-PF-03",
@@ -57,14 +55,13 @@
     {
       "id": "R7-PF-04",
       "requirement": "GitHub credential separation verified",
-      "state": "BLOCKED",
+      "state": "PASS",
       "evidence": [
-        "SECURITY-REVIEW.md \u00a71: probe workflow and expectations"
+        "Credential probe (SECURITY-REVIEW.md section 1) run against the secrets on kemiller2002/indy-init-rehearsal-008: run 41185232453 (2026-10-31), artifact credential-probe",
+        "readGet 200, readWrite 403, writeTest 201, writeCleanup 204, writeElsewhere 403"
       ],
-      "why": "The probe cannot run until the credentials exist. Rehearsal 6's CAUSA_GITHUB_TOKEN could write (D-09).",
-      "needs": [
-        "Owner: create CAUSA_GITHUB_TOKEN (read-only on the data repository) and CAUSA_WRITE_TOKEN (write to kemiller2002/causa-write-test only) as repository secrets; the agent then dispatches the probe"
-      ]
+      "why": "Real requests against GitHub show CAUSA_GITHUB_TOKEN reads causa-data and cannot write it, and CAUSA_WRITE_TOKEN writes only causa-write-test (refused on causa-data). Rehearsal 6's D-09 (a read token that could write) does not recur. The probe ran from a temporary branch so 008's main keeps its starting state.",
+      "needs": []
     },
     {
       "id": "R7-PF-05",
@@ -161,12 +158,11 @@
         "Conditor: PASS_WITH_FINDINGS, F1-F8 fixed (not re-reviewed)",
         "Forma: PASS after fixes",
         "Indy-init tools: first review BLOCKING (F1-F5), fixed; re-review BLOCKING (N1-N3, F3 partial, N5), fixed at eb978e2; third review BLOCKING (D1-D4), fixed at c08c23e; fourth BLOCKING (E1), fixed; fifth PASS_WITH_FINDINGS, fixed at 2e4b561; N4 documented as an inherent limit",
-        "Security: SECURITY-REVIEW.md; the credential probe is not run"
+        "Security: SECURITY-REVIEW.md; credential probe PASS (indy-init-rehearsal-008 run 41185232453)"
       ],
-      "why": "The Indy-init tools' final review is PASS_WITH_FINDINGS with every finding fixed, Arca's PASS_WITH_FINDINGS (low, fixed) and Forma's PASS. Conditor's fixes were not re-reviewed, and the security review depends on the credential probe.",
+      "why": "The Indy-init tools' final review is PASS_WITH_FINDINGS with every finding fixed, Arca's PASS_WITH_FINDINGS (low, fixed) and Forma's PASS. The credential probe passed (R7-PF-04). Conditor's F1-F8 fixes were not re-reviewed, so this gate stays NOT_RUN.",
       "needs": [
-        "Independent re-review verdicts",
-        "Owner: credentials for the probe (R7-PF-04)"
+        "Independent re-review of Conditor's F1-F8 fixes (conditor#122)"
       ]
     },
     {

@@ -126,12 +126,12 @@
       "acceptance": [
         "Both probes recorded against real GitHub before kickoff"
       ],
-      "evidence": [],
-      "status": "BLOCKED",
-      "review": "Not run.",
-      "remaining": [
-        "Owner action: create and store the two credentials; then the agent runs the probe"
-      ]
+      "evidence": [
+        "indy-init-rehearsal-008 run 41185232453, artifact credential-probe"
+      ],
+      "status": "VERIFIED",
+      "review": "Credential probe PASS against real GitHub (indy-init-rehearsal-008 run 41185232453): readGet 200, readWrite 403, writeTest 201, writeCleanup 204, writeElsewhere 403.",
+      "remaining": []
     },
     {
       "id": "R7-REM-004",
