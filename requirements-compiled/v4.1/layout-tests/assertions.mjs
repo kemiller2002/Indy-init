@@ -954,8 +954,8 @@ export const onlyFormaTokens = async (page, { inventory, hooks = [], formaHref =
 // ---- FL-06e automated WCAG checks ---------------------------------------------------------------------------
 
 // axe-core's WCAG 2.0-2.2 A and AA rules report no violation. The axe source comes from the caller (axeSource), or
-// from the axe-core package installed beside this module (the event build adds it to package.json; its version is
-// owner decision ODR-V41-09, because ODR-V41-07 locked the test runners only).
+// from the axe-core package installed beside this module (the bootstrap writes axe-core 4.14.0 into the event build's
+// package.json, as the owner locked it in ODR-V41-09).
 const loadAxe = async () => {
   const { createRequire } = await import('node:module');
   const { readFileSync } = await import('node:fs');

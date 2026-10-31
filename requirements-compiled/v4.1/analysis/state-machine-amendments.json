@@ -1,6 +1,6 @@
 {
   "schema": "indy-init.v41-state-machine-amendments/1",
-  "description": "Amendments of v4's state machines that the owner approved (ODR-V41-08, APR-V41-OWNER-2). v4 is frozen at tag indy-init-requirements-v4.0.0 and its files are never edited: requirements-compiler v41 applies each transition over the frozen machines when it compiles state-machine-contracts.json. Check X12 requires each transition and accepted entry to name a state-machine-amendment request and its operator approval, sources that are baseline requirements, and a fit with its machine (known states and events, deterministic guards, Saved entered only by a confirmation); the offline suite checks that the owner's selected option adds exactly these transitions. No state or event is added. MutationSent is stepped by the App runtime when it hands the outstanding mutation to Execute (IF41-SAVE).",
+  "description": "Amendments of v4's state machines that the owner approved (ODR-V41-08, APR-V41-OWNER-2). v4 is frozen at tag indy-init-requirements-v4.0.0 and its files are never edited: requirements-compiler v41 applies each transition over the frozen machines when it compiles state-machine-contracts.json. Check X12 requires each transition and accepted entry to name a state-machine-amendment request and its operator approval, sources that are baseline requirements, and a fit with its machine (known states and events, deterministic guards, Saved entered only by a confirmation); the offline suite checks that the owner's selected option adds exactly these transitions. No state or event is added. Engine.Update (src/Causa.App/Engine.fs, ui) steps MutationSent in the same update that turns the mutation request into HostEffect.Http (IF41-SAVE, IF41-APP); because T-S61 changes nothing, a missing MutationSent changes no outcome, and no test beyond T-S61's state-machine test requires it.",
   "transitions": [
     {
       "machine": "SM-SAVE",
@@ -10,7 +10,7 @@
       "to": "Saving",
       "guard": "current: its RequestId is the session's Outstanding request, which awaits MutationAnswer",
       "effects": [
-        "record that the outstanding createCommitOnBranch was handed to Execute; the state, the base head, Outstanding (RequestId, MutationAnswer) and the unsaved changes are unchanged"
+        "none: the state, the base head, Outstanding (RequestId, MutationAnswer) and the unsaved changes are unchanged; the event confirms that the outstanding createCommitOnBranch was handed to the host"
       ],
       "sources": [
         "PERSIST-006",

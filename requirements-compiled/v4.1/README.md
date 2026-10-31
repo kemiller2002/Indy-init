@@ -1,6 +1,6 @@
 # Compiled package v4.1: implementation efficiency
 
-**Status: CANDIDATE.** v4.1 is compiled and validated (checks X01–X16 pass). The owner's decisions ODR-V41-02..08 are recorded (APR-V41-OWNER-2) and applied; ODR-V41-09 is pending. It has not been approved or frozen. See [FREEZE.md](FREEZE.md).
+**Status: CANDIDATE.** v4.1 is compiled and validated (checks X01–X16 pass). The owner's decisions ODR-V41-02..08 are recorded (APR-V41-OWNER-2) and applied; ODR-V41-09 is recorded (APR-V41-OWNER-3) and applied; only ODR-V41-01 is pending. It has not been approved or frozen. See [FREEZE.md](FREEZE.md).
 
 v4.1 sits on top of [package v4](../v4/README.md). It does not change any requirement, obligation or test binding: it uses v4's verification plan byte for byte, and [preservation-report.json](preservation-report.json) proves this. What v4.1 adds is the material a team would otherwise have to work out during the seven-hour build:
 

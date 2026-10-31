@@ -320,7 +320,8 @@ let decide repo dryRun (p: Package) =
     let title = $"""Owner decisions {String.Join(", ", ids)} ({approvalId})"""
     let body =
         $"Operator approval {approvalId} in {approvalsPath}, written and committed by the owner.\n\n" +
-        "Next (agent): apply the approved amendments in the curation's obligationAmendments, re-pin the approvals commit, recompile, and run a fresh independent review if the plan changed."
+        (if p.Name = "v4" then "Next (agent): apply the approved amendments in the curation's obligationAmendments, re-pin the approvals commit, recompile, and run a fresh independent review if the plan changed."
+         else "Next (agent): apply these decisions in requirements-compiled/v4.1 (FREEZE.md step 2), recompile v4.1, and run a fresh independent review.")
     commitAndPropose repo dryRun $"owner/{p.Name}-decisions-{stamp ()}" title body (render (withApproval approvals approvalId changes))
 
 // ---- approve ---------------------------------------------------------------------------------------------------------

@@ -733,56 +733,104 @@
           "severity": "major",
           "finding": "Amendments to v4's machines were not limited to what the owner approved, and v4's machine safety checks were not re-run on the amended machines: an amendment into Saved without a confirmation, a second amendment, an unknown source or a decision of another kind passed every check",
           "remediation": "X12 applies v4's W05 rule (Saved entered only by a confirmation, entersSavedOnlyBy) to the amended machines, requires amendment sources to be baseline requirements, requires the decision to be a state-machine-amendment request, and validates the accepted entries. The offline suite pins each selected option to the transitions its text adds (ODR-V41-08 A: exactly SM-SAVE Saving + MutationSent -> Saving) and requires every selected option to be applied. Negative controls for each case",
-          "status": "fixed; to be verified in round 12"
+          "status": "verified fixed in round 12 (the accepted entries are completed under RV41-12-3)"
         },
         {
           "id": "RV41-11-2",
           "severity": "major",
           "finding": "T-S61 conflicted with IF41-SAVE and v4's definition of MutationSent: no component produced the event, its guard was 'true' (any RequestId could overwrite Outstanding and leave a save stuck), its effect restated existing bookkeeping, and its sources were weak",
           "remediation": "IF41-SAVE names the producer: the App runtime steps MutationSent when it hands the outstanding mutation (Awaiting MutationAnswer) to Execute. T-S61's guard is 'current' (its RequestId is the Outstanding request awaiting MutationAnswer), its effect changes nothing else (state, base head, Outstanding, unsaved changes), and its sources are PERSIST-006 and PERSIST-031",
-          "status": "fixed; to be verified in round 12"
+          "status": "verified fixed in round 12 (the producer's wording is completed under RV41-12-1)"
         },
         {
           "id": "RV41-11-3",
           "severity": "minor",
           "finding": "amberLabelled matched Forma's light accent-primary (35.5 RGB units from the light warning token) and missed a nested dark theme, and its dark path was never run; the limits were not disclosed",
           "remediation": "amberLabelled reads the warning token in each element's own theme and matches it within 12 RGB units (#E9A23B keeps 40); the conforming fixture adds unlabelled accent-primary and control-active marks; a broken fixture uses a nested dark theme; the assertion runs in light and dark; R41-11 discloses the tolerances. Mutation runs: without the token match the token fixtures pass; with a radius of 40 the accent mark fails",
-          "status": "fixed; to be verified in round 12"
+          "status": "verified fixed in round 12 for Causa's default themes (the remaining limits are disclosed under RV41-12-2)"
         },
         {
           "id": "RV41-11-4",
           "severity": "minor",
           "finding": "No check stops web/causa.css from using the literal #E9A23B, and the conforming fixture still painted the lozenge #E9A23B",
           "remediation": "The conforming fixture draws amber with the warning token beside its label; R41-11 discloses that no automated check reads the stylesheet for the literal and that the T16 review checks it",
-          "status": "fixed; to be verified in round 12"
+          "status": "verified fixed (by disclosure) in round 12"
         },
         {
           "id": "RV41-11-5",
           "severity": "minor",
           "finding": "X16 did not fix which projects take the test tooling, its title claimed a comparison with the owner's record it does not make, ownerRecords had no negative controls, and the ODR-V41-09 path would fail ownerRecords",
           "remediation": "testTooling holds one lock per decision; X16 requires testProjects to be exactly the test projects that host .NET tests, checks each lock's decision kind and approval and packages locked twice across locks, and is retitled; ownerRecords compares each lock with its own record and has negative controls (another version, an extra or missing package, an unrecorded approval, a lock no approval records)",
-          "status": "fixed; to be verified in round 12"
+          "status": "verified fixed in round 12"
         },
         {
           "id": "RV41-11-6",
           "severity": "minor",
           "finding": "Inline package versions conflicted with the planned Directory.Packages.props (central package management: NU1008)",
           "remediation": "The bootstrap writes Directory.Packages.props with ManagePackageVersionsCentrally and the locked PackageVersion items, and version-less references in the test projects; the bootstrap builds with 0 warnings",
-          "status": "fixed; to be verified in round 12"
+          "status": "verified fixed in round 12"
         },
         {
           "id": "RV41-11-7",
           "severity": "minor",
           "finding": "The frozen-v4 job trusted a mutable tag and installed the SDK from HEAD's global.json",
           "remediation": "The job fails unless the tag names c9dc556, and installs the SDK from the tag's global.json",
-          "status": "fixed; to be verified in round 12"
+          "status": "verified fixed in round 12"
         },
         {
           "id": "RV41-11-8",
           "severity": "minor",
           "finding": "Stale counts and texts: 1 unused event, 75 transitions, 97 broken pages, the requests' status, and a doc comment above the wrong function",
           "remediation": "No unused event; 76 transitions (report and task-adjustments); 99 broken pages; the requests' status names the decided and pending requests; the doc comment is back above machineProject",
-          "status": "fixed; to be verified in round 12"
+          "status": "verified fixed in round 12 (other stale texts under RV41-12-5)"
+        }
+      ]
+    },
+    {
+      "round": 12,
+      "reviewedCommit": "951d641",
+      "verdict": "PASS",
+      "counts": {
+        "critical": 0,
+        "major": 0,
+        "minor": 5
+      },
+      "scope": "The round-11 remediation (#61, merged as 421fda3 after this PASS)",
+      "findings": [
+        {
+          "id": "RV41-12-1",
+          "severity": "minor",
+          "finding": "MutationSent's producer was named only as 'the App runtime ... when it hands the outstanding mutation to Execute', a point IF41-APP does not have (Update is pure; Execute is synchronous); no file or test was assigned, and T-S61's effect ('record that ...') contradicted 'the session is unchanged'",
+          "remediation": "IF41-SAVE and the amendments name Engine.Update (src/Causa.App/Engine.fs, ui), which steps MutationSent in the same update that turns the mutation request into HostEffect.Http; T-S61's effect is 'none'; the docs state that a missing MutationSent changes no outcome and no test beyond T-S61's requires it",
+          "status": "fixed; to be verified in round 13"
+        },
+        {
+          "id": "RV41-12-2",
+          "severity": "minor",
+          "finding": "amberLabelled's literal radius of 40 contains Forma accents in the dark-restrained and dark-technical themes, and ::before/::after marks and accent-color are not examined; R41-11 did not name these",
+          "remediation": "R41-11 names both themes and colours (Causa uses the default themes) and that ::before/::after and accent-color are not examined; the assertion is unchanged, so its measured catch rate stands",
+          "status": "fixed; to be verified in round 13"
+        },
+        {
+          "id": "RV41-12-3",
+          "severity": "minor",
+          "finding": "The accepted entries were not tied to the option: replacing SM-LOAD, adding SM-CONFLICT or dropping the entry passed",
+          "remediation": "The offline suite pins the accepted machines per option (ODR-V41-08 A: exactly SM-LOAD), with negative controls for each case",
+          "status": "fixed; to be verified in round 13"
+        },
+        {
+          "id": "RV41-12-4",
+          "severity": "minor",
+          "finding": "A package could sit in the other manager's list (npm in NuGet or the reverse), and a recorded dependency-lock decision with no lock passed",
+          "remediation": "X16 rejects a scoped @x/y name in the NuGet list and an npm name that is not lowercase; the offline suite requires a lock for every operator-recorded dependency-lock decision (the ODR-V41-09 lock is now applied); negative controls for each",
+          "status": "fixed; to be verified in round 13"
+        },
+        {
+          "id": "RV41-12-5",
+          "severity": "minor",
+          "finding": "Stale or inaccurate documentation: 173 generated files (178), 266 single-owner files (270), 'package references come at T10', and the Directory.Packages.props note claiming no project file is rewritten",
+          "remediation": "The counts are corrected, the bootstrap line names the owner's test tooling, and the note says integration adds the dependency lock's other versions and their references in the source projects at T10",
+          "status": "fixed; to be verified in round 13"
         }
       ]
     }

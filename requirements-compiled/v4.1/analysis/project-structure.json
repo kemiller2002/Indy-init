@@ -558,7 +558,7 @@
       "dependsOn": [],
       "implements": [],
       "requiredTests": [],
-      "note": "Central package versions (ManagePackageVersionsCentrally). The bootstrap writes the test tooling the owner locked (testTooling); integration adds the dependency lock's other NuGet versions here, so no project file is rewritten"
+      "note": "Central package versions (ManagePackageVersionsCentrally). The bootstrap writes the test tooling the owner locked (testTooling); integration adds the dependency lock's other NuGet versions here (EchelonFoundry.Limen.Contract, EchelonFoundry.Aegis.Core) and their version-less references in the source projects that use them, at T10"
     },
     {
       "path": "global.json",
@@ -747,7 +747,7 @@
     "Integration alone writes: .gitignore, every project and solution file, Directory.*.props and .targets, NuGet.config, global.json, package.json, package-lock.json, playwright.config.ts, *.runsettings, build.fsx, README.md, .github/, .echelon/, tests/fixtures/, tests/browser/support/, web/boundary.js, src/Causa.Host/, src/Causa.App/View.fs and src/Causa.App/Program.fs (check X02). web/index.html and web/causa.css are ui's (T16)."
   ],
   "testTooling": {
-    "description": "The test tooling the owner locked, one lock per dependency-lock decision with its operator approval (ODR-V41-07, option A, APR-V41-OWNER-2; a later decision such as ODR-V41-09 adds its own lock). The bootstrap writes the NuGet versions into Directory.Packages.props (central package management) and a version-less reference into each test project that hosts .NET tests, and the npm packages into package.json, at exactly these versions; nothing else is added. Check X16 requires testProjects to be exactly the test projects that host .NET tests (Causa.TestSupport is a helper library and takes none); the offline suite compares each lock with the owner's record.",
+    "description": "The test tooling the owner locked, one lock per dependency-lock decision with its operator approval (ODR-V41-07, option A, APR-V41-OWNER-2; ODR-V41-09, option A, APR-V41-OWNER-3). The bootstrap writes the NuGet versions into Directory.Packages.props (central package management) and a version-less reference into each test project that hosts .NET tests, and the npm packages into package.json, at exactly these versions; nothing else is added. Check X16 requires testProjects to be exactly the test projects that host .NET tests (Causa.TestSupport is a helper library and takes none); the offline suite compares each lock with the owner's record.",
     "locks": [
       {
         "decision": "ODR-V41-07",
@@ -759,6 +759,13 @@
         ],
         "npm": [
           "@playwright/test@1.63.0"
+        ]
+      },
+      {
+        "decision": "ODR-V41-09",
+        "approval": "APR-V41-OWNER-3",
+        "npm": [
+          "axe-core@4.14.0"
         ]
       }
     ],
