@@ -1,6 +1,7 @@
-/// F# port of tools/build-requirements-baseline.py: drafts the Causa requirements baseline
+/// The authoritative Causa requirements baseline generator (owner decision 2026-11-01). It began as an F# port of
+/// tools/build-requirements-baseline.py, verified byte-identical in CI, which was then removed. It drafts the baseline
 /// (praxis.requirements-baseline/1). The rules, document list, exclusions and output bytes are
-/// those of the Python generator; the equivalence tests compare outputs byte for byte.
+/// those the Python generator had; the offline suite reproduces the committed baselines byte for byte.
 /// `read` supplies a document's text, so the same rules run on a working tree or at a git commit.
 module Baseline
 

@@ -501,7 +501,7 @@ let defaults =
       Check = false
       Evidence = "" }
 
-/// `baseline ROOT COMMIT`: same contract as tools/build-requirements-baseline.py (reads the working
+/// `baseline ROOT COMMIT`: the authoritative baseline generator (the contract of the removed Python original; reads the working
 /// tree under ROOT, writes the baseline to stdout; exit 2 on usage, 1 on a rule violation).
 let baselineCommand (root: string) (commit: string) : int =
     if not (Baseline.isCommit commit) then
