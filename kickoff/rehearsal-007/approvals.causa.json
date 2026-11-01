@@ -219,6 +219,21 @@
           "review_sha256": "fee006995d2c2d1d2c6b6b2a772981f294ec73444810a665bf8f99db0243c2be"
         }
       ]
+    },
+    {
+      "id": "APR-V411-OWNER-1",
+      "authority": {
+        "kind": "operator",
+        "id": "kemiller2002"
+      },
+      "date": "2026-11-01",
+      "changes": [
+        {
+          "decision_id": "ODR-V411-02",
+          "action": "select",
+          "option": "A"
+        }
+      ]
     }
   ]
 }
