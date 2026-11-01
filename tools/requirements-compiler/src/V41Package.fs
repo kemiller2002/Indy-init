@@ -1494,7 +1494,7 @@ type ContractMember = { Scope: string; Symbol: string; Text: string }
 /// Comments, string literals and character literals blanked, line structure kept, following the F# lexer's order:
 /// a string or character literal is read before a comment can start, so `"(*"` and `'"'` hide nothing; triple-quoted
 /// and verbatim strings and nested block comments are handled. `(*)` is the multiplication operator, not a comment.
-let private stripCode (text: string) =
+let private stripCode (stringsInComments: bool) (text: string) =
     let s = text.Replace("\r\n", "\n")
     let n = s.Length
     let at (i: int) (p: string) = i + p.Length <= n && String.CompareOrdinal(s, i, p, 0, p.Length) = 0
@@ -1507,7 +1507,7 @@ let private stripCode (text: string) =
         else skipString (i + 1)
     let rec skipBlock (i: int) (depth: int) =
         if i >= n then n
-        elif s.[i] = '"' then skipBlock (skipString (i + 1)) depth
+        elif stringsInComments && s.[i] = '"' then skipBlock (skipString (i + 1)) depth
         elif at i "(*" && not (at i "(*)") then skipBlock (i + 2) (depth + 1)
         elif at i "*)" then (if depth = 1 then i + 2 else skipBlock (i + 2) (depth - 1))
         else skipBlock (i + 1) depth
@@ -1552,8 +1552,6 @@ let contractImplementations (text: string) : ContractMember list =
     let named = Regex(@"\b(?:let|use)\s+(?:(?:rec|inline|private|internal|mutable)\s+)*(\(\|[^)]*\|\)|``[^`]*``|\([^)]*\)|[A-Za-z_][A-Za-z0-9_']*)|\b(?:member|override|default)\s+(?:(?:private|internal|inline)\s+)*(?:[A-Za-z_][A-Za-z0-9_]*\.)?(``[^`]*``|[A-Za-z_][A-Za-z0-9_']*)")
     let indent (l: string) = l.Length - l.TrimStart().Length
     let raw = text.Replace("\r\n", "\n").Split('\n')
-    let code = (stripCode text).Split('\n')
-    let rows = Array.zip raw code |> List.ofArray
     let rec go (scopes: (int * string) list) (rows: (string * string) list) (found: ContractMember list) =
         match rows with
         | [] -> List.rev found
@@ -1579,7 +1577,10 @@ let contractImplementations (text: string) : ContractMember list =
                     else k |> Option.defaultValue "expression"
                 let scope = (if s.Success then scopes' else open') |> List.rev |> List.map snd |> String.concat "."
                 go scopes' (List.skip body.Length rest) ({ Scope = scope; Symbol = symbol; Text = text } :: found)
-    go [] rows []
+    // Two readings of comments: with and without strings lexed inside them. Hidden code must evade both, so the
+    // members either reading finds are all reported (RV411-4-1: each reading alone has a bypass the other catches).
+    let scan (stringsInComments: bool) = go [] (Array.zip raw ((stripCode stringsInComments text).Split('\n')) |> List.ofArray) []
+    scan true @ scan false |> List.distinctBy (fun m -> m.Scope, m.Symbol, m.Text)
 
 /// Each generated contract file with its classification: a specification (types and signatures only), a specification
 /// with reviewed boundary code (the amendment's allowlist names each member and why), the generated compile control, the
@@ -1688,9 +1689,10 @@ let entrypointCheck (i: Inputs) (files: OwnedFile list) : Check =
               for (role, owns) in rows do
                   if role <> "integration" && (if sentence = "" then owns else owns.Replace(sentence, "")).Contains p then yield sprintf "AGENT-RULES.md's roles table names %s under %s outside the change-request sentence" p role
               let reviewed = strs "ruleLinesSha256" spec |> Set.ofList
-              let fileName = p.Substring(p.LastIndexOf '/' + 1)
+              let fileName = p.Substring(p.LastIndexOf '/' + 1).ToLowerInvariant()
+              let plain (l: string) = l.Replace("\\", "").Replace("`", "").ToLowerInvariant()
               for l in rules.Split('\n') do
-                  if (l.Contains p || l.Contains fileName) && not (reviewed.Contains(Git.sha256Hex (Text.Encoding.UTF8.GetBytes(l.TrimEnd())))) then
+                  if (plain l).Contains fileName && not (reviewed.Contains(Git.sha256Hex (Text.Encoding.UTF8.GetBytes(l.TrimEnd())))) then
                       yield sprintf "AGENT-RULES.md names %s in a line that is not one of the reviewed lines (sharedEntrypoints.ruleLinesSha256): %s" p (l.Trim().Substring(0, min 120 (l.Trim().Length)))
           if (sOr "ruleSentence" cr) = "" || not (rules.Contains(sOr "ruleSentence" cr)) then yield "AGENT-RULES.md does not carry the change-request sentence the amendment fixes (sharedEntrypoints.changeRequests.ruleSentence)"
           if sOr "owner" cr <> "integration" then yield "change requests to the shared entrypoints must be owned by integration"
@@ -1719,8 +1721,8 @@ let bootstrapCheck (i: Inputs) : Check =
     // approval or confirmation, DAG waivers resting on ODR-V41-06, and each matching line of the scanned documents.
     let refs = arr "organizerReferences" policy
     let decisions = requestIds i @ [ "OD-INDY-18" ]
-    let organizerRx = Regex(@"organi[sz]er", RegexOptions.IgnoreCase)
-    let gateRx = Regex(@"confirm|approv|verif|permission|permit|interpretation|sign[- ]?off|signs? off|signed|wait|until|hold|obtain|\bask|consent|authori[sz]|agree", RegexOptions.IgnoreCase)
+    let organizerRx = Regex(@"organi[sz]er|organi[sz]ing committee", RegexOptions.IgnoreCase)
+    let gateRx = Regex(@"confirm|approv|verif|permission|permit|interpretation|sign[- ]?off|signs? off|signed|wait|until|hold|obtain|\bask|consent|authori[sz]|agree|response|go-ahead|pending|clearance|blessing", RegexOptions.IgnoreCase)
     let mentions (j: Json) = match j with JObj ps -> ps |> List.exists (fun (_, v) -> match v with JStr s -> organizerRx.IsMatch s && gateRx.IsMatch s | _ -> false) | _ -> false
     let rec walk (j: Json) : Json list = match j with JObj ps -> j :: (ps |> List.collect (snd >> walk)) | JArr xs -> xs |> List.collect walk | _ -> []
     let fromJson (path: string) (select: Json -> string list) =
@@ -1774,7 +1776,10 @@ let bootstrapCheck (i: Inputs) : Check =
           for w in waiverGates do
               if not (refs |> List.exists (fun x -> sOr "id" x = w)) then yield sprintf "%s rests on ODR-V41-06 and has no recorded disposition" w
           for (d, n, l) in docLines do
-              if not (refs |> List.exists (fun x -> sOr "source" x = d && sOr "quote" x <> "" && l.Contains(sOr "quote" x))) then
+              let covers (x: Json) =
+                  sOr "source" x = d && sOr "quote" x <> "" && l.Contains(sOr "quote" x)
+                  && (match strOpt "lineSha256" x with Some h -> h = Git.sha256Hex (Text.Encoding.UTF8.GetBytes(l.TrimEnd())) | None -> true)
+              if not (refs |> List.exists covers) then
                   yield sprintf "organizer gate at %s:%d has no recorded disposition: %s" d n (l.Trim().Substring(0, min 100 (l.Trim().Length)))
           for x in refs do
               if String.IsNullOrWhiteSpace (sOr "disposition" x) then yield sprintf "organizer reference %s has no disposition" (sOr "id" x)
@@ -1811,6 +1816,11 @@ let amendmentRecordCheck (i: Inputs) : Check =
           | Some d when d <> sOr "manifestSha256" amends -> yield sprintf "the amended manifest has sha256 %s, the amendment names %s" d (sOr "manifestSha256" amends)
           | Some _ -> ()
           if String.IsNullOrWhiteSpace (sOr "approval" amends) then yield "the amendment names no approval of the package it amends"
+          for p in arr "pinnedDocuments" a do
+              match i.ReadSource (sOr "path" p) with
+              | Some t when Git.sha256Hex (Text.Encoding.UTF8.GetBytes t) = sOr "sha256" p -> ()
+              | Some _ -> yield sprintf "%s does not have the digest the amendment pins" (sOr "path" p)
+              | None -> yield sprintf "%s, which the amendment pins, is not readable" (sOr "path" p)
           let changes = arr "changes" a
           if changes.IsEmpty then yield "the amendment lists no change"
           for c in changes do

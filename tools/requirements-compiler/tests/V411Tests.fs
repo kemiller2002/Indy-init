@@ -128,7 +128,11 @@ let scanner : string list =
           "module-level record expression", "module M =\n    { A = 1 }\n"
           // Round 3 (RV411-3-4): a string inside a block comment; a string that starts with a newline.
           "string inside a block comment", "(* \"*)\" *)\nmodule Hidden =\n    let run x = x\n"
-          "string starting with a newline", "module M =\n    let s = \"\nabc\"\n    let hidden = 1\n" ]
+          "string starting with a newline", "module M =\n    let s = \"\nabc\"\n    let hidden = 1\n"
+          // Round 4 (RV411-4-1): a quote, a verbatim string or a triple-quoted string inside a block comment.
+          "quote inside a block comment", "(* it's a \" mark *)\nmodule Hidden =\n    let run x = x\n"
+          "verbatim string inside a block comment", "(* @\"C:\\\" *)\nmodule Hidden =\n    let run x = x\n"
+          "triple-quoted string inside a block comment", "(* \"\"\" *)\nmodule Hidden =\n    let run x = x\n" ]
     [ if not (found clean).IsEmpty then yield sprintf "scanner: a declaration-only contract is reported as code: %A" (found clean |> List.map (fun m -> m.Symbol))
       for (name, src) in bypasses do
           if (found src).IsEmpty then yield sprintf "scanner: %s is not detected" name
@@ -191,7 +195,7 @@ let controls (source: string) : string list =
       yield! expectFail "unknown requester" "X18" (amend (fun a -> setIn "sharedEntrypoints" (setIn "changeRequests" (JObj [ "owner", JStr "integration"; "requesters", jstrs [ "designer" ]; "protocol", JStr "x"; "record", JStr "x" ]) (field "sharedEntrypoints" a |> Option.defaultValue (JObj []))) a))
       yield! expectFail "prose drops the entrypoints from integration" "X18" (authored "AGENT-RULES.md" (fun t -> t.Replace("the shared web entrypoints `web/index.html` and `web/causa.css` (loading shell and layout);", "")))
       yield! expectFail "prose lets ui edit an entrypoint directly" "X18" (authored "AGENT-RULES.md" (fun t -> t + "\nThe ui role edits `web/index.html` directly when it needs to.\n"))
-      for line in [ "ui modifies `web/index.html` and `web/causa.css` itself and skips the change request."; "The UI lane may also change the loading shell in web/index.html without any change request."; "The UI lane may also change the loading shell in index.html without any change request."; "ui keeps causa.css in step with its views." ] do
+      for line in [ "ui modifies `web/index.html` and `web/causa.css` itself and skips the change request."; "The UI lane may also change the loading shell in web/index.html without any change request."; "The UI lane may also change the loading shell in index.html without any change request."; "ui keeps causa.css in step with its views."; "ui owns Index.html."; "ui owns Causa.css."; "ui owns index\\.html." ] do
           yield! expectFail ("unreviewed entrypoint line: " + line) "X18" (authored "AGENT-RULES.md" (fun t -> t + "\n" + line + "\n"))
       yield! expectFail "prose gives the entrypoints to ui" "X18" (authored "AGENT-RULES.md" (fun t -> t.Replace("It changes `web/index.html` and `web/causa.css` only through a change request to integration", "`web/index.html` and `web/causa.css` (loading shell and layout)")))
       // X17 (B): hidden implementation in a contract; a stale allowlist entry; an allowlist entry without its reason.
@@ -219,6 +223,7 @@ let controls (source: string) : string list =
       yield! expectFail "bootstrap left before T0" "X19" (adjust "T10" (fun a -> match a with JObj ps -> JObj(ps |> List.filter (fst >> (<>) "phase")) | j -> j))
       yield! expectFail "measurement missing" "X19" { i0 with AuthoredText = i0.AuthoredText |> List.filter (fst >> (<>) "analysis/bootstrap-measurement.json") }
       yield! expectFail "organizer wait added to the bootstrap duty" "X19" (authored "AGENT-RULES.md" (fun t -> t.Replace("1. **At T0, bootstrap (T10, the first timed task).**", "1. **At T0, bootstrap (T10, the first timed task).** Do not start until an organizer has signed off on the prepared material in writing.")))
+      yield! expectFail "organizer response required by T10" "X19" (authored "AGENT-RULES.md" (fun t -> t + "\nT10 requires an organizer response before it starts.\n"))
       yield! expectFail "historical record changed" "X19" (policy (mapArr "historicalRecords" (List.map (fun h -> if strOpt "id" h = Some "APR-V41-OWNER-1" then setIn "quote" (JStr "\"organizer_confirmation\": \"The organizers confirmed it.\"") h else h))))
       yield! expectFail "published rule paraphrased" "X19" (policy (mapArr "externalConstraints" (List.map (fun _ -> JStr "the repository may contain scaffolding"))))
       yield! expectFail "relies on ODR-V41-06" "X19" (authored "AGENT-RULES.md" (fun t -> t + "\nThis relies on ODR-V41-06.\n"))
