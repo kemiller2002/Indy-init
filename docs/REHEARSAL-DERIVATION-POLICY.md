@@ -23,7 +23,7 @@ Every rehearsal MUST derive its requirements package from the pinned baseline. A
 
 - **Recording.** The rehearsal records the baseline id, its pinned commit and its SHA-256 in its own repository.
 - **Changed source.** If the source documents change after pinning, the gate reports drift. The rehearsal then either re-pins against the new commit and re-derives, or records an operator decision to stay on the earlier pin.
-- **Regenerating.** Re-pinning means regenerating the baseline with `tools/build-requirements-baseline.py`. It never means editing the manifest by hand.
+- **Regenerating.** Re-pinning means regenerating the baseline with the F# generator, `requirements-compiler baseline . <commit>` (authoritative since 2026-11-01, [OWNER-DECISIONS-2026-11-01](OWNER-DECISIONS-2026-11-01.md); it replaced the byte-identical `tools/build-requirements-baseline.py`). It never means editing the manifest by hand.
 
 ## RDP-002: Every requirement gets a disposition
 
@@ -86,7 +86,7 @@ The gate MUST pass at two points:
 
 ## Procedure for a new rehearsal
 
-1. **Resolve the commit.** Resolve this repository's commit for the run. If the baseline's pinned commit differs and the source documents changed, regenerate the baseline (`python3 -I tools/build-requirements-baseline.py . <commit>`) on a reviewed branch.
+1. **Resolve the commit.** Resolve this repository's commit for the run. If the baseline's pinned commit differs and the source documents changed, regenerate the baseline (`requirements-compiler baseline . <commit>`) on a reviewed branch.
 2. **Scope.** State the run's scope. Request operator approvals for every exclusion the scope implies.
 3. **Derive.** Derive the requirements package in the rehearsal repository's documented Praxis requirements location, through its documented Praxis input workflow. Never use GitHub Issues.
 4. **Reconcile.** Write the disposition file.

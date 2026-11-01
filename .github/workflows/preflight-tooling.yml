@@ -11,13 +11,13 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Run offline negative-case tests
+      # The acceptance ledger and verdict tools are the last Python, kept until they are ported to F#; new tooling is F#
+      # only (docs/OWNER-DECISIONS-2026-11-01.md), which the F# offline suite enforces.
+      - name: Run the acceptance ledger and verdict tools' negative-case tests (Python, pending the F# port)
         run: |
-          python3 tools/test-preflight.py
           python3 tools/test-acceptance-ledger.py
           python3 tools/test-acceptance-verdict.py
-          python3 tools/test-requirements-baseline.py
-      - name: Compile Python tooling
+      - name: Compile the remaining Python tooling
         run: python3 -m compileall -q tools
   # Compiled package v4 is frozen at tag indy-init-requirements-v4.0.0 and is never recompiled with a later compiler:
   # its files on this commit must equal the tagged ones, and the tagged compiler and test suite reproduce them.
@@ -82,13 +82,10 @@ jobs:
           git -C "$RUNNER_TEMP/r7" sparse-checkout set --no-cone /evidence/FINAL-REPORT.md /evidence/provenance.md /evidence/defects.md /evidence/DECISIONS.md /evidence/traceability.json
           git -C "$RUNNER_TEMP/r7" checkout --quiet 9b307aa1d3d7d5e6fe1737680d03bf74fd90c1a9
           echo "CAUSA_R7_EVIDENCE=$RUNNER_TEMP/r7" >> "$GITHUB_ENV"
-      - name: Offline tests (baseline port reproduces the committed baseline, units, preflight verdict, v4 and v4.1 scope and controls)
+      - name: Offline tests (baseline reproduces the committed baseline, units, preflight verdict, v4 and v4.1 scope and controls, F#-only tooling)
         run: dotnet run -c Release --no-build --project tools/requirements-compiler/tests -- --offline --source .
-      - name: F# and Python baseline generators agree byte for byte at this commit
-        run: |
-          python3 -I tools/build-requirements-baseline.py . "$GITHUB_SHA" > "$RUNNER_TEMP/py.json"
-          dotnet tools/requirements-compiler/src/bin/Release/net10.0/requirements-compiler.dll baseline . "$GITHUB_SHA" > "$RUNNER_TEMP/fs.json"
-          cmp "$RUNNER_TEMP/py.json" "$RUNNER_TEMP/fs.json"
+      - name: The F# baseline generator (authoritative since 2026-11-01) runs at this commit
+        run: dotnet tools/requirements-compiler/src/bin/Release/net10.0/requirements-compiler.dll baseline . "$GITHUB_SHA" > "$RUNNER_TEMP/baseline.json"
       - name: Rehearsal 7 persistence requirements (ADR-R7-001) and the validator's negative controls
         run: |
           args="--root . --baseline requirements/causa-requirements-baseline-r7.json --previous requirements/causa-requirements-baseline-r6.json --trace docs/rehearsal-007/traceability.json"

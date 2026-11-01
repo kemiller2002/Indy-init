@@ -3,7 +3,7 @@
 /// Offline (indy-init history only; run in CI):
 ///   dotnet run --project tools/requirements-compiler/tests -- --offline --source .
 ///     - the F# baseline port reproduces the committed Python-generated baseline byte for byte;
-///     - unit cases ported from tools/test-requirements-baseline.py;
+///     - unit cases ported from tools/test-requirements-baseline.py (removed 2026-11-01);
 ///     - the preflight verdict rule;
 ///     - defect-class closures checked against a throwaway git history (R7-REM-008);
 ///     - the pre-lock release comparison (R7-REM-010);
@@ -598,6 +598,32 @@ let private planWithBindings (source: string) (bindings: Json) =
     let committed = File.ReadAllText(Path.Combine(source, "requirements", "causa-requirements-baseline.json"))
     VerificationPlan.build (withSpec (planInputs source committed) "testBindings" bindings)
 
+/// Tooling is F# only (owner decision 2026-11-01, docs/OWNER-DECISIONS-2026-11-01.md): a tracked script in another
+/// language under tools/ or .github/ fails, except the tools still to be ported, listed here until each is.
+let private pendingPorts =
+    set [ "tools/compute-acceptance-verdict.py"; "tools/validate-acceptance-ledger.py"; "tools/test-acceptance-ledger.py"
+          "tools/test-acceptance-verdict.py"; "tools/process-evidence/simulate-rehearsal.sh" ]
+
+let private scriptExtensions =
+    [ ".py"; ".pyc"; ".sh"; ".bash"; ".zsh"; ".ps1"; ".psm1"; ".rb"; ".pl"; ".js"; ".mjs"; ".cjs"; ".ts"; ".lua"; ".go"; ".rs"; ".java"; ".kt"; ".cs"; ".vb" ]
+
+let nonFSharpTooling (files: string list) : string list =
+    files
+    |> List.filter (fun f -> f.StartsWith("tools/", StringComparison.Ordinal) || f.StartsWith(".github/", StringComparison.Ordinal))
+    |> List.filter (fun f -> scriptExtensions |> List.exists (fun e -> f.EndsWith(e, StringComparison.OrdinalIgnoreCase)))
+    |> List.filter (pendingPorts.Contains >> not)
+    |> List.map (sprintf "tooling: %s is not F# (tooling is F# only, docs/OWNER-DECISIONS-2026-11-01.md)")
+
+let toolingLanguage (source: string) : string list =
+    match Git.run source [ "ls-files" ] with
+    | Error e -> [ sprintf "tooling: git ls-files failed: %s" e ]
+    | Ok bytes ->
+        let tracked = (Text.Encoding.UTF8.GetString bytes).Split('\n', StringSplitOptions.RemoveEmptyEntries) |> List.ofArray
+        nonFSharpTooling tracked
+        @ [ // Control: a new Python or shell tool is rejected; F# and files outside tools/ and .github/ are not.
+            if nonFSharpTooling [ "tools/new-tool.py"; "tools/x/run.sh"; "tools/ok.fsx"; "docs/a.py" ] |> List.length <> 2 then
+                yield "tooling control: a Python or shell tool under tools/ was not rejected" ]
+
 let private processSimulation (source: string) = ProcessTests.simulation source (planWithBindings source)
 
 let private r6Readiness (source: string) =
@@ -631,7 +657,7 @@ let private offline (source: string) : string list =
                   yield sprintf "r7 baseline: the port's output at %s differs from requirements/causa-requirements-baseline-r7.json" commit ]
         with ex -> [ "r7 baseline: " + ex.Message ]
 
-    // Cases ported from tools/test-requirements-baseline.py.
+    // Cases ported from tools/test-requirements-baseline.py (removed 2026-11-01, when the F# generator became authoritative).
     let units =
         let lines =
             [| "## Architectural contract"; ""; "**PF-001 [P0] One.** Define a port. It must not leak."; ""
@@ -731,8 +757,8 @@ let main argv =
             2
         | Ok o ->
             let processFailures = snd (processSimulation o.Source) @ producerBindings o.Source @ r6Readiness o.Source @ R6ScopeTests.all o.Source @ V4Tests.all o.Source @ V41Tests.all o.Source
-            let failures = offline o.Source @ processFailures
-            let label = "offline tests (baseline equivalence, baseline units, preflight verdict, verification plan, acceptance contracts, process evidence, v4 scope and controls, v4.1 scope and controls)"
+            let failures = offline o.Source @ processFailures @ toolingLanguage o.Source
+            let label = "offline tests (baseline equivalence, baseline units, preflight verdict, verification plan, acceptance contracts, process evidence, v4 scope and controls, v4.1 scope and controls, F#-only tooling)"
             let code = report failures label
             record
             |> Option.iter (fun path ->

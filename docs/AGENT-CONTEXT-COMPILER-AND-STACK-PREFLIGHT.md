@@ -1,6 +1,6 @@
 # Agent Context Compiler and Current Stack Preflight
 
-Status: tooling implemented; remote CI and live registry compatibility results NOT YET VERIFIED. No experiment started.
+Status: **retired 2026-11-01.** `tools/compile-agent-context.py`, `tools/discover-echelon-stack.py`, `tools/echelon-stack-sources.json` and `tools/test-preflight.py` were removed ([OWNER-DECISIONS-2026-11-01](OWNER-DECISIONS-2026-11-01.md)): stack discovery is superseded by the F# registry check PRE-DEP-01, and agent assignments by the ownership and lanes `requirements-compiler v41` generates. `tools/validate-acceptance-ledger.py` remains until it is ported to F#. The rest of this document is kept as history.
 
 ## Tools
 - `tools/compile-agent-context.py`: source-pinned, bounded assignment generator. Takes JSON manifest with schema_version=1, source_sha (40-char commit), interface_manifest_sha, dependency_lock_sha, sources [{path,sha256}], and agents [{name,requirement_ids,owned_paths,required_inputs,allowed_decisions,prohibited_decisions,outputs,acceptance_tests}]. Requirement headings must have exactly one matching canonical ID in pinned sources. Rejects source drift, duplicate agent names, missing requirements, path traversal and overlapping owned paths. Emits one JSON packet per agent.

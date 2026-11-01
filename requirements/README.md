@@ -14,8 +14,8 @@ rehearsal must use it is defined in
 | Documents | 19, each pinned by SHA-256 |
 | Requirements | 461 |
 | Obligations | 2293: 378 `acceptance`, 55 `value`, 1860 `constraint` |
-| Regenerate | `python3 -I tools/build-requirements-baseline.py . <commit> > requirements/causa-requirements-baseline.json` |
-| Tests | `python3 tools/test-requirements-baseline.py` (run by the preflight-tooling workflow) |
+| Regenerate | `dotnet build tools/requirements-compiler/src -c Release`, then `dotnet tools/requirements-compiler/src/bin/Release/net10.0/requirements-compiler.dll baseline . <commit> > requirements/causa-requirements-baseline.json` (the F# generator, authoritative since 2026-11-01) |
+| Tests | The F# offline suite (`dotnet run --project tools/requirements-compiler/tests -- --offline --source .`, run by the preflight-tooling workflow): it reproduces the committed baselines and runs the baseline unit cases |
 
 ## Rehearsal 6 and Rehearsal 7 baselines
 
@@ -27,9 +27,9 @@ Later rehearsals, and the November 7 event (v4), pin their own baseline file bes
 | `causa-requirements-baseline-r7.json` | `BL-CAUSA-INDY-INIT-8445ca11986f` | `8445ca11986f7808190e4e33e30a4fe2d37981cd` | 20 documents, 517 requirements (161 P0), 2595 obligations. Adds `docs/CAUSA-PERSISTENCE-REQUIREMENTS.md` (PERSIST-001..PERSIST-055) and amends 30 requirements, under ADR-R7-001 and owner decisions DEC-R7-001..007 ([`docs/rehearsal-007/`](../docs/rehearsal-007/), [`kickoff/rehearsal-007/`](../kickoff/rehearsal-007/)). Re-pinned from `7d44f55`, which preceded the owner decisions |
 | `causa-requirements-baseline-v4.json` | `BL-CAUSA-INDY-INIT-62df28a559c0` | `62df28a559c054226dd4022e9744cf1db06e954f` | 20 documents, 520 requirements (161 P0), 2599 obligations. The R7 baseline plus DCC-013..DCC-015, the owner-approved R7-AMD-03..05 (DEC-R7-008..010), written verbatim. The source of compiled package v4 ([`requirements-compiled/v4/`](../requirements-compiled/v4/)) |
 
-Regenerate the Rehearsal 7 file with `python3 -I tools/build-requirements-baseline.py . 8445ca11986f7808190e4e33e30a4fe2d37981cd` on a checkout of that commit. The offline compiler suite checks that the F# port reproduces it at the pinned commit. `tools/validate-r7-persistence-requirements.fsx` checks its persistence requirements and their traceability to the Rehearsal 6 baseline.
+Regenerate the Rehearsal 7 file with `dotnet tools/requirements-compiler/src/bin/Release/net10.0/requirements-compiler.dll baseline . 8445ca11986f7808190e4e33e30a4fe2d37981cd` on a checkout of that commit. The offline compiler suite checks that the generator reproduces it at the pinned commit. `tools/validate-r7-persistence-requirements.fsx` checks its persistence requirements and their traceability to the Rehearsal 6 baseline.
 
-The script is deterministic: run twice, it produces byte-identical output.
+The generator is deterministic: run twice, it produces byte-identical output.
 Against this checkout at the pinned commit, the Praxis gate reports no
 `baseline-invalid` and no drift findings, and one `disposition-missing`
 finding per requirement when the disposition is empty.
@@ -79,9 +79,9 @@ a new section is detected through the document hash, not by id.
 
 ## Mechanical rules (no obligation is invented)
 
-- **Introduced documents.** A document in `INTRODUCED_DOCUMENTS` (Python) or `Baseline.introducedDocuments` (F#) enters the baseline at every commit that has it. A commit from before it was added has no such file, so that commit's baseline is unchanged. Every other document is required, and its absence is an error. `docs/CAUSA-PERSISTENCE-REQUIREMENTS.md` is the only introduced document.
+- **Introduced documents.** A document in `Baseline.introducedDocuments` enters the baseline at every commit that has it. A commit from before it was added has no such file, so that commit's baseline is unchanged. Every other document is required, and its absence is an error. `docs/CAUSA-PERSISTENCE-REQUIREMENTS.md` is the only introduced document.
 
-These rules are implemented in `tools/build-requirements-baseline.py`.
+These rules are implemented in `tools/requirements-compiler/src/Baseline.fs`. Its Python original, `tools/build-requirements-baseline.py`, produced byte-identical output and was removed on 2026-11-01, when the owner made the F# generator authoritative ([OWNER-DECISIONS-2026-11-01](../docs/OWNER-DECISIONS-2026-11-01.md)).
 
 - **What counts as a requirement.**
   - Every line the document's pattern captures an id from: a heading, a
