@@ -59,7 +59,7 @@ The stronger claim is:
 
 ## Organizer verification
 
-Before the event, verify with the organizers any ambiguity involving:
+No task waits on an organizer response (OD-INDY-18, docs/OWNER-DECISIONS-2026-11-01.md): the engineering methodology is internal and its execution does not depend on organizer permission. The starting-state policy, requirements-compiled/v4.1.1/STARTING-STATE.md, records the implementation boundary and the residual interpretation risk. These are the areas where that risk lies:
 
 - use of pre-existing private or public frameworks
 - pre-written requirements
@@ -109,6 +109,6 @@ Until clarified, keep this repository specification-heavy and keep competition a
 
 A machine-readable contract generated directly from these requirements may be extremely valuable for the software factory.
 
-Before producing application-specific executable/generated scaffolding from it before kickoff, confirm organizer interpretation.
+Application-specific executable or generated scaffolding is not written to the competition repository before kickoff. The generator runs at T0, as task T10 of the plan. Organizer confirmation is not a prerequisite (OD-INDY-18). The residual interpretation risk is recorded in requirements-compiled/v4.1.1/STARTING-STATE.md.
 
 Architecture and semantic contracts themselves remain preparation artifacts.
