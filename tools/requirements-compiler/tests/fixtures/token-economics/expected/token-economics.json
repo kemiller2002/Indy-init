@@ -1,0 +1,2643 @@
+{
+  "schema": "indy-init.token-economics/1",
+  "source": {
+    "telemetry": "Praxis execution records (.ros/telemetry/executions, telemetry schema 1.0.0)",
+    "records": [
+      {
+        "file": "EXE-20260110T110000000Z-f0000001.json",
+        "sha256": "bb8b3b89e0af92c6bb32bcf850168437823117f109ff884b60c51f55ebfd4bfc"
+      },
+      {
+        "file": "EXE-20260110T120500000Z-f0000002.json",
+        "sha256": "9fa9e0a0406d4eee01b7989357d5a98f4e171082edf8e3f283c0b1c03b1d920f"
+      },
+      {
+        "file": "EXE-20260110T121000000Z-f0000003.json",
+        "sha256": "e068e94e952d95dc654f4176bc163ec5e4bf68ef416791a5736434ebb9a8fce3"
+      },
+      {
+        "file": "EXE-20260110T123000000Z-f0000004.json",
+        "sha256": "28d039e58eb6ae280a3c2437218e13c9a1379d426a167f809f611249eaf2f48c"
+      },
+      {
+        "file": "EXE-20260110T150000000Z-f0000005.json",
+        "sha256": "02234e35a430f9d13d906b640c5335d7e53dc10e752fd2fea223690c6a465173"
+      },
+      {
+        "file": "EXE-20260110T160000000Z-f0000006.json",
+        "sha256": "0635ddfa4c4f79b15f0dd325acb614a641006cde8815a3884b4c90e97339e310"
+      },
+      {
+        "file": "EXE-20260110T170000000Z-f0000007.json",
+        "sha256": "01e3f7b00f445048ae5d35be0ff00f950035641aaa28e42974e5bf446423a234"
+      }
+    ]
+  },
+  "window": {
+    "start": "2026-01-10T12:00:00Z",
+    "end": "2026-01-10T19:00:00Z"
+  },
+  "priceTable": {
+    "source": "fixture-prices-not-real",
+    "version": "fixture-1",
+    "effectiveDate": "2026-01-01",
+    "currency": "USD",
+    "unit": "per-million-tokens",
+    "models": [
+      "fixture-model"
+    ]
+  },
+  "rules": [
+    "Token figures come only from tokens.* measurements of quality observed or derived in the Praxis execution records; never from elapsed time, commits, source lines or transcript size.",
+    "A value the records do not carry is unavailable, with the record's capability status and reason; it is never zero and never estimated.",
+    "A group value with some executions unavailable is partial: the sum of the others, a lower bound.",
+    "tokens.output from a Claude Code transcript is a lower bound (dimensions.bound = lower); any figure including it is marked lowerBound.",
+    "total = input + output + cacheRead + cacheWrite; cache read and cache write are never folded into input.",
+    "A transcript snapshot ingested into two executions is counted once, in the ordinally first execution.",
+    "Provider-reported cost is the sum of observed cost.execution_total; price-table-derived cost prices the token buckets with an operator-supplied table. They are separate figures and are never summed.",
+    "The runtime's own cost estimate (cost.session_cumulative, quality estimated) is listed per execution and enters neither cost figure.",
+    "Phase: a measurement is pre-event, timed or post-event by its span against the competition window, both ends inclusive. A measurement of a transcript session the record dates (start and end) spans that session; any other measurement spans its execution, startedAt to finalizedAt, widened to every session the record dates. A measurement with no known span (no finalizedAt) is placed by its collectedAt, else the execution's startedAt; an execution with no measurements is placed by its span, else its startedAt.",
+    "A measurement whose span crosses the window start or end is in the phase bucket 'unsplit (crosses the window boundary)', which is assigned to no phase, and its span is listed under phaseCaveats: the record's sums carry no per-request times, so it is never split by proportion or duration. Split a session with praxis telemetry reliability-report --transcripts DIR.",
+    "Repeated work: every execution of a work item after the first (by startedAt) repeats it."
+  ],
+  "totals": {
+    "executions": [
+      "EXE-20260110T110000000Z-f0000001",
+      "EXE-20260110T120500000Z-f0000002",
+      "EXE-20260110T121000000Z-f0000003",
+      "EXE-20260110T123000000Z-f0000004",
+      "EXE-20260110T150000000Z-f0000005",
+      "EXE-20260110T160000000Z-f0000006",
+      "EXE-20260110T170000000Z-f0000007"
+    ],
+    "tokens": {
+      "input": {
+        "availability": "partial",
+        "value": 610,
+        "lowerBound": true,
+        "unavailableExecutions": [
+          "EXE-20260110T121000000Z-f0000003",
+          "EXE-20260110T170000000Z-f0000007"
+        ]
+      },
+      "output": {
+        "availability": "partial",
+        "value": 15200,
+        "lowerBound": true,
+        "unavailableExecutions": [
+          "EXE-20260110T121000000Z-f0000003",
+          "EXE-20260110T170000000Z-f0000007"
+        ]
+      },
+      "cacheRead": {
+        "availability": "partial",
+        "value": 640000,
+        "lowerBound": true,
+        "unavailableExecutions": [
+          "EXE-20260110T121000000Z-f0000003",
+          "EXE-20260110T170000000Z-f0000007"
+        ]
+      },
+      "cacheWrite": {
+        "availability": "partial",
+        "value": 34000,
+        "lowerBound": true,
+        "unavailableExecutions": [
+          "EXE-20260110T121000000Z-f0000003",
+          "EXE-20260110T123000000Z-f0000004",
+          "EXE-20260110T170000000Z-f0000007"
+        ]
+      },
+      "total": {
+        "availability": "partial",
+        "value": 689810,
+        "lowerBound": true,
+        "unavailableExecutions": [
+          "EXE-20260110T121000000Z-f0000003",
+          "EXE-20260110T123000000Z-f0000004",
+          "EXE-20260110T170000000Z-f0000007"
+        ],
+        "derivation": "input + output + cacheRead + cacheWrite"
+      }
+    },
+    "cost": {
+      "providerReported": {
+        "availability": "partial",
+        "amount": "1.250000",
+        "currency": "USD",
+        "lowerBound": true,
+        "unavailableExecutions": [
+          "EXE-20260110T110000000Z-f0000001",
+          "EXE-20260110T121000000Z-f0000003",
+          "EXE-20260110T123000000Z-f0000004",
+          "EXE-20260110T150000000Z-f0000005",
+          "EXE-20260110T160000000Z-f0000006",
+          "EXE-20260110T170000000Z-f0000007"
+        ],
+        "basis": "provider-reported: observed cost.execution_total"
+      },
+      "priceTableDerived": {
+        "availability": "partial",
+        "amount": "0.341040",
+        "currency": "USD",
+        "lowerBound": true,
+        "unavailableExecutions": [
+          "EXE-20260110T121000000Z-f0000003",
+          "EXE-20260110T123000000Z-f0000004",
+          "EXE-20260110T160000000Z-f0000006",
+          "EXE-20260110T170000000Z-f0000007"
+        ],
+        "basis": "estimated:fixture-prices-not-real@fixture-1/2026-01-01"
+      }
+    }
+  },
+  "byPhase": [
+    {
+      "key": "pre-event",
+      "executions": [
+        "EXE-20260110T110000000Z-f0000001"
+      ],
+      "tokens": {
+        "input": {
+          "availability": "available",
+          "value": 100,
+          "lowerBound": false,
+          "unavailableExecutions": []
+        },
+        "output": {
+          "availability": "available",
+          "value": 2000,
+          "lowerBound": true,
+          "unavailableExecutions": []
+        },
+        "cacheRead": {
+          "availability": "available",
+          "value": 50000,
+          "lowerBound": false,
+          "unavailableExecutions": []
+        },
+        "cacheWrite": {
+          "availability": "available",
+          "value": 4000,
+          "lowerBound": false,
+          "unavailableExecutions": []
+        },
+        "total": {
+          "availability": "available",
+          "value": 56100,
+          "lowerBound": true,
+          "unavailableExecutions": [],
+          "derivation": "input + output + cacheRead + cacheWrite"
+        }
+      },
+      "cost": {
+        "providerReported": {
+          "availability": "unavailable",
+          "amount": null,
+          "currency": null,
+          "lowerBound": false,
+          "unavailableExecutions": [
+            "EXE-20260110T110000000Z-f0000001"
+          ],
+          "basis": "provider-reported: observed cost.execution_total"
+        },
+        "priceTableDerived": {
+          "availability": "available",
+          "amount": "0.040200",
+          "currency": "USD",
+          "lowerBound": true,
+          "unavailableExecutions": [],
+          "basis": "estimated:fixture-prices-not-real@fixture-1/2026-01-01"
+        }
+      }
+    },
+    {
+      "key": "timed",
+      "executions": [
+        "EXE-20260110T121000000Z-f0000003",
+        "EXE-20260110T123000000Z-f0000004",
+        "EXE-20260110T150000000Z-f0000005",
+        "EXE-20260110T160000000Z-f0000006",
+        "EXE-20260110T170000000Z-f0000007"
+      ],
+      "tokens": {
+        "input": {
+          "availability": "partial",
+          "value": 210,
+          "lowerBound": true,
+          "unavailableExecutions": [
+            "EXE-20260110T121000000Z-f0000003",
+            "EXE-20260110T170000000Z-f0000007"
+          ]
+        },
+        "output": {
+          "availability": "partial",
+          "value": 4200,
+          "lowerBound": true,
+          "unavailableExecutions": [
+            "EXE-20260110T121000000Z-f0000003",
+            "EXE-20260110T170000000Z-f0000007"
+          ]
+        },
+        "cacheRead": {
+          "availability": "partial",
+          "value": 190000,
+          "lowerBound": true,
+          "unavailableExecutions": [
+            "EXE-20260110T121000000Z-f0000003",
+            "EXE-20260110T170000000Z-f0000007"
+          ]
+        },
+        "cacheWrite": {
+          "availability": "partial",
+          "value": 10000,
+          "lowerBound": true,
+          "unavailableExecutions": [
+            "EXE-20260110T121000000Z-f0000003",
+            "EXE-20260110T123000000Z-f0000004",
+            "EXE-20260110T170000000Z-f0000007"
+          ]
+        },
+        "total": {
+          "availability": "partial",
+          "value": 204410,
+          "lowerBound": true,
+          "unavailableExecutions": [
+            "EXE-20260110T121000000Z-f0000003",
+            "EXE-20260110T123000000Z-f0000004",
+            "EXE-20260110T170000000Z-f0000007"
+          ],
+          "derivation": "input + output + cacheRead + cacheWrite"
+        }
+      },
+      "cost": {
+        "providerReported": {
+          "availability": "unavailable",
+          "amount": null,
+          "currency": null,
+          "lowerBound": false,
+          "unavailableExecutions": [
+            "EXE-20260110T121000000Z-f0000003",
+            "EXE-20260110T123000000Z-f0000004",
+            "EXE-20260110T150000000Z-f0000005",
+            "EXE-20260110T160000000Z-f0000006",
+            "EXE-20260110T170000000Z-f0000007"
+          ],
+          "basis": "provider-reported: observed cost.execution_total"
+        },
+        "priceTableDerived": {
+          "availability": "partial",
+          "amount": "0.080240",
+          "currency": "USD",
+          "lowerBound": true,
+          "unavailableExecutions": [
+            "EXE-20260110T121000000Z-f0000003",
+            "EXE-20260110T123000000Z-f0000004",
+            "EXE-20260110T160000000Z-f0000006",
+            "EXE-20260110T170000000Z-f0000007"
+          ],
+          "basis": "estimated:fixture-prices-not-real@fixture-1/2026-01-01"
+        }
+      }
+    },
+    {
+      "key": "unsplit (crosses the window boundary)",
+      "executions": [
+        "EXE-20260110T120500000Z-f0000002"
+      ],
+      "tokens": {
+        "input": {
+          "availability": "available",
+          "value": 300,
+          "lowerBound": false,
+          "unavailableExecutions": []
+        },
+        "output": {
+          "availability": "available",
+          "value": 9000,
+          "lowerBound": true,
+          "unavailableExecutions": []
+        },
+        "cacheRead": {
+          "availability": "available",
+          "value": 400000,
+          "lowerBound": false,
+          "unavailableExecutions": []
+        },
+        "cacheWrite": {
+          "availability": "available",
+          "value": 20000,
+          "lowerBound": false,
+          "unavailableExecutions": []
+        },
+        "total": {
+          "availability": "available",
+          "value": 429300,
+          "lowerBound": true,
+          "unavailableExecutions": [],
+          "derivation": "input + output + cacheRead + cacheWrite"
+        }
+      },
+      "cost": {
+        "providerReported": {
+          "availability": "available",
+          "amount": "1.250000",
+          "currency": "USD",
+          "lowerBound": false,
+          "unavailableExecutions": [],
+          "basis": "provider-reported: observed cost.execution_total"
+        },
+        "priceTableDerived": {
+          "availability": "available",
+          "amount": "0.220600",
+          "currency": "USD",
+          "lowerBound": true,
+          "unavailableExecutions": [],
+          "basis": "estimated:fixture-prices-not-real@fixture-1/2026-01-01"
+        }
+      }
+    }
+  ],
+  "phaseCaveats": [
+    {
+      "executionId": "EXE-20260110T120500000Z-f0000002",
+      "span": "session",
+      "snapshot": "fixture-session-2",
+      "startedAt": "2026-01-10T11:50:00.000Z",
+      "endedAt": "2026-01-10T13:58:30.000Z",
+      "spans": [
+        "window start"
+      ],
+      "bucket": "unsplit (crosses the window boundary)"
+    }
+  ],
+  "byWorkItem": [
+    {
+      "key": "WI-F1",
+      "executions": [
+        "EXE-20260110T110000000Z-f0000001"
+      ],
+      "tokens": {
+        "input": {
+          "availability": "available",
+          "value": 100,
+          "lowerBound": false,
+          "unavailableExecutions": []
+        },
+        "output": {
+          "availability": "available",
+          "value": 2000,
+          "lowerBound": true,
+          "unavailableExecutions": []
+        },
+        "cacheRead": {
+          "availability": "available",
+          "value": 50000,
+          "lowerBound": false,
+          "unavailableExecutions": []
+        },
+        "cacheWrite": {
+          "availability": "available",
+          "value": 4000,
+          "lowerBound": false,
+          "unavailableExecutions": []
+        },
+        "total": {
+          "availability": "available",
+          "value": 56100,
+          "lowerBound": true,
+          "unavailableExecutions": [],
+          "derivation": "input + output + cacheRead + cacheWrite"
+        }
+      },
+      "cost": {
+        "providerReported": {
+          "availability": "unavailable",
+          "amount": null,
+          "currency": null,
+          "lowerBound": false,
+          "unavailableExecutions": [
+            "EXE-20260110T110000000Z-f0000001"
+          ],
+          "basis": "provider-reported: observed cost.execution_total"
+        },
+        "priceTableDerived": {
+          "availability": "available",
+          "amount": "0.040200",
+          "currency": "USD",
+          "lowerBound": true,
+          "unavailableExecutions": [],
+          "basis": "estimated:fixture-prices-not-real@fixture-1/2026-01-01"
+        }
+      }
+    },
+    {
+      "key": "WI-F2",
+      "executions": [
+        "EXE-20260110T120500000Z-f0000002",
+        "EXE-20260110T150000000Z-f0000005"
+      ],
+      "tokens": {
+        "input": {
+          "availability": "available",
+          "value": 420,
+          "lowerBound": false,
+          "unavailableExecutions": []
+        },
+        "output": {
+          "availability": "available",
+          "value": 12000,
+          "lowerBound": true,
+          "unavailableExecutions": []
+        },
+        "cacheRead": {
+          "availability": "available",
+          "value": 550000,
+          "lowerBound": false,
+          "unavailableExecutions": []
+        },
+        "cacheWrite": {
+          "availability": "available",
+          "value": 28000,
+          "lowerBound": false,
+          "unavailableExecutions": []
+        },
+        "total": {
+          "availability": "available",
+          "value": 590420,
+          "lowerBound": true,
+          "unavailableExecutions": [],
+          "derivation": "input + output + cacheRead + cacheWrite"
+        }
+      },
+      "cost": {
+        "providerReported": {
+          "availability": "partial",
+          "amount": "1.250000",
+          "currency": "USD",
+          "lowerBound": true,
+          "unavailableExecutions": [
+            "EXE-20260110T150000000Z-f0000005"
+          ],
+          "basis": "provider-reported: observed cost.execution_total"
+        },
+        "priceTableDerived": {
+          "availability": "available",
+          "amount": "0.300840",
+          "currency": "USD",
+          "lowerBound": true,
+          "unavailableExecutions": [],
+          "basis": "estimated:fixture-prices-not-real@fixture-1/2026-01-01"
+        }
+      }
+    },
+    {
+      "key": "WI-F3",
+      "executions": [
+        "EXE-20260110T121000000Z-f0000003"
+      ],
+      "tokens": {
+        "input": {
+          "availability": "unavailable",
+          "value": null,
+          "lowerBound": false,
+          "unavailableExecutions": [
+            "EXE-20260110T121000000Z-f0000003"
+          ]
+        },
+        "output": {
+          "availability": "unavailable",
+          "value": null,
+          "lowerBound": false,
+          "unavailableExecutions": [
+            "EXE-20260110T121000000Z-f0000003"
+          ]
+        },
+        "cacheRead": {
+          "availability": "unavailable",
+          "value": null,
+          "lowerBound": false,
+          "unavailableExecutions": [
+            "EXE-20260110T121000000Z-f0000003"
+          ]
+        },
+        "cacheWrite": {
+          "availability": "unavailable",
+          "value": null,
+          "lowerBound": false,
+          "unavailableExecutions": [
+            "EXE-20260110T121000000Z-f0000003"
+          ]
+        },
+        "total": {
+          "availability": "unavailable",
+          "value": null,
+          "lowerBound": false,
+          "unavailableExecutions": [
+            "EXE-20260110T121000000Z-f0000003"
+          ],
+          "derivation": "input + output + cacheRead + cacheWrite"
+        }
+      },
+      "cost": {
+        "providerReported": {
+          "availability": "unavailable",
+          "amount": null,
+          "currency": null,
+          "lowerBound": false,
+          "unavailableExecutions": [
+            "EXE-20260110T121000000Z-f0000003"
+          ],
+          "basis": "provider-reported: observed cost.execution_total"
+        },
+        "priceTableDerived": {
+          "availability": "unavailable",
+          "amount": null,
+          "currency": "USD",
+          "lowerBound": false,
+          "unavailableExecutions": [
+            "EXE-20260110T121000000Z-f0000003"
+          ],
+          "basis": "estimated:fixture-prices-not-real@fixture-1/2026-01-01"
+        }
+      }
+    },
+    {
+      "key": "WI-F4",
+      "executions": [
+        "EXE-20260110T123000000Z-f0000004"
+      ],
+      "tokens": {
+        "input": {
+          "availability": "available",
+          "value": 50,
+          "lowerBound": false,
+          "unavailableExecutions": []
+        },
+        "output": {
+          "availability": "available",
+          "value": 700,
+          "lowerBound": true,
+          "unavailableExecutions": []
+        },
+        "cacheRead": {
+          "availability": "available",
+          "value": 30000,
+          "lowerBound": false,
+          "unavailableExecutions": []
+        },
+        "cacheWrite": {
+          "availability": "unavailable",
+          "value": null,
+          "lowerBound": false,
+          "unavailableExecutions": [
+            "EXE-20260110T123000000Z-f0000004"
+          ]
+        },
+        "total": {
+          "availability": "partial",
+          "value": 30750,
+          "lowerBound": true,
+          "unavailableExecutions": [
+            "EXE-20260110T123000000Z-f0000004"
+          ],
+          "derivation": "input + output + cacheRead + cacheWrite"
+        }
+      },
+      "cost": {
+        "providerReported": {
+          "availability": "unavailable",
+          "amount": null,
+          "currency": null,
+          "lowerBound": false,
+          "unavailableExecutions": [
+            "EXE-20260110T123000000Z-f0000004"
+          ],
+          "basis": "provider-reported: observed cost.execution_total"
+        },
+        "priceTableDerived": {
+          "availability": "unavailable",
+          "amount": null,
+          "currency": "USD",
+          "lowerBound": false,
+          "unavailableExecutions": [
+            "EXE-20260110T123000000Z-f0000004"
+          ],
+          "basis": "estimated:fixture-prices-not-real@fixture-1/2026-01-01"
+        }
+      }
+    },
+    {
+      "key": "WI-F5",
+      "executions": [
+        "EXE-20260110T160000000Z-f0000006"
+      ],
+      "tokens": {
+        "input": {
+          "availability": "available",
+          "value": 40,
+          "lowerBound": false,
+          "unavailableExecutions": []
+        },
+        "output": {
+          "availability": "available",
+          "value": 500,
+          "lowerBound": true,
+          "unavailableExecutions": []
+        },
+        "cacheRead": {
+          "availability": "available",
+          "value": 10000,
+          "lowerBound": false,
+          "unavailableExecutions": []
+        },
+        "cacheWrite": {
+          "availability": "available",
+          "value": 2000,
+          "lowerBound": false,
+          "unavailableExecutions": []
+        },
+        "total": {
+          "availability": "available",
+          "value": 12540,
+          "lowerBound": true,
+          "unavailableExecutions": [],
+          "derivation": "input + output + cacheRead + cacheWrite"
+        }
+      },
+      "cost": {
+        "providerReported": {
+          "availability": "unavailable",
+          "amount": null,
+          "currency": null,
+          "lowerBound": false,
+          "unavailableExecutions": [
+            "EXE-20260110T160000000Z-f0000006"
+          ],
+          "basis": "provider-reported: observed cost.execution_total"
+        },
+        "priceTableDerived": {
+          "availability": "unavailable",
+          "amount": null,
+          "currency": "USD",
+          "lowerBound": false,
+          "unavailableExecutions": [
+            "EXE-20260110T160000000Z-f0000006"
+          ],
+          "basis": "estimated:fixture-prices-not-real@fixture-1/2026-01-01"
+        }
+      }
+    },
+    {
+      "key": "WI-F6",
+      "executions": [
+        "EXE-20260110T170000000Z-f0000007"
+      ],
+      "tokens": {
+        "input": {
+          "availability": "unavailable",
+          "value": null,
+          "lowerBound": false,
+          "unavailableExecutions": [
+            "EXE-20260110T170000000Z-f0000007"
+          ]
+        },
+        "output": {
+          "availability": "unavailable",
+          "value": null,
+          "lowerBound": false,
+          "unavailableExecutions": [
+            "EXE-20260110T170000000Z-f0000007"
+          ]
+        },
+        "cacheRead": {
+          "availability": "unavailable",
+          "value": null,
+          "lowerBound": false,
+          "unavailableExecutions": [
+            "EXE-20260110T170000000Z-f0000007"
+          ]
+        },
+        "cacheWrite": {
+          "availability": "unavailable",
+          "value": null,
+          "lowerBound": false,
+          "unavailableExecutions": [
+            "EXE-20260110T170000000Z-f0000007"
+          ]
+        },
+        "total": {
+          "availability": "unavailable",
+          "value": null,
+          "lowerBound": false,
+          "unavailableExecutions": [
+            "EXE-20260110T170000000Z-f0000007"
+          ],
+          "derivation": "input + output + cacheRead + cacheWrite"
+        }
+      },
+      "cost": {
+        "providerReported": {
+          "availability": "unavailable",
+          "amount": null,
+          "currency": null,
+          "lowerBound": false,
+          "unavailableExecutions": [
+            "EXE-20260110T170000000Z-f0000007"
+          ],
+          "basis": "provider-reported: observed cost.execution_total"
+        },
+        "priceTableDerived": {
+          "availability": "unavailable",
+          "amount": null,
+          "currency": "USD",
+          "lowerBound": false,
+          "unavailableExecutions": [
+            "EXE-20260110T170000000Z-f0000007"
+          ],
+          "basis": "estimated:fixture-prices-not-real@fixture-1/2026-01-01"
+        }
+      }
+    }
+  ],
+  "byAgent": [
+    {
+      "key": "fixture-provider/fixture-runtime",
+      "executions": [
+        "EXE-20260110T110000000Z-f0000001",
+        "EXE-20260110T170000000Z-f0000007"
+      ],
+      "tokens": {
+        "input": {
+          "availability": "partial",
+          "value": 100,
+          "lowerBound": true,
+          "unavailableExecutions": [
+            "EXE-20260110T170000000Z-f0000007"
+          ]
+        },
+        "output": {
+          "availability": "partial",
+          "value": 2000,
+          "lowerBound": true,
+          "unavailableExecutions": [
+            "EXE-20260110T170000000Z-f0000007"
+          ]
+        },
+        "cacheRead": {
+          "availability": "partial",
+          "value": 50000,
+          "lowerBound": true,
+          "unavailableExecutions": [
+            "EXE-20260110T170000000Z-f0000007"
+          ]
+        },
+        "cacheWrite": {
+          "availability": "partial",
+          "value": 4000,
+          "lowerBound": true,
+          "unavailableExecutions": [
+            "EXE-20260110T170000000Z-f0000007"
+          ]
+        },
+        "total": {
+          "availability": "partial",
+          "value": 56100,
+          "lowerBound": true,
+          "unavailableExecutions": [
+            "EXE-20260110T170000000Z-f0000007"
+          ],
+          "derivation": "input + output + cacheRead + cacheWrite"
+        }
+      },
+      "cost": {
+        "providerReported": {
+          "availability": "unavailable",
+          "amount": null,
+          "currency": null,
+          "lowerBound": false,
+          "unavailableExecutions": [
+            "EXE-20260110T110000000Z-f0000001",
+            "EXE-20260110T170000000Z-f0000007"
+          ],
+          "basis": "provider-reported: observed cost.execution_total"
+        },
+        "priceTableDerived": {
+          "availability": "partial",
+          "amount": "0.040200",
+          "currency": "USD",
+          "lowerBound": true,
+          "unavailableExecutions": [
+            "EXE-20260110T170000000Z-f0000007"
+          ],
+          "basis": "estimated:fixture-prices-not-real@fixture-1/2026-01-01"
+        }
+      }
+    },
+    {
+      "key": "fixture-provider/fixture-runtime/implementer-1",
+      "executions": [
+        "EXE-20260110T120500000Z-f0000002",
+        "EXE-20260110T150000000Z-f0000005"
+      ],
+      "tokens": {
+        "input": {
+          "availability": "available",
+          "value": 420,
+          "lowerBound": false,
+          "unavailableExecutions": []
+        },
+        "output": {
+          "availability": "available",
+          "value": 12000,
+          "lowerBound": true,
+          "unavailableExecutions": []
+        },
+        "cacheRead": {
+          "availability": "available",
+          "value": 550000,
+          "lowerBound": false,
+          "unavailableExecutions": []
+        },
+        "cacheWrite": {
+          "availability": "available",
+          "value": 28000,
+          "lowerBound": false,
+          "unavailableExecutions": []
+        },
+        "total": {
+          "availability": "available",
+          "value": 590420,
+          "lowerBound": true,
+          "unavailableExecutions": [],
+          "derivation": "input + output + cacheRead + cacheWrite"
+        }
+      },
+      "cost": {
+        "providerReported": {
+          "availability": "partial",
+          "amount": "1.250000",
+          "currency": "USD",
+          "lowerBound": true,
+          "unavailableExecutions": [
+            "EXE-20260110T150000000Z-f0000005"
+          ],
+          "basis": "provider-reported: observed cost.execution_total"
+        },
+        "priceTableDerived": {
+          "availability": "available",
+          "amount": "0.300840",
+          "currency": "USD",
+          "lowerBound": true,
+          "unavailableExecutions": [],
+          "basis": "estimated:fixture-prices-not-real@fixture-1/2026-01-01"
+        }
+      }
+    },
+    {
+      "key": "fixture-provider/fixture-runtime/implementer-2",
+      "executions": [
+        "EXE-20260110T121000000Z-f0000003"
+      ],
+      "tokens": {
+        "input": {
+          "availability": "unavailable",
+          "value": null,
+          "lowerBound": false,
+          "unavailableExecutions": [
+            "EXE-20260110T121000000Z-f0000003"
+          ]
+        },
+        "output": {
+          "availability": "unavailable",
+          "value": null,
+          "lowerBound": false,
+          "unavailableExecutions": [
+            "EXE-20260110T121000000Z-f0000003"
+          ]
+        },
+        "cacheRead": {
+          "availability": "unavailable",
+          "value": null,
+          "lowerBound": false,
+          "unavailableExecutions": [
+            "EXE-20260110T121000000Z-f0000003"
+          ]
+        },
+        "cacheWrite": {
+          "availability": "unavailable",
+          "value": null,
+          "lowerBound": false,
+          "unavailableExecutions": [
+            "EXE-20260110T121000000Z-f0000003"
+          ]
+        },
+        "total": {
+          "availability": "unavailable",
+          "value": null,
+          "lowerBound": false,
+          "unavailableExecutions": [
+            "EXE-20260110T121000000Z-f0000003"
+          ],
+          "derivation": "input + output + cacheRead + cacheWrite"
+        }
+      },
+      "cost": {
+        "providerReported": {
+          "availability": "unavailable",
+          "amount": null,
+          "currency": null,
+          "lowerBound": false,
+          "unavailableExecutions": [
+            "EXE-20260110T121000000Z-f0000003"
+          ],
+          "basis": "provider-reported: observed cost.execution_total"
+        },
+        "priceTableDerived": {
+          "availability": "unavailable",
+          "amount": null,
+          "currency": "USD",
+          "lowerBound": false,
+          "unavailableExecutions": [
+            "EXE-20260110T121000000Z-f0000003"
+          ],
+          "basis": "estimated:fixture-prices-not-real@fixture-1/2026-01-01"
+        }
+      }
+    },
+    {
+      "key": "fixture-provider/fixture-runtime/reviewer-1",
+      "executions": [
+        "EXE-20260110T160000000Z-f0000006"
+      ],
+      "tokens": {
+        "input": {
+          "availability": "available",
+          "value": 40,
+          "lowerBound": false,
+          "unavailableExecutions": []
+        },
+        "output": {
+          "availability": "available",
+          "value": 500,
+          "lowerBound": true,
+          "unavailableExecutions": []
+        },
+        "cacheRead": {
+          "availability": "available",
+          "value": 10000,
+          "lowerBound": false,
+          "unavailableExecutions": []
+        },
+        "cacheWrite": {
+          "availability": "available",
+          "value": 2000,
+          "lowerBound": false,
+          "unavailableExecutions": []
+        },
+        "total": {
+          "availability": "available",
+          "value": 12540,
+          "lowerBound": true,
+          "unavailableExecutions": [],
+          "derivation": "input + output + cacheRead + cacheWrite"
+        }
+      },
+      "cost": {
+        "providerReported": {
+          "availability": "unavailable",
+          "amount": null,
+          "currency": null,
+          "lowerBound": false,
+          "unavailableExecutions": [
+            "EXE-20260110T160000000Z-f0000006"
+          ],
+          "basis": "provider-reported: observed cost.execution_total"
+        },
+        "priceTableDerived": {
+          "availability": "unavailable",
+          "amount": null,
+          "currency": "USD",
+          "lowerBound": false,
+          "unavailableExecutions": [
+            "EXE-20260110T160000000Z-f0000006"
+          ],
+          "basis": "estimated:fixture-prices-not-real@fixture-1/2026-01-01"
+        }
+      }
+    },
+    {
+      "key": "fixture-provider/fixture-runtime/tester-1",
+      "executions": [
+        "EXE-20260110T123000000Z-f0000004"
+      ],
+      "tokens": {
+        "input": {
+          "availability": "available",
+          "value": 50,
+          "lowerBound": false,
+          "unavailableExecutions": []
+        },
+        "output": {
+          "availability": "available",
+          "value": 700,
+          "lowerBound": true,
+          "unavailableExecutions": []
+        },
+        "cacheRead": {
+          "availability": "available",
+          "value": 30000,
+          "lowerBound": false,
+          "unavailableExecutions": []
+        },
+        "cacheWrite": {
+          "availability": "unavailable",
+          "value": null,
+          "lowerBound": false,
+          "unavailableExecutions": [
+            "EXE-20260110T123000000Z-f0000004"
+          ]
+        },
+        "total": {
+          "availability": "partial",
+          "value": 30750,
+          "lowerBound": true,
+          "unavailableExecutions": [
+            "EXE-20260110T123000000Z-f0000004"
+          ],
+          "derivation": "input + output + cacheRead + cacheWrite"
+        }
+      },
+      "cost": {
+        "providerReported": {
+          "availability": "unavailable",
+          "amount": null,
+          "currency": null,
+          "lowerBound": false,
+          "unavailableExecutions": [
+            "EXE-20260110T123000000Z-f0000004"
+          ],
+          "basis": "provider-reported: observed cost.execution_total"
+        },
+        "priceTableDerived": {
+          "availability": "unavailable",
+          "amount": null,
+          "currency": "USD",
+          "lowerBound": false,
+          "unavailableExecutions": [
+            "EXE-20260110T123000000Z-f0000004"
+          ],
+          "basis": "estimated:fixture-prices-not-real@fixture-1/2026-01-01"
+        }
+      }
+    }
+  ],
+  "byRole": [
+    {
+      "key": "(not recorded)",
+      "executions": [
+        "EXE-20260110T170000000Z-f0000007"
+      ],
+      "tokens": {
+        "input": {
+          "availability": "unavailable",
+          "value": null,
+          "lowerBound": false,
+          "unavailableExecutions": [
+            "EXE-20260110T170000000Z-f0000007"
+          ]
+        },
+        "output": {
+          "availability": "unavailable",
+          "value": null,
+          "lowerBound": false,
+          "unavailableExecutions": [
+            "EXE-20260110T170000000Z-f0000007"
+          ]
+        },
+        "cacheRead": {
+          "availability": "unavailable",
+          "value": null,
+          "lowerBound": false,
+          "unavailableExecutions": [
+            "EXE-20260110T170000000Z-f0000007"
+          ]
+        },
+        "cacheWrite": {
+          "availability": "unavailable",
+          "value": null,
+          "lowerBound": false,
+          "unavailableExecutions": [
+            "EXE-20260110T170000000Z-f0000007"
+          ]
+        },
+        "total": {
+          "availability": "unavailable",
+          "value": null,
+          "lowerBound": false,
+          "unavailableExecutions": [
+            "EXE-20260110T170000000Z-f0000007"
+          ],
+          "derivation": "input + output + cacheRead + cacheWrite"
+        }
+      },
+      "cost": {
+        "providerReported": {
+          "availability": "unavailable",
+          "amount": null,
+          "currency": null,
+          "lowerBound": false,
+          "unavailableExecutions": [
+            "EXE-20260110T170000000Z-f0000007"
+          ],
+          "basis": "provider-reported: observed cost.execution_total"
+        },
+        "priceTableDerived": {
+          "availability": "unavailable",
+          "amount": null,
+          "currency": "USD",
+          "lowerBound": false,
+          "unavailableExecutions": [
+            "EXE-20260110T170000000Z-f0000007"
+          ],
+          "basis": "estimated:fixture-prices-not-real@fixture-1/2026-01-01"
+        }
+      }
+    },
+    {
+      "key": "coordinator",
+      "executions": [
+        "EXE-20260110T110000000Z-f0000001"
+      ],
+      "tokens": {
+        "input": {
+          "availability": "available",
+          "value": 100,
+          "lowerBound": false,
+          "unavailableExecutions": []
+        },
+        "output": {
+          "availability": "available",
+          "value": 2000,
+          "lowerBound": true,
+          "unavailableExecutions": []
+        },
+        "cacheRead": {
+          "availability": "available",
+          "value": 50000,
+          "lowerBound": false,
+          "unavailableExecutions": []
+        },
+        "cacheWrite": {
+          "availability": "available",
+          "value": 4000,
+          "lowerBound": false,
+          "unavailableExecutions": []
+        },
+        "total": {
+          "availability": "available",
+          "value": 56100,
+          "lowerBound": true,
+          "unavailableExecutions": [],
+          "derivation": "input + output + cacheRead + cacheWrite"
+        }
+      },
+      "cost": {
+        "providerReported": {
+          "availability": "unavailable",
+          "amount": null,
+          "currency": null,
+          "lowerBound": false,
+          "unavailableExecutions": [
+            "EXE-20260110T110000000Z-f0000001"
+          ],
+          "basis": "provider-reported: observed cost.execution_total"
+        },
+        "priceTableDerived": {
+          "availability": "available",
+          "amount": "0.040200",
+          "currency": "USD",
+          "lowerBound": true,
+          "unavailableExecutions": [],
+          "basis": "estimated:fixture-prices-not-real@fixture-1/2026-01-01"
+        }
+      }
+    },
+    {
+      "key": "development",
+      "executions": [
+        "EXE-20260110T121000000Z-f0000003"
+      ],
+      "tokens": {
+        "input": {
+          "availability": "unavailable",
+          "value": null,
+          "lowerBound": false,
+          "unavailableExecutions": [
+            "EXE-20260110T121000000Z-f0000003"
+          ]
+        },
+        "output": {
+          "availability": "unavailable",
+          "value": null,
+          "lowerBound": false,
+          "unavailableExecutions": [
+            "EXE-20260110T121000000Z-f0000003"
+          ]
+        },
+        "cacheRead": {
+          "availability": "unavailable",
+          "value": null,
+          "lowerBound": false,
+          "unavailableExecutions": [
+            "EXE-20260110T121000000Z-f0000003"
+          ]
+        },
+        "cacheWrite": {
+          "availability": "unavailable",
+          "value": null,
+          "lowerBound": false,
+          "unavailableExecutions": [
+            "EXE-20260110T121000000Z-f0000003"
+          ]
+        },
+        "total": {
+          "availability": "unavailable",
+          "value": null,
+          "lowerBound": false,
+          "unavailableExecutions": [
+            "EXE-20260110T121000000Z-f0000003"
+          ],
+          "derivation": "input + output + cacheRead + cacheWrite"
+        }
+      },
+      "cost": {
+        "providerReported": {
+          "availability": "unavailable",
+          "amount": null,
+          "currency": null,
+          "lowerBound": false,
+          "unavailableExecutions": [
+            "EXE-20260110T121000000Z-f0000003"
+          ],
+          "basis": "provider-reported: observed cost.execution_total"
+        },
+        "priceTableDerived": {
+          "availability": "unavailable",
+          "amount": null,
+          "currency": "USD",
+          "lowerBound": false,
+          "unavailableExecutions": [
+            "EXE-20260110T121000000Z-f0000003"
+          ],
+          "basis": "estimated:fixture-prices-not-real@fixture-1/2026-01-01"
+        }
+      }
+    },
+    {
+      "key": "implementer",
+      "executions": [
+        "EXE-20260110T120500000Z-f0000002",
+        "EXE-20260110T150000000Z-f0000005"
+      ],
+      "tokens": {
+        "input": {
+          "availability": "available",
+          "value": 420,
+          "lowerBound": false,
+          "unavailableExecutions": []
+        },
+        "output": {
+          "availability": "available",
+          "value": 12000,
+          "lowerBound": true,
+          "unavailableExecutions": []
+        },
+        "cacheRead": {
+          "availability": "available",
+          "value": 550000,
+          "lowerBound": false,
+          "unavailableExecutions": []
+        },
+        "cacheWrite": {
+          "availability": "available",
+          "value": 28000,
+          "lowerBound": false,
+          "unavailableExecutions": []
+        },
+        "total": {
+          "availability": "available",
+          "value": 590420,
+          "lowerBound": true,
+          "unavailableExecutions": [],
+          "derivation": "input + output + cacheRead + cacheWrite"
+        }
+      },
+      "cost": {
+        "providerReported": {
+          "availability": "partial",
+          "amount": "1.250000",
+          "currency": "USD",
+          "lowerBound": true,
+          "unavailableExecutions": [
+            "EXE-20260110T150000000Z-f0000005"
+          ],
+          "basis": "provider-reported: observed cost.execution_total"
+        },
+        "priceTableDerived": {
+          "availability": "available",
+          "amount": "0.300840",
+          "currency": "USD",
+          "lowerBound": true,
+          "unavailableExecutions": [],
+          "basis": "estimated:fixture-prices-not-real@fixture-1/2026-01-01"
+        }
+      }
+    },
+    {
+      "key": "reviewer",
+      "executions": [
+        "EXE-20260110T160000000Z-f0000006"
+      ],
+      "tokens": {
+        "input": {
+          "availability": "available",
+          "value": 40,
+          "lowerBound": false,
+          "unavailableExecutions": []
+        },
+        "output": {
+          "availability": "available",
+          "value": 500,
+          "lowerBound": true,
+          "unavailableExecutions": []
+        },
+        "cacheRead": {
+          "availability": "available",
+          "value": 10000,
+          "lowerBound": false,
+          "unavailableExecutions": []
+        },
+        "cacheWrite": {
+          "availability": "available",
+          "value": 2000,
+          "lowerBound": false,
+          "unavailableExecutions": []
+        },
+        "total": {
+          "availability": "available",
+          "value": 12540,
+          "lowerBound": true,
+          "unavailableExecutions": [],
+          "derivation": "input + output + cacheRead + cacheWrite"
+        }
+      },
+      "cost": {
+        "providerReported": {
+          "availability": "unavailable",
+          "amount": null,
+          "currency": null,
+          "lowerBound": false,
+          "unavailableExecutions": [
+            "EXE-20260110T160000000Z-f0000006"
+          ],
+          "basis": "provider-reported: observed cost.execution_total"
+        },
+        "priceTableDerived": {
+          "availability": "unavailable",
+          "amount": null,
+          "currency": "USD",
+          "lowerBound": false,
+          "unavailableExecutions": [
+            "EXE-20260110T160000000Z-f0000006"
+          ],
+          "basis": "estimated:fixture-prices-not-real@fixture-1/2026-01-01"
+        }
+      }
+    },
+    {
+      "key": "tester",
+      "executions": [
+        "EXE-20260110T123000000Z-f0000004"
+      ],
+      "tokens": {
+        "input": {
+          "availability": "available",
+          "value": 50,
+          "lowerBound": false,
+          "unavailableExecutions": []
+        },
+        "output": {
+          "availability": "available",
+          "value": 700,
+          "lowerBound": true,
+          "unavailableExecutions": []
+        },
+        "cacheRead": {
+          "availability": "available",
+          "value": 30000,
+          "lowerBound": false,
+          "unavailableExecutions": []
+        },
+        "cacheWrite": {
+          "availability": "unavailable",
+          "value": null,
+          "lowerBound": false,
+          "unavailableExecutions": [
+            "EXE-20260110T123000000Z-f0000004"
+          ]
+        },
+        "total": {
+          "availability": "partial",
+          "value": 30750,
+          "lowerBound": true,
+          "unavailableExecutions": [
+            "EXE-20260110T123000000Z-f0000004"
+          ],
+          "derivation": "input + output + cacheRead + cacheWrite"
+        }
+      },
+      "cost": {
+        "providerReported": {
+          "availability": "unavailable",
+          "amount": null,
+          "currency": null,
+          "lowerBound": false,
+          "unavailableExecutions": [
+            "EXE-20260110T123000000Z-f0000004"
+          ],
+          "basis": "provider-reported: observed cost.execution_total"
+        },
+        "priceTableDerived": {
+          "availability": "unavailable",
+          "amount": null,
+          "currency": "USD",
+          "lowerBound": false,
+          "unavailableExecutions": [
+            "EXE-20260110T123000000Z-f0000004"
+          ],
+          "basis": "estimated:fixture-prices-not-real@fixture-1/2026-01-01"
+        }
+      }
+    }
+  ],
+  "byProvider": [
+    {
+      "key": "fixture-provider",
+      "executions": [
+        "EXE-20260110T110000000Z-f0000001",
+        "EXE-20260110T120500000Z-f0000002",
+        "EXE-20260110T121000000Z-f0000003",
+        "EXE-20260110T123000000Z-f0000004",
+        "EXE-20260110T150000000Z-f0000005",
+        "EXE-20260110T160000000Z-f0000006",
+        "EXE-20260110T170000000Z-f0000007"
+      ],
+      "tokens": {
+        "input": {
+          "availability": "partial",
+          "value": 610,
+          "lowerBound": true,
+          "unavailableExecutions": [
+            "EXE-20260110T121000000Z-f0000003",
+            "EXE-20260110T170000000Z-f0000007"
+          ]
+        },
+        "output": {
+          "availability": "partial",
+          "value": 15200,
+          "lowerBound": true,
+          "unavailableExecutions": [
+            "EXE-20260110T121000000Z-f0000003",
+            "EXE-20260110T170000000Z-f0000007"
+          ]
+        },
+        "cacheRead": {
+          "availability": "partial",
+          "value": 640000,
+          "lowerBound": true,
+          "unavailableExecutions": [
+            "EXE-20260110T121000000Z-f0000003",
+            "EXE-20260110T170000000Z-f0000007"
+          ]
+        },
+        "cacheWrite": {
+          "availability": "partial",
+          "value": 34000,
+          "lowerBound": true,
+          "unavailableExecutions": [
+            "EXE-20260110T121000000Z-f0000003",
+            "EXE-20260110T123000000Z-f0000004",
+            "EXE-20260110T170000000Z-f0000007"
+          ]
+        },
+        "total": {
+          "availability": "partial",
+          "value": 689810,
+          "lowerBound": true,
+          "unavailableExecutions": [
+            "EXE-20260110T121000000Z-f0000003",
+            "EXE-20260110T123000000Z-f0000004",
+            "EXE-20260110T170000000Z-f0000007"
+          ],
+          "derivation": "input + output + cacheRead + cacheWrite"
+        }
+      },
+      "cost": {
+        "providerReported": {
+          "availability": "partial",
+          "amount": "1.250000",
+          "currency": "USD",
+          "lowerBound": true,
+          "unavailableExecutions": [
+            "EXE-20260110T110000000Z-f0000001",
+            "EXE-20260110T121000000Z-f0000003",
+            "EXE-20260110T123000000Z-f0000004",
+            "EXE-20260110T150000000Z-f0000005",
+            "EXE-20260110T160000000Z-f0000006",
+            "EXE-20260110T170000000Z-f0000007"
+          ],
+          "basis": "provider-reported: observed cost.execution_total"
+        },
+        "priceTableDerived": {
+          "availability": "partial",
+          "amount": "0.341040",
+          "currency": "USD",
+          "lowerBound": true,
+          "unavailableExecutions": [
+            "EXE-20260110T121000000Z-f0000003",
+            "EXE-20260110T123000000Z-f0000004",
+            "EXE-20260110T160000000Z-f0000006",
+            "EXE-20260110T170000000Z-f0000007"
+          ],
+          "basis": "estimated:fixture-prices-not-real@fixture-1/2026-01-01"
+        }
+      }
+    }
+  ],
+  "byModel": [
+    {
+      "key": "fixture-model",
+      "executions": [
+        "EXE-20260110T110000000Z-f0000001",
+        "EXE-20260110T120500000Z-f0000002",
+        "EXE-20260110T121000000Z-f0000003",
+        "EXE-20260110T123000000Z-f0000004",
+        "EXE-20260110T150000000Z-f0000005",
+        "EXE-20260110T170000000Z-f0000007"
+      ],
+      "tokens": {
+        "input": {
+          "availability": "partial",
+          "value": 570,
+          "lowerBound": true,
+          "unavailableExecutions": [
+            "EXE-20260110T121000000Z-f0000003",
+            "EXE-20260110T170000000Z-f0000007"
+          ]
+        },
+        "output": {
+          "availability": "partial",
+          "value": 14700,
+          "lowerBound": true,
+          "unavailableExecutions": [
+            "EXE-20260110T121000000Z-f0000003",
+            "EXE-20260110T170000000Z-f0000007"
+          ]
+        },
+        "cacheRead": {
+          "availability": "partial",
+          "value": 630000,
+          "lowerBound": true,
+          "unavailableExecutions": [
+            "EXE-20260110T121000000Z-f0000003",
+            "EXE-20260110T170000000Z-f0000007"
+          ]
+        },
+        "cacheWrite": {
+          "availability": "partial",
+          "value": 32000,
+          "lowerBound": true,
+          "unavailableExecutions": [
+            "EXE-20260110T121000000Z-f0000003",
+            "EXE-20260110T123000000Z-f0000004",
+            "EXE-20260110T170000000Z-f0000007"
+          ]
+        },
+        "total": {
+          "availability": "partial",
+          "value": 677270,
+          "lowerBound": true,
+          "unavailableExecutions": [
+            "EXE-20260110T121000000Z-f0000003",
+            "EXE-20260110T123000000Z-f0000004",
+            "EXE-20260110T170000000Z-f0000007"
+          ],
+          "derivation": "input + output + cacheRead + cacheWrite"
+        }
+      },
+      "cost": {
+        "providerReported": {
+          "availability": "partial",
+          "amount": "1.250000",
+          "currency": "USD",
+          "lowerBound": true,
+          "unavailableExecutions": [
+            "EXE-20260110T110000000Z-f0000001",
+            "EXE-20260110T121000000Z-f0000003",
+            "EXE-20260110T123000000Z-f0000004",
+            "EXE-20260110T150000000Z-f0000005",
+            "EXE-20260110T170000000Z-f0000007"
+          ],
+          "basis": "provider-reported: observed cost.execution_total"
+        },
+        "priceTableDerived": {
+          "availability": "partial",
+          "amount": "0.341040",
+          "currency": "USD",
+          "lowerBound": true,
+          "unavailableExecutions": [
+            "EXE-20260110T121000000Z-f0000003",
+            "EXE-20260110T123000000Z-f0000004",
+            "EXE-20260110T170000000Z-f0000007"
+          ],
+          "basis": "estimated:fixture-prices-not-real@fixture-1/2026-01-01"
+        }
+      }
+    },
+    {
+      "key": "fixture-model-b",
+      "executions": [
+        "EXE-20260110T160000000Z-f0000006"
+      ],
+      "tokens": {
+        "input": {
+          "availability": "available",
+          "value": 40,
+          "lowerBound": false,
+          "unavailableExecutions": []
+        },
+        "output": {
+          "availability": "available",
+          "value": 500,
+          "lowerBound": true,
+          "unavailableExecutions": []
+        },
+        "cacheRead": {
+          "availability": "available",
+          "value": 10000,
+          "lowerBound": false,
+          "unavailableExecutions": []
+        },
+        "cacheWrite": {
+          "availability": "available",
+          "value": 2000,
+          "lowerBound": false,
+          "unavailableExecutions": []
+        },
+        "total": {
+          "availability": "available",
+          "value": 12540,
+          "lowerBound": true,
+          "unavailableExecutions": [],
+          "derivation": "input + output + cacheRead + cacheWrite"
+        }
+      },
+      "cost": {
+        "providerReported": {
+          "availability": "unavailable",
+          "amount": null,
+          "currency": null,
+          "lowerBound": false,
+          "unavailableExecutions": [
+            "EXE-20260110T160000000Z-f0000006"
+          ],
+          "basis": "provider-reported: observed cost.execution_total"
+        },
+        "priceTableDerived": {
+          "availability": "unavailable",
+          "amount": null,
+          "currency": "USD",
+          "lowerBound": false,
+          "unavailableExecutions": [
+            "EXE-20260110T160000000Z-f0000006"
+          ],
+          "basis": "estimated:fixture-prices-not-real@fixture-1/2026-01-01"
+        }
+      }
+    }
+  ],
+  "byStep": [
+    {
+      "key": "(outside any step)",
+      "executions": [
+        "EXE-20260110T110000000Z-f0000001",
+        "EXE-20260110T120500000Z-f0000002",
+        "EXE-20260110T121000000Z-f0000003",
+        "EXE-20260110T150000000Z-f0000005",
+        "EXE-20260110T160000000Z-f0000006",
+        "EXE-20260110T170000000Z-f0000007"
+      ],
+      "tokens": {
+        "input": {
+          "availability": "partial",
+          "value": 560,
+          "lowerBound": true,
+          "unavailableExecutions": [
+            "EXE-20260110T121000000Z-f0000003",
+            "EXE-20260110T170000000Z-f0000007"
+          ]
+        },
+        "output": {
+          "availability": "partial",
+          "value": 14500,
+          "lowerBound": true,
+          "unavailableExecutions": [
+            "EXE-20260110T121000000Z-f0000003",
+            "EXE-20260110T170000000Z-f0000007"
+          ]
+        },
+        "cacheRead": {
+          "availability": "partial",
+          "value": 610000,
+          "lowerBound": true,
+          "unavailableExecutions": [
+            "EXE-20260110T121000000Z-f0000003",
+            "EXE-20260110T170000000Z-f0000007"
+          ]
+        },
+        "cacheWrite": {
+          "availability": "partial",
+          "value": 34000,
+          "lowerBound": true,
+          "unavailableExecutions": [
+            "EXE-20260110T121000000Z-f0000003",
+            "EXE-20260110T170000000Z-f0000007"
+          ]
+        },
+        "total": {
+          "availability": "partial",
+          "value": 659060,
+          "lowerBound": true,
+          "unavailableExecutions": [
+            "EXE-20260110T121000000Z-f0000003",
+            "EXE-20260110T170000000Z-f0000007"
+          ],
+          "derivation": "input + output + cacheRead + cacheWrite"
+        }
+      },
+      "cost": {
+        "providerReported": {
+          "availability": "partial",
+          "amount": "1.250000",
+          "currency": "USD",
+          "lowerBound": true,
+          "unavailableExecutions": [
+            "EXE-20260110T110000000Z-f0000001",
+            "EXE-20260110T121000000Z-f0000003",
+            "EXE-20260110T150000000Z-f0000005",
+            "EXE-20260110T160000000Z-f0000006",
+            "EXE-20260110T170000000Z-f0000007"
+          ],
+          "basis": "provider-reported: observed cost.execution_total"
+        },
+        "priceTableDerived": {
+          "availability": "partial",
+          "amount": "0.341040",
+          "currency": "USD",
+          "lowerBound": true,
+          "unavailableExecutions": [
+            "EXE-20260110T121000000Z-f0000003",
+            "EXE-20260110T160000000Z-f0000006",
+            "EXE-20260110T170000000Z-f0000007"
+          ],
+          "basis": "estimated:fixture-prices-not-real@fixture-1/2026-01-01"
+        }
+      }
+    },
+    {
+      "key": "STEP-F04-1",
+      "executions": [
+        "EXE-20260110T123000000Z-f0000004"
+      ],
+      "tokens": {
+        "input": {
+          "availability": "available",
+          "value": 50,
+          "lowerBound": false,
+          "unavailableExecutions": []
+        },
+        "output": {
+          "availability": "available",
+          "value": 700,
+          "lowerBound": true,
+          "unavailableExecutions": []
+        },
+        "cacheRead": {
+          "availability": "available",
+          "value": 30000,
+          "lowerBound": false,
+          "unavailableExecutions": []
+        },
+        "cacheWrite": {
+          "availability": "unavailable",
+          "value": null,
+          "lowerBound": false,
+          "unavailableExecutions": [
+            "EXE-20260110T123000000Z-f0000004"
+          ]
+        },
+        "total": {
+          "availability": "partial",
+          "value": 30750,
+          "lowerBound": true,
+          "unavailableExecutions": [
+            "EXE-20260110T123000000Z-f0000004"
+          ],
+          "derivation": "input + output + cacheRead + cacheWrite"
+        }
+      },
+      "cost": {
+        "providerReported": {
+          "availability": "unavailable",
+          "amount": null,
+          "currency": null,
+          "lowerBound": false,
+          "unavailableExecutions": [
+            "EXE-20260110T123000000Z-f0000004"
+          ],
+          "basis": "provider-reported: observed cost.execution_total"
+        },
+        "priceTableDerived": {
+          "availability": "unavailable",
+          "amount": null,
+          "currency": "USD",
+          "lowerBound": false,
+          "unavailableExecutions": [
+            "EXE-20260110T123000000Z-f0000004"
+          ],
+          "basis": "estimated:fixture-prices-not-real@fixture-1/2026-01-01"
+        }
+      }
+    }
+  ],
+  "completeness": {
+    "executions": 7,
+    "tokensComplete": [
+      "EXE-20260110T110000000Z-f0000001",
+      "EXE-20260110T120500000Z-f0000002",
+      "EXE-20260110T150000000Z-f0000005",
+      "EXE-20260110T160000000Z-f0000006"
+    ],
+    "tokensPartial": [
+      {
+        "executionId": "EXE-20260110T123000000Z-f0000004",
+        "missing": [
+          {
+            "metric": "tokens.cache_write",
+            "capabilityStatus": "supported-unavailable",
+            "reason": "reported on 3 of 5 requests"
+          }
+        ]
+      }
+    ],
+    "tokensUnavailable": [
+      {
+        "executionId": "EXE-20260110T121000000Z-f0000003",
+        "missing": [
+          {
+            "metric": "tokens.input",
+            "capabilityStatus": "supported-unavailable",
+            "reason": "runtime family can expose this metric, but no observation has been ingested for this execution"
+          },
+          {
+            "metric": "tokens.output",
+            "capabilityStatus": "supported-unavailable",
+            "reason": "runtime family can expose this metric, but no observation has been ingested for this execution"
+          },
+          {
+            "metric": "tokens.cache_read",
+            "capabilityStatus": "supported-unavailable",
+            "reason": "runtime family can expose this metric, but no observation has been ingested for this execution"
+          },
+          {
+            "metric": "tokens.cache_write",
+            "capabilityStatus": "supported-unavailable",
+            "reason": "runtime family can expose this metric, but no observation has been ingested for this execution"
+          }
+        ]
+      },
+      {
+        "executionId": "EXE-20260110T170000000Z-f0000007",
+        "missing": [
+          {
+            "metric": "tokens.input",
+            "capabilityStatus": "unknown",
+            "reason": "runtime capability not reported or mapped"
+          },
+          {
+            "metric": "tokens.output",
+            "capabilityStatus": "unknown",
+            "reason": "runtime capability not reported or mapped"
+          },
+          {
+            "metric": "tokens.cache_read",
+            "capabilityStatus": "unknown",
+            "reason": "runtime capability not reported or mapped"
+          },
+          {
+            "metric": "tokens.cache_write",
+            "capabilityStatus": "unknown",
+            "reason": "runtime capability not reported or mapped"
+          }
+        ]
+      }
+    ],
+    "providerCostReported": [
+      "EXE-20260110T120500000Z-f0000002"
+    ]
+  },
+  "failedOrRepeated": {
+    "abandoned": [
+      {
+        "executionId": "EXE-20260110T160000000Z-f0000006",
+        "workItemId": "WI-F5",
+        "reason": "superseded by WI-F2; the reviewer was stopped"
+      }
+    ],
+    "failed": [
+      {
+        "executionId": "EXE-20260110T123000000Z-f0000004",
+        "workItemId": "WI-F4",
+        "failedSteps": [
+          {
+            "step": "STEP-F04-1",
+            "reason": "acceptance tests failed; the work item was handed back"
+          }
+        ]
+      }
+    ],
+    "unfinalized": [
+      {
+        "executionId": "EXE-20260110T170000000Z-f0000007",
+        "workItemId": "WI-F6",
+        "status": "active"
+      }
+    ],
+    "repeatedWorkItems": [
+      {
+        "workItemId": "WI-F2",
+        "executions": [
+          "EXE-20260110T120500000Z-f0000002",
+          "EXE-20260110T150000000Z-f0000005"
+        ],
+        "repeats": [
+          "EXE-20260110T150000000Z-f0000005"
+        ]
+      }
+    ],
+    "figures": {
+      "executions": [
+        "EXE-20260110T123000000Z-f0000004",
+        "EXE-20260110T150000000Z-f0000005",
+        "EXE-20260110T160000000Z-f0000006",
+        "EXE-20260110T170000000Z-f0000007"
+      ],
+      "tokens": {
+        "input": {
+          "availability": "partial",
+          "value": 210,
+          "lowerBound": true,
+          "unavailableExecutions": [
+            "EXE-20260110T170000000Z-f0000007"
+          ]
+        },
+        "output": {
+          "availability": "partial",
+          "value": 4200,
+          "lowerBound": true,
+          "unavailableExecutions": [
+            "EXE-20260110T170000000Z-f0000007"
+          ]
+        },
+        "cacheRead": {
+          "availability": "partial",
+          "value": 190000,
+          "lowerBound": true,
+          "unavailableExecutions": [
+            "EXE-20260110T170000000Z-f0000007"
+          ]
+        },
+        "cacheWrite": {
+          "availability": "partial",
+          "value": 10000,
+          "lowerBound": true,
+          "unavailableExecutions": [
+            "EXE-20260110T123000000Z-f0000004",
+            "EXE-20260110T170000000Z-f0000007"
+          ]
+        },
+        "total": {
+          "availability": "partial",
+          "value": 204410,
+          "lowerBound": true,
+          "unavailableExecutions": [
+            "EXE-20260110T123000000Z-f0000004",
+            "EXE-20260110T170000000Z-f0000007"
+          ],
+          "derivation": "input + output + cacheRead + cacheWrite"
+        }
+      },
+      "cost": {
+        "providerReported": {
+          "availability": "unavailable",
+          "amount": null,
+          "currency": null,
+          "lowerBound": false,
+          "unavailableExecutions": [
+            "EXE-20260110T123000000Z-f0000004",
+            "EXE-20260110T150000000Z-f0000005",
+            "EXE-20260110T160000000Z-f0000006",
+            "EXE-20260110T170000000Z-f0000007"
+          ],
+          "basis": "provider-reported: observed cost.execution_total"
+        },
+        "priceTableDerived": {
+          "availability": "partial",
+          "amount": "0.080240",
+          "currency": "USD",
+          "lowerBound": true,
+          "unavailableExecutions": [
+            "EXE-20260110T123000000Z-f0000004",
+            "EXE-20260110T160000000Z-f0000006",
+            "EXE-20260110T170000000Z-f0000007"
+          ],
+          "basis": "estimated:fixture-prices-not-real@fixture-1/2026-01-01"
+        }
+      }
+    }
+  },
+  "executions": [
+    {
+      "executionId": "EXE-20260110T110000000Z-f0000001",
+      "record": {
+        "file": "EXE-20260110T110000000Z-f0000001.json",
+        "sha256": "bb8b3b89e0af92c6bb32bcf850168437823117f109ff884b60c51f55ebfd4bfc"
+      },
+      "workItemId": "WI-F1",
+      "attempt": 1,
+      "attemptsOfWorkItem": 1,
+      "status": "finalized",
+      "outcome": "finalized",
+      "startedAt": "2026-01-10T11:00:00.000Z",
+      "finalizedAt": "2026-01-10T11:40:00.000Z",
+      "phases": [
+        "pre-event"
+      ],
+      "provider": "fixture-provider",
+      "model": "fixture-model",
+      "servedModels": [],
+      "runtime": "fixture-runtime",
+      "agent": "fixture-provider/fixture-runtime",
+      "role": "coordinator",
+      "actorKind": "agent",
+      "parentExecutionId": null,
+      "tokens": {
+        "input": {
+          "availability": "available",
+          "value": 100,
+          "lowerBound": false,
+          "quality": [
+            "observed"
+          ],
+          "source": [
+            "runtime-output/fixture-transcript/session-transcript-jsonl"
+          ]
+        },
+        "output": {
+          "availability": "available",
+          "value": 2000,
+          "lowerBound": true,
+          "quality": [
+            "observed"
+          ],
+          "source": [
+            "runtime-output/fixture-transcript/session-transcript-jsonl"
+          ]
+        },
+        "cacheRead": {
+          "availability": "available",
+          "value": 50000,
+          "lowerBound": false,
+          "quality": [
+            "observed"
+          ],
+          "source": [
+            "runtime-output/fixture-transcript/session-transcript-jsonl"
+          ]
+        },
+        "cacheWrite": {
+          "availability": "available",
+          "value": 4000,
+          "lowerBound": false,
+          "quality": [
+            "observed"
+          ],
+          "source": [
+            "runtime-output/fixture-transcript/session-transcript-jsonl"
+          ]
+        }
+      },
+      "cost": {
+        "providerReported": {
+          "availability": "unavailable",
+          "capabilityStatus": "supported-unavailable",
+          "reason": "runtime family can expose this metric, but no observation has been ingested for this execution"
+        },
+        "priceTableDerived": {
+          "availability": "available",
+          "amount": "0.040200",
+          "currency": "USD",
+          "lowerBound": true
+        },
+        "runtimeEstimates": []
+      }
+    },
+    {
+      "executionId": "EXE-20260110T120500000Z-f0000002",
+      "record": {
+        "file": "EXE-20260110T120500000Z-f0000002.json",
+        "sha256": "9fa9e0a0406d4eee01b7989357d5a98f4e171082edf8e3f283c0b1c03b1d920f"
+      },
+      "workItemId": "WI-F2",
+      "attempt": 1,
+      "attemptsOfWorkItem": 2,
+      "status": "finalized",
+      "outcome": "finalized",
+      "startedAt": "2026-01-10T12:05:00.000Z",
+      "finalizedAt": "2026-01-10T14:00:00.000Z",
+      "phases": [
+        "unsplit (crosses the window boundary)"
+      ],
+      "provider": "fixture-provider",
+      "model": "fixture-model",
+      "servedModels": [
+        "fixture-model"
+      ],
+      "runtime": "fixture-runtime",
+      "agent": "fixture-provider/fixture-runtime/implementer-1",
+      "role": "implementer",
+      "actorKind": "agent",
+      "parentExecutionId": null,
+      "tokens": {
+        "input": {
+          "availability": "available",
+          "value": 300,
+          "lowerBound": false,
+          "quality": [
+            "observed"
+          ],
+          "source": [
+            "runtime-output/fixture-transcript/session-transcript-jsonl"
+          ]
+        },
+        "output": {
+          "availability": "available",
+          "value": 9000,
+          "lowerBound": true,
+          "quality": [
+            "observed"
+          ],
+          "source": [
+            "runtime-output/fixture-transcript/session-transcript-jsonl"
+          ]
+        },
+        "cacheRead": {
+          "availability": "available",
+          "value": 400000,
+          "lowerBound": false,
+          "quality": [
+            "observed"
+          ],
+          "source": [
+            "runtime-output/fixture-transcript/session-transcript-jsonl"
+          ]
+        },
+        "cacheWrite": {
+          "availability": "available",
+          "value": 20000,
+          "lowerBound": false,
+          "quality": [
+            "observed"
+          ],
+          "source": [
+            "runtime-output/fixture-transcript/session-transcript-jsonl"
+          ]
+        }
+      },
+      "cost": {
+        "providerReported": {
+          "availability": "available",
+          "amount": "1.250000",
+          "currency": "USD"
+        },
+        "priceTableDerived": {
+          "availability": "available",
+          "amount": "0.220600",
+          "currency": "USD",
+          "lowerBound": true
+        },
+        "runtimeEstimates": [
+          {
+            "amount": "2.500000",
+            "currency": "USD",
+            "quality": "estimated",
+            "source": "runtime-output/fixture-transcript/session-transcript-jsonl",
+            "note": "the runtime's own estimate; not provider-reported and not price-table-derived"
+          }
+        ]
+      }
+    },
+    {
+      "executionId": "EXE-20260110T121000000Z-f0000003",
+      "record": {
+        "file": "EXE-20260110T121000000Z-f0000003.json",
+        "sha256": "e068e94e952d95dc654f4176bc163ec5e4bf68ef416791a5736434ebb9a8fce3"
+      },
+      "workItemId": "WI-F3",
+      "attempt": 1,
+      "attemptsOfWorkItem": 1,
+      "status": "finalized",
+      "outcome": "finalized",
+      "startedAt": "2026-01-10T12:10:00.000Z",
+      "finalizedAt": "2026-01-10T15:00:00.000Z",
+      "phases": [
+        "timed"
+      ],
+      "provider": "fixture-provider",
+      "model": "fixture-model",
+      "servedModels": [],
+      "runtime": "fixture-runtime",
+      "agent": "fixture-provider/fixture-runtime/implementer-2",
+      "role": "development",
+      "actorKind": "agent",
+      "parentExecutionId": null,
+      "tokens": {
+        "input": {
+          "availability": "unavailable",
+          "value": null,
+          "capabilityStatus": "supported-unavailable",
+          "reason": "runtime family can expose this metric, but no observation has been ingested for this execution"
+        },
+        "output": {
+          "availability": "unavailable",
+          "value": null,
+          "capabilityStatus": "supported-unavailable",
+          "reason": "runtime family can expose this metric, but no observation has been ingested for this execution"
+        },
+        "cacheRead": {
+          "availability": "unavailable",
+          "value": null,
+          "capabilityStatus": "supported-unavailable",
+          "reason": "runtime family can expose this metric, but no observation has been ingested for this execution"
+        },
+        "cacheWrite": {
+          "availability": "unavailable",
+          "value": null,
+          "capabilityStatus": "supported-unavailable",
+          "reason": "runtime family can expose this metric, but no observation has been ingested for this execution"
+        }
+      },
+      "cost": {
+        "providerReported": {
+          "availability": "unavailable",
+          "capabilityStatus": "supported-unavailable",
+          "reason": "runtime family can expose this metric, but no observation has been ingested for this execution"
+        },
+        "priceTableDerived": {
+          "availability": "unavailable",
+          "reason": "no tokens.input measurement to price"
+        },
+        "runtimeEstimates": []
+      }
+    },
+    {
+      "executionId": "EXE-20260110T123000000Z-f0000004",
+      "record": {
+        "file": "EXE-20260110T123000000Z-f0000004.json",
+        "sha256": "28d039e58eb6ae280a3c2437218e13c9a1379d426a167f809f611249eaf2f48c"
+      },
+      "workItemId": "WI-F4",
+      "attempt": 1,
+      "attemptsOfWorkItem": 1,
+      "status": "finalized",
+      "outcome": "failed",
+      "startedAt": "2026-01-10T12:30:00.000Z",
+      "finalizedAt": "2026-01-10T13:30:00.000Z",
+      "phases": [
+        "timed"
+      ],
+      "provider": "fixture-provider",
+      "model": "fixture-model",
+      "servedModels": [],
+      "runtime": "fixture-runtime",
+      "agent": "fixture-provider/fixture-runtime/tester-1",
+      "role": "tester",
+      "actorKind": "agent",
+      "parentExecutionId": null,
+      "tokens": {
+        "input": {
+          "availability": "available",
+          "value": 50,
+          "lowerBound": false,
+          "quality": [
+            "observed"
+          ],
+          "source": [
+            "runtime-output/fixture-transcript/session-transcript-jsonl"
+          ]
+        },
+        "output": {
+          "availability": "available",
+          "value": 700,
+          "lowerBound": true,
+          "quality": [
+            "observed"
+          ],
+          "source": [
+            "runtime-output/fixture-transcript/session-transcript-jsonl"
+          ]
+        },
+        "cacheRead": {
+          "availability": "available",
+          "value": 30000,
+          "lowerBound": false,
+          "quality": [
+            "observed"
+          ],
+          "source": [
+            "runtime-output/fixture-transcript/session-transcript-jsonl"
+          ]
+        },
+        "cacheWrite": {
+          "availability": "unavailable",
+          "value": null,
+          "capabilityStatus": "supported-unavailable",
+          "reason": "reported on 3 of 5 requests"
+        }
+      },
+      "cost": {
+        "providerReported": {
+          "availability": "unavailable",
+          "capabilityStatus": "supported-unavailable",
+          "reason": "runtime family can expose this metric, but no observation has been ingested for this execution"
+        },
+        "priceTableDerived": {
+          "availability": "unavailable",
+          "reason": "no tokens.cache_write measurement to price"
+        },
+        "runtimeEstimates": []
+      }
+    },
+    {
+      "executionId": "EXE-20260110T150000000Z-f0000005",
+      "record": {
+        "file": "EXE-20260110T150000000Z-f0000005.json",
+        "sha256": "02234e35a430f9d13d906b640c5335d7e53dc10e752fd2fea223690c6a465173"
+      },
+      "workItemId": "WI-F2",
+      "attempt": 2,
+      "attemptsOfWorkItem": 2,
+      "status": "finalized",
+      "outcome": "finalized",
+      "startedAt": "2026-01-10T15:00:00.000Z",
+      "finalizedAt": "2026-01-10T16:00:00.000Z",
+      "phases": [
+        "timed"
+      ],
+      "provider": "fixture-provider",
+      "model": "fixture-model",
+      "servedModels": [],
+      "runtime": "fixture-runtime",
+      "agent": "fixture-provider/fixture-runtime/implementer-1",
+      "role": "implementer",
+      "actorKind": "agent",
+      "parentExecutionId": "EXE-20260110T120500000Z-f0000002",
+      "tokens": {
+        "input": {
+          "availability": "available",
+          "value": 120,
+          "lowerBound": false,
+          "quality": [
+            "observed"
+          ],
+          "source": [
+            "runtime-output/fixture-transcript/session-transcript-jsonl"
+          ]
+        },
+        "output": {
+          "availability": "available",
+          "value": 3000,
+          "lowerBound": true,
+          "quality": [
+            "observed"
+          ],
+          "source": [
+            "runtime-output/fixture-transcript/session-transcript-jsonl"
+          ]
+        },
+        "cacheRead": {
+          "availability": "available",
+          "value": 150000,
+          "lowerBound": false,
+          "quality": [
+            "observed"
+          ],
+          "source": [
+            "runtime-output/fixture-transcript/session-transcript-jsonl"
+          ]
+        },
+        "cacheWrite": {
+          "availability": "available",
+          "value": 8000,
+          "lowerBound": false,
+          "quality": [
+            "observed"
+          ],
+          "source": [
+            "runtime-output/fixture-transcript/session-transcript-jsonl"
+          ]
+        }
+      },
+      "cost": {
+        "providerReported": {
+          "availability": "unavailable",
+          "capabilityStatus": "supported-unavailable",
+          "reason": "runtime family can expose this metric, but no observation has been ingested for this execution"
+        },
+        "priceTableDerived": {
+          "availability": "available",
+          "amount": "0.080240",
+          "currency": "USD",
+          "lowerBound": true
+        },
+        "runtimeEstimates": []
+      }
+    },
+    {
+      "executionId": "EXE-20260110T160000000Z-f0000006",
+      "record": {
+        "file": "EXE-20260110T160000000Z-f0000006.json",
+        "sha256": "0635ddfa4c4f79b15f0dd325acb614a641006cde8815a3884b4c90e97339e310"
+      },
+      "workItemId": "WI-F5",
+      "attempt": 1,
+      "attemptsOfWorkItem": 1,
+      "status": "finalized",
+      "outcome": "abandoned",
+      "startedAt": "2026-01-10T16:00:00.000Z",
+      "finalizedAt": "2026-01-10T16:30:00.000Z",
+      "phases": [
+        "timed"
+      ],
+      "provider": "fixture-provider",
+      "model": "fixture-model-b",
+      "servedModels": [],
+      "runtime": "fixture-runtime",
+      "agent": "fixture-provider/fixture-runtime/reviewer-1",
+      "role": "reviewer",
+      "actorKind": "agent",
+      "parentExecutionId": null,
+      "tokens": {
+        "input": {
+          "availability": "available",
+          "value": 40,
+          "lowerBound": false,
+          "quality": [
+            "observed"
+          ],
+          "source": [
+            "runtime-output/fixture-transcript/session-transcript-jsonl"
+          ]
+        },
+        "output": {
+          "availability": "available",
+          "value": 500,
+          "lowerBound": true,
+          "quality": [
+            "observed"
+          ],
+          "source": [
+            "runtime-output/fixture-transcript/session-transcript-jsonl"
+          ]
+        },
+        "cacheRead": {
+          "availability": "available",
+          "value": 10000,
+          "lowerBound": false,
+          "quality": [
+            "observed"
+          ],
+          "source": [
+            "runtime-output/fixture-transcript/session-transcript-jsonl"
+          ]
+        },
+        "cacheWrite": {
+          "availability": "available",
+          "value": 2000,
+          "lowerBound": false,
+          "quality": [
+            "observed"
+          ],
+          "source": [
+            "runtime-output/fixture-transcript/session-transcript-jsonl"
+          ]
+        }
+      },
+      "cost": {
+        "providerReported": {
+          "availability": "unavailable",
+          "capabilityStatus": "supported-unavailable",
+          "reason": "runtime family can expose this metric, but no observation has been ingested for this execution"
+        },
+        "priceTableDerived": {
+          "availability": "unavailable",
+          "reason": "model fixture-model-b is not in the price table"
+        },
+        "runtimeEstimates": []
+      }
+    },
+    {
+      "executionId": "EXE-20260110T170000000Z-f0000007",
+      "record": {
+        "file": "EXE-20260110T170000000Z-f0000007.json",
+        "sha256": "01e3f7b00f445048ae5d35be0ff00f950035641aaa28e42974e5bf446423a234"
+      },
+      "workItemId": "WI-F6",
+      "attempt": 1,
+      "attemptsOfWorkItem": 1,
+      "status": "active",
+      "outcome": "unfinalized",
+      "startedAt": "2026-01-10T17:00:00.000Z",
+      "finalizedAt": null,
+      "phases": [
+        "timed"
+      ],
+      "provider": "fixture-provider",
+      "model": "fixture-model",
+      "servedModels": [],
+      "runtime": "fixture-runtime",
+      "agent": "fixture-provider/fixture-runtime",
+      "role": "(not recorded)",
+      "actorKind": "agent",
+      "parentExecutionId": null,
+      "tokens": {
+        "input": {
+          "availability": "unavailable",
+          "value": null,
+          "capabilityStatus": "unknown",
+          "reason": "runtime capability not reported or mapped"
+        },
+        "output": {
+          "availability": "unavailable",
+          "value": null,
+          "capabilityStatus": "unknown",
+          "reason": "runtime capability not reported or mapped"
+        },
+        "cacheRead": {
+          "availability": "unavailable",
+          "value": null,
+          "capabilityStatus": "unknown",
+          "reason": "runtime capability not reported or mapped"
+        },
+        "cacheWrite": {
+          "availability": "unavailable",
+          "value": null,
+          "capabilityStatus": "unknown",
+          "reason": "runtime capability not reported or mapped"
+        }
+      },
+      "cost": {
+        "providerReported": {
+          "availability": "unavailable",
+          "capabilityStatus": "not-recorded",
+          "reason": "the record has neither a measurement nor a capability state for this metric"
+        },
+        "priceTableDerived": {
+          "availability": "unavailable",
+          "reason": "no tokens.input measurement to price"
+        },
+        "runtimeEstimates": []
+      }
+    }
+  ],
+  "excludedMeasurements": [
+    {
+      "executionId": "EXE-20260110T160000000Z-f0000006",
+      "measurementId": "MEAS-f06-estimate",
+      "metric": "tokens.input",
+      "quality": "estimated",
+      "reason": "token value of quality 'estimated' is never counted"
+    }
+  ]
+}

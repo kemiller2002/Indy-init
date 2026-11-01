@@ -18,6 +18,8 @@
     <Compile Include="AssertionRatchetTests.fs" />
     <Compile Include="V4Tests.fs" />
     <Compile Include="V41Tests.fs" />
+    <Compile Include="V411Tests.fs" />
+    <Compile Include="TokenEconomicsTests.fs" />
     <Compile Include="Tests.fs" />
   </ItemGroup>
   <ItemGroup>

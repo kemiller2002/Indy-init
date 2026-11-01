@@ -115,6 +115,26 @@ jobs:
           git init --quiet "$RUNNER_TEMP/app"
           dotnet tools/requirements-compiler/src/bin/Release/net10.0/requirements-compiler.dll v41 --source . --package requirements-compiled/v4.1 --base requirements-compiled/v4 --bootstrap "$RUNNER_TEMP/app"
           dotnet build "$RUNNER_TEMP/app/Causa.slnx" -c Release
+      - name: Successor package v4.1.1 is reproduced byte for byte and its checks X01-X20 pass; its contracts and layout tests equal v4.1's
+        run: |
+          dotnet tools/requirements-compiler/src/bin/Release/net10.0/requirements-compiler.dll v41 --source . --package requirements-compiled/v4.1.1 --base requirements-compiled/v4 --forma-tarball "$RUNNER_TEMP/forma.tgz" --check
+          diff -r requirements-compiled/v4.1/contracts requirements-compiled/v4.1.1/contracts
+          diff -r requirements-compiled/v4.1/layout-tests requirements-compiled/v4.1.1/layout-tests
+      - name: The v4.1.1 skeleton bootstraps into an empty repository and builds
+        run: |
+          git init --quiet "$RUNNER_TEMP/app411"
+          dotnet tools/requirements-compiler/src/bin/Release/net10.0/requirements-compiler.dll v41 --source . --package requirements-compiled/v4.1.1 --base requirements-compiled/v4 --bootstrap "$RUNNER_TEMP/app411"
+          dotnet build "$RUNNER_TEMP/app411/Causa.slnx" -c Release
+      - name: The v4.1.1 skeleton layers onto a recorded Conditor 0.10.18 scaffold, and both solutions build
+        run: |
+          fixture=tools/requirements-compiler/tests/fixtures/conditor-0.10.18-scaffold
+          git init --quiet "$RUNNER_TEMP/layered"
+          cp -r "$fixture"/. "$RUNNER_TEMP/layered/"
+          mv "$RUNNER_TEMP/layered/gitignore.txt" "$RUNNER_TEMP/layered/.gitignore"
+          rm "$RUNNER_TEMP/layered/README.md"
+          dotnet tools/requirements-compiler/src/bin/Release/net10.0/requirements-compiler.dll v41 --source . --package requirements-compiled/v4.1.1 --base requirements-compiled/v4 --check --bootstrap "$RUNNER_TEMP/layered"
+          dotnet build "$RUNNER_TEMP/layered/Causa.slnx" -c Release
+          dotnet build "$RUNNER_TEMP/layered/App.slnx" -c Release
       - name: Executable Forma layout assertions pass on Forma 0.12.0 patterns and fail on broken fixtures (Chromium and WebKit)
         run: |
           mkdir -p "$RUNNER_TEMP/forma" "$RUNNER_TEMP/layout"

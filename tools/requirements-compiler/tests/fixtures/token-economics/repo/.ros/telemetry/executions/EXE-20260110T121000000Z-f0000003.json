@@ -1,0 +1,35 @@
+{
+  "schemaVersion": "1.0.0",
+  "executionId": "EXE-20260110T121000000Z-f0000003",
+  "workItemId": "WI-F3",
+  "workItem": { "repositoryId": null, "repository": "fixture/token-economics", "provider": "github", "localId": "WI-F3" },
+  "instanceId": "pxi-fixture",
+  "status": "finalized",
+  "startedAt": "2026-01-10T12:10:00.000Z",
+  "finalizedAt": "2026-01-10T15:00:00.000Z",
+  "identity": {
+    "provider": "fixture-provider", "model": "fixture-model", "modelVersion": null,
+    "runtime": "fixture-runtime", "runtimeVersion": null, "sessionId": "fixture-session-3",
+    "conversationId": null, "runId": null, "agentId": "fixture-provider/fixture-runtime", "subagentId": "implementer-2",
+    "parentExecutionId": null, "actorKind": "agent", "orchestration": {}
+  },
+  "provider": { "sessionId": "fixture-session-3", "agentInstanceId": "implementer-2" },
+  "classification": { "types": [ "development" ], "rationale": null, "evidence": [], "rd": null },
+  "capabilities": [
+    { "metricId": "tokens.input", "status": "supported-unavailable", "reason": "runtime family can expose this metric, but no observation has been ingested for this execution", "discoveredAt": "2026-01-10T12:10:00.000Z" },
+    { "metricId": "tokens.output", "status": "supported-unavailable", "reason": "runtime family can expose this metric, but no observation has been ingested for this execution", "discoveredAt": "2026-01-10T12:10:00.000Z" },
+    { "metricId": "tokens.cache_read", "status": "supported-unavailable", "reason": "runtime family can expose this metric, but no observation has been ingested for this execution", "discoveredAt": "2026-01-10T12:10:00.000Z" },
+    { "metricId": "tokens.cache_write", "status": "supported-unavailable", "reason": "runtime family can expose this metric, but no observation has been ingested for this execution", "discoveredAt": "2026-01-10T12:10:00.000Z" },
+    { "metricId": "cost.execution_total", "status": "supported-unavailable", "reason": "runtime family can expose this metric, but no observation has been ingested for this execution", "discoveredAt": "2026-01-10T12:10:00.000Z" }
+  ],
+  "metrics": [
+    { "measurementId": "MEAS-f03-wall", "id": "time.wall_ms", "value": 10200000, "unit": "milliseconds", "currency": null, "quality": "derived", "confidence": null, "scope": "execution", "aggregation": "sum", "dimensions": {}, "pricing": null, "source": { "type": "calculated", "name": "ros", "mechanism": "timestamp-difference" }, "collectedAt": "2026-01-10T15:00:00.000Z", "schemaVersion": "1.0.0" },
+    { "measurementId": "MEAS-f03-commits", "id": "git.commits_created", "value": 4, "unit": "count", "currency": null, "quality": "derived", "confidence": null, "scope": "execution", "aggregation": "sum", "dimensions": {}, "pricing": null, "source": { "type": "ros-git", "name": "git", "mechanism": "repository-delta" }, "collectedAt": "2026-01-10T15:00:00.000Z", "schemaVersion": "1.0.0" },
+    { "measurementId": "MEAS-f03-lines", "id": "git.lines_added", "value": 1500, "unit": "lines", "currency": null, "quality": "derived", "confidence": null, "scope": "execution", "aggregation": "sum", "dimensions": {}, "pricing": null, "source": { "type": "ros-git", "name": "git", "mechanism": "repository-delta" }, "collectedAt": "2026-01-10T15:00:00.000Z", "schemaVersion": "1.0.0" }
+  ],
+  "rawTelemetry": [],
+  "events": [
+    { "type": "execution.started", "occurredAt": "2026-01-10T12:10:00.000Z", "source": { "type": "ros-clock", "name": "ros", "mechanism": "work-lifecycle" } },
+    { "type": "execution.finalized", "occurredAt": "2026-01-10T15:00:00.000Z", "source": { "type": "ros-clock", "name": "ros", "mechanism": "work-lifecycle" } }
+  ]
+}

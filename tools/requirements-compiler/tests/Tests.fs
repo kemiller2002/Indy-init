@@ -7,6 +7,7 @@
 ///     - the preflight verdict rule;
 ///     - defect-class closures checked against a throwaway git history (R7-REM-008);
 ///     - the pre-lock release comparison (R7-REM-010);
+///     - token economics (Amendment D) over the recorded fixture in tests/fixtures/token-economics;
 ///     - the assertion ratchet over a throwaway git history (R7-REM-011, RF-F-8);
 ///     - the verification plan, and the EII-C acceptance-contract negative controls (missing obligation, incorrect
 ///       test mapping, altered values, swapped requirement and obligation identities, stale evidence,
@@ -756,9 +757,9 @@ let main argv =
             eprintfn "%s" e
             2
         | Ok o ->
-            let processFailures = snd (processSimulation o.Source) @ producerBindings o.Source @ r6Readiness o.Source @ R6ScopeTests.all o.Source @ V4Tests.all o.Source @ V41Tests.all o.Source
-            let failures = offline o.Source @ processFailures @ toolingLanguage o.Source
-            let label = "offline tests (baseline equivalence, baseline units, preflight verdict, verification plan, acceptance contracts, process evidence, v4 scope and controls, v4.1 scope and controls, F#-only tooling)"
+            let processFailures = snd (processSimulation o.Source) @ producerBindings o.Source @ r6Readiness o.Source @ R6ScopeTests.all o.Source @ V4Tests.all o.Source @ V41Tests.all o.Source @ V411Tests.all o.Source
+            let failures = offline o.Source @ processFailures @ TokenEconomicsTests.all o.Source @ toolingLanguage o.Source
+            let label = "offline tests (baseline equivalence, baseline units, preflight verdict, verification plan, acceptance contracts, process evidence, v4 scope and controls, v4.1 and v4.1.1 scope and controls, token economics, F#-only tooling)"
             let code = report failures label
             record
             |> Option.iter (fun path ->

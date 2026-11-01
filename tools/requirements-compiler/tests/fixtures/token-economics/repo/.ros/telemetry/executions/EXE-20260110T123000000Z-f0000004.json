@@ -1,0 +1,39 @@
+{
+  "schemaVersion": "1.0.0",
+  "executionId": "EXE-20260110T123000000Z-f0000004",
+  "workItemId": "WI-F4",
+  "workItem": { "repositoryId": null, "repository": "fixture/token-economics", "provider": "github", "localId": "WI-F4" },
+  "instanceId": "pxi-fixture",
+  "status": "finalized",
+  "startedAt": "2026-01-10T12:30:00.000Z",
+  "finalizedAt": "2026-01-10T13:30:00.000Z",
+  "identity": {
+    "provider": "fixture-provider", "model": "fixture-model", "modelVersion": null,
+    "runtime": "fixture-runtime", "runtimeVersion": null, "sessionId": "fixture-session-4",
+    "conversationId": null, "runId": null, "agentId": "fixture-provider/fixture-runtime", "subagentId": "tester-1",
+    "parentExecutionId": null, "actorKind": "agent", "orchestration": { "role": "tester" }
+  },
+  "provider": { "sessionId": "fixture-session-4", "agentInstanceId": "tester-1" },
+  "classification": { "types": [ "testing" ], "rationale": null, "evidence": [], "rd": null },
+  "capabilities": [
+    { "metricId": "tokens.input", "status": "supported-observed", "reason": "derived from the session transcript", "discoveredAt": "2026-01-10T13:29:00.000Z" },
+    { "metricId": "tokens.output", "status": "supported-observed", "reason": "derived from the session transcript; a lower bound: the transcript records the streaming-start count, not the provider's final count", "discoveredAt": "2026-01-10T13:29:00.000Z" },
+    { "metricId": "tokens.cache_read", "status": "supported-observed", "reason": "derived from the session transcript", "discoveredAt": "2026-01-10T13:29:00.000Z" },
+    { "metricId": "tokens.cache_write", "status": "supported-unavailable", "reason": "reported on 3 of 5 requests", "discoveredAt": "2026-01-10T13:29:00.000Z" },
+    { "metricId": "cost.execution_total", "status": "supported-unavailable", "reason": "runtime family can expose this metric, but no observation has been ingested for this execution", "discoveredAt": "2026-01-10T12:30:00.000Z" }
+  ],
+  "metrics": [
+    { "measurementId": "MEAS-f04-input", "id": "tokens.input", "value": 50, "unit": "tokens", "currency": null, "quality": "observed", "confidence": null, "scope": "session", "aggregation": "sum", "dimensions": { "snapshot": "fixture-session-4", "step": "STEP-F04-1" }, "pricing": null, "source": { "type": "runtime-output", "name": "fixture-transcript", "mechanism": "session-transcript-jsonl", "provider": "fixture-provider", "runtime": "fixture-runtime" }, "collectedAt": "2026-01-10T13:29:00.000Z", "schemaVersion": "1.0.0" },
+    { "measurementId": "MEAS-f04-output", "id": "tokens.output", "value": 700, "unit": "tokens", "currency": null, "quality": "observed", "confidence": null, "scope": "session", "aggregation": "sum", "dimensions": { "bound": "lower", "snapshot": "fixture-session-4", "step": "STEP-F04-1" }, "pricing": null, "source": { "type": "runtime-output", "name": "fixture-transcript", "mechanism": "session-transcript-jsonl", "provider": "fixture-provider", "runtime": "fixture-runtime" }, "collectedAt": "2026-01-10T13:29:00.000Z", "schemaVersion": "1.0.0" },
+    { "measurementId": "MEAS-f04-cache-read", "id": "tokens.cache_read", "value": 30000, "unit": "tokens", "currency": null, "quality": "observed", "confidence": null, "scope": "session", "aggregation": "sum", "dimensions": { "snapshot": "fixture-session-4", "step": "STEP-F04-1" }, "pricing": null, "source": { "type": "runtime-output", "name": "fixture-transcript", "mechanism": "session-transcript-jsonl", "provider": "fixture-provider", "runtime": "fixture-runtime" }, "collectedAt": "2026-01-10T13:29:00.000Z", "schemaVersion": "1.0.0" },
+    { "measurementId": "MEAS-f04-wall", "id": "time.wall_ms", "value": 3600000, "unit": "milliseconds", "currency": null, "quality": "derived", "confidence": null, "scope": "execution", "aggregation": "sum", "dimensions": {}, "pricing": null, "source": { "type": "calculated", "name": "ros", "mechanism": "timestamp-difference" }, "collectedAt": "2026-01-10T13:30:00.000Z", "schemaVersion": "1.0.0" }
+  ],
+  "rawTelemetry": [],
+  "events": [
+    { "type": "execution.started", "occurredAt": "2026-01-10T12:30:00.000Z", "source": { "type": "ros-clock", "name": "ros", "mechanism": "work-lifecycle" } },
+    { "type": "step.started", "occurredAt": "2026-01-10T12:31:00.000Z", "stepId": "STEP-F04-1", "name": "Run the acceptance tests" },
+    { "type": "step.failed", "occurredAt": "2026-01-10T13:28:00.000Z", "stepId": "STEP-F04-1", "reason": "acceptance tests failed; the work item was handed back" },
+    { "type": "telemetry.snapshot.ingested", "occurredAt": "2026-01-10T13:29:00.000Z", "snapshotId": "fixture-session-4" },
+    { "type": "execution.finalized", "occurredAt": "2026-01-10T13:30:00.000Z", "source": { "type": "ros-clock", "name": "ros", "mechanism": "work-lifecycle" } }
+  ]
+}

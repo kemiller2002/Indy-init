@@ -35,6 +35,9 @@ type Inputs =
       /// Owner-approved amendments of v4's state machines (analysis/state-machine-amendments.json). v4.1 applies them
       /// over the frozen v4 machines; v4's files are never edited.
       MachineAmendments: Json
+      /// The successor amendment record (analysis/amendment.json, v4.1.1 and later). None for v4.1 itself, whose
+      /// generated output stays byte for byte as the owner approved it; every v4.1.1 behaviour below is gated on it.
+      Amendment: Json option
       /// The committed Forma inventory, and the one extracted from the published package when it is supplied.
       FormaInventory: Json
       FormaExtract: Json option
@@ -44,6 +47,12 @@ type Inputs =
       ReadSource: string -> string option }
 
 type Check = { Id: string; Title: string; Problems: string list }
+
+/// The amendment's list under a key; empty for v4.1 itself.
+let amendmentList (key: string) (i: Inputs) = i.Amendment |> Option.map (arr key) |> Option.defaultValue []
+let amendmentField (key: string) (i: Inputs) = i.Amendment |> Option.bind (field key) |> Option.defaultValue (JObj [])
+/// The package version the compiler writes: 4.1.0, or the successor amendment's.
+let packageVersion (i: Inputs) = i.Amendment |> Option.bind (strOpt "packageVersion") |> Option.defaultValue "4.1.0"
 
 let private check id title problems = { Id = id; Title = title; Problems = problems }
 
@@ -571,8 +580,17 @@ let applyAdjustments (i: Inputs) (deps: bool) (estimates: bool) : WorkTask list 
                     let kept = t.DependsOn |> List.filter (fun d -> not (timedIds.Contains d.Task))
                     kept @ (ds |> List.map (fun d -> { Task = str "task" d; Reason = str "reason" d }) |> List.filter (fun d -> not (kept |> List.exists (fun k -> k.Task = d.Task))))
                 | _ -> t.DependsOn
-            let raw = match intOpt "estimateMinutes" a with Some e when estimates -> setIn "estimateMinutes" (JInt e) t.Raw | _ -> t.Raw
-            { t with DependsOn = deps'; Raw = raw })
+            // A successor amendment may move a task into the timed window (v4.1.1: the T10 bootstrap at T0). The move is
+            // structural, so it follows the dependency changes; a moved task has no v4 estimate to fall back to.
+            let phase' = match strOpt "phase" a with Some p when deps -> p | _ -> t.Phase
+            let moved = phase' <> t.Phase
+            let prefs' =
+                match field "dropPreferenceAfter" a with
+                | Some(JArr ds) when deps -> t.Preferences |> List.filter (fun p -> not (ds |> List.exists (fun d -> sOr "task" d = p.Task)))
+                | _ -> t.Preferences
+            let raw = match intOpt "estimateMinutes" a with Some e when estimates || moved -> setIn "estimateMinutes" (JInt e) t.Raw | _ -> t.Raw
+            let raw' = if moved then setIn "phase" (JStr phase') raw else raw
+            { t with DependsOn = deps'; Phase = phase'; Preferences = prefs'; Raw = raw' })
 
 let adjustedTasks (i: Inputs) = applyAdjustments i true true
 
@@ -662,6 +680,36 @@ let private topologyJson (policy: Json) (tasks: WorkTask list) (id: string) : Js
     total,
     total <= window
 
+/// Sensitivity scenarios of a successor amendment: each scales the estimates of named tasks, or of every task an owner
+/// holds, by a whole percentage (rounded up), and reschedules every topology with the same scheduler. Nothing is shortened.
+let private sensitivity (i: Inputs) (tasks: WorkTask list) : Json list =
+    let window = field "clock" i.Policy |> Option.bind (intOpt "timedMinutes") |> Option.map int |> Option.defaultValue 420
+    let topologies = arr "topologies" i.Policy |> List.map (str "id")
+    amendmentList "sensitivity" i
+    |> List.map (fun s ->
+        let rules = arr "scale" s
+        let percentFor (t: WorkTask) =
+            let pct (r: Json) = intOpt "percent" r |> Option.map int |> Option.defaultValue 100
+            let named = rules |> List.filter (fun r -> List.contains t.Id (strs "tasks" r))
+            let byOwner = rules |> List.filter (fun r -> (strs "tasks" r).IsEmpty && sOr "owner" r <> "" && sOr "owner" r = t.Owner)
+            // A rule that names the task replaces the owner rule; it never compounds with it.
+            (if named.IsEmpty then byOwner else named) |> List.fold (fun p r -> p * pct r / 100) 100
+        let scaled =
+            tasks |> List.map (fun t ->
+                match TimedSchedule.estimate t with
+                | Some e when t.Phase = "timed" -> { t with Raw = setIn "estimateMinutes" (JInt(int64 ((e * percentFor t + 99) / 100))) t.Raw }
+                | _ -> t)
+        let _, cp = TimedSchedule.criticalPath scaled
+        JObj
+            [ "id", JStr(str "id" s)
+              "description", JStr(sOr "description" s)
+              "scale", JArr rules
+              "criticalPathMinutes", jint cp
+              "topologies",
+              JArr(topologies |> List.map (fun id ->
+                  let _, total, fits = topologyJson i.Policy scaled id
+                  JObj [ "id", JStr id; "totalMinutes", jint total; "windowMinutes", jint window; "marginMinutes", jint (window - total); "fits", JBool fits ])) ])
+
 let schedule (i: Inputs) : Json * Json * string list =
     let tasks = adjustedTasks i
     let timed = tasks |> List.filter (fun t -> t.Phase = "timed")
@@ -679,7 +727,21 @@ let schedule (i: Inputs) : Json * Json * string list =
                   if not (taskIds.Contains (str "task" d)) then yield sprintf "adjustment of %s depends on %s, which is not a v4 task" id (str "task" d)
                   if String.IsNullOrWhiteSpace (sOr "reason" d) then yield sprintf "adjustment of %s: dependency on %s has no reason" id (str "task" d)
               if String.IsNullOrWhiteSpace (sOr "rationale" a) then yield sprintf "adjustment of %s has no rationale" id
-              if sOr "evidence" a <> "estimated" then yield sprintf "adjustment of %s must be labelled estimated" id
+              match sOr "evidence" a with
+              | "estimated" -> ()
+              | "measured+estimated" when i.Amendment.IsSome ->
+                  if not (i.AuthoredText |> List.exists (fst >> (=) (sOr "measurement" a))) then yield sprintf "adjustment of %s is labelled partly measured but names no measurement record of the package" id
+                  match intOpt "measuredMinutes" a, intOpt "estimatedMinutes" a, intOpt "estimateMinutes" a with
+                  | Some m, Some e, Some t when m >= 0L && e >= 0L && m + e = t -> ()
+                  | _ -> yield sprintf "adjustment of %s is partly measured but its measuredMinutes and estimatedMinutes do not add up to its estimate" id
+              | _ -> yield sprintf "adjustment of %s must be labelled estimated" id
+              if (field "phase" a).IsSome || (field "dropPreferenceAfter" a).IsSome then
+                  if i.Amendment.IsNone then yield sprintf "adjustment of %s moves a phase or drops a preference, which only a successor amendment may do" id
+                  match strOpt "phase" a with
+                  | Some p when p <> "timed" -> yield sprintf "adjustment of %s moves it to phase %s; only a move into the timed window is allowed" id p
+                  | _ -> ()
+                  for d in arr "dropPreferenceAfter" a do
+                      if String.IsNullOrWhiteSpace (sOr "reason" d) || String.IsNullOrWhiteSpace (sOr "decision" d) then yield sprintf "adjustment of %s drops its preference after %s without a reason and a decision" id (sOr "task" d)
               // No estimate falls below half of v4's: a larger cut is a different plan, not an adjustment.
               match intOpt "estimateMinutes" a, i.Tasks |> List.tryFind (fun t -> t.Id = id) |> Option.bind TimedSchedule.estimate with
               | Some e, Some v4 when int e * 2 < v4 -> yield sprintf "adjustment of %s cuts its estimate from %d to %d, below half of v4's" id v4 e
@@ -718,15 +780,20 @@ let schedule (i: Inputs) : Json * Json * string list =
             let _, cp = TimedSchedule.criticalPath ts
             JObj
                 [ "scenario", JStr name
-                  "dependencies", JStr(if deps then "v4.1" else "v4")
-                  "estimates", JStr(if est then "v4.1" else "v4")
+                  "dependencies", JStr(if deps then (match i.Amendment with Some _ -> "v" + packageVersion i | None -> "v4.1") else "v4")
+                  "estimates", JStr(if est then (match i.Amendment with Some _ -> "v" + packageVersion i | None -> "v4.1") else "v4")
                   "criticalPathMinutes", jint cp
                   "topologies", JArr(topologies |> List.map (fun id -> let _, total, fits = topologyJson i.Policy ts id in JObj [ "id", JStr id; "totalMinutes", jint total; "fits", JBool fits ])) ]
     let newTopologies = if acyclic tasks then topologies |> List.map (topologyJson i.Policy tasks) else []
     let dag =
         JObj
             [ "schema", JStr "indy-init.v41-execution-dag/1"
-              "description", JStr "The timed work items of v4 with v4.1's estimate and dependency changes (analysis/task-adjustments.json) applied, generated by requirements-compiler v41. Every v4 task is kept with the requirements it covers; every ordering v4 implied is kept except the waived ones listed here. Estimates are the package author's; none is measured."
+              "description",
+              JStr(
+                  match i.Amendment with
+                  | None -> "The timed work items of v4 with v4.1's estimate and dependency changes (analysis/task-adjustments.json) applied, generated by requirements-compiler v41. Every v4 task is kept with the requirements it covers; every ordering v4 implied is kept except the waived ones listed here. Estimates are the package author's; none is measured."
+                  | Some _ -> sprintf "The timed work items of v4 with the estimate, dependency and phase changes of package %s (analysis/task-adjustments.json) applied, generated by requirements-compiler v41. Every v4 task is kept with the requirements it covers; every ordering v4 implied is kept except the waived ones listed here. An adjustment labelled measured names its measurement record; every other estimate is the package author's." (packageVersion i)
+              )
               "criticalPath", JObj [ "tasks", jstrs path; "minutes", jint pathMinutes ]
               "waivedPrecedences", JArr(lost |> Set.toList |> List.map (fun (a, b) -> JObj [ "before", JStr a; "after", JStr b; "reason", JStr(waivers |> List.tryFind (fst >> (=) (a, b)) |> Option.map (snd >> sOr "reason") |> Option.defaultValue "") ]))
               "tasks",
@@ -750,11 +817,18 @@ let schedule (i: Inputs) : Json * Json * string list =
     let sched =
         JObj
             [ "schema", JStr "indy-init.v41-schedule/1"
-              "description", JStr "The v4.1 timed schedule for one lead agent (B-single-lead), role lanes with one UI agent (A-role-lanes) and role lanes with two UI agents (C-role-lanes-two-ui), computed by the same scheduler as v4 (TimedSchedule) over execution-dag.json, with v4's reserves and window. All minutes are estimates. 'scenarios' separates the effect of the dependency changes (ODR-V41-03) from the estimate changes (ODR-V41-04)."
+              "description",
+              JStr(
+                  match i.Amendment with
+                  | None -> "The v4.1 timed schedule for one lead agent (B-single-lead), role lanes with one UI agent (A-role-lanes) and role lanes with two UI agents (C-role-lanes-two-ui), computed by the same scheduler as v4 (TimedSchedule) over execution-dag.json, with v4's reserves and window. All minutes are estimates. 'scenarios' separates the effect of the dependency changes (ODR-V41-03) from the estimate changes (ODR-V41-04)."
+                  | Some _ -> sprintf "The v%s timed schedule for one lead agent (B-single-lead), role lanes with one UI agent (A-role-lanes) and role lanes with two UI agents (C-role-lanes-two-ui), computed by the same scheduler as v4 (TimedSchedule) over execution-dag.json, with v4's reserves and window. Every estimate is the package author's except T10's, which is partly measured (analysis/bootstrap-measurement.json). 'scenarios' separates the dependency changes from the estimate changes; a scenario with v4's dependencies keeps T10 before T0, outside the window, as v4 has it. 'sensitivity' rescales named tasks or an owner's tasks; a rule naming a task replaces the owner rule for it." (packageVersion i)
+              )
               "evidence", JStr "estimated"
               "experimentalTarget", JObj [ "criticalPathMinutes", jint 300; "meets", JBool(pathMinutes < 300); "note", JStr "an experimental goal of the v4.1 brief, not an acceptance condition. It is measured on the lane-free dependency critical path; each topology's makespan, which adds waiting for a busy lane, is in topologies (makespanMinutes, bindingChain)." ]
               "criticalPath", JObj [ "v4", JObj [ "tasks", jstrs basePath; "minutes", jint baseMinutes ]; "v41", JObj [ "tasks", jstrs path; "minutes", jint pathMinutes ] ]
-              "scenarios", JArr [ scenario "v4" false false; scenario "v4.1 dependencies only" true false; scenario "v4.1 estimates only" false true; scenario "v4.1" true true ]
+              "scenarios",
+              (let v = match i.Amendment with Some _ -> "v" + packageVersion i | None -> "v4.1"
+               JArr [ scenario "v4" false false; scenario (v + " dependencies only") true false; scenario (v + " estimates only") false true; scenario v true true ])
               "riskiestDependencies",
               JArr(
                   List.pairwise path
@@ -763,7 +837,12 @@ let schedule (i: Inputs) : Json * Json * string list =
                       JObj [ "from", JStr a; "to", JStr b; "slackMinutes", jint 0; "reason", JStr reason ])
               )
               "topologies", JArr(newTopologies |> List.map (fun (j, _, _) -> j)) ]
-    dag, sched, problems
+    // A successor amendment adds its version and the sensitivity of each topology to overruns.
+    let sched' =
+        match i.Amendment, sched with
+        | Some _, JObj ps when acyclic tasks -> JObj(ps @ [ "packageVersion", JStr(packageVersion i); "sensitivity", JArr(sensitivity i tasks) ])
+        | _ -> sched
+    dag, sched', problems
 
 // ---- checks ------------------------------------------------------------------------------------------------------
 
@@ -791,9 +870,10 @@ let ownershipCheck (i: Inputs) (files: OwnedFile list) : Check list =
                 for o in f.Conflicts do
                     yield sprintf "%s holds tests of %s and of %s" f.Path f.Owner o ]
       check "X02" "Project files, the solution, composition, shared configuration, dependency manifests, CI and deployment are owned by integration"
-          [ for f in files do
-                if integrationExclusive f.Path && f.Owner <> "integration" then yield sprintf "%s is integration's alone but owned by %s" f.Path f.Owner
-                if integrationExclusive f.Path && not f.Contributors.IsEmpty then yield sprintf "%s is integration's alone but lists contributors %s" f.Path (String.concat ", " f.Contributors)
+          [ let exclusive (p: string) = integrationExclusive p || List.contains p (strs "files" (amendmentField "sharedEntrypoints" i))
+            for f in files do
+                if exclusive f.Path && f.Owner <> "integration" then yield sprintf "%s is integration's alone but owned by %s" f.Path f.Owner
+                if exclusive f.Path && not f.Contributors.IsEmpty then yield sprintf "%s is integration's alone but lists contributors %s" f.Path (String.concat ", " f.Contributors)
             // The shared files the event build cannot do without must be in the manifest, owned by integration.
             for required in [ ".gitignore"; "Causa.slnx"; "global.json"; "Directory.Build.props"; "Directory.Packages.props"; "package.json"; "package-lock.json"; "playwright.config.ts"; ".github/workflows/ci.yml"; "web/boundary.js"; "tests/browser/support/layout-assertions.mjs" ] do
                 if not (files |> List.exists (fun f -> f.Path = required)) then yield sprintf "%s is missing from the manifest" required ]
@@ -1309,9 +1389,16 @@ let bootstrapFiles (i: Inputs) (files: OwnedFile list) (globalJson: string) : (s
     let gitignore = String.concat "\n" [ "bin/"; "obj/"; "node_modules/"; "test-results/"; "playwright-report/"; "*.trx"; "" ]
     let packageJson =
         serialize (JObj [ "name", JStr "causa"; "private", JBool true; "devDependencies", JObj(npm |> List.map (fun (id, v) -> id, JStr v)) ])
+    // v4.1.1 layers onto Conditor's repository, whose own projects (App.slnx) pin their package versions inline: central
+    // package management then applies to the Causa projects only, so both solutions build (measured: an unconditional
+    // switch fails App.slnx with NU1008).
+    let layered = i.Amendment |> Option.bind (field "bootstrap") |> Option.bind (strOpt "layersOnto") = Some "conditor"
+    let cpm =
+        if layered then "    <ManagePackageVersionsCentrally Condition=\"$(MSBuildProjectName.StartsWith('Causa.'))\">true</ManagePackageVersionsCentrally>"
+        else "    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>"
     let centralVersions =
         String.concat "\n"
-            ([ "<Project>"; "  <PropertyGroup>"; "    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>"; "  </PropertyGroup>"; "  <ItemGroup>" ]
+            ([ "<Project>"; "  <PropertyGroup>"; cpm; "  </PropertyGroup>"; "  <ItemGroup>" ]
              @ (nuget |> List.map (fun (id, v) -> sprintf "    <PackageVersion Include=\"%s\" Version=\"%s\" />" id v))
              @ [ "  </ItemGroup>"; "</Project>"; "" ])
     [ ".gitignore", gitignore; "Causa.slnx", slnx; "Directory.Build.props", props; "global.json", globalJson ]
@@ -1398,6 +1485,387 @@ let contractFiles (i: Inputs) : (string * string) list =
     (named |> List.map (fun (f, t) -> "contracts/" + f, t))
     @ [ "contracts/ContractCheck.fsproj", fsproj; "contracts/negative/ForgeConfirmation.fs", forge; "contracts/negative/ReadCredential.fs", readCredential ]
 
+// ---- successor amendment (v4.1.1) ------------------------------------------------------------------------------
+
+/// A member of a contract that is code rather than declaration: its enclosing module and type path, its symbol, and
+/// its full text (the declaring line and every deeper-indented line under it), which the amendment pins by digest.
+type ContractMember = { Scope: string; Symbol: string; Text: string }
+
+/// Comments, string literals and character literals blanked, line structure kept, following the F# lexer's order:
+/// a string or character literal is read before a comment can start, so `"(*"` and `'"'` hide nothing; triple-quoted
+/// and verbatim strings and nested block comments are handled. `(*)` is the multiplication operator, not a comment.
+let private stripCode (stringsInComments: bool) (text: string) =
+    let s = text.Replace("\r\n", "\n")
+    let n = s.Length
+    let at (i: int) (p: string) = i + p.Length <= n && String.CompareOrdinal(s, i, p, 0, p.Length) = 0
+    let blank (c: char) = if c = '\n' then '\n' else ' '
+    // Returns the index just past the construct that starts at i, or i when none starts there.
+    let rec skipString (i: int) =
+        if i >= n then n
+        elif s.[i] = '\\' then skipString (i + 2)
+        elif s.[i] = '"' then i + 1
+        else skipString (i + 1)
+    let rec skipBlock (i: int) (depth: int) =
+        if i >= n then n
+        elif stringsInComments && s.[i] = '"' then skipBlock (skipString (i + 1)) depth
+        elif at i "(*" && not (at i "(*)") then skipBlock (i + 2) (depth + 1)
+        elif at i "*)" then (if depth = 1 then i + 2 else skipBlock (i + 2) (depth - 1))
+        else skipBlock (i + 1) depth
+    let rec skipVerbatim (i: int) =
+        if i >= n then n
+        elif at i "\"\"" then skipVerbatim (i + 2)
+        elif s.[i] = '"' then i + 1
+        else skipVerbatim (i + 1)
+    let skipTriple (i: int) = let e = s.IndexOf("\"\"\"", i, StringComparison.Ordinal) in if e < 0 then n else e + 3
+    let construct (i: int) =
+        if at i "\"\"\"" then Some(skipTriple (i + 3), "\"\"")
+        elif at i "@\"" then Some(skipVerbatim (i + 2), "\"\"")
+        elif s.[i] = '"' then Some(skipString (i + 1), "\"\"")
+        elif s.[i] = '\'' && i + 2 < n && s.[i + 1] <> '\\' && s.[i + 2] = '\'' then Some(i + 3, "' '")
+        elif s.[i] = '\'' && i + 3 < n && s.[i + 1] = '\\' then (let e = s.IndexOf('\'', i + 2) in if e > 0 && e - i <= 8 then Some(e + 1, "' '") else None)
+        elif at i "(*" && not (at i "(*)") then Some(skipBlock i 0, "")
+        elif at i "//" then (let e = s.IndexOf('\n', i) in Some((if e < 0 then n else e), ""))
+        else None
+    let rec go (i: int) (acc: Text.StringBuilder) =
+        if i >= n then acc.ToString()
+        else
+            match construct i with
+            | Some(j, _) ->
+                // Keep the newlines the construct spanned so line numbers and indentation stay true.
+                let span = s.Substring(i, j - i)
+                go j (acc.Append(String(span |> Seq.map blank |> Array.ofSeq)))
+            | None -> go (i + 1) (acc.Append(s.[i]))
+    go 0 (Text.StringBuilder())
+
+/// The code members of a contract file. A line is declaration only when it begins as a declaration does (namespace,
+/// module, open, type, a union case, a record field or signature `name:`, an attribute, a brace, a type continuation)
+/// and contains no code keyword. Every other line is code: a let, member, override, default, static, do, use, new or
+/// inherit binding; an active pattern; a primary constructor; an expression; or any line that begins otherwise. This is a
+/// heuristic over lines, not the F# syntax tree: the amendment also requires every contract to equal its reviewed
+/// baseline byte for byte, and pins each allowed member's text by digest (X17).
+let contractImplementations (text: string) : ContractMember list =
+    let scopeRx = Regex(@"^\s*(?:module|type)\s+(?:private\s+|internal\s+|rec\s+)*([A-Za-z_][A-Za-z0-9_']*)")
+    let declStart =
+        Regex(@"^(?:(?:namespace|module|open|type|exception|abstract|interface|with|private|internal)\b|and\s+[A-Z]|\||\{|\}|\[<|->|\*|\)|[A-Za-z_][A-Za-z0-9_']*\s*:(?!:)|[A-Z][A-Za-z0-9_']*\s+of\b|[A-Z][A-Za-z0-9_']*\s*$)")
+    let keyword = Regex(@"\b(let|member|override|default|static|do|use|new|inherit|val|fun|function|match|if|then|else|while|for|yield|lazy|async|task)\b")
+    let primaryCtor = Regex(@"^\s*type\s+[A-Za-z_][A-Za-z0-9_']*\s*(?:<[^>]*>)?\s*\(")
+    let named = Regex(@"\b(?:let|use)\s+(?:(?:rec|inline|private|internal|mutable)\s+)*(\(\|[^)]*\|\)|``[^`]*``|\([^)]*\)|[A-Za-z_][A-Za-z0-9_']*)|\b(?:member|override|default)\s+(?:(?:private|internal|inline)\s+)*(?:[A-Za-z_][A-Za-z0-9_]*\.)?(``[^`]*``|[A-Za-z_][A-Za-z0-9_']*)")
+    let indent (l: string) = l.Length - l.TrimStart().Length
+    let raw = text.Replace("\r\n", "\n").Split('\n')
+    let rec go (scopes: (int * string) list) (rows: (string * string) list) (found: ContractMember list) =
+        match rows with
+        | [] -> List.rev found
+        | (_, c) :: rest when c.Trim() = "" -> go scopes rest found
+        | (r, c) :: rest ->
+            let ind = indent c
+            let open' = scopes |> List.filter (fun (n, _) -> n < ind)
+            let trimmed = c.Trim()
+            let signature = trimmed.StartsWith("abstract", StringComparison.Ordinal)
+            let k = if signature then None else (let m = keyword.Match trimmed in if m.Success then Some m.Groups.[1].Value else None)
+            let recordExpression = trimmed.StartsWith("{", StringComparison.Ordinal) && Regex.IsMatch(trimmed, @"[^<>=:]=[^>]")
+            let isCode = k.IsSome || recordExpression || primaryCtor.IsMatch c || not (declStart.IsMatch trimmed)
+            let s = scopeRx.Match c
+            let scopes' = if s.Success then (ind, s.Groups.[1].Value) :: open' else open'
+            if not isCode then go scopes' rest found
+            else
+                let body = rest |> List.takeWhile (fun (_, bc) -> bc.Trim() = "" || indent bc > ind)
+                let text = (r :: (body |> List.map fst)) |> List.map (fun l -> l.TrimEnd()) |> String.concat "\n" |> fun t -> t.TrimEnd()
+                let n = named.Match trimmed
+                let symbol =
+                    if n.Success then (if n.Groups.[1].Success then n.Groups.[1].Value else n.Groups.[2].Value)
+                    elif primaryCtor.IsMatch c then "new"
+                    else k |> Option.defaultValue "expression"
+                let scope = (if s.Success then scopes' else open') |> List.rev |> List.map snd |> String.concat "."
+                go scopes' (List.skip body.Length rest) ({ Scope = scope; Symbol = symbol; Text = text } :: found)
+    // Two readings of comments: with and without strings lexed inside them. Hidden code must evade both, so the
+    // members either reading finds are all reported (RV411-4-1: each reading alone has a bypass the other catches).
+    let scan (stringsInComments: bool) = go [] (Array.zip raw ((stripCode stringsInComments text).Split('\n')) |> List.ofArray) []
+    scan true @ scan false |> List.distinctBy (fun m -> m.Scope, m.Symbol, m.Text)
+
+/// Each generated contract file with its classification: a specification (types and signatures only), a specification
+/// with reviewed boundary code (the amendment's allowlist names each member and why), the generated compile control, the
+/// typecheck project, or a negative control that must fail to compile.
+let contractClassification (i: Inputs) (contracts: (string * string) list) : Json * string list =
+    let allowed = amendmentList "contractImplementations" i
+    let controls = amendmentList "contractControls" i |> List.map (fun c -> sOr "file" c, c)
+    let key (a: Json) = sOr "file" a, sOr "scope" a, sOr "symbol" a
+    let interfaces = arr "interfaces" i.Interfaces
+    let entries =
+        contracts
+        |> List.map (fun (path, text) ->
+            let name = path.Substring("contracts/".Length)
+            let found = if name.EndsWith(".fs", StringComparison.Ordinal) then contractImplementations text |> List.map (fun m -> name, m) else []
+            let iface = interfaces |> List.tryFind (fun x -> name.EndsWith("-" + str "id" x + ".fs", StringComparison.Ordinal))
+            let kind =
+                match controls |> List.tryFind (fst >> (=) name) with
+                | Some(_, c) -> sOr "classification" c
+                | None when starts "negative/" name -> "negative control: must fail to compile"
+                | None when name.EndsWith(".fsproj", StringComparison.Ordinal) -> "typecheck project: builds the contracts and the controls"
+                | None when found.IsEmpty -> "specification: types and signatures only"
+                | None -> "specification with reviewed boundary code"
+            name, found, iface, kind)
+    let isControl (name: string) = controls |> List.exists (fst >> (=) name) || starts "negative/" name
+    let implemented = entries |> List.filter (fun (n, _, _, _) -> not (isControl n)) |> List.collect (fun (_, f, _, _) -> f)
+    let digest (t: string) = Git.sha256Hex (Text.Encoding.UTF8.GetBytes t)
+    let baseline = amendmentField "contractBaseline" i |> sOr "package"
+    let amends = amendmentField "amends" i
+    let problems =
+        [ for (n, m) in implemented do
+              match allowed |> List.tryFind (key >> (=) (n, m.Scope, m.Symbol)) with
+              | None -> yield sprintf "contracts/%s: %s.%s is implementation code in a specification and is not on the reviewed allowlist" n m.Scope m.Symbol
+              | Some a when sOr "sha256" a <> digest m.Text -> yield sprintf "contracts/%s: the text of %s.%s has sha256 %s, the allowlist pins %s" n m.Scope m.Symbol (digest m.Text) (sOr "sha256" a)
+              | Some _ -> ()
+          for a in allowed do
+              let (n, s, m) = key a
+              if not (implemented |> List.exists (fun (f, x) -> (f, x.Scope, x.Symbol) = (n, s, m))) then yield sprintf "the allowlist names %s %s.%s, which the contracts do not implement (stale entry)" n s m
+              if String.IsNullOrWhiteSpace (sOr "rationale" a) || (strs "requirements" a).IsEmpty then
+                  yield sprintf "the allowlist entry %s %s.%s needs a rationale and the requirements it enforces" n s m
+          // The line scan is a heuristic; the guarantee is that every contract equals its reviewed, approved baseline.
+          if baseline = "" then yield "the amendment names no reviewed contract baseline"
+          elif baseline <> sOr "package" amends || sOr "approval" (amendmentField "contractBaseline" i) <> sOr "approval" amends then
+              yield sprintf "the contract baseline %s is not the package the amendment amends (%s, %s)" baseline (sOr "package" amends) (sOr "approval" amends)
+          else
+              let approved =
+                  i.ReadSource (baseline + "/package-manifest.json")
+                  |> Option.bind (fun t -> field "files" (parseBytes (Text.Encoding.UTF8.GetBytes t)))
+                  |> Option.defaultValue (JObj [])
+              for (path, text) in contracts do
+                  match i.ReadSource (baseline + "/" + path) with
+                  | Some b when b = text ->
+                      if strOpt path approved <> Some(digest b) then yield sprintf "%s/%s does not have the digest its approved package manifest records" baseline path
+                  | Some _ -> yield sprintf "%s differs from the reviewed baseline %s/%s; a changed contract needs its own review" path baseline path
+                  | None -> yield sprintf "%s is not in the reviewed baseline %s" path baseline
+          for (c, j) in controls do
+              if not (entries |> List.exists (fun (n, _, _, _) -> n = c)) then yield sprintf "the control %s is not a generated contract file" c
+              if String.IsNullOrWhiteSpace (sOr "classification" j) then yield sprintf "the control %s has no classification" c
+          if allowed.IsEmpty && controls.IsEmpty then yield "the amendment classifies no contract file" ]
+    let json =
+        JObj
+            [ "schema", JStr "indy-init.v411-contract-classification/1"
+              "description", JStr "Every generated contract file, classified. The contracts are specifications: frozen types and signatures the implementing roles compile against. The only code they carry is the reviewed boundary code listed here, which enforces a requirement at the type boundary (a credential that never prints its token; a confirmation that exists only from a read-back equal to what was written); each producer replaces nothing in it and implements everything else. Generated by requirements-compiler v41 from the contracts it generates and analysis/amendment.json (X17)."
+              "typecheck", JStr "CI builds contracts/ContractCheck.fsproj; each negative control must fail to compile"
+              "stateMachines", JStr "X05 proves each machine's states and events are exactly the cases of one interface's unions"
+              "materialization", JStr "the bootstrap writes each contract into its producer's file, byte for byte, from the same text; two builds are identical (offline suite)"
+              "files",
+              JArr(entries |> List.map (fun (n, found, iface, kind) ->
+                  JObj
+                      [ "file", JStr("contracts/" + n)
+                        "classification", JStr kind
+                        "interface", (match iface with Some x -> JStr(str "id" x) | None -> JNull)
+                        "producerFile", (match iface with Some x -> JStr(sOr "file" x) | None -> JNull)
+                        "implementation",
+                        JArr(found |> List.map (fun (fn, x) ->
+                            let a = allowed |> List.tryFind (key >> (=) (fn, x.Scope, x.Symbol))
+                            JObj [ "scope", JStr x.Scope; "symbol", JStr x.Symbol; "sha256", JStr(digest x.Text); "rationale", JStr(a |> Option.map (sOr "rationale") |> Option.defaultValue ""); "requirements", (a |> Option.map (fun x -> jstrs (strs "requirements" x)) |> Option.defaultValue (JArr [])) ])) ])) ]
+    json, problems
+
+/// X18 (E): the shared web entrypoints are integration's; a UI role changes one only through a change request
+/// integration owns and applies; the ownership manifest and the agent rules say the same.
+let entrypointCheck (i: Inputs) (files: OwnedFile list) : Check =
+    let spec = amendmentField "sharedEntrypoints" i
+    let paths = strs "files" spec
+    let cr = field "changeRequests" spec |> Option.defaultValue (JObj [])
+    let roles = arr "roles" i.Structure |> List.map (str "id") |> Set.ofList
+    let rules = i.AuthoredText |> List.tryFind (fst >> (=) "AGENT-RULES.md") |> Option.map snd |> Option.defaultValue ""
+    // The roles table of AGENT-RULES: (role, what it owns). Prose and manifest agree when integration's row lists each
+    // entrypoint and no other role's row claims one except to say it asks for changes by change request.
+    let rows =
+        rules.Split('\n')
+        |> List.ofArray
+        |> List.filter (fun l -> l.StartsWith("| ", StringComparison.Ordinal))
+        |> List.map (fun l -> l.Split('|') |> Array.map (fun c -> c.Trim()))
+        |> List.filter (fun cells -> cells.Length > 3)
+        |> List.map (fun cells -> cells.[1], cells.[2])
+    check "X18" "The shared web entrypoints are integration's alone; a UI role changes one only through a change request that integration owns and applies; the ownership manifest and the agent rules agree"
+        [ if paths.IsEmpty then yield "the amendment names no shared web entrypoint"
+          for p in paths do
+              match files |> List.tryFind (fun f -> f.Path = p) with
+              | None -> yield sprintf "%s is not in the ownership manifest" p
+              | Some f ->
+                  if f.Owner <> "integration" then yield sprintf "%s is a shared entrypoint but owned by %s" p f.Owner
+                  if not f.Contributors.IsEmpty then yield sprintf "%s is a shared entrypoint but lists contributors %s" p (String.concat ", " f.Contributors)
+              if not (rows |> List.exists (fun (role, owns) -> role = "integration" && owns.Contains p)) then yield sprintf "AGENT-RULES.md's roles table does not list %s under integration" p
+              let sentence = sOr "ruleSentence" cr
+              for (role, owns) in rows do
+                  if role <> "integration" && (if sentence = "" then owns else owns.Replace(sentence, "")).Contains p then yield sprintf "AGENT-RULES.md's roles table names %s under %s outside the change-request sentence" p role
+              let reviewed = strs "ruleLinesSha256" spec |> Set.ofList
+              let fileName = p.Substring(p.LastIndexOf '/' + 1).ToLowerInvariant()
+              let plain (l: string) = l.Replace("\\", "").Replace("`", "").ToLowerInvariant()
+              for l in rules.Split('\n') do
+                  if (plain l).Contains fileName && not (reviewed.Contains(Git.sha256Hex (Text.Encoding.UTF8.GetBytes(l.TrimEnd())))) then
+                      yield sprintf "AGENT-RULES.md names %s in a line that is not one of the reviewed lines (sharedEntrypoints.ruleLinesSha256): %s" p (l.Trim().Substring(0, min 120 (l.Trim().Length)))
+          if (sOr "ruleSentence" cr) = "" || not (rules.Contains(sOr "ruleSentence" cr)) then yield "AGENT-RULES.md does not carry the change-request sentence the amendment fixes (sharedEntrypoints.changeRequests.ruleSentence)"
+          if sOr "owner" cr <> "integration" then yield "change requests to the shared entrypoints must be owned by integration"
+          let requesters = strs "requesters" cr
+          if requesters.IsEmpty then yield "the change-request protocol names no requesting role"
+          for r in requesters do
+              if not (roles.Contains r) then yield sprintf "change-request requester %s is not a declared role" r
+              if r = "integration" then yield "integration does not request changes to its own files"
+          if String.IsNullOrWhiteSpace (sOr "protocol" cr) || String.IsNullOrWhiteSpace (sOr "record" cr) then yield "the change-request protocol needs its steps and where each request is recorded"
+          if not (rules.Contains "change request") then yield "AGENT-RULES.md does not describe the change-request protocol" ]
+
+/// X19 (A, C): the bootstrap runs at T0 inside the timed window with a measured duration, every other timed task
+/// follows it, and no task waits on organizer permission; the starting-state policy records the published rules as
+/// external constraints, keeps the historical records, and states the residual interpretation risk.
+let bootstrapCheck (i: Inputs) : Check =
+    let spec = amendmentField "bootstrap" i
+    let task = sOr "task" spec
+    let tasks = adjustedTasks i
+    let timed = tasks |> List.filter (fun t -> t.Phase = "timed")
+    let prec = precedences tasks
+    let policy = amendmentField "startingState" i
+    let measurement = i.AuthoredText |> List.tryFind (fst >> (=) (sOr "measurement" spec)) |> Option.map (snd >> fun t -> parseBytes (Text.Encoding.UTF8.GetBytes t))
+    let removed = arr "removedGates" policy
+    // Every organizer gate in the frozen v4 inputs and the internal rule documents must have a recorded disposition
+    // under an owner decision (RV411-1-1): preflight checks, tasks and requirement obligations that mention organizer
+    // approval or confirmation, DAG waivers resting on ODR-V41-06, and each matching line of the scanned documents.
+    let refs = arr "organizerReferences" policy
+    let decisions = requestIds i @ [ "OD-INDY-18" ]
+    let organizerRx = Regex(@"organi[sz]er|organi[sz]ing committee", RegexOptions.IgnoreCase)
+    let gateRx = Regex(@"confirm|approv|verif|permission|permit|interpretation|sign[- ]?off|signs? off|signed|wait|until|hold|obtain|\bask|consent|authori[sz]|agree|response|go-ahead|pending|clearance|blessing", RegexOptions.IgnoreCase)
+    let mentions (j: Json) = match j with JObj ps -> ps |> List.exists (fun (_, v) -> match v with JStr s -> organizerRx.IsMatch s && gateRx.IsMatch s | _ -> false) | _ -> false
+    let rec walk (j: Json) : Json list = match j with JObj ps -> j :: (ps |> List.collect (snd >> walk)) | JArr xs -> xs |> List.collect walk | _ -> []
+    let fromJson (path: string) (select: Json -> string list) =
+        match i.ReadSource path with
+        | Some t -> Ok(select (parseBytes (Text.Encoding.UTF8.GetBytes t)))
+        | None -> Error(sprintf "%s is not readable for the organizer-gate scan" path)
+    let jsonGates =
+        [ fromJson "requirements-compiled/v4/preflight-manifest.json" (fun j -> arr "checks" j |> List.filter mentions |> List.map (str "id"))
+          fromJson "requirements-compiled/v4/curation/tasks.json" (fun j -> arr "tasks" j |> List.filter (fun t -> organizerRx.IsMatch(sOr "title" t)) |> List.map (str "id"))
+          fromJson "requirements-compiled/v4/requirements-inventory.json" (fun j -> walk j |> List.filter (fun x -> (strOpt "id" x).IsSome && mentions x) |> List.map (str "id") |> List.distinct)
+          fromJson "requirements-compiled/v4/risk-register.json" (fun j -> arr "risks" j |> List.filter mentions |> List.map (str "id")) ]
+    let waiverGates = arr "waivedPrecedences" i.Adjustments |> List.filter (fun w -> (sOr "reason" w).Contains "ODR-V41-06") |> List.map (fun w -> sprintf "waiver %s>%s" (sOr "before" w) (sOr "after" w))
+    let docLines =
+        strs "organizerDocuments" policy
+        |> List.collect (fun d ->
+            // A package document is read from the package inputs (so a changed AGENT-RULES is seen); others from the source.
+            match i.AuthoredText |> List.tryFind (fst >> (=) d) |> Option.map snd |> Option.orElse (i.ReadSource d) with
+            | None -> [ d, 0, "<unreadable>" ]
+            | Some t -> t.Split('\n') |> Array.mapi (fun n l -> d, n + 1, l) |> Array.filter (fun (_, _, l) -> organizerRx.IsMatch l && gateRx.IsMatch l) |> List.ofArray)
+    check "X19" "The bootstrap is the first timed task (T0), its duration partly measured and labelled so, every other timed task follows it, every organizer gate the scan finds has a recorded disposition under an owner decision, and the starting-state policy quotes the published rules verbatim, keeps the historical records unchanged and states the residual risk"
+        [ match timed |> List.tryFind (fun t -> t.Id = task) with
+          | None -> yield sprintf "the bootstrap task %s is not in the timed window" task
+          | Some t ->
+              if t.Owner <> "integration" then yield sprintf "the bootstrap task %s is owned by %s, not integration" task t.Owner
+              if t.DependsOn |> List.exists (fun d -> timed |> List.exists (fun x -> x.Id = d.Task)) then yield sprintf "the bootstrap task %s waits on another timed task" task
+              for x in timed do
+                  if x.Id <> task && not (prec.Contains(task, x.Id)) then yield sprintf "timed task %s can start before the bootstrap %s" x.Id task
+              let adj = arr "adjustments" i.Adjustments |> List.tryFind (fun a -> str "task" a = task)
+              match adj with
+              | Some a when sOr "evidence" a = "measured+estimated" && sOr "measurement" a = sOr "measurement" spec ->
+                  let t10 = measurement |> Option.bind (field "t10") |> Option.defaultValue (JObj [])
+                  if intOpt "measuredMinutes" a <> intOpt "measuredMinutes" t10 || intOpt "estimatedMinutes" a <> intOpt "estimatedMinutes" t10 then
+                      yield sprintf "the measured and estimated minutes of %s differ from the bootstrap measurement record" task
+              | _ -> yield sprintf "the estimate of %s is not labelled measured+estimated with the bootstrap measurement record" task
+          match measurement with
+          | None -> yield "the bootstrap measurement record is missing"
+          | Some m ->
+              if (arr "runs" m).IsEmpty then yield "the bootstrap measurement records no run"
+              if (arr "steps" m).IsEmpty then yield "the bootstrap measurement names no step"
+              for s in arr "steps" m do
+                  if String.IsNullOrWhiteSpace (sOr "command" s) then yield sprintf "measurement step %s has no command" (sOr "name" s)
+          for g in removed do
+              let gate = sOr "task" g
+              for t in timed do
+                  if t.DependsOn @ t.Preferences |> List.exists (fun d -> d.Task = gate) then yield sprintf "timed task %s still waits on %s (%s)" t.Id gate (sOr "was" g)
+              if tasks |> List.exists (fun t -> t.Id = task && (t.DependsOn @ t.Preferences |> List.exists (fun d -> d.Task = gate))) then yield sprintf "the bootstrap still waits on %s" gate
+          for r in jsonGates do
+              match r with
+              | Error e -> yield e
+              | Ok ids -> for id in ids do if not (refs |> List.exists (fun x -> sOr "id" x = id)) then yield sprintf "organizer gate %s has no recorded disposition" id
+          for w in waiverGates do
+              if not (refs |> List.exists (fun x -> sOr "id" x = w)) then yield sprintf "%s rests on ODR-V41-06 and has no recorded disposition" w
+          for (d, n, l) in docLines do
+              let covers (x: Json) =
+                  sOr "source" x = d && sOr "quote" x <> "" && l.Contains(sOr "quote" x)
+                  && (match strOpt "lineSha256" x with Some h -> h = Git.sha256Hex (Text.Encoding.UTF8.GetBytes(l.TrimEnd())) | None -> true)
+              if not (refs |> List.exists covers) then
+                  yield sprintf "organizer gate at %s:%d has no recorded disposition: %s" d n (l.Trim().Substring(0, min 100 (l.Trim().Length)))
+          for x in refs do
+              if String.IsNullOrWhiteSpace (sOr "disposition" x) then yield sprintf "organizer reference %s has no disposition" (sOr "id" x)
+              if not (List.contains (sOr "decision" x) decisions) then yield sprintf "organizer reference %s names decision %s, which is neither an owner decision request nor OD-INDY-18" (sOr "id" x) (sOr "decision" x)
+          if (strs "externalConstraints" policy).IsEmpty then yield "the starting-state policy quotes no published rule as an external constraint"
+          if String.IsNullOrWhiteSpace (sOr "residualRisk" policy) then yield "the starting-state policy does not state the residual interpretation risk"
+          let rulesDoc = sOr "externalConstraintsSource" policy
+          match i.ReadSource rulesDoc with
+          | None -> yield sprintf "the published rules' source %s is not readable" rulesDoc
+          | Some t -> for c in strs "externalConstraints" policy do if not (t.Contains c) then yield sprintf "the external constraint '%s' is not quoted verbatim in %s" c rulesDoc
+          for h in arr "historicalRecords" policy do
+              if sOr "disposition" h <> "kept unchanged" then yield sprintf "historical record %s must be kept unchanged" (sOr "id" h)
+              match i.ReadSource (sOr "source" h) with
+              | Some t when sOr "quote" h <> "" && t.Contains(sOr "quote" h) -> ()
+              | _ -> yield sprintf "historical record %s no longer reads as recorded in %s" (sOr "id" h) (sOr "source" h)
+          if (arr "historicalRecords" policy).IsEmpty then yield "the starting-state policy lists no historical record"
+          let docs = sOr "document" policy
+          if not (i.AuthoredText |> List.exists (fst >> (=) docs)) then yield sprintf "the starting-state policy document %s is not part of the package" docs
+          for (n, t) in i.AuthoredText do
+              if n = "AGENT-RULES.md" && t.Contains "relies on ODR-V41-06" then yield "AGENT-RULES.md still makes the bootstrap rely on organizer confirmation (ODR-V41-06)" ]
+
+/// X20: the amendment names the package it amends by its approved manifest digest and its approval, and its version is a
+/// successor of 4.1.0.
+let amendmentRecordCheck (i: Inputs) : Check =
+    let a = i.Amendment |> Option.defaultValue (JObj [])
+    let amends = field "amends" a |> Option.defaultValue (JObj [])
+    let target = sOr "package" amends
+    let actual = i.ReadSource (target + "/package-manifest.json") |> Option.map (fun t -> Git.sha256Hex (Text.Encoding.UTF8.GetBytes t))
+    check "X20" "The amendment names the package it amends by the approved manifest digest and approval, its version succeeds 4.1.0, and every change is classified"
+        [ if not (Regex.IsMatch(packageVersion i, @"^4\.1\.[1-9][0-9]*$")) then yield sprintf "version %s is not a successor of 4.1.0" (packageVersion i)
+          if target <> "requirements-compiled/v4.1" then yield sprintf "the amendment amends %s, not requirements-compiled/v4.1" target
+          match actual with
+          | None -> yield sprintf "%s/package-manifest.json is not readable" target
+          | Some d when d <> sOr "manifestSha256" amends -> yield sprintf "the amended manifest has sha256 %s, the amendment names %s" d (sOr "manifestSha256" amends)
+          | Some _ -> ()
+          if String.IsNullOrWhiteSpace (sOr "approval" amends) then yield "the amendment names no approval of the package it amends"
+          for p in arr "pinnedDocuments" a do
+              match i.ReadSource (sOr "path" p) with
+              | Some t when Git.sha256Hex (Text.Encoding.UTF8.GetBytes t) = sOr "sha256" p -> ()
+              | Some _ -> yield sprintf "%s does not have the digest the amendment pins" (sOr "path" p)
+              | None -> yield sprintf "%s, which the amendment pins, is not readable" (sOr "path" p)
+          let changes = arr "changes" a
+          if changes.IsEmpty then yield "the amendment lists no change"
+          for c in changes do
+              if String.IsNullOrWhiteSpace (sOr "id" c) || String.IsNullOrWhiteSpace (sOr "summary" c) || String.IsNullOrWhiteSpace (sOr "area" c) then yield "every change needs an id, an area and a summary" ]
+
+/// Layers one generated bootstrap file onto a repository Conditor has initialized (v4.1.1: Conditor's `init` runs first
+/// on the empty repository, then the generator). Conditor's scaffold files belong to the project once its lock records
+/// the scaffold as established, so three of them are merged deterministically and every other existing file must be
+/// identical: package.json takes the owner's locked devDependencies (ODR-V41-07, ODR-V41-09) over Conditor's pins;
+/// Directory.Build.props is kept when it already sets every property the generator sets, to the same value; .gitignore
+/// gains the generator's missing lines. Ok None: nothing to write.
+let layerFile (name: string) (existing: string) (generated: string) : Result<string option, string> =
+    let norm (s: string) = s.Replace("\r\n", "\n").TrimEnd()
+    if norm existing = norm generated then Ok None
+    else
+        match name with
+        | "package.json" ->
+            let locks = match field "devDependencies" (parseBytes (Text.Encoding.UTF8.GetBytes generated)) with Some(JObj ps) -> ps | _ -> []
+            match parseBytes (Text.Encoding.UTF8.GetBytes existing) with
+            | JObj ps ->
+                let section (name: string) = match List.tryFind (fst >> (=) name) ps with Some(_, JObj ds) -> ds | _ -> []
+                let runtime = section "dependencies"
+                // A locked package Conditor already lists under dependencies takes the lock's version there; every other
+                // lock goes to devDependencies. No package ends up in both sections.
+                let inRuntime (k: string) = runtime |> List.exists (fst >> (=) k)
+                let runtime' = runtime |> List.map (fun (k, v) -> match locks |> List.tryFind (fst >> (=) k) with Some(_, l) -> k, l | None -> k, v)
+                let devLocks = locks |> List.filter (fst >> inRuntime >> not)
+                let merged = (section "devDependencies" |> List.filter (fun (k, _) -> not (locks |> List.exists (fst >> (=) k)))) @ devLocks |> List.sortBy fst
+                let withRuntime = ps |> List.map (fun (k, v) -> if k = "dependencies" then k, JObj runtime' else k, v)
+                let ps' = if withRuntime |> List.exists (fst >> (=) "devDependencies") then withRuntime |> List.map (fun (k, v) -> if k = "devDependencies" then k, JObj merged else k, v) else withRuntime @ [ "devDependencies", JObj merged ]
+                Ok(Some(serialize (JObj ps')))
+            | _ -> Error "package.json exists but is not a JSON object"
+        | "Directory.Build.props" ->
+            let props (s: string) = Regex.Matches(s, @"<([A-Za-z]+)>([^<]*)</\1>") |> Seq.map (fun m -> m.Groups.[1].Value, m.Groups.[2].Value.Trim()) |> List.ofSeq
+            let have = props existing
+            match props generated |> List.filter (fun p -> not (List.contains p have)) with
+            | [] -> Ok None
+            | missing -> Error(sprintf "Directory.Build.props exists and does not set %s" (missing |> List.map (fun (k, v) -> k + "=" + v) |> String.concat ", "))
+        | ".gitignore" ->
+            let have = existing.Replace("\r\n", "\n").Split('\n') |> Array.map (fun l -> l.Trim()) |> Set.ofArray
+            match generated.Replace("\r\n", "\n").Split('\n') |> Array.filter (fun l -> l.Trim() <> "" && not (have.Contains(l.Trim()))) |> List.ofArray with
+            | [] -> Ok None
+            | add -> Ok(Some(existing.TrimEnd('\n') + "\n# requirements-compiler v41 (v4.1.1 bootstrap)\n" + String.concat "\n" add + "\n"))
+        | _ -> Error(sprintf "%s already exists with different content; the bootstrap never overwrites it" name)
+
 // ---- build -------------------------------------------------------------------------------------------------------
 
 type Built = { Files: (string * string) list; Checks: Check list }
@@ -1422,6 +1890,16 @@ let build (i: Inputs) : Built =
             testIdentityCheck i files
             layoutKitCheck i
             testToolingCheck i files ]
+    let contracts = contractFiles i
+    let classification, classificationProblems = contractClassification i contracts
+    let amended =
+        match i.Amendment with
+        | None -> []
+        | Some _ ->
+            [ check "X17" "The interface contracts are specifications: types and signatures only, except reviewed boundary code each allowlist entry names with its rationale and requirements; the compile control and negative controls are classified" classificationProblems
+              entrypointCheck i files
+              bootstrapCheck i
+              amendmentRecordCheck i ]
     let json (n: string) (j: Json) = n, serialize j
     { Files =
         [ json "agent-file-ownership.json" (ownershipJson i files)
@@ -1430,8 +1908,9 @@ let build (i: Inputs) : Built =
           json "execution-dag.json" dag
           json "schedule.json" sched
           json "preservation-report.json" preservationReport ]
-        @ contractFiles i
-      Checks = checks |> List.sortBy (fun c -> c.Id) }
+        @ contracts
+        @ (if i.Amendment.IsSome then [ json "contract-classification.json" classification ] else [])
+      Checks = checks @ amended |> List.sortBy (fun c -> c.Id) }
 
 let validationReport (checks: Check list) : Json =
     JObj
@@ -1445,9 +1924,15 @@ let packageManifest (i: Inputs) (digests: (string * string) list) (verdict: stri
     let vp = field "verificationPlan" i.BaseManifest |> Option.defaultValue JNull
     JObj
         [ "schema", JStr "indy-init.v41-package-manifest/1"
-          "packageVersion", JStr "4.1.0"
+          "packageVersion", JStr(packageVersion i)
           "status", JStr "CANDIDATE"
-          "statusMeaning", JStr "Compiled and validated by requirements-compiler v41. Not approved and not frozen: only the owner's approval of ODR-V41-01 and the freeze tag make it frozen (FREEZE.md). The compiler never reports frozen."
+          "statusMeaning",
+          JStr(
+              match i.Amendment with
+              | None -> "Compiled and validated by requirements-compiler v41. Not approved and not frozen: only the owner's approval of ODR-V41-01 and the freeze tag make it frozen (FREEZE.md). The compiler never reports frozen."
+              | Some a -> sprintf "Compiled and validated by requirements-compiler v41. Not approved and not frozen: only the owner's approval of %s and the freeze tag make it frozen (FREEZE.md). The compiler never reports frozen." (sOr "approvalDecision" a)
+          )
+          yield! (match i.Amendment with Some a -> [ "amends", field "amends" a |> Option.defaultValue JNull ] | None -> [])
           "base", JObj [ "package", JStr "requirements-compiled/v4"; "verificationPlan", JObj [ "planId", JStr(sOr "planId" vp); "fileSha256", JStr(sOr "fileSha256" vp); "contentDigest", JStr(sOr "contentDigest" vp) ] ]
           "validation", JStr verdict
           "files", JObj(digests |> List.sortBy fst |> List.map (fun (n, d) -> n, JStr d)) ]
