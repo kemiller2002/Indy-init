@@ -91,7 +91,41 @@ let layering : string list =
       match V41Package.layerFile "src/Causa.Domain/Causa.Domain.fsproj" "<Project />" "<Project Sdk=\"x\" />" with
       | Error _ -> ()
       | other -> yield sprintf "layering: an existing project file with other content is overwritten (%A)" other
-      if V41Package.layerFile "App.slnx" "x\n" "x" <> Ok None then yield "layering: an identical file is rewritten" ]
+      if V41Package.layerFile "App.slnx" "x\n" "x" <> Ok None then yield "layering: an identical file is rewritten"
+      // A locked package Conditor lists under dependencies takes the lock there and is not duplicated (RV411-1-10).
+      match V41Package.layerFile "package.json" "{\n  \"name\": \"app\",\n  \"dependencies\": {\n    \"axe-core\": \"4.10.0\"\n  }\n}\n" generatedPackage with
+      | Ok(Some merged) ->
+          let j = parseBytes (System.Text.Encoding.UTF8.GetBytes merged)
+          if (field "dependencies" j |> Option.bind (strOpt "axe-core")) <> Some "4.14.0" then yield "layering: a locked package under dependencies does not take the lock"
+          if (field "devDependencies" j |> Option.bind (strOpt "axe-core")).IsSome then yield "layering: a locked package is listed in both sections"
+      | other -> yield sprintf "layering: package.json merge with dependencies gave %A" other ]
+
+
+/// The contract scanner (X17's heuristic) finds code in every form the independent review used to bypass its first
+/// version (RV411-1-2), and finds nothing in a contract that only declares.
+let scanner : string list =
+    let found (src: string) = V41Package.contractImplementations ("namespace N\n\n" + src)
+    let clean = "type A =\n    | One of int\n    | Two\n\ntype R = { X: int; Y: string }\n\n[<RequireQualifiedAccess>]\ntype I =\n    abstract Run: int -> int\n    abstract member Name: string\n\ntype F = int -> string\n"
+    let bypasses =
+        [ "active pattern", "module M =\n    let (|Even|Odd|) n = if n % 2 = 0 then Even else Odd\n"
+          "static let", "type T() =\n    static let cache = 1\n"
+          "standalone do", "module M =\n    do\n        printfn \"x\"\n"
+          "bare expression", "module M =\n    printfn \"x\"\n"
+          "use binding", "module M =\n    use r = new System.IO.MemoryStream()\n"
+          "attribute and let on one line", "module M =\n    [<Literal>] let X = 1\n"
+          "backtick name", "module M =\n    let ``hidden work`` x = x + 1\n"
+          "one-line type with member", "type T() = member _.Run x = x * 2\n"
+          "block comment before let", "module M =\n    (* note *) let f x = x\n"
+          "let with its name on the next line", "module M =\n    let\n        f x = x\n"
+          "record with a member", "type R =\n    { A: int }\n    member r.Double = r.A * 2\n"
+          "object expression", "module M =\n    let o = { new System.IDisposable with member _.Dispose() = () }\n"
+          "and-chained binding", "module M =\n    let rec f x = g x\n    and g x = x\n" ]
+    [ if not (found clean).IsEmpty then yield sprintf "scanner: a declaration-only contract is reported as code: %A" (found clean |> List.map (fun m -> m.Symbol))
+      for (name, src) in bypasses do
+          if (found src).IsEmpty then yield sprintf "scanner: %s is not detected" name
+      match found "module M =\n    let f x = x\n    and g x = x\n" |> List.map (fun m -> m.Symbol) with
+      | [ "f"; _ ] -> ()
+      | other -> yield sprintf "scanner: an and-chained binding is not reported separately: %A" other ]
 
 /// Each v4.1.1 check rejects what it guards against.
 let controls (source: string) : string list =
@@ -110,10 +144,14 @@ let controls (source: string) : string list =
       yield! expectFail "change requests owned by ui" "X18" (amend (fun a -> setIn "sharedEntrypoints" (setIn "changeRequests" (JObj [ "owner", JStr "ui"; "requesters", jstrs [ "ui" ]; "protocol", JStr "x"; "record", JStr "x" ]) (field "sharedEntrypoints" a |> Option.defaultValue (JObj []))) a))
       yield! expectFail "unknown requester" "X18" (amend (fun a -> setIn "sharedEntrypoints" (setIn "changeRequests" (JObj [ "owner", JStr "integration"; "requesters", jstrs [ "designer" ]; "protocol", JStr "x"; "record", JStr "x" ]) (field "sharedEntrypoints" a |> Option.defaultValue (JObj []))) a))
       yield! expectFail "prose drops the entrypoints from integration" "X18" (authored "AGENT-RULES.md" (fun t -> t.Replace("the shared web entrypoints `web/index.html` and `web/causa.css` (loading shell and layout);", "")))
+      yield! expectFail "prose lets ui edit an entrypoint directly" "X18" (authored "AGENT-RULES.md" (fun t -> t + "\nThe ui role edits `web/index.html` directly when it needs to.\n"))
       yield! expectFail "prose gives the entrypoints to ui" "X18" (authored "AGENT-RULES.md" (fun t -> t.Replace("It changes `web/index.html` and `web/causa.css` only through a change request to integration", "`web/index.html` and `web/causa.css` (loading shell and layout)")))
       // X17 (B): hidden implementation in a contract; a stale allowlist entry; an allowlist entry without its reason.
       yield! expectFail "hidden implementation" "X17" (iface "IF41-APP" (fun x -> setIn "fsharp" (JStr(str "fsharp" x + "\nmodule Hidden =\n    let decide (m: Model) = m\n")) x))
       yield! expectFail "hidden member" "X17" (iface "IF41-VIEW" (fun x -> setIn "fsharp" (JStr(str "fsharp" x + "\ntype Extra =\n    { A: int }\n    member e.Double = e.A * 2\n")) x))
+      yield! expectFail "contract differs from the reviewed baseline" "X17" (iface "IF41-VIEW" (fun x -> setIn "fsharp" (JStr(str "fsharp" x + "\n/// a changed comment\n")) x))
+      yield! expectFail "allowlisted member body changed" "X17" (amend (mapArr "contractImplementations" (List.map (fun a -> if strOpt "symbol" a = Some "ofReadBack" then setIn "sha256" (JStr(String.replicate 64 "a")) a else a))))
+      yield! expectFail "no reviewed baseline" "X17" (amend (setIn "contractBaseline" (JObj [])))
       yield! expectFail "stale allowlist entry" "X17" (amend (mapArr "contractImplementations" (fun xs -> xs @ [ JObj [ "file", JStr "06-IF41-APP.fs"; "scope", JStr "Engine"; "symbol", JStr "run"; "rationale", JStr "x"; "requirements", jstrs [ "PF-015" ] ] ])))
       yield! expectFail "allowlist entry without rationale" "X17" (amend (mapArr "contractImplementations" (List.map (setIn "rationale" (JStr "")))))
       // X19 (A, C): a timed task that need not wait for the bootstrap; the organizer gate restored; the bootstrap
@@ -121,6 +159,14 @@ let controls (source: string) : string list =
       yield! expectFail "T14 starts before the bootstrap" "X19" (adjust "T14" (setIn "dependsOn" (JArr [])))
       yield! expectFail "organizer gate restored" "X19" (adjust "T10" (setIn "dropPreferenceAfter" (JArr [])))
       yield! expectFail "bootstrap estimate unmeasured" "X19" (adjust "T10" (setIn "evidence" (JStr "estimated")))
+      yield! expectFail "bootstrap labelled fully measured" "X13" (adjust "T10" (setIn "evidence" (JStr "measured")))
+      yield! expectFail "measured split does not add up" "X13" (adjust "T10" (setIn "measuredMinutes" (JInt 5L)))
+      yield! expectFail "measured split differs from the record" "X19" (adjust "T10" (setIn "measuredMinutes" (JInt 5L) >> setIn "estimatedMinutes" (JInt 24L)))
+      let policy f = amend (fun a -> setIn "startingState" (f (field "startingState" a |> Option.defaultValue (JObj []))) a)
+      for gate in [ "PRE-ORG-01"; "ADRP-016-O2"; "STORAGE-008-O1"; "waiver T12>T14"; "OD-INDY-12" ] do
+          yield! expectFail ("organizer gate without disposition: " + gate) "X19" (policy (mapArr "organizerReferences" (List.filter (fun r -> strOpt "id" r <> Some gate))))
+      yield! expectFail "organizer reference naming an unknown decision" "X19" (policy (mapArr "organizerReferences" (List.map (setIn "decision" (JStr "ODR-V411-99")))))
+      yield! expectFail "new organizer gate in a rule document" "X19" (policy (setIn "organizerDocuments" (jstrs [ "docs/HACKATHON-BOUNDARIES.md"; "docs/OWNER-DECISIONS-2026-11-01.md" ])))
       yield! expectFail "bootstrap left before T0" "X19" (adjust "T10" (fun a -> match a with JObj ps -> JObj(ps |> List.filter (fst >> (<>) "phase")) | j -> j))
       yield! expectFail "measurement missing" "X19" { i0 with AuthoredText = i0.AuthoredText |> List.filter (fst >> (<>) "analysis/bootstrap-measurement.json") }
       yield! expectFail "relies on ODR-V41-06" "X19" (authored "AGENT-RULES.md" (fun t -> t + "\nThis relies on ODR-V41-06.\n"))
@@ -137,4 +183,5 @@ let controls (source: string) : string list =
 let all (source: string) : string list =
     (try scope source with ex -> [ "v4.1.1 scope: " + ex.Message ])
     @ (try layering with ex -> [ "v4.1.1 layering: " + ex.Message ])
+    @ (try scanner with ex -> [ "v4.1.1 scanner: " + ex.Message ])
     @ (try controls source with ex -> [ "v4.1.1 controls: " + ex.Message ])
