@@ -17,8 +17,11 @@
 //   dotnet fsi Indy-init/tools/owner-freeze.fsx -- decide v4.1 --repo Indy-init   # ODR-V41-02..09, each asked once (after v4 is frozen)
 //   dotnet fsi Indy-init/tools/owner-freeze.fsx -- approve v4.1 --repo Indy-init  # ODR-V41-01
 //   dotnet fsi Indy-init/tools/owner-freeze.fsx -- tag v4.1 --repo Indy-init --commit <merge commit of the ODR-V41-01 pull request>
-//   dotnet fsi Indy-init/tools/owner-freeze.fsx -- approve v4.1.1 --repo Indy-init # ODR-V411-01
+//   dotnet fsi Indy-init/tools/owner-freeze.fsx -- decide v4.1.1 --repo Indy-init  # ODR-V411-02
+//   dotnet fsi Indy-init/tools/owner-freeze.fsx -- approve v4.1.1 --repo Indy-init # ODR-V411-01, after ODR-V411-02
 //   dotnet fsi Indy-init/tools/owner-freeze.fsx -- tag v4.1.1 --repo Indy-init --commit <merge commit of the ODR-V411-01 pull request>
+//   dotnet fsi Indy-init/tools/owner-freeze.fsx -- freeze v4.1.1 --repo Indy-init   # all three v4.1.1 steps in order: decide, merge,
+//                                                                                  # approve, merge, tag; each waits for you to type
 //
 // Options: --repo DIR (default: current directory), --dry-run (print what would be written; no commit, no push).
 //
@@ -166,10 +169,11 @@ let withApproval (approvals: JsonNode) (approvalId: string) (changes: JsonNode l
     |> obj
 
 /// Writes the approvals file on a new branch from origin/main, commits as you, pushes and opens a pull request.
-let commitAndPropose (repo: string) (dryRun: bool) (branch: string) (title: string) (body: string) (content: string) =
+let commitAndPropose (repo: string) (dryRun: bool) (branch: string) (title: string) (body: string) (content: string) : string option =
     if dryRun then
         rule (); say $"DRY RUN: {approvalsPath} would become:"; say content
         say $"DRY RUN: commit \"{title}\" on branch {branch}; nothing was written, committed or pushed."
+        None
     else
         git repo [ "switch"; "--quiet"; "-c"; branch; "origin/main" ] |> ignore
         File.WriteAllText(Path.Combine(repo, approvalsPath), content)
@@ -182,6 +186,7 @@ let commitAndPropose (repo: string) (dryRun: bool) (branch: string) (title: stri
         let url = try run repo "gh" [ "pr"; "create"; "--repo"; githubRepo; "--base"; "main"; "--head"; branch; "--title"; title; "--body"; body ] with Stop e -> $"(gh could not open the pull request: {e}) open it at https://github.com/{githubRepo}/compare/main...{branch}"
         say $"Committed as you on {branch} and pushed. Pull request: {url}"
         say "Review the diff there and merge it yourself."
+        Some branch
 
 // ---- status ----------------------------------------------------------------------------------------------------------
 
@@ -307,18 +312,18 @@ let decide repo dryRun (p: Package) =
             let done' = isRecorded recorded r
             if done' then say $"""{str r "id"}: already recorded; not asked again."""
             not done')
-    if open'.IsEmpty then say $"No open decision request in {p.Name}." else
+    if open'.IsEmpty then (say $"No open decision request in {p.Name}."; None) else
     say $"{open'.Length} open request(s) in {p.Name}. Each answer is yours; skip leaves a request pending."
     let answers = open' |> List.map (fun r -> r, decideOne p r)
     let changes = changesOf answers
     rule ()
-    if changes.IsEmpty then say "Nothing to record: every request was skipped." else
+    if changes.IsEmpty then (say "Nothing to record: every request was skipped."; None) else
     let approvalId = nextApprovalId approvals p.ApprovalPrefix
     say $"Summary: operator approval {approvalId} by {operatorId} with {changes.Length} change(s):"
     answers |> List.iter (fun (r, a) ->
         let text = match a with Approve _ -> "approve the amendment(s) as proposed" | Decline -> "decline" | Select c -> (c.ToJsonString()) | Skip -> "skipped (stays pending)"
         say $"""  {str r "id"}: {text}""")
-    if choose "Type 'record' to write these as your decisions, or 'abort'" [ "record"; "abort" ] = "abort" then say "Aborted; nothing was written." else
+    if choose "Type 'record' to write these as your decisions, or 'abort'" [ "record"; "abort" ] = "abort" then (say "Aborted; nothing was written."; None) else
     let ids = answers |> List.filter (fun (_, a) -> a <> Skip) |> List.map (fst >> fun r -> str r "id")
     let title = $"""Owner decisions {String.Join(", ", ids)} ({approvalId})"""
     let body =
@@ -362,13 +367,13 @@ let approve repo dryRun (p: Package) =
     // package is approved again by a new record beside it.
     let earlier = recordedChanges approvals |> List.filter (fun c -> str c "decision_id" = p.PackageApprovalId)
     let matchesChange (c: JsonNode) = change.AsObject() |> Seq.forall (fun kv -> str c kv.Key = str change kv.Key)
-    if earlier |> List.exists matchesChange then say $"{p.PackageApprovalId} is already recorded on main for the package as it now stands; nothing to do." else
+    if earlier |> List.exists matchesChange then (say $"{p.PackageApprovalId} is already recorded on main for the package as it now stands; nothing to do."; None) else
     if not earlier.IsEmpty then
         say $"Note: {p.PackageApprovalId} was recorded earlier for other digests. That record no longer matches the package, so approving records it again."
     say $"""You are approving {p.Dir} as on origin/main ({git repo [ "rev-parse"; "--short"; "origin/main" ]}), bound to:"""
     shown |> List.iter (fun s -> say $"  {s}")
     say $"Read {p.Dir}/FREEZE.md and independent-review.md first. If you want changes instead, do not approve here."
-    if choose $"Type 'approve' to record {p.PackageApprovalId}, or 'abort'" [ "approve"; "abort" ] = "abort" then say "Aborted; nothing was written." else
+    if choose $"Type 'approve' to record {p.PackageApprovalId}, or 'abort'" [ "approve"; "abort" ] = "abort" then (say "Aborted; nothing was written."; None) else
     let approvalId = nextApprovalId approvals p.ApprovalPrefix
     let title = $"Owner approval {p.PackageApprovalId}: {p.Dir} ({approvalId})"
     let body =
@@ -425,6 +430,88 @@ let tag repo dryRun (p: Package) (commitArg: string option) =
     git repo [ "push"; "--quiet"; "origin"; p.Tag ] |> ignore
     say $"Created and pushed {p.Tag}."
 
+// ---- freeze (v4.1.1 end to end) --------------------------------------------------------------------------------------
+
+/// Runs a program and returns its exit code and combined output, without stopping on a non-zero exit.
+let probe (dir: string) (program: string) (args: string list) : int * string =
+    let info = ProcessStartInfo(program, WorkingDirectory = dir, RedirectStandardOutput = true, RedirectStandardError = true, UseShellExecute = false)
+    args |> List.iter info.ArgumentList.Add
+    use p = Process.Start info
+    let out = p.StandardOutput.ReadToEndAsync()
+    let err = p.StandardError.ReadToEnd()
+    p.WaitForExit()
+    p.ExitCode, (out.Result + err).Trim()
+
+/// Waits until every check on the pull request has passed (gh exits 0), polling every 30 seconds for up to 90 minutes.
+/// A failed check stops the run: nothing is merged.
+let waitForChecks repo (number: string) =
+    let started = DateTime.UtcNow
+    let rec poll (lastReport: DateTime) =
+        match probe repo "gh" [ "pr"; "checks"; number; "--repo"; githubRepo ] with
+        | 0, _ -> say $"All checks passed on #{number}."
+        | code, output when code = 8 || output.Contains "no checks reported" ->
+            if DateTime.UtcNow - started > TimeSpan.FromMinutes 90.0 then stop $"checks on #{number} still pending after 90 minutes; nothing was merged"
+            let report = if DateTime.UtcNow - lastReport > TimeSpan.FromMinutes 2.0 then (say $"  still waiting for checks on #{number} ({int (DateTime.UtcNow - started).TotalMinutes} min)"; DateTime.UtcNow) else lastReport
+            Threading.Thread.Sleep 30000
+            poll report
+        | _, output -> stop $"a check failed on #{number}; nothing was merged.\n{output}"
+    poll started
+
+/// The pull request the script opened from `branch`: waits for its checks, asks you to type 'merge', merges it with a
+/// merge commit (as the repository's pull requests are merged), and returns to an up-to-date main.
+let mergeOwnerPr repo (branch: string) =
+    let number = run repo "gh" [ "pr"; "view"; branch; "--repo"; githubRepo; "--json"; "number"; "--jq"; ".number" ]
+    say $"Pull request #{number} (branch {branch}): waiting for its checks. This usually takes about 20 minutes."
+    Threading.Thread.Sleep 20000
+    waitForChecks repo number
+    if choose $"Type 'merge' to merge #{number} into main, or 'abort'" [ "merge"; "abort" ] = "abort" then stop $"stopped before merging #{number}; run freeze v4.1.1 again to continue"
+    run repo "gh" [ "pr"; "merge"; number; "--repo"; githubRepo; "--merge" ] |> ignore
+    git repo [ "switch"; "--quiet"; "main" ] |> ignore
+    git repo [ "pull"; "--quiet"; "--ff-only"; "origin"; "main" ] |> ignore
+    git repo [ "fetch"; "--quiet"; "origin"; "main"; "--tags" ] |> ignore
+    say $"Merged #{number}; main is up to date."
+
+/// The merge commit on main that first carried the package approval binding the package as it now stands on main.
+let approvalMergeCommit repo (p: Package) =
+    let manifest = atMain repo $"{p.Dir}/package-manifest.json" |> sha256Hex
+    let review = atMain repo $"{p.Dir}/analysis/independent-review.json" |> sha256Hex
+    let binds (commit: string) =
+        try
+            recordedChanges (atCommit repo commit approvalsPath |> parse)
+            |> List.exists (fun c ->
+                str c "decision_id" = p.PackageApprovalId && str c "action" = "approve-package"
+                && str c "manifest_sha256" = manifest && str c "review_sha256" = review)
+        with Stop _ -> false
+    (git repo [ "log"; "--first-parent"; "--format=%H"; "origin/main"; "--"; approvalsPath ]).Split('\n', StringSplitOptions.RemoveEmptyEntries)
+    |> List.ofArray
+    |> List.takeWhile binds
+    |> List.tryLast
+
+/// v4.1.1 from start to finish: decide ODR-V411-02, merge; approve (ODR-V411-01), merge; tag. Every decision, approval,
+/// merge and the tag waits for your typed answer, exactly as the separate steps do. Run it again after a stop: a step
+/// already done on main is skipped.
+let freeze repo dryRun (p: Package) =
+    if p.Name <> "v4.1.1" then stop "freeze runs the v4.1.1 steps; for v4 and v4.1 use decide, approve and tag"
+    if dryRun then
+        say "DRY RUN: step 1 (decide) as it would be asked; a real run then merges, approves, merges and tags."
+        decide repo true p |> ignore
+    else
+    rule (); say "Step 1 of 3: decide ODR-V411-02."
+    decide repo false p |> Option.iter (mergeOwnerPr repo)
+    git repo [ "fetch"; "--quiet"; "origin"; "main" ] |> ignore
+    match recordedChanges (approvalsAtMain repo) |> List.tryFind (fun c -> str c "decision_id" = "ODR-V411-02") |> Option.map (fun c -> str c "option") with
+    | None -> stop "ODR-V411-02 is not recorded on main, so v4.1.1 cannot be approved yet; run freeze v4.1.1 again to decide it"
+    | Some o when o <> "A" -> stop $"you recorded option {o} for ODR-V411-02. The package needs a change before it can be approved (FREEZE.md step 2): tell the agent, and run freeze v4.1.1 again after that change merges"
+    | Some _ -> say "ODR-V411-02 is recorded on main (option A)."
+    rule (); say "Step 2 of 3: approve v4.1.1 (ODR-V411-01)."
+    approve repo false p |> Option.iter (mergeOwnerPr repo)
+    git repo [ "fetch"; "--quiet"; "origin"; "main"; "--tags" ] |> ignore
+    let commit = approvalMergeCommit repo p |> Option.defaultWith (fun () -> stop "no ODR-V411-01 approval of the package as it stands is on main; run freeze v4.1.1 again to approve it")
+    rule (); say $"Step 3 of 3: tag {p.Tag} on the approval's merge commit {commit}."
+    if git repo [ "tag"; "-l"; p.Tag ] <> "" then say $"{p.Tag} already exists; nothing to do." else
+    tag repo false p (Some commit)
+    say "v4.1.1 is decided, approved and tagged."
+
 // ---- main --------------------------------------------------------------------------------------------------------------
 
 let argv = fsi.CommandLineArgs |> Array.toList |> List.tail
@@ -444,13 +531,14 @@ let writes = not (flag "--dry-run")
 
 let exitCode =
     try
-        if writes && argv |> List.exists (fun a -> List.contains a [ "decide"; "approve"; "tag" ]) then ownerAtTerminal ()
+        if writes && argv |> List.exists (fun a -> List.contains a [ "decide"; "approve"; "tag"; "freeze" ]) then ownerAtTerminal ()
         match argv |> List.filter (fun a -> not (a.StartsWith "--")) |> List.except (option "--repo" |> Option.toList) |> List.except (option "--commit" |> Option.toList) with
         | [ "status" ] -> status repo; 0
-        | [ "decide"; name ] -> decide repo (flag "--dry-run") (packageNamed name); 0
-        | [ "approve"; name ] -> approve repo (flag "--dry-run") (packageNamed name); 0
+        | [ "decide"; name ] -> decide repo (flag "--dry-run") (packageNamed name) |> ignore; 0
+        | [ "approve"; name ] -> approve repo (flag "--dry-run") (packageNamed name) |> ignore; 0
+        | [ "freeze"; name ] -> freeze repo (flag "--dry-run") (packageNamed name); 0
         | [ "tag"; name ] -> tag repo (flag "--dry-run") (packageNamed name) (option "--commit"); 0
-        | _ -> say "usage: dotnet fsi Indy-init/tools/owner-freeze.fsx -- status | decide v4|v4.1|v4.1.1 | approve v4|v4.1|v4.1.1 | tag v4|v4.1|v4.1.1 [--commit SHA] [--repo DIR] [--dry-run]"; 2
+        | _ -> say "usage: dotnet fsi Indy-init/tools/owner-freeze.fsx -- status | decide v4|v4.1|v4.1.1 | approve v4|v4.1|v4.1.1 | tag v4|v4.1|v4.1.1 [--commit SHA] | freeze v4.1.1 [--repo DIR] [--dry-run]"; 2
     with Stop message -> eprintfn "stopped: %s" message; 1
 
 exit exitCode
