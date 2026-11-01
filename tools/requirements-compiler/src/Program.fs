@@ -1128,11 +1128,14 @@ let formaFromTarball (path: string) : string * string * Json =
 /// Reads every input of the v4.1 stage: v4's plan, manifest, machines, tasks and policy, and the authored v4.1 inputs.
 let v41Inputs (source: string) (package: string) (basePackage: string) (formaTarball: string option) : V41Package.Inputs =
     let a n = Path.Combine(package, "analysis", n)
-    let authored = [ "interface-specifications.json"; "project-structure.json"; "github-error-matrix.json"; "forma-layout-contract.json"; "task-adjustments.json"; "conflict-telemetry.json"; "guard-partitions.json"; "state-machine-amendments.json" ]
+    // A successor amendment (v4.1.1 and later) is the package's analysis/amendment.json; v4.1 itself has none.
+    let amendment = if File.Exists(a "amendment.json") then Some(parseFile (a "amendment.json")) else None
+    let authored = [ "interface-specifications.json"; "project-structure.json"; "github-error-matrix.json"; "forma-layout-contract.json"; "task-adjustments.json"; "conflict-telemetry.json"; "guard-partitions.json"; "state-machine-amendments.json" ] @ (if amendment.IsSome then [ "amendment.json" ] else [])
     // Documents and records the owner approves with the package; the review record exists once a review has run.
     let documents =
         [ "README.md"; "AGENT-RULES.md"; "FREEZE.md"; "optimization-report.md"; "independent-review.md"; "proposals/owner-decision-requests.json"; "analysis/independent-review.json"
           "layout-tests/assertions.mjs"; "layout-tests/fixtures.mjs"; "layout-tests/run.mjs"; "layout-tests/catch-rate.mjs" ]
+        @ (amendment |> Option.map (fun x -> strs "inputs" x @ strs "documents" x) |> Option.defaultValue [])
     let forma = parseFile (a "forma-layout-contract.json")
     let formaSpec = field "forma" forma |> Option.defaultValue JNull
     let inventoryPath = Path.Combine(package, str "inventory" formaSpec)
@@ -1157,6 +1160,7 @@ let v41Inputs (source: string) (package: string) (basePackage: string) (formaTar
       Telemetry = parseFile (a "conflict-telemetry.json")
       GuardPartitions = parseFile (a "guard-partitions.json")
       MachineAmendments = parseFile (a "state-machine-amendments.json")
+      Amendment = amendment
       FormaInventory =
         if File.Exists inventoryPath then parseFile inventoryPath
         else match extract with Some x -> x | None -> failwithf "%s is missing; generate it with --forma-tarball" inventoryPath
@@ -1191,8 +1195,27 @@ let v41Command (args: string list) : int =
             match m.TryFind "--bootstrap" with
             // An empty application repository may already hold its .git directory (git init, or a clone of an empty
             // repository); anything else is refused, so the bootstrap never overwrites work.
+            // v4.1.1: Conditor initializes the empty repository first; the generator then layers onto it (layerFile)
+            // and refuses, writing nothing, if any file it would change is not one of the three it may merge.
             | Some dir when Directory.Exists dir && Directory.EnumerateFileSystemEntries dir |> Seq.exists (fun e -> Path.GetFileName e <> ".git") ->
-                failwithf "--bootstrap needs a new or empty directory (a .git directory is allowed); %s holds other files" dir
+                let layered = i.Amendment |> Option.bind (field "bootstrap") |> Option.bind (strOpt "layersOnto") = Some "conditor"
+                if not (layered && File.Exists(Path.Combine(dir, "conditor.json"))) then
+                    failwithf "--bootstrap needs a new or empty directory (a .git directory is allowed)%s; %s holds other files" (if layered then ", or one Conditor initialized" else "") dir
+                let files = V41Package.bootstrapFiles i (V41Package.ownedFiles i) (File.ReadAllText(Path.Combine(m.["--source"], "global.json")))
+                let plan =
+                    files |> List.map (fun (n, t) ->
+                        let p = Path.Combine(dir, n)
+                        n, (if File.Exists p then V41Package.layerFile n (File.ReadAllText p) t else Ok(Some t)))
+                match plan |> List.choose (fun (_, r) -> match r with Error e -> Some e | Ok _ -> None) with
+                | [] -> ()
+                | errors -> failwithf "the bootstrap cannot layer onto %s:\n  %s" dir (String.concat "\n  " errors)
+                let writes = plan |> List.choose (fun (n, r) -> match r with Ok(Some t) -> Some(n, t) | _ -> None)
+                for (n, t) in writes do
+                    let p = Path.Combine(dir, n)
+                    Directory.CreateDirectory(Path.GetDirectoryName p) |> ignore
+                    File.WriteAllText(p, t)
+                let merged = writes |> List.filter (fun (n, _) -> List.contains n [ "package.json"; ".gitignore" ] && File.Exists(Path.Combine(dir, n)))
+                printfn "bootstrap: %d of %d files written onto the Conditor repository %s (merged: %s)" writes.Length files.Length dir (merged |> List.map fst |> String.concat ", ")
             | Some dir ->
                 let files = V41Package.bootstrapFiles i (V41Package.ownedFiles i) (File.ReadAllText(Path.Combine(m.["--source"], "global.json")))
                 for (n, t) in files do
@@ -1220,7 +1243,7 @@ let v41Command (args: string list) : int =
             built.Checks |> List.iter (fun c ->
                 printfn "%s %s  %s" (if c.Problems.IsEmpty then "PASS" else "FAIL") c.Id c.Title
                 c.Problems |> List.truncate 10 |> List.iter (printfn "      - %s"))
-            printfn "v4.1 validation: %s; status: CANDIDATE" verdict
+            printfn "%s validation: %s; status: CANDIDATE" (match i.Amendment with Some _ -> "v" + V41Package.packageVersion i | None -> "v4.1") verdict
             if check then
                 let differing = all |> List.filter (fun (n, t) -> let p = Path.Combine(package, n) in not (File.Exists p) || File.ReadAllText p <> t) |> List.map fst
                 differing |> List.iter (eprintfn "differs from the package: %s")

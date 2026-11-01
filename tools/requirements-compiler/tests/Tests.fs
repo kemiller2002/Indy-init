@@ -756,7 +756,7 @@ let main argv =
             eprintfn "%s" e
             2
         | Ok o ->
-            let processFailures = snd (processSimulation o.Source) @ producerBindings o.Source @ r6Readiness o.Source @ R6ScopeTests.all o.Source @ V4Tests.all o.Source @ V41Tests.all o.Source
+            let processFailures = snd (processSimulation o.Source) @ producerBindings o.Source @ r6Readiness o.Source @ R6ScopeTests.all o.Source @ V4Tests.all o.Source @ V41Tests.all o.Source @ V411Tests.all o.Source
             let failures = offline o.Source @ processFailures @ toolingLanguage o.Source
             let label = "offline tests (baseline equivalence, baseline units, preflight verdict, verification plan, acceptance contracts, process evidence, v4 scope and controls, v4.1 scope and controls, F#-only tooling)"
             let code = report failures label
