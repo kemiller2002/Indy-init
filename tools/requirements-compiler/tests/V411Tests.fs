@@ -127,6 +127,43 @@ let scanner : string list =
       | [ "f"; _ ] -> ()
       | other -> yield sprintf "scanner: an and-chained binding is not reported separately: %A" other ]
 
+/// The bootstrap layered onto the recorded Conditor 0.10.18 scaffold (RV411-1-10): it merges package.json and
+/// .gitignore, keeps Conditor's Directory.Build.props, writes the skeleton, and leaves Conditor's own files untouched.
+let ontoConditor (source: string) : string list =
+    let fixture = Path.Combine(source, "tools", "requirements-compiler", "tests", "fixtures", "conditor-0.10.18-scaffold")
+    let target = Path.Combine(Path.GetTempPath(), "v411-layered-" + string (System.Guid.NewGuid()))
+    let copy (rel: string) (dest: string) =
+        let p = Path.Combine(target, dest)
+        Directory.CreateDirectory(Path.GetDirectoryName p) |> ignore
+        File.Copy(Path.Combine(fixture, rel), p)
+    let files = Directory.GetFiles(fixture, "*", SearchOption.AllDirectories) |> Array.map (fun f -> Path.GetRelativePath(fixture, f).Replace('\\', '/')) |> List.ofArray
+    try
+        Directory.CreateDirectory(Path.Combine(target, ".git")) |> ignore
+        files |> List.filter (fun f -> f <> "README.md") |> List.iter (fun f -> copy f (if f = "gitignore.txt" then ".gitignore" else f))
+        let before = files |> List.filter (fun f -> f.StartsWith "src/engine/" || f.StartsWith "tests/App.Engine.Tests/" || f = "App.slnx" || f = "Directory.Build.props") |> List.map (fun f -> f, File.ReadAllText(Path.Combine(target, f)))
+        let code =
+            Program.v41Command [ "--source"; source; "--package"; Path.Combine(source, "requirements-compiled", "v4.1.1"); "--base"; Path.Combine(source, "requirements-compiled", "v4"); "--check"; "--bootstrap"; target ]
+        let read (f: string) = let p = Path.Combine(target, f) in if File.Exists p then Some(File.ReadAllText p) else None
+        let pkg = read "package.json" |> Option.map (System.Text.Encoding.UTF8.GetBytes >> parseBytes)
+        [ if code <> 0 then yield sprintf "onto Conditor: the bootstrap exited %d" code
+          for (f, t) in before do
+              if read f <> Some t then yield sprintf "onto Conditor: %s was changed" f
+          if (read "Causa.slnx").IsNone then yield "onto Conditor: the skeleton was not written"
+          match pkg with
+          | Some j ->
+              if strOpt "name" j <> (parseFile (Path.Combine(fixture, "package.json")) |> strOpt "name") then yield "onto Conditor: package.json lost Conditor's name"
+              if (field "devDependencies" j |> Option.bind (strOpt "axe-core")) <> Some "4.14.0" then yield "onto Conditor: package.json lacks the owner's axe-core lock"
+              if (field "scripts" j).IsNone then yield "onto Conditor: package.json lost Conditor's scripts"
+          | None -> yield "onto Conditor: package.json is missing"
+          match read ".gitignore" with
+          | Some g when g.StartsWith(File.ReadAllText(Path.Combine(fixture, "gitignore.txt")).TrimEnd('\n')) -> ()
+          | _ -> yield "onto Conditor: Conditor's .gitignore was not kept ahead of the generator's lines"
+          match read "Directory.Packages.props" with
+          | Some p when p.Contains "StartsWith('Causa.')" -> ()
+          | _ -> yield "onto Conditor: central package management is not limited to the Causa projects" ]
+    finally
+        if Directory.Exists target then Directory.Delete(target, true)
+
 /// Each v4.1.1 check rejects what it guards against.
 let controls (source: string) : string list =
     let i0 = inputs source
@@ -184,4 +221,5 @@ let all (source: string) : string list =
     (try scope source with ex -> [ "v4.1.1 scope: " + ex.Message ])
     @ (try layering with ex -> [ "v4.1.1 layering: " + ex.Message ])
     @ (try scanner with ex -> [ "v4.1.1 scanner: " + ex.Message ])
+    @ (try ontoConditor source with ex -> [ "v4.1.1 onto Conditor: " + ex.Message ])
     @ (try controls source with ex -> [ "v4.1.1 controls: " + ex.Message ])
