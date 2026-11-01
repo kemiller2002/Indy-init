@@ -929,6 +929,68 @@ let reviewAttestationsCommand (args: string list) : int =
             2
 
 
+/// `token-economics`: Amendment D. Reads the Praxis execution records of a rehearsal repository
+/// (ROOT/.ros/telemetry/executions/*.json) and writes token-economics.json and token-economics.md (default
+/// ROOT/evidence/telemetry). The report itself is pure (TokenEconomics.build); this is the IO edge. Exit 0 written,
+/// 2 unusable input.
+let tokenEconomicsUsage =
+    "usage: requirements-compiler token-economics ROOT --window-start ISO-8601 --window-end ISO-8601 [--price-table FILE] [--out DIR]"
+
+/// The report for ROOT's execution records: the JSON text and the Markdown text.
+let tokenEconomicsReport (root: string) (window: TokenEconomics.Window) (priceTable: string option) : Result<string * string, string> =
+    let dir = Path.Combine(root, ".ros", "telemetry", "executions")
+    if not (Directory.Exists dir) then Error(sprintf "no Praxis execution records: %s does not exist" dir)
+    else
+        let table =
+            match priceTable with
+            | None -> Ok None
+            | Some f -> TokenEconomics.parsePriceTable (parseFile f) |> Result.map Some
+        match table with
+        | Error e -> Error e
+        | Ok t ->
+            let records =
+                Directory.GetFiles(dir, "*.json")
+                |> Array.sortWith (fun a b -> String.CompareOrdinal(a, b))
+                |> Array.map (fun f ->
+                    let bytes = File.ReadAllBytes f
+                    Path.GetFileName f, Git.sha256Hex bytes, parseBytes bytes)
+                |> List.ofArray
+            let report = TokenEconomics.build window t records
+            Ok(serialize report, TokenEconomics.markdown report)
+
+let tokenEconomicsCommand (args: string list) : int =
+    match args with
+    | root :: rest when not (root.StartsWith("--", StringComparison.Ordinal)) ->
+        match optionMap rest with
+        | Error e ->
+            eprintfn "%s\n%s" e tokenEconomicsUsage
+            2
+        | Ok m ->
+            let last k = m.TryFind k |> Option.map List.last
+            match last "--window-start" |> Option.bind TokenEconomics.parseTime, last "--window-end" |> Option.bind TokenEconomics.parseTime with
+            | Some s, Some e when s <= e ->
+                try
+                    match tokenEconomicsReport root { Start = s; End = e } (last "--price-table") with
+                    | Error msg ->
+                        eprintfn "input error: %s" msg
+                        2
+                    | Ok(json, md) ->
+                        let out = last "--out" |> Option.defaultValue (Path.Combine(root, "evidence", "telemetry"))
+                        Directory.CreateDirectory out |> ignore
+                        File.WriteAllText(Path.Combine(out, "token-economics.json"), json)
+                        File.WriteAllText(Path.Combine(out, "token-economics.md"), md)
+                        printfn "wrote %s and %s" (Path.Combine(out, "token-economics.json")) (Path.Combine(out, "token-economics.md"))
+                        0
+                with ex ->
+                    eprintfn "input error: %s" ex.Message
+                    2
+            | _ ->
+                eprintfn "--window-start and --window-end must be ISO-8601 times, start not after end\n%s" tokenEconomicsUsage
+                2
+    | _ ->
+        eprintfn "%s" tokenEconomicsUsage
+        2
+
 /// The F# source files that make up the compiler and its tests, relative to the compiler directory, for the tree
 /// digest the compiler test record and the freeze manifest carry.
 let compilerSources (compilerDir: string) : (string * byte[]) list =
@@ -1254,6 +1316,7 @@ let main argv =
     | "review-attestations" :: rest -> reviewAttestationsCommand rest
     | "v4" :: rest -> v4Command rest
     | "v41" :: rest -> v41Command rest
+    | "token-economics" :: rest -> tokenEconomicsCommand rest
     | "preflight" :: rest ->
         match parseArgs rest defaults with
         | Error e ->

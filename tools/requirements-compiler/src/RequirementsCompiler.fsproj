@@ -36,6 +36,7 @@
     <Compile Include="Preflight.fs" />
     <Compile Include="V4Package.fs" />
     <Compile Include="V41Package.fs" />
+    <Compile Include="TokenEconomics.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 </Project>
