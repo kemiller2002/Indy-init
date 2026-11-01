@@ -46,12 +46,12 @@ T10 is the first timed task. Integration:
 5. builds the skeleton and runs `conditor ci-policy check`;
 6. commits (the initial bootstrap commit), publishes with `conditor repo create`, and waits for the first green CI.
 
-The generator writes the contract declarations into their producers' files and an empty namespace into every other planned file. It writes no application behavior beyond the reviewed boundary code that [contract-classification.json](contract-classification.json) lists: the credential that prints as `<credential>` and the confirmation that exists only from a matching read-back. No source is imported from an earlier rehearsal (X11).
+The generator writes the contract declarations into their producers' files, an empty namespace into every other planned file, and one pre-written executable test module: `tests/browser/support/layout-assertions.mjs`, the layout contract's assertion kit (979 lines), which the plan's browser tests import. It writes no application behavior beyond the reviewed boundary code that [contract-classification.json](contract-classification.json) lists: the credential that prints as `<credential>` and the confirmation that exists only from a matching read-back. No source is imported from an earlier rehearsal (X11).
 
 ## Historical records, unchanged
 
 - ODR-V41-06 (proposals/owner-decision-requests.json) and its record APR-V41-OWNER-1 in `kickoff/rehearsal-007/approvals.causa.json` stay as written, including the owner's `organizer_confirmation` text. This policy does not restate or reinterpret what the organizers said.
-- The published-rule section of docs/HACKATHON-BOUNDARIES.md stays as reviewed on 2026-09-24.
+- The quoted published rules in docs/HACKATHON-BOUNDARIES.md (the list under "Published rule verification") stay as reviewed on 2026-09-24. Two other lines of that section, the ones that made the plan wait for clarification, were rewritten under OD-INDY-18 on 2026-11-01. X19 checks the quoted rules by their text.
 
 ## Residual interpretation risk
 

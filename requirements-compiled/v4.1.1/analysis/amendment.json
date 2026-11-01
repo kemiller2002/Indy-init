@@ -226,7 +226,7 @@
         "id": "ADRP-016-O2",
         "source": "requirements-compiled/v4/requirements-inventory.json",
         "decision": "ODR-V411-02",
-        "disposition": "A must obligation of the frozen baseline. It stays unchanged and is not weakened or claimed met. Without organizer approval it is reported as not met at G0 and G10; the owner decides whether to proceed so (ODR-V411-02). Its second clause, no prebuilt competition app transferred, holds: nothing is written to the competition repository before T0."
+        "disposition": "A must obligation of the frozen baseline with two clauses. First: prepared requirements, library capabilities, design guidance, frozen fixtures and scripts are subject to organizer approval. Second: do not transfer a prebuilt competition app where prohibited. Both stay unchanged, and neither is claimed met here. The package as proposed (option A of ODR-V411-02) does not seek organizer approval. At T0 it writes the material prepared before kickoff into the competition repository: the contract declarations, the generator output, the executable layout-assertion module, the Conditor scaffold and the requirements import. Whether that counts as transferring a prebuilt app is the open question of STARTING-STATE.md. The obligation is verified by its own evidence at G0 and G10, and the owner decides how it is treated (ODR-V411-02)."
       },
       {
         "id": "AGENT-DECISION-REDUCTION-PROFILE§pre-experiment-readiness-checklist-O7",
@@ -354,7 +354,7 @@
         "source": "docs/DOMAIN-TEST-MATRIX.md",
         "quote": "If organizer rules permit pre-written executable acceptance tests",
         "decision": "ODR-V411-02",
-        "disposition": "The matrix converts to executable tests before kickoff only if organizer rules permit (§29: 'verify event rules regarding pre-written executable tests'). v4.1.1 writes no executable test to the competition repository before T0; the test files are empty namespaces at T0. Whether pre-written test specifications need an organizer answer is part of ODR-V411-02."
+        "disposition": "The matrix converts to executable tests before kickoff only if organizer rules permit (§29: 'verify event rules regarding pre-written executable tests'). At T0, v4.1.1 writes empty namespaces for the plan's test files, plus one pre-written executable test module: tests/browser/support/layout-assertions.mjs, the layout contract's 979-line assertion kit, which the plan's browser tests import. Whether pre-written executable test code may be written at T0 is part of ODR-V411-02."
       },
       {
         "id": "PRODUCT-REQUIREMENTS line 1056",
