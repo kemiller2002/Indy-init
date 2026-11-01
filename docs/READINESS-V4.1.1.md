@@ -38,7 +38,7 @@ Two files carry reviewed boundary code, seven members in all, each pinned by SHA
 - the credential's `ToString`, `create` and `authorization` (PF-015, INV-21);
 - the confirmation's three accessors and `ofReadBack` (PERSIST-023).
 
-They fix the `Bearer` scheme and exact read-back equality, both of which are requirements. The byte equality with v4.1's reviewed contracts is the guarantee. X17's line scan is a second, heuristic guard. It approximates the F# lexer's reading of strings, characters and comments; comments are read with and without strings inside them, and code that either reading finds is reported. The offline suite tests it against every bypass form the four review rounds found.
+They fix the `Bearer` scheme and exact read-back equality, both of which are requirements. The byte equality with v4.1's reviewed contracts is the guarantee. X17's line scan is a second, heuristic guard. It approximates the F# lexer's reading of strings, characters and comments; comments are read with and without strings inside them, and code that either reading finds is reported. The offline suite tests it against representative bypass forms from each review round. It remains a heuristic that a determined author can defeat; byte equality is the guarantee.
 
 ## D. Is file ownership unambiguous?
 
@@ -90,4 +90,4 @@ Two levers would cut actual work without removing a requirement. They are not ap
 
 ## Independent review
 
-See [independent-review.md](../requirements-compiled/v4.1.1/independent-review.md). Rounds 1 to 3 failed, with five, one and one major findings, none of them blocking. Round 4 passed, with three minor findings and two notes. Every finding has a disposition. A short round 5 verifies the round-4 fixes.
+See [independent-review.md](../requirements-compiled/v4.1.1/independent-review.md). Rounds 1 to 3 failed, with five, one and one major findings, none of them blocking. Round 4 passed, with three minor findings and two notes. Round 5 verified those fixes and passed, with one minor finding and three notes. Every finding has a disposition.

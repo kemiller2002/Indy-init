@@ -2,6 +2,82 @@
 
 The reviews are independent: each was run by an agent that did not write the package, read-only, with instructions to challenge it. A failed review is recorded as failed. [analysis/independent-review.json](analysis/independent-review.json) holds the latest round, with each finding's disposition.
 
+## Round 5: PASS (verification of the round-4 fixes)
+
+Reviewed commit 2a73b9c982fad1237573c3d093c50ebf0295347f. Round 4 had reviewed the whole package and passed; round 5 verified its five fixes, all real, and the diff since. It found no blocking or major issue; it left one minor finding and three notes. The changes made after round 5, listed below, are wording and two added tests. They were not reviewed again.
+
+| Finding | Severity | Disposition |
+|---|---|---|
+| RV411-5-1 | minor | Accepted as a stated limit; the scan is not changed. The documents now say the line scan is a heuristic a determined author can defeat, and that one comment mixing a character literal and a string defeats both readings. The guarantee is X17's byte equality with the reviewed v4.1 contracts, checked against the approved manifest's digests and diffed by CI. Every v4.1.1 contract is byte-identical to v4.1's. |
+| RV411-5-2 | note | Fixed: AMENDMENT B and READINESS C now say the suite tests representative forms from each round, not every form. |
+| RV411-5-3 | note | Fixed: AMENDMENT C says 30 entries. |
+| RV411-5-4 | note | Fixed: offline controls change a reference's pinned line digest, which must fail X19, and the runbook digest, which must fail X20. |
+
+### The reviewer's report (round 5)
+
+
+**Package:** requirements-compiled/v4.1.1  
+**Commit:** 2a73b9c (branch claude/v411-amendment)  
+**Verdict: PASS**  
+**Scope:** verification of the round-4 fixes and the diff since round 4; round 4 reviewed the whole package
+
+No blocking or major finding. All five round-4 dispositions are verified by re-running the round-4 probes against the 2a73b9c build. The X18 and X19 descriptions now match the checks. One minor finding: the two-reading X17 scan can be evaded by a comment that mixes a character, verbatim or triple-quoted literal with a string holding '(*'. The documents disclose that the scan is a heuristic, and byte equality with v4.1 remains the guarantee. Three notes. ODR-V411-02 and ODR-V411-01 are pending by design.
+
+#### What was run
+
+- export PATH=$HOME/.dotnet:$PATH; dotnet build tools/requirements-compiler/src -c Release (in /home/user/indy-init): Build succeeded, 0 warnings, 0 errors
+- v41 --check for v4.1.1: X01-X20 PASS, validation PASS, status CANDIDATE (check-v411.log)
+- v41 --check for v4.1: X01-X16 PASS, validation PASS (check-v41.log); sha256 of v4.1/package-manifest.json = 779916ab...31736a = APR-V41-OWNER-4
+- git diff 3f5d062..2a73b9c on requirements-compiled/v4, requirements-compiled/v4.1, kickoff/: empty. Manifests: v4.1.1 45 files and v4.1 40 files, every sha256 matches, none missing or unlisted
+- Committed analysis/independent-review.json equals round 4's JSON apart from the added disposition fields
+- X17: round 4's x17r4.fsx re-pointed at the new dll, plus R5a-R5c (scripts/x17r5.fsx); R5a-R5c compiled with TreatWarningsAsErrors (fsprobe/proj-R5*)
+- Mutations on a git-archive copy of HEAD, each regenerated and then --check: m18 (round-4 mutX18 + upper-case/emphasis/code-mark variants: X18 FAIL), m19 (round-4 mutX19 exactly: X19 FAIL), m19v (reply/cleared wording: X19 PASS, disclosed), m19pin (text appended to the pinned duty-1 line: X19 FAIL), m20 (runbook edit: X20 FAIL)
+- Offline suite in a scratch clone with origin/main=3f5d062: 'all passed', exit 0 (offline-suite.log); a first attempt in a git-archive copy without history aborted on a missing git object, which is an environment problem, not a test failure
+
+#### Round-4 dispositions
+
+| ID | Verified | Note |
+|---|---|---|
+| RV411-4-1 | yes | Fixed as described. contractImplementations now scans twice (stripCode with and without strings lexed inside comments) and reports the union. Re-running round 4's x17r4.fsx against the 2a73b9c build: R3a, R3f, R3h, R4a, R4b, R4c, R4d, R4e, R4g, R4h and R4i are detected, and R4f is detected; R3d is still not detected (a known limit since round 3) and R3i is not code. The documents now describe the limit accurately: AMENDMENT B and READINESS C say comments are read both ways, that either reading's code is reported, and that the scan 'remains a heuristic: the guarantee is layer 1'. Residuals: a form that evades both readings exists (RV411-5-1), and 'catches every form the four review rounds used' does not hold for R3d (RV411-5-2). |
+| RV411-4-2 | yes | Fixed. entrypointCheck lowercases the line and the file name and strips backslashes and backticks. Round 4's mutX18 lines ('Index.html', 'Causa.css', 'index\.html, causa\.css') plus '**INDEX.HTML**' and '`Causa.CSS`' each fail X18 twice (once per file) after regeneration (m18.check.log). AMENDMENT E and READINESS D now say the match 'ignores case, Markdown escapes and code marks' and that prose not naming the files is unchecked; that matches the code. Three case and escape controls were added to the offline suite. |
+| RV411-4-3 | yes | Fixed. gateRx gains response/go-ahead/pending/clearance/blessing, organizerRx gains 'organi[sz]ing committee'. Round 4's exact mutX19 now fails X19 on both lines (AGENT-RULES:19 and HACKATHON-BOUNDARIES:116). V411-C now reads 'a heuristic over those sources, and requires a disposition for each it finds', and AMENDMENT C adds 'It looks for a list of words, and a gate worded without any of them is not found'. That disclosure is accurate: 'needs an organizer reply before T10 starts' and 'only once the organising committee has cleared the prepared material' still pass X19 (m19v), which the documents now admit. New: doc-sourced references carry lineSha256, so appending gate text to a reviewed line fails X19 (m19pin). |
+| RV411-4-4 | yes | Fixed. amendment.json pinnedDocuments pins docs/TOKEN-ECONOMICS.md at afa3fb2a...c91b3, which equals sha256sum of the file; amendmentRecordCheck (X20) checks it, and appending a line to the runbook fails X20 (m20.check.log). Because amendment.json is in the package manifest, ODR-V411-01's digest now fixes the runbook. Token usage moved to a new 'Coordinator duties' section (item 1); READINESS E and AMENDMENT D say 'coordinator duty 1', and no current document still says 'duty 6' outside the historical review records. The post-freeze main-session residual remains disclosed in TOKEN-ECONOMICS.md:41-42. |
+| RV411-4-5 | yes | Fixed. The T14 rationale in analysis/task-adjustments.json keeps v4.1's sentence and appends '(v4.1's text, superseded in v4.1.1: the contracts are materialized at T0, and whether this rests on ODR-V41-06 without its organizer premise is the owner's decision ODR-V411-02; see STARTING-STATE.md.)'. This agrees with STARTING-STATE and the waiver dispositions; X13 and X19 pass. |
+
+#### Findings
+
+##### RV411-5-1 (minor): B: X17 line scan (two-reading fix)
+
+The two readings can be defeated together. Reading A (strings lexed inside comments) is misled by a literal it does not know inside a comment, such as a character literal '"', a verbatim string @"\" or a triple-quoted string """\""". Reading B (no strings inside comments) is misled by a '(*' inside a string in the comment, which it counts as a nested comment. Put one of each in the same comment, as in '(* '"' "(*" *)', and both readings blank the module that follows, while F# closes the comment at the first '*)'. Three probes, R5a '(* '"' "(*" *)', R5b 'type T = | A (* @"\" "(*" *)' and R5c '(* """\""" "(*" *)', each followed by 'module Evil =', '    let run () = System.Environment.Exit 3 // " *)' and '// *)'. contractImplementations reports nothing for any of them. Each compiles with TreatWarningsAsErrors, and another file can call P.Evil.run. The documents are accurate about this: they call the scan a heuristic whose guarantee is layer 1, and the code comment says only that hidden code 'must evade both'. Impact is limited. The committed contracts are byte-identical to v4.1 (X17 layer 1), and they hold only the 7 allowlisted members.
+
+**Evidence.** /tmp/claude-0/review411-r5/scripts/x17r5.fsx output (R5a-R5c NOT DETECTED, all round-4 forms detected); /tmp/claude-0/review411-r5/fsprobe/proj-R5a, proj-R5b, proj-R5c and build-R5*.log (Build succeeded, 0 warnings, 0 errors); tools/requirements-compiler/src/V41Package.fs stripCode/skipBlock (only '"', '(*' and '*)' are recognised inside comments) and contractImplementations 'scan true @ scan false'
+
+**Remediation.** Use one reading that does what the F# lexer does inside a block comment. Skip a character literal (including '"' and '\"'), a verbatim @"..." string, a triple-quoted """...""" string and a plain string, each by its own rule, and count '(*' and '*)' only outside them. Add R5a to R5c as offline controls. Otherwise, add to AMENDMENT B that a comment mixing these literals can still hide code from the scan.
+
+##### RV411-5-2 (note): B: X17 description
+
+AMENDMENT B says the scan 'catches every form the four review rounds used, and the offline suite tests each one'. Round 3's R3d does not fit that sentence. R3d is a keyword-free module-level pipeline from a union case ('Victim' / '|> string' / '|> System.IO.File.Delete'). It compiles, and the scanner still does not detect it (x17r5.fsx). Round 3 counted it as admitted by the 'begins as a declaration and carries no code keyword' rule, but the sentence makes no exception for it. A similar sentence was already there at round 4 ('three review rounds ... 20 in all'). The disposition for RV411-4-1 also says 'the five round-4 forms and R3f are offline controls'. The suite instead adds three representative forms: a lone quote, a verbatim string and a triple-quoted string inside a comment. The character-literal forms R3f, R4a and R4d are covered only by that class, not literally.
+
+**Evidence.** requirements-compiled/v4.1.1/AMENDMENT-4.1.1.md:67; /tmp/claude-0/review411-r5/scripts/x17r5.fsx (R3d NOT DETECTED); tools/requirements-compiler/tests/V411Tests.fs:132-135; analysis/independent-review.json RV411-4-1 disposition
+
+**Remediation.** Change the sentence to 'catches every form the four review rounds used except the keyword-free continuation line (R3d)'. Alternatively, add R3d as an expected-undetected control, and reword the disposition to 'representative controls for each class'.
+
+##### RV411-5-3 (note): C: stale count
+
+AMENDMENT C still says 'startingState.organizerReferences, 29 entries'. The round-5 fix added a 30th entry, 'v4.1.1 AGENT-RULES duty 1', because 'response' is now a gate word and duty 1's 'No organizer response is a prerequisite' line now matches.
+
+**Evidence.** requirements-compiled/v4.1.1/AMENDMENT-4.1.1.md:81; analysis/amendment.json startingState.organizerReferences (30 entries)
+
+**Remediation.** Change the count to 30, or remove it.
+
+##### RV411-5-4 (note): Tests: new pins have no offline control
+
+Neither of the two new enforcement paths has a negative control in the offline suite. One is the per-line lineSha256 pin for document references (X19). The other is pinnedDocuments (X20). Both work when mutated by hand: appending gate text to the pinned AGENT-RULES duty-1 line fails X19 (m19pin), and editing docs/TOKEN-ECONOMICS.md fails X20 (m20). But a regression in either would not be caught by CI.
+
+**Evidence.** tools/requirements-compiler/tests/V411Tests.fs (no lineSha256 or pinnedDocuments control; X20 controls at lines 235-238 cover only the digest, version and package); /tmp/claude-0/review411-r5/m19pin.check.log, m20.check.log
+
+**Remediation.** Add two expectFail controls: one that appends text to a pinned reviewed line ('X19'), and one that changes a pinned document's text or digest ('X20').
+
 ## Round 4: PASS
 
 Reviewed commit 168cdae. No blocking or major finding; three minor findings and two notes. Each is fixed after the review, as the table says, and a short round 5 verifies those fixes.

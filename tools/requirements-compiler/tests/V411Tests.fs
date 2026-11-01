@@ -224,6 +224,9 @@ let controls (source: string) : string list =
       yield! expectFail "measurement missing" "X19" { i0 with AuthoredText = i0.AuthoredText |> List.filter (fst >> (<>) "analysis/bootstrap-measurement.json") }
       yield! expectFail "organizer wait added to the bootstrap duty" "X19" (authored "AGENT-RULES.md" (fun t -> t.Replace("1. **At T0, bootstrap (T10, the first timed task).**", "1. **At T0, bootstrap (T10, the first timed task).** Do not start until an organizer has signed off on the prepared material in writing.")))
       yield! expectFail "organizer response required by T10" "X19" (authored "AGENT-RULES.md" (fun t -> t + "\nT10 requires an organizer response before it starts.\n"))
+      // Round 5 (RV411-5-4): the line pins of document references and the runbook pin.
+      yield! expectFail "pinned line changed" "X19" (policy (mapArr "organizerReferences" (List.map (fun r -> if strOpt "id" r = Some "v4.1.1 AGENT-RULES duty 1" then setIn "lineSha256" (JStr(String.replicate 64 "0")) r else r))))
+      yield! expectFail "runbook digest changed" "X20" (amend (mapArr "pinnedDocuments" (List.map (setIn "sha256" (JStr(String.replicate 64 "0"))))))
       yield! expectFail "historical record changed" "X19" (policy (mapArr "historicalRecords" (List.map (fun h -> if strOpt "id" h = Some "APR-V41-OWNER-1" then setIn "quote" (JStr "\"organizer_confirmation\": \"The organizers confirmed it.\"") h else h))))
       yield! expectFail "published rule paraphrased" "X19" (policy (mapArr "externalConstraints" (List.map (fun _ -> JStr "the repository may contain scaffolding"))))
       yield! expectFail "relies on ODR-V41-06" "X19" (authored "AGENT-RULES.md" (fun t -> t + "\nThis relies on ODR-V41-06.\n"))
