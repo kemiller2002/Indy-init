@@ -38,6 +38,20 @@ jobs:
             exit 1
           fi
           git worktree add --quiet --detach "$RUNNER_TEMP/v4-frozen" indy-init-requirements-v4.0.0
+      - name: Compiled packages v4.1 and v4.1.1 on this commit are the frozen ones (tags indy-init-requirements-v4.1.0 at 183bbb4 and indy-init-requirements-v4.1.1 at f85081f)
+        run: |
+          frozen() {
+            tag=$1 commit=$2 dir=$3
+            git fetch --quiet --force origin "refs/tags/$tag:refs/tags/$tag"
+            test "$(git rev-parse "$tag^{commit}")" = "$commit" || { echo "tag $tag no longer names $commit"; exit 1; }
+            if ! git diff --quiet "$tag" HEAD -- "$dir"; then
+              echo "$dir differs from the frozen tag $tag:"
+              git diff --stat "$tag" HEAD -- "$dir"
+              exit 1
+            fi
+          }
+          frozen indy-init-requirements-v4.1.0 183bbb4abce1f00f59a37565ddb508c1d262895b requirements-compiled/v4.1
+          frozen indy-init-requirements-v4.1.1 f85081f8321e773ee5a564d183930e8fab20ef55 requirements-compiled/v4.1.1
       - name: Install the SDK the tagged compiler pins (the tag's global.json)
         uses: actions/setup-dotnet@v4
         with:
