@@ -1,0 +1,39 @@
+{
+  "schemaVersion": "1.0.0",
+  "executionId": "EXE-20260110T160000000Z-f0000006",
+  "workItemId": "WI-F5",
+  "workItem": { "repositoryId": null, "repository": "fixture/token-economics", "provider": "github", "localId": "WI-F5" },
+  "instanceId": "pxi-fixture",
+  "status": "finalized",
+  "startedAt": "2026-01-10T16:00:00.000Z",
+  "finalizedAt": "2026-01-10T16:30:00.000Z",
+  "identity": {
+    "provider": "fixture-provider", "model": "fixture-model-b", "modelVersion": null,
+    "runtime": "fixture-runtime", "runtimeVersion": null, "sessionId": "fixture-session-6",
+    "conversationId": null, "runId": null, "agentId": "fixture-provider/fixture-runtime", "subagentId": "reviewer-1",
+    "parentExecutionId": null, "actorKind": "agent", "orchestration": { "role": "reviewer" }
+  },
+  "provider": { "sessionId": "fixture-session-6", "agentInstanceId": "reviewer-1" },
+  "classification": { "types": [ "testing" ], "rationale": null, "evidence": [], "rd": null },
+  "capabilities": [
+    { "metricId": "tokens.input", "status": "supported-observed", "reason": "derived from the session transcript", "discoveredAt": "2026-01-10T16:29:00.000Z" },
+    { "metricId": "tokens.output", "status": "supported-observed", "reason": "derived from the session transcript; a lower bound: the transcript records the streaming-start count, not the provider's final count", "discoveredAt": "2026-01-10T16:29:00.000Z" },
+    { "metricId": "tokens.cache_read", "status": "supported-observed", "reason": "derived from the session transcript", "discoveredAt": "2026-01-10T16:29:00.000Z" },
+    { "metricId": "tokens.cache_write", "status": "supported-observed", "reason": "derived from the session transcript", "discoveredAt": "2026-01-10T16:29:00.000Z" },
+    { "metricId": "cost.execution_total", "status": "supported-unavailable", "reason": "runtime family can expose this metric, but no observation has been ingested for this execution", "discoveredAt": "2026-01-10T16:00:00.000Z" }
+  ],
+  "metrics": [
+    { "measurementId": "MEAS-f06-input", "id": "tokens.input", "value": 40, "unit": "tokens", "currency": null, "quality": "observed", "confidence": null, "scope": "session", "aggregation": "sum", "dimensions": { "snapshot": "fixture-session-6" }, "pricing": null, "source": { "type": "runtime-output", "name": "fixture-transcript", "mechanism": "session-transcript-jsonl", "provider": "fixture-provider", "runtime": "fixture-runtime" }, "collectedAt": "2026-01-10T16:29:00.000Z", "schemaVersion": "1.0.0" },
+    { "measurementId": "MEAS-f06-output", "id": "tokens.output", "value": 500, "unit": "tokens", "currency": null, "quality": "observed", "confidence": null, "scope": "session", "aggregation": "sum", "dimensions": { "bound": "lower", "snapshot": "fixture-session-6" }, "pricing": null, "source": { "type": "runtime-output", "name": "fixture-transcript", "mechanism": "session-transcript-jsonl", "provider": "fixture-provider", "runtime": "fixture-runtime" }, "collectedAt": "2026-01-10T16:29:00.000Z", "schemaVersion": "1.0.0" },
+    { "measurementId": "MEAS-f06-cache-read", "id": "tokens.cache_read", "value": 10000, "unit": "tokens", "currency": null, "quality": "observed", "confidence": null, "scope": "session", "aggregation": "sum", "dimensions": { "snapshot": "fixture-session-6" }, "pricing": null, "source": { "type": "runtime-output", "name": "fixture-transcript", "mechanism": "session-transcript-jsonl", "provider": "fixture-provider", "runtime": "fixture-runtime" }, "collectedAt": "2026-01-10T16:29:00.000Z", "schemaVersion": "1.0.0" },
+    { "measurementId": "MEAS-f06-cache-write", "id": "tokens.cache_write", "value": 2000, "unit": "tokens", "currency": null, "quality": "observed", "confidence": null, "scope": "session", "aggregation": "sum", "dimensions": { "snapshot": "fixture-session-6" }, "pricing": null, "source": { "type": "runtime-output", "name": "fixture-transcript", "mechanism": "session-transcript-jsonl", "provider": "fixture-provider", "runtime": "fixture-runtime" }, "collectedAt": "2026-01-10T16:29:00.000Z", "schemaVersion": "1.0.0" },
+    { "measurementId": "MEAS-f06-estimate", "id": "tokens.input", "value": 999, "unit": "tokens", "currency": null, "quality": "estimated", "confidence": "low", "scope": "execution", "aggregation": "sum", "dimensions": {}, "pricing": null, "source": { "type": "agent-report", "name": "fixture-agent", "mechanism": "self-report" }, "collectedAt": "2026-01-10T16:20:00.000Z", "schemaVersion": "1.0.0" }
+  ],
+  "rawTelemetry": [],
+  "events": [
+    { "type": "execution.started", "occurredAt": "2026-01-10T16:00:00.000Z", "source": { "type": "ros-clock", "name": "ros", "mechanism": "work-lifecycle" } },
+    { "type": "work.abandoned", "occurredAt": "2026-01-10T16:25:00.000Z", "reason": "superseded by WI-F2; the reviewer was stopped", "eventId": "TEVT-fixture-6" },
+    { "type": "telemetry.snapshot.ingested", "occurredAt": "2026-01-10T16:29:00.000Z", "snapshotId": "fixture-session-6" },
+    { "type": "execution.finalized", "occurredAt": "2026-01-10T16:30:00.000Z", "source": { "type": "ros-clock", "name": "ros", "mechanism": "work-lifecycle" } }
+  ]
+}

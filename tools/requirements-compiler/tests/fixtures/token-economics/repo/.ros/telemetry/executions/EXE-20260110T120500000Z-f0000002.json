@@ -1,0 +1,43 @@
+{
+  "schemaVersion": "1.0.0",
+  "executionId": "EXE-20260110T120500000Z-f0000002",
+  "workItemId": "WI-F2",
+  "workItem": { "repositoryId": null, "repository": "fixture/token-economics", "provider": "github", "localId": "WI-F2" },
+  "instanceId": "pxi-fixture",
+  "status": "finalized",
+  "startedAt": "2026-01-10T12:05:00.000Z",
+  "finalizedAt": "2026-01-10T14:00:00.000Z",
+  "identity": {
+    "provider": "fixture-provider", "model": "fixture-model", "modelVersion": null,
+    "runtime": "fixture-runtime", "runtimeVersion": null, "sessionId": "fixture-session-2",
+    "conversationId": null, "runId": null, "agentId": "fixture-provider/fixture-runtime", "subagentId": "implementer-1",
+    "parentExecutionId": null, "actorKind": "agent", "orchestration": { "role": "implementer" }
+  },
+  "provider": { "sessionId": "fixture-session-2", "agentInstanceId": "implementer-1" },
+  "classification": { "types": [ "development" ], "rationale": null, "evidence": [], "rd": null },
+  "capabilities": [
+    { "metricId": "tokens.input", "status": "supported-observed", "reason": "derived from the session transcript", "discoveredAt": "2026-01-10T13:59:00.000Z" },
+    { "metricId": "tokens.output", "status": "supported-observed", "reason": "derived from the session transcript; a lower bound: the transcript records the streaming-start count, not the provider's final count", "discoveredAt": "2026-01-10T13:59:00.000Z" },
+    { "metricId": "tokens.cache_read", "status": "supported-observed", "reason": "derived from the session transcript", "discoveredAt": "2026-01-10T13:59:00.000Z" },
+    { "metricId": "tokens.cache_write", "status": "supported-observed", "reason": "derived from the session transcript", "discoveredAt": "2026-01-10T13:59:00.000Z" },
+    { "metricId": "cost.execution_total", "status": "supported-observed", "reason": "recorded by telemetry record", "discoveredAt": "2026-01-10T13:59:30.000Z" },
+    { "metricId": "cost.session_cumulative", "status": "estimated", "reason": "derived from the session transcript", "discoveredAt": "2026-01-10T13:59:00.000Z" }
+  ],
+  "metrics": [
+    { "measurementId": "MEAS-f02-input", "id": "tokens.input", "value": 300, "unit": "tokens", "currency": null, "quality": "observed", "confidence": null, "scope": "session", "aggregation": "sum", "dimensions": { "snapshot": "fixture-session-2" }, "pricing": null, "source": { "type": "runtime-output", "name": "fixture-transcript", "mechanism": "session-transcript-jsonl", "provider": "fixture-provider", "runtime": "fixture-runtime" }, "collectedAt": "2026-01-10T13:59:00.000Z", "schemaVersion": "1.0.0" },
+    { "measurementId": "MEAS-f02-output", "id": "tokens.output", "value": 9000, "unit": "tokens", "currency": null, "quality": "observed", "confidence": null, "scope": "session", "aggregation": "sum", "dimensions": { "bound": "lower", "snapshot": "fixture-session-2" }, "pricing": null, "source": { "type": "runtime-output", "name": "fixture-transcript", "mechanism": "session-transcript-jsonl", "provider": "fixture-provider", "runtime": "fixture-runtime" }, "collectedAt": "2026-01-10T13:59:00.000Z", "schemaVersion": "1.0.0" },
+    { "measurementId": "MEAS-f02-cache-read", "id": "tokens.cache_read", "value": 400000, "unit": "tokens", "currency": null, "quality": "observed", "confidence": null, "scope": "session", "aggregation": "sum", "dimensions": { "snapshot": "fixture-session-2" }, "pricing": null, "source": { "type": "runtime-output", "name": "fixture-transcript", "mechanism": "session-transcript-jsonl", "provider": "fixture-provider", "runtime": "fixture-runtime" }, "collectedAt": "2026-01-10T13:59:00.000Z", "schemaVersion": "1.0.0" },
+    { "measurementId": "MEAS-f02-cache-write", "id": "tokens.cache_write", "value": 20000, "unit": "tokens", "currency": null, "quality": "observed", "confidence": null, "scope": "session", "aggregation": "sum", "dimensions": { "snapshot": "fixture-session-2" }, "pricing": null, "source": { "type": "runtime-output", "name": "fixture-transcript", "mechanism": "session-transcript-jsonl", "provider": "fixture-provider", "runtime": "fixture-runtime" }, "collectedAt": "2026-01-10T13:59:00.000Z", "schemaVersion": "1.0.0" },
+    { "measurementId": "MEAS-f02-runtime-cost", "id": "cost.session_cumulative", "value": 2.5, "unit": "currency", "currency": "USD", "quality": "estimated", "confidence": "medium", "scope": "session", "aggregation": "latest-per-session", "dimensions": { "snapshot": "fixture-session-2" }, "pricing": { "source": "fixture-runtime-price-table", "version": null, "effectiveAt": null }, "source": { "type": "runtime-output", "name": "fixture-transcript", "mechanism": "session-transcript-jsonl", "provider": "fixture-provider", "runtime": "fixture-runtime" }, "collectedAt": "2026-01-10T13:59:00.000Z", "schemaVersion": "1.0.0" },
+    { "measurementId": "MEAS-f02-platform-cost", "id": "cost.execution_total", "value": 1.25, "unit": "currency", "currency": "USD", "quality": "observed", "confidence": null, "scope": "execution", "aggregation": "sum", "dimensions": {}, "pricing": null, "source": { "type": "platform", "name": "fixture-platform", "mechanism": "session-record" }, "collectedAt": "2026-01-10T13:59:30.000Z", "schemaVersion": "1.0.0" },
+    { "measurementId": "MEAS-f02-wall", "id": "time.wall_ms", "value": 6900000, "unit": "milliseconds", "currency": null, "quality": "derived", "confidence": null, "scope": "execution", "aggregation": "sum", "dimensions": {}, "pricing": null, "source": { "type": "calculated", "name": "ros", "mechanism": "timestamp-difference" }, "collectedAt": "2026-01-10T14:00:00.000Z", "schemaVersion": "1.0.0" }
+  ],
+  "rawTelemetry": [
+    { "snapshotId": "fixture-session-2", "adapter": "anthropic-claude-session", "schemaVersion": "1.0.0", "collectedAt": "2026-01-10T13:59:00.000Z", "payload": { "schema": "praxis.claude-session-summary/2", "sessionId": "fixture-session-2", "models": [ "fixture-model" ], "startedAt": "2026-01-10T11:50:00.000Z", "endedAt": "2026-01-10T13:58:30.000Z" } }
+  ],
+  "events": [
+    { "type": "execution.started", "occurredAt": "2026-01-10T12:05:00.000Z", "source": { "type": "ros-clock", "name": "ros", "mechanism": "work-lifecycle" } },
+    { "type": "telemetry.snapshot.ingested", "occurredAt": "2026-01-10T13:59:00.000Z", "snapshotId": "fixture-session-2" },
+    { "type": "execution.finalized", "occurredAt": "2026-01-10T14:00:00.000Z", "source": { "type": "ros-clock", "name": "ros", "mechanism": "work-lifecycle" } }
+  ]
+}
