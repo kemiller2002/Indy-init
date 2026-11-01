@@ -1,5 +1,5 @@
-// owner-freeze.fsx: the owner's steps to freeze Indy-init's compiled requirements packages v4 and v4.1
-// (requirements-compiled/v4/FREEZE.md and requirements-compiled/v4.1/FREEZE.md).
+// owner-freeze.fsx: the owner's steps to freeze Indy-init's compiled requirements packages v4, v4.1 and v4.1.1
+// (requirements-compiled/v4/FREEZE.md, requirements-compiled/v4.1/FREEZE.md and requirements-compiled/v4.1.1/FREEZE.md).
 //
 // Every decision is yours. The script shows each owner decision request as the package states it and records
 // exactly the choice you type. Nothing has a default, and nothing is written until you confirm the summary. It
@@ -17,6 +17,8 @@
 //   dotnet fsi Indy-init/tools/owner-freeze.fsx -- decide v4.1 --repo Indy-init   # ODR-V41-02..09, each asked once (after v4 is frozen)
 //   dotnet fsi Indy-init/tools/owner-freeze.fsx -- approve v4.1 --repo Indy-init  # ODR-V41-01
 //   dotnet fsi Indy-init/tools/owner-freeze.fsx -- tag v4.1 --repo Indy-init --commit <merge commit of the ODR-V41-01 pull request>
+//   dotnet fsi Indy-init/tools/owner-freeze.fsx -- approve v4.1.1 --repo Indy-init # ODR-V411-01
+//   dotnet fsi Indy-init/tools/owner-freeze.fsx -- tag v4.1.1 --repo Indy-init --commit <merge commit of the ODR-V411-01 pull request>
 //
 // Options: --repo DIR (default: current directory), --dry-run (print what would be written; no commit, no push).
 //
@@ -40,15 +42,16 @@ let approvalsPath = "kickoff/rehearsal-007/approvals.causa.json"
 let githubRepo = "kemiller2002/Indy-init"
 
 type Package =
-    { Name: string                 // "v4" or "v4.1"
+    { Name: string                 // "v4", "v4.1" or "v4.1.1"
       Dir: string                  // requirements-compiled/<name>
       ApprovalPrefix: string       // APR-V4-OWNER / APR-V41-OWNER
-      PackageApprovalId: string    // ODR-V4-01 / ODR-V41-01
+      PackageApprovalId: string    // ODR-V4-01 / ODR-V41-01 / ODR-V411-01
       Tag: string }
 
 let packages =
     [ { Name = "v4"; Dir = "requirements-compiled/v4"; ApprovalPrefix = "APR-V4-OWNER"; PackageApprovalId = "ODR-V4-01"; Tag = "indy-init-requirements-v4.0.0" }
-      { Name = "v4.1"; Dir = "requirements-compiled/v4.1"; ApprovalPrefix = "APR-V41-OWNER"; PackageApprovalId = "ODR-V41-01"; Tag = "indy-init-requirements-v4.1.0" } ]
+      { Name = "v4.1"; Dir = "requirements-compiled/v4.1"; ApprovalPrefix = "APR-V41-OWNER"; PackageApprovalId = "ODR-V41-01"; Tag = "indy-init-requirements-v4.1.0" }
+      { Name = "v4.1.1"; Dir = "requirements-compiled/v4.1.1"; ApprovalPrefix = "APR-V411-OWNER"; PackageApprovalId = "ODR-V411-01"; Tag = "indy-init-requirements-v4.1.1" } ]
 
 // ---- processes, files and JSON -------------------------------------------------------------------------------------
 
@@ -266,7 +269,7 @@ let decideOne (p: Package) (request: JsonNode) =
     | "obligation-amendment" -> decideAmendment request
     | "scope-or-topology" -> decideTopology request
     | "scope" -> decideOption "decide" request
-    | _ when p.Name = "v4.1" -> decideOption "select" request
+    | _ when p.Name = "v4.1" || p.Name = "v4.1.1" -> decideOption "select" request
     | kind -> stop $"""{str request "id"}: unknown request kind '{kind}'; ask the agent to update this script"""
 
 /// The changes to write, from the answers. Where two approved requests amend the same obligation, its combined
@@ -349,7 +352,7 @@ let approve repo dryRun (p: Package) =
         else
             let manifest = atMain repo $"{p.Dir}/package-manifest.json" |> sha256Hex
             let review = atMain repo $"{p.Dir}/analysis/independent-review.json" |> sha256Hex
-            obj [ "decision_id", jstr "ODR-V41-01"; "action", jstr "approve-package"; "package", jstr p.Dir
+            obj [ "decision_id", jstr p.PackageApprovalId; "action", jstr "approve-package"; "package", jstr p.Dir
                   "manifest_sha256", jstr manifest; "review_sha256", jstr review ],
             [ $"package-manifest.json sha256 {manifest}"; $"independent-review.json sha256 {review}" ]
     // A record counts only while its digests match the package (FG-05); one naming an earlier state is stale, and the
@@ -368,7 +371,7 @@ let approve repo dryRun (p: Package) =
     let body =
         $"Operator approval {approvalId} in {approvalsPath}, written and committed by the owner. It binds the approval to:\n" +
         String.Join("\n", shown |> List.map (sprintf "- %s")) +
-        (if p.Name = "v4" then "\n\nNext (agent): after this merges, set analysis/freeze-input.json freezeCommit to the merge commit and recompile until the status reads READY-FOR-OWNER-FREEZE; then the owner runs `owner-freeze.fsx tag v4`." else "\n\nNext: after this merges, the owner runs `owner-freeze.fsx tag v4.1 --commit <merge commit>`.")
+        (if p.Name = "v4" then "\n\nNext (agent): after this merges, set analysis/freeze-input.json freezeCommit to the merge commit and recompile until the status reads READY-FOR-OWNER-FREEZE; then the owner runs `owner-freeze.fsx tag v4`." else $"\n\nNext: after this merges, the owner runs `owner-freeze.fsx tag {p.Name} --commit <merge commit>`.")
     commitAndPropose repo dryRun $"owner/{p.Name}-approval-{stamp ()}" title body (render (withApproval approvals approvalId [ change ]))
 
 // ---- tag -------------------------------------------------------------------------------------------------------------
@@ -393,7 +396,7 @@ let tag repo dryRun (p: Package) (commitArg: string option) =
                 |> Option.defaultWith (fun () -> stop "no commit on main carries a READY-FOR-OWNER-FREEZE manifest")
             if not (gitOk repo [ "merge-base"; "--is-ancestor"; freezeCommit; firstReady ]) then stop $"freezeCommit {freezeCommit} is not an ancestor of {firstReady}"
             firstReady
-        else commitArg |> Option.defaultWith (fun () -> stop "give --commit <merge commit of the pull request that carries ODR-V41-01>")
+        else commitArg |> Option.defaultWith (fun () -> stop $"give --commit <merge commit of the pull request that carries {p.PackageApprovalId}>")
     let full = git repo [ "rev-parse"; $"{commit}^{{commit}}" ]
     if not (gitOk repo [ "merge-base"; "--is-ancestor"; full; "origin/main" ]) then stop $"{full} is not on origin/main"
     let holds =
@@ -425,7 +428,7 @@ let argv = fsi.CommandLineArgs |> Array.toList |> List.tail
 let flag name = List.contains name argv
 let option name = argv |> List.pairwise |> List.tryFind (fst >> (=) name) |> Option.map snd
 let repo = option "--repo" |> Option.defaultValue (Directory.GetCurrentDirectory()) |> Path.GetFullPath
-let packageNamed name = packages |> List.tryFind (fun p -> p.Name = name) |> Option.defaultWith (fun () -> stop "the package must be v4 or v4.1")
+let packageNamed name = packages |> List.tryFind (fun p -> p.Name = name) |> Option.defaultWith (fun () -> stop "the package must be v4, v4.1 or v4.1.1")
 
 /// RDP-003: a record or tag is the owner's own act. Refuses to write when an agent runs the script or nobody can type.
 let ownerAtTerminal () =
@@ -444,7 +447,7 @@ let exitCode =
         | [ "decide"; name ] -> decide repo (flag "--dry-run") (packageNamed name); 0
         | [ "approve"; name ] -> approve repo (flag "--dry-run") (packageNamed name); 0
         | [ "tag"; name ] -> tag repo (flag "--dry-run") (packageNamed name) (option "--commit"); 0
-        | _ -> say "usage: dotnet fsi Indy-init/tools/owner-freeze.fsx -- status | decide v4|v4.1 | approve v4|v4.1 | tag v4|v4.1 [--commit SHA] [--repo DIR] [--dry-run]"; 2
+        | _ -> say "usage: dotnet fsi Indy-init/tools/owner-freeze.fsx -- status | decide v4|v4.1|v4.1.1 | approve v4|v4.1|v4.1.1 | tag v4|v4.1|v4.1.1 [--commit SHA] [--repo DIR] [--dry-run]"; 2
     with Stop message -> eprintfn "stopped: %s" message; 1
 
 exit exitCode
