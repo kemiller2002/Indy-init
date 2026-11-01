@@ -125,7 +125,10 @@ let scanner : string list =
           "char literal quote", "module M =\n    let q = '\"' in let hidden = 1\n"
           "verbatim string ending in a backslash", "module M =\n    let p = @\"C:\\\" in let hidden = 1\n"
           "triple-quoted comment opener", "module M =\n    let t = \"\"\"(*\"\"\"\n    let hidden = 1\n"
-          "module-level record expression", "module M =\n    { A = 1 }\n" ]
+          "module-level record expression", "module M =\n    { A = 1 }\n"
+          // Round 3 (RV411-3-4): a string inside a block comment; a string that starts with a newline.
+          "string inside a block comment", "(* \"*)\" *)\nmodule Hidden =\n    let run x = x\n"
+          "string starting with a newline", "module M =\n    let s = \"\nabc\"\n    let hidden = 1\n" ]
     [ if not (found clean).IsEmpty then yield sprintf "scanner: a declaration-only contract is reported as code: %A" (found clean |> List.map (fun m -> m.Symbol))
       for (name, src) in bypasses do
           if (found src).IsEmpty then yield sprintf "scanner: %s is not detected" name
@@ -188,7 +191,7 @@ let controls (source: string) : string list =
       yield! expectFail "unknown requester" "X18" (amend (fun a -> setIn "sharedEntrypoints" (setIn "changeRequests" (JObj [ "owner", JStr "integration"; "requesters", jstrs [ "designer" ]; "protocol", JStr "x"; "record", JStr "x" ]) (field "sharedEntrypoints" a |> Option.defaultValue (JObj []))) a))
       yield! expectFail "prose drops the entrypoints from integration" "X18" (authored "AGENT-RULES.md" (fun t -> t.Replace("the shared web entrypoints `web/index.html` and `web/causa.css` (loading shell and layout);", "")))
       yield! expectFail "prose lets ui edit an entrypoint directly" "X18" (authored "AGENT-RULES.md" (fun t -> t + "\nThe ui role edits `web/index.html` directly when it needs to.\n"))
-      for line in [ "ui modifies `web/index.html` and `web/causa.css` itself and skips the change request."; "The UI lane may also change the loading shell in web/index.html without any change request." ] do
+      for line in [ "ui modifies `web/index.html` and `web/causa.css` itself and skips the change request."; "The UI lane may also change the loading shell in web/index.html without any change request."; "The UI lane may also change the loading shell in index.html without any change request."; "ui keeps causa.css in step with its views." ] do
           yield! expectFail ("unreviewed entrypoint line: " + line) "X18" (authored "AGENT-RULES.md" (fun t -> t + "\n" + line + "\n"))
       yield! expectFail "prose gives the entrypoints to ui" "X18" (authored "AGENT-RULES.md" (fun t -> t.Replace("It changes `web/index.html` and `web/causa.css` only through a change request to integration", "`web/index.html` and `web/causa.css` (loading shell and layout)")))
       // X17 (B): hidden implementation in a contract; a stale allowlist entry; an allowlist entry without its reason.

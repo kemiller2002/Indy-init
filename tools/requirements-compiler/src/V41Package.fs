@@ -1500,16 +1500,17 @@ let private stripCode (text: string) =
     let at (i: int) (p: string) = i + p.Length <= n && String.CompareOrdinal(s, i, p, 0, p.Length) = 0
     let blank (c: char) = if c = '\n' then '\n' else ' '
     // Returns the index just past the construct that starts at i, or i when none starts there.
-    let rec skipBlock (i: int) (depth: int) =
-        if i >= n then n
-        elif at i "(*" && not (at i "(*)") then skipBlock (i + 2) (depth + 1)
-        elif at i "*)" then (if depth = 1 then i + 2 else skipBlock (i + 2) (depth - 1))
-        else skipBlock (i + 1) depth
     let rec skipString (i: int) =
         if i >= n then n
         elif s.[i] = '\\' then skipString (i + 2)
         elif s.[i] = '"' then i + 1
         else skipString (i + 1)
+    let rec skipBlock (i: int) (depth: int) =
+        if i >= n then n
+        elif s.[i] = '"' then skipBlock (skipString (i + 1)) depth
+        elif at i "(*" && not (at i "(*)") then skipBlock (i + 2) (depth + 1)
+        elif at i "*)" then (if depth = 1 then i + 2 else skipBlock (i + 2) (depth - 1))
+        else skipBlock (i + 1) depth
     let rec skipVerbatim (i: int) =
         if i >= n then n
         elif at i "\"\"" then skipVerbatim (i + 2)
@@ -1529,11 +1530,10 @@ let private stripCode (text: string) =
         if i >= n then acc.ToString()
         else
             match construct i with
-            | Some(j, marker) ->
+            | Some(j, _) ->
                 // Keep the newlines the construct spanned so line numbers and indentation stay true.
                 let span = s.Substring(i, j - i)
-                let kept = String(span |> Seq.map blank |> Array.ofSeq)
-                go j (acc.Append(if marker = "" then kept else marker + kept.Substring(min kept.Length marker.Length)))
+                go j (acc.Append(String(span |> Seq.map blank |> Array.ofSeq)))
             | None -> go (i + 1) (acc.Append(s.[i]))
     go 0 (Text.StringBuilder())
 
@@ -1624,9 +1624,14 @@ let contractClassification (i: Inputs) (contracts: (string * string) list) : Jso
           elif baseline <> sOr "package" amends || sOr "approval" (amendmentField "contractBaseline" i) <> sOr "approval" amends then
               yield sprintf "the contract baseline %s is not the package the amendment amends (%s, %s)" baseline (sOr "package" amends) (sOr "approval" amends)
           else
+              let approved =
+                  i.ReadSource (baseline + "/package-manifest.json")
+                  |> Option.bind (fun t -> field "files" (parseBytes (Text.Encoding.UTF8.GetBytes t)))
+                  |> Option.defaultValue (JObj [])
               for (path, text) in contracts do
                   match i.ReadSource (baseline + "/" + path) with
-                  | Some b when b = text -> ()
+                  | Some b when b = text ->
+                      if strOpt path approved <> Some(digest b) then yield sprintf "%s/%s does not have the digest its approved package manifest records" baseline path
                   | Some _ -> yield sprintf "%s differs from the reviewed baseline %s/%s; a changed contract needs its own review" path baseline path
                   | None -> yield sprintf "%s is not in the reviewed baseline %s" path baseline
           for (c, j) in controls do
@@ -1683,8 +1688,9 @@ let entrypointCheck (i: Inputs) (files: OwnedFile list) : Check =
               for (role, owns) in rows do
                   if role <> "integration" && (if sentence = "" then owns else owns.Replace(sentence, "")).Contains p then yield sprintf "AGENT-RULES.md's roles table names %s under %s outside the change-request sentence" p role
               let reviewed = strs "ruleLinesSha256" spec |> Set.ofList
+              let fileName = p.Substring(p.LastIndexOf '/' + 1)
               for l in rules.Split('\n') do
-                  if l.Contains p && not (reviewed.Contains(Git.sha256Hex (Text.Encoding.UTF8.GetBytes(l.TrimEnd())))) then
+                  if (l.Contains p || l.Contains fileName) && not (reviewed.Contains(Git.sha256Hex (Text.Encoding.UTF8.GetBytes(l.TrimEnd())))) then
                       yield sprintf "AGENT-RULES.md names %s in a line that is not one of the reviewed lines (sharedEntrypoints.ruleLinesSha256): %s" p (l.Trim().Substring(0, min 120 (l.Trim().Length)))
           if (sOr "ruleSentence" cr) = "" || not (rules.Contains(sOr "ruleSentence" cr)) then yield "AGENT-RULES.md does not carry the change-request sentence the amendment fixes (sharedEntrypoints.changeRequests.ruleSentence)"
           if sOr "owner" cr <> "integration" then yield "change requests to the shared entrypoints must be owned by integration"
@@ -1714,7 +1720,7 @@ let bootstrapCheck (i: Inputs) : Check =
     let refs = arr "organizerReferences" policy
     let decisions = requestIds i @ [ "OD-INDY-18" ]
     let organizerRx = Regex(@"organi[sz]er", RegexOptions.IgnoreCase)
-    let gateRx = Regex(@"confirm|approv|verif|permission|permit|interpretation|sign[- ]?off|signs? off|signed|wait|until|hold|obtain|\bask", RegexOptions.IgnoreCase)
+    let gateRx = Regex(@"confirm|approv|verif|permission|permit|interpretation|sign[- ]?off|signs? off|signed|wait|until|hold|obtain|\bask|consent|authori[sz]|agree", RegexOptions.IgnoreCase)
     let mentions (j: Json) = match j with JObj ps -> ps |> List.exists (fun (_, v) -> match v with JStr s -> organizerRx.IsMatch s && gateRx.IsMatch s | _ -> false) | _ -> false
     let rec walk (j: Json) : Json list = match j with JObj ps -> j :: (ps |> List.collect (snd >> walk)) | JArr xs -> xs |> List.collect walk | _ -> []
     let fromJson (path: string) (select: Json -> string list) =
