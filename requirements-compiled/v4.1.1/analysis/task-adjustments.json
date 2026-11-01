@@ -1,0 +1,182 @@
+{
+  "schema": "indy-init.v41-task-adjustments/1",
+  "description": "Changes v4.1 makes to v4's work items (requirements-compiled/v4/curation/tasks.json), each with its reason. Every number is a planning estimate by the package author; none is measured. No work item is removed and no requirement leaves a work item. Every ordering v4 implied (its transitive dependencies) is kept unless listed in waivedPrecedences with its reason; no estimate falls below half of v4's. The compiler checks all of this (X13). The ordering changes need the owner's decision ODR-V41-03, the estimate changes ODR-V41-04.",
+  "adjustments": [
+    {
+      "task": "T10",
+      "phase": "timed",
+      "estimateMinutes": 29,
+      "rationale": "v4.1.1: the bootstrap runs at T0, the first timed task, owned by integration. Measured on fresh empty repositories (analysis/bootstrap-measurement.json): the mechanical sequence (git init, conditor init, the generator layered onto it, both solutions built, ci-policy check, verify, commit) took 72 s, 32 s and 76 s, so 2 minutes. Estimated, not measured: conditor repo create and the first push, 2 minutes; integration's remaining shared files, 15 minutes; first green CI on GitHub Actions, 10 minutes. 29 minutes in all (v4.1 estimated 25, outside the window).",
+      "evidence": "measured",
+      "measurement": "analysis/bootstrap-measurement.json",
+      "dropPreferenceAfter": [
+        {
+          "task": "T06",
+          "reason": "The plan no longer waits on organizer confirmation: the published rules are external constraints and the residual interpretation risk is recorded (STARTING-STATE.md). T06 and its historical records stay as they are.",
+          "decision": "OD-INDY-18"
+        }
+      ]
+    },
+    {
+      "task": "T12",
+      "estimateMinutes": 15,
+      "rationale": "Invariants, state machines and the error matrix are already compiled (v4 invariants.json, state-machine-contracts.json, github-error-matrix.json); the task is writing the named failing-first tests, not deriving them.",
+      "evidence": "estimated"
+    },
+    {
+      "task": "T14",
+      "dependsOn": [
+        {
+          "task": "T10",
+          "reason": "the frozen contracts (interface-specifications.json) are copied into each project's Contracts file and typechecked; they need the empty projects, not the kernel's implementation"
+        }
+      ],
+      "rationale": "No estimate change: the types exist before kickoff, but each producer commits its contract block and writes its producer contract tests here, and the consumers start their consumer contract tests. T14 no longer waits for the kernel (T13): the contracts fix the types and the kernel implements them; IF41-DOMAIN's producer tests that need the kernel (DecideIsTotalOverCommands, FrozenFixturesReplay) are completed in T13 and T15. This rests on the owner's statement that the organizers allow pre-kickoff scaffolding (ODR-V41-06).",
+      "evidence": "estimated"
+    },
+    {
+      "task": "T13",
+      "estimateMinutes": 45,
+      "dependsOn": [
+        {
+          "task": "T12",
+          "reason": "decisions are implemented against the invariant tests written first"
+        },
+        {
+          "task": "T14",
+          "reason": "the kernel implements the frozen IF41-DOMAIN contract"
+        }
+      ],
+      "rationale": "Unchanged estimate; now implements the frozen kernel contract.",
+      "evidence": "estimated"
+    },
+    {
+      "task": "T17",
+      "dependsOn": [
+        {
+          "task": "T13",
+          "reason": "integration checkpoint 1 sends a typed command through Limen and needs a real decide (kept from v4, where T17 reached T13 through T14)"
+        },
+        {
+          "task": "T14",
+          "reason": "the frozen contracts"
+        },
+        {
+          "task": "T16",
+          "reason": "the workspace shell"
+        }
+      ],
+      "rationale": "No estimate change. Keeps v4's kernel-before-checkpoint order explicitly, since T14 no longer implies it.",
+      "evidence": "estimated"
+    },
+    {
+      "task": "T18",
+      "estimateMinutes": 35,
+      "rationale": "The provider-conformance probe records live answers against a prepared classification (github-error-matrix.json) instead of discovering the classes: 15 rows, each with its detection evidence and test.",
+      "evidence": "estimated"
+    },
+    {
+      "task": "T19",
+      "estimateMinutes": 60,
+      "dependsOn": [
+        {
+          "task": "T12",
+          "reason": "R4-01 and AR-022: the invariant tests are written and failing before the first write code (kept from v4, where T19 reached T12 through T14 and T13)"
+        },
+        {
+          "task": "T14",
+          "reason": "implements the frozen IF41-SAVE contract"
+        },
+        {
+          "task": "T18",
+          "reason": "tested against the stateful fake built from the live recordings"
+        }
+      ],
+      "rationale": "Unchanged estimate: the decision table (state-machine-contracts.json) replaces reading prose, but this task writes the transition tests of SM-SAVE and SM-CONFLICT (76 transitions) and their illegal-pair tests. In v4, T19 waited for the kernel through T14 (T14 depended on T13); with the contracts frozen before the kernel it does not, but it still waits for the invariant tests (T12). Replay verification against the real kernel is exercised at integration (T21). The transition tests are generated from one table (each a call to Step with the listed input and an assertion on the listed next state and effects), which is what makes 60 minutes plausible; it is an estimate, and T19 is not on the dependency critical path.",
+      "evidence": "estimated"
+    },
+    {
+      "task": "T21",
+      "estimateMinutes": 25,
+      "dependsOn": [
+        {
+          "task": "T20",
+          "reason": "exercises the GitHub provider"
+        },
+        {
+          "task": "T17",
+          "reason": "builds on the first end-to-end path"
+        },
+        {
+          "task": "T13",
+          "reason": "live replay verification needs the real kernel"
+        }
+      ],
+      "rationale": "Unchanged estimate; now explicitly joins the kernel and the persistence lane.",
+      "evidence": "estimated"
+    },
+    {
+      "task": "T16",
+      "rationale": "No estimate change: the Forma layout contract names the patterns, tokens, breakpoints and viewports, and its executable assertions (layout-tests/) check them, but T16 also writes the SM-CONNECTION and SM-NETWORK state-machine tests (11 transitions), which v4 did not list.",
+      "evidence": "estimated"
+    },
+    {
+      "task": "T31",
+      "estimateMinutes": 45,
+      "rationale": "Unchanged estimate. (An earlier draft cut it to 40 on a claimed setup saving that the suite fixtures do not support; withdrawn after review RV41-1-8.)",
+      "evidence": "estimated"
+    },
+    {
+      "task": "T20",
+      "rationale": "No estimate change: this task also writes the SM-LOAD transition tests (10 transitions), alongside the Connect flow and provider read it already covers.",
+      "evidence": "estimated"
+    },
+    {
+      "task": "T35",
+      "dependsOn": [
+        {
+          "task": "T12",
+          "reason": "checkpoint 1 reviews the invariant tests (DCC-002 critical invariants), so it follows them"
+        },
+        {
+          "task": "T14",
+          "reason": "checkpoint 1 reviews the frozen interface contracts"
+        }
+      ],
+      "rationale": "No estimate change. Keeps the invariant review explicit now that T14 no longer implies T12; the kernel is reviewed at T30 and T36.",
+      "evidence": "estimated"
+    }
+  ],
+  "waivedPrecedences": [
+    {
+      "before": "T12",
+      "after": "T14",
+      "reason": "The interface freeze copies contracts typechecked before kickoff; it does not use the invariant tests. T19, the first write code, still follows T12. It sets aside KICKOFF-EXECUTION-PACKET §4 (parallel ownership after the kernel stabilizes) and REHEARSAL-AGENT-INTERFACE-FREEZE's kickoff authoring (ODR-V41-06).",
+      "decision": "ODR-V41-03"
+    },
+    {
+      "before": "T13",
+      "after": "T14",
+      "reason": "The contracts fix the kernel's types before the kernel exists; the kernel (T13) now implements IF41-DOMAIN after the freeze. It sets aside KICKOFF-EXECUTION-PACKET §4 (parallel ownership after the kernel stabilizes) and REHEARSAL-AGENT-INTERFACE-FREEZE's kickoff authoring (ODR-V41-06).",
+      "decision": "ODR-V41-03"
+    },
+    {
+      "before": "T13",
+      "after": "T19",
+      "reason": "The save machine is written against IF41-DOMAIN's frozen types and the stateful fake; replay verification against the real kernel is exercised at T21, which depends on T13 (risk R41-03). It sets aside KICKOFF-EXECUTION-PACKET §4 (parallel ownership after the kernel stabilizes) and REHEARSAL-AGENT-INTERFACE-FREEZE's kickoff authoring (ODR-V41-06).",
+      "decision": "ODR-V41-03"
+    },
+    {
+      "before": "T13",
+      "after": "T20",
+      "reason": "As T13 before T19: the GitHub provider path builds on the save machine and the frozen types, and meets the real kernel at T21. It sets aside KICKOFF-EXECUTION-PACKET §4 (parallel ownership after the kernel stabilizes) and REHEARSAL-AGENT-INTERFACE-FREEZE's kickoff authoring (ODR-V41-06).",
+      "decision": "ODR-V41-03"
+    },
+    {
+      "before": "T13",
+      "after": "T35",
+      "reason": "Checkpoint T35 reviews the frozen interface contracts and the invariant tests (T12), before the kernel exists; the kernel is reviewed at T30 (architecture and invariant review) and T36. DCC-002's critical invariants are reviewed as tests at T35 and as implemented at T30.",
+      "decision": "ODR-V41-03"
+    }
+  ]
+}

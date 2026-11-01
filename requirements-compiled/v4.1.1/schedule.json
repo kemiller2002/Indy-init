@@ -1,0 +1,1213 @@
+{
+  "schema": "indy-init.v41-schedule/1",
+  "description": "The v4.1 timed schedule for one lead agent (B-single-lead), role lanes with one UI agent (A-role-lanes) and role lanes with two UI agents (C-role-lanes-two-ui), computed by the same scheduler as v4 (TimedSchedule) over execution-dag.json, with v4's reserves and window. All minutes are estimates. 'scenarios' separates the effect of the dependency changes (ODR-V41-03) from the estimate changes (ODR-V41-04).",
+  "evidence": "estimated",
+  "experimentalTarget": {
+    "criticalPathMinutes": 300,
+    "meets": false,
+    "note": "an experimental goal of the v4.1 brief, not an acceptance condition. It is measured on the lane-free dependency critical path; each topology's makespan, which adds waiting for a busy lane, is in topologies (makespanMinutes, bindingChain)."
+  },
+  "criticalPath": {
+    "v4": {
+      "tasks": [
+        "T12",
+        "T13",
+        "T14",
+        "T19",
+        "T20",
+        "T21",
+        "T30",
+        "T31",
+        "T32",
+        "T33",
+        "T34"
+      ],
+      "minutes": 340
+    },
+    "v41": {
+      "tasks": [
+        "T10",
+        "T14",
+        "T13",
+        "T17",
+        "T22",
+        "T28",
+        "T31",
+        "T32",
+        "T33",
+        "T34"
+      ],
+      "minutes": 329
+    }
+  },
+  "scenarios": [
+    {
+      "scenario": "v4",
+      "dependencies": "v4",
+      "estimates": "v4",
+      "criticalPathMinutes": 340,
+      "topologies": [
+        {
+          "id": "A-role-lanes",
+          "totalMinutes": 465,
+          "fits": false
+        },
+        {
+          "id": "B-single-lead",
+          "totalMinutes": 765,
+          "fits": false
+        },
+        {
+          "id": "C-role-lanes-two-ui",
+          "totalMinutes": 405,
+          "fits": true
+        }
+      ]
+    },
+    {
+      "scenario": "v4.1 dependencies only",
+      "dependencies": "v4.1",
+      "estimates": "v4",
+      "criticalPathMinutes": 334,
+      "topologies": [
+        {
+          "id": "A-role-lanes",
+          "totalMinutes": 494,
+          "fits": false
+        },
+        {
+          "id": "B-single-lead",
+          "totalMinutes": 794,
+          "fits": false
+        },
+        {
+          "id": "C-role-lanes-two-ui",
+          "totalMinutes": 424,
+          "fits": false
+        }
+      ]
+    },
+    {
+      "scenario": "v4.1 estimates only",
+      "dependencies": "v4",
+      "estimates": "v4.1",
+      "criticalPathMinutes": 330,
+      "topologies": [
+        {
+          "id": "A-role-lanes",
+          "totalMinutes": 455,
+          "fits": false
+        },
+        {
+          "id": "B-single-lead",
+          "totalMinutes": 745,
+          "fits": false
+        },
+        {
+          "id": "C-role-lanes-two-ui",
+          "totalMinutes": 395,
+          "fits": true
+        }
+      ]
+    },
+    {
+      "scenario": "v4.1",
+      "dependencies": "v4.1",
+      "estimates": "v4.1",
+      "criticalPathMinutes": 329,
+      "topologies": [
+        {
+          "id": "A-role-lanes",
+          "totalMinutes": 484,
+          "fits": false
+        },
+        {
+          "id": "B-single-lead",
+          "totalMinutes": 774,
+          "fits": false
+        },
+        {
+          "id": "C-role-lanes-two-ui",
+          "totalMinutes": 414,
+          "fits": true
+        }
+      ]
+    }
+  ],
+  "riskiestDependencies": [
+    {
+      "from": "T10",
+      "to": "T14",
+      "slackMinutes": 0,
+      "reason": "the frozen contracts (interface-specifications.json) are copied into each project's Contracts file and typechecked; they need the empty projects, not the kernel's implementation"
+    },
+    {
+      "from": "T14",
+      "to": "T13",
+      "slackMinutes": 0,
+      "reason": "the kernel implements the frozen IF41-DOMAIN contract"
+    },
+    {
+      "from": "T13",
+      "to": "T17",
+      "slackMinutes": 0,
+      "reason": "integration checkpoint 1 sends a typed command through Limen and needs a real decide (kept from v4, where T17 reached T13 through T14)"
+    },
+    {
+      "from": "T17",
+      "to": "T22",
+      "slackMinutes": 0,
+      "reason": "views consume the verified projection path"
+    },
+    {
+      "from": "T22",
+      "to": "T28",
+      "slackMinutes": 0,
+      "reason": "uses the workspace views and inspector"
+    },
+    {
+      "from": "T28",
+      "to": "T31",
+      "slackMinutes": 0,
+      "reason": "candidate includes time travel or its approved exclusion"
+    },
+    {
+      "from": "T31",
+      "to": "T32",
+      "slackMinutes": 0,
+      "reason": "closes the classes the candidate exposed"
+    },
+    {
+      "from": "T32",
+      "to": "T33",
+      "slackMinutes": 0,
+      "reason": "reviews the closed candidate"
+    },
+    {
+      "from": "T33",
+      "to": "T34",
+      "slackMinutes": 0,
+      "reason": "final review precedes the verdict (R4-03)"
+    }
+  ],
+  "topologies": [
+    {
+      "id": "A-role-lanes",
+      "bindingChain": [
+        {
+          "task": "T10",
+          "startsAfter": "start"
+        },
+        {
+          "task": "T14",
+          "startsAfter": "dependency on T10"
+        },
+        {
+          "task": "T12",
+          "startsAfter": "lane domain after T14"
+        },
+        {
+          "task": "T13",
+          "startsAfter": "dependency on T12"
+        },
+        {
+          "task": "T17",
+          "startsAfter": "dependency on T13"
+        },
+        {
+          "task": "T22",
+          "startsAfter": "dependency on T17"
+        },
+        {
+          "task": "T28",
+          "startsAfter": "dependency on T22"
+        },
+        {
+          "task": "T23",
+          "startsAfter": "lane ui after T28"
+        },
+        {
+          "task": "T26",
+          "startsAfter": "lane ui after T23"
+        },
+        {
+          "task": "T29",
+          "startsAfter": "lane ui after T26"
+        },
+        {
+          "task": "T31",
+          "startsAfter": "dependency on T29"
+        },
+        {
+          "task": "T32",
+          "startsAfter": "dependency on T31"
+        },
+        {
+          "task": "T33",
+          "startsAfter": "dependency on T32"
+        },
+        {
+          "task": "T34",
+          "startsAfter": "dependency on T33"
+        }
+      ],
+      "makespanMinutes": 419,
+      "reservedMinutes": 65,
+      "totalMinutes": 484,
+      "windowMinutes": 420,
+      "fits": false,
+      "slackMinutes": -64,
+      "contentionMinutes": 480,
+      "integrationMinutes": {
+        "lane": 179,
+        "reserve": 20
+      },
+      "lanes": [
+        {
+          "lane": "domain",
+          "busyMinutes": 130,
+          "utilization": "0.31",
+          "slots": [
+            {
+              "task": "T14",
+              "start": 29,
+              "finish": 49,
+              "waitedForLane": 0
+            },
+            {
+              "task": "T12",
+              "start": 49,
+              "finish": 64,
+              "waitedForLane": 20
+            },
+            {
+              "task": "T13",
+              "start": 64,
+              "finish": 109,
+              "waitedForLane": 0
+            },
+            {
+              "task": "T15",
+              "start": 109,
+              "finish": 129,
+              "waitedForLane": 0
+            },
+            {
+              "task": "T27",
+              "start": 129,
+              "finish": 159,
+              "waitedForLane": 20
+            }
+          ]
+        },
+        {
+          "lane": "integration",
+          "busyMinutes": 179,
+          "utilization": "0.43",
+          "slots": [
+            {
+              "task": "T10",
+              "start": 0,
+              "finish": 29,
+              "waitedForLane": 0
+            },
+            {
+              "task": "T11",
+              "start": 29,
+              "finish": 44,
+              "waitedForLane": 0
+            },
+            {
+              "task": "T24",
+              "start": 44,
+              "finish": 54,
+              "waitedForLane": 0
+            },
+            {
+              "task": "T17",
+              "start": 109,
+              "finish": 124,
+              "waitedForLane": 0
+            },
+            {
+              "task": "T21",
+              "start": 164,
+              "finish": 189,
+              "waitedForLane": 0
+            },
+            {
+              "task": "T31",
+              "start": 314,
+              "finish": 359,
+              "waitedForLane": 0
+            },
+            {
+              "task": "T32",
+              "start": 359,
+              "finish": 379,
+              "waitedForLane": 0
+            },
+            {
+              "task": "T34",
+              "start": 399,
+              "finish": 419,
+              "waitedForLane": 0
+            }
+          ]
+        },
+        {
+          "lane": "persistence",
+          "busyMinutes": 155,
+          "utilization": "0.37",
+          "slots": [
+            {
+              "task": "T18",
+              "start": 29,
+              "finish": 64,
+              "waitedForLane": 0
+            },
+            {
+              "task": "T19",
+              "start": 64,
+              "finish": 124,
+              "waitedForLane": 0
+            },
+            {
+              "task": "T20",
+              "start": 124,
+              "finish": 164,
+              "waitedForLane": 0
+            },
+            {
+              "task": "T25",
+              "start": 164,
+              "finish": 184,
+              "waitedForLane": 0
+            }
+          ]
+        },
+        {
+          "lane": "reviewer",
+          "busyMinutes": 70,
+          "utilization": "0.17",
+          "slots": [
+            {
+              "task": "T35",
+              "start": 64,
+              "finish": 79,
+              "waitedForLane": 0
+            },
+            {
+              "task": "T36",
+              "start": 189,
+              "finish": 204,
+              "waitedForLane": 0
+            },
+            {
+              "task": "T30",
+              "start": 204,
+              "finish": 224,
+              "waitedForLane": 10
+            },
+            {
+              "task": "T33",
+              "start": 379,
+              "finish": 399,
+              "waitedForLane": 0
+            }
+          ]
+        },
+        {
+          "lane": "ui",
+          "busyMinutes": 225,
+          "utilization": "0.54",
+          "slots": [
+            {
+              "task": "T16",
+              "start": 44,
+              "finish": 79,
+              "waitedForLane": 0
+            },
+            {
+              "task": "T22",
+              "start": 124,
+              "finish": 194,
+              "waitedForLane": 0
+            },
+            {
+              "task": "T28",
+              "start": 194,
+              "finish": 239,
+              "waitedForLane": 0
+            },
+            {
+              "task": "T23",
+              "start": 239,
+              "finish": 269,
+              "waitedForLane": 115
+            },
+            {
+              "task": "T26",
+              "start": 269,
+              "finish": 294,
+              "waitedForLane": 145
+            },
+            {
+              "task": "T29",
+              "start": 294,
+              "finish": 314,
+              "waitedForLane": 170
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "B-single-lead",
+      "bindingChain": [
+        {
+          "task": "T10",
+          "startsAfter": "start"
+        },
+        {
+          "task": "T14",
+          "startsAfter": "dependency on T10"
+        },
+        {
+          "task": "T12",
+          "startsAfter": "lane lead after T14"
+        },
+        {
+          "task": "T11",
+          "startsAfter": "lane lead after T12"
+        },
+        {
+          "task": "T18",
+          "startsAfter": "lane lead after T11"
+        },
+        {
+          "task": "T13",
+          "startsAfter": "lane lead after T18"
+        },
+        {
+          "task": "T16",
+          "startsAfter": "lane lead after T13"
+        },
+        {
+          "task": "T19",
+          "startsAfter": "lane lead after T16"
+        },
+        {
+          "task": "T17",
+          "startsAfter": "lane lead after T19"
+        },
+        {
+          "task": "T22",
+          "startsAfter": "dependency on T17"
+        },
+        {
+          "task": "T20",
+          "startsAfter": "lane lead after T22"
+        },
+        {
+          "task": "T15",
+          "startsAfter": "lane lead after T20"
+        },
+        {
+          "task": "T21",
+          "startsAfter": "lane lead after T15"
+        },
+        {
+          "task": "T28",
+          "startsAfter": "lane lead after T21"
+        },
+        {
+          "task": "T24",
+          "startsAfter": "lane lead after T28"
+        },
+        {
+          "task": "T25",
+          "startsAfter": "lane lead after T24"
+        },
+        {
+          "task": "T23",
+          "startsAfter": "lane lead after T25"
+        },
+        {
+          "task": "T27",
+          "startsAfter": "lane lead after T23"
+        },
+        {
+          "task": "T26",
+          "startsAfter": "lane lead after T27"
+        },
+        {
+          "task": "T29",
+          "startsAfter": "lane lead after T26"
+        },
+        {
+          "task": "T31",
+          "startsAfter": "dependency on T29"
+        },
+        {
+          "task": "T32",
+          "startsAfter": "dependency on T31"
+        },
+        {
+          "task": "T33",
+          "startsAfter": "dependency on T32"
+        },
+        {
+          "task": "T34",
+          "startsAfter": "dependency on T33"
+        }
+      ],
+      "makespanMinutes": 709,
+      "reservedMinutes": 65,
+      "totalMinutes": 774,
+      "windowMinutes": 420,
+      "fits": false,
+      "slackMinutes": -354,
+      "contentionMinutes": 2250,
+      "integrationMinutes": {
+        "lane": 179,
+        "reserve": 20
+      },
+      "lanes": [
+        {
+          "lane": "lead",
+          "busyMinutes": 689,
+          "utilization": "0.97",
+          "slots": [
+            {
+              "task": "T10",
+              "start": 0,
+              "finish": 29,
+              "waitedForLane": 0
+            },
+            {
+              "task": "T14",
+              "start": 29,
+              "finish": 49,
+              "waitedForLane": 0
+            },
+            {
+              "task": "T12",
+              "start": 49,
+              "finish": 64,
+              "waitedForLane": 20
+            },
+            {
+              "task": "T11",
+              "start": 64,
+              "finish": 79,
+              "waitedForLane": 35
+            },
+            {
+              "task": "T18",
+              "start": 79,
+              "finish": 114,
+              "waitedForLane": 50
+            },
+            {
+              "task": "T13",
+              "start": 114,
+              "finish": 159,
+              "waitedForLane": 50
+            },
+            {
+              "task": "T16",
+              "start": 159,
+              "finish": 194,
+              "waitedForLane": 80
+            },
+            {
+              "task": "T19",
+              "start": 194,
+              "finish": 254,
+              "waitedForLane": 80
+            },
+            {
+              "task": "T17",
+              "start": 254,
+              "finish": 269,
+              "waitedForLane": 60
+            },
+            {
+              "task": "T22",
+              "start": 269,
+              "finish": 339,
+              "waitedForLane": 0
+            },
+            {
+              "task": "T20",
+              "start": 339,
+              "finish": 379,
+              "waitedForLane": 85
+            },
+            {
+              "task": "T15",
+              "start": 379,
+              "finish": 399,
+              "waitedForLane": 220
+            },
+            {
+              "task": "T21",
+              "start": 399,
+              "finish": 424,
+              "waitedForLane": 20
+            },
+            {
+              "task": "T28",
+              "start": 424,
+              "finish": 469,
+              "waitedForLane": 85
+            },
+            {
+              "task": "T24",
+              "start": 469,
+              "finish": 479,
+              "waitedForLane": 390
+            },
+            {
+              "task": "T25",
+              "start": 479,
+              "finish": 499,
+              "waitedForLane": 80
+            },
+            {
+              "task": "T23",
+              "start": 499,
+              "finish": 529,
+              "waitedForLane": 20
+            },
+            {
+              "task": "T27",
+              "start": 529,
+              "finish": 559,
+              "waitedForLane": 370
+            },
+            {
+              "task": "T26",
+              "start": 559,
+              "finish": 584,
+              "waitedForLane": 290
+            },
+            {
+              "task": "T29",
+              "start": 584,
+              "finish": 604,
+              "waitedForLane": 315
+            },
+            {
+              "task": "T31",
+              "start": 604,
+              "finish": 649,
+              "waitedForLane": 0
+            },
+            {
+              "task": "T32",
+              "start": 649,
+              "finish": 669,
+              "waitedForLane": 0
+            },
+            {
+              "task": "T34",
+              "start": 689,
+              "finish": 709,
+              "waitedForLane": 0
+            }
+          ]
+        },
+        {
+          "lane": "reviewer",
+          "busyMinutes": 70,
+          "utilization": "0.10",
+          "slots": [
+            {
+              "task": "T35",
+              "start": 64,
+              "finish": 79,
+              "waitedForLane": 0
+            },
+            {
+              "task": "T36",
+              "start": 424,
+              "finish": 439,
+              "waitedForLane": 0
+            },
+            {
+              "task": "T30",
+              "start": 499,
+              "finish": 519,
+              "waitedForLane": 0
+            },
+            {
+              "task": "T33",
+              "start": 669,
+              "finish": 689,
+              "waitedForLane": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "C-role-lanes-two-ui",
+      "bindingChain": [
+        {
+          "task": "T10",
+          "startsAfter": "start"
+        },
+        {
+          "task": "T14",
+          "startsAfter": "dependency on T10"
+        },
+        {
+          "task": "T12",
+          "startsAfter": "lane domain after T14"
+        },
+        {
+          "task": "T13",
+          "startsAfter": "dependency on T12"
+        },
+        {
+          "task": "T17",
+          "startsAfter": "dependency on T13"
+        },
+        {
+          "task": "T23",
+          "startsAfter": "dependency on T17"
+        },
+        {
+          "task": "T26",
+          "startsAfter": "lane ui-2 after T23"
+        },
+        {
+          "task": "T29",
+          "startsAfter": "lane ui-2 after T26"
+        },
+        {
+          "task": "T28",
+          "startsAfter": "lane ui-2 after T29"
+        },
+        {
+          "task": "T31",
+          "startsAfter": "dependency on T28"
+        },
+        {
+          "task": "T32",
+          "startsAfter": "dependency on T31"
+        },
+        {
+          "task": "T33",
+          "startsAfter": "dependency on T32"
+        },
+        {
+          "task": "T34",
+          "startsAfter": "dependency on T33"
+        }
+      ],
+      "makespanMinutes": 349,
+      "reservedMinutes": 65,
+      "totalMinutes": 414,
+      "windowMinutes": 420,
+      "fits": true,
+      "slackMinutes": 6,
+      "contentionMinutes": 140,
+      "integrationMinutes": {
+        "lane": 179,
+        "reserve": 20
+      },
+      "lanes": [
+        {
+          "lane": "domain",
+          "busyMinutes": 130,
+          "utilization": "0.37",
+          "slots": [
+            {
+              "task": "T14",
+              "start": 29,
+              "finish": 49,
+              "waitedForLane": 0
+            },
+            {
+              "task": "T12",
+              "start": 49,
+              "finish": 64,
+              "waitedForLane": 20
+            },
+            {
+              "task": "T13",
+              "start": 64,
+              "finish": 109,
+              "waitedForLane": 0
+            },
+            {
+              "task": "T15",
+              "start": 109,
+              "finish": 129,
+              "waitedForLane": 0
+            },
+            {
+              "task": "T27",
+              "start": 129,
+              "finish": 159,
+              "waitedForLane": 20
+            }
+          ]
+        },
+        {
+          "lane": "integration",
+          "busyMinutes": 179,
+          "utilization": "0.51",
+          "slots": [
+            {
+              "task": "T10",
+              "start": 0,
+              "finish": 29,
+              "waitedForLane": 0
+            },
+            {
+              "task": "T11",
+              "start": 29,
+              "finish": 44,
+              "waitedForLane": 0
+            },
+            {
+              "task": "T24",
+              "start": 44,
+              "finish": 54,
+              "waitedForLane": 0
+            },
+            {
+              "task": "T17",
+              "start": 109,
+              "finish": 124,
+              "waitedForLane": 0
+            },
+            {
+              "task": "T21",
+              "start": 164,
+              "finish": 189,
+              "waitedForLane": 0
+            },
+            {
+              "task": "T31",
+              "start": 244,
+              "finish": 289,
+              "waitedForLane": 0
+            },
+            {
+              "task": "T32",
+              "start": 289,
+              "finish": 309,
+              "waitedForLane": 0
+            },
+            {
+              "task": "T34",
+              "start": 329,
+              "finish": 349,
+              "waitedForLane": 0
+            }
+          ]
+        },
+        {
+          "lane": "persistence",
+          "busyMinutes": 155,
+          "utilization": "0.44",
+          "slots": [
+            {
+              "task": "T18",
+              "start": 29,
+              "finish": 64,
+              "waitedForLane": 0
+            },
+            {
+              "task": "T19",
+              "start": 64,
+              "finish": 124,
+              "waitedForLane": 0
+            },
+            {
+              "task": "T20",
+              "start": 124,
+              "finish": 164,
+              "waitedForLane": 0
+            },
+            {
+              "task": "T25",
+              "start": 164,
+              "finish": 184,
+              "waitedForLane": 0
+            }
+          ]
+        },
+        {
+          "lane": "reviewer",
+          "busyMinutes": 70,
+          "utilization": "0.20",
+          "slots": [
+            {
+              "task": "T35",
+              "start": 64,
+              "finish": 79,
+              "waitedForLane": 0
+            },
+            {
+              "task": "T36",
+              "start": 189,
+              "finish": 204,
+              "waitedForLane": 0
+            },
+            {
+              "task": "T30",
+              "start": 204,
+              "finish": 224,
+              "waitedForLane": 10
+            },
+            {
+              "task": "T33",
+              "start": 309,
+              "finish": 329,
+              "waitedForLane": 0
+            }
+          ]
+        },
+        {
+          "lane": "ui",
+          "busyMinutes": 105,
+          "utilization": "0.30",
+          "slots": [
+            {
+              "task": "T16",
+              "start": 44,
+              "finish": 79,
+              "waitedForLane": 0
+            },
+            {
+              "task": "T22",
+              "start": 124,
+              "finish": 194,
+              "waitedForLane": 0
+            }
+          ]
+        },
+        {
+          "lane": "ui-2",
+          "busyMinutes": 120,
+          "utilization": "0.34",
+          "slots": [
+            {
+              "task": "T23",
+              "start": 124,
+              "finish": 154,
+              "waitedForLane": 0
+            },
+            {
+              "task": "T26",
+              "start": 154,
+              "finish": 179,
+              "waitedForLane": 30
+            },
+            {
+              "task": "T29",
+              "start": 179,
+              "finish": 199,
+              "waitedForLane": 55
+            },
+            {
+              "task": "T28",
+              "start": 199,
+              "finish": 244,
+              "waitedForLane": 5
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "packageVersion": "4.1.1",
+  "sensitivity": [
+    {
+      "id": "SENS-BOOT-150",
+      "description": "the bootstrap (T10) takes half again as long as measured",
+      "scale": [
+        {
+          "tasks": [
+            "T10"
+          ],
+          "percent": 150
+        }
+      ],
+      "criticalPathMinutes": 344,
+      "topologies": [
+        {
+          "id": "A-role-lanes",
+          "totalMinutes": 499,
+          "windowMinutes": 420,
+          "marginMinutes": -79,
+          "fits": false
+        },
+        {
+          "id": "B-single-lead",
+          "totalMinutes": 789,
+          "windowMinutes": 420,
+          "marginMinutes": -369,
+          "fits": false
+        },
+        {
+          "id": "C-role-lanes-two-ui",
+          "totalMinutes": 429,
+          "windowMinutes": 420,
+          "marginMinutes": -9,
+          "fits": false
+        }
+      ]
+    },
+    {
+      "id": "SENS-BOOT-200",
+      "description": "the bootstrap (T10) takes twice as long as measured",
+      "scale": [
+        {
+          "tasks": [
+            "T10"
+          ],
+          "percent": 200
+        }
+      ],
+      "criticalPathMinutes": 358,
+      "topologies": [
+        {
+          "id": "A-role-lanes",
+          "totalMinutes": 513,
+          "windowMinutes": 420,
+          "marginMinutes": -93,
+          "fits": false
+        },
+        {
+          "id": "B-single-lead",
+          "totalMinutes": 803,
+          "windowMinutes": 420,
+          "marginMinutes": -383,
+          "fits": false
+        },
+        {
+          "id": "C-role-lanes-two-ui",
+          "totalMinutes": 443,
+          "windowMinutes": 420,
+          "marginMinutes": -23,
+          "fits": false
+        }
+      ]
+    },
+    {
+      "id": "SENS-INT-125",
+      "description": "every integration task overruns by a quarter",
+      "scale": [
+        {
+          "owner": "integration",
+          "percent": 125
+        }
+      ],
+      "criticalPathMinutes": 363,
+      "topologies": [
+        {
+          "id": "A-role-lanes",
+          "totalMinutes": 518,
+          "windowMinutes": 420,
+          "marginMinutes": -98,
+          "fits": false
+        },
+        {
+          "id": "B-single-lead",
+          "totalMinutes": 822,
+          "windowMinutes": 420,
+          "marginMinutes": -402,
+          "fits": false
+        },
+        {
+          "id": "C-role-lanes-two-ui",
+          "totalMinutes": 448,
+          "windowMinutes": 420,
+          "marginMinutes": -28,
+          "fits": false
+        }
+      ]
+    },
+    {
+      "id": "SENS-INT-150",
+      "description": "every integration task overruns by half",
+      "scale": [
+        {
+          "owner": "integration",
+          "percent": 150
+        }
+      ],
+      "criticalPathMinutes": 395,
+      "topologies": [
+        {
+          "id": "A-role-lanes",
+          "totalMinutes": 550,
+          "windowMinutes": 420,
+          "marginMinutes": -130,
+          "fits": false
+        },
+        {
+          "id": "B-single-lead",
+          "totalMinutes": 866,
+          "windowMinutes": 420,
+          "marginMinutes": -446,
+          "fits": false
+        },
+        {
+          "id": "C-role-lanes-two-ui",
+          "totalMinutes": 480,
+          "windowMinutes": 420,
+          "marginMinutes": -60,
+          "fits": false
+        }
+      ]
+    },
+    {
+      "id": "SENS-BOOT-200-INT-125",
+      "description": "the bootstrap takes twice as long as measured and every other integration task overruns by a quarter",
+      "scale": [
+        {
+          "tasks": [
+            "T10"
+          ],
+          "percent": 200
+        },
+        {
+          "owner": "integration",
+          "percent": 125
+        }
+      ],
+      "criticalPathMinutes": 399,
+      "topologies": [
+        {
+          "id": "A-role-lanes",
+          "totalMinutes": 554,
+          "windowMinutes": 420,
+          "marginMinutes": -134,
+          "fits": false
+        },
+        {
+          "id": "B-single-lead",
+          "totalMinutes": 858,
+          "windowMinutes": 420,
+          "marginMinutes": -438,
+          "fits": false
+        },
+        {
+          "id": "C-role-lanes-two-ui",
+          "totalMinutes": 484,
+          "windowMinutes": 420,
+          "marginMinutes": -64,
+          "fits": false
+        }
+      ]
+    }
+  ]
+}

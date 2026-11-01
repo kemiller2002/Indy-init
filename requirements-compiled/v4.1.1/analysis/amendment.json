@@ -1,0 +1,80 @@
+{
+  "schema": "indy-init.v411-amendment/1",
+  "packageVersion": "4.1.1",
+  "description": "Successor amendment of the approved package v4.1 (Indy Init v4.1: Final Execution Optimization and Readiness Amendment). It changes no requirement, obligation, test binding, state machine or contract text. It moves the T10 bootstrap into the timed window at T0 with a measured duration, classifies the F# contracts as specifications, removes the organizer-permission gate from the execution plan, gives the shared web entrypoints to integration with a change-request protocol, adds schedule sensitivity, and specifies the Praxis token-economics report. v4.1 itself is not edited: it stays as approved (APR-V41-OWNER-4).",
+  "approvalDecision": "ODR-V411-01",
+  "amends": {
+    "package": "requirements-compiled/v4.1",
+    "packageVersion": "4.1.0",
+    "manifestSha256": "779916abe4b7c1351fd7752d648721cba61bb4eee6a8aa779a20d47bcc31736a",
+    "approval": "APR-V41-OWNER-4"
+  },
+  "inputs": [ "analysis/bootstrap-measurement.json" ],
+  "documents": [ "STARTING-STATE.md", "AMENDMENT-4.1.1.md" ],
+  "changes": [
+    { "id": "V411-A", "area": "A", "summary": "T10 (bootstrap) runs at T0, inside the timed window, owned by integration, with the duration measured on fresh empty repositories (analysis/bootstrap-measurement.json). T11, T12, T14 and T18, the timed tasks without another timed predecessor, all follow it. Conditor's init runs first on the empty repository and the v4.1 generator layers onto it." },
+    { "id": "V411-B", "area": "B", "summary": "The F# contracts stay in the package as specifications. contract-classification.json classifies every contract file; X17 rejects any implementation member that is not on the reviewed allowlist (the Credential and Confirmation boundary code)." },
+    { "id": "V411-C", "area": "C", "summary": "No task waits on organizer permission: T10's preference after T06 (organizer confirmation) is dropped, and AGENT-RULES no longer makes the bootstrap rely on ODR-V41-06. The published rules stay external constraints (STARTING-STATE.md), the historical records stay unchanged, and the residual interpretation risk is stated." },
+    { "id": "V411-D", "area": "D", "summary": "The token-economics report is produced from Praxis 3.24.0's own telemetry records by requirements-compiler token-economics (docs/TOKEN-ECONOMICS.md), verified with a recorded fixture in the offline suite." },
+    { "id": "V411-E", "area": "E", "summary": "web/index.html and web/causa.css are integration's (they were ui's). UI roles change them only through an integration-owned change request (X18); the ownership manifest and AGENT-RULES agree." },
+    { "id": "V411-F", "area": "schedule", "summary": "The schedule is recomputed with T10 at T0, with sensitivity scenarios for bootstrap and integration overruns. The reserves (RES-INTEGRATION 20, RES-FINAL 45) are unchanged and no estimate is shortened." }
+  ],
+  "bootstrap": {
+    "task": "T10",
+    "measurement": "analysis/bootstrap-measurement.json",
+    "layersOnto": "conditor",
+    "order": [
+      "Record the start timestamp; git init -b main in the empty competition repository (git metadata only)",
+      "conditor init --preset indy-init --target . (Conditor 0.10.18: Echelon scaffold, Praxis init, requirements import)",
+      "requirements-compiler v41 --source INDY-INIT --package requirements-compiled/v4.1.1 --base requirements-compiled/v4 --bootstrap . (layers onto Conditor's repository: merges package.json, Directory.Build.props and .gitignore, refuses any other overlap)",
+      "dotnet build Causa.slnx; conditor ci-policy check --target .",
+      "git commit (the initial bootstrap commit), conditor repo create, push; first green CI"
+    ]
+  },
+  "contractControls": [
+    { "file": "99-Usage.fs", "classification": "compile control: generated positive control that the contract cases are usable unambiguously; typecheck only, never materialized into the application" }
+  ],
+  "contractImplementations": [
+    { "file": "03-IF41-WIRE.fs", "scope": "Credential.T", "symbol": "ToString", "requirements": [ "PF-015", "INV-21" ], "rationale": "The credential type's printed form is fixed to <credential>, so no log, exception or interpolation can show the token. Boundary code: the type is the requirement, not application behavior." },
+    { "file": "03-IF41-WIRE.fs", "scope": "Credential", "symbol": "create", "requirements": [ "PF-015", "INV-21" ], "rationale": "The only constructor of the private credential representation. Boundary code: without it the private type cannot be created at all." },
+    { "file": "03-IF41-WIRE.fs", "scope": "Credential", "symbol": "authorization", "requirements": [ "PF-015", "INV-21" ], "rationale": "The only way to read the token, as an Authorization header. Boundary code: it is what keeps the token out of every other code path; the negative control ReadCredential.fs proves no other reader compiles." },
+    { "file": "05-IF41-SAVE.fs", "scope": "Confirmation.T", "symbol": "InvestigationId", "requirements": [ "PERSIST-023" ], "rationale": "Read-only accessor of the private confirmation representation. Boundary code: consumers can read a confirmation but never build one." },
+    { "file": "05-IF41-SAVE.fs", "scope": "Confirmation.T", "symbol": "CommitOid", "requirements": [ "PERSIST-023" ], "rationale": "Read-only accessor of the private confirmation representation (as InvestigationId)." },
+    { "file": "05-IF41-SAVE.fs", "scope": "Confirmation.T", "symbol": "CommitTime", "requirements": [ "PERSIST-023" ], "rationale": "Read-only accessor of the private confirmation representation (as InvestigationId)." },
+    { "file": "05-IF41-SAVE.fs", "scope": "Confirmation", "symbol": "ofReadBack", "requirements": [ "PERSIST-023" ], "rationale": "The only constructor: a confirmation exists only when the read-back equals what was written (one equality test). Boundary code: it is the type-level form of PERSIST-023; the negative control ForgeConfirmation.fs proves nothing else can create one. The save workflow that calls it is persistence's timed work." }
+  ],
+  "sharedEntrypoints": {
+    "files": [ "web/index.html", "web/causa.css" ],
+    "changeRequests": {
+      "owner": "integration",
+      "requesters": [ "ui", "ui-2" ],
+      "protocol": "A UI role that needs a change to a shared entrypoint does not edit it. It opens a change request naming the file, the change (the exact markup or Forma-token rule) and the task it serves; integration applies it in its own pull request, in order, and the requesting role reviews that pull request. UI roles own their view modules (src/Causa.App/Views/*) and component-level presentation; the entrypoints only load them.",
+      "record": "a Praxis work item owned by integration whose title starts with CR- and names the file, linked to the requesting task's work item"
+    }
+  },
+  "startingState": {
+    "document": "STARTING-STATE.md",
+    "externalConstraints": [
+      "the repository starts empty",
+      "code starts at kickoff",
+      "teams may plan beforehand, including the problem, stack, and sketch",
+      "the build window is 9:30 AM to 5:00 PM on November 7, 2026"
+    ],
+    "removedGates": [
+      { "task": "T06", "was": "T10 preferred to follow T06 (organizer confirmation for prepared requirements, data and tooling)" }
+    ],
+    "historicalRecords": [
+      { "id": "ODR-V41-06", "disposition": "kept unchanged" },
+      { "id": "APR-V41-OWNER-1", "disposition": "kept unchanged" },
+      { "id": "docs/HACKATHON-BOUNDARIES.md published-rule section (last reviewed 2026-09-24)", "disposition": "kept unchanged" }
+    ],
+    "residualRisk": "The published rules say the repository starts empty and code starts at kickoff; they do not say whether specifications prepared before kickoff in executable form (the F# contract declarations, the deterministic generator, the layout assertions) count as planning or as code. The plan's boundary: before T0 nothing is written to the competition repository; at T0 the generator writes the skeleton and the contract declarations from the approved package. An organizer could read the materialized contract declarations, or the bootstrap itself, as code prepared before kickoff. The plan does not claim otherwise; if an organizer rules so on the day, the team follows the ruling (HACKATHON-BOUNDARIES: organizer guidance wins)."
+  },
+  "sensitivity": [
+    { "id": "SENS-BOOT-150", "description": "the bootstrap (T10) takes half again as long as measured", "scale": [ { "tasks": [ "T10" ], "percent": 150 } ] },
+    { "id": "SENS-BOOT-200", "description": "the bootstrap (T10) takes twice as long as measured", "scale": [ { "tasks": [ "T10" ], "percent": 200 } ] },
+    { "id": "SENS-INT-125", "description": "every integration task overruns by a quarter", "scale": [ { "owner": "integration", "percent": 125 } ] },
+    { "id": "SENS-INT-150", "description": "every integration task overruns by half", "scale": [ { "owner": "integration", "percent": 150 } ] },
+    { "id": "SENS-BOOT-200-INT-125", "description": "the bootstrap takes twice as long as measured and every other integration task overruns by a quarter", "scale": [ { "tasks": [ "T10" ], "percent": 200 }, { "owner": "integration", "percent": 125 } ] }
+  ]
+}

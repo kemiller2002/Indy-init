@@ -1,0 +1,886 @@
+{
+  "schema": "indy-init.v41-project-structure/1",
+  "description": "Project structure and file ownership for the event build, with the dependency direction App -> Persistence -> Domain: Causa.App holds the web and application layers and references Causa.Persistence, which references only Causa.Domain. This supersedes the direction of FSHARP-TYPE-SHAPES section 46 (Web/Persistence -> Application -> Domain) for Causa; Domain depends on nothing in both. Each file has one primary owner. After the T14 interface freeze, only integration edits shared files and project files; every project file's Compile list is written once, complete, at T14, so no agent adds a file to a project later. Test files for bound test identities are generated from the verification plan (agent-file-ownership.json). Contract tests (one file per interface and side), state-machine tests (one file per machine, in its owner's test project) and the unit-test files named by requiredTests are generated with their owners, so every Compile list is complete at bootstrap.",
+  "roles": [
+    {
+      "id": "domain",
+      "lane": "domain",
+      "description": "F# kernel: identity, commands, events, decide, evolve, replay, projection, policies, capabilities"
+    },
+    {
+      "id": "persistence",
+      "lane": "persistence",
+      "description": "storage codec, wire, classification, save machine, reconciliation, session, stateful fake"
+    },
+    {
+      "id": "ui",
+      "lane": "ui",
+      "description": "Limen engine, routes, projections, workspace shell, investigation views, save indicator, conflict review"
+    },
+    {
+      "id": "ui-2",
+      "lane": "ui-2",
+      "description": "second UI agent (topology C): causal graph, report, history and semantic diff, administration and settings views In a topology without a ui-2 lane (A-role-lanes, B-single-lead) these files belong to ui.",
+      "fallback": "ui"
+    },
+    {
+      "id": "integration",
+      "lane": "integration",
+      "description": "sole writer of every shared file after T14: solution, project files, package manifests, CI, deployment, host shim, boundary script, stylesheet entry; merges qualifying pull requests; runs cross-component contract tests"
+    },
+    {
+      "id": "coordinator",
+      "lane": "coordinator",
+      "description": "interface change control, requirements ledger, kickoff record and clock"
+    },
+    {
+      "id": "reviewer",
+      "lane": "reviewer",
+      "description": "independent review checkpoints; writes no product file"
+    }
+  ],
+  "projects": [
+    {
+      "id": "Causa.Domain",
+      "path": "src/Causa.Domain/Causa.Domain.fsproj",
+      "language": "F#",
+      "references": [],
+      "owner": "integration",
+      "files": [
+        {
+          "path": "src/Causa.Domain/Identity.fs",
+          "owner": "domain",
+          "contributors": [],
+          "dependsOn": [],
+          "implements": [],
+          "requiredTests": [
+            "dotnet:Causa.Domain.Tests.Identity"
+          ]
+        },
+        {
+          "path": "src/Causa.Domain/Semantics.fs",
+          "owner": "domain",
+          "contributors": [],
+          "dependsOn": [
+            "src/Causa.Domain/Identity.fs"
+          ],
+          "implements": [],
+          "requiredTests": []
+        },
+        {
+          "path": "src/Causa.Domain/Entities.fs",
+          "owner": "domain",
+          "contributors": [],
+          "dependsOn": [
+            "src/Causa.Domain/Semantics.fs"
+          ],
+          "implements": [],
+          "requiredTests": []
+        },
+        {
+          "path": "src/Causa.Domain/Commands.fs",
+          "owner": "domain",
+          "contributors": [],
+          "dependsOn": [
+            "src/Causa.Domain/Entities.fs"
+          ],
+          "implements": [],
+          "requiredTests": []
+        },
+        {
+          "path": "src/Causa.Domain/Events.fs",
+          "owner": "domain",
+          "contributors": [],
+          "dependsOn": [
+            "src/Causa.Domain/Entities.fs"
+          ],
+          "implements": [],
+          "requiredTests": []
+        },
+        {
+          "path": "src/Causa.Domain/Policies.fs",
+          "owner": "domain",
+          "contributors": [],
+          "dependsOn": [
+            "src/Causa.Domain/Commands.fs",
+            "src/Causa.Domain/Events.fs"
+          ],
+          "implements": [],
+          "requiredTests": []
+        },
+        {
+          "path": "src/Causa.Domain/Decide.fs",
+          "owner": "domain",
+          "contributors": [],
+          "dependsOn": [
+            "src/Causa.Domain/Policies.fs"
+          ],
+          "implements": [],
+          "requiredTests": []
+        },
+        {
+          "path": "src/Causa.Domain/Evolve.fs",
+          "owner": "domain",
+          "contributors": [],
+          "dependsOn": [
+            "src/Causa.Domain/Events.fs"
+          ],
+          "implements": [],
+          "requiredTests": []
+        },
+        {
+          "path": "src/Causa.Domain/Capabilities.fs",
+          "owner": "domain",
+          "contributors": [],
+          "dependsOn": [
+            "src/Causa.Domain/Decide.fs",
+            "src/Causa.Domain/Evolve.fs"
+          ],
+          "implements": [],
+          "requiredTests": []
+        },
+        {
+          "path": "src/Causa.Domain/Kernel.fs",
+          "owner": "domain",
+          "contributors": [],
+          "dependsOn": [
+            "src/Causa.Domain/Capabilities.fs"
+          ],
+          "implements": [
+            "IF41-DOMAIN"
+          ],
+          "requiredTests": [
+            "dotnet:Causa.Contract.Tests.Domain.Producer.DecideIsTotalOverCommands"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "Causa.Persistence",
+      "path": "src/Causa.Persistence/Causa.Persistence.fsproj",
+      "language": "F#",
+      "references": [
+        "Causa.Domain"
+      ],
+      "owner": "integration",
+      "files": [
+        {
+          "path": "src/Causa.Persistence/Storage.fs",
+          "owner": "persistence",
+          "contributors": [],
+          "dependsOn": [
+            "src/Causa.Domain/Kernel.fs"
+          ],
+          "implements": [
+            "IF41-STORAGE"
+          ],
+          "requiredTests": []
+        },
+        {
+          "path": "src/Causa.Persistence/Canonical.fs",
+          "owner": "persistence",
+          "contributors": [],
+          "dependsOn": [
+            "src/Causa.Persistence/Storage.fs"
+          ],
+          "implements": [],
+          "requiredTests": [],
+          "note": "RFC 8785 canonical JSON and digests"
+        },
+        {
+          "path": "src/Causa.Persistence/Reader.fs",
+          "owner": "persistence",
+          "contributors": [],
+          "dependsOn": [
+            "src/Causa.Persistence/Canonical.fs"
+          ],
+          "implements": [],
+          "requiredTests": [],
+          "note": "causa-data v1.0.0 section 11 verification"
+        },
+        {
+          "path": "src/Causa.Persistence/Wire.fs",
+          "owner": "persistence",
+          "contributors": [],
+          "dependsOn": [
+            "src/Causa.Persistence/Storage.fs"
+          ],
+          "implements": [
+            "IF41-WIRE"
+          ],
+          "requiredTests": []
+        },
+        {
+          "path": "src/Causa.Persistence/GitHubRequests.fs",
+          "owner": "persistence",
+          "contributors": [],
+          "dependsOn": [
+            "src/Causa.Persistence/Wire.fs"
+          ],
+          "implements": [],
+          "requiredTests": [],
+          "note": "GraphQL createCommitOnBranch and REST reads as HttpRequest values"
+        },
+        {
+          "path": "src/Causa.Persistence/Classify.fs",
+          "owner": "persistence",
+          "contributors": [],
+          "dependsOn": [
+            "src/Causa.Persistence/Wire.fs"
+          ],
+          "implements": [
+            "IF41-ERRORS"
+          ],
+          "requiredTests": []
+        },
+        {
+          "path": "src/Causa.Persistence/SaveMachine.fs",
+          "owner": "persistence",
+          "contributors": [],
+          "dependsOn": [
+            "src/Causa.Persistence/Classify.fs",
+            "src/Causa.Persistence/Reader.fs",
+            "src/Causa.Persistence/GitHubRequests.fs"
+          ],
+          "implements": [
+            "IF41-SAVE"
+          ],
+          "requiredTests": []
+        },
+        {
+          "path": "src/Causa.Persistence/Reconcile.fs",
+          "owner": "persistence",
+          "contributors": [],
+          "dependsOn": [
+            "src/Causa.Persistence/SaveMachine.fs"
+          ],
+          "implements": [],
+          "requiredTests": []
+        },
+        {
+          "path": "src/Causa.Persistence/Conflict.fs",
+          "owner": "persistence",
+          "contributors": [],
+          "dependsOn": [
+            "src/Causa.Persistence/SaveMachine.fs"
+          ],
+          "implements": [],
+          "requiredTests": [],
+          "note": "SM-CONFLICT"
+        },
+        {
+          "path": "src/Causa.Persistence/LoadMachine.fs",
+          "owner": "persistence",
+          "contributors": [],
+          "dependsOn": [
+            "src/Causa.Persistence/Reader.fs"
+          ],
+          "implements": [],
+          "requiredTests": [],
+          "note": "SM-LOAD"
+        },
+        {
+          "path": "src/Causa.Persistence/Session.fs",
+          "owner": "persistence",
+          "contributors": [],
+          "dependsOn": [
+            "src/Causa.Persistence/Reconcile.fs",
+            "src/Causa.Persistence/Conflict.fs",
+            "src/Causa.Persistence/LoadMachine.fs"
+          ],
+          "implements": [],
+          "requiredTests": [],
+          "note": "tab session id, write markers, per-investigation sessions"
+        }
+      ]
+    },
+    {
+      "id": "Causa.App",
+      "path": "src/Causa.App/Causa.App.fsproj",
+      "language": "F#",
+      "references": [
+        "Causa.Domain",
+        "Causa.Persistence"
+      ],
+      "owner": "integration",
+      "files": [
+        {
+          "path": "src/Causa.App/Engine.fs",
+          "owner": "ui",
+          "contributors": [],
+          "dependsOn": [
+            "src/Causa.Persistence/Session.fs"
+          ],
+          "implements": [
+            "IF41-APP"
+          ],
+          "requiredTests": []
+        },
+        {
+          "path": "src/Causa.App/Routes.fs",
+          "owner": "ui",
+          "contributors": [],
+          "dependsOn": [
+            "src/Causa.App/Engine.fs"
+          ],
+          "implements": [],
+          "requiredTests": []
+        },
+        {
+          "path": "src/Causa.App/Connection.fs",
+          "owner": "ui",
+          "contributors": [],
+          "dependsOn": [
+            "src/Causa.App/Engine.fs"
+          ],
+          "implements": [],
+          "requiredTests": [],
+          "note": "SM-CONNECTION, SM-NETWORK"
+        },
+        {
+          "path": "src/Causa.App/Projections.fs",
+          "owner": "ui",
+          "contributors": [],
+          "dependsOn": [
+            "src/Causa.App/Connection.fs",
+            "src/Causa.App/Routes.fs"
+          ],
+          "implements": [
+            "IF41-VIEW"
+          ],
+          "requiredTests": []
+        },
+        {
+          "path": "src/Causa.App/Reporting.fs",
+          "owner": "ui",
+          "contributors": [],
+          "dependsOn": [
+            "src/Causa.App/Projections.fs"
+          ],
+          "implements": [
+            "IF41-REPORT"
+          ],
+          "requiredTests": [],
+          "note": "the contract is ui's; ui-2 implements the report view"
+        },
+        {
+          "path": "src/Causa.App/Update.fs",
+          "owner": "ui",
+          "contributors": [],
+          "dependsOn": [
+            "src/Causa.App/Projections.fs",
+            "src/Causa.App/Reporting.fs"
+          ],
+          "implements": [],
+          "requiredTests": []
+        },
+        {
+          "path": "src/Causa.App/Views/Shell.fs",
+          "owner": "ui",
+          "contributors": [],
+          "dependsOn": [
+            "src/Causa.App/Projections.fs"
+          ],
+          "implements": [],
+          "requiredTests": [],
+          "note": "workspace shell, navigation, header"
+        },
+        {
+          "path": "src/Causa.App/Views/SaveIndicator.fs",
+          "owner": "ui",
+          "contributors": [],
+          "dependsOn": [
+            "src/Causa.App/Views/Shell.fs"
+          ],
+          "implements": [],
+          "requiredTests": []
+        },
+        {
+          "path": "src/Causa.App/Views/ConflictReview.fs",
+          "owner": "ui",
+          "contributors": [],
+          "dependsOn": [
+            "src/Causa.App/Views/SaveIndicator.fs"
+          ],
+          "implements": [],
+          "requiredTests": []
+        },
+        {
+          "path": "src/Causa.App/Views/Dashboard.fs",
+          "owner": "ui",
+          "contributors": [],
+          "dependsOn": [
+            "src/Causa.App/Views/Shell.fs"
+          ],
+          "implements": [],
+          "requiredTests": []
+        },
+        {
+          "path": "src/Causa.App/Views/Investigation.fs",
+          "owner": "ui",
+          "contributors": [],
+          "dependsOn": [
+            "src/Causa.App/Views/SaveIndicator.fs"
+          ],
+          "implements": [],
+          "requiredTests": [],
+          "note": "overview, timeline, evidence inspector, commands, next steps"
+        },
+        {
+          "path": "src/Causa.App/Views/Graph.fs",
+          "owner": "ui-2",
+          "contributors": [],
+          "dependsOn": [
+            "src/Causa.App/Views/Shell.fs"
+          ],
+          "implements": [],
+          "requiredTests": []
+        },
+        {
+          "path": "src/Causa.App/Views/Report.fs",
+          "owner": "ui-2",
+          "contributors": [],
+          "dependsOn": [
+            "src/Causa.App/Views/Shell.fs",
+            "src/Causa.App/Reporting.fs"
+          ],
+          "implements": [],
+          "requiredTests": []
+        },
+        {
+          "path": "src/Causa.App/Views/History.fs",
+          "owner": "ui-2",
+          "contributors": [],
+          "dependsOn": [
+            "src/Causa.App/Views/Shell.fs"
+          ],
+          "implements": [],
+          "requiredTests": [],
+          "note": "S14, S15"
+        },
+        {
+          "path": "src/Causa.App/Views/Administration.fs",
+          "owner": "ui-2",
+          "contributors": [],
+          "dependsOn": [
+            "src/Causa.App/Views/Shell.fs"
+          ],
+          "implements": [],
+          "requiredTests": [],
+          "note": "UI-018, UI-019"
+        },
+        {
+          "path": "src/Causa.App/View.fs",
+          "owner": "integration",
+          "contributors": [],
+          "dependsOn": [
+            "src/Causa.App/Views/ConflictReview.fs",
+            "src/Causa.App/Views/Dashboard.fs",
+            "src/Causa.App/Views/Investigation.fs",
+            "src/Causa.App/Views/Graph.fs",
+            "src/Causa.App/Views/Report.fs",
+            "src/Causa.App/Views/History.fs",
+            "src/Causa.App/Views/Administration.fs"
+          ],
+          "implements": [],
+          "requiredTests": [],
+          "note": "composition: route to view; written once by integration with every view wired"
+        },
+        {
+          "path": "src/Causa.App/Program.fs",
+          "owner": "integration",
+          "contributors": [],
+          "dependsOn": [
+            "src/Causa.App/View.fs",
+            "src/Causa.App/Update.fs"
+          ],
+          "implements": [],
+          "requiredTests": [],
+          "note": "Limen engine entry"
+        }
+      ]
+    },
+    {
+      "id": "Causa.Host",
+      "path": "src/Causa.Host/Causa.Host.csproj",
+      "language": "C#",
+      "references": [
+        "Causa.App"
+      ],
+      "owner": "integration",
+      "files": [
+        {
+          "path": "src/Causa.Host/Host.cs",
+          "owner": "integration",
+          "contributors": [],
+          "dependsOn": [
+            "src/Causa.App/Program.fs"
+          ],
+          "implements": [],
+          "requiredTests": [],
+          "note": "the single [JSExport] entry point: F# does not run the JSExport generator (Rehearsal 7 finding KD-007)"
+        }
+      ]
+    }
+  ],
+  "sharedFiles": [
+    {
+      "path": ".gitignore",
+      "owner": "integration",
+      "contributors": [],
+      "dependsOn": [],
+      "implements": [],
+      "requiredTests": [],
+      "note": "bin/, obj/, node_modules/, test output; written by the bootstrap"
+    },
+    {
+      "path": "Causa.slnx",
+      "owner": "integration",
+      "contributors": [],
+      "dependsOn": [],
+      "implements": [],
+      "requiredTests": [],
+      "note": "solution"
+    },
+    {
+      "path": "Directory.Build.props",
+      "owner": "integration",
+      "contributors": [],
+      "dependsOn": [],
+      "implements": [],
+      "requiredTests": [],
+      "note": "shared build properties"
+    },
+    {
+      "path": "Directory.Packages.props",
+      "owner": "integration",
+      "contributors": [],
+      "dependsOn": [],
+      "implements": [],
+      "requiredTests": [],
+      "note": "Central package versions (ManagePackageVersionsCentrally). The bootstrap writes the test tooling the owner locked (testTooling); integration adds the dependency lock's other NuGet versions here (EchelonFoundry.Limen.Contract, EchelonFoundry.Aegis.Core) and their version-less references in the source projects that use them, at T10"
+    },
+    {
+      "path": "global.json",
+      "owner": "integration",
+      "contributors": [],
+      "dependsOn": [],
+      "implements": [],
+      "requiredTests": [],
+      "note": "SDK 10.0.402, rollForward disable"
+    },
+    {
+      "path": "package.json",
+      "owner": "integration",
+      "contributors": [],
+      "dependsOn": [],
+      "implements": [],
+      "requiredTests": [],
+      "note": "npm manifest: Limen 0.9.1, Forma 0.12.0, Playwright"
+    },
+    {
+      "path": "package-lock.json",
+      "owner": "integration",
+      "contributors": [],
+      "dependsOn": [],
+      "implements": [],
+      "requiredTests": [],
+      "note": "npm lock"
+    },
+    {
+      "path": "build.fsx",
+      "owner": "integration",
+      "contributors": [],
+      "dependsOn": [],
+      "implements": [],
+      "requiredTests": [],
+      "note": "build script (dotnet fsi; no FAKE)"
+    },
+    {
+      "path": ".github/workflows/ci.yml",
+      "owner": "integration",
+      "contributors": [],
+      "dependsOn": [],
+      "implements": [],
+      "requiredTests": [],
+      "note": "CI: errexit, pipefail, CAUSA_PLAN, suites run to completion"
+    },
+    {
+      "path": ".github/workflows/live.yml",
+      "owner": "integration",
+      "contributors": [],
+      "dependsOn": [],
+      "implements": [],
+      "requiredTests": [],
+      "note": "live provider suites, one test-repository branch per run"
+    },
+    {
+      "path": ".github/workflows/deploy.yml",
+      "owner": "integration",
+      "contributors": [],
+      "dependsOn": [],
+      "implements": [],
+      "requiredTests": [],
+      "note": "GitHub Pages deploy of the exact SHA and deployed acceptance"
+    },
+    {
+      "path": "web/index.html",
+      "owner": "integration",
+      "contributors": [],
+      "dependsOn": [],
+      "implements": [],
+      "requiredTests": [],
+      "note": "loading shell and layout; reads only Forma tokens (layout contract). Integration owns it (v4.1.1, X18); UI roles change it only through an integration-owned change request (amendment.json sharedEntrypoints)"
+    },
+    {
+      "path": "web/boundary.js",
+      "owner": "integration",
+      "contributors": [],
+      "dependsOn": [],
+      "implements": [],
+      "requiredTests": [],
+      "note": "browser boundary: connectivity, timers, leave guard; no application state (Rehearsal 7 finding KD-010)"
+    },
+    {
+      "path": "web/causa.css",
+      "owner": "integration",
+      "contributors": [],
+      "dependsOn": [],
+      "implements": [],
+      "requiredTests": [],
+      "note": "loading shell and layout; reads only Forma tokens (layout contract). Integration owns it (v4.1.1, X18); UI roles change it only through an integration-owned change request (amendment.json sharedEntrypoints)"
+    },
+    {
+      "path": ".echelon/routes.json",
+      "owner": "integration",
+      "contributors": [],
+      "dependsOn": [],
+      "implements": [],
+      "requiredTests": [],
+      "note": "route registry"
+    },
+    {
+      "path": "tests/fixtures/manifest.json",
+      "owner": "integration",
+      "contributors": [],
+      "dependsOn": [],
+      "implements": [],
+      "requiredTests": [],
+      "note": "storage-like fixtures declared for the credential scan (DCC-015)"
+    },
+    {
+      "path": "playwright.config.ts",
+      "owner": "integration",
+      "contributors": [],
+      "dependsOn": [],
+      "implements": [],
+      "requiredTests": [],
+      "note": "browser projects chromium and webkit; no maxFailures"
+    },
+    {
+      "path": "README.md",
+      "owner": "integration",
+      "contributors": [],
+      "dependsOn": [],
+      "implements": [],
+      "requiredTests": [],
+      "note": "build instructions"
+    },
+    {
+      "path": "evidence/",
+      "owner": "coordinator",
+      "contributors": [
+        "integration"
+      ],
+      "dependsOn": [],
+      "implements": [],
+      "requiredTests": [],
+      "note": "acceptance ledger and evidence (coordinator writes, integration merges)"
+    }
+  ],
+  "testHelpers": [
+    {
+      "path": "tests/Causa.TestSupport/Recordings.fs",
+      "owner": "persistence",
+      "contributors": [],
+      "dependsOn": [],
+      "implements": [],
+      "requiredTests": [],
+      "note": "recorded GitHub answers from the provider-conformance probe (T18)"
+    },
+    {
+      "path": "tests/Causa.TestSupport/StatefulFake.fs",
+      "owner": "persistence",
+      "contributors": [],
+      "dependsOn": [
+        "tests/Causa.TestSupport/Recordings.fs",
+        "src/Causa.Persistence/Wire.fs"
+      ],
+      "implements": [],
+      "requiredTests": [],
+      "note": "PERSIST-025 stateful GitHub fake built from the recordings; the browser suites use it through the test build, which integration composes (build.fsx)"
+    },
+    {
+      "path": "tests/browser/support/fixtures.js",
+      "owner": "integration",
+      "contributors": [],
+      "dependsOn": [],
+      "implements": [],
+      "requiredTests": [],
+      "note": "shared Playwright fixtures"
+    },
+    {
+      "path": "tests/browser/support/layout-assertions.mjs",
+      "owner": "integration",
+      "contributors": [],
+      "dependsOn": [],
+      "implements": [],
+      "requiredTests": [],
+      "note": "copy of requirements-compiled/v4.1/layout-tests/assertions.mjs written by the bootstrap (T10); the plan's browser tests for FL-01..FL-10 import it (T16, T22)"
+    }
+  ],
+  "rules": [
+    "A file has exactly one primary owner; contributors may edit only through a pull request the owner approves, never concurrently.",
+    "A change to a frozen interface (interface-specifications.json) goes through the coordinator and is versioned; consumers are notified before merge.",
+    "F# compile order is the order of each project's files list; a file may depend only on earlier files of its project or on referenced projects.",
+    "ui and ui-2 never own the same file; Shell.fs is ui's and ui-2 consumes it read-only.",
+    "Integration alone writes: .gitignore, every project and solution file, Directory.*.props and .targets, NuGet.config, global.json, package.json, package-lock.json, playwright.config.ts, *.runsettings, build.fsx, README.md, .github/, .echelon/, tests/fixtures/, tests/browser/support/, web/boundary.js, web/index.html, web/causa.css, src/Causa.Host/, src/Causa.App/View.fs and src/Causa.App/Program.fs (checks X02 and X18). A UI role changes web/index.html or web/causa.css only through a change request integration owns and applies (v4.1.1)."
+  ],
+  "testTooling": {
+    "description": "The test tooling the owner locked, one lock per dependency-lock decision with its operator approval (ODR-V41-07, option A, APR-V41-OWNER-2; ODR-V41-09, option A, APR-V41-OWNER-3). The bootstrap writes the NuGet versions into Directory.Packages.props (central package management) and a version-less reference into each test project that hosts .NET tests, and the npm packages into package.json, at exactly these versions; nothing else is added. Check X16 requires testProjects to be exactly the test projects that host .NET tests (Causa.TestSupport is a helper library and takes none); the offline suite compares each lock with the owner's record.",
+    "locks": [
+      {
+        "decision": "ODR-V41-07",
+        "approval": "APR-V41-OWNER-2",
+        "nuget": [
+          "xunit@2.9.2",
+          "xunit.runner.visualstudio@2.8.2",
+          "Microsoft.NET.Test.Sdk@17.11.1"
+        ],
+        "npm": [
+          "@playwright/test@1.63.0"
+        ]
+      },
+      {
+        "decision": "ODR-V41-09",
+        "approval": "APR-V41-OWNER-3",
+        "npm": [
+          "axe-core@4.14.0"
+        ]
+      }
+    ],
+    "testProjects": [
+      "Causa.Acceptance",
+      "Causa.Invariants",
+      "Causa.Contract.Tests",
+      "Causa.Domain.Tests",
+      "Causa.Persistence.Tests",
+      "Causa.App.Tests"
+    ]
+  },
+  "testProjects": [
+    {
+      "id": "Causa.TestSupport",
+      "path": "tests/Causa.TestSupport/Causa.TestSupport.fsproj",
+      "owner": "integration",
+      "references": [
+        "Causa.Domain",
+        "Causa.Persistence"
+      ]
+    },
+    {
+      "id": "Causa.Acceptance",
+      "path": "tests/Causa.Acceptance/Causa.Acceptance.fsproj",
+      "owner": "integration",
+      "references": [
+        "Causa.Domain",
+        "Causa.Persistence",
+        "Causa.App",
+        "Causa.TestSupport"
+      ]
+    },
+    {
+      "id": "Causa.Invariants",
+      "path": "tests/Causa.Invariants/Causa.Invariants.fsproj",
+      "owner": "integration",
+      "references": [
+        "Causa.Domain",
+        "Causa.Persistence",
+        "Causa.App",
+        "Causa.TestSupport"
+      ]
+    },
+    {
+      "id": "Causa.Contract.Tests",
+      "path": "tests/Causa.Contract.Tests/Causa.Contract.Tests.fsproj",
+      "owner": "integration",
+      "references": [
+        "Causa.Domain",
+        "Causa.Persistence",
+        "Causa.App",
+        "Causa.TestSupport"
+      ]
+    },
+    {
+      "id": "Causa.Domain.Tests",
+      "path": "tests/Causa.Domain.Tests/Causa.Domain.Tests.fsproj",
+      "owner": "integration",
+      "references": [
+        "Causa.Domain"
+      ]
+    },
+    {
+      "id": "Causa.Persistence.Tests",
+      "path": "tests/Causa.Persistence.Tests/Causa.Persistence.Tests.fsproj",
+      "owner": "integration",
+      "references": [
+        "Causa.Domain",
+        "Causa.Persistence",
+        "Causa.TestSupport"
+      ]
+    },
+    {
+      "id": "Causa.App.Tests",
+      "path": "tests/Causa.App.Tests/Causa.App.Tests.fsproj",
+      "owner": "integration",
+      "references": [
+        "Causa.Domain",
+        "Causa.Persistence",
+        "Causa.App",
+        "Causa.TestSupport"
+      ]
+    }
+  ],
+  "stateMachines": [
+    {
+      "machine": "SM-SAVE",
+      "owner": "persistence",
+      "project": "Causa.Persistence.Tests",
+      "task": "T19"
+    },
+    {
+      "machine": "SM-CONFLICT",
+      "owner": "persistence",
+      "project": "Causa.Persistence.Tests",
+      "task": "T19"
+    },
+    {
+      "machine": "SM-LOAD",
+      "owner": "persistence",
+      "project": "Causa.Persistence.Tests",
+      "task": "T20"
+    },
+    {
+      "machine": "SM-CONNECTION",
+      "owner": "ui",
+      "project": "Causa.App.Tests",
+      "task": "T16"
+    },
+    {
+      "machine": "SM-NETWORK",
+      "owner": "ui",
+      "project": "Causa.App.Tests",
+      "task": "T16"
+    }
+  ]
+}
