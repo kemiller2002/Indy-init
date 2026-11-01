@@ -2,7 +2,7 @@
 
 > **v4.1.1:** this is v4.1's optimization report, carried into the successor package. Where v4.1.1 differs, [AMENDMENT-4.1.1.md](AMENDMENT-4.1.1.md) and [STARTING-STATE.md](STARTING-STATE.md) govern. The changes are:
 >
-> - the bootstrap runs at T0 inside the window, with a measured duration;
+> - the bootstrap runs at T0 inside the window, its 29 minutes partly measured (2 measured, 27 estimated);
 > - no organizer-permission gate;
 > - `web/index.html` and `web/causa.css` are owned by integration;
 > - the recomputed schedule, with sensitivity.
@@ -36,9 +36,9 @@ v4.1 changes no requirement text, obligation or test binding (X10). It does ask 
 
 - REHEARSAL-AGENT-INTERFACE-FREEZE says F# signatures are authored at kickoff;
 - KICKOFF-EXECUTION-PACKET §4 says parallel ownership starts after the kernel stabilizes;
-- HACKATHON-BOUNDARIES quotes the published event rules, "the repository starts empty" and "code starts at kickoff". It also says to confirm with the organizers before producing scaffolding and to keep application source out until then. The T10 bootstrap makes the application repository non-empty before kickoff.
+- HACKATHON-BOUNDARIES quotes the published event rules, "the repository starts empty" and "code starts at kickoff". It also says to confirm with the organizers before producing scaffolding and to keep application source out until then. The T10 bootstrap makes the application repository non-empty before kickoff. *(v4.1's text, superseded in v4.1.1: the bootstrap runs at T0, so the competition repository stays empty before kickoff; see STARTING-STATE.md.)*
 
-The owner stated in session on 2026-10-30 that the organizers allow pre-kickoff scaffolding. The owner's own record makes that authoritative.
+The owner stated in session on 2026-10-30 that the organizers allow pre-kickoff scaffolding. The owner's own record makes that authoritative. *(v4.1's text, superseded in v4.1.1: v4.1.1 writes nothing to the competition repository before T0 and does not restate what the organizers said; the owner's record reads only "I approved it." See STARTING-STATE.md and ODR-V411-02.)*
 
 ## Where v4 left time on the table
 
@@ -123,7 +123,7 @@ Unchanged, because each now carries named test work:
 | T22 | 70 | Restored after review RV41-3-9: the layout assertions do not shorten the views' work by a known amount |
 | T31 | 45 | — |
 
-Preflight T10 gets 25 minutes outside the window (v4.1). In v4.1.1, T10 runs at T0 inside the window with a measured duration (AMENDMENT-4.1.1.md).
+Preflight T10 gets 25 minutes outside the window (v4.1). In v4.1.1, T10 runs at T0 inside the window: 29 minutes, 2 measured and 27 estimated (AMENDMENT-4.1.1.md).
 
 **Binding chains (estimated).** These are the riskiest dependencies, and any overrun on them moves the deadline. Each topology's chain is in `schedule.json` `topologies[].bindingChain`.
 

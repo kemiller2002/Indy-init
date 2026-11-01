@@ -13,7 +13,7 @@ This report answers the seven questions of the Final Execution Optimization and 
 - the layout tests;
 - the verification execution plan.
 
-No requirement is weakened or claimed met. The organizer-approval obligations of the frozen baseline (ADRP-016-O2, STORAGE-008-O1) stay as they are, and the owner decides how they are reported (ODR-V411-02).
+No requirement is weakened or claimed met. The organizer-related obligations of the frozen baseline stay as they are, and the owner decides how they are reported (ODR-V411-02). They are ADRP-016-O2, STORAGE-008-O1, R0.1-O1, the kickoff checks, PRE-ORG-01 and the DOMAIN-TEST-MATRIX condition.
 
 ## B. Can the application be generated from an empty repository at T0?
 
@@ -38,7 +38,7 @@ Two files carry reviewed boundary code, seven members in all, each pinned by SHA
 - the credential's `ToString`, `create` and `authorization` (PF-015, INV-21);
 - the confirmation's three accessors and `ofReadBack` (PERSIST-023).
 
-They fix the `Bearer` scheme and exact read-back equality, both of which are requirements. X17's line scan is a heuristic that rejects any other code. The offline suite tests it against every bypass form the review found.
+They fix the `Bearer` scheme and exact read-back equality, both of which are requirements. The byte equality with v4.1's reviewed contracts is the guarantee. X17's line scan is a second, heuristic guard. It reads strings, characters and comments as the F# lexer does, and the offline suite tests it against all 18 bypass forms both review rounds found.
 
 ## D. Is file ownership unambiguous?
 
@@ -47,8 +47,7 @@ They fix the `Bearer` scheme and exact read-back equality, both of which are req
 X18 rejects, among other cases, these three:
 
 - another owner or contributor for either file;
-- a UI row that names the files outside the fixed change-request sentence;
-- any rule line that lets a UI role edit the files directly.
+- any AGENT-RULES line naming the files that is not one of the four reviewed lines pinned by SHA-256.
 
 Nothing in the generated repository enforces ownership technically; there is no CODEOWNERS file.
 
@@ -91,4 +90,4 @@ Two levers would cut actual work without removing a requirement. They are not ap
 
 ## Independent review
 
-See [independent-review.md](../requirements-compiled/v4.1.1/independent-review.md). Round 1 failed, with five major findings, none of them blocking; each has a disposition. Round 2 reviews the fixes.
+See [independent-review.md](../requirements-compiled/v4.1.1/independent-review.md). Round 1 failed with five major findings, and round 2 failed with one major finding; none was blocking, and each finding has a disposition. Round 3 reviews the fixes.

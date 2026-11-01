@@ -36,7 +36,7 @@ CI layers onto a recorded Conditor 0.10.18 scaffold and builds both solutions; t
 | R2 | warm | 0.0 s | 5.2 s | 1.1 s | 17.8 s | 6.1 s | 0.2 s | 1.2 s | 0.1 s | 31.8 s |
 | R3 | cold | 0.0 s | 45.8 s | 0.9 s | 20.6 s | 7.6 s | 0.1 s | 1.4 s | 0.1 s | 76.4 s |
 
-A cross-check with the tools built from their release tags took 71.8 s, 32.3 s and 75.9 s. The runs were on one 4-CPU container with a warm NuGet cache.
+A cross-check with the tools built from their release tags took 71.8 s, 32.3 s and 75.9 s. The runs were on one 4-CPU container with a warm NuGet cache. They used an earlier shell runner, which is not committed because this repository is F#-only. The committed script, written afterwards with the same steps, reproduced them at 83.0 s with a cold Conditor cache, every step passing.
 
 **T10 is 29 minutes, labelled `measured+estimated`:**
 
@@ -62,9 +62,9 @@ That code fixes two choices before kickoff: the `Bearer` scheme, and exact equal
 
 X17 has three layers:
 
-1. **Baseline equality.** Every contract must equal its file in the reviewed, approved v4.1 package byte for byte. This is the guarantee.
+1. **Baseline equality.** Every contract must equal its file in the reviewed, approved v4.1 package byte for byte. This is the guarantee. The baseline must be the package the amendment amends, with its approval (X20 pins both).
 2. **Pinned members.** Each allowed member's text must match its pinned digest.
-3. **Line scan.** No other code may appear. The scan is a heuristic over lines, not the F# syntax tree. It requires every line to begin as a declaration and to carry no code keyword. It catches every form the independent review used to bypass its first version: active patterns, `static let`, `do`, bare expressions, `use`, one-line types with members, backtick names and chained bindings. The offline suite tests each of these.
+3. **Line scan.** No other code may appear. The scan is a heuristic over lines, not the F# syntax tree. It first blanks strings, character literals and comments the way the F# lexer reads them: triple-quoted and verbatim strings, and nested comments. It then requires every line to begin as a declaration and to carry no code keyword. It catches every form both review rounds used, 18 in all, and the offline suite tests each one. These include active patterns, `static let`, `do`, bare expressions, record expressions, `use`, one-line types with members, backtick names, chained bindings, and code hidden behind a string, character or verbatim literal.
 
 CI proves that the contracts typecheck and that the negative controls fail to compile. X05 proves that each state machine equals one interface's unions. The bootstrap writes each contract verbatim into its producer's file, and two bootstraps are identical.
 
@@ -72,28 +72,29 @@ CI proves that the contracts typecheck and that the negative controls fail to co
 
 No task waits on organizer permission (OD-INDY-18): T10 no longer prefers to follow T06, and AGENT-RULES no longer makes the bootstrap rely on ODR-V41-06. The published rules remain external constraints. ODR-V41-06 and APR-V41-OWNER-1 stay as written.
 
-X19 scans these sources for organizer approval or confirmation:
+X19 scans for organizer gates: a mention of an organizer with a word of approval, confirmation, permission, waiting or asking. It reads these sources:
 
-- v4's preflight checks, tasks and requirement obligations;
+- v4's preflight checks, tasks, requirement obligations and risk register;
 - the DAG waivers that rest on ODR-V41-06;
-- the internal rule documents.
+- the documents in `startingState.organizerDocuments`: the internal rule documents, the data contract, the domain test matrix, the product requirements, and v4.1.1's own AGENT-RULES, README and FREEZE.
 
-Each match must have a recorded disposition under an owner decision (`startingState.organizerReferences`, 20 entries). Some are met without any organizer:
-
-- R0.1-O1 and the kickoff packet's "empty/organizer-compliant" checks are met by the empty repository at T0.
-- PRE-REQ-04 and PRE-TOOL-03 accept an owner record.
-
-Others conflict with the owner's instruction, and an agent may not set a requirement aside:
+The scan is a heuristic over those sources, not over every file in the repository. Each match must have a recorded disposition (`startingState.organizerReferences`, 29 entries). No obligation is claimed met. These conflict with the owner's instruction, and an agent may not set them aside:
 
 - ADRP-016-O2 ("subject to organizer approval", a must obligation) and its readiness-checklist form;
-- STORAGE-008-O1;
-- PRE-ORG-01/T06;
+- STORAGE-008-O1 and the data contract's §10.8;
+- R0.1-O1 ("blank application repository or the organizer-approved equivalent") and the kickoff packet's "empty/organizer-compliant" checks;
+- the DOMAIN-TEST-MATRIX condition on pre-written executable tests;
+- PRE-ORG-01/T06 and RISK-12;
 - OD-INDY-12's organizer condition;
-- the four contract-first waivers that rest on ODR-V41-06.
+- ODR-V41-06's set-aside of the interface-freeze clause, and the four contract-first waivers that rest on it.
+
+PRE-REQ-04 and PRE-TOOL-03 accept an owner record. The plan provides one, and their own checks decide.
+
+The historical records (ODR-V41-06, APR-V41-OWNER-1 and the quoted published rules) are checked by their content, and the external constraints must be quoted verbatim.
 
 **ODR-V411-02** asks the owner to choose:
 
-- **A:** proceed, and report these obligations as not met, with the reason.
+- **A:** proceed without seeking organizer approval. The approval obligations are reported as not met, with the reason; the others are reported by their own evidence.
 - **B:** keep the gate.
 - **C:** ask the organizers but do not wait.
 
@@ -112,7 +113,7 @@ Applying the requests costs integration time. T17, integration's first checkpoin
 What enforces the ownership:
 
 - X18 and X02 reject any other owner or contributor in the manifest.
-- X18 requires AGENT-RULES' UI rows to name the files only in the fixed change-request sentence, and rejects any line that lets a UI role edit them directly.
+- AGENT-RULES may name the files only in four reviewed lines, each pinned by SHA-256: the integration row, the ui row with its fixed change-request sentence, duty 4, and the Forma rule. Any other line that names them fails X18, whatever its wording.
 - Nothing in the generated repository enforces it (there is no CODEOWNERS file). The agent rules do.
 
 ## Schedule
@@ -150,6 +151,6 @@ Two levers would reduce actual work without removing a requirement. Neither is a
 
 - **The first GitHub Actions run and the remaining T10 work.** `conditor repo create` and integration's shared-file authoring are not measured either. Together they are 27 of T10's 29 minutes.
 - **Every other estimate.** None has been measured in an event build of v4.1 or v4.1.1.
-- **Change-request overhead in a real run.** It is estimated at 5 minutes.
+- **Change-request overhead in a real run.** It is estimated at 5 minutes. ui cannot see its loading-shell and visual-identity work in the real entrypoints until integration applies the requests in T17. That round-trip is not in the estimate; the 20-minute integration reserve partly covers it.
 - **Token economics on a real timed run.** It is verified on a fixture only.
 - **The organizers' reading of the starting state.** The residual risk is in STARTING-STATE.md, and how the organizer-approval obligations are reported is ODR-V411-02.

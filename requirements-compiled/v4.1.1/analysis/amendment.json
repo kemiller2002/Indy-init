@@ -1,7 +1,7 @@
 {
   "schema": "indy-init.v411-amendment/1",
   "packageVersion": "4.1.1",
-  "description": "Successor amendment of the approved package v4.1 (Indy Init v4.1: Final Execution Optimization and Readiness Amendment). It changes no requirement, obligation, test binding, state machine or contract text. It moves the T10 bootstrap into the timed window at T0 with a measured duration, classifies the F# contracts as specifications, removes the organizer-permission gate from the execution plan, gives the shared web entrypoints to integration with a change-request protocol, adds schedule sensitivity, and specifies the Praxis token-economics report. v4.1 itself is not edited: it stays as approved (APR-V41-OWNER-4).",
+  "description": "Successor amendment of the approved package v4.1 (Indy Init v4.1: Final Execution Optimization and Readiness Amendment). It changes no requirement, obligation, test binding, state machine or contract text. It moves the T10 bootstrap into the timed window at T0, its 29 minutes partly measured (2 measured, 27 estimated), classifies the F# contracts as specifications, removes the organizer-permission gate from the execution plan, gives the shared web entrypoints to integration with a change-request protocol, adds schedule sensitivity, and specifies the Praxis token-economics report. v4.1 itself is not edited: it stays as approved (APR-V41-OWNER-4).",
   "approvalDecision": "ODR-V411-01",
   "amends": {
     "package": "requirements-compiled/v4.1",
@@ -25,7 +25,7 @@
     {
       "id": "V411-B",
       "area": "B",
-      "summary": "The F# contracts stay in the package as specifications. contract-classification.json classifies every contract file; X17 rejects any implementation member that is not on the reviewed allowlist (the Credential and Confirmation boundary code)."
+      "summary": "The F# contracts stay in the package as specifications. contract-classification.json classifies every contract file. X17 requires every contract to equal the reviewed v4.1 contract byte for byte (the guarantee), pins each allowed boundary member (the Credential and Confirmation code) by SHA-256, and runs a heuristic line scan for other code."
     },
     {
       "id": "V411-C",
@@ -40,7 +40,7 @@
     {
       "id": "V411-E",
       "area": "E",
-      "summary": "web/index.html and web/causa.css are integration's (they were ui's). UI roles change them only through an integration-owned change request (X18); the ownership manifest and AGENT-RULES agree. Applying the UI change requests costs integration time: T17 carries 5 more minutes for T16's entrypoint requests; later requests fall in RES-INTEGRATION."
+      "summary": "web/index.html and web/causa.css are integration's (they were ui's). UI roles change them only through an integration-owned change request (X18 (the manifest; and AGENT-RULES may name the entrypoints only in reviewed lines pinned by SHA-256)); the ownership manifest and AGENT-RULES agree. Applying the UI change requests costs integration time: T17 carries 5 more minutes for T16's entrypoint requests; later requests fall in RES-INTEGRATION."
     },
     {
       "id": "V411-F",
@@ -155,7 +155,13 @@
       "protocol": "A UI role that needs a change to a shared entrypoint does not edit it. It opens a change request naming the file, the change (the exact markup or Forma-token rule) and the task it serves; integration applies it in its own pull request, in order, and the requesting role reviews that pull request. UI roles own their view modules (src/Causa.App/Views/*) and component-level presentation; the entrypoints only load them.",
       "record": "a Praxis work item owned by integration whose title starts with CR- and names the file, linked to the requesting task's work item",
       "ruleSentence": "It changes `web/index.html` and `web/causa.css` only through a change request to integration"
-    }
+    },
+    "ruleLinesSha256": [
+      "e70d3310f1715942140b3d9931a4d794d322cfb487a661b45425d634044c9ca8",
+      "79f5e415d2a9133bc8ee2f25b606421cbdde0fea76492b2f0df45fa31378f0f9",
+      "580b8773a4c4a1605e928b8459544de927621e361b65050b6cb37e1edaba3a85",
+      "a3a109c75efac4da13c3f89d426beeb6066bcbb7953088e26d2e9c5140a7da23"
+    ]
   },
   "startingState": {
     "document": "STARTING-STATE.md",
@@ -163,7 +169,7 @@
       "the repository starts empty",
       "code starts at kickoff",
       "teams may plan beforehand, including the problem, stack, and sketch",
-      "the build window is 9:30 AM to 5:00 PM on November 7, 2026"
+      "the build window is currently published as 9:30 AM to 5:00 PM on November 7, 2026"
     ],
     "removedGates": [
       {
@@ -174,22 +180,34 @@
     "historicalRecords": [
       {
         "id": "ODR-V41-06",
+        "source": "requirements-compiled/v4.1/proposals/owner-decision-requests.json",
+        "quote": "On 2026-10-30 the owner told the package author in session that the organizers allow pre-kickoff scaffolding.",
         "disposition": "kept unchanged"
       },
       {
         "id": "APR-V41-OWNER-1",
+        "source": "kickoff/rehearsal-007/approvals.causa.json",
+        "quote": "\"organizer_confirmation\": \"I approved it.\"",
         "disposition": "kept unchanged"
       },
       {
-        "id": "docs/HACKATHON-BOUNDARIES.md published-rule section (last reviewed 2026-09-24)",
+        "id": "docs/HACKATHON-BOUNDARIES.md: the quoted published rules (the list under 'Published rule verification'; other lines of that section were edited under OD-INDY-18 on 2026-11-01)",
+        "source": "docs/HACKATHON-BOUNDARIES.md",
+        "quote": "- the repository starts empty;\n- teams may plan beforehand, including the problem, stack, and sketch;\n- code starts at kickoff;",
         "disposition": "kept unchanged"
       }
     ],
-    "residualRisk": "The published rules say the repository starts empty and code starts at kickoff. They do not say whether material prepared before kickoff in executable form counts as planning or as code. Four kinds of material are at issue: the F# contract declarations, the deterministic generator, the layout assertions, and what conditor init writes at T0. conditor init writes the Echelon scaffold and imports 68 requirement documents (42 from this planning repository at commit 2eee2d5, 26 from Percepta). HACKATHON-BOUNDARIES lists, as an open question, whether a separate planning repository may be consumed directly by the blank implementation repository. The plan's boundary is that nothing is written to the competition repository before T0, and that everything written at T0 comes from approved, published sources. An organizer could read the materialized contract declarations, the Conditor scaffold, the requirements import, or the bootstrap itself as material prepared before kickoff. The plan does not claim otherwise. Organizer approval of the prepared material (ADRP-016-O2) is not sought; how that obligation is reported is the owner's decision ODR-V411-02. If an organizer rules on the day, the team follows the ruling.",
+    "residualRisk": "The published rules say the repository starts empty and code starts at kickoff. They do not say whether material prepared before kickoff in executable form counts as planning or as code. Four kinds of material are at issue: the F# contract declarations, the deterministic generator, the layout assertions, and what conditor init writes at T0. conditor init writes the Echelon scaffold and imports 68 requirement documents (42 from this planning repository at commit 2eee2d5, 26 from Percepta). HACKATHON-BOUNDARIES lists, as an open question, whether a separate planning repository may be consumed directly by the blank implementation repository. The plan's boundary is that nothing is written to the competition repository before T0, and that everything written at T0 comes from approved, published sources. An organizer could read the materialized contract declarations, the Conditor scaffold, the requirements import, or the bootstrap itself as material prepared before kickoff. The plan does not claim otherwise. Whether organizer approval of the prepared material (ADRP-016-O2) is sought, and how it and R0.1-O1 are reported, is the owner's decision ODR-V411-02; the package as proposed does not seek it. If an organizer rules on the day, the team follows the ruling.",
     "organizerDocuments": [
       "docs/OWNER-DECISIONS-2026-10-26.md",
       "docs/AGENT-DECISION-REDUCTION-PROFILE.md",
-      "docs/HACKATHON-BOUNDARIES.md"
+      "docs/HACKATHON-BOUNDARIES.md",
+      "docs/CAUSA-DATA-CONTRACT-v1.md",
+      "docs/DOMAIN-TEST-MATRIX.md",
+      "docs/PRODUCT-REQUIREMENTS.md",
+      "AGENT-RULES.md",
+      "README.md",
+      "FREEZE.md"
     ],
     "organizerReferences": [
       {
@@ -220,37 +238,37 @@
         "id": "STORAGE-008-O1",
         "source": "requirements-compiled/v4/requirements-inventory.json",
         "decision": "ODR-V411-02",
-        "disposition": "Organizer permission for the pre-created datastore and test data (causa-data) is not sought. The obligation stays unchanged and is reported as not met unless the owner decides otherwise (ODR-V411-02)."
+        "disposition": "Organizer permission for the pre-created datastore and test data (causa-data). The package as proposed (option A of ODR-V411-02) does not seek it; the obligation stays unchanged and is not claimed met. The owner decides (ODR-V411-02)."
       },
       {
         "id": "R0.1-O1",
         "source": "requirements-compiled/v4/requirements-inventory.json",
-        "decision": "OD-INDY-18",
-        "disposition": "Met by its first branch: the competition source begins at kickoff from a blank application repository (git init at T0, T10). The organizer-approved-equivalent branch is not used, so no organizer record is needed."
+        "decision": "ODR-V411-02",
+        "disposition": "A must obligation: 'source implementation must begin at hackathon kickoff from a blank application repository or the organizer-approved equivalent'. It stays unchanged and is not claimed met here. The plan starts from a blank repository at T0, but whether material authored before kickoff and written at T0 (the contract declarations, the generator's output, the Conditor scaffold, the requirements import) satisfies it is the open question of STARTING-STATE.md. It is verified by its own obligation at acceptance, and the owner decides how it is treated (ODR-V411-02)."
       },
       {
         "id": "KICKOFF-EXECUTION-PACKET§1-9-30-baseline-O2",
         "source": "requirements-compiled/v4/requirements-inventory.json",
-        "decision": "OD-INDY-18",
-        "disposition": "Met by its first branch: T10 starts from an empty repository and records that it is empty; the organizer-compliant alternative is not used."
+        "decision": "ODR-V411-02",
+        "disposition": "'verify target implementation repository is empty/organizer-compliant'. Not claimed met here: T10 records that the repository is empty at T0, and the obligation is verified by its own check. Whether 'organizer-compliant' needs an organizer record is the owner's decision ODR-V411-02."
       },
       {
         "id": "KICKOFF-EXECUTION-PACKET§preamble-O4",
         "source": "requirements-compiled/v4/requirements-inventory.json",
-        "decision": "OD-INDY-18",
-        "disposition": "As KICKOFF-EXECUTION-PACKET§1-9-30-baseline-O2: the repository is verified empty at T0."
+        "decision": "ODR-V411-02",
+        "disposition": "As KICKOFF-EXECUTION-PACKET§1-9-30-baseline-O2."
       },
       {
         "id": "PRE-REQ-04",
         "source": "requirements-compiled/v4/preflight-manifest.json",
         "decision": "OD-INDY-18",
-        "disposition": "Needs an owner or organizer record; the owner's record is used (the package approval). No organizer record is needed."
+        "disposition": "Unchanged. It needs 'an owner or organizer record'; the plan provides the owner's record (the package approval) and plans no organizer record. Its own check decides whether it passes; nothing is claimed here."
       },
       {
         "id": "PRE-TOOL-03",
         "source": "requirements-compiled/v4/preflight-manifest.json",
         "decision": "OD-INDY-18",
-        "disposition": "Needs an owner or organizer record; the owner's record is used. No organizer record is needed."
+        "disposition": "Unchanged. It needs 'an owner or organizer record'; the plan provides the owner's record and plans no organizer record. Its own check decides whether it passes; nothing is claimed here."
       },
       {
         "id": "waiver T12>T14",
@@ -317,8 +335,71 @@
         "quote": "Organizer confirmation is not a prerequisite",
         "decision": "OD-INDY-18",
         "disposition": "OD-INDY-18's rewrite of the former 'confirm organizer interpretation' rule."
+      },
+      {
+        "id": "RISK-12",
+        "source": "requirements-compiled/v4/risk-register.json",
+        "decision": "ODR-V411-02",
+        "disposition": "v4's risk 'Organizer confirmation for prepared data and requirements (PRE-ORG-01) not obtained', mitigated by 'Owner obtains it before the event (ADRP-016)'. The risk stays as frozen. Under ODR-V411-02 the owner decides whether the mitigation is pursued (C), dropped and the risk accepted (A), or required (B)."
+      },
+      {
+        "id": "CAUSA-DATA-CONTRACT-v1 §10.8",
+        "source": "docs/CAUSA-DATA-CONTRACT-v1.md",
+        "quote": "verify organizer permission for pre-created dataset and app-specific executable schemas",
+        "decision": "ODR-V411-02",
+        "disposition": "The data contract's pre-competition step: verify organizer permission for the pre-created dataset and executable schemas, else seed at kickoff. Handled with STORAGE-008-O1 under ODR-V411-02."
+      },
+      {
+        "id": "DOMAIN-TEST-MATRIX §29 and introduction",
+        "source": "docs/DOMAIN-TEST-MATRIX.md",
+        "quote": "If organizer rules permit pre-written executable acceptance tests",
+        "decision": "ODR-V411-02",
+        "disposition": "The matrix converts to executable tests before kickoff only if organizer rules permit (§29: 'verify event rules regarding pre-written executable tests'). v4.1.1 writes no executable test to the competition repository before T0; the test files are empty namespaces at T0. Whether pre-written test specifications need an organizer answer is part of ODR-V411-02."
+      },
+      {
+        "id": "PRODUCT-REQUIREMENTS line 1056",
+        "source": "docs/PRODUCT-REQUIREMENTS.md",
+        "quote": "subject to organizer rules about when executable comp",
+        "decision": "ODR-V411-02",
+        "disposition": "The product requirement that ties DOMAIN-TEST-MATRIX verification to organizer rules on when executable components may be written; handled with DOMAIN-TEST-MATRIX §29 under ODR-V411-02."
+      },
+      {
+        "id": "ADRP precedence order",
+        "source": "docs/AGENT-DECISION-REDUCTION-PROFILE.md",
+        "quote": "(1) organizer rules and explicit safety/security invariants",
+        "decision": "OD-INDY-18",
+        "disposition": "Ranks organizer rules first among the sources an agent follows: the published rules as external constraints. Not a gate; unchanged."
+      },
+      {
+        "id": "v4.1.1 README status",
+        "source": "README.md",
+        "quote": "ODR-V411-02 (the organizer-approval obligations)",
+        "decision": "ODR-V411-02",
+        "disposition": "States that ODR-V411-02 is pending. Not a gate."
+      },
+      {
+        "id": "v4.1.1 README change list",
+        "source": "README.md",
+        "quote": "**No organizer gate.**",
+        "decision": "OD-INDY-18",
+        "disposition": "States OD-INDY-18. Not a gate."
+      },
+      {
+        "id": "v4.1.1 FREEZE status",
+        "source": "FREEZE.md",
+        "quote": "ODR-V411-02 (the organizer-approval obligations)",
+        "decision": "ODR-V411-02",
+        "disposition": "States that ODR-V411-02 is pending. Not a gate."
+      },
+      {
+        "id": "v4.1.1 FREEZE step 2",
+        "source": "FREEZE.md",
+        "quote": "2. **Decide ODR-V411-02**",
+        "decision": "ODR-V411-02",
+        "disposition": "The owner's step that records ODR-V411-02. Not a gate on any task."
       }
-    ]
+    ],
+    "externalConstraintsSource": "docs/HACKATHON-BOUNDARIES.md"
   },
   "sensitivity": [
     {

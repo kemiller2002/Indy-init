@@ -229,9 +229,59 @@
   ],
   "t10": {
     "measuredMinutes": 2,
-    "measuredBasis": "slowest run rounded up to whole minutes",
+    "measuredBasis": "the slowest run, rounded up to whole minutes (R1-R3 at most 77 s; the script reproduction 83 s)",
     "estimatedMinutes": 27,
     "totalMinutes": 29,
     "note": "The plan uses 29 minutes: 2 minutes measured and 27 minutes estimated. The estimated part is larger than the measured part, and the sensitivity scenarios in schedule.json cover it overrunning."
+  },
+  "provenance": "The three recorded runs (R1-R3) used an earlier shell runner that is not committed (this repository is F#-only, OD-INDY-14). tools/measure-t0-bootstrap.fsx was written afterwards to reproduce them with the same steps; its run is under reproduction.",
+  "reproduction": {
+    "script": "tools/measure-t0-bootstrap.fsx",
+    "cache": "cold Conditor cache, warm NuGet cache",
+    "tools": "the same Registry-pinned release binaries",
+    "totalSeconds": 83.0,
+    "steps": [
+      {
+        "name": "1-git-init",
+        "seconds": 0.01,
+        "exit": 0
+      },
+      {
+        "name": "2-conditor-init",
+        "seconds": 48.40,
+        "exit": 0
+      },
+      {
+        "name": "3-v411-bootstrap",
+        "seconds": 1.27,
+        "exit": 0
+      },
+      {
+        "name": "4-build-Causa",
+        "seconds": 22.67,
+        "exit": 0
+      },
+      {
+        "name": "4-build-App",
+        "seconds": 8.49,
+        "exit": 0
+      },
+      {
+        "name": "5-ci-policy",
+        "seconds": 0.19,
+        "exit": 0
+      },
+      {
+        "name": "6-verify",
+        "seconds": 1.88,
+        "exit": 0
+      },
+      {
+        "name": "7-commit",
+        "seconds": 0.11,
+        "exit": 0
+      }
+    ],
+    "note": "Every step passed; 83 s still rounds up to 2 minutes."
   }
 }

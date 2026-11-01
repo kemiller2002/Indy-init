@@ -1,6 +1,6 @@
 # Compiled package v4.1.1: implementation efficiency, executed from T0
 
-**Status: CANDIDATE.** v4.1.1 is the successor amendment of v4.1, which the owner approved (ODR-V41-01, APR-V41-OWNER-4) and which is not edited. It is compiled and validated: checks X01–X20 pass. ODR-V411-02 (the organizer-approval obligations) and ODR-V411-01 (the approval of this package) are pending. ODR-V411-01, the approval of this package, is pending. See [FREEZE.md](FREEZE.md) and [AMENDMENT-4.1.1.md](AMENDMENT-4.1.1.md).
+**Status: CANDIDATE.** v4.1.1 is the successor amendment of v4.1, which the owner approved (ODR-V41-01, APR-V41-OWNER-4) and which is not edited. It is compiled and validated: checks X01–X20 pass. ODR-V411-02 (the organizer-approval obligations) and ODR-V411-01 (the approval of this package) are pending. See [FREEZE.md](FREEZE.md) and [AMENDMENT-4.1.1.md](AMENDMENT-4.1.1.md).
 
 v4.1.1 changes no requirement, obligation, test binding, state machine or contract text: X10 and preservation-report.json prove it. It makes these changes:
 

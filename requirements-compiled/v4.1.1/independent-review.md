@@ -2,6 +2,180 @@
 
 The reviews are independent: each was run by an agent that did not write the package, read-only, with instructions to challenge it. A failed review is recorded as failed. [analysis/independent-review.json](analysis/independent-review.json) holds the latest round, with each finding's disposition.
 
+## Round 2: FAIL
+
+Reviewed commit 6db97ae. The reviewer verified 11 of the 14 round-1 dispositions as real and complete. One major finding, seven minor and one note remain; none is blocking. Every one has a disposition below, and round 3 reviews the fixes.
+
+| Finding | Severity | Disposition |
+|---|---|---|
+| RV411-2-1 | major | Fixed: R0.1-O1 and the kickoff checks are no longer declared met. Like ADRP-016-O2, they are stated, not claimed, and the owner decides them (ODR-V411-02). Also dispositioned under ODR-V411-02: RISK-12, CAUSA-DATA-CONTRACT-v1 §10.8, DOMAIN-TEST-MATRIX (introduction and §29) and PRODUCT-REQUIREMENTS line 1056, all now in ODR-V411-02's question. The scan covers v4's risk register and those documents. STARTING-STATE, AMENDMENT and READINESS name exactly what is scanned and call the scan a heuristic. |
+| RV411-2-2 | minor | Fixed: wider gate words (permit, sign-off, wait, until, hold, obtain, ask). v4.1.1's own AGENT-RULES, README and FREEZE are scanned from the package inputs. An offline control adds 'Do not start until an organizer has signed off' to duty 1 and X19 fails. |
+| RV411-2-3 | minor | Fixed: the record names the quoted published rules, and says the section's other lines were edited under OD-INDY-18. Each historical record carries a source and an exact quote, and X19 checks the source still contains it. The external constraints are verbatim quotes, which X19 finds in HACKATHON-BOUNDARIES. |
+| RV411-2-4 | minor | Fixed: AGENT-RULES may name the entrypoints only in four reviewed lines, each pinned by SHA-256. Any other line that names them fails X18, whatever its wording; the review's three rewrites are offline controls. The documents describe exactly that. |
+| RV411-2-5 | minor | Fixed: the contract baseline must equal the amended package and its approval (offline control). The stripper follows the F# lexer: strings, characters, verbatim and triple-quoted strings, then comments, nested. Record expressions are code. The five new forms are offline controls. READINESS and V411-B now name byte equality as the guarantee and the scan as a heuristic. |
+| RV411-2-6 | minor | Fixed: the X19 title, amendment.json, the optimization report and ODR-V411-01 say 'partly measured (2 of 29 minutes)'; ODR-V411-01 names the warm NuGet cache. The script's step 7 now times git add and commit together without --allow-empty. Its committed run (83.0 s, cold Conditor cache) is recorded under reproduction, with provenance stating that R1-R3 predate it. |
+| RV411-2-7 | minor | Fixed: both v4.1 sentences in the carried optimization report are marked superseded in v4.1.1 and point to STARTING-STATE. |
+| RV411-2-8 | minor | Fixed: (1) 'not sought' reads 'the package as proposed (option A) does not seek it'. (2) The impact sentence is corrected. (3) owner-freeze.fsx approve v4.1.1 refuses while a requirement-conflict request of v4.1.1 is pending. (4) The decide body names the package's own directory. |
+| RV411-2-9 | note | Fixed: the README duplicate is removed; the ui verification lag is listed under 'What remains unverified'; ODR-V411-02 names the REHEARSAL-AGENT-INTERFACE-FREEZE clause. |
+
+### The reviewer's report (round 2)
+
+
+- **Package:** `requirements-compiled/v4.1.1`
+- **Commit reviewed:** `6db97ae` (branch `claude/v411-amendment`)
+- **Verdict:** **FAIL**. One major finding remains, and any blocking or major finding fails the round.
+
+One major finding and seven minor findings remain, plus one note. Of the 14 round-1 findings, 11 have real and complete fixes and 3 are only partly fixed (RV411-1-1, -8 and -9). The checks pass: v41 --check passes on v4.1.1 (X01-X20) and on v4.1 (X01-X16), and the offline suite passes in full with exit 0. v4, v4.1 and kickoff/ are byte-unchanged. No approval was fabricated.
+
+#### What was run
+
+- dotnet build tools/requirements-compiler/src -c Release: 0 warnings, 0 errors
+- v41 --check on v4.1.1 (X01-X20) and on v4.1 (X01-X16): both PASS
+- offline suite (--offline --source .): all passed, exit 0 (the round-1 W16 failure did not reproduce)
+- git diff 3f5d062..HEAD for requirements-compiled/v4, requirements-compiled/v4.1 and kickoff: empty. v4 equals tag indy-init-requirements-v4.0.0. The v4.1 manifest sha256 is 779916ab...31736a, the digest APR-V41-OWNER-4 approved
+- v4.1.1's contracts, layout-tests, state machines, verification execution plan, preservation report and analysis inputs are byte-identical to v4.1's. All 45 manifest digests match the files
+- Independent recomputation of the lane-free critical path: 334 minutes (T10 29, T14 20, T13 45, T17 20, T22 70, T28 45, T31 45, T32 20, T33 20, T34 20)
+- /tmp/claude-0/review411-r2/scripts/x17r2.fsx probes V41Package.contractImplementations with the round-1 forms and new ones
+- Scratch mutations under /tmp/claude-0/review411-r2: mutX17, mutX18, mutX19 and mutR1x18
+
+#### Round-1 dispositions
+
+| Finding | Verified | Note |
+|---|---|---|
+| RV411-1-1 | **no** | Only partly fixed. The items round 1 listed now have dispositions, and ODR-V411-02 covers ADRP-016-O2, STORAGE-008-O1, PRE-ORG-01/T06, OD-INDY-12 and the four waivers. However, R0.1-O1 is declared 'met' under OD-INDY-18 rather than put to the owner. The completeness claim is false, and X19 is still bypassable for v4.1.1's own rules. See RV411-2-1 and RV411-2-2. |
+| RV411-1-2 | yes | The fix is real. X17 compares every contract byte for byte with v4.1 and pins each of the 7 members by SHA-256. All 18 round-1 probe forms are now detected (x17r2.fsx), and the contracts are clean. Residual problems: the line scan misses lexer-level forms, contractBaseline.package is not bound to the approved package, and READINESS and amendment.json V411-B still overclaim. See RV411-2-5 (minor). |
+| RV411-1-3 | yes | T10 now reads evidence 'measured+estimated', 2 + 27 = 29, and X13/X19 enforce the split. ODR-V411-01, AGENT-RULES, README and the sensitivity texts say 2 measured and 27 estimated, and the script is committed. Unqualified 'measured' labels remain elsewhere. See RV411-2-6 (minor). |
+| RV411-1-4 | yes | T17 is 20 minutes (15 + 5 for change requests), and SENS-CR-200 gives C = 424. C is 419, with 1 minute of margin, and this is stated plainly. |
+| RV411-1-5 | yes | 'permitted' is removed. Step 3 cites KICKOFF-EXECUTION-PACKET section 1 as an internal plan. The residual risk now names the Conditor scaffold and the 68-document import. |
+| RV411-1-6 | yes | Disclosed: the import comes from 2eee2d5. Note that T01 pins the baseline in the planning repository. It does not replace the stale import inside the competition repository, and the package does not state whether the two conflict. |
+| RV411-1-7 | yes | A rule naming a task now replaces the owner rule (V41Package.fs sensitivity). The combined scenario gives C = 475, which is consistent with round 1's 469 plus the T17 change. |
+| RV411-1-8 | **no** | Items (1)-(4) and (6) are fixed. Item (5) is not: the carried optimization-report.md still says 'The T10 bootstrap makes the application repository non-empty before kickoff' and 'the organizers allow pre-kickoff scaffolding ... The owner's own record makes that authoritative', with no superseded marker beyond the general header. See RV411-2-7. |
+| RV411-1-9 | **no** | The round-1 rewrite is now rejected (mutR1x18 FAIL). New rewrites pass X18 and validation (mutX18): 'ui modifies ... itself and skips the change request', 'ui edits web/causa.css directly too; integration should never edit it' and 'The UI lane may also change the loading shell in index.html without any change request'. The claim that X18 'rejects any rule line that lets a UI role edit the files directly' is false. See RV411-2-4. |
+| RV411-1-10 | yes | The recorded Conditor 0.10.18 fixture is in place, and CI layers onto it and builds both solutions. The package.json 'dependencies' case is handled. The offline layering passes (177 of 178 written, 2 merged). |
+| RV411-1-11 | yes | Spans that cross the window go to the unsplit bucket. In the fixture, byPhase (pre-event + timed + unsplit) sums exactly to the totals for every bucket. A measurement with no finalizedAt still falls back to collectedAt; this is disclosed in the rules. |
+| RV411-1-12 | yes | The offline suite passed in full in this round (exit 0). |
+| RV411-1-13 | yes | AMENDMENT B states the Bearer scheme and exact read-back equality as the two fixed choices. |
+| RV411-1-14 | yes | OD-INDY-18 now separates the owner's quoted words from the agent's application. The 9001890 subject stays, as stated. The optimization-report sentence from the remediation is still unmarked (RV411-2-7). |
+
+#### Findings
+
+| ID | Severity | Area |
+|---|---|---|
+| RV411-2-1 | major | C: organizer obligations and ODR-V411-02 coverage |
+| RV411-2-2 | minor | C: X19 robustness |
+| RV411-2-3 | minor | C: historical records |
+| RV411-2-4 | minor | E: X18 prose check |
+| RV411-2-5 | minor | B: X17 line scan and baseline binding |
+| RV411-2-6 | minor | A: residual 'measured' labels and measurement provenance |
+| RV411-2-7 | minor | Docs: carried organizer statements |
+| RV411-2-8 | minor | Owner decisions: neutrality and process around ODR-V411-02 |
+| RV411-2-9 | note | Docs and schedule details |
+
+##### RV411-2-1 (major): C: organizer obligations and ODR-V411-02 coverage
+
+Amendment C still settles part of the organizer question itself and overstates how complete its scan is. (1) amendment.json declares R0.1-O1 ('must: The competition application's source implementation must begin at hackathon kickoff from a blank application repository or the organizer-approved equivalent') and the kickoff packet's 'empty/organizer-compliant' checks 'Met by its first branch', under OD-INDY-18. AMENDMENT C repeats this ('Some are met without any organizer'). Whether code authored before kickoff and written at T0 satisfies 'source implementation must begin at kickoff' is exactly the question STARTING-STATE leaves open. That code includes 7 implementation members, plus the generator output, the Conditor scaffold and the requirements import: 'An organizer could read the materialized contract declarations ... as material prepared before kickoff ... This policy does not claim that the F# contracts are exempt under every reading'. OD-INDY-18's quoted owner words do not decide R0.1-O1, and ODR-V411-02 does not ask about it. READINESS A meanwhile says 'No requirement is weakened or claimed met'. (2) STARTING-STATE says 'Every organizer reference in the frozen v4 inputs and the internal rule documents has a recorded disposition ... X19 scans for them and fails on any without one', and ODR-V411-02's impact says 'X19 lists every organizer reference'. Both are false. CAUSA-DATA-CONTRACT-v1 section 10 step 8 is a v4 source that the inventory cites 6 times, and it reads 'Before competition, verify organizer permission for pre-created dataset and app-specific executable schemas'. v4 risk-register RISK-12's mitigation reads 'Owner obtains it before the event (ADRP-016)'. DOMAIN-TEST-MATRIX section 29 ('Before kickoff, verify event rules regarding pre-written executable tests') and PRODUCT-REQUIREMENTS:1056 bear on the pre-written layout assertions that v4.1.1 writes at T0. None of these has a disposition, and ODR-V411-02 does not mention them. As a result, the owner's decision on the organizer conflict is posed over an incomplete list, and one 'must' obligation is resolved by the agent.
+
+**Evidence.** requirements-compiled/v4.1.1/analysis/amendment.json startingState.organizerReferences (R0.1-O1, KICKOFF-EXECUTION-PACKET section 1 / preamble entries: 'Met by its first branch'); AMENDMENT-4.1.1.md section C; docs/READINESS-V4.1.1.md section A; STARTING-STATE.md:22 and :63; proposals/owner-decision-requests.json ODR-V411-02 question/impact; docs/CAUSA-DATA-CONTRACT-v1.md:170; requirements-compiled/v4/risk-register.json RISK-12; docs/DOMAIN-TEST-MATRIX.md:5,517-523; docs/PRODUCT-REQUIREMENTS.md:1056; requirements-compiled/v4/requirements-inventory.json R0.1-O1 (modality must)
+
+**Remediation.** Do not declare R0.1-O1 or the kickoff-packet checks met. Give them the same disposition as ADRP-016-O2 (stated, not claimed, decided by the owner) and add them to ODR-V411-02's question. Add dispositions for CAUSA-DATA-CONTRACT-v1 section 10.8, RISK-12 and DOMAIN-TEST-MATRIX section 29 / PRODUCT-REQUIREMENTS:1056, and list them in ODR-V411-02. Either scan every v4 source document and the v4 risk register, or reword the completeness claim to name exactly what is scanned. Make READINESS A consistent with whatever is claimed.
+
+##### RV411-2-2 (minor): C: X19 robustness
+
+X19 still verifies 'no task waits on organizer permission' only for the timed DAG and one literal phrase in v4.1.1's own rule documents. Its gate regex (confirm|approv|verif|permission|interpretation) also misses ordinary wording. In mutX19, 'Do not start until an organizer has signed off on the prepared material in writing.' was added to AGENT-RULES duty 1 (T10's own instruction), and 'The integration agent holds T10 until the organizers sign off on the generator.' was added to HACKATHON-BOUNDARIES. Both regenerate and check with X19 PASS and validation PASS. A disposition quote also covers any later line that contains it.
+
+**Evidence.** tools/requirements-compiler/src/V41Package.fs bootstrapCheck (organizerDocuments = 3 docs; AGENT-RULES only checked for 'relies on ODR-V41-06'); scratch /tmp/claude-0/review411-r2/mutX19
+
+**Remediation.** Add v4.1.1's AGENT-RULES.md, STARTING-STATE.md and README.md to the scanned documents. Widen the pattern, for example to organi[sz]er near wait|until|before|hold|sign|ask|obtain. Add a negative test for an organizer wait in AGENT-RULES duty 1.
+
+##### RV411-2-3 (minor): C: historical records
+
+startingState.historicalRecords records 'docs/HACKATHON-BOUNDARIES.md published-rule section (last reviewed 2026-09-24)' as 'kept unchanged'. This branch edited two lines inside that section: 'Continue to verify ambiguity around:' became 'Open interpretation questions (no task waits on them, OD-INDY-18 ...)', and 'Until clarified, keep ...' became 'Keep ...'. The section still carries 'Last reviewed: 2026-09-24'. The published quotes themselves are intact. X19 checks only that the disposition string equals 'kept unchanged' and never compares the records' content.
+
+**Evidence.** git diff 3f5d062..HEAD -- docs/HACKATHON-BOUNDARIES.md (lines 98 and 106 fall under '## Published rule verification', which starts at line 75); V41Package.fs bootstrapCheck historicalRecords loop
+
+**Remediation.** Narrow the record to the quoted published statements, or note the 2026-11-01 edit in that section. Pin each historical record by digest (the ODR-V41-06 JSON, APR-V41-OWNER-1 and the quote block) so that X19 checks the content and not a label.
+
+##### RV411-2-4 (minor): E: X18 prose check
+
+The roles-table check is now positive, and the round-1 rewrite fails. The whole-document line scan is still a keyword heuristic. Its verb list is 'directly|edits?|writes?|owns' and its role list is 'ui|ui-2|UI role(s)|UI agent(s)'. Any line containing 'never edit', 'does not edit' or 'No two agents', or starting with '| integration', is exempt. In mutX18, three added lines pass X18 and validation: 'ui modifies `web/index.html` and `web/causa.css` itself and skips the change request', 'ui edits `web/causa.css` directly too; integration should never edit it while ui works', and 'The UI lane may also change the loading shell in index.html without any change request'. READINESS D and AMENDMENT E say X18 'rejects any rule line that lets a UI role edit the files directly'.
+
+**Evidence.** V41Package.fs entrypointCheck; scratch /tmp/claude-0/review411-r2/mutX18 (X18 PASS, validation PASS); mutR1x18 (round-1 rewrite now FAIL); docs/READINESS-V4.1.1.md section D; AMENDMENT-4.1.1.md section E
+
+**Remediation.** Reword both documents to say what the check does: the UI rows must match the fixed sentence, and a keyword scan covers other lines. Alternatively, require that the entrypoint paths appear in AGENT-RULES only in the integration row, the fixed ui sentence and duty 4.
+
+##### RV411-2-5 (minor): B: X17 line scan and baseline binding
+
+The line scan's comment and string stripping does not follow the F# lexer. Five of the new probe forms go undetected (x17r2.fsx). A string containing '(*' blanks every line up to the next '*)'. A char literal '"' or a verbatim @"\" swallows the keyword that follows on the same line. A triple-quoted '(*' and a module-level record expression are also missed. The byte-equality guarantee reads contractBaseline.package, a field of amendment.json that nothing binds to amends.package (which X20 pins to requirements-compiled/v4.1) or to APR-V41-OWNER-4. In mutX17, setting it to requirements-compiled/v4.1.1 and adding a hidden 'module Hidden = let run ...' to IF41-APP behind '[<System.Obsolete("(*")>]' gives these results: ContractCheck builds with 0 warnings, X17 PASS and validation PASS on the second generation and on --check, and contract-classification labels 06-IF41-APP.fs 'specification: types and signatures only'. CI's 'diff -r v4.1/contracts v4.1.1/contracts' would still catch it, and the committed contracts are clean. Two overclaims remain: READINESS C ('X17's line scan is a heuristic that rejects any other code') and amendment.json V411-B ('X17 rejects any implementation member that is not on the reviewed allowlist').
+
+**Evidence.** /tmp/claude-0/review411-r2/scripts/x17r2.fsx (R2a-R2e NOT DETECTED); /tmp/claude-0/review411-r2/mutX17; V41Package.fs:1569 (baseline = contractBaseline.package, unchecked); analysis/amendment.json changes V411-B; docs/READINESS-V4.1.1.md:41
+
+**Remediation.** In X17, require contractBaseline.package = amends.package and contractBaseline.approval = amends.approval, or drop the field and use amends.package. Optionally verify the baseline files against the approved manifest's per-file digests. Strip strings and char literals before block comments, and handle verbatim and triple-quoted strings. Reword READINESS C and V411-B.
+
+##### RV411-2-6 (minor): A: residual 'measured' labels and measurement provenance
+
+Unqualified 'measured' remains in owner-facing text. The X19 title (validation-report.json and the --check output) reads 'with a measured duration'. amendment.json's description reads 'at T0 with a measured duration'. optimization-report.md lines 5 and 126 say 'with a measured duration'. ODR-V411-01's recommendation says 'into the timed window, measured'. ODR-V411-01 says '2 are measured on fresh empty repositories' without the condition that every run had a warm NuGet cache. tools/measure-t0-bootstrap.fsx was committed (8d04bba) after the measurement (71b69b1) and does not match the recorded steps: 7-commit uses --allow-empty, and its git add -A is untimed. No raw logs are committed, so 'reproduces the measurement' is unverified.
+
+**Evidence.** requirements-compiled/v4.1.1/validation-report.json:115; analysis/amendment.json description; optimization-report.md:5,126; proposals/owner-decision-requests.json ODR-V411-01; analysis/bootstrap-measurement.json environment.nugetCache and steps[7]; tools/measure-t0-bootstrap.fsx
+
+**Remediation.** Change the X19 title and the remaining texts to 'partly measured (2 of 29 minutes)'. Add 'warm NuGet cache' to ODR-V411-01. Run the committed script once and commit its output, or say that the record predates the script.
+
+##### RV411-2-7 (minor): Docs: carried organizer statements
+
+The v4.1.1 package's optimization-report.md still says 'The T10 bootstrap makes the application repository non-empty before kickoff' and 'The owner stated in session on 2026-10-30 that the organizers allow pre-kickoff scaffolding. The owner's own record makes that authoritative.' The owner's record (APR-V41-OWNER-1 organizer_confirmation) reads 'I approved it.' It does not say what the organizers allowed. Both sentences contradict STARTING-STATE ('does not restate or reinterpret what the organizers said') and v4.1.1's T0 plan. Round 1 asked for them to be marked superseded (RV411-1-8(5), RV411-1-14), and neither disposition did so.
+
+**Evidence.** requirements-compiled/v4.1.1/optimization-report.md:39-41; kickoff/rehearsal-007/approvals.causa.json APR-V41-OWNER-1
+
+**Remediation.** Put an explicit 'superseded in v4.1.1: see STARTING-STATE.md' marker on those two sentences. The file is authored, so v4.1 itself is not touched.
+
+##### RV411-2-8 (minor): Owner decisions: neutrality and process around ODR-V411-02
+
+Four problems. (1) STARTING-STATE ('Organizer approval of the prepared material (ADRP-016-O2) is not sought') and the STORAGE-008-O1 disposition ('is not sought') state option A of the pending ODR-V411-02 as fact. Options B and C both involve an organizer record. (2) ODR-V411-02's impact says 'X19 lists every organizer reference with ODR-V411-02 as the decision', but 7 of the 20 references name OD-INDY-18. (3) It also says 'Until decided, v4.1.1 cannot be approved', but owner-freeze.fsx approve only prints 'Note: still pending' and records the approval. (4) owner-freeze.fsx decide's pull-request body for v4.1.1 tells the agent to 'apply these decisions in requirements-compiled/v4.1 (FREEZE.md step 2), recompile v4.1'. That is the approved package, which must stay byte-identical. The question itself is otherwise neutral ('The owner's call'), and nothing records ODR-V411-02 or ODR-V411-01 as decided.
+
+**Evidence.** requirements-compiled/v4.1.1/STARTING-STATE.md:63; analysis/amendment.json STORAGE-008-O1 disposition; proposals/owner-decision-requests.json ODR-V411-02 impact; tools/owner-freeze.fsx approve (pending only noted) and decide (body text for p.Name <> v4)
+
+**Remediation.** Write 'the package as proposed (option A) does not seek it'. Correct the impact sentence. Make approve refuse while a requirement-conflict request of the same package is pending, or soften the sentence. Make the decide body name p.Dir.
+
+##### RV411-2-9 (note): Docs and schedule details
+
+Three details. README line 3 says twice that ODR-V411-01 is pending. ui cannot verify its loading-shell and visual-identity work in the real entrypoints until integration applies its change requests in T17, after T16. The 5 minutes model integration's work, not the ui round-trip; AMENDMENT's lever 2 and the 20-minute reserve partly cover it. ODR-V411-02 reaches ODR-V41-06's set-aside of REHEARSAL-AGENT-INTERFACE-FREEZE ('F# signatures MUST be authored from the requirements at kickoff') only through the waiver reasons. It does not name that clause, which Amendment B's pre-authored contracts rest on.
+
+**Evidence.** requirements-compiled/v4.1.1/README.md:3; execution-dag.json T16/T17; proposals/owner-decision-requests.json ODR-V41-06 and ODR-V411-02
+
+**Remediation.** Remove the duplicate sentence. Mention the ui verification lag under 'What remains unverified'. Name the REHEARSAL-AGENT-INTERFACE-FREEZE clause in ODR-V411-02's question.
+
+#### Challenges
+
+**1. Does the app start empty?**  
+*YES, WITH AN OVERREACHING CLAIM.* Nothing is written to the competition repository before T0. CI and the measurement use throwaway directories. At T0 the order is git init, then conditor init (Echelon scaffold plus 68 requirement documents, 42 of them from Indy-init@2eee2d5), then the generator. All of this is disclosed in STARTING-STATE. However, amendment.json then declares R0.1-O1 'met' on that basis, although the package's own residual risk says an organizer could read the T0 materialization as material prepared before kickoff (RV411-2-1).
+
+**2. Is there hidden implementation in the contracts?**  
+*NO (CONTRACTS CLEAN); X17'S LINE SCAN STILL BYPASSABLE.* The contracts are byte-identical to v4.1's. X17 enforces this, and so does CI's diff -r. Only the 7 allowlisted members are code, and each is pinned by SHA-256. Every round-1 bypass form is now detected. The new lexer-level forms are not detected, and the byte-equality path is an unbound amendment field. An end-to-end mutation reached validation PASS, but only with that field edited, and CI diff -r would still catch it (RV411-2-5).
+
+**3. Does the schedule fit 420 (now C = 419)?**  
+*YES, ON PAPER, WITH 1 MINUTE OF MARGIN.* C = 354 + 65 = 419. The reserves are 20 + 45. The independently recomputed critical path is 334. Compared with v4.1, only T10 (new in the window, 29) and T17 (15 to 20) changed, and no estimate is shorter. The sensitivity rules are now correct (a named rule replaces the owner rule). Every modelled overrun breaks the window: 424, 434, 448, 454, 475 and 487. The documents state this plainly.
+
+**4. Is the bootstrap time realistic, and is it honestly labelled?**  
+*MOSTLY.* The 2 measured minutes are credible: 77 s at most, cold Conditor cache, warm NuGet cache, release binaries. The 27 estimated minutes are plausible but unmeasured. The DAG, ODR-V411-01, AGENT-RULES and README now say '2 measured, 27 estimated'. The X19 title, amendment.json's description, the optimization report and one ODR sentence still say 'measured'. The script post-dates the record (RV411-2-6).
+
+**5. Are the telemetry totals complete and non-duplicated, with the unsplit bucket?**  
+*YES.* In the fixture report, pre-event + timed + unsplit sum exactly to the totals for input, output, cacheRead, cacheWrite and total. The session crossing the window start (f0000002) is in 'unsplit (crosses the window boundary)' and is listed in phaseCaveats. Only observed or derived tokens.* values count, missing data is null with its reason, and the two cost kinds are never summed. When there is no finalizedAt, phase still falls back to collectedAt. This is disclosed, and the runbook says to ingest before the window ends.
+
+**6. Does the owner manifest match the files?**  
+*YES (MANIFEST); PROSE CHECK WEAK.* package-manifest.json lists 45 files, and every sha256 matches. agent-file-ownership.json gives web/index.html and web/causa.css to integration (kind 'shared') with no contributors, and X02/X18 reject other owners. The AGENT-RULES prose check can be bypassed with ordinary wording (RV411-2-4). Nothing in the generated repository enforces ownership, and this is disclosed.
+
+**7. Is any P0 weakened?**  
+*NO.* X10 reads PRESERVED: 520 requirements, 161 P0; 2599 obligations, 613 P0. v4 is unchanged against its tag. The v4.1.1 verification execution plan, state machines and contracts are byte-identical to v4.1's. The issue in RV411-2-1 concerns a 'must' obligation of unstated priority (R0.1-O1) that is claimed met. No text was weakened.
+
+**8. Do the docs contradict the plan?**  
+*YES (ONE MAJOR, SEVERAL MINOR).* READINESS A ('no requirement ... claimed met') contradicts amendment.json and AMENDMENT C (R0.1-O1 'met'). READINESS C and D, and amendment.json V411-B, overclaim X17 and X18. optimization-report.md keeps 'organizers allow pre-kickoff scaffolding' and 'non-empty before kickoff'. HACKATHON-BOUNDARIES' published-rule section is recorded as unchanged but was edited. owner-freeze decide tells the agent to edit v4.1.
+
+**9. Is v4.1 unchanged, and is the layering safe?**  
+*YES.* git diff 3f5d062..HEAD is empty for v4, v4.1 and kickoff/. The v4.1 manifest sha256 is 779916ab...31736a, equal to APR-V41-OWNER-4, and v4.1 --check passes. X20 binds the amended package and its digest. layerFile pre-checks every overlap and refuses anything except the three merged files. CI and the offline suite layer onto a recorded Conditor 0.10.18 scaffold and build both solutions, and the real measurement layered 177 of 178 files. contractBaseline is not bound to the amended package (RV411-2-5).
+
+**10. Are any approvals fabricated?**  
+*NO.* approvals.causa.json holds no ODR-V411 record. The package is CANDIDATE, and README, FREEZE, AMENDMENT, READINESS and the ODR status line all say that ODR-V411-02 and ODR-V411-01 are pending. OD-INDY-18 separates the owner's quoted words from the agent's application and decides nothing about the obligations. The package text does presume option A ('not sought'), and the approve script does not block on the pending ODR-V411-02 (RV411-2-8).
+
+
 ## Round 1: FAIL
 
 Reviewed commit 71b69b175a6923b50f01caed9c5f16f0f012c732. Five major findings, six minor, three notes; none blocking. Every one has a disposition below; round 2 reviews the fixes.
@@ -203,4 +377,3 @@ No approval was fabricated: kickoff/ is unchanged, ODR-V411-01 is pending, and t
 
 **10. Is OD-INDY-18 faithful; is anything recorded as an approval the owner did not give?**  
 *PASS WITH NOTES.* No approval record was written, and the package is CANDIDATE with ODR-V411-01 pending. OD-INDY-18 quotes the owner's assignment and claims nothing about organizers. One sentence interprets scope, and commit 9001890's subject reads like an approval (RV411-1-14). OD-INDY-18 does not supersede OD-INDY-12's organizer condition, which conflicts with it (RV411-1-1).
-

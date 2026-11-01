@@ -112,7 +112,7 @@
     },
     {
       "id": "X19",
-      "title": "The bootstrap is the first timed task (T0) with a measured duration, every other timed task follows it, no task waits on organizer permission, and the starting-state policy keeps the published rules as external constraints, the historical records unchanged and the residual risk stated",
+      "title": "The bootstrap is the first timed task (T0), its duration partly measured and labelled so, every other timed task follows it, every organizer gate the scan finds has a recorded disposition under an owner decision, and the starting-state policy quotes the published rules verbatim, keeps the historical records unchanged and states the residual risk",
       "result": "PASS",
       "problems": []
     },
