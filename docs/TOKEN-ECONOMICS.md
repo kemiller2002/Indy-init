@@ -38,7 +38,8 @@ Each agent or subagent runs under its own execution. A subagent's execution is s
 - `TARGET` may be the execution ID (`EXE-...`) or the work item. Use the execution ID when a work item has more than one active execution.
 - `<cwd-slug>` is the session's working directory with `/` replaced by `-`, for example `-home-user`. `ls ~/.claude/projects/*/"$CLAUDE_CODE_SESSION_ID".jsonl` finds the file.
 - The adapter writes `tokens.input`, `tokens.output`, `tokens.cache_read`, `tokens.cache_write` and the TTL split, all `observed`, with `dimensions.snapshot = claude-session-SESSION`. Output is a lower bound (`dimensions.bound = lower`). It also writes `cost.session_cumulative`, which is the runtime's own estimate (`estimated`). It never stores prompts or content.
-- Ingest each session once, when its work is done. The coordinator's main session runs to the end, so ingest it once, at completion, into the coordinator's execution and before that execution's `work complete`.
+- Ingest each session once, when its work is done, and before the window end. The coordinator's main session runs to the end, so ingest it once, at the merge freeze and before the deadline, into the coordinator's execution and before that execution's `work complete`.
+- The report places a session by its first and last timestamps. A session that runs across T0 or across the deadline (for example a coordinator session started in preflight, or one still running after the deadline) goes into the bucket `unsplit (crosses the window boundary)`. That bucket is not assigned to either phase: its tokens are not timed and not pre-event or post-event. When the split is needed, copy the transcripts before the container ends and run `./praxis telemetry reliability-report --transcripts DIR` (below), which splits by each request's own timestamp.
 - Do not ingest the same session into two executions. If it happens, the report counts the session once, at its largest value, and lists the other ingest as excluded.
 
 ### Only when the platform shows a cost
@@ -64,7 +65,7 @@ dotnet run --project tools/requirements-compiler/src -- token-economics <REHEARS
 ./praxis telemetry reliability-report --transcripts <COPIED-TRANSCRIPTS-DIR> --out evidence/telemetry/praxis-reliability-report.json
 ```
 
-`reliability-report --transcripts` uses each request's own timestamp. It is the only way to split one session that crosses T0. Copy the transcripts next to the run before the container ends; the report identifies them by SHA-256, never by path.
+`reliability-report --transcripts` uses each request's own timestamp. It is the only way to split one session that crosses T0 or the deadline; this tool reports such a session in the unsplit bucket and never splits it. Copy the transcripts next to the run before the container ends; the report identifies them by SHA-256, never by path.
 
 ## 2. The command
 
@@ -93,8 +94,8 @@ A table without `source`, `version`, `effectiveDate`, `currency` and `unit: per-
 | `window`, `priceTable` | The inputs: the window, and the table's source, version, effective date, currency and models |
 | `rules` | The accounting rules below, as stated in the output |
 | `totals` | One figure group for all executions |
-| `byPhase` | `pre-event`, `timed`, `post-event` (and `unknown`) |
-| `phaseCaveats` | Transcript sessions whose span crosses the window start or end |
+| `byPhase` | `pre-event`, `timed`, `post-event`, `unsplit (crosses the window boundary)` (and `unknown`) |
+| `phaseCaveats` | Each dated transcript session, and each execution's own `startedAt` to `finalizedAt`, that crosses the window start or end, with the boundaries it crosses and the bucket (`unsplit (crosses the window boundary)`) its measurements are in |
 | `byWorkItem`, `byAgent`, `byRole`, `byProvider`, `byModel`, `byStep` | Attribution as far as the records allow |
 | `completeness` | `tokensComplete`, `tokensPartial` and `tokensUnavailable` (each missing metric with its capability status and reason), `providerCostReported` |
 | `failedOrRepeated` | `abandoned` (`work.abandoned`, with reason), `failed` (`step.failed`, with step and reason), `unfinalized` (status not `finalized`), `repeatedWorkItems`, and `figures`: one group over all such executions |
@@ -119,8 +120,9 @@ A table without `source`, `version`, `effectiveDate`, `currency` and `unit: per-
 5. `total` = input + output + cache read + cache write. It is derived only from those four buckets. Cache read and cache write are never folded into input.
 6. A session snapshot ingested into several executions is counted once, at its largest value, in the execution that holds it. The other ingests are listed as excluded.
 7. Provider-reported cost is the sum of `observed` `cost.execution_total`. Price-table-derived cost prices each bucket with the operator's table. An execution is priced only when all four buckets are present, its model is in the table, and its measurements are on or after the table's effective date. Otherwise its price is unavailable, with the reason. The two costs are never summed. The runtime's own `cost.session_cumulative` estimate is listed per execution and enters neither.
-8. **Phase.** A measurement is `pre-event`, `timed` or `post-event` by its `collectedAt` (else the execution's `startedAt`) against the window, with both ends inclusive. An execution with no measurements is placed by its `startedAt`. A session whose span crosses a boundary is listed in `phaseCaveats` and is never split by proportion or duration.
+8. **Phase.** A measurement is `pre-event`, `timed` or `post-event` by its span against the window, with both ends inclusive, not by when it was ingested. A measurement of a transcript session whose first and last timestamps the record carries (`rawTelemetry` payload `startedAt` and `endedAt`) spans that session. Any other measurement spans its execution, from `startedAt` to `finalizedAt`, widened to every session the record dates for that execution. A measurement with no known span (an execution with no `finalizedAt`) is placed by its `collectedAt`, else the execution's `startedAt`. An execution with no measurements is placed by its span, else its `startedAt`.
 9. **Repeated work.** Every execution of a work item after the first (by `startedAt`) repeats it.
+10. **Unsplit.** A measurement whose span crosses the window start or end goes into the bucket `unsplit (crosses the window boundary)`. That bucket is not assigned to either phase: it is not timed, and it is not pre-event or post-event. It is never split by proportion or duration, so `timed` contains only usage known to lie wholly inside the window. Each crossing span is listed in `phaseCaveats`, naming the bucket. To split such a session, use `praxis telemetry reliability-report --transcripts DIR` (section 1).
 
 The offline suite (`dotnet run --project tools/requirements-compiler/tests -- --offline --source .`, group "token economics") runs the command on the recorded fixture `tools/requirements-compiler/tests/fixtures/token-economics/` and checks the expected JSON and Markdown byte for byte. It also checks the following:
 
@@ -131,6 +133,7 @@ The offline suite (`dotnet run --project tools/requirements-compiler/tests -- --
 - duplicate and re-ingested snapshots are counted once;
 - without a table, price-table cost is unavailable and provider-reported cost is unchanged;
 - the phase boundaries hold;
+- a session that crosses a window boundary is in the unsplit bucket and not in `timed`, even when ingested after the deadline, and a session wholly inside the window is `timed` whenever it was ingested;
 - the output does not depend on record order;
 - an undated price table is refused.
 

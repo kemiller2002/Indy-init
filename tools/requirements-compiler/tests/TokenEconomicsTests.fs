@@ -92,7 +92,7 @@ let all (source: string) : string list =
           if at [ "totals"; "cost"; "providerReported"; "amount" ] report <> JStr "1.250000" then yield "provider-reported cost is not the observed cost.execution_total"
           if at [ "totals"; "cost"; "priceTableDerived"; "amount" ] report <> JStr "0.341040" then yield "price-table cost is not the priced token buckets"
           let phases = arr "byPhase" report |> List.map (str "key")
-          if phases <> [ "pre-event"; "timed" ] then yield sprintf "phases are %A, not pre-event and timed" phases
+          if phases <> [ "pre-event"; "timed"; TokenEconomics.unsplit ] then yield sprintf "phases are %A, not pre-event, timed and unsplit" phases
           if strs "repeats" (arr "repeatedWorkItems" (at [ "failedOrRepeated" ] report) |> List.head) <> [ f05 ] then yield "the repeat of WI-F2 is not reported"
           if arr "failed" (at [ "failedOrRepeated" ] report) |> List.length <> 1 then yield "the failed execution is not reported"
           if arr "abandoned" (at [ "failedOrRepeated" ] report) |> List.length <> 1 then yield "the abandoned execution is not reported"
@@ -150,9 +150,39 @@ let all (source: string) : string list =
     // A session that spans the window start is flagged, never split.
     let caveats =
         [ match arr "phaseCaveats" report with
-          | [ c ] when strOpt "executionId" c = Some f02 && strs "spans" c = [ "window start" ] -> ()
-          | cs -> yield sprintf "the session of %s spanning the window start is not the one caveat (found %d)" f02 cs.Length ]
+          | [ c ] when strOpt "executionId" c = Some f02 && strs "spans" c = [ "window start" ] && strOpt "bucket" c = Some TokenEconomics.unsplit -> ()
+          | cs -> yield sprintf "the session of %s spanning the window start is not the one caveat naming the unsplit bucket (found %d)" f02 cs.Length ]
         |> List.map (sprintf "phase caveats: %s")
+
+    // A session whose span crosses a window boundary is in the unsplit bucket, never in timed; a session wholly inside
+    // the window is timed whenever it was ingested.
+    let unsplitPhase =
+        let phase (r: Json) key = arr "byPhase" r |> List.tryFind (fun g -> strOpt "key" g = Some key) |> Option.defaultValue JNull
+        let session (startedAt: string) (endedAt: string) (collectedAt: string) (finalizedAt: string) =
+            rs
+            |> mapRecord f02 (fun j ->
+                j
+                |> setIn "finalizedAt" (JStr finalizedAt)
+                |> setIn "metrics" (JArr(arr "metrics" j |> List.map (setIn "collectedAt" (JStr collectedAt))))
+                |> setIn "rawTelemetry" (JArr(arr "rawTelemetry" j |> List.map (fun snap -> setIn "payload" (field "payload" snap |> Option.defaultValue JNull |> setIn "startedAt" (JStr startedAt) |> setIn "endedAt" (JStr endedAt)) snap))))
+            |> build (Some t)
+        let u = phase report TokenEconomics.unsplit
+        let timed = phase report "timed"
+        let coordinator = session "2026-01-10T11:50:00.000Z" "2026-01-10T19:02:00.000Z" "2026-01-10T19:02:30.000Z" "2026-01-10T19:03:00.000Z"
+        let inside = session "2026-01-10T12:06:00.000Z" "2026-01-10T13:58:30.000Z" "2026-01-10T19:30:00.000Z" "2026-01-10T13:59:30.000Z"
+        [ if strs "executions" u <> [ f02 ] then yield sprintf "the unsplit bucket holds %A, not %s" (strs "executions" u) f02
+          if intAt [ "tokens"; "input"; "value" ] u <> Some 300L || intAt [ "tokens"; "cacheRead"; "value" ] u <> Some 400000L then yield "the crossing session's tokens are not in the unsplit bucket"
+          if strs "executions" timed |> List.contains f02 then yield "the crossing session's execution is in timed"
+          if intAt [ "tokens"; "input"; "value" ] timed <> Some 210L || intAt [ "tokens"; "cacheRead"; "value" ] timed <> Some 190000L then yield "timed contains the crossing session's tokens"
+          if strs "phases" (execution report f02) <> [ TokenEconomics.unsplit ] then yield "the crossing execution's phases are not unsplit alone"
+          if intAt [ "tokens"; "input"; "value" ] (phase coordinator TokenEconomics.unsplit) <> Some 300L then yield "a session spanning the deadline, ingested after it, is not unsplit"
+          if phase coordinator "post-event" <> JNull then yield "a session spanning the deadline, ingested after it, is post-event"
+          if (arr "phaseCaveats" coordinator |> List.filter (fun c -> strOpt "span" c = Some "session") |> List.map (strs "spans")) <> [ [ "window start"; "window end" ] ] then yield "the session spanning both boundaries is not one caveat naming both"
+          if intAt [ "tokens"; "input"; "value" ] (phase inside "timed") <> Some 510L || phase inside TokenEconomics.unsplit <> JNull then yield "a session wholly inside the window, ingested after it, is not timed"
+          if TokenEconomics.spanPhase window (window.Start, window.End) <> "timed" then yield "the whole window is not timed"
+          if TokenEconomics.spanPhase window (window.Start.AddSeconds -1.0, window.Start) <> TokenEconomics.unsplit then yield "a span ending at the window start is not unsplit"
+          if TokenEconomics.spanPhase window (window.End, window.End.AddSeconds 1.0) <> TokenEconomics.unsplit then yield "a span starting at the window end is not unsplit" ]
+        |> List.map (sprintf "unsplit: %s")
 
     let rules =
         [ if TokenEconomics.phaseOf window (Some(DateTimeOffset(2026, 1, 10, 19, 0, 1, TimeSpan.Zero))) <> "post-event" then yield "after the window is not post-event"
@@ -164,5 +194,5 @@ let all (source: string) : string list =
           | Error _ -> () ]
         |> List.map (sprintf "rules: %s")
 
-    (golden @ figures @ addsUp "fixture" report @ addsUp "no price table" (build None rs) @ unavailable @ nonToken @ duplicates @ caveats @ rules)
+    (golden @ figures @ addsUp "fixture" report @ addsUp "no price table" (build None rs) @ unavailable @ nonToken @ duplicates @ caveats @ unsplitPhase @ rules)
     |> List.map (sprintf "token economics: %s")
