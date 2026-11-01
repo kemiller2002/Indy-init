@@ -9,15 +9,44 @@
     "manifestSha256": "779916abe4b7c1351fd7752d648721cba61bb4eee6a8aa779a20d47bcc31736a",
     "approval": "APR-V41-OWNER-4"
   },
-  "inputs": [ "analysis/bootstrap-measurement.json" ],
-  "documents": [ "STARTING-STATE.md", "AMENDMENT-4.1.1.md" ],
+  "inputs": [
+    "analysis/bootstrap-measurement.json"
+  ],
+  "documents": [
+    "STARTING-STATE.md",
+    "AMENDMENT-4.1.1.md"
+  ],
   "changes": [
-    { "id": "V411-A", "area": "A", "summary": "T10 (bootstrap) runs at T0, inside the timed window, owned by integration, with the duration measured on fresh empty repositories (analysis/bootstrap-measurement.json). T11, T12, T14 and T18, the timed tasks without another timed predecessor, all follow it. Conditor's init runs first on the empty repository and the v4.1 generator layers onto it." },
-    { "id": "V411-B", "area": "B", "summary": "The F# contracts stay in the package as specifications. contract-classification.json classifies every contract file; X17 rejects any implementation member that is not on the reviewed allowlist (the Credential and Confirmation boundary code)." },
-    { "id": "V411-C", "area": "C", "summary": "No task waits on organizer permission: T10's preference after T06 (organizer confirmation) is dropped, and AGENT-RULES no longer makes the bootstrap rely on ODR-V41-06. The published rules stay external constraints (STARTING-STATE.md), the historical records stay unchanged, and the residual interpretation risk is stated." },
-    { "id": "V411-D", "area": "D", "summary": "The token-economics report is produced from Praxis 3.24.0's own telemetry records by requirements-compiler token-economics (docs/TOKEN-ECONOMICS.md), verified with a recorded fixture in the offline suite." },
-    { "id": "V411-E", "area": "E", "summary": "web/index.html and web/causa.css are integration's (they were ui's). UI roles change them only through an integration-owned change request (X18); the ownership manifest and AGENT-RULES agree." },
-    { "id": "V411-F", "area": "schedule", "summary": "The schedule is recomputed with T10 at T0, with sensitivity scenarios for bootstrap and integration overruns. The reserves (RES-INTEGRATION 20, RES-FINAL 45) are unchanged and no estimate is shortened." }
+    {
+      "id": "V411-A",
+      "area": "A",
+      "summary": "T10 (bootstrap) runs at T0, inside the timed window, owned by integration, with a duration of 29 minutes, 2 of them measured on fresh empty repositories and 27 estimated (analysis/bootstrap-measurement.json). T11, T12, T14 and T18, the timed tasks without another timed predecessor, all follow it. Conditor's init runs first on the empty repository and the v4.1 generator layers onto it."
+    },
+    {
+      "id": "V411-B",
+      "area": "B",
+      "summary": "The F# contracts stay in the package as specifications. contract-classification.json classifies every contract file; X17 rejects any implementation member that is not on the reviewed allowlist (the Credential and Confirmation boundary code)."
+    },
+    {
+      "id": "V411-C",
+      "area": "C",
+      "summary": "No task waits on organizer permission: T10's preference after T06 (organizer confirmation) is dropped, and AGENT-RULES no longer makes the bootstrap rely on ODR-V41-06. The published rules stay external constraints (STARTING-STATE.md), the historical records stay unchanged, and the residual interpretation risk is stated. The organizer-approval obligations of the frozen baseline (ADRP-016-O2, STORAGE-008-O1) and PRE-ORG-01/T06 stay unchanged; how they are reported is the owner's decision ODR-V411-02 (X19 lists every organizer reference with its disposition)."
+    },
+    {
+      "id": "V411-D",
+      "area": "D",
+      "summary": "The token-economics report is produced from Praxis 3.24.0's own telemetry records by requirements-compiler token-economics (docs/TOKEN-ECONOMICS.md), verified with a recorded fixture in the offline suite."
+    },
+    {
+      "id": "V411-E",
+      "area": "E",
+      "summary": "web/index.html and web/causa.css are integration's (they were ui's). UI roles change them only through an integration-owned change request (X18); the ownership manifest and AGENT-RULES agree. Applying the UI change requests costs integration time: T17 carries 5 more minutes for T16's entrypoint requests; later requests fall in RES-INTEGRATION."
+    },
+    {
+      "id": "V411-F",
+      "area": "schedule",
+      "summary": "The schedule is recomputed with T10 at T0, with sensitivity scenarios for bootstrap and integration overruns. The reserves (RES-INTEGRATION 20, RES-FINAL 45) are unchanged and no estimate is shortened."
+    }
   ],
   "bootstrap": {
     "task": "T10",
@@ -32,24 +61,100 @@
     ]
   },
   "contractControls": [
-    { "file": "99-Usage.fs", "classification": "compile control: generated positive control that the contract cases are usable unambiguously; typecheck only, never materialized into the application" }
+    {
+      "file": "99-Usage.fs",
+      "classification": "compile control: generated positive control that the contract cases are usable unambiguously; typecheck only, never materialized into the application"
+    }
   ],
   "contractImplementations": [
-    { "file": "03-IF41-WIRE.fs", "scope": "Credential.T", "symbol": "ToString", "requirements": [ "PF-015", "INV-21" ], "rationale": "The credential type's printed form is fixed to <credential>, so no log, exception or interpolation can show the token. Boundary code: the type is the requirement, not application behavior." },
-    { "file": "03-IF41-WIRE.fs", "scope": "Credential", "symbol": "create", "requirements": [ "PF-015", "INV-21" ], "rationale": "The only constructor of the private credential representation. Boundary code: without it the private type cannot be created at all." },
-    { "file": "03-IF41-WIRE.fs", "scope": "Credential", "symbol": "authorization", "requirements": [ "PF-015", "INV-21" ], "rationale": "The only way to read the token, as an Authorization header. Boundary code: it is what keeps the token out of every other code path; the negative control ReadCredential.fs proves no other reader compiles." },
-    { "file": "05-IF41-SAVE.fs", "scope": "Confirmation.T", "symbol": "InvestigationId", "requirements": [ "PERSIST-023" ], "rationale": "Read-only accessor of the private confirmation representation. Boundary code: consumers can read a confirmation but never build one." },
-    { "file": "05-IF41-SAVE.fs", "scope": "Confirmation.T", "symbol": "CommitOid", "requirements": [ "PERSIST-023" ], "rationale": "Read-only accessor of the private confirmation representation (as InvestigationId)." },
-    { "file": "05-IF41-SAVE.fs", "scope": "Confirmation.T", "symbol": "CommitTime", "requirements": [ "PERSIST-023" ], "rationale": "Read-only accessor of the private confirmation representation (as InvestigationId)." },
-    { "file": "05-IF41-SAVE.fs", "scope": "Confirmation", "symbol": "ofReadBack", "requirements": [ "PERSIST-023" ], "rationale": "The only constructor: a confirmation exists only when the read-back equals what was written (one equality test). Boundary code: it is the type-level form of PERSIST-023; the negative control ForgeConfirmation.fs proves nothing else can create one. The save workflow that calls it is persistence's timed work." }
+    {
+      "file": "03-IF41-WIRE.fs",
+      "scope": "Credential.T",
+      "symbol": "ToString",
+      "requirements": [
+        "PF-015",
+        "INV-21"
+      ],
+      "rationale": "The credential type's printed form is fixed to <credential>, so no log, exception or interpolation can show the token. Boundary code: the type is the requirement, not application behavior.",
+      "sha256": "d77df01002dca4b35e3fc460273e05a73ab8ad1a459543ee8c7f7bc48647742b"
+    },
+    {
+      "file": "03-IF41-WIRE.fs",
+      "scope": "Credential",
+      "symbol": "create",
+      "requirements": [
+        "PF-015",
+        "INV-21"
+      ],
+      "rationale": "The only constructor of the private credential representation. Boundary code: without it the private type cannot be created at all.",
+      "sha256": "2193946f45de21738e7e6d82988dac5ea0c4cea7c34b715dd918b16914ec7721"
+    },
+    {
+      "file": "03-IF41-WIRE.fs",
+      "scope": "Credential",
+      "symbol": "authorization",
+      "requirements": [
+        "PF-015",
+        "INV-21"
+      ],
+      "rationale": "The only way to read the token, as an Authorization header. Boundary code: it is what keeps the token out of every other code path; the negative control ReadCredential.fs proves no other reader compiles.",
+      "sha256": "b2b542329f835af8111a0e81537c7b7651b2b663837741f6637d1b8388b3e4aa"
+    },
+    {
+      "file": "05-IF41-SAVE.fs",
+      "scope": "Confirmation.T",
+      "symbol": "InvestigationId",
+      "requirements": [
+        "PERSIST-023"
+      ],
+      "rationale": "Read-only accessor of the private confirmation representation. Boundary code: consumers can read a confirmation but never build one.",
+      "sha256": "3be44399e836906f680fdd24c4715302a6a9cf4ec6ba00205168469455f6d6a4"
+    },
+    {
+      "file": "05-IF41-SAVE.fs",
+      "scope": "Confirmation.T",
+      "symbol": "CommitOid",
+      "requirements": [
+        "PERSIST-023"
+      ],
+      "rationale": "Read-only accessor of the private confirmation representation (as InvestigationId).",
+      "sha256": "c1438354e2d91f4b7bf87e7e844465c1f2a872931bec0ad772ce976ad96dab88"
+    },
+    {
+      "file": "05-IF41-SAVE.fs",
+      "scope": "Confirmation.T",
+      "symbol": "CommitTime",
+      "requirements": [
+        "PERSIST-023"
+      ],
+      "rationale": "Read-only accessor of the private confirmation representation (as InvestigationId).",
+      "sha256": "f5b4ddb5687d6c050e1eef145f0f1c2dfa6ef3f6e26fd364eef83b969b75a4e0"
+    },
+    {
+      "file": "05-IF41-SAVE.fs",
+      "scope": "Confirmation",
+      "symbol": "ofReadBack",
+      "requirements": [
+        "PERSIST-023"
+      ],
+      "rationale": "The only constructor: a confirmation exists only when the read-back equals what was written (one equality test). Boundary code: it is the type-level form of PERSIST-023; the negative control ForgeConfirmation.fs proves nothing else can create one. The save workflow that calls it is persistence's timed work.",
+      "sha256": "f349c1d6ccf4b4c27c1c6e051d6147a507c1faa79300baed6ecd54637d3d8346"
+    }
   ],
   "sharedEntrypoints": {
-    "files": [ "web/index.html", "web/causa.css" ],
+    "files": [
+      "web/index.html",
+      "web/causa.css"
+    ],
     "changeRequests": {
       "owner": "integration",
-      "requesters": [ "ui", "ui-2" ],
+      "requesters": [
+        "ui",
+        "ui-2"
+      ],
       "protocol": "A UI role that needs a change to a shared entrypoint does not edit it. It opens a change request naming the file, the change (the exact markup or Forma-token rule) and the task it serves; integration applies it in its own pull request, in order, and the requesting role reviews that pull request. UI roles own their view modules (src/Causa.App/Views/*) and component-level presentation; the entrypoints only load them.",
-      "record": "a Praxis work item owned by integration whose title starts with CR- and names the file, linked to the requesting task's work item"
+      "record": "a Praxis work item owned by integration whose title starts with CR- and names the file, linked to the requesting task's work item",
+      "ruleSentence": "It changes `web/index.html` and `web/causa.css` only through a change request to integration"
     }
   },
   "startingState": {
@@ -61,20 +166,237 @@
       "the build window is 9:30 AM to 5:00 PM on November 7, 2026"
     ],
     "removedGates": [
-      { "task": "T06", "was": "T10 preferred to follow T06 (organizer confirmation for prepared requirements, data and tooling)" }
+      {
+        "task": "T06",
+        "was": "T10 preferred to follow T06 (organizer confirmation for prepared requirements, data and tooling)"
+      }
     ],
     "historicalRecords": [
-      { "id": "ODR-V41-06", "disposition": "kept unchanged" },
-      { "id": "APR-V41-OWNER-1", "disposition": "kept unchanged" },
-      { "id": "docs/HACKATHON-BOUNDARIES.md published-rule section (last reviewed 2026-09-24)", "disposition": "kept unchanged" }
+      {
+        "id": "ODR-V41-06",
+        "disposition": "kept unchanged"
+      },
+      {
+        "id": "APR-V41-OWNER-1",
+        "disposition": "kept unchanged"
+      },
+      {
+        "id": "docs/HACKATHON-BOUNDARIES.md published-rule section (last reviewed 2026-09-24)",
+        "disposition": "kept unchanged"
+      }
     ],
-    "residualRisk": "The published rules say the repository starts empty and code starts at kickoff; they do not say whether specifications prepared before kickoff in executable form (the F# contract declarations, the deterministic generator, the layout assertions) count as planning or as code. The plan's boundary: before T0 nothing is written to the competition repository; at T0 the generator writes the skeleton and the contract declarations from the approved package. An organizer could read the materialized contract declarations, or the bootstrap itself, as code prepared before kickoff. The plan does not claim otherwise; if an organizer rules so on the day, the team follows the ruling (HACKATHON-BOUNDARIES: organizer guidance wins)."
+    "residualRisk": "The published rules say the repository starts empty and code starts at kickoff. They do not say whether material prepared before kickoff in executable form counts as planning or as code. Four kinds of material are at issue: the F# contract declarations, the deterministic generator, the layout assertions, and what conditor init writes at T0. conditor init writes the Echelon scaffold and imports 68 requirement documents (42 from this planning repository at commit 2eee2d5, 26 from Percepta). HACKATHON-BOUNDARIES lists, as an open question, whether a separate planning repository may be consumed directly by the blank implementation repository. The plan's boundary is that nothing is written to the competition repository before T0, and that everything written at T0 comes from approved, published sources. An organizer could read the materialized contract declarations, the Conditor scaffold, the requirements import, or the bootstrap itself as material prepared before kickoff. The plan does not claim otherwise. Organizer approval of the prepared material (ADRP-016-O2) is not sought; how that obligation is reported is the owner's decision ODR-V411-02. If an organizer rules on the day, the team follows the ruling.",
+    "organizerDocuments": [
+      "docs/OWNER-DECISIONS-2026-10-26.md",
+      "docs/AGENT-DECISION-REDUCTION-PROFILE.md",
+      "docs/HACKATHON-BOUNDARIES.md"
+    ],
+    "organizerReferences": [
+      {
+        "id": "PRE-ORG-01",
+        "source": "requirements-compiled/v4/preflight-manifest.json",
+        "decision": "ODR-V411-02",
+        "disposition": "Stays in v4's frozen preflight manifest, unchanged and NOT_RUN. No timed task waits on it. How it is reported at gate G0 is the owner's decision ODR-V411-02."
+      },
+      {
+        "id": "T06",
+        "source": "requirements-compiled/v4/curation/tasks.json",
+        "decision": "ODR-V411-02",
+        "disposition": "Stays in v4's frozen task list (preflight, operator). No v4.1.1 task depends on it or prefers to follow it (T10's preference is dropped). Whether it runs at all is the owner's decision ODR-V411-02."
+      },
+      {
+        "id": "ADRP-016-O2",
+        "source": "requirements-compiled/v4/requirements-inventory.json",
+        "decision": "ODR-V411-02",
+        "disposition": "A must obligation of the frozen baseline. It stays unchanged and is not weakened or claimed met. Without organizer approval it is reported as not met at G0 and G10; the owner decides whether to proceed so (ODR-V411-02). Its second clause, no prebuilt competition app transferred, holds: nothing is written to the competition repository before T0."
+      },
+      {
+        "id": "AGENT-DECISION-REDUCTION-PROFILE§pre-experiment-readiness-checklist-O7",
+        "source": "requirements-compiled/v4/requirements-inventory.json",
+        "decision": "ODR-V411-02",
+        "disposition": "The readiness-checklist form of ADRP-016-O2 (\"Obtain organizer rule confirmation ... where necessary\"); handled with it under ODR-V411-02."
+      },
+      {
+        "id": "STORAGE-008-O1",
+        "source": "requirements-compiled/v4/requirements-inventory.json",
+        "decision": "ODR-V411-02",
+        "disposition": "Organizer permission for the pre-created datastore and test data (causa-data) is not sought. The obligation stays unchanged and is reported as not met unless the owner decides otherwise (ODR-V411-02)."
+      },
+      {
+        "id": "R0.1-O1",
+        "source": "requirements-compiled/v4/requirements-inventory.json",
+        "decision": "OD-INDY-18",
+        "disposition": "Met by its first branch: the competition source begins at kickoff from a blank application repository (git init at T0, T10). The organizer-approved-equivalent branch is not used, so no organizer record is needed."
+      },
+      {
+        "id": "KICKOFF-EXECUTION-PACKET§1-9-30-baseline-O2",
+        "source": "requirements-compiled/v4/requirements-inventory.json",
+        "decision": "OD-INDY-18",
+        "disposition": "Met by its first branch: T10 starts from an empty repository and records that it is empty; the organizer-compliant alternative is not used."
+      },
+      {
+        "id": "KICKOFF-EXECUTION-PACKET§preamble-O4",
+        "source": "requirements-compiled/v4/requirements-inventory.json",
+        "decision": "OD-INDY-18",
+        "disposition": "As KICKOFF-EXECUTION-PACKET§1-9-30-baseline-O2: the repository is verified empty at T0."
+      },
+      {
+        "id": "PRE-REQ-04",
+        "source": "requirements-compiled/v4/preflight-manifest.json",
+        "decision": "OD-INDY-18",
+        "disposition": "Needs an owner or organizer record; the owner's record is used (the package approval). No organizer record is needed."
+      },
+      {
+        "id": "PRE-TOOL-03",
+        "source": "requirements-compiled/v4/preflight-manifest.json",
+        "decision": "OD-INDY-18",
+        "disposition": "Needs an owner or organizer record; the owner's record is used. No organizer record is needed."
+      },
+      {
+        "id": "waiver T12>T14",
+        "source": "analysis/task-adjustments.json",
+        "decision": "ODR-V411-02",
+        "disposition": "The waiver rests on ODR-V41-06, which the owner recorded (APR-V41-OWNER-1) with an organizer_confirmation text. The decision stands as recorded. Whether it stands without that organizer premise is the owner's decision ODR-V411-02 (option B withdraws the contract-first ordering)."
+      },
+      {
+        "id": "waiver T13>T14",
+        "source": "analysis/task-adjustments.json",
+        "decision": "ODR-V411-02",
+        "disposition": "As waiver T12>T14."
+      },
+      {
+        "id": "waiver T13>T19",
+        "source": "analysis/task-adjustments.json",
+        "decision": "ODR-V411-02",
+        "disposition": "As waiver T12>T14."
+      },
+      {
+        "id": "waiver T13>T20",
+        "source": "analysis/task-adjustments.json",
+        "decision": "ODR-V411-02",
+        "disposition": "As waiver T12>T14."
+      },
+      {
+        "id": "OD-INDY-12",
+        "source": "docs/OWNER-DECISIONS-2026-10-26.md",
+        "quote": "only after the organizer confirms (PRE-ORG-01)",
+        "decision": "ODR-V411-02",
+        "disposition": "OD-INDY-12 governs interfaces extracted from earlier rehearsals' source. v4.1.1 carries none (X11): its contracts are authored from the requirements. Its organizer condition, and how it applies to the materialized contract declarations, is the owner's decision ODR-V411-02."
+      },
+      {
+        "id": "ADRP consequences",
+        "source": "docs/AGENT-DECISION-REDUCTION-PROFILE.md",
+        "quote": "subject to organizer approval",
+        "decision": "ODR-V411-02",
+        "disposition": "The prose source of ADRP-016-O2; handled with it."
+      },
+      {
+        "id": "ADRP readiness checklist",
+        "source": "docs/AGENT-DECISION-REDUCTION-PROFILE.md",
+        "quote": "Obtain organizer rule confirmation",
+        "decision": "ODR-V411-02",
+        "disposition": "The prose source of the readiness-checklist obligation; handled with ADRP-016-O2."
+      },
+      {
+        "id": "HACKATHON-BOUNDARIES organizer verification",
+        "source": "docs/HACKATHON-BOUNDARIES.md",
+        "quote": "## Organizer verification",
+        "decision": "OD-INDY-18",
+        "disposition": "Rewritten by OD-INDY-18: the section lists the interpretation questions and states that no task waits on an organizer response."
+      },
+      {
+        "id": "HACKATHON-BOUNDARIES no organizer wait",
+        "source": "docs/HACKATHON-BOUNDARIES.md",
+        "quote": "No task waits on an organizer response",
+        "decision": "OD-INDY-18",
+        "disposition": "OD-INDY-18's own statement."
+      },
+      {
+        "id": "HACKATHON-BOUNDARIES scaffolding rule",
+        "source": "docs/HACKATHON-BOUNDARIES.md",
+        "quote": "Organizer confirmation is not a prerequisite",
+        "decision": "OD-INDY-18",
+        "disposition": "OD-INDY-18's rewrite of the former 'confirm organizer interpretation' rule."
+      }
+    ]
   },
   "sensitivity": [
-    { "id": "SENS-BOOT-150", "description": "the bootstrap (T10) takes half again as long as measured", "scale": [ { "tasks": [ "T10" ], "percent": 150 } ] },
-    { "id": "SENS-BOOT-200", "description": "the bootstrap (T10) takes twice as long as measured", "scale": [ { "tasks": [ "T10" ], "percent": 200 } ] },
-    { "id": "SENS-INT-125", "description": "every integration task overruns by a quarter", "scale": [ { "owner": "integration", "percent": 125 } ] },
-    { "id": "SENS-INT-150", "description": "every integration task overruns by half", "scale": [ { "owner": "integration", "percent": 150 } ] },
-    { "id": "SENS-BOOT-200-INT-125", "description": "the bootstrap takes twice as long as measured and every other integration task overruns by a quarter", "scale": [ { "tasks": [ "T10" ], "percent": 200 }, { "owner": "integration", "percent": 125 } ] }
-  ]
+    {
+      "id": "SENS-BOOT-150",
+      "description": "the bootstrap (T10) takes half again as long as planned (29 minutes: 2 measured, 27 estimated)",
+      "scale": [
+        {
+          "tasks": [
+            "T10"
+          ],
+          "percent": 150
+        }
+      ]
+    },
+    {
+      "id": "SENS-BOOT-200",
+      "description": "the bootstrap (T10) takes twice as long as planned (29 minutes: 2 measured, 27 estimated)",
+      "scale": [
+        {
+          "tasks": [
+            "T10"
+          ],
+          "percent": 200
+        }
+      ]
+    },
+    {
+      "id": "SENS-INT-125",
+      "description": "every integration task overruns by a quarter",
+      "scale": [
+        {
+          "owner": "integration",
+          "percent": 125
+        }
+      ]
+    },
+    {
+      "id": "SENS-INT-150",
+      "description": "every integration task overruns by half",
+      "scale": [
+        {
+          "owner": "integration",
+          "percent": 150
+        }
+      ]
+    },
+    {
+      "id": "SENS-BOOT-200-INT-125",
+      "description": "the bootstrap takes twice as long as planned and every other integration task overruns by a quarter (a rule naming T10 replaces the owner rule for it)",
+      "scale": [
+        {
+          "tasks": [
+            "T10"
+          ],
+          "percent": 200
+        },
+        {
+          "owner": "integration",
+          "percent": 125
+        }
+      ]
+    },
+    {
+      "id": "SENS-CR-200",
+      "description": "applying UI change requests to the shared web entrypoints takes twice the 5 minutes T17 carries for it (T17 25 minutes)",
+      "scale": [
+        {
+          "tasks": [
+            "T17"
+          ],
+          "percent": 125
+        }
+      ]
+    }
+  ],
+  "contractBaseline": {
+    "package": "requirements-compiled/v4.1",
+    "approval": "APR-V41-OWNER-4",
+    "note": "v4.1's contracts, reviewed in thirteen rounds and approved; X17 requires every v4.1.1 contract to equal its v4.1 file byte for byte, so the line scan is a second, heuristic guard, not the guarantee"
+  }
 }

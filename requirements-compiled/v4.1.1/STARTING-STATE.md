@@ -19,6 +19,7 @@ The engineering methodology is ours. No task in the execution plan waits on an o
 
 - T10, the bootstrap, no longer follows T06 ("Organizer confirmation for prepared requirements, data and tooling"). The adjustment drops that preference (X13), and X19 fails if any timed task depends on, or prefers to follow, T06.
 - AGENT-RULES no longer says the bootstrap "relies on ODR-V41-06" (X19 checks that too).
+- Every organizer reference in the frozen v4 inputs and the internal rule documents has a recorded disposition in [analysis/amendment.json](analysis/amendment.json) (`startingState.organizerReferences`). X19 scans for them and fails on any without one. The organizer-approval obligations of the frozen baseline stay unchanged, and are not claimed met: ADRP-016-O2, its readiness-checklist form, and STORAGE-008-O1. How they, PRE-ORG-01/T06, OD-INDY-12's organizer condition and the waivers resting on ODR-V41-06 are reported is the owner's decision ODR-V411-02.
 
 v4's T06 remains in v4's frozen task list, because v4 is frozen. No v4.1.1 task depends on it.
 
@@ -40,7 +41,7 @@ T10 is the first timed task. Integration:
 
 1. records the start timestamp;
 2. creates the empty repository (`git init -b main`; git metadata only);
-3. runs `conditor init --preset indy-init --target .`, the permitted event setup (Echelon scaffold, Praxis initialization, requirements import);
+3. runs `conditor init --preset indy-init --target .`: the Echelon scaffold, Praxis initialization and the requirements import (the plan's own event setup, from v4's KICKOFF-EXECUTION-PACKET §1, an internal plan, not an organizer permission);
 4. runs the generator with `--bootstrap .`, which layers the solution, projects, compile lists and contract declarations onto Conditor's repository;
 5. builds the skeleton and runs `conditor ci-policy check`;
 6. commits (the initial bootstrap commit), publishes with `conditor repo create`, and waits for the first green CI.
@@ -54,9 +55,9 @@ The generator writes the contract declarations into their producers' files and a
 
 ## Residual interpretation risk
 
-The published rules say the repository starts empty and code starts at kickoff. They do not say whether specifications prepared before kickoff in executable form count as planning or as code. Those specifications are the F# contract declarations, the deterministic generator and the layout assertions. The plan's boundary is as follows:
+The published rules say the repository starts empty and code starts at kickoff. They do not say whether material prepared before kickoff in executable form counts as planning or as code. That material is the F# contract declarations, the deterministic generator, the layout assertions, and what `conditor init` writes at T0. It writes the Echelon scaffold and imports 68 requirement documents: 42 from this planning repository, at its older commit 2eee2d5 (T01 still regenerates and pins the authoritative baseline at the kickoff commit), and 26 from Percepta. HACKATHON-BOUNDARIES itself lists as open whether a separate planning repository may be consumed directly by the blank implementation repository. The plan's boundary is as follows:
 
 - Before T0, nothing is written to the competition repository.
 - At T0, the generator writes the skeleton and the contract declarations from the approved package.
 
-An organizer could read the materialized contract declarations, or the bootstrap itself, as code prepared before kickoff. This policy does not claim that the F# contracts are exempt under every reading of the rules. If an organizer rules otherwise on the day, the team follows the ruling.
+An organizer could read the materialized contract declarations, the Conditor scaffold, the requirements import or the bootstrap itself as material prepared before kickoff. Organizer approval of the prepared material (ADRP-016-O2) is not sought; how that obligation is reported is the owner's decision ODR-V411-02. This policy does not claim that the F# contracts are exempt under every reading of the rules. If an organizer rules otherwise on the day, the team follows the ruling.

@@ -1,10 +1,10 @@
 # Compiled package v4.1.1: implementation efficiency, executed from T0
 
-**Status: CANDIDATE.** v4.1.1 is the successor amendment of v4.1, which the owner approved (ODR-V41-01, APR-V41-OWNER-4) and which is not edited. It is compiled and validated: checks X01–X20 pass. ODR-V411-01, the approval of this package, is pending. See [FREEZE.md](FREEZE.md) and [AMENDMENT-4.1.1.md](AMENDMENT-4.1.1.md).
+**Status: CANDIDATE.** v4.1.1 is the successor amendment of v4.1, which the owner approved (ODR-V41-01, APR-V41-OWNER-4) and which is not edited. It is compiled and validated: checks X01–X20 pass. ODR-V411-02 (the organizer-approval obligations) and ODR-V411-01 (the approval of this package) are pending. ODR-V411-01, the approval of this package, is pending. See [FREEZE.md](FREEZE.md) and [AMENDMENT-4.1.1.md](AMENDMENT-4.1.1.md).
 
 v4.1.1 changes no requirement, obligation, test binding, state machine or contract text: X10 and preservation-report.json prove it. It makes these changes:
 
-- **T10 at T0.** The bootstrap runs at T0, inside the timed window, with a measured duration.
+- **T10 at T0.** The bootstrap runs at T0, inside the timed window: 29 minutes, 2 of them measured on fresh empty repositories and 27 estimated.
 - **Contracts classified.** The F# contracts are classified as specifications (contract-classification.json, X17).
 - **No organizer gate.** The organizer-permission gate is gone (STARTING-STATE.md, X19).
 - **Web entrypoints owned by integration.** `web/index.html` and `web/causa.css` belong to integration, and UI roles change them by change request (X18).
@@ -13,13 +13,11 @@ v4.1.1 changes no requirement, obligation, test binding, state machine or contra
 
 Compile it with `requirements-compiler v41 --source . --package requirements-compiled/v4.1.1 --base requirements-compiled/v4`.
 
-The rest of this page is v4.1's description, which still holds where v4.1.1 does not change it.
+The rest of this page is v4.1's description, carried unchanged except for its status line and the rows marked v4.1.1; where it differs from the list above, the list governs.
 
 ---
 
 # Compiled package v4.1: implementation efficiency
-
-**Status: CANDIDATE.** v4.1 is compiled and validated (checks X01–X16 pass). The owner's decisions ODR-V41-02..08 are recorded (APR-V41-OWNER-2) and applied; ODR-V41-09 is recorded (APR-V41-OWNER-3) and applied; only ODR-V41-01 is pending. It has not been approved or frozen. See [FREEZE.md](FREEZE.md).
 
 v4.1 sits on top of [package v4](../v4/README.md). It does not change any requirement, obligation or test binding: it uses v4's verification plan byte for byte, and [preservation-report.json](preservation-report.json) proves this. What v4.1 adds is the material a team would otherwise have to work out during the seven-hour build:
 
@@ -44,7 +42,7 @@ CI does six things:
 2. Runs `v41 --check` with that tarball. This regenerates every file, compares it byte for byte, and checks that the committed Forma inventory matches the published package.
 3. Builds `contracts/` to typecheck the interface contracts.
 4. Checks that each negative control in `contracts/negative/` (a forged `Confirmation`, a read of the credential's token) is refused (FS1093).
-5. Runs `v41 --bootstrap` (v4.1.1: at T0, onto the repository `conditor init` created; see AGENT-RULES duty 1) into a git-initialised empty directory and builds the generated .NET skeleton of the application repository (solution, projects, compile lists, contracts, layout-assertion module, and the NuGet test tooling the owner locked in ODR-V41-07, restored from NuGet; its `package.json` also pins the npm tooling of ODR-V41-07 and ODR-V41-09, which this step does not install; integration's other shared files are added at T10).
+5. Runs `v41 --bootstrap` into a git-initialised empty directory (at the event, v4.1.1 instead layers onto the repository `conditor init` created; see AGENT-RULES duty 1; CI also layers onto a recorded Conditor 0.10.18 scaffold) and builds the generated .NET skeleton of the application repository (solution, projects, compile lists, contracts, layout-assertion module, and the NuGet test tooling the owner locked in ODR-V41-07, restored from NuGet; its `package.json` also pins the npm tooling of ODR-V41-07 and ODR-V41-09, which this step does not install; integration's other shared files are added at T10).
 6. Runs the executable layout assertions (`layout-tests/run.mjs`, with axe-core 4.14.0 for `axeClean`) in Chromium and WebKit against Forma's pattern pages and the broken fixtures. It then measures the catch rate on every review defect page (`run.mjs --catch-rate`, [layout-tests/catch-rate.mjs](layout-tests/catch-rate.mjs)) and fails on a miss that R41-11 does not disclose or on a conforming page that fails.
 
 The offline test suite also runs the v4.1 negative controls in [V41Tests.fs](../../tools/requirements-compiler/tests/V41Tests.fs).
@@ -68,11 +66,11 @@ The "In" column says whether a file is authored (A) or generated by the compiler
 | 11 | Schedule | [schedule.json](schedule.json): topologies B, A and C, compared with v4 | G |
 | 12 | Independent review | [independent-review.md](independent-review.md), [analysis/independent-review.json](analysis/independent-review.json) | A |
 | 13 | Preservation report | [preservation-report.json](preservation-report.json) | G |
-| 14 | Owner decision requests | [proposals/owner-decision-requests.json](proposals/owner-decision-requests.json): ODR-V41-01..09 | A |
+| 14 | Owner decision requests | [proposals/owner-decision-requests.json](proposals/owner-decision-requests.json): ODR-V41-01..09 (decided), ODR-V411-01 and ODR-V411-02 (v4.1.1, pending) | A |
 | 15 | Freeze procedure | [FREEZE.md](FREEZE.md) | A |
 | — | Agent roles and rules | [AGENT-RULES.md](AGENT-RULES.md) | A |
 | — | Coordination telemetry | [analysis/conflict-telemetry.json](analysis/conflict-telemetry.json) | A |
-| — | Validation | [validation-report.json](validation-report.json): X01–X16 | G |
+| — | Validation | [validation-report.json](validation-report.json): X01–X20 (v4.1.1) | G |
 
 The v4 versus v4.1 comparison is in the optimization report. So is the split between proven improvements, estimated improvements, hypotheses and risks.
 

@@ -1,6 +1,6 @@
 {
   "schema": "indy-init.v41-owner-decision-requests/1",
-  "status": "decided: ODR-V41-06 (APR-V41-OWNER-1); ODR-V41-02, -03, -04, -05, -07 and -08, option A each (APR-V41-OWNER-2); ODR-V41-09, option A (APR-V41-OWNER-3). Pending: ODR-V41-01, the package approval. Only the operator writes records (RDP-003)",
+  "status": "decided: ODR-V41-01 (APR-V41-OWNER-4) and ODR-V41-02..09, as for v4.1; they carry over unchanged. Pending: ODR-V411-02 (organizer-approval obligations) and ODR-V411-01 (approval of package v4.1.1). Only the operator writes records (RDP-003)",
   "requests": [
     {
       "id": "ODR-V41-01",
@@ -154,7 +154,7 @@
       "id": "ODR-V411-01",
       "kind": "package-approval",
       "title": "Approve compiled package v4.1.1 as the implementation plan for November 7",
-      "question": "Approve requirements-compiled/v4.1.1, the successor amendment of the approved v4.1 (APR-V41-OWNER-4): the bootstrap (T10) at T0 with a measured duration, the contracts classified as specifications, no organizer-permission gate, the shared web entrypoints owned by integration with change requests, the recomputed schedule with its sensitivity, and the token-economics report from Praxis telemetry?",
+      "question": "Approve requirements-compiled/v4.1.1, the successor amendment of the approved v4.1 (APR-V41-OWNER-4)? It contains: the bootstrap (T10) at T0, 29 minutes of which 2 are measured on fresh empty repositories and 27 estimated; the contracts classified as specifications and pinned to v4.1's; the organizer references dispositioned per ODR-V411-02; the shared web entrypoints owned by integration with change requests (T17 carries 5 minutes for them); the recomputed schedule with its sensitivity; and the token-economics report from Praxis telemetry",
       "options": [
         "A: approve v4.1.1",
         "B: request changes",
@@ -165,6 +165,23 @@
       "impact": "Until approved, v4.1.1 is a CANDIDATE and the event build follows v4.1 as approved.",
       "approvalRecord": {
         "how": "A change in an operator approval, recorded by the owner with `dotnet fsi tools/owner-freeze.fsx -- approve v4.1.1`: {\"decision_id\": \"ODR-V411-01\", \"action\": \"approve-package\", \"package\": \"requirements-compiled/v4.1.1\", \"manifest_sha256\": \"<sha256 of requirements-compiled/v4.1.1/package-manifest.json>\", \"review_sha256\": \"<sha256 of requirements-compiled/v4.1.1/analysis/independent-review.json>\"}. Written and committed by the owner, never by an agent."
+      }
+    },
+    {
+      "id": "ODR-V411-02",
+      "kind": "requirement-conflict",
+      "title": "Organizer-approval obligations for November 7",
+      "question": "The assignment removes every internal workflow gate that waits on organizers (OD-INDY-18), but the frozen v4 baseline still holds organizer-approval obligations: ADRP-016-O2 (must: 'Prepared requirements, library capabilities, design guidance, frozen fixtures, and scripts are subject to organizer approval'), its readiness-checklist form, and STORAGE-008-O1 (organizer permission for the pre-created datastore and test data). The preflight check PRE-ORG-01 (task T06, gate G0) records that approval; OD-INDY-12 lets the event carry interfaces 'only after the organizer confirms (PRE-ORG-01)'; and the contract-first waivers (T12>T14, T13>T14, T13>T19, T13>T20) rest on ODR-V41-06, whose record states an organizer confirmation. No agent may weaken a requirement or decide this. How are they handled for November 7?",
+      "options": [
+        "A: proceed without organizer approval. The obligations and PRE-ORG-01/T06 stay unchanged in the frozen baseline and are reported as not met at G0 and G10, with OD-INDY-18 as the reason; no task waits on them. OD-INDY-12's organizer condition does not apply to the v4.1.1 contracts, which are authored from the requirements, not extracted from earlier rehearsals (X11). The contract-first waivers rest on ODR-V41-06 as the owner recorded it.",
+        "B: keep the organizer gate. T10 waits for an organizer record under PRE-ORG-01; v4.1.1 withdraws change V411-C and keeps the rest.",
+        "C: ask the organizers but do not wait. The question is sent before the event; any answer is recorded under PRE-ORG-01; the obligations are reported met or not met by that answer; no task waits on it."
+      ],
+      "recommendation": "The owner's call. A follows the assignment's instruction ('We are not requesting organizer approval for the engineering process') and reports the unmet obligations honestly instead of claiming them; C keeps the same schedule and may close them.",
+      "rationale": "A must obligation of the frozen baseline conflicts with the owner's instruction to remove organizer gates. The agent may not set a requirement aside (RDP-003); only the owner decides.",
+      "impact": "Until decided, v4.1.1 cannot be approved: X19 lists every organizer reference with ODR-V411-02 as the decision that disposes of it.",
+      "approvalRecord": {
+        "how": "A change in an operator approval, recorded by the owner with `dotnet fsi tools/owner-freeze.fsx -- decide v4.1.1`: {\"decision_id\": \"ODR-V411-02\", \"action\": \"select\", \"option\": \"A\" | \"B\" | \"C\"}. Written and committed by the owner, never by an agent."
       }
     }
   ],

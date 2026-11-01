@@ -7,7 +7,7 @@
       "phase": "timed",
       "estimateMinutes": 29,
       "rationale": "v4.1.1: the bootstrap runs at T0, the first timed task, owned by integration. Measured on fresh empty repositories (analysis/bootstrap-measurement.json): the mechanical sequence (git init, conditor init, the generator layered onto it, both solutions built, ci-policy check, verify, commit) took 77 s, 32 s and 76 s with the release binaries the Registry set pins, so 2 minutes. Estimated, not measured: conditor repo create and the first push, 2 minutes; integration's remaining shared files, 15 minutes; first green CI on GitHub Actions, 10 minutes. 29 minutes in all (v4.1 estimated 25, outside the window).",
-      "evidence": "measured",
+      "evidence": "measured+estimated",
       "measurement": "analysis/bootstrap-measurement.json",
       "dropPreferenceAfter": [
         {
@@ -15,7 +15,9 @@
           "reason": "The plan no longer waits on organizer confirmation: the published rules are external constraints and the residual interpretation risk is recorded (STARTING-STATE.md). T06 and its historical records stay as they are.",
           "decision": "OD-INDY-18"
         }
-      ]
+      ],
+      "measuredMinutes": 2,
+      "estimatedMinutes": 27
     },
     {
       "task": "T12",
@@ -66,8 +68,9 @@
           "reason": "the workspace shell"
         }
       ],
-      "rationale": "No estimate change. Keeps v4's kernel-before-checkpoint order explicitly, since T14 no longer implies it.",
-      "evidence": "estimated"
+      "rationale": "v4.1.1: 20 minutes, v4's 15 plus 5 for applying T16's change requests to the shared web entrypoints (web/index.html, web/causa.css), which integration now owns (X18). Estimated. Keeps v4's kernel-before-checkpoint order explicitly, since T14 no longer implies it.",
+      "evidence": "estimated",
+      "estimateMinutes": 20
     },
     {
       "task": "T18",

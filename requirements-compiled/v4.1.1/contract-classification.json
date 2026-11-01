@@ -35,6 +35,7 @@
         {
           "scope": "Credential.T",
           "symbol": "ToString",
+          "sha256": "d77df01002dca4b35e3fc460273e05a73ab8ad1a459543ee8c7f7bc48647742b",
           "rationale": "The credential type's printed form is fixed to <credential>, so no log, exception or interpolation can show the token. Boundary code: the type is the requirement, not application behavior.",
           "requirements": [
             "PF-015",
@@ -44,6 +45,7 @@
         {
           "scope": "Credential",
           "symbol": "create",
+          "sha256": "2193946f45de21738e7e6d82988dac5ea0c4cea7c34b715dd918b16914ec7721",
           "rationale": "The only constructor of the private credential representation. Boundary code: without it the private type cannot be created at all.",
           "requirements": [
             "PF-015",
@@ -53,6 +55,7 @@
         {
           "scope": "Credential",
           "symbol": "authorization",
+          "sha256": "b2b542329f835af8111a0e81537c7b7651b2b663837741f6637d1b8388b3e4aa",
           "rationale": "The only way to read the token, as an Authorization header. Boundary code: it is what keeps the token out of every other code path; the negative control ReadCredential.fs proves no other reader compiles.",
           "requirements": [
             "PF-015",
@@ -77,6 +80,7 @@
         {
           "scope": "Confirmation.T",
           "symbol": "InvestigationId",
+          "sha256": "3be44399e836906f680fdd24c4715302a6a9cf4ec6ba00205168469455f6d6a4",
           "rationale": "Read-only accessor of the private confirmation representation. Boundary code: consumers can read a confirmation but never build one.",
           "requirements": [
             "PERSIST-023"
@@ -85,6 +89,7 @@
         {
           "scope": "Confirmation.T",
           "symbol": "CommitOid",
+          "sha256": "c1438354e2d91f4b7bf87e7e844465c1f2a872931bec0ad772ce976ad96dab88",
           "rationale": "Read-only accessor of the private confirmation representation (as InvestigationId).",
           "requirements": [
             "PERSIST-023"
@@ -93,6 +98,7 @@
         {
           "scope": "Confirmation.T",
           "symbol": "CommitTime",
+          "sha256": "f5b4ddb5687d6c050e1eef145f0f1c2dfa6ef3f6e26fd364eef83b969b75a4e0",
           "rationale": "Read-only accessor of the private confirmation representation (as InvestigationId).",
           "requirements": [
             "PERSIST-023"
@@ -101,6 +107,7 @@
         {
           "scope": "Confirmation",
           "symbol": "ofReadBack",
+          "sha256": "f349c1d6ccf4b4c27c1c6e051d6147a507c1faa79300baed6ecd54637d3d8346",
           "rationale": "The only constructor: a confirmation exists only when the read-back equals what was written (one equality test). Boundary code: it is the type-level form of PERSIST-023; the negative control ForgeConfirmation.fs proves nothing else can create one. The save workflow that calls it is persistence's timed work.",
           "requirements": [
             "PERSIST-023"
@@ -138,42 +145,49 @@
         {
           "scope": "ContractUsage",
           "symbol": "lostBeforeSending",
+          "sha256": "20ed1872d7c1239229bc2a9cbfdf29ab55f37ea287ec82c56969d95a089d11d5",
           "rationale": "",
           "requirements": []
         },
         {
           "scope": "ContractUsage",
           "symbol": "saveInput",
+          "sha256": "2e696d44df3f9cf8f21099c3f6ba77cafc8ea0eba25d1367d876fe510278037d",
           "rationale": "",
           "requirements": []
         },
         {
           "scope": "ContractUsage",
           "symbol": "networkOffline",
+          "sha256": "5be8e3a624245f79064e5011b0e6e9d910063736eda71c2cb8df9f8829a232dd",
           "rationale": "",
           "requirements": []
         },
         {
           "scope": "ContractUsage",
           "symbol": "saveOffline",
+          "sha256": "5173aa1a8958552c196d6bde645bb30d1ec7329a9c497c8e58fb59175c2aad88",
           "rationale": "",
           "requirements": []
         },
         {
           "scope": "ContractUsage",
           "symbol": "saveConflict",
+          "sha256": "9605597d750bef3182bed70149e4df25981768bf73a8c34a8880e6d5e98bfeb1",
           "rationale": "",
           "requirements": []
         },
         {
           "scope": "ContractUsage",
           "symbol": "versionClash",
+          "sha256": "5e7477a6c2de1ec8ed0858e6412524adb3f262ed6c53f6cf3e5003ca07a4d1a3",
           "rationale": "",
           "requirements": []
         },
         {
           "scope": "ContractUsage",
           "symbol": "connection",
+          "sha256": "cf1a7c87cc7871686b7a4f473cc17fc06204a72411da46f0465fc6acba1b5c8c",
           "rationale": "",
           "requirements": []
         }
@@ -195,6 +209,7 @@
         {
           "scope": "ForgeConfirmation",
           "symbol": "forged",
+          "sha256": "3f40f341bc251c9bba395a69d78ef1727af114a1d6afed42b271278b02471ef3",
           "rationale": "",
           "requirements": []
         }
@@ -209,6 +224,7 @@
         {
           "scope": "ReadCredential",
           "symbol": "token",
+          "sha256": "a74f9384faeb6ea213511dc5034de457e262a6edac707e731b52965c0f9533da",
           "rationale": "",
           "requirements": []
         }

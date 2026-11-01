@@ -95,7 +95,7 @@ Sources:
 
 These published statements support aggressive pre-event planning/specification, but they do not answer every implementation-boundary question.
 
-Continue to verify ambiguity around:
+Open interpretation questions (no task waits on them, OD-INDY-18; they are the residual risk in requirements-compiled/v4.1.1/STARTING-STATE.md):
 
 - whether executable application-specific tests may exist before kickoff;
 - whether application-specific machine-readable contracts count as planning or scaffolding;
@@ -103,7 +103,7 @@ Continue to verify ambiguity around:
 - exact auth/deployment expectations;
 - whether a separate planning repository may be consumed directly by the blank implementation repo.
 
-Until clarified, keep this repository specification-heavy and keep competition application source code out of it.
+Keep this repository specification-heavy and keep competition application source code out of it.
 
 ## Machine-readable specifications
 

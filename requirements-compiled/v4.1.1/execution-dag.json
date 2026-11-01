@@ -14,7 +14,7 @@
       "T33",
       "T34"
     ],
-    "minutes": 329
+    "minutes": 334
   },
   "waivedPrecedences": [
     {
@@ -182,8 +182,8 @@
         "T13"
       ],
       "earliestStart": 94,
-      "latestStart": 164,
-      "slackMinutes": 70,
+      "latestStart": 169,
+      "slackMinutes": 75,
       "adjusted": false,
       "covers": [
         "doc:docs/FROZEN-DEMO-STORAGE-REQUIREMENTS.md",
@@ -228,7 +228,7 @@
       "id": "T17",
       "title": "Integration checkpoint 1: a legal command end to end in the browser",
       "owner": "integration",
-      "estimateMinutes": 15,
+      "estimateMinutes": 20,
       "v4EstimateMinutes": 15,
       "dependsOn": [
         "T13",
@@ -254,8 +254,8 @@
         "T10"
       ],
       "earliestStart": 29,
-      "latestStart": 44,
-      "slackMinutes": 15,
+      "latestStart": 49,
+      "slackMinutes": 20,
       "adjusted": true,
       "covers": [
         "prefix:PF-",
@@ -280,8 +280,8 @@
         "T18"
       ],
       "earliestStart": 64,
-      "latestStart": 79,
-      "slackMinutes": 15,
+      "latestStart": 84,
+      "slackMinutes": 20,
       "adjusted": true,
       "covers": [
         "R10.5",
@@ -322,8 +322,8 @@
         "T19"
       ],
       "earliestStart": 124,
-      "latestStart": 139,
-      "slackMinutes": 15,
+      "latestStart": 144,
+      "slackMinutes": 20,
       "adjusted": true,
       "covers": [
         "prefix:EXT-DATA-",
@@ -352,8 +352,8 @@
         "T13"
       ],
       "earliestStart": 164,
-      "latestStart": 179,
-      "slackMinutes": 15,
+      "latestStart": 184,
+      "slackMinutes": 20,
       "adjusted": true,
       "covers": [
         "EXT-DATA-009",
@@ -377,8 +377,8 @@
       "dependsOn": [
         "T17"
       ],
-      "earliestStart": 109,
-      "latestStart": 109,
+      "earliestStart": 114,
+      "latestStart": 114,
       "slackMinutes": 0,
       "adjusted": false,
       "covers": [
@@ -405,8 +405,8 @@
         "T24",
         "T17"
       ],
-      "earliestStart": 109,
-      "latestStart": 194,
+      "earliestStart": 114,
+      "latestStart": 199,
       "slackMinutes": 85,
       "adjusted": false,
       "covers": [
@@ -425,8 +425,8 @@
         "T11"
       ],
       "earliestStart": 44,
-      "latestStart": 184,
-      "slackMinutes": 140,
+      "latestStart": 189,
+      "slackMinutes": 145,
       "adjusted": false,
       "covers": [
         "WDL-001",
@@ -446,8 +446,8 @@
         "T15"
       ],
       "earliestStart": 164,
-      "latestStart": 184,
-      "slackMinutes": 20,
+      "latestStart": 189,
+      "slackMinutes": 25,
       "adjusted": false,
       "covers": [
         "origin:external",
@@ -463,8 +463,8 @@
       "dependsOn": [
         "T17"
       ],
-      "earliestStart": 109,
-      "latestStart": 199,
+      "earliestStart": 114,
+      "latestStart": 204,
       "slackMinutes": 90,
       "adjusted": false,
       "covers": [
@@ -482,8 +482,8 @@
         "T13"
       ],
       "earliestStart": 94,
-      "latestStart": 194,
-      "slackMinutes": 100,
+      "latestStart": 199,
+      "slackMinutes": 105,
       "adjusted": false,
       "covers": [
         "KICKOFF-EXECUTION-PACKET\u00a7ai-tool-agent",
@@ -500,8 +500,8 @@
       "dependsOn": [
         "T22"
       ],
-      "earliestStart": 179,
-      "latestStart": 179,
+      "earliestStart": 184,
+      "latestStart": 184,
       "slackMinutes": 0,
       "adjusted": false,
       "covers": [
@@ -520,8 +520,8 @@
         "T11",
         "T17"
       ],
-      "earliestStart": 109,
-      "latestStart": 204,
+      "earliestStart": 114,
+      "latestStart": 209,
       "slackMinutes": 95,
       "adjusted": false,
       "covers": [
@@ -542,8 +542,8 @@
         "T25"
       ],
       "earliestStart": 189,
-      "latestStart": 204,
-      "slackMinutes": 15,
+      "latestStart": 209,
+      "slackMinutes": 20,
       "adjusted": false,
       "covers": [
         "doc:docs/DESIGN-DECISION-BOUNDARIES.md",
@@ -565,8 +565,8 @@
         "T28",
         "T29"
       ],
-      "earliestStart": 224,
-      "latestStart": 224,
+      "earliestStart": 229,
+      "latestStart": 229,
       "slackMinutes": 0,
       "adjusted": true,
       "covers": [
@@ -597,8 +597,8 @@
       "dependsOn": [
         "T31"
       ],
-      "earliestStart": 269,
-      "latestStart": 269,
+      "earliestStart": 274,
+      "latestStart": 274,
       "slackMinutes": 0,
       "adjusted": false,
       "covers": [
@@ -621,8 +621,8 @@
       "dependsOn": [
         "T32"
       ],
-      "earliestStart": 289,
-      "latestStart": 289,
+      "earliestStart": 294,
+      "latestStart": 294,
       "slackMinutes": 0,
       "adjusted": false,
       "covers": [
@@ -638,8 +638,8 @@
       "dependsOn": [
         "T33"
       ],
-      "earliestStart": 309,
-      "latestStart": 309,
+      "earliestStart": 314,
+      "latestStart": 314,
       "slackMinutes": 0,
       "adjusted": false,
       "covers": [
@@ -667,8 +667,8 @@
         "T14"
       ],
       "earliestStart": 49,
-      "latestStart": 314,
-      "slackMinutes": 265,
+      "latestStart": 319,
+      "slackMinutes": 270,
       "adjusted": true,
       "covers": [
         "DCC-002"
@@ -684,8 +684,8 @@
         "T21"
       ],
       "earliestStart": 189,
-      "latestStart": 314,
-      "slackMinutes": 125,
+      "latestStart": 319,
+      "slackMinutes": 130,
       "adjusted": false,
       "covers": [
         "AR-034"
