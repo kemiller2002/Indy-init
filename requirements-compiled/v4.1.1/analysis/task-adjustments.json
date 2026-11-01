@@ -6,7 +6,7 @@
       "task": "T10",
       "phase": "timed",
       "estimateMinutes": 29,
-      "rationale": "v4.1.1: the bootstrap runs at T0, the first timed task, owned by integration. Measured on fresh empty repositories (analysis/bootstrap-measurement.json): the mechanical sequence (git init, conditor init, the generator layered onto it, both solutions built, ci-policy check, verify, commit) took 72 s, 32 s and 76 s, so 2 minutes. Estimated, not measured: conditor repo create and the first push, 2 minutes; integration's remaining shared files, 15 minutes; first green CI on GitHub Actions, 10 minutes. 29 minutes in all (v4.1 estimated 25, outside the window).",
+      "rationale": "v4.1.1: the bootstrap runs at T0, the first timed task, owned by integration. Measured on fresh empty repositories (analysis/bootstrap-measurement.json): the mechanical sequence (git init, conditor init, the generator layered onto it, both solutions built, ci-policy check, verify, commit) took 77 s, 32 s and 76 s with the release binaries the Registry set pins, so 2 minutes. Estimated, not measured: conditor repo create and the first push, 2 minutes; integration's remaining shared files, 15 minutes; first green CI on GitHub Actions, 10 minutes. 29 minutes in all (v4.1 estimated 25, outside the window).",
       "evidence": "measured",
       "measurement": "analysis/bootstrap-measurement.json",
       "dropPreferenceAfter": [

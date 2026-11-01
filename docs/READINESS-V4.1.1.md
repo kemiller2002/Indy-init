@@ -29,7 +29,7 @@ The amendment changes only these:
 4. a build of both `Causa.slnx` and `App.slnx`;
 5. `conditor ci-policy check`, `conditor verify`, and a commit.
 
-Every step passed in every run. The runs took 72 s and 76 s with a cold cache, and 32 s with a warm one.
+Every step passed in every run. They used the release binaries the Registry set echelon-current pins for linux-x64, each checked against its SHA-256. The runs took 77 s and 76 s with a cold cache, and 32 s with a warm one.
 
 The test found and fixed one real defect. Copying the generator's output over Conditor's repository broke Conditor's `App.slnx`. The generator now layers onto the repository instead, and central package management applies only to the Causa projects.
 

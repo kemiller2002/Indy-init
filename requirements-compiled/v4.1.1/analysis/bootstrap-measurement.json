@@ -10,12 +10,14 @@
     "network": "github.com reachable through the session proxy; no credential set (GH_TOKEN, GITHUB_TOKEN and CONDITOR_GITHUB_TOKEN unset)"
   },
   "tools": {
-    "conditor": "0.10.18 (commit 2d6ae48)",
-    "praxis": "3.24.0 (built from the v3.24.0 tree)",
-    "ordo": "1.19.0 (tag v1.19.0, commit 1e8a957)",
-    "percepta-repo": "0.1.0 (tag percepta-repo-v0.1.0, commit 3027983)",
+    "source": "the release binaries the Registry set echelon-current pins for linux-x64 (channels/echelon-current/linux-x64.json), downloaded from their GitHub releases and checked against the pinned SHA-256; Conditor from its v0.10.18 release, checked against its checksums.txt",
+    "conditor": "0.10.18, conditor-linux-x64 sha256 298f5df4973bc08c6fd15688ca64256afca218ad1af057406439c883d9eecc03",
+    "praxis": "3.24.0, praxis-linux-x64.tar.gz sha256 95f2455cd0afeb9b58db47447ff3588f7e2ad864c9ac8be8ba29077dc742f26c",
+    "ordo": "1.19.0, ordo-linux-x64.tar.gz sha256 2898e8541a2bc2836f3e1efee108f2b05594118b9ca1ecf4464a452c33aa4a36",
+    "percepta-repo": "0.1.0, percepta-repo-linux-x64 sha256 e46113aa08c9d2a97dfb1f75ca65c986946e1601c5f2c5cdcc9e8c25841d6039",
     "generator": "requirements-compiler v41 of this change, with --package requirements-compiled/v4.1.1"
   },
+  "crossCheck": "The same sequence, run with Praxis, Ordo and percepta-repo built from their release tags and Conditor from its source at 2d6ae48, took 71.8 s, 32.3 s and 75.9 s, with every step passing.",
   "steps": [
     {
       "name": "1-git-init",
@@ -54,7 +56,7 @@
     {
       "id": "R1",
       "cache": "cold Conditor cache",
-      "totalSeconds": 71.8,
+      "totalSeconds": 77,
       "steps": [
         {
           "name": "1-git-init",
@@ -63,37 +65,37 @@
         },
         {
           "name": "2-conditor-init",
-          "seconds": 45.18,
+          "seconds": 46.76,
           "exit": 0
         },
         {
           "name": "3-v411-bootstrap",
-          "seconds": 1.03,
+          "seconds": 0.82,
           "exit": 0
         },
         {
           "name": "4-build-Causa",
-          "seconds": 17.02,
+          "seconds": 21.04,
           "exit": 0
         },
         {
           "name": "4-build-App",
-          "seconds": 7.14,
+          "seconds": 6.74,
           "exit": 0
         },
         {
           "name": "5-ci-policy",
-          "seconds": 0.13,
+          "seconds": 0.16,
           "exit": 0
         },
         {
           "name": "6-verify",
-          "seconds": 1.16,
+          "seconds": 1.32,
           "exit": 0
         },
         {
           "name": "7-commit",
-          "seconds": 0.13,
+          "seconds": 0.11,
           "exit": 0
         }
       ]
@@ -101,7 +103,7 @@
     {
       "id": "R2",
       "cache": "warm Conditor cache (same cache as R1)",
-      "totalSeconds": 32.3,
+      "totalSeconds": 31.8,
       "steps": [
         {
           "name": "1-git-init",
@@ -110,37 +112,37 @@
         },
         {
           "name": "2-conditor-init",
-          "seconds": 4.39,
+          "seconds": 5.19,
           "exit": 0
         },
         {
           "name": "3-v411-bootstrap",
-          "seconds": 1.05,
+          "seconds": 1.1,
           "exit": 0
         },
         {
           "name": "4-build-Causa",
-          "seconds": 17.28,
+          "seconds": 17.82,
           "exit": 0
         },
         {
           "name": "4-build-App",
-          "seconds": 7.77,
+          "seconds": 6.13,
           "exit": 0
         },
         {
           "name": "5-ci-policy",
-          "seconds": 0.24,
+          "seconds": 0.17,
           "exit": 0
         },
         {
           "name": "6-verify",
-          "seconds": 1.45,
+          "seconds": 1.23,
           "exit": 0
         },
         {
           "name": "7-commit",
-          "seconds": 0.16,
+          "seconds": 0.11,
           "exit": 0
         }
       ]
@@ -148,7 +150,7 @@
     {
       "id": "R3",
       "cache": "cold Conditor cache",
-      "totalSeconds": 75.9,
+      "totalSeconds": 76.4,
       "steps": [
         {
           "name": "1-git-init",
@@ -157,37 +159,37 @@
         },
         {
           "name": "2-conditor-init",
-          "seconds": 47.3,
+          "seconds": 45.82,
           "exit": 0
         },
         {
           "name": "3-v411-bootstrap",
-          "seconds": 0.98,
+          "seconds": 0.86,
           "exit": 0
         },
         {
           "name": "4-build-Causa",
-          "seconds": 18.74,
+          "seconds": 20.57,
           "exit": 0
         },
         {
           "name": "4-build-App",
-          "seconds": 7.5,
+          "seconds": 7.57,
           "exit": 0
         },
         {
           "name": "5-ci-policy",
-          "seconds": 0.19,
+          "seconds": 0.13,
           "exit": 0
         },
         {
           "name": "6-verify",
-          "seconds": 1.1,
+          "seconds": 1.35,
           "exit": 0
         },
         {
           "name": "7-commit",
-          "seconds": 0.11,
+          "seconds": 0.12,
           "exit": 0
         }
       ]

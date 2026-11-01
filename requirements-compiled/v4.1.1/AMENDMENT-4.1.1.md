@@ -16,13 +16,15 @@ v4.1.1 therefore runs `conditor init` first. The generator then layers onto Cond
 - Central package management applies only to `Causa.*` projects.
 - Any other existing file with different content is refused, and nothing is written.
 
-[analysis/bootstrap-measurement.json](analysis/bootstrap-measurement.json) records three fresh empty repositories:
+[analysis/bootstrap-measurement.json](analysis/bootstrap-measurement.json) records three fresh empty repositories. The tools are the release binaries the Registry set echelon-current pins for linux-x64: Conditor 0.10.18, Praxis 3.24.0, Ordo 1.19.0 and percepta-repo 0.1.0, each checked against its SHA-256.
 
 | Run | Conditor cache | git init | conditor init | generator | build Causa.slnx | build App.slnx | ci-policy | verify | commit | total |
 |---|---|---|---|---|---|---|---|---|---|---|
-| R1 | cold | 0.0 s | 45.2 s | 1.0 s | 17.0 s | 7.1 s | 0.1 s | 1.2 s | 0.1 s | 71.8 s |
-| R2 | warm | 0.0 s | 4.4 s | 1.1 s | 17.3 s | 7.8 s | 0.2 s | 1.5 s | 0.2 s | 32.3 s |
-| R3 | cold | 0.0 s | 47.3 s | 1.0 s | 18.7 s | 7.5 s | 0.2 s | 1.1 s | 0.1 s | 75.9 s |
+| R1 | cold | 0.0 s | 46.8 s | 0.8 s | 21.0 s | 6.7 s | 0.2 s | 1.3 s | 0.1 s | 77.0 s |
+| R2 | warm | 0.0 s | 5.2 s | 1.1 s | 17.8 s | 6.1 s | 0.2 s | 1.2 s | 0.1 s | 31.8 s |
+| R3 | cold | 0.0 s | 45.8 s | 0.9 s | 20.6 s | 7.6 s | 0.1 s | 1.4 s | 0.1 s | 76.4 s |
+
+A cross-check, with tools built from their release tags instead, took 71.8 s, 32.3 s and 75.9 s.
 
 Every step passed in every run. Both solutions built, `conditor ci-policy check` and `conditor verify` passed, and Praxis, Ordo and percepta-repo initialized. Conditor imported 68 requirement documents, 42 from Indy-init@2eee2d5 and 26 from Percepta.
 
