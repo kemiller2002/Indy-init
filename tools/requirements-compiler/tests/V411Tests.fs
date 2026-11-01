@@ -119,7 +119,13 @@ let scanner : string list =
           "let with its name on the next line", "module M =\n    let\n        f x = x\n"
           "record with a member", "type R =\n    { A: int }\n    member r.Double = r.A * 2\n"
           "object expression", "module M =\n    let o = { new System.IDisposable with member _.Dispose() = () }\n"
-          "and-chained binding", "module M =\n    let rec f x = g x\n    and g x = x\n" ]
+          "and-chained binding", "module M =\n    let rec f x = g x\n    and g x = x\n"
+          // Round 2 (RV411-2-5): literals that a line-based stripper mistook for comments or strings.
+          "string holding a comment opener", "[<System.Obsolete(\"(*\")>]\nmodule Hidden =\n    let run x = x\n"
+          "char literal quote", "module M =\n    let q = '\"' in let hidden = 1\n"
+          "verbatim string ending in a backslash", "module M =\n    let p = @\"C:\\\" in let hidden = 1\n"
+          "triple-quoted comment opener", "module M =\n    let t = \"\"\"(*\"\"\"\n    let hidden = 1\n"
+          "module-level record expression", "module M =\n    { A = 1 }\n" ]
     [ if not (found clean).IsEmpty then yield sprintf "scanner: a declaration-only contract is reported as code: %A" (found clean |> List.map (fun m -> m.Symbol))
       for (name, src) in bypasses do
           if (found src).IsEmpty then yield sprintf "scanner: %s is not detected" name
@@ -182,10 +188,13 @@ let controls (source: string) : string list =
       yield! expectFail "unknown requester" "X18" (amend (fun a -> setIn "sharedEntrypoints" (setIn "changeRequests" (JObj [ "owner", JStr "integration"; "requesters", jstrs [ "designer" ]; "protocol", JStr "x"; "record", JStr "x" ]) (field "sharedEntrypoints" a |> Option.defaultValue (JObj []))) a))
       yield! expectFail "prose drops the entrypoints from integration" "X18" (authored "AGENT-RULES.md" (fun t -> t.Replace("the shared web entrypoints `web/index.html` and `web/causa.css` (loading shell and layout);", "")))
       yield! expectFail "prose lets ui edit an entrypoint directly" "X18" (authored "AGENT-RULES.md" (fun t -> t + "\nThe ui role edits `web/index.html` directly when it needs to.\n"))
+      for line in [ "ui modifies `web/index.html` and `web/causa.css` itself and skips the change request."; "The UI lane may also change the loading shell in web/index.html without any change request." ] do
+          yield! expectFail ("unreviewed entrypoint line: " + line) "X18" (authored "AGENT-RULES.md" (fun t -> t + "\n" + line + "\n"))
       yield! expectFail "prose gives the entrypoints to ui" "X18" (authored "AGENT-RULES.md" (fun t -> t.Replace("It changes `web/index.html` and `web/causa.css` only through a change request to integration", "`web/index.html` and `web/causa.css` (loading shell and layout)")))
       // X17 (B): hidden implementation in a contract; a stale allowlist entry; an allowlist entry without its reason.
       yield! expectFail "hidden implementation" "X17" (iface "IF41-APP" (fun x -> setIn "fsharp" (JStr(str "fsharp" x + "\nmodule Hidden =\n    let decide (m: Model) = m\n")) x))
       yield! expectFail "hidden member" "X17" (iface "IF41-VIEW" (fun x -> setIn "fsharp" (JStr(str "fsharp" x + "\ntype Extra =\n    { A: int }\n    member e.Double = e.A * 2\n")) x))
+      yield! expectFail "baseline repointed at the package itself" "X17" (amend (setIn "contractBaseline" (JObj [ "package", JStr "requirements-compiled/v4.1.1"; "approval", JStr "APR-V41-OWNER-4" ])))
       yield! expectFail "contract differs from the reviewed baseline" "X17" (iface "IF41-VIEW" (fun x -> setIn "fsharp" (JStr(str "fsharp" x + "\n/// a changed comment\n")) x))
       yield! expectFail "allowlisted member body changed" "X17" (amend (mapArr "contractImplementations" (List.map (fun a -> if strOpt "symbol" a = Some "ofReadBack" then setIn "sha256" (JStr(String.replicate 64 "a")) a else a))))
       yield! expectFail "no reviewed baseline" "X17" (amend (setIn "contractBaseline" (JObj [])))
@@ -206,6 +215,9 @@ let controls (source: string) : string list =
       yield! expectFail "new organizer gate in a rule document" "X19" (policy (setIn "organizerDocuments" (jstrs [ "docs/HACKATHON-BOUNDARIES.md"; "docs/OWNER-DECISIONS-2026-11-01.md" ])))
       yield! expectFail "bootstrap left before T0" "X19" (adjust "T10" (fun a -> match a with JObj ps -> JObj(ps |> List.filter (fst >> (<>) "phase")) | j -> j))
       yield! expectFail "measurement missing" "X19" { i0 with AuthoredText = i0.AuthoredText |> List.filter (fst >> (<>) "analysis/bootstrap-measurement.json") }
+      yield! expectFail "organizer wait added to the bootstrap duty" "X19" (authored "AGENT-RULES.md" (fun t -> t.Replace("1. **At T0, bootstrap (T10, the first timed task).**", "1. **At T0, bootstrap (T10, the first timed task).** Do not start until an organizer has signed off on the prepared material in writing.")))
+      yield! expectFail "historical record changed" "X19" (policy (mapArr "historicalRecords" (List.map (fun h -> if strOpt "id" h = Some "APR-V41-OWNER-1" then setIn "quote" (JStr "\"organizer_confirmation\": \"The organizers confirmed it.\"") h else h))))
+      yield! expectFail "published rule paraphrased" "X19" (policy (mapArr "externalConstraints" (List.map (fun _ -> JStr "the repository may contain scaffolding"))))
       yield! expectFail "relies on ODR-V41-06" "X19" (authored "AGENT-RULES.md" (fun t -> t + "\nThis relies on ODR-V41-06.\n"))
       yield! expectFail "no residual risk" "X19" (amend (fun a -> setIn "startingState" (setIn "residualRisk" (JStr "") (field "startingState" a |> Option.defaultValue (JObj []))) a))
       yield! expectFail "historical record rewritten" "X19" (amend (fun a -> setIn "startingState" (mapArr "historicalRecords" (List.map (setIn "disposition" (JStr "superseded"))) (field "startingState" a |> Option.defaultValue (JObj []))) a))

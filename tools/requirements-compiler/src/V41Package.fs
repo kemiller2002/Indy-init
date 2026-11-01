@@ -1491,12 +1491,51 @@ let contractFiles (i: Inputs) : (string * string) list =
 /// its full text (the declaring line and every deeper-indented line under it), which the amendment pins by digest.
 type ContractMember = { Scope: string; Symbol: string; Text: string }
 
-/// Comments and string literals removed, line structure kept (so indentation and line numbers still hold).
+/// Comments, string literals and character literals blanked, line structure kept, following the F# lexer's order:
+/// a string or character literal is read before a comment can start, so `"(*"` and `'"'` hide nothing; triple-quoted
+/// and verbatim strings and nested block comments are handled. `(*)` is the multiplication operator, not a comment.
 let private stripCode (text: string) =
-    let t = text.Replace("\r\n", "\n")
-    let noBlock = Regex.Replace(t, @"\(\*[\s\S]*?\*\)", (fun (m: Match) -> String(m.Value |> Seq.filter ((=) '\n') |> Array.ofSeq)))
-    let noStrings = Regex.Replace(noBlock, "\"(?:[^\"\\\\\\n]|\\\\.)*\"", "\"\"")
-    Regex.Replace(noStrings, @"//.*$", "", RegexOptions.Multiline)
+    let s = text.Replace("\r\n", "\n")
+    let n = s.Length
+    let at (i: int) (p: string) = i + p.Length <= n && String.CompareOrdinal(s, i, p, 0, p.Length) = 0
+    let blank (c: char) = if c = '\n' then '\n' else ' '
+    // Returns the index just past the construct that starts at i, or i when none starts there.
+    let rec skipBlock (i: int) (depth: int) =
+        if i >= n then n
+        elif at i "(*" && not (at i "(*)") then skipBlock (i + 2) (depth + 1)
+        elif at i "*)" then (if depth = 1 then i + 2 else skipBlock (i + 2) (depth - 1))
+        else skipBlock (i + 1) depth
+    let rec skipString (i: int) =
+        if i >= n then n
+        elif s.[i] = '\\' then skipString (i + 2)
+        elif s.[i] = '"' then i + 1
+        else skipString (i + 1)
+    let rec skipVerbatim (i: int) =
+        if i >= n then n
+        elif at i "\"\"" then skipVerbatim (i + 2)
+        elif s.[i] = '"' then i + 1
+        else skipVerbatim (i + 1)
+    let skipTriple (i: int) = let e = s.IndexOf("\"\"\"", i, StringComparison.Ordinal) in if e < 0 then n else e + 3
+    let construct (i: int) =
+        if at i "\"\"\"" then Some(skipTriple (i + 3), "\"\"")
+        elif at i "@\"" then Some(skipVerbatim (i + 2), "\"\"")
+        elif s.[i] = '"' then Some(skipString (i + 1), "\"\"")
+        elif s.[i] = '\'' && i + 2 < n && s.[i + 1] <> '\\' && s.[i + 2] = '\'' then Some(i + 3, "' '")
+        elif s.[i] = '\'' && i + 3 < n && s.[i + 1] = '\\' then (let e = s.IndexOf('\'', i + 2) in if e > 0 && e - i <= 8 then Some(e + 1, "' '") else None)
+        elif at i "(*" && not (at i "(*)") then Some(skipBlock i 0, "")
+        elif at i "//" then (let e = s.IndexOf('\n', i) in Some((if e < 0 then n else e), ""))
+        else None
+    let rec go (i: int) (acc: Text.StringBuilder) =
+        if i >= n then acc.ToString()
+        else
+            match construct i with
+            | Some(j, marker) ->
+                // Keep the newlines the construct spanned so line numbers and indentation stay true.
+                let span = s.Substring(i, j - i)
+                let kept = String(span |> Seq.map blank |> Array.ofSeq)
+                go j (acc.Append(if marker = "" then kept else marker + kept.Substring(min kept.Length marker.Length)))
+            | None -> go (i + 1) (acc.Append(s.[i]))
+    go 0 (Text.StringBuilder())
 
 /// The code members of a contract file. A line is declaration only when it begins as a declaration does (namespace,
 /// module, open, type, a union case, a record field or signature `name:`, an attribute, a brace, a type continuation)
@@ -1525,7 +1564,8 @@ let contractImplementations (text: string) : ContractMember list =
             let trimmed = c.Trim()
             let signature = trimmed.StartsWith("abstract", StringComparison.Ordinal)
             let k = if signature then None else (let m = keyword.Match trimmed in if m.Success then Some m.Groups.[1].Value else None)
-            let isCode = k.IsSome || primaryCtor.IsMatch c || not (declStart.IsMatch trimmed)
+            let recordExpression = trimmed.StartsWith("{", StringComparison.Ordinal) && Regex.IsMatch(trimmed, @"[^<>=:]=[^>]")
+            let isCode = k.IsSome || recordExpression || primaryCtor.IsMatch c || not (declStart.IsMatch trimmed)
             let s = scopeRx.Match c
             let scopes' = if s.Success then (ind, s.Groups.[1].Value) :: open' else open'
             if not isCode then go scopes' rest found
@@ -1567,6 +1607,7 @@ let contractClassification (i: Inputs) (contracts: (string * string) list) : Jso
     let implemented = entries |> List.filter (fun (n, _, _, _) -> not (isControl n)) |> List.collect (fun (_, f, _, _) -> f)
     let digest (t: string) = Git.sha256Hex (Text.Encoding.UTF8.GetBytes t)
     let baseline = amendmentField "contractBaseline" i |> sOr "package"
+    let amends = amendmentField "amends" i
     let problems =
         [ for (n, m) in implemented do
               match allowed |> List.tryFind (key >> (=) (n, m.Scope, m.Symbol)) with
@@ -1580,6 +1621,8 @@ let contractClassification (i: Inputs) (contracts: (string * string) list) : Jso
                   yield sprintf "the allowlist entry %s %s.%s needs a rationale and the requirements it enforces" n s m
           // The line scan is a heuristic; the guarantee is that every contract equals its reviewed, approved baseline.
           if baseline = "" then yield "the amendment names no reviewed contract baseline"
+          elif baseline <> sOr "package" amends || sOr "approval" (amendmentField "contractBaseline" i) <> sOr "approval" amends then
+              yield sprintf "the contract baseline %s is not the package the amendment amends (%s, %s)" baseline (sOr "package" amends) (sOr "approval" amends)
           else
               for (path, text) in contracts do
                   match i.ReadSource (baseline + "/" + path) with
@@ -1639,9 +1682,10 @@ let entrypointCheck (i: Inputs) (files: OwnedFile list) : Check =
               let sentence = sOr "ruleSentence" cr
               for (role, owns) in rows do
                   if role <> "integration" && (if sentence = "" then owns else owns.Replace(sentence, "")).Contains p then yield sprintf "AGENT-RULES.md's roles table names %s under %s outside the change-request sentence" p role
+              let reviewed = strs "ruleLinesSha256" spec |> Set.ofList
               for l in rules.Split('\n') do
-                  if l.Contains p && Regex.IsMatch(l, @"\b(directly|edits?|writes?|owns)\b") && Regex.IsMatch(l, @"\b(ui|ui-2|UI role|UI roles|UI agent|UI agents)\b") && not (l.StartsWith("| integration", StringComparison.Ordinal)) && not (l.Contains "never edit" || l.Contains "does not edit" || l.Contains "No two agents") then
-                      yield sprintf "AGENT-RULES.md lets a UI role change %s other than by change request: %s" p (l.Trim().Substring(0, min 120 (l.Trim().Length)))
+                  if l.Contains p && not (reviewed.Contains(Git.sha256Hex (Text.Encoding.UTF8.GetBytes(l.TrimEnd())))) then
+                      yield sprintf "AGENT-RULES.md names %s in a line that is not one of the reviewed lines (sharedEntrypoints.ruleLinesSha256): %s" p (l.Trim().Substring(0, min 120 (l.Trim().Length)))
           if (sOr "ruleSentence" cr) = "" || not (rules.Contains(sOr "ruleSentence" cr)) then yield "AGENT-RULES.md does not carry the change-request sentence the amendment fixes (sharedEntrypoints.changeRequests.ruleSentence)"
           if sOr "owner" cr <> "integration" then yield "change requests to the shared entrypoints must be owned by integration"
           let requesters = strs "requesters" cr
@@ -1670,7 +1714,7 @@ let bootstrapCheck (i: Inputs) : Check =
     let refs = arr "organizerReferences" policy
     let decisions = requestIds i @ [ "OD-INDY-18" ]
     let organizerRx = Regex(@"organi[sz]er", RegexOptions.IgnoreCase)
-    let gateRx = Regex(@"confirm|approv|verif|permission|interpretation", RegexOptions.IgnoreCase)
+    let gateRx = Regex(@"confirm|approv|verif|permission|permit|interpretation|sign[- ]?off|signs? off|signed|wait|until|hold|obtain|\bask", RegexOptions.IgnoreCase)
     let mentions (j: Json) = match j with JObj ps -> ps |> List.exists (fun (_, v) -> match v with JStr s -> organizerRx.IsMatch s && gateRx.IsMatch s | _ -> false) | _ -> false
     let rec walk (j: Json) : Json list = match j with JObj ps -> j :: (ps |> List.collect (snd >> walk)) | JArr xs -> xs |> List.collect walk | _ -> []
     let fromJson (path: string) (select: Json -> string list) =
@@ -1680,15 +1724,17 @@ let bootstrapCheck (i: Inputs) : Check =
     let jsonGates =
         [ fromJson "requirements-compiled/v4/preflight-manifest.json" (fun j -> arr "checks" j |> List.filter mentions |> List.map (str "id"))
           fromJson "requirements-compiled/v4/curation/tasks.json" (fun j -> arr "tasks" j |> List.filter (fun t -> organizerRx.IsMatch(sOr "title" t)) |> List.map (str "id"))
-          fromJson "requirements-compiled/v4/requirements-inventory.json" (fun j -> walk j |> List.filter (fun x -> (strOpt "id" x).IsSome && mentions x) |> List.map (str "id") |> List.distinct) ]
+          fromJson "requirements-compiled/v4/requirements-inventory.json" (fun j -> walk j |> List.filter (fun x -> (strOpt "id" x).IsSome && mentions x) |> List.map (str "id") |> List.distinct)
+          fromJson "requirements-compiled/v4/risk-register.json" (fun j -> arr "risks" j |> List.filter mentions |> List.map (str "id")) ]
     let waiverGates = arr "waivedPrecedences" i.Adjustments |> List.filter (fun w -> (sOr "reason" w).Contains "ODR-V41-06") |> List.map (fun w -> sprintf "waiver %s>%s" (sOr "before" w) (sOr "after" w))
     let docLines =
         strs "organizerDocuments" policy
         |> List.collect (fun d ->
-            match i.ReadSource d with
+            // A package document is read from the package inputs (so a changed AGENT-RULES is seen); others from the source.
+            match i.AuthoredText |> List.tryFind (fst >> (=) d) |> Option.map snd |> Option.orElse (i.ReadSource d) with
             | None -> [ d, 0, "<unreadable>" ]
             | Some t -> t.Split('\n') |> Array.mapi (fun n l -> d, n + 1, l) |> Array.filter (fun (_, _, l) -> organizerRx.IsMatch l && gateRx.IsMatch l) |> List.ofArray)
-    check "X19" "The bootstrap is the first timed task (T0) with a measured duration, every other timed task follows it, no task waits on organizer permission, and the starting-state policy keeps the published rules as external constraints, the historical records unchanged and the residual risk stated"
+    check "X19" "The bootstrap is the first timed task (T0), its duration partly measured and labelled so, every other timed task follows it, every organizer gate the scan finds has a recorded disposition under an owner decision, and the starting-state policy quotes the published rules verbatim, keeps the historical records unchanged and states the residual risk"
         [ match timed |> List.tryFind (fun t -> t.Id = task) with
           | None -> yield sprintf "the bootstrap task %s is not in the timed window" task
           | Some t ->
@@ -1729,8 +1775,15 @@ let bootstrapCheck (i: Inputs) : Check =
               if not (List.contains (sOr "decision" x) decisions) then yield sprintf "organizer reference %s names decision %s, which is neither an owner decision request nor OD-INDY-18" (sOr "id" x) (sOr "decision" x)
           if (strs "externalConstraints" policy).IsEmpty then yield "the starting-state policy quotes no published rule as an external constraint"
           if String.IsNullOrWhiteSpace (sOr "residualRisk" policy) then yield "the starting-state policy does not state the residual interpretation risk"
+          let rulesDoc = sOr "externalConstraintsSource" policy
+          match i.ReadSource rulesDoc with
+          | None -> yield sprintf "the published rules' source %s is not readable" rulesDoc
+          | Some t -> for c in strs "externalConstraints" policy do if not (t.Contains c) then yield sprintf "the external constraint '%s' is not quoted verbatim in %s" c rulesDoc
           for h in arr "historicalRecords" policy do
               if sOr "disposition" h <> "kept unchanged" then yield sprintf "historical record %s must be kept unchanged" (sOr "id" h)
+              match i.ReadSource (sOr "source" h) with
+              | Some t when sOr "quote" h <> "" && t.Contains(sOr "quote" h) -> ()
+              | _ -> yield sprintf "historical record %s no longer reads as recorded in %s" (sOr "id" h) (sOr "source" h)
           if (arr "historicalRecords" policy).IsEmpty then yield "the starting-state policy lists no historical record"
           let docs = sOr "document" policy
           if not (i.AuthoredText |> List.exists (fst >> (=) docs)) then yield sprintf "the starting-state policy document %s is not part of the package" docs

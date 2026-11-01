@@ -324,7 +324,7 @@ let decide repo dryRun (p: Package) =
     let body =
         $"Operator approval {approvalId} in {approvalsPath}, written and committed by the owner.\n\n" +
         (if p.Name = "v4" then "Next (agent): apply the approved amendments in the curation's obligationAmendments, re-pin the approvals commit, recompile, and run a fresh independent review if the plan changed."
-         else "Next (agent): apply these decisions in requirements-compiled/v4.1 (FREEZE.md step 2), recompile v4.1, and run a fresh independent review.")
+         else $"Next (agent): apply these decisions in {p.Dir} (FREEZE.md step 2), recompile {p.Name}, and run a fresh independent review.")
     commitAndPropose repo dryRun $"owner/{p.Name}-decisions-{stamp ()}" title body (render (withApproval approvals approvalId changes))
 
 // ---- approve ---------------------------------------------------------------------------------------------------------
@@ -337,6 +337,9 @@ let approve repo dryRun (p: Package) =
         |> List.filter (fun r -> str r "kind" <> "package-approval" && not (isRecorded (recordedChanges approvals) r))
         |> List.map (fun r -> str r "id")
     if not pending.IsEmpty then say $"""Note: still pending in {p.Name}: {String.Join(", ", pending)}."""
+    // v4.1.1: a requirement conflict must be decided before the package that depends on it is approved.
+    let conflicts = requestsOf repo p |> List.filter (fun r -> str r "kind" = "requirement-conflict" && not (isRecorded (recordedChanges approvals) r)) |> List.map (fun r -> str r "id")
+    if p.Name = "v4.1.1" && not conflicts.IsEmpty then stop $"""decide {String.Join(", ", conflicts)} first (owner-freeze.fsx decide v4.1.1): the package approval depends on it"""
     rule ()
     let change, shown =
         if p.Name = "v4" then

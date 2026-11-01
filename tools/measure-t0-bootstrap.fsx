@@ -41,7 +41,7 @@ let steps =
       "4-build-App", "dotnet", [ "build"; "App.slnx" ]
       "5-ci-policy", "conditor", [ "ci-policy"; "check"; "--target"; "." ]
       "6-verify", "conditor", [ "verify"; "--target"; "." ]
-      "7-commit", "git", [ "-c"; "user.name=t0"; "-c"; "user.email=t0@example.invalid"; "-c"; "commit.gpgsign=false"; "commit"; "-q"; "--allow-empty"; "-m"; "T0 bootstrap" ] ]
+      "7-commit", "git", [ "-c"; "user.name=t0"; "-c"; "user.email=t0@example.invalid"; "-c"; "commit.gpgsign=false"; "commit"; "-q"; "-m"; "T0 bootstrap" ] ]
 
 let run (name: string, program: string, args: string list) =
     let info = ProcessStartInfo(program, WorkingDirectory = target, RedirectStandardOutput = true, RedirectStandardError = true)
@@ -56,14 +56,15 @@ let run (name: string, program: string, args: string list) =
     File.WriteAllText(Path.Combine(target, "..", Path.GetFileName target + "." + name + ".log"), output.Result + errors.Result)
     name, clock.Elapsed.TotalSeconds, p.ExitCode, program + " " + String.Join(" ", args)
 
-// The commit stages everything first; it is the last step, so a failure earlier still leaves the logs.
-let stage () = run ("7a-git-add", "git", [ "add"; "-A" ]) |> ignore
-
+// Step 7 is `git add -A` and `git commit`, timed together as the recorded runs timed them.
 let results =
     steps
     |> List.map (fun ((name, _, _) as step) ->
-        if name = "7-commit" then stage ()
-        run step)
+        if name = "7-commit" then
+            let _, addSeconds, addCode, _ = run ("7-git-add", "git", [ "add"; "-A" ])
+            let n, commitSeconds, commitCode, cmd = run step
+            n, addSeconds + commitSeconds, (if addCode <> 0 then addCode else commitCode), "git add -A && " + cmd
+        else run step)
 
 results |> List.iter (fun (n, s, c, cmd) -> printfn "%s\t%.2f\t%d\t%s" n s c cmd)
 printfn "total\t%.1f" (results |> List.sumBy (fun (_, s, _, _) -> s))
