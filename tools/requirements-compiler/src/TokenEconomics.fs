@@ -51,6 +51,7 @@ type Execution =
       WorkItem: string
       Status: string
       StartedAt: DateTimeOffset option
+      FinalizedAt: DateTimeOffset option
       StartedText: string option
       FinalizedText: string option
       Provider: string
@@ -145,6 +146,7 @@ let parseExecution (file: string) (sha256: string) (record: Json) : Execution =
       WorkItem = textOr notRecorded "workItemId" record
       Status = textOr notRecorded "status" record
       StartedAt = strOpt "startedAt" record |> Option.bind parseTime
+      FinalizedAt = strOpt "finalizedAt" record |> Option.bind parseTime
       StartedText = strOpt "startedAt" record
       FinalizedText = strOpt "finalizedAt" record
       Provider = textOr notRecorded "provider" identity
@@ -213,7 +215,45 @@ let phaseOf (w: Window) (t: DateTimeOffset option) =
     | Some t when t > w.End -> "post-event"
     | Some _ -> "timed"
 
-let private phaseRank = Map [ "pre-event", 0; "timed", 1; "post-event", 2; "unknown", 3 ]
+/// The phase bucket of usage whose span crosses the window start or end. It is assigned to no phase: the records carry
+/// sums without per-request times, so such usage is never split by proportion or duration.
+let unsplit = "unsplit (crosses the window boundary)"
+
+let private phaseRank = Map [ "pre-event", 0; "timed", 1; "post-event", 2; unsplit, 3; "unknown", 4 ]
+
+/// The window boundaries a span from `s` to `f` crosses: those its two ends fall on either side of, by `phaseOf`.
+let crossings (w: Window) (s: DateTimeOffset) (f: DateTimeOffset) =
+    [ if s < w.Start && f >= w.Start then yield "window start"
+      if s <= w.End && f > w.End then yield "window end" ]
+
+/// The phase of usage known to lie between `s` and `f`: the phase of both ends, or `unsplit` when they differ.
+let spanPhase (w: Window) (s: DateTimeOffset, f: DateTimeOffset) =
+    if (crossings w s f).IsEmpty then phaseOf w (Some s) else unsplit
+
+/// The transcript sessions the record dates (rawTelemetry payload startedAt and endedAt both present).
+let private datedSessions (e: Execution) =
+    e.Sessions |> List.choose (fun (snap, s, f) -> match s, f with Some s, Some f -> Some(snap, (s, f)) | _ -> None)
+
+/// The execution's span: startedAt to finalizedAt, widened to every session its record dates, since a measurement of
+/// the whole execution includes those sessions. None when the record has no startedAt or no finalizedAt.
+let executionSpan (e: Execution) =
+    match e.StartedAt, e.FinalizedAt with
+    | Some s, Some f ->
+        let spans = (s, f) :: (datedSessions e |> List.map snd)
+        Some(spans |> List.map fst |> List.min, spans |> List.map snd |> List.max)
+    | _ -> None
+
+/// A measurement's span: its session's, when the record dates that session; otherwise its execution's.
+let measurementSpan (e: Execution) (m: Measurement) =
+    match m.Snapshot |> Option.bind (fun snap -> datedSessions e |> List.tryFind (fst >> (=) snap)) with
+    | Some(_, span) -> Some span
+    | None -> executionSpan e
+
+/// A measurement's phase: by its span when known; otherwise by its collectedAt, else the execution's startedAt.
+let measurementPhase (w: Window) (e: Execution) (m: Measurement) =
+    match measurementSpan e m with
+    | Some span -> spanPhase w span
+    | None -> phaseOf w (match m.CollectedAt with Some t -> Some t | None -> e.StartedAt)
 
 type Excluded = { Measurement: Measurement; Reason: string }
 
@@ -272,10 +312,12 @@ type Row =
 
 let private rowsOf (w: Window) (e: Execution) (counted: Measurement list) : Row list =
     match counted with
-    | [] -> [ { Exec = e; Phase = phaseOf w e.StartedAt; Step = outsideAnyStep; Tokens = Map.empty; ProviderCost = []; Earliest = None } ]
+    | [] ->
+        let phase = match executionSpan e with Some span -> spanPhase w span | None -> phaseOf w e.StartedAt
+        [ { Exec = e; Phase = phase; Step = outsideAnyStep; Tokens = Map.empty; ProviderCost = []; Earliest = None } ]
     | ms ->
         ms
-        |> List.groupBy (fun m -> phaseOf w (match m.CollectedAt with Some t -> Some t | None -> e.StartedAt), defaultArg m.Step outsideAnyStep)
+        |> List.groupBy (fun m -> measurementPhase w e m, defaultArg m.Step outsideAnyStep)
         |> List.map (fun ((phase, step), group) ->
             let tokens =
                 group
@@ -475,28 +517,34 @@ let rules =
       "A transcript snapshot ingested into two executions is counted once, in the ordinally first execution."
       "Provider-reported cost is the sum of observed cost.execution_total; price-table-derived cost prices the token buckets with an operator-supplied table. They are separate figures and are never summed."
       "The runtime's own cost estimate (cost.session_cumulative, quality estimated) is listed per execution and enters neither cost figure."
-      "Phase: a measurement is pre-event, timed or post-event by its collectedAt (else the execution's startedAt) against the competition window; an execution with no measurements is placed by its startedAt."
-      "A transcript session that spans the window start or end is listed under phaseCaveats: its sums carry no per-request times in the record, so its phase is its collection time and it includes usage from the other side of the boundary. It is never split by proportion or duration."
+      "Phase: a measurement is pre-event, timed or post-event by its span against the competition window, both ends inclusive. A measurement of a transcript session the record dates (start and end) spans that session; any other measurement spans its execution, startedAt to finalizedAt, widened to every session the record dates. A measurement with no known span (no finalizedAt) is placed by its collectedAt, else the execution's startedAt; an execution with no measurements is placed by its span, else its startedAt."
+      "A measurement whose span crosses the window start or end is in the phase bucket 'unsplit (crosses the window boundary)', which is assigned to no phase, and its span is listed under phaseCaveats: the record's sums carry no per-request times, so it is never split by proportion or duration. Split a session with praxis telemetry reliability-report --transcripts DIR."
       "Repeated work: every execution of a work item after the first (by startedAt) repeats it." ]
 
-/// Transcript sessions whose span crosses a window boundary: their tokens cannot be split by phase from the record.
+/// The dated sessions, and the executions' own startedAt to finalizedAt, that cross a window boundary: the measurements
+/// they span are in the `unsplit` bucket and cannot be split by phase from the record.
 let private phaseCaveats (w: Window) (execs: Execution list) =
+    let stamp (t: DateTimeOffset) = t.ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture)
     execs
     |> List.collect (fun e ->
-        e.Sessions
-        |> List.choose (fun (snap, s, f) ->
-            let crosses (b: DateTimeOffset) = match s, f with Some s, Some f -> s < b && b <= f | _ -> false
-            let stamp (t: DateTimeOffset option) = t |> Option.map (fun t -> t.ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture))
-            let boundary = [ if crosses w.Start then yield "window start"; if crosses w.End then yield "window end" ]
-            if boundary.IsEmpty then None
-            else
+        let own =
+            match e.StartedAt, e.FinalizedAt with
+            | Some s, Some f -> [ "execution", None, (s, f) ]
+            | _ -> []
+        own @ (datedSessions e |> List.map (fun (snap, span) -> "session", Some snap, span))
+        |> List.choose (fun (kind, snap, (s, f)) ->
+            match crossings w s f with
+            | [] -> None
+            | boundary ->
                 Some(
                     JObj
                         [ "executionId", JStr e.Id
-                          "snapshot", JStr snap
-                          "sessionStartedAt", jopt JStr (stamp s)
-                          "sessionEndedAt", jopt JStr (stamp f)
-                          "spans", jstrs boundary ]
+                          "span", JStr kind
+                          "snapshot", jopt JStr snap
+                          "startedAt", JStr(stamp s)
+                          "endedAt", JStr(stamp f)
+                          "spans", jstrs boundary
+                          "bucket", JStr unsplit ]
                 )))
 
 /// The report over all records. `records` are (file name, SHA-256, parsed record).
@@ -749,11 +797,12 @@ let markdown (report: Json) : string =
         @ (match arr "phaseCaveats" report with
            | [] -> []
            | xs ->
-               [ "Sessions that span a window boundary (reported by collection time, not split):"; "" ]
+               [ sprintf "Spans that cross a window boundary. What they span is in the bucket `%s`, which is assigned to no phase and never split by proportion or duration; `praxis telemetry reliability-report --transcripts DIR` splits a session by its requests' own times:" unsplit; "" ]
                @ (xs
                   |> List.map (fun x ->
-                      sprintf "- %s, %s: %s to %s, spans the %s" (str "executionId" x) (str "snapshot" x)
-                          (defaultArg (strOpt "sessionStartedAt" x) "?") (defaultArg (strOpt "sessionEndedAt" x) "?") (String.concat " and " (strs "spans" x))))
+                      let what = match strOpt "snapshot" x with Some snap -> "session " + snap | None -> "execution"
+                      sprintf "- %s, %s: %s to %s, spans the %s; in `%s`" (str "executionId" x) what
+                          (str "startedAt" x) (str "endedAt" x) (String.concat " and " (strs "spans" x)) (str "bucket" x)))
                @ [ "" ])
         @ table "By work item" (arr "byWorkItem" report)
         @ table "By agent" (arr "byAgent" report)

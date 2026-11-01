@@ -56,8 +56,8 @@
     "A transcript snapshot ingested into two executions is counted once, in the ordinally first execution.",
     "Provider-reported cost is the sum of observed cost.execution_total; price-table-derived cost prices the token buckets with an operator-supplied table. They are separate figures and are never summed.",
     "The runtime's own cost estimate (cost.session_cumulative, quality estimated) is listed per execution and enters neither cost figure.",
-    "Phase: a measurement is pre-event, timed or post-event by its collectedAt (else the execution's startedAt) against the competition window; an execution with no measurements is placed by its startedAt.",
-    "A transcript session that spans the window start or end is listed under phaseCaveats: its sums carry no per-request times in the record, so its phase is its collection time and it includes usage from the other side of the boundary. It is never split by proportion or duration.",
+    "Phase: a measurement is pre-event, timed or post-event by its span against the competition window, both ends inclusive. A measurement of a transcript session the record dates (start and end) spans that session; any other measurement spans its execution, startedAt to finalizedAt, widened to every session the record dates. A measurement with no known span (no finalizedAt) is placed by its collectedAt, else the execution's startedAt; an execution with no measurements is placed by its span, else its startedAt.",
+    "A measurement whose span crosses the window start or end is in the phase bucket 'unsplit (crosses the window boundary)', which is assigned to no phase, and its span is listed under phaseCaveats: the record's sums carry no per-request times, so it is never split by proportion or duration. Split a session with praxis telemetry reliability-report --transcripts DIR.",
     "Repeated work: every execution of a work item after the first (by startedAt) repeats it."
   ],
   "totals": {
@@ -214,7 +214,6 @@
     {
       "key": "timed",
       "executions": [
-        "EXE-20260110T120500000Z-f0000002",
         "EXE-20260110T121000000Z-f0000003",
         "EXE-20260110T123000000Z-f0000004",
         "EXE-20260110T150000000Z-f0000005",
@@ -224,7 +223,7 @@
       "tokens": {
         "input": {
           "availability": "partial",
-          "value": 510,
+          "value": 210,
           "lowerBound": true,
           "unavailableExecutions": [
             "EXE-20260110T121000000Z-f0000003",
@@ -233,7 +232,7 @@
         },
         "output": {
           "availability": "partial",
-          "value": 13200,
+          "value": 4200,
           "lowerBound": true,
           "unavailableExecutions": [
             "EXE-20260110T121000000Z-f0000003",
@@ -242,7 +241,7 @@
         },
         "cacheRead": {
           "availability": "partial",
-          "value": 590000,
+          "value": 190000,
           "lowerBound": true,
           "unavailableExecutions": [
             "EXE-20260110T121000000Z-f0000003",
@@ -251,7 +250,7 @@
         },
         "cacheWrite": {
           "availability": "partial",
-          "value": 30000,
+          "value": 10000,
           "lowerBound": true,
           "unavailableExecutions": [
             "EXE-20260110T121000000Z-f0000003",
@@ -261,7 +260,7 @@
         },
         "total": {
           "availability": "partial",
-          "value": 633710,
+          "value": 204410,
           "lowerBound": true,
           "unavailableExecutions": [
             "EXE-20260110T121000000Z-f0000003",
@@ -273,10 +272,10 @@
       },
       "cost": {
         "providerReported": {
-          "availability": "partial",
-          "amount": "1.250000",
-          "currency": "USD",
-          "lowerBound": true,
+          "availability": "unavailable",
+          "amount": null,
+          "currency": null,
+          "lowerBound": false,
           "unavailableExecutions": [
             "EXE-20260110T121000000Z-f0000003",
             "EXE-20260110T123000000Z-f0000004",
@@ -288,7 +287,7 @@
         },
         "priceTableDerived": {
           "availability": "partial",
-          "amount": "0.300840",
+          "amount": "0.080240",
           "currency": "USD",
           "lowerBound": true,
           "unavailableExecutions": [
@@ -300,17 +299,76 @@
           "basis": "estimated:fixture-prices-not-real@fixture-1/2026-01-01"
         }
       }
+    },
+    {
+      "key": "unsplit (crosses the window boundary)",
+      "executions": [
+        "EXE-20260110T120500000Z-f0000002"
+      ],
+      "tokens": {
+        "input": {
+          "availability": "available",
+          "value": 300,
+          "lowerBound": false,
+          "unavailableExecutions": []
+        },
+        "output": {
+          "availability": "available",
+          "value": 9000,
+          "lowerBound": true,
+          "unavailableExecutions": []
+        },
+        "cacheRead": {
+          "availability": "available",
+          "value": 400000,
+          "lowerBound": false,
+          "unavailableExecutions": []
+        },
+        "cacheWrite": {
+          "availability": "available",
+          "value": 20000,
+          "lowerBound": false,
+          "unavailableExecutions": []
+        },
+        "total": {
+          "availability": "available",
+          "value": 429300,
+          "lowerBound": true,
+          "unavailableExecutions": [],
+          "derivation": "input + output + cacheRead + cacheWrite"
+        }
+      },
+      "cost": {
+        "providerReported": {
+          "availability": "available",
+          "amount": "1.250000",
+          "currency": "USD",
+          "lowerBound": false,
+          "unavailableExecutions": [],
+          "basis": "provider-reported: observed cost.execution_total"
+        },
+        "priceTableDerived": {
+          "availability": "available",
+          "amount": "0.220600",
+          "currency": "USD",
+          "lowerBound": true,
+          "unavailableExecutions": [],
+          "basis": "estimated:fixture-prices-not-real@fixture-1/2026-01-01"
+        }
+      }
     }
   ],
   "phaseCaveats": [
     {
       "executionId": "EXE-20260110T120500000Z-f0000002",
+      "span": "session",
       "snapshot": "fixture-session-2",
-      "sessionStartedAt": "2026-01-10T11:50:00.000Z",
-      "sessionEndedAt": "2026-01-10T13:58:30.000Z",
+      "startedAt": "2026-01-10T11:50:00.000Z",
+      "endedAt": "2026-01-10T13:58:30.000Z",
       "spans": [
         "window start"
-      ]
+      ],
+      "bucket": "unsplit (crosses the window boundary)"
     }
   ],
   "byWorkItem": [
@@ -2119,7 +2177,7 @@
       "startedAt": "2026-01-10T12:05:00.000Z",
       "finalizedAt": "2026-01-10T14:00:00.000Z",
       "phases": [
-        "timed"
+        "unsplit (crosses the window boundary)"
       ],
       "provider": "fixture-provider",
       "model": "fixture-model",
