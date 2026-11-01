@@ -38,7 +38,7 @@ Two files carry reviewed boundary code, seven members in all, each pinned by SHA
 - the credential's `ToString`, `create` and `authorization` (PF-015, INV-21);
 - the confirmation's three accessors and `ofReadBack` (PERSIST-023).
 
-They fix the `Bearer` scheme and exact read-back equality, both of which are requirements. The byte equality with v4.1's reviewed contracts is the guarantee. X17's line scan is a second, heuristic guard. It approximates the F# lexer's reading of strings, characters and comments. The offline suite tests it against the 20 bypass forms the three review rounds found.
+They fix the `Bearer` scheme and exact read-back equality, both of which are requirements. The byte equality with v4.1's reviewed contracts is the guarantee. X17's line scan is a second, heuristic guard. It approximates the F# lexer's reading of strings, characters and comments; comments are read with and without strings inside them, and code that either reading finds is reported. The offline suite tests it against every bypass form the four review rounds found.
 
 ## D. Is file ownership unambiguous?
 
@@ -47,7 +47,7 @@ They fix the `Bearer` scheme and exact read-back equality, both of which are req
 X18 rejects, among other cases, these three:
 
 - another owner or contributor for either file;
-- any AGENT-RULES line that names either file, by path or by file name, and is not one of the four reviewed lines pinned by SHA-256. Prose that refers to the files without naming them is not checked.
+- any AGENT-RULES line that names either file and is not one of the four reviewed lines pinned by SHA-256. The match is by path or by file name, and ignores case, Markdown escapes and code marks. Prose that refers to the files without naming them is not checked.
 
 Nothing in the generated repository enforces ownership technically; there is no CODEOWNERS file.
 
@@ -55,7 +55,7 @@ Nothing in the generated repository enforces ownership technically; there is no 
 
 **The tooling is ready. It depends on the run executing the Praxis ingestion steps.** `requirements-compiler token-economics` produces `evidence/telemetry/token-economics.{json,md}` from Praxis 3.24.0's execution records. It has been verified on a recorded fixture. Usage from a session that crosses the window boundary is kept apart, in an `unsplit` bucket.
 
-Rehearsals 5 and 6 recorded no tokens, because nothing ran Praxis's transcript adapter. The coordinator now owns these steps (AGENT-RULES duty 6), and the runbook in [TOKEN-ECONOMICS.md](TOKEN-ECONOMICS.md) makes them explicit:
+Rehearsals 5 and 6 recorded no tokens, because nothing ran Praxis's transcript adapter. The coordinator now owns these steps (AGENT-RULES, coordinator duty 1), and the runbook in [TOKEN-ECONOMICS.md](TOKEN-ECONOMICS.md) makes them explicit:
 
 - `praxis telemetry ingest` for each session, before the window ends;
 - the report, at completion.
@@ -90,4 +90,4 @@ Two levers would cut actual work without removing a requirement. They are not ap
 
 ## Independent review
 
-See [independent-review.md](../requirements-compiled/v4.1.1/independent-review.md). Rounds 1 to 3 failed, with five, one and one major findings; none was blocking. Each finding has a disposition, and round 4 reviews the fixes.
+See [independent-review.md](../requirements-compiled/v4.1.1/independent-review.md). Rounds 1 to 3 failed, with five, one and one major findings, none of them blocking. Round 4 passed, with three minor findings and two notes. Every finding has a disposition. A short round 5 verifies the round-4 fixes.

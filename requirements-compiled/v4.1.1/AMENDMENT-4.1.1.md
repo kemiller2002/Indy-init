@@ -64,7 +64,7 @@ X17 has three layers:
 
 1. **Baseline equality.** Every contract must equal its file in the reviewed, approved v4.1 package byte for byte. This is the guarantee. The baseline must be the package the amendment amends, with its approval (X20 pins both).
 2. **Pinned members.** Each allowed member's text must match its pinned digest.
-3. **Line scan.** No other code may appear. The scan is a heuristic over lines, not the F# syntax tree. It first blanks strings, character literals and comments in an approximation of the F# lexer, covering strings (including strings inside comments), character literals, verbatim and triple-quoted strings, and nested comments. It then requires every line to begin as a declaration and to carry no code keyword. It catches every form the three review rounds used, 20 in all, and the offline suite tests each one. These include active patterns, `static let`, `do`, bare expressions, record expressions, `use`, one-line types with members, backtick names, chained bindings, and code hidden behind a string, character or verbatim literal.
+3. **Line scan.** No other code may appear. The scan is a heuristic over lines, not the F# syntax tree. It first blanks strings, character literals and comments in an approximation of the F# lexer, covering character literals, verbatim and triple-quoted strings, and nested comments. Comments are read twice, once with strings lexed inside them and once without, and code that either reading finds is reported. It then requires every line to begin as a declaration and to carry no code keyword. It catches every form the four review rounds used, and the offline suite tests each one. It remains a heuristic: the guarantee is layer 1. These include active patterns, `static let`, `do`, bare expressions, record expressions, `use`, one-line types with members, backtick names, chained bindings, and code hidden behind a string, character or verbatim literal.
 
 CI proves that the contracts typecheck and that the negative controls fail to compile. X05 proves that each state machine equals one interface's unions. The bootstrap writes each contract verbatim into its producer's file, and two bootstraps are identical.
 
@@ -78,7 +78,7 @@ X19 scans for organizer gates: a mention of an organizer with a word of approval
 - the DAG waivers that rest on ODR-V41-06;
 - the documents in `startingState.organizerDocuments`: the internal rule documents, the data contract, the domain test matrix, the product requirements, and v4.1.1's own AGENT-RULES, README and FREEZE.
 
-The scan is a heuristic over those sources, not over every file in the repository. Each match must have a recorded disposition (`startingState.organizerReferences`, 29 entries). No obligation is claimed met. These conflict with the owner's instruction, and an agent may not set them aside:
+The scan is a heuristic over those sources, not over every file in the repository. It looks for a list of words, and a gate worded without any of them is not found. Each match must have a recorded disposition (`startingState.organizerReferences`, 29 entries). No obligation is claimed met. These conflict with the owner's instruction, and an agent may not set them aside:
 
 - ADRP-016-O2 ("subject to organizer approval", a must obligation) and its readiness-checklist form;
 - STORAGE-008-O1 and the data contract's §10.8;
@@ -102,7 +102,7 @@ The historical records (ODR-V41-06, APR-V41-OWNER-1 and the quoted published rul
 
 ## D. Token economics from Praxis
 
-The report is produced from Praxis 3.24.0's own telemetry records ([docs/TOKEN-ECONOMICS.md](../../docs/TOKEN-ECONOMICS.md)), and the offline suite verifies it with a recorded fixture. The coordinator owns the ingestion and the report (AGENT-RULES duty 6): Rehearsals 5 and 6 recorded no tokens because no role was assigned to it. Usage from a session whose span crosses the window start or end goes into an `unsplit` bucket, never into timed or pre-event.
+The report is produced from Praxis 3.24.0's own telemetry records ([docs/TOKEN-ECONOMICS.md](../../docs/TOKEN-ECONOMICS.md)), and the offline suite verifies it with a recorded fixture. The coordinator owns the ingestion and the report (AGENT-RULES, coordinator duty 1): Rehearsals 5 and 6 recorded no tokens because no role was assigned to it. Usage from a session whose span crosses the window start or end goes into an `unsplit` bucket, never into timed or pre-event.
 
 ## E. One owner for the shared web entrypoints
 
@@ -113,7 +113,7 @@ Applying the requests costs integration time. T17, integration's first checkpoin
 What enforces the ownership:
 
 - X18 and X02 reject any other owner or contributor in the manifest.
-- AGENT-RULES may name the files only in four reviewed lines, each pinned by SHA-256: the integration row, the ui row with its fixed change-request sentence, duty 4, and the Forma rule. Any other line that names either file, by path or by file name, fails X18. Prose that refers to the files without naming them is not checked.
+- AGENT-RULES may name the files only in four reviewed lines, each pinned by SHA-256: the integration row, the ui row with its fixed change-request sentence, duty 4, and the Forma rule. Any other line that names either file, by path or by file name, fails X18. The match ignores case, Markdown escapes and code marks. Prose that refers to the files without naming them is not checked.
 - Nothing in the generated repository enforces it (there is no CODEOWNERS file). The agent rules do.
 
 ## Schedule

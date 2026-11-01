@@ -21,7 +21,10 @@ These rules apply during the timed build. The authority on who owns which file i
 3. **Merge qualifying pull requests in order.** Run the contract tests (`Causa.Contract.Tests`) and the state-machine tests on each merge.
 4. **Be the only writer of shared files.** Another role that needs a shared change asks integration, which makes it in one pull request. For the shared web entrypoints `web/index.html` and `web/causa.css` (integration's, check X18), a UI role opens a change request: a Praxis work item owned by integration whose title starts with `CR-` and names the file, the exact change and the task it serves. Integration applies it in its own pull request, in order, and the requesting role reviews it. No two agents edit these files concurrently.
 5. **Record coordination telemetry as it happens** (see [analysis/conflict-telemetry.json](analysis/conflict-telemetry.json)): every conflicting merge, its resolution time, and every reverted integration.
-6. **Token usage is the coordinator's** ([docs/TOKEN-ECONOMICS.md](../../docs/TOKEN-ECONOMICS.md)). At T0 the coordinator runs `praxis telemetry adapters`. Before each execution's `work complete`, the agent that ran it ingests its own session transcript with `praxis telemetry ingest`. The coordinator ingests the main session at the merge freeze, before the deadline, and checks that every execution has an ingest. At completion it runs `requirements-compiler token-economics` and commits `evidence/telemetry/token-economics.{json,md}`. A missing ingest is a process defect; a report that says the provider gave no usage is not.
+
+## Coordinator duties
+
+1. **Token usage is the coordinator's** ([docs/TOKEN-ECONOMICS.md](../../docs/TOKEN-ECONOMICS.md)). At T0 the coordinator runs `praxis telemetry adapters`. Before each execution's `work complete`, the agent that ran it ingests its own session transcript with `praxis telemetry ingest`. The coordinator ingests the main session at the merge freeze, before the deadline, and checks that every execution has an ingest. At completion it runs `requirements-compiler token-economics` and commits `evidence/telemetry/token-economics.{json,md}`. A missing ingest is a process defect; a report that says the provider gave no usage is not.
 
 ## Rules
 

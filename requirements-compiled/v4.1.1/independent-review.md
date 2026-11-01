@@ -2,6 +2,139 @@
 
 The reviews are independent: each was run by an agent that did not write the package, read-only, with instructions to challenge it. A failed review is recorded as failed. [analysis/independent-review.json](analysis/independent-review.json) holds the latest round, with each finding's disposition.
 
+## Round 4: PASS
+
+Reviewed commit 168cdae. No blocking or major finding; three minor findings and two notes. Each is fixed after the review, as the table says, and a short round 5 verifies those fixes.
+
+| Finding | Severity | Disposition |
+|---|---|---|
+| RV411-4-1 | minor | Fixed: the regression came from my round-3 change. Comments are now read twice, with and without strings lexed inside them, and code that either reading finds is reported, so hidden code must evade both. The five round-4 forms and R3f are offline controls. The documents call the scan a heuristic, with byte equality as the guarantee. |
+| RV411-4-2 | minor | Fixed: X18 matches the file names case-insensitively, after removing Markdown escapes and code marks. Index.html, Causa.css and index\.html are offline controls. |
+| RV411-4-3 | minor | Fixed: the gate words include response, go-ahead, pending, clearance and blessing, and 'organizing committee' counts as an organizer. 'T10 requires an organizer response' is an offline control. V411-C and the documents call X19 a heuristic over named sources and a word list, and say a gate worded without those words is not found. |
+| RV411-4-4 | note | Fixed: the amendment pins docs/TOKEN-ECONOMICS.md by SHA-256 (pinnedDocuments, checked by X20). It is pinned rather than included as a package document because it names earlier rehearsal repositories, which X11 rejects in package documents. Token usage is the first item of a new 'Coordinator duties' section of AGENT-RULES. |
+| RV411-4-5 | note | Fixed: the T14 rationale's sentence about the organizers is marked superseded in v4.1.1 and points to ODR-V411-02 and STARTING-STATE. |
+
+### The reviewer's report (round 4)
+
+
+**Package:** requirements-compiled/v4.1.1  
+**Commit:** 168cdae (branch claude/v411-amendment)  
+**Verdict: PASS**
+
+No blocking or major finding. Every round-3 disposition except RV411-3-4 is verified, and RV411-3-4's documentation part is done. However, its code change regressed the X17 heuristic: a character literal holding a double quote inside a block comment (round 3's own probe R3f, detected at 4867673) now hides the code after it, and so do verbatim and triple-quoted strings inside comments. Two other heuristics are still described more broadly than they behave: X18 matches file names case-sensitively and literally, and amendment.json V411-C says X19 'lists every organizer reference'. These are three minor findings. There are two notes. v4.1 is byte-unchanged and its approval digest still matches. No approval was fabricated, and no obligation is claimed met. Topology C is a feasible 354 + 65 = 419 of 420. Every check (X01 to X20) passes, and the offline suite passes.
+
+#### What was run
+
+- Scratch clone /tmp/claude-0/review411-r4/repo at 168cdae, with origin/main set to 3f5d062 as in the main repository
+- dotnet build tools/requirements-compiler/src -c Release: Build succeeded, 0 warnings, 0 errors
+- v41 --check for v4.1.1: X01 to X20 PASS, validation PASS, CANDIDATE (log: check-v411.log)
+- v41 --check for v4.1: X01 to X16 PASS, validation PASS. sha256 of v4.1/package-manifest.json is 779916ab...31736a, which equals APR-V41-OWNER-4's manifest_sha256 (log: check-v41.log)
+- Offline suite (dotnet run --project tools/requirements-compiler/tests -c Release -- --offline --source .): 'all passed', exit 0 (log: offline-suite.log)
+- git diff 3f5d062..168cdae on requirements-compiled/v4, requirements-compiled/v4.1 and kickoff/: empty
+- Package manifests of v4.1 (40 files) and v4.1.1 (45 files): every sha256 matches, and no file is missing or unlisted
+- Bootstrap of HEAD into an empty git directory (boot/t): 178 files, all owned in agent-file-ownership.json. The F# test files hold only a header and a namespace; the one executable module is tests/browser/support/layout-assertions.mjs (979 lines). Each src contract file equals its v4.1 contract plus a one-line header
+- X17 probes (scripts/x17r4.fsx) against the HEAD build and the 4867673 build (scripts/x17r4-old.fsx). The forms not detected at HEAD were compiled with the real F# compiler under TreatWarningsAsErrors, with a second file calling P.Evil.run (fsprobe/proj-R3f, proj-R4a to proj-R4d: Build succeeded, 0 warnings)
+- The probe scripts of rounds 1 to 3 were re-run against the HEAD build. Every round-1 form is detected. R2f, R2g and R2i are still not detected; round 2 accepted these. R3b and R3c do not compile in F# (FS0039). R3d is not detected, as disclosed. R3f is not detected (a regression)
+- Mutations, each regenerated and then run with --check: mutX18 (case and markdown-escape variants of the file names: X18 PASS); mutX19 (AGENT-RULES duty 1 says T10 'requires an organizer response' and waits for the 'organising committee', and HACKATHON-BOUNDARIES says 'needs an organizer reply ... blocked pending the organizers' go-ahead': X19 PASS); mutX19b (round 3's 'consent' line: X19 FAIL, as fixed); mutX17 (drift in v4.1/contracts: X17 FAIL)
+- An independent check of the topology C schedule: every slot's duration equals its estimate, no slot starts before its dependencies finish, no lane holds two slots at once, and the makespan is 354. Only T17's estimate differs from v4.1's (15 to 20), plus the new T10 (29)
+
+#### Round-3 dispositions
+
+| ID | Verified | Note |
+|---|---|---|
+| RV411-3-1 | yes | The ADRP-016-O2 disposition now states both clauses and claims neither met. It names what T0 writes, including the layout-assertion module, the Conditor scaffold and the requirements import, and leaves the transfer question to ODR-V411-02. ODR-V411-02's question quotes both clauses. A scan of all 29 organizerReferences dispositions for holds/met/satisfies/compliant/passes finds only negated or deferred forms ('not claimed met', 'whether ... satisfies it is the open question', 'Its own check decides whether it passes; nothing is claimed here'). |
+| RV411-3-2 | yes | The DOMAIN-TEST-MATRIX disposition, STARTING-STATE 'At T0' and the ODR-V411-02 question all name tests/browser/support/layout-assertions.mjs as pre-written executable test code. A bootstrap of HEAD confirms it: 979 lines, and every F# test file is a header plus a namespace. amendment.json's residualRisk lists 'the layout assertions'. |
+| RV411-3-3 | yes | entrypointCheck now matches the bare file name as well as the path, and offline controls cover round 2's 'in index.html' line and 'ui keeps causa.css'. AMENDMENT E and READINESS D state the limit (prose that does not name the files is not checked). Residual: the match is case-sensitive and literal, so 'Index.html', 'Causa.css' and the markdown-escaped 'index\.html' pass (RV411-4-2). |
+| RV411-3-4 | **no** | Partly. R3h is detected. R3i no longer crashes. Both are offline controls, and the documents now say the stripper approximates the F# lexer. But skipBlock now opens a string at every '"' inside a comment. F# lexes character, verbatim and triple-quoted literals inside comments too, so a comment holding '"' (round 3's probe R3f), '\"', @"\" or """\""" now hides the code that follows. The 4867673 scanner detected all five forms. The disposition's 'as F# does' holds only for plain strings (RV411-4-1). |
+| RV411-3-5 | yes | STARTING-STATE now says the quoted published rules are unchanged and that two other lines of the section were rewritten under OD-INDY-18. git diff 3f5d062..HEAD shows exactly two changed lines in 'Published rule verification' (98, 106). The other edits are in other sections and each has a disposition. |
+| RV411-3-6 | yes | AGENT-RULES duty 6 gives token ingestion and the report to the coordinator, a declared role that owns evidence/ in agent-file-ownership.json. Each agent ingests its own session before its work is complete. The coordinator ingests the main session before the deadline, checks that every execution has an ingest, and commits the report. AMENDMENT D and READINESS E agree. Residuals are in RV411-4-4. |
+| RV411-3-7 | yes | gateRx now includes consent\|authori[sz]\|agree. Round 3's 'consent' line in AGENT-RULES duty 1 now fails X19 (mutX19b). Other waiting vocabulary is still missed (RV411-4-3). |
+| RV411-3-8 | yes | FREEZE.md says rounds 1 to 3 failed and points to analysis/independent-review.json for the latest round. READINESS says the same. The committed round-3 JSON is faithful to the reviewer's output: every finding, disposition and challenge is identical, with only 'disposition' fields added. |
+| RV411-3-9 | yes | Checked by code inspection. contractClassification reads <baseline>/package-manifest.json's files map and requires each baseline contract's sha256 to match it, and X20 pins that manifest's bytes. X17 passes at HEAD, so every lookup succeeds. Contract drift in v4.1/contracts fails X17 (mutX17). The digest branch itself could not be isolated, because regeneration rewrites the v4.1.1 contracts. |
+
+#### Findings
+
+| ID | Severity | Area |
+|---|---|---|
+| RV411-4-1 | minor | B: X17 stripper regression (round-3 fix) |
+| RV411-4-2 | minor | E: X18 file-name match is case-sensitive and literal |
+| RV411-4-3 | minor | C: X19 described as complete in the amendment record; waiting vocabulary still missed |
+| RV411-4-4 | note | D: ingestion procedure sits outside the approved package |
+| RV411-4-5 | note | Docs: carried organizer premise in the T14 rationale |
+
+##### RV411-4-1 (minor): B: X17 stripper regression (round-3 fix)
+
+The RV411-3-4 fix makes skipBlock treat every double quote inside a block comment as the start of a regular string. The F# lexer also recognizes character literals, verbatim strings and triple-quoted strings inside comments, so the stripper now runs a 'string' past the end of the comment and blanks real code. Five forms that the 4867673 scanner detected are now missed. One is R3f, round 3's own probe, '(* '"' *)' followed by a module with a let. The others are R4a 'type T = | A (* '"' *)', R4b '(* @"\" *)', R4c '(* """\""" *)' and R4d '(* '\"' *)', each followed by 'module Evil =' and '    let run () = System.Environment.Exit 3 // " *)'. Each compiles with TreatWarningsAsErrors, and P.Evil.run can be called from another file. contractImplementations reports nothing for any of them. AMENDMENT B says the scan covers 'strings (including strings inside comments), character literals, verbatim and triple-quoted strings' and 'catches every form the three review rounds used'. The RV411-3-4 disposition says a string in a comment is lexed 'as F# does'. Neither statement holds for these forms. Impact is limited: the committed contracts are byte-identical to v4.1, they hold only the 7 allowlisted members, and byte equality remains the guarantee.
+
+**Evidence.** tools/requirements-compiler/src/V41Package.fs stripCode, skipBlock ('elif s.[i] = '"' then skipBlock (skipString (i + 1)) depth'); /tmp/claude-0/review411-r4/scripts/x17r4.fsx (HEAD: R3f, R4a-R4d NOT DETECTED) and x17r4-old.fsx (4867673: all five detected); /tmp/claude-0/review411-r4/fsprobe/proj-R3f, proj-R4a..proj-R4d ('Build succeeded. 0 Warning(s)'); requirements-compiled/v4.1.1/AMENDMENT-4.1.1.md:67; independent-review.md RV411-3-4 disposition; tools/requirements-compiler/tests/V411Tests.fs scanner (no control for these forms)
+
+**Remediation.** Inside skipBlock, skip character literals (including '"' and '\"'), verbatim @"..." and triple-quoted """...""" literals with their own rules, as the F# lexer does. Add R3f and R4a to R4d as offline controls. Otherwise, say that strings inside comments are approximated and that literals other than plain strings inside comments are not handled.
+
+##### RV411-4-2 (minor): E: X18 file-name match is case-sensitive and literal
+
+AMENDMENT E says 'Any other line that names either file, by path or by file name, fails X18', and READINESS D says the same. entrypointCheck uses l.Contains p || l.Contains fileName, which is ordinal and case-sensitive. Two lines were appended to AGENT-RULES. One was 'The UI lane may also change the loading shell in Index.html and the stylesheet Causa.css without any change request.' The other was 'Either UI role may also edit the web entrypoint files (index\.html, causa\.css) directly when integration is busy; no change request is needed.' The markdown escape renders as 'index.html'. After regeneration, --check gives X18 PASS and validation PASS. Both lines name the files by file name, and the second one renders the exact name. The manifest stays authoritative, and AGENT-RULES says 'the manifest wins', so this is a prose-lint overclaim of the kind recorded in RV411-3-3.
+
+**Evidence.** tools/requirements-compiler/src/V41Package.fs entrypointCheck ('(l.Contains p || l.Contains fileName)'); /tmp/claude-0/review411-r4/mutX18 and mutX18.check.log (X18 PASS, validation PASS); requirements-compiled/v4.1.1/AMENDMENT-4.1.1.md:116; docs/READINESS-V4.1.1.md:50
+
+**Remediation.** Match case-insensitively after removing markdown escapes, backticks and emphasis, for example after normalising '\.' to '.'. Otherwise, reword the claim to 'any line containing the literal path or file name'. Add a case-variant control.
+
+##### RV411-4-3 (minor): C: X19 described as complete in the amendment record; waiting vocabulary still missed
+
+amendment.json's V411-C summary, which is part of what ODR-V411-01 approves, says 'X19 lists every organizer reference with its disposition'. AMENDMENT C, STARTING-STATE and ODR-V411-02 describe X19 more accurately, as a heuristic that lists every gate 'the scan finds'. The scan still misses common waiting forms. In mutX19, AGENT-RULES duty 1, T10's own instruction, was changed to 'Start this step only once the organising committee has cleared the prepared material, and T10 requires an organizer response before it begins'. HACKATHON-BOUNDARIES received 'The integration agent needs an organizer reply before T10 starts; T10 is blocked pending the organizers' go-ahead.' X19 passes and validation passes. 'requires an organizer response' is the wording that OD-INDY-18 forbids. 'organising' does not match organi[sz]er. The heuristic itself is disclosed; the unqualified V411-C sentence is the overclaim.
+
+**Evidence.** requirements-compiled/v4.1.1/analysis/amendment.json changes V411-C summary (introduced in 22ec882); V41Package.fs bootstrapCheck organizerRx and gateRx; /tmp/claude-0/review411-r4/mutX19 and mutX19.check.log (X19 PASS, validation PASS); docs/OWNER-DECISIONS-2026-11-01.md OD-INDY-18 ('does not require an organizer response')
+
+**Remediation.** Reword V411-C to 'X19 lists every organizer gate its scan finds, each with a disposition'. Add require|response|reply|pending|go-ahead|clear|block to gateRx, and organi[sz](?:er|ing|ation) to organizerRx, or state the exact word list.
+
+##### RV411-4-4 (note): D: ingestion procedure sits outside the approved package
+
+Duty 6 assigns ingestion correctly. However, it delegates the operative procedure (adapter name, input paths, the subagent execution flags, the report command) to docs/TOKEN-ECONOMICS.md. That file is neither in package-manifest.json nor pinned by digest in amendment.json. ODR-V411-01's digest therefore does not fix the runbook the coordinator must follow, as RV411-1-14 already noted. Duty 6 also sits in the 'Integration agent duties' list, although it assigns the coordinator and every agent. The main session is ingested at the merge freeze, so its usage after that point is not recorded. If that session started before T0, the report puts all of its usage in the unsplit bucket. TOKEN-ECONOMICS.md discloses this.
+
+**Evidence.** requirements-compiled/v4.1.1/AGENT-RULES.md:24 (duty 6 under 'Integration agent duties'); package-manifest.json files (no docs/TOKEN-ECONOMICS.md); analysis/amendment.json documents ['STARTING-STATE.md','AMENDMENT-4.1.1.md']; docs/TOKEN-ECONOMICS.md:41-42
+
+**Remediation.** Pin docs/TOKEN-ECONOMICS.md by sha256 in amendment.json, or copy the runbook into the package. Move duty 6 to a 'Coordinator duties' heading.
+
+##### RV411-4-5 (note): Docs: carried organizer premise in the T14 rationale
+
+analysis/task-adjustments.json T14 still reads 'This rests on the owner's statement that the organizers allow pre-kickoff scaffolding (ODR-V41-06).' This is v4.1's sentence. It matches the ODR-V41-06 historical quote, and the waiver dispositions correctly send the premise to ODR-V411-02. But it carries no 'superseded' marker, although the identical sentence in optimization-report.md:41 has one. v4.1.1 also does no pre-kickoff scaffolding: it writes nothing before T0, and only the contracts are authored before kickoff. The sentence sits uneasily with STARTING-STATE's 'does not restate ... what the organizers said'.
+
+**Evidence.** requirements-compiled/v4.1.1/analysis/task-adjustments.json:36; optimization-report.md:41; analysis/amendment.json organizerReferences 'waiver T13>T14'
+
+**Remediation.** Reword it to 'The waiver rests on ODR-V41-06 as recorded; whether it stands is ODR-V411-02', or mark the sentence as v4.1's.
+
+#### Challenges
+
+**1. Does the application start empty?**  
+*YES (disclosed).* Nothing is written to the competition repository before T0. CI, the measurement and this review's bootstrap all use throwaway directories. At T0 the order is git init, then conditor init (the scaffold and 68 requirement documents, 42 of them from Indy-init commit 2eee2d5), then the generator. A bootstrap of HEAD writes 178 files: the 9 contract files, each equal to its v4.1 contract plus a header, with the 7 boundary members; empty namespaces; build files; and the 979-line layout-assertion module. STARTING-STATE, residualRisk, the DOMAIN-TEST-MATRIX disposition and ODR-V411-02 now all disclose the module.
+
+**2. Is there hidden implementation in the contracts?**  
+*NO (contracts clean); the X17 line scan regressed.* diff -r shows v4.1/contracts and v4.1.1/contracts are identical, and X17 enforces this. The code-bearing lines are exactly the 7 allowlisted members: Credential ToString, create and authorization; Confirmation's three accessors and ofReadBack. 99-Usage is the compile control. The heuristic scan now misses a quote-character, verbatim or triple-quoted literal inside a comment, which it caught at 4867673 (RV411-4-1). Byte equality remains the guarantee.
+
+**3. Does topology C fit in 420 minutes?**  
+*YES, by 1 minute.* An independent check of schedule.json's C lanes finds every duration equal to its estimate, every dependency respected and no lane overlap. The makespan is 354, plus RES-INTEGRATION 20 and RES-FINAL 45, for a total of 419 of 420. The lane-free critical path is 334 (T10-T14-T13-T17-T22-T28-T31-T32-T33-T34). Against v4.1, the only estimate change is T17 from 15 to 20 (change-request time), plus T10 at 29. The sensitivity figures check out: T10 x2 gives 448 (419+29), T17 at 25 gives 424, and T10 at 44 gives 434. Any overrun on the binding chain of more than 1 minute breaks the fit, and the documents say so.
+
+**4. Is the bootstrap time labelled honestly?**  
+*YES.* T10 is 'measured+estimated', with measuredMinutes 2 and estimatedMinutes 27. The 2 measured minutes come from runs of 77, 32 and 76 s with the Registry-pinned binaries, a cold Conditor cache and a warm NuGet cache. The 27 estimated minutes cover repo create and push (2), shared-file authoring (15) and the first CI run (10). ODR-V411-01, AMENDMENT, READINESS and AGENT-RULES all say partly measured. The measurement script tools/measure-t0-bootstrap.fsx is committed.
+
+**5. Is the token telemetry complete, and does a role own its ingestion?**  
+*YES, with notes.* AGENT-RULES duty 6 gives ingestion and the report to the coordinator, a declared role that owns evidence/. Each agent ingests its own session before its work is complete, and the coordinator checks that every execution has an ingest. The report logic passes the fixture tests in the offline suite. The runbook it relies on is outside the approved package. Main-session usage after the merge freeze is not recorded, and TOKEN-ECONOMICS.md discloses that (RV411-4-4).
+
+**6. Does the ownership manifest match the files?**  
+*YES.* package-manifest.json lists 45 files, and every sha256 matches; no file is missing or unlisted. In agent-file-ownership.json, web/index.html and web/causa.css are owned by integration with no contributors, no path appears twice, and every one of the 178 bootstrapped files has an owner. The prose lint (X18) is narrower than described (RV411-4-2).
+
+**7. Is any P0 requirement weakened?**  
+*NO.* preservation-report.json, verification-execution-plan.json, state-machine-contracts.json, contracts/ and layout-tests/ are byte-identical to v4.1, and X10 passes. requirements-compiled/v4 is unchanged against 3f5d062. No obligation text changed.
+
+**8. Do the documents contradict the execution plan?**  
+*NO material contradiction.* STARTING-STATE, AGENT-RULES, AMENDMENT, READINESS, FREEZE, ODR-V411-01/02 and amendment.json agree with the DAG, the schedule and the bootstrap output. Remaining differences are wording only: the X17, X18 and X19 descriptions are broader than the checks (RV411-4-1 to 4-3), and the carried T14 rationale (RV411-4-5).
+
+**9. Is v4.1 unchanged?**  
+*YES.* git diff 3f5d062..168cdae is empty for requirements-compiled/v4, requirements-compiled/v4.1 and kickoff/. The sha256 of v4.1's package-manifest.json is 779916ab...31736a, equal to APR-V41-OWNER-4's manifest_sha256. All 40 per-file digests match, and v41 --check of v4.1 passes.
+
+**10. Is any approval fabricated, or any obligation claimed met in whole or in part?**  
+*NO.* approvals.causa.json has no ODR-V411 record. The manifest, README and FREEZE read CANDIDATE, with ODR-V411-02 and ODR-V411-01 pending, and the round-4 diff touches no decision record. None of the 29 dispositions claims an obligation met; ADRP-016-O2 now names both clauses as not claimed. PRE-REQ-04 and PRE-TOOL-03 accept an owner record and are left to their own checks.
+
+
 ## Round 3: FAIL
 
 Reviewed commit 4867673. One major finding, five minor and three notes; none blocking. Every one has a disposition below, and round 4 reviews the fixes.

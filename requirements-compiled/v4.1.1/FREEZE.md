@@ -1,6 +1,6 @@
 # v4.1.1 freeze procedure
 
-**Status: CANDIDATE.** v4.1.1 is the successor amendment of v4.1 ([AMENDMENT-4.1.1.md](AMENDMENT-4.1.1.md), [analysis/amendment.json](analysis/amendment.json)). It is compiled and validated, with checks X01–X20 passing. It is not approved and not frozen; [package-manifest.json](package-manifest.json) always reads `CANDIDATE`. Its independent review record is in [independent-review.md](independent-review.md): rounds 1 to 3 failed, and every finding is dispositioned there; the latest round is in analysis/independent-review.json. Two owner decisions are pending: ODR-V411-02 (the organizer-approval obligations) and ODR-V411-01 (the package approval).
+**Status: CANDIDATE.** v4.1.1 is the successor amendment of v4.1 ([AMENDMENT-4.1.1.md](AMENDMENT-4.1.1.md), [analysis/amendment.json](analysis/amendment.json)). It is compiled and validated, with checks X01–X20 passing. It is not approved and not frozen; [package-manifest.json](package-manifest.json) always reads `CANDIDATE`. Its independent review record is in [independent-review.md](independent-review.md): rounds 1 to 3 failed and round 4 passed; every finding is dispositioned there, and the latest round is in analysis/independent-review.json. Two owner decisions are pending: ODR-V411-02 (the organizer-approval obligations) and ODR-V411-01 (the package approval).
 
 ## Dependency on v4 and v4.1
 

@@ -33,7 +33,7 @@
           "reason": "the frozen contracts (interface-specifications.json) are copied into each project's Contracts file and typechecked; they need the empty projects, not the kernel's implementation"
         }
       ],
-      "rationale": "No estimate change: the types exist before kickoff, but each producer commits its contract block and writes its producer contract tests here, and the consumers start their consumer contract tests. T14 no longer waits for the kernel (T13): the contracts fix the types and the kernel implements them; IF41-DOMAIN's producer tests that need the kernel (DecideIsTotalOverCommands, FrozenFixturesReplay) are completed in T13 and T15. This rests on the owner's statement that the organizers allow pre-kickoff scaffolding (ODR-V41-06).",
+      "rationale": "No estimate change: the types exist before kickoff, but each producer commits its contract block and writes its producer contract tests here, and the consumers start their consumer contract tests. T14 no longer waits for the kernel (T13): the contracts fix the types and the kernel implements them; IF41-DOMAIN's producer tests that need the kernel (DecideIsTotalOverCommands, FrozenFixturesReplay) are completed in T13 and T15. This rests on the owner's statement that the organizers allow pre-kickoff scaffolding (ODR-V41-06). (v4.1's text, superseded in v4.1.1: the contracts are materialized at T0, and whether this rests on ODR-V41-06 without its organizer premise is the owner's decision ODR-V411-02; see STARTING-STATE.md.)",
       "evidence": "estimated"
     },
     {
