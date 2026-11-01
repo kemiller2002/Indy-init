@@ -202,6 +202,23 @@
           ]
         }
       ]
+    },
+    {
+      "id": "APR-V41-OWNER-4",
+      "authority": {
+        "kind": "operator",
+        "id": "kemiller2002"
+      },
+      "date": "2026-11-01",
+      "changes": [
+        {
+          "decision_id": "ODR-V41-01",
+          "action": "approve-package",
+          "package": "requirements-compiled/v4.1",
+          "manifest_sha256": "779916abe4b7c1351fd7752d648721cba61bb4eee6a8aa779a20d47bcc31736a",
+          "review_sha256": "fee006995d2c2d1d2c6b6b2a772981f294ec73444810a665bf8f99db0243c2be"
+        }
+      ]
     }
   ]
 }
