@@ -387,5 +387,126 @@ class VerdictTests(unittest.TestCase):
         self.assertTrue(result["claim_problems"])
 
 
+class PreflightTests(unittest.TestCase):
+    """Pre-T0 trust preflight: the same baseline and approval rules acceptance applies."""
+
+    def preflight(self, fixture, operator="repository-owner"):
+        command = [
+            "python3", "-I", str(TOOL), "--preflight",
+            "--baseline", str(fixture.baseline_path),
+            "--baseline-sha256", fixture.baseline_digest,
+            "--baseline-source", str(fixture.baseline_repo),
+            "--approvals", str(fixture.approvals_path),
+            "--approvals-sha256", fixture.approvals_digest,
+            "--trusted-operator-id", operator,
+        ]
+        result = subprocess.run(command, capture_output=True, text=True)
+        return result.returncode, json.loads(result.stdout) if result.stdout else None
+
+    def approval(self, **overrides):
+        value = {
+            "id": "APR-TEST-1",
+            "authority": {"kind": "operator", "id": "repository-owner"},
+            "source": {"repository": "example/causa-requirements", "commit": "a" * 40,
+                       "path": "decisions/APR-TEST-1.md"},
+            "changes": [{"requirement_id": "P0-SCOPE", "action": "exclude"}],
+        }
+        value.update(overrides)
+        return value
+
+    def test_p01_valid_trust_inputs_are_ready_without_a_ledger(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            fixture = AcceptanceFixture(tmp)
+            fixture.approvals["approvals"] = [self.approval()]
+            fixture.save_approvals()
+            code, payload = self.preflight(fixture)
+            self.assertEqual((code, payload["verdict"], payload["problems"]), (0, "READY", []))
+            self.assertEqual(payload["trusted_changes"], 1)
+
+    def test_p02_approval_without_immutable_source_is_invalid_with_owner_action(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            fixture = AcceptanceFixture(tmp)
+            approval = self.approval()
+            del approval["source"]
+            fixture.approvals["approvals"] = [approval]
+            fixture.save_approvals()
+            code, payload = self.preflight(fixture)
+            self.assertEqual((code, payload["verdict"]), (3, "INVALID"))
+            problem = payload["problems"][0]
+            self.assertIn("lacks an immutable authority source", problem["problem"])
+            self.assertTrue(problem["owner_action"].startswith("owner:"))
+
+    def test_p03_rehearsal_8_change_shape_is_invalid(self):
+        """Rehearsal 8: changes named obligation_id/decision_id, which the verifier cannot bind."""
+        with tempfile.TemporaryDirectory() as tmp:
+            fixture = AcceptanceFixture(tmp)
+            fixture.approvals["approvals"] = [self.approval(changes=[
+                {"obligation_id": "PERSIST-026-O2", "action": "amend", "criterion": "..."},
+                {"decision_id": "ODR-V41-06", "action": "select", "option": "A"}])]
+            fixture.save_approvals()
+            code, payload = self.preflight(fixture)
+            self.assertEqual(code, 3)
+            self.assertEqual(sum("invalid change identity" in p["problem"] for p in payload["problems"]), 2)
+
+    def test_p04_untrusted_operator_and_tampered_digest_are_invalid(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            fixture = AcceptanceFixture(tmp)
+            fixture.approvals["approvals"] = [self.approval()]
+            fixture.save_approvals()
+            code, payload = self.preflight(fixture, operator="someone-else")
+            self.assertEqual(code, 3)
+            self.assertTrue(any("not authenticated" in p["problem"] for p in payload["problems"]))
+            fixture.approvals_digest = "0" * 64
+            code, payload = self.preflight(fixture)
+            self.assertEqual(code, 3)
+            self.assertTrue(any("SHA-256 mismatch" in p["problem"] for p in payload["problems"]))
+
+    def test_p05_preflight_and_acceptance_agree_on_trust_problems(self):
+        """No second interpretation: every preflight problem is also an acceptance trust problem."""
+        with tempfile.TemporaryDirectory() as tmp:
+            fixture = AcceptanceFixture(tmp)
+            approval = self.approval(changes=[{"obligation_id": "X-O1", "action": "amend"}])
+            del approval["source"]
+            fixture.approvals["approvals"] = [approval]
+            fixture.save_approvals()
+            _, payload = self.preflight(fixture)
+            result = subprocess.run(fixture.command(), capture_output=True, text=True)
+            reasons = json.loads(result.stdout)["reasons"]
+            for problem in payload["problems"]:
+                self.assertIn(problem["problem"], reasons)
+
+    def test_p06_ledger_still_required_without_preflight(self):
+        result = subprocess.run(["python3", "-I", str(TOOL)], capture_output=True, text=True)
+        self.assertEqual(result.returncode, 2)
+
+
+class DryRunVerdictTests(unittest.TestCase):
+    """Synthetic evidence: the verifier distinguishes every verdict (ACCEPTED, FAILED, BLOCKED,
+    INCOMPLETE for NOT_RUN, INVALID), and FAIL takes precedence over BLOCKED over NOT_RUN."""
+
+    def verdict_with(self, statuses, break_trust=False):
+        with tempfile.TemporaryDirectory() as temporary:
+            fixture = AcceptanceFixture(temporary)
+            if statuses or break_trust:
+                fixture.ledger["accepted"] = False
+            for index, status in statuses.items():
+                fixture.ledger["gates"][index].update(status=status, verified_sha=None, evidence_paths=[])
+            if break_trust:
+                fixture.approvals_digest = "0" * 64
+            result, payload = fixture.run()
+            return result.returncode, payload["verdict"]
+
+    def test_d01_every_verdict_is_distinguished(self):
+        self.assertEqual(self.verdict_with({}), (0, "ACCEPTED"))
+        self.assertEqual(self.verdict_with({3: "FAIL"}), (3, "FAILED"))
+        self.assertEqual(self.verdict_with({0: "BLOCKED"}), (3, "BLOCKED"))
+        self.assertEqual(self.verdict_with({5: "NOT_RUN"}), (3, "INCOMPLETE"))
+        self.assertEqual(self.verdict_with({}, break_trust=True), (3, "INVALID"))
+
+    def test_d02_precedence(self):
+        self.assertEqual(self.verdict_with({0: "BLOCKED", 3: "FAIL", 5: "NOT_RUN"})[1], "FAILED")
+        self.assertEqual(self.verdict_with({0: "BLOCKED", 5: "NOT_RUN"})[1], "BLOCKED")
+
+
 if __name__ == "__main__":
     unittest.main()
