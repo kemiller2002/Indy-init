@@ -22,7 +22,7 @@
 //   dotnet fsi Indy-init/tools/owner-freeze.fsx -- tag v4.1.1 --repo Indy-init --commit <merge commit of the ODR-V411-01 pull request>
 //   dotnet fsi Indy-init/tools/owner-freeze.fsx -- freeze v4.1.1 --repo Indy-init   # all three v4.1.1 steps in order: decide, merge,
 //                                                                                  # approve, merge, tag; each waits for you to type
-//   dotnet fsi Indy-init/tools/owner-freeze.fsx -- decide v4.1.2 --repo Indy-init  # ODR-V412-01..03; then the agent compiles v4.1.2
+//   dotnet fsi Indy-init/tools/owner-freeze.fsx -- decide v4.1.2 --repo Indy-init  # ODR-V412-01..03 and -05; then the agent compiles v4.1.2
 //   dotnet fsi Indy-init/tools/owner-freeze.fsx -- approve v4.1.2 --repo Indy-init # ODR-V412-04, after the compiled package is reviewed
 //   dotnet fsi Indy-init/tools/owner-freeze.fsx -- tag v4.1.2 --repo Indy-init --commit <merge commit of the ODR-V412-04 pull request>
 //
@@ -349,7 +349,7 @@ let approve repo dryRun (p: Package) =
     // v4.1.1: a requirement conflict must be decided before the package that depends on it is approved.
     let conflicts = requestsOf repo p |> List.filter (fun r -> str r "kind" = "requirement-conflict" && not (isRecorded (recordedChanges approvals) r)) |> List.map (fun r -> str r "id")
     if p.Name = "v4.1.1" && not conflicts.IsEmpty then stop $"""decide {String.Join(", ", conflicts)} first (owner-freeze.fsx decide v4.1.1): the package approval depends on it"""
-    // v4.1.2: the package applies its decisions (ODR-V412-01..03), so each must be recorded, and the package recompiled
+    // v4.1.2: the package applies its decisions (ODR-V412-01..03, -05), so each must be recorded, and the package recompiled
     // from them, before it can be approved.
     if p.Name = "v4.1.2" && not pending.IsEmpty then stop $"""decide {String.Join(", ", pending)} first (owner-freeze.fsx decide v4.1.2); the agent then compiles v4.1.2 from your records"""
     rule ()

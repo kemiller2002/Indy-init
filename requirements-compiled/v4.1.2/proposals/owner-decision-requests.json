@@ -1,6 +1,6 @@
 {
  "schema": "indy-init.v41-owner-decision-requests/1",
- "status": "v4.1 and v4.1.1 requests are recorded (APR-V41-OWNER-1..4, APR-V411-OWNER-1/2). Pending: ODR-V412-01..03 (owner-freeze.fsx decide v4.1.2), then ODR-V412-04 (approve v4.1.2) once the package is compiled from those records and reviewed.",
+ "status": "v4.1 and v4.1.1 requests are recorded (APR-V41-OWNER-1..4, APR-V411-OWNER-1/2), and ODR-V412-01..03 (APR-V412-OWNER-1). Pending: ODR-V412-05 (owner-freeze.fsx decide v4.1.2), then ODR-V412-04 (approve v4.1.2) once the package is compiled from those records and reviewed.",
  "requests": [
   {
    "id": "ODR-V41-01",
@@ -383,12 +383,92 @@
    }
   },
   {
+   "id": "ODR-V412-05",
+   "kind": "state-machine-amendment",
+   "title": "Schedule the automatic reads where SM-SAVE leaves them unscheduled (independent review RV412-2-1, RV412-2-2)",
+   "question": "As recorded (APR-V412-OWNER-1), two paths leave a save in UnknownOutcome with no read scheduled, and Check again is not offered while automatic reads are left, so the save stalls. (1) T-S65, back online with automatic reads left, says the reads 'resume' but schedules none; if the scheduled read fell due while offline, nothing sends it. (2) T-S58 (read-back failed) and T-S59 (rebase read failed) enter UnknownOutcome without scheduling read 1, unlike T-S19. Which transitions apply?",
+   "options": [
+    "A: T-S65 schedules the next automatic read at once, replacing any pending one (ReconcileDue sends it under the 60 s window; this replaces T-S65 of ODR-V412-01); T-S58 and T-S59 keep their v4 effects and add 'schedule reconciliation read 1 after at least 2 s', as T-S19 does",
+    "B: leave the transitions as recorded (the stall stays)"
+   ],
+   "recommendation": "A. Every read is still sent by ReconcileDue, T-S31 or T-S32, so INV-04's window holds; the session always reaches T-S64 or a resolution.",
+   "rationale": "Owner choice given 2026-11-02: record the fix as a new decision and keep APR-V412-OWNER-1 as recorded.",
+   "impact": "Until recorded, v4.1.2 cannot be compiled (X12: T-S58, T-S59 and T-S65 name no operator approval).",
+   "approvalRecord": {
+    "how": "A change in an operator approval (recordFormat): {\"decision_id\": \"ODR-V412-05\", \"action\": \"select\", \"option\": \"A\"}, recorded by the owner with tools/owner-freeze.fsx decide v4.1.2. Selecting an option approves exactly what its 'applies' entry lists; the offline suite compares the package with it. Agents never write the record (RDP-003)."
+   },
+   "applies": {
+    "A": {
+     "transitions": [
+      {
+       "machine": "SM-SAVE",
+       "id": "T-S65",
+       "from": "UnknownOutcome",
+       "event": "WentOnline",
+       "to": "UnknownOutcome",
+       "guard": "automatic reads left",
+       "effects": [
+        "send nothing now",
+        "schedule the next automatic read at once, replacing any pending one; ReconcileDue sends it under the 60 s window"
+       ],
+       "sources": [
+        "PERSIST-016"
+       ]
+      },
+      {
+       "machine": "SM-SAVE",
+       "id": "T-S58",
+       "replaces": true,
+       "from": "Saving",
+       "event": "ReadBackReadFailed",
+       "to": "UnknownOutcome",
+       "guard": "current",
+       "effects": [
+        "the commit may hold the bytes; reconcile by marker and head before anything else is sent",
+        "schedule reconciliation read 1 after at least 2 s"
+       ],
+       "sources": [
+        "PERSIST-015",
+        "PERSIST-007"
+       ]
+      },
+      {
+       "machine": "SM-SAVE",
+       "id": "T-S59",
+       "replaces": true,
+       "from": "Saving",
+       "event": "RebaseReadFailed",
+       "to": "UnknownOutcome",
+       "guard": "current and online",
+       "effects": [
+        "state the cause (GitHub could not be read after a stale head); reconciliation decides, Check again is offered after the automatic reads; never Conflict, never Discard",
+        "schedule reconciliation read 1 after at least 2 s"
+       ],
+       "sources": [
+        "PERSIST-024",
+        "PERSIST-046",
+        "PERSIST-015"
+       ],
+       "residual": "After a known stale head nothing was written, so Unknown commit outcome's fixed words ('may or may not have reached GitHub') overstate the uncertainty. PAT-07 (PERSIST-046-O4) allows only Offline or Unknown commit outcome here, and Offline is untrue while online. Recorded as a residual for the owner, not resolved."
+      }
+     ],
+     "contracts": [],
+     "supersedes": [
+      {
+       "decision": "ODR-V412-01",
+       "transition": "T-S65"
+      }
+     ]
+    }
+   }
+  },
+  {
    "id": "ODR-V412-04",
    "kind": "package-approval",
    "title": "Approve compiled package v4.1.2",
    "question": "Approve requirements-compiled/v4.1.2 (successor of the approved v4.1.1) as the implementation plan: v4.1.1 plus ODR-V412-01..03?",
    "options": [
-    "A: approve v4.1.2 after ODR-V412-01..03 are recorded",
+    "A: approve v4.1.2 after ODR-V412-01..03 and -05 are recorded",
     "B: request changes",
     "C: decline; build from v4.1.1"
    ],

@@ -1,6 +1,6 @@
 {
  "schema": "indy-init.v41-state-machine-amendments/1",
- "description": "Amendments of v4's state machines that the owner approved (ODR-V41-08, APR-V41-OWNER-2). v4 is frozen at tag indy-init-requirements-v4.0.0 and its files are never edited: requirements-compiler v41 applies each transition over the frozen machines when it compiles state-machine-contracts.json. Check X12 requires each transition and accepted entry to name a state-machine-amendment request and its operator approval, sources that are baseline requirements, and a fit with its machine (known states and events, deterministic guards, Saved entered only by a confirmation); the offline suite checks that the owner's selected option adds exactly these transitions. No state or event is added. Engine.Update (src/Causa.App/Engine.fs, ui) steps MutationSent in the same update that turns the mutation request into HostEffect.Http (IF41-SAVE, IF41-APP); because T-S61 changes nothing, a missing MutationSent changes no outcome, and no test beyond T-S61's state-machine test requires it. Option A's 'records the outstanding request' holds without an effect: the step that sends the mutation (T-S04, T-S14, T-S24, T-S26, T-S54) already records it as Outstanding, and T-S61's guard admits only that request. v4.1.2 (ODR-V412-01, ODR-V412-03): every reconciliation read of SM-SAVE, automatic or not, is sent only while fewer than four were sent in the 60 s before RequestContext.Now (INV-04): T-S31 and T-S32 are replaced and T-S62, T-S63 and T-S65 added for CheckAgain and WentOnline; T-S47 is replaced so it no longer promises a read on return; the automatic reads apply the same window in ReconcileDue (IF41-SAVE). T-S64 states the failed final automatic read (Rehearsal 8 DEV-R8-12). No state or event is added.",
+ "description": "Amendments of v4's state machines that the owner approved (ODR-V41-08, APR-V41-OWNER-2). v4 is frozen at tag indy-init-requirements-v4.0.0 and its files are never edited: requirements-compiler v41 applies each transition over the frozen machines when it compiles state-machine-contracts.json. Check X12 requires each transition and accepted entry to name a state-machine-amendment request and its operator approval, sources that are baseline requirements, and a fit with its machine (known states and events, deterministic guards, Saved entered only by a confirmation); the offline suite checks that the owner's selected option adds exactly these transitions. No state or event is added. Engine.Update (src/Causa.App/Engine.fs, ui) steps MutationSent in the same update that turns the mutation request into HostEffect.Http (IF41-SAVE, IF41-APP); because T-S61 changes nothing, a missing MutationSent changes no outcome, and no test beyond T-S61's state-machine test requires it. Option A's 'records the outstanding request' holds without an effect: the step that sends the mutation (T-S04, T-S14, T-S24, T-S26, T-S54) already records it as Outstanding, and T-S61's guard admits only that request. v4.1.2 (ODR-V412-01, ODR-V412-03): every reconciliation read of SM-SAVE, automatic or not, is sent only while fewer than four were sent in the 60 s before RequestContext.Now (INV-04): T-S31 and T-S32 are replaced and T-S62, T-S63 and T-S65 added for CheckAgain and WentOnline; T-S47 is replaced so it no longer promises a read on return; the automatic reads apply the same window in ReconcileDue (IF41-SAVE). T-S64 states the failed final automatic read (Rehearsal 8 DEV-R8-12). ODR-V412-05: T-S65 schedules the next automatic read at once on return, and T-S58 and T-S59 (replaced) schedule read 1, so no path leaves UnknownOutcome without a scheduled read or Check again. No state or event is added.",
  "transitions": [
   {
    "machine": "SM-SAVE",
@@ -36,7 +36,7 @@
     "PERSIST-031"
    ],
    "decision": "ODR-V412-01",
-   "approval": ""
+   "approval": "APR-V412-OWNER-1"
   },
   {
    "machine": "SM-SAVE",
@@ -55,7 +55,7 @@
     "PERSIST-031"
    ],
    "decision": "ODR-V412-01",
-   "approval": ""
+   "approval": "APR-V412-OWNER-1"
   },
   {
    "machine": "SM-SAVE",
@@ -73,7 +73,7 @@
     "PERSIST-016"
    ],
    "decision": "ODR-V412-01",
-   "approval": ""
+   "approval": "APR-V412-OWNER-1"
   },
   {
    "machine": "SM-SAVE",
@@ -91,7 +91,7 @@
     "PERSIST-031"
    ],
    "decision": "ODR-V412-01",
-   "approval": ""
+   "approval": "APR-V412-OWNER-1"
   },
   {
    "machine": "SM-SAVE",
@@ -102,12 +102,12 @@
    "guard": "automatic reads left",
    "effects": [
     "send nothing now",
-    "the automatic reads resume: the next is sent when due, under the 60 s window of ReconcileDue"
+    "schedule the next automatic read at once, replacing any pending one; ReconcileDue sends it under the 60 s window"
    ],
    "sources": [
     "PERSIST-016"
    ],
-   "decision": "ODR-V412-01",
+   "decision": "ODR-V412-05",
    "approval": ""
   },
   {
@@ -126,7 +126,7 @@
     "PERSIST-016"
    ],
    "decision": "ODR-V412-01",
-   "approval": ""
+   "approval": "APR-V412-OWNER-1"
   },
   {
    "machine": "SM-SAVE",
@@ -145,6 +145,46 @@
     "PERSIST-031"
    ],
    "decision": "ODR-V412-03",
+   "approval": "APR-V412-OWNER-1"
+  },
+  {
+   "machine": "SM-SAVE",
+   "id": "T-S58",
+   "replaces": true,
+   "from": "Saving",
+   "event": "ReadBackReadFailed",
+   "to": "UnknownOutcome",
+   "guard": "current",
+   "effects": [
+    "the commit may hold the bytes; reconcile by marker and head before anything else is sent",
+    "schedule reconciliation read 1 after at least 2 s"
+   ],
+   "sources": [
+    "PERSIST-015",
+    "PERSIST-007"
+   ],
+   "decision": "ODR-V412-05",
+   "approval": ""
+  },
+  {
+   "machine": "SM-SAVE",
+   "id": "T-S59",
+   "replaces": true,
+   "from": "Saving",
+   "event": "RebaseReadFailed",
+   "to": "UnknownOutcome",
+   "guard": "current and online",
+   "effects": [
+    "state the cause (GitHub could not be read after a stale head); reconciliation decides, Check again is offered after the automatic reads; never Conflict, never Discard",
+    "schedule reconciliation read 1 after at least 2 s"
+   ],
+   "sources": [
+    "PERSIST-024",
+    "PERSIST-046",
+    "PERSIST-015"
+   ],
+   "residual": "After a known stale head nothing was written, so Unknown commit outcome's fixed words ('may or may not have reached GitHub') overstate the uncertainty. PAT-07 (PERSIST-046-O4) allows only Offline or Unknown commit outcome here, and Offline is untrue while online. Recorded as a residual for the owner, not resolved.",
+   "decision": "ODR-V412-05",
    "approval": ""
   }
  ],
