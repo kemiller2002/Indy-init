@@ -1,4 +1,4 @@
-# Amendment 4.1.2: the three frozen-package defects Rehearsal 8 hit
+# Amendment 4.1.2: the frozen-package defects Rehearsal 8 hit
 
 v4.1.2 is the successor of the approved, frozen package v4.1.1 (APR-V411-OWNER-2, tag `indy-init-requirements-v4.1.1`). v4.1.1 is not edited.
 
@@ -27,10 +27,12 @@ Every other part of v4.1.1 is carried unchanged.
 
 **Offline-to-online reads after the automatic reads:** T-S30 and T-S64 say 'no further automatic reads except one per offline-to-online change'. That read is T-S32's, and it is windowed: at four reads in 60 s T-S63 sends nothing and keeps Check again offered.
 
-**Mutations are not windowed (a known limit).** INV-04 bounds reads. A mutation is resent only after a successful read decides it was not applied, and a failed send is never retried automatically, so under total network failure no mutation is resent. Otherwise the per-save limits apply, and Retry after a failure (T-S35) starts fresh limits with no time window. The owner chose to record this rather than add a decision (independent review RV412-2-8).
+**Mutations are not windowed (a known limit).** INV-04 also bounds mutations: four in 60 s under total network failure. That bound holds without a window, because a mutation is resent only after a successful read decides it was not applied, and a failed send is never retried automatically, so under total network failure no mutation is resent. Otherwise the per-save limits apply, and Retry after a failure (T-S35) starts fresh limits with no time window. The owner chose to record this rather than add a decision (independent review RV412-2-8).
 
 **Window details left as stated:** the clock is `RequestContext.Now`, the host clock; the window is counted per investigation session (the owner's choice), so several sessions in one tab are counted apart; one reconciliation counts once whatever its pages (RV412-2-7).
 
 **Bootstrap measurement:** `analysis/bootstrap-measurement.json` is carried from v4.1.1 and records the measured v4.1.1 bootstrap; the bootstrap itself (AGENT-RULES.md, `analysis/amendment.json`) generates v4.1.2.
+
+**T-S65's read on return (independent review RV412-3-1).** 'At once, replacing any pending one' is a requirement on the engine; the contract gives timers no cancel or generation, so the implementation must ignore a superseded timer. This read is the 'plus one per offline-to-online change' of INV-04, and it is still counted in the 60 s window by `ReconcileDue`. The four-in-60 s bound holds either way, and no path stalls.
 
 **Schedule:** unchanged from v4.1.1. The changes are guard conditions and one counted list in the persistence lane, within T20's estimate. Topology C keeps its 1-minute margin (419 of 420 minutes); this is the package author's estimate (independent review RV412-1-9).

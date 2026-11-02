@@ -1,4 +1,4 @@
-# Starting-state policy (v4.1.1)
+# Starting-state policy (v4.1.2)
 
 This policy says what exists before T0 on November 7, what the competition repository holds at T0, and how the plan treats the published event rules. It replaces the internal organizer-permission gate of v4.1 (change V411-C, [analysis/amendment.json](analysis/amendment.json); owner decision OD-INDY-18).
 

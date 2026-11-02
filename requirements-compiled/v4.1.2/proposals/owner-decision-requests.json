@@ -466,7 +466,7 @@
    "id": "ODR-V412-04",
    "kind": "package-approval",
    "title": "Approve compiled package v4.1.2",
-   "question": "Approve requirements-compiled/v4.1.2 (successor of the approved v4.1.1) as the implementation plan: v4.1.1 plus ODR-V412-01..03?",
+   "question": "Approve requirements-compiled/v4.1.2 (successor of the approved v4.1.1) as the implementation plan: v4.1.1 plus ODR-V412-01..03 and -05?",
    "options": [
     "A: approve v4.1.2 after ODR-V412-01..03 and -05 are recorded",
     "B: request changes",
