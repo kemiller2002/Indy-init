@@ -1,6 +1,6 @@
 {
  "schema": "indy-init.v41-owner-decision-requests/1",
- "status": "v4.1 and v4.1.1 requests are recorded (APR-V41-OWNER-1..4, APR-V411-OWNER-1/2), and ODR-V412-01..03 (APR-V412-OWNER-1). Pending: ODR-V412-05 (owner-freeze.fsx decide v4.1.2), then ODR-V412-04 (approve v4.1.2) once the package is compiled from those records and reviewed.",
+ "status": "v4.1 and v4.1.1 requests are recorded (APR-V41-OWNER-1..4, APR-V411-OWNER-1/2), ODR-V412-01..03 (APR-V412-OWNER-1) and ODR-V412-05 (APR-V412-OWNER-2). Pending: ODR-V412-04 (approve v4.1.2), for the package as compiled from those records and reviewed.",
  "requests": [
   {
    "id": "ODR-V41-01",
@@ -466,7 +466,7 @@
    "id": "ODR-V412-04",
    "kind": "package-approval",
    "title": "Approve compiled package v4.1.2",
-   "question": "Approve requirements-compiled/v4.1.2 (successor of the approved v4.1.1) as the implementation plan: v4.1.1 plus ODR-V412-01..03?",
+   "question": "Approve requirements-compiled/v4.1.2 (successor of the approved v4.1.1) as the implementation plan: v4.1.1 plus ODR-V412-01..03 and -05?",
    "options": [
     "A: approve v4.1.2 after ODR-V412-01..03 and -05 are recorded",
     "B: request changes",

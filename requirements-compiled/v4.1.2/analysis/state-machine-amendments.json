@@ -108,7 +108,7 @@
     "PERSIST-016"
    ],
    "decision": "ODR-V412-05",
-   "approval": ""
+   "approval": "APR-V412-OWNER-2"
   },
   {
    "machine": "SM-SAVE",
@@ -164,7 +164,7 @@
     "PERSIST-007"
    ],
    "decision": "ODR-V412-05",
-   "approval": ""
+   "approval": "APR-V412-OWNER-2"
   },
   {
    "machine": "SM-SAVE",
@@ -185,7 +185,7 @@
    ],
    "residual": "After a known stale head nothing was written, so Unknown commit outcome's fixed words ('may or may not have reached GitHub') overstate the uncertainty. PAT-07 (PERSIST-046-O4) allows only Offline or Unknown commit outcome here, and Offline is untrue while online. Recorded as a residual for the owner, not resolved.",
    "decision": "ODR-V412-05",
-   "approval": ""
+   "approval": "APR-V412-OWNER-2"
   }
  ],
  "accepted": [
