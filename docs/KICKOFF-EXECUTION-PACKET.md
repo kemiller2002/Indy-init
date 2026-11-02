@@ -19,9 +19,25 @@ Before application implementation:
 9. record generated lock and component versions;
 10. create first post-bootstrap commit;
 11. create/start initial ROS work item;
-12. capture Praxis baseline.
+12. capture Praxis baseline;
+13. in every agent session, before any `ordo`/`sde` command, set
+    `export ORDO_DECISION_EVENTS=evidence/ordo/decision-events.jsonl`
+    (run from the application repository root), and commit that file with the
+    other evidence at each checkpoint and at the final freeze.
 
 No application feature coding begins before this evidence exists.
+
+`ORDO_DECISION_EVENTS` makes every `ordo ecir recognize` append
+`ordo.decision-event/1` records (pattern evaluation and selection) to that
+file without changing its output; a write failure only warns. An agent that
+finishes a delegation packet reports it with
+`ordo events record-execution --packet ID --status succeeded|failed|abandoned`,
+and a Dokimos completion receipt is recorded with
+`ordo events record-verification --packet ID --dokimos-receipt FILE`. Specula's
+Verification view reads this exact path. A missing file shows as unknown, not
+as zero Ordo use. Only Ordo builds that include kemiller2002/ordo#111 (merged
+2026-11-02, after 1.19.0) write events; an older Ordo ignores the variable.
+Format and rules: kemiller2002/ordo `docs/architecture/ordo-decision-events.md`.
 
 ## 2. Canonical contract entry
 
