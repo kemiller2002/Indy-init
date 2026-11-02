@@ -2,10 +2,11 @@
 
 The decision record is [R9-VERIFICATION-DECISION-RECORD.md](R9-VERIFICATION-DECISION-RECORD.md). Every claim below names its evidence; nothing here was estimated.
 
-**Verdict: NOT READY today. It becomes READY WITH RISKS once the three must-fix owner items in §F are done.**
+**Verdict: NOT READY today. It becomes READY WITH RISKS once the must-fix owner items 1 and 3 in §F are done.** (Item 2, the frozen-package defects, is done: v4.1.2 is approved and tagged.)
 
 - The engineering mechanisms are built, tested and demonstrated.
-- The pinned acceptance inputs are still the ones that made Rehearsal 8 INVALID, and the frozen package still carries the three defects Rehearsal 8 hit.
+- The pinned acceptance inputs are still the ones that made Rehearsal 8 INVALID.
+- The three package defects Rehearsal 8 hit are resolved in v4.1.2 (APR-V412-OWNER-3, tag `indy-init-requirements-v4.1.2` at 485b8a9), which the build now uses.
 - Running Rehearsal 9 before those are fixed would, with near certainty, again end INVALID at T34.
 
 ## A. Framework changes
@@ -121,9 +122,9 @@ The details are in dokimos #63: `experiments/verification-benchmarks/BENCHMARK-R
 
 **Must fix before Rehearsal 9** (owner actions; agents may not do them):
 1. **Approval contract.** `tools/owner-freeze.fsx` writes changes keyed by `obligation_id`/`decision_id` without `source`, and the verifier accepts only `requirement_id` + `action` with an immutable source. The owner decides which side changes; then re-record the approvals and re-pin their digest in `conditor.acceptance.json`. Until then every acceptance run is INVALID.
-2. **Frozen-package defects.** The three are INV-04 versus T-S31/T-S32, the `CommandEnvelope` body and the (UnknownOutcome, ReconcileReadFailed) transition. Each needs an owner decision and a successor package (v4.1.2, never an edit of v4.1.1). Otherwise Rehearsal 9 re-lives DEV-R8-09, -11 and -12, with at least one obligation failing by construction.
+2. **Frozen-package defects: DONE.** v4.1.2 resolves INV-04 versus T-S31/T-S32 (every reconciliation read windowed), the `CommandEnvelope` body and the (UnknownOutcome, ReconcileReadFailed) transition (owner decisions ODR-V412-01..03 and -05; approval ODR-V412-04, APR-V412-OWNER-3; three independent review rounds, the last PASS). `percepta spec-preflight` exits 0 on v4.1.2 (3 on v4.1.1). Minor findings left for the owner are in `requirements-compiled/v4.1.2/independent-review.md`.
 3. **Merge and make the tools available at T0.**
-   - Merge #72, #127, #62 and #45.
+   - #72, #127, #62 and #45 are merged.
    - Either cut releases (Dokimos is not in the Conditor `indy-init` preset; Percepta `spec-preflight` is in the semantic CLI line, not `percepta-repo` 0.1.0), or have the T0 bootstrap build Dokimos from a pinned commit.
    - Decide which, and pin it.
 
