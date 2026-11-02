@@ -1,7 +1,7 @@
 {
  "schema": "indy-init.v411-amendment/1",
  "packageVersion": "4.1.2",
- "description": "Successor amendment of the approved package v4.1.1 (APR-V411-OWNER-2), which is not edited. It applies three owner decisions taken on 2026-11-02 to resolve the frozen-package defects Rehearsal 8 hit: ODR-V412-01 rate-limits the user- and network-driven reconciliation reads of SM-SAVE to INV-04's own bound (T-S31 and T-S32 narrowed, T-S62 and T-S63 added, the clock entering through RequestContext.Now; DEV-R8-11); ODR-V412-02 restores CommandEnvelope.Command and the EventPayload body of FSHARP-TYPE-SHAPES sections 31-33 (DEV-R8-09, CR-T17-01); ODR-V412-03 adds T-S64 for the failed final automatic read (DEV-R8-12). It changes no requirement, obligation or test binding of v4 (X10). Every other v4.1.1 change is carried unchanged.",
+ "description": "Successor amendment of the approved package v4.1.1 (APR-V411-OWNER-2), which is not edited. It applies three owner decisions taken on 2026-11-02 to resolve the frozen-package defects Rehearsal 8 hit: ODR-V412-01 sends every reconciliation read of SM-SAVE, automatic or not, only within INV-04's own bound of four in 60 s (T-S31, T-S32 and T-S47 replaced, T-S62, T-S63 and T-S65 added, ReconcileDue windowed, the clock entering through RequestContext.Now; DEV-R8-11); ODR-V412-02 restores CommandEnvelope.Command and the EventPayload body of FSHARP-TYPE-SHAPES sections 31-33 (DEV-R8-09, CR-T17-01); ODR-V412-03 adds T-S64 for the failed final automatic read (DEV-R8-12). It changes no requirement, obligation or test binding of v4 (X10). Every other v4.1.1 change is carried unchanged.",
  "approvalDecision": "ODR-V412-04",
  "amends": {
   "package": "requirements-compiled/v4.1.1",
@@ -20,12 +20,12 @@
   {
    "id": "V412-A",
    "area": "state machines",
-   "summary": "ODR-V412-01: T-S31 and T-S32 count the reconciliation reads sent in the 60 s before RequestContext.Now and read only below four (INV-04); T-S62 and T-S63 answer CheckAgain and WentOnline at four with no read. Guard partitions reviewed for both pairs."
+   "summary": "ODR-V412-01: every reconciliation read, automatic or not, is sent only while fewer than four were sent in the 60 s before RequestContext.Now (INV-04). T-S31/T-S32 replaced; T-S62/T-S63 answer CheckAgain/WentOnline at four with no read; T-S65 answers WentOnline while automatic reads are left; T-S47 replaced (no read promised on return); ReconcileDue reschedules an automatic read at the limit. Guard partitions reviewed."
   },
   {
    "id": "V412-B",
    "area": "contracts",
-   "summary": "ODR-V412-02: 00-DOMAIN-STUBS.fs gains Command (Core of 29 CoreCommand cases | Extension), CoreEvent (28 cases) and EventPayload (CoreEvent | ExtensionEvent), with CommandEnvelope.Command; payload types opaque. ODR-V412-01: RequestContext.Now (03-IF41-WIRE.fs) and InvestigationSession.ReconcileReadsSentAt (05-IF41-SAVE.fs). Each change is declared in contractChanges with its digest (X17)."
+   "summary": "ODR-V412-02: 00-DOMAIN-STUBS.fs gains Command (Core of 29 CoreCommand cases | Extension), CoreEvent (28 cases) and EventPayload (CoreEvent | ExtensionEvent), with CommandEnvelope.Command; payload types opaque. ODR-V412-01: RequestContext.Now (03-IF41-WIRE.fs); InvestigationSession.ReconcileReadsSentAt and the windowed ReconcileDue (05-IF41-SAVE.fs). Each change is declared in contractChanges with its digest and approval (X17)."
   },
   {
    "id": "V412-C",
@@ -499,19 +499,22 @@
    "file": "contracts/00-DOMAIN-STUBS.fs",
    "sha256": "178b6e3f6902f656f9a1c092792707452cf4dbff976d7603b5c75671e2c6e258",
    "decision": "ODR-V412-02",
-   "summary": "CommandEnvelope gains Command: Command; Command, CoreCommand (29 cases) and EventPayload (CoreEvent of 28 cases | ExtensionEvent) as in FSHARP-TYPE-SHAPES sections 31-33, payload types opaque"
+   "summary": "CommandEnvelope gains Command: Command; Command, CoreCommand (29 cases), CoreEvent (28 cases) and EventPayload (CoreEvent | ExtensionEvent) as in FSHARP-TYPE-SHAPES sections 31-33, payload types opaque",
+   "approval": ""
   },
   {
    "file": "contracts/03-IF41-WIRE.fs",
    "sha256": "48f227960704c4e5b165e227b44d53a2da03c1d1347ab43ee0d9c6bcd3a21116",
    "decision": "ODR-V412-01",
-   "summary": "RequestContext gains Now: DateTimeOffset, the host clock the reconciliation-read guards of ODR-V412-01 count against"
+   "summary": "RequestContext gains Now: DateTimeOffset, the host clock every reconciliation-read window of ODR-V412-01 counts against",
+   "approval": ""
   },
   {
    "file": "contracts/05-IF41-SAVE.fs",
-   "sha256": "57e9be2d1098616a08b93634907ead64ed2287a3622ff724b3c7f5fe671b1302",
+   "sha256": "904465d9f47f05c12b17b544e8b379842b2ace0915b4516a785a28dd648d980f",
    "decision": "ODR-V412-01",
-   "summary": "InvestigationSession gains ReconcileReadsSentAt, the send times the guards of ODR-V412-01 count"
+   "summary": "InvestigationSession gains ReconcileReadsSentAt (one entry per reconciliation read, automatic or not); ReconcileDue sends an automatic read only inside the INV-04 window, otherwise reschedules it",
+   "approval": ""
   }
  ]
 }

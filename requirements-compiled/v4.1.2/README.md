@@ -7,7 +7,7 @@
 - It is compiled only after the owner records ODR-V412-01..03, because each state-machine amendment must cite the operator approval that selects it. See [FREEZE.md](FREEZE.md) and [AMENDMENT-4.1.2.md](AMENDMENT-4.1.2.md).
 
 v4.1.2 changes three things and nothing else; v4.1.1's other content is carried unchanged:
-- SM-SAVE's user- and network-driven reconciliation reads are limited to INV-04's own bound.
+- Every SM-SAVE reconciliation read, automatic or not, is sent only within INV-04's own bound of four in 60 s.
 - The domain contract gets the command and event bodies FSHARP-TYPE-SHAPES specifies.
 - The failed final automatic read gets a transition.
 
