@@ -133,7 +133,7 @@
     "automatic reads spent and four reconciliation reads already sent in the 60 s before RequestContext.Now"
    ],
    "exhaustive": false,
-   "exclusiveBecause": "with the automatic reads spent, fewer than four or four reconciliation reads were sent in the 60 s window; while automatic reads are left Check again is not offered (T-S62, T-S63 and T-S65 offer it only once they are spent) and the input fails closed"
+   "exclusiveBecause": "with the automatic reads spent, fewer than four or four reconciliation reads were sent in the 60 s window; while automatic reads are left Check again is not offered (T-S62, T-S63 and T-S64 offer it only once they are spent) and the input fails closed"
   },
   {
    "machine": "SM-SAVE",

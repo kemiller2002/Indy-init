@@ -1,7 +1,7 @@
 {
  "schema": "indy-init.v411-amendment/1",
  "packageVersion": "4.1.2",
- "description": "Successor amendment of the approved package v4.1.1 (APR-V411-OWNER-2), which is not edited. It applies three owner decisions taken on 2026-11-02 to resolve the frozen-package defects Rehearsal 8 hit: ODR-V412-01 sends every reconciliation read of SM-SAVE, automatic or not, only within INV-04's own bound of four in 60 s (T-S31, T-S32 and T-S47 replaced, T-S62, T-S63 and T-S65 added, ReconcileDue windowed, the clock entering through RequestContext.Now; DEV-R8-11); ODR-V412-02 restores CommandEnvelope.Command and the EventPayload body of FSHARP-TYPE-SHAPES sections 31-33 (DEV-R8-09, CR-T17-01); ODR-V412-03 adds T-S64 for the failed final automatic read (DEV-R8-12). It changes no requirement, obligation or test binding of v4 (X10). Every other v4.1.1 change is carried unchanged.",
+ "description": "Successor amendment of the approved package v4.1.1 (APR-V411-OWNER-2), which is not edited. It applies four owner decisions taken on 2026-11-02 to resolve the frozen-package defects Rehearsal 8 hit: ODR-V412-01 sends every reconciliation read of SM-SAVE, automatic or not, only within INV-04's own bound of four in 60 s (T-S31, T-S32 and T-S47 replaced, T-S62, T-S63 and T-S65 added, ReconcileDue windowed, the clock entering through RequestContext.Now; DEV-R8-11); ODR-V412-02 restores CommandEnvelope.Command and the EventPayload body of FSHARP-TYPE-SHAPES sections 31-33 (DEV-R8-09, CR-T17-01); ODR-V412-03 adds T-S64 for the failed final automatic read (DEV-R8-12). ODR-V412-05 schedules the automatic reads where the recorded tables left them unscheduled: T-S65 schedules the next one at once (replacing ODR-V412-01's T-S65), and T-S58 and T-S59 schedule read 1 as T-S19 does (independent review RV412-2-1, RV412-2-2). It changes no requirement, obligation or test binding of v4 (X10). Every other v4.1.1 change is carried unchanged.",
  "approvalDecision": "ODR-V412-04",
  "amends": {
   "package": "requirements-compiled/v4.1.1",
@@ -31,6 +31,11 @@
    "id": "V412-C",
    "area": "state machines",
    "summary": "ODR-V412-03: T-S64, (UnknownOutcome, ReconcileReadFailed) with three automatic reads already made: offer Check again, nothing outstanding (T-S30's effects, Rehearsal 8 DEV-R8-12). Guard partition reviewed."
+  },
+  {
+   "id": "V412-D",
+   "area": "state machines",
+   "summary": "ODR-V412-05: T-S65 (back online, automatic reads left) schedules the next automatic read at once, replacing any pending one, so a read due while offline is sent on return; T-S58 and T-S59 replaced to schedule reconciliation read 1 after at least 2 s. Every read is still sent by ReconcileDue, T-S31 or T-S32 under INV-04's window. Guard partitions unchanged."
   }
  ],
  "bootstrap": {
@@ -40,7 +45,7 @@
   "order": [
    "Record the start timestamp; git init -b main in the empty competition repository (git metadata only)",
    "conditor init --preset indy-init --target . (Conditor 0.10.18: Echelon scaffold, Praxis init, requirements import)",
-   "requirements-compiler v41 --source INDY-INIT --package requirements-compiled/v4.1.1 --base requirements-compiled/v4 --bootstrap . (layers onto Conditor's repository: merges package.json, Directory.Build.props and .gitignore, refuses any other overlap)",
+   "requirements-compiler v41 --source INDY-INIT --package requirements-compiled/v4.1.2 --base requirements-compiled/v4 --bootstrap . (layers onto Conditor's repository: merges package.json, Directory.Build.props and .gitignore, refuses any other overlap)",
    "dotnet build Causa.slnx; conditor ci-policy check --target .",
    "git commit (the initial bootstrap commit), conditor repo create, push; first green CI"
   ]
@@ -403,7 +408,7 @@
     "quote": "No organizer response is a prerequisite of this step",
     "decision": "OD-INDY-18",
     "disposition": "OD-INDY-18 in the bootstrap duty itself: the step does not wait on organizers. Not a gate.",
-    "lineSha256": "cbe17f42042748a60fdc601abc94d4b95be663aca343246c87d12e17caec698c"
+    "lineSha256": "d0fc16239cecae8c25281d6eda29e4a9733bc34f626469c301d7d1d5e6a0fffb"
    }
   ],
   "externalConstraintsSource": "docs/HACKATHON-BOUNDARIES.md"
@@ -500,21 +505,21 @@
    "sha256": "178b6e3f6902f656f9a1c092792707452cf4dbff976d7603b5c75671e2c6e258",
    "decision": "ODR-V412-02",
    "summary": "CommandEnvelope gains Command: Command; Command, CoreCommand (29 cases), CoreEvent (28 cases) and EventPayload (CoreEvent | ExtensionEvent) as in FSHARP-TYPE-SHAPES sections 31-33, payload types opaque",
-   "approval": ""
+   "approval": "APR-V412-OWNER-1"
   },
   {
    "file": "contracts/03-IF41-WIRE.fs",
    "sha256": "48f227960704c4e5b165e227b44d53a2da03c1d1347ab43ee0d9c6bcd3a21116",
    "decision": "ODR-V412-01",
    "summary": "RequestContext gains Now: DateTimeOffset, the host clock every reconciliation-read window of ODR-V412-01 counts against",
-   "approval": ""
+   "approval": "APR-V412-OWNER-1"
   },
   {
    "file": "contracts/05-IF41-SAVE.fs",
    "sha256": "904465d9f47f05c12b17b544e8b379842b2ace0915b4516a785a28dd648d980f",
    "decision": "ODR-V412-01",
    "summary": "InvestigationSession gains ReconcileReadsSentAt (one entry per reconciliation read, automatic or not); ReconcileDue sends an automatic read only inside the INV-04 window, otherwise reschedules it",
-   "approval": ""
+   "approval": "APR-V412-OWNER-1"
   }
  ]
 }

@@ -45,12 +45,14 @@ let private isV412 (j: Json) = (str "decision" j).StartsWith "ODR-V412"
 /// The approval id a test names for the owner's not-yet-recorded decisions, and that record as it will read.
 let private simulatedApproval = "APR-TEST-OWNER"
 
+/// Only the decisions the owner has not recorded are simulated, so the owner's own records stay the latest of theirs.
 let private simulatedRecords (real: Json list) =
+    let recorded = real |> List.collect (arr "changes") |> List.choose (strOpt "decision_id") |> Set.ofList
     real
     @ [ JObj
             [ "id", JStr simulatedApproval
               "authority", JObj [ "kind", JStr "operator"; "id", JStr "kemiller2002" ]
-              "changes", JArr [ for d in [ "ODR-V412-01"; "ODR-V412-02"; "ODR-V412-03" ] -> JObj [ "decision_id", JStr d; "action", JStr "select"; "option", JStr "A" ] ] ] ]
+              "changes", JArr [ for d in [ "ODR-V412-01"; "ODR-V412-02"; "ODR-V412-03"; "ODR-V412-05" ] |> List.filter (fun d -> not (recorded.Contains d)) -> JObj [ "decision_id", JStr d; "action", JStr "select"; "option", JStr "A" ] ] ] ]
 
 /// Every v4.1.2 amendment and contract change names the given approval (the test stand-in before the owner records).
 let private naming (approval: string) (i: V41Package.Inputs) =
@@ -67,8 +69,12 @@ let private requestsOf (i: V41Package.Inputs) =
 let ownerRecordsWith (approvals: Json list) (i: V41Package.Inputs) : string list =
     let operator (a: Json) = (field "authority" a |> Option.bind (strOpt "kind")) = Some "operator"
     let byId id = approvals |> List.tryFind (fun a -> strOpt "id" a = Some id) |> Option.filter operator
+    let records (decision: string) (a: Json) = arr "changes" a |> List.exists (fun c -> strOpt "decision_id" c = Some decision)
+    // The operator's latest record of a decision is its decision (RV412-2-4): a cited approval a later record overrides selects nothing.
+    let latest (decision: string) = approvals |> List.filter operator |> List.filter (records decision) |> List.tryLast |> Option.bind (strOpt "id")
     let selected (approvalId: string) (decision: string) =
-        byId approvalId |> Option.bind (fun a -> arr "changes" a |> List.tryFind (fun c -> strOpt "decision_id" c = Some decision)) |> Option.bind (strOpt "option")
+        if latest decision <> Some approvalId then None
+        else byId approvalId |> Option.bind (fun a -> arr "changes" a |> List.tryFind (fun c -> strOpt "decision_id" c = Some decision)) |> Option.bind (strOpt "option")
     let requests = requestsOf i
     let applies (decision: string) (option: string) =
         requests |> List.tryFind (fun r -> str "id" r = decision) |> Option.bind (field "applies") |> Option.bind (field option)
@@ -76,12 +82,23 @@ let ownerRecordsWith (approvals: Json list) (i: V41Package.Inputs) : string list
     let contractChanges = i.Amendment |> Option.map (arr "contractChanges") |> Option.defaultValue []
     let decisions = (transitions @ contractChanges) |> List.map (str "decision") |> List.distinct
     let amendment = i.Amendment |> Option.defaultValue (JObj [])
-    let approvesPackage (approvalId: string) (package: string) =
-        byId approvalId |> Option.exists (fun a -> arr "changes" a |> List.exists (fun c -> strOpt "action" c = Some "approve-package" && strOpt "package" c = Some package))
+    let approvesPackage (approvalId: string) (package: string) (manifest: string option) =
+        byId approvalId |> Option.exists (fun a ->
+            arr "changes" a |> List.exists (fun c ->
+                strOpt "action" c = Some "approve-package" && strOpt "package" c = Some package
+                && (manifest.IsNone || strOpt "manifest_sha256" c = manifest)))
+    // A selected option may replace transitions another decision applies (`supersedes`); those are no longer that decision's.
+    let selectedOption (decision: string) =
+        (transitions @ contractChanges) |> List.filter (fun x -> str "decision" x = decision) |> List.tryHead |> Option.bind (fun x -> selected (str "approval" x) decision)
+    let superseded (decision: string) =
+        [ for d in decisions do
+              match selectedOption d |> Option.bind (applies d) with
+              | Some a -> for s in arr "supersedes" a do if str "decision" s = decision then yield str "transition" s
+              | None -> () ] |> Set.ofList
     [ // The approvals the amendment names for the package it amends are the owner's approvals of that package.
       for key in [ "amends"; "contractBaseline" ] do
           let x = field key amendment |> Option.defaultValue (JObj [])
-          if not (approvesPackage (str "approval" x) (str "package" x)) then
+          if not (approvesPackage (str "approval" x) (str "package" x) (strOpt "manifestSha256" x)) then
               yield sprintf "v4.1.2: %s names approval %s, which is no operator approval of %s" key (str "approval" x) (str "package" x)
       for decision in decisions do
           let ts = transitions |> List.filter (fun t -> str "decision" t = decision)
@@ -91,7 +108,8 @@ let ownerRecordsWith (approvals: Json list) (i: V41Package.Inputs) : string list
               match applies decision option with
               | None -> yield sprintf "v4.1.2: option %s of %s lists nothing under 'applies', yet the package applies it" option decision
               | Some a ->
-                  let expectedT = arr "transitions" a |> Set.ofList
+                  let gone = superseded decision
+                  let expectedT = arr "transitions" a |> List.filter (fun t -> not (gone.Contains(str "id" t))) |> Set.ofList
                   let actualT = ts |> List.map (without [ "decision"; "approval" ]) |> Set.ofList
                   if expectedT <> actualT || ts.Length <> expectedT.Count then
                       yield sprintf "v4.1.2: the transitions citing %s are not exactly those option %s applies (%d applied, %d listed, %d differ)" decision option ts.Length expectedT.Count (Set.count (Set.union (Set.difference expectedT actualT) (Set.difference actualT expectedT)))
@@ -104,7 +122,7 @@ let ownerRecordsWith (approvals: Json list) (i: V41Package.Inputs) : string list
           for c in arr "changes" a do
               let d, o = strOpt "decision_id" c |> Option.defaultValue "", strOpt "option" c |> Option.defaultValue ""
               match applies d o with
-              | Some x when not ((arr "transitions" x).IsEmpty && (arr "contracts" x).IsEmpty) && not (List.contains d decisions) ->
+              | Some x when latest d = strOpt "id" a && not ((arr "transitions" x |> List.filter (fun t -> not ((superseded d).Contains(str "id" t)))).IsEmpty && (arr "contracts" x).IsEmpty) && not (List.contains d decisions) ->
                   yield sprintf "v4.1.2: %s selects option %s of %s, but the package applies none of it" (str "id" a) o d
               | _ -> () ]
 
@@ -118,10 +136,10 @@ let ownerRecords (source: string) (i: V41Package.Inputs) : string list =
     let bodies =
         if since = "" then [ "the v4.1.2 requests' first commit is not found" ]
         else
-            match Git.run source [ "log"; "--format=%B%x00"; since + "..HEAD"; "--"; approvalsPath ] with
+            match Git.run source [ "log"; "--format=%ae%n%B%x00"; since + "..HEAD"; "--"; approvalsPath ] with
             | Ok b -> (System.Text.Encoding.UTF8.GetString b).Split('\000') |> List.ofArray
             | Error e -> [ e ]
-    [ if bodies |> List.exists (fun m -> m.Contains "Claude-Session:" || m.Contains "Co-Authored-By: Claude" || m.Contains "not found") then
+    [ if bodies |> List.exists (fun m -> m.Contains "Claude-Session:" || m.Contains "Co-Authored-By: Claude" || m.Contains "noreply@anthropic.com" || m.Contains "not found") then
           yield "v4.1.2: an agent commit changed the approvals file after the v4.1.2 requests were introduced"
       yield! ownerRecordsWith approvals i ]
 
@@ -130,15 +148,20 @@ let ownerRecords (source: string) (i: V41Package.Inputs) : string list =
 let scope (source: string) : string list =
     let committed = inputs source
     let realApprovals = parseFile (Path.Combine(source, approvalsPath)) |> arr "approvals"
-    let recorded = realApprovals |> List.exists (fun a -> arr "changes" a |> List.exists (fun c -> (strOpt "decision_id" c |> Option.defaultValue "").StartsWith "ODR-V412-0"))
-    let pendingInputs = committed.MachineAmendments |> arr "transitions" |> List.exists (fun t -> isV412 t && str "approval" t = "")
+    let recordedIds = realApprovals |> List.collect (arr "changes") |> List.choose (strOpt "decision_id") |> Set.ofList
+    let pendingDecisions =
+        (arr "transitions" committed.MachineAmendments @ (committed.Amendment |> Option.map (arr "contractChanges") |> Option.defaultValue []))
+        |> List.filter (fun x -> isV412 x && str "approval" x = "") |> List.map (str "decision") |> Set.ofList
+    let recordedButPending = Set.intersect recordedIds pendingDecisions
+    let pendingInputs = not pendingDecisions.IsEmpty
     let named = naming simulatedApproval committed
     let saveMachine = V41Package.amendedMachines named |> List.find (fun m -> str "id" m = "SM-SAVE")
     let transition id = arr "transitions" saveMachine |> List.tryFind (fun t -> str "id" t = id)
     [ if pendingInputs then
           match failing committed with
-          | [ "X12"; "X17" ] | [ "X17"; "X12" ] when (problemsOf "X12" committed @ problemsOf "X17" committed) |> List.forall (fun p -> p.EndsWith "names no operator approval") -> ()
-          | other -> yield sprintf "v4.1.2: the committed inputs should fail only X12 and X17 for the approvals not yet recorded, not %A" other
+          | ids when not ids.IsEmpty && ids |> List.forall (fun id -> id = "X12" || id = "X17")
+                     && ids |> List.collect (fun id -> problemsOf id committed) |> List.forall (fun p -> p.EndsWith "names no operator approval") -> ()
+          | other -> yield sprintf "v4.1.2: the committed inputs should fail only X12 or X17, for the approvals not yet recorded, not %A" other
           for c in (V41Package.build named).Checks do
               if not c.Problems.IsEmpty then yield sprintf "v4.1.2: %s fails with the approvals named: %A" c.Id (List.truncate 3 c.Problems)
           yield! ownerRecordsWith (simulatedRecords realApprovals) named
@@ -146,7 +169,7 @@ let scope (source: string) : string list =
           for c in (V41Package.build committed).Checks do
               if not c.Problems.IsEmpty then yield sprintf "v4.1.2: %s fails on the committed package: %A" c.Id (List.truncate 3 c.Problems)
           yield! ownerRecords source committed
-      if recorded && pendingInputs then yield "v4.1.2: the owner has recorded ODR-V412 decisions; compile the package from them (FREEZE.md step 2)"
+      if not recordedButPending.IsEmpty then yield sprintf "v4.1.2: the owner has recorded %A; compile the package from them (FREEZE.md step 2)" (Set.toList recordedButPending)
       // ODR-V412-01 and -03 as decided: every read path windowed, T-S47 no longer promises a read on return.
       for id, guardPart in [ "T-S31", "automatic reads spent and fewer than four reconciliation reads sent"; "T-S32", "automatic reads spent and fewer than four reconciliation reads sent"
                              "T-S62", "four reconciliation reads already sent"; "T-S63", "four reconciliation reads already sent"
@@ -155,6 +178,11 @@ let scope (source: string) : string list =
           | Some t when (str "guard" t).Contains guardPart -> ()
           | Some t -> yield sprintf "v4.1.2: %s has guard '%s'" id (str "guard" t)
           | None -> yield sprintf "v4.1.2: %s is missing from SM-SAVE" id
+      // ODR-V412-05: every path into reconciliation schedules a read (RV412-2-1, RV412-2-2).
+      for id, effect in [ "T-S65", "schedule the next automatic read at once"; "T-S58", "schedule reconciliation read 1 after at least 2 s"; "T-S59", "schedule reconciliation read 1 after at least 2 s" ] do
+          match transition id with
+          | Some t when strs "effects" t |> List.exists (fun e -> e.Contains effect) -> ()
+          | _ -> yield sprintf "v4.1.2: %s does not %s" id effect
       match transition "T-S47" with
       | Some t when strs "effects" t |> List.exists (fun e -> e.Contains "one read on return") -> yield "v4.1.2: T-S47 still promises a read on return"
       | Some _ -> ()
@@ -196,6 +224,10 @@ let recordControls (source: string) : string list =
       yield! recordFails "T-S32 retargeted to SaveFailed" (edit "T-S32" (setIn "to" (JStr "SaveFailed")) i)
       yield! recordFails "T-S31 reading twice" (edit "T-S31" (setIn "effects" (JArr [ JStr "two reconciliation reads" ])) i)
       yield! recordFails "T-S64 resending the mutation" (edit "T-S64" (setIn "effects" (JArr [ JStr "resend the mutation" ])) i)
+      yield! recordFails "T-S58 without its read schedule" (edit "T-S58" (setIn "effects" (JArr [ JStr "the commit may hold the bytes; reconcile by marker and head before anything else is sent" ])) i)
+      yield! recordFails "T-S65 as ODR-V412-01 first applied it, though superseded" (edit "T-S65" (fun t -> t |> setIn "decision" (JStr "ODR-V412-01") |> setIn "effects" (JArr [ JStr "send nothing now"; JStr "the automatic reads resume: the next is sent when due, under the 60 s window of ReconcileDue" ])) i)
+      yield! [ let later = records @ [ JObj [ "id", JStr "APR-TEST-LATER"; "authority", JObj [ "kind", JStr "operator"; "id", JStr "kemiller2002" ]; "changes", JArr [ JObj [ "decision_id", JStr "ODR-V412-03"; "action", JStr "select"; "option", JStr "B" ] ] ] ]
+               if (try (ownerRecordsWith later i).IsEmpty with _ -> true) then yield "v4.1.2 owner-record control 'a later record selecting B' passed" ]
       yield! recordFails "an extra transition" (mapTransitions (fun ts -> ts @ [ ts |> List.find (fun t -> str "id" t = "T-S64") |> setIn "id" (JStr "T-S66") ]) i)
       yield! recordFails "a missing transition" (mapTransitions (List.filter (fun t -> str "id" t <> "T-S63")) i)
       yield! recordFails "an approval that records nothing" (edit "T-S64" (setIn "approval" (JStr "APR-NOBODY")) i)
@@ -203,6 +235,7 @@ let recordControls (source: string) : string list =
       yield! recordFails "a contract digest the option does not list" (mapContractChanges (List.map (fun c -> if str "file" c = "contracts/05-IF41-SAVE.fs" then setIn "sha256" (JStr(String.replicate 64 "1")) c else c)) i)
       // RV412-1-5: the approvals of the amended package are real operator records.
       yield! recordFails "amends naming an unreal approval" (mapAmendment (fun a -> setIn "amends" (field "amends" a |> Option.defaultValue (JObj []) |> setIn "approval" (JStr "APR-NOBODY")) a) i)
+      yield! recordFails "amends pinned to another manifest digest" (mapAmendment (fun a -> setIn "amends" (field "amends" a |> Option.defaultValue (JObj []) |> setIn "manifestSha256" (JStr(String.replicate 64 "2"))) a) i)
       yield! recordFails "a contract baseline naming an unreal approval" (mapAmendment (fun a -> setIn "contractBaseline" (field "contractBaseline" a |> Option.defaultValue (JObj []) |> setIn "approval" (JStr "APR-NOBODY")) a) i) ]
 
 let all (source: string) : string list = scope source @ controls source @ recordControls source
