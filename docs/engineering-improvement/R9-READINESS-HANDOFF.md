@@ -2,7 +2,7 @@
 
 The decision record is [R9-VERIFICATION-DECISION-RECORD.md](R9-VERIFICATION-DECISION-RECORD.md). Every claim below names its evidence; nothing here was estimated.
 
-**Verdict: NOT READY today. It becomes READY WITH RISKS once the must-fix owner items 1 and 3 in §F are done.** (Item 2, the frozen-package defects, is done: v4.1.2 is approved and tagged.)
+**Verdict: NOT READY today. It becomes READY WITH RISKS once the owner runs `owner-freeze.fsx acceptance` (§F item 1).** Item 2, the frozen-package defects, is done: v4.1.2 is approved and tagged. Item 3, the tools at T0, is done: echelon-current 1.35.0 (approved) pins Dokimos 0.10.0 and Percepta semantic 0.4.0.
 
 - The engineering mechanisms are built, tested and demonstrated.
 - The pinned acceptance inputs are still the ones that made Rehearsal 8 INVALID.
@@ -121,12 +121,9 @@ The details are in dokimos #63: `experiments/verification-benchmarks/BENCHMARK-R
 ## F. Remaining work that could change competition-day execution
 
 **Must fix before Rehearsal 9** (owner actions; agents may not do them):
-1. **Approval contract.** `tools/owner-freeze.fsx` writes changes keyed by `obligation_id`/`decision_id` without `source`, and the verifier accepts only `requirement_id` + `action` with an immutable source. The owner decides which side changes; then re-record the approvals and re-pin their digest in `conditor.acceptance.json`. Until then every acceptance run is INVALID.
+1. **Approval contract: decided, one owner command left.** The approvals file the preflight pins (`kickoff/rehearsal-007/approvals.causa.json`) holds 12 package and decision records (31 changes keyed by `decision_id` or `obligation_id`, no `source`) and not one requirement scope change; the verifier reads every entry as a scope change, so the preflight reads INVALID (44 problems). The owner chose separate files (2026-11-02): the verifier is unchanged, and `owner-freeze.fsx acceptance` writes `kickoff/acceptance/approvals.causa.json`, the scope-change approvals only (none today, bound to the baseline by digest), and moves the approvals pin in `conditor.acceptance.json` to it, in the owner's own commit. Package and decision records stay where they are. On that file the preflight reads READY with no problems (checked on the command's dry-run output, sha256 `87eaf064…`). Until the owner runs it, every acceptance run is INVALID.
 2. **Frozen-package defects: DONE.** v4.1.2 resolves INV-04 versus T-S31/T-S32 (every reconciliation read windowed), the `CommandEnvelope` body and the (UnknownOutcome, ReconcileReadFailed) transition (owner decisions ODR-V412-01..03 and -05; approval ODR-V412-04, APR-V412-OWNER-3; three independent review rounds, the last PASS). `percepta spec-preflight` exits 0 on v4.1.2 (3 on v4.1.1). Minor findings left for the owner are in `requirements-compiled/v4.1.2/independent-review.md`.
-3. **Merge and make the tools available at T0.**
-   - #72, #127, #62 and #45 are merged.
-   - Either cut releases (Dokimos is not in the Conditor `indy-init` preset; Percepta `spec-preflight` is in the semantic CLI line, not `percepta-repo` 0.1.0), or have the T0 bootstrap build Dokimos from a pinned commit.
-   - Decide which, and pin it.
+3. **Tools at T0: DONE.** Released as Dokimos 0.10.0 (`dokimos-v0.10.0`) and Percepta semantic 0.4.0 (`percepta-semantic-v0.4.0`), registered and pinned in echelon-current 1.35.0, which the owner approved (echelon-registry#107) after REG-RU-007 and Conditor's qualification of the exact set (conditor#129). `conditor workstation apply` installs both at T0 from their release archives, digest-checked; nothing is built in the window. The preflight's required verification plan is now v4.1.2's.
 
 **Should fix if time permits:**
 4. **Bootstrap skeletons.** The T0 bootstrap should write `dokimos verification scaffold --write true` skeletons instead of the `requirements-compiler v41` compiling stubs, and CI should publish `dokimos verification coverage` on every merge. This is the change that turns Rehearsal 8's silent *not run* into visible red. It is reusable workflow work, permitted before kickoff, and is not done.

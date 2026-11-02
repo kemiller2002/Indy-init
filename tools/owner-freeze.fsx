@@ -25,10 +25,12 @@
 //   dotnet fsi Indy-init/tools/owner-freeze.fsx -- decide v4.1.2 --repo Indy-init  # ODR-V412-01..03 and -05; then the agent compiles v4.1.2
 //   dotnet fsi Indy-init/tools/owner-freeze.fsx -- approve v4.1.2 --repo Indy-init # ODR-V412-04, after the compiled package is reviewed
 //   dotnet fsi Indy-init/tools/owner-freeze.fsx -- tag v4.1.2 --repo Indy-init --commit <merge commit of the ODR-V412-04 pull request>
+//   dotnet fsi Indy-init/tools/owner-freeze.fsx -- acceptance --repo Indy-init     # the scope-change approvals the acceptance verifier
+//                                                                                  # reads (none today), and their pin in conditor.acceptance.json
 //
 // Options: --repo DIR (default: current directory), --dry-run (print what would be written; no commit, no push).
 //
-// Only the owner records (RDP-003): decide, approve and tag refuse to write when run by an agent (CLAUDECODE is set) or
+// Only the owner records (RDP-003): decide, approve, tag and acceptance refuse to write when run by an agent (CLAUDECODE is set) or
 // without a terminal to type into. status and --dry-run work for anyone, so an agent can prepare and check a step.
 
 open System
@@ -45,6 +47,11 @@ open System.Text.RegularExpressions
 
 let operatorId = "kemiller2002"
 let approvalsPath = "kickoff/rehearsal-007/approvals.causa.json"
+/// The acceptance verifier's approvals: requirement scope changes only (causa.requirements-approvals/1, each change a
+/// requirement_id and an action, each approval an immutable source). Package and decision records stay in approvalsPath,
+/// which the verifier does not read (R9-READINESS-HANDOFF.md §F item 1, owner's choice of 2026-11-02: separate files).
+let acceptanceApprovalsPath = "kickoff/acceptance/approvals.causa.json"
+let acceptanceContractPath = "conditor.acceptance.json"
 let githubRepo = "kemiller2002/Indy-init"
 
 type Package =
@@ -172,16 +179,20 @@ let withApproval (approvals: JsonNode) (approvalId: string) (changes: JsonNode l
     |> fun pairs -> if pairs |> List.exists (fst >> (=) "approvals") then pairs else pairs @ [ ("approvals", jarr [ approval ]) ]
     |> obj
 
-/// Writes the approvals file on a new branch from origin/main, commits as you, pushes and opens a pull request.
-let commitAndPropose (repo: string) (dryRun: bool) (branch: string) (title: string) (body: string) (content: string) : string option =
+/// Writes `files` (path, content) on a new branch from origin/main, commits as you, pushes and opens a pull request.
+let commitFilesAndPropose (repo: string) (dryRun: bool) (branch: string) (title: string) (body: string) (files: (string * string) list) : string option =
     if dryRun then
-        rule (); say $"DRY RUN: {approvalsPath} would become:"; say content
+        rule ()
+        files |> List.iter (fun (path, content) -> say $"DRY RUN: {path} would become:"; say content)
         say $"DRY RUN: commit \"{title}\" on branch {branch}; nothing was written, committed or pushed."
         None
     else
         git repo [ "switch"; "--quiet"; "-c"; branch; "origin/main" ] |> ignore
-        File.WriteAllText(Path.Combine(repo, approvalsPath), content)
-        git repo [ "add"; approvalsPath ] |> ignore
+        files |> List.iter (fun (path, content) ->
+            let full = Path.Combine(repo, path)
+            Directory.CreateDirectory(Path.GetDirectoryName full) |> ignore
+            File.WriteAllText(full, content)
+            git repo [ "add"; path ] |> ignore)
         git repo [ "commit"; "--quiet"; "-m"; title; "-m"; body ] |> ignore
         let message = git repo [ "log"; "-1"; "--format=%B" ]
         if message.Contains "Claude-Session:" || message.Contains "Co-Authored-By: Claude" then
@@ -191,6 +202,10 @@ let commitAndPropose (repo: string) (dryRun: bool) (branch: string) (title: stri
         say $"Committed as you on {branch} and pushed. Pull request: {url}"
         say "Review the diff there and merge it yourself."
         Some branch
+
+/// Writes the approvals file on a new branch from origin/main, commits as you, pushes and opens a pull request.
+let commitAndPropose repo dryRun branch title body (content: string) =
+    commitFilesAndPropose repo dryRun branch title body [ approvalsPath, content ]
 
 // ---- status ----------------------------------------------------------------------------------------------------------
 
@@ -519,6 +534,46 @@ let freeze repo dryRun (p: Package) =
     tag repo false p (Some commit)
     say "v4.1.1 is decided, approved and tagged."
 
+// ---- acceptance ----------------------------------------------------------------------------------------------------
+
+/// conditor.acceptance.json with its approvals pin moved to `path` at `sha256`; every other byte is kept.
+let repinApprovals (contract: string) (path: string) (sha256: string) =
+    let pattern = Regex("\"approvals\": \\{ \"path\": \"[^\"]*\", \"sha256\": \"[0-9a-f]{64}\" \\}")
+    if pattern.Matches(contract).Count <> 1 then stop $"{acceptanceContractPath} does not hold exactly one approvals pin in its usual form; re-pin it by hand"
+    pattern.Replace(contract, $"\"approvals\": {{ \"path\": \"{path}\", \"sha256\": \"{sha256}\" }}")
+
+/// The acceptance verifier's approvals file: requirement scope changes for the pinned baseline. None exist today
+/// (no baseline requirement is excluded or re-prioritized), so the file holds no approval; it is bound to the baseline
+/// by digest. Written once, by the owner, with the contract's approvals pin moved to it in the same commit.
+let acceptance repo dryRun =
+    prepare repo
+    let contractText = atMain repo acceptanceContractPath |> Encoding.UTF8.GetString
+    let contract = JsonNode.Parse contractText
+    let baselinePath = str contract["baseline"] "path"
+    let baselineSha = str contract["baseline"] "sha256"
+    let actual = atMain repo baselinePath |> sha256Hex
+    if actual <> baselineSha then stop $"{baselinePath} on main has sha256 {actual}, but {acceptanceContractPath} pins {baselineSha}"
+    if gitOk repo [ "cat-file"; "-e"; $"origin/main:{acceptanceApprovalsPath}" ] then
+        stop $"{acceptanceApprovalsPath} already exists on main; a scope change is recorded by editing it, not by this command"
+    let content =
+        obj [ "schema", jstr "causa.requirements-approvals/1"
+              "baseline_sha256", jstr baselineSha
+              "description", jstr $"Operator approvals of requirement scope changes (exclude, priority-change) for the baseline {baselinePath}, the only approvals the acceptance verifier reads. It holds none: no baseline requirement's scope has been changed. Package and decision approvals are in {approvalsPath}, which the verifier does not read. Written by the owner with tools/owner-freeze.fsx acceptance (RDP-003); an agent must not write, edit or infer a record here."
+              "approvals", jarr [] ]
+        |> render
+    let digest = Encoding.UTF8.GetBytes content |> sha256Hex
+    let repinned = repinApprovals contractText acceptanceApprovalsPath digest
+    rule ()
+    say $"This writes {acceptanceApprovalsPath}: no approval, bound to {baselinePath} (sha256 {baselineSha}), sha256 {digest}."
+    let pinnedNow = str contract["approvals"] "path"
+    say $"It moves the approvals pin in {acceptanceContractPath} from {pinnedNow} to it."
+    say $"{approvalsPath} is not changed; it keeps your package and decision records."
+    if not dryRun && choose "Type 'record' to write and pin this as your acceptance approvals, or 'abort'" [ "record"; "abort" ] = "abort" then (say "Aborted; nothing was written."; None) else
+    let title = "Owner acceptance approvals: scope changes only (none), pinned in conditor.acceptance.json"
+    let body =
+        $"{acceptanceApprovalsPath} holds the requirement scope-change approvals the acceptance verifier reads. There are none, so it holds no approval and is bound to the baseline by digest. {acceptanceContractPath} now pins it (sha256 {digest}). Package and decision records stay in {approvalsPath}. Written and committed by the owner.\n\nNext: conditor acceptance preflight (or the verifier's --preflight) reads READY on these inputs."
+    commitFilesAndPropose repo dryRun $"owner/acceptance-approvals-{stamp ()}" title body [ acceptanceApprovalsPath, content; acceptanceContractPath, repinned ]
+
 // ---- main --------------------------------------------------------------------------------------------------------------
 
 let argv = fsi.CommandLineArgs |> Array.toList |> List.tail
@@ -538,14 +593,15 @@ let writes = not (flag "--dry-run")
 
 let exitCode =
     try
-        if writes && argv |> List.exists (fun a -> List.contains a [ "decide"; "approve"; "tag"; "freeze" ]) then ownerAtTerminal ()
+        if writes && argv |> List.exists (fun a -> List.contains a [ "decide"; "approve"; "tag"; "freeze"; "acceptance" ]) then ownerAtTerminal ()
         match argv |> List.filter (fun a -> not (a.StartsWith "--")) |> List.except (option "--repo" |> Option.toList) |> List.except (option "--commit" |> Option.toList) with
         | [ "status" ] -> status repo; 0
+        | [ "acceptance" ] -> acceptance repo (flag "--dry-run") |> ignore; 0
         | [ "decide"; name ] -> decide repo (flag "--dry-run") (packageNamed name) |> ignore; 0
         | [ "approve"; name ] -> approve repo (flag "--dry-run") (packageNamed name) |> ignore; 0
         | [ "freeze"; name ] -> freeze repo (flag "--dry-run") (packageNamed name); 0
         | [ "tag"; name ] -> tag repo (flag "--dry-run") (packageNamed name) (option "--commit"); 0
-        | _ -> say "usage: dotnet fsi Indy-init/tools/owner-freeze.fsx -- status | decide v4|v4.1|v4.1.1|v4.1.2 | approve v4|v4.1|v4.1.1|v4.1.2 | tag v4|v4.1|v4.1.1|v4.1.2 [--commit SHA] | freeze v4.1.1 [--repo DIR] [--dry-run]"; 2
+        | _ -> say "usage: dotnet fsi Indy-init/tools/owner-freeze.fsx -- status | decide v4|v4.1|v4.1.1|v4.1.2 | approve v4|v4.1|v4.1.1|v4.1.2 | tag v4|v4.1|v4.1.1|v4.1.2 [--commit SHA] | freeze v4.1.1 | acceptance [--repo DIR] [--dry-run]"; 2
     with Stop message -> eprintfn "stopped: %s" message; 1
 
 exit exitCode
