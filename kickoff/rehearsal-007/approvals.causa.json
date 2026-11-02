@@ -276,6 +276,21 @@
           "option": "A"
         }
       ]
+    },
+    {
+      "id": "APR-V412-OWNER-2",
+      "authority": {
+        "kind": "operator",
+        "id": "kemiller2002"
+      },
+      "date": "2026-11-02",
+      "changes": [
+        {
+          "decision_id": "ODR-V412-05",
+          "action": "select",
+          "option": "A"
+        }
+      ]
     }
   ]
 }
