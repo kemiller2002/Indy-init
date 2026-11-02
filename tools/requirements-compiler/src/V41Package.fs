@@ -169,9 +169,17 @@ let amendmentProblems (i: Inputs) : string list =
         [ if not (List.contains (sOr "machine" x) v4Machines) then yield sprintf "%s names machine %s, which v4 does not define" what (sOr "machine" x)
           if not (requestOfKind i "state-machine-amendment" (sOr "decision" x)) then yield sprintf "%s names decision '%s', which is not a state-machine-amendment request" what (sOr "decision" x)
           if String.IsNullOrWhiteSpace (sOr "approval" x) then yield sprintf "%s names no operator approval" what ]
+    let v4Transitions (machine: string) =
+        arr "machines" i.StateMachines |> List.filter (fun m -> str "id" m = machine) |> List.collect (arr "transitions") |> List.map (str "id")
     [ for t in arr "transitions" i.MachineAmendments do
           let what = sprintf "amendment %s" (sOr "id" t)
           yield! cites what t
+          let existing = List.contains (sOr "id" t) (v4Transitions (sOr "machine" t))
+          match field "replaces" t with
+          | Some(JBool true) when not existing -> yield sprintf "%s replaces a transition %s does not define" what (sOr "machine" t)
+          | Some(JBool true) -> ()
+          | _ when existing -> yield sprintf "%s reuses the id of a v4 transition without replacing it (\"replaces\": true)" what
+          | _ -> ()
           for s in strs "sources" t do
               if not (requirementIds.Contains s) then yield sprintf "%s: source %s is not a baseline requirement" what s
       for a in arr "accepted" i.MachineAmendments do
@@ -181,12 +189,20 @@ let amendmentProblems (i: Inputs) : string list =
 /// with its decision. No state or event is added, and v4's files are never edited (v4 is frozen at its tag).
 let amendedMachines (i: Inputs) : Json list =
     let added = arr "transitions" i.MachineAmendments
-    let transitionOf (t: Json) = match t with JObj ps -> JObj(ps |> List.filter (fun (k, _) -> k <> "machine" && k <> "approval")) | j -> j
+    // An amendment that replaces a v4 transition (v4.1.2: a guard narrowed by an owner decision) takes its place under
+    // the same id; every other amendment is added. Whether a replacement names a v4 transition is amendmentProblems'.
+    let replaces (t: Json) = match field "replaces" t with Some(JBool true) -> true | _ -> false
+    let transitionOf (t: Json) = match t with JObj ps -> JObj(ps |> List.filter (fun (k, _) -> k <> "machine" && k <> "approval" && k <> "replaces")) | j -> j
     arr "machines" i.StateMachines
     |> List.map (fun m ->
         match added |> List.filter (fun t -> sOr "machine" t = str "id" m) with
         | [] -> m
-        | ts -> setIn "transitions" (JArr(arr "transitions" m @ (ts |> List.map transitionOf))) m)
+        | ts ->
+            let replaced = ts |> List.filter replaces |> List.map (fun t -> sOr "id" t, t) |> Map.ofList
+            let kept =
+                arr "transitions" m
+                |> List.map (fun t -> match replaced.TryFind(sOr "id" t) with Some r -> transitionOf r | None -> t)
+            setIn "transitions" (JArr(kept @ (ts |> List.filter (replaces >> not) |> List.map transitionOf))) m)
 
 /// The state-machine test ids of a machine: one per transition and one for its illegal pairs, in the test project of
 /// the machine's owner (analysis/project-structure.json stateMachines).
@@ -1629,12 +1645,25 @@ let contractClassification (i: Inputs) (contracts: (string * string) list) : Jso
                   i.ReadSource (baseline + "/package-manifest.json")
                   |> Option.bind (fun t -> field "files" (parseBytes (Text.Encoding.UTF8.GetBytes t)))
                   |> Option.defaultValue (JObj [])
+              // A contract may differ from its baseline only as the amendment declares (v4.1.2): the file, the digest
+              // of its new text and the interface-change decision that authorizes it. Any other difference still fails.
+              let declared = amendmentList "contractChanges" i |> List.map (fun c -> sOr "file" c, c) |> Map.ofList
               for (path, text) in contracts do
-                  match i.ReadSource (baseline + "/" + path) with
-                  | Some b when b = text ->
+                  match i.ReadSource (baseline + "/" + path), declared.TryFind path with
+                  | Some b, None when b = text ->
                       if strOpt path approved <> Some(digest b) then yield sprintf "%s/%s does not have the digest its approved package manifest records" baseline path
-                  | Some _ -> yield sprintf "%s differs from the reviewed baseline %s/%s; a changed contract needs its own review" path baseline path
-                  | None -> yield sprintf "%s is not in the reviewed baseline %s" path baseline
+                  | Some b, Some c ->
+                      if strOpt path approved <> Some(digest b) then yield sprintf "%s/%s does not have the digest its approved package manifest records" baseline path
+                      if b = text then yield sprintf "%s is declared changed but equals its baseline %s/%s (stale contractChanges entry)" path baseline path
+                      elif sOr "sha256" c <> digest text then yield sprintf "%s has sha256 %s; its declared change pins %s" path (digest text) (sOr "sha256" c)
+                      // An interface change, or the state-machine amendment whose guards need the changed contract.
+                      if not (requestOfKind i "interface-change" (sOr "decision" c) || requestOfKind i "state-machine-amendment" (sOr "decision" c)) then
+                          yield sprintf "the change of %s names decision '%s', which is not an interface-change or state-machine-amendment request" path (sOr "decision" c)
+                      if String.IsNullOrWhiteSpace (sOr "summary" c) then yield sprintf "the change of %s has no summary" path
+                  | Some _, None -> yield sprintf "%s differs from the reviewed baseline %s/%s; a changed contract needs its own review" path baseline path
+                  | None, _ -> yield sprintf "%s is not in the reviewed baseline %s" path baseline
+              for KeyValue(path, _) in declared do
+                  if not (contracts |> List.exists (fst >> (=) path)) then yield sprintf "contractChanges names %s, which is not a generated contract file" path
           for (c, j) in controls do
               if not (entries |> List.exists (fun (n, _, _, _) -> n = c)) then yield sprintf "the control %s is not a generated contract file" c
               if String.IsNullOrWhiteSpace (sOr "classification" j) then yield sprintf "the control %s has no classification" c
@@ -1801,8 +1830,8 @@ let bootstrapCheck (i: Inputs) : Check =
           for (n, t) in i.AuthoredText do
               if n = "AGENT-RULES.md" && t.Contains "relies on ODR-V41-06" then yield "AGENT-RULES.md still makes the bootstrap rely on organizer confirmation (ODR-V41-06)" ]
 
-/// X20: the amendment names the package it amends by its approved manifest digest and its approval, and its version is a
-/// successor of 4.1.0.
+/// X20: the amendment names the package it amends (v4.1, or an earlier successor of it) by its approved manifest digest
+/// and its approval, and its version is a successor of the amended version.
 let amendmentRecordCheck (i: Inputs) : Check =
     let a = i.Amendment |> Option.defaultValue (JObj [])
     let amends = field "amends" a |> Option.defaultValue (JObj [])
@@ -1810,7 +1839,15 @@ let amendmentRecordCheck (i: Inputs) : Check =
     let actual = i.ReadSource (target + "/package-manifest.json") |> Option.map (fun t -> Git.sha256Hex (Text.Encoding.UTF8.GetBytes t))
     check "X20" "The amendment names the package it amends by the approved manifest digest and approval, its version succeeds 4.1.0, and every change is classified"
         [ if not (Regex.IsMatch(packageVersion i, @"^4\.1\.[1-9][0-9]*$")) then yield sprintf "version %s is not a successor of 4.1.0" (packageVersion i)
-          if target <> "requirements-compiled/v4.1" then yield sprintf "the amendment amends %s, not requirements-compiled/v4.1" target
+          // A successor amends v4.1 or an earlier, approved successor of it (v4.1.2 amends v4.1.1), never a later one.
+          let amendedVersion = sOr "packageVersion" amends
+          let versionOf (v: string) = v.Split('.') |> Array.map (fun x -> match Int32.TryParse x with | true, n -> n | _ -> -1) |> List.ofArray
+          if not (Regex.IsMatch(target, @"^requirements-compiled/v4\.1(\.[1-9][0-9]*)?$")) then
+              yield sprintf "the amendment amends %s, which is neither requirements-compiled/v4.1 nor a successor of it" target
+          elif target <> "requirements-compiled/v" + (if amendedVersion = "4.1.0" then "4.1" else amendedVersion) then
+              yield sprintf "the amendment amends %s but names its version %s" target amendedVersion
+          elif compare (versionOf amendedVersion) (versionOf (packageVersion i)) >= 0 then
+              yield sprintf "the amended version %s does not precede this package's version %s" amendedVersion (packageVersion i)
           match actual with
           | None -> yield sprintf "%s/package-manifest.json is not readable" target
           | Some d when d <> sOr "manifestSha256" amends -> yield sprintf "the amended manifest has sha256 %s, the amendment names %s" d (sOr "manifestSha256" amends)
