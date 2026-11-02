@@ -35,8 +35,9 @@ finishes a delegation packet reports it with
 and a Dokimos completion receipt is recorded with
 `ordo events record-verification --packet ID --dokimos-receipt FILE`. Specula's
 Verification view reads this exact path. A missing file shows as unknown, not
-as zero Ordo use. Only Ordo builds that include kemiller2002/ordo#111 (merged
-2026-11-02, after 1.19.0) write events; an older Ordo ignores the variable.
+as zero Ordo use. Ordo 1.20.0 and later write events (kemiller2002/ordo#111);
+1.19.0 and earlier ignore the variable, so the kickoff set must select Ordo
+1.20.0 (echelon-current 1.34.0 or later).
 Format and rules: kemiller2002/ordo `docs/architecture/ordo-decision-events.md`.
 
 ## 2. Canonical contract entry
