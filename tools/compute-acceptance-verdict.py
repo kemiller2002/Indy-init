@@ -68,38 +68,15 @@ def safe_relative(path):
     return not candidate.is_absolute() and ".." not in candidate.parts and "." not in candidate.parts
 
 
-def build_trust(
-    *,
-    baseline_raw=None,
-    expected_baseline_digest=None,
-    baseline_read=lambda commit, path: None,
-    approvals_raw=None,
-    expected_approvals_digest=None,
-    manifest_raw=None,
-    expected_manifest_digest=None,
-    evidence_read=lambda path: None,
-    trusted_source_sha=None,
-    source_exists=False,
-    trusted_operator_ids=(),
-):
-    problems = []
-    baseline = parse_json(baseline_raw, "requirements baseline", problems)
-    approvals = parse_json(approvals_raw, "approvals file", problems)
-    manifest = parse_json(manifest_raw, "evidence manifest", problems)
-
-    actual_baseline_digest = digest(baseline_raw) if baseline_raw is not None else None
-    actual_approvals_digest = digest(approvals_raw) if approvals_raw is not None else None
-    actual_manifest_digest = digest(manifest_raw) if manifest_raw is not None else None
-    for label, actual, expected in (
-        ("requirements baseline", actual_baseline_digest, expected_baseline_digest),
-        ("approvals file", actual_approvals_digest, expected_approvals_digest),
-        ("evidence manifest", actual_manifest_digest, expected_manifest_digest),
-    ):
+def check_digests(pairs, problems):
+    for label, actual, expected in pairs:
         if not _ledger.is_digest(expected):
             problems.append(f"trusted {label} expected SHA-256 is required")
         elif actual != expected:
             problems.append(f"trusted {label} SHA-256 mismatch: expected {expected}, actual {actual}")
 
+
+def check_baseline(baseline, baseline_read, problems):
     baseline_source = baseline.get("source") if isinstance(baseline.get("source"), dict) else {}
     if baseline.get("schema") != "praxis.requirements-baseline/1":
         problems.append("trusted requirements baseline has unsupported schema")
@@ -125,6 +102,9 @@ def build_trust(
     if not isinstance(requirements, list):
         problems.append("trusted requirements baseline requirements must be an array")
 
+
+def check_approvals(approvals, actual_baseline_digest, trusted_operator_ids, problems):
+    """Returns the trusted approval changes keyed by (approval id, requirement id, action)."""
     if approvals.get("schema") != "causa.requirements-approvals/1":
         problems.append("trusted approvals file has unsupported schema")
     if approvals.get("baseline_sha256") != actual_baseline_digest:
@@ -134,36 +114,68 @@ def build_trust(
     approval_items = approvals.get("approvals")
     if not isinstance(approval_items, list):
         problems.append("trusted approvals must be an array")
-    else:
-        for approval in approval_items:
-            if not isinstance(approval, dict):
-                problems.append("trusted approval entry must be an object")
+        return approval_changes
+    for approval in approval_items:
+        if not isinstance(approval, dict):
+            problems.append("trusted approval entry must be an object")
+            continue
+        approval_id = approval.get("id")
+        authority = approval.get("authority") if isinstance(approval.get("authority"), dict) else {}
+        source = approval.get("source") if isinstance(approval.get("source"), dict) else {}
+        if not isinstance(approval_id, str) or not approval_id:
+            problems.append("trusted approval entry missing id")
+            continue
+        if (authority.get("kind") != "operator" or
+                authority.get("id") not in trusted_operator_ids):
+            problems.append(
+                f"approval {approval_id} is not authenticated as a trusted operator decision")
+        if not source.get("repository") or not _ledger.is_sha(source.get("commit")) or not safe_relative(source.get("path")):
+            problems.append(f"approval {approval_id} lacks an immutable authority source")
+        changes = approval.get("changes")
+        if not isinstance(changes, list) or not changes:
+            problems.append(f"approval {approval_id} has no changes")
+            continue
+        for change in changes:
+            if not isinstance(change, dict):
+                problems.append(f"approval {approval_id} contains an invalid change")
                 continue
-            approval_id = approval.get("id")
-            authority = approval.get("authority") if isinstance(approval.get("authority"), dict) else {}
-            source = approval.get("source") if isinstance(approval.get("source"), dict) else {}
-            if not isinstance(approval_id, str) or not approval_id:
-                problems.append("trusted approval entry missing id")
+            key = (change.get("requirement_id"), change.get("action"))
+            if not all(isinstance(value, str) and value for value in key):
+                problems.append(f"approval {approval_id} contains an invalid change identity")
                 continue
-            if (authority.get("kind") != "operator" or
-                    authority.get("id") not in trusted_operator_ids):
-                problems.append(
-                    f"approval {approval_id} is not authenticated as a trusted operator decision")
-            if not source.get("repository") or not _ledger.is_sha(source.get("commit")) or not safe_relative(source.get("path")):
-                problems.append(f"approval {approval_id} lacks an immutable authority source")
-            changes = approval.get("changes")
-            if not isinstance(changes, list) or not changes:
-                problems.append(f"approval {approval_id} has no changes")
-                continue
-            for change in changes:
-                if not isinstance(change, dict):
-                    problems.append(f"approval {approval_id} contains an invalid change")
-                    continue
-                key = (change.get("requirement_id"), change.get("action"))
-                if not all(isinstance(value, str) and value for value in key):
-                    problems.append(f"approval {approval_id} contains an invalid change identity")
-                    continue
-                approval_changes[(approval_id,) + key] = change
+            approval_changes[(approval_id,) + key] = change
+    return approval_changes
+
+
+def build_trust(
+    *,
+    baseline_raw=None,
+    expected_baseline_digest=None,
+    baseline_read=lambda commit, path: None,
+    approvals_raw=None,
+    expected_approvals_digest=None,
+    manifest_raw=None,
+    expected_manifest_digest=None,
+    evidence_read=lambda path: None,
+    trusted_source_sha=None,
+    source_exists=False,
+    trusted_operator_ids=(),
+):
+    problems = []
+    baseline = parse_json(baseline_raw, "requirements baseline", problems)
+    approvals = parse_json(approvals_raw, "approvals file", problems)
+    manifest = parse_json(manifest_raw, "evidence manifest", problems)
+
+    actual_baseline_digest = digest(baseline_raw) if baseline_raw is not None else None
+    actual_approvals_digest = digest(approvals_raw) if approvals_raw is not None else None
+    actual_manifest_digest = digest(manifest_raw) if manifest_raw is not None else None
+    check_digests((
+        ("requirements baseline", actual_baseline_digest, expected_baseline_digest),
+        ("approvals file", actual_approvals_digest, expected_approvals_digest),
+        ("evidence manifest", actual_manifest_digest, expected_manifest_digest),
+    ), problems)
+    check_baseline(baseline, baseline_read, problems)
+    approval_changes = check_approvals(approvals, actual_baseline_digest, trusted_operator_ids, problems)
 
     if manifest.get("schema") != "causa.acceptance-evidence-manifest/1":
         problems.append("trusted evidence manifest has unsupported schema")
@@ -196,6 +208,60 @@ def build_trust(
         "evidence_read": evidence_read,
         "trusted_source_sha": trusted_source_sha,
         "problems": tuple(problems),
+    }
+
+
+PREFLIGHT_SCHEMA = "causa.acceptance-preflight/1"
+OWNER_ACTIONS = (
+    ("lacks an immutable authority source",
+     "owner: re-record this approval with source.repository, source.commit (40 hex) and source.path naming the decision record"),
+    ("invalid change identity",
+     "owner: every change must name requirement_id and action; the verifier ignores obligation_id or decision_id alone"),
+    ("not authenticated as a trusted operator decision",
+     "owner: authority must be {kind: operator, id: <trusted operator>} and the operator must be passed with --trusted-operator-id"),
+    ("bound to a different requirements baseline",
+     "owner: re-bind the approvals file to the pinned baseline (baseline_sha256)"),
+    ("has no changes", "owner: an approval must list the changes it authorizes"),
+)
+
+
+def owner_action(problem):
+    return next((action for marker, action in OWNER_ACTIONS if marker in problem), None)
+
+
+def preflight(
+    *,
+    baseline_raw=None,
+    expected_baseline_digest=None,
+    baseline_read=lambda commit, path: None,
+    approvals_raw=None,
+    expected_approvals_digest=None,
+    trusted_operator_ids=(),
+):
+    """Pre-T0 trust check: the baseline and approvals rules of build_trust, without a ledger.
+
+    The evidence manifest and source SHA exist only after a candidate is built, so they are not
+    checked here; every check that is run is the one acceptance runs."""
+    problems = []
+    baseline = parse_json(baseline_raw, "requirements baseline", problems)
+    approvals = parse_json(approvals_raw, "approvals file", problems)
+    actual_baseline_digest = digest(baseline_raw) if baseline_raw is not None else None
+    actual_approvals_digest = digest(approvals_raw) if approvals_raw is not None else None
+    check_digests((
+        ("requirements baseline", actual_baseline_digest, expected_baseline_digest),
+        ("approvals file", actual_approvals_digest, expected_approvals_digest),
+    ), problems)
+    check_baseline(baseline, baseline_read, problems)
+    changes = check_approvals(approvals, actual_baseline_digest, trusted_operator_ids, problems)
+    return {
+        "schema": PREFLIGHT_SCHEMA,
+        "verdict": "INVALID" if problems else "READY",
+        "checked": ["baseline", "approvals"],
+        "not_checked": ["evidence manifest (exists only after a candidate)", "candidate source SHA"],
+        "baseline_sha256": actual_baseline_digest,
+        "approvals_sha256": actual_approvals_digest,
+        "trusted_changes": len(changes),
+        "problems": [{"problem": item, "owner_action": owner_action(item)} for item in problems],
     }
 
 
@@ -430,7 +496,9 @@ def read_optional(path):
 
 def parse_args(argv):
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("ledger")
+    parser.add_argument("ledger", nargs="?")
+    parser.add_argument("--preflight", action="store_true",
+                        help="check only the baseline and approvals, before T0; exit 0 READY, 3 INVALID")
     parser.add_argument("--repo")
     parser.add_argument("--baseline")
     parser.add_argument("--baseline-sha256")
@@ -446,8 +514,32 @@ def parse_args(argv):
     return parser.parse_args(argv)
 
 
+def run_preflight(args):
+    try:
+        baseline_raw = read_optional(args.baseline)
+        approvals_raw = read_optional(args.approvals)
+    except OSError as ex:
+        print(f"Unreadable input: {ex}", file=sys.stderr)
+        return 2
+    result = preflight(
+        baseline_raw=baseline_raw,
+        expected_baseline_digest=args.baseline_sha256,
+        baseline_read=git_blob_reader(args.baseline_source) if args.baseline_source else (lambda commit, path: None),
+        approvals_raw=approvals_raw,
+        expected_approvals_digest=args.approvals_sha256,
+        trusted_operator_ids=args.trusted_operator_id,
+    )
+    print(json.dumps(result, indent=2))
+    return 0 if result["verdict"] == "READY" else 3
+
+
 def main(argv):
     args = parse_args(argv)
+    if args.preflight:
+        return run_preflight(args)
+    if args.ledger is None:
+        print("a ledger is required unless --preflight is given", file=sys.stderr)
+        return 2
     try:
         data = json.loads(Path(args.ledger).read_text(encoding="utf-8"))
         report = Path(args.report).read_text(encoding="utf-8") if args.report else None

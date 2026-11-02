@@ -1,0 +1,12 @@
+{
+  "schema": "conditor.acceptance-preflight/1",
+  "description": "Pre-T0 acceptance-trust preflight (docs/engineering-improvement/R9-VERIFICATION-DECISION-RECORD.md D1). Conditor runs the authoritative verifier in --preflight mode; it adds no acceptance rule. The approvals digest below is the file's digest on 2026-11-02 and must be confirmed (or re-pinned) by the owner for Rehearsal 9; agents never re-pin it to match an edited file.",
+  "verifier": ["python3", "tools/compute-acceptance-verdict.py"],
+  "baseline": { "path": "requirements/causa-requirements-baseline-v4.json", "sha256": "f86a3539e48ee8dda7d99d5f4f5546a18e2397a82d308a277c8f346edb2a8f1a" },
+  "baselineSource": ".",
+  "approvals": { "path": "kickoff/rehearsal-007/approvals.causa.json", "sha256": "63a9ce5b8a5cd160fff7d485bbd877276625b2093e894e3b7fe75b57b9d7a8c8" },
+  "trustedOperators": ["kemiller2002"],
+  "requiredInputs": [
+    { "id": "verification-execution-plan", "path": "requirements-compiled/v4.1.1/verification-execution-plan.json", "sha256": "06c667e52c098a4f95de06e9a451ebdbfecc671c21cf49dd6070a9f67744ac01" }
+  ]
+}
