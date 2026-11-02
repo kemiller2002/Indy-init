@@ -133,18 +133,19 @@
     "automatic reads spent and four reconciliation reads already sent in the 60 s before RequestContext.Now"
    ],
    "exhaustive": false,
-   "exclusiveBecause": "with the automatic reads spent, fewer than four or four reads were sent in the 60 s window; before the automatic reads are spent Check again is not offered and fails closed"
+   "exclusiveBecause": "with the automatic reads spent, fewer than four or four reconciliation reads were sent in the 60 s window; while automatic reads are left Check again is not offered (T-S62, T-S63 and T-S65 offer it only once they are spent) and the input fails closed"
   },
   {
    "machine": "SM-SAVE",
    "state": "UnknownOutcome",
    "event": "WentOnline",
    "guards": [
-    "fewer than four reconciliation reads sent in the 60 s before RequestContext.Now",
-    "four reconciliation reads already sent in the 60 s before RequestContext.Now"
+    "automatic reads left",
+    "automatic reads spent and fewer than four reconciliation reads sent in the 60 s before RequestContext.Now",
+    "automatic reads spent and four reconciliation reads already sent in the 60 s before RequestContext.Now"
    ],
    "exhaustive": true,
-   "exclusiveBecause": "fewer than four or four reads were sent in the 60 s window"
+   "exclusiveBecause": "automatic reads are left, or spent with fewer than four or four reconciliation reads in the 60 s window"
   },
   {
    "machine": "SM-SAVE",

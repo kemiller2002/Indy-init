@@ -1,6 +1,6 @@
 {
  "schema": "indy-init.v41-owner-decision-requests/1",
- "status": "decided: ODR-V41-01 (APR-V41-OWNER-4) and ODR-V41-02..09, as for v4.1; they carry over unchanged. Pending: ODR-V411-02 (organizer-approval obligations) and ODR-V411-01 (approval of package v4.1.1). Only the operator writes records (RDP-003)",
+ "status": "v4.1 and v4.1.1 requests are recorded (APR-V41-OWNER-1..4, APR-V411-OWNER-1/2). Pending: ODR-V412-01..03 (owner-freeze.fsx decide v4.1.2), then ODR-V412-04 (approve v4.1.2) once the package is compiled from those records and reviewed.",
  "requests": [
   {
    "id": "ODR-V41-01",
@@ -188,17 +188,130 @@
    "id": "ODR-V412-01",
    "kind": "state-machine-amendment",
    "title": "Rate-limit user- and network-driven reconciliation reads to INV-04 (Rehearsal 8 DEV-R8-11)",
-   "question": "INV-04 allows at most four reconciliation reads in 60 s under total network failure, but SM-SAVE T-S31 (Check again) and T-S32 (back online) each send a read with no limit, so the frozen tables contradict the invariant (Rehearsal 8 DEV-R8-11; percepta spec-preflight rate-bound-vs-unbounded-loop). How do the transitions keep within INV-04?",
+   "question": "INV-04 allows at most four reconciliation reads in 60 s under total network failure, but SM-SAVE sends them without that bound: T-S31 (Check again) and T-S32 (back online) read without limit, and the three automatic reads (T-S19, T-S29, ReconcileDue) are not counted against any window (Rehearsal 8 DEV-R8-11; independent review RV412-1-1). How does SM-SAVE keep within INV-04?",
    "options": [
-    "A: rate-limit to INV-04's own numbers: replace T-S31 (UnknownOutcome + CheckAgain -> UnknownOutcome, automatic reads spent and fewer than four reconciliation reads sent in the 60 s before RequestContext.Now: one read) and T-S32 (UnknownOutcome + WentOnline -> UnknownOutcome, fewer than four reads sent in that window: one read); add T-S62 (UnknownOutcome + CheckAgain -> UnknownOutcome at four reads: send nothing, keep Check again offered and announce when it reads again) and T-S63 (UnknownOutcome + WentOnline -> UnknownOutcome at four reads: send nothing, offer Check again); add RequestContext.Now and InvestigationSession.ReconcileReadsSentAt (IF41-WIRE, IF41-SAVE)",
+    "A: count every reconciliation read, automatic or not, against INV-04's own window: a read is sent only while fewer than four reconciliation reads were sent in the 60 s before RequestContext.Now, one entry per reconciliation (its commit pages and file reads are not further reads), counted per investigation session. At the limit an automatic read is rescheduled (ReconcileDue) and Check again or back-online sends nothing; Check again is offered only once the automatic reads are spent. Applies exactly the transitions and contract digests listed in 'applies' under A: T-S31, T-S32 and T-S47 replaced; T-S62, T-S63 and T-S65 added; RequestContext.Now (IF41-WIRE); InvestigationSession.ReconcileReadsSentAt and the windowed ReconcileDue (IF41-SAVE)",
     "B: amend INV-04 to count only automatic reads (a requirement change, not in v4.1.2)",
     "C: leave the contradiction; INV04 RequestBounds stays red"
    ],
-   "recommendation": "A. It uses INV-04's own numbers, so no requirement changes; the clock enters through RequestContext and the machines stay pure.",
-   "rationale": "Owner choice given 2026-11-02: rate limit, INV-04's own numbers.",
+   "recommendation": "A. Every path that sends a reconciliation read checks the same window, so INV-04 holds by construction; no requirement changes and the machines stay pure.",
+   "rationale": "Owner choices given 2026-11-02 after the round-1 review: count every read; one reconciliation attempt is one read; re-decide.",
    "impact": "Until recorded, v4.1.2 cannot be compiled with these transitions (ownerRecords).",
    "approvalRecord": {
-    "how": "A change in an operator approval (recordFormat): {\"decision_id\": \"ODR-V412-01\", \"action\": \"select\", \"option\": \"A\"}, recorded by the owner with tools/owner-freeze.fsx decide v4.1.2. Agents never write it (RDP-003)."
+    "how": "A change in an operator approval (recordFormat): {\"decision_id\": \"ODR-V412-01\", \"action\": \"select\", \"option\": \"A\"}, recorded by the owner with tools/owner-freeze.fsx decide v4.1.2. Selecting an option approves exactly what its 'applies' entry lists; the offline suite compares the package with it. Agents never write the record (RDP-003)."
+   },
+   "applies": {
+    "A": {
+     "transitions": [
+      {
+       "machine": "SM-SAVE",
+       "id": "T-S31",
+       "replaces": true,
+       "from": "UnknownOutcome",
+       "event": "CheckAgain",
+       "to": "UnknownOutcome",
+       "guard": "automatic reads spent and fewer than four reconciliation reads sent in the 60 s before RequestContext.Now",
+       "effects": [
+        "one reconciliation read",
+        "record its send time in ReconcileReadsSentAt"
+       ],
+       "sources": [
+        "PERSIST-016",
+        "PERSIST-031"
+       ]
+      },
+      {
+       "machine": "SM-SAVE",
+       "id": "T-S62",
+       "from": "UnknownOutcome",
+       "event": "CheckAgain",
+       "to": "UnknownOutcome",
+       "guard": "automatic reads spent and four reconciliation reads already sent in the 60 s before RequestContext.Now",
+       "effects": [
+        "send nothing",
+        "keep Check again offered",
+        "announce that Check again can read again 60 s after the oldest of those four reads"
+       ],
+       "sources": [
+        "PERSIST-016",
+        "PERSIST-031"
+       ]
+      },
+      {
+       "machine": "SM-SAVE",
+       "id": "T-S32",
+       "replaces": true,
+       "from": "UnknownOutcome",
+       "event": "WentOnline",
+       "to": "UnknownOutcome",
+       "guard": "automatic reads spent and fewer than four reconciliation reads sent in the 60 s before RequestContext.Now",
+       "effects": [
+        "one reconciliation read",
+        "record its send time in ReconcileReadsSentAt"
+       ],
+       "sources": [
+        "PERSIST-016"
+       ]
+      },
+      {
+       "machine": "SM-SAVE",
+       "id": "T-S63",
+       "from": "UnknownOutcome",
+       "event": "WentOnline",
+       "to": "UnknownOutcome",
+       "guard": "automatic reads spent and four reconciliation reads already sent in the 60 s before RequestContext.Now",
+       "effects": [
+        "send nothing",
+        "keep Check again offered"
+       ],
+       "sources": [
+        "PERSIST-016",
+        "PERSIST-031"
+       ]
+      },
+      {
+       "machine": "SM-SAVE",
+       "id": "T-S65",
+       "from": "UnknownOutcome",
+       "event": "WentOnline",
+       "to": "UnknownOutcome",
+       "guard": "automatic reads left",
+       "effects": [
+        "send nothing now",
+        "the automatic reads resume: the next is sent when due, under the 60 s window of ReconcileDue"
+       ],
+       "sources": [
+        "PERSIST-016"
+       ]
+      },
+      {
+       "machine": "SM-SAVE",
+       "id": "T-S47",
+       "replaces": true,
+       "from": "UnknownOutcome",
+       "event": "WentOffline",
+       "to": "UnknownOutcome",
+       "guard": "true",
+       "effects": [
+        "automatic reads pause",
+        "on return, T-S32, T-S63 or T-S65 applies"
+       ],
+       "sources": [
+        "PERSIST-016"
+       ]
+      }
+     ],
+     "contracts": [
+      {
+       "file": "contracts/03-IF41-WIRE.fs",
+       "sha256": "48f227960704c4e5b165e227b44d53a2da03c1d1347ab43ee0d9c6bcd3a21116"
+      },
+      {
+       "file": "contracts/05-IF41-SAVE.fs",
+       "sha256": "904465d9f47f05c12b17b544e8b379842b2ace0915b4516a785a28dd648d980f"
+      }
+     ]
+    }
    }
   },
   {
@@ -215,7 +328,18 @@
    "rationale": "Owner choice given 2026-11-02: add the command field, section-31 case names with opaque payloads, and the same treatment for events.",
    "impact": "Until recorded, the v4.1.2 contract changes cannot pass X17.",
    "approvalRecord": {
-    "how": "A change in an operator approval (recordFormat): {\"decision_id\": \"ODR-V412-02\", \"action\": \"select\", \"option\": \"A\"}, recorded by the owner with tools/owner-freeze.fsx decide v4.1.2. Agents never write it (RDP-003)."
+    "how": "A change in an operator approval (recordFormat): {\"decision_id\": \"ODR-V412-02\", \"action\": \"select\", \"option\": \"A\"}, recorded by the owner with tools/owner-freeze.fsx decide v4.1.2. Selecting an option approves exactly what its 'applies' entry lists; the offline suite compares the package with it. Agents never write the record (RDP-003)."
+   },
+   "applies": {
+    "A": {
+     "transitions": [],
+     "contracts": [
+      {
+       "file": "contracts/00-DOMAIN-STUBS.fs",
+       "sha256": "178b6e3f6902f656f9a1c092792707452cf4dbff976d7603b5c75671e2c6e258"
+      }
+     ]
+    }
    }
   },
   {
@@ -231,7 +355,31 @@
    "rationale": "Owner choice given 2026-11-02: write it to the table.",
    "impact": "Until recorded, v4.1.2 cannot be compiled with T-S64 (ownerRecords).",
    "approvalRecord": {
-    "how": "A change in an operator approval (recordFormat): {\"decision_id\": \"ODR-V412-03\", \"action\": \"select\", \"option\": \"A\"}, recorded by the owner with tools/owner-freeze.fsx decide v4.1.2. Agents never write it (RDP-003)."
+    "how": "A change in an operator approval (recordFormat): {\"decision_id\": \"ODR-V412-03\", \"action\": \"select\", \"option\": \"A\"}, recorded by the owner with tools/owner-freeze.fsx decide v4.1.2. Selecting an option approves exactly what its 'applies' entry lists; the offline suite compares the package with it. Agents never write the record (RDP-003)."
+   },
+   "applies": {
+    "A": {
+     "transitions": [
+      {
+       "machine": "SM-SAVE",
+       "id": "T-S64",
+       "from": "UnknownOutcome",
+       "event": "ReconcileReadFailed",
+       "to": "UnknownOutcome",
+       "guard": "three automatic reads already made",
+       "effects": [
+        "offer Check again",
+        "nothing outstanding",
+        "no further automatic reads except one per offline-to-online change"
+       ],
+       "sources": [
+        "PERSIST-016",
+        "PERSIST-031"
+       ]
+      }
+     ],
+     "contracts": []
+    }
    }
   },
   {

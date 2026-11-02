@@ -1647,7 +1647,12 @@ let contractClassification (i: Inputs) (contracts: (string * string) list) : Jso
                   |> Option.defaultValue (JObj [])
               // A contract may differ from its baseline only as the amendment declares (v4.1.2): the file, the digest
               // of its new text and the interface-change decision that authorizes it. Any other difference still fails.
-              let declared = amendmentList "contractChanges" i |> List.map (fun c -> sOr "file" c, c) |> Map.ofList
+              let changeList = amendmentList "contractChanges" i
+              let declared = changeList |> List.map (fun c -> sOr "file" c, c) |> Map.ofList
+              for (file, n) in changeList |> List.countBy (sOr "file") do
+                  if n > 1 then yield sprintf "contractChanges declares %s %d times; each changed contract is declared once" file n
+              for c in changeList do
+                  if String.IsNullOrWhiteSpace (sOr "approval" c) then yield sprintf "the change of %s names no operator approval" (sOr "file" c)
               for (path, text) in contracts do
                   match i.ReadSource (baseline + "/" + path), declared.TryFind path with
                   | Some b, None when b = text ->
