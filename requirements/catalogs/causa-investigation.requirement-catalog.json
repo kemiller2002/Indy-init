@@ -3,7 +3,7 @@
   "catalogId": "CAT-CAUSA-INVESTIGATION",
   "idPattern": "^INV-\\d{3}$",
   "status": "ratified",
-  "description": "Field-level decomposition of the authoritative Causa investigation creation and workspace requirements (SCREEN-CONTRACTS S01, S02, S04, S05; REQUIREMENTS R1-R3, R10; CAUSA-UI-EXPERIENCE UI-006; CAUSA-PERSISTENCE PERSIST-007, PERSIST-021, PERSIST-030). Proposed by an agent; not ratified. It adds no product obligation the sources do not state: no length limits, no non-empty rule for the problem statement and no Cancel action are defined, because no authoritative requirement defines them (docs/requirement-catalogs/CAUSA-INVESTIGATION.md, open questions).",
+  "description": "Field-level decomposition of the authoritative Causa investigation requirements: creation and workspace (SCREEN-CONTRACTS S01, S02, S04, S05; REQUIREMENTS R1-R3, R10; CAUSA-UI-EXPERIENCE UI-006; CAUSA-PERSISTENCE PERSIST-007, PERSIST-021, PERSIST-030), INV-001..INV-018; and investigation content, the Rehearsal 9 content gaps and the answers to the catalog's open questions (OD-INDY-19..21, OD-INDY-23), INV-019..INV-038. Drafted by an agent; ratified by the owner.",
   "screens": [
     { "id": "investigation-start", "route": "#/investigations/new" },
     { "id": "investigation-workspace", "route": "#/investigations/new" }
@@ -131,6 +131,811 @@
       "verification": [ "mapped", "exists", "visible", "outcome" ],
       "dependsOn": [ "INV-004" ],
       "sources": [ { "document": "docs/SCREEN-CONTRACTS.md", "requirement": "S02" }, { "document": "docs/REQUIREMENTS.md", "requirement": "R2.2" } ]
+    },
+    {
+      "id": "INV-019",
+      "type": "validation-rule",
+      "screen": "investigation-start",
+      "name": "Problem statement must not be empty",
+      "required": true,
+      "visible": true,
+      "editable": false,
+      "validation": {
+        "minLength": 1
+      },
+      "verification": [
+        "mapped",
+        "validation",
+        "rejects"
+      ],
+      "dependsOn": [
+        "INV-001"
+      ],
+      "sources": [
+        {
+          "document": "docs/SCREEN-CONTRACTS.md",
+          "requirement": "S01"
+        },
+        {
+          "document": "docs/REQUIREMENTS.md",
+          "requirement": "R1.1"
+        },
+        {
+          "document": "docs/OWNER-DECISIONS-2026-11-03.md",
+          "requirement": "OD-INDY-21"
+        }
+      ],
+      "notes": "Open question 1: an empty or whitespace-only problem statement is refused with a field message; nothing is created."
+    },
+    {
+      "id": "INV-020",
+      "type": "validation-rule",
+      "screen": "investigation-start",
+      "name": "Title length",
+      "required": true,
+      "visible": true,
+      "editable": false,
+      "validation": {
+        "maxLength": 200
+      },
+      "verification": [
+        "mapped",
+        "validation",
+        "rejects"
+      ],
+      "dependsOn": [
+        "INV-002"
+      ],
+      "sources": [
+        {
+          "document": "docs/SCREEN-CONTRACTS.md",
+          "requirement": "S01"
+        },
+        {
+          "document": "docs/OWNER-DECISIONS-2026-11-03.md",
+          "requirement": "OD-INDY-21"
+        }
+      ]
+    },
+    {
+      "id": "INV-021",
+      "type": "validation-rule",
+      "screen": "investigation-start",
+      "name": "Problem statement length",
+      "required": true,
+      "visible": true,
+      "editable": false,
+      "validation": {
+        "maxLength": 10000
+      },
+      "verification": [
+        "mapped",
+        "validation",
+        "rejects"
+      ],
+      "dependsOn": [
+        "INV-001"
+      ],
+      "sources": [
+        {
+          "document": "docs/SCREEN-CONTRACTS.md",
+          "requirement": "S01"
+        },
+        {
+          "document": "docs/OWNER-DECISIONS-2026-11-03.md",
+          "requirement": "OD-INDY-21"
+        }
+      ]
+    },
+    {
+      "id": "INV-022",
+      "type": "action",
+      "screen": "investigation-start",
+      "name": "Cancel investigation start",
+      "component": "button",
+      "required": true,
+      "visible": true,
+      "editable": false,
+      "verification": [
+        "mapped",
+        "exists",
+        "visible",
+        "accessible",
+        "activate",
+        "outcome"
+      ],
+      "sources": [
+        {
+          "document": "docs/OWNER-DECISIONS-2026-11-03.md",
+          "requirement": "OD-INDY-21"
+        }
+      ],
+      "notes": "Leaves the start screen; no investigation is created and nothing is written."
+    },
+    {
+      "id": "INV-023",
+      "type": "ui-field",
+      "screen": "investigation-start",
+      "name": "Primary investigative question",
+      "component": "textarea",
+      "required": false,
+      "visible": true,
+      "editable": true,
+      "validation": {
+        "maxLength": 10000
+      },
+      "verification": [
+        "mapped",
+        "exists",
+        "visible",
+        "accessible",
+        "editable",
+        "enter",
+        "validation",
+        "rejects",
+        "save",
+        "reload",
+        "update"
+      ],
+      "sources": [
+        {
+          "document": "docs/OWNER-DECISIONS-2026-11-03.md",
+          "requirement": "OD-INDY-20"
+        },
+        {
+          "document": "docs/OWNER-DECISIONS-2026-11-03.md",
+          "requirement": "OD-INDY-21"
+        }
+      ],
+      "notes": "Optional; shown in the investigation header."
+    },
+    {
+      "id": "INV-024",
+      "type": "ui-field",
+      "screen": "investigation-workspace",
+      "name": "Observation text",
+      "component": "textarea",
+      "required": true,
+      "visible": true,
+      "editable": true,
+      "validation": {
+        "minLength": 1,
+        "maxLength": 10000
+      },
+      "verification": [
+        "mapped",
+        "exists",
+        "visible",
+        "accessible",
+        "editable",
+        "enter",
+        "validation",
+        "rejects",
+        "save",
+        "reload",
+        "update"
+      ],
+      "dependsOn": [
+        "INV-014"
+      ],
+      "instances": "observation id",
+      "sources": [
+        {
+          "document": "docs/REQUIREMENTS.md",
+          "requirement": "R1.1"
+        },
+        {
+          "document": "docs/REQUIREMENTS.md",
+          "requirement": "R1.2"
+        },
+        {
+          "document": "docs/DESIGN-DECISION-BOUNDARIES.md",
+          "requirement": "D-001"
+        },
+        {
+          "document": "docs/OWNER-DECISIONS-2026-11-03.md",
+          "requirement": "OD-INDY-20"
+        }
+      ],
+      "notes": "The entered text itself is shown when the observation is listed or reopened, never only a label or sequence number."
+    },
+    {
+      "id": "INV-025",
+      "type": "ui-field",
+      "screen": "investigation-workspace",
+      "name": "Observation source reference",
+      "component": "text-input",
+      "required": false,
+      "visible": true,
+      "editable": true,
+      "validation": {
+        "maxLength": 10000
+      },
+      "verification": [
+        "mapped",
+        "exists",
+        "visible",
+        "accessible",
+        "editable",
+        "enter",
+        "validation",
+        "rejects",
+        "save",
+        "reload"
+      ],
+      "dependsOn": [
+        "INV-014"
+      ],
+      "instances": "observation id",
+      "sources": [
+        {
+          "document": "docs/REQUIREMENTS.md",
+          "requirement": "R3.2"
+        },
+        {
+          "document": "docs/OWNER-DECISIONS-2026-11-03.md",
+          "requirement": "OD-INDY-20"
+        }
+      ]
+    },
+    {
+      "id": "INV-026",
+      "type": "ui-field",
+      "screen": "investigation-workspace",
+      "name": "Hypothesis statement",
+      "component": "textarea",
+      "required": true,
+      "visible": true,
+      "editable": true,
+      "validation": {
+        "minLength": 1,
+        "maxLength": 10000
+      },
+      "verification": [
+        "mapped",
+        "exists",
+        "visible",
+        "accessible",
+        "editable",
+        "enter",
+        "validation",
+        "rejects",
+        "save",
+        "reload",
+        "update"
+      ],
+      "dependsOn": [
+        "INV-009"
+      ],
+      "instances": "hypothesis id",
+      "sources": [
+        {
+          "document": "docs/REQUIREMENTS.md",
+          "requirement": "R2.1"
+        },
+        {
+          "document": "docs/SCREEN-CONTRACTS.md",
+          "requirement": "S03"
+        },
+        {
+          "document": "docs/DESIGN-DECISION-BOUNDARIES.md",
+          "requirement": "D-001"
+        },
+        {
+          "document": "docs/OWNER-DECISIONS-2026-11-03.md",
+          "requirement": "OD-INDY-20"
+        }
+      ],
+      "notes": "Presented as a hypothesis, distinct from observations and conclusions."
+    },
+    {
+      "id": "INV-027",
+      "type": "ui-field",
+      "screen": "investigation-workspace",
+      "name": "Evidence label",
+      "component": "text-input",
+      "required": true,
+      "visible": true,
+      "editable": true,
+      "validation": {
+        "minLength": 1,
+        "maxLength": 200
+      },
+      "verification": [
+        "mapped",
+        "exists",
+        "visible",
+        "accessible",
+        "editable",
+        "enter",
+        "validation",
+        "rejects",
+        "save",
+        "reload",
+        "update"
+      ],
+      "dependsOn": [
+        "INV-013"
+      ],
+      "instances": "evidence id",
+      "sources": [
+        {
+          "document": "docs/REQUIREMENTS.md",
+          "requirement": "R3.1"
+        },
+        {
+          "document": "docs/SCREEN-CONTRACTS.md",
+          "requirement": "S05"
+        },
+        {
+          "document": "docs/OWNER-DECISIONS-2026-11-03.md",
+          "requirement": "OD-INDY-20"
+        }
+      ]
+    },
+    {
+      "id": "INV-028",
+      "type": "ui-field",
+      "screen": "investigation-workspace",
+      "name": "Evidence source reference",
+      "component": "text-input",
+      "required": false,
+      "visible": true,
+      "editable": true,
+      "validation": {
+        "maxLength": 10000
+      },
+      "verification": [
+        "mapped",
+        "exists",
+        "visible",
+        "accessible",
+        "editable",
+        "enter",
+        "validation",
+        "rejects",
+        "save",
+        "reload"
+      ],
+      "dependsOn": [
+        "INV-013"
+      ],
+      "instances": "evidence id",
+      "sources": [
+        {
+          "document": "docs/REQUIREMENTS.md",
+          "requirement": "R3.2"
+        },
+        {
+          "document": "docs/SCREEN-CONTRACTS.md",
+          "requirement": "S05"
+        },
+        {
+          "document": "docs/OWNER-DECISIONS-2026-11-03.md",
+          "requirement": "OD-INDY-20"
+        }
+      ]
+    },
+    {
+      "id": "INV-029",
+      "type": "ui-field",
+      "screen": "investigation-workspace",
+      "name": "Evidence source URL",
+      "component": "url-input",
+      "required": false,
+      "visible": true,
+      "editable": true,
+      "validation": {
+        "maxLength": 2000,
+        "pattern": "^https?://[^\\s]+$"
+      },
+      "verification": [
+        "mapped",
+        "exists",
+        "visible",
+        "accessible",
+        "editable",
+        "enter",
+        "validation",
+        "rejects",
+        "save",
+        "reload"
+      ],
+      "dependsOn": [
+        "INV-013"
+      ],
+      "instances": "evidence id",
+      "sources": [
+        {
+          "document": "docs/REQUIREMENTS.md",
+          "requirement": "R3.5"
+        },
+        {
+          "document": "docs/SCREEN-CONTRACTS.md",
+          "requirement": "S05"
+        },
+        {
+          "document": "docs/CAUSA-UI-EXPERIENCE-REQUIREMENTS.md",
+          "requirement": "UI-005"
+        },
+        {
+          "document": "docs/OWNER-DECISIONS-2026-11-03.md",
+          "requirement": "OD-INDY-20"
+        }
+      ],
+      "notes": "Only absolute http(s) URLs; anything else is refused and never rendered as a link (UI-005 sanitising)."
+    },
+    {
+      "id": "INV-030",
+      "type": "action",
+      "screen": "investigation-workspace",
+      "name": "Link evidence to a hypothesis",
+      "component": "button",
+      "required": true,
+      "visible": true,
+      "editable": false,
+      "verification": [
+        "mapped",
+        "exists",
+        "visible",
+        "accessible",
+        "activate",
+        "outcome",
+        "save",
+        "reload",
+        "update"
+      ],
+      "dependsOn": [
+        "INV-013",
+        "INV-010"
+      ],
+      "sources": [
+        {
+          "document": "docs/REQUIREMENTS.md",
+          "requirement": "R3.3"
+        },
+        {
+          "document": "docs/REQUIREMENTS.md",
+          "requirement": "R3.4"
+        },
+        {
+          "document": "docs/CAUSA-UI-EXPERIENCE-REQUIREMENTS.md",
+          "requirement": "UI-005"
+        },
+        {
+          "document": "docs/OWNER-DECISIONS-2026-11-03.md",
+          "requirement": "OD-INDY-20"
+        },
+        {
+          "document": "docs/OWNER-DECISIONS-2026-11-03.md",
+          "requirement": "OD-INDY-23"
+        }
+      ],
+      "notes": "The link is shown on both the evidence and the hypothesis, and survives a reload. A link to a non-existent target is refused. At most one current assessment per evidence-hypothesis pair: a second link for the pair is refused, pointing to the existing one. Reassessing or withdrawing keeps the earlier assessment and its provenance in the history (OD-INDY-23)."
+    },
+    {
+      "id": "INV-031",
+      "type": "ui-field",
+      "screen": "investigation-workspace",
+      "name": "Evidence relationship kind",
+      "component": "radio-group",
+      "required": true,
+      "visible": true,
+      "editable": true,
+      "validation": {
+        "options": [
+          "supports",
+          "contradicts",
+          "consistent-with",
+          "inconclusive"
+        ]
+      },
+      "verification": [
+        "mapped",
+        "exists",
+        "visible",
+        "accessible",
+        "select",
+        "validation",
+        "rejects",
+        "save",
+        "reload"
+      ],
+      "dependsOn": [
+        "INV-030"
+      ],
+      "instances": "relationship id",
+      "sources": [
+        {
+          "document": "docs/REQUIREMENTS.md",
+          "requirement": "R3.3"
+        },
+        {
+          "document": "docs/OWNER-DECISIONS-2026-11-03.md",
+          "requirement": "OD-INDY-20"
+        },
+        {
+          "document": "docs/OWNER-DECISIONS-2026-11-03.md",
+          "requirement": "OD-INDY-23"
+        }
+      ],
+      "notes": "A Forma choice group with no option selected initially. supports: makes the hypothesis more credible; contradicts: makes it less credible; consistent-with: fits but does not favour it over competing hypotheses it also fits; inconclusive: assessed, but whether it fits cannot yet be determined. Not assessed is the absence of a relationship, never an option (OD-INDY-23, docs/rehearsal-009-content-readiness/HYPOTHESIS-EVIDENCE-RELATIONSHIPS.md)."
+    },
+    {
+      "id": "INV-032",
+      "type": "action",
+      "screen": "investigation-workspace",
+      "name": "Record a conclusion",
+      "component": "button",
+      "required": true,
+      "visible": true,
+      "editable": false,
+      "verification": [
+        "mapped",
+        "exists",
+        "visible",
+        "accessible",
+        "activate",
+        "outcome",
+        "save",
+        "reload"
+      ],
+      "sources": [
+        {
+          "document": "docs/REQUIREMENTS.md",
+          "requirement": "R6.1"
+        },
+        {
+          "document": "docs/REQUIREMENTS.md",
+          "requirement": "R6.4"
+        },
+        {
+          "document": "docs/STATE-TRANSITION-TABLES.md",
+          "requirement": "STATE-TRANSITION-TABLES§14-conclusion-behavior"
+        },
+        {
+          "document": "docs/OWNER-DECISIONS-2026-11-03.md",
+          "requirement": "OD-INDY-20"
+        }
+      ],
+      "notes": "Records a snapshot; it does not resolve the investigation, whose existing gates are unchanged."
+    },
+    {
+      "id": "INV-033",
+      "type": "ui-field",
+      "screen": "investigation-workspace",
+      "name": "Conclusion statement",
+      "component": "textarea",
+      "required": true,
+      "visible": true,
+      "editable": true,
+      "validation": {
+        "minLength": 1,
+        "maxLength": 10000
+      },
+      "verification": [
+        "mapped",
+        "exists",
+        "visible",
+        "accessible",
+        "editable",
+        "enter",
+        "validation",
+        "rejects",
+        "save",
+        "reload"
+      ],
+      "dependsOn": [
+        "INV-032"
+      ],
+      "instances": "conclusion id",
+      "sources": [
+        {
+          "document": "docs/REQUIREMENTS.md",
+          "requirement": "R6.4"
+        },
+        {
+          "document": "docs/DESIGN-DECISION-BOUNDARIES.md",
+          "requirement": "D-001"
+        },
+        {
+          "document": "docs/OWNER-DECISIONS-2026-11-03.md",
+          "requirement": "OD-INDY-20"
+        }
+      ]
+    },
+    {
+      "id": "INV-034",
+      "type": "action",
+      "screen": "investigation-workspace",
+      "name": "Edit investigation details",
+      "component": "button",
+      "required": true,
+      "visible": true,
+      "editable": false,
+      "verification": [
+        "mapped",
+        "exists",
+        "visible",
+        "accessible",
+        "activate",
+        "outcome",
+        "save",
+        "reload",
+        "update"
+      ],
+      "dependsOn": [
+        "INV-001",
+        "INV-002",
+        "INV-023"
+      ],
+      "sources": [
+        {
+          "document": "docs/REQUIREMENTS.md",
+          "requirement": "R1.3"
+        },
+        {
+          "document": "docs/OWNER-DECISIONS-2026-11-03.md",
+          "requirement": "OD-INDY-20"
+        }
+      ],
+      "notes": "Title, problem statement and question can be edited; the investigation identifier (INV-006) is unchanged."
+    },
+    {
+      "id": "INV-035",
+      "type": "workflow-outcome",
+      "screen": "investigation-workspace",
+      "name": "Editing keeps identity and history",
+      "required": true,
+      "visible": true,
+      "editable": false,
+      "verification": [
+        "mapped",
+        "outcome",
+        "save",
+        "reload",
+        "update"
+      ],
+      "dependsOn": [
+        "INV-024",
+        "INV-026",
+        "INV-027",
+        "INV-034"
+      ],
+      "sources": [
+        {
+          "document": "docs/REQUIREMENTS.md",
+          "requirement": "R2.4"
+        },
+        {
+          "document": "docs/REQUIREMENTS.md",
+          "requirement": "R15.4"
+        },
+        {
+          "document": "docs/CAUSA-UI-EXPERIENCE-REQUIREMENTS.md",
+          "requirement": "UI-005"
+        },
+        {
+          "document": "docs/OWNER-DECISIONS-2026-11-03.md",
+          "requirement": "OD-INDY-20"
+        }
+      ],
+      "notes": "An edited observation, hypothesis, evidence item or investigation keeps its identifier; the earlier text and its provenance remain in the history."
+    },
+    {
+      "id": "INV-036",
+      "type": "action",
+      "screen": "investigation-workspace",
+      "name": "Cancel a content editor",
+      "component": "button",
+      "required": true,
+      "visible": true,
+      "editable": false,
+      "verification": [
+        "mapped",
+        "exists",
+        "visible",
+        "accessible",
+        "activate",
+        "outcome"
+      ],
+      "instances": "editor",
+      "sources": [
+        {
+          "document": "docs/OWNER-DECISIONS-2026-11-03.md",
+          "requirement": "OD-INDY-21"
+        }
+      ],
+      "notes": "Closes the editor; nothing entered is recorded or written."
+    },
+    {
+      "id": "INV-037",
+      "type": "workflow-outcome",
+      "screen": "investigation-workspace",
+      "name": "All content survives a reload from GitHub",
+      "required": true,
+      "visible": true,
+      "editable": false,
+      "verification": [
+        "mapped",
+        "outcome",
+        "save",
+        "reload",
+        "isolation"
+      ],
+      "dependsOn": [
+        "INV-001",
+        "INV-002",
+        "INV-023",
+        "INV-024",
+        "INV-026",
+        "INV-012",
+        "INV-027",
+        "INV-028",
+        "INV-030",
+        "INV-031",
+        "INV-033"
+      ],
+      "sources": [
+        {
+          "document": "docs/REQUIREMENTS.md",
+          "requirement": "R10.7"
+        },
+        {
+          "document": "docs/CAUSA-PERSISTENCE-REQUIREMENTS.md",
+          "requirement": "PERSIST-021"
+        },
+        {
+          "document": "docs/CAUSA-PERSISTENCE-REQUIREMENTS.md",
+          "requirement": "PERSIST-049"
+        },
+        {
+          "document": "docs/OWNER-DECISIONS-2026-11-03.md",
+          "requirement": "OD-INDY-20"
+        }
+      ],
+      "notes": "After verified persistence, a reload from the real GitHub repository in a new browser context shows every entered value (the INVESTIGATION-CONTENT-E2E scenario, docs/rehearsal-009-content-readiness/E2E-VERIFICATION.md)."
+    },
+    {
+      "id": "INV-038",
+      "type": "ui-field",
+      "screen": "investigation-workspace",
+      "name": "Evidence relationship rationale",
+      "component": "textarea",
+      "required": true,
+      "visible": true,
+      "editable": true,
+      "validation": {
+        "minLength": 1,
+        "maxLength": 10000
+      },
+      "verification": [
+        "mapped",
+        "exists",
+        "visible",
+        "accessible",
+        "editable",
+        "enter",
+        "validation",
+        "rejects",
+        "save",
+        "reload"
+      ],
+      "dependsOn": [
+        "INV-030"
+      ],
+      "instances": "relationship id",
+      "sources": [
+        {
+          "document": "docs/REQUIREMENTS.md",
+          "requirement": "R3.3"
+        },
+        {
+          "document": "docs/OWNER-DECISIONS-2026-11-03.md",
+          "requirement": "OD-INDY-23"
+        }
+      ],
+      "notes": "Required for every assessment, including a reassessment; a withdrawal records its own reason. The rationale is the recorded inference that separates the evidence from what it is taken to mean."
     }
   ],
   "retired": []
