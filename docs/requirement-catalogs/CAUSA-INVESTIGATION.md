@@ -58,9 +58,15 @@ states them, and the agent contract forbids inventing them.
 
 ## What verification found in Causa (indy-init-rehearsal-008)
 
-Implementing and verifying the catalog against Causa showed that the frozen
+Implementing and verifying the catalog against Causa showed that Rehearsal 8's
 IF41-DOMAIN `EventPayload` carries only the event kind. The problem statement,
-title and creation timestamp therefore have nowhere to be saved. INV-001,
+title and creation timestamp therefore have nowhere to be saved there. INV-001,
 INV-002 and INV-008 fail their lifecycle obligations, and INV-007 fails
-structurally. This needs an owner decision on the investigation data
-contract. Editing the catalog would only hide it.
+structurally.
+
+This is not a new decision. ODR-V412-02 (package v4.1.2, approved and tagged
+`indy-init-requirements-v4.1.2`) already restores the command and event bodies
+of FSHARP-TYPE-SHAPES sections 31–33, for example `InvestigationStarted of
+InvestigationStarted`. Rehearsal 8 was built before v4.1.2. An implementation
+on v4.1.2 can save these values, and the verifier will tell whether it does.
+Editing the catalog would only hide the gap.
