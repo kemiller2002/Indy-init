@@ -24,4 +24,4 @@ PASS requirement manifest: CRLF and LF checkouts of one catalog compile to the s
 PASS requirement manifest: check reports current for a freshly compiled manifest
 PASS requirement manifest: changing a requirement without regenerating the manifest is detected as stale
 PASS requirement manifest: hand-editing a compiled manifest is detected as tampering
-# whole suite at the time of recording: 1475 PASS, 0 FAIL/SKIP (suite still running when recorded)
+# whole suite: stopped by a local 1500 s timeout (exit 124) before it finished: 1846 PASS, 0 FAIL/SKIP when stopped. Not a complete run; the 24 requirement-manifest cases above all completed and passed.
