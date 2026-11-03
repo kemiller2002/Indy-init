@@ -1,0 +1,9 @@
+# cmd: $SCRATCH/whome/.local/bin/praxis init --root $WORK/work/repo
+# cwd: $WORK/work/repo
+init: applied 133 change(s); 0 file(s) preserved
+manifest: .echelon/ros.json
+instance identity: created pxi-685a7de21c2c4743a1fe01d183339ccc in .praxis/instance.json
+
+# exit: 0
+# expected: 0 containing 'init'
+# result: PASS

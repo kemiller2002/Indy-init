@@ -1,0 +1,45 @@
+{
+  "schema": "indy-init.r9-toolchain-lock/1",
+  "description": "The one toolchain and requirements package every Rehearsal 009 agent starts from. Conditor is the installer, so it is not in the Registry resolved set it installs; it is pinned here by release tag, source commit and per-platform SHA-256 (from the v0.10.19 release checksums.txt, verified against the downloaded linux-x64 binary on 2026-11-03). tools/r9/r9.fsx install-conditor installs exactly this binary and refuses any other; workstation applies the resolved set below. Change this file only through the owner decision process.",
+  "conditor": {
+    "version": "0.10.19",
+    "tag": "v0.10.19",
+    "commit": "31725a78cc74a64d51084250a1c49cbabcba3646",
+    "downloadBase": "https://github.com/kemiller2002/conditor/releases/download/v0.10.19",
+    "artifacts": {
+      "linux-x64": { "name": "conditor-linux-x64", "sha256": "cd6b87d39792808d4ad28e801fcb440a1fad44e8c64ff1d1e420ce30e41841cc" },
+      "linux-arm64": { "name": "conditor-linux-arm64", "sha256": "6cc9ff9eb914142ae99cc4bdfc08f358c9f4f3bf4cf85bd608ac8f22872578df" },
+      "linux-musl-x64": { "name": "conditor-linux-musl-x64", "sha256": "8d036dc1840d0eaa75527d9d10240abe35a903294533372f477fef8014a739dc" },
+      "linux-musl-arm64": { "name": "conditor-linux-musl-arm64", "sha256": "a1cdc41bf0fa50827f1c095a6103674dc3d157440cb350dd43cb6f1d5f83dda1" },
+      "osx-x64": { "name": "conditor-osx-x64", "sha256": "546c493db6e6a8bf3941dcf597bf3ad74738549c2f483964860517e546345be9" },
+      "osx-arm64": { "name": "conditor-osx-arm64", "sha256": "30d15aeed29019cecc00571e59a7187203b924995ceeb97b2c5a6b79a412d2fe" },
+      "win-x64": { "name": "conditor-win-x64.exe", "sha256": "a85d1909446daf10c00ed17016263a47432bf586b13b19eec6c90828351557b1" },
+      "win-arm64": { "name": "conditor-win-arm64.exe", "sha256": "ad27ff4b180875e451be799d451508b30581398654d9de68fa7b59456d66fd37" }
+    }
+  },
+  "resolvedSet": {
+    "registry": "kemiller2002/echelon-registry",
+    "commit": "ae03cff61daf7a3211eac0e5dc383fc194a87793",
+    "channel": "echelon-current",
+    "profileVersion": "1.35.0",
+    "platforms": {
+      "linux-x64": { "path": "channels/echelon-current/linux-x64.json", "sha256": "bc0f95150a2abc1850340bfddc3b94814820aa1ed0ed10687ecd029ec9398aab" },
+      "linux-arm64": { "path": "channels/echelon-current/linux-arm64.json", "sha256": "de624674e9fc9e219cf97f72a8b0a95e475dbfd2a496cbb03d5e7eb0bcaec6e9" },
+      "osx-x64": { "path": "channels/echelon-current/osx-x64.json", "sha256": "a7035848992753c77ce1eb2b40337fed6e7da790bedad7de3b43a41e2792ecf1" },
+      "osx-arm64": { "path": "channels/echelon-current/osx-arm64.json", "sha256": "b04487c05e51e118ceba7b57b70dd3be48250c4ffcfa2574babe51fd410df684" },
+      "win-x64": { "path": "channels/echelon-current/win-x64.json", "sha256": "7ac33c34271db18aafd7a70f6ca6ad55811c51f12c66a19dd8fa0d6ca1331b38" }
+    },
+    "expectedTools": { "praxis": "3.24.0", "dokimos": "0.10.0", "percepta-semantic": "0.4.0", "ordo": "1.20.0" }
+  },
+  "requirementsPackage": {
+    "path": "requirements-compiled/v4.1.2",
+    "base": "requirements-compiled/v4",
+    "packageVersion": "4.1.2",
+    "tag": "indy-init-requirements-v4.1.2",
+    "tagCommit": "485b8a90972f5a996ed3dba3d9db17952fd677f9",
+    "manifestSha256": "1977780f82547db2b589a59515e0f619e8d114761f8fbc8780647149720c683a",
+    "verificationPlanSha256": "e31dc2045954f12c1b1eb0c0a9e953cdcfddba44bb57bc08e34e0bfcc047a3ca",
+    "approval": "APR-V412-OWNER-3"
+  },
+  "workstationTargetId": "indy-init-r9-workstation"
+}

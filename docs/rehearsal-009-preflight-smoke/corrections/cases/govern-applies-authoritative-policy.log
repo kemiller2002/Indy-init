@@ -1,0 +1,11 @@
+# cmd: dotnet fsi /home/user/Indy-init/tools/r9/r9.fsx -- govern --indy-init /home/user/Indy-init --target $WORK/work/repo
+# cwd: $WORK/work/repo
+  ros.json qualityEvidence = {"version":"1.0.0","description":"Rehearsal 009 (Indy-init tools/r9/governance.json): every work item needs a satisfied verification matrix produced by Dokimos at the candidate. Do not edit: CI compares this block with the authoritative copy.","dokimos":"off","ordoBoundary":"off","requiredFacets":["verification-matrix-satisfied"]}
+  wrote $WORK/work/repo/.github/workflows/verification-gate.yml
+  verification evidence directory $WORK/work/repo/.echelon/verification
+  1 item(s) completed before governance are recorded and left as they are
+govern: PASS
+
+# exit: 0
+# expected: 0 containing 'verification-matrix-satisfied'
+# result: PASS

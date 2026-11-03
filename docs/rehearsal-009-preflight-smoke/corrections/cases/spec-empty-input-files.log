@@ -1,0 +1,11 @@
+# cmd: dotnet fsi /home/user/Indy-init/tools/r9/r9.fsx -- spec-preflight --percepta $SCRATCH/whome/.local/bin/percepta --out $WORK/work/spec/empty.json --machines $WORK/work/spec/empty/m.json --invariants $WORK/work/spec/empty/i.json --interfaces $WORK/work/spec/empty/f.json --catalog $WORK/work/spec/empty/c.md
+# cwd: $WORK/work
+  REFUSED --machines $WORK/work/spec/empty/m.json is empty
+  REFUSED --invariants $WORK/work/spec/empty/i.json is empty
+  REFUSED --interfaces $WORK/work/spec/empty/f.json is empty
+  REFUSED --catalog $WORK/work/spec/empty/c.md is empty
+spec-preflight: REFUSED (4 cause(s))
+
+# exit: 4
+# expected: 4 containing 'is empty'
+# result: PASS

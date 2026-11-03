@@ -1,0 +1,21 @@
+{
+  "schema": "indy-init.r9-gate-verdict/1",
+  "verdict": "REFUSED",
+  "mode": "release",
+  "candidate": "bcfe6d3ab87eb906334afc97aeddb547667f6636",
+  "planId": "VP-R9-FIX",
+  "scope": [],
+  "workItem": "",
+  "dokimosExit": 4,
+  "obligations": 1,
+  "verified": 0,
+  "deferredToAcceptanceVerifier": [],
+  "recordIdentitiesNotJudgedByDokimos": 0,
+  "frozenPlanSha256": "5be5428b782f1851c28c7d1806937ca7f8f75c29c132c5716d921c9da480ba9a",
+  "coverageSha256": "04bd44de06e3155bac6b786f26f205382985c799b8d665455bd18f10d0400af1",
+  "resultsSha256": "3c4124313433e88e6a01ca926164d40ca11b64163acfdfe3dbf02bd835c095d3",
+  "matrixSha256": "",
+  "causes": [
+    "SMK-001-O1 (SMK-001) is invalid: dotnet:Smoke.Tests.SMK001Tests.SMK-001-O1: placeholder body (DOKIMOS-UNIMPLEMENTED or not implemented); dotnet:Smoke.Tests.SMK001Tests.SMK-001-O1: does not reach the suite boundary (Ledger): exercises only helpers or mocks"
+  ]
+}

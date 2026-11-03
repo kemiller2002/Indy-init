@@ -1,0 +1,11 @@
+# cmd: dotnet fsi /home/user/Indy-init/tools/r9/r9.fsx -- gate --mode release --obligations $WORK/work/compiled.json --root $WORK/work/repo --results $WORK/work/results/skip/results.json --dokimos $SCRATCH/whome/.local/bin/dokimos --out $WORK/work/gate/skip --expect-candidate 002f42bebe009dc8e73ab67c8b94da41a0c93957
+# cwd: $WORK/work/repo
+  candidate 002f42bebe009dc8e73ab67c8b94da41a0c93957 (release, whole plan)
+  0/1 obligations verified; 0 deferred to the acceptance verifier (record evidence only)
+  verdict $WORK/work/gate/skip/gate.json
+  REFUSED SMK-001-O1 (SMK-001) is invalid: dotnet:Smoke.Tests.SMK001Tests.SMK-001-O1: skipped
+gate: REFUSED (1 cause(s))
+
+# exit: 4
+# expected: 4 containing 'skipped'
+# result: PASS

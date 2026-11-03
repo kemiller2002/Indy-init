@@ -1,0 +1,98 @@
+# Rehearsal 009 verification gate. Written at T0 by Indy-init `tools/r9/r9.fsx govern`; `check-governance`
+# fails CI if this file differs from Indy-init's tools/r9/verification-gate.yml. Do not edit it here.
+#
+# A green `dotnet test` is not verification: a skipped or missing test still exits 0. This workflow runs the frozen
+# plan's suites, has Dokimos 0.10.0 judge every bound identity at the exact candidate, and fails unless every
+# in-scope obligation is verified (development: the scope in .echelon/verification-scope.json, which may only
+# grow; release: the whole frozen plan, with record-evidence obligations deferred to the acceptance verifier).
+name: Verification gate
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: development or release
+        default: release
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+      - name: Candidate is the checked-out commit (never an asserted SHA)
+        id: candidate
+        env:
+          CANDIDATE: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          test "$(git rev-parse HEAD)" = "$CANDIDATE" || { echo "::error::checkout $(git rev-parse HEAD) is not the candidate $CANDIDATE"; exit 1; }
+          echo "sha=$CANDIDATE" >> "$GITHUB_OUTPUT"
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+      - name: Indy-init at the governing commit
+        run: |
+          commit=$(jq -r .indyInitCommit .echelon/r9-governance.json)
+          git init -q "$RUNNER_TEMP/indy-init"
+          git -C "$RUNNER_TEMP/indy-init" fetch -q --depth 1 https://github.com/kemiller2002/Indy-init "$commit"
+          git -C "$RUNNER_TEMP/indy-init" checkout -q FETCH_HEAD
+      - name: Governance is unchanged (policy, this workflow, completed items, scope only grows)
+        run: |
+          base_scope=""
+          if [ -n "${{ github.base_ref }}" ]; then
+            git show "origin/${{ github.base_ref }}:.echelon/verification-scope.json" > "$RUNNER_TEMP/base-scope.json" 2>/dev/null && base_scope="--base-scope $RUNNER_TEMP/base-scope.json"
+          fi
+          dotnet fsi "$RUNNER_TEMP/indy-init/tools/r9/r9.fsx" -- check-governance --indy-init "$RUNNER_TEMP/indy-init" --target . $base_scope
+      - name: Pinned toolchain (Conditor 0.10.19, then the echelon-current resolved set)
+        run: |
+          lock="$RUNNER_TEMP/indy-init/kickoff/rehearsal-009/toolchain.lock.json"
+          dotnet fsi "$RUNNER_TEMP/indy-init/tools/r9/r9.fsx" -- install-conditor --lock "$lock" --dir "$RUNNER_TEMP/conditor"
+          dotnet fsi "$RUNNER_TEMP/indy-init/tools/r9/r9.fsx" -- workstation --lock "$lock" --conditor "$RUNNER_TEMP/conditor/conditor" --home "$RUNNER_TEMP/echelon" --target-id "ci-${{ github.run_id }}"
+          echo "$RUNNER_TEMP/echelon/.local/bin" >> "$GITHUB_PATH"
+      - name: Compile the frozen verification plan
+        run: |
+          src="$RUNNER_TEMP/indy-init"
+          dokimos verification compile --indy-execution-plan "$src/requirements-compiled/v4.1.2/verification-execution-plan.json" \
+            --indy-verification-plan "$src/requirements-compiled/v4/verification-plan.json" --out "$RUNNER_TEMP/obligations.json"
+      - name: Run the plan's suites at the candidate
+        env:
+          MODE: ${{ inputs.mode || 'development' }}
+        run: |
+          npm ci
+          # Release runs every executable suite of the plan (live suites need their provider secrets in this job);
+          # development runs the deterministic ones, and the gate refuses any in-scope suite without evidence.
+          suites=""
+          if [ "$MODE" = "development" ]; then suites="--suites SU-OWN-DOTNET,SU-DOTNET-DETERMINISTIC,SU-DOTNET-INVARIANTS,SU-OWN-BROWSER,SU-BROWSER-CHROMIUM"; fi
+          dotnet fsi "$RUNNER_TEMP/indy-init/tools/r9/r9.fsx" -- run-suites --obligations "$RUNNER_TEMP/obligations.json" --root . \
+            --out "$RUNNER_TEMP/results" $suites
+      - name: Dokimos coverage gate
+        env:
+          MODE: ${{ inputs.mode || 'development' }}
+        run: |
+          scope=""
+          if [ "$MODE" = "development" ]; then scope="--scope-file .echelon/verification-scope.json"; fi
+          dotnet fsi "$RUNNER_TEMP/indy-init/tools/r9/r9.fsx" -- gate --mode "$MODE" $scope \
+            --obligations "$RUNNER_TEMP/obligations.json" --root . --results "$RUNNER_TEMP/results/results.json" \
+            --dokimos "$(command -v dokimos)" --expect-candidate "${{ steps.candidate.outputs.sha }}" --out "$RUNNER_TEMP/gate"
+      - name: Publish the coverage report, results and verdict
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: verification-${{ steps.candidate.outputs.sha }}
+          path: |
+            ${{ runner.temp }}/gate
+            ${{ runner.temp }}/results
+            ${{ runner.temp }}/obligations.json

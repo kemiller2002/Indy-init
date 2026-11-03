@@ -1,0 +1,39 @@
+# cmd: dotnet fsi /home/user/Indy-init/tools/r9/r9.fsx -- workstation --lock /home/user/Indy-init/kickoff/rehearsal-009/toolchain.lock.json --conditor $SCRATCH/cbin/conditor --home $WORK/work/home
+# cwd: $WORK/work
+  resolved set https://raw.githubusercontent.com/kemiller2002/echelon-registry/ae03cff61daf7a3211eac0e5dc383fc194a87793/channels/echelon-current/linux-x64.json sha256 bc0f95150a2abc1850340bfddc3b94814820aa1ed0ed10687ecd029ec9398aab = lock
+  plan sha256:d39022c4a04e945042cefb02d69ce4d7f04c6f424c4fe5435fd7cc8dc826dfd3
+  target id indy-init-r9-workstation
+  registration dokimos: unavailable (no Project Administration integration is configured (.echelon/administration.json))
+  registration ordo: unavailable (no Project Administration integration is configured (.echelon/administration.json))
+  registration percepta: unavailable (no Project Administration integration is configured (.echelon/administration.json))
+  registration percepta-semantic: unavailable (no Project Administration integration is configured (.echelon/administration.json))
+  registration praxis: unavailable (no Project Administration integration is configured (.echelon/administration.json))
+  registration strata: unavailable (no Project Administration integration is configured (.echelon/administration.json))
+  praxis 3.24.0 installed
+  dokimos 0.10.0 installed
+  percepta-semantic 0.4.0 installed
+  ordo 1.20.0 installed
+  status: shared            ~/.profile 
+  conditor-created  ~/.conditor/cache/praxis/3.24.0/praxis-linux-x64.tar.gz praxis
+  conditor-created  ~/.local/share/echelon/praxis/3.24.0 praxis
+  conditor-created  ~/.local/bin/praxis praxis
+  conditor-created  ~/.conditor/cache/ordo/1.20.0/ordo-linux-x64.tar.gz ordo
+  conditor-created  ~/.local/share/echelon/ordo/1.20.0 ordo
+  conditor-created  ~/.local/bin/ordo ordo
+  conditor-created  ~/.conditor/cache/percepta/0.1.0/percepta-repo-linux-x64 percepta
+  conditor-created  ~/.local/share/echelon/percepta/0.1.0 percepta
+  conditor-created  ~/.local/bin/percepta-repo percepta
+  conditor-created  ~/.conditor/cache/percepta-semantic/0.4.0/percepta-semantic-0.4.0-linux-x64.tar.gz percepta-semantic
+  conditor-created  ~/.local/share/echelon/percepta-semantic/0.4.0 percepta-semantic
+  conditor-created  ~/.local/bin/percepta percepta-semantic
+  conditor-created  ~/.conditor/cache/dokimos/0.10.0/dokimos-linux-x64.tar.gz dokimos
+  conditor-created  ~/.local/share/echelon/dokimos/0.10.0 dokimos
+  conditor-created  ~/.local/bin/dokimos dokimos
+  conditor-created  ~/.conditor/cache/strata/0.1.1/strata-linux-x64.tar.gz strata
+  conditor-created  ~/.local/share/echelon/strata/0.1.1 strata
+  conditor-created  ~/.local/bin/strata strata
+workstation: PASS
+
+# exit: 0
+# expected: 0 containing 'target id'
+# result: PASS

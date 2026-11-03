@@ -1,0 +1,10 @@
+# cmd: dotnet fsi /home/user/Indy-init/tools/r9/r9.fsx -- gate --mode release --obligations $WORK/work/compiled.json --root $WORK/work/repo --results $WORK/work/results/later/results.json --dokimos $SCRATCH/whome/.local/bin/dokimos --out $WORK/work/gate/dirty --expect-candidate 2aea9226f15766068de82d58a4c21ac35d1797e6
+# cwd: $WORK/work/repo
+  REFUSED the working tree differs from HEAD, so HEAD is not what ran:
+ M src/Smoke/Ledger.fs
+
+gate: REFUSED (1 cause(s))
+
+# exit: 4
+# expected: 4 containing 'differs from HEAD'
+# result: PASS

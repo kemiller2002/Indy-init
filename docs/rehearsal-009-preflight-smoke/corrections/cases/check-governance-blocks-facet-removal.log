@@ -1,0 +1,13 @@
+# cmd: dotnet fsi /home/user/Indy-init/tools/r9/r9.fsx -- check-governance --indy-init /home/user/Indy-init --target $WORK/work/repo
+# cwd: $WORK/work/repo
+  REFUSED ros.json workProtocol.qualityEvidence differs from Indy-init tools/r9/governance.json (found {"version":"1.0.0","description":"Rehearsal 009 (Indy-init tools/r9/governance.json): every work item needs a satisfied verification matrix produced by Dokimos at the candidate. Do not edit: CI compares this block with the authoritative copy.","dokimos":"off","ordoBoundary":"off","requiredFacets":[]}); restore it with `r9.fsx govern`, never by editing the authoritative copy
+  REFUSED WI-FORGED: its verification matrix (sha256:105753e0bcb45017eea9a57fc3c7570643d71175798c45f15948c69dfa32c1b0) matches no PASS gate verdict under .echelon/verification; run `r9.fsx gate --work-item WI-FORGED` at the candidate and commit its output
+  REFUSED WI-STRIPPED was completed without a completion-readiness record (completed under no policy)
+  REFUSED WI-STRIPPED was completed under a policy without verification-matrix-satisfied (the facet was removed)
+  REFUSED WI-STRIPPED: verification-matrix-satisfied is '', not satisfied
+  REFUSED WI-STRIPPED: its verification matrix () matches no PASS gate verdict under .echelon/verification; run `r9.fsx gate --work-item WI-STRIPPED` at the candidate and commit its output
+check-governance: REFUSED (6 cause(s))
+
+# exit: 4
+# expected: 4 containing 'differs from Indy-init tools/r9/governance.json'
+# result: PASS

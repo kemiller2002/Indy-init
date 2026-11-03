@@ -1,0 +1,8 @@
+# cmd: dotnet fsi /home/user/Indy-init/tools/r9/r9.fsx -- spec-preflight --percepta $SCRATCH/whome/.local/bin/percepta --out $WORK/work/spec/missing.json --machines /home/user/Indy-init/requirements-compiled/v4.1.2/state-machine-contracts.json --invariants /home/user/Indy-init/requirements-compiled/v4/invariants.json.absent --interfaces /home/user/Indy-init/requirements-compiled/v4.1.2/analysis/interface-specifications.json --catalog /home/user/Indy-init/docs/COMMAND-EVENT-CATALOG.md
+# cwd: $WORK/work
+  REFUSED --invariants /home/user/Indy-init/requirements-compiled/v4/invariants.json.absent does not exist
+spec-preflight: REFUSED (1 cause(s))
+
+# exit: 4
+# expected: 4 containing 'does not exist'
+# result: PASS

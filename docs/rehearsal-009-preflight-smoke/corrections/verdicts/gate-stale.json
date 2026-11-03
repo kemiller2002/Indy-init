@@ -1,0 +1,24 @@
+{
+  "schema": "indy-init.r9-gate-verdict/1",
+  "verdict": "REFUSED",
+  "mode": "release",
+  "candidate": "2aea9226f15766068de82d58a4c21ac35d1797e6",
+  "planId": "VP-R9-FIX",
+  "scope": [],
+  "workItem": "",
+  "dokimosExit": 4,
+  "obligations": 1,
+  "verified": 0,
+  "deferredToAcceptanceVerifier": [],
+  "recordIdentitiesNotJudgedByDokimos": 0,
+  "frozenPlanSha256": "5be5428b782f1851c28c7d1806937ca7f8f75c29c132c5716d921c9da480ba9a",
+  "coverageSha256": "3118a943fe8db3447d875e02b251ef29f2f2cf8db375cc8c3f5428206dfa4e7b",
+  "resultsSha256": "05d87f9c0ecac2b579b282e56898625f2d74db2281663bd615c50aeb7edaa10e",
+  "matrixSha256": "",
+  "causes": [
+    "the results manifest names candidate \u0027eb5ac40cfb37d9630b52261aec9b9aa4d441d008\u0027, not HEAD 2aea9226f15766068de82d58a4c21ac35d1797e6",
+    "run SU-SMOKE-UNIT was recorded at \u0027eb5ac40cfb37d9630b52261aec9b9aa4d441d008\u0027, not HEAD 2aea9226f15766068de82d58a4c21ac35d1797e6 (stale evidence)",
+    "Dokimos rejected runs: [{\u0022path\u0022:\u0022SU-SMOKE-UNIT/_vm_2026-11-03_08_41_03_net10.0.trx\u0022,\u0022reason\u0022:\u0022results are for eb5ac40cfb37d9630b52261aec9b9aa4d441d008, candidate is 2aea9226f15766068de82d58a4c21ac35d1797e6\u0022,\u0022sourceSha\u0022:\u0022eb5ac40cfb37d9630b52261aec9b9aa4d441d008\u0022,\u0022suite\u0022:\u0022SU-SMOKE-UNIT\u0022}]",
+    "SMK-001-O1 (SMK-001) is blocked: dotnet:Smoke.Tests.SMK001Tests.SMK-001-O1: blocked: results exist only for another SHA"
+  ]
+}

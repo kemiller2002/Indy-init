@@ -1,0 +1,14 @@
+# cmd: dotnet fsi /home/user/Indy-init/tools/r9/r9.fsx -- gate --mode release --obligations $WORK/work/compiled.json --root $WORK/work/repo --results $WORK/work/results/pass/results.json --dokimos $SCRATCH/whome/.local/bin/dokimos --out $WORK/work/gate/stale --expect-candidate 2aea9226f15766068de82d58a4c21ac35d1797e6
+# cwd: $WORK/work/repo
+  candidate 2aea9226f15766068de82d58a4c21ac35d1797e6 (release, whole plan)
+  0/1 obligations verified; 0 deferred to the acceptance verifier (record evidence only)
+  verdict $WORK/work/gate/stale/gate.json
+  REFUSED the results manifest names candidate 'eb5ac40cfb37d9630b52261aec9b9aa4d441d008', not HEAD 2aea9226f15766068de82d58a4c21ac35d1797e6
+  REFUSED run SU-SMOKE-UNIT was recorded at 'eb5ac40cfb37d9630b52261aec9b9aa4d441d008', not HEAD 2aea9226f15766068de82d58a4c21ac35d1797e6 (stale evidence)
+  REFUSED Dokimos rejected runs: [{"path":"SU-SMOKE-UNIT/_vm_2026-11-03_08_41_03_net10.0.trx","reason":"results are for eb5ac40cfb37d9630b52261aec9b9aa4d441d008, candidate is 2aea9226f15766068de82d58a4c21ac35d1797e6","sourceSha":"eb5ac40cfb37d9630b52261aec9b9aa4d441d008","suite":"SU-SMOKE-UNIT"}]
+  REFUSED SMK-001-O1 (SMK-001) is blocked: dotnet:Smoke.Tests.SMK001Tests.SMK-001-O1: blocked: results exist only for another SHA
+gate: REFUSED (4 cause(s))
+
+# exit: 4
+# expected: 4 containing 'stale evidence'
+# result: PASS

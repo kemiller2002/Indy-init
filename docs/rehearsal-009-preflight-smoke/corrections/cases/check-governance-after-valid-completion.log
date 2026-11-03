@@ -1,0 +1,8 @@
+# cmd: dotnet fsi /home/user/Indy-init/tools/r9/r9.fsx -- check-governance --indy-init /home/user/Indy-init --target $WORK/work/repo
+# cwd: $WORK/work/repo
+  policy, workflow and governance record match Indy-init; 2 completed item(s) checked
+check-governance: PASS
+
+# exit: 0
+# expected: 0 containing 'PASS'
+# result: PASS

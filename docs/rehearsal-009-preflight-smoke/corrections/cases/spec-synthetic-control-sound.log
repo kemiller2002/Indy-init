@@ -1,0 +1,14 @@
+# cmd: dotnet fsi /home/user/Indy-init/tools/r9/r9.fsx -- spec-preflight --percepta $SCRATCH/whome/.local/bin/percepta --out $WORK/work/spec/sound.json --machines $WORK/work/spec/sound/m.json --invariants $WORK/work/spec/sound/i.json --interfaces $WORK/work/spec/sound/f.json --catalog $WORK/work/spec/sound/c.md
+# cwd: $WORK/work
+  machines: 1 analysed / 1 in the inputs
+  transitions: 3 analysed / 3 in the inputs
+  invariants: 1 analysed / 1 in the inputs
+  operations: 1 analysed / 1 in the inputs
+  catalogCommands: 3 analysed / 3 in the inputs
+  types: 4
+  report $WORK/work/spec/sound.json
+spec-preflight: PASS
+
+# exit: 0
+# expected: 0 containing 'spec-preflight: PASS'
+# result: PASS

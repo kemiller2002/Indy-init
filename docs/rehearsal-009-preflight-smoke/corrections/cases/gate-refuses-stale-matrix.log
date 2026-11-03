@@ -1,0 +1,11 @@
+# cmd: dotnet fsi /home/user/Indy-init/tools/r9/r9.fsx -- gate --mode release --obligations $WORK/work/compiled.json --root $WORK/work/repo --results $WORK/work/results/later/results.json --dokimos $SCRATCH/whome/.local/bin/dokimos --out $WORK/work/gate/stale-matrix --expect-candidate 2aea9226f15766068de82d58a4c21ac35d1797e6 --matrix $WORK/work/repo/.echelon/verification/WI-VALID/praxis-matrix.json
+# cwd: $WORK/work/repo
+  candidate 2aea9226f15766068de82d58a4c21ac35d1797e6 (release, whole plan)
+  1/1 obligations verified; 0 deferred to the acceptance verifier (record evidence only)
+  verdict $WORK/work/gate/stale-matrix/gate.json
+  REFUSED the matrix's coverage evidence does not name HEAD 2aea9226f15766068de82d58a4c21ac35d1797e6 (stale or hand-written matrix)
+gate: REFUSED (1 cause(s))
+
+# exit: 4
+# expected: 4 containing 'stale or hand-written matrix'
+# result: PASS

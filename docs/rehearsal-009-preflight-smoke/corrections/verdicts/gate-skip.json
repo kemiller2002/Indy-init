@@ -1,0 +1,21 @@
+{
+  "schema": "indy-init.r9-gate-verdict/1",
+  "verdict": "REFUSED",
+  "mode": "release",
+  "candidate": "002f42bebe009dc8e73ab67c8b94da41a0c93957",
+  "planId": "VP-R9-FIX",
+  "scope": [],
+  "workItem": "",
+  "dokimosExit": 4,
+  "obligations": 1,
+  "verified": 0,
+  "deferredToAcceptanceVerifier": [],
+  "recordIdentitiesNotJudgedByDokimos": 0,
+  "frozenPlanSha256": "5be5428b782f1851c28c7d1806937ca7f8f75c29c132c5716d921c9da480ba9a",
+  "coverageSha256": "bc39944d02a728af6fe6c3ecdf594446e31b36b776c504ee34cba9a62ee20c1b",
+  "resultsSha256": "f03e38380fe2e6b97b5898dc9c4e3d3e8b8431457e9a8e6b7c2d9ef7bde8dd68",
+  "matrixSha256": "",
+  "causes": [
+    "SMK-001-O1 (SMK-001) is invalid: dotnet:Smoke.Tests.SMK001Tests.SMK-001-O1: skipped"
+  ]
+}

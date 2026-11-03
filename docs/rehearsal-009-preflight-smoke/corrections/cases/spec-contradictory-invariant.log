@@ -1,0 +1,17 @@
+# cmd: dotnet fsi /home/user/Indy-init/tools/r9/r9.fsx -- spec-preflight --percepta $SCRATCH/whome/.local/bin/percepta --out $WORK/work/spec/contradiction.json --machines $WORK/work/spec/contradiction/m.json --invariants $WORK/work/spec/contradiction/i.json --interfaces $WORK/work/spec/contradiction/f.json --catalog $WORK/work/spec/contradiction/c.md
+# cwd: $WORK/work
+  machines: 1 analysed / 1 in the inputs
+  transitions: 3 analysed / 3 in the inputs
+  invariants: 1 analysed / 1 in the inputs
+  operations: 1 analysed / 1 in the inputs
+  catalogCommands: 3 analysed / 3 in the inputs
+  types: 4
+  report $WORK/work/spec/contradiction.json
+  REFUSED percepta spec-preflight exited 3
+  REFUSED the report is blocked
+  REFUSED blockingContradictions: rate-bound-vs-unbounded-loop INV-SMK-01 allows at most 3 pump stroke(s) in 30 s (under a stuck valve), but SM-SMK-PUMP T-SMK-3 (Stalled x Retry, guard 'operator retried') emits a pump stroke on every repetition, and no guard on it limits repetition or references a clock.
+spec-preflight: REFUSED (3 cause(s))
+
+# exit: 4
+# expected: 4 containing 'rate-bound-vs-unbounded-loop'
+# result: PASS

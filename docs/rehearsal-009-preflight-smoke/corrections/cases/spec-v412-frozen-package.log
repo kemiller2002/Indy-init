@@ -1,0 +1,14 @@
+# cmd: dotnet fsi /home/user/Indy-init/tools/r9/r9.fsx -- spec-preflight --indy-init /home/user/Indy-init --lock /home/user/Indy-init/kickoff/rehearsal-009/toolchain.lock.json --percepta $SCRATCH/whome/.local/bin/percepta --out $WORK/work/spec/v412.json
+# cwd: $WORK/work
+  machines: 5 analysed / 5 in the inputs
+  transitions: 101 analysed / 101 in the inputs
+  invariants: 25 analysed / 25 in the inputs
+  operations: 26 analysed / 26 in the inputs
+  catalogCommands: 134 analysed / 134 in the inputs
+  types: 85
+  report $WORK/work/spec/v412.json
+spec-preflight: PASS
+
+# exit: 0
+# expected: 0 containing 'spec-preflight: PASS'
+# result: PASS

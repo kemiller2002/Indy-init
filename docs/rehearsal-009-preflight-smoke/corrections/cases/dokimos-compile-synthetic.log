@@ -1,0 +1,59 @@
+# cmd: $SCRATCH/whome/.local/bin/dokimos verification compile --obligations $WORK/work/obligations.json --out $WORK/work/compiled.json
+# cwd: $WORK/work
+{
+  "namespaceRoots": [
+    {
+      "directory": "tests/Smoke.Tests",
+      "namespace": "Smoke.Tests"
+    }
+  ],
+  "obligations": [
+    {
+      "categories": [
+        "unit"
+      ],
+      "criterion": "appending 3 then 4 to an empty ledger yields a total of 7.",
+      "dependencies": [],
+      "id": "SMK-001-O1",
+      "priority": "P0",
+      "requirement": "SMK-001"
+    }
+  ],
+  "planDigest": "",
+  "planId": "VP-R9-FIX",
+  "schema": "dokimos.verification-obligations/1",
+  "suites": [
+    {
+      "command": "dotnet test tests/Smoke.Tests",
+      "dependsOn": [],
+      "environment": "",
+      "fixture": "none",
+      "id": "SU-SMOKE-UNIT",
+      "paths": [
+        "tests/Smoke.Tests"
+      ],
+      "requiredBoundary": [
+        "Ledger"
+      ],
+      "runner": "dotnet-test",
+      "testRoot": null
+    }
+  ],
+  "tests": [
+    {
+      "categories": [
+        "unit"
+      ],
+      "id": "dotnet:Smoke.Tests.SMK001Tests.SMK-001-O1",
+      "kind": "unit",
+      "obligations": [
+        "SMK-001-O1"
+      ],
+      "suite": "SU-SMOKE-UNIT"
+    }
+  ]
+}
+
+# exit: 0
+# expected: 0 containing 'SMK-001-O1'
+# result: PASS

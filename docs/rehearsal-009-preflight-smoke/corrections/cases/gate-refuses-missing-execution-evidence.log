@@ -1,0 +1,12 @@
+# cmd: dotnet fsi /home/user/Indy-init/tools/r9/r9.fsx -- gate --mode release --obligations $WORK/work/compiled.json --root $WORK/work/repo --results $WORK/work/results/later/noruns.json --dokimos $SCRATCH/whome/.local/bin/dokimos --out $WORK/work/gate/noruns --expect-candidate 2aea9226f15766068de82d58a4c21ac35d1797e6
+# cwd: $WORK/work/repo
+  candidate 2aea9226f15766068de82d58a4c21ac35d1797e6 (release, whole plan)
+  0/1 obligations verified; 0 deferred to the acceptance verifier (record evidence only)
+  verdict $WORK/work/gate/noruns/gate.json
+  REFUSED suite SU-SMOKE-UNIT has in-scope obligations but no execution evidence in the results manifest
+  REFUSED SMK-001-O1 (SMK-001) is not-run: dotnet:Smoke.Tests.SMK001Tests.SMK-001-O1: generated, no result at the candidate
+gate: REFUSED (2 cause(s))
+
+# exit: 4
+# expected: 4 containing 'no execution evidence'
+# result: PASS
