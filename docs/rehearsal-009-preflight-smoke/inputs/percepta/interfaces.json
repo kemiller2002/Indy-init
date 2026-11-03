@@ -1,0 +1,3 @@
+{ "schema": "indy-init.v41-interface-specifications/1", "description": "R9 SMOKE SYNTHETIC",
+  "domainStubs": { "id": "DOMAIN-STUBS", "fsharp": "type ValveId = ValveId of Guid\ntype SmokeEnvelope = { CommandId: Guid; Target: ValveId; Version: int64 option }\ntype Outbox = { Pending: SmokeEnvelope list }" },
+  "interfaces": [ { "id": "IF-SMK-KERNEL", "fsharp": "", "operations": [ { "name": "Decide", "signature": "Policy -> SmokeEnvelope -> Decision" } ] } ] }

@@ -1,0 +1,56 @@
+{
+  "bySuite": [
+    {
+      "identities": 1,
+      "status": {
+        "not-generated": 1
+      },
+      "suite": "SU-SMOKE-UNIT"
+    }
+  ],
+  "candidate": "db1fffaff803a7e2f61097d7c00574e41f81267c",
+  "causes": [
+    {
+      "cause": "SU-SMOKE-UNIT: not-generated",
+      "obligations": 1
+    }
+  ],
+  "obligations": [
+    {
+      "id": "SMK-001-O1",
+      "identities": [
+        {
+          "id": "dotnet:Smoke.Tests.SMK001Tests.SMK-001-O1",
+          "location": null,
+          "status": "not-generated",
+          "suite": "SU-SMOKE-UNIT"
+        }
+      ],
+      "quality": "none",
+      "reasons": [
+        "dotnet:Smoke.Tests.SMK001Tests.SMK-001-O1: not generated"
+      ],
+      "requirement": "SMK-001",
+      "status": "not-generated"
+    }
+  ],
+  "planDigest": "",
+  "planId": "VP-R9-SMOKE",
+  "rejectedRuns": [],
+  "schema": "dokimos.verification-coverage/1",
+  "scope": [],
+  "summary": {
+    "faultSensitive": 0,
+    "identityStatus": {
+      "not-generated": 1
+    },
+    "obligationStatus": {
+      "not-generated": 1
+    },
+    "obligations": 1,
+    "requirements": 1,
+    "requirementsVerified": 0,
+    "unplannedResults": 1
+  },
+  "verified": false
+}

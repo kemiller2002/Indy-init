@@ -1,0 +1,124 @@
+# utc: 2026-11-03T07:24:28Z
+# cwd: /tmp/claude-0/-home-user/191f324a-ea3a-5051-b276-748b564d6e03/scratchpad/r9smoke/synthetic
+# cmd: /tmp/claude-0/-home-user/191f324a-ea3a-5051-b276-748b564d6e03/scratchpad/r9smoke/case.sh pass WI-SMK-PASS
+candidate SHA: 3a45897a07e31aee3543625ea8f4130793cca914
+== dotnet test
+10.0.402
+dotnet test exit: 0
+Passed!  - Failed:     0, Passed:     1, Skipped:     0, Total:     1, Duration: 7 ms - Smoke.Tests.dll (net10.0)
+== dokimos verification coverage
+dokimos exit: 0
+coverage obligations: [{"id": "SMK-001-O1", "status": "verified", "causes": null}]
+coverage identities: []
+matrix: {"rows": [{"dimension": "happy-path", "evidence": [{"kind": "command", "reference": "dokimos verification coverage --candidate 3a45897a07e31aee3543625ea8f4130793cca914 (plan VP-R9-SMOKE)", "result": "verified"}, {"kind": "unit-test", "reference": "dotnet:Smoke.Tests.SMK001Tests.SMK-001-O1", "result": "passed"}], "status": "met"}, {"dimension": "negative", "evidence": [{"kind": "command", "reference": "dokimos verification coverage --candidate 3a45897a07e31aee3543625ea8f4130793cca914 (plan VP-R9-SMOKE)", "result": "verified"}, {"kind": "unit-test", "reference": "dotnet:Smoke.Tests.SMK001Tests.SMK-001-O1", "result": "passed"}], "status": "met"}, {"dimension": "corruption", "evidence": [{"kind": "command", "reference": "dokimos verification coverage --candidate 3a45897a07e31aee3543625ea8f4130793cca914 (plan VP-R9-SMOKE)", "result": "verified"}, {"kind": "unit-test", "reference": "dotnet:Smo
+== praxis
+capture exit: 0
+update exit: 0
+ready exit: 0
+start exit: 0
+praxis work complete exit: 0
+{
+  "workItems": [
+    {
+      "id": "ROS-INSTALL-3-24-0",
+      "type": "mechanical",
+      "state": "complete",
+      "semanticState": "complete",
+      "evidence": [
+        {
+          "type": "installation",
+          "path": ".ros/installation.json"
+        }
+      ],
+      "updatedAt": "2026-11-03T07:23:24.710Z",
+      "completedAt": "2026-11-03T07:23:24.710Z"
+    },
+    {
+      "id": "WI-SMK-PASS",
+      "type": "task",
+      "state": "complete",
+      "semanticState": "complete",
+      "evidence": [
+        {
+          "type": "implementation",
+          "path": "src/Smoke/Ledger.fs"
+        },
+        {
+          "type": "tests",
+          "path": "tests/Smoke.Tests/SMK001Tests.fs"
+        },
+        {
+          "type": "verification-matrix",
+          "path": "/tmp/claude-0/-home-user/191f324a-ea3a-5051-b276-748b564d6e03/scratchpad/r9smoke/evidence/case-pass/praxis-matrix.json"
+        }
+      ],
+      "updatedAt": "2026-11-03T08:05:00Z",
+      "telemetryExecutionIds": [
+        "EXE-20261103T072436694Z-4b33b138"
+      ],
+      "completedAt": "2026-11-03T08:05:00Z",
+      "completionReadiness": {
+        "schema": "praxis.completion-readiness/1",
+        "workItem": "WI-SMK-PASS",
+        "decision": "ready",
+        "policy": {
+          "dokimos": "off",
+          "ordoBoundary": "off",
+          "requiredFacets": []
+        },
+        "facets": {
+          "implementationComplete": {
+            "required": false,
+            "status": "satisfied",
+            "evidence": [
+              "implementation=src/Smoke/Ledger.fs"
+            ],
+            "blocking": false
+          },
+          "behaviorVerified": {
+            "required": false,
+            "status": "satisfied",
+            "evidence": [
+              "tests=tests/Smoke.Tests/SMK001Tests.fs"
+            ],
+            "blocking": false
+          },
+          "architectureVerified": {
+            "required": false,
+            "status": "not-required",
+            "blocking": false
+          },
+          "releaseReady": {
+            "required": false,
+            "status": "not-required",
+            "blocking": false
+          },
+          "designDebtDeclared": {
+            "required": false,
+            "status": "not-required",
+            "blocking": false
+          },
+          "verificationMatrixSatisfied": {
+            "required": true,
+            "status": "satisfied",
+            "evidence": [
+              "verification matrix met: happy-path, negative, corruption, compatibility, recovery, concurrency"
+            ],
+            "blocking": false
+          },
+          "groupVerified": {
+            "required": false,
+            "status": "not-required",
+            "blocking": false
+          }
+        },
+        "sources": {
+          "dokimos": {
+            "evidenceType": "dokimos-ratchet",
+            "requirement": "off",
+            "judgement": "ignored"
+          },
+          "ordoBoundary": {
+            "evidenceType": "ordo-boundary",
+      
+# exit: 0

@@ -1,0 +1,7 @@
+# utc: 2026-11-03T07:23:24Z
+# cwd: /tmp/claude-0/-home-user/191f324a-ea3a-5051-b276-748b564d6e03/scratchpad/r9smoke/synthetic
+# cmd: /tmp/claude-0/-home-user/191f324a-ea3a-5051-b276-748b564d6e03/scratchpad/r9smoke/home/.local/bin/praxis init --root .
+init: applied 133 change(s); 0 file(s) preserved
+manifest: .echelon/ros.json
+instance identity: created pxi-5bbd1cc71d0e4ad8bdb74d007bb58589 in .praxis/instance.json
+# exit: 0

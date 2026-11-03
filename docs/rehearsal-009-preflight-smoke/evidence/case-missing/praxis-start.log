@@ -1,0 +1,177 @@
+{
+  "workItems": [
+    {
+      "id": "ROS-INSTALL-3-24-0",
+      "type": "mechanical",
+      "state": "complete",
+      "semanticState": "complete",
+      "evidence": [
+        {
+          "type": "installation",
+          "path": ".ros/installation.json"
+        }
+      ],
+      "updatedAt": "2026-11-03T07:23:24.710Z",
+      "completedAt": "2026-11-03T07:23:24.710Z"
+    },
+    {
+      "id": "WI-SMK-PASS",
+      "type": "task",
+      "state": "complete",
+      "semanticState": "complete",
+      "evidence": [
+        {
+          "type": "implementation",
+          "path": "src/Smoke/Ledger.fs"
+        },
+        {
+          "type": "tests",
+          "path": "tests/Smoke.Tests/SMK001Tests.fs"
+        },
+        {
+          "type": "verification-matrix",
+          "path": "/tmp/claude-0/-home-user/191f324a-ea3a-5051-b276-748b564d6e03/scratchpad/r9smoke/evidence/case-pass/praxis-matrix.json"
+        }
+      ],
+      "updatedAt": "2026-11-03T08:05:00Z",
+      "telemetryExecutionIds": [
+        "EXE-20261103T072436694Z-4b33b138"
+      ],
+      "completedAt": "2026-11-03T08:05:00Z",
+      "completionReadiness": {
+        "schema": "praxis.completion-readiness/1",
+        "workItem": "WI-SMK-PASS",
+        "decision": "ready",
+        "policy": {
+          "dokimos": "off",
+          "ordoBoundary": "off",
+          "requiredFacets": []
+        },
+        "facets": {
+          "implementationComplete": {
+            "required": false,
+            "status": "satisfied",
+            "evidence": [
+              "implementation=src/Smoke/Ledger.fs"
+            ],
+            "blocking": false
+          },
+          "behaviorVerified": {
+            "required": false,
+            "status": "satisfied",
+            "evidence": [
+              "tests=tests/Smoke.Tests/SMK001Tests.fs"
+            ],
+            "blocking": false
+          },
+          "architectureVerified": {
+            "required": false,
+            "status": "not-required",
+            "blocking": false
+          },
+          "releaseReady": {
+            "required": false,
+            "status": "not-required",
+            "blocking": false
+          },
+          "designDebtDeclared": {
+            "required": false,
+            "status": "not-required",
+            "blocking": false
+          },
+          "verificationMatrixSatisfied": {
+            "required": true,
+            "status": "satisfied",
+            "evidence": [
+              "verification matrix met: happy-path, negative, corruption, compatibility, recovery, concurrency"
+            ],
+            "blocking": false
+          },
+          "groupVerified": {
+            "required": false,
+            "status": "not-required",
+            "blocking": false
+          }
+        },
+        "sources": {
+          "dokimos": {
+            "evidenceType": "dokimos-ratchet",
+            "requirement": "off",
+            "judgement": "ignored"
+          },
+          "ordoBoundary": {
+            "evidenceType": "ordo-boundary",
+            "requirement": "off",
+            "judgement": "ignored"
+          },
+          "verificationMatrix": {
+            "evidenceType": "verification-matrix",
+            "requirement": "required",
+            "path": "/tmp/claude-0/-home-user/191f324a-ea3a-5051-b276-748b564d6e03/scratchpad/r9smoke/evidence/case-pass/praxis-matrix.json",
+            "observation": "parsed",
+            "judgement": "passed",
+            "evidence": [
+              "verification matrix met: happy-path, negative, corruption, compatibility, recovery, concurrency"
+            ]
+          }
+        },
+        "risk": {
+          "schema": "praxis.work-risk/1",
+          "changeClasses": [
+            "persistence"
+          ],
+          "level": "medium",
+          "persistentStateImpact": true,
+          "externalProtocolImpact": false,
+          "securityImpact": false,
+          "failurePosture": "fail-closed",
+          "tierOwnership": []
+        },
+        "obligations": {
+          "designDebtDeclaration": false,
+          "verificationDimensions": [
+            "happy-path",
+            "negative",
+            "corruption",
+            "concurrency",
+            "compatibility",
+            "recovery"
+          ]
+        },
+        "consumedEvidence": [
+          {
+            "type": "verification-matrix",
+            "path": "/tmp/claude-0/-home-user/191f324a-ea3a-5051-b276-748b564d6e03/scratchpad/r9smoke/evidence/case-pass/praxis-matrix.json",
+            "sha256": "sha256:7031e8bb6af5a5598d3fd098e22f31a8d1a8427f921d1c10f8d1fa1f54b47af9"
+          }
+        ],
+        "blockingReasons": []
+      }
+    },
+    {
+      "id": "WI-SMK-SKIP",
+      "type": "task",
+      "state": "active",
+      "semanticState": "active",
+      "evidence": [],
+      "updatedAt": "2026-11-03T08:00:00Z",
+      "telemetryExecutionIds": [
+        "EXE-20261103T072456656Z-3f0d7c58"
+      ]
+    },
+    {
+      "id": "WI-SMK-MISSING",
+      "type": "task",
+      "state": "active",
+      "semanticState": "active",
+      "evidence": [],
+      "updatedAt": "2026-11-03T08:00:00Z",
+      "telemetryExecutionIds": [
+        "EXE-20261103T072507110Z-3a9d29e0"
+      ]
+    }
+  ],
+  "events": [
+    "29edfb641d5bec349b7e4e35"
+  ]
+}

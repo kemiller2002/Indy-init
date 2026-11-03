@@ -1,0 +1,43 @@
+# utc: 2026-11-03T07:27:34Z
+# cwd: /home/user/Indy-init
+# cmd: bash /tmp/claude-0/-home-user/191f324a-ea3a-5051-b276-748b564d6e03/scratchpad/r9smoke/c8.sh
++ cd /home/user/Indy-init
++ git rev-parse HEAD
+98bad5f76ef95812d67a0b512512a6eba12d7a3d
++ sha256sum requirements-compiled/v4.1.2/package-manifest.json requirements-compiled/v4.1.2/independent-review.md requirements-compiled/v4.1.2/analysis/independent-review.json requirements-compiled/v4.1.1/package-manifest.json requirements-compiled/v4.1.2/verification-execution-plan.json requirements/causa-requirements-baseline-v4.json kickoff/acceptance/approvals.causa.json
+1977780f82547db2b589a59515e0f619e8d114761f8fbc8780647149720c683a  requirements-compiled/v4.1.2/package-manifest.json
+a3719960864521531e00dac6a4f608e5a4bc973f5f5feaa2d9a433b9e78a000d  requirements-compiled/v4.1.2/independent-review.md
+b0a819fb5f357bf674e05836eeacd35f4f2cdece9462bde26642fa00d3ee164e  requirements-compiled/v4.1.2/analysis/independent-review.json
+77d15f555c215d66569db6802f8d291a1b13dfaa9f0a99d974b748a3fbc3afa0  requirements-compiled/v4.1.1/package-manifest.json
+e31dc2045954f12c1b1eb0c0a9e953cdcfddba44bb57bc08e34e0bfcc047a3ca  requirements-compiled/v4.1.2/verification-execution-plan.json
+f86a3539e48ee8dda7d99d5f4f5546a18e2397a82d308a277c8f346edb2a8f1a  requirements/causa-requirements-baseline-v4.json
+87eaf064e310e24b50f3086fa2c65db3009666894ed4fca45f6e20433b2cf2ed  kickoff/acceptance/approvals.causa.json
++ python3 -I -c '
+import json
+m=json.load(open('\''requirements-compiled/v4.1.2/package-manifest.json'\''))
+print('\''manifest keys:'\'', list(m)[:12])
+for k in ('\''version'\'','\''package'\'','\''tag'\'','\''id'\'','\''base'\'','\''supersedes'\'','\''successorOf'\''):
+  if k in m: print(k, '\''='\'', m[k])
+fs=m.get('\''files'\'') or m.get('\''artifacts'\'') or []
+print([f for f in fs if '\''verification-execution-plan'\'' in json.dumps(f)])
+'
+manifest keys: ['schema', 'packageVersion', 'status', 'statusMeaning', 'amends', 'base', 'validation', 'files']
+base = {'package': 'requirements-compiled/v4', 'verificationPlan': {'planId': 'VP-1e3c66bcc958', 'fileSha256': '10ce16eb8d14514ed586d6695c10dda0e741ede719af9a03d855977ebdccb9e7', 'contentDigest': '1d2a6043388dc3ba4ace36195c550ba6e30caaade0b9caa84afda86172822640'}}
+['verification-execution-plan.json']
++ git fetch -q --depth=1 origin refs/tags/indy-init-requirements-v4.1.2:refs/tags/indy-init-requirements-v4.1.2 refs/tags/indy-init-requirements-v4.1.1:refs/tags/indy-init-requirements-v4.1.1
++ git rev-parse 'indy-init-requirements-v4.1.2^{commit}' 'indy-init-requirements-v4.1.1^{commit}'
+485b8a90972f5a996ed3dba3d9db17952fd677f9
+f85081f8321e773ee5a564d183930e8fab20ef55
++ git rev-parse HEAD:requirements-compiled/v4.1.2 indy-init-requirements-v4.1.2:requirements-compiled/v4.1.2
+afa2c766b1439902ee8c17ea6bb2e44b737e0441
+afa2c766b1439902ee8c17ea6bb2e44b737e0441
++ git rev-parse HEAD:requirements-compiled/v4.1.1 indy-init-requirements-v4.1.1:requirements-compiled/v4.1.1
+0636cc793313dbc12e39d493450c8ac8514c0a2d
+0636cc793313dbc12e39d493450c8ac8514c0a2d
++ git diff --quiet indy-init-requirements-v4.1.2 HEAD -- requirements-compiled/v4.1.2
++ echo 'v4.1.2 diff vs tag rc=0'
+v4.1.2 diff vs tag rc=0
++ git diff --quiet indy-init-requirements-v4.1.1 HEAD -- requirements-compiled/v4.1.1
++ echo 'v4.1.1 diff vs tag rc=0'
+v4.1.1 diff vs tag rc=0
+# exit: 0

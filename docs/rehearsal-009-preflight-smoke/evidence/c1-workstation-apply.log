@@ -1,0 +1,30 @@
+# utc: 2026-11-03T07:21:17Z
+# cwd: /tmp/claude-0/-home-user/191f324a-ea3a-5051-b276-748b564d6e03/scratchpad/r9smoke
+# cmd: bin/conditor/conditor-linux-x64 workstation apply --authorize sha256:d39022c4a04e945042cefb02d69ce4d7f04c6f424c4fe5435fd7cc8dc826dfd3 --resolved-set /home/user/kemiller2002/echelon-registry/channels/echelon-current/linux-x64.json --resolved-set-sha256 bc0f95150a2abc1850340bfddc3b94814820aa1ed0ed10687ecd029ec9398aab --home /tmp/claude-0/-home-user/191f324a-ea3a-5051-b276-748b564d6e03/scratchpad/r9smoke/home
+  completed shell-path (receipt matched)
+  completed praxis-download (receipt matched)
+  completed praxis-extract (receipt matched)
+  completed praxis-shim (receipt matched)
+  completed ordo-download (receipt matched)
+  completed ordo-extract (receipt matched)
+  completed ordo-shim (receipt matched)
+  completed percepta-download (receipt matched)
+  completed percepta-extract (receipt matched)
+  completed percepta-shim (receipt matched)
+  completed percepta-semantic-download (receipt matched)
+  completed percepta-semantic-extract (receipt matched)
+  completed percepta-semantic-shim (receipt matched)
+  completed dokimos-download (receipt matched)
+  completed dokimos-extract (receipt matched)
+  completed dokimos-shim (receipt matched)
+  completed strata-download (receipt matched)
+  completed strata-extract (receipt matched)
+  completed strata-shim (receipt matched)
+  registration praxis: invalid (invalid-target: an environment target needs an explicit logical id (--target-id or .echelon/administration.json environment.id); Praxis never infers one from the hostname)
+  registration ordo: invalid (invalid-target: an environment target needs an explicit logical id (--target-id or .echelon/administration.json environment.id); Praxis never infers one from the hostname)
+  registration percepta: invalid (invalid-target: an environment target needs an explicit logical id (--target-id or .echelon/administration.json environment.id); Praxis never infers one from the hostname)
+  registration percepta-semantic: invalid (invalid-target: an environment target needs an explicit logical id (--target-id or .echelon/administration.json environment.id); Praxis never infers one from the hostname)
+  registration dokimos: invalid (invalid-target: an environment target needs an explicit logical id (--target-id or .echelon/administration.json environment.id); Praxis never infers one from the hostname)
+  registration strata: invalid (invalid-target: an environment target needs an explicit logical id (--target-id or .echelon/administration.json environment.id); Praxis never infers one from the hostname)
+Workstation ready.
+# exit: 0

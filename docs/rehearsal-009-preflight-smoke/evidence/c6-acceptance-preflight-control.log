@@ -1,0 +1,6 @@
+# utc: 2026-11-03T07:25:31Z
+# cwd: /home/user/Indy-init
+# cmd: /tmp/claude-0/-home-user/191f324a-ea3a-5051-b276-748b564d6e03/scratchpad/r9smoke/bin/conditor/conditor-linux-x64 acceptance preflight --target /home/user/Indy-init
+acceptance preflight: READY
+  COND-ACC-READY [verifier] the authoritative verifier accepts the pinned baseline and approvals
+# exit: 0

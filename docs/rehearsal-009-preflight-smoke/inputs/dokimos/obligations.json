@@ -1,0 +1,49 @@
+{
+  "schema": "dokimos.verification-obligations/1",
+  "planId": "VP-R9-SMOKE",
+  "planDigest": "",
+  "namespaceRoots": [
+    {
+      "namespace": "Smoke.Tests",
+      "directory": "tests/Smoke.Tests"
+    }
+  ],
+  "suites": [
+    {
+      "id": "SU-SMOKE-UNIT",
+      "runner": "dotnet-test",
+      "command": "dotnet test tests/Smoke.Tests",
+      "paths": [
+        "tests/Smoke.Tests"
+      ],
+      "fixture": "none",
+      "requiredBoundary": [
+        "Ledger"
+      ]
+    }
+  ],
+  "obligations": [
+    {
+      "id": "SMK-001-O1",
+      "requirement": "SMK-001",
+      "priority": "P0",
+      "criterion": "appending 3 then 4 to an empty ledger yields a total of 7.",
+      "categories": [
+        "unit"
+      ]
+    }
+  ],
+  "tests": [
+    {
+      "id": "dotnet:Smoke.Tests.SMK001Tests.SMK-001-O1",
+      "suite": "SU-SMOKE-UNIT",
+      "kind": "unit",
+      "obligations": [
+        "SMK-001-O1"
+      ],
+      "categories": [
+        "unit"
+      ]
+    }
+  ]
+}

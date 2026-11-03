@@ -1,0 +1,1 @@
+{"schema":"dokimos.verification-results/1","candidate":"db1fffaff803a7e2f61097d7c00574e41f81267c","runs":[{"suite":"SU-SMOKE-UNIT","format":"trx","path":"r.trx","sourceSha":"db1fffaff803a7e2f61097d7c00574e41f81267c"}]}

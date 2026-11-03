@@ -1,0 +1,11 @@
+# utc: 2026-11-03T07:25:54Z
+# cwd: /tmp/claude-0/-home-user/191f324a-ea3a-5051-b276-748b564d6e03/scratchpad/r9smoke/indy-copy
+# cmd: /tmp/claude-0/-home-user/191f324a-ea3a-5051-b276-748b564d6e03/scratchpad/r9smoke/bin/conditor/conditor-linux-x64 acceptance preflight --target /tmp/claude-0/-home-user/191f324a-ea3a-5051-b276-748b564d6e03/scratchpad/r9smoke/indy-copy
+acceptance preflight: INVALID
+  COND-ACC-TRUST [approvals] approval APR-R9-SMOKE-SYNTHETIC-1 is not authenticated as a trusted operator decision
+    owner action: owner: authority must be {kind: operator, id: <trusted operator>} and the operator must be passed with --trusted-operator-id
+  COND-ACC-TRUST [approvals] approval APR-R9-SMOKE-SYNTHETIC-1 lacks an immutable authority source
+    owner action: owner: re-record this approval with source.repository, source.commit (40 hex) and source.path naming the decision record
+  COND-ACC-TRUST [approvals] approval APR-R9-SMOKE-SYNTHETIC-1 contains an invalid change identity
+    owner action: owner: every change must name requirement_id and action; the verifier ignores obligation_id or decision_id alone
+# exit: 3

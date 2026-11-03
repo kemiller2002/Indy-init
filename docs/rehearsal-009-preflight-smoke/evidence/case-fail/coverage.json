@@ -1,0 +1,56 @@
+{
+  "bySuite": [
+    {
+      "identities": 1,
+      "status": {
+        "failed": 1
+      },
+      "suite": "SU-SMOKE-UNIT"
+    }
+  ],
+  "candidate": "1f87bfb42d0046f8d405c6ffbb710638cbfafc47",
+  "causes": [
+    {
+      "cause": "SU-SMOKE-UNIT: failed",
+      "obligations": 1
+    }
+  ],
+  "obligations": [
+    {
+      "id": "SMK-001-O1",
+      "identities": [
+        {
+          "id": "dotnet:Smoke.Tests.SMK001Tests.SMK-001-O1",
+          "location": "tests/Smoke.Tests/SMK001Tests.fs:9",
+          "status": "failed",
+          "suite": "SU-SMOKE-UNIT"
+        }
+      ],
+      "quality": "none",
+      "reasons": [
+        "dotnet:Smoke.Tests.SMK001Tests.SMK-001-O1: failed: Assert.Equal() Failure: Values differ\nExpected: 8\nActual:   7"
+      ],
+      "requirement": "SMK-001",
+      "status": "failed"
+    }
+  ],
+  "planDigest": "",
+  "planId": "VP-R9-SMOKE",
+  "rejectedRuns": [],
+  "schema": "dokimos.verification-coverage/1",
+  "scope": [],
+  "summary": {
+    "faultSensitive": 0,
+    "identityStatus": {
+      "failed": 1
+    },
+    "obligationStatus": {
+      "failed": 1
+    },
+    "obligations": 1,
+    "requirements": 1,
+    "requirementsVerified": 0,
+    "unplannedResults": 0
+  },
+  "verified": false
+}

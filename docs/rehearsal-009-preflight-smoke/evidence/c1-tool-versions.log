@@ -1,0 +1,47 @@
+# utc: 2026-11-03T07:21:40Z
+# cwd: /tmp/claude-0/-home-user/191f324a-ea3a-5051-b276-748b564d6e03/scratchpad/r9smoke
+# cmd: bash /tmp/claude-0/-home-user/191f324a-ea3a-5051-b276-748b564d6e03/scratchpad/r9smoke/versions.sh
++ /tmp/claude-0/-home-user/191f324a-ea3a-5051-b276-748b564d6e03/scratchpad/r9smoke/home/.local/bin/praxis --version
+praxis 3.24.0
++ /tmp/claude-0/-home-user/191f324a-ea3a-5051-b276-748b564d6e03/scratchpad/r9smoke/home/.local/bin/dokimos version
+{
+  "CompatibilityAliases": [],
+  "Contract": "dokimos.version",
+  "Contracts": {
+    "Comparison": [
+      "1.0.0"
+    ],
+    "CompletionVerification": [
+      "dokimos.completion-verification/1"
+    ],
+    "Evaluation": [
+      "1.0.0"
+    ],
+    "EvidenceReuse": [
+      "dokimos.evidence-reuse-plan/1"
+    ],
+    "Policy": [
+      "1.0.0",
+      "1.1.0",
+      "1.2.0"
+    ],
+    "Snapshot": [
+      "1.0.0",
+      "2.0.0"
+    ]
+  },
+  "DokimosVersion": "0.10.0+11477629f0a2682a256e1d0c75ffeab64abef11a",
+  "Executable": "dokimos",
+  "ReleaseVersion": "0.10.0",
+  "Repository": "kemiller2002/dokimos",
+  "SchemaVersion": "1.1.0",
+  "SourceCommit": "11477629f0a2682a256e1d0c75ffeab64abef11a",
+  "SystemId": "dokimos"
+}
++ /tmp/claude-0/-home-user/191f324a-ea3a-5051-b276-748b564d6e03/scratchpad/r9smoke/home/.local/bin/percepta --version
+percepta 0.4.0+4a53688238f205fdde474cc340378a89ddea0c09
++ /tmp/claude-0/-home-user/191f324a-ea3a-5051-b276-748b564d6e03/scratchpad/r9smoke/home/.local/bin/ordo --version
+1.20.0
++ sha256sum /tmp/claude-0/-home-user/191f324a-ea3a-5051-b276-748b564d6e03/scratchpad/r9smoke/bin/conditor/conditor-linux-x64
+cd6b87d39792808d4ad28e801fcb440a1fad44e8c64ff1d1e420ce30e41841cc  /tmp/claude-0/-home-user/191f324a-ea3a-5051-b276-748b564d6e03/scratchpad/r9smoke/bin/conditor/conditor-linux-x64
+# exit: 0

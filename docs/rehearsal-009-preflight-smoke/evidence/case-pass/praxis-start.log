@@ -1,0 +1,32 @@
+{
+  "workItems": [
+    {
+      "id": "ROS-INSTALL-3-24-0",
+      "type": "mechanical",
+      "state": "complete",
+      "semanticState": "complete",
+      "evidence": [
+        {
+          "type": "installation",
+          "path": ".ros/installation.json"
+        }
+      ],
+      "updatedAt": "2026-11-03T07:23:24.710Z",
+      "completedAt": "2026-11-03T07:23:24.710Z"
+    },
+    {
+      "id": "WI-SMK-PASS",
+      "type": "task",
+      "state": "active",
+      "semanticState": "active",
+      "evidence": [],
+      "updatedAt": "2026-11-03T08:00:00Z",
+      "telemetryExecutionIds": [
+        "EXE-20261103T072436694Z-4b33b138"
+      ]
+    }
+  ],
+  "events": [
+    "78393eb9d68e486f25e26b5d"
+  ]
+}

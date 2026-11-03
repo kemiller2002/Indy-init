@@ -1,0 +1,22 @@
+# utc: 2026-11-03T07:27:02Z
+# cwd: /tmp/claude-0/-home-user/191f324a-ea3a-5051-b276-748b564d6e03/scratchpad/r9smoke/percepta-synthetic
+# cmd: /tmp/claude-0/-home-user/191f324a-ea3a-5051-b276-748b564d6e03/scratchpad/r9smoke/home/.local/bin/percepta spec-preflight --machines /home/user/Indy-init/requirements-compiled/v4.1.2/state-machine-contracts.json --invariants /home/user/Indy-init/requirements-compiled/v4/invariants.json --interfaces /home/user/Indy-init/requirements-compiled/v4.1.2/analysis/interface-specifications.json --catalog /home/user/Indy-init/docs/COMMAND-EVENT-CATALOG.md --out /tmp/claude-0/-home-user/191f324a-ea3a-5051-b276-748b564d6e03/scratchpad/r9smoke/evidence/c7-control-v412.json
+{
+  "analysed": {
+    "catalogCommands": 134,
+    "invariants": 25,
+    "machines": 5,
+    "operations": 26,
+    "transitions": 101,
+    "types": 85
+  },
+  "blocked": false,
+  "blockingContradictions": [],
+  "missingDecisions": [],
+  "missingInterfaces": [],
+  "schema": "percepta.specification-preflight/1",
+  "suggestedOwnerActions": [],
+  "unsupportedVerificationObligations": [],
+  "warnings": []
+}
+# exit: 0

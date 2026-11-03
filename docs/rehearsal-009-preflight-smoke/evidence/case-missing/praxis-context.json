@@ -1,0 +1,105 @@
+{
+  "schemaVersion": "1.0.0",
+  "protocolVersion": "1.0.0",
+  "repository": "synthetic",
+  "actor": "ros-bootstrap",
+  "workItems": [
+    {
+      "id": "WI-SMK-MISSING",
+      "type": "task",
+      "state": "active",
+      "semanticState": "active",
+      "evidence": [],
+      "updatedAt": "2026-11-03T08:00:00Z",
+      "telemetryExecutionIds": [
+        "EXE-20261103T072507110Z-3a9d29e0"
+      ],
+      "allowedActions": [
+        "abandon",
+        "block",
+        "complete"
+      ],
+      "requiredEvidenceForCompletion": [
+        "implementation",
+        "tests"
+      ],
+      "qualityEvidenceForCompletion": {
+        "dokimos": "off",
+        "ordoBoundary": "off",
+        "requiredFacets": [],
+        "requiredEvidenceTypes": [
+          "verification-matrix"
+        ],
+        "risk": {
+          "schema": "praxis.work-risk/1",
+          "changeClasses": [
+            "persistence"
+          ],
+          "level": "medium",
+          "persistentStateImpact": true,
+          "externalProtocolImpact": false,
+          "securityImpact": false,
+          "failurePosture": "fail-closed",
+          "tierOwnership": []
+        },
+        "obligations": {
+          "designDebtDeclaration": false,
+          "verificationDimensions": [
+            "happy-path",
+            "negative",
+            "corruption",
+            "concurrency",
+            "compatibility",
+            "recovery"
+          ]
+        }
+      }
+    }
+  ],
+  "continuity": [
+    {
+      "workItemId": "WI-SMK-MISSING",
+      "state": "active",
+      "freshness": "none",
+      "checkpoint": null,
+      "local": null,
+      "workingTree": {
+        "state": "clean",
+        "meaningfulPaths": [],
+        "excludedBaselinePaths": []
+      },
+      "warnings": [
+        {
+          "code": "no-durable-checkpoint",
+          "workItemId": "WI-SMK-MISSING",
+          "message": "active work WI-SMK-MISSING has no durable checkpoint"
+        }
+      ],
+      "recovery": [
+        {
+          "kind": "note",
+          "text": "no durable checkpoint is recorded; nothing guarantees which remote state is the intended recovery point, so inspect the branch history before relying on it"
+        }
+      ],
+      "unrecoverableLocalState": null,
+      "telemetry": {
+        "executions": [
+          {
+            "executionId": "EXE-20261103T072507110Z-3a9d29e0",
+            "status": "active",
+            "startedAt": "2026-11-03T07:25:07.110Z",
+            "segmentation": "execution-level",
+            "stepTrackingStartedAt": null,
+            "executionScopedBefore": null,
+            "historicalStepAttribution": "unavailable",
+            "measurements": {
+              "executionScopedBeforeSteps": 1,
+              "executionScopedOutsideSteps": 0,
+              "stepScoped": 0
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

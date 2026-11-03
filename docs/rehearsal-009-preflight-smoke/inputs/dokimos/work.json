@@ -1,0 +1,30 @@
+{
+  "packages": [
+    {
+      "cost": 1,
+      "dependsOn": [],
+      "file": "tests/Smoke.Tests/SMK001Tests.fs",
+      "fixture": "none",
+      "id": "WP-001",
+      "identities": [
+        "dotnet:Smoke.Tests.SMK001Tests.SMK-001-O1"
+      ],
+      "language": "fsharp",
+      "obligations": [
+        {
+          "categories": [
+            "unit"
+          ],
+          "criterion": "appending 3 then 4 to an empty ledger yields a total of 7.",
+          "id": "SMK-001-O1",
+          "requirement": "SMK-001"
+        }
+      ],
+      "rank": 1,
+      "suite": "SU-SMOKE-UNIT"
+    }
+  ],
+  "planId": "VP-R9-SMOKE",
+  "schema": "dokimos.verification-work/1",
+  "unmapped": []
+}
