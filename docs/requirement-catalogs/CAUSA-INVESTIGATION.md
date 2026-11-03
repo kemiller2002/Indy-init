@@ -70,3 +70,34 @@ of FSHARP-TYPE-SHAPES sections 31–33, for example `InvestigationStarted of
 InvestigationStarted`. Rehearsal 8 was built before v4.1.2. An implementation
 on v4.1.2 can save these values, and the verifier will tell whether it does.
 Editing the catalog would only hide the gap.
+
+## Using it for the November 7 build
+
+Rehearsal 8 (kemiller2002/indy-init-rehearsal-008 PR #57, unmerged) is the
+reference implementation. Its acceptance gate fails by design, and it is not
+merged into the completed rehearsal. The released tools are on `main`:
+
+- Praxis `requirements manifest`;
+- Dokimos `verification requirements`;
+- Forma `RequirementIdentity`;
+- the Specula requirements view.
+
+The application built at kickoff adopts the pipeline this way:
+
+1. Put `data-requirement-id="INV-0nn"` on the element of each implemented
+   requirement, and list the files in
+   `requirements/requirement-implementation-map.json`.
+2. Copy these from the reference PR:
+   - `tests/browser/requirements/` (the probes);
+   - `tools/requirement-mutations.fsx`;
+   - `.github/workflows/requirement-verification.yml`.
+
+   The workflow compiles the manifest from this catalog at a pinned Indy-init
+   commit, so the application cannot change its own obligations.
+3. Commit the run's `requirement-verification.json` to
+   `evidence/requirement-verification/requirement-verification.json` on the
+   application's `main`. Specula reads that file, not the CI artifact. Without
+   the commit, its view says "no evidence", which is correct but uninformative.
+4. Implement ODR-V412-02 (v4.1.2's command and event bodies) so that the
+   problem statement, title and creation time are saved. Until then INV-001,
+   INV-002, INV-007 and INV-008 fail, as they do in Rehearsal 8.
