@@ -1,0 +1,49 @@
+# Indy-init verification kit: the non-blocking coverage job. Integration pastes this job, unchanged, under `jobs:` in
+# .github/workflows/ci.yml (its own file; no new file is added to the repository). It reads the obligation set the
+# coordinator committed at T0 (evidence/verification/obligations.json) and publishes, on every push and pull request,
+# which bound tests exist: verified/generated, invalid (skeletons, skips, no assertion) and not generated, per suite.
+# It never fails the build (continue-on-error); it adds no acceptance rule. Dokimos 0.10.0 is the echelon-current
+# 1.35.0 release, installed from its release asset and checked against the digest the Registry records.
+  verification-coverage:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    timeout-minutes: 10
+    env:
+      DOKIMOS_VERSION: 0.10.0
+      DOKIMOS_SHA256: b08c2235ce6bc2f8c62be916773f0a0ef869aec853332452e7ef022259761cc1
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Dokimos (echelon-current 1.35.0, digest-checked)
+        run: |
+          curl -fsSL -o "$RUNNER_TEMP/dokimos.tgz" "https://github.com/kemiller2002/dokimos/releases/download/dokimos-v$DOKIMOS_VERSION/dokimos-linux-x64.tar.gz"
+          echo "$DOKIMOS_SHA256  $RUNNER_TEMP/dokimos.tgz" | sha256sum -c -
+          mkdir -p "$RUNNER_TEMP/dokimos" && tar -xzf "$RUNNER_TEMP/dokimos.tgz" -C "$RUNNER_TEMP/dokimos"
+      - name: Verification coverage (source scan)
+        run: |
+          if [ ! -f evidence/verification/obligations.json ]; then
+            echo "evidence/verification/obligations.json is missing: the coordinator compiles it at T0 (Indy-init tools/verification-kit/README.md)" >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          "$RUNNER_TEMP/dokimos/dokimos" verification coverage --obligations evidence/verification/obligations.json --root . --candidate "$GITHUB_SHA" --out "$RUNNER_TEMP/coverage.json" > /dev/null
+          jq -r -f /dev/stdin "$RUNNER_TEMP/coverage.json" >> "$GITHUB_STEP_SUMMARY" <<'JQ'
+          def n($k): (.status[$k] // 0);
+          "## Verification coverage (Dokimos \($ENV.DOKIMOS_VERSION), source scan at \((.candidate // "this commit")[0:12]))",
+          "",
+          "Obligations: **\(.summary.obligations)**. " + (.summary.obligationStatus | to_entries | map("\(.key) \(.value)") | join(", ")) + ".",
+          "",
+          "`not-generated`: the bound test does not exist yet. `invalid`: it exists but cannot count (a DOKIMOS-UNIMPLEMENTED skeleton, a skip, no assertion). `generated`: a real test exists; this scan does not run it.",
+          "",
+          "| Suite | Bound identities | Generated | Invalid | Not generated | Blocked (records) |",
+          "|---|---:|---:|---:|---:|---:|",
+          (.bySuite[] | "| \(.suite) | \(.identities) | \(n("generated") + n("passed")) | \(n("invalid") + n("failed")) | \(n("not-generated")) | \(n("blocked")) |"),
+          "",
+          "### Largest gaps",
+          "",
+          (.causes | map(select((.cause | test(": (not-generated|invalid|failed)$")) and .obligations > 0)) | sort_by(-.obligations) | .[0:10][] | "- \(.cause): \(.obligations) obligation(s)")
+          JQ
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: verification-coverage
+          path: ${{ runner.temp }}/coverage.json
+          if-no-files-found: ignore
