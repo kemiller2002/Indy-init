@@ -1,0 +1,6 @@
+{
+  "schema": "causa.requirements-approvals/1",
+  "baseline_sha256": "f86a3539e48ee8dda7d99d5f4f5546a18e2397a82d308a277c8f346edb2a8f1a",
+  "description": "Operator approvals of requirement scope changes (exclude, priority-change) for the baseline requirements/causa-requirements-baseline-v4.json, the only approvals the acceptance verifier reads. It holds none: no baseline requirement's scope has been changed. Package and decision approvals are in kickoff/rehearsal-007/approvals.causa.json, which the verifier does not read. Written by the owner with tools/owner-freeze.fsx acceptance (RDP-003); an agent must not write, edit or infer a record here.",
+  "approvals": []
+}
