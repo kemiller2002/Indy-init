@@ -1,0 +1,21 @@
+{
+  "schema": "indy-init.r9-gate-verdict/1",
+  "verdict": "REFUSED",
+  "mode": "release",
+  "candidate": "dd3fed46144a89c9d8f1bb328a5e18cbce9d68a8",
+  "planId": "VP-R9-FIX",
+  "scope": [],
+  "workItem": "",
+  "dokimosExit": 4,
+  "obligations": 1,
+  "verified": 0,
+  "deferredToAcceptanceVerifier": [],
+  "recordIdentitiesNotJudgedByDokimos": 0,
+  "frozenPlanSha256": "5be5428b782f1851c28c7d1806937ca7f8f75c29c132c5716d921c9da480ba9a",
+  "coverageSha256": "2f2a0f4dd5b40ee70c833383ce572ce13dd418303e4c91a0612870545ae033c4",
+  "resultsSha256": "d683772ef592bdf72bf8191a0a37651e292b1597bc4543f5de7a1ffcb0e15e5e",
+  "matrixSha256": "",
+  "causes": [
+    "SMK-001-O1 (SMK-001) is failed: dotnet:Smoke.Tests.SMK001Tests.SMK-001-O1: failed: Assert.Equal() Failure: Values differ\nExpected: 8\nActual:   7"
+  ]
+}

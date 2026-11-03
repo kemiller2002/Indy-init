@@ -208,3 +208,30 @@ jobs:
         run: |
           dotnet build tools/src/Causa.Tool -c Release
           dotnet tools/src/Causa.Tool/bin/Release/net10.0/causa.dll template-verify --template demonstration-v1
+  # Rehearsal 009 readiness gates (docs/rehearsal-009-preflight-smoke/FINAL-CORRECTIONS.md): the pinned Conditor, the
+  # resolved set from echelon-current, the governed Praxis policy, the Dokimos coverage gate with its candidate-SHA
+  # checks and the non-empty Percepta preflight, each proven by positive and negative cases on the released binaries.
+  r9-readiness-gates:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+      - name: Pinned Conditor 0.10.19 and the echelon-current 1.35.0 workstation, in a disposable home
+        run: |
+          dotnet fsi tools/r9/r9.fsx -- install-conditor --lock kickoff/rehearsal-009/toolchain.lock.json --dir "$RUNNER_TEMP/conditor"
+          dotnet fsi tools/r9/r9.fsx -- workstation --lock kickoff/rehearsal-009/toolchain.lock.json \
+            --conditor "$RUNNER_TEMP/conditor/conditor" --home "$RUNNER_TEMP/echelon" --target-id "indy-init-ci-${{ github.run_id }}"
+      - name: Readiness gates, positive and negative cases
+        run: |
+          git config --global user.name ci && git config --global user.email ci@example.invalid
+          dotnet fsi tools/r9/tests.fsx -- --indy-init . --bin "$RUNNER_TEMP/echelon/.local/bin" \
+            --conditor "$RUNNER_TEMP/conditor/conditor" --work "$RUNNER_TEMP/r9-work" --evidence "$RUNNER_TEMP/r9-evidence"
+      - name: Publish the gate evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: r9-readiness-gates
+          path: ${{ runner.temp }}/r9-evidence

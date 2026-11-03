@@ -1,0 +1,20 @@
+# cmd: dotnet fsi /home/user/Indy-init/tools/r9/r9.fsx -- spec-preflight --percepta $SCRATCH/whome/.local/bin/percepta --out $WORK/work/spec/hollow.json --machines $WORK/work/spec/hollow/m.json --invariants $WORK/work/spec/hollow/i.json --interfaces $WORK/work/spec/hollow/f.json --catalog $WORK/work/spec/hollow/c.md
+# cwd: $WORK/work
+  machines: 0 analysed / 0 in the inputs
+  transitions: 0 analysed / 0 in the inputs
+  invariants: 0 analysed / 0 in the inputs
+  operations: 0 analysed / 0 in the inputs
+  catalogCommands: 0 analysed / 0 in the inputs
+  types: 0
+  report $WORK/work/spec/hollow.json
+  REFUSED the input holds no machines: an empty specification proves nothing
+  REFUSED the input holds no transitions: an empty specification proves nothing
+  REFUSED the input holds no invariants: an empty specification proves nothing
+  REFUSED the input holds no operations: an empty specification proves nothing
+  REFUSED the input holds no catalogCommands: an empty specification proves nothing
+  REFUSED Percepta analysed no types
+spec-preflight: REFUSED (6 cause(s))
+
+# exit: 4
+# expected: 4 containing 'an empty specification proves nothing'
+# result: PASS

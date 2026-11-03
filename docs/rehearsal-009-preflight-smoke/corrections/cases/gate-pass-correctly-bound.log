@@ -1,0 +1,10 @@
+# cmd: dotnet fsi /home/user/Indy-init/tools/r9/r9.fsx -- gate --mode release --obligations $WORK/work/compiled.json --root $WORK/work/repo --results $WORK/work/results/pass/results.json --dokimos $SCRATCH/whome/.local/bin/dokimos --out $WORK/work/gate/pass --expect-candidate eb5ac40cfb37d9630b52261aec9b9aa4d441d008
+# cwd: $WORK/work/repo
+  candidate eb5ac40cfb37d9630b52261aec9b9aa4d441d008 (release, whole plan)
+  1/1 obligations verified; 0 deferred to the acceptance verifier (record evidence only)
+  verdict $WORK/work/gate/pass/gate.json
+gate: PASS
+
+# exit: 0
+# expected: 0 containing '1/1 obligations verified'
+# result: PASS

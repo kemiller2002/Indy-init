@@ -1,0 +1,325 @@
+# cmd: $SCRATCH/whome/.local/bin/praxis work complete --id WI-STRIPPED --occurred-at 2026-11-03T12:00:00Z --evidence implementation=src/Smoke/Ledger.fs --evidence tests=tests/Smoke.Tests/SMK001Tests.fs
+# cwd: $WORK/work/repo
+{
+  "workItems": [
+    {
+      "id": "ROS-INSTALL-3-24-0",
+      "type": "mechanical",
+      "state": "complete",
+      "semanticState": "complete",
+      "evidence": [
+        {
+          "type": "installation",
+          "path": ".ros/installation.json"
+        }
+      ],
+      "updatedAt": "2026-11-03T08:40:47.430Z",
+      "completedAt": "2026-11-03T08:40:47.430Z"
+    },
+    {
+      "id": "WI-VALID",
+      "type": "feature",
+      "state": "complete",
+      "semanticState": "complete",
+      "evidence": [
+        {
+          "type": "implementation",
+          "path": "src/Smoke/Ledger.fs"
+        },
+        {
+          "type": "tests",
+          "path": "tests/Smoke.Tests/SMK001Tests.fs"
+        },
+        {
+          "type": "verification-matrix",
+          "path": ".echelon/verification/WI-VALID/praxis-matrix.json"
+        }
+      ],
+      "updatedAt": "2026-11-03T12:00:00Z",
+      "telemetryExecutionIds": [
+        "EXE-20261103T084329246Z-fa88c0c4"
+      ],
+      "completedAt": "2026-11-03T12:00:00Z",
+      "completionReadiness": {
+        "schema": "praxis.completion-readiness/1",
+        "workItem": "WI-VALID",
+        "decision": "ready",
+        "policy": {
+          "dokimos": "off",
+          "ordoBoundary": "off",
+          "requiredFacets": [
+            "verification-matrix-satisfied"
+          ]
+        },
+        "facets": {
+          "implementationComplete": {
+            "required": false,
+            "status": "satisfied",
+            "evidence": [
+              "implementation=src/Smoke/Ledger.fs"
+            ],
+            "blocking": false
+          },
+          "behaviorVerified": {
+            "required": false,
+            "status": "satisfied",
+            "evidence": [
+              "tests=tests/Smoke.Tests/SMK001Tests.fs"
+            ],
+            "blocking": false
+          },
+          "architectureVerified": {
+            "required": false,
+            "status": "not-required",
+            "blocking": false
+          },
+          "releaseReady": {
+            "required": false,
+            "status": "not-required",
+            "blocking": false
+          },
+          "designDebtDeclared": {
+            "required": false,
+            "status": "not-required",
+            "blocking": false
+          },
+          "verificationMatrixSatisfied": {
+            "required": true,
+            "status": "satisfied",
+            "evidence": [
+              "verification matrix met: happy-path, negative, corruption, compatibility, recovery, concurrency"
+            ],
+            "blocking": false
+          },
+          "groupVerified": {
+            "required": false,
+            "status": "not-required",
+            "blocking": false
+          }
+        },
+        "sources": {
+          "dokimos": {
+            "evidenceType": "dokimos-ratchet",
+            "requirement": "off",
+            "judgement": "ignored"
+          },
+          "ordoBoundary": {
+            "evidenceType": "ordo-boundary",
+            "requirement": "off",
+            "judgement": "ignored"
+          },
+          "verificationMatrix": {
+            "evidenceType": "verification-matrix",
+            "requirement": "required",
+            "path": ".echelon/verification/WI-VALID/praxis-matrix.json",
+            "observation": "parsed",
+            "judgement": "passed",
+            "evidence": [
+              "verification matrix met: happy-path, negative, corruption, compatibility, recovery, concurrency"
+            ]
+          }
+        },
+        "obligations": {
+          "designDebtDeclaration": false,
+          "verificationDimensions": []
+        },
+        "consumedEvidence": [
+          {
+            "type": "verification-matrix",
+            "path": ".echelon/verification/WI-VALID/praxis-matrix.json",
+            "sha256": "sha256:0069872276b2fcc9aac408cd7b73778415515bcf9a7729366f5006f4b6b52a21"
+          }
+        ],
+        "blockingReasons": []
+      }
+    },
+    {
+      "id": "WI-NOMATRIX",
+      "type": "feature",
+      "state": "active",
+      "semanticState": "active",
+      "evidence": [],
+      "updatedAt": "2026-11-03T12:00:00Z",
+      "telemetryExecutionIds": [
+        "EXE-20261103T084335501Z-3b8fc5ff"
+      ]
+    },
+    {
+      "id": "WI-NORISK",
+      "type": "research",
+      "state": "active",
+      "semanticState": "active",
+      "evidence": [],
+      "updatedAt": "2026-11-03T12:00:00Z",
+      "telemetryExecutionIds": [
+        "EXE-20261103T084337364Z-7e0837af"
+      ]
+    },
+    {
+      "id": "WI-FAILED",
+      "type": "feature",
+      "state": "active",
+      "semanticState": "active",
+      "evidence": [],
+      "updatedAt": "2026-11-03T12:00:00Z",
+      "telemetryExecutionIds": [
+        "EXE-20261103T084344177Z-5d76c2e9"
+      ]
+    },
+    {
+      "id": "WI-COPIED",
+      "type": "feature",
+      "state": "active",
+      "semanticState": "active",
+      "evidence": [],
+      "updatedAt": "2026-11-03T12:00:00Z",
+      "telemetryExecutionIds": [
+        "EXE-20261103T084346324Z-b8879168"
+      ]
+    },
+    {
+      "id": "WI-FORGED",
+      "type": "feature",
+      "state": "complete",
+      "semanticState": "complete",
+      "evidence": [
+        {
+          "type": "implementation",
+          "path": "src/Smoke/Ledger.fs"
+        },
+        {
+          "type": "tests",
+          "path": "tests/Smoke.Tests/SMK001Tests.fs"
+        },
+        {
+          "type": "verification-matrix",
+          "path": ".echelon/verification/WI-FORGED/praxis-matrix.json"
+        }
+      ],
+      "updatedAt": "2026-11-03T12:00:00Z",
+      "telemetryExecutionIds": [
+        "EXE-20261103T084353478Z-4d0c4ac5"
+      ],
+      "completedAt": "2026-11-03T12:00:00Z",
+      "completionReadiness": {
+        "schema": "praxis.completion-readiness/1",
+        "workItem": "WI-FORGED",
+        "decision": "ready",
+        "policy": {
+          "dokimos": "off",
+          "ordoBoundary": "off",
+          "requiredFacets": [
+            "verification-matrix-satisfied"
+          ]
+        },
+        "facets": {
+          "implementationComplete": {
+            "required": false,
+            "status": "satisfied",
+            "evidence": [
+              "implementation=src/Smoke/Ledger.fs"
+            ],
+            "blocking": false
+          },
+          "behaviorVerified": {
+            "required": false,
+            "status": "satisfied",
+            "evidence": [
+              "tests=tests/Smoke.Tests/SMK001Tests.fs"
+            ],
+            "blocking": false
+          },
+          "architectureVerified": {
+            "required": false,
+            "status": "not-required",
+            "blocking": false
+          },
+          "releaseReady": {
+            "required": false,
+            "status": "not-required",
+            "blocking": false
+          },
+          "designDebtDeclared": {
+            "required": false,
+            "status": "not-required",
+            "blocking": false
+          },
+          "verificationMatrixSatisfied": {
+            "required": true,
+            "status": "satisfied",
+            "evidence": [
+              "verification matrix met: happy-path, negative, corruption, compatibility, recovery, concurrency"
+            ],
+            "blocking": false
+          },
+          "groupVerified": {
+            "required": false,
+            "status": "not-required",
+            "blocking": false
+          }
+        },
+        "sources": {
+          "dokimos": {
+            "evidenceType": "dokimos-ratchet",
+            "requirement": "off",
+            "judgement": "ignored"
+          },
+          "ordoBoundary": {
+            "evidenceType": "ordo-boundary",
+            "requirement": "off",
+            "judgement": "ignored"
+          },
+          "verificationMatrix": {
+            "evidenceType": "verification-matrix",
+            "requirement": "required",
+            "path": ".echelon/verification/WI-FORGED/praxis-matrix.json",
+            "observation": "parsed",
+            "judgement": "passed",
+            "evidence": [
+              "verification matrix met: happy-path, negative, corruption, compatibility, recovery, concurrency"
+            ]
+          }
+        },
+        "obligations": {
+          "designDebtDeclaration": false,
+          "verificationDimensions": []
+        },
+        "consumedEvidence": [
+          {
+            "type": "verification-matrix",
+            "path": ".echelon/verification/WI-FORGED/praxis-matrix.json",
+            "sha256": "sha256:105753e0bcb45017eea9a57fc3c7570643d71175798c45f15948c69dfa32c1b0"
+          }
+        ],
+        "blockingReasons": []
+      }
+    },
+    {
+      "id": "WI-STRIPPED",
+      "type": "feature",
+      "state": "complete",
+      "semanticState": "complete",
+      "evidence": [
+        {
+          "type": "implementation",
+          "path": "src/Smoke/Ledger.fs"
+        },
+        {
+          "type": "tests",
+          "path": "tests/Smoke.Tests/SMK001Tests.fs"
+        }
+      ],
+      "updatedAt": "2026-11-03T12:00:00Z",
+      "telemetryExecutionIds": [
+        "EXE-20261103T084400774Z-0bc2033d"
+      ],
+      "completedAt": "2026-11-03T12:00:00Z"
+    }
+  ],
+  "events": [
+    "e54b424172cd44130be1cfd0"
+  ]
+}
+# exit: 0
+# expected: 0 containing 'complete'
+# result: PASS

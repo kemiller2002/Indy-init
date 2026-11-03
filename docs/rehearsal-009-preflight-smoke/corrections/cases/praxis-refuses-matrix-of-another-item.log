@@ -1,0 +1,106 @@
+# cmd: $SCRATCH/whome/.local/bin/praxis work complete --id WI-COPIED --occurred-at 2026-11-03T12:00:00Z --evidence implementation=src/Smoke/Ledger.fs --evidence tests=tests/Smoke.Tests/SMK001Tests.fs --evidence verification-matrix=.echelon/verification/WI-COPIED/praxis-matrix.json
+# cwd: $WORK/work/repo
+{
+  "outcome": "refused",
+  "completionReadiness": [
+    {
+      "schema": "praxis.completion-readiness/1",
+      "workItem": "WI-COPIED",
+      "decision": "refused",
+      "policy": {
+        "dokimos": "off",
+        "ordoBoundary": "off",
+        "requiredFacets": [
+          "verification-matrix-satisfied"
+        ]
+      },
+      "facets": {
+        "implementationComplete": {
+          "required": false,
+          "status": "satisfied",
+          "evidence": [
+            "implementation=src/Smoke/Ledger.fs"
+          ],
+          "blocking": false
+        },
+        "behaviorVerified": {
+          "required": false,
+          "status": "satisfied",
+          "evidence": [
+            "tests=tests/Smoke.Tests/SMK001Tests.fs"
+          ],
+          "blocking": false
+        },
+        "architectureVerified": {
+          "required": false,
+          "status": "not-required",
+          "blocking": false
+        },
+        "releaseReady": {
+          "required": false,
+          "status": "not-required",
+          "blocking": false
+        },
+        "designDebtDeclared": {
+          "required": false,
+          "status": "not-required",
+          "blocking": false
+        },
+        "verificationMatrixSatisfied": {
+          "required": true,
+          "status": "unavailable",
+          "reasons": [
+            "verification matrix is for work item \u0027WI-VALID\u0027, not \u0027WI-COPIED\u0027"
+          ],
+          "blocking": true
+        },
+        "groupVerified": {
+          "required": false,
+          "status": "not-required",
+          "blocking": false
+        }
+      },
+      "sources": {
+        "dokimos": {
+          "evidenceType": "dokimos-ratchet",
+          "requirement": "off",
+          "judgement": "ignored"
+        },
+        "ordoBoundary": {
+          "evidenceType": "ordo-boundary",
+          "requirement": "off",
+          "judgement": "ignored"
+        },
+        "verificationMatrix": {
+          "evidenceType": "verification-matrix",
+          "requirement": "required",
+          "path": ".echelon/verification/WI-COPIED/praxis-matrix.json",
+          "observation": "parsed",
+          "judgement": "unavailable",
+          "reasons": [
+            "verification matrix is for work item \u0027WI-VALID\u0027, not \u0027WI-COPIED\u0027"
+          ]
+        }
+      },
+      "obligations": {
+        "designDebtDeclaration": false,
+        "verificationDimensions": []
+      },
+      "consumedEvidence": [
+        {
+          "type": "verification-matrix",
+          "path": ".echelon/verification/WI-COPIED/praxis-matrix.json",
+          "sha256": "sha256:0069872276b2fcc9aac408cd7b73778415515bcf9a7729366f5006f4b6b52a21"
+        }
+      ],
+      "blockingReasons": [
+        "verification-matrix-satisfied unavailable: verification matrix is for work item \u0027WI-VALID\u0027, not \u0027WI-COPIED\u0027"
+      ]
+    }
+  ]
+}
+ERROR completion readiness refused for 'WI-COPIED': verification-matrix-satisfied unavailable: verification matrix is for work item 'WI-VALID', not 'WI-COPIED'
+
+# exit: 3
+# expected: 3 containing 'is for work item 'WI-VALID''
+# result: PASS

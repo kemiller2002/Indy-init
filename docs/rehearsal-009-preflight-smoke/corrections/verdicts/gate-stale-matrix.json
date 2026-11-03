@@ -1,0 +1,21 @@
+{
+  "schema": "indy-init.r9-gate-verdict/1",
+  "verdict": "REFUSED",
+  "mode": "release",
+  "candidate": "2aea9226f15766068de82d58a4c21ac35d1797e6",
+  "planId": "VP-R9-FIX",
+  "scope": [],
+  "workItem": "",
+  "dokimosExit": 0,
+  "obligations": 1,
+  "verified": 1,
+  "deferredToAcceptanceVerifier": [],
+  "recordIdentitiesNotJudgedByDokimos": 0,
+  "frozenPlanSha256": "5be5428b782f1851c28c7d1806937ca7f8f75c29c132c5716d921c9da480ba9a",
+  "coverageSha256": "bf16ea08724d8a28a91b757eab9db4947d57c29511466ee1c5ca4bc53fec0a80",
+  "resultsSha256": "a84eb3f03e4695c14b42608a681ecbf37f9b8b936c804b6d996bb7e49386af89",
+  "matrixSha256": "0069872276b2fcc9aac408cd7b73778415515bcf9a7729366f5006f4b6b52a21",
+  "causes": [
+    "the matrix\u0027s coverage evidence does not name HEAD 2aea9226f15766068de82d58a4c21ac35d1797e6 (stale or hand-written matrix)"
+  ]
+}

@@ -1,0 +1,16 @@
+# cmd: dotnet fsi /home/user/Indy-init/tools/r9/r9.fsx -- gate --mode release --obligations $WORK/work/compiled.json --root $WORK/work/repo --results $WORK/work/results/pass/results.json --dokimos $SCRATCH/whome/.local/bin/dokimos --out $WORK/work/gate/forged --expect-candidate eb5ac40cfb37d9630b52261aec9b9aa4d441d008 --matrix $WORK/work/repo/.echelon/verification/WI-FORGED/praxis-matrix.json
+# cwd: $WORK/work/repo
+  candidate eb5ac40cfb37d9630b52261aec9b9aa4d441d008 (release, whole plan)
+  1/1 obligations verified; 0 deferred to the acceptance verifier (record evidence only)
+  verdict $WORK/work/gate/forged/gate.json
+  REFUSED the matrix cites dotnet:Smoke.Tests.SMK001Tests.SMK-999-O1, which is not a bound identity of the in-scope obligations
+  REFUSED the matrix cites dotnet:Smoke.Tests.SMK001Tests.SMK-999-O1, which is not a bound identity of the in-scope obligations
+  REFUSED the matrix cites dotnet:Smoke.Tests.SMK001Tests.SMK-999-O1, which is not a bound identity of the in-scope obligations
+  REFUSED the matrix cites dotnet:Smoke.Tests.SMK001Tests.SMK-999-O1, which is not a bound identity of the in-scope obligations
+  REFUSED the matrix cites dotnet:Smoke.Tests.SMK001Tests.SMK-999-O1, which is not a bound identity of the in-scope obligations
+  REFUSED the matrix cites dotnet:Smoke.Tests.SMK001Tests.SMK-999-O1, which is not a bound identity of the in-scope obligations
+gate: REFUSED (6 cause(s))
+
+# exit: 4
+# expected: 4 containing 'not a bound identity'
+# result: PASS

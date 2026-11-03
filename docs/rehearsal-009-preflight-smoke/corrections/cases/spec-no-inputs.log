@@ -1,0 +1,11 @@
+# cmd: dotnet fsi /home/user/Indy-init/tools/r9/r9.fsx -- spec-preflight --percepta $SCRATCH/whome/.local/bin/percepta --out $WORK/work/spec/none.json
+# cwd: $WORK/work
+  REFUSED no --machines input: name the package (--indy-init and --lock) or every input file
+  REFUSED no --invariants input: name the package (--indy-init and --lock) or every input file
+  REFUSED no --interfaces input: name the package (--indy-init and --lock) or every input file
+  REFUSED no --catalog input: name the package (--indy-init and --lock) or every input file
+spec-preflight: REFUSED (4 cause(s))
+
+# exit: 4
+# expected: 4 containing 'no --machines input'
+# result: PASS

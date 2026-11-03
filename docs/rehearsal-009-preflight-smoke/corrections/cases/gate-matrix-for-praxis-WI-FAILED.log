@@ -1,0 +1,13 @@
+# cmd: dotnet fsi /home/user/Indy-init/tools/r9/r9.fsx -- gate --mode release --obligations $WORK/work/compiled.json --root $WORK/work/repo --results $WORK/work/results/fail/results.json --dokimos $SCRATCH/whome/.local/bin/dokimos --out $WORK/work/repo/.echelon/verification/WI-FAILED --work-item WI-FAILED --scope SMK-001 --expect-candidate dd3fed46144a89c9d8f1bb328a5e18cbce9d68a8
+# cwd: $WORK/work/repo
+  candidate dd3fed46144a89c9d8f1bb328a5e18cbce9d68a8 (release, scope SMK-001)
+  0/1 obligations verified; 0 deferred to the acceptance verifier (record evidence only)
+  verdict $WORK/work/repo/.echelon/verification/WI-FAILED/gate.json
+  REFUSED SMK-001-O1 (SMK-001) is failed: dotnet:Smoke.Tests.SMK001Tests.SMK-001-O1: failed: Assert.Equal() Failure: Values differ
+Expected: 8
+Actual:   7
+gate: REFUSED (1 cause(s))
+
+# exit: 4
+# expected: 4 containing 'failed'
+# result: PASS

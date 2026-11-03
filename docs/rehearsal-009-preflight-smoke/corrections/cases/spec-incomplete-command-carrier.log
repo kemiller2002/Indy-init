@@ -1,0 +1,17 @@
+# cmd: dotnet fsi /home/user/Indy-init/tools/r9/r9.fsx -- spec-preflight --percepta $SCRATCH/whome/.local/bin/percepta --out $WORK/work/spec/carrier.json --machines $WORK/work/spec/carrier/m.json --invariants $WORK/work/spec/carrier/i.json --interfaces $WORK/work/spec/carrier/f.json --catalog $WORK/work/spec/carrier/c.md
+# cwd: $WORK/work
+  machines: 1 analysed / 1 in the inputs
+  transitions: 3 analysed / 3 in the inputs
+  invariants: 1 analysed / 1 in the inputs
+  operations: 1 analysed / 1 in the inputs
+  catalogCommands: 3 analysed / 3 in the inputs
+  types: 3
+  report $WORK/work/spec/carrier.json
+  REFUSED percepta spec-preflight exited 3
+  REFUSED the report is blocked
+  REFUSED missingInterfaces: carrier-cannot-discriminate The catalog carries all 3 commands (OpenValve, CloseValve, Flush, ...) inside SmokeEnvelope, but `SmokeEnvelope = { CommandId: Guid; Target: ValveId; Version: int64 option }` holds only identities and versions: no field can say which command it is or carry its body. IF-SMK-KERNEL.Decide must distinguish them from that value alone.
+spec-preflight: REFUSED (3 cause(s))
+
+# exit: 4
+# expected: 4 containing 'carrier-cannot-discriminate'
+# result: PASS

@@ -1,0 +1,116 @@
+# cmd: $SCRATCH/whome/.local/bin/praxis work complete --id WI-FAILED --occurred-at 2026-11-03T12:00:00Z --evidence implementation=src/Smoke/Ledger.fs --evidence tests=tests/Smoke.Tests/SMK001Tests.fs --evidence verification-matrix=.echelon/verification/WI-FAILED/praxis-matrix.json
+# cwd: $WORK/work/repo
+{
+  "outcome": "refused",
+  "completionReadiness": [
+    {
+      "schema": "praxis.completion-readiness/1",
+      "workItem": "WI-FAILED",
+      "decision": "refused",
+      "policy": {
+        "dokimos": "off",
+        "ordoBoundary": "off",
+        "requiredFacets": [
+          "verification-matrix-satisfied"
+        ]
+      },
+      "facets": {
+        "implementationComplete": {
+          "required": false,
+          "status": "satisfied",
+          "evidence": [
+            "implementation=src/Smoke/Ledger.fs"
+          ],
+          "blocking": false
+        },
+        "behaviorVerified": {
+          "required": false,
+          "status": "satisfied",
+          "evidence": [
+            "tests=tests/Smoke.Tests/SMK001Tests.fs"
+          ],
+          "blocking": false
+        },
+        "architectureVerified": {
+          "required": false,
+          "status": "not-required",
+          "blocking": false
+        },
+        "releaseReady": {
+          "required": false,
+          "status": "not-required",
+          "blocking": false
+        },
+        "designDebtDeclared": {
+          "required": false,
+          "status": "not-required",
+          "blocking": false
+        },
+        "verificationMatrixSatisfied": {
+          "required": true,
+          "status": "not-satisfied",
+          "reasons": [
+            "happy-path is not met",
+            "negative is not met",
+            "corruption is not met",
+            "compatibility is not met",
+            "recovery is not met",
+            "concurrency is not met"
+          ],
+          "blocking": true
+        },
+        "groupVerified": {
+          "required": false,
+          "status": "not-required",
+          "blocking": false
+        }
+      },
+      "sources": {
+        "dokimos": {
+          "evidenceType": "dokimos-ratchet",
+          "requirement": "off",
+          "judgement": "ignored"
+        },
+        "ordoBoundary": {
+          "evidenceType": "ordo-boundary",
+          "requirement": "off",
+          "judgement": "ignored"
+        },
+        "verificationMatrix": {
+          "evidenceType": "verification-matrix",
+          "requirement": "required",
+          "path": ".echelon/verification/WI-FAILED/praxis-matrix.json",
+          "observation": "parsed",
+          "judgement": "failed",
+          "reasons": [
+            "happy-path is not met",
+            "negative is not met",
+            "corruption is not met",
+            "compatibility is not met",
+            "recovery is not met",
+            "concurrency is not met"
+          ]
+        }
+      },
+      "obligations": {
+        "designDebtDeclaration": false,
+        "verificationDimensions": []
+      },
+      "consumedEvidence": [
+        {
+          "type": "verification-matrix",
+          "path": ".echelon/verification/WI-FAILED/praxis-matrix.json",
+          "sha256": "sha256:419a6d943a7c751ab178190bcb4dddf16374ae4d9c97376e202a100e1d3edd78"
+        }
+      ],
+      "blockingReasons": [
+        "verification-matrix-satisfied not satisfied: happy-path is not met; negative is not met; corruption is not met; compatibility is not met; recovery is not met; concurrency is not met"
+      ]
+    }
+  ]
+}
+ERROR completion readiness refused for 'WI-FAILED': verification-matrix-satisfied not satisfied: happy-path is not met; negative is not met; corruption is not met; compatibility is not met; recovery is not met; concurrency is not met
+
+# exit: 3
+# expected: 3 containing 'not met'
+# result: PASS
