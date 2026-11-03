@@ -1,0 +1,137 @@
+{
+  "schema": "praxis.requirement-catalog/1",
+  "catalogId": "CAT-CAUSA-INVESTIGATION",
+  "idPattern": "^INV-\\d{3}$",
+  "status": "proposed",
+  "description": "Field-level decomposition of the authoritative Causa investigation creation and workspace requirements (SCREEN-CONTRACTS S01, S02, S04, S05; REQUIREMENTS R1-R3, R10; CAUSA-UI-EXPERIENCE UI-006; CAUSA-PERSISTENCE PERSIST-007, PERSIST-021, PERSIST-030). Proposed by an agent; not ratified. It adds no product obligation the sources do not state: no length limits, no non-empty rule for the problem statement and no Cancel action are defined, because no authoritative requirement defines them (docs/requirement-catalogs/CAUSA-INVESTIGATION.md, open questions).",
+  "screens": [
+    { "id": "investigation-start", "route": "#/investigations/new" },
+    { "id": "investigation-workspace", "route": "#/investigations/new" }
+  ],
+  "facts": [ "domain-profile-selected" ],
+  "requirements": [
+    {
+      "id": "INV-001", "type": "ui-field", "screen": "investigation-start", "name": "Problem statement",
+      "component": "textarea", "required": true, "visible": true, "editable": true,
+      "verification": [ "mapped", "exists", "visible", "accessible", "editable", "enter", "save" ],
+      "sources": [
+        { "document": "docs/SCREEN-CONTRACTS.md", "requirement": "S01" },
+        { "document": "docs/REQUIREMENTS.md", "requirement": "R1.1" }
+      ]
+    },
+    {
+      "id": "INV-002", "type": "ui-field", "screen": "investigation-start", "name": "Title",
+      "component": "text-input", "required": false, "visible": true, "editable": true,
+      "verification": [ "mapped", "exists", "visible", "accessible", "editable", "enter", "save" ],
+      "sources": [ { "document": "docs/SCREEN-CONTRACTS.md", "requirement": "S01" } ]
+    },
+    {
+      "id": "INV-003", "type": "ui-control", "screen": "investigation-start", "name": "Domain or profile indicator",
+      "component": "display", "required": true, "visible": true, "editable": false,
+      "verification": [ "mapped", "exists", "visible" ],
+      "appliesWhen": [ { "fact": "domain-profile-selected", "equals": true } ],
+      "sources": [ { "document": "docs/SCREEN-CONTRACTS.md", "requirement": "S01" } ]
+    },
+    {
+      "id": "INV-004", "type": "action", "screen": "investigation-start", "name": "Start investigation",
+      "component": "button", "required": true, "visible": true, "editable": false,
+      "verification": [ "mapped", "exists", "visible", "accessible", "activate", "outcome" ],
+      "sources": [ { "document": "docs/SCREEN-CONTRACTS.md", "requirement": "S01" } ]
+    },
+    {
+      "id": "INV-005", "type": "ui-control", "screen": "investigation-start", "name": "Persistence destination indicator",
+      "component": "display", "required": true, "visible": true, "editable": false,
+      "verification": [ "mapped", "exists", "visible", "accessible" ],
+      "sources": [ { "document": "docs/SCREEN-CONTRACTS.md", "requirement": "S01" } ]
+    },
+    {
+      "id": "INV-006", "type": "ui-field", "screen": "investigation-start", "name": "Investigation identifier",
+      "component": "text-input", "required": true, "visible": true, "editable": true,
+      "validation": { "minLength": 1, "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$" },
+      "verification": [ "mapped", "exists", "visible", "accessible", "editable", "enter", "validation", "rejects" ],
+      "sources": [ { "document": "docs/REQUIREMENTS.md", "requirement": "R1.3" } ]
+    },
+    {
+      "id": "INV-007", "type": "ui-control", "screen": "investigation-workspace", "name": "Creation timestamp",
+      "component": "display", "required": true, "visible": true, "editable": false,
+      "verification": [ "mapped", "exists", "visible" ],
+      "sources": [ { "document": "docs/REQUIREMENTS.md", "requirement": "R1.3" } ]
+    },
+    {
+      "id": "INV-008", "type": "ui-control", "screen": "investigation-workspace", "name": "Original problem statement",
+      "component": "display", "required": true, "visible": true, "editable": false,
+      "verification": [ "mapped", "exists", "visible", "outcome", "reload" ],
+      "dependsOn": [ "INV-001" ],
+      "sources": [
+        { "document": "docs/SCREEN-CONTRACTS.md", "requirement": "S01" },
+        { "document": "docs/REQUIREMENTS.md", "requirement": "R1.2" },
+        { "document": "docs/INVESTIGATION-ACCEPTANCE-SCENARIOS.md", "requirement": "A96" }
+      ]
+    },
+    {
+      "id": "INV-009", "type": "action", "screen": "investigation-workspace", "name": "Record a hypothesis",
+      "component": "button", "required": true, "visible": true, "editable": false,
+      "verification": [ "mapped", "exists", "visible", "accessible", "activate", "outcome" ],
+      "sources": [ { "document": "docs/REQUIREMENTS.md", "requirement": "R2.1" }, { "document": "docs/SCREEN-CONTRACTS.md", "requirement": "S02" } ]
+    },
+    {
+      "id": "INV-010", "type": "ui-control", "screen": "investigation-workspace", "name": "Hypotheses",
+      "component": "display", "required": true, "visible": true, "editable": false,
+      "verification": [ "mapped", "exists", "visible", "outcome" ],
+      "dependsOn": [ "INV-009" ],
+      "sources": [ { "document": "docs/SCREEN-CONTRACTS.md", "requirement": "S02" } ]
+    },
+    {
+      "id": "INV-011", "type": "ui-field", "screen": "investigation-workspace", "name": "Hypothesis explanation",
+      "component": "textarea", "required": true, "visible": true, "editable": true,
+      "verification": [ "mapped", "exists", "visible", "editable", "enter", "save" ],
+      "dependsOn": [ "INV-009" ],
+      "sources": [ { "document": "docs/SCREEN-CONTRACTS.md", "requirement": "S04" }, { "document": "docs/REQUIREMENTS.md", "requirement": "R2.1" } ]
+    },
+    {
+      "id": "INV-012", "type": "ui-field", "screen": "investigation-workspace", "name": "Evidence original content",
+      "component": "textarea", "required": true, "visible": true, "editable": true,
+      "verification": [ "mapped", "exists", "visible", "editable", "enter", "save" ],
+      "sources": [ { "document": "docs/SCREEN-CONTRACTS.md", "requirement": "S05" }, { "document": "docs/REQUIREMENTS.md", "requirement": "R3.1" } ]
+    },
+    {
+      "id": "INV-013", "type": "ui-control", "screen": "investigation-workspace", "name": "Evidence",
+      "component": "display", "required": true, "visible": true, "editable": false,
+      "verification": [ "mapped", "exists", "visible" ],
+      "sources": [ { "document": "docs/SCREEN-CONTRACTS.md", "requirement": "S02" }, { "document": "docs/CAUSA-UI-EXPERIENCE-REQUIREMENTS.md", "requirement": "UI-005" } ]
+    },
+    {
+      "id": "INV-014", "type": "action", "screen": "investigation-workspace", "name": "Record an observation",
+      "component": "button", "required": true, "visible": true, "editable": false,
+      "verification": [ "mapped", "exists", "visible", "accessible", "activate", "outcome" ],
+      "sources": [ { "document": "docs/SCREEN-CONTRACTS.md", "requirement": "S02" }, { "document": "docs/REQUIREMENTS.md", "requirement": "R1.1" } ]
+    },
+    {
+      "id": "INV-015", "type": "action", "screen": "investigation-workspace", "name": "Save",
+      "component": "button", "required": true, "visible": true, "editable": false,
+      "verification": [ "mapped", "exists", "visible", "accessible", "activate", "outcome" ],
+      "sources": [ { "document": "docs/CAUSA-PERSISTENCE-REQUIREMENTS.md", "requirement": "PERSIST-007" }, { "document": "docs/REQUIREMENTS.md", "requirement": "R10.1" } ]
+    },
+    {
+      "id": "INV-016", "type": "ui-control", "screen": "investigation-workspace", "name": "Save state",
+      "component": "display", "required": true, "visible": true, "editable": false,
+      "verification": [ "mapped", "exists", "visible", "accessible" ],
+      "sources": [ { "document": "docs/CAUSA-UI-EXPERIENCE-REQUIREMENTS.md", "requirement": "UI-006" }, { "document": "docs/CAUSA-PERSISTENCE-REQUIREMENTS.md", "requirement": "PERSIST-030" } ]
+    },
+    {
+      "id": "INV-017", "type": "workflow-outcome", "screen": "investigation-workspace", "name": "Reopening restores the saved investigation",
+      "required": true, "visible": true, "editable": false,
+      "verification": [ "mapped", "reload" ],
+      "dependsOn": [ "INV-014", "INV-015" ],
+      "sources": [ { "document": "docs/REQUIREMENTS.md", "requirement": "R10.7" }, { "document": "docs/CAUSA-PERSISTENCE-REQUIREMENTS.md", "requirement": "PERSIST-021" } ]
+    },
+    {
+      "id": "INV-018", "type": "ui-control", "screen": "investigation-workspace", "name": "Investigation state",
+      "component": "display", "required": true, "visible": true, "editable": false,
+      "verification": [ "mapped", "exists", "visible", "outcome" ],
+      "dependsOn": [ "INV-004" ],
+      "sources": [ { "document": "docs/SCREEN-CONTRACTS.md", "requirement": "S02" }, { "document": "docs/REQUIREMENTS.md", "requirement": "R2.2" } ]
+    }
+  ],
+  "retired": []
+}
