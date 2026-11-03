@@ -31,11 +31,13 @@
 | Observation | **Id** (`ObservationId`), **Text**, Notes, SourceRef | `RecordObservation`, then `ObservationRecorded`; `ReviseObservation`, then `ObservationRevised` | §19 `Observation.Original` |
 | Hypothesis | **Id**, **Statement**, Explanation | `RecordHypothesis`, then `HypothesisRecorded`; `ReviseHypothesis`, then `HypothesisRevised` | §19 `Hypothesis.Statement`/`Mechanism` |
 | Evidence | **Id** (`EvidenceId`), **Label**, **Description**, SourceRef, SourceUrl (`SourceUrl option`, validated absolute http(s)), ObservedAt | `AdmitEvidence`, then `EvidenceAdmitted`; `ReviseEvidence`, then `EvidenceRevised` | §20 `TextEvidence`; R3.2/R3.5; S05. Label and description are **new**. |
-| Evidence relationship | **Id**, **Evidence** (`EvidenceId`), **Hypothesis** (`HypothesisId`), **Kind** (`Supports`/`Contradicts`/`Irrelevant`), Rationale | `RelateEvidence`, then `EvidenceRelationshipRecorded` | §15/§21. The kinds are a subset of `CoreEvidenceRelationshipKind`, with no new semantics. |
+| Evidence relationship | **Id**, **Evidence** (`EvidenceId`), **Hypothesis** (`HypothesisId`), **Kind** (`Supports`/`Contradicts`/`ConsistentWith`/`Inconclusive`), **Rationale** | `RelateEvidence`, then `EvidenceRelationshipRecorded`; `ReviseEvidenceRelationship`, then `EvidenceRelationshipRevised`; `WithdrawEvidenceRelationship`, then `EvidenceRelationshipWithdrawn` | §15/§21, as amended by OD-INDY-23 (HYPOTHESIS-EVIDENCE-RELATIONSHIPS.md) |
 | Conclusion | **Id** (`ConclusionId`), **Statement**, Evidence (`EvidenceId list`) | `RecordConclusion`, then `ConclusionRecorded` | §27 (Statement, Evidence). A snapshot record. |
 | Provenance | ActorId, ActorKind, RecordedAt, SourceRef | carried by every payload | §5 |
 
-**Relationship kinds.** `Irrelevant` is the assignment's "relevant without establishing either direction". It is the FSHARP-TYPE-SHAPES core kind of that name. No competing causal model is introduced: D-301 to D-312 (EDF, experimental) and D-403 (deferred DAG ontology) stay as they are.
+**Relationship kinds** (amended by OD-INDY-23; see HYPOTHESIS-EVIDENCE-RELATIONSHIPS.md).
+- The earlier third kind `Irrelevant`/`relevant` is replaced by `ConsistentWith` (fits, but does not discriminate between hypotheses) and `Inconclusive`.
+- "Not assessed" is the absence of a relationship. No competing causal model is introduced: D-301 to D-312 (EDF, experimental) and D-403 (deferred DAG ontology) stay as they are.
 
 ## Contract changes against v4.1.2
 

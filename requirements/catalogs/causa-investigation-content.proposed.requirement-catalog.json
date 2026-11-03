@@ -3,7 +3,7 @@
   "catalogId": "CAT-CAUSA-INVESTIGATION-CONTENT",
   "idPattern": "^INV-\\d{3}$",
   "status": "proposed",
-  "description": "PROPOSED additions to CAT-CAUSA-INVESTIGATION (OD-INDY-19): the ten content gaps of the Rehearsal 9 content audit (OD-INDY-20) and the answers to the catalog's open questions 1-3 (OD-INDY-21), as INV-019..INV-037, continuing the ratified numbering. Proposed by an agent; not ratified. The owner ratifies by merging these entries into requirements/catalogs/causa-investigation.requirement-catalog.json (docs/requirement-catalogs/CAUSA-INVESTIGATION-CONTENT.md).",
+  "description": "PROPOSED additions to CAT-CAUSA-INVESTIGATION (OD-INDY-19): the ten content gaps of the Rehearsal 9 content audit (OD-INDY-20) and the answers to the catalog's open questions 1-3 (OD-INDY-21), as INV-019..INV-037, with INV-038 and the amended INV-030/031 from OD-INDY-23 (hypothesis-evidence relationships), continuing the ratified numbering. Proposed by an agent; not ratified. The owner ratifies by merging these entries into requirements/catalogs/causa-investigation.requirement-catalog.json (docs/requirement-catalogs/CAUSA-INVESTIGATION-CONTENT.md).",
   "screens": [
     {
       "id": "investigation-start",
@@ -466,7 +466,8 @@
         "activate",
         "outcome",
         "save",
-        "reload"
+        "reload",
+        "update"
       ],
       "dependsOn": [
         "INV-013",
@@ -488,16 +489,20 @@
         {
           "document": "docs/OWNER-DECISIONS-2026-11-03.md",
           "requirement": "OD-INDY-20"
+        },
+        {
+          "document": "docs/OWNER-DECISIONS-2026-11-03.md",
+          "requirement": "OD-INDY-23"
         }
       ],
-      "notes": "The link is shown on both the evidence and the hypothesis, and survives a reload. A link to a non-existent target is refused."
+      "notes": "The link is shown on both the evidence and the hypothesis, and survives a reload. A link to a non-existent target is refused. At most one current assessment per evidence-hypothesis pair: a second link for the pair is refused, pointing to the existing one. Reassessing or withdrawing keeps the earlier assessment and its provenance in the history (OD-INDY-23)."
     },
     {
       "id": "INV-031",
       "type": "ui-field",
       "screen": "investigation-workspace",
       "name": "Evidence relationship kind",
-      "component": "select",
+      "component": "radio-group",
       "required": true,
       "visible": true,
       "editable": true,
@@ -505,7 +510,8 @@
         "options": [
           "supports",
           "contradicts",
-          "relevant"
+          "consistent-with",
+          "inconclusive"
         ]
       },
       "verification": [
@@ -531,9 +537,13 @@
         {
           "document": "docs/OWNER-DECISIONS-2026-11-03.md",
           "requirement": "OD-INDY-20"
+        },
+        {
+          "document": "docs/OWNER-DECISIONS-2026-11-03.md",
+          "requirement": "OD-INDY-23"
         }
       ],
-      "notes": "supports, contradicts, or relevant without establishing either direction."
+      "notes": "A Forma choice group with no option selected initially. supports: makes the hypothesis more credible; contradicts: makes it less credible; consistent-with: fits but does not favour it over competing hypotheses it also fits; inconclusive: assessed, but whether it fits cannot yet be determined. Not assessed is the absence of a relationship, never an option (OD-INDY-23, docs/rehearsal-009-content-readiness/HYPOTHESIS-EVIDENCE-RELATIONSHIPS.md)."
     },
     {
       "id": "INV-032",
@@ -769,6 +779,47 @@
         }
       ],
       "notes": "After verified persistence, a reload from the real GitHub repository in a new browser context shows every entered value (the INVESTIGATION-CONTENT-E2E scenario, docs/rehearsal-009-content-readiness/E2E-VERIFICATION.md)."
+    },
+    {
+      "id": "INV-038",
+      "type": "ui-field",
+      "screen": "investigation-workspace",
+      "name": "Evidence relationship rationale",
+      "component": "textarea",
+      "required": true,
+      "visible": true,
+      "editable": true,
+      "validation": {
+        "minLength": 1,
+        "maxLength": 10000
+      },
+      "verification": [
+        "mapped",
+        "exists",
+        "visible",
+        "accessible",
+        "editable",
+        "enter",
+        "validation",
+        "rejects",
+        "save",
+        "reload"
+      ],
+      "dependsOn": [
+        "INV-030"
+      ],
+      "instances": "relationship id",
+      "sources": [
+        {
+          "document": "docs/REQUIREMENTS.md",
+          "requirement": "R3.3"
+        },
+        {
+          "document": "docs/OWNER-DECISIONS-2026-11-03.md",
+          "requirement": "OD-INDY-23"
+        }
+      ],
+      "notes": "Required for every assessment, including a reassessment; a withdrawal records its own reason. The rationale is the recorded inference that separates the evidence from what it is taken to mean."
     }
   ]
 }
