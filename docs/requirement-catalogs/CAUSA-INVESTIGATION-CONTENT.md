@@ -1,11 +1,11 @@
-# Causa investigation content: catalog additions INV-019 to INV-037
+# Causa investigation content: catalog entries INV-019 to INV-038
 
-Entries INV-019 to INV-037 of [`requirements/catalogs/causa-investigation.requirement-catalog.json`](../../requirements/catalogs/causa-investigation.requirement-catalog.json) (`CAT-CAUSA-INVESTIGATION`, schema `praxis.requirement-catalog/1`).
+Entries INV-019 to INV-038 of [`requirements/catalogs/causa-investigation.requirement-catalog.json`](../../requirements/catalogs/causa-investigation.requirement-catalog.json) (`CAT-CAUSA-INVESTIGATION`, schema `praxis.requirement-catalog/1`).
 
-**Status: ratified when the owner merges the pull request that adds these entries to `requirements/catalogs/causa-investigation.requirement-catalog.json`** (OD-INDY-19..21, `docs/OWNER-DECISIONS-2026-11-03.md`).
-- INV-019 to INV-037 continue the ratified catalog `CAT-CAUSA-INVESTIGATION` (INV-001 to INV-018). No earlier entry changes.
-- The separate proposed file is removed in that same pull request.
-- An agent prepared the entries. The owner's merge is the ratification; no agent merges it.
+**Status: ratified** by the owner in commit `7cefdc6` (PR #98), under OD-INDY-19..21 and OD-INDY-23 (`docs/OWNER-DECISIONS-2026-11-03.md`).
+- INV-019 to INV-038 continue the catalog after INV-001 to INV-018.
+- OD-INDY-23 (hypothesis-evidence relationships) amended INV-030 and INV-031 and added INV-038, the relationship rationale, before ratification.
+- The separate proposed file was removed when they were ratified.
 
 ## The ten content gaps (OD-INDY-20) and the catalog's open questions (OD-INDY-21)
 
@@ -14,7 +14,7 @@ Entries INV-019 to INV-037 of [`requirements/catalogs/causa-investigation.requir
 | (1) Observation text | INV-024 Observation text (required, 1–10,000); INV-025 Observation source reference | R1.1, R1.2, D-001, R3.2 |
 | (2) Hypothesis statement | INV-026 Hypothesis statement (required, 1–10,000) | R2.1, S03, D-001 |
 | (3) Evidence label, source reference and URL | INV-027 Evidence label (required, 1–200); INV-028 Evidence source reference; INV-029 Evidence source URL (`^https?://`, refused otherwise) | R3.1, R3.2, R3.5, S05, UI-005 |
-| (4) Evidence-to-hypothesis links | INV-030 Link evidence to a hypothesis; INV-031 relationship kind (`supports`, `contradicts`, `relevant`) | R3.3, R3.4, UI-005 |
+| (4) Evidence-to-hypothesis links | INV-030 Link evidence to a hypothesis (one current assessment per pair; reassess and withdraw keep history); INV-031 relationship kind (`supports`, `contradicts`, `consistent-with`, `inconclusive`; no default); INV-038 required rationale (OD-INDY-23) | R3.3, R3.4, UI-005, OD-INDY-23 |
 | (5) Conclusions | INV-032 Record a conclusion (a snapshot; resolution gates unchanged); INV-033 Conclusion statement | R6.1, R6.4, STATE-TRANSITION-TABLES§14-conclusion-behavior, D-001 |
 | (6) Editing keeps identity and history | INV-034 Edit investigation details; INV-035 Editing keeps identity and history | R1.3, R2.4, R15.4, UI-005 |
 | (7) Primary investigative question | INV-023 (optional, at most 10,000) | OD-INDY-20 |

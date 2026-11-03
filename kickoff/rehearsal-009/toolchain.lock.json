@@ -1,76 +1,76 @@
 {
   "schema": "indy-init.r9-toolchain-lock/1",
-  "description": "The one toolchain and requirements package every Rehearsal 009 agent starts from. Conditor is the installer, so it is not in the Registry resolved set it installs; it is pinned here by release tag, source commit and per-platform SHA-256 (from the v0.10.19 release checksums.txt, verified against the downloaded linux-x64 binary on 2026-11-03). tools/r9/r9.fsx install-conditor installs exactly this binary and refuses any other; workstation applies the resolved set below. Change this file only through the owner decision process.",
+  "description": "The one toolchain and requirements package every Rehearsal 009 agent starts from. Conditor is the installer, so it is not in the Registry resolved set it installs; it is pinned here by release tag, source commit and per-platform SHA-256 (from the v0.10.20 release checksums.txt, verified against the downloaded linux-x64 binary on 2026-11-03). tools/r9/r9.fsx install-conditor installs exactly this binary and refuses any other; workstation applies the resolved set below. Change this file only through the owner decision process.",
   "conditor": {
-    "version": "0.10.19",
-    "tag": "v0.10.19",
-    "commit": "31725a78cc74a64d51084250a1c49cbabcba3646",
-    "downloadBase": "https://github.com/kemiller2002/conditor/releases/download/v0.10.19",
+    "version": "0.10.20",
+    "tag": "v0.10.20",
+    "commit": "a4c53cee6f72966ed737362be5daa5d8ddea12d8",
+    "downloadBase": "https://github.com/kemiller2002/conditor/releases/download/v0.10.20",
     "artifacts": {
       "linux-x64": {
         "name": "conditor-linux-x64",
-        "sha256": "cd6b87d39792808d4ad28e801fcb440a1fad44e8c64ff1d1e420ce30e41841cc"
+        "sha256": "75849672f326b3f58dfe9e8de3a3a274ef4137a39d4e76bbe62889042ff326bd"
       },
       "linux-arm64": {
         "name": "conditor-linux-arm64",
-        "sha256": "6cc9ff9eb914142ae99cc4bdfc08f358c9f4f3bf4cf85bd608ac8f22872578df"
+        "sha256": "f9c5e76276a60224467d644b6fbfd01feeb4b62e9206c2be5b2aafe0310cf4c2"
       },
       "linux-musl-x64": {
         "name": "conditor-linux-musl-x64",
-        "sha256": "8d036dc1840d0eaa75527d9d10240abe35a903294533372f477fef8014a739dc"
+        "sha256": "9fe9e89961f38e78d54ea5d98090220896ac94e33285aca9173e7a3448d84b47"
       },
       "linux-musl-arm64": {
         "name": "conditor-linux-musl-arm64",
-        "sha256": "a1cdc41bf0fa50827f1c095a6103674dc3d157440cb350dd43cb6f1d5f83dda1"
+        "sha256": "a1278e119000b41f15ce623ff16dfe8e2683ac42cce984282a916ef9e6aa194a"
       },
       "osx-x64": {
         "name": "conditor-osx-x64",
-        "sha256": "546c493db6e6a8bf3941dcf597bf3ad74738549c2f483964860517e546345be9"
+        "sha256": "ad9d7ba890961088c0b448fcc90ad9089ea663e044a4e91ab215963a4e568a6f"
       },
       "osx-arm64": {
         "name": "conditor-osx-arm64",
-        "sha256": "30d15aeed29019cecc00571e59a7187203b924995ceeb97b2c5a6b79a412d2fe"
+        "sha256": "791343bb7daee212f481aef9a7ba6432878c3be017bf1f8bed1776e8928be2ec"
       },
       "win-x64": {
         "name": "conditor-win-x64.exe",
-        "sha256": "a85d1909446daf10c00ed17016263a47432bf586b13b19eec6c90828351557b1"
+        "sha256": "e0fb24f8a5813fda92ddea9a135048f99d8e76226364b92bc989b80787ae54c9"
       },
       "win-arm64": {
         "name": "conditor-win-arm64.exe",
-        "sha256": "ad27ff4b180875e451be799d451508b30581398654d9de68fa7b59456d66fd37"
+        "sha256": "c8f668ca2331dceddc0b7cb8dbcf0373d64a627ecd231f1744dcfc4f37ab6745"
       }
     }
   },
   "resolvedSet": {
     "registry": "kemiller2002/echelon-registry",
-    "commit": "ae03cff61daf7a3211eac0e5dc383fc194a87793",
+    "commit": "de72a4069af64e99fc7da188f76f0f22cfa4f89c",
     "channel": "echelon-current",
-    "profileVersion": "1.35.0",
+    "profileVersion": "1.36.0",
     "platforms": {
       "linux-x64": {
         "path": "channels/echelon-current/linux-x64.json",
-        "sha256": "bc0f95150a2abc1850340bfddc3b94814820aa1ed0ed10687ecd029ec9398aab"
+        "sha256": "1189bc9bcb90dbc375d3af829569455349f17e2be3941da46230e57d83161797"
       },
       "linux-arm64": {
         "path": "channels/echelon-current/linux-arm64.json",
-        "sha256": "de624674e9fc9e219cf97f72a8b0a95e475dbfd2a496cbb03d5e7eb0bcaec6e9"
+        "sha256": "f7cffd15abf09b37b1becd7d6ddfd489b8c304611b5faf006696c55b41f7bad6"
       },
       "osx-x64": {
         "path": "channels/echelon-current/osx-x64.json",
-        "sha256": "a7035848992753c77ce1eb2b40337fed6e7da790bedad7de3b43a41e2792ecf1"
+        "sha256": "6a20fd7129b6f266b0235b3fc0543de4fd6b0170b4da4db3af80503a529aabd1"
       },
       "osx-arm64": {
         "path": "channels/echelon-current/osx-arm64.json",
-        "sha256": "b04487c05e51e118ceba7b57b70dd3be48250c4ffcfa2574babe51fd410df684"
+        "sha256": "82d9958c1f3f37272ce9ac9c20109351d10f10c5b5886000de9cde7b238c8465"
       },
       "win-x64": {
         "path": "channels/echelon-current/win-x64.json",
-        "sha256": "7ac33c34271db18aafd7a70f6ca6ad55811c51f12c66a19dd8fa0d6ca1331b38"
+        "sha256": "d4e6be86b69d267c8f181570b0ffd10d0dacccf789fe98ce7acd27a546c3b74b"
       }
     },
     "expectedTools": {
-      "praxis": "3.24.0",
-      "dokimos": "0.10.0",
+      "praxis": "3.25.0",
+      "dokimos": "0.11.0",
       "percepta-semantic": "0.4.0",
       "ordo": "1.20.0"
     }
@@ -91,7 +91,7 @@
     "plan": "requirements-compiled/v4/verification-plan.json",
     "planDigest": "1e3c66bcc958a60415811ffbe2795b5e7147360340749c16e1a0f43fc19c751d",
     "rules": "kickoff/rehearsal-009/process-evidence-rules.json",
-    "rulesSha256": null,
-    "rulesStatus": "PROPOSED: owner confirmation and pin required before T0"
+    "rulesSha256": "b8adffc4122226cbe568dae1b0173ee85aab08b8435ded7390f9d5205ad0d115",
+    "rulesStatus": "CONFIRMED by the owner on 2026-11-03: the rules file reviewed and pinned by its SHA-256"
   }
 }
