@@ -1,0 +1,54 @@
+{
+  "schema": "indy-init.v41-owner-decision-requests/1",
+  "status": "PROPOSED (Rehearsal 009 content readiness, 2026-11-03). Not recorded; no package v4.1.3 exists. Per the v4.1.2 precedent (FREEZE.md), the owner records the decisions first, then an agent compiles the successor package from them, then the owner approves the compiled package.",
+  "recordFormat": "As package v4: one operator approval in kickoff/rehearsal-007/approvals.causa.json, one change per decision, committed by the owner without agent trailers (owner-freeze.fsx decide). Agents never write the record (RDP-003).",
+  "requests": [
+    {
+      "id": "ODR-V413-01",
+      "kind": "requirement-addition",
+      "title": "Make investigation content a verified P0 requirement (Rehearsal 8 content gap)",
+      "question": "The baseline's content requirements (R1.1, R1.2, R2.x, R3.1-R3.5, R6.x, S01, S03, S05) have priority 'unstated', so the P0-only verification plan (ODR-V4-10 A) gives them no criterion and no test, and Rehearsal 8 shipped workflow commands with no way to enter or read investigation content. Add the content obligations CONTENT-001..012 (14 obligations, 22 test identities, proposed/content-obligations.proposed.json) to the successor package's verification plan as P0, each traced to the baseline obligations it makes verifiable?",
+      "options": [
+        "A: add CONTENT-001..012 as P0 obligations of package v4.1.3, with the INVESTIGATION-CONTENT-E2E live browser scenario, the negative and mobile suites, and the content-round-trip fault-sensitivity rule",
+        "B: promote the existing baseline requirements (R1.1, R3.1-R3.5, S01, S05, ...) to P0 in a regenerated baseline instead of adding CONTENT-* (larger: the baseline is frozen and every criterion would still have to be written)",
+        "C: do not change the plan; Rehearsal 9 builds content as guidance only, unverified (Rehearsal 8's outcome can recur with every gate green)"
+      ],
+      "recommendation": "A. It leaves the frozen baseline untouched, keeps provenance through sourceRequirements, and makes every existing gate (Dokimos, Praxis, the release gate) enforce content.",
+      "impact": "Until recorded, content is not a verified requirement of Rehearsal 9.",
+      "proposal": {
+        "file": "docs/rehearsal-009-content-readiness/proposed/content-obligations.proposed.json",
+        "sha256": "a1a0c7f7fe1d2daf17752f5027367f97f66e236aaf333f80f631f4c837fdd541"
+      }
+    },
+    {
+      "id": "ODR-V413-02",
+      "kind": "interface-change",
+      "title": "Define the six content payloads, revisions and the conclusion record in the contract",
+      "question": "ODR-V412-02 option A (owner choice 2026-11-02) froze the command and event case names with opaque payloads, deliberately not freezing about 20 payload records. The opaque payloads specify no content fields, and v4.1.2 has no revision commands, no RecordConclusion, no description and no primary question. Freeze concrete payloads for the content entities only (proposed/00-DOMAIN-STUBS.proposed.fs: investigation details, observation, hypothesis, evidence, relationship, conclusion, provenance, plus five revision/conclusion commands and events)?",
+      "options": [
+        "A: replace contracts/00-DOMAIN-STUBS.fs with the proposed stubs (it typechecks with every other v4.1.2 contract unchanged; Percepta finds nothing blocking)",
+        "B: no contract change; carry revisions and the conclusion as Command.Extension / ExtensionEvent with registered semantic ids, and define the content fields in the domain owner's code (untyped at the boundary, not checked by Percepta)",
+        "C: keep the opaque payloads (the CONTENT obligations then rest on the domain owner's undocumented choices)"
+      ],
+      "recommendation": "A. It freezes only what the content workflow needs (not the 20 records ODR-V412-02 declined to freeze), so every lane reads and writes the same fields.",
+      "impact": "Until recorded, the content model is guidance (CONTENT-MODEL.md).",
+      "proposal": {
+        "file": "docs/rehearsal-009-content-readiness/proposed/00-DOMAIN-STUBS.proposed.fs",
+        "sha256": "92831b44694932699844200f9566911f52a144261ac310100ffed35a57cf1466"
+      }
+    },
+    {
+      "id": "ODR-V413-03",
+      "kind": "package-approval",
+      "title": "Approve compiled package v4.1.3",
+      "question": "After ODR-V413-01/02 are recorded and an agent compiles requirements-compiled/v4.1.3 (successor of v4.1.2, which is not edited), with X01-X20, contract typecheck, Percepta and an independent review: approve it as the Rehearsal 9 plan?",
+      "options": [
+        "A: approve",
+        "B: request changes",
+        "C: decline; Rehearsal 9 uses v4.1.2"
+      ],
+      "recommendation": "A, after review.",
+      "impact": "Until approved, v4.1.2 remains the plan of record and content is unverified."
+    }
+  ]
+}

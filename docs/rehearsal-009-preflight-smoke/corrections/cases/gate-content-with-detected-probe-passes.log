@@ -1,0 +1,10 @@
+# cmd: dotnet fsi /home/user/Indy-init/tools/r9/r9.fsx -- gate --mode development --scope SMK-001 --work-item WI-CONTENT-PROBE --obligations $WORK/work/content-obligations.json --root $WORK/work/repo --results $WORK/work/results/pass/results.json --dokimos $SCRATCH/whome/.local/bin/dokimos --out $WORK/work/gate/content-probe --expect-candidate bd3064650020f85a678817f8e68ea5ab4c9cf442 --require-fault-sensitive content-round-trip --probes $WORK/work/probe-results.json
+# cwd: $WORK/work/repo
+  candidate bd3064650020f85a678817f8e68ea5ab4c9cf442 (development, scope SMK-001)
+  executable: 1/1 verified by Dokimos; record: 0/0 verified by verify-process; mixed: 0; 0 deferred to the independent verifier
+  verdict $WORK/work/gate/content-probe/gate.json
+gate: PASS
+
+# exit: 0
+# expected: 0 containing 'executable: 1/1 verified by Dokimos'
+# result: PASS

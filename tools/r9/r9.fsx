@@ -9,6 +9,7 @@
 //        [--work-item ID --scope REQ,...] [--matrix F]
 //        [--rc REQUIREMENTS-COMPILER.dll --process-plan F --process-plan-digest HEX --process-rules F --process-rules-sha256 HEX
 //         --process-attestations F --process-trusted-run-id ID [--process-events F --process-ancestry F [--process-executions DIR]]]
+//        [--probes F,... --require-fault-sensitive CATEGORY,...]
 //        Evidence type comes only from the plan's suite runner: executable obligations need Dokimos at HEAD, record
 //        obligations (praxis:*) need verify-process VERIFIED at HEAD, mixed ones need both; verifier:* is acceptance-only.
 //   dotnet fsi tools/r9/r9.fsx -- run-suites --obligations F --root REPO --out DIR [--suites ID,...]
@@ -425,6 +426,7 @@ let gate () =
                     [ "verification"; "coverage"; "--obligations"; viewPath; "--root"; root; "--results"; Path.GetFullPath resultsPath
                       "--candidate"; head; "--require-verified"; "true"; "--out"; coveragePath ]
                     @ (if scope.IsEmpty then [] else [ "--scope"; String.Join(",", scope) ])
+                    @ (opt "--probes" |> Option.map (fun ps -> ps.Split(',', StringSplitOptions.RemoveEmptyEntries) |> List.ofArray |> List.collect (fun p -> [ "--probes"; Path.GetFullPath p ])) |> Option.defaultValue [])
                     @ (match matrixOut, opt "--work-item" with
                        | Some m, Some wi -> [ "--praxis-matrix"; m; "--work-item"; wi; "--dimensions"; String.Join(",", dimensions) ]
                        | _ -> [])
@@ -444,6 +446,15 @@ let gate () =
                 @ check (dokimosCode = 0 || not unverified.IsEmpty) $"dokimos verification coverage --require-verified true exited {dokimosCode}: {dokimosOut}"
                 @ (unverified |> List.map (fun o ->
                     $"""{str o "id"} ({str o "requirement"}) is {str o "status"}: {String.Join("; ", arr o "reasons" |> List.map (fun r -> r.GetValue<string>()))}"""))
+        // Categories whose obligations must also be fault-sensitive (a Dokimos fault probe at HEAD was detected): a test
+        // that passes whatever the content is cannot verify a content round trip (FINAL-READINESS, content readiness).
+        let sensitiveCategories = opt "--require-fault-sensitive" |> Option.map (fun c -> c.Split(',', StringSplitOptions.RemoveEmptyEntries) |> Set.ofArray) |> Option.defaultValue Set.empty
+        let categoriesOf = arr frozen "obligations" |> List.map (fun o -> str o "id", arr o "categories" |> List.map (fun c -> c.GetValue<string>()) |> Set.ofList) |> Map.ofList
+        let sensitivityCauses =
+            obligationsCov
+            |> List.filter (fun o -> not (Set.intersect sensitiveCategories (categoriesOf.TryFind(str o "id") |> Option.defaultValue Set.empty)).IsEmpty)
+            |> List.filter (fun o -> str o "quality" <> "fault-sensitive")
+            |> List.map (fun o -> $"""{str o "id"} must be fault-sensitive (a fault probe at HEAD detected by its test), but its quality is '{str o "quality"}'""")
         // Record obligations: the authoritative record verifier at HEAD, with the pinned plan and rules. Record evidence
         // is bound to the candidate it reviews, so it is judged when a work item completes and at release, never
         // re-judged on every development merge (where a review of an earlier commit is correctly stale).
@@ -486,7 +497,7 @@ let gate () =
         match matrixOut, opt "--work-item" with
         | Some m, Some wi when not executableIds.IsEmpty && File.Exists m ->
             let matrix = readJson m
-            let rows = arr matrix "rows" |> List.map (fun r -> matrixRow (str r "dimension") (str r "status" = "met" && recordOk) ((arr r "evidence" |> List.map (fun e -> e.DeepClone())) @ (recordEvidence |> List.map (fun e -> e.DeepClone()))))
+            let rows = arr matrix "rows" |> List.map (fun r -> matrixRow (str r "dimension") (str r "status" = "met" && recordOk && sensitivityCauses.IsEmpty) ((arr r "evidence" |> List.map (fun e -> e.DeepClone())) @ (recordEvidence |> List.map (fun e -> e.DeepClone()))))
             matrix["rows"] <- JsonArray(rows |> Array.ofList)
             File.WriteAllText(m, matrix.ToJsonString(JsonSerializerOptions(WriteIndented = true)) + "\n")
         | Some m, Some wi when executableIds.IsEmpty && not recordIds.IsEmpty ->
@@ -516,7 +527,7 @@ let gate () =
                     match statusOf.TryFind id with
                     | None -> [ $"the matrix cites {id}, which is not a bound identity of the in-scope obligations" ]
                     | Some s -> check (s = str e "result") $"""the matrix says {id} {str e "result"}, Dokimos says {s} at HEAD"""))
-        let causes = candidateCauses @ resultCauses @ coverageCauses @ recordCauses @ verifierCauses @ emptyCauses @ matrixCauses
+        let causes = candidateCauses @ resultCauses @ coverageCauses @ sensitivityCauses @ recordCauses @ verifierCauses @ emptyCauses @ matrixCauses
         let deferred = if mode = "release" && opt "--work-item" |> Option.isNone then verifierIds else []
         let strings (xs: string list) = JsonArray(xs |> List.map (fun x -> JsonValue.Create x :> JsonNode) |> Array.ofList) :> JsonNode
         let verdict =

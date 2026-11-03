@@ -1,0 +1,4 @@
+# cmd: dotnet run --project tools/requirements-compiler/tests -- --offline --source .
+v4.1.1 validation: PASS; status: CANDIDATE
+offline tests (baseline equivalence, baseline units, preflight verdict, verification plan, acceptance contracts, process evidence, v4 scope and controls, v4.1, v4.1.1 and v4.1.2 scope and controls, token economics, F#-only tooling): all passed
+# exit: 0

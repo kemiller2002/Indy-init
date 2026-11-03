@@ -1,6 +1,6 @@
 # cmd: dotnet fsi /home/user/Indy-init/tools/r9/r9.fsx -- gate --mode development --scope SMK-002 --work-item WI-EXEC-MISSING --obligations $WORK/work/typed-compiled.json --root $WORK/work/repo --results $WORK/work/results/pass/results.json --dokimos $SCRATCH/whome/.local/bin/dokimos --out $WORK/work/gate/exec-missing
 # cwd: $WORK/work/repo
-  candidate e635f62df94fed8a45051ca841d13191d9656b8b (development, scope SMK-002)
+  candidate bd3064650020f85a678817f8e68ea5ab4c9cf442 (development, scope SMK-002)
   executable: 0/1 verified by Dokimos; record: 0/0 verified by verify-process; mixed: 0; 0 deferred to the independent verifier
   verdict $WORK/work/gate/exec-missing/gate.json
   REFUSED SMK-002-O1 (SMK-002) is not-generated: dotnet:Smoke.Tests.SMK002Tests.SMK-002-O1: not generated

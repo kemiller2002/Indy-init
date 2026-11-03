@@ -1,6 +1,6 @@
 # cmd: dotnet fsi /home/user/Indy-init/tools/r9/r9.fsx -- check-governance --indy-init /home/user/Indy-init --target $WORK/work/repo
 # cwd: $WORK/work/repo
-  REFUSED WI-FORGED: its verification matrix (sha256:59864528407348c2a3d5ad024af81a15b1e7d861fa03ec8d05e9c5da97c75279) matches no PASS gate verdict under .echelon/verification; run `r9.fsx gate --work-item WI-FORGED` at the candidate and commit its output
+  REFUSED WI-FORGED: its verification matrix (sha256:2f395ec9f6bed92d07c1bac6585175cfc4c29906e4a46282aa0bd7ec22eb7c38) matches no PASS gate verdict under .echelon/verification; run `r9.fsx gate --work-item WI-FORGED` at the candidate and commit its output
 check-governance: REFUSED (1 cause(s))
 
 # exit: 4

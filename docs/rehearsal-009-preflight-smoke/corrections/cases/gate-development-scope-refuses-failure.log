@@ -1,6 +1,6 @@
 # cmd: dotnet fsi /home/user/Indy-init/tools/r9/r9.fsx -- gate --mode development --scope-file $WORK/work/repo/.echelon/verification-scope.json --obligations $WORK/work/compiled.json --root $WORK/work/repo --results $WORK/work/results/fail/results.json --dokimos $SCRATCH/whome/.local/bin/dokimos --out $WORK/work/gate/dev-fail
 # cwd: $WORK/work/repo
-  candidate a6b4b7df885d8df32c1796612ea425d55305578f (development, scope SMK-001,AR-001)
+  candidate 0c3c5c344aa6322d04eb22c53c47c5b79d2dde31 (development, scope SMK-001,AR-001)
   executable: 0/1 verified by Dokimos; record: 0/0 verified by verify-process; mixed: 0; 0 deferred to the independent verifier
   verdict $WORK/work/gate/dev-fail/gate.json
   REFUSED SMK-001-O1 (SMK-001) is failed: dotnet:Smoke.Tests.SMK001Tests.SMK-001-O1: failed: Assert.Equal() Failure: Values differ

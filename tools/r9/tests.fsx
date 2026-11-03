@@ -285,6 +285,22 @@ r9case "gate-executable-missing-test-never-record" [ 4 ] "not-generated" (typedG
 let unknownPlan = Path.Combine(work, "typed-unknown.json")
 write unknownPlan ((File.ReadAllText typed).Replace("\"runner\": \"evidence-record\"", "\"runner\": \"manual-checklist\""))
 r9case "gate-unclassified-evidence-type-refused" [ 4 ] "gives it no evidence type" [ "gate"; "--mode"; "development"; "--scope"; "AR-001"; "--obligations"; unknownPlan; "--root"; repo; "--results"; resultsOf "pass"; "--dokimos"; dokimos; "--out"; gateOut "unknown" ] repo |> ignore
+// Content round trips must be fault-sensitive: a probe that loses the content must be caught by the bound test. The
+// synthetic ledger stands in for the content path (a probe drops the appended entry).
+let contentPlan = Path.Combine(work, "content-obligations.json")
+let contentNode = JsonNode.Parse(File.ReadAllText compiled)
+contentNode.["obligations"].AsArray() |> Seq.iter (fun o -> o.["categories"] <- JsonArray(JsonValue.Create "content-round-trip"))
+write contentPlan (contentNode.ToJsonString())
+let probeSpec = Path.Combine(work, "probes.json")
+let dotnetExe = (run "sh" [ "-c"; "command -v dotnet" ] work |> snd).Trim()
+write probeSpec ("""{ "schema": "dokimos.fault-probes/1", "probes": [ { "id": "P-CONTENT-DROPPED", "obligations": [ "SMK-001-O1" ],
+  "file": "src/Smoke/Ledger.fs", "find": "ledger @ [ amount ]", "replace": "ledger",
+  "build": [ "DOTNET", "build", "tests/Smoke.Tests" ], "command": [ "DOTNET", "test", "tests/Smoke.Tests", "--no-build" ] } ] }""".Replace("DOTNET", dotnetExe))
+let probeResults = Path.Combine(work, "probe-results.json")
+case "dokimos-probe-content-dropped-detected" [ 0 ] "detected" dokimos [ "verification"; "probe"; "--spec"; probeSpec; "--sha"; atPass; "--root"; repo; "--out"; probeResults ] repo |> ignore
+let contentGate (name: string) (extra: string list) = [ "gate"; "--mode"; "development"; "--scope"; "SMK-001"; "--work-item"; "WI-" + name.ToUpperInvariant(); "--obligations"; contentPlan; "--root"; repo; "--results"; resultsOf "pass"; "--dokimos"; dokimos; "--out"; gateOut name; "--expect-candidate"; atPass; "--require-fault-sensitive"; "content-round-trip" ] @ extra
+r9case "gate-content-without-probe-refused" [ 4 ] "must be fault-sensitive" (contentGate "content-noprobe" []) repo |> ignore
+r9case "gate-content-with-detected-probe-passes" [ 0 ] "executable: 1/1 verified by Dokimos" (contentGate "content-probe" [ "--probes"; probeResults ]) repo |> ignore
 r9case "gate-development-merge-does-not-rejudge-records" [ 0 ] "not re-judged on a development merge" [ "gate"; "--mode"; "development"; "--scope"; "SMK-001,AR-001"; "--obligations"; typed; "--root"; repo; "--results"; resultsOf "pass"; "--dokimos"; dokimos; "--out"; gateOut "dev-merge"; "--expect-candidate"; atPass ] repo |> ignore
 at "mixed"
 r9case "gate-mixed-both-verified" [ 0 ] "mixed: 1" ([ "gate"; "--mode"; "development"; "--scope"; "AR-002"; "--obligations"; typed; "--root"; repo; "--results"; resultsOf "mixed"; "--dokimos"; dokimos; "--out"; gateOut "mixed"; "--work-item"; "WI-MIXED"; "--expect-candidate"; shaOf "mixed" ] @ processArgs (processLog "mixed" (shaOf "mixed") id) rulesPin) repo |> ignore
