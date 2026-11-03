@@ -91,7 +91,7 @@
     "plan": "requirements-compiled/v4/verification-plan.json",
     "planDigest": "1e3c66bcc958a60415811ffbe2795b5e7147360340749c16e1a0f43fc19c751d",
     "rules": "kickoff/rehearsal-009/process-evidence-rules.json",
-    "rulesSha256": null,
-    "rulesStatus": "PROPOSED: owner confirmation and pin required before T0"
+    "rulesSha256": "b8adffc4122226cbe568dae1b0173ee85aab08b8435ded7390f9d5205ad0d115",
+    "rulesStatus": "CONFIRMED by the owner on 2026-11-03: the rules file reviewed and pinned by its SHA-256"
   }
 }
