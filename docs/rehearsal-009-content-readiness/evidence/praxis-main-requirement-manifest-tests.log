@@ -1,0 +1,27 @@
+# cmd: dotnet tests/Praxis.Tests/bin/Release/net10.0/Praxis.Tests.dll (kemiller2002/praxis main ddfcbbe, built from source for validation only; UNRELEASED)
+# requirement-manifest cases:
+PASS requirement manifest: identical catalogs compile to byte-identical manifests
+PASS requirement manifest: requirement and obligation order is canonical whatever the catalog order
+PASS requirement manifest: obligation IDs are requirement/level/check and carry the mandatory flag
+PASS requirement manifest: renaming a label keeps every requirement and obligation ID
+PASS requirement manifest: the manifest records the source commit, catalog hash and its own content hash
+PASS requirement manifest: an unmapped requirement keeps every obligation (the application cannot shrink its obligations)
+PASS requirement manifest: duplicate IDs are rejected
+PASS requirement manifest: a requirement without an ID is rejected
+PASS requirement manifest: an ID outside the catalog pattern is rejected
+PASS requirement manifest: an undeclared screen, dependency or fact is an invalid reference
+PASS requirement manifest: a requirement with no verification obligation is rejected
+PASS requirement manifest: unknown verification types, and checks that do not fit the requirement type, are unsupported
+PASS requirement manifest: an unsupported requirement type is rejected
+PASS requirement manifest: conflicting requirements are rejected
+PASS requirement manifest: an implementation mapping naming no requirement is orphaned
+PASS requirement manifest: a retired ID cannot be reused, and a retirement must name its authority
+PASS requirement manifest: a requirement must trace to an authoritative source
+PASS requirement manifest: a full Git SHA is required as the source commit
+PASS requirement manifest: deleting a requirement without a retirement record is rejected against the previous manifest
+PASS requirement manifest: decoding refuses another schema and strictly types every member
+PASS requirement manifest: CRLF and LF checkouts of one catalog compile to the same manifest
+PASS requirement manifest: check reports current for a freshly compiled manifest
+PASS requirement manifest: changing a requirement without regenerating the manifest is detected as stale
+PASS requirement manifest: hand-editing a compiled manifest is detected as tampering
+# whole suite: stopped by a local 1500 s timeout (exit 124) before it finished: 1846 PASS, 0 FAIL/SKIP when stopped. Not a complete run; the 24 requirement-manifest cases above all completed and passed.

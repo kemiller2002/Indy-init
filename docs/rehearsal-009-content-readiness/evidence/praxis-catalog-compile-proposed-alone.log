@@ -1,0 +1,19 @@
+# cmd: praxis requirements manifest compile --catalog <proposed-alone catalog> --source-commit 0ab8ffda3b82fc084773eeac83fc3c4ac797a42b --output manifest.json --findings findings.json (Praxis main ddfcbbe, built from source for validation only; UNRELEASED)
+ERROR invalid-reference INV-019: dependency 'INV-001' is not an active requirement of the catalog
+ERROR invalid-reference INV-020: dependency 'INV-002' is not an active requirement of the catalog
+ERROR invalid-reference INV-021: dependency 'INV-001' is not an active requirement of the catalog
+ERROR invalid-reference INV-024: dependency 'INV-014' is not an active requirement of the catalog
+ERROR invalid-reference INV-025: dependency 'INV-014' is not an active requirement of the catalog
+ERROR invalid-reference INV-026: dependency 'INV-009' is not an active requirement of the catalog
+ERROR invalid-reference INV-027: dependency 'INV-013' is not an active requirement of the catalog
+ERROR invalid-reference INV-028: dependency 'INV-013' is not an active requirement of the catalog
+ERROR invalid-reference INV-029: dependency 'INV-013' is not an active requirement of the catalog
+ERROR invalid-reference INV-030: dependency 'INV-010' is not an active requirement of the catalog
+ERROR invalid-reference INV-030: dependency 'INV-013' is not an active requirement of the catalog
+ERROR invalid-reference INV-034: dependency 'INV-001' is not an active requirement of the catalog
+ERROR invalid-reference INV-034: dependency 'INV-002' is not an active requirement of the catalog
+ERROR invalid-reference INV-037: dependency 'INV-001' is not an active requirement of the catalog
+ERROR invalid-reference INV-037: dependency 'INV-002' is not an active requirement of the catalog
+ERROR invalid-reference INV-037: dependency 'INV-012' is not an active requirement of the catalog
+REJECTED catalog CAT-CAUSA-INVESTIGATION-CONTENT: 16 error(s); no manifest written
+# exit: 3

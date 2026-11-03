@@ -1,5 +1,12 @@
 # Rehearsal 009 content readiness: amendment decision
 
+> **Superseded in part by the owner's decision OD-INDY-19 (2026-11-03, `docs/OWNER-DECISIONS-2026-11-03.md`).**
+> Content is specified in the requirement catalog, not in a v4.1.3 package. The proposed CONTENT-* obligations and ODR-V413-01..03 are withdrawn without being recorded.
+> Their substance is now the proposed catalog additions INV-019 … INV-037 (`docs/requirement-catalogs/CAUSA-INVESTIGATION-CONTENT.md`).
+> The mapping is: CONTENT-001 → INV-001/002/019–022 (ratified INV-001, INV-002); CONTENT-002 → INV-034; CONTENT-003 → INV-024/025; CONTENT-004 → INV-026; CONTENT-005 → INV-027–029 (with ratified INV-012); CONTENT-006 → INV-030/031; CONTENT-007 → INV-032/033; CONTENT-008 → INV-035; CONTENT-009 → INV-037; CONTENT-010 → INV-019–021 and the field rules; CONTENT-011/012 → the failure and mobile scenarios of E2E-VERIFICATION.md.
+> The analysis below is kept as the record of why.
+
+
 **Decision: v4.1.2 does not cover these behaviours. A successor amendment (v4.1.3) is required. It is PROPOSED, not authoritative, and it needs the owner's approval.**
 
 ## Why v4.1.2 is not enough

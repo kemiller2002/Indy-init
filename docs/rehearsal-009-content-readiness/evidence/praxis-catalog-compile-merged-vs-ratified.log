@@ -1,0 +1,2 @@
+# cmd: praxis requirements manifest compile --catalog <merged catalog> --previous <ratified manifest> --source-commit 0ab8ffda3b82fc084773eeac83fc3c4ac797a42b --output m.json (Praxis main ddfcbbe, built for validation only; UNRELEASED)
+# exit: 0

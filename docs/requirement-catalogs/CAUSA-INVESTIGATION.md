@@ -8,8 +8,11 @@ Dokimos verifies Causa against. See kemiller2002/praxis
 `docs/requirement-verification-manifest.md` and kemiller2002/dokimos
 `docs/requirement-verification.md`.
 
-**Status: proposed.** An agent wrote it. It is not ratified, and it is not a
-frozen package. It adds no obligation the cited sources do not state. Each
+**Status: ratified** by the owner (commit `0ab8ffd`, which set the catalog's
+`status` to `ratified`). The catalog's `description` still carries the earlier
+sentence "Proposed by an agent; not ratified": only the owner edits the
+catalog, so the description is left for the owner to correct. An agent wrote
+the catalog. It is not a frozen package. It adds no obligation the cited sources do not state. Each
 requirement names its authoritative sources (`sources`). Ratifying it, or
 changing a requirement, goes through the owner's requirements governance
 process (OD-INDY-15, RDP-003), never through an agent's edit made to turn a
@@ -73,31 +76,41 @@ Editing the catalog would only hide the gap.
 
 ## Using it for the November 7 build
 
-Rehearsal 8 (kemiller2002/indy-init-rehearsal-008 PR #57, unmerged) is the
-reference implementation. Its acceptance gate fails by design, and it is not
-merged into the completed rehearsal. The released tools are on `main`:
+**Every rehearsal starts from the requirements alone (OD-INDY-22).** Nothing
+is copied from an earlier rehearsal: no application code, tests, probes, tools
+or workflows from Rehearsal 8 (kemiller2002/indy-init-rehearsal-008) or its
+reference PR #57. The steps below are written inside the timed window from
+this catalog, the frozen packages and the released Echelon tools. An earlier
+version of this section said to copy Rehearsal 8's probes, mutation tool and
+workflow. That conflicts with the contest rules and is withdrawn.
 
-- Praxis `requirements manifest`;
-- Dokimos `verification requirements`;
-- Forma `RequirementIdentity`;
-- the Specula requirements view.
+**Tool releases: not yet available.** The pipeline needs
+`praxis requirements manifest` and `dokimos verification requirements`. Both
+are merged on `main` (kemiller2002/praxis #301, kemiller2002/dokimos #65) but
+**not released**. The Rehearsal 9 toolchain pins Praxis 3.24.0 and Dokimos
+0.10.0 (echelon-current 1.35.0; kickoff/rehearsal-009/toolchain.lock.json),
+and neither carries these commands. Until both are released, registered in a
+new echelon-current set and pinned in the lock, a rehearsal cannot compile or
+verify this catalog with the approved toolchain. That is an owner decision
+(docs/rehearsal-009-content-readiness/FINAL-READINESS.md).
 
-The application built at kickoff adopts the pipeline this way:
+Once the tools are released and pinned, the application built at kickoff
+adopts the pipeline as follows:
 
 1. Put `data-requirement-id="INV-0nn"` on the element of each implemented
    requirement, and list the files in
    `requirements/requirement-implementation-map.json`.
-2. Copy these from the reference PR:
-   - `tests/browser/requirements/` (the probes);
-   - `tools/requirement-mutations.fsx`;
-   - `.github/workflows/requirement-verification.yml`.
-
-   The workflow compiles the manifest from this catalog at a pinned Indy-init
-   commit, so the application cannot change its own obligations.
+2. Write the requirement probes, the mutations and the verification workflow
+   in the rehearsal's own repository, from the released tools' documentation
+   (kemiller2002/praxis `docs/requirement-verification-manifest.md`,
+   kemiller2002/dokimos `docs/requirement-verification.md`). The workflow
+   compiles the manifest from this catalog at a pinned Indy-init commit, so the
+   application cannot change its own obligations.
 3. Commit the run's `requirement-verification.json` to
    `evidence/requirement-verification/requirement-verification.json` on the
-   application's `main`. Specula reads that file, not the CI artifact. Without
-   the commit, its view says "no evidence", which is correct but uninformative.
-4. Implement ODR-V412-02 (v4.1.2's command and event bodies) so that the
-   problem statement, title and creation time are saved. Until then INV-001,
-   INV-002, INV-007 and INV-008 fail, as they do in Rehearsal 8.
+   application's `main`. Specula reads that file, not the CI artifact.
+4. Implement v4.1.2's command and event bodies (ODR-V412-02), so that the
+   problem statement, title, creation time and every content field are saved.
+
+The proposed content additions (INV-019 to INV-037, OD-INDY-19..21) are in
+[CAUSA-INVESTIGATION-CONTENT.md](CAUSA-INVESTIGATION-CONTENT.md).
