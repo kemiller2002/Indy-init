@@ -1,11 +1,11 @@
-# cmd: dotnet fsi /home/user/Indy-init/tools/r9/r9.fsx -- gate --mode release --obligations $WORK/work/compiled.json --root $WORK/work/repo --results $WORK/work/results/pass/results.json --dokimos $SCRATCH/whome/.local/bin/dokimos --out $WORK/work/gate/stale --expect-candidate 58bfb4851285b6a1f561fea6df45781b040a61f3
+# cmd: dotnet fsi /home/user/Indy-init/tools/r9/r9.fsx -- gate --mode release --obligations $WORK/work/compiled.json --root $WORK/work/repo --results $WORK/work/results/pass/results.json --dokimos $SCRATCH/whome/.local/bin/dokimos --out $WORK/work/gate/stale --expect-candidate f80eca8d2598a6601f7ee5fa31d85db933b17310
 # cwd: $WORK/work/repo
-  candidate 58bfb4851285b6a1f561fea6df45781b040a61f3 (release, whole plan)
+  candidate f80eca8d2598a6601f7ee5fa31d85db933b17310 (release, whole plan)
   executable: 0/1 verified by Dokimos; record: 0/0 verified by verify-process; mixed: 0; 0 deferred to the independent verifier
   verdict $WORK/work/gate/stale/gate.json
-  REFUSED the results manifest names candidate 'e635f62df94fed8a45051ca841d13191d9656b8b', not HEAD 58bfb4851285b6a1f561fea6df45781b040a61f3
-  REFUSED run SU-SMOKE-UNIT was recorded at 'e635f62df94fed8a45051ca841d13191d9656b8b', not HEAD 58bfb4851285b6a1f561fea6df45781b040a61f3 (stale evidence)
-  REFUSED Dokimos rejected runs: [{"path":"SU-SMOKE-UNIT/_vm_2026-11-03_12_28_22_net10.0.trx","reason":"results are for e635f62df94fed8a45051ca841d13191d9656b8b, candidate is 58bfb4851285b6a1f561fea6df45781b040a61f3","sourceSha":"e635f62df94fed8a45051ca841d13191d9656b8b","suite":"SU-SMOKE-UNIT"}]
+  REFUSED the results manifest names candidate 'bd3064650020f85a678817f8e68ea5ab4c9cf442', not HEAD f80eca8d2598a6601f7ee5fa31d85db933b17310
+  REFUSED run SU-SMOKE-UNIT was recorded at 'bd3064650020f85a678817f8e68ea5ab4c9cf442', not HEAD f80eca8d2598a6601f7ee5fa31d85db933b17310 (stale evidence)
+  REFUSED Dokimos rejected runs: [{"path":"SU-SMOKE-UNIT/_vm_2026-11-03_12_56_42_net10.0.trx","reason":"results are for bd3064650020f85a678817f8e68ea5ab4c9cf442, candidate is f80eca8d2598a6601f7ee5fa31d85db933b17310","sourceSha":"bd3064650020f85a678817f8e68ea5ab4c9cf442","suite":"SU-SMOKE-UNIT"}]
   REFUSED SMK-001-O1 (SMK-001) is blocked: dotnet:Smoke.Tests.SMK001Tests.SMK-001-O1: blocked: results exist only for another SHA
 gate: REFUSED (4 cause(s))
 

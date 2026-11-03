@@ -1,0 +1,11 @@
+# cmd: dotnet fsi /home/user/Indy-init/tools/r9/r9.fsx -- gate --mode development --scope SMK-001 --work-item WI-CONTENT-NOPROBE --obligations $WORK/work/content-obligations.json --root $WORK/work/repo --results $WORK/work/results/pass/results.json --dokimos $SCRATCH/whome/.local/bin/dokimos --out $WORK/work/gate/content-noprobe --expect-candidate bd3064650020f85a678817f8e68ea5ab4c9cf442 --require-fault-sensitive content-round-trip
+# cwd: $WORK/work/repo
+  candidate bd3064650020f85a678817f8e68ea5ab4c9cf442 (development, scope SMK-001)
+  executable: 1/1 verified by Dokimos; record: 0/0 verified by verify-process; mixed: 0; 0 deferred to the independent verifier
+  verdict $WORK/work/gate/content-noprobe/gate.json
+  REFUSED SMK-001-O1 must be fault-sensitive (a fault probe at HEAD detected by its test), but its quality is 'passing (fault sensitivity not demonstrated)'
+gate: REFUSED (1 cause(s))
+
+# exit: 4
+# expected: 4 containing 'must be fault-sensitive'
+# result: PASS

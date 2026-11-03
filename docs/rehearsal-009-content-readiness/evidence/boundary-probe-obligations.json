@@ -1,0 +1,6 @@
+{ "schema": "dokimos.verification-obligations/1", "planId": "VP-PROBE", "planDigest": "", "namespaceRoots": [],
+  "suites": [ { "id": "SU-CONTENT-LIVE", "runner": "playwright", "command": "npx playwright test --project=chromium tests/browser/live", "paths": [ "tests/browser/live" ], "testRoot": "tests/browser/live", "fixture": "deployed", "requiredBoundary": [ "fill", "reload" ] } ],
+  "obligations": [ { "id": "CONTENT-001-O1", "requirement": "CONTENT-001", "priority": "P0", "criterion": "round trip", "categories": ["browser"] },
+                   { "id": "CONTENT-001-O2", "requirement": "CONTENT-001", "priority": "P0", "criterion": "x", "categories": ["browser"] } ],
+  "tests": [ { "id": "playwright:content.spec.js > INVESTIGATION-CONTENT-E2E > CONTENT-001-O1 round trip [chromium]", "suite": "SU-CONTENT-LIVE", "kind": "browser", "obligations": ["CONTENT-001-O1"], "categories": ["browser"] },
+             { "id": "playwright:content.spec.js > INVESTIGATION-CONTENT-E2E > CONTENT-001-O2 command only [chromium]", "suite": "SU-CONTENT-LIVE", "kind": "browser", "obligations": ["CONTENT-001-O2"], "categories": ["browser"] } ] }

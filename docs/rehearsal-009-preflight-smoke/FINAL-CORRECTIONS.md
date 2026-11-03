@@ -3,7 +3,7 @@
 This corrects the six risks in [REPORT.md](REPORT.md), the historical smoke-test record. REPORT.md is preserved unchanged.
 
 **Decision: BLOCKED, on one owner action. Everything else is READY.**
-- All six corrections and both owner decisions of 2026-11-03 are implemented and verified: 73 of 73 cases pass on the released binaries.
+- All six corrections and both owner decisions of 2026-11-03 are implemented and verified: 76 of 76 cases pass on the released binaries.
 - The one remaining gate is a trust input only the owner may set. The Rehearsal 009 process-evidence rules (`kickoff/rehearsal-009/process-evidence-rules.json`) are drafted, but their hash is not yet pinned (§Owner action).
   - Until they are pinned, record-bound obligations cannot be verified: the record gate fails closed.
   - Those are 119 obligations (72 record-only and 47 mixed), covering 26 record-only requirements.
@@ -21,7 +21,7 @@ All of it is in Indy-init. No framework release was needed, and nothing in Praxi
 | `tools/r9/governance.json` | The authoritative Praxis completion policy: `requiredFacets: ["verification-matrix-satisfied"]`, with no `workTypes`. |
 | `tools/r9/verification-gate.yml` | The gate workflow that `govern` writes into the competition repository. |
 | `tools/r9/r9.fsx` | The commands `install-conditor`, `workstation`, `govern`, `check-governance`, `run-suites`, `gate` and `spec-preflight` (F#, per OD-INDY-14). |
-| `tools/r9/tests.fsx` | 73 end-to-end positive and negative cases on the released binaries. |
+| `tools/r9/tests.fsx` | 76 end-to-end positive and negative cases on the released binaries (the last three cover the content fault-sensitivity rule of docs/rehearsal-009-content-readiness). |
 | `kickoff/rehearsal-009/process-evidence-rules.json` | PROPOSED rules for `verify-process`: owner, implementing agents, independent reviewer roster, repository and owner-decision ids, drafted from Rehearsal 6's. The lock references it with `rulesSha256: null` until the owner pins it. |
 | `.github/workflows/preflight-tooling.yml` | New job `r9-readiness-gates`. It installs the pinned toolchain into a disposable home and runs `tests.fsx` on every push. |
 
@@ -222,7 +222,7 @@ The frozen v4.1.2 package is untouched. T10 gains one step, `r9.fsx govern`, bet
 | Record-only item | completes on valid records only | PASS (`gate-record-only-valid-records`, `praxis-record-only-item-completes`; 5 record negatives refused) |
 | Mixed item, executable evidence missing | refused | PASS (`gate-mixed-missing-executable-refused`) |
 
-- **Local run:** `dotnet fsi tools/r9/tests.fsx -- --indy-init . --bin $HOME_DIR/.local/bin --conditor $CONDITOR --work $WORK --evidence $EVIDENCE` gave 73 cases, 0 failed (`corrections/cases.tsv`).
+- **Local run:** `dotnet fsi tools/r9/tests.fsx -- --indy-init . --bin $HOME_DIR/.local/bin --conditor $CONDITOR --work $WORK --evidence $EVIDENCE` gave 76 cases, 0 failed (`corrections/cases.tsv`).
 - **Tools:** .NET SDK 10.0.402; Praxis 3.24.0, Dokimos 0.10.0, Percepta 0.4.0 and Ordo 1.20.0 from echelon-current 1.35.0; Conditor 0.10.19.
 - **Offline suite:** passes.
 - **Actual CI:** the job `r9-readiness-gates` in `preflight-tooling.yml` runs the same cases on GitHub's runner. Its result is recorded in the pull request that delivers this file.

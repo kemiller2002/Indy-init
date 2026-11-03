@@ -13,8 +13,8 @@
           "path": ".ros/installation.json"
         }
       ],
-      "updatedAt": "2026-11-03T12:28:05.656Z",
-      "completedAt": "2026-11-03T12:28:05.656Z"
+      "updatedAt": "2026-11-03T12:56:27.358Z",
+      "completedAt": "2026-11-03T12:56:27.358Z"
     },
     {
       "id": "WI-VALID",
@@ -37,7 +37,7 @@
       ],
       "updatedAt": "2026-11-03T12:00:00Z",
       "telemetryExecutionIds": [
-        "EXE-20261103T123200364Z-02a90360"
+        "EXE-20261103T125919514Z-8ef87412"
       ],
       "completedAt": "2026-11-03T12:00:00Z",
       "completionReadiness": {
@@ -127,7 +127,7 @@
           {
             "type": "verification-matrix",
             "path": ".echelon/verification/WI-VALID/praxis-matrix.json",
-            "sha256": "sha256:8a47debe40f40930c3a750e3adf787198e78ad6ddd17e647b306232a06845822"
+            "sha256": "sha256:ba4c014683857e34ab91fb657edcfee392a25f77ed74532845aee78ee9a15a4d"
           }
         ],
         "blockingReasons": []
@@ -154,7 +154,7 @@
       ],
       "updatedAt": "2026-11-03T12:00:00Z",
       "telemetryExecutionIds": [
-        "EXE-20261103T123212922Z-b59ee709"
+        "EXE-20261103T125931087Z-450e6178"
       ],
       "completedAt": "2026-11-03T12:00:00Z",
       "completionReadiness": {
@@ -244,7 +244,7 @@
           {
             "type": "verification-matrix",
             "path": ".echelon/verification/WI-RECORD/praxis-matrix.json",
-            "sha256": "sha256:53c1d11026a7c245d78a75983bddf9b8192a41e31b72260c1f84b5c441397a8a"
+            "sha256": "sha256:e1fe26ba8057576987873518859f2b41f8742a34b82228d0257d125c87e0d964"
           }
         ],
         "blockingReasons": []
@@ -258,7 +258,7 @@
       "evidence": [],
       "updatedAt": "2026-11-03T12:00:00Z",
       "telemetryExecutionIds": [
-        "EXE-20261103T123320480Z-0a6113a1"
+        "EXE-20261103T130047920Z-c73c79d9"
       ]
     },
     {
@@ -269,7 +269,7 @@
       "evidence": [],
       "updatedAt": "2026-11-03T12:00:00Z",
       "telemetryExecutionIds": [
-        "EXE-20261103T123322587Z-e2eb1fa4"
+        "EXE-20261103T130049935Z-c3ec38e8"
       ]
     },
     {
@@ -280,7 +280,7 @@
       "evidence": [],
       "updatedAt": "2026-11-03T12:00:00Z",
       "telemetryExecutionIds": [
-        "EXE-20261103T123330269Z-8dc1cca6"
+        "EXE-20261103T130056665Z-1810df49"
       ]
     },
     {
@@ -291,7 +291,7 @@
       "evidence": [],
       "updatedAt": "2026-11-03T12:00:00Z",
       "telemetryExecutionIds": [
-        "EXE-20261103T123332338Z-91af0a32"
+        "EXE-20261103T130058556Z-1c514387"
       ]
     },
     {
@@ -315,7 +315,7 @@
       ],
       "updatedAt": "2026-11-03T12:00:00Z",
       "telemetryExecutionIds": [
-        "EXE-20261103T123339256Z-f52efcdb"
+        "EXE-20261103T130105214Z-4e4edb02"
       ],
       "completedAt": "2026-11-03T12:00:00Z",
       "completionReadiness": {
@@ -405,7 +405,7 @@
           {
             "type": "verification-matrix",
             "path": ".echelon/verification/WI-FORGED/praxis-matrix.json",
-            "sha256": "sha256:59864528407348c2a3d5ad024af81a15b1e7d861fa03ec8d05e9c5da97c75279"
+            "sha256": "sha256:2f395ec9f6bed92d07c1bac6585175cfc4c29906e4a46282aa0bd7ec22eb7c38"
           }
         ],
         "blockingReasons": []
@@ -428,13 +428,13 @@
       ],
       "updatedAt": "2026-11-03T12:00:00Z",
       "telemetryExecutionIds": [
-        "EXE-20261103T123346068Z-45048ff7"
+        "EXE-20261103T130112113Z-88a61191"
       ],
       "completedAt": "2026-11-03T12:00:00Z"
     }
   ],
   "events": [
-    "95618210178ee44f0a0d8cb3"
+    "1d46d6767571c336a63ccd2b"
   ]
 }
 # exit: 0

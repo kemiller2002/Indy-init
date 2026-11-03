@@ -1,0 +1,82 @@
+# cmd: dokimos verification coverage --obligations boundary-probe-obligations.json (compiled) --root <probe repository> (requiredBoundary [fill, reload], SU-CONTENT-LIVE)
+{
+  "bySuite": [
+    {
+      "identities": 2,
+      "status": {
+        "generated": 1,
+        "invalid": 1
+      },
+      "suite": "SU-CONTENT-LIVE"
+    }
+  ],
+  "candidate": "unknown",
+  "causes": [
+    {
+      "cause": "SU-CONTENT-LIVE: generated",
+      "obligations": 1
+    },
+    {
+      "cause": "SU-CONTENT-LIVE: invalid: does not reach the suite boundary (fill, reload)",
+      "obligations": 1
+    }
+  ],
+  "obligations": [
+    {
+      "id": "CONTENT-001-O1",
+      "identities": [
+        {
+          "id": "playwright:content.spec.js > INVESTIGATION-CONTENT-E2E > CONTENT-001-O1 round trip [chromium]",
+          "location": "content.spec.js:4",
+          "status": "generated",
+          "suite": "SU-CONTENT-LIVE"
+        }
+      ],
+      "quality": "none",
+      "reasons": [
+        "playwright:content.spec.js > INVESTIGATION-CONTENT-E2E > CONTENT-001-O1 round trip [chromium]: generated, no result at the candidate"
+      ],
+      "requirement": "CONTENT-001",
+      "status": "not-run"
+    },
+    {
+      "id": "CONTENT-001-O2",
+      "identities": [
+        {
+          "id": "playwright:content.spec.js > INVESTIGATION-CONTENT-E2E > CONTENT-001-O2 command only [chromium]",
+          "location": "content.spec.js:13",
+          "status": "invalid",
+          "suite": "SU-CONTENT-LIVE"
+        }
+      ],
+      "quality": "none",
+      "reasons": [
+        "playwright:content.spec.js > INVESTIGATION-CONTENT-E2E > CONTENT-001-O2 command only [chromium]: does not reach the suite boundary (fill, reload): exercises only helpers or mocks"
+      ],
+      "requirement": "CONTENT-001",
+      "status": "invalid"
+    }
+  ],
+  "planDigest": "",
+  "planId": "VP-PROBE",
+  "rejectedRuns": [],
+  "schema": "dokimos.verification-coverage/1",
+  "scope": [],
+  "summary": {
+    "faultSensitive": 0,
+    "identityStatus": {
+      "generated": 1,
+      "invalid": 1
+    },
+    "obligationStatus": {
+      "invalid": 1,
+      "not-run": 1
+    },
+    "obligations": 2,
+    "requirements": 1,
+    "requirementsVerified": 0,
+    "unplannedResults": 0
+  },
+  "verified": false
+}
+# exit: 0

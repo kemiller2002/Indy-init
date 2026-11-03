@@ -1,7 +1,7 @@
 # cmd: dotnet fsi /home/user/Indy-init/tools/r9/r9.fsx -- run-suites --obligations $WORK/work/compiled.json --root $WORK/work/repo --out $WORK/work/results/identity
 # cwd: $WORK/work/repo
   SU-SMOKE-UNIT: exit 0, 1 result file(s)
-  results $WORK/work/results/identity/results.json at 78fb60f5c34cb0492d2e16e973e88690fbdf488c
+  results $WORK/work/results/identity/results.json at 2a524a2db37bf0bc7f1380ff48ecf24188a31e01
 run-suites: PASS
 
 # exit: 0

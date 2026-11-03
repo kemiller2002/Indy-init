@@ -1,0 +1,28 @@
+{
+  "schema": "indy-init.r9-gate-verdict/2",
+  "verdict": "REFUSED",
+  "mode": "development",
+  "candidate": "bd3064650020f85a678817f8e68ea5ab4c9cf442",
+  "planId": "VP-R9-FIX",
+  "scope": [
+    "SMK-001"
+  ],
+  "workItem": "WI-CONTENT-NOPROBE",
+  "obligations": 1,
+  "executable": 1,
+  "executableVerified": 1,
+  "record": 0,
+  "recordJudged": true,
+  "recordVerified": 0,
+  "mixed": 0,
+  "deferredToIndependentVerifier": [],
+  "dokimosExit": 0,
+  "frozenPlanSha256": "b02849c52663e445cd710aa0827cca8997491ba77bfa161d6abe48e3605789c0",
+  "coverageSha256": "1604f1dbe082100278ee365745965269537aef7c0ade7f88122e7edbddf665cb",
+  "processAssessmentSha256": "",
+  "resultsSha256": "ce0bd4f766ec6bceec7d56c973d55e996da68c8832520d9b5f0f5b75a8a540ed",
+  "matrixSha256": "2f8e96a391393f6978b7ca13c0aae8a367497ff7b0ad9050db21e55d02efc782",
+  "causes": [
+    "SMK-001-O1 must be fault-sensitive (a fault probe at HEAD detected by its test), but its quality is \u0027passing (fault sensitivity not demonstrated)\u0027"
+  ]
+}

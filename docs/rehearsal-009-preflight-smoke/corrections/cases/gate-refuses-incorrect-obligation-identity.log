@@ -1,6 +1,6 @@
-# cmd: dotnet fsi /home/user/Indy-init/tools/r9/r9.fsx -- gate --mode release --obligations $WORK/work/compiled.json --root $WORK/work/repo --results $WORK/work/results/pass/results.json --dokimos $SCRATCH/whome/.local/bin/dokimos --out $WORK/work/gate/forged --expect-candidate e635f62df94fed8a45051ca841d13191d9656b8b --matrix $WORK/work/repo/.echelon/verification/WI-FORGED/praxis-matrix.json
+# cmd: dotnet fsi /home/user/Indy-init/tools/r9/r9.fsx -- gate --mode release --obligations $WORK/work/compiled.json --root $WORK/work/repo --results $WORK/work/results/pass/results.json --dokimos $SCRATCH/whome/.local/bin/dokimos --out $WORK/work/gate/forged --expect-candidate bd3064650020f85a678817f8e68ea5ab4c9cf442 --matrix $WORK/work/repo/.echelon/verification/WI-FORGED/praxis-matrix.json
 # cwd: $WORK/work/repo
-  candidate e635f62df94fed8a45051ca841d13191d9656b8b (release, whole plan)
+  candidate bd3064650020f85a678817f8e68ea5ab4c9cf442 (release, whole plan)
   executable: 1/1 verified by Dokimos; record: 0/0 verified by verify-process; mixed: 0; 0 deferred to the independent verifier
   verdict $WORK/work/gate/forged/gate.json
   REFUSED the matrix cites dotnet:Smoke.Tests.SMK001Tests.SMK-999-O1, which is not a bound identity of the in-scope obligations

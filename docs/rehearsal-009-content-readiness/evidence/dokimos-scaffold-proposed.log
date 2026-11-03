@@ -1,0 +1,221 @@
+# cmd: dokimos verification scaffold --obligations content-compiled.json --root <empty scratch repository> --write true
+{
+  "packages": [
+    {
+      "cost": 1,
+      "dependsOn": [],
+      "file": "tests/browser/acceptance/content/content-conclusion.spec.js",
+      "fixture": "the test build with the stateful GitHub fake",
+      "id": "WP-001",
+      "identities": [
+        "playwright:content-conclusion.spec.js > INVESTIGATION-CONTENT-CONCLUSION > records a conclusion without bypassing the resolution gate [chromium]"
+      ],
+      "language": "javascript",
+      "obligations": [
+        {
+          "categories": [
+            "browser",
+            "integration"
+          ],
+          "criterion": "A user enters a substantive conclusion statement, shown distinctly from hypotheses; the existing review, evidence and causal-analysis gates still decide whether the investigation can be resolved.",
+          "id": "CONTENT-007-O1",
+          "requirement": "CONTENT-007"
+        }
+      ],
+      "rank": 1,
+      "suite": "SU-CONTENT-BROWSER"
+    },
+    {
+      "cost": 9,
+      "dependsOn": [],
+      "file": "tests/browser/live/content/content-e2e.spec.js",
+      "fixture": "the deployed candidate at the exact SHA and the authorized GitHub test repository; one fresh investigation per test",
+      "id": "WP-002",
+      "identities": [
+        "playwright:content-e2e.spec.js > INVESTIGATION-CONTENT-E2E > admits textual evidence with its source reference [chromium]",
+        "playwright:content-e2e.spec.js > INVESTIGATION-CONTENT-E2E > creates Challenger STS-51L Disaster with description and question [chromium]",
+        "playwright:content-e2e.spec.js > INVESTIGATION-CONTENT-E2E > edits the description and keeps the identifier after reload [chromium]",
+        "playwright:content-e2e.spec.js > INVESTIGATION-CONTENT-E2E > keeps provenance and event history intact after edits [chromium]",
+        "playwright:content-e2e.spec.js > INVESTIGATION-CONTENT-E2E > links the evidence to the hypothesis and keeps the link after reload [chromium]",
+        "playwright:content-e2e.spec.js > INVESTIGATION-CONTENT-E2E > records and reopens the O-ring temperature observation [chromium]",
+        "playwright:content-e2e.spec.js > INVESTIGATION-CONTENT-E2E > records the cold-temperature sealing hypothesis as a hypothesis [chromium]",
+        "playwright:content-e2e.spec.js > INVESTIGATION-CONTENT-E2E > reloads every entered field from GitHub in a new context [chromium]",
+        "playwright:content-e2e.spec.js > INVESTIGATION-CONTENT-E2E > reports Saved only after verified persistence [chromium]"
+      ],
+      "language": "javascript",
+      "obligations": [
+        {
+          "categories": [
+            "browser",
+            "live-provider",
+            "content-round-trip"
+          ],
+          "criterion": "A user records a textual evidence item with a label, a substantive description, a source reference, an optional source URL and an optional date; it is independently identifiable and viewable.",
+          "id": "CONTENT-005-O1",
+          "requirement": "CONTENT-005"
+        },
+        {
+          "categories": [
+            "browser",
+            "live-provider",
+            "content-round-trip"
+          ],
+          "criterion": "Through the UI, a user creates an investigation by entering a required name, an optional description and an optional primary question; the application assigns a stable identifier that is not derived from the name.",
+          "id": "CONTENT-001-O1",
+          "requirement": "CONTENT-001"
+        },
+        {
+          "categories": [
+            "browser",
+            "live-provider",
+            "content-round-trip"
+          ],
+          "criterion": "A user edits the name, description and primary question; after save and reload the edited values are shown and the investigation identifier is unchanged.",
+          "id": "CONTENT-002-O1",
+          "requirement": "CONTENT-002"
+        },
+        {
+          "categories": [
+            "browser",
+            "live-provider",
+            "content-round-trip"
+          ],
+          "criterion": "Editing an observation, hypothesis or evidence item records a revision event: the entity identifier is unchanged, the current text is the revised text, and the earlier text and its provenance remain in the history.",
+          "id": "CONTENT-008-O1",
+          "requirement": "CONTENT-008"
+        },
+        {
+          "categories": [
+            "browser",
+            "live-provider",
+            "content-round-trip"
+          ],
+          "criterion": "A user links an evidence item to a hypothesis as supports, contradicts or relevant-without-direction; the link persists and is shown on both the evidence and the hypothesis after reload.",
+          "id": "CONTENT-006-O1",
+          "requirement": "CONTENT-006"
+        },
+        {
+          "categories": [
+            "browser",
+            "live-provider",
+            "content-round-trip"
+          ],
+          "criterion": "A user adds an observation with required text, optional notes and optional source reference; it receives a stable identifier, and reopening it shows the entered text, not an event label or sequence number.",
+          "id": "CONTENT-003-O1",
+          "requirement": "CONTENT-003"
+        },
+        {
+          "categories": [
+            "browser",
+            "live-provider",
+            "content-round-trip"
+          ],
+          "criterion": "A user adds a hypothesis with a required statement and optional explanation; it receives a stable identifier and is visually and semantically distinct from observations and conclusions.",
+          "id": "CONTENT-004-O1",
+          "requirement": "CONTENT-004"
+        },
+        {
+          "categories": [
+            "browser",
+            "live-provider",
+            "content-round-trip"
+          ],
+          "criterion": "After verified persistence, a reload from GitHub in a new browser context shows the same name, description, question, observation, hypothesis, evidence and relationship content the user entered.",
+          "id": "CONTENT-009-O1",
+          "requirement": "CONTENT-009"
+        },
+        {
+          "categories": [
+            "browser",
+            "live-provider"
+          ],
+          "criterion": "Until the save protocol confirms the commit (PERSIST-007 read-back), the investigation is shown as a local draft (Unsaved/Saving), never as Saved.",
+          "id": "CONTENT-001-O2",
+          "requirement": "CONTENT-001"
+        }
+      ],
+      "rank": 2,
+      "suite": "SU-CONTENT-LIVE"
+    },
+    {
+      "cost": 10,
+      "dependsOn": [],
+      "file": "tests/browser/acceptance/content/content-negative.spec.js",
+      "fixture": "the test build with the stateful GitHub fake",
+      "id": "WP-003",
+      "identities": [
+        "playwright:content-negative.spec.js > INVESTIGATION-CONTENT-NEGATIVE > keeps content and offers retry after a save failure [chromium]",
+        "playwright:content-negative.spec.js > INVESTIGATION-CONTENT-NEGATIVE > records a duplicate submission once [chromium]",
+        "playwright:content-negative.spec.js > INVESTIGATION-CONTENT-NEGATIVE > refuses a missing investigation name [chromium]",
+        "playwright:content-negative.spec.js > INVESTIGATION-CONTENT-NEGATIVE > refuses an empty hypothesis [chromium]",
+        "playwright:content-negative.spec.js > INVESTIGATION-CONTENT-NEGATIVE > refuses an empty observation [chromium]",
+        "playwright:content-negative.spec.js > INVESTIGATION-CONTENT-NEGATIVE > refuses an invalid relationship target [chromium]",
+        "playwright:content-negative.spec.js > INVESTIGATION-CONTENT-NEGATIVE > refuses an invalid source URL [chromium]",
+        "playwright:content-negative.spec.js > INVESTIGATION-CONTENT-NEGATIVE > reports missing or malformed data on reload [chromium]",
+        "playwright:content-negative.spec.js > INVESTIGATION-CONTENT-NEGATIVE > shows a concurrent edit conflict [chromium]",
+        "playwright:content-negative.spec.js > INVESTIGATION-CONTENT-NEGATIVE > shows an authentication failure without losing content [chromium]"
+      ],
+      "language": "javascript",
+      "obligations": [
+        {
+          "categories": [
+            "browser",
+            "negative"
+          ],
+          "criterion": "A save failure, a GitHub authentication failure, a concurrent-edit conflict and a reload of missing or malformed data each show their state, keep the user's entered content, and offer the recovery action; none is reported as Saved.",
+          "id": "CONTENT-011-O1",
+          "requirement": "CONTENT-011"
+        },
+        {
+          "categories": [
+            "browser",
+            "negative"
+          ],
+          "criterion": "A duplicate submission of the same content (double tap, retry) records it once.",
+          "id": "CONTENT-010-O2",
+          "requirement": "CONTENT-010"
+        },
+        {
+          "categories": [
+            "browser",
+            "negative"
+          ],
+          "criterion": "Missing investigation name, empty observation, empty hypothesis, an invalid source URL and a relationship to a non-existent target are refused with a visible, field-level message, and nothing is saved.",
+          "id": "CONTENT-010-O1",
+          "requirement": "CONTENT-010"
+        }
+      ],
+      "rank": 3,
+      "suite": "SU-CONTENT-BROWSER"
+    },
+    {
+      "cost": 2,
+      "dependsOn": [],
+      "file": "tests/browser/acceptance/content/content-mobile.spec.js",
+      "fixture": "the test build with the stateful GitHub fake",
+      "id": "WP-004",
+      "identities": [
+        "playwright:content-mobile.spec.js > INVESTIGATION-CONTENT-MOBILE > content forms are keyboard and screen-reader operable [chromium]",
+        "playwright:content-mobile.spec.js > INVESTIGATION-CONTENT-MOBILE > content forms fit and wrap at 320 and 390 px [chromium]"
+      ],
+      "language": "javascript",
+      "obligations": [
+        {
+          "categories": [
+            "browser",
+            "accessibility"
+          ],
+          "criterion": "At 320 px and 390 px widths every content form is usable: labelled fields, visible focus, touch targets of at least 44 px, long text wraps, and no control overflows its container or the viewport.",
+          "id": "CONTENT-012-O1",
+          "requirement": "CONTENT-012"
+        }
+      ],
+      "rank": 4,
+      "suite": "SU-CONTENT-BROWSER"
+    }
+  ],
+  "planId": "VP-CONTENT-PROPOSED",
+  "schema": "dokimos.verification-work/1",
+  "unmapped": []
+}
+# exit: 0

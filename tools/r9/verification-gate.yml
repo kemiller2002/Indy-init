@@ -108,6 +108,16 @@ jobs:
           dotnet "$rc" review-attestations --repository "$REPO" --run-id "${{ github.run_id }}" \
             --candidate "${{ steps.candidate.outputs.sha }}" --pulls "$RUNNER_TEMP/pulls.json" --out "$RUNNER_TEMP/attestations.json"
           echo "args=--rc $rc --process-plan $src/$(jq -r .processEvidence.plan "$lock") --process-plan-digest $(jq -r .processEvidence.planDigest "$lock") --process-rules $src/$(jq -r .processEvidence.rules "$lock") --process-rules-sha256 $rules_sha --process-attestations $RUNNER_TEMP/attestations.json --process-trusted-run-id ${{ github.run_id }}" >> "$GITHUB_OUTPUT"
+      - name: Fault probes at the candidate (content round trips must be fault-sensitive)
+        id: probes
+        run: |
+          # Obligations the plan marks content-round-trip need a detected probe; without .echelon/fault-probes.json
+          # they stay unverified (the gate names them), never silently passed.
+          if [ -f .echelon/fault-probes.json ]; then
+            dokimos verification probe --spec .echelon/fault-probes.json --sha "${{ steps.candidate.outputs.sha }}" --root . \
+              --out "$RUNNER_TEMP/probe-results.json" || true
+            echo "args=--probes $RUNNER_TEMP/probe-results.json" >> "$GITHUB_OUTPUT"
+          fi
       - name: Verification gate (executable, record and mixed obligations)
         env:
           MODE: ${{ inputs.mode || 'development' }}
@@ -118,6 +128,7 @@ jobs:
           if [ -n "$WORK_ITEM" ]; then scope="--work-item $WORK_ITEM --scope $SCOPE"
           elif [ "$MODE" = "development" ]; then scope="--scope-file .echelon/verification-scope.json"; fi
           dotnet fsi "$RUNNER_TEMP/indy-init/tools/r9/r9.fsx" -- gate --mode "$MODE" $scope ${{ steps.records.outputs.args }} \
+            ${{ steps.probes.outputs.args }} --require-fault-sensitive content-round-trip \
             --obligations "$RUNNER_TEMP/obligations.json" --root . --results "$RUNNER_TEMP/results/results.json" \
             --dokimos "$(command -v dokimos)" --expect-candidate "${{ steps.candidate.outputs.sha }}" --out "$RUNNER_TEMP/gate"
       - name: Publish the coverage report, results and verdict
@@ -130,3 +141,4 @@ jobs:
             ${{ runner.temp }}/results
             ${{ runner.temp }}/obligations.json
             ${{ runner.temp }}/attestations.json
+            ${{ runner.temp }}/probe-results.json

@@ -1,0 +1,4 @@
+# cmd: conditor acceptance preflight --target /home/user/Indy-init (Conditor 0.10.19, pinned)
+acceptance preflight: READY
+  COND-ACC-READY [verifier] the authoritative verifier accepts the pinned baseline and approvals
+# exit: 0

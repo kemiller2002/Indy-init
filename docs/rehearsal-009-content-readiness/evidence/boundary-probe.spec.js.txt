@@ -1,0 +1,18 @@
+const { test, expect } = require("@playwright/test");
+
+test.describe("INVESTIGATION-CONTENT-E2E", () => {
+  test("CONTENT-001-O1 round trip", async ({ page }) => {
+    await page.goto("/");
+    await page.getByLabel("Investigation name").fill("Challenger STS-51L Disaster");
+    await page.getByRole("button", { name: "Create investigation" }).click();
+    await expect(page.getByTestId("save-indicator")).toHaveText("Saved");
+    await page.reload();
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Challenger STS-51L Disaster");
+  });
+
+  test("CONTENT-001-O2 command only", async ({ page }) => {
+    await page.goto("/");
+    await page.getByRole("button", { name: "Record observation" }).click();
+    await expect(page.getByText("Observation recorded")).toBeVisible();
+  });
+});
