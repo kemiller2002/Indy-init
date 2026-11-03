@@ -4,7 +4,7 @@
   "verifier": ["python3", "tools/compute-acceptance-verdict.py"],
   "baseline": { "path": "requirements/causa-requirements-baseline-v4.json", "sha256": "f86a3539e48ee8dda7d99d5f4f5546a18e2397a82d308a277c8f346edb2a8f1a" },
   "baselineSource": ".",
-  "approvals": { "path": "kickoff/rehearsal-007/approvals.causa.json", "sha256": "63a9ce5b8a5cd160fff7d485bbd877276625b2093e894e3b7fe75b57b9d7a8c8" },
+  "approvals": { "path": "kickoff/acceptance/approvals.causa.json", "sha256": "87eaf064e310e24b50f3086fa2c65db3009666894ed4fca45f6e20433b2cf2ed" },
   "trustedOperators": ["kemiller2002"],
   "requiredInputs": [
     { "id": "verification-execution-plan", "path": "requirements-compiled/v4.1.2/verification-execution-plan.json", "sha256": "e31dc2045954f12c1b1eb0c0a9e953cdcfddba44bb57bc08e34e0bfcc047a3ca" }
