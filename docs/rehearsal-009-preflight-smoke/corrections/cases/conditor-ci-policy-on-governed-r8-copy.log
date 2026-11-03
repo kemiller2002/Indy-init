@@ -1,2 +1,3 @@
-CIP-002 .github/workflows/verification-gate.yml:1 a push or pull-request workflow has no workflow-level concurrency group, so superseded runs accumulate
-CI policy: FAIL (1 findings in 9 workflows)
+# cmd: conditor ci-policy check --target <governed copy of indy-init-rehearsal-008>
+CI policy: PASS (9 workflows)
+# exit: 0

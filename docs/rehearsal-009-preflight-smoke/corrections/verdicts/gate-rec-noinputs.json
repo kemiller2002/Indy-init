@@ -1,0 +1,28 @@
+{
+  "schema": "indy-init.r9-gate-verdict/2",
+  "verdict": "REFUSED",
+  "mode": "development",
+  "candidate": "e635f62df94fed8a45051ca841d13191d9656b8b",
+  "planId": "VP-R9-TYPED",
+  "scope": [
+    "AR-001"
+  ],
+  "workItem": "WI-REC-NOINPUTS",
+  "obligations": 1,
+  "executable": 0,
+  "executableVerified": 0,
+  "record": 1,
+  "recordJudged": true,
+  "recordVerified": 0,
+  "mixed": 0,
+  "deferredToIndependentVerifier": [],
+  "dokimosExit": 0,
+  "frozenPlanSha256": "9d7ec41ecf8c860dc4d7d8856b7fe033c1421cdb14e0090bb2603bc71c6b5bf5",
+  "coverageSha256": "",
+  "processAssessmentSha256": "",
+  "resultsSha256": "f3047290d805df591aaddeed2de38623f67be3d3179b402d6f6f9bb840ce49a6",
+  "matrixSha256": "78c44954db60d4875b6fdc790b7c403d1a93bd4f4bc1fb005a917d02751e8ee0",
+  "causes": [
+    "AR-001-O1: record evidence not verified: record evidence is required but the pinned record-verifier inputs are missing: --rc, --process-plan, --process-plan-digest, --process-rules, --process-rules-sha256, --process-attestations, --process-trusted-run-id"
+  ]
+}

@@ -1,6 +1,6 @@
 # cmd: dotnet fsi /home/user/Indy-init/tools/r9/r9.fsx -- gate --mode development --scope-file $WORK/work/empty-scope.json --obligations $WORK/work/compiled.json --root $WORK/work/repo --results $WORK/work/results/later/results.json --dokimos $SCRATCH/whome/.local/bin/dokimos --out $WORK/work/gate/dev-empty
 # cwd: $WORK/work/repo
-  candidate 2aea9226f15766068de82d58a4c21ac35d1797e6: the development scope (.echelon/verification-scope.json) is empty, so nothing is claimed verified yet; every completed work item adds its requirements (check-governance enforces it)
+  candidate 58bfb4851285b6a1f561fea6df45781b040a61f3: the development scope (.echelon/verification-scope.json) is empty, so nothing is claimed verified yet; every completed work item adds its requirements (check-governance enforces it)
 gate: PASS
 
 # exit: 0

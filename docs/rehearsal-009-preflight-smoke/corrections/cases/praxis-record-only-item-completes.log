@@ -1,0 +1,260 @@
+# cmd: $SCRATCH/whome/.local/bin/praxis work complete --id WI-RECORD --occurred-at 2026-11-03T12:00:00Z --evidence implementation=src/Smoke/Ledger.fs --evidence tests=tests/Smoke.Tests/SMK001Tests.fs --evidence verification-matrix=.echelon/verification/WI-RECORD/praxis-matrix.json
+# cwd: $WORK/work/repo
+{
+  "workItems": [
+    {
+      "id": "ROS-INSTALL-3-24-0",
+      "type": "mechanical",
+      "state": "complete",
+      "semanticState": "complete",
+      "evidence": [
+        {
+          "type": "installation",
+          "path": ".ros/installation.json"
+        }
+      ],
+      "updatedAt": "2026-11-03T12:28:05.656Z",
+      "completedAt": "2026-11-03T12:28:05.656Z"
+    },
+    {
+      "id": "WI-VALID",
+      "type": "feature",
+      "state": "complete",
+      "semanticState": "complete",
+      "evidence": [
+        {
+          "type": "implementation",
+          "path": "src/Smoke/Ledger.fs"
+        },
+        {
+          "type": "tests",
+          "path": "tests/Smoke.Tests/SMK001Tests.fs"
+        },
+        {
+          "type": "verification-matrix",
+          "path": ".echelon/verification/WI-VALID/praxis-matrix.json"
+        }
+      ],
+      "updatedAt": "2026-11-03T12:00:00Z",
+      "telemetryExecutionIds": [
+        "EXE-20261103T123200364Z-02a90360"
+      ],
+      "completedAt": "2026-11-03T12:00:00Z",
+      "completionReadiness": {
+        "schema": "praxis.completion-readiness/1",
+        "workItem": "WI-VALID",
+        "decision": "ready",
+        "policy": {
+          "dokimos": "off",
+          "ordoBoundary": "off",
+          "requiredFacets": [
+            "verification-matrix-satisfied"
+          ]
+        },
+        "facets": {
+          "implementationComplete": {
+            "required": false,
+            "status": "satisfied",
+            "evidence": [
+              "implementation=src/Smoke/Ledger.fs"
+            ],
+            "blocking": false
+          },
+          "behaviorVerified": {
+            "required": false,
+            "status": "satisfied",
+            "evidence": [
+              "tests=tests/Smoke.Tests/SMK001Tests.fs"
+            ],
+            "blocking": false
+          },
+          "architectureVerified": {
+            "required": false,
+            "status": "not-required",
+            "blocking": false
+          },
+          "releaseReady": {
+            "required": false,
+            "status": "not-required",
+            "blocking": false
+          },
+          "designDebtDeclared": {
+            "required": false,
+            "status": "not-required",
+            "blocking": false
+          },
+          "verificationMatrixSatisfied": {
+            "required": true,
+            "status": "satisfied",
+            "evidence": [
+              "verification matrix met: happy-path, negative, corruption, compatibility, recovery, concurrency"
+            ],
+            "blocking": false
+          },
+          "groupVerified": {
+            "required": false,
+            "status": "not-required",
+            "blocking": false
+          }
+        },
+        "sources": {
+          "dokimos": {
+            "evidenceType": "dokimos-ratchet",
+            "requirement": "off",
+            "judgement": "ignored"
+          },
+          "ordoBoundary": {
+            "evidenceType": "ordo-boundary",
+            "requirement": "off",
+            "judgement": "ignored"
+          },
+          "verificationMatrix": {
+            "evidenceType": "verification-matrix",
+            "requirement": "required",
+            "path": ".echelon/verification/WI-VALID/praxis-matrix.json",
+            "observation": "parsed",
+            "judgement": "passed",
+            "evidence": [
+              "verification matrix met: happy-path, negative, corruption, compatibility, recovery, concurrency"
+            ]
+          }
+        },
+        "obligations": {
+          "designDebtDeclaration": false,
+          "verificationDimensions": []
+        },
+        "consumedEvidence": [
+          {
+            "type": "verification-matrix",
+            "path": ".echelon/verification/WI-VALID/praxis-matrix.json",
+            "sha256": "sha256:8a47debe40f40930c3a750e3adf787198e78ad6ddd17e647b306232a06845822"
+          }
+        ],
+        "blockingReasons": []
+      }
+    },
+    {
+      "id": "WI-RECORD",
+      "type": "task",
+      "state": "complete",
+      "semanticState": "complete",
+      "evidence": [
+        {
+          "type": "implementation",
+          "path": "src/Smoke/Ledger.fs"
+        },
+        {
+          "type": "tests",
+          "path": "tests/Smoke.Tests/SMK001Tests.fs"
+        },
+        {
+          "type": "verification-matrix",
+          "path": ".echelon/verification/WI-RECORD/praxis-matrix.json"
+        }
+      ],
+      "updatedAt": "2026-11-03T12:00:00Z",
+      "telemetryExecutionIds": [
+        "EXE-20261103T123212922Z-b59ee709"
+      ],
+      "completedAt": "2026-11-03T12:00:00Z",
+      "completionReadiness": {
+        "schema": "praxis.completion-readiness/1",
+        "workItem": "WI-RECORD",
+        "decision": "ready",
+        "policy": {
+          "dokimos": "off",
+          "ordoBoundary": "off",
+          "requiredFacets": [
+            "verification-matrix-satisfied"
+          ]
+        },
+        "facets": {
+          "implementationComplete": {
+            "required": false,
+            "status": "satisfied",
+            "evidence": [
+              "implementation=src/Smoke/Ledger.fs"
+            ],
+            "blocking": false
+          },
+          "behaviorVerified": {
+            "required": false,
+            "status": "satisfied",
+            "evidence": [
+              "tests=tests/Smoke.Tests/SMK001Tests.fs"
+            ],
+            "blocking": false
+          },
+          "architectureVerified": {
+            "required": false,
+            "status": "not-required",
+            "blocking": false
+          },
+          "releaseReady": {
+            "required": false,
+            "status": "not-required",
+            "blocking": false
+          },
+          "designDebtDeclared": {
+            "required": false,
+            "status": "not-required",
+            "blocking": false
+          },
+          "verificationMatrixSatisfied": {
+            "required": true,
+            "status": "satisfied",
+            "evidence": [
+              "verification matrix met: happy-path, negative, corruption, compatibility, recovery, concurrency"
+            ],
+            "blocking": false
+          },
+          "groupVerified": {
+            "required": false,
+            "status": "not-required",
+            "blocking": false
+          }
+        },
+        "sources": {
+          "dokimos": {
+            "evidenceType": "dokimos-ratchet",
+            "requirement": "off",
+            "judgement": "ignored"
+          },
+          "ordoBoundary": {
+            "evidenceType": "ordo-boundary",
+            "requirement": "off",
+            "judgement": "ignored"
+          },
+          "verificationMatrix": {
+            "evidenceType": "verification-matrix",
+            "requirement": "required",
+            "path": ".echelon/verification/WI-RECORD/praxis-matrix.json",
+            "observation": "parsed",
+            "judgement": "passed",
+            "evidence": [
+              "verification matrix met: happy-path, negative, corruption, compatibility, recovery, concurrency"
+            ]
+          }
+        },
+        "obligations": {
+          "designDebtDeclaration": false,
+          "verificationDimensions": []
+        },
+        "consumedEvidence": [
+          {
+            "type": "verification-matrix",
+            "path": ".echelon/verification/WI-RECORD/praxis-matrix.json",
+            "sha256": "sha256:53c1d11026a7c245d78a75983bddf9b8192a41e31b72260c1f84b5c441397a8a"
+          }
+        ],
+        "blockingReasons": []
+      }
+    }
+  ],
+  "events": [
+    "1831be866edd4e4376678a6e"
+  ]
+}
+# exit: 0
+# expected: 0 containing 'complete'
+# result: PASS

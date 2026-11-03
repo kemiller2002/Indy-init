@@ -1,7 +1,7 @@
 # cmd: dotnet fsi /home/user/Indy-init/tools/r9/r9.fsx -- gate --mode release --obligations $WORK/work/compiled.json --root $WORK/work/repo --results $WORK/work/results/later/results.json --dokimos $SCRATCH/whome/.local/bin/dokimos --out $WORK/work/gate/malformed --expect-candidate 1234abc
 # cwd: $WORK/work/repo
   REFUSED --expect-candidate '1234abc' is not a 40-character SHA
-  REFUSED CI's candidate 1234abc is not the checked-out HEAD 2aea9226f15766068de82d58a4c21ac35d1797e6
+  REFUSED CI's candidate 1234abc is not the checked-out HEAD 58bfb4851285b6a1f561fea6df45781b040a61f3
 gate: REFUSED (2 cause(s))
 
 # exit: 4

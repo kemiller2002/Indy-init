@@ -1,0 +1,28 @@
+{
+  "schema": "indy-init.r9-gate-verdict/2",
+  "verdict": "REFUSED",
+  "mode": "development",
+  "candidate": "e635f62df94fed8a45051ca841d13191d9656b8b",
+  "planId": "VP-R9-TYPED",
+  "scope": [
+    "AR-001"
+  ],
+  "workItem": "WI-REC-CANDIDATE",
+  "obligations": 1,
+  "executable": 0,
+  "executableVerified": 0,
+  "record": 1,
+  "recordJudged": true,
+  "recordVerified": 0,
+  "mixed": 0,
+  "deferredToIndependentVerifier": [],
+  "dokimosExit": 0,
+  "frozenPlanSha256": "9d7ec41ecf8c860dc4d7d8856b7fe033c1421cdb14e0090bb2603bc71c6b5bf5",
+  "coverageSha256": "",
+  "processAssessmentSha256": "729ae3b8c8fcbfc49efd616d5c9526f116d94b86c70f65abbbf6ce5c30c992d4",
+  "resultsSha256": "f3047290d805df591aaddeed2de38623f67be3d3179b402d6f6f9bb840ce49a6",
+  "matrixSha256": "76ac9902f3723c74ad09d58c9d3b300466aca81dae5291c9dd701c97790d79b1",
+  "causes": [
+    "AR-001-O1: record evidence not verified: independent-acceptance unverified (MISSING-INDEPENDENT-REVIEW independent-review: no qualifying approving independent review of this candidate | STALE-REVIEW independent-review cab5c704b5f2b6fd083af407: the review is of fad440a5f2752a1eca67f9d4d02e9cc1dddcb1c2, not the candidate e635f62df94fed8a45051ca841d13191d9656b8b | UNATTESTED-REVIEW independent-review cab5c704b5f2b6fd083af407: attestation Some \u0022github-review:kemiller2002/simulated-rehearsal#2@2001\u0022 was not observed by CI in the trusted run for this candidate)"
+  ]
+}

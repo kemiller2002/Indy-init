@@ -2,10 +2,13 @@
 
 This corrects the six risks in [REPORT.md](REPORT.md), the historical smoke-test record. REPORT.md is preserved unchanged.
 
-**Decision: READY WITH RISKS.**
-- All four P0 corrections and the candidate-SHA correction are implemented and verified: 57 of 57 cases pass on the released binaries.
-- Workstation registration is fixed only as far as it can go without an owner decision (§6).
-- Two owner decisions remain open (§Owner decisions). Neither blocks the start of Rehearsal 009.
+**Decision: BLOCKED, on one owner action. Everything else is READY.**
+- All six corrections and both owner decisions of 2026-11-03 are implemented and verified: 73 of 73 cases pass on the released binaries.
+- The one remaining gate is a trust input only the owner may set. The Rehearsal 009 process-evidence rules (`kickoff/rehearsal-009/process-evidence-rules.json`) are drafted, but their hash is not yet pinned (§Owner action).
+  - Until they are pinned, record-bound obligations cannot be verified: the record gate fails closed.
+  - Those are 119 obligations (72 record-only and 47 mixed), covering 26 record-only requirements.
+  - Once pinned, the verdict is READY WITH RISKS. The remaining risks are in §Remaining limitations.
+- Workstation registration is UNAVAILABLE. It is accepted as a limitation and is not counted as a registration (§6).
 - Rehearsal 009 was not started.
 
 ## What changed
@@ -18,7 +21,8 @@ All of it is in Indy-init. No framework release was needed, and nothing in Praxi
 | `tools/r9/governance.json` | The authoritative Praxis completion policy: `requiredFacets: ["verification-matrix-satisfied"]`, with no `workTypes`. |
 | `tools/r9/verification-gate.yml` | The gate workflow that `govern` writes into the competition repository. |
 | `tools/r9/r9.fsx` | The commands `install-conditor`, `workstation`, `govern`, `check-governance`, `run-suites`, `gate` and `spec-preflight` (F#, per OD-INDY-14). |
-| `tools/r9/tests.fsx` | 57 end-to-end positive and negative cases on the released binaries. |
+| `tools/r9/tests.fsx` | 73 end-to-end positive and negative cases on the released binaries. |
+| `kickoff/rehearsal-009/process-evidence-rules.json` | PROPOSED rules for `verify-process`: owner, implementing agents, independent reviewer roster, repository and owner-decision ids, drafted from Rehearsal 6's. The lock references it with `rulesSha256: null` until the owner pins it. |
 | `.github/workflows/preflight-tooling.yml` | New job `r9-readiness-gates`. It installs the pinned toolchain into a disposable home and runs `tests.fsx` on every push. |
 
 The frozen v4.1.2 package is untouched. T10 gains one step, `r9.fsx govern`, between the package's `--bootstrap .` and the build. It writes only into the new competition repository.
@@ -70,8 +74,8 @@ The frozen v4.1.2 package is untouched. T10 gains one step, `r9.fsx govern`, bet
   - An empty scope (T0) passes and explicitly claims nothing.
   - Only the deterministic suites run.
 - **Release scope:** the whole frozen plan, all suites. The scope is not reduced.
-- **Record evidence:** Dokimos never judges record evidence (`praxis:*`, `verifier:*`; it reports such identities as `blocked`, by design). The gate therefore runs Dokimos on the executable view of the frozen plan, with record identities removed. It requires exit 0 on that view and lists the 72 record-only obligations as deferred to the acceptance verifier, never as verified.
-- **On the real plan:** 613 obligations become 541 executable plus 72 deferred (`gate-release-real-v412-plan-blank-refused`: 0/541 verified, exit 4).
+- **Record evidence:** Dokimos never judges record identities; it reports them as `blocked`, by design. The gate therefore runs Dokimos on the executable view of the frozen plan, requires exit 0 there, and judges record evidence with the existing record verifier (§7).
+- **On the real plan:** 613 obligations: 541 bind executable identities and 119 bind record identities, so 47 are mixed (`gate-release-real-v412-plan-blank-refused`: 0/541 and 0/119 verified, exit 4; nothing deferred, nothing counted).
 - **Negative cases** (all exit 4): missing test, skipped test, failing test, placeholder test, mismatched identity, stale candidate SHA, stale matrix, missing execution evidence (no run, and a missing TRX), dirty tree, and a failure inside the development scope.
 - **Positive case:** a passing, correctly bound test (`gate-pass-correctly-bound`): 1/1 verified, Dokimos exit 0.
 - **Conditor CI policy:** `conditor ci-policy check` on a copy of Rehearsal 008's Conditor-initialized repository passes before and after `govern` (9 workflows). Before the fix it failed CIP-002, which led me to add the workflow's concurrency group (`corrections/cases/conditor-ci-policy-*.log`).
@@ -120,27 +124,80 @@ The frozen v4.1.2 package is untouched. T10 gains one step, `r9.fsx govern`, bet
 - **Tests, all refused (exit 4):** previous-commit SHA, malformed SHA, missing SHA, evidence from another candidate, stale results, stale matrix.
 - **Not changed:** the acceptance manifest is checked by the existing authoritative verifier (`compute-acceptance-verdict.py`, its `source_commit_sha` and trusted SHA), which is unchanged.
 
-### 6. Workstation registration (P1): PARTIALLY CORRECTED; needs an owner decision
+### 6. Workstation registration (P1): installation CORRECTED; registration UNAVAILABLE, accepted (owner decision 1)
 - **Fixed:**
   - `r9.fsx workstation` always passes `--target-id` (default `indy-init-r9-workstation`, a logical id, not a host identity), which removes `invalid-target`.
   - It reads registration back from Conditor's ledger and checks every tool identity. A repeat run reuses every receipt (`workstation-fresh-home`, `workstation-repeat-idempotent`).
-- **Still blocked:** registration now reports `unavailable: no Project Administration integration is configured`.
-  - Praxis registers into Project Administration, which has no release, so a local store would need a source build.
-  - The GitHub-workflow transport would write rehearsal workstations into the real `kemiller2002/project-administration` inventory.
-  - Registration is optional in Praxis's contract (exit 0). `workstation` fails on `invalid`, `refused` or `misconfigured`, and fails on `unavailable` only with `--require-registration true`.
+- **Owner decision 1 (2026-11-03): registration is UNAVAILABLE for Rehearsal 009.**
+  - Project Administration is not built from source, its repository is not modified, and no rehearsal record is written to the production inventory.
+  - `workstation` reports `installation: VERIFIED` and, separately, `registration: UNAVAILABLE (6 of 6 components not registered: no Project Administration integration; accepted limitation for Rehearsal 009, not a registration)`.
+  - Installation, the pinned resolved set, the checksums and the tool identities remain mandatory and fail the command if wrong.
+  - `invalid`, `refused` or `misconfigured` registration still fails it.
 
-## Owner decisions
+### 7. Record-only and mixed obligations: CORRECTED with the existing contracts (owner decision 2)
+- **Evidence type comes only from the authoritative plan:** the runner of the suite each identity is bound in.
+  - `dotnet-test` and `playwright` identities are **executable**, judged by Dokimos.
+  - `evidence-record` identities named `praxis:<kind>` are **record**, judged by `requirements-compiler verify-process`.
+  - `evidence-record` identities named `verifier:*` are **independent-verifier**, judged only by the acceptance verifier.
 
-1. **Registration target (risk 6).** Choose:
-   - the GitHub-workflow transport into `kemiller2002/project-administration`;
-   - a released `administration` executable;
-   - accept registration as `unavailable` for Rehearsal 009.
+  Any other runner, or an obligation with no bound identity, is refused; its type is never inferred (`gate-unclassified-evidence-type-refused`). A missing test never makes an obligation record-only (`gate-executable-missing-test-never-record`).
+- **Rules:**
+  - Executable obligations need Dokimos `verified` at HEAD.
+  - Record obligations need every category `verify-process` decides for them to be `verified` at the same HEAD.
+  - Mixed obligations need both.
+  - A work item is record-only only when the plan classifies every in-scope obligation as record. It then completes on the record verdict alone.
+  - Work items keep their own identities and requirement scopes: nothing is merged to fill a matrix.
+- **Record verifier, existing and unchanged:** `verify-process` (docs/PROCESS-EVIDENCE-AND-READINESS.md) judges:
+  - **provenance:** the Praxis provenance class, and the execution envelope's actor;
+  - **authority:** the frozen roster of owners, agents and reviewers, and owner decisions only for the decisions they name;
+  - **independence:** a frozen reviewer who implemented nothing, anchored by a CI-observed review;
+  - **candidate binding:** records name this candidate; commits are this candidate or its ancestors.
 
-   This does not block T0.
-2. **Record-only obligations and work items.**
-   - 72 obligations (45 of 161 requirements touch record evidence, mostly `praxis:independent-review`) are verified by the acceptance verifier, not by Dokimos.
-   - A work item whose scope holds only record-only requirements cannot get a non-empty matrix, so the gate refuses it.
-   - Confirm that such items (review or approval records) are scoped with the executable requirements they review, or name an explicit exception.
+  Attestations count only from the CI run that observed them (`review-attestations`, `--trusted-run-id`). The pinned plan is the frozen v4 plan (digest `1e3c66bc…`); the rules are pinned by hash. On the real plan it decides exactly the 119 record-bound obligations (`gate-release-real-v412-plan-blank-refused`).
+- **Where records are judged:**
+  - At work-item completion and at release, by the gate workflow's `workflow_dispatch` (inputs `work_item`, `scope`, `mode`). It observes reviews in its own run, then runs `review-attestations`, then `gate` with the record verifier.
+  - A development merge re-checks executable obligations only, and says so. A review of an earlier commit is correctly stale at a later HEAD, so re-judging records on every merge would always fail (`gate-development-merge-does-not-rejudge-records`).
+- **Matrix for Praxis:**
+  - **Mixed item:** Dokimos's rows also carry the record verdict (command evidence naming `verify-process --candidate HEAD`). A row is `met` only when both hold.
+  - **Record-only item:** the gate writes the rows from the record verdict, with command and location evidence. Praxis 3.24.0 accepts it (`praxis-record-only-item-completes`).
+  - `check-governance` still ties every completion to a PASS gate verdict.
+- **The acceptance verifier is not weakened:** `compute-acceptance-verdict.py`, `verify-plan` and `verify-process` are unchanged.
+- **Tests** (each against the frozen v4 plan, on the Praxis log recorded by `tools/process-evidence/simulate-rehearsal.sh`, relabelled to the synthetic candidate; mutations touch only the agent-recorded log, never the rules or the CI attestations):
+
+| Case | Expected | Actual |
+|---|---|---|
+| Record-only item, valid records (`gate-record-only-valid-records`) | PASS; Praxis completes; governance holds | exit 0, `record: 1/1`; `praxis-record-only-item-completes` 0; `check-governance-after-record-only-completion` 0 |
+| Missing review record (`gate-record-missing-review-refused`) | refused | exit 4, `MISSING-INDEPENDENT-REVIEW` |
+| Invalid authority: reviewer not on the roster (`gate-record-invalid-authority-refused`) | refused | exit 4, `INCORRECT-AGENT-IDENTITY`, `SELF-ACCEPTANCE` |
+| Rules not matching the pin (`gate-record-unpinned-rules-refused`) | refused | exit 4, verify-process INVALID |
+| Wrong candidate SHA: records of another commit (`gate-record-wrong-candidate-refused`) | refused | exit 4, `STALE-REVIEW` |
+| No pinned record-verifier inputs (`gate-record-without-verifier-inputs-refused`) | refused | exit 4 |
+| Mixed item, records valid, executable test missing (`gate-mixed-missing-executable-refused`) | refused | exit 4, `not-generated` |
+| Mixed item, executable passed, review missing (`gate-mixed-missing-record-refused`) | refused | exit 4, `MISSING-INDEPENDENT-REVIEW` |
+| Mixed item, both present (`gate-mixed-both-verified`) | PASS | exit 0, executable 1/1, record 1/1 |
+| Executable-only obligation whose test is missing (`gate-executable-missing-test-never-record`) | refused, never treated as record | exit 4, `not-generated` |
+| Identity with an unclassified runner (`gate-unclassified-evidence-type-refused`) | refused | exit 4 |
+
+- **Independent-verifier evidence:** two mixed obligations, PERSIST-052-O3 and PERSIST-026-O2, also bind `verifier:*` evidence, which the post-deployment independent verifier job produces.
+  - The gate refuses to claim them at work-item time.
+  - At release it lists them for the acceptance verifier (`verify-plan`). They are never counted as verified.
+
+## Owner action required before T0
+
+**Confirm the Rehearsal 009 process-evidence rules and pin them.**
+- `kickoff/rehearsal-009/process-evidence-rules.json` is an agent's draft from the Rehearsal 6 rules. Its current sha256 is `b8adffc4122226cbe568dae1b0173ee85aab08b8435ded7390f9d5205ad0d115`.
+- It names:
+  - the owner, `kemiller2002`;
+  - the implementing agents;
+  - the independent reviewer roster (Rehearsal 6's: `anthropic/claude-code-reviewer`, login `kemiller2002`);
+  - the repository, `indy-init-rehearsal-009`;
+  - the decision proving AR-024-O1/O2 and AR-008-O2, `DEC-R9-KICKOFF`.
+- If it is right, the owner sets `processEvidence.rulesSha256` in `kickoff/rehearsal-009/toolchain.lock.json` to that hash, in the owner's own commit. Otherwise the owner corrects the file first.
+- Agents never pin it. While the hash is `null`, the gate workflow refuses every work-item or release check that has record-bound obligations, naming the missing pin.
+
+## Owner decisions applied (2026-11-03)
+1. **Registration:** UNAVAILABLE is accepted for Rehearsal 009, as reported in §6. Nothing was built from source, and no production inventory was written.
+2. **Record-only requirements:** obligation-type-aware verification is applied with the existing Praxis and acceptance contracts (§7). No new framework was needed; the only new input is the rules pin above.
 
 ## Erratum in REPORT.md
 - REPORT.md cites the pass case's candidate as `0a4922c4…`. That SHA comes from the first run, whose evidence was deleted when the Praxis state was reset.
@@ -161,9 +218,11 @@ The frozen v4.1.2 package is untouched. T10 gains one step, `r9.fsx govern`, bet
 | Empty specification | rejected | PASS (`spec-no-inputs`, `spec-empty-input-files`, `spec-well-formed-but-empty`) |
 | Valid v4.1.2 specification | passes | PASS (`spec-v412-frozen-package`) |
 | Pinned Conditor bootstrap | 0.10.19 installed | PASS (`conditor-install-pinned`) |
-| Workstation registration | target registered | target id supplied, receipts idempotent; registration `unavailable` (owner decision 1) |
+| Workstation registration | installed; registration UNAVAILABLE, accepted | installation VERIFIED, receipts idempotent; `registration: UNAVAILABLE` reported, not counted as registered (`workstation-fresh-home`) |
+| Record-only item | completes on valid records only | PASS (`gate-record-only-valid-records`, `praxis-record-only-item-completes`; 5 record negatives refused) |
+| Mixed item, executable evidence missing | refused | PASS (`gate-mixed-missing-executable-refused`) |
 
-- **Local run:** `dotnet fsi tools/r9/tests.fsx -- --indy-init . --bin $HOME_DIR/.local/bin --conditor $CONDITOR --work $WORK --evidence $EVIDENCE` gave 57 cases, 0 failed (`corrections/cases.tsv`).
+- **Local run:** `dotnet fsi tools/r9/tests.fsx -- --indy-init . --bin $HOME_DIR/.local/bin --conditor $CONDITOR --work $WORK --evidence $EVIDENCE` gave 73 cases, 0 failed (`corrections/cases.tsv`).
 - **Tools:** .NET SDK 10.0.402; Praxis 3.24.0, Dokimos 0.10.0, Percepta 0.4.0 and Ordo 1.20.0 from echelon-current 1.35.0; Conditor 0.10.19.
 - **Offline suite:** passes.
 - **Actual CI:** the job `r9-readiness-gates` in `preflight-tooling.yml` runs the same cases on GitHub's runner. Its result is recorded in the pull request that delivers this file.
@@ -192,24 +251,27 @@ $CONDITOR ci-policy check --target .
 git add -A && git commit -m "T0 bootstrap"
 # publish with $CONDITOR repo create (as the package states); first green CI includes the Verification gate
 
-# Completing a work item (every item)
-dotnet fsi $INDY/tools/r9/r9.fsx -- run-suites --obligations OBLIGATIONS --root . --out $RUNNER_TEMP/results
-dotnet fsi $INDY/tools/r9/r9.fsx -- gate --mode development --scope-file .echelon/verification-scope.json \
-  --obligations OBLIGATIONS --root . --results $RUNNER_TEMP/results/results.json --dokimos $(command -v dokimos) \
-  --work-item WI-ID --scope REQ-A,REQ-B --out .echelon/verification/WI-ID
+# Completing a work item (every item, executable, record-only or mixed): run the gate in CI, where record evidence is
+# observed in the run itself
+gh workflow run "Verification gate" -f mode=development -f work_item=WI-ID -f scope=REQ-A,REQ-B
+# download its artifact verification-<SHA>/gate into .echelon/verification/WI-ID, then:
 praxis work complete --id WI-ID --occurred-at NOW --evidence implementation=… --evidence tests=… \
   --evidence verification-matrix=.echelon/verification/WI-ID/praxis-matrix.json
 # commit .echelon/verification/WI-ID and the REQ ids added to .echelon/verification-scope.json
+# (executable-only items may also run the same gate locally: r9.fsx run-suites, then r9.fsx gate --work-item ...)
 
-# Release acceptance (T34): workflow_dispatch of "Verification gate" with mode=release at the candidate,
-# then the authoritative acceptance verifier for the 72 deferred record obligations.
+# Release acceptance (T34): workflow_dispatch of "Verification gate" with mode=release at the candidate (executable
+# and record evidence), then the authoritative acceptance verifier (verify-plan) for the two independent-verifier
+# obligations and the final verdict.
 ```
 
 `OBLIGATIONS` is the output of `dokimos verification compile --indy-execution-plan $INDY/requirements-compiled/v4.1.2/verification-execution-plan.json --indy-verification-plan $INDY/requirements-compiled/v4/verification-plan.json --out OBLIGATIONS`.
 
 ## Remaining limitations
-- **Registration** (owner decision 1).
-- **Record-only obligations** (owner decision 2).
+- **Registration is UNAVAILABLE** for Rehearsal 009 (owner decision 1). Installation is verified; the inventory records nothing.
+- **The process-evidence rules pin** is the owner action above. Until it is set, record-bound obligations cannot be verified.
+- **Record-gate CI not run against a live repository.** The work-item and release record path in the gate workflow (observe reviews, `review-attestations`, `verify-process`) reuses the Rehearsal 6 acceptance job's steps. It has not run against a live competition repository here. Its logic was proven with the recorded Praxis log, and the workflow passes Conditor's CI policy.
+- **Two `verifier:*` obligations** (PERSIST-052-O3, PERSIST-026-O2) can complete only at acceptance, not at their work items.
 - **Live suites at release** need their provider secrets in the gate job. Without them, their obligations are refused as having no execution evidence; they never pass.
 - **The T0 sequence was not run end to end here.** `conditor init --preset indy-init` needs authenticated GitHub fetches this sandbox lacks. `govern`, `check-governance` and `ci-policy check` were proven on a copy of Rehearsal 008's Conditor-initialized repository instead.
 - **Local completion is not blocked:** a forged or locally edited completion is stopped at CI (it cannot merge), not at `praxis work complete`.

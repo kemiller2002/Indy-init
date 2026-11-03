@@ -1,0 +1,28 @@
+{
+  "schema": "indy-init.r9-gate-verdict/2",
+  "verdict": "REFUSED",
+  "mode": "development",
+  "candidate": "e635f62df94fed8a45051ca841d13191d9656b8b",
+  "planId": "VP-R9-TYPED",
+  "scope": [
+    "AR-001"
+  ],
+  "workItem": "WI-REC-MISSING",
+  "obligations": 1,
+  "executable": 0,
+  "executableVerified": 0,
+  "record": 1,
+  "recordJudged": true,
+  "recordVerified": 0,
+  "mixed": 0,
+  "deferredToIndependentVerifier": [],
+  "dokimosExit": 0,
+  "frozenPlanSha256": "9d7ec41ecf8c860dc4d7d8856b7fe033c1421cdb14e0090bb2603bc71c6b5bf5",
+  "coverageSha256": "",
+  "processAssessmentSha256": "38ce6e8666e08e2d4588a34f70c24b69f8bc870b1eba83ad3d2e06534478a6ff",
+  "resultsSha256": "f3047290d805df591aaddeed2de38623f67be3d3179b402d6f6f9bb840ce49a6",
+  "matrixSha256": "e8cb379a75a9fecd2afce86012abd89e81c79fbd26040a830788f9378983a068",
+  "causes": [
+    "AR-001-O1: record evidence not verified: independent-acceptance unverified (MISSING-INDEPENDENT-REVIEW independent-review: no qualifying approving independent review of this candidate)"
+  ]
+}

@@ -1,0 +1,9 @@
+# cmd: dotnet fsi /home/user/Indy-init/tools/r9/r9.fsx -- gate --mode development --scope AR-001 --obligations $WORK/work/typed-unknown.json --root $WORK/work/repo --results $WORK/work/results/pass/results.json --dokimos $SCRATCH/whome/.local/bin/dokimos --out $WORK/work/gate/unknown
+# cwd: $WORK/work/repo
+  REFUSED praxis:independent-review: its suite SU-REVIEW-RECORDS (runner Some(manual-checklist)) gives it no evidence type in the plan
+  REFUSED AR-001-O1 has no bound identity of a known evidence type in the plan; its type is never inferred
+gate: REFUSED (2 cause(s))
+
+# exit: 4
+# expected: 4 containing 'gives it no evidence type'
+# result: PASS

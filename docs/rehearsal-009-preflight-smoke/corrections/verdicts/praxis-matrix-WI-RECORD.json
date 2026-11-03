@@ -1,0 +1,102 @@
+{
+  "schema": "praxis.verification-matrix/1",
+  "workItem": "WI-RECORD",
+  "rows": [
+    {
+      "dimension": "happy-path",
+      "evidence": [
+        {
+          "kind": "command",
+          "reference": "requirements-compiler verify-process --candidate e635f62df94fed8a45051ca841d13191d9656b8b (plan 1e3c66bcc958a60415811ffbe2795b5e7147360340749c16e1a0f43fc19c751d, rules sha256 0ece640ee83dfa30651083514b6eadf0f8ee1e473cb9f477f68e802ffa19caf4): VERIFIED for 1 record obligation(s)",
+          "result": "verified"
+        },
+        {
+          "kind": "location",
+          "reference": "$WORK/work/repo/.echelon/verification/WI-RECORD/process-assessment.json",
+          "result": "recorded"
+        }
+      ],
+      "status": "met"
+    },
+    {
+      "dimension": "negative",
+      "evidence": [
+        {
+          "kind": "command",
+          "reference": "requirements-compiler verify-process --candidate e635f62df94fed8a45051ca841d13191d9656b8b (plan 1e3c66bcc958a60415811ffbe2795b5e7147360340749c16e1a0f43fc19c751d, rules sha256 0ece640ee83dfa30651083514b6eadf0f8ee1e473cb9f477f68e802ffa19caf4): VERIFIED for 1 record obligation(s)",
+          "result": "verified"
+        },
+        {
+          "kind": "location",
+          "reference": "$WORK/work/repo/.echelon/verification/WI-RECORD/process-assessment.json",
+          "result": "recorded"
+        }
+      ],
+      "status": "met"
+    },
+    {
+      "dimension": "corruption",
+      "evidence": [
+        {
+          "kind": "command",
+          "reference": "requirements-compiler verify-process --candidate e635f62df94fed8a45051ca841d13191d9656b8b (plan 1e3c66bcc958a60415811ffbe2795b5e7147360340749c16e1a0f43fc19c751d, rules sha256 0ece640ee83dfa30651083514b6eadf0f8ee1e473cb9f477f68e802ffa19caf4): VERIFIED for 1 record obligation(s)",
+          "result": "verified"
+        },
+        {
+          "kind": "location",
+          "reference": "$WORK/work/repo/.echelon/verification/WI-RECORD/process-assessment.json",
+          "result": "recorded"
+        }
+      ],
+      "status": "met"
+    },
+    {
+      "dimension": "compatibility",
+      "evidence": [
+        {
+          "kind": "command",
+          "reference": "requirements-compiler verify-process --candidate e635f62df94fed8a45051ca841d13191d9656b8b (plan 1e3c66bcc958a60415811ffbe2795b5e7147360340749c16e1a0f43fc19c751d, rules sha256 0ece640ee83dfa30651083514b6eadf0f8ee1e473cb9f477f68e802ffa19caf4): VERIFIED for 1 record obligation(s)",
+          "result": "verified"
+        },
+        {
+          "kind": "location",
+          "reference": "$WORK/work/repo/.echelon/verification/WI-RECORD/process-assessment.json",
+          "result": "recorded"
+        }
+      ],
+      "status": "met"
+    },
+    {
+      "dimension": "recovery",
+      "evidence": [
+        {
+          "kind": "command",
+          "reference": "requirements-compiler verify-process --candidate e635f62df94fed8a45051ca841d13191d9656b8b (plan 1e3c66bcc958a60415811ffbe2795b5e7147360340749c16e1a0f43fc19c751d, rules sha256 0ece640ee83dfa30651083514b6eadf0f8ee1e473cb9f477f68e802ffa19caf4): VERIFIED for 1 record obligation(s)",
+          "result": "verified"
+        },
+        {
+          "kind": "location",
+          "reference": "$WORK/work/repo/.echelon/verification/WI-RECORD/process-assessment.json",
+          "result": "recorded"
+        }
+      ],
+      "status": "met"
+    },
+    {
+      "dimension": "concurrency",
+      "evidence": [
+        {
+          "kind": "command",
+          "reference": "requirements-compiler verify-process --candidate e635f62df94fed8a45051ca841d13191d9656b8b (plan 1e3c66bcc958a60415811ffbe2795b5e7147360340749c16e1a0f43fc19c751d, rules sha256 0ece640ee83dfa30651083514b6eadf0f8ee1e473cb9f477f68e802ffa19caf4): VERIFIED for 1 record obligation(s)",
+          "result": "verified"
+        },
+        {
+          "kind": "location",
+          "reference": "$WORK/work/repo/.echelon/verification/WI-RECORD/process-assessment.json",
+          "result": "recorded"
+        }
+      ],
+      "status": "met"
+    }
+  ]
+}

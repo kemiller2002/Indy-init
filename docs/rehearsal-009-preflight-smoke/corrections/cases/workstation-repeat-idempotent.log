@@ -1,5 +1,7 @@
 # cmd: dotnet fsi /home/user/Indy-init/tools/r9/r9.fsx -- workstation --lock /home/user/Indy-init/kickoff/rehearsal-009/toolchain.lock.json --conditor $SCRATCH/cbin/conditor --home $WORK/work/home
 # cwd: $WORK/work
+  installation: VERIFIED (pinned set, digests, tool identities)
+  registration: UNAVAILABLE (6 of 6 components not registered: no Project Administration integration; accepted limitation for Rehearsal 009, not a registration)
   resolved set https://raw.githubusercontent.com/kemiller2002/echelon-registry/ae03cff61daf7a3211eac0e5dc383fc194a87793/channels/echelon-current/linux-x64.json sha256 bc0f95150a2abc1850340bfddc3b94814820aa1ed0ed10687ecd029ec9398aab = lock
   plan sha256:d39022c4a04e945042cefb02d69ce4d7f04c6f424c4fe5435fd7cc8dc826dfd3
   target id indy-init-r9-workstation

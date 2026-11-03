@@ -1,0 +1,2601 @@
+{
+  "schema": "indy-init.process-evidence-assessment/1",
+  "plan": {
+    "planId": "VP-1e3c66bcc958",
+    "digest": "1e3c66bcc958a60415811ffbe2795b5e7147360340749c16e1a0f43fc19c751d"
+  },
+  "candidate": "e635f62df94fed8a45051ca841d13191d9656b8b",
+  "rules": {
+    "sha256": "0ece640ee83dfa30651083514b6eadf0f8ee1e473cb9f477f68e802ffa19caf4"
+  },
+  "attestationRun": "9000000001",
+  "verdict": "VERIFIED",
+  "problems": [],
+  "summary": {
+    "records": 13,
+    "qualifyingRecords": 13,
+    "recordsByClass": {
+      "agent-assertion": 4,
+      "owner-decision": 3,
+      "reviewer-finding": 1,
+      "tool-observed": 5
+    },
+    "obligations": 119,
+    "categoryChecks": 133,
+    "verified": 133,
+    "unverified": 0
+  },
+  "records": [
+    {
+      "eventId": "e2ac2f520f031cfe42af4137",
+      "kind": "execution-start",
+      "workItem": "WI-0001",
+      "claimedClass": "tool-observed",
+      "class": "tool-observed",
+      "actor": "example/implementing-agent",
+      "qualifies": true,
+      "diagnostics": []
+    },
+    {
+      "eventId": "8ffa547e7beae5ffebe0a20d",
+      "kind": "assignment",
+      "workItem": "WI-0001",
+      "claimedClass": "agent-assertion",
+      "class": "agent-assertion",
+      "actor": "example/implementing-agent",
+      "qualifies": true,
+      "diagnostics": []
+    },
+    {
+      "eventId": "253d1df3bdf148946177400f",
+      "kind": "dependency-decision",
+      "workItem": "WI-0001",
+      "claimedClass": "agent-assertion",
+      "class": "agent-assertion",
+      "actor": "example/implementing-agent",
+      "qualifies": true,
+      "diagnostics": []
+    },
+    {
+      "eventId": "8e2f8b9c85eabb9f342b39a6",
+      "kind": "checkpoint",
+      "workItem": "WI-0001",
+      "claimedClass": "tool-observed",
+      "class": "tool-observed",
+      "actor": "example/implementing-agent",
+      "qualifies": true,
+      "diagnostics": []
+    },
+    {
+      "eventId": "8878ffae25dff450280c0e8c",
+      "kind": "scope-change",
+      "workItem": "WI-0001",
+      "claimedClass": "agent-assertion",
+      "class": "agent-assertion",
+      "actor": "example/implementing-agent",
+      "qualifies": true,
+      "diagnostics": []
+    },
+    {
+      "eventId": "cfea32e4cb5d01cae63d4235",
+      "kind": "owner-approval",
+      "workItem": "WI-0001",
+      "claimedClass": "owner-decision",
+      "class": "owner-decision",
+      "actor": "kemiller2002",
+      "qualifies": true,
+      "diagnostics": []
+    },
+    {
+      "eventId": "15295de0979bbc2a869d265f",
+      "kind": "owner-approval",
+      "workItem": "WI-0001",
+      "claimedClass": "owner-decision",
+      "class": "owner-decision",
+      "actor": "kemiller2002",
+      "qualifies": true,
+      "diagnostics": []
+    },
+    {
+      "eventId": "2ed11227e87f91abdc321c7b",
+      "kind": "release-selection",
+      "workItem": "WI-0001",
+      "claimedClass": "agent-assertion",
+      "class": "agent-assertion",
+      "actor": "example/implementing-agent",
+      "qualifies": true,
+      "diagnostics": []
+    },
+    {
+      "eventId": "dae86ce25ce69eebc92b8d0f",
+      "kind": "test-result",
+      "workItem": "WI-0001",
+      "claimedClass": "tool-observed",
+      "class": "tool-observed",
+      "actor": "github/github-actions",
+      "qualifies": true,
+      "diagnostics": []
+    },
+    {
+      "eventId": "0d933561f03c07e8f8906804",
+      "kind": "acceptance-reference",
+      "workItem": "WI-0001",
+      "claimedClass": "tool-observed",
+      "class": "tool-observed",
+      "actor": "github/github-actions",
+      "qualifies": true,
+      "diagnostics": []
+    },
+    {
+      "eventId": "f488ae1f8740d55a06648600",
+      "kind": "execution-start",
+      "workItem": "WI-0002",
+      "claimedClass": "tool-observed",
+      "class": "tool-observed",
+      "actor": "example/review-agent",
+      "qualifies": true,
+      "diagnostics": []
+    },
+    {
+      "eventId": "cab5c704b5f2b6fd083af407",
+      "kind": "independent-review",
+      "workItem": "WI-0002",
+      "claimedClass": "reviewer-finding",
+      "class": "reviewer-finding",
+      "actor": "example/review-agent",
+      "qualifies": true,
+      "diagnostics": []
+    },
+    {
+      "eventId": "2b7a6c2e822e4f3cc5fe860d",
+      "kind": "final-disposition",
+      "workItem": "WI-0001",
+      "claimedClass": "owner-decision",
+      "class": "owner-decision",
+      "actor": "kemiller2002",
+      "qualifies": true,
+      "diagnostics": []
+    }
+  ],
+  "obligations": [
+    {
+      "requirement": "AR-001",
+      "obligation": "AR-001-O1",
+      "obligationId": "VPO-a5795f29e0de763c",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "AR-001",
+      "obligation": "AR-001-O2",
+      "obligationId": "VPO-e30db6532f5cf262",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "AR-002",
+      "obligation": "AR-002-O1",
+      "obligationId": "VPO-b5f193731c58028b",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "AR-002",
+      "obligation": "AR-002-O2",
+      "obligationId": "VPO-413ff7efb9ab1eaf",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "AR-003",
+      "obligation": "AR-003-O1",
+      "obligationId": "VPO-9b0ea135ac4e6776",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "AR-003",
+      "obligation": "AR-003-O2",
+      "obligationId": "VPO-74e10fdbcee13f97",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "AR-004",
+      "obligation": "AR-004-O1",
+      "obligationId": "VPO-60d3de8d19b647a8",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "AR-004",
+      "obligation": "AR-004-O2",
+      "obligationId": "VPO-95819a9f20306ce1",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "AR-005",
+      "obligation": "AR-005-O1",
+      "obligationId": "VPO-a5e276239baf88ad",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        },
+        {
+          "category": "process-record",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:dependency-decision"
+          ],
+          "records": [
+            "253d1df3bdf148946177400f"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "AR-005",
+      "obligation": "AR-005-O2",
+      "obligationId": "VPO-59214484c4423a46",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        },
+        {
+          "category": "process-record",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:dependency-decision"
+          ],
+          "records": [
+            "253d1df3bdf148946177400f"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "AR-006",
+      "obligation": "AR-006-O1",
+      "obligationId": "VPO-6886a2a6e612f704",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "AR-006",
+      "obligation": "AR-006-O2",
+      "obligationId": "VPO-199103f9166730e7",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "AR-007",
+      "obligation": "AR-007-O1",
+      "obligationId": "VPO-42705f754abba51b",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "AR-007",
+      "obligation": "AR-007-O2",
+      "obligationId": "VPO-8d0817ad76ab9956",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "AR-008",
+      "obligation": "AR-008-O1",
+      "obligationId": "VPO-94507c8e92862459",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "AR-008",
+      "obligation": "AR-008-O2",
+      "obligationId": "VPO-7593c929d716d3bf",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        },
+        {
+          "category": "owner-decision",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:owner-approval"
+          ],
+          "records": [
+            "cfea32e4cb5d01cae63d4235",
+            "15295de0979bbc2a869d265f"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "AR-009",
+      "obligation": "AR-009-O1",
+      "obligationId": "VPO-821ce84e76d497b9",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "AR-009",
+      "obligation": "AR-009-O2",
+      "obligationId": "VPO-787e24f3c23195e9",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "AR-010",
+      "obligation": "AR-010-O1",
+      "obligationId": "VPO-2f4beacb25bb0586",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "AR-010",
+      "obligation": "AR-010-O2",
+      "obligationId": "VPO-fbcff0eece408886",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "AR-011",
+      "obligation": "AR-011-O1",
+      "obligationId": "VPO-79a72fb717368c95",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "AR-011",
+      "obligation": "AR-011-O2",
+      "obligationId": "VPO-dbd2edcdfa078b0e",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "AR-012",
+      "obligation": "AR-012-O1",
+      "obligationId": "VPO-a59db6f04d98cd0d",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        },
+        {
+          "category": "process-record",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:assignment"
+          ],
+          "records": [
+            "8ffa547e7beae5ffebe0a20d"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "AR-012",
+      "obligation": "AR-012-O2",
+      "obligationId": "VPO-33b57a9348c4707d",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        },
+        {
+          "category": "process-record",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:scope-change"
+          ],
+          "records": [
+            "8878ffae25dff450280c0e8c"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "AR-013",
+      "obligation": "AR-013-O1",
+      "obligationId": "VPO-c83b17e570429db6",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "AR-013",
+      "obligation": "AR-013-O2",
+      "obligationId": "VPO-98deffeeff197c5d",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "AR-014",
+      "obligation": "AR-014-O1",
+      "obligationId": "VPO-770de2a43b888b53",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "AR-014",
+      "obligation": "AR-014-O2",
+      "obligationId": "VPO-c41f10e4ed8a086b",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "AR-015",
+      "obligation": "AR-015-O1",
+      "obligationId": "VPO-b54c8db02f0fb4b3",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        },
+        {
+          "category": "process-record",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:checkpoint"
+          ],
+          "records": [
+            "8e2f8b9c85eabb9f342b39a6"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "AR-017",
+      "obligation": "AR-017-O1",
+      "obligationId": "VPO-4f48b0b01fd918ea",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        },
+        {
+          "category": "process-record",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:execution-start"
+          ],
+          "records": [
+            "e2ac2f520f031cfe42af4137",
+            "f488ae1f8740d55a06648600"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "AR-017",
+      "obligation": "AR-017-O2",
+      "obligationId": "VPO-30ecf50560947199",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        },
+        {
+          "category": "process-record",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:execution-start"
+          ],
+          "records": [
+            "e2ac2f520f031cfe42af4137",
+            "f488ae1f8740d55a06648600"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "AR-018",
+      "obligation": "AR-018-O1",
+      "obligationId": "VPO-9827ff5a95a7c74f",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "AR-018",
+      "obligation": "AR-018-O2",
+      "obligationId": "VPO-b65e916f00fd843a",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "AR-019",
+      "obligation": "AR-019-O1",
+      "obligationId": "VPO-6f2f2edbfc6b5c65",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "AR-019",
+      "obligation": "AR-019-O2",
+      "obligationId": "VPO-a96869ed8f00e776",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "AR-019",
+      "obligation": "AR-019-O3",
+      "obligationId": "VPO-4a40040c5484b444",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "AR-019",
+      "obligation": "AR-019-O4",
+      "obligationId": "VPO-a191144b5315b64a",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "AR-020",
+      "obligation": "AR-020-O1",
+      "obligationId": "VPO-da69ee0106c21847",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "AR-020",
+      "obligation": "AR-020-O2",
+      "obligationId": "VPO-5e9adab59b7498ad",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "AR-020",
+      "obligation": "AR-020-O3",
+      "obligationId": "VPO-e6cb4bb12bf3f901",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "AR-021",
+      "obligation": "AR-021-O1",
+      "obligationId": "VPO-1382da3cee447700",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        },
+        {
+          "category": "process-record",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:checkpoint"
+          ],
+          "records": [
+            "8e2f8b9c85eabb9f342b39a6"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "AR-021",
+      "obligation": "AR-021-O2",
+      "obligationId": "VPO-d84c2e19e3161c81",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        },
+        {
+          "category": "process-record",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:checkpoint"
+          ],
+          "records": [
+            "8e2f8b9c85eabb9f342b39a6"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "AR-021",
+      "obligation": "AR-021-O3",
+      "obligationId": "VPO-936a73d2f53c22ad",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        },
+        {
+          "category": "process-record",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "AR-022",
+      "obligation": "AR-022-O1",
+      "obligationId": "VPO-7f06980ae32e712b",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "AR-022",
+      "obligation": "AR-022-O2",
+      "obligationId": "VPO-a71f7df7b092e654",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "AR-022",
+      "obligation": "AR-022-O3",
+      "obligationId": "VPO-7b54ff75e3784cae",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "AR-023",
+      "obligation": "AR-023-O1",
+      "obligationId": "VPO-d1885e94421cf8a4",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "AR-023",
+      "obligation": "AR-023-O2",
+      "obligationId": "VPO-9145c1f2ed57ebca",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "AR-023",
+      "obligation": "AR-023-O3",
+      "obligationId": "VPO-e6f25a1308c520c6",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "AR-023",
+      "obligation": "AR-023-O4",
+      "obligationId": "VPO-7478642aec32b7da",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "AR-024",
+      "obligation": "AR-024-O1",
+      "obligationId": "VPO-2825c9554af4f069",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        },
+        {
+          "category": "owner-decision",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:owner-approval"
+          ],
+          "records": [
+            "cfea32e4cb5d01cae63d4235",
+            "15295de0979bbc2a869d265f"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "AR-024",
+      "obligation": "AR-024-O2",
+      "obligationId": "VPO-5feb800a1da326b9",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        },
+        {
+          "category": "owner-decision",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:owner-approval"
+          ],
+          "records": [
+            "cfea32e4cb5d01cae63d4235",
+            "15295de0979bbc2a869d265f"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "AR-027",
+      "obligation": "AR-027-O1",
+      "obligationId": "VPO-91db8b09f2b03b7e",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "AR-027",
+      "obligation": "AR-027-O2",
+      "obligationId": "VPO-81a24891ac58ed9d",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "AR-027",
+      "obligation": "AR-027-O3",
+      "obligationId": "VPO-0dcccbf2a1cc3dba",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "AR-027",
+      "obligation": "AR-027-O4",
+      "obligationId": "VPO-2141efcb097df34c",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "AR-027",
+      "obligation": "AR-027-O5",
+      "obligationId": "VPO-42b84e664a985ae3",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "AR-027",
+      "obligation": "AR-027-O6",
+      "obligationId": "VPO-5196556cc54f29ef",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "AR-028",
+      "obligation": "AR-028-O1",
+      "obligationId": "VPO-b3704656bb87e1a4",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "AR-028",
+      "obligation": "AR-028-O2",
+      "obligationId": "VPO-4465979af86f3141",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "AR-028",
+      "obligation": "AR-028-O3",
+      "obligationId": "VPO-c6f05f6dbae7caaf",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "AR-028",
+      "obligation": "AR-028-O4",
+      "obligationId": "VPO-0ae54e56b89d804f",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "AR-029",
+      "obligation": "AR-029-O1",
+      "obligationId": "VPO-861360435ff8e061",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "AR-029",
+      "obligation": "AR-029-O2",
+      "obligationId": "VPO-b182970a49d28d93",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "AR-029",
+      "obligation": "AR-029-O3",
+      "obligationId": "VPO-0d60d5d4ee94281c",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "AR-030",
+      "obligation": "AR-030-O1",
+      "obligationId": "VPO-14853f97a67beb5b",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "AR-030",
+      "obligation": "AR-030-O2",
+      "obligationId": "VPO-3bdccf6a9a8bda55",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "AR-030",
+      "obligation": "AR-030-O3",
+      "obligationId": "VPO-c537c7018add91ca",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "AR-031",
+      "obligation": "AR-031-O1",
+      "obligationId": "VPO-a31155364ab462a0",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "AR-031",
+      "obligation": "AR-031-O2",
+      "obligationId": "VPO-396a341780885794",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "AR-031",
+      "obligation": "AR-031-O3",
+      "obligationId": "VPO-fa640eb746dbca67",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "AR-034",
+      "obligation": "AR-034-O1",
+      "obligationId": "VPO-c15bed3aab9a181f",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "AR-034",
+      "obligation": "AR-034-O2",
+      "obligationId": "VPO-3ec7817310feacec",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "AR-034",
+      "obligation": "AR-034-O3",
+      "obligationId": "VPO-2fda7cee2a59b88f",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "AR-034",
+      "obligation": "AR-034-O4",
+      "obligationId": "VPO-d2af3e484f639adc",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "AR-034",
+      "obligation": "AR-034-O5",
+      "obligationId": "VPO-c100a3515f2b4475",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "AR-035",
+      "obligation": "AR-035-O1",
+      "obligationId": "VPO-a07fbb184c3650d4",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "AR-035",
+      "obligation": "AR-035-O2",
+      "obligationId": "VPO-1976f3b115db3588",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "AR-035",
+      "obligation": "AR-035-O3",
+      "obligationId": "VPO-bb663299626c71d3",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "AR-035",
+      "obligation": "AR-035-O4",
+      "obligationId": "VPO-c13f10f45535c2a6",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "AR-035",
+      "obligation": "AR-035-O5",
+      "obligationId": "VPO-b8d6cf54efa73310",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "EXT-DATA-009",
+      "obligation": "EXT-DATA-009-O1",
+      "obligationId": "VPO-05eeddad528e2cd4",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "EXT-DATA-009",
+      "obligation": "EXT-DATA-009-O2",
+      "obligationId": "VPO-b50ee1d4e3e78f25",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "PERSIST-026",
+      "obligation": "PERSIST-026-O1",
+      "obligationId": "VPO-62a431f10c048bab",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "PERSIST-026",
+      "obligation": "PERSIST-026-O2",
+      "obligationId": "VPO-988149b5a02ad26d",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "PERSIST-026",
+      "obligation": "PERSIST-026-O3",
+      "obligationId": "VPO-a9d0dcdb06c68006",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "PERSIST-026",
+      "obligation": "PERSIST-026-O4",
+      "obligationId": "VPO-a7e5cb7c98a874c1",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "PERSIST-026",
+      "obligation": "PERSIST-026-O5",
+      "obligationId": "VPO-598ecc619de4c064",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "PERSIST-052",
+      "obligation": "PERSIST-052-O1",
+      "obligationId": "VPO-c47f11c44348a050",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "PERSIST-052",
+      "obligation": "PERSIST-052-O2",
+      "obligationId": "VPO-59227ec1f2366e74",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "PERSIST-052",
+      "obligation": "PERSIST-052-O3",
+      "obligationId": "VPO-56433859278a1ec4",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "PERSIST-052",
+      "obligation": "PERSIST-052-O4",
+      "obligationId": "VPO-e200a8437a540c81",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "PERSIST-052",
+      "obligation": "PERSIST-052-O5",
+      "obligationId": "VPO-75973b09a3478dff",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "PERSIST-055",
+      "obligation": "PERSIST-055-O1",
+      "obligationId": "VPO-1b058f0376528e5e",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "PERSIST-055",
+      "obligation": "PERSIST-055-O2",
+      "obligationId": "VPO-d9adc6ad17bf0f26",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "PERSIST-055",
+      "obligation": "PERSIST-055-O3",
+      "obligationId": "VPO-f8b915f1b25156b0",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "PERSIST-055",
+      "obligation": "PERSIST-055-O4",
+      "obligationId": "VPO-d974462e9edcfb81",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "PF-019",
+      "obligation": "PF-019-O1",
+      "obligationId": "VPO-7833f2bbb6af960d",
+      "categories": [
+        {
+          "category": "process-record",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:test-result"
+          ],
+          "records": [
+            "dae86ce25ce69eebc92b8d0f"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "PF-020",
+      "obligation": "PF-020-O1",
+      "obligationId": "VPO-fe04733e99e5e461",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "PF-020",
+      "obligation": "PF-020-O2",
+      "obligationId": "VPO-b58ad46c59853677",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "UI-015",
+      "obligation": "UI-015-O1",
+      "obligationId": "VPO-59c5cc78868b7d74",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "UI-015",
+      "obligation": "UI-015-O2",
+      "obligationId": "VPO-a43abb50cba9ecc3",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "UI-015",
+      "obligation": "UI-015-O3",
+      "obligationId": "VPO-5c8d5917d17f8960",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "UI-015",
+      "obligation": "UI-015-O4",
+      "obligationId": "VPO-fd43b3e4e7e02f59",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "UI-021",
+      "obligation": "UI-021-O3",
+      "obligationId": "VPO-57c0df8ba4399c17",
+      "categories": [
+        {
+          "category": "process-record",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:execution-start"
+          ],
+          "records": [
+            "e2ac2f520f031cfe42af4137",
+            "f488ae1f8740d55a06648600"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "UI-030",
+      "obligation": "UI-030-O3",
+      "obligationId": "VPO-0a1011b7c5476354",
+      "categories": [
+        {
+          "category": "process-record",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:acceptance-reference",
+            "praxis:release-selection"
+          ],
+          "records": [
+            "0d933561f03c07e8f8906804",
+            "2ed11227e87f91abdc321c7b"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "UI-040",
+      "obligation": "UI-040-O1",
+      "obligationId": "VPO-8a5de7e5afae98cb",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "UI-040",
+      "obligation": "UI-040-O2",
+      "obligationId": "VPO-45c306b736593248",
+      "categories": [
+        {
+          "category": "independent-acceptance",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:independent-review"
+          ],
+          "records": [
+            "cab5c704b5f2b6fd083af407"
+          ],
+          "diagnostics": []
+        },
+        {
+          "category": "process-record",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:execution-start"
+          ],
+          "records": [
+            "e2ac2f520f031cfe42af4137",
+            "f488ae1f8740d55a06648600"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "VER-001",
+      "obligation": "VER-001-O1",
+      "obligationId": "VPO-f8c818739fb10bb9",
+      "categories": [
+        {
+          "category": "process-record",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:dependency-decision"
+          ],
+          "records": [
+            "253d1df3bdf148946177400f"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "VER-001",
+      "obligation": "VER-001-O2",
+      "obligationId": "VPO-6ae60e9f7196e16c",
+      "categories": [
+        {
+          "category": "process-record",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:dependency-decision"
+          ],
+          "records": [
+            "253d1df3bdf148946177400f"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "VER-001",
+      "obligation": "VER-001-O3",
+      "obligationId": "VPO-e6647e8155448d52",
+      "categories": [
+        {
+          "category": "process-record",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:dependency-decision"
+          ],
+          "records": [
+            "253d1df3bdf148946177400f"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "VER-002",
+      "obligation": "VER-002-O1",
+      "obligationId": "VPO-5281c2e8b5927722",
+      "categories": [
+        {
+          "category": "process-record",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:dependency-decision"
+          ],
+          "records": [
+            "253d1df3bdf148946177400f"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "VER-002",
+      "obligation": "VER-002-O2",
+      "obligationId": "VPO-924f0b36b70bfd0e",
+      "categories": [
+        {
+          "category": "process-record",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:dependency-decision"
+          ],
+          "records": [
+            "253d1df3bdf148946177400f"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "VER-002",
+      "obligation": "VER-002-O3",
+      "obligationId": "VPO-d4566deb24f7e80b",
+      "categories": [
+        {
+          "category": "process-record",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:dependency-decision"
+          ],
+          "records": [
+            "253d1df3bdf148946177400f"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "VER-003",
+      "obligation": "VER-003-O1",
+      "obligationId": "VPO-d7cf349736bfc48f",
+      "categories": [
+        {
+          "category": "process-record",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:dependency-decision"
+          ],
+          "records": [
+            "253d1df3bdf148946177400f"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "VER-003",
+      "obligation": "VER-003-O2",
+      "obligationId": "VPO-b06105a4b3121295",
+      "categories": [
+        {
+          "category": "process-record",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:dependency-decision"
+          ],
+          "records": [
+            "253d1df3bdf148946177400f"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "VER-004",
+      "obligation": "VER-004-O3",
+      "obligationId": "VPO-e362dff6239f51ed",
+      "categories": [
+        {
+          "category": "process-record",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:dependency-decision"
+          ],
+          "records": [
+            "253d1df3bdf148946177400f"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "VER-010",
+      "obligation": "VER-010-O1",
+      "obligationId": "VPO-6f0348e05133ebd2",
+      "categories": [
+        {
+          "category": "process-record",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:acceptance-reference"
+          ],
+          "records": [
+            "0d933561f03c07e8f8906804"
+          ],
+          "diagnostics": []
+        }
+      ]
+    },
+    {
+      "requirement": "VER-010",
+      "obligation": "VER-010-O2",
+      "obligationId": "VPO-1d26080e6f69aad4",
+      "categories": [
+        {
+          "category": "process-record",
+          "status": "verified",
+          "class": "verified-acceptance",
+          "bindings": [
+            "praxis:execution-start"
+          ],
+          "records": [
+            "e2ac2f520f031cfe42af4137",
+            "f488ae1f8740d55a06648600"
+          ],
+          "diagnostics": []
+        }
+      ]
+    }
+  ]
+}

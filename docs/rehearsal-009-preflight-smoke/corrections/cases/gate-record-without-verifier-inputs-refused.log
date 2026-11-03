@@ -1,0 +1,11 @@
+# cmd: dotnet fsi /home/user/Indy-init/tools/r9/r9.fsx -- gate --mode development --scope AR-001 --work-item WI-REC-NOINPUTS --obligations $WORK/work/typed-compiled.json --root $WORK/work/repo --results $WORK/work/results/pass/results.json --dokimos $SCRATCH/whome/.local/bin/dokimos --out $WORK/work/gate/rec-noinputs
+# cwd: $WORK/work/repo
+  candidate e635f62df94fed8a45051ca841d13191d9656b8b (development, scope AR-001)
+  executable: 0/0 verified by Dokimos; record: 0/1 verified by verify-process; mixed: 0; 0 deferred to the independent verifier
+  verdict $WORK/work/gate/rec-noinputs/gate.json
+  REFUSED AR-001-O1: record evidence not verified: record evidence is required but the pinned record-verifier inputs are missing: --rc, --process-plan, --process-plan-digest, --process-rules, --process-rules-sha256, --process-attestations, --process-trusted-run-id
+gate: REFUSED (1 cause(s))
+
+# exit: 4
+# expected: 4 containing 'record-verifier inputs are missing'
+# result: PASS

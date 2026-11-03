@@ -1,5 +1,8 @@
-# cmd: dotnet fsi /home/user/Indy-init/tools/r9/r9.fsx -- gate --mode release --obligations $WORK/work/compiled.json --root $WORK/work/repo --results $WORK/work/results/later/gone.json --dokimos $SCRATCH/whome/.local/bin/dokimos --out $WORK/work/gate/gone --expect-candidate 2aea9226f15766068de82d58a4c21ac35d1797e6
+# cmd: dotnet fsi /home/user/Indy-init/tools/r9/r9.fsx -- gate --mode release --obligations $WORK/work/compiled.json --root $WORK/work/repo --results $WORK/work/results/later/gone.json --dokimos $SCRATCH/whome/.local/bin/dokimos --out $WORK/work/gate/gone --expect-candidate 58bfb4851285b6a1f561fea6df45781b040a61f3
 # cwd: $WORK/work/repo
+  candidate 58bfb4851285b6a1f561fea6df45781b040a61f3 (release, whole plan)
+  executable: 0/1 verified by Dokimos; record: 0/0 verified by verify-process; mixed: 0; 0 deferred to the independent verifier
+  verdict $WORK/work/gate/gone/gate.json
   REFUSED run SU-SMOKE-UNIT: result file SU-SMOKE-UNIT/absent.trx does not exist
   REFUSED dokimos verification coverage produced no report (exit 3): {
   "Contract": "dokimos.diagnostic",

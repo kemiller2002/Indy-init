@@ -1,0 +1,28 @@
+{
+  "schema": "indy-init.r9-gate-verdict/2",
+  "verdict": "REFUSED",
+  "mode": "development",
+  "candidate": "e635f62df94fed8a45051ca841d13191d9656b8b",
+  "planId": "VP-R9-TYPED",
+  "scope": [
+    "SMK-002"
+  ],
+  "workItem": "WI-EXEC-MISSING",
+  "obligations": 1,
+  "executable": 1,
+  "executableVerified": 0,
+  "record": 0,
+  "recordJudged": true,
+  "recordVerified": 0,
+  "mixed": 0,
+  "deferredToIndependentVerifier": [],
+  "dokimosExit": 4,
+  "frozenPlanSha256": "9d7ec41ecf8c860dc4d7d8856b7fe033c1421cdb14e0090bb2603bc71c6b5bf5",
+  "coverageSha256": "8dcee8ae501788b1580081c1691ee8b1a783610f7c0f3764a7a079a5a50a0a00",
+  "processAssessmentSha256": "",
+  "resultsSha256": "f3047290d805df591aaddeed2de38623f67be3d3179b402d6f6f9bb840ce49a6",
+  "matrixSha256": "2c26a033ba1929d4f8c142646b007314275cafdaf5b97d3f4cd23565df9edfd7",
+  "causes": [
+    "SMK-002-O1 (SMK-002) is not-generated: dotnet:Smoke.Tests.SMK002Tests.SMK-002-O1: not generated"
+  ]
+}

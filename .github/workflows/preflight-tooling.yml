@@ -224,6 +224,8 @@ jobs:
           dotnet fsi tools/r9/r9.fsx -- install-conditor --lock kickoff/rehearsal-009/toolchain.lock.json --dir "$RUNNER_TEMP/conditor"
           dotnet fsi tools/r9/r9.fsx -- workstation --lock kickoff/rehearsal-009/toolchain.lock.json \
             --conditor "$RUNNER_TEMP/conditor/conditor" --home "$RUNNER_TEMP/echelon" --target-id "indy-init-ci-${{ github.run_id }}"
+      - name: Build the requirements compiler (verify-process judges record evidence)
+        run: dotnet build tools/requirements-compiler/src -c Release
       - name: Readiness gates, positive and negative cases
         run: |
           git config --global user.name ci && git config --global user.email ci@example.invalid
