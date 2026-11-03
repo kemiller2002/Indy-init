@@ -62,9 +62,10 @@ let installed = Path.Combine(cdir, "conditor")
 let identity = if File.Exists installed then Text.Encoding.UTF8.GetString(File.ReadAllBytes installed) else ""
 // The installed binary must carry exactly the lock's version and source commit, and not the release it replaced.
 let lockConditor = (JsonNode.Parse(File.ReadAllText lock)).["conditor"]
-let pinnedIdentity = $"""{lockConditor.["version"].GetValue<string>()}+{lockConditor.["commit"].GetValue<string>()}"""
+let pinnedVersion = lockConditor.["version"].GetValue<string>()
+let pinnedIdentity = pinnedVersion + "+" + lockConditor.["commit"].GetValue<string>()
 let pinnedLinuxSha = lockConditor.["artifacts"].["linux-x64"].["sha256"].GetValue<string>()
-let identityCase = $"conditor-identity-{lockConditor.["version"].GetValue<string>()}-not-0.10.19"
+let identityCase = "conditor-identity-" + pinnedVersion + "-not-0.10.19"
 cases <- (identityCase, identity.Contains pinnedIdentity && not (identity.Contains "0.10.19+")) :: cases
 printfn "%-44s %s" identityCase (if fst cases.Head = identityCase && snd cases.Head then "PASS" else "FAIL  <<<")
 let tampered = Path.Combine(work, "tampered.lock.json")
