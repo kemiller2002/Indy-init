@@ -1,12 +1,11 @@
-# Causa investigation content: proposed catalog additions
+# Causa investigation content: catalog additions INV-019 to INV-037
 
-[`requirements/catalogs/causa-investigation-content.proposed.requirement-catalog.json`](../../requirements/catalogs/causa-investigation-content.proposed.requirement-catalog.json)
-(`CAT-CAUSA-INVESTIGATION-CONTENT`, schema `praxis.requirement-catalog/1`).
+Entries INV-019 to INV-037 of [`requirements/catalogs/causa-investigation.requirement-catalog.json`](../../requirements/catalogs/causa-investigation.requirement-catalog.json) (`CAT-CAUSA-INVESTIGATION`, schema `praxis.requirement-catalog/1`).
 
-**Status: proposed.** An agent wrote it under the owner's decisions OD-INDY-19..21 (`docs/OWNER-DECISIONS-2026-11-03.md`). It is not ratified.
-- It adds INV-019 to INV-037 to the ratified catalog `CAT-CAUSA-INVESTIGATION` (INV-001 to INV-018), continuing its numbering. It changes no ratified entry.
-- **To ratify,** the owner merges the entries into `requirements/catalogs/causa-investigation.requirement-catalog.json`, in the owner's own commit. The file is then retired.
-- A catalog `status` is catalog-wide, so the additions cannot sit `proposed` inside the ratified file.
+**Status: ratified when the owner merges the pull request that adds these entries to `requirements/catalogs/causa-investigation.requirement-catalog.json`** (OD-INDY-19..21, `docs/OWNER-DECISIONS-2026-11-03.md`).
+- INV-019 to INV-037 continue the ratified catalog `CAT-CAUSA-INVESTIGATION` (INV-001 to INV-018). No earlier entry changes.
+- The separate proposed file is removed in that same pull request.
+- An agent prepared the entries. The owner's merge is the ratification; no agent merges it.
 
 ## The ten content gaps (OD-INDY-20) and the catalog's open questions (OD-INDY-21)
 

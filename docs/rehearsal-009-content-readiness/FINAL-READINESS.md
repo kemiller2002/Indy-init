@@ -29,7 +29,7 @@
 | Gate workflow: runs `dokimos verification probe` on `.echelon/fault-probes.json` at the candidate, and always passes `--require-fault-sensitive content-round-trip` | `tools/r9/verification-gate.yml` |
 | Three new harness cases (76 in total) | `tools/r9/tests.fsx` |
 | Owner decisions OD-INDY-19..22 recorded (decided by the owner; written by an agent) | `docs/OWNER-DECISIONS-2026-11-03.md` |
-| Proposed catalog additions INV-019 … INV-037 and their reconciliation | `requirements/catalogs/causa-investigation-content.proposed.requirement-catalog.json`, `docs/requirement-catalogs/CAUSA-INVESTIGATION-CONTENT.md` |
+| Catalog additions INV-019 … INV-037 and their reconciliation (ratified by the owner's merge of the ratification pull request) | `requirements/catalogs/causa-investigation.requirement-catalog.json`, `docs/requirement-catalogs/CAUSA-INVESTIGATION-CONTENT.md` |
 | Catalog build guidance corrected: no copying from Rehearsal 8 (OD-INDY-22); the catalog tools are unreleased | `docs/requirement-catalogs/CAUSA-INVESTIGATION.md` |
 
 **Nothing else was touched:**
@@ -66,7 +66,7 @@
 
 | # | Action | Who | How |
 |---|---|---|---|
-| 1 | Ratify the content requirements INV-019 … INV-037 (OD-INDY-19..21) | owner | Merge the entries of `requirements/catalogs/causa-investigation-content.proposed.requirement-catalog.json` into `requirements/catalogs/causa-investigation.requirement-catalog.json` in your own commit, then delete the proposed file. Also correct the ratified catalog's `description`, which still says "not ratified". |
+| 1 | Ratify the content requirements INV-019 … INV-037 (OD-INDY-19..21) | owner | Merge the ratification pull request. It adds the entries to `requirements/catalogs/causa-investigation.requirement-catalog.json`, corrects its `description`, and removes the proposed file. It compiles with exit 0, 37 requirements and 239 obligations, and `--previous` drops nothing. |
 | 2 | Decide how Rehearsal 9 gets the catalog tools | owner decision | Option A: release Praxis (with `requirements manifest`) and Dokimos (with `verification requirements`), register them in a new echelon-current set, and move `kickoff/rehearsal-009/toolchain.lock.json` to it. Option B: Rehearsal 9 runs without catalog verification, so INV-* is guidance only and not enforced. Option C: decide otherwise. Recommended: A. An agent can prepare the releases through each repository's release process, but it does not publish them without your go-ahead. |
 | 3 | Pin the Rehearsal 9 process-evidence rules | owner | Set `processEvidence.rulesSha256` in the toolchain lock (`docs/rehearsal-009-preflight-smoke/FINAL-CORRECTIONS.md`, §Owner action). |
 
