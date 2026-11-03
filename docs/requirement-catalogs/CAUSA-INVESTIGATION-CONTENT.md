@@ -1,12 +1,11 @@
-# Causa investigation content: proposed catalog additions
+# Causa investigation content: catalog additions INV-019 … INV-038
 
-[`requirements/catalogs/causa-investigation-content.proposed.requirement-catalog.json`](../../requirements/catalogs/causa-investigation-content.proposed.requirement-catalog.json)
-(`CAT-CAUSA-INVESTIGATION-CONTENT`, schema `praxis.requirement-catalog/1`).
+Ratified into [`requirements/catalogs/causa-investigation.requirement-catalog.json`](../../requirements/catalogs/causa-investigation.requirement-catalog.json)
+(`CAT-CAUSA-INVESTIGATION`, schema `praxis.requirement-catalog/1`). They were drafted as `CAT-CAUSA-INVESTIGATION-CONTENT`.
 
-**Status: proposed.** An agent wrote it under the owner's decisions OD-INDY-19..21 (`docs/OWNER-DECISIONS-2026-11-03.md`). It is not ratified.
-- It adds INV-019 to INV-037 to the ratified catalog `CAT-CAUSA-INVESTIGATION` (INV-001 to INV-018), continuing its numbering. It changes no ratified entry.
-- **To ratify,** the owner merges the entries into `requirements/catalogs/causa-investigation.requirement-catalog.json`, in the owner's own commit. The file is then retired.
-- A catalog `status` is catalog-wide, so the additions cannot sit `proposed` inside the ratified file.
+**Status: ratified** by the owner on 2026-11-03 (commit `7cefdc6`, Indy-init#98). An agent drafted it under the owner's decisions OD-INDY-19..21 and OD-INDY-23 (`docs/OWNER-DECISIONS-2026-11-03.md`).
+- It added INV-019 to INV-038 to `CAT-CAUSA-INVESTIGATION` (INV-001 to INV-018), continuing its numbering, and changed no earlier entry.
+- The entries now live in `requirements/catalogs/causa-investigation.requirement-catalog.json`. The proposed file they were drafted in was retired at ratification.
 
 ## The ten content gaps (OD-INDY-20) and the catalog's open questions (OD-INDY-21)
 

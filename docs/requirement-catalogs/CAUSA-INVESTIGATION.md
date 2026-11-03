@@ -8,15 +8,13 @@ Dokimos verifies Causa against. See kemiller2002/praxis
 `docs/requirement-verification-manifest.md` and kemiller2002/dokimos
 `docs/requirement-verification.md`.
 
-**Status: ratified** by the owner (commit `0ab8ffd`, which set the catalog's
-`status` to `ratified`). The catalog's `description` still carries the earlier
-sentence "Proposed by an agent; not ratified": only the owner edits the
-catalog, so the description is left for the owner to correct. An agent wrote
-the catalog. It is not a frozen package. It adds no obligation the cited sources do not state. Each
-requirement names its authoritative sources (`sources`). Ratifying it, or
-changing a requirement, goes through the owner's requirements governance
-process (OD-INDY-15, RDP-003), never through an agent's edit made to turn a
-build green.
+**Status: ratified** by the owner: INV-001 to INV-018 in commit `0ab8ffd`, and
+INV-019 to INV-038 (the content additions, OD-INDY-19..23) in commit `7cefdc6`
+(Indy-init#98), which also corrected the catalog's `description`. An agent
+drafted the catalog. It is not a frozen package. Each requirement names its
+authoritative sources (`sources`). Changing a requirement goes through the
+owner's requirements governance process (OD-INDY-15, RDP-003), never through
+an agent's edit made to turn a build green.
 
 ## Reconciliation with the authoritative requirements
 
@@ -41,23 +39,17 @@ build green.
 | INV-017 | Reopening restores the saved investigation | workflow-outcome | R10.7; PERSIST-021 |
 | INV-018 | Investigation state | ui-control | S02; R2.2 |
 
-## Open questions for the owner
+## Open questions for the owner (answered)
 
-These are deliberately **not** in the catalog. No authoritative requirement
-states them, and the agent contract forbids inventing them.
-
-1. **Is a problem statement required to start an investigation?** S01 lists
-   the field. R1.1 says a user "must be able to begin" with one. Neither says
-   an empty statement must be refused. INV-001 therefore has no `minLength`.
-2. **Length limits** for the problem statement and the title. None are
-   stated, so the catalog defines no `maxLength`.
-3. **A Cancel action** on investigation start ("exit without unintended
-   changes"). No authoritative requirement defines one, so none is in the
-   catalog.
-4. **Hypothesis editing and evidence association** (R2.3, R3.3, S04, S06). The
-   catalog covers the entry fields (INV-011, INV-012). The relationship
-   controls (support, contradiction, discrimination, insufficiency) need their
-   own requirements once their presentation is decided.
+The four questions this section used to list are answered, and the answers are
+ratified requirements:
+1. **A problem statement is required** and must not be empty (OD-INDY-21): INV-019.
+2. **Length limits:** a title is at most 200 characters (INV-020); each free-text
+   content field is at most 10,000 characters (INV-021 and the content fields).
+3. **Cancel:** investigation start and every content editor have a Cancel action
+   that writes nothing (INV-022, INV-036).
+4. **Hypothesis–evidence relationships** (OD-INDY-23): INV-030, INV-031 (kinds
+   supports, contradicts, consistent-with, inconclusive) and INV-038 (rationale).
 
 ## What verification found in Causa (indy-init-rehearsal-008)
 
@@ -84,18 +76,14 @@ this catalog, the frozen packages and the released Echelon tools. An earlier
 version of this section said to copy Rehearsal 8's probes, mutation tool and
 workflow. That conflicts with the contest rules and is withdrawn.
 
-**Tool releases: not yet available.** The pipeline needs
-`praxis requirements manifest` and `dokimos verification requirements`. Both
-are merged on `main` (kemiller2002/praxis #301, kemiller2002/dokimos #65) but
-**not released**. The Rehearsal 9 toolchain pins Praxis 3.24.0 and Dokimos
-0.10.0 (echelon-current 1.35.0; kickoff/rehearsal-009/toolchain.lock.json),
-and neither carries these commands. Until both are released, registered in a
-new echelon-current set and pinned in the lock, a rehearsal cannot compile or
-verify this catalog with the approved toolchain. That is an owner decision
-(docs/rehearsal-009-content-readiness/FINAL-READINESS.md).
+**Tool releases: available and pinned.** The pipeline needs
+`praxis requirements manifest` and `dokimos verification requirements`. They
+are in the released Praxis 3.25.0 and Dokimos 0.11.0, which echelon-current
+1.36.0 selects (approved by the owner, echelon-registry#108). Conditor 0.10.20
+qualifies that set (conditor#130), and `kickoff/rehearsal-009/toolchain.lock.json`
+pins both (Indy-init#96).
 
-Once the tools are released and pinned, the application built at kickoff
-adopts the pipeline as follows:
+The application built at kickoff adopts the pipeline as follows:
 
 1. Put `data-requirement-id="INV-0nn"` on the element of each implemented
    requirement, and list the files in
@@ -112,5 +100,5 @@ adopts the pipeline as follows:
 4. Implement v4.1.2's command and event bodies (ODR-V412-02), so that the
    problem statement, title, creation time and every content field are saved.
 
-The proposed content additions (INV-019 to INV-037, OD-INDY-19..21) are in
-[CAUSA-INVESTIGATION-CONTENT.md](CAUSA-INVESTIGATION-CONTENT.md).
+The content additions (INV-019 to INV-038, OD-INDY-19..23), now ratified, are
+described in [CAUSA-INVESTIGATION-CONTENT.md](CAUSA-INVESTIGATION-CONTENT.md).

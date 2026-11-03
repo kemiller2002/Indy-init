@@ -1,11 +1,13 @@
 # Rehearsal 009 content readiness: final readiness
 
-**Verdict: BLOCKED** (updated 2026-11-03, after the owner's decisions OD-INDY-19..22).
-- Content is now specified, as proposed catalog additions INV-019 … INV-038. Merged with the ratified catalog, they compile with exit 0 under Praxis's catalog compiler.
-- Three things remain outstanding:
-  1. **Ratification.** The owner must ratify the content additions.
-  2. **Tool releases.** The tools that compile and verify a requirement catalog (`praxis requirements manifest`, `dokimos verification requirements`) are merged on `main` but **not released**. The Rehearsal 9 toolchain pins Praxis 3.24.0 and Dokimos 0.10.0, which lack them. So the approved toolchain cannot enforce the catalog.
-  3. **Process-evidence rules.** The Rehearsal 9 process-evidence rules are not pinned.
+**Verdict: READY WITH RISKS** (updated 2026-11-03, after the owner's three actions).
+- **Ratified.** CAT-CAUSA-INVESTIGATION now holds INV-001 … INV-038, ratified by the owner (`7cefdc6`, Indy-init#98, made with `tools/owner-r9-ratify.fsx`). The proposed file is retired. Released Praxis 3.25.0 compiles it with exit 0: 38 requirements, 250 obligations (202 mandatory).
+- **Tools released and pinned.** `kickoff/rehearsal-009/toolchain.lock.json` pins:
+  - Conditor 0.10.20 (`v0.10.20`, `a4c53cee`; conditor#130);
+  - echelon-current 1.36.0, approved by the owner (echelon-registry#108, `de72a406`), which selects Praxis 3.25.0 (`praxis requirements manifest`) and Dokimos 0.11.0 (`dokimos verification requirements`).
+  The readiness gates pass on that lock: 76 cases, 0 failed (Indy-init#96).
+- **Rules pinned.** `processEvidence.rulesSha256` is `b8adffc4…d115`, the owner's pin of `kickoff/rehearsal-009/process-evidence-rules.json` (`a76cf6c`). The record gate no longer fails closed.
+- The remaining risks are listed in §Is Rehearsal 009 ready?
 - Rehearsal 009 was not launched.
 
 **Superseded.** The earlier route, a v4.1.3 package with ODR-V413-01..03, is superseded by OD-INDY-19 and withdrawn. Its analysis is kept below and in AMENDMENT-DECISION.md.
@@ -61,29 +63,37 @@
 | 13 | The proposed catalog compiles once merged | `praxis requirements manifest compile` on ratified + proposed, and again with `--previous` the ratified manifest (`evidence/praxis-catalog-compile-*.log`) | Praxis main `ddfcbbe`, built from source for validation only (unreleased) | 0 / 0 | 37 requirements, 239 obligations; nothing dropped. After OD-INDY-23 (INV-038, amended INV-030/031): 38 requirements, 250 obligations, exit 0, nothing dropped (re-run 2026-11-03) |
 | 14 | Catalog sources resolve | every non-owner-decision `sources[].requirement` of INV-019 … INV-038 checked against the baseline's requirement IDs | baseline v4 | 0 | all resolve |
 | 12 | Repository CI | the pull request that delivers this file | | | recorded on the pull request |
+| 15 | The ratified catalog compiles with the released compiler | `praxis requirements manifest compile --catalog requirements/catalogs/causa-investigation.requirement-catalog.json --source-commit ad0493c…` | Praxis 3.25.0 (released, linux-x64) | 0 | 38 requirements, 250 obligations, 202 mandatory (V1 70, V2 56, V3 38, V4 42, V5 44) |
+| 16 | Readiness gates on the new lock | `r9.fsx install-conditor`, `r9.fsx workstation`, `tests.fsx` (Indy-init#96 CI and a local run) | Conditor 0.10.20, echelon-current 1.36.0 | 0 | 76 cases, 0 failed; every receipt matched |
 
-## Unresolved owner actions
+## Owner actions (all resolved)
 
 | # | Action | Who | How |
 |---|---|---|---|
-| 1 | Ratify the content requirements INV-019 … INV-038 (OD-INDY-19..21, OD-INDY-23) | owner | Merge the entries of `requirements/catalogs/causa-investigation-content.proposed.requirement-catalog.json` into `requirements/catalogs/causa-investigation.requirement-catalog.json` in your own commit, then delete the proposed file. Also correct the ratified catalog's `description`, which still says "not ratified". `tools/owner-r9-ratify.fsx` does this (with item 3) and checks the result first. |
-| 2 | Decide how Rehearsal 9 gets the catalog tools | owner decision | Option A: release Praxis (with `requirements manifest`) and Dokimos (with `verification requirements`), register them in a new echelon-current set, and move `kickoff/rehearsal-009/toolchain.lock.json` to it. Option B: Rehearsal 9 runs without catalog verification, so INV-* is guidance only and not enforced. Option C: decide otherwise. Recommended: A. An agent can prepare the releases through each repository's release process, but it does not publish them without your go-ahead. **In progress (Option A):** Praxis 3.25.0 and Dokimos 0.11.0 are released; echelon-registry#108 cuts echelon-current 1.36.0 (proposed); conditor#130 qualifies it and, once merged, releases Conditor 0.10.20, which REG-RU-007 needs; the owner then approves 1.36.0 and the lock moves to it. |
-| 3 | Pin the Rehearsal 9 process-evidence rules | owner | Set `processEvidence.rulesSha256` in the toolchain lock (`docs/rehearsal-009-preflight-smoke/FINAL-CORRECTIONS.md`, §Owner action). `tools/owner-r9-ratify.fsx` does this and shows the rules for review first. |
+| 1 | Ratify the content requirements INV-019 … INV-038 (OD-INDY-19..21, OD-INDY-23) | owner | Merge the entries of `requirements/catalogs/causa-investigation-content.proposed.requirement-catalog.json` into `requirements/catalogs/causa-investigation.requirement-catalog.json` in your own commit, then delete the proposed file. Also correct the ratified catalog's `description`, which still says "not ratified". `tools/owner-r9-ratify.fsx` does this (with item 3) and checks the result first. **Done** 2026-11-03: `7cefdc6` (Indy-init#98). |
+| 2 | Decide how Rehearsal 9 gets the catalog tools | owner decision | Option A: release Praxis (with `requirements manifest`) and Dokimos (with `verification requirements`), register them in a new echelon-current set, and move `kickoff/rehearsal-009/toolchain.lock.json` to it. Option B: Rehearsal 9 runs without catalog verification, so INV-* is guidance only and not enforced. Option C: decide otherwise. Recommended: A. An agent can prepare the releases through each repository's release process, but it does not publish them without your go-ahead. **In progress (Option A):** Praxis 3.25.0 and Dokimos 0.11.0 are released; echelon-registry#108 cuts echelon-current 1.36.0 (proposed); conditor#130 qualifies it and, once merged, releases Conditor 0.10.20, which REG-RU-007 needs; the owner then approves 1.36.0 and the lock moves to it. **Done** 2026-11-03, Option A: Praxis 3.25.0 and Dokimos 0.11.0 released; echelon-current 1.36.0 approved (echelon-registry#108); Conditor 0.10.20 qualifies it (conditor#130); the lock moved (Indy-init#96). |
+| 3 | Pin the Rehearsal 9 process-evidence rules | owner | Set `processEvidence.rulesSha256` in the toolchain lock (`docs/rehearsal-009-preflight-smoke/FINAL-CORRECTIONS.md`, §Owner action). `tools/owner-r9-ratify.fsx` does this and shows the rules for review first. **Done** 2026-11-03: `a76cf6c` (Indy-init#98). |
 
 **Withdrawn:** ODR-V413-01..03 (superseded by OD-INDY-19).
 
 ## Is Rehearsal 009 ready?
 
-**No, it is BLOCKED** on the three actions above. After them:
-- the catalog is ratified;
-- the released Praxis and Dokimos are pinned;
-- the record rules are pinned.
+**Yes, with risks.** The catalog is ratified, the released Praxis and Dokimos are pinned, and the record rules are pinned. Each INV requirement is compiled into obligations and verified against the running application with the released Dokimos. The INVESTIGATION-CONTENT-E2E scenario is INV-037's live round trip.
 
-Each INV requirement is then compiled into obligations and verified against the running application, with the mutations the released Dokimos runs. The INVESTIGATION-CONTENT-E2E scenario is INV-037's live round trip.
+Every rehearsal starts from the requirements alone (OD-INDY-22). The probes, mutations and verification workflow that apply the catalog are written inside the timed window from the released tools' documentation (docs/requirement-catalogs/CAUSA-INVESTIGATION.md).
+
+Remaining risks, none of which blocks the start:
+- **Registration is UNAVAILABLE** (owner decision 1, FINAL-CORRECTIONS §6). Installation is verified; the inventory records nothing.
+- **The record-gate path has not run against a live competition repository** (FINAL-CORRECTIONS §Remaining limitations). Its logic is proven with a recorded Praxis log.
+- **The T0 sequence was not run end to end here.** `conditor init --preset indy-init` needs authenticated GitHub fetches this sandbox lacks.
+- **Live suites at release need their provider secrets.** Without them, their obligations are refused; they never pass.
+- **Two `verifier:*` obligations** (PERSIST-052-O3, PERSIST-026-O2) complete only at acceptance.
+- **The pinned rules file's own description still reads "PROPOSED … drafted by an agent".** The owner pinned the file as it stands; its content (owner, agents, reviewer roster, repository, decisions) is what the record gate uses. Editing it now would change its hash and need a new pin.
+- **One `fsharp-tooling` run on Indy-init#94 failed 145 WebKit touch-target cases and passed on re-run** with unchanged, pinned inputs. Its cause is unknown.
 
 ## Acceptance scenarios that must pass during the seven-hour run
 
-These apply once INV-019 … INV-038 are ratified and the catalog tools are released and pinned. Each must pass at the release candidate through `Verification gate` in `mode=release`:
+INV-019 … INV-038 are ratified and the catalog tools are released and pinned. Each must pass at the release candidate through `Verification gate` in `mode=release`:
 1. **INVESTIGATION-CONTENT-E2E**, live, in SU-CONTENT-LIVE: INV-037, with INV-001/002/023–035 and INV-038 entered and reloaded. Each must be fault-sensitive (P-CONTENT-WIRE, -PROJECTION, -VIEW and -RELATION detected).
 2. **INVESTIGATION-CONTENT-NEGATIVE** (the `validation`/`rejects` obligations of INV-019–021 and INV-023–033, and the failure states):
    - missing name, empty observation, empty hypothesis;
