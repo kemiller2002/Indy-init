@@ -1,0 +1,135 @@
+# cmd: $SCRATCH/whome/.local/bin/dokimos verification compile --obligations $WORK/work/typed-obligations.json --out $WORK/work/typed-compiled.json
+# cwd: $WORK/work
+{
+  "namespaceRoots": [
+    {
+      "directory": "tests/Smoke.Tests",
+      "namespace": "Smoke.Tests"
+    }
+  ],
+  "obligations": [
+    {
+      "categories": [
+        "unit"
+      ],
+      "criterion": "appending 3 then 4 yields 7.",
+      "dependencies": [],
+      "id": "SMK-001-O1",
+      "priority": "P0",
+      "requirement": "SMK-001"
+    },
+    {
+      "categories": [
+        "independent-acceptance"
+      ],
+      "criterion": "record-only: an independent review of the candidate.",
+      "dependencies": [],
+      "id": "AR-001-O1",
+      "priority": "P0",
+      "requirement": "AR-001"
+    },
+    {
+      "categories": [
+        "unit",
+        "independent-acceptance"
+      ],
+      "criterion": "mixed: a test and an independent review.",
+      "dependencies": [],
+      "id": "AR-002-O1",
+      "priority": "P0",
+      "requirement": "AR-002"
+    },
+    {
+      "categories": [
+        "unit"
+      ],
+      "criterion": "executable only; its test is not written.",
+      "dependencies": [],
+      "id": "SMK-002-O1",
+      "priority": "P0",
+      "requirement": "SMK-002"
+    }
+  ],
+  "planDigest": "",
+  "planId": "VP-R9-TYPED",
+  "schema": "dokimos.verification-obligations/1",
+  "suites": [
+    {
+      "command": "dotnet test tests/Smoke.Tests",
+      "dependsOn": [],
+      "environment": "",
+      "fixture": "none",
+      "id": "SU-SMOKE-UNIT",
+      "paths": [
+        "tests/Smoke.Tests"
+      ],
+      "requiredBoundary": [
+        "Ledger"
+      ],
+      "runner": "dotnet-test",
+      "testRoot": null
+    },
+    {
+      "command": "Praxis work evidence --kind independent-review / owner-approval",
+      "dependsOn": [],
+      "environment": "",
+      "fixture": "the run's Praxis event log",
+      "id": "SU-REVIEW-RECORDS",
+      "paths": [],
+      "requiredBoundary": [],
+      "runner": "evidence-record",
+      "testRoot": null
+    }
+  ],
+  "tests": [
+    {
+      "categories": [
+        "unit"
+      ],
+      "id": "dotnet:Smoke.Tests.SMK001Tests.SMK-001-O1",
+      "kind": "unit",
+      "obligations": [
+        "SMK-001-O1"
+      ],
+      "suite": "SU-SMOKE-UNIT"
+    },
+    {
+      "categories": [
+        "independent-acceptance"
+      ],
+      "id": "praxis:independent-review",
+      "kind": "review",
+      "obligations": [
+        "AR-001-O1",
+        "AR-002-O1"
+      ],
+      "suite": "SU-REVIEW-RECORDS"
+    },
+    {
+      "categories": [
+        "unit"
+      ],
+      "id": "dotnet:Smoke.Tests.SMK001Tests.AR-002-O1",
+      "kind": "unit",
+      "obligations": [
+        "AR-002-O1"
+      ],
+      "suite": "SU-SMOKE-UNIT"
+    },
+    {
+      "categories": [
+        "unit"
+      ],
+      "id": "dotnet:Smoke.Tests.SMK002Tests.SMK-002-O1",
+      "kind": "unit",
+      "obligations": [
+        "SMK-002-O1"
+      ],
+      "suite": "SU-SMOKE-UNIT"
+    }
+  ]
+}
+
+# exit: 0
+# expected: 0 containing 'AR-002-O1'
+# result: PASS

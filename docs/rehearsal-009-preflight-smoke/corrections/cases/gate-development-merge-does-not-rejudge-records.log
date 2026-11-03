@@ -1,0 +1,10 @@
+# cmd: dotnet fsi /home/user/Indy-init/tools/r9/r9.fsx -- gate --mode development --scope SMK-001,AR-001 --obligations $WORK/work/typed-compiled.json --root $WORK/work/repo --results $WORK/work/results/pass/results.json --dokimos $SCRATCH/whome/.local/bin/dokimos --out $WORK/work/gate/dev-merge --expect-candidate e635f62df94fed8a45051ca841d13191d9656b8b
+# cwd: $WORK/work/repo
+  candidate e635f62df94fed8a45051ca841d13191d9656b8b (development, scope SMK-001,AR-001)
+  executable: 1/1 verified by Dokimos; record: 0/1 verified by verify-process (not re-judged on a development merge: judged at completion and at release); mixed: 0; 0 deferred to the independent verifier
+  verdict $WORK/work/gate/dev-merge/gate.json
+gate: PASS
+
+# exit: 0
+# expected: 0 containing 'not re-judged on a development merge'
+# result: PASS

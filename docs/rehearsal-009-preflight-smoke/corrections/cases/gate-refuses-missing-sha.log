@@ -1,7 +1,10 @@
-# cmd: dotnet fsi /home/user/Indy-init/tools/r9/r9.fsx -- gate --mode release --obligations $WORK/work/compiled.json --root $WORK/work/repo --results $WORK/work/results/later/nosha.json --dokimos $SCRATCH/whome/.local/bin/dokimos --out $WORK/work/gate/nosha --expect-candidate 2aea9226f15766068de82d58a4c21ac35d1797e6
+# cmd: dotnet fsi /home/user/Indy-init/tools/r9/r9.fsx -- gate --mode release --obligations $WORK/work/compiled.json --root $WORK/work/repo --results $WORK/work/results/later/nosha.json --dokimos $SCRATCH/whome/.local/bin/dokimos --out $WORK/work/gate/nosha --expect-candidate 58bfb4851285b6a1f561fea6df45781b040a61f3
 # cwd: $WORK/work/repo
-  REFUSED the results manifest names candidate '', not HEAD 2aea9226f15766068de82d58a4c21ac35d1797e6
-  REFUSED run SU-SMOKE-UNIT was recorded at '', not HEAD 2aea9226f15766068de82d58a4c21ac35d1797e6 (stale evidence)
+  candidate 58bfb4851285b6a1f561fea6df45781b040a61f3 (release, whole plan)
+  executable: 0/1 verified by Dokimos; record: 0/0 verified by verify-process; mixed: 0; 0 deferred to the independent verifier
+  verdict $WORK/work/gate/nosha/gate.json
+  REFUSED the results manifest names candidate '', not HEAD 58bfb4851285b6a1f561fea6df45781b040a61f3
+  REFUSED run SU-SMOKE-UNIT was recorded at '', not HEAD 58bfb4851285b6a1f561fea6df45781b040a61f3 (stale evidence)
   REFUSED dokimos verification coverage produced no report (exit 3): {
   "Contract": "dokimos.diagnostic",
   "SchemaVersion": "1.0.0",

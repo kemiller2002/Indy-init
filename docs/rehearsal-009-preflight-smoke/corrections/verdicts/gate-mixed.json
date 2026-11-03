@@ -1,0 +1,26 @@
+{
+  "schema": "indy-init.r9-gate-verdict/2",
+  "verdict": "PASS",
+  "mode": "development",
+  "candidate": "878365147f90efd3811beb69bfc44bb5c3064777",
+  "planId": "VP-R9-TYPED",
+  "scope": [
+    "AR-002"
+  ],
+  "workItem": "WI-MIXED",
+  "obligations": 1,
+  "executable": 1,
+  "executableVerified": 1,
+  "record": 1,
+  "recordJudged": true,
+  "recordVerified": 1,
+  "mixed": 1,
+  "deferredToIndependentVerifier": [],
+  "dokimosExit": 0,
+  "frozenPlanSha256": "9d7ec41ecf8c860dc4d7d8856b7fe033c1421cdb14e0090bb2603bc71c6b5bf5",
+  "coverageSha256": "aa988481f89b374587d60f5622f35fdcbecfd5191e16b114e7692220f5b92323",
+  "processAssessmentSha256": "23e527c3f611b56e5cdcbf71cb12619785de37f345ffa1de43cf17374dd9ec3c",
+  "resultsSha256": "13c2dd04b2c488add5a1bd2929086eb795a70b0a4f597eb0b95397a7ea7eb279",
+  "matrixSha256": "98306577967da0abd7037727549d49a6b9a1f64d8e20ffac7e3547db5c26ceec",
+  "causes": []
+}

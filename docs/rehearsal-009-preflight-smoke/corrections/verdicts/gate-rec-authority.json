@@ -1,0 +1,28 @@
+{
+  "schema": "indy-init.r9-gate-verdict/2",
+  "verdict": "REFUSED",
+  "mode": "development",
+  "candidate": "e635f62df94fed8a45051ca841d13191d9656b8b",
+  "planId": "VP-R9-TYPED",
+  "scope": [
+    "AR-001"
+  ],
+  "workItem": "WI-REC-AUTHORITY",
+  "obligations": 1,
+  "executable": 0,
+  "executableVerified": 0,
+  "record": 1,
+  "recordJudged": true,
+  "recordVerified": 0,
+  "mixed": 0,
+  "deferredToIndependentVerifier": [],
+  "dokimosExit": 0,
+  "frozenPlanSha256": "9d7ec41ecf8c860dc4d7d8856b7fe033c1421cdb14e0090bb2603bc71c6b5bf5",
+  "coverageSha256": "",
+  "processAssessmentSha256": "2c6ef2a809f811d54e2162b13cd683f70b818aa60c37e08acae174c2a4828da6",
+  "resultsSha256": "f3047290d805df591aaddeed2de38623f67be3d3179b402d6f6f9bb840ce49a6",
+  "matrixSha256": "6d05e9cfbe0fca4629a8f9f8a12a101cd633042be9f1230aa88a8ae785a04294",
+  "causes": [
+    "AR-001-O1: record evidence not verified: independent-acceptance unverified (MISSING-INDEPENDENT-REVIEW independent-review: no qualifying approving independent review of this candidate | INCORRECT-AGENT-IDENTITY independent-review cab5c704b5f2b6fd083af407: actor \u0027example/impostor-agent\u0027 is not an identity the frozen rules allow | SELF-ACCEPTANCE independent-review cab5c704b5f2b6fd083af407: \u0027example/impostor-agent\u0027 is not an independent reviewer of the frozen rules | SELF-ACCEPTANCE independent-review cab5c704b5f2b6fd083af407: the attesting review is by \u0027example-reviewer\u0027, not the frozen login of reviewer \u0027example/impostor-agent\u0027)"
+  ]
+}

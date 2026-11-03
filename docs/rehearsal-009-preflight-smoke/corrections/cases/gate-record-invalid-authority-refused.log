@@ -1,0 +1,11 @@
+# cmd: dotnet fsi /home/user/Indy-init/tools/r9/r9.fsx -- gate --mode development --scope AR-001 --work-item WI-REC-AUTHORITY --obligations $WORK/work/typed-compiled.json --root $WORK/work/repo --results $WORK/work/results/pass/results.json --dokimos $SCRATCH/whome/.local/bin/dokimos --out $WORK/work/gate/rec-authority --rc /home/user/Indy-init/tools/requirements-compiler/src/bin/Release/net10.0/requirements-compiler.dll --process-plan /home/user/Indy-init/requirements-compiled/v4/verification-plan.json --process-plan-digest 1e3c66bcc958a60415811ffbe2795b5e7147360340749c16e1a0f43fc19c751d --process-rules $WORK/work/process/authority/rules.json --process-rules-sha256 0ece640ee83dfa30651083514b6eadf0f8ee1e473cb9f477f68e802ffa19caf4 --process-attestations $WORK/work/process/authority/attestations.json --process-trusted-run-id 9000000001 --process-events $WORK/work/process/authority/events.jsonl --process-ancestry $WORK/work/process/authority/ancestry.txt --process-executions $WORK/work/process/authority/executions
+# cwd: $WORK/work/repo
+  candidate e635f62df94fed8a45051ca841d13191d9656b8b (development, scope AR-001)
+  executable: 0/0 verified by Dokimos; record: 0/1 verified by verify-process; mixed: 0; 0 deferred to the independent verifier
+  verdict $WORK/work/gate/rec-authority/gate.json
+  REFUSED AR-001-O1: record evidence not verified: independent-acceptance unverified (MISSING-INDEPENDENT-REVIEW independent-review: no qualifying approving independent review of this candidate | INCORRECT-AGENT-IDENTITY independent-review cab5c704b5f2b6fd083af407: actor 'example/impostor-agent' is not an identity the frozen rules allow | SELF-ACCEPTANCE independent-review cab5c704b5f2b6fd083af407: 'example/impostor-agent' is not an independent reviewer of the frozen rules | SELF-ACCEPTANCE independent-review cab5c704b5f2b6fd083af407: the attesting review is by 'example-reviewer', not the frozen login of reviewer 'example/impostor-agent')
+gate: REFUSED (1 cause(s))
+
+# exit: 4
+# expected: 4 containing 'independent-acceptance unverified'
+# result: PASS

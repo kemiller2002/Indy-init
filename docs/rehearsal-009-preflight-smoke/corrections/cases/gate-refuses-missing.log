@@ -1,7 +1,7 @@
-# cmd: dotnet fsi /home/user/Indy-init/tools/r9/r9.fsx -- gate --mode release --obligations $WORK/work/compiled.json --root $WORK/work/repo --results $WORK/work/results/missing/results.json --dokimos $SCRATCH/whome/.local/bin/dokimos --out $WORK/work/gate/missing --expect-candidate 7af290fbbc4be7388ebe02f0d207156fa3f1b531
+# cmd: dotnet fsi /home/user/Indy-init/tools/r9/r9.fsx -- gate --mode release --obligations $WORK/work/compiled.json --root $WORK/work/repo --results $WORK/work/results/missing/results.json --dokimos $SCRATCH/whome/.local/bin/dokimos --out $WORK/work/gate/missing --expect-candidate 311b414da63da0e15159c356d719c8bcd3d7bf7e
 # cwd: $WORK/work/repo
-  candidate 7af290fbbc4be7388ebe02f0d207156fa3f1b531 (release, whole plan)
-  0/1 obligations verified; 0 deferred to the acceptance verifier (record evidence only)
+  candidate 311b414da63da0e15159c356d719c8bcd3d7bf7e (release, whole plan)
+  executable: 0/1 verified by Dokimos; record: 0/0 verified by verify-process; mixed: 0; 0 deferred to the independent verifier
   verdict $WORK/work/gate/missing/gate.json
   REFUSED SMK-001-O1 (SMK-001) is not-generated: dotnet:Smoke.Tests.SMK001Tests.SMK-001-O1: not generated
 gate: REFUSED (1 cause(s))

@@ -1,0 +1,10 @@
+# cmd: dotnet fsi /home/user/Indy-init/tools/r9/r9.fsx -- gate --mode development --scope AR-002 --obligations $WORK/work/typed-compiled.json --root $WORK/work/repo --results $WORK/work/results/mixed/results.json --dokimos $SCRATCH/whome/.local/bin/dokimos --out $WORK/work/gate/mixed --work-item WI-MIXED --expect-candidate 878365147f90efd3811beb69bfc44bb5c3064777 --rc /home/user/Indy-init/tools/requirements-compiler/src/bin/Release/net10.0/requirements-compiler.dll --process-plan /home/user/Indy-init/requirements-compiled/v4/verification-plan.json --process-plan-digest 1e3c66bcc958a60415811ffbe2795b5e7147360340749c16e1a0f43fc19c751d --process-rules $WORK/work/process/mixed/rules.json --process-rules-sha256 0ece640ee83dfa30651083514b6eadf0f8ee1e473cb9f477f68e802ffa19caf4 --process-attestations $WORK/work/process/mixed/attestations.json --process-trusted-run-id 9000000001 --process-events $WORK/work/process/mixed/events.jsonl --process-ancestry $WORK/work/process/mixed/ancestry.txt --process-executions $WORK/work/process/mixed/executions
+# cwd: $WORK/work/repo
+  candidate 878365147f90efd3811beb69bfc44bb5c3064777 (development, scope AR-002)
+  executable: 1/1 verified by Dokimos; record: 1/1 verified by verify-process; mixed: 1; 0 deferred to the independent verifier
+  verdict $WORK/work/gate/mixed/gate.json
+gate: PASS
+
+# exit: 0
+# expected: 0 containing 'mixed: 1'
+# result: PASS

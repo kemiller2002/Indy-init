@@ -13,8 +13,8 @@
           "path": ".ros/installation.json"
         }
       ],
-      "updatedAt": "2026-11-03T08:40:47.430Z",
-      "completedAt": "2026-11-03T08:40:47.430Z"
+      "updatedAt": "2026-11-03T12:28:05.656Z",
+      "completedAt": "2026-11-03T12:28:05.656Z"
     },
     {
       "id": "WI-VALID",
@@ -37,7 +37,7 @@
       ],
       "updatedAt": "2026-11-03T12:00:00Z",
       "telemetryExecutionIds": [
-        "EXE-20261103T084329246Z-fa88c0c4"
+        "EXE-20261103T123200364Z-02a90360"
       ],
       "completedAt": "2026-11-03T12:00:00Z",
       "completionReadiness": {
@@ -127,7 +127,124 @@
           {
             "type": "verification-matrix",
             "path": ".echelon/verification/WI-VALID/praxis-matrix.json",
-            "sha256": "sha256:0069872276b2fcc9aac408cd7b73778415515bcf9a7729366f5006f4b6b52a21"
+            "sha256": "sha256:8a47debe40f40930c3a750e3adf787198e78ad6ddd17e647b306232a06845822"
+          }
+        ],
+        "blockingReasons": []
+      }
+    },
+    {
+      "id": "WI-RECORD",
+      "type": "task",
+      "state": "complete",
+      "semanticState": "complete",
+      "evidence": [
+        {
+          "type": "implementation",
+          "path": "src/Smoke/Ledger.fs"
+        },
+        {
+          "type": "tests",
+          "path": "tests/Smoke.Tests/SMK001Tests.fs"
+        },
+        {
+          "type": "verification-matrix",
+          "path": ".echelon/verification/WI-RECORD/praxis-matrix.json"
+        }
+      ],
+      "updatedAt": "2026-11-03T12:00:00Z",
+      "telemetryExecutionIds": [
+        "EXE-20261103T123212922Z-b59ee709"
+      ],
+      "completedAt": "2026-11-03T12:00:00Z",
+      "completionReadiness": {
+        "schema": "praxis.completion-readiness/1",
+        "workItem": "WI-RECORD",
+        "decision": "ready",
+        "policy": {
+          "dokimos": "off",
+          "ordoBoundary": "off",
+          "requiredFacets": [
+            "verification-matrix-satisfied"
+          ]
+        },
+        "facets": {
+          "implementationComplete": {
+            "required": false,
+            "status": "satisfied",
+            "evidence": [
+              "implementation=src/Smoke/Ledger.fs"
+            ],
+            "blocking": false
+          },
+          "behaviorVerified": {
+            "required": false,
+            "status": "satisfied",
+            "evidence": [
+              "tests=tests/Smoke.Tests/SMK001Tests.fs"
+            ],
+            "blocking": false
+          },
+          "architectureVerified": {
+            "required": false,
+            "status": "not-required",
+            "blocking": false
+          },
+          "releaseReady": {
+            "required": false,
+            "status": "not-required",
+            "blocking": false
+          },
+          "designDebtDeclared": {
+            "required": false,
+            "status": "not-required",
+            "blocking": false
+          },
+          "verificationMatrixSatisfied": {
+            "required": true,
+            "status": "satisfied",
+            "evidence": [
+              "verification matrix met: happy-path, negative, corruption, compatibility, recovery, concurrency"
+            ],
+            "blocking": false
+          },
+          "groupVerified": {
+            "required": false,
+            "status": "not-required",
+            "blocking": false
+          }
+        },
+        "sources": {
+          "dokimos": {
+            "evidenceType": "dokimos-ratchet",
+            "requirement": "off",
+            "judgement": "ignored"
+          },
+          "ordoBoundary": {
+            "evidenceType": "ordo-boundary",
+            "requirement": "off",
+            "judgement": "ignored"
+          },
+          "verificationMatrix": {
+            "evidenceType": "verification-matrix",
+            "requirement": "required",
+            "path": ".echelon/verification/WI-RECORD/praxis-matrix.json",
+            "observation": "parsed",
+            "judgement": "passed",
+            "evidence": [
+              "verification matrix met: happy-path, negative, corruption, compatibility, recovery, concurrency"
+            ]
+          }
+        },
+        "obligations": {
+          "designDebtDeclaration": false,
+          "verificationDimensions": []
+        },
+        "consumedEvidence": [
+          {
+            "type": "verification-matrix",
+            "path": ".echelon/verification/WI-RECORD/praxis-matrix.json",
+            "sha256": "sha256:53c1d11026a7c245d78a75983bddf9b8192a41e31b72260c1f84b5c441397a8a"
           }
         ],
         "blockingReasons": []
@@ -141,7 +258,7 @@
       "evidence": [],
       "updatedAt": "2026-11-03T12:00:00Z",
       "telemetryExecutionIds": [
-        "EXE-20261103T084335501Z-3b8fc5ff"
+        "EXE-20261103T123320480Z-0a6113a1"
       ]
     },
     {
@@ -152,7 +269,7 @@
       "evidence": [],
       "updatedAt": "2026-11-03T12:00:00Z",
       "telemetryExecutionIds": [
-        "EXE-20261103T084337364Z-7e0837af"
+        "EXE-20261103T123322587Z-e2eb1fa4"
       ]
     },
     {
@@ -163,7 +280,7 @@
       "evidence": [],
       "updatedAt": "2026-11-03T12:00:00Z",
       "telemetryExecutionIds": [
-        "EXE-20261103T084344177Z-5d76c2e9"
+        "EXE-20261103T123330269Z-8dc1cca6"
       ]
     },
     {
@@ -174,7 +291,7 @@
       "evidence": [],
       "updatedAt": "2026-11-03T12:00:00Z",
       "telemetryExecutionIds": [
-        "EXE-20261103T084346324Z-b8879168"
+        "EXE-20261103T123332338Z-91af0a32"
       ]
     },
     {
@@ -198,7 +315,7 @@
       ],
       "updatedAt": "2026-11-03T12:00:00Z",
       "telemetryExecutionIds": [
-        "EXE-20261103T084353478Z-4d0c4ac5"
+        "EXE-20261103T123339256Z-f52efcdb"
       ],
       "completedAt": "2026-11-03T12:00:00Z",
       "completionReadiness": {
@@ -288,7 +405,7 @@
           {
             "type": "verification-matrix",
             "path": ".echelon/verification/WI-FORGED/praxis-matrix.json",
-            "sha256": "sha256:105753e0bcb45017eea9a57fc3c7570643d71175798c45f15948c69dfa32c1b0"
+            "sha256": "sha256:59864528407348c2a3d5ad024af81a15b1e7d861fa03ec8d05e9c5da97c75279"
           }
         ],
         "blockingReasons": []
@@ -296,7 +413,7 @@
     }
   ],
   "events": [
-    "a1fdc9b525cf7ef4fb115d7d"
+    "cd11e6bcef741a7582256f6f"
   ]
 }
 # exit: 0

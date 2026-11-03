@@ -1,0 +1,28 @@
+{
+  "schema": "indy-init.r9-gate-verdict/2",
+  "verdict": "REFUSED",
+  "mode": "development",
+  "candidate": "e635f62df94fed8a45051ca841d13191d9656b8b",
+  "planId": "VP-R9-TYPED",
+  "scope": [
+    "AR-001"
+  ],
+  "workItem": "WI-REC-RULES",
+  "obligations": 1,
+  "executable": 0,
+  "executableVerified": 0,
+  "record": 1,
+  "recordJudged": true,
+  "recordVerified": 0,
+  "mixed": 0,
+  "deferredToIndependentVerifier": [],
+  "dokimosExit": 0,
+  "frozenPlanSha256": "9d7ec41ecf8c860dc4d7d8856b7fe033c1421cdb14e0090bb2603bc71c6b5bf5",
+  "coverageSha256": "",
+  "processAssessmentSha256": "46b42a0e40d846f9621ddf8edf18e6d8280046b1bf430101218c6d26c9b25bf0",
+  "resultsSha256": "f3047290d805df591aaddeed2de38623f67be3d3179b402d6f6f9bb840ce49a6",
+  "matrixSha256": "f7b75a6541bc9e25bc04b3b40eb44b6a996cf342abe30c9144aea3a157867936",
+  "causes": [
+    "AR-001-O1: record evidence not verified: the record verifier found the inputs INVALID: the process rules hash to 0ece640ee83dfa30651083514b6eadf0f8ee1e473cb9f477f68e802ffa19caf4, not the frozen 0000000000000000000000000000000000000000000000000000000000000000"
+  ]
+}

@@ -7,6 +7,10 @@
 //   dotnet fsi tools/r9/r9.fsx -- gate --obligations F --root REPO --results F --dokimos EXE --out DIR
 //        (--mode release | --mode development --scope-file F) [--expect-candidate SHA]
 //        [--work-item ID --scope REQ,...] [--matrix F]
+//        [--rc REQUIREMENTS-COMPILER.dll --process-plan F --process-plan-digest HEX --process-rules F --process-rules-sha256 HEX
+//         --process-attestations F --process-trusted-run-id ID [--process-events F --process-ancestry F [--process-executions DIR]]]
+//        Evidence type comes only from the plan's suite runner: executable obligations need Dokimos at HEAD, record
+//        obligations (praxis:*) need verify-process VERIFIED at HEAD, mixed ones need both; verifier:* is acceptance-only.
 //   dotnet fsi tools/r9/r9.fsx -- run-suites --obligations F --root REPO --out DIR [--suites ID,...]
 //   dotnet fsi tools/r9/r9.fsx -- spec-preflight --percepta EXE --out F (--indy-init SRC --lock LOCK |
 //        --machines F --invariants F --interfaces F --catalog F)
@@ -174,8 +178,15 @@ let workstation () =
                 @ (if opt "--require-registration" = Some "true" then registrationLines |> List.filter (fun l -> not (Regex.IsMatch(l, @"registration \S+: (recorded|replayed|unchanged|submitted)"))) |> List.map (fun l -> $"registration required but not recorded: {l.Trim()}") else [])
                 @ check (not registrationLines.IsEmpty) "the ledger records no registration attempt"
                 @ (tools |> List.collect (fun (t, v) -> check ((versionOf t).Contains v) $"{t} does not report {v}"))
+            // Owner decision (2026-11-03): for Rehearsal 009 registration UNAVAILABLE is accepted as a limitation. It
+            // is reported as such and never as a registration; installation, pins and tool identities stay mandatory.
+            let registered = registrationLines |> List.filter (fun l -> Regex.IsMatch(l, @"registration \S+: (recorded|replayed|unchanged|submitted)"))
+            let registrationVerdict =
+                if not registrationLines.IsEmpty && registered.Length = registrationLines.Length then "REGISTERED"
+                else $"UNAVAILABLE ({registrationLines.Length - registered.Length} of {registrationLines.Length} components not registered: no Project Administration integration; accepted limitation for Rehearsal 009, not a registration)"
             if causes.IsEmpty then
-                Pass ([ $"resolved set {url} sha256 {actual} = lock"; $"plan {digest.Groups[1].Value}"; $"target id {targetId}" ]
+                Pass ([ $"installation: VERIFIED (pinned set, digests, tool identities)"; $"registration: {registrationVerdict}"
+                        $"resolved set {url} sha256 {actual} = lock"; $"plan {digest.Groups[1].Value}"; $"target id {targetId}" ]
                       @ (registrationLines |> List.map (fun l -> l.Trim())) @ (tools |> List.map (fun (t, v) -> $"{t} {v} installed")) @ [ $"status: {status.Trim()}" ])
             else Refused causes
 
@@ -277,22 +288,71 @@ let checkGovernance () =
     let causes = policyCauses @ (items |> List.collect itemCauses) @ scopeCauses @ declarationCauses
     if causes.IsEmpty then Pass [ $"policy, workflow and governance record match Indy-init; {items.Length} completed item(s) checked" ] else Refused causes
 
-// ---- gate: Dokimos coverage at the trusted candidate, with the trust-boundary checks ------------------------------
+// ---- gate: obligation-type-aware verification at the trusted candidate ---------------------------------------------
 
-let executable (identity: string) = identity.StartsWith "dotnet:" || identity.StartsWith "playwright:"
+/// What kind of evidence an identity is, read only from the authoritative plan: the runner of the suite it is bound in.
+/// Never inferred from a missing test, an empty matrix or an agent's claim.
+type EvidenceType =
+    | Executable // dotnet-test / playwright suites: Dokimos judges them from execution results
+    | Record // evidence-record suites, praxis:<kind>: verify-process judges them from the Praxis log
+    | IndependentVerifier // evidence-record suite SU-VERIFIER, verifier:*: only the acceptance verifier judges them
 
-/// The frozen plan as Dokimos can verify it: record identities (praxis:*, verifier:*), which Dokimos reports as
-/// blocked for their producer and never judges, are removed, and obligations bound only to record evidence are listed
-/// as deferred to the acceptance verifier. Nothing else changes, so every executable identity is still required.
-let executableView (obligations: JsonNode) =
-    let view = obligations.DeepClone()
-    let tests = arr obligations "tests"
-    let deferredIdentities = tests |> List.filter (fun t -> not (executable (str t "id"))) |> List.map (fun t -> str t "id") |> List.distinct
-    let bound = tests |> List.filter (fun t -> executable (str t "id")) |> List.collect (fun t -> arr t "obligations" |> List.map (fun o -> o.GetValue<string>())) |> Set.ofList
-    let deferredObligations = arr obligations "obligations" |> List.map (fun o -> str o "id") |> List.filter (bound.Contains >> not)
-    view["tests"] <- JsonArray(tests |> List.filter (fun t -> executable (str t "id")) |> List.map (fun t -> t.DeepClone()) |> Array.ofList)
-    view["obligations"] <- JsonArray(arr obligations "obligations" |> List.filter (fun o -> bound.Contains(str o "id")) |> List.map (fun o -> o.DeepClone()) |> Array.ofList)
-    view, deferredObligations, deferredIdentities
+let classify (plan: JsonNode) =
+    let runners = arr plan "suites" |> List.map (fun s -> str s "id", str s "runner") |> Map.ofList
+    let typeOf (t: JsonNode) =
+        let id = str t "id"
+        match runners.TryFind(str t "suite") with
+        | Some "dotnet-test"
+        | Some "playwright" -> Ok Executable
+        | Some "evidence-record" when id.StartsWith "praxis:" -> Ok Record
+        | Some "evidence-record" when id.StartsWith "verifier:" -> Ok IndependentVerifier
+        | runner -> Error $"""{id}: its suite {str t "suite"} (runner {runner}) gives it no evidence type in the plan"""
+    let typed = arr plan "tests" |> List.map (fun t -> t, typeOf t)
+    let errors = typed |> List.choose (fun (_, r) -> match r with Error e -> Some e | Ok _ -> None)
+    let types =
+        typed
+        |> List.collect (fun (t, r) -> match r with Ok k -> arr t "obligations" |> List.map (fun o -> o.GetValue<string>(), k) | Error _ -> [])
+        |> List.groupBy fst |> List.map (fun (o, ks) -> o, ks |> List.map snd |> Set.ofList) |> Map.ofList
+    let typesOf (obligation: string) = types.TryFind obligation |> Option.defaultValue Set.empty
+    errors, typesOf, typed
+
+/// The frozen plan as Dokimos judges it: only executable identities, and only obligations that have one.
+let executableView (plan: JsonNode) typed (typesOf: string -> Set<EvidenceType>) =
+    let view = plan.DeepClone()
+    view["tests"] <- JsonArray(typed |> List.filter (fun (_, r) -> r = Ok Executable) |> List.map (fun (t: JsonNode, _) -> t.DeepClone()) |> Array.ofList)
+    view["obligations"] <- JsonArray(arr plan "obligations" |> List.filter (fun o -> (typesOf (str o "id")).Contains Executable) |> List.map (fun o -> o.DeepClone()) |> Array.ofList)
+    view
+
+let matrixRow (dimension: string) (met: bool) (evidence: JsonNode list) =
+    JsonObject(
+        [ Collections.Generic.KeyValuePair("dimension", JsonValue.Create dimension :> JsonNode)
+          Collections.Generic.KeyValuePair("evidence", JsonArray(evidence |> Array.ofList) :> JsonNode)
+          Collections.Generic.KeyValuePair("status", JsonValue.Create(if met then "met" else "not-met") :> JsonNode) ]) :> JsonNode
+let evidenceItem (kind: string) (reference: string) (result: string) =
+    JsonObject(
+        [ Collections.Generic.KeyValuePair("kind", JsonValue.Create kind :> JsonNode)
+          Collections.Generic.KeyValuePair("reference", JsonValue.Create reference :> JsonNode)
+          Collections.Generic.KeyValuePair("result", JsonValue.Create result :> JsonNode) ]) :> JsonNode
+
+/// Runs the authoritative record verifier (requirements-compiler verify-process) for HEAD with the pinned plan and
+/// rules; the candidate is never taken from the caller. Returns the assessment, or the reason there is none.
+let processAssessment (root: string) (head: string) (out: string) =
+    let needed = [ "--rc"; "--process-plan"; "--process-plan-digest"; "--process-rules"; "--process-rules-sha256"; "--process-attestations"; "--process-trusted-run-id" ]
+    match needed |> List.filter (opt >> Option.isNone) with
+    | missing when not missing.IsEmpty -> Error $"""record evidence is required but the pinned record-verifier inputs are missing: {String.Join(", ", missing)}"""
+    | _ ->
+        let path = Path.Combine(out, "process-assessment.json")
+        let source =
+            match opt "--process-events" with
+            | Some events -> [ "--events"; events; "--ancestry"; req "--process-ancestry" ] @ (opt "--process-executions" |> Option.map (fun e -> [ "--executions"; e ]) |> Option.defaultValue [])
+            | None -> [ "--repo"; root ]
+        let argv =
+            [ req "--rc"; "verify-process"; "--plan"; req "--process-plan"; "--plan-digest"; req "--process-plan-digest"; "--rules"; req "--process-rules"
+              "--rules-sha256"; req "--process-rules-sha256"; "--candidate"; head; "--attestations"; req "--process-attestations"
+              "--trusted-run-id"; req "--process-trusted-run-id"; "--out"; path ] @ source
+        let code, output = run "dotnet" argv root
+        File.WriteAllText(Path.Combine(out, "verify-process.log"), $"dotnet {String.Join(' ', argv)}\nexit {code}\n{output}")
+        if File.Exists path then Ok(readJson path, path, code) else Error $"verify-process produced no assessment (exit {code}): {output}"
 
 let gate () =
     let root = Path.GetFullPath(req "--root")
@@ -306,7 +366,8 @@ let gate () =
     let dirtyCode, dirty = git root [ "status"; "--porcelain"; "--untracked-files=no"; "--"; "."; ":(exclude).ros"; ":(exclude).echelon/verification" ]
     let expected = opt "--expect-candidate"
     let frozen = readJson obligationsPath
-    let obligations, deferredRecord, deferredIdentities = executableView frozen
+    let classificationErrors, typesOf, typed = classify frozen
+    let obligations = executableView frozen typed typesOf
     let viewPath = Path.Combine(out, "executable-obligations.json")
     File.WriteAllText(viewPath, obligations.ToJsonString(JsonSerializerOptions(WriteIndented = true)) + "\n")
     let scope =
@@ -314,6 +375,10 @@ let gate () =
         | _, Some s, _ -> s.Split(',', StringSplitOptions.RemoveEmptyEntries) |> List.ofArray
         | "development", None, Some f -> arr (readJson f) "requirements" |> List.map (fun n -> n.GetValue<string>())
         | _ -> []
+    let inScope (o: JsonNode) = scope.IsEmpty || List.contains (str o "requirement") scope
+    let inScopeIds = arr frozen "obligations" |> List.filter inScope |> List.map (fun o -> str o "id")
+    let ofType k = inScopeIds |> List.filter (fun o -> (typesOf o).Contains k)
+    let executableIds, recordIds, verifierIds = ofType Executable, ofType Record, ofType IndependentVerifier
     let candidateCauses =
         check (headCode = 0 && isSha head) $"the repository HEAD is not a commit ({headOut.Trim()})"
         @ check (dirtyCode = 0 && dirty.Trim() = "") $"the working tree differs from HEAD, so HEAD is not what ran:\n{dirty}"
@@ -323,22 +388,25 @@ let gate () =
         @ check (mode = "release" || mode = "development") $"--mode must be release or development, not '{mode}'"
         @ check (mode <> "development" || not scope.IsEmpty || opt "--scope-file" |> Option.isSome) "development mode needs --scope-file"
         @ check (mode <> "release" || opt "--scope" |> Option.isNone || opt "--work-item" |> Option.isSome) "release mode verifies the whole plan; --scope is only for a work item's matrix"
+        @ classificationErrors
+        @ (inScopeIds |> List.filter (typesOf >> Set.isEmpty) |> List.map (fun o -> $"{o} has no bound identity of a known evidence type in the plan; its type is never inferred"))
     let results = readJson resultsPath
     let runs = arr results "runs"
     let resultsDir = Path.GetDirectoryName(Path.GetFullPath resultsPath)
-    let inScope (o: JsonNode) = scope.IsEmpty || List.contains (str o "requirement") scope
-    let scopedObligations = arr obligations "obligations" |> List.filter inScope |> List.map (fun o -> str o "id") |> Set.ofList
+    let scopedExecutable = Set.ofList executableIds
     let neededSuites =
         arr obligations "tests"
-        |> List.filter (fun t -> executable (str t "id") && (arr t "obligations" |> List.exists (fun o -> scopedObligations.Contains(o.GetValue<string>()))))
+        |> List.filter (fun t -> arr t "obligations" |> List.exists (fun o -> scopedExecutable.Contains(o.GetValue<string>())))
         |> List.map (fun t -> str t "suite") |> List.distinct
     let resultCauses =
-        check (str results "schema" = "dokimos.verification-results/1") "the results manifest is not dokimos.verification-results/1"
-        @ check (str results "candidate" = head) $"""the results manifest names candidate '{str results "candidate"}', not HEAD {head}"""
-        @ (runs |> List.collect (fun r ->
-            check (str r "sourceSha" = head) $"""run {str r "suite"} was recorded at '{str r "sourceSha"}', not HEAD {head} (stale evidence)"""
-            @ check (File.Exists(Path.Combine(resultsDir, str r "path"))) $"""run {str r "suite"}: result file {str r "path"} does not exist"""))
-        @ (neededSuites |> List.collect (fun s -> check (runs |> List.exists (fun r -> str r "suite" = s)) $"suite {s} has in-scope obligations but no execution evidence in the results manifest"))
+        if executableIds.IsEmpty then []
+        else
+            check (str results "schema" = "dokimos.verification-results/1") "the results manifest is not dokimos.verification-results/1"
+            @ check (str results "candidate" = head) $"""the results manifest names candidate '{str results "candidate"}', not HEAD {head}"""
+            @ (runs |> List.collect (fun r ->
+                check (str r "sourceSha" = head) $"""run {str r "suite"} was recorded at '{str r "sourceSha"}', not HEAD {head} (stale evidence)"""
+                @ check (File.Exists(Path.Combine(resultsDir, str r "path"))) $"""run {str r "suite"}: result file {str r "path"} does not exist"""))
+            @ (neededSuites |> List.collect (fun s -> check (runs |> List.exists (fun r -> str r "suite" = s)) $"suite {s} has in-scope obligations but no execution evidence in the results manifest"))
     let emptyDevelopmentScope = mode = "development" && scope.IsEmpty && opt "--scope" |> Option.isNone
     if not candidateCauses.IsEmpty then Refused candidateCauses
     elif emptyDevelopmentScope then
@@ -346,76 +414,142 @@ let gate () =
         if causes.IsEmpty then Pass [ $"candidate {head}: the development scope (.echelon/verification-scope.json) is empty, so nothing is claimed verified yet; every completed work item adds its requirements (check-governance enforces it)" ]
         else Refused causes
     else
-        let coveragePath = Path.Combine(out, "coverage.json")
+        let dimensions = (opt "--dimensions" |> Option.defaultValue "happy-path,negative,corruption,compatibility,recovery,concurrency").Split(',') |> List.ofArray
         let matrixOut = opt "--work-item" |> Option.map (fun _ -> Path.Combine(out, "praxis-matrix.json"))
-        let dokimosArgs =
-            [ "verification"; "coverage"; "--obligations"; viewPath; "--root"; root; "--results"; Path.GetFullPath resultsPath
-              "--candidate"; head; "--require-verified"; "true"; "--out"; coveragePath ]
-            @ (if scope.IsEmpty then [] else [ "--scope"; String.Join(",", scope) ])
-            @ (match matrixOut, opt "--work-item" with
-               | Some m, Some wi -> [ "--praxis-matrix"; m; "--work-item"; wi; "--dimensions"; opt "--dimensions" |> Option.defaultValue "happy-path,negative,corruption,compatibility,recovery,concurrency" ]
-               | _ -> [])
-        let dokimosCode, dokimosOut = run (req "--dokimos") dokimosArgs root
-        File.WriteAllText(Path.Combine(out, "dokimos.log"), $"dokimos {String.Join(' ', dokimosArgs)}\nexit {dokimosCode}\n{dokimosOut}")
-        if not (File.Exists coveragePath) then Refused (resultCauses @ [ $"dokimos verification coverage produced no report (exit {dokimosCode}): {dokimosOut}" ])
-        else
-            let cov = readJson coveragePath
-            let obligationsCov = arr cov "obligations"
-            let inScopeIds = arr frozen "obligations" |> List.filter inScope |> List.map (fun o -> str o "id") |> Set.ofList
-            let deferred = deferredRecord |> List.filter inScopeIds.Contains
-            let unverified = obligationsCov |> List.filter (fun o -> str o "status" <> "verified")
-            let coverageCauses =
+        // Executable obligations: Dokimos at HEAD, --require-verified true.
+        let coveragePath = Path.Combine(out, "coverage.json")
+        let dokimosCode, dokimosOut =
+            if executableIds.IsEmpty then 0, "no executable obligation in scope"
+            else
+                let dokimosArgs =
+                    [ "verification"; "coverage"; "--obligations"; viewPath; "--root"; root; "--results"; Path.GetFullPath resultsPath
+                      "--candidate"; head; "--require-verified"; "true"; "--out"; coveragePath ]
+                    @ (if scope.IsEmpty then [] else [ "--scope"; String.Join(",", scope) ])
+                    @ (match matrixOut, opt "--work-item" with
+                       | Some m, Some wi -> [ "--praxis-matrix"; m; "--work-item"; wi; "--dimensions"; String.Join(",", dimensions) ]
+                       | _ -> [])
+                let code, output = run (req "--dokimos") dokimosArgs root
+                File.WriteAllText(Path.Combine(out, "dokimos.log"), $"dokimos {String.Join(' ', dokimosArgs)}\nexit {code}\n{output}")
+                code, output
+        let cov = if File.Exists coveragePath && not executableIds.IsEmpty then readJson coveragePath else null
+        let obligationsCov = arr cov "obligations"
+        let unverified = obligationsCov |> List.filter (fun o -> str o "status" <> "verified")
+        let coverageCauses =
+            if executableIds.IsEmpty then []
+            elif isNull cov then [ $"dokimos verification coverage produced no report (exit {dokimosCode}): {dokimosOut}" ]
+            else
                 check (str cov "candidate" = head) $"""the coverage report names candidate '{str cov "candidate"}', not HEAD {head}"""
                 @ check (str cov "planId" = str obligations "planId" && str cov "planDigest" = str obligations "planDigest") "the coverage report was computed for another plan"
                 @ check (arr cov "rejectedRuns" |> List.isEmpty) $"""Dokimos rejected runs: {canonical cov.["rejectedRuns"]}"""
                 @ check (dokimosCode = 0 || not unverified.IsEmpty) $"dokimos verification coverage --require-verified true exited {dokimosCode}: {dokimosOut}"
                 @ (unverified |> List.map (fun o ->
                     $"""{str o "id"} ({str o "requirement"}) is {str o "status"}: {String.Join("; ", arr o "reasons" |> List.map (fun r -> r.GetValue<string>()))}"""))
-                @ check (not obligationsCov.IsEmpty) "no executable obligation is in scope: an empty verification proves nothing (record-only obligations are judged by the acceptance verifier, not here)"
-            let matrixPath = opt "--matrix" |> Option.orElse matrixOut
-            let matrixCauses =
-                match matrixPath with
-                | None -> []
-                | Some m when not (File.Exists m) -> [ $"verification matrix {m} does not exist" ]
-                | Some m ->
-                    let matrix = readJson m
-                    let statusOf = obligationsCov |> List.collect (fun o -> arr o "identities") |> List.map (fun i -> str i "id", str i "status") |> Map.ofList
-                    let evidence = arr matrix "rows" |> List.collect (fun r -> arr r "evidence")
-                    let commands = evidence |> List.filter (fun e -> str e "kind" = "command") |> List.map (fun e -> str e "reference")
-                    let tests = evidence |> List.filter (fun e -> (str e "kind").EndsWith "-test")
-                    check (not commands.IsEmpty && commands |> List.forall (fun c -> c.Contains $"--candidate {head} ")) $"the matrix's coverage evidence does not name HEAD {head} (stale or hand-written matrix)"
-                    @ (tests |> List.collect (fun e ->
-                        let id = str e "reference"
-                        match statusOf.TryFind id with
-                        | None -> [ $"the matrix cites {id}, which is not a bound identity of the in-scope obligations" ]
-                        | Some s -> check (s = str e "result") $"""the matrix says {id} {str e "result"}, Dokimos says {s} at HEAD"""))
-            let causes = resultCauses @ coverageCauses @ matrixCauses
-            let verdict =
+        // Record obligations: the authoritative record verifier at HEAD, with the pinned plan and rules. Record evidence
+        // is bound to the candidate it reviews, so it is judged when a work item completes and at release, never
+        // re-judged on every development merge (where a review of an earlier commit is correctly stale).
+        let judgeRecords = mode = "release" || opt "--work-item" |> Option.isSome
+        let assessment = if recordIds.IsEmpty || not judgeRecords then None else Some(processAssessment root head out)
+        let recordStatus =
+            match assessment with
+            | Some(Ok(a, _, _)) ->
+                let decided =
+                    arr a "obligations"
+                    |> List.map (fun o ->
+                        str o "obligation",
+                        arr o "categories" |> List.map (fun c -> str c "category", str c "status", arr c "diagnostics" |> List.map (fun d -> $"""{str d "code"} {str d "subject"}: {str d "detail"}""")))
+                    |> Map.ofList
+                recordIds |> List.map (fun id ->
+                    match decided.TryFind id with
+                    | _ when str a "verdict" = "INVALID" -> id, false, $"""the record verifier found the inputs INVALID: {String.Join("; ", arr a "problems" |> List.map (fun p -> p.GetValue<string>()))}"""
+                    | None -> id, false, "the record verifier decided no category for it"
+                    | Some cats when cats |> List.forall (fun (_, st, _) -> st = "verified") -> id, true, ""
+                    | Some cats ->
+                        id, false,
+                        String.Join("; ", cats |> List.filter (fun (_, st, _) -> st <> "verified") |> List.map (fun (c, _, ds) -> $"""{c} unverified ({String.Join(" | ", ds)})""")))
+            | Some(Error why) -> recordIds |> List.map (fun id -> id, false, why)
+            | None -> []
+        let recordOk = judgeRecords && recordStatus |> List.forall (fun (_, ok, _) -> ok)
+        let recordCauses = recordStatus |> List.filter (fun (_, ok, _) -> not ok) |> List.map (fun (id, _, why) -> $"{id}: record evidence not verified: {why}")
+        // verifier:* evidence exists only after deployment and is judged only by the acceptance verifier.
+        let verifierCauses =
+            if mode = "release" && opt "--work-item" |> Option.isNone then []
+            else verifierIds |> List.map (fun id -> $"{id} needs independent-verifier evidence (verifier:*), which only the acceptance verifier judges; it cannot be completed here")
+        let emptyCauses = check (not inScopeIds.IsEmpty) "no obligation is in scope: an empty verification proves nothing"
+        // The work item's matrix: Dokimos's rows for executable obligations, each also bound to the record verdict.
+        let recordReference =
+            let a = match assessment with | Some(Ok(a, _, _)) -> a | _ -> null
+            $"""requirements-compiler verify-process --candidate {head} (plan {str (if isNull a then null else a.["plan"]) "digest"}, rules sha256 {str (if isNull a then null else a.["rules"]) "sha256"}): {(if recordOk then "VERIFIED" else "NOT VERIFIED")} for {recordIds.Length} record obligation(s)"""
+        let assessmentLocation = match assessment with | Some(Ok(_, p, _)) -> Some p | _ -> None
+        let recordEvidence =
+            if recordIds.IsEmpty then []
+            else [ evidenceItem "command" recordReference (if recordOk then "verified" else "not verified") ] @ (assessmentLocation |> Option.map (fun p -> [ evidenceItem "location" p "recorded" ]) |> Option.defaultValue [])
+        match matrixOut, opt "--work-item" with
+        | Some m, Some wi when not executableIds.IsEmpty && File.Exists m ->
+            let matrix = readJson m
+            let rows = arr matrix "rows" |> List.map (fun r -> matrixRow (str r "dimension") (str r "status" = "met" && recordOk) ((arr r "evidence" |> List.map (fun e -> e.DeepClone())) @ (recordEvidence |> List.map (fun e -> e.DeepClone()))))
+            matrix["rows"] <- JsonArray(rows |> Array.ofList)
+            File.WriteAllText(m, matrix.ToJsonString(JsonSerializerOptions(WriteIndented = true)) + "\n")
+        | Some m, Some wi when executableIds.IsEmpty && not recordIds.IsEmpty ->
+            // Record-only, as the plan classifies every in-scope obligation: the record verdict is the evidence.
+            let matrix =
                 JsonObject(
-                    [ Collections.Generic.KeyValuePair("schema", JsonValue.Create "indy-init.r9-gate-verdict/1" :> JsonNode)
-                      Collections.Generic.KeyValuePair("verdict", JsonValue.Create(if causes.IsEmpty then "PASS" else "REFUSED") :> JsonNode)
-                      Collections.Generic.KeyValuePair("mode", JsonValue.Create mode :> JsonNode)
-                      Collections.Generic.KeyValuePair("candidate", JsonValue.Create head :> JsonNode)
-                      Collections.Generic.KeyValuePair("planId", JsonValue.Create(str obligations "planId") :> JsonNode)
-                      Collections.Generic.KeyValuePair("scope", JsonArray(scope |> List.map (fun s -> JsonValue.Create s :> JsonNode) |> Array.ofList) :> JsonNode)
-                      Collections.Generic.KeyValuePair("workItem", JsonValue.Create(opt "--work-item" |> Option.defaultValue "") :> JsonNode)
-                      Collections.Generic.KeyValuePair("dokimosExit", JsonValue.Create dokimosCode :> JsonNode)
-                      Collections.Generic.KeyValuePair("obligations", JsonValue.Create obligationsCov.Length :> JsonNode)
-                      Collections.Generic.KeyValuePair("verified", JsonValue.Create(obligationsCov |> List.filter (fun o -> str o "status" = "verified") |> List.length) :> JsonNode)
-                      Collections.Generic.KeyValuePair("deferredToAcceptanceVerifier", JsonArray(deferred |> List.map (fun d -> JsonValue.Create d :> JsonNode) |> Array.ofList) :> JsonNode)
-                      Collections.Generic.KeyValuePair("recordIdentitiesNotJudgedByDokimos", JsonValue.Create deferredIdentities.Length :> JsonNode)
-                      Collections.Generic.KeyValuePair("frozenPlanSha256", JsonValue.Create(sha256File obligationsPath) :> JsonNode)
-                      Collections.Generic.KeyValuePair("coverageSha256", JsonValue.Create(sha256File coveragePath) :> JsonNode)
-                      Collections.Generic.KeyValuePair("resultsSha256", JsonValue.Create(sha256File resultsPath) :> JsonNode)
-                      Collections.Generic.KeyValuePair("matrixSha256", JsonValue.Create(matrixPath |> Option.filter File.Exists |> Option.map sha256File |> Option.defaultValue "") :> JsonNode)
-                      Collections.Generic.KeyValuePair("causes", JsonArray(causes |> List.map (fun c -> JsonValue.Create c :> JsonNode) |> Array.ofList) :> JsonNode) ])
-            File.WriteAllText(Path.Combine(out, "gate.json"), verdict.ToJsonString(JsonSerializerOptions(WriteIndented = true)) + "\n")
-            let summary =
-                let scopeText = if scope.IsEmpty then ", whole plan" else ", scope " + String.Join(",", scope)
-                [ $"candidate {head} ({mode}{scopeText})"
-                  $"""{str verdict "verified"}/{obligationsCov.Length} obligations verified; {deferred.Length} deferred to the acceptance verifier (record evidence only)"""
-                  $"""verdict {Path.Combine(out, "gate.json")}""" ]
-            if causes.IsEmpty then Pass summary else (summary |> List.iter (printfn "  %s"); Refused causes)
+                    [ Collections.Generic.KeyValuePair("schema", JsonValue.Create "praxis.verification-matrix/1" :> JsonNode)
+                      Collections.Generic.KeyValuePair("workItem", JsonValue.Create wi :> JsonNode)
+                      Collections.Generic.KeyValuePair("rows", JsonArray(dimensions |> List.map (fun d -> matrixRow d (recordOk && verifierIds.IsEmpty) (recordEvidence |> List.map (fun e -> e.DeepClone()))) |> Array.ofList) :> JsonNode) ])
+            File.WriteAllText(m, matrix.ToJsonString(JsonSerializerOptions(WriteIndented = true)) + "\n")
+        | _ -> ()
+        let matrixPath = opt "--matrix" |> Option.orElse matrixOut
+        let matrixCauses =
+            match matrixPath with
+            | None -> []
+            | Some m when not (File.Exists m) -> [ $"verification matrix {m} does not exist" ]
+            | Some m ->
+                let matrix = readJson m
+                let statusOf = obligationsCov |> List.collect (fun o -> arr o "identities") |> List.map (fun i -> str i "id", str i "status") |> Map.ofList
+                let evidence = arr matrix "rows" |> List.collect (fun r -> arr r "evidence")
+                let commands = evidence |> List.filter (fun e -> str e "kind" = "command") |> List.map (fun e -> str e "reference")
+                let tests = evidence |> List.filter (fun e -> (str e "kind").EndsWith "-test")
+                check (not commands.IsEmpty && commands |> List.forall (fun c -> c.Contains $"--candidate {head} ")) $"the matrix's verification evidence does not name HEAD {head} (stale or hand-written matrix)"
+                @ check (recordIds.IsEmpty || commands |> List.exists (fun c -> c.StartsWith "requirements-compiler verify-process")) "the matrix omits the record verifier's verdict for this scope's record obligations"
+                @ (tests |> List.collect (fun e ->
+                    let id = str e "reference"
+                    match statusOf.TryFind id with
+                    | None -> [ $"the matrix cites {id}, which is not a bound identity of the in-scope obligations" ]
+                    | Some s -> check (s = str e "result") $"""the matrix says {id} {str e "result"}, Dokimos says {s} at HEAD"""))
+        let causes = candidateCauses @ resultCauses @ coverageCauses @ recordCauses @ verifierCauses @ emptyCauses @ matrixCauses
+        let deferred = if mode = "release" && opt "--work-item" |> Option.isNone then verifierIds else []
+        let strings (xs: string list) = JsonArray(xs |> List.map (fun x -> JsonValue.Create x :> JsonNode) |> Array.ofList) :> JsonNode
+        let verdict =
+            JsonObject(
+                [ Collections.Generic.KeyValuePair("schema", JsonValue.Create "indy-init.r9-gate-verdict/2" :> JsonNode)
+                  Collections.Generic.KeyValuePair("verdict", JsonValue.Create(if causes.IsEmpty then "PASS" else "REFUSED") :> JsonNode)
+                  Collections.Generic.KeyValuePair("mode", JsonValue.Create mode :> JsonNode)
+                  Collections.Generic.KeyValuePair("candidate", JsonValue.Create head :> JsonNode)
+                  Collections.Generic.KeyValuePair("planId", JsonValue.Create(str frozen "planId") :> JsonNode)
+                  Collections.Generic.KeyValuePair("scope", strings scope)
+                  Collections.Generic.KeyValuePair("workItem", JsonValue.Create(opt "--work-item" |> Option.defaultValue "") :> JsonNode)
+                  Collections.Generic.KeyValuePair("obligations", JsonValue.Create inScopeIds.Length :> JsonNode)
+                  Collections.Generic.KeyValuePair("executable", JsonValue.Create executableIds.Length :> JsonNode)
+                  Collections.Generic.KeyValuePair("executableVerified", JsonValue.Create(obligationsCov |> List.filter (fun o -> str o "status" = "verified") |> List.length) :> JsonNode)
+                  Collections.Generic.KeyValuePair("record", JsonValue.Create recordIds.Length :> JsonNode)
+                  Collections.Generic.KeyValuePair("recordJudged", JsonValue.Create judgeRecords :> JsonNode)
+                  Collections.Generic.KeyValuePair("recordVerified", JsonValue.Create(recordStatus |> List.filter (fun (_, ok, _) -> ok) |> List.length) :> JsonNode)
+                  Collections.Generic.KeyValuePair("mixed", JsonValue.Create(executableIds |> List.filter (fun o -> List.contains o recordIds) |> List.length) :> JsonNode)
+                  Collections.Generic.KeyValuePair("deferredToIndependentVerifier", strings deferred)
+                  Collections.Generic.KeyValuePair("dokimosExit", JsonValue.Create dokimosCode :> JsonNode)
+                  Collections.Generic.KeyValuePair("frozenPlanSha256", JsonValue.Create(sha256File obligationsPath) :> JsonNode)
+                  Collections.Generic.KeyValuePair("coverageSha256", JsonValue.Create(if File.Exists coveragePath then sha256File coveragePath else "") :> JsonNode)
+                  Collections.Generic.KeyValuePair("processAssessmentSha256", JsonValue.Create(assessmentLocation |> Option.map sha256File |> Option.defaultValue "") :> JsonNode)
+                  Collections.Generic.KeyValuePair("resultsSha256", JsonValue.Create(sha256File resultsPath) :> JsonNode)
+                  Collections.Generic.KeyValuePair("matrixSha256", JsonValue.Create(matrixPath |> Option.filter File.Exists |> Option.map sha256File |> Option.defaultValue "") :> JsonNode)
+                  Collections.Generic.KeyValuePair("causes", strings causes) ])
+        File.WriteAllText(Path.Combine(out, "gate.json"), verdict.ToJsonString(JsonSerializerOptions(WriteIndented = true)) + "\n")
+        let summary =
+            let scopeText = if scope.IsEmpty then ", whole plan" else ", scope " + String.Join(",", scope)
+            [ $"candidate {head} ({mode}{scopeText})"
+              $"""executable: {str verdict "executableVerified"}/{executableIds.Length} verified by Dokimos; record: {str verdict "recordVerified"}/{recordIds.Length} verified by verify-process{(if judgeRecords || recordIds.IsEmpty then "" else " (not re-judged on a development merge: judged at completion and at release)")}; mixed: {str verdict "mixed"}; {deferred.Length} deferred to the independent verifier"""
+              $"""verdict {Path.Combine(out, "gate.json")}""" ]
+        if causes.IsEmpty then Pass summary else (summary |> List.iter (printfn "  %s"); Refused causes)
 
 // ---- run-suites: execute the plan's own suite commands and record machine-readable results at HEAD -----------------
 

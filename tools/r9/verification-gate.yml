@@ -2,9 +2,11 @@
 # fails CI if this file differs from Indy-init's tools/r9/verification-gate.yml. Do not edit it here.
 #
 # A green `dotnet test` is not verification: a skipped or missing test still exits 0. This workflow runs the frozen
-# plan's suites, has Dokimos 0.10.0 judge every bound identity at the exact candidate, and fails unless every
-# in-scope obligation is verified (development: the scope in .echelon/verification-scope.json, which may only
-# grow; release: the whole frozen plan, with record-evidence obligations deferred to the acceptance verifier).
+# plan's suites and judges each obligation by the evidence type the plan gives it, at the exact candidate: executable
+# identities by Dokimos 0.10.0, record identities (praxis:*) by requirements-compiler verify-process with attestations
+# observed in this run, mixed obligations by both. Development merges re-check the executable obligations of
+# .echelon/verification-scope.json (which may only grow); a work item (inputs work_item, scope) and release (the whole
+# frozen plan) also judge record evidence. A work item's gate writes the Praxis verification matrix to the artifact.
 name: Verification gate
 
 on:
@@ -16,9 +18,16 @@ on:
       mode:
         description: development or release
         default: release
+      work_item:
+        description: Praxis work item to verify (writes its verification matrix); empty for a merge or release check
+        default: ""
+      scope:
+        description: The work item's requirement ids, comma-separated (with work_item)
+        default: ""
 
 permissions:
   contents: read
+  pull-requests: read
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -78,13 +87,37 @@ jobs:
           if [ "$MODE" = "development" ]; then suites="--suites SU-OWN-DOTNET,SU-DOTNET-DETERMINISTIC,SU-DOTNET-INVARIANTS,SU-OWN-BROWSER,SU-BROWSER-CHROMIUM"; fi
           dotnet fsi "$RUNNER_TEMP/indy-init/tools/r9/r9.fsx" -- run-suites --obligations "$RUNNER_TEMP/obligations.json" --root . \
             --out "$RUNNER_TEMP/results" $suites
-      - name: Dokimos coverage gate
+      - name: Record evidence observed by this run (work-item and release checks only)
+        id: records
+        if: inputs.work_item != '' || inputs.mode == 'release'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          # Record-bound obligations are judged by requirements-compiler verify-process with the pinned plan and rules
+          # and with attestations this run observes itself; it fails closed while the rules are unpinned.
+          src="$RUNNER_TEMP/indy-init"; lock="$src/kickoff/rehearsal-009/toolchain.lock.json"
+          rules_sha=$(jq -r '.processEvidence.rulesSha256 // empty' "$lock")
+          [[ "$rules_sha" =~ ^[0-9a-f]{64}$ ]] || { echo "::error::process-evidence rules are not pinned by the owner (processEvidence.rulesSha256)"; exit 1; }
+          dotnet build "$src/tools/requirements-compiler/src" -c Release
+          gh api --paginate "repos/$REPO/pulls?state=all&per_page=100" --jq '.[].number' |
+            while read -r n; do
+              gh api --paginate "repos/$REPO/pulls/$n/reviews?per_page=100" | jq -s --argjson n "$n" '{number: $n, reviews: add}'
+            done | jq -s . > "$RUNNER_TEMP/pulls.json"
+          rc="$src/tools/requirements-compiler/src/bin/Release/net10.0/requirements-compiler.dll"
+          dotnet "$rc" review-attestations --repository "$REPO" --run-id "${{ github.run_id }}" \
+            --candidate "${{ steps.candidate.outputs.sha }}" --pulls "$RUNNER_TEMP/pulls.json" --out "$RUNNER_TEMP/attestations.json"
+          echo "args=--rc $rc --process-plan $src/$(jq -r .processEvidence.plan "$lock") --process-plan-digest $(jq -r .processEvidence.planDigest "$lock") --process-rules $src/$(jq -r .processEvidence.rules "$lock") --process-rules-sha256 $rules_sha --process-attestations $RUNNER_TEMP/attestations.json --process-trusted-run-id ${{ github.run_id }}" >> "$GITHUB_OUTPUT"
+      - name: Verification gate (executable, record and mixed obligations)
         env:
           MODE: ${{ inputs.mode || 'development' }}
+          WORK_ITEM: ${{ inputs.work_item }}
+          SCOPE: ${{ inputs.scope }}
         run: |
           scope=""
-          if [ "$MODE" = "development" ]; then scope="--scope-file .echelon/verification-scope.json"; fi
-          dotnet fsi "$RUNNER_TEMP/indy-init/tools/r9/r9.fsx" -- gate --mode "$MODE" $scope \
+          if [ -n "$WORK_ITEM" ]; then scope="--work-item $WORK_ITEM --scope $SCOPE"
+          elif [ "$MODE" = "development" ]; then scope="--scope-file .echelon/verification-scope.json"; fi
+          dotnet fsi "$RUNNER_TEMP/indy-init/tools/r9/r9.fsx" -- gate --mode "$MODE" $scope ${{ steps.records.outputs.args }} \
             --obligations "$RUNNER_TEMP/obligations.json" --root . --results "$RUNNER_TEMP/results/results.json" \
             --dokimos "$(command -v dokimos)" --expect-candidate "${{ steps.candidate.outputs.sha }}" --out "$RUNNER_TEMP/gate"
       - name: Publish the coverage report, results and verdict
@@ -96,3 +129,4 @@ jobs:
             ${{ runner.temp }}/gate
             ${{ runner.temp }}/results
             ${{ runner.temp }}/obligations.json
+            ${{ runner.temp }}/attestations.json

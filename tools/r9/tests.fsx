@@ -67,7 +67,7 @@ write tampered ((File.ReadAllText lock).Replace("cd6b87d39792808d4ad28e801fcb440
 r9case "conditor-install-digest-mismatch-refused" [ 4 ] "the lock pins" [ "install-conditor"; "--lock"; tampered; "--dir"; Path.Combine(work, "never") ] work |> ignore
 cases <- ("conditor-tampered-writes-nothing", not (Directory.Exists(Path.Combine(work, "never")))) :: cases
 let home = Path.Combine(work, "home")
-r9case "workstation-fresh-home" [ 0 ] "target id" [ "workstation"; "--lock"; lock; "--conditor"; conditor; "--home"; home ] work |> ignore
+r9case "workstation-fresh-home" [ 0 ] "registration: UNAVAILABLE" [ "workstation"; "--lock"; lock; "--conditor"; conditor; "--home"; home ] work |> ignore
 r9case "workstation-repeat-idempotent" [ 0 ] "target id" [ "workstation"; "--lock"; lock; "--conditor"; conditor; "--home"; home ] work |> ignore
 
 // ---- Percepta specification preflight -----------------------------------------------------------------------------
@@ -129,7 +129,7 @@ case "dokimos-compile-synthetic" [ 0 ] "SMK-001-O1" dokimos [ "verification"; "c
 let compiled = Path.Combine(work, "compiled.json")
 case "praxis-init" [ 0 ] "init" praxis [ "init"; "--root"; repo ] repo |> ignore
 r9case "govern-applies-authoritative-policy" [ 0 ] "verification-matrix-satisfied" [ "govern"; "--indy-init"; src; "--target"; repo ] repo |> ignore
-write (Path.Combine(repo, ".echelon", "verification-scope.json")) "{\n  \"schema\": \"indy-init.r9-verification-scope/1\",\n  \"requirements\": [\"SMK-001\"]\n}\n"
+write (Path.Combine(repo, ".echelon", "verification-scope.json")) "{\n  \"schema\": \"indy-init.r9-verification-scope/1\",\n  \"requirements\": [\"SMK-001\", \"AR-001\"]\n}\n"
 git repo [ "add"; "-A" ] |> ignore
 git repo [ "commit"; "-qm"; "base: synthetic SMK-001, Praxis, R9 governance" ] |> ignore
 
@@ -142,7 +142,8 @@ let variants =
       "fail", body (real.Replace("Assert.Equal(7,", "Assert.Equal(8,")) "[<Fact>]" "SMK-001-O1" "SMK001Tests"
       "missing", body real "[<Fact>]" "ledger totals entries" "SMK001Tests"
       "placeholder", body "failwith \"DOKIMOS-UNIMPLEMENTED dotnet:Smoke.Tests.SMK001Tests.SMK-001-O1\"" "[<Fact>]" "SMK-001-O1" "SMK001Tests"
-      "identity", body real "[<Fact>]" "SMK-001-O1" "SMK001LedgerTests" ]
+      "identity", body real "[<Fact>]" "SMK-001-O1" "SMK001LedgerTests"
+      "mixed", body real "[<Fact>]" "SMK-001-O1" "SMK001Tests" + "\n    /// AR-002-O1: the executable half of a mixed obligation.\n    [<Fact>]\n    let ``AR-002-O1`` () : unit =\n        Assert.Equal(3, Ledger.total (Ledger.append 3 Ledger.empty))\n" ]
 
 /// Commits a variant on its own branch from main and runs the plan's suite at it; returns (sha, results manifest).
 let prepare (name: string) (text: string) =
@@ -164,7 +165,7 @@ let resultsOf n = snd prepared[n]
 let at n = git repo [ "checkout"; "-q"; "case-" + n ] |> ignore
 
 at "pass"
-r9case "gate-pass-correctly-bound" [ 0 ] "1/1 obligations verified" (gateArgs (resultsOf "pass") (gateOut "pass") [ "--expect-candidate"; shaOf "pass" ]) repo |> ignore
+r9case "gate-pass-correctly-bound" [ 0 ] "executable: 1/1 verified by Dokimos" (gateArgs (resultsOf "pass") (gateOut "pass") [ "--expect-candidate"; shaOf "pass" ]) repo |> ignore
 [ "skip", "skipped"; "fail", "failed"; "missing", "not-generated"; "placeholder", "invalid"; "identity", "not-generated" ]
 |> List.iter (fun (n, why) ->
     at n
@@ -216,6 +217,79 @@ at "pass"
 startItem "WI-VALID" "feature"
 complete "praxis-valid-matrix-completes" "WI-VALID" [ 0 ] "complete" [ "--evidence"; "verification-matrix=.echelon/verification/WI-VALID/praxis-matrix.json" ]
 r9case "check-governance-after-valid-completion" [ 0 ] "PASS" [ "check-governance"; "--indy-init"; src; "--target"; repo ] repo |> ignore
+
+// ---- obligation types: executable (Dokimos), record (verify-process), mixed (both) ---------------------------------
+// The type comes only from the plan: the runner of the suite each identity is bound in. Record evidence is judged by
+// the existing authoritative verifier, requirements-compiler verify-process, against the frozen v4 plan, on the Praxis
+// log recorded by tools/process-evidence/simulate-rehearsal.sh, relabelled to the synthetic candidate.
+let fixture = Path.Combine(src, "tools", "fixtures", "process-evidence", "simulated-rehearsal")
+let fixtureCandidate = (File.ReadAllText(Path.Combine(fixture, "candidate.txt"))).Trim()
+let rc = Path.Combine(src, "tools", "requirements-compiler", "src", "bin", "Release", "net10.0", "requirements-compiler.dll")
+let processPlan = v412 "v4/verification-plan.json"
+let processPlanDigest = (JsonNode.Parse(File.ReadAllText processPlan)).["planIdentity"].["digest"].GetValue<string>()
+let sha256 (path: string) = Security.Cryptography.SHA256.HashData(File.ReadAllBytes path) |> Convert.ToHexString |> fun h -> h.ToLowerInvariant()
+let trustedRun = (JsonNode.Parse(File.ReadAllText(Path.Combine(fixture, "attestations.json")))).["runId"].GetValue<string>()
+/// The recorded log with its candidate relabelled to `sha` and `mutate` applied to every file.
+let processLog (name: string) (sha: string) (mutate: string -> string) =
+    let d = Path.Combine(work, "process", name)
+    Directory.EnumerateFiles(fixture, "*", SearchOption.AllDirectories)
+    |> Seq.iter (fun f ->
+        let relative = Path.GetRelativePath(fixture, f)
+        let relabelled = (File.ReadAllText f).Replace(fixtureCandidate, sha)
+        // Mutations change only what agents record (the Praxis log and its execution envelopes), never the frozen rules
+        // or the CI-observed attestations, so each control fails for the reason it names.
+        let recorded = relative = "events.jsonl" || relative.StartsWith "executions"
+        write (Path.Combine(d, relative)) (if recorded then mutate relabelled else relabelled))
+    d
+let processArgs (d: string) (rulesSha: string) =
+    [ "--rc"; rc; "--process-plan"; processPlan; "--process-plan-digest"; processPlanDigest; "--process-rules"; Path.Combine(d, "rules.json")
+      "--process-rules-sha256"; rulesSha; "--process-attestations"; Path.Combine(d, "attestations.json"); "--process-trusted-run-id"; trustedRun
+      "--process-events"; Path.Combine(d, "events.jsonl"); "--process-ancestry"; Path.Combine(d, "ancestry.txt"); "--process-executions"; Path.Combine(d, "executions") ]
+let rulesPin = sha256 (Path.Combine(fixture, "rules.json"))
+let typedPlan = Path.Combine(work, "typed-obligations.json")
+write typedPlan """{
+  "schema": "dokimos.verification-obligations/1", "planId": "VP-R9-TYPED", "planDigest": "",
+  "namespaceRoots": [ { "namespace": "Smoke.Tests", "directory": "tests/Smoke.Tests" } ],
+  "suites": [
+    { "id": "SU-SMOKE-UNIT", "runner": "dotnet-test", "command": "dotnet test tests/Smoke.Tests", "paths": [ "tests/Smoke.Tests" ], "fixture": "none", "requiredBoundary": [ "Ledger" ] },
+    { "id": "SU-REVIEW-RECORDS", "runner": "evidence-record", "command": "Praxis work evidence --kind independent-review / owner-approval", "paths": [], "fixture": "the run's Praxis event log" } ],
+  "obligations": [
+    { "id": "SMK-001-O1", "requirement": "SMK-001", "priority": "P0", "criterion": "appending 3 then 4 yields 7.", "categories": [ "unit" ] },
+    { "id": "AR-001-O1", "requirement": "AR-001", "priority": "P0", "criterion": "record-only: an independent review of the candidate.", "categories": [ "independent-acceptance" ] },
+    { "id": "AR-002-O1", "requirement": "AR-002", "priority": "P0", "criterion": "mixed: a test and an independent review.", "categories": [ "unit", "independent-acceptance" ] },
+    { "id": "SMK-002-O1", "requirement": "SMK-002", "priority": "P0", "criterion": "executable only; its test is not written.", "categories": [ "unit" ] } ],
+  "tests": [
+    { "id": "dotnet:Smoke.Tests.SMK001Tests.SMK-001-O1", "suite": "SU-SMOKE-UNIT", "kind": "unit", "obligations": [ "SMK-001-O1" ], "categories": [ "unit" ] },
+    { "id": "praxis:independent-review", "suite": "SU-REVIEW-RECORDS", "kind": "review", "obligations": [ "AR-001-O1", "AR-002-O1" ], "categories": [ "independent-acceptance" ] },
+    { "id": "dotnet:Smoke.Tests.SMK001Tests.AR-002-O1", "suite": "SU-SMOKE-UNIT", "kind": "unit", "obligations": [ "AR-002-O1" ], "categories": [ "unit" ] },
+    { "id": "dotnet:Smoke.Tests.SMK002Tests.SMK-002-O1", "suite": "SU-SMOKE-UNIT", "kind": "unit", "obligations": [ "SMK-002-O1" ], "categories": [ "unit" ] } ]
+}
+"""
+case "dokimos-compile-typed-plan" [ 0 ] "AR-002-O1" dokimos [ "verification"; "compile"; "--obligations"; typedPlan; "--out"; Path.Combine(work, "typed-compiled.json") ] work |> ignore
+let typed = Path.Combine(work, "typed-compiled.json")
+let typedGate (name: string) (scope: string) (extra: string list) =
+    [ "gate"; "--mode"; "development"; "--scope"; scope; "--work-item"; "WI-" + name.ToUpperInvariant(); "--obligations"; typed; "--root"; repo; "--results"; resultsOf "pass"; "--dokimos"; dokimos; "--out"; gateOut name ] @ extra
+let atPass = shaOf "pass"
+let validLog = processLog "valid" atPass id
+r9case "gate-record-only-valid-records" [ 0 ] "record: 1/1 verified by verify-process" ([ "gate"; "--mode"; "development"; "--scope"; "AR-001"; "--obligations"; typed; "--root"; repo; "--results"; resultsOf "pass"; "--dokimos"; dokimos; "--out"; Path.Combine(repo, ".echelon", "verification", "WI-RECORD"); "--work-item"; "WI-RECORD"; "--expect-candidate"; atPass ] @ processArgs validLog rulesPin) repo |> ignore
+startItem "WI-RECORD" "task"
+complete "praxis-record-only-item-completes" "WI-RECORD" [ 0 ] "complete" [ "--evidence"; "verification-matrix=.echelon/verification/WI-RECORD/praxis-matrix.json" ]
+r9case "check-governance-after-record-only-completion" [ 0 ] "PASS" [ "check-governance"; "--indy-init"; src; "--target"; repo ] repo |> ignore
+r9case "gate-record-missing-review-refused" [ 4 ] "MISSING-INDEPENDENT-REVIEW" (typedGate "rec-missing" "AR-001" (processArgs (processLog "missing" atPass (fun t -> t.Split('\n') |> Array.filter (fun l -> not (l.Contains "\"kind\":\"independent-review\"")) |> String.concat "\n")) rulesPin)) repo |> ignore
+r9case "gate-record-invalid-authority-refused" [ 4 ] "independent-acceptance unverified" (typedGate "rec-authority" "AR-001" (processArgs (processLog "authority" atPass (fun t -> t.Replace("example/review-agent", "example/impostor-agent"))) rulesPin)) repo |> ignore
+r9case "gate-record-unpinned-rules-refused" [ 4 ] "not the frozen 0000" (typedGate "rec-rules" "AR-001" (processArgs validLog (String('0', 64)))) repo |> ignore
+r9case "gate-record-wrong-candidate-refused" [ 4 ] "STALE-REVIEW" (typedGate "rec-candidate" "AR-001" (processArgs (processLog "other-candidate" fixtureCandidate id) rulesPin)) repo |> ignore
+r9case "gate-record-without-verifier-inputs-refused" [ 4 ] "record-verifier inputs are missing" (typedGate "rec-noinputs" "AR-001" []) repo |> ignore
+r9case "gate-mixed-missing-executable-refused" [ 4 ] "not-generated" (typedGate "mixed-noexec" "AR-002" (processArgs validLog rulesPin)) repo |> ignore
+r9case "gate-executable-missing-test-never-record" [ 4 ] "not-generated" (typedGate "exec-missing" "SMK-002" []) repo |> ignore
+let unknownPlan = Path.Combine(work, "typed-unknown.json")
+write unknownPlan ((File.ReadAllText typed).Replace("\"runner\": \"evidence-record\"", "\"runner\": \"manual-checklist\""))
+r9case "gate-unclassified-evidence-type-refused" [ 4 ] "gives it no evidence type" [ "gate"; "--mode"; "development"; "--scope"; "AR-001"; "--obligations"; unknownPlan; "--root"; repo; "--results"; resultsOf "pass"; "--dokimos"; dokimos; "--out"; gateOut "unknown" ] repo |> ignore
+r9case "gate-development-merge-does-not-rejudge-records" [ 0 ] "not re-judged on a development merge" [ "gate"; "--mode"; "development"; "--scope"; "SMK-001,AR-001"; "--obligations"; typed; "--root"; repo; "--results"; resultsOf "pass"; "--dokimos"; dokimos; "--out"; gateOut "dev-merge"; "--expect-candidate"; atPass ] repo |> ignore
+at "mixed"
+r9case "gate-mixed-both-verified" [ 0 ] "mixed: 1" ([ "gate"; "--mode"; "development"; "--scope"; "AR-002"; "--obligations"; typed; "--root"; repo; "--results"; resultsOf "mixed"; "--dokimos"; dokimos; "--out"; gateOut "mixed"; "--work-item"; "WI-MIXED"; "--expect-candidate"; shaOf "mixed" ] @ processArgs (processLog "mixed" (shaOf "mixed") id) rulesPin) repo |> ignore
+r9case "gate-mixed-missing-record-refused" [ 4 ] "MISSING-INDEPENDENT-REVIEW" ([ "gate"; "--mode"; "development"; "--scope"; "AR-002"; "--work-item"; "WI-MIXED-NORECORD"; "--obligations"; typed; "--root"; repo; "--results"; resultsOf "mixed"; "--dokimos"; dokimos; "--out"; gateOut "mixed-norecord" ] @ processArgs (processLog "mixed-norecord" (shaOf "mixed") (fun t -> t.Split('\n') |> Array.filter (fun l -> not (l.Contains "\"kind\":\"independent-review\"")) |> String.concat "\n")) rulesPin) repo |> ignore
+at "pass"
 startItem "WI-NOMATRIX" "feature"
 complete "praxis-missing-matrix-refused" "WI-NOMATRIX" [ 3 ] "no verification-matrix evidence" []
 startItem "WI-NORISK" "research"
@@ -249,8 +323,8 @@ let shrunk = Path.Combine(work, "base-scope.json")
 write shrunk "{\"requirements\": [\"SMK-001\", \"SMK-002\"]}"
 r9case "check-governance-scope-only-grows" [ 4 ] "may only grow" [ "check-governance"; "--indy-init"; src; "--target"; repo; "--base-scope"; shrunk ] repo |> ignore
 
-// The release gate over the real frozen v4.1.2 plan, on a repository with no application code: nothing is verified,
-// and the 72 record-only obligations are reported as deferred to the acceptance verifier, never as verified.
+// The release gate over the real frozen v4.1.2 plan, on a repository with no application code: the plan classifies
+// 541 obligations as executable and 119 as record-bound (47 of them mixed); nothing is verified and nothing is deferred.
 let realPlan = Path.Combine(work, "v412-obligations.json")
 case "dokimos-compile-frozen-v412" [ 0 ] "VP-" dokimos [ "verification"; "compile"; "--indy-execution-plan"; v412 "v4.1.2/verification-execution-plan.json"; "--indy-verification-plan"; v412 "v4/verification-plan.json"; "--out"; realPlan ] work |> ignore
 let blank = Path.Combine(work, "blank")
@@ -262,7 +336,7 @@ git blank [ "commit"; "-qm"; "blank" ] |> ignore
 let blankSha = (git blank [ "rev-parse"; "HEAD" ]).Trim()
 let blankResults = Path.Combine(work, "blank-results.json")
 write blankResults ("{\"schema\":\"dokimos.verification-results/1\",\"candidate\":\"" + blankSha + "\",\"runs\":[]}")
-r9case "gate-release-real-v412-plan-blank-refused" [ 4 ] "72 deferred to the acceptance verifier" [ "gate"; "--mode"; "release"; "--obligations"; realPlan; "--root"; blank; "--results"; blankResults; "--dokimos"; dokimos; "--out"; gateOut "real-v412"; "--expect-candidate"; blankSha ] blank |> ignore
+r9case "gate-release-real-v412-plan-blank-refused" [ 4 ] "executable: 0/541 verified by Dokimos; record: 0/119 verified by verify-process; mixed: 47" [ "gate"; "--mode"; "release"; "--obligations"; realPlan; "--root"; blank; "--results"; blankResults; "--dokimos"; dokimos; "--out"; gateOut "real-v412"; "--expect-candidate"; blankSha ] blank |> ignore
 
 // ---- verdict ------------------------------------------------------------------------------------------------------
 

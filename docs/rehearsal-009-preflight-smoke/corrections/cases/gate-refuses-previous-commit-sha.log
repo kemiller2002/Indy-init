@@ -1,6 +1,6 @@
-# cmd: dotnet fsi /home/user/Indy-init/tools/r9/r9.fsx -- gate --mode release --obligations $WORK/work/compiled.json --root $WORK/work/repo --results $WORK/work/results/later/results.json --dokimos $SCRATCH/whome/.local/bin/dokimos --out $WORK/work/gate/prev --expect-candidate eb5ac40cfb37d9630b52261aec9b9aa4d441d008
+# cmd: dotnet fsi /home/user/Indy-init/tools/r9/r9.fsx -- gate --mode release --obligations $WORK/work/compiled.json --root $WORK/work/repo --results $WORK/work/results/later/results.json --dokimos $SCRATCH/whome/.local/bin/dokimos --out $WORK/work/gate/prev --expect-candidate e635f62df94fed8a45051ca841d13191d9656b8b
 # cwd: $WORK/work/repo
-  REFUSED CI's candidate eb5ac40cfb37d9630b52261aec9b9aa4d441d008 is not the checked-out HEAD 2aea9226f15766068de82d58a4c21ac35d1797e6
+  REFUSED CI's candidate e635f62df94fed8a45051ca841d13191d9656b8b is not the checked-out HEAD 58bfb4851285b6a1f561fea6df45781b040a61f3
 gate: REFUSED (1 cause(s))
 
 # exit: 4
