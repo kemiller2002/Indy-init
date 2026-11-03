@@ -219,7 +219,7 @@ jobs:
       - uses: actions/setup-dotnet@v4
         with:
           global-json-file: global.json
-      - name: Pinned Conditor 0.10.19 and the echelon-current 1.35.0 workstation, in a disposable home
+      - name: Pinned Conditor 0.10.20 and the echelon-current 1.36.0 workstation, in a disposable home
         run: |
           dotnet fsi tools/r9/r9.fsx -- install-conditor --lock kickoff/rehearsal-009/toolchain.lock.json --dir "$RUNNER_TEMP/conditor"
           dotnet fsi tools/r9/r9.fsx -- workstation --lock kickoff/rehearsal-009/toolchain.lock.json \

@@ -2,7 +2,7 @@
 //
 //   dotnet fsi tools/r9/tests.fsx -- --indy-init SRC --bin DIR --conditor EXE --work NEW-DIR --evidence DIR
 //
-// DIR holds praxis 3.24.0, dokimos 0.10.0 and percepta 0.4.0 (installed by `r9.fsx workstation`). Everything is
+// DIR holds praxis 3.25.0, dokimos 0.11.0 and percepta 0.4.0 (installed by `r9.fsx workstation`). Everything is
 // written under --work (a synthetic repository, a disposable Conditor home); nothing outside it is touched.
 // Each case records its command, exit code and expectation in --evidence/cases.tsv; exit 1 if any case fails.
 
@@ -60,10 +60,15 @@ let cdir = Path.Combine(work, "conditor-bin")
 r9case "conditor-install-pinned" [ 0 ] "= lock" [ "install-conditor"; "--lock"; lock; "--dir"; cdir ] work |> ignore
 let installed = Path.Combine(cdir, "conditor")
 let identity = if File.Exists installed then Text.Encoding.UTF8.GetString(File.ReadAllBytes installed) else ""
-cases <- ("conditor-identity-0.10.19-not-0.10.18", identity.Contains "0.10.19+31725a78cc74a64d51084250a1c49cbabcba3646" && not (identity.Contains "0.10.18+")) :: cases
-printfn "%-44s %s" "conditor-identity-0.10.19-not-0.10.18" (if fst cases.Head = "conditor-identity-0.10.19-not-0.10.18" && snd cases.Head then "PASS" else "FAIL  <<<")
+// The installed binary must carry exactly the lock's version and source commit, and not the release it replaced.
+let lockConditor = (JsonNode.Parse(File.ReadAllText lock)).["conditor"]
+let pinnedIdentity = $"""{lockConditor.["version"].GetValue<string>()}+{lockConditor.["commit"].GetValue<string>()}"""
+let pinnedLinuxSha = lockConditor.["artifacts"].["linux-x64"].["sha256"].GetValue<string>()
+let identityCase = $"conditor-identity-{lockConditor.["version"].GetValue<string>()}-not-0.10.19"
+cases <- (identityCase, identity.Contains pinnedIdentity && not (identity.Contains "0.10.19+")) :: cases
+printfn "%-44s %s" identityCase (if fst cases.Head = identityCase && snd cases.Head then "PASS" else "FAIL  <<<")
 let tampered = Path.Combine(work, "tampered.lock.json")
-write tampered ((File.ReadAllText lock).Replace("cd6b87d39792808d4ad28e801fcb440a1fad44e8c64ff1d1e420ce30e41841cc", String('0', 64)))
+write tampered ((File.ReadAllText lock).Replace(pinnedLinuxSha, String('0', 64)))
 r9case "conditor-install-digest-mismatch-refused" [ 4 ] "the lock pins" [ "install-conditor"; "--lock"; tampered; "--dir"; Path.Combine(work, "never") ] work |> ignore
 cases <- ("conditor-tampered-writes-nothing", not (Directory.Exists(Path.Combine(work, "never")))) :: cases
 let home = Path.Combine(work, "home")

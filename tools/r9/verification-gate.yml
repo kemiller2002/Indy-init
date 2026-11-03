@@ -3,7 +3,7 @@
 #
 # A green `dotnet test` is not verification: a skipped or missing test still exits 0. This workflow runs the frozen
 # plan's suites and judges each obligation by the evidence type the plan gives it, at the exact candidate: executable
-# identities by Dokimos 0.10.0, record identities (praxis:*) by requirements-compiler verify-process with attestations
+# identities by Dokimos 0.11.0, record identities (praxis:*) by requirements-compiler verify-process with attestations
 # observed in this run, mixed obligations by both. Development merges re-check the executable obligations of
 # .echelon/verification-scope.json (which may only grow); a work item (inputs work_item, scope) and release (the whole
 # frozen plan) also judge record evidence. A work item's gate writes the Praxis verification matrix to the artifact.
@@ -65,7 +65,7 @@ jobs:
             git show "origin/${{ github.base_ref }}:.echelon/verification-scope.json" > "$RUNNER_TEMP/base-scope.json" 2>/dev/null && base_scope="--base-scope $RUNNER_TEMP/base-scope.json"
           fi
           dotnet fsi "$RUNNER_TEMP/indy-init/tools/r9/r9.fsx" -- check-governance --indy-init "$RUNNER_TEMP/indy-init" --target . $base_scope
-      - name: Pinned toolchain (Conditor 0.10.19, then the echelon-current resolved set)
+      - name: Pinned toolchain (Conditor 0.10.20, then the echelon-current resolved set)
         run: |
           lock="$RUNNER_TEMP/indy-init/kickoff/rehearsal-009/toolchain.lock.json"
           dotnet fsi "$RUNNER_TEMP/indy-init/tools/r9/r9.fsx" -- install-conditor --lock "$lock" --dir "$RUNNER_TEMP/conditor"
