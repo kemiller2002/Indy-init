@@ -2,12 +2,12 @@
 
 The decision record is [R9-VERIFICATION-DECISION-RECORD.md](R9-VERIFICATION-DECISION-RECORD.md). Every claim below names its evidence; nothing here was estimated.
 
-**Verdict: NOT READY today. It becomes READY WITH RISKS once the owner runs `owner-freeze.fsx acceptance` (§F item 1).** Item 2, the frozen-package defects, is done: v4.1.2 is approved and tagged. Item 3, the tools at T0, is done: echelon-current 1.35.0 (approved) pins Dokimos 0.10.0 and Percepta semantic 0.4.0.
+**Verdict: READY WITH RISKS (2026-11-03).** Every must-fix item in §F is done: the acceptance preflight reads READY on main (item 1, the owner's acceptance approvals, #84); v4.1.2 is approved and tagged (item 2); echelon-current 1.35.0 (approved) pins Dokimos 0.10.0 and Percepta semantic 0.4.0 (item 3). The risks are §F's should-fix items 4–7 and the minor findings of v4.1.2's independent review (`requirements-compiled/v4.1.2/independent-review.md`).
 
 - The engineering mechanisms are built, tested and demonstrated.
-- The pinned acceptance inputs are still the ones that made Rehearsal 8 INVALID.
+- The acceptance inputs no longer carry Rehearsal 8's INVALID cause: the verifier reads a scope-change approvals file of its own, and the preflight reads READY on main.
 - The three package defects Rehearsal 8 hit are resolved in v4.1.2 (APR-V412-OWNER-3, tag `indy-init-requirements-v4.1.2` at 485b8a9), which the build now uses.
-- Running Rehearsal 9 before those are fixed would, with near certainty, again end INVALID at T34.
+- The tools the build needs at T0 are released and pinned in the approved kickoff set, echelon-current 1.35.0.
 
 ## A. Framework changes
 
@@ -121,7 +121,7 @@ The details are in dokimos #63: `experiments/verification-benchmarks/BENCHMARK-R
 ## F. Remaining work that could change competition-day execution
 
 **Must fix before Rehearsal 9** (owner actions; agents may not do them):
-1. **Approval contract: decided, one owner command left.** The approvals file the preflight pins (`kickoff/rehearsal-007/approvals.causa.json`) holds 12 package and decision records (31 changes keyed by `decision_id` or `obligation_id`, no `source`) and not one requirement scope change; the verifier reads every entry as a scope change, so the preflight reads INVALID (44 problems). The owner chose separate files (2026-11-02): the verifier is unchanged, and `owner-freeze.fsx acceptance` writes `kickoff/acceptance/approvals.causa.json`, the scope-change approvals only (none today, bound to the baseline by digest), and moves the approvals pin in `conditor.acceptance.json` to it, in the owner's own commit. Package and decision records stay where they are. On that file the preflight reads READY with no problems (checked on the command's dry-run output, sha256 `87eaf064…`). Until the owner runs it, every acceptance run is INVALID.
+1. **Approval contract: DONE.** The approvals file the preflight pins (`kickoff/rehearsal-007/approvals.causa.json`) holds 12 package and decision records (31 changes keyed by `decision_id` or `obligation_id`, no `source`) and not one requirement scope change; the verifier reads every entry as a scope change, so the preflight reads INVALID (44 problems). The owner chose separate files (2026-11-02): the verifier is unchanged, and `owner-freeze.fsx acceptance` writes `kickoff/acceptance/approvals.causa.json`, the scope-change approvals only (none today, bound to the baseline by digest), and moves the approvals pin in `conditor.acceptance.json` to it, in the owner's own commit. Package and decision records stay where they are. On that file the preflight reads READY with no problems (checked on the command's dry-run output, sha256 `87eaf064…`). The owner ran it on 2026-11-03 (#84, commit 81b5461): `conditor.acceptance.json` pins `kickoff/acceptance/approvals.causa.json` (sha256 `87eaf064…`), and released Conditor 0.10.19's `acceptance preflight` reads READY ("the authoritative verifier accepts the pinned baseline and approvals").
 2. **Frozen-package defects: DONE.** v4.1.2 resolves INV-04 versus T-S31/T-S32 (every reconciliation read windowed), the `CommandEnvelope` body and the (UnknownOutcome, ReconcileReadFailed) transition (owner decisions ODR-V412-01..03 and -05; approval ODR-V412-04, APR-V412-OWNER-3; three independent review rounds, the last PASS). `percepta spec-preflight` exits 0 on v4.1.2 (3 on v4.1.1). Minor findings left for the owner are in `requirements-compiled/v4.1.2/independent-review.md`.
 3. **Tools at T0: DONE.** Released as Dokimos 0.10.0 (`dokimos-v0.10.0`) and Percepta semantic 0.4.0 (`percepta-semantic-v0.4.0`), registered and pinned in echelon-current 1.35.0, which the owner approved (echelon-registry#107) after REG-RU-007 and Conditor's qualification of the exact set (conditor#129). `conditor workstation apply` installs both at T0 from their release archives, digest-checked; nothing is built in the window. The preflight's required verification plan is now v4.1.2's.
 
