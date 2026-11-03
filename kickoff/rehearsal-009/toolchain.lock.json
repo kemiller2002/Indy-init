@@ -43,7 +43,7 @@
   },
   "resolvedSet": {
     "registry": "kemiller2002/echelon-registry",
-    "commit": "7318eb33fbdc9d739ea3e163af59e4f96d37b475",
+    "commit": "de72a4069af64e99fc7da188f76f0f22cfa4f89c",
     "channel": "echelon-current",
     "profileVersion": "1.36.0",
     "platforms": {
