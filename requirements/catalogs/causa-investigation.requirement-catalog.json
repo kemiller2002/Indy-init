@@ -2,7 +2,7 @@
   "schema": "praxis.requirement-catalog/1",
   "catalogId": "CAT-CAUSA-INVESTIGATION",
   "idPattern": "^INV-\\d{3}$",
-  "status": "proposed",
+  "status": "ratified",
   "description": "Field-level decomposition of the authoritative Causa investigation creation and workspace requirements (SCREEN-CONTRACTS S01, S02, S04, S05; REQUIREMENTS R1-R3, R10; CAUSA-UI-EXPERIENCE UI-006; CAUSA-PERSISTENCE PERSIST-007, PERSIST-021, PERSIST-030). Proposed by an agent; not ratified. It adds no product obligation the sources do not state: no length limits, no non-empty rule for the problem statement and no Cancel action are defined, because no authoritative requirement defines them (docs/requirement-catalogs/CAUSA-INVESTIGATION.md, open questions).",
   "screens": [
     { "id": "investigation-start", "route": "#/investigations/new" },
