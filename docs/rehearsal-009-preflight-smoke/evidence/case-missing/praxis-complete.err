@@ -1,0 +1,1 @@
+ERROR completion readiness refused for 'WI-SMK-MISSING': verification-matrix-satisfied not satisfied: happy-path is not met; negative is not met; corruption is not met; compatibility is not met; recovery is not met; concurrency is not met

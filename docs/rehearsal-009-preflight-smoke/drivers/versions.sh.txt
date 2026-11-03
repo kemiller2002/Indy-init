@@ -1,0 +1,6 @@
+set -x
+/tmp/claude-0/-home-user/191f324a-ea3a-5051-b276-748b564d6e03/scratchpad/r9smoke/home/.local/bin/praxis --version
+/tmp/claude-0/-home-user/191f324a-ea3a-5051-b276-748b564d6e03/scratchpad/r9smoke/home/.local/bin/dokimos version
+/tmp/claude-0/-home-user/191f324a-ea3a-5051-b276-748b564d6e03/scratchpad/r9smoke/home/.local/bin/percepta --version
+/tmp/claude-0/-home-user/191f324a-ea3a-5051-b276-748b564d6e03/scratchpad/r9smoke/home/.local/bin/ordo --version
+sha256sum /tmp/claude-0/-home-user/191f324a-ea3a-5051-b276-748b564d6e03/scratchpad/r9smoke/bin/conditor/conditor-linux-x64

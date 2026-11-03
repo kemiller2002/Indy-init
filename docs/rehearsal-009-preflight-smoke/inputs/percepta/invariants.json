@@ -1,0 +1,3 @@
+{ "schema": "indy-init.invariants/1", "description": "R9 SMOKE SYNTHETIC",
+  "invariants": [ { "id": "INV-SMK-01", "machines": [ "SM-SMK-PUMP" ],
+    "statement": "Each start is logged; under a stuck valve at most three pump strokes in 30 seconds." } ] }

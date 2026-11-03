@@ -1,0 +1,57 @@
+# utc: 2026-11-03T07:23:17Z
+# cwd: /tmp/claude-0/-home-user/191f324a-ea3a-5051-b276-748b564d6e03/scratchpad/r9smoke/synthetic
+# cmd: /tmp/claude-0/-home-user/191f324a-ea3a-5051-b276-748b564d6e03/scratchpad/r9smoke/home/.local/bin/dokimos verification compile --obligations obligations.json --out compiled.json
+{
+  "namespaceRoots": [
+    {
+      "directory": "tests/Smoke.Tests",
+      "namespace": "Smoke.Tests"
+    }
+  ],
+  "obligations": [
+    {
+      "categories": [
+        "unit"
+      ],
+      "criterion": "appending 3 then 4 to an empty ledger yields a total of 7.",
+      "dependencies": [],
+      "id": "SMK-001-O1",
+      "priority": "P0",
+      "requirement": "SMK-001"
+    }
+  ],
+  "planDigest": "",
+  "planId": "VP-R9-SMOKE",
+  "schema": "dokimos.verification-obligations/1",
+  "suites": [
+    {
+      "command": "dotnet test tests/Smoke.Tests",
+      "dependsOn": [],
+      "environment": "",
+      "fixture": "none",
+      "id": "SU-SMOKE-UNIT",
+      "paths": [
+        "tests/Smoke.Tests"
+      ],
+      "requiredBoundary": [
+        "Ledger"
+      ],
+      "runner": "dotnet-test",
+      "testRoot": null
+    }
+  ],
+  "tests": [
+    {
+      "categories": [
+        "unit"
+      ],
+      "id": "dotnet:Smoke.Tests.SMK001Tests.SMK-001-O1",
+      "kind": "unit",
+      "obligations": [
+        "SMK-001-O1"
+      ],
+      "suite": "SU-SMOKE-UNIT"
+    }
+  ]
+}
+# exit: 0

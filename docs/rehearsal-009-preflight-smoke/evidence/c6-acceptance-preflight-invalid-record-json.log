@@ -1,0 +1,45 @@
+# utc: 2026-11-03T07:25:54Z
+# cwd: /tmp/claude-0/-home-user/191f324a-ea3a-5051-b276-748b564d6e03/scratchpad/r9smoke/indy-copy
+# cmd: /tmp/claude-0/-home-user/191f324a-ea3a-5051-b276-748b564d6e03/scratchpad/r9smoke/bin/conditor/conditor-linux-x64 acceptance preflight --target /tmp/claude-0/-home-user/191f324a-ea3a-5051-b276-748b564d6e03/scratchpad/r9smoke/indy-copy --json
+{
+  "findings": [
+    {
+      "code": "COND-ACC-TRUST",
+      "detail": "approval APR-R9-SMOKE-SYNTHETIC-1 is not authenticated as a trusted operator decision",
+      "ownerAction": "owner: authority must be {kind: operator, id: \u003Ctrusted operator\u003E} and the operator must be passed with --trusted-operator-id",
+      "severity": "error",
+      "subject": "approvals"
+    },
+    {
+      "code": "COND-ACC-TRUST",
+      "detail": "approval APR-R9-SMOKE-SYNTHETIC-1 lacks an immutable authority source",
+      "ownerAction": "owner: re-record this approval with source.repository, source.commit (40 hex) and source.path naming the decision record",
+      "severity": "error",
+      "subject": "approvals"
+    },
+    {
+      "code": "COND-ACC-TRUST",
+      "detail": "approval APR-R9-SMOKE-SYNTHETIC-1 contains an invalid change identity",
+      "ownerAction": "owner: every change must name requirement_id and action; the verifier ignores obligation_id or decision_id alone",
+      "severity": "error",
+      "subject": "approvals"
+    }
+  ],
+  "ownerActions": [
+    {
+      "action": "owner: authority must be {kind: operator, id: \u003Ctrusted operator\u003E} and the operator must be passed with --trusted-operator-id",
+      "findings": 1
+    },
+    {
+      "action": "owner: re-record this approval with source.repository, source.commit (40 hex) and source.path naming the decision record",
+      "findings": 1
+    },
+    {
+      "action": "owner: every change must name requirement_id and action; the verifier ignores obligation_id or decision_id alone",
+      "findings": 1
+    }
+  ],
+  "schema": "conditor.acceptance-preflight-report/1",
+  "verdict": "INVALID"
+}
+# exit: 3

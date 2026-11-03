@@ -1,0 +1,102 @@
+{
+  "rows": [
+    {
+      "dimension": "happy-path",
+      "evidence": [
+        {
+          "kind": "command",
+          "reference": "dokimos verification coverage --candidate db1fffaff803a7e2f61097d7c00574e41f81267c (plan VP-R9-SMOKE)",
+          "result": "not verified"
+        },
+        {
+          "kind": "unit-test",
+          "reference": "dotnet:Smoke.Tests.SMK001Tests.SMK-001-O1",
+          "result": "not-generated"
+        }
+      ],
+      "status": "not-met"
+    },
+    {
+      "dimension": "negative",
+      "evidence": [
+        {
+          "kind": "command",
+          "reference": "dokimos verification coverage --candidate db1fffaff803a7e2f61097d7c00574e41f81267c (plan VP-R9-SMOKE)",
+          "result": "not verified"
+        },
+        {
+          "kind": "unit-test",
+          "reference": "dotnet:Smoke.Tests.SMK001Tests.SMK-001-O1",
+          "result": "not-generated"
+        }
+      ],
+      "status": "not-met"
+    },
+    {
+      "dimension": "corruption",
+      "evidence": [
+        {
+          "kind": "command",
+          "reference": "dokimos verification coverage --candidate db1fffaff803a7e2f61097d7c00574e41f81267c (plan VP-R9-SMOKE)",
+          "result": "not verified"
+        },
+        {
+          "kind": "unit-test",
+          "reference": "dotnet:Smoke.Tests.SMK001Tests.SMK-001-O1",
+          "result": "not-generated"
+        }
+      ],
+      "status": "not-met"
+    },
+    {
+      "dimension": "compatibility",
+      "evidence": [
+        {
+          "kind": "command",
+          "reference": "dokimos verification coverage --candidate db1fffaff803a7e2f61097d7c00574e41f81267c (plan VP-R9-SMOKE)",
+          "result": "not verified"
+        },
+        {
+          "kind": "unit-test",
+          "reference": "dotnet:Smoke.Tests.SMK001Tests.SMK-001-O1",
+          "result": "not-generated"
+        }
+      ],
+      "status": "not-met"
+    },
+    {
+      "dimension": "recovery",
+      "evidence": [
+        {
+          "kind": "command",
+          "reference": "dokimos verification coverage --candidate db1fffaff803a7e2f61097d7c00574e41f81267c (plan VP-R9-SMOKE)",
+          "result": "not verified"
+        },
+        {
+          "kind": "unit-test",
+          "reference": "dotnet:Smoke.Tests.SMK001Tests.SMK-001-O1",
+          "result": "not-generated"
+        }
+      ],
+      "status": "not-met"
+    },
+    {
+      "dimension": "concurrency",
+      "evidence": [
+        {
+          "kind": "command",
+          "reference": "dokimos verification coverage --candidate db1fffaff803a7e2f61097d7c00574e41f81267c (plan VP-R9-SMOKE)",
+          "result": "not verified"
+        },
+        {
+          "kind": "unit-test",
+          "reference": "dotnet:Smoke.Tests.SMK001Tests.SMK-001-O1",
+          "result": "not-generated"
+        }
+      ],
+      "status": "not-met"
+    }
+  ],
+  "schema": "praxis.verification-matrix/1",
+  "workItem": "WI-SMK-MISSING"
+}

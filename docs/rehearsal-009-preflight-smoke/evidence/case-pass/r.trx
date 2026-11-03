@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="eea093ef-99df-488a-b5e2-174ecc8984b6" name="@vm 2026-11-03 07:24:34" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-11-03T07:24:34.6211538+00:00" queuing="2026-11-03T07:24:34.6211539+00:00" start="2026-11-03T07:24:33.7750450+00:00" finish="2026-11-03T07:24:34.6303865+00:00" />
+  <TestSettings name="default" id="3c2fabc1-099e-420c-bd6f-d3fc5fc47285">
+    <Deployment runDeploymentRoot="_vm_2026-11-03_07_24_34" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="9517b708-f4b4-4259-910f-b8776a74c378" testId="376a7081-3e82-146f-d011-7684e3dc6fd7" testName="Smoke.Tests.SMK001Tests.SMK-001-O1" computerName="vm" duration="00:00:00.0076486" startTime="2026-11-03T07:24:34.4777527+00:00" endTime="2026-11-03T07:24:34.4778406+00:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="9517b708-f4b4-4259-910f-b8776a74c378" />
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="Smoke.Tests.SMK001Tests.SMK-001-O1" storage="/tmp/claude-0/-home-user/191f324a-ea3a-5051-b276-748b564d6e03/scratchpad/r9smoke/synthetic/tests/smoke.tests/bin/debug/net10.0/smoke.tests.dll" id="376a7081-3e82-146f-d011-7684e3dc6fd7">
+      <Execution id="9517b708-f4b4-4259-910f-b8776a74c378" />
+      <TestMethod codeBase="/tmp/claude-0/-home-user/191f324a-ea3a-5051-b276-748b564d6e03/scratchpad/r9smoke/synthetic/tests/Smoke.Tests/bin/Debug/net10.0/Smoke.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="Smoke.Tests.SMK001Tests" name="SMK-001-O1" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="376a7081-3e82-146f-d011-7684e3dc6fd7" executionId="9517b708-f4b4-4259-910f-b8776a74c378" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Completed">
+    <Counters total="1" executed="1" passed="1" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>[xUnit.net 00:00:00.00] xUnit.net VSTest Adapter v2.8.2+699d445a1a (64-bit .NET 10.0.13)
+[xUnit.net 00:00:00.09]   Discovering: Smoke.Tests
+[xUnit.net 00:00:00.12]   Discovered:  Smoke.Tests
+[xUnit.net 00:00:00.13]   Starting:    Smoke.Tests
+[xUnit.net 00:00:00.19]   Finished:    Smoke.Tests
+</StdOut>
+    </Output>
+  </ResultSummary>
+</TestRun>

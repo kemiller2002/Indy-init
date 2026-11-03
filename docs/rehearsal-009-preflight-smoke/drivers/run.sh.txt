@@ -1,0 +1,10 @@
+#!/bin/bash
+# usage: run.sh <evidence-name> <cmd...> ; records command, exit code, output
+E=/tmp/claude-0/-home-user/191f324a-ea3a-5051-b276-748b564d6e03/scratchpad/r9smoke
+n=$1; shift
+f=$E/evidence/$n.log
+{ echo "# utc: $(date -u +%FT%TZ)"; echo "# cwd: $PWD"; printf '# cmd:'; printf ' %q' "$@"; echo; } > $f
+"$@" >> $f 2>&1; rc=$?
+echo "# exit: $rc" >> $f
+cat $f | head -c ${MAXOUT:-6000}; echo; echo "[evidence: $f rc=$rc]"
+exit $rc

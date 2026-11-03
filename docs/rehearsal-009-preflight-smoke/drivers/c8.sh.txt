@@ -1,0 +1,19 @@
+set -x
+cd /home/user/Indy-init
+git rev-parse HEAD
+sha256sum requirements-compiled/v4.1.2/package-manifest.json requirements-compiled/v4.1.2/independent-review.md requirements-compiled/v4.1.2/analysis/independent-review.json requirements-compiled/v4.1.1/package-manifest.json requirements-compiled/v4.1.2/verification-execution-plan.json requirements/causa-requirements-baseline-v4.json kickoff/acceptance/approvals.causa.json
+python3 -I -c "
+import json
+m=json.load(open('requirements-compiled/v4.1.2/package-manifest.json'))
+print('manifest keys:', list(m)[:12])
+for k in ('version','package','tag','id','base','supersedes','successorOf'):
+  if k in m: print(k, '=', m[k])
+fs=m.get('files') or m.get('artifacts') or []
+print([f for f in fs if 'verification-execution-plan' in json.dumps(f)])
+"
+git fetch -q --depth=1 origin refs/tags/indy-init-requirements-v4.1.2:refs/tags/indy-init-requirements-v4.1.2 refs/tags/indy-init-requirements-v4.1.1:refs/tags/indy-init-requirements-v4.1.1
+git rev-parse indy-init-requirements-v4.1.2^{commit} indy-init-requirements-v4.1.1^{commit}
+git rev-parse HEAD:requirements-compiled/v4.1.2 indy-init-requirements-v4.1.2:requirements-compiled/v4.1.2
+git rev-parse HEAD:requirements-compiled/v4.1.1 indy-init-requirements-v4.1.1:requirements-compiled/v4.1.1
+git diff --quiet indy-init-requirements-v4.1.2 HEAD -- requirements-compiled/v4.1.2; echo "v4.1.2 diff vs tag rc=$?"
+git diff --quiet indy-init-requirements-v4.1.1 HEAD -- requirements-compiled/v4.1.1; echo "v4.1.1 diff vs tag rc=$?"

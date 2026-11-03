@@ -1,0 +1,8 @@
+{
+  "id": "WI-SMK-SKIP",
+  "title": "R9 smoke skip",
+  "status": "captured",
+  "tags": [],
+  "priority": "medium"
+}
+canonical identity: incomplete; the repository identity is not established (run 'praxis repository identity set')

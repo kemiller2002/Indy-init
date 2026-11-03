@@ -1,0 +1,126 @@
+# utc: 2026-11-03T07:25:08Z
+# cwd: /home/user
+# cmd: /tmp/claude-0/-home-user/191f324a-ea3a-5051-b276-748b564d6e03/scratchpad/r9smoke/case.sh fail WI-SMK-FAIL
+candidate SHA: 1f87bfb42d0046f8d405c6ffbb710638cbfafc47
+== dotnet test
+10.0.402
+dotnet test exit: 1
+Failed!  - Failed:     1, Passed:     0, Skipped:     0, Total:     1, Duration: 13 ms - Smoke.Tests.dll (net10.0)
+== dokimos verification coverage
+dokimos exit: 4
+coverage obligations: [{"id": "SMK-001-O1", "status": "failed", "causes": null}]
+coverage identities: []
+matrix: {"rows": [{"dimension": "happy-path", "evidence": [{"kind": "command", "reference": "dokimos verification coverage --candidate 1f87bfb42d0046f8d405c6ffbb710638cbfafc47 (plan VP-R9-SMOKE)", "result": "not verified"}, {"kind": "unit-test", "reference": "dotnet:Smoke.Tests.SMK001Tests.SMK-001-O1", "result": "failed"}], "status": "not-met"}, {"dimension": "negative", "evidence": [{"kind": "command", "reference": "dokimos verification coverage --candidate 1f87bfb42d0046f8d405c6ffbb710638cbfafc47 (plan VP-R9-SMOKE)", "result": "not verified"}, {"kind": "unit-test", "reference": "dotnet:Smoke.Tests.SMK001Tests.SMK-001-O1", "result": "failed"}], "status": "not-met"}, {"dimension": "corruption", "evidence": [{"kind": "command", "reference": "dokimos verification coverage --candidate 1f87bfb42d0046f8d405c6ffbb710638cbfafc47 (plan VP-R9-SMOKE)", "result": "not verified"}, {"kind": "unit-test", "ref
+== praxis
+capture exit: 0
+update exit: 0
+ready exit: 0
+start exit: 0
+praxis work complete exit: 3
+ERROR completion readiness refused for 'WI-SMK-FAIL': verification-matrix-satisfied not satisfied: happy-path is not met; negative is not met; corruption is not met; compatibility is not met; recovery is not met; concurrency is not met
+{
+  "outcome": "refused",
+  "completionReadiness": [
+    {
+      "schema": "praxis.completion-readiness/1",
+      "workItem": "WI-SMK-FAIL",
+      "decision": "refused",
+      "policy": {
+        "dokimos": "off",
+        "ordoBoundary": "off",
+        "requiredFacets": []
+      },
+      "facets": {
+        "implementationComplete": {
+          "required": false,
+          "status": "satisfied",
+          "evidence": [
+            "implementation=src/Smoke/Ledger.fs"
+          ],
+          "blocking": false
+        },
+        "behaviorVerified": {
+          "required": false,
+          "status": "satisfied",
+          "evidence": [
+            "tests=tests/Smoke.Tests/SMK001Tests.fs"
+          ],
+          "blocking": false
+        },
+        "architectureVerified": {
+          "required": false,
+          "status": "not-required",
+          "blocking": false
+        },
+        "releaseReady": {
+          "required": false,
+          "status": "not-required",
+          "blocking": false
+        },
+        "designDebtDeclared": {
+          "required": false,
+          "status": "not-required",
+          "blocking": false
+        },
+        "verificationMatrixSatisfied": {
+          "required": true,
+          "status": "not-satisfied",
+          "reasons": [
+            "happy-path is not met",
+            "negative is not met",
+            "corruption is not met",
+            "compatibility is not met",
+            "recovery is not met",
+            "concurrency is not met"
+          ],
+          "blocking": true
+        },
+        "groupVerified": {
+          "required": false,
+          "status": "not-required",
+          "blocking": false
+        }
+      },
+      "sources": {
+        "dokimos": {
+          "evidenceType": "dokimos-ratchet",
+          "requirement": "off",
+          "judgement": "ignored"
+        },
+        "ordoBoundary": {
+          "evidenceType": "ordo-boundary",
+          "requirement": "off",
+          "judgement": "ignored"
+        },
+        "verificationMatrix": {
+          "evidenceType": "verification-matrix",
+          "requirement": "required",
+          "path": "/tmp/claude-0/-home-user/191f324a-ea3a-5051-b276-748b564d6e03/scratchpad/r9smoke/evidence/case-fail/praxis-matrix.json",
+          "observation": "parsed",
+          "judgement": "failed",
+          "reasons": [
+            "happy-path is not met",
+            "negative is not met",
+            "corruption is not met",
+            "compatibility is not met",
+            "recovery is not met",
+            "concurrency is not met"
+          ]
+        }
+      },
+      "risk": {
+        "schema": "praxis.work-risk/1",
+        "changeClasses": [
+          "persistence"
+        ],
+        "level": "medium",
+        "persistentStateImpact": true,
+        "externalProtocolImpact": false,
+        "securityImpact": false,
+        "failurePosture": "fail-closed",
+        "tierOwnership": []
+      },
+      "obligations": {
+        "designDebtDeclaration": false,
+     
+# exit: 0

@@ -1,0 +1,30 @@
+#!/bin/bash
+# usage: case.sh <variant> <work-item-id>   -- runs one verification handshake case end to end
+E=/tmp/claude-0/-home-user/191f324a-ea3a-5051-b276-748b564d6e03/scratchpad/r9smoke
+S=$E/synthetic; B=$E/home/.local/bin; V=$1; WI=$2; O=$E/evidence/case-$V
+export DOTNET_CLI_TELEMETRY_OPTOUT=1 DOTNET_NOLOGO=1 PATH=$E/dotnet:$PATH
+mkdir -p $O; cd $S
+git checkout -q -B case-$V main
+cp $E/variants/$V.fs tests/Smoke.Tests/SMK001Tests.fs
+git add tests/Smoke.Tests/SMK001Tests.fs && git commit -qm "R9 smoke case: $V"
+SHA=$(git rev-parse HEAD); echo "candidate SHA: $SHA" | tee $O/candidate.txt
+echo "== dotnet test"; dotnet --version
+dotnet test tests/Smoke.Tests --logger "trx;LogFileName=r.trx" --results-directory $O > $O/dotnet-test.log 2>&1; echo "dotnet test exit: $?"; grep -E "Passed!|Failed!|Skipped|error" $O/dotnet-test.log | head -5
+printf '{"schema":"dokimos.verification-results/1","candidate":"%s","runs":[{"suite":"SU-SMOKE-UNIT","format":"trx","path":"r.trx","sourceSha":"%s"}]}\n' $SHA $SHA > $O/results.json
+echo "== dokimos verification coverage"
+$B/dokimos verification coverage --obligations compiled.json --root . --results $O/results.json --candidate $SHA --require-verified true --out $O/coverage.json --praxis-matrix $O/praxis-matrix.json --work-item $WI --dimensions happy-path,negative,corruption,compatibility,recovery,concurrency > $O/dokimos.log 2>&1; echo "dokimos exit: $?"
+python3 -I -c "
+import json,sys;c=json.load(open(sys.argv[1]))
+print('coverage obligations:', json.dumps([{k:o.get(k) for k in ('id','status','causes')} for o in c.get('obligations',[])]))
+print('coverage identities:', json.dumps([{k:i.get(k) for k in ('id','status','reasons','causes')} for i in c.get('identities',[])]))
+m=json.load(open(sys.argv[2])); print('matrix:', json.dumps(m)[:900])" $O/coverage.json $O/praxis-matrix.json
+echo "== praxis"
+T=2026-11-03T08:00:00Z
+$B/praxis work capture --id $WI --title "R9 smoke $V" --occurred-at $T > $O/praxis-capture.log 2>&1; echo "capture exit: $?"
+$B/praxis work update --id $WI --occurred-at $T --change-class persistence --risk-level medium --state-impact --failure-posture fail-closed > $O/praxis-update.log 2>&1; echo "update exit: $?"
+$B/praxis work backlog-transition --id $WI --action ready --occurred-at $T > $O/praxis-ready.log 2>&1; echo "ready exit: $?"
+$B/praxis work start --id $WI --occurred-at $T > $O/praxis-start.log 2>&1; echo "start exit: $?"
+$B/praxis work complete --id $WI --occurred-at 2026-11-03T08:05:00Z --evidence implementation=src/Smoke/Ledger.fs --evidence tests=tests/Smoke.Tests/SMK001Tests.fs --evidence verification-matrix=$O/praxis-matrix.json > $O/praxis-complete.out 2> $O/praxis-complete.err; echo "praxis work complete exit: $?"
+cat $O/praxis-complete.err; head -c 3000 $O/praxis-complete.out; echo
+$B/praxis work context $WI > $O/praxis-context.json 2>&1
+git checkout -q main

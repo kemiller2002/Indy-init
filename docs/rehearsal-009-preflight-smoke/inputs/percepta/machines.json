@@ -1,0 +1,5 @@
+{ "schema": "indy-init.v41-state-machine-contracts/1", "description": "R9 SMOKE SYNTHETIC",
+  "machines": [ { "id": "SM-SMK-PUMP", "initial": "Idle", "pairs": [
+    { "state": "Idle", "event": "Start", "outcome": "legal", "transitions": [ { "id": "T-SMK-1", "guard": "true", "next": "Pumping", "effects": [ "one pump stroke" ] } ] },
+    { "state": "Pumping", "event": "Stall", "outcome": "legal", "transitions": [ { "id": "T-SMK-2", "guard": "true", "next": "Stalled", "effects": [ "log the stall" ] } ] },
+    { "state": "Stalled", "event": "Retry", "outcome": "legal", "transitions": [ { "id": "T-SMK-3", "guard": "operator retried", "next": "Stalled", "effects": [ "one pump stroke" ] } ] } ] } ] }

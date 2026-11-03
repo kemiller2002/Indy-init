@@ -1,0 +1,126 @@
+{
+  "outcome": "refused",
+  "completionReadiness": [
+    {
+      "schema": "praxis.completion-readiness/1",
+      "workItem": "WI-SMK-SKIP",
+      "decision": "refused",
+      "policy": {
+        "dokimos": "off",
+        "ordoBoundary": "off",
+        "requiredFacets": []
+      },
+      "facets": {
+        "implementationComplete": {
+          "required": false,
+          "status": "satisfied",
+          "evidence": [
+            "implementation=src/Smoke/Ledger.fs"
+          ],
+          "blocking": false
+        },
+        "behaviorVerified": {
+          "required": false,
+          "status": "satisfied",
+          "evidence": [
+            "tests=tests/Smoke.Tests/SMK001Tests.fs"
+          ],
+          "blocking": false
+        },
+        "architectureVerified": {
+          "required": false,
+          "status": "not-required",
+          "blocking": false
+        },
+        "releaseReady": {
+          "required": false,
+          "status": "not-required",
+          "blocking": false
+        },
+        "designDebtDeclared": {
+          "required": false,
+          "status": "not-required",
+          "blocking": false
+        },
+        "verificationMatrixSatisfied": {
+          "required": true,
+          "status": "not-satisfied",
+          "reasons": [
+            "happy-path is not met",
+            "negative is not met",
+            "corruption is not met",
+            "compatibility is not met",
+            "recovery is not met",
+            "concurrency is not met"
+          ],
+          "blocking": true
+        },
+        "groupVerified": {
+          "required": false,
+          "status": "not-required",
+          "blocking": false
+        }
+      },
+      "sources": {
+        "dokimos": {
+          "evidenceType": "dokimos-ratchet",
+          "requirement": "off",
+          "judgement": "ignored"
+        },
+        "ordoBoundary": {
+          "evidenceType": "ordo-boundary",
+          "requirement": "off",
+          "judgement": "ignored"
+        },
+        "verificationMatrix": {
+          "evidenceType": "verification-matrix",
+          "requirement": "required",
+          "path": "/tmp/claude-0/-home-user/191f324a-ea3a-5051-b276-748b564d6e03/scratchpad/r9smoke/evidence/case-skip/praxis-matrix.json",
+          "observation": "parsed",
+          "judgement": "failed",
+          "reasons": [
+            "happy-path is not met",
+            "negative is not met",
+            "corruption is not met",
+            "compatibility is not met",
+            "recovery is not met",
+            "concurrency is not met"
+          ]
+        }
+      },
+      "risk": {
+        "schema": "praxis.work-risk/1",
+        "changeClasses": [
+          "persistence"
+        ],
+        "level": "medium",
+        "persistentStateImpact": true,
+        "externalProtocolImpact": false,
+        "securityImpact": false,
+        "failurePosture": "fail-closed",
+        "tierOwnership": []
+      },
+      "obligations": {
+        "designDebtDeclaration": false,
+        "verificationDimensions": [
+          "happy-path",
+          "negative",
+          "corruption",
+          "concurrency",
+          "compatibility",
+          "recovery"
+        ]
+      },
+      "consumedEvidence": [
+        {
+          "type": "verification-matrix",
+          "path": "/tmp/claude-0/-home-user/191f324a-ea3a-5051-b276-748b564d6e03/scratchpad/r9smoke/evidence/case-skip/praxis-matrix.json",
+          "sha256": "sha256:a83487992e0d6e487c3ba6e85b366c57c33271aa456070b827c079fbd477d36d"
+        }
+      ],
+      "blockingReasons": [
+        "verification-matrix-satisfied not satisfied: happy-path is not met; negative is not met; corruption is not met; compatibility is not met; recovery is not met; concurrency is not met"
+      ]
+    }
+  ]
+}

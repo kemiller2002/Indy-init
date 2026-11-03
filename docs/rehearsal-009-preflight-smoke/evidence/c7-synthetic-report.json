@@ -1,0 +1,62 @@
+{
+  "analysed": {
+    "catalogCommands": 3,
+    "invariants": 1,
+    "machines": 1,
+    "operations": 1,
+    "transitions": 3,
+    "types": 3
+  },
+  "blocked": true,
+  "blockingContradictions": [
+    {
+      "blocking": true,
+      "counterexample": [
+        "T-SMK-1: Idle --Start [true]--\u003E Pumping",
+        "T-SMK-2: Pumping --Stall [true]--\u003E Stalled",
+        "(steps that make \u0027operator retried\u0027 hold come first; they add pump strokes, never remove one)",
+        "T-SMK-3: Stalled --Retry [operator retried]--\u003E Stalled  [pump stroke #1]",
+        "T-SMK-3: Stalled --Retry [operator retried]--\u003E Stalled  [pump stroke #2]",
+        "T-SMK-3: Stalled --Retry [operator retried]--\u003E Stalled  [pump stroke #3]",
+        "T-SMK-3: Stalled --Retry [operator retried]--\u003E Stalled  [pump stroke #4]",
+        "4 pump strokes with no time between them: exceeds 3 in 30 s"
+      ],
+      "detail": "INV-SMK-01 allows at most 3 pump stroke(s) in 30 s (under a stuck valve), but SM-SMK-PUMP T-SMK-3 (Stalled x Retry, guard \u0027operator retried\u0027) emits a pump stroke on every repetition, and no guard on it limits repetition or references a clock.",
+      "kind": "likely-contradiction",
+      "ownerAction": "decide which governs: bound T-SMK-3 (a clock, a count or a rate in its guard) or amend INV-SMK-01",
+      "requiresOwnerDecision": true,
+      "rule": "rate-bound-vs-unbounded-loop",
+      "subjects": [
+        "INV-SMK-01",
+        "SM-SMK-PUMP",
+        "T-SMK-3"
+      ]
+    }
+  ],
+  "missingDecisions": [],
+  "missingInterfaces": [
+    {
+      "blocking": true,
+      "counterexample": [
+        "two different commands (e.g. OpenValve and CloseValve) with the same identities and version are the same SmokeEnvelope value",
+        "the body is therefore also lost wherever Outbox carries SmokeEnvelope (Pending)"
+      ],
+      "detail": "The catalog carries all 3 commands (OpenValve, CloseValve, Flush, ...) inside SmokeEnvelope, but \u0060SmokeEnvelope = { CommandId: Guid; Target: ValveId; Version: int64 option }\u0060 holds only identities and versions: no field can say which command it is or carry its body. IF-SMK-KERNEL.Decide must distinguish them from that value alone.",
+      "kind": "missing-interface",
+      "ownerAction": "add the command (a union of the catalog commands, with payloads) to SmokeEnvelope, or name the out-of-band source consumers must read it from",
+      "requiresOwnerDecision": true,
+      "rule": "carrier-cannot-discriminate",
+      "subjects": [
+        "SmokeEnvelope",
+        "IF-SMK-KERNEL.Decide"
+      ]
+    }
+  ],
+  "schema": "percepta.specification-preflight/1",
+  "suggestedOwnerActions": [
+    "decide which governs: bound T-SMK-3 (a clock, a count or a rate in its guard) or amend INV-SMK-01",
+    "add the command (a union of the catalog commands, with payloads) to SmokeEnvelope, or name the out-of-band source consumers must read it from"
+  ],
+  "unsupportedVerificationObligations": [],
+  "warnings": []
+}

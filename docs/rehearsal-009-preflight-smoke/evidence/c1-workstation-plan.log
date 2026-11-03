@@ -1,0 +1,62 @@
+# utc: 2026-11-03T07:21:04Z
+# cwd: /tmp/claude-0/-home-user/191f324a-ea3a-5051-b276-748b564d6e03/scratchpad/r9smoke
+# cmd: bin/conditor/conditor-linux-x64 workstation plan --resolved-set /home/user/kemiller2002/echelon-registry/channels/echelon-current/linux-x64.json --resolved-set-sha256 bc0f95150a2abc1850340bfddc3b94814820aa1ed0ed10687ecd029ec9398aab --home /tmp/claude-0/-home-user/191f324a-ea3a-5051-b276-748b564d6e03/scratchpad/r9smoke/home
+Workstation plan: profile echelon-current@1.35.0 for linux-x64 (home /tmp/claude-0/-home-user/191f324a-ea3a-5051-b276-748b564d6e03/scratchpad/r9smoke/home)
+   1. MODIFY          ~/.profile  [shared]
+        expect:   ~/.profile holds exactly one current conditor:workstation-path block
+   2. DOWNLOAD        ~/.conditor/cache/praxis/3.24.0/praxis-linux-x64.tar.gz  [conditor-created]
+        artifact: https://github.com/kemiller2002/praxis/releases/download/v3.24.0/praxis-linux-x64.tar.gz
+        digest:   sha256:95f2455cd0afeb9b58db47447ff3588f7e2ad864c9ac8be8ba29077dc742f26c (trust: IntegrityVerified)
+        expect:   file ~/.conditor/cache/praxis/3.24.0/praxis-linux-x64.tar.gz has sha256:95f2455cd0afeb9b58db47447ff3588f7e2ad864c9ac8be8ba29077dc742f26c
+   3. CREATE          ~/.local/share/echelon/praxis/3.24.0  [conditor-created]
+        expect:   directory ~/.local/share/echelon/praxis/3.24.0 contains praxis
+   4. CREATE          ~/.local/bin/praxis  [conditor-created]
+        command:  praxis --version
+        expect:   `~/.local/bin/praxis --version` exits 0 and reports 3.24.0
+   5. DOWNLOAD        ~/.conditor/cache/ordo/1.20.0/ordo-linux-x64.tar.gz  [conditor-created]
+        artifact: https://github.com/kemiller2002/ordo/releases/download/v1.20.0/ordo-linux-x64.tar.gz
+        digest:   sha256:c5851a5bead4145d6bb5bb56bfab67927c9db06c84960136f677bc94fc84e3cf (trust: IntegrityVerified)
+        expect:   file ~/.conditor/cache/ordo/1.20.0/ordo-linux-x64.tar.gz has sha256:c5851a5bead4145d6bb5bb56bfab67927c9db06c84960136f677bc94fc84e3cf
+   6. CREATE          ~/.local/share/echelon/ordo/1.20.0  [conditor-created]
+        expect:   directory ~/.local/share/echelon/ordo/1.20.0 contains ordo
+   7. CREATE          ~/.local/bin/ordo  [conditor-created]
+        command:  ordo --version
+        expect:   `~/.local/bin/ordo --version` exits 0 and reports 1.20.0
+   8. DOWNLOAD        ~/.conditor/cache/percepta/0.1.0/percepta-repo-linux-x64  [conditor-created]
+        artifact: https://github.com/kemiller2002/percepta/releases/download/percepta-repo-v0.1.0/percepta-repo-linux-x64
+        digest:   sha256:e46113aa08c9d2a97dfb1f75ca65c986946e1601c5f2c5cdcc9e8c25841d6039 (trust: IntegrityVerified)
+        expect:   file ~/.conditor/cache/percepta/0.1.0/percepta-repo-linux-x64 has sha256:e46113aa08c9d2a97dfb1f75ca65c986946e1601c5f2c5cdcc9e8c25841d6039
+   9. CREATE          ~/.local/share/echelon/percepta/0.1.0  [conditor-created]
+        expect:   directory ~/.local/share/echelon/percepta/0.1.0 contains percepta-repo
+  10. CREATE          ~/.local/bin/percepta-repo  [conditor-created]
+        command:  percepta-repo --version
+        expect:   `~/.local/bin/percepta-repo --version` exits 0 and reports 0.1.0
+  11. DOWNLOAD        ~/.conditor/cache/percepta-semantic/0.4.0/percepta-semantic-0.4.0-linux-x64.tar.gz  [conditor-created]
+        artifact: https://github.com/kemiller2002/percepta/releases/download/percepta-semantic-v0.4.0/percepta-semantic-0.4.0-linux-x64.tar.gz
+        digest:   sha256:6c498b170818bbeeb0eae22da236007440d806c645e9e7a0acc1c0e0bcb67a34 (trust: IntegrityVerified)
+        expect:   file ~/.conditor/cache/percepta-semantic/0.4.0/percepta-semantic-0.4.0-linux-x64.tar.gz has sha256:6c498b170818bbeeb0eae22da236007440d806c645e9e7a0acc1c0e0bcb67a34
+  12. CREATE          ~/.local/share/echelon/percepta-semantic/0.4.0  [conditor-created]
+        expect:   directory ~/.local/share/echelon/percepta-semantic/0.4.0 contains percepta
+  13. CREATE          ~/.local/bin/percepta  [conditor-created]
+        command:  percepta --version
+        expect:   `~/.local/bin/percepta --version` exits 0 and reports 0.4.0
+  14. DOWNLOAD        ~/.conditor/cache/dokimos/0.10.0/dokimos-linux-x64.tar.gz  [conditor-created]
+        artifact: https://github.com/kemiller2002/dokimos/releases/download/dokimos-v0.10.0/dokimos-linux-x64.tar.gz
+        digest:   sha256:b08c2235ce6bc2f8c62be916773f0a0ef869aec853332452e7ef022259761cc1 (trust: IntegrityVerified)
+        expect:   file ~/.conditor/cache/dokimos/0.10.0/dokimos-linux-x64.tar.gz has sha256:b08c2235ce6bc2f8c62be916773f0a0ef869aec853332452e7ef022259761cc1
+  15. CREATE          ~/.local/share/echelon/dokimos/0.10.0  [conditor-created]
+        expect:   directory ~/.local/share/echelon/dokimos/0.10.0 contains dokimos
+  16. CREATE          ~/.local/bin/dokimos  [conditor-created]
+        command:  dokimos version
+        expect:   `~/.local/bin/dokimos version` exits 0 and reports identity systemId=dokimos, repository=kemiller2002/dokimos, executable=dokimos, releaseVersion=0.10.0, sourceCommit=11477629f0a2682a256e1d0c75ffeab64abef11a
+  17. DOWNLOAD        ~/.conditor/cache/strata/0.1.1/strata-linux-x64.tar.gz  [conditor-created]
+        artifact: https://github.com/kemiller2002/strata/releases/download/v0.1.1/strata-linux-x64.tar.gz
+        digest:   sha256:497ec245b60994e13b8a8923ec6a8fb994acdb8365d022e9e4fcf955605f2a1b (trust: IntegrityVerified)
+        expect:   file ~/.conditor/cache/strata/0.1.1/strata-linux-x64.tar.gz has sha256:497ec245b60994e13b8a8923ec6a8fb994acdb8365d022e9e4fcf955605f2a1b
+  18. CREATE          ~/.local/share/echelon/strata/0.1.1  [conditor-created]
+        expect:   directory ~/.local/share/echelon/strata/0.1.1 contains strata
+  19. CREATE          ~/.local/bin/strata  [conditor-created]
+        command:  strata version
+        expect:   `~/.local/bin/strata version` exits 0 and reports identity systemId=strata, repository=kemiller2002/strata, executable=strata, releaseVersion=0.1.1, sourceCommit=f650d91e2930dfcbe82a1d2c52d8c5245e0f9996
+Authorize exactly these effects with: conditor workstation apply --authorize sha256:d39022c4a04e945042cefb02d69ce4d7f04c6f424c4fe5435fd7cc8dc826dfd3
+# exit: 0
