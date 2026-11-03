@@ -1,12 +1,11 @@
-# Causa investigation content: proposed catalog additions
+# Causa investigation content: catalog entries INV-019 to INV-038
 
-[`requirements/catalogs/causa-investigation-content.proposed.requirement-catalog.json`](../../requirements/catalogs/causa-investigation-content.proposed.requirement-catalog.json)
-(`CAT-CAUSA-INVESTIGATION-CONTENT`, schema `praxis.requirement-catalog/1`).
+Entries INV-019 to INV-038 of [`requirements/catalogs/causa-investigation.requirement-catalog.json`](../../requirements/catalogs/causa-investigation.requirement-catalog.json) (`CAT-CAUSA-INVESTIGATION`, schema `praxis.requirement-catalog/1`).
 
-**Status: proposed.** An agent wrote it under the owner's decisions OD-INDY-19..21 (`docs/OWNER-DECISIONS-2026-11-03.md`). It is not ratified.
-- It adds INV-019 to INV-037 to the ratified catalog `CAT-CAUSA-INVESTIGATION` (INV-001 to INV-018), continuing its numbering. It changes no ratified entry.
-- **To ratify,** the owner merges the entries into `requirements/catalogs/causa-investigation.requirement-catalog.json`, in the owner's own commit. The file is then retired.
-- A catalog `status` is catalog-wide, so the additions cannot sit `proposed` inside the ratified file.
+**Status: ratified** by the owner in commit `7cefdc6` (PR #98), under OD-INDY-19..21 and OD-INDY-23 (`docs/OWNER-DECISIONS-2026-11-03.md`).
+- INV-019 to INV-038 continue the catalog after INV-001 to INV-018.
+- OD-INDY-23 (hypothesis-evidence relationships) amended INV-030 and INV-031 and added INV-038, the relationship rationale, before ratification.
+- The separate proposed file was removed when they were ratified.
 
 ## The ten content gaps (OD-INDY-20) and the catalog's open questions (OD-INDY-21)
 

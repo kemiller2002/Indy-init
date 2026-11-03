@@ -8,11 +8,9 @@ Dokimos verifies Causa against. See kemiller2002/praxis
 `docs/requirement-verification-manifest.md` and kemiller2002/dokimos
 `docs/requirement-verification.md`.
 
-**Status: ratified** by the owner (commit `0ab8ffd`, which set the catalog's
-`status` to `ratified`). The catalog's `description` still carries the earlier
-sentence "Proposed by an agent; not ratified": only the owner edits the
-catalog, so the description is left for the owner to correct. An agent wrote
-the catalog. It is not a frozen package. It adds no obligation the cited sources do not state. Each
+**Status: ratified** by the owner: INV-001 to INV-018 in commit `0ab8ffd`, and
+INV-019 to INV-038 in commit `7cefdc6` (PR #98, OD-INDY-19..21 and OD-INDY-23).
+An agent wrote the catalog. It is not a frozen package. It adds no obligation the cited sources do not state. Each
 requirement names its authoritative sources (`sources`). Ratifying it, or
 changing a requirement, goes through the owner's requirements governance
 process (OD-INDY-15, RDP-003), never through an agent's edit made to turn a
@@ -112,5 +110,5 @@ adopts the pipeline as follows:
 4. Implement v4.1.2's command and event bodies (ODR-V412-02), so that the
    problem statement, title, creation time and every content field are saved.
 
-The proposed content additions (INV-019 to INV-037, OD-INDY-19..21) are in
+The content entries (INV-019 to INV-038, OD-INDY-19..21 and OD-INDY-23) are described in
 [CAUSA-INVESTIGATION-CONTENT.md](CAUSA-INVESTIGATION-CONTENT.md).
