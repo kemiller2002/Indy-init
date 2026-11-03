@@ -1,6 +1,15 @@
 # Hypothesis–evidence relationships for Causa
 
-**Status: PROPOSED (2026-11-03).** This is an analysis and a recommendation for owner review. It records no decision and changes no frozen package, approval record, ratified catalog entry or Causa implementation.
+**Status: DECIDED (OD-INDY-23, 2026-11-03).** The owner accepted the recommendation ("Apply the amendment and merge"), and the §9 amendment is applied to the proposed files:
+- INV-030 and INV-031, plus the new INV-038, in `requirements/catalogs/causa-investigation-content.proposed.requirement-catalog.json`;
+- `proposed/00-DOMAIN-STUBS.proposed.fs` and its copy in `proposed/interface-specifications.proposed.json`.
+
+They stay **proposed** until the owner ratifies INV-019 … INV-038. No frozen package, approval record, ratified catalog entry or Causa implementation is changed.
+
+**Checks of the applied amendment:**
+- The stubs typecheck with every other v4.1.2 contract (`dotnet build ContractCheck.fsproj`: 0 warnings, 0 errors).
+- Ratified plus proposed compiles under `praxis requirements manifest compile` with `--previous` set to the ratified manifest: exit 0, 38 requirements, 250 obligations, nothing dropped.
+- The withdrawn ODR-V413-02 request (`proposed/owner-decision-requests.proposed.json`) still records the pre-amendment SHA-256 of the stubs. It is a historical record of a withdrawn request and is not updated.
 
 **What it resolves:** the one open catalog question that OD-INDY-21 left unanswered. That is question 4 of `docs/requirement-catalogs/CAUSA-INVESTIGATION.md`: which hypothesis–evidence relationships Causa offers. It answers before the content additions INV-019 … INV-037 are ratified.
 

@@ -64,12 +64,21 @@ type ReviseHypothesis = { Id: HypothesisId; Statement: NonEmptyText; Explanation
 type EvidenceContent = { Label: NonEmptyText; Description: NonEmptyText; SourceRef: string option; SourceUrl: SourceUrl option; ObservedAt: DateTimeOffset option }
 type AdmitEvidence = { Id: EvidenceId; Content: EvidenceContent; Provenance: Provenance }
 type ReviseEvidence = { Id: EvidenceId; Content: EvidenceContent; Provenance: Provenance }
-/// FSHARP-TYPE-SHAPES section 15, restricted to the three kinds the competition release exposes.
+/// The investigator's assessment of what one evidence item implies for one hypothesis (OD-INDY-23,
+/// HYPOTHESIS-EVIDENCE-RELATIONSHIPS.md). "Not assessed" is the absence of a relationship, never a case here.
 type RelationshipKind =
     | Supports
     | Contradicts
-    | Irrelevant
-type RelateEvidence = { Id: EvidenceRelationshipId; Evidence: EvidenceId; Hypothesis: HypothesisId; Kind: RelationshipKind; Rationale: string option; Provenance: Provenance }
+    /// Fits this hypothesis but does not favour it over the competing hypotheses it also fits.
+    | ConsistentWith
+    /// Assessed, but whether it fits cannot yet be determined.
+    | Inconclusive
+/// At most one current relationship per evidence-hypothesis pair; the rationale is the recorded inference.
+type RelateEvidence = { Id: EvidenceRelationshipId; Evidence: EvidenceId; Hypothesis: HypothesisId; Kind: RelationshipKind; Rationale: NonEmptyText; Provenance: Provenance }
+/// Reassess an existing relationship: same Id, same evidence and hypothesis; the earlier assessment stays in history.
+type ReviseEvidenceRelationship = { Id: EvidenceRelationshipId; Kind: RelationshipKind; Rationale: NonEmptyText; Provenance: Provenance }
+/// Withdraw a mistaken relationship; the pair returns to "not assessed" and nothing is deleted.
+type WithdrawEvidenceRelationship = { Id: EvidenceRelationshipId; Reason: NonEmptyText; Provenance: Provenance }
 type RecordConclusion = { Id: ConclusionId; Statement: NonEmptyText; Evidence: EvidenceId list; Provenance: Provenance }
 type InvestigationStarted = StartInvestigation
 type Observation = RecordObservation
@@ -95,6 +104,8 @@ type CoreCommand =
     | AdmitEvidence of AdmitEvidence
     | ReviseEvidence of ReviseEvidence
     | RelateEvidence of RelateEvidence
+    | ReviseEvidenceRelationship of ReviseEvidenceRelationship
+    | WithdrawEvidenceRelationship of WithdrawEvidenceRelationship
     | RecordConclusion of RecordConclusion
     | IdentifyUnknown of IdentifyUnknown
     | RecordAssumption of RecordAssumption
@@ -133,6 +144,8 @@ type CoreEvent =
     | EvidenceAdmitted of Evidence
     | EvidenceRevised of ReviseEvidence
     | EvidenceRelationshipRecorded of EvidenceRelationship
+    | EvidenceRelationshipRevised of ReviseEvidenceRelationship
+    | EvidenceRelationshipWithdrawn of WithdrawEvidenceRelationship
     | ConclusionRecorded of Conclusion
     | UnknownIdentified of Unknown
     | AssumptionRecorded of Assumption
