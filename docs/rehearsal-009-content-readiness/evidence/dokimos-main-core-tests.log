@@ -1,0 +1,3 @@
+# cmd: dotnet test tests/Dokimos.Core.Tests -c Release (kemiller2002/dokimos main 30e3846; includes RequirementVerificationTests adversarial cases)
+Passed!  - Failed:     0, Passed:   432, Skipped:     0, Total:   432, Duration: 1 s - Dokimos.Core.Tests.dll (net8.0)
+# exit: 0
