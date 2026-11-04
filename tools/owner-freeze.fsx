@@ -418,9 +418,15 @@ let staleRecord repo (change: JsonNode) =
 let approvalsBaseline = "55f2467f5ff7f39f8216d2ba291dbeb58b506a5f"
 
 /// Whether GitHub verifies `commit` as committed and signed by you (verification valid, committer you, not web-flow).
+/// Without commit signing (your decision of 2026-11-04), "yours" is GitHub's record that you committed and authored it.
+/// With --require-signatures, it must also be a valid signature (launch-preflight verifies the key itself).
 let signedByYou repo (commit: string) =
-    let out = try run repo "gh" [ "api"; $"repos/{githubRepo}/commits/{commit}"; "--jq"; "[.commit.verification.verified, .commit.verification.reason, .committer.login] | @json" ] with Stop _ -> ""
-    out = $"[true,\"valid\",\"{operatorId}\"]"
+    if fsi.CommandLineArgs |> Array.contains "--require-signatures" then
+        let out = try run repo "gh" [ "api"; $"repos/{githubRepo}/commits/{commit}"; "--jq"; "[.commit.verification.verified, .commit.verification.reason, .committer.login] | @json" ] with Stop _ -> ""
+        out = $"[true,\"valid\",\"{operatorId}\"]"
+    else
+        let out = try run repo "gh" [ "api"; $"repos/{githubRepo}/commits/{commit}"; "--jq"; "[.committer.login, .author.login] | @json" ] with Stop _ -> ""
+        out = $"[\"{operatorId}\",\"{operatorId}\"]"
 
 /// The changes of the approvals file after the baseline on origin/main's first-parent line that are neither signed by
 /// you nor a merge bringing in only your signed changes from a branch (a rollback or evil merge is caught).
