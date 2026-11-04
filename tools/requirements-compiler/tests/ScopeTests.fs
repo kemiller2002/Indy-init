@@ -333,8 +333,11 @@ let suiteRunners (source: string) : string list =
 /// content (every field but the approval) equals the runner of that suite in the amendment the owner decided on, so a
 /// runner weakened or shadowed after the decision is refused; no suite has two runners; each decision applies to
 /// exactly the runners that cite it (counted, not as sets); and the bootstrap a decision applies is unchanged.
-/// `decided` gives the amendment at the commit that recorded an approval id.
-let v414OwnerRecordsWith (approvals: Json list) (requests: Json list) (amendment: Json) (decided: string -> Result<Json, string>) : string list =
+/// `decided` gives the amendment at the commit that recorded an approval id; `proposed` is the amendment and the
+/// requests as the commit that introduced the v4.1.4 requests wrote them, which is what the owner was asked about: the
+/// requests must still equal it, and the runners and bootstrap the owner decided on must equal its own.
+let v414OwnerRecordsWith (approvals: Json list) (requests: Json list) (amendment: Json) (proposed: Json * Json list) (decided: string -> Result<Json, string>) : string list =
+    let proposedAmendment, proposedRequests = proposed
     let operator (a: Json) = (field "authority" a |> Option.bind (strOpt "kind")) = Some "operator"
     let changeOf (decision: string) (a: Json) = arr "changes" a |> List.tryFind (fun c -> strOpt "decision_id" c = Some decision)
     let latest (decision: string) = approvals |> List.filter operator |> List.filter (changeOf decision >> Option.isSome) |> List.tryLast
@@ -342,7 +345,9 @@ let v414OwnerRecordsWith (approvals: Json list) (requests: Json list) (amendment
     let content (j: Json) = match j with JObj ps -> ps |> List.filter (fun (k, _) -> k <> "approval") |> List.sortBy fst | _ -> []
     let runners = arr "suiteRunners" amendment
     let applies (r: Json) = field "applies" r |> Option.defaultValue (JObj [])
-    [ for suite, n in runners |> List.countBy (get "suite") do
+    let runnerOf (suite: string) (a: Json) = arr "suiteRunners" a |> List.filter (fun x -> get "suite" x = suite)
+    [ if requests <> proposedRequests then yield "v4.1.4: the decision requests differ from those the owner was asked about (the commit that introduced them)"
+      for suite, n in runners |> List.countBy (get "suite") do
           if n > 1 then yield sprintf "v4.1.4: %s has %d runners; a suite has one" suite n
       for r in runners do
           let suite, decision, approval = get "suite" r, get "decision" r, get "approval" r
@@ -355,8 +360,9 @@ let v414OwnerRecordsWith (approvals: Json list) (requests: Json list) (amendment
                   match decided approval with
                   | Error e -> yield sprintf "v4.1.4: the amendment %s was recorded against cannot be read: %s" approval e
                   | Ok before ->
-                      match arr "suiteRunners" before |> List.filter (fun x -> get "suite" x = suite) with
-                      | [ x ] when content x = content r -> ()
+                      match runnerOf suite before with
+                      | [ x ] when content x = content r && (runnerOf suite proposedAmendment |> List.map content) = [ content x ] -> ()
+                      | [ x ] when content x = content r -> yield sprintf "v4.1.4: %s's runner as decided in %s is not the one the request proposed" suite approval
                       | [ _ ] -> yield sprintf "v4.1.4: %s's runner differs from the one the owner decided in %s" suite approval
                       | xs -> yield sprintf "v4.1.4: the amendment %s was recorded against has %d runners of %s" approval xs.Length suite
               | other -> yield sprintf "v4.1.4: %s records option %A of %s; the runners are option A's" approval other decision
@@ -374,7 +380,7 @@ let v414OwnerRecordsWith (approvals: Json list) (requests: Json list) (amendment
               match latest id with
               | Some a when changeOf id a |> Option.bind (strOpt "option") = Some "A" ->
                   match decided (get "id" a) with
-                  | Ok before when field "bootstrap" before = current -> ()
+                  | Ok before when field "bootstrap" before = current && field "bootstrap" proposedAmendment = current -> ()
                   | Ok _ -> yield sprintf "v4.1.4: the bootstrap differs from the one the owner decided in %s" (get "id" a)
                   | Error e -> yield sprintf "v4.1.4: the amendment %s was recorded against cannot be read: %s" (get "id" a) e
               | _ -> () ]
@@ -394,31 +400,49 @@ let v414OwnerRecords (source: string) : string list =
         lines [ "log"; "--format=%H"; "-S"; sprintf "\"%s\"" approval; "--"; approvalsPath ]
         |> Result.bind (function [] -> Error "no commit records it" | cs -> Ok (List.last cs))
         |> Result.bind (fun c -> git [ "show"; c + ":" + amendmentPath ] |> Result.map parseBytes)
-    let agentCommits =
+    let introduced =
         match git [ "rev-parse"; "--is-shallow-repository" ] |> Result.map (text >> fun t -> t.Trim()) with
         | Ok "false" ->
             match lines [ "log"; "--diff-filter=A"; "--format=%H"; "--"; requestsPath ] with
-            | Ok [] -> [ "the commit that introduced the v4.1.4 requests is not found" ]
-            | Error e -> [ e ]
-            | Ok cs ->
-                match git [ "log"; "--no-merges"; "--format=%H%n%ae%n%ce%n%B%x00"; List.last cs + "..HEAD"; "--"; approvalsPath ] with
-                | Error e -> [ e ]
-                | Ok b ->
-                    (text b).Split('\000') |> List.ofArray |> List.map (fun m -> m.Trim()) |> List.filter ((<>) "")
-                    |> List.choose (fun m ->
-                        let ls = m.Split('\n')
-                        let body = m.ToLowerInvariant()
-                        if ls.Length < 3 || ls[1] <> owner || ls[2] <> owner || body.Contains "claude-session:" || body.Contains "co-authored-by: claude" || body.Contains "noreply@anthropic.com"
-                        then Some (sprintf "commit %s (author %s, committer %s)" ls[0] (Array.tryItem 1 ls |> Option.defaultValue "?") (Array.tryItem 2 ls |> Option.defaultValue "?"))
-                        else None)
-        | Ok _ -> [ "the history is shallow" ]
+            | Ok [] -> Error "the commit that introduced the v4.1.4 requests is not found"
+            | Ok cs -> Ok (List.last cs)
+            | Error e -> Error e
+        | Ok _ -> Error "the history is shallow"
+        | Error e -> Error e
+    let blob (c: string) = git [ "rev-parse"; "--verify"; "--quiet"; c + ":" + approvalsPath ] |> Result.map (text >> fun t -> t.Trim()) |> Result.defaultValue ""
+    // Every commit since the requests that changed the approvals file, merges included. A merge whose approvals file
+    // equals one parent's added nothing to it (GitHub's own merges); any other must be the owner's, like a commit.
+    let agentCommits =
+        match introduced with
         | Error e -> [ e ]
+        | Ok since ->
+            match git [ "log"; "--full-history"; "--format=%H%n%P%n%ae%n%ce%n%B%x00"; since + "..HEAD"; "--"; approvalsPath ] with
+            | Error e -> [ e ]
+            | Ok b ->
+                (text b).Split('\000') |> List.ofArray |> List.map (fun m -> m.Trim()) |> List.filter ((<>) "")
+                |> List.choose (fun m ->
+                    let ls = m.Split('\n')
+                    let item i = Array.tryItem i ls |> Option.defaultValue "?"
+                    let parents = item 1 |> fun p -> p.Split(' ', StringSplitOptions.RemoveEmptyEntries) |> List.ofArray
+                    let body = m.ToLowerInvariant()
+                    let passThrough = parents.Length > 1 && parents |> List.exists (fun p -> blob p = blob ls[0])
+                    let owners = ls.Length >= 4 && ls[2] = owner && ls[3] = owner && not (body.Contains "claude-session:" || body.Contains "co-authored-by: claude" || body.Contains "noreply@anthropic.com")
+                    if passThrough || owners then None
+                    else Some (sprintf "commit %s (author %s, committer %s)" ls[0] (item 2) (item 3)))
+    let proposed =
+        introduced
+        |> Result.bind (fun c ->
+            git [ "show"; c + ":" + amendmentPath ] |> Result.map parseBytes
+            |> Result.bind (fun a -> git [ "show"; c + ":" + requestsPath ] |> Result.map (fun r -> a, parseBytes r |> arr "requests")))
     [ for c in agentCommits do yield sprintf "v4.1.4: the approvals file since the v4.1.4 requests is not the owner's alone: %s" c
-      yield! v414OwnerRecordsWith
-                 (parseFile (Path.Combine(source, approvalsPath)) |> arr "approvals")
-                 (parseFile (Path.Combine(source, requestsPath)) |> arr "requests")
-                 (parseFile (Path.Combine(source, amendmentPath)))
-                 decided ]
+      match proposed with
+      | Error e -> yield sprintf "v4.1.4: the proposal the owner was asked about cannot be read: %s" e
+      | Ok p ->
+          yield! v414OwnerRecordsWith
+                     (parseFile (Path.Combine(source, approvalsPath)) |> arr "approvals")
+                     (parseFile (Path.Combine(source, requestsPath)) |> arr "requests")
+                     (parseFile (Path.Combine(source, amendmentPath)))
+                     p decided ]
 
 /// The guard refuses what it exists for. Starting from the committed records, each mutation (a wrong or missing
 /// approval, option B, a later record selecting B, a runner citing the wrong decision, a runner weakened after the
@@ -446,6 +470,7 @@ let v414OwnerRecordControls (source: string) : string list =
             set "changes" (JArr (arr "changes" a |> List.map (fun c -> if strOpt "decision_id" c = Some "ODR-V414-02" then set "option" (JStr "B") c else c))) a
         else a
     let weakened = (strOpt "runner" webkit |> Option.defaultValue "").Replace(" tests/browser/invariants", "")
+    let withoutBootstrap = requests |> List.map (fun q -> match field "applies" q with Some ap when strOpt "id" q = Some "ODR-V414-02" -> set "applies" (unset "bootstrap" ap) q | _ -> q)
     let cases =
         [ "wrong approval id", approvals, onRunner "SU-OWN-DOTNET" (set "approval" (JStr "APR-V414-OWNER-9")), amendment
           "missing approval", approvals, onRunner "SU-OWN-DOTNET" (unset "approval"), amendment
@@ -454,15 +479,25 @@ let v414OwnerRecordControls (source: string) : string list =
           "runner cites the wrong decision", approvals, onRunner "SU-OWN-DOTNET" (set "decision" (JStr "ODR-V414-02")), amendment
           "runner weakened after the decision", approvals, onRunner "SU-BROWSER-WEBKIT" (set "runner" (JStr weakened)), amendment
           "duplicate runner shadows the approved one", approvals, withRunners (set "runner" (JStr weakened) webkit :: runners), amendment
-          "extra runner", approvals, withRunners (runners @ [ set "suite" (JStr "SU-UNIT") webkit ]), amendment
+          "extra runner", approvals, withRunners (runners @ [ set "suite" (JStr "SU-DOTNET-DETERMINISTIC") webkit ]), amendment
           "bootstrap changed after the decision", approvals, set "bootstrap" (JObj [ "playwrightConfig", JStr "playwright.config.ts" ]) amendment, amendment ]
-    [ match v414OwnerRecordsWith approvals requests amendment (decidedFixed amendment) with
+    // Changes before the decision: the decided tree carries a runner or bootstrap other than the one proposed.
+    let beforeCases =
+        [ "runner changed between the request and the decision", onRunner "SU-BROWSER-WEBKIT" (set "runner" (JStr weakened))
+          "bootstrap changed between the request and the decision", set "bootstrap" (JObj [ "playwrightConfig", JStr "playwright.config.ts" ]) amendment ]
+    let check aps qs current before = v414OwnerRecordsWith aps qs current (amendment, requests) (decidedFixed before)
+    [ match check approvals requests amendment amendment with
       | [] -> ()
       | ps -> yield sprintf "v4.1.4 owner-record control: the committed records fail: %A" ps
       if weakened = (strOpt "runner" webkit |> Option.defaultValue "") then yield "v4.1.4 owner-record control: the WebKit runner no longer runs tests/browser/invariants; update the mutation"
       for name, aps, current, before in cases do
-          if v414OwnerRecordsWith aps requests current (decidedFixed before) |> List.isEmpty then
-              yield sprintf "v4.1.4 owner-record control: '%s' was not refused" name ]
+          if check aps requests current before |> List.isEmpty then
+              yield sprintf "v4.1.4 owner-record control: '%s' was not refused" name
+      for name, decidedAndCurrent in beforeCases do
+          if check approvals requests decidedAndCurrent decidedAndCurrent |> List.isEmpty then
+              yield sprintf "v4.1.4 owner-record control: '%s' was not refused" name
+      if check approvals withoutBootstrap amendment amendment |> List.isEmpty then
+          yield "v4.1.4 owner-record control: 'a request edited after it was proposed (bootstrap dropped)' was not refused" ]
 
 /// The committed v4.1.4 package is what the compiler produces from its inputs (`v41 --check`).
 let committedPackage (source: string) : string list =
