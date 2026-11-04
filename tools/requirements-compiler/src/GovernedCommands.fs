@@ -135,7 +135,7 @@ let sliceGateCommand (args: string list) =
 let completionGateCommand (args: string list) =
     let o = options args
     if not (require o [ "--manifest"; "--events"; "--candidate"; "--out" ]) then
-        eprintfn "usage: completion-gate --manifest F --events F --candidate SHA [--release-gate F] [--catalog F] [--journeys F --journey-bindings F] [--design F] [--facts F] [--plan-sha256 HEX] [--approvals F --trusted-operator ID] --out F"; 2
+        eprintfn "usage: completion-gate --manifest F --events F --candidate SHA [--release-gate F] [--catalog F] [--journeys F --journey-bindings F] [--design F] [--coverage F] [--catalog-verification F] [--facts F] [--plan-sha256 HEX] [--approvals F --trusted-operator ID] --out F"; 2
     else
         match Ledger.replayWith (ScopeCommands.exclusionsOf o) (parseFile o["--manifest"]) (eventsOf o["--events"]) with
         | Error why -> printfn "  REFUSED %s" why; printfn "completion-gate: INCOMPLETE"; 4
@@ -143,6 +143,7 @@ let completionGateCommand (args: string list) =
             let e : Ledger.ReleaseEvidence =
                 { Candidate = o["--candidate"]; ReleaseGate = optFile o "--release-gate"; CatalogAcceptance = optFile o "--catalog"
                   Journeys = optFile o "--journeys"; DesignContract = optFile o "--design"; Facts = factsOf o
+                  Coverage = optFile o "--coverage"; CatalogVerification = optFile o "--catalog-verification"
                   PlanSha256 = o.TryFind "--plan-sha256"
                   JourneyBindings = optFile o "--journey-bindings" |> Option.map Ledger.journeysOf |> Option.defaultValue [] }
             let refusals = Ledger.completionGate s e

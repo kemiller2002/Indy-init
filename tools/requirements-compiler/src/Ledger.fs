@@ -99,9 +99,9 @@ let replayWith (approvedExclusions: Set<string * string>) (manifest: Json) (even
         (fun acc (n, j) ->
             acc
             |> Result.bind (fun s ->
-                if ledgerKinds.Contains(strOpt "kind" j |> Option.defaultValue "") then applyLedger approvedExclusions s j
-                else eventOf j |> Result.bind (Progress.apply s.Progress) |> Result.map (fun p -> { s with Progress = p }))
-            |> Result.mapError (sprintf "event %d: %s" (n + 1)))
+                (if ledgerKinds.Contains(strOpt "kind" j |> Option.defaultValue "") then applyLedger approvedExclusions s j
+                 else eventOf j |> Result.bind (Progress.apply s.Progress) |> Result.map (fun p -> { s with Progress = p }))
+                |> Result.mapError (sprintf "event %d: %s" (n + 1))))
         (Ok start)
 
 /// Replays with no approved exclusion: any `excluded` event is refused.
@@ -296,6 +296,29 @@ let sliceManifest (manifest: Json) (estimates: Map<string, int64>) (journeys: Jo
           "slices", JArr(items |> List.map slice) ],
     refusals
 
+// ---- governed verification: the only authority for integration, regression and completion ------------------------
+
+/// The obligations governed evidence shows verified: the plan coverage's `verified` obligations (Dokimos, computed by
+/// the governed gate), the governed catalog verification's PASS obligations (and NOT_APPLICABLE within a requirement
+/// that is not applicable as a whole), and, when the release gate judged record evidence and passed, the plan's
+/// record-only obligations. Progress events written by the builder never add to it.
+let governedVerified (manifest: Json) (coverage: Json option) (catalogVerification: Json option) (recordsPassed: bool) : Set<string> =
+    let plan = coverage |> Option.map (arr "obligations" >> List.filter (fun o -> strOpt "status" o = Some "verified") >> List.map (str "id")) |> Option.defaultValue []
+    let catalog =
+        catalogVerification
+        |> Option.map (arr "requirements" >> List.collect (fun r -> arr "obligations" r |> List.filter (fun o -> strOpt "status" o = Some "PASS" || (strOpt "status" o = Some "NOT_APPLICABLE" && strOpt "status" r = Some "NOT_APPLICABLE")) |> List.map (str "id")))
+        |> Option.defaultValue []
+    let records =
+        if not recordsPassed then []
+        else arr "requirements" manifest |> List.collect (arr "obligations") |> List.filter (fun o -> strOpt "kind" o = Some "record") |> List.map (str "id")
+    Set.ofList (plan @ catalog @ records)
+
+/// A requirement is integrated when every mandatory obligation is governed-verified at the judged commit, or the owner
+/// excluded it (an approved exclusion record).
+let governedIntegrated (s: State) (verified: Set<string>) (req: Json) =
+    s.ExcludedBy.ContainsKey(str "id" req)
+    || arr "obligations" req |> List.filter (boolOr "mandatory" true) |> List.forall (fun o -> verified.Contains(str "id" o))
+
 // ---- the slice integration gate --------------------------------------------------------------------------------------
 
 /// What a slice merge is judged on. Every artifact names the candidate it judged; the gate compares it with the
@@ -338,7 +361,10 @@ let sliceRules : SliceRule list =
               let items = arr "workItems" s.Progress.Manifest |> List.map (fun w -> str "id" w, strs "requirements" w) |> Map.ofList
               [ for d in deps do
                     let rs = items.TryFind d |> Option.defaultValue []
-                    let integrated = if rs.IsEmpty then s.Progress.CompletedItems.Contains d else rs |> List.forall (fun r -> List.contains (ledgerState s r) [ Integrated; Excluded ])
+                    let headVerified = e.Regression |> Option.map (strs "passed" >> Set.ofList) |> Option.defaultValue Set.empty
+                    let reqs = arr "requirements" s.Progress.Manifest |> List.map (fun r -> str "id" r, r) |> Map.ofList
+                    // A dependency without requirements is a timed task; it completes by its Praxis record.
+                    let integrated = if rs.IsEmpty then s.Progress.CompletedItems.Contains d else rs |> List.forall (fun r -> reqs.TryFind r |> Option.exists (governedIntegrated s headVerified))
                     if not integrated then yield ref' "DEPENDENCY_NOT_INTEGRATED" (sprintf "dependency SL-%s is not integrated" d) ] }
       { Id = "current-target"
         Check = fun _ e -> if e.TargetBase <> e.TargetHead || e.TargetHead = "" then [ ref' "STALE_TARGET" (sprintf "the merged result was built on %s; the target is now %s: re-merge and re-verify" e.TargetBase e.TargetHead) ] else [] }
@@ -375,13 +401,13 @@ let sliceRules : SliceRule list =
       { Id = "regression"
         Check =
           fun s e ->
-              let integrated = arr "requirements" s.Progress.Manifest |> List.filter (fun r -> s.IntegratedAt.ContainsKey(str "id" r)) |> List.collect (arr "obligations") |> List.filter (boolOr "mandatory" false) |> List.map (str "id")
-              if integrated.IsEmpty then []
-              else
-                  atCandidate "REGRESSION" e e.Regression (fun r ->
-                      let passed = strs "passed" r |> Set.ofList
-                      [ for o in integrated do
-                            if not (passed.Contains o) then yield ref' "REGRESSION" (sprintf "previously integrated obligation %s does not pass at the merged result" o) ]) }
+              atCandidate "REGRESSION" e e.Regression (fun r ->
+                  let passed = strs "passed" r |> Set.ofList
+                  match field "required" r with
+                  | None -> [ ref' "REGRESSION_BASE_MISSING" "the regression evidence has no governed verification of the target base (required)" ]
+                  | Some _ ->
+                      [ for o in strs "required" r do
+                            if not (passed.Contains o) then yield ref' "REGRESSION" (sprintf "obligation %s is verified at the target base and not at the merged result" o) ]) }
       { Id = "build-and-start"
         Check =
           fun _ e ->
@@ -441,6 +467,9 @@ type ReleaseEvidence =
       Journeys: Json option
       DesignContract: Json option
       Facts: Map<string, string>
+      /// The release gate's governed coverage (whole plan) and the governed catalog verification at the candidate.
+      Coverage: Json option
+      CatalogVerification: Json option
       /// The approved plan's frozenPlanSha256 the release gate must have judged, when pinned.
       PlanSha256: string option
       /// The journeys and their P0 assertions (verification/journeys/bindings.json).
@@ -502,9 +531,13 @@ let completionRules : CompletionRule list =
       { Id = "scope-integrated"
         Check =
           fun s e ->
-              let open' = arr "requirements" s.Progress.Manifest |> List.filter (fun r -> boolOr "mandatory" false r && applies e.Facts r && not (List.contains (ledgerState s (str "id" r)) [ Integrated; Excluded ]))
-              if open'.IsEmpty then []
-              else [ ref' "SCOPE_NOT_INTEGRATED" (sprintf "%d applicable mandatory requirement(s) are not integrated, for example %s" open'.Length (open' |> List.truncate 6 |> List.map (fun r -> sprintf "%s (%s)" (str "id" r) (ledgerStateName (ledgerState s (str "id" r)))) |> String.concat ", ")) ] } ]
+              let recordsPassed = e.ReleaseGate |> Option.exists (fun g -> strOpt "verdict" g = Some "PASS" && (strs "causes" g).IsEmpty && strOpt "mode" g = Some "release")
+              let verified = governedVerified s.Progress.Manifest e.Coverage e.CatalogVerification recordsPassed
+              let open' = arr "requirements" s.Progress.Manifest |> List.filter (fun r -> boolOr "mandatory" false r && applies e.Facts r && not (governedIntegrated s verified r))
+              [ if e.Coverage.IsNone then yield ref' "COVERAGE_MISSING" "no governed coverage of the whole plan at the candidate; integration is judged only from governed evidence, never from progress events"
+                if e.CatalogVerification.IsNone then yield ref' "CATALOG_VERIFICATION_MISSING" "no governed catalog verification at the candidate"
+                if not open'.IsEmpty then
+                    yield ref' "SCOPE_NOT_INTEGRATED" (sprintf "%d applicable mandatory requirement(s) are not governed-verified at the candidate, for example %s" open'.Length (open' |> List.truncate 6 |> List.map (str "id") |> String.concat ", ")) ] } ]
 
 let completionGateWith (rules: CompletionRule list) (s: State) (e: ReleaseEvidence) = rules |> List.collect (fun r -> r.Check s e)
 

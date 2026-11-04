@@ -47,8 +47,11 @@ let scopeSha = (JsonDocument.Parse(File.ReadAllText manifest)).RootElement.GetPr
 let events = Path.Combine(src, "docs", "rehearsal-010-readiness", "evidence", "stop-decision", "r9-events.json")
 let checkpoint = write "checkpoint.json" (json (dict [ "schema", box "indy-init.scope-checkpoint/1"; "scopeSha256", box scopeSha ]))
 // Rehearsal 009 recorded T0 in evidence/t0/T0.md (00:30:01Z); the T0 record format is new in Rehearsal 010.
-let t0Record = write "t0.json" (json (dict [ "schema", box "indy-init.t0/1"; "t0", box "2026-11-04T00:30:01Z"; "deadline", box "2026-11-04T07:30:01Z"; "windowMinutes", box 420 ]))
+let t0Record = write "r9/evidence/t0/t0.json" (json (dict [ "schema", box "indy-init.t0/1"; "t0", box "2026-11-04T00:30:01Z"; "deadline", box "2026-11-04T07:30:01Z"; "windowMinutes", box 420 ]))
+run "git" [ "-C"; r9; "-c"; "user.name=replay"; "-c"; "user.email=replay@example.invalid"; "add"; "evidence/t0/t0.json" ] r9 |> ignore
+run "git" [ "-C"; r9; "-c"; "user.name=replay"; "-c"; "user.email=replay@example.invalid"; "commit"; "-qm"; "replay only: the T0 record in the Rehearsal 010 format (not part of Rehearsal 009)" ] r9 |> ignore
 let policy = Path.Combine(src, "kickoff", "rehearsal-010", "deadline-policy.json")
+let policySha = Security.Cryptography.SHA256.HashData(File.ReadAllBytes policy) |> Convert.ToHexString |> fun s -> s.ToLowerInvariant()
 let releaseCandidate = "39dc037990c8c049ee997fae8384c5bcc9290e2b"
 
 type Check = { Id: string; Finding: string; Kind: string; Expected: string; Command: string; Exit: int; Output: string; AsExpected: bool }
@@ -87,14 +90,15 @@ let catalog =
 let completion =
     cmd "requirements-compiler completion-gate"
         [ "completion-gate"; "--manifest"; manifest; "--events"; events; "--candidate"; releaseCandidate; "--release-gate"; at "evidence/release-gate/local-gate-release-39dc037.json"
-          "--catalog"; catalogOut; "--out"; Path.Combine(evidence, "completion-gate.json") ]
+          "--catalog"; catalogOut; "--coverage"; Path.Combine(src, "docs", "release-gate-repair", "evidence", "r9-release-gate", "coverage.json")
+          "--catalog-verification"; at "evidence/requirement-verification/requirement-verification.json"; "--out"; Path.Combine(evidence, "completion-gate.json") ]
     |> fun (c, a) -> c, rc a
 
 // The stop requests Rehearsal 009 made at 02:25Z (115 minutes), judged with the clock bound to T0.
 let stop (reason: string) =
     let request = write $"request-{reason}.json" (json (dict [ "at", box "2026-11-04T02:25:00Z"; "reason", box reason; "scopeSha256", box scopeSha ]))
     cmd "requirements-compiler stop-decision"
-        [ "stop-decision"; "--manifest"; manifest; "--checkpoint"; checkpoint; "--events"; events; "--request"; request; "--t0-record"; t0Record; "--deadline-policy"; policy; "--out"; Path.Combine(evidence, $"stop-decision-{reason}.json") ]
+        [ "stop-decision"; "--manifest"; manifest; "--checkpoint"; checkpoint; "--events"; events; "--request"; request; "--t0-record"; t0Record; "--deadline-policy"; policy; "--deadline-policy-sha256"; policySha; "--repo"; r9; "--out"; Path.Combine(evidence, $"stop-decision-{reason}.json") ]
     |> fun (c, a) -> c, rc a
 
 // The ledger and scope report from the replayed events.
@@ -122,9 +126,6 @@ let () =
     let report = File.ReadAllText(at "evidence/FINAL-REPORT.md")
     let claim = report.Split('\n') |> Array.filter (fun l -> l.Contains("verified", StringComparison.OrdinalIgnoreCase) || l.Contains("accepted", StringComparison.OrdinalIgnoreCase)) |> Array.truncate 3 |> String.concat " "
     File.WriteAllText(Path.Combine(observerEvidence, "claim.json"), json (dict [ "schema", box "indy-init.builder-claim/1"; "source", box "evidence/FINAL-REPORT.md (Rehearsal 009)"; "text", box claim ]))
-let t0InRepo = write "r9/evidence/t0/t0.json" (File.ReadAllText t0Record)
-run "git" [ "-C"; r9; "-c"; "user.name=replay"; "-c"; "user.email=replay@example.invalid"; "add"; "evidence/t0/t0.json" ] r9 |> ignore
-run "git" [ "-C"; r9; "-c"; "user.name=replay"; "-c"; "user.email=replay@example.invalid"; "commit"; "-qm"; "replay only: the T0 record in the Rehearsal 010 format (not part of Rehearsal 009)" ] r9 |> ignore
 let observe =
     cmd "requirements-compiler observe"
         [ "observe"; "--manifest"; manifest; "--events"; events; "--repo"; r9; "--t0-record"; "evidence/t0/t0.json"; "--deadline-policy"; policy; "--now"; "2026-11-04T03:00:00Z"

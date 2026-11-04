@@ -127,28 +127,56 @@ let progressCommand (args: string list) : int =
 /// The run clock. With --t0-record and --deadline-policy (Rehearsal 010 and later) it is bound to the committed T0
 /// record and the owner's policy; a --t0 or --window-minutes that differs is DEADLINE_RESET. Without them (earlier
 /// replays) --t0 and --window-minutes are used as given.
+/// Whether this invocation judges a historical replay (--replay-clock true): only then may the caller supply T0 or the
+/// current time. A live run's clock is the committed T0 record, the pinned policy and this machine's time.
+let private replayMode (o: Map<string, string>) = o.TryFind "--replay-clock" = Some "true"
+
+/// The first committed version of the T0 record in --repo, when given: a record changed after T0 is DEADLINE_RESET.
+let private committedT0 (o: Map<string, string>) (recordPath: string) : Result<unit, Refusal> =
+    match o.TryFind "--repo" with
+    | None -> Ok()
+    | Some repo ->
+        let rel = IO.Path.GetRelativePath(IO.Path.GetFullPath repo, IO.Path.GetFullPath recordPath).Replace('\\', '/')
+        match Git.run repo [ "log"; "--reverse"; "--diff-filter=A"; "--format=%H"; "--"; rel ] with
+        | Ok b ->
+            match (Text.Encoding.UTF8.GetString b).Split('\n', StringSplitOptions.RemoveEmptyEntries) |> Array.tryHead with
+            | None -> Error { Code = "T0_RECORD_UNCOMMITTED"; Detail = sprintf "%s is not committed in %s: the T0 record is committed at T0" rel repo }
+            | Some sha ->
+                match Git.run repo [ "show"; sprintf "%s:%s" sha rel ] with
+                | Ok first ->
+                    let firstT0 = parseBytes first |> strOpt "t0"
+                    let nowT0 = parseFile recordPath |> strOpt "t0"
+                    if firstT0 = nowT0 then Ok()
+                    else Error { Code = "DEADLINE_RESET"; Detail = sprintf "the T0 record says %A; at T0 (commit %s) it said %A" nowT0 (sha.Substring(0, 12)) firstT0 }
+                | Error e -> Error { Code = "T0_RECORD_UNCOMMITTED"; Detail = e }
+        | Error e -> Error { Code = "T0_RECORD_UNCOMMITTED"; Detail = e }
+
 let private clockOf (o: Map<string, string>) : Result<Continuation.Clock, Refusal> =
     let claimedT0 = o.TryFind "--t0" |> Option.map DateTimeOffset.Parse
     let claimedWindow = o.TryFind "--window-minutes" |> Option.map float
     let sha (path: string) = Security.Cryptography.SHA256.HashData(IO.File.ReadAllBytes path) |> Convert.ToHexString |> fun s -> s.ToLowerInvariant()
     match o.TryFind "--t0-record", o.TryFind "--deadline-policy" with
     | Some t, Some p ->
-        // The policy must be the one the owner pinned (the lock's deadlinePolicy.sha256) when the pin is given.
+        // A live run's policy must be the one the owner pinned (the lock's deadlinePolicy.sha256).
         match o.TryFind "--deadline-policy-sha256" with
+        | None when not (replayMode o) -> Error { Code = "DEADLINE_POLICY_UNAPPROVED"; Detail = "a live run needs --deadline-policy-sha256 (the lock's deadlinePolicy.sha256)" }
         | Some pinned when pinned <> sha p -> Error { Code = "DEADLINE_POLICY_UNAPPROVED"; Detail = sprintf "the deadline policy has sha256 %s; the lock pins %s" (sha p) pinned }
-        | _ -> Continuation.boundClock (parseFile t) (parseFile p) claimedT0 claimedWindow
+        | _ -> committedT0 o t |> Result.bind (fun () -> Continuation.boundClock (parseFile t) (parseFile p) claimedT0 claimedWindow)
     | Some _, None -> Error { Code = "DEADLINE_POLICY_MISSING"; Detail = "--t0-record needs --deadline-policy" }
     | None, _ ->
         // A caller-supplied T0 is accepted only for an explicit historical replay; a live run binds the clock to its record.
-        match claimedT0, o.TryFind "--replay-clock" with
-        | Some t0, Some "true" -> Ok { T0 = t0; Deadline = t0.AddMinutes(claimedWindow |> Option.defaultValue 420.0) }
-        | Some _, _ -> Error { Code = "T0_RECORD_MISSING"; Detail = "a live run's clock comes from --t0-record and --deadline-policy; --t0 alone is accepted only with --replay-clock true (a historical replay)" }
-        | None, _ -> Error { Code = "T0_RECORD_MISSING"; Detail = "no --t0-record" }
+        match claimedT0 with
+        | Some t0 when replayMode o -> Ok { T0 = t0; Deadline = t0.AddMinutes(claimedWindow |> Option.defaultValue 420.0) }
+        | Some _ -> Error { Code = "T0_RECORD_MISSING"; Detail = "a live run's clock comes from --t0-record and --deadline-policy; --t0 alone is accepted only with --replay-clock true (a historical replay)" }
+        | None -> Error { Code = "T0_RECORD_MISSING"; Detail = "no --t0-record" }
 
-/// A request may not be stamped after the moment it is judged (--now, or the current time): a request dated past the
-/// deadline does not make the deadline pass.
+/// A request may not be stamped after the moment it is judged: this machine's time in a live run (--now is accepted
+/// only in a historical replay). A request dated past the deadline does not make the deadline pass.
 let private futureRequest (o: Map<string, string>) (at: DateTimeOffset) : Refusal option =
-    let now = o.TryFind "--now" |> Option.map DateTimeOffset.Parse |> Option.defaultValue DateTimeOffset.UtcNow
+    let now =
+        match o.TryFind "--now" with
+        | Some n when replayMode o -> DateTimeOffset.Parse n
+        | _ -> DateTimeOffset.UtcNow
     if at > now.AddMinutes 2.0 then Some { Code = "REQUEST_IN_FUTURE"; Detail = sprintf "the request is dated %s, after the time it is judged (%s)" (at.ToString "o") (now.ToString "o") } else None
 
 /// Exclusions the owner approved: trusted operator records {requirement_id, action: exclude} in the pinned approvals.
@@ -162,9 +190,9 @@ let exclusionsOf (o: Map<string, string>) : Set<string * string> =
     | _ -> Set.empty
 
 /// The decision as written, with the clock it was judged against (so an observer can compare it with the T0 record).
-let private withClock (clock: Continuation.Clock) (j: Json) =
+let private withClock (replay: bool) (clock: Continuation.Clock) (j: Json) =
     match j with
-    | JObj ps -> JObj(ps @ [ "t0", JStr(clock.T0.ToString "o"); "deadline", JStr(clock.Deadline.ToString "o") ])
+    | JObj ps -> JObj(ps @ [ "t0", JStr(clock.T0.ToString "o"); "deadline", JStr(clock.Deadline.ToString "o"); "clock", JStr(if replay then "replay" else "live") ])
     | j -> j
 
 let stopDecisionCommand (args: string list) : int =
@@ -198,7 +226,13 @@ let stopDecisionCommand (args: string list) : int =
                 match futureRequest o request.At with
                 | Some r -> { d with Permitted = false; Refusals = r :: d.Refusals }
                 | None -> d
-            File.WriteAllText(o["--out"], serialize (withClock clock (Continuation.decisionJson request d)))
+            // "complete" before the deadline also needs the full-scope completion gate's COMPLETE verdict (--completion).
+            let d =
+                let complete = o.TryFind "--completion" |> Option.filter IO.File.Exists |> Option.exists (fun f -> strOpt "verdict" (parseFile f) = Some "COMPLETE")
+                if request.Reason = "complete" && request.At < clock.Deadline && not complete then
+                    { d with Permitted = false; Refusals = d.Refusals @ [ { Code = "COMPLETION_GATE_MISSING"; Detail = "stopping as complete needs the completion gate's COMPLETE verdict (--completion)" } ] }
+                else d
+            File.WriteAllText(o["--out"], serialize (withClock (replayMode o) clock (Continuation.decisionJson request d)))
             d.Refusals |> List.iter (fun r -> printfn "  REFUSED %s %s" r.Code r.Detail)
             printfn "stop-decision: %s (%d minute(s) remaining, %d open mandatory requirement(s))" (if d.Permitted then "STOP_PERMITTED" else "CONTINUE_REQUIRED") d.MinutesRemaining d.OpenMandatory.Length
             if d.Permitted && d.Refusals.IsEmpty then 0 else 4

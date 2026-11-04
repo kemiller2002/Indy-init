@@ -98,7 +98,13 @@ let detectors : Detector list =
                                 yield f "DEADLINE_RESET" "blocking" (sprintf "a stop decision was judged with T0 %s; the run's T0 is %s" used recorded) [] [] "judge stop requests with --t0-record" None
                             | _ -> () ]
                   | [] -> []
-              decisionResets
+              let replayed =
+                  [ for d in o.StopDecisions do
+                        if strOpt "clock" d = Some "replay" then yield f "DEADLINE_RESET" "blocking" "a stop decision was judged with a replay clock (--replay-clock): a live run's clock is its T0 record" [] [] "judge stop requests with --t0-record, the pinned policy and --repo" None
+                        match strOpt "requestedAt" d |> Option.map DateTimeOffset.Parse with
+                        | Some at when at > o.Now.AddMinutes 2.0 -> yield f "REQUEST_IN_FUTURE" "blocking" (sprintf "a stop request is dated %s, after this observation (%s)" (at.ToString "o") (o.Now.ToString "o")) [] [] "date requests when they are made" None
+                        | _ -> () ]
+              decisionResets @ replayed
               @ (match o.ClockProblem with
                  | Some why -> [ f "CLOCK_UNBOUND" "blocking" (sprintf "the run clock cannot be bound to the T0 record and the policy: %s; deadline and premature-stop findings are unavailable" why) [] [] "commit a valid evidence/t0/t0.json at T0" None ]
                  | None -> [])
