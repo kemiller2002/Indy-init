@@ -53,6 +53,7 @@ open System.Text.Json.Nodes
 open System.Text.RegularExpressions
 
 Environment.SetEnvironmentVariable("GIT_NO_REPLACE_OBJECTS", "1")
+Environment.SetEnvironmentVariable("GIT_GRAFT_FILE", "/nonexistent/owner-freeze-no-grafts")
 
 // ---- configuration -------------------------------------------------------------------------------------------------
 

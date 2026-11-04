@@ -40,6 +40,7 @@ open System.Text.RegularExpressions
 
 // No replace refs or grafts: the history judged is the history as committed.
 Environment.SetEnvironmentVariable("GIT_NO_REPLACE_OBJECTS", "1")
+Environment.SetEnvironmentVariable("GIT_GRAFT_FILE", "/nonexistent/launch-preflight-no-grafts")
 let args = fsi.CommandLineArgs |> Array.skip 1 |> List.ofArray |> List.skipWhile ((=) "--")
 let opt (name: string) = args |> List.pairwise |> List.tryFind (fst >> (=) name) |> Option.map snd
 let src = opt "--indy-init" |> Option.defaultWith (fun () -> failwith "missing --indy-init") |> Path.GetFullPath
@@ -93,6 +94,7 @@ let githubSaysOwnerSigned (commit: string) =
         | _ -> false
     with _ -> false
 
+let mutable keyFetchFailures : string list = []
 /// The operator's own signing keys, as registered on GitHub (SSH signing keys and GPG keys), in a private keyring and
 /// an allowed-signers file: a commit verifies locally only against these, never against GitHub's or an agent's key.
 let ownerKeys =
@@ -101,7 +103,7 @@ let ownerKeys =
         run home "chmod" [ "700"; home ] |> ignore
         let keysOf (endpoint: string) (field: string) =
             let code, out = run src gh [ "api"; $"users/{operator}/{endpoint}"; "--jq"; $"[.[].{field}] | @json" ]
-            if code <> 0 then [] else (try (JsonNode.Parse out).AsArray() |> Seq.map (fun k -> k.GetValue<string>()) |> List.ofSeq with _ -> [])
+            if code <> 0 then (keyFetchFailures <- $"users/{operator}/{endpoint}: {out}" :: keyFetchFailures; []) else (try (JsonNode.Parse out).AsArray() |> Seq.map (fun k -> k.GetValue<string>()) |> List.ofSeq with _ -> [])
         let allowed = Path.Combine(home, "allowed-signers")
         File.WriteAllLines(allowed, keysOf "ssh_signing_keys" "key" |> List.map (fun k -> $"{operator} namespaces=\"git\" {k}"))
         keysOf "gpg_keys" "raw_key" |> List.iteri (fun i k ->
@@ -115,7 +117,10 @@ let locallyOwnerSigned (commit: string) =
     let home, allowed = ownerKeys.Force()
     // The verifying programs are pinned: a configured gpg.program or gpg.ssh.program (an agent's signer, say) never
     // decides; only the owner's registered keys verify.
-    fst (runEnv [ "GNUPGHOME", home ] src "git" [ "-c"; "gpg.program=gpg"; "-c"; "gpg.ssh.program=ssh-keygen"; "-c"; $"gpg.ssh.allowedSignersFile={allowed}"; "verify-commit"; commit ]) = 0
+    // Global and system config are ignored, and every verifier is pinned (x509 is never the owner's): only the owner's
+    // registered keys can verify.
+    let env = [ "GNUPGHOME", home; "GIT_CONFIG_GLOBAL", "/dev/null"; "GIT_CONFIG_NOSYSTEM", "1" ]
+    fst (runEnv env src "git" [ "-c"; "gpg.program=gpg"; "-c"; "gpg.ssh.program=ssh-keygen"; "-c"; "gpg.x509.program=false"; "-c"; $"gpg.ssh.allowedSignersFile={allowed}"; "verify-commit"; commit ]) = 0
 
 /// Owner-signed: GitHub verifies the owner as committer AND the signature verifies against the owner's own keys.
 let ownerSigned (commit: string) = githubSaysOwnerSigned commit && locallyOwnerSigned commit
@@ -126,6 +131,12 @@ let blobAt (commit: string) (file: string) =
     if code = 0 then out else ""
 let parentsOf (commit: string) =
     (snd (git src [ "rev-list"; "--parents"; "-n"; "1"; commit ])).Split(' ', StringSplitOptions.RemoveEmptyEntries) |> Array.skip 1 |> List.ofArray
+
+/// Whether the owner merged this merge commit: GitHub records the pull request it merged as merged by the operator (a
+/// signature shows who wrote a change, not who decided to merge it; an abandoned owner branch merged by anyone fails).
+let mergedByOwner (commit: string) =
+    let code, out = run src gh [ "api"; $"repos/{indyInitRepo}/commits/{commit}/pulls"; "--jq"; $"[.[] | select(.merge_commit_sha == \"{commit}\") | .merged_by.login] | @json" ]
+    code = 0 && (try (JsonNode.Parse out).AsArray() |> Seq.exists (fun l -> l <> null && l.GetValue<string>() = operator) with _ -> false)
 
 /// The commits that changed `file` (against their first parent) on the first-parent line `range`, oldest first.
 let rec changesOn (file: string) (range: string list) =
@@ -143,6 +154,7 @@ and acceptable (file: string) (commit: string) =
         | [ p1; p2 ] ->
             let mb = snd (git src [ "merge-base"; p1; p2 ])
             mb <> "" && blobAt commit file = blobAt p2 file && blobAt p1 file = blobAt mb file
+            && mergedByOwner commit
             && (changesOn file [ $"{mb}..{p2}" ] |> List.forall (acceptable file))
         | _ -> false)
 
@@ -157,8 +169,10 @@ let lp00 =
     let _, head = git src [ "rev-parse"; "HEAD" ]
     let code, remote = git src [ "ls-remote"; origin; "refs/heads/main" ]
     let remoteMain = remote.Split('\t').[0]
-    check "LP-00" "the Indy-init checkout is clean and is origin/main" (
+    let _, shallow = git src [ "rev-parse"; "--is-shallow-repository" ]
+    check "LP-00" "the Indy-init checkout is clean, complete and is origin/main" (
         fail (status = "") "the Indy-init checkout has uncommitted changes"
+        @ fail (shallow = "false") "the Indy-init checkout is shallow: its history cannot be judged (git fetch --unshallow)"
         @ fail (code = 0 && remoteMain <> "") $"main of {origin} cannot be read"
         @ fail (code <> 0 || remoteMain = head) $"HEAD {head} is not origin/main {remoteMain}: judge what is published")
 
@@ -270,6 +284,7 @@ let lp05 =
     let provenance =
         (approvalsUnsigned |> List.map (fun c -> $"{approvalsRel} was changed in {c.Substring(0, 12)}, which GitHub does not verify as signed by {operator}: no record in it counts"))
         @ (duplicateIds |> List.map (fun i -> $"approval id {i} appears more than once"))
+        @ (keyFetchFailures |> List.map (fun e -> $"the owner's signing keys could not be read from GitHub ({e}): no signature can be verified"))
     check "LP-05" "every owner decision is recorded in owner-signed commits, launchable, and what it approved is what is pinned" (provenance @ packageDecisions @ r10)
 
 let lp06 =
@@ -403,5 +418,6 @@ opt "--out" |> Option.iter (fun out ->
               Collections.Generic.KeyValuePair("verdict", JsonValue.Create(if ready then "READY" else "REFUSED") :> JsonNode)
               Collections.Generic.KeyValuePair("checks", JsonArray(checks |> List.map (fun c -> JsonObject([ Collections.Generic.KeyValuePair("id", JsonValue.Create c.Id :> JsonNode); Collections.Generic.KeyValuePair("title", JsonValue.Create c.Title :> JsonNode); Collections.Generic.KeyValuePair("causes", JsonArray(c.Causes |> List.map (fun x -> JsonValue.Create x :> JsonNode) |> Array.ofList) :> JsonNode) ]) :> JsonNode) |> Array.ofList) :> JsonNode) ])
     File.WriteAllText(out, j.ToJsonString(Text.Json.JsonSerializerOptions(WriteIndented = true)) + "\n"))
+if ownerKeys.IsValueCreated then (try Directory.Delete(fst ownerKeys.Value, true) with _ -> ())
 printfn "launch-preflight: %s" (if ready then "READY" else "REFUSED")
 exit (if ready then 0 else 4)
