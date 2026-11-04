@@ -13,6 +13,8 @@
 //        Evidence type comes only from the plan's suite runner: executable obligations need Dokimos at HEAD, record
 //        obligations (praxis:*) need verify-process VERIFIED at HEAD, mixed ones need both; verifier:* is acceptance-only.
 //   dotnet fsi tools/r9/r9.fsx -- run-suites --obligations F --root REPO --out DIR [--suites ID,...]
+//   dotnet fsi tools/r9/r9.fsx -- suite-preflight --obligations F --root REPO [--out F]
+//        Executes every executable suite command in list mode; refuses readiness if any cannot execute.
 //   dotnet fsi tools/r9/r9.fsx -- spec-preflight --percepta EXE --out F (--indy-init SRC --lock LOCK |
 //        --machines F --invariants F --interfaces F --catalog F)
 //
@@ -607,6 +609,51 @@ let runSuites () =
     elif missing.IsEmpty then Pass (ran |> List.map (fun (id, code, files) -> $"{id}: exit {code}, {files.Length} result file(s)") |> fun l -> l @ [ $"results {out}/results.json at {head}" ])
     else Refused missing
 
+// ---- suite-preflight: every suite command of the plan must be able to execute ---------------------------------------
+
+/// Executes each executable suite's own command in list mode, against a repository, before readiness is claimed
+/// (docs/release-gate-repair). A dotnet-test suite runs `COMMAND --list-tests` (the SDK resolves the target, restores
+/// and builds it); a Playwright suite runs `COMMAND --list --pass-with-no-tests` (Playwright resolves the configuration
+/// and every --project). Listing needs no test to exist yet, so this runs before implementation; a command that cannot
+/// execute (Rehearsal 009: MSB1008, 'Project(s) "webkit" not found') refuses readiness. Writes the report to --out.
+let suitePreflight () =
+    let root = Path.GetFullPath(req "--root")
+    let obligations = readJson (req "--obligations")
+    let suites = arr obligations "suites" |> List.filter (fun s -> str s "runner" = "dotnet-test" || str s "runner" = "playwright")
+    let probe (s: JsonNode) =
+        let id, command = str s "id", str s "command"
+        let listed = if str s "runner" = "dotnet-test" then $"{command} --list-tests" else $"{command} --list --pass-with-no-tests"
+        let code, output = run "sh" [ "-c"; listed ] root
+        let cause =
+            output.Split('\n')
+            |> Array.tryFind (fun l -> Regex.IsMatch(l, @"error|Error:|not found", RegexOptions.IgnoreCase))
+            |> Option.map (fun l -> l.Trim())
+            |> Option.defaultValue $"exit {code}"
+        id, listed, code, (if code = 0 then "" else cause)
+    let results = suites |> List.map probe
+    let report =
+        JsonObject(
+            [ Collections.Generic.KeyValuePair("schema", JsonValue.Create "indy-init.r9-suite-preflight/1" :> JsonNode)
+              Collections.Generic.KeyValuePair("plan", JsonValue.Create(str obligations "planId") :> JsonNode)
+              Collections.Generic.KeyValuePair("root", JsonValue.Create root :> JsonNode)
+              Collections.Generic.KeyValuePair(
+                  "suites",
+                  JsonArray(
+                      results
+                      |> List.map (fun (id, cmd, code, cause) ->
+                          JsonObject(
+                              [ Collections.Generic.KeyValuePair("id", JsonValue.Create id :> JsonNode)
+                                Collections.Generic.KeyValuePair("command", JsonValue.Create cmd :> JsonNode)
+                                Collections.Generic.KeyValuePair("exit", JsonValue.Create(code: int) :> JsonNode)
+                                Collections.Generic.KeyValuePair("executable", JsonValue.Create((code = 0): bool) :> JsonNode)
+                                Collections.Generic.KeyValuePair("cause", JsonValue.Create cause :> JsonNode) ]) :> JsonNode)
+                      |> Array.ofList) :> JsonNode) ])
+    opt "--out" |> Option.iter (fun f -> File.WriteAllText(f, report.ToJsonString(JsonSerializerOptions(WriteIndented = true)) + "\n"))
+    let refused = results |> List.filter (fun (_, _, code, _) -> code <> 0) |> List.map (fun (id, cmd, code, cause) -> $"suite {id} cannot execute (exit {code}): {cause}  [$ {cmd}]")
+    if suites.IsEmpty then Unusable "the obligations name no executable suite"
+    elif refused.IsEmpty then Pass (results |> List.map (fun (id, _, _, _) -> $"{id}: executable") )
+    else Refused refused
+
 // ---- spec-preflight: Percepta must analyse the intended, non-empty package -----------------------------------------
 
 let legalTransitions (machines: JsonNode) =
@@ -709,6 +756,7 @@ match args with
 | "check-governance" :: _ -> checkGovernance () |> finish "check-governance"
 | "gate" :: _ -> gate () |> finish "gate"
 | "run-suites" :: _ -> runSuites () |> finish "run-suites"
+| "suite-preflight" :: _ -> suitePreflight () |> finish "suite-preflight"
 | "spec-preflight" :: _ -> specPreflight () |> finish "spec-preflight"
 | _ ->
     eprintfn "usage: dotnet fsi tools/r9/r9.fsx -- install-conditor|workstation|govern|check-governance|gate|spec-preflight ... (see the header)"
