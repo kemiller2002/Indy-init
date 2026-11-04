@@ -127,7 +127,7 @@ All costs are estimates.
 | Existing gate behaviour | Dokimos rejects placeholders, skips and stale SHAs, but cannot tell who computed `observed` |
 | Impact on user | A content regression in a field no probe covers ships "verified" |
 | Proposed correction | Owner-authored black-box journeys (R3) that drive the UI by accessible name and read GitHub directly. Plus governed **field-drop** probes: the gate mutates the *saved document* through a provider proxy (drops each content field in turn on read) and requires the journey to fail. That needs no knowledge of the implementer's source |
-| Executable verification | Harness case: an app that reads values from `sessionStorage` after reload fails the governed journey |
+| Executable verification | Harness case: an app that restores values from `sessionStorage` instead of GitHub after reload fails the governed journey |
 | Cost | Owner effort about 1–1.5 days (journeys plus proxy). CI +4–6 min. Tokens 0 for the implementer (they must still make the app pass) |
 | Confidence | Medium |
 
@@ -245,7 +245,7 @@ All costs are estimates.
 | Classification | **Observed** (009 `playwright.config.js:23` is chromium only) |
 | Shortcut | Chromium mobile emulation stands in for WebKit |
 | Why attractive | No WebKit install; fewer engine-specific bugs to fix |
-| Impact on user | Safari-specific failures (e.g. OPFS ephemeral refusal, 008 CR-T33-F08) are found on stage |
+| Impact on user | Safari-specific failures (e.g. WebKit's ephemeral-context storage refusal, 008 CR-T33-F08) are found on stage |
 | Proposed correction | The governed R3 journeys run in the `webkit` project at iPad 820×1180 and 1180×820 |
 | Cost | CI +3 min (the WebKit install is cached). Owner effort included in R3 |
 | Confidence | High |
