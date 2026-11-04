@@ -8,7 +8,7 @@
   "refusals": [
     {
       "code": "NOT_A_STOP_CONDITION",
-      "detail": "'release-gate-failed': a failed release gate is a verification result; it does not authorize stopping or reducing scope; 161 applicable mandatory requirement(s) are not verified (for example AR-001, AR-002, AR-003, AR-004, AR-005); 33 work item(s) are open, 33 can proceed now"
+      "detail": "'release-gate-failed': a failed release gate is a verification result; it does not authorize stopping or reducing scope; 161 applicable mandatory requirement(s) are not verified (for example AR-001, AR-002, AR-003, AR-004, AR-005); 34 work item(s) are open, 34 can proceed now"
     }
   ],
   "remaining": {
@@ -44,6 +44,7 @@
       "WI-GEN-AR",
       "WI-GEN-EXT-DATA",
       "WI-GEN-PF",
+      "WI-GEN-RECORDS",
       "WI-GEN-UI",
       "WI-GEN-VER",
       "WI-GEN-WDL"

@@ -28,6 +28,7 @@ exit 4
   REFUSED DEPENDENCY_NOT_INTEGRATED dependency SL-WI-GEN-AR is not integrated
   REFUSED DEPENDENCY_NOT_INTEGRATED dependency SL-WI-GEN-EXT-DATA is not integrated
   REFUSED DEPENDENCY_NOT_INTEGRATED dependency SL-WI-GEN-PF is not integrated
+  REFUSED DEPENDENCY_NOT_INTEGRATED dependency SL-WI-GEN-RECORDS is not integrated
   REFUSED DEPENDENCY_NOT_INTEGRATED dependency SL-WI-GEN-UI is not integrated
   REFUSED DEPENDENCY_NOT_INTEGRATED dependency SL-WI-GEN-VER is not integrated
   REFUSED DEPENDENCY_NOT_INTEGRATED dependency SL-WI-GEN-WDL is not integrated

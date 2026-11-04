@@ -143,7 +143,8 @@ let fixture (name: string) (edit: Fixture -> unit) (extraArgs: Fixture -> string
           @"# [unsigned] or carrying an agent trailer) or a run's workflow file; run view: a run's metadata; run download: its artifact."
           @"if [ ""$1"" = api ]; then"
           @"  case ""$2"" in */actions/runs/*) cat '@RUNS@'/path-${2##*/} 2>/dev/null || exit 1; exit 0 ;; esac"
-          @"  case ""$2"" in */pulls) p=${2%/pulls}; cat '@RUNS@'/pulls-${p##*/} 2>/dev/null || echo '[]'; exit 0 ;; esac"
+          @"  case ""$2"" in */commits/*/pulls) p=${2%/pulls}; cat '@RUNS@'/pulls-${p##*/} 2>/dev/null || echo '[]'; exit 0 ;; esac"
+          @"  case ""$2"" in */pulls/*) cat '@RUNS@'/pr-${2##*/} 2>/dev/null || exit 1; exit 0 ;; esac"
           @"  case ""$2"" in users/*/gpg_keys) cat '@RUNS@'/gpg-keys.json; exit 0 ;; users/*/ssh_signing_keys) echo '[]'; exit 0 ;; esac"
           @"  c=${2##*/}; msg=$(git -C '@INDY@' show -s --format=%B ""$c"" 2>/dev/null) || exit 1"
           @"  committer=$(git -C '@INDY@' show -s --format=%cn ""$c"")"
@@ -238,7 +239,8 @@ let cases =
           git f.Indy [ "push"; "-q"; "origin"; "main" ] |> ignore
           // GitHub records the owner as the one who merged the pull request
           let _, m = git f.Indy [ "rev-parse"; "HEAD" ]
-          write (Path.Combine(f.Runs, "pulls-" + m.Trim())) "[\"kemiller2002\"]\n" }
+          write (Path.Combine(f.Runs, "pulls-" + m.Trim())) "[1]\n"
+          write (Path.Combine(f.Runs, "pr-1")) "[true,\"kemiller2002\"]\n" }
       case "abandoned-owner-branch-merged-by-someone-else" "LP-05" (fun f ->
           git f.Indy [ "checkout"; "-q"; "-b"; "owner/abandoned" ] |> ignore
           replaceIn (approvals f) "]}]}" "]},{\"id\":\"APR-R10-OWNER-2\",\"authority\":{\"kind\":\"operator\",\"id\":\"kemiller2002\"},\"changes\":[{\"decision_id\":\"ODR-R10-18\",\"action\":\"decide\",\"option\":\"A\",\"pins\":[]}]}]}"

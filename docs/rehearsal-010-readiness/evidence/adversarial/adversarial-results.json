@@ -180,12 +180,12 @@
       "attack": {
         "exit": 1,
         "decidedAsExpected": true,
-        "summary": "    Error: P0 assertion(s) failed: J2-01 (expect(locator).toBeVisible() failed); J2-08 (expect(locator).toBeVisible() failed); J2-09 (values missing from GitHub (read directly): obs-mw20xay9-yipdul) |       43 |   const failed = test.info().annotations.filter((a) =\u003E a.type === \u0027assertion\u0027).map((a) =\u003E JSON.parse(a.description)).filter((a) =\u003E a.priority === \u0027P0\u0027 \u0026\u0026 a.status !== \u0027passed\u0027); |     \u003E 44 |   if (failed.length) throw new Error(\u0060P0 assertion(s) failed: ${failed.map((a) =\u003E \u0060${a.id} (${a.detail})\u0060).join(\u0027; \u0027)}\u0060); |   1 failed"
+        "summary": "    Error: P0 assertion(s) failed: J2-01 (expect(locator).toBeVisible() failed); J2-08 (expect(locator).toBeVisible() failed); J2-09 (values missing from GitHub (read directly): obs-mw26pitp-hmqo5x) |       43 |   const failed = test.info().annotations.filter((a) =\u003E a.type === \u0027assertion\u0027).map((a) =\u003E JSON.parse(a.description)).filter((a) =\u003E a.priority === \u0027P0\u0027 \u0026\u0026 a.status !== \u0027passed\u0027); |     \u003E 44 |   if (failed.length) throw new Error(\u0060P0 assertion(s) failed: ${failed.map((a) =\u003E \u0060${a.id} (${a.detail})\u0060).join(\u0027; \u0027)}\u0060); |   1 failed"
       },
       "positiveControl": {
         "exit": 0,
         "passed": true,
-        "summary": "  1 passed (4.2s)"
+        "summary": "  1 passed (4.1s)"
       },
       "protectionRemoved": {
         "mutation": [
@@ -196,7 +196,7 @@
         ],
         "exit": 0,
         "decidedAsExpected": false,
-        "summary": "  1 passed (4.3s)"
+        "summary": "  1 passed (4.1s)"
       },
       "verdict": "VALIDATED",
       "error": ""
@@ -219,7 +219,7 @@
       "positiveControl": {
         "exit": 0,
         "passed": true,
-        "summary": "  1 passed (2.5s)"
+        "summary": "  1 passed (2.7s)"
       },
       "protectionRemoved": {
         "mutation": [
@@ -230,7 +230,7 @@
         ],
         "exit": 0,
         "decidedAsExpected": false,
-        "summary": "  1 passed (3.8s)"
+        "summary": "  1 passed (4.5s)"
       },
       "verdict": "VALIDATED",
       "error": ""
@@ -248,12 +248,12 @@
       "attack": {
         "exit": 1,
         "decidedAsExpected": true,
-        "summary": "  1 failed"
+        "summary": "    [pid=5359][err] [1104/140428.644629:ERROR:base/files/file_path_watcher_inotify.cc:338] inotify_init() failed: Too many open files (24) |     [pid=5359][err] [1104/140428.717619:ERROR:base/files/file_path_watcher_inotify.cc:338] inotify_init() failed: Too many open files (24) |   1 failed"
       },
       "positiveControl": {
         "exit": 0,
         "passed": true,
-        "summary": "  1 passed (2.4s)"
+        "summary": "  1 passed (2.7s)"
       },
       "protectionRemoved": {
         "mutation": [
@@ -264,7 +264,7 @@
         ],
         "exit": 0,
         "decidedAsExpected": false,
-        "summary": "  1 passed (2.3s)"
+        "summary": "  1 passed (2.6s)"
       },
       "verdict": "VALIDATED",
       "error": ""
@@ -377,7 +377,7 @@
       "attack": {
         "exit": 4,
         "decidedAsExpected": true,
-        "summary": "  REFUSED NOT_A_STOP_CONDITION \u0027conserve-compute\u0027: unused time is not a reason to stop while approved work remains; 161 applicable mandatory requirement(s) are not verified (for example AR-001, AR-002, AR-003, AR-004, AR-005); 33 work item(s) are open, 33 can proceed now | stop-decision: CONTINUE_REQUIRED (305 minute(s) remaining, 161 open mandatory requirement(s))"
+        "summary": "  REFUSED NOT_A_STOP_CONDITION \u0027conserve-compute\u0027: unused time is not a reason to stop while approved work remains; 161 applicable mandatory requirement(s) are not verified (for example AR-001, AR-002, AR-003, AR-004, AR-005); 34 work item(s) are open, 34 can proceed now | stop-decision: CONTINUE_REQUIRED (305 minute(s) remaining, 161 open mandatory requirement(s))"
       },
       "positiveControl": {
         "exit": 0,
@@ -393,7 +393,7 @@
         ],
         "exit": 4,
         "decidedAsExpected": false,
-        "summary": "  REFUSED NOT_A_STOP_CONDITION \u0027conserve-compute\u0027: unused time is not a reason to stop while approved work remains; 161 applicable mandatory requirement(s) are not verified (for example AR-001, AR-002, AR-003, AR-004, AR-005); 33 work item(s) are open, 33 can proceed now | stop-decision: STOP_PERMITTED (305 minute(s) remaining, 161 open mandatory requirement(s))"
+        "summary": "  REFUSED NOT_A_STOP_CONDITION \u0027conserve-compute\u0027: unused time is not a reason to stop while approved work remains; 161 applicable mandatory requirement(s) are not verified (for example AR-001, AR-002, AR-003, AR-004, AR-005); 34 work item(s) are open, 34 can proceed now | stop-decision: STOP_PERMITTED (305 minute(s) remaining, 161 open mandatory requirement(s))"
       },
       "verdict": "VALIDATED",
       "error": ""
@@ -409,7 +409,7 @@
       "attack": {
         "exit": 4,
         "decidedAsExpected": true,
-        "summary": "  REFUSED SCOPE_INCOMPLETE 193 applicable mandatory requirement(s) are not verified (for example AR-001, AR-002, AR-003, AR-004, AR-005); 35 work item(s) are open, 35 can proceed now |   REFUSED COMPLETION_CLAIM_REFUSED completion is claimed with open scope: 193 applicable mandatory requirement(s) are not verified (for example AR-001, AR-002, AR-003, AR-004, AR-005); 35 work item(s) are open, 35 can proceed now |   REFUSED SCOPE_NOT_INTEGRATED 193 applicable mandatory requirement(s) are not integrated on main |   REFUSED COMPLETION_GATE_MISSING stopping as complete needs the governed completion gate\u0027s COMPLETE verdict (--completion)"
+        "summary": "  REFUSED SCOPE_INCOMPLETE 193 applicable mandatory requirement(s) are not verified (for example AR-001, AR-002, AR-003, AR-004, AR-005); 36 work item(s) are open, 36 can proceed now |   REFUSED COMPLETION_CLAIM_REFUSED completion is claimed with open scope: 193 applicable mandatory requirement(s) are not verified (for example AR-001, AR-002, AR-003, AR-004, AR-005); 36 work item(s) are open, 36 can proceed now |   REFUSED SCOPE_NOT_INTEGRATED 193 applicable mandatory requirement(s) are not integrated on main |   REFUSED COMPLETION_GATE_MISSING stopping as complete needs the governed completion gate\u0027s COMPLETE verdict (--completion)"
       },
       "positiveControl": {
         "exit": 0,
@@ -445,7 +445,7 @@
       "attack": {
         "exit": 4,
         "decidedAsExpected": true,
-        "summary": "  REFUSED DEADLINE_RESET the request uses T0 2026-11-04T07:56:00.0000000\u002B00:00; the run\u0027s T0 is 2026-11-04T02:56:00.0000000\u002B00:00 (the original deadline is never reset) | stop-decision: REFUSED (the run clock)"
+        "summary": "  REFUSED DEADLINE_RESET the request uses T0 2026-11-04T10:37:00.0000000\u002B00:00; the run\u0027s T0 is 2026-11-04T05:37:00.0000000\u002B00:00 (the original deadline is never reset) | stop-decision: REFUSED (the run clock)"
       },
       "positiveControl": {
         "exit": 0,
@@ -461,7 +461,7 @@
         ],
         "exit": 4,
         "decidedAsExpected": false,
-        "summary": "  REFUSED NOT_A_STOP_CONDITION \u0027conserve-compute\u0027: unused time is not a reason to stop while approved work remains; 161 applicable mandatory requirement(s) are not verified (for example AR-001, AR-002, AR-003, AR-004, AR-005); 33 work item(s) are open, 33 can proceed now | stop-decision: CONTINUE_REQUIRED (310 minute(s) remaining, 161 open mandatory requirement(s))"
+        "summary": "  REFUSED NOT_A_STOP_CONDITION \u0027conserve-compute\u0027: unused time is not a reason to stop while approved work remains; 161 applicable mandatory requirement(s) are not verified (for example AR-001, AR-002, AR-003, AR-004, AR-005); 34 work item(s) are open, 34 can proceed now | stop-decision: CONTINUE_REQUIRED (310 minute(s) remaining, 161 open mandatory requirement(s))"
       },
       "verdict": "VALIDATED",
       "error": ""
@@ -477,7 +477,7 @@
       "attack": {
         "exit": 4,
         "decidedAsExpected": true,
-        "summary": "  REFUSED SCOPE_CHANGE_UNAPPROVED the request works to scope ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff, the checkpoint pins b407b5cc5f200e3651088440c0db630f18e84357c933020970f236f18f9352d6, and no owner record {action: approve-scope, scope_sha256: ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff} exists | stop-decision: CONTINUE_REQUIRED (0 minute(s) remaining, 161 open mandatory requirement(s))"
+        "summary": "  REFUSED SCOPE_CHANGE_UNAPPROVED the request works to scope ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff, the checkpoint pins 5a8aef29cb2dff62d8ee60b7162e7df226bb42818ffb87f7f827fdcb443d9095, and no owner record {action: approve-scope, scope_sha256: ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff} exists | stop-decision: CONTINUE_REQUIRED (0 minute(s) remaining, 161 open mandatory requirement(s))"
       },
       "positiveControl": {
         "exit": 0,
@@ -509,7 +509,7 @@
       "attack": {
         "exit": 4,
         "decidedAsExpected": true,
-        "summary": "  REFUSED IMPLEMENTATION_BEFORE_CHECKPOINT commit fcac470f510046b0d3ae9919b1ce35ee086c3e99 changes application code before the scope checkpoint (commit 0a6f95e1d173142e31b95bd5bdc7d98ad0922875) | scope order: REFUSED (1)"
+        "summary": "  REFUSED IMPLEMENTATION_BEFORE_CHECKPOINT commit ba2221cd4db34f2d3dea45e443fc154f00876afd changes application code before the scope checkpoint (commit 8e5e6c325b5476a846469b27a8f547238f222328) | scope order: REFUSED (1)"
       },
       "positiveControl": {
         "exit": 0,
@@ -638,7 +638,7 @@
       "attack": {
         "exit": 4,
         "decidedAsExpected": true,
-        "summary": "  REFUSED REQUEST_IN_FUTURE the request is dated 2026-11-04T12:16:00.0000000\u002B00:00, after the time it is judged (2026-11-04T11:29:47.8036556\u002B00:00) | stop-decision: CONTINUE_REQUIRED (0 minute(s) remaining, 161 open mandatory requirement(s))"
+        "summary": "  REFUSED REQUEST_IN_FUTURE the request is dated 2026-11-04T14:57:00.0000000\u002B00:00, after the time it is judged (2026-11-04T14:12:25.9486869\u002B00:00) | stop-decision: CONTINUE_REQUIRED (0 minute(s) remaining, 161 open mandatory requirement(s))"
       },
       "positiveControl": {
         "exit": 0,
@@ -766,7 +766,7 @@
       "attack": {
         "exit": 4,
         "decidedAsExpected": true,
-        "summary": "  REFUSED IMPLEMENTATION_BEFORE_CHECKPOINT commit a46d9435e150dcb1ee8e8284a9c765d9e1f4ee8a changes application code before the scope checkpoint (commit 8e2c725591d1fed87b87d8d1112ae3cfc4b7585a) | scope order: REFUSED (1)"
+        "summary": "  REFUSED IMPLEMENTATION_BEFORE_CHECKPOINT commit 3d1ffc540ebba2b20e7768a1ff2d8f7ec09d6553 changes application code before the scope checkpoint (commit e6b4e4e3d8997b7b901920fb44281137e13cfb84) | scope order: REFUSED (1)"
       },
       "positiveControl": {
         "exit": 0,
@@ -830,7 +830,7 @@
       "attack": {
         "exit": 4,
         "decidedAsExpected": true,
-        "summary": "  REFUSED DEADLINE_RESET the T0 record says Some \u00222026-11-04T07:56:00.0000000\u002B00:00\u0022; at T0 (commit ada5648e3d62) it said Some \u00222026-11-04T02:56:00.0000000\u002B00:00\u0022 | stop-decision: REFUSED (the run clock)"
+        "summary": "  REFUSED DEADLINE_RESET the T0 record says Some \u00222026-11-04T10:37:00.0000000\u002B00:00\u0022; at T0 (commit 65aea664c695) it said Some \u00222026-11-04T05:37:00.0000000\u002B00:00\u0022 | stop-decision: REFUSED (the run clock)"
       },
       "positiveControl": {
         "exit": 0,
@@ -846,7 +846,7 @@
         ],
         "exit": 4,
         "decidedAsExpected": false,
-        "summary": "  REFUSED NOT_A_STOP_CONDITION \u0027conserve-compute\u0027: unused time is not a reason to stop while approved work remains; 161 applicable mandatory requirement(s) are not verified (for example AR-001, AR-002, AR-003, AR-004, AR-005); 33 work item(s) are open, 33 can proceed now | stop-decision: CONTINUE_REQUIRED (221 minute(s) remaining, 161 open mandatory requirement(s))"
+        "summary": "  REFUSED NOT_A_STOP_CONDITION \u0027conserve-compute\u0027: unused time is not a reason to stop while approved work remains; 161 applicable mandatory requirement(s) are not verified (for example AR-001, AR-002, AR-003, AR-004, AR-005); 34 work item(s) are open, 34 can proceed now | stop-decision: CONTINUE_REQUIRED (221 minute(s) remaining, 161 open mandatory requirement(s))"
       },
       "verdict": "VALIDATED",
       "error": ""
@@ -896,7 +896,7 @@
       "attack": {
         "exit": 4,
         "decidedAsExpected": true,
-        "summary": "  WARNING EARLY_STOP_PERMITTED a stop for \u0027deadline\u0027 was permitted at 2026-11-04T07:56:00.0000000\u002B00:00 with 0 minutes left; the owner should confirm its evidence"
+        "summary": "  WARNING EARLY_STOP_PERMITTED a stop for \u0027deadline\u0027 was permitted at 2026-11-04T10:37:00.0000000\u002B00:00 with 0 minutes left; the owner should confirm its evidence"
       },
       "positiveControl": {
         "exit": 4,
@@ -912,7 +912,7 @@
         ],
         "exit": 4,
         "decidedAsExpected": false,
-        "summary": "  WARNING EARLY_STOP_PERMITTED a stop for \u0027deadline\u0027 was permitted at 2026-11-04T07:56:00.0000000\u002B00:00 with 0 minutes left; the owner should confirm its evidence"
+        "summary": "  WARNING EARLY_STOP_PERMITTED a stop for \u0027deadline\u0027 was permitted at 2026-11-04T10:37:00.0000000\u002B00:00 with 0 minutes left; the owner should confirm its evidence"
       },
       "verdict": "VALIDATED",
       "error": ""
@@ -960,7 +960,7 @@
       "attack": {
         "exit": 4,
         "decidedAsExpected": true,
-        "summary": "  REFUSED COMPLETION_CANDIDATE_MISMATCH the completion verdict is for eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee; the repository\u0027s HEAD must be main and that commit (f80a94b8ed39f72e38a3a7d2315ecd8a86a76460) | stop-decision: CONTINUE_REQUIRED (120 minute(s) remaining, 0 open mandatory requirement(s))"
+        "summary": "  REFUSED COMPLETION_CANDIDATE_MISMATCH the completion verdict is for eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee; the repository\u0027s HEAD must be main and that commit (8769631fddffda5ed33f43bb2a9850a7c9822b6d) | stop-decision: CONTINUE_REQUIRED (120 minute(s) remaining, 0 open mandatory requirement(s))"
       },
       "positiveControl": {
         "exit": 0,
@@ -993,7 +993,7 @@
       "attack": {
         "exit": 4,
         "decidedAsExpected": true,
-        "summary": "  BLOCKING PREMATURE_STOP a stop as complete was permitted at 2026-11-04T07:56:00.0000000\u002B00:00, but no governed completion-gate COMPLETE verdict exists"
+        "summary": "  BLOCKING PREMATURE_STOP a stop as complete was permitted at 2026-11-04T10:37:00.0000000\u002B00:00, but no governed completion-gate COMPLETE verdict exists"
       },
       "positiveControl": {
         "exit": 4,
@@ -1058,7 +1058,7 @@
       "attack": {
         "exit": 4,
         "decidedAsExpected": true,
-        "summary": "  BLOCKING PREMATURE_STOP a stop as complete was permitted at 2026-11-04T07:56:00.0000000\u002B00:00, but no governed completion-gate COMPLETE verdict exists"
+        "summary": "  BLOCKING PREMATURE_STOP a stop as complete was permitted at 2026-11-04T10:37:00.0000000\u002B00:00, but no governed completion-gate COMPLETE verdict exists"
       },
       "positiveControl": {
         "exit": 4,
@@ -1090,7 +1090,7 @@
       "attack": {
         "exit": 4,
         "decidedAsExpected": true,
-        "summary": "  REFUSED T0_RECORD_INVALID the T0 record\u0027s t0 2026-11-04T02:56:00 is not an instant with an explicit UTC offset | stop-decision: REFUSED (the run clock)"
+        "summary": "  REFUSED T0_RECORD_INVALID the T0 record\u0027s t0 2026-11-04T05:37:00 is not an instant with an explicit UTC offset | stop-decision: REFUSED (the run clock)"
       },
       "positiveControl": {
         "exit": 0,

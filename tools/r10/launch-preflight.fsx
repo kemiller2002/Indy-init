@@ -103,7 +103,10 @@ let ownerKeys =
         run home "chmod" [ "700"; home ] |> ignore
         let keysOf (endpoint: string) (field: string) =
             let code, out = run src gh [ "api"; $"users/{operator}/{endpoint}"; "--jq"; $"[.[].{field}] | @json" ]
-            if code <> 0 then (keyFetchFailures <- $"users/{operator}/{endpoint}: {out}" :: keyFetchFailures; []) else (try (JsonNode.Parse out).AsArray() |> Seq.map (fun k -> k.GetValue<string>()) |> List.ofSeq with _ -> [])
+            if code <> 0 then (keyFetchFailures <- $"users/{operator}/{endpoint}: {out}" :: keyFetchFailures; [])
+            else
+                try (JsonNode.Parse out).AsArray() |> Seq.map (fun k -> k.GetValue<string>()) |> List.ofSeq
+                with _ -> (keyFetchFailures <- $"users/{operator}/{endpoint}: unreadable answer" :: keyFetchFailures; [])
         let allowed = Path.Combine(home, "allowed-signers")
         File.WriteAllLines(allowed, keysOf "ssh_signing_keys" "key" |> List.map (fun k -> $"{operator} namespaces=\"git\" {k}"))
         keysOf "gpg_keys" "raw_key" |> List.iteri (fun i k ->
@@ -135,8 +138,15 @@ let parentsOf (commit: string) =
 /// Whether the owner merged this merge commit: GitHub records the pull request it merged as merged by the operator (a
 /// signature shows who wrote a change, not who decided to merge it; an abandoned owner branch merged by anyone fails).
 let mergedByOwner (commit: string) =
-    let code, out = run src gh [ "api"; $"repos/{indyInitRepo}/commits/{commit}/pulls"; "--jq"; $"[.[] | select(.merge_commit_sha == \"{commit}\") | .merged_by.login] | @json" ]
-    code = 0 && (try (JsonNode.Parse out).AsArray() |> Seq.exists (fun l -> l <> null && l.GetValue<string>() = operator) with _ -> false)
+    // commits/{sha}/pulls lists abbreviated pull requests (no merged_by): find the one this commit merged, then read
+    // the full pull request.
+    let code, out = run src gh [ "api"; $"repos/{indyInitRepo}/commits/{commit}/pulls"; "--jq"; $"[.[] | select(.merge_commit_sha == \"{commit}\") | .number] | @json" ]
+    let numbers = if code <> 0 then [] else (try (JsonNode.Parse out).AsArray() |> Seq.map (fun n -> n.GetValue<int>()) |> List.ofSeq with _ -> [])
+    numbers |> List.exists (fun n ->
+        let c, pr = run src gh [ "api"; $"repos/{indyInitRepo}/pulls/{n}"; "--jq"; "[.merged, .merged_by.login] | @json" ]
+        c = 0 && (try (match JsonNode.Parse pr with
+                       | :? JsonArray as x when x.Count = 2 && not (isNull x[1]) -> x[0].GetValue<bool>() && x[1].GetValue<string>() = operator
+                       | _ -> false) with _ -> false))
 
 /// The commits that changed `file` (against their first parent) on the first-parent line `range`, oldest first.
 let rec changesOn (file: string) (range: string list) =
@@ -284,7 +294,7 @@ let lp05 =
     let provenance =
         (approvalsUnsigned |> List.map (fun c -> $"{approvalsRel} was changed in {c.Substring(0, 12)}, which GitHub does not verify as signed by {operator}: no record in it counts"))
         @ (duplicateIds |> List.map (fun i -> $"approval id {i} appears more than once"))
-        @ (keyFetchFailures |> List.map (fun e -> $"the owner's signing keys could not be read from GitHub ({e}): no signature can be verified"))
+        @ (keyFetchFailures |> List.map (fun e -> $"the owner's signing keys could not all be read from GitHub ({e}): signatures by those keys cannot be verified"))
     check "LP-05" "every owner decision is recorded in owner-signed commits, launchable, and what it approved is what is pinned" (provenance @ packageDecisions @ r10)
 
 let lp06 =

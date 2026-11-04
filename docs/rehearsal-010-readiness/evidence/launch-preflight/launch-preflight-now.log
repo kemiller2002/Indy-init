@@ -1,41 +1,47 @@
+LP-00 REFUSED  the Indy-init checkout is clean, complete and is origin/main
+        the Indy-init checkout has uncommitted changes
+        the Indy-init checkout is shallow: its history cannot be judged (git fetch --unshallow)
+        HEAD 0c80154640bb365f64c30398059471494ea50c43 is not origin/main cae4102b5e4e6a7c9190af96fad60cf923bcbb31: judge what is published
 LP-01 REFUSED  the owner's lock is committed
         kickoff/rehearsal-010/toolchain.lock.json does not exist (ODR-RG-04: the owner commits it)
-LP-02 REFUSED  v4.1.4 is frozen and tagged
+LP-02 REFUSED  v4.1.4 is frozen and tagged on origin
         no lock
 LP-03 REFUSED  every contract digest in the lock is its file's
         no lock
 LP-04 REFUSED  the scope is the approved one
         no lock
-LP-05 REFUSED  every owner decision is recorded, and what it approved is what is pinned
-        ODR-V414-01 is not recorded (owner-freeze.fsx decide v4.1.4)
-        ODR-V414-02 is not recorded (owner-freeze.fsx decide v4.1.4)
-        ODR-V414-03 (approve v4.1.4) is not recorded (owner-freeze.fsx approve v4.1.4)
-        ODR-RG-03 is not recorded (owner-freeze.fsx decide rehearsal-010)
-        ODR-RG-05 is not recorded (owner-freeze.fsx decide rehearsal-010)
-        ODR-R10-02 is not recorded (owner-freeze.fsx decide rehearsal-010)
-        ODR-R10-03 is not recorded (owner-freeze.fsx decide rehearsal-010)
-        ODR-R10-04 is not recorded (owner-freeze.fsx decide rehearsal-010)
-        ODR-R10-05 is not recorded (owner-freeze.fsx decide rehearsal-010)
-        ODR-R10-06 is not recorded (owner-freeze.fsx decide rehearsal-010)
-        ODR-R10-07 is not recorded (owner-freeze.fsx decide rehearsal-010)
-        ODR-R10-08 is not recorded (owner-freeze.fsx decide rehearsal-010)
-        ODR-R10-09 is not recorded (owner-freeze.fsx decide rehearsal-010)
-        ODR-R10-10 is not recorded (owner-freeze.fsx decide rehearsal-010)
-        ODR-R10-11 is not recorded (owner-freeze.fsx decide rehearsal-010)
-        ODR-R10-12 is not recorded (owner-freeze.fsx decide rehearsal-010)
-        ODR-R10-13 is not recorded (owner-freeze.fsx decide rehearsal-010)
-        ODR-R10-14 is not recorded (owner-freeze.fsx decide rehearsal-010)
-        ODR-R10-15 is not recorded (owner-freeze.fsx decide rehearsal-010)
-        ODR-R10-16 is not recorded (owner-freeze.fsx decide rehearsal-010)
-        ODR-R10-17 is not recorded (owner-freeze.fsx decide rehearsal-010)
-        ODR-R10-18 is not recorded (owner-freeze.fsx decide rehearsal-010)
-        ODR-R10-01 is not recorded (owner-freeze.fsx decide rehearsal-010)
+LP-05 REFUSED  every owner decision is recorded in owner-signed commits, launchable, and what it approved is what is pinned
+        kickoff/rehearsal-007/approvals.causa.json was changed in 485b8a90972f, which GitHub does not verify as signed by kemiller2002: no record in it counts
+        ODR-V414-01 is not recorded by the owner (owner-freeze.fsx decide v4.1.4)
+        ODR-V414-02 is not recorded by the owner (owner-freeze.fsx decide v4.1.4)
+        ODR-V414-03 (approve v4.1.4) is not recorded by the owner (owner-freeze.fsx approve v4.1.4)
+        ODR-RG-03 is not recorded by the owner (owner-freeze.fsx decide rehearsal-010)
+        ODR-RG-05 is not recorded by the owner (owner-freeze.fsx decide rehearsal-010)
+        ODR-R10-02 is not recorded by the owner (owner-freeze.fsx decide rehearsal-010)
+        ODR-R10-03 is not recorded by the owner (owner-freeze.fsx decide rehearsal-010)
+        ODR-R10-04 is not recorded by the owner (owner-freeze.fsx decide rehearsal-010)
+        ODR-R10-05 is not recorded by the owner (owner-freeze.fsx decide rehearsal-010)
+        ODR-R10-06 is not recorded by the owner (owner-freeze.fsx decide rehearsal-010)
+        ODR-R10-07 is not recorded by the owner (owner-freeze.fsx decide rehearsal-010)
+        ODR-R10-08 is not recorded by the owner (owner-freeze.fsx decide rehearsal-010)
+        ODR-R10-09 is not recorded by the owner (owner-freeze.fsx decide rehearsal-010)
+        ODR-R10-10 is not recorded by the owner (owner-freeze.fsx decide rehearsal-010)
+        ODR-R10-11 is not recorded by the owner (owner-freeze.fsx decide rehearsal-010)
+        ODR-R10-12 is not recorded by the owner (owner-freeze.fsx decide rehearsal-010)
+        ODR-R10-13 is not recorded by the owner (owner-freeze.fsx decide rehearsal-010)
+        ODR-R10-14 is not recorded by the owner (owner-freeze.fsx decide rehearsal-010)
+        ODR-R10-15 is not recorded by the owner (owner-freeze.fsx decide rehearsal-010)
+        ODR-R10-16 is not recorded by the owner (owner-freeze.fsx decide rehearsal-010)
+        ODR-R10-17 is not recorded by the owner (owner-freeze.fsx decide rehearsal-010)
+        ODR-R10-18 is not recorded by the owner (owner-freeze.fsx decide rehearsal-010)
+        ODR-R10-01 is not recorded by the owner (owner-freeze.fsx decide rehearsal-010)
 LP-06 REFUSED  the resolved set carries Dokimos 0.11.1
         no lock
-LP-07 REFUSED  the test repository is isolated
+LP-07 REFUSED  the test repository is isolated and the one approved
         no lock
-LP-08 REFUSED  live-provider preflight passed (J1-J3, Chromium and WebKit, api.github.com)
-        no live-provider preflight evidence (--live-evidence; LIVE-PROVIDER-PREFLIGHT.md)
-LP-09 PASS     the adversarial suite is validated
-LP-10 PASS     the competition repository is clean (no T0, no clock)
+LP-08 REFUSED  live-provider preflight passed (the governed run: J1-J3, Chromium and WebKit, api.github.com)
+        no live-provider preflight run (--live-run RUN_ID; LIVE-PROVIDER-PREFLIGHT.md)
+LP-09 REFUSED  the adversarial suite is validated in every case it defines (a CI run of this tree)
+        no adversarial CI run (--adversarial-run RUN_ID: the Preflight tooling run of this tree)
+LP-10 PASS     the competition repository is clean (no T0, no clock), as published
 launch-preflight: REFUSED

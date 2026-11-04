@@ -2,12 +2,12 @@ exit 1
 
 Running 1 test using 1 worker
 
-  ✘  1 [chromium] › j2-analysis.spec.mjs:22:1 › J2 complete investigation analysis (12.6s)
+  ✘  1 [chromium] › j2-analysis.spec.mjs:22:1 › J2 complete investigation analysis (12.8s)
 
 
   1) [chromium] › j2-analysis.spec.mjs:22:1 › J2 complete investigation analysis ───────────────────
 
-    Error: P0 assertion(s) failed: J2-01 (expect(locator).toBeVisible() failed); J2-08 (expect(locator).toBeVisible() failed); J2-09 (values missing from GitHub (read directly): obs-mw20xay9-yipdul)
+    Error: P0 assertion(s) failed: J2-01 (expect(locator).toBeVisible() failed); J2-08 (expect(locator).toBeVisible() failed); J2-09 (values missing from GitHub (read directly): obs-mw26pitp-hmqo5x)
 
        at support.mjs:44
 

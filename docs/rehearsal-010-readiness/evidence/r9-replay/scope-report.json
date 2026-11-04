@@ -1,6 +1,6 @@
 {
   "schema": "indy-init.scope-report/1",
-  "scopeSha256": "b407b5cc5f200e3651088440c0db630f18e84357c933020970f236f18f9352d6",
+  "scopeSha256": "5a8aef29cb2dff62d8ee60b7162e7df226bb42818ffb87f7f827fdcb443d9095",
   "mainHealthy": true,
   "states": {
     "not-started": 161,
@@ -50,7 +50,8 @@
         "T31",
         "T33",
         "T36",
-        "WI-GEN-AR"
+        "WI-GEN-AR",
+        "WI-GEN-RECORDS"
       ],
       "supportingEvidence": [],
       "exclusions": []
@@ -284,7 +285,9 @@
       "id": "AR-001",
       "mandatory": true,
       "state": "not-started",
-      "workItems": [],
+      "workItems": [
+        "WI-GEN-RECORDS"
+      ],
       "integratedAt": null,
       "excludedBy": null
     },
@@ -292,7 +295,9 @@
       "id": "AR-002",
       "mandatory": true,
       "state": "not-started",
-      "workItems": [],
+      "workItems": [
+        "WI-GEN-RECORDS"
+      ],
       "integratedAt": null,
       "excludedBy": null
     },
@@ -300,7 +305,9 @@
       "id": "AR-003",
       "mandatory": true,
       "state": "not-started",
-      "workItems": [],
+      "workItems": [
+        "WI-GEN-RECORDS"
+      ],
       "integratedAt": null,
       "excludedBy": null
     },
@@ -308,7 +315,9 @@
       "id": "AR-004",
       "mandatory": true,
       "state": "not-started",
-      "workItems": [],
+      "workItems": [
+        "WI-GEN-RECORDS"
+      ],
       "integratedAt": null,
       "excludedBy": null
     },
@@ -336,7 +345,9 @@
       "id": "AR-007",
       "mandatory": true,
       "state": "not-started",
-      "workItems": [],
+      "workItems": [
+        "WI-GEN-RECORDS"
+      ],
       "integratedAt": null,
       "excludedBy": null
     },
@@ -385,7 +396,9 @@
       "id": "AR-012",
       "mandatory": true,
       "state": "not-started",
-      "workItems": [],
+      "workItems": [
+        "WI-GEN-RECORDS"
+      ],
       "integratedAt": null,
       "excludedBy": null
     },
@@ -413,7 +426,9 @@
       "id": "AR-015",
       "mandatory": true,
       "state": "not-started",
-      "workItems": [],
+      "workItems": [
+        "WI-GEN-RECORDS"
+      ],
       "integratedAt": null,
       "excludedBy": null
     },
@@ -421,7 +436,9 @@
       "id": "AR-017",
       "mandatory": true,
       "state": "not-started",
-      "workItems": [],
+      "workItems": [
+        "WI-GEN-RECORDS"
+      ],
       "integratedAt": null,
       "excludedBy": null
     },
@@ -429,7 +446,9 @@
       "id": "AR-018",
       "mandatory": true,
       "state": "not-started",
-      "workItems": [],
+      "workItems": [
+        "WI-GEN-RECORDS"
+      ],
       "integratedAt": null,
       "excludedBy": null
     },
@@ -437,7 +456,9 @@
       "id": "AR-019",
       "mandatory": true,
       "state": "not-started",
-      "workItems": [],
+      "workItems": [
+        "WI-GEN-RECORDS"
+      ],
       "integratedAt": null,
       "excludedBy": null
     },
@@ -445,7 +466,9 @@
       "id": "AR-020",
       "mandatory": true,
       "state": "not-started",
-      "workItems": [],
+      "workItems": [
+        "WI-GEN-RECORDS"
+      ],
       "integratedAt": null,
       "excludedBy": null
     },
@@ -453,7 +476,9 @@
       "id": "AR-021",
       "mandatory": true,
       "state": "not-started",
-      "workItems": [],
+      "workItems": [
+        "WI-GEN-RECORDS"
+      ],
       "integratedAt": null,
       "excludedBy": null
     },
@@ -481,7 +506,9 @@
       "id": "AR-024",
       "mandatory": true,
       "state": "not-started",
-      "workItems": [],
+      "workItems": [
+        "WI-GEN-RECORDS"
+      ],
       "integratedAt": null,
       "excludedBy": null
     },
@@ -489,7 +516,9 @@
       "id": "AR-027",
       "mandatory": true,
       "state": "not-started",
-      "workItems": [],
+      "workItems": [
+        "WI-GEN-RECORDS"
+      ],
       "integratedAt": null,
       "excludedBy": null
     },
@@ -497,7 +526,9 @@
       "id": "AR-028",
       "mandatory": true,
       "state": "not-started",
-      "workItems": [],
+      "workItems": [
+        "WI-GEN-RECORDS"
+      ],
       "integratedAt": null,
       "excludedBy": null
     },
@@ -525,7 +556,9 @@
       "id": "AR-031",
       "mandatory": true,
       "state": "not-started",
-      "workItems": [],
+      "workItems": [
+        "WI-GEN-RECORDS"
+      ],
       "integratedAt": null,
       "excludedBy": null
     },

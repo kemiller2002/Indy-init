@@ -1,0 +1,17 @@
+LP-00 REFUSED  the Indy-init checkout is clean, complete and is origin/main
+        HEAD b494d82647b19eb774f17a0c6d2bd18af2df6970 is not origin/main a05d7a065b664d222dbf7eff4d73155a1b4d01b5: judge what is published
+LP-01 PASS     the owner's lock is committed
+LP-02 PASS     v4.1.4 is frozen and tagged on origin
+LP-03 PASS     every contract digest in the lock is its file's
+LP-04 PASS     the scope is the approved one
+LP-05 PASS     every owner decision is recorded in owner-signed commits, launchable, and what it approved is what is pinned
+LP-06 PASS     the resolved set carries Dokimos 0.11.1
+LP-07 PASS     the test repository is isolated and the one approved
+LP-08 PASS     live-provider preflight passed (the governed run: J1-J3, Chromium and WebKit, api.github.com)
+LP-09 PASS     the adversarial suite is validated in every case it defines (a CI run of this tree)
+LP-10 PASS     the competition repository is clean (no T0, no clock), as published
+launch-preflight: REFUSED
+
+
+$SRC/tools/r10/launch-preflight.fsx(115,20): info FS3886: This list expression contains a single tuple element. Did you mean to use ';' instead of ',' to separate list elements?
+
