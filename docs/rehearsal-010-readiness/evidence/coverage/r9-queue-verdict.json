@@ -1,0 +1,151 @@
+{
+  "schema": "indy-init.scope-verdict/1",
+  "check": "scope-preflight",
+  "verdict": "REFUSED",
+  "refusals": [
+    {
+      "code": "WORK_ITEM_MISSING",
+      "detail": "T10 (5 requirement(s)) has no Praxis work item: praxis add \"[T10] Blank repository bootstrap on the kickoff set; first green CI\""
+    },
+    {
+      "code": "WORK_ITEM_MISSING",
+      "detail": "T11 (4 requirement(s)) has no Praxis work item: praxis add \"[T11] Stack lock and compatibility gate\""
+    },
+    {
+      "code": "WORK_ITEM_MISSING",
+      "detail": "T12 (4 requirement(s)) has no Praxis work item: praxis add \"[T12] Invariant inventory and invariant tests first: requirements-compiled/v4/invariants.json, save-state and conflict machines (state-machines.json)\""
+    },
+    {
+      "code": "WORK_ITEM_MISSING",
+      "detail": "T13 (1 requirement(s)) has no Praxis work item: praxis add \"[T13] F# semantic kernel and policy/capabilities\""
+    },
+    {
+      "code": "WORK_ITEM_MISSING",
+      "detail": "T14 (0 requirement(s)) has no Praxis work item: praxis add \"[T14] Interface freeze: versioned manifest for boundaries A-E\""
+    },
+    {
+      "code": "WORK_ITEM_MISSING",
+      "detail": "T15 (1 requirement(s)) has no Praxis work item: praxis add \"[T15] Frozen fixture replay against the storage contract\""
+    },
+    {
+      "code": "WORK_ITEM_MISSING",
+      "detail": "T16 (5 requirement(s)) has no Praxis work item: praxis add \"[T16] Application shell, loading experience, routes and visual identity\""
+    },
+    {
+      "code": "WORK_ITEM_MISSING",
+      "detail": "T17 (0 requirement(s)) has no Praxis work item: praxis add \"[T17] Integration checkpoint 1: a legal command end to end in the browser\""
+    },
+    {
+      "code": "WORK_ITEM_MISSING",
+      "detail": "T18 (4 requirement(s)) has no Praxis work item: praxis add \"[T18] Provider conformance first: probe real GitHub (stale head, moved-head FORBIDDEN form, secondary rate limit, lost answer) and build the stateful fake from what it answers\""
+    },
+    {
+      "code": "WORK_ITEM_MISSING",
+      "detail": "T19 (22 requirement(s)) has no Praxis work item: praxis add \"[T19] Session-memory save-state machine and save process: one commit per save, read-back confirmation, rebase, conflict, reconciliation, bounds (ADR-R7-001)\""
+    },
+    {
+      "code": "WORK_ITEM_MISSING",
+      "detail": "T20 (0 requirement(s)) has no Praxis work item: praxis add \"[T20] Connect flow and GitHub provider: read, create, write, conflict\""
+    },
+    {
+      "code": "WORK_ITEM_MISSING",
+      "detail": "T21 (10 requirement(s)) has no Praxis work item: praxis add \"[T21] Integration checkpoint 2: live write path against the real test repository\""
+    },
+    {
+      "code": "WORK_ITEM_MISSING",
+      "detail": "T22 (4 requirement(s)) has no Praxis work item: praxis add \"[T22] Investigation workspace views\""
+    },
+    {
+      "code": "WORK_ITEM_MISSING",
+      "detail": "T23 (0 requirement(s)) has no Praxis work item: praxis add \"[T23] Causal graph with the existing workflow layout engine\""
+    },
+    {
+      "code": "WORK_ITEM_MISSING",
+      "detail": "T24 (3 requirement(s)) has no Praxis work item: praxis add \"[T24] Discover the workflow layout engine and existing capabilities\""
+    },
+    {
+      "code": "WORK_ITEM_MISSING",
+      "detail": "T25 (1 requirement(s)) has no Praxis work item: praxis add \"[T25] Load the active historical catalog after Connect\""
+    },
+    {
+      "code": "WORK_ITEM_MISSING",
+      "detail": "T26 (0 requirement(s)) has no Praxis work item: praxis add \"[T26] Report preview and Folio export\""
+    },
+    {
+      "code": "WORK_ITEM_MISSING",
+      "detail": "T27 (0 requirement(s)) has no Praxis work item: praxis add \"[T27] Prompt/data boundaries (R11.4) and the structured AI proposal loop, whose event scope DEC-022 left open\""
+    },
+    {
+      "code": "WORK_ITEM_MISSING",
+      "detail": "T28 (0 requirement(s)) has no Praxis work item: praxis add \"[T28] History, time travel and semantic diff (S14, S15; in scope by DEC-R7-005)\""
+    },
+    {
+      "code": "WORK_ITEM_MISSING",
+      "detail": "T29 (3 requirement(s)) has no Praxis work item: praxis add \"[T29] Administration and Settings pages with actual loaded versions\""
+    },
+    {
+      "code": "WORK_ITEM_MISSING",
+      "detail": "T30 (1 requirement(s)) has no Praxis work item: praxis add \"[T30] Independent architecture and invariant review before the first release candidate\""
+    },
+    {
+      "code": "WORK_ITEM_MISSING",
+      "detail": "T31 (11 requirement(s)) has no Praxis work item: praxis add \"[T31] Release candidate: full applicable matrix at the deployed SHA\""
+    },
+    {
+      "code": "WORK_ITEM_MISSING",
+      "detail": "T32 (0 requirement(s)) has no Praxis work item: praxis add \"[T32] Defect-class closure\""
+    },
+    {
+      "code": "WORK_ITEM_MISSING",
+      "detail": "T33 (1 requirement(s)) has no Praxis work item: praxis add \"[T33] Fresh reviewer before the final verdict\""
+    },
+    {
+      "code": "WORK_ITEM_MISSING",
+      "detail": "T34 (3 requirement(s)) has no Praxis work item: praxis add \"[T34] Acceptance: preservation gate re-run, ledger, computed verdict, measurements\""
+    },
+    {
+      "code": "WORK_ITEM_MISSING",
+      "detail": "T35 (0 requirement(s)) has no Praxis work item: praxis add \"[T35] Independent review checkpoint 1: interfaces and invariants (DCC-002, target T+90..120)\""
+    },
+    {
+      "code": "WORK_ITEM_MISSING",
+      "detail": "T36 (1 requirement(s)) has no Praxis work item: praxis add \"[T36] Independent review checkpoint 2: live write path and conflict handling\""
+    },
+    {
+      "code": "WORK_ITEM_MISSING",
+      "detail": "WI-GEN-AR (3 requirement(s)) has no Praxis work item: praxis add \"[WI-GEN-AR] Implement the AR requirements no execution-DAG task covers\""
+    },
+    {
+      "code": "WORK_ITEM_MISSING",
+      "detail": "WI-GEN-EXT-DATA (9 requirement(s)) has no Praxis work item: praxis add \"[WI-GEN-EXT-DATA] Implement the EXT-DATA requirements no execution-DAG task covers\""
+    },
+    {
+      "code": "WORK_ITEM_MISSING",
+      "detail": "WI-GEN-PF (16 requirement(s)) has no Praxis work item: praxis add \"[WI-GEN-PF] Implement the PF requirements no execution-DAG task covers\""
+    },
+    {
+      "code": "WORK_ITEM_MISSING",
+      "detail": "WI-GEN-RECORDS (16 requirement(s)) has no Praxis work item: praxis add \"[WI-GEN-RECORDS] Produce the record evidence (reviews, process and owner records) of the P0 requirements no execution-DAG task covers\""
+    },
+    {
+      "code": "WORK_ITEM_MISSING",
+      "detail": "WI-GEN-UI (21 requirement(s)) has no Praxis work item: praxis add \"[WI-GEN-UI] Implement the UI requirements no execution-DAG task covers\""
+    },
+    {
+      "code": "WORK_ITEM_MISSING",
+      "detail": "WI-GEN-VER (1 requirement(s)) has no Praxis work item: praxis add \"[WI-GEN-VER] Implement the VER requirements no execution-DAG task covers\""
+    },
+    {
+      "code": "WORK_ITEM_MISSING",
+      "detail": "WI-GEN-WDL (12 requirement(s)) has no Praxis work item: praxis add \"[WI-GEN-WDL] Implement the WDL requirements no execution-DAG task covers\""
+    },
+    {
+      "code": "WORK_ITEM_MISSING",
+      "detail": "WI-INV-START (11 requirement(s)) has no Praxis work item: praxis add \"[WI-INV-START] Implement the CAT-CAUSA-INVESTIGATION requirements of screen START\""
+    },
+    {
+      "code": "WORK_ITEM_MISSING",
+      "detail": "WI-INV-WORKSPACE (27 requirement(s)) has no Praxis work item: praxis add \"[WI-INV-WORKSPACE] Implement the CAT-CAUSA-INVESTIGATION requirements of screen WORKSPACE\""
+    }
+  ]
+}

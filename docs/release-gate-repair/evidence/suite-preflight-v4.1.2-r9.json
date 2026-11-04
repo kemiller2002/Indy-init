@@ -1,0 +1,63 @@
+{
+  "schema": "indy-init.r9-suite-preflight/1",
+  "plan": "VP-1e3c66bcc958",
+  "root": "<rehearsal-009 checkout at 13e1cf8>",
+  "suites": [
+    {
+      "id": "SU-OWN-DOTNET",
+      "command": "dotnet test tests/Causa.Contract.Tests tests/Causa.Domain.Tests tests/Causa.Persistence.Tests tests/Causa.App.Tests --list-tests",
+      "exit": 1,
+      "executable": false,
+      "cause": "MSBUILD : error MSB1008: Only one project can be specified."
+    },
+    {
+      "id": "SU-OWN-BROWSER",
+      "command": "npx playwright test --project=chromium tests/browser/contract --list --pass-with-no-tests",
+      "exit": 0,
+      "executable": true,
+      "cause": ""
+    },
+    {
+      "id": "SU-DOTNET-DETERMINISTIC",
+      "command": "dotnet test tests/Causa.Acceptance --filter FullyQualifiedName~Causa.Acceptance.Deterministic. --list-tests",
+      "exit": 0,
+      "executable": true,
+      "cause": ""
+    },
+    {
+      "id": "SU-DOTNET-INVARIANTS",
+      "command": "dotnet test tests/Causa.Invariants --filter \u0022FullyQualifiedName~Causa.Invariants.\u0026FullyQualifiedName!~Causa.Invariants.Live.\u0022 --list-tests",
+      "exit": 0,
+      "executable": true,
+      "cause": ""
+    },
+    {
+      "id": "SU-BROWSER-CHROMIUM",
+      "command": "npx playwright test --project=chromium tests/browser/acceptance tests/browser/invariants --list --pass-with-no-tests",
+      "exit": 0,
+      "executable": true,
+      "cause": ""
+    },
+    {
+      "id": "SU-BROWSER-WEBKIT",
+      "command": "npx playwright test --project=webkit tests/browser/acceptance tests/browser/invariants --list --pass-with-no-tests",
+      "exit": 1,
+      "executable": false,
+      "cause": "Error: Project(s) \u0022webkit\u0022 not found. Available projects: \u0022chromium\u0022"
+    },
+    {
+      "id": "SU-DOTNET-LIVE",
+      "command": "dotnet test tests/Causa.Acceptance tests/Causa.Invariants --filter \u0022FullyQualifiedName~Causa.Acceptance.Live.|FullyQualifiedName~Causa.Invariants.Live.\u0022 --list-tests",
+      "exit": 1,
+      "executable": false,
+      "cause": "MSBUILD : error MSB1008: Only one project can be specified."
+    },
+    {
+      "id": "SU-BROWSER-LIVE",
+      "command": "npx playwright test --project=chromium tests/browser/live --list --pass-with-no-tests",
+      "exit": 0,
+      "executable": true,
+      "cause": ""
+    }
+  ]
+}

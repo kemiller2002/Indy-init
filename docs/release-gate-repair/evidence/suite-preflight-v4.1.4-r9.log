@@ -1,0 +1,9 @@
+  SU-OWN-DOTNET: executable
+  SU-OWN-BROWSER: executable
+  SU-DOTNET-DETERMINISTIC: executable
+  SU-DOTNET-INVARIANTS: executable
+  SU-BROWSER-CHROMIUM: executable
+  SU-BROWSER-WEBKIT: executable
+  SU-DOTNET-LIVE: executable
+  SU-BROWSER-LIVE: executable
+suite-preflight: PASS

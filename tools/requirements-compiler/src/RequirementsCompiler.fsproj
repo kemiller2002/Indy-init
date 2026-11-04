@@ -37,6 +37,10 @@
     <Compile Include="V4Package.fs" />
     <Compile Include="V41Package.fs" />
     <Compile Include="TokenEconomics.fs" />
+    <Compile Include="Scope.fs" />
+    <Compile Include="Progress.fs" />
+    <Compile Include="Continuation.fs" />
+    <Compile Include="ScopeCommands.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 </Project>

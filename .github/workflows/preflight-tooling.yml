@@ -211,6 +211,52 @@ jobs:
   # Rehearsal 009 readiness gates (docs/rehearsal-009-preflight-smoke/FINAL-CORRECTIONS.md): the pinned Conditor, the
   # resolved set from echelon-current, the governed Praxis policy, the Dokimos coverage gate with its candidate-SHA
   # checks and the non-empty Percepta preflight, each proven by positive and negative cases on the released binaries.
+  release-gate-repair:
+    # docs/release-gate-repair: the suite-command defects Rehearsal 009 hit stay refused, the corrected v4.1.4 runners
+    # execute, the Praxis ordering gate and the acceptance levels behave as specified.
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Pinned Conditor 0.10.20 and the echelon-current 1.36.0 workstation, in a disposable home
+        run: |
+          dotnet fsi tools/r9/r9.fsx -- install-conditor --lock kickoff/rehearsal-009/toolchain.lock.json --dir "$RUNNER_TEMP/conditor"
+          dotnet fsi tools/r9/r9.fsx -- workstation --lock kickoff/rehearsal-009/toolchain.lock.json \
+            --conditor "$RUNNER_TEMP/conditor/conditor" --home "$RUNNER_TEMP/echelon" --target-id "indy-init-rg-${{ github.run_id }}"
+          echo "$RUNNER_TEMP/echelon/.local/bin" >> "$GITHUB_PATH"
+      - name: Build the requirements compiler
+        run: dotnet build tools/requirements-compiler/src -c Release
+      - name: Candidate package v4.1.4 is reproduced byte for byte and X01-X21 pass
+        run: dotnet tools/requirements-compiler/src/bin/Release/net10.0/requirements-compiler.dll v41 --source . --package requirements-compiled/v4.1.4 --base requirements-compiled/v4 --check
+      - name: Playwright test runner (the version the owner locked, ODR-V41-07)
+        run: |
+          mkdir -p "$RUNNER_TEMP/pw" && cd "$RUNNER_TEMP/pw" && npm init -y > /dev/null && npm install --no-audit --no-fund @playwright/test@1.63.0 > /dev/null
+      - name: Release-gate repair cases
+        run: |
+          git config --global user.name ci && git config --global user.email ci@example.invalid
+          dotnet fsi tools/release-gate-repair/tests.fsx -- --indy-init . --praxis "$RUNNER_TEMP/echelon/.local/bin/praxis" \
+            --node-modules "$RUNNER_TEMP/pw/node_modules" --work "$RUNNER_TEMP/rg-work" --evidence "$RUNNER_TEMP/rg-evidence"
+      - name: The obligation inventory is what the generator writes from the committed inputs
+        run: |
+          dotnet fsi tools/release-gate-repair/inventory.fsx -- --plan requirements-compiled/v4/verification-plan.json \
+            --execution-plan requirements-compiled/v4.1.4/verification-execution-plan.json \
+            --ownership requirements-compiled/v4.1.4/agent-file-ownership.json --dag requirements-compiled/v4.1.4/execution-dag.json \
+            --coverage docs/release-gate-repair/evidence/r9-release-gate/coverage.json --gate docs/release-gate-repair/evidence/r9-release-gate/gate.json \
+            --suite-preflight docs/release-gate-repair/evidence/suite-preflight-v4.1.2-r9.json --out "$RUNNER_TEMP/inventory.json"
+          cmp "$RUNNER_TEMP/inventory.json" docs/release-gate-repair/obligation-inventory.json
+      - name: Publish the repair evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-gate-repair
+          path: ${{ runner.temp }}/rg-evidence
+
   r9-readiness-gates:
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -237,3 +283,40 @@ jobs:
         with:
           name: r9-readiness-gates
           path: ${{ runner.temp }}/r9-evidence
+  # Rehearsal 009's release gate failed in run-suites: two `dotnet test` runners named several projects (MSB1008) and
+  # SU-BROWSER-WEBKIT named a Playwright project nobody defined. This job proves, on a deterministic fixture tree with
+  # the plan's layout (no application code), that the frozen v4.1.2 commands are refused and that every executable
+  # suite of the successor v4.1.4 lists and runs, WebKit included. The release-gate-repair harness lists the same
+  # commands; this job also executes them (docs/rehearsal-010-readiness/INTEGRATION-REPORT.md).
+  suite-commands:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+      - name: Fixture trees (with and without the webkit project)
+        run: |
+          dotnet fsi tools/r9/r9.fsx -- suite-fixture --out "$RUNNER_TEMP/fx"
+          dotnet fsi tools/r9/r9.fsx -- suite-fixture --out "$RUNNER_TEMP/fx-nowebkit" --without-webkit true
+          (cd "$RUNNER_TEMP/fx" && npm install --no-audit --no-fund && npx playwright install --with-deps chromium webkit)
+          cp -r "$RUNNER_TEMP/fx/node_modules" "$RUNNER_TEMP/fx-nowebkit/"
+      - name: The frozen v4.1.2 commands are refused (MSB1008), and a missing webkit project is refused
+        run: |
+          set +e
+          dotnet fsi tools/r9/r9.fsx -- suite-preflight --plan requirements-compiled/v4.1.2/verification-execution-plan.json --root "$RUNNER_TEMP/fx" --out "$RUNNER_TEMP/v412.json" --require-tests true
+          test $? -eq 4 || { echo "::error::v4.1.2 was not refused"; exit 1; }
+          jq -e '[.suites[] | select(.cause != "") | .id] == ["SU-OWN-DOTNET","SU-DOTNET-LIVE"]' "$RUNNER_TEMP/v412.json" || exit 1
+          dotnet fsi tools/r9/r9.fsx -- suite-preflight --plan requirements-compiled/v4.1.4/verification-execution-plan.json --root "$RUNNER_TEMP/fx-nowebkit" --out "$RUNNER_TEMP/nowebkit.json" --require-tests true
+          test $? -eq 4 || { echo "::error::a missing webkit project was not refused"; exit 1; }
+          jq -e '[.suites[] | select(.cause != "") | .id] == ["SU-BROWSER-WEBKIT"]' "$RUNNER_TEMP/nowebkit.json" || exit 1
+      - name: Every v4.1.4 suite command lists and runs, each test passing (WebKit included)
+        run: |
+          dotnet fsi tools/r9/r9.fsx -- suite-preflight --plan requirements-compiled/v4.1.4/verification-execution-plan.json --root "$RUNNER_TEMP/fx" --out "$RUNNER_TEMP/v414.json" --require-tests true
+          dotnet fsi tools/r9/r9.fsx -- run-suites --plan requirements-compiled/v4.1.4/verification-execution-plan.json --root "$RUNNER_TEMP/fx" --out "$RUNNER_TEMP/runs"
+          for f in "$RUNNER_TEMP"/runs/*/run.log; do head -2 "$f"; done
+          ! grep -l 'outcome="Failed"' "$RUNNER_TEMP"/runs/*/*.trx
+          for s in SU-OWN-BROWSER SU-BROWSER-CHROMIUM SU-BROWSER-WEBKIT SU-BROWSER-LIVE; do
+            jq -e '.stats.unexpected == 0 and .stats.expected > 0' "$RUNNER_TEMP/runs/$s/results.json" || { echo "::error::$s did not pass"; exit 1; }
+          done
