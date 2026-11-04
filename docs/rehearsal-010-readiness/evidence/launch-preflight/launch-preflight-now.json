@@ -1,0 +1,94 @@
+{
+  "schema": "indy-init.launch-preflight/1",
+  "verdict": "REFUSED",
+  "checks": [
+    {
+      "id": "LP-01",
+      "title": "the owner\u0027s lock is committed",
+      "causes": [
+        "kickoff/rehearsal-010/toolchain.lock.json does not exist (ODR-RG-04: the owner commits it)"
+      ]
+    },
+    {
+      "id": "LP-02",
+      "title": "v4.1.4 is frozen and tagged",
+      "causes": [
+        "no lock"
+      ]
+    },
+    {
+      "id": "LP-03",
+      "title": "every contract digest in the lock is its file\u0027s",
+      "causes": [
+        "no lock"
+      ]
+    },
+    {
+      "id": "LP-04",
+      "title": "the scope is the approved one",
+      "causes": [
+        "no lock"
+      ]
+    },
+    {
+      "id": "LP-05",
+      "title": "every owner decision is recorded, and what it approved is what is pinned",
+      "causes": [
+        "ODR-V414-01 is not recorded (owner-freeze.fsx decide v4.1.4)",
+        "ODR-V414-02 is not recorded (owner-freeze.fsx decide v4.1.4)",
+        "ODR-V414-03 (approve v4.1.4) is not recorded (owner-freeze.fsx approve v4.1.4)",
+        "ODR-RG-03 is not recorded (owner-freeze.fsx decide rehearsal-010)",
+        "ODR-RG-05 is not recorded (owner-freeze.fsx decide rehearsal-010)",
+        "ODR-R10-02 is not recorded (owner-freeze.fsx decide rehearsal-010)",
+        "ODR-R10-03 is not recorded (owner-freeze.fsx decide rehearsal-010)",
+        "ODR-R10-04 is not recorded (owner-freeze.fsx decide rehearsal-010)",
+        "ODR-R10-05 is not recorded (owner-freeze.fsx decide rehearsal-010)",
+        "ODR-R10-06 is not recorded (owner-freeze.fsx decide rehearsal-010)",
+        "ODR-R10-07 is not recorded (owner-freeze.fsx decide rehearsal-010)",
+        "ODR-R10-08 is not recorded (owner-freeze.fsx decide rehearsal-010)",
+        "ODR-R10-09 is not recorded (owner-freeze.fsx decide rehearsal-010)",
+        "ODR-R10-10 is not recorded (owner-freeze.fsx decide rehearsal-010)",
+        "ODR-R10-11 is not recorded (owner-freeze.fsx decide rehearsal-010)",
+        "ODR-R10-12 is not recorded (owner-freeze.fsx decide rehearsal-010)",
+        "ODR-R10-13 is not recorded (owner-freeze.fsx decide rehearsal-010)",
+        "ODR-R10-14 is not recorded (owner-freeze.fsx decide rehearsal-010)",
+        "ODR-R10-15 is not recorded (owner-freeze.fsx decide rehearsal-010)",
+        "ODR-R10-16 is not recorded (owner-freeze.fsx decide rehearsal-010)",
+        "ODR-R10-17 is not recorded (owner-freeze.fsx decide rehearsal-010)",
+        "ODR-R10-18 is not recorded (owner-freeze.fsx decide rehearsal-010)",
+        "ODR-R10-01 is not recorded (owner-freeze.fsx decide rehearsal-010)"
+      ]
+    },
+    {
+      "id": "LP-06",
+      "title": "the resolved set carries Dokimos 0.11.1",
+      "causes": [
+        "no lock"
+      ]
+    },
+    {
+      "id": "LP-07",
+      "title": "the test repository is isolated",
+      "causes": [
+        "no lock"
+      ]
+    },
+    {
+      "id": "LP-08",
+      "title": "live-provider preflight passed (J1-J3, Chromium and WebKit, api.github.com)",
+      "causes": [
+        "no live-provider preflight evidence (--live-evidence; LIVE-PROVIDER-PREFLIGHT.md)"
+      ]
+    },
+    {
+      "id": "LP-09",
+      "title": "the adversarial suite is validated",
+      "causes": []
+    },
+    {
+      "id": "LP-10",
+      "title": "the competition repository is clean (no T0, no clock)",
+      "causes": []
+    }
+  ]
+}

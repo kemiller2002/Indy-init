@@ -1,0 +1,99 @@
+name: Live-provider preflight (Rehearsal 010)
+
+# The real-provider positive control before Rehearsal 010 (docs/rehearsal-010-readiness/LIVE-PROVIDER-PREFLIGHT.md).
+# The governed journeys J1-J3 run, on Chromium and WebKit, against the harness's positive-control fixture application
+# and the real GitHub API, persisting to the isolated test repository named in the Rehearsal 010 lock with a GitHub App
+# installation token for that repository alone, minted for this job and revoked when it ends. No builder code exists
+# here: the run proves the journeys, the repository and the credential work against the real provider, and that the
+# token reaches only this job. The journey results are the evidence launch-preflight LP-08 reads.
+#
+# Owner-dispatched only (workflow_dispatch); it starts no rehearsal and writes no T0 record.
+
+on:
+  workflow_dispatch:
+    inputs:
+      lock:
+        description: The Rehearsal 010 lock whose testRepository the journeys use
+        required: true
+        default: kickoff/rehearsal-010/toolchain.lock.json
+
+permissions:
+  contents: read
+
+concurrency:
+  group: live-provider-preflight
+  cancel-in-progress: false
+
+jobs:
+  live:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: The isolated test repository (ODR-R10-09)
+        id: testrepo
+        env:
+          LOCK: ${{ inputs.lock }}
+        run: |
+          test -f "$LOCK" || { echo "::error::$LOCK does not exist"; exit 1; }
+          test "$(jq -r '.testRepository.isolated // false' "$LOCK")" = true || { echo "::error::the lock's testRepository is not isolated"; exit 1; }
+          echo "owner=$(jq -r .testRepository.owner "$LOCK")" >> "$GITHUB_OUTPUT"
+          echo "repo=$(jq -r .testRepository.repo "$LOCK")" >> "$GITHUB_OUTPUT"
+          echo "branch=$(jq -r '.testRepository.branch // "causa-acceptance"' "$LOCK")" >> "$GITHUB_OUTPUT"
+      - name: Test-repository credential, for that repository alone, revoked when this job ends
+        id: testtoken
+        uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
+        with:
+          client-id: ${{ secrets.CAUSA_ACCEPTANCE_APP_CLIENT_ID }}
+          private-key: ${{ secrets.CAUSA_ACCEPTANCE_APP_KEY }}
+          owner: ${{ steps.testrepo.outputs.owner }}
+          repositories: ${{ steps.testrepo.outputs.repo }}
+          permission-contents: write
+      - name: The credential reaches the test repository, and nothing else
+        env:
+          GH_TOKEN: ${{ steps.testtoken.outputs.token }}
+          OWNER: ${{ steps.testrepo.outputs.owner }}
+          REPO: ${{ steps.testrepo.outputs.repo }}
+          BRANCH: ${{ steps.testrepo.outputs.branch }}
+        run: |
+          api() { curl -sS -o /dev/null -w '%{http_code}' -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" "https://api.github.com$1"; }
+          test "$(api "/repos/$OWNER/$REPO")" = 200 || { echo "::error::the token cannot read $OWNER/$REPO"; exit 1; }
+          test "$(api "/repos/$OWNER/$REPO/branches/$BRANCH")" = 200 || { echo "::error::$OWNER/$REPO has no branch $BRANCH"; exit 1; }
+          # Least privilege: the token must not reach Indy-init (or any other repository of the owner).
+          code=$(api "/repos/${{ github.repository }}"); case "$code" in 200) echo "::error::the token can read ${{ github.repository }}: it is not scoped to the test repository"; exit 1;; esac
+          echo "token scope: $OWNER/$REPO only (Indy-init answered $code)"
+      - name: Journeys J1-J3 against the real provider (Chromium and WebKit)
+        env:
+          CAUSA_PROVIDER: github
+          CAUSA_GITHUB_TOKEN: ${{ steps.testtoken.outputs.token }}
+          CAUSA_TEST_OWNER: ${{ steps.testrepo.outputs.owner }}
+          CAUSA_TEST_REPO: ${{ steps.testrepo.outputs.repo }}
+          CAUSA_TEST_BRANCH: ${{ steps.testrepo.outputs.branch }}
+          CAUSA_APP_URL: http://127.0.0.1:4620/
+          CAUSA_CANDIDATE: fixture-${{ github.sha }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/pw" "$RUNNER_TEMP/live" && (cd "$RUNNER_TEMP/pw" && npm init -y > /dev/null && npm install --no-audit --no-fund @playwright/test@1.63.0 axe-core@4.14.0 > /dev/null && npx playwright install --with-deps chromium webkit)
+          ln -sfn "$RUNNER_TEMP/pw/node_modules" verification/journeys/node_modules
+          node verification/harness/serve.mjs verification/harness/fixture-app/web 4620 & sleep 1
+          (cd verification/journeys && CAUSA_JOURNEY_RESULTS="$RUNNER_TEMP/live/journey-results.json" npx playwright test)
+      - name: The results are real-provider evidence
+        if: always()
+        run: |
+          r="$RUNNER_TEMP/live/journey-results.json"
+          test -f "$r" || { echo "::error::no journey results"; exit 1; }
+          jq -e '.provider.mode == "github" and .provider.baseUrl == "https://api.github.com"' "$r" > /dev/null || { echo "::error::the journeys did not run against api.github.com"; exit 1; }
+          jq -r '.results[] | "\(.journey) \(.engine) \(.status)"' "$r"
+          jq -e '[.results[] | select(.status != "passed")] | length == 0' "$r" > /dev/null || { echo "::error::a journey did not pass"; exit 1; }
+          # The token never reaches a file or an artifact.
+          ! grep -rqF "${{ steps.testtoken.outputs.token }}" "$RUNNER_TEMP/live" || { echo "::error::the token appears in the evidence"; exit 1; }
+      - name: Publish the live-provider evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: live-provider-preflight-${{ github.sha }}
+          path: ${{ runner.temp }}/live

@@ -1,0 +1,18 @@
+LP-01 PASS     the owner's lock is committed
+LP-02 PASS     v4.1.4 is frozen and tagged
+LP-03 PASS     every contract digest in the lock is its file's
+LP-04 PASS     the scope is the approved one
+LP-05 REFUSED  every owner decision is recorded, and what it approved is what is pinned
+        ODR-V414-01 is not recorded (owner-freeze.fsx decide v4.1.4)
+        ODR-V414-02 is not recorded (owner-freeze.fsx decide v4.1.4)
+        ODR-V414-03 (approve v4.1.4) is not recorded (owner-freeze.fsx approve v4.1.4)
+        ODR-RG-03 is not recorded (owner-freeze.fsx decide rehearsal-010)
+        ODR-R10-03 is not recorded (owner-freeze.fsx decide rehearsal-010)
+        ODR-R10-05 is not recorded (owner-freeze.fsx decide rehearsal-010)
+        ODR-R10-01 is not recorded (owner-freeze.fsx decide rehearsal-010)
+LP-06 PASS     the resolved set carries Dokimos 0.11.1
+LP-07 PASS     the test repository is isolated
+LP-08 PASS     live-provider preflight passed (J1-J3, Chromium and WebKit, api.github.com)
+LP-09 PASS     the adversarial suite is validated
+LP-10 PASS     the competition repository is clean (no T0, no clock)
+launch-preflight: REFUSED

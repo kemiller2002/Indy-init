@@ -26,12 +26,13 @@ on:
         default: ""
 
 permissions:
-  # write: the governed journeys persist to the designated test branch with this job's token (ODR-R10-09). The builder
-  # already has write access to its repository; main stays protected by branch protection. The token is not persisted in
-  # the checkout (candidate code cannot read it from .git/config); it reaches only the steps that run the live suites
-  # and journeys, as CAUSA_GITHUB_TOKEN. Those steps run candidate code, so the test repository must be one the owner
-  # accepts the builder writing to (ODR-R10-09).
-  contents: write
+  # read only (ODR-R10-09): this job's own token never writes. Live persistence goes to the isolated test repository
+  # with a GitHub App installation token minted below for that repository alone (contents read/write, nothing else),
+  # revoked when the job ends. That token reaches only the steps that run the live suites, the journeys and the slice
+  # gate, as CAUSA_GITHUB_TOKEN; it is never persisted in the checkout, written to a file or an artifact, or put in
+  # the served application. Candidate code in those steps can read it (the application needs a credential to persist),
+  # so what it can reach is bounded to synthetic data in one repository for one job (LIVE-PROVIDER-PREFLIGHT.md).
+  contents: read
   pull-requests: read
 
 concurrency:
@@ -134,13 +135,32 @@ jobs:
           npm ci
           dotnet fsi "$RUNNER_TEMP/indy-init/tools/r9/r9.fsx" -- suite-preflight --obligations "$RUNNER_TEMP/obligations.json" --root . \
             --out "$RUNNER_TEMP/suite-preflight.json"
+      - name: The designated test repository (ODR-R10-09)
+        id: testrepo
+        run: |
+          src="$RUNNER_TEMP/indy-init"; lock="$src/$(jq -r '.toolchainLock // .lock // "kickoff/rehearsal-009/toolchain.lock.json"' .echelon/r9-governance.json)"
+          echo "owner=$(jq -r '.testRepository.owner // ""' "$lock")" >> "$GITHUB_OUTPUT"
+          echo "repo=$(jq -r '.testRepository.repo // ""' "$lock")" >> "$GITHUB_OUTPUT"
+          echo "isolated=$(jq -r '.testRepository.isolated // false' "$lock")" >> "$GITHUB_OUTPUT"
+      - name: Test-repository credential, for that repository alone, revoked when this job ends (ODR-R10-09)
+        id: testtoken
+        # Fails, and so refuses the run, when the owner's App credentials are absent: live evidence is never produced
+        # with a broader token.
+        if: steps.testrepo.outputs.isolated == 'true'
+        uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
+        with:
+          client-id: ${{ secrets.CAUSA_ACCEPTANCE_APP_CLIENT_ID }}
+          private-key: ${{ secrets.CAUSA_ACCEPTANCE_APP_KEY }}
+          owner: ${{ steps.testrepo.outputs.owner }}
+          repositories: ${{ steps.testrepo.outputs.repo }}
+          permission-contents: write
       - name: Playwright browsers for every project the plan names (Chromium and WebKit)
         timeout-minutes: 10
         run: npx playwright install --with-deps chromium webkit
       - name: Run the plan's suites at the candidate
         env:
           MODE: ${{ inputs.mode || 'development' }}
-          CAUSA_GITHUB_TOKEN: ${{ github.token }}
+          CAUSA_GITHUB_TOKEN: ${{ steps.testtoken.outputs.token }}
         run: |
           # npm dependencies are installed by the suite-preflight step
 
@@ -223,7 +243,7 @@ jobs:
         if: always()
         env:
           CAUSA_PROVIDER: github
-          CAUSA_GITHUB_TOKEN: ${{ github.token }}
+          CAUSA_GITHUB_TOKEN: ${{ steps.testtoken.outputs.token }}
           CAUSA_CANDIDATE: ${{ steps.candidate.outputs.sha }}
           CAUSA_APP_URL: http://127.0.0.1:4620/
         run: |
@@ -266,7 +286,7 @@ jobs:
         if: always() && steps.slice.outputs.id != ''
         env:
           CANDIDATE: ${{ steps.candidate.outputs.sha }}
-          CAUSA_GITHUB_TOKEN: ${{ github.token }}
+          CAUSA_GITHUB_TOKEN: ${{ steps.testtoken.outputs.token }}
         run: |
           src="$RUNNER_TEMP/indy-init"; rc="${{ steps.catalog.outputs.rc }}"; ev="$RUNNER_TEMP/slice-evidence"; mkdir -p "$ev"
           base="${{ steps.slice.outputs.target_base }}"

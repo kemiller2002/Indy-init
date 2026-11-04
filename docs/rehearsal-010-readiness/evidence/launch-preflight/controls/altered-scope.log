@@ -1,0 +1,13 @@
+LP-01 PASS     the owner's lock is committed
+LP-02 PASS     v4.1.4 is frozen and tagged
+LP-03 PASS     every contract digest in the lock is its file's
+LP-04 REFUSED  the scope is the approved one
+        the scope manifest has scopeSha256 scope-other, the lock pins scope-final
+LP-05 REFUSED  every owner decision is recorded, and what it approved is what is pinned
+        ODR-R10-01 approved docs/rehearsal-010-readiness/scope-manifest.json scopeSha256 = "scope-final"; it is now "scope-other"
+LP-06 PASS     the resolved set carries Dokimos 0.11.1
+LP-07 PASS     the test repository is isolated
+LP-08 PASS     live-provider preflight passed (J1-J3, Chromium and WebKit, api.github.com)
+LP-09 PASS     the adversarial suite is validated
+LP-10 PASS     the competition repository is clean (no T0, no clock)
+launch-preflight: REFUSED
