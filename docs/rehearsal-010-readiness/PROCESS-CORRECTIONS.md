@@ -149,11 +149,12 @@ The owner chose #101's successor package **v4.1.4** (CANDIDATE) over #102's v4.1
 
 | # | Blocker | Who | How |
 |---|---|---|---|
-| 1 | v4.1.4's decisions are not recorded (#101: `docs/release-gate-repair/owner-decision-requests.json`, `requirements-compiled/v4.1.4/proposals/`) | owner | `owner-freeze.fsx decide`; then an agent recompiles v4.1.4 and records its independent review |
+| 1 | ~~v4.1.4's decisions are not recorded~~ **done**: APR-V414-OWNER-1 (PR #106) records ODR-V414-01/-02, option A. The approval ids are written into the package and checked offline; the package is recompiled. Its independent review is recorded in `requirements-compiled/v4.1.4/analysis/independent-review.json` (an agent review with a fresh context; the owner decides whether a separate-session or human review is also required) | — | — |
 | 2 | v4.1.4 is not approved or tagged | owner | `owner-freeze.fsx approve`, then `tag`; an agent adds it to the frozen guard |
 | 3 | Dokimos `url-input` fix is not released | Dokimos owners, then owner | kemiller2002/dokimos#67 is merged. Release Dokimos. Register it in a new echelon-current set (owner approval, Conditor qualification). Without it, INV-029 (non-mandatory) still fails V1–V3. |
 | 4 | No Rehearsal 010 lock | owner | Adopt `kickoff/rehearsal-010/toolchain.lock.proposed.json` as `toolchain.lock.json` after 1–3 (package path, manifest digest, resolved set). The scope manifest's `scopeSha256` is recompiled if v4.1.4 changes. |
 | 5 | The launch prompt | owner | Use the prompt in STARTUP-INSTRUCTIONS.md, with no narrower target and no compute-saving instruction (ROOT-CAUSE H1, H2) |
+| 6 | ODR-RG-01, -03, -04, -05 are not recorded (#101 `docs/release-gate-repair/owner-decision-requests.json`) | owner | One operator record `{id, authority: {kind: operator, id}, date, changes: [...]}` appended to `kickoff/rehearsal-007/approvals.causa.json` (the package-decision file, not `kickoff/acceptance/approvals.causa.json`, which holds requirement scope changes only and is digest-pinned). ODR-RG-01 is `{decision_id: ODR-RG-01, action: approve-scope, option: A, scope_sha256: <scopeSha256 of scope-manifest.json>}`; `r9.fsx acceptance-status --scope docs/rehearsal-010-readiness/scope-manifest.json` reads it |
 
 **Not blockers, but known limits:**
 - Progress events are written by the implementing agent. `stop-decision` refuses inconsistent events and agent acceptance, but it cannot detect an event that claims a passing verification which never ran. The release gate and the independent verifier remain the authority on verification.
