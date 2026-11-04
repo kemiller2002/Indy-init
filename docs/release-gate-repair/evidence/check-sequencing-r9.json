@@ -6,13 +6,13 @@
     {
       "commit": "edde38cb7ea541f12e928f7a467071038d7a405b",
       "subject": "Causa content application: F# domain, GitHub persistence, Limen engine on .NET WebAssembly, page",
-      "implementationFiles": 22,
+      "implementationFiles": 26,
       "examples": [
+        "Directory.Build.props",
+        "Directory.Packages.props",
         "build.fsx",
-        "src/Causa.App/Connection.fs",
-        "src/Causa.App/Program.fs",
-        "src/Causa.App/Routes.fs",
-        "src/Causa.App/Update.fs"
+        "package-lock.json",
+        "package.json"
       ]
     },
     {

@@ -157,20 +157,28 @@ let manifest = Path.Combine(app, "requirements", "verification", "verification-m
 Directory.CreateDirectory(Path.GetDirectoryName manifest) |> ignore
 case "praxis-compiles-the-catalog-manifest" [ 0 ] [] [] praxis [ "requirements"; "manifest"; "compile"; "--catalog"; catalog; "--source-commit"; "bc3c381df2840187a46799ea59f425ffe1b1ceed"; "--output"; manifest ] app |> ignore
 write (Path.Combine(app, "src", "Causa.Domain", "Identity.fs")) "namespace Causa.Domain\n"
+write (Path.Combine(app, "global.json")) """{ "sdk": { "version": "10.0.402", "rollForward": "disable" } }"""
+write (Path.Combine(app, "Causa.slnx")) "<Solution>\n</Solution>\n"
 let bootstrapSha = commitAll app "T0 bootstrap"
 // A tiny frozen plan: one requirement with one executable obligation, bound in SU-OWN-DOTNET.
 let plan = Path.Combine(work, "plan-obligations.json")
-write plan """{"schema":"dokimos.verification-obligations/1","planId":"VP-TEST","obligations":[{"id":"SMK-001-O1","requirement":"SMK-001"}],"tests":[{"id":"dotnet:Causa.Domain.Tests.Smoke.SMK-001-O1","suite":"SU-OWN-DOTNET","obligations":["SMK-001-O1"]}],"suites":[]}"""
+write plan """{"schema":"dokimos.verification-obligations/1","planId":"VP-TEST","obligations":[{"id":"SMK-001-O1","requirement":"SMK-001"}],"tests":[{"id":"dotnet:Causa.Domain.Tests.Smoke.SMK-001-O1","suite":"SU-OWN-DOTNET","obligations":["SMK-001-O1"]}],"suites":[{"id":"SU-OWN-DOTNET","runner":"dotnet-test","command":"dotnet test Causa.slnx --filter \"FullyQualifiedName~Causa.Domain.Tests.\""}]}"""
+let appSuites = Path.Combine(work, "app-suite-preflight.json")
+r9case "suite-preflight-of-the-application-plan" [ 0 ] [ "SU-OWN-DOTNET: executable" ] [ "suite-preflight"; "--obligations"; plan; "--root"; app; "--out"; appSuites ] app |> ignore
 let scopeFile = Path.Combine(work, "scope.json")
 write scopeFile """{"schema":"indy-init.competition-scope/1","id":"CS-TEST","status":"proposed","requirements":["SMK-001"],"catalogRequirements":["INV-001"]}"""
 let spec = Path.Combine(work, "spec-preflight.json")
 write spec """{"schema":"indy-init.r9-spec-preflight/1","verdict":"PASS"}"""
+let specRefused = Path.Combine(work, "spec-refused.json")
+write specRefused """{"schema":"indy-init.r9-spec-preflight/1","verdict":"REFUSED","report":{"note":"PASS appears in the embedded report"}}"""
+let notReady = Path.Combine(work, "acceptance-not-ready.log")
+write notReady "acceptance preflight: NOT READY\n"
 let acceptance = Path.Combine(work, "acceptance-preflight.log")
 write acceptance "acceptance preflight: READY\n"
 let authorizeWith (suiteReport: string) =
     [ "authorize-implementation"; "--target"; app; "--catalog"; catalog; "--obligations"; plan; "--suite-preflight"; suiteReport
       "--spec-preflight"; spec; "--acceptance-preflight"; acceptance; "--scope"; scopeFile; "--praxis"; praxis ]
-let authorize (_: string list) = authorizeWith (Path.Combine(work, "suite-preflight.json"))
+let authorize (_: string list) = authorizeWith appSuites
 r9case "authorize-refuses-without-work-items" [ 4 ] [ "3 work items:"; "r9-work-plan.json"; "Praxis holds no work item" ] (authorize []) app |> ignore
 run praxis [ "work"; "begin"; "--id"; "WI-CONTENT-1"; "--occurred-at"; DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ"); "--root"; app ] app |> ignore
 write (Path.Combine(app, ".echelon", "r9-work-plan.json")) """{"schema":"indy-init.r9-work-plan/1","workItems":[{"id":"WI-CONTENT-1","requirements":["INV-001"],"obligations":["INV-001/V1/mapped"]}]}"""
@@ -190,6 +198,16 @@ commitAll app "work plan" |> ignore
 let badSuites = obligationsWith "bad-suite-report" []
 write badSuites """{"schema":"indy-init.r9-suite-preflight/1","suites":[{"id":"SU-OWN-DOTNET","executable":false,"cause":"MSB1008"}]}"""
 r9case "authorize-refuses-a-non-executable-matrix" [ 4 ] [ "5 matrix: suite SU-OWN-DOTNET binds in-scope obligations but its command cannot execute"; "6 preflight: suite-preflight did not pass" ] (authorizeWith badSuites) app |> ignore
+let otherRootSuites = Path.Combine(work, "suite-preflight.json")
+r9case "authorize-refuses-a-suite-report-of-another-plan-or-root" [ 4 ] [ "5 matrix: the suite-preflight report ran against" ] (authorizeWith otherRootSuites) app |> ignore
+let withPreflights specFile accFile =
+    authorize [] |> List.mapi (fun i a -> a) |> fun xs ->
+        xs |> List.map (fun a -> if a = spec then specFile elif a = acceptance then accFile else a)
+r9case "authorize-refuses-a-refused-spec-report" [ 4 ] [ "6 preflight: the specification preflight" ] (withPreflights specRefused acceptance) app |> ignore
+r9case "authorize-refuses-not-ready" [ 4 ] [ "6 preflight: conditor acceptance preflight is missing or not READY" ] (withPreflights spec notReady) app |> ignore
+let emptyScope = Path.Combine(work, "empty-scope.json")
+write emptyScope """{"schema":"indy-init.competition-scope/1","id":"CS-EMPTY","status":"proposed"}"""
+r9case "authorize-refuses-an-empty-scope" [ 4 ] [ "the scope names no requirement" ] (authorize [] |> List.map (fun a -> if a = scopeFile then emptyScope else a)) app |> ignore
 r9case "authorize-passes-and-writes-the-checkpoint" [ 0 ] [ "checkpoint"; "1 work item(s)" ] (authorize []) app |> ignore
 let checkpointSha = commitAll app "initialization checkpoint"
 r9case "authorize-refuses-a-second-checkpoint" [ 4 ] [ "is immutable" ] (authorize []) app |> ignore
@@ -279,6 +297,32 @@ File.AppendAllText(Path.Combine(good, ".echelon", "scope-checkpoint.json"), " ")
 commitAll good "agent: touch the scope checkpoint" |> ignore
 r9case "check-sequencing-refuses-an-edited-scope-checkpoint" [ 4 ] [ "the scope checkpoint is immutable" ] (sequencingWithScope good) good |> ignore
 
+// Implementation on a branch forked before the checkpoint and merged after it is still unauthorized.
+let branchy = Path.Combine(work, "branchy")
+Directory.CreateDirectory branchy |> ignore
+git branchy [ "init"; "-q"; "-b"; "main" ] |> ignore
+write (Path.Combine(branchy, ".echelon", "r9-governance.json")) "{}\n"
+let branchyBoot = commitAll branchy "T0 bootstrap"
+git branchy [ "checkout"; "-q"; "-b"; "early-work" ] |> ignore
+write (Path.Combine(branchy, "src", "A.fs")) "module A\n"
+commitAll branchy "implementation on a branch before authorization" |> ignore
+git branchy [ "checkout"; "-q"; "main" ] |> ignore
+write (Path.Combine(branchy, ".echelon", "r9-initialization-checkpoint.json")) $"""{{"authorizedAtCommit":"{branchyBoot}"}}"""
+commitAll branchy "checkpoint" |> ignore
+git branchy [ "merge"; "-q"; "--no-ff"; "-m"; "merge early work"; "early-work" ] |> ignore
+r9case "check-sequencing-refuses-a-pre-checkpoint-branch-merged-later" [ 4 ] [ "implementation on a branch before authorization" ] [ "check-sequencing"; "--target"; branchy ] branchy |> ignore
+let inCheckpoint = Path.Combine(work, "in-checkpoint")
+Directory.CreateDirectory inCheckpoint |> ignore
+git inCheckpoint [ "init"; "-q"; "-b"; "main" ] |> ignore
+write (Path.Combine(inCheckpoint, "src", "Pre.fs")) "module Pre\n"
+commitAll inCheckpoint "implementation before governance" |> ignore
+write (Path.Combine(inCheckpoint, ".echelon", "r9-governance.json")) "{}\n"
+let icBoot = commitAll inCheckpoint "T0 bootstrap"
+write (Path.Combine(inCheckpoint, ".echelon", "r9-initialization-checkpoint.json")) $"""{{"authorizedAtCommit":"{icBoot}"}}"""
+write (Path.Combine(inCheckpoint, "src", "Smuggled.fs")) "module Smuggled\n"
+commitAll inCheckpoint "checkpoint carrying implementation" |> ignore
+r9case "check-sequencing-refuses-implementation-before-governance-and-in-the-checkpoint" [ 4 ] [ "implementation before governance"; "checkpoint carrying implementation" ] [ "check-sequencing"; "--target"; inCheckpoint ] inCheckpoint |> ignore
+
 // ---- 4. acceptance-status: four levels, evidence-bound -----------------------------------------------------------
 
 let ev = Path.Combine(src, "docs", "release-gate-repair", "evidence")
@@ -320,6 +364,61 @@ write fullScope ((File.ReadAllText proposed).Replace("\"status\": \"proposed\"",
 let fullApprovals = Path.Combine(work, "full-approvals.json")
 write fullApprovals ($"""{{"changes":[{{"decision_id":"ODR-RG-01","action":"approve-scope","scope_sha256":"{sha256 fullScope}"}}]}}""")
 r9case "acceptance-approved-full-scope-refused-on-rehearsal-009" [ 4 ] [ "competitionScope: REFUSED"; "613 in-scope plan obligation(s) are not verified" ] (status [ "--catalog-verification"; r9Catalog; "--gate-dir"; r9Gate; "--scope"; fullScope; "--obligations"; r9Obligations; "--approvals"; fullApprovals; "--require"; "scope" ]) work |> ignore
+
+let emptyApproved = Path.Combine(work, "empty-approved-scope.json")
+write emptyApproved """{"schema":"indy-init.competition-scope/1","id":"CS-EMPTY","status":"approved","approval":"ODR-EMPTY","requirements":[],"catalogRequirements":[]}"""
+let emptyApprovals = Path.Combine(work, "empty-approvals.json")
+write emptyApprovals ($"""{{"changes":[{{"decision_id":"ODR-EMPTY","action":"approve-scope","scope_sha256":"{sha256 emptyApproved}"}}]}}""")
+r9case "acceptance-empty-approved-scope-refused" [ 4 ] [ "the scope names no requirement" ] (status [ "--scope"; emptyApproved; "--approvals"; emptyApprovals; "--require"; "scope" ]) work |> ignore
+let planOnly = Path.Combine(work, "plan-scope.json")
+write planOnly """{"schema":"indy-init.competition-scope/1","id":"CS-PLAN","status":"approved","approval":"ODR-PLAN","requirements":["AR-014"],"catalogRequirements":[]}"""
+let planApprovals = Path.Combine(work, "plan-approvals.json")
+write planApprovals ($"""{{"changes":[{{"decision_id":"ODR-PLAN","action":"approve-scope","scope_sha256":"{sha256 planOnly}"}}]}}""")
+r9case "acceptance-scope-without-plan-or-coverage-refused" [ 4 ] [ "no compiled plan (--obligations)"; "no release-gate coverage" ] (status [ "--scope"; planOnly; "--approvals"; planApprovals; "--require"; "scope" ]) work |> ignore
+let staleGate = Path.Combine(work, "stale-gate")
+Directory.CreateDirectory staleGate |> ignore
+File.WriteAllText(Path.Combine(staleGate, "coverage.json"), (File.ReadAllText(Path.Combine(r9Gate, "coverage.json"))).Replace(r9Candidate, "0000000000000000000000000000000000000000"))
+r9case "acceptance-stale-coverage-refused" [ 4 ] [ "stale evidence: the release-gate coverage is for 0000000000000000000000000000000000000000" ] (status [ "--scope"; planOnly; "--approvals"; planApprovals; "--obligations"; r9Obligations; "--gate-dir"; staleGate; "--require"; "scope" ]) work |> ignore
+let ownerOther = Path.Combine(work, "owner-verdict-other.md")
+write ownerOther "<!-- acceptance-verdict: ACCEPTED -->\ntrusted source sha 1111111111111111111111111111111111111111\n"
+r9case "acceptance-owner-verdict-of-another-candidate-refused" [ 4 ] [ "the computed verdict does not name the candidate" ] (status [ "--owner-verdict"; ownerOther; "--require"; "owner" ]) work |> ignore
+let ownerHere = Path.Combine(work, "owner-verdict-here.md")
+write ownerHere ($"<!-- acceptance-verdict: ACCEPTED -->\ntrusted source sha {r9Candidate}\n")
+r9case "acceptance-owner-verdict-bound-to-the-candidate" [ 0 ] [ "ownerVerdict: ACCEPTED" ] (status [ "--owner-verdict"; ownerHere; "--require"; "owner" ]) work |> ignore
+
+// Independent-verifier evidence: a scope holding a verifier-bound obligation (PERSIST-052-O3) is not accepted while the
+// computed owner verdict is absent, even when every executable and record part is verified.
+let verifierGate = Path.Combine(work, "verifier-gate")
+Directory.CreateDirectory verifierGate |> ignore
+let coverageNode = JsonNode.Parse(File.ReadAllText(Path.Combine(r9Gate, "coverage.json"))) |> nonNull
+for o in coverageNode["obligations"].AsArray() do
+    if (o["id"].GetValue<string>()).StartsWith "PERSIST-052-" then o["status"] <- JsonValue.Create("verified")
+File.WriteAllText(Path.Combine(verifierGate, "coverage.json"), coverageNode.ToJsonString())
+let planNode = JsonNode.Parse(File.ReadAllText r9Obligations) |> nonNull
+let persist052 = planNode["obligations"].AsArray() |> Seq.map (fun o -> o["id"].GetValue<string>()) |> Seq.filter (fun i -> i.StartsWith "PERSIST-052-") |> List.ofSeq
+File.WriteAllText(Path.Combine(verifierGate, "process-assessment.json"), "{\"obligations\":[" + String.Join(",", persist052 |> List.map (fun i -> "{\"obligation\":\"" + i + "\",\"categories\":[{\"category\":\"provenance\",\"status\":\"verified\"}]}")) + "]}")
+let verifierScope = Path.Combine(work, "verifier-scope.json")
+write verifierScope """{"schema":"indy-init.competition-scope/1","id":"CS-VERIFIER","status":"approved","approval":"ODR-VERIFIER","requirements":["PERSIST-052"],"catalogRequirements":[]}"""
+let verifierApprovals = Path.Combine(work, "verifier-approvals.json")
+write verifierApprovals ($"""{{"changes":[{{"decision_id":"ODR-VERIFIER","action":"approve-scope","scope_sha256":"{sha256 verifierScope}"}}]}}""")
+r9case "acceptance-verifier-bound-obligation-needs-the-owner-verdict" [ 4 ] [ "PERSIST-052-O3: independent-verifier evidence, judged only by the computed owner verdict (NOT-COMPUTED)" ] (status [ "--scope"; verifierScope; "--approvals"; verifierApprovals; "--obligations"; r9Obligations; "--gate-dir"; verifierGate; "--require"; "scope" ]) work |> ignore
+r9case "acceptance-refuses-a-partial-candidate-sha" [ 2 ] [ "must be a full 40-hex commit SHA" ] [ "acceptance-status"; "--candidate"; "39dc037"; "--owner-verdict"; ownerHere; "--require"; "owner" ] work |> ignore
+r9case "govern-refuses-a-lock-outside-kickoff" [ 2 ] [ "--lock must be kickoff/<rehearsal>/toolchain.lock.json" ] [ "govern"; "--indy-init"; src; "--target"; work; "--lock"; "../../etc/lock.json" ] work |> ignore
+// An evil merge: a merge commit that itself adds implementation before the checkpoint.
+let evil = Path.Combine(work, "evil-merge")
+Directory.CreateDirectory evil |> ignore
+git evil [ "init"; "-q"; "-b"; "main" ] |> ignore
+write (Path.Combine(evil, ".echelon", "r9-governance.json")) "{}\n"
+commitAll evil "T0 bootstrap" |> ignore
+git evil [ "checkout"; "-q"; "-b"; "side" ] |> ignore
+write (Path.Combine(evil, "docs", "note.md")) "note\n"
+commitAll evil "side: docs only" |> ignore
+git evil [ "checkout"; "-q"; "main" ] |> ignore
+git evil [ "merge"; "-q"; "--no-ff"; "--no-commit"; "side" ] |> ignore
+write (Path.Combine(evil, "src", "Evil.fs")) "module Evil\n"
+git evil [ "add"; "-A" ] |> ignore
+git evil [ "commit"; "-qm"; "merge side (with implementation)" ] |> ignore
+r9case "check-sequencing-inspects-what-a-merge-adds" [ 4 ] [ "merge side (with implementation)" ] [ "check-sequencing"; "--target"; evil ] evil |> ignore
 
 // ---- verdict ------------------------------------------------------------------------------------------------------
 

@@ -67,23 +67,22 @@ jobs:
           dotnet fsi "$RUNNER_TEMP/indy-init/tools/r9/r9.fsx" -- check-governance --indy-init "$RUNNER_TEMP/indy-init" --target . $base_scope
       - name: Pinned toolchain (Conditor 0.10.20, then the echelon-current resolved set)
         run: |
-          # The lock named at govern time (r9.fsx govern --lock); Rehearsal 009's record names none and reads its own.
-          lock="$RUNNER_TEMP/indy-init/$(jq -r '.toolchainLock // "kickoff/rehearsal-009/toolchain.lock.json"' .echelon/r9-governance.json)"
+          lock="$RUNNER_TEMP/indy-init/$(jq -r '.lock // "kickoff/rehearsal-009/toolchain.lock.json"' .echelon/r9-governance.json)"
           dotnet fsi "$RUNNER_TEMP/indy-init/tools/r9/r9.fsx" -- install-conditor --lock "$lock" --dir "$RUNNER_TEMP/conditor"
           dotnet fsi "$RUNNER_TEMP/indy-init/tools/r9/r9.fsx" -- workstation --lock "$lock" --conditor "$RUNNER_TEMP/conditor/conditor" --home "$RUNNER_TEMP/echelon" --target-id "ci-${{ github.run_id }}"
           echo "$RUNNER_TEMP/echelon/.local/bin" >> "$GITHUB_PATH"
       - name: Compile the frozen verification plan
         run: |
           src="$RUNNER_TEMP/indy-init"
-          lock="$RUNNER_TEMP/indy-init/$(jq -r '.toolchainLock // "kickoff/rehearsal-009/toolchain.lock.json"' .echelon/r9-governance.json)"
-          pkg=$(jq -r .requirementsPackage.path "$lock")
+          # The package is the one the rehearsal's lock pins (requirementsPackage.path), never a hard-coded version.
+          pkg=$(jq -r .requirementsPackage.path "$src/$(jq -r '.lock // "kickoff/rehearsal-009/toolchain.lock.json"' .echelon/r9-governance.json)")
           dokimos verification compile --indy-execution-plan "$src/$pkg/verification-execution-plan.json" \
             --indy-verification-plan "$src/requirements-compiled/v4/verification-plan.json" --out "$RUNNER_TEMP/obligations.json"
       - name: Implementation was authorized before it was committed (Praxis ordering; docs/release-gate-repair)
         run: |
           # A lock that pins a scope manifest (Rehearsal 010 on) also requires the committed scope checkpoint with its
           # scopeSha256 and complete Praxis work-item coverage before implementation.
-          lock="$RUNNER_TEMP/indy-init/$(jq -r '.toolchainLock // "kickoff/rehearsal-009/toolchain.lock.json"' .echelon/r9-governance.json)"
+          lock="$RUNNER_TEMP/indy-init/$(jq -r '.lock // "kickoff/rehearsal-009/toolchain.lock.json"' .echelon/r9-governance.json)"
           manifest=$(jq -r '.scope.manifest // empty' "$lock")
           scope=""; [ -n "$manifest" ] && scope="--scope-manifest $RUNNER_TEMP/indy-init/$manifest"
           dotnet fsi "$RUNNER_TEMP/indy-init/tools/r9/r9.fsx" -- check-sequencing --target . $scope --out "$RUNNER_TEMP/sequencing.json"
@@ -116,7 +115,7 @@ jobs:
         run: |
           # Record-bound obligations are judged by requirements-compiler verify-process with the pinned plan and rules
           # and with attestations this run observes itself; it fails closed while the rules are unpinned.
-          src="$RUNNER_TEMP/indy-init"; lock="$RUNNER_TEMP/indy-init/$(jq -r '.toolchainLock // "kickoff/rehearsal-009/toolchain.lock.json"' .echelon/r9-governance.json)"
+          src="$RUNNER_TEMP/indy-init"; lock="$src/$(jq -r '.lock // "kickoff/rehearsal-009/toolchain.lock.json"' .echelon/r9-governance.json)"
           rules_sha=$(jq -r '.processEvidence.rulesSha256 // empty' "$lock")
           [[ "$rules_sha" =~ ^[0-9a-f]{64}$ ]] || { echo "::error::process-evidence rules are not pinned by the owner (processEvidence.rulesSha256)"; exit 1; }
           dotnet build "$src/tools/requirements-compiler/src" -c Release
