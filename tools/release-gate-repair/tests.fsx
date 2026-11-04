@@ -423,7 +423,8 @@ r9case "check-sequencing-inspects-what-a-merge-adds" [ 4 ] [ "merge side (with i
 // The authoritative scope manifest as the scope (docs/rehearsal-010-readiness): the owner's approve-scope record names
 // its scopeSha256, in the operator-record format owner-freeze.fsx writes ({id, authority, changes: [...]}).
 let approvedScope = Path.Combine(src, "docs", "rehearsal-010-readiness", "scope-manifest.json")
-let approvedScopeSha = (JsonNode.Parse(File.ReadAllText approvedScope) |> nonNull)["scopeSha256"].GetValue<string>()
+let approvedScopeJson = JsonNode.Parse(File.ReadAllText approvedScope) |> nonNull
+let approvedScopeSha = approvedScopeJson["scopeSha256"].GetValue<string>()
 let operatorRecord (operator: string) (scopeSha: string) =
     $"""{{"approvals":[{{"id":"APR-FIXTURE-RG","authority":{{"kind":"operator","id":"{operator}"}},"changes":[{{"decision_id":"ODR-RG-01","action":"approve-scope","option":"A","scope_sha256":"{scopeSha}"}}]}}]}}"""
 let nestedApproved = Path.Combine(work, "approvals-nested.json")
@@ -435,7 +436,7 @@ write nestedByAgent ((operatorRecord "kemiller2002" approvedScopeSha).Replace("\
 r9case "acceptance-scope-manifest-agent-record-does-not-approve" [ 4 ] [ "competitionScope: SCOPE-NOT-APPROVED" ]
     (status [ "--catalog-verification"; r9Catalog; "--gate-dir"; r9Gate; "--scope"; approvedScope; "--obligations"; r9Obligations; "--approvals"; nestedByAgent; "--require"; "scope" ]) work |> ignore
 let nestedStale = Path.Combine(work, "approvals-nested-stale.json")
-write nestedStale (operatorRecord "kemiller2002" (String('0', 64)))
+write nestedStale (operatorRecord "kemiller2002" (String.replicate 64 "0"))
 r9case "acceptance-scope-manifest-other-hash-does-not-approve" [ 4 ] [ "competitionScope: SCOPE-NOT-APPROVED" ]
     (status [ "--catalog-verification"; r9Catalog; "--gate-dir"; r9Gate; "--scope"; approvedScope; "--obligations"; r9Obligations; "--approvals"; nestedStale; "--require"; "scope" ]) work |> ignore
 
