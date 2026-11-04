@@ -1,0 +1,6 @@
+exit 4
+  REFUSED SCOPE_INCOMPLETE 193 applicable mandatory requirement(s) are not verified (for example AR-001, AR-002, AR-003, AR-004, AR-005); 36 work item(s) are open, 36 can proceed now
+  REFUSED COMPLETION_CLAIM_REFUSED completion is claimed with open scope: 193 applicable mandatory requirement(s) are not verified (for example AR-001, AR-002, AR-003, AR-004, AR-005); 36 work item(s) are open, 36 can proceed now
+  REFUSED SCOPE_NOT_INTEGRATED 193 applicable mandatory requirement(s) are not integrated on main
+  REFUSED COMPLETION_GATE_MISSING stopping as complete needs the governed completion gate's COMPLETE verdict (--completion)
+stop-decision: CONTINUE_REQUIRED (120 minute(s) remaining, 193 open mandatory requirement(s))

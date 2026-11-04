@@ -417,3 +417,13 @@ let checkpoint (manifest: Json) (at: string) (commit: string) : Json =
           "preflight", JStr "PASS"
           "coverage", JStr "PASS"
           "rule", JStr "No application source or test may be committed before this checkpoint (r9.fsx check-sequencing --scope-manifest); the scope it pins changes only with an owner approval {action: approve-scope, scope_sha256} in the pinned approvals file." ]
+
+/// Commits (oldest first) as (sha, paths): the first commit that touches application code must not precede the
+/// commit that adds the checkpoint (`scope order`, kept beside `r9.fsx check-sequencing --scope-manifest`). Bootstrap
+/// files (T10) are not application code.
+let implementationBeforeCheckpoint (checkpointPath: string) (isApplication: string -> bool) (commits: (string * string list) list) : Refusal list =
+    let indexOf p = commits |> List.tryFindIndex (fun (_, files) -> files |> List.exists p)
+    match indexOf ((=) checkpointPath), indexOf isApplication with
+    | None, Some i -> [ refusal "IMPLEMENTATION_BEFORE_CHECKPOINT" (sprintf "commit %s changes application code and no scope checkpoint exists" (fst commits[i])) ]
+    | Some c, Some i when i < c -> [ refusal "IMPLEMENTATION_BEFORE_CHECKPOINT" (sprintf "commit %s changes application code before the scope checkpoint (commit %s)" (fst commits[i]) (fst commits[c])) ]
+    | _ -> []

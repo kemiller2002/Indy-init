@@ -1,0 +1,5 @@
+exit 4
+  BLOCKING SCOPE_COVERAGE_UNKNOWN no slice execution manifest is published; coverage of the approved scope cannot be checked
+  BLOCKING REQUEST_UNDATED a stop decision records no request time with an explicit UTC offset: premature-stop and future-request checks cannot judge it
+  WARNING DESIGN_CONTRACT_NOT_RUN no design-contract verdict yet
+observe: 3 finding(s), 2 blocking ($WORK/observe-c36.json)

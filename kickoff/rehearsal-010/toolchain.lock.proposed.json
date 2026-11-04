@@ -1,6 +1,6 @@
 {
  "schema": "indy-init.r9-toolchain-lock/1",
- "description": "Proposed toolchain and requirements package for Rehearsal 010: Rehearsal 009's lock with the requirements package moved to the successor v4.1.4 (#101: executable suite runners). Conditor, the resolved set and the process-evidence rules are unchanged from Rehearsal 009 and are re-confirmed by the owner. Change this file only through the owner decision process.",
+ "description": "Proposed toolchain, requirements package and governed contracts for Rehearsal 010: Rehearsal 009's Conditor and process-evidence pins, the successor package v4.1.4 (corrected suite runners), and the governed catalog, design and deadline contracts of the adversarial-audit remediation. The resolved set must be replaced by an echelon-current set carrying Dokimos 0.11.1 (url-input). Change this file only through the owner decision process.",
  "conditor": {
   "version": "0.10.20",
   "tag": "v0.10.20",
@@ -83,21 +83,58 @@
   "tagCommit": null,
   "manifestSha256": "af0132f62039bf814a98cf3a3c2b60d939eea1ce3791e6ee45a202bb9210540f",
   "verificationPlanSha256": "8254ed03b991dd3d3a56a4e0bf5897c2484bbbf11e67e2f15e80309c1482b973",
-  "approval": "the v4.1.4 package approval in docs/release-gate-repair/owner-decision-requests.json (pending)"
+  "approval": "ODR-V414-01..03 (pending)"
  },
  "workstationTargetId": "indy-init-r9-workstation",
  "processEvidence": {
-  "description": "Record-bound obligations (plan suites with runner evidence-record, identities praxis:<kind>) are judged by requirements-compiler verify-process against this plan and these rules, with attestations the CI run observes itself. rulesSha256 is null until the owner confirms the rules; while it is null the record gate fails closed.",
+  "description": "Record-bound obligations (plan suites with runner evidence-record, identities praxis:<kind>) are judged by requirements-compiler verify-process against this plan and these rules, with attestations the CI run observes itself. rulesSha256 is null until the owner pins the Rehearsal 010 rules (ODR-R10-14); while it is null the record gate fails closed.",
   "plan": "requirements-compiled/v4/verification-plan.json",
   "planDigest": "1e3c66bcc958a60415811ffbe2795b5e7147360340749c16e1a0f43fc19c751d",
-  "rules": "kickoff/rehearsal-009/process-evidence-rules.json",
-  "rulesSha256": "b8adffc4122226cbe568dae1b0173ee85aab08b8435ded7390f9d5205ad0d115",
-  "rulesStatus": "CONFIRMED by the owner on 2026-11-03: the rules file reviewed and pinned by its SHA-256"
+  "rules": "kickoff/rehearsal-010/process-evidence-rules.json",
+  "rulesSha256": null,
+  "proposedSha256": "36172c57721419714a414334cd65a1548da5c0bc6318f55f73b77a207546344d",
+  "rulesStatus": "PROPOSED: regenerated from the confirmed Rehearsal 009 rules for indy-init-rehearsal-010; the owner pins it (ODR-R10-14)"
  },
- "status": "PROPOSED: not an owner pin. The owner adopts it by renaming it to toolchain.lock.json in their own commit after the v4.1.4 decisions (docs/release-gate-repair/owner-decision-requests.json) are recorded and v4.1.4 is tagged, and after a Dokimos release carrying the url-input fix (kemiller2002/dokimos#67) is registered in an approved echelon-current set and replaces the resolved set below. Until then Rehearsal 010 has no approved lock.",
+ "status": "PROPOSED: not an owner pin. The owner adopts it by renaming it to toolchain.lock.json in their own commit after ODR-V414-01..03 are recorded and v4.1.4 is tagged, a Dokimos release carrying the url-input fix is registered in an approved echelon-current set and replaces the resolved set, and ODR-R10-01..09 are recorded. Until then Rehearsal 010 has no approved lock.",
  "scope": {
   "manifest": "docs/rehearsal-010-readiness/scope-manifest.json",
   "scopeSha256": "5a8aef29cb2dff62d8ee60b7162e7df226bb42818ffb87f7f827fdcb443d9095",
-  "rule": "the gate passes the scope manifest to r9.fsx check-sequencing: the committed scope checkpoint (this scopeSha256, complete Praxis coverage) must precede implementation (STARTUP-INSTRUCTIONS.md)"
+  "approval": "ODR-R10-01 (pending; asked by owner-freeze.fsx decide rehearsal-010 only once v4.1.4 is tagged and the scope is recompiled from it and the ratified catalog)",
+  "rule": "scope preflight and the Praxis coverage check must pass and the scope checkpoint must be committed before any application code (STARTUP-INSTRUCTIONS.md)"
+ },
+ "catalogVerification": {
+  "contract": "kickoff/rehearsal-010/catalog-verification-contract.json",
+  "contractSha256": "808de8a9fe43a4b1f8bfe7fb9f789a6de8f5e23ab27d878dfb675c74ada02a9a",
+  "approval": "ODR-R10-03, ODR-R10-04 (pending)"
+ },
+ "designContract": {
+  "contract": "kickoff/rehearsal-010/design-contract.json",
+  "contractSha256": "366ed579446636d31894e77ab63877d5dc5f4ef0e935ae14f089b4360780482a",
+  "approval": "ODR-R10-05 (pending)"
+ },
+ "deadlinePolicy": {
+  "path": "kickoff/rehearsal-010/deadline-policy.json",
+  "sha256": "9f6ac357b09190074efcc3bdba851ddce0ebd8cca56d3c0fe69fe7ba8499a4e0",
+  "approval": "ODR-R10-06 (pending)"
+ },
+ "journeys": {
+  "bindings": "verification/journeys/bindings.json",
+  "bindingsSha256": "cd68237205ff8f56503c46bdb6dc925085a3b07c9306ab6f9979f2b17b9754dd",
+  "approval": "ODR-R10-07 (pending)"
+ },
+ "testRepository": {
+  "owner": "kemiller2002",
+  "repo": "causa-acceptance-r10",
+  "branch": "causa-acceptance",
+  "isolated": true,
+  "visibility": "private",
+  "data": "synthetic only; resettable; evidence lives in the governed CI artifacts",
+  "credential": "a GitHub App installed on this repository alone (Contents: read and write); installation token minted per job by actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 (v3.3.0), scoped to this repository, revoked at job end; secrets CAUSA_ACCEPTANCE_APP_CLIENT_ID and CAUSA_ACCEPTANCE_APP_KEY",
+  "approval": "ODR-R10-09 (pending)"
+ },
+ "ownerDecisionRequests": {
+  "path": "kickoff/rehearsal-010/proposals/owner-decision-requests.json",
+  "sha256": "b5ea5f7a08766a7695e82bc527f0f475939dc77ffb64ea4aaff66eceeffb39ea",
+  "rule": "the questions the owner answers are these, pinned by the owner's lock (launch-preflight LP-03)"
  }
 }

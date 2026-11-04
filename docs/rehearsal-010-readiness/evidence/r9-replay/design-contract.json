@@ -1,0 +1,99 @@
+{
+  "schema": "indy-init.design-contract/1",
+  "candidate": "0e760501b5585d11009a2fd2da8d146a1d47e025",
+  "verdict": "REFUSED",
+  "static": [
+    {
+      "code": "FORMA_ROLE_MISSING",
+      "detail": "navigation-shell (UI-029): no source uses ef-navigation-shell; a lookalike custom component does not satisfy it"
+    },
+    {
+      "code": "FORMA_ROLE_MISSING",
+      "detail": "save-status (UI-006): no source uses ef-status-lozenge; a lookalike custom component does not satisfy it"
+    },
+    {
+      "code": "DESTINATION_MISSING",
+      "detail": "primary destination Administration (UI-020) appears in no source"
+    },
+    {
+      "code": "DESTINATION_MISSING",
+      "detail": "primary destination Settings (UI-020) appears in no source"
+    },
+    {
+      "code": "SECTION_MISSING",
+      "detail": "investigation section Overview (UI-029) appears in no source"
+    },
+    {
+      "code": "SECTION_MISSING",
+      "detail": "investigation section Causal Analysis (UI-029) appears in no source"
+    },
+    {
+      "code": "SECTION_MISSING",
+      "detail": "investigation section Timeline (UI-029) appears in no source"
+    },
+    {
+      "code": "THEME_MISSING",
+      "detail": "no theme file (theme) defines the Causa tokens"
+    },
+    {
+      "code": "PALETTE_TOKEN_MISSING",
+      "detail": "palette deep-navy #14283F (UI-016) is not defined as a theme token"
+    },
+    {
+      "code": "PALETTE_TOKEN_MISSING",
+      "detail": "palette teal #087F8C (UI-016) is not defined as a theme token"
+    },
+    {
+      "code": "PALETTE_TOKEN_MISSING",
+      "detail": "palette amber #E9A23B (UI-016) is not defined as a theme token"
+    },
+    {
+      "code": "PALETTE_TOKEN_MISSING",
+      "detail": "palette coral #D66B58 (UI-016) is not defined as a theme token"
+    },
+    {
+      "code": "PALETTE_TOKEN_MISSING",
+      "detail": "palette soft-ivory #F5F3ED (UI-016) is not defined as a theme token"
+    },
+    {
+      "code": "LITERAL_COLOUR_OUTSIDE_THEME",
+      "detail": "web/causa.css:6 background: #fff uses a literal colour outside the theme boundary"
+    },
+    {
+      "code": "LITERAL_COLOUR_OUTSIDE_THEME",
+      "detail": "web/causa.css:19 background: #fff uses a literal colour outside the theme boundary"
+    },
+    {
+      "code": "LITERAL_COLOUR_OUTSIDE_THEME",
+      "detail": "web/causa.css:30 color: #1a1a1a uses a literal colour outside the theme boundary"
+    },
+    {
+      "code": "LITERAL_COLOUR_OUTSIDE_THEME",
+      "detail": "web/causa.css:46 color: #8a5a00 uses a literal colour outside the theme boundary"
+    }
+  ],
+  "screenshots": [],
+  "independentVisualReview": "required (UI-016-O16): the owner reviews the screenshots; this verdict is not that review",
+  "causes": [
+    "FORMA_ROLE_MISSING navigation-shell (UI-029): no source uses ef-navigation-shell; a lookalike custom component does not satisfy it",
+    "FORMA_ROLE_MISSING save-status (UI-006): no source uses ef-status-lozenge; a lookalike custom component does not satisfy it",
+    "DESTINATION_MISSING primary destination Administration (UI-020) appears in no source",
+    "DESTINATION_MISSING primary destination Settings (UI-020) appears in no source",
+    "SECTION_MISSING investigation section Overview (UI-029) appears in no source",
+    "SECTION_MISSING investigation section Causal Analysis (UI-029) appears in no source",
+    "SECTION_MISSING investigation section Timeline (UI-029) appears in no source",
+    "THEME_MISSING no theme file (theme) defines the Causa tokens",
+    "PALETTE_TOKEN_MISSING palette deep-navy #14283F (UI-016) is not defined as a theme token",
+    "PALETTE_TOKEN_MISSING palette teal #087F8C (UI-016) is not defined as a theme token",
+    "PALETTE_TOKEN_MISSING palette amber #E9A23B (UI-016) is not defined as a theme token",
+    "PALETTE_TOKEN_MISSING palette coral #D66B58 (UI-016) is not defined as a theme token",
+    "PALETTE_TOKEN_MISSING palette soft-ivory #F5F3ED (UI-016) is not defined as a theme token",
+    "LITERAL_COLOUR_OUTSIDE_THEME web/causa.css:6 background: #fff uses a literal colour outside the theme boundary",
+    "LITERAL_COLOUR_OUTSIDE_THEME web/causa.css:19 background: #fff uses a literal colour outside the theme boundary",
+    "LITERAL_COLOUR_OUTSIDE_THEME web/causa.css:30 color: #1a1a1a uses a literal colour outside the theme boundary",
+    "LITERAL_COLOUR_OUTSIDE_THEME web/causa.css:46 color: #8a5a00 uses a literal colour outside the theme boundary",
+    "rendered: the rendered design contract did not run (layout, overflow, touch targets, focus, contrast, screenshots)",
+    "rendered: no rendered verdict for chromium",
+    "rendered: no rendered verdict for webkit"
+  ]
+}

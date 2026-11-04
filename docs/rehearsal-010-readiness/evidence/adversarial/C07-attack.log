@@ -1,0 +1,26 @@
+exit 1
+
+Running 1 test using 1 worker
+
+  ✘  1 [chromium] › j1-create-persist.spec.mjs:6:1 › J1 investigation creation and persistence (3.0m)
+
+
+  1) [chromium] › j1-create-persist.spec.mjs:6:1 › J1 investigation creation and persistence ───────
+
+    Test timeout of 180000ms exceeded.
+
+    Error: browserContext.close: Target page, context or browser has been closed
+
+      38 |     await b.close();
+      39 |   });
+    > 40 |   await a.close();
+         |   ^
+      41 |   finish();
+      42 | });
+      43 |
+        at $SRC/verification/journeys/j1-create-persist.spec.mjs:40:3
+
+    Error Context: test-results/j1-create-persist-J1-investigation-creation-and-persistence-chromium/error-context.md
+
+  1 failed
+    [chromium] › j1-create-persist.spec.mjs:6:1 › J1 investigation creation and persistence ────────

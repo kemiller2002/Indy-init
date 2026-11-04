@@ -1,0 +1,3 @@
+exit 4
+  REFUSED REQUEST_IN_FUTURE the request is dated 2026-11-04T14:57:00.0000000+00:00, after the time it is judged (2026-11-04T14:12:25.9486869+00:00)
+stop-decision: CONTINUE_REQUIRED (0 minute(s) remaining, 161 open mandatory requirement(s))

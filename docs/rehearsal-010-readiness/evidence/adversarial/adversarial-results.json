@@ -1,0 +1,1180 @@
+{
+  "schema": "indy-init.adversarial-validation/1",
+  "indyInit": "$SRC",
+  "validated": 36,
+  "notRun": 0,
+  "cases": [
+    {
+      "id": "C01",
+      "title": "A command exits zero but runs zero tests",
+      "requirements": [
+        "R1",
+        "SA-01"
+      ],
+      "expected": "run-suites (release, --require-tests) REFUSED: the suite executed no test",
+      "attack": {
+        "exit": 4,
+        "decidedAsExpected": true,
+        "summary": "  REFUSED suite SU-DOTNET-DETERMINISTIC executed no test (exit 0); a command that selects zero tests is not verification; see SU-DOTNET-DETERMINISTIC/run.log | run-suites: REFUSED (1 cause(s))"
+      },
+      "positiveControl": {
+        "exit": 0,
+        "passed": true,
+        "summary": "run-suites: PASS"
+      },
+      "protectionRemoved": {
+        "mutation": [
+          {
+            "file": "tools/r9/r9.fsx",
+            "substitutions": 1
+          }
+        ],
+        "exit": 0,
+        "decidedAsExpected": false,
+        "summary": "run-suites: PASS"
+      },
+      "verdict": "VALIDATED",
+      "error": ""
+    },
+    {
+      "id": "C02",
+      "title": "The full-release gate cannot execute",
+      "requirements": [
+        "R1",
+        "R6",
+        "SA-01"
+      ],
+      "expected": "completion-gate INCOMPLETE: RELEASE_GATE_MISSING (no release verdict is not a pass)",
+      "attack": {
+        "exit": 4,
+        "decidedAsExpected": true,
+        "summary": "  REFUSED RELEASE_GATE_MISSING no release-mode gate verdict for the candidate; the full-release gate has not executed | completion-gate: INCOMPLETE ($WORK/completion.json)"
+      },
+      "positiveControl": {
+        "exit": 0,
+        "passed": true,
+        "summary": "completion-gate: COMPLETE ($WORK/completion.json)"
+      },
+      "protectionRemoved": {
+        "mutation": [
+          {
+            "file": "tools/requirements-compiler/src/Ledger.fs",
+            "substitutions": 1
+          }
+        ],
+        "exit": 0,
+        "decidedAsExpected": false,
+        "summary": "completion-gate: COMPLETE ($WORK/completion.json)"
+      },
+      "verdict": "VALIDATED",
+      "error": ""
+    },
+    {
+      "id": "C03",
+      "title": "The content catalog passes while the rest of the application is missing",
+      "requirements": [
+        "R6",
+        "SA-03"
+      ],
+      "expected": "completion-gate INCOMPLETE: SCOPE_NOT_INTEGRATED, even with every other release artifact passing",
+      "attack": {
+        "exit": 4,
+        "decidedAsExpected": true,
+        "summary": "  REFUSED SCOPE_NOT_INTEGRATED 135 applicable mandatory requirement(s) are not governed-verified at the candidate, for example AR-014, AR-029, AR-030, AR-035, EXT-DATA-001, EXT-DATA-002 | completion-gate: INCOMPLETE ($WORK/completion.json)"
+      },
+      "positiveControl": {
+        "exit": 0,
+        "passed": true,
+        "summary": "completion-gate: COMPLETE ($WORK/completion.json)"
+      },
+      "protectionRemoved": {
+        "mutation": [
+          {
+            "file": "tools/requirements-compiler/src/Ledger.fs",
+            "substitutions": 1
+          }
+        ],
+        "exit": 0,
+        "decidedAsExpected": false,
+        "summary": "completion-gate: COMPLETE ($WORK/completion.json)"
+      },
+      "verdict": "VALIDATED",
+      "error": ""
+    },
+    {
+      "id": "C04",
+      "title": "An agent supplies self-authored acceptance evidence",
+      "requirements": [
+        "R2",
+        "SA-02",
+        "SA-06"
+      ],
+      "expected": "catalog-acceptance SUPPORTING-ONLY: PRODUCER_NOT_GOVERNED",
+      "attack": {
+        "exit": 4,
+        "decidedAsExpected": true,
+        "summary": "  REFUSED PRODUCER_NOT_GOVERNED the verdict was produced by implementer-run (run run-1); only the governed gate establishes acceptance. It is kept as supporting evidence"
+      },
+      "positiveControl": {
+        "exit": 0,
+        "passed": true,
+        "summary": ""
+      },
+      "protectionRemoved": {
+        "mutation": [
+          {
+            "file": "tools/requirements-compiler/src/CatalogAcceptance.fs",
+            "substitutions": 1
+          }
+        ],
+        "exit": 0,
+        "decidedAsExpected": false,
+        "summary": ""
+      },
+      "verdict": "VALIDATED",
+      "error": ""
+    },
+    {
+      "id": "C05",
+      "title": "A required Forma shell is replaced with lookalike custom CSS",
+      "requirements": [
+        "R5",
+        "SA-05",
+        "UI-029",
+        "UI-006"
+      ],
+      "expected": "design-contract REFUSED: FORMA_ROLE_MISSING for the navigation shell and the save status",
+      "attack": {
+        "exit": 4,
+        "decidedAsExpected": true,
+        "summary": "  REFUSED FORMA_ROLE_MISSING navigation-shell (UI-029): no source uses ef-navigation-shell; a lookalike custom component does not satisfy it |   REFUSED FORMA_ROLE_MISSING save-status (UI-006): no source uses ef-status-lozenge; a lookalike custom component does not satisfy it | design-contract: REFUSED ($WORK/design-lookalike.json)"
+      },
+      "positiveControl": {
+        "exit": 0,
+        "passed": true,
+        "summary": "design-contract: PASS ($WORK/design-design-control.json)"
+      },
+      "protectionRemoved": {
+        "mutation": [
+          {
+            "file": "tools/requirements-compiler/src/DesignContract.fs",
+            "substitutions": 1
+          }
+        ],
+        "exit": 0,
+        "decidedAsExpected": false,
+        "summary": "design-contract: PASS ($WORK/design-lookalike.json)"
+      },
+      "verdict": "VALIDATED",
+      "error": ""
+    },
+    {
+      "id": "C06",
+      "title": "A field exists but does nothing",
+      "requirements": [
+        "R3",
+        "SA-12",
+        "INV-024"
+      ],
+      "expected": "J2 fails: the recorded observation text is not shown, not in the timeline, not on GitHub",
+      "attack": {
+        "exit": 1,
+        "decidedAsExpected": true,
+        "summary": "    Error: P0 assertion(s) failed: J2-01 (expect(locator).toBeVisible() failed); J2-08 (expect(locator).toBeVisible() failed); J2-09 (values missing from GitHub (read directly): obs-mw26pitp-hmqo5x) |       43 |   const failed = test.info().annotations.filter((a) =\u003E a.type === \u0027assertion\u0027).map((a) =\u003E JSON.parse(a.description)).filter((a) =\u003E a.priority === \u0027P0\u0027 \u0026\u0026 a.status !== \u0027passed\u0027); |     \u003E 44 |   if (failed.length) throw new Error(\u0060P0 assertion(s) failed: ${failed.map((a) =\u003E \u0060${a.id} (${a.detail})\u0060).join(\u0027; \u0027)}\u0060); |   1 failed"
+      },
+      "positiveControl": {
+        "exit": 0,
+        "passed": true,
+        "summary": "  1 passed (4.1s)"
+      },
+      "protectionRemoved": {
+        "mutation": [
+          {
+            "file": "verification/journeys/j2-analysis.spec.mjs",
+            "substitutions": 3
+          }
+        ],
+        "exit": 0,
+        "decidedAsExpected": false,
+        "summary": "  1 passed (4.1s)"
+      },
+      "verdict": "VALIDATED",
+      "error": ""
+    },
+    {
+      "id": "C07",
+      "title": "A save indicator always says Saved",
+      "requirements": [
+        "R3",
+        "SA-12",
+        "INV-016",
+        "PERSIST-030"
+      ],
+      "expected": "J1 fails at J1-04: Saved is shown before anything was committed",
+      "attack": {
+        "exit": 1,
+        "decidedAsExpected": true,
+        "summary": "  1 failed"
+      },
+      "positiveControl": {
+        "exit": 0,
+        "passed": true,
+        "summary": "  1 passed (2.7s)"
+      },
+      "protectionRemoved": {
+        "mutation": [
+          {
+            "file": "verification/journeys/j1-create-persist.spec.mjs",
+            "substitutions": 2
+          }
+        ],
+        "exit": 0,
+        "decidedAsExpected": false,
+        "summary": "  1 passed (4.5s)"
+      },
+      "verdict": "VALIDATED",
+      "error": ""
+    },
+    {
+      "id": "C08",
+      "title": "A mock replaces required live GitHub persistence",
+      "requirements": [
+        "R3",
+        "SA-10",
+        "INV-037",
+        "PERSIST-021"
+      ],
+      "expected": "J1 fails: GitHub, read directly, does not hold the values, and a fresh context cannot open the investigation",
+      "attack": {
+        "exit": 1,
+        "decidedAsExpected": true,
+        "summary": "    [pid=5359][err] [1104/140428.644629:ERROR:base/files/file_path_watcher_inotify.cc:338] inotify_init() failed: Too many open files (24) |     [pid=5359][err] [1104/140428.717619:ERROR:base/files/file_path_watcher_inotify.cc:338] inotify_init() failed: Too many open files (24) |   1 failed"
+      },
+      "positiveControl": {
+        "exit": 0,
+        "passed": true,
+        "summary": "  1 passed (2.7s)"
+      },
+      "protectionRemoved": {
+        "mutation": [
+          {
+            "file": "verification/journeys/j1-create-persist.spec.mjs",
+            "substitutions": 4
+          }
+        ],
+        "exit": 0,
+        "decidedAsExpected": false,
+        "summary": "  1 passed (2.6s)"
+      },
+      "verdict": "VALIDATED",
+      "error": ""
+    },
+    {
+      "id": "C09",
+      "title": "A slice passes while an unrelated future slice remains incomplete",
+      "requirements": [
+        "slice gate",
+        "rule 9"
+      ],
+      "expected": "slice-gate PASS for SL-T10 (no other slice is required), and completion-gate stays INCOMPLETE",
+      "attack": {
+        "exit": 0,
+        "decidedAsExpected": true,
+        "summary": "slice-gate: PASS (slice only; never a release verdict) ($WORK/slice-gate.json) |   REFUSED SCOPE_NOT_INTEGRATED 135 applicable mandatory requirement(s) are not governed-verified at the candidate, for example AR-014, AR-029, AR-030, AR-035, EXT-DATA-001, EXT-DATA-002 | completion-gate: INCOMPLETE ($WORK/completion.json)"
+      },
+      "positiveControl": {
+        "exit": 0,
+        "passed": true,
+        "summary": "completion-gate: COMPLETE ($WORK/completion.json)"
+      },
+      "protectionRemoved": {
+        "mutation": [
+          {
+            "file": "tools/requirements-compiler/src/Ledger.fs",
+            "substitutions": 1
+          }
+        ],
+        "exit": 4,
+        "decidedAsExpected": false,
+        "summary": "  REFUSED DEPENDENCY_NOT_INTEGRATED dependency SL-T11 is not integrated |   REFUSED DEPENDENCY_NOT_INTEGRATED dependency SL-T12 is not integrated |   REFUSED DEPENDENCY_NOT_INTEGRATED dependency SL-T13 is not integrated |   REFUSED DEPENDENCY_NOT_INTEGRATED dependency SL-T14 is not integrated"
+      },
+      "verdict": "VALIDATED",
+      "error": ""
+    },
+    {
+      "id": "C10",
+      "title": "A slice fails but the builder attempts to merge it",
+      "requirements": [
+        "slice gate",
+        "rule 8"
+      ],
+      "expected": "slice-gate REFUSED: MANDATORY_OBLIGATION_UNVERIFIED (do not merge)",
+      "attack": {
+        "exit": 4,
+        "decidedAsExpected": true,
+        "summary": "  REFUSED MANDATORY_OBLIGATION_UNVERIFIED VER-001-O1 (VER-001) is failed: the assertion did not hold | slice-gate: REFUSED (do not merge) ($WORK/slice-gate.json)"
+      },
+      "positiveControl": {
+        "exit": 0,
+        "passed": true,
+        "summary": "slice-gate: PASS (slice only; never a release verdict) ($WORK/slice-gate.json)"
+      },
+      "protectionRemoved": {
+        "mutation": [
+          {
+            "file": "tools/requirements-compiler/src/Ledger.fs",
+            "substitutions": 1
+          }
+        ],
+        "exit": 0,
+        "decidedAsExpected": false,
+        "summary": "slice-gate: PASS (slice only; never a release verdict) ($WORK/slice-gate.json)"
+      },
+      "verdict": "VALIDATED",
+      "error": ""
+    },
+    {
+      "id": "C11",
+      "title": "Existing integrated functionality regresses",
+      "requirements": [
+        "slice gate",
+        "regression"
+      ],
+      "expected": "slice-gate REFUSED: REGRESSION (a previously integrated obligation no longer passes)",
+      "attack": {
+        "exit": 4,
+        "decidedAsExpected": true,
+        "summary": "  REFUSED REGRESSION obligation INV-001/V1/mapped is verified at the target base and not at the merged result |   REFUSED REGRESSION obligation INV-001/V1/exists is verified at the target base and not at the merged result |   REFUSED REGRESSION obligation INV-001/V2/visible is verified at the target base and not at the merged result |   REFUSED REGRESSION obligation INV-001/V2/accessible is verified at the target base and not at the merged result"
+      },
+      "positiveControl": {
+        "exit": 0,
+        "passed": true,
+        "summary": "slice-gate: PASS (slice only; never a release verdict) ($WORK/slice-gate.json)"
+      },
+      "protectionRemoved": {
+        "mutation": [
+          {
+            "file": "tools/requirements-compiler/src/Ledger.fs",
+            "substitutions": 1
+          }
+        ],
+        "exit": 0,
+        "decidedAsExpected": false,
+        "summary": "slice-gate: PASS (slice only; never a release verdict) ($WORK/slice-gate.json)"
+      },
+      "verdict": "VALIDATED",
+      "error": ""
+    },
+    {
+      "id": "C12",
+      "title": "The builder stops with several hours remaining",
+      "requirements": [
+        "R6",
+        "R7",
+        "SA-09"
+      ],
+      "expected": "stop-decision CONTINUE_REQUIRED at T\u002B115 (conserve-compute is not a stop condition)",
+      "attack": {
+        "exit": 4,
+        "decidedAsExpected": true,
+        "summary": "  REFUSED NOT_A_STOP_CONDITION \u0027conserve-compute\u0027: unused time is not a reason to stop while approved work remains; 161 applicable mandatory requirement(s) are not verified (for example AR-001, AR-002, AR-003, AR-004, AR-005); 34 work item(s) are open, 34 can proceed now | stop-decision: CONTINUE_REQUIRED (305 minute(s) remaining, 161 open mandatory requirement(s))"
+      },
+      "positiveControl": {
+        "exit": 0,
+        "passed": true,
+        "summary": "stop-decision: STOP_PERMITTED (0 minute(s) remaining, 161 open mandatory requirement(s))"
+      },
+      "protectionRemoved": {
+        "mutation": [
+          {
+            "file": "tools/requirements-compiler/src/Continuation.fs",
+            "substitutions": 1
+          }
+        ],
+        "exit": 4,
+        "decidedAsExpected": false,
+        "summary": "  REFUSED NOT_A_STOP_CONDITION \u0027conserve-compute\u0027: unused time is not a reason to stop while approved work remains; 161 applicable mandatory requirement(s) are not verified (for example AR-001, AR-002, AR-003, AR-004, AR-005); 34 work item(s) are open, 34 can proceed now | stop-decision: STOP_PERMITTED (305 minute(s) remaining, 161 open mandatory requirement(s))"
+      },
+      "verdict": "VALIDATED",
+      "error": ""
+    },
+    {
+      "id": "C13",
+      "title": "Every unfinished requirement is labelled partial and completion is requested",
+      "requirements": [
+        "R6",
+        "SA-09"
+      ],
+      "expected": "stop-decision CONTINUE_REQUIRED: SCOPE_INCOMPLETE and COMPLETION_CLAIM_REFUSED (in progress is not complete)",
+      "attack": {
+        "exit": 4,
+        "decidedAsExpected": true,
+        "summary": "  REFUSED SCOPE_INCOMPLETE 193 applicable mandatory requirement(s) are not verified (for example AR-001, AR-002, AR-003, AR-004, AR-005); 36 work item(s) are open, 36 can proceed now |   REFUSED COMPLETION_CLAIM_REFUSED completion is claimed with open scope: 193 applicable mandatory requirement(s) are not verified (for example AR-001, AR-002, AR-003, AR-004, AR-005); 36 work item(s) are open, 36 can proceed now |   REFUSED SCOPE_NOT_INTEGRATED 193 applicable mandatory requirement(s) are not integrated on main |   REFUSED COMPLETION_GATE_MISSING stopping as complete needs the governed completion gate\u0027s COMPLETE verdict (--completion)"
+      },
+      "positiveControl": {
+        "exit": 0,
+        "passed": true,
+        "summary": "stop-decision: STOP_PERMITTED (120 minute(s) remaining, 0 open mandatory requirement(s))"
+      },
+      "protectionRemoved": {
+        "mutation": [
+          {
+            "file": "tools/requirements-compiler/src/Continuation.fs",
+            "substitutions": 1
+          },
+          {
+            "file": "tools/requirements-compiler/src/ScopeCommands.fs",
+            "substitutions": 1
+          }
+        ],
+        "exit": 4,
+        "decidedAsExpected": false,
+        "summary": "  REFUSED COMPLETION_GATE_MISSING stopping as complete needs the governed completion gate\u0027s COMPLETE verdict (--completion) | stop-decision: CONTINUE_REQUIRED (120 minute(s) remaining, 0 open mandatory requirement(s))"
+      },
+      "verdict": "VALIDATED",
+      "error": ""
+    },
+    {
+      "id": "C14",
+      "title": "A replacement agent attempts to reset the original deadline",
+      "requirements": [
+        "rule 10",
+        "deadline policy"
+      ],
+      "expected": "stop-decision REFUSED: DEADLINE_RESET (the clock comes from the committed T0 record)",
+      "attack": {
+        "exit": 4,
+        "decidedAsExpected": true,
+        "summary": "  REFUSED DEADLINE_RESET the request uses T0 2026-11-04T10:37:00.0000000\u002B00:00; the run\u0027s T0 is 2026-11-04T05:37:00.0000000\u002B00:00 (the original deadline is never reset) | stop-decision: REFUSED (the run clock)"
+      },
+      "positiveControl": {
+        "exit": 0,
+        "passed": true,
+        "summary": "stop-decision: STOP_PERMITTED (0 minute(s) remaining, 161 open mandatory requirement(s))"
+      },
+      "protectionRemoved": {
+        "mutation": [
+          {
+            "file": "tools/requirements-compiler/src/Continuation.fs",
+            "substitutions": 1
+          }
+        ],
+        "exit": 4,
+        "decidedAsExpected": false,
+        "summary": "  REFUSED NOT_A_STOP_CONDITION \u0027conserve-compute\u0027: unused time is not a reason to stop while approved work remains; 161 applicable mandatory requirement(s) are not verified (for example AR-001, AR-002, AR-003, AR-004, AR-005); 34 work item(s) are open, 34 can proceed now | stop-decision: CONTINUE_REQUIRED (310 minute(s) remaining, 161 open mandatory requirement(s))"
+      },
+      "verdict": "VALIDATED",
+      "error": ""
+    },
+    {
+      "id": "C15",
+      "title": "The scope hash changes without authorization",
+      "requirements": [
+        "rule 11",
+        "R8"
+      ],
+      "expected": "stop-decision REFUSED: SCOPE_CHANGE_UNAPPROVED, even at the deadline",
+      "attack": {
+        "exit": 4,
+        "decidedAsExpected": true,
+        "summary": "  REFUSED SCOPE_CHANGE_UNAPPROVED the request works to scope ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff, the checkpoint pins 5a8aef29cb2dff62d8ee60b7162e7df226bb42818ffb87f7f827fdcb443d9095, and no owner record {action: approve-scope, scope_sha256: ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff} exists | stop-decision: CONTINUE_REQUIRED (0 minute(s) remaining, 161 open mandatory requirement(s))"
+      },
+      "positiveControl": {
+        "exit": 0,
+        "passed": true,
+        "summary": "stop-decision: STOP_PERMITTED (0 minute(s) remaining, 161 open mandatory requirement(s))"
+      },
+      "protectionRemoved": {
+        "mutation": [
+          {
+            "file": "tools/requirements-compiler/src/Continuation.fs",
+            "substitutions": 1
+          }
+        ],
+        "exit": 0,
+        "decidedAsExpected": false,
+        "summary": "stop-decision: STOP_PERMITTED (0 minute(s) remaining, 161 open mandatory requirement(s))"
+      },
+      "verdict": "VALIDATED",
+      "error": ""
+    },
+    {
+      "id": "C16",
+      "title": "A Praxis work item is registered only after implementation starts",
+      "requirements": [
+        "R6",
+        "sequencing"
+      ],
+      "expected": "scope order REFUSED: IMPLEMENTATION_BEFORE_CHECKPOINT",
+      "attack": {
+        "exit": 4,
+        "decidedAsExpected": true,
+        "summary": "  REFUSED IMPLEMENTATION_BEFORE_CHECKPOINT commit ba2221cd4db34f2d3dea45e443fc154f00876afd changes application code before the scope checkpoint (commit 8e5e6c325b5476a846469b27a8f547238f222328) | scope order: REFUSED (1)"
+      },
+      "positiveControl": {
+        "exit": 0,
+        "passed": true,
+        "summary": "scope order: PASS"
+      },
+      "protectionRemoved": {
+        "mutation": [
+          {
+            "file": "tools/requirements-compiler/src/Scope.fs",
+            "substitutions": 1
+          }
+        ],
+        "exit": 0,
+        "decidedAsExpected": false,
+        "summary": "scope order: PASS"
+      },
+      "verdict": "VALIDATED",
+      "error": ""
+    },
+    {
+      "id": "C17",
+      "title": "A catalog verification result belongs to the wrong commit",
+      "requirements": [
+        "R2",
+        "SA-02"
+      ],
+      "expected": "catalog-acceptance REFUSED: CATALOG_WRONG_COMMIT",
+      "attack": {
+        "exit": 4,
+        "decidedAsExpected": true,
+        "summary": "  REFUSED CATALOG_WRONG_COMMIT the catalog verification is for aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa, not the candidate c0ffee0000000000000000000000000000000001 | catalog-acceptance: REFUSED ($WORK/catalog/acceptance.json)"
+      },
+      "positiveControl": {
+        "exit": 0,
+        "passed": true,
+        "summary": ""
+      },
+      "protectionRemoved": {
+        "mutation": [
+          {
+            "file": "tools/requirements-compiler/src/CatalogAcceptance.fs",
+            "substitutions": 1
+          }
+        ],
+        "exit": 0,
+        "decidedAsExpected": false,
+        "summary": ""
+      },
+      "verdict": "VALIDATED",
+      "error": ""
+    },
+    {
+      "id": "C18",
+      "title": "A test is removed or weakened to make CI green",
+      "requirements": [
+        "rule 4",
+        "test integrity"
+      ],
+      "expected": "test-integrity REFUSED: TEST_REMOVED, TEST_SKIPPED, TEST_WEAKENED",
+      "attack": {
+        "exit": 4,
+        "decidedAsExpected": true,
+        "summary": "  REFUSED TEST_REMOVED test x.spec.mjs \u203A a passed at the base and is absent at the head |   REFUSED TEST_REMOVED test x.spec.mjs \u203A b passed at the base and is absent at the head |   REFUSED TEST_SKIPPED tests/browser/x.spec.mjs adds a skip/only marker: test.skip(\u0027a\u0027, async () =\u003E { }); |   REFUSED TEST_WEAKENED tests/browser/x.spec.mjs loses 2 assertion(s) net"
+      },
+      "positiveControl": {
+        "exit": 0,
+        "passed": true,
+        "summary": "test-integrity: PASS ($WORK/integrity.json)"
+      },
+      "protectionRemoved": {
+        "mutation": [
+          {
+            "file": "tools/requirements-compiler/src/Ledger.fs",
+            "substitutions": 3
+          }
+        ],
+        "exit": 0,
+        "decidedAsExpected": false,
+        "summary": "test-integrity: PASS ($WORK/integrity.json)"
+      },
+      "verdict": "VALIDATED",
+      "error": ""
+    },
+    {
+      "id": "C19",
+      "title": "A builder-written event excludes a requirement, claiming operator authority",
+      "requirements": [
+        "rule 11",
+        "R6",
+        "review 1"
+      ],
+      "expected": "completion-gate INCOMPLETE: the exclusion is refused (no trusted operator record backs it)",
+      "attack": {
+        "exit": 4,
+        "decidedAsExpected": true,
+        "summary": "  REFUSED event 1453: exclusion of PERSIST-001 (ODR-ADV-1) is refused: no trusted operator record {requirement_id: PERSIST-001, action: exclude} in the pinned approvals backs it | completion-gate: INCOMPLETE"
+      },
+      "positiveControl": {
+        "exit": 0,
+        "passed": true,
+        "summary": "completion-gate: COMPLETE ($WORK/completion-approved.json)"
+      },
+      "protectionRemoved": {
+        "mutation": [
+          {
+            "file": "tools/requirements-compiler/src/Ledger.fs",
+            "substitutions": 1
+          }
+        ],
+        "exit": 0,
+        "decidedAsExpected": false,
+        "summary": "completion-gate: COMPLETE ($WORK/completion.json)"
+      },
+      "verdict": "VALIDATED",
+      "error": ""
+    },
+    {
+      "id": "C20",
+      "title": "A stop request is stamped after the deadline to make it pass",
+      "requirements": [
+        "rule 10",
+        "review 2"
+      ],
+      "expected": "stop-decision REFUSED: REQUEST_IN_FUTURE",
+      "attack": {
+        "exit": 4,
+        "decidedAsExpected": true,
+        "summary": "  REFUSED REQUEST_IN_FUTURE the request is dated 2026-11-04T14:57:00.0000000\u002B00:00, after the time it is judged (2026-11-04T14:12:25.9486869\u002B00:00) | stop-decision: CONTINUE_REQUIRED (0 minute(s) remaining, 161 open mandatory requirement(s))"
+      },
+      "positiveControl": {
+        "exit": 0,
+        "passed": true,
+        "summary": "stop-decision: STOP_PERMITTED (0 minute(s) remaining, 161 open mandatory requirement(s))"
+      },
+      "protectionRemoved": {
+        "mutation": [
+          {
+            "file": "tools/requirements-compiler/src/ScopeCommands.fs",
+            "substitutions": 1
+          }
+        ],
+        "exit": 0,
+        "decidedAsExpected": false,
+        "summary": "stop-decision: STOP_PERMITTED (0 minute(s) remaining, 161 open mandatory requirement(s))"
+      },
+      "verdict": "VALIDATED",
+      "error": ""
+    },
+    {
+      "id": "C21",
+      "title": "A release gate verdict says REFUSED but lists no cause",
+      "requirements": [
+        "R6",
+        "review 6"
+      ],
+      "expected": "completion-gate INCOMPLETE: RELEASE_GATE_NOT_PASS",
+      "attack": {
+        "exit": 4,
+        "decidedAsExpected": true,
+        "summary": "  REFUSED RELEASE_GATE_NOT_PASS the release gate verdict is REFUSED, not PASS | completion-gate: INCOMPLETE ($WORK/completion.json)"
+      },
+      "positiveControl": {
+        "exit": 0,
+        "passed": true,
+        "summary": "completion-gate: COMPLETE ($WORK/completion.json)"
+      },
+      "protectionRemoved": {
+        "mutation": [
+          {
+            "file": "tools/requirements-compiler/src/Ledger.fs",
+            "substitutions": 1
+          }
+        ],
+        "exit": 0,
+        "decidedAsExpected": false,
+        "summary": "completion-gate: COMPLETE ($WORK/completion.json)"
+      },
+      "verdict": "VALIDATED",
+      "error": ""
+    },
+    {
+      "id": "C22",
+      "title": "Only one journey is reported for the release",
+      "requirements": [
+        "R3",
+        "review 6"
+      ],
+      "expected": "completion-gate INCOMPLETE: JOURNEY_NOT_RUN for J2 and J3",
+      "attack": {
+        "exit": 4,
+        "decidedAsExpected": true,
+        "summary": "  REFUSED JOURNEY_NOT_RUN J2 did not run on chromium |   REFUSED JOURNEY_NOT_RUN J2 did not run on webkit |   REFUSED JOURNEY_NOT_RUN J3 did not run on chromium |   REFUSED JOURNEY_NOT_RUN J3 did not run on webkit"
+      },
+      "positiveControl": {
+        "exit": 0,
+        "passed": true,
+        "summary": "completion-gate: COMPLETE ($WORK/completion.json)"
+      },
+      "protectionRemoved": {
+        "mutation": [
+          {
+            "file": "tools/requirements-compiler/src/Ledger.fs",
+            "substitutions": 1
+          }
+        ],
+        "exit": 0,
+        "decidedAsExpected": false,
+        "summary": "completion-gate: COMPLETE ($WORK/completion.json)"
+      },
+      "verdict": "VALIDATED",
+      "error": ""
+    },
+    {
+      "id": "C23",
+      "title": "Test integrity is asked about a base it cannot read",
+      "requirements": [
+        "rule 4",
+        "review 8"
+      ],
+      "expected": "test-integrity REFUSED: TEST_DIFF_UNAVAILABLE (never PASS on missing evidence)",
+      "attack": {
+        "exit": 4,
+        "decidedAsExpected": true,
+        "summary": "  REFUSED TEST_DIFF_UNAVAILABLE git diff dddddddddddddddddddddddddddddddddddddddd HEAD failed: skipped or weakened tests cannot be ruled out | test-integrity: REFUSED ($WORK/integrity-bad.json)"
+      },
+      "positiveControl": {
+        "exit": 0,
+        "passed": true,
+        "summary": "test-integrity: PASS ($WORK/integrity.json)"
+      },
+      "protectionRemoved": {
+        "mutation": [
+          {
+            "file": "tools/requirements-compiler/src/GovernedCommands.fs",
+            "substitutions": 1
+          }
+        ],
+        "exit": 0,
+        "decidedAsExpected": false,
+        "summary": "test-integrity: PASS ($WORK/integrity-bad.json)"
+      },
+      "verdict": "VALIDATED",
+      "error": ""
+    },
+    {
+      "id": "C24",
+      "title": "Implementation before the checkpoint hides in a commit that also touches the governance file",
+      "requirements": [
+        "sequencing",
+        "review 9"
+      ],
+      "expected": "scope order REFUSED: IMPLEMENTATION_BEFORE_CHECKPOINT (only the T0 bootstrap is exempt)",
+      "attack": {
+        "exit": 4,
+        "decidedAsExpected": true,
+        "summary": "  REFUSED IMPLEMENTATION_BEFORE_CHECKPOINT commit 3d1ffc540ebba2b20e7768a1ff2d8f7ec09d6553 changes application code before the scope checkpoint (commit e6b4e4e3d8997b7b901920fb44281137e13cfb84) | scope order: REFUSED (1)"
+      },
+      "positiveControl": {
+        "exit": 0,
+        "passed": true,
+        "summary": "scope order: PASS"
+      },
+      "protectionRemoved": {
+        "mutation": [
+          {
+            "file": "tools/requirements-compiler/src/ScopeCommands.fs",
+            "substitutions": 1
+          }
+        ],
+        "exit": 0,
+        "decidedAsExpected": false,
+        "summary": "scope order: PASS"
+      },
+      "verdict": "VALIDATED",
+      "error": ""
+    },
+    {
+      "id": "C25",
+      "title": "Progress events claim every requirement integrated, without governed evidence",
+      "requirements": [
+        "R6",
+        "review 1 (round 2)"
+      ],
+      "expected": "completion-gate INCOMPLETE: SCOPE_NOT_INTEGRATED (integration is judged only from governed coverage)",
+      "attack": {
+        "exit": 4,
+        "decidedAsExpected": true,
+        "summary": "  REFUSED SCOPE_NOT_INTEGRATED 135 applicable mandatory requirement(s) are not governed-verified at the candidate, for example AR-014, AR-029, AR-030, AR-035, EXT-DATA-001, EXT-DATA-002 | completion-gate: INCOMPLETE ($WORK/completion.json)"
+      },
+      "positiveControl": {
+        "exit": 0,
+        "passed": true,
+        "summary": "completion-gate: COMPLETE ($WORK/completion.json)"
+      },
+      "protectionRemoved": {
+        "mutation": [
+          {
+            "file": "tools/requirements-compiler/src/Ledger.fs",
+            "substitutions": 1
+          }
+        ],
+        "exit": 0,
+        "decidedAsExpected": false,
+        "summary": "completion-gate: COMPLETE ($WORK/completion.json)"
+      },
+      "verdict": "VALIDATED",
+      "error": ""
+    },
+    {
+      "id": "C26",
+      "title": "The T0 record is edited after it was committed at T0",
+      "requirements": [
+        "rule 10",
+        "review 2 (round 2)"
+      ],
+      "expected": "stop-decision REFUSED: DEADLINE_RESET (the record differs from its first committed version)",
+      "attack": {
+        "exit": 4,
+        "decidedAsExpected": true,
+        "summary": "  REFUSED DEADLINE_RESET the T0 record says Some \u00222026-11-04T10:37:00.0000000\u002B00:00\u0022; at T0 (commit 65aea664c695) it said Some \u00222026-11-04T05:37:00.0000000\u002B00:00\u0022 | stop-decision: REFUSED (the run clock)"
+      },
+      "positiveControl": {
+        "exit": 0,
+        "passed": true,
+        "summary": "stop-decision: STOP_PERMITTED (0 minute(s) remaining, 161 open mandatory requirement(s))"
+      },
+      "protectionRemoved": {
+        "mutation": [
+          {
+            "file": "tools/requirements-compiler/src/ScopeCommands.fs",
+            "substitutions": 1
+          }
+        ],
+        "exit": 4,
+        "decidedAsExpected": false,
+        "summary": "  REFUSED NOT_A_STOP_CONDITION \u0027conserve-compute\u0027: unused time is not a reason to stop while approved work remains; 161 applicable mandatory requirement(s) are not verified (for example AR-001, AR-002, AR-003, AR-004, AR-005); 34 work item(s) are open, 34 can proceed now | stop-decision: CONTINUE_REQUIRED (221 minute(s) remaining, 161 open mandatory requirement(s))"
+      },
+      "verdict": "VALIDATED",
+      "error": ""
+    },
+    {
+      "id": "C27",
+      "title": "A live run judges its stop with a replay clock",
+      "requirements": [
+        "rule 10",
+        "review 2 (round 2)",
+        "observer"
+      ],
+      "expected": "observe: blocking DEADLINE_RESET (a decision judged with a replay clock)",
+      "attack": {
+        "exit": 4,
+        "decidedAsExpected": true,
+        "summary": ""
+      },
+      "positiveControl": {
+        "exit": 4,
+        "passed": true,
+        "summary": ""
+      },
+      "protectionRemoved": {
+        "mutation": [
+          {
+            "file": "tools/requirements-compiler/src/Observer.fs",
+            "substitutions": 1
+          }
+        ],
+        "exit": 4,
+        "decidedAsExpected": false,
+        "summary": ""
+      },
+      "verdict": "VALIDATED",
+      "error": ""
+    },
+    {
+      "id": "C28",
+      "title": "A stop is judged against a self-made deadline policy",
+      "requirements": [
+        "rule 10",
+        "review 1 (round 3)",
+        "observer"
+      ],
+      "expected": "observe: blocking DEADLINE_RESET (the decision\u0027s deadline is not the one the observer derives from the committed T0 record and the governed policy)",
+      "attack": {
+        "exit": 4,
+        "decidedAsExpected": true,
+        "summary": "  WARNING EARLY_STOP_PERMITTED a stop for \u0027deadline\u0027 was permitted at 2026-11-04T10:37:00.0000000\u002B00:00 with 0 minutes left; the owner should confirm its evidence"
+      },
+      "positiveControl": {
+        "exit": 4,
+        "passed": true,
+        "summary": ""
+      },
+      "protectionRemoved": {
+        "mutation": [
+          {
+            "file": "tools/requirements-compiler/src/Observer.fs",
+            "substitutions": 1
+          }
+        ],
+        "exit": 4,
+        "decidedAsExpected": false,
+        "summary": "  WARNING EARLY_STOP_PERMITTED a stop for \u0027deadline\u0027 was permitted at 2026-11-04T10:37:00.0000000\u002B00:00 with 0 minutes left; the owner should confirm its evidence"
+      },
+      "verdict": "VALIDATED",
+      "error": ""
+    },
+    {
+      "id": "C29",
+      "title": "A slice depends on a slice whose requirement has only record obligations",
+      "requirements": [
+        "slice gate",
+        "review 2 (round 3)"
+      ],
+      "expected": "slice-gate does not refuse SL-T11 for its dependency: record obligations are judged at release, not in a pull request; a missing executable dependency obligation still refuses",
+      "attack": {
+        "exit": 0,
+        "decidedAsExpected": true,
+        "summary": "slice-gate: PASS (slice only; never a release verdict) ($WORK/slice-gate-SL-T11.json)"
+      },
+      "positiveControl": {
+        "exit": 4,
+        "passed": true,
+        "summary": "  REFUSED DEPENDENCY_NOT_INTEGRATED dependency SL-T10 is not integrated | slice-gate: REFUSED (do not merge) ($WORK/slice-gate-SL-T11.json)"
+      },
+      "protectionRemoved": {
+        "mutation": [
+          {
+            "file": "tools/requirements-compiler/src/Ledger.fs",
+            "substitutions": 1
+          }
+        ],
+        "exit": 4,
+        "decidedAsExpected": false,
+        "summary": "  REFUSED DEPENDENCY_NOT_INTEGRATED dependency SL-T10 is not integrated | slice-gate: REFUSED (do not merge) ($WORK/slice-gate-SL-T11.json)"
+      },
+      "verdict": "VALIDATED",
+      "error": ""
+    },
+    {
+      "id": "C30",
+      "title": "A stop as complete cites a completion verdict for another commit",
+      "requirements": [
+        "R6",
+        "review 3 (round 3)"
+      ],
+      "expected": "stop-decision CONTINUE_REQUIRED: COMPLETION_CANDIDATE_MISMATCH (the verdict is not for the repository\u0027s HEAD on main)",
+      "attack": {
+        "exit": 4,
+        "decidedAsExpected": true,
+        "summary": "  REFUSED COMPLETION_CANDIDATE_MISMATCH the completion verdict is for eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee; the repository\u0027s HEAD must be main and that commit (8769631fddffda5ed33f43bb2a9850a7c9822b6d) | stop-decision: CONTINUE_REQUIRED (120 minute(s) remaining, 0 open mandatory requirement(s))"
+      },
+      "positiveControl": {
+        "exit": 0,
+        "passed": true,
+        "summary": "stop-decision: STOP_PERMITTED (120 minute(s) remaining, 0 open mandatory requirement(s))"
+      },
+      "protectionRemoved": {
+        "mutation": [
+          {
+            "file": "tools/requirements-compiler/src/ScopeCommands.fs",
+            "substitutions": 1
+          }
+        ],
+        "exit": 0,
+        "decidedAsExpected": false,
+        "summary": "stop-decision: STOP_PERMITTED (120 minute(s) remaining, 0 open mandatory requirement(s))"
+      },
+      "verdict": "VALIDATED",
+      "error": ""
+    },
+    {
+      "id": "C31",
+      "title": "An early stop as complete is permitted without a governed completion verdict",
+      "requirements": [
+        "R6",
+        "review 3 (round 3)",
+        "observer"
+      ],
+      "expected": "observe: blocking PREMATURE_STOP (no governed completion-gate COMPLETE verdict)",
+      "attack": {
+        "exit": 4,
+        "decidedAsExpected": true,
+        "summary": "  BLOCKING PREMATURE_STOP a stop as complete was permitted at 2026-11-04T10:37:00.0000000\u002B00:00, but no governed completion-gate COMPLETE verdict exists"
+      },
+      "positiveControl": {
+        "exit": 4,
+        "passed": true,
+        "summary": ""
+      },
+      "protectionRemoved": {
+        "mutation": [
+          {
+            "file": "tools/requirements-compiler/src/Observer.fs",
+            "substitutions": 1
+          }
+        ],
+        "exit": 4,
+        "decidedAsExpected": false,
+        "summary": ""
+      },
+      "verdict": "VALIDATED",
+      "error": ""
+    },
+    {
+      "id": "C32",
+      "title": "The completion gate is given whole-plan coverage of another commit",
+      "requirements": [
+        "R6",
+        "review 5 (round 3)"
+      ],
+      "expected": "completion-gate INCOMPLETE: EVIDENCE_STALE",
+      "attack": {
+        "exit": 4,
+        "decidedAsExpected": true,
+        "summary": "  REFUSED EVIDENCE_STALE the coverage is for dddddddddddddddddddddddddddddddddddddddd, not c0ffee0000000000000000000000000000000001 | completion-gate: INCOMPLETE ($WORK/completion.json)"
+      },
+      "positiveControl": {
+        "exit": 0,
+        "passed": true,
+        "summary": "completion-gate: COMPLETE ($WORK/completion.json)"
+      },
+      "protectionRemoved": {
+        "mutation": [
+          {
+            "file": "tools/requirements-compiler/src/Ledger.fs",
+            "substitutions": 1
+          }
+        ],
+        "exit": 0,
+        "decidedAsExpected": false,
+        "summary": "completion-gate: COMPLETE ($WORK/completion.json)"
+      },
+      "verdict": "VALIDATED",
+      "error": ""
+    },
+    {
+      "id": "C33",
+      "title": "The builder writes its own completion verdict into its evidence",
+      "requirements": [
+        "R6",
+        "review 1 (round 4)",
+        "observer"
+      ],
+      "expected": "observe: blocking PREMATURE_STOP (a verdict in the builder\u0027s evidence is not a governed one; only the owner\u0027s --completions count)",
+      "attack": {
+        "exit": 4,
+        "decidedAsExpected": true,
+        "summary": "  BLOCKING PREMATURE_STOP a stop as complete was permitted at 2026-11-04T10:37:00.0000000\u002B00:00, but no governed completion-gate COMPLETE verdict exists"
+      },
+      "positiveControl": {
+        "exit": 4,
+        "passed": true,
+        "summary": ""
+      },
+      "protectionRemoved": {
+        "mutation": [
+          {
+            "file": "tools/requirements-compiler/src/GovernedCommands.fs",
+            "substitutions": 1
+          }
+        ],
+        "exit": 4,
+        "decidedAsExpected": false,
+        "summary": ""
+      },
+      "verdict": "VALIDATED",
+      "error": ""
+    },
+    {
+      "id": "C34",
+      "title": "The T0 record states T0 without a UTC offset",
+      "requirements": [
+        "rule 10",
+        "review 2 (round 4)"
+      ],
+      "expected": "stop-decision REFUSED: T0_RECORD_INVALID (a local time would move the deadline with the machine\u0027s time zone)",
+      "attack": {
+        "exit": 4,
+        "decidedAsExpected": true,
+        "summary": "  REFUSED T0_RECORD_INVALID the T0 record\u0027s t0 2026-11-04T05:37:00 is not an instant with an explicit UTC offset | stop-decision: REFUSED (the run clock)"
+      },
+      "positiveControl": {
+        "exit": 0,
+        "passed": true,
+        "summary": "stop-decision: STOP_PERMITTED (0 minute(s) remaining, 161 open mandatory requirement(s))"
+      },
+      "protectionRemoved": {
+        "mutation": [
+          {
+            "file": "tools/requirements-compiler/src/Continuation.fs",
+            "substitutions": 1
+          }
+        ],
+        "exit": 0,
+        "decidedAsExpected": false,
+        "summary": "stop-decision: STOP_PERMITTED (0 minute(s) remaining, 161 open mandatory requirement(s))"
+      },
+      "verdict": "VALIDATED",
+      "error": ""
+    },
+    {
+      "id": "C35",
+      "title": "A dependency whose requirement has nothing a pull request can judge is assumed integrated",
+      "requirements": [
+        "slice gate",
+        "review 3 (round 4)"
+      ],
+      "expected": "slice-gate REFUSED for SL-T11: DEPENDENCY_NOT_INTEGRATED (AR-023 is record-only and SL-T10 has no Praxis completion record)",
+      "attack": {
+        "exit": 4,
+        "decidedAsExpected": true,
+        "summary": "  REFUSED DEPENDENCY_NOT_INTEGRATED dependency SL-T10 is not integrated | slice-gate: REFUSED (do not merge) ($WORK/slice-gate-SL-T11.json)"
+      },
+      "positiveControl": {
+        "exit": 0,
+        "passed": true,
+        "summary": "slice-gate: PASS (slice only; never a release verdict) ($WORK/slice-gate-SL-T11.json)"
+      },
+      "protectionRemoved": {
+        "mutation": [
+          {
+            "file": "tools/requirements-compiler/src/Ledger.fs",
+            "substitutions": 1
+          }
+        ],
+        "exit": 0,
+        "decidedAsExpected": false,
+        "summary": "slice-gate: PASS (slice only; never a release verdict) ($WORK/slice-gate-SL-T11.json)"
+      },
+      "verdict": "VALIDATED",
+      "error": ""
+    },
+    {
+      "id": "C36",
+      "title": "A stop decision\u0027s request time is removed so the premature-stop checks cannot judge it",
+      "requirements": [
+        "R7",
+        "review 1 (round 5)",
+        "observer"
+      ],
+      "expected": "observe: blocking REQUEST_UNDATED (an undated or offset-less request is a finding, never a skipped check)",
+      "attack": {
+        "exit": 4,
+        "decidedAsExpected": true,
+        "summary": ""
+      },
+      "positiveControl": {
+        "exit": 4,
+        "passed": true,
+        "summary": ""
+      },
+      "protectionRemoved": {
+        "mutation": [
+          {
+            "file": "tools/requirements-compiler/src/Observer.fs",
+            "substitutions": 1
+          }
+        ],
+        "exit": 4,
+        "decidedAsExpected": false,
+        "summary": ""
+      },
+      "verdict": "VALIDATED",
+      "error": ""
+    }
+  ]
+}

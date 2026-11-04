@@ -1,5 +1,7 @@
 # Rehearsal 009: why the run built only the catalog and stopped at 115 minutes
 
+> **Integrated (2026-11-04, #104).** This is #102's record and is kept as written. In the integrated tree, v4.1.3 is replaced by #101's v4.1.4. The scope manifest is recompiled from v4.1.4 with the same 199 requirements, 863 obligations and 35 work items; its scopeSha256 is now `b407b5cc…`. The current readiness state is [FINAL-READINESS.md](FINAL-READINESS.md).
+
 **Summary.**
 - Rehearsal 009 built and verified the 38-requirement investigation-content catalog. It then stopped at 02:25Z, 115 minutes into a 420-minute window.
 - At that point, 161 P0 requirements of the frozen v4.1.2 plan had not been started. Neither had their 613 obligations or 660 plan tests.

@@ -1,0 +1,5 @@
+exit 4
+  BLOCKING SCOPE_COVERAGE_UNKNOWN no slice execution manifest is published; coverage of the approved scope cannot be checked
+  WARNING DESIGN_CONTRACT_NOT_RUN no design-contract verdict yet
+  WARNING EARLY_STOP_PERMITTED a stop for 'deadline' was permitted at 2026-11-04T10:37:00.0000000+00:00 with 0 minutes left; the owner should confirm its evidence
+observe: 3 finding(s), 1 blocking ($WORK/observe-c28.json)

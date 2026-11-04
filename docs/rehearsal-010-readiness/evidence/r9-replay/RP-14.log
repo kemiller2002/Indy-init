@@ -1,0 +1,14 @@
+$ requirements-compiler observe observe --manifest $SRC/docs/rehearsal-010-readiness/scope-manifest.json --events $SRC/docs/rehearsal-010-readiness/evidence/stop-decision/r9-events.json --repo $WORK/r9 --t0-record evidence/t0/t0.json --deadline-policy $SRC/kickoff/rehearsal-010/deadline-policy.json --now 2026-11-04T03:00:00Z --evidence $WORK/observer-evidence --out $EVIDENCE/observer-findings.json
+exit 4
+  BLOCKING SCOPE_COVERAGE_UNKNOWN no slice execution manifest is published; coverage of the approved scope cannot be checked
+  BLOCKING IMPLEMENTATION_WITHOUT_WORK_ITEM commit edde38cb7ea541f12e928f7a467071038d7a405b changes implementation and no scope checkpoint is committed
+  BLOCKING IMPLEMENTATION_WITHOUT_WORK_ITEM commit 6ee228151b44c275164f71832638ab8d7b2c2c9e changes implementation and no scope checkpoint is committed
+  BLOCKING IMPLEMENTATION_WITHOUT_WORK_ITEM commit 8e663bdcbca721236e2cfd3163b2751827a24619 changes implementation and no scope checkpoint is committed
+  BLOCKING IMPLEMENTATION_WITHOUT_WORK_ITEM commit f1e0be78259ba462830243c5f87105c0929d71ba changes implementation and no scope checkpoint is committed
+  BLOCKING IMPLEMENTATION_WITHOUT_WORK_ITEM commit 1f2206bf7d12acee1da73764f8b2482b9fbd3ade changes implementation and no scope checkpoint is committed
+  BLOCKING IMPLEMENTATION_WITHOUT_WORK_ITEM commit 33d072da798a4ec762f15cebfc3c205c9014bbbd changes implementation and no scope checkpoint is committed
+  BLOCKING DESIGN_CONTRACT_FAILED FORMA_ROLE_MISSING navigation-shell (UI-029): no source uses ef-navigation-shell; a lookalike custom component does not satisfy it; FORMA_ROLE_MISSING save-status (UI-006): no source uses ef-status-lozenge; a lookalike custom component does not satisfy it; DESTINATION_MISSING primary destination Administration (UI-020) appears in no source; DESTINATION_MISSING primary destination Settings (UI-020) appears in no source
+  BLOCKING SELF_VERIFIED_SUCCESS evidence/FINAL-REPORT.md (Rehearsal 009) claims success, but no governed release verdict and governed catalog acceptance support it
+  BLOCKING PREMATURE_STOP a stop was refused at 2026-11-04T02:25:00.0000000+00:00 (CONTINUE_REQUIRED, 306 minutes left) and no implementation work followed for 35 minutes
+  WARNING UNMERGED_VERIFIED_WORK 36 verified requirement(s) are not integrated
+observe: 11 finding(s), 10 blocking ($EVIDENCE/observer-findings.json)

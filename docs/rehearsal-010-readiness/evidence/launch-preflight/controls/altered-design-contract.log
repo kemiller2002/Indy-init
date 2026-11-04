@@ -1,0 +1,18 @@
+LP-00 PASS     the Indy-init checkout is clean, complete and is origin/main
+LP-01 PASS     the owner's lock is committed
+LP-02 PASS     v4.1.4 is frozen and tagged on origin
+LP-03 REFUSED  every contract digest in the lock is its file's
+        kickoff/rehearsal-010/design-contract.json: sha256 50afb6d447d90bd4f1fe67c2bc5cb3b20129c7cd31ef7385e358c02e8f51cafa, the lock pins 9114ec4625c189550ffae2cfebadbd25237646a20c4c1d385909ec960356627e
+LP-04 PASS     the scope is the approved one
+LP-05 REFUSED  every owner decision is recorded in owner-signed commits, launchable, and what it approved is what is pinned
+        ODR-R10-05 approved kickoff/rehearsal-010/design-contract.json at sha256 9114ec4625c189550ffae2cfebadbd25237646a20c4c1d385909ec960356627e; it is now 50afb6d447d90bd4f1fe67c2bc5cb3b20129c7cd31ef7385e358c02e8f51cafa
+LP-06 PASS     the resolved set carries Dokimos 0.11.1
+LP-07 PASS     the test repository is isolated and the one approved
+LP-08 PASS     live-provider preflight passed (the governed run: J1-J3, Chromium and WebKit, api.github.com)
+LP-09 PASS     the adversarial suite is validated in every case it defines (a CI run of this tree)
+LP-10 PASS     the competition repository is clean (no T0, no clock), as published
+launch-preflight: REFUSED
+
+
+$SRC/tools/r10/launch-preflight.fsx(115,20): info FS3886: This list expression contains a single tuple element. Did you mean to use ';' instead of ',' to separate list elements?
+

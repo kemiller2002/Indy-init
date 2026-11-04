@@ -1,0 +1,3 @@
+exit 4
+  REFUSED DEPENDENCY_NOT_INTEGRATED dependency SL-T10 is not integrated
+slice-gate: REFUSED (do not merge) ($WORK/slice-gate-SL-T11.json)

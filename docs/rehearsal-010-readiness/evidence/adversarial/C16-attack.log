@@ -1,0 +1,3 @@
+exit 4
+  REFUSED IMPLEMENTATION_BEFORE_CHECKPOINT commit ba2221cd4db34f2d3dea45e443fc154f00876afd changes application code before the scope checkpoint (commit 8e5e6c325b5476a846469b27a8f547238f222328)
+scope order: REFUSED (1)

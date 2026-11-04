@@ -1,0 +1,101 @@
+{
+  "schema": "indy-init.catalog-acceptance/1",
+  "level": "REFUSED",
+  "governed": false,
+  "candidate": "39dc037990c8c049ee997fae8384c5bcc9290e2b",
+  "catalogId": "CAT-CAUSA-INVESTIGATION",
+  "catalogSha256": "19a036682876b496a1785890ab22203931eb7afe7bf519f4c15526ac36f2d5af",
+  "manifestContentHash": "63936e8fab4692b0007490239079f0a2b5f56884d24fc8ee1bff0dfecdface21",
+  "contractSha256": "808de8a9fe43a4b1f8bfe7fb9f789a6de8f5e23ab27d878dfb675c74ada02a9a",
+  "producer": {
+    "kind": "implementer-run",
+    "runId": "41754817534-live"
+  },
+  "failures": [],
+  "refusals": [
+    {
+      "code": "CATALOG_WRONG_COMMIT",
+      "detail": "the catalog verification is for 33d072da798a4ec762f15cebfc3c205c9014bbbd, not the candidate 39dc037990c8c049ee997fae8384c5bcc9290e2b"
+    },
+    {
+      "code": "FAULT_INSENSITIVE",
+      "detail": "INV-001/V5/save (content-round-trip) passed, but no detected fault probe at the candidate names it"
+    },
+    {
+      "code": "FAULT_INSENSITIVE",
+      "detail": "INV-008/V5/reload (content-round-trip) passed, but no detected fault probe at the candidate names it"
+    },
+    {
+      "code": "FAULT_INSENSITIVE",
+      "detail": "INV-011/V5/save (content-round-trip) passed, but no detected fault probe at the candidate names it"
+    },
+    {
+      "code": "FAULT_INSENSITIVE",
+      "detail": "INV-012/V5/save (content-round-trip) passed, but no detected fault probe at the candidate names it"
+    },
+    {
+      "code": "FAULT_INSENSITIVE",
+      "detail": "INV-024/V5/save (content-round-trip) passed, but no detected fault probe at the candidate names it"
+    },
+    {
+      "code": "FAULT_INSENSITIVE",
+      "detail": "INV-026/V5/save (content-round-trip) passed, but no detected fault probe at the candidate names it"
+    },
+    {
+      "code": "FAULT_INSENSITIVE",
+      "detail": "INV-027/V5/reload (content-round-trip) passed, but no detected fault probe at the candidate names it"
+    },
+    {
+      "code": "FAULT_INSENSITIVE",
+      "detail": "INV-030/V5/save (content-round-trip) passed, but no detected fault probe at the candidate names it"
+    },
+    {
+      "code": "FAULT_INSENSITIVE",
+      "detail": "INV-032/V5/save (content-round-trip) passed, but no detected fault probe at the candidate names it"
+    },
+    {
+      "code": "FAULT_INSENSITIVE",
+      "detail": "INV-032/V5/reload (content-round-trip) passed, but no detected fault probe at the candidate names it"
+    },
+    {
+      "code": "FAULT_INSENSITIVE",
+      "detail": "INV-033/V5/save (content-round-trip) passed, but no detected fault probe at the candidate names it"
+    },
+    {
+      "code": "FAULT_INSENSITIVE",
+      "detail": "INV-033/V5/reload (content-round-trip) passed, but no detected fault probe at the candidate names it"
+    },
+    {
+      "code": "FAULT_INSENSITIVE",
+      "detail": "INV-034/V5/save (content-round-trip) passed, but no detected fault probe at the candidate names it"
+    },
+    {
+      "code": "FAULT_INSENSITIVE",
+      "detail": "INV-034/V5/reload (content-round-trip) passed, but no detected fault probe at the candidate names it"
+    },
+    {
+      "code": "FAULT_INSENSITIVE",
+      "detail": "INV-035/V5/save (content-round-trip) passed, but no detected fault probe at the candidate names it"
+    },
+    {
+      "code": "FAULT_INSENSITIVE",
+      "detail": "INV-035/V5/reload (content-round-trip) passed, but no detected fault probe at the candidate names it"
+    },
+    {
+      "code": "FAULT_INSENSITIVE",
+      "detail": "INV-037/V5/reload (content-round-trip) passed, but no detected fault probe at the candidate names it"
+    },
+    {
+      "code": "FAULT_INSENSITIVE",
+      "detail": "INV-038/V5/save (content-round-trip) passed, but no detected fault probe at the candidate names it"
+    },
+    {
+      "code": "FAULT_INSENSITIVE",
+      "detail": "INV-038/V5/reload (content-round-trip) passed, but no detected fault probe at the candidate names it"
+    },
+    {
+      "code": "PRODUCER_NOT_GOVERNED",
+      "detail": "the verdict was produced by implementer-run (run 41754817534-live); only the governed gate establishes acceptance. It is kept as supporting evidence"
+    }
+  ]
+}

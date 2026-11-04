@@ -1,0 +1,38 @@
+{
+  "schema": "indy-init.design-contract/1",
+  "status": "PROPOSED (ODR-R10-05): becomes binding when the owner pins this file's sha256 as designContract.contractSha256 in the lock",
+  "description": "The governed design contract (adversarial audit R5). Static half: requirements-compiler design-contract. Rendered half: verification/design-contract/rendered.spec.mjs from the governed checkout. Roles list every name an approved Forma version uses, so a newer compatible Forma passes once its names are added here under owner review.",
+  "forma": {
+    "package": "@echelon-foundry/design-system",
+    "acceptedVersions": [ "0.12.", "0.13." ],
+    "inventories": [ "requirements-compiled/v4.1.4/analysis/forma-0.12.0-inventory.json", "verification/design-contract/forma-0.13.0-inventory.json" ]
+  },
+  "roles": [
+    { "role": "navigation-shell", "names": [ "ef-navigation-shell" ], "requirement": "UI-029", "screens": [ "list", "workspace" ] },
+    { "role": "save-status", "names": [ "ef-status-lozenge" ], "requirement": "UI-006", "screens": [ "workspace" ] }
+  ],
+  "primaryDestinations": { "names": [ "Investigations", "Administration", "Settings" ], "requirement": "UI-020" },
+  "investigationSections": { "names": [ "Overview", "Causal Analysis", "Evidence", "Hypotheses", "Timeline" ], "requirement": "UI-029" },
+  "palette": [
+    { "role": "deep-navy", "hex": "#14283F" },
+    { "role": "teal", "hex": "#087F8C" },
+    { "role": "amber", "hex": "#E9A23B" },
+    { "role": "coral", "hex": "#D66B58" },
+    { "role": "soft-ivory", "hex": "#F5F3ED" }
+  ],
+  "paletteRequirement": "UI-016",
+  "themeFiles": [ "theme" ],
+  "themeBoundary": "A literal colour (hex, rgb(), hsl()) may appear only as the value of a custom-property definition in a theme file (a CSS file whose path contains 'theme'). Elsewhere colours are var(--…) of a defined token or a pinned Forma property; var() fallbacks are allowed. Derived shades are allowed (UI-016 'derived foreground, hover, disabled, border and dark-mode tokens').",
+  "rendered": {
+    "viewports": [
+      { "id": "mobile", "width": 390, "height": 844 },
+      { "id": "ipad-portrait", "width": 820, "height": 1180 },
+      { "id": "ipad-landscape", "width": 1180, "height": 820 },
+      { "id": "desktop", "width": 1440, "height": 900 }
+    ],
+    "minimumTouchTarget": 44,
+    "minimumContrast": 4.5,
+    "requirements": [ "UI-011", "UI-014", "UI-016", "UI-029", "FL-01..FL-10" ]
+  },
+  "independentVisualReview": "UI-016-O16: the owner reviews the screenshots the rendered check publishes; the automated verdict is not that review."
+}

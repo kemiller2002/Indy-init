@@ -1,0 +1,3 @@
+exit 4
+  REFUSED COMPLETION_GATE_MISSING stopping as complete needs the governed completion gate's COMPLETE verdict (--completion)
+stop-decision: CONTINUE_REQUIRED (120 minute(s) remaining, 0 open mandatory requirement(s))

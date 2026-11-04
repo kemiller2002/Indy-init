@@ -1,5 +1,7 @@
 # Rehearsal 010 readiness: process corrections
 
+> **Integrated (2026-11-04, #104).** This is #102's record and is kept as written. In the integrated tree, v4.1.3 is replaced by #101's v4.1.4. The scope manifest is recompiled from v4.1.4 with the same 199 requirements, 863 obligations and 35 work items; its scopeSha256 is now `b407b5cc…`. The current readiness state is [FINAL-READINESS.md](FINAL-READINESS.md).
+
 **Verdict: NOT READY.**
 - The engineering corrections are built, tested and demonstrated.
 - Rehearsal 010 still needs owner actions that agents may not take (§8):

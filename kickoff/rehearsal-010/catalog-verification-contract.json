@@ -1,0 +1,24 @@
+{
+  "schema": "indy-init.catalog-verification-contract/1",
+  "status": "PROPOSED (ODR-R10-03): becomes binding when the owner pins this file's sha256 as catalogVerification.contractSha256 in kickoff/rehearsal-010/toolchain.lock.json",
+  "description": "What a catalog verdict must bind to count as governed acceptance (adversarial audit R2). Judged by requirements-compiler catalog-acceptance inside the governed Verification gate; a builder-run verdict is supporting evidence only.",
+  "catalog": {
+    "path": "requirements/catalogs/causa-investigation.requirement-catalog.json",
+    "catalogId": "CAT-CAUSA-INVESTIGATION",
+    "sha256": "19a036682876b496a1785890ab22203931eb7afe7bf519f4c15526ac36f2d5af",
+    "ratified": "Indy-init 0ab8ffd (INV-001..018) and 7cefdc6 (INV-019..038, PR #98)"
+  },
+  "governedProducers": [ "governed-gate" ],
+  "faultSensitivity": [
+    {
+      "category": "content-round-trip",
+      "checks": [ "save", "reload", "isolation" ],
+      "rationale": "A round trip that passes whatever the content is verifies nothing (SA-07). These checks are the catalog's real persistence obligations (INV-017, INV-023..038 save/reload/isolation); the frozen plan has no such category, so the gate no longer passes the inert --require-fault-sensitive content-round-trip to the plan judgement."
+    }
+  ],
+  "requireProbeSpec": true,
+  "facts": {
+    "domain-profile-selected": false
+  },
+  "factsDecision": "ODR-R10-04: Rehearsal 010 offers no domain or profile selection on the start screen, so INV-003 is not applicable. A candidate may not declare a different value; an owner decision changes it."
+}

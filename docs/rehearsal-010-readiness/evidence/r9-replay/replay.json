@@ -1,0 +1,142 @@
+{
+  "schema": "indy-init.r9-replay/1",
+  "r9Head": "0e760501b5585d11009a2fd2da8d146a1d47e025",
+  "releaseCandidate": "39dc037990c8c049ee997fae8384c5bcc9290e2b",
+  "checks": [
+    {
+      "id": "RP-01",
+      "finding": "Missing full application shell (Forma navigation shell)",
+      "kind": "observed",
+      "expected": "design-contract REFUSED: FORMA_ROLE_MISSING navigation-shell",
+      "exit": 4,
+      "asExpected": true,
+      "command": "requirements-compiler design-contract design-contract --contract $SRC/kickoff/rehearsal-010/design-contract.json --forma-inventory $SRC/verification/design-contract/forma-0.13.0-inventory.json --root $WORK/r9 --candidate 0e760501b5585d11009a2fd2da8d146a1d47e025 --out $EVIDENCE/design-contract.json"
+    },
+    {
+      "id": "RP-02",
+      "finding": "Missing Administration and Settings",
+      "kind": "observed",
+      "expected": "DESTINATION_MISSING Administration and Settings",
+      "exit": 4,
+      "asExpected": true,
+      "command": "requirements-compiler design-contract design-contract --contract $SRC/kickoff/rehearsal-010/design-contract.json --forma-inventory $SRC/verification/design-contract/forma-0.13.0-inventory.json --root $WORK/r9 --candidate 0e760501b5585d11009a2fd2da8d146a1d47e025 --out $EVIDENCE/design-contract.json"
+    },
+    {
+      "id": "RP-03",
+      "finding": "Missing causal analysis views (Overview, Causal Analysis, Timeline)",
+      "kind": "observed",
+      "expected": "SECTION_MISSING Causal Analysis",
+      "exit": 4,
+      "asExpected": true,
+      "command": "requirements-compiler design-contract design-contract --contract $SRC/kickoff/rehearsal-010/design-contract.json --forma-inventory $SRC/verification/design-contract/forma-0.13.0-inventory.json --root $WORK/r9 --candidate 0e760501b5585d11009a2fd2da8d146a1d47e025 --out $EVIDENCE/design-contract.json"
+    },
+    {
+      "id": "RP-04",
+      "finding": "Incomplete Forma integration (save status, theme boundary)",
+      "kind": "observed",
+      "expected": "FORMA_ROLE_MISSING save-status and LITERAL_COLOUR_OUTSIDE_THEME",
+      "exit": 4,
+      "asExpected": true,
+      "command": "requirements-compiler design-contract design-contract --contract $SRC/kickoff/rehearsal-010/design-contract.json --forma-inventory $SRC/verification/design-contract/forma-0.13.0-inventory.json --root $WORK/r9 --candidate 0e760501b5585d11009a2fd2da8d146a1d47e025 --out $EVIDENCE/design-contract.json"
+    },
+    {
+      "id": "RP-05",
+      "finding": "Missing design tokens (UI-016 palette)",
+      "kind": "observed",
+      "expected": "PALETTE_TOKEN_MISSING for the palette, THEME_MISSING",
+      "exit": 4,
+      "asExpected": true,
+      "command": "requirements-compiler design-contract design-contract --contract $SRC/kickoff/rehearsal-010/design-contract.json --forma-inventory $SRC/verification/design-contract/forma-0.13.0-inventory.json --root $WORK/r9 --candidate 0e760501b5585d11009a2fd2da8d146a1d47e025 --out $EVIDENCE/design-contract.json"
+    },
+    {
+      "id": "RP-06",
+      "finding": "Missing independent acceptance evidence (builder-run catalog verdict)",
+      "kind": "observed",
+      "expected": "catalog-acceptance not governed: PRODUCER_NOT_GOVERNED, and CATALOG_WRONG_COMMIT (33d072d is not the release candidate 39dc037)",
+      "exit": 4,
+      "asExpected": true,
+      "command": "requirements-compiler catalog-acceptance catalog-acceptance --contract $SRC/kickoff/rehearsal-010/catalog-verification-contract.json --approved-contract-sha256 808de8a9fe43a4b1f8bfe7fb9f789a6de8f5e23ab27d878dfb675c74ada02a9a --catalog $SRC/requirements/catalogs/causa-investigation.requirement-catalog.json --candidate 39dc037990c8c049ee997fae8384c5bcc9290e2b --manifest $WORK/r9/evidence/requirement-verification/verification-manifest.json --verification $WORK/r9/evidence/requirement-verification/requirement-verification.json --producer $WORK/producer.json --probe-results $WORK/r9/evidence/requirement-verification/fault-probe-results.json --probe-spec $WORK/r9/.echelon/fault-probes.json --declared-facts $WORK/declared-facts.json --out $EVIDENCE/catalog-acceptance.json"
+    },
+    {
+      "id": "RP-07",
+      "finding": "Incomplete scope presented as the approved scope",
+      "kind": "observed",
+      "expected": "completion-gate INCOMPLETE: SCOPE_NOT_INTEGRATED, RELEASE_GATE_REFUSED, CATALOG_NOT_GOVERNED_ACCEPTED, JOURNEYS_MISSING, DESIGN_CONTRACT_MISSING",
+      "exit": 4,
+      "asExpected": true,
+      "command": "requirements-compiler completion-gate completion-gate --manifest $SRC/docs/rehearsal-010-readiness/scope-manifest.json --events $SRC/docs/rehearsal-010-readiness/evidence/stop-decision/r9-events.json --candidate 39dc037990c8c049ee997fae8384c5bcc9290e2b --release-gate $WORK/r9/evidence/release-gate/local-gate-release-39dc037.json --catalog $EVIDENCE/catalog-acceptance.json --coverage $SRC/docs/release-gate-repair/evidence/r9-release-gate/coverage.json --catalog-verification $WORK/r9/evidence/requirement-verification/requirement-verification.json --out $EVIDENCE/completion-gate.json"
+    },
+    {
+      "id": "RP-08",
+      "finding": "Premature stopping (115 of 420 minutes, compute)",
+      "kind": "observed",
+      "expected": "stop-decision CONTINUE_REQUIRED: NOT_A_STOP_CONDITION",
+      "exit": 4,
+      "asExpected": true,
+      "command": "requirements-compiler stop-decision stop-decision --manifest $SRC/docs/rehearsal-010-readiness/scope-manifest.json --checkpoint $WORK/checkpoint.json --events $SRC/docs/rehearsal-010-readiness/evidence/stop-decision/r9-events.json --request $WORK/request-conserve-compute.json --t0-record $WORK/r9/evidence/t0/t0.json --deadline-policy $SRC/kickoff/rehearsal-010/deadline-policy.json --lock $WORK/lock.json --repo $WORK/r9 --out $EVIDENCE/stop-decision-conserve-compute.json"
+    },
+    {
+      "id": "RP-09",
+      "finding": "Premature stopping claimed as complete (catalog only)",
+      "kind": "observed",
+      "expected": "stop-decision CONTINUE_REQUIRED: CATALOG_IS_NOT_SCOPE, SCOPE_NOT_INTEGRATED",
+      "exit": 4,
+      "asExpected": true,
+      "command": "requirements-compiler stop-decision stop-decision --manifest $SRC/docs/rehearsal-010-readiness/scope-manifest.json --checkpoint $WORK/checkpoint.json --events $SRC/docs/rehearsal-010-readiness/evidence/stop-decision/r9-events.json --request $WORK/request-complete.json --t0-record $WORK/r9/evidence/t0/t0.json --deadline-policy $SRC/kickoff/rehearsal-010/deadline-policy.json --lock $WORK/lock.json --repo $WORK/r9 --out $EVIDENCE/stop-decision-complete.json"
+    },
+    {
+      "id": "RP-10",
+      "finding": "Premature stopping because the release gate failed",
+      "kind": "observed",
+      "expected": "stop-decision CONTINUE_REQUIRED: NOT_A_STOP_CONDITION (a failed gate is a result, not a stop condition)",
+      "exit": 4,
+      "asExpected": true,
+      "command": "requirements-compiler stop-decision stop-decision --manifest $SRC/docs/rehearsal-010-readiness/scope-manifest.json --checkpoint $WORK/checkpoint.json --events $SRC/docs/rehearsal-010-readiness/evidence/stop-decision/r9-events.json --request $WORK/request-release-gate-failed.json --t0-record $WORK/r9/evidence/t0/t0.json --deadline-policy $SRC/kickoff/rehearsal-010/deadline-policy.json --lock $WORK/lock.json --repo $WORK/r9 --out $EVIDENCE/stop-decision-release-gate-failed.json"
+    },
+    {
+      "id": "RP-11",
+      "finding": "Incorrect Praxis sequencing (scope checkpoint)",
+      "kind": "observed",
+      "expected": "scope order REFUSED: IMPLEMENTATION_BEFORE_CHECKPOINT",
+      "exit": 4,
+      "asExpected": true,
+      "command": "requirements-compiler scope order scope order --repo $WORK/r9"
+    },
+    {
+      "id": "RP-12",
+      "finding": "Incorrect Praxis sequencing (initialization checkpoint)",
+      "kind": "observed",
+      "expected": "check-sequencing reports implementation commits before authorization",
+      "exit": 4,
+      "asExpected": true,
+      "command": "r9.fsx check-sequencing --target R9"
+    },
+    {
+      "id": "RP-13",
+      "finding": "Incomplete scope, by requirement group",
+      "kind": "observed",
+      "expected": "ledger CONTINUE_REQUIRED with the P0 groups unstarted",
+      "exit": 0,
+      "asExpected": true,
+      "command": "requirements-compiler ledger ledger --manifest $SRC/docs/rehearsal-010-readiness/scope-manifest.json --events $SRC/docs/rehearsal-010-readiness/evidence/stop-decision/r9-events.json --out $EVIDENCE/scope-report.json"
+    },
+    {
+      "id": "RP-14",
+      "finding": "The observer reports the run\u0027s defects with evidence",
+      "kind": "observed",
+      "expected": "observe: blocking findings (IMPLEMENTATION_WITHOUT_WORK_ITEM, DESIGN_CONTRACT_FAILED, SELF_VERIFIED_SUCCESS, PREMATURE_STOP)",
+      "exit": 4,
+      "asExpected": true,
+      "command": "requirements-compiler observe observe --manifest $SRC/docs/rehearsal-010-readiness/scope-manifest.json --events $SRC/docs/rehearsal-010-readiness/evidence/stop-decision/r9-events.json --repo $WORK/r9 --t0-record evidence/t0/t0.json --deadline-policy $SRC/kickoff/rehearsal-010/deadline-policy.json --now 2026-11-04T03:00:00Z --evidence $WORK/observer-evidence --out $EVIDENCE/observer-findings.json"
+    },
+    {
+      "id": "RP-15",
+      "finding": "Invalid suite execution (v4.1.2 runners)",
+      "kind": "observed",
+      "expected": "suite-preflight REFUSED: MSB1008",
+      "exit": 4,
+      "asExpected": true,
+      "command": "r9.fsx suite-preflight (v4.1.2 plan) --root R9"
+    }
+  ]
+}

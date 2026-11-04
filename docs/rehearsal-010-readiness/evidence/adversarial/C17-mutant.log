@@ -1,0 +1,2 @@
+exit 0
+catalog-acceptance: GOVERNED-ACCEPTED ($WORK/catalog/acceptance.json)

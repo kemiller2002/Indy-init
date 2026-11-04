@@ -87,6 +87,7 @@ let private request (minutesIn: float) (reason: string) =
       EnvironmentEvidence = []
       EnvironmentAttempts = 0
       ScopeSha256 = scope
+      ComputeUsed = None
       Facts = Map.empty }
 
 let private codes (d: Decision) = d.Refusals |> List.map (fun r -> r.Code)
@@ -219,7 +220,13 @@ let legitimate () : string list =
       | Error _ -> ()
       match replay manifest [ started "T9" [ "Z-999" ] ] with
       | Ok _ -> yield "progress: a requirement outside the scope was applied"
-      | Error _ -> () ]
+      | Error _ -> ()
+      // Implementation may not precede the scope checkpoint (scope order, kept beside check-sequencing).
+      let isApp (p: string) = p.StartsWith "src/"
+      if (implementationBeforeCheckpoint ".echelon/scope-checkpoint.json" isApp [ "a", [ "README.md" ]; "b", [ "src/A.fs" ]; "c", [ ".echelon/scope-checkpoint.json" ] ]).IsEmpty then
+          yield "order: application code before the checkpoint was accepted"
+      if not (implementationBeforeCheckpoint ".echelon/scope-checkpoint.json" isApp [ "a", [ "README.md" ]; "c", [ ".echelon/scope-checkpoint.json" ]; "b", [ "src/A.fs" ] ]).IsEmpty then
+          yield "order: application code after the checkpoint was refused" ]
 
 // ---- recovery: a successor continues from repository files alone ----------------------------------------------
 
@@ -297,6 +304,36 @@ let real (source: string) : string list =
 
 // ---- independent consistency check against #101's obligation inventory --------------------------------------------
 
+let private setIn (key: string) (value: Json) (j: Json) =
+    match j with
+    | JObj ps when ps |> List.exists (fst >> (=) key) -> JObj(ps |> List.map (fun (k, v) -> if k = key then k, value else k, v))
+    | JObj ps -> JObj(ps @ [ key, value ])
+    | j -> j
+
+let suiteRunners (source: string) : string list =
+    let inputs v = Program.v41Inputs source (Path.Combine(source, "requirements-compiled", v)) (Path.Combine(source, "requirements-compiled", "v4")) None
+    let x21 (i: V41Package.Inputs) = (V41Package.build i).Checks |> List.filter (fun c -> c.Id = "X21")
+    let v414 = inputs "v4.1.4"
+    let unrepaired = { v414 with Amendment = v414.Amendment |> Option.map (setIn "suiteRunners" (JArr [])) }
+    let wrongSuite = { v414 with Amendment = v414.Amendment |> Option.map (setIn "suiteRunners" (JArr [ JObj [ "suite", JStr "SU-NOPE"; "runner", JStr "dotnet test Causa.slnx"; "decision", JStr "ODR-V414-01" ] ])) }
+    let undecided = { v414 with Amendment = v414.Amendment |> Option.map (setIn "suiteRunners" (JArr [ JObj [ "suite", JStr "SU-OWN-DOTNET"; "runner", JStr "dotnet test Causa.slnx" ] ])) }
+    [ match x21 v414 with
+      | [ c ] when c.Problems.IsEmpty -> ()
+      | cs -> yield sprintf "X21: v4.1.4 does not pass X21: %A" cs
+      match x21 unrepaired with
+      | [ c ] when c.Problems |> List.exists (fun p -> p.Contains "SU-OWN-DOTNET") && c.Problems |> List.exists (fun p -> p.Contains "SU-DOTNET-LIVE") -> ()
+      | cs -> yield sprintf "X21 control: v4.1.2's runners were not refused: %A" cs
+      if (x21 wrongSuite |> List.collect (fun c -> c.Problems)).IsEmpty then yield "X21 control: a runner for an unknown suite was accepted"
+      if (x21 undecided |> List.collect (fun c -> c.Problems)).IsEmpty then yield "X21 control: a runner without an owner decision was accepted"
+      // v4.1.2 is frozen: it compiles without X21, byte for byte as approved (the committed-package check covers the bytes).
+      if not (x21 (inputs "v4.1.2")).IsEmpty then yield "X21: the frozen v4.1.2 gained a check" ]
+
+/// The committed v4.1.4 package is what the compiler produces from its inputs (`v41 --check`).
+let committedPackage (source: string) : string list =
+    let code =
+        Program.v41Command [ "--source"; source; "--package"; Path.Combine(source, "requirements-compiled", "v4.1.4"); "--base"; Path.Combine(source, "requirements-compiled", "v4"); "--check" ]
+    if code = 0 then [] else [ sprintf "v4.1.4: v41 --check exited %d (the committed package differs from its compilation)" code ]
+
 /// docs/release-gate-repair/obligation-inventory.json reconciles the 613 plan obligations with Rehearsal 009's gate.
 /// The scope manifest is derived independently; both must agree on every obligation, its requirement and its
 /// evidence kind (record-only, or executable/mixed), and the inventory must exclude nothing.
@@ -328,4 +365,4 @@ let reconciliation (source: string) : string list =
 
 let all (source: string) : string list =
     let guard name f = try f () with ex -> [ sprintf "%s threw: %s" name ex.Message ]
-    guard "adversarial" adversarial @ guard "legitimate" legitimate @ guard "recovery" recovery @ guard "real" (fun () -> real source) @ guard "reconciliation" (fun () -> reconciliation source)
+    guard "adversarial" adversarial @ guard "legitimate" legitimate @ guard "recovery" recovery @ guard "real" (fun () -> real source) @ guard "suite runners" (fun () -> suiteRunners source) @ guard "v4.1.4 package" (fun () -> committedPackage source) @ guard "reconciliation" (fun () -> reconciliation source)

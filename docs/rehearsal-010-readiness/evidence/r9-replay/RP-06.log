@@ -1,0 +1,24 @@
+$ requirements-compiler catalog-acceptance catalog-acceptance --contract $SRC/kickoff/rehearsal-010/catalog-verification-contract.json --approved-contract-sha256 808de8a9fe43a4b1f8bfe7fb9f789a6de8f5e23ab27d878dfb675c74ada02a9a --catalog $SRC/requirements/catalogs/causa-investigation.requirement-catalog.json --candidate 39dc037990c8c049ee997fae8384c5bcc9290e2b --manifest $WORK/r9/evidence/requirement-verification/verification-manifest.json --verification $WORK/r9/evidence/requirement-verification/requirement-verification.json --producer $WORK/producer.json --probe-results $WORK/r9/evidence/requirement-verification/fault-probe-results.json --probe-spec $WORK/r9/.echelon/fault-probes.json --declared-facts $WORK/declared-facts.json --out $EVIDENCE/catalog-acceptance.json
+exit 4
+  REFUSED CATALOG_WRONG_COMMIT the catalog verification is for 33d072da798a4ec762f15cebfc3c205c9014bbbd, not the candidate 39dc037990c8c049ee997fae8384c5bcc9290e2b
+  REFUSED FAULT_INSENSITIVE INV-001/V5/save (content-round-trip) passed, but no detected fault probe at the candidate names it
+  REFUSED FAULT_INSENSITIVE INV-008/V5/reload (content-round-trip) passed, but no detected fault probe at the candidate names it
+  REFUSED FAULT_INSENSITIVE INV-011/V5/save (content-round-trip) passed, but no detected fault probe at the candidate names it
+  REFUSED FAULT_INSENSITIVE INV-012/V5/save (content-round-trip) passed, but no detected fault probe at the candidate names it
+  REFUSED FAULT_INSENSITIVE INV-024/V5/save (content-round-trip) passed, but no detected fault probe at the candidate names it
+  REFUSED FAULT_INSENSITIVE INV-026/V5/save (content-round-trip) passed, but no detected fault probe at the candidate names it
+  REFUSED FAULT_INSENSITIVE INV-027/V5/reload (content-round-trip) passed, but no detected fault probe at the candidate names it
+  REFUSED FAULT_INSENSITIVE INV-030/V5/save (content-round-trip) passed, but no detected fault probe at the candidate names it
+  REFUSED FAULT_INSENSITIVE INV-032/V5/save (content-round-trip) passed, but no detected fault probe at the candidate names it
+  REFUSED FAULT_INSENSITIVE INV-032/V5/reload (content-round-trip) passed, but no detected fault probe at the candidate names it
+  REFUSED FAULT_INSENSITIVE INV-033/V5/save (content-round-trip) passed, but no detected fault probe at the candidate names it
+  REFUSED FAULT_INSENSITIVE INV-033/V5/reload (content-round-trip) passed, but no detected fault probe at the candidate names it
+  REFUSED FAULT_INSENSITIVE INV-034/V5/save (content-round-trip) passed, but no detected fault probe at the candidate names it
+  REFUSED FAULT_INSENSITIVE INV-034/V5/reload (content-round-trip) passed, but no detected fault probe at the candidate names it
+  REFUSED FAULT_INSENSITIVE INV-035/V5/save (content-round-trip) passed, but no detected fault probe at the candidate names it
+  REFUSED FAULT_INSENSITIVE INV-035/V5/reload (content-round-trip) passed, but no detected fault probe at the candidate names it
+  REFUSED FAULT_INSENSITIVE INV-037/V5/reload (content-round-trip) passed, but no detected fault probe at the candidate names it
+  REFUSED FAULT_INSENSITIVE INV-038/V5/save (content-round-trip) passed, but no detected fault probe at the candidate names it
+  REFUSED FAULT_INSENSITIVE INV-038/V5/reload (content-round-trip) passed, but no detected fault probe at the candidate names it
+  REFUSED PRODUCER_NOT_GOVERNED the verdict was produced by implementer-run (run 41754817534-live); only the governed gate establishes acceptance. It is kept as supporting evidence
+catalog-acceptance: REFUSED ($EVIDENCE/catalog-acceptance.json)

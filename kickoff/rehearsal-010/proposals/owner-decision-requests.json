@@ -1,0 +1,327 @@
+{
+  "schema": "indy-init.v41-owner-decision-requests/1",
+  "status": "Pending: every request below. The owner records them with tools/owner-freeze.fsx decide rehearsal-010, in the order of OWNER-APPROVAL-EXECUTION.md; requests that pin a file record its sha256 at origin/main as shown at the moment of the decision. No request here is recorded by an agent (RDP-003).",
+  "recordFormat": "As package v4: one operator approval in kickoff/rehearsal-007/approvals.causa.json (prefix APR-R10-OWNER), one change per decision, committed by the owner without agent trailers. A change that approves a pinned file also carries pins: [{path, sha256, field?, value?}] computed by the script from origin/main. A request lists the options Rehearsal 010 can launch with in \"launchable\" (default [\"A\"]); launch-preflight LP-05 refuses any other recorded option.",
+  "requests": [
+    {
+      "id": "ODR-RG-03",
+      "kind": "decision",
+      "title": "Release Dokimos 0.11.1 with the url-input fix and register it in a new echelon-current set",
+      "question": "Rehearsal 009's catalog run failed INV-029 because Dokimos 0.11.0 had no url-input component (kemiller2002/dokimos#67, merged). Release 0.11.1 from kemiller2002/dokimos#69 and register a new echelon-current set that carries it, so the lock can pin a published release?",
+      "options": [
+        "A: merge dokimos#69, tag dokimos-v0.11.1 through Dokimos's release process, verify the published artifact, register a new echelon-current set with it and qualify it with Conditor",
+        "B: keep Dokimos 0.11.0 (INV-029's url field stays unverifiable; the catalog cannot reach GOVERNED-ACCEPTED)"
+      ],
+      "recommendation": "A. The fix is merged and tested; only the release, the registry set and its qualification remain.",
+      "rationale": "Releases and registry sets are owner actions.",
+      "impact": "With B, the catalog verification of every candidate refuses INV-029-V1."
+    },
+    {
+      "id": "ODR-RG-05",
+      "kind": "decision",
+      "title": "Topology for Rehearsal 010: five development lanes and one independent reviewer",
+      "question": "Run the build as Topology A: lanes integration, domain, persistence, ui-1 and ui-2 (each owning its implementation boundary in agent-file-ownership.json), one independent reviewer that never certifies its own work, one integration authority, one merge at a time, a bounded verification queue?",
+      "options": [
+        "A: Topology A as stated (SLICE-EXECUTION-PLAN §4; schedule evidence docs/rehearsal-010-readiness/evidence/schedule/)",
+        "B: one lead agent (serial)",
+        "C: another named topology"
+      ],
+      "recommendation": "A. It is the fastest of the five-lane assignments simulated. It does not make the full scope fit: see ODR-R10-18.",
+      "rationale": "The frozen schedule plans role lanes; the topology is the owner's choice (ODR-RG-05 of #101).",
+      "impact": "The topology sets how many slices integrate before the deadline; it does not change the scope or any gate."
+    },
+    {
+      "id": "ODR-R10-02",
+      "kind": "decision",
+      "title": "Ratify the CAT-CAUSA-INVESTIGATION successor (INV-039..044, distinct list, start and workspace routes)",
+      "question": "Ratify docs/rehearsal-010-readiness/proposals/causa-investigation.requirement-catalog.successor.proposed.json: every ratified requirement unchanged, INV-039..044 added (44 requirements, 277 obligations), and the screens of the investigation list, start and workspace routes? Ratification replaces the ratified catalog through tools/owner-freeze.fsx ratify rehearsal-010 and changes the scope (ODR-R10-01): 205 requirements, 890 obligations, 37 work items instead of 199, 863, 36.",
+      "options": [
+        "A: ratify the successor before Rehearsal 010 (the scope is recompiled from it)",
+        "B: defer the successor to a later rehearsal (Rehearsal 010 builds the ratified 38-requirement catalog)"
+      ],
+      "recommendation": "A. The successor separates the routes the journeys navigate, and it adds no change to a ratified entry.",
+      "rationale": "Only the owner ratifies a catalog; an agent never edits the ratified catalog (RDP-003).",
+      "impact": "A adds 6 requirements and 27 obligations to the scope, and a work item.",
+      "pins": [
+        {
+          "path": "docs/rehearsal-010-readiness/proposals/causa-investigation.requirement-catalog.successor.proposed.json"
+        }
+      ],
+      "launchable": [
+        "A",
+        "B"
+      ]
+    },
+    {
+      "id": "ODR-R10-03",
+      "kind": "decision",
+      "title": "Approve the governed catalog-verification contract",
+      "question": "Approve kickoff/rehearsal-010/catalog-verification-contract.json: governed acceptance binds the candidate SHA, the approved catalog digest, the contract digest, the governed-gate producer, the actual results and every failure's detail; builder-run verification is supporting evidence only?",
+      "options": [
+        "A: approve as written",
+        "B: do not approve (catalog acceptance stays SUPPORTING-ONLY for every candidate)"
+      ],
+      "recommendation": "A.",
+      "rationale": "The contract decides what counts as catalog acceptance.",
+      "impact": "Without it, no candidate can reach GOVERNED-ACCEPTED.",
+      "pins": [
+        {
+          "path": "kickoff/rehearsal-010/catalog-verification-contract.json"
+        }
+      ]
+    },
+    {
+      "id": "ODR-R10-04",
+      "kind": "decision",
+      "title": "Governed fact domain-profile-selected = false",
+      "question": "Rehearsal 010 offers no domain or profile selection, so INV-003 is not applicable. Record the governed fact domain-profile-selected = false (in the catalog-verification contract's facts), which a candidate cannot redefine?",
+      "options": [
+        "A: false (INV-003 not applicable)",
+        "B: true (INV-003 applies; the scope must include profile selection)"
+      ],
+      "recommendation": "A. No Rehearsal 010 requirement asks for profile selection.",
+      "rationale": "A fact the candidate could set would let it choose which requirements apply.",
+      "impact": "With B, INV-003 is mandatory.",
+      "pins": [
+        {
+          "path": "kickoff/rehearsal-010/catalog-verification-contract.json"
+        }
+      ]
+    },
+    {
+      "id": "ODR-R10-05",
+      "kind": "decision",
+      "title": "Approve the Forma design contract",
+      "question": "Approve kickoff/rehearsal-010/design-contract.json: the Forma application shell and navigation, save-state presentation, the Echelon/Causa tokens, accessibility, responsive layout (layout kit FL-01..10), the required screenshots and an independent visual review, against the pinned Forma 0.13.0 inventory?",
+      "options": [
+        "A: approve as written",
+        "B: do not approve (no candidate can pass the design contract)"
+      ],
+      "recommendation": "A.",
+      "rationale": "The contract is mandatory acceptance, not optional polish (ODR-R10-10).",
+      "impact": "Required for release and for every UI-bearing slice.",
+      "pins": [
+        {
+          "path": "kickoff/rehearsal-010/design-contract.json"
+        },
+        {
+          "path": "verification/design-contract/forma-0.13.0-inventory.json"
+        }
+      ]
+    },
+    {
+      "id": "ODR-R10-06",
+      "kind": "decision",
+      "title": "Approve the deadline policy: 420 minutes, one immutable T0, no reset, no early stop, no compute-stop limit",
+      "question": "Approve kickoff/rehearsal-010/deadline-policy.json: the window is 420 minutes from the T0 record committed once at the authorized kickoff, never reset by a recovery or a replacement agent; no automatic early stop; no compute-stop limit is approved?",
+      "options": [
+        "A: approve as written",
+        "B: another window (state it)"
+      ],
+      "recommendation": "A.",
+      "rationale": "The observer derives the deadline from this policy and the committed T0 record; a builder cannot supply another.",
+      "impact": "stop-decision and the observer refuse a live run without the pinned policy.",
+      "pins": [
+        {
+          "path": "kickoff/rehearsal-010/deadline-policy.json"
+        }
+      ]
+    },
+    {
+      "id": "ODR-R10-07",
+      "kind": "decision",
+      "title": "Approve the J1-J3 journey bindings",
+      "question": "Approve verification/journeys/bindings.json and its accessible-name contract: real investigation creation, durable persistence on the real provider read back in a fresh browser context, hypothesis/evidence relationships, application navigation, recovery behaviour and the Forma architecture, on Chromium and WebKit?",
+      "options": [
+        "A: approve as written",
+        "B: do not approve (the journeys cannot be governed acceptance)"
+      ],
+      "recommendation": "A.",
+      "rationale": "The bindings are owner-controlled acceptance assets (ODR-R10-12).",
+      "impact": "Required for every slice that binds a journey assertion and for release.",
+      "pins": [
+        {
+          "path": "verification/journeys/bindings.json"
+        }
+      ]
+    },
+    {
+      "id": "ODR-R10-08",
+      "kind": "decision",
+      "title": "WASM-LOAD-001 and WASM-LOAD-005 are P0 under UI-014-O2",
+      "question": "UI-014 (P0) requires, in UI-014-O2, that startup satisfy WASM-LOADING-EXPERIENCE-REQUIREMENTS.md, whose requirements state no priority. For Rehearsal 010 acceptance, are WASM-LOAD-001 (a loading screen before the runtime) and WASM-LOAD-005 (failure with a working Retry) the P0 content of UI-014-O2, every other WASM-LOAD requirement keeping its stated (unstated) priority? This interprets UI-014-O2; it changes no normative text, so no successor package is needed. The journey bindings apply it.",
+      "options": [
+        "A: WASM-LOAD-001 and -005 are P0 under UI-014-O2; the rest unchanged",
+        "B: all of WASM-LOAD-001..008 are P0",
+        "C: none (UI-014-O2 accepted on the icon alone)"
+      ],
+      "recommendation": "A.",
+      "rationale": "A P0 judgement of an unprioritised reference must be the owner's.",
+      "impact": "Sets which loading assertions are P0 in J1."
+    },
+    {
+      "id": "ODR-R10-09",
+      "kind": "decision",
+      "title": "The live test repository and its credential",
+      "question": "Run every live journey and live suite against the dedicated private repository kemiller2002/causa-acceptance-r10, branch causa-acceptance (synthetic data only, no production secrets, resettable; evidence stays in the governed artifacts), with a GitHub App installed on that repository alone (contents read/write), whose installation token is minted per job and revoked at its end; the Verification gate's own token becomes contents: read?",
+      "options": [
+        "A: as stated (LIVE-PROVIDER-PREFLIGHT.md: repository, App, secrets CAUSA_ACCEPTANCE_APP_CLIENT_ID and CAUSA_ACCEPTANCE_APP_KEY in the competition repository)",
+        "B: the competition repository's own causa-acceptance branch with the workflow token (contents: write; not isolated)"
+      ],
+      "recommendation": "A. The token reaching candidate code can write only a synthetic repository, and only for one job.",
+      "rationale": "Credentials and repositories are created by the owner.",
+      "impact": "Without a credential the Verification gate refuses every slice that needs the real provider, and release.",
+      "pins": [
+        {
+          "path": "kickoff/rehearsal-010/toolchain.lock.proposed.json",
+          "field": "testRepository"
+        }
+      ]
+    },
+    {
+      "id": "ODR-R10-10",
+      "kind": "decision",
+      "title": "The mandatory Forma design contract is not cuttable visual polish",
+      "question": "Cut-order item 1 of KICKOFF-EXECUTION-PACKET §6 ('visual polish beyond accessibility') does not cover UI-016-O18 or the governed design contract, which stay mandatory?",
+      "options": [
+        "A: yes, as stated",
+        "B: the design contract may be cut under time pressure"
+      ],
+      "recommendation": "A.",
+      "rationale": "Rehearsal 009 shipped without the Forma shell under that reading.",
+      "impact": "With B, a candidate without the Forma shell can be accepted."
+    },
+    {
+      "id": "ODR-R10-11",
+      "kind": "decision",
+      "title": "The P0 causal-analysis floor",
+      "question": "UI-026 (P0) is 'centered on the causal graph' while UI-002 (the graph) is P1. For P0, is the floor an accessible relationship list of hypotheses and evidence plus a Forma workflow rendering, more advanced graph interactions remaining P1?",
+      "options": [
+        "A: yes, as stated",
+        "B: the full causal graph is P0"
+      ],
+      "recommendation": "A.",
+      "rationale": "Resolves the priority conflict without changing either requirement's text.",
+      "impact": "Sets J2's P0 causal-analysis assertions."
+    },
+    {
+      "id": "ODR-R10-12",
+      "kind": "decision",
+      "title": "Owner-controlled verification assets are permitted inputs (OD-INDY-22)",
+      "question": "OD-INDY-22 ('start from the requirements alone') permits the owner-controlled verification assets in Indy-init (journeys, design contract, layout kit, harness) as inputs; earlier rehearsal application implementations remain prohibited as starting code?",
+      "options": [
+        "A: yes, as stated",
+        "B: no verification asset may be supplied"
+      ],
+      "recommendation": "A.",
+      "rationale": "Acceptance assets judge the build; they are not application code.",
+      "impact": "With B, the governed journeys and design contract cannot be used."
+    },
+    {
+      "id": "ODR-R10-13",
+      "kind": "decision",
+      "title": "No compute-stop limit",
+      "question": "Rehearsal 010 approves no compute-stop limit: the builder continues until the governed completion condition, a genuine blocking condition (hard-blocker, environment-failure) or the original deadline?",
+      "options": [
+        "A: no limit",
+        "B: a limit (state it as {action: approve-compute-limit, limit})"
+      ],
+      "recommendation": "A.",
+      "rationale": "Rehearsal 009 stopped at 115 of 420 minutes on a compute claim.",
+      "impact": "stop-decision refuses compute-limit with A."
+    },
+    {
+      "id": "ODR-R10-14",
+      "kind": "decision",
+      "title": "Pin the Rehearsal 010 process-evidence rules",
+      "question": "Pin kickoff/rehearsal-010/process-evidence-rules.json (regenerated for the Rehearsal 010 repository) in the lock's processEvidence.rulesSha256?",
+      "options": [
+        "A: pin as generated",
+        "B: do not pin (process evidence is unchecked)"
+      ],
+      "recommendation": "A.",
+      "rationale": "The rules name the competition repository; only the owner pins them.",
+      "impact": "spec-preflight refuses an unpinned rules file.",
+      "pins": [
+        {
+          "path": "kickoff/rehearsal-010/process-evidence-rules.json"
+        }
+      ]
+    },
+    {
+      "id": "ODR-R10-15",
+      "kind": "decision",
+      "title": "Independent review of the integrated result",
+      "question": "Accept the independent review rounds recorded in FINAL-READINESS §5 for the reviewed commit, provided no blocking finding is open, any material change after review requiring a renewed review?",
+      "options": [
+        "A: accept, as stated",
+        "B: require a separate reviewer before approval"
+      ],
+      "recommendation": "A, for the commit named in FINAL-READINESS §5.",
+      "rationale": "Review sufficiency is the owner's call.",
+      "impact": "With B, #104 waits for that review."
+    },
+    {
+      "id": "ODR-R10-16",
+      "kind": "decision",
+      "title": "Merge Indy-init #104; close #101 as superseded",
+      "question": "Merge #104 after this transaction's checks (green CI on its head, review, digests), and close #101 as superseded (#102 is already merged; #104 carries #101's review fixes that #102 did not)?",
+      "options": [
+        "A: yes",
+        "B: no"
+      ],
+      "recommendation": "A.",
+      "rationale": "Only the owner merges.",
+      "impact": "The lock's governing Indy-init commit is #104's merge commit."
+    },
+    {
+      "id": "ODR-R10-17",
+      "kind": "decision",
+      "title": "Approve the Specula observer adapter",
+      "question": "Approve kemiller2002/specula#11 (read-only ObserverFindings adapter, CAP-016) after its CI and the observer replay?",
+      "options": [
+        "A: approve and merge",
+        "B: do not approve (observer findings are read as files only)"
+      ],
+      "recommendation": "A.",
+      "rationale": "Specula is the owner's dashboard.",
+      "impact": "With B, the observer still runs; Specula does not display it."
+    },
+    {
+      "id": "ODR-R10-18",
+      "kind": "decision",
+      "title": "Full-scope completion is not expected within 420 minutes",
+      "question": "The schedule simulation (Topology A, DAG estimates plus derived estimates for the generated work items, serialized governed integration) completes the full scope after the deadline at every CI latency, even zero (docs/rehearsal-010-readiness/evidence/schedule/). Launch anyway, with the full scope unchanged and the objective 'maximize correctly implemented, verified and integrated capability before the original deadline', the run ending at the deadline with the scope ledger as its report?",
+      "options": [
+        "A: launch with the full scope; partial integration at the deadline is the expected, reported outcome",
+        "B: reduce the scope first (a new scope manifest through ODR-R10-01)",
+        "C: extend the window (a new deadline policy through ODR-R10-06)"
+      ],
+      "recommendation": "A. The scope stays whole and is never silently reduced; the ledger reports what did not integrate.",
+      "rationale": "Only the owner decides between scope, window and expectation.",
+      "impact": "With A, FINAL-READINESS never reports completion unless the completion gate says COMPLETE."
+    },
+    {
+      "id": "ODR-R10-01",
+      "kind": "decision",
+      "title": "Approve the full Rehearsal 010 scope",
+      "question": "Approve docs/rehearsal-010-readiness/scope-manifest.json, compiled from the frozen v4.1.4 and the ratified catalog, as shown below (requirements, obligations, work items, zero exclusions, scopeSha256), slice integration and full-release acceptance remaining separate gates? Asked only once indy-init-requirements-v4.1.4 is tagged and ODR-R10-02 is applied, because both change the scope digest.",
+      "options": [
+        "A: approve the scope as shown",
+        "B: do not approve (the scope is recompiled after changes)"
+      ],
+      "recommendation": "A, after checking the counts and digest shown against OWNER-APPROVAL-EXECUTION.md.",
+      "rationale": "The scope is approved once, by digest; any later change needs a new approval.",
+      "impact": "The lock pins this scopeSha256; check-sequencing refuses any other.",
+      "requiresTag": "indy-init-requirements-v4.1.4",
+      "requiresCurrentScope": "true",
+      "pins": [
+        {
+          "path": "docs/rehearsal-010-readiness/scope-manifest.json",
+          "field": "scopeSha256",
+          "show": "counts"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,2 @@
+exit 0
+slice-gate: PASS (slice only; never a release verdict) ($WORK/slice-gate.json)

@@ -1,0 +1,3 @@
+exit 4
+  REFUSED MANDATORY_OBLIGATION_UNVERIFIED VER-001-O1 (VER-001) is failed: the assertion did not hold
+slice-gate: REFUSED (do not merge) ($WORK/slice-gate.json)

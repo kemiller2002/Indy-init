@@ -1,0 +1,7 @@
+exit 0
+
+Running 1 test using 1 worker
+
+  ✓  1 [chromium] › j2-analysis.spec.mjs:22:1 › J2 complete investigation analysis (3.1s)
+
+  1 passed (4.1s)

@@ -1,0 +1,7 @@
+$ requirements-compiler stop-decision stop-decision --manifest $SRC/docs/rehearsal-010-readiness/scope-manifest.json --checkpoint $WORK/checkpoint.json --events $SRC/docs/rehearsal-010-readiness/evidence/stop-decision/r9-events.json --request $WORK/request-complete.json --t0-record $WORK/r9/evidence/t0/t0.json --deadline-policy $SRC/kickoff/rehearsal-010/deadline-policy.json --lock $WORK/lock.json --repo $WORK/r9 --out $EVIDENCE/stop-decision-complete.json
+exit 4
+  REFUSED SCOPE_INCOMPLETE 161 applicable mandatory requirement(s) are not verified (for example AR-001, AR-002, AR-003, AR-004, AR-005); 34 work item(s) are open, 34 can proceed now
+  REFUSED CATALOG_IS_NOT_SCOPE every applicable mandatory catalog requirement is verified, but P0 requirements of the frozen plan remain; the catalog is part of the approved scope, not all of it
+  REFUSED SCOPE_NOT_INTEGRATED 193 applicable mandatory requirement(s) are not integrated on main
+  REFUSED COMPLETION_GATE_MISSING stopping as complete needs the governed completion gate's COMPLETE verdict (--completion)
+stop-decision: CONTINUE_REQUIRED (306 minute(s) remaining, 161 open mandatory requirement(s))

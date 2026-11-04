@@ -140,6 +140,31 @@ r9case "suite-preflight-fixture-refuses-v4.1.2" [ 4 ] [ "SU-OWN-DOTNET cannot ex
 r9case "suite-preflight-fixture-passes-v4.1.4-with-tests" [ 0 ] [ "SU-OWN-DOTNET: executable, 4 test(s) listed"; "SU-DOTNET-LIVE: executable, 2 test(s) listed"; "SU-BROWSER-WEBKIT: executable, 2 test(s) listed" ] [ "suite-preflight"; "--plan"; planOf "v4.1.4"; "--root"; fixture; "--require-tests"; "true" ] fixture |> ignore
 r9case "suite-preflight-fixture-refuses-a-missing-webkit-project" [ 4 ] [ "SU-BROWSER-WEBKIT cannot execute"; "Project(s) \"webkit\" not found" ] [ "suite-preflight"; "--plan"; planOf "v4.1.4"; "--root"; fixtureNoWebkit; "--require-tests"; "true" ] fixtureNoWebkit |> ignore
 
+// ---- 2b. the deterministic fixture and the zero-test refusal (ported from #102, integration) ----------------------
+
+let compileObligations (pkg: string) =
+    let out = Path.Combine(work, $"obligations-{pkg}.json")
+    let code, output =
+        run "dokimos" [ "verification"; "compile"; "--indy-execution-plan"; Path.Combine(src, "requirements-compiled", pkg, "verification-execution-plan.json")
+                        "--indy-verification-plan"; Path.Combine(src, "requirements-compiled", "v4", "verification-plan.json"); "--out"; out ] work
+    if code <> 0 then failwithf "dokimos verification compile %s: %s" pkg output
+    out
+let obl412, obl414 = compileObligations "v4.1.2", compileObligations "v4.1.4"
+let fixtureAt name extra =
+    let dir = Path.Combine(work, name)
+    r9case $"suite-fixture-{name}" [ 0 ] [ "suite-fixture: PASS" ] ([ "suite-fixture"; "--out"; dir ] @ extra) work |> ignore
+    Directory.CreateSymbolicLink(Path.Combine(dir, "node_modules"), nodeModules) |> ignore
+    dir
+let fx, fxEmpty, fxNoWebkit = fixtureAt "fx" [], fixtureAt "fx-empty" [ "--empty-project"; "Causa.Acceptance" ], fixtureAt "fx-nowebkit" [ "--without-webkit"; "true" ]
+r9case "fixture-v4.1.2-runners-refused-msb1008" [ 4 ] [ "SU-OWN-DOTNET cannot execute"; "SU-DOTNET-LIVE cannot execute"; "MSB1008" ] [ "suite-preflight"; "--obligations"; obl412; "--root"; fx; "--require-tests"; "true" ] fx |> ignore
+r9case "fixture-v4.1.4-every-suite-lists-tests" [ 0 ] [ "SU-OWN-DOTNET: executable, 4 test(s)"; "SU-BROWSER-WEBKIT: executable, 2 test(s)"; "SU-DOTNET-LIVE: executable, 2 test(s)" ] [ "suite-preflight"; "--obligations"; obl414; "--root"; fx; "--require-tests"; "true" ] fx |> ignore
+r9case "fixture-v4.1.4-missing-webkit-project-refused" [ 4 ] [ "SU-BROWSER-WEBKIT cannot execute"; "Project(s) \"webkit\" not found" ] [ "suite-preflight"; "--obligations"; obl414; "--root"; fxNoWebkit ] fxNoWebkit |> ignore
+r9case "suite-preflight-zero-selected-tests-refused" [ 4 ] [ "SU-DOTNET-DETERMINISTIC: the command executes but selects no test" ] [ "suite-preflight"; "--obligations"; obl414; "--root"; fxEmpty; "--require-tests"; "true" ] fxEmpty |> ignore
+// Control: before implementation (no --require-tests) an empty suite is executable, so preflight can run at T0.
+r9case "suite-preflight-zero-tests-allowed-before-implementation" [ 0 ] [ "SU-DOTNET-DETERMINISTIC: executable, 0 test(s)" ] [ "suite-preflight"; "--obligations"; obl414; "--root"; fxEmpty ] fxEmpty |> ignore
+r9case "run-suites-release-zero-executed-refused" [ 4 ] [ "suite SU-DOTNET-DETERMINISTIC executed no test (exit 0)" ] [ "run-suites"; "--obligations"; obl414; "--root"; fxEmpty; "--out"; Path.Combine(work, "runs-empty"); "--suites"; "SU-DOTNET-DETERMINISTIC"; "--require-tests"; "true" ] fxEmpty |> ignore
+r9case "run-suites-release-fixture-executes" [ 0 ] [ "SU-OWN-DOTNET: exit 0"; "SU-DOTNET-DETERMINISTIC: exit 0" ] [ "run-suites"; "--obligations"; obl414; "--root"; fx; "--out"; Path.Combine(work, "runs-fx"); "--suites"; "SU-OWN-DOTNET,SU-DOTNET-DETERMINISTIC"; "--require-tests"; "true" ] fx |> ignore
+
 // ---- 3. Praxis ordering: authorize-implementation and check-sequencing -------------------------------------------
 
 let app = Path.Combine(work, "app")
@@ -208,7 +233,12 @@ r9case "authorize-refuses-not-ready" [ 4 ] [ "6 preflight: conditor acceptance p
 let emptyScope = Path.Combine(work, "empty-scope.json")
 write emptyScope """{"schema":"indy-init.competition-scope/1","id":"CS-EMPTY","status":"proposed"}"""
 r9case "authorize-refuses-an-empty-scope" [ 4 ] [ "the scope names no requirement" ] (authorize [] |> List.map (fun a -> if a = scopeFile then emptyScope else a)) app |> ignore
-r9case "authorize-passes-and-writes-the-checkpoint" [ 0 ] [ "checkpoint"; "1 work item(s)" ] (authorize []) app |> ignore
+// #102's scope checkpoint is required before authorization (integration): refused without it and for another scope.
+r9case "authorize-refuses-without-a-scope-checkpoint" [ 4 ] [ "7 scope: .echelon/scope-checkpoint.json is missing" ] (authorize []) app |> ignore
+write (Path.Combine(app, ".echelon", "scope-checkpoint.json")) """{"schema":"indy-init.scope-checkpoint/1","scopeSha256":"scope-approved"}"""
+commitAll app "scope checkpoint (every work item in Praxis)" |> ignore
+r9case "authorize-refuses-a-scope-checkpoint-of-another-scope" [ 4 ] [ "7 scope: the scope checkpoint pins scope-approved, not the approved scope scope-other" ] (authorize [] @ [ "--scope-sha256"; "scope-other" ]) app |> ignore
+r9case "authorize-passes-and-writes-the-checkpoint" [ 0 ] [ "checkpoint"; "1 work item(s)" ] (authorize [] @ [ "--scope-sha256"; "scope-approved" ]) app |> ignore
 let checkpointSha = commitAll app "initialization checkpoint"
 r9case "authorize-refuses-a-second-checkpoint" [ 4 ] [ "is immutable" ] (authorize []) app |> ignore
 r9case "check-sequencing-passes-ordered-history" [ 0 ] [ "no implementation before authorization" ] [ "check-sequencing"; "--target"; app ] app |> ignore
@@ -219,6 +249,8 @@ r9case "check-sequencing-allows-implementation-after-the-checkpoint" [ 0 ] [ "no
 File.AppendAllText(Path.Combine(app, ".echelon", "r9-initialization-checkpoint.json"), " ")
 commitAll app "agent: touch the checkpoint" |> ignore
 r9case "check-sequencing-refuses-an-edited-checkpoint" [ 4 ] [ "was changed after it was committed" ] [ "check-sequencing"; "--target"; app ] app |> ignore
+// An edited scope checkpoint is refused by check-sequencing --scope-manifest (the gate always passes it): the case
+// check-sequencing-refuses-an-edited-scope-checkpoint below, on a repository checkpointed against a manifest.
 
 // Implementation before authorization (Rehearsal 009's history): reported as process violations.
 let early = Path.Combine(work, "early")
@@ -322,6 +354,18 @@ write (Path.Combine(inCheckpoint, ".echelon", "r9-initialization-checkpoint.json
 write (Path.Combine(inCheckpoint, "src", "Smuggled.fs")) "module Smuggled\n"
 commitAll inCheckpoint "checkpoint carrying implementation" |> ignore
 r9case "check-sequencing-refuses-implementation-before-governance-and-in-the-checkpoint" [ 4 ] [ "implementation before governance"; "checkpoint carrying implementation" ] [ "check-sequencing"; "--target"; inCheckpoint ] inCheckpoint |> ignore
+
+// Review round 6: a scope checkpoint on a side branch (forked before the initialization checkpoint) merged after
+// implementation landed on main does not authorize that implementation.
+let side = scopedRepo "scope-side-branch"
+git side [ "checkout"; "-q"; "-b"; "side"; "HEAD~1" ] |> ignore
+praxisQueue side [ "T10"; "WI-INV-START" ]
+scopeCheckpoint side "scope-1"
+commitAll side "scope checkpoint on a side branch" |> ignore
+git side [ "checkout"; "-q"; "main" ] |> ignore
+implementIn side
+git side [ "merge"; "-q"; "--no-ff"; "-m"; "merge the side scope checkpoint"; "side" ] |> ignore
+r9case "check-sequencing-refuses-checkpoints-on-different-branches" [ 4 ] [ "process violation:" ] (sequencingWithScope side) side |> ignore
 
 // ---- 4. acceptance-status: four levels, evidence-bound -----------------------------------------------------------
 

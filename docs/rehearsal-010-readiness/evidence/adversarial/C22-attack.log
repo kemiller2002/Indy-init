@@ -1,0 +1,6 @@
+exit 4
+  REFUSED JOURNEY_NOT_RUN J2 did not run on chromium
+  REFUSED JOURNEY_NOT_RUN J2 did not run on webkit
+  REFUSED JOURNEY_NOT_RUN J3 did not run on chromium
+  REFUSED JOURNEY_NOT_RUN J3 did not run on webkit
+completion-gate: INCOMPLETE ($WORK/completion.json)

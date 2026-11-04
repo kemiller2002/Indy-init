@@ -10,15 +10,16 @@
 //        [--rc REQUIREMENTS-COMPILER.dll --process-plan F --process-plan-digest HEX --process-rules F --process-rules-sha256 HEX
 //         --process-attestations F --process-trusted-run-id ID [--process-events F --process-ancestry F [--process-executions DIR]]]
 //        [--probes F,... --require-fault-sensitive CATEGORY,...]
+//        [--catalog-acceptance F]   (release: required, GOVERNED-ACCEPTED at HEAD)
 //        Evidence type comes only from the plan's suite runner: executable obligations need Dokimos at HEAD, record
 //        obligations (praxis:*) need verify-process VERIFIED at HEAD, mixed ones need both; verifier:* is acceptance-only.
-//   dotnet fsi tools/r9/r9.fsx -- run-suites (--obligations F | --plan EXECUTION-PLAN) --root REPO --out DIR [--suites ID,...]
+//   dotnet fsi tools/r9/r9.fsx -- run-suites (--obligations F | --plan EXECUTION-PLAN) --root REPO --out DIR [--suites ID,...] [--require-tests true]
 //   dotnet fsi tools/r9/r9.fsx -- suite-preflight (--obligations F | --plan EXECUTION-PLAN) --root REPO [--out F] [--require-tests true]
 //        Executes every executable suite command in list mode; refuses readiness if any cannot execute, and with
-//        --require-tests if one executes but selects no test.
-//   dotnet fsi tools/r9/r9.fsx -- suite-fixture --out NEW-DIR [--without-webkit true]
+//        --require-tests if one executes but selects no test (run-suites: if one runs but executes no test).
+//   dotnet fsi tools/r9/r9.fsx -- suite-fixture --out NEW-DIR [--without-webkit true] [--empty-project NAME]
 //        A deterministic tree with the plan's test layout (one trivial test per suite, no application code).
-//   dotnet fsi tools/r9/r9.fsx -- authorize-implementation --target REPO --catalog F --obligations F --suite-preflight F
+//   dotnet fsi tools/r9/r9.fsx -- authorize-implementation --target REPO --catalog F --obligations F --suite-preflight F --scope-sha256 HEX [--scope-checkpoint F]
 //        --spec-preflight F --acceptance-preflight F [--work-plan F] [--manifest F] [--scope F] [--praxis EXE]
 //        Pre-implementation gate (Praxis ordering); writes the immutable .echelon/r9-initialization-checkpoint.json.
 //   dotnet fsi tools/r9/r9.fsx -- check-sequencing --target REPO [--scope-manifest F] [--out F]
@@ -242,7 +243,7 @@ let govern () =
                   Collections.Generic.KeyValuePair("indyInitCommit", JsonValue.Create(srcCommit.Trim()) :> JsonNode)
                   // The rehearsal's toolchain lock (relative to Indy-init): the gate workflow reads its toolchain and
                   // requirements package from it, so the governed repository cannot choose another one.
-                  Collections.Generic.KeyValuePair("lock", JsonValue.Create(lockPath) :> JsonNode)
+                  Collections.Generic.KeyValuePair("toolchainLock", JsonValue.Create(lockPath) :> JsonNode)
                   Collections.Generic.KeyValuePair("policySha256", JsonValue.Create(sha256Bytes (Encoding.UTF8.GetBytes(canonical g.["qualityEvidence"]))) :> JsonNode)
                   Collections.Generic.KeyValuePair("workflowSha256", JsonValue.Create(sha256File workflow) :> JsonNode)
                   Collections.Generic.KeyValuePair("completedBeforeGovernance", JsonArray(preexisting |> Array.ofList) :> JsonNode) ])
@@ -553,7 +554,24 @@ let gate () =
                     match statusOf.TryFind id with
                     | None -> [ $"the matrix cites {id}, which is not a bound identity of the in-scope obligations" ]
                     | Some s -> check (s = str e "result") $"""the matrix says {id} {str e "result"}, Dokimos says {s} at HEAD"""))
-        let causes = candidateCauses @ resultCauses @ coverageCauses @ sensitivityCauses @ recordCauses @ verifierCauses @ emptyCauses @ matrixCauses
+        // A required fault-sensitivity category that matches no obligation of the plan enforces nothing: refused, never
+        // silently passed (adversarial audit SA-07). Catalog round trips are judged by the governed catalog acceptance.
+        let emptyCategoryCauses =
+            sensitiveCategories
+            |> Set.filter (fun c -> categoriesOf |> Map.forall (fun _ cs -> not (cs.Contains c)))
+            |> Set.toList
+            |> List.map (fun c -> $"fault-sensitivity category {c} matches no obligation of the plan; an empty category enforces nothing")
+        // Release: the catalog verdict must be governed acceptance at this exact candidate (adversarial audit R2). A
+        // builder-run verdict is supporting evidence only.
+        let catalogCauses =
+            if mode <> "release" then []
+            else
+                match opt "--catalog-acceptance" |> Option.filter File.Exists |> Option.map readJson with
+                | None -> [ "release requires the governed catalog acceptance (requirements-compiler catalog-acceptance); none was supplied" ]
+                | Some c ->
+                    check (str c "candidate" = head) $"""the catalog acceptance is for {str c "candidate"}, not HEAD {head}"""
+                    @ check (str c "level" = "GOVERNED-ACCEPTED") $"""catalog acceptance is {str c "level"}, not GOVERNED-ACCEPTED"""
+        let causes = candidateCauses @ resultCauses @ coverageCauses @ sensitivityCauses @ emptyCategoryCauses @ catalogCauses @ recordCauses @ verifierCauses @ emptyCauses @ matrixCauses
         let deferred = if mode = "release" && opt "--work-item" |> Option.isNone then verifierIds else []
         let strings (xs: string list) = JsonArray(xs |> List.map (fun x -> JsonValue.Create x :> JsonNode) |> Array.ofList) :> JsonNode
         let verdict =
@@ -607,6 +625,20 @@ let suiteSource () : string * JsonNode list =
     | None, Some o -> let j = readJson o in str j "planId", arr j "suites"
     | None, None -> eprintfn "missing --obligations or --plan"; exit 2
 
+
+/// The number of tests a result file says were executed (passed, failed or flaky; skipped and not-run tests are not
+/// executed). TRX: Counters executed; Playwright JSON: stats expected + unexpected + flaky.
+let executedTests (format: string) (path: string) : int =
+    let text = File.ReadAllText path
+    if format = "trx" then
+        let m = Regex.Match(text, "<Counters[^>]*\\sexecuted=\"([0-9]+)\"")
+        if m.Success then int m.Groups[1].Value else 0
+    else
+        try
+            let stats = (JsonNode.Parse text)["stats"]
+            [ "expected"; "unexpected"; "flaky" ] |> List.sumBy (fun k -> match stats with | null -> 0 | s when isNull s[k] -> 0 | s -> s[k].GetValue<int>())
+        with _ -> 0
+
 // ---- run-suites: execute the plan's own suite commands and record machine-readable results at HEAD -----------------
 
 /// Runs each selected executable suite exactly as the frozen plan states it, adding only a machine-readable logger,
@@ -639,6 +671,7 @@ let runSuites () =
                     [ Collections.Generic.KeyValuePair("suite", JsonValue.Create id :> JsonNode)
                       Collections.Generic.KeyValuePair("format", JsonValue.Create format :> JsonNode)
                       Collections.Generic.KeyValuePair("path", JsonValue.Create path :> JsonNode)
+                      Collections.Generic.KeyValuePair("executedTests", JsonValue.Create(executedTests format (Path.Combine(out, path)): int) :> JsonNode)
                       Collections.Generic.KeyValuePair("sourceSha", JsonValue.Create head :> JsonNode) ]) :> JsonNode))
     let manifest =
         JsonObject(
@@ -648,6 +681,15 @@ let runSuites () =
     File.WriteAllText(Path.Combine(out, "results.json"), manifest.ToJsonString(JsonSerializerOptions(WriteIndented = true)) + "\n")
     // A failing suite is not a gate failure here: the gate judges every identity from the recorded results.
     let missing = ran |> List.filter (fun (_, _, files) -> files.IsEmpty) |> List.map (fun (id, code, _) -> $"suite {id} produced no result file (exit {code}); see {id}/run.log")
+    // --require-tests true (release): a suite whose result files record no executed test is refused. A command that
+    // exits 0 having run nothing is never evidence (adversarial case 1).
+    let empty =
+        if opt "--require-tests" <> Some "true" then []
+        else
+            ran
+            |> List.filter (fun (_, _, files) -> not files.IsEmpty && files |> List.sumBy (fun (p, f) -> executedTests f (Path.Combine(out, p))) = 0)
+            |> List.map (fun (id, code, _) -> $"suite {id} executed no test (exit {code}); a command that selects zero tests is not verification; see {id}/run.log")
+    let missing = missing @ empty
     if suites.IsEmpty then Unusable "no executable suite selected"
     elif missing.IsEmpty then Pass (ran |> List.map (fun (id, code, files) -> $"{id}: exit {code}, {files.Length} result file(s)") |> fun l -> l @ [ $"results {out}/results.json at {head}" ])
     else Refused missing
@@ -716,7 +758,10 @@ let suitePreflight () =
                                 Collections.Generic.KeyValuePair("cause", JsonValue.Create cause :> JsonNode) ]) :> JsonNode)
                       |> Array.ofList) :> JsonNode) ])
     opt "--out" |> Option.iter (fun f -> File.WriteAllText(f, report.ToJsonString(JsonSerializerOptions(WriteIndented = true)) + "\n"))
-    let refused = results |> List.filter (fun (_, _, _, _, cause) -> cause <> "") |> List.map (fun (id, cmd, code, _, cause) -> $"suite {id} cannot execute (exit {code}): {cause}  [$ {cmd}]")
+    let refused =
+        results
+        |> List.filter (fun (_, _, _, _, cause) -> cause <> "")
+        |> List.map (fun (id, cmd, code, _, cause) -> if code <> 0 then $"suite {id} cannot execute (exit {code}): {cause}  [$ {cmd}]" else $"suite {id}: {cause}  [$ {cmd}]")
     if suites.IsEmpty then Unusable "the obligations name no executable suite"
     elif refused.IsEmpty then Pass (results |> List.map (fun (id, _, _, count, _) -> $"{id}: executable, {count} test(s) listed"))
     else Refused refused
@@ -726,7 +771,7 @@ let suitePreflight () =
 /// A deterministic test tree with the plan's project, namespace and folder layout and one trivial test per suite,
 /// so every suite command of a package can be executed before T0 (#102). withWebkit = false reproduces Rehearsal
 /// 009's missing project.
-let fixtureFiles (withWebkit: bool) : (string * string) list =
+let fixtureFiles (withWebkit: bool) (emptyProject: string option) : (string * string) list =
     let dotnetProjects =
         [ "Causa.Contract.Tests", [ "Causa.Contract.Tests.Fixture" ]
           "Causa.Domain.Tests", [ "Causa.Domain.Tests.Fixture" ]
@@ -736,8 +781,9 @@ let fixtureFiles (withWebkit: bool) : (string * string) list =
           "Causa.Invariants", [ "Causa.Invariants.Model.Fixture"; "Causa.Invariants.Live.Fixture" ] ]
     let fsproj =
         "<Project Sdk=\"Microsoft.NET.Sdk\">\n  <PropertyGroup>\n    <TargetFramework>net10.0</TargetFramework>\n    <IsPackable>false</IsPackable>\n  </PropertyGroup>\n  <ItemGroup>\n    <Compile Include=\"Tests.fs\" />\n  </ItemGroup>\n  <ItemGroup>\n    <PackageReference Include=\"Microsoft.NET.Test.Sdk\" Version=\"17.11.1\" />\n    <PackageReference Include=\"xunit\" Version=\"2.9.2\" />\n    <PackageReference Include=\"xunit.runner.visualstudio\" Version=\"2.8.2\" />\n  </ItemGroup>\n</Project>\n"
-    let testsFs (modules: string list) =
-        modules |> List.map (fun m -> $"namespace {m}\n\nmodule FixtureTests =\n    [<Xunit.Fact>]\n    let ``suite command executes`` () = Xunit.Assert.Equal(2, 1 + 1)\n") |> String.concat "\n"
+    let testsFs (project: string) (modules: string list) =
+        if Some project = emptyProject then modules |> List.map (fun m -> $"namespace {m}\n\nmodule FixtureTests =\n    let notATest () = 2\n") |> String.concat "\n"
+        else modules |> List.map (fun m -> $"namespace {m}\n\nmodule FixtureTests =\n    [<Xunit.Fact>]\n    let ``suite command executes`` () = Xunit.Assert.Equal(2, 1 + 1)\n") |> String.concat "\n"
     let slnx = dotnetProjects |> List.map (fun (p, _) -> $"  <Project Path=\"tests/{p}/{p}.fsproj\" />\n") |> String.concat "" |> sprintf "<Solution>\n%s</Solution>\n"
     let projects = (if withWebkit then [ "chromium"; "webkit" ] else [ "chromium" ]) |> List.map (fun p -> $"    {{ name: '{p}', use: {{ browserName: '{p}' }} }},\n") |> String.concat ""
     let spec (folder: string) = $"tests/browser/{folder}/fixture.spec.mjs", $"import {{ test, expect }} from '@playwright/test';\n\ntest('{folder}: suite command executes', async ({{ page }}) => {{\n  await page.setContent('<p>suite</p>');\n  await expect(page.locator('p')).toHaveText('suite');\n}});\n"
@@ -746,14 +792,14 @@ let fixtureFiles (withWebkit: bool) : (string * string) list =
       "package.json", "{\n  \"name\": \"r9-suite-fixture\",\n  \"private\": true,\n  \"devDependencies\": {\n    \"@playwright/test\": \"1.63.0\"\n  }\n}\n"
       "playwright.config.ts", $"import {{ defineConfig }} from '@playwright/test';\n\nexport default defineConfig({{\n  testDir: 'tests/browser',\n  projects: [\n{projects}  ],\n}});\n"
       ".gitignore", "bin/\nobj/\nnode_modules/\ntest-results/\n" ]
-    @ (dotnetProjects |> List.collect (fun (p, ms) -> [ $"tests/{p}/{p}.fsproj", fsproj; $"tests/{p}/Tests.fs", testsFs ms ]))
+    @ (dotnetProjects |> List.collect (fun (p, ms) -> [ $"tests/{p}/{p}.fsproj", fsproj; $"tests/{p}/Tests.fs", testsFs p ms ]))
     @ ([ "contract"; "acceptance"; "invariants"; "live" ] |> List.map spec)
 
 let suiteFixture () =
     let out = Path.GetFullPath(req "--out")
     if Directory.Exists out && not (Seq.isEmpty (Directory.EnumerateFileSystemEntries out)) then Unusable $"{out} is not empty"
     else
-        let files = fixtureFiles (opt "--without-webkit" <> Some "true")
+        let files = fixtureFiles (opt "--without-webkit" <> Some "true") (opt "--empty-project")
         files |> List.iter (fun (path, text) ->
             let full = Path.Combine(out, path)
             Directory.CreateDirectory(Path.GetDirectoryName full) |> ignore
@@ -791,6 +837,7 @@ let isImplementationPath (path: string) =
     || (name.StartsWith("Directory.", StringComparison.Ordinal) && (name.EndsWith(".props", StringComparison.Ordinal) || name.EndsWith(".targets", StringComparison.Ordinal)))
 
 let checkpointPath = ".echelon/r9-initialization-checkpoint.json"
+let scopeCheckpointRel = ".echelon/scope-checkpoint.json"
 
 /// The scope checkpoint `requirements-compiler scope checkpoint` writes once the scope manifest re-derives from the
 /// frozen sources and every work item is in Praxis (#102); check-sequencing --scope-manifest requires it.
@@ -897,9 +944,22 @@ let authorizeImplementation () =
     let _, status = git target [ "status"; "--porcelain"; "--untracked-files=no" ]
     let _, headOut = git target [ "rev-parse"; "HEAD" ]
     let head = headOut.Trim()
+    // 7 scope (#102, integrated): the approved scope's checkpoint, which requirements-compiler scope checkpoint writes
+    // only when the scope manifest equals its frozen sources and every work item of the scope is in Praxis, must be
+    // committed before implementation is authorized; with --scope-sha256 (the lock's scope.scopeSha256) it must pin it.
+    let scopeCheckpointPath = Path.Combine(target, opt "--scope-checkpoint" |> Option.defaultValue scopeCheckpointRel)
+    let step7 =
+        if not (exists scopeCheckpointPath) then
+            [ $"7 scope: {scopeCheckpointRel} is missing; run requirements-compiler scope checkpoint (every work item of the approved scope in Praxis) and commit it first" ]
+        else
+            let sc = readJson scopeCheckpointPath
+            check (str sc "schema" = "indy-init.scope-checkpoint/1") $"7 scope: {scopeCheckpointRel} is not an indy-init.scope-checkpoint/1 record"
+            @ (match opt "--scope-sha256" with
+               | Some pinned -> check (str sc "scopeSha256" = pinned) $"""7 scope: the scope checkpoint pins {str sc "scopeSha256"}, not the approved scope {pinned}"""
+               | None -> [ "7 scope: --scope-sha256 (the lock's scope.scopeSha256) is required: a scope checkpoint of any other scope does not authorize" ])
     let causes =
         check (not (exists ck)) $"{checkpointPath} already exists: the initialization checkpoint is immutable"
-        @ step1 @ step2 @ step3 @ step4 @ step5 @ step6
+        @ step1 @ step2 @ step3 @ step4 @ step5 @ step6 @ step7
         @ check (status.Trim() = "") "the tracked tree is not clean: authorize from a committed state"
     if not causes.IsEmpty then Refused causes
     else
@@ -912,7 +972,7 @@ let authorizeImplementation () =
                   "meaning", jstr "Implementation is authorized from the commit that adds this file. Every commit before it that changes implementation paths (src/, web/, tests/, build files), other than the T0 bootstrap, is a process violation (r9.fsx check-sequencing). Verification evidence is produced after implementation and is not part of this checkpoint."
                   "workItems", jstrs (items |> List.map (fun w -> str w "id"))
                   "inScopeObligations", jint inScope.Length
-                  "inputs", jarr ([ digest manifestPath; digest workPlanPath; digest (req "--obligations") ] @ ([ "--suite-preflight"; "--spec-preflight"; "--acceptance-preflight"; "--scope" ] |> List.choose opt |> List.map digest)) ]
+                  "inputs", jarr ([ digest manifestPath; digest workPlanPath; digest (req "--obligations"); digest scopeCheckpointPath ] @ ([ "--suite-preflight"; "--spec-preflight"; "--acceptance-preflight"; "--scope" ] |> List.choose opt |> List.map digest)) ]
         writeJson ck record
         Pass [ $"checkpoint {ck} written at {head}: commit it as its own commit before any implementation"; $"{items.Length} work item(s), {inScope.Length} in-scope obligation(s) linked" ]
 
@@ -1324,5 +1384,5 @@ match args with
 | "acceptance-status" :: _ -> acceptanceStatus () |> finish "acceptance-status"
 | "spec-preflight" :: _ -> specPreflight () |> finish "spec-preflight"
 | _ ->
-    eprintfn "usage: dotnet fsi tools/r9/r9.fsx -- install-conditor|workstation|govern|check-governance|gate|spec-preflight ... (see the header)"
+    eprintfn "usage: dotnet fsi tools/r9/r9.fsx -- install-conditor|workstation|govern|check-governance|gate|run-suites|suite-preflight|suite-fixture|spec-preflight|... (see the header)"
     exit 2

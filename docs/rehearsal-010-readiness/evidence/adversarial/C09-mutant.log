@@ -1,0 +1,40 @@
+exit 4
+  REFUSED DEPENDENCY_NOT_INTEGRATED dependency SL-T11 is not integrated
+  REFUSED DEPENDENCY_NOT_INTEGRATED dependency SL-T12 is not integrated
+  REFUSED DEPENDENCY_NOT_INTEGRATED dependency SL-T13 is not integrated
+  REFUSED DEPENDENCY_NOT_INTEGRATED dependency SL-T14 is not integrated
+  REFUSED DEPENDENCY_NOT_INTEGRATED dependency SL-T15 is not integrated
+  REFUSED DEPENDENCY_NOT_INTEGRATED dependency SL-T16 is not integrated
+  REFUSED DEPENDENCY_NOT_INTEGRATED dependency SL-T17 is not integrated
+  REFUSED DEPENDENCY_NOT_INTEGRATED dependency SL-T18 is not integrated
+  REFUSED DEPENDENCY_NOT_INTEGRATED dependency SL-T19 is not integrated
+  REFUSED DEPENDENCY_NOT_INTEGRATED dependency SL-T20 is not integrated
+  REFUSED DEPENDENCY_NOT_INTEGRATED dependency SL-T21 is not integrated
+  REFUSED DEPENDENCY_NOT_INTEGRATED dependency SL-T22 is not integrated
+  REFUSED DEPENDENCY_NOT_INTEGRATED dependency SL-T23 is not integrated
+  REFUSED DEPENDENCY_NOT_INTEGRATED dependency SL-T24 is not integrated
+  REFUSED DEPENDENCY_NOT_INTEGRATED dependency SL-T25 is not integrated
+  REFUSED DEPENDENCY_NOT_INTEGRATED dependency SL-T26 is not integrated
+  REFUSED DEPENDENCY_NOT_INTEGRATED dependency SL-T27 is not integrated
+  REFUSED DEPENDENCY_NOT_INTEGRATED dependency SL-T28 is not integrated
+  REFUSED DEPENDENCY_NOT_INTEGRATED dependency SL-T29 is not integrated
+  REFUSED DEPENDENCY_NOT_INTEGRATED dependency SL-T30 is not integrated
+  REFUSED DEPENDENCY_NOT_INTEGRATED dependency SL-T31 is not integrated
+  REFUSED DEPENDENCY_NOT_INTEGRATED dependency SL-T32 is not integrated
+  REFUSED DEPENDENCY_NOT_INTEGRATED dependency SL-T33 is not integrated
+  REFUSED DEPENDENCY_NOT_INTEGRATED dependency SL-T34 is not integrated
+  REFUSED DEPENDENCY_NOT_INTEGRATED dependency SL-T35 is not integrated
+  REFUSED DEPENDENCY_NOT_INTEGRATED dependency SL-T36 is not integrated
+  REFUSED DEPENDENCY_NOT_INTEGRATED dependency SL-WI-GEN-AR is not integrated
+  REFUSED DEPENDENCY_NOT_INTEGRATED dependency SL-WI-GEN-EXT-DATA is not integrated
+  REFUSED DEPENDENCY_NOT_INTEGRATED dependency SL-WI-GEN-PF is not integrated
+  REFUSED DEPENDENCY_NOT_INTEGRATED dependency SL-WI-GEN-RECORDS is not integrated
+  REFUSED DEPENDENCY_NOT_INTEGRATED dependency SL-WI-GEN-UI is not integrated
+  REFUSED DEPENDENCY_NOT_INTEGRATED dependency SL-WI-GEN-VER is not integrated
+  REFUSED DEPENDENCY_NOT_INTEGRATED dependency SL-WI-GEN-WDL is not integrated
+  REFUSED DEPENDENCY_NOT_INTEGRATED dependency SL-WI-INV-START is not integrated
+  REFUSED DEPENDENCY_NOT_INTEGRATED dependency SL-WI-INV-WORKSPACE is not integrated
+slice-gate: REFUSED (do not merge) ($WORK/slice-gate.json)
+
+  REFUSED SCOPE_NOT_INTEGRATED 135 applicable mandatory requirement(s) are not governed-verified at the candidate, for example AR-014, AR-029, AR-030, AR-035, EXT-DATA-001, EXT-DATA-002
+completion-gate: INCOMPLETE ($WORK/completion.json)

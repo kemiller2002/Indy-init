@@ -1,0 +1,27 @@
+exit 1
+
+Running 1 test using 1 worker
+
+  ✘  1 [chromium] › j2-analysis.spec.mjs:22:1 › J2 complete investigation analysis (12.8s)
+
+
+  1) [chromium] › j2-analysis.spec.mjs:22:1 › J2 complete investigation analysis ───────────────────
+
+    Error: P0 assertion(s) failed: J2-01 (expect(locator).toBeVisible() failed); J2-08 (expect(locator).toBeVisible() failed); J2-09 (values missing from GitHub (read directly): obs-mw26pitp-hmqo5x)
+
+       at support.mjs:44
+
+      42 | export const finish = () => {
+      43 |   const failed = test.info().annotations.filter((a) => a.type === 'assertion').map((a) => JSON.parse(a.description)).filter((a) => a.priority === 'P0' && a.status !== 'passed');
+    > 44 |   if (failed.length) throw new Error(`P0 assertion(s) failed: ${failed.map((a) => `${a.id} (${a.detail})`).join('; ')}`);
+         |                            ^
+      45 | };
+      46 |
+      47 | /// In harness-double mode the browser's requests to api.github.com are answered by the double, so a fixture app that
+        at finish ($SRC/verification/journeys/support.mjs:44:28)
+        at $SRC/verification/journeys/j2-analysis.spec.mjs:112:3
+
+    Error Context: test-results/j2-analysis-J2-complete-investigation-analysis-chromium/error-context.md
+
+  1 failed
+    [chromium] › j2-analysis.spec.mjs:22:1 › J2 complete investigation analysis ────────────────────

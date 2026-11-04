@@ -1,0 +1,43 @@
+exit 1
+
+Running 1 test using 1 worker
+
+  ✘  1 [chromium] › j1-create-persist.spec.mjs:6:1 › J1 investigation creation and persistence (3.0m)
+
+
+  1) [chromium] › j1-create-persist.spec.mjs:6:1 › J1 investigation creation and persistence ───────
+
+    Test timeout of 180000ms exceeded.
+
+    Error: browserContext.close: Test ended.
+    Browser logs:
+
+    <launching> /opt/pw-browsers/chromium_headless_shell-1243/chrome-headless-shell-linux64/chrome-headless-shell --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-edgeupdater --disable-extensions --disable-features=AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,BlockOriginHeaderModificationOnRedirect,Translate,AutoDeElevate,OptimizationHints,msForceBrowserSignIn,msEdgeUpdateLaunchServicesPreferredVersion --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --disable-updater-scheduler --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --disable-infobars --disable-search-engine-choice-screen --disable-sync --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=/tmp/playwright_chromiumdev_profile-vzmAv2 --remote-debugging-pipe --no-startup-window
+    <launched> pid=5359
+    [pid=5359][err] [1104/140428.643273:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Failed to connect to socket /run/dbus/system_bus_socket: No such file or directory
+    [pid=5359][err] [1104/140428.644629:ERROR:base/files/file_path_watcher_inotify.cc:338] inotify_init() failed: Too many open files (24)
+    [pid=5359][err] [1104/140428.646509:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+    [pid=5359][err] [1104/140428.647308:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Failed to connect to socket /run/dbus/system_bus_socket: No such file or directory
+    [pid=5359][err] [1104/140428.647371:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Failed to connect to socket /run/dbus/system_bus_socket: No such file or directory
+    [pid=5359][err] [1104/140428.670237:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: 
+    [pid=5359][err] [1104/140428.670374:WARNING:device/bluetooth/dbus/bluez_dbus_manager.cc:209] Floss manager service not available, cannot set Floss enable/disable.
+    [pid=5359][err] [1104/140428.675736:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+    [pid=5359][err] [1104/140428.678141:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: 
+    [pid=5359][err] [1104/140428.678673:WARNING:media/gpu/vaapi/vaapi_wrapper.cc:1660] drmGetDevices2() has not found any devices
+    [pid=5359][err] [1104/140428.689411:WARNING:sandbox/policy/linux/sandbox_linux.cc:405] InitializeSandbox() called with multiple threads in process gpu-process.
+    [pid=5359][err] [1104/140428.717619:ERROR:base/files/file_path_watcher_inotify.cc:338] inotify_init() failed: Too many open files (24)
+    [pid=5359] <gracefully close start>
+
+      38 |     await b.close();
+      39 |   });
+    > 40 |   await a.close();
+         |   ^
+      41 |   finish();
+      42 | });
+      43 |
+        at $SRC/verification/journeys/j1-create-persist.spec.mjs:40:3
+
+    Error Context: test-results/j1-create-persist-J1-investigation-creation-and-persistence-chromium/error-context.md
+
+  1 failed
+    [chromium] › j1-create-persist.spec.mjs:6:1 › J1 investigation creation and persistence ────────

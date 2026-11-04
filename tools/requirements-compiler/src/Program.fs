@@ -1344,6 +1344,15 @@ let main argv =
     | "progress" :: rest -> ScopeCommands.progressCommand rest
     | "stop-decision" :: rest -> ScopeCommands.stopDecisionCommand rest
     | "resume" :: rest -> ScopeCommands.resumeCommand rest
+    | "catalog-acceptance" :: rest -> GovernedCommands.catalogAcceptanceCommand rest
+    | "ledger" :: rest -> GovernedCommands.ledgerCommand rest
+    | "slice-manifest" :: rest -> GovernedCommands.sliceManifestCommand rest
+    | "slice-gate" :: rest -> GovernedCommands.sliceGateCommand rest
+    | "completion-gate" :: rest -> GovernedCommands.completionGateCommand rest
+    | "test-integrity" :: rest -> GovernedCommands.testIntegrityCommand rest
+    | "design-contract" :: rest -> GovernedCommands.designContractCommand rest
+    | "observe" :: rest -> GovernedCommands.observeCommand rest
+    | "forma-inventory" :: rest -> GovernedCommands.formaInventoryCommand rest
     | "preflight" :: rest ->
         match parseArgs rest defaults with
         | Error e ->

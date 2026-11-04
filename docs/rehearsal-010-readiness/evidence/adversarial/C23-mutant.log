@@ -1,0 +1,2 @@
+exit 0
+test-integrity: PASS ($WORK/integrity-bad.json)
