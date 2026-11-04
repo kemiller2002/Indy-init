@@ -410,8 +410,31 @@ let staleRecord repo (change: JsonNode) =
         | Some b when str pin "field" <> "" -> (match (parse b)[str pin "field"] with null -> "" | n -> n.ToJsonString()) <> str pin "value"
         | Some b -> sha256Hex b <> str pin "sha256")
 
+/// The last change of the approvals file before Rehearsal 010 (APR-V412-OWNER-3). Every later change is a v4.1.4 or
+/// Rehearsal 010 record, and must be one GitHub verifies as committed and signed by you.
+let approvalsBaseline = "55f2467f5ff7f39f8216d2ba291dbeb58b506a5f"
+
+/// The changes of the approvals file at origin/main after the baseline that GitHub does not verify as committed and
+/// signed by you (a record an agent planted, under any id or name). Records in such a file are not yours to build on.
+let unsignedApprovalChanges repo =
+    let log = git repo [ "log"; "--reverse"; "--format=%H"; $"{approvalsBaseline}..origin/main"; "--"; approvalsPath ]
+    log.Split('\n', StringSplitOptions.RemoveEmptyEntries)
+    |> Array.filter (fun c ->
+        let out = try run repo "gh" [ "api"; $"repos/{githubRepo}/commits/{c}"; "--jq"; "[.commit.verification.verified, .commit.verification.reason, .committer.login] | @json" ] with Stop _ -> ""
+        out <> $"[true,\"valid\",\"{operatorId}\"]")
+    |> List.ofArray
+
+/// Refuses to build on an approvals file that holds a change you did not sign (v4.1.4 and Rehearsal 010 only).
+let requireSignedApprovals repo (p: Package) =
+    if p.Name = "v4.1.4" || p.Name = "rehearsal-010" then
+        match unsignedApprovalChanges repo with
+        | [] -> ()
+        | unsigned ->
+            stop $"""{approvalsPath} was changed after {approvalsBaseline.Substring(0, 12)} by commit(s) GitHub does not verify as committed and signed by you: {String.Join(", ", unsigned |> List.map (fun c -> c.Substring(0, 12)))}. Their records are not yours: revert them before recording (and turn on commit signing, OWNER-APPROVAL-EXECUTION step 0)"""
+
 let decide repo dryRun (p: Package) =
     prepare repo
+    requireSignedApprovals repo p
     let approvals = approvalsAtMain repo
     let recorded = recordedChanges approvals
     let open' =
@@ -467,6 +490,7 @@ let decisionsOnly (p: Package) =
 let approve repo dryRun (p: Package) =
     decisionsOnly p
     prepare repo
+    requireSignedApprovals repo p
     let approvals = approvalsAtMain repo
     let pending =
         requestsOf repo p
@@ -698,6 +722,7 @@ let ratifiedCatalogPath = "requirements/catalogs/causa-investigation.requirement
 /// requirements and screens become the ratified catalog, with status "ratified".
 let ratifyR10 repo dryRun =
     prepare repo
+    requireSignedApprovals repo (packages |> List.find (fun p -> p.Name = "rehearsal-010"))
     let recorded = recordedChanges (approvalsAtMain repo) |> List.filter (fun c -> str c "decision_id" = "ODR-R10-02")
     match recorded |> List.tryLast with
     | None -> stop "ODR-R10-02 is not recorded: run decide rehearsal-010 first"

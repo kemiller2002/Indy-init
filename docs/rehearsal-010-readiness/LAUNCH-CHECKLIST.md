@@ -16,13 +16,13 @@
   - `release-gate-repair`
   - `r9-readiness-gates`
   - `suite-commands` (WebKit)
-  - `r10-adversarial`: Chromium and WebKit; the 36 cases; the fixture journeys and design contract; the Rehearsal 009 replay; the 36 launch-preflight controls; the schedule evidence
+  - `r10-adversarial`: Chromium and WebKit; the 36 cases; the fixture journeys and design contract; the Rehearsal 009 replay; the 41 launch-preflight controls; the schedule evidence
 - [ ] Independent review: no open blocking finding (FINAL-READINESS §5).
 - [ ] Frozen packages unchanged (CI `frozen-v4` and the offline suite).
 
 ## B. The owner transaction (OWNER-APPROVAL-EXECUTION.md §3, steps 0–14)
 
-- [ ] 0. Commit signing on: your owner records and lock are commits GitHub verifies as signed by you.
+- [ ] 0. Commit signing on: your owner records and lock are commits GitHub verifies as committed and signed by you. Merge owner-freeze pull requests with **Create a merge commit**, not squash or rebase.
 
 - [ ] 1. #104 merged; #101 closed as superseded.
 - [ ] 2–5. v4.1.4:

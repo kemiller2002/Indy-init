@@ -3,9 +3,10 @@
 //   dotnet fsi tools/r10/launch-preflight.fsx -- --indy-init DIR --competition URL --live-run RUN_ID --adversarial-run RUN_ID
 //     [--origin URL] [--gh PATH] [--out F]
 //
-// Owner provenance is a signature, not a name: every commit that changes the decisions approvals file (from the first
-// Rehearsal 010 or v4.1.4 record on) or the lock must be one GitHub verifies as signed by the owner (gh api), with no
-// agent trailer. An agent can write any author name; it cannot sign as the owner.
+// Owner provenance is a signature, not a name: every commit that changes the decisions approvals file (after 55f2467)
+// or the lock must be one GitHub verifies as signed by the owner: verification valid and the committer the owner, not
+// GitHub's web-flow (gh api), with no agent trailer. An agent can write any author name; it cannot sign as the owner.
+// The owner merges owner-freeze pull requests with a merge commit (not squash or rebase), so the signed commits stay.
 //
 // READY only when every check below passes; otherwise REFUSED with each cause. Exit 0 READY, 4 REFUSED.
 //   LP-00  the Indy-init checkout is clean and is main of the published repository (--origin)
@@ -15,8 +16,8 @@
 //   LP-03  every digest in the lock (contracts, rules, the owner-decision requests) is the digest of the file it names
 //   LP-04  the scope manifest's scopeSha256 is the lock's
 //   LP-05  every decision a launch needs (fixed in this file, with the options each can launch with) and
-//          ODR-V414-01..03 is recorded by the operator; every change of the approvals file since the first Rehearsal
-//          010 or v4.1.4 record is owner-signed; no approval id repeats; every pin a decision recorded is the current
+//          ODR-V414-01..03 is recorded by the operator; every change of the approvals file since the last owner record
+//          before Rehearsal 010 (55f2467) is committed, and signed, by the owner; no approval id repeats; every pin a decision recorded is the current
 //          file's digest (and the lock's, where the lock pins it)
 //   LP-06  the resolved set carries Dokimos 0.11.1 or later
 //   LP-07  the test repository is isolated, named, not a competition repository, and the one ODR-R10-09 approved
@@ -73,27 +74,26 @@ let approvalsRel = "kickoff/rehearsal-007/approvals.causa.json"
 let requestsRel = "kickoff/rehearsal-010/proposals/owner-decision-requests.json"
 let operator = "kemiller2002"
 
-/// Whether GitHub verifies `commit` as signed and authored by the operator, with no agent trailer.
+/// Whether GitHub verifies `commit` as signed by the operator's own key: verification valid, and the COMMITTER (whose
+/// key GitHub checked; the author is free text) the operator. GitHub's own commits (committer web-flow: web edits,
+/// API writes, squash merges) are not the owner's signature. No agent trailer.
 let ownerSigned (commit: string) =
-    let code, out = run src gh [ "api"; $"repos/{indyInitRepo}/commits/{commit}"; "--jq"; "[.commit.verification.verified, .author.login, .commit.message] | @json" ]
+    let code, out = run src gh [ "api"; $"repos/{indyInitRepo}/commits/{commit}"; "--jq"; "[.commit.verification.verified, .commit.verification.reason, .committer.login, .commit.message] | @json" ]
     if code <> 0 then false else
     try
         match JsonNode.Parse out with
-        | :? JsonArray as a when a.Count = 3 ->
-            a[0].GetValue<bool>() && a[1].GetValue<string>() = operator
-            && not (Regex.IsMatch(a[2].GetValue<string>(), @"Claude-Session:|Co-Authored-By:\s*Claude"))
+        | :? JsonArray as a when a.Count = 4 ->
+            a[0].GetValue<bool>() && a[1].GetValue<string>() = "valid" && a[2].GetValue<string>() = operator
+            && not (Regex.IsMatch(a[3].GetValue<string>(), @"Claude-Session:|Co-Authored-By:\s*Claude", RegexOptions.IgnoreCase))
         | _ -> false
     with _ -> false
 
-/// The commits that changed `file` (oldest first) from the first one whose version contains `marker` (every commit
-/// when marker is ""): each must be owner-signed. Returns the unsigned ones.
-let unsignedChanges (file: string) (marker: string) =
-    let _, log = git src [ "log"; "--reverse"; "--format=%H"; "--"; file ]
-    let commits = log.Split('\n', StringSplitOptions.RemoveEmptyEntries) |> List.ofArray
-    let from =
-        if marker = "" then commits
-        else commits |> List.skipWhile (fun c -> not ((snd (git src [ "show"; $"{c}:{file}" ])).Contains marker))
-    from |> List.filter (ownerSigned >> not)
+/// The commits that changed `file` after `baseline` (every commit when the baseline is "" or not in this history),
+/// oldest first, that are not owner-signed.
+let unsignedChanges (file: string) (baseline: string) =
+    let range = if baseline <> "" && fst (git src [ "merge-base"; "--is-ancestor"; baseline; "HEAD" ]) = 0 then [ $"{baseline}..HEAD" ] else []
+    let _, log = git src ([ "log"; "--reverse"; "--format=%H" ] @ range @ [ "--"; file ])
+    log.Split('\n', StringSplitOptions.RemoveEmptyEntries) |> List.ofArray |> List.filter (ownerSigned >> not)
 
 let lp00 =
     let _, status = git src [ "status"; "--porcelain"; "--untracked-files=no" ]
@@ -155,12 +155,13 @@ let lp04 =
         fail (not (isNull manifest)) "the lock names no scope manifest that exists"
         @ fail (isNull manifest || str manifest "scopeSha256" = str (node lock "scope") "scopeSha256") $"""the scope manifest has scopeSha256 {str manifest "scopeSha256"}, the lock pins {str (node lock "scope") "scopeSha256"}""")
 
-let approvalsMarkers = [ "APR-R10-OWNER"; "APR-V414-OWNER" ]
-let approvalsUnsigned =
-    approvalsMarkers |> List.collect (unsignedChanges approvalsRel) |> List.distinct
-/// The approvals that count: by the operator, in a file whose every change since the first Rehearsal 010 or v4.1.4
-/// record is owner-signed. An unsigned change anywhere in that history voids them all (an in-place edit, a reused
-/// id or an appended change cannot be told apart from the owner's own).
+/// The last change of the approvals file before Rehearsal 010 (APR-V412-OWNER-3, the owner's v4.1.2 approval): every
+/// later change must be owner-signed, whatever it adds (an approval id, a decision id or an edit).
+let approvalsBaseline = "55f2467f5ff7f39f8216d2ba291dbeb58b506a5f"
+let approvalsUnsigned = unsignedChanges approvalsRel approvalsBaseline
+/// The approvals that count: by the operator, in a file whose every change since the baseline is owner-signed. An
+/// unsigned change voids them all (an in-place edit, a reused id or an appended change cannot be told apart from the
+/// owner's own).
 let ownerApprovals =
     let approvals = json (path approvalsRel) |> Option.toObj
     if not approvalsUnsigned.IsEmpty then [] else
@@ -263,6 +264,8 @@ let lp08 =
         | Some id ->
             let code, metaText = run src gh [ "run"; "view"; id; "--repo"; indyInitRepo; "--json"; "workflowName,headBranch,event,conclusion,headSha" ]
             if code <> 0 then [ $"gh run view {id} failed: {metaText}" ] else
+            let _, wfPath = run src gh [ "api"; $"repos/{indyInitRepo}/actions/runs/{id}"; "--jq"; ".path" ]
+            if wfPath <> ".github/workflows/live-provider-preflight.yml" then [ $"run {id} is of workflow file {wfPath}, not .github/workflows/live-provider-preflight.yml" ] else
             let dir = tempDir "live"
             let dcode, dout = run src gh [ "run"; "download"; id; "--repo"; indyInitRepo; "--dir"; dir ]
             let find name = if Directory.Exists dir then Directory.EnumerateFiles(dir, name, SearchOption.AllDirectories) |> Seq.tryHead else None
@@ -280,11 +283,12 @@ let lp09 =
     let judged (meta: JsonNode) (tsv: string) =
         let headSha = str meta "headSha"
         let ancestor = headSha <> "" && fst (git src [ "merge-base"; "--is-ancestor"; headSha; "HEAD" ]) = 0
-        let unchanged = ancestor && fst (git src [ "diff"; "--quiet"; headSha; "HEAD"; "--"; "tools"; "verification" ]) = 0
+        let unchanged = ancestor && fst (git src [ "diff"; "--quiet"; headSha; "HEAD"; "--"; "tools"; "verification"; ".github/workflows/preflight-tooling.yml" ]) = 0
         let rows = File.ReadAllLines tsv |> Array.skip 1 |> Array.filter (fun l -> l.Trim() <> "") |> List.ofArray
         let validated = rows |> List.filter (fun l -> l.EndsWith "VALIDATED") |> List.map (fun l -> l.Split('\t').[0]) |> Set.ofList
         let missing = Set.difference defined validated
         fail (str meta "workflowName" = "Preflight tooling") $"""run is workflow "{str meta "workflowName"}", not "Preflight tooling" """
+        @ fail (str meta "headBranch" = "main") $"""run is on {str meta "headBranch"}, not main"""
         @ fail (str meta "conclusion" = "success") $"""run concluded {str meta "conclusion"}"""
         @ fail ancestor $"the run's commit {headSha} is not in this history"
         @ fail (not ancestor || unchanged) $"the tools or the verification assets changed since the run's commit {headSha}: use a run of this tree"
@@ -296,6 +300,8 @@ let lp09 =
         | Some id ->
             let code, metaText = run src gh [ "run"; "view"; id; "--repo"; indyInitRepo; "--json"; "workflowName,headBranch,event,conclusion,headSha" ]
             if code <> 0 then [ $"gh run view {id} failed: {metaText}" ] else
+            let _, wfPath = run src gh [ "api"; $"repos/{indyInitRepo}/actions/runs/{id}"; "--jq"; ".path" ]
+            if wfPath <> ".github/workflows/preflight-tooling.yml" then [ $"run {id} is of workflow file {wfPath}, not .github/workflows/preflight-tooling.yml" ] else
             let dir = tempDir "adversarial"
             let dcode, dout = run src gh [ "run"; "download"; id; "--repo"; indyInitRepo; "--name"; "r10-adversarial"; "--dir"; dir ]
             let tsv = if Directory.Exists dir then Directory.EnumerateFiles(dir, "cases.tsv", SearchOption.AllDirectories) |> Seq.tryHead else None

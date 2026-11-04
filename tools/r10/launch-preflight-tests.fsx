@@ -113,17 +113,20 @@ let fixture (name: string) (edit: Fixture -> unit) (extraArgs: Fixture -> string
     write (Path.Combine(f.Runs, "4242", "live-provider-preflight", "journey-results.json"))
         ($"{{\"schema\":\"indy-init.journey-results/1\",\"candidate\":\"fixture-{h1}\",\"provider\":{{\"mode\":\"github\",\"baseUrl\":\"https://api.github.com\"}},\"results\":[" + String.Join(",", rows) + "]}\n")
     write (Path.Combine(f.Runs, "4242", "live-provider-preflight", "run-info.json")) ($"{{\"lock\":\"kickoff/rehearsal-010/toolchain.lock.json\",\"sha\":\"{h1}\",\"testRepository\":{testRepository}}}\n")
+    write (Path.Combine(f.Runs, "path-4242")) ".github/workflows/live-provider-preflight.yml\n"
+    write (Path.Combine(f.Runs, "path-777")) ".github/workflows/preflight-tooling.yml\n"
     write (Path.Combine(f.Runs, "run-777.json")) $"{{\"workflowName\":\"Preflight tooling\",\"headBranch\":\"main\",\"event\":\"push\",\"conclusion\":\"success\",\"headSha\":\"{h1}\"}}\n"
     write (Path.Combine(f.Runs, "777", "r10-adversarial", "adv-evidence", "cases.tsv")) "case\ttitle\tverdict\nC01\tzero tests\tVALIDATED\nC02\tgate\tVALIDATED\n"
     let stub =
         [ @"#!/bin/sh"
-          @"# gh stand-in (fixture). api: GitHub's verdict on a commit (signed by the owner unless authored otherwise or marked);"
-          @"# run view: a run's metadata; run download: a run's artifact."
+          @"# gh stand-in (fixture). api: GitHub's verdict on a commit (valid, committer = git's committer name, unless marked"
+          @"# [unsigned] or carrying an agent trailer) or a run's workflow file; run view: a run's metadata; run download: its artifact."
           @"if [ ""$1"" = api ]; then"
+          @"  case ""$2"" in */actions/runs/*) cat '@RUNS@'/path-${2##*/} 2>/dev/null || exit 1; exit 0 ;; esac"
           @"  c=${2##*/}; msg=$(git -C '@INDY@' show -s --format=%B ""$c"" 2>/dev/null) || exit 1"
-          @"  who=$(git -C '@INDY@' show -s --format=%an ""$c"")"
+          @"  committer=$(git -C '@INDY@' show -s --format=%cn ""$c"")"
           @"  case ""$msg"" in *Claude-Session:*|*'[unsigned]'*) v=false ;; *) v=true ;; esac"
-          @"  printf '[%s,""%s"",""""]\n' ""$v"" ""$who""; exit 0"
+          @"  printf '[%s,""valid"",""%s"",""""]\n' ""$v"" ""$committer""; exit 0"
           @"fi"
           @"case ""$1 $2"" in"
           @"  ""run view"") cat '@RUNS@'/run-$3.json 2>/dev/null || exit 1 ;;"
@@ -170,6 +173,15 @@ let cases =
       case "agent-reuses-an-approval-id" "LP-05" (fun f ->
           replaceIn (approvals f) "]}]}" "]},{\"id\":\"APR-R10-OWNER-1\",\"authority\":{\"kind\":\"operator\",\"id\":\"kemiller2002\"},\"changes\":[{\"decision_id\":\"ODR-R10-18\",\"action\":\"decide\",\"option\":\"A\",\"pins\":[]}]}]}"
           agentCommitPush f "Owner decisions")
+      case "agent-signed-commit-with-the-owner-as-author" "LP-05" (fun f ->
+          // signed and verified, but by the agent's own key: GitHub reports the agent as committer
+          replaceIn (approvals f) "\"decision_id\":\"ODR-R10-05\",\"action\":\"decide\",\"option\":\"A\"" "\"decision_id\":\"ODR-R10-05\",\"action\":\"decide\",\"option\":\"A\" "
+          git f.Indy [ "add"; "-A" ] |> ignore
+          gitAs "claude" f.Indy [ "commit"; "-q"; "--author"; "kemiller2002 <kemiller2002@example.invalid>"; "-m"; "Owner decisions" ] |> ignore
+          git f.Indy [ "push"; "-q"; "origin"; "main" ] |> ignore)
+      case "record-planted-under-another-id" "LP-05" (fun f ->
+          replaceIn (approvals f) "]}]}" "]},{\"id\":\"APR-X-1\",\"authority\":{\"kind\":\"operator\",\"id\":\"kemiller2002\"},\"changes\":[{\"decision_id\":\"ODR-R10-18\",\"action\":\"decide\",\"option\":\"A\",\"pins\":[]}]}]}"
+          agentCommitPush f "decisions")
       case "duplicate-approval-id-even-if-signed" "LP-05" (fun f ->
           replaceIn (approvals f) "]}]}" "]},{\"id\":\"APR-R10-OWNER-1\",\"authority\":{\"kind\":\"operator\",\"id\":\"kemiller2002\"},\"changes\":[]}]}"
           commitPush f "Owner decisions")
@@ -190,6 +202,7 @@ let cases =
       { case "absent-credential-no-live-run" "LP-08" ignore with Args = without "--live-run" }
       case "live-run-against-a-double" "LP-08" (fun f -> replaceIn (liveResults f) "https://api.github.com" "http://127.0.0.1:4610")
       case "live-run-on-a-branch" "LP-08" (fun f -> replaceIn (Path.Combine(f.Runs, "run-4242.json")) "\"headBranch\":\"main\"" "\"headBranch\":\"agent-branch\"")
+      case "live-run-of-another-workflow-file" "LP-08" (fun f -> write (Path.Combine(f.Runs, "path-4242")) ".github/workflows/lookalike.yml\n")
       case "live-run-failed" "LP-08" (fun f -> replaceIn (Path.Combine(f.Runs, "run-4242.json")) "\"conclusion\":\"success\"" "\"conclusion\":\"failure\"")
       case "live-run-of-another-commit" "LP-08" (fun f -> replaceIn (liveResults f) "\"candidate\":\"fixture-" "\"candidate\":\"fixture-0")
       case "live-run-before-the-journeys-changed" "LP-08" (fun f -> write (Path.Combine(f.Indy, "verification/journeys/j1.spec.mjs")) "// changed\n"; commitPush f "journeys")
@@ -198,6 +211,8 @@ let cases =
       case "duplicate-journey-row-hides-a-failure" "LP-08" (fun f -> replaceIn (liveResults f) "{\"journey\":\"J3\",\"engine\":\"webkit\",\"status\":\"passed\"}" "{\"journey\":\"J3\",\"engine\":\"webkit\",\"status\":\"passed\"},{\"journey\":\"J3\",\"engine\":\"webkit\",\"status\":\"failed\"}")
       // LP-09: the adversarial suite, from its CI run
       { case "no-adversarial-run" "LP-09" ignore with Args = without "--adversarial-run" }
+      case "adversarial-run-of-another-workflow-file" "LP-09" (fun f -> write (Path.Combine(f.Runs, "path-777")) ".github/workflows/lookalike.yml\n")
+      case "adversarial-run-on-a-branch" "LP-09" (fun f -> replaceIn (Path.Combine(f.Runs, "run-777.json")) "\"headBranch\":\"main\"" "\"headBranch\":\"agent-branch\"")
       case "adversarial-run-failed" "LP-09" (fun f -> replaceIn (Path.Combine(f.Runs, "run-777.json")) "\"conclusion\":\"success\"" "\"conclusion\":\"failure\"")
       case "adversarial-case-not-validated" "LP-09" (fun f -> replaceIn (Path.Combine(f.Runs, "777", "r10-adversarial", "adv-evidence", "cases.tsv")) "C02\tgate\tVALIDATED" "C02\tgate\tFAILED")
       case "adversarial-case-missing" "LP-09" (fun f -> replaceIn (Path.Combine(f.Runs, "777", "r10-adversarial", "adv-evidence", "cases.tsv")) "C02\tgate\tVALIDATED\n" "")
