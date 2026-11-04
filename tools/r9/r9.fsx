@@ -994,25 +994,22 @@ let checkSequencing () =
     match firstAdding ".echelon/r9-governance.json" with
     | None -> Unusable "no commit adds .echelon/r9-governance.json: the repository was not bootstrapped under r9 governance"
     | Some bootstrap ->
-        let initCheckpoint = firstAdding checkpointPath
+        let checkpoint = firstAdding checkpointPath
         let isAncestor (a: string) (b: string) = fst (git target [ "merge-base"; "--is-ancestor"; a; b ]) = 0
-        // #102: with --scope-manifest, implementation is authorized from the later of the two checkpoints (each must
-        // exist); without it, from the initialization checkpoint alone.
+        let _, revs = git target [ "rev-list"; "--reverse"; "HEAD" ]
+        // With --scope-manifest (Rehearsal 010 on), implementation is authorized only after both checkpoints: the
+        // initialization checkpoint and the scope checkpoint (#102). Each commit is judged by ancestry, as above.
         let scopeManifest = opt "--scope-manifest" |> Option.map readJson
         let scopeCheckpoint = scopeManifest |> Option.bind (fun _ -> firstAdding scopeCheckpointPath)
-        let checkpoint =
-            match initCheckpoint, scopeCheckpoint, scopeManifest with
-            | Some c, Some sc, Some _ -> Some(if isAncestor c sc then sc else c)
-            | Some _, None, Some _ -> None
-            | Some c, _, None -> Some c
-            | None, _, _ -> None
-        // #101 (review): every commit of HEAD's history is judged by ancestry, not by a range, so implementation on a
-        // branch forked before authorization and merged later is still unauthorized; a merge is judged by what it
-        // changes beyond its parents (--cc: an evil merge or a conflict resolution).
-        let _, revs = git target [ "rev-list"; "--reverse"; "HEAD" ]
+        let scopeAuthorizes (c: string) =
+            match scopeManifest, scopeCheckpoint with
+            | None, _ -> true
+            | Some _, Some sc -> c <> sc && isAncestor sc c
+            | Some _, None -> false
         let violations =
             lines revs
             |> List.choose (fun c ->
+                // A merge is judged by what it changes beyond its parents (--cc: an evil merge or a conflict resolution).
                 let _, parents = git target [ "rev-list"; "--parents"; "-n"; "1"; c ]
                 let isMerge = (lines parents |> List.head).Split(' ').Length > 2
                 let _, files =
@@ -1021,22 +1018,16 @@ let checkSequencing () =
                 let impl = lines files |> List.filter isImplementationPath
                 let authorized =
                     c = bootstrap
-                    || (match checkpoint with
-                        | Some ck -> c <> ck && isAncestor ck c
-                        | None -> false)
+                    || ((match checkpoint with
+                         | Some ck -> c <> ck && isAncestor ck c
+                         | None -> false)
+                        && scopeAuthorizes c)
                 if impl.IsEmpty || authorized then None
                 else
                     let _, subject = git target [ "log"; "-1"; "--format=%s"; c ]
                     Some(c, subject.Trim(), impl))
-        // The two checkpoints must lie on one line of history: a scope checkpoint on a side branch, merged after
-        // implementation was committed on main, would otherwise let the earlier one authorize it (review round 6).
-        let orderCauses =
-            match initCheckpoint, scopeCheckpoint with
-            | Some c, Some sc when not (isAncestor c sc) && not (isAncestor sc c) ->
-                [ $"the scope checkpoint {sc.Substring(0, 12)} and the initialization checkpoint {c.Substring(0, 12)} are on different branches: neither precedes the other, so neither authorizes implementation" ]
-            | _ -> []
-        let initCauses =
-            match initCheckpoint with
+        let checkpointCauses =
+            match checkpoint with
             // Before authorization a repository may hold only its bootstrap: no checkpoint is a cause only once
             // implementation has been committed without one.
             | None when violations.IsEmpty -> []
@@ -1048,7 +1039,6 @@ let checkSequencing () =
                    let _, recordedText = git target [ "show"; c + ":" + checkpointPath ]
                    let recorded = try str (JsonNode.Parse recordedText) "authorizedAtCommit" with _ -> ""
                    check (recorded = parent.Trim()) $"the checkpoint records authorization at {recorded}, but it was committed on top of {parent.Trim()}")
-        let checkpointCauses = orderCauses @ initCauses
         let scopeCauses =
             match scopeManifest with
             | None -> []
@@ -1057,7 +1047,8 @@ let checkSequencing () =
                 | None when violations.IsEmpty && (firstAdding checkpointPath).IsNone -> []
                 | None -> [ $"no scope checkpoint ({scopeCheckpointPath}): the approved scope was never checkpointed (requirements-compiler scope checkpoint)" ]
                 | Some sc ->
-                    let recorded = str (readJson (Path.Combine(target, scopeCheckpointPath))) "scopeSha256"
+                    let _, recordedText = git target [ "show"; $"{sc}:{scopeCheckpointPath}" ]
+                    let recorded = try str (JsonNode.Parse recordedText) "scopeSha256" with _ -> ""
                     let expected = str manifest "scopeSha256"
                     // Praxis at the scope checkpoint commit: backlog items titled "[ID] ..." or with that id
                     // (.ros/work/queue.json) and begun work items (.ros/context/current.json).
@@ -1087,7 +1078,7 @@ let checkSequencing () =
         let causes =
             checkpointCauses
             @ scopeCauses
-            @ (violations |> List.map (fun (c, s, files) -> $"process violation: {c.Substring(0, 12)} \"{s}\" changed {files.Length} implementation file(s) before implementation was authorized"))
+            @ (violations |> List.map (fun (c, s, files) -> $"process violation: {c.Substring(0, 12)} \"{s}\" changed {files.Length} implementation file(s) without authorization"))
         if causes.IsEmpty then
             match checkpoint with
             | Some c -> Pass [ $"bootstrap {bootstrap.Substring(0, 12)}, checkpoint {c.Substring(0, 12)}: no implementation before authorization" ]

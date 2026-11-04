@@ -265,32 +265,6 @@ write (Path.Combine(early, ".echelon", "r9-initialization-checkpoint.json")) $""
 commitAll early "checkpoint after the fact" |> ignore
 r9case "check-sequencing-reports-implementation-before-authorization" [ 4 ] [ "process violation:"; "implement before authorizing" ] [ "check-sequencing"; "--target"; early ] early |> ignore
 
-// Implementation on a branch forked before the checkpoint and merged after it is still unauthorized.
-let branchy = Path.Combine(work, "branchy")
-Directory.CreateDirectory branchy |> ignore
-git branchy [ "init"; "-q"; "-b"; "main" ] |> ignore
-write (Path.Combine(branchy, ".echelon", "r9-governance.json")) "{}\n"
-let branchyBoot = commitAll branchy "T0 bootstrap"
-git branchy [ "checkout"; "-q"; "-b"; "early-work" ] |> ignore
-write (Path.Combine(branchy, "src", "A.fs")) "module A\n"
-commitAll branchy "implementation on a branch before authorization" |> ignore
-git branchy [ "checkout"; "-q"; "main" ] |> ignore
-write (Path.Combine(branchy, ".echelon", "r9-initialization-checkpoint.json")) $"""{{"authorizedAtCommit":"{branchyBoot}"}}"""
-commitAll branchy "checkpoint" |> ignore
-git branchy [ "merge"; "-q"; "--no-ff"; "-m"; "merge early work"; "early-work" ] |> ignore
-r9case "check-sequencing-refuses-a-pre-checkpoint-branch-merged-later" [ 4 ] [ "implementation on a branch before authorization" ] [ "check-sequencing"; "--target"; branchy ] branchy |> ignore
-let inCheckpoint = Path.Combine(work, "in-checkpoint")
-Directory.CreateDirectory inCheckpoint |> ignore
-git inCheckpoint [ "init"; "-q"; "-b"; "main" ] |> ignore
-write (Path.Combine(inCheckpoint, "src", "Pre.fs")) "module Pre\n"
-commitAll inCheckpoint "implementation before governance" |> ignore
-write (Path.Combine(inCheckpoint, ".echelon", "r9-governance.json")) "{}\n"
-let icBoot = commitAll inCheckpoint "T0 bootstrap"
-write (Path.Combine(inCheckpoint, ".echelon", "r9-initialization-checkpoint.json")) $"""{{"authorizedAtCommit":"{icBoot}"}}"""
-write (Path.Combine(inCheckpoint, "src", "Smuggled.fs")) "module Smuggled\n"
-commitAll inCheckpoint "checkpoint carrying implementation" |> ignore
-r9case "check-sequencing-refuses-implementation-before-governance-and-in-the-checkpoint" [ 4 ] [ "implementation before governance"; "checkpoint carrying implementation" ] [ "check-sequencing"; "--target"; inCheckpoint ] inCheckpoint |> ignore
-
 // The scope checkpoint (#102, decision 3): with --scope-manifest, check-sequencing also requires the committed,
 // immutable scope checkpoint with the manifest's scopeSha256 and every work item in Praxis, and implementation is
 // authorized only from the later of the two checkpoints.
@@ -355,6 +329,32 @@ File.AppendAllText(Path.Combine(good, ".echelon", "scope-checkpoint.json"), " ")
 commitAll good "agent: touch the scope checkpoint" |> ignore
 r9case "check-sequencing-refuses-an-edited-scope-checkpoint" [ 4 ] [ "the scope checkpoint is immutable" ] (sequencingWithScope good) good |> ignore
 
+// Implementation on a branch forked before the checkpoint and merged after it is still unauthorized.
+let branchy = Path.Combine(work, "branchy")
+Directory.CreateDirectory branchy |> ignore
+git branchy [ "init"; "-q"; "-b"; "main" ] |> ignore
+write (Path.Combine(branchy, ".echelon", "r9-governance.json")) "{}\n"
+let branchyBoot = commitAll branchy "T0 bootstrap"
+git branchy [ "checkout"; "-q"; "-b"; "early-work" ] |> ignore
+write (Path.Combine(branchy, "src", "A.fs")) "module A\n"
+commitAll branchy "implementation on a branch before authorization" |> ignore
+git branchy [ "checkout"; "-q"; "main" ] |> ignore
+write (Path.Combine(branchy, ".echelon", "r9-initialization-checkpoint.json")) $"""{{"authorizedAtCommit":"{branchyBoot}"}}"""
+commitAll branchy "checkpoint" |> ignore
+git branchy [ "merge"; "-q"; "--no-ff"; "-m"; "merge early work"; "early-work" ] |> ignore
+r9case "check-sequencing-refuses-a-pre-checkpoint-branch-merged-later" [ 4 ] [ "implementation on a branch before authorization" ] [ "check-sequencing"; "--target"; branchy ] branchy |> ignore
+let inCheckpoint = Path.Combine(work, "in-checkpoint")
+Directory.CreateDirectory inCheckpoint |> ignore
+git inCheckpoint [ "init"; "-q"; "-b"; "main" ] |> ignore
+write (Path.Combine(inCheckpoint, "src", "Pre.fs")) "module Pre\n"
+commitAll inCheckpoint "implementation before governance" |> ignore
+write (Path.Combine(inCheckpoint, ".echelon", "r9-governance.json")) "{}\n"
+let icBoot = commitAll inCheckpoint "T0 bootstrap"
+write (Path.Combine(inCheckpoint, ".echelon", "r9-initialization-checkpoint.json")) $"""{{"authorizedAtCommit":"{icBoot}"}}"""
+write (Path.Combine(inCheckpoint, "src", "Smuggled.fs")) "module Smuggled\n"
+commitAll inCheckpoint "checkpoint carrying implementation" |> ignore
+r9case "check-sequencing-refuses-implementation-before-governance-and-in-the-checkpoint" [ 4 ] [ "implementation before governance"; "checkpoint carrying implementation" ] [ "check-sequencing"; "--target"; inCheckpoint ] inCheckpoint |> ignore
+
 // Review round 6: a scope checkpoint on a side branch (forked before the initialization checkpoint) merged after
 // implementation landed on main does not authorize that implementation.
 let side = scopedRepo "scope-side-branch"
@@ -365,7 +365,7 @@ commitAll side "scope checkpoint on a side branch" |> ignore
 git side [ "checkout"; "-q"; "main" ] |> ignore
 implementIn side
 git side [ "merge"; "-q"; "--no-ff"; "-m"; "merge the side scope checkpoint"; "side" ] |> ignore
-r9case "check-sequencing-refuses-checkpoints-on-different-branches" [ 4 ] [ "are on different branches" ] (sequencingWithScope side) side |> ignore
+r9case "check-sequencing-refuses-checkpoints-on-different-branches" [ 4 ] [ "process violation:" ] (sequencingWithScope side) side |> ignore
 
 // ---- 4. acceptance-status: four levels, evidence-bound -----------------------------------------------------------
 
