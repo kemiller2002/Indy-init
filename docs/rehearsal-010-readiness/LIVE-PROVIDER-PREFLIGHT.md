@@ -89,10 +89,10 @@ gh run download --repo kemiller2002/Indy-init --name live-provider-preflight-<sh
 | Both engines | Chromium and WebKit, each journey on each |
 | It is real | `provider.baseUrl` = `https://api.github.com`, `mode` = `github`; the double is not started |
 
-**After the run:** keep the artifact as governed evidence and note the run id. LP-08 fetches the run itself with `gh`. It checks that the run is this workflow, dispatched on `main` and successful, and it reads its artifact:
+**After the run:** keep the artifact as governed evidence and note the run id. LP-08 fetches the run itself with `gh`. It checks that the run is this workflow, dispatched on `main` and successful, of a commit in the history whose journeys and workflow are unchanged since, bound to that commit, and against the lock's test repository (`run-info.json`). Then it reads the artifact:
 
 ```
-dotnet fsi tools/r10/launch-preflight.fsx -- --indy-init . --live-run <run id> --competition https://github.com/kemiller2002/indy-init-rehearsal-010
+dotnet fsi tools/r10/launch-preflight.fsx -- --indy-init . --live-run <run id> --adversarial-run <Preflight tooling run id of main> --competition https://github.com/kemiller2002/indy-init-rehearsal-010
 ```
 
 ## 4. After the rehearsal

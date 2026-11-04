@@ -88,6 +88,9 @@ jobs:
         run: |
           ln -sfn "$RUNNER_TEMP/pw/node_modules" verification/journeys/node_modules
           node verification/harness/serve.mjs verification/harness/fixture-app/web 4620 & sleep 1
+          # What this run used, so launch-preflight LP-08 can compare it with the lock it judges.
+          jq -n --arg lock "${{ inputs.lock }}" --arg sha "${{ github.sha }}" --argjson repo "$(jq -c .testRepository "${{ inputs.lock }}")" \
+            '{schema: "indy-init.live-provider-run/1", lock: $lock, sha: $sha, testRepository: $repo}' > "$RUNNER_TEMP/live/run-info.json"
           (cd verification/journeys && CAUSA_JOURNEY_RESULTS="$RUNNER_TEMP/live/journey-results.json" npx playwright test)
       - name: The results are real-provider evidence
         if: always()

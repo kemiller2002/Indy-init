@@ -316,7 +316,7 @@ jobs:
           dotnet fsi tools/r9/r9.fsx -- suite-preflight --plan requirements-compiled/v4.1.4/verification-execution-plan.json --root "$RUNNER_TEMP/fx" --out "$RUNNER_TEMP/v414.json" --require-tests true
           dotnet fsi tools/r9/r9.fsx -- run-suites --plan requirements-compiled/v4.1.4/verification-execution-plan.json --root "$RUNNER_TEMP/fx" --out "$RUNNER_TEMP/runs" --require-tests true
           for f in "$RUNNER_TEMP"/runs/*/run.log; do head -2 "$f"; done
-          ! grep -l 'outcome="Failed"' "$RUNNER_TEMP"/runs/*/*.trx
+          if grep -l 'outcome="Failed"' "$RUNNER_TEMP"/runs/*/*.trx; then echo "::error::a suite test failed"; exit 1; fi
           for s in SU-OWN-BROWSER SU-BROWSER-CHROMIUM SU-BROWSER-WEBKIT SU-BROWSER-LIVE; do
             jq -e '.stats.unexpected == 0 and .stats.expected > 0' "$RUNNER_TEMP/runs/$s/results.json" || { echo "::error::$s did not pass"; exit 1; }
           done

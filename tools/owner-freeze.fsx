@@ -425,7 +425,17 @@ let decide repo dryRun (p: Package) =
                 done' && p.Name = "rehearsal-010"
                 && (recorded |> List.filter (fun c -> str c "decision_id" = str r "id") |> List.tryLast
                     |> Option.exists (fun c -> staleRecord repo c))
-            if stale then say $"""{str r "id"}: recorded, but a file it approved has changed since; asked again."""
+            if stale then
+                say $"""{str r "id"}: recorded, but a file it approved has changed since; asked again. What changed:"""
+                recorded |> List.filter (fun c -> str c "decision_id" = str r "id") |> List.tryLast
+                |> Option.iter (fun c -> items c "pins" |> List.iter (fun pin ->
+                    let path = str pin "path"
+                    let now = try sha256Hex (atMain repo path) with Stop _ -> "(missing)"
+                    if now <> str pin "sha256" || str pin "field" <> "" then
+                        say $"""    {path}: approved sha256 {str pin "sha256"}, now {now}"""
+                        if str pin "field" <> "" then say $"""      {str pin "field"} approved as {str pin "value"}"""
+                        let changes = try git repo [ "log"; "--oneline"; "-5"; "origin/main"; "--"; path ] with Stop _ -> ""
+                        changes.Split('\n', StringSplitOptions.RemoveEmptyEntries) |> Array.iter (fun l -> say $"      changed by {l}")))
             elif done' then say $"""{str r "id"}: already recorded; not asked again."""
             not done' || stale)
     if open'.IsEmpty then (say $"No open decision request in {p.Name}."; None) else
