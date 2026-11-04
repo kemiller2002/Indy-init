@@ -28,6 +28,9 @@ jobs:
   live:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    # The App secrets live in this environment, restricted to main: a workflow pushed to any other branch (an agent's
+    # included) cannot read them (LIVE-PROVIDER-PREFLIGHT.md §2).
+    environment: live-provider-preflight
     steps:
       - uses: actions/checkout@v4
         with:
@@ -61,12 +64,18 @@ jobs:
           REPO: ${{ steps.testrepo.outputs.repo }}
           BRANCH: ${{ steps.testrepo.outputs.branch }}
         run: |
-          api() { curl -sS -o /dev/null -w '%{http_code}' -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" "https://api.github.com$1"; }
-          test "$(api "/repos/$OWNER/$REPO")" = 200 || { echo "::error::the token cannot read $OWNER/$REPO"; exit 1; }
-          test "$(api "/repos/$OWNER/$REPO/branches/$BRANCH")" = 200 || { echo "::error::$OWNER/$REPO has no branch $BRANCH"; exit 1; }
-          # Least privilege: the token must not reach Indy-init (or any other repository of the owner).
-          code=$(api "/repos/${{ github.repository }}"); case "$code" in 200) echo "::error::the token can read ${{ github.repository }}: it is not scoped to the test repository"; exit 1;; esac
-          echo "token scope: $OWNER/$REPO only (Indy-init answered $code)"
+          api() { curl -sS -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" "https://api.github.com$1"; }
+          # Least privilege: the installation token lists exactly one repository, the test repository (a public
+          # repository is readable by any token, so reading Indy-init proves nothing).
+          repos=$(api "/installation/repositories" | jq -r '[.repositories[].full_name] | join(",")')
+          test "$repos" = "$OWNER/$REPO" || { echo "::error::the token reaches [$repos], not only $OWNER/$REPO"; exit 1; }
+          test "$(api "/repos/$OWNER/$REPO/branches/$BRANCH" | jq -r .name)" = "$BRANCH" || { echo "::error::$OWNER/$REPO has no branch $BRANCH"; exit 1; }
+          echo "token scope: $repos only"
+      - name: Browsers and the test runner (no credential in this step)
+        run: |
+          mkdir -p "$RUNNER_TEMP/pw" "$RUNNER_TEMP/live" && cd "$RUNNER_TEMP/pw" && npm init -y > /dev/null
+          npm install --no-audit --no-fund @playwright/test@1.63.0 axe-core@4.14.0 > /dev/null
+          npx playwright install --with-deps chromium webkit
       - name: Journeys J1-J3 against the real provider (Chromium and WebKit)
         env:
           CAUSA_PROVIDER: github
@@ -77,7 +86,6 @@ jobs:
           CAUSA_APP_URL: http://127.0.0.1:4620/
           CAUSA_CANDIDATE: fixture-${{ github.sha }}
         run: |
-          mkdir -p "$RUNNER_TEMP/pw" "$RUNNER_TEMP/live" && (cd "$RUNNER_TEMP/pw" && npm init -y > /dev/null && npm install --no-audit --no-fund @playwright/test@1.63.0 axe-core@4.14.0 > /dev/null && npx playwright install --with-deps chromium webkit)
           ln -sfn "$RUNNER_TEMP/pw/node_modules" verification/journeys/node_modules
           node verification/harness/serve.mjs verification/harness/fixture-app/web 4620 & sleep 1
           (cd verification/journeys && CAUSA_JOURNEY_RESULTS="$RUNNER_TEMP/live/journey-results.json" npx playwright test)

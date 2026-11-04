@@ -50,7 +50,7 @@
 | Tool | Owner commands | Agent use |
 |---|---|---|
 | `tools/owner-freeze.fsx` | `decide v4.1.4`, `approve v4.1.4`, `tag v4.1.4 --commit SHA`, `decide rehearsal-010`, `ratify rehearsal-010` | `status`, and any command with `--dry-run` |
-| `tools/r10/launch-preflight.fsx` | — (read-only) | LP-01..10; READY only when everything is done |
+| `tools/r10/launch-preflight.fsx` | — (read-only) | LP-00..10; READY only when everything is done |
 | `.github/workflows/live-provider-preflight.yml` | dispatch | read its artifact |
 
 **How `decide rehearsal-010` records decisions:**
@@ -86,13 +86,13 @@
 | 6 | owner | **Dokimos (ODR-RG-03).** Merge kemiller2002/dokimos#69. Then `git tag dokimos-v0.11.1 <merge commit> && git push origin dokimos-v0.11.1`, or dispatch `release.yml` with version `0.11.1` from `main`. The Release workflow publishes, with checksums and provenance attestations | `gh release view dokimos-v0.11.1 --repo kemiller2002/dokimos` lists the tool, the native CLIs and `dokimos-checksums.txt`; `gh attestation verify` passes on the tool |
 | 6a | agent | Verify the published artifacts against `dokimos-checksums.txt`. Prepare the echelon-registry PR for a new `echelon-current` set carrying Dokimos 0.11.1. Run Conditor qualification against that set | Conditor qualification PASS on the actual set |
 | 6b | owner | Approve and merge the echelon-registry PR | The set's registry commit and per-platform digests are fixed |
-| 7 | owner | **Test repository and App** (LIVE-PROVIDER-PREFLIGHT.md §2): create `kemiller2002/causa-acceptance-r10` and its App; add the two secrets to Indy-init. Create the empty competition repository `kemiller2002/indy-init-rehearsal-010` and add the two secrets there | §2's checks |
+| 7 | owner | **Test repository and App** (LIVE-PROVIDER-PREFLIGHT.md §2): create `kemiller2002/causa-acceptance-r10` and its App; add the two secrets to the Indy-init **environment** `live-provider-preflight` (deployment branch: `main` only). Create the empty competition repository `kemiller2002/indy-init-rehearsal-010` and add the two secrets there | §2's checks |
 | 8 | owner | `owner-freeze.fsx -- decide rehearsal-010 --repo Indy-init`. Answer as you selected. ODR-R10-01 is **not asked yet**: the tool says why. Merge the PR | `status`: everything recorded except ODR-R10-01 |
 | 9 | owner | If ODR-R10-02 = A: `owner-freeze.fsx -- ratify rehearsal-010 --repo Indy-init`. Merge the PR | The ratified catalog has 44 requirements; the 38 earlier ones are byte-for-byte unchanged |
 | 10 | agent | Recompile the scope manifest from the frozen v4.1.4 and the ratified catalog. Regenerate the slice manifest, the Praxis inventory and the schedule evidence. Regenerate the proposed lock (all digests, the new set, `processEvidence` with the recorded rules digest). Open a PR; you merge it | `scope preflight` PASS; the counts match §0's last column (or the middle one if ODR-R10-02 = B) |
 | 11 | owner | `owner-freeze.fsx -- decide rehearsal-010 --repo Indy-init` again. **ODR-R10-01** is now asked and shows the counts and `scopeSha256` from step 10. Approve only if they equal the agent's report. Merge the PR | `status`: ODR-R10-01 recorded |
-| 12 | owner | Dispatch the live preflight (LIVE-PROVIDER-PREFLIGHT.md §3). Download its artifact | J1–J3 × Chromium and WebKit all `passed` against `api.github.com`; the token scope check passed |
-| 13 | owner | **ODR-RG-04.** Commit `kickoff/rehearsal-010/toolchain.lock.json`: the proposed lock from step 10, with `status` set to your pin. This is your own commit; an agent never writes it | `dotnet fsi tools/r10/launch-preflight.fsx -- --indy-init Indy-init --live-evidence <artifact dir> --competition <empty competition clone>` prints **READY** |
+| 12 | owner | Dispatch the live preflight (LIVE-PROVIDER-PREFLIGHT.md §3). Download its artifact | J1–J3 × Chromium and WebKit all `passed` against `api.github.com`; the token reaches exactly the test repository. Note the run id |
+| 13 | owner | **ODR-RG-04.** Commit `kickoff/rehearsal-010/toolchain.lock.json`: the proposed lock from step 10, with `status` set to your pin. This is your own commit; an agent never writes it | `dotnet fsi tools/r10/launch-preflight.fsx -- --indy-init Indy-init --live-run <run id of step 12> --competition https://github.com/kemiller2002/indy-init-rehearsal-010` prints **READY** (from a clean clone at `origin/main`) |
 | 14 | owner | Merge kemiller2002/specula#11 (ODR-R10-17). Point Specula at the observer repository. Schedule the observer (STARTUP-INSTRUCTIONS §9) | Specula shows the observer's replay findings |
 
 Only after step 13 prints READY: FINAL-READINESS §9's launch command.

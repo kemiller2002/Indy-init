@@ -21,7 +21,7 @@ The remaining conditions are owner actions, set out as one ordered transaction i
 
 **It is not READY TO LAUNCH.** Owner actions are outstanding, and the required real-provider test has not run. Rehearsal 010 has not been started; no T0 exists.
 
-**The launch preflight** (`tools/r10/launch-preflight.fsx`) decides launch. Today it refuses, and only for owner actions: [`evidence/launch-preflight/launch-preflight-now.log`](evidence/launch-preflight/launch-preflight-now.log). Its 14 negative controls pass.
+**The launch preflight** (`tools/r10/launch-preflight.fsx`) decides launch. Today it refuses, and only for owner actions: [`evidence/launch-preflight/launch-preflight-now.log`](evidence/launch-preflight/launch-preflight-now.log). Its 24 negative controls pass.
 
 ## 1. Integrated result
 
@@ -72,8 +72,8 @@ The remaining conditions are owner actions, set out as one ordered transaction i
 | `tools/r9/tests.fsx` | {R9} |
 | `tools/r10/adversarial.fsx` | {ADV} |
 | `tools/r10/r9-replay.fsx` | {REPLAY} |
-| `tools/r10/launch-preflight-tests.fsx` | 14 of 14 (positive READY; 13 refusals, each by its target check) |
-| `tools/r10/launch-preflight.fsx` on this repository | REFUSED, for owner actions only (LP-01..08); LP-09 and LP-10 PASS |
+| `tools/r10/launch-preflight-tests.fsx` | 24 of 24 (positive READY; 23 refusals, each by its target check) |
+| `tools/r10/launch-preflight.fsx` on this repository | REFUSED, for owner actions only ({NOWREFUSED}); {NOWPASS} PASS |
 | Specula adapter on the current observer output | 6 of 6 |
 | CI on `{HEAD}` | {CI} |
 
@@ -88,7 +88,7 @@ Earlier rounds (R1–R8, slices, observer) are unchanged; see INTEGRATION-BASELI
 | Owner-decision transaction | `owner-freeze.fsx decide rehearsal-010` and `ratify rehearsal-010`; the requests in `kickoff/rehearsal-010/proposals/owner-decision-requests.json`. Each decision records the digest of what it approves; both commands refuse to write under an agent |
 | Isolated live credential (ODR-R10-09) | The Verification gate is `contents: read`. A single-repository GitHub App token is minted per job, revoked at the end, and fails closed without secrets |
 | Live-provider preflight | `.github/workflows/live-provider-preflight.yml`: owner-dispatched J1–J3 × Chromium and WebKit against `api.github.com`, with a token-scope check |
-| Launch preflight | `tools/r10/launch-preflight.fsx` (LP-01..10) and its 14 negative controls |
+| Launch preflight | `tools/r10/launch-preflight.fsx` (LP-00..10) and its 24 negative controls |
 | Topology A schedule | `tools/r10/schedule.fsx`; `evidence/schedule/` |
 | Rehearsal 010 process-evidence rules | `kickoff/rehearsal-010/process-evidence-rules.json` (proposed; ODR-R10-14) |
 
@@ -153,7 +153,7 @@ It runs in a clone of the empty competition repository `kemiller2002/indy-init-r
 ```
 cd <clone of kemiller2002/indy-init-rehearsal-010> && \
 SRC=<Indy-init checkout at the lock's governing commit> && \
-dotnet fsi "$SRC/tools/r10/launch-preflight.fsx" -- --indy-init "$SRC" --live-evidence <live-provider artifact> --competition . && \
+dotnet fsi "$SRC/tools/r10/launch-preflight.fsx" -- --indy-init "$SRC" --live-run <live-provider preflight run id> --competition https://github.com/kemiller2002/indy-init-rehearsal-010 && \
 claude -p "$(sed -n '/^> \*\*Objective/,/^$/p' "$SRC/docs/rehearsal-010-readiness/STARTUP-INSTRUCTIONS.md" | sed 's/^> //') SRC is $SRC. Follow $SRC/docs/rehearsal-010-readiness/STARTUP-INSTRUCTIONS.md."
 ```
 

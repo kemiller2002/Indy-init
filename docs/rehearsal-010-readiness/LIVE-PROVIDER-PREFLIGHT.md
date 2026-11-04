@@ -22,7 +22,7 @@ The live preflight is the real-provider positive control before launch. It runs 
 | Test repository | `kemiller2002/causa-acceptance-r10`, **private**, branch `causa-acceptance`. It holds synthetic data only and no production secrets. It is resettable: authoritative evidence lives in the governed CI artifacts, never in this repository |
 | Credential | A GitHub App installed on that one repository with **Contents: read and write** and nothing else. There is no organization-wide or all-repositories installation |
 | Token | An installation token minted per job by `actions/create-github-app-token` (pinned to v3.3.0, `64ab729a…`). It is scoped with `repositories: causa-acceptance-r10` and `permission-contents: write`, and revoked when the job ends |
-| Secrets | `CAUSA_ACCEPTANCE_APP_CLIENT_ID` and `CAUSA_ACCEPTANCE_APP_KEY`, held in **Indy-init** (this preflight) and in the **competition repository** (the Verification gate) |
+| Secrets | `CAUSA_ACCEPTANCE_APP_CLIENT_ID` and `CAUSA_ACCEPTANCE_APP_KEY`. In **Indy-init** they are held in the environment `live-provider-preflight`, restricted to `main`, so a workflow an agent pushes to a branch cannot read them. In the **competition repository** they are repository secrets for the Verification gate (residual risk below) |
 | The gate's own token | `contents: read` (it was `contents: write`). It never writes |
 
 **Who receives the token.**
@@ -38,7 +38,7 @@ The live preflight is the real-provider positive control before launch. It runs 
 - The candidate application needs a credential to persist to GitHub. That is what J1–J3 verify.
 - So candidate code running in those steps can read that token. This cannot be removed without removing real-provider verification.
 - The design bounds it instead. The exposed token can write only synthetic data in one repository, for at most one job, and is revoked at job end.
-- It cannot reach the competition repository, Indy-init, or any other repository. The preflight checks this: the token must get no `200` from Indy-init.
+- It cannot reach the competition repository, Indy-init, or any other repository. The preflight checks this: the installation lists exactly one repository.
 - The long-lived App private key is a secret of the competition repository.
 - **Residual risk:**
   - Who can obtain the key: a builder who pushes a workflow change to a branch could obtain it, because GitHub runs a branch's own workflow with the repository's secrets.
@@ -54,7 +54,7 @@ The live preflight is the real-provider positive control before launch. It runs 
    - No webhook.
    - Install it on **only** `kemiller2002/causa-acceptance-r10`.
 3. Generate a private key. Record the App's client ID.
-4. Add two Actions secrets to **kemiller2002/Indy-init** and to the **competition repository** (`indy-init-rehearsal-010`):
+4. In **kemiller2002/Indy-init**, create the environment `live-provider-preflight`, with deployment branches set to `main` only, and add the two secrets to it. In the **competition repository** (`indy-init-rehearsal-010`), add the same two secrets as repository secrets:
    - `CAUSA_ACCEPTANCE_APP_CLIENT_ID` = the client ID;
    - `CAUSA_ACCEPTANCE_APP_KEY` = the private key.
 5. Delete the downloaded key file.
@@ -80,7 +80,7 @@ gh run download --repo kemiller2002/Indy-init --name live-provider-preflight-<sh
 
 | Check | How |
 |---|---|
-| The credential works and is narrow | It reads the test repository and its branch. It must get no `200` from Indy-init |
+| The credential works and is narrow | `GET /installation/repositories` lists exactly the test repository; its branch exists |
 | Real investigation creation, and durable persistence | J1: GitHub is read directly; the investigation reopens in a fresh browser context |
 | Hypothesis and evidence relationships | J2 on the real provider, re-read in a fresh context |
 | Navigation and application structure | J3-01, J3-02 |
@@ -89,10 +89,10 @@ gh run download --repo kemiller2002/Indy-init --name live-provider-preflight-<sh
 | Both engines | Chromium and WebKit, each journey on each |
 | It is real | `provider.baseUrl` = `https://api.github.com`, `mode` = `github`; the double is not started |
 
-**After the run:** keep the artifact as governed evidence. Then check it with LP-08:
+**After the run:** keep the artifact as governed evidence and note the run id. LP-08 fetches the run itself with `gh`. It checks that the run is this workflow, dispatched on `main` and successful, and it reads its artifact:
 
 ```
-dotnet fsi tools/r10/launch-preflight.fsx -- --indy-init . --live-evidence evidence-live --competition <clone of the empty competition repository>
+dotnet fsi tools/r10/launch-preflight.fsx -- --indy-init . --live-run <run id> --competition https://github.com/kemiller2002/indy-init-rehearsal-010
 ```
 
 ## 4. After the rehearsal

@@ -141,7 +141,13 @@ jobs:
           src="$RUNNER_TEMP/indy-init"; lock="$src/$(jq -r '.toolchainLock // .lock // "kickoff/rehearsal-009/toolchain.lock.json"' .echelon/r9-governance.json)"
           echo "owner=$(jq -r '.testRepository.owner // ""' "$lock")" >> "$GITHUB_OUTPUT"
           echo "repo=$(jq -r '.testRepository.repo // ""' "$lock")" >> "$GITHUB_OUTPUT"
-          echo "isolated=$(jq -r '.testRepository.isolated // false' "$lock")" >> "$GITHUB_OUTPUT"
+          isolated=$(jq -r '.testRepository.isolated // false' "$lock")
+          echo "isolated=$isolated" >> "$GITHUB_OUTPUT"
+          # A Rehearsal 010 lock (it carries the governed catalog contract) must name an isolated test repository:
+          # live evidence is never produced with another credential.
+          if jq -e '.catalogVerification' "$lock" > /dev/null && [ "$isolated" != true ]; then
+            echo "::error::the lock names no isolated testRepository (ODR-R10-09)"; exit 1
+          fi
       - name: Test-repository credential, for that repository alone, revoked when this job ends (ODR-R10-09)
         id: testtoken
         # Fails, and so refuses the run, when the owner's App credentials are absent: live evidence is never produced

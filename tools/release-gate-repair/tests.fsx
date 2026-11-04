@@ -355,6 +355,18 @@ File.AppendAllText(Path.Combine(good, ".echelon", "scope-checkpoint.json"), " ")
 commitAll good "agent: touch the scope checkpoint" |> ignore
 r9case "check-sequencing-refuses-an-edited-scope-checkpoint" [ 4 ] [ "the scope checkpoint is immutable" ] (sequencingWithScope good) good |> ignore
 
+// Review round 6: a scope checkpoint on a side branch (forked before the initialization checkpoint) merged after
+// implementation landed on main does not authorize that implementation.
+let side = scopedRepo "scope-side-branch"
+git side [ "checkout"; "-q"; "-b"; "side"; "HEAD~1" ] |> ignore
+praxisQueue side [ "T10"; "WI-INV-START" ]
+scopeCheckpoint side "scope-1"
+commitAll side "scope checkpoint on a side branch" |> ignore
+git side [ "checkout"; "-q"; "main" ] |> ignore
+implementIn side
+git side [ "merge"; "-q"; "--no-ff"; "-m"; "merge the side scope checkpoint"; "side" ] |> ignore
+r9case "check-sequencing-refuses-checkpoints-on-different-branches" [ 4 ] [ "are on different branches" ] (sequencingWithScope side) side |> ignore
+
 // ---- 4. acceptance-status: four levels, evidence-bound -----------------------------------------------------------
 
 let ev = Path.Combine(src, "docs", "release-gate-repair", "evidence")

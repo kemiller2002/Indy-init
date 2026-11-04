@@ -1028,7 +1028,14 @@ let checkSequencing () =
                 else
                     let _, subject = git target [ "log"; "-1"; "--format=%s"; c ]
                     Some(c, subject.Trim(), impl))
-        let checkpointCauses =
+        // The two checkpoints must lie on one line of history: a scope checkpoint on a side branch, merged after
+        // implementation was committed on main, would otherwise let the earlier one authorize it (review round 6).
+        let orderCauses =
+            match initCheckpoint, scopeCheckpoint with
+            | Some c, Some sc when not (isAncestor c sc) && not (isAncestor sc c) ->
+                [ $"the scope checkpoint {sc.Substring(0, 12)} and the initialization checkpoint {c.Substring(0, 12)} are on different branches: neither precedes the other, so neither authorizes implementation" ]
+            | _ -> []
+        let initCauses =
             match initCheckpoint with
             // Before authorization a repository may hold only its bootstrap: no checkpoint is a cause only once
             // implementation has been committed without one.
@@ -1041,6 +1048,7 @@ let checkSequencing () =
                    let _, recordedText = git target [ "show"; c + ":" + checkpointPath ]
                    let recorded = try str (JsonNode.Parse recordedText) "authorizedAtCommit" with _ -> ""
                    check (recorded = parent.Trim()) $"the checkpoint records authorization at {recorded}, but it was committed on top of {parent.Trim()}")
+        let checkpointCauses = orderCauses @ initCauses
         let scopeCauses =
             match scopeManifest with
             | None -> []

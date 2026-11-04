@@ -220,7 +220,13 @@ let legitimate () : string list =
       | Error _ -> ()
       match replay manifest [ started "T9" [ "Z-999" ] ] with
       | Ok _ -> yield "progress: a requirement outside the scope was applied"
-      | Error _ -> () ]
+      | Error _ -> ()
+      // Implementation may not precede the scope checkpoint (scope order, kept beside check-sequencing).
+      let isApp (p: string) = p.StartsWith "src/"
+      if (implementationBeforeCheckpoint ".echelon/scope-checkpoint.json" isApp [ "a", [ "README.md" ]; "b", [ "src/A.fs" ]; "c", [ ".echelon/scope-checkpoint.json" ] ]).IsEmpty then
+          yield "order: application code before the checkpoint was accepted"
+      if not (implementationBeforeCheckpoint ".echelon/scope-checkpoint.json" isApp [ "a", [ "README.md" ]; "c", [ ".echelon/scope-checkpoint.json" ]; "b", [ "src/A.fs" ] ]).IsEmpty then
+          yield "order: application code after the checkpoint was refused" ]
 
 // ---- recovery: a successor continues from repository files alone ----------------------------------------------
 

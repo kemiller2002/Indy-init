@@ -290,29 +290,19 @@ jobs:
   # commands; this job also executes them (docs/rehearsal-010-readiness/INTEGRATION-REPORT.md).
   suite-commands:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
         with:
           global-json-file: global.json
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "22"
-      - name: Pinned Conditor and the echelon-current workstation (Dokimos compiles the obligations)
+      - name: Fixture trees (with and without the webkit project)
         run: |
-          dotnet fsi tools/r9/r9.fsx -- install-conditor --lock kickoff/rehearsal-009/toolchain.lock.json --dir "$RUNNER_TEMP/conditor"
-          dotnet fsi tools/r9/r9.fsx -- workstation --lock kickoff/rehearsal-009/toolchain.lock.json \
-            --conditor "$RUNNER_TEMP/conditor/conditor" --home "$RUNNER_TEMP/echelon" --target-id "indy-init-sc-${{ github.run_id }}"
-          echo "$RUNNER_TEMP/echelon/.local/bin" >> "$GITHUB_PATH"
-      - name: Fixture tree and the v4.1.4 obligations
-        run: |
-          git config --global user.name ci && git config --global user.email ci@example.invalid
           dotnet fsi tools/r9/r9.fsx -- suite-fixture --out "$RUNNER_TEMP/fx"
+          dotnet fsi tools/r9/r9.fsx -- suite-fixture --out "$RUNNER_TEMP/fx-nowebkit" --without-webkit true
           (cd "$RUNNER_TEMP/fx" && npm install --no-audit --no-fund && npx playwright install --with-deps chromium webkit)
-          dokimos verification compile --indy-execution-plan requirements-compiled/v4.1.4/verification-execution-plan.json \
-            --indy-verification-plan requirements-compiled/v4/verification-plan.json --out "$RUNNER_TEMP/obligations.json"
-      - name: Every v4.1.4 suite command lists tests and runs them, WebKit included
+          cp -r "$RUNNER_TEMP/fx/node_modules" "$RUNNER_TEMP/fx-nowebkit/"
+      - name: The frozen v4.1.2 commands are refused (MSB1008), and a missing webkit project is refused
         run: |
           set +e
           dotnet fsi tools/r9/r9.fsx -- suite-preflight --plan requirements-compiled/v4.1.2/verification-execution-plan.json --root "$RUNNER_TEMP/fx" --out "$RUNNER_TEMP/v412.json" --require-tests true
@@ -330,17 +320,7 @@ jobs:
           for s in SU-OWN-BROWSER SU-BROWSER-CHROMIUM SU-BROWSER-WEBKIT SU-BROWSER-LIVE; do
             jq -e '.stats.unexpected == 0 and .stats.expected > 0' "$RUNNER_TEMP/runs/$s/results.json" || { echo "::error::$s did not pass"; exit 1; }
           done
-      - name: Publish the suite-command evidence
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: suite-commands
-          path: |
-            ${{ runner.temp }}/preflight.json
-            ${{ runner.temp }}/runs
 
-  # Rehearsal 010 readiness: the 18 adversarial cases (attack, positive control, protection removed) and the
-  # Rehearsal 009 read-only replay (docs/rehearsal-010-readiness/ADVERSARIAL-VALIDATION.md, R9-ADVERSARIAL-REPLAY.md).
   r10-adversarial:
     runs-on: ubuntu-latest
     timeout-minutes: 45

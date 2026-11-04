@@ -39,13 +39,14 @@ let raw =
 /// Minutes per mandatory obligation over the DAG-estimated slices that carry obligations.
 let rate =
     let carrying = raw |> List.choose (fun (_, _, _, e, o) -> match e with Some m when o > 0 -> Some(m, float o) | _ -> None)
-    (carrying |> List.sumBy fst) / (carrying |> List.sumBy snd)
+    // No DAG-estimated slice that carries obligations: no rate can be derived (every unestimated slice gets the default).
+    if carrying.IsEmpty then nan else (carrying |> List.sumBy fst) / (carrying |> List.sumBy snd)
 let defaultMinutes = opt "--default-minutes" |> Option.map float |> Option.defaultValue 20.0
 let slices =
     raw |> List.map (fun (id, b, d, e, o) ->
         match e with
         | Some m -> { Id = id; Boundary = b; Deps = d; Minutes = m; Source = "execution-dag"; Obligations = o }
-        | None when o > 0 -> { Id = id; Boundary = b; Deps = d; Minutes = Math.Ceiling(rate * float o); Source = "derived"; Obligations = o }
+        | None when o > 0 && not (Double.IsNaN rate) -> { Id = id; Boundary = b; Deps = d; Minutes = Math.Ceiling(rate * float o); Source = "derived"; Obligations = o }
         | None -> { Id = id; Boundary = b; Deps = d; Minutes = defaultMinutes; Source = "default"; Obligations = o })
 let byId = slices |> List.map (fun s -> s.Id, s) |> Map.ofList
 

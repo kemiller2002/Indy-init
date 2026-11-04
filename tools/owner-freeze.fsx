@@ -334,10 +334,17 @@ let scopeNotCurrent repo =
     elif successorChosen && not (successorIn ()) then Some "ODR-R10-02 chose the successor, which is not ratified yet (ratify rehearsal-010)"
     else None
 
-let decideR10 repo (request: JsonNode) =
+let decideR10 repo (earlier: (JsonNode * Answer) list) (request: JsonNode) =
     let tag = str request "requiresTag"
+    // An answer given earlier in this run changes what a later request pins: ODR-R10-02 = A means the scope is
+    // recompiled after ratification, so ODR-R10-01 waits for the next run.
+    let successorChosenNow =
+        earlier |> List.exists (fun (r, a) -> str r "id" = "ODR-R10-02" && (match a with Select c -> str c "option" = "A" | _ -> false))
     if tag <> "" && git repo [ "tag"; "-l"; tag ] = "" then
         say $"  Not asked yet: it needs the tag {tag} first (what it pins changes until then). It stays pending."
+        Skip
+    elif str request "requiresCurrentScope" = "true" && successorChosenNow then
+        say "  Not asked yet: ODR-R10-02 was just answered A, so the scope is recompiled after ratification. It stays pending."
         Skip
     elif str request "requiresCurrentScope" = "true" && (scopeNotCurrent repo).IsSome then
         say $"  Not asked yet: {(scopeNotCurrent repo).Value}. It stays pending."
@@ -358,10 +365,10 @@ let decideR10 repo (request: JsonNode) =
             Select change
         | answer -> answer
 
-let decideOne repo (p: Package) (request: JsonNode) =
+let decideOne repo (p: Package) (earlier: (JsonNode * Answer) list) (request: JsonNode) =
     show request
     match str request "kind" with
-    | _ when p.Name = "rehearsal-010" -> decideR10 repo request
+    | _ when p.Name = "rehearsal-010" -> decideR10 repo earlier request
     | "obligation-amendment" -> decideAmendment request
     | "scope-or-topology" -> decideTopology request
     | "scope" -> decideOption "decide" request
@@ -392,6 +399,17 @@ let changesOf (answers: (JsonNode * Answer) list) : JsonNode list =
             | _ -> None)
     amendments @ decisions
 
+/// Whether a recorded decision pinned a file whose digest (or pinned field) at origin/main is no longer what it approved.
+let staleRecord repo (change: JsonNode) =
+    items change "pins"
+    |> List.exists (fun pin ->
+        let path = str pin "path"
+        let bytes = try Some(atMain repo path) with Stop _ -> None
+        match bytes with
+        | None -> true
+        | Some b when str pin "field" <> "" -> (match (parse b)[str pin "field"] with null -> "" | n -> n.ToJsonString()) <> str pin "value"
+        | Some b -> sha256Hex b <> str pin "sha256")
+
 let decide repo dryRun (p: Package) =
     prepare repo
     let approvals = approvalsAtMain repo
@@ -401,11 +419,18 @@ let decide repo dryRun (p: Package) =
         |> List.filter (fun r -> str r "kind" <> "package-approval")
         |> List.filter (fun r ->
             let done' = isRecorded recorded r
-            if done' then say $"""{str r "id"}: already recorded; not asked again."""
-            not done')
+            // A Rehearsal 010 decision whose pinned file has changed since it was recorded is asked again; the
+            // later record supersedes it (the lock and launch-preflight read the latest).
+            let stale =
+                done' && p.Name = "rehearsal-010"
+                && (recorded |> List.filter (fun c -> str c "decision_id" = str r "id") |> List.tryLast
+                    |> Option.exists (fun c -> staleRecord repo c))
+            if stale then say $"""{str r "id"}: recorded, but a file it approved has changed since; asked again."""
+            elif done' then say $"""{str r "id"}: already recorded; not asked again."""
+            not done' || stale)
     if open'.IsEmpty then (say $"No open decision request in {p.Name}."; None) else
     say $"{open'.Length} open request(s) in {p.Name}. Each answer is yours; skip leaves a request pending."
-    let answers = open' |> List.map (fun r -> r, decideOne repo p r)
+    let answers = open' |> List.fold (fun acc r -> acc @ [ r, decideOne repo p acc r ]) []
     let changes = changesOf answers
     rule ()
     if changes.IsEmpty then (say "Nothing to record: every request was skipped."; None) else

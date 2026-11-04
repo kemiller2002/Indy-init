@@ -16,7 +16,7 @@
   - `release-gate-repair`
   - `r9-readiness-gates`
   - `suite-commands` (WebKit)
-  - `r10-adversarial`: Chromium and WebKit; the 36 cases; the fixture journeys and design contract; the Rehearsal 009 replay; the 14 launch-preflight controls; the schedule evidence
+  - `r10-adversarial`: Chromium and WebKit; the 36 cases; the fixture journeys and design contract; the Rehearsal 009 replay; the 24 launch-preflight controls; the schedule evidence
 - [ ] Independent review: no open blocking finding (FINAL-READINESS §5).
 - [ ] Frozen packages unchanged (CI `frozen-v4` and the offline suite).
 
@@ -43,9 +43,10 @@
 
 - [ ] This prints **READY**:
   ```
-  dotnet fsi tools/r10/launch-preflight.fsx -- --indy-init Indy-init --live-evidence <live-provider artifact> --competition <clone of indy-init-rehearsal-010>
+  dotnet fsi tools/r10/launch-preflight.fsx -- --indy-init Indy-init --live-run <live-provider preflight run id> --competition https://github.com/kemiller2002/indy-init-rehearsal-010
   ```
-  LP-01..10 cover:
+  LP-00..10 cover:
+  - a clean Indy-init checkout equal to `origin/main`;
   - the lock;
   - v4.1.4 and its tag;
   - every contract digest;
