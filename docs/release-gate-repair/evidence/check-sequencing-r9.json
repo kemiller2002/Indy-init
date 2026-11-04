@@ -1,0 +1,74 @@
+{
+  "schema": "indy-init.r9-sequencing/1",
+  "bootstrapCommit": "8001e7c0493ee457c6a93086dde08a67e3fe0cf5",
+  "checkpointCommit": "",
+  "processViolations": [
+    {
+      "commit": "edde38cb7ea541f12e928f7a467071038d7a405b",
+      "subject": "Causa content application: F# domain, GitHub persistence, Limen engine on .NET WebAssembly, page",
+      "implementationFiles": 26,
+      "examples": [
+        "Directory.Build.props",
+        "Directory.Packages.props",
+        "build.fsx",
+        "package-lock.json",
+        "package.json"
+      ]
+    },
+    {
+      "commit": "6ee228151b44c275164f71832638ab8d7b2c2c9e",
+      "subject": "Requirement probes: content E2E, field validation; manifest compiled from the pinned catalog",
+      "implementationFiles": 9,
+      "examples": [
+        "playwright.config.js",
+        "src/Causa.App/Views/Investigation.fs",
+        "tests/browser/requirements/content-e2e.spec.mjs",
+        "tests/browser/requirements/content-validation.spec.mjs",
+        "tests/browser/smoke.spec.js"
+      ]
+    },
+    {
+      "commit": "8e663bdcbca721236e2cfd3163b2751827a24619",
+      "subject": "Negative scenarios: missing statement, empty content, invalid URL and target, duplicates, save/auth failure, conflict, malformed reload",
+      "implementationFiles": 3,
+      "examples": [
+        "src/Causa.App/Update.fs",
+        "tests/browser/scenarios/content-negative.spec.mjs",
+        "web/index.html"
+      ]
+    },
+    {
+      "commit": "f1e0be78259ba462830243c5f87105c0929d71ba",
+      "subject": "Mobile and conclusion suites; fault probes; a11y fixes (contrast, aria-controls)",
+      "implementationFiles": 6,
+      "examples": [
+        "playwright.config.js",
+        "tests/browser/requirements/content-e2e.spec.mjs",
+        "tests/browser/requirements/content-mobile.spec.mjs",
+        "tests/browser/scenarios/content-conclusion.spec.mjs",
+        "web/causa.css"
+      ]
+    },
+    {
+      "commit": "1f2206bf7d12acee1da73764f8b2482b9fbd3ade",
+      "subject": "CI: build and test Causa.slnx and the site; requirement-verification workflow (live round trip, Dokimos verdict, fault probes); kernel unit tests",
+      "implementationFiles": 2,
+      "examples": [
+        "tests/Causa.Domain.Tests/Identity.fs",
+        "tests/Causa.Persistence.Tests/StateMachines/SMLOAD.fs"
+      ]
+    },
+    {
+      "commit": "33d072da798a4ec762f15cebfc3c205c9014bbbd",
+      "subject": "Independent review fixes: late loads, unsaved work, lost save answers, strict reload, uppercase links",
+      "implementationFiles": 8,
+      "examples": [
+        "src/Causa.App/Program.fs",
+        "src/Causa.App/Routes.fs",
+        "src/Causa.App/Update.fs",
+        "src/Causa.Domain/Decide.fs",
+        "src/Causa.Domain/Evolve.fs"
+      ]
+    }
+  ]
+}

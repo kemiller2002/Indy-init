@@ -1,4 +1,4 @@
-// owner-freeze.fsx: the owner's steps to freeze Indy-init's compiled requirements packages v4, v4.1, v4.1.1 and v4.1.2
+// owner-freeze.fsx: the owner's steps to freeze Indy-init's compiled requirements packages v4, v4.1, v4.1.1, v4.1.2 and v4.1.4
 // (the FREEZE.md of each package under requirements-compiled/).
 //
 // Every decision is yours. The script shows each owner decision request as the package states it and records
@@ -65,7 +65,9 @@ let packages =
     [ { Name = "v4"; Dir = "requirements-compiled/v4"; ApprovalPrefix = "APR-V4-OWNER"; PackageApprovalId = "ODR-V4-01"; Tag = "indy-init-requirements-v4.0.0" }
       { Name = "v4.1"; Dir = "requirements-compiled/v4.1"; ApprovalPrefix = "APR-V41-OWNER"; PackageApprovalId = "ODR-V41-01"; Tag = "indy-init-requirements-v4.1.0" }
       { Name = "v4.1.1"; Dir = "requirements-compiled/v4.1.1"; ApprovalPrefix = "APR-V411-OWNER"; PackageApprovalId = "ODR-V411-01"; Tag = "indy-init-requirements-v4.1.1" }
-      { Name = "v4.1.2"; Dir = "requirements-compiled/v4.1.2"; ApprovalPrefix = "APR-V412-OWNER"; PackageApprovalId = "ODR-V412-04"; Tag = "indy-init-requirements-v4.1.2" } ]
+      { Name = "v4.1.2"; Dir = "requirements-compiled/v4.1.2"; ApprovalPrefix = "APR-V412-OWNER"; PackageApprovalId = "ODR-V412-04"; Tag = "indy-init-requirements-v4.1.2" }
+      // v4.1.4 (docs/release-gate-repair): corrected suite runners. 4.1.3 belonged to the withdrawn proposal.
+      { Name = "v4.1.4"; Dir = "requirements-compiled/v4.1.4"; ApprovalPrefix = "APR-V414-OWNER"; PackageApprovalId = "ODR-V414-03"; Tag = "indy-init-requirements-v4.1.4" } ]
 
 // ---- processes, files and JSON -------------------------------------------------------------------------------------
 
@@ -366,7 +368,7 @@ let approve repo dryRun (p: Package) =
     if p.Name = "v4.1.1" && not conflicts.IsEmpty then stop $"""decide {String.Join(", ", conflicts)} first (owner-freeze.fsx decide v4.1.1): the package approval depends on it"""
     // v4.1.2: the package applies its decisions (ODR-V412-01..03, -05), so each must be recorded, and the package recompiled
     // from them, before it can be approved.
-    if p.Name = "v4.1.2" && not pending.IsEmpty then stop $"""decide {String.Join(", ", pending)} first (owner-freeze.fsx decide v4.1.2); the agent then compiles v4.1.2 from your records"""
+    if (p.Name = "v4.1.2" || p.Name = "v4.1.4") && not pending.IsEmpty then stop $"""decide {String.Join(", ", pending)} first (owner-freeze.fsx decide {p.Name}); the agent then compiles {p.Name} from your records"""
     rule ()
     let change, shown =
         if p.Name = "v4" then

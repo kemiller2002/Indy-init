@@ -211,6 +211,52 @@ jobs:
   # Rehearsal 009 readiness gates (docs/rehearsal-009-preflight-smoke/FINAL-CORRECTIONS.md): the pinned Conditor, the
   # resolved set from echelon-current, the governed Praxis policy, the Dokimos coverage gate with its candidate-SHA
   # checks and the non-empty Percepta preflight, each proven by positive and negative cases on the released binaries.
+  release-gate-repair:
+    # docs/release-gate-repair: the suite-command defects Rehearsal 009 hit stay refused, the corrected v4.1.4 runners
+    # execute, the Praxis ordering gate and the acceptance levels behave as specified.
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Pinned Conditor 0.10.20 and the echelon-current 1.36.0 workstation, in a disposable home
+        run: |
+          dotnet fsi tools/r9/r9.fsx -- install-conditor --lock kickoff/rehearsal-009/toolchain.lock.json --dir "$RUNNER_TEMP/conditor"
+          dotnet fsi tools/r9/r9.fsx -- workstation --lock kickoff/rehearsal-009/toolchain.lock.json \
+            --conditor "$RUNNER_TEMP/conditor/conditor" --home "$RUNNER_TEMP/echelon" --target-id "indy-init-rg-${{ github.run_id }}"
+          echo "$RUNNER_TEMP/echelon/.local/bin" >> "$GITHUB_PATH"
+      - name: Build the requirements compiler
+        run: dotnet build tools/requirements-compiler/src -c Release
+      - name: Candidate package v4.1.4 is reproduced byte for byte and X01-X21 pass
+        run: dotnet tools/requirements-compiler/src/bin/Release/net10.0/requirements-compiler.dll v41 --source . --package requirements-compiled/v4.1.4 --base requirements-compiled/v4 --check
+      - name: Playwright test runner (the version the owner locked, ODR-V41-07)
+        run: |
+          mkdir -p "$RUNNER_TEMP/pw" && cd "$RUNNER_TEMP/pw" && npm init -y > /dev/null && npm install --no-audit --no-fund @playwright/test@1.63.0 > /dev/null
+      - name: Release-gate repair cases
+        run: |
+          git config --global user.name ci && git config --global user.email ci@example.invalid
+          dotnet fsi tools/release-gate-repair/tests.fsx -- --indy-init . --praxis "$RUNNER_TEMP/echelon/.local/bin/praxis" \
+            --node-modules "$RUNNER_TEMP/pw/node_modules" --work "$RUNNER_TEMP/rg-work" --evidence "$RUNNER_TEMP/rg-evidence"
+      - name: The obligation inventory is what the generator writes from the committed inputs
+        run: |
+          dotnet fsi tools/release-gate-repair/inventory.fsx -- --plan requirements-compiled/v4/verification-plan.json \
+            --execution-plan requirements-compiled/v4.1.4/verification-execution-plan.json \
+            --ownership requirements-compiled/v4.1.4/agent-file-ownership.json --dag requirements-compiled/v4.1.4/execution-dag.json \
+            --coverage docs/release-gate-repair/evidence/r9-release-gate/coverage.json --gate docs/release-gate-repair/evidence/r9-release-gate/gate.json \
+            --suite-preflight docs/release-gate-repair/evidence/suite-preflight-v4.1.2-r9.json --out "$RUNNER_TEMP/inventory.json"
+          cmp "$RUNNER_TEMP/inventory.json" docs/release-gate-repair/obligation-inventory.json
+      - name: Publish the repair evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-gate-repair
+          path: ${{ runner.temp }}/rg-evidence
+
   r9-readiness-gates:
     runs-on: ubuntu-latest
     timeout-minutes: 30

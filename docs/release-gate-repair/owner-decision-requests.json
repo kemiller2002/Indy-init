@@ -1,0 +1,82 @@
+{
+  "schema": "indy-init.owner-decision-requests/1",
+  "status": "PROPOSED by an agent; none is decided. Agents never record decisions or approvals (RDP-003).",
+  "context": "docs/release-gate-repair/FINAL-REPORT.md",
+  "requests": [
+    {
+      "id": "ODR-RG-01",
+      "kind": "scope",
+      "title": "Competition scope of the next Indy Init build",
+      "question": "Approve docs/release-gate-repair/competition-scope.proposed.json (sha256 1aae1e1de4cb3af267973076cff3112ec50442fb5f8b71f8f3a820bc8b1525ae) as the competition scope: every obligation of the frozen plan (161 P0 requirements, 613 obligations: 541 executable, 119 record, 47 mixed) plus CAT-CAUSA-INVESTIGATION INV-001..038, with no exclusion?",
+      "options": [
+        "A: approve the proposed scope as is (nothing excluded)",
+        "B: approve a narrower scope: name each requirement to exclude; each exclusion is also recorded as the plan's own exclusion {requirement_id, action: exclude} (exclusionPolicy), and the scope file lists it",
+        "C: catalog-only competition release: exclude all 161 frozen-plan requirements (613 obligations); the full-plan level then stays REFUSED and is reported as such"
+      ],
+      "recommendation": "A, unless the build is staffed and timed to make it achievable; B only with every exclusion named. The agent proposes no exclusion: in Rehearsal 009 every frozen-plan obligation was unimplemented, not inapplicable.",
+      "evidence": {
+        "inventory": "docs/release-gate-repair/obligation-inventory.json",
+        "unimplemented": 541,
+        "blockedByInvalidCommand": 210,
+        "recordOnly": 72
+      },
+      "impact": "Until this is recorded, r9.fsx acceptance-status reports the competition-scope level SCOPE-NOT-APPROVED and the scope is the whole frozen plan.",
+      "approvalRecord": {
+        "how": "{\"decision_id\": \"ODR-RG-01\", \"action\": \"approve-scope\", \"scope_sha256\": \"<sha256 of the approved scope file>\"} in the pinned approvals file, recorded by the owner."
+      }
+    },
+    {
+      "id": "ODR-RG-02",
+      "kind": "package-approval",
+      "title": "Approve package v4.1.4 (corrected suite runners)",
+      "question": "Record ODR-V414-01 and -02 and approve requirements-compiled/v4.1.4 (ODR-V414-03) after its independent review, so the next rehearsal's lock can pin it?",
+      "options": [
+        "A: decide ODR-V414-01/02 option A, then approve v4.1.4",
+        "B: request changes",
+        "C: keep v4.1.2 (its SU-OWN-DOTNET, SU-DOTNET-LIVE and SU-BROWSER-WEBKIT cannot execute)"
+      ],
+      "recommendation": "A",
+      "impact": "With C the release gate refuses every candidate at run-suites, whatever the application does.",
+      "approvalRecord": {
+        "how": "tools/owner-freeze.fsx decide v4.1.4, approve v4.1.4, tag v4.1.4 (requirements-compiled/v4.1.4/FREEZE.md)."
+      }
+    },
+    {
+      "id": "ODR-RG-03",
+      "kind": "toolchain",
+      "title": "Release Dokimos 0.11.1 (url-input) and register it",
+      "question": "Release Dokimos 0.11.1 through its release process with the url-input fix (kemiller2002/dokimos#67, merged; #68 was a duplicate and is closed), and register a new echelon-current set with it?",
+      "options": [
+        "A: release and register",
+        "B: keep 0.11.0 (INV-029 can never pass V1-V3; non-mandatory)"
+      ],
+      "recommendation": "A",
+      "impact": "Catalog verification of INV-029 stays FAIL under 0.11.0 whatever the application renders."
+    },
+    {
+      "id": "ODR-RG-04",
+      "kind": "toolchain-lock",
+      "title": "A Rehearsal 010 toolchain lock",
+      "question": "Create kickoff/rehearsal-010/toolchain.lock.json pinning package v4.1.4 (once tagged), the echelon-current set carrying Dokimos 0.11.1, and new process-evidence rules (repository name), and govern the next competition repository with the Indy-init commit that carries this repair (verification-gate.yml with suite-preflight, browser installation and check-sequencing)?",
+      "options": [
+        "A: create the lock after ODR-RG-02 and -03",
+        "B: reuse the Rehearsal 009 lock (pins v4.1.2: the gate cannot pass)"
+      ],
+      "recommendation": "A",
+      "impact": "The lock is the one starting point every agent uses; only the owner changes it."
+    },
+    {
+      "id": "ODR-RG-05",
+      "kind": "staffing",
+      "title": "Topology for the next build",
+      "question": "The frozen schedule plans the event build for role lanes (topology C: integration, domain, persistence, two UI agents, reviewer; 419 of 420 minutes). Rehearsal 009 ran one agent and built the catalog only. Which topology does the next build use?",
+      "options": [
+        "A: topology C as scheduled",
+        "B: one lead agent (B-single-lead) with the scope of ODR-RG-01 narrowed accordingly",
+        "C: another, named topology"
+      ],
+      "recommendation": "A if the scope stays the whole plan (ODR-RG-01 A); a single agent cannot write 541 executable tests in the window.",
+      "impact": "Decides whether ODR-RG-01 option A is achievable."
+    }
+  ]
+}

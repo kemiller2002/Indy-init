@@ -1,0 +1,71 @@
+{
+  "schema": "indy-init.r9-acceptance-status/1",
+  "candidate": "39dc037990c8c049ee997fae8384c5bcc9290e2b",
+  "rule": "Each level has its own status and evidence. No level is inferred from another: catalog acceptance is never release acceptance, a scoped release never claims the full plan, and only the computed owner verdict is the final acceptance verdict.",
+  "catalog": {
+    "status": "ACCEPTED",
+    "candidate": "39dc037990c8c049ee997fae8384c5bcc9290e2b",
+    "causes": [],
+    "evidence": [
+      {
+        "path": "docs/release-gate-repair/evidence/r9-catalog/requirement-verification-39dc037.json",
+        "sha256": "f3be4b162685241a4973143a042847b51f2ec30ea8a9b3cd0682b5fa3ec9ca7b"
+      }
+    ],
+    "summary": {
+      "applicable": 37,
+      "implemented": 36,
+      "verified": 36,
+      "failed": 1,
+      "blocked": 0,
+      "notRun": 0,
+      "notApplicable": 1,
+      "verifiedPercent": 97.2
+    },
+    "catalog": "CAT-CAUSA-INVESTIGATION"
+  },
+  "competitionScope": {
+    "status": "SCOPE-NOT-APPROVED",
+    "candidate": "39dc037990c8c049ee997fae8384c5bcc9290e2b",
+    "causes": [
+      "the scope (proposed) has no owner approval record (approve-scope, scope_sha256 1aae1e1de4cb) in the pinned approvals: until the owner approves it, the competition scope is the whole frozen plan",
+      "613 in-scope plan obligation(s) are not verified (first: AR-014-O1: executable not-generated, no record assessment; AR-014-O2: executable not-generated, no record assessment; AR-030-O1: executable not-generated, no record assessment)"
+    ],
+    "evidence": [
+      {
+        "path": "docs/release-gate-repair/competition-scope.proposed.json",
+        "sha256": "1aae1e1de4cb3af267973076cff3112ec50442fb5f8b71f8f3a820bc8b1525ae"
+      },
+      {
+        "path": "docs/release-gate-repair/evidence/r9-release-gate/coverage.json",
+        "sha256": "755dc98172e8fecc31527ef0f9a01bc51795ad85bf52ff951177562b4d9fe28c"
+      }
+    ],
+    "scope": "CS-INDY-INIT-PROPOSED-1",
+    "planObligationsInScope": 613,
+    "catalogRequirementsInScope": 38,
+    "claimsFullPlan": false
+  },
+  "fullPlan": {
+    "status": "REFUSED",
+    "candidate": "39dc037990c8c049ee997fae8384c5bcc9290e2b",
+    "causes": [
+      "the release gate verdict is REFUSED (executable 0/541, record 0/119)"
+    ],
+    "evidence": [
+      {
+        "path": "docs/release-gate-repair/evidence/r9-release-gate/gate.json",
+        "sha256": "712260929e8a46db8df986f56f3f9f665264e4947e6ab4dac65f1785ff6f5821"
+      }
+    ],
+    "obligations": "613"
+  },
+  "ownerVerdict": {
+    "status": "NOT-COMPUTED",
+    "candidate": "39dc037990c8c049ee997fae8384c5bcc9290e2b",
+    "causes": [
+      "no computed acceptance verdict: tools/compute-acceptance-verdict.py needs the owner-pinned approvals and evidence manifest of this rehearsal"
+    ],
+    "evidence": []
+  }
+}
