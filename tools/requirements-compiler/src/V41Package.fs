@@ -521,10 +521,14 @@ let runnerArgs (runner: string) =
 /// The positional targets of a `dotnet test` runner. The pinned SDK (10.0.402) accepts at most one project or solution
 /// (more is MSB1008, "Only one project can be specified": Rehearsal 009's SU-OWN-DOTNET and SU-DOTNET-LIVE).
 let dotnetTestTargets (runner: string) =
-    let valued = set [ "--filter"; "-c"; "--configuration"; "--logger"; "-l"; "--results-directory"; "-r"; "-f"; "--framework"; "--settings"; "-s"; "--runtime"; "-a"; "--arch"; "-o"; "--output"; "-v"; "--verbosity" ]
+    let valued =
+        set [ "--filter"; "-c"; "--configuration"; "--logger"; "-l"; "--results-directory"; "-r"; "-f"; "--framework"; "--settings"; "-s"
+              "--runtime"; "-a"; "--arch"; "-o"; "--output"; "-v"; "--verbosity"; "--collect"; "-e"; "--environment"; "--diag"; "-d"
+              "--test-adapter-path"; "--blame-crash-dump-type"; "--blame-hang-dump-type"; "--blame-hang-timeout"; "--os"; "--property"; "-p" ]
     let rec go acc xs =
         match xs with
         | [] -> List.rev acc
+        | "--" :: _ -> List.rev acc // the rest are RunSettings arguments, never targets
         | (o: string) :: _ :: rest when valued.Contains o -> go acc rest
         | (o: string) :: rest when o.StartsWith "-" -> go acc rest
         | t :: rest -> go (t :: acc) rest
@@ -1443,8 +1447,12 @@ let runnerCheck (i: Inputs) : Check =
         [ for o in suiteRunnerOverrides i do
               if not (suites |> List.exists (fun s -> s.Id = str "suite" o)) then yield sprintf "suiteRunners names %s, which is not a suite" (str "suite" o)
               if str "decision" o = "" then yield sprintf "the corrected runner of %s names no decision" (str "suite" o)
+              elif not (i.AuthoredText |> List.exists (fun (n, t) -> n = "proposals/owner-decision-requests.json" && t.Contains(sprintf "\"%s\"" (str "decision" o)))) then
+                  yield sprintf "the corrected runner of %s names %s, which proposals/owner-decision-requests.json does not request" (str "suite" o) (str "decision" o)
           for s in suites do
               let r = runnerOf i s
+              if r.Contains "dotnet test" && not (r.StartsWith("dotnet test", StringComparison.Ordinal)) then
+                  yield sprintf "%s: the runner wraps dotnet test (%s); a runner must start with dotnet test so its target can be checked" s.Id r
               match dotnetTestTargets r with
               | Some [ target ] when target = "Causa.slnx" || List.contains target testProjects -> ()
               | Some [ target ] -> yield sprintf "%s: dotnet test target %s is neither Causa.slnx nor a declared test project" s.Id target

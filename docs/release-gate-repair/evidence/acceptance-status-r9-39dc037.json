@@ -29,8 +29,7 @@
     "candidate": "39dc037990c8c049ee997fae8384c5bcc9290e2b",
     "causes": [
       "the scope (proposed) has no owner approval record (approve-scope, scope_sha256 1aae1e1de4cb) in the pinned approvals: until the owner approves it, the competition scope is the whole frozen plan",
-      "613 in-scope plan obligation(s) are not verified (first: AR-014-O1: executable not-generated; AR-014-O2: executable not-generated; AR-030-O1: executable not-generated)",
-      "catalog INV-029 is FAIL"
+      "613 in-scope plan obligation(s) are not verified (first: AR-014-O1: executable not-generated, no record assessment; AR-014-O2: executable not-generated, no record assessment; AR-030-O1: executable not-generated, no record assessment)"
     ],
     "evidence": [
       {
