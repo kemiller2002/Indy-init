@@ -1,0 +1,1 @@
+dokimos (source at kemiller2002/dokimos#68 head 481b494, unreleased) verification requirements on Rehearsal 009's committed live observations (candidate 33d072d): 37/37 verified, accepted. Under the released 0.11.0 the same inputs gave 36/37 (INV-029 FAIL, url-input).

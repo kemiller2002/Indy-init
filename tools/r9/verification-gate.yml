@@ -76,11 +76,22 @@ jobs:
           src="$RUNNER_TEMP/indy-init"
           dokimos verification compile --indy-execution-plan "$src/requirements-compiled/v4.1.2/verification-execution-plan.json" \
             --indy-verification-plan "$src/requirements-compiled/v4/verification-plan.json" --out "$RUNNER_TEMP/obligations.json"
+      - name: Implementation was authorized before it was committed (Praxis ordering; docs/release-gate-repair)
+        run: dotnet fsi "$RUNNER_TEMP/indy-init/tools/r9/r9.fsx" -- check-sequencing --target . --out "$RUNNER_TEMP/sequencing.json"
+      - name: Every suite command of the plan can execute (suite-preflight)
+        run: |
+          npm ci
+          dotnet fsi "$RUNNER_TEMP/indy-init/tools/r9/r9.fsx" -- suite-preflight --obligations "$RUNNER_TEMP/obligations.json" --root . \
+            --out "$RUNNER_TEMP/suite-preflight.json"
+      - name: Playwright browsers for every project the plan names (Chromium and WebKit)
+        timeout-minutes: 10
+        run: npx playwright install --with-deps chromium webkit
       - name: Run the plan's suites at the candidate
         env:
           MODE: ${{ inputs.mode || 'development' }}
         run: |
-          npm ci
+          # npm dependencies are installed by the suite-preflight step
+
           # Release runs every executable suite of the plan (live suites need their provider secrets in this job);
           # development runs the deterministic ones, and the gate refuses any in-scope suite without evidence.
           suites=""
@@ -142,3 +153,5 @@ jobs:
             ${{ runner.temp }}/obligations.json
             ${{ runner.temp }}/attestations.json
             ${{ runner.temp }}/probe-results.json
+            ${{ runner.temp }}/suite-preflight.json
+            ${{ runner.temp }}/sequencing.json
