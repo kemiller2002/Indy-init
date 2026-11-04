@@ -1,9 +1,12 @@
 // launch-preflight.fsx: may Rehearsal 010 be launched? Read-only: it checks, it never records, pins or starts anything.
 //
 //   dotnet fsi tools/r10/launch-preflight.fsx -- --indy-init DIR --competition URL --live-run RUN_ID --adversarial-run RUN_ID
-//     [--origin URL] [--gh PATH] [--out F]
+//     [--origin URL] [--gh PATH] [--require-signatures true] [--out F]
 //
-// Owner provenance is a signature, not a name: every change of the decisions approvals file (after 55f2467) or of the
+// Owner provenance (with --require-signatures true) is a signature, not a name. By default (the owner's decision of
+// 2026-11-04 not to sign commits) it is GitHub's record that the owner committed and authored the change, which an
+// agent writing the owner's email as committer can imitate: an accepted risk. The rest of this paragraph describes
+// the signed mode: every change of the decisions approvals file (after 55f2467) or of the
 // lock, along main's first-parent history, must be a commit (or a merge that brings in only such commits) that GitHub
 // verifies as committed and signed by the owner (not web-flow, no agent trailer) AND whose signature verifies locally
 // against the owner's signing keys registered on GitHub. An agent can write any author or committer name; it cannot
@@ -126,7 +129,27 @@ let locallyOwnerSigned (commit: string) =
     fst (runEnv env src "git" [ "-c"; "gpg.program=gpg"; "-c"; "gpg.ssh.program=ssh-keygen"; "-c"; "gpg.x509.program=false"; "-c"; $"gpg.ssh.allowedSignersFile={allowed}"; "verify-commit"; commit ]) = 0
 
 /// Owner-signed: GitHub verifies the owner as committer AND the signature verifies against the owner's own keys.
-let ownerSigned (commit: string) = githubSaysOwnerSigned commit && locallyOwnerSigned commit
+/// GitHub's record without a signature (the owner's decision, 2026-11-04: no commit signing): the committer and the
+/// author are the operator (not web-flow, not an agent account) and the message carries no agent trailer. ACCEPTED
+/// RISK: a commit whose committer email is the owner's is recorded as the owner's, so an agent that writes the owner's
+/// email as committer is not told apart (FINAL-READINESS §6).
+let githubSaysOwnerCommitted (commit: string) =
+    let code, out = run src gh [ "api"; $"repos/{indyInitRepo}/commits/{commit}"; "--jq"; "[.committer.login, .author.login, .commit.message] | @json" ]
+    if code <> 0 then false else
+    try
+        match JsonNode.Parse out with
+        | :? JsonArray as a when a.Count = 3 && not (isNull a[0]) && not (isNull a[1]) ->
+            a[0].GetValue<string>() = operator && a[1].GetValue<string>() = operator
+            && not (Regex.IsMatch(a[2].GetValue<string>(), @"Claude-Session:|Co-Authored-By:\s*Claude", RegexOptions.IgnoreCase))
+        | _ -> false
+    with _ -> false
+
+/// --require-signatures true restores the full check (GitHub-verified signature by the owner as committer, and the
+/// signature verified locally against the owner's registered keys). Off by default: the owner does not sign commits.
+let requireSignatures = opt "--require-signatures" = Some "true"
+let ownerSigned (commit: string) =
+    if requireSignatures then githubSaysOwnerSigned commit && locallyOwnerSigned commit
+    else githubSaysOwnerCommitted commit
 
 /// The blob of `file` at `commit` ("" when absent).
 let blobAt (commit: string) (file: string) =

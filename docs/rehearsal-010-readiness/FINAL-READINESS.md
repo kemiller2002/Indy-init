@@ -21,7 +21,7 @@ The remaining conditions are owner actions, set out as one ordered transaction i
 
 **It is not READY TO LAUNCH.** Owner actions are outstanding, and the required real-provider test has not run. Rehearsal 010 has not been started; no T0 exists.
 
-**The launch preflight** (`tools/r10/launch-preflight.fsx`) decides launch. Today it refuses, and only for owner actions: [`evidence/launch-preflight/launch-preflight-now.log`](evidence/launch-preflight/launch-preflight-now.log). Its 47 negative controls pass.
+**The launch preflight** (`tools/r10/launch-preflight.fsx`) decides launch. Today it refuses, and only for owner actions: [`evidence/launch-preflight/launch-preflight-now.log`](evidence/launch-preflight/launch-preflight-now.log). Its 49 controls pass.
 
 ## 1. Integrated result
 
@@ -72,7 +72,7 @@ The remaining conditions are owner actions, set out as one ordered transaction i
 | `tools/r9/tests.fsx` | 80 cases, 0 failed |
 | `tools/r10/adversarial.fsx` | **36 VALIDATED**, 0 not run, 0 failed |
 | `tools/r10/r9-replay.fsx` | 15 of 15 as expected |
-| `tools/r10/launch-preflight-tests.fsx` | 47 of 47 (2 positive READY controls, including an owner PR merged with a merge commit; 45 refusals, each by its target check) |
+| `tools/r10/launch-preflight-tests.fsx` | 49 of 49 (positive controls in the unsigned and signed modes, an owner PR merged with a merge commit, and the accepted-risk case read READY; the other 45 are refused, each by its target check) |
 | `tools/r10/launch-preflight.fsx` on this repository | REFUSED, for owner actions only (LP-00..09); LP-10 (the published `indy-init-rehearsal-010` holds one initial commit) PASS |
 | Specula adapter on the current observer output | 6 of 6 |
 | CI on `7e6dca7` | every job green on `b288b75`, `dfa42a2` and `53c2136`; `7e6dca7` was still running when this was written (FINAL-LAUNCH-VERIFICATION §3) |
@@ -88,7 +88,7 @@ Earlier rounds (R1–R8, slices, observer) are unchanged; see INTEGRATION-BASELI
 | Owner-decision transaction | `owner-freeze.fsx decide rehearsal-010` and `ratify rehearsal-010`; the requests in `kickoff/rehearsal-010/proposals/owner-decision-requests.json`. Each decision records the digest of what it approves; both commands refuse to write under an agent |
 | Isolated live credential (ODR-R10-09) | The Verification gate is `contents: read`. A single-repository GitHub App token is minted per job, revoked at the end, and fails closed without secrets |
 | Live-provider preflight | `.github/workflows/live-provider-preflight.yml`: owner-dispatched J1–J3 × Chromium and WebKit against `api.github.com`, with a token-scope check |
-| Launch preflight | `tools/r10/launch-preflight.fsx` (LP-00..10) and its 47 negative controls |
+| Launch preflight | `tools/r10/launch-preflight.fsx` (LP-00..10) and its 49 controls |
 | Topology A schedule | `tools/r10/schedule.fsx`; `evidence/schedule/` |
 | Rehearsal 010 process-evidence rules | `kickoff/rehearsal-010/process-evidence-rules.json` (proposed; ODR-R10-14) |
 
@@ -126,6 +126,10 @@ The fix of round 11 was checked against live GitHub (PR #103: `[103]`, then `[tr
 - **Browsers in this container.** The local browser runs are Chromium only. WebKit runs in CI.
 - **The App private key** is a secret of the competition repository. A builder workflow change could read it before the governance check refuses that run. What it grants is only the synthetic test repository. Rotate the key after the rehearsal. Moving it out of reach needs a separate owner-controlled runner repository, which is not done.
 - **`fsharp-tooling`** has a known layout-kit timing flake.
+
+- **No commit signing (the owner's decision, 2026-11-04).** Owner records and the lock count by GitHub's record that the owner committed and authored them; merges count only when the owner merged them.
+  - The accepted risk: agents in this environment act on GitHub as the owner. An agent that writes the owner's email as its committer is recorded as the owner, and launch-preflight cannot tell it apart (case `accepted-risk-agent-commit-under-the-owners-name` reads READY).
+  - Signing closes this: `--require-signatures true` on launch-preflight and owner-freeze restores the signed check, which is still tested.
 
 ## 7. Releases (owner merges and tags)
 

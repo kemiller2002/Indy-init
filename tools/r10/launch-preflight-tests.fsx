@@ -149,7 +149,9 @@ let fixture (name: string) (edit: Fixture -> unit) (extraArgs: Fixture -> string
           @"  c=${2##*/}; msg=$(git -C '@INDY@' show -s --format=%B ""$c"" 2>/dev/null) || exit 1"
           @"  committer=$(git -C '@INDY@' show -s --format=%cn ""$c"")"
           @"  case ""$msg"" in *Claude-Session:*|*'[unsigned]'*) v=false ;; *) v=true ;; esac"
-          @"  printf '[%s,""valid"",""%s"",""""]\n' ""$v"" ""$committer""; exit 0"
+          @"  author=$(git -C '@INDY@' show -s --format=%an ""$c"")"
+          @"  case ""$msg"" in *Claude-Session:*) t='Claude-Session:' ;; *) t='' ;; esac"
+          @"  case ""$4"" in *verification*) printf '[%s,""valid"",""%s"",""%s""]\n' ""$v"" ""$committer"" ""$t"" ;; *) printf '[""%s"",""%s"",""%s""]\n' ""$committer"" ""$author"" ""$t"" ;; esac; exit 0"
           @"fi"
           @"case ""$1 $2"" in"
           @"  ""run view"") cat '@RUNS@'/run-$3.json 2>/dev/null || exit 1 ;;"
@@ -179,10 +181,14 @@ let without (flag: string) (f: Fixture) =
     let all = [ "--indy-init", f.Indy; "--origin", f.Origin; "--competition", f.Competition; "--live-run", "4242"; "--adversarial-run", "777"; "--gh", f.Gh ]
     Some(all |> List.filter (fst >> (<>) flag) |> List.collect (fun (k, v) -> [ k; v ]))
 let approvals f = Path.Combine(f.Indy, "kickoff/rehearsal-007/approvals.causa.json")
+/// The default arguments with --require-signatures true (the signed mode).
+let signed (f: Fixture) =
+    Some [ "--indy-init"; f.Indy; "--origin"; f.Origin; "--competition"; f.Competition; "--live-run"; "4242"; "--adversarial-run"; "777"; "--gh"; f.Gh; "--require-signatures"; "true" ]
 let lockFile f = Path.Combine(f.Indy, "kickoff/rehearsal-010/toolchain.lock.json")
 let liveResults f = Path.Combine(f.Runs, "4242", "live-provider-preflight", "journey-results.json")
 let cases =
     [ { Name = "positive-control"; Expect = "READY"; Check = ""; Edit = ignore; Args = fun _ -> None }
+      { Name = "positive-control-when-signatures-are-required"; Expect = "READY"; Check = ""; Edit = ignore; Args = signed }
       // LP-05: decisions and their provenance
       case "missing-owner-approval" "LP-05" (fun f -> replaceIn (approvals f) "\"decision_id\":\"ODR-R10-05\"" "\"decision_id\":\"ODR-R10-XX\""; commitPush f "Owner decisions (edit)")
       case "approval-by-someone-else" "LP-05" (fun f -> replaceIn (approvals f) "\"id\":\"kemiller2002\"" "\"id\":\"claude\""; commitPush f "Owner decisions (edit)")
@@ -202,20 +208,20 @@ let cases =
           git f.Indy [ "add"; "-A" ] |> ignore
           gitAs "claude" f.Indy [ "commit"; "-q"; "--author"; "kemiller2002 <kemiller2002@example.invalid>"; "-m"; "Owner decisions" ] |> ignore
           git f.Indy [ "push"; "-q"; "origin"; "main" ] |> ignore)
-      case "agent-key-signs-as-the-owner-committer" "LP-05" (fun f ->
+      { case "agent-key-signs-as-the-owner-committer-when-signatures-are-required" "LP-05" (fun f ->
           // GitHub (stand-in) is fooled into reporting the owner as committer; the signature is the agent's key
           replaceIn (approvals f) "\"decision_id\":\"ODR-R10-05\",\"action\":\"decide\",\"option\":\"A\"" "\"decision_id\":\"ODR-R10-05\",\"action\":\"decide\",\"option\":\"A\" "
           gitAsKey "kemiller2002" agentKey f.Indy [ "add"; "-A" ] |> ignore
           gitAsKey "kemiller2002" agentKey f.Indy [ "commit"; "-qm"; "Owner decisions" ] |> ignore
-          git f.Indy [ "push"; "-q"; "origin"; "main" ] |> ignore)
-      case "planted-git-config-fakes-local-verification" "LP-05" (fun f ->
+          git f.Indy [ "push"; "-q"; "origin"; "main" ] |> ignore) with Args = signed }
+      { case "planted-git-config-fakes-local-verification-when-signatures-are-required" "LP-05" (fun f ->
           // the agent's key signs, and the checkout's config names a verifier that always says yes
           replaceIn (approvals f) "\"decision_id\":\"ODR-R10-05\",\"action\":\"decide\",\"option\":\"A\"" "\"decision_id\":\"ODR-R10-05\",\"action\":\"decide\",\"option\":\"A\" "
           gitAsKey "kemiller2002" agentKey f.Indy [ "add"; "-A" ] |> ignore
           gitAsKey "kemiller2002" agentKey f.Indy [ "commit"; "-qm"; "Owner decisions" ] |> ignore
           git f.Indy [ "push"; "-q"; "origin"; "main" ] |> ignore
           git f.Indy [ "config"; "gpg.program"; "true" ] |> ignore
-          git f.Indy [ "config"; "gpg.ssh.program"; "true" ] |> ignore)
+          git f.Indy [ "config"; "gpg.ssh.program"; "true" ] |> ignore) with Args = signed }
       case "merge-rolls-back-an-owner-decision" "LP-05" (fun f ->
           // the owner's first record (A), then the owner revokes it (B); an agent merges the first record back in
           let _, o1 = git f.Indy [ "rev-list"; "--max-parents=0"; "HEAD" ]
@@ -258,6 +264,14 @@ let cases =
           commitPush f "Owner note"
           let _, o = git f.Indy [ "rev-parse"; "HEAD" ]
           write (Path.Combine(f.Indy, ".git", "info", "grafts")) $"{o.Trim()} {before.Trim()}\n")
+      // ACCEPTED RISK (the owner's decision not to sign commits): a commit an agent makes under the owner's name and email
+      // is the owner's by GitHub's record, so the unsigned mode reads READY. The signed mode refuses it (above).
+      { Name = "accepted-risk-agent-commit-under-the-owners-name"; Expect = "READY"; Check = ""; Args = (fun _ -> None)
+        Edit = fun f ->
+          replaceIn (approvals f) "\"decision_id\":\"ODR-R10-05\",\"action\":\"decide\",\"option\":\"A\"" "\"decision_id\":\"ODR-R10-05\",\"action\":\"decide\",\"option\":\"A\" "
+          gitAsKey "kemiller2002" agentKey f.Indy [ "add"; "-A" ] |> ignore
+          gitAsKey "kemiller2002" agentKey f.Indy [ "commit"; "-qm"; "Owner decisions" ] |> ignore
+          git f.Indy [ "push"; "-q"; "origin"; "main" ] |> ignore }
       case "record-planted-under-another-id" "LP-05" (fun f ->
           replaceIn (approvals f) "]}]}" "]},{\"id\":\"APR-X-1\",\"authority\":{\"kind\":\"operator\",\"id\":\"kemiller2002\"},\"changes\":[{\"decision_id\":\"ODR-R10-18\",\"action\":\"decide\",\"option\":\"A\",\"pins\":[]}]}]}"
           agentCommitPush f "decisions")
