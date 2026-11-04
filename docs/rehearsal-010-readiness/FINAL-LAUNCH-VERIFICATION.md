@@ -10,11 +10,11 @@
 
 | Requirement | Status | Evidence |
 |---|---|---|
-| v4.1.4 frozen, tagged, verified | ODR-V414-01 and -02 recorded (APR-V414-OWNER-1, #106); FREEZE step 2 compiled and reviewed (package manifest `@MAN8@…`). **Owner action**: ODR-V414-03 and the tag | `owner-freeze.fsx status`; LP-02, LP-05 |
+| v4.1.4 frozen, tagged, verified | ODR-V414-01 and -02 recorded (APR-V414-OWNER-1, #106); FREEZE step 2 compiled and reviewed (package manifest `24c68f7a…`). **Owner action**: ODR-V414-03 and the tag | `owner-freeze.fsx status`; LP-02, LP-05 |
 | Dokimos 0.11.1 published | **owner action**: dokimos#69 ready (version bump only, on #67's url-input merge, CI green); not merged, tagged or published | LP-06 |
 | New echelon-current set approved and Conditor-qualified | **pending**: needs the published 0.11.1 artifacts (OWNER-APPROVAL-EXECUTION step 6a) | LP-06 |
 | Toolchain lock committed | **owner action**: `toolchain.lock.json` does not exist (only the proposal) | LP-01 |
-| Scope digest matches | proposal consistent: manifest `@SCOPE8@…` (v4.1.4 compiled with APR-V414-OWNER-1, FREEZE step 2) equals the proposed lock. **Not final** if the successor is ratified | LP-04; `scope preflight` in the offline suite PASS |
+| Scope digest matches | proposal consistent: manifest `9d5a121e…` (v4.1.4 compiled with APR-V414-OWNER-1, FREEZE step 2) equals the proposed lock. **Not final** if the successor is ratified | LP-04; `scope preflight` in the offline suite PASS |
 | Contract digests match: catalog contract, design contract, deadline policy, journey bindings, owner-decision requests | PASS against the proposed lock | LP-03 on the committed lock |
 | Process-evidence rules pinned | **owner action**: Rehearsal 010 rules drafted; `rulesSha256` null until ODR-R10-14 | LP-03 |
 | Praxis inventory complete | PASS: 36 of 36 work items; `praxis-work-inventory.json` = `scope work-plan`; `slice-manifest` COMPLETE COVERAGE | offline suite; CI |

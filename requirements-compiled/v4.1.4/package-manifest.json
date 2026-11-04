@@ -32,6 +32,7 @@
     "analysis/forma-layout-contract.json": "5203744db2669fd7eab37e2af1fab4e66a82c2689ec048d2a4da62111d039522",
     "analysis/github-error-matrix.json": "3b3fb3ac2d9e9d6b7ca218c82757204b56a327e3fab3d16b8679c362a4bf0e67",
     "analysis/guard-partitions.json": "0ef3fec56d718f8794b669dd7c89d0f90dbf6edfa6ffa2303f08204a5524894f",
+    "analysis/independent-review.json": "37487d190723e76c6858d755727db322eeac0f8c8a3d2ff0814a608bad475d41",
     "analysis/interface-specifications.json": "4095c5a2bedb353152df27c131fea0d1e219342c2b7e9c202fe7ab74d39f4340",
     "analysis/project-structure.json": "0debe0a6b6733685568be6e81dd6768df20854075a2a7c05cd55241359106b13",
     "analysis/state-machine-amendments.json": "e441e18ae47dd5ab741c657afd05b7ddeb6261227201255e118ec969f15ee4a4",

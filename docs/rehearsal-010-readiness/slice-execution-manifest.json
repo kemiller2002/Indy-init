@@ -1,6 +1,6 @@
 {
   "schema": "indy-init.slice-execution-manifest/1",
-  "scopeSha256": "046fa7885a1caca6d9931d5dac81f2d438df424e685eee53b96715ddfe218b1c",
+  "scopeSha256": "9d5a121e5f94917b0db3227ab135e09244214ee6ddb22d04a5d44bf4a2662d37",
   "derivedFrom": "the approved scope manifest; requirements are not rewritten",
   "coverage": {
     "requirements": 199,
