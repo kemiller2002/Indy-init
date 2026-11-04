@@ -28,7 +28,7 @@ The remaining conditions are owner actions, set out as one ordered transaction i
 | Item | Value |
 |---|---|
 | Branch and PR | kemiller2002/Indy-init `claude/rehearsal-010-integration`, **#104** (draft) |
-| Integrated head | **`{HEAD}`**. Every result below is for this commit |
+| Integrated head | **`7e6dca7`**. Every result below is for this commit |
 | Base | `main` `cae4102`, the merge of #102. #104 merges it (`cadf4e4`) |
 | Successor package | `requirements-compiled/v4.1.4` (CANDIDATE; X01–X21 PASS); package-manifest `af0132f6…` |
 | Scope (as compiled now) | `5a8aef29cb2dff62d8ee60b7162e7df226bb42818ffb87f7f827fdcb443d9095`. **Not the approval digest**: it changes when v4.1.4 is frozen and if the successor is ratified (§2) |
@@ -62,20 +62,20 @@ The remaining conditions are owner actions, set out as one ordered transaction i
 - Per the mission, **the scope-approval transaction stops on this difference.** `owner-freeze.fsx decide rehearsal-010` does not ask ODR-R10-01 until the scope is compiled from the frozen v4.1.4 and the ratified catalog.
 - Slices: 36, all 199 requirements placed, 0 unassigned (SLICE-EXECUTION-PLAN §1).
 
-## 3. Verification at `{HEAD}`
+## 3. Verification at `7e6dca7`
 
 | Check | Result |
 |---|---|
-| Build: requirements-compiler, tests (Debug) and src (Release) | {BUILD} |
-| Offline suite | {OFFLINE} |
-| `tools/release-gate-repair/tests.fsx` | {RG} |
-| `tools/r9/tests.fsx` | {R9} |
-| `tools/r10/adversarial.fsx` | {ADV} |
-| `tools/r10/r9-replay.fsx` | {REPLAY} |
+| Build: requirements-compiler, tests (Debug) and src (Release) | PASS |
+| Offline suite | PASS (all groups) |
+| `tools/release-gate-repair/tests.fsx` | 74 cases, 0 failed (includes the side-branch checkpoint case) |
+| `tools/r9/tests.fsx` | 80 cases, 0 failed |
+| `tools/r10/adversarial.fsx` | **36 VALIDATED**, 0 not run, 0 failed |
+| `tools/r10/r9-replay.fsx` | 15 of 15 as expected |
 | `tools/r10/launch-preflight-tests.fsx` | 47 of 47 (2 positive READY controls, including an owner PR merged with a merge commit; 45 refusals, each by its target check) |
-| `tools/r10/launch-preflight.fsx` on this repository | REFUSED, for owner actions only ({NOWREFUSED}); {NOWPASS} PASS |
+| `tools/r10/launch-preflight.fsx` on this repository | REFUSED, for owner actions only (LP-00..09); LP-10 (the published `indy-init-rehearsal-010` holds one initial commit) PASS |
 | Specula adapter on the current observer output | 6 of 6 |
-| CI on `{HEAD}` | {CI} |
+| CI on `7e6dca7` | every job green on `b288b75`, `dfa42a2` and `53c2136`; `7e6dca7` was still running when this was written (FINAL-LAUNCH-VERIFICATION §3) |
 
 FINAL-LAUNCH-VERIFICATION.md lists the preflight item by item.
 
@@ -103,9 +103,14 @@ Each round was run by a reviewer agent spawned by this session. Each saw the cod
 | 3 | `d841ac2` | 2 | 3 | `9dd597f` (C28–C32) |
 | 4 | `9dd597f` | 0 | 3 | `fad97aa` (C33–C35) |
 | 5 | `fad97aa` | 0 | 2 | `6e43b7a` (C36) |
-| 6 | the merge with `main` and this round's tooling (`7521966..d73b22c`) | {R6B} | {R6M} | {R6FIX} |
+| 6 | the merge with `main` and this round's tooling (`7521966..d73b22c`) | 0 | 7: dropped checkpoint ancestry check; stale ODR-R10-01; LP-05 trusted free-text authority; LP-08 hand-written evidence; impossible scope check; App key on agent-pushable workflows; LP-10 bad path | `b288b75` |
+| 7 | `975cd98..b288b75` | 2: LP-05 provenance (first commit only); the requests file was agent-writable | 5 | `dfa42a2` |
+| 8 | `b288b75..dfa42a2` | 2: author, not committer, was trusted; the marker window could be skipped | 2 | `53c2136` |
+| 9 | `dfa42a2..53c2136` | 1: a merge hid a rollback from `git log -- file` | 1 (local signature verification) | `316a13a` |
+| 10 | `53c2136..316a13a` | 0 | 3: x509 verifier; grafts and shallow clones; who merged | `0c80154` |
+| 11 | `316a13a..0c80154` | 1 (a false refusal): `merged_by` is absent from the abbreviated pull-request list | 0 | `7e6dca7` |
 
-ODR-R10-15 asks the owner to accept these rounds for the reviewed commit. Any material change after this requires a new round.
+The fix of round 11 was checked against live GitHub (PR #103: `[103]`, then `[true,"kemiller2002"]`) and by the 47 controls; it has not had a round of its own. ODR-R10-15 asks the owner to accept these rounds for `7e6dca7`. Any material change after this requires a new round.
 
 **Minor items accepted and documented:**
 - `CompletedItems` (Praxis completion records) is builder-written. A record-only dependency's slice-order check rests on it. Record obligations are judged at release.
@@ -134,7 +139,7 @@ They are in order in OWNER-APPROVAL-EXECUTION.md §3:
 1. merge #104 and close #101;
 2. v4.1.4: decide, then the agent recompiles, then approve, then tag;
 3. Dokimos 0.11.1 and the registry set;
-4. the test repository, the App and its secrets; the competition repository;
+4. the test repository, the App and its secrets. The competition repository `kemiller2002/indy-init-rehearsal-010` already exists, with one initial commit (`616ee17`, README only) and no T0 record. The test repository `causa-acceptance-r10` is not visible to this session, so it is not confirmed;
 5. `decide rehearsal-010`;
 6. `ratify rehearsal-010`;
 7. the scope recompile, then ODR-R10-01;
