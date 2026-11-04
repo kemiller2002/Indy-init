@@ -1,4 +1,4 @@
-$ requirements-compiler design-contract design-contract --contract $SRC/kickoff/rehearsal-010/design-contract.json --forma-inventory $SRC/verification/design-contract/forma-0.13.0-inventory.json --root $WORK/r9 --candidate 0e760501b5585d11009a2fd2da8d146a1d47e025 --out $SCRATCH/rp-e/design-contract.json
+$ requirements-compiler design-contract design-contract --contract $SRC/kickoff/rehearsal-010/design-contract.json --forma-inventory $SRC/verification/design-contract/forma-0.13.0-inventory.json --root $WORK/r9 --candidate 0e760501b5585d11009a2fd2da8d146a1d47e025 --out $EVIDENCE/design-contract.json
 exit 4
   REFUSED FORMA_ROLE_MISSING navigation-shell (UI-029): no source uses ef-navigation-shell; a lookalike custom component does not satisfy it
   REFUSED FORMA_ROLE_MISSING save-status (UI-006): no source uses ef-status-lozenge; a lookalike custom component does not satisfy it
@@ -18,4 +18,6 @@ exit 4
   REFUSED LITERAL_COLOUR_OUTSIDE_THEME web/causa.css:30 color: #1a1a1a uses a literal colour outside the theme boundary
   REFUSED LITERAL_COLOUR_OUTSIDE_THEME web/causa.css:46 color: #8a5a00 uses a literal colour outside the theme boundary
   REFUSED rendered: the rendered design contract did not run (layout, overflow, touch targets, focus, contrast, screenshots)
-design-contract: REFUSED ($SCRATCH/rp-e/design-contract.json)
+  REFUSED rendered: no rendered verdict for chromium
+  REFUSED rendered: no rendered verdict for webkit
+design-contract: REFUSED ($EVIDENCE/design-contract.json)

@@ -1,4 +1,4 @@
-$ requirements-compiler completion-gate completion-gate --manifest $SRC/docs/rehearsal-010-readiness/scope-manifest.json --events $SRC/docs/rehearsal-010-readiness/evidence/stop-decision/r9-events.json --candidate 39dc037990c8c049ee997fae8384c5bcc9290e2b --release-gate $WORK/r9/evidence/release-gate/local-gate-release-39dc037.json --catalog $SCRATCH/rp-e/catalog-acceptance.json --out $SCRATCH/rp-e/completion-gate.json
+$ requirements-compiler completion-gate completion-gate --manifest $SRC/docs/rehearsal-010-readiness/scope-manifest.json --events $SRC/docs/rehearsal-010-readiness/evidence/stop-decision/r9-events.json --candidate 39dc037990c8c049ee997fae8384c5bcc9290e2b --release-gate $WORK/r9/evidence/release-gate/local-gate-release-39dc037.json --catalog $EVIDENCE/catalog-acceptance.json --coverage $SRC/docs/release-gate-repair/evidence/r9-release-gate/coverage.json --catalog-verification $WORK/r9/evidence/requirement-verification/requirement-verification.json --out $EVIDENCE/completion-gate.json
 exit 4
   REFUSED RELEASE_GATE_REFUSED suite SU-BROWSER-WEBKIT has in-scope obligations but no execution evidence in the results manifest
   REFUSED RELEASE_GATE_REFUSED suite SU-DOTNET-LIVE has in-scope obligations but no execution evidence in the results manifest
@@ -662,8 +662,10 @@ exit 4
   REFUSED RELEASE_GATE_REFUSED AR-034-O4: record evidence not verified: record evidence is required but the pinned record-verifier inputs are missing: --rc, --process-plan, --process-plan-digest, --process-rules, --process-rules-sha256, --process-attestations, --process-trusted-run-id
   REFUSED RELEASE_GATE_REFUSED AR-034-O5: record evidence not verified: record evidence is required but the pinned record-verifier inputs are missing: --rc, --process-plan, --process-plan-digest, --process-rules, --process-rules-sha256, --process-attestations, --process-trusted-run-id
   REFUSED RELEASE_GATE_REFUSED AR-035-O5: record evidence not verified: record evidence is required but the pinned record-verifier inputs are missing: --rc, --process-plan, --process-plan-digest, --process-rules, --process-rules-sha256, --process-attestations, --process-trusted-run-id
+  REFUSED RELEASE_GATE_NOT_PASS the release gate verdict is REFUSED, not PASS
   REFUSED CATALOG_NOT_GOVERNED_ACCEPTED the catalog level is REFUSED
   REFUSED JOURNEYS_MISSING the governed journeys did not run for the candidate
   REFUSED DESIGN_CONTRACT_MISSING the design contract did not run for the candidate
-  REFUSED SCOPE_NOT_INTEGRATED 193 applicable mandatory requirement(s) are not integrated, for example AR-001 (not-started), AR-002 (not-started), AR-003 (not-started), AR-004 (not-started), AR-005 (not-started), AR-006 (not-started)
-completion-gate: INCOMPLETE ($SCRATCH/rp-e/completion-gate.json)
+  REFUSED EVIDENCE_STALE the catalog verification is for 33d072da798a4ec762f15cebfc3c205c9014bbbd, not 39dc037990c8c049ee997fae8384c5bcc9290e2b
+  REFUSED SCOPE_NOT_INTEGRATED 161 applicable mandatory requirement(s) are not governed-verified at the candidate, for example AR-001, AR-002, AR-003, AR-004, AR-005, AR-006
+completion-gate: INCOMPLETE ($EVIDENCE/completion-gate.json)

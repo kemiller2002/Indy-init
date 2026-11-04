@@ -1,2 +1,2 @@
 exit 0
-test-integrity: PASS ($SCRATCH/adv-w/integrity.json)
+test-integrity: PASS ($WORK/integrity.json)

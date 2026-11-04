@@ -1,4 +1,4 @@
 exit 4
   REFUSED FORMA_ROLE_MISSING navigation-shell (UI-029): no source uses ef-navigation-shell; a lookalike custom component does not satisfy it
   REFUSED FORMA_ROLE_MISSING save-status (UI-006): no source uses ef-status-lozenge; a lookalike custom component does not satisfy it
-design-contract: REFUSED ($SCRATCH/adv-w/design-lookalike.json)
+design-contract: REFUSED ($WORK/design-lookalike.json)

@@ -2,35 +2,26 @@ exit 1
 
 Running 1 test using 1 worker
 
-  ✘  1 [chromium] › j2-analysis.spec.mjs:21:1 › J2 complete investigation analysis (5.8s)
+  ✘  1 [chromium] › j2-analysis.spec.mjs:22:1 › J2 complete investigation analysis (12.6s)
 
 
-  1) [chromium] › j2-analysis.spec.mjs:21:1 › J2 complete investigation analysis › J2-01 an observation with a source reference is recorded 
+  1) [chromium] › j2-analysis.spec.mjs:22:1 › J2 complete investigation analysis ───────────────────
 
-    Error: expect(locator).toBeVisible() failed
+    Error: P0 assertion(s) failed: J2-01 (expect(locator).toBeVisible() failed); J2-08 (expect(locator).toBeVisible() failed); J2-09 (values missing from GitHub (read directly): obs-mw20xay9-yipdul)
 
-    Locator: getByText('obs-mw1vj497-u5uho4').first()
-    Expected: visible
-    Timeout: 5000ms
-    Error: element(s) not found
+       at support.mjs:44
 
-    Call log:
-      - Expect "toBeVisible" getByText('obs-mw1vj497-u5uho4').first() with timeout 5000ms
-      - waiting for getByText('obs-mw1vj497-u5uho4').first()
-
-
-      35 |     await fieldNamed(page, 'Observation source reference').fill(obs.source);
-      36 |     await button(page, 'Record an observation').click();
-    > 37 |     await expect(page.getByText(obs.text).first()).toBeVisible();
-         |                                                    ^
-      38 |   });
-      39 |   await assertion('J2', 'J2-02', async () => {
-      40 |     await section(page, 'Hypotheses');
-        at $SRC/verification/journeys/j2-analysis.spec.mjs:37:52
-        at assertion ($SRC/verification/journeys/support.mjs:34:5)
-        at $SRC/verification/journeys/j2-analysis.spec.mjs:32:3
+      42 | export const finish = () => {
+      43 |   const failed = test.info().annotations.filter((a) => a.type === 'assertion').map((a) => JSON.parse(a.description)).filter((a) => a.priority === 'P0' && a.status !== 'passed');
+    > 44 |   if (failed.length) throw new Error(`P0 assertion(s) failed: ${failed.map((a) => `${a.id} (${a.detail})`).join('; ')}`);
+         |                            ^
+      45 | };
+      46 |
+      47 | /// In harness-double mode the browser's requests to api.github.com are answered by the double, so a fixture app that
+        at finish ($SRC/verification/journeys/support.mjs:44:28)
+        at $SRC/verification/journeys/j2-analysis.spec.mjs:112:3
 
     Error Context: test-results/j2-analysis-J2-complete-investigation-analysis-chromium/error-context.md
 
   1 failed
-    [chromium] › j2-analysis.spec.mjs:21:1 › J2 complete investigation analysis ────────────────────
+    [chromium] › j2-analysis.spec.mjs:22:1 › J2 complete investigation analysis ────────────────────

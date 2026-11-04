@@ -92,6 +92,8 @@
     "LITERAL_COLOUR_OUTSIDE_THEME web/causa.css:19 background: #fff uses a literal colour outside the theme boundary",
     "LITERAL_COLOUR_OUTSIDE_THEME web/causa.css:30 color: #1a1a1a uses a literal colour outside the theme boundary",
     "LITERAL_COLOUR_OUTSIDE_THEME web/causa.css:46 color: #8a5a00 uses a literal colour outside the theme boundary",
-    "rendered: the rendered design contract did not run (layout, overflow, touch targets, focus, contrast, screenshots)"
+    "rendered: the rendered design contract did not run (layout, overflow, touch targets, focus, contrast, screenshots)",
+    "rendered: no rendered verdict for chromium",
+    "rendered: no rendered verdict for webkit"
   ]
 }

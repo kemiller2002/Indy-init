@@ -17,6 +17,7 @@
 | Rehearsal 009's own evidence | `evidence/requirement-verification/*`, `evidence/release-gate/local-gate-release-39dc037.json`, `.echelon/fault-probes.json`, `evidence/FINAL-REPORT.md` |
 | Its progress events | #102's reconstruction `docs/rehearsal-010-readiness/evidence/stop-decision/r9-events.json` |
 | Its T0 | 00:30:01Z (`evidence/t0/T0.md`). The `indy-init.t0/1` record format is new in Rehearsal 010, so the replay synthesizes it from T0.md |
+| Clock | Stop decisions are judged as a live run would judge them: `--t0-record`, the governed deadline policy pinned through `--lock`, and `--repo` (the first committed T0 record). The observer derives the same deadline independently |
 
 **Historical outcome preserved.**
 - The replay works on a **copy** of the clone. The evidence repository is never written, repaired or re-judged.

@@ -1,7 +1,7 @@
 {
   "schema": "indy-init.r9-suite-preflight/1",
   "plan": "VP-1e3c66bcc958",
-  "root": "$SCRATCH/rp-w/r9",
+  "root": "$WORK/r9",
   "suites": [
     {
       "id": "SU-OWN-DOTNET",
@@ -19,7 +19,7 @@
       "executable": false,
       "listedTests": 0,
       "requireTests": false,
-      "cause": "Error: Cannot find package \u0027@playwright/test\u0027 imported from $SCRATCH/rp-w/r9/playwright.config.js"
+      "cause": "Error: Cannot find package \u0027@playwright/test\u0027 imported from $WORK/r9/playwright.config.js"
     },
     {
       "id": "SU-DOTNET-DETERMINISTIC",
@@ -46,7 +46,7 @@
       "executable": false,
       "listedTests": 0,
       "requireTests": false,
-      "cause": "Error: Cannot find package \u0027@playwright/test\u0027 imported from $SCRATCH/rp-w/r9/playwright.config.js"
+      "cause": "Error: Cannot find package \u0027@playwright/test\u0027 imported from $WORK/r9/playwright.config.js"
     },
     {
       "id": "SU-BROWSER-WEBKIT",
@@ -55,7 +55,7 @@
       "executable": false,
       "listedTests": 0,
       "requireTests": false,
-      "cause": "Error: Cannot find package \u0027@playwright/test\u0027 imported from $SCRATCH/rp-w/r9/playwright.config.js"
+      "cause": "Error: Cannot find package \u0027@playwright/test\u0027 imported from $WORK/r9/playwright.config.js"
     },
     {
       "id": "SU-DOTNET-LIVE",
@@ -73,7 +73,7 @@
       "executable": false,
       "listedTests": 0,
       "requireTests": false,
-      "cause": "Error: Cannot find package \u0027@playwright/test\u0027 imported from $SCRATCH/rp-w/r9/playwright.config.js"
+      "cause": "Error: Cannot find package \u0027@playwright/test\u0027 imported from $WORK/r9/playwright.config.js"
     }
   ]
 }

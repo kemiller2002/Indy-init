@@ -2652,6 +2652,10 @@
       "detail": "AR-035-O5: record evidence not verified: record evidence is required but the pinned record-verifier inputs are missing: --rc, --process-plan, --process-plan-digest, --process-rules, --process-rules-sha256, --process-attestations, --process-trusted-run-id"
     },
     {
+      "code": "RELEASE_GATE_NOT_PASS",
+      "detail": "the release gate verdict is REFUSED, not PASS"
+    },
+    {
       "code": "CATALOG_NOT_GOVERNED_ACCEPTED",
       "detail": "the catalog level is REFUSED"
     },
@@ -2664,8 +2668,12 @@
       "detail": "the design contract did not run for the candidate"
     },
     {
+      "code": "EVIDENCE_STALE",
+      "detail": "the catalog verification is for 33d072da798a4ec762f15cebfc3c205c9014bbbd, not 39dc037990c8c049ee997fae8384c5bcc9290e2b"
+    },
+    {
       "code": "SCOPE_NOT_INTEGRATED",
-      "detail": "193 applicable mandatory requirement(s) are not integrated, for example AR-001 (not-started), AR-002 (not-started), AR-003 (not-started), AR-004 (not-started), AR-005 (not-started), AR-006 (not-started)"
+      "detail": "161 applicable mandatory requirement(s) are not governed-verified at the candidate, for example AR-001, AR-002, AR-003, AR-004, AR-005, AR-006"
     }
   ]
 }

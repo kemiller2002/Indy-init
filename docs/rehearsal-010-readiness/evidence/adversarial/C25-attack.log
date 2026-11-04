@@ -1,0 +1,3 @@
+exit 4
+  REFUSED SCOPE_NOT_INTEGRATED 135 applicable mandatory requirement(s) are not governed-verified at the candidate, for example AR-014, AR-029, AR-030, AR-035, EXT-DATA-001, EXT-DATA-002
+completion-gate: INCOMPLETE ($WORK/completion.json)

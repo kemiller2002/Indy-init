@@ -2,6 +2,6 @@ exit 0
 
 Running 1 test using 1 worker
 
-  ✓  1 [chromium] › j1-create-persist.spec.mjs:5:1 › J1 investigation creation and persistence (2.8s)
+  ✓  1 [chromium] › j1-create-persist.spec.mjs:6:1 › J1 investigation creation and persistence (3.0s)
 
-  1 passed (3.6s)
+  1 passed (3.8s)

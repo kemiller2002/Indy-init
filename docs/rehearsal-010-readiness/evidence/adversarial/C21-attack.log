@@ -1,0 +1,3 @@
+exit 4
+  REFUSED RELEASE_GATE_NOT_PASS the release gate verdict is REFUSED, not PASS
+completion-gate: INCOMPLETE ($WORK/completion.json)

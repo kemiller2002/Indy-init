@@ -1,0 +1,6 @@
+exit 4
+  BLOCKING SCOPE_COVERAGE_UNKNOWN no slice execution manifest is published; coverage of the approved scope cannot be checked
+  BLOCKING DEADLINE_RESET a stop decision was judged against deadline 2026-11-04T07:56:00.0000000+00:00; the run's deadline (committed T0 record and governed policy) is 2026-11-04T09:56:00.0000000+00:00
+  WARNING DESIGN_CONTRACT_NOT_RUN no design-contract verdict yet
+  WARNING EARLY_STOP_PERMITTED a stop for 'deadline' was permitted at 2026-11-04T07:56:00.0000000+00:00 with 0 minutes left; the owner should confirm its evidence
+observe: 4 finding(s), 2 blocking ($WORK/observe-c28.json)

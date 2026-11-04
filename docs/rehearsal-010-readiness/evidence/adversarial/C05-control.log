@@ -1,2 +1,2 @@
 exit 0
-design-contract: PASS ($SCRATCH/adv-w/design-design-control.json)
+design-contract: PASS ($WORK/design-design-control.json)

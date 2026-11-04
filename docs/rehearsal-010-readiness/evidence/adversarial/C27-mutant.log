@@ -1,0 +1,4 @@
+exit 4
+  BLOCKING SCOPE_COVERAGE_UNKNOWN no slice execution manifest is published; coverage of the approved scope cannot be checked
+  WARNING DESIGN_CONTRACT_NOT_RUN no design-contract verdict yet
+observe: 2 finding(s), 1 blocking ($WORK/observe-replay.json)

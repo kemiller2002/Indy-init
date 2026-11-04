@@ -17,6 +17,10 @@
     {
       "code": "SCOPE_NOT_INTEGRATED",
       "detail": "193 applicable mandatory requirement(s) are not integrated on main"
+    },
+    {
+      "code": "COMPLETION_GATE_MISSING",
+      "detail": "stopping as complete needs the governed completion gate's COMPLETE verdict (--completion)"
     }
   ],
   "remaining": {
@@ -68,5 +72,8 @@
       "T18",
       "T19"
     ]
-  }
+  },
+  "t0": "2026-11-04T00:30:01.0000000+00:00",
+  "deadline": "2026-11-04T07:30:01.0000000+00:00",
+  "clock": "live"
 }

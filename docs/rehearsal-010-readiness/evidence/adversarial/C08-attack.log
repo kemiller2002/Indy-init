@@ -2,38 +2,25 @@ exit 1
 
 Running 1 test using 1 worker
 
-  ✘  1 [chromium] › j1-create-persist.spec.mjs:5:1 › J1 investigation creation and persistence (972ms)
+  ✘  1 [chromium] › j1-create-persist.spec.mjs:6:1 › J1 investigation creation and persistence (3.0m)
 
 
-  1) [chromium] › j1-create-persist.spec.mjs:5:1 › J1 investigation creation and persistence › J1-04 Save reaches Saved, and Saved is shown only after the commit exists on GitHub 
+  1) [chromium] › j1-create-persist.spec.mjs:6:1 › J1 investigation creation and persistence ───────
 
-    Error: values missing from GitHub (read directly): J1-problem-mw1vjxq0-si8767
+    Test timeout of 180000ms exceeded.
 
-    expect(received).toEqual(expected) // deep equality
+    Error: browserContext.close: Protocol error (Target.disposeBrowserContext): Failed to find context with id 16FC5B16BE2DC1388F143F0B7712FD73
 
-    - Expected  - 1
-    + Received  + 3
-
-    - Array []
-    + Array [
-    +   "J1-problem-mw1vjxq0-si8767",
-    + ]
-
-       at support.mjs:69
-
-      67 |   const texts = (await providerTexts()).join('\n');
-      68 |   const missing = values.filter((v) => !texts.includes(v));
-    > 69 |   expect(missing, `values missing from GitHub (read directly): ${missing.join(', ')}`).toEqual([]);
-         |                                                                                        ^
-      70 | };
-      71 |
-      72 | const firstVisible = async (candidates) => {
-        at providerHolds ($SRC/verification/journeys/support.mjs:69:88)
-        at $SRC/verification/journeys/j1-create-persist.spec.mjs:27:5
-        at assertion ($SRC/verification/journeys/support.mjs:34:5)
-        at $SRC/verification/journeys/j1-create-persist.spec.mjs:22:3
+      38 |     await b.close();
+      39 |   });
+    > 40 |   await a.close();
+         |   ^
+      41 |   finish();
+      42 | });
+      43 |
+        at $SRC/verification/journeys/j1-create-persist.spec.mjs:40:3
 
     Error Context: test-results/j1-create-persist-J1-investigation-creation-and-persistence-chromium/error-context.md
 
   1 failed
-    [chromium] › j1-create-persist.spec.mjs:5:1 › J1 investigation creation and persistence ────────
+    [chromium] › j1-create-persist.spec.mjs:6:1 › J1 investigation creation and persistence ────────

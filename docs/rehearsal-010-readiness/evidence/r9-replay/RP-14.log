@@ -1,4 +1,4 @@
-$ requirements-compiler observe observe --manifest $SRC/docs/rehearsal-010-readiness/scope-manifest.json --events $SRC/docs/rehearsal-010-readiness/evidence/stop-decision/r9-events.json --repo $WORK/r9 --t0-record evidence/t0/t0.json --deadline-policy $SRC/kickoff/rehearsal-010/deadline-policy.json --now 2026-11-04T03:00:00Z --evidence $WORK/observer-evidence --out $SCRATCH/rp-e/observer-findings.json
+$ requirements-compiler observe observe --manifest $SRC/docs/rehearsal-010-readiness/scope-manifest.json --events $SRC/docs/rehearsal-010-readiness/evidence/stop-decision/r9-events.json --repo $WORK/r9 --t0-record evidence/t0/t0.json --deadline-policy $SRC/kickoff/rehearsal-010/deadline-policy.json --now 2026-11-04T03:00:00Z --evidence $WORK/observer-evidence --out $EVIDENCE/observer-findings.json
 exit 4
   BLOCKING SCOPE_COVERAGE_UNKNOWN no slice execution manifest is published; coverage of the approved scope cannot be checked
   BLOCKING IMPLEMENTATION_WITHOUT_WORK_ITEM commit edde38cb7ea541f12e928f7a467071038d7a405b changes implementation and no scope checkpoint is committed
@@ -11,4 +11,4 @@ exit 4
   BLOCKING SELF_VERIFIED_SUCCESS evidence/FINAL-REPORT.md (Rehearsal 009) claims success, but no governed release verdict and governed catalog acceptance support it
   BLOCKING PREMATURE_STOP a stop was refused at 2026-11-04T02:25:00.0000000+00:00 (CONTINUE_REQUIRED, 306 minutes left) and no implementation work followed for 35 minutes
   WARNING UNMERGED_VERIFIED_WORK 36 verified requirement(s) are not integrated
-observe: 11 finding(s), 10 blocking ($SCRATCH/rp-e/observer-findings.json)
+observe: 11 finding(s), 10 blocking ($EVIDENCE/observer-findings.json)

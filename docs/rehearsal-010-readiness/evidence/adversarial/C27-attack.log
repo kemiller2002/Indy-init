@@ -1,0 +1,5 @@
+exit 4
+  BLOCKING SCOPE_COVERAGE_UNKNOWN no slice execution manifest is published; coverage of the approved scope cannot be checked
+  BLOCKING DEADLINE_RESET a stop decision was judged with a replay clock (--replay-clock): a live run's clock is its T0 record
+  WARNING DESIGN_CONTRACT_NOT_RUN no design-contract verdict yet
+observe: 3 finding(s), 2 blocking ($WORK/observe-replay.json)

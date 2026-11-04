@@ -33,7 +33,7 @@ exit 4
   REFUSED DEPENDENCY_NOT_INTEGRATED dependency SL-WI-GEN-WDL is not integrated
   REFUSED DEPENDENCY_NOT_INTEGRATED dependency SL-WI-INV-START is not integrated
   REFUSED DEPENDENCY_NOT_INTEGRATED dependency SL-WI-INV-WORKSPACE is not integrated
-slice-gate: REFUSED (do not merge) ($SCRATCH/adv-w/slice-gate.json)
+slice-gate: REFUSED (do not merge) ($WORK/slice-gate.json)
 
-  REFUSED SCOPE_NOT_INTEGRATED 193 applicable mandatory requirement(s) are not integrated, for example AR-001 (not-started), AR-002 (not-started), AR-003 (not-started), AR-004 (not-started), AR-005 (not-started), AR-006 (not-started)
-completion-gate: INCOMPLETE ($SCRATCH/adv-w/completion.json)
+  REFUSED SCOPE_NOT_INTEGRATED 135 applicable mandatory requirement(s) are not governed-verified at the candidate, for example AR-014, AR-029, AR-030, AR-035, EXT-DATA-001, EXT-DATA-002
+completion-gate: INCOMPLETE ($WORK/completion.json)

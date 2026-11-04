@@ -14,7 +14,7 @@
   - `release-gate-repair`
   - `r9-readiness-gates`
   - `suite-commands` (WebKit runs here)
-  - `r10-adversarial` (Chromium and WebKit, the 18 cases, the journeys and design contract on the fixture, and the Rehearsal 009 replay)
+  - `r10-adversarial` (Chromium and WebKit, the 36 cases, the journeys and design contract on the fixture, and the Rehearsal 009 replay)
 - [ ] Independent review: no open blocking finding (FINAL-READINESS §5).
 - [ ] Frozen packages unchanged (CI `frozen-v4` and the offline suite).
 

@@ -1,2 +1,2 @@
 exit 0
-completion-gate: COMPLETE ($SCRATCH/adv-w/completion.json)
+completion-gate: COMPLETE ($WORK/completion.json)

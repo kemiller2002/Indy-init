@@ -1,0 +1,3 @@
+exit 4
+  REFUSED T0_RECORD_INVALID the T0 record's t0 2026-11-04T02:56:00 is not an instant with an explicit UTC offset
+stop-decision: REFUSED (the run clock)

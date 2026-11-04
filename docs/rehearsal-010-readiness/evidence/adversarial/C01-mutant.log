@@ -1,8 +1,8 @@
 exit 0
   SU-DOTNET-DETERMINISTIC: exit 0, 2 result file(s)
-  results $SCRATCH/adv-w/runs-empty/results.json at 03a1f91c7d5d598de72a69fe91f2d5077bd0b1a9
+  results $WORK/runs-empty/results.json at 1649bc1e4c35092654fb0daf408b173793ff43f1
 run-suites: PASS
 
 
-$SCRATCH/adv-w/mut-C01/tools/r9/r9.fsx(1056,83): info FS3886: This list expression contains a single tuple element. Did you mean to use ';' instead of ',' to separate list elements?
+$WORK/mut-C01/tools/r9/r9.fsx(1080,83): info FS3886: This list expression contains a single tuple element. Did you mean to use ';' instead of ',' to separate list elements?
 

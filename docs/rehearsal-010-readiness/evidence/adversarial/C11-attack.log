@@ -1,9 +1,9 @@
 exit 4
-  REFUSED REGRESSION previously integrated obligation INV-001/V1/mapped does not pass at the merged result
-  REFUSED REGRESSION previously integrated obligation INV-001/V1/exists does not pass at the merged result
-  REFUSED REGRESSION previously integrated obligation INV-001/V2/visible does not pass at the merged result
-  REFUSED REGRESSION previously integrated obligation INV-001/V2/accessible does not pass at the merged result
-  REFUSED REGRESSION previously integrated obligation INV-001/V3/editable does not pass at the merged result
-  REFUSED REGRESSION previously integrated obligation INV-001/V3/enter does not pass at the merged result
-  REFUSED REGRESSION previously integrated obligation INV-001/V5/save does not pass at the merged result
-slice-gate: REFUSED (do not merge) ($SCRATCH/adv-w/slice-gate.json)
+  REFUSED REGRESSION obligation INV-001/V1/mapped is verified at the target base and not at the merged result
+  REFUSED REGRESSION obligation INV-001/V1/exists is verified at the target base and not at the merged result
+  REFUSED REGRESSION obligation INV-001/V2/visible is verified at the target base and not at the merged result
+  REFUSED REGRESSION obligation INV-001/V2/accessible is verified at the target base and not at the merged result
+  REFUSED REGRESSION obligation INV-001/V3/editable is verified at the target base and not at the merged result
+  REFUSED REGRESSION obligation INV-001/V3/enter is verified at the target base and not at the merged result
+  REFUSED REGRESSION obligation INV-001/V5/save is verified at the target base and not at the merged result
+slice-gate: REFUSED (do not merge) ($WORK/slice-gate.json)

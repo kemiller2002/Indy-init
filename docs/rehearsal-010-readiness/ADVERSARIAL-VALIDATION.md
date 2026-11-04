@@ -32,9 +32,13 @@ A case that cannot run here is NOT-RUN, never PASS.
 
 **Fixtures.** Browser cases run the governed journeys against variants of the harness's positive-control fixture app. The variants are made by text substitution in a scratch copy: the inert field, the constant "Saved" and the local-only store. Persistence goes to a GitHub REST double. These are **harness runs, not real-provider verification**: the journeys record the double's base URL, and the gates refuse any live result whose provider is not api.github.com.
 
-## Result: 18 of 18 VALIDATED
+## Result: 36 of 36 VALIDATED
 
-Run locally on 2026-11-04 with Chromium and the .NET 10.0.402 SDK; see FINAL-READINESS §3 for the final run. WebKit is not installable in this container. CI job `r10-adversarial` runs Chromium and WebKit.
+Run locally on 2026-11-04 at `6e43b7a` with Chromium and the .NET 10.0.402 SDK: 36 validated, 0 not run, 0 failed. CI job `r10-adversarial` on `6e43b7a` passed with Chromium and WebKit. WebKit is not installable in this container. See FINAL-READINESS §3.
+
+The mission asked for at least 18 cases.
+- C01–C18 are those 18.
+- C19–C36 were added during independent review, one or more per finding, each in the same three-run form.
 
 | # | Case | Expected decision | Attack | Control | Protection removed (what was removed) | Verdict |
 |---|---|---|---|---|---|---|
@@ -56,17 +60,37 @@ Run locally on 2026-11-04 with Chromium and the .NET 10.0.402 SDK; see FINAL-REA
 | C16 | A Praxis work item is registered only after implementation starts | `scope order` REFUSED: IMPLEMENTATION_BEFORE_CHECKPOINT | refused | exit 0 (checkpoint first) | exit 0 (`Scope.fs`: the ordering comparison disabled) | VALIDATED |
 | C17 | A catalog verification result belongs to the wrong commit | `catalog-acceptance` REFUSED: CATALOG_WRONG_COMMIT | refused | exit 0 | exit 0 (`CatalogAcceptance.fs`: the candidate comparison disabled) | VALIDATED |
 | C18 | A test is removed or weakened to make CI green | `test-integrity` REFUSED: TEST_REMOVED, TEST_SKIPPED, TEST_WEAKENED | refused | exit 0 (a test added) | exit 0 (`Ledger.testIntegrity`: all three comparisons emptied) | VALIDATED |
+| C19 | A builder-written event excludes a requirement, claiming operator authority | `completion-gate` INCOMPLETE: the exclusion is refused (no trusted operator record) | exit 4 | exit 0 | exit 0 (`Ledger.fs`: the approved-exclusion check disabled) | VALIDATED |
+| C20 | A stop request is stamped after the deadline to make it pass | `stop-decision` REFUSED: REQUEST_IN_FUTURE | exit 4 | exit 0 | exit 0 (`ScopeCommands.fs`: the future-request check disabled) | VALIDATED |
+| C21 | A release gate verdict says REFUSED but lists no cause | `completion-gate` INCOMPLETE: RELEASE_GATE_NOT_PASS | exit 4 | exit 0 | exit 0 (`Ledger.fs`: the verdict check disabled) | VALIDATED |
+| C22 | Only one journey is reported for the release | `completion-gate` INCOMPLETE: JOURNEY_NOT_RUN (J2, J3) | exit 4 | exit 0 | exit 0 (`Ledger.fs`: the not-run rule returns nothing) | VALIDATED |
+| C23 | Test integrity is asked about a base it cannot read | `test-integrity` REFUSED: TEST_DIFF_UNAVAILABLE (never PASS on missing evidence) | exit 4 | exit 0 | exit 0 (`GovernedCommands.fs`: the unavailable-diff refusal dropped) | VALIDATED |
+| C24 | Implementation before the checkpoint hides in a commit that also touches the governance file | `scope order` REFUSED: IMPLEMENTATION_BEFORE_CHECKPOINT (only the T0 bootstrap is exempt) | exit 4 | exit 0 | exit 0 (`ScopeCommands.fs`: every governance-touching commit exempted) | VALIDATED |
+| C25 | Progress events claim every requirement integrated, without governed evidence | `completion-gate` INCOMPLETE: SCOPE_NOT_INTEGRATED | exit 4 | exit 0 | exit 0 (`Ledger.fs`: integration taken from events) | VALIDATED |
+| C26 | The T0 record is edited after it was committed at T0 | `stop-decision` REFUSED: DEADLINE_RESET | exit 4 | exit 0 | no DEADLINE_RESET (`ScopeCommands.fs`: the first-committed comparison disabled) | VALIDATED |
+| C27 | A live run judges its stop with a replay clock | `observe`: blocking DEADLINE_RESET | finding | finding absent | finding absent (`Observer.fs`: the replay-clock check disabled) | VALIDATED |
+| C28 | A stop is judged against a self-made deadline policy (round 3, blocking 1) | `observe`: blocking DEADLINE_RESET (the decision's deadline is not the one derived from the committed T0 record and the governed policy) | finding | finding absent | finding absent (`Observer.fs`: the deadline comparison disabled) | VALIDATED |
+| C29 | A slice depends on a slice whose requirement has only record obligations (round 3, blocking 2) | `slice-gate` PASS for SL-T11: record obligations are judged at release | exit 0, PASS | a missing executable dependency obligation still refuses | DEPENDENCY_NOT_INTEGRATED (`Ledger.fs`: record obligations required in a pull request) | VALIDATED |
+| C30 | A stop as complete cites a completion verdict for another commit | `stop-decision` CONTINUE_REQUIRED: COMPLETION_CANDIDATE_MISMATCH | exit 4 | exit 0 | exit 0 (`ScopeCommands.fs`: the HEAD binding removed) | VALIDATED |
+| C31 | An early stop as complete is permitted without a governed completion verdict | `observe`: blocking PREMATURE_STOP | finding | finding absent (verdict in `--completions`) | finding absent (`Observer.fs`: the completion check disabled) | VALIDATED |
+| C32 | The completion gate is given whole-plan coverage of another commit | `completion-gate` INCOMPLETE: EVIDENCE_STALE | exit 4 | exit 0 | exit 0 (`Ledger.fs`: the candidate check disabled) | VALIDATED |
+| C33 | The builder writes its own completion verdict into its evidence (round 4) | `observe`: blocking PREMATURE_STOP (only the owner's `--completions` count) | finding | finding absent | finding absent (`GovernedCommands.fs`: completions read from `--evidence`) | VALIDATED |
+| C34 | The T0 record states T0 without a UTC offset (round 4) | `stop-decision` REFUSED: T0_RECORD_INVALID | exit 4 | exit 0 | exit 0 (`Continuation.fs`: offset-less instants accepted) | VALIDATED |
+| C35 | A dependency whose requirement has nothing a pull request can judge is assumed integrated (round 4) | `slice-gate` REFUSED: DEPENDENCY_NOT_INTEGRATED (no Praxis completion record for SL-T10) | exit 4 | exit 0 | exit 0 (`Ledger.fs`: an empty judged set counted as integrated) | VALIDATED |
+| C36 | A stop decision's request time is removed so the premature-stop checks cannot judge it (round 5) | `observe`: blocking REQUEST_UNDATED | finding | finding absent | finding absent (`Observer.fs`: the undated-request finding disabled) | VALIDATED |
 
 ## Additional regression coverage
 
-These are not part of the 18, but run in CI:
-- `tools/release-gate-repair/tests.fsx`: 57 cases. #101's 47, plus 10 for the fixture and the zero-test refusal.
+These are not among the 36, but they run in CI:
+- `tools/release-gate-repair/tests.fsx`: 60 cases. #101's 47, plus 13 for the fixture, the zero-test refusal and the scope checkpoint.
 - `tools/r9/tests.fsx`: 80 cases. Includes 4 new governed-catalog cases for the gate:
   - no catalog acceptance;
   - a builder-run verdict;
   - a verdict for another commit;
   - an empty fault category.
 - The offline suite, including #102's adversarial, legitimate-stop and recovery cases against the v4.1.4 scope.
+
+**Reading the observer rows.** The observer cases (C27, C28, C31, C33, C36) run `observe` over a deliberately incomplete fixture run, so the observer always exits 4 with other findings. Attack, control and mutant are therefore judged on the presence of the case's own finding, not on the exit code.
 
 ## Limits of this validation
 

@@ -1,0 +1,3 @@
+exit 4
+  REFUSED COMPLETION_CANDIDATE_MISMATCH the completion verdict is for eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee; the repository's HEAD must be main and that commit (f80a94b8ed39f72e38a3a7d2315ecd8a86a76460)
+stop-decision: CONTINUE_REQUIRED (120 minute(s) remaining, 0 open mandatory requirement(s))

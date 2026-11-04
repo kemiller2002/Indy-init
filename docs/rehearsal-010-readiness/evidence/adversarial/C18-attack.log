@@ -3,4 +3,4 @@ exit 4
   REFUSED TEST_REMOVED test x.spec.mjs › b passed at the base and is absent at the head
   REFUSED TEST_SKIPPED tests/browser/x.spec.mjs adds a skip/only marker: test.skip('a', async () => { });
   REFUSED TEST_WEAKENED tests/browser/x.spec.mjs loses 2 assertion(s) net
-test-integrity: REFUSED ($SCRATCH/adv-w/integrity.json)
+test-integrity: REFUSED ($WORK/integrity.json)
