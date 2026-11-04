@@ -52,6 +52,7 @@ run "git" [ "-C"; r9; "-c"; "user.name=replay"; "-c"; "user.email=replay@example
 run "git" [ "-C"; r9; "-c"; "user.name=replay"; "-c"; "user.email=replay@example.invalid"; "commit"; "-qm"; "replay only: the T0 record in the Rehearsal 010 format (not part of Rehearsal 009)" ] r9 |> ignore
 let policy = Path.Combine(src, "kickoff", "rehearsal-010", "deadline-policy.json")
 let policySha = Security.Cryptography.SHA256.HashData(File.ReadAllBytes policy) |> Convert.ToHexString |> fun s -> s.ToLowerInvariant()
+let lockFile = write "lock.json" (json (dict [ "deadlinePolicy", box (dict [ "sha256", box policySha ]) ]))
 let releaseCandidate = "39dc037990c8c049ee997fae8384c5bcc9290e2b"
 
 type Check = { Id: string; Finding: string; Kind: string; Expected: string; Command: string; Exit: int; Output: string; AsExpected: bool }
@@ -98,7 +99,7 @@ let completion =
 let stop (reason: string) =
     let request = write $"request-{reason}.json" (json (dict [ "at", box "2026-11-04T02:25:00Z"; "reason", box reason; "scopeSha256", box scopeSha ]))
     cmd "requirements-compiler stop-decision"
-        [ "stop-decision"; "--manifest"; manifest; "--checkpoint"; checkpoint; "--events"; events; "--request"; request; "--t0-record"; t0Record; "--deadline-policy"; policy; "--deadline-policy-sha256"; policySha; "--repo"; r9; "--out"; Path.Combine(evidence, $"stop-decision-{reason}.json") ]
+        [ "stop-decision"; "--manifest"; manifest; "--checkpoint"; checkpoint; "--events"; events; "--request"; request; "--t0-record"; t0Record; "--deadline-policy"; policy; "--lock"; lockFile; "--repo"; r9; "--out"; Path.Combine(evidence, $"stop-decision-{reason}.json") ]
     |> fun (c, a) -> c, rc a
 
 // The ledger and scope report from the replayed events.

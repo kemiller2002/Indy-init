@@ -169,21 +169,28 @@ let t0RepoMain = t0Repo "main"
 let t0Record = Path.Combine(t0RepoMain, "evidence", "t0", "t0.json")
 let policy = Path.Combine(src, "kickoff", "rehearsal-010", "deadline-policy.json")
 let policySha = Security.Cryptography.SHA256.HashData(File.ReadAllBytes policy) |> Convert.ToHexString |> fun s -> s.ToLowerInvariant()
+// The governed lock pins the policy; stop-decision reads the pin from it.
+let lockFile = write (Path.Combine(work, "lock.json")) (json (dict [ "deadlinePolicy", box (dict [ "path", box "kickoff/rehearsal-010/deadline-policy.json"; "sha256", box policySha ]) ]))
 let request (name: string) (minutes: float) (reason: string) (scope: string) (claimsComplete: bool) =
     write (Path.Combine(work, "requests", name + ".json"))
         (json (dict [ "at", box ((t0.AddMinutes minutes).ToString "o"); "reason", box reason; "scopeSha256", box scope; "claims", box (dict [ "complete", box claimsComplete ]) ]))
 let stopDecision (t: Tools) (events: string) (req: string) (extra: string list) =
-    rc t ([ "stop-decision"; "--manifest"; manifestPath; "--checkpoint"; checkpoint; "--events"; events; "--request"; req; "--t0-record"; t0Record; "--deadline-policy"; policy; "--deadline-policy-sha256"; policySha; "--repo"; t0RepoMain; "--out"; Path.Combine(work, "decision-" + Path.GetFileName req) ] @ extra)
+    rc t ([ "stop-decision"; "--manifest"; manifestPath; "--checkpoint"; checkpoint; "--events"; events; "--request"; req; "--t0-record"; t0Record; "--deadline-policy"; policy; "--lock"; lockFile; "--repo"; t0RepoMain; "--out"; Path.Combine(work, "decision-" + Path.GetFileName req) ] @ extra)
 
 // Governed coverage: every plan obligation verified, or none; the governed catalog verification, every obligation PASS.
 let coverageOf (name: string) (verified: string -> bool) =
     write (Path.Combine(work, "release", name + ".json"))
         (json (dict [ "candidate", box candidate; "obligations", box (reqs |> List.filter (fun r -> originOf r = "v4-plan") |> List.collect obligationsOf |> List.map (fun o -> dict [ "id", box o; "status", box (if verified o then "verified" else "not-generated") ]) |> List.toArray) ]))
 let coverageAll, coverageNone = coverageOf "coverage-all" (fun _ -> true), coverageOf "coverage-none" (fun _ -> false)
+// The whole-plan coverage of another commit, presented for this candidate.
+let coverageStale = write (Path.Combine(work, "release", "coverage-stale.json")) ((File.ReadAllText coverageAll).Replace(candidate, String.replicate 40 "d"))
 let catalogVerificationAll =
     write (Path.Combine(work, "release", "catalog-verification.json"))
-        (json (dict [ "requirements", box (reqs |> List.filter (fun r -> originOf r = "catalog") |> List.map (fun r -> dict [ "id", box (idOf r); "status", box "PASS"; "obligations", box (obligationsOf r |> List.map (fun o -> dict [ "id", box o; "status", box "PASS" ]) |> List.toArray) ]) |> List.toArray) ]))
-let completeVerdict = write (Path.Combine(work, "release", "completion-complete.json")) (json (dict [ "verdict", box "COMPLETE" ]))
+        (json (dict [ "candidate", box candidate; "requirements", box (reqs |> List.filter (fun r -> originOf r = "catalog") |> List.map (fun r -> dict [ "id", box (idOf r); "status", box "PASS"; "obligations", box (obligationsOf r |> List.map (fun o -> dict [ "id", box o; "status", box "PASS" ]) |> List.toArray) ]) |> List.toArray) ]))
+// The governed completion verdict for the run repository's head (stop-decision binds it to --repo HEAD).
+let t0Head = (git t0RepoMain [ "rev-parse"; "HEAD" ]).Output.Trim()
+let staleVerdict = write (Path.Combine(work, "release", "completion-stale.json")) (json (dict [ "schema", box "indy-init.completion-gate/1"; "verdict", box "COMPLETE"; "candidate", box (String.replicate 40 "e") ]))
+let completeVerdict = write (Path.Combine(work, "release", "completion-complete.json")) (json (dict [ "schema", box "indy-init.completion-gate/1"; "verdict", box "COMPLETE"; "candidate", box t0Head ]))
 
 // Release evidence for the completion gate, all bound to `candidate`.
 let releaseGate = write (Path.Combine(work, "release", "gate.json")) (json (dict [ "schema", box "indy-init.r9-gate/1"; "verdict", box "PASS"; "mode", box "release"; "candidate", box candidate; "scope", box [||]; "workItem", box ""; "causes", box [||] ]))
@@ -245,13 +252,23 @@ let t10Item : JsonNode = manifest["workItems"].AsArray() |> Seq.find (fun w -> w
 let t10 = t10Item["requirements"].AsArray() |> Seq.map (fun x -> x.GetValue<string>()) |> List.ofSeq
 let byId id = reqs |> List.find (fun r -> idOf r = id)
 let t10Verified = t10 |> List.map byId |> List.collect (fun r -> [ started r; completed r ] @ (obligationsOf r |> List.map passed))
-let sliceEvidence (name: string) (causes: string list) (regressionPassed: string list) (regressionRequired: string list) =
+let sliceEvidenceFor (item: string) (scope: string list) (name: string) (causes: string list) (regressionPassed: string list) (regressionRequired: string list) =
     let f n (o: obj) = write (Path.Combine(work, "slice-" + name, n + ".json")) (json o)
-    [ "--gate"; f "gate" (dict [ "verdict", box (if causes.IsEmpty then "PASS" else "REFUSED"); "candidate", box candidate; "workItem", box "T10"; "scope", box (List.toArray t10); "causes", box (List.toArray causes) ])
+    [ "--gate"; f "gate" (dict [ "verdict", box (if causes.IsEmpty then "PASS" else "REFUSED"); "candidate", box candidate; "workItem", box item; "scope", box (List.toArray scope); "causes", box (List.toArray causes) ])
       "--build"; f "build" (dict [ "candidate", box candidate; "built", box true; "started", box true ])
       "--live"; f "live" (dict [ "candidate", box candidate; "baseUrl", box "https://api.github.com"; "status", box "passed" ])
       "--test-integrity"; f "integrity" (dict [ "candidate", box candidate; "refusals", box [||] ])
       "--regression"; f "regression" (dict [ "candidate", box candidate; "passed", box (List.toArray regressionPassed); "required", box (List.toArray regressionRequired) ]) ]
+let sliceEvidence = sliceEvidenceFor "T10" t10
+let sliceGateFor (t: Tools) (slice: string) (events: string) (extra: string list) =
+    rc t ([ "slice-gate"; "--manifest"; manifestPath; "--events"; events; "--slices"; slicesPath; "--slice"; slice; "--candidate"; candidate; "--target-base"; commit; "--target-head"; commit; "--out"; Path.Combine(work, "slice-gate-" + slice + ".json") ] @ extra)
+// SL-T11 depends on SL-T10, whose AR-023 has only record obligations (judged at release, never in a pull request's coverage).
+let itemReqs (id: string) = manifest["workItems"].AsArray() |> Seq.find (fun w -> w["id"].GetValue<string>() = id) |> fun w -> w["requirements"].AsArray() |> Seq.map (fun x -> x.GetValue<string>()) |> List.ofSeq
+let t11 = itemReqs "T11"
+let isRecord (o: string) = reqs |> Seq.collect (fun r -> r["obligations"].AsArray()) |> Seq.exists (fun x -> x["id"].GetValue<string>() = o && x["kind"].GetValue<string>() = "record")
+let t10Executable = t10 |> List.collect (byId >> obligationsOf) |> List.filter (isRecord >> not)
+let t11Obligations = t11 |> List.collect (byId >> obligationsOf)
+let t11Verified = t10Verified @ (t11 |> List.map byId |> List.collect (fun r -> [ started r; completed r ] @ (obligationsOf r |> List.map passed)))
 let sliceGate (t: Tools) (events: string) (extra: string list) =
     rc t ([ "slice-gate"; "--manifest"; manifestPath; "--events"; events; "--slices"; slicesPath; "--slice"; "SL-T10"; "--candidate"; candidate; "--target-base"; commit; "--target-head"; commit; "--out"; Path.Combine(work, "slice-gate.json") ] @ extra)
 let inv001 = byId "INV-001"
@@ -312,6 +329,15 @@ let integrityRepo (name: string) (weaken: bool) =
     repo, results "base" [ "a"; "b" ], results "head" (if weaken then [] else [ "a"; "b"; "c" ])
 let integrity (t: Tools) (repo: string, baseResults: string, headResults: string) =
     rc t [ "test-integrity"; "--repo"; repo; "--base"; "HEAD~1"; "--head"; "HEAD"; "--base-results"; baseResults; "--head-results"; headResults; "--out"; Path.Combine(work, "integrity.json") ]
+
+// The observer over one stop decision, with optional further evidence files (name, text).
+let observeDecision (t: Tools) (name: string) (decision: (string * obj) list) (more: (string * string) list) =
+    let ev = Path.Combine(work, "observer-" + name + "-" + string (Guid.NewGuid()))
+    write (Path.Combine(ev, "stop-decision.json")) (json (dict ([ "schema", box "indy-init.stop-decision/1"; "clock", box "live"; "t0", box (t0.ToString "o") ] @ decision))) |> ignore
+    more |> List.iter (fun (n, text) -> write (Path.Combine(ev, n)) text |> ignore)
+    rc t [ "observe"; "--manifest"; manifestPath; "--events"; catalogOnly; "--repo"; t0RepoMain; "--t0-record"; "evidence/t0/t0.json"; "--deadline-policy"; policy
+           "--now"; DateTimeOffset.UtcNow.ToString "o"; "--evidence"; ev; "--out"; Path.Combine(work, "observe-" + name + ".json") ]
+let at (m: float) = box ((t0.AddMinutes m).ToString "o")
 
 // The observer over one stop decision judged with the given clock ("live" or "replay").
 let observeWith (t: Tools) (clockMode: string) =
@@ -596,7 +622,7 @@ let cases : Case list =
               let repo = t0Repo ("edited-" + string (Guid.NewGuid()))
               write (Path.Combine(repo, "evidence", "t0", "t0.json")) (t0Text (t0.AddMinutes 300.0)) |> ignore
               rc t [ "stop-decision"; "--manifest"; manifestPath; "--checkpoint"; checkpoint; "--events"; catalogOnly; "--request"; request "c26" 499.0 "conserve-compute" scopeSha false
-                     "--t0-record"; Path.Combine(repo, "evidence", "t0", "t0.json"); "--deadline-policy"; policy; "--deadline-policy-sha256"; policySha; "--repo"; repo; "--out"; Path.Combine(work, "decision-c26.json") ]
+                     "--t0-record"; Path.Combine(repo, "evidence", "t0", "t0.json"); "--deadline-policy"; policy; "--lock"; lockFile; "--repo"; repo; "--out"; Path.Combine(work, "decision-c26.json") ]
         Correct = refusedWith "DEADLINE_RESET"
         Control = fun t -> stopDecision t catalogOnly (request "c26-control" 499.0 "deadline" scopeSha false) []
         ControlOk = fun o -> o.Exit = 0
@@ -607,7 +633,42 @@ let cases : Case list =
         Correct = fun o -> has "judged with a replay clock" o
         Control = fun t -> observeWith t "live"
         ControlOk = fun o -> not (has "judged with a replay clock" o)
-        Mutation = [ "tools/requirements-compiler/src/Observer.fs", [ "                        if strOpt \"clock\" d = Some \"replay\" then yield", "                        if false then yield" ] ] } ]
+        Mutation = [ "tools/requirements-compiler/src/Observer.fs", [ "                        if strOpt \"clock\" d = Some \"replay\" then yield", "                        if false then yield" ] ] }
+      { Id = "C28"; Title = "A stop is judged against a self-made deadline policy"; Requirements = [ "rule 10"; "review 1 (round 3)"; "observer" ]; Needs = Nothing
+        Expected = "observe: blocking DEADLINE_RESET (the decision's deadline is not the one the observer derives from the committed T0 record and the governed policy)"
+        Attack = fun t -> observeDecision t "c28" [ "requestedAt", at 300.0; "reason", box "deadline"; "decision", box "STOP_PERMITTED"; "minutesRemaining", box 0; "deadline", at 300.0 ] []
+        Correct = fun o -> has "was judged against deadline" o
+        Control = fun t -> observeDecision t "c28-control" [ "requestedAt", at 420.0; "reason", box "deadline"; "decision", box "STOP_PERMITTED"; "minutesRemaining", box 0; "deadline", at 420.0 ] []
+        ControlOk = fun o -> not (has "was judged against deadline" o) && not (has "PREMATURE_STOP" o)
+        Mutation = [ "tools/requirements-compiler/src/Observer.fs", [ "                        | Some dl when o.ClockProblem.IsNone && dl <> o.Clock.Deadline ->", "                        | Some dl when false ->" ] ] }
+      { Id = "C29"; Title = "A slice depends on a slice whose requirement has only record obligations"; Requirements = [ "slice gate"; "review 2 (round 3)" ]; Needs = Nothing
+        Expected = "slice-gate does not refuse SL-T11 for its dependency: record obligations are judged at release, not in a pull request; a missing executable dependency obligation still refuses"
+        Attack = fun t -> sliceGateFor t "SL-T11" (eventsFile "t11-verified" t11Verified) (sliceEvidenceFor "T11" t11 "c29" [] (t10Executable @ t11Obligations) [])
+        Correct = fun o -> not (has "DEPENDENCY_NOT_INTEGRATED" o)
+        Control = fun t -> sliceGateFor t "SL-T11" (eventsFile "t11-verified-b" t11Verified) (sliceEvidenceFor "T11" t11 "c29-control" [] (List.tail t10Executable @ t11Obligations) [])
+        ControlOk = fun o -> has "DEPENDENCY_NOT_INTEGRATED" o
+        Mutation = [ ledger, [ "                        strOpt \"kind\" o <> Some \"record\"\n", "                        true\n" ] ] }
+      { Id = "C30"; Title = "A stop as complete cites a completion verdict for another commit"; Requirements = [ "R6"; "review 3 (round 3)" ]; Needs = Nothing
+        Expected = "stop-decision CONTINUE_REQUIRED: COMPLETION_GATE_MISSING (the verdict is not the governed one for the repository's head)"
+        Attack = fun t -> stopDecision t allIntegrated (request "c30" 300.0 "complete" scopeSha true) [ "--completion"; staleVerdict ]
+        Correct = refusedWith "COMPLETION_GATE_MISSING"
+        Control = fun t -> stopDecision t allIntegrated (request "c30-control" 300.0 "complete" scopeSha true) [ "--completion"; completeVerdict ]
+        ControlOk = fun o -> o.Exit = 0
+        Mutation = [ "tools/requirements-compiler/src/ScopeCommands.fs", [ "&& (replayMode o || (head.IsSome && strOpt \"candidate\" c = head))", "&& true" ] ] }
+      { Id = "C31"; Title = "An early stop as complete is permitted without a governed completion verdict"; Requirements = [ "R6"; "review 3 (round 3)"; "observer" ]; Needs = Nothing
+        Expected = "observe: blocking PREMATURE_STOP (no governed completion-gate COMPLETE verdict)"
+        Attack = fun t -> observeDecision t "c31" [ "requestedAt", at 300.0; "reason", box "complete"; "decision", box "STOP_PERMITTED"; "minutesRemaining", box 120; "deadline", at 420.0 ] []
+        Correct = fun o -> has "no governed completion-gate COMPLETE verdict" o
+        Control = fun t -> observeDecision t "c31-control" [ "requestedAt", at 300.0; "reason", box "complete"; "decision", box "STOP_PERMITTED"; "minutesRemaining", box 120; "deadline", at 420.0 ] [ "completion.json", File.ReadAllText completeVerdict ]
+        ControlOk = fun o -> not (has "PREMATURE_STOP" o)
+        Mutation = [ "tools/requirements-compiler/src/Observer.fs", [ "strOpt \"reason\" d = Some \"complete\" && not (o.Completions |> List.exists (fun c -> strOpt \"verdict\" c = Some \"COMPLETE\"))", "strOpt \"reason\" d = Some \"complete\" && false" ] ] }
+      { Id = "C32"; Title = "The completion gate is given whole-plan coverage of another commit"; Requirements = [ "R6"; "review 5 (round 3)" ]; Needs = Nothing
+        Expected = "completion-gate INCOMPLETE: EVIDENCE_STALE"
+        Attack = fun t -> completion t allIntegrated true coverageStale
+        Correct = fun o -> o.Exit = 4 && has "EVIDENCE_STALE" o
+        Control = fun t -> completion t allIntegrated true coverageAll
+        ControlOk = fun o -> o.Exit = 0
+        Mutation = [ ledger, [ "                    | Some x when strOpt \"candidate\" x <> Some e.Candidate -> yield ref' \"EVIDENCE_STALE\"", "                    | Some x when false -> yield ref' \"EVIDENCE_STALE\"" ] ] } ]
 
 
 

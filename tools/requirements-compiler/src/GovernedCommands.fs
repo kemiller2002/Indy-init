@@ -316,6 +316,7 @@ let observeCommand (args: string list) =
               DesignContract = bySchema "indy-init.design-contract/1" |> List.tryLast
               LiveResults = bySchema "indy-init.journey-results/1"
               StopDecisions = bySchema "indy-init.stop-decision/1"
+              Completions = bySchema "indy-init.completion-gate/1"
               TestIntegrity = bySchema "indy-init.test-integrity/1"
               Claims = bySchema "indy-init.builder-claim/1"
               SliceManifest = slices; RemainingEstimate = remaining }

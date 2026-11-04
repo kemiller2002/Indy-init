@@ -364,7 +364,14 @@ let sliceRules : SliceRule list =
                     let headVerified = e.Regression |> Option.map (strs "passed" >> Set.ofList) |> Option.defaultValue Set.empty
                     let reqs = arr "requirements" s.Progress.Manifest |> List.map (fun r -> str "id" r, r) |> Map.ofList
                     // A dependency without requirements is a timed task; it completes by its Praxis record.
-                    let integrated = if rs.IsEmpty then s.Progress.CompletedItems.Contains d else rs |> List.forall (fun r -> reqs.TryFind r |> Option.exists (governedIntegrated s headVerified))
+                    let runsLive = boolOr "realProvider" false e.Slice
+                    let judgedHere (o: Json) =
+                        strOpt "kind" o <> Some "record"
+                        && (runsLive || not (strs "producers" o |> List.exists (fun p -> liveProducers.Contains p || p = "SU-BROWSER-WEBKIT")))
+                    let integratedReq (r: Json) =
+                        s.ExcludedBy.ContainsKey(str "id" r)
+                        || arr "obligations" r |> List.filter (fun o -> boolOr "mandatory" true o && judgedHere o) |> List.forall (fun o -> headVerified.Contains(str "id" o))
+                    let integrated = if rs.IsEmpty then s.Progress.CompletedItems.Contains d else rs |> List.forall (fun r -> reqs.TryFind r |> Option.exists integratedReq)
                     if not integrated then yield ref' "DEPENDENCY_NOT_INTEGRATED" (sprintf "dependency SL-%s is not integrated" d) ] }
       { Id = "current-target"
         Check = fun _ e -> if e.TargetBase <> e.TargetHead || e.TargetHead = "" then [ ref' "STALE_TARGET" (sprintf "the merged result was built on %s; the target is now %s: re-merge and re-verify" e.TargetBase e.TargetHead) ] else [] }
@@ -534,7 +541,11 @@ let completionRules : CompletionRule list =
               let recordsPassed = e.ReleaseGate |> Option.exists (fun g -> strOpt "verdict" g = Some "PASS" && (strs "causes" g).IsEmpty && strOpt "mode" g = Some "release")
               let verified = governedVerified s.Progress.Manifest e.Coverage e.CatalogVerification recordsPassed
               let open' = arr "requirements" s.Progress.Manifest |> List.filter (fun r -> boolOr "mandatory" false r && applies e.Facts r && not (governedIntegrated s verified r))
-              [ if e.Coverage.IsNone then yield ref' "COVERAGE_MISSING" "no governed coverage of the whole plan at the candidate; integration is judged only from governed evidence, never from progress events"
+              [ for name, j in [ "coverage", e.Coverage; "catalog verification", e.CatalogVerification ] do
+                    match j with
+                    | Some x when strOpt "candidate" x <> Some e.Candidate -> yield ref' "EVIDENCE_STALE" (sprintf "the %s is for %s, not %s" name (strOpt "candidate" x |> Option.defaultValue "(none)") e.Candidate)
+                    | _ -> ()
+                if e.Coverage.IsNone then yield ref' "COVERAGE_MISSING" "no governed coverage of the whole plan at the candidate; integration is judged only from governed evidence, never from progress events"
                 if e.CatalogVerification.IsNone then yield ref' "CATALOG_VERIFICATION_MISSING" "no governed catalog verification at the candidate"
                 if not open'.IsEmpty then
                     yield ref' "SCOPE_NOT_INTEGRATED" (sprintf "%d applicable mandatory requirement(s) are not governed-verified at the candidate, for example %s" open'.Length (open' |> List.truncate 6 |> List.map (str "id") |> String.concat ", ")) ] } ]

@@ -27,7 +27,10 @@ on:
 
 permissions:
   # write: the governed journeys persist to the designated test branch with this job's token (ODR-R10-09). The builder
-  # already has write access to its repository; main stays protected by branch protection.
+  # already has write access to its repository; main stays protected by branch protection. The token is not persisted in
+  # the checkout (candidate code cannot read it from .git/config); it reaches only the steps that run the live suites
+  # and journeys, as CAUSA_GITHUB_TOKEN. Those steps run candidate code, so the test repository must be one the owner
+  # accepts the builder writing to (ODR-R10-09).
   contents: write
   pull-requests: read
 
@@ -44,6 +47,7 @@ jobs:
         with:
           ref: ${{ github.sha }}
           fetch-depth: 0
+          persist-credentials: false
       - name: Candidate is the checked-out commit (never an asserted SHA)
         id: candidate
         env:
@@ -79,11 +83,12 @@ jobs:
         env:
           HEAD_REF: ${{ github.head_ref }}
           BASE_REF: ${{ github.base_ref }}
+          GH_TOKEN: ${{ github.token }}
         run: |
           # A pull request that changes implementation names its slice by its branch; the gate then judges that work item
           # at the merged result (this checkout is the merge of the head into the current base).
           src="$RUNNER_TEMP/indy-init"; slices="$src/docs/rehearsal-010-readiness/slice-execution-manifest.json"
-          impl=$(git diff --name-only HEAD^1 HEAD | grep -vE '^(docs|evidence|\.ros)/|\.md$' || true)
+          impl=$(git diff --name-only HEAD^1 HEAD | grep -vE '^(docs|evidence|\.ros)/|\.md$|^\.echelon/(verification-scope|scope-checkpoint)\.json$' || true)
           slice=""; case "$HEAD_REF" in slice/SL-*) slice="${HEAD_REF#slice/}";; esac
           if [ -n "$impl" ] && [ -z "$slice" ]; then echo "::error::this pull request changes implementation but its branch does not name a slice (slice/SL-<work item>)"; exit 1; fi
           if [ -n "$slice" ]; then
@@ -93,7 +98,7 @@ jobs:
             echo "scope=$(jq -r '.requirements | join(",")' "$RUNNER_TEMP/slice.json")" >> "$GITHUB_OUTPUT"
             echo "live=$(jq -r .realProvider "$RUNNER_TEMP/slice.json")" >> "$GITHUB_OUTPUT"
             echo "target_base=$(git rev-parse HEAD^1)" >> "$GITHUB_OUTPUT"
-            git fetch -q origin "$BASE_REF" && echo "target_head=$(git rev-parse FETCH_HEAD)" >> "$GITHUB_OUTPUT"
+            git fetch -q "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}" "$BASE_REF" && echo "target_head=$(git rev-parse FETCH_HEAD)" >> "$GITHUB_OUTPUT"
           fi
       - name: Governance is unchanged (policy, this workflow, completed items, scope only grows)
         run: |
@@ -263,6 +268,8 @@ jobs:
           jq '{schema: "indy-init.r9-verification-scope/1", requirements: ([.obligations[].requirement] | unique)}' "$RUNNER_TEMP/obligations.json" > "$ev/all-scope.json"
           dotnet fsi "$src/tools/r9/r9.fsx" -- gate --mode development --scope-file "$ev/all-scope.json" --obligations "$RUNNER_TEMP/obligations.json" --root . \
             --results "$RUNNER_TEMP/results/results.json" --dokimos "$(command -v dokimos)" --out "$ev/gate-all-head" || true
+          # Fail closed: without whole-plan coverage, regression and dependencies cannot be judged.
+          test -f "$ev/gate-all-head/coverage.json" || { echo "::error::no whole-plan coverage at the merged result: regression and dependencies cannot be judged"; exit 1; }
           git worktree add -q "$RUNNER_TEMP/base" "$base"
           (cd "$RUNNER_TEMP/base" && npm ci > /dev/null 2>&1; true)
           dotnet fsi "$src/tools/r9/r9.fsx" -- run-suites --obligations "$RUNNER_TEMP/obligations.json" --root "$RUNNER_TEMP/base" \
@@ -272,12 +279,18 @@ jobs:
             dotnet fsi "$src/tools/r9/r9.fsx" -- gate --mode development --scope-file "$ev/all-scope.json" --obligations "$RUNNER_TEMP/obligations.json" --root "$RUNNER_TEMP/base" \
               --results "$RUNNER_TEMP/base-results/results.json" --dokimos "$(command -v dokimos)" --out "$ev/gate-all-base" || true
           fi
-          verified() { [ -f "$1" ] && jq '[.obligations[] | select(.status == "verified") | .id]' "$1" || echo '[]'; }
+          if [ -d "$RUNNER_TEMP/base/tests" ] && [ ! -f "$ev/gate-all-base/coverage.json" ]; then echo "::error::no whole-plan coverage at the target base: regression cannot be judged"; exit 1; fi
+          # A base without tests (the first slice) has nothing to regress; any other missing file has been refused above.
+          verified() { if [ -f "$1" ]; then jq '[.obligations[] | select(.status == "verified") | .id]' "$1"; else echo '[]'; fi; }
           catalogPass=$(jq '[.requirements[].obligations[] | select(.status == "PASS") | .id]' "$RUNNER_TEMP/catalog/requirement-verification.json" 2>/dev/null || echo '[]')
           jq -n --arg c "$CANDIDATE" --argjson head "$(verified "$ev/gate-all-head/coverage.json")" --argjson base "$(verified "$ev/gate-all-base/coverage.json")" \
             --argjson cat "$catalogPass" '{candidate: $c, passed: ($head + $cat), required: $base}' > "$ev/regression.json"
           # Real provider: the plan's live suites ran at the merged result against GitHub (their obligations are judged by the gate).
-          livestatus=failed; ls "$RUNNER_TEMP"/results/SU-DOTNET-LIVE/*.trx "$RUNNER_TEMP"/results/SU-BROWSER-LIVE/results.json > /dev/null 2>&1 && livestatus=passed
+          # Passed only when both live suites ran tests and none failed (their files existing is not enough).
+          livestatus=failed
+          trx=$(ls "$RUNNER_TEMP"/results/SU-DOTNET-LIVE/*.trx 2>/dev/null | head -1); pw="$RUNNER_TEMP/results/SU-BROWSER-LIVE/results.json"
+          if [ -n "$trx" ] && [ -f "$pw" ] && grep -q 'outcome="Passed"' "$trx" && ! grep -qE 'outcome="(Failed|Error|Timeout|Aborted)"' "$trx" \
+             && [ "$(jq '.stats.unexpected // 1' "$pw")" = 0 ] && [ "$(jq '.stats.expected // 0' "$pw")" -gt 0 ]; then livestatus=passed; fi
           jq -n --arg c "$CANDIDATE" --arg s "$livestatus" '{candidate: $c, baseUrl: "https://api.github.com", status: $s}' > "$ev/live.json"
           dotnet "$rc" test-integrity --repo . --base "$base" --head "$CANDIDATE" \
             --base-results "$RUNNER_TEMP/base-results" --head-results "$RUNNER_TEMP/results" --out "$ev/test-integrity.json" || true

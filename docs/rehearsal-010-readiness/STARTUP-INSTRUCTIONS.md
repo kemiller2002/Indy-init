@@ -160,7 +160,7 @@ Before stopping for any reason other than the deadline, write `evidence/progress
 ```
 requirements-compiler stop-decision --manifest SRC/docs/rehearsal-010-readiness/scope-manifest.json --checkpoint .echelon/scope-checkpoint.json \
   --events evidence/progress/events.json --request evidence/progress/stop-request.json \
-  --t0-record evidence/t0/t0.json --deadline-policy SRC/kickoff/rehearsal-010/deadline-policy.json --deadline-policy-sha256 <lock deadlinePolicy.sha256> --repo . \
+  --t0-record evidence/t0/t0.json --deadline-policy SRC/kickoff/rehearsal-010/deadline-policy.json --lock SRC/kickoff/rehearsal-010/toolchain.lock.json --repo . \
   [--completion <the latest completion-gate.json of main>] --approvals SRC/kickoff/acceptance/approvals.causa.json --trusted-operator kemiller2002 --out evidence/progress/stop-decision.json
 ```
 
@@ -168,7 +168,7 @@ Stop only on `STOP_PERMITTED`. Anything else is `CONTINUE_REQUIRED`: go back to 
 
 | Reason | Permitted only when |
 |---|---|
-| `complete` | the full-scope completion gate says COMPLETE for main (`--completion`) |
+| `complete` | the governed full-scope completion gate says COMPLETE for the current head of main (`--completion`: its `completion-gate.json`, whose `candidate` must be `git rev-parse HEAD`) |
 | `owner-authorized` | an operator record `{action: authorize-stop}` named by the request exists |
 | `hard-blocker` | every blocker has evidence and no open work item can proceed (a verification blocker never counts) |
 | `compute-limit` | an operator record `{action: approve-compute-limit, limit}` exists and the request shows the limit reached. None is approved for Rehearsal 010 |
@@ -187,7 +187,7 @@ The session is disposable; the run is not. The successor runs:
 ```
 requirements-compiler resume --manifest SRC/docs/rehearsal-010-readiness/scope-manifest.json --checkpoint .echelon/scope-checkpoint.json \
   --events evidence/progress/events.json --t0-record evidence/t0/t0.json --deadline-policy SRC/kickoff/rehearsal-010/deadline-policy.json \
-  --deadline-policy-sha256 <lock deadlinePolicy.sha256> --repo . --at NOW [--stop-decision evidence/progress/stop-decision.json] --out evidence/progress/resume.json
+  --lock SRC/kickoff/rehearsal-010/toolchain.lock.json --repo . --at NOW [--stop-decision evidence/progress/stop-decision.json] --out evidence/progress/resume.json
 ```
 
 It does what the result says:

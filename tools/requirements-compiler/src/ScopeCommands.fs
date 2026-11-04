@@ -157,9 +157,13 @@ let private clockOf (o: Map<string, string>) : Result<Continuation.Clock, Refusa
     let sha (path: string) = Security.Cryptography.SHA256.HashData(IO.File.ReadAllBytes path) |> Convert.ToHexString |> fun s -> s.ToLowerInvariant()
     match o.TryFind "--t0-record", o.TryFind "--deadline-policy" with
     | Some t, Some p ->
-        // A live run's policy must be the one the owner pinned (the lock's deadlinePolicy.sha256).
-        match o.TryFind "--deadline-policy-sha256" with
-        | None when not (replayMode o) -> Error { Code = "DEADLINE_POLICY_UNAPPROVED"; Detail = "a live run needs --deadline-policy-sha256 (the lock's deadlinePolicy.sha256)" }
+        // A live run's policy must be the one the owner pinned: read from the governed lock (deadlinePolicy.sha256),
+        // and its T0 record must be the one committed at T0 (--repo). The observer recomputes the same deadline
+        // independently and compares it with each decision's, so a self-made lock or policy is caught there.
+        let pinned = o.TryFind "--lock" |> Option.filter IO.File.Exists |> Option.bind (fun l -> parseFile l |> field "deadlinePolicy" |> Option.bind (strOpt "sha256"))
+        match pinned with
+        | None when not (replayMode o) -> Error { Code = "DEADLINE_POLICY_UNAPPROVED"; Detail = "a live run needs --lock (the governed toolchain lock with deadlinePolicy.sha256)" }
+        | _ when not (replayMode o) && not (o.ContainsKey "--repo") -> Error { Code = "T0_RECORD_UNCOMMITTED"; Detail = "a live run needs --repo: the T0 record must be the one committed at T0" }
         | Some pinned when pinned <> sha p -> Error { Code = "DEADLINE_POLICY_UNAPPROVED"; Detail = sprintf "the deadline policy has sha256 %s; the lock pins %s" (sha p) pinned }
         | _ -> committedT0 o t |> Result.bind (fun () -> Continuation.boundClock (parseFile t) (parseFile p) claimedT0 claimedWindow)
     | Some _, None -> Error { Code = "DEADLINE_POLICY_MISSING"; Detail = "--t0-record needs --deadline-policy" }
@@ -198,7 +202,7 @@ let private withClock (replay: bool) (clock: Continuation.Clock) (j: Json) =
 let stopDecisionCommand (args: string list) : int =
     let o = options args
     if not ([ "--manifest"; "--checkpoint"; "--events"; "--request"; "--out" ] |> List.forall o.ContainsKey) || not (o.ContainsKey "--t0" || o.ContainsKey "--t0-record") then
-        eprintfn "usage: stop-decision --manifest FILE --checkpoint FILE --events FILE --request FILE (--t0-record FILE --deadline-policy FILE [--deadline-policy-sha256 HEX] | --t0 ISO --replay-clock true [--window-minutes 420]) [--now ISO] [--approvals FILE --trusted-operator ID] --out FILE"; 2
+        eprintfn "usage: stop-decision --manifest FILE --checkpoint FILE --events FILE --request FILE (--t0-record FILE --deadline-policy FILE --lock FILE --repo DIR | --t0 ISO --replay-clock true [--window-minutes 420]) [--now ISO] [--approvals FILE --trusted-operator ID] --out FILE"; 2
     else
         match clockOf o with
         | Error refusal -> printfn "  REFUSED %s %s" refusal.Code refusal.Detail; printfn "stop-decision: REFUSED (the run clock)"; 4
@@ -228,7 +232,13 @@ let stopDecisionCommand (args: string list) : int =
                 | None -> d
             // "complete" before the deadline also needs the full-scope completion gate's COMPLETE verdict (--completion).
             let d =
-                let complete = o.TryFind "--completion" |> Option.filter IO.File.Exists |> Option.exists (fun f -> strOpt "verdict" (parseFile f) = Some "COMPLETE")
+                // The verdict must be the governed completion gate's, for the repository's current head.
+                let head = o.TryFind "--repo" |> Option.bind (fun r -> match Git.run r [ "rev-parse"; "HEAD" ] with Ok b -> Some((Text.Encoding.UTF8.GetString b).Trim()) | Error _ -> None)
+                let complete =
+                    o.TryFind "--completion" |> Option.filter IO.File.Exists |> Option.map parseFile
+                    |> Option.exists (fun c ->
+                        strOpt "schema" c = Some "indy-init.completion-gate/1" && strOpt "verdict" c = Some "COMPLETE"
+                        && (replayMode o || (head.IsSome && strOpt "candidate" c = head)))
                 if request.Reason = "complete" && request.At < clock.Deadline && not complete then
                     { d with Permitted = false; Refusals = d.Refusals @ [ { Code = "COMPLETION_GATE_MISSING"; Detail = "stopping as complete needs the completion gate's COMPLETE verdict (--completion)" } ] }
                 else d
@@ -242,7 +252,7 @@ let stopDecisionCommand (args: string list) : int =
 let resumeCommand (args: string list) : int =
     let o = options args
     if not ([ "--manifest"; "--checkpoint"; "--events"; "--at"; "--out" ] |> List.forall o.ContainsKey) || not (o.ContainsKey "--t0" || o.ContainsKey "--t0-record") then
-        eprintfn "usage: resume --manifest FILE --checkpoint FILE --events FILE (--t0-record FILE --deadline-policy FILE [--deadline-policy-sha256 HEX] | --t0 ISO --replay-clock true [--window-minutes 420]) --at ISO [--now ISO] [--stop-decision FILE] --out FILE"; 2
+        eprintfn "usage: resume --manifest FILE --checkpoint FILE --events FILE (--t0-record FILE --deadline-policy FILE --lock FILE --repo DIR | --t0 ISO --replay-clock true [--window-minutes 420]) --at ISO [--now ISO] [--stop-decision FILE] --out FILE"; 2
     else
         match clockOf o with
         | Error refusal -> printfn "  REFUSED %s %s" refusal.Code refusal.Detail; printfn "resume: REFUSED (the run clock)"; 4

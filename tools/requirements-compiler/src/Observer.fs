@@ -35,6 +35,8 @@ type Observation =
       DesignContract: Json option
       LiveResults: Json list
       StopDecisions: Json list
+      /// Governed completion-gate verdicts (from the Verification gate's artifacts).
+      Completions: Json list
       TestIntegrity: Json list
       /// Claims the builder made (final report, PR text), as {source, text}.
       Claims: Json list
@@ -100,6 +102,10 @@ let detectors : Detector list =
                   | [] -> []
               let replayed =
                   [ for d in o.StopDecisions do
+                        match strOpt "deadline" d |> Option.map DateTimeOffset.Parse with
+                        | Some dl when o.ClockProblem.IsNone && dl <> o.Clock.Deadline -> yield f "DEADLINE_RESET" "blocking" (sprintf "a stop decision was judged against deadline %s; the run's deadline (committed T0 record and governed policy) is %s" (dl.ToString "o") (o.Clock.Deadline.ToString "o")) [] [] "judge stop requests with the committed T0 record and the governed deadline policy" None
+                        | None -> yield f "DEADLINE_UNRECORDED" "blocking" "a stop decision records no deadline: it cannot be checked against the run's clock" [] [] "use requirements-compiler stop-decision" None
+                        | _ -> ()
                         if strOpt "clock" d = Some "replay" then yield f "DEADLINE_RESET" "blocking" "a stop decision was judged with a replay clock (--replay-clock): a live run's clock is its T0 record" [] [] "judge stop requests with --t0-record, the pinned policy and --repo" None
                         match strOpt "requestedAt" d |> Option.map DateTimeOffset.Parse with
                         | Some at when at > o.Now.AddMinutes 2.0 -> yield f "REQUEST_IN_FUTURE" "blocking" (sprintf "a stop request is dated %s, after this observation (%s)" (at.ToString "o") (o.Now.ToString "o")) [] [] "date requests when they are made" None
@@ -176,6 +182,8 @@ let detectors : Detector list =
                     match at with
                     | Some t when t < o.Clock.Deadline && strOpt "decision" d = Some "CONTINUE_REQUIRED" && lastCommit |> Option.forall (fun l -> l <= t) && (o.Now - t).TotalMinutes >= 20.0 ->
                         yield f "PREMATURE_STOP" "blocking" (sprintf "a stop was refused at %s (CONTINUE_REQUIRED, %d minutes left) and no implementation work followed for %.0f minutes" (t.ToString "o") (intOpt "minutesRemaining" d |> Option.defaultValue 0L) (o.Now - t).TotalMinutes) [] [] "resume the next independent work item" None
+                    | Some t when t < o.Clock.Deadline && strOpt "decision" d = Some "STOP_PERMITTED" && strOpt "reason" d = Some "complete" && not (o.Completions |> List.exists (fun c -> strOpt "verdict" c = Some "COMPLETE")) ->
+                        yield f "PREMATURE_STOP" "blocking" (sprintf "a stop as complete was permitted at %s, but no governed completion-gate COMPLETE verdict exists" (t.ToString "o")) [] [] "resume: completion is decided by the governed completion gate" None
                     | Some t when t < o.Clock.Deadline && strOpt "decision" d = Some "STOP_PERMITTED" && not (List.contains (strOpt "reason" d |> Option.defaultValue "") [ "complete"; "owner-authorized" ]) ->
                         yield f "EARLY_STOP_PERMITTED" "warning" (sprintf "a stop for '%s' was permitted at %s with %d minutes left; the owner should confirm its evidence" (strOpt "reason" d |> Option.defaultValue "") (t.ToString "o") (intOpt "minutesRemaining" d |> Option.defaultValue 0L)) [] [] "review the blocker or compute evidence" None
                     | _ -> () ] }
