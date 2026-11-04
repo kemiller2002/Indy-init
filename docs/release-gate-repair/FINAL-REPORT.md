@@ -17,7 +17,7 @@ The Rehearsal 009 release gate could not reach a verdict that means anything. Th
 | `SU-DOTNET-LIVE produced no result file` | the same generator | It has two targets, `tests/Causa.Acceptance tests/Causa.Invariants`: MSB1008. It binds 139 obligations. | the same log |
 | `SU-BROWSER-WEBKIT produced no result file` | the same generator, and the bootstrap | Its runner names `--project=webkit`. The ownership manifest plans an integration-owned `playwright.config.ts`, but the bootstrap never wrote it. Conditor's scaffold `playwright.config.js` defines only `chromium`, hence `Project(s) "webkit" not found`. It binds 71 obligations. | the same log; `evidence/webkit-run.log` |
 | Nothing caught these before the release gate | process | No check executed a runner. The readiness harness and Rehearsal 008 never ran these suites, and the gate's own workflow installed no browsers. | — |
-| INV-029 always FAIL (catalog) | Dokimos 0.11.0 `RequirementJudging.componentMatches` | The catalog's component `url-input` has no case. Praxis accepts any component name, and Forma renders a URL field as a text-type input. | kemiller2002/dokimos#68 tests (they fail on 0.11.0) |
+| INV-029 always FAIL (catalog) | Dokimos 0.11.0 `RequirementJudging.componentMatches` | The catalog's component `url-input` has no case. Praxis accepts any component name, and Forma renders a URL field as a text-type input. | kemiller2002/dokimos#67 (merged) and the duplicate #68 tests (both fail on 0.11.0) |
 | Implementation before any Praxis work item (Rehearsal 009 process deviation) | process | Nothing required work items, links or a matrix before implementation. | `evidence/check-sequencing-r9.json`: 6 violating commits, no checkpoint |
 | Catalog acceptance read as "the" result | acceptance model | There was one verdict per tool and no separation of levels. | — |
 
@@ -38,7 +38,7 @@ The frozen v4.1.2 package was not edited. It and v4.1.1 still regenerate byte fo
   - Every correction names its decision.
 - **Preflight `r9.fsx suite-preflight`:** executes each suite's own command in list mode (`--list-tests`; `--list --pass-with-no-tests`) against a repository, and refuses readiness if any cannot execute. It needs no tests to exist, so it runs before implementation. It is also a step of the governed Verification gate.
 - **Governed gate workflow** (`tools/r9/verification-gate.yml`): installs Playwright Chromium and WebKit with their dependencies (it installed no browser before).
-- **Dokimos `url-input`:** kemiller2002/dokimos#68 makes `url-input` an `<input>` of type `url`, `text` or no type, and refuses every other element.
+- **Dokimos `url-input`:** kemiller2002/dokimos#67 (merged on Dokimos `main`; my identical #68 was closed as a duplicate) makes `url-input` an `<input>` of type `url`, `text` or no type, and refuses every other element.
   - It adds 4 independent tests; the 2 positive ones fail on 0.11.0. Dokimos.Core.Tests passes 436 of 436.
   - Run on Rehearsal 009's committed live observations, the patched build gives **37 of 37 verified**. The released 0.11.0 gives 36 of 37 (`evidence/r9-catalog/`).
 - **Acceptance criteria:** none was weakened. WebKit stays mandatory, and every suite keeps its tests and bindings.
@@ -134,7 +134,7 @@ Missing or stale evidence is an explicit refusal of that level. `--require` gate
 | Deliverable | Where |
 |---|---|
 | Corrected generator and successor package | `tools/requirements-compiler/src/V41Package.fs`, `requirements-compiled/v4.1.4/` |
-| Regression tests | `tools/release-gate-repair/tests.fsx`; kemiller2002/dokimos#68 |
+| Regression tests | `tools/release-gate-repair/tests.fsx`; kemiller2002/dokimos#67 |
 | Updated preflight checks | `r9.fsx suite-preflight`, X21, `tools/r9/verification-gate.yml`, `.github/workflows/preflight-tooling.yml` |
 | Praxis sequencing enforcement | `r9.fsx authorize-implementation`, `r9.fsx check-sequencing` |
 | Complete obligation inventory | `obligation-inventory.json`, `tools/release-gate-repair/inventory.fsx` |
@@ -150,7 +150,7 @@ Missing or stale evidence is an explicit refusal of that level. `--require` gate
 | 1 | Competition scope: the whole plan plus the catalog (proposed, no exclusion), or a named narrower scope | **scope decision** | ODR-RG-01 |
 | 2 | Topology: one agent cannot write the 541 unimplemented executable obligations in the window. The frozen schedule plans role lanes (topology C). | **scope decision** (decides whether #1 is achievable) | ODR-RG-05 |
 | 3 | Approve and tag package v4.1.4. Until then the only frozen package, v4.1.2, cannot execute three of its suites. | owner approval | ODR-RG-02 (ODR-V414-01..03) |
-| 4 | Release Dokimos 0.11.1 (dokimos#68, the `url-input` fix) and register it in echelon-current | owner release and registry approval | ODR-RG-03 |
+| 4 | Release Dokimos 0.11.1 (dokimos#67, the `url-input` fix, merged) and register it in echelon-current | owner release and registry approval | ODR-RG-03 |
 | 5 | A Rehearsal 010 lock pinning v4.1.4, the new tool set and new process-evidence rules, and governing with this Indy-init commit | owner lock change | ODR-RG-04 |
 
 **Technical defects versus scope decisions:**
@@ -172,3 +172,13 @@ Missing or stale evidence is an explicit refusal of that level. `--require` gate
 - No rehearsal was run, and the application was not rebuilt.
 - None of the 541 unimplemented obligations was implemented, and none was excluded.
 - No owner decision, approval, release, tag or lock change was recorded. Each is the owner's.
+
+## 10. Coordination with #102
+
+A second agent's PR, kemiller2002/Indy-init#102 (process corrections), overlaps six files of this one. Neither PR merges until both are reviewed together and the combined integration tests pass.
+
+The proposed resolution is in [INTEGRATION-RESPONSE.md](INTEGRATION-RESPONSE.md):
+- test commands from #101 (v4.1.4);
+- Dokimos from dokimos#67;
+- one scope artifact, #102's `scope-manifest.json`, with #101's inventory kept as reconciliation evidence;
+- sequencing decided by #102.

@@ -45,7 +45,7 @@
       "id": "ODR-RG-03",
       "kind": "toolchain",
       "title": "Release Dokimos 0.11.1 (url-input) and register it",
-      "question": "Merge kemiller2002/dokimos#68 (url-input components), release Dokimos 0.11.1 through its release process, and register a new echelon-current set with it?",
+      "question": "Release Dokimos 0.11.1 through its release process with the url-input fix (kemiller2002/dokimos#67, merged; #68 was a duplicate and is closed), and register a new echelon-current set with it?",
       "options": [
         "A: release and register",
         "B: keep 0.11.0 (INV-029 can never pass V1-V3; non-mandatory)"
