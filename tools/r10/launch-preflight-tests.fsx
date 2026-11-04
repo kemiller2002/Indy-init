@@ -21,16 +21,31 @@ let work = opt "--work" |> Option.defaultWith (fun () -> failwith "missing --wor
 let evidence = opt "--evidence"
 let preflight = Path.Combine(src, "tools", "r10", "launch-preflight.fsx")
 
-let run (dir: string) (exe: string) (a: string list) =
+let runEnv (env: (string * string) list) (dir: string) (exe: string) (a: string list) =
     let info = ProcessStartInfo(exe, WorkingDirectory = dir, RedirectStandardOutput = true, RedirectStandardError = true, UseShellExecute = false)
     a |> List.iter info.ArgumentList.Add
+    env |> List.iter (fun (k, v) -> info.Environment[k] <- v)
     use p = Process.Start info
     let out = p.StandardOutput.ReadToEnd()
     let err = p.StandardError.ReadToEnd()
     p.WaitForExit()
     p.ExitCode, out + err
-let gitAs (who: string) dir a = run dir "git" ([ "-c"; $"user.name={who}"; "-c"; $"user.email={who}@example.invalid"; "-c"; "commit.gpgsign=false" ] @ a)
-let git dir a = gitAs "kemiller2002" dir a
+let run = runEnv []
+
+/// The fixture's signing keys: the owner's (the one registered on "GitHub") and an agent's, in one keyring.
+let keyring = Path.Combine(work, "gnupg")
+let gpg (a: string list) = runEnv [ "GNUPGHOME", keyring ] work "gpg" ([ "--batch"; "--quiet"; "--pinentry-mode"; "loopback"; "--passphrase"; "" ] @ a)
+let keyOf (who: string) =
+    let _, out = gpg [ "--list-secret-keys"; "--with-colons"; $"{who}@example.invalid" ]
+    out.Split('\n') |> Array.tryFind (fun l -> l.StartsWith "fpr:") |> Option.map (fun l -> l.Split(':').[9]) |> Option.defaultValue ""
+/// A git command as `who`, signing with `key` ("" = unsigned).
+let gitAsKey (who: string) (key: string) dir a =
+    let signing = if key = "" then [ "-c"; "commit.gpgsign=false" ] else [ "-c"; "commit.gpgsign=true"; "-c"; "gpg.format=openpgp"; "-c"; $"user.signingkey={key}"; "-c"; "gpg.program=gpg" ]
+    runEnv [ "GNUPGHOME", keyring ] dir "git" ([ "-c"; $"user.name={who}"; "-c"; $"user.email={who}@example.invalid" ] @ signing @ a)
+let mutable ownerKey = ""
+let mutable agentKey = ""
+let git dir a = gitAsKey "kemiller2002" ownerKey dir a
+let gitAs (who: string) dir a = gitAsKey who (if who = "kemiller2002" then ownerKey else agentKey) dir a
 let write (file: string) (text: string) = Directory.CreateDirectory(Path.GetDirectoryName file) |> ignore; File.WriteAllText(file, text)
 let sha (text: string) = (SHA256.HashData(Text.Encoding.UTF8.GetBytes text) |> Convert.ToHexString).ToLowerInvariant()
 let replaceIn (file: string) (a: string) (b: string) =
@@ -45,7 +60,10 @@ let commitPushMessage (f: Fixture) (message: string list) =
     git f.Indy [ "push"; "-q"; "origin"; "main" ] |> ignore
 let commitPush f (message: string) = commitPushMessage f [ message ]
 /// A commit an agent made, though it may carry the owner's name: never owner-signed.
-let agentCommitPush f (message: string) = commitPushMessage f [ message; "[unsigned]" ]
+let agentCommitPush f (message: string) =
+    gitAsKey "claude" agentKey f.Indy [ "add"; "-A" ] |> ignore
+    gitAsKey "claude" agentKey f.Indy [ "commit"; "-q"; "-m"; message; "-m"; "[unsigned]" ] |> ignore
+    git f.Indy [ "push"; "-q"; "origin"; "main" ] |> ignore
 
 let testRepository = "{\"owner\":\"kemiller2002\",\"repo\":\"causa-acceptance-r10\",\"branch\":\"causa-acceptance\",\"isolated\":true}"
 let decisions =
@@ -113,6 +131,8 @@ let fixture (name: string) (edit: Fixture -> unit) (extraArgs: Fixture -> string
     write (Path.Combine(f.Runs, "4242", "live-provider-preflight", "journey-results.json"))
         ($"{{\"schema\":\"indy-init.journey-results/1\",\"candidate\":\"fixture-{h1}\",\"provider\":{{\"mode\":\"github\",\"baseUrl\":\"https://api.github.com\"}},\"results\":[" + String.Join(",", rows) + "]}\n")
     write (Path.Combine(f.Runs, "4242", "live-provider-preflight", "run-info.json")) ($"{{\"lock\":\"kickoff/rehearsal-010/toolchain.lock.json\",\"sha\":\"{h1}\",\"testRepository\":{testRepository}}}\n")
+    let _, armored = gpg [ "--armor"; "--export"; ownerKey ]
+    write (Path.Combine(f.Runs, "gpg-keys.json")) (Text.Json.JsonSerializer.Serialize [| armored |])
     write (Path.Combine(f.Runs, "path-4242")) ".github/workflows/live-provider-preflight.yml\n"
     write (Path.Combine(f.Runs, "path-777")) ".github/workflows/preflight-tooling.yml\n"
     write (Path.Combine(f.Runs, "run-777.json")) $"{{\"workflowName\":\"Preflight tooling\",\"headBranch\":\"main\",\"event\":\"push\",\"conclusion\":\"success\",\"headSha\":\"{h1}\"}}\n"
@@ -123,6 +143,7 @@ let fixture (name: string) (edit: Fixture -> unit) (extraArgs: Fixture -> string
           @"# [unsigned] or carrying an agent trailer) or a run's workflow file; run view: a run's metadata; run download: its artifact."
           @"if [ ""$1"" = api ]; then"
           @"  case ""$2"" in */actions/runs/*) cat '@RUNS@'/path-${2##*/} 2>/dev/null || exit 1; exit 0 ;; esac"
+          @"  case ""$2"" in users/*/gpg_keys) cat '@RUNS@'/gpg-keys.json; exit 0 ;; users/*/ssh_signing_keys) echo '[]'; exit 0 ;; esac"
           @"  c=${2##*/}; msg=$(git -C '@INDY@' show -s --format=%B ""$c"" 2>/dev/null) || exit 1"
           @"  committer=$(git -C '@INDY@' show -s --format=%cn ""$c"")"
           @"  case ""$msg"" in *Claude-Session:*|*'[unsigned]'*) v=false ;; *) v=true ;; esac"
@@ -179,6 +200,41 @@ let cases =
           git f.Indy [ "add"; "-A" ] |> ignore
           gitAs "claude" f.Indy [ "commit"; "-q"; "--author"; "kemiller2002 <kemiller2002@example.invalid>"; "-m"; "Owner decisions" ] |> ignore
           git f.Indy [ "push"; "-q"; "origin"; "main" ] |> ignore)
+      case "agent-key-signs-as-the-owner-committer" "LP-05" (fun f ->
+          // GitHub (stand-in) is fooled into reporting the owner as committer; the signature is the agent's key
+          replaceIn (approvals f) "\"decision_id\":\"ODR-R10-05\",\"action\":\"decide\",\"option\":\"A\"" "\"decision_id\":\"ODR-R10-05\",\"action\":\"decide\",\"option\":\"A\" "
+          gitAsKey "kemiller2002" agentKey f.Indy [ "add"; "-A" ] |> ignore
+          gitAsKey "kemiller2002" agentKey f.Indy [ "commit"; "-qm"; "Owner decisions" ] |> ignore
+          git f.Indy [ "push"; "-q"; "origin"; "main" ] |> ignore)
+      case "planted-git-config-fakes-local-verification" "LP-05" (fun f ->
+          // the agent's key signs, and the checkout's config names a verifier that always says yes
+          replaceIn (approvals f) "\"decision_id\":\"ODR-R10-05\",\"action\":\"decide\",\"option\":\"A\"" "\"decision_id\":\"ODR-R10-05\",\"action\":\"decide\",\"option\":\"A\" "
+          gitAsKey "kemiller2002" agentKey f.Indy [ "add"; "-A" ] |> ignore
+          gitAsKey "kemiller2002" agentKey f.Indy [ "commit"; "-qm"; "Owner decisions" ] |> ignore
+          git f.Indy [ "push"; "-q"; "origin"; "main" ] |> ignore
+          git f.Indy [ "config"; "gpg.program"; "true" ] |> ignore
+          git f.Indy [ "config"; "gpg.ssh.program"; "true" ] |> ignore)
+      case "merge-rolls-back-an-owner-decision" "LP-05" (fun f ->
+          // the owner's first record (A), then the owner revokes it (B); an agent merges the first record back in
+          let _, o1 = git f.Indy [ "rev-list"; "--max-parents=0"; "HEAD" ]
+          replaceIn (approvals f) "\"decision_id\":\"ODR-R10-05\",\"action\":\"decide\",\"option\":\"A\"" "\"decision_id\":\"ODR-R10-05\",\"action\":\"decide\",\"option\":\"B\""
+          commitPush f "Owner decisions: revoke ODR-R10-05"
+          git f.Indy [ "checkout"; o1.Trim(); "--"; "kickoff/rehearsal-007/approvals.causa.json" ] |> ignore
+          gitAsKey "claude" agentKey f.Indy [ "add"; "-A" ] |> ignore
+          let _, tree = git f.Indy [ "write-tree" ]
+          let _, merge = gitAsKey "claude" agentKey f.Indy [ "commit-tree"; tree.Trim(); "-p"; "HEAD"; "-p"; o1.Trim(); "-m"; "merge" ]
+          git f.Indy [ "reset"; "-q"; "--hard"; merge.Trim() ] |> ignore
+          git f.Indy [ "push"; "-q"; "origin"; "main" ] |> ignore)
+      { Name = "owner-pr-merged-with-a-merge-commit"; Expect = "READY"; Check = ""; Args = (fun _ -> None)
+        Edit = fun f ->
+          // the owner's signed record on a branch, merged by GitHub (web-flow, unsigned): a legitimate flow
+          git f.Indy [ "checkout"; "-q"; "-b"; "owner/decisions" ] |> ignore
+          replaceIn (approvals f) "]}]}" "]},{\"id\":\"APR-R10-OWNER-2\",\"authority\":{\"kind\":\"operator\",\"id\":\"kemiller2002\"},\"changes\":[{\"decision_id\":\"ODR-R10-18\",\"action\":\"decide\",\"option\":\"A\",\"pins\":[]}]}]}"
+          git f.Indy [ "add"; "-A" ] |> ignore
+          git f.Indy [ "commit"; "-qm"; "Owner decisions ODR-R10-18 (APR-R10-OWNER-2)" ] |> ignore
+          git f.Indy [ "checkout"; "-q"; "main" ] |> ignore
+          gitAsKey "web-flow" "" f.Indy [ "merge"; "-q"; "--no-ff"; "-m"; "Merge pull request #1"; "owner/decisions" ] |> ignore
+          git f.Indy [ "push"; "-q"; "origin"; "main" ] |> ignore }
       case "record-planted-under-another-id" "LP-05" (fun f ->
           replaceIn (approvals f) "]}]}" "]},{\"id\":\"APR-X-1\",\"authority\":{\"kind\":\"operator\",\"id\":\"kemiller2002\"},\"changes\":[{\"decision_id\":\"ODR-R10-18\",\"action\":\"decide\",\"option\":\"A\",\"pins\":[]}]}]}"
           agentCommitPush f "decisions")
@@ -232,6 +288,13 @@ let cases =
 
 if Directory.Exists work then failwithf "%s exists; give a new directory" work
 Directory.CreateDirectory work |> ignore
+Directory.CreateDirectory keyring |> ignore
+run work "chmod" [ "700"; keyring ] |> ignore
+gpg [ "--quick-gen-key"; "kemiller2002 <kemiller2002@example.invalid>"; "ed25519"; "sign"; "never" ] |> ignore
+gpg [ "--quick-gen-key"; "claude <claude@example.invalid>"; "ed25519"; "sign"; "never" ] |> ignore
+ownerKey <- keyOf "kemiller2002"
+agentKey <- keyOf "claude"
+if ownerKey = "" || agentKey = "" then failwith "gpg could not create the fixture keys"
 let outcomes =
     cases |> List.map (fun c ->
         let code, out = fixture c.Name c.Edit c.Args

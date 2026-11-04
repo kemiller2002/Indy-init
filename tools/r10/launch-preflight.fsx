@@ -3,9 +3,11 @@
 //   dotnet fsi tools/r10/launch-preflight.fsx -- --indy-init DIR --competition URL --live-run RUN_ID --adversarial-run RUN_ID
 //     [--origin URL] [--gh PATH] [--out F]
 //
-// Owner provenance is a signature, not a name: every commit that changes the decisions approvals file (after 55f2467)
-// or the lock must be one GitHub verifies as signed by the owner: verification valid and the committer the owner, not
-// GitHub's web-flow (gh api), with no agent trailer. An agent can write any author name; it cannot sign as the owner.
+// Owner provenance is a signature, not a name: every change of the decisions approvals file (after 55f2467) or of the
+// lock, along main's first-parent history, must be a commit (or a merge that brings in only such commits) that GitHub
+// verifies as committed and signed by the owner (not web-flow, no agent trailer) AND whose signature verifies locally
+// against the owner's signing keys registered on GitHub. An agent can write any author or committer name; it cannot
+// sign with the owner's key.
 // The owner merges owner-freeze pull requests with a merge commit (not squash or rebase), so the signed commits stay.
 //
 // READY only when every check below passes; otherwise REFUSED with each cause. Exit 0 READY, 4 REFUSED.
@@ -36,6 +38,8 @@ open System.Security.Cryptography
 open System.Text.Json.Nodes
 open System.Text.RegularExpressions
 
+// No replace refs or grafts: the history judged is the history as committed.
+Environment.SetEnvironmentVariable("GIT_NO_REPLACE_OBJECTS", "1")
 let args = fsi.CommandLineArgs |> Array.skip 1 |> List.ofArray |> List.skipWhile ((=) "--")
 let opt (name: string) = args |> List.pairwise |> List.tryFind (fst >> (=) name) |> Option.map snd
 let src = opt "--indy-init" |> Option.defaultWith (fun () -> failwith "missing --indy-init") |> Path.GetFullPath
@@ -45,16 +49,18 @@ let origin = opt "--origin" |> Option.defaultValue "https://github.com/kemiller2
 let indyInitRepo = "kemiller2002/Indy-init"
 let liveWorkflow = "Live-provider preflight (Rehearsal 010)"
 
-let run (dir: string) (exe: string) (a: string list) =
+let runEnv (env: (string * string) list) (dir: string) (exe: string) (a: string list) =
     try
         let info = ProcessStartInfo(exe, WorkingDirectory = dir, RedirectStandardOutput = true, RedirectStandardError = true, UseShellExecute = false)
         a |> List.iter info.ArgumentList.Add
+        env |> List.iter (fun (k, v) -> info.Environment[k] <- v)
         use p = Process.Start info
         let out = p.StandardOutput.ReadToEnd()
         p.StandardError.ReadToEnd() |> ignore
         p.WaitForExit()
         p.ExitCode, out.Trim()
     with ex -> 127, ex.Message
+let run = runEnv []
 let git dir a = run dir "git" a
 let sha256Bytes (b: byte[]) = (SHA256.HashData b |> Convert.ToHexString).ToLowerInvariant()
 let sha256 (file: string) = if File.Exists file then sha256Bytes (File.ReadAllBytes file) else ""
@@ -74,10 +80,9 @@ let approvalsRel = "kickoff/rehearsal-007/approvals.causa.json"
 let requestsRel = "kickoff/rehearsal-010/proposals/owner-decision-requests.json"
 let operator = "kemiller2002"
 
-/// Whether GitHub verifies `commit` as signed by the operator's own key: verification valid, and the COMMITTER (whose
-/// key GitHub checked; the author is free text) the operator. GitHub's own commits (committer web-flow: web edits,
-/// API writes, squash merges) are not the owner's signature. No agent trailer.
-let ownerSigned (commit: string) =
+/// GitHub's verdict: the signature is valid and the COMMITTER (whose key GitHub checked; the author is free text) is
+/// the operator. GitHub's own commits (committer web-flow: web edits, API writes, squash merges) are not the owner's.
+let githubSaysOwnerSigned (commit: string) =
     let code, out = run src gh [ "api"; $"repos/{indyInitRepo}/commits/{commit}"; "--jq"; "[.commit.verification.verified, .commit.verification.reason, .committer.login, .commit.message] | @json" ]
     if code <> 0 then false else
     try
@@ -88,12 +93,64 @@ let ownerSigned (commit: string) =
         | _ -> false
     with _ -> false
 
-/// The commits that changed `file` after `baseline` (every commit when the baseline is "" or not in this history),
-/// oldest first, that are not owner-signed.
+/// The operator's own signing keys, as registered on GitHub (SSH signing keys and GPG keys), in a private keyring and
+/// an allowed-signers file: a commit verifies locally only against these, never against GitHub's or an agent's key.
+let ownerKeys =
+    lazy (
+        let home = tempDir "owner-keys"
+        run home "chmod" [ "700"; home ] |> ignore
+        let keysOf (endpoint: string) (field: string) =
+            let code, out = run src gh [ "api"; $"users/{operator}/{endpoint}"; "--jq"; $"[.[].{field}] | @json" ]
+            if code <> 0 then [] else (try (JsonNode.Parse out).AsArray() |> Seq.map (fun k -> k.GetValue<string>()) |> List.ofSeq with _ -> [])
+        let allowed = Path.Combine(home, "allowed-signers")
+        File.WriteAllLines(allowed, keysOf "ssh_signing_keys" "key" |> List.map (fun k -> $"{operator} namespaces=\"git\" {k}"))
+        keysOf "gpg_keys" "raw_key" |> List.iteri (fun i k ->
+            let f = Path.Combine(home, $"key-{i}.asc")
+            File.WriteAllText(f, k)
+            runEnv [ "GNUPGHOME", home ] home "gpg" [ "--batch"; "--quiet"; "--import"; f ] |> ignore)
+        home, allowed)
+
+/// Whether the commit's signature verifies locally against the operator's registered keys.
+let locallyOwnerSigned (commit: string) =
+    let home, allowed = ownerKeys.Force()
+    // The verifying programs are pinned: a configured gpg.program or gpg.ssh.program (an agent's signer, say) never
+    // decides; only the owner's registered keys verify.
+    fst (runEnv [ "GNUPGHOME", home ] src "git" [ "-c"; "gpg.program=gpg"; "-c"; "gpg.ssh.program=ssh-keygen"; "-c"; $"gpg.ssh.allowedSignersFile={allowed}"; "verify-commit"; commit ]) = 0
+
+/// Owner-signed: GitHub verifies the owner as committer AND the signature verifies against the owner's own keys.
+let ownerSigned (commit: string) = githubSaysOwnerSigned commit && locallyOwnerSigned commit
+
+/// The blob of `file` at `commit` ("" when absent).
+let blobAt (commit: string) (file: string) =
+    let code, out = git src [ "rev-parse"; "--verify"; "--quiet"; $"{commit}:{file}" ]
+    if code = 0 then out else ""
+let parentsOf (commit: string) =
+    (snd (git src [ "rev-list"; "--parents"; "-n"; "1"; commit ])).Split(' ', StringSplitOptions.RemoveEmptyEntries) |> Array.skip 1 |> List.ofArray
+
+/// The commits that changed `file` (against their first parent) on the first-parent line `range`, oldest first.
+let rec changesOn (file: string) (range: string list) =
+    let _, revs = git src ([ "rev-list"; "--reverse"; "--first-parent" ] @ range)
+    revs.Split('\n', StringSplitOptions.RemoveEmptyEntries) |> List.ofArray
+    |> List.filter (fun c -> blobAt c file <> (match parentsOf c with p :: _ -> blobAt p file | [] -> ""))
+
+/// A change of `file` is acceptable when its commit is owner-signed, or when it is a merge that only brings in the
+/// owner's signed changes from a branch: the result is the branch's file, main did not change the file since the
+/// branch point, and every change of the file on that branch is itself acceptable. Anything else (a merge that rolls
+/// the file back to an older owner version, an evil merge, an unsigned commit) is not.
+and acceptable (file: string) (commit: string) =
+    ownerSigned commit
+    || (match parentsOf commit with
+        | [ p1; p2 ] ->
+            let mb = snd (git src [ "merge-base"; p1; p2 ])
+            mb <> "" && blobAt commit file = blobAt p2 file && blobAt p1 file = blobAt mb file
+            && (changesOn file [ $"{mb}..{p2}" ] |> List.forall (acceptable file))
+        | _ -> false)
+
+/// The changes of `file` after `baseline` (the whole history when the baseline is "" or not in it) on main's
+/// first-parent line that are not acceptable.
 let unsignedChanges (file: string) (baseline: string) =
-    let range = if baseline <> "" && fst (git src [ "merge-base"; "--is-ancestor"; baseline; "HEAD" ]) = 0 then [ $"{baseline}..HEAD" ] else []
-    let _, log = git src ([ "log"; "--reverse"; "--format=%H" ] @ range @ [ "--"; file ])
-    log.Split('\n', StringSplitOptions.RemoveEmptyEntries) |> List.ofArray |> List.filter (ownerSigned >> not)
+    let range = if baseline <> "" && fst (git src [ "merge-base"; "--is-ancestor"; baseline; "HEAD" ]) = 0 then [ $"{baseline}..HEAD" ] else [ "HEAD" ]
+    changesOn file range |> List.filter (acceptable file >> not)
 
 let lp00 =
     let _, status = git src [ "status"; "--porcelain"; "--untracked-files=no" ]

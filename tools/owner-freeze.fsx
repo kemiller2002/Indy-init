@@ -52,6 +52,8 @@ open System.Text.Json
 open System.Text.Json.Nodes
 open System.Text.RegularExpressions
 
+Environment.SetEnvironmentVariable("GIT_NO_REPLACE_OBJECTS", "1")
+
 // ---- configuration -------------------------------------------------------------------------------------------------
 
 let operatorId = "kemiller2002"
@@ -414,15 +416,27 @@ let staleRecord repo (change: JsonNode) =
 /// Rehearsal 010 record, and must be one GitHub verifies as committed and signed by you.
 let approvalsBaseline = "55f2467f5ff7f39f8216d2ba291dbeb58b506a5f"
 
-/// The changes of the approvals file at origin/main after the baseline that GitHub does not verify as committed and
-/// signed by you (a record an agent planted, under any id or name). Records in such a file are not yours to build on.
+/// Whether GitHub verifies `commit` as committed and signed by you (verification valid, committer you, not web-flow).
+let signedByYou repo (commit: string) =
+    let out = try run repo "gh" [ "api"; $"repos/{githubRepo}/commits/{commit}"; "--jq"; "[.commit.verification.verified, .commit.verification.reason, .committer.login] | @json" ] with Stop _ -> ""
+    out = $"[true,\"valid\",\"{operatorId}\"]"
+
+/// The changes of the approvals file after the baseline on origin/main's first-parent line that are neither signed by
+/// you nor a merge bringing in only your signed changes from a branch (a rollback or evil merge is caught).
 let unsignedApprovalChanges repo =
-    let log = git repo [ "log"; "--reverse"; "--format=%H"; $"{approvalsBaseline}..origin/main"; "--"; approvalsPath ]
-    log.Split('\n', StringSplitOptions.RemoveEmptyEntries)
-    |> Array.filter (fun c ->
-        let out = try run repo "gh" [ "api"; $"repos/{githubRepo}/commits/{c}"; "--jq"; "[.commit.verification.verified, .commit.verification.reason, .committer.login] | @json" ] with Stop _ -> ""
-        out <> $"[true,\"valid\",\"{operatorId}\"]")
-    |> List.ofArray
+    let blob (c: string) = try git repo [ "rev-parse"; "--verify"; "--quiet"; $"{c}:{approvalsPath}" ] with Stop _ -> ""
+    let parents (c: string) = (git repo [ "rev-list"; "--parents"; "-n"; "1"; c ]).Split(' ', StringSplitOptions.RemoveEmptyEntries) |> Array.skip 1 |> List.ofArray
+    let rec changes (range: string) =
+        (git repo [ "rev-list"; "--reverse"; "--first-parent"; range ]).Split('\n', StringSplitOptions.RemoveEmptyEntries) |> List.ofArray
+        |> List.filter (fun c -> blob c <> (match parents c with p :: _ -> blob p | [] -> ""))
+    and acceptable (c: string) =
+        signedByYou repo c
+        || (match parents c with
+            | [ p1; p2 ] ->
+                let mb = git repo [ "merge-base"; p1; p2 ]
+                blob c = blob p2 && blob p1 = blob mb && (changes $"{mb}..{p2}" |> List.forall acceptable)
+            | _ -> false)
+    changes $"{approvalsBaseline}..origin/main" |> List.filter (acceptable >> not)
 
 /// Refuses to build on an approvals file that holds a change you did not sign (v4.1.4 and Rehearsal 010 only).
 let requireSignedApprovals repo (p: Package) =

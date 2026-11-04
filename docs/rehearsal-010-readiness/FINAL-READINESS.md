@@ -21,7 +21,7 @@ The remaining conditions are owner actions, set out as one ordered transaction i
 
 **It is not READY TO LAUNCH.** Owner actions are outstanding, and the required real-provider test has not run. Rehearsal 010 has not been started; no T0 exists.
 
-**The launch preflight** (`tools/r10/launch-preflight.fsx`) decides launch. Today it refuses, and only for owner actions: [`evidence/launch-preflight/launch-preflight-now.log`](evidence/launch-preflight/launch-preflight-now.log). Its 41 negative controls pass.
+**The launch preflight** (`tools/r10/launch-preflight.fsx`) decides launch. Today it refuses, and only for owner actions: [`evidence/launch-preflight/launch-preflight-now.log`](evidence/launch-preflight/launch-preflight-now.log). Its 45 negative controls pass.
 
 ## 1. Integrated result
 
@@ -72,7 +72,7 @@ The remaining conditions are owner actions, set out as one ordered transaction i
 | `tools/r9/tests.fsx` | {R9} |
 | `tools/r10/adversarial.fsx` | {ADV} |
 | `tools/r10/r9-replay.fsx` | {REPLAY} |
-| `tools/r10/launch-preflight-tests.fsx` | 41 of 41 (positive READY; 40 refusals, each by its target check) |
+| `tools/r10/launch-preflight-tests.fsx` | 45 of 45 (2 positive READY controls, including an owner PR merged with a merge commit; 43 refusals, each by its target check) |
 | `tools/r10/launch-preflight.fsx` on this repository | REFUSED, for owner actions only ({NOWREFUSED}); {NOWPASS} PASS |
 | Specula adapter on the current observer output | 6 of 6 |
 | CI on `{HEAD}` | {CI} |
@@ -88,7 +88,7 @@ Earlier rounds (R1–R8, slices, observer) are unchanged; see INTEGRATION-BASELI
 | Owner-decision transaction | `owner-freeze.fsx decide rehearsal-010` and `ratify rehearsal-010`; the requests in `kickoff/rehearsal-010/proposals/owner-decision-requests.json`. Each decision records the digest of what it approves; both commands refuse to write under an agent |
 | Isolated live credential (ODR-R10-09) | The Verification gate is `contents: read`. A single-repository GitHub App token is minted per job, revoked at the end, and fails closed without secrets |
 | Live-provider preflight | `.github/workflows/live-provider-preflight.yml`: owner-dispatched J1–J3 × Chromium and WebKit against `api.github.com`, with a token-scope check |
-| Launch preflight | `tools/r10/launch-preflight.fsx` (LP-00..10) and its 41 negative controls |
+| Launch preflight | `tools/r10/launch-preflight.fsx` (LP-00..10) and its 45 negative controls |
 | Topology A schedule | `tools/r10/schedule.fsx`; `evidence/schedule/` |
 | Rehearsal 010 process-evidence rules | `kickoff/rehearsal-010/process-evidence-rules.json` (proposed; ODR-R10-14) |
 
