@@ -106,14 +106,26 @@ The order always respects dependencies. At each step the builder takes the highe
 
 ### Slice integration gate
 
-`requirements-compiler slice-gate`, run on the merged result (the candidate merged onto the current target). A slice merges only on PASS. The rules, each a separate named rule, are:
+`requirements-compiler slice-gate`, run on the merged result (the candidate merged onto the current target). A slice merges only on PASS.
+
+**Enforced in CI.** The governed Verification gate runs `slice-gate` on every pull request whose branch is `slice/SL-<work item>`. The candidate is the pull request's merge commit, and the gate derives every input itself:
+- the target base and head;
+- the build and start record;
+- regression from the gate coverage and the governed catalog verification;
+- base-versus-head test integrity;
+- live journeys.
+
+A pull request that changes implementation from any other branch is refused.
+
+The rules, each a separate named rule, are:
 
 | Rule | Refusal codes |
 |---|---|
 | main is healthy | MAIN_UNHEALTHY |
 | dependency slices are integrated | DEPENDENCY_NOT_INTEGRATED |
 | the merged result is built on the current target | STALE_TARGET |
-| governed gate for this work item, scope covering the slice, no cause | GATE_MISSING, GATE_STALE, GATE_OTHER_WORK_ITEM, GATE_SCOPE_INCOMPLETE, MANDATORY_OBLIGATION_UNVERIFIED |
+| governed gate for this work item, scope covering the slice, verdict PASS, no cause | GATE_MISSING, GATE_STALE, GATE_OTHER_WORK_ITEM, GATE_SCOPE_INCOMPLETE, MANDATORY_OBLIGATION_UNVERIFIED, GATE_NOT_PASS |
+| governed catalog acceptance, for slices with catalog requirements: every binding refusal, plus failures of this slice's obligations | CATALOG_MISSING, CATALOG_STALE, the catalog-acceptance codes |
 | each bound journey assertion passes on Chromium **and** WebKit, against api.github.com | JOURNEY_FAILED, JOURNEY_NOT_RUN, LIVE_PROVIDER_SUBSTITUTED |
 | every previously integrated obligation still passes | REGRESSION |
 | the application builds and starts | BUILD_FAILED, START_FAILED |

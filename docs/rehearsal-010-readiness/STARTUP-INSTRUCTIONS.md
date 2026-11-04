@@ -72,6 +72,7 @@ Implementation is prohibited until steps 1–5 pass. They need no implementation
      --spec-preflight evidence/t0/spec-preflight.json --acceptance-preflight evidence/t0/acceptance.log \
      --scope-sha256 <lock scope.scopeSha256>
    ```
+   `--scope-sha256` is required: a scope checkpoint of any other scope does not authorize.
    Commit `.echelon/r9-initialization-checkpoint.json`. It is immutable.
 5. **Sequencing.** `r9.fsx check-sequencing` and `requirements-compiler scope order` must PASS on every commit. The governed gate runs `check-sequencing` first.
 
@@ -81,9 +82,17 @@ Repeat until the deadline or a permitted stop:
 
 1. **Select** the highest-value ready slice: integrated dependencies, by the order in SLICE-EXECUTION-PLAN §3 (J1, then J2, then the design contract, then the rest of P0, then P1).
 2. **Confirm** its requirements, obligations and dependencies in `slice-execution-manifest.json`. **Start** its Praxis work item.
-3. **Implement** on an isolated branch. Keep `main` working.
+3. **Implement** on the branch `slice/SL-<work item>`. Keep `main` working. A pull request that changes implementation from a branch not named for its slice is refused by the governed gate.
 4. **Run** the slice's acceptance tests and the regression set.
-5. **Run the governed Verification gate** for the work item (`workflow_dispatch`, `work_item`, `scope`). Then run the slice gate on the merged result:
+5. **Open the pull request.** The governed Verification gate runs on the **merge result** of your branch onto the current `main`. It runs, in order:
+   - the plan gate for the slice's work item;
+   - governed catalog acceptance;
+   - J1–J3 and the design contract (Chromium and WebKit, real GitHub);
+   - build and start;
+   - base-versus-head test integrity;
+   - `slice-gate`.
+
+   The pull request is mergeable only when that job is green. To check locally first (the same command, with your own evidence files):
    ```
    requirements-compiler slice-gate --manifest SRC/docs/rehearsal-010-readiness/scope-manifest.json --events evidence/progress/events.json \
      --slices SRC/docs/rehearsal-010-readiness/slice-execution-manifest.json --slice SL-<work item> --candidate <merged SHA> \
@@ -109,7 +118,7 @@ Repeat until the deadline or a permitted stop:
 | `work-item-completed` | work item |
 | `main-unhealthy` / `main-healthy` | commit, cause |
 
-`acceptance-recorded` and `excluded` are owner or independent-verifier records. An agent's version of either is refused.
+`acceptance-recorded` and `excluded` are owner or independent-verifier records. An `excluded` event counts only when a trusted operator record `{requirement_id, action: exclude}` in the pinned approvals backs it. An agent's version of either is refused.
 
 **Requirement states** (one each, no "partial"):
 
@@ -149,7 +158,7 @@ Before stopping for any reason other than the deadline, write `evidence/progress
 ```
 requirements-compiler stop-decision --manifest SRC/docs/rehearsal-010-readiness/scope-manifest.json --checkpoint .echelon/scope-checkpoint.json \
   --events evidence/progress/events.json --request evidence/progress/stop-request.json \
-  --t0-record evidence/t0/t0.json --deadline-policy SRC/kickoff/rehearsal-010/deadline-policy.json \
+  --t0-record evidence/t0/t0.json --deadline-policy SRC/kickoff/rehearsal-010/deadline-policy.json --deadline-policy-sha256 <lock deadlinePolicy.sha256> \
   --approvals SRC/kickoff/acceptance/approvals.causa.json --trusted-operator kemiller2002 --out evidence/progress/stop-decision.json
 ```
 
