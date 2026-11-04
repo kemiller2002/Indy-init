@@ -81,7 +81,7 @@
   "packageVersion": "4.1.4",
   "tag": "indy-init-requirements-v4.1.4 (not yet created)",
   "tagCommit": null,
-  "manifestSha256": "cd999924cc1f5c35da73a95cfb715fc5318bd058fb08a480683d6bd4f3b2ba8b",
+  "manifestSha256": "7c3b0a36d87f42b02dff1ff911ecf49da8a2cad9d9f2afa845996cd330950378",
   "verificationPlanSha256": "8254ed03b991dd3d3a56a4e0bf5897c2484bbbf11e67e2f15e80309c1482b973",
   "approval": "ODR-V414-01..03 (pending)"
  },
@@ -98,7 +98,7 @@
  "status": "PROPOSED: not an owner pin. The owner adopts it by renaming it to toolchain.lock.json in their own commit after ODR-V414-01..03 are recorded and v4.1.4 is tagged, a Dokimos release carrying the url-input fix is registered in an approved echelon-current set and replaces the resolved set, and ODR-R10-01..09 are recorded. Until then Rehearsal 010 has no approved lock.",
  "scope": {
   "manifest": "docs/rehearsal-010-readiness/scope-manifest.json",
-  "scopeSha256": "d4adb9807703a66f38064a185de10ee7fd8aadf83b75f86eb4c998d11b14aab0",
+  "scopeSha256": "046fa7885a1caca6d9931d5dac81f2d438df424e685eee53b96715ddfe218b1c",
   "approval": "ODR-R10-01 (pending; asked by owner-freeze.fsx decide rehearsal-010 only once v4.1.4 is tagged and the scope is recompiled from it and the ratified catalog)",
   "rule": "scope preflight and the Praxis coverage check must pass and the scope checkpoint must be committed before any application code (STARTUP-INSTRUCTIONS.md)"
  },

@@ -28,10 +28,10 @@ The remaining conditions are owner actions, set out as one ordered transaction i
 | Item | Value |
 |---|---|
 | Branch and PR | kemiller2002/Indy-init `claude/rehearsal-010-integration`, **#104** (draft) |
-| Integrated head | **`7e6dca7`**. Every result below is for this commit |
+| Integrated head | **`7e6dca7`** for §3–§5. The v4.1.4 package and scope rows below are FREEZE step 2's, compiled after the owner recorded APR-V414-OWNER-1 |
 | Base | `main` `cae4102`, the merge of #102. #104 merges it (`cadf4e4`) |
-| Successor package | `requirements-compiled/v4.1.4` (CANDIDATE; X01–X21 PASS); package-manifest `cd999924…`, compiled with the owner's APR-V414-OWNER-1 (FREEZE step 2) |
-| Scope (as compiled now) | `d4adb9807703a66f38064a185de10ee7fd8aadf83b75f86eb4c998d11b14aab0`. **Not the approval digest**: it changes if the successor is ratified (§2) |
+| Successor package | `requirements-compiled/v4.1.4` (CANDIDATE; X01–X21 PASS); package-manifest `@MAN8@…`, compiled with the owner's APR-V414-OWNER-1 (FREEZE step 2) |
+| Scope (as compiled now) | `@SCOPE@`. **Not the approval digest**: it changes if the successor is ratified (§2) |
 | Proposed lock | `kickoff/rehearsal-010/toolchain.lock.proposed.json`; every digest matches its file |
 
 **What the merge with `main` changed** (details in OWNER-APPROVAL-EXECUTION §0):
