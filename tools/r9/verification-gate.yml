@@ -132,6 +132,69 @@ jobs:
               --out "$RUNNER_TEMP/probe-results.json" || true
             echo "args=--probes $RUNNER_TEMP/probe-results.json" >> "$GITHUB_OUTPUT"
           fi
+      - name: Governed catalog acceptance (the governed gate is the producer; adversarial audit R2)
+        id: catalog
+        env:
+          MODE: ${{ inputs.mode || 'development' }}
+          CAUSA_RUN_ID: ${{ github.run_id }}-governed
+          CAUSA_CANDIDATE: ${{ steps.candidate.outputs.sha }}
+          CAUSA_OBSERVATIONS: ${{ runner.temp }}/catalog/observations
+          CAUSA_PLAYWRIGHT_JSON: ${{ runner.temp }}/catalog/playwright.json
+        run: |
+          # The manifest is compiled here from the approved catalog in the governed checkout and the candidate's mappings;
+          # the candidate's requirement probes run in this job, so this run, not a builder workflow, produces the verdict.
+          src="$RUNNER_TEMP/indy-init"; lock="$src/$(jq -r '.lock // "kickoff/rehearsal-009/toolchain.lock.json"' .echelon/r9-governance.json)"
+          contract="$src/$(jq -r '.catalogVerification.contract // "kickoff/rehearsal-010/catalog-verification-contract.json"' "$lock")"
+          approved=$(jq -r '.catalogVerification.contractSha256 // ""' "$lock")
+          mkdir -p "$RUNNER_TEMP/catalog/observations"
+          dotnet build "$src/tools/requirements-compiler/src" -c Release -v q
+          rc="$src/tools/requirements-compiler/src/bin/Release/net10.0/requirements-compiler.dll"
+          praxis requirements manifest compile --catalog "$src/$(jq -r .catalog.path "$contract")" --source-commit "$(jq -r .indyInitCommit .echelon/r9-governance.json)" \
+            --mappings requirements/requirement-implementation-map.json --output "$RUNNER_TEMP/catalog/manifest.json" || true
+          npx playwright test --config playwright.config.ts --project=chromium "$(jq -r '.requirementTests // "tests/browser/requirements"' "$contract")" || true
+          if [ -f "$RUNNER_TEMP/catalog/manifest.json" ]; then
+            dokimos verification requirements --manifest "$RUNNER_TEMP/catalog/manifest.json" --observations "$CAUSA_OBSERVATIONS" \
+              --results "$CAUSA_PLAYWRIGHT_JSON" --root . --candidate "$CAUSA_CANDIDATE" --out "$RUNNER_TEMP/catalog/requirement-verification.json" || true
+          fi
+          jq -s '[.[] | (.facts // {})] | add // {}' "$CAUSA_OBSERVATIONS"/*.json > "$RUNNER_TEMP/catalog/declared-facts.json" 2>/dev/null || echo '{}' > "$RUNNER_TEMP/catalog/declared-facts.json"
+          echo "{\"kind\":\"governed-gate\",\"runId\":\"$CAUSA_RUN_ID\"}" > "$RUNNER_TEMP/catalog/producer.json"
+          probes=""; [ -f "$RUNNER_TEMP/probe-results.json" ] && probes="--probe-results $RUNNER_TEMP/probe-results.json"
+          spec=""; [ -f .echelon/fault-probes.json ] && spec="--probe-spec .echelon/fault-probes.json"
+          set +e
+          dotnet "$rc" catalog-acceptance --contract "$contract" --approved-contract-sha256 "$approved" --catalog "$src/$(jq -r .catalog.path "$contract")" \
+            --candidate "$CAUSA_CANDIDATE" --manifest "$RUNNER_TEMP/catalog/manifest.json" --verification "$RUNNER_TEMP/catalog/requirement-verification.json" \
+            --producer "$RUNNER_TEMP/catalog/producer.json" --declared-facts "$RUNNER_TEMP/catalog/declared-facts.json" $probes $spec \
+            --out "$RUNNER_TEMP/catalog/catalog-acceptance.json"
+          echo "rc=$rc" >> "$GITHUB_OUTPUT"
+          echo "args=--catalog-acceptance $RUNNER_TEMP/catalog/catalog-acceptance.json" >> "$GITHUB_OUTPUT"
+      - name: Governed journeys J1-J3 and the design contract (Chromium and WebKit; adversarial audit R3, R5)
+        id: journeys
+        if: inputs.mode == 'release' || inputs.work_item != ''
+        env:
+          CAUSA_PROVIDER: github
+          CAUSA_GITHUB_TOKEN: ${{ github.token }}
+          CAUSA_CANDIDATE: ${{ steps.candidate.outputs.sha }}
+          CAUSA_APP_URL: http://127.0.0.1:4620/
+        run: |
+          # The journeys and the design contract run from the governed checkout; the candidate cannot edit them. The
+          # candidate is built and served locally at its exact SHA and persists to the designated test repository.
+          src="$RUNNER_TEMP/indy-init"; lock="$src/$(jq -r '.lock // "kickoff/rehearsal-009/toolchain.lock.json"' .echelon/r9-governance.json)"
+          export CAUSA_TEST_OWNER=$(jq -r '.testRepository.owner // "${{ github.repository_owner }}"' "$lock")
+          export CAUSA_TEST_REPO=$(jq -r '.testRepository.repo // "${{ github.event.repository.name }}"' "$lock")
+          export CAUSA_TEST_BRANCH=$(jq -r '.testRepository.branch // "causa-acceptance"' "$lock")
+          design="$src/$(jq -r '.designContract.contract // "kickoff/rehearsal-010/design-contract.json"' "$lock")"
+          npm run build
+          root=$(jq -r '.servedRoot // "dist"' "$design"); [ -d "$root" ] || root=web
+          node "$src/verification/harness/serve.mjs" "$root" 4620 & sleep 1
+          (cd "$src/verification/journeys" && npm install --no-audit --no-fund && npx playwright install --with-deps chromium webkit)
+          set +e
+          (cd "$src/verification/journeys" && CAUSA_JOURNEY_RESULTS="$RUNNER_TEMP/journeys/journey-results.json" npx playwright test)
+          ln -sfn "$src/verification/journeys/node_modules" "$src/verification/design-contract/node_modules"
+          (cd "$src/verification/design-contract" && CAUSA_DESIGN_CONTRACT="$design" CAUSA_DESIGN_RENDERED="$RUNNER_TEMP/journeys/design-rendered.json" \
+            CAUSA_SCREENSHOTS="$RUNNER_TEMP/journeys/screenshots" npx playwright test)
+          dotnet "${{ steps.catalog.outputs.rc }}" design-contract --contract "$design" --forma-inventory "$src/$(jq -r '.forma.inventories[-1]' "$design")" \
+            --root . --candidate "$CAUSA_CANDIDATE" --rendered "$RUNNER_TEMP/journeys/design-rendered.json" --out "$RUNNER_TEMP/journeys/design-contract.json"
+          exit 0
       - name: Verification gate (executable, record and mixed obligations)
         env:
           MODE: ${{ inputs.mode || 'development' }}
@@ -142,9 +205,17 @@ jobs:
           if [ -n "$WORK_ITEM" ]; then scope="--work-item $WORK_ITEM --scope $SCOPE"
           elif [ "$MODE" = "development" ]; then scope="--scope-file .echelon/verification-scope.json"; fi
           dotnet fsi "$RUNNER_TEMP/indy-init/tools/r9/r9.fsx" -- gate --mode "$MODE" $scope ${{ steps.records.outputs.args }} \
-            ${{ steps.probes.outputs.args }} --require-fault-sensitive content-round-trip \
+            ${{ steps.probes.outputs.args }} ${{ steps.catalog.outputs.args }} \
             --obligations "$RUNNER_TEMP/obligations.json" --root . --results "$RUNNER_TEMP/results/results.json" \
             --dokimos "$(command -v dokimos)" --expect-candidate "${{ steps.candidate.outputs.sha }}" --out "$RUNNER_TEMP/gate"
+      - name: Full-scope completion gate (release; a slice PASS is never a release PASS)
+        if: always() && inputs.mode == 'release'
+        run: |
+          src="$RUNNER_TEMP/indy-init"
+          dotnet "${{ steps.catalog.outputs.rc }}" completion-gate --manifest "$src/docs/rehearsal-010-readiness/scope-manifest.json" \
+            --events evidence/progress/events.json --candidate "${{ steps.candidate.outputs.sha }}" --release-gate "$RUNNER_TEMP/gate/gate.json" \
+            --catalog "$RUNNER_TEMP/catalog/catalog-acceptance.json" --journeys "$RUNNER_TEMP/journeys/journey-results.json" \
+            --design "$RUNNER_TEMP/journeys/design-contract.json" --out "$RUNNER_TEMP/gate/completion.json"
       - name: Publish the coverage report, results and verdict
         if: always()
         uses: actions/upload-artifact@v4
@@ -158,3 +229,5 @@ jobs:
             ${{ runner.temp }}/probe-results.json
             ${{ runner.temp }}/suite-preflight.json
             ${{ runner.temp }}/sequencing.json
+            ${{ runner.temp }}/catalog
+            ${{ runner.temp }}/journeys

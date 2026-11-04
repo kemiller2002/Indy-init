@@ -171,7 +171,18 @@ let resultsOf n = snd prepared[n]
 let at n = git repo [ "checkout"; "-q"; "case-" + n ] |> ignore
 
 at "pass"
-r9case "gate-pass-correctly-bound" [ 0 ] "executable: 1/1 verified by Dokimos" (gateArgs (resultsOf "pass") (gateOut "pass") [ "--expect-candidate"; shaOf "pass" ]) repo |> ignore
+// Governed catalog acceptance (adversarial audit R2): release refuses without it, with a builder-run verdict, or with a
+// verdict for another commit; a governed verdict at the candidate is accepted.
+let catalogAcceptance name level candidate =
+    let path = Path.Combine(work, $"catalog-acceptance-{name}.json")
+    File.WriteAllText(path, $"""{{"schema":"indy-init.catalog-acceptance/1","level":"{level}","governed":{(if level = "GOVERNED-ACCEPTED" then "true" else "false")},"candidate":"{candidate}"}}""")
+    path
+let governedCatalog = catalogAcceptance "governed" "GOVERNED-ACCEPTED" (shaOf "pass")
+r9case "gate-release-without-catalog-acceptance-refused" [ 4 ] "release requires the governed catalog acceptance" (gateArgs (resultsOf "pass") (gateOut "no-catalog") [ "--expect-candidate"; shaOf "pass" ]) repo |> ignore
+r9case "gate-release-builder-run-catalog-refused" [ 4 ] "catalog acceptance is SUPPORTING-ONLY, not GOVERNED-ACCEPTED" (gateArgs (resultsOf "pass") (gateOut "builder-catalog") [ "--expect-candidate"; shaOf "pass"; "--catalog-acceptance"; catalogAcceptance "builder" "SUPPORTING-ONLY" (shaOf "pass") ]) repo |> ignore
+r9case "gate-release-catalog-for-another-commit-refused" [ 4 ] "the catalog acceptance is for" (gateArgs (resultsOf "pass") (gateOut "stale-catalog") [ "--expect-candidate"; shaOf "pass"; "--catalog-acceptance"; catalogAcceptance "stale" "GOVERNED-ACCEPTED" (String.replicate 40 "0") ]) repo |> ignore
+r9case "gate-empty-fault-category-refused" [ 4 ] "fault-sensitivity category content-round-trip matches no obligation" (gateArgs (resultsOf "pass") (gateOut "empty-category") [ "--expect-candidate"; shaOf "pass"; "--catalog-acceptance"; governedCatalog; "--require-fault-sensitive"; "content-round-trip" ]) repo |> ignore
+r9case "gate-pass-correctly-bound" [ 0 ] "executable: 1/1 verified by Dokimos" (gateArgs (resultsOf "pass") (gateOut "pass") [ "--expect-candidate"; shaOf "pass"; "--catalog-acceptance"; governedCatalog ]) repo |> ignore
 [ "skip", "skipped"; "fail", "failed"; "missing", "not-generated"; "placeholder", "invalid"; "identity", "not-generated" ]
 |> List.iter (fun (n, why) ->
     at n
@@ -179,7 +190,7 @@ r9case "gate-pass-correctly-bound" [ 0 ] "executable: 1/1 verified by Dokimos" (
 
 // Stale evidence: the passing results and matrix, offered for a later commit.
 at "pass"
-r9case "gate-matrix-for-praxis-WI-VALID" [ 0 ] "PASS" [ "gate"; "--mode"; "release"; "--obligations"; compiled; "--root"; repo; "--results"; resultsOf "pass"; "--dokimos"; dokimos; "--out"; Path.Combine(repo, ".echelon", "verification", "WI-VALID"); "--work-item"; "WI-VALID"; "--scope"; "SMK-001"; "--expect-candidate"; shaOf "pass" ] repo |> ignore
+r9case "gate-matrix-for-praxis-WI-VALID" [ 0 ] "PASS" [ "gate"; "--mode"; "release"; "--obligations"; compiled; "--root"; repo; "--results"; resultsOf "pass"; "--dokimos"; dokimos; "--out"; Path.Combine(repo, ".echelon", "verification", "WI-VALID"); "--work-item"; "WI-VALID"; "--scope"; "SMK-001"; "--expect-candidate"; shaOf "pass"; "--catalog-acceptance"; governedCatalog ] repo |> ignore
 let validMatrix = Path.Combine(repo, ".echelon", "verification", "WI-VALID", "praxis-matrix.json")
 git repo [ "checkout"; "-q"; "-B"; "case-later"; "case-pass" ] |> ignore
 write (Path.Combine(repo, "src/Smoke/Ledger.fs")) ((File.ReadAllText(Path.Combine(repo, "src/Smoke/Ledger.fs"))) + "// a later commit\n")

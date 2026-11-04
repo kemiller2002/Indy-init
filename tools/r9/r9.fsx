@@ -10,6 +10,7 @@
 //        [--rc REQUIREMENTS-COMPILER.dll --process-plan F --process-plan-digest HEX --process-rules F --process-rules-sha256 HEX
 //         --process-attestations F --process-trusted-run-id ID [--process-events F --process-ancestry F [--process-executions DIR]]]
 //        [--probes F,... --require-fault-sensitive CATEGORY,...]
+//        [--catalog-acceptance F]   (release: required, GOVERNED-ACCEPTED at HEAD)
 //        Evidence type comes only from the plan's suite runner: executable obligations need Dokimos at HEAD, record
 //        obligations (praxis:*) need verify-process VERIFIED at HEAD, mixed ones need both; verifier:* is acceptance-only.
 //   dotnet fsi tools/r9/r9.fsx -- run-suites --obligations F --root REPO --out DIR [--suites ID,...] [--require-tests true]
@@ -549,7 +550,24 @@ let gate () =
                     match statusOf.TryFind id with
                     | None -> [ $"the matrix cites {id}, which is not a bound identity of the in-scope obligations" ]
                     | Some s -> check (s = str e "result") $"""the matrix says {id} {str e "result"}, Dokimos says {s} at HEAD"""))
-        let causes = candidateCauses @ resultCauses @ coverageCauses @ sensitivityCauses @ recordCauses @ verifierCauses @ emptyCauses @ matrixCauses
+        // A required fault-sensitivity category that matches no obligation of the plan enforces nothing: refused, never
+        // silently passed (adversarial audit SA-07). Catalog round trips are judged by the governed catalog acceptance.
+        let emptyCategoryCauses =
+            sensitiveCategories
+            |> Set.filter (fun c -> categoriesOf |> Map.forall (fun _ cs -> not (cs.Contains c)))
+            |> Set.toList
+            |> List.map (fun c -> $"fault-sensitivity category {c} matches no obligation of the plan; an empty category enforces nothing")
+        // Release: the catalog verdict must be governed acceptance at this exact candidate (adversarial audit R2). A
+        // builder-run verdict is supporting evidence only.
+        let catalogCauses =
+            if mode <> "release" then []
+            else
+                match opt "--catalog-acceptance" |> Option.filter File.Exists |> Option.map readJson with
+                | None -> [ "release requires the governed catalog acceptance (requirements-compiler catalog-acceptance); none was supplied" ]
+                | Some c ->
+                    check (str c "candidate" = head) $"""the catalog acceptance is for {str c "candidate"}, not HEAD {head}"""
+                    @ check (str c "level" = "GOVERNED-ACCEPTED") $"""catalog acceptance is {str c "level"}, not GOVERNED-ACCEPTED"""
+        let causes = candidateCauses @ resultCauses @ coverageCauses @ sensitivityCauses @ emptyCategoryCauses @ catalogCauses @ recordCauses @ verifierCauses @ emptyCauses @ matrixCauses
         let deferred = if mode = "release" && opt "--work-item" |> Option.isNone then verifierIds else []
         let strings (xs: string list) = JsonArray(xs |> List.map (fun x -> JsonValue.Create x :> JsonNode) |> Array.ofList) :> JsonNode
         let verdict =
