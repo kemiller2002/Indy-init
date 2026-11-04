@@ -11,8 +11,11 @@ import { env, contextFor, connect, startInvestigation, fieldNamed, button, secti
 const root = path.resolve(new URL('../..', import.meta.url).pathname);
 const contract = JSON.parse(fs.readFileSync(process.env.CAUSA_DESIGN_CONTRACT || path.join(root, 'kickoff/rehearsal-010/design-contract.json'), 'utf8'));
 const kit = await import(path.join(root, process.env.CAUSA_LAYOUT_KIT || 'requirements-compiled/v4.1.4/layout-tests/assertions.mjs'));
-const out = process.env.CAUSA_DESIGN_RENDERED || 'design-rendered.json';
-const shots = process.env.CAUSA_SCREENSHOTS || 'design-screenshots';
+// One verdict file and one screenshot folder per engine, so no engine's result overwrites another's.
+const outBase = process.env.CAUSA_DESIGN_RENDERED || 'design-rendered.json';
+const shotsBase = process.env.CAUSA_SCREENSHOTS || 'design-screenshots';
+const perEngine = (engine) => ({ out: outBase.replace(/\.json$/, '') + `-${engine}.json`, shots: path.join(shotsBase, engine) });
+let shots = shotsBase;
 const failures = [];
 const screenshots = [];
 const fail = (check, viewport, detail) => failures.push({ check, viewport, detail: String(detail).slice(0, 400) });
@@ -51,7 +54,10 @@ const judge = async (page, viewport, where, checks = layoutChecks) => {
   screenshots.push(file);
 };
 
-test('design contract (rendered)', async ({ browser }) => {
+test('design contract (rendered)', async ({ browser }, info) => {
+  const engine = info.project.name;
+  const { out } = perEngine(engine);
+  shots = perEngine(engine).shots;
   fs.mkdirSync(shots, { recursive: true });
   const colours = new Set();
   for (const vp of contract.rendered.viewports) {
@@ -82,6 +88,6 @@ test('design contract (rendered)', async ({ browser }) => {
     if (![...colours].some((c) => c.replace(/\s/g, '').startsWith(`rgb(${r},${g},${b}`) || c.replace(/\s/g, '').startsWith(`rgba(${r},${g},${b},`)))
       fail(`palette ${p.role} ${p.hex} (UI-016)`, 'all', 'never rendered in any populated state');
   }
-  fs.writeFileSync(out, JSON.stringify({ schema: 'indy-init.design-rendered/1', candidate: process.env.CAUSA_CANDIDATE || '', failures, screenshots }, null, 2) + '\n');
+  fs.writeFileSync(out, JSON.stringify({ schema: 'indy-init.design-rendered/1', candidate: process.env.CAUSA_CANDIDATE || '', engine, failures, screenshots }, null, 2) + '\n');
   expect(failures, failures.map((f) => `${f.check} @${f.viewport}: ${f.detail}`).join('\n')).toEqual([]);
 });

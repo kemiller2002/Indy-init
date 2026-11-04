@@ -85,7 +85,11 @@ let judge (i: Inputs) : Verdict =
         let obs = obligations v
         let failures =
             obs
-            |> List.filter (fun (_, o) -> boolOr "mandatory" false o && not (List.contains (strOpt "status" o |> Option.defaultValue "") [ "PASS"; "NOT_APPLICABLE" ]))
+            // An obligation without a mandatory flag counts as mandatory (fail closed). NOT_APPLICABLE counts only when its
+            // requirement is not applicable as a whole (judged against the governed facts below).
+            |> List.filter (fun (req, o) ->
+                let st = strOpt "status" o |> Option.defaultValue ""
+                boolOr "mandatory" true o && not (st = "PASS" || (st = "NOT_APPLICABLE" && strOpt "status" req = Some "NOT_APPLICABLE")))
             |> List.map (fun (_, o) -> str "id" o, strOpt "reason" o |> Option.defaultValue (strOpt "status" o |> Option.defaultValue "no status"))
         let detected =
             match i.ProbeResults with
@@ -104,12 +108,18 @@ let judge (i: Inputs) : Verdict =
                   let catalogSha = field "source" m |> Option.bind (strOpt "catalogSha256") |> Option.defaultValue ""
                   if catalogSha <> i.Contract.CatalogSha256 || i.Contract.CatalogSha256 = "" then
                       yield r "CATALOG_DIGEST_UNAPPROVED" (sprintf "the manifest was compiled from catalog sha256 %s; the approved catalog is %s" (if catalogSha = "" then "(none)" else catalogSha) i.Contract.CatalogSha256)
+                  // Every requirement of the governed manifest must be judged by the verification.
+                  let judged = arr "requirements" v |> List.map (str "id") |> Set.ofList
+                  for req in arr "requirements" m do
+                      match strOpt "id" req with
+                      | Some id when not (judged.Contains id) -> yield r "CATALOG_REQUIREMENT_UNJUDGED" (sprintf "%s is in the governed manifest but the verification does not judge it" id)
+                      | _ -> ()
                   if strOpt "contentHash" manifest <> strOpt "contentHash" m then
                       yield r "CATALOG_MANIFEST_MISMATCH" (sprintf "the verification judged manifest %s, not the governed manifest %s" (strOpt "contentHash" manifest |> Option.defaultValue "(none)") (strOpt "contentHash" m |> Option.defaultValue "(none)"))
               if not (boolOr "intact" false manifest) then yield r "CATALOG_DIGEST_UNAPPROVED" "the verification reports the catalog manifest as not intact" ]
         let sensitivityRefusals =
             [ for category, checks in i.Contract.FaultSensitivity do
-                  let members = obs |> List.filter (fun (_, o) -> boolOr "mandatory" false o && List.contains (strOpt "check" o |> Option.defaultValue "") checks)
+                  let members = obs |> List.filter (fun (_, o) -> boolOr "mandatory" true o && List.contains (strOpt "check" o |> Option.defaultValue "") checks)
                   if members.IsEmpty then
                       yield r "FAULT_CATEGORY_EMPTY" (sprintf "fault-sensitivity category %s matches no mandatory obligation of the catalog (checks %s); an empty category enforces nothing" category (String.concat ", " checks))
                   else

@@ -44,7 +44,7 @@ type Clock = { T0: DateTimeOffset; Deadline: DateTimeOffset }
 
 /// An owner approval that names the decision a stop needs: {decision_id, action: "authorize-stop"} or a scope change
 /// {action: "approve-scope", scope_sha256}, in a record whose authority is a trusted operator.
-type ApprovalChange = { RecordId: string; Authority: string; Action: string; DecisionId: string; ScopeSha256: string; Limit: int64 option }
+type ApprovalChange = { RecordId: string; Authority: string; Action: string; DecisionId: string; ScopeSha256: string; Limit: int64 option; RequirementId: string }
 
 let approvalChanges (approvals: Json) (trusted: Set<string>) : ApprovalChange list =
     arr "approvals" approvals
@@ -57,7 +57,8 @@ let approvalChanges (approvals: Json) (trusted: Set<string>) : ApprovalChange li
               Action = strOpt "action" c |> Option.defaultValue ""
               DecisionId = strOpt "decision_id" c |> Option.defaultValue ""
               ScopeSha256 = strOpt "scope_sha256" c |> Option.defaultValue ""
-              Limit = intOpt "limit" c }))
+              Limit = intOpt "limit" c
+              RequirementId = strOpt "requirement_id" c |> Option.defaultValue "" }))
 
 let environmentFailureKinds = set [ "container-lost"; "toolchain-unavailable"; "credentials-revoked"; "network-unavailable"; "provider-outage" ]
 

@@ -40,12 +40,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          ref: ${{ github.sha }}
           fetch-depth: 0
       - name: Candidate is the checked-out commit (never an asserted SHA)
         id: candidate
         env:
-          CANDIDATE: ${{ github.event.pull_request.head.sha || github.sha }}
+          CANDIDATE: ${{ github.sha }}
         run: |
           test "$(git rev-parse HEAD)" = "$CANDIDATE" || { echo "::error::checkout $(git rev-parse HEAD) is not the candidate $CANDIDATE"; exit 1; }
           echo "sha=$CANDIDATE" >> "$GITHUB_OUTPUT"
@@ -58,6 +58,36 @@ jobs:
           git init -q "$RUNNER_TEMP/indy-init"
           git -C "$RUNNER_TEMP/indy-init" fetch -q --depth 1 https://github.com/kemiller2002/Indy-init "$commit"
           git -C "$RUNNER_TEMP/indy-init" checkout -q FETCH_HEAD
+      - name: Governed contracts are the ones the lock pins (catalog, design, deadline policy, journey bindings)
+        run: |
+          src="$RUNNER_TEMP/indy-init"; lock="$src/$(jq -r '.lock // "kickoff/rehearsal-009/toolchain.lock.json"' .echelon/r9-governance.json)"
+          check() { pinned=$(jq -r "$2" "$lock"); [ -z "$pinned" ] || [ "$pinned" = "null" ] && return 0
+            echo "$pinned  $src/$(jq -r "$1" "$lock")" | sha256sum -c - || { echo "::error::$1 does not match the lock's pin"; exit 1; }; }
+          check '.catalogVerification.contract' '.catalogVerification.contractSha256'
+          check '.designContract.contract' '.designContract.contractSha256'
+          check '.deadlinePolicy.path' '.deadlinePolicy.sha256'
+          check '.journeys.bindings' '.journeys.bindingsSha256'
+      - name: The slice a pull request integrates (branch slice/SL-<work item>)
+        id: slice
+        if: github.event_name == 'pull_request'
+        env:
+          HEAD_REF: ${{ github.head_ref }}
+          BASE_REF: ${{ github.base_ref }}
+        run: |
+          # A pull request that changes implementation names its slice by its branch; the gate then judges that work item
+          # at the merged result (this checkout is the merge of the head into the current base).
+          src="$RUNNER_TEMP/indy-init"; slices="$src/docs/rehearsal-010-readiness/slice-execution-manifest.json"
+          impl=$(git diff --name-only HEAD^1 HEAD | grep -E '^(src|web|tests)/|\.(fsproj|slnx|sln)$|^(package\.json|playwright\.config\.ts|build\.fsx)$' || true)
+          slice=""; case "$HEAD_REF" in slice/SL-*) slice="${HEAD_REF#slice/}";; esac
+          if [ -n "$impl" ] && [ -z "$slice" ]; then echo "::error::this pull request changes implementation but its branch does not name a slice (slice/SL-<work item>)"; exit 1; fi
+          if [ -n "$slice" ]; then
+            jq -e --arg s "$slice" '.slices[] | select(.id == $s)' "$slices" > "$RUNNER_TEMP/slice.json" || { echo "::error::$slice is not in the slice manifest"; exit 1; }
+            echo "id=$slice" >> "$GITHUB_OUTPUT"
+            echo "work_item=$(jq -r .workItem "$RUNNER_TEMP/slice.json")" >> "$GITHUB_OUTPUT"
+            echo "scope=$(jq -r '.requirements | join(",")' "$RUNNER_TEMP/slice.json")" >> "$GITHUB_OUTPUT"
+            echo "target_base=$(git rev-parse HEAD^1)" >> "$GITHUB_OUTPUT"
+            git fetch -q origin "$BASE_REF" && echo "target_head=$(git rev-parse FETCH_HEAD)" >> "$GITHUB_OUTPUT"
+          fi
       - name: Governance is unchanged (policy, this workflow, completed items, scope only grows)
         run: |
           base_scope=""
@@ -103,7 +133,7 @@ jobs:
             --out "$RUNNER_TEMP/results" $suites
       - name: Record evidence observed by this run (work-item and release checks only)
         id: records
-        if: inputs.work_item != '' || inputs.mode == 'release'
+        if: inputs.work_item != '' || inputs.mode == 'release' || steps.slice.outputs.work_item != ''
         env:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
@@ -169,7 +199,7 @@ jobs:
           echo "args=--catalog-acceptance $RUNNER_TEMP/catalog/catalog-acceptance.json" >> "$GITHUB_OUTPUT"
       - name: Governed journeys J1-J3 and the design contract (Chromium and WebKit; adversarial audit R3, R5)
         id: journeys
-        if: inputs.mode == 'release' || inputs.work_item != ''
+        if: always()
         env:
           CAUSA_PROVIDER: github
           CAUSA_GITHUB_TOKEN: ${{ github.token }}
@@ -183,9 +213,12 @@ jobs:
           export CAUSA_TEST_REPO=$(jq -r '.testRepository.repo // "${{ github.event.repository.name }}"' "$lock")
           export CAUSA_TEST_BRANCH=$(jq -r '.testRepository.branch // "causa-acceptance"' "$lock")
           design="$src/$(jq -r '.designContract.contract // "kickoff/rehearsal-010/design-contract.json"' "$lock")"
-          npm run build
+          mkdir -p "$RUNNER_TEMP/journeys"
+          built=false; npm run build && built=true
           root=$(jq -r '.servedRoot // "dist"' "$design"); [ -d "$root" ] || root=web
-          node "$src/verification/harness/serve.mjs" "$root" 4620 & sleep 1
+          node "$src/verification/harness/serve.mjs" "$root" 4620 & sleep 2
+          started=false; curl -sf http://127.0.0.1:4620/ > /dev/null && started=true
+          echo "{\"candidate\":\"$CAUSA_CANDIDATE\",\"built\":$built,\"started\":$started}" > "$RUNNER_TEMP/journeys/build.json"
           (cd "$src/verification/journeys" && npm install --no-audit --no-fund && npx playwright install --with-deps chromium webkit)
           set +e
           (cd "$src/verification/journeys" && CAUSA_JOURNEY_RESULTS="$RUNNER_TEMP/journeys/journey-results.json" npx playwright test)
@@ -193,13 +226,13 @@ jobs:
           (cd "$src/verification/design-contract" && CAUSA_DESIGN_CONTRACT="$design" CAUSA_DESIGN_RENDERED="$RUNNER_TEMP/journeys/design-rendered.json" \
             CAUSA_SCREENSHOTS="$RUNNER_TEMP/journeys/screenshots" npx playwright test)
           dotnet "${{ steps.catalog.outputs.rc }}" design-contract --contract "$design" --forma-inventory "$src/$(jq -r '.forma.inventories[-1]' "$design")" \
-            --root . --candidate "$CAUSA_CANDIDATE" --rendered "$RUNNER_TEMP/journeys/design-rendered.json" --out "$RUNNER_TEMP/journeys/design-contract.json"
+            --root . --candidate "$CAUSA_CANDIDATE" --rendered "$RUNNER_TEMP/journeys/design-rendered-chromium.json,$RUNNER_TEMP/journeys/design-rendered-webkit.json" --out "$RUNNER_TEMP/journeys/design-contract.json"
           exit 0
       - name: Verification gate (executable, record and mixed obligations)
         env:
           MODE: ${{ inputs.mode || 'development' }}
-          WORK_ITEM: ${{ inputs.work_item }}
-          SCOPE: ${{ inputs.scope }}
+          WORK_ITEM: ${{ inputs.work_item || steps.slice.outputs.work_item }}
+          SCOPE: ${{ inputs.scope || steps.slice.outputs.scope }}
         run: |
           scope=""
           if [ -n "$WORK_ITEM" ]; then scope="--work-item $WORK_ITEM --scope $SCOPE"
@@ -208,6 +241,31 @@ jobs:
             ${{ steps.probes.outputs.args }} ${{ steps.catalog.outputs.args }} \
             --obligations "$RUNNER_TEMP/obligations.json" --root . --results "$RUNNER_TEMP/results/results.json" \
             --dokimos "$(command -v dokimos)" --expect-candidate "${{ steps.candidate.outputs.sha }}" --out "$RUNNER_TEMP/gate"
+      - name: Slice integration gate (pull request of a slice; merge only on PASS)
+        if: always() && steps.slice.outputs.id != ''
+        env:
+          CANDIDATE: ${{ steps.candidate.outputs.sha }}
+        run: |
+          src="$RUNNER_TEMP/indy-init"; rc="${{ steps.catalog.outputs.rc }}"; ev="$RUNNER_TEMP/slice-evidence"; mkdir -p "$ev"
+          # Regression: every obligation the gate's coverage and the governed catalog verification judge verified here.
+          jq -n --arg c "$CANDIDATE" --slurpfile cov "$RUNNER_TEMP/gate/coverage.json" --slurpfile cat "$RUNNER_TEMP/catalog/requirement-verification.json" \
+            '{candidate: $c, passed: ([$cov[0].obligations[] | select(.status == "verified") | .id] + [$cat[0].requirements[].obligations[] | select(.status == "PASS") | .id])}' \
+            > "$ev/regression.json" 2>/dev/null || echo "{\"candidate\":\"$CANDIDATE\",\"passed\":[]}" > "$ev/regression.json"
+          live=$(jq -r --arg c "$CANDIDATE" '{candidate: $c, baseUrl: .provider.baseUrl, status: (if ([.results[] | select(.journey != null)] | length) > 0 and all(.results[]; .status == "passed") then "passed" else "failed" end)}' "$RUNNER_TEMP/journeys/journey-results.json" 2>/dev/null || echo "{\"candidate\":\"$CANDIDATE\",\"status\":\"missing\"}")
+          echo "$live" > "$ev/live.json"
+          # The base the slice merges onto, run with the same deterministic suites, gives the test identities that must survive.
+          git worktree add -q "$RUNNER_TEMP/base" "${{ steps.slice.outputs.target_base }}"
+          (cd "$RUNNER_TEMP/base" && npm ci > /dev/null 2>&1; dotnet fsi "$src/tools/r9/r9.fsx" -- run-suites --obligations "$RUNNER_TEMP/obligations.json" --root . \
+            --out "$RUNNER_TEMP/base-results" --suites SU-OWN-DOTNET,SU-DOTNET-DETERMINISTIC,SU-DOTNET-INVARIANTS,SU-OWN-BROWSER,SU-BROWSER-CHROMIUM) || true
+          dotnet "$rc" test-integrity --repo . --base "${{ steps.slice.outputs.target_base }}" --head "$CANDIDATE" \
+            --base-results "$RUNNER_TEMP/base-results" --head-results "$RUNNER_TEMP/results" --out "$ev/test-integrity.json" || true
+          dotnet "$rc" slice-gate --manifest "$src/docs/rehearsal-010-readiness/scope-manifest.json" --events evidence/progress/events.json \
+            --slices "$src/docs/rehearsal-010-readiness/slice-execution-manifest.json" --slice "${{ steps.slice.outputs.id }}" --candidate "$CANDIDATE" \
+            --target-base "${{ steps.slice.outputs.target_base }}" --target-head "${{ steps.slice.outputs.target_head }}" \
+            --gate "$RUNNER_TEMP/gate/gate.json" --journeys "$RUNNER_TEMP/journeys/journey-results.json" --design "$RUNNER_TEMP/journeys/design-contract.json" \
+            --regression "$ev/regression.json" --build "$RUNNER_TEMP/journeys/build.json" --live "$ev/live.json" --test-integrity "$ev/test-integrity.json" \
+            --catalog "$RUNNER_TEMP/catalog/catalog-acceptance.json" --approvals "$src/kickoff/acceptance/approvals.causa.json" --trusted-operator kemiller2002 \
+            --out "$ev/slice-gate.json"
       - name: Full-scope completion gate (release; a slice PASS is never a release PASS)
         if: always() && inputs.mode == 'release'
         run: |
@@ -215,7 +273,9 @@ jobs:
           dotnet "${{ steps.catalog.outputs.rc }}" completion-gate --manifest "$src/docs/rehearsal-010-readiness/scope-manifest.json" \
             --events evidence/progress/events.json --candidate "${{ steps.candidate.outputs.sha }}" --release-gate "$RUNNER_TEMP/gate/gate.json" \
             --catalog "$RUNNER_TEMP/catalog/catalog-acceptance.json" --journeys "$RUNNER_TEMP/journeys/journey-results.json" \
-            --design "$RUNNER_TEMP/journeys/design-contract.json" --out "$RUNNER_TEMP/gate/completion.json"
+            --design "$RUNNER_TEMP/journeys/design-contract.json" --journey-bindings "$src/verification/journeys/bindings.json" \
+            --facts "$src/kickoff/rehearsal-010/catalog-verification-contract.json" \
+            --approvals "$src/kickoff/acceptance/approvals.causa.json" --trusted-operator kemiller2002 --out "$RUNNER_TEMP/gate/completion.json"
       - name: Publish the coverage report, results and verdict
         if: always()
         uses: actions/upload-artifact@v4
@@ -231,3 +291,4 @@ jobs:
             ${{ runner.temp }}/sequencing.json
             ${{ runner.temp }}/catalog
             ${{ runner.temp }}/journeys
+            ${{ runner.temp }}/slice-evidence

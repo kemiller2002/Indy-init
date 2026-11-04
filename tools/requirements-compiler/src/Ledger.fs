@@ -64,7 +64,9 @@ let ledgerState (s: State) (id: string) : LedgerState =
         | Verified
         | Accepted -> if s.IntegratedAt.ContainsKey id then Integrated else VerifiedUnmerged
 
-let private applyLedger (s: State) (j: Json) : Result<State, string> =
+/// approvedExclusions: (requirement, decision) pairs from trusted operator records {requirement_id, action: exclude} in
+/// the pinned approvals file. An `excluded` event that no such record backs is refused, whatever authority it claims.
+let private applyLedger (approvedExclusions: Set<string * string>) (s: State) (j: Json) : Result<State, string> =
     let known id = s.Progress.Requirements.ContainsKey id
     match strOpt "kind" j with
     | Some "integrated" ->
@@ -82,13 +84,14 @@ let private applyLedger (s: State) (j: Json) : Result<State, string> =
         if not (known id) then Error(sprintf "excluded names a requirement outside the scope: %s" id)
         elif authority <> "operator" then Error(sprintf "exclusion of %s by %s is refused: only the owner (operator) excludes scope" id (if authority = "" then "an unnamed authority" else authority))
         elif decision = "" then Error(sprintf "exclusion of %s names no owner decision" id)
+        elif not (approvedExclusions.Contains(id, decision)) then Error(sprintf "exclusion of %s (%s) is refused: no trusted operator record {requirement_id: %s, action: exclude} in the pinned approvals backs it" id decision id)
         else Ok { s with ExcludedBy = s.ExcludedBy.Add(id, decision) }
     | Some "main-unhealthy" -> Ok { s with Unhealthy = Some(strOpt "commit" j |> Option.defaultValue "", strOpt "cause" j |> Option.defaultValue "deployment verification failed") }
     | Some "main-healthy" -> Ok { s with Unhealthy = None }
     | k -> Error(sprintf "not a ledger event: %A" k)
 
 /// Folds progress and ledger events in order; the first refused event stops the fold.
-let replay (manifest: Json) (events: Json list) : Result<State, string> =
+let replayWith (approvedExclusions: Set<string * string>) (manifest: Json) (events: Json list) : Result<State, string> =
     let start = { Progress = Progress.initial manifest; IntegratedAt = Map.empty; ExcludedBy = Map.empty; Unhealthy = None }
     events
     |> List.indexed
@@ -96,10 +99,13 @@ let replay (manifest: Json) (events: Json list) : Result<State, string> =
         (fun acc (n, j) ->
             acc
             |> Result.bind (fun s ->
-                if ledgerKinds.Contains(strOpt "kind" j |> Option.defaultValue "") then applyLedger s j
+                if ledgerKinds.Contains(strOpt "kind" j |> Option.defaultValue "") then applyLedger approvedExclusions s j
                 else eventOf j |> Result.bind (Progress.apply s.Progress) |> Result.map (fun p -> { s with Progress = p }))
             |> Result.mapError (sprintf "event %d: %s" (n + 1)))
         (Ok start)
+
+/// Replays with no approved exclusion: any `excluded` event is refused.
+let replay (manifest: Json) (events: Json list) = replayWith Set.empty manifest events
 
 // ---- applicability ------------------------------------------------------------------------------------------------
 
@@ -307,7 +313,9 @@ type SliceEvidence =
       Regression: Json option
       Build: Json option
       LiveProvider: Json option
-      TestIntegrity: Json option }
+      TestIntegrity: Json option
+      /// The governed catalog acceptance at the merged result (catalog slices).
+      CatalogAcceptance: Json option }
 
 type SliceRule = { Id: string; Check: State -> SliceEvidence -> Refusal list }
 
@@ -342,7 +350,8 @@ let sliceRules : SliceRule list =
                   let missing = strs "requirements" e.Slice |> List.filter (scope.Contains >> not)
                   [ if strOpt "workItem" g <> strOpt "workItem" e.Slice then yield ref' "GATE_OTHER_WORK_ITEM" (sprintf "the gate judged work item %s, not %s" (strOpt "workItem" g |> Option.defaultValue "(none)") (str "workItem" e.Slice))
                     if not missing.IsEmpty then yield ref' "GATE_SCOPE_INCOMPLETE" (sprintf "the gate's scope omits %s" (String.concat ", " missing))
-                    for c in strs "causes" g do yield ref' "MANDATORY_OBLIGATION_UNVERIFIED" c ]) }
+                    for c in strs "causes" g do yield ref' "MANDATORY_OBLIGATION_UNVERIFIED" c
+                    if strOpt "verdict" g <> Some "PASS" && (strs "causes" g).IsEmpty then yield ref' "GATE_NOT_PASS" (sprintf "the gate verdict is %s, not PASS" (strOpt "verdict" g |> Option.defaultValue "(none)")) ]) }
       { Id = "journeys"
         Check =
           fun _ e ->
@@ -392,6 +401,21 @@ let sliceRules : SliceRule list =
           fun _ e ->
               if not (boolOr "formaAndAccessibility" false e.Slice) then []
               else atCandidate "DESIGN_CONTRACT" e e.DesignContract (fun d -> [ for c in strs "causes" d do yield ref' "DESIGN_CONTRACT" c ] @ (if strOpt "verdict" d = Some "PASS" then [] else [ ref' "DESIGN_CONTRACT" "the design contract did not pass" ])) |> List.distinctBy (fun r -> r.Detail) }
+      { Id = "catalog"
+        Check =
+          fun _ e ->
+              // A slice carrying catalog requirements needs the governed catalog acceptance at the merged result: every binding
+              // refusal counts (wrong commit, digest, producer, contract, facts, probe spec), and an obligation refusal counts
+              // when it names one of this slice's obligations; other slices' unfinished catalog work does not block it.
+              let mine = strs "obligations" e.Slice |> List.filter (fun o -> o.StartsWith "INV-")
+              if mine.IsEmpty then []
+              else
+                  atCandidate "CATALOG" e e.CatalogAcceptance (fun c ->
+                      let perObligation = set [ "CATALOG_OBLIGATION_FAILED"; "FAULT_INSENSITIVE" ]
+                      [ for r in arr "refusals" c do
+                            let code, detail = str "code" r, str "detail" r
+                            if not (perObligation.Contains code) && code <> "CATALOG_NOT_ACCEPTED" then yield ref' code detail
+                            elif perObligation.Contains code && mine |> List.exists (fun o -> detail.StartsWith(o + " ") || detail.StartsWith(o + ":")) then yield ref' code detail ]) }
       { Id = "test-integrity"
         Check = fun _ e -> atCandidate "TEST_INTEGRITY" e e.TestIntegrity (fun t -> arr "refusals" t |> List.map (fun r -> ref' (str "code" r) (str "detail" r))) } ]
 
@@ -416,7 +440,11 @@ type ReleaseEvidence =
       CatalogAcceptance: Json option
       Journeys: Json option
       DesignContract: Json option
-      Facts: Map<string, string> }
+      Facts: Map<string, string>
+      /// The approved plan's frozenPlanSha256 the release gate must have judged, when pinned.
+      PlanSha256: string option
+      /// The journeys and their P0 assertions (verification/journeys/bindings.json).
+      JourneyBindings: Journey list }
 
 type CompletionRule = { Id: string; Check: State -> ReleaseEvidence -> Refusal list }
 
@@ -430,7 +458,11 @@ let completionRules : CompletionRule list =
                   [ if candidateOf g <> e.Candidate then yield ref' "RELEASE_GATE_STALE" (sprintf "the gate verdict is for %s, not %s" (candidateOf g) e.Candidate)
                     if strOpt "mode" g <> Some "release" then yield ref' "SLICE_VERDICT_IS_NOT_RELEASE" (sprintf "the gate ran in %s mode; only a release-mode verdict over the whole plan completes the release" (strOpt "mode" g |> Option.defaultValue "(unknown)"))
                     if not (strs "scope" g).IsEmpty || (strOpt "workItem" g |> Option.defaultValue "") <> "" then yield ref' "SLICE_VERDICT_IS_NOT_RELEASE" "the gate verdict is scoped to a slice or work item; a slice PASS is never a release PASS"
-                    for c in strs "causes" g do yield ref' "RELEASE_GATE_REFUSED" c ] }
+                    for c in strs "causes" g do yield ref' "RELEASE_GATE_REFUSED" c
+                    if strOpt "verdict" g <> Some "PASS" then yield ref' "RELEASE_GATE_NOT_PASS" (sprintf "the release gate verdict is %s, not PASS" (strOpt "verdict" g |> Option.defaultValue "(none)"))
+                    match e.PlanSha256 with
+                    | Some pinned when strOpt "frozenPlanSha256" g <> Some pinned -> yield ref' "RELEASE_GATE_OTHER_PLAN" (sprintf "the release gate judged plan %s, not the approved %s" (strOpt "frozenPlanSha256" g |> Option.defaultValue "(none)") pinned)
+                    | _ -> () ] }
       { Id = "catalog"
         Check =
           fun _ e ->
@@ -448,10 +480,18 @@ let completionRules : CompletionRule list =
                   let results = arr "results" j
                   [ if candidateOf j <> e.Candidate then yield ref' "JOURNEYS_STALE" (sprintf "the journey results are for %s" (candidateOf j))
                     if strOpt "baseUrl" (field "provider" j |> Option.defaultValue (JObj [])) <> Some "https://api.github.com" then yield ref' "LIVE_PROVIDER_SUBSTITUTED" "the journeys did not run against api.github.com"
-                    for engine in [ "chromium"; "webkit" ] do
-                        if not (results |> List.exists (fun r -> strOpt "engine" r = Some engine)) then yield ref' "JOURNEY_NOT_RUN" (sprintf "no journey ran on %s" engine)
-                    for r in results do
-                        if strOpt "status" r <> Some "passed" then yield ref' "JOURNEY_FAILED" (sprintf "%s on %s: %s" (str "journey" r) (str "engine" r) (strOpt "status" r |> Option.defaultValue "")) ] }
+                    if e.JourneyBindings.IsEmpty then yield ref' "JOURNEY_BINDINGS_MISSING" "the completion gate was given no journey bindings"
+                    for journey in e.JourneyBindings do
+                        for engine in [ "chromium"; "webkit" ] do
+                            match results |> List.tryFind (fun r -> strOpt "journey" r = Some journey.Id && strOpt "engine" r = Some engine) with
+                            | None -> yield ref' "JOURNEY_NOT_RUN" (sprintf "%s did not run on %s" journey.Id engine)
+                            | Some r ->
+                                if strOpt "status" r <> Some "passed" then yield ref' "JOURNEY_FAILED" (sprintf "%s on %s: %s" journey.Id engine (strOpt "status" r |> Option.defaultValue ""))
+                                for (aid, _) in journey.Assertions do
+                                    match arr "assertions" r |> List.tryFind (fun a -> strOpt "id" a = Some aid) with
+                                    | Some a when strOpt "status" a = Some "passed" -> ()
+                                    | Some _ -> yield ref' "JOURNEY_FAILED" (sprintf "%s failed on %s" aid engine)
+                                    | None -> yield ref' "JOURNEY_NOT_RUN" (sprintf "%s has no recorded result on %s" aid engine) ] }
       { Id = "design-contract"
         Check =
           fun _ e ->
@@ -482,7 +522,10 @@ let completionJson (e: ReleaseEvidence) (refusals: Refusal list) =
 type TestDiffLine = { File: string; Added: bool; Text: string }
 
 let private isTestFile (f: string) =
-    f.StartsWith("tests/", StringComparison.Ordinal) || f.Contains ".spec." || f.Contains ".test." || f.EndsWith("Tests.fs", StringComparison.Ordinal)
+    let name = f.Substring(f.LastIndexOf('/') + 1)
+    [ "tests/"; "test/"; "__tests__/"; "spec/" ] |> List.exists (fun d -> f.StartsWith(d, StringComparison.Ordinal) || f.Contains("/" + d))
+    || [ ".spec."; ".test."; "_test."; "-test." ] |> List.exists name.Contains
+    || [ "Tests.fs"; "Test.fs"; "Tests.cs"; "Test.cs" ] |> List.exists (fun x -> name.EndsWith(x, StringComparison.Ordinal))
 
 let private skipPattern = Regex(@"\b(test|it|describe)\.(skip|fixme|only)\s*\(|Skip\s*=\s*""|\[<\s*Fact\s*\(\s*Skip|\[<\s*Ignore|\bxit\s*\(|\bxdescribe\s*\(|test\.fail\s*\(")
 let private assertionPattern = Regex(@"\bexpect\s*\(|\bAssert\.|\bshould\b|\btoBe|\btoHave|\btoEqual|\bassert\b")

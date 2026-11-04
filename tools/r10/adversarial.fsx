@@ -1,4 +1,5 @@
-// adversarial.fsx: the bounded adversarial validation suite for Rehearsal 010 readiness (section 7 of the mission;
+// adversarial.fsx: the bounded adversarial validation suite (18 mission cases, C01..C18, plus C19..C24 from the
+// independent review) for Rehearsal 010 readiness (section 7 of the mission;
 // docs/rehearsal-010-readiness/ADVERSARIAL-VALIDATION.md). F#, as OD-INDY-14 requires.
 //
 //   dotnet fsi tools/r10/adversarial.fsx -- --indy-init SRC --work NEW-DIR --evidence DIR
@@ -159,16 +160,56 @@ let request (name: string) (minutes: float) (reason: string) (scope: string) (cl
     write (Path.Combine(work, "requests", name + ".json"))
         (json (dict [ "at", box ((t0.AddMinutes minutes).ToString "o"); "reason", box reason; "scopeSha256", box scope; "claims", box (dict [ "complete", box claimsComplete ]) ]))
 let stopDecision (t: Tools) (events: string) (req: string) (extra: string list) =
-    rc t ([ "stop-decision"; "--manifest"; manifestPath; "--checkpoint"; checkpoint; "--events"; events; "--request"; req; "--t0-record"; t0Record; "--deadline-policy"; policy; "--out"; Path.Combine(work, "decision-" + Path.GetFileName req) ] @ extra)
+    rc t ([ "stop-decision"; "--manifest"; manifestPath; "--checkpoint"; checkpoint; "--events"; events; "--request"; req; "--t0-record"; t0Record; "--deadline-policy"; policy; "--now"; (t0.AddMinutes 600.0).ToString "o"; "--out"; Path.Combine(work, "decision-" + Path.GetFileName req) ] @ extra)
 
 // Release evidence for the completion gate, all bound to `candidate`.
 let releaseGate = write (Path.Combine(work, "release", "gate.json")) (json (dict [ "schema", box "indy-init.r9-gate/1"; "verdict", box "PASS"; "mode", box "release"; "candidate", box candidate; "scope", box [||]; "workItem", box ""; "causes", box [||] ]))
 let governedCatalog = write (Path.Combine(work, "release", "catalog.json")) (json (dict [ "schema", box "indy-init.catalog-acceptance/1"; "level", box "GOVERNED-ACCEPTED"; "candidate", box candidate ]))
-let journeyResult (j: string) (e: string) = dict [ "journey", box j; "engine", box e; "status", box "passed" ]
-let journeysPass = write (Path.Combine(work, "release", "journeys.json")) (json (dict [ "schema", box "indy-init.journey-results/1"; "candidate", box candidate; "provider", box (dict [ "baseUrl", box "https://api.github.com" ]); "results", box [| for j in [ "J1"; "J2"; "J3" ] do for e in [ "chromium"; "webkit" ] do yield journeyResult j e |] ]))
 let designPass = write (Path.Combine(work, "release", "design.json")) (json (dict [ "schema", box "indy-init.design-contract/1"; "verdict", box "PASS"; "candidate", box candidate; "causes", box [||] ]))
+// Fixtures for the review regressions.
+let bindingsPath = Path.Combine(src, "verification", "journeys", "bindings.json")
+let bindingsNode : JsonNode = JsonNode.Parse(File.ReadAllText bindingsPath)
+let p0Assertions (journey: string) =
+    bindingsNode["journeys"].AsArray()
+    |> Seq.filter (fun j -> j["id"].GetValue<string>() = journey)
+    |> Seq.collect (fun j -> j["assertions"].AsArray())
+    |> Seq.filter (fun a -> a["priority"].GetValue<string>() = "P0")
+    |> Seq.map (fun a -> dict [ "id", box (a["id"].GetValue<string>()); "status", box "passed" ])
+    |> Array.ofSeq
+let journeysOf (name: string) (journeys: string list) =
+    write (Path.Combine(work, "release", name + ".json"))
+        (json (dict [ "schema", box "indy-init.journey-results/1"; "candidate", box candidate; "provider", box (dict [ "baseUrl", box "https://api.github.com" ])
+                      "results", box [| for j in journeys do for e in [ "chromium"; "webkit" ] do yield dict [ "journey", box j; "engine", box e; "status", box "passed"; "assertions", box (p0Assertions j) ] |] ]))
+let journeysPass = journeysOf "journeys" [ "J1"; "J2"; "J3" ]
+let journeysJ1Only = journeysOf "journeys-j1" [ "J1" ]
+let refusedGate = write (Path.Combine(work, "release", "gate-refused.json")) (json (dict [ "schema", box "indy-init.r9-gate/1"; "verdict", box "REFUSED"; "mode", box "release"; "candidate", box candidate; "scope", box [||]; "workItem", box ""; "causes", box [||] ]))
+let completionWith (t: Tools) (events: string) (gate: string) (journeys: string) =
+    rc t [ "completion-gate"; "--manifest"; manifestPath; "--events"; events; "--candidate"; candidate; "--release-gate"; gate; "--catalog"; governedCatalog; "--journeys"; journeys; "--journey-bindings"; bindingsPath; "--design"; designPass; "--out"; Path.Combine(work, "completion.json") ]
+let excludedId = "PERSIST-001"
+let forgedExclusion =
+    eventsFile "forged-exclusion"
+        ((reqs |> List.filter (fun r -> idOf r <> excludedId) |> List.collect fullyIntegrated)
+         @ [ ev "excluded" [ "requirement", box excludedId; "decision", box "ODR-ADV-1"; "authority", box (dict [ "kind", box "operator" ]) ] ])
+let exclusionApprovals =
+    write (Path.Combine(work, "approvals-exclusion.json"))
+        (json (dict [ "approvals", box [| dict [ "id", box "APR-ADV-1"; "authority", box (dict [ "kind", box "operator"; "id", box "owner-1" ]); "changes", box [| dict [ "action", box "exclude"; "requirement_id", box excludedId; "decision_id", box "ODR-ADV-1" ] |] ] |] ]))
+let stopDecisionAt (t: Tools) (events: string) (req: string) (now: DateTimeOffset) =
+    rc t [ "stop-decision"; "--manifest"; manifestPath; "--checkpoint"; checkpoint; "--events"; events; "--request"; req; "--t0-record"; t0Record; "--deadline-policy"; policy; "--now"; now.ToString "o"; "--out"; Path.Combine(work, "decision-at-" + Path.GetFileName req) ]
+// A history whose first commit installs governance (the T0 bootstrap) and, for the attack, a later implementation
+// commit that also edits the governance file, before any checkpoint.
+let governedRepo (name: string) (hide: bool) =
+    let repo = Path.Combine(work, "repos", name)
+    Directory.CreateDirectory repo |> ignore
+    git repo [ "init"; "-q"; "-b"; "main" ] |> ignore
+    let commitFiles (files: (string * string) list) (msg: string) =
+        files |> List.iter (fun (p, text) -> write (Path.Combine(repo, p)) text |> ignore)
+        git repo [ "add"; "-A" ] |> ignore; git repo [ "commit"; "-qm"; msg ] |> ignore
+    commitFiles [ ".echelon/r9-governance.json", "{}"; "src/Stub.fs", "module Stub" ] "T0 bootstrap"
+    if hide then commitFiles [ ".echelon/r9-governance.json", "{ }"; "src/App.fs", "module App" ] "implementation with a governance touch"
+    commitFiles [ ".echelon/scope-checkpoint.json", "{}" ] "scope checkpoint"
+    repo
 let completion (t: Tools) (events: string) (withGate: bool) =
-    rc t ([ "completion-gate"; "--manifest"; manifestPath; "--events"; events; "--candidate"; candidate; "--catalog"; governedCatalog; "--journeys"; journeysPass; "--design"; designPass; "--out"; Path.Combine(work, "completion.json") ]
+    rc t ([ "completion-gate"; "--manifest"; manifestPath; "--events"; events; "--candidate"; candidate; "--catalog"; governedCatalog; "--journeys"; journeysPass; "--journey-bindings"; bindingsPath; "--design"; designPass; "--out"; Path.Combine(work, "completion.json") ]
           @ (if withGate then [ "--release-gate"; releaseGate ] else []))
 
 // The slice manifest, and slice-gate evidence for SL-T10 (no dependencies).
@@ -182,7 +223,7 @@ let byId id = reqs |> List.find (fun r -> idOf r = id)
 let t10Verified = t10 |> List.map byId |> List.collect (fun r -> [ started r; completed r ] @ (obligationsOf r |> List.map passed))
 let sliceEvidence (name: string) (causes: string list) (regressionPassed: string list) =
     let f n (o: obj) = write (Path.Combine(work, "slice-" + name, n + ".json")) (json o)
-    [ "--gate"; f "gate" (dict [ "candidate", box candidate; "workItem", box "T10"; "scope", box (List.toArray t10); "causes", box (List.toArray causes) ])
+    [ "--gate"; f "gate" (dict [ "verdict", box (if causes.IsEmpty then "PASS" else "REFUSED"); "candidate", box candidate; "workItem", box "T10"; "scope", box (List.toArray t10); "causes", box (List.toArray causes) ])
       "--build"; f "build" (dict [ "candidate", box candidate; "built", box true; "started", box true ])
       "--live"; f "live" (dict [ "candidate", box candidate; "baseUrl", box "https://api.github.com"; "status", box "passed" ])
       "--test-integrity"; f "integrity" (dict [ "candidate", box candidate; "refusals", box [||] ])
@@ -290,7 +331,9 @@ let runSuites (t: Tools) (root: string) (name: string) =
     r9 t [ "run-suites"; "--obligations"; obligations414.Force(); "--root"; root; "--out"; Path.Combine(work, "runs-" + name); "--suites"; "SU-DOTNET-DETERMINISTIC"; "--require-tests"; "true" ] root
 
 let designStatic (t: Tools) (root: string) =
-    let rendered = write (Path.Combine(work, "rendered-pass.json")) (json (dict [ "schema", box "indy-init.design-rendered/1"; "candidate", box "fixture"; "failures", box [||] ]))
+    // One passing rendered stub per engine: this case judges the static half only.
+    let stub engine = write (Path.Combine(work, $"rendered-pass-{engine}.json")) (json (dict [ "schema", box "indy-init.design-rendered/1"; "candidate", box "fixture"; "engine", box engine; "failures", box [||] ]))
+    let rendered = stub "chromium" + "," + stub "webkit"
     rc t [ "design-contract"; "--contract"; Path.Combine(src, "kickoff", "rehearsal-010", "design-contract.json"); "--forma-inventory"; Path.Combine(src, "verification", "design-contract", "forma-0.13.0-inventory.json")
            "--root"; root; "--candidate"; "fixture"; "--rendered"; rendered; "--out"; Path.Combine(work, "design-" + Path.GetFileName root + ".json") ]
 
@@ -401,7 +444,7 @@ let cases : Case list =
         Correct = refusedWith "MANDATORY_OBLIGATION_UNVERIFIED"
         Control = fun t -> sliceGate t (eventsFile "t10-b" t10Verified) (sliceEvidence "c10-control" [] [])
         ControlOk = fun o -> o.Exit = 0
-        Mutation = [ ledger, [ "                    for c in strs \"causes\" g do yield ref' \"MANDATORY_OBLIGATION_UNVERIFIED\" c ]) }", "                    for c in List.empty<string> do yield ref' \"MANDATORY_OBLIGATION_UNVERIFIED\" c ]) }" ] ] }
+        Mutation = [ ledger, [ "                    for c in strs \"causes\" g do yield ref' \"MANDATORY_OBLIGATION_UNVERIFIED\" c\n", "                    for c in List.empty<string> do yield ref' \"MANDATORY_OBLIGATION_UNVERIFIED\" c\n" ] ] }
       { Id = "C11"; Title = "Existing integrated functionality regresses"; Requirements = [ "slice gate"; "regression" ]; Needs = Nothing
         Expected = "slice-gate REFUSED: REGRESSION (a previously integrated obligation no longer passes)"
         Attack = fun t -> sliceGate t (eventsFile "regress-a" (earlierIntegrated @ t10Verified)) (sliceEvidence "c11" [] [])
@@ -462,7 +505,51 @@ let cases : Case list =
         Mutation =
           [ ledger, [ "for t in removed do yield ref' \"TEST_REMOVED\"", "for t in Set.empty<string> do yield ref' \"TEST_REMOVED\""
                       "for d in skips do yield ref' \"TEST_SKIPPED\"", "for d in List.empty<TestDiffLine> do yield ref' \"TEST_SKIPPED\""
-                      "for f, n in assertionLoss do yield ref' \"TEST_WEAKENED\"", "for f, n in List.empty<string * int> do yield ref' \"TEST_WEAKENED\"" ] ] } ]
+                      "for f, n in assertionLoss do yield ref' \"TEST_WEAKENED\"", "for f, n in List.empty<string * int> do yield ref' \"TEST_WEAKENED\"" ] ] }
+      // ---- regressions from the independent review (each a reproduced defect, now refused) -------------------------
+      { Id = "C19"; Title = "A builder-written event excludes a requirement, claiming operator authority"; Requirements = [ "rule 11"; "R6"; "review 1" ]; Needs = Nothing
+        Expected = "completion-gate INCOMPLETE: the exclusion is refused (no trusted operator record backs it)"
+        Attack = fun t -> completion t forgedExclusion true
+        Correct = refusedWith "no trusted operator record"
+        Control = fun t -> rc t [ "completion-gate"; "--manifest"; manifestPath; "--events"; forgedExclusion; "--candidate"; candidate; "--release-gate"; releaseGate; "--catalog"; governedCatalog; "--journeys"; journeysPass; "--journey-bindings"; bindingsPath; "--design"; designPass; "--approvals"; exclusionApprovals; "--trusted-operator"; "owner-1"; "--out"; Path.Combine(work, "completion-approved.json") ]
+        ControlOk = fun o -> o.Exit = 0
+        Mutation = [ ledger, [ "        elif not (approvedExclusions.Contains(id, decision)) then Error(", "        elif false then Error(" ] ] }
+      { Id = "C20"; Title = "A stop request is stamped after the deadline to make it pass"; Requirements = [ "rule 10"; "review 2" ]; Needs = Nothing
+        Expected = "stop-decision REFUSED: REQUEST_IN_FUTURE"
+        Attack = fun t -> stopDecisionAt t catalogOnly (request "c20" 421.0 "conserve-compute" scopeSha false) (t0.AddMinutes 60.0)
+        Correct = refusedWith "REQUEST_IN_FUTURE"
+        Control = fun t -> stopDecisionAt t catalogOnly (request "c20-control" 421.0 "deadline" scopeSha false) (t0.AddMinutes 421.0)
+        ControlOk = fun o -> o.Exit = 0
+        Mutation = [ "tools/requirements-compiler/src/ScopeCommands.fs", [ "    if at > now.AddMinutes 2.0 then Some", "    if false then Some" ] ] }
+      { Id = "C21"; Title = "A release gate verdict says REFUSED but lists no cause"; Requirements = [ "R6"; "review 6" ]; Needs = Nothing
+        Expected = "completion-gate INCOMPLETE: RELEASE_GATE_NOT_PASS"
+        Attack = fun t -> completionWith t allIntegrated refusedGate journeysPass
+        Correct = refusedWith "RELEASE_GATE_NOT_PASS"
+        Control = fun t -> completion t allIntegrated true
+        ControlOk = fun o -> o.Exit = 0
+        Mutation = [ ledger, [ "                    if strOpt \"verdict\" g <> Some \"PASS\" then yield ref' \"RELEASE_GATE_NOT_PASS\"", "                    if false then yield ref' \"RELEASE_GATE_NOT_PASS\"" ] ] }
+      { Id = "C22"; Title = "Only one journey is reported for the release"; Requirements = [ "R3"; "review 6" ]; Needs = Nothing
+        Expected = "completion-gate INCOMPLETE: JOURNEY_NOT_RUN for J2 and J3"
+        Attack = fun t -> completionWith t allIntegrated releaseGate journeysJ1Only
+        Correct = refusedWith "JOURNEY_NOT_RUN"
+        Control = fun t -> completion t allIntegrated true
+        ControlOk = fun o -> o.Exit = 0
+        Mutation = [ ledger, [ "                            | None -> yield ref' \"JOURNEY_NOT_RUN\" (sprintf \"%s did not run on %s\" journey.Id engine)", "                            | None -> ()" ] ] }
+      { Id = "C23"; Title = "Test integrity is asked about a base it cannot read"; Requirements = [ "rule 4"; "review 8" ]; Needs = Nothing
+        Expected = "test-integrity REFUSED: TEST_DIFF_UNAVAILABLE (never PASS on missing evidence)"
+        Attack = fun t -> let repo, b, h = integrityRepo ("unreadable-" + string (Guid.NewGuid())) false in rc t [ "test-integrity"; "--repo"; repo; "--base"; String.replicate 40 "d"; "--head"; "HEAD"; "--base-results"; b; "--head-results"; h; "--out"; Path.Combine(work, "integrity-bad.json") ]
+        Correct = refusedWith "TEST_DIFF_UNAVAILABLE"
+        Control = fun t -> integrity t (integrityRepo ("grow-b-" + string (Guid.NewGuid())) false)
+        ControlOk = fun o -> o.Exit = 0
+        Mutation = [ "tools/requirements-compiler/src/GovernedCommands.fs", [ "              | None -> yield { Code = \"TEST_DIFF_UNAVAILABLE\";", "              | None -> () // { Code = \"TEST_DIFF_UNAVAILABLE\";" ] ] }
+      { Id = "C24"; Title = "Implementation before the checkpoint hides in a commit that also touches the governance file"; Requirements = [ "sequencing"; "review 9" ]; Needs = Nothing
+        Expected = "scope order REFUSED: IMPLEMENTATION_BEFORE_CHECKPOINT (only the T0 bootstrap is exempt)"
+        Attack = fun t -> rc t [ "scope"; "order"; "--repo"; governedRepo ("hidden-" + string (Guid.NewGuid())) true ]
+        Correct = refusedWith "IMPLEMENTATION_BEFORE_CHECKPOINT"
+        Control = fun t -> rc t [ "scope"; "order"; "--repo"; governedRepo ("bootstrap-" + string (Guid.NewGuid())) false ]
+        ControlOk = fun o -> o.Exit = 0
+        Mutation = [ "tools/requirements-compiler/src/ScopeCommands.fs", [ "                let afterBootstrap = commits |> List.filter (fun (sha, _) -> Some sha <> bootstrap)", "                let afterBootstrap = commits |> List.filter (fun (_, files) -> not (List.contains \".echelon/r9-governance.json\" files))" ] ] } ]
+
 
 // ---- run ----------------------------------------------------------------------------------------------------------
 

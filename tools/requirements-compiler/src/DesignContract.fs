@@ -57,6 +57,17 @@ let private stripComments (css: string) = Regex.Replace(css, @"/\*.*?\*/", "", R
 /// A literal colour that is only the fallback of a var() (var(--x, #fff)) is not a use of a literal.
 let private withoutFallbacks (value: string) = Regex.Replace(value, @"var\([^()]*\)", "var()")
 
+/// Markup and code with comments removed (HTML, CSS/JS block, JS/F# line and F# block comments), so a name that
+/// appears only in a comment does not count as used.
+let private withoutComments (text: string) =
+    let t = Regex.Replace(text, @"<!--.*?-->|/\*.*?\*/|\(\*.*?\*\)", "", RegexOptions.Singleline)
+    Regex.Replace(t, @"(?<![:""'\\])//[^\n]*", "")
+
+/// A Forma name is used when it appears as a class or element name, or inside a string literal of the view code.
+let private usesName (code: string) (name: string) =
+    let n = Regex.Escape name
+    Regex.IsMatch(code, @"<" + n + @"[\s>/]|[""'`][^""'`\n]*(?<![\w-])" + n + @"(?![\w-])[^""'`\n]*[""'`]")
+
 let isTheme (c: Contract) (path: string) = c.ThemeFiles |> List.exists (fun t -> path.Contains(t, StringComparison.OrdinalIgnoreCase))
 
 let private lineOf (text: string) (index: int) = text.Substring(0, index).Split('\n').Length
@@ -66,7 +77,7 @@ let private lineOf (text: string) (index: int) = text.Substring(0, index).Split(
 let check (c: Contract) (files: SourceFile list) (packageJson: Json option) : Refusal list =
     let css = files |> List.filter (fun f -> f.Path.EndsWith(".css", StringComparison.OrdinalIgnoreCase))
     let markup = files |> List.filter (fun f -> not (f.Path.EndsWith(".css", StringComparison.OrdinalIgnoreCase)))
-    let allMarkup = markup |> List.map (fun f -> f.Text) |> String.concat "\n"
+    let allMarkup = markup |> List.map (fun f -> withoutComments f.Text) |> String.concat "\n"
     let html = files |> List.filter (fun f -> f.Path.EndsWith(".html", StringComparison.OrdinalIgnoreCase))
     let version =
         packageJson
@@ -81,14 +92,14 @@ let check (c: Contract) (files: SourceFile list) (packageJson: Json option) : Re
     [ // The approved Forma package, at an accepted version, loaded by the page.
       match version with
       | None -> yield refusal "FORMA_NOT_DECLARED" (sprintf "package.json does not depend on %s" c.FormaPackage)
-      | Some v when not (c.AcceptedVersions |> List.exists (fun p -> v.TrimStart('^', '~', '=').StartsWith p)) ->
+      | Some v when [ "||"; ">"; "<"; "*"; " - "; "x"; "X" ] |> List.exists v.Contains || not (c.AcceptedVersions |> List.exists (fun p -> v.TrimStart('^', '~', '=').StartsWith p)) ->
           yield refusal "FORMA_VERSION_UNAPPROVED" (sprintf "%s %s is not an approved version (%s)" c.FormaPackage v (String.concat ", " c.AcceptedVersions))
       | Some _ -> ()
-      if not (html |> List.exists (fun f -> Regex.IsMatch(f.Text, @"<link[^>]+(forma|design-system)[^>]*\.css", RegexOptions.IgnoreCase))) then
+      if not (html |> List.exists (fun f -> Regex.IsMatch(withoutComments f.Text, @"<link[^>]+href\s*=\s*[""'][^""']*(@echelon-foundry/design-system|design-system/|/forma/)[^""']*\.css", RegexOptions.IgnoreCase))) then
           yield refusal "FORMA_NOT_LOADED" "no page loads the Forma stylesheet"
       // Forma roles: the application shell and the save-status presentation.
       for r in c.Roles do
-          if not (r.Names |> List.exists (fun n -> allMarkup.Contains n)) then
+          if not (r.Names |> List.exists (usesName allMarkup)) then
               yield refusal "FORMA_ROLE_MISSING" (sprintf "%s (%s): no source uses %s; a lookalike custom component does not satisfy it" r.Role r.Requirement (String.concat " or " r.Names))
       // The required primary destinations.
       for d in c.Destinations do
@@ -121,18 +132,22 @@ let check (c: Contract) (files: SourceFile list) (packageJson: Json option) : Re
     |> List.distinct
 
 /// Combines the static refusals with the rendered verdict (verification/design-contract, `indy-init.design-rendered/1`).
-let verdictJson (candidate: string) (staticRefusals: Refusal list) (rendered: Json option) : Json =
+/// `rendered`: one verdict per engine; every required engine must have one, for this candidate.
+let verdictJson (candidate: string) (staticRefusals: Refusal list) (requiredEngines: string list) (rendered: Json list) : Json =
     let renderedCauses =
-        match rendered with
-        | None -> [ "rendered: the rendered design contract did not run (layout, overflow, touch targets, focus, contrast, screenshots)" ]
-        | Some r when strOpt "candidate" r <> Some candidate -> [ sprintf "rendered: the rendered verdict is for %s, not %s" (strOpt "candidate" r |> Option.defaultValue "(none)") candidate ]
-        | Some r -> arr "failures" r |> List.map (fun f -> sprintf "rendered %s at %s: %s" (str "check" f) (strOpt "viewport" f |> Option.defaultValue "-") (str "detail" f))
+        [ if rendered.IsEmpty then yield "rendered: the rendered design contract did not run (layout, overflow, touch targets, focus, contrast, screenshots)"
+          for engine in requiredEngines do
+              if not (rendered |> List.exists (fun r -> strOpt "engine" r = Some engine)) then yield sprintf "rendered: no rendered verdict for %s" engine
+          for r in rendered do
+              let engine = strOpt "engine" r |> Option.defaultValue "(unknown engine)"
+              if strOpt "candidate" r <> Some candidate then yield sprintf "rendered (%s): the rendered verdict is for %s, not %s" engine (strOpt "candidate" r |> Option.defaultValue "(none)") candidate
+              for f in arr "failures" r do yield sprintf "rendered %s (%s) at %s: %s" (str "check" f) engine (strOpt "viewport" f |> Option.defaultValue "-") (str "detail" f) ]
     let causes = (staticRefusals |> List.map (fun r -> sprintf "%s %s" r.Code r.Detail)) @ renderedCauses
     JObj
         [ "schema", JStr "indy-init.design-contract/1"
           "candidate", JStr candidate
           "verdict", JStr(if causes.IsEmpty then "PASS" else "REFUSED")
           "static", JArr(staticRefusals |> List.map refusalJson)
-          "screenshots", (rendered |> Option.bind (field "screenshots") |> Option.defaultValue (JArr []))
+          "screenshots", JArr(rendered |> List.collect (arr "screenshots"))
           "independentVisualReview", JStr "required (UI-016-O16): the owner reviews the screenshots; this verdict is not that review"
           "causes", jstrs causes ]

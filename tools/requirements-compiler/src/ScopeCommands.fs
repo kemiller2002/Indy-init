@@ -101,7 +101,9 @@ let scopeCommand (args: string list) : int =
                 let isApplication (path: string) = (path.StartsWith("src/", StringComparison.Ordinal) || path.StartsWith("tests/", StringComparison.Ordinal) || path.StartsWith("web/", StringComparison.Ordinal)) && not (path.EndsWith(".fsproj", StringComparison.Ordinal))
                 // The T0 bootstrap (the commit that installs governance, .echelon/r9-governance.json) writes the generated
                 // stubs before any checkpoint can exist; it is not implementation (as r9.fsx check-sequencing judges it).
-                let afterBootstrap = commits |> List.filter (fun (_, files) -> not (List.contains ".echelon/r9-governance.json" files))
+                // Only that one commit: a later commit that also touches the governance file is judged like any other.
+                let bootstrap = commits |> List.tryFind (fun (_, files) -> List.contains ".echelon/r9-governance.json" files) |> Option.map fst
+                let afterBootstrap = commits |> List.filter (fun (sha, _) -> Some sha <> bootstrap)
                 finish "scope order" (implementationBeforeCheckpoint cp isApplication afterBootstrap)
     | _ -> eprintfn "usage: scope compile|preflight|checkpoint|order ..."; 2
 
@@ -128,18 +130,47 @@ let progressCommand (args: string list) : int =
 let private clockOf (o: Map<string, string>) : Result<Continuation.Clock, Refusal> =
     let claimedT0 = o.TryFind "--t0" |> Option.map DateTimeOffset.Parse
     let claimedWindow = o.TryFind "--window-minutes" |> Option.map float
+    let sha (path: string) = Security.Cryptography.SHA256.HashData(IO.File.ReadAllBytes path) |> Convert.ToHexString |> fun s -> s.ToLowerInvariant()
     match o.TryFind "--t0-record", o.TryFind "--deadline-policy" with
-    | Some t, Some p -> Continuation.boundClock (parseFile t) (parseFile p) claimedT0 claimedWindow
+    | Some t, Some p ->
+        // The policy must be the one the owner pinned (the lock's deadlinePolicy.sha256) when the pin is given.
+        match o.TryFind "--deadline-policy-sha256" with
+        | Some pinned when pinned <> sha p -> Error { Code = "DEADLINE_POLICY_UNAPPROVED"; Detail = sprintf "the deadline policy has sha256 %s; the lock pins %s" (sha p) pinned }
+        | _ -> Continuation.boundClock (parseFile t) (parseFile p) claimedT0 claimedWindow
     | Some _, None -> Error { Code = "DEADLINE_POLICY_MISSING"; Detail = "--t0-record needs --deadline-policy" }
     | None, _ ->
-        match claimedT0 with
-        | Some t0 -> Ok { T0 = t0; Deadline = t0.AddMinutes(claimedWindow |> Option.defaultValue 420.0) }
-        | None -> Error { Code = "T0_RECORD_MISSING"; Detail = "no --t0-record and no --t0" }
+        // A caller-supplied T0 is accepted only for an explicit historical replay; a live run binds the clock to its record.
+        match claimedT0, o.TryFind "--replay-clock" with
+        | Some t0, Some "true" -> Ok { T0 = t0; Deadline = t0.AddMinutes(claimedWindow |> Option.defaultValue 420.0) }
+        | Some _, _ -> Error { Code = "T0_RECORD_MISSING"; Detail = "a live run's clock comes from --t0-record and --deadline-policy; --t0 alone is accepted only with --replay-clock true (a historical replay)" }
+        | None, _ -> Error { Code = "T0_RECORD_MISSING"; Detail = "no --t0-record" }
+
+/// A request may not be stamped after the moment it is judged (--now, or the current time): a request dated past the
+/// deadline does not make the deadline pass.
+let private futureRequest (o: Map<string, string>) (at: DateTimeOffset) : Refusal option =
+    let now = o.TryFind "--now" |> Option.map DateTimeOffset.Parse |> Option.defaultValue DateTimeOffset.UtcNow
+    if at > now.AddMinutes 2.0 then Some { Code = "REQUEST_IN_FUTURE"; Detail = sprintf "the request is dated %s, after the time it is judged (%s)" (at.ToString "o") (now.ToString "o") } else None
+
+/// Exclusions the owner approved: trusted operator records {requirement_id, action: exclude} in the pinned approvals.
+let exclusionsOf (o: Map<string, string>) : Set<string * string> =
+    match o.TryFind "--approvals", o.TryFind "--trusted-operator" with
+    | Some a, Some op ->
+        Continuation.approvalChanges (parseFile a) (set [ op ])
+        |> List.filter (fun c -> c.Action = "exclude" && c.RequirementId <> "")
+        |> List.collect (fun c -> [ c.RequirementId, c.RecordId; c.RequirementId, c.DecisionId ])
+        |> Set.ofList
+    | _ -> Set.empty
+
+/// The decision as written, with the clock it was judged against (so an observer can compare it with the T0 record).
+let private withClock (clock: Continuation.Clock) (j: Json) =
+    match j with
+    | JObj ps -> JObj(ps @ [ "t0", JStr(clock.T0.ToString "o"); "deadline", JStr(clock.Deadline.ToString "o") ])
+    | j -> j
 
 let stopDecisionCommand (args: string list) : int =
     let o = options args
     if not ([ "--manifest"; "--checkpoint"; "--events"; "--request"; "--out" ] |> List.forall o.ContainsKey) || not (o.ContainsKey "--t0" || o.ContainsKey "--t0-record") then
-        eprintfn "usage: stop-decision --manifest FILE --checkpoint FILE --events FILE --request FILE (--t0-record FILE --deadline-policy FILE | --t0 ISO [--window-minutes 420]) [--approvals FILE --trusted-operator ID] --out FILE"; 2
+        eprintfn "usage: stop-decision --manifest FILE --checkpoint FILE --events FILE --request FILE (--t0-record FILE --deadline-policy FILE [--deadline-policy-sha256 HEX] | --t0 ISO --replay-clock true [--window-minutes 420]) [--now ISO] [--approvals FILE --trusted-operator ID] --out FILE"; 2
     else
         match clockOf o with
         | Error refusal -> printfn "  REFUSED %s %s" refusal.Code refusal.Detail; printfn "stop-decision: REFUSED (the run clock)"; 4
@@ -150,7 +181,7 @@ let stopDecisionCommand (args: string list) : int =
             | Some a, Some op -> Continuation.approvalChanges (parseFile a) (set [ op ])
             | _ -> []
         let request = Continuation.requestOf (parseFile o["--request"])
-        match Ledger.replay manifest (eventsOf o["--events"]) with
+        match Ledger.replayWith (exclusionsOf o) manifest (eventsOf o["--events"]) with
         | Error why -> printfn "  REFUSED %s" why; printfn "stop-decision: REFUSED (the progress events do not replay)"; 4
         | Ok ledger ->
             let s = ledger.Progress
@@ -163,7 +194,11 @@ let stopDecisionCommand (args: string list) : int =
                 if request.Reason = "complete" && request.At < clock.Deadline && not unintegrated.IsEmpty then
                     { d0 with Permitted = false; Refusals = d0.Refusals @ [ { Code = "SCOPE_NOT_INTEGRATED"; Detail = sprintf "%d applicable mandatory requirement(s) are not integrated on main" unintegrated.Length } ] }
                 else d0
-            File.WriteAllText(o["--out"], serialize (Continuation.decisionJson request d))
+            let d =
+                match futureRequest o request.At with
+                | Some r -> { d with Permitted = false; Refusals = r :: d.Refusals }
+                | None -> d
+            File.WriteAllText(o["--out"], serialize (withClock clock (Continuation.decisionJson request d)))
             d.Refusals |> List.iter (fun r -> printfn "  REFUSED %s %s" r.Code r.Detail)
             printfn "stop-decision: %s (%d minute(s) remaining, %d open mandatory requirement(s))" (if d.Permitted then "STOP_PERMITTED" else "CONTINUE_REQUIRED") d.MinutesRemaining d.OpenMandatory.Length
             if d.Permitted && d.Refusals.IsEmpty then 0 else 4
@@ -173,10 +208,13 @@ let stopDecisionCommand (args: string list) : int =
 let resumeCommand (args: string list) : int =
     let o = options args
     if not ([ "--manifest"; "--checkpoint"; "--events"; "--at"; "--out" ] |> List.forall o.ContainsKey) || not (o.ContainsKey "--t0" || o.ContainsKey "--t0-record") then
-        eprintfn "usage: resume --manifest FILE --checkpoint FILE --events FILE (--t0-record FILE --deadline-policy FILE | --t0 ISO [--window-minutes 420]) --at ISO [--stop-decision FILE] --out FILE"; 2
+        eprintfn "usage: resume --manifest FILE --checkpoint FILE --events FILE (--t0-record FILE --deadline-policy FILE [--deadline-policy-sha256 HEX] | --t0 ISO --replay-clock true [--window-minutes 420]) --at ISO [--now ISO] [--stop-decision FILE] --out FILE"; 2
     else
         match clockOf o with
         | Error refusal -> printfn "  REFUSED %s %s" refusal.Code refusal.Detail; printfn "resume: REFUSED (the run clock)"; 4
+        | Ok _ when (futureRequest o (DateTimeOffset.Parse o["--at"])).IsSome ->
+            let r = (futureRequest o (DateTimeOffset.Parse o["--at"])).Value
+            printfn "  REFUSED %s %s" r.Code r.Detail; printfn "resume: REFUSED"; 4
         | Ok clock ->
         let manifest = parseFile o["--manifest"]
         let at = DateTimeOffset.Parse o["--at"]

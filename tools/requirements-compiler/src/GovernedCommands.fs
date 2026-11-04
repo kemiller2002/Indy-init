@@ -37,7 +37,8 @@ let private eventsOf (path: string) =
     | j -> arr "events" j
 
 let private factsOf (o: Map<string, string>) =
-    match optFile o "--facts" with
+    let facts = optFile o "--facts" |> Option.map (fun j -> field "facts" j |> Option.defaultValue j)
+    match facts with
     | Some(JObj ps) -> ps |> List.map (fun (k, v) -> k, (match v with JBool b -> (if b then "true" else "false") | JStr s -> s | j -> serialize j)) |> Map.ofList
     | _ -> Map.empty
 
@@ -72,7 +73,7 @@ let ledgerCommand (args: string list) =
     let o = options args
     if not (require o [ "--manifest"; "--events"; "--out" ]) then eprintfn "usage: ledger --manifest F --events F [--facts F] --out F"; 2
     else
-        match Ledger.replay (parseFile o["--manifest"]) (eventsOf o["--events"]) with
+        match Ledger.replayWith (ScopeCommands.exclusionsOf o) (parseFile o["--manifest"]) (eventsOf o["--events"]) with
         | Error why -> printfn "  REFUSED %s" why; printfn "ledger: REFUSED"; 4
         | Ok s ->
             let r = Ledger.scopeReport s (factsOf o)
@@ -105,7 +106,7 @@ let sliceManifestCommand (args: string list) =
     if not (require o [ "--manifest"; "--dag"; "--journeys"; "--out" ]) then eprintfn "usage: slice-manifest --manifest F --dag F --journeys F [--events F] --out F"; 2
     else
         let manifest = parseFile o["--manifest"]
-        let state = o.TryFind "--events" |> Option.map (fun e -> Ledger.replay manifest (eventsOf e))
+        let state = o.TryFind "--events" |> Option.map (fun e -> Ledger.replayWith (ScopeCommands.exclusionsOf o) manifest (eventsOf e))
         match state with
         | Some(Error why) -> printfn "  REFUSED %s" why; printfn "slice-manifest: REFUSED"; 4
         | _ ->
@@ -118,7 +119,7 @@ let sliceGateCommand (args: string list) =
     if not (require o [ "--manifest"; "--events"; "--slices"; "--slice"; "--candidate"; "--target-base"; "--target-head"; "--out" ]) then
         eprintfn "usage: slice-gate --manifest F --events F --slices F --slice ID --candidate SHA --target-base SHA --target-head SHA [--gate F] [--journeys F] [--design F] [--regression F] [--build F] [--live F] [--test-integrity F] --out F"; 2
     else
-        match Ledger.replay (parseFile o["--manifest"]) (eventsOf o["--events"]) with
+        match Ledger.replayWith (ScopeCommands.exclusionsOf o) (parseFile o["--manifest"]) (eventsOf o["--events"]) with
         | Error why -> printfn "  REFUSED %s" why; printfn "slice-gate: REFUSED"; 4
         | Ok s ->
             match arr "slices" (parseFile o["--slices"]) |> List.tryFind (fun x -> strOpt "id" x = Some o["--slice"]) with
@@ -127,21 +128,23 @@ let sliceGateCommand (args: string list) =
                 let e : Ledger.SliceEvidence =
                     { Slice = slice; Candidate = o["--candidate"]; TargetBase = o["--target-base"]; TargetHead = o["--target-head"]
                       Gate = optFile o "--gate"; Journeys = optFile o "--journeys"; DesignContract = optFile o "--design"; Regression = optFile o "--regression"
-                      Build = optFile o "--build"; LiveProvider = optFile o "--live"; TestIntegrity = optFile o "--test-integrity" }
+                      Build = optFile o "--build"; LiveProvider = optFile o "--live"; TestIntegrity = optFile o "--test-integrity"; CatalogAcceptance = optFile o "--catalog" }
                 let refusals = Ledger.sliceGate s e
                 report "slice-gate" o["--out"] (Ledger.sliceVerdictJson e refusals) refusals "PASS (slice only; never a release verdict)" "REFUSED (do not merge)"
 
 let completionGateCommand (args: string list) =
     let o = options args
     if not (require o [ "--manifest"; "--events"; "--candidate"; "--out" ]) then
-        eprintfn "usage: completion-gate --manifest F --events F --candidate SHA [--release-gate F] [--catalog F] [--journeys F] [--design F] [--facts F] --out F"; 2
+        eprintfn "usage: completion-gate --manifest F --events F --candidate SHA [--release-gate F] [--catalog F] [--journeys F --journey-bindings F] [--design F] [--facts F] [--plan-sha256 HEX] [--approvals F --trusted-operator ID] --out F"; 2
     else
-        match Ledger.replay (parseFile o["--manifest"]) (eventsOf o["--events"]) with
+        match Ledger.replayWith (ScopeCommands.exclusionsOf o) (parseFile o["--manifest"]) (eventsOf o["--events"]) with
         | Error why -> printfn "  REFUSED %s" why; printfn "completion-gate: INCOMPLETE"; 4
         | Ok s ->
             let e : Ledger.ReleaseEvidence =
                 { Candidate = o["--candidate"]; ReleaseGate = optFile o "--release-gate"; CatalogAcceptance = optFile o "--catalog"
-                  Journeys = optFile o "--journeys"; DesignContract = optFile o "--design"; Facts = factsOf o }
+                  Journeys = optFile o "--journeys"; DesignContract = optFile o "--design"; Facts = factsOf o
+                  PlanSha256 = o.TryFind "--plan-sha256"
+                  JourneyBindings = optFile o "--journey-bindings" |> Option.map Ledger.journeysOf |> Option.defaultValue [] }
             let refusals = Ledger.completionGate s e
             report "completion-gate" o["--out"] (Ledger.completionJson e refusals) refusals "COMPLETE" "INCOMPLETE"
 
@@ -170,9 +173,9 @@ let testIdentities (dir: string) : Set<string> =
             |> Seq.collect (fun f -> try arr "suites" (parseFile f) |> Seq.collect (specs "") with _ -> Seq.empty)
         Seq.append trx pw |> Set.ofSeq
 
-let private diffLines (repo: string) (baseSha: string) (headSha: string) : Ledger.TestDiffLine list =
+let private diffLines (repo: string) (baseSha: string) (headSha: string) : Ledger.TestDiffLine list option =
     match Git.run repo [ "diff"; "--unified=0"; "--no-color"; baseSha; headSha ] with
-    | Error _ -> []
+    | Error _ -> None
     | Ok bytes ->
         let lines = (Text.Encoding.UTF8.GetString bytes).Split('\n') |> List.ofArray
         lines
@@ -186,13 +189,21 @@ let private diffLines (repo: string) (baseSha: string) (headSha: string) : Ledge
             ("", [])
         |> snd
         |> List.rev
+        |> Some
 
 let testIntegrityCommand (args: string list) =
     let o = options args
     if not (require o [ "--repo"; "--base"; "--head"; "--base-results"; "--head-results"; "--out" ]) then
         eprintfn "usage: test-integrity --repo DIR --base SHA --head SHA --base-results DIR --head-results DIR --out F"; 2
     else
-        let refusals = Ledger.testIntegrity (testIdentities o["--base-results"]) (testIdentities o["--head-results"]) (diffLines o["--repo"] o["--base"] o["--head"])
+        let missingDirs = [ o["--base-results"]; o["--head-results"] ] |> List.filter (Directory.Exists >> not)
+        let diff = diffLines o["--repo"] o["--base"] o["--head"]
+        let refusals =
+            [ for d in missingDirs do yield { Code = "TEST_RESULTS_MISSING"; Detail = sprintf "no run-suites results at %s: removed tests cannot be ruled out" d }
+              match diff with
+              | None -> yield { Code = "TEST_DIFF_UNAVAILABLE"; Detail = sprintf "git diff %s %s failed: skipped or weakened tests cannot be ruled out" o["--base"] o["--head"] }
+              | Some _ -> () ]
+            @ Ledger.testIntegrity (testIdentities o["--base-results"]) (testIdentities o["--head-results"]) (diff |> Option.defaultValue [])
         report "test-integrity" o["--out"] (Ledger.testIntegrityJson o["--head"] refusals) refusals "PASS" "REFUSED"
 
 // ---- design contract ------------------------------------------------------------------------------------------------
@@ -216,12 +227,15 @@ let sourceFiles (root: string) : DesignContract.SourceFile list =
 let designContractCommand (args: string list) =
     let o = options args
     if not (require o [ "--contract"; "--forma-inventory"; "--root"; "--candidate"; "--out" ]) then
-        eprintfn "usage: design-contract --contract F --forma-inventory F --root DIR --candidate SHA [--rendered F] --out F"; 2
+        eprintfn "usage: design-contract --contract F --forma-inventory F --root DIR --candidate SHA [--rendered F,F] [--engines chromium,webkit] --out F"; 2
     else
         let c = DesignContract.contractOf (parseFile o["--contract"]) (parseFile o["--forma-inventory"])
         let pkg = Path.Combine(o["--root"], "package.json")
         let refusals = DesignContract.check c (sourceFiles o["--root"]) (if File.Exists pkg then Some(parseFile pkg) else None)
-        let json = DesignContract.verdictJson o["--candidate"] refusals (optFile o "--rendered")
+        // --rendered A,B: one verdict per engine; --engines (default chromium,webkit) names the engines each must cover.
+        let rendered = o.TryFind "--rendered" |> Option.map (fun s -> s.Split(',', StringSplitOptions.RemoveEmptyEntries) |> List.ofArray |> List.filter File.Exists |> List.map parseFile) |> Option.defaultValue []
+        let engines = o.TryFind "--engines" |> Option.map (fun s -> s.Split(',', StringSplitOptions.RemoveEmptyEntries) |> List.ofArray) |> Option.defaultValue [ "chromium"; "webkit" ]
+        let json = DesignContract.verdictJson o["--candidate"] refusals engines rendered
         File.WriteAllText(o["--out"], serialize json)
         strs "causes" json |> List.iter (printfn "  REFUSED %s")
         let pass = strOpt "verdict" json = Some "PASS"
@@ -258,10 +272,11 @@ let observeCommand (args: string list) =
         let repo = o["--repo"]
         let t0Versions = versionsOf repo o["--t0-record"]
         let policy = parseFile o["--deadline-policy"]
-        let clock =
+        let bound =
             match t0Versions with
-            | (_, first) :: _ -> Continuation.boundClock first policy None None |> Result.toOption
-            | [] -> None
+            | (_, first) :: _ -> Continuation.boundClock first policy None None |> Result.mapError (fun r -> sprintf "%s %s" r.Code r.Detail)
+            | [] -> Error "no T0 record is committed"
+        let clock = bound |> Result.toOption
         let now = DateTimeOffset.Parse o["--now"]
         let clock' = clock |> Option.defaultValue { T0 = now; Deadline = now }
         let evidence = o.TryFind "--evidence" |> Option.filter Directory.Exists
@@ -289,7 +304,7 @@ let observeCommand (args: string list) =
         let remaining =
             slices |> Option.map (fun m -> arr "slices" m |> List.filter (fun x -> strOpt "status" x <> Some "integrated") |> List.sumBy (fun x -> intOpt "estimateMinutes" x |> Option.defaultValue 0L |> int))
         let observation : Observer.Observation =
-            { Now = now; Clock = clock'; Manifest = manifest
+            { Now = now; Clock = clock'; ClockProblem = (match bound with Error why -> Some why | Ok _ -> None); Manifest = manifest
               CheckpointScope = checkpoint |> Option.bind (fun p -> strOpt "scopeSha256" (parseFile p))
               CheckpointAt = checkpoint |> Option.bind (fun p -> strOpt "at" (parseFile p)) |> Option.map DateTimeOffset.Parse
               T0Versions = t0Versions; PinnedDigests = pinned; HeadDigests = head

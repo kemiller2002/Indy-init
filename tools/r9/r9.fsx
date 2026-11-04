@@ -17,7 +17,7 @@
 //   dotnet fsi tools/r9/r9.fsx -- suite-preflight --obligations F --root REPO [--out F] [--require-tests true]
 //   dotnet fsi tools/r9/r9.fsx -- suite-fixture --out NEW-DIR [--without-webkit true] [--empty-project NAME]
 //        Executes every executable suite command in list mode; refuses readiness if any cannot execute.
-//   dotnet fsi tools/r9/r9.fsx -- authorize-implementation --target REPO --catalog F --obligations F --suite-preflight F [--scope-checkpoint F --scope-sha256 HEX]
+//   dotnet fsi tools/r9/r9.fsx -- authorize-implementation --target REPO --catalog F --obligations F --suite-preflight F --scope-sha256 HEX [--scope-checkpoint F]
 //        --spec-preflight F --acceptance-preflight F [--work-plan F] [--manifest F] [--scope F] [--praxis EXE]
 //        Pre-implementation gate (Praxis ordering); writes the immutable .echelon/r9-initialization-checkpoint.json.
 //   dotnet fsi tools/r9/r9.fsx -- check-sequencing --target REPO [--out F]
@@ -934,7 +934,7 @@ let authorizeImplementation () =
             check (str sc "schema" = "indy-init.scope-checkpoint/1") $"7 scope: {scopeCheckpointRel} is not an indy-init.scope-checkpoint/1 record"
             @ (match opt "--scope-sha256" with
                | Some pinned -> check (str sc "scopeSha256" = pinned) $"""7 scope: the scope checkpoint pins {str sc "scopeSha256"}, not the approved scope {pinned}"""
-               | None -> [])
+               | None -> [ "7 scope: --scope-sha256 (the lock's scope.scopeSha256) is required: a scope checkpoint of any other scope does not authorize" ])
     let causes =
         check (not (exists ck)) $"{checkpointPath} already exists: the initialization checkpoint is immutable"
         @ step1 @ step2 @ step3 @ step4 @ step5 @ step6 @ step7

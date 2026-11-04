@@ -15,6 +15,8 @@ type Commit = { Sha: string; At: DateTimeOffset; Message: string; Files: string 
 type Observation =
     { Now: DateTimeOffset
       Clock: Continuation.Clock
+      /// Why the run clock could not be bound to the T0 record and the policy, if it could not.
+      ClockProblem: string option
       Manifest: Json
       /// The scope hash the committed checkpoint pins, if a checkpoint is committed.
       CheckpointScope: string option
@@ -87,6 +89,20 @@ let detectors : Detector list =
       { Id = "deadline-reset"
         Detect =
           fun o ->
+              let decisionResets =
+                  match o.T0Versions with
+                  | (_, first) :: _ ->
+                      [ for d in o.StopDecisions do
+                            match strOpt "t0" d, strOpt "t0" first with
+                            | Some used, Some recorded when DateTimeOffset.Parse used <> DateTimeOffset.Parse recorded ->
+                                yield f "DEADLINE_RESET" "blocking" (sprintf "a stop decision was judged with T0 %s; the run's T0 is %s" used recorded) [] [] "judge stop requests with --t0-record" None
+                            | _ -> () ]
+                  | [] -> []
+              decisionResets
+              @ (match o.ClockProblem with
+                 | Some why -> [ f "CLOCK_UNBOUND" "blocking" (sprintf "the run clock cannot be bound to the T0 record and the policy: %s; deadline and premature-stop findings are unavailable" why) [] [] "commit a valid evidence/t0/t0.json at T0" None ]
+                 | None -> [])
+              @
               match o.T0Versions with
               | (_, first) :: rest ->
                   [ for sha, later in rest do
@@ -97,7 +113,9 @@ let detectors : Detector list =
         Detect =
           fun o ->
               // The T0 bootstrap (the commit that installs governance) writes the generated stubs; it is not implementation.
-              let o = { o with Commits = o.Commits |> List.filter (fun c -> not (c.Files |> List.contains ".echelon/r9-governance.json")) }
+              // Only the first such commit; a later commit touching the governance file is judged like any other.
+              let bootstrap = o.Commits |> List.tryFind (fun c -> c.Files |> List.contains ".echelon/r9-governance.json") |> Option.map (fun c -> c.Sha)
+              let o = { o with Commits = o.Commits |> List.filter (fun c -> Some c.Sha <> bootstrap) }
               [ match o.CheckpointAt with
                 | None ->
                     for c in o.Commits do
@@ -136,9 +154,11 @@ let detectors : Detector list =
               let releasePass = o.Gates |> List.exists (fun g -> strOpt "mode" g = Some "release" && (strs "causes" g).IsEmpty && (strs "scope" g).IsEmpty)
               [ for c in o.Claims do
                     let text = strOpt "text" c |> Option.defaultValue ""
-                    let claimsSuccess = [ "accepted"; "verified"; "complete"; "all pass" ] |> List.exists (fun w -> text.Contains(w, StringComparison.OrdinalIgnoreCase))
-                    let labelled = text.Contains("implementer-run", StringComparison.OrdinalIgnoreCase)
-                    if claimsSuccess && not labelled && not (governed && releasePass) then
+                    let has (w: string) = text.Contains(w, StringComparison.OrdinalIgnoreCase)
+                    // "implementer-run" honestly labels a verified/passed result; it never makes completion or acceptance true.
+                    let claimsCompletion = [ "accepted"; "complete" ] |> List.exists has
+                    let claimsVerified = [ "verified"; "all pass" ] |> List.exists has && not (has "implementer-run")
+                    if (claimsCompletion || claimsVerified) && not (governed && releasePass) then
                         yield f "SELF_VERIFIED_SUCCESS" "blocking" (sprintf "%s claims success, but no governed release verdict and governed catalog acceptance support it" (strOpt "source" c |> Option.defaultValue "a report")) [ strOpt "source" c |> Option.defaultValue "" ] [] "lead with the governed verdict; label builder-run results implementer-run" (Some "verification collapsed into implementation") ] }
       { Id = "premature-stop"
         Detect =
@@ -150,6 +170,8 @@ let detectors : Detector list =
                     match at with
                     | Some t when t < o.Clock.Deadline && strOpt "decision" d = Some "CONTINUE_REQUIRED" && lastCommit |> Option.forall (fun l -> l <= t) && (o.Now - t).TotalMinutes >= 20.0 ->
                         yield f "PREMATURE_STOP" "blocking" (sprintf "a stop was refused at %s (CONTINUE_REQUIRED, %d minutes left) and no implementation work followed for %.0f minutes" (t.ToString "o") (intOpt "minutesRemaining" d |> Option.defaultValue 0L) (o.Now - t).TotalMinutes) [] [] "resume the next independent work item" None
+                    | Some t when t < o.Clock.Deadline && strOpt "decision" d = Some "STOP_PERMITTED" && not (List.contains (strOpt "reason" d |> Option.defaultValue "") [ "complete"; "owner-authorized" ]) ->
+                        yield f "EARLY_STOP_PERMITTED" "warning" (sprintf "a stop for '%s' was permitted at %s with %d minutes left; the owner should confirm its evidence" (strOpt "reason" d |> Option.defaultValue "") (t.ToString "o") (intOpt "minutesRemaining" d |> Option.defaultValue 0L)) [] [] "review the blocker or compute evidence" None
                     | _ -> () ] }
       { Id = "unmerged-verified"
         Detect =
