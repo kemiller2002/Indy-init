@@ -271,15 +271,18 @@ jobs:
           # Fail closed: without whole-plan coverage, regression and dependencies cannot be judged.
           test -f "$ev/gate-all-head/coverage.json" || { echo "::error::no whole-plan coverage at the merged result: regression and dependencies cannot be judged"; exit 1; }
           git worktree add -q "$RUNNER_TEMP/base" "$base"
+          # Whether the target base has any test code at all (wherever it lives): only a base without tests (the first
+          # slice) may lack results and coverage.
+          basetests=$(git -C "$RUNNER_TEMP/base" ls-files | grep -iE '(^|/)tests?/|\.Tests?/|\.(spec|test)\.(m?js|ts)$|Tests?\.fs$' | head -1 || true)
           (cd "$RUNNER_TEMP/base" && npm ci > /dev/null 2>&1; true)
           dotnet fsi "$src/tools/r9/r9.fsx" -- run-suites --obligations "$RUNNER_TEMP/obligations.json" --root "$RUNNER_TEMP/base" \
             --out "$RUNNER_TEMP/base-results" --suites SU-OWN-DOTNET,SU-DOTNET-DETERMINISTIC,SU-DOTNET-INVARIANTS,SU-OWN-BROWSER,SU-BROWSER-CHROMIUM || true
-          if [ -d "$RUNNER_TEMP/base/tests" ] && [ ! -f "$RUNNER_TEMP/base-results/results.json" ]; then echo "::error::the target base has tests but its suites produced no results: regression cannot be judged"; exit 1; fi
+          if [ -n "$basetests" ] && [ ! -f "$RUNNER_TEMP/base-results/results.json" ]; then echo "::error::the target base has tests but its suites produced no results: regression cannot be judged"; exit 1; fi
           if [ -f "$RUNNER_TEMP/base-results/results.json" ]; then
             dotnet fsi "$src/tools/r9/r9.fsx" -- gate --mode development --scope-file "$ev/all-scope.json" --obligations "$RUNNER_TEMP/obligations.json" --root "$RUNNER_TEMP/base" \
               --results "$RUNNER_TEMP/base-results/results.json" --dokimos "$(command -v dokimos)" --out "$ev/gate-all-base" || true
           fi
-          if [ -d "$RUNNER_TEMP/base/tests" ] && [ ! -f "$ev/gate-all-base/coverage.json" ]; then echo "::error::no whole-plan coverage at the target base: regression cannot be judged"; exit 1; fi
+          if [ -n "$basetests" ] && [ ! -f "$ev/gate-all-base/coverage.json" ]; then echo "::error::no whole-plan coverage at the target base: regression cannot be judged"; exit 1; fi
           # A base without tests (the first slice) has nothing to regress; any other missing file has been refused above.
           verified() { if [ -f "$1" ]; then jq '[.obligations[] | select(.status == "verified") | .id]' "$1"; else echo '[]'; fi; }
           catalogPass=$(jq '[.requirements[].obligations[] | select(.status == "PASS") | .id]' "$RUNNER_TEMP/catalog/requirement-verification.json" 2>/dev/null || echo '[]')
@@ -288,8 +291,8 @@ jobs:
           # Real provider: the plan's live suites ran at the merged result against GitHub (their obligations are judged by the gate).
           # Passed only when both live suites ran tests and none failed (their files existing is not enough).
           livestatus=failed
-          trx=$(ls "$RUNNER_TEMP"/results/SU-DOTNET-LIVE/*.trx 2>/dev/null | head -1); pw="$RUNNER_TEMP/results/SU-BROWSER-LIVE/results.json"
-          if [ -n "$trx" ] && [ -f "$pw" ] && grep -q 'outcome="Passed"' "$trx" && ! grep -qE 'outcome="(Failed|Error|Timeout|Aborted)"' "$trx" \
+          trx=$(ls "$RUNNER_TEMP"/results/SU-DOTNET-LIVE/*.trx 2>/dev/null || true); pw="$RUNNER_TEMP/results/SU-BROWSER-LIVE/results.json"
+          if [ -n "$trx" ] && [ -f "$pw" ] && cat $trx | grep -q 'outcome="Passed"' && ! cat $trx | grep -qE 'outcome="(Failed|Error|Timeout|Aborted)"' \
              && [ "$(jq '.stats.unexpected // 1' "$pw")" = 0 ] && [ "$(jq '.stats.expected // 0' "$pw")" -gt 0 ]; then livestatus=passed; fi
           jq -n --arg c "$CANDIDATE" --arg s "$livestatus" '{candidate: $c, baseUrl: "https://api.github.com", status: $s}' > "$ev/live.json"
           dotnet "$rc" test-integrity --repo . --base "$base" --head "$CANDIDATE" \

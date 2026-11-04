@@ -282,14 +282,25 @@ let resumeJson (at: DateTimeOffset) (p: ResumePlan) : Json =
 /// The clock comes from the run's T0 record (committed once at T0, `indy-init.t0/1`) and the owner's deadline policy
 /// (`indy-init.deadline-policy/1`), never from the caller: a recovery or a replacement agent continues against the
 /// original deadline. A claimed T0 or window that differs is DEADLINE_RESET.
+/// An instant with an explicit UTC offset (Z or ±hh:mm); anything else is None, so no machine's local time zone
+/// can change a deadline.
+let instant (s: string) : DateTimeOffset option =
+    let s = s.Trim()
+    let explicitOffset = s.EndsWith "Z" || s.EndsWith "z" || Text.RegularExpressions.Regex.IsMatch(s, @"[T ].*[+-]\d{2}:?\d{2}$")
+    match DateTimeOffset.TryParse(s, Globalization.CultureInfo.InvariantCulture, Globalization.DateTimeStyles.None) with
+    | true, v when explicitOffset -> Some v
+    | _ -> None
+
 let boundClock (t0Record: Json) (policy: Json) (claimedT0: DateTimeOffset option) (claimedWindow: float option) : Result<Clock, Refusal> =
     let window = intOpt "windowMinutes" policy |> Option.map float
-    match strOpt "t0" t0Record |> Option.map DateTimeOffset.Parse, window with
+    match strOpt "t0" t0Record, window with
+    | Some s, _ when (instant s).IsNone -> Error(r "T0_RECORD_INVALID" (sprintf "the T0 record's t0 %s is not an instant with an explicit UTC offset" s))
     | None, _ -> Error(r "T0_RECORD_MISSING" "the T0 record states no t0")
     | _, None -> Error(r "DEADLINE_POLICY_MISSING" "the deadline policy states no windowMinutes")
-    | Some t0, Some w ->
+    | Some t0s, Some w ->
+        let t0 = (instant t0s).Value
         let deadline = t0.AddMinutes w
-        let recorded = strOpt "deadline" t0Record |> Option.map DateTimeOffset.Parse
+        let recorded = strOpt "deadline" t0Record |> Option.bind instant
         if recorded.IsSome && recorded.Value <> deadline then Error(r "DEADLINE_RESET" (sprintf "the T0 record's deadline %s is not t0 + %g minutes (%s)" (recorded.Value.ToString "o") w (deadline.ToString "o")))
         elif claimedT0 |> Option.exists ((<>) t0) then Error(r "DEADLINE_RESET" (sprintf "the request uses T0 %s; the run's T0 is %s (the original deadline is never reset)" (claimedT0.Value.ToString "o") (t0.ToString "o")))
         elif claimedWindow |> Option.exists ((<>) w) then Error(r "DEADLINE_RESET" (sprintf "the request uses a %g-minute window; the owner's policy is %g" claimedWindow.Value w))

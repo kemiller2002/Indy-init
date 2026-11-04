@@ -12,7 +12,7 @@
 ///   requirements-compiler test-integrity --repo DIR --base SHA --head SHA --base-results DIR --head-results DIR --out F
 ///   requirements-compiler design-contract --contract F --forma-inventory F --root DIR --candidate SHA [--rendered F] --out F
 ///   requirements-compiler observe --manifest F --events F --repo DIR --t0-record PATH --deadline-policy F --now ISO
-///                         [--checkpoint PATH] [--evidence DIR] [--pins F] [--approvals F --trusted-operator ID] --out F
+///                         [--checkpoint PATH] [--evidence DIR] [--completions DIR] [--pins F] [--approvals F --trusted-operator ID] --out F
 ///
 /// Exit codes: 0 PASS (or a report written), 4 REFUSED / INCOMPLETE / blocking findings, 2 usage.
 module GovernedCommands
@@ -268,7 +268,7 @@ let private versionsOf (repo: string) (path: string) : (string * Json) list =
 let observeCommand (args: string list) =
     let o = options args
     if not (require o [ "--manifest"; "--events"; "--repo"; "--t0-record"; "--deadline-policy"; "--now"; "--out" ]) then
-        eprintfn "usage: observe --manifest F --events F --repo DIR --t0-record PATH --deadline-policy F --now ISO [--checkpoint PATH] [--evidence DIR] [--pins F] [--approvals F --trusted-operator ID] --out F"; 2
+        eprintfn "usage: observe --manifest F --events F --repo DIR --t0-record PATH --deadline-policy F --now ISO [--checkpoint PATH] [--evidence DIR] [--completions DIR] [--pins F] [--approvals F --trusted-operator ID] --out F"; 2
     else
         let repo = o["--repo"]
         let t0Versions = versionsOf repo o["--t0-record"]
@@ -316,7 +316,13 @@ let observeCommand (args: string list) =
               DesignContract = bySchema "indy-init.design-contract/1" |> List.tryLast
               LiveResults = bySchema "indy-init.journey-results/1"
               StopDecisions = bySchema "indy-init.stop-decision/1"
-              Completions = bySchema "indy-init.completion-gate/1"
+              Completions =
+                  // The owner's copies of governed artifacts; each must judge a commit on the run repository's main.
+                  let onMain (c: Json) = strOpt "candidate" c |> Option.exists (fun sha -> Git.run repo [ "merge-base"; "--is-ancestor"; sha; "main" ] |> Result.isOk)
+                  o.TryFind "--completions" |> Option.filter Directory.Exists
+                  |> Option.map (fun dir -> Directory.EnumerateFiles(dir, "*.json", SearchOption.AllDirectories) |> Seq.sort |> Seq.map parseFile |> List.ofSeq)
+                  |> Option.defaultValue []
+                  |> List.filter (fun j -> strOpt "schema" j = Some "indy-init.completion-gate/1" && onMain j)
               TestIntegrity = bySchema "indy-init.test-integrity/1"
               Claims = bySchema "indy-init.builder-claim/1"
               SliceManifest = slices; RemainingEstimate = remaining }

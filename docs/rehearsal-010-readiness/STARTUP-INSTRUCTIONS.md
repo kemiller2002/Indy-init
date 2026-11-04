@@ -161,14 +161,14 @@ Before stopping for any reason other than the deadline, write `evidence/progress
 requirements-compiler stop-decision --manifest SRC/docs/rehearsal-010-readiness/scope-manifest.json --checkpoint .echelon/scope-checkpoint.json \
   --events evidence/progress/events.json --request evidence/progress/stop-request.json \
   --t0-record evidence/t0/t0.json --deadline-policy SRC/kickoff/rehearsal-010/deadline-policy.json --lock SRC/kickoff/rehearsal-010/toolchain.lock.json --repo . \
-  [--completion <the latest completion-gate.json of main>] --approvals SRC/kickoff/acceptance/approvals.causa.json --trusted-operator kemiller2002 --out evidence/progress/stop-decision.json
+  [--completion <gate/completion.json from the release-mode Verification gate artifact of main's HEAD>] --approvals SRC/kickoff/acceptance/approvals.causa.json --trusted-operator kemiller2002 --out evidence/progress/stop-decision.json
 ```
 
 Stop only on `STOP_PERMITTED`. Anything else is `CONTINUE_REQUIRED`: go back to §4.
 
 | Reason | Permitted only when |
 |---|---|
-| `complete` | the governed full-scope completion gate says COMPLETE for the current head of main (`--completion`: its `completion-gate.json`, whose `candidate` must be `git rev-parse HEAD`) |
+| `complete` | the governed full-scope completion gate says COMPLETE for the current head of main (`--completion`: its `gate/completion.json`; HEAD must be `main` and equal the verdict's `candidate`) |
 | `owner-authorized` | an operator record `{action: authorize-stop}` named by the request exists |
 | `hard-blocker` | every blocker has evidence and no open work item can proceed (a verification blocker never counts) |
 | `compute-limit` | an operator record `{action: approve-compute-limit, limit}` exists and the request shows the limit reached. None is approved for Rehearsal 010 |
@@ -217,11 +217,13 @@ The observer runs in the owner's environment, never in the builder's repository 
 
 It writes findings that Specula displays (Specula CAP-016, `evidence/observer/findings.json` in the owner's observer repository).
 
-Every 20 minutes from T0, with `EVIDENCE` holding the latest verification artifacts downloaded from the builder's runs:
+Every 20 minutes from T0, with `EVIDENCE` holding the latest verification artifacts downloaded from the builder's runs, and `COMPLETIONS` holding only the `gate/completion.json` files the owner downloaded from the Verification gate's release-mode artifacts (`verification-<sha>`). A completion verdict anywhere else, including the builder's repository, is never counted. One whose candidate is not on the builder's `main` is not counted either.
+
+The observer derives the deadline itself, from the T0 record first committed in BUILDER and the governed deadline policy. Every stop decision whose recorded deadline differs is DEADLINE_RESET, even if the builder's own `--lock` and policy agreed with it.
 ```
 requirements-compiler observe --manifest SRC/docs/rehearsal-010-readiness/scope-manifest.json --events BUILDER/evidence/progress/events.json \
   --repo BUILDER --t0-record evidence/t0/t0.json --deadline-policy SRC/kickoff/rehearsal-010/deadline-policy.json \
-  --checkpoint .echelon/scope-checkpoint.json --evidence EVIDENCE --pins SRC/kickoff/rehearsal-010/observer-pins.json \
+  --checkpoint .echelon/scope-checkpoint.json --evidence EVIDENCE --completions COMPLETIONS --pins SRC/kickoff/rehearsal-010/observer-pins.json \
   --approvals SRC/kickoff/acceptance/approvals.causa.json --trusted-operator kemiller2002 --now NOW --out OBSERVER/evidence/observer/findings.json
 ```
 

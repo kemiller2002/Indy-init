@@ -233,14 +233,21 @@ let stopDecisionCommand (args: string list) : int =
             // "complete" before the deadline also needs the full-scope completion gate's COMPLETE verdict (--completion).
             let d =
                 // The verdict must be the governed completion gate's, for the repository's current head.
-                let head = o.TryFind "--repo" |> Option.bind (fun r -> match Git.run r [ "rev-parse"; "HEAD" ] with Ok b -> Some((Text.Encoding.UTF8.GetString b).Trim()) | Error _ -> None)
+                // HEAD must be main: a verdict dispatched on an unmerged branch is not completion of the run.
+                let revOf r (ref: string) = match Git.run r [ "rev-parse"; ref ] with Ok b -> Some((Text.Encoding.UTF8.GetString b).Trim()) | Error _ -> None
+                let head = o.TryFind "--repo" |> Option.bind (fun r -> match revOf r "HEAD", revOf r "refs/heads/main" with Some h, Some m when h = m -> Some h | _ -> None)
                 let complete =
                     o.TryFind "--completion" |> Option.filter IO.File.Exists |> Option.map parseFile
                     |> Option.exists (fun c ->
                         strOpt "schema" c = Some "indy-init.completion-gate/1" && strOpt "verdict" c = Some "COMPLETE"
                         && (replayMode o || (head.IsSome && strOpt "candidate" c = head)))
                 if request.Reason = "complete" && request.At < clock.Deadline && not complete then
-                    { d with Permitted = false; Refusals = d.Refusals @ [ { Code = "COMPLETION_GATE_MISSING"; Detail = "stopping as complete needs the completion gate's COMPLETE verdict (--completion)" } ] }
+                    let why =
+                        match o.TryFind "--completion" |> Option.filter IO.File.Exists |> Option.map parseFile with
+                        | None -> { Code = "COMPLETION_GATE_MISSING"; Detail = "stopping as complete needs the governed completion gate's COMPLETE verdict (--completion)" }
+                        | Some c when strOpt "schema" c <> Some "indy-init.completion-gate/1" || strOpt "verdict" c <> Some "COMPLETE" -> { Code = "COMPLETION_GATE_MISSING"; Detail = "--completion is not a completion-gate COMPLETE verdict" }
+                        | Some c -> { Code = "COMPLETION_CANDIDATE_MISMATCH"; Detail = sprintf "the completion verdict is for %s; the repository's HEAD must be main and that commit (%s)" (strOpt "candidate" c |> Option.defaultValue "(none)") (head |> Option.defaultValue "HEAD is not main") }
+                    { d with Permitted = false; Refusals = d.Refusals @ [ why ] }
                 else d
             File.WriteAllText(o["--out"], serialize (withClock (replayMode o) clock (Continuation.decisionJson request d)))
             d.Refusals |> List.iter (fun r -> printfn "  REFUSED %s %s" r.Code r.Detail)

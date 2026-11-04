@@ -165,6 +165,12 @@ let t0Repo (name: string) =
     git repo [ "add"; "-A" ] |> ignore
     git repo [ "commit"; "-qm"; "T0" ] |> ignore
     repo
+let t0RepoWith (name: string) (text: string) =
+    let repo = t0Repo name
+    write (Path.Combine(repo, "evidence", "t0", "t0.json")) text |> ignore
+    git repo [ "add"; "-A" ] |> ignore
+    git repo [ "commit"; "--amend"; "-qm"; "T0" ] |> ignore
+    repo
 let t0RepoMain = t0Repo "main"
 let t0Record = Path.Combine(t0RepoMain, "evidence", "t0", "t0.json")
 let policy = Path.Combine(src, "kickoff", "rehearsal-010", "deadline-policy.json")
@@ -268,7 +274,9 @@ let t11 = itemReqs "T11"
 let isRecord (o: string) = reqs |> Seq.collect (fun r -> r["obligations"].AsArray()) |> Seq.exists (fun x -> x["id"].GetValue<string>() = o && x["kind"].GetValue<string>() = "record")
 let t10Executable = t10 |> List.collect (byId >> obligationsOf) |> List.filter (isRecord >> not)
 let t11Obligations = t11 |> List.collect (byId >> obligationsOf)
-let t11Verified = t10Verified @ (t11 |> List.map byId |> List.collect (fun r -> [ started r; completed r ] @ (obligationsOf r |> List.map passed)))
+// SL-T10's Praxis completion record: AR-023 (record obligations only) is integrated by it, not vacuously.
+let t11NoT10Record = t10Verified @ (t11 |> List.map byId |> List.collect (fun r -> [ started r; completed r ] @ (obligationsOf r |> List.map passed)))
+let t11Verified = t10Verified @ [ ev "work-item-completed" [ "workItem", box "T10" ] ] @ (t11 |> List.map byId |> List.collect (fun r -> [ started r; completed r ] @ (obligationsOf r |> List.map passed)))
 let sliceGate (t: Tools) (events: string) (extra: string list) =
     rc t ([ "slice-gate"; "--manifest"; manifestPath; "--events"; events; "--slices"; slicesPath; "--slice"; "SL-T10"; "--candidate"; candidate; "--target-base"; commit; "--target-head"; commit; "--out"; Path.Combine(work, "slice-gate.json") ] @ extra)
 let inv001 = byId "INV-001"
@@ -331,12 +339,15 @@ let integrity (t: Tools) (repo: string, baseResults: string, headResults: string
     rc t [ "test-integrity"; "--repo"; repo; "--base"; "HEAD~1"; "--head"; "HEAD"; "--base-results"; baseResults; "--head-results"; headResults; "--out"; Path.Combine(work, "integrity.json") ]
 
 // The observer over one stop decision, with optional further evidence files (name, text).
-let observeDecision (t: Tools) (name: string) (decision: (string * obj) list) (more: (string * string) list) =
+let observeDecisionWith (t: Tools) (name: string) (decision: (string * obj) list) (more: (string * string) list) (completions: (string * string) list) =
     let ev = Path.Combine(work, "observer-" + name + "-" + string (Guid.NewGuid()))
+    let cdir = ev + "-completions"
+    completions |> List.iter (fun (n, text) -> write (Path.Combine(cdir, n)) text |> ignore)
     write (Path.Combine(ev, "stop-decision.json")) (json (dict ([ "schema", box "indy-init.stop-decision/1"; "clock", box "live"; "t0", box (t0.ToString "o") ] @ decision))) |> ignore
     more |> List.iter (fun (n, text) -> write (Path.Combine(ev, n)) text |> ignore)
     rc t [ "observe"; "--manifest"; manifestPath; "--events"; catalogOnly; "--repo"; t0RepoMain; "--t0-record"; "evidence/t0/t0.json"; "--deadline-policy"; policy
-           "--now"; DateTimeOffset.UtcNow.ToString "o"; "--evidence"; ev; "--out"; Path.Combine(work, "observe-" + name + ".json") ]
+           "--now"; DateTimeOffset.UtcNow.ToString "o"; "--evidence"; ev; "--completions"; cdir; "--out"; Path.Combine(work, "observe-" + name + ".json") ]
+let observeDecision t name decision more = observeDecisionWith t name decision more []
 let at (m: float) = box ((t0.AddMinutes m).ToString "o")
 
 // The observer over one stop decision judged with the given clock ("live" or "replay").
@@ -649,9 +660,9 @@ let cases : Case list =
         ControlOk = fun o -> has "DEPENDENCY_NOT_INTEGRATED" o
         Mutation = [ ledger, [ "                        strOpt \"kind\" o <> Some \"record\"\n", "                        true\n" ] ] }
       { Id = "C30"; Title = "A stop as complete cites a completion verdict for another commit"; Requirements = [ "R6"; "review 3 (round 3)" ]; Needs = Nothing
-        Expected = "stop-decision CONTINUE_REQUIRED: COMPLETION_GATE_MISSING (the verdict is not the governed one for the repository's head)"
+        Expected = "stop-decision CONTINUE_REQUIRED: COMPLETION_CANDIDATE_MISMATCH (the verdict is not for the repository's HEAD on main)"
         Attack = fun t -> stopDecision t allIntegrated (request "c30" 300.0 "complete" scopeSha true) [ "--completion"; staleVerdict ]
-        Correct = refusedWith "COMPLETION_GATE_MISSING"
+        Correct = refusedWith "COMPLETION_CANDIDATE_MISMATCH"
         Control = fun t -> stopDecision t allIntegrated (request "c30-control" 300.0 "complete" scopeSha true) [ "--completion"; completeVerdict ]
         ControlOk = fun o -> o.Exit = 0
         Mutation = [ "tools/requirements-compiler/src/ScopeCommands.fs", [ "&& (replayMode o || (head.IsSome && strOpt \"candidate\" c = head))", "&& true" ] ] }
@@ -659,7 +670,7 @@ let cases : Case list =
         Expected = "observe: blocking PREMATURE_STOP (no governed completion-gate COMPLETE verdict)"
         Attack = fun t -> observeDecision t "c31" [ "requestedAt", at 300.0; "reason", box "complete"; "decision", box "STOP_PERMITTED"; "minutesRemaining", box 120; "deadline", at 420.0 ] []
         Correct = fun o -> has "no governed completion-gate COMPLETE verdict" o
-        Control = fun t -> observeDecision t "c31-control" [ "requestedAt", at 300.0; "reason", box "complete"; "decision", box "STOP_PERMITTED"; "minutesRemaining", box 120; "deadline", at 420.0 ] [ "completion.json", File.ReadAllText completeVerdict ]
+        Control = fun t -> observeDecisionWith t "c31-control" [ "requestedAt", at 300.0; "reason", box "complete"; "decision", box "STOP_PERMITTED"; "minutesRemaining", box 120; "deadline", at 420.0 ] [] [ "completion.json", File.ReadAllText completeVerdict ]
         ControlOk = fun o -> not (has "PREMATURE_STOP" o)
         Mutation = [ "tools/requirements-compiler/src/Observer.fs", [ "strOpt \"reason\" d = Some \"complete\" && not (o.Completions |> List.exists (fun c -> strOpt \"verdict\" c = Some \"COMPLETE\"))", "strOpt \"reason\" d = Some \"complete\" && false" ] ] }
       { Id = "C32"; Title = "The completion gate is given whole-plan coverage of another commit"; Requirements = [ "R6"; "review 5 (round 3)" ]; Needs = Nothing
@@ -668,7 +679,32 @@ let cases : Case list =
         Correct = fun o -> o.Exit = 4 && has "EVIDENCE_STALE" o
         Control = fun t -> completion t allIntegrated true coverageAll
         ControlOk = fun o -> o.Exit = 0
-        Mutation = [ ledger, [ "                    | Some x when strOpt \"candidate\" x <> Some e.Candidate -> yield ref' \"EVIDENCE_STALE\"", "                    | Some x when false -> yield ref' \"EVIDENCE_STALE\"" ] ] } ]
+        Mutation = [ ledger, [ "                    | Some x when strOpt \"candidate\" x <> Some e.Candidate -> yield ref' \"EVIDENCE_STALE\"", "                    | Some x when false -> yield ref' \"EVIDENCE_STALE\"" ] ] }
+      { Id = "C33"; Title = "The builder writes its own completion verdict into its evidence"; Requirements = [ "R6"; "review 1 (round 4)"; "observer" ]; Needs = Nothing
+        Expected = "observe: blocking PREMATURE_STOP (a verdict in the builder's evidence is not a governed one; only the owner's --completions count)"
+        Attack = fun t -> observeDecision t "c33" [ "requestedAt", at 300.0; "reason", box "complete"; "decision", box "STOP_PERMITTED"; "minutesRemaining", box 120; "deadline", at 420.0 ] [ "x.json", File.ReadAllText completeVerdict ]
+        Correct = fun o -> has "no governed completion-gate COMPLETE verdict" o
+        Control = fun t -> observeDecisionWith t "c33-control" [ "requestedAt", at 300.0; "reason", box "complete"; "decision", box "STOP_PERMITTED"; "minutesRemaining", box 120; "deadline", at 420.0 ] [] [ "completion.json", File.ReadAllText completeVerdict ]
+        ControlOk = fun o -> not (has "PREMATURE_STOP" o)
+        Mutation = [ "tools/requirements-compiler/src/GovernedCommands.fs", [ "                  o.TryFind \"--completions\" |> Option.filter Directory.Exists", "                  o.TryFind \"--evidence\" |> Option.filter Directory.Exists" ] ] }
+      { Id = "C34"; Title = "The T0 record states T0 without a UTC offset"; Requirements = [ "rule 10"; "review 2 (round 4)" ]; Needs = Nothing
+        Expected = "stop-decision REFUSED: T0_RECORD_INVALID (a local time would move the deadline with the machine's time zone)"
+        Attack = fun t ->
+            let local = t0.ToString "yyyy-MM-ddTHH:mm:ss"
+            let repo = t0RepoWith ("no-offset-" + string (Guid.NewGuid())) (json (dict [ "schema", box "indy-init.t0/1"; "t0", box local; "windowMinutes", box 420 ]))
+            rc t [ "stop-decision"; "--manifest"; manifestPath; "--checkpoint"; checkpoint; "--events"; catalogOnly; "--request"; request "c34" 499.0 "deadline" scopeSha false
+                   "--t0-record"; Path.Combine(repo, "evidence", "t0", "t0.json"); "--deadline-policy"; policy; "--lock"; lockFile; "--repo"; repo; "--out"; Path.Combine(work, "decision-c34.json") ]
+        Correct = refusedWith "T0_RECORD_INVALID"
+        Control = fun t -> stopDecision t catalogOnly (request "c34-control" 499.0 "deadline" scopeSha false) []
+        ControlOk = fun o -> o.Exit = 0
+        Mutation = [ continuation, [ "    | true, v when explicitOffset -> Some v", "    | true, v -> Some v" ] ] }
+      { Id = "C35"; Title = "A dependency whose requirement has nothing a pull request can judge is assumed integrated"; Requirements = [ "slice gate"; "review 3 (round 4)" ]; Needs = Nothing
+        Expected = "slice-gate REFUSED for SL-T11: DEPENDENCY_NOT_INTEGRATED (AR-023 is record-only and SL-T10 has no Praxis completion record)"
+        Attack = fun t -> sliceGateFor t "SL-T11" (eventsFile "t11-no-t10-record" t11NoT10Record) (sliceEvidenceFor "T11" t11 "c35" [] (t10Executable @ t11Obligations) [])
+        Correct = fun o -> o.Exit = 4 && has "DEPENDENCY_NOT_INTEGRATED" o
+        Control = fun t -> sliceGateFor t "SL-T11" (eventsFile "t11-verified-c" t11Verified) (sliceEvidenceFor "T11" t11 "c35-control" [] (t10Executable @ t11Obligations) [])
+        ControlOk = fun o -> o.Exit = 0
+        Mutation = [ ledger, [ "if judged.IsEmpty then s.Progress.CompletedItems.Contains d else", "if judged.IsEmpty then true else" ] ] } ]
 
 
 

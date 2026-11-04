@@ -368,9 +368,12 @@ let sliceRules : SliceRule list =
                     let judgedHere (o: Json) =
                         strOpt "kind" o <> Some "record"
                         && (runsLive || not (strs "producers" o |> List.exists (fun p -> liveProducers.Contains p || p = "SU-BROWSER-WEBKIT")))
+                    // A requirement with nothing a pull request can judge (all record, or live in a non-live slice) is not
+                    // integrated vacuously: its work item must be completed by its Praxis record.
                     let integratedReq (r: Json) =
+                        let judged = arr "obligations" r |> List.filter (fun o -> boolOr "mandatory" true o && judgedHere o)
                         s.ExcludedBy.ContainsKey(str "id" r)
-                        || arr "obligations" r |> List.filter (fun o -> boolOr "mandatory" true o && judgedHere o) |> List.forall (fun o -> headVerified.Contains(str "id" o))
+                        || (if judged.IsEmpty then s.Progress.CompletedItems.Contains d else judged |> List.forall (fun o -> headVerified.Contains(str "id" o)))
                     let integrated = if rs.IsEmpty then s.Progress.CompletedItems.Contains d else rs |> List.forall (fun r -> reqs.TryFind r |> Option.exists integratedReq)
                     if not integrated then yield ref' "DEPENDENCY_NOT_INTEGRATED" (sprintf "dependency SL-%s is not integrated" d) ] }
       { Id = "current-target"
