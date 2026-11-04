@@ -91,6 +91,9 @@
    "title": "[WI-GEN-PF] Implement the PF requirements no execution-DAG task covers"
   },
   {
+   "title": "[WI-GEN-RECORDS] Produce the record evidence (reviews, process and owner records) of the P0 requirements no execution-DAG task covers"
+  },
+  {
    "title": "[WI-GEN-UI] Implement the UI requirements no execution-DAG task covers"
   },
   {

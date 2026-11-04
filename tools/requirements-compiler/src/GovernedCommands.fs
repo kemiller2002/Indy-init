@@ -83,23 +83,9 @@ let ledgerCommand (args: string list) =
 
 let private estimatesOf (dag: Json) = arr "tasks" dag |> List.choose (fun t -> intOpt "estimateMinutes" t |> Option.map (fun m -> str "id" t, m)) |> Map.ofList
 
-/// The Praxis work inventory in the form r9.fsx authorize-implementation reads (`indy-init.r9-work-plan/1`): every
-/// slice that carries requirements, with all their obligations, plus WI-RELEASE-RECORDS for the full-release
-/// (record-only) requirements, so every in-scope obligation is linked to a work item and none is dropped.
-let workPlan (manifest: Json) (slices: Json) : Json =
-    let reqs = arr "requirements" manifest |> List.map (fun r -> str "id" r, r) |> Map.ofList
-    let obligationsOf ids = ids |> List.collect (fun id -> reqs.TryFind id |> Option.map (arr "obligations" >> List.map (str "id")) |> Option.defaultValue [])
-    let item id title (rs: string list) = JObj [ "id", JStr id; "title", JStr title; "requirements", jstrs rs; "obligations", jstrs (obligationsOf rs) ]
-    let fromSlices =
-        arr "slices" slices
-        |> List.filter (fun s -> not (strs "requirements" s).IsEmpty)
-        |> List.map (fun s -> item (str "workItem" s) (strOpt "title" s |> Option.defaultValue "") (strs "requirements" s))
-    let releaseRecords = strs "fullReleaseObligations" slices
-    JObj
-        [ "schema", JStr "indy-init.r9-work-plan/1"
-          "scopeSha256", JStr(strOpt "scopeSha256" manifest |> Option.defaultValue "")
-          "description", JStr "Derived by requirements-compiler slice-manifest --work-plan from the approved scope. Register every listed work item in Praxis (the 35 of the scope manifest that carry requirements, plus WI-RELEASE-RECORDS) and copy this file to .echelon/r9-work-plan.json before authorize-implementation."
-          "workItems", JArr(fromSlices @ (if releaseRecords.IsEmpty then [] else [ item "WI-RELEASE-RECORDS" "Full-release record obligations (independent review, owner and process records)" releaseRecords ])) ]
+/// The Praxis work inventory in the form r9.fsx authorize-implementation reads (`indy-init.r9-work-plan/1`): exactly
+/// `scope work-plan` (Scope.workPlan), every work item of the approved scope, so there is one generator.
+let workPlan (manifest: Json) (_slices: Json) : Json = Scope.workPlan manifest
 
 let sliceManifestCommand (args: string list) =
     let o = options args

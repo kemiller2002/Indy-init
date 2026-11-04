@@ -46,7 +46,7 @@ git add -A && git commit -m "T0 bootstrap"
      --indy-verification-plan $INDY/requirements-compiled/v4/verification-plan.json --out .echelon/obligations.json
    ```
 
-3. **Create the Praxis work items** with `./praxis work begin --id WI-… --occurred-at NOW`. Write `.echelon/r9-work-plan.json` (schema `indy-init.r9-work-plan/1`). It lists, for each work item:
+3. **Create the Praxis work items** from the authoritative scope (docs/rehearsal-010-readiness/STARTUP-INSTRUCTIONS.md §2): generate `.echelon/r9-work-plan.json` with `requirements-compiler scope work-plan --manifest $INDY/docs/rehearsal-010-readiness/scope-manifest.json --out .echelon/r9-work-plan.json`, begin each of its work items with `./praxis work begin --id ID --occurred-at NOW`, then write and commit the scope checkpoint (`requirements-compiler scope checkpoint`); `check-sequencing --scope-manifest` requires it. The work plan (schema `indy-init.r9-work-plan/1`) lists, for each work item:
    - its `requirements`, as catalog `INV-…` or plan requirement IDs;
    - its `obligations`, as catalog obligation IDs such as `INV-024/V3/enter`, or plan obligation IDs such as `PERSIST-007-O1`.
 

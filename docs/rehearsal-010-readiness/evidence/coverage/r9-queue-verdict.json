@@ -125,6 +125,10 @@
     },
     {
       "code": "WORK_ITEM_MISSING",
+      "detail": "WI-GEN-RECORDS (16 requirement(s)) has no Praxis work item: praxis add \"[WI-GEN-RECORDS] Produce the record evidence (reviews, process and owner records) of the P0 requirements no execution-DAG task covers\""
+    },
+    {
+      "code": "WORK_ITEM_MISSING",
       "detail": "WI-GEN-UI (21 requirement(s)) has no Praxis work item: praxis add \"[WI-GEN-UI] Implement the UI requirements no execution-DAG task covers\""
     },
     {

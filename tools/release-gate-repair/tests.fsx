@@ -9,7 +9,8 @@
 // refused by X21 and by suite-preflight, and pass once corrected; frozen packages regenerate unchanged; the Praxis
 // ordering gate refuses each missing step, writes an immutable checkpoint, and check-sequencing reports
 // implementation before authorization; acceptance-status keeps its four levels apart, refuses missing and stale
-// evidence, and gives a scoped verdict that never claims the full plan.
+// evidence, and gives a scoped verdict that never claims the full plan. Integration with #102: suite-preflight
+// --require-tests and the deterministic fixture, and check-sequencing --scope-manifest (the scope checkpoint).
 
 open System
 open System.Diagnostics
@@ -124,6 +125,20 @@ let fixedRunners =
 r9case "suite-preflight-passes-corrected-runners" [ 0 ] [ "SU-OWN-DOTNET: executable"; "SU-BROWSER-WEBKIT: executable" ] [ "suite-preflight"; "--obligations"; fixedRunners; "--root"; suiteRepo; "--out"; Path.Combine(work, "suite-preflight.json") ] suiteRepo |> ignore
 let noSuites = obligationsWith "no-suites" []
 r9case "suite-preflight-refuses-a-plan-without-suites" [ 2 ] [ "the obligations name no executable suite" ] [ "suite-preflight"; "--obligations"; noSuites; "--root"; suiteRepo ] suiteRepo |> ignore
+// #102: a command that executes but selects no test proves nothing (a filtered `dotnet test` exits 0 on no match).
+r9case "suite-preflight-require-tests-refuses-an-empty-selection" [ 4 ] [ "selects no test" ] [ "suite-preflight"; "--obligations"; fixedRunners; "--root"; suiteRepo; "--require-tests"; "true" ] suiteRepo |> ignore
+// #102: the deterministic fixture (the plan's test layout, one trivial test per suite) executes a package's own
+// commands before T0: the frozen v4.1.2 runners are refused (MSB1008), v4.1.4's list a test in every suite, and a
+// configuration without the webkit project is refused.
+let fixture = Path.Combine(work, "fixture")
+let fixtureNoWebkit = Path.Combine(work, "fixture-nowebkit")
+r9case "suite-fixture-writes-the-plan-layout" [ 0 ] [ "committed (no application code)" ] [ "suite-fixture"; "--out"; fixture ] work |> ignore
+r9case "suite-fixture-without-webkit" [ 0 ] [ "committed (no application code)" ] [ "suite-fixture"; "--out"; fixtureNoWebkit; "--without-webkit"; "true" ] work |> ignore
+[ fixture; fixtureNoWebkit ] |> List.iter (fun d -> if Directory.Exists d then Directory.CreateSymbolicLink(Path.Combine(d, "node_modules"), nodeModules) |> ignore)
+let planOf (v: string) = Path.Combine(src, "requirements-compiled", v, "verification-execution-plan.json")
+r9case "suite-preflight-fixture-refuses-v4.1.2" [ 4 ] [ "SU-OWN-DOTNET cannot execute"; "SU-DOTNET-LIVE cannot execute"; "MSB1008" ] [ "suite-preflight"; "--plan"; planOf "v4.1.2"; "--root"; fixture; "--require-tests"; "true" ] fixture |> ignore
+r9case "suite-preflight-fixture-passes-v4.1.4-with-tests" [ 0 ] [ "SU-OWN-DOTNET: executable, 4 test(s) listed"; "SU-DOTNET-LIVE: executable, 2 test(s) listed"; "SU-BROWSER-WEBKIT: executable, 2 test(s) listed" ] [ "suite-preflight"; "--plan"; planOf "v4.1.4"; "--root"; fixture; "--require-tests"; "true" ] fixture |> ignore
+r9case "suite-preflight-fixture-refuses-a-missing-webkit-project" [ 4 ] [ "SU-BROWSER-WEBKIT cannot execute"; "Project(s) \"webkit\" not found" ] [ "suite-preflight"; "--plan"; planOf "v4.1.4"; "--root"; fixtureNoWebkit; "--require-tests"; "true" ] fixtureNoWebkit |> ignore
 
 // ---- 2b. the deterministic fixture and the zero-test refusal (ported from #102, integration) ----------------------
 
@@ -135,12 +150,12 @@ let compileObligations (pkg: string) =
     if code <> 0 then failwithf "dokimos verification compile %s: %s" pkg output
     out
 let obl412, obl414 = compileObligations "v4.1.2", compileObligations "v4.1.4"
-let fixture name extra =
+let fixtureAt name extra =
     let dir = Path.Combine(work, name)
     r9case $"suite-fixture-{name}" [ 0 ] [ "suite-fixture: PASS" ] ([ "suite-fixture"; "--out"; dir ] @ extra) work |> ignore
     Directory.CreateSymbolicLink(Path.Combine(dir, "node_modules"), nodeModules) |> ignore
     dir
-let fx, fxEmpty, fxNoWebkit = fixture "fx" [], fixture "fx-empty" [ "--empty-project"; "Causa.Acceptance" ], fixture "fx-nowebkit" [ "--without-webkit"; "true" ]
+let fx, fxEmpty, fxNoWebkit = fixtureAt "fx" [], fixtureAt "fx-empty" [ "--empty-project"; "Causa.Acceptance" ], fixtureAt "fx-nowebkit" [ "--without-webkit"; "true" ]
 r9case "fixture-v4.1.2-runners-refused-msb1008" [ 4 ] [ "SU-OWN-DOTNET cannot execute"; "SU-DOTNET-LIVE cannot execute"; "MSB1008" ] [ "suite-preflight"; "--obligations"; obl412; "--root"; fx; "--require-tests"; "true" ] fx |> ignore
 r9case "fixture-v4.1.4-every-suite-lists-tests" [ 0 ] [ "SU-OWN-DOTNET: executable, 4 test(s)"; "SU-BROWSER-WEBKIT: executable, 2 test(s)"; "SU-DOTNET-LIVE: executable, 2 test(s)" ] [ "suite-preflight"; "--obligations"; obl414; "--root"; fx; "--require-tests"; "true" ] fx |> ignore
 r9case "fixture-v4.1.4-missing-webkit-project-refused" [ 4 ] [ "SU-BROWSER-WEBKIT cannot execute"; "Project(s) \"webkit\" not found" ] [ "suite-preflight"; "--obligations"; obl414; "--root"; fxNoWebkit ] fxNoWebkit |> ignore
@@ -234,9 +249,8 @@ r9case "check-sequencing-allows-implementation-after-the-checkpoint" [ 0 ] [ "no
 File.AppendAllText(Path.Combine(app, ".echelon", "r9-initialization-checkpoint.json"), " ")
 commitAll app "agent: touch the checkpoint" |> ignore
 r9case "check-sequencing-refuses-an-edited-checkpoint" [ 4 ] [ "was changed after it was committed" ] [ "check-sequencing"; "--target"; app ] app |> ignore
-File.AppendAllText(Path.Combine(app, ".echelon", "scope-checkpoint.json"), " ")
-commitAll app "agent: touch the scope checkpoint" |> ignore
-r9case "check-sequencing-refuses-an-edited-scope-checkpoint" [ 4 ] [ "the scope checkpoint is immutable" ] [ "check-sequencing"; "--target"; app ] app |> ignore
+// An edited scope checkpoint is refused by check-sequencing --scope-manifest (the gate always passes it): the case
+// check-sequencing-refuses-an-edited-scope-checkpoint below, on a repository checkpointed against a manifest.
 
 // Implementation before authorization (Rehearsal 009's history): reported as process violations.
 let early = Path.Combine(work, "early")
@@ -276,6 +290,70 @@ write (Path.Combine(inCheckpoint, ".echelon", "r9-initialization-checkpoint.json
 write (Path.Combine(inCheckpoint, "src", "Smuggled.fs")) "module Smuggled\n"
 commitAll inCheckpoint "checkpoint carrying implementation" |> ignore
 r9case "check-sequencing-refuses-implementation-before-governance-and-in-the-checkpoint" [ 4 ] [ "implementation before governance"; "checkpoint carrying implementation" ] [ "check-sequencing"; "--target"; inCheckpoint ] inCheckpoint |> ignore
+
+// The scope checkpoint (#102, decision 3): with --scope-manifest, check-sequencing also requires the committed,
+// immutable scope checkpoint with the manifest's scopeSha256 and every work item in Praxis, and implementation is
+// authorized only from the later of the two checkpoints.
+let scopeManifest = Path.Combine(work, "scope-manifest.json")
+write scopeManifest """{"schema":"indy-init.approved-scope/1","scopeSha256":"scope-1","workItems":[{"id":"T10"},{"id":"WI-INV-START"}]}"""
+let scopedRepo (name: string) =
+    let repo = Path.Combine(work, name)
+    Directory.CreateDirectory repo |> ignore
+    git repo [ "init"; "-q"; "-b"; "main" ] |> ignore
+    write (Path.Combine(repo, ".echelon", "r9-governance.json")) "{}\n"
+    commitAll repo "T0 bootstrap" |> ignore
+    let parent = (git repo [ "rev-parse"; "HEAD" ]).Trim()
+    write (Path.Combine(repo, ".echelon", "r9-initialization-checkpoint.json")) $"""{{"authorizedAtCommit":"{parent}"}}"""
+    commitAll repo "initialization checkpoint" |> ignore
+    repo
+let praxisQueue (repo: string) (ids: string list) =
+    write (Path.Combine(repo, ".ros", "work", "queue.json")) ($"""{{"items":[{String.Join(",", ids |> List.map (fun i -> $"{{\"title\":\"[{i}] work\"}}"))}]}}""")
+let scopeCheckpoint (repo: string) (sha: string) =
+    write (Path.Combine(repo, ".echelon", "scope-checkpoint.json")) $"""{{"schema":"indy-init.scope-checkpoint/1","scopeSha256":"{sha}"}}"""
+let implementIn (repo: string) = write (Path.Combine(repo, "src", "App.fs")) "module App\n"; commitAll repo "implementation" |> ignore
+let sequencingWithScope (repo: string) = [ "check-sequencing"; "--target"; repo; "--scope-manifest"; scopeManifest ]
+
+let noScope = scopedRepo "scope-missing"
+implementIn noScope
+r9case "check-sequencing-without-scope-manifest-is-unchanged" [ 0 ] [ "no implementation before authorization" ] [ "check-sequencing"; "--target"; noScope ] noScope |> ignore
+r9case "check-sequencing-refuses-implementation-without-a-scope-checkpoint" [ 4 ] [ "no scope checkpoint"; "process violation:" ] (sequencingWithScope noScope) noScope |> ignore
+
+let good = scopedRepo "scope-good"
+praxisQueue good [ "T10"; "WI-INV-START" ]
+scopeCheckpoint good "scope-1"
+commitAll good "scope checkpoint" |> ignore
+implementIn good
+r9case "check-sequencing-passes-with-the-scope-checkpoint" [ 0 ] [ "no implementation before authorization" ] (sequencingWithScope good) good |> ignore
+
+let late = scopedRepo "scope-late"
+implementIn late
+praxisQueue late [ "T10"; "WI-INV-START" ]
+scopeCheckpoint late "scope-1"
+commitAll late "scope checkpoint after the fact" |> ignore
+r9case "check-sequencing-refuses-implementation-before-the-scope-checkpoint" [ 4 ] [ "process violation:" ] (sequencingWithScope late) late |> ignore
+
+let changed = scopedRepo "scope-changed"
+praxisQueue changed [ "T10"; "WI-INV-START" ]
+scopeCheckpoint changed "scope-reduced"
+commitAll changed "scope checkpoint of a reduced scope" |> ignore
+r9case "check-sequencing-refuses-a-scope-hash-mismatch" [ 4 ] [ "the scope changed without an owner record" ] (sequencingWithScope changed) changed |> ignore
+
+let partial = scopedRepo "scope-partial"
+praxisQueue partial [ "T10" ]
+scopeCheckpoint partial "scope-1"
+commitAll partial "scope checkpoint with one work item in Praxis" |> ignore
+r9case "check-sequencing-refuses-incomplete-praxis-coverage" [ 4 ] [ "Praxis work-item coverage at the scope checkpoint is incomplete: 1 work item(s) missing (first: WI-INV-START)" ] (sequencingWithScope partial) partial |> ignore
+
+let begun = scopedRepo "scope-begun"
+write (Path.Combine(begun, ".ros", "context", "current.json")) """{"workItems":[{"id":"T10","state":"ready"},{"id":"WI-INV-START","state":"ready"}]}"""
+scopeCheckpoint begun "scope-1"
+commitAll begun "scope checkpoint, work items begun with praxis work begin" |> ignore
+implementIn begun
+r9case "check-sequencing-counts-work-items-begun-in-praxis" [ 0 ] [ "no implementation before authorization" ] (sequencingWithScope begun) begun |> ignore
+
+File.AppendAllText(Path.Combine(good, ".echelon", "scope-checkpoint.json"), " ")
+commitAll good "agent: touch the scope checkpoint" |> ignore
+r9case "check-sequencing-refuses-an-edited-scope-checkpoint" [ 4 ] [ "the scope checkpoint is immutable" ] (sequencingWithScope good) good |> ignore
 
 // ---- 4. acceptance-status: four levels, evidence-bound -----------------------------------------------------------
 

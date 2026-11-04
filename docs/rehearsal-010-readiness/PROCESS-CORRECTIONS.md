@@ -5,31 +5,31 @@
 **Verdict: NOT READY.**
 - The engineering corrections are built, tested and demonstrated.
 - Rehearsal 010 still needs owner actions that agents may not take (§8):
-  - the decisions and approval of the successor package v4.1.3;
+  - the decisions and approval of the successor package v4.1.4 (from #101);
   - a Dokimos release with the `url-input` fix, registered and pinned;
   - the Rehearsal 010 toolchain lock.
 
 Rehearsal 010 was not launched.
 
-The root-cause analysis is [ROOT-CAUSE.md](ROOT-CAUSE.md). The new startup instructions are [STARTUP-INSTRUCTIONS.md](STARTUP-INSTRUCTIONS.md).
+The root-cause analysis is [ROOT-CAUSE.md](ROOT-CAUSE.md). The new startup instructions are [STARTUP-INSTRUCTIONS.md](STARTUP-INSTRUCTIONS.md). How #101 and #102 were combined, and the combined test results, are in [INTEGRATION-REPORT.md](INTEGRATION-REPORT.md).
 
 ## 1. What failed in Rehearsal 009, in one table
 
 | Failure | Correction | Where |
 |---|---|---|
-| The catalog was treated as the whole target | One authoritative scope manifest: 199 requirements (161 P0 + 38 catalog), 863 obligations, 35 work items, pinned by source hashes and closed by `scopeSha256` | `scope-manifest.json`, `tools/requirements-compiler/src/Scope.fs` |
-| No work-item inventory; Praxis showed one mission item | `scope preflight` refuses an omitted, weakened, altered or unsourced requirement, an orphaned requirement and an obligation without a producer. `coverage` refuses a Praxis backlog missing any work item. `scope checkpoint` is written only when both pass. `scope order` refuses application code before it. | `Scope.fs`, `ScopeCommands.fs` |
+| The catalog was treated as the whole target | One authoritative scope manifest: 199 requirements (161 P0 + 38 catalog), 863 obligations, 36 work items, pinned by source hashes and closed by `scopeSha256`; #101's obligation inventory is checked against it | `scope-manifest.json`, `tools/requirements-compiler/src/Scope.fs` |
+| No work-item inventory; Praxis showed one mission item | `scope preflight` refuses an omitted, weakened, altered or unsourced requirement, an orphaned requirement and an obligation without a producer. `coverage` refuses a Praxis record missing any work item. `scope checkpoint` is written only when both pass. `scope work-plan` generates #101's work plan from the manifest. #101's `r9.fsx check-sequencing --scope-manifest` refuses application code before the scope checkpoint. | `Scope.fs`, `ScopeCommands.fs` |
 | Implementation and verification were one status | Two independent axes per requirement, plus acceptance from the owner or the independent verifier only. `suite-blocked` changes verification only. | `src/Progress.fs` |
 | No stop rule; compute saving became a stop reason | `stop-decision` permits only complete, owner-authorized, hard-blocker, environment-failure and the deadline. Every other request gets a machine-readable `CONTINUE_REQUIRED` with the remaining work and the next independent items. A retry budget parks repeated failures. | `src/Continuation.fs` |
-| The plan's commands could not run (MSB1008 ×2, no webkit project, no browser install) | Successor package **v4.1.3** (CANDIDATE; ODR-V413-04/05/06 pending). New compiler check X21. `r9.fsx suite-preflight` and `suite-fixture`. The gate installs Chromium and WebKit and reads the package from the pinned lock. | `requirements-compiled/v4.1.3/`, `V41Package.fs`, `tools/r9/` |
-| Dokimos `url-input` mismatch (INV-029 V1–V3 failed on a correct element) | `componentMatches` gains `url-input` (input of type url, text or none), with tests | kemiller2002/dokimos#67 |
+| The plan's commands could not run (MSB1008 ×2, no webkit project, no browser install) | Successor package **v4.1.4** from #101 (CANDIDATE; its decisions are pending), its X21 and `suite-preflight`, and its bootstrap `playwright.config.ts`. Ported from #102: `suite-preflight --require-tests`, `suite-fixture`, `--plan`, and the gate reading the package from the lock named at govern time. | `requirements-compiled/v4.1.4/`, `V41Package.fs`, `tools/r9/` |
+| Dokimos `url-input` mismatch (INV-029 V1–V3 failed on a correct element) | `componentMatches` gains `url-input` (input of type url, text or none), with tests | kemiller2002/dokimos#67 (merged); #68 closed as its duplicate |
 
 ## 2. The authoritative scope (deliverable 2)
 
 `docs/rehearsal-010-readiness/scope-manifest.json`, schema `indy-init.approved-scope/1`, compiled by:
 
 ```
-requirements-compiler scope compile --source . --package requirements-compiled/v4.1.3 --out docs/rehearsal-010-readiness/scope-manifest.json
+requirements-compiler scope compile --source . --package requirements-compiled/v4.1.4 --out docs/rehearsal-010-readiness/scope-manifest.json
 ```
 
 | | |
@@ -39,11 +39,11 @@ requirements-compiler scope compile --source . --package requirements-compiled/v
 | Obligations | 863: 613 of the plan, 250 of the catalog (815 mandatory) |
 | Executable / record-only | 791 / 72 |
 | Plan tests | 660 identities, linked to their obligations |
-| Work items | 35: 27 DAG tasks (T10–T36), 6 generated `WI-GEN-*` for the P0 requirements no DAG task covers (AR, EXT-DATA, PF, UI, VER, WDL), 2 `WI-INV-*` for the catalog screens |
+| Work items | 36: 27 DAG tasks (T10–T36); 6 generated `WI-GEN-*` implementation items for the executable P0 requirements no DAG task covers (AR, EXT-DATA, PF, UI, VER, WDL); `WI-GEN-RECORDS`, the evidence item for the 16 record-only ones; 2 `WI-INV-*` for the catalog screens |
 | Producers | the 11 plan suites, plus `DOKIMOS-REQUIREMENTS` for the catalog |
 | Gate-level scope | 359 requirements without priority P0: in scope by ODR-V4-10 A (APR-V4-OWNER-1), judged by the acceptance gates, not excluded |
 | Exclusions | none. INV-003 is conditional (`domain-profile-selected=true`). |
-| Frozen pins | v4.1.3 package manifest, v4 verification plan `10ce16eb…`, v4.1.3 execution plan, catalog `19a03668…`, baseline `f86a3539…` |
+| Frozen pins | v4.1.4 package manifest, v4 verification plan `10ce16eb…`, v4.1.4 execution plan, catalog `19a03668…`, baseline `f86a3539…` |
 
 **Reconciling the "660 unverified obligations".** They are not 660 tasks:
 - There are 613 obligations and 660 test identities, because some obligations bind several tests.
@@ -60,11 +60,11 @@ Before implementation, `scope checkpoint` must pass:
    - `MANDATORY_REQUIREMENT_MISSING`, `REQUIREMENT_MISSING`, `MANDATORY_WEAKENED`, `OBLIGATION_MISSING`, `REQUIREMENT_ALTERED`, `REQUIREMENT_UNSOURCED`;
    - `FROZEN_SOURCES_CHANGED`, `SCOPE_HASH_MISMATCH`;
    - `REQUIREMENT_ORPHANED`, `WORK_ITEM_UNDECLARED`, `OBLIGATION_WITHOUT_PRODUCER`, `PRODUCER_UNDECLARED`.
-2. Every work item exists in the Praxis backlog (`[ID] …` title). Otherwise `WORK_ITEM_MISSING` is refused, with the exact `praxis add` command.
-3. The checkpoint `indy-init.scope-checkpoint/1` records the scope hash. `scope order` refuses application code committed before it.
+2. Every work item exists in Praxis: a backlog item titled `[ID] …` or with that id, or a work item begun with `praxis work begin`. Otherwise `WORK_ITEM_MISSING` is refused, with the exact `praxis add` command.
+3. The checkpoint `indy-init.scope-checkpoint/1` records the scope hash. `r9.fsx check-sequencing --scope-manifest` (#101's CI-facing command, run by the gate whenever the lock pins a scope) refuses application code committed before it, a scope hash that differs from the approved manifest, an edited checkpoint, and incomplete Praxis coverage at the checkpoint commit.
 
 Demonstrated:
-- Rehearsal 009's own queue gives 35 × `WORK_ITEM_MISSING` (`evidence/coverage/r9-queue-verdict.json`).
+- Rehearsal 009's own queue gives 36 × `WORK_ITEM_MISSING` (`evidence/coverage/r9-queue-verdict.json`).
 - A complete queue gives the checkpoint (`evidence/coverage/example-checkpoint.json`).
 
 ## 4. Progress model (deliverable 4) and early-stop validation (deliverable 5)
@@ -94,34 +94,21 @@ No implementation state changed when the suites were blocked.
 
 ## 5. Release-gate repairs (deliverable 1)
 
-**v4.1.3** is a successor of v4.1.2 (APR-V412-OWNER-3, tag `indy-init-requirements-v4.1.2`). v4.1.2 is not edited; CI still checks it against its tag. See `requirements-compiled/v4.1.3/AMENDMENT-4.1.3.md`.
+The owner chose #101's successor package **v4.1.4** (CANDIDATE) over #102's v4.1.3, which is withdrawn. It corrects the six runners (MSB1008 and the `--config playwright.config.ts` the bootstrap now writes), adds X21, and adds `r9.fsx suite-preflight`. It was validated against the real Rehearsal 009 application. v4.1.2 is unchanged and still checked against its tag. See #101's `docs/release-gate-repair/` and `requirements-compiled/v4.1.4/`.
 
-| Suite | v4.1.2 | v4.1.3 (ODR-V413-04, option A, pending) |
-|---|---|---|
-| SU-OWN-DOTNET | `dotnet test tests/Causa.Contract.Tests tests/Causa.Domain.Tests tests/Causa.Persistence.Tests tests/Causa.App.Tests` (MSB1008) | `dotnet test Causa.slnx --filter "FullyQualifiedName~Causa.Contract.Tests.\|…Domain.Tests.\|…Persistence.Tests.\|…App.Tests."` |
-| SU-DOTNET-LIVE | `dotnet test tests/Causa.Acceptance tests/Causa.Invariants --filter …` (MSB1008) | `dotnet test Causa.slnx --filter "FullyQualifiedName~Causa.Acceptance.Live.\|FullyQualifiedName~Causa.Invariants.Live."` |
-| Browser suites | the `webkit` project unchecked | `suitePrerequisites` (ODR-V413-05): `r9.fsx suite-preflight` at T10 and before T0 |
+**Ported from #102:**
+- `suite-preflight --require-tests true`: a command that executes but selects no test is refused. A filtered `dotnet test` exits 0 when nothing matches.
+- `suite-fixture`: the deterministic test tree (the plan's layout, one trivial test per suite, no application code).
+- `--plan`: run a package's own commands before T0 without Dokimos.
+- The gate reads the package and lock named at govern time (`r9.fsx govern --lock`). #101's gate compiled the v4.1.2 plan with the Rehearsal 009 lock hardcoded.
 
-Further changes:
-- The compiler gains X21: every `dotnet test` runner names exactly one project or solution, and a replaced runner names its decision. It applies from 4.1.3 on, so v4.1.1 and v4.1.2 compile byte for byte as before.
-- No requirement, obligation, binding, state machine or contract changes (X10, X17).
-- v4.1.3 validation: X01–X21 PASS.
+**Executed:**
 
-**The gate workflow** (`tools/r9/verification-gate.yml`):
-- installs Chromium and WebKit (`npx playwright install --with-deps chromium webkit`);
-- reads the package from the lock named in the governance record (`r9.fsx govern --lock …`), so Rehearsal 010 runs the v4.1.3 plan.
-
-Rehearsal 009's record has no `toolchainLock`, so it reads v4.1.2 exactly as before.
-
-**Executed before any timed run** (`evidence/suite-commands/`), on a deterministic fixture tree from `r9.fsx suite-fixture`: the plan's project, namespace and folder layout, one trivial test per suite, no application code.
-
-| Check | Result |
+| Check | Where |
 |---|---|
-| `suite-preflight`, v4.1.2 plan | REFUSED: SU-OWN-DOTNET and SU-DOTNET-LIVE (MSB1008). This reproduces Rehearsal 009. |
-| `suite-preflight`, v4.1.3 plan, fixture without webkit | REFUSED: SU-BROWSER-WEBKIT (`Project(s) "webkit" not found`) |
-| `suite-preflight`, v4.1.3 plan | PASS: all 8 executable suites list (4, 1, 1, 1, 2, 2, 2, 1 tests) |
-| `run-suites`, v4.1.3 plan (this container) | .NET: 8/8 passed in 4 suites. Chromium: 4/4 passed in 3 suites. WebKit: not run here, because the container cannot install WebKit's host libraries (`browserType.launch: Executable doesn't exist`). |
-| CI job `suite-commands` (`.github/workflows/preflight-tooling.yml`) | Repeats all of the above with `--with-deps chromium webkit` and fails unless every suite, WebKit included, passes. Recorded on the pull request that delivers this file. |
+| v4.1.2 refused on the fixture (MSB1008 ×2); a fixture without webkit refused; v4.1.4 lists a test in every suite | #101's harness cases `suite-preflight-fixture-*`, `suite-preflight-require-tests-*` |
+| every v4.1.4 suite runs on the fixture, WebKit included | CI job `suite-commands` |
+| v4.1.4 reproduced byte for byte, X01–X21 PASS | CI job `release-gate-repair`; #101's harness |
 
 ## 6. Regression tests (deliverable 6)
 
@@ -140,11 +127,13 @@ Rehearsal 009's record has no `toolchainLock`, so it reads v4.1.2 exactly as bef
 
 **Also covered:**
 - The legitimate stops: complete, the deadline (with an invented acceptance claim refused), owner-authorized (an agent-authored "approval" is ignored), environment failure (a broken gate is not one), and a documented hard blocker.
-- The retry budget, the agent's own acceptance (refused), progress events that would invent progress (refused), and scope order.
+- The retry budget, the agent's own acceptance (refused), progress events that would invent progress (refused).
 - The real scope: the committed manifest equals its compilation; 161 + 38 requirements are present; no orphan; every obligation has a producer; the counts.
 - The Rehearsal 009 replay of §4.
-- X21: v4.1.3 passes; v4.1.2's runners, an unknown suite and an undecided runner fail; frozen v4.1.2 gains no check.
-- `v41 --check` on v4.1.3.
+- Recovery: a successor session rebuilds its plan from committed files and continues; it stops at the deadline and refuses a missing or changed checkpoint.
+- Reconciliation: the scope manifest and #101's obligation inventory agree on all 613 plan obligations, their requirements and their evidence kind (72 record-only, 541 executable or mixed), and the inventory excludes nothing.
+- The generated work plan links every obligation to a work item; Praxis items begun with `praxis work begin` count toward coverage.
+- Sequencing (#101's harness): `check-sequencing --scope-manifest` refuses implementation without, or before, the scope checkpoint, a scope hash mismatch, incomplete Praxis coverage and an edited checkpoint. Without `--scope-manifest`, its behaviour is unchanged.
 
 ## 7. Phase 8 validation
 
@@ -152,7 +141,7 @@ Rehearsal 009's record has no `toolchainLock`, so it reads v4.1.2 exactly as bef
 |---|---|
 | Every mandatory requirement is represented | `real` test: all 161 P0 and 38 catalog ids are in the manifest; `scope preflight` PASS |
 | Every implementation work item is traceable | each requirement names its work items; each work item names its requirements (gate-level ones too); `REQUIREMENT_ORPHANED` never fires on the real scope |
-| The release gate executes | `suite-preflight` PASS and `run-suites` on v4.1.3. WebKit runs in CI job `suite-commands`. |
+| The release gate executes | v4.1.4 `suite-preflight` PASS on the fixture and on Rehearsal 009 (#101); every suite runs in CI job `suite-commands`, WebKit included |
 | Implementation and verification states are independent | cases 2 and 6; `r9-progress.json` |
 | Completion cannot be claimed after only the catalog | case 1; R9 replay `r9-decision-complete.json` |
 | A blocked release gate does not prevent unrelated implementation | case 2; `r9-decision-gate-blocker.json` (`nextIndependentWork`) |
@@ -162,10 +151,10 @@ Rehearsal 009's record has no `toolchainLock`, so it reads v4.1.2 exactly as bef
 
 | # | Blocker | Who | How |
 |---|---|---|---|
-| 1 | ODR-V413-04 and ODR-V413-05 are not recorded | owner | `owner-freeze.fsx decide v4.1.3`; then an agent recompiles v4.1.3 and records its independent review (FREEZE.md step 2) |
-| 2 | v4.1.3 is not approved or tagged (ODR-V413-06) | owner | `owner-freeze.fsx approve v4.1.3`, then `tag v4.1.3`; an agent adds it to the frozen guard |
-| 3 | Dokimos `url-input` fix is not released | Dokimos owners, then owner | Merge kemiller2002/dokimos#67. Release Dokimos. Register it in a new echelon-current set (owner approval, Conditor qualification). Without it, INV-029 (non-mandatory) still fails V1–V3. |
-| 4 | No Rehearsal 010 lock | owner | Adopt `kickoff/rehearsal-010/toolchain.lock.proposed.json` as `toolchain.lock.json` after 1–3 (package path, manifest digest, resolved set). The scope manifest's `scopeSha256` is recompiled if v4.1.3 changes. |
+| 1 | v4.1.4's decisions are not recorded (#101: `docs/release-gate-repair/owner-decision-requests.json`, `requirements-compiled/v4.1.4/proposals/`) | owner | `owner-freeze.fsx decide`; then an agent recompiles v4.1.4 and records its independent review |
+| 2 | v4.1.4 is not approved or tagged | owner | `owner-freeze.fsx approve`, then `tag`; an agent adds it to the frozen guard |
+| 3 | Dokimos `url-input` fix is not released | Dokimos owners, then owner | kemiller2002/dokimos#67 is merged. Release Dokimos. Register it in a new echelon-current set (owner approval, Conditor qualification). Without it, INV-029 (non-mandatory) still fails V1–V3. |
+| 4 | No Rehearsal 010 lock | owner | Adopt `kickoff/rehearsal-010/toolchain.lock.proposed.json` as `toolchain.lock.json` after 1–3 (package path, manifest digest, resolved set). The scope manifest's `scopeSha256` is recompiled if v4.1.4 changes. |
 | 5 | The launch prompt | owner | Use the prompt in STARTUP-INSTRUCTIONS.md, with no narrower target and no compute-saving instruction (ROOT-CAUSE H1, H2) |
 
 **Not blockers, but known limits:**
@@ -173,3 +162,24 @@ Rehearsal 009's record has no `toolchainLock`, so it reads v4.1.2 exactly as bef
 - The generated `WI-GEN-*` items group requirements by family. They depend on T17 only, so their finer order is the agent's to plan.
 - Ordo was not changed. No Ordo capability was needed for these checks.
 - Praxis was not changed. Coverage reads Praxis's own backlog file; work items are created with `praxis add`.
+
+## 9. Incremental merges versus final completion, and proposed follow-ups
+
+**How the two gates are separated in the combined tree.** Nothing in this PR makes completion of the full scope a condition for merging a slice.
+- **A slice merges on the development-mode gate:**
+  - its applicable acceptance tests (the requirements it adds to `.echelon/verification-scope.json`, which only grows);
+  - regression of every requirement already there;
+  - governance and `check-sequencing`.
+- **The full scope is required only by:**
+  - the release gate (`mode=release`, unchanged);
+  - `stop-decision complete` (final completion);
+  - `acceptance-status` (fullPlan level).
+
+None of these was weakened.
+
+**Proposed follow-ups.** These are not implemented here, because they go beyond the approved integration scope.
+- **F1: dependency satisfaction for a slice merge.** The gate does not yet check that the `dependsOn` of a slice's work items (manifest `workItems[].dependsOn`, `requirements[].dependsOn`) is implemented and verified. Proposal:
+  - add `requirements-compiler slice-check --manifest M --events E --work-item ID`. It refuses when a dependency is not implemented, or when a dependency's obligations are not verified or recorded blocked;
+  - run it in the development-mode gate for the work item a PR names.
+- **F2: one startup document.** `docs/release-gate-repair/NEXT-REHEARSAL-STARTUP.md` (#101) and `STARTUP-INSTRUCTIONS.md` (#102) now point at each other. They could be merged into one document once the owner pins the lock.
+- **F3: competition scope.** If the owner approves a narrower competition scope (#101 ODR-RG-01), it should become a new scope manifest with its own `scopeSha256`, under an owner `approve-scope` record. It should not be a second scope file.

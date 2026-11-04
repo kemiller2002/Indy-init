@@ -66,7 +66,7 @@ jobs:
           git -C "$RUNNER_TEMP/indy-init" checkout -q FETCH_HEAD
       - name: Governed contracts are the ones the lock pins (catalog, design, deadline policy, journey bindings)
         run: |
-          src="$RUNNER_TEMP/indy-init"; lock="$src/$(jq -r '.lock // "kickoff/rehearsal-009/toolchain.lock.json"' .echelon/r9-governance.json)"
+          src="$RUNNER_TEMP/indy-init"; lock="$src/$(jq -r '.toolchainLock // .lock // "kickoff/rehearsal-009/toolchain.lock.json"' .echelon/r9-governance.json)"
           r10=$(jq -r 'has("catalogVerification")' "$lock")
           check() { pinned=$(jq -r "$2 // empty" "$lock")
             if [ -z "$pinned" ]; then [ "$r10" = "true" ] && { echo "::error::the lock does not pin $2"; exit 1; }; return 0; fi
@@ -109,19 +109,26 @@ jobs:
           dotnet fsi "$RUNNER_TEMP/indy-init/tools/r9/r9.fsx" -- check-governance --indy-init "$RUNNER_TEMP/indy-init" --target . $base_scope
       - name: Pinned toolchain (Conditor 0.10.20, then the echelon-current resolved set)
         run: |
-          lock="$RUNNER_TEMP/indy-init/$(jq -r '.lock // "kickoff/rehearsal-009/toolchain.lock.json"' .echelon/r9-governance.json)"
+          # The lock named at govern time (r9.fsx govern --lock); Rehearsal 009's record names none and reads its own.
+          lock="$RUNNER_TEMP/indy-init/$(jq -r '.toolchainLock // .lock // "kickoff/rehearsal-009/toolchain.lock.json"' .echelon/r9-governance.json)"
           dotnet fsi "$RUNNER_TEMP/indy-init/tools/r9/r9.fsx" -- install-conditor --lock "$lock" --dir "$RUNNER_TEMP/conditor"
           dotnet fsi "$RUNNER_TEMP/indy-init/tools/r9/r9.fsx" -- workstation --lock "$lock" --conditor "$RUNNER_TEMP/conditor/conditor" --home "$RUNNER_TEMP/echelon" --target-id "ci-${{ github.run_id }}"
           echo "$RUNNER_TEMP/echelon/.local/bin" >> "$GITHUB_PATH"
       - name: Compile the frozen verification plan
         run: |
           src="$RUNNER_TEMP/indy-init"
-          # The package is the one the rehearsal's lock pins (requirementsPackage.path), never a hard-coded version.
-          pkg=$(jq -r .requirementsPackage.path "$src/$(jq -r '.lock // "kickoff/rehearsal-009/toolchain.lock.json"' .echelon/r9-governance.json)")
+          lock="$RUNNER_TEMP/indy-init/$(jq -r '.toolchainLock // .lock // "kickoff/rehearsal-009/toolchain.lock.json"' .echelon/r9-governance.json)"
+          pkg=$(jq -r .requirementsPackage.path "$lock")
           dokimos verification compile --indy-execution-plan "$src/$pkg/verification-execution-plan.json" \
             --indy-verification-plan "$src/requirements-compiled/v4/verification-plan.json" --out "$RUNNER_TEMP/obligations.json"
       - name: Implementation was authorized before it was committed (Praxis ordering; docs/release-gate-repair)
-        run: dotnet fsi "$RUNNER_TEMP/indy-init/tools/r9/r9.fsx" -- check-sequencing --target . --out "$RUNNER_TEMP/sequencing.json"
+        run: |
+          # A lock that pins a scope manifest (Rehearsal 010 on) also requires the committed scope checkpoint with its
+          # scopeSha256 and complete Praxis work-item coverage before implementation.
+          lock="$RUNNER_TEMP/indy-init/$(jq -r '.toolchainLock // .lock // "kickoff/rehearsal-009/toolchain.lock.json"' .echelon/r9-governance.json)"
+          manifest=$(jq -r '.scope.manifest // empty' "$lock")
+          scope=""; [ -n "$manifest" ] && scope="--scope-manifest $RUNNER_TEMP/indy-init/$manifest"
+          dotnet fsi "$RUNNER_TEMP/indy-init/tools/r9/r9.fsx" -- check-sequencing --target . $scope --out "$RUNNER_TEMP/sequencing.json"
       - name: Every suite command of the plan can execute (suite-preflight)
         run: |
           npm ci
@@ -154,7 +161,7 @@ jobs:
         run: |
           # Record-bound obligations are judged by requirements-compiler verify-process with the pinned plan and rules
           # and with attestations this run observes itself; it fails closed while the rules are unpinned.
-          src="$RUNNER_TEMP/indy-init"; lock="$src/$(jq -r '.lock // "kickoff/rehearsal-009/toolchain.lock.json"' .echelon/r9-governance.json)"
+          src="$RUNNER_TEMP/indy-init"; lock="$RUNNER_TEMP/indy-init/$(jq -r '.toolchainLock // .lock // "kickoff/rehearsal-009/toolchain.lock.json"' .echelon/r9-governance.json)"
           rules_sha=$(jq -r '.processEvidence.rulesSha256 // empty' "$lock")
           [[ "$rules_sha" =~ ^[0-9a-f]{64}$ ]] || { echo "::error::process-evidence rules are not pinned by the owner (processEvidence.rulesSha256)"; exit 1; }
           dotnet build "$src/tools/requirements-compiler/src" -c Release
@@ -187,7 +194,7 @@ jobs:
         run: |
           # The manifest is compiled here from the approved catalog in the governed checkout and the candidate's mappings;
           # the candidate's requirement probes run in this job, so this run, not a builder workflow, produces the verdict.
-          src="$RUNNER_TEMP/indy-init"; lock="$src/$(jq -r '.lock // "kickoff/rehearsal-009/toolchain.lock.json"' .echelon/r9-governance.json)"
+          src="$RUNNER_TEMP/indy-init"; lock="$src/$(jq -r '.toolchainLock // .lock // "kickoff/rehearsal-009/toolchain.lock.json"' .echelon/r9-governance.json)"
           contract="$src/$(jq -r '.catalogVerification.contract // "kickoff/rehearsal-010/catalog-verification-contract.json"' "$lock")"
           approved=$(jq -r '.catalogVerification.contractSha256 // ""' "$lock")
           mkdir -p "$RUNNER_TEMP/catalog/observations"
@@ -222,7 +229,7 @@ jobs:
         run: |
           # The journeys and the design contract run from the governed checkout; the candidate cannot edit them. The
           # candidate is built and served locally at its exact SHA and persists to the designated test repository.
-          src="$RUNNER_TEMP/indy-init"; lock="$src/$(jq -r '.lock // "kickoff/rehearsal-009/toolchain.lock.json"' .echelon/r9-governance.json)"
+          src="$RUNNER_TEMP/indy-init"; lock="$src/$(jq -r '.toolchainLock // .lock // "kickoff/rehearsal-009/toolchain.lock.json"' .echelon/r9-governance.json)"
           export CAUSA_TEST_OWNER=$(jq -r '.testRepository.owner // "${{ github.repository_owner }}"' "$lock")
           export CAUSA_TEST_REPO=$(jq -r '.testRepository.repo // "${{ github.event.repository.name }}"' "$lock")
           export CAUSA_TEST_BRANCH=$(jq -r '.testRepository.branch // "causa-acceptance"' "$lock")
@@ -308,7 +315,7 @@ jobs:
         if: always() && inputs.mode == 'release'
         run: |
           src="$RUNNER_TEMP/indy-init"
-          lock="$src/$(jq -r '.lock // "kickoff/rehearsal-009/toolchain.lock.json"' .echelon/r9-governance.json)"
+          lock="$src/$(jq -r '.toolchainLock // .lock // "kickoff/rehearsal-009/toolchain.lock.json"' .echelon/r9-governance.json)"
           bindings="$src/$(jq -r '.journeys.bindings // "verification/journeys/bindings.json"' "$lock")"
           dotnet "${{ steps.catalog.outputs.rc }}" completion-gate --manifest "$src/docs/rehearsal-010-readiness/scope-manifest.json" \
             --coverage "$RUNNER_TEMP/gate/coverage.json" --catalog-verification "$RUNNER_TEMP/catalog/requirement-verification.json" \

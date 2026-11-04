@@ -2,8 +2,8 @@
 ///
 ///   requirements-compiler scope compile --source DIR --package DIR --out FILE
 ///   requirements-compiler scope preflight --source DIR --package DIR --manifest FILE [--praxis-queue FILE] [--out FILE]
-///   requirements-compiler scope checkpoint --source DIR --package DIR --manifest FILE --praxis-queue FILE --at ISO --commit SHA --out FILE
-///   requirements-compiler scope order --repo DIR [--checkpoint PATH]
+///   requirements-compiler scope checkpoint --source DIR --package DIR --manifest FILE (--praxis-queue FILE | --praxis-context FILE)... --at ISO --commit SHA --out FILE
+///   requirements-compiler scope work-plan --manifest FILE --out FILE   (the indy-init.r9-work-plan/1 authorize-implementation reads)
 ///   requirements-compiler progress --manifest FILE --events FILE --out FILE
 ///   requirements-compiler resume --manifest FILE --checkpoint FILE --events FILE --t0 ISO --at ISO [--window-minutes 420]
 ///                         [--stop-decision FILE] --out FILE
@@ -56,7 +56,8 @@ let private preflightAll (o: Map<string, string>) =
     let expected = compile (sourcesOf o["--source"] o["--package"])
     let manifest = parseFile o["--manifest"]
     let refusals = preflight expected manifest
-    let queueRefusals = o.TryFind "--praxis-queue" |> Option.map (fun q -> coverage manifest (parseFile q)) |> Option.defaultValue []
+    let praxis = [ "--praxis-queue"; "--praxis-context" ] |> List.choose o.TryFind |> List.filter File.Exists |> List.map parseFile
+    let queueRefusals = if o.ContainsKey "--praxis-queue" || o.ContainsKey "--praxis-context" then coverage manifest praxis else []
     manifest, refusals @ queueRefusals
 
 let scopeCommand (args: string list) : int =
@@ -79,12 +80,20 @@ let scopeCommand (args: string list) : int =
             finish "scope preflight" refusals
     | "checkpoint" :: rest ->
         let o = options rest
-        if not ([ "--source"; "--package"; "--manifest"; "--praxis-queue"; "--at"; "--commit"; "--out" ] |> List.forall o.ContainsKey) then
+        if not ([ "--source"; "--package"; "--manifest"; "--at"; "--commit"; "--out" ] |> List.forall o.ContainsKey) || not (o.ContainsKey "--praxis-queue" || o.ContainsKey "--praxis-context") then
             eprintfn "usage: scope checkpoint --source DIR --package DIR --manifest FILE --praxis-queue FILE --at ISO --commit SHA --out FILE"; 2
         else
             let manifest, refusals = preflightAll o
             if refusals.IsEmpty then File.WriteAllText(o["--out"], serialize (checkpoint manifest o["--at"] o["--commit"]))
             finish "scope checkpoint" refusals
+    | "work-plan" :: rest ->
+        let o = options rest
+        match o.TryFind "--manifest", o.TryFind "--out" with
+        | Some m, Some out ->
+            File.WriteAllText(out, serialize (workPlan (parseFile m)))
+            printfn "scope work-plan: %s" out
+            0
+        | _ -> eprintfn "usage: scope work-plan --manifest FILE --out FILE"; 2
     | "order" :: rest ->
         let o = options rest
         match o.TryFind "--repo" with
@@ -105,7 +114,7 @@ let scopeCommand (args: string list) : int =
                 let bootstrap = commits |> List.tryFind (fun (_, files) -> List.contains ".echelon/r9-governance.json" files) |> Option.map fst
                 let afterBootstrap = commits |> List.filter (fun (sha, _) -> Some sha <> bootstrap)
                 finish "scope order" (implementationBeforeCheckpoint cp isApplication afterBootstrap)
-    | _ -> eprintfn "usage: scope compile|preflight|checkpoint|order ..."; 2
+    | _ -> eprintfn "usage: scope compile|preflight|checkpoint|work-plan|order ..."; 2
 
 let private eventsOf (path: string) =
     match parseFile path with
