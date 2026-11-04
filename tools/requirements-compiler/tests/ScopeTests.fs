@@ -409,14 +409,16 @@ let v414OwnerRecords (source: string) : string list =
             | Error e -> Error e
         | Ok _ -> Error "the history is shallow"
         | Error e -> Error e
-    let blob (c: string) = git [ "rev-parse"; "--verify"; "--quiet"; c + ":" + approvalsPath ] |> Result.map (text >> fun t -> t.Trim()) |> Result.defaultValue ""
+    // A missing or unreadable blob is never equal to anything: a lookup error refuses (RV414-3-2).
+    let blob (c: string) = git [ "rev-parse"; "--verify"; "--quiet"; c + ":" + approvalsPath ] |> Result.map (text >> fun t -> t.Trim()) |> Result.toOption |> Option.filter ((<>) "")
+    let recordsAt (c: string) = git [ "show"; c + ":" + approvalsPath ] |> Result.map (parseBytes >> arr "approvals")
     // Every commit since the requests that changed the approvals file, merges included. A merge whose approvals file
     // equals one parent's added nothing to it (GitHub's own merges); any other must be the owner's, like a commit.
     let agentCommits =
         match introduced with
         | Error e -> [ e ]
         | Ok since ->
-            match git [ "log"; "--full-history"; "--format=%H%n%P%n%ae%n%ce%n%B%x00"; since + "..HEAD"; "--"; approvalsPath ] with
+            match git [ "log"; "--full-history"; "--format=%H%n%P%n%ae%n%ce%n%B%x00"; since + "^..HEAD"; "--"; approvalsPath ] with
             | Error e -> [ e ]
             | Ok b ->
                 (text b).Split('\000') |> List.ofArray |> List.map (fun m -> m.Trim()) |> List.filter ((<>) "")
@@ -425,16 +427,38 @@ let v414OwnerRecords (source: string) : string list =
                     let item i = Array.tryItem i ls |> Option.defaultValue "?"
                     let parents = item 1 |> fun p -> p.Split(' ', StringSplitOptions.RemoveEmptyEntries) |> List.ofArray
                     let body = m.ToLowerInvariant()
-                    let passThrough = parents.Length > 1 && parents |> List.exists (fun p -> blob p = blob ls[0])
+                    let passThrough = parents.Length > 1 && parents |> List.exists (fun p -> blob p |> Option.isSome && blob p = blob ls[0])
                     let owners = ls.Length >= 4 && ls[2] = owner && ls[3] = owner && not (body.Contains "claude-session:" || body.Contains "co-authored-by: claude" || body.Contains "noreply@anthropic.com")
                     if passThrough || owners then None
                     else Some (sprintf "commit %s (author %s, committer %s)" ls[0] (item 2) (item 3)))
+    // The approvals file is append-only (RV414-3-1): every record in any version of it since the requests (each commit
+    // that changed it, each merge parent, and the version the requests were introduced on) is in HEAD's file
+    // unchanged. A merge resolved to one side, or any rewrite, that drops or edits a record is refused whoever made it.
+    let dropped =
+        match introduced with
+        | Error e -> [ e ]
+        | Ok since ->
+            match lines [ "log"; "--full-history"; "--format=%H %P"; since + "^..HEAD"; "--"; approvalsPath ] with
+            | Error e -> [ e ]
+            | Ok ls ->
+                let versions = since :: (ls |> List.collect (fun l -> l.Split(' ', StringSplitOptions.RemoveEmptyEntries) |> List.ofArray)) |> List.distinct
+                match recordsAt "HEAD" with
+                | Error e -> [ e ]
+                | Ok head ->
+                    versions
+                    |> List.collect (fun c ->
+                        match recordsAt c with
+                        | Error _ when blob c |> Option.isNone -> []   // the file did not exist at c
+                        | Error e -> [ sprintf "%s: %s" c e ]
+                        | Ok rs -> rs |> List.filter (fun r -> not (List.contains r head)) |> List.map (fun r -> sprintf "%s (in %s)" (strOpt "id" r |> Option.defaultValue "?") c))
+                    |> List.distinct
     let proposed =
         introduced
         |> Result.bind (fun c ->
             git [ "show"; c + ":" + amendmentPath ] |> Result.map parseBytes
             |> Result.bind (fun a -> git [ "show"; c + ":" + requestsPath ] |> Result.map (fun r -> a, parseBytes r |> arr "requests")))
     [ for c in agentCommits do yield sprintf "v4.1.4: the approvals file since the v4.1.4 requests is not the owner's alone: %s" c
+      for d in dropped do yield sprintf "v4.1.4: the approvals file is append-only, but a record is missing or changed at HEAD: %s" d
       match proposed with
       | Error e -> yield sprintf "v4.1.4: the proposal the owner was asked about cannot be read: %s" e
       | Ok p ->
