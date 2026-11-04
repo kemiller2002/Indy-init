@@ -1,0 +1,98 @@
+{
+  "schema": "indy-init.v41-conflict-telemetry/1",
+  "description": "Coordination telemetry the event build records, so v4.1's ownership plan can be judged by observation rather than assertion. Textual merge conflicts (git could not merge) are kept apart from semantic integration failures (merged, then a contract or integration test failed). A metric whose source was not recorded is reported as unavailable with the reason; it is never estimated or back-filled.",
+  "unavailablePolicy": {
+    "value": null,
+    "unavailable": true,
+    "reasonRequired": true,
+    "inferenceAllowed": false,
+    "rule": "Record {metric, value: null, unavailable: true, reason}. Never infer a value from other metrics or estimate it."
+  },
+  "metrics": [
+    {
+      "id": "merge-conflicts",
+      "name": "Merge conflicts encountered",
+      "definition": "count of pull requests whose merge reported conflicts",
+      "source": "GitHub pull request mergeable_state history; git merge exit status in the integration agent's log",
+      "kind": "textual"
+    },
+    {
+      "id": "overlapping-files",
+      "name": "Files with overlapping edits",
+      "definition": "files changed by two or more open pull requests at the same time",
+      "source": "GitHub pull request file lists, sampled at each merge",
+      "kind": "textual"
+    },
+    {
+      "id": "conflict-line-ranges",
+      "name": "Conflicting line ranges",
+      "definition": "line ranges git reported as conflicting",
+      "source": "git merge output (conflict markers) where the integration agent records it; otherwise unavailable",
+      "kind": "textual"
+    },
+    {
+      "id": "prs-needing-resolution",
+      "name": "Pull requests requiring conflict resolution",
+      "definition": "count of pull requests that needed a merge commit with a manual resolution",
+      "source": "git log of merge commits with conflict-resolution trailers",
+      "kind": "textual"
+    },
+    {
+      "id": "resolution-time",
+      "name": "Time spent resolving conflicts",
+      "definition": "wall-clock minutes from a conflicting merge attempt to the resolving push",
+      "source": "integration agent's timestamps (date -u) recorded in its checkpoint log; unavailable if not recorded",
+      "kind": "textual"
+    },
+    {
+      "id": "contract-test-failures",
+      "name": "Contract-test failures",
+      "definition": "failed runs of Causa.Contract.Tests per component",
+      "source": "CI test results (TRX/JUnit) for the contract project",
+      "kind": "semantic"
+    },
+    {
+      "id": "integration-test-failures",
+      "name": "Integration-test failures",
+      "definition": "failed integration checkpoint runs (T17, T21, T31)",
+      "source": "CI test results for the integration suites",
+      "kind": "semantic"
+    },
+    {
+      "id": "reverted-integrations",
+      "name": "Reverted integrations",
+      "definition": "merges later reverted",
+      "source": "git log of revert commits on main",
+      "kind": "semantic"
+    },
+    {
+      "id": "multi-agent-files",
+      "name": "Files edited by multiple agents",
+      "definition": "files whose commits carry two or more agent identities",
+      "source": "git log with Work-Item and agent trailers",
+      "kind": "textual"
+    },
+    {
+      "id": "shared-file-modifications",
+      "name": "Shared-file modification frequency",
+      "definition": "commits touching a shared file of project-structure.json, by author",
+      "source": "git log on the shared paths",
+      "kind": "textual"
+    },
+    {
+      "id": "ownership-violations",
+      "name": "Ownership violations",
+      "definition": "commits by a non-owner to an owned file without the owner's approval",
+      "source": "git log joined with agent-file-ownership.json",
+      "kind": "textual"
+    },
+    {
+      "id": "waiting-time",
+      "name": "Time waiting for another agent",
+      "definition": "minutes an agent was blocked on another agent's pull request or contract",
+      "source": "agent checkpoint logs (blocked/unblocked entries with date -u); unavailable if an agent did not record them",
+      "kind": "coordination"
+    }
+  ],
+  "output": "evidence/telemetry/coordination.json in the event repository, written by the coordinator at the deadline and after delivery"
+}

@@ -1,0 +1,287 @@
+{
+  "schema": "indy-init.v411-bootstrap-measurement/1",
+  "description": "Measured duration of the mechanical T0 bootstrap (T10) on fresh empty repositories, with the v4.1.1 sequence: Conditor first, then the generator layered onto it. Wall-clock seconds on one host, each step timed separately. The steps a script cannot run without creating a real GitHub repository are not measured and are listed under notMeasured with the estimate the plan uses for them.",
+  "date": "2026-11-01",
+  "environment": {
+    "os": "Ubuntu 24.04.5 LTS (cloud container)",
+    "cpus": 4,
+    "dotnetSdk": "10.0.402",
+    "nugetCache": "warm in every run",
+    "network": "github.com reachable through the session proxy; no credential set (GH_TOKEN, GITHUB_TOKEN and CONDITOR_GITHUB_TOKEN unset)"
+  },
+  "tools": {
+    "source": "the release binaries the Registry set echelon-current pins for linux-x64 (channels/echelon-current/linux-x64.json), downloaded from their GitHub releases and checked against the pinned SHA-256; Conditor from its v0.10.18 release, checked against its checksums.txt",
+    "conditor": "0.10.18, conditor-linux-x64 sha256 298f5df4973bc08c6fd15688ca64256afca218ad1af057406439c883d9eecc03",
+    "praxis": "3.24.0, praxis-linux-x64.tar.gz sha256 95f2455cd0afeb9b58db47447ff3588f7e2ad864c9ac8be8ba29077dc742f26c",
+    "ordo": "1.19.0, ordo-linux-x64.tar.gz sha256 2898e8541a2bc2836f3e1efee108f2b05594118b9ca1ecf4464a452c33aa4a36",
+    "percepta-repo": "0.1.0, percepta-repo-linux-x64 sha256 e46113aa08c9d2a97dfb1f75ca65c986946e1601c5f2c5cdcc9e8c25841d6039",
+    "generator": "requirements-compiler v41 of this change, with --package requirements-compiled/v4.1.1"
+  },
+  "crossCheck": "The same sequence, run with Praxis, Ordo and percepta-repo built from their release tags and Conditor from its source at 2d6ae48, took 71.8 s, 32.3 s and 75.9 s, with every step passing.",
+  "steps": [
+    {
+      "name": "1-git-init",
+      "command": "git init -b main"
+    },
+    {
+      "name": "2-conditor-init",
+      "command": "conditor init --preset indy-init --target ."
+    },
+    {
+      "name": "3-v411-bootstrap",
+      "command": "dotnet requirements-compiler.dll v41 --source INDY-INIT --package INDY-INIT/requirements-compiled/v4.1.1 --base INDY-INIT/requirements-compiled/v4 --check --bootstrap . | grep '^bootstrap:'"
+    },
+    {
+      "name": "4-build-Causa",
+      "command": "dotnet build Causa.slnx"
+    },
+    {
+      "name": "4-build-App",
+      "command": "dotnet build App.slnx"
+    },
+    {
+      "name": "5-ci-policy",
+      "command": "conditor ci-policy check --target ."
+    },
+    {
+      "name": "6-verify",
+      "command": "conditor verify --target ."
+    },
+    {
+      "name": "7-commit",
+      "command": "git add -A && git -c user.name=t0 -c user.email=t0@example.invalid -c commit.gpgsign=false commit -q -m 'T0 bootstrap' && git ls-files | wc -l"
+    }
+  ],
+  "runs": [
+    {
+      "id": "R1",
+      "cache": "cold Conditor cache",
+      "totalSeconds": 77,
+      "steps": [
+        {
+          "name": "1-git-init",
+          "seconds": 0.01,
+          "exit": 0
+        },
+        {
+          "name": "2-conditor-init",
+          "seconds": 46.76,
+          "exit": 0
+        },
+        {
+          "name": "3-v411-bootstrap",
+          "seconds": 0.82,
+          "exit": 0
+        },
+        {
+          "name": "4-build-Causa",
+          "seconds": 21.04,
+          "exit": 0
+        },
+        {
+          "name": "4-build-App",
+          "seconds": 6.74,
+          "exit": 0
+        },
+        {
+          "name": "5-ci-policy",
+          "seconds": 0.16,
+          "exit": 0
+        },
+        {
+          "name": "6-verify",
+          "seconds": 1.32,
+          "exit": 0
+        },
+        {
+          "name": "7-commit",
+          "seconds": 0.11,
+          "exit": 0
+        }
+      ]
+    },
+    {
+      "id": "R2",
+      "cache": "warm Conditor cache (same cache as R1)",
+      "totalSeconds": 31.8,
+      "steps": [
+        {
+          "name": "1-git-init",
+          "seconds": 0.01,
+          "exit": 0
+        },
+        {
+          "name": "2-conditor-init",
+          "seconds": 5.19,
+          "exit": 0
+        },
+        {
+          "name": "3-v411-bootstrap",
+          "seconds": 1.1,
+          "exit": 0
+        },
+        {
+          "name": "4-build-Causa",
+          "seconds": 17.82,
+          "exit": 0
+        },
+        {
+          "name": "4-build-App",
+          "seconds": 6.13,
+          "exit": 0
+        },
+        {
+          "name": "5-ci-policy",
+          "seconds": 0.17,
+          "exit": 0
+        },
+        {
+          "name": "6-verify",
+          "seconds": 1.23,
+          "exit": 0
+        },
+        {
+          "name": "7-commit",
+          "seconds": 0.11,
+          "exit": 0
+        }
+      ]
+    },
+    {
+      "id": "R3",
+      "cache": "cold Conditor cache",
+      "totalSeconds": 76.4,
+      "steps": [
+        {
+          "name": "1-git-init",
+          "seconds": 0.01,
+          "exit": 0
+        },
+        {
+          "name": "2-conditor-init",
+          "seconds": 45.82,
+          "exit": 0
+        },
+        {
+          "name": "3-v411-bootstrap",
+          "seconds": 0.86,
+          "exit": 0
+        },
+        {
+          "name": "4-build-Causa",
+          "seconds": 20.57,
+          "exit": 0
+        },
+        {
+          "name": "4-build-App",
+          "seconds": 7.57,
+          "exit": 0
+        },
+        {
+          "name": "5-ci-policy",
+          "seconds": 0.13,
+          "exit": 0
+        },
+        {
+          "name": "6-verify",
+          "seconds": 1.35,
+          "exit": 0
+        },
+        {
+          "name": "7-commit",
+          "seconds": 0.12,
+          "exit": 0
+        }
+      ]
+    }
+  ],
+  "results": {
+    "causaSlnxBuilds": "3 of 3 runs",
+    "appSlnxBuilds": "3 of 3 runs",
+    "ciPolicyCheck": "pass in 3 of 3 runs",
+    "conditorVerify": "pass in 3 of 3 runs",
+    "generatorFiles": 178,
+    "filesMergedOntoConditor": [
+      "package.json (owner locks over Conditor pins; Conditor's name, type, scripts and dependencies kept)",
+      ".gitignore (generator lines appended after Conditor's regions)"
+    ],
+    "filesKept": [
+      "Directory.Build.props (Conditor's already sets every property the generator sets)"
+    ]
+  },
+  "earlierFinding": "An earlier measurement copied the v4.1 generator output over Conditor's repository. App.slnx then failed in 3 of 3 runs: NU1008 under the unconditional central package management, then NETSDK1013 with Conditor's Directory.Build.props overwritten. v4.1.1 fixes both: it layers instead of overwriting, and central package management applies only to Causa.* projects.",
+  "notMeasured": [
+    {
+      "component": "conditor repo create (publish, protect, GitHub Pages) and the first push",
+      "estimateMinutes": 2,
+      "reason": "needs a real GitHub repository; not created from this session"
+    },
+    {
+      "component": "integration writes its remaining shared files: CI for Causa.slnx, playwright.config.ts, build.fsx, package-lock.json (npm install), web/boundary.js and the web entrypoint shells",
+      "estimateMinutes": 15,
+      "reason": "agent authoring, not a scripted step"
+    },
+    {
+      "component": "first green CI on GitHub Actions",
+      "estimateMinutes": 10,
+      "reason": "needs a real GitHub repository and runner; GitHub Actions timings are not measured here"
+    }
+  ],
+  "t10": {
+    "measuredMinutes": 2,
+    "measuredBasis": "the slowest run, rounded up to whole minutes (R1-R3 at most 77 s; the script reproduction 83 s)",
+    "estimatedMinutes": 27,
+    "totalMinutes": 29,
+    "note": "The plan uses 29 minutes: 2 minutes measured and 27 minutes estimated. The estimated part is larger than the measured part, and the sensitivity scenarios in schedule.json cover it overrunning."
+  },
+  "provenance": "The three recorded runs (R1-R3) used an earlier shell runner that is not committed (this repository is F#-only, OD-INDY-14). tools/measure-t0-bootstrap.fsx was written afterwards to reproduce them with the same steps; its run is under reproduction.",
+  "reproduction": {
+    "script": "tools/measure-t0-bootstrap.fsx",
+    "cache": "cold Conditor cache, warm NuGet cache",
+    "tools": "the same Registry-pinned release binaries",
+    "totalSeconds": 83.0,
+    "steps": [
+      {
+        "name": "1-git-init",
+        "seconds": 0.01,
+        "exit": 0
+      },
+      {
+        "name": "2-conditor-init",
+        "seconds": 48.40,
+        "exit": 0
+      },
+      {
+        "name": "3-v411-bootstrap",
+        "seconds": 1.27,
+        "exit": 0
+      },
+      {
+        "name": "4-build-Causa",
+        "seconds": 22.67,
+        "exit": 0
+      },
+      {
+        "name": "4-build-App",
+        "seconds": 8.49,
+        "exit": 0
+      },
+      {
+        "name": "5-ci-policy",
+        "seconds": 0.19,
+        "exit": 0
+      },
+      {
+        "name": "6-verify",
+        "seconds": 1.88,
+        "exit": 0
+      },
+      {
+        "name": "7-commit",
+        "seconds": 0.11,
+        "exit": 0
+      }
+    ],
+    "note": "Every step passed; 83 s still rounds up to 2 minutes."
+  }
+}

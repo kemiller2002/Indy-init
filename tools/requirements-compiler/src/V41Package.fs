@@ -497,6 +497,46 @@ let suites : Suite list =
       { Id = "SU-REVIEW-RECORDS"; Runner = "Praxis work evidence --kind independent-review / owner-approval"; Environment = "process"; Fixture = "the run's Praxis event log"; Scope = PerSuite; DependsOn = [ "SU-VERIFIER" ]; Producer = "independent reviewer and owner records"; Plan = true; Matches = fun t -> t = "praxis:independent-review" || t = "praxis:owner-approval" }
       { Id = "SU-PROCESS-RECORDS"; Runner = "Praxis work event log, checked by verify-process"; Environment = "process"; Fixture = "the run's Praxis event log"; Scope = PerSuite; DependsOn = []; Producer = "Praxis work event log"; Plan = true; Matches = fun t -> starts "praxis:" t && t <> "praxis:independent-review" && t <> "praxis:owner-approval" } ]
 
+/// The positional arguments of a `dotnet test` runner (the projects or solutions it names), up to the first option.
+/// The .NET 10 SDK refuses more than one (MSB1008), so a runner naming two never executes (Rehearsal 009).
+let dotnetTestTargets (runner: string) : string list option =
+    let words = runner.Split([| ' ' |], StringSplitOptions.RemoveEmptyEntries) |> List.ofArray
+    match words with
+    | "dotnet" :: "test" :: rest -> Some(rest |> List.takeWhile (fun w -> not (w.StartsWith("-", StringComparison.Ordinal))))
+    | _ -> None
+
+/// Runner replacement and X21 apply from package 4.1.3; v4.1.1 and v4.1.2 compile byte for byte as approved.
+let runnersAmendable (i: Inputs) =
+    let parts = (packageVersion i).Split('.') |> Array.map (fun x -> match Int32.TryParse x with | true, n -> n | _ -> -1) |> List.ofArray
+    i.Amendment.IsSome && compare parts [ 4; 1; 3 ] >= 0
+
+/// The plan suites of a package: v4.1's, with the runner commands a successor amendment replaces (`suiteRunners`,
+/// v4.1.3 and later), each under its owner decision. Identities, environments and assignment rules never change.
+let suitesOf (i: Inputs) : Suite list =
+    let replaced =
+        if runnersAmendable i then amendmentList "suiteRunners" i |> List.map (fun r -> sOr "suite" r, sOr "runner" r) |> Map.ofList
+        else Map.empty
+    suites |> List.map (fun s -> match replaced.TryFind s.Id with Some r -> { s with Runner = r } | None -> s)
+
+/// X21: every replaced runner names an existing suite and an owner decision, keeps the runner kind, and a `dotnet test`
+/// runner (replaced or carried) names exactly one project or solution.
+let suiteRunnerCheck (i: Inputs) : Check =
+    let known = suites |> List.map (fun s -> s.Id) |> Set.ofList
+    let byId = suites |> List.map (fun s -> s.Id, s) |> Map.ofList
+    check "X21" "Every suite runner can execute: a replaced runner names an existing suite, its owner decision and the same runner kind, and every `dotnet test` runner names exactly one project or solution (MSB1008)"
+        [ for r in amendmentList "suiteRunners" i do
+              let id = sOr "suite" r
+              if not (known.Contains id) then yield sprintf "suiteRunners: %s is not a suite of the plan" id
+              if String.IsNullOrWhiteSpace (sOr "decision" r) then yield sprintf "suiteRunners: %s names no owner decision" id
+              match byId.TryFind id with
+              | Some s when (dotnetTestTargets s.Runner).IsSome <> (dotnetTestTargets (sOr "runner" r)).IsSome -> yield sprintf "suiteRunners: %s changes the runner kind" id
+              | _ -> ()
+          if runnersAmendable i then
+              for s in suitesOf i do
+                  match dotnetTestTargets s.Runner with
+                  | Some targets when targets.Length <> 1 -> yield sprintf "%s: `dotnet test` names %d projects or solutions (%s); the SDK accepts exactly one" s.Id targets.Length (String.concat ", " targets)
+                  | _ -> () ]
+
 let suiteOf (plan: bool) (test: string) = suites |> List.filter (fun s -> s.Plan = plan && s.Matches test)
 
 /// The number of fixture set-ups a suite performs, by its scope: test classes (the id without its last segment),
@@ -509,6 +549,7 @@ let private fixtureInstances (s: Suite) (tests: string list) =
     | PerClass -> tests |> List.map (fun t -> let k = t.LastIndexOf '.' in if k > 0 then t.Substring(0, k) else t) |> List.distinct |> List.length
 
 let verificationExecutionPlan (i: Inputs) : Json * string list =
+    let suites = suitesOf i
     let bound = boundTests i.Plan
     let own = namedTests i |> List.map (fun (t, _, _) -> t) |> List.distinct
     let problems =
@@ -1942,6 +1983,7 @@ let build (i: Inputs) : Built =
               entrypointCheck i files
               bootstrapCheck i
               amendmentRecordCheck i ]
+            @ (if runnersAmendable i then [ suiteRunnerCheck i ] else [])
     let json (n: string) (j: Json) = n, serialize j
     { Files =
         [ json "agent-file-ownership.json" (ownershipJson i files)

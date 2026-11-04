@@ -1,0 +1,70 @@
+{
+  "schema": "indy-init.r9-suite-preflight/1",
+  "verdict": "PASS",
+  "suites": [
+    {
+      "id": "SU-OWN-DOTNET",
+      "command": "dotnet test Causa.slnx --filter \u0022FullyQualifiedName~Causa.Contract.Tests.|FullyQualifiedName~Causa.Domain.Tests.|FullyQualifiedName~Causa.Persistence.Tests.|FullyQualifiedName~Causa.App.Tests.\u0022 --list-tests",
+      "exit": 0,
+      "listedTests": 4,
+      "cause": null,
+      "outputTail": "-567e-abcc-43413449cb8d/scratchpad/fx/tests/Causa.Acceptance/bin/Debug/net10.0/Causa.Acceptance.dll\n    Causa.Domain.Tests.Fixture.FixtureTests.suite command executes\n    Causa.App.Tests.Fixture.FixtureTests.suite command executes\n    Causa.Contract.Tests.Fixture.FixtureTests.suite command executes\n  Causa.Invariants -\u003E <fixture>/tests/Causa.Invariants/bin/Debug/net10.0/Causa.Invariants.dll\nTest run for <fixture>/tests/Causa.Invariants/bin/Debug/net10.0/Causa.Invariants.dll (.NETCoreApp,Version=v10.0)\n  Causa.Persistence.Tests -\u003E <fixture>/tests/Causa.Persistence.Tests/bin/Debug/net10.0/Causa.Persistence.Tests.dll\nThe following Tests are available:\nTest run for <fixture>/tests/Causa.Persistence.Tests/bin/Debug/net10.0/Causa.Persistence.Tests.dll (.NETCoreApp,Version=v10.0)\nThe following Tests are available:\nNo test matches the given testcase filter \u0060FullyQualifiedName~Causa.Contract.Tests.|FullyQualifiedName~Causa.Domain.Tests.|FullyQualifiedName~Causa.Persistence.Tests.|FullyQualifiedName~Causa.App.Tests.\u0060 in <fixture>/tests/Causa.Invariants/bin/Debug/net10.0/Causa.Invariants.dll\n    Causa.Persistence.Tests.Fixture.FixtureTests.suite command executes\n"
+    },
+    {
+      "id": "SU-OWN-BROWSER",
+      "command": "npx playwright test --project=chromium tests/browser/contract --list --pass-with-no-tests",
+      "exit": 0,
+      "listedTests": 1,
+      "cause": null,
+      "outputTail": "Listing tests:\n  [chromium] \u203A contract/fixture.spec.mjs:3:1 \u203A contract: suite command executes\nTotal: 1 test in 1 file\n"
+    },
+    {
+      "id": "SU-DOTNET-DETERMINISTIC",
+      "command": "dotnet test tests/Causa.Acceptance --filter FullyQualifiedName~Causa.Acceptance.Deterministic. --list-tests",
+      "exit": 0,
+      "listedTests": 1,
+      "cause": null,
+      "outputTail": "  Determining projects to restore...\n  All projects are up-to-date for restore.\n  Causa.Acceptance -\u003E <fixture>/tests/Causa.Acceptance/bin/Debug/net10.0/Causa.Acceptance.dll\nTest run for <fixture>/tests/Causa.Acceptance/bin/Debug/net10.0/Causa.Acceptance.dll (.NETCoreApp,Version=v10.0)\nThe following Tests are available:\n    Causa.Acceptance.Deterministic.Fixture.FixtureTests.suite command executes\n"
+    },
+    {
+      "id": "SU-DOTNET-INVARIANTS",
+      "command": "dotnet test tests/Causa.Invariants --filter \u0022FullyQualifiedName~Causa.Invariants.\u0026FullyQualifiedName!~Causa.Invariants.Live.\u0022 --list-tests",
+      "exit": 0,
+      "listedTests": 1,
+      "cause": null,
+      "outputTail": "  Determining projects to restore...\n  All projects are up-to-date for restore.\n  Causa.Invariants -\u003E <fixture>/tests/Causa.Invariants/bin/Debug/net10.0/Causa.Invariants.dll\nTest run for <fixture>/tests/Causa.Invariants/bin/Debug/net10.0/Causa.Invariants.dll (.NETCoreApp,Version=v10.0)\nThe following Tests are available:\n    Causa.Invariants.Model.Fixture.FixtureTests.suite command executes\n"
+    },
+    {
+      "id": "SU-BROWSER-CHROMIUM",
+      "command": "npx playwright test --project=chromium tests/browser/acceptance tests/browser/invariants --list --pass-with-no-tests",
+      "exit": 0,
+      "listedTests": 2,
+      "cause": null,
+      "outputTail": "Listing tests:\n  [chromium] \u203A acceptance/fixture.spec.mjs:3:1 \u203A acceptance: suite command executes\n  [chromium] \u203A invariants/fixture.spec.mjs:3:1 \u203A invariants: suite command executes\nTotal: 2 tests in 2 files\n"
+    },
+    {
+      "id": "SU-BROWSER-WEBKIT",
+      "command": "npx playwright test --project=webkit tests/browser/acceptance tests/browser/invariants --list --pass-with-no-tests",
+      "exit": 0,
+      "listedTests": 2,
+      "cause": null,
+      "outputTail": "Listing tests:\n  [webkit] \u203A acceptance/fixture.spec.mjs:3:1 \u203A acceptance: suite command executes\n  [webkit] \u203A invariants/fixture.spec.mjs:3:1 \u203A invariants: suite command executes\nTotal: 2 tests in 2 files\n"
+    },
+    {
+      "id": "SU-DOTNET-LIVE",
+      "command": "dotnet test Causa.slnx --filter \u0022FullyQualifiedName~Causa.Acceptance.Live.|FullyQualifiedName~Causa.Invariants.Live.\u0022 --list-tests",
+      "exit": 0,
+      "listedTests": 2,
+      "cause": null,
+      "outputTail": "/Causa.App.Tests.dll\nNo test matches the given testcase filter \u0060FullyQualifiedName~Causa.Acceptance.Live.|FullyQualifiedName~Causa.Invariants.Live.\u0060 in <fixture>/tests/Causa.Domain.Tests/bin/Debug/net10.0/Causa.Domain.Tests.dll\n    Causa.Acceptance.Live.Fixture.FixtureTests.suite command executes\n  Causa.Invariants -\u003E <fixture>/tests/Causa.Invariants/bin/Debug/net10.0/Causa.Invariants.dll\nTest run for <fixture>/tests/Causa.Invariants/bin/Debug/net10.0/Causa.Invariants.dll (.NETCoreApp,Version=v10.0)\n  Causa.Persistence.Tests -\u003E <fixture>/tests/Causa.Persistence.Tests/bin/Debug/net10.0/Causa.Persistence.Tests.dll\nTest run for <fixture>/tests/Causa.Persistence.Tests/bin/Debug/net10.0/Causa.Persistence.Tests.dll (.NETCoreApp,Version=v10.0)\nThe following Tests are available:\nThe following Tests are available:\nNo test matches the given testcase filter \u0060FullyQualifiedName~Causa.Acceptance.Live.|FullyQualifiedName~Causa.Invariants.Live.\u0060 in <fixture>/tests/Causa.Persistence.Tests/bin/Debug/net10.0/Causa.Persistence.Tests.dll\n    Causa.Invariants.Live.Fixture.FixtureTests.suite command executes\n"
+    },
+    {
+      "id": "SU-BROWSER-LIVE",
+      "command": "npx playwright test --project=chromium tests/browser/live --list --pass-with-no-tests",
+      "exit": 0,
+      "listedTests": 1,
+      "cause": null,
+      "outputTail": "Listing tests:\n  [chromium] \u203A live/fixture.spec.mjs:3:1 \u203A live: suite command executes\nTotal: 1 test in 1 file\n"
+    }
+  ]
+}
