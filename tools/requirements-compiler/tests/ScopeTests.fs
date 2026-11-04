@@ -328,6 +328,50 @@ let suiteRunners (source: string) : string list =
       // v4.1.2 is frozen: it compiles without X21, byte for byte as approved (the committed-package check covers the bytes).
       if not (x21 (inputs "v4.1.2")).IsEmpty then yield "X21: the frozen v4.1.2 gained a check" ]
 
+/// The owner's record against v4.1.4's corrected runners (RDP-003, FREEZE.md step 2): each runner names its decision and
+/// the operator approval whose latest record of that decision selects option A, the decision applies to exactly the
+/// runners that cite it, every v4.1.4 decision request with runners is recorded, and no agent commit changed the
+/// approvals file since the v4.1.4 requests were introduced.
+let v414OwnerRecords (source: string) : string list =
+    let approvalsPath = "kickoff/rehearsal-007/approvals.causa.json"
+    let approvals = parseFile (Path.Combine(source, approvalsPath)) |> arr "approvals"
+    let amendment = parseFile (Path.Combine(source, "requirements-compiled", "v4.1.4", "analysis", "amendment.json"))
+    let requests = parseFile (Path.Combine(source, "requirements-compiled", "v4.1.4", "proposals", "owner-decision-requests.json")) |> arr "requests"
+    let operator (a: Json) = (field "authority" a |> Option.bind (strOpt "kind")) = Some "operator"
+    let latest (decision: string) =
+        approvals |> List.filter operator
+        |> List.filter (fun a -> arr "changes" a |> List.exists (fun c -> strOpt "decision_id" c = Some decision))
+        |> List.tryLast
+    let runners = arr "suiteRunners" amendment
+    let applied (decision: string) =
+        requests |> List.tryFind (fun r -> str "id" r = decision) |> Option.bind (field "applies") |> Option.map (strs "suiteRunners") |> Option.defaultValue []
+    let since =
+        match Git.run source [ "log"; "--diff-filter=A"; "--format=%H"; "--"; "requirements-compiled/v4.1.4/proposals/owner-decision-requests.json" ] with
+        | Ok b -> (System.Text.Encoding.UTF8.GetString b).Trim().Split('\n') |> Array.last
+        | Error _ -> ""
+    let bodies =
+        if since = "" then [ "not found" ]
+        else
+            match Git.run source [ "log"; "--format=%ae%n%B%x00"; since + "..HEAD"; "--"; approvalsPath ] with
+            | Ok b -> (System.Text.Encoding.UTF8.GetString b).Split('\000') |> List.ofArray
+            | Error e -> [ e ]
+    [ if bodies |> List.exists (fun m -> m.Contains "Claude-Session:" || m.Contains "Co-Authored-By: Claude" || m.Contains "noreply@anthropic.com" || m.Contains "not found") then
+          yield "v4.1.4: an agent commit changed the approvals file after the v4.1.4 requests were introduced"
+      for r in runners do
+          let suite, decision, approval = str "suite" r, str "decision" r, (strOpt "approval" r |> Option.defaultValue "")
+          match latest decision with
+          | None -> yield sprintf "v4.1.4: %s's runner applies %s, which the owner has not recorded" suite decision
+          | Some a when str "id" a <> approval -> yield sprintf "v4.1.4: %s's runner names %s, but the owner's latest record of %s is %s" suite approval decision (str "id" a)
+          | Some a ->
+              match arr "changes" a |> List.tryFind (fun c -> strOpt "decision_id" c = Some decision) |> Option.bind (strOpt "option") with
+              | Some "A" -> ()
+              | other -> yield sprintf "v4.1.4: %s records option %A of %s; the runners are option A's" approval other decision
+          if not (List.contains suite (applied decision)) then yield sprintf "v4.1.4: %s does not apply to %s" decision suite
+      for r in requests do
+          let suites = strs "suiteRunners" (field "applies" r |> Option.defaultValue (JObj []))
+          let cited = runners |> List.filter (fun x -> str "decision" x = str "id" r) |> List.map (str "suite")
+          if Set.ofList suites <> Set.ofList cited then yield sprintf "v4.1.4: %s applies %A, but the runners citing it are %A" (str "id" r) suites cited ]
+
 /// The committed v4.1.4 package is what the compiler produces from its inputs (`v41 --check`).
 let committedPackage (source: string) : string list =
     let code =
@@ -365,4 +409,4 @@ let reconciliation (source: string) : string list =
 
 let all (source: string) : string list =
     let guard name f = try f () with ex -> [ sprintf "%s threw: %s" name ex.Message ]
-    guard "adversarial" adversarial @ guard "legitimate" legitimate @ guard "recovery" recovery @ guard "real" (fun () -> real source) @ guard "suite runners" (fun () -> suiteRunners source) @ guard "v4.1.4 package" (fun () -> committedPackage source) @ guard "reconciliation" (fun () -> reconciliation source)
+    guard "adversarial" adversarial @ guard "legitimate" legitimate @ guard "recovery" recovery @ guard "real" (fun () -> real source) @ guard "suite runners" (fun () -> suiteRunners source) @ guard "v4.1.4 owner records" (fun () -> v414OwnerRecords source) @ guard "v4.1.4 package" (fun () -> committedPackage source) @ guard "reconciliation" (fun () -> reconciliation source)

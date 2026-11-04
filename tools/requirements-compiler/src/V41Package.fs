@@ -1450,6 +1450,8 @@ let runnerCheck (i: Inputs) : Check =
               let suite, decision = field' "suite", field' "decision"
               if not (suites |> List.exists (fun s -> s.Id = suite)) then yield sprintf "suiteRunners names %s, which is not a suite" suite
               if decision = "" then yield sprintf "the corrected runner of %s names no decision" suite
+              // A corrected runner applies an owner decision: once recorded, it names the operator approval (FREEZE.md step 2).
+              if field' "approval" = "" then yield sprintf "the corrected runner of %s names no operator approval" suite
               elif not (i.AuthoredText |> List.exists (fun (n, t) -> n = "proposals/owner-decision-requests.json" && t.Contains(sprintf "\"%s\"" decision))) then
                   yield sprintf "the corrected runner of %s names %s, which proposals/owner-decision-requests.json does not request" suite decision
           for s in suites do

@@ -27,7 +27,7 @@
 | requirements | 199 | 199 | 199 | **205** |
 | obligations | 863 | 863 | 863 | **890** |
 | work items | 35 | 36 | 36 | **37** |
-| scopeSha256 | `b407b5cc…` | `fefde8a1…` | `5a8aef29…` | computed after ratification |
+| scopeSha256 | `b407b5cc…` | `fefde8a1…` | `d4adb980…` (after FREEZE step 2; `5a8aef29…` before) | computed after ratification |
 
 **Why the numbers differ:**
 - `main` added `WI-GEN-RECORDS`, which gives the 16 record-only AR requirements a work item. That makes 36 work items.
@@ -70,7 +70,7 @@
 | `verification/journeys/bindings.json` | `cd68237205ff8f56503c46bdb6dc925085a3b07c9306ab6f9979f2b17b9754dd` |
 | `kickoff/rehearsal-010/process-evidence-rules.json` | `36172c57721419714a414334cd65a1548da5c0bc6318f55f73b77a207546344d` |
 | `docs/rehearsal-010-readiness/proposals/causa-investigation.requirement-catalog.successor.proposed.json` | `b4bd432fdcbc673718e3df752a403ca2605a72bb0497a06a5aa05086b605d6e9` |
-| `requirements-compiled/v4.1.4/package-manifest.json` (before step 3 recompiles it) | `af0132f62039bf814a98cf3a3c2b60d939eea1ce3791e6ee45a202bb9210540f` |
+| `requirements-compiled/v4.1.4/package-manifest.json` (FREEZE step 2, compiled with APR-V414-OWNER-1; `af0132f6…` before) | `cd999924cc1f5c35da73a95cfb715fc5318bd058fb08a480683d6bd4f3b2ba8b` |
 
 `git show origin/main:<path> | sha256sum` reproduces each digest.
 
