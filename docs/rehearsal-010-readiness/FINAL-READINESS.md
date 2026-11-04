@@ -1,165 +1,163 @@
 # Rehearsal 010 final readiness
 
-## Decision: READY FOR OWNER APPROVAL
+## Decision: READY FOR OWNER ACTION
 
-The engineering work is done, verified and independently reviewed:
-- no blocking review finding is open;
-- local verification passes;
-- CI passes on the integrated head.
+Engineering is complete and verified:
+- the integration with `main` (#102);
+- the governed gates;
+- the owner tooling;
+- the isolated live credential;
+- the launch preflight and its negative controls;
+- the schedule analysis.
 
-**Rehearsal 010 is not READY TO LAUNCH.** Owner actions are still outstanding (§8): package freeze, Dokimos release, scope approval, contract approvals, lock adoption and merges. No agent can perform them (RDP-003). Rehearsal 010 was not started and its clock was not consumed.
+The remaining conditions are owner actions, set out as one ordered transaction in [OWNER-APPROVAL-EXECUTION.md](OWNER-APPROVAL-EXECUTION.md). They are:
+- the package freeze and tag;
+- the Dokimos release and the registry set;
+- the test repository and its App;
+- the decisions;
+- the catalog ratification;
+- the scope approval;
+- the lock.
+
+**It is not READY TO LAUNCH.** Owner actions are outstanding, and the required real-provider test has not run. Rehearsal 010 has not been started; no T0 exists.
+
+**The launch preflight** (`tools/r10/launch-preflight.fsx`) decides launch. Today it refuses, and only for owner actions: [`evidence/launch-preflight/launch-preflight-now.log`](evidence/launch-preflight/launch-preflight-now.log). Its 14 negative controls pass.
 
 ## 1. Integrated result
 
 | Item | Value |
 |---|---|
-| Repository and branch | kemiller2002/Indy-init `claude/rehearsal-010-integration` |
-| Pull request | **#104** (draft): integrates #101 and #102 on `main` `8672bc1` |
-| Integrated head | **`6e43b7a`** (every result below is for this commit) |
-| Successor package | `requirements-compiled/v4.1.4` (#101's; v4.1.3 removed). Validation PASS, status CANDIDATE, X01–X21 PASS |
-| Scope | `scope-manifest.json`, scopeSha256 `b407b5cc5f200e3651088440c0db630f18e84357c933020970f236f18f9352d6` |
-| Proposed lock | `kickoff/rehearsal-010/toolchain.lock.proposed.json`, regenerated at `6e43b7a`; its digests match the contract files |
+| Branch and PR | kemiller2002/Indy-init `claude/rehearsal-010-integration`, **#104** (draft) |
+| Integrated head | **`{HEAD}`**. Every result below is for this commit |
+| Base | `main` `cae4102`, the merge of #102. #104 merges it (`cadf4e4`) |
+| Successor package | `requirements-compiled/v4.1.4` (CANDIDATE; X01–X21 PASS); package-manifest `af0132f6…` |
+| Scope (as compiled now) | `5a8aef29cb2dff62d8ee60b7162e7df226bb42818ffb87f7f827fdcb443d9095`. **Not the approval digest**: it changes when v4.1.4 is frozen and if the successor is ratified (§2) |
+| Proposed lock | `kickoff/rehearsal-010/toolchain.lock.proposed.json`; every digest matches its file |
+
+**What the merge with `main` changed** (details in OWNER-APPROVAL-EXECUTION §0):
+- **Taken from `main`:** #102's work item `WI-GEN-RECORDS`, which gives the 16 record-only requirements a work item (36 work items); `scope work-plan`; `--plan` suite sources; the obligation-inventory reconciliation; INTEGRATION-REPORT.md.
+- **`check-sequencing` combines both sides.** #102's rule: authorization runs from the later of the two checkpoints, with `--scope-manifest` coverage. #101's review fixes, which `main` lacked: every commit is judged by ancestry, and merges with `--cc`.
+- **#104's FREEZE.md step 2 is kept.** Approval IDs go beside `suiteRunners`, which X21 reads.
 
 **Other pull requests**
 
-| PR | State | Purpose |
+| PR | State | Note |
 |---|---|---|
-| kemiller2002/Indy-init#101 | open | Superseded by #104: v4.1.4, suite repair, scope checkpoint. Close after #104 merges (ODR-R10-16) |
-| kemiller2002/Indy-init#102 | open | Superseded by #104: zero-test refusal, fixture, scope, Continuation. Close after #104 merges |
-| kemiller2002/dokimos#69 | draft, CI green | Release 0.11.1, carrying url-input (#67). Dokimos #68 was a duplicate of #67 and is closed unmerged; nothing is lost (INTEGRATION-BASELINE) |
-| kemiller2002/specula#11 | draft, CI green | Observer-findings adapter (CAP-016), read-only |
+| Indy-init #102 | **merged** (`cae4102`) | carried #101 as of `0d816e3` |
+| Indy-init #101 | open | superseded: #104 carries its review fixes (`7fefd7b`). Close after #104 merges |
+| kemiller2002/dokimos#69 | draft, CI green | Dokimos 0.11.1; only a version bump and Praxis records, on #67's merge `9370202`; release by tag `dokimos-v0.11.1` (with checksums and provenance attestations) |
+| kemiller2002/specula#11 | draft, CI green | read-only `ObserverFindings` adapter (CAP-016); 6 of 6 tests pass on the current observer output |
 
 ## 2. Scope counts
 
-**Requirements**
-- 199 requirements, 194 of them mandatory;
-- 863 obligations: 791 executable and 72 record;
-- 161 P0 requirements of the frozen plan (613 obligations);
-- the 38 of catalog CAT-CAUSA-INVESTIGATION (250 obligations);
-- 0 excluded.
+| | Now (successor deferred) | If ODR-R10-02 = A (successor ratified) | Mission expectation |
+|---|---|---|---|
+| Requirements | 199 (194 mandatory) | 205 (200 mandatory) | 199 |
+| Obligations | 863 (791 executable, 72 record) | 890 | 863 |
+| Work items | 36 | 37 | 35 |
+| Exclusions | 0 | 0 | 0 |
 
-**Slice manifest** (`slice-execution-manifest.json`)
-- 35 slices;
-- 183 requirements assigned to slices;
-- 16 full-release requirements;
-- 0 unassigned; coverage `complete: true`.
+- The mission's 35 work items predate `main`'s `WI-GEN-RECORDS`.
+- The expected digest `b407b5cc…` was #104's scope before the merge.
+- Per the mission, **the scope-approval transaction stops on this difference.** `owner-freeze.fsx decide rehearsal-010` does not ask ODR-R10-01 until the scope is compiled from the frozen v4.1.4 and the ratified catalog.
+- Slices: 36, all 199 requirements placed, 0 unassigned (SLICE-EXECUTION-PLAN §1).
 
-**Cross-checks**
-- `praxis-work-inventory.json`: derived from the same plan.
-- #101's inventory matches as a cross-check (INTEGRATION-BASELINE).
-
-**Catalog successor (proposed):**
-- 44 requirements and 277 obligations;
-- adds INV-039..044;
-- compiles under Praxis;
-- awaits ODR-R10-02.
-
-## 3. Verification results at `6e43b7a`
-
-**Local run** (`.NET 10.0.402`, Chromium; WebKit is not installable in this container):
+## 3. Verification at `{HEAD}`
 
 | Check | Result |
 |---|---|
-| Build: requirements-compiler, tests (Debug) and src (Release) | PASS |
-| Offline suite, including the v4.1.4 scope, progress, stop decisions, suite runners and F#-only tooling | PASS (all groups) |
-| `tools/release-gate-repair/tests.fsx` | 60 cases, 0 failed |
-| `tools/r9/tests.fsx` | 80 cases, 0 failed |
-| `tools/r10/adversarial.fsx`, with `--browsers true --dotnet-tests true` | **36 VALIDATED**, 0 not run, 0 failed |
-| `tools/r10/r9-replay.fsx`, with `--suites true` | 15 of 15 as expected |
+| Build: requirements-compiler, tests (Debug) and src (Release) | {BUILD} |
+| Offline suite | {OFFLINE} |
+| `tools/release-gate-repair/tests.fsx` | {RG} |
+| `tools/r9/tests.fsx` | {R9} |
+| `tools/r10/adversarial.fsx` | {ADV} |
+| `tools/r10/r9-replay.fsx` | {REPLAY} |
+| `tools/r10/launch-preflight-tests.fsx` | 14 of 14 (positive READY; 13 refusals, each by its target check) |
+| `tools/r10/launch-preflight.fsx` on this repository | REFUSED, for owner actions only (LP-01..08); LP-09 and LP-10 PASS |
+| Specula adapter on the current observer output | 6 of 6 |
+| CI on `{HEAD}` | {CI} |
 
-**CI on `6e43b7a`.** Every job passed:
-- `offline-contract-tests`
-- `offline-factory`
-- `frozen-v4`
-- `fsharp-tooling`
-- `release-gate-repair`
-- `r9-readiness-gates`
-- `suite-commands` (WebKit)
-- `r10-adversarial` (Chromium **and WebKit**; the 36 cases, the fixture journeys and design contract, and the replay)
+FINAL-LAUNCH-VERIFICATION.md lists the preflight item by item.
 
-The evidence is committed in [`evidence/adversarial/`](evidence/adversarial/) and [`evidence/r9-replay/`](evidence/r9-replay/). Local paths are normalised to `$SRC`, `$WORK`, `$EVIDENCE`, `$R9` and `$SCRATCH`.
+## 4. What was implemented
 
-**Nothing is labelled PASS that did not run.** The following are not run here, and are stated as limits (§6), not as passes:
-- a real GitHub journey;
-- the journeys against Rehearsal 009's built application.
+Earlier rounds (R1–R8, slices, observer) are unchanged; see INTEGRATION-BASELINE.md and ADVERSARIAL-VALIDATION.md. Added in this round:
 
-## 4. What was implemented (R1–R8, slices, observer)
-
-| Audit item | Where | Proved by |
-|---|---|---|
-| R1 Executable verification (zero-test refusal, `--require-tests`) | `r9.fsx run-suites` / `suite-preflight` | C01, release-gate-repair 2b |
-| R2 Governed catalog acceptance | `CatalogAcceptance.fs`, gate `--catalog-acceptance` | C04, C17, r9 tests |
-| R3 Owner-controlled journeys J1–J3 (Chromium, WebKit, real provider) | `verification/journeys` | C06–C08, C22 |
-| R4 Catalog successor INV-039..044 | `proposals/…successor.proposed.json` | Praxis compile |
-| R5 Forma design contract | `DesignContract.fs`, `verification/design-contract` | C05, RP-01..05 |
-| R6 Scope report: 8 states, CONTINUE_REQUIRED | `Ledger.fs`, `ledger`, `completion-gate` | C02, C03, C21, C25, C32, RP-13 |
-| R7 Stop decisions bound to the original deadline | `Continuation.fs`, `stop-decision`, `resume` | C12–C15, C20, C26, C30, C34 |
-| R8 Requirement conflicts | OWNER-DECISIONS-REQUIRED §D | owner decision |
-| Slices: derived manifest, slice gate, completion gate | `slice-manifest`, `slice-gate`, Verification gate | C09–C11, C29, C35 |
-| Praxis sequencing (scope checkpoint before implementation) | `scope order`, `check-sequencing` | C16, C24, RP-11, RP-12 |
-| Test integrity | `test-integrity` | C18, C23 |
-| Observer (read-only; recommends only existing holds) | `Observer.fs`, `observe`, Specula #11 | C27, C28, C31, C33, C36, RP-14 |
+| Item | Where |
+|---|---|
+| Owner-decision transaction | `owner-freeze.fsx decide rehearsal-010` and `ratify rehearsal-010`; the requests in `kickoff/rehearsal-010/proposals/owner-decision-requests.json`. Each decision records the digest of what it approves; both commands refuse to write under an agent |
+| Isolated live credential (ODR-R10-09) | The Verification gate is `contents: read`. A single-repository GitHub App token is minted per job, revoked at the end, and fails closed without secrets |
+| Live-provider preflight | `.github/workflows/live-provider-preflight.yml`: owner-dispatched J1–J3 × Chromium and WebKit against `api.github.com`, with a token-scope check |
+| Launch preflight | `tools/r10/launch-preflight.fsx` (LP-01..10) and its 14 negative controls |
+| Topology A schedule | `tools/r10/schedule.fsx`; `evidence/schedule/` |
+| Rehearsal 010 process-evidence rules | `kickoff/rehearsal-010/process-evidence-rules.json` (proposed; ODR-R10-14) |
 
 ## 5. Independent review
 
-Five rounds of review by reviewer agents spawned by this session. Each saw the code, not this document's conclusions.
+Each round was run by a reviewer agent spawned by this session. Each saw the code, not this document's conclusions.
 
 | Round | On | Blocking | Major | Fixed in |
 |---|---|---|---|---|
-| 1 | the first integrated head | 16 findings (blocking and major) | — | `b65d2f7` |
-| 2 | `b65d2f7` | integration was judged from builder events, not only governed evidence; the live clock | — | `d841ac2` |
-| 3 | `d841ac2` | 2: self-made deadline policy; record-only dependencies blocked forever | 3 | `9dd597f` (C28–C32) |
-| 4 | `9dd597f` | **0** | 3: forgeable completion verdict; offset-less T0; vacuous dependency | `fad97aa` (C33–C35) |
-| 5 | `fad97aa` | **0** | 2: undated request skipped checks; observer crash on builder timestamps | `6e43b7a` (C36) |
+| 1 | the first integrated head | 16 findings | — | `b65d2f7` |
+| 2 | `b65d2f7` | integration judged from builder events; the live clock | — | `d841ac2` |
+| 3 | `d841ac2` | 2 | 3 | `9dd597f` (C28–C32) |
+| 4 | `9dd597f` | 0 | 3 | `fad97aa` (C33–C35) |
+| 5 | `fad97aa` | 0 | 2 | `6e43b7a` (C36) |
+| 6 | the merge with `main` and this round's tooling (`7521966..d73b22c`) | {R6B} | {R6M} | {R6FIX} |
 
-**Verdict:** no open blocking finding. Every major finding is fixed and has an adversarial case. ODR-R10-15 asks the owner whether agent review suffices.
+ODR-R10-15 asks the owner to accept these rounds for the reviewed commit. Any material change after this requires a new round.
 
-**Minor items accepted and documented** (not fixed):
-- `CompletedItems` (a Praxis completion record) is builder-written. A record-only dependency's slice-order check therefore rests on that record. Record obligations are still judged at release.
-- The observer accepts any governed COMPLETE verdict for a commit on `main`; the decision does not carry its own candidate.
-- In the builder's own commands, `--t0` (accepted only with `--replay-clock true`) and `resume --at` are still read with the machine's local time when they lack an offset. Only the builder's own run is affected. Request files, the T0 record and everything the observer reads require an explicit offset.
-- `contents: write` reaches the steps that run candidate code with the live suites (ODR-R10-09 names a test repository the owner accepts writes to). The token is not persisted in the checkout.
+**Minor items accepted and documented:**
+- `CompletedItems` (Praxis completion records) is builder-written. A record-only dependency's slice-order check rests on it. Record obligations are judged at release.
+- The observer accepts any governed COMPLETE verdict for a commit on `main`.
+- In the builder's own commands, `--t0` (replay only) and `resume --at` are read in local time when they lack an offset.
+- The App token reaches candidate code in the live steps. That is inherent: the application needs a credential to persist. It is bounded to one synthetic repository for one job (LIVE-PROVIDER-PREFLIGHT §1).
 
 ## 6. Known limits
 
-- **Builder-authored probes.** Fault probes (`.echelon/fault-probes.json`) are written by the builder. Governed acceptance requires a detected probe for content round-trip obligations, but the probes themselves are not owner-authored.
-- **Self-reported compute.** No compute limit is approved (ODR-R10-13); a compute stop needs an owner record.
-- **Browsers.** The local browser runs are Chromium only. WebKit ran in CI.
-- **No real GitHub run.** No journey ran against real GitHub here (no designated test repository, ODR-R10-09). The harness uses a REST double, and the gates refuse a double as live evidence (C08, LIVE_PROVIDER_SUBSTITUTED).
-- **Rehearsal 009 journeys.** J1–J3 and the rendered design contract were not run against Rehearsal 009's application (R9-ADVERSARIAL-REPLAY, "Not detected").
-- **Flake.** `fsharp-tooling` has a known layout-kit timing flake. It was green on `6e43b7a`.
-- **The observer is the deadline authority.** stop-decision runs in the builder's repository, so a builder can feed it a self-made lock. The independent check is the observer: it derives the deadline from the committed T0 record and the governed policy (C28). Specula shows its findings.
+- **No real-provider run yet.** The journeys have run only against the REST double. LP-08 refuses launch until the live preflight passes.
+- **The full scope does not fit 420 minutes** under Topology A at any CI latency, even zero (SLICE-EXECUTION-PLAN §3). The expected outcome is partial, verified integration reported at the deadline (ODR-R10-18).
+- **Builder-authored fault probes; self-reported compute.**
+- **Browsers in this container.** The local browser runs are Chromium only. WebKit runs in CI.
+- **The App private key** is a secret of the competition repository. A builder workflow change could read it before the governance check refuses that run. What it grants is only the synthetic test repository. Rotate the key after the rehearsal. Moving it out of reach needs a separate owner-controlled runner repository, which is not done.
+- **`fsharp-tooling`** has a known layout-kit timing flake.
 
-## 7. Releases prepared (owner merges and tags)
+## 7. Releases (owner merges and tags)
 
-- **Dokimos 0.11.1** (kemiller2002/dokimos#69): version bump and Praxis DOK-REL-0111. url-input from #67. A new echelon-current set must carry it (ODR-RG-03).
-- **Specula** (kemiller2002/specula#11): `ObserverFindings.fs`, its evidence registry entry, tests and CAP-016 (ODR-R10-17).
+- **Dokimos 0.11.1** (dokimos#69). Merge it. Then tag `dokimos-v0.11.1` on the merge commit, or dispatch `release.yml` with version `0.11.1`. Then verify the release assets against `dokimos-checksums.txt` and the attestations.
+- **echelon-current.** Then an agent prepares the echelon-registry pull request for a new set carrying 0.11.1, and runs Conditor qualification on that set. The owner approves and merges it.
+- **Specula** (specula#11): merge after its CI (ODR-R10-17).
 
-## 8. Owner decisions outstanding
+## 8. Owner actions outstanding
 
-These are all in OWNER-DECISIONS-REQUIRED.md:
+They are in order in OWNER-APPROVAL-EXECUTION.md §3:
+1. merge #104 and close #101;
+2. v4.1.4: decide, then the agent recompiles, then approve, then tag;
+3. Dokimos 0.11.1 and the registry set;
+4. the test repository, the App and its secrets; the competition repository;
+5. `decide rehearsal-010`;
+6. `ratify rehearsal-010`;
+7. the scope recompile, then ODR-R10-01;
+8. the live preflight;
+9. commit the lock;
+10. Specula and the observer.
 
-| Group | Decisions |
-|---|---|
-| Package | ODR-V414-01, -02 (decide), -03 (approve, tag) |
-| Releases and lock | ODR-RG-03 (Dokimos 0.11.1 and the echelon-current set), ODR-RG-04 (commit the lock), ODR-RG-05 (topology) |
-| Scope | ODR-R10-01: approve scope `b407b5cc…` |
-| Contracts | ODR-R10-02 … -09: catalog successor, catalog contract, governed fact, design contract, deadline policy, journey bindings, loading priority, test repository |
-| Conflicts | ODR-R10-10 … -12 |
-| Process | ODR-R10-13 (compute), -14 (process evidence), -15 (review sufficiency), -16 (merge #104; close #101 and #102), -17 (Specula) |
+The decisions are ODR-V414-01..03, ODR-RG-03, -04, -05 and ODR-R10-01..18. ODR-R10-18 is new: accept the expected partial outcome, or reduce scope, or extend the window.
 
 ## 9. The exact next launch command
 
-**Run only after LAUNCH-CHECKLIST §A–C are all checked.** Until then this command must not run.
+**Run only after LAUNCH-CHECKLIST §A–C are all checked**, including `launch-preflight` printing READY. Until then this command must not run.
 
-It starts the builder in the empty competition repository, with `SRC` = the Indy-init checkout at the lock's governing commit (the #104 merge commit):
+It runs in a clone of the empty competition repository `kemiller2002/indy-init-rehearsal-010`, with `SRC` = the Indy-init checkout at the lock's governing commit:
 
 ```
-cd <competition repository clone> && \
+cd <clone of kemiller2002/indy-init-rehearsal-010> && \
 SRC=<Indy-init checkout at the lock's governing commit> && \
+dotnet fsi "$SRC/tools/r10/launch-preflight.fsx" -- --indy-init "$SRC" --live-evidence <live-provider artifact> --competition . && \
 claude -p "$(sed -n '/^> \*\*Objective/,/^$/p' "$SRC/docs/rehearsal-010-readiness/STARTUP-INSTRUCTIONS.md" | sed 's/^> //') SRC is $SRC. Follow $SRC/docs/rehearsal-010-readiness/STARTUP-INSTRUCTIONS.md."
 ```
 
-The prompt is exactly STARTUP-INSTRUCTIONS §0, with nothing narrower added. T0 is the builder's first commit, the bootstrap with `evidence/t0/t0.json` (§2).
-
-The owner schedules the observer (STARTUP-INSTRUCTIONS §9) at T0.
+- The launch preflight runs first, and the `&&` stops the launch unless it prints READY.
+- The prompt is exactly STARTUP-INSTRUCTIONS §0, with nothing narrower added.
+- T0 is the builder's first commit, the bootstrap with `evidence/t0/t0.json`.
+- The owner schedules the observer at T0 (STARTUP-INSTRUCTIONS §9).

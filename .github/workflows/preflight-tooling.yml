@@ -383,6 +383,16 @@ jobs:
         run: |
           git clone -q https://github.com/kemiller2002/indy-init-rehearsal-009 "$RUNNER_TEMP/r9"
           dotnet fsi tools/r10/r9-replay.fsx -- --indy-init . --r9 "$RUNNER_TEMP/r9" --work "$RUNNER_TEMP/replay" --evidence "$RUNNER_TEMP/replay-evidence" --suites true
+      - name: Launch preflight refuses every missing condition (negative controls; synthetic fixtures)
+        run: dotnet fsi tools/r10/launch-preflight-tests.fsx -- --indy-init . --work "$RUNNER_TEMP/launch-controls" --evidence "$RUNNER_TEMP/launch-evidence"
+      - name: Topology A schedule from the slice manifest (the committed evidence must be reproducible)
+        run: |
+          dotnet fsi tools/r10/schedule.fsx -- --slices docs/rehearsal-010-readiness/slice-execution-manifest.json --window 420 --setup 45 \
+            --ci 0,5,10,15,20,25 --merge 3 --lanes "integration:integration,domain:domain,persistence:persistence,ui-1:ui,ui-2:ui,reviewer:reviewer" \
+            --out "$RUNNER_TEMP/launch-evidence/topology-a.json"
+          jq -S 'del(.scenarios[].timeline)' "$RUNNER_TEMP/launch-evidence/topology-a.json" > "$RUNNER_TEMP/a.json"
+          jq -S 'del(.scenarios[].timeline)' docs/rehearsal-010-readiness/evidence/schedule/topology-a.json > "$RUNNER_TEMP/b.json"
+          diff "$RUNNER_TEMP/a.json" "$RUNNER_TEMP/b.json" || { echo "::error::the committed schedule evidence is stale; regenerate it"; exit 1; }
       - name: Publish
         if: always()
         uses: actions/upload-artifact@v4
@@ -391,3 +401,4 @@ jobs:
           path: |
             ${{ runner.temp }}/adv-evidence
             ${{ runner.temp }}/replay-evidence
+            ${{ runner.temp }}/launch-evidence

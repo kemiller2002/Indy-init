@@ -15,10 +15,11 @@ requirements-compiler slice-manifest --manifest docs/rehearsal-010-readiness/sco
 
 Validated: `slice-manifest` exits 0 only when every requirement is placed; otherwise it refuses with REQUIREMENT_UNASSIGNED.
 
-| Requirements | 199 |
+| Requirements | 199 (205 if the catalog successor is ratified, ODR-R10-02) |
 |---|---|
-| In a slice | 183 |
-| Full-release obligations (record-only, no implementation slice) | 16: AR-001, AR-002, AR-003, AR-004, AR-007, AR-012, AR-015, AR-017, AR-018, AR-019, AR-020, AR-021, AR-024, AR-027, AR-028, AR-031 |
+| Slices | 36: one per work item of the scope, including the 9 timed tasks without requirements |
+| In a slice | 199 |
+| Record-only requirements | 16: AR-001, AR-002, AR-003, AR-004, AR-007, AR-012, AR-015, AR-017, AR-018, AR-019, AR-020, AR-021, AR-024, AR-027, AR-028, AR-031. They are in `SL-WI-GEN-RECORDS` (#102's `WI-GEN-RECORDS`, reviewer lane), and their record obligations are judged at release |
 | Excluded by owner decision | 0 |
 | **Unassigned** | **0** |
 
@@ -28,8 +29,8 @@ Validated: `slice-manifest` exits 0 only when every requirement is placed; other
 - regression of every integrated obligation.
 
 A requirement never disappears because it lacks a DAG task:
-- the 8 generated work items (`WI-GEN-*`, `WI-INV-*`) carry the 100 requirements the DAG does not cover;
-- the 16 record-only requirements are full-release obligations judged at release by their record producers.
+- the 9 generated work items (`WI-GEN-*`, `WI-INV-*`) carry the 116 requirements the DAG does not cover;
+- the record obligations of the 16 record-only requirements are judged at release by their record producers. A slice that depends on one is gated by its work item's Praxis completion record (slice-gate `dependencies-integrated`).
 
 ## 2. What each slice states
 
@@ -96,11 +97,34 @@ The order always respects dependencies. At each step the builder takes the highe
 | 34 | SL-T34 | 3 | 14 | 20 | T33 | | | |
 | 35 | SL-T35 | 0 | 0 | 15 | T12 T14 | | | |
 
-**Execution cost (a known risk, stated rather than hidden):**
-- The 27 DAG-estimated slices sum to **764 minutes**. The DAG estimates are per lane, for topology C: five builder lanes and a reviewer, finishing in 419 of 420 minutes.
-- The 8 generated slices carry 100 requirements and have no DAG estimate.
-- **One agent cannot complete the whole scope serially in 420 minutes.** ODR-RG-05 (topology) decides this.
-- Neither the scope nor the full-release gate is relaxed because of it. The process instead makes partial delivery honest: whatever is integrated is verified, and everything else stays open and visible.
+**Execution cost (a known risk, stated rather than hidden).** `tools/r10/schedule.fsx` simulates the plan. Its evidence is in [`evidence/schedule/`](evidence/schedule/), and CI checks that the evidence is reproducible.
+
+What it models:
+- **Topology A:** lanes integration, domain, persistence, ui-1 and ui-2, and one independent reviewer. Each lane runs only slices of its boundary.
+- **Dependencies:** a slice starts only when every slice it depends on is integrated.
+- **One integration authority:** the slice gate requires the merged result to be built on the current target. So each merge is one governed gate run on current main plus the merge itself, strictly one at a time.
+- **Estimates:**
+  - DAG estimates for the 27 DAG tasks (764 minutes);
+  - for the 9 generated slices, which have none, derived estimates at the DAG's own rate of 1.35 minutes per mandatory obligation (586 minutes);
+  - in total, 1,350 minutes of implementation.
+
+Results, with 45 minutes of T0 set-up and 3 minutes per merge:
+
+| CI latency per gate run | All 36 slices integrated at | Slices integrated by T+420 |
+|---|---|---|
+| 0 min | T+503 | 29 |
+| 5 min | T+558 | 27 |
+| 10 min | T+663 | 23 |
+| 15 min | T+819 | 17 |
+| 20 min | T+977 | 14 |
+| 25 min | T+1157 | 11 |
+
+- **The full scope does not fit 420 minutes under Topology A at any CI latency, even zero.**
+- The critical path is `SL-T17`, then `SL-WI-INV-WORKSPACE`, then `SL-T31`–`SL-T34`. The workspace slice alone is 159 mandatory obligations, about 215 minutes, on one UI lane.
+- Moving a lane to UI (integration, core, three UI lanes) does not help: T+508 at zero CI latency.
+- Dividing serial minutes by five lanes would have suggested 270 minutes; that division proves nothing.
+- **Neither the scope nor any gate is relaxed because of it.** The run maximizes integrated, verified capability. At the deadline it reports the ledger. ODR-R10-18 asks the owner to accept this outcome explicitly, or to reduce scope or extend the window instead.
+- **A derived, non-normative improvement for a later rehearsal:** split the large generated work items into dependency-free requirement groups. That would let `WI-INV-WORKSPACE`'s 27 requirements run on both UI lanes. It changes the scope's work items, so it needs a new scope approval. It is not done here.
 
 ## 4. The two gates
 

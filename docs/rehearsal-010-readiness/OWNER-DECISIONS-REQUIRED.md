@@ -1,5 +1,17 @@
 # Rehearsal 010: owner decisions required
 
+> **How these are recorded now.**
+> - The decisions below are machine-readable requests in [`kickoff/rehearsal-010/proposals/owner-decision-requests.json`](../../kickoff/rehearsal-010/proposals/owner-decision-requests.json).
+> - You record them with `tools/owner-freeze.fsx decide rehearsal-010`, and ratify the catalog with `ratify rehearsal-010`.
+> - The package decisions use `decide`, `approve` and `tag v4.1.4`.
+> - The order, the commands and the checks are in [OWNER-APPROVAL-EXECUTION.md](OWNER-APPROVAL-EXECUTION.md).
+>
+> **Changed since this list was written:**
+> - **ODR-R10-01:** the scope is 199/863/36 now, or 205/890/37 with the successor. Its digest is final only after v4.1.4 is frozen and ODR-R10-02 is applied.
+> - **ODR-R10-09:** an isolated test repository with a single-repository App token.
+> - **ODR-R10-16:** #102 is merged; only #101 remains to close.
+> - **ODR-R10-18 is new:** the full scope does not fit 420 minutes.
+
 **Agents never write approval records (RDP-003).** Every item below is a request.
 - The owner records each decision with the existing mechanisms:
   - `tools/owner-freeze.fsx` for packages;
@@ -24,7 +36,7 @@
 
 | ID | Decision | Proposed | How | Blocks |
 |---|---|---|---|---|
-| ODR-R10-01 (replaces ODR-RG-01) | Approve the scope manifest `docs/rehearsal-010-readiness/scope-manifest.json`, scopeSha256 `b407b5cc5f200e3651088440c0db630f18e84357c933020970f236f18f9352d6` (199 requirements, 863 obligations, 35 work items, no exclusion) as the Rehearsal 010 scope. #101's `competition-scope.proposed.json` is retired by the agreed integration | approve as is. An exclusion is a separate operator change `{requirement_id, action: exclude}` per requirement | approvals record `{decision_id: ODR-R10-01, action: approve-scope, scope_sha256: b407b5cc…}` | `acceptance-status` scope level; stop-decision's scope |
+| ODR-R10-01 (replaces ODR-RG-01) | Approve the scope manifest `docs/rehearsal-010-readiness/scope-manifest.json` **as recompiled after v4.1.4 is frozen and ODR-R10-02 is applied**: 199 requirements, 863 obligations and 36 work items today (scopeSha256 `5a8aef29…` at this commit, which is not the final digest); 205, 890 and 37 if the successor is ratified. Zero exclusions | approve the recompiled digest | `owner-freeze.fsx decide rehearsal-010` (asked only once the scope is current) | the lock |
 
 ## C. Governed verification contracts (new)
 
@@ -37,7 +49,7 @@
 | ODR-R10-06 | Approve `kickoff/rehearsal-010/deadline-policy.json`: 420 minutes, no reset, T0 record `evidence/t0/t0.json` committed once at T0, no compute limit approved | approve | pin `deadlinePolicy.sha256` | stop-decision, resume |
 | ODR-R10-07 | Approve the journey bindings `verification/journeys/bindings.json` and their accessible-name contract. The catalog `name`s; the destination and section names of UI-020 and UI-029; the button "Record evidence" (or "Add evidence"), which no requirement names; the connection form matched by label pattern (owner, repository, branch, token or credential) | approve. The builder receives these names at launch | pin `journeys.bindingsSha256` | journeys |
 | ODR-R10-08 | Loading-screen priority (R8): which WASM-LOAD requirements are P0 under UI-014-O2 | WASM-LOAD-001 (a loading state) and WASM-LOAD-005 (failure with Retry) are P0; the rest stay as written. Until decided, J3-10 is reported but does not fail the journey | owner decision record (OD-INDY-24) and a successor package if UI-014-O2's text changes | J3-10's priority |
-| ODR-R10-09 | The designated test repository for live journeys and its credential | the competition repository, branch `causa-acceptance`, the Verification gate's `github.token`. The builder never supplies the credential | lock `testRepository` | live journeys, slice gate |
+| ODR-R10-09 | The live test repository and its credential | `kemiller2002/causa-acceptance-r10` (private), branch `causa-acceptance`, with a GitHub App installed on that repository alone. Its installation token is minted per job and revoked at job end; the Verification gate itself is `contents: read` (LIVE-PROVIDER-PREFLIGHT.md) | `decide rehearsal-010`; create the repository, the App and the secrets | live journeys, release |
 
 ## D. Requirement conflicts (R8; normative text changes go through owner decisions and a successor package)
 
@@ -60,5 +72,7 @@ The agent did not edit any normative document. These sections are compiled into 
 | ODR-R10-13 | Compute budget (R7). A stated budget is not a stop condition. A stop on compute needs a separate `{action: approve-compute-limit, decision_id, limit}` record and evidence that the limit is reached | no compute limit: the full 420-minute window is expected to be used |
 | ODR-R10-14 | Process-evidence rules for Rehearsal 010 (they name the competition repository) | regenerate the Rehearsal 009 rules for the new repository with `tools/owner-r9-ratify.fsx`'s pin step, and pin the sha256 in the lock |
 | ODR-R10-15 | Independent review of the combined result. A reviewer agent spawned by this session reviewed it (FINAL-READINESS §5) | the owner decides whether that suffices or a separate reviewer is required before approving v4.1.4 and merging #104 |
-| ODR-R10-16 | Merge #104 and close #101 and #102 as superseded | merge after the review and green CI |
+| ODR-R10-16 | Merge #104; close #101 as superseded (#102 is already merged; #104 carries #101's review fixes that #102 did not) | merge after the review and green CI |
 | ODR-R10-17 | Specula observer adapter: approve the Specula requirement and adapter change (FINAL-READINESS §7) | approve |
+| ODR-R10-18 | The full scope does not fit 420 minutes under Topology A at any CI latency (SLICE-EXECUTION-PLAN §3, `evidence/schedule/`). Launch with the full scope and partial integration as the expected, reported outcome; or reduce the scope; or extend the window | A: launch with the full scope |
+

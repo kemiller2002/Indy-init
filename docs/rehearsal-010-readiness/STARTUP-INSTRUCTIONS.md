@@ -57,15 +57,23 @@ Implementation is prohibited until steps 1–5 pass. They need no implementation
    dotnet fsi SRC/tools/r9/r9.fsx -- suite-preflight --obligations .echelon/obligations.json --root . --out evidence/t0/suite-preflight.json
    ```
    It must PASS: every executable suite command runs (chromium and webkit defined; one `dotnet test` target each). A refusal is a T10 defect; fix it in T10.
-2. **Register every work item in Praxis.** That is every work item in `SRC/docs/rehearsal-010-readiness/praxis-work-inventory.json`: the scope's work items, plus WI-RELEASE-RECORDS. `requirements-compiler scope preflight --praxis-queue .ros/work/queue.json` prints each missing one as a command.
+2. **Generate the work plan, and register every work item in Praxis.** Do not write the work plan by hand.
+   ```
+   requirements-compiler scope work-plan --manifest SRC/docs/rehearsal-010-readiness/scope-manifest.json --out .echelon/r9-work-plan.json
+   ```
+   - It lists every work item of the approved scope: 36 today, 37 if the catalog successor is ratified. That covers T10–T36, `WI-GEN-*` (including `WI-GEN-RECORDS`, the record-only requirements) and `WI-INV-*`.
+   - It equals `SRC/docs/rehearsal-010-readiness/praxis-work-inventory.json`.
+   - Create each work item with `./praxis work begin --id ID …` or `./praxis add "[ID] title"`.
+   - `requirements-compiler scope preflight --praxis-queue .ros/work/queue.json --praxis-context .ros/context/current.json` prints each missing one.
 3. **Scope checkpoint:**
    ```
    requirements-compiler scope checkpoint --source SRC --package requirements-compiled/v4.1.4 \
      --manifest SRC/docs/rehearsal-010-readiness/scope-manifest.json --praxis-queue .ros/work/queue.json \
-     --at NOW --commit SRC-COMMIT --out .echelon/scope-checkpoint.json
+     --praxis-context .ros/context/current.json --at NOW --commit SRC-COMMIT --out .echelon/scope-checkpoint.json
    ```
-   Commit it. It is immutable.
-4. **Initialization checkpoint (authorization).** Copy `praxis-work-inventory.json` to `.echelon/r9-work-plan.json`, then:
+   - It writes the checkpoint only when the manifest equals what the frozen sources give and every work item is in Praxis.
+   - Commit it. It is immutable.
+4. **Initialization checkpoint (authorization).** With the work plan of step 2 committed:
    ```
    dotnet fsi SRC/tools/r9/r9.fsx -- authorize-implementation --target . --catalog SRC/requirements/catalogs/causa-investigation.requirement-catalog.json \
      --obligations .echelon/obligations.json --suite-preflight evidence/t0/suite-preflight.json \
@@ -74,7 +82,11 @@ Implementation is prohibited until steps 1–5 pass. They need no implementation
    ```
    `--scope-sha256` is required: a scope checkpoint of any other scope does not authorize.
    Commit `.echelon/r9-initialization-checkpoint.json`. It is immutable.
-5. **Sequencing.** `r9.fsx check-sequencing` and `requirements-compiler scope order` must PASS on every commit. The governed gate runs `check-sequencing` first.
+5. **Sequencing.** `r9.fsx check-sequencing --scope-manifest` and `requirements-compiler scope order` must PASS on every commit. The governed gate runs `check-sequencing --scope-manifest` first. It refuses:
+   - application code committed before the later of the two checkpoints, on any branch, merged or not;
+   - a scope hash that differs from the approved manifest;
+   - an edited checkpoint;
+   - incomplete Praxis coverage at the scope-checkpoint commit.
 
 ## 4. The slice loop (continue to the next ready slice after every merge)
 

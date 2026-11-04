@@ -1,76 +1,69 @@
 # Rehearsal 010 launch checklist
 
 **Use this checklist in order.**
-- Nothing here starts the rehearsal clock; T0 is the bootstrap of §D.
+- Nothing here starts the rehearsal clock. T0 is the builder's bootstrap commit (§D).
 - Each box needs its evidence before the next section begins.
-- An unchecked box means the state is BLOCKED or READY FOR OWNER APPROVAL, never READY TO LAUNCH.
+- Section C's preflight decides; this list only orders the work.
+- While any box is unchecked, the verdict is READY FOR OWNER ACTION or BLOCKED, never READY TO LAUNCH.
 
-## A. Engineering (done on #104; re-run on its final commit)
+## A. Engineering (#104; re-run on its final commit)
 
 - [ ] CI on the #104 head is green:
   - `offline-contract-tests`
+  - `offline-factory`
   - `frozen-v4`
   - `fsharp-tooling`
   - `release-gate-repair`
   - `r9-readiness-gates`
-  - `suite-commands` (WebKit runs here)
-  - `r10-adversarial` (Chromium and WebKit, the 36 cases, the journeys and design contract on the fixture, and the Rehearsal 009 replay)
+  - `suite-commands` (WebKit)
+  - `r10-adversarial`: Chromium and WebKit; the 36 cases; the fixture journeys and design contract; the Rehearsal 009 replay; the 14 launch-preflight controls; the schedule evidence
 - [ ] Independent review: no open blocking finding (FINAL-READINESS §5).
 - [ ] Frozen packages unchanged (CI `frozen-v4` and the offline suite).
 
-## B. Owner decisions and releases (OWNER-DECISIONS-REQUIRED.md)
+## B. The owner transaction (OWNER-APPROVAL-EXECUTION.md §3, steps 1–14)
 
-- [ ] ODR-V414-01, -02: `dotnet fsi tools/owner-freeze.fsx -- decide v4.1.4`.
-- [ ] Agent step 2 of `requirements-compiled/v4.1.4/FREEZE.md`:
-  - write the approval ids into `analysis/amendment.json`;
-  - recompile (X01–X21 PASS);
-  - run percepta spec-preflight;
-  - record the package's independent review;
-  - add the CI steps.
-- [ ] ODR-V414-03: `owner-freeze.fsx approve v4.1.4`, then `owner-freeze.fsx tag v4.1.4 --commit <freeze commit>`. An agent then adds v4.1.4 to the frozen guard.
-- [ ] ODR-RG-03:
-  - merge kemiller2002/dokimos#69;
-  - tag and publish `dokimos-v0.11.1`;
-  - register a new echelon-current set carrying it.
-- [ ] ODR-R10-01: approvals record `{action: approve-scope, scope_sha256: b407b5cc5f200e3651088440c0db630f18e84357c933020970f236f18f9352d6}`.
-- [ ] ODR-R10-03..09: decide and review each, then pin its digest in the lock:
-  - the catalog contract;
-  - the governed fact;
-  - the design contract;
-  - the deadline policy;
-  - the journey bindings;
-  - the loading-screen priority;
-  - the test repository.
-- [ ] ODR-R10-10..12: the R8 conflicts, recorded (cut order, UI-026, OD-INDY-22 clarification). Any normative text change goes through the successor process before the lock.
-- [ ] ODR-R10-13: compute budget stated (proposed: no limit; the full window is expected).
-- [ ] ODR-R10-14: process-evidence rules for the Rehearsal 010 repository, pinned.
-- [ ] ODR-RG-05: topology chosen.
-- [ ] ODR-R10-16:
-  - #104 merged;
-  - #101 and #102 closed as superseded;
-  - the lock's governing Indy-init commit is the merge commit.
-- [ ] ODR-R10-17: kemiller2002/specula#11 merged, and an observer repository created.
-- [ ] **ODR-RG-04: the owner commits `kickoff/rehearsal-010/toolchain.lock.json`.** It is the proposed lock with:
-  - the v4.1.4 tag commit;
-  - the new echelon-current resolved set;
+- [ ] 1. #104 merged; #101 closed as superseded.
+- [ ] 2–5. v4.1.4:
+  - decided (ODR-V414-01, -02);
+  - recompiled and reviewed;
+  - approved (ODR-V414-03);
+  - tagged;
+  - added to the frozen guard.
+- [ ] 6. Dokimos 0.11.1:
+  - merged, tagged and published;
+  - artifacts verified;
+  - a new echelon-current set registered and Conditor-qualified.
+- [ ] 7. Test repository `kemiller2002/causa-acceptance-r10`, its App and secrets; the empty competition repository `kemiller2002/indy-init-rehearsal-010`.
+- [ ] 8–11. `decide rehearsal-010` (all requests), then `ratify rehearsal-010`, then the scope recompile, then ODR-R10-01.
+- [ ] 12. Live-provider preflight run: J1–J3 × Chromium and WebKit pass against `api.github.com`.
+- [ ] 13. **The owner commits `kickoff/rehearsal-010/toolchain.lock.json`** (ODR-RG-04).
+- [ ] 14. Specula #11 merged; observer scheduled.
+
+## C. Launch preflight (owner side; no clock)
+
+- [ ] This prints **READY**:
+  ```
+  dotnet fsi tools/r10/launch-preflight.fsx -- --indy-init Indy-init --live-evidence <live-provider artifact> --competition <clone of indy-init-rehearsal-010>
+  ```
+  LP-01..10 cover:
+  - the lock;
+  - v4.1.4 and its tag;
   - every contract digest;
-  - the test repository.
-
-## C. Pre-launch preflight (owner side, before T0; no clock)
-
+  - the scope digest;
+  - every owner decision and the digests it approved;
+  - Dokimos 0.11.1;
+  - the isolated test repository;
+  - the live evidence;
+  - the adversarial suite;
+  - a clean competition repository (no T0).
 - [ ] `r9.fsx spec-preflight --lock kickoff/rehearsal-010/toolchain.lock.json` PASS.
 - [ ] `conditor acceptance preflight` reads READY.
-- [ ] `requirements-compiler v41 --package requirements-compiled/v4.1.4 --check` PASS.
-- [ ] `requirements-compiler slice-manifest … --work-plan …` reproduces `slice-execution-manifest.json` and `praxis-work-inventory.json` byte for byte.
 - [ ] `requirements-compiler scope preflight --source . --package requirements-compiled/v4.1.4 --manifest docs/rehearsal-010-readiness/scope-manifest.json` PASS.
-- [ ] Empty competition repository created.
-  - Its `causa-acceptance` branch exists for the live journeys (ODR-R10-09).
-  - Repository settings let the Verification gate's `github.token` write to that branch.
-- [ ] Observer scheduled (STARTUP-INSTRUCTIONS §9). Specula is pointed at the observer repository.
+- [ ] `requirements-compiler slice-manifest … --work-plan …` reproduces `slice-execution-manifest.json` and `praxis-work-inventory.json` byte for byte.
 
 ## D. Launch (starts the clock)
 
 - [ ] The builder receives exactly the §0 prompt of STARTUP-INSTRUCTIONS.md, with SRC = the lock's governing Indy-init commit.
 - [ ] The builder's first commit is the T0 bootstrap with `evidence/t0/t0.json`.
 
-**The exact launch command** is in FINAL-READINESS.md §9. It is run only after A–C are checked.
+**The exact launch command** is in FINAL-READINESS.md §9. Run it only after A–C are checked.
