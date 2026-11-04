@@ -1,0 +1,4 @@
+$ requirements-compiler scope order scope order --repo $WORK/r9
+exit 4
+  REFUSED IMPLEMENTATION_BEFORE_CHECKPOINT commit 8001e7c0493ee457c6a93086dde08a67e3fe0cf5 changes application code and no scope checkpoint exists
+scope order: REFUSED (1)

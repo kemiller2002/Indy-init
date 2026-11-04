@@ -17,7 +17,7 @@
 //   dotnet fsi tools/r9/r9.fsx -- suite-preflight --obligations F --root REPO [--out F] [--require-tests true]
 //   dotnet fsi tools/r9/r9.fsx -- suite-fixture --out NEW-DIR [--without-webkit true] [--empty-project NAME]
 //        Executes every executable suite command in list mode; refuses readiness if any cannot execute.
-//   dotnet fsi tools/r9/r9.fsx -- authorize-implementation --target REPO --catalog F --obligations F --suite-preflight F
+//   dotnet fsi tools/r9/r9.fsx -- authorize-implementation --target REPO --catalog F --obligations F --suite-preflight F [--scope-checkpoint F --scope-sha256 HEX]
 //        --spec-preflight F --acceptance-preflight F [--work-plan F] [--manifest F] [--scope F] [--praxis EXE]
 //        Pre-implementation gate (Praxis ordering); writes the immutable .echelon/r9-initialization-checkpoint.json.
 //   dotnet fsi tools/r9/r9.fsx -- check-sequencing --target REPO [--out F]
@@ -819,6 +819,7 @@ let isImplementationPath (path: string) =
     || (name.StartsWith("Directory.", StringComparison.Ordinal) && (name.EndsWith(".props", StringComparison.Ordinal) || name.EndsWith(".targets", StringComparison.Ordinal)))
 
 let checkpointPath = ".echelon/r9-initialization-checkpoint.json"
+let scopeCheckpointRel = ".echelon/scope-checkpoint.json"
 
 /// Refuses implementation until, in order: Conditor initialized the repository; the catalog manifest is compiled and
 /// current and Praxis validates; work items exist; every work item is linked to requirements and obligations that
@@ -921,9 +922,22 @@ let authorizeImplementation () =
     let _, status = git target [ "status"; "--porcelain"; "--untracked-files=no" ]
     let _, headOut = git target [ "rev-parse"; "HEAD" ]
     let head = headOut.Trim()
+    // 7 scope (#102, integrated): the approved scope's checkpoint, which requirements-compiler scope checkpoint writes
+    // only when the scope manifest equals its frozen sources and every work item of the scope is in Praxis, must be
+    // committed before implementation is authorized; with --scope-sha256 (the lock's scope.scopeSha256) it must pin it.
+    let scopeCheckpointPath = Path.Combine(target, opt "--scope-checkpoint" |> Option.defaultValue scopeCheckpointRel)
+    let step7 =
+        if not (exists scopeCheckpointPath) then
+            [ $"7 scope: {scopeCheckpointRel} is missing; run requirements-compiler scope checkpoint (every work item of the approved scope in Praxis) and commit it first" ]
+        else
+            let sc = readJson scopeCheckpointPath
+            check (str sc "schema" = "indy-init.scope-checkpoint/1") $"7 scope: {scopeCheckpointRel} is not an indy-init.scope-checkpoint/1 record"
+            @ (match opt "--scope-sha256" with
+               | Some pinned -> check (str sc "scopeSha256" = pinned) $"""7 scope: the scope checkpoint pins {str sc "scopeSha256"}, not the approved scope {pinned}"""
+               | None -> [])
     let causes =
         check (not (exists ck)) $"{checkpointPath} already exists: the initialization checkpoint is immutable"
-        @ step1 @ step2 @ step3 @ step4 @ step5 @ step6
+        @ step1 @ step2 @ step3 @ step4 @ step5 @ step6 @ step7
         @ check (status.Trim() = "") "the tracked tree is not clean: authorize from a committed state"
     if not causes.IsEmpty then Refused causes
     else
@@ -936,7 +950,7 @@ let authorizeImplementation () =
                   "meaning", jstr "Implementation is authorized from the commit that adds this file. Every commit before it that changes implementation paths (src/, web/, tests/, build files), other than the T0 bootstrap, is a process violation (r9.fsx check-sequencing). Verification evidence is produced after implementation and is not part of this checkpoint."
                   "workItems", jstrs (items |> List.map (fun w -> str w "id"))
                   "inScopeObligations", jint inScope.Length
-                  "inputs", jarr ([ digest manifestPath; digest workPlanPath; digest (req "--obligations") ] @ ([ "--suite-preflight"; "--spec-preflight"; "--acceptance-preflight"; "--scope" ] |> List.choose opt |> List.map digest)) ]
+                  "inputs", jarr ([ digest manifestPath; digest workPlanPath; digest (req "--obligations"); digest scopeCheckpointPath ] @ ([ "--suite-preflight"; "--spec-preflight"; "--acceptance-preflight"; "--scope" ] |> List.choose opt |> List.map digest)) ]
         writeJson ck record
         Pass [ $"checkpoint {ck} written at {head}: commit it as its own commit before any implementation"; $"{items.Length} work item(s), {inScope.Length} in-scope obligation(s) linked" ]
 
@@ -980,7 +994,17 @@ let checkSequencing () =
                 else
                     let _, subject = git target [ "log"; "-1"; "--format=%s"; c ]
                     Some(c, subject.Trim(), impl))
-        let checkpointCauses =
+        // The scope checkpoint (#102) must precede authorization: committed once, never edited, and an ancestor of (or
+        // the same commit as) the initialization checkpoint.
+        let scopeCheckpoint = firstAdding scopeCheckpointRel
+        let scopeCauses =
+            match checkpoint, scopeCheckpoint with
+            | Some _, None -> [ $"no scope checkpoint ({scopeCheckpointRel}): implementation was authorized without the approved scope's work items registered (requirements-compiler scope checkpoint)" ]
+            | Some ck, Some sc ->
+                check (isAncestor sc ck) $"the scope checkpoint {sc.Substring(0, 12)} is not an ancestor of the initialization checkpoint {ck.Substring(0, 12)}: the scope must be registered first"
+                @ check ((touching scopeCheckpointRel).Length = 1) $"{scopeCheckpointRel} was changed after it was committed: the scope checkpoint is immutable"
+            | None, _ -> []
+        let initCauses =
             match checkpoint with
             // Before authorization a repository may hold only its bootstrap: no checkpoint is a cause only once
             // implementation has been committed without one.
@@ -1002,7 +1026,7 @@ let checkSequencing () =
                   jarr (violations |> List.map (fun (c, s, files) -> jobj [ "commit", jstr c; "subject", jstr s; "implementationFiles", jint files.Length; "examples", jstrs (files |> List.truncate 5) ])) ]
         opt "--out" |> Option.iter (fun f -> writeJson f report)
         let causes =
-            checkpointCauses
+            scopeCauses @ initCauses
             @ (violations |> List.map (fun (c, s, files) -> $"process violation: {c.Substring(0, 12)} \"{s}\" changed {files.Length} implementation file(s) without authorization"))
         if causes.IsEmpty then
             match checkpoint with

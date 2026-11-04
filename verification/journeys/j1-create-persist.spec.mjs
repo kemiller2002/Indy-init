@@ -1,6 +1,7 @@
 // J1: investigation creation and persistence (bindings.json). Governed; the builder cannot edit it.
 import { test, expect } from '@playwright/test';
 import { env, assertion, contextFor, connect, startInvestigation, saveState, button, providerHolds } from './support.mjs';
+import { finish } from './support.mjs';
 
 test('J1 investigation creation and persistence', async ({ browser }) => {
   const a = await contextFor(browser);
@@ -37,4 +38,5 @@ test('J1 investigation creation and persistence', async ({ browser }) => {
     await b.close();
   });
   await a.close();
+  finish();
 });

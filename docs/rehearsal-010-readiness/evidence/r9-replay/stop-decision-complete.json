@@ -1,0 +1,72 @@
+{
+  "schema": "indy-init.stop-decision/1",
+  "requestedAt": "2026-11-04T02:25:00.0000000+00:00",
+  "reason": "complete",
+  "decision": "CONTINUE_REQUIRED",
+  "minutesRemaining": 306,
+  "acceptanceClaimPermitted": false,
+  "refusals": [
+    {
+      "code": "SCOPE_INCOMPLETE",
+      "detail": "161 applicable mandatory requirement(s) are not verified (for example AR-001, AR-002, AR-003, AR-004, AR-005); 33 work item(s) are open, 33 can proceed now"
+    },
+    {
+      "code": "CATALOG_IS_NOT_SCOPE",
+      "detail": "every applicable mandatory catalog requirement is verified, but P0 requirements of the frozen plan remain; the catalog is part of the approved scope, not all of it"
+    },
+    {
+      "code": "SCOPE_NOT_INTEGRATED",
+      "detail": "193 applicable mandatory requirement(s) are not integrated on main"
+    }
+  ],
+  "remaining": {
+    "openMandatoryRequirements": 161,
+    "openWorkItems": [
+      "T10",
+      "T11",
+      "T12",
+      "T13",
+      "T14",
+      "T15",
+      "T16",
+      "T17",
+      "T18",
+      "T19",
+      "T20",
+      "T21",
+      "T22",
+      "T23",
+      "T24",
+      "T25",
+      "T26",
+      "T27",
+      "T28",
+      "T29",
+      "T30",
+      "T31",
+      "T32",
+      "T33",
+      "T34",
+      "T35",
+      "T36",
+      "WI-GEN-AR",
+      "WI-GEN-EXT-DATA",
+      "WI-GEN-PF",
+      "WI-GEN-UI",
+      "WI-GEN-VER",
+      "WI-GEN-WDL"
+    ],
+    "nextIndependentWork": [
+      "T10",
+      "T11",
+      "T12",
+      "T13",
+      "T14",
+      "T15",
+      "T16",
+      "T17",
+      "T18",
+      "T19"
+    ]
+  }
+}

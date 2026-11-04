@@ -96,6 +96,8 @@ let detectors : Detector list =
       { Id = "work-item-before-implementation"
         Detect =
           fun o ->
+              // The T0 bootstrap (the commit that installs governance) writes the generated stubs; it is not implementation.
+              let o = { o with Commits = o.Commits |> List.filter (fun c -> not (c.Files |> List.contains ".echelon/r9-governance.json")) }
               [ match o.CheckpointAt with
                 | None ->
                     for c in o.Commits do
@@ -141,12 +143,13 @@ let detectors : Detector list =
       { Id = "premature-stop"
         Detect =
           fun o ->
-              let lastCommit = o.Commits |> List.tryLast |> Option.map (fun c -> c.At)
+              // Work on scope means implementation; a report or evidence commit after a refused stop is not progress.
+              let lastCommit = o.Commits |> List.filter (fun c -> c.Files |> List.exists isImplementation) |> List.tryLast |> Option.map (fun c -> c.At)
               [ for d in o.StopDecisions do
                     let at = strOpt "requestedAt" d |> Option.map DateTimeOffset.Parse
                     match at with
                     | Some t when t < o.Clock.Deadline && strOpt "decision" d = Some "CONTINUE_REQUIRED" && lastCommit |> Option.forall (fun l -> l <= t) && (o.Now - t).TotalMinutes >= 20.0 ->
-                        yield f "PREMATURE_STOP" "blocking" (sprintf "a stop was refused at %s (CONTINUE_REQUIRED, %d minutes left) and no work followed for %.0f minutes" (t.ToString "o") (intOpt "minutesRemaining" d |> Option.defaultValue 0L) (o.Now - t).TotalMinutes) [] [] "resume the next independent work item" None
+                        yield f "PREMATURE_STOP" "blocking" (sprintf "a stop was refused at %s (CONTINUE_REQUIRED, %d minutes left) and no implementation work followed for %.0f minutes" (t.ToString "o") (intOpt "minutesRemaining" d |> Option.defaultValue 0L) (o.Now - t).TotalMinutes) [] [] "resume the next independent work item" None
                     | _ -> () ] }
       { Id = "unmerged-verified"
         Detect =

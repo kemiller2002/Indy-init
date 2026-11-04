@@ -99,7 +99,10 @@ let scopeCommand (args: string list) : int =
                     |> Array.map (fun block -> let lines = block.Split('\n', StringSplitOptions.RemoveEmptyEntries) in lines[0].Trim(), lines |> Array.skip 1 |> Array.map (fun l -> l.Trim()) |> List.ofArray)
                     |> List.ofArray
                 let isApplication (path: string) = (path.StartsWith("src/", StringComparison.Ordinal) || path.StartsWith("tests/", StringComparison.Ordinal) || path.StartsWith("web/", StringComparison.Ordinal)) && not (path.EndsWith(".fsproj", StringComparison.Ordinal))
-                finish "scope order" (implementationBeforeCheckpoint cp isApplication commits)
+                // The T0 bootstrap (the commit that installs governance, .echelon/r9-governance.json) writes the generated
+                // stubs before any checkpoint can exist; it is not implementation (as r9.fsx check-sequencing judges it).
+                let afterBootstrap = commits |> List.filter (fun (_, files) -> not (List.contains ".echelon/r9-governance.json" files))
+                finish "scope order" (implementationBeforeCheckpoint cp isApplication afterBootstrap)
     | _ -> eprintfn "usage: scope compile|preflight|checkpoint|order ..."; 2
 
 let private eventsOf (path: string) =

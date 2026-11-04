@@ -1,0 +1,3 @@
+exit 4
+  REFUSED DEADLINE_RESET the request uses T0 2026-11-10T14:00:00.0000000+00:00; the run's T0 is 2026-11-10T09:00:00.0000000+00:00 (the original deadline is never reset)
+stop-decision: REFUSED (the run clock)

@@ -25,6 +25,8 @@ type Contract =
       Roles: Role list
       Destinations: string list
       DestinationsRequirement: string
+      /// The investigation sections (UI-029 secondary navigation).
+      Sections: string list
       /// (role, hex) for the UI-016 canonical palette.
       Palette: (string * string) list
       /// Substrings that identify the theme files (the only place a literal colour may be defined).
@@ -39,6 +41,7 @@ let contractOf (j: Json) (formaInventory: Json) : Contract =
       Roles = arr "roles" j |> List.map (fun r -> { Role = str "role" r; Names = strs "names" r; Requirement = strOpt "requirement" r |> Option.defaultValue "" })
       Destinations = field "primaryDestinations" j |> Option.map (strs "names") |> Option.defaultValue []
       DestinationsRequirement = field "primaryDestinations" j |> Option.bind (strOpt "requirement") |> Option.defaultValue ""
+      Sections = field "investigationSections" j |> Option.map (strs "names") |> Option.defaultValue []
       Palette = arr "palette" j |> List.map (fun p -> str "role" p, (str "hex" p).ToUpperInvariant())
       ThemeFiles = strs "themeFiles" j
       FormaProperties = (strs "customProperties" formaInventory @ strs "hookProperties" formaInventory) |> Set.ofList }
@@ -89,8 +92,11 @@ let check (c: Contract) (files: SourceFile list) (packageJson: Json option) : Re
               yield refusal "FORMA_ROLE_MISSING" (sprintf "%s (%s): no source uses %s; a lookalike custom component does not satisfy it" r.Role r.Requirement (String.concat " or " r.Names))
       // The required primary destinations.
       for d in c.Destinations do
-          if not (Regex.IsMatch(allMarkup, @">\s*" + Regex.Escape d + @"\s*<|""" + Regex.Escape d + @"""")) then
+          if not (Regex.IsMatch(allMarkup, @">\s*" + Regex.Escape d + @"\s*<|[""'`]" + Regex.Escape d + @"[""'`]")) then
               yield refusal "DESTINATION_MISSING" (sprintf "primary destination %s (%s) appears in no source" d c.DestinationsRequirement)
+      for s in c.Sections do
+          if not (Regex.IsMatch(allMarkup, @">\s*" + Regex.Escape s + @"\s*<|[""'`]" + Regex.Escape s + @"[""'`]")) then
+              yield refusal "SECTION_MISSING" (sprintf "investigation section %s (UI-029) appears in no source" s)
       // The UI-016 palette is defined as theme tokens.
       if not (css |> List.exists (fun f -> isTheme c f.Path)) then
           yield refusal "THEME_MISSING" (sprintf "no theme file (%s) defines the Causa tokens" (String.concat ", " c.ThemeFiles))

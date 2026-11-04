@@ -1,0 +1,2 @@
+exit 0
+catalog-acceptance: GOVERNED-ACCEPTED ($SCRATCH/adv-w/catalog/acceptance.json)

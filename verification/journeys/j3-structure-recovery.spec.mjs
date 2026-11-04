@@ -3,6 +3,7 @@
 // network boundary (the request still targets the real provider path), never by replacing persistence.
 import { test, expect } from '@playwright/test';
 import { env, assertion, contextFor, connect, startInvestigation, fieldNamed, button, section, saveState, saveAndConfirm, marker } from './support.mjs';
+import { finish } from './support.mjs';
 
 const primary = (page) => page.getByRole('navigation', { name: /primary|main/i }).first();
 const recordObservation = async (page, text) => {
@@ -103,4 +104,5 @@ test('J3 application structure and recovery', async ({ browser }) => {
     expect(overflow, 'horizontal overflow at 390 px').toBeLessThanOrEqual(0);
   });
   await ctx.close();
+  finish();
 });

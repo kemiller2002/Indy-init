@@ -1,6 +1,7 @@
 // J2: complete investigation analysis (bindings.json). Governed; the builder cannot edit it.
 import { test, expect } from '@playwright/test';
 import { assertion, contextFor, connect, startInvestigation, fieldNamed, button, section, saveAndConfirm, providerHolds, marker } from './support.mjs';
+import { finish } from './support.mjs';
 
 const kind = async (page, value) => {
   const group = page.getByRole('group', { name: /evidence relationship kind/i }).or(page.getByRole('radiogroup', { name: /evidence relationship kind/i })).first();
@@ -108,4 +109,5 @@ test('J2 complete investigation analysis', async ({ browser }) => {
     await page.emulateMedia({ media: 'screen' });
   });
   await ctx.close();
+  finish();
 });

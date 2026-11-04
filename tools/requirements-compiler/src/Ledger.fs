@@ -189,10 +189,13 @@ let uiGroups = set [ "UI"; "INV"; "WDL"; "WASM-LOAD"; "EXT-DATA" ]
 
 /// The governed journeys and the requirements each one binds (verification/journeys/bindings.json is the source; the
 /// slice manifest copies it so a slice names the journeys that judge it).
-type Journey = { Id: string; Requirements: string list }
+type Journey = { Id: string; Requirements: string list; Assertions: (string * string list) list }
 
 let journeysOf (bindings: Json) : Journey list =
-    arr "journeys" bindings |> List.map (fun j -> { Id = str "id" j; Requirements = arr "assertions" j |> List.collect (strs "requirements") |> List.distinct })
+    arr "journeys" bindings
+    |> List.map (fun j ->
+        let assertions = arr "assertions" j |> List.filter (fun a -> strOpt "priority" a = Some "P0") |> List.map (fun a -> str "id" a, strs "requirements" a)
+        { Id = str "id" j; Requirements = assertions |> List.collect snd |> List.distinct; Assertions = assertions })
 
 let mergeConditions =
     [ "every mandatory applicable obligation of the slice passes in the governed gate at the merged result"
@@ -254,6 +257,9 @@ let sliceManifest (manifest: Json) (estimates: Map<string, int64>) (journeys: Jo
               "acceptanceTests", jstrs (obligations |> List.collect (strs "tests") |> List.distinct |> List.sort)
               "producers", jstrs producers
               "governedJourneys", jstrs (journeys |> List.filter (fun j -> j.Requirements |> List.exists (fun x -> List.contains x rids)) |> List.map (fun j -> j.Id))
+              // Only the P0 assertions bound to this slice's requirements judge it: another slice's assertion failing in the
+              // same journey never blocks this one.
+              "governedAssertions", jstrs (journeys |> List.collect (fun j -> j.Assertions) |> List.filter (fun (_, rs) -> rs |> List.exists (fun x -> List.contains x rids)) |> List.map fst)
               "regressionTests", JStr "every obligation integrated before this slice (computed at the gate from the ledger)"
               "realProvider", JBool(producers |> List.exists liveProducers.Contains)
               "formaAndAccessibility", JBool(rids |> List.exists (groupOf >> uiGroups.Contains))
@@ -340,17 +346,23 @@ let sliceRules : SliceRule list =
       { Id = "journeys"
         Check =
           fun _ e ->
-              let bound = strs "governedJourneys" e.Slice
+              let bound = strs "governedAssertions" e.Slice
               if bound.IsEmpty then []
               else
                   atCandidate "JOURNEYS" e e.Journeys (fun j ->
                       let results = arr "results" j
-                      [ for id in bound do
+                      [ if strOpt "baseUrl" (field "provider" j |> Option.defaultValue (JObj [])) <> Some "https://api.github.com" then
+                            yield ref' "LIVE_PROVIDER_SUBSTITUTED" "the journeys did not run against api.github.com"
+                        for id in bound do
+                            let journey = id.Substring(0, id.IndexOf '-')
                             for engine in [ "chromium"; "webkit" ] do
-                                match results |> List.tryFind (fun r -> strOpt "journey" r = Some id && strOpt "engine" r = Some engine) with
-                                | Some r when strOpt "status" r = Some "passed" -> ()
-                                | Some r -> yield ref' "JOURNEY_FAILED" (sprintf "%s failed on %s: %s" id engine (strOpt "error" r |> Option.defaultValue (strOpt "status" r |> Option.defaultValue "")))
-                                | None -> yield ref' "JOURNEY_NOT_RUN" (sprintf "%s was not run on %s" id engine) ]) }
+                                match results |> List.tryFind (fun r -> strOpt "journey" r = Some journey && strOpt "engine" r = Some engine) with
+                                | None -> yield ref' "JOURNEY_NOT_RUN" (sprintf "%s was not run on %s" journey engine)
+                                | Some r ->
+                                    match arr "assertions" r |> List.tryFind (fun a -> strOpt "id" a = Some id) with
+                                    | Some a when strOpt "status" a = Some "passed" -> ()
+                                    | Some a -> yield ref' "JOURNEY_FAILED" (sprintf "%s failed on %s: %s" id engine (strOpt "detail" a |> Option.defaultValue ""))
+                                    | None -> yield ref' "JOURNEY_NOT_RUN" (sprintf "%s did not run on %s (an earlier step of %s failed)" id engine journey) ]) }
       { Id = "regression"
         Check =
           fun s e ->

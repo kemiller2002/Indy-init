@@ -1,0 +1,3 @@
+exit 4
+  REFUSED IMPLEMENTATION_BEFORE_CHECKPOINT commit 3188fe6bf4eba54d1e6a05c419b121c65394eda1 changes application code before the scope checkpoint (commit b05fe780a1a2934b69da8e34a885712b30414f75)
+scope order: REFUSED (1)

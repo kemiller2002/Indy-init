@@ -1,0 +1,21 @@
+$ requirements-compiler design-contract design-contract --contract $SRC/kickoff/rehearsal-010/design-contract.json --forma-inventory $SRC/verification/design-contract/forma-0.13.0-inventory.json --root $WORK/r9 --candidate 0e760501b5585d11009a2fd2da8d146a1d47e025 --out $SCRATCH/rp-e/design-contract.json
+exit 4
+  REFUSED FORMA_ROLE_MISSING navigation-shell (UI-029): no source uses ef-navigation-shell; a lookalike custom component does not satisfy it
+  REFUSED FORMA_ROLE_MISSING save-status (UI-006): no source uses ef-status-lozenge; a lookalike custom component does not satisfy it
+  REFUSED DESTINATION_MISSING primary destination Administration (UI-020) appears in no source
+  REFUSED DESTINATION_MISSING primary destination Settings (UI-020) appears in no source
+  REFUSED SECTION_MISSING investigation section Overview (UI-029) appears in no source
+  REFUSED SECTION_MISSING investigation section Causal Analysis (UI-029) appears in no source
+  REFUSED SECTION_MISSING investigation section Timeline (UI-029) appears in no source
+  REFUSED THEME_MISSING no theme file (theme) defines the Causa tokens
+  REFUSED PALETTE_TOKEN_MISSING palette deep-navy #14283F (UI-016) is not defined as a theme token
+  REFUSED PALETTE_TOKEN_MISSING palette teal #087F8C (UI-016) is not defined as a theme token
+  REFUSED PALETTE_TOKEN_MISSING palette amber #E9A23B (UI-016) is not defined as a theme token
+  REFUSED PALETTE_TOKEN_MISSING palette coral #D66B58 (UI-016) is not defined as a theme token
+  REFUSED PALETTE_TOKEN_MISSING palette soft-ivory #F5F3ED (UI-016) is not defined as a theme token
+  REFUSED LITERAL_COLOUR_OUTSIDE_THEME web/causa.css:6 background: #fff uses a literal colour outside the theme boundary
+  REFUSED LITERAL_COLOUR_OUTSIDE_THEME web/causa.css:19 background: #fff uses a literal colour outside the theme boundary
+  REFUSED LITERAL_COLOUR_OUTSIDE_THEME web/causa.css:30 color: #1a1a1a uses a literal colour outside the theme boundary
+  REFUSED LITERAL_COLOUR_OUTSIDE_THEME web/causa.css:46 color: #8a5a00 uses a literal colour outside the theme boundary
+  REFUSED rendered: the rendered design contract did not run (layout, overflow, touch targets, focus, contrast, screenshots)
+design-contract: REFUSED ($SCRATCH/rp-e/design-contract.json)

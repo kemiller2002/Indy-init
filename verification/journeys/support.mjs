@@ -25,7 +25,9 @@ export const env = {
 export const providerBase = env.provider === 'harness-double' ? env.double : 'https://api.github.com';
 export const marker = (label) => `${label}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
 
-/// One bound assertion. A P0 failure fails the journey; P1 and ODR-pending failures are recorded, not thrown.
+/// One bound assertion. Every assertion runs and is recorded (so the slice gate can judge exactly the assertions bound
+/// to a slice's requirements); finish() then fails the journey if any P0 assertion failed. P1 and ODR-pending failures
+/// are recorded and reported, never failing the journey.
 export const assertion = async (journey, id, fn) => {
   const spec = bindings.journeys.find((j) => j.id === journey).assertions.find((a) => a.id === id);
   if (!spec) throw new Error(`assertion ${id} is not bound in bindings.json`);
@@ -35,8 +37,11 @@ export const assertion = async (journey, id, fn) => {
     record('passed', '');
   } catch (e) {
     record('failed', String(e.message || e).split('\n')[0]);
-    if (spec.priority === 'P0') throw e;
   }
+};
+export const finish = () => {
+  const failed = test.info().annotations.filter((a) => a.type === 'assertion').map((a) => JSON.parse(a.description)).filter((a) => a.priority === 'P0' && a.status !== 'passed');
+  if (failed.length) throw new Error(`P0 assertion(s) failed: ${failed.map((a) => `${a.id} (${a.detail})`).join('; ')}`);
 };
 
 /// In harness-double mode the browser's requests to api.github.com are answered by the double, so a fixture app that

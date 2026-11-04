@@ -1,4 +1,4 @@
-# Causa investigation requirement catalog (proposed)
+# Causa investigation requirement catalog (ratified)
 
 [`requirements/catalogs/causa-investigation.requirement-catalog.json`](../../requirements/catalogs/causa-investigation.requirement-catalog.json)
 (`CAT-CAUSA-INVESTIGATION`, schema `praxis.requirement-catalog/1`) gives the
@@ -82,18 +82,19 @@ this catalog, the frozen packages and the released Echelon tools. An earlier
 version of this section said to copy Rehearsal 8's probes, mutation tool and
 workflow. That conflicts with the contest rules and is withdrawn.
 
-**Tool releases: not yet available.** The pipeline needs
-`praxis requirements manifest` and `dokimos verification requirements`. Both
-are merged on `main` (kemiller2002/praxis #301, kemiller2002/dokimos #65) but
-**not released**. The Rehearsal 9 toolchain pins Praxis 3.24.0 and Dokimos
-0.10.0 (echelon-current 1.35.0; kickoff/rehearsal-009/toolchain.lock.json),
-and neither carries these commands. Until both are released, registered in a
-new echelon-current set and pinned in the lock, a rehearsal cannot compile or
-verify this catalog with the approved toolchain. That is an owner decision
-(docs/rehearsal-009-content-readiness/FINAL-READINESS.md).
+**Tool releases (updated 2026-11-04, R8 of the adversarial audit).** The pipeline's
+`praxis requirements manifest` and `dokimos verification requirements` are released
+in Praxis 3.25.0 and Dokimos 0.11.0 (echelon-current 1.36.0, pinned by
+`kickoff/rehearsal-009/toolchain.lock.json`). Dokimos 0.11.0 lacks the `url-input`
+component (INV-029); the fix is merged (kemiller2002/dokimos#67) and is available to
+Rehearsal 010 only once a released, qualified Dokimos carrying it is registered in
+an approved echelon-current set and pinned in the Rehearsal 010 lock
+(docs/rehearsal-010-readiness/OWNER-DECISIONS-REQUIRED.md). Governed acceptance of
+this catalog is judged by `requirements-compiler catalog-acceptance` inside the
+governed Verification gate (docs/rehearsal-010-readiness/FINAL-READINESS.md); a
+verdict from a workflow the builder wrote is supporting evidence only.
 
-Once the tools are released and pinned, the application built at kickoff
-adopts the pipeline as follows:
+The application built at kickoff adopts the pipeline as follows:
 
 1. Put `data-requirement-id="INV-0nn"` on the element of each implemented
    requirement, and list the files in

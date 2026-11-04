@@ -1,0 +1,13 @@
+$ r9.fsx suite-preflight (v4.1.2 plan) --root R9
+exit 4
+  REFUSED suite SU-OWN-DOTNET cannot execute (exit 1): MSBUILD : error MSB1008: Only one project can be specified.  [$ dotnet test tests/Causa.Contract.Tests tests/Causa.Domain.Tests tests/Causa.Persistence.Tests tests/Causa.App.Tests --list-tests]
+  REFUSED suite SU-OWN-BROWSER cannot execute (exit 1): Error: Cannot find package '@playwright/test' imported from $SCRATCH/rp-w/r9/playwright.config.js  [$ npx playwright test --project=chromium tests/browser/contract --list --pass-with-no-tests]
+  REFUSED suite SU-BROWSER-CHROMIUM cannot execute (exit 1): Error: Cannot find package '@playwright/test' imported from $SCRATCH/rp-w/r9/playwright.config.js  [$ npx playwright test --project=chromium tests/browser/acceptance tests/browser/invariants --list --pass-with-no-tests]
+  REFUSED suite SU-BROWSER-WEBKIT cannot execute (exit 1): Error: Cannot find package '@playwright/test' imported from $SCRATCH/rp-w/r9/playwright.config.js  [$ npx playwright test --project=webkit tests/browser/acceptance tests/browser/invariants --list --pass-with-no-tests]
+  REFUSED suite SU-DOTNET-LIVE cannot execute (exit 1): MSBUILD : error MSB1008: Only one project can be specified.  [$ dotnet test tests/Causa.Acceptance tests/Causa.Invariants --filter "FullyQualifiedName~Causa.Acceptance.Live.|FullyQualifiedName~Causa.Invariants.Live." --list-tests]
+  REFUSED suite SU-BROWSER-LIVE cannot execute (exit 1): Error: Cannot find package '@playwright/test' imported from $SCRATCH/rp-w/r9/playwright.config.js  [$ npx playwright test --project=chromium tests/browser/live --list --pass-with-no-tests]
+suite-preflight: REFUSED (6 cause(s))
+
+
+$SRC/tools/r9/r9.fsx(1056,83): info FS3886: This list expression contains a single tuple element. Did you mean to use ';' instead of ',' to separate list elements?
+

@@ -1,0 +1,38 @@
+exit 1
+
+Running 1 test using 1 worker
+
+  ✘  1 [chromium] › j1-create-persist.spec.mjs:5:1 › J1 investigation creation and persistence (5.7s)
+
+
+  1) [chromium] › j1-create-persist.spec.mjs:5:1 › J1 investigation creation and persistence › J1-04 Save reaches Saved, and Saved is shown only after the commit exists on GitHub 
+
+    Error: expect(locator).not.toHaveText(expected) failed
+
+    Locator: getByRole('status', { name: /save state/i }).or(locator('[data-requirement-id="INV-016"]')).first()
+    Expected pattern: not /^\s*Saved\s*$/
+    Received string: "Saved"
+    Timeout: 5000ms
+
+    Call log:
+      - Expect "not toHaveText" getByRole('status', { name: /save state/i }).or(locator('[data-requirement-id="INV-016"]')).first() with timeout 5000ms
+      - waiting for getByRole('status', { name: /save state/i }).or(locator('[data-requirement-id="INV-016"]')).first()
+        14 × locator resolved to <span role="status" aria-live="polite" aria-label="Save state" class="ef-status-lozenge ">Saved</span>
+           - unexpected value "Saved"
+
+
+      22 |   await assertion('J1', 'J1-04', async () => {
+      23 |     // Saved must not appear before the commit: GitHub is checked as soon as Saved shows.
+    > 24 |     await expect(saveState(page)).not.toHaveText(/^\s*Saved\s*$/);
+         |                                       ^
+      25 |     await button(page, 'Save').click();
+      26 |     await expect(saveState(page)).toHaveText(/^\s*Saved\s*$/, { timeout: 20000 });
+      27 |     await providerHolds([v.problem]);
+        at $SRC/verification/journeys/j1-create-persist.spec.mjs:24:39
+        at assertion ($SRC/verification/journeys/support.mjs:34:5)
+        at $SRC/verification/journeys/j1-create-persist.spec.mjs:22:3
+
+    Error Context: test-results/j1-create-persist-J1-investigation-creation-and-persistence-chromium/error-context.md
+
+  1 failed
+    [chromium] › j1-create-persist.spec.mjs:5:1 › J1 investigation creation and persistence ────────

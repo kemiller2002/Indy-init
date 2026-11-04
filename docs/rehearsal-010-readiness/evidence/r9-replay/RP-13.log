@@ -1,0 +1,3 @@
+$ requirements-compiler ledger ledger --manifest $SRC/docs/rehearsal-010-readiness/scope-manifest.json --events $SRC/docs/rehearsal-010-readiness/evidence/stop-decision/r9-events.json --out $SCRATCH/rp-e/scope-report.json
+exit 0
+ledger: $SCRATCH/rp-e/scope-report.json (193 open mandatory; CONTINUE_REQUIRED)

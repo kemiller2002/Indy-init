@@ -1,0 +1,39 @@
+exit 1
+
+Running 1 test using 1 worker
+
+  ✘  1 [chromium] › j1-create-persist.spec.mjs:5:1 › J1 investigation creation and persistence (972ms)
+
+
+  1) [chromium] › j1-create-persist.spec.mjs:5:1 › J1 investigation creation and persistence › J1-04 Save reaches Saved, and Saved is shown only after the commit exists on GitHub 
+
+    Error: values missing from GitHub (read directly): J1-problem-mw1vjxq0-si8767
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 1
+    + Received  + 3
+
+    - Array []
+    + Array [
+    +   "J1-problem-mw1vjxq0-si8767",
+    + ]
+
+       at support.mjs:69
+
+      67 |   const texts = (await providerTexts()).join('\n');
+      68 |   const missing = values.filter((v) => !texts.includes(v));
+    > 69 |   expect(missing, `values missing from GitHub (read directly): ${missing.join(', ')}`).toEqual([]);
+         |                                                                                        ^
+      70 | };
+      71 |
+      72 | const firstVisible = async (candidates) => {
+        at providerHolds ($SRC/verification/journeys/support.mjs:69:88)
+        at $SRC/verification/journeys/j1-create-persist.spec.mjs:27:5
+        at assertion ($SRC/verification/journeys/support.mjs:34:5)
+        at $SRC/verification/journeys/j1-create-persist.spec.mjs:22:3
+
+    Error Context: test-results/j1-create-persist-J1-investigation-creation-and-persistence-chromium/error-context.md
+
+  1 failed
+    [chromium] › j1-create-persist.spec.mjs:5:1 › J1 investigation creation and persistence ────────

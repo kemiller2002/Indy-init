@@ -218,7 +218,12 @@ r9case "authorize-refuses-not-ready" [ 4 ] [ "6 preflight: conditor acceptance p
 let emptyScope = Path.Combine(work, "empty-scope.json")
 write emptyScope """{"schema":"indy-init.competition-scope/1","id":"CS-EMPTY","status":"proposed"}"""
 r9case "authorize-refuses-an-empty-scope" [ 4 ] [ "the scope names no requirement" ] (authorize [] |> List.map (fun a -> if a = scopeFile then emptyScope else a)) app |> ignore
-r9case "authorize-passes-and-writes-the-checkpoint" [ 0 ] [ "checkpoint"; "1 work item(s)" ] (authorize []) app |> ignore
+// #102's scope checkpoint is required before authorization (integration): refused without it and for another scope.
+r9case "authorize-refuses-without-a-scope-checkpoint" [ 4 ] [ "7 scope: .echelon/scope-checkpoint.json is missing" ] (authorize []) app |> ignore
+write (Path.Combine(app, ".echelon", "scope-checkpoint.json")) """{"schema":"indy-init.scope-checkpoint/1","scopeSha256":"scope-approved"}"""
+commitAll app "scope checkpoint (every work item in Praxis)" |> ignore
+r9case "authorize-refuses-a-scope-checkpoint-of-another-scope" [ 4 ] [ "7 scope: the scope checkpoint pins scope-approved, not the approved scope scope-other" ] (authorize [] @ [ "--scope-sha256"; "scope-other" ]) app |> ignore
+r9case "authorize-passes-and-writes-the-checkpoint" [ 0 ] [ "checkpoint"; "1 work item(s)" ] (authorize [] @ [ "--scope-sha256"; "scope-approved" ]) app |> ignore
 let checkpointSha = commitAll app "initialization checkpoint"
 r9case "authorize-refuses-a-second-checkpoint" [ 4 ] [ "is immutable" ] (authorize []) app |> ignore
 r9case "check-sequencing-passes-ordered-history" [ 0 ] [ "no implementation before authorization" ] [ "check-sequencing"; "--target"; app ] app |> ignore
@@ -229,6 +234,9 @@ r9case "check-sequencing-allows-implementation-after-the-checkpoint" [ 0 ] [ "no
 File.AppendAllText(Path.Combine(app, ".echelon", "r9-initialization-checkpoint.json"), " ")
 commitAll app "agent: touch the checkpoint" |> ignore
 r9case "check-sequencing-refuses-an-edited-checkpoint" [ 4 ] [ "was changed after it was committed" ] [ "check-sequencing"; "--target"; app ] app |> ignore
+File.AppendAllText(Path.Combine(app, ".echelon", "scope-checkpoint.json"), " ")
+commitAll app "agent: touch the scope checkpoint" |> ignore
+r9case "check-sequencing-refuses-an-edited-scope-checkpoint" [ 4 ] [ "the scope checkpoint is immutable" ] [ "check-sequencing"; "--target"; app ] app |> ignore
 
 // Implementation before authorization (Rehearsal 009's history): reported as process violations.
 let early = Path.Combine(work, "early")

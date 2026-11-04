@@ -1,0 +1,3 @@
+exit 4
+  REFUSED SCOPE_NOT_INTEGRATED 161 applicable mandatory requirement(s) are not integrated, for example AR-001 (not-started), AR-002 (not-started), AR-003 (not-started), AR-004 (not-started), AR-005 (not-started), AR-006 (not-started)
+completion-gate: INCOMPLETE ($SCRATCH/adv-w/completion.json)

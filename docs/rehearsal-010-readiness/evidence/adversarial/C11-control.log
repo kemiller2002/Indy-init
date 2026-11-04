@@ -1,0 +1,2 @@
+exit 0
+slice-gate: PASS (slice only; never a release verdict) ($SCRATCH/adv-w/slice-gate.json)

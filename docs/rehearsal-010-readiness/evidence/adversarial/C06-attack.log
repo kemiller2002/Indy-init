@@ -1,0 +1,36 @@
+exit 1
+
+Running 1 test using 1 worker
+
+  ✘  1 [chromium] › j2-analysis.spec.mjs:21:1 › J2 complete investigation analysis (5.8s)
+
+
+  1) [chromium] › j2-analysis.spec.mjs:21:1 › J2 complete investigation analysis › J2-01 an observation with a source reference is recorded 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByText('obs-mw1vj497-u5uho4').first()
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByText('obs-mw1vj497-u5uho4').first() with timeout 5000ms
+      - waiting for getByText('obs-mw1vj497-u5uho4').first()
+
+
+      35 |     await fieldNamed(page, 'Observation source reference').fill(obs.source);
+      36 |     await button(page, 'Record an observation').click();
+    > 37 |     await expect(page.getByText(obs.text).first()).toBeVisible();
+         |                                                    ^
+      38 |   });
+      39 |   await assertion('J2', 'J2-02', async () => {
+      40 |     await section(page, 'Hypotheses');
+        at $SRC/verification/journeys/j2-analysis.spec.mjs:37:52
+        at assertion ($SRC/verification/journeys/support.mjs:34:5)
+        at $SRC/verification/journeys/j2-analysis.spec.mjs:32:3
+
+    Error Context: test-results/j2-analysis-J2-complete-investigation-analysis-chromium/error-context.md
+
+  1 failed
+    [chromium] › j2-analysis.spec.mjs:21:1 › J2 complete investigation analysis ────────────────────

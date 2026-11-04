@@ -327,3 +327,56 @@ jobs:
           path: |
             ${{ runner.temp }}/preflight.json
             ${{ runner.temp }}/runs
+
+  # Rehearsal 010 readiness: the 18 adversarial cases (attack, positive control, protection removed) and the
+  # Rehearsal 009 read-only replay (docs/rehearsal-010-readiness/ADVERSARIAL-VALIDATION.md, R9-ADVERSARIAL-REPLAY.md).
+  r10-adversarial:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Pinned Conditor and the echelon-current workstation
+        run: |
+          dotnet fsi tools/r9/r9.fsx -- install-conditor --lock kickoff/rehearsal-009/toolchain.lock.json --dir "$RUNNER_TEMP/conditor"
+          dotnet fsi tools/r9/r9.fsx -- workstation --lock kickoff/rehearsal-009/toolchain.lock.json \
+            --conditor "$RUNNER_TEMP/conditor/conditor" --home "$RUNNER_TEMP/echelon" --target-id "indy-init-adv-${{ github.run_id }}"
+          echo "$RUNNER_TEMP/echelon/.local/bin" >> "$GITHUB_PATH"
+      - name: Playwright, Chromium and WebKit; Forma for the harness fixture
+        run: |
+          mkdir -p "$RUNNER_TEMP/pw" && cd "$RUNNER_TEMP/pw" && npm init -y > /dev/null
+          npm install --no-audit --no-fund @playwright/test@1.63.0 axe-core@4.14.0 > /dev/null
+          npx playwright install --with-deps chromium webkit
+          npm pack @echelon-foundry/design-system@0.13.0 > /dev/null && mkdir forma && tar -xzf echelon-foundry-design-system-0.13.0.tgz -C forma
+          mkdir -p "$GITHUB_WORKSPACE/verification/harness/fixture-app/web/vendor/forma"
+          cp forma/package/dist/all.css "$GITHUB_WORKSPACE/verification/harness/fixture-app/web/vendor/forma/all.css"
+      - name: Adversarial validation (18 cases)
+        run: |
+          git config --global user.name ci && git config --global user.email ci@example.invalid
+          dotnet fsi tools/r10/adversarial.fsx -- --indy-init . --work "$RUNNER_TEMP/adv" --evidence "$RUNNER_TEMP/adv-evidence" \
+            --node-modules "$RUNNER_TEMP/pw/node_modules" --browsers true --dotnet-tests true
+      - name: Governed journeys and the rendered design contract on the positive-control fixture, Chromium and WebKit
+        run: |
+          node verification/harness/github-double.mjs 4610 & node verification/harness/serve.mjs verification/harness/fixture-app/web 4620 & sleep 1
+          ln -sfn "$RUNNER_TEMP/pw/node_modules" verification/journeys/node_modules
+          ln -sfn "$RUNNER_TEMP/pw/node_modules" verification/design-contract/node_modules
+          export CAUSA_PROVIDER=harness-double CAUSA_APP_URL=http://127.0.0.1:4620/ CAUSA_CANDIDATE=fixture
+          (cd verification/journeys && CAUSA_JOURNEY_RESULTS="$RUNNER_TEMP/adv-evidence/journeys-fixture.json" npx playwright test)
+          (cd verification/design-contract && CAUSA_DESIGN_RENDERED="$RUNNER_TEMP/adv-evidence/design-rendered-fixture.json" CAUSA_SCREENSHOTS="$RUNNER_TEMP/adv-evidence/screenshots" npx playwright test)
+      - name: Rehearsal 009 read-only replay
+        run: |
+          git clone -q https://github.com/kemiller2002/indy-init-rehearsal-009 "$RUNNER_TEMP/r9"
+          dotnet fsi tools/r10/r9-replay.fsx -- --indy-init . --r9 "$RUNNER_TEMP/r9" --work "$RUNNER_TEMP/replay" --evidence "$RUNNER_TEMP/replay-evidence" --suites true
+      - name: Publish
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: r10-adversarial
+          path: |
+            ${{ runner.temp }}/adv-evidence
+            ${{ runner.temp }}/replay-evidence
