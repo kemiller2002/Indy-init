@@ -1445,10 +1445,13 @@ let runnerCheck (i: Inputs) : Check =
     let defined = if config = "" then [] else planPlaywrightProjects i
     check "X21" "Every suite runner can execute on the pinned toolchain: a dotnet test runner names exactly one target (the solution or a declared test project), a Playwright runner selects the bootstrapped configuration and names only projects it defines, and every corrected runner names its suite and authorizing decision"
         [ for o in suiteRunnerOverrides i do
-              if not (suites |> List.exists (fun s -> s.Id = str "suite" o)) then yield sprintf "suiteRunners names %s, which is not a suite" (str "suite" o)
-              if str "decision" o = "" then yield sprintf "the corrected runner of %s names no decision" (str "suite" o)
-              elif not (i.AuthoredText |> List.exists (fun (n, t) -> n = "proposals/owner-decision-requests.json" && t.Contains(sprintf "\"%s\"" (str "decision" o)))) then
-                  yield sprintf "the corrected runner of %s names %s, which proposals/owner-decision-requests.json does not request" (str "suite" o) (str "decision" o)
+              // A missing field is a reported problem, never an exception: X21 must produce a diagnostic, not crash.
+              let field' k = strOpt k o |> Option.defaultValue ""
+              let suite, decision = field' "suite", field' "decision"
+              if not (suites |> List.exists (fun s -> s.Id = suite)) then yield sprintf "suiteRunners names %s, which is not a suite" suite
+              if decision = "" then yield sprintf "the corrected runner of %s names no decision" suite
+              elif not (i.AuthoredText |> List.exists (fun (n, t) -> n = "proposals/owner-decision-requests.json" && t.Contains(sprintf "\"%s\"" decision))) then
+                  yield sprintf "the corrected runner of %s names %s, which proposals/owner-decision-requests.json does not request" suite decision
           for s in suites do
               let r = runnerOf i s
               if r.Contains "dotnet test" && not (r.StartsWith("dotnet test", StringComparison.Ordinal)) then
