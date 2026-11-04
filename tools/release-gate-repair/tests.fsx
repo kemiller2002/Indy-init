@@ -420,6 +420,25 @@ git evil [ "add"; "-A" ] |> ignore
 git evil [ "commit"; "-qm"; "merge side (with implementation)" ] |> ignore
 r9case "check-sequencing-inspects-what-a-merge-adds" [ 4 ] [ "merge side (with implementation)" ] [ "check-sequencing"; "--target"; evil ] evil |> ignore
 
+// The authoritative scope manifest as the scope (docs/rehearsal-010-readiness): the owner's approve-scope record names
+// its scopeSha256, in the operator-record format owner-freeze.fsx writes ({id, authority, changes: [...]}).
+let approvedScope = Path.Combine(src, "docs", "rehearsal-010-readiness", "scope-manifest.json")
+let approvedScopeSha = (JsonNode.Parse(File.ReadAllText approvedScope) |> nonNull)["scopeSha256"].GetValue<string>()
+let operatorRecord (operator: string) (scopeSha: string) =
+    $"""{{"approvals":[{{"id":"APR-FIXTURE-RG","authority":{{"kind":"operator","id":"{operator}"}},"changes":[{{"decision_id":"ODR-RG-01","action":"approve-scope","option":"A","scope_sha256":"{scopeSha}"}}]}}]}}"""
+let nestedApproved = Path.Combine(work, "approvals-nested.json")
+write nestedApproved (operatorRecord "kemiller2002" approvedScopeSha)
+r9case "acceptance-scope-manifest-approved-by-an-operator-record" [ 4 ] [ "competitionScope: REFUSED"; "613 in-scope plan obligation(s) are not verified" ]
+    (status [ "--catalog-verification"; r9Catalog; "--gate-dir"; r9Gate; "--scope"; approvedScope; "--obligations"; r9Obligations; "--approvals"; nestedApproved; "--require"; "scope" ]) work |> ignore
+let nestedByAgent = Path.Combine(work, "approvals-nested-agent.json")
+write nestedByAgent ((operatorRecord "kemiller2002" approvedScopeSha).Replace("\"kind\":\"operator\"", "\"kind\":\"agent\""))
+r9case "acceptance-scope-manifest-agent-record-does-not-approve" [ 4 ] [ "competitionScope: SCOPE-NOT-APPROVED" ]
+    (status [ "--catalog-verification"; r9Catalog; "--gate-dir"; r9Gate; "--scope"; approvedScope; "--obligations"; r9Obligations; "--approvals"; nestedByAgent; "--require"; "scope" ]) work |> ignore
+let nestedStale = Path.Combine(work, "approvals-nested-stale.json")
+write nestedStale (operatorRecord "kemiller2002" (String('0', 64)))
+r9case "acceptance-scope-manifest-other-hash-does-not-approve" [ 4 ] [ "competitionScope: SCOPE-NOT-APPROVED" ]
+    (status [ "--catalog-verification"; r9Catalog; "--gate-dir"; r9Gate; "--scope"; approvedScope; "--obligations"; r9Obligations; "--approvals"; nestedStale; "--require"; "scope" ]) work |> ignore
+
 // ---- verdict ------------------------------------------------------------------------------------------------------
 
 let failed = cases |> List.filter (snd >> not) |> List.map fst
