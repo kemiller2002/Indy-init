@@ -273,7 +273,7 @@ jobs:
           git worktree add -q "$RUNNER_TEMP/base" "$base"
           # Whether the target base has any test code at all (wherever it lives): only a base without tests (the first
           # slice) may lack results and coverage.
-          basetests=$(git -C "$RUNNER_TEMP/base" ls-files | grep -iE '(^|/)tests?/|\.Tests?/|\.(spec|test)\.(m?js|ts)$|Tests?\.fs$' | head -1 || true)
+          basetests=$(git -C "$RUNNER_TEMP/base" ls-files | grep -E '(^|/)[Tt]ests?/|\.Tests?/|\.(spec|test)\.[cm]?[jt]sx?$|(^|/)[^/]*Tests?\.(fs|cs)$' | head -1 || true)
           (cd "$RUNNER_TEMP/base" && npm ci > /dev/null 2>&1; true)
           dotnet fsi "$src/tools/r9/r9.fsx" -- run-suites --obligations "$RUNNER_TEMP/obligations.json" --root "$RUNNER_TEMP/base" \
             --out "$RUNNER_TEMP/base-results" --suites SU-OWN-DOTNET,SU-DOTNET-DETERMINISTIC,SU-DOTNET-INVARIANTS,SU-OWN-BROWSER,SU-BROWSER-CHROMIUM || true
@@ -292,7 +292,7 @@ jobs:
           # Passed only when both live suites ran tests and none failed (their files existing is not enough).
           livestatus=failed
           trx=$(ls "$RUNNER_TEMP"/results/SU-DOTNET-LIVE/*.trx 2>/dev/null || true); pw="$RUNNER_TEMP/results/SU-BROWSER-LIVE/results.json"
-          if [ -n "$trx" ] && [ -f "$pw" ] && cat $trx | grep -q 'outcome="Passed"' && ! cat $trx | grep -qE 'outcome="(Failed|Error|Timeout|Aborted)"' \
+          if [ -n "$trx" ] && [ -f "$pw" ] && cat -- "$RUNNER_TEMP"/results/SU-DOTNET-LIVE/*.trx | grep -q 'outcome="Passed"' && ! cat -- "$RUNNER_TEMP"/results/SU-DOTNET-LIVE/*.trx | grep -qE 'outcome="(Failed|Error|Timeout|Aborted)"' \
              && [ "$(jq '.stats.unexpected // 1' "$pw")" = 0 ] && [ "$(jq '.stats.expected // 0' "$pw")" -gt 0 ]; then livestatus=passed; fi
           jq -n --arg c "$CANDIDATE" --arg s "$livestatus" '{candidate: $c, baseUrl: "https://api.github.com", status: $s}' > "$ev/live.json"
           dotnet "$rc" test-integrity --repo . --base "$base" --head "$CANDIDATE" \

@@ -212,7 +212,8 @@ let stopDecisionCommand (args: string list) : int =
             match o.TryFind "--approvals", o.TryFind "--trusted-operator" with
             | Some a, Some op -> Continuation.approvalChanges (parseFile a) (set [ op ])
             | _ -> []
-        let request = Continuation.requestOf (parseFile o["--request"])
+        let requestJson = parseFile o["--request"]
+        let request = Continuation.requestOf requestJson
         match Ledger.replayWith (exclusionsOf o) manifest (eventsOf o["--events"]) with
         | Error why -> printfn "  REFUSED %s" why; printfn "stop-decision: REFUSED (the progress events do not replay)"; 4
         | Ok ledger ->
@@ -230,6 +231,10 @@ let stopDecisionCommand (args: string list) : int =
                 match futureRequest o request.At with
                 | Some r -> { d with Permitted = false; Refusals = r :: d.Refusals }
                 | None -> d
+            let d =
+                if (strOpt "at" requestJson |> Option.bind Continuation.instant).IsNone then
+                    { d with Permitted = false; Refusals = { Code = "REQUEST_UNDATED"; Detail = "the stop request's at is missing or has no explicit UTC offset" } :: d.Refusals }
+                else d
             // "complete" before the deadline also needs the full-scope completion gate's COMPLETE verdict (--completion).
             let d =
                 // The verdict must be the governed completion gate's, for the repository's current head.

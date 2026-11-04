@@ -199,8 +199,19 @@ let decisionJson (q: Request) (d: Decision) : Json =
                 "openWorkItems", jstrs d.OpenWorkItems
                 "nextIndependentWork", jstrs (d.IndependentWorkItems |> List.truncate 10) ] ]
 
+/// An instant with an explicit UTC offset (Z or ±hh:mm); anything else is None, so no machine's local time zone
+/// can change a deadline.
+let instant (s: string) : DateTimeOffset option =
+    let s = s.Trim()
+    let explicitOffset = s.EndsWith "Z" || s.EndsWith "z" || Text.RegularExpressions.Regex.IsMatch(s, @"[T ].*[+-]\d{2}:?\d{2}$")
+    match DateTimeOffset.TryParse(s, Globalization.CultureInfo.InvariantCulture, Globalization.DateTimeStyles.None) with
+    | true, v when explicitOffset -> Some v
+    | _ -> None
+
 let requestOf (j: Json) : Request =
-    let at = strOpt "at" j |> Option.map DateTimeOffset.Parse |> Option.defaultValue DateTimeOffset.MinValue
+    // An undated or offset-less request is judged as made at the earliest instant (it never reaches the deadline);
+    // stop-decision also refuses it (REQUEST_UNDATED).
+    let at = strOpt "at" j |> Option.bind instant |> Option.defaultValue DateTimeOffset.MinValue
     let env = field "environment" j |> Option.defaultValue (JObj [])
     let claims = field "claims" j |> Option.defaultValue (JObj [])
     { At = at
@@ -282,15 +293,6 @@ let resumeJson (at: DateTimeOffset) (p: ResumePlan) : Json =
 /// The clock comes from the run's T0 record (committed once at T0, `indy-init.t0/1`) and the owner's deadline policy
 /// (`indy-init.deadline-policy/1`), never from the caller: a recovery or a replacement agent continues against the
 /// original deadline. A claimed T0 or window that differs is DEADLINE_RESET.
-/// An instant with an explicit UTC offset (Z or ±hh:mm); anything else is None, so no machine's local time zone
-/// can change a deadline.
-let instant (s: string) : DateTimeOffset option =
-    let s = s.Trim()
-    let explicitOffset = s.EndsWith "Z" || s.EndsWith "z" || Text.RegularExpressions.Regex.IsMatch(s, @"[T ].*[+-]\d{2}:?\d{2}$")
-    match DateTimeOffset.TryParse(s, Globalization.CultureInfo.InvariantCulture, Globalization.DateTimeStyles.None) with
-    | true, v when explicitOffset -> Some v
-    | _ -> None
-
 let boundClock (t0Record: Json) (policy: Json) (claimedT0: DateTimeOffset option) (claimedWindow: float option) : Result<Clock, Refusal> =
     let window = intOpt "windowMinutes" policy |> Option.map float
     match strOpt "t0" t0Record, window with

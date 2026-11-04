@@ -109,6 +109,7 @@ let detectors : Detector list =
                         | _ -> ()
                         if strOpt "clock" d = Some "replay" then yield f "DEADLINE_RESET" "blocking" "a stop decision was judged with a replay clock (--replay-clock): a live run's clock is its T0 record" [] [] "judge stop requests with --t0-record, the pinned policy and --repo" None
                         match strOpt "requestedAt" d |> Option.bind Continuation.instant with
+                        | None -> yield f "REQUEST_UNDATED" "blocking" "a stop decision records no request time with an explicit UTC offset: premature-stop and future-request checks cannot judge it" [] [] "use requirements-compiler stop-decision" None
                         | Some at when at > o.Now.AddMinutes 2.0 -> yield f "REQUEST_IN_FUTURE" "blocking" (sprintf "a stop request is dated %s, after this observation (%s)" (at.ToString "o") (o.Now.ToString "o")) [] [] "date requests when they are made" None
                         | _ -> () ]
               decisionResets @ replayed

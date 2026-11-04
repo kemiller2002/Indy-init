@@ -704,7 +704,14 @@ let cases : Case list =
         Correct = fun o -> o.Exit = 4 && has "DEPENDENCY_NOT_INTEGRATED" o
         Control = fun t -> sliceGateFor t "SL-T11" (eventsFile "t11-verified-c" t11Verified) (sliceEvidenceFor "T11" t11 "c35-control" [] (t10Executable @ t11Obligations) [])
         ControlOk = fun o -> o.Exit = 0
-        Mutation = [ ledger, [ "if judged.IsEmpty then s.Progress.CompletedItems.Contains d else", "if judged.IsEmpty then true else" ] ] } ]
+        Mutation = [ ledger, [ "if judged.IsEmpty then s.Progress.CompletedItems.Contains d else", "if judged.IsEmpty then true else" ] ] }
+      { Id = "C36"; Title = "A stop decision's request time is removed so the premature-stop checks cannot judge it"; Requirements = [ "R7"; "review 1 (round 5)"; "observer" ]; Needs = Nothing
+        Expected = "observe: blocking REQUEST_UNDATED (an undated or offset-less request is a finding, never a skipped check)"
+        Attack = fun t -> observeDecision t "c36" [ "requestedAt", box ((t0.AddMinutes 300.0).ToString "yyyy-MM-ddTHH:mm:ss"); "reason", box "complete"; "decision", box "STOP_PERMITTED"; "minutesRemaining", box 120; "deadline", at 420.0 ] []
+        Correct = fun o -> has "REQUEST_UNDATED" o
+        Control = fun t -> observeDecision t "c36-control" [ "requestedAt", at 420.0; "reason", box "deadline"; "decision", box "STOP_PERMITTED"; "minutesRemaining", box 0; "deadline", at 420.0 ] []
+        ControlOk = fun o -> not (has "REQUEST_UNDATED" o)
+        Mutation = [ "tools/requirements-compiler/src/Observer.fs", [ "                        | None -> yield f \"REQUEST_UNDATED\"", "                        | None when false -> yield f \"REQUEST_UNDATED\"" ] ] } ]
 
 
 

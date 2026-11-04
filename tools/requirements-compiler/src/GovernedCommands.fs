@@ -246,14 +246,15 @@ let designContractCommand (args: string list) =
 // ---- observer -------------------------------------------------------------------------------------------------------
 
 let private commitsOf (repo: string) : Observer.Commit list =
-    match Git.run repo [ "log"; "--reverse"; "--name-only"; "--format=@%H|%cI|%s" ] with
+    // Records are separated by U+001E, which a commit subject cannot forge into a new record.
+    match Git.run repo [ "log"; "--reverse"; "--name-only"; "--format=%x1e%H|%cI|%s" ] with
     | Error _ -> []
     | Ok bytes ->
-        (Text.Encoding.UTF8.GetString bytes).Split('@', StringSplitOptions.RemoveEmptyEntries)
+        (Text.Encoding.UTF8.GetString bytes).Split('\u001e', StringSplitOptions.RemoveEmptyEntries)
         |> Array.choose (fun block ->
             let lines = block.Split('\n', StringSplitOptions.RemoveEmptyEntries)
             match lines[0].Split('|', 3) with
-            | [| sha; at; msg |] -> Some({ Sha = sha; At = DateTimeOffset.Parse at; Message = msg; Files = lines |> Array.skip 1 |> Array.map (fun l -> l.Trim()) |> List.ofArray }: Observer.Commit)
+            | [| sha; at; msg |] when (Continuation.instant at).IsSome -> Some({ Sha = sha; At = (Continuation.instant at).Value; Message = msg; Files = lines |> Array.skip 1 |> Array.map (fun l -> l.Trim()) |> List.ofArray }: Observer.Commit)
             | _ -> None)
         |> List.ofArray
 
@@ -278,7 +279,7 @@ let observeCommand (args: string list) =
             | (_, first) :: _ -> Continuation.boundClock first policy None None |> Result.mapError (fun r -> sprintf "%s %s" r.Code r.Detail)
             | [] -> Error "no T0 record is committed"
         let clock = bound |> Result.toOption
-        let now = DateTimeOffset.Parse o["--now"]
+        let now = Continuation.instant o["--now"] |> Option.defaultWith (fun () -> failwithf "--now %s needs an explicit UTC offset" o["--now"])
         let clock' = clock |> Option.defaultValue { T0 = now; Deadline = now }
         let evidence = o.TryFind "--evidence" |> Option.filter Directory.Exists
         let files pattern = evidence |> Option.map (fun d -> Directory.EnumerateFiles(d, pattern, SearchOption.AllDirectories) |> Seq.sort |> Seq.map parseFile |> List.ofSeq) |> Option.defaultValue []
@@ -307,7 +308,7 @@ let observeCommand (args: string list) =
         let observation : Observer.Observation =
             { Now = now; Clock = clock'; ClockProblem = (match bound with Error why -> Some why | Ok _ -> None); Manifest = manifest
               CheckpointScope = checkpoint |> Option.bind (fun p -> strOpt "scopeSha256" (parseFile p))
-              CheckpointAt = checkpoint |> Option.bind (fun p -> strOpt "at" (parseFile p)) |> Option.map DateTimeOffset.Parse
+              CheckpointAt = checkpoint |> Option.bind (fun p -> strOpt "at" (parseFile p)) |> Option.bind Continuation.instant
               T0Versions = t0Versions; PinnedDigests = pinned; HeadDigests = head
               Approvals = (match o.TryFind "--approvals", o.TryFind "--trusted-operator" with Some a, Some op -> Continuation.approvalChanges (parseFile a) (set [ op ]) | _ -> [])
               Events = eventsOf o["--events"]; Commits = commitsOf repo
