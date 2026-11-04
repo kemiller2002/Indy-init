@@ -1,0 +1,16 @@
+# cmd: dokimos verification requirements --manifest manifest.json --observations obs --results pw.json --root <app whose elements only carry data-requirement-id, no behaviour> --candidate <its HEAD>
+# tool: dokimos 0.11.0, released (echelon-current 1.36.0)
+# exit: 4 (refused)
+{
+  "schema": "dokimos.requirement-verification/1",
+  "summary": {
+    "applicable": 38,
+    "implemented": 0,
+    "verified": 0,
+    "failed": 37,
+    "blocked": 1,
+    "notRun": 0,
+    "notApplicable": 0,
+    "verifiedPercent": 0
+  }
+}

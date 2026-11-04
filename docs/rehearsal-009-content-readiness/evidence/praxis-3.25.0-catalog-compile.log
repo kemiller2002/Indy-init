@@ -1,0 +1,41 @@
+# cmd: praxis requirements manifest compile --catalog requirements/catalogs/causa-investigation.requirement-catalog.json --source-commit 97481bcd1e649db9004c2f74b9c10ec96553d181 --output manifest.json
+# tool: praxis 3.25.0, released (echelon-current 1.36.0, installed by Conditor 0.10.20 workstation apply)
+# exit: 0
+{
+  "compiler": {
+    "name": "praxis requirements manifest",
+    "version": "1.0.0"
+  },
+  "catalogId": "CAT-CAUSA-INVESTIGATION",
+  "catalogStatus": "ratified",
+  "counts": {
+    "requirements": 38,
+    "requiredRequirements": 33,
+    "obligations": 250,
+    "mandatoryObligations": 202,
+    "byType": {
+      "ui-field": 15,
+      "ui-control": 8,
+      "action": 9,
+      "navigation": 0,
+      "validation-rule": 3,
+      "data-contract": 0,
+      "state-transition": 0,
+      "workflow-outcome": 3,
+      "accessibility": 0
+    },
+    "byLevel": {
+      "V1": 70,
+      "V2": 56,
+      "V3": 38,
+      "V4": 42,
+      "V5": 44
+    },
+    "retired": 0
+  },
+  "retired": [],
+  "contentHash": "77d32de8dfd4080235a1b4566a53a91040fb9844b40c304a3f3663877a722822"
+}
+
+# cmd: (same) --previous <manifest of the catalog at 0ab8ffd, INV-001..018>
+# exit: 0 (no requirement or obligation dropped or renamed; retired [])
