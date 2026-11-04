@@ -111,7 +111,7 @@ let progressCommand (args: string list) : int =
     let o = options args
     match o.TryFind "--manifest", o.TryFind "--events", o.TryFind "--out" with
     | Some m, Some e, Some out ->
-        match Progress.replay (parseFile m) (eventsOf e) with
+        match Ledger.replay (parseFile m) (eventsOf e) |> Result.map (fun l -> l.Progress) with
         | Error why -> printfn "  REFUSED %s" why; printfn "progress: REFUSED"; 4
         | Ok s ->
             File.WriteAllText(out, serialize (Progress.report s))
@@ -119,23 +119,47 @@ let progressCommand (args: string list) : int =
             0
     | _ -> eprintfn "usage: progress --manifest FILE --events FILE --out FILE"; 2
 
+/// The run clock. With --t0-record and --deadline-policy (Rehearsal 010 and later) it is bound to the committed T0
+/// record and the owner's policy; a --t0 or --window-minutes that differs is DEADLINE_RESET. Without them (earlier
+/// replays) --t0 and --window-minutes are used as given.
+let private clockOf (o: Map<string, string>) : Result<Continuation.Clock, Refusal> =
+    let claimedT0 = o.TryFind "--t0" |> Option.map DateTimeOffset.Parse
+    let claimedWindow = o.TryFind "--window-minutes" |> Option.map float
+    match o.TryFind "--t0-record", o.TryFind "--deadline-policy" with
+    | Some t, Some p -> Continuation.boundClock (parseFile t) (parseFile p) claimedT0 claimedWindow
+    | Some _, None -> Error { Code = "DEADLINE_POLICY_MISSING"; Detail = "--t0-record needs --deadline-policy" }
+    | None, _ ->
+        match claimedT0 with
+        | Some t0 -> Ok { T0 = t0; Deadline = t0.AddMinutes(claimedWindow |> Option.defaultValue 420.0) }
+        | None -> Error { Code = "T0_RECORD_MISSING"; Detail = "no --t0-record and no --t0" }
+
 let stopDecisionCommand (args: string list) : int =
     let o = options args
-    if not ([ "--manifest"; "--checkpoint"; "--events"; "--request"; "--t0"; "--out" ] |> List.forall o.ContainsKey) then
-        eprintfn "usage: stop-decision --manifest FILE --checkpoint FILE --events FILE --request FILE --t0 ISO [--window-minutes 420] [--approvals FILE --trusted-operator ID] --out FILE"; 2
+    if not ([ "--manifest"; "--checkpoint"; "--events"; "--request"; "--out" ] |> List.forall o.ContainsKey) || not (o.ContainsKey "--t0" || o.ContainsKey "--t0-record") then
+        eprintfn "usage: stop-decision --manifest FILE --checkpoint FILE --events FILE --request FILE (--t0-record FILE --deadline-policy FILE | --t0 ISO [--window-minutes 420]) [--approvals FILE --trusted-operator ID] --out FILE"; 2
     else
+        match clockOf o with
+        | Error refusal -> printfn "  REFUSED %s %s" refusal.Code refusal.Detail; printfn "stop-decision: REFUSED (the run clock)"; 4
+        | Ok clock ->
         let manifest = parseFile o["--manifest"]
-        let t0 = DateTimeOffset.Parse o["--t0"]
-        let window = o.TryFind "--window-minutes" |> Option.map float |> Option.defaultValue 420.0
         let approvals =
             match o.TryFind "--approvals", o.TryFind "--trusted-operator" with
             | Some a, Some op -> Continuation.approvalChanges (parseFile a) (set [ op ])
             | _ -> []
         let request = Continuation.requestOf (parseFile o["--request"])
-        match Progress.replay manifest (eventsOf o["--events"]) with
+        match Ledger.replay manifest (eventsOf o["--events"]) with
         | Error why -> printfn "  REFUSED %s" why; printfn "stop-decision: REFUSED (the progress events do not replay)"; 4
-        | Ok s ->
-            let d = Continuation.decide s { T0 = t0; Deadline = t0.AddMinutes window } (str "scopeSha256" (parseFile o["--checkpoint"])) approvals request
+        | Ok ledger ->
+            let s = ledger.Progress
+            let d0 = Continuation.decide s clock (str "scopeSha256" (parseFile o["--checkpoint"])) approvals request
+            // "complete" also needs every applicable mandatory requirement integrated on main, not only verified.
+            let unintegrated =
+                arr "requirements" manifest
+                |> List.filter (fun r -> boolOr "mandatory" false r && Ledger.applies request.Facts r && not (List.contains (Ledger.ledgerState ledger (str "id" r)) [ Ledger.Integrated; Ledger.Excluded ]))
+            let d =
+                if request.Reason = "complete" && request.At < clock.Deadline && not unintegrated.IsEmpty then
+                    { d0 with Permitted = false; Refusals = d0.Refusals @ [ { Code = "SCOPE_NOT_INTEGRATED"; Detail = sprintf "%d applicable mandatory requirement(s) are not integrated on main" unintegrated.Length } ] }
+                else d0
             File.WriteAllText(o["--out"], serialize (Continuation.decisionJson request d))
             d.Refusals |> List.iter (fun r -> printfn "  REFUSED %s %s" r.Code r.Detail)
             printfn "stop-decision: %s (%d minute(s) remaining, %d open mandatory requirement(s))" (if d.Permitted then "STOP_PERMITTED" else "CONTINUE_REQUIRED") d.MinutesRemaining d.OpenMandatory.Length
@@ -145,19 +169,20 @@ let stopDecisionCommand (args: string list) : int =
 /// that need no repair), 4 when the checkpoint must be repaired first.
 let resumeCommand (args: string list) : int =
     let o = options args
-    if not ([ "--manifest"; "--checkpoint"; "--events"; "--t0"; "--at"; "--out" ] |> List.forall o.ContainsKey) then
-        eprintfn "usage: resume --manifest FILE --checkpoint FILE --events FILE --t0 ISO --at ISO [--window-minutes 420] [--stop-decision FILE] --out FILE"; 2
+    if not ([ "--manifest"; "--checkpoint"; "--events"; "--at"; "--out" ] |> List.forall o.ContainsKey) || not (o.ContainsKey "--t0" || o.ContainsKey "--t0-record") then
+        eprintfn "usage: resume --manifest FILE --checkpoint FILE --events FILE (--t0-record FILE --deadline-policy FILE | --t0 ISO [--window-minutes 420]) --at ISO [--stop-decision FILE] --out FILE"; 2
     else
+        match clockOf o with
+        | Error refusal -> printfn "  REFUSED %s %s" refusal.Code refusal.Detail; printfn "resume: REFUSED (the run clock)"; 4
+        | Ok clock ->
         let manifest = parseFile o["--manifest"]
-        let t0 = DateTimeOffset.Parse o["--t0"]
-        let window = o.TryFind "--window-minutes" |> Option.map float |> Option.defaultValue 420.0
         let at = DateTimeOffset.Parse o["--at"]
         let checkpointScope = if File.Exists o["--checkpoint"] then strOpt "scopeSha256" (parseFile o["--checkpoint"]) |> Option.defaultValue "" else ""
         let stopped = o.TryFind "--stop-decision" |> Option.filter File.Exists |> Option.exists (fun f -> strOpt "decision" (parseFile f) = Some "STOP_PERMITTED")
-        match Progress.replay manifest (eventsOf o["--events"]) with
+        match Ledger.replay manifest (eventsOf o["--events"]) |> Result.map (fun l -> l.Progress) with
         | Error why -> printfn "  REFUSED %s" why; printfn "resume: REFUSED (the progress events do not replay)"; 4
         | Ok s ->
-            let p = Continuation.resumePlan s { T0 = t0; Deadline = t0.AddMinutes window } checkpointScope at stopped
+            let p = Continuation.resumePlan s clock checkpointScope at stopped
             File.WriteAllText(o["--out"], serialize (Continuation.resumeJson at p))
             p.Refusals |> List.iter (fun r -> printfn "  REFUSED %s %s" r.Code r.Detail)
             printfn "resume: %s (%d minute(s) remaining, next: %s)" p.Action p.MinutesRemaining (p.NextWork |> List.truncate 5 |> String.concat ", ")

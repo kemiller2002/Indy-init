@@ -1,0 +1,497 @@
+/// The coverage ledger, the derived slice execution manifest and the two independent gates (adversarial audit R6;
+/// correctness-first execution).
+///
+/// - The ledger folds the progress events (Progress) with the integration events this module adds, and gives each
+///   requirement exactly one of eight states. There is no "partial" state: a requirement is integrated or it is not.
+/// - The slice manifest is derived from the approved scope; every requirement is assigned to a slice, classified as a
+///   full-release (record) obligation, or excluded by an owner decision. Anything else is a refusal.
+/// - The slice integration gate decides whether one slice may merge. The full-scope completion gate decides whether
+///   the release is complete. A slice PASS is never a release PASS: the completion gate reads only whole-plan,
+///   release-mode, governed evidence.
+module Ledger
+
+open System
+open System.Text.RegularExpressions
+open Json
+open Scope
+open Progress
+
+// ---- ledger state ------------------------------------------------------------------------------------------------
+
+type LedgerState =
+    | NotStarted
+    | InProgress
+    | ImplementedUnverified
+    | VerifiedUnmerged
+    | Integrated
+    | Blocked
+    | Failed
+    | Excluded
+
+let ledgerStateName =
+    function
+    | NotStarted -> "not-started"
+    | InProgress -> "in-progress"
+    | ImplementedUnverified -> "implemented-unverified"
+    | VerifiedUnmerged -> "verified-unmerged"
+    | Integrated -> "integrated"
+    | Blocked -> "blocked"
+    | Failed -> "failed"
+    | Excluded -> "excluded"
+
+let allLedgerStates = [ NotStarted; InProgress; ImplementedUnverified; VerifiedUnmerged; Integrated; Blocked; Failed; Excluded ]
+
+type State =
+    { Progress: Progress.State
+      /// requirement -> the main commit that integrated it
+      IntegratedAt: Map<string, string>
+      /// requirement -> the owner decision that excluded it
+      ExcludedBy: Map<string, string>
+      /// Some (commit, cause) while main is unhealthy (deployment verification failed after a merge): no merges.
+      Unhealthy: (string * string) option }
+
+let ledgerKinds = set [ "integrated"; "excluded"; "main-unhealthy"; "main-healthy" ]
+
+let ledgerState (s: State) (id: string) : LedgerState =
+    if s.ExcludedBy.ContainsKey id then Excluded
+    else
+        match status s.Progress id with
+        | NotStartedStatus -> NotStarted
+        | ImplementationInProgress -> InProgress
+        | VerificationPending -> ImplementedUnverified
+        | VerificationBlocked -> Blocked
+        | VerificationFailed -> Failed
+        | Verified
+        | Accepted -> if s.IntegratedAt.ContainsKey id then Integrated else VerifiedUnmerged
+
+let private applyLedger (s: State) (j: Json) : Result<State, string> =
+    let known id = s.Progress.Requirements.ContainsKey id
+    match strOpt "kind" j with
+    | Some "integrated" ->
+        let rs, commit = strs "requirements" j, strOpt "commit" j |> Option.defaultValue ""
+        let unknown = rs |> List.filter (known >> not)
+        let unverified = rs |> List.filter (fun id -> known id && not (List.contains (status s.Progress id) [ Verified; Accepted ]))
+        if commit = "" then Error "integrated names no main commit"
+        elif not unknown.IsEmpty then Error(sprintf "integrated names requirements outside the scope: %s" (String.concat ", " unknown))
+        elif not unverified.IsEmpty then Error(sprintf "integration of requirements that are not verified is refused: %s" (String.concat ", " unverified))
+        elif s.Unhealthy.IsSome then Error(sprintf "integration while main is unhealthy (%s) is refused: repair or revert first" (snd s.Unhealthy.Value))
+        else Ok { s with IntegratedAt = rs |> List.fold (fun m id -> m.Add(id, commit)) s.IntegratedAt }
+    | Some "excluded" ->
+        let id, decision = strOpt "requirement" j |> Option.defaultValue "", strOpt "decision" j |> Option.defaultValue ""
+        let authority = field "authority" j |> Option.bind (strOpt "kind") |> Option.defaultValue ""
+        if not (known id) then Error(sprintf "excluded names a requirement outside the scope: %s" id)
+        elif authority <> "operator" then Error(sprintf "exclusion of %s by %s is refused: only the owner (operator) excludes scope" id (if authority = "" then "an unnamed authority" else authority))
+        elif decision = "" then Error(sprintf "exclusion of %s names no owner decision" id)
+        else Ok { s with ExcludedBy = s.ExcludedBy.Add(id, decision) }
+    | Some "main-unhealthy" -> Ok { s with Unhealthy = Some(strOpt "commit" j |> Option.defaultValue "", strOpt "cause" j |> Option.defaultValue "deployment verification failed") }
+    | Some "main-healthy" -> Ok { s with Unhealthy = None }
+    | k -> Error(sprintf "not a ledger event: %A" k)
+
+/// Folds progress and ledger events in order; the first refused event stops the fold.
+let replay (manifest: Json) (events: Json list) : Result<State, string> =
+    let start = { Progress = Progress.initial manifest; IntegratedAt = Map.empty; ExcludedBy = Map.empty; Unhealthy = None }
+    events
+    |> List.indexed
+    |> List.fold
+        (fun acc (n, j) ->
+            acc
+            |> Result.bind (fun s ->
+                if ledgerKinds.Contains(strOpt "kind" j |> Option.defaultValue "") then applyLedger s j
+                else eventOf j |> Result.bind (Progress.apply s.Progress) |> Result.map (fun p -> { s with Progress = p }))
+            |> Result.mapError (sprintf "event %d: %s" (n + 1)))
+        (Ok start)
+
+// ---- applicability ------------------------------------------------------------------------------------------------
+
+/// A requirement applies always, or when every `fact=value` of its rule holds.
+let applies (facts: Map<string, string>) (req: Json) =
+    match strOpt "applicability" req |> Option.defaultValue "always" with
+    | "always" -> true
+    | rule -> rule.Split([| " and " |], StringSplitOptions.None) |> Array.forall (fun c -> match c.Split('=') with [| k; v |] -> facts.TryFind k = Some v | _ -> false)
+
+let private requirements (s: State) = arr "requirements" s.Progress.Manifest
+
+/// The requirement group: the id without its trailing number (PERSIST-001 -> PERSIST, EXT-DATA-013 -> EXT-DATA).
+let groupOf (id: string) =
+    let m = Regex.Match(id, @"^(.*?)-?[0-9]+(\.[0-9]+)?$")
+    if m.Success && m.Groups[1].Value <> "" then m.Groups[1].Value else id
+
+// ---- the machine-readable scope report -------------------------------------------------------------------------------
+
+let scopeReport (s: State) (facts: Map<string, string>) : Json =
+    let reqs = requirements s |> List.filter (applies facts)
+    let obligationState (req: Json) (o: Json) =
+        let id = str "id" req
+        let rs = s.Progress.Requirements[id]
+        match ledgerState s id, obligationVerification s.Progress rs o with
+        | Excluded, _ -> "excluded"
+        | NotStarted, _ -> "missing"
+        | _, OBlocked _ -> "blocked"
+        | _, OFail _ -> "failed"
+        | Integrated, OPass -> "integrated"
+        | _, OPass -> "verified"
+        | (InProgress | ImplementedUnverified | VerifiedUnmerged | Blocked | Failed | Integrated), OPending -> if rs.Implementation = Implemented then "implemented" else "in-progress"
+    let group (g: string, members: Json list) =
+        let states = members |> List.collect (fun r -> arr "obligations" r |> List.filter (boolOr "mandatory" false) |> List.map (obligationState r))
+        let count st = states |> List.filter ((=) st) |> List.length
+        // Implemented counts every obligation whose implementation is done, whatever its verification; verified
+        // counts every passing one; integrated only those merged to main.
+        let implemented = states |> List.filter (fun x -> List.contains x [ "implemented"; "verified"; "integrated"; "failed"; "blocked" ]) |> List.length
+        JObj
+            [ "group", JStr g
+              "requirements", jint members.Length
+              "mandatoryRequirements", jint (members |> List.filter (boolOr "mandatory" false) |> List.length)
+              "applicableObligations", jint states.Length
+              "implemented", jint implemented
+              "verified", jint (count "verified" + count "integrated")
+              "integrated", jint (count "integrated")
+              "missing", jint (count "missing")
+              "inProgress", jint (count "in-progress")
+              "blocked", jint (count "blocked")
+              "failed", jint (count "failed")
+              "excluded", jint (count "excluded")
+              "states", JObj(allLedgerStates |> List.map (fun st -> ledgerStateName st, jint (members |> List.filter (fun r -> ledgerState s (str "id" r) = st) |> List.length)))
+              "workItems", jstrs (members |> List.collect (strs "workItems") |> List.distinct |> List.sort)
+              "supportingEvidence", jstrs (members |> List.choose (fun r -> s.IntegratedAt.TryFind(str "id" r)) |> List.distinct)
+              "exclusions", JArr(members |> List.choose (fun r -> s.ExcludedBy.TryFind(str "id" r) |> Option.map (fun d -> JObj [ "requirement", JStr(str "id" r); "decision", JStr d ]))) ]
+    let groups = reqs |> List.groupBy (str "id" >> groupOf) |> List.sortBy fst
+    let mandatoryOpen = reqs |> List.filter (fun r -> boolOr "mandatory" false r && not (List.contains (ledgerState s (str "id" r)) [ Integrated; Excluded ]))
+    JObj
+        [ "schema", JStr "indy-init.scope-report/1"
+          "scopeSha256", JStr(strOpt "scopeSha256" s.Progress.Manifest |> Option.defaultValue "")
+          "mainHealthy", JBool s.Unhealthy.IsNone
+          "states", JObj(allLedgerStates |> List.map (fun st -> ledgerStateName st, jint (reqs |> List.filter (fun r -> ledgerState s (str "id" r) = st) |> List.length)))
+          "mandatoryApplicable", jint (reqs |> List.filter (boolOr "mandatory" false) |> List.length)
+          "mandatoryOpen", jint mandatoryOpen.Length
+          "completion", JStr(if mandatoryOpen.IsEmpty then "SCOPE-INTEGRATED" else "CONTINUE_REQUIRED")
+          "groups", JArr(groups |> List.map group)
+          "requirements",
+          JArr(
+              reqs
+              |> List.map (fun r ->
+                  let id = str "id" r
+                  JObj
+                      [ "id", JStr id
+                        "mandatory", JBool(boolOr "mandatory" false r)
+                        "state", JStr(ledgerStateName (ledgerState s id))
+                        "workItems", jstrs (strs "workItems" r)
+                        "integratedAt", jopt JStr (s.IntegratedAt.TryFind id)
+                        "excludedBy", jopt JStr (s.ExcludedBy.TryFind id) ])
+          ) ]
+
+// ---- the derived slice execution manifest ---------------------------------------------------------------------------
+
+/// Producers that need the real provider (GitHub) rather than a deterministic double.
+let liveProducers = set [ "SU-DOTNET-LIVE"; "SU-BROWSER-LIVE" ]
+
+/// Requirement groups whose slices carry Forma, design-contract and accessibility obligations.
+let uiGroups = set [ "UI"; "INV"; "WDL"; "WASM-LOAD"; "EXT-DATA" ]
+
+/// The governed journeys and the requirements each one binds (verification/journeys/bindings.json is the source; the
+/// slice manifest copies it so a slice names the journeys that judge it).
+type Journey = { Id: string; Requirements: string list }
+
+let journeysOf (bindings: Json) : Journey list =
+    arr "journeys" bindings |> List.map (fun j -> { Id = str "id" j; Requirements = arr "assertions" j |> List.collect (strs "requirements") |> List.distinct })
+
+let mergeConditions =
+    [ "every mandatory applicable obligation of the slice passes in the governed gate at the merged result"
+      "every dependency slice is integrated"
+      "every governed journey bound to the slice's requirements passes in Chromium and WebKit"
+      "every previously integrated obligation still passes (regression)"
+      "the application builds and starts at the merged result"
+      "required real-provider checks pass against api.github.com"
+      "the merged result is the candidate merged onto the current target branch"
+      "no mandatory security, accessibility or design-contract check fails"
+      "no test was removed, skipped or weakened" ]
+
+/// Derives the slice manifest. `estimates` maps execution-DAG task ids to their estimated minutes.
+let sliceManifest (manifest: Json) (estimates: Map<string, int64>) (journeys: Journey list) (s: State option) : Json * Refusal list =
+    let reqs = arr "requirements" manifest
+    let items = arr "workItems" manifest
+    let reqById = reqs |> List.map (fun r -> str "id" r, r) |> Map.ofList
+    let excluded = s |> Option.map (fun st -> st.ExcludedBy) |> Option.defaultValue Map.empty
+    let classify (r: Json) =
+        let id = str "id" r
+        if excluded.ContainsKey id then "excluded"
+        elif not (strs "workItems" r).IsEmpty then "slice"
+        elif arr "obligations" r |> List.forall (fun o -> strOpt "kind" o = Some "record") then "full-release"
+        else "unassigned"
+    let unassigned = reqs |> List.filter (classify >> (=) "unassigned") |> List.map (str "id")
+    let danglingItems = reqs |> List.collect (fun r -> strs "workItems" r |> List.filter (fun w -> not (items |> List.exists (fun x -> str "id" x = w))) |> List.map (fun w -> str "id" r, w))
+    let refusals =
+        [ for id in unassigned do yield { Code = "REQUIREMENT_UNASSIGNED"; Detail = sprintf "%s has executable obligations but no slice, no full-release classification and no owner exclusion" id }
+          for id, w in danglingItems do yield { Code = "WORK_ITEM_UNKNOWN"; Detail = sprintf "%s names work item %s, which the scope does not register" id w } ]
+    let slice (w: Json) =
+        let wid = str "id" w
+        let rs = strs "requirements" w |> List.choose reqById.TryFind
+        let obligations = rs |> List.collect (arr "obligations")
+        let producers = obligations |> List.collect (strs "producers") |> List.distinct |> List.sort
+        let rids = rs |> List.map (str "id")
+        let status =
+            match s with
+            | None -> "not-started"
+            | Some st ->
+                let states = rids |> List.map (ledgerState st)
+                if rids.IsEmpty then (if st.Progress.CompletedItems.Contains wid then "integrated" else "not-started")
+                elif states |> List.forall (fun x -> x = Integrated || x = Excluded) then "integrated"
+                elif states |> List.contains Failed then "failed"
+                elif states |> List.contains Blocked then "blocked"
+                elif states |> List.forall (fun x -> List.contains x [ VerifiedUnmerged; Integrated; Excluded ]) then "verified-unmerged"
+                elif states |> List.forall ((=) NotStarted) then "not-started"
+                elif states |> List.exists (fun x -> x = InProgress || x = NotStarted) then "in-progress"
+                else "implemented-unverified"
+        JObj
+            [ "id", JStr("SL-" + wid)
+              "workItem", JStr wid
+              "title", JStr(strOpt "title" w |> Option.defaultValue "")
+              "requirements", jstrs rids
+              "gateRequirements", jstrs (strs "gateRequirements" w)
+              "obligations", jstrs (obligations |> List.map (str "id"))
+              "mandatoryObligations", jint (obligations |> List.filter (boolOr "mandatory" false) |> List.length)
+              "dependsOn", jstrs (strs "dependsOn" w |> List.map ((+) "SL-"))
+              "implementationBoundary", JStr(strOpt "owner" w |> Option.defaultValue "integration")
+              "acceptanceTests", jstrs (obligations |> List.collect (strs "tests") |> List.distinct |> List.sort)
+              "producers", jstrs producers
+              "governedJourneys", jstrs (journeys |> List.filter (fun j -> j.Requirements |> List.exists (fun x -> List.contains x rids)) |> List.map (fun j -> j.Id))
+              "regressionTests", JStr "every obligation integrated before this slice (computed at the gate from the ledger)"
+              "realProvider", JBool(producers |> List.exists liveProducers.Contains)
+              "formaAndAccessibility", JBool(rids |> List.exists (groupOf >> uiGroups.Contains))
+              "mergeConditions", jstrs mergeConditions
+              "estimateMinutes", (match estimates.TryFind wid with Some m -> JInt m | None -> JNull)
+              "estimateSource", JStr(if estimates.ContainsKey wid then "execution-dag" else "unestimated: generated work item (no DAG estimate)")
+              "status", JStr status ]
+    let classified = reqs |> List.map (fun r -> str "id" r, classify r)
+    let count c = classified |> List.filter (snd >> (=) c) |> List.length
+    JObj
+        [ "schema", JStr "indy-init.slice-execution-manifest/1"
+          "scopeSha256", JStr(strOpt "scopeSha256" manifest |> Option.defaultValue "")
+          "derivedFrom", JStr "the approved scope manifest; requirements are not rewritten"
+          "coverage",
+          JObj
+              [ "requirements", jint reqs.Length
+                "inSlices", jint (count "slice")
+                "fullRelease", jint (count "full-release")
+                "excluded", jint (count "excluded")
+                "unassigned", jint (count "unassigned")
+                "complete", JBool(refusals.IsEmpty) ]
+          "fullReleaseObligations", jstrs (classified |> List.filter (snd >> (=) "full-release") |> List.map fst)
+          "crossCutting",
+          JObj
+              [ "designContract", JStr "verification/design-contract (every UI-bearing slice and the release)"
+                "journeys", jstrs (journeys |> List.map (fun j -> j.Id))
+                "regression", JStr "every integrated obligation, at every merge" ]
+          "slices", JArr(items |> List.map slice) ],
+    refusals
+
+// ---- the slice integration gate --------------------------------------------------------------------------------------
+
+/// What a slice merge is judged on. Every artifact names the candidate it judged; the gate compares it with the
+/// merged result, never with a SHA the builder asserts.
+type SliceEvidence =
+    { Slice: Json
+      /// The merged result: the candidate merged onto the current target.
+      Candidate: string
+      /// The target branch head the merged result was built on, and the target's head now.
+      TargetBase: string
+      TargetHead: string
+      Gate: Json option
+      Journeys: Json option
+      DesignContract: Json option
+      Regression: Json option
+      Build: Json option
+      LiveProvider: Json option
+      TestIntegrity: Json option }
+
+type SliceRule = { Id: string; Check: State -> SliceEvidence -> Refusal list }
+
+let private ref' code detail = { Code = code; Detail = detail }
+let private candidateOf (j: Json) = strOpt "candidate" j |> Option.defaultValue ""
+
+let private atCandidate (name: string) (e: SliceEvidence) (j: Json option) (ok: Json -> Refusal list) =
+    match j with
+    | None -> [ ref' (name + "_MISSING") (sprintf "no %s evidence for the merged result %s" (name.ToLowerInvariant().Replace('_', ' ')) e.Candidate) ]
+    | Some x when candidateOf x <> e.Candidate -> [ ref' (name + "_STALE") (sprintf "the %s evidence is for %s, not the merged result %s" (name.ToLowerInvariant().Replace('_', ' ')) (candidateOf x) e.Candidate) ]
+    | Some x -> ok x
+
+let sliceRules : SliceRule list =
+    [ { Id = "main-healthy"
+        Check = fun s _ -> match s.Unhealthy with Some(c, why) -> [ ref' "MAIN_UNHEALTHY" (sprintf "main is unhealthy at %s (%s); no merge until it is repaired or reverted" c why) ] | None -> [] }
+      { Id = "dependencies-integrated"
+        Check =
+          fun s e ->
+              let deps = strs "dependsOn" e.Slice |> List.map (fun d -> d.Substring 3)
+              let items = arr "workItems" s.Progress.Manifest |> List.map (fun w -> str "id" w, strs "requirements" w) |> Map.ofList
+              [ for d in deps do
+                    let rs = items.TryFind d |> Option.defaultValue []
+                    let integrated = if rs.IsEmpty then s.Progress.CompletedItems.Contains d else rs |> List.forall (fun r -> List.contains (ledgerState s r) [ Integrated; Excluded ])
+                    if not integrated then yield ref' "DEPENDENCY_NOT_INTEGRATED" (sprintf "dependency SL-%s is not integrated" d) ] }
+      { Id = "current-target"
+        Check = fun _ e -> if e.TargetBase <> e.TargetHead || e.TargetHead = "" then [ ref' "STALE_TARGET" (sprintf "the merged result was built on %s; the target is now %s: re-merge and re-verify" e.TargetBase e.TargetHead) ] else [] }
+      { Id = "governed-gate"
+        Check =
+          fun _ e ->
+              atCandidate "GATE" e e.Gate (fun g ->
+                  let scope = strs "scope" g |> Set.ofList
+                  let missing = strs "requirements" e.Slice |> List.filter (scope.Contains >> not)
+                  [ if strOpt "workItem" g <> strOpt "workItem" e.Slice then yield ref' "GATE_OTHER_WORK_ITEM" (sprintf "the gate judged work item %s, not %s" (strOpt "workItem" g |> Option.defaultValue "(none)") (str "workItem" e.Slice))
+                    if not missing.IsEmpty then yield ref' "GATE_SCOPE_INCOMPLETE" (sprintf "the gate's scope omits %s" (String.concat ", " missing))
+                    for c in strs "causes" g do yield ref' "MANDATORY_OBLIGATION_UNVERIFIED" c ]) }
+      { Id = "journeys"
+        Check =
+          fun _ e ->
+              let bound = strs "governedJourneys" e.Slice
+              if bound.IsEmpty then []
+              else
+                  atCandidate "JOURNEYS" e e.Journeys (fun j ->
+                      let results = arr "results" j
+                      [ for id in bound do
+                            for engine in [ "chromium"; "webkit" ] do
+                                match results |> List.tryFind (fun r -> strOpt "journey" r = Some id && strOpt "engine" r = Some engine) with
+                                | Some r when strOpt "status" r = Some "passed" -> ()
+                                | Some r -> yield ref' "JOURNEY_FAILED" (sprintf "%s failed on %s: %s" id engine (strOpt "error" r |> Option.defaultValue (strOpt "status" r |> Option.defaultValue "")))
+                                | None -> yield ref' "JOURNEY_NOT_RUN" (sprintf "%s was not run on %s" id engine) ]) }
+      { Id = "regression"
+        Check =
+          fun s e ->
+              let integrated = arr "requirements" s.Progress.Manifest |> List.filter (fun r -> s.IntegratedAt.ContainsKey(str "id" r)) |> List.collect (arr "obligations") |> List.filter (boolOr "mandatory" false) |> List.map (str "id")
+              if integrated.IsEmpty then []
+              else
+                  atCandidate "REGRESSION" e e.Regression (fun r ->
+                      let passed = strs "passed" r |> Set.ofList
+                      [ for o in integrated do
+                            if not (passed.Contains o) then yield ref' "REGRESSION" (sprintf "previously integrated obligation %s does not pass at the merged result" o) ]) }
+      { Id = "build-and-start"
+        Check =
+          fun _ e ->
+              atCandidate "BUILD" e e.Build (fun b ->
+                  [ if not (boolOr "built" false b) then yield ref' "BUILD_FAILED" "the application does not build"
+                    if not (boolOr "started" false b) then yield ref' "START_FAILED" "the application does not start" ]) }
+      { Id = "real-provider"
+        Check =
+          fun _ e ->
+              if not (boolOr "realProvider" false e.Slice) then []
+              else
+                  atCandidate "LIVE_PROVIDER" e e.LiveProvider (fun l ->
+                      [ if strOpt "baseUrl" l <> Some "https://api.github.com" then yield ref' "LIVE_PROVIDER_SUBSTITUTED" (sprintf "the real-provider check ran against %s, not api.github.com; a double is not real-provider verification" (strOpt "baseUrl" l |> Option.defaultValue "(unknown)"))
+                        if strOpt "status" l <> Some "passed" then yield ref' "LIVE_PROVIDER_FAILED" (sprintf "the real-provider check is %s" (strOpt "status" l |> Option.defaultValue "missing")) ]) }
+      { Id = "design-contract"
+        Check =
+          fun _ e ->
+              if not (boolOr "formaAndAccessibility" false e.Slice) then []
+              else atCandidate "DESIGN_CONTRACT" e e.DesignContract (fun d -> [ for c in strs "causes" d do yield ref' "DESIGN_CONTRACT" c ] @ (if strOpt "verdict" d = Some "PASS" then [] else [ ref' "DESIGN_CONTRACT" "the design contract did not pass" ])) |> List.distinctBy (fun r -> r.Detail) }
+      { Id = "test-integrity"
+        Check = fun _ e -> atCandidate "TEST_INTEGRITY" e e.TestIntegrity (fun t -> arr "refusals" t |> List.map (fun r -> ref' (str "code" r) (str "detail" r))) } ]
+
+let sliceGateWith (rules: SliceRule list) (s: State) (e: SliceEvidence) : Refusal list = rules |> List.collect (fun r -> r.Check s e)
+
+let sliceGate s e = sliceGateWith sliceRules s e
+
+let sliceVerdictJson (e: SliceEvidence) (refusals: Refusal list) =
+    JObj
+        [ "schema", JStr "indy-init.slice-gate/1"
+          "slice", JStr(str "id" e.Slice)
+          "candidate", JStr e.Candidate
+          "verdict", JStr(if refusals.IsEmpty then "PASS" else "REFUSED")
+          "claimsRelease", JBool false
+          "refusals", JArr(refusals |> List.map refusalJson) ]
+
+// ---- the full-scope completion gate ----------------------------------------------------------------------------------
+
+type ReleaseEvidence =
+    { Candidate: string
+      ReleaseGate: Json option
+      CatalogAcceptance: Json option
+      Journeys: Json option
+      DesignContract: Json option
+      Facts: Map<string, string> }
+
+type CompletionRule = { Id: string; Check: State -> ReleaseEvidence -> Refusal list }
+
+let completionRules : CompletionRule list =
+    [ { Id = "release-gate"
+        Check =
+          fun _ e ->
+              match e.ReleaseGate with
+              | None -> [ ref' "RELEASE_GATE_MISSING" "no release-mode gate verdict for the candidate; the full-release gate has not executed" ]
+              | Some g ->
+                  [ if candidateOf g <> e.Candidate then yield ref' "RELEASE_GATE_STALE" (sprintf "the gate verdict is for %s, not %s" (candidateOf g) e.Candidate)
+                    if strOpt "mode" g <> Some "release" then yield ref' "SLICE_VERDICT_IS_NOT_RELEASE" (sprintf "the gate ran in %s mode; only a release-mode verdict over the whole plan completes the release" (strOpt "mode" g |> Option.defaultValue "(unknown)"))
+                    if not (strs "scope" g).IsEmpty || (strOpt "workItem" g |> Option.defaultValue "") <> "" then yield ref' "SLICE_VERDICT_IS_NOT_RELEASE" "the gate verdict is scoped to a slice or work item; a slice PASS is never a release PASS"
+                    for c in strs "causes" g do yield ref' "RELEASE_GATE_REFUSED" c ] }
+      { Id = "catalog"
+        Check =
+          fun _ e ->
+              match e.CatalogAcceptance with
+              | None -> [ ref' "CATALOG_ACCEPTANCE_MISSING" "no governed catalog acceptance for the candidate" ]
+              | Some c ->
+                  [ if candidateOf c <> e.Candidate then yield ref' "CATALOG_ACCEPTANCE_STALE" (sprintf "the catalog acceptance is for %s" (candidateOf c))
+                    if strOpt "level" c <> Some "GOVERNED-ACCEPTED" then yield ref' "CATALOG_NOT_GOVERNED_ACCEPTED" (sprintf "the catalog level is %s" (strOpt "level" c |> Option.defaultValue "(none)")) ] }
+      { Id = "journeys"
+        Check =
+          fun _ e ->
+              match e.Journeys with
+              | None -> [ ref' "JOURNEYS_MISSING" "the governed journeys did not run for the candidate" ]
+              | Some j ->
+                  let results = arr "results" j
+                  [ if candidateOf j <> e.Candidate then yield ref' "JOURNEYS_STALE" (sprintf "the journey results are for %s" (candidateOf j))
+                    if strOpt "baseUrl" (field "provider" j |> Option.defaultValue (JObj [])) <> Some "https://api.github.com" then yield ref' "LIVE_PROVIDER_SUBSTITUTED" "the journeys did not run against api.github.com"
+                    for engine in [ "chromium"; "webkit" ] do
+                        if not (results |> List.exists (fun r -> strOpt "engine" r = Some engine)) then yield ref' "JOURNEY_NOT_RUN" (sprintf "no journey ran on %s" engine)
+                    for r in results do
+                        if strOpt "status" r <> Some "passed" then yield ref' "JOURNEY_FAILED" (sprintf "%s on %s: %s" (str "journey" r) (str "engine" r) (strOpt "status" r |> Option.defaultValue "")) ] }
+      { Id = "design-contract"
+        Check =
+          fun _ e ->
+              match e.DesignContract with
+              | None -> [ ref' "DESIGN_CONTRACT_MISSING" "the design contract did not run for the candidate" ]
+              | Some d -> [ if candidateOf d <> e.Candidate then yield ref' "DESIGN_CONTRACT_STALE" "the design-contract verdict is for another commit"
+                            if strOpt "verdict" d <> Some "PASS" then yield ref' "DESIGN_CONTRACT_FAILED" (String.concat "; " (strs "causes" d |> List.truncate 5)) ] }
+      { Id = "scope-integrated"
+        Check =
+          fun s e ->
+              let open' = arr "requirements" s.Progress.Manifest |> List.filter (fun r -> boolOr "mandatory" false r && applies e.Facts r && not (List.contains (ledgerState s (str "id" r)) [ Integrated; Excluded ]))
+              if open'.IsEmpty then []
+              else [ ref' "SCOPE_NOT_INTEGRATED" (sprintf "%d applicable mandatory requirement(s) are not integrated, for example %s" open'.Length (open' |> List.truncate 6 |> List.map (fun r -> sprintf "%s (%s)" (str "id" r) (ledgerStateName (ledgerState s (str "id" r)))) |> String.concat ", ")) ] } ]
+
+let completionGateWith (rules: CompletionRule list) (s: State) (e: ReleaseEvidence) = rules |> List.collect (fun r -> r.Check s e)
+
+let completionGate s e = completionGateWith completionRules s e
+
+let completionJson (e: ReleaseEvidence) (refusals: Refusal list) =
+    JObj
+        [ "schema", JStr "indy-init.completion-gate/1"
+          "candidate", JStr e.Candidate
+          "verdict", JStr(if refusals.IsEmpty then "COMPLETE" else "INCOMPLETE")
+          "refusals", JArr(refusals |> List.map refusalJson) ]
+
+// ---- test integrity: no test removed, skipped or weakened to get green ------------------------------------------------
+
+type TestDiffLine = { File: string; Added: bool; Text: string }
+
+let private isTestFile (f: string) =
+    f.StartsWith("tests/", StringComparison.Ordinal) || f.Contains ".spec." || f.Contains ".test." || f.EndsWith("Tests.fs", StringComparison.Ordinal)
+
+let private skipPattern = Regex(@"\b(test|it|describe)\.(skip|fixme|only)\s*\(|Skip\s*=\s*""|\[<\s*Fact\s*\(\s*Skip|\[<\s*Ignore|\bxit\s*\(|\bxdescribe\s*\(|test\.fail\s*\(")
+let private assertionPattern = Regex(@"\bexpect\s*\(|\bAssert\.|\bshould\b|\btoBe|\btoHave|\btoEqual|\bassert\b")
+
+/// Compares the test identities recorded at the base (what was integrated) with those at the head, and the changed
+/// lines of test files. A removed identity, an added skip/only marker or a net loss of assertions in a test file is a
+/// refusal. Governed acceptance assets (verification/ in Indy-init) are never in the candidate, so the builder cannot
+/// edit them at all.
+let testIntegrity (baseTests: Set<string>) (headTests: Set<string>) (diff: TestDiffLine list) : Refusal list =
+    let removed = Set.difference baseTests headTests
+    let testDiff = diff |> List.filter (fun d -> isTestFile d.File)
+    let skips = testDiff |> List.filter (fun d -> d.Added && skipPattern.IsMatch d.Text)
+    let assertionLoss =
+        testDiff
+        |> List.groupBy (fun d -> d.File)
+        |> List.choose (fun (f, ls) ->
+            let n added = ls |> List.filter (fun d -> d.Added = added && assertionPattern.IsMatch d.Text) |> List.length
+            if n false > n true then Some(f, n false - n true) else None)
+    [ for t in removed do yield ref' "TEST_REMOVED" (sprintf "test %s passed at the base and is absent at the head" t)
+      for d in skips do yield ref' "TEST_SKIPPED" (sprintf "%s adds a skip/only marker: %s" d.File (d.Text.Trim()))
+      for f, n in assertionLoss do yield ref' "TEST_WEAKENED" (sprintf "%s loses %d assertion(s) net" f n) ]
+
+let testIntegrityJson (candidate: string) (refusals: Refusal list) =
+    JObj [ "schema", JStr "indy-init.test-integrity/1"; "candidate", JStr candidate; "verdict", JStr(if refusals.IsEmpty then "PASS" else "REFUSED"); "refusals", JArr(refusals |> List.map refusalJson) ]

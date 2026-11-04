@@ -1,0 +1,54 @@
+{
+  "schema": "indy-init.journey-bindings/1",
+  "description": "Owner-controlled black-box acceptance journeys (adversarial audit R3). Every assertion is bound to approved requirement IDs; none adds product behaviour. priority P0 fails the journey; P1 and ODR-pending assertions are recorded and reported but do not fail it (UI-009 is P1; the WASM-LOAD P0 subset is owner decision ODR-R10-08). The builder cannot edit these files: they run from the governed Indy-init checkout.",
+  "accessibleNames": "Fields and actions are found by the catalog's names (CAT-CAUSA-INVESTIGATION name fields) and by the requirement-named destinations and sections. The connection form is found by role and label pattern (owner, repository, branch, token|credential) because no requirement fixes those labels; the pattern list is owner decision ODR-R10-07.",
+  "journeys": [
+    {
+      "id": "J1",
+      "title": "Investigation creation and persistence",
+      "spec": "j1-create-persist.spec.mjs",
+      "assertions": [
+        { "id": "J1-01", "priority": "P0", "requirements": [ "EXT-DATA-002" ], "check": "a fresh launch shows a disconnected workspace with an explicit Connect data repository action" },
+        { "id": "J1-02", "priority": "P0", "requirements": [ "EXT-DATA-003", "UI-001" ], "check": "connecting to the designated test repository shows its investigations" },
+        { "id": "J1-03", "priority": "P0", "requirements": [ "INV-001", "INV-002", "INV-023", "INV-004", "EXT-DATA-008" ], "check": "an investigation with a problem statement, title and question is started" },
+        { "id": "J1-04", "priority": "P0", "requirements": [ "INV-015", "INV-016", "PERSIST-007", "PERSIST-030" ], "check": "Save reaches Saved, and Saved is shown only after the commit exists on GitHub" },
+        { "id": "J1-05", "priority": "P0", "requirements": [ "INV-037", "PERSIST-021" ], "check": "GitHub itself (read by the journey, not the app) holds every entered value" },
+        { "id": "J1-06", "priority": "P0", "requirements": [ "INV-017", "INV-008", "INV-006", "INV-037", "UI-001" ], "check": "a fresh browser context lists the investigation, opens it, and shows its identity and content" }
+      ]
+    },
+    {
+      "id": "J2",
+      "title": "Complete investigation analysis",
+      "spec": "j2-analysis.spec.mjs",
+      "assertions": [
+        { "id": "J2-01", "priority": "P0", "requirements": [ "INV-014", "INV-024", "INV-025" ], "check": "an observation with a source reference is recorded" },
+        { "id": "J2-02", "priority": "P0", "requirements": [ "INV-009", "INV-026", "INV-010" ], "check": "two hypotheses are recorded and listed" },
+        { "id": "J2-03", "priority": "P0", "requirements": [ "INV-012", "INV-013", "INV-027", "INV-028" ], "check": "two evidence items are recorded" },
+        { "id": "J2-04", "priority": "P0", "requirements": [ "INV-030", "INV-031", "INV-038" ], "check": "evidence is linked to a hypothesis as supports and as contradicts, each with a rationale" },
+        { "id": "J2-05", "priority": "P0", "requirements": [ "INV-030", "UI-005", "UI-033", "OD-INDY-23" ], "check": "each link is shown from the evidence view and from the hypothesis view" },
+        { "id": "J2-06", "priority": "P0", "requirements": [ "INV-030", "INV-035" ], "check": "reassessing a link changes its kind and keeps the earlier assessment in the history" },
+        { "id": "J2-07", "priority": "P0", "requirements": [ "INV-032", "INV-033" ], "check": "a conclusion is recorded" },
+        { "id": "J2-08", "priority": "P0", "requirements": [ "UI-029", "UI-026", "UI-003" ], "check": "Overview, Causal Analysis, Evidence, Hypotheses and Timeline each open and show this investigation's content; Causal Analysis lists the relationships" },
+        { "id": "J2-09", "priority": "P0", "requirements": [ "INV-037", "INV-035" ], "check": "after Save and a reload in a fresh context every value, link and the reassessment history persist" },
+        { "id": "J2-10", "priority": "P1", "requirements": [ "UI-009" ], "check": "a report of the investigation renders and has a print presentation" }
+      ]
+    },
+    {
+      "id": "J3",
+      "title": "Application structure and recovery",
+      "spec": "j3-structure-recovery.spec.mjs",
+      "assertions": [
+        { "id": "J3-01", "priority": "P0", "requirements": [ "UI-020", "UI-029" ], "check": "Investigations, Administration and Settings are persistent primary destinations; each opens and marks itself current" },
+        { "id": "J3-02", "priority": "P0", "requirements": [ "UI-031", "UI-020" ], "check": "Administration shows the provider and repository; Settings shows preferences" },
+        { "id": "J3-03", "priority": "P0", "requirements": [ "PERSIST-031", "INV-016" ], "check": "an edit makes the state Unsaved" },
+        { "id": "J3-04", "priority": "P0", "requirements": [ "PERSIST-031", "PERSIST-032" ], "check": "going offline with unsaved changes shows Offline and keeps the values; coming back shows Unsaved" },
+        { "id": "J3-05", "priority": "P0", "requirements": [ "PERSIST-011", "PERSIST-031", "INV-016" ], "check": "a second writer's save shows Conflict and keeps that tab's values" },
+        { "id": "J3-06", "priority": "P0", "requirements": [ "PERSIST-031" ], "check": "a provider refusal shows Save failed and keeps the values" },
+        { "id": "J3-07", "priority": "P0", "requirements": [ "PERSIST-015", "PERSIST-031" ], "check": "a lost answer after a write is sent shows Unknown commit outcome, never Saved" },
+        { "id": "J3-08", "priority": "P0", "requirements": [ "UI-011", "UI-029" ], "check": "the primary navigation is reachable and operable by keyboard with visible focus" },
+        { "id": "J3-09", "priority": "P0", "requirements": [ "UI-011", "UI-029" ], "check": "at 390 px the shell and workspace have no horizontal overflow" },
+        { "id": "J3-10", "priority": "ODR-pending", "requirements": [ "WASM-LOAD-001", "UI-014" ], "check": "while the application loads, a visible status says it is loading" }
+      ]
+    }
+  ]
+}

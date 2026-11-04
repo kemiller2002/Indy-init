@@ -1,0 +1,16 @@
+/* Causa theme tokens (UI-016). The only place a literal colour is defined. */
+:root {
+  --causa-deep-navy: #14283F;
+  --causa-teal: #087F8C;
+  --causa-amber: #E9A23B;
+  --causa-coral: #D66B58;
+  --causa-soft-ivory: #F5F3ED;
+  --causa-ink: #14283F;
+  --causa-on-navy: #F5F3ED;
+  --causa-teal-strong: #066570;
+  --causa-coral-strong: #9E3E2E;
+  --causa-amber-ink: #5C3A07;
+  --causa-surface: #FFFFFF;
+  --causa-border: #5E6B78;
+  --causa-focus: #087F8C;
+}

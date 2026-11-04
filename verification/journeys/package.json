@@ -1,0 +1,7 @@
+{
+  "name": "indy-init-governed-journeys",
+  "private": true,
+  "type": "module",
+  "description": "Owner-controlled acceptance journeys J1-J3 and the rendered design contract (verification/). Run from the governed Indy-init checkout.",
+  "devDependencies": { "@playwright/test": "1.63.0", "axe-core": "4.14.0" }
+}

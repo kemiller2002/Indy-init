@@ -1,0 +1,25 @@
+/* Harness positive control: layout on Forma and the Causa theme tokens only (no literal colours). */
+body { margin: 0; background: var(--causa-soft-ivory); color: var(--causa-ink); font-family: system-ui, sans-serif; }
+.causa-skip { display: inline-flex; align-items: center; min-height: 44px; padding: 0 12px; color: var(--causa-ink); }
+.causa-loading { padding: 16px; }
+.causa-header { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding: 8px 16px; background: var(--causa-deep-navy); color: var(--causa-on-navy); }
+.causa-brand { font-weight: 700; }
+.causa-primary, .causa-sections { display: flex; flex-wrap: wrap; gap: 4px; }
+.causa-primary a { color: var(--causa-on-navy); }
+.causa-primary a, .causa-sections a, button, .causa-list a, main p > a { display: inline-flex; align-items: center; min-height: 44px; min-width: 44px; padding: 0 12px; box-sizing: border-box; }
+.causa-primary a[aria-current="page"] { text-decoration: underline; }
+.causa-sections a { color: var(--causa-teal-strong); }
+.causa-sections a[aria-current="page"] { font-weight: 700; text-decoration: underline; }
+main { padding: 16px; max-width: 72rem; margin: 0 auto; box-sizing: border-box; overflow-wrap: anywhere; }
+label { display: block; margin-top: 8px; }
+input, textarea, select { width: 100%; max-width: 40rem; min-height: 44px; box-sizing: border-box; border: 1px solid var(--causa-border); background: var(--causa-surface); color: var(--causa-ink); }
+input[type=radio] { appearance: none; width: 44px; height: 44px; min-height: 44px; border: 2px solid var(--causa-border); border-radius: 50%; vertical-align: middle; }
+input[type=radio]:checked { background: radial-gradient(circle, var(--causa-teal) 40%, var(--causa-surface) 45%); }
+button { background: var(--causa-teal); color: var(--causa-surface); border: 1px solid var(--causa-border); margin-top: 8px; }
+:focus-visible { outline: 3px solid var(--causa-focus); outline-offset: 2px; }
+.ef-status-lozenge { display: inline-block; padding: 4px 8px; border: 1px solid var(--causa-border); background: var(--causa-surface); color: var(--causa-ink); }
+.ef-status-lozenge.causa-attention { background: var(--causa-amber); color: var(--causa-ink); }
+.causa-contradicts { border-left: 6px solid var(--causa-coral); padding-left: 8px; }
+.causa-conflict { color: var(--causa-coral-strong); }
+.causa-card { background: var(--causa-surface); border: 1px solid var(--causa-border); padding: 12px; margin: 8px 0; }
+@media print { .causa-header, .causa-sections { display: none; } }

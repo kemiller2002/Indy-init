@@ -1,0 +1,13 @@
+{
+  "schema": "indy-init.deadline-policy/1",
+  "status": "PROPOSED (ODR-R10-06): binding once the owner pins its sha256 as deadlinePolicy.sha256 in the lock",
+  "windowMinutes": 420,
+  "resetPermitted": false,
+  "t0Record": "evidence/t0/t0.json",
+  "t0RecordSchema": { "schema": "indy-init.t0/1", "t0": "ISO-8601 UTC", "deadline": "t0 + windowMinutes", "windowMinutes": 420 },
+  "rule": "The T0 record is committed once, at T0, before any other rehearsal commit, and never changed. stop-decision and resume take --t0-record and --deadline-policy; a claimed T0 or window that differs is DEADLINE_RESET. Recovery, container loss and agent replacement continue against the original deadline.",
+  "computeLimit": {
+    "status": "none approved",
+    "rule": "A stated compute budget is not a stop condition. Stopping on compute needs a separate owner record {action: approve-compute-limit, decision_id, limit} and evidence that the limit is reached (stop-decision reason compute-limit)."
+  }
+}

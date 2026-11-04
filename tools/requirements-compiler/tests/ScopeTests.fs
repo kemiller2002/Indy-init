@@ -87,6 +87,7 @@ let private request (minutesIn: float) (reason: string) =
       EnvironmentEvidence = []
       EnvironmentAttempts = 0
       ScopeSha256 = scope
+      ComputeUsed = None
       Facts = Map.empty }
 
 let private codes (d: Decision) = d.Refusals |> List.map (fun r -> r.Code)

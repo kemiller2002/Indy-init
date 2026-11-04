@@ -1,0 +1,6 @@
+{
+  "name": "indy-init-harness-fixture-app",
+  "private": true,
+  "description": "Harness positive control for the governed journeys and design contract; not Causa.",
+  "dependencies": { "@echelon-foundry/design-system": "0.13.0" }
+}
