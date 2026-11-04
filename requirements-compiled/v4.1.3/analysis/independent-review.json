@@ -1,6 +1,0 @@
-{
- "package": "requirements-compiled/v4.1.3",
- "verdict": "NOT_RUN",
- "summary": "No independent review of v4.1.3 has run; it is scheduled by FREEZE.md step 2.",
- "findings": []
-}

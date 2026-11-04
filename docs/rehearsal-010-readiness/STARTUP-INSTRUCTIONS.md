@@ -1,8 +1,8 @@
 # Rehearsal 010 startup instructions
 
 These replace the Rehearsal 009 launch instructions. They take effect only once the owner has:
-- recorded ODR-V413-04..06;
-- tagged v4.1.3;
+- recorded the v4.1.4 decisions and approval (#101, `docs/release-gate-repair/owner-decision-requests.json`);
+- tagged v4.1.4;
 - pinned `kickoff/rehearsal-010/toolchain.lock.json`.
 
 Until then, Rehearsal 010 is not ready (PROCESS-CORRECTIONS.md §Verdict). **Do not launch it from this document alone.**
@@ -25,27 +25,46 @@ Do not add a narrower target or a compute-saving instruction to the prompt. If t
 
 ## 2. Before any application code (T10, the bootstrap)
 
-1. Record T0 and bootstrap exactly as `requirements-compiled/v4.1.3/AGENT-RULES.md` duty 1 says. Then run:
-   `r9.fsx govern --indy-init SRC --target . --lock kickoff/rehearsal-010/toolchain.lock.json`
-2. **Suite preflight:**
-   ```
-   dotnet fsi SRC/tools/r9/r9.fsx -- suite-preflight --plan SRC/requirements-compiled/v4.1.3/verification-execution-plan.json --root . --out evidence/t0/suite-preflight.json
-   ```
-   It must PASS: every executable suite command lists, every Playwright project (`chromium`, `webkit`) is defined, and no `dotnet test` runner names two projects. A refusal is a T10 defect; fix it in T10.
-3. **Create every work item in Praxis.** Run `./praxis add "[ID] title"` for each entry of the manifest's `workItems` (35 items: T10–T36, `WI-GEN-*`, `WI-INV-*`). `scope preflight --praxis-queue .ros/work/queue.json` prints each missing item as the exact `praxis add` command.
-4. **Scope preflight and checkpoint:**
-   ```
-   requirements-compiler scope checkpoint --source SRC --package requirements-compiled/v4.1.3 --manifest SRC/docs/rehearsal-010-readiness/scope-manifest.json \
-     --praxis-queue .ros/work/queue.json --at NOW --commit SRC-COMMIT --out .echelon/scope-checkpoint.json
-   ```
-   It writes the checkpoint only when both of these pass:
-   - the manifest equals what the frozen sources give (no omitted, weakened or unsourced requirement, no orphaned work item, every obligation with a producer);
-   - every work item is in Praxis.
+Follow the startup order in [`docs/release-gate-repair/NEXT-REHEARSAL-STARTUP.md`](../release-gate-repair/NEXT-REHEARSAL-STARTUP.md) (#101), with the package and lock the owner pinned: workstation, preflights, T0 bootstrap with v4.1.4, catalog manifest, obligations, suite preflight, initialization checkpoint. Two changes apply:
 
-   Commit and push the checkpoint. Then run `./praxis work checkpoint`.
-5. `requirements-compiler scope order --repo .` must PASS on every commit: no file under `src/`, `tests/` or `web/` (other than project files) may precede the checkpoint commit.
+1. **`govern` names the lock**, so the gate compiles the pinned package and runs `check-sequencing` with the scope:
+   ```
+   dotnet fsi SRC/tools/r9/r9.fsx -- govern --indy-init SRC --target . --lock kickoff/rehearsal-010/toolchain.lock.json
+   ```
+2. **The work items come from the scope manifest, and the scope is checkpointed before authorization:**
+   - **Generate the work plan.** `authorize-implementation` reads it; do not write it by hand.
+     ```
+     requirements-compiler scope work-plan --manifest SRC/docs/rehearsal-010-readiness/scope-manifest.json --out .echelon/r9-work-plan.json
+     ```
+   - **Create every one of its 36 work items in Praxis:** T10–T36, `WI-GEN-*` and `WI-INV-*`. Use `./praxis work begin --id ID …` or `./praxis add "[ID] title"`. `scope preflight` prints each missing one.
+   - **Write the scope checkpoint, then commit and push it:**
+     ```
+     requirements-compiler scope checkpoint --source SRC --package requirements-compiled/v4.1.4 --manifest SRC/docs/rehearsal-010-readiness/scope-manifest.json \
+       --praxis-queue .ros/work/queue.json --praxis-context .ros/context/current.json --at NOW --commit SRC-COMMIT --out .echelon/scope-checkpoint.json
+     ```
+     It writes the checkpoint only when the manifest equals what the frozen sources give and every work item is in Praxis.
+   - **Run `authorize-implementation`** (#101) and commit the initialization checkpoint.
 
-**Implementation is prohibited until steps 2–4 pass.** They do not require any implementation or verification to be complete.
+   `r9.fsx check-sequencing --scope-manifest` runs in the gate on every push. It refuses:
+   - application code committed before the later of the two checkpoints;
+   - a scope hash that differs from the approved manifest;
+   - an edited scope checkpoint;
+   - incomplete Praxis coverage at the checkpoint commit.
+
+On a tree past initialization, run `suite-preflight` with `--require-tests true`. A suite command that executes but selects no test is refused.
+
+**Implementation is prohibited until these steps pass.** None of them requires any implementation or verification to be complete.
+
+### Incremental merges and final completion
+
+- **A vertical slice merges** when the gate passes in development mode. That covers:
+  - the slice's applicable acceptance tests (the requirements it adds to `.echelon/verification-scope.json`, which may only grow);
+  - regression of every requirement already in that scope;
+  - governance and sequencing.
+
+  It does not need the other 198 requirements.
+- **Before merging, check the slice's dependencies.** The `dependsOn` of the slice's work items in the manifest must be implemented and verified. The gate does not yet check this (PROCESS-CORRECTIONS.md §9, follow-up F1).
+- **The full-scope manifest stays authoritative** for planning, coverage, reporting, the stop decision (§5), and the release gate (`mode=release`). Completion of the run is still every applicable mandatory requirement verified.
 
 ## 3. Tracking progress
 

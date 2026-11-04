@@ -127,10 +127,17 @@ let adversarial () : string list =
       // 3. A required work item has not been created in Praxis.
       let queue (ids: string list) = JObj [ "items", JArr(ids |> List.map (fun id -> JObj [ "title", JStr(sprintf "[%s] work" id) ])) ]
       let all = arr "workItems" manifest |> List.map (str "id")
-      let missing = coverage manifest (queue (all |> List.filter ((<>) "T2")))
+      let missing = coverage manifest [ queue (all |> List.filter ((<>) "T2")) ]
       if missing |> List.map (fun r -> r.Code) <> [ "WORK_ITEM_MISSING" ] || not (missing.Head.Detail.StartsWith "T2") then yield sprintf "3: a missing work item was not refused: %A" missing
-      if not (coverage manifest (queue all)).IsEmpty then yield "3: a complete Praxis backlog was refused"
-      let r9Queue = coverage manifest (JObj [ "items", JArr [ JObj [ "title", JStr "Build the platform from the kickoff contract" ] ] ])
+      if not (coverage manifest [ queue all ]).IsEmpty then yield "3: a complete Praxis backlog was refused"
+      // Work items begun with `praxis work begin` (.ros/context/current.json) count as well as backlog items.
+      let context = JObj [ "workItems", JArr(all |> List.map (fun id -> JObj [ "id", JStr id ])) ]
+      if not (coverage manifest [ context ]).IsEmpty then yield "3: work items begun in Praxis were not counted"
+      // The generated work plan links every obligation of the scope to a work item (authorize-implementation step 4).
+      let planned = workPlan manifest |> arr "workItems" |> List.collect (strs "obligations") |> Set.ofList
+      let everyObligation = arr "requirements" manifest |> List.collect (arr "obligations") |> List.map (str "id") |> Set.ofList
+      if planned <> everyObligation then yield sprintf "3: the work plan leaves %d obligation(s) unlinked" (Set.difference everyObligation planned).Count
+      let r9Queue = coverage manifest [ JObj [ "items", JArr [ JObj [ "id", JStr "COND-MISSION-001"; "title", JStr "Build the platform from the kickoff contract" ] ] ] ]
       if r9Queue.Length <> all.Length then
           yield "3: Rehearsal 009's single mission item was accepted as coverage"
 
@@ -212,13 +219,7 @@ let legitimate () : string list =
       | Error _ -> ()
       match replay manifest [ started "T9" [ "Z-999" ] ] with
       | Ok _ -> yield "progress: a requirement outside the scope was applied"
-      | Error _ -> ()
-      // Implementation may not precede the scope checkpoint.
-      let isApp (p: string) = p.StartsWith "src/"
-      if (implementationBeforeCheckpoint ".echelon/scope-checkpoint.json" isApp [ "a", [ "README.md" ]; "b", [ "src/A.fs" ]; "c", [ ".echelon/scope-checkpoint.json" ] ]).IsEmpty then
-          yield "order: application code before the checkpoint was accepted"
-      if not (implementationBeforeCheckpoint ".echelon/scope-checkpoint.json" isApp [ "a", [ "README.md" ]; "c", [ ".echelon/scope-checkpoint.json" ]; "b", [ "src/A.fs" ] ]).IsEmpty then
-          yield "order: application code after the checkpoint was refused" ]
+      | Error _ -> () ]
 
 // ---- recovery: a successor continues from repository files alone ----------------------------------------------
 
@@ -249,7 +250,7 @@ let recovery () : string list =
 let private manifestPath (source: string) = Path.Combine(source, "docs", "rehearsal-010-readiness", "scope-manifest.json")
 
 let real (source: string) : string list =
-    let s = ScopeCommands.sourcesOf source "requirements-compiled/v4.1.3"
+    let s = ScopeCommands.sourcesOf source "requirements-compiled/v4.1.4"
     let m = compile s
     let committed = parseFile (manifestPath source)
     let reqs = arr "requirements" m
@@ -261,7 +262,7 @@ let real (source: string) : string list =
       for id in p0 @ inv do
           if not (ids.Contains id) then yield sprintf "real: approved requirement %s is not in the manifest" id
       for r in reqs do
-          if boolOr "executable" false r && (strs "workItems" r).IsEmpty then yield sprintf "real: %s has no implementation work item" (str "id" r)
+          if (strs "workItems" r).IsEmpty then yield sprintf "real: %s has no work item" (str "id" r)
           for o in arr "obligations" r do
               if (strs "producers" o).IsEmpty then yield sprintf "real: %s has no producer" (str "id" o)
       let count k = field "counts" m |> Option.bind (intOpt k) |> Option.defaultValue -1L
@@ -294,38 +295,37 @@ let real (source: string) : string list =
           if asked.Head.OpenMandatory.Length < 161 then yield sprintf "r9 replay: only %d open mandatory requirements" asked.Head.OpenMandatory.Length
           if asked.Head.IndependentWorkItems.IsEmpty then yield "r9 replay: no independent work offered while the gate is blocked" ]
 
-// ---- X21: suite runners that cannot execute ----------------------------------------------------------------------
+// ---- independent consistency check against #101's obligation inventory --------------------------------------------
 
-let private setIn (key: string) (value: Json) (j: Json) =
-    match j with
-    | JObj ps when ps |> List.exists (fst >> (=) key) -> JObj(ps |> List.map (fun (k, v) -> if k = key then k, value else k, v))
-    | JObj ps -> JObj(ps @ [ key, value ])
-    | j -> j
-
-let suiteRunners (source: string) : string list =
-    let inputs v = Program.v41Inputs source (Path.Combine(source, "requirements-compiled", v)) (Path.Combine(source, "requirements-compiled", "v4")) None
-    let x21 (i: V41Package.Inputs) = (V41Package.build i).Checks |> List.filter (fun c -> c.Id = "X21")
-    let v413 = inputs "v4.1.3"
-    let unrepaired = { v413 with Amendment = v413.Amendment |> Option.map (setIn "suiteRunners" (JArr [])) }
-    let wrongSuite = { v413 with Amendment = v413.Amendment |> Option.map (setIn "suiteRunners" (JArr [ JObj [ "suite", JStr "SU-NOPE"; "runner", JStr "dotnet test Causa.slnx"; "decision", JStr "ODR-V413-04" ] ])) }
-    let undecided = { v413 with Amendment = v413.Amendment |> Option.map (setIn "suiteRunners" (JArr [ JObj [ "suite", JStr "SU-OWN-DOTNET"; "runner", JStr "dotnet test Causa.slnx" ] ])) }
-    [ match x21 v413 with
-      | [ c ] when c.Problems.IsEmpty -> ()
-      | cs -> yield sprintf "X21: v4.1.3 does not pass X21: %A" cs
-      match x21 unrepaired with
-      | [ c ] when c.Problems |> List.exists (fun p -> p.Contains "SU-OWN-DOTNET") && c.Problems |> List.exists (fun p -> p.Contains "SU-DOTNET-LIVE") -> ()
-      | cs -> yield sprintf "X21 control: v4.1.2's runners were not refused: %A" cs
-      if (x21 wrongSuite |> List.collect (fun c -> c.Problems)).IsEmpty then yield "X21 control: a runner for an unknown suite was accepted"
-      if (x21 undecided |> List.collect (fun c -> c.Problems)).IsEmpty then yield "X21 control: a runner without an owner decision was accepted"
-      // v4.1.2 is frozen: it compiles without X21, byte for byte as approved (the committed-package check covers the bytes).
-      if not (x21 (inputs "v4.1.2")).IsEmpty then yield "X21: the frozen v4.1.2 gained a check" ]
-
-/// The committed v4.1.3 package is what the compiler produces from its inputs (`v41 --check`).
-let committedPackage (source: string) : string list =
-    let code =
-        Program.v41Command [ "--source"; source; "--package"; Path.Combine(source, "requirements-compiled", "v4.1.3"); "--base"; Path.Combine(source, "requirements-compiled", "v4"); "--check" ]
-    if code = 0 then [] else [ sprintf "v4.1.3: v41 --check exited %d (the committed package differs from its compilation)" code ]
+/// docs/release-gate-repair/obligation-inventory.json reconciles the 613 plan obligations with Rehearsal 009's gate.
+/// The scope manifest is derived independently; both must agree on every obligation, its requirement and its
+/// evidence kind (record-only, or executable/mixed), and the inventory must exclude nothing.
+let reconciliation (source: string) : string list =
+    let inventory = parseFile (Path.Combine(source, "docs", "release-gate-repair", "obligation-inventory.json"))
+    let manifest = compile (ScopeCommands.sourcesOf source "requirements-compiled/v4.1.4")
+    let fromManifest =
+        arr "requirements" manifest
+        |> List.filter (fun r -> str "origin" r = "v4-plan")
+        |> List.collect (fun r -> arr "obligations" r |> List.map (fun o -> str "id" o, (str "id" r, str "kind" o)))
+        |> Map.ofList
+    let fromInventory =
+        arr "obligations" inventory
+        |> List.map (fun o -> str "obligation" o, (str "requirement" o, (if str "evidenceType" o = "record" then "record" else "executable")))
+        |> Map.ofList
+    let keys (m: Map<string, _>) = m |> Map.toList |> List.map fst |> Set.ofList
+    let summary k = field "summary" inventory |> Option.bind (intOpt k) |> Option.defaultValue -1L
+    let count kind = fromManifest |> Map.filter (fun _ (_, k) -> k = kind) |> Map.count |> int64
+    [ for o in Set.difference (keys fromManifest) (keys fromInventory) do yield sprintf "reconciliation: %s is in the scope manifest, not in the inventory" o
+      for o in Set.difference (keys fromInventory) (keys fromManifest) do yield sprintf "reconciliation: %s is in the inventory, not in the scope manifest" o
+      for KeyValue(o, v) in fromManifest do
+          match fromInventory.TryFind o with
+          | Some w when w <> v -> yield sprintf "reconciliation: %s is %A in the scope manifest and %A in the inventory" o v w
+          | _ -> ()
+      if summary "recordOnly" <> count "record" then yield sprintf "reconciliation: %d record-only obligations in the inventory, %d in the manifest" (summary "recordOnly") (count "record")
+      if summary "executable" <> count "executable" then yield sprintf "reconciliation: %d executable obligations in the inventory, %d in the manifest" (summary "executable") (count "executable")
+      if summary "approvedExclusions" <> 0L then yield "reconciliation: the inventory records an exclusion the scope manifest does not"
+      if arr "obligations" inventory |> List.exists (fun o -> strOpt "scopeStatus" o <> Some "in-scope") then yield "reconciliation: the inventory has an obligation out of scope" ]
 
 let all (source: string) : string list =
     let guard name f = try f () with ex -> [ sprintf "%s threw: %s" name ex.Message ]
-    guard "adversarial" adversarial @ guard "legitimate" legitimate @ guard "recovery" recovery @ guard "real" (fun () -> real source) @ guard "suite runners" (fun () -> suiteRunners source) @ guard "v4.1.3 package" (fun () -> committedPackage source)
+    guard "adversarial" adversarial @ guard "legitimate" legitimate @ guard "recovery" recovery @ guard "real" (fun () -> real source) @ guard "reconciliation" (fun () -> reconciliation source)

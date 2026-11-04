@@ -1,11 +1,11 @@
 {
   "schema": "indy-init.scope-checkpoint/1",
-  "scopeSha256": "2b99dc0152437d3055952cd97b488c20c7b955b100a252f3d62f6d441917773a",
-  "recordedAt": "2026-11-04T06:00:00Z",
-  "sourceCommit": "bc3c381df2840187a46799ea59f425ffe1b1ceed",
+  "scopeSha256": "fefde8a14e06b0f6159727f77d5305020e8f30ad358620ec98176d571c2aa370",
+  "recordedAt": "2026-11-04T07:00:00Z",
+  "sourceCommit": "c98968b1062e56c4e828789a33e73afa679266a3",
   "requirements": 199,
-  "workItems": 35,
+  "workItems": 36,
   "preflight": "PASS",
   "coverage": "PASS",
-  "rule": "No application source or test may be committed before this checkpoint (scope order); the scope it pins changes only with an owner approval {action: approve-scope, scope_sha256} in the pinned approvals file."
+  "rule": "No application source or test may be committed before this checkpoint (r9.fsx check-sequencing --scope-manifest); the scope it pins changes only with an owner approval {action: approve-scope, scope_sha256} in the pinned approvals file."
 }

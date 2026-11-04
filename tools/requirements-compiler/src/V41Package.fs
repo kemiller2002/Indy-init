@@ -497,47 +497,40 @@ let suites : Suite list =
       { Id = "SU-REVIEW-RECORDS"; Runner = "Praxis work evidence --kind independent-review / owner-approval"; Environment = "process"; Fixture = "the run's Praxis event log"; Scope = PerSuite; DependsOn = [ "SU-VERIFIER" ]; Producer = "independent reviewer and owner records"; Plan = true; Matches = fun t -> t = "praxis:independent-review" || t = "praxis:owner-approval" }
       { Id = "SU-PROCESS-RECORDS"; Runner = "Praxis work event log, checked by verify-process"; Environment = "process"; Fixture = "the run's Praxis event log"; Scope = PerSuite; DependsOn = []; Producer = "Praxis work event log"; Plan = true; Matches = fun t -> starts "praxis:" t && t <> "praxis:independent-review" && t <> "praxis:owner-approval" } ]
 
-/// The positional arguments of a `dotnet test` runner (the projects or solutions it names), up to the first option.
-/// The .NET 10 SDK refuses more than one (MSB1008), so a runner naming two never executes (Rehearsal 009).
-let dotnetTestTargets (runner: string) : string list option =
-    let words = runner.Split([| ' ' |], StringSplitOptions.RemoveEmptyEntries) |> List.ofArray
-    match words with
-    | "dotnet" :: "test" :: rest -> Some(rest |> List.takeWhile (fun w -> not (w.StartsWith("-", StringComparison.Ordinal))))
-    | _ -> None
-
-/// Runner replacement and X21 apply from package 4.1.3; v4.1.1 and v4.1.2 compile byte for byte as approved.
-let runnersAmendable (i: Inputs) =
-    let parts = (packageVersion i).Split('.') |> Array.map (fun x -> match Int32.TryParse x with | true, n -> n | _ -> -1) |> List.ofArray
-    i.Amendment.IsSome && compare parts [ 4; 1; 3 ] >= 0
-
-/// The plan suites of a package: v4.1's, with the runner commands a successor amendment replaces (`suiteRunners`,
-/// v4.1.3 and later), each under its owner decision. Identities, environments and assignment rules never change.
-let suitesOf (i: Inputs) : Suite list =
-    let replaced =
-        if runnersAmendable i then amendmentList "suiteRunners" i |> List.map (fun r -> sOr "suite" r, sOr "runner" r) |> Map.ofList
-        else Map.empty
-    suites |> List.map (fun s -> match replaced.TryFind s.Id with Some r -> { s with Runner = r } | None -> s)
-
-/// X21: every replaced runner names an existing suite and an owner decision, keeps the runner kind, and a `dotnet test`
-/// runner (replaced or carried) names exactly one project or solution.
-let suiteRunnerCheck (i: Inputs) : Check =
-    let known = suites |> List.map (fun s -> s.Id) |> Set.ofList
-    let byId = suites |> List.map (fun s -> s.Id, s) |> Map.ofList
-    check "X21" "Every suite runner can execute: a replaced runner names an existing suite, its owner decision and the same runner kind, and every `dotnet test` runner names exactly one project or solution (MSB1008)"
-        [ for r in amendmentList "suiteRunners" i do
-              let id = sOr "suite" r
-              if not (known.Contains id) then yield sprintf "suiteRunners: %s is not a suite of the plan" id
-              if String.IsNullOrWhiteSpace (sOr "decision" r) then yield sprintf "suiteRunners: %s names no owner decision" id
-              match byId.TryFind id with
-              | Some s when (dotnetTestTargets s.Runner).IsSome <> (dotnetTestTargets (sOr "runner" r)).IsSome -> yield sprintf "suiteRunners: %s changes the runner kind" id
-              | _ -> ()
-          if runnersAmendable i then
-              for s in suitesOf i do
-                  match dotnetTestTargets s.Runner with
-                  | Some targets when targets.Length <> 1 -> yield sprintf "%s: `dotnet test` names %d projects or solutions (%s); the SDK accepts exactly one" s.Id targets.Length (String.concat ", " targets)
-                  | _ -> () ]
-
 let suiteOf (plan: bool) (test: string) = suites |> List.filter (fun s -> s.Plan = plan && s.Matches test)
+
+/// The corrected suite runners a successor amendment declares (`suiteRunners`: suite, runner, decision). A suite keeps
+/// its tests, matcher, fixture and environment; only the command that runs it changes. Packages that declare none
+/// (v4.1 to v4.1.2) keep the runners above byte for byte.
+let suiteRunnerOverrides (i: Inputs) : Json list =
+    match i.Amendment |> Option.bind (field "suiteRunners") with
+    | Some(JArr xs) -> xs
+    | _ -> []
+
+let runnerOf (i: Inputs) (s: Suite) =
+    suiteRunnerOverrides i |> List.tryFind (fun o -> str "suite" o = s.Id) |> Option.map (str "runner") |> Option.defaultValue s.Runner
+
+/// The Playwright projects a runner names (`--project=NAME` or `--project NAME`).
+let playwrightProjects (runner: string) =
+    Regex.Matches(runner, @"--project(?:=|\s+)([A-Za-z0-9_-]+)") |> Seq.map (fun m -> m.Groups[1].Value) |> List.ofSeq
+
+/// Split a runner into arguments the way a POSIX shell does for plain words and double-quoted strings.
+let runnerArgs (runner: string) =
+    Regex.Matches(runner, "\"([^\"]*)\"|(\\S+)") |> Seq.map (fun m -> if m.Groups[1].Success then m.Groups[1].Value else m.Groups[2].Value) |> List.ofSeq
+
+/// The positional targets of a `dotnet test` runner. The pinned SDK (10.0.402) accepts at most one project or solution
+/// (more is MSB1008, "Only one project can be specified": Rehearsal 009's SU-OWN-DOTNET and SU-DOTNET-LIVE).
+let dotnetTestTargets (runner: string) =
+    let valued = set [ "--filter"; "-c"; "--configuration"; "--logger"; "-l"; "--results-directory"; "-r"; "-f"; "--framework"; "--settings"; "-s"; "--runtime"; "-a"; "--arch"; "-o"; "--output"; "-v"; "--verbosity" ]
+    let rec go acc xs =
+        match xs with
+        | [] -> List.rev acc
+        | (o: string) :: _ :: rest when valued.Contains o -> go acc rest
+        | (o: string) :: rest when o.StartsWith "-" -> go acc rest
+        | t :: rest -> go (t :: acc) rest
+    match runnerArgs runner with
+    | "dotnet" :: "test" :: rest -> Some(go [] rest)
+    | _ -> None
 
 /// The number of fixture set-ups a suite performs, by its scope: test classes (the id without its last segment),
 /// files, tests, or one.
@@ -549,7 +542,6 @@ let private fixtureInstances (s: Suite) (tests: string list) =
     | PerClass -> tests |> List.map (fun t -> let k = t.LastIndexOf '.' in if k > 0 then t.Substring(0, k) else t) |> List.distinct |> List.length
 
 let verificationExecutionPlan (i: Inputs) : Json * string list =
-    let suites = suitesOf i
     let bound = boundTests i.Plan
     let own = namedTests i |> List.map (fun (t, _, _) -> t) |> List.distinct
     let problems =
@@ -563,7 +555,7 @@ let verificationExecutionPlan (i: Inputs) : Json * string list =
         let ids = if s.Plan then tests |> List.map fst else ownMine
         JObj
             [ "id", JStr s.Id
-              "runner", JStr s.Runner
+              "runner", JStr(runnerOf i s)
               "environment", JStr s.Environment
               "fixture", JStr s.Fixture
               "fixtureScope", JStr(scopeName s.Scope)
@@ -1397,6 +1389,76 @@ let testToolingCheck (i: Inputs) (files: OwnedFile list) : Check =
 /// a version-less reference in each test project that hosts .NET tests, and its npm packages in package.json. Every
 /// module is written by its owner. Building it proves the project graph, the compile order, the contract placement and
 /// the test tooling restore.
+/// The Playwright projects the plan's runners name, in first-use order.
+let planPlaywrightProjects (i: Inputs) = suites |> List.collect (runnerOf i >> playwrightProjects) |> List.distinct
+
+/// The integration-owned Playwright configuration the bootstrap writes (v4.1.4): one project per engine the runners
+/// name, each on Playwright's own device descriptor. The web server serves the repository root, as Conditor's scaffold
+/// does; integration replaces it with the application's own build when there is one.
+let playwrightConfigText (i: Inputs) =
+    let device = function
+        | "chromium" -> "Desktop Chrome"
+        | "webkit" -> "Desktop Safari"
+        | "firefox" -> "Desktop Firefox"
+        | other -> failwithf "no Playwright device for project %s" other
+    let projects =
+        planPlaywrightProjects i
+        |> List.map (fun p ->
+            if p = "chromium" then sprintf "    { name: \"%s\", use: { ...devices[\"%s\"], launchOptions: preinstalledChromium } }," p (device p)
+            else sprintf "    { name: \"%s\", use: { ...devices[\"%s\"] } }," p (device p))
+    String.concat "\n"
+        ([ "// Owner: integration. Written at bootstrap by requirements-compiler v41 (package " + packageVersion i + ")."
+           "// Defines every Playwright project the verification execution plan's runners name; a runner that names a"
+           "// project this file does not define cannot execute (r9.fsx suite-preflight and validation check X21)."
+           "import { existsSync } from \"node:fs\";"
+           "import { defineConfig, devices } from \"@playwright/test\";"
+           ""
+           "const port = 4321;"
+           "const origin = `http://127.0.0.1:${port}`;"
+           "const preinstalledChromium = existsSync(\"/opt/pw-browsers/chromium\") ? { executablePath: \"/opt/pw-browsers/chromium\" } : {};"
+           ""
+           "export default defineConfig({"
+           "  testDir: \"./tests/browser\","
+           "  fullyParallel: false,"
+           "  workers: 1,"
+           "  forbidOnly: !!process.env.CI,"
+           "  retries: 0,"
+           "  use: { baseURL: origin, trace: \"retain-on-failure\" },"
+           "  projects: [" ]
+         @ projects
+         @ [ "  ],"
+             "  webServer: { command: `python3 -m http.server ${port} --bind 127.0.0.1`, url: origin, reuseExistingServer: !process.env.CI, timeout: 60_000 }"
+             "});"
+             "" ])
+
+/// X21 (v4.1.4, Rehearsal 009): every suite runner of the plan can execute on the pinned toolchain. A `dotnet test`
+/// runner names exactly one target, the solution or a declared test project; a Playwright runner selects the
+/// bootstrapped configuration and names only projects it defines; every corrected runner names its suite and the
+/// owner decision that authorizes it. Static: r9.fsx suite-preflight executes the same runners against a repository.
+let runnerCheck (i: Inputs) : Check =
+    let config = i.Amendment |> Option.bind (field "bootstrap") |> Option.bind (strOpt "playwrightConfig") |> Option.defaultValue ""
+    let testProjects = arr "testProjects" i.Structure |> List.map (str "path") |> List.collect (fun p -> [ p; p.Substring(0, max 0 (p.LastIndexOf '/')) ])
+    let defined = if config = "" then [] else planPlaywrightProjects i
+    check "X21" "Every suite runner can execute on the pinned toolchain: a dotnet test runner names exactly one target (the solution or a declared test project), a Playwright runner selects the bootstrapped configuration and names only projects it defines, and every corrected runner names its suite and authorizing decision"
+        [ for o in suiteRunnerOverrides i do
+              if not (suites |> List.exists (fun s -> s.Id = str "suite" o)) then yield sprintf "suiteRunners names %s, which is not a suite" (str "suite" o)
+              if str "decision" o = "" then yield sprintf "the corrected runner of %s names no decision" (str "suite" o)
+          for s in suites do
+              let r = runnerOf i s
+              match dotnetTestTargets r with
+              | Some [ target ] when target = "Causa.slnx" || List.contains target testProjects -> ()
+              | Some [ target ] -> yield sprintf "%s: dotnet test target %s is neither Causa.slnx nor a declared test project" s.Id target
+              | Some targets -> yield sprintf "%s: dotnet test names %d targets (%s); the pinned SDK accepts one (MSB1008)" s.Id targets.Length (String.concat " " targets)
+              | None -> ()
+              if r.Contains "playwright test" then
+                  let ps = playwrightProjects r
+                  if ps.IsEmpty then yield sprintf "%s: the Playwright runner names no project" s.Id
+                  if config = "" then yield sprintf "%s: the bootstrap writes no Playwright configuration defining %s" s.Id (String.concat ", " ps)
+                  elif not (runnerArgs r |> List.pairwise |> List.exists (fun (a, b) -> (a = "--config" || a = "-c") && b = config)) then
+                      yield sprintf "%s: the runner does not select the bootstrapped configuration %s (--config %s)" s.Id config config
+                  for p in ps do
+                      if not (List.contains p defined) then yield sprintf "%s: Playwright project %s is not defined by %s" s.Id p config ]
+
 let bootstrapFiles (i: Inputs) (files: OwnedFile list) (globalJson: string) : (string * string) list =
     let lists = compileLists i files |> Map.ofList
     let interfaces = arr "interfaces" i.Interfaces |> List.map (fun x -> sOr "file" x, x) |> Map.ofList
@@ -1458,7 +1520,15 @@ let bootstrapFiles (i: Inputs) (files: OwnedFile list) (globalJson: string) : (s
             ([ "<Project>"; "  <PropertyGroup>"; cpm; "  </PropertyGroup>"; "  <ItemGroup>" ]
              @ (nuget |> List.map (fun (id, v) -> sprintf "    <PackageVersion Include=\"%s\" Version=\"%s\" />" id v))
              @ [ "  </ItemGroup>"; "</Project>"; "" ])
+    // v4.1.4 (ODR-V414-02): the plan names Playwright projects (chromium, webkit) that nothing defined; Conditor's
+    // scaffold config has chromium only (Rehearsal 009: 'Project(s) "webkit" not found'). The bootstrap writes the
+    // integration-owned playwright.config.ts with exactly the projects the runners name, and the runners select it.
+    let playwrightConfig =
+        match i.Amendment |> Option.bind (field "bootstrap") |> Option.bind (strOpt "playwrightConfig") with
+        | Some path when path <> "" -> [ path, playwrightConfigText i ]
+        | _ -> []
     [ ".gitignore", gitignore; "Causa.slnx", slnx; "Directory.Build.props", props; "global.json", globalJson ]
+    @ playwrightConfig
     @ (if nuget.IsEmpty then [] else [ "Directory.Packages.props", centralVersions ])
     @ (if npm.IsEmpty then [] else [ "package.json", packageJson ])
     @ projectFiles @ fsFiles @ host @ layoutCopy
@@ -1983,7 +2053,7 @@ let build (i: Inputs) : Built =
               entrypointCheck i files
               bootstrapCheck i
               amendmentRecordCheck i ]
-            @ (if runnersAmendable i then [ suiteRunnerCheck i ] else [])
+            @ (if suiteRunnerOverrides i |> List.isEmpty && (amendmentField "bootstrap" i |> strOpt "playwrightConfig").IsNone then [] else [ runnerCheck i ])
     let json (n: string) (j: Json) = n, serialize j
     { Files =
         [ json "agent-file-ownership.json" (ownershipJson i files)

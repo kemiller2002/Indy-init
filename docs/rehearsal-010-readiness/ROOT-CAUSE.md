@@ -49,7 +49,7 @@ Sources:
    - `SU-BROWSER-WEBKIT` names a `webkit` Playwright project the application did not define.
    - Separately, the gate workflow installs no browser.
 
-   This investigation reproduced all of it on a fixture tree (`evidence/suite-commands/preflight-v4.1.2.json`, `preflight-nowebkit.json`).
+   This was reproduced on a deterministic fixture tree (#101's harness cases `suite-preflight-fixture-*`) and on the Rehearsal 009 application itself (`docs/release-gate-repair/evidence/`).
 2. **A failed verification was read as a reason to stop implementing.** The report says: "the remaining release-gate refusals cannot be cleared by more application work inside the rules", and "Writing about 540 plan-bound tests would not change the release-gate verdict while the plan's commands cannot run. Under the compute constraint, I stopped." Implementation status and verification status were one variable.
 3. **Completion was impossible to record.** The governance policy (`tools/r9/governance.json`: `requiredFacets: [verification-matrix-satisfied]`) needs a passing gate matrix to complete any work item. Its one work item, `R9-CONTENT-001`, therefore stayed `active`. With no recordable progress, more work looked worthless.
 4. **No stop rule existed.** No document listed the permitted stop conditions, so "save compute" filled the gap.
@@ -68,7 +68,7 @@ Sources:
 - `.ros/work/queue.json` holds one item, `COND-MISSION-001`.
 - `.ros/context/current.json` holds `ROS-INSTALL-3-25-0` (complete) and `R9-CONTENT-001` (active). The agent created `R9-CONTENT-001` *after* the first application commits (FINAL-REPORT §12).
 - No check refused implementation before a complete work-item inventory existed.
-- Replaying that queue through the new coverage check gives `WORK_ITEM_MISSING` for all 35 work items of the approved scope (`evidence/coverage/r9-queue-verdict.json`).
+- Replaying that queue through the new coverage check gives `WORK_ITEM_MISSING` for all 36 work items of the approved scope (`evidence/coverage/r9-queue-verdict.json`).
 
 ## 6. Was the agent authorized to continue implementing independent requirements?
 
@@ -83,8 +83,8 @@ Sources:
 | Cause | Type | Corrected by |
 |---|---|---|
 | C1. The catalog was presented as the target; the P0 plan was one "unchanged" line | instruction defect | One scope manifest of 199 requirements (`scope-manifest.json`); STARTUP-INSTRUCTIONS §1 |
-| C2. No work-item inventory; Praxis showed one mission item; 78 P0 requirements had no DAG task | process defect | `scope preflight` and `coverage`, generated `WI-GEN-*` and `WI-INV-*` items, `scope checkpoint` before code |
-| C3. Plan commands that cannot run (MSB1008, no webkit project, no browser install) | frozen-package and integration defect | v4.1.3 candidate (ODR-V413-04/05), `r9.fsx suite-preflight`, gate workflow installs browsers |
+| C2. No work-item inventory; Praxis showed one mission item; 78 P0 requirements had no DAG task | process defect | `scope preflight` and `coverage`, generated `WI-GEN-*` and `WI-INV-*` items, the scope checkpoint required by `r9.fsx check-sequencing` |
+| C3. Plan commands that cannot run (MSB1008, no webkit project, no browser install) | frozen-package and integration defect | v4.1.4 candidate (#101), `r9.fsx suite-preflight` (with `--require-tests`), the gate installs browsers and reads the package from the pinned lock |
 | C4. Implementation and verification were one status; a blocked runner looked like no progress | model defect | `Progress`: separate axes, `suite-blocked` touches verification only |
 | C5. No stop conditions; compute saving filled the gap | rule defect | `Continuation.decide` and `stop-decision`: four permitted stops plus the deadline; every other request refused with machine-readable remaining work |
-| C6. Dokimos had no `url-input` component (INV-029) | tool defect | kemiller2002/dokimos#67 (a release is needed) |
+| C6. Dokimos had no `url-input` component (INV-029) | tool defect | kemiller2002/dokimos#67, merged (a release is needed) |

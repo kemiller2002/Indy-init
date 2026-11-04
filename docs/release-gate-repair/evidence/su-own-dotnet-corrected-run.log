@@ -1,0 +1,7 @@
+No test matches the given testcase filter `FullyQualifiedName~Causa.Contract.Tests.|FullyQualifiedName~Causa.Domain.Tests.|FullyQualifiedName~Causa.Persistence.Tests.|FullyQualifiedName~Causa.App.Tests.` in <rehearsal-009 checkout at 13e1cf8>/tests/Causa.Acceptance/bin/Debug/net10.0/Causa.Acceptance.dll
+Passed!  - Failed:     0, Passed:     7, Skipped:     0, Total:     7, Duration: 231 ms - Causa.Domain.Tests.dll (net10.0)
+No test matches the given testcase filter `FullyQualifiedName~Causa.Contract.Tests.|FullyQualifiedName~Causa.Domain.Tests.|FullyQualifiedName~Causa.Persistence.Tests.|FullyQualifiedName~Causa.App.Tests.` in <rehearsal-009 checkout at 13e1cf8>/tests/Causa.App.Tests/bin/Debug/net10.0/Causa.App.Tests.dll
+Passed!  - Failed:     0, Passed:     7, Skipped:     0, Total:     7, Duration: 139 ms - Causa.Persistence.Tests.dll (net10.0)
+No test matches the given testcase filter `FullyQualifiedName~Causa.Contract.Tests.|FullyQualifiedName~Causa.Domain.Tests.|FullyQualifiedName~Causa.Persistence.Tests.|FullyQualifiedName~Causa.App.Tests.` in <rehearsal-009 checkout at 13e1cf8>/tests/Causa.Invariants/bin/Debug/net10.0/Causa.Invariants.dll
+No test matches the given testcase filter `FullyQualifiedName~Causa.Contract.Tests.|FullyQualifiedName~Causa.Domain.Tests.|FullyQualifiedName~Causa.Persistence.Tests.|FullyQualifiedName~Causa.App.Tests.` in <rehearsal-009 checkout at 13e1cf8>/tests/Causa.Contract.Tests/bin/Debug/net10.0/Causa.Contract.Tests.dll
+exit 0

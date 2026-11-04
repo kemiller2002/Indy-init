@@ -1,6 +1,6 @@
 {
  "schema": "indy-init.r9-toolchain-lock/1",
- "description": "Proposed toolchain and requirements package for Rehearsal 010: Rehearsal 009's lock with the requirements package moved to the successor v4.1.3 (release-gate corrections). Conditor, the resolved set and the process-evidence rules are unchanged from Rehearsal 009 and are re-confirmed by the owner. Change this file only through the owner decision process.",
+ "description": "Proposed toolchain and requirements package for Rehearsal 010: Rehearsal 009's lock with the requirements package moved to the successor v4.1.4 (#101: executable suite runners). Conditor, the resolved set and the process-evidence rules are unchanged from Rehearsal 009 and are re-confirmed by the owner. Change this file only through the owner decision process.",
  "conditor": {
   "version": "0.10.20",
   "tag": "v0.10.20",
@@ -76,14 +76,14 @@
   }
  },
  "requirementsPackage": {
-  "path": "requirements-compiled/v4.1.3",
+  "path": "requirements-compiled/v4.1.4",
   "base": "requirements-compiled/v4",
-  "packageVersion": "4.1.3",
-  "tag": "indy-init-requirements-v4.1.3 (not yet created)",
+  "packageVersion": "4.1.4",
+  "tag": "indy-init-requirements-v4.1.4 (not yet created)",
   "tagCommit": null,
-  "manifestSha256": "bbea432ced1a19f8fecbac33689a774100ac0e006e4acd8e10de042722a9a651",
-  "verificationPlanSha256": "642606612029d91fc5314555ae3fa7e20c6047debd30cee0a2923c1d33da49d8",
-  "approval": "ODR-V413-06 (pending)"
+  "manifestSha256": "dd81a4b39e0294e5bea160938e01855bbe2fc753e28747d690addbe2f770d71e",
+  "verificationPlanSha256": "8254ed03b991dd3d3a56a4e0bf5897c2484bbbf11e67e2f15e80309c1482b973",
+  "approval": "the v4.1.4 package approval in docs/release-gate-repair/owner-decision-requests.json (pending)"
  },
  "workstationTargetId": "indy-init-r9-workstation",
  "processEvidence": {
@@ -94,10 +94,10 @@
   "rulesSha256": "b8adffc4122226cbe568dae1b0173ee85aab08b8435ded7390f9d5205ad0d115",
   "rulesStatus": "CONFIRMED by the owner on 2026-11-03: the rules file reviewed and pinned by its SHA-256"
  },
- "status": "PROPOSED: not an owner pin. The owner adopts it by renaming it to toolchain.lock.json in their own commit after ODR-V413-04..06 are recorded and v4.1.3 is tagged, and after a Dokimos release carrying the url-input fix (kemiller2002/dokimos#67) is registered in an approved echelon-current set and replaces the resolved set below. Until then Rehearsal 010 has no approved lock.",
+ "status": "PROPOSED: not an owner pin. The owner adopts it by renaming it to toolchain.lock.json in their own commit after the v4.1.4 decisions (docs/release-gate-repair/owner-decision-requests.json) are recorded and v4.1.4 is tagged, and after a Dokimos release carrying the url-input fix (kemiller2002/dokimos#67) is registered in an approved echelon-current set and replaces the resolved set below. Until then Rehearsal 010 has no approved lock.",
  "scope": {
   "manifest": "docs/rehearsal-010-readiness/scope-manifest.json",
-  "scopeSha256": "2b99dc0152437d3055952cd97b488c20c7b955b100a252f3d62f6d441917773a",
-  "rule": "scope preflight and the Praxis coverage check must pass and the scope checkpoint must be committed before any application code (STARTUP-INSTRUCTIONS.md)"
+  "scopeSha256": "fefde8a14e06b0f6159727f77d5305020e8f30ad358620ec98176d571c2aa370",
+  "rule": "the gate passes the scope manifest to r9.fsx check-sequencing: the committed scope checkpoint (this scopeSha256, complete Praxis coverage) must precede implementation (STARTUP-INSTRUCTIONS.md)"
  }
 }

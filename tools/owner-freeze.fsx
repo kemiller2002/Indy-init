@@ -1,4 +1,4 @@
-// owner-freeze.fsx: the owner's steps to freeze Indy-init's compiled requirements packages v4, v4.1, v4.1.1 and v4.1.2
+// owner-freeze.fsx: the owner's steps to freeze Indy-init's compiled requirements packages v4, v4.1, v4.1.1, v4.1.2 and v4.1.4
 // (the FREEZE.md of each package under requirements-compiled/).
 //
 // Every decision is yours. The script shows each owner decision request as the package states it and records
@@ -55,7 +55,7 @@ let acceptanceContractPath = "conditor.acceptance.json"
 let githubRepo = "kemiller2002/Indy-init"
 
 type Package =
-    { Name: string                 // "v4", "v4.1", "v4.1.1", "v4.1.2" or "v4.1.3"
+    { Name: string                 // "v4", "v4.1", "v4.1.1" or "v4.1.2"
       Dir: string                  // requirements-compiled/<name>
       ApprovalPrefix: string       // APR-V4-OWNER / APR-V41-OWNER
       PackageApprovalId: string    // ODR-V4-01 / ODR-V41-01 / ODR-V411-01 / ODR-V412-04
@@ -66,7 +66,8 @@ let packages =
       { Name = "v4.1"; Dir = "requirements-compiled/v4.1"; ApprovalPrefix = "APR-V41-OWNER"; PackageApprovalId = "ODR-V41-01"; Tag = "indy-init-requirements-v4.1.0" }
       { Name = "v4.1.1"; Dir = "requirements-compiled/v4.1.1"; ApprovalPrefix = "APR-V411-OWNER"; PackageApprovalId = "ODR-V411-01"; Tag = "indy-init-requirements-v4.1.1" }
       { Name = "v4.1.2"; Dir = "requirements-compiled/v4.1.2"; ApprovalPrefix = "APR-V412-OWNER"; PackageApprovalId = "ODR-V412-04"; Tag = "indy-init-requirements-v4.1.2" }
-      { Name = "v4.1.3"; Dir = "requirements-compiled/v4.1.3"; ApprovalPrefix = "APR-V413-OWNER"; PackageApprovalId = "ODR-V413-06"; Tag = "indy-init-requirements-v4.1.3" } ]
+      // v4.1.4 (docs/release-gate-repair): corrected suite runners. 4.1.3 belonged to the withdrawn proposal.
+      { Name = "v4.1.4"; Dir = "requirements-compiled/v4.1.4"; ApprovalPrefix = "APR-V414-OWNER"; PackageApprovalId = "ODR-V414-03"; Tag = "indy-init-requirements-v4.1.4" } ]
 
 // ---- processes, files and JSON -------------------------------------------------------------------------------------
 
@@ -367,7 +368,7 @@ let approve repo dryRun (p: Package) =
     if p.Name = "v4.1.1" && not conflicts.IsEmpty then stop $"""decide {String.Join(", ", conflicts)} first (owner-freeze.fsx decide v4.1.1): the package approval depends on it"""
     // v4.1.2: the package applies its decisions (ODR-V412-01..03, -05), so each must be recorded, and the package recompiled
     // from them, before it can be approved.
-    if (p.Name = "v4.1.2" || p.Name = "v4.1.3") && not pending.IsEmpty then stop $"""decide {String.Join(", ", pending)} first (owner-freeze.fsx decide {p.Name}); the agent then compiles {p.Name} from your records"""
+    if (p.Name = "v4.1.2" || p.Name = "v4.1.4") && not pending.IsEmpty then stop $"""decide {String.Join(", ", pending)} first (owner-freeze.fsx decide {p.Name}); the agent then compiles {p.Name} from your records"""
     rule ()
     let change, shown =
         if p.Name = "v4" then
@@ -581,7 +582,7 @@ let argv = fsi.CommandLineArgs |> Array.toList |> List.tail
 let flag name = List.contains name argv
 let option name = argv |> List.pairwise |> List.tryFind (fst >> (=) name) |> Option.map snd
 let repo = option "--repo" |> Option.defaultValue (Directory.GetCurrentDirectory()) |> Path.GetFullPath
-let packageNamed name = packages |> List.tryFind (fun p -> p.Name = name) |> Option.defaultWith (fun () -> stop "the package must be v4, v4.1, v4.1.1, v4.1.2 or v4.1.3")
+let packageNamed name = packages |> List.tryFind (fun p -> p.Name = name) |> Option.defaultWith (fun () -> stop "the package must be v4, v4.1, v4.1.1 or v4.1.2")
 
 /// RDP-003: a record or tag is the owner's own act. Refuses to write when an agent runs the script or nobody can type.
 let ownerAtTerminal () =
@@ -602,7 +603,7 @@ let exitCode =
         | [ "approve"; name ] -> approve repo (flag "--dry-run") (packageNamed name) |> ignore; 0
         | [ "freeze"; name ] -> freeze repo (flag "--dry-run") (packageNamed name); 0
         | [ "tag"; name ] -> tag repo (flag "--dry-run") (packageNamed name) (option "--commit"); 0
-        | _ -> say "usage: dotnet fsi Indy-init/tools/owner-freeze.fsx -- status | decide v4|v4.1|v4.1.1|v4.1.2|v4.1.3 | approve v4|v4.1|v4.1.1|v4.1.2|v4.1.3 | tag v4|v4.1|v4.1.1|v4.1.2|v4.1.3 [--commit SHA] | freeze v4.1.1 | acceptance [--repo DIR] [--dry-run]"; 2
+        | _ -> say "usage: dotnet fsi Indy-init/tools/owner-freeze.fsx -- status | decide v4|v4.1|v4.1.1|v4.1.2 | approve v4|v4.1|v4.1.1|v4.1.2 | tag v4|v4.1|v4.1.1|v4.1.2 [--commit SHA] | freeze v4.1.1 | acceptance [--repo DIR] [--dry-run]"; 2
     with Stop message -> eprintfn "stopped: %s" message; 1
 
 exit exitCode
