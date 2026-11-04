@@ -3,7 +3,7 @@
 ///   requirements-compiler catalog-acceptance --contract F --approved-contract-sha256 SHA --catalog F --candidate SHA
 ///                         [--manifest F] [--verification F] [--producer F] [--probe-results F] [--probe-spec F] [--declared-facts F] --out F
 ///   requirements-compiler ledger --manifest F --events F [--facts F] --out F
-///   requirements-compiler slice-manifest --manifest F --dag F --journeys F [--events F] --out F
+///   requirements-compiler slice-manifest --manifest F --dag F --journeys F [--events F] [--work-plan F] --out F
 ///   requirements-compiler slice-gate --manifest F --events F --slices F --slice ID --candidate SHA --target-base SHA
 ///                         --target-head SHA [--gate F] [--journeys F] [--design F] [--regression F] [--build F]
 ///                         [--live F] [--test-integrity F] --out F
@@ -82,6 +82,24 @@ let ledgerCommand (args: string list) =
 
 let private estimatesOf (dag: Json) = arr "tasks" dag |> List.choose (fun t -> intOpt "estimateMinutes" t |> Option.map (fun m -> str "id" t, m)) |> Map.ofList
 
+/// The Praxis work inventory in the form r9.fsx authorize-implementation reads (`indy-init.r9-work-plan/1`): every
+/// slice that carries requirements, with all their obligations, plus WI-RELEASE-RECORDS for the full-release
+/// (record-only) requirements, so every in-scope obligation is linked to a work item and none is dropped.
+let workPlan (manifest: Json) (slices: Json) : Json =
+    let reqs = arr "requirements" manifest |> List.map (fun r -> str "id" r, r) |> Map.ofList
+    let obligationsOf ids = ids |> List.collect (fun id -> reqs.TryFind id |> Option.map (arr "obligations" >> List.map (str "id")) |> Option.defaultValue [])
+    let item id title (rs: string list) = JObj [ "id", JStr id; "title", JStr title; "requirements", jstrs rs; "obligations", jstrs (obligationsOf rs) ]
+    let fromSlices =
+        arr "slices" slices
+        |> List.filter (fun s -> not (strs "requirements" s).IsEmpty)
+        |> List.map (fun s -> item (str "workItem" s) (strOpt "title" s |> Option.defaultValue "") (strs "requirements" s))
+    let releaseRecords = strs "fullReleaseObligations" slices
+    JObj
+        [ "schema", JStr "indy-init.r9-work-plan/1"
+          "scopeSha256", JStr(strOpt "scopeSha256" manifest |> Option.defaultValue "")
+          "description", JStr "Derived by requirements-compiler slice-manifest --work-plan from the approved scope. Register every listed work item in Praxis (the 35 of the scope manifest that carry requirements, plus WI-RELEASE-RECORDS) and copy this file to .echelon/r9-work-plan.json before authorize-implementation."
+          "workItems", JArr(fromSlices @ (if releaseRecords.IsEmpty then [] else [ item "WI-RELEASE-RECORDS" "Full-release record obligations (independent review, owner and process records)" releaseRecords ])) ]
+
 let sliceManifestCommand (args: string list) =
     let o = options args
     if not (require o [ "--manifest"; "--dag"; "--journeys"; "--out" ]) then eprintfn "usage: slice-manifest --manifest F --dag F --journeys F [--events F] --out F"; 2
@@ -92,6 +110,7 @@ let sliceManifestCommand (args: string list) =
         | Some(Error why) -> printfn "  REFUSED %s" why; printfn "slice-manifest: REFUSED"; 4
         | _ ->
             let json, refusals = Ledger.sliceManifest manifest (estimatesOf (parseFile o["--dag"])) (Ledger.journeysOf (parseFile o["--journeys"])) (state |> Option.bind (function Ok s -> Some s | Error _ -> None))
+            o.TryFind "--work-plan" |> Option.iter (fun f -> File.WriteAllText(f, serialize (workPlan manifest json)))
             report "slice-manifest" o["--out"] json refusals "COMPLETE COVERAGE" "INCOMPLETE COVERAGE"
 
 let sliceGateCommand (args: string list) =
@@ -250,7 +269,20 @@ let observeCommand (args: string list) =
         let bySchema (schema: string) = files "*.json" |> List.filter (fun j -> strOpt "schema" j = Some schema)
         let checkpoint = o.TryFind "--checkpoint" |> Option.map (fun p -> Path.Combine(repo, p)) |> Option.filter File.Exists
         let pins = optFile o "--pins"
-        let pinned = match pins |> Option.bind (field "digests") with Some(JObj ps) -> ps |> List.map (fun (k, v) -> k, asStr v) |> Map.ofList | _ -> Map.empty
+        // A pinned path is judged against its first committed version (written at T0) unless the pins give a digest.
+        let hashOf (bytes: byte[]) = SHA256.HashData bytes |> Convert.ToHexString |> fun s -> s.ToLowerInvariant()
+        let firstVersionDigest (path: string) =
+            let firstAdding =
+                match Git.run repo [ "log"; "--reverse"; "--diff-filter=A"; "--format=%H"; "--"; path ] with
+                | Ok b -> (Text.Encoding.UTF8.GetString b).Split('\n', StringSplitOptions.RemoveEmptyEntries) |> Array.tryHead
+                | Error _ -> None
+            firstAdding
+            |> Option.bind (fun sha -> match Git.run repo [ "show"; sprintf "%s:%s" sha path ] with Ok bytes -> Some(hashOf bytes) | Error _ -> None)
+            |> Option.defaultValue ""
+        let pinned =
+            (match pins |> Option.bind (field "digests") with Some(JObj ps) -> ps |> List.map (fun (k, v) -> k, asStr v) | _ -> [])
+            @ (pins |> Option.map (strs "firstCommitted") |> Option.defaultValue [] |> List.map (fun path -> path, firstVersionDigest path) |> List.filter (fun (_, d) -> d <> ""))
+            |> Map.ofList
         let head = pinned |> Map.map (fun path _ -> let p = Path.Combine(repo, path) in if File.Exists p then sha256 p else "")
         let manifest = parseFile o["--manifest"]
         let slices = bySchema "indy-init.slice-execution-manifest/1" |> List.tryLast

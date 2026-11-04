@@ -1,5 +1,7 @@
 # Integrating #102 (process corrections) with #101 (release-gate repair)
 
+> **Integrated (2026-11-04, #104).** This is #102's record and is kept as written. In the integrated tree, v4.1.3 is replaced by #101's v4.1.4. The scope manifest is recompiled from v4.1.4 with the same 199 requirements, 863 obligations and 35 work items; its scopeSha256 is now `b407b5cc…`. The current readiness state is [FINAL-READINESS.md](FINAL-READINESS.md).
+
 Two agents worked on overlapping parts of the same problem at the same time:
 - #102: branch `claude/rehearsal-009-early-stop-hcy044`;
 - #101: branch `claude/causa-investigation-r9-6l5isz`.

@@ -1,0 +1,12 @@
+{
+  "schema": "indy-init.observer-pins/1",
+  "description": "Builder-repository files the read-only observer (requirements-compiler observe) holds to their first committed version: each is written once at T0 or at the checkpoint and never changed. A change is reported as PLAN_CHANGED (or DEADLINE_RESET for the T0 record) with evidence; the observer itself changes nothing.",
+  "firstCommitted": [
+    "evidence/t0/t0.json",
+    ".echelon/r9-governance.json",
+    ".echelon/scope-checkpoint.json",
+    ".echelon/r9-initialization-checkpoint.json",
+    ".echelon/r9-work-plan.json",
+    ".github/workflows/verification-gate.yml"
+  ]
+}
