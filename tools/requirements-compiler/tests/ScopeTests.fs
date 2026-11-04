@@ -220,6 +220,30 @@ let legitimate () : string list =
       if not (implementationBeforeCheckpoint ".echelon/scope-checkpoint.json" isApp [ "a", [ "README.md" ]; "c", [ ".echelon/scope-checkpoint.json" ]; "b", [ "src/A.fs" ] ]).IsEmpty then
           yield "order: application code after the checkpoint was refused" ]
 
+// ---- recovery: a successor continues from repository files alone ----------------------------------------------
+
+let recovery () : string list =
+    let midRun = catalogDone @ [ started "T1" [ "P-001" ]; blocked "SU-X" "MSB1008" ]
+    // The successor reads the events back from their committed serialization, not from the lost executor's memory.
+    let persisted = match parseBytes (Text.Encoding.UTF8.GetBytes(serialize (JArr midRun))) with JArr xs -> xs | _ -> []
+    let original, successor = stateOf midRun, stateOf persisted
+    let at = t0.AddMinutes 150.0
+    let plan = resumePlan successor clock scope at false
+    [ if plan.Action <> "CONTINUE" then yield sprintf "recovery: a lost executor at 150 min gives %s, expected CONTINUE" plan.Action
+      if plan.NextWork <> snd (independentWork original []) then yield "recovery: the successor's next work differs from the lost executor's"
+      if plan.MinutesRemaining <> 270 then yield sprintf "recovery: %d minutes remaining, expected 270" plan.MinutesRemaining
+      if plan.BlockedSuites <> [ "SU-X" ] then yield "recovery: the blocked suite was not carried over"
+      if successor.Requirements["P-001"].Implementation <> InProgress then yield "recovery: in-progress implementation was lost"
+      // An environment-failure stop ends an executor, not the run: the successor continues.
+      let afterEnv = decide successor clock scope [] { request 150.0 "environment-failure" with EnvironmentKind = "container-lost"; EnvironmentEvidence = [ "e" ]; EnvironmentAttempts = 2 }
+      if not afterEnv.Permitted then yield "recovery: the documented environment failure was not permitted"
+      if (resumePlan successor clock scope (t0.AddMinutes 160.0) false).Action <> "CONTINUE" then yield "recovery: the successor did not continue after the environment failure"
+      if (resumePlan successor clock scope (t0.AddMinutes 420.0) false).Action <> "REPORT_AND_STOP" then yield "recovery: the successor did not stop at the deadline"
+      if (resumePlan successor clock "" at false).Action <> "REPAIR_CHECKPOINT" then yield "recovery: a missing checkpoint was not refused"
+      if (resumePlan successor clock "other-scope" at false).Refusals |> List.exists (fun r -> r.Code = "SCOPE_CHANGE_UNAPPROVED") |> not then yield "recovery: a changed scope was not refused"
+      if (resumePlan (stateOf allDone) clock scope at false).Action <> "REQUEST_STOP_COMPLETE" then yield "recovery: a complete run was not sent to stop-decision"
+      if (resumePlan (stateOf catalogDone) clock scope at true).Action <> "STOPPED" then yield "recovery: a recorded permitted stop was not respected" ]
+
 // ---- the real scope, and Rehearsal 009 replayed against it ------------------------------------------------------
 
 let private manifestPath (source: string) = Path.Combine(source, "docs", "rehearsal-010-readiness", "scope-manifest.json")
@@ -304,4 +328,4 @@ let committedPackage (source: string) : string list =
 
 let all (source: string) : string list =
     let guard name f = try f () with ex -> [ sprintf "%s threw: %s" name ex.Message ]
-    guard "adversarial" adversarial @ guard "legitimate" legitimate @ guard "real" (fun () -> real source) @ guard "suite runners" (fun () -> suiteRunners source) @ guard "v4.1.3 package" (fun () -> committedPackage source)
+    guard "adversarial" adversarial @ guard "legitimate" legitimate @ guard "recovery" recovery @ guard "real" (fun () -> real source) @ guard "suite runners" (fun () -> suiteRunners source) @ guard "v4.1.3 package" (fun () -> committedPackage source)

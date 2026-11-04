@@ -5,6 +5,8 @@
 ///   requirements-compiler scope checkpoint --source DIR --package DIR --manifest FILE --praxis-queue FILE --at ISO --commit SHA --out FILE
 ///   requirements-compiler scope order --repo DIR [--checkpoint PATH]
 ///   requirements-compiler progress --manifest FILE --events FILE --out FILE
+///   requirements-compiler resume --manifest FILE --checkpoint FILE --events FILE --t0 ISO --at ISO [--window-minutes 420]
+///                         [--stop-decision FILE] --out FILE
 ///   requirements-compiler stop-decision --manifest FILE --checkpoint FILE --events FILE --request FILE --t0 ISO
 ///                         [--window-minutes 420] [--approvals FILE --trusted-operator ID] --out FILE
 ///
@@ -138,3 +140,25 @@ let stopDecisionCommand (args: string list) : int =
             d.Refusals |> List.iter (fun r -> printfn "  REFUSED %s %s" r.Code r.Detail)
             printfn "stop-decision: %s (%d minute(s) remaining, %d open mandatory requirement(s))" (if d.Permitted then "STOP_PERMITTED" else "CONTINUE_REQUIRED") d.MinutesRemaining d.OpenMandatory.Length
             if d.Permitted && d.Refusals.IsEmpty then 0 else 4
+
+/// Recovery: a successor session's plan, from repository files alone. Exit 0 for CONTINUE (and the other actions
+/// that need no repair), 4 when the checkpoint must be repaired first.
+let resumeCommand (args: string list) : int =
+    let o = options args
+    if not ([ "--manifest"; "--checkpoint"; "--events"; "--t0"; "--at"; "--out" ] |> List.forall o.ContainsKey) then
+        eprintfn "usage: resume --manifest FILE --checkpoint FILE --events FILE --t0 ISO --at ISO [--window-minutes 420] [--stop-decision FILE] --out FILE"; 2
+    else
+        let manifest = parseFile o["--manifest"]
+        let t0 = DateTimeOffset.Parse o["--t0"]
+        let window = o.TryFind "--window-minutes" |> Option.map float |> Option.defaultValue 420.0
+        let at = DateTimeOffset.Parse o["--at"]
+        let checkpointScope = if File.Exists o["--checkpoint"] then strOpt "scopeSha256" (parseFile o["--checkpoint"]) |> Option.defaultValue "" else ""
+        let stopped = o.TryFind "--stop-decision" |> Option.filter File.Exists |> Option.exists (fun f -> strOpt "decision" (parseFile f) = Some "STOP_PERMITTED")
+        match Progress.replay manifest (eventsOf o["--events"]) with
+        | Error why -> printfn "  REFUSED %s" why; printfn "resume: REFUSED (the progress events do not replay)"; 4
+        | Ok s ->
+            let p = Continuation.resumePlan s { T0 = t0; Deadline = t0.AddMinutes window } checkpointScope at stopped
+            File.WriteAllText(o["--out"], serialize (Continuation.resumeJson at p))
+            p.Refusals |> List.iter (fun r -> printfn "  REFUSED %s %s" r.Code r.Detail)
+            printfn "resume: %s (%d minute(s) remaining, next: %s)" p.Action p.MinutesRemaining (p.NextWork |> List.truncate 5 |> String.concat ", ")
+            if p.Refusals.IsEmpty then 0 else 4

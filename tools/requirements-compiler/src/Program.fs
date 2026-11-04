@@ -1343,6 +1343,7 @@ let main argv =
     | "scope" :: rest -> ScopeCommands.scopeCommand rest
     | "progress" :: rest -> ScopeCommands.progressCommand rest
     | "stop-decision" :: rest -> ScopeCommands.stopDecisionCommand rest
+    | "resume" :: rest -> ScopeCommands.resumeCommand rest
     | "preflight" :: rest ->
         match parseArgs rest defaults with
         | Error e ->

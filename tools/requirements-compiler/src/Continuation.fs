@@ -203,3 +203,59 @@ let requestOf (j: Json) : Request =
         match field "facts" j with
         | Some(JObj ps) -> ps |> List.map (fun (k, v) -> k, (match v with JBool b -> (if b then "true" else "false") | JStr x -> x | _ -> "")) |> Map.ofList
         | _ -> Map.empty }
+
+// ---- recovery: what a successor session does next ---------------------------------------------------------------
+
+/// The plan a successor reads after the executor is lost (container restart, session end). It is rebuilt from
+/// repository files alone: the scope manifest, the committed checkpoint and the committed progress events. A lost
+/// executor is never a stop condition for the run; the successor continues unless the deadline has passed or a
+/// stop was permitted and recorded.
+type ResumePlan =
+    { Action: string
+      Refusals: Refusal list
+      MinutesRemaining: int
+      OpenMandatory: string list
+      NextWork: string list
+      BlockedSuites: string list
+      Parked: string list }
+
+let resumePlan (s: State) (clock: Clock) (checkpointScope: string) (at: DateTimeOffset) (stopPermittedRecorded: bool) : ResumePlan =
+    let manifestScope = strOpt "scopeSha256" s.Manifest |> Option.defaultValue ""
+    let refusals =
+        [ if checkpointScope = "" then yield { Code = "CHECKPOINT_MISSING"; Detail = "no scope checkpoint is committed: run scope checkpoint before any implementation" }
+          elif checkpointScope <> manifestScope then
+              yield { Code = "SCOPE_CHANGE_UNAPPROVED"; Detail = sprintf "the manifest's scope %s is not the checkpointed scope %s" manifestScope checkpointScope } ]
+    let openMandatory =
+        arr "requirements" s.Manifest
+        |> List.filter (fun x -> boolOr "mandatory" false x && str "applicability" x = "always")
+        |> List.filter (fun x -> not (List.contains (status s (str "id" x)) [ Verified; Accepted ]))
+        |> List.map (str "id")
+    let _, independent = independentWork s []
+    let minutes = int (Math.Ceiling((clock.Deadline - at).TotalMinutes)) |> max 0
+    let action =
+        if not refusals.IsEmpty then "REPAIR_CHECKPOINT"
+        elif at >= clock.Deadline then "REPORT_AND_STOP"
+        elif stopPermittedRecorded then "STOPPED"
+        elif openMandatory.IsEmpty then "REQUEST_STOP_COMPLETE"
+        elif independent.IsEmpty then "REQUEST_STOP_DECISION"
+        else "CONTINUE"
+    { Action = action
+      Refusals = refusals
+      MinutesRemaining = minutes
+      OpenMandatory = openMandatory
+      NextWork = independent
+      BlockedSuites = s.BlockedSuites |> Map.toList |> List.map fst
+      Parked = parked s |> Set.toList }
+
+let resumeJson (at: DateTimeOffset) (p: ResumePlan) : Json =
+    JObj
+        [ "schema", JStr "indy-init.resume-plan/1"
+          "at", JStr(at.ToString "o")
+          "action", JStr p.Action
+          "minutesRemaining", jint p.MinutesRemaining
+          "refusals", JArr(p.Refusals |> List.map refusalJson)
+          "openMandatoryRequirements", jint p.OpenMandatory.Length
+          "nextIndependentWork", jstrs (p.NextWork |> List.truncate 10)
+          "blockedSuites", jstrs p.BlockedSuites
+          "parkedWorkItems", jstrs p.Parked
+          "rule", JStr "A lost executor is not a stop condition. Continue with nextIndependentWork; stop only on a recorded STOP_PERMITTED decision or at the deadline." ]

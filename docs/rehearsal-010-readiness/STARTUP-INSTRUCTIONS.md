@@ -111,6 +111,26 @@ Any other request gets `CONTINUE_REQUIRED` with its refusal codes and the remain
 
 At the deadline, stop and report the actual state. Claim acceptance only if `acceptanceClaimPermitted` is true; otherwise the decision refuses the claim (`ACCEPTANCE_NOT_ESTABLISHED`).
 
-## 6. Scope changes
+## 6. Recovery (a lost executor)
+
+An executor session is disposable. If it is lost (a container restart, a session end, or a permitted `environment-failure` stop), the run is not over. The successor rebuilds its plan from the committed scope manifest, checkpoint and progress events:
+
+```
+requirements-compiler resume --manifest SRC/docs/rehearsal-010-readiness/scope-manifest.json --checkpoint .echelon/scope-checkpoint.json \
+  --events evidence/progress/events.json --t0 T0 --at NOW [--stop-decision evidence/progress/stop-decision.json] --out evidence/progress/resume.json
+```
+
+It returns one of these actions:
+
+| Action | Meaning |
+|---|---|
+| `CONTINUE` | work `nextIndependentWork` |
+| `REQUEST_STOP_COMPLETE` | ask `stop-decision` with `complete` |
+| `REQUEST_STOP_DECISION` | nothing independent remains; ask `stop-decision` |
+| `REPORT_AND_STOP` | the deadline has passed |
+| `STOPPED` | a `STOP_PERMITTED` decision is recorded |
+| `REPAIR_CHECKPOINT` | the checkpoint is missing or does not match the scope |
+
+## 7. Scope changes
 
 The scope is the checkpointed `scopeSha256`. A different scope needs an owner record `{action: approve-scope, scope_sha256: <new>}` in the pinned approvals file. Agents never write it (RDP-003). Without it, `stop-decision` refuses every request (`SCOPE_CHANGE_UNAPPROVED`).
