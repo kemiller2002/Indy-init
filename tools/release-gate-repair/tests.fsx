@@ -125,6 +125,31 @@ r9case "suite-preflight-passes-corrected-runners" [ 0 ] [ "SU-OWN-DOTNET: execut
 let noSuites = obligationsWith "no-suites" []
 r9case "suite-preflight-refuses-a-plan-without-suites" [ 2 ] [ "the obligations name no executable suite" ] [ "suite-preflight"; "--obligations"; noSuites; "--root"; suiteRepo ] suiteRepo |> ignore
 
+// ---- 2b. the deterministic fixture and the zero-test refusal (ported from #102, integration) ----------------------
+
+let compileObligations (pkg: string) =
+    let out = Path.Combine(work, $"obligations-{pkg}.json")
+    let code, output =
+        run "dokimos" [ "verification"; "compile"; "--indy-execution-plan"; Path.Combine(src, "requirements-compiled", pkg, "verification-execution-plan.json")
+                        "--indy-verification-plan"; Path.Combine(src, "requirements-compiled", "v4", "verification-plan.json"); "--out"; out ] work
+    if code <> 0 then failwithf "dokimos verification compile %s: %s" pkg output
+    out
+let obl412, obl414 = compileObligations "v4.1.2", compileObligations "v4.1.4"
+let fixture name extra =
+    let dir = Path.Combine(work, name)
+    r9case $"suite-fixture-{name}" [ 0 ] [ "suite-fixture: PASS" ] ([ "suite-fixture"; "--out"; dir ] @ extra) work |> ignore
+    Directory.CreateSymbolicLink(Path.Combine(dir, "node_modules"), nodeModules) |> ignore
+    dir
+let fx, fxEmpty, fxNoWebkit = fixture "fx" [], fixture "fx-empty" [ "--empty-project"; "Causa.Acceptance" ], fixture "fx-nowebkit" [ "--without-webkit"; "true" ]
+r9case "fixture-v4.1.2-runners-refused-msb1008" [ 4 ] [ "SU-OWN-DOTNET cannot execute"; "SU-DOTNET-LIVE cannot execute"; "MSB1008" ] [ "suite-preflight"; "--obligations"; obl412; "--root"; fx; "--require-tests"; "true" ] fx |> ignore
+r9case "fixture-v4.1.4-every-suite-lists-tests" [ 0 ] [ "SU-OWN-DOTNET: executable, 4 test(s)"; "SU-BROWSER-WEBKIT: executable, 2 test(s)"; "SU-DOTNET-LIVE: executable, 2 test(s)" ] [ "suite-preflight"; "--obligations"; obl414; "--root"; fx; "--require-tests"; "true" ] fx |> ignore
+r9case "fixture-v4.1.4-missing-webkit-project-refused" [ 4 ] [ "SU-BROWSER-WEBKIT cannot execute"; "Project(s) \"webkit\" not found" ] [ "suite-preflight"; "--obligations"; obl414; "--root"; fxNoWebkit ] fxNoWebkit |> ignore
+r9case "suite-preflight-zero-selected-tests-refused" [ 4 ] [ "SU-DOTNET-DETERMINISTIC: the command executes but selects no test" ] [ "suite-preflight"; "--obligations"; obl414; "--root"; fxEmpty; "--require-tests"; "true" ] fxEmpty |> ignore
+// Control: before implementation (no --require-tests) an empty suite is executable, so preflight can run at T0.
+r9case "suite-preflight-zero-tests-allowed-before-implementation" [ 0 ] [ "SU-DOTNET-DETERMINISTIC: executable, 0 test(s)" ] [ "suite-preflight"; "--obligations"; obl414; "--root"; fxEmpty ] fxEmpty |> ignore
+r9case "run-suites-release-zero-executed-refused" [ 4 ] [ "suite SU-DOTNET-DETERMINISTIC executed no test (exit 0)" ] [ "run-suites"; "--obligations"; obl414; "--root"; fxEmpty; "--out"; Path.Combine(work, "runs-empty"); "--suites"; "SU-DOTNET-DETERMINISTIC"; "--require-tests"; "true" ] fxEmpty |> ignore
+r9case "run-suites-release-fixture-executes" [ 0 ] [ "SU-OWN-DOTNET: exit 0"; "SU-DOTNET-DETERMINISTIC: exit 0" ] [ "run-suites"; "--obligations"; obl414; "--root"; fx; "--out"; Path.Combine(work, "runs-fx"); "--suites"; "SU-OWN-DOTNET,SU-DOTNET-DETERMINISTIC"; "--require-tests"; "true" ] fx |> ignore
+
 // ---- 3. Praxis ordering: authorize-implementation and check-sequencing -------------------------------------------
 
 let app = Path.Combine(work, "app")

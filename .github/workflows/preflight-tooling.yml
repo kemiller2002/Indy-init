@@ -284,38 +284,46 @@ jobs:
           name: r9-readiness-gates
           path: ${{ runner.temp }}/r9-evidence
   # Rehearsal 009's release gate failed in run-suites: two `dotnet test` runners named several projects (MSB1008) and
-  # SU-BROWSER-WEBKIT named a Playwright project nobody defined. This job proves, on a deterministic fixture tree with
-  # the plan's layout (no application code), that the frozen v4.1.2 commands are refused and that every executable
-  # suite of the successor v4.1.3 lists and runs, WebKit included (docs/rehearsal-010-readiness/PROCESS-CORRECTIONS.md).
+  # SU-BROWSER-WEBKIT named a Playwright project nobody defined. On the deterministic fixture tree (no application
+  # code), every v4.1.4 suite command lists and RUNS, WebKit included, with a zero-test suite refused (release mode).
+  # This container-independent run is the WebKit execution evidence for the successor package.
   suite-commands:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
         with:
           global-json-file: global.json
-      - name: Fixture trees (with and without the webkit project)
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Pinned Conditor and the echelon-current workstation (Dokimos compiles the obligations)
         run: |
+          dotnet fsi tools/r9/r9.fsx -- install-conditor --lock kickoff/rehearsal-009/toolchain.lock.json --dir "$RUNNER_TEMP/conditor"
+          dotnet fsi tools/r9/r9.fsx -- workstation --lock kickoff/rehearsal-009/toolchain.lock.json \
+            --conditor "$RUNNER_TEMP/conditor/conditor" --home "$RUNNER_TEMP/echelon" --target-id "indy-init-sc-${{ github.run_id }}"
+          echo "$RUNNER_TEMP/echelon/.local/bin" >> "$GITHUB_PATH"
+      - name: Fixture tree and the v4.1.4 obligations
+        run: |
+          git config --global user.name ci && git config --global user.email ci@example.invalid
           dotnet fsi tools/r9/r9.fsx -- suite-fixture --out "$RUNNER_TEMP/fx"
-          dotnet fsi tools/r9/r9.fsx -- suite-fixture --out "$RUNNER_TEMP/fx-nowebkit" --without-webkit true
           (cd "$RUNNER_TEMP/fx" && npm install --no-audit --no-fund && npx playwright install --with-deps chromium webkit)
-          cp -r "$RUNNER_TEMP/fx/node_modules" "$RUNNER_TEMP/fx-nowebkit/"
-      - name: The frozen v4.1.2 commands are refused (MSB1008), and a missing webkit project is refused
+          dokimos verification compile --indy-execution-plan requirements-compiled/v4.1.4/verification-execution-plan.json \
+            --indy-verification-plan requirements-compiled/v4/verification-plan.json --out "$RUNNER_TEMP/obligations.json"
+      - name: Every v4.1.4 suite command lists tests and runs them, WebKit included
         run: |
-          set +e
-          dotnet fsi tools/r9/r9.fsx -- suite-preflight --plan requirements-compiled/v4.1.2/verification-execution-plan.json --root "$RUNNER_TEMP/fx" --out "$RUNNER_TEMP/v412.json" --require-tests true
-          test $? -eq 4 || { echo "::error::v4.1.2 was not refused"; exit 1; }
-          jq -e '[.suites[] | select(.cause != null) | .id] == ["SU-OWN-DOTNET","SU-DOTNET-LIVE"]' "$RUNNER_TEMP/v412.json" || exit 1
-          dotnet fsi tools/r9/r9.fsx -- suite-preflight --plan requirements-compiled/v4.1.3/verification-execution-plan.json --root "$RUNNER_TEMP/fx-nowebkit" --out "$RUNNER_TEMP/nowebkit.json" --require-tests true
-          test $? -eq 4 || { echo "::error::a missing webkit project was not refused"; exit 1; }
-          jq -e '[.suites[] | select(.cause != null) | .id] == ["SU-BROWSER-WEBKIT"]' "$RUNNER_TEMP/nowebkit.json" || exit 1
-      - name: Every v4.1.3 suite command lists and runs, each test passing (WebKit included)
-        run: |
-          dotnet fsi tools/r9/r9.fsx -- suite-preflight --plan requirements-compiled/v4.1.3/verification-execution-plan.json --root "$RUNNER_TEMP/fx" --out "$RUNNER_TEMP/v413.json" --require-tests true
-          dotnet fsi tools/r9/r9.fsx -- run-suites --plan requirements-compiled/v4.1.3/verification-execution-plan.json --root "$RUNNER_TEMP/fx" --out "$RUNNER_TEMP/runs"
-          for f in "$RUNNER_TEMP"/runs/*/run.log; do head -2 "$f"; done
+          dotnet fsi tools/r9/r9.fsx -- suite-preflight --obligations "$RUNNER_TEMP/obligations.json" --root "$RUNNER_TEMP/fx" --require-tests true --out "$RUNNER_TEMP/preflight.json"
+          dotnet fsi tools/r9/r9.fsx -- run-suites --obligations "$RUNNER_TEMP/obligations.json" --root "$RUNNER_TEMP/fx" --out "$RUNNER_TEMP/runs" --require-tests true
           ! grep -l 'outcome="Failed"' "$RUNNER_TEMP"/runs/*/*.trx
           for s in SU-OWN-BROWSER SU-BROWSER-CHROMIUM SU-BROWSER-WEBKIT SU-BROWSER-LIVE; do
             jq -e '.stats.unexpected == 0 and .stats.expected > 0' "$RUNNER_TEMP/runs/$s/results.json" || { echo "::error::$s did not pass"; exit 1; }
           done
+      - name: Publish the suite-command evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: suite-commands
+          path: |
+            ${{ runner.temp }}/preflight.json
+            ${{ runner.temp }}/runs

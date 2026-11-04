@@ -12,8 +12,9 @@
 //        [--probes F,... --require-fault-sensitive CATEGORY,...]
 //        Evidence type comes only from the plan's suite runner: executable obligations need Dokimos at HEAD, record
 //        obligations (praxis:*) need verify-process VERIFIED at HEAD, mixed ones need both; verifier:* is acceptance-only.
-//   dotnet fsi tools/r9/r9.fsx -- run-suites --obligations F --root REPO --out DIR [--suites ID,...]
-//   dotnet fsi tools/r9/r9.fsx -- suite-preflight --obligations F --root REPO [--out F]
+//   dotnet fsi tools/r9/r9.fsx -- run-suites --obligations F --root REPO --out DIR [--suites ID,...] [--require-tests true]
+//   dotnet fsi tools/r9/r9.fsx -- suite-preflight --obligations F --root REPO [--out F] [--require-tests true]
+//   dotnet fsi tools/r9/r9.fsx -- suite-fixture --out NEW-DIR [--without-webkit true] [--empty-project NAME]
 //        Executes every executable suite command in list mode; refuses readiness if any cannot execute.
 //   dotnet fsi tools/r9/r9.fsx -- authorize-implementation --target REPO --catalog F --obligations F --suite-preflight F
 //        --spec-preflight F --acceptance-preflight F [--work-plan F] [--manifest F] [--scope F] [--praxis EXE]
@@ -583,6 +584,35 @@ let gate () =
               $"""verdict {Path.Combine(out, "gate.json")}""" ]
         if causes.IsEmpty then Pass summary else (summary |> List.iter (printfn "  %s"); Refused causes)
 
+/// The number of tests a listing run reports (ported from #102). dotnet: the distinct four-space-indented lines after
+/// "The following Tests are available:" (projects of a solution list in parallel and interleave; build lines are
+/// indented by two and carry "->"). Playwright: "Total: N tests". A command that exits 0 having found no test proves
+/// nothing about its suite.
+let listedTests (runner: string) (output: string) : int =
+    if runner = "dotnet-test" then
+        output.Replace("\r", "").Split('\n')
+        |> List.ofArray
+        |> List.skipWhile (fun l -> not (l.Contains "The following Tests are available:"))
+        |> List.filter (fun l -> l.StartsWith "    " && l.Trim() <> "" && not (l.Contains " -> "))
+        |> List.distinct
+        |> List.length
+    else
+        let m = Regex.Match(output, "Total: ([0-9]+) tests?")
+        if m.Success then int m.Groups[1].Value else 0
+
+/// The number of tests a result file says were executed (passed, failed or flaky; skipped and not-run tests are not
+/// executed). TRX: Counters executed; Playwright JSON: stats expected + unexpected + flaky.
+let executedTests (format: string) (path: string) : int =
+    let text = File.ReadAllText path
+    if format = "trx" then
+        let m = Regex.Match(text, "<Counters[^>]*\\sexecuted=\"([0-9]+)\"")
+        if m.Success then int m.Groups[1].Value else 0
+    else
+        try
+            let stats = (JsonNode.Parse text)["stats"]
+            [ "expected"; "unexpected"; "flaky" ] |> List.sumBy (fun k -> match stats with | null -> 0 | s when isNull s[k] -> 0 | s -> s[k].GetValue<int>())
+        with _ -> 0
+
 // ---- run-suites: execute the plan's own suite commands and record machine-readable results at HEAD -----------------
 
 /// Runs each selected executable suite exactly as the frozen plan states it, adding only a machine-readable logger,
@@ -615,6 +645,7 @@ let runSuites () =
                     [ Collections.Generic.KeyValuePair("suite", JsonValue.Create id :> JsonNode)
                       Collections.Generic.KeyValuePair("format", JsonValue.Create format :> JsonNode)
                       Collections.Generic.KeyValuePair("path", JsonValue.Create path :> JsonNode)
+                      Collections.Generic.KeyValuePair("executedTests", JsonValue.Create(executedTests format (Path.Combine(out, path)): int) :> JsonNode)
                       Collections.Generic.KeyValuePair("sourceSha", JsonValue.Create head :> JsonNode) ]) :> JsonNode))
     let manifest =
         JsonObject(
@@ -624,6 +655,15 @@ let runSuites () =
     File.WriteAllText(Path.Combine(out, "results.json"), manifest.ToJsonString(JsonSerializerOptions(WriteIndented = true)) + "\n")
     // A failing suite is not a gate failure here: the gate judges every identity from the recorded results.
     let missing = ran |> List.filter (fun (_, _, files) -> files.IsEmpty) |> List.map (fun (id, code, _) -> $"suite {id} produced no result file (exit {code}); see {id}/run.log")
+    // --require-tests true (release): a suite whose result files record no executed test is refused. A command that
+    // exits 0 having run nothing is never evidence (adversarial case 1).
+    let empty =
+        if opt "--require-tests" <> Some "true" then []
+        else
+            ran
+            |> List.filter (fun (_, _, files) -> not files.IsEmpty && files |> List.sumBy (fun (p, f) -> executedTests f (Path.Combine(out, p))) = 0)
+            |> List.map (fun (id, code, _) -> $"suite {id} executed no test (exit {code}); a command that selects zero tests is not verification; see {id}/run.log")
+    let missing = missing @ empty
     if suites.IsEmpty then Unusable "no executable suite selected"
     elif missing.IsEmpty then Pass (ran |> List.map (fun (id, code, files) -> $"{id}: exit {code}, {files.Length} result file(s)") |> fun l -> l @ [ $"results {out}/results.json at {head}" ])
     else Refused missing
@@ -638,6 +678,8 @@ let runSuites () =
 let suitePreflight () =
     let root = Path.GetFullPath(req "--root")
     let obligations = readJson (req "--obligations")
+    // --require-tests true (a fixture tree, and any tree past implementation): a suite that lists no test is refused.
+    let requireTests = opt "--require-tests" = Some "true"
     let suites = arr obligations "suites" |> List.filter (fun s -> str s "runner" = "dotnet-test" || str s "runner" = "playwright")
     let probe (s: JsonNode) =
         let id, command = str s "id", str s "command"
@@ -648,7 +690,12 @@ let suitePreflight () =
             |> Array.tryFind (fun l -> Regex.IsMatch(l, @"error|Error:|not found", RegexOptions.IgnoreCase))
             |> Option.map (fun l -> l.Trim())
             |> Option.defaultValue $"exit {code}"
-        id, listed, code, (if code = 0 then "" else cause)
+        let count = listedTests (str s "runner") output
+        let cause' =
+            if code <> 0 then cause
+            elif requireTests && count = 0 then "the command executes but selects no test"
+            else ""
+        id, listed, code, count, cause'
     let results = suites |> List.map probe
     let report =
         JsonObject(
@@ -659,19 +706,74 @@ let suitePreflight () =
                   "suites",
                   JsonArray(
                       results
-                      |> List.map (fun (id, cmd, code, cause) ->
+                      |> List.map (fun (id, cmd, code, count, cause) ->
                           JsonObject(
                               [ Collections.Generic.KeyValuePair("id", JsonValue.Create id :> JsonNode)
                                 Collections.Generic.KeyValuePair("command", JsonValue.Create cmd :> JsonNode)
                                 Collections.Generic.KeyValuePair("exit", JsonValue.Create(code: int) :> JsonNode)
                                 Collections.Generic.KeyValuePair("executable", JsonValue.Create((code = 0): bool) :> JsonNode)
+                                Collections.Generic.KeyValuePair("listedTests", JsonValue.Create(count: int) :> JsonNode)
+                                Collections.Generic.KeyValuePair("requireTests", JsonValue.Create(requireTests: bool) :> JsonNode)
                                 Collections.Generic.KeyValuePair("cause", JsonValue.Create cause :> JsonNode) ]) :> JsonNode)
                       |> Array.ofList) :> JsonNode) ])
     opt "--out" |> Option.iter (fun f -> File.WriteAllText(f, report.ToJsonString(JsonSerializerOptions(WriteIndented = true)) + "\n"))
-    let refused = results |> List.filter (fun (_, _, code, _) -> code <> 0) |> List.map (fun (id, cmd, code, cause) -> $"suite {id} cannot execute (exit {code}): {cause}  [$ {cmd}]")
+    let refused =
+        results
+        |> List.filter (fun (_, _, _, _, cause) -> cause <> "")
+        |> List.map (fun (id, cmd, code, _, cause) -> if code <> 0 then $"suite {id} cannot execute (exit {code}): {cause}  [$ {cmd}]" else $"suite {id}: {cause}  [$ {cmd}]")
     if suites.IsEmpty then Unusable "the obligations name no executable suite"
-    elif refused.IsEmpty then Pass (results |> List.map (fun (id, _, _, _) -> $"{id}: executable") )
+    elif refused.IsEmpty then Pass (results |> List.map (fun (id, _, _, count, _) -> $"{id}: executable, {count} test(s) listed") )
     else Refused refused
+
+// ---- suite-fixture: the plan's test layout with one trivial test per suite, no application code (ported from #102) --
+
+/// A deterministic tree with the layout v4.1.4's runners address: Causa.slnx over the six test projects (namespaces as
+/// the suite filters select them), the bootstrapped playwright.config.ts (chromium and webkit) and one spec per
+/// browser folder. With --without-webkit the configuration defines chromium only (Conditor's scaffold, Rehearsal 009);
+/// with --empty-project NAME that project keeps its build but has no test (a command that selects zero tests).
+let fixtureFiles (withWebkit: bool) (emptyProject: string option) : (string * string) list =
+    let dotnetProjects =
+        [ "Causa.Contract.Tests", [ "Causa.Contract.Tests.Fixture" ]
+          "Causa.Domain.Tests", [ "Causa.Domain.Tests.Fixture" ]
+          "Causa.Persistence.Tests", [ "Causa.Persistence.Tests.Fixture" ]
+          "Causa.App.Tests", [ "Causa.App.Tests.Fixture" ]
+          "Causa.Acceptance", [ "Causa.Acceptance.Deterministic.Fixture"; "Causa.Acceptance.Live.Fixture" ]
+          "Causa.Invariants", [ "Causa.Invariants.Model.Fixture"; "Causa.Invariants.Live.Fixture" ] ]
+    let fsproj =
+        "<Project Sdk=\"Microsoft.NET.Sdk\">\n  <PropertyGroup>\n    <TargetFramework>net10.0</TargetFramework>\n    <IsPackable>false</IsPackable>\n  </PropertyGroup>\n  <ItemGroup>\n    <Compile Include=\"Tests.fs\" />\n  </ItemGroup>\n  <ItemGroup>\n    <PackageReference Include=\"Microsoft.NET.Test.Sdk\" Version=\"17.11.1\" />\n    <PackageReference Include=\"xunit\" Version=\"2.9.2\" />\n    <PackageReference Include=\"xunit.runner.visualstudio\" Version=\"2.8.2\" />\n  </ItemGroup>\n</Project>\n"
+    let testsFs (project: string) (modules: string list) =
+        if Some project = emptyProject then modules |> List.map (fun m -> $"namespace {m}\n\nmodule FixtureTests =\n    let notATest () = 2\n") |> String.concat "\n"
+        else modules |> List.map (fun m -> $"namespace {m}\n\nmodule FixtureTests =\n    [<Xunit.Fact>]\n    let ``suite command executes`` () = Xunit.Assert.Equal(2, 1 + 1)\n") |> String.concat "\n"
+    let slnx =
+        dotnetProjects |> List.map (fun (p, _) -> $"  <Project Path=\"tests/{p}/{p}.fsproj\" />\n") |> String.concat "" |> sprintf "<Solution>\n%s</Solution>\n"
+    let projects =
+        [ yield "    { name: \"chromium\", use: { ...devices[\"Desktop Chrome\"] } },\n"
+          if withWebkit then yield "    { name: \"webkit\", use: { ...devices[\"Desktop Safari\"] } },\n" ]
+        |> String.concat ""
+    let spec folder = $"tests/browser/{folder}/fixture.spec.mjs", $"import {{ test, expect }} from '@playwright/test';\n\ntest('{folder}: suite command executes', async ({{ page }}) => {{\n  await page.setContent('<p>suite</p>');\n  await expect(page.locator('p')).toHaveText('suite');\n}});\n"
+    [ "global.json", "{\n  \"sdk\": {\n    \"version\": \"10.0.402\",\n    \"rollForward\": \"disable\"\n  }\n}\n"
+      "Causa.slnx", slnx
+      "package.json", "{\n  \"name\": \"r9-suite-fixture\",\n  \"private\": true,\n  \"type\": \"module\",\n  \"devDependencies\": {\n    \"@playwright/test\": \"1.63.0\"\n  }\n}\n"
+      "playwright.config.ts", $"import {{ defineConfig, devices }} from \"@playwright/test\";\n\nexport default defineConfig({{\n  testDir: \"./tests/browser\",\n  projects: [\n{projects}  ],\n}});\n"
+      ".gitignore", "bin/\nobj/\nnode_modules/\ntest-results/\n" ]
+    @ (dotnetProjects |> List.collect (fun (p, ms) -> [ $"tests/{p}/{p}.fsproj", fsproj; $"tests/{p}/Tests.fs", testsFs p ms ]))
+    @ ([ "contract"; "acceptance"; "invariants"; "live" ] |> List.map spec)
+
+let suiteFixture () =
+    let out = Path.GetFullPath(req "--out")
+    if Directory.Exists out && not (Seq.isEmpty (Directory.EnumerateFileSystemEntries out)) then Unusable $"{out} is not empty"
+    else
+        let files = fixtureFiles (opt "--without-webkit" <> Some "true") (opt "--empty-project")
+        files |> List.iter (fun (path, text) ->
+            let full = Path.Combine(out, path)
+            Directory.CreateDirectory(Path.GetDirectoryName full) |> ignore
+            File.WriteAllText(full, text))
+        let code, output = git out [ "init"; "-q"; "-b"; "main" ]
+        if code <> 0 then Unusable output
+        else
+            git out [ "add"; "-A" ] |> ignore
+            git out [ "-c"; "user.name=r9"; "-c"; "user.email=r9@invalid"; "commit"; "-q"; "-m"; "suite fixture" ] |> ignore
+            Pass [ $"{files.Length} files written to {out} and committed (no application code); install @playwright/test there before listing the browser suites" ]
 
 // ---- small JSON builders used by the sequencing and acceptance commands ---------------------------------------------
 
@@ -1183,10 +1285,11 @@ match args with
 | "gate" :: _ -> gate () |> finish "gate"
 | "run-suites" :: _ -> runSuites () |> finish "run-suites"
 | "suite-preflight" :: _ -> suitePreflight () |> finish "suite-preflight"
+| "suite-fixture" :: _ -> suiteFixture () |> finish "suite-fixture"
 | "authorize-implementation" :: _ -> authorizeImplementation () |> finish "authorize-implementation"
 | "check-sequencing" :: _ -> checkSequencing () |> finish "check-sequencing"
 | "acceptance-status" :: _ -> acceptanceStatus () |> finish "acceptance-status"
 | "spec-preflight" :: _ -> specPreflight () |> finish "spec-preflight"
 | _ ->
-    eprintfn "usage: dotnet fsi tools/r9/r9.fsx -- install-conditor|workstation|govern|check-governance|gate|spec-preflight ... (see the header)"
+    eprintfn "usage: dotnet fsi tools/r9/r9.fsx -- install-conditor|workstation|govern|check-governance|gate|run-suites|suite-preflight|suite-fixture|spec-preflight|... (see the header)"
     exit 2

@@ -96,7 +96,8 @@ jobs:
 
           # Release runs every executable suite of the plan (live suites need their provider secrets in this job);
           # development runs the deterministic ones, and the gate refuses any in-scope suite without evidence.
-          suites=""
+          # Release also refuses a suite that executed zero tests: exit 0 with nothing selected is not evidence.
+          suites="--require-tests true"
           if [ "$MODE" = "development" ]; then suites="--suites SU-OWN-DOTNET,SU-DOTNET-DETERMINISTIC,SU-DOTNET-INVARIANTS,SU-OWN-BROWSER,SU-BROWSER-CHROMIUM"; fi
           dotnet fsi "$RUNNER_TEMP/indy-init/tools/r9/r9.fsx" -- run-suites --obligations "$RUNNER_TEMP/obligations.json" --root . \
             --out "$RUNNER_TEMP/results" $suites
