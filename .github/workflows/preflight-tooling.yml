@@ -187,6 +187,37 @@ jobs:
           dotnet tools/requirements-compiler/src/bin/Release/net10.0/requirements-compiler.dll v41 --source . --package requirements-compiled/v4.1.2 --base requirements-compiled/v4 --check --bootstrap "$RUNNER_TEMP/layered412"
           dotnet build "$RUNNER_TEMP/layered412/Causa.slnx" -c Release
           dotnet build "$RUNNER_TEMP/layered412/App.slnx" -c Release
+      - name: Successor package v4.1.4 is reproduced byte for byte and its checks X01-X21 pass; its contracts and layout tests equal v4.1.2's
+        run: |
+          dotnet tools/requirements-compiler/src/bin/Release/net10.0/requirements-compiler.dll v41 --source . --package requirements-compiled/v4.1.4 --base requirements-compiled/v4 --forma-tarball "$RUNNER_TEMP/forma.tgz" --check
+          diff -r requirements-compiled/v4.1.2/layout-tests requirements-compiled/v4.1.4/layout-tests
+          diff -r requirements-compiled/v4.1.2/contracts requirements-compiled/v4.1.4/contracts
+      - name: The v4.1.4 interface contracts typecheck, and each negative control (forged Confirmation, credential read) is refused (built outside the checkout)
+        run: |
+          cp -r requirements-compiled/v4.1.4/contracts "$RUNNER_TEMP/contracts414"
+          cp global.json "$RUNNER_TEMP/contracts414/"
+          dotnet build "$RUNNER_TEMP/contracts414/ContractCheck.fsproj" -c Release
+          for negative in "$RUNNER_TEMP"/contracts414/negative/*.fs; do
+            name=$(basename "$negative")
+            cp "$RUNNER_TEMP/contracts414/ContractCheck.fsproj" "$RUNNER_TEMP/contracts414/Negative.fsproj"
+            sed -i "s|</ItemGroup>|  <Compile Include=\"negative/$name\" />\n  </ItemGroup>|" "$RUNNER_TEMP/contracts414/Negative.fsproj"
+            if dotnet build "$RUNNER_TEMP/contracts414/Negative.fsproj" -c Release > "$RUNNER_TEMP/negative414.log" 2>&1; then echo "$name compiled but must not"; exit 1; fi
+            grep -q FS1093 "$RUNNER_TEMP/negative414.log" || { echo "$name failed for another reason"; cat "$RUNNER_TEMP/negative414.log"; exit 1; }
+            rm "$RUNNER_TEMP/contracts414/Negative.fsproj"
+          done
+      - name: The v4.1.4 skeleton bootstraps into an empty repository and onto a recorded Conditor 0.10.18 scaffold, and every solution builds
+        run: |
+          git init --quiet "$RUNNER_TEMP/app414"
+          dotnet tools/requirements-compiler/src/bin/Release/net10.0/requirements-compiler.dll v41 --source . --package requirements-compiled/v4.1.4 --base requirements-compiled/v4 --bootstrap "$RUNNER_TEMP/app414"
+          dotnet build "$RUNNER_TEMP/app414/Causa.slnx" -c Release
+          fixture=tools/requirements-compiler/tests/fixtures/conditor-0.10.18-scaffold
+          git init --quiet "$RUNNER_TEMP/layered414"
+          cp -r "$fixture"/. "$RUNNER_TEMP/layered414/"
+          mv "$RUNNER_TEMP/layered414/gitignore.txt" "$RUNNER_TEMP/layered414/.gitignore"
+          rm "$RUNNER_TEMP/layered414/README.md"
+          dotnet tools/requirements-compiler/src/bin/Release/net10.0/requirements-compiler.dll v41 --source . --package requirements-compiled/v4.1.4 --base requirements-compiled/v4 --check --bootstrap "$RUNNER_TEMP/layered414"
+          dotnet build "$RUNNER_TEMP/layered414/Causa.slnx" -c Release
+          dotnet build "$RUNNER_TEMP/layered414/App.slnx" -c Release
       - name: Executable Forma layout assertions pass on Forma 0.12.0 patterns and fail on broken fixtures (Chromium and WebKit)
         run: |
           mkdir -p "$RUNNER_TEMP/forma" "$RUNNER_TEMP/layout"
@@ -234,6 +265,11 @@ jobs:
         run: dotnet build tools/requirements-compiler/src -c Release
       - name: Candidate package v4.1.4 is reproduced byte for byte and X01-X21 pass
         run: dotnet tools/requirements-compiler/src/bin/Release/net10.0/requirements-compiler.dll v41 --source . --package requirements-compiled/v4.1.4 --base requirements-compiled/v4 --check
+      - name: Percepta's specification preflight finds nothing blocking in v4.1.4 (FREEZE.md step 2)
+        run: |
+          percepta spec-preflight --machines requirements-compiled/v4.1.4/state-machine-contracts.json --invariants requirements-compiled/v4/invariants.json \
+            --interfaces requirements-compiled/v4.1.4/analysis/interface-specifications.json --out "$RUNNER_TEMP/spec-preflight-v414.json"
+          jq -e '.blocked == false and (.blockingContradictions | length) == 0 and .analysed.transitions > 0' "$RUNNER_TEMP/spec-preflight-v414.json"
       - name: Playwright test runner (the version the owner locked, ODR-V41-07)
         run: |
           mkdir -p "$RUNNER_TEMP/pw" && cd "$RUNNER_TEMP/pw" && npm init -y > /dev/null && npm install --no-audit --no-fund @playwright/test@1.63.0 > /dev/null

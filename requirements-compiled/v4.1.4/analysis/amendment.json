@@ -500,31 +500,37 @@
     {
       "suite": "SU-OWN-DOTNET",
       "decision": "ODR-V414-01",
+      "approval": "APR-V414-OWNER-1",
       "runner": "dotnet test Causa.slnx --filter \"FullyQualifiedName~Causa.Contract.Tests.|FullyQualifiedName~Causa.Domain.Tests.|FullyQualifiedName~Causa.Persistence.Tests.|FullyQualifiedName~Causa.App.Tests.\""
     },
     {
       "suite": "SU-DOTNET-LIVE",
       "decision": "ODR-V414-01",
+      "approval": "APR-V414-OWNER-1",
       "runner": "dotnet test Causa.slnx --filter \"FullyQualifiedName~Causa.Acceptance.Live.|FullyQualifiedName~Causa.Invariants.Live.\""
     },
     {
       "suite": "SU-OWN-BROWSER",
       "decision": "ODR-V414-02",
+      "approval": "APR-V414-OWNER-1",
       "runner": "npx playwright test --config playwright.config.ts --project=chromium tests/browser/contract"
     },
     {
       "suite": "SU-BROWSER-CHROMIUM",
       "decision": "ODR-V414-02",
+      "approval": "APR-V414-OWNER-1",
       "runner": "npx playwright test --config playwright.config.ts --project=chromium tests/browser/acceptance tests/browser/invariants"
     },
     {
       "suite": "SU-BROWSER-WEBKIT",
       "decision": "ODR-V414-02",
+      "approval": "APR-V414-OWNER-1",
       "runner": "npx playwright test --config playwright.config.ts --project=webkit tests/browser/acceptance tests/browser/invariants"
     },
     {
       "suite": "SU-BROWSER-LIVE",
       "decision": "ODR-V414-02",
+      "approval": "APR-V414-OWNER-1",
       "runner": "npx playwright test --config playwright.config.ts --project=chromium tests/browser/live"
     }
   ]

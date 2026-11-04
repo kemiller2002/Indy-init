@@ -124,7 +124,7 @@
     },
     {
       "id": "X21",
-      "title": "Every suite runner can execute on the pinned toolchain: a dotnet test runner names exactly one target (the solution or a declared test project), a Playwright runner selects the bootstrapped configuration and names only projects it defines, and every corrected runner names its suite and authorizing decision",
+      "title": "Every suite runner can execute on the pinned toolchain: a dotnet test runner names exactly one target (the solution or a declared test project), a Playwright runner selects the bootstrapped configuration and names only projects it defines, and every suite has at most one corrected runner, which names its authorizing decision and the operator approval",
       "result": "PASS",
       "problems": []
     }

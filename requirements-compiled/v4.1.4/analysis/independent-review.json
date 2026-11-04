@@ -1,0 +1,189 @@
+{
+  "round": 4,
+  "package": "requirements-compiled/v4.1.4",
+  "commit": "b8bbac5fc127c3dc0f6b784c35545f099cc6cfe5",
+  "verdict": "PASS",
+  "summary": "Commit b8bbac5 changes only tools/requirements-compiler/tests/ScopeTests.fs. It adds an append-only check on kickoff/rehearsal-007/approvals.causa.json, makes `blob` return an Option, and widens the history range to <since>^..HEAD. The package, derived files and lock are unchanged: the package-manifest sha256 is still 7c3b0a36…. On the real history the build, `v41 --check` (X01–X21, byte for byte) and the offline suite all pass. GitHub's merges #104 and #106 still pass through. The round-3 major (an agent merge resolved to its own side, silently dropping the owner's later record) is now refused: 'append-only … APR-V414-OWNER-2'. Three more cases are refused under every identity: editing a record in place, dropping a record and re-adding it changed, and rewriting key order. The agent two-parent and octopus merges that plant a record are still refused, and so is a GitHub merge that brings in an agent-side commit. I found no blocker or major. Two minor gaps remain. First, the records check reads the working-tree approvals file while the history checks read HEAD, so a dirty tree can give a false PASS locally. Second, the append-only check ignores record order while `latest` depends on it, so reordering records under the owner's identity neutralizes a later decision. That second gap is no wider than the owner's accepted no-signing risk.",
+  "whatWasRun": [
+    "Setup: I worked only in /tmp/claude-0/review414, in two full-history (non-shallow) clones of /home/user/Indy-init. `clone` holds the branch claude/v414-freeze-step2 checked out at b8bbac5. `clone2` was used for the history experiments. /home/user/Indy-init was not modified. tools/owner-freeze.fsx was not run in any mode.",
+    "Change scope: `git diff --stat 62967b8 b8bbac5` shows only tools/requirements-compiler/tests/ScopeTests.fs, +27/−3. Across the whole branch (25dd44d..b8bbac5), approvals.causa.json and requirements-compiled/v4.1.4/proposals/owner-decision-requests.json are untouched (`git diff --quiet`). The frozen packages v4, v4.1, v4.1.1 and v4.1.2 equal their tags indy-init-requirements-v4.0.0, v4.1.0, v4.1.1 and v4.1.2. The only package-input change on the branch adds \"approval\": \"APR-V414-OWNER-1\" to the six suiteRunners. Their (suite, decision, runner) content is identical at 6c2e45b (requests introduced), 8b1d628 (the owner's record) and HEAD.",
+    "Provenance: since the v4.1.4 requests were introduced (6c2e45b), the only non-merge commit to the approvals file is 8b1d628, authored and committed by kemiller2002@gmail.com with no agent trailer. It records APR-V414-OWNER-1: operator kemiller2002, ODR-V414-01=A and ODR-V414-02=A. The merges #104 (3aa94d8) and #106 (6e27eba) are GitHub merges (committer noreply@github.com) whose approvals blob equals one parent's. Each decision's applies.suiteRunners equals the set of runners citing it.",
+    "Build, with PATH set to /root/.dotnet plus the echelon .local/bin: `dotnet build tools/requirements-compiler/tests` gives 0 warnings and 0 errors. `dotnet build tools/requirements-compiler/src -c Release` gives 0 errors.",
+    "`requirements-compiler v41 --source . --package requirements-compiled/v4.1.4 --base requirements-compiled/v4 --check`: 21 PASS lines (X01–X21), validation PASS, and the working tree stays clean. sha256(package-manifest.json) is 7c3b0a36d87f42b02dff1ff911ecf49da8a2cad9d9f2afa845996cd330950378. It equals the proposed lock's manifestSha256 and the scope manifest's frozen.packageManifestSha256. The lock's scopeSha256 equals the manifest's 046fa7885a1caca6d9931d5dac81f2d438df424e685eee53b96715ddfe218b1c.",
+    "Derived files, verified at 8565842; no input to them has changed since. `scope compile` reproduces docs/rehearsal-010-readiness/scope-manifest.json byte for byte except the informational source.commit. `slice-manifest` reproduces slice-execution-manifest.json and `scope work-plan` reproduces praxis-work-inventory.json, both byte-identical.",
+    "`percepta spec-preflight` (0.4.0) on the v4.1.4 state machines, the v4 invariants and the v4.1.4 interface specifications: blocked=false, 0 blocking contradictions, 101 transitions. The CI jq gate evaluates true.",
+    "CI, verified in round 1 and unchanged since: the v4.1.4 steps in .github/workflows/preflight-tooling.yml mirror v4.1.2's. Contracts and layout tests equal v4.1.2's. ContractCheck builds. The negative controls ForgeConfirmation.fs and ReadCredential.fs are refused with FS1093. Both jobs that run the offline suite use fetch-depth 0.",
+    "Offline suite at b8bbac5 in clone: `dotnet run --no-build --project tools/requirements-compiler/tests -- --offline --source .` gives rc 0, 'all passed'.",
+    "Earlier rounds: round-1 mutations were caught by the owner-record check or by X21 at 8565842 and, for the sample re-run, at 62967b8. They covered a wrong or missing approval, option B, a later B record, a wrong decision, an extra runner, a duplicate shadowing runner, a weakened runner, an agent author or trailer, a lowercase trailer and an agent committer. n2a (request edited) and n2b (suite removed) were refused at 62967b8.",
+    "Round-4 experiments in clone2, at b8bbac5, using scripts /tmp/claude-0/review414/mut4.sh and mut4b.sh (logs /tmp/claude-0/review414/mut4.log and mut4b.log). Each experiment ran the offline suite and `v41 --check`. The first batch reused stale side-branch names, so I re-ran the four merge experiments with fresh branches (mut4b).",
+    "  ours-merge: the owner appends APR-V414-OWNER-2 (ODR-V414-01=B) on a side branch; an agent runs `merge -s ours`. Refused: 'append-only … APR-V414-OWNER-2 (in 84a3447)'.",
+    "  n1: an agent two-parent merge plants an operator record. Refused as an agent commit.",
+    "  octopus: an agent three-parent merge plants a record. Refused as an agent commit.",
+    "  merge-takes-agent-side: an agent side commit plants a record, merged with author owner and committer noreply@github.com. The agent commit is refused.",
+    "  Owner-identity in-place edit of APR-V414-OWNER-1. Refused by append-only.",
+    "  Owner-identity drop, then re-add with a changed date. Refused by append-only.",
+    "  Owner-identity key-order rewrite of every record. Refused by append-only.",
+    "  Agent-authored reorder. Refused as an agent commit.",
+    "  Owner-identity reorder that moves a later B record before APR-V414-OWNER-1. Not refused; see RV414-4-2.",
+    "  The W16 failure that appears in clone2 is environmental to that clone: it is present at clean 8565842 there and absent in clone.",
+    "Working-tree experiment in clone: an owner-identity commit appends APR-V414-OWNER-2 (ODR-V414-01=B), then the working-tree approvals file is reverted without committing. The offline suite gives rc 0, 'all passed'. The clone was then reset to b8bbac5; see RV414-4-1."
+  ],
+  "roundThreeDispositions": [
+    {
+      "id": "RV414-3-1",
+      "severity": "major",
+      "disposition": "resolved",
+      "evidence": "The new `dropped` check collects every version of the approvals file: each commit listed by `git log --full-history <since>^..HEAD -- approvals`, each parent of those commits, and <since> itself. Every record in every version must appear, structurally unchanged, in HEAD's file. The ours-merge case (merge 8154fbe resolved to its first parent 8656b6d, dropping the owner's 84a3447 record) is refused with 'v4.1.4: the approvals file is append-only, but a record is missing or changed at HEAD: APR-V414-OWNER-2 (in 84a3447…)'. Drops and in-place edits are refused even under the owner's identity. An edit can only escape the version set if it lands on a commit that does not change the file against its parent, which is no edit. Commits before <since>^ are covered by the <since> version."
+    },
+    {
+      "id": "RV414-3-2",
+      "severity": "minor",
+      "disposition": "resolved",
+      "evidence": "`blob` now returns None on a lookup error or empty output, and a pass-through requires Some on the parent. The range is <since>^..HEAD, so the commit that introduced the requests is inspected. One narrow skip remains in `dropped`, see RV414-4-3."
+    },
+    {
+      "id": "RV414-3-3",
+      "severity": "note",
+      "disposition": "unchanged (accepted risk)",
+      "evidence": "A commit whose author and committer are the owner's email, with no trailer, passes the identity check. This follows owner decision 10700d5 (no commit signing). The append-only check now limits even such commits: they can no longer drop or edit records. They can still append records or reorder them (RV414-4-2)."
+    }
+  ],
+  "findings": [
+    {
+      "id": "RV414-4-1",
+      "severity": "minor",
+      "title": "The records check reads the working tree while the history checks read HEAD, so a dirty tree gives a false local PASS",
+      "evidence": "`v414OwnerRecords` passes `parseFile` of the working-tree approvals, requests and amendment files to `v414OwnerRecordsWith`. `dropped`, `decided`, `proposed` and `agentCommits` read from git. Experiment in clone: an owner-identity commit appended APR-V414-OWNER-2 selecting ODR-V414-01=B, so HEAD is non-compliant; the same addition committed is refused (round-1 m3b). I then reverted the working-tree file without committing (`git status`: ' M kickoff/rehearsal-007/approvals.causa.json'). The offline suite gave rc 0, 'all passed'. CI checks out a clean tree, so CI would refuse, but a review or evidence record produced from a dirty local tree could claim a PASS that HEAD does not support.",
+      "recommendation": "Read all three files from HEAD (`git show HEAD:<path>`). Alternatively, refuse when any of them differs from HEAD (`git diff --quiet HEAD -- <paths>`)."
+    },
+    {
+      "id": "RV414-4-2",
+      "severity": "minor",
+      "title": "The append-only check ignores record order, but `latest` takes the last record in file order, so a reorder can neutralize a later decision",
+      "evidence": "`dropped` uses `List.contains` and so accepts any permutation. `latest` is `List.tryLast` over file order. Experiment e3: an owner-identity commit appends APR-V414-OWNER-2 (ODR-V414-01=B), then a second owner-identity commit moves it before APR-V414-OWNER-1. The offline suite shows no v4.1.4 failure: latest(ODR-V414-01) is APR-V414-OWNER-1=A and the runners pass. The same reorder in an agent-authored commit is refused by the identity check (experiment e4), and an agent merge cannot introduce it as a pass-through. The gap is therefore reachable only under the owner's identity, which the accepted no-signing risk already lets append a fresh A record. It does contradict the commit's stated intent that the history be honoured 'whoever made it'. A strict prefix rule would wrongly refuse two owner branches that append concurrently.",
+      "recommendation": "Define 'latest' by history, not file position. Order records by the commit that introduced each one (the oldest `git log -S` hit for its id), or refuse any version in which the relative order of two records with the same decision_id differs from HEAD's. Refuse duplicate record ids as well."
+    },
+    {
+      "id": "RV414-4-3",
+      "severity": "note",
+      "title": "`dropped` skips a version silently when both the show and the blob lookup fail",
+      "evidence": "In `dropped`, `| Error _ when blob c |> Option.isNone -> []` treats 'the file did not exist at c' and 'any rev-parse error for c' the same. A version whose commit or tree object cannot be read would be skipped rather than refused. In a non-shallow repository every listed commit and parent exists, and the shallow case is already refused, so I could not construct a reachable case.",
+      "recommendation": "Separate absence from failure. Use `git ls-tree --name-only <c> -- <path>`, where empty output means absent and an error refuses, or check `git cat-file -e <c>^{commit}` first."
+    },
+    {
+      "id": "RV414-4-4",
+      "severity": "note",
+      "title": "Structural equality is strict (key order, number representation); it fails closed",
+      "evidence": "Json objects compare as ordered key lists, so a key-order-only rewrite of every record under the owner's identity (experiment e5) is refused for every record in every version. JInt 1 and JNum 1.0 also differ. Values are compared after parsing, so whitespace is ignored. Duplicate keys inside a record are parsed by System.Text.Json and kept in order, and `field` takes the first. Adding a duplicate key to an existing record is caught as a change. I found no case where equality is too loose.",
+      "recommendation": "None required. owner-freeze.fsx must keep appending records without re-serializing existing ones, or the owner's own next record will be refused."
+    },
+    {
+      "id": "RV414-4-5",
+      "severity": "note",
+      "title": "RV414-2-4 is still open: the review record and the placeholder digests",
+      "evidence": "requirements-compiled/v4.1.4/analysis/independent-review.json is not yet present, and @MAN@, @MAN8@, @SCOPE@ and @SCOPE8@ remain in FINAL-READINESS, FINAL-LAUNCH-VERIFICATION, OWNER-APPROVAL-EXECUTION and OWNER-DECISIONS-REQUIRED. Adding the review changes package-manifest.json from its current 7c3b0a36…, and with it the scope digest (now 046fa788…), the slice manifest, the Praxis inventory and the proposed lock.",
+      "recommendation": "After adding the review, recompile and regenerate. On the final commit re-run `v41 --check`, the three derivations and the lock-digest comparison. Confirm that no @…@ placeholder remains, and that the review names the final package-manifest digest."
+    }
+  ],
+  "previousRounds": [
+    {
+      "round": 1,
+      "commit": "317caa55d1af1571b50a8a550101e86caca97118",
+      "verdict": "FAIL",
+      "summary": "The commit's content is correct and stays inside FREEZE step 2. Its only package-input change adds approval \"APR-V414-OWNER-1\" to the six suiteRunners. The runner texts are byte-identical to those the owner decided on (the same at 6c2e45b, 8b1d628 and 317caa5). The approvals file and the requests file are untouched, and the frozen v4, v4.1, v4.1.1 and v4.1.2 packages equal their tags. The only non-merge commit to the approvals file since the v4.1.4 requests were added is the owner's 8b1d628. It records option A for both decisions. The v41 --check reproduces byte for byte (X01-X21 PASS) and the offline suite passes. The scope manifest, slice manifest, Praxis inventory and lock digests reproduce. Percepta spec-preflight reports nothing blocking, the CI steps mirror v4.1.2's, and the contract typecheck and negative controls behave as expected. The verdict is FAIL because of one major defect in the new owner-record guard, which FREEZE step 2 requires to pass. v4.1.2's guard binds each approval to what it applies: exact transitions, contract sha256 values and counts. v4.1.4's guard binds an approval only to suite names. A runner text changed after the owner's decision still passes, for example one that drops tests/browser/invariants from SU-BROWSER-WEBKIT. So does a duplicate suiteRunners entry that shadows the approved runner. With the derived files regenerated, both pass every offline check and X01-X21 while still citing APR-V414-OWNER-1. The other mutations asked for are caught: wrong id, missing approval, option B, wrong decision, an extra runner for another suite, and an agent-authored or agent-trailered commit. Smaller gaps are listed as minor findings.",
+      "findings": [
+        {
+          "id": "RV414-1-1",
+          "severity": "major",
+          "title": "The owner-record guard does not bind APR-V414-OWNER-1 to the runners option A approved. A changed or shadowed runner passes every check while citing the owner's approval."
+        },
+        {
+          "id": "RV414-1-2",
+          "severity": "minor",
+          "title": "The agent-commit heuristic misses the owner's own stated criterion (committer must be the owner) and a lowercase trailer, and git errors fail open"
+        },
+        {
+          "id": "RV414-1-3",
+          "severity": "minor",
+          "title": "The new X21 line re-attaches the existing 'elif', so the not-requested-decision check is skipped when the approval is missing"
+        },
+        {
+          "id": "RV414-1-4",
+          "severity": "minor",
+          "title": "Other docs still state the old scope digest as current"
+        },
+        {
+          "id": "RV414-1-5",
+          "severity": "minor",
+          "title": "The FINAL-READINESS and OWNER-APPROVAL-EXECUTION edits are accurate, but their framing now contradicts them"
+        },
+        {
+          "id": "RV414-1-6",
+          "severity": "note",
+          "title": "FREEZE step 2 is not complete in this commit: analysis/independent-review.json is missing"
+        },
+        {
+          "id": "RV414-1-7",
+          "severity": "note",
+          "title": "The scope manifest's source.commit is the parent commit, and the offline-suite label omits the new check"
+        },
+        {
+          "id": "RV414-1-8",
+          "severity": "note",
+          "title": "The CI additions are sound and mirror v4.1.2's"
+        }
+      ]
+    },
+    {
+      "round": 2,
+      "commit": "85658425575055c0a3410bed857435739e43befe",
+      "verdict": "PASS",
+      "summary": "8565842 fixes the round-1 major finding. The owner-record check now compares every field of each corrected runner except the approval. It compares them with that suite's runner in the amendment at the earliest commit whose diff adds the approval id to the approvals file, which here is the owner's 8b1d628. It counts runners per suite and per decision, and checks the bootstrap the decision applies. X21 refuses a suite named twice and has its if/elif structure back. I re-ran all eleven round-1 mutations against 8565842, regenerating the package, scope, slice, inventory and lock each time. All eleven are now refused, including the two that slipped in round 1: m7 (a weakened runner) and m5b (a duplicate that shadows the approved runner). Build, `v41 --check` (X01-X21 PASS, byte for byte), the offline suite (rc 0, nine new controls included), the derived files, the lock digests, Percepta and the frozen-tag comparisons all pass. The approvals and requests files are still untouched. I found no blocker or major. There are three new minor findings. First, the new `--no-merges` makes the v4.1.4 history check blind to an agent merge that edits the approvals file. I demonstrated it: today only the v4.1 and v4.1.2 checks catch it. Second, the anchor binds to the tree the owner decided on. That tree is not the one the owner was asked about, and the owner tool does not show runner text. Third, the requests file itself is not anchored. One edit to it is caught only by accident: dropping its `bootstrap` entry fails the controls, not the real check.",
+      "findings": [
+        {
+          "id": "RV414-2-1",
+          "severity": "minor",
+          "title": "The v4.1.4 approvals-history check now skips merge commits, so an agent's merge that edits the approvals file is invisible to it"
+        },
+        {
+          "id": "RV414-2-2",
+          "severity": "minor",
+          "title": "The anchor proves only that the runners equal the tree the owner committed on top of; it does not prove they equal what the owner was asked about"
+        },
+        {
+          "id": "RV414-2-3",
+          "severity": "minor",
+          "title": "The requests file is read at HEAD, not anchored; removing its bootstrap entry is caught only through the controls"
+        },
+        {
+          "id": "RV414-2-4",
+          "severity": "note",
+          "title": "Digests to re-verify after the review record and placeholder fill"
+        }
+      ]
+    },
+    {
+      "round": 3,
+      "commit": "62967b8d770c8ec9198a78b914a68f7d313f3adc",
+      "verdict": "FAIL",
+      "summary": "62967b8 changes only tools/requirements-compiler/tests/ScopeTests.fs. The package, derived files and lock are unchanged from 8565842: the package-manifest sha256 is still 7c3b0a36…, and the lock and scope manifest still match it. On the real history, the build, v41 --check (X01-X21 byte for byte) and the offline suite all pass. GitHub's own merges #104 and #106 (committer noreply@github.com) pass as pass-throughs. The round-2 holes are closed. An agent merge that plants a record is refused, whether a two-parent merge or an octopus merge. So is a GitHub-style merge that brings in an agent-side commit. The requests are now anchored to the commit that introduced them, and n2a is refused by the real check. The sampled round-1 mutations (m3a, m5b, m6c, m7) are still refused. One major remains, in the new merge rule itself. The rule lets a merge through when its approvals file equals one parent's. That catches additions but not deletions. An agent merge that resolves the approvals file to its own side silently drops an owner record made on the other side. I tested this: the owner appended a later record selecting B on a branch, and an agent merged that branch with `-s ours`. The offline suite raised no v4.1.4 failure, and no v4.1.2 failure either. The check then passed against the superseded APR-V414-OWNER-1. The fix is small: treat the approvals file as append-only across merges.",
+      "findings": [
+        {
+          "id": "RV414-3-1",
+          "severity": "major",
+          "title": "The merge rule lets through a merge that silently drops an owner record, as long as the merge equals the agent's parent"
+        },
+        {
+          "id": "RV414-3-2",
+          "severity": "minor",
+          "title": "Two fail-open edges in the history check: blob lookup errors compare equal, and the commit that introduced the requests is outside the range"
+        },
+        {
+          "id": "RV414-3-3",
+          "severity": "note",
+          "title": "Accepted residual risk: forged owner identity"
+        }
+      ]
+    }
+  ]
+}

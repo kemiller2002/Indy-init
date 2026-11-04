@@ -1443,7 +1443,7 @@ let runnerCheck (i: Inputs) : Check =
     let config = i.Amendment |> Option.bind (field "bootstrap") |> Option.bind (strOpt "playwrightConfig") |> Option.defaultValue ""
     let testProjects = arr "testProjects" i.Structure |> List.map (str "path") |> List.collect (fun p -> [ p; p.Substring(0, max 0 (p.LastIndexOf '/')) ])
     let defined = if config = "" then [] else planPlaywrightProjects i
-    check "X21" "Every suite runner can execute on the pinned toolchain: a dotnet test runner names exactly one target (the solution or a declared test project), a Playwright runner selects the bootstrapped configuration and names only projects it defines, and every corrected runner names its suite and authorizing decision"
+    check "X21" "Every suite runner can execute on the pinned toolchain: a dotnet test runner names exactly one target (the solution or a declared test project), a Playwright runner selects the bootstrapped configuration and names only projects it defines, and every suite has at most one corrected runner, which names its authorizing decision and the operator approval"
         [ for o in suiteRunnerOverrides i do
               // A missing field is a reported problem, never an exception: X21 must produce a diagnostic, not crash.
               let field' k = strOpt k o |> Option.defaultValue ""
@@ -1452,6 +1452,10 @@ let runnerCheck (i: Inputs) : Check =
               if decision = "" then yield sprintf "the corrected runner of %s names no decision" suite
               elif not (i.AuthoredText |> List.exists (fun (n, t) -> n = "proposals/owner-decision-requests.json" && t.Contains(sprintf "\"%s\"" decision))) then
                   yield sprintf "the corrected runner of %s names %s, which proposals/owner-decision-requests.json does not request" suite decision
+              // A corrected runner applies an owner decision: once recorded, it names the operator approval (FREEZE.md step 2).
+              if field' "approval" = "" then yield sprintf "the corrected runner of %s names no operator approval" suite
+          for suite, n in suiteRunnerOverrides i |> List.countBy (fun o -> strOpt "suite" o |> Option.defaultValue "") do
+              if n > 1 then yield sprintf "suiteRunners names %s %d times; a suite has one corrected runner" suite n
           for s in suites do
               let r = runnerOf i s
               if r.Contains "dotnet test" && not (r.StartsWith("dotnet test", StringComparison.Ordinal)) then
