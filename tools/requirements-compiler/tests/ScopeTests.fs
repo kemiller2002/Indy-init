@@ -326,6 +326,35 @@ let reconciliation (source: string) : string list =
       if summary "approvedExclusions" <> 0L then yield "reconciliation: the inventory records an exclusion the scope manifest does not"
       if arr "obligations" inventory |> List.exists (fun o -> strOpt "scopeStatus" o <> Some "in-scope") then yield "reconciliation: the inventory has an obligation out of scope" ]
 
+/// FREEZE.md step 2 of v4.1.4: every corrected suite runner names the approval that records its decision, and that
+/// approval is a real operator record in the package-decision approvals file holding exactly that decision. An agent
+/// cannot satisfy this by naming an approval; only the owner's record does.
+let private ownerRecordProblems (amendment: Json) (approvals: Json) : string list =
+    let operatorRecords =
+        arr "approvals" approvals
+        |> List.filter (fun r -> field "authority" r |> Option.exists (fun a -> strOpt "kind" a = Some "operator" && strOpt "id" a = Some "kemiller2002"))
+        |> List.map (fun r -> str "id" r, arr "changes" r |> List.choose (strOpt "decision_id"))
+        |> Map.ofList
+    [ for r in arr "suiteRunners" amendment do
+          let suite, decision = str "suite" r, str "decision" r
+          match strOpt "approval" r with
+          | None -> yield sprintf "v4.1.4: the corrected runner of %s names no approval for %s" suite decision
+          | Some a ->
+              match operatorRecords.TryFind a with
+              | None -> yield sprintf "v4.1.4: %s names approval %s, which is not an operator record of the owner" suite a
+              | Some ds when not (List.contains decision ds) -> yield sprintf "v4.1.4: approval %s does not record %s (the decision of %s)" a decision suite
+              | Some _ -> () ]
+
+let v414OwnerRecords (source: string) : string list =
+    let amendment = parseFile (Path.Combine(source, "requirements-compiled", "v4.1.4", "analysis", "amendment.json"))
+    let approvals = parseFile (Path.Combine(source, "kickoff", "rehearsal-007", "approvals.causa.json"))
+    let forged =
+        match amendment with
+        | JObj ps -> JObj(ps |> List.map (fun (k, v) -> if k = "suiteRunners" then k, JArr(arr "suiteRunners" amendment |> List.map (fun r -> match r with JObj qs -> JObj(qs |> List.map (fun (a, b) -> if a = "approval" then a, JStr "APR-AGENT-INVENTED" else a, b)) | x -> x)) else k, v))
+        | j -> j
+    ownerRecordProblems amendment approvals
+    @ (if (ownerRecordProblems forged approvals).IsEmpty then [ "v4.1.4 control: an invented approval was accepted" ] else [])
+
 let all (source: string) : string list =
     let guard name f = try f () with ex -> [ sprintf "%s threw: %s" name ex.Message ]
-    guard "adversarial" adversarial @ guard "legitimate" legitimate @ guard "recovery" recovery @ guard "real" (fun () -> real source) @ guard "reconciliation" (fun () -> reconciliation source)
+    guard "adversarial" adversarial @ guard "legitimate" legitimate @ guard "recovery" recovery @ guard "real" (fun () -> real source) @ guard "reconciliation" (fun () -> reconciliation source) @ guard "v4.1.4 owner records" (fun () -> v414OwnerRecords source)

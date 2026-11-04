@@ -1,6 +1,6 @@
 {
  "schema": "indy-init.v41-owner-decision-requests/1",
- "status": "Requests of v4.1 to v4.1.2 are carried as recorded (APR-V41-OWNER-1..4, APR-V411-OWNER-1/2, APR-V412-OWNER-1..3). Pending: ODR-V414-01 and ODR-V414-02 (the corrected suite runners and Playwright configuration), then ODR-V414-03 (approve v4.1.4), for the package as compiled from those records and independently reviewed. No ODR-V413 request exists: 4.1.3 belonged to the withdrawn v4.1.3 proposal.",
+ "status": "Requests of v4.1 to v4.1.2 are carried as recorded (APR-V41-OWNER-1..4, APR-V411-OWNER-1/2, APR-V412-OWNER-1..3). ODR-V414-01 and ODR-V414-02 are recorded (APR-V414-OWNER-1, option A each). Pending: ODR-V414-04 (FSharp.Core in the locked test tooling; independent review RV414-1-1), then ODR-V414-03 (approve v4.1.4) for the package as compiled from those records and independently reviewed. No ODR-V413 request exists: 4.1.3 belonged to the withdrawn v4.1.3 proposal.",
  "requests": [
   {
    "id": "ODR-V41-01",
@@ -497,6 +497,9 @@
      "SU-OWN-DOTNET",
      "SU-DOTNET-LIVE"
     ]
+   },
+   "approvalRecord": {
+    "how": "A change in an operator approval: {\"decision_id\": \"ODR-V414-01\", \"action\": \"select\", \"option\": \"A\" | \"B\" | \"C\"}, recorded with tools/owner-freeze.fsx decide v4.1.4 (recorded: APR-V414-OWNER-1)."
    }
   },
   {
@@ -520,6 +523,31 @@
      "SU-BROWSER-LIVE"
     ],
     "bootstrap": "playwright.config.ts"
+   },
+   "approvalRecord": {
+    "how": "A change in an operator approval: {\"decision_id\": \"ODR-V414-02\", \"action\": \"select\", \"option\": \"A\" | \"B\" | \"C\"}, recorded with tools/owner-freeze.fsx decide v4.1.4 (recorded: APR-V414-OWNER-1)."
+   }
+  },
+  {
+   "id": "ODR-V414-04",
+   "kind": "dependency-lock",
+   "title": "Lock FSharp.Core 10.1.402 in the test tooling, so the bootstrapped .NET test projects run their tests",
+   "question": "The bootstrapped test projects use central package management, so the F# SDK does not add its implicit FSharp.Core reference, and the locked test tooling (ODR-V41-07: xunit 2.9.2, xunit.runner.visualstudio 2.8.2, Microsoft.NET.Test.Sdk 17.11.1) has none. FSharp.Core.dll is then never deployed: xunit skips every test project ('could not find dependent assembly FSharp.Core, Version=10.1.0') and every .NET suite runner, including both corrected ones, exits 0 having run no test (independent review RV414-1-1; reproduced with a probe test on the v4.1.4 bootstrap). Add FSharp.Core 10.1.402 (the version SDK 10.0.402 ships in its library packs) to the locked NuGet test tooling, with a version-less reference in each of the six test projects that host .NET tests?",
+   "options": [
+    "A: add FSharp.Core 10.1.402 to the test-tooling lock (Directory.Packages.props) and reference it from the six test projects; verified: the probe test then runs and passes",
+    "B: another FSharp.Core version, named by the owner",
+    "C: keep the lock unchanged (no .NET plan test can execute; every .NET obligation stays unverified)"
+   ],
+   "recommendation": "A. It is the only change: no requirement, obligation, binding, runner or contract changes. A setting such as DisableImplicitFSharpCoreReference=false does not work under central package management (NU1008).",
+   "rationale": "The test tooling is an owner lock (ODR-V41-07, X16); only the owner adds a package (AGENT-RULES duty 1).",
+   "impact": "With C, the release gate and the Dokimos coverage see no .NET result for any obligation.",
+   "applies": {
+    "testTooling": [
+     "FSharp.Core 10.1.402"
+    ]
+   },
+   "approvalRecord": {
+    "how": "{\"decision_id\": \"ODR-V414-04\", \"action\": \"select\", \"option\": \"A\" | \"B\" | \"C\", \"packages\": [\"FSharp.Core@10.1.402\"]}, recorded with tools/owner-freeze.fsx decide v4.1.4 (it asks for the exact packages). The agent then adds the lock entry and the six test-project references, recompiles v4.1.4 and re-runs the independent review."
    }
   },
   {

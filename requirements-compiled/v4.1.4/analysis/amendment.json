@@ -500,32 +500,38 @@
     {
       "suite": "SU-OWN-DOTNET",
       "decision": "ODR-V414-01",
-      "runner": "dotnet test Causa.slnx --filter \"FullyQualifiedName~Causa.Contract.Tests.|FullyQualifiedName~Causa.Domain.Tests.|FullyQualifiedName~Causa.Persistence.Tests.|FullyQualifiedName~Causa.App.Tests.\""
+      "runner": "dotnet test Causa.slnx --filter \"FullyQualifiedName~Causa.Contract.Tests.|FullyQualifiedName~Causa.Domain.Tests.|FullyQualifiedName~Causa.Persistence.Tests.|FullyQualifiedName~Causa.App.Tests.\"",
+      "approval": "APR-V414-OWNER-1"
     },
     {
       "suite": "SU-DOTNET-LIVE",
       "decision": "ODR-V414-01",
-      "runner": "dotnet test Causa.slnx --filter \"FullyQualifiedName~Causa.Acceptance.Live.|FullyQualifiedName~Causa.Invariants.Live.\""
+      "runner": "dotnet test Causa.slnx --filter \"FullyQualifiedName~Causa.Acceptance.Live.|FullyQualifiedName~Causa.Invariants.Live.\"",
+      "approval": "APR-V414-OWNER-1"
     },
     {
       "suite": "SU-OWN-BROWSER",
       "decision": "ODR-V414-02",
-      "runner": "npx playwright test --config playwright.config.ts --project=chromium tests/browser/contract"
+      "runner": "npx playwright test --config playwright.config.ts --project=chromium tests/browser/contract",
+      "approval": "APR-V414-OWNER-1"
     },
     {
       "suite": "SU-BROWSER-CHROMIUM",
       "decision": "ODR-V414-02",
-      "runner": "npx playwright test --config playwright.config.ts --project=chromium tests/browser/acceptance tests/browser/invariants"
+      "runner": "npx playwright test --config playwright.config.ts --project=chromium tests/browser/acceptance tests/browser/invariants",
+      "approval": "APR-V414-OWNER-1"
     },
     {
       "suite": "SU-BROWSER-WEBKIT",
       "decision": "ODR-V414-02",
-      "runner": "npx playwright test --config playwright.config.ts --project=webkit tests/browser/acceptance tests/browser/invariants"
+      "runner": "npx playwright test --config playwright.config.ts --project=webkit tests/browser/acceptance tests/browser/invariants",
+      "approval": "APR-V414-OWNER-1"
     },
     {
       "suite": "SU-BROWSER-LIVE",
       "decision": "ODR-V414-02",
-      "runner": "npx playwright test --config playwright.config.ts --project=chromium tests/browser/live"
+      "runner": "npx playwright test --config playwright.config.ts --project=chromium tests/browser/live",
+      "approval": "APR-V414-OWNER-1"
     }
   ]
 }

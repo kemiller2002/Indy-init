@@ -26,7 +26,10 @@
 //        --scope-manifest (Rehearsal 010 on): authorization also needs the committed, immutable scope checkpoint
 //        (.echelon/scope-checkpoint.json) with that manifest's scopeSha256 and complete Praxis work-item coverage.
 //   dotnet fsi tools/r9/r9.fsx -- acceptance-status --candidate SHA [--catalog-verification F] [--gate-dir DIR]
-//        [--scope F --obligations F --approvals F] [--owner-verdict F] [--out F] [--require catalog,scope,fullPlan,owner]
+//        [--scope F --obligations F --approvals F [--trusted-operator ID] [--scope-decision ODR-ID]] [--owner-verdict F] [--out F]
+//        [--require catalog,scope,fullPlan,owner]
+//        --scope: a competition-scope file, or the authoritative scope manifest (its scopeSha256 is what the owner's
+//        approve-scope record names). Approval records may be flat changes or operator records with nested changes.
 //        Four separate acceptance levels, each with its own status and evidence.
 //   dotnet fsi tools/r9/r9.fsx -- spec-preflight --percepta EXE --out F (--indy-init SRC --lock LOCK |
 //        --machines F --invariants F --interfaces F --catalog F)
@@ -1085,23 +1088,37 @@ let acceptanceStatus () =
         | None -> level "REFUSED" [ "missing evidence: no competition scope was supplied" ] [] []
         | Some sf ->
             let s = readJson sf
-            let approval = str s "approval"
+            // The authoritative scope manifest (indy-init.approved-scope/1, docs/rehearsal-010-readiness) is identified
+            // by its own scopeSha256, which `requirements-compiler scope preflight` re-derives from the frozen sources;
+            // its decision is ODR-RG-01 unless --scope-decision names another. A competition-scope file
+            // (indy-init.competition-scope/1) is identified by its file digest and names its own decision.
+            let isManifest = str s "schema" = "indy-init.approved-scope/1"
+            let manifestIds (origin: string) = arr s "requirements" |> List.filter (fun r -> str r "origin" = origin) |> List.map (fun r -> str r "id")
+            let approval = if isManifest then opt "--scope-decision" |> Option.defaultValue "ODR-RG-01" else str s "approval"
             // A scope is approved only by an owner record in the pinned approvals file: {decision_id, action:
             // approve-scope, scope_sha256}. The scope file's own words never approve it.
-            let scopeSha = sha256File sf
+            let scopeSha = if isManifest then str s "scopeSha256" else sha256File sf
+            let shortSha = if scopeSha.Length >= 12 then scopeSha.Substring(0, 12) else scopeSha
+            // The record may be a flat change, or a change inside an operator approval record (the format
+            // owner-freeze.fsx writes: {id, authority: {kind: operator, id}, changes: [...]}) whose operator is trusted.
+            let trusted = opt "--trusted-operator" |> Option.defaultValue "kemiller2002"
             let approvalRecorded =
                 present "--approvals"
                 |> Option.map (fun af ->
                     let text = File.ReadAllText af
                     let a = JsonNode.Parse text
-                    let records = match a with :? JsonArray as xs -> xs |> Seq.toList | o -> arr o "changes" @ arr o "approvals"
-                    records |> List.exists (fun r -> str r "decision_id" = approval && str r "action" = "approve-scope" && str r "scope_sha256" = scopeSha))
+                    let top = match a with :? JsonArray as xs -> xs |> Seq.toList | o -> arr o "changes" @ arr o "approvals"
+                    let byOperator (r: JsonNode) =
+                        let authority = if isNull r then null else r["authority"]
+                        not (isNull authority) && str authority "kind" = "operator" && str authority "id" = trusted
+                    let nested = top |> List.filter byOperator |> List.collect (fun r -> arr r "changes")
+                    top @ nested |> List.exists (fun r -> str r "decision_id" = approval && str r "action" = "approve-scope" && str r "scope_sha256" = scopeSha))
                 |> Option.defaultValue false
             let approved = approval <> "" && approvalRecorded
-            let reqs = strList s "requirements" |> Set.ofList
+            let reqs = (if isManifest then manifestIds "v4-plan" else strList s "requirements") |> Set.ofList
             let cov = gateDir |> Option.map (fun d -> Path.Combine(d, "coverage.json")) |> Option.filter File.Exists
             let proc = gateDir |> Option.map (fun d -> Path.Combine(d, "process-assessment.json")) |> Option.filter File.Exists
-            let catalogReqs = strList s "catalogRequirements" |> Set.ofList
+            let catalogReqs = (if isManifest then manifestIds "catalog" else strList s "catalogRequirements") |> Set.ofList
             let execStatus = cov |> Option.map (fun c -> arr (readJson c) "obligations" |> List.map (fun o -> str o "id", (str o "requirement", str o "status"))) |> Option.defaultValue []
             let recStatus =
                 proc
@@ -1186,14 +1203,14 @@ let acceptanceStatus () =
                 @ (match covCandidate with
                    | Some c when c <> candidate -> [ $"stale evidence: the release-gate coverage is for {c}, not {candidate}" ]
                    | _ -> [])
-                @ (if approved then [] else [ $"""the scope ({str s "status"}) has no owner approval record (approve-scope, scope_sha256 {scopeSha.Substring(0, 12)}) in the pinned approvals: until the owner approves it, the competition scope is the whole frozen plan""" ])
+                @ (if approved then [] else [ $"""the scope ({str s "status"}) has no owner approval record (approve-scope, scope_sha256 {shortSha}) in the pinned approvals: until the owner approves it, the competition scope is the whole frozen plan""" ])
                 @ (match gateFile with
                    | Some f when str (readJson f) "candidate" <> candidate -> [ "stale evidence: the gate output is for another candidate" ]
                    | _ -> [])
                 @ (if unverified.IsEmpty then [] else [ $"""{unverified.Length} in-scope plan obligation(s) are not verified (first: {String.Join("; ", unverified |> List.truncate 3)})""" ])
                 @ catalogCauses
             let status = if not approved then "SCOPE-NOT-APPROVED" elif causes.IsEmpty then "ACCEPTED" else "REFUSED"
-            level status causes ([ sf ] @ (cov |> Option.toList) @ (proc |> Option.toList)) [ "scope", jstr (str s "id"); "planObligationsInScope", jint inScope.Length; "catalogRequirementsInScope", jint catalogReqs.Count; "claimsFullPlan", jbool false ]
+            level status causes ([ sf ] @ (cov |> Option.toList) @ (proc |> Option.toList)) [ "scope", jstr (if isManifest then "approved-scope " + shortSha else str s "id"); "planObligationsInScope", jint inScope.Length; "catalogRequirementsInScope", jint catalogReqs.Count; "claimsFullPlan", jbool false ]
     let report =
         jobj
             [ "schema", jstr "indy-init.r9-acceptance-status/1"
