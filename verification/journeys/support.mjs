@@ -51,8 +51,17 @@ export const contextFor = async (browser) => {
   if (env.provider === 'harness-double') {
     await context.route('https://api.github.com/**', async (route) => {
       const u = new URL(route.request().url());
-      const response = await route.fetch({ url: env.double + u.pathname + u.search });
-      await route.fulfill({ response });
+      // Read the double's whole answer before fulfilling: a streamed response can be disposed if the page moves on
+      // (Playwright "Fetch response has been disposed"). A request the browser already abandoned stays abandoned.
+      let answer;
+      try {
+        const response = await route.fetch({ url: env.double + u.pathname + u.search });
+        answer = { status: response.status(), headers: response.headers(), body: await response.body() };
+      } catch (error) {
+        await route.abort().catch(() => {});
+        return;
+      }
+      await route.fulfill(answer).catch(() => {});
     });
   }
   return context;
