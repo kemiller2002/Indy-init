@@ -1,8 +1,8 @@
 {
   "schema": "indy-init.scope-checkpoint/1",
-  "scopeSha256": "d133e5345c00a3e296c819076a889c9cff74c26fecd9634c12f4c5e56ab5e39e",
+  "scopeSha256": "d531cdc89c766df912d5daf642f1492d4952c43dc414dc4133d8623f1942b9f9",
   "recordedAt": "2026-11-04T07:00:00Z",
-  "sourceCommit": "6e27eba7e8a41a31c8f84149c8c422f1e3be51d5",
+  "sourceCommit": "0e4978f35c5d3e306c08f8ba5aa4ef4e587b8266",
   "requirements": 199,
   "workItems": 36,
   "preflight": "PASS",

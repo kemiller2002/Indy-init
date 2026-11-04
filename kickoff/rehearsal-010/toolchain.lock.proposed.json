@@ -81,7 +81,7 @@
   "packageVersion": "4.1.4",
   "tag": "indy-init-requirements-v4.1.4 (not yet created)",
   "tagCommit": null,
-  "manifestSha256": "cbf2315383198335cdafea861a0d1a4f2bfdda0e40600209ef5c37fe72ee2e13",
+  "manifestSha256": "04ab552551993afbc1f0d51419bfac90ee1f9c4137c2afa4cdca2d0fc3614c43",
   "verificationPlanSha256": "8254ed03b991dd3d3a56a4e0bf5897c2484bbbf11e67e2f15e80309c1482b973",
   "approval": "the v4.1.4 package approval in docs/release-gate-repair/owner-decision-requests.json (pending)"
  },
@@ -97,7 +97,7 @@
  "status": "PROPOSED: not an owner pin. The owner adopts it by renaming it to toolchain.lock.json in their own commit after the v4.1.4 decisions (docs/release-gate-repair/owner-decision-requests.json) are recorded and v4.1.4 is tagged, and after a Dokimos release carrying the url-input fix (kemiller2002/dokimos#67) is registered in an approved echelon-current set and replaces the resolved set below. Until then Rehearsal 010 has no approved lock.",
  "scope": {
   "manifest": "docs/rehearsal-010-readiness/scope-manifest.json",
-  "scopeSha256": "d133e5345c00a3e296c819076a889c9cff74c26fecd9634c12f4c5e56ab5e39e",
+  "scopeSha256": "d531cdc89c766df912d5daf642f1492d4952c43dc414dc4133d8623f1942b9f9",
   "rule": "the gate passes the scope manifest to r9.fsx check-sequencing: the committed scope checkpoint (this scopeSha256, complete Praxis coverage) must precede implementation (STARTUP-INSTRUCTIONS.md)"
  }
 }

@@ -1,6 +1,6 @@
 # v4.1 optimization report
 
-> **v4.1.1 and v4.1.2:** this is v4.1's optimization report, carried into the successor packages. v4.1.2 changes only SM-SAVE and three contracts ([AMENDMENT-4.1.2.md](AMENDMENT-4.1.2.md)); the schedule is v4.1.1's. Where v4.1.1 differs, [AMENDMENT-4.1.1.md](../v4.1.1/AMENDMENT-4.1.1.md) and [STARTING-STATE.md](STARTING-STATE.md) govern. The changes are:
+> **v4.1.1, v4.1.2 and v4.1.4:** this is v4.1's optimization report, carried into the successor packages. v4.1.2 changes only SM-SAVE and three contracts ([AMENDMENT-4.1.2.md](../v4.1.2/AMENDMENT-4.1.2.md)); v4.1.4 changes only suite runners and the bootstrapped Playwright configuration ([AMENDMENT-4.1.4.md](AMENDMENT-4.1.4.md)); the schedule is v4.1.1's. Where v4.1.1 differs, [AMENDMENT-4.1.1.md](../v4.1.1/AMENDMENT-4.1.1.md) and [STARTING-STATE.md](STARTING-STATE.md) govern. The changes are:
 >
 > - the bootstrap runs at T0 inside the window, its 29 minutes partly measured (2 measured, 27 estimated);
 > - no organizer-permission gate;

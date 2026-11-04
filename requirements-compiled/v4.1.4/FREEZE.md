@@ -4,9 +4,9 @@ Only the owner records decisions, approves and tags (RDP-003). `tools/owner-free
 
 | Step | Who | What |
 |---|---|---|
-| 1 | owner | `dotnet fsi Indy-init/tools/owner-freeze.fsx -- decide v4.1.4 --repo Indy-init` records ODR-V414-01 and ODR-V414-02 (`proposals/owner-decision-requests.json`). Merge the pull request it opens. |
+| 1 | owner | `dotnet fsi Indy-init/tools/owner-freeze.fsx -- decide v4.1.4 --repo Indy-init` records ODR-V414-01 and ODR-V414-02 (`proposals/owner-decision-requests.json`). Merge the pull request it opens. **Done:** APR-V414-OWNER-1 (PR #106). It also records ODR-V414-04 (FSharp.Core in the test tooling, independent review RV414-1-1), pending. |
 | 2 | agent | Writes the approval id of each recorded decision beside it in `analysis/amendment.json` (`suiteRunners`), compiles v4.1.4 (X01–X21 must pass; the offline suite's owner-record check must pass) and commits the generated package. Then runs `percepta spec-preflight` on it (expected: nothing blocking), records an independent review in `analysis/independent-review.json`, and adds the CI steps of v4.1.2 for v4.1.4 (`v41 --check`, contract typecheck, negative controls, bootstrap). |
-| 3 | owner | `dotnet fsi Indy-init/tools/owner-freeze.fsx -- approve v4.1.4 --repo Indy-init` records ODR-V414-03 for the package as compiled. The script refuses while any of ODR-V414-01 or -02 is unrecorded. |
+| 3 | owner | `dotnet fsi Indy-init/tools/owner-freeze.fsx -- approve v4.1.4 --repo Indy-init` records ODR-V414-03 for the package as compiled. The script refuses while any of ODR-V414-01, -02 or -04 is unrecorded. Approve only after the independent review reads PASS (round 1: FAIL, RV414-1-1). |
 | 4 | owner | `dotnet fsi Indy-init/tools/owner-freeze.fsx -- tag v4.1.4 --repo Indy-init --commit <merge commit of the ODR-V414-03 pull request>` creates `indy-init-requirements-v4.1.4`. |
 | 5 | agent | Adds v4.1.4 to the frozen-package guard in CI and to AGENTS.md, as for v4.1.2. |
 
