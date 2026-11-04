@@ -15,6 +15,14 @@
 //   dotnet fsi tools/r9/r9.fsx -- run-suites --obligations F --root REPO --out DIR [--suites ID,...]
 //   dotnet fsi tools/r9/r9.fsx -- suite-preflight --obligations F --root REPO [--out F]
 //        Executes every executable suite command in list mode; refuses readiness if any cannot execute.
+//   dotnet fsi tools/r9/r9.fsx -- authorize-implementation --target REPO --catalog F --obligations F --suite-preflight F
+//        --spec-preflight F --acceptance-preflight F [--work-plan F] [--manifest F] [--scope F] [--praxis EXE]
+//        Pre-implementation gate (Praxis ordering); writes the immutable .echelon/r9-initialization-checkpoint.json.
+//   dotnet fsi tools/r9/r9.fsx -- check-sequencing --target REPO [--out F]
+//        Reports every implementation commit made before implementation was authorized as a process violation.
+//   dotnet fsi tools/r9/r9.fsx -- acceptance-status --candidate SHA [--catalog-verification F] [--gate-dir DIR]
+//        [--scope F --obligations F --approvals F] [--owner-verdict F] [--out F] [--require catalog,scope,fullPlan,owner]
+//        Four separate acceptance levels, each with its own status and evidence.
 //   dotnet fsi tools/r9/r9.fsx -- spec-preflight --percepta EXE --out F (--indy-init SRC --lock LOCK |
 //        --machines F --invariants F --interfaces F --catalog F)
 //
@@ -654,6 +662,325 @@ let suitePreflight () =
     elif refused.IsEmpty then Pass (results |> List.map (fun (id, _, _, _) -> $"{id}: executable") )
     else Refused refused
 
+// ---- small JSON builders used by the sequencing and acceptance commands ---------------------------------------------
+
+let jstr (v: string) : JsonNode = JsonValue.Create(v: string) :> JsonNode
+let jbool (v: bool) : JsonNode = JsonValue.Create(v: bool) :> JsonNode
+let jint (v: int) : JsonNode = JsonValue.Create(v: int) :> JsonNode
+let jarr (xs: JsonNode list) : JsonNode = JsonArray(xs |> Array.ofList) :> JsonNode
+let jstrs (xs: string list) = xs |> List.map jstr |> jarr
+let jobj (fields: (string * JsonNode) list) : JsonNode =
+    let o = JsonObject()
+    fields |> List.iter (fun (k, v) -> o[k] <- (if isNull v || isNull v.Parent then v else v.DeepClone()))
+    o :> JsonNode
+let writeJson (path: string) (n: JsonNode) = File.WriteAllText(path, n.ToJsonString(JsonSerializerOptions(WriteIndented = true)) + "\n")
+let strList (n: JsonNode) key = arr n key |> List.map (fun v -> v.GetValue<string>())
+
+// ---- authorize-implementation: Praxis ordering before any implementation (docs/release-gate-repair) -----------------
+
+/// The repository paths whose change is implementation (application, tests, build). Requirements, records, docs,
+/// evidence and CI are not.
+let isImplementationPath (path: string) =
+    [ "src/"; "web/"; "tests/" ] |> List.exists (fun p -> path.StartsWith(p, StringComparison.Ordinal))
+    || List.contains path [ "build.fsx"; "playwright.config.ts"; "playwright.config.js" ]
+
+let checkpointPath = ".echelon/r9-initialization-checkpoint.json"
+
+/// Refuses implementation until, in order: Conditor initialized the repository; the catalog manifest is compiled and
+/// current and Praxis validates; work items exist; every work item is linked to requirements and obligations that
+/// exist, and every in-scope obligation is linked; the verification matrix is executable (every bound suite passed
+/// suite-preflight); and the specification, suite and acceptance preflights passed. On PASS it writes the immutable
+/// initialization checkpoint; it never overwrites one. Verification evidence is NOT required: it comes after
+/// implementation.
+let authorizeImplementation () =
+    let target = Path.GetFullPath(req "--target")
+    let praxis = opt "--praxis" |> Option.defaultValue "praxis"
+    let workPlanPath = Path.Combine(target, opt "--work-plan" |> Option.defaultValue ".echelon/r9-work-plan.json")
+    let manifestPath = Path.Combine(target, opt "--manifest" |> Option.defaultValue "requirements/verification/verification-manifest.json")
+    let ck = Path.Combine(target, checkpointPath)
+    let exists p = File.Exists p
+    let step1 =
+        check (exists (Path.Combine(target, "conditor.json")) && exists (Path.Combine(target, ".conditor", "lock.json")))
+            "1 Conditor: conditor.json and .conditor/lock.json are missing; run conditor init first"
+        @ check (exists (Path.Combine(target, ".echelon", "r9-governance.json"))) "1 governance: .echelon/r9-governance.json is missing; run r9.fsx govern at T0"
+    let step2 =
+        if not (exists manifestPath) then [ $"2 requirements: {manifestPath} is missing; compile the catalog with praxis requirements manifest compile" ]
+        else
+            let code, out = run praxis [ "requirements"; "manifest"; "check"; "--catalog"; req "--catalog"; "--manifest"; manifestPath ] target
+            let vcode, vout = run praxis [ "validate"; "--root"; target ] target
+            check (code = 0) $"2 requirements: the manifest is not what the pinned catalog compiles to (praxis requirements manifest check exit {code}): {out.Trim()}"
+            @ check (vcode = 0) $"2 Praxis: praxis validate failed (exit {vcode}): {vout.Trim()}"
+            @ check (exists (req "--obligations")) "2 plan: the compiled frozen-plan obligations file is missing"
+    let workPlan = if exists workPlanPath then readJson workPlanPath else null
+    let items = arr workPlan "workItems"
+    let praxisItems =
+        let code, out = run praxis [ "work"; "--root"; target ] target
+        if code <> 0 then []
+        else
+            try (JsonNode.Parse out :?> JsonArray) |> Seq.map (fun n -> str n "id") |> List.ofSeq with _ -> []
+    let lifecycle (id: string) = id.StartsWith "COND-MISSION" || id.StartsWith "ROS-INSTALL"
+    let step3 =
+        check (not (isNull workPlan)) $"3 work items: {workPlanPath} (indy-init.r9-work-plan/1) is missing"
+        @ check (praxisItems |> List.exists (lifecycle >> not)) "3 work items: Praxis holds no work item beyond its own lifecycle records; create them before implementing"
+        @ (items |> List.choose (fun w -> let id = str w "id" in if List.contains id praxisItems then None else Some $"3 work items: {id} is in the work plan but not in Praxis"))
+    let manifest = if exists manifestPath then readJson manifestPath else null
+    let catalogObligations = arr manifest "requirements" |> List.collect (fun r -> arr r "obligations" |> List.map (fun o -> str o "id", str r "id")) |> Map.ofList
+    let plan = if exists (req "--obligations") then readJson (req "--obligations") else null
+    let planObligations = arr plan "obligations" |> List.map (fun o -> str o "id", str o "requirement") |> Map.ofList
+    let known o = catalogObligations.ContainsKey o || planObligations.ContainsKey o
+    let scope =
+        match opt "--scope" with
+        | Some f -> readJson f
+        | None -> null
+    let inScope =
+        if isNull scope then (catalogObligations |> Map.toList |> List.map fst) @ (planObligations |> Map.toList |> List.map fst)
+        else
+            let reqs = strList scope "requirements" @ strList scope "catalogRequirements" |> Set.ofList
+            (catalogObligations |> Map.toList) @ (planObligations |> Map.toList) |> List.filter (fun (_, r) -> reqs.Contains r) |> List.map fst
+    let linked = items |> List.collect (fun w -> strList w "obligations") |> Set.ofList
+    let step4 =
+        (items |> List.collect (fun w ->
+            let id = str w "id"
+            check (not (strList w "requirements").IsEmpty) $"4 links: {id} names no requirement"
+            @ check (not (strList w "obligations").IsEmpty) $"4 links: {id} names no verification obligation"
+            @ (strList w "obligations" |> List.filter (known >> not) |> List.map (fun o -> $"4 links: {id} names obligation {o}, which neither the catalog manifest nor the plan defines"))))
+        @ (match inScope |> List.filter (linked.Contains >> not) with
+           | [] -> []
+           | missing -> [ $"""4 links: {missing.Length} in-scope obligation(s) are linked to no work item (first: {String.Join(", ", missing |> List.truncate 5)})""" ])
+    let suitePre = opt "--suite-preflight" |> Option.filter exists |> Option.map readJson
+    let executable = suitePre |> Option.map (fun p -> arr p "suites" |> List.map (fun s -> str s "id", str s "executable" = "true") |> Map.ofList) |> Option.defaultValue Map.empty
+    let suiteOfIdentity = arr plan "tests" |> List.map (fun t -> str t "id", str t "suite") |> Map.ofList
+    let step5 =
+        match suitePre with
+        | None -> [ "5 matrix: no suite-preflight report (r9.fsx suite-preflight) was supplied" ]
+        | Some _ ->
+            arr plan "tests"
+            |> List.filter (fun t -> not (arr t "obligations").IsEmpty && (arr t "obligations" |> List.exists (fun o -> List.contains (o.GetValue<string>()) inScope)))
+            |> List.choose (fun t -> let s = str t "suite" in match executable.TryFind s with Some true -> None | Some false -> Some s | None -> None)
+            |> List.distinct
+            |> List.map (fun s -> $"5 matrix: suite {s} binds in-scope obligations but its command cannot execute (suite-preflight)")
+    let step6 =
+        let specOk = opt "--spec-preflight" |> Option.filter exists |> Option.map (fun f -> (File.ReadAllText f).Contains "PASS" || str (readJson f) "verdict" = "PASS") |> Option.defaultValue false
+        let accOk = opt "--acceptance-preflight" |> Option.filter exists |> Option.map (fun f -> (File.ReadAllText f).Contains "READY") |> Option.defaultValue false
+        check specOk "6 preflight: the specification preflight (r9.fsx spec-preflight) report is missing or not PASS"
+        @ check (suitePre |> Option.exists (fun p -> arr p "suites" |> List.forall (fun s -> str s "executable" = "true"))) "6 preflight: suite-preflight did not pass for every suite"
+        @ check accOk "6 preflight: conditor acceptance preflight is missing or not READY"
+    let _, status = git target [ "status"; "--porcelain"; "--untracked-files=no" ]
+    let _, headOut = git target [ "rev-parse"; "HEAD" ]
+    let head = headOut.Trim()
+    let causes =
+        check (not (exists ck)) $"{checkpointPath} already exists: the initialization checkpoint is immutable"
+        @ step1 @ step2 @ step3 @ step4 @ step5 @ step6
+        @ check (status.Trim() = "") "the tracked tree is not clean: authorize from a committed state"
+    if not causes.IsEmpty then Refused causes
+    else
+        let digest (p: string) = jobj [ "path", jstr (Path.GetRelativePath(target, Path.GetFullPath p)); "sha256", jstr (sha256File p) ]
+        let record =
+            jobj
+                [ "schema", jstr "indy-init.r9-initialization-checkpoint/1"
+                  "authorizedAt", jstr (DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ"))
+                  "authorizedAtCommit", jstr head
+                  "meaning", jstr "Implementation is authorized from the commit that adds this file. Every commit before it that changes implementation paths (src/, web/, tests/, build files), other than the T0 bootstrap, is a process violation (r9.fsx check-sequencing). Verification evidence is produced after implementation and is not part of this checkpoint."
+                  "workItems", jstrs (items |> List.map (fun w -> str w "id"))
+                  "inScopeObligations", jint inScope.Length
+                  "inputs", jarr ([ digest manifestPath; digest workPlanPath; digest (req "--obligations") ] @ ([ "--suite-preflight"; "--spec-preflight"; "--acceptance-preflight"; "--scope" ] |> List.choose opt |> List.map digest)) ]
+        writeJson ck record
+        Pass [ $"checkpoint {ck} written at {head}: commit it as its own commit before any implementation"; $"{items.Length} work item(s), {inScope.Length} in-scope obligation(s) linked" ]
+
+/// Process-violation report: every commit after the T0 bootstrap (the commit that adds .echelon/r9-governance.json)
+/// and before the commit that adds the initialization checkpoint that changes an implementation path. Also refuses a
+/// checkpoint that was edited after it was committed. A repository without a checkpoint reports every implementation
+/// commit after the bootstrap.
+let checkSequencing () =
+    let target = Path.GetFullPath(req "--target")
+    let firstAdding (path: string) =
+        let _, out = git target [ "log"; "--diff-filter=A"; "--format=%H"; "--reverse"; "--"; path ]
+        out.Split('\n', StringSplitOptions.RemoveEmptyEntries) |> Array.tryHead
+    let touching (path: string) =
+        let _, out = git target [ "log"; "--format=%H"; "--"; path ]
+        out.Split('\n', StringSplitOptions.RemoveEmptyEntries) |> List.ofArray
+    match firstAdding ".echelon/r9-governance.json" with
+    | None -> Unusable "no commit adds .echelon/r9-governance.json: the repository was not bootstrapped under r9 governance"
+    | Some bootstrap ->
+        let checkpoint = firstAdding checkpointPath
+        let range =
+            match checkpoint with
+            | Some c -> $"{bootstrap}..{c}^"
+            | None -> $"{bootstrap}..HEAD"
+        let _, revs = git target [ "rev-list"; "--reverse"; range ]
+        let commits = revs.Split('\n', StringSplitOptions.RemoveEmptyEntries) |> List.ofArray
+        let violations =
+            commits
+            |> List.choose (fun c ->
+                let _, files = git target [ "diff-tree"; "--no-commit-id"; "--name-only"; "-r"; c ]
+                let impl = files.Split('\n', StringSplitOptions.RemoveEmptyEntries) |> Array.filter isImplementationPath |> List.ofArray
+                if impl.IsEmpty then None
+                else
+                    let _, subject = git target [ "log"; "-1"; "--format=%s"; c ]
+                    Some(c, subject.Trim(), impl))
+        let checkpointCauses =
+            match checkpoint with
+            // Before authorization a repository may hold only its bootstrap: no checkpoint is a cause only once
+            // implementation has been committed without one.
+            | None when violations.IsEmpty -> []
+            | None -> [ $"no initialization checkpoint ({checkpointPath}): implementation was committed but never authorized (r9.fsx authorize-implementation)" ]
+            | Some c ->
+                let edits = touching checkpointPath
+                check (edits.Length = 1) $"{checkpointPath} was changed after it was committed ({edits.Length} commits touch it): the checkpoint is immutable"
+                @ (let _, parent = git target [ "rev-parse"; c + "^" ]
+                   let recorded = str (readJson (Path.Combine(target, checkpointPath))) "authorizedAtCommit"
+                   check (recorded = parent.Trim()) $"the checkpoint records authorization at {recorded}, but it was committed on top of {parent.Trim()}")
+        let report =
+            jobj
+                [ "schema", jstr "indy-init.r9-sequencing/1"
+                  "bootstrapCommit", jstr bootstrap
+                  "checkpointCommit", jstr (checkpoint |> Option.defaultValue "")
+                  "processViolations",
+                  jarr (violations |> List.map (fun (c, s, files) -> jobj [ "commit", jstr c; "subject", jstr s; "implementationFiles", jint files.Length; "examples", jstrs (files |> List.truncate 5) ])) ]
+        opt "--out" |> Option.iter (fun f -> writeJson f report)
+        let causes =
+            checkpointCauses
+            @ (violations |> List.map (fun (c, s, files) -> $"process violation: {c.Substring(0, 12)} \"{s}\" changed {files.Length} implementation file(s) before implementation was authorized"))
+        if causes.IsEmpty then
+            match checkpoint with
+            | Some c -> Pass [ $"bootstrap {bootstrap.Substring(0, 12)}, checkpoint {c.Substring(0, 12)}: no implementation before authorization" ]
+            | None -> Pass [ $"bootstrap {bootstrap.Substring(0, 12)}: implementation not yet authorized, and none committed" ]
+        else Refused causes
+
+// ---- acceptance-status: four separate acceptance levels, never inferred from one another ----------------------------
+
+/// Reports, each with its own status, candidate and evidence digests:
+///   catalog      Dokimos requirement verification of the catalog (dokimos.requirement-verification/1);
+///   scope        competition-scope release acceptance: every obligation of an owner-approved scope verified at the
+///                candidate in the release gate's coverage and process assessment (a proposed, unapproved scope is
+///                reported SCOPE-NOT-APPROVED, never accepted);
+///   fullPlan     the release gate's verdict on the whole frozen plan (mode release, no scope);
+///   owner        the computed acceptance verdict (tools/compute-acceptance-verdict.py) with its trust inputs, or
+///                NOT-COMPUTED.
+/// Missing or stale evidence is an explicit refusal of that level. `--require LEVEL,...` exits 4 unless each named
+/// level is ACCEPTED.
+let acceptanceStatus () =
+    let candidate = req "--candidate"
+    let present (o: string) = opt o |> Option.filter File.Exists
+    let evidence (paths: string list) = paths |> List.map (fun p -> jobj [ "path", jstr p; "sha256", jstr (sha256File p) ]) |> jarr
+    let level (status: string) (causes: string list) (paths: string list) (extra: (string * JsonNode) list) =
+        jobj ([ "status", jstr status; "candidate", jstr candidate; "causes", jstrs causes; "evidence", evidence paths ] @ extra)
+    let catalog =
+        match present "--catalog-verification" with
+        | None -> level "REFUSED" [ "missing evidence: no catalog requirement verification (dokimos.requirement-verification/1) was supplied" ] [] []
+        | Some f ->
+            let r = readJson f
+            let accepted = str (r["acceptance"]) "accepted" = "true"
+            let causes =
+                check (str r "schema" = "dokimos.requirement-verification/1") $"{f} is not dokimos.requirement-verification/1"
+                @ check (str r "candidate" = candidate) $"""stale evidence: the catalog verification is for {str r "candidate"}, not {candidate}"""
+                @ check accepted "Dokimos did not accept the catalog"
+            level (if causes.IsEmpty then "ACCEPTED" else "REFUSED") causes [ f ] [ "summary", (match r["summary"] with null -> null | s -> s.DeepClone()); "catalog", jstr (str (r["manifest"]) "catalogId") ]
+    let gateDir = opt "--gate-dir"
+    let gateFile = gateDir |> Option.map (fun d -> Path.Combine(d, "gate.json")) |> Option.filter File.Exists
+    let fullPlan =
+        match gateFile with
+        | None -> level "REFUSED" [ "missing evidence: no release-gate verdict (gate.json) was supplied" ] [] []
+        | Some f ->
+            let g = readJson f
+            let causes =
+                check (str g "candidate" = candidate) $"""stale evidence: the gate verdict is for {str g "candidate"}, not {candidate}"""
+                @ check (str g "mode" = "release" && (arr g "scope").IsEmpty && str g "workItem" = "") "the gate verdict is not a release-mode verdict on the whole plan"
+                @ check (str g "verdict" = "PASS") $"""the release gate verdict is {str g "verdict"} (executable {str g "executableVerified"}/{str g "executable"}, record {str g "recordVerified"}/{str g "record"})"""
+            level (if causes.IsEmpty then "ACCEPTED" else "REFUSED") causes [ f ] [ "obligations", jstr (str g "obligations") ]
+    let scope =
+        match present "--scope" with
+        | None -> level "REFUSED" [ "missing evidence: no competition scope was supplied" ] [] []
+        | Some sf ->
+            let s = readJson sf
+            let approval = str s "approval"
+            // A scope is approved only by an owner record in the pinned approvals file: {decision_id, action:
+            // approve-scope, scope_sha256}. The scope file's own words never approve it.
+            let scopeSha = sha256File sf
+            let approvalRecorded =
+                present "--approvals"
+                |> Option.map (fun af ->
+                    let text = File.ReadAllText af
+                    let a = JsonNode.Parse text
+                    let records = match a with :? JsonArray as xs -> xs |> Seq.toList | o -> arr o "changes" @ arr o "approvals"
+                    records |> List.exists (fun r -> str r "decision_id" = approval && str r "action" = "approve-scope" && str r "scope_sha256" = scopeSha))
+                |> Option.defaultValue false
+            let approved = approval <> "" && approvalRecorded
+            let reqs = strList s "requirements" |> Set.ofList
+            let cov = gateDir |> Option.map (fun d -> Path.Combine(d, "coverage.json")) |> Option.filter File.Exists
+            let proc = gateDir |> Option.map (fun d -> Path.Combine(d, "process-assessment.json")) |> Option.filter File.Exists
+            let catalogReqs = strList s "catalogRequirements" |> Set.ofList
+            let execStatus = cov |> Option.map (fun c -> arr (readJson c) "obligations" |> List.map (fun o -> str o "id", (str o "requirement", str o "status"))) |> Option.defaultValue []
+            let recStatus =
+                proc
+                |> Option.map (fun p -> arr (readJson p) "obligations" |> List.map (fun o -> str o "obligation", (arr o "categories" |> List.forall (fun c -> str c "status" = "verified"))))
+                |> Option.defaultValue []
+            let planObligations = present "--obligations" |> Option.map (fun f -> arr (readJson f) "obligations" |> List.map (fun o -> str o "id", str o "requirement")) |> Option.defaultValue []
+            let inScope = planObligations |> List.filter (fun (_, r) -> reqs.Contains r)
+            let execMap = Map.ofList execStatus
+            let recMap = Map.ofList recStatus
+            let unverified =
+                inScope
+                |> List.choose (fun (o, _) ->
+                    match execMap.TryFind o, recMap.TryFind o with
+                    | Some(_, st), _ when st <> "verified" -> Some $"{o}: executable {st}"
+                    | _, Some false -> Some $"{o}: record not verified"
+                    | None, None -> Some $"{o}: no evidence"
+                    | _ -> None)
+            let catalogCauses =
+                if catalogReqs.IsEmpty then []
+                else
+                    match present "--catalog-verification" with
+                    | None -> [ "missing evidence: the scope includes catalog requirements but no catalog verification was supplied" ]
+                    | Some f ->
+                        let r = readJson f
+                        // A catalog requirement counts by its mandatory obligations, as Dokimos's own acceptance does.
+                        arr r "requirements"
+                        |> List.filter (fun q -> catalogReqs.Contains(str q "id"))
+                        |> List.collect (fun q ->
+                            arr q "obligations"
+                            |> List.filter (fun o -> str o "mandatory" = "true" && str o "status" <> "PASS" && str o "status" <> "NOT_APPLICABLE")
+                            |> List.map (fun o -> $"""catalog {str o "id"} (mandatory) is {str o "status"}"""))
+                        |> fun xs -> xs @ check (str r "candidate" = candidate) "stale evidence: the catalog verification is for another candidate"
+            let causes =
+                (if approved then [] else [ $"""the scope ({str s "status"}) has no owner approval record (approve-scope, scope_sha256 {scopeSha.Substring(0, 12)}) in the pinned approvals: until the owner approves it, the competition scope is the whole frozen plan""" ])
+                @ check (inScope.IsEmpty || cov.IsSome) "missing evidence: the scope names plan obligations but no release-gate coverage (coverage.json) was supplied"
+                @ (match gateFile with
+                   | Some f when str (readJson f) "candidate" <> candidate -> [ "stale evidence: the gate output is for another candidate" ]
+                   | _ -> [])
+                @ (if unverified.IsEmpty then [] else [ $"""{unverified.Length} in-scope plan obligation(s) are not verified (first: {String.Join("; ", unverified |> List.truncate 3)})""" ])
+                @ catalogCauses
+            let status = if not approved then "SCOPE-NOT-APPROVED" elif causes.IsEmpty then "ACCEPTED" else "REFUSED"
+            level status causes ([ sf ] @ (cov |> Option.toList) @ (proc |> Option.toList)) [ "scope", jstr (str s "id"); "planObligationsInScope", jint inScope.Length; "catalogRequirementsInScope", jint catalogReqs.Count; "claimsFullPlan", jbool false ]
+    let owner =
+        match present "--owner-verdict" with
+        | None -> level "NOT-COMPUTED" [ "no computed acceptance verdict: tools/compute-acceptance-verdict.py needs the owner-pinned approvals and evidence manifest of this rehearsal" ] [] []
+        | Some f ->
+            let text = File.ReadAllText f
+            let m = Regex.Match(text, "acceptance-verdict:\\s*([A-Z]+)")
+            let v = if m.Success then m.Groups[1].Value else "INVALID"
+            level (if v = "ACCEPTED" then "ACCEPTED" else v) (if v = "ACCEPTED" then [] else [ $"the computed verdict is {v}" ]) [ f ] []
+    let report =
+        jobj
+            [ "schema", jstr "indy-init.r9-acceptance-status/1"
+              "candidate", jstr candidate
+              "rule", jstr "Each level has its own status and evidence. No level is inferred from another: catalog acceptance is never release acceptance, a scoped release never claims the full plan, and only the computed owner verdict is the final acceptance verdict."
+              "catalog", catalog
+              "competitionScope", scope
+              "fullPlan", fullPlan
+              "ownerVerdict", owner ]
+    opt "--out" |> Option.iter (fun f -> writeJson f report)
+    let statusOf (n: JsonNode) = str n "status"
+    let lines =
+        [ "catalog", catalog; "competitionScope", scope; "fullPlan", fullPlan; "ownerVerdict", owner ]
+        |> List.map (fun (k, n) -> $"""{k}: {statusOf n}{(if (arr n "causes").IsEmpty then "" else " (" + String.Join("; ", arr n "causes" |> List.map (fun c -> c.GetValue<string>()) |> List.truncate 2) + ")")}""")
+    let required = opt "--require" |> Option.map (fun r -> r.Split(',', StringSplitOptions.RemoveEmptyEntries) |> List.ofArray) |> Option.defaultValue []
+    let byName = Map.ofList [ "catalog", catalog; "scope", scope; "competitionScope", scope; "fullPlan", fullPlan; "full", fullPlan; "owner", owner; "ownerVerdict", owner ]
+    let unmet = required |> List.filter (fun r -> byName.TryFind r |> Option.map statusOf <> Some "ACCEPTED")
+    lines |> List.iter (printfn "  %s")
+    if unmet.IsEmpty then Pass [ (if required.IsEmpty then "report only (no --require)" else $"""required levels accepted: {String.Join(", ", required)}""") ]
+    else Refused (unmet |> List.map (fun r -> $"""required level {r} is {byName.TryFind r |> Option.map statusOf |> Option.defaultValue "unknown"}"""))
+
 // ---- spec-preflight: Percepta must analyse the intended, non-empty package -----------------------------------------
 
 let legalTransitions (machines: JsonNode) =
@@ -757,6 +1084,9 @@ match args with
 | "gate" :: _ -> gate () |> finish "gate"
 | "run-suites" :: _ -> runSuites () |> finish "run-suites"
 | "suite-preflight" :: _ -> suitePreflight () |> finish "suite-preflight"
+| "authorize-implementation" :: _ -> authorizeImplementation () |> finish "authorize-implementation"
+| "check-sequencing" :: _ -> checkSequencing () |> finish "check-sequencing"
+| "acceptance-status" :: _ -> acceptanceStatus () |> finish "acceptance-status"
 | "spec-preflight" :: _ -> specPreflight () |> finish "spec-preflight"
 | _ ->
     eprintfn "usage: dotnet fsi tools/r9/r9.fsx -- install-conditor|workstation|govern|check-governance|gate|spec-preflight ... (see the header)"
