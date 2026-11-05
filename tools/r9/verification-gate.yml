@@ -36,9 +36,11 @@ permissions:
   pull-requests: read
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  # A newer push to a pull request supersedes its older run. A run on main is never cancelled: each merge commit's
-  # verification is the post-merge record of that commit, and the next merge must not erase it.
+  # A pull request's runs share one group: a newer push supersedes its older run. Every other run (a push to main, a
+  # release dispatch) has a group of its own, so it is never cancelled, running or pending: each merge commit's
+  # verification is the post-merge record of that commit, and a later merge must not erase it. (A group holds one
+  # pending run and cancels it for the next, whatever cancel-in-progress says.)
+  group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.ref || github.run_id }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:

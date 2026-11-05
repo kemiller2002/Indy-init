@@ -44,12 +44,12 @@ Build to what they check. The names they look for are listed in `SRC/verificatio
    {"schema": "indy-init.t0/1", "t0": "<T0 UTC>", "deadline": "<T0 + 420 min>", "windowMinutes": 420}
    ```
    It is never changed. Every recovery and every replacement agent uses it. A different T0 or window is refused as DEADLINE_RESET.
-3. **Before you push, run §3 step 1 (the suite preflight) on this tree.** If it refuses, fix the bootstrap in this same commit. `r9.fsx check-sequencing` exempts only the bootstrap commit: a later commit that touches `tests/`, a project file, `package.json`, `package-lock.json` or `playwright.config.ts` before both checkpoints is refused as application code.
+3. **Before you push, run `npm ci`, then §3 step 1 (the suite preflight), on this tree.** If it refuses, fix the bootstrap in this same commit. `r9.fsx check-sequencing` exempts only the bootstrap commit: a later commit before both checkpoints that touches an implementation path (`isImplementationPath`, r9.fsx: `src/`, `tests/`, `web/`, any project or solution file, `Directory.*.props`/`.targets`, `package.json`, `package-lock.json`, `playwright.config.*`, `global.json`, `build.fsx`) is refused as application code. If the bootstrap was already pushed and the preflight refuses, stop and report it: do not repair it in a later commit.
 4. Commit and push.
 
 ## 3. Before any application code
 
-Implementation is prohibited until steps 1–5 pass. They need no implementation and no verification evidence.
+Implementation is prohibited until steps 1–5 pass. They need no implementation and no verification evidence. `SRC-COMMIT` below is the Indy-init commit `govern` recorded: `jq -r .indyInitCommit .echelon/r9-governance.json`.
 
 1. **Suite preflight.** Compile the obligations, then run the preflight:
    ```
@@ -57,7 +57,7 @@ Implementation is prohibited until steps 1–5 pass. They need no implementation
      --indy-verification-plan SRC/requirements-compiled/v4/verification-plan.json --out .echelon/obligations.json
    dotnet fsi SRC/tools/r9/r9.fsx -- suite-preflight --obligations .echelon/obligations.json --root . --out evidence/t0/suite-preflight.json
    ```
-   It must PASS: every executable suite command runs (chromium and webkit defined; one `dotnet test` target each). A refusal is a T10 defect; fix it in T10.
+   It must PASS: every executable suite command runs (chromium and webkit defined; one `dotnet test` target each). It runs before the bootstrap is pushed (§2 step 3); a refusal is fixed in the bootstrap commit, never after it.
 2. **Generate the work plan, and register every work item in Praxis.** Do not write the work plan by hand.
    ```
    requirements-compiler scope work-plan --manifest SRC/docs/rehearsal-010-readiness/scope-manifest.json --out .echelon/r9-work-plan.json
@@ -74,7 +74,7 @@ Implementation is prohibited until steps 1–5 pass. They need no implementation
    ```
    - It writes the checkpoint only when the manifest equals what the frozen sources give and every work item is in Praxis.
    - Commit it. It is immutable.
-4. **Initialization checkpoint (authorization).** It reads three inputs no other step writes. Produce them first, with the work plan of step 2 committed:
+4. **Initialization checkpoint (authorization).** It reads three inputs no other step writes. Produce them first:
    ```
    praxis requirements manifest compile --catalog SRC/requirements/catalogs/causa-investigation.requirement-catalog.json \
      --source-commit SRC-COMMIT --output requirements/verification/verification-manifest.json
@@ -83,7 +83,7 @@ Implementation is prohibited until steps 1–5 pass. They need no implementation
    conditor acceptance preflight --target SRC > evidence/t0/acceptance.log
    ```
    - `spec-preflight` must print `spec-preflight: PASS`; `evidence/t0/acceptance.log` must contain the line `acceptance preflight: READY`.
-   - These are records, not application code; commit them with the work plan.
+   - These are records, not application code (`isImplementationPath` matches none of them). Commit them, with the work plan, directly on main before the initialization checkpoint; through a pull request they would need a slice branch.
 
    Then:
    ```
