@@ -1,0 +1,12 @@
+/* UI-016 identity colours as semantic tokens (the design contract's theme boundary: literals only in a 'theme' file). */
+:root {
+  --causa-navy: #14283F;
+  --causa-teal: #087F8C;
+  --causa-amber: #E9A23B;
+  --causa-coral: #D66B58;
+  --causa-ivory: #F5F3ED;
+  --causa-ink: #14283F;
+  --causa-on-navy: #F5F3ED;
+  /* Derived (UI-016 allows derived tokens after measuring): ivory on teal #087F8C is 4.27:1, below 4.5:1 for normal text. */
+  --causa-teal-strong: #066A75;
+}

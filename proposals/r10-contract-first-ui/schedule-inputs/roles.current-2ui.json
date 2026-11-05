@@ -1,0 +1,63 @@
+{
+  "schema": "indy-init.slice-roles/1",
+  "status": "APPROVED ownership (v4.1.4); slice ids from the PROPOSED successor scope a847f98c (PR #119)",
+  "description": "Frozen v4.1.4 file ownership (analysis/project-structure.json): ui-2 owns Graph.fs, Report.fs, History.fs, Administration.fs (T23, T26, T28, T29) and the workflow layout beside Graph.fs; ui-1 owns every other view. Same lanes as Topology A.",
+  "roles": {
+    "SL-T23": "ui-2",
+    "SL-T26": "ui-2",
+    "SL-T28": "ui-2",
+    "SL-T29": "ui-2",
+    "SL-WI-GEN-WDL": "ui-2",
+    "SL-T16": "ui-1",
+    "SL-WI-INV-LIST": "ui-1",
+    "SL-WI-INV-WORKSPACE-FRAME": "ui-1",
+    "SL-WI-GEN-UI-LANDING": "ui-1",
+    "SL-WI-GEN-UI-STATES": "ui-1",
+    "SL-WI-GEN-UI-LANGUAGE": "ui-1",
+    "SL-WI-GEN-UI-VERIFY": "ui-1",
+    "SL-WI-INV-START-FORM": "ui-1",
+    "SL-WI-INV-START-RULES": "ui-1",
+    "SL-WI-INV-START-ACTIONS": "ui-1",
+    "SL-WI-INV-WORKSPACE-SAVE": "ui-1",
+    "SL-WI-INV-WORKSPACE-DETAILS": "ui-1",
+    "SL-WI-INV-WORKSPACE-ROUNDTRIP": "ui-1",
+    "SL-T22": "ui-1",
+    "SL-WI-INV-WORKSPACE-HYPOTHESES": "ui-1",
+    "SL-WI-INV-WORKSPACE-EVIDENCE": "ui-1",
+    "SL-WI-INV-WORKSPACE-LINKS": "ui-1",
+    "SL-WI-INV-WORKSPACE-CONCLUSION": "ui-1",
+    "SL-WI-GEN-UI-INSPECT": "ui-1"
+  },
+  "capabilities": {
+    "data-visible": [
+      "SL-T16",
+      "SL-WI-GEN-EXT-DATA",
+      "SL-T25",
+      "SL-WI-INV-LIST",
+      "SL-WI-INV-WORKSPACE-FRAME",
+      "SL-WI-GEN-UI-LANDING",
+      "SL-WI-GEN-UI-STATES"
+    ],
+    "data-understood": [
+      "SL-T13",
+      "SL-T15",
+      "SL-WI-INV-WORKSPACE-HYPOTHESES",
+      "SL-WI-INV-WORKSPACE-EVIDENCE",
+      "SL-WI-INV-WORKSPACE-LINKS",
+      "SL-WI-INV-WORKSPACE-CONCLUSION",
+      "SL-WI-GEN-UI-INSPECT",
+      "SL-WI-GEN-WDL",
+      "SL-T23"
+    ],
+    "data-editable": [
+      "SL-T21",
+      "SL-T22",
+      "SL-WI-INV-START-FORM",
+      "SL-WI-INV-START-RULES",
+      "SL-WI-INV-START-ACTIONS",
+      "SL-WI-INV-WORKSPACE-SAVE",
+      "SL-WI-INV-WORKSPACE-DETAILS",
+      "SL-WI-INV-WORKSPACE-ROUNDTRIP"
+    ]
+  }
+}

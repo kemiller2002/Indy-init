@@ -1,0 +1,16 @@
+<!-- PROPOSAL: fixture-backed implementation of the UI contracts. Every value is labelled a fixture. -->
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="CausaDataExtract.g.fs" />
+    <Compile Include="Scenarios.fs" />
+    <Compile Include="FixtureBackend.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="../contracts/Causa.Ui.Contracts.fsproj" />
+  </ItemGroup>
+</Project>

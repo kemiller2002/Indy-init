@@ -1,0 +1,133 @@
+# contract-first-bound.fsx output (MODEL, not measurement)
+# input: docs/rehearsal-010-optimization/proposals/slice-execution-manifest.successor.json at origin/claude/r10-optimization e64b4f3 (sha256 03cbf4fa90392d265daab26991d66d840676ac06ca8f3f4dcf4c3cc1e2467f4e)
+# setup 45, merge 3, CI 0 and 10 minutes per gate run; roles and hidden merge dependencies from this directory
+
+policy=current roles=roles.current-2ui.json ci=0 setup=45 merge=3 rate=1.348
+  data-visible     T+666
+  data-understood  T+589
+  data-editable    T+693
+  all-slices       T+693
+  first non-shell UI slice starts: T+189; UI lane idle: 607 lane-min; UI built-but-unmerged: 88 slice-min
+policy=current roles=roles.current-2ui.json ci=10 setup=45 merge=3 rate=1.348
+  data-visible     T+736
+  data-understood  T+762
+  data-editable    T+846
+  all-slices       T+846
+  first non-shell UI slice starts: T+253; UI lane idle: 913 lane-min; UI built-but-unmerged: 1150 slice-min
+policy=current roles=roles.contract-first-1ui.json ci=0 setup=45 merge=3 rate=1.348
+  data-visible     T+819
+  data-understood  T+742
+  data-editable    T+846
+  all-slices       T+846
+  first non-shell UI slice starts: T+189; UI lane idle: 112 lane-min; UI built-but-unmerged: 81 slice-min
+policy=current roles=roles.contract-first-1ui.json ci=10 setup=45 merge=3 rate=1.348
+  data-visible     T+893
+  data-understood  T+816
+  data-editable    T+923
+  all-slices       T+923
+  first non-shell UI slice starts: T+253; UI lane idle: 189 lane-min; UI built-but-unmerged: 714 slice-min
+policy=current roles=roles.contract-first-2ui.json ci=0 setup=45 merge=3 rate=1.348
+  data-visible     T+440
+  data-understood  T+531
+  data-editable    T+577
+  all-slices       T+577
+  first non-shell UI slice starts: T+189; UI lane idle: 375 lane-min; UI built-but-unmerged: 94 slice-min
+policy=current roles=roles.contract-first-2ui.json ci=10 setup=45 merge=3 rate=1.348
+  data-visible     T+607
+  data-understood  T+750
+  data-editable    T+791
+  all-slices       T+791
+  first non-shell UI slice starts: T+253; UI lane idle: 803 lane-min; UI built-but-unmerged: 1433 slice-min
+policy=current roles=roles.contract-first-3ui.json ci=0 setup=45 merge=3 rate=1.348
+  data-visible     T+333
+  data-understood  T+452
+  data-editable    T+465
+  all-slices       T+465
+  first non-shell UI slice starts: T+189; UI lane idle: 571 lane-min; UI built-but-unmerged: 154 slice-min
+policy=current roles=roles.contract-first-3ui.json ci=10 setup=45 merge=3 rate=1.348
+  data-visible     T+620
+  data-understood  T+766
+  data-editable    T+799
+  all-slices       T+799
+  first non-shell UI slice starts: T+253; UI lane idle: 1573 lane-min; UI built-but-unmerged: 1591 slice-min
+policy=contract-first roles=roles.current-2ui.json ci=0 setup=45 merge=3 rate=1.348
+  data-visible     T+557
+  data-understood  T+480
+  data-editable    T+584
+  all-slices       T+584
+  first non-shell UI slice starts: T+45; UI lane idle: 389 lane-min; UI built-but-unmerged: 774 slice-min
+policy=contract-first roles=roles.current-2ui.json ci=10 setup=45 merge=3 rate=1.348
+  data-visible     T+669
+  data-understood  T+734
+  data-editable    T+760
+  all-slices       T+846
+  first non-shell UI slice starts: T+45; UI lane idle: 741 lane-min; UI built-but-unmerged: 5192 slice-min
+policy=contract-first roles=roles.contract-first-1ui.json ci=0 setup=45 merge=3 rate=1.348
+  data-visible     T+710
+  data-understood  T+633
+  data-editable    T+737
+  all-slices       T+737
+  first non-shell UI slice starts: T+80; UI lane idle: 3 lane-min; UI built-but-unmerged: 288 slice-min
+policy=contract-first roles=roles.contract-first-1ui.json ci=10 setup=45 merge=3 rate=1.348
+  data-visible     T+747
+  data-understood  T+682
+  data-editable    T+786
+  all-slices       T+806
+  first non-shell UI slice starts: T+87; UI lane idle: 52 lane-min; UI built-but-unmerged: 2381 slice-min
+policy=contract-first roles=roles.contract-first-2ui.json ci=0 setup=45 merge=3 rate=1.348
+  data-visible     T+352
+  data-understood  T+374
+  data-editable    T+433
+  all-slices       T+437
+  first non-shell UI slice starts: T+45; UI lane idle: 87 lane-min; UI built-but-unmerged: 964 slice-min
+policy=contract-first roles=roles.contract-first-2ui.json ci=10 setup=45 merge=3 rate=1.348
+  data-visible     T+591
+  data-understood  T+734
+  data-editable    T+760
+  all-slices       T+846
+  first non-shell UI slice starts: T+45; UI lane idle: 741 lane-min; UI built-but-unmerged: 6856 slice-min
+policy=contract-first roles=roles.contract-first-3ui.json ci=0 setup=45 merge=3 rate=1.348
+  data-visible     T+286
+  data-understood  T+331
+  data-editable    T+343
+  all-slices       T+440
+  first non-shell UI slice starts: T+45; UI lane idle: 205 lane-min; UI built-but-unmerged: 1905 slice-min
+policy=contract-first roles=roles.contract-first-3ui.json ci=10 setup=45 merge=3 rate=1.348
+  data-visible     T+591
+  data-understood  T+734
+  data-editable    T+760
+  all-slices       T+846
+  first non-shell UI slice starts: T+45; UI lane idle: 1456 lane-min; UI built-but-unmerged: 8319 slice-min
+
+# cyclic merge dependencies deferred in every run (CF-07):
+  cyclic merge dependencies (deferred, CF-07): SL-T16->SL-WI-GEN-EXT-DATA, SL-T16->SL-T21, SL-T16->SL-T25, SL-T19->SL-WI-GEN-EXT-DATA, SL-T19->SL-T21, SL-T19->SL-T25
+
+# Approved v4.1.4 scope (docs/rehearsal-010-readiness/slice-execution-manifest.json, 37 slices). Capability rows are 'never' only because the capability groups name successor slice ids; read all-slices.
+policy=current roles=roles.current-2ui.json ci=0 setup=45 merge=3 rate=1.348
+  data-visible     never
+  data-understood  never
+  data-editable    never
+  all-slices       T+595
+  cyclic merge dependencies (deferred, CF-07): SL-T16->SL-WI-GEN-EXT-DATA, SL-T16->SL-T21, SL-T16->SL-T25, SL-T19->SL-WI-GEN-EXT-DATA, SL-T19->SL-T21, SL-T19->SL-T25
+  first non-shell UI slice starts: T+189; UI lane idle: 967 lane-min; UI built-but-unmerged: 81 slice-min
+policy=current roles=roles.current-2ui.json ci=10 setup=45 merge=3 rate=1.348
+  data-visible     never
+  data-understood  never
+  data-editable    never
+  all-slices       T+690
+  cyclic merge dependencies (deferred, CF-07): SL-T16->SL-WI-GEN-EXT-DATA, SL-T16->SL-T21, SL-T16->SL-T25, SL-T19->SL-WI-GEN-EXT-DATA, SL-T19->SL-T21, SL-T19->SL-T25
+  first non-shell UI slice starts: T+253; UI lane idle: 1192 lane-min; UI built-but-unmerged: 396 slice-min
+policy=contract-first roles=roles.current-2ui.json ci=0 setup=45 merge=3 rate=1.348
+  data-visible     never
+  data-understood  never
+  data-editable    never
+  all-slices       T+453
+  cyclic merge dependencies (deferred, CF-07): SL-T16->SL-WI-GEN-EXT-DATA, SL-T16->SL-T21, SL-T16->SL-T25, SL-T19->SL-WI-GEN-EXT-DATA, SL-T19->SL-T21, SL-T19->SL-T25
+  first non-shell UI slice starts: T+45; UI lane idle: 541 lane-min; UI built-but-unmerged: 704 slice-min
+policy=contract-first roles=roles.current-2ui.json ci=10 setup=45 merge=3 rate=1.348
+  data-visible     never
+  data-understood  never
+  data-editable    never
+  all-slices       T+696
+  cyclic merge dependencies (deferred, CF-07): SL-T16->SL-WI-GEN-EXT-DATA, SL-T16->SL-T21, SL-T16->SL-T25, SL-T19->SL-WI-GEN-EXT-DATA, SL-T19->SL-T21, SL-T19->SL-T25
+  first non-shell UI slice starts: T+45; UI lane idle: 760 lane-min; UI built-but-unmerged: 2008 slice-min

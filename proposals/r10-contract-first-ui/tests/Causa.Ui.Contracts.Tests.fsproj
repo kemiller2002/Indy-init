@@ -1,0 +1,28 @@
+<!-- PROPOSAL: Layer A contract verification. Test tooling at the versions the owner locked (ODR-V41-07, APR-V41-OWNER-2). -->
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <Nullable>disable</Nullable>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Support.fs" />
+    <Compile Include="ManifestTests.fs" />
+    <Compile Include="ContractTests.fs" />
+    <Compile Include="FixtureBackendTests.fs" />
+    <Compile Include="BoundaryTests.fs" />
+    <Compile Include="OwnershipTests.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
+    <PackageReference Include="xunit" Version="2.9.2" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="../contracts/Causa.Ui.Contracts.fsproj" />
+    <ProjectReference Include="../fixtures/Causa.Ui.Fixtures.fsproj" />
+    <ProjectReference Include="../prototype/screens/Causa.Ui.Prototype.Screens.fsproj" />
+    <ProjectReference Include="../real-adapter-sketch/Causa.Ui.RealAdapter.Sketch.fsproj" />
+  </ItemGroup>
+</Project>

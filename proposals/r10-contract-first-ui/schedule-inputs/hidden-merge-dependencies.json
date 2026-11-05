@@ -1,0 +1,55 @@
+{
+  "schema": "indy-init.r10-contract-first-ui.merge-dependencies/1",
+  "description": "Dependencies a UI slice's MERGE has but its declared dependsOn does not state: the slice gate judges each bound governed journey assertion against api.github.com (SLICE-EXECUTION-PLAN.md section 4), so a slice bound to an assertion that connects, lists, saves or reloads cannot pass before the slices that make that real. Derived from the slice's governedAssertions in slice-execution-manifest.successor.json and the journey steps in verification/journeys/*.spec.mjs. Applied to BOTH policies, so the current plan is not credited with merges its gate would refuse. Not modelled: ODR-R10-25/-26 (the frozen contracts cannot represent causa-data), a blocker that no ordering removes.",
+  "rules": [
+    {
+      "assertions": [
+        "J1-02",
+        "J3-01",
+        "J3-02"
+      ],
+      "needs": [
+        "SL-WI-GEN-EXT-DATA"
+      ],
+      "why": "Connect against the real provider (support.mjs connect)"
+    },
+    {
+      "assertions": [
+        "J1-03",
+        "J1-04",
+        "J1-05",
+        "J2-01",
+        "J2-02",
+        "J2-03",
+        "J2-04",
+        "J2-05",
+        "J2-06",
+        "J2-07",
+        "J2-08",
+        "J3-03",
+        "J3-04",
+        "J3-06",
+        "J3-07"
+      ],
+      "needs": [
+        "SL-WI-GEN-EXT-DATA",
+        "SL-T21"
+      ],
+      "why": "the run first starts an investigation and saves it to GitHub (startInvestigation, saveAndConfirm in support.mjs) on the live write path"
+    },
+    {
+      "assertions": [
+        "J1-06",
+        "J2-09",
+        "J3-05",
+        "J3-09"
+      ],
+      "needs": [
+        "SL-WI-GEN-EXT-DATA",
+        "SL-T21",
+        "SL-T25"
+      ],
+      "why": "a fresh browser context connects, lists the saved investigation and opens it from GitHub"
+    }
+  ]
+}

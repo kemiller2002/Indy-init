@@ -1,0 +1,36 @@
+<!-- PROPOSAL (proposals/r10-contract-first-ui): presentation-facing UI contracts. Not part of any approved package.
+     The frozen v4.1.4 interface contracts are compiled here by link, byte-for-byte from requirements-compiled/v4.1.4/contracts
+     (never copied, never edited), so this library cannot drift from the frozen boundary types it builds on. -->
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <Nullable>enable</Nullable>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- Frozen v4.1.4 boundary types (IF41-DOMAIN stubs .. IF41-REPORT), linked read-only. 99-Usage.fs is a positive control, not a contract. -->
+    <Compile Include="../../../requirements-compiled/v4.1.4/contracts/00-DOMAIN-STUBS.fs" Link="Frozen/00-DOMAIN-STUBS.fs" />
+    <Compile Include="../../../requirements-compiled/v4.1.4/contracts/01-IF41-DOMAIN.fs" Link="Frozen/01-IF41-DOMAIN.fs" />
+    <Compile Include="../../../requirements-compiled/v4.1.4/contracts/02-IF41-STORAGE.fs" Link="Frozen/02-IF41-STORAGE.fs" />
+    <Compile Include="../../../requirements-compiled/v4.1.4/contracts/03-IF41-WIRE.fs" Link="Frozen/03-IF41-WIRE.fs" />
+    <Compile Include="../../../requirements-compiled/v4.1.4/contracts/04-IF41-ERRORS.fs" Link="Frozen/04-IF41-ERRORS.fs" />
+    <Compile Include="../../../requirements-compiled/v4.1.4/contracts/05-IF41-SAVE.fs" Link="Frozen/05-IF41-SAVE.fs" />
+    <Compile Include="../../../requirements-compiled/v4.1.4/contracts/06-IF41-APP.fs" Link="Frozen/06-IF41-APP.fs" />
+    <Compile Include="../../../requirements-compiled/v4.1.4/contracts/07-IF41-VIEW.fs" Link="Frozen/07-IF41-VIEW.fs" />
+    <Compile Include="../../../requirements-compiled/v4.1.4/contracts/08-IF41-REPORT.fs" Link="Frozen/08-IF41-REPORT.fs" />
+    <!-- Presentation contracts (this proposal). -->
+    <Compile Include="Ids.fs" />
+    <Compile Include="Types.fs" />
+    <Compile Include="UiStates.fs" />
+    <Compile Include="Navigation.fs" />
+    <Compile Include="Connection.fs" />
+    <Compile Include="InvestigationList.fs" />
+    <Compile Include="InvestigationDetail.fs" />
+    <Compile Include="InvestigationEditor.fs" />
+    <Compile Include="InvestigationAnalysis.fs" />
+    <Compile Include="System.fs" />
+    <Compile Include="UiActions.fs" />
+    <Compile Include="Bindings.fs" />
+  </ItemGroup>
+</Project>

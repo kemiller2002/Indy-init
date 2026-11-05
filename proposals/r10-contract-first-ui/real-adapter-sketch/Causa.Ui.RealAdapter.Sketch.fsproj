@@ -1,0 +1,16 @@
+<!-- PROPOSAL (mission §9 item 4): the same UiBackend contract implemented over the FROZEN v4.1.4 Engine (IF41-APP), the
+     shape the integration lane's adapter takes. It takes the Engine as a parameter, so it compiles while no engine,
+     persistence or GitHub implementation exists; where the frozen contracts cannot supply a view it says so in a type. -->
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="RealAdapter.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="../contracts/Causa.Ui.Contracts.fsproj" />
+  </ItemGroup>
+</Project>

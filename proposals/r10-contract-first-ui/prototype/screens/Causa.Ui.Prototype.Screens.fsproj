@@ -1,0 +1,18 @@
+<!-- PROPOSAL prototype (mission §9): the Connection and Investigation List screens. References ONLY the UI contract
+     library: no domain implementation, no persistence implementation, no fixture. It compiles with the domain absent. -->
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Shell.fs" />
+    <Compile Include="ConnectionScreen.fs" />
+    <Compile Include="InvestigationListScreen.fs" />
+    <Compile Include="Events.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../contracts/Causa.Ui.Contracts.fsproj" />
+  </ItemGroup>
+</Project>
