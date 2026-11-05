@@ -1,0 +1,155 @@
+// Runs every executable layout assertion the Forma layout contract names:
+//   positive: against each listed Forma pattern page, each page composed from several patterns (composed), and each
+//   named conforming fixture (fixtures.mjs), at each listed viewport and colour scheme; every run must pass;
+//   negative: against the assertion's broken fixture (fixtures.mjs); every run must fail;
+//   Forma gaps (contract formaGaps): the unmodified pattern must still fail (so a fixed Forma release is noticed) and
+//   the pattern with the gap's remedy CSS, which may use only Forma tokens, must pass.
+// Usage: node run.mjs --forma <extracted Forma package dir> --contract <forma-layout-contract.json>
+//                     --inventory <forma inventory json> [--axe axe.min.js] [--browsers chromium,webkit] [--out results.json]
+//                     [--catch-rate]
+// Exit 0 when every positive run passes and every negative run fails; 1 otherwise; 2 for unusable input.
+// --catch-rate instead measures the kit against the review defect pages (catch-rate.mjs): it prints the catch rate
+// and exits 1 when a violation is missed without an R41-11 disclosure or a conforming page fails.
+
+import { readFileSync, writeFileSync, mkdtempSync } from 'node:fs';
+import { join, resolve } from 'node:path';
+import { tmpdir } from 'node:os';
+import { pathToFileURL } from 'node:url';
+import { createRequire } from 'node:module';
+import { assertions } from './assertions.mjs';
+import { brokenFixtures, conformingFixtures } from './fixtures.mjs';
+import { cases as reviewCases } from './catch-rate.mjs';
+
+const require = createRequire(import.meta.url);
+const playwright = require('playwright');
+
+const args = Object.fromEntries(
+  process.argv.slice(2).reduce((acc, a, k, all) => (a.startsWith('--') ? [...acc, [a.slice(2), all[k + 1]]] : acc), []),
+);
+if (!args.forma || !args.contract || !args.inventory) {
+  console.error('usage: node run.mjs --forma DIR --contract FILE --inventory FILE [--browsers chromium,webkit] [--out FILE]');
+  process.exit(2);
+}
+
+const contract = JSON.parse(readFileSync(args.contract, 'utf8'));
+const inventoryFile = JSON.parse(readFileSync(args.inventory, 'utf8'));
+const inventory = inventoryFile.customProperties;
+const hooks = inventoryFile.hookProperties || [];
+// axe-core: --axe FILE, or the package resolved beside this runner.
+const axeSource = args.axe ? readFileSync(args.axe, 'utf8') : (() => { try { return readFileSync(require.resolve('axe-core/axe.min.js'), 'utf8'); } catch (e) { return undefined; } })();
+const css = pathToFileURL(resolve(args.forma, 'dist/all.css')).href;
+const scratch = mkdtempSync(join(tmpdir(), 'forma-layout-'));
+const viewports = Object.fromEntries(contract.viewports.map(v => [v.id, v]));
+
+const page = (name, body, zoom) => {
+  const file = join(scratch, `${name.replace(/[^a-z0-9-]/gi, '_')}-${zoom}.html`);
+  writeFileSync(file, `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${name}</title><link rel="stylesheet" href="${css}"><style>html{font-size:${zoom * 100}%}</style></head><body>${body}</body></html>`);
+  return pathToFileURL(file).href;
+};
+const pattern = id => readFileSync(resolve(args.forma, 'patterns', `${id}.html`), 'utf8');
+
+// Every (rule, assertion, pattern-or-fixture, viewport, scheme) run, positive and negative.
+const gaps = contract.formaGaps || [];
+const gapOf = (assertion, p, vp) => gaps.find(g => g.assertion === assertion && g.pattern === p && (g.viewports || []).includes(vp));
+const runsOf = rule =>
+  (rule.executable || []).flatMap(x => {
+    const vps = x.viewports === 'all' || !x.viewports ? contract.viewports.map(v => v.id) : x.viewports;
+    const schemes = x.colorSchemes || ['light'];
+    const one = (kind, target, body, vp) => schemes.map(scheme => ({ rule: rule.id, assertion: x.assertion, emulate: x.emulate || {}, kind, target, body, vp, scheme }));
+    const cell = (kind, target, body) => vps.flatMap(vp => one(kind, target, body, vp));
+    return [
+      ...(x.patterns || []).flatMap(p =>
+        vps.flatMap(vp => {
+          const gap = gapOf(x.assertion, p, vp);
+          return gap
+            ? [...one('gap', p, pattern(p), vp), ...one('positive', `${p}+remedy`, `<style>${gap.remedyCss}</style>${pattern(p)}`, vp)]
+            : one('positive', p, pattern(p), vp);
+        }),
+      ),
+      ...(x.composed || []).flatMap(ps => cell('positive', ps.join('+'), ps.map(pattern).join('\n'))),
+      ...(x.fixtures || []).flatMap(f => cell('positive', `conforming:${f}`, conformingFixtures[f])),
+      ...[].concat(brokenFixtures[x.assertion]).flatMap((body, k) => cell('negative', `broken:${x.assertion}#${k + 1}`, body)),
+    ];
+  });
+
+const execute = browser => async run => {
+  const vp = viewports[run.vp];
+  const context = await browser.newContext({
+    viewport: { width: vp.width, height: vp.height },
+    colorScheme: run.scheme,
+    reducedMotion: run.assertion === 'reducedMotion' ? 'reduce' : 'no-preference',
+    forcedColors: run.emulate.forcedColors || 'none',
+  });
+  const tab = await context.newPage();
+  try {
+    await tab.goto(page(run.target, run.body, vp.textZoom || 1));
+    const violations = await assertions[run.assertion](tab, { inventory, hooks, axeSource, ...(run.options || {}) });
+    const ok = run.kind === 'positive' ? violations.length === 0 : violations.length > 0;
+    // A gap run that passes means Forma fixed it: fail, so the gap entry is removed.
+    if (run.kind === 'gap' && violations.length === 0) violations.push('the Forma gap is closed in this release; remove it from formaGaps');
+    return { ...run, body: undefined, violations, ok };
+  } catch (e) {
+    return { ...run, body: undefined, violations: [`error: ${e.message}`], ok: false };
+  } finally {
+    await context.close();
+  }
+};
+
+const sequence = (xs, f) => xs.reduce((acc, x) => acc.then(rs => f(x).then(r => [...rs, r])), Promise.resolve([]));
+
+// A failure that only says a page element is missing does not show the defect was found.
+const absence = /^(no (element received focus|dialog invoker|status indicator|save-state indicator|loading placeholder|fault on the page|navigation landmark|Forma navigation shell)|error: )/;
+const catchRate = async () => {
+  const runs = reviewCases.flatMap(c => c.vps.map(vp => ({ rule: c.id, assertion: c.assertion, emulate: c.forced ? { forcedColors: 'active' } : {}, kind: 'catch', target: c.id, options: c.options, body: typeof c.body === 'function' ? c.body(pattern) : c.body, vp, scheme: c.scheme || 'light', case: c })));
+  const browser = await playwright.chromium.launch();
+  const done = await sequence(runs, run => execute(browser)(run).then(r => ({ ...r, case: run.case, found: r.violations.filter(v => !absence.test(v)) })));
+  await browser.close();
+  const of = verdict => done.filter(r => (verdict === 'other' ? !['violation', 'conforming'].includes(r.case.verdict) : r.case.verdict === verdict));
+  const violations = of('violation');
+  const caught = violations.filter(r => r.found.length > 0);
+  const missed = violations.filter(r => r.found.length === 0);
+  const undisclosed = missed.filter(r => !r.case.disclosed);
+  // A conforming page may lack the element an assertion judges (a status that is not a fault): it then returns only a
+  // missing-element result, which is reported, and a plan test does not run that assertion on such a page. Any other
+  // violation, or an error, fails.
+  const conformingFailed = of('conforming').filter(r => r.found.length > 0 || r.violations.some(v => v.startsWith('error: ')));
+  const absenceOnly = of('conforming').filter(r => r.found.length === 0 && r.violations.length > 0 && !r.violations.some(v => v.startsWith('error: ')));
+  console.log(`catch rate (Chromium, own assertion): ${caught.length} of ${violations.length} violation runs caught; ${missed.length - undisclosed.length} disclosed misses; ${of('other').length} runs of pages not judged violations (each with its reason); ${of('conforming').length - conformingFailed.length} of ${of('conforming').length} conforming runs pass (${absenceOnly.length} of them return only a missing-element result)`);
+  missed.forEach(r => console.log(`  ${r.case.disclosed ? 'DISCLOSED' : 'MISSED'} round ${r.case.round} ${r.case.id} ${r.assertion} ${r.vp}${r.case.disclosed ? ': ' + r.case.disclosed : ''}`));
+  conformingFailed.forEach(r => console.log(`  FALSE FAILURE round ${r.case.round} ${r.case.id} ${r.assertion} ${r.vp}: ${r.violations.slice(0, 3).join('; ')}`));
+  if (args.out) writeFileSync(args.out, JSON.stringify(done.map(r => ({ id: r.case.id, round: r.case.round, verdict: r.case.verdict, assertion: r.assertion, vp: r.vp, violations: r.violations })), null, 2) + '\n');
+  process.exit(undisclosed.length === 0 && conformingFailed.length === 0 ? 0 : 1);
+};
+
+const main = async () => {
+  if ('catch-rate' in args) return catchRate();
+  const unknown = contract.rules.flatMap(r => (r.executable || []).filter(x => !assertions[x.assertion] || !brokenFixtures[x.assertion] || (x.fixtures || []).some(f => !conformingFixtures[f])).map(x => `${r.id}: ${x.assertion}`));
+  if (unknown.length > 0) {
+    console.error(`unknown assertions or missing fixtures: ${unknown.join(', ')}`);
+    process.exit(2);
+  }
+  const runs = contract.rules.flatMap(runsOf);
+  const names = (args.browsers || 'chromium').split(',');
+  const results = await sequence(names, async name => {
+    const browser = await playwright[name].launch();
+    const rs = await sequence(runs, execute(browser));
+    await browser.close();
+    return { browser: name, version: browser.version(), runs: rs };
+  });
+  const summary = results.map(b => ({
+    browser: b.browser,
+    version: b.version,
+    positive: b.runs.filter(r => r.kind === 'positive').length,
+    negative: b.runs.filter(r => r.kind === 'negative').length,
+    gaps: b.runs.filter(r => r.kind === 'gap').length,
+    failed: b.runs.filter(r => !r.ok).map(r => ({ rule: r.rule, assertion: r.assertion, kind: r.kind, target: r.target, viewport: r.vp, scheme: r.scheme, violations: r.violations.slice(0, 5) })),
+  }));
+  if (args.out) writeFileSync(args.out, JSON.stringify({ summary, results }, null, 2) + '\n');
+  summary.forEach(s => {
+    console.log(`${s.browser} ${s.version}: ${s.positive} positive, ${s.negative} negative and ${s.gaps} Forma-gap runs, ${s.failed.length} failed`);
+    s.failed.slice(0, 40).forEach(f => console.log(`  FAIL ${f.rule} ${f.assertion} ${f.kind} ${f.target} ${f.viewport} ${f.scheme}: ${f.violations.join('; ')}`));
+  });
+  process.exit(summary.every(s => s.failed.length === 0) ? 0 : 1);
+};
+
+main().catch(e => { console.error(e); process.exit(2); });

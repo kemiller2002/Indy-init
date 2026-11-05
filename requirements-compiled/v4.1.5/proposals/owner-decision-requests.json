@@ -1,0 +1,656 @@
+{
+ "schema": "indy-init.v41-owner-decision-requests/1",
+ "status": "Requests of v4.1 to v4.1.4 are carried as recorded (APR-V41-OWNER-1..4, APR-V411-OWNER-1/2, APR-V412-OWNER-1..3, APR-V414-OWNER-1/2). Pending: ODR-V415-01, -02 and -03 (the minimum contract change for real causa-data), then ODR-V415-04 (approve v4.1.5) for the package as compiled from those records and independently reviewed.",
+ "requests": [
+  {
+   "id": "ODR-V41-01",
+   "kind": "package-approval",
+   "title": "Approve compiled package v4.1 as the implementation plan for November 7",
+   "question": "Approve requirements-compiled/v4.1 (on top of package v4, whose verification plan it uses unchanged) as the plan the event build follows: interface contracts, file ownership, state-machine tables, GitHub error matrix, Forma layout contract, verification execution plan and schedule?",
+   "options": [
+    "A: approve v4.1, after v4 is approved (ODR-V4-01)",
+    "B: request changes",
+    "C: decline; build from v4 alone"
+   ],
+   "recommendation": "A. v4.1 changes no requirement, obligation or test binding (preservation-report.json); it removes decisions the team would otherwise make inside the timed window.",
+   "rationale": "Only the owner approves a package (RDP-003). v4.1 depends on v4: approving v4.1 without v4 leaves the requirements unfrozen.",
+   "impact": "Until approved, v4.1 is a CANDIDATE. The event build may follow it as guidance but must report it unapproved.",
+   "approvalRecord": {
+    "how": "A change in an operator approval (v4 recordFormat): {\"decision_id\": \"ODR-V41-01\", \"action\": \"approve-package\", \"package\": \"requirements-compiled/v4.1\", \"manifest_sha256\": \"<sha256 of requirements-compiled/v4.1/package-manifest.json>\", \"review_sha256\": \"<sha256 of requirements-compiled/v4.1/analysis/independent-review.json>\"}. The manifest digests every authored input and document (including AGENT-RULES.md and this file) and every generated file. Written and committed by the owner only."
+   }
+  },
+  {
+   "id": "ODR-V41-02",
+   "kind": "interface-freeze",
+   "title": "Confirm the reconciliation of FSHARP-TYPE-SHAPES sections 42 and 46",
+   "question": "At the owner's direction (2026-10-30), docs/FSHARP-TYPE-SHAPES.md §42 (persistence port with ProviderConflict) and §46 (module split with LocalStore.fs) now carry ADR-R7-001 supersession notes pointing to the v4.1 contracts and project structure, and docs/rehearsal-007/traceability.json lists both sections as superseded (the R7 persistence validator passes). Confirm?",
+   "options": [
+    "A: confirm the reconciliation",
+    "B: request changes"
+   ],
+   "recommendation": "A.",
+   "rationale": "The edit follows the owner's instruction; the owner's record makes it authoritative.",
+   "impact": "With B, the notes are revised before v4.1 is approved.",
+   "approvalRecord": {
+    "how": "{\"decision_id\": \"ODR-V41-02\", \"action\": \"select\", \"option\": \"A\" | \"B\"}"
+   }
+  },
+  {
+   "id": "ODR-V41-03",
+   "kind": "schedule",
+   "title": "Accept the interface-first ordering changes of the v4.1 DAG",
+   "question": "v4.1 lets the interface freeze (T14) start before the kernel (T13) and the invariant tests (T12), and the save machine (T19) and GitHub provider (T20) start before the kernel, because the frozen contracts fix the types. It keeps the invariant tests before the save machine (T12 before T19, R4-01) and the kernel before integration checkpoint 1 (T13 before T17) and before live integration (T13 before T21). It also keeps the invariant tests before review checkpoint T35. The five v4 orderings it drops are listed with reasons in analysis/task-adjustments.json waivedPrecedences: T12 before T14, T13 before T14, T13 before T19, T13 before T20, T13 before T35. Dropping T13 before T14, T19 and T20 sets aside KICKOFF-EXECUTION-PACKET §4 ('parallel ownership after the kernel stabilizes'), which T14 covers; it depends on ODR-V41-06. Accept them?",
+   "options": [
+    "A: accept the ordering changes",
+    "B: keep v4's orderings"
+   ],
+   "recommendation": "A, if ODR-V41-06 is A. With v4's estimates, the ordering changes alone shorten the dependency critical path from 340 to 305 minutes and topology C's total from 405 to 395 (schedule.json scenarios). Topology A does not fit the 420-minute window in any scenario; C fits in every scenario.",
+   "rationale": "The change moves integration risk from T19 to T21 (optimization-report.md, risks R41-02 and R41-03); the owner decides whether that trade is acceptable.",
+   "impact": "With B, the agent removes the dependency changes from task-adjustments.json and recompiles; the other v4.1 artifacts still apply.",
+   "approvalRecord": {
+    "how": "{\"decision_id\": \"ODR-V41-03\", \"action\": \"select\", \"option\": \"A\" | \"B\"}"
+   }
+  },
+  {
+   "id": "ODR-V41-04",
+   "kind": "schedule",
+   "title": "Accept the v4.1 estimate changes",
+   "question": "v4.1 lowers two timed estimates (minutes): T12 25 to 15 and T18 45 to 35. It also gives preflight T10 an estimate of 25 outside the window. Each reason is in analysis/task-adjustments.json; both are the package author's estimates, not measurements. Accept them for planning?",
+   "options": [
+    "A: accept the estimate changes",
+    "B: keep v4's estimates"
+   ],
+   "recommendation": "A only if the reasons convince you: with v4's orderings, the estimate changes alone take the dependency critical path from 340 to 330 minutes and C from 405 to 395; with ODR-V41-03 also accepted, 300 and 385 (C's makespan 320 plus 65 minutes of reserves).",
+   "rationale": "Lower estimates move the schedule without moving the work; only the owner accepts them.",
+   "impact": "With B, the agent restores v4's estimates and recompiles; reserves are unchanged either way.",
+   "approvalRecord": {
+    "how": "{\"decision_id\": \"ODR-V41-04\", \"action\": \"select\", \"option\": \"A\" | \"B\"}"
+   }
+  },
+  {
+   "id": "ODR-V41-05",
+   "kind": "requirement-conflict",
+   "title": "Map UI-016's amber #E9A23B to a Forma token",
+   "question": "UI-016 (docs/CAUSA-UI-EXPERIENCE-REQUIREMENTS.md) names the identity colour amber #E9A23B and requires every colour to map to a named semantic Forma theme token. Forma 0.12.0 defines no such value (its ambers differ), and v4.1 forbids declaring new --ef-* properties. Which applies?",
+   "options": [
+    "A: use Forma's warning-status token for amber, keeping text labels (DEC-R7-002)",
+    "B: allow web/causa.css to declare one theme token for #E9A23B, outside the --ef-* namespace, after measuring contrast",
+    "C: ask Forma for a release with the identity colours"
+   ],
+   "recommendation": "A for November 7: it uses only published tokens; B or C if the exact hex is required.",
+   "rationale": "A requirement value and the no-invented-token rule conflict; an agent may not resolve that by itself.",
+   "impact": "Until decided, FL-06 cites #E9A23B as the requirement's value (check X07 accepts a literal only with its requirement source).",
+   "approvalRecord": {
+    "how": "{\"decision_id\": \"ODR-V41-05\", \"action\": \"select\", \"option\": \"A\" | \"B\" | \"C\"}"
+   }
+  },
+  {
+   "id": "ODR-V41-06",
+   "kind": "requirement-conflict",
+   "title": "Pre-kickoff contracts and scaffolding for November 7",
+   "question": "Baseline and event clauses conflict with v4.1. (1) docs/REHEARSAL-AGENT-INTERFACE-FREEZE.md preamble and contract-freeze step 1: F# signatures 'MUST be authored from the requirements at kickoff'; 'these are not fabricated compile-ready interfaces'. (2) KICKOFF-EXECUTION-PACKET §4: parallel ownership after the kernel stabilizes. (3) docs/HACKATHON-BOUNDARIES.md, quoting the published event page: 'the repository starts empty' and 'code starts at kickoff'; and its own rules: 'Before producing application-specific executable/generated scaffolding from it before kickoff, confirm organizer interpretation' and 'Until clarified, keep this repository specification-heavy and keep competition application source code out of it.' v4.1 ships compile-ready interface contracts (contracts/), and its bootstrap (T10, before T0) makes the application repository non-empty before kickoff. On 2026-10-30 the owner told the package author in session that the organizers allow pre-kickoff scaffolding. Record that, and set these clauses aside for November 7?",
+   "options": [
+    "A: the organizers allow it; for November 7 the v4.1 contracts are authored before kickoff and committed at T14, and the bootstrap may be generated at T10",
+    "B: keep the kickoff-authoring clauses; the contracts become reference text and the bootstrap is not used"
+   ],
+   "recommendation": "A, as the owner stated; the owner's own record is what makes it authoritative (the package author may not write it).",
+   "rationale": "Only the owner can set aside a baseline clause, and only the organizers can interpret the event rules.",
+   "impact": "With B, T14 returns to authoring at kickoff and ODR-V41-03's waivers of T13 before T14, T19 and T20 fall away.",
+   "approvalRecord": {
+    "how": "{\"decision_id\": \"ODR-V41-06\", \"action\": \"select\", \"option\": \"A\" | \"B\", \"organizer_confirmation\": \"<who confirmed, and when>\"}"
+   }
+  },
+  {
+   "id": "ODR-V41-07",
+   "kind": "dependency-lock",
+   "title": "Lock the test tooling",
+   "question": "requirements-compiled/v4/dependency-lock.json locks no .NET test framework and no Playwright version, yet the plan binds 'dotnet:' and 'playwright:' tests. The bootstrap (v41 --bootstrap) therefore builds the test projects without a test framework, and the layout tests run on the Playwright the CI runner provides. Which test tooling is locked?",
+   "options": [
+    "A: xUnit with Microsoft.NET.Test.Sdk, and Playwright 1.63.0 (the version this package's layout tests ran on)",
+    "B: Expecto, and Playwright 1.63.0",
+    "C: another set the owner names"
+   ],
+   "recommendation": "A, or whatever Dokimos 0.9.0 documents as its supported runner; the lock entry is added to the dependency lock by the owner's decision, not chosen by an agent.",
+   "rationale": "Adding a framework needs a verified requirement or an owner decision (v4.1 brief).",
+   "impact": "Until decided, T10 cannot write the test projects' package references.",
+   "approvalRecord": {
+    "how": "{\"decision_id\": \"ODR-V41-07\", \"action\": \"select\", \"option\": \"A\" | \"B\" | \"C\", \"packages\": [\"<id>@<version>\"]}"
+   }
+  },
+  {
+   "id": "ODR-V41-08",
+   "kind": "state-machine-amendment",
+   "title": "Amend two v4 state-machine gaps",
+   "question": "(1) SM-SAVE declares MutationSent, but no transition accepts it, so it fails closed in every state (analysis/guard-partitions.json unusedEvents). (2) SM-LOAD has no transport-failure event; v4.1 routes provider refusals and lost answers through LoadRejected of LoadFailure.ProviderFailed (IF41-SAVE). Amend v4?",
+   "options": [
+    "A: add a Saving + MutationSent transition that records the outstanding request and stays Saving, and accept LoadRejected carrying ProviderFailed for transport failures",
+    "B: remove MutationSent from SM-SAVE, and keep SM-LOAD as is",
+    "C: leave both as they are"
+   ],
+   "recommendation": "A: it changes no state and makes the declared event usable.",
+   "rationale": "v4.1 may not add transitions or states to v4's machines on its own.",
+   "impact": "Until decided, MutationSent stays declared and illegal everywhere, so the implementation never emits it.",
+   "approvalRecord": {
+    "how": "{\"decision_id\": \"ODR-V41-08\", \"action\": \"select\", \"option\": \"A\" | \"B\" | \"C\"}"
+   }
+  },
+  {
+   "id": "ODR-V41-09",
+   "kind": "dependency-lock",
+   "title": "Lock axe-core for the accessibility assertion",
+   "question": "The event build copies the layout kit (layout-tests/assertions.mjs) as tests/browser/support/layout-assertions.mjs, and its axeClean assertion (FL-06e, bound through PERSIST-030-O6) loads axe-core from the event build's own node_modules. ODR-V41-07 locked the test runners (xUnit, Microsoft.NET.Test.Sdk, @playwright/test) but not axe-core, so T10 cannot add it to package.json. Which axe-core version is locked?",
+   "options": [
+    "A: axe-core 4.14.0 (the version this package's layout tests run with in CI)",
+    "B: another version the owner names"
+   ],
+   "recommendation": "A: it is the version the layout kit's catch rate and every conforming Forma pattern were measured with; the lock entry is added by the owner's decision, not chosen by an agent.",
+   "rationale": "Adding a library needs a verified requirement or an owner decision (v4.1 brief). FL-06e requires axe-core checks but names no version.",
+   "impact": "Until decided, the bootstrap writes no axe-core entry, and the event build's axeClean assertion has no axe-core to load.",
+   "approvalRecord": {
+    "how": "{\"decision_id\": \"ODR-V41-09\", \"action\": \"select\", \"option\": \"A\" | \"B\", \"packages\": [\"axe-core@<version>\"]}"
+   }
+  },
+  {
+   "id": "ODR-V411-01",
+   "kind": "package-approval",
+   "title": "Approve compiled package v4.1.1 as the implementation plan for November 7",
+   "question": "Approve requirements-compiled/v4.1.1, the successor amendment of the approved v4.1 (APR-V41-OWNER-4)? It contains: the bootstrap (T10) at T0, 29 minutes partly measured (2 measured on fresh empty repositories with a warm NuGet cache, 27 estimated); the contracts classified as specifications and pinned to v4.1's; the organizer references dispositioned per ODR-V411-02; the shared web entrypoints owned by integration with change requests (T17 carries 5 minutes for them); the recomputed schedule (topology C 419 of 420 minutes) with its sensitivity; and the token-economics report from Praxis telemetry",
+   "options": [
+    "A: approve v4.1.1",
+    "B: request changes",
+    "C: decline; build from v4.1 as approved"
+   ],
+   "recommendation": "The owner's call, after ODR-V411-02. v4.1.1 changes no requirement, obligation, test binding, state machine or contract text (preservation-report.json, X10, X17). It moves work the plan already had into the timed window, partly measured, and removes waiting on a third party. Its schedule margin is 1 minute in topology C.",
+   "rationale": "Only the owner approves a package (RDP-003). v4.1 stays approved and unedited; v4.1.1 replaces it as the plan only once approved.",
+   "impact": "Until approved, v4.1.1 is a CANDIDATE and the event build follows v4.1 as approved.",
+   "approvalRecord": {
+    "how": "A change in an operator approval, recorded by the owner with `dotnet fsi tools/owner-freeze.fsx -- approve v4.1.1`: {\"decision_id\": \"ODR-V411-01\", \"action\": \"approve-package\", \"package\": \"requirements-compiled/v4.1.1\", \"manifest_sha256\": \"<sha256 of requirements-compiled/v4.1.1/package-manifest.json>\", \"review_sha256\": \"<sha256 of requirements-compiled/v4.1.1/analysis/independent-review.json>\"}. Written and committed by the owner, never by an agent."
+   }
+  },
+  {
+   "id": "ODR-V411-02",
+   "kind": "requirement-conflict",
+   "title": "Organizer-approval obligations for November 7",
+   "question": "The assignment removes every internal workflow gate that waits on organizers (OD-INDY-18), but the frozen v4 baseline and its source documents still tie parts of the plan to organizer approval or organizer rules. These are: ADRP-016-O2 (must: 'Prepared requirements, library capabilities, design guidance, frozen fixtures, and scripts are subject to organizer approval; do not transfer a prebuilt competition app where prohibited', both clauses) and its readiness-checklist form; STORAGE-008-O1 and CAUSA-DATA-CONTRACT-v1 §10.8 (organizer permission for the pre-created dataset and executable schemas); R0.1-O1 (must: source implementation begins at kickoff 'from a blank application repository or the organizer-approved equivalent') and the kickoff packet's 'empty/organizer-compliant' checks; DOMAIN-TEST-MATRIX §29 and PRODUCT-REQUIREMENTS (executable tests before kickoff only if organizer rules permit; at T0 the bootstrap writes the pre-written executable layout-assertion module, tests/browser/support/layout-assertions.mjs); the preflight check PRE-ORG-01 (task T06, gate G0) and v4's risk RISK-12; OD-INDY-12 (interfaces 'only after the organizer confirms'); and ODR-V41-06, whose record states an organizer confirmation and which set aside REHEARSAL-AGENT-INTERFACE-FREEZE's clause that F# signatures 'MUST be authored from the requirements at kickoff' — the basis of the pre-authored contracts and of the four contract-first waivers (T12>T14, T13>T14, T13>T19, T13>T20). No agent may weaken a requirement, claim one met, or decide this. How are they handled for November 7?",
+   "options": [
+    "A: proceed without seeking organizer approval. Every obligation listed stays unchanged in the frozen baseline. The organizer-approval obligations (ADRP-016-O2, its checklist form, STORAGE-008-O1, PRE-ORG-01) are reported as not met at G0 and G10, with OD-INDY-18 as the reason. R0.1-O1, the kickoff checks and the DOMAIN-TEST-MATRIX condition are verified by their own obligations at acceptance and reported as their evidence shows, not presumed met. RISK-12 is accepted. OD-INDY-12's condition does not apply to the v4.1.1 contracts, which are authored from the requirements, not extracted from earlier rehearsals (X11). ODR-V41-06's set-aside, and the contract-first waivers resting on it, stand as the owner recorded them. No task waits on any of this.",
+    "B: keep the organizer gate. T10 waits for an organizer record under PRE-ORG-01; v4.1.1 withdraws change V411-C and keeps the rest.",
+    "C: ask the organizers, but do not wait. The question is sent before the event; any answer is recorded under PRE-ORG-01; each obligation is reported met or not met by that answer and its own evidence; no task waits on it."
+   ],
+   "recommendation": "The owner's call. A follows the assignment's instruction ('We are not requesting organizer approval for the engineering process') and reports the unmet obligations honestly instead of claiming them; C keeps the same schedule and may close them.",
+   "rationale": "A must obligation of the frozen baseline conflicts with the owner's instruction to remove organizer gates. The agent may not set a requirement aside (RDP-003); only the owner decides.",
+   "impact": "Until it is decided, owner-freeze.fsx approve v4.1.1 refuses to record the package approval. X19 lists every organizer reference the scan finds, each with a disposition under ODR-V411-02 or, where nothing is decided, OD-INDY-18.",
+   "approvalRecord": {
+    "how": "A change in an operator approval, recorded by the owner with `dotnet fsi tools/owner-freeze.fsx -- decide v4.1.1`: {\"decision_id\": \"ODR-V411-02\", \"action\": \"select\", \"option\": \"A\" | \"B\" | \"C\"}. Written and committed by the owner, never by an agent."
+   }
+  },
+  {
+   "id": "ODR-V412-01",
+   "kind": "state-machine-amendment",
+   "title": "Rate-limit user- and network-driven reconciliation reads to INV-04 (Rehearsal 8 DEV-R8-11)",
+   "question": "INV-04 allows at most four reconciliation reads in 60 s under total network failure, but SM-SAVE sends them without that bound: T-S31 (Check again) and T-S32 (back online) read without limit, and the three automatic reads (T-S19, T-S29, ReconcileDue) are not counted against any window (Rehearsal 8 DEV-R8-11; independent review RV412-1-1). How does SM-SAVE keep within INV-04?",
+   "options": [
+    "A: count every reconciliation read, automatic or not, against INV-04's own window: a read is sent only while fewer than four reconciliation reads were sent in the 60 s before RequestContext.Now, one entry per reconciliation (its commit pages and file reads are not further reads), counted per investigation session. At the limit an automatic read is rescheduled (ReconcileDue) and Check again or back-online sends nothing; Check again is offered only once the automatic reads are spent. Applies exactly the transitions and contract digests listed in 'applies' under A: T-S31, T-S32 and T-S47 replaced; T-S62, T-S63 and T-S65 added; RequestContext.Now (IF41-WIRE); InvestigationSession.ReconcileReadsSentAt and the windowed ReconcileDue (IF41-SAVE)",
+    "B: amend INV-04 to count only automatic reads (a requirement change, not in v4.1.2)",
+    "C: leave the contradiction; INV04 RequestBounds stays red"
+   ],
+   "recommendation": "A. Every path that sends a reconciliation read checks the same window, so INV-04 holds by construction; no requirement changes and the machines stay pure.",
+   "rationale": "Owner choices given 2026-11-02 after the round-1 review: count every read; one reconciliation attempt is one read; re-decide.",
+   "impact": "Until recorded, v4.1.2 cannot be compiled with these transitions (ownerRecords).",
+   "approvalRecord": {
+    "how": "A change in an operator approval (recordFormat): {\"decision_id\": \"ODR-V412-01\", \"action\": \"select\", \"option\": \"A\"}, recorded by the owner with tools/owner-freeze.fsx decide v4.1.2. Selecting an option approves exactly what its 'applies' entry lists; the offline suite compares the package with it. Agents never write the record (RDP-003)."
+   },
+   "applies": {
+    "A": {
+     "transitions": [
+      {
+       "machine": "SM-SAVE",
+       "id": "T-S31",
+       "replaces": true,
+       "from": "UnknownOutcome",
+       "event": "CheckAgain",
+       "to": "UnknownOutcome",
+       "guard": "automatic reads spent and fewer than four reconciliation reads sent in the 60 s before RequestContext.Now",
+       "effects": [
+        "one reconciliation read",
+        "record its send time in ReconcileReadsSentAt"
+       ],
+       "sources": [
+        "PERSIST-016",
+        "PERSIST-031"
+       ]
+      },
+      {
+       "machine": "SM-SAVE",
+       "id": "T-S62",
+       "from": "UnknownOutcome",
+       "event": "CheckAgain",
+       "to": "UnknownOutcome",
+       "guard": "automatic reads spent and four reconciliation reads already sent in the 60 s before RequestContext.Now",
+       "effects": [
+        "send nothing",
+        "keep Check again offered",
+        "announce that Check again can read again 60 s after the oldest of those four reads"
+       ],
+       "sources": [
+        "PERSIST-016",
+        "PERSIST-031"
+       ]
+      },
+      {
+       "machine": "SM-SAVE",
+       "id": "T-S32",
+       "replaces": true,
+       "from": "UnknownOutcome",
+       "event": "WentOnline",
+       "to": "UnknownOutcome",
+       "guard": "automatic reads spent and fewer than four reconciliation reads sent in the 60 s before RequestContext.Now",
+       "effects": [
+        "one reconciliation read",
+        "record its send time in ReconcileReadsSentAt"
+       ],
+       "sources": [
+        "PERSIST-016"
+       ]
+      },
+      {
+       "machine": "SM-SAVE",
+       "id": "T-S63",
+       "from": "UnknownOutcome",
+       "event": "WentOnline",
+       "to": "UnknownOutcome",
+       "guard": "automatic reads spent and four reconciliation reads already sent in the 60 s before RequestContext.Now",
+       "effects": [
+        "send nothing",
+        "keep Check again offered"
+       ],
+       "sources": [
+        "PERSIST-016",
+        "PERSIST-031"
+       ]
+      },
+      {
+       "machine": "SM-SAVE",
+       "id": "T-S65",
+       "from": "UnknownOutcome",
+       "event": "WentOnline",
+       "to": "UnknownOutcome",
+       "guard": "automatic reads left",
+       "effects": [
+        "send nothing now",
+        "the automatic reads resume: the next is sent when due, under the 60 s window of ReconcileDue"
+       ],
+       "sources": [
+        "PERSIST-016"
+       ]
+      },
+      {
+       "machine": "SM-SAVE",
+       "id": "T-S47",
+       "replaces": true,
+       "from": "UnknownOutcome",
+       "event": "WentOffline",
+       "to": "UnknownOutcome",
+       "guard": "true",
+       "effects": [
+        "automatic reads pause",
+        "on return, T-S32, T-S63 or T-S65 applies"
+       ],
+       "sources": [
+        "PERSIST-016"
+       ]
+      }
+     ],
+     "contracts": [
+      {
+       "file": "contracts/03-IF41-WIRE.fs",
+       "sha256": "48f227960704c4e5b165e227b44d53a2da03c1d1347ab43ee0d9c6bcd3a21116"
+      },
+      {
+       "file": "contracts/05-IF41-SAVE.fs",
+       "sha256": "904465d9f47f05c12b17b544e8b379842b2ace0915b4516a785a28dd648d980f"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "ODR-V412-02",
+   "kind": "interface-change",
+   "title": "Give CommandEnvelope its command and EventPayload its event body (Rehearsal 8 DEV-R8-09, CR-T17-01)",
+   "question": "The frozen CommandEnvelope stub holds only identities and a version, and EventPayload only a kind string, though FSHARP-TYPE-SHAPES sections 31-33 specify CommandEnvelope.Command : Command and EventPayload = CoreEvent | ExtensionEvent. Decide cannot tell the 134 catalog commands apart and replay cannot rebuild an investigation. Restore them?",
+   "options": [
+    "A: restore sections 31-33 in 00-DOMAIN-STUBS.fs: Command = Core of CoreCommand (its 29 case names) | Extension of SemanticId * payloadJson; EventPayload = CoreEvent of CoreEvent (its 28 case names) | ExtensionEvent of SemanticId * payloadJson; CommandEnvelope gains Command: Command; each payload type is opaque in the stub and defined by the domain owner",
+    "B: restore the full payload shapes of sections 31-33",
+    "C: keep the abbreviated stubs"
+   ],
+   "recommendation": "A. It restores the specified boundary without freezing about 20 payload records into the contract.",
+   "rationale": "Owner choice given 2026-11-02: add the command field, section-31 case names with opaque payloads, and the same treatment for events.",
+   "impact": "Until recorded, the v4.1.2 contract changes cannot pass X17.",
+   "approvalRecord": {
+    "how": "A change in an operator approval (recordFormat): {\"decision_id\": \"ODR-V412-02\", \"action\": \"select\", \"option\": \"A\"}, recorded by the owner with tools/owner-freeze.fsx decide v4.1.2. Selecting an option approves exactly what its 'applies' entry lists; the offline suite compares the package with it. Agents never write the record (RDP-003)."
+   },
+   "applies": {
+    "A": {
+     "transitions": [],
+     "contracts": [
+      {
+       "file": "contracts/00-DOMAIN-STUBS.fs",
+       "sha256": "178b6e3f6902f656f9a1c092792707452cf4dbff976d7603b5c75671e2c6e258"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "ODR-V412-03",
+   "kind": "state-machine-amendment",
+   "title": "State the failed final automatic reconciliation read (Rehearsal 8 DEV-R8-12)",
+   "question": "SM-SAVE defines (UnknownOutcome, ReconcileReadFailed) only while fewer than three automatic reads were made; when the third read fails the step fails closed with a request outstanding and the session cannot progress (Rehearsal 8 DEV-R8-12). Which transition applies?",
+   "options": [
+    "A: add T-S64 (UnknownOutcome + ReconcileReadFailed -> UnknownOutcome, three automatic reads already made): offer Check again, nothing outstanding, no further automatic reads except one per offline-to-online change (T-S30's effects, as Rehearsal 8 ratified)",
+    "B: leave the pair fail-closed"
+   ],
+   "recommendation": "A. The fail-safe reading Rehearsal 8 ratified: no write, no guess, a user-driven retry.",
+   "rationale": "Owner choice given 2026-11-02: write it to the table.",
+   "impact": "Until recorded, v4.1.2 cannot be compiled with T-S64 (ownerRecords).",
+   "approvalRecord": {
+    "how": "A change in an operator approval (recordFormat): {\"decision_id\": \"ODR-V412-03\", \"action\": \"select\", \"option\": \"A\"}, recorded by the owner with tools/owner-freeze.fsx decide v4.1.2. Selecting an option approves exactly what its 'applies' entry lists; the offline suite compares the package with it. Agents never write the record (RDP-003)."
+   },
+   "applies": {
+    "A": {
+     "transitions": [
+      {
+       "machine": "SM-SAVE",
+       "id": "T-S64",
+       "from": "UnknownOutcome",
+       "event": "ReconcileReadFailed",
+       "to": "UnknownOutcome",
+       "guard": "three automatic reads already made",
+       "effects": [
+        "offer Check again",
+        "nothing outstanding",
+        "no further automatic reads except one per offline-to-online change"
+       ],
+       "sources": [
+        "PERSIST-016",
+        "PERSIST-031"
+       ]
+      }
+     ],
+     "contracts": []
+    }
+   }
+  },
+  {
+   "id": "ODR-V412-05",
+   "kind": "state-machine-amendment",
+   "title": "Schedule the automatic reads where SM-SAVE leaves them unscheduled (independent review RV412-2-1, RV412-2-2)",
+   "question": "As recorded (APR-V412-OWNER-1), two paths leave a save in UnknownOutcome with no read scheduled, and Check again is not offered while automatic reads are left, so the save stalls. (1) T-S65, back online with automatic reads left, says the reads 'resume' but schedules none; if the scheduled read fell due while offline, nothing sends it. (2) T-S58 (read-back failed) and T-S59 (rebase read failed) enter UnknownOutcome without scheduling read 1, unlike T-S19. Which transitions apply?",
+   "options": [
+    "A: T-S65 schedules the next automatic read at once, replacing any pending one (ReconcileDue sends it under the 60 s window; this replaces T-S65 of ODR-V412-01); T-S58 and T-S59 keep their v4 effects and add 'schedule reconciliation read 1 after at least 2 s', as T-S19 does",
+    "B: leave the transitions as recorded (the stall stays)"
+   ],
+   "recommendation": "A. Every read is still sent by ReconcileDue, T-S31 or T-S32, so INV-04's window holds; the session always reaches T-S64 or a resolution.",
+   "rationale": "Owner choice given 2026-11-02: record the fix as a new decision and keep APR-V412-OWNER-1 as recorded.",
+   "impact": "Until recorded, v4.1.2 cannot be compiled (X12: T-S58, T-S59 and T-S65 name no operator approval).",
+   "approvalRecord": {
+    "how": "A change in an operator approval (recordFormat): {\"decision_id\": \"ODR-V412-05\", \"action\": \"select\", \"option\": \"A\"}, recorded by the owner with tools/owner-freeze.fsx decide v4.1.2. Selecting an option approves exactly what its 'applies' entry lists; the offline suite compares the package with it. Agents never write the record (RDP-003)."
+   },
+   "applies": {
+    "A": {
+     "transitions": [
+      {
+       "machine": "SM-SAVE",
+       "id": "T-S65",
+       "from": "UnknownOutcome",
+       "event": "WentOnline",
+       "to": "UnknownOutcome",
+       "guard": "automatic reads left",
+       "effects": [
+        "send nothing now",
+        "schedule the next automatic read at once, replacing any pending one; ReconcileDue sends it under the 60 s window"
+       ],
+       "sources": [
+        "PERSIST-016"
+       ]
+      },
+      {
+       "machine": "SM-SAVE",
+       "id": "T-S58",
+       "replaces": true,
+       "from": "Saving",
+       "event": "ReadBackReadFailed",
+       "to": "UnknownOutcome",
+       "guard": "current",
+       "effects": [
+        "the commit may hold the bytes; reconcile by marker and head before anything else is sent",
+        "schedule reconciliation read 1 after at least 2 s"
+       ],
+       "sources": [
+        "PERSIST-015",
+        "PERSIST-007"
+       ]
+      },
+      {
+       "machine": "SM-SAVE",
+       "id": "T-S59",
+       "replaces": true,
+       "from": "Saving",
+       "event": "RebaseReadFailed",
+       "to": "UnknownOutcome",
+       "guard": "current and online",
+       "effects": [
+        "state the cause (GitHub could not be read after a stale head); reconciliation decides, Check again is offered after the automatic reads; never Conflict, never Discard",
+        "schedule reconciliation read 1 after at least 2 s"
+       ],
+       "sources": [
+        "PERSIST-024",
+        "PERSIST-046",
+        "PERSIST-015"
+       ],
+       "residual": "After a known stale head nothing was written, so Unknown commit outcome's fixed words ('may or may not have reached GitHub') overstate the uncertainty. PAT-07 (PERSIST-046-O4) allows only Offline or Unknown commit outcome here, and Offline is untrue while online. Recorded as a residual for the owner, not resolved."
+      }
+     ],
+     "contracts": [],
+     "supersedes": [
+      {
+       "decision": "ODR-V412-01",
+       "transition": "T-S65"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "ODR-V412-04",
+   "kind": "package-approval",
+   "title": "Approve compiled package v4.1.2",
+   "question": "Approve requirements-compiled/v4.1.2 (successor of the approved v4.1.1) as the implementation plan: v4.1.1 plus ODR-V412-01..03 and -05?",
+   "options": [
+    "A: approve v4.1.2 after ODR-V412-01..03 and -05 are recorded",
+    "B: request changes",
+    "C: decline; build from v4.1.1"
+   ],
+   "recommendation": "A, after its independent review.",
+   "rationale": "Only the owner approves a package (RDP-003).",
+   "impact": "Until approved and tagged, v4.1.2 is a CANDIDATE.",
+   "approvalRecord": {
+    "how": "A change in an operator approval: {\"decision_id\": \"ODR-V412-04\", \"action\": \"approve-package\", \"package\": \"requirements-compiled/v4.1.2\", \"manifest_sha256\": \"<sha256 of package-manifest.json>\", \"review_sha256\": \"<sha256 of analysis/independent-review.json>\"}, recorded with tools/owner-freeze.fsx approve v4.1.2."
+   }
+  },
+  {
+   "id": "ODR-V414-01",
+   "kind": "amendment",
+   "title": "Run SU-OWN-DOTNET and SU-DOTNET-LIVE as one dotnet test of Causa.slnx with a filter",
+   "question": "The v4.1.2 runners of SU-OWN-DOTNET and SU-DOTNET-LIVE name several projects to one dotnet test, which the pinned SDK 10.0.402 refuses before any test runs (MSB1008, Rehearsal 009; docs/release-gate-repair). Replace them with one dotnet test of Causa.slnx and a FullyQualifiedName filter that selects exactly the tests each suite's matcher assigns?",
+   "options": [
+    "A: replace both runners as in analysis/amendment.json suiteRunners (tests, bindings, fixtures and environments unchanged)",
+    "B: one runner per project (splits each suite into several runs; needs a run-suites change)",
+    "C: keep v4.1.2's runners (the suites cannot execute)"
+   ],
+   "recommendation": "A. It is the smallest change that executes; r9.fsx suite-preflight and a real run on the Rehearsal 009 application show both suites execute and select exactly their tests.",
+   "rationale": "A suite runner is part of the frozen verification execution plan; only the owner changes it (RDP-003).",
+   "impact": "With C, 0 of the SU-DOTNET-LIVE obligations can ever be verified and the release gate refuses every candidate.",
+   "applies": {
+    "suiteRunners": [
+     "SU-OWN-DOTNET",
+     "SU-DOTNET-LIVE"
+    ]
+   }
+  },
+  {
+   "id": "ODR-V414-02",
+   "kind": "amendment",
+   "title": "Bootstrap a Playwright configuration that defines every project the plan names",
+   "question": "The plan's browser runners name the projects chromium and webkit; the bootstrap writes no Playwright configuration, and Conditor's scaffold defines chromium only, so SU-BROWSER-WEBKIT cannot execute ('Project(s) \"webkit\" not found', Rehearsal 009). Have the bootstrap write the integration-owned playwright.config.ts (already in the ownership manifest) with exactly the projects the runners name, and have every Playwright runner select it with --config playwright.config.ts?",
+   "options": [
+    "A: bootstrap playwright.config.ts and select it in the four Playwright runners",
+    "B: require integration to add the webkit project by hand at T0 (not checked)",
+    "C: remove WebKit from the plan (drops WebKit obligations; not recommended)"
+   ],
+   "recommendation": "A. WebKit stays mandatory; the configuration is generated and checked (X21), and r9.fsx suite-preflight executes it before readiness.",
+   "rationale": "Only the owner changes the frozen plan or the bootstrap (RDP-003).",
+   "impact": "With B the defect can recur silently; C removes required verification and needs its own scope decision.",
+   "applies": {
+    "suiteRunners": [
+     "SU-OWN-BROWSER",
+     "SU-BROWSER-CHROMIUM",
+     "SU-BROWSER-WEBKIT",
+     "SU-BROWSER-LIVE"
+    ],
+    "bootstrap": "playwright.config.ts"
+   }
+  },
+  {
+   "id": "ODR-V414-03",
+   "kind": "package-approval",
+   "title": "Approve compiled package v4.1.4",
+   "question": "Approve requirements-compiled/v4.1.4 (successor of the approved v4.1.2) as the implementation plan: v4.1.2 plus ODR-V414-01 and -02?",
+   "options": [
+    "A: approve v4.1.4 after ODR-V414-01 and -02 are recorded and it is independently reviewed",
+    "B: request changes",
+    "C: decline; build from v4.1.2"
+   ],
+   "recommendation": "A, after its independent review.",
+   "rationale": "Only the owner approves a package (RDP-003).",
+   "impact": "Until approved and tagged, v4.1.4 is a CANDIDATE and the Rehearsal 009 lock still pins v4.1.2.",
+   "approvalRecord": {
+    "how": "A change in an operator approval: {\"decision_id\": \"ODR-V414-03\", \"action\": \"approve-package\", \"package\": \"requirements-compiled/v4.1.4\", \"manifest_sha256\": \"<sha256 of package-manifest.json>\", \"review_sha256\": \"<sha256 of analysis/independent-review.json>\"}, recorded by the owner."
+   }
+  },
+  {
+   "id": "ODR-V415-01",
+   "kind": "interface-change",
+   "title": "E1: an event union that represents every causa-storage v1.0.0 event",
+   "question": "Frozen CoreEvent (28 cases) cannot represent 487 of the 1,315 catalog events (proposals/r10-historical-data-compatibility/SCHEMA-DIFF.md section 2). Extend it so every stored event is representable without loss?",
+   "options": [
+    "A: 00-DOMAIN-STUBS.fs CoreEvent 28 -> 50 cases: every v4.1.4 case name kept, 9 widened with the wire's fields (InvestigationActivated/Resolved/Reopened carry from; the four hypothesis transitions carry a HypothesisTransition; CauseConfirmed a CauseConfirmation; ProposalRejected a reason), 22 added, HypothesisFalsified without the Scope the wire lacks; EventEnvelope gains Provenance; payloads stay opaque (the domain owner's, with exactly the wire fields); 02-IF41-STORAGE.fs VerificationFailure gains ReaderStage (CONTRACT section 11.1)",
+    "B: keep v4.1.4 and declare the catalog unreadable (ODR-R10-25 B)"
+   ],
+   "recommendation": "A. It is the union checks C11/C15 proved lossless on all 1,315 catalog events, and it keeps every frozen case name.",
+   "rationale": "ODR-R10-25 A and OD-HC-01 A (recorded) commission it.",
+   "impact": "Until recorded, v4.1.5's contract changes cannot pass the offline suite.",
+   "approvalRecord": {
+    "how": "A change in an operator approval (recordFormat): {\"decision_id\": \"ODR-V415-01\", \"action\": \"select\", \"option\": \"A\"}, recorded by the owner with tools/owner-freeze.fsx decide v4.1.5, or under a delegated-authority record if the lead's checker is accepted by the owner-record checks. Selecting an option approves exactly what its 'applies' entry lists; the offline suite compares the package with it. Agents never write an owner record (RDP-003)."
+   },
+   "applies": {
+    "A": {
+     "transitions": [],
+     "contracts": [
+      {
+       "file": "contracts/00-DOMAIN-STUBS.fs",
+       "sha256": "605c75a920ea81dbaef4436ec5dbbaef28a8bf17868fa2baa3b3ca570439d54c"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "ODR-V415-02",
+   "kind": "interface-change",
+   "title": "W1 + L1: a derived workspace and listing a workspace",
+   "question": "No frozen contract can address a workspace or list the investigations it holds, so the build cannot browse the catalog (EXT-DATA-013) or find a working copy. Add them?",
+   "options": [
+    "A: Workspace (02), WorkspaceRole Catalog | WorkingCopy and WorkspaceAddress (03), WorkspaceLister/Listing as a read with no machine state (05), Msg.ListRequested/CreateRequested and Model.Listings/ListingsInFlight (06); PathOf, Verify, VerifiedInvestigation, Initial and LoadInput.OpenRequested carry the workspace. The workspace is derived (catalog: catalog/active.json; working copy: workspaces/demo/<run>) and selected by the user (EXT-DATA-003); the J1 Connect form is unchanged",
+    "B: a workspace field on the Connect form (needs owner changes to verification/journeys)"
+   ],
+   "recommendation": "A (OD-V415-05 A).",
+   "rationale": "Listing and addressing are the gap SCHEMA-DIFF.md section 5 names.",
+   "impact": "Until recorded, v4.1.5's contract changes cannot pass the offline suite.",
+   "approvalRecord": {
+    "how": "A change in an operator approval (recordFormat): {\"decision_id\": \"ODR-V415-02\", \"action\": \"select\", \"option\": \"A\"}, recorded by the owner with tools/owner-freeze.fsx decide v4.1.5, or under a delegated-authority record if the lead's checker is accepted by the owner-record checks. Selecting an option approves exactly what its 'applies' entry lists; the offline suite compares the package with it. Agents never write an owner record (RDP-003)."
+   },
+   "applies": {
+    "A": {
+     "transitions": [],
+     "contracts": [
+      {
+       "file": "contracts/02-IF41-STORAGE.fs",
+       "sha256": "924b677eadf3d02b752e802475f2079d096fe28b2cd72d33fe5b24fd2e1b6717"
+      },
+      {
+       "file": "contracts/03-IF41-WIRE.fs",
+       "sha256": "f02499fe8c099cd26e4cb4beb09fe152f784a907834163e1856349c545731f1d"
+      },
+      {
+       "file": "contracts/06-IF41-APP.fs",
+       "sha256": "413a8e7f1619dd0ff0b060d99dbcf242dc22b9778da3d053c9b0996f82df68fe"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "ODR-V415-03",
+   "kind": "state-machine-amendment",
+   "title": "C1: create a new investigation through the existing SM-SAVE states",
+   "question": "EXT-DATA-008 needs a command-created, round-trip-verified new investigation; SM-SAVE begins only from a verified stored history. Let a new investigation's session begin in Unsaved?",
+   "options": [
+    "A: SaveMachine.InitialNew starts in Unsaved at the head just read; the first save is one commit adding StorageCodec.EncodeNew's three files, conditional on that head, Saved only from an equal read-back; every later step is an existing transition. One 'accepted' note on SM-SAVE; no state, event or transition added",
+    "B: authorize a compiler change allowing an added SM-SAVE state"
+   ],
+   "recommendation": "A (OD-V415-04 A): X05/X12 stay as they are.",
+   "rationale": "PERSIST-005..007 already define the save; only its starting point is new.",
+   "impact": "Until recorded, v4.1.5's 05-IF41-SAVE.fs change cannot pass the offline suite.",
+   "approvalRecord": {
+    "how": "A change in an operator approval (recordFormat): {\"decision_id\": \"ODR-V415-03\", \"action\": \"select\", \"option\": \"A\"}, recorded by the owner with tools/owner-freeze.fsx decide v4.1.5, or under a delegated-authority record if the lead's checker is accepted by the owner-record checks. Selecting an option approves exactly what its 'applies' entry lists; the offline suite compares the package with it. Agents never write an owner record (RDP-003)."
+   },
+   "applies": {
+    "A": {
+     "transitions": [],
+     "accepted": [
+      {
+       "machine": "SM-SAVE",
+       "decision": "ODR-V415-03"
+      }
+     ],
+     "contracts": [
+      {
+       "file": "contracts/05-IF41-SAVE.fs",
+       "sha256": "7c7ffc70118c2bc821baefea24a2acf4592765d1151c5fd0013ee93426d92d2a"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "ODR-V415-04",
+   "kind": "package-approval",
+   "title": "Approve compiled package v4.1.5",
+   "question": "Approve requirements-compiled/v4.1.5 (successor of the approved v4.1.4) as the implementation plan: v4.1.4 plus ODR-V415-01, -02 and -03?",
+   "options": [
+    "A: approve v4.1.5 after ODR-V415-01..03 are recorded and it is independently reviewed",
+    "B: request changes",
+    "C: decline; build from v4.1.4 with ODR-R10-25 B's declared expected failures"
+   ],
+   "recommendation": "A, after its independent review.",
+   "rationale": "Only the owner approves a package (RDP-003).",
+   "impact": "Until approved and tagged, v4.1.5 is a CANDIDATE and the Rehearsal 010 lock still pins v4.1.4.",
+   "approvalRecord": {
+    "how": "A change in an operator approval: {\"decision_id\": \"ODR-V415-04\", \"action\": \"approve-package\", \"package\": \"requirements-compiled/v4.1.5\", \"manifest_sha256\": \"<sha256 of package-manifest.json>\", \"review_sha256\": \"<sha256 of analysis/independent-review.json>\"}, recorded by the owner."
+   }
+  }
+ ],
+ "recordFormat": "As package v4 (requirements-compiled/v4/proposals/owner-decision-requests.json recordFormat): one operator approval in kickoff/rehearsal-007/approvals.causa.json, one change per decision, committed by the owner without agent trailers."
+}
