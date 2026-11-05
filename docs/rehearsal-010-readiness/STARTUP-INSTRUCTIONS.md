@@ -110,6 +110,9 @@ Repeat until the deadline or a permitted stop:
 2. **Confirm** its requirements, obligations and dependencies in `slice-execution-manifest.json`. **Start** its Praxis work item.
 3. **Implement** on the branch `slice/SL-<work item>`. Keep `main` working. A pull request that changes implementation from a branch not named for its slice is refused by the governed gate.
 4. **Run** the slice's acceptance tests and the regression set.
+   - *Optional, owner-acknowledged 2026-11-05:* to see quickly which test projects and suites your change affects, run `dotnet fsi SRC/tools/r10/change-impact.fsx -- --indy-init SRC select $(git diff --name-only main...HEAD)`.
+     - It is feedback only. It verifies nothing; an unrecognised path selects everything.
+     - It never replaces the governed gate in step 5, which runs the full plan on every slice.
 5. **Open the pull request.** The governed Verification gate runs on the **merge result** of your branch onto the current `main`. It runs, in order:
    - the plan gate for the slice's work item;
    - governed catalog acceptance;

@@ -163,7 +163,7 @@ Independent review: ADVERSARIAL-REVIEW.md, round 6 (FAIL, fixed) and round 7.
 **For a launch on the approved plan today:**
 1. Run the bootstrap preflight P1–P8.
 2. Plan 10 min of set-up.
-3. Builders *may* use Level 1/2 locally (`change-impact.fsx`) before each PR, so fewer slices fail in the gate. It is a proposal, neither locked nor approved, so the owner should acknowledge it before the run. It never touches the gate (review RVO-6-5).
+3. Builders *may* use Level 1/2 locally (`change-impact.fsx`) before each PR, so fewer slices fail in the gate. The owner acknowledged builder use on 2026-11-05 (STARTUP-INSTRUCTIONS §4 step 4). It is not locked, and it never touches the gate (review RVO-6-5).
 4. Integration uses the handoff contract.
 5. Declare in advance the expected failures from ODR-R10-25 and -28.
 
