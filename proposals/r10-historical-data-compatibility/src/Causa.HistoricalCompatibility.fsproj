@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <AssemblyName>Causa.HistoricalCompatibility</AssemblyName>
+    <RootNamespace>Causa.HistoricalCompatibility</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Json.fs" />
+    <Compile Include="Primitives.fs" />
+    <Compile Include="EventEnvelope.fs" />
+    <Compile Include="EventDecoder.fs" />
+    <Compile Include="EventEncoder.fs" />
+    <Compile Include="StateSchema.fs" />
+    <Compile Include="StorageReader.fs" />
+    <Compile Include="ReplayAdapter.fs" />
+    <Compile Include="SuccessorContract.fs" />
+    <Compile Include="EventCompatibility.fs" />
+    <Compile Include="HistoricalLoader.fs" />
+  </ItemGroup>
+</Project>

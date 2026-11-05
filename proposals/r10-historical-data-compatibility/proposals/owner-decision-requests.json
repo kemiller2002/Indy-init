@@ -1,0 +1,111 @@
+{
+  "schema": "indy-init.owner-decision-requests/1",
+  "status": "requests; nothing here is a decision until the owner records it with tools/owner-freeze.fsx decide historical-compatibility",
+  "recordFormat": "A change in an operator approval APR-HC-OWNER-n of kickoff/rehearsal-007/approvals.causa.json: {\"decision_id\": \"OD-HC-nn\", \"action\": \"decide\", \"option\": \"<letter>\", \"pins\": [{\"path\", \"sha256\"}]}. Written and committed by the owner only (RDP-003).",
+  "requests": [
+    {
+      "id": "OD-HC-01",
+      "kind": "decision",
+      "title": "Commission the historical-compatibility successor contract",
+      "question": "Commission a successor package whose event union keeps all 28 frozen v4.1.4 CoreEvent names, widens 9, adds 22, adds Provenance {OccurredAt; Actor; CorrelationId; FormatVersion; SemanticVersion} to EventEnvelope, pins payload records to the causa-storage v1.0.0 wire tables and adds VerificationFailure.ReaderStage, exactly as the pinned SUCCESSOR-CONTRACT.md and src/SuccessorContract.fs state?",
+      "options": [
+        "A: commission it; an agent compiles the successor with X01-X21, an independent review follows, then FREEZE steps 1-5 and a tag",
+        "B: stay on v4.1.4 and record in advance that EXT-DATA-013 and EXT-DATA-005 cannot pass for the historical catalog",
+        "C: a different successor shape, which the owner specifies before any compile"
+      ],
+      "recommendation": "A. Checks C11 and C15 prove it lossless on all 1,315 historical events and keep every frozen case name.",
+      "rationale": "No agent may add union cases or field names to a frozen package (ADRP-005-O4); a successor needs the owner's decision first (FREEZE.md step 1).",
+      "impact": "With B, 487 of the 1,315 historical events have no frozen case and no event keeps its provenance; the catalog journeys fail acceptance.",
+      "pins": [
+        { "path": "proposals/r10-historical-data-compatibility/SUCCESSOR-CONTRACT.md" },
+        { "path": "proposals/r10-historical-data-compatibility/src/SuccessorContract.fs" }
+      ]
+    },
+    {
+      "id": "OD-HC-02",
+      "kind": "decision",
+      "title": "Version number of the successor",
+      "question": "ODR-R10-20 (UI ownership rebalancing) and ODR-R10-25 (storage mirror) also name a v4.1.5. Which number does the historical-compatibility content take?",
+      "options": [
+        "A: one combined v4.1.5 holding OD-HC-01 and whatever ODR-R10-20 and ODR-R10-25 approve",
+        "B: v4.1.5 holds OD-HC-01 only; UI ownership rebalancing becomes v4.1.6",
+        "C: UI ownership rebalancing is v4.1.5; OD-HC-01 becomes v4.1.6"
+      ],
+      "recommendation": "A if both are approved for the same rehearsal (one freeze cycle instead of two); otherwise B.",
+      "rationale": "Two unrelated packages cannot share one number; 4.1.3 stays unused (withdrawn).",
+      "impact": "Sets the directory, tag and lock pin of every downstream artifact."
+    },
+    {
+      "id": "OD-HC-03",
+      "kind": "decision",
+      "title": "Admissibility authority for the application's kernel",
+      "question": "causa-storage v1.0.0 §11.3 names the private engine's History.validate as the admissibility oracle, and OD-INDY-22 forbids copying it. 31 of the 35 engine-refused negative fixtures pass every check that does not need it (check C07). Where does the application's admissibility come from?",
+      "options": [
+        "A: the requirements-derived kernel must refuse all 35 CAUSA.HISTORY_INADMISSIBLE negative fixtures with their expected domain codes; check C07 becomes its acceptance test",
+        "B: defer admissibility; historical cases load read-only on structural validity plus a reproduced snapshot (see OD-HC-04)",
+        "C: let the rehearsal use the engine as a released dependency (amends OD-INDY-22)"
+      ],
+      "recommendation": "A for release acceptance, with B as the interim (OD-HC-04).",
+      "rationale": "A consumer that cannot evaluate admissibility must not report a history as valid (CONTRACT §11.3); EXT-DATA-005-O1 requires the F# admissibility pipeline.",
+      "impact": "Without A or C, Level C (authoritative reconstruction) cannot be claimed for any investigation."
+    },
+    {
+      "id": "OD-HC-04",
+      "kind": "decision",
+      "title": "Read-only interim for the catalog cases",
+      "question": "Until OD-HC-03 A exists, may the application show the four catalog cases labelled 'read-only, admissibility not evaluated', verified by reader stages 1-14, 16 and 17 with the projection byte-identical to the engine snapshot and equal to the catalog expectedStateSha256, as the pinned REPLAY-VERIFICATION.md describes?",
+      "options": [
+        "A: yes, labelled as such, with no writes to those cases and no 'verified' claim",
+        "B: no; nothing loads until admissibility is evaluated (EXT-DATA-005-O1 read literally)"
+      ],
+      "recommendation": "A. It meets EXT-DATA-013's 'to the states recorded in the catalog manifest' and keeps §11.3's 'MUST NOT report a history as valid'.",
+      "rationale": "Separates what is proven (projection) from what is not (admissibility).",
+      "impact": "With B, the M2 read journeys wait for the full admissibility kernel.",
+      "pins": [ { "path": "proposals/r10-historical-data-compatibility/REPLAY-VERIFICATION.md" } ]
+    },
+    {
+      "id": "OD-HC-05",
+      "kind": "decision",
+      "title": "How the adapter reaches a rehearsal",
+      "question": "OD-INDY-22 forbids a rehearsal to copy code from earlier work. How does the verified decoder and projection reach the application (pinned INTEGRATION-HANDOFF.md §4)?",
+      "options": [
+        "A: release it as a versioned package, as the Echelon tools are, and pin it in the dependency lock (route R1)",
+        "B: freeze CONTRACT §8.3 plus checks C02-C18 as owner-controlled verification assets; the rehearsal writes its own decoder and must pass them (route R2)",
+        "C: reference only; the rehearsal rebuilds the decoder from CONTRACT.md inside its window (route R3)"
+      ],
+      "recommendation": "B. It keeps 'start from the requirements alone' and still gives the rehearsal an executable target. A if speed matters more than OD-INDY-22's intent.",
+      "rationale": "Each route needs the owner: a release, a frozen asset, or an explicit choice to rely on rehearsal time.",
+      "impact": "Determines whether the verified decoder is used before the competition.",
+      "pins": [ { "path": "proposals/r10-historical-data-compatibility/INTEGRATION-HANDOFF.md" } ]
+    },
+    {
+      "id": "OD-HC-06",
+      "kind": "decision",
+      "title": "Content that causa-storage v1.0.0 cannot store",
+      "question": "The primary question (INV-023), observation source (INV-025), evidence label (INV-027), separate evidence URL (INV-029), relationship revise/withdraw (INV-030 update, INV-035, OD-INDY-23) and investigation rename/edit (INV-034, INV-035) have no v1.0.0 wire form (pinned SCHEMA-DIFF.md §6). What happens to them?",
+      "options": [
+        "A: commission causa-storage 1.1.0 (CONTRACT §13.1 compatible additive extension) with the fields and events, plus matching successor cases",
+        "B: descope them from historical and read-only views now; keep them for new working-copy investigations only after A",
+        "C: drop the requirements"
+      ],
+      "recommendation": "B now, then A. The historical cases do not contain these fields; inventing them would fabricate history.",
+      "rationale": "v1.0.0 refuses unknown data and has no extension namespace (CONTRACT §13.5).",
+      "impact": "Without A, journeys J1-03, J2-01, J2-03, J2-05, J2-06 and J2-09 cannot round-trip these fields.",
+      "pins": [ { "path": "proposals/r10-historical-data-compatibility/SCHEMA-DIFF.md" } ]
+    },
+    {
+      "id": "OD-HC-07",
+      "kind": "decision",
+      "title": "Rendering of the wire relationship kinds",
+      "question": "The wire relationship kind 'insufficient' (9 historical relationships) and 'discriminates' (0) have no INV-031 option, and INV-031's 'consistent-with' and 'inconclusive' have no wire value. How are historical relationships shown?",
+      "options": [
+        "A: show 'insufficient' as 'inconclusive' for historical cases, read-only, never written back",
+        "B: show the wire kind verbatim as an extra read-only label",
+        "C: amend INV-031 to include the wire kinds"
+      ],
+      "recommendation": "B, the only option that invents no meaning. A needs an explicit owner statement that the two mean the same.",
+      "rationale": "No source defines whether 'insufficient' means 'inconclusive'.",
+      "impact": "Decides J2-04 on the catalog cases."
+    }
+  ]
+}
