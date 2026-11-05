@@ -1,0 +1,317 @@
+{
+  "schema": "indy-init.r10-contract-first-ui.competition-ui-ownership/1",
+  "status": "Ownership record for workstream B of the owner's Parallel Acceleration Directive (2026-11-05 19:00 UTC), coordinated by the lead/integration session. Revises FILE-OWNERSHIP.json's ui-a/ui-b/ui-c to the directive's UI-1/UI-2/UI-3 areas; CF-10 A (three UI roles). Applies to the competition build; contracts and stubs only reach Indy-init main (OD-INDY-22).",
+  "agentCount": "Three UI areas. If only two UI agents are available, UI-1 and UI-2 start and UI-3 is assigned after M1 and M2 are stable (directive \u00a74).",
+  "buildOrder": [
+    "bootstrap: integration writes Projections.fs (IF41-VIEW with Causa.Ui.Contracts), UiFixtures, View.fs and web/index.html",
+    "UI-1, UI-2 and UI-3 build in parallel against IF41-VIEW and the fixture backend (Layers A and B); none edits another's files or any shared wiring",
+    "integration points follow the milestones: M1, M2 (UI-1, then UI-2's detail), M3 and M4 (UI-2), M5 (UI-3)"
+  ],
+  "verification": {
+    "perChange": "compile the role's files; dotnet test of its Causa.App.Tests/Ui tests against the fixture backend (Layer A)",
+    "perScreen": "its Playwright screen spec with the governed journey locators, axe-core and the four design-contract viewports (Layer B)",
+    "atIntegration": "slice-gate on the merged result: bound journey assertions on Chromium and WebKit against api.github.com, judged as ODR-R10-33 A decides (Layer C, unchanged)"
+  },
+  "areas": [
+    {
+      "id": "UI-1",
+      "name": "Application shell",
+      "directive": "browser startup and Limen integration, navigation and routing, Connect screen, investigation listing, loading and error states",
+      "files": [
+        "src/Causa.App/Connection.fs",
+        "src/Causa.App/Views/Shell.fs",
+        "src/Causa.App/Views/Connection.fs",
+        "src/Causa.App/Views/InvestigationList.fs",
+        "src/Causa.App/Views/States.fs",
+        "src/Causa.App/Views/Language.fs",
+        "src/Causa.App/Views/Administration.fs",
+        "src/Causa.App/Views/Settings.fs",
+        "web/screens/investigation-list.html",
+        "web/screens/investigation-list.css",
+        "web/screens/administration.html",
+        "web/screens/administration.css",
+        "web/screens/settings.html",
+        "web/screens/settings.css",
+        "web/screens/not-found.html",
+        "web/screens/not-found.css",
+        "tests/Causa.App.Tests/Ui/ConnectionTests.fs",
+        "tests/Causa.App.Tests/Ui/InvestigationListTests.fs",
+        "tests/Causa.App.Tests/Ui/StatesTests.fs",
+        "tests/Causa.App.Tests/Ui/AdministrationTests.fs",
+        "tests/Causa.App.Tests/Ui/SettingsTests.fs",
+        "tests/Causa.App.Tests/Ui/CrossViewConsistencyTests.fs",
+        "tests/Causa.TestSupport/UiFixtures/Scenarios.ui-1.fs"
+      ],
+      "requirements": [
+        "UI-001",
+        "UI-010",
+        "UI-011",
+        "UI-014",
+        "UI-017",
+        "UI-018",
+        "UI-019",
+        "UI-020",
+        "UI-022",
+        "UI-023",
+        "UI-024",
+        "UI-029",
+        "UI-031",
+        "INV-039",
+        "INV-040",
+        "INV-041",
+        "EXT-DATA-002",
+        "EXT-DATA-003",
+        "EXT-DATA-007"
+      ],
+      "buildableFrom": "bootstrap (IF41-VIEW with Causa.Ui.Contracts in Projections.fs, the UiFixtures backend)",
+      "integration": [
+        {
+          "milestone": "M1 connect",
+          "needs": [
+            "integration: Ui/UiAdapter.fs Connect mapping (already sketched in real-adapter-sketch)",
+            "persistence: Connect request and interpret (T20)",
+            "owner: tokens and App installation (ODR-R10-28)"
+          ],
+          "journeys": [
+            "J1-01",
+            "J1-02",
+            "J3-01",
+            "J3-02",
+            "J3-08"
+          ]
+        },
+        {
+          "milestone": "M2 browse",
+          "needs": [
+            "v4.1.5 listing operation (ODR-R10-25 A)",
+            "T25 catalog load",
+            "domain: event union able to replay the catalog (OD-HC-01 A)"
+          ],
+          "journeys": [
+            "J1-06",
+            "J3-09"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "UI-2",
+      "name": "Investigation workspace",
+      "directive": "investigation detail, creation, editing, save and reload interface, workspace state presentation",
+      "files": [
+        "src/Causa.App/Views/Workspace/Frame.fs",
+        "src/Causa.App/Views/Workspace/StoredRecord.fs",
+        "src/Causa.App/Views/Start.fs",
+        "src/Causa.App/Views/Workspace/Details.fs",
+        "src/Causa.App/Views/SaveIndicator.fs",
+        "src/Causa.App/Views/ConflictReview.fs",
+        "src/Causa.App/Views/History.fs",
+        "web/screens/workspace-frame.html",
+        "web/screens/workspace-frame.css",
+        "web/screens/investigation-start.html",
+        "web/screens/investigation-start.css",
+        "web/screens/workspace-save.html",
+        "web/screens/workspace-save.css",
+        "web/screens/workspace-details.html",
+        "web/screens/workspace-details.css",
+        "tests/Causa.App.Tests/Ui/FrameTests.fs",
+        "tests/Causa.App.Tests/Ui/StartTests.fs",
+        "tests/Causa.App.Tests/Ui/DetailsTests.fs",
+        "tests/Causa.App.Tests/Ui/SaveIndicatorTests.fs",
+        "tests/Causa.App.Tests/Ui/ConflictReviewTests.fs",
+        "tests/Causa.App.Tests/Ui/RoundTripTests.fs",
+        "tests/Causa.TestSupport/UiFixtures/Scenarios.ui-2.fs"
+      ],
+      "requirements": [
+        "UI-006",
+        "UI-013",
+        "UI-025",
+        "INV-001",
+        "INV-002",
+        "INV-003",
+        "INV-004",
+        "INV-005",
+        "INV-006",
+        "INV-007",
+        "INV-008",
+        "INV-015",
+        "INV-016",
+        "INV-017",
+        "INV-018",
+        "INV-019",
+        "INV-020",
+        "INV-021",
+        "INV-022",
+        "INV-023",
+        "INV-034",
+        "INV-035",
+        "INV-036",
+        "INV-037",
+        "INV-042",
+        "INV-043",
+        "PERSIST-030",
+        "PERSIST-031",
+        "PERSIST-032",
+        "PERSIST-033"
+      ],
+      "buildableFrom": "bootstrap",
+      "integration": [
+        {
+          "milestone": "M2 open (detail)",
+          "needs": [
+            "the same as UI-1 M2"
+          ],
+          "journeys": [
+            "J1-06"
+          ]
+        },
+        {
+          "milestone": "M3 create",
+          "needs": [
+            "v4.1.5 creation path (SaveMachine.InitialNew)",
+            "T19 session save machine"
+          ],
+          "journeys": [
+            "J1-03"
+          ]
+        },
+        {
+          "milestone": "M4 save and reload",
+          "needs": [
+            "T20, T21 live write path",
+            "T22 save states"
+          ],
+          "journeys": [
+            "J1-04",
+            "J1-05",
+            "J3-03",
+            "J3-04",
+            "J3-05",
+            "J3-06",
+            "J3-07"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "UI-3",
+      "name": "Hypotheses and evidence",
+      "directive": "hypothesis and evidence entry and editing, relationships, analysis presentation",
+      "files": [
+        "src/Causa.App/Reporting.fs",
+        "src/Causa.App/Views/Workspace/Overview.fs",
+        "src/Causa.App/Views/Workspace/Hypotheses.fs",
+        "src/Causa.App/Views/Workspace/Evidence.fs",
+        "src/Causa.App/Views/Workspace/Links.fs",
+        "src/Causa.App/Views/Workspace/Conclusions.fs",
+        "src/Causa.App/Views/Workspace/Timeline.fs",
+        "src/Causa.App/Views/Workspace/Inspector.fs",
+        "src/Causa.App/Views/Graph.fs",
+        "src/Causa.App/Views/Report.fs",
+        "web/screens/workspace-overview.html",
+        "web/screens/workspace-overview.css",
+        "web/screens/workspace-hypotheses.html",
+        "web/screens/workspace-hypotheses.css",
+        "web/screens/workspace-evidence.html",
+        "web/screens/workspace-evidence.css",
+        "web/screens/workspace-causal-analysis.html",
+        "web/screens/workspace-causal-analysis.css",
+        "web/screens/workspace-timeline.html",
+        "web/screens/workspace-timeline.css",
+        "tests/Causa.App.Tests/Ui/OverviewTests.fs",
+        "tests/Causa.App.Tests/Ui/HypothesesTests.fs",
+        "tests/Causa.App.Tests/Ui/EvidenceTests.fs",
+        "tests/Causa.App.Tests/Ui/LinksTests.fs",
+        "tests/Causa.App.Tests/Ui/ConclusionsTests.fs",
+        "tests/Causa.App.Tests/Ui/TimelineTests.fs",
+        "tests/Causa.App.Tests/Ui/InspectorTests.fs",
+        "tests/Causa.App.Tests/Ui/GraphTests.fs",
+        "tests/Causa.TestSupport/UiFixtures/Scenarios.ui-3.fs"
+      ],
+      "requirements": [
+        "UI-003",
+        "UI-004",
+        "UI-005",
+        "UI-026",
+        "UI-032",
+        "UI-033",
+        "UI-034",
+        "UI-038",
+        "INV-009",
+        "INV-010",
+        "INV-011",
+        "INV-012",
+        "INV-013",
+        "INV-014",
+        "INV-024",
+        "INV-025",
+        "INV-026",
+        "INV-027",
+        "INV-028",
+        "INV-029",
+        "INV-030",
+        "INV-031",
+        "INV-032",
+        "INV-033",
+        "INV-038",
+        "INV-044",
+        "WDL-001..015"
+      ],
+      "buildableFrom": "bootstrap (T23 graph also needs T24's layout-engine discovery)",
+      "integration": [
+        {
+          "milestone": "M5 analysis",
+          "needs": [
+            "domain kernel projections (T13) over the v4.1.5 event union",
+            "T21 live write path for recording",
+            "ODR-R10-26 A wire fields (INV-023, -025, -027, INV-031 values) from causa-data storage v1.1"
+          ],
+          "journeys": [
+            "J2-01",
+            "J2-02",
+            "J2-03",
+            "J2-04",
+            "J2-05",
+            "J2-06",
+            "J2-07",
+            "J2-08",
+            "J2-09"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "integration",
+      "name": "Shared wiring (lead)",
+      "directive": "project files, Program.fs, View.fs, Update dispatch",
+      "files": [
+        "src/Causa.App/Engine.fs",
+        "src/Causa.App/Routes.fs",
+        "src/Causa.App/Projections.fs",
+        "src/Causa.App/Ui/UiAdapter.fs",
+        "src/Causa.App/Ui/Events.fs",
+        "src/Causa.App/Update.fs",
+        "src/Causa.App/View.fs",
+        "src/Causa.App/Program.fs",
+        "src/Causa.App/Causa.App.fsproj",
+        "web/index.html",
+        "web/causa.css",
+        "web/causa-theme.css",
+        "build.fsx",
+        "tests/Causa.TestSupport/UiFixtures/CausaDataExtract.g.fs",
+        "tests/Causa.TestSupport/UiFixtures/Scenarios.fs",
+        "tests/Causa.TestSupport/UiFixtures/FixtureBackend.fs"
+      ],
+      "buildableFrom": "bootstrap: writes View.fs once with every ScreenView case wired, and web/index.html including every web/screens fragment",
+      "integration": [
+        {
+          "milestone": "every milestone",
+          "needs": [
+            "swap FixtureBackend for UiAdapter in the composition; screen modules do not change"
+          ],
+          "journeys": []
+        }
+      ]
+    }
+  ]
+}
