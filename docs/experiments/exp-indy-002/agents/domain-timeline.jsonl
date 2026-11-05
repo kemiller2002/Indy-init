@@ -1,0 +1,21 @@
+{"t":"2026-11-05T21:20:53Z","agent":"domain","group":"CG-1-START","event":"start","detail":"read contracts/registry; begin Engine project, validateStart, decide/evolve for StartInvestigation"}
+{"t":"2026-11-05T21:22:32Z","agent":"domain","group":"CG-1-START","event":"compile-pass","detail":"Engine + Tests first build clean"}
+{"t":"2026-11-05T21:22:32Z","agent":"domain","group":"CG-1-START","event":"tests","detail":"14 pass 0 fail; contract-check PASS"}
+{"t":"2026-11-05T21:22:32Z","agent":"domain","group":"CG-1-START","event":"complete","detail":"validateStart, decide/evolve/replay for StartInvestigation","durationSec":120}
+{"t":"2026-11-05T21:22:36Z","agent":"domain","group":"CG-2-HEADER","event":"start","detail":"CG-2..CG-5 all RELEASED; merged coordinator branch"}
+{"t":"2026-11-05T21:27:27Z","agent":"domain","group":"CG-2-HEADER","event":"complete","detail":"validators + decide/evolve cases implemented; tests pass"}
+{"t":"2026-11-05T21:27:27Z","agent":"domain","group":"CG-3-CONTENT","event":"complete","detail":"validators + decide/evolve cases implemented; tests pass"}
+{"t":"2026-11-05T21:27:27Z","agent":"domain","group":"CG-4-RELATIONSHIP","event":"complete","detail":"validators + decide/evolve cases implemented; tests pass"}
+{"t":"2026-11-05T21:27:27Z","agent":"domain","group":"CG-2-HEADER","event":"repair","detail":"tooling slip (not a compile failure): a shell heredoc command blocked on stdin for 120s and was killed; rewrote Validation.fs with the file tool","durationSec":150}
+{"t":"2026-11-05T21:27:27Z","agent":"domain","group":"CG-4-RELATIONSHIP","event":"compile-pass","detail":"CG-2..4 build clean first attempt"}
+{"t":"2026-11-05T21:27:27Z","agent":"domain","group":"CG-4-RELATIONSHIP","event":"tests","detail":"48 pass 0 fail; contract-check PASS"}
+{"t":"2026-11-05T21:27:27Z","agent":"domain","group":"CG-5-PERSISTENCE","event":"start","detail":"codec, saveTransition, memory store, Engine.ports"}
+{"t":"2026-11-05T21:28:59Z","agent":"domain","group":"CG-5-PERSISTENCE","event":"compile-fail","detail":"FS0041 ambiguous overload JsonObject.TryGetPropertyValue in Persistence.fs"}
+{"t":"2026-11-05T21:29:10Z","agent":"domain","group":"CG-5-PERSISTENCE","event":"repair","detail":"replaced with ContainsKey + indexer","durationSec":11}
+{"t":"2026-11-05T21:29:10Z","agent":"domain","group":"CG-5-PERSISTENCE","event":"compile-pass","detail":"Persistence.fs, Engine.fs, PersistenceTests.fs"}
+{"t":"2026-11-05T21:29:40Z","agent":"domain","group":"CG-5-PERSISTENCE","event":"tests","detail":"58 pass 0 fail; contract-check PASS; --tests missing only UI-owned UT-INV-005/022/036/039/040"}
+{"t":"2026-11-05T21:29:40Z","agent":"domain","group":"CG-5-PERSISTENCE","event":"contract-change-request","detail":"SaveState/SaveEvent (INV-015/INV-016, SM-SAVE): Saving carries no data, so 'write confirmed, read-back pending' cannot hold the confirmed (version, at) that Saved needs on ReadBackMatched. Proposed: add case 'Verifying of version:int * at:Timestamp' (or make ReadBackMatched carry version*at). Workaround in Persistence.saveTransition: WriteConfirmed(v,t) while Saving -> Saved(v,t) provisionally; ReadBackMatched keeps Saved; ReadBackMismatched from Saved or Saving -> SaveFailed."}
+{"t":"2026-11-05T21:29:40Z","agent":"domain","group":"CG-5-PERSISTENCE","event":"complete","detail":"encode/decode, saveTransition, MemoryStore save/load, Engine.ports","durationSec":300}
+{"t":"2026-11-05T21:30:26Z","agent":"domain","group":"CG-5-PERSISTENCE","event":"tests","detail":"merged coordinator CR-1/CR-2 (registry UI labels only, Contracts.fs unchanged, no domain repair needed); 58 pass 0 fail; contract-check PASS. All groups complete."}
+{"t":"2026-11-05T21:31:56Z","agent":"domain","group":"CG-5-PERSISTENCE","event":"repair","detail":"start CR-3 rework: ReadBackMatched of version*at; saveTransition + UT-INV-015/016"}
+{"t":"2026-11-05T21:32:47Z","agent":"domain","group":"CG-5-PERSISTENCE","event":"repair","detail":"complete CR-3 rework: WriteConfirmed keeps Saving, ReadBackMatched(v,t) -> Saved(v,t), ReadBackMismatched -> SaveFailed; UT-INV-015/016 updated; 59 pass 0 fail; no compile failures; contract-check PASS","durationSec":50}
