@@ -727,6 +727,61 @@
           "option": "A"
         }
       ]
+    },
+    {
+      "id": "APR-CFUI-OWNER-1",
+      "authority": {
+        "kind": "operator",
+        "id": "kemiller2002"
+      },
+      "date": "2026-11-05",
+      "changes": [
+        {
+          "decision_id": "CF-09",
+          "action": "decide",
+          "option": "A"
+        },
+        {
+          "decision_id": "CF-10",
+          "action": "decide",
+          "option": "A"
+        },
+        {
+          "decision_id": "CF-08",
+          "action": "decide",
+          "option": "A"
+        },
+        {
+          "decision_id": "CF-02",
+          "action": "decide",
+          "option": "A"
+        },
+        {
+          "decision_id": "CF-03",
+          "action": "decide",
+          "option": "A"
+        },
+        {
+          "decision_id": "CF-05",
+          "action": "decide",
+          "option": "A"
+        },
+        {
+          "decision_id": "CF-06",
+          "action": "decide",
+          "option": "A"
+        },
+        {
+          "decision_id": "CF-11",
+          "action": "decide",
+          "option": "A"
+        },
+        {
+          "decision_id": "CF-12",
+          "action": "decide",
+          "option": "A"
+        }
+      ]
     }
   ]
 }
