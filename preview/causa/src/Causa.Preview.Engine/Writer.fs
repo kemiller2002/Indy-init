@@ -37,21 +37,23 @@ let private line (investigationId: Uuid) (version: int64) (now: Timestamp) (corr
 let eventsOf (investigationId: Uuid) (nextVersion: int64) (now: Timestamp) (command: Command) : Result<string list, string> =
     let correlation = Uuid.v5 previewNamespace $"command/{investigationId.Text}/{nextVersion}/{now.Text}"
     let id kind = (Uuid.v5 previewNamespace $"{kind}/{investigationId.Text}/{nextVersion}").Text
-    let nonBlank what (s: string) = match Text.tryCreate s with Some _ -> Ok s | None -> Error $"{what} must contain a non-whitespace character"
+    let validated (errors: Validation.FieldError list) value =
+        match errors with
+        | [] -> Ok value
+        | es -> Error(es |> List.map (fun e -> e.Message) |> String.concat " ")
     match command with
     | Start(title, observation) ->
-        nonBlank "The title" title
-        |> Result.bind (fun t -> nonBlank "The observation" observation |> Result.map (fun o -> t, o))
+        validated (Validation.startForm title observation) (title, observation)
         |> Result.map (fun (t, o) ->
             [ line investigationId nextVersion now correlation "InvestigationStarted"
                   (JObj [ "title", JStr t; "observationId", JStr(id "observation"); "original", JStr o ]) ])
     | RecordObservation text ->
-        nonBlank "The observation" text
+        validated (Validation.observationText text) text
         |> Result.map (fun o ->
             [ line investigationId nextVersion now correlation "ObservationRecorded"
                   (JObj [ "observationId", JStr(id "observation"); "original", JStr o; "observedAt", JNull ]) ])
     | RecordHypothesis statement ->
-        nonBlank "The hypothesis" statement
+        validated (Validation.hypothesisStatement statement) statement
         |> Result.map (fun s ->
             [ line investigationId nextVersion now correlation "HypothesisRecorded"
                   (JObj [ "hypothesisId", JStr(id "hypothesis"); "statement", JStr s; "mechanism", JNull ]) ])
