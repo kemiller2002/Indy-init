@@ -177,7 +177,7 @@ let private workspaceEntries (ws: Workspace option) =
       b "editorReassess" (isEditor (function RelationshipEditor _ -> true | _ -> false))
       s "reassessTarget" revising
       items "reassessing" (match editor with
-                           | Some(RelationshipEditor rid, _) -> [ [ "id", S(idText.rel rid) ] ]
+                           | Some(RelationshipEditor rid, _) -> [ [ ("id", S(idText.rel rid)) ] ]
                            | _ -> [])
       b "canLink" (inv |> Option.exists (fun i -> not i.Evidence.IsEmpty && not i.Hypotheses.IsEmpty))
       b "cannotLink" (inv |> Option.forall (fun i -> i.Evidence.IsEmpty || i.Hypotheses.IsEmpty))
