@@ -1,0 +1,19 @@
+{
+  "schema": "exp-indy-002.contract-changes/1",
+  "changes": [
+    {
+      "id": "CR-1",
+      "contracts": ["INV-009", "INV-013", "INV-014", "INV-030", "INV-034", "INV-039", "INV-040"],
+      "groups": { "CG-2-HEADER": "v1->v2", "CG-3-CONTENT": "v1->v2", "CG-4-RELATIONSHIP": "v1->v2", "CG-5-PERSISTENCE": "v1->v2" },
+      "raisedBy": "verification agent (coordinator) while writing the independent browser acceptance test",
+      "cause": "The registry gave labels for fields and primary actions, but no accessible names for editor submit, per-item Edit, Reassess, Withdraw, the evidence and link openers, New investigation, or the open link. An independent test cannot find those controls, and the UI agent would have had to invent names.",
+      "change": "Added submitLabel=Confirm, itemEditLabel=Edit, openLabel, reviseLabel=Reassess, withdrawLabel=Withdraw, newActionLabel=New investigation, and accessibleName for open links. No F# type changed; Contracts.fs hash unchanged.",
+      "detectedAt": "2026-11-05T21:22:40Z",
+      "releasedAt": "2026-11-05T21:23:23Z",
+      "repairMinutes": { "coordinator": 2, "uiAgent": "measured at integration", "domainAgent": 0 },
+      "couldHaveBeenDetectedEarlier": "yes: the registry schema had no field for the accessible names of secondary controls, and contract-check did not require one for actions",
+      "notified": ["ui agent (SendMessage)"],
+      "affectedCode": "ui agent's web/index.html, if it had already written those controls"
+    }
+  ]
+}
