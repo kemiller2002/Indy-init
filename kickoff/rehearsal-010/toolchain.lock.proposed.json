@@ -79,11 +79,11 @@
   "path": "requirements-compiled/v4.1.4",
   "base": "requirements-compiled/v4",
   "packageVersion": "4.1.4",
-  "tag": "indy-init-requirements-v4.1.4 (not yet created)",
-  "tagCommit": null,
+  "tag": "indy-init-requirements-v4.1.4",
+  "tagCommit": "208ec9f187578c0e9c8b871361e302e58ffb84ba",
   "manifestSha256": "24c68f7a72e38f79c79b1385267806bd0c2eded9f0243a87596f5d3bb68f58df",
   "verificationPlanSha256": "8254ed03b991dd3d3a56a4e0bf5897c2484bbbf11e67e2f15e80309c1482b973",
-  "approval": "ODR-V414-01..03 (pending)"
+  "approval": "APR-V414-OWNER-1 (ODR-V414-01, -02), APR-V414-OWNER-2 (ODR-V414-03)"
  },
  "workstationTargetId": "indy-init-r9-workstation",
  "processEvidence": {
