@@ -386,7 +386,9 @@ r9case "acceptance-stale-catalog-evidence-refused" [ 4 ] [ "stale evidence: the 
 // A scope approved by an owner record: here a fixture of the catalog requirements only, approved in a scratch
 // approvals file. It is accepted as a scope while the full plan stays REFUSED, and says it claims nothing more.
 let fixtureScope = Path.Combine(work, "catalog-only-scope.json")
-let catalogJson = JsonNode.Parse(File.ReadAllText catalog)
+// The catalog Rehearsal 009 verified (its 38 requirements), read from its own verification evidence: the ratified
+// successor's INV-039..044 were added after it ended (ODR-R10-02), so they are not part of what it could accept.
+let catalogJson = JsonNode.Parse(File.ReadAllText r9Catalog)
 let catalogIds = catalogJson["requirements"].AsArray() |> Seq.map (fun r -> "\"" + r["id"].GetValue<string>() + "\"") |> List.ofSeq
 write fixtureScope ($"""{{"schema":"indy-init.competition-scope/1","id":"CS-FIXTURE-CATALOG-ONLY","status":"approved","approval":"ODR-FIXTURE-SCOPE","requirements":[],"catalogRequirements":[{String.Join(",", catalogIds)}]}}""")
 let approvals = Path.Combine(work, "approvals.json")

@@ -265,7 +265,9 @@ let real (source: string) : string list =
     let p0 = arr "requirements" s.Plan |> List.map (str "requirement")
     let inv = arr "requirements" s.Catalog |> List.map (str "id")
     [ if not (preflight m committed).IsEmpty then yield sprintf "real: the committed scope manifest is stale or altered: %A" (preflight m committed |> List.truncate 5)
-      if p0.Length <> 161 || inv.Length <> 38 then yield sprintf "real: %d P0 and %d catalog requirements (expected 161, 38)" p0.Length inv.Length
+      // The ratified CAT-CAUSA-INVESTIGATION successor (ODR-R10-02 = A, APR-R10-OWNER-1) has 44 requirements: Rehearsal 009's
+      // 38, unchanged, and INV-039..INV-044.
+      if p0.Length <> 161 || inv.Length <> 44 then yield sprintf "real: %d P0 and %d catalog requirements (expected 161, 44)" p0.Length inv.Length
       for id in p0 @ inv do
           if not (ids.Contains id) then yield sprintf "real: approved requirement %s is not in the manifest" id
       for r in reqs do
@@ -273,14 +275,16 @@ let real (source: string) : string list =
           for o in arr "obligations" r do
               if (strs "producers" o).IsEmpty then yield sprintf "real: %s has no producer" (str "id" o)
       let count k = field "counts" m |> Option.bind (intOpt k) |> Option.defaultValue -1L
-      if count "planObligations" <> 613L || count "planTests" <> 660L || count "obligations" <> 863L || count "mandatoryRequirements" <> 194L then
+      if count "planObligations" <> 613L || count "planTests" <> 660L || count "obligations" <> 890L || count "mandatoryRequirements" <> 200L then
           yield sprintf "real: counts %s" (field "counts" m |> Option.map serialize |> Option.defaultValue "")
 
       // Rehearsal 009 as it ended (evidence/FINAL-REPORT.md): every catalog requirement implemented and all but
       // INV-029 verified, INV-003 not applicable, no P0 requirement started, the release gate unable to run three
       // suites. It asked to stop at 02:25Z, 115 minutes after T0, for the reasons it gave.
-      let catalogIds = inv
-      let catalogObligations = reqs |> List.filter (fun r -> str "origin" r = "catalog" && str "id" r <> "INV-029" && str "id" r <> "INV-003") |> List.collect (arr "obligations") |> List.map (str "id")
+      // Rehearsal 009 had the catalog's first 38 requirements; the successor's six were added after it ended (ODR-R10-02).
+      let successorOnly = set [ "INV-039"; "INV-040"; "INV-041"; "INV-042"; "INV-043"; "INV-044" ]
+      let catalogIds = inv |> List.filter (successorOnly.Contains >> not)
+      let catalogObligations = reqs |> List.filter (fun r -> str "origin" r = "catalog" && List.contains (str "id" r) catalogIds && str "id" r <> "INV-029" && str "id" r <> "INV-003") |> List.collect (arr "obligations") |> List.map (str "id")
       let events =
           [ started "WI-INV-START" (catalogIds |> List.filter (fun i -> reqs |> List.exists (fun r -> str "id" r = i && List.contains "WI-INV-START" (strs "workItems" r))))
             started "WI-INV-WORKSPACE" (catalogIds |> List.filter (fun i -> reqs |> List.exists (fun r -> str "id" r = i && List.contains "WI-INV-WORKSPACE" (strs "workItems" r))))
@@ -297,7 +301,19 @@ let real (source: string) : string list =
           let asked = [ decide st r9Clock (str "scopeSha256" m) [] (q "complete"); decide st r9Clock (str "scopeSha256" m) [] (q "release-gate-failed"); decide st r9Clock (str "scopeSha256" m) [] (q "conserve-compute") ]
           for d in asked do
               if d.Permitted then yield sprintf "r9 replay: the Rehearsal 009 stop was permitted (%A)" (codes d)
-          if not (List.contains "CATALOG_IS_NOT_SCOPE" (codes asked.Head)) then yield sprintf "r9 replay: 'complete' not refused as catalog-only: %A" (codes asked.Head)
+          // Against the ratified scope Rehearsal 009 did not even finish the catalog (INV-039..INV-044 are new), so its
+          // 'complete' is refused as incomplete scope.
+          if not (List.contains "SCOPE_INCOMPLETE" (codes asked.Head)) then yield sprintf "r9 replay: 'complete' not refused as incomplete scope: %A" (codes asked.Head)
+          // The same claim with the whole ratified catalog done and no P0 requirement started is refused as catalog-only.
+          let wholeCatalog = reqs |> List.filter (fun r -> str "origin" r = "catalog" && str "id" r <> "INV-029" && str "id" r <> "INV-003") |> List.collect (arr "obligations") |> List.map (str "id")
+          let byItem (wi: string) = inv |> List.filter (fun i -> reqs |> List.exists (fun r -> str "id" r = i && List.contains wi (strs "workItems" r)))
+          let catalogItems = reqs |> List.filter (fun r -> str "origin" r = "catalog") |> List.collect (strs "workItems") |> List.distinct
+          match replay m ((catalogItems |> List.map (fun wi -> started wi (byItem wi))) @ [ completed inv ] @ (wholeCatalog |> List.map passed)) with
+          | Error e -> yield sprintf "r9 replay (whole catalog): %s" e
+          | Ok st2 ->
+              let d = decide st2 r9Clock (str "scopeSha256" m) [] (q "complete")
+              if d.Permitted then yield "r9 replay (whole catalog): 'complete' was permitted with no P0 requirement started"
+              if not (List.contains "CATALOG_IS_NOT_SCOPE" (codes d)) then yield sprintf "r9 replay (whole catalog): 'complete' not refused as catalog-only: %A" (codes d)
           if asked.Head.MinutesRemaining <> 306 then yield sprintf "r9 replay: %d minutes remaining, expected 306" asked.Head.MinutesRemaining
           if asked.Head.OpenMandatory.Length < 161 then yield sprintf "r9 replay: only %d open mandatory requirements" asked.Head.OpenMandatory.Length
           if asked.Head.IndependentWorkItems.IsEmpty then yield "r9 replay: no independent work offered while the gate is blocked" ]

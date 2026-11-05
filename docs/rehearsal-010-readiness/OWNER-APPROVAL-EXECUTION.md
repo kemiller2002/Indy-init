@@ -27,7 +27,7 @@
 | requirements | 199 | 199 | 199 | **205** |
 | obligations | 863 | 863 | 863 | **890** |
 | work items | 35 | 36 | 36 | **37** |
-| scopeSha256 | `b407b5cc…` | `fefde8a1…` | `9d5a121e…` (after FREEZE step 2; `5a8aef29…` before) | computed after ratification |
+| scopeSha256 | `b407b5cc…` | `fefde8a1…` | `9d5a121e…` (after FREEZE step 2; `5a8aef29…` before) | `59bfef5a…` (ratified, step 10) |
 
 **Why the numbers differ:**
 - `main` added `WI-GEN-RECORDS`, which gives the 16 record-only AR requirements a work item. That makes 36 work items.

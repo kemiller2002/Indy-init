@@ -31,7 +31,7 @@ The remaining conditions are owner actions, set out as one ordered transaction i
 | Integrated head | **`7e6dca7`** for §3–§5. The v4.1.4 package and scope rows below are FREEZE step 2's, compiled after the owner recorded APR-V414-OWNER-1 |
 | Base | `main` `cae4102`, the merge of #102. #104 merges it (`cadf4e4`) |
 | Successor package | `requirements-compiled/v4.1.4` (CANDIDATE; X01–X21 PASS); package-manifest `24c68f7a…`, compiled with the owner's APR-V414-OWNER-1 (FREEZE step 2) |
-| Scope (as compiled now) | `9d5a121e5f94917b0db3227ab135e09244214ee6ddb22d04a5d44bf4a2662d37`. **Not the approval digest**: it changes if the successor is ratified (§2) |
+| Scope (as compiled now) | `59bfef5a62a3ab43ef19c08b5915ffaf3d408bd55d8add874c5f1071e7cd087c`: the frozen v4.1.4 and the ratified catalog (205 requirements, 890 obligations, 37 work items). ODR-R10-01 approves this digest |
 | Proposed lock | `kickoff/rehearsal-010/toolchain.lock.proposed.json`; every digest matches its file |
 
 **What the merge with `main` changed** (details in OWNER-APPROVAL-EXECUTION §0):
@@ -60,7 +60,7 @@ The remaining conditions are owner actions, set out as one ordered transaction i
 - The mission's 35 work items predate `main`'s `WI-GEN-RECORDS`.
 - The expected digest `b407b5cc…` was #104's scope before the merge.
 - Per the mission, **the scope-approval transaction stops on this difference.** `owner-freeze.fsx decide rehearsal-010` does not ask ODR-R10-01 until the scope is compiled from the frozen v4.1.4 and the ratified catalog.
-- Slices: 36, all 199 requirements placed, 0 unassigned (SLICE-EXECUTION-PLAN §1).
+- Slices: 37, all 205 requirements placed, 0 unassigned (SLICE-EXECUTION-PLAN §1).
 
 ## 3. Verification at `7e6dca7`
 

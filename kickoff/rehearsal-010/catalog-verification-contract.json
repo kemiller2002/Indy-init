@@ -5,8 +5,8 @@
   "catalog": {
     "path": "requirements/catalogs/causa-investigation.requirement-catalog.json",
     "catalogId": "CAT-CAUSA-INVESTIGATION",
-    "sha256": "19a036682876b496a1785890ab22203931eb7afe7bf519f4c15526ac36f2d5af",
-    "ratified": "Indy-init 0ab8ffd (INV-001..018) and 7cefdc6 (INV-019..038, PR #98)"
+    "sha256": "7e5e8a400b52d79218e2fb42927d5cb122cc0e6c8ab002f146b33198647ce53c",
+    "ratified": "Indy-init 0ab8ffd (INV-001..018), 7cefdc6 (INV-019..038, PR #98) and the successor ab24c4a (INV-039..044; ODR-R10-02 = A, APR-R10-OWNER-1, PR #114)"
   },
   "governedProducers": [ "governed-gate" ],
   "faultSensitivity": [

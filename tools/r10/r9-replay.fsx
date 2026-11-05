@@ -142,7 +142,10 @@ let checks =
       check "RP-06" "Missing independent acceptance evidence (builder-run catalog verdict)" "observed" "catalog-acceptance not governed: PRODUCER_NOT_GOVERNED, and CATALOG_WRONG_COMMIT (33d072d is not the release candidate 39dc037)" (refused [ "PRODUCER_NOT_GOVERNED"; "CATALOG_WRONG_COMMIT" ]) catalog
       check "RP-07" "Incomplete scope presented as the approved scope" "observed" "completion-gate INCOMPLETE: SCOPE_NOT_INTEGRATED, RELEASE_GATE_REFUSED, CATALOG_NOT_GOVERNED_ACCEPTED, JOURNEYS_MISSING, DESIGN_CONTRACT_MISSING" (refused [ "SCOPE_NOT_INTEGRATED"; "RELEASE_GATE_REFUSED"; "CATALOG_NOT_GOVERNED_ACCEPTED"; "JOURNEYS_MISSING" ]) completion
       check "RP-08" "Premature stopping (115 of 420 minutes, compute)" "observed" "stop-decision CONTINUE_REQUIRED: NOT_A_STOP_CONDITION" (refused [ "NOT_A_STOP_CONDITION"; "CONTINUE_REQUIRED" ]) stopConserve
-      check "RP-09" "Premature stopping claimed as complete (catalog only)" "observed" "stop-decision CONTINUE_REQUIRED: CATALOG_IS_NOT_SCOPE, SCOPE_NOT_INTEGRATED" (refused [ "CATALOG_IS_NOT_SCOPE"; "SCOPE_NOT_INTEGRATED" ]) stopComplete
+      // Against the ratified scope (ODR-R10-02 = A) Rehearsal 009 did not finish even the catalog (INV-039..044 are new),
+      // so its catalog-only 'complete' is refused as incomplete scope; CATALOG_IS_NOT_SCOPE, a finished catalog with no
+      // P0 work, stays covered by the offline suite's whole-catalog replay (ScopeTests.real).
+      check "RP-09" "Premature stopping claimed as complete (catalog only)" "observed" "stop-decision CONTINUE_REQUIRED: SCOPE_INCOMPLETE, SCOPE_NOT_INTEGRATED" (refused [ "SCOPE_INCOMPLETE"; "SCOPE_NOT_INTEGRATED" ]) stopComplete
       check "RP-10" "Premature stopping because the release gate failed" "observed" "stop-decision CONTINUE_REQUIRED: NOT_A_STOP_CONDITION (a failed gate is a result, not a stop condition)" (refused [ "NOT_A_STOP_CONDITION" ]) stopGate
       check "RP-11" "Incorrect Praxis sequencing (scope checkpoint)" "observed" "scope order REFUSED: IMPLEMENTATION_BEFORE_CHECKPOINT" (refused [ "IMPLEMENTATION_BEFORE_CHECKPOINT" ]) order
       check "RP-12" "Incorrect Praxis sequencing (initialization checkpoint)" "observed" "check-sequencing reports implementation commits before authorization" (fun (e, o) -> e <> 0 && o.Contains "edde38c") sequencing

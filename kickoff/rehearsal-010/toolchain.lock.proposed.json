@@ -1,6 +1,6 @@
 {
  "schema": "indy-init.r9-toolchain-lock/1",
- "description": "Proposed toolchain, requirements package and governed contracts for Rehearsal 010: Rehearsal 009's Conditor and process-evidence pins, the successor package v4.1.4 (corrected suite runners), and the governed catalog, design and deadline contracts of the adversarial-audit remediation. The resolved set must be replaced by an echelon-current set carrying Dokimos 0.11.1 (url-input). Change this file only through the owner decision process.",
+ "description": "Proposed toolchain, requirements package and governed contracts for Rehearsal 010: Rehearsal 009's Conditor and process-evidence pins, the successor package v4.1.4 (corrected suite runners), and the governed catalog, design and deadline contracts of the adversarial-audit remediation. The resolved set is echelon-current 1.37.0, which carries Dokimos 0.11.1 (url-input). Change this file only through the owner decision process.",
  "conditor": {
   "version": "0.10.20",
   "tag": "v0.10.20",
@@ -43,37 +43,38 @@
  },
  "resolvedSet": {
   "registry": "kemiller2002/echelon-registry",
-  "commit": "de72a4069af64e99fc7da188f76f0f22cfa4f89c",
+  "commit": "575240233d1fc32b57cfa827ea1031b68609fc58",
   "channel": "echelon-current",
-  "profileVersion": "1.36.0",
+  "profileVersion": "1.37.0",
   "platforms": {
    "linux-x64": {
     "path": "channels/echelon-current/linux-x64.json",
-    "sha256": "1189bc9bcb90dbc375d3af829569455349f17e2be3941da46230e57d83161797"
+    "sha256": "bba3594ad1db8a4cee3550620c4a86dd5cbb5ce2f4bc183ea50951476b29ca91"
    },
    "linux-arm64": {
     "path": "channels/echelon-current/linux-arm64.json",
-    "sha256": "f7cffd15abf09b37b1becd7d6ddfd489b8c304611b5faf006696c55b41f7bad6"
+    "sha256": "84be0c098b6bdda425e2628fb174e5e85c10f8b87081c00600158fb8caa9072b"
    },
    "osx-x64": {
     "path": "channels/echelon-current/osx-x64.json",
-    "sha256": "6a20fd7129b6f266b0235b3fc0543de4fd6b0170b4da4db3af80503a529aabd1"
+    "sha256": "ea7682ab0d7937644a1268d14efb87ba3f5a6043ce7d44579f9fd4d1272a5c57"
    },
    "osx-arm64": {
     "path": "channels/echelon-current/osx-arm64.json",
-    "sha256": "82d9958c1f3f37272ce9ac9c20109351d10f10c5b5886000de9cde7b238c8465"
+    "sha256": "b8db37491977d810180d07f429f671adecac0e360d7a9bc3786a87c2f250c566"
    },
    "win-x64": {
     "path": "channels/echelon-current/win-x64.json",
-    "sha256": "d4e6be86b69d267c8f181570b0ffd10d0dacccf789fe98ce7acd27a546c3b74b"
+    "sha256": "d8409d60a4933320e6aeb5af8037cb73e940c37436db002793312d943ed3fb0f"
    }
   },
   "expectedTools": {
    "praxis": "3.25.0",
-   "dokimos": "0.11.0",
+   "dokimos": "0.11.1",
    "percepta-semantic": "0.4.0",
    "ordo": "1.20.0"
-  }
+  },
+  "approval": "echelon-current 1.37.0 approved by the owner (sets/echelon-current/1.37.0.json, OD-INDY-8; echelon-registry#109 merged as 5752402) after Conditor qualified it (conditor#131)"
  },
  "requirementsPackage": {
   "path": "requirements-compiled/v4.1.4",
@@ -87,40 +88,40 @@
  },
  "workstationTargetId": "indy-init-r9-workstation",
  "processEvidence": {
-  "description": "Record-bound obligations (plan suites with runner evidence-record, identities praxis:<kind>) are judged by requirements-compiler verify-process against this plan and these rules, with attestations the CI run observes itself. rulesSha256 is null until the owner pins the Rehearsal 010 rules (ODR-R10-14); while it is null the record gate fails closed.",
+  "description": "Record-bound obligations (plan suites with runner evidence-record, identities praxis:<kind>) are judged by requirements-compiler verify-process against this plan and these rules, with attestations the CI run observes itself. rulesSha256 pins the Rehearsal 010 rules the owner recorded (ODR-R10-14, APR-R10-OWNER-1).",
   "plan": "requirements-compiled/v4/verification-plan.json",
   "planDigest": "1e3c66bcc958a60415811ffbe2795b5e7147360340749c16e1a0f43fc19c751d",
   "rules": "kickoff/rehearsal-010/process-evidence-rules.json",
-  "rulesSha256": null,
+  "rulesSha256": "36172c57721419714a414334cd65a1548da5c0bc6318f55f73b77a207546344d",
   "proposedSha256": "36172c57721419714a414334cd65a1548da5c0bc6318f55f73b77a207546344d",
-  "rulesStatus": "PROPOSED: regenerated from the confirmed Rehearsal 009 rules for indy-init-rehearsal-010; the owner pins it (ODR-R10-14)"
+  "rulesStatus": "PINNED: the owner recorded ODR-R10-14 = A with this file's digest (APR-R10-OWNER-1)"
  },
- "status": "PROPOSED: not an owner pin. The owner adopts it by renaming it to toolchain.lock.json in their own commit after ODR-V414-01..03 are recorded and v4.1.4 is tagged, a Dokimos release carrying the url-input fix is registered in an approved echelon-current set and replaces the resolved set, and ODR-R10-01..09 are recorded. Until then Rehearsal 010 has no approved lock.",
+ "status": "PROPOSED: not an owner pin. Recorded: v4.1.4 (APR-V414-OWNER-1, -2; tag indy-init-requirements-v4.1.4), the Rehearsal 010 decisions and the ratified catalog (APR-R10-OWNER-1), echelon-current 1.37.0 with Dokimos 0.11.1 (echelon-registry#109). Still the owner's: ODR-R10-03 again (the catalog contract now names the ratified catalog) and ODR-R10-01 for this scopeSha256, then the live-provider run, then renaming this file to toolchain.lock.json in the owner's own commit (ODR-RG-04). Until then Rehearsal 010 has no approved lock.",
  "scope": {
   "manifest": "docs/rehearsal-010-readiness/scope-manifest.json",
-  "scopeSha256": "9d5a121e5f94917b0db3227ab135e09244214ee6ddb22d04a5d44bf4a2662d37",
-  "approval": "ODR-R10-01 (pending; asked by owner-freeze.fsx decide rehearsal-010 only once v4.1.4 is tagged and the scope is recompiled from it and the ratified catalog)",
+  "scopeSha256": "59bfef5a62a3ab43ef19c08b5915ffaf3d408bd55d8add874c5f1071e7cd087c",
+  "approval": "ODR-R10-01 (pending: the owner approves this scopeSha256 with owner-freeze.fsx decide rehearsal-010; v4.1.4 is tagged and the catalog ratified, APR-R10-OWNER-1 ODR-R10-02)",
   "rule": "scope preflight and the Praxis coverage check must pass and the scope checkpoint must be committed before any application code (STARTUP-INSTRUCTIONS.md)"
  },
  "catalogVerification": {
   "contract": "kickoff/rehearsal-010/catalog-verification-contract.json",
-  "contractSha256": "808de8a9fe43a4b1f8bfe7fb9f789a6de8f5e23ab27d878dfb675c74ada02a9a",
-  "approval": "ODR-R10-03, ODR-R10-04 (pending)"
+  "contractSha256": "3d587618abce0c5f3bb470ffde05bab81c38f82f059180d68ba9b70fd8b67317",
+  "approval": "ODR-R10-03 (pending again: the contract now names the ratified catalog, so owner-freeze.fsx decide rehearsal-010 asks it again), ODR-R10-04 (APR-R10-OWNER-1)"
  },
  "designContract": {
   "contract": "kickoff/rehearsal-010/design-contract.json",
   "contractSha256": "366ed579446636d31894e77ab63877d5dc5f4ef0e935ae14f089b4360780482a",
-  "approval": "ODR-R10-05 (pending)"
+  "approval": "APR-R10-OWNER-1 (ODR-R10-05)"
  },
  "deadlinePolicy": {
   "path": "kickoff/rehearsal-010/deadline-policy.json",
   "sha256": "9f6ac357b09190074efcc3bdba851ddce0ebd8cca56d3c0fe69fe7ba8499a4e0",
-  "approval": "ODR-R10-06 (pending)"
+  "approval": "APR-R10-OWNER-1 (ODR-R10-06)"
  },
  "journeys": {
   "bindings": "verification/journeys/bindings.json",
   "bindingsSha256": "cd68237205ff8f56503c46bdb6dc925085a3b07c9306ab6f9979f2b17b9754dd",
-  "approval": "ODR-R10-07 (pending)"
+  "approval": "APR-R10-OWNER-1 (ODR-R10-07)"
  },
  "testRepository": {
   "owner": "kemiller2002",
@@ -130,7 +131,7 @@
   "visibility": "private",
   "data": "synthetic only; resettable; evidence lives in the governed CI artifacts",
   "credential": "a GitHub App installed on this repository alone (Contents: read and write); installation token minted per job by actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 (v3.3.0), scoped to this repository, revoked at job end; secrets CAUSA_ACCEPTANCE_APP_CLIENT_ID and CAUSA_ACCEPTANCE_APP_KEY",
-  "approval": "ODR-R10-09 (pending)"
+  "approval": "APR-R10-OWNER-1 (ODR-R10-09)"
  },
  "ownerDecisionRequests": {
   "path": "kickoff/rehearsal-010/proposals/owner-decision-requests.json",

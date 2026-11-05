@@ -16,9 +16,9 @@ The prompt says this and nothing narrower:
 ## 1. What you are building
 
 **The whole approved scope:**
-- 199 requirements (194 mandatory) and 863 obligations;
+- 205 requirements (200 mandatory) and 890 obligations;
 - 161 P0 requirements of the frozen plan (613 obligations);
-- the 38 requirements of the ratified catalog CAT-CAUSA-INVESTIGATION (250 obligations);
+- the 44 requirements of the ratified catalog CAT-CAUSA-INVESTIGATION, its successor included (INV-039..044; 277 obligations);
 - nothing excluded.
 
 **What is not the scope:**
