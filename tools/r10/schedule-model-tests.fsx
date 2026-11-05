@@ -27,7 +27,7 @@ let case (name: string) (problems: string list) =
         printfn "%-72s FAIL" name
         problems |> List.truncate 5 |> List.iter (printfn "    %s")
 
-let cfg setup lanes = { Setup = setup; Merge = 3.0; Window = 420.0; QueueDepth = 1; FailEvery = 0; RepairFraction = 0.25; Scale = 1.0; SliceOverhead = 0.0; Milestones = []; Priority = "tail"; DefaultMinutes = 20.0; Lanes = parseLanes lanes }
+let cfg setup lanes = { Setup = setup; Merge = 3.0; Window = 420.0; QueueDepth = 1; FailEvery = 0; RepairFraction = 0.25; Scale = 1.0; SliceOverhead = 0.0; Milestones = []; Priority = "tail"; DefaultMinutes = 20.0; Lanes = parseLanes lanes; MergeDeps = Map.empty }
 let manifest = at "docs/rehearsal-010-readiness/slice-execution-manifest.json"
 let roles = at "docs/rehearsal-010-optimization/inputs/slice-roles.v414.json"
 let ownLanes = "integration:integration,domain:domain,persistence:persistence,ui:ui,ui-2:ui-2,reviewer:reviewer"
@@ -231,6 +231,33 @@ case "committed milestone runs R0-R6 reproduce (finish, obligations, milestones,
                   let usableNode = sc["usableMilestonesAt"]
                   let committedUsable = usableNode[k].GetValue<int>()
                   if usableAt times w <> committedUsable then yield sprintf "%s ci %.0f: %d usable at %s, committed %d" file ci (usableAt times w) k committedUsable ]
+
+// merge-time dependencies (the journeys rule; CF-07 in PR #121)
+case "a merge dependency delays integration, not building: B waits on main for A"
+    [ let two = synth [ "A", []; "B", [] ] (fun id -> id)
+      let c = { cfg 0.0 "a:A,b:B" with MergeDeps = Map.ofList [ "B", [ "A" ] ] }
+      let two = two |> List.map (fun s -> if s.Id = "A" then { s with Minutes = 30.0 } else s)
+      let r = simulate c 5.0 two
+      if r["B"].Implemented >= r["A"].Implemented then yield sprintf "B was not built first (B %.0f, A %.0f)" r["B"].Implemented r["A"].Implemented
+      if r["B"].Integrated <= r["A"].Integrated then yield sprintf "B integrated at %.0f, before or with A at %.0f" r["B"].Integrated r["A"].Integrated ]
+case "no slice integrates before its merge dependencies (real successor plan, derived merge deps)"
+    [ let suc = loadSlices successorManifest (Some roles) ownC
+      // a deterministic synthetic merge-dependency set over the real plan: every UI slice needs SL-T20 on main
+      let md = suc |> List.filter (fun s -> s.Role = "ui" && s.Id <> "SL-T16") |> List.map (fun s -> s.Id, [ "SL-T20" ]) |> Map.ofList
+      let md = deferCyclic suc md
+      let r = simulate { ownC with Setup = 25.0; QueueDepth = 3; MergeDeps = md } 10.0 suc
+      for KeyValue(s, ds) in md do
+          for d in ds do
+              if r[s].Integrated < r[d].Integrated then yield sprintf "%s integrated at %.0f before its merge dependency %s at %.0f" s r[s].Integrated d r[d].Integrated ]
+case "cyclic merge dependencies are detected, and CF-07 deferral removes exactly them"
+    [ let two = synth [ "A", []; "B", [] ] (fun id -> id)
+      let md = Map.ofList [ "A", [ "B" ]; "B", [ "A" ] ]
+      let cyc = cyclicMergeEdges two md
+      if Set.ofList cyc <> Set.ofList [ "A", "B"; "B", "A" ] then yield sprintf "cycle edges %A" cyc
+      let chain = synth [ "A", []; "B", [ "A" ] ] (fun id -> id)
+      if not (cyclicMergeEdges chain (Map.ofList [ "A", [ "B" ] ])).IsEmpty |> not then yield "a merge edge against dependsOn (A needs B, B depends on A) was not found cyclic"
+      if not (cyclicMergeEdges chain (Map.ofList [ "B", [ "A" ] ])).IsEmpty then yield "a merge edge along dependsOn was reported cyclic"
+      if deferCyclic two md |> Map.exists (fun _ v -> not v.IsEmpty) then yield "deferral kept a cyclic edge" ]
 
 // ---- 4. refusals ---------------------------------------------------------------------------------------------------
 

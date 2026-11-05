@@ -156,3 +156,7 @@ The reviewer could not defeat the selection with any path a real `git diff` prod
 | RVO-7-3 | minor | Stale case count | **Fixed** (22) |
 | RVO-7-4 | note | `TAG:` selectors undefined; `.github/` lost its dot; `..` not resolved | **Fixed:** tags defined in the matrix; paths normalised; 2 new cases |
 | RVO-7-5 | note | The other execution-readiness docs make no completion claims | – |
+
+### Round 8 (merge-dependency model; cross-agent findings)
+
+Requested on the commit that adds `--merge-deps`; result below when it completes.

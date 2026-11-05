@@ -174,6 +174,8 @@ Its wording findings RVO-5-1..7 were fixed.
 
 ## Execution readiness (continuation)
 
+**Launch blocker, found by Agent 2 (CF-07, PR #121) and confirmed here.** Under the frozen slice gate's journeys rule (Ledger.fs 391–410), the approved plan cannot complete. SL-T16, the shell, is bound to J2-08, which needs slices that depend on T16; slices sharing J1-03 or J1-06 need each other. All 42 merge-dependency edges are cyclic. Every milestone time in these documents is the optimistic bound, with those edges deferred. See [execution-readiness/CROSS-AGENT-FINDINGS.md](execution-readiness/CROSS-AGENT-FINDINGS.md).
+
 Full report: [execution-readiness/FINAL-REPORT.md](execution-readiness/FINAL-REPORT.md).
 
 **In summary:**

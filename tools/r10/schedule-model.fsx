@@ -46,9 +46,21 @@ let config =
       Milestones = opt "--milestones" |> Option.map loadMilestones |> Option.defaultValue []
       Priority = opt "--priority" |> Option.defaultValue "tail"
       DefaultMinutes = num "--default-minutes" 20.0
-      Lanes = parseLanes (opt "--lanes" |> Option.defaultValue defaultLanes) }
+      Lanes = parseLanes (opt "--lanes" |> Option.defaultValue defaultLanes)
+      MergeDeps = Map.empty }
 let slices = loadSlices (req "--slices") (opt "--roles") config
+// --merge-deps FILE: the journeys rule's merge-time dependencies; refused if cyclic unless --defer-cyclic (CF-07 A)
+let configWithMerge =
+    match opt "--merge-deps" with
+    | None -> config
+    | Some f ->
+        let md = loadMergeDeps (req "--slices") f
+        let cyc = cyclicMergeEdges slices md
+        if not cyc.IsEmpty && opt "--defer-cyclic" <> Some "true" then
+            failwithf "%d merge-dependency edges are cyclic (the slices can never merge under the frozen gate), e.g. %s; pass --defer-cyclic true to model CF-07 option A" cyc.Length (cyc |> List.truncate 4 |> List.map (fun (a, b) -> a + "->" + b) |> String.concat ", ")
+        if not cyc.IsEmpty then eprintfn "deferred %d cyclic merge-dependency edges (CF-07 option A)" cyc.Length
+        { config with MergeDeps = deferCyclic slices md }
 let cis = (opt "--ci" |> Option.defaultValue "0,2,5,10,15,20").Split(',') |> Array.map float |> List.ofArray
-let report = run config slices cis
+let report = run configWithMerge slices cis
 printReport report
 opt "--out" |> Option.iter (fun out -> writeReport out report)

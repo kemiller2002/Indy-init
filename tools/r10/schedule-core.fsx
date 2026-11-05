@@ -35,7 +35,12 @@ type Config =
       /// "tail" (schedule.fsx: the longest chain first) or "milestones" (the earliest milestone a slice serves first).
       Priority: string
       DefaultMinutes: float
-      Lanes: (string * string list) list }
+      Lanes: (string * string list) list
+      /// Merge-time dependencies a slice's gate adds beyond dependsOn (the journeys rule, Ledger.fs: every bound
+      /// assertion must pass live, so the slices its steps need must already be on main). A slice may be BUILT when
+      /// its Deps are integrated, but enters the integration queue only when its MergeDeps are integrated too.
+      /// Empty = none (every published run before this option).
+      MergeDeps: Map<string, string list> }
 
 let defaultLanes = "integration:integration,domain:domain,persistence:persistence,ui-1:ui,ui-2:ui,reviewer:reviewer"
 
@@ -100,6 +105,42 @@ let milestoneRank (milestones: (string * string * string list) list) (slices: Sl
             let carriers = slices |> List.filter (fun s -> s.Requirements |> List.exists (fun r -> List.contains r reqs)) |> List.map (fun s -> s.Id)
             i + 1, carriers |> List.fold (fun a c -> ancestors c a) Set.empty)
     slices |> List.map (fun s -> s.Id, (needed |> List.tryFind (fun (_, set) -> set.Contains s.Id) |> Option.map fst |> Option.defaultValue (milestones.Length + 1))) |> Map.ofList
+
+/// Merge dependencies from a manifest's governedAssertions and an assertion -> needed-slices file
+/// ({ "rules": [ { "assertions": [..], "needs": [..] } ] }). Ids absent from the manifest are ignored.
+let loadMergeDeps (manifestPath: string) (depsPath: string) : Map<string, string list> =
+    let depsDoc = JsonNode.Parse(File.ReadAllText depsPath)
+    let rules = depsDoc["rules"].AsArray() |> List.ofSeq
+    let needs (a: string) =
+        rules |> List.filter (fun r -> r["assertions"].AsArray() |> Seq.exists (fun x -> x.ToString() = a))
+        |> List.collect (fun r -> r["needs"].AsArray() |> Seq.map string |> List.ofSeq)
+    let manifestDoc = JsonNode.Parse(File.ReadAllText manifestPath)
+    let slices = manifestDoc["slices"].AsArray() |> List.ofSeq
+    let ids = slices |> List.map (fun s -> str s "id") |> Set.ofList
+    slices |> List.map (fun s ->
+        let id = str s "id"
+        let bound = match s["governedAssertions"] with null -> [] | v -> v.AsArray() |> Seq.map string |> List.ofSeq
+        id, bound |> List.collect needs |> List.distinct |> List.filter (fun x -> x <> id && ids.Contains x))
+    |> List.filter (fun (_, d) -> not d.IsEmpty) |> Map.ofList
+
+/// The merge-dependency edges (slice, needed) that close a cycle with dependsOn and the other merge dependencies:
+/// under the frozen gate such slices can never merge (review CF-07, PR #121).
+let cyclicMergeEdges (slices: Slice list) (mergeDeps: Map<string, string list>) : (string * string) list =
+    let graph = slices |> List.map (fun s -> s.Id, s.Deps @ (Map.tryFind s.Id mergeDeps |> Option.defaultValue [])) |> Map.ofList
+    let reaches (a: string) (b: string) =
+        let rec go (seen: Set<string>) (stack: string list) =
+            match stack with
+            | [] -> false
+            | n :: rest when n = b -> true
+            | n :: rest when seen.Contains n -> go seen rest
+            | n :: rest -> go (seen.Add n) ((Map.tryFind n graph |> Option.defaultValue []) @ rest)
+        go Set.empty [ a ]
+    mergeDeps |> Map.toList |> List.collect (fun (s, ds) -> ds |> List.filter (fun d -> reaches d s) |> List.map (fun d -> s, d))
+
+/// CF-07 option A: defer the cyclic merge edges (judge those assertions at a later integration point).
+let deferCyclic (slices: Slice list) (mergeDeps: Map<string, string list>) : Map<string, string list> =
+    let cyc = cyclicMergeEdges slices mergeDeps |> Set.ofList
+    mergeDeps |> Map.map (fun s ds -> ds |> List.filter (fun d -> not (cyc.Contains(s, d))))
 
 /// When each milestone is delivered: every slice carrying each of its requirements is integrated. A requirement no
 /// slice carries is an error (a milestone must not name work that is not in the plan).
@@ -215,10 +256,19 @@ let private pass (c: Config) (ci: float) (slices: Slice list) (prio: Map<string,
         st1.Phases |> Map.toList
         |> List.choose (fun (id, p) -> match p with Implementing(l, s0, u) when u <= t -> Some(id, l, s0) | Repairing(l, u) when u <= t -> Some(id, l, u) | _ -> None)
         |> List.sortBy (fun (_, l, s0) -> -s0, -(c.Lanes |> List.findIndex (fst >> (=) l)))
+    let mergeReady (s: State) (id: string) =
+        Map.tryFind id c.MergeDeps |> Option.defaultValue [] |> List.forall (fun d -> integratedAt s d |> Option.exists (fun a -> a <= t))
+    // b1. built slices that were waiting for merge-time dependencies join the queue first, in the order they were built
+    let st1b =
+        st1.Phases |> Map.toList
+        |> List.choose (fun (id, p) -> match p with Queued at when not (List.contains id st1.Queue) -> Some(id, at) | _ -> None)
+        |> List.sortBy snd
+        |> List.fold (fun (s: State) (id, _) -> if mergeReady s id then { s with Queue = s.Queue @ [ id ] } else s) st1
+    // b2. finishers, in schedule.fsx's order; one with unmet merge dependencies waits outside the queue
     let st2 =
         finished |> List.fold (fun s (id, l, _) ->
-            { (set id (Queued t) s) with Queue = s.Queue @ [ id ]; LaneFree = s.LaneFree.Add(l, t) }
-            |> upd id (fun r -> if r.Implemented < 0.0 then { r with Implemented = t } else r)) st1
+            { (set id (Queued t) s) with Queue = (if mergeReady s id then s.Queue @ [ id ] else s.Queue); LaneFree = s.LaneFree.Add(l, t) }
+            |> upd id (fun r -> if r.Implemented < 0.0 then { r with Implemented = t } else r)) st1b
     // c. verifications completing now: pass, or fail (every FailEvery-th run) and go back to the lane for repair;
     //    a failure restarts every speculative verification stacked behind it
     let done' = st2.Queue |> List.filter (fun id -> match st2.Phases[id] with Verifying(_, u, _) -> u <= t | _ -> false)

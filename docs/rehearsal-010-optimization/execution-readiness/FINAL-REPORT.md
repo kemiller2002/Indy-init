@@ -6,6 +6,17 @@
 - Agents 2 (contract-first UI) and 3 (historical data compatibility) had published **no PR or branch** when this was written. Their effects are modelled from the problem they address, not from their deliverables (§7).
 - Nothing frozen was changed. No owner decision was recorded, and the timed run was not started.
 
+## 0. Launch blocker found with Agent 2 (CF-07)
+
+**Under the frozen slice gate, the approved plan cannot complete.**
+- The gate's journeys rule requires every bound assertion to pass live at merge (Ledger.fs 391–410).
+- The shell slice SL-T16 is bound to J2-08, which runs after steps that need slices depending on T16. Slices sharing an assertion (J1-03, J1-06) need each other.
+- Every one of the approved plan's 42 merge-dependency edges is cyclic.
+
+This is independent of every optimization, and needs the owner's decision on CF-07 (Agent 2, PR #121) before any launch. Details and runs: CROSS-AGENT-FINDINGS.md.
+
+**Every milestone time in this report is therefore the optimistic bound**, with all cyclic journey edges deferred. Agent 2's narrower deferral gives T+700–1,000 at 10-min CI for every plan.
+
 ## 1. Current bottleneck ranking
 
 Combined plan E8 at 10-min CI:
@@ -114,6 +125,7 @@ New:
 - **ODR-R10-32:** one combined v4.1.5 successor package. It brings ODR-R10-20, -21 and -25, FO-2 and FO-3, Agent 2's UI contracts and Agent 3's event-union successor into **one** freeze cycle, never two competing ones.
 
 Still open:
+- **CF-07 (Agent 2, PR #121): how assertions with cyclic merge dependencies are judged. A launch blocker on the approved plan.**
 - ODR-R10-19..30;
 - the App installation (ODR-R10-28).
 
