@@ -1,0 +1,87 @@
+{
+  "schema": "indy-init.delegated-decisions/1",
+  "authority": "DA-R10-1",
+  "description": "Append-only log of technical decisions made by agents under DA-R10-1. Each entry names the agent session that decided it. Entries already on main may not be edited or removed (the checker compares with the base ref). Not owner approvals; tools/r10/delegated-authority.fsx is a format and scope check, so each new entry also needs review in its PR. DTD-R10-002 was withdrawn before merge (review of PR #136, B1): staging v4.1.5 is the owner's OD-V415-01, not a delegated deferral.",
+  "decisions": [
+    {
+      "id": "DTD-R10-001",
+      "class": "source-ownership",
+      "decision": "Workstream ownership: lead session owns integration, Workstreams A (milestones) and C (verification), docs/rehearsal-010-optimization/ and tools/r10/; the contract-first UI session owns Workstream B and proposals/r10-contract-first-ui/; the historical-compatibility session owns Workstream D's minimum v4.1.5 contract and proposals/r10-historical-data-compatibility/.",
+      "rationale": "Directive sections 3-7: use existing agents, nonoverlapping ownership, lead owns integration.",
+      "actingAgent": {
+        "kind": "agent",
+        "session": "session_01G1iECgS2MYoyqvc2eXNdhV",
+        "role": "lead/integration"
+      },
+      "decidedAt": "2026-11-05T19:12:00Z",
+      "paths": [
+        "docs/rehearsal-010-optimization/acceleration/OWNERSHIP.md"
+      ],
+      "evidence": "docs/rehearsal-010-optimization/acceleration/OWNERSHIP.md"
+    },
+    {
+      "id": "DTD-R10-003",
+      "class": "source-ownership",
+      "decision": "v4.1.5 build: the lead session is accountable for v4.1.5 (the owner named the lead); the historical-compatibility session keeps exclusive hands-on ownership of requirements-compiled/v4.1.5 on PR #135, where its compile is already under way, and the lead independently reviews, verifies and merges it. No second agent edits requirements-compiled/v4.1.5.",
+      "rationale": "The owner answered 'You' but asked that it not conflict with other updates. Moving a compile already in progress to another session would put two agents on the same package files; directive section 4/7: exclusive ownership, avoid two agents redesigning the same interface.",
+      "actingAgent": {
+        "kind": "agent",
+        "session": "session_01G1iECgS2MYoyqvc2eXNdhV",
+        "role": "lead/integration"
+      },
+      "decidedAt": "2026-11-05T19:27:00Z",
+      "paths": [
+        "docs/rehearsal-010-optimization/acceleration/OWNERSHIP.md"
+      ],
+      "evidence": "PR #135"
+    },
+    {
+      "id": "DTD-R10-004",
+      "class": "technical-interface",
+      "decision": "Competition UI roles: keep the v4.1.x role names ui and ui-2 and add ui-3; assign UI-1 (shell), UI-2 (workspace) and UI-3 (hypotheses/evidence) areas by file ownership in project-structure, not by renaming roles to ui-a/ui-b/ui-c. No requirements-compiler change.",
+      "rationale": "Renaming roles fails X01 for 65 test files and X18, and changes the AGENT-RULES digest unless the compiler changes (V41Package.fs hard-codes ui; laneOverrides name ui-2). File-level ownership gives the same exclusivity with no compiler change on the critical path.",
+      "actingAgent": {
+        "kind": "agent",
+        "session": "session_01G1iECgS2MYoyqvc2eXNdhV",
+        "role": "lead/integration"
+      },
+      "decidedAt": "2026-11-05T19:29:00Z",
+      "paths": [
+        "proposals/r10-contract-first-ui/v415-fold/project-structure.delta.json"
+      ],
+      "evidence": "PR #135 (v4.1.5 session report of the X01/X18 failure); PR #134 (COMPETITION-UI-OWNERSHIP)"
+    },
+    {
+      "id": "DTD-R10-005",
+      "class": "technical-interface",
+      "decision": "v4.1.5 interface design (revision 3): a session writes only under workspaces/demo/causa-app-<run> in the connected repository, a reserved namespace that never names a catalog workspace; WorkspaceAddress.T is private and its role comes only from WorkspaceAddress.catalog and .workingCopy; loads, sessions, timers and machine messages are keyed by InvestigationRef {Address; Id}; a private Writable.T guards write access; the contract change goes to the owner as one coupled request, with staging and the fallback as separate requests.",
+      "rationale": "Directive section 6 (smallest contract change) and section 7 (stable shared interfaces). Recorded by the lead on behalf of the deciding session, as that session asked; the deciding session is named below. Revision 3 answers the independent review's finding that the role was asserted by the caller; its re-review is pending and this entry does not claim the guard works. The package contracts themselves are approved by the owner through the v4.1.5 interface request; this entry records only the design choice behind them.",
+      "actingAgent": {
+        "kind": "agent",
+        "session": "session_01G1iECgvwA92qPWSR19ZXxX",
+        "role": "v4.1.5 compilation (workstream D)"
+      },
+      "decidedAt": "2026-11-05T19:33:00Z",
+      "paths": [
+        "docs/rehearsal-010-dependency-reduction/V415-DESIGN-NOTE.md"
+      ],
+      "evidence": "PR #135 at 730e2d6, docs/rehearsal-010-dependency-reduction/V415-DESIGN-NOTE.md"
+    },
+    {
+      "id": "DTD-R10-006",
+      "class": "technical-interface",
+      "decision": "Folded UI view contract: contract files carry types and signatures only (plus already-reviewed boundary code). Implementation code (validation, navigation, presentation language, identifiers and the like; 153 members in the first fold) moves to its producer's files under the competition UI ownership map, rather than being allowlisted as frozen contract.",
+      "rationale": "Contracts freeze what agents share; freezing implementation as contract would make 153 code members owner-approved interface and block ordinary fixes. Signatures-only keeps the contract check meaningful and does not relax it.",
+      "actingAgent": {
+        "kind": "agent",
+        "session": "session_01G1iECgS2MYoyqvc2eXNdhV",
+        "role": "lead/integration"
+      },
+      "decidedAt": "2026-11-05T19:46:00Z",
+      "paths": [
+        "proposals/r10-contract-first-ui/v415-fold/07-IF41-VIEW.folded.fs"
+      ],
+      "evidence": "v4.1.5 session report (19:45 UTC) on the fold; PR #134"
+    }
+  ]
+}

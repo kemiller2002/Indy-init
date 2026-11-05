@@ -29,6 +29,9 @@ let nodeModules = opt "--node-modules" |> Option.map Path.GetFullPath
 let browsers = opt "--browsers" = Some "true" && nodeModules.IsSome
 let dotnetTests = opt "--dotnet-tests" = Some "true" && nodeModules.IsSome
 let only = opt "--only" |> Option.map (fun s -> s.Split(',') |> Set.ofArray)
+// --shard K/N (CI): run every case whose position in the case list is K modulo N (K from 0). The results record
+// allCases, so the job that merges the shards can prove their union is the whole suite (no case silently dropped).
+let shard = opt "--shard" |> Option.map (fun s -> match s.Split('/') with [| k; n |] -> int k, int n | _ -> failwithf "--shard K/N, got %s" s)
 
 // ---- processes and files -----------------------------------------------------------------------------------------
 
@@ -721,6 +724,9 @@ slices ()
 let firstLines (o: Outcome) = o.Output.Split('\n') |> Array.filter (fun l -> l.Contains "REFUSED" || l.Contains ": PASS" || l.Contains "COMPLETE" || l.Contains "STOP_PERMITTED" || l.Contains "CONTINUE_REQUIRED" || l.Contains "passed" || l.Contains "failed") |> Array.truncate 4 |> String.concat " | "
 let verdicts =
     cases
+    |> List.indexed
+    |> List.filter (fun (i, _) -> shard |> Option.forall (fun (k, n) -> i % n = k))
+    |> List.map snd
     |> List.filter (fun c -> only |> Option.forall (fun s -> s.Contains c.Id))
     |> List.map (fun c ->
         let available = match c.Needs with Nothing -> true | Browsers -> browsers | DotnetTests -> dotnetTests
@@ -760,6 +766,6 @@ let results =
                    "verdict", box verdict; "error", box err ])
 let validated = results |> List.filter (fun r -> string r["verdict"] = "VALIDATED") |> List.length
 let notRun = results |> List.filter (fun r -> string r["verdict"] = "NOT-RUN") |> List.length
-File.WriteAllText(Path.Combine(evidence, "adversarial-results.json"), json (dict [ "schema", box "indy-init.adversarial-validation/1"; "indyInit", box src; "validated", box validated; "notRun", box notRun; "cases", box results ]))
+File.WriteAllText(Path.Combine(evidence, "adversarial-results.json"), json (dict [ "schema", box "indy-init.adversarial-validation/1"; "indyInit", box src; "validated", box validated; "notRun", box notRun; "allCases", box (cases |> List.map (fun c -> c.Id)); "cases", box results ]))
 printfn "\n%d case(s): %d validated, %d not run, %d failed" results.Length validated notRun (results.Length - validated - notRun)
 exit (if results.Length - validated - notRun = 0 then 0 else 1)
