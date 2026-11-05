@@ -88,16 +88,17 @@ type Capability =
     /// Inputs, commands, validation results and save progress. Persistence and the domain engine decide correctness.
     | DataEditable
 
-/// A value shown as stored (Data Visible). There is no Visible -> Understood conversion. Understood.projected is public,
-/// though, so "stored data is never presented as the kernel's interpretation" rests on an ownership rule (only the
-/// integration adapter calls Understood.projected; screens and Presentation.fs never do), checked in review, not on
-/// the types.
+/// A value shown as stored (Data Visible). It can never be turned into an Understood value: there is no conversion,
+/// so stored data cannot be presented as the kernel's interpretation.
 type Visible<'a> =
     private
     | StoredValue of 'a * StoredRef
     | VisibleFixture of 'a * FixtureLabel
 
-/// A value the domain engine projected at a version (Data Understood).
+/// A value the domain engine projected at a version (Data Understood). The private representation keeps a stored value from
+/// becoming Understood without Understood.projected; it does not prove the engine produced it, because
+/// Understood.projected is public. That only the domain-engine adapter calls it is an ownership rule (integration owns the
+/// adapter, AGENT-RULES) checked in review, not a type guarantee.
 type Understood<'a> =
     private
     | Projected of 'a * AggregateVersion
@@ -113,8 +114,7 @@ module Visible =
 
 [<RequireQualifiedAccess>]
 module Understood =
-    /// Only the integration adapter (Ui/UiAdapter.fs), holding a domain projection, may call this. That is an ownership
-    /// and review rule: the type does not stop another caller.
+    /// Only an integration adapter holding a domain projection calls this.
     let projected (version: AggregateVersion) (value: 'a) = Projected(value, version)
     let fixture (label: FixtureLabel) (value: 'a) = UnderstoodFixture(value, label)
     let value u = match u with Projected(x, _) | UnderstoodFixture(x, _) -> x
@@ -194,7 +194,6 @@ type RouteTarget = { Workspace: string; Role: WorkspaceRole; Id: InvestigationId
 // ---- Failure and loading ---------------------------------------------------------------------------------------------
 
 /// Why data is not shown. Each case has its own plain-language copy (PresentationLanguage.failure, UI-010, UI-028).
-/// Qualified access: CredentialRefused would otherwise collide with IF41-APP ConnectionState.CredentialRefused.
 [<RequireQualifiedAccess>]
 type UiFailure =
     /// Keyed by workspace and id (v4.1.5 W1): the same case can be stored in two workspaces.
@@ -413,6 +412,14 @@ type Destination = { Repository: string; Branch: string; Writable: bool }
 
 type StartForm = { ProblemStatement: string; Title: string; Question: string; Identifier: string }
 
+/// The progress of one submitted command. Correctness is the engine's and persistence's; the UI shows the outcome.
+[<RequireQualifiedAccess>]
+type Submission =
+    | NotSubmitted
+    | Submitting
+    | Refused of reasons: string list
+    | Accepted
+
 type StartView =
     { Form: StartForm
       Errors: ValidationError list
@@ -423,14 +430,6 @@ type StartView =
       Cancel: Availability
       /// Data Editable progress of the Start command (submit, refusal, accepted).
       Submission: Submission }
-
-/// The progress of one submitted command. Correctness is the engine's and persistence's; the UI shows the outcome.
-/// Qualified access: Refused would otherwise collide with IF41-SAVE SaveFailure.Refused.
-and [<RequireQualifiedAccess>] Submission =
-    | NotSubmitted
-    | Submitting
-    | Refused of reasons: string list
-    | Accepted
 
 // ---- Edit investigation details (INV-034, INV-035) --------------------------------------------------------------------
 
@@ -643,10 +642,9 @@ type ScreenView =
     | SettingsScreen of SettingsView
     | NotFoundScreen of NotFoundView
 
-/// Who produced a view: a claim, not a proof. IntegratedBackend is a public case; that only the integration adapter
-/// over the real engine produces it, and that fixtures always say FixtureBackend, are ownership rules checked in review
-/// and by the fixture tests, not type guarantees. Acceptance evidence is never this value: only Layer C (slice-gate,
-/// the governed journeys) judges an integrated feature (VERIFICATION-STRATEGY.md).
+/// Who produced a view. Acceptance evidence requires IntegratedBackend (VERIFICATION-STRATEGY.md). IntegratedBackend is a
+/// public case: that only integration's adapter over the real engine constructs it is an ownership rule (integration owns
+/// the adapter, AGENT-RULES) checked in review, not a type guarantee. A fixture-backed value still carries its FixtureLabel.
 type BackendOrigin =
     | FixtureBackend of FixtureLabel
     | IntegratedBackend
