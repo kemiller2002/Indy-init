@@ -10,3 +10,9 @@
 {"t":"2026-11-05T21:27:27Z","agent":"domain","group":"CG-4-RELATIONSHIP","event":"compile-pass","detail":"CG-2..4 build clean first attempt"}
 {"t":"2026-11-05T21:27:27Z","agent":"domain","group":"CG-4-RELATIONSHIP","event":"tests","detail":"48 pass 0 fail; contract-check PASS"}
 {"t":"2026-11-05T21:27:27Z","agent":"domain","group":"CG-5-PERSISTENCE","event":"start","detail":"codec, saveTransition, memory store, Engine.ports"}
+{"t":"2026-11-05T21:28:59Z","agent":"domain","group":"CG-5-PERSISTENCE","event":"compile-fail","detail":"FS0041 ambiguous overload JsonObject.TryGetPropertyValue in Persistence.fs"}
+{"t":"2026-11-05T21:29:10Z","agent":"domain","group":"CG-5-PERSISTENCE","event":"repair","detail":"replaced with ContainsKey + indexer","durationSec":11}
+{"t":"2026-11-05T21:29:10Z","agent":"domain","group":"CG-5-PERSISTENCE","event":"compile-pass","detail":"Persistence.fs, Engine.fs, PersistenceTests.fs"}
+{"t":"2026-11-05T21:29:40Z","agent":"domain","group":"CG-5-PERSISTENCE","event":"tests","detail":"58 pass 0 fail; contract-check PASS; --tests missing only UI-owned UT-INV-005/022/036/039/040"}
+{"t":"2026-11-05T21:29:40Z","agent":"domain","group":"CG-5-PERSISTENCE","event":"contract-change-request","detail":"SaveState/SaveEvent (INV-015/INV-016, SM-SAVE): Saving carries no data, so 'write confirmed, read-back pending' cannot hold the confirmed (version, at) that Saved needs on ReadBackMatched. Proposed: add case 'Verifying of version:int * at:Timestamp' (or make ReadBackMatched carry version*at). Workaround in Persistence.saveTransition: WriteConfirmed(v,t) while Saving -> Saved(v,t) provisionally; ReadBackMatched keeps Saved; ReadBackMismatched from Saved or Saving -> SaveFailed."}
+{"t":"2026-11-05T21:29:40Z","agent":"domain","group":"CG-5-PERSISTENCE","event":"complete","detail":"encode/decode, saveTransition, MemoryStore save/load, Engine.ports","durationSec":300}

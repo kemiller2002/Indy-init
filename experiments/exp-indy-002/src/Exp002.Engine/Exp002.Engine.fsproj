@@ -6,6 +6,8 @@
   <ItemGroup>
     <Compile Include="Validation.fs" />
     <Compile Include="Domain.fs" />
+    <Compile Include="Persistence.fs" />
+    <Compile Include="Engine.fs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="../Exp002.Contracts/Exp002.Contracts.fsproj" />

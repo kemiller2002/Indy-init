@@ -3,7 +3,7 @@ module Exp002.Tests.Program
 open Exp002.Tests.Runner
 
 let allTests: Test list =
-    StartTests.tests @ DomainTests.header @ DomainTests.content @ DomainTests.relationship
+    StartTests.tests @ DomainTests.header @ DomainTests.content @ DomainTests.relationship @ PersistenceTests.tests
 
 [<EntryPoint>]
 let main _ =

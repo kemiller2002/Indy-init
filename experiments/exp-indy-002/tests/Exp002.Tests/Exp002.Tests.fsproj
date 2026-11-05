@@ -8,6 +8,7 @@
     <Compile Include="Runner.fs" />
     <Compile Include="StartTests.fs" />
     <Compile Include="DomainTests.fs" />
+    <Compile Include="PersistenceTests.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
   <ItemGroup>
