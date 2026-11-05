@@ -14,7 +14,7 @@ let check name ok detail =
     if not ok then failures <- failures + 1
     printfn "%s %s%s" (if ok then "PASS" else "FAIL") name (if ok then "" else " — " + detail)
 
-type Session = { Model: Model.Model; World: World; View: (string * JValue) list; Raw: string; Now: Timestamp; Pushed: string list }
+type Session = { Model: Model.Model; World: World; View: (string * JValue) list; Raw: string; Now: Timestamp; Pushed: string list; Real: bool }
 
 let private send (s: Session) (message: JValue) : Session * JValue list =
     let m, out = Dispatch.step s.Now s.Model (Json.canonical message)
@@ -34,7 +34,7 @@ let rec private settle (s: Session) (effects: JValue list) : Session =
         settle { s with Pushed = s.Pushed @ [ url ] } rest
     | JObj e :: rest ->
         let id = match Json.tryField "correlationId" e with Some(JStr x) -> x | _ -> ""
-        let w, outcome = answer s.World e
+        let w, outcome = if s.Real then s.World, RealGitHub.answer e else answer s.World e
         let s', more = send { s with World = w } (JObj [ "kind", JStr "EffectResult"; "result", JObj [ "kind", JStr "HttpResult"; "correlationId", JStr id; "outcome", outcome ] ])
         settle s' (rest @ more)
     | _ :: rest -> settle s rest
@@ -60,15 +60,72 @@ let private catalogTree (root: string) : Map<string, byte[]> =
 
 let private connected (root: string) (writable: bool) =
     let world = seed [ "kemiller2002/causa-data", catalogTree root; "acme/causa-work", Map.ofList [ "README.md", "work\n"B ] ]
-    let s = { Model = Model.initial; World = world; View = []; Raw = ""; Now = (Timestamp.tryParse "2026-11-05T15:00:00.000Z").Value; Pushed = [] }
+    let s = { Model = Model.initial; World = world; View = []; Raw = ""; Now = (Timestamp.tryParse "2026-11-05T15:00:00.000Z").Value; Pushed = []; Real = false }
     let s = at "2026-11-05T15:00:00.000Z" s
     let s = dispatch s (setField "token" "test-token-not-real")
     let s = if writable then dispatch (dispatch (dispatch s (setField "writeRepo" "acme/causa-work")) (setField "writeBranch" "main")) (setField "workspace" "preview-test") else s
     dispatch s (event "connect")
 
+/// Real-provider acceptance: the same engine and boundary against api.github.com (via `gh`), writing only under
+/// workspaces/demo/<workspace>/ in the named repository. Usage: <causa-data checkout> --real <owner/repo> <workspace>
+let realProvider (repo: string) (workspace: string) =
+    let gh (args: string list) =
+        let info = Diagnostics.ProcessStartInfo("gh", RedirectStandardOutput = true, UseShellExecute = false)
+        args |> List.iter info.ArgumentList.Add
+        use p = Diagnostics.Process.Start info
+        let out = p.StandardOutput.ReadToEnd()
+        p.WaitForExit()
+        out.Trim()
+    let head () = gh [ "api"; $"repos/{repo}/branches/main"; "--jq"; ".commit.sha" ]
+    let now () = (Timestamp.tryParse (DateTimeOffset.UtcNow.ToString("yyyy-MM-dd'T'HH:mm:ss.fff'Z'", Globalization.CultureInfo.InvariantCulture))).Value
+    let fresh () =
+        let s = { Model = Model.initial; World = seed []; View = []; Raw = ""; Now = now (); Pushed = []; Real = true }
+        let s = dispatch (dispatch (dispatch s (setField "writeRepo" repo)) (setField "writeBranch" "main")) (setField "workspace" workspace)
+        dispatch s (event "connect")
+    let s = fresh ()
+    check "real: the catalog lists the four cases from kemiller2002/causa-data" ((items s "catalogItems").Length = 4) (v s "problem")
+    let before = head ()
+    let s = dispatch (dispatch (dispatch s (event "show-create")) (setField "newTitle" $"Preview acceptance {workspace}")) (setField "newObservation" "Created by the real-provider acceptance run of the Causa preview.")
+    let s = dispatch { s with Now = now () } (event "create")
+    check "real: create is confirmed by a byte-identical read-back from GitHub" ((v s "confirmed").Contains "read back byte-identical") (v s "problem")
+    check "real: the branch head moved by exactly the save" (head () <> before) "head unchanged"
+    let dir = s.Model.Opened |> Option.map (fun o -> o.DirName) |> Option.defaultValue ""
+    let s = dispatch (dispatch s (setField "editObservation" "A second observation, saved separately.")) (event "add-observation")
+    let s = dispatch (dispatch s (setField "editHypothesis" "The preview persists through one conditional commit per save.")) (event "add-hypothesis")
+    let s = dispatch { s with Now = now () } (event "save")
+    check "real: the edit is confirmed by read-back" ((v s "confirmed").Contains "read back byte-identical") (v s "problem")
+    // Independent reload: a new session, no engine memory.
+    let r = fresh ()
+    check "real: a fresh session lists the stored investigation" (items r "workingItems" |> List.exists (fun i -> itemField "id" i = dir)) dir
+    let r = dispatch r (eventKey "open" ("w:" + dir))
+    check "real: the fresh session reads 2 observations and 1 hypothesis" ((items r "observations").Length = 2 && (items r "hypotheses").Length = 1) (v r "dDecoded")
+    // Independent of the engine: read the stored files with gh and run the full reader on them.
+    let raw f = Convert.FromBase64String(gh [ "api"; $"repos/{repo}/contents/workspaces/demo/{workspace}/investigations/{dir}/{f}?ref=main"; "--jq"; ".content" ] |> fun s -> s.Replace("\\n", "").Replace("\n", ""))
+    let files = { DirectoryName = dir; Entries = StorageReader.fileNames |> List.map (fun f -> f, raw f) }
+    check "real: the stored file set passes the full reader independently (stages 1-14, 16, 17)" (match HistoricalLoader.load files with StructurallyVerified h -> h.State.Version = 3L | _ -> false) (match HistoricalLoader.load files with LoadRejected(e, _) -> ReaderError.describe e | _ -> "")
+    // Conflict: another writer moves the branch; the stale session's save is refused and writes nothing.
+    let s = dispatch (dispatch s (setField "editObservation" "This save must be refused.")) (event "add-observation")
+    let other = fresh ()
+    let other = dispatch other (eventKey "open" ("w:" + dir))
+    let other = dispatch (dispatch other (setField "editObservation" "Another writer saves first.")) (event "add-observation")
+    let other = dispatch { other with Now = now () } (event "save")
+    check "real: the other writer's save is confirmed" ((v other "confirmed").Contains "read back byte-identical") (v other "problem")
+    let moved = head ()
+    let s = dispatch { s with Now = now () } (event "save")
+    check "real: a save against the moved head is refused by GitHub (expectedHeadOid)" ((v s "problem").StartsWith "Save refused") (v s "problem")
+    check "real: the refused save wrote nothing" (head () = moved) "head changed"
+    check "real: the unsaved change is kept" (v s "unsavedCount" = "1") (v s "unsavedCount")
+    printfn "real-provider workspace: %s/workspaces/demo/%s/investigations/%s" repo workspace dir
+
 [<EntryPoint>]
 let main argv =
-    let root = match argv with [| r |] -> r | _ -> failwith "usage: <causa-data checkout>"
+    match argv with
+    | [| _; "--real"; repo; workspace |] ->
+        realProvider repo workspace
+        printfn "%s" (if failures = 0 then "all real-provider checks passed" else $"{failures} real-provider check(s) FAILED")
+        (if failures = 0 then 0 else 1)
+    | _ ->
+    let root = match argv with [| r |] -> r | _ -> failwith "usage: <causa-data checkout> [--real <owner/repo> <workspace>]"
 
     // ---- read path against the real catalog bytes
     let s = connected root false
@@ -144,7 +201,7 @@ let main argv =
     let s6 = dispatch (dispatch (dispatch s6 (event "show-create")) (setField "newTitle" "   ")) (setField "newObservation" "x")
     let s6 = dispatch s6 (event "create")
     check "a blank title is refused before any write" ((v s6 "problem").Contains "title" && headOf s6.World "acme/causa-work" = "c0") (v s6 "problem")
-    let s7 = { Model = Model.initial; World = seed []; View = []; Raw = ""; Now = (Timestamp.tryParse "2026-11-05T15:00:00.000Z").Value; Pushed = [] }
+    let s7 = { Model = Model.initial; World = seed []; View = []; Raw = ""; Now = (Timestamp.tryParse "2026-11-05T15:00:00.000Z").Value; Pushed = []; Real = false }
     let s7 = dispatch (dispatch (dispatch (dispatch s7 (setField "writeRepo" "acme/x")) (setField "workspace" "../../fixtures")) (event "connect")) (event "connect")
     check "a workspace name outside ^[a-z0-9][a-z0-9-]{0,63}$ is refused" ((v s7 "problem").Contains "workspace") (v s7 "problem")
 
@@ -161,7 +218,7 @@ let main argv =
     check "a browser move is never pushed again" (r.Pushed.Length = pushedBefore) (sprintf "%A" r.Pushed)
     let r = dispatch r (loc $"#/investigations/catalog/{apolloId}")
     check "Forward to a case shows it again" (v r "screenDetail" = "True" && (v r "dDecoded").StartsWith "432 of 432") (v r "dDecoded")
-    let d = { Model = Model.initial; World = seed [ "kemiller2002/causa-data", catalogTree root ]; View = []; Raw = ""; Now = (Timestamp.tryParse "2026-11-05T15:00:00.000Z").Value; Pushed = [] }
+    let d = { Model = Model.initial; World = seed [ "kemiller2002/causa-data", catalogTree root ]; View = []; Raw = ""; Now = (Timestamp.tryParse "2026-11-05T15:00:00.000Z").Value; Pushed = []; Real = false }
     let init hash = JObj [ "kind", JStr "Initialize"; "protocolVersion", JInt 1L; "capabilities", JArr [ JStr "Http"; JStr "Navigation" ]; "location", JObj [ "path", JStr "/"; "query", JStr ""; "hash", JStr hash ] ]
     let d = dispatch d (init $"#/investigations/catalog/{apolloId}")
     check "a deep link before Connect waits on the Connect screen" (v d "screenConnect" = "True") (v d "screenConnect")

@@ -5,6 +5,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="FakeGitHub.fs" />
+    <Compile Include="RealGitHub.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
   <ItemGroup>
