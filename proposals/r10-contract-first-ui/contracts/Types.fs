@@ -29,8 +29,10 @@ type Capability =
     /// Inputs, commands, validation results and save progress. Persistence and the domain engine decide correctness.
     | DataEditable
 
-/// A value shown as stored (Data Visible). It can never be turned into an Understood value: there is no conversion,
-/// so stored data cannot be presented as the kernel's interpretation.
+/// A value shown as stored (Data Visible). There is no Visible -> Understood conversion. Understood.projected is public,
+/// though, so "stored data is never presented as the kernel's interpretation" rests on an ownership rule (only the
+/// integration adapter calls Understood.projected; screens and Presentation.fs never do), checked in review, not on
+/// the types.
 type Visible<'a> =
     private
     | StoredValue of 'a * StoredRef
@@ -52,7 +54,8 @@ module Visible =
 
 [<RequireQualifiedAccess>]
 module Understood =
-    /// Only an integration adapter holding a domain projection calls this.
+    /// Only the integration adapter (Ui/UiAdapter.fs), holding a domain projection, may call this. That is an ownership
+    /// and review rule: the type does not stop another caller.
     let projected (version: AggregateVersion) (value: 'a) = Projected(value, version)
     let fixture (label: FixtureLabel) (value: 'a) = UnderstoodFixture(value, label)
     let value u = match u with Projected(x, _) | UnderstoodFixture(x, _) -> x
@@ -131,7 +134,9 @@ type RouteTarget = { Workspace: string; Role: WorkspaceRole; Id: InvestigationId
 
 // ---- Failure and loading ---------------------------------------------------------------------------------------------
 
-/// Why data is not shown. Each case has its own plain-language copy (UiStates.describe, UI-010, UI-028).
+/// Why data is not shown. Each case has its own plain-language copy (PresentationLanguage.failure, UI-010, UI-028).
+/// Qualified access: CredentialRefused would otherwise collide with IF41-APP ConnectionState.CredentialRefused.
+[<RequireQualifiedAccess>]
 type UiFailure =
     /// Keyed by workspace and id (v4.1.5 W1): the same case can be stored in two workspaces.
     | InvestigationNotFound of RouteTarget

@@ -218,17 +218,17 @@ module PresentationLanguage =
 
     let failure (f: UiFailure) : FailureCopy =
         match f with
-        | InvestigationNotFound _ ->
+        | UiFailure.InvestigationNotFound _ ->
             { What = "This investigation could not be found in the connected repository."
               Preserved = "Nothing was changed."
               NextStep = "Return to Investigations."
               Retry = false }
-        | InvalidData _ ->
+        | UiFailure.InvalidData _ ->
             { What = "This investigation's stored history could not be read safely, so it is not shown."
               Preserved = "Nothing was changed in the repository."
               NextStep = "See Administration for details."
               Retry = false }
-        | NotAuthorized ->
+        | UiFailure.NotAuthorized ->
             { What = "You do not have access to this repository."
               Preserved = unsavedNote
               NextStep = "Check the repository name, or connect with a credential that can read it."
@@ -238,22 +238,22 @@ module PresentationLanguage =
               Preserved = unsavedNote
               NextStep = "Reconnect with a valid credential."
               Retry = false }
-        | ProviderUnreachable ->
+        | UiFailure.ProviderUnreachable ->
             { What = "The repository cannot be reached right now."
               Preserved = unsavedNote
               NextStep = "Try again when you are back online."
               Retry = true }
-        | ProviderRateLimited ->
+        | UiFailure.ProviderRateLimited ->
             { What = "The repository is limiting requests for now."
               Preserved = unsavedNote
               NextStep = "Try again in a few minutes."
               Retry = true }
-        | ProviderError _ ->
+        | UiFailure.ProviderError _ ->
             { What = "The repository returned an answer Causa does not recognise."
               Preserved = unsavedNote
               NextStep = "See Administration for details."
               Retry = true }
-        | CapabilityAbsent _ ->
+        | UiFailure.CapabilityAbsent _ ->
             { What = "This information is not available yet."
               Preserved = "Nothing was changed."
               NextStep = "Other sections of the investigation remain available."

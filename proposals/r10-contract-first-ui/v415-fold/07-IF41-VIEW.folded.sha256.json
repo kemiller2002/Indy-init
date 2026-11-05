@@ -1,13 +1,13 @@
 {
   "file": "proposals/r10-contract-first-ui/v415-fold/07-IF41-VIEW.folded.fs",
-  "sha256": "0cf59e200ccc45cd0d6fb49cd384592392d29d892517ce7c0297dc021aa9c9ae",
-  "bytes": 28105,
+  "sha256": "e1e584862b15137d8786feecca03cf7bbf19a5b536bd925ae55876f04c554831",
+  "bytes": 28876,
   "frozenPrefix": {
     "source": "requirements-compiled/v4.1.5/contracts/07-IF41-VIEW.fs (PR #135 rev 3, 730e2d6; identical to v4.1.4's)",
     "lines": 40,
     "identical": true
   },
-  "targets": "v4.1.5 revision 3 (PR #135 730e2d6): WorkspaceAddress.T is private; routes carry an unresolved RouteTarget",
+  "targets": "byte-identical to requirements-compiled/v4.1.5/contracts/07-IF41-VIEW.fs on #137 (f838f35): RequireQualifiedAccess on UiFailure and a standalone Submission (the v4.1.x X17 scanner misreads `and [<...>] X =`), ownership-rule wording for Understood.projected and IntegratedBackend",
   "codeMembers": {
     "count": 16,
     "all": "boundary members beside private representations: FixtureLabel.create/value, Visible.stored/fixture/value/fixtureLabel/map, Understood.projected/fixture/value/version/fixtureLabel/map, SafeUrl.pattern/tryCreate/value",

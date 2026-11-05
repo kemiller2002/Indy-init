@@ -9,6 +9,15 @@ type Destination = { Repository: string; Branch: string; Writable: bool }
 
 type StartForm = { ProblemStatement: string; Title: string; Question: string; Identifier: string }
 
+/// The progress of one submitted command. Correctness is the engine's and persistence's; the UI shows the outcome.
+/// Qualified access: Refused would otherwise collide with IF41-SAVE SaveFailure.Refused.
+[<RequireQualifiedAccess>]
+type Submission =
+    | NotSubmitted
+    | Submitting
+    | Refused of reasons: string list
+    | Accepted
+
 type StartView =
     { Form: StartForm
       Errors: ValidationError list
@@ -19,13 +28,6 @@ type StartView =
       Cancel: Availability
       /// Data Editable progress of the Start command (submit, refusal, accepted).
       Submission: Submission }
-
-/// The progress of one submitted command. Correctness is the engine's and persistence's; the UI shows the outcome.
-and Submission =
-    | NotSubmitted
-    | Submitting
-    | Refused of reasons: string list
-    | Accepted
 
 // ---- Edit investigation details (INV-034, INV-035) --------------------------------------------------------------------
 
