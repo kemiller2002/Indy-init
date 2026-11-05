@@ -574,6 +574,58 @@ let reconciliation (source: string) : string list =
       if summary "approvedExclusions" <> 0L then yield "reconciliation: the inventory records an exclusion the scope manifest does not"
       if arr "obligations" inventory |> List.exists (fun o -> strOpt "scopeStatus" o <> Some "in-scope") then yield "reconciliation: the inventory has an obligation out of scope" ]
 
+// ---- work-item split: a governed successor scope ---------------------------------------------------------------------
+
+/// The proposed split plan compiles to a successor scope that keeps every requirement, obligation, priority and
+/// mandatory flag of the approved scope, the approved scope still compiles unchanged, and every mutation that would
+/// drop, duplicate, move or reorder work is refused with its code.
+let splitScope (source: string) : string list =
+    let planPath = "docs/rehearsal-010-optimization/inputs/work-item-split.proposed.json"
+    let plan = parseFile (Path.Combine(source, planPath))
+    let sources = ScopeCommands.sourcesOf source "requirements-compiled/v4.1.4"
+    let approved = compile sources
+    let content (m: Json) = arr "requirements" m |> List.map (fun r -> str "id" r, serialize (JObj [ "o", (field "obligations" r |> Option.defaultValue (JArr [])); "p", JStr(strOpt "priority" r |> Option.defaultValue ""); "m", (field "mandatory" r |> Option.defaultValue JNull) ])) |> Map.ofList
+    let mapSplits (f: Json -> Json) (j: Json) =
+        match j with
+        | JObj ps -> JObj(ps |> List.map (fun (k, v) -> if k = "splits" then k, (match v with JArr xs -> JArr(List.map f xs) | x -> x) else k, v))
+        | x -> x
+    let setField (k: string) (v: Json) (j: Json) = match j with JObj ps -> JObj(ps |> List.map (fun (k', x) -> if k' = k then k', v else k', x)) | x -> x
+    let onParts (parent: string) (f: Json list -> Json list) =
+        plan |> mapSplits (fun sp -> if str "workItem" sp = parent then setField "parts" (JArr(f (arr "parts" sp))) sp else sp)
+    let onPart (parent: string) (part: string) (f: Json -> Json) = onParts parent (List.map (fun p -> if str "id" p = part then f p else p))
+    let reqs (xs: string list) = JArr(xs |> List.map JStr)
+    let refusedWith (code: string) (mutant: Json) =
+        match compileWithSplit sources mutant planPath "test" with
+        | Error ps when ps |> List.exists (fun p -> p.StartsWith code) -> None
+        | Error ps -> Some(sprintf "split control: expected %s, got %A" code (List.truncate 3 ps))
+        | Ok _ -> Some(sprintf "split control: a plan that should be refused with %s compiled" code)
+    let mutants =
+        [ "SPLIT_REQUIREMENT_DROPPED", onPart "WI-INV-WORKSPACE" "WI-INV-WORKSPACE-ROUNDTRIP" (setField "requirements" (reqs [ "INV-017" ]))
+          "SPLIT_REQUIREMENT_DUPLICATED", onPart "WI-INV-WORKSPACE" "WI-INV-WORKSPACE-SAVE" (setField "requirements" (reqs [ "INV-015"; "INV-016"; "INV-043"; "INV-017" ]))
+          "SPLIT_FOREIGN_REQUIREMENT", onPart "WI-INV-START" "WI-INV-START-ACTIONS" (setField "requirements" (reqs [ "INV-004"; "INV-022"; "INV-039" ]))
+          "SPLIT_FROZEN_TASK", plan |> mapSplits (fun sp -> if str "workItem" sp = "WI-GEN-PF" then setField "workItem" (JStr "T19") sp else sp)
+          "SPLIT_CYCLE", onPart "WI-INV-WORKSPACE" "WI-INV-WORKSPACE-FRAME" (setField "dependsOn" (reqs [ "WI-INV-WORKSPACE-ROUNDTRIP" ]))
+          "SPLIT_BREAKS_REQUIREMENT_DEPENDENCY", onPart "WI-INV-WORKSPACE" "WI-INV-WORKSPACE-DETAILS" (setField "dependsOn" (reqs [ "WI-INV-WORKSPACE-FRAME" ]))
+          "SPLIT_UNKNOWN_DEPENDENCY", onPart "WI-GEN-PF" "WI-GEN-PF-SECURITY" (setField "dependsOn" (reqs [ "WI-NOPE" ]))
+          "SPLIT_ID_TAKEN", onPart "WI-GEN-UI" "WI-GEN-UI-VERIFY" (setField "id" (JStr "T31"))
+          "SPLIT_EMPTY_PART", onParts "WI-GEN-PF" (fun ps -> ps @ [ JObj [ "id", JStr "WI-GEN-PF-EMPTY"; "dependsOn", JArr []; "requirements", JArr [] ] ]) ]
+    [ match compileWithSplit sources plan planPath "test" with
+      | Error ps -> yield sprintf "split: the proposed plan is refused: %A" (List.truncate 3 ps)
+      | Ok successor ->
+          if content successor <> content approved then yield "split: the successor's requirements, obligations, priorities or mandatory flags differ from the approved scope"
+          let count k (m: Json) = field "counts" m |> Option.bind (intOpt k) |> Option.defaultValue -1L
+          for k in [ "requirements"; "obligations"; "mandatoryObligations"; "mandatoryRequirements"; "planTests" ] do
+              if count k successor <> count k approved then yield sprintf "split: count %s differs (%d, approved %d)" k (count k successor) (count k approved)
+          if str "scopeSha256" successor = str "scopeSha256" approved then yield "split: the successor has the approved scopeSha256; a successor must be approved on its own digest"
+          let wis = arr "workItems" successor |> List.map (str "id") |> Set.ofList
+          for r in arr "requirements" successor do
+              for w in strs "workItems" r do
+                  if not (wis.Contains w) then yield sprintf "split: %s names work item %s, which the successor does not have" (str "id" r) w
+      if str "scopeSha256" (compile sources) <> str "scopeSha256" (parseFile (Path.Combine(source, "docs", "rehearsal-010-readiness", "scope-manifest.json"))) then
+          yield "split: the approved scope no longer compiles to the committed manifest's scopeSha256"
+      for code, mutant in mutants do
+          match refusedWith code mutant with Some p -> yield p | None -> () ]
+
 let all (source: string) : string list =
     let guard name f = try f () with ex -> [ sprintf "%s threw: %s" name ex.Message ]
-    guard "adversarial" adversarial @ guard "legitimate" legitimate @ guard "recovery" recovery @ guard "real" (fun () -> real source) @ guard "suite runners" (fun () -> suiteRunners source) @ guard "v4.1.4 owner records" (fun () -> v414OwnerRecords source) @ guard "v4.1.4 owner-record controls" (fun () -> v414OwnerRecordControls source) @ guard "v4.1.4 package" (fun () -> committedPackage source) @ guard "reconciliation" (fun () -> reconciliation source)
+    guard "adversarial" adversarial @ guard "legitimate" legitimate @ guard "recovery" recovery @ guard "real" (fun () -> real source) @ guard "suite runners" (fun () -> suiteRunners source) @ guard "v4.1.4 owner records" (fun () -> v414OwnerRecords source) @ guard "v4.1.4 owner-record controls" (fun () -> v414OwnerRecordControls source) @ guard "v4.1.4 package" (fun () -> committedPackage source) @ guard "reconciliation" (fun () -> reconciliation source) @ guard "work-item split" (fun () -> splitScope source)

@@ -1,0 +1,51 @@
+{
+  "schema": "indy-init.slice-roles/1",
+  "status": "PROPOSED: needs a successor package (v4.1.5) whose agent-file-ownership gives these roles the files these slices implement; not valid under the frozen v4.1.4 ownership",
+  "description": "V5: rebalance UI work between ui and ui-2 through a v4.1.5 file-ownership successor.",
+  "roles": {
+    "SL-T23": {
+      "role": "ui-2",
+      "basis": "T23 'Causal graph with the existing workflow layout engine' implements src/Causa.App/Views/Graph.fs, owned by ui-2"
+    },
+    "SL-T26": {
+      "role": "ui-2",
+      "basis": "T26 'Report preview and Folio export' implements src/Causa.App/Views/Report.fs, owned by ui-2"
+    },
+    "SL-T28": {
+      "role": "ui-2",
+      "basis": "T28 'History, time travel and semantic diff' implements src/Causa.App/Views/History.fs, owned by ui-2"
+    },
+    "SL-T29": {
+      "role": "ui-2",
+      "basis": "T29 'Administration and Settings pages' implements src/Causa.App/Views/Administration.fs, owned by ui-2"
+    },
+    "SL-WI-GEN-WDL": {
+      "role": "ui-2",
+      "basis": "workflow layout beside Graph.fs: moves to ui-2 in a v4.1.5 ownership successor (new or re-owned view files and their browser specs)"
+    },
+    "SL-WI-INV-WORKSPACE-EVIDENCE": {
+      "role": "ui-2",
+      "basis": "Views/Investigation/Evidence.fs: moves to ui-2 in a v4.1.5 ownership successor (new or re-owned view files and their browser specs)"
+    },
+    "SL-WI-INV-WORKSPACE-LINKS": {
+      "role": "ui-2",
+      "basis": "Views/Investigation/Links.fs: moves to ui-2 in a v4.1.5 ownership successor (new or re-owned view files and their browser specs)"
+    },
+    "SL-WI-INV-WORKSPACE-CONCLUSION": {
+      "role": "ui-2",
+      "basis": "Views/Investigation/Conclusion.fs: moves to ui-2 in a v4.1.5 ownership successor (new or re-owned view files and their browser specs)"
+    },
+    "SL-WI-INV-LIST": {
+      "role": "ui-2",
+      "basis": "Views/InvestigationList.fs: moves to ui-2 in a v4.1.5 ownership successor (new or re-owned view files and their browser specs)"
+    },
+    "SL-WI-GEN-UI-LANGUAGE": {
+      "role": "ui-2",
+      "basis": "presentation-language module: moves to ui-2 in a v4.1.5 ownership successor (new or re-owned view files and their browser specs)"
+    },
+    "SL-WI-GEN-UI-STATES": {
+      "role": "ui-2",
+      "basis": "timeline and state views: moves to ui-2 in a v4.1.5 ownership successor (new or re-owned view files and their browser specs)"
+    }
+  }
+}

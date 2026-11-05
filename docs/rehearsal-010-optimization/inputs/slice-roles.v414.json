@@ -1,0 +1,11 @@
+{
+  "schema": "indy-init.slice-roles/1",
+  "description": "The owning role of each UI-boundary slice under the frozen v4.1.4 file ownership (requirements-compiled/v4.1.4/agent-file-ownership.json: 'ui and ui-2 never own the same file'). The slice manifest gives every UI slice the boundary 'ui'; schedule.fsx lets either UI lane take any of them. A slice is ui-2's only when the view file it implements is ui-2's; every other UI slice stays ui's (the default, not listed).",
+  "source": "requirements-compiled/v4.1.4/agent-file-ownership.json at indy-init-requirements-v4.1.4 (208ec9f)",
+  "roles": {
+    "SL-T23": { "role": "ui-2", "basis": "T23 'Causal graph with the existing workflow layout engine' implements src/Causa.App/Views/Graph.fs, owned by ui-2" },
+    "SL-T26": { "role": "ui-2", "basis": "T26 'Report preview and Folio export' implements src/Causa.App/Views/Report.fs, owned by ui-2" },
+    "SL-T28": { "role": "ui-2", "basis": "T28 'History, time travel and semantic diff' implements src/Causa.App/Views/History.fs, owned by ui-2" },
+    "SL-T29": { "role": "ui-2", "basis": "T29 'Administration and Settings pages' implements src/Causa.App/Views/Administration.fs, owned by ui-2" }
+  }
+}

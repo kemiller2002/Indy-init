@@ -410,6 +410,8 @@ jobs:
           jq -S 'del(.scenarios[].timeline)' "$RUNNER_TEMP/launch-evidence/topology-a.json" > "$RUNNER_TEMP/a.json"
           jq -S 'del(.scenarios[].timeline)' docs/rehearsal-010-readiness/evidence/schedule/topology-a.json > "$RUNNER_TEMP/b.json"
           diff "$RUNNER_TEMP/a.json" "$RUNNER_TEMP/b.json" || { echo "::error::the committed schedule evidence is stale; regenerate it"; exit 1; }
+      - name: Schedule model (docs/rehearsal-010-optimization) equals schedule.fsx under its defaults, and its invariants and controls hold
+        run: dotnet fsi tools/r10/schedule-model-tests.fsx -- --indy-init .
       - name: Publish
         if: always()
         uses: actions/upload-artifact@v4
