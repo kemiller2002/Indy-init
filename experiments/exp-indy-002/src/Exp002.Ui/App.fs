@@ -378,8 +378,8 @@ let private onAction (ports: EnginePorts) (now: Timestamp) (m: Model) (action: U
                     let ws = { Id = inv.Id; Events = events; Investigation = inv; Version = 0; Save = Unsaved; Editor = None; FieldErrors = [] }
                     let m1 = { m with Workspace = Some ws; Screen = WorkspaceScreen inv.Id; StartErrors = []; Alert = None }
                     let m2, nav = navigate m1 (WorkspaceRoute raw)
-                    let m3, saves = startSave ports m2
-                    m3, nav :: saves
+                    // INV-004: starting writes nothing; the save state is Unsaved until the user presses Save (INV-015).
+                    m2, [ nav ]
     | OpenEditor editor, Some ws ->
         match openDraft ws.Investigation editor with
         | Some d -> { m with Workspace = Some { ws with Editor = Some(editor, d); FieldErrors = [] } }, []

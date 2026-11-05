@@ -32,7 +32,7 @@ let storageGets effects = effects |> List.choose (function StorageGet(c, k) -> S
 let started () =
     let m1, _ = run init [ Init "#/investigations/new" ]
     let m2, effects =
-        run m1 [ Ui(SetField("INV-001", "Pump 3 tripped twice")); Ui(SetField("INV-002", "Pump trip")); Ui SubmitStart ]
+        run m1 [ Ui(SetField("INV-001", "Pump 3 tripped twice")); Ui(SetField("INV-002", "Pump trip")); Ui SubmitStart; Ui SaveInvestigation ]
     let (c, _, _) = storageSets effects |> List.head
     let m3, e3 = run m2 [ StorageResult(c, StorageValue None) ]
     let (rc, _) = storageGets e3 |> List.head
@@ -122,10 +122,20 @@ let tests: (string * (unit -> Outcome)) list =
                 check (scalar "saveStateTone" v = Some "ok") "tone"
                 check (indexWrite |> Option.exists (fun (_, _, text) -> decodeIndex text |> List.exists (fun e -> e.Title = "Pump trip"))) "index not written" ]
 
-      "UI-INV-016 the lozenge never shows Saved before the read-back (CR-3)",
+      "UI-INV-004 Start investigation opens the workspace Unsaved and writes nothing (D-3)",
       fun () ->
           let m1, _ = run init [ Init "#/investigations/new" ]
           let m2, effects = run m1 [ Ui(SetField("INV-001", "p")); Ui SubmitStart ]
+          all [ check (match m2.Screen with WorkspaceScreen _ -> true | _ -> false) "not on the workspace"
+                check (m2.Workspace |> Option.exists (fun w -> w.Save = Unsaved)) (sprintf "save state %A" (m2.Workspace |> Option.map (fun w -> w.Save)))
+                check (effects |> List.forall (function StorageGet _ | StorageSet _ -> false | NavigatePush _ -> true)) "a Storage effect was emitted"
+                check (effects |> List.exists (function NavigatePush _ -> true | _ -> false)) "no navigation"
+                check (scalar "saveStateText" (project m2) = Some "Unsaved changes") "lozenge text" ]
+
+      "UI-INV-016 the lozenge never shows Saved before the read-back (CR-3)",
+      fun () ->
+          let m1, _ = run init [ Init "#/investigations/new" ]
+          let m2, effects = run m1 [ Ui(SetField("INV-001", "p")); Ui SubmitStart; Ui SaveInvestigation ]
           let (c, _, _) = storageSets effects |> List.head
           let m3, _ = run m2 [ StorageResult(c, StorageValue None) ]
           all [ check (m2.Workspace.Value.Save = Saving) "not Saving while the write is in flight"
