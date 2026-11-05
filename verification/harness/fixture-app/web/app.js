@@ -13,7 +13,10 @@ const set = (f) => { state = f(state); render(); };
 
 // ---- provider (GitHub contents API; credentials in memory only) ------------------------------------------------------
 const gh = async (path, init = {}) => {
-  const r = await fetch(`${API}${path}`, { ...init, headers: { authorization: `Bearer ${state.conn.token}`, accept: 'application/vnd.github+json', 'content-type': 'application/json' } });
+  // cache: 'no-store': GitHub answers reads with Cache-Control: private, max-age=60, so without it Chromium serves the
+  // read-back after a save from its HTTP cache and the confirmation compares against stale content (live preflight run
+  // 42068316592, J3-05 on Chromium).
+  const r = await fetch(`${API}${path}`, { ...init, cache: 'no-store', headers: { authorization: `Bearer ${state.conn.token}`, accept: 'application/vnd.github+json', 'content-type': 'application/json' } });
   return { status: r.status, body: r.status === 204 ? null : await r.json().catch(() => null) };
 };
 const repoPath = (p) => `/repos/${state.conn.owner}/${state.conn.repo}/contents/${p}`;
