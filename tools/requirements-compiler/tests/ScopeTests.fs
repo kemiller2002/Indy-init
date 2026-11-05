@@ -574,6 +574,97 @@ let reconciliation (source: string) : string list =
       if summary "approvedExclusions" <> 0L then yield "reconciliation: the inventory records an exclusion the scope manifest does not"
       if arr "obligations" inventory |> List.exists (fun o -> strOpt "scopeStatus" o <> Some "in-scope") then yield "reconciliation: the inventory has an obligation out of scope" ]
 
+// ---- work-item split: a governed successor scope ---------------------------------------------------------------------
+
+/// The proposed split plan compiles to a successor scope that keeps every requirement, obligation, priority and
+/// mandatory flag of the approved scope, the approved scope still compiles unchanged, and every mutation that would
+/// drop, duplicate, move or reorder work is refused with its code.
+let splitScope (source: string) : string list =
+    let planPath = "docs/rehearsal-010-optimization/inputs/work-item-split.proposed.json"
+    let plan = parseFile (Path.Combine(source, planPath))
+    let sources = ScopeCommands.sourcesOf source "requirements-compiled/v4.1.4"
+    let approved = compile sources
+    let content (m: Json) = arr "requirements" m |> List.map (fun r -> str "id" r, serialize (JObj [ "o", (field "obligations" r |> Option.defaultValue (JArr [])); "p", JStr(strOpt "priority" r |> Option.defaultValue ""); "m", (field "mandatory" r |> Option.defaultValue JNull) ])) |> Map.ofList
+    let mapSplits (f: Json -> Json) (j: Json) =
+        match j with
+        | JObj ps -> JObj(ps |> List.map (fun (k, v) -> if k = "splits" then k, (match v with JArr xs -> JArr(List.map f xs) | x -> x) else k, v))
+        | x -> x
+    let setField (k: string) (v: Json) (j: Json) = match j with JObj ps -> JObj(ps |> List.map (fun (k', x) -> if k' = k then k', v else k', x)) | x -> x
+    let onParts (parent: string) (f: Json list -> Json list) =
+        plan |> mapSplits (fun sp -> if str "workItem" sp = parent then setField "parts" (JArr(f (arr "parts" sp))) sp else sp)
+    let onPart (parent: string) (part: string) (f: Json -> Json) = onParts parent (List.map (fun p -> if str "id" p = part then f p else p))
+    let reqs (xs: string list) = JArr(xs |> List.map JStr)
+    let refusedWith (code: string) (mutant: Json) =
+        match compileWithSplit sources mutant planPath "test" with
+        | Error ps when ps |> List.exists (fun p -> p.StartsWith code) -> None
+        | Error ps -> Some(sprintf "split control: expected %s, got %A" code (List.truncate 3 ps))
+        | Ok _ -> Some(sprintf "split control: a plan that should be refused with %s compiled" code)
+    let mutants =
+        [ "SPLIT_REQUIREMENT_DROPPED", onPart "WI-INV-WORKSPACE" "WI-INV-WORKSPACE-ROUNDTRIP" (setField "requirements" (reqs [ "INV-017" ]))
+          "SPLIT_REQUIREMENT_DUPLICATED", onPart "WI-INV-WORKSPACE" "WI-INV-WORKSPACE-SAVE" (setField "requirements" (reqs [ "INV-015"; "INV-016"; "INV-043"; "INV-017" ]))
+          "SPLIT_FOREIGN_REQUIREMENT", onPart "WI-INV-START" "WI-INV-START-ACTIONS" (setField "requirements" (reqs [ "INV-004"; "INV-022"; "INV-039" ]))
+          "SPLIT_FROZEN_TASK", plan |> mapSplits (fun sp -> if str "workItem" sp = "WI-GEN-PF" then setField "workItem" (JStr "T19") sp else sp)
+          "SPLIT_CYCLE", onPart "WI-INV-WORKSPACE" "WI-INV-WORKSPACE-FRAME" (setField "dependsOn" (reqs [ "WI-INV-WORKSPACE-ROUNDTRIP" ]))
+          "SPLIT_BREAKS_REQUIREMENT_DEPENDENCY", onPart "WI-INV-WORKSPACE" "WI-INV-WORKSPACE-DETAILS" (setField "dependsOn" (reqs [ "WI-INV-WORKSPACE-FRAME" ]))
+          "SPLIT_UNKNOWN_DEPENDENCY", onPart "WI-GEN-PF" "WI-GEN-PF-SECURITY" (setField "dependsOn" (reqs [ "WI-NOPE" ]))
+          "SPLIT_ID_TAKEN", onPart "WI-GEN-UI" "WI-GEN-UI-VERIFY" (setField "id" (JStr "T31"))
+          "SPLIT_EMPTY_PART", onParts "WI-GEN-PF" (fun ps -> ps @ [ JObj [ "id", JStr "WI-GEN-PF-EMPTY"; "dependsOn", JArr []; "requirements", JArr [] ] ])
+          // review RVO-1-1: judged against the work items that exist after the split
+          "SPLIT_DROPS_PARENT_DEPENDENCY", onPart "WI-GEN-PF" "WI-GEN-PF-BOUNDARY" (setField "dependsOn" (JArr []))
+          "SPLIT_DEPENDS_ON_REPLACED", onPart "WI-GEN-PF" "WI-GEN-PF-SECURITY" (setField "dependsOn" (reqs [ "WI-GEN-UI" ]))
+          "SPLIT_OWNER_CHANGED", onPart "WI-GEN-PF" "WI-GEN-PF-SECURITY" (fun p -> match p with JObj ps -> JObj(ps @ [ "owner", JStr "nobody" ]) | x -> x)
+          "SPLIT_DUPLICATE_PART_ID", onPart "WI-GEN-PF" "WI-GEN-PF-SECURITY" (setField "id" (JStr "WI-GEN-UI-VERIFY"))
+          // review RVO-2-1: a cycle across two splits (LANDING -> PF-SECURITY -> UI-VERIFY -> ... -> LANDING)
+          "SPLIT_CYCLE", (onPart "WI-GEN-PF" "WI-GEN-PF-SECURITY" (setField "dependsOn" (reqs [ "WI-GEN-PF-BOUNDARY"; "WI-GEN-UI-VERIFY" ]))
+                          |> fun pl -> pl |> mapSplits (fun sp -> if str "workItem" sp = "WI-GEN-UI" then setField "parts" (JArr(arr "parts" sp |> List.map (fun p -> if str "id" p = "WI-GEN-UI-LANDING" then setField "dependsOn" (reqs [ "T17"; "WI-GEN-PF-SECURITY" ]) p else p))) sp else sp)) ]
+    [ match compileWithSplit sources plan planPath "test" with
+      | Error ps -> yield sprintf "split: the proposed plan is refused: %A" (List.truncate 3 ps)
+      | Ok successor ->
+          if content successor <> content approved then yield "split: the successor's requirements, obligations, priorities or mandatory flags differ from the approved scope"
+          let count k (m: Json) = field "counts" m |> Option.bind (intOpt k) |> Option.defaultValue -1L
+          for k in [ "requirements"; "obligations"; "mandatoryObligations"; "mandatoryRequirements"; "planTests" ] do
+              if count k successor <> count k approved then yield sprintf "split: count %s differs (%d, approved %d)" k (count k successor) (count k approved)
+          if str "scopeSha256" successor = str "scopeSha256" approved then yield "split: the successor has the approved scopeSha256; a successor must be approved on its own digest"
+          let wis = arr "workItems" successor |> List.map (str "id") |> Set.ofList
+          for r in arr "requirements" successor do
+              for w in strs "workItems" r do
+                  if not (wis.Contains w) then yield sprintf "split: %s names work item %s, which the successor does not have" (str "id" r) w
+      if str "scopeSha256" (compile sources) <> str "scopeSha256" (parseFile (Path.Combine(source, "docs", "rehearsal-010-readiness", "scope-manifest.json"))) then
+          yield "split: the approved scope no longer compiles to the committed manifest's scopeSha256"
+      for code, mutant in mutants do
+          match refusedWith code mutant with Some p -> yield p | None -> ()
+      // review RVO-1-2: preflight compares the work items, so a successor edited after compiling is refused
+      match compileWithSplit sources plan planPath "test" with
+      | Ok successor ->
+          let editItem (f: Json -> Json) (m: Json) =
+              match m with
+              | JObj ps -> JObj(ps |> List.map (fun (k, v) -> if k = "workItems" then k, (match v with JArr xs -> JArr(xs |> List.map (fun w -> if str "id" w = "WI-GEN-PF-SECURITY" then f w else w)) | x -> x) else k, v)) |> withScopeHash
+              | x -> x
+          let strip (m: Json) = match m with JObj ps -> JObj(ps |> List.filter (fun (k, _) -> k <> "scopeSha256")) | x -> x
+          for name, forged in [ "requirements emptied", editItem (setField "requirements" (JArr [])) (strip successor)
+                                "dependency dropped", editItem (setField "dependsOn" (JArr [])) (strip successor)
+                                "owner changed", editItem (setField "owner" (JStr "nobody")) (strip successor) ] do
+              if not (preflight successor forged |> List.exists (fun r -> r.Code = "WORK_ITEM_ALTERED")) then
+                  yield sprintf "split control: a successor with a work item's %s passes preflight" name
+          if not (preflight successor successor).IsEmpty then yield sprintf "split: the successor fails its own preflight: %A" (preflight successor successor |> List.truncate 3)
+      | Error _ -> () ]
+
+/// The milestone-aligned refinement (TIME-TO-WORKING-APPLICATION.md, R5) compiles, keeps the approved requirements,
+/// obligations, priorities and mandatory flags, and reproduces the committed proposal's digest.
+let milestoneAlignedSplit (source: string) : string list =
+    let planPath = "docs/rehearsal-010-optimization/inputs/work-item-split.milestone-aligned.proposed.json"
+    let sources = ScopeCommands.sourcesOf source "requirements-compiled/v4.1.4"
+    let content (m: Json) = arr "requirements" m |> List.map (fun r -> str "id" r, serialize (JObj [ "o", (field "obligations" r |> Option.defaultValue (JArr [])); "p", JStr(strOpt "priority" r |> Option.defaultValue ""); "m", (field "mandatory" r |> Option.defaultValue JNull) ])) |> Map.ofList
+    let committed = parseFile (Path.Combine(source, "docs/rehearsal-010-optimization/proposals/scope-manifest.milestone-aligned.json"))
+    let planSha = Git.sha256Hex (File.ReadAllBytes(Path.Combine(source, planPath)))
+    [ match compileWithSplit sources (parseFile (Path.Combine(source, planPath))) planPath planSha with
+      | Error ps -> yield sprintf "milestone-aligned split: refused: %A" (List.truncate 3 ps)
+      | Ok m ->
+          if content m <> content (compile sources) then yield "milestone-aligned split: requirements, obligations, priorities or mandatory flags differ from the approved scope"
+          if str "scopeSha256" m <> str "scopeSha256" committed then yield sprintf "milestone-aligned split: compiles to %s, the committed proposal has %s" (str "scopeSha256" m) (str "scopeSha256" committed)
+          if Option.map (str "planSha256") (field "workItemSplit" committed) <> Some planSha then yield "milestone-aligned split: the committed proposal records a different plan digest"
+          if not (preflight m committed).IsEmpty then yield sprintf "milestone-aligned split: the committed proposal fails preflight: %A" (preflight m committed |> List.truncate 3) ]
+
 let all (source: string) : string list =
     let guard name f = try f () with ex -> [ sprintf "%s threw: %s" name ex.Message ]
-    guard "adversarial" adversarial @ guard "legitimate" legitimate @ guard "recovery" recovery @ guard "real" (fun () -> real source) @ guard "suite runners" (fun () -> suiteRunners source) @ guard "v4.1.4 owner records" (fun () -> v414OwnerRecords source) @ guard "v4.1.4 owner-record controls" (fun () -> v414OwnerRecordControls source) @ guard "v4.1.4 package" (fun () -> committedPackage source) @ guard "reconciliation" (fun () -> reconciliation source)
+    guard "adversarial" adversarial @ guard "legitimate" legitimate @ guard "recovery" recovery @ guard "real" (fun () -> real source) @ guard "suite runners" (fun () -> suiteRunners source) @ guard "v4.1.4 owner records" (fun () -> v414OwnerRecords source) @ guard "v4.1.4 owner-record controls" (fun () -> v414OwnerRecordControls source) @ guard "v4.1.4 package" (fun () -> committedPackage source) @ guard "reconciliation" (fun () -> reconciliation source) @ guard "work-item split" (fun () -> splitScope source) @ guard "milestone-aligned split" (fun () -> milestoneAlignedSplit source)

@@ -1,0 +1,351 @@
+{
+  "schema": "indy-init.work-item-split/1",
+  "status": "PROPOSED (milestone-aligned refinement of work-item-split.proposed.json; not adopted)",
+  "description": "As work-item-split.proposed.json, with the parts that straddled functional milestones (TIME-TO-WORKING-APPLICATION.md) split again so that M1 and M2 requirements sit in parts of their own. Requirement sets, owners and the T17 rule are unchanged.",
+  "splits": [
+    {
+      "workItem": "WI-INV-WORKSPACE",
+      "parts": [
+        {
+          "id": "WI-INV-WORKSPACE-READ",
+          "title": "Open an investigation read-only: its state and problem statement",
+          "dependsOn": [
+            "T17"
+          ],
+          "requirements": [
+            "INV-008",
+            "INV-042"
+          ]
+        },
+        {
+          "id": "WI-INV-WORKSPACE-FRAME",
+          "title": "Workspace frame: sections, investigation state, timestamps and problem statement",
+          "dependsOn": [
+            "WI-INV-WORKSPACE-READ"
+          ],
+          "requirements": [
+            "INV-007",
+            "INV-018"
+          ]
+        },
+        {
+          "id": "WI-INV-WORKSPACE-DETAILS",
+          "title": "Edit investigation details, keeping identity and history; cancel an editor",
+          "dependsOn": [
+            "WI-INV-WORKSPACE-HYPOTHESES",
+            "WI-INV-WORKSPACE-EVIDENCE"
+          ],
+          "requirements": [
+            "INV-034",
+            "INV-035",
+            "INV-036"
+          ]
+        },
+        {
+          "id": "WI-INV-WORKSPACE-HYPOTHESES",
+          "title": "Record and display hypotheses",
+          "dependsOn": [
+            "WI-INV-WORKSPACE-FRAME"
+          ],
+          "requirements": [
+            "INV-009",
+            "INV-010",
+            "INV-011",
+            "INV-026"
+          ]
+        },
+        {
+          "id": "WI-INV-WORKSPACE-EVIDENCE",
+          "title": "Record observations and evidence with their sources",
+          "dependsOn": [
+            "WI-INV-WORKSPACE-FRAME"
+          ],
+          "requirements": [
+            "INV-012",
+            "INV-013",
+            "INV-014",
+            "INV-024",
+            "INV-025",
+            "INV-027",
+            "INV-028",
+            "INV-029"
+          ]
+        },
+        {
+          "id": "WI-INV-WORKSPACE-LINKS",
+          "title": "Link evidence to hypotheses: kind, rationale, shown on both",
+          "dependsOn": [
+            "WI-INV-WORKSPACE-HYPOTHESES",
+            "WI-INV-WORKSPACE-EVIDENCE"
+          ],
+          "requirements": [
+            "INV-030",
+            "INV-031",
+            "INV-038",
+            "INV-044"
+          ]
+        },
+        {
+          "id": "WI-INV-WORKSPACE-CONCLUSION",
+          "title": "Record a conclusion",
+          "dependsOn": [
+            "WI-INV-WORKSPACE-HYPOTHESES"
+          ],
+          "requirements": [
+            "INV-032",
+            "INV-033"
+          ]
+        },
+        {
+          "id": "WI-INV-WORKSPACE-SAVE",
+          "title": "Save and the save state and its outcomes",
+          "dependsOn": [
+            "WI-INV-WORKSPACE-FRAME"
+          ],
+          "requirements": [
+            "INV-015",
+            "INV-016",
+            "INV-043"
+          ]
+        },
+        {
+          "id": "WI-INV-WORKSPACE-ROUNDTRIP",
+          "title": "Reopening and reload restore all content from GitHub",
+          "dependsOn": [
+            "WI-INV-WORKSPACE-SAVE",
+            "WI-INV-WORKSPACE-DETAILS",
+            "WI-INV-WORKSPACE-LINKS",
+            "WI-INV-WORKSPACE-CONCLUSION"
+          ],
+          "requirements": [
+            "INV-017",
+            "INV-037"
+          ]
+        }
+      ]
+    },
+    {
+      "workItem": "WI-INV-START",
+      "parts": [
+        {
+          "id": "WI-INV-START-FORM",
+          "title": "Start form: problem statement, title, question, identifier and indicators",
+          "dependsOn": [
+            "T17"
+          ],
+          "requirements": [
+            "INV-001",
+            "INV-002",
+            "INV-003",
+            "INV-005",
+            "INV-006",
+            "INV-023"
+          ]
+        },
+        {
+          "id": "WI-INV-START-RULES",
+          "title": "Start form validation rules",
+          "dependsOn": [
+            "WI-INV-START-FORM"
+          ],
+          "requirements": [
+            "INV-019",
+            "INV-020",
+            "INV-021"
+          ]
+        },
+        {
+          "id": "WI-INV-START-ACTIONS",
+          "title": "Start and cancel an investigation",
+          "dependsOn": [
+            "WI-INV-START-RULES"
+          ],
+          "requirements": [
+            "INV-004",
+            "INV-022"
+          ]
+        }
+      ]
+    },
+    {
+      "workItem": "WI-GEN-UI",
+      "parts": [
+        {
+          "id": "WI-GEN-UI-CONNECT",
+          "title": "Landing view after Connect: the connected repository and its investigations",
+          "dependsOn": [
+            "T17"
+          ],
+          "requirements": [
+            "UI-001",
+            "UI-025"
+          ]
+        },
+        {
+          "id": "WI-GEN-UI-RECOVERY",
+          "title": "Empty, error and recovery states",
+          "dependsOn": [
+            "WI-GEN-UI-CONNECT"
+          ],
+          "requirements": [
+            "UI-010"
+          ]
+        },
+        {
+          "id": "WI-GEN-UI-LANDING",
+          "title": "Dashboard, overview landing view, cards and the causal analysis workspace",
+          "dependsOn": [
+            "WI-GEN-UI-CONNECT"
+          ],
+          "requirements": [
+            "UI-022",
+            "UI-026",
+            "UI-033"
+          ]
+        },
+        {
+          "id": "WI-GEN-UI-INSPECT",
+          "title": "Command interface, evidence inspector and the shared Forma inspector",
+          "dependsOn": [
+            "WI-GEN-UI-LANDING"
+          ],
+          "requirements": [
+            "UI-004",
+            "UI-005",
+            "UI-034"
+          ]
+        },
+        {
+          "id": "WI-GEN-UI-STATES",
+          "title": "Timeline and empty, error and recovery states",
+          "dependsOn": [
+            "WI-GEN-UI-LANDING"
+          ],
+          "requirements": [
+            "UI-003"
+          ]
+        },
+        {
+          "id": "WI-GEN-UI-LANGUAGE",
+          "title": "Domain copy, terminology, presentation of integrity, next steps and provenance",
+          "dependsOn": [
+            "WI-GEN-UI-LANDING"
+          ],
+          "requirements": [
+            "UI-017",
+            "UI-023",
+            "UI-024",
+            "UI-031",
+            "UI-032",
+            "UI-038"
+          ]
+        },
+        {
+          "id": "WI-GEN-UI-VERIFY",
+          "title": "Cross-view consistency, traceability and presentation verification",
+          "dependsOn": [
+            "WI-GEN-UI-INSPECT",
+            "WI-GEN-UI-STATES",
+            "WI-GEN-UI-LANGUAGE"
+          ],
+          "requirements": [
+            "UI-013",
+            "UI-015",
+            "UI-021",
+            "UI-030",
+            "UI-039"
+          ]
+        }
+      ]
+    },
+    {
+      "workItem": "WI-GEN-PF",
+      "parts": [
+        {
+          "id": "WI-GEN-PF-BOUNDARY",
+          "title": "Provider-neutral boundary, single domain authority, explicit selection, fidelity and isolation",
+          "dependsOn": [
+            "T17"
+          ],
+          "requirements": [
+            "PF-001",
+            "PF-002",
+            "PF-003",
+            "PF-004",
+            "PF-005"
+          ]
+        },
+        {
+          "id": "WI-GEN-PF-FIXTURES",
+          "title": "Populated, edge-case, provider-failure and concurrency fixtures",
+          "dependsOn": [
+            "WI-GEN-PF-BOUNDARY"
+          ],
+          "requirements": [
+            "PF-006",
+            "PF-007",
+            "PF-008",
+            "PF-009"
+          ]
+        },
+        {
+          "id": "WI-GEN-PF-LEVELS",
+          "title": "Verification levels, fast feedback, visual verification, failure isolation, traceability, local-first",
+          "dependsOn": [
+            "WI-GEN-PF-FIXTURES"
+          ],
+          "requirements": [
+            "PF-011",
+            "PF-012",
+            "PF-016",
+            "PF-017",
+            "PF-018",
+            "PF-019"
+          ]
+        },
+        {
+          "id": "WI-GEN-PF-SECURITY",
+          "title": "Credentials and security",
+          "dependsOn": [
+            "WI-GEN-PF-BOUNDARY"
+          ],
+          "requirements": [
+            "PF-015"
+          ]
+        }
+      ]
+    },
+    {
+      "workItem": "WI-GEN-EXT-DATA",
+      "parts": [
+        {
+          "id": "WI-GEN-EXT-DATA-CONNECT",
+          "title": "Connect to the data repository: configuration, credential, permissions, states, isolation, no fallback",
+          "dependsOn": [
+            "T17"
+          ],
+          "requirements": [
+            "EXT-DATA-001",
+            "EXT-DATA-002",
+            "EXT-DATA-003",
+            "EXT-DATA-004",
+            "EXT-DATA-005",
+            "EXT-DATA-006",
+            "EXT-DATA-007",
+            "EXT-DATA-012"
+          ]
+        },
+        {
+          "id": "WI-GEN-EXT-DATA-WRITE",
+          "title": "Write new investigations to the data repository",
+          "dependsOn": [
+            "WI-GEN-EXT-DATA-CONNECT"
+          ],
+          "requirements": [
+            "EXT-DATA-008"
+          ]
+        }
+      ]
+    }
+  ]
+}

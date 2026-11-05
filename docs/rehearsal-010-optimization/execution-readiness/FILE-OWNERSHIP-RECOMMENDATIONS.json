@@ -1,0 +1,41 @@
+{
+  "schema": "indy-init.r10-file-ownership-recommendations/1",
+  "status": "PROPOSED. Nothing here changes the frozen v4.1.4 ownership; each recommendation names the owner decision it needs.",
+  "keepAsFrozen": [
+    "One primary owner per file; contributors edit only through a PR the owner approves (agent-file-ownership.json rules[0]).",
+    "Integration alone writes project, solution, props, package, CI, web entry and composition files (rules[4], X02, X18).",
+    "Every compile list is complete at bootstrap; no agent adds a file to a project later (project-structure.json).",
+    "Interface changes go through the coordinator and are versioned (rules[1]).",
+    "TreatWarningsAsErrors stays on in Directory.Build.props (contract drift otherwise compiles; INTEGRATION-CONTRACTS.md)."
+  ],
+  "recommendations": [
+    {
+      "id": "FO-1",
+      "change": "Split Views/Investigation.fs into capability files (frame, hypotheses, evidence, links, conclusion) and give ui-2 the evidence, links and conclusion views, the investigation list, and the WDL and GEN-UI language/state parts.",
+      "removes": "the ui lane's 564 lane-minutes as one serial queue",
+      "evidence": "model R4 / E6 (slice-roles.v415-proposed.json); TOPOLOGY-COMPARISON.md",
+      "needs": "ODR-R10-20 (v4.1.5 successor package)"
+    },
+    {
+      "id": "FO-2",
+      "change": "Split Update.fs and Projections.fs by capability: one Msg sub-union and one update function per capability file, composed in Update.fs by a frozen dispatcher that only integration edits.",
+      "removes": "the single frozen Update as the funnel for every UI stream (06-IF41-APP.fs:77-79)",
+      "evidence": "MILESTONE-DEPENDENCIES.md section 7: streams A, C, D, E and F all add Msg handling to Update.fs",
+      "needs": "the same v4.1.5 successor; an IF41-APP contract change through the coordinator"
+    },
+    {
+      "id": "FO-3",
+      "change": "Give GitHubRequests.fs and Classify.fs per-capability companions (read requests, write requests) so the read path (M0, M1) and the write path (M4) are separate files within persistence.",
+      "removes": "same-owner serialization between connect/read and save work",
+      "evidence": "MILESTONE-DEPENDENCIES.md section 7 (streams A, C, E share these files)",
+      "needs": "v4.1.5 successor (compile lists are frozen)"
+    },
+    {
+      "id": "FO-4",
+      "change": "Fold Agent 2's screen-level file ownership (proposals/r10-contract-first-ui/) into FO-1/FO-2 once published; do not adopt a second, competing ownership manifest.",
+      "removes": "the risk of two ownership authorities",
+      "evidence": "Agent 2's PR is not available at the time of writing",
+      "needs": "inspection of Agent 2's deliverable"
+    }
+  ]
+}

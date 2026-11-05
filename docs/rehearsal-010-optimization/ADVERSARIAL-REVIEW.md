@@ -1,0 +1,189 @@
+# Rehearsal 010 optimization: independent adversarial review
+
+Two independent reviewer agents worked from the code and their own clones, not from the implementer's conclusions. Neither modified the repository. The implementing agent certified nothing itself: every blocking finding below was fixed and then re-reviewed.
+
+## A. Launch fixes (PR #118): three rounds, final verdict PASS
+
+| Round | Head | Verdict | Blocking findings | Disposition |
+|---|---|---|---|---|
+| 1 | 1539cfc | FAIL | Major: a concurrency group keeps one *pending* run and cancels it for the next, so main's verification could still be cancelled while waiting | Fixed: every non-PR run gets its own group (`github.run_id`) |
+| 2 | 5041eea | FAIL | Major: Conditor's scaffold protects main (pull requests required), so the setup records couldn't be committed directly; through a PR the gate treated them as implementation | Fixed: the gate excludes these records, as `isImplementationPath` already did, and STARTUP routes them through `setup/*` PRs merged with a merge commit |
+| 3 | 485655f | **PASS** | none | Notes: `check-sequencing` can't tell a real initialization checkpoint from a hand-written one (this predates the PR, and is left to the observer); `.ros` coverage files go in or before the scope-checkpoint commit (added to STARTUP); LP-09 needs a new tooling run after merge |
+
+Round 3 verified, among other things:
+- a setup PR runs governance, `check-sequencing` and the base suites, and skips only the slice gate;
+- the checkpoint-parent rule holds under a merge-commit merge (shown in a scratch repository);
+- a clean GitHub merge commit lists no implementation paths;
+- the excluded files are never read by the gate from the candidate.
+
+## B. Optimization (PR #119)
+
+### Round 1 (39d83e0): FAIL, 2 majors
+
+| ID | Severity | Finding | Disposition |
+|---|---|---|---|
+| RVO-1-1 | major | `applySplit` validated against the pre-split items. Duplicate ids across parents, dependencies on replaced parents, parts skipping T17 and arbitrary owners all compiled, and preflight passed them | **Fixed:** judged against the post-split set; four new refusal codes; the reviewer's mutants are offline controls |
+| RVO-1-2 | minor | `scope preflight` never compared work items | **Fixed:** WORK_ITEM_ALTERED, _MISSING, _UNSOURCED and _DUPLICATED, with forged-successor controls |
+| RVO-1-3 | minor | Cross-item requirement dependencies are not ordered, and the docs overclaimed | **Narrowed:** the claim now covers dependencies within one parent; the gap predates the split and is documented |
+| RVO-1-4 | major | ODR-R10-22 cited a speculative-verification spec and controls that did not exist; the obvious implementation would relax `STALE_TARGET` | **Fixed:** VERIFICATION-OPTIMIZATION §7. The verified tree must equal the merged tree, which strengthens `STALE_TARGET`; controls S1–S6; ODR-R10-22 cannot be decided before they exist |
+| RVO-1-5 | minor | The model tests did not catch merges out of queue order, or repairs costing no time | **Fixed:** two invariants added. The out-of-order mutation is now caught (4 cases fail on it) |
+| RVO-1-6 | minor | Optimistic assumptions: no per-slice overhead; V5 assumes ownership that doesn't exist; merges cost no agent time; a false monotonicity claim | **Fixed or labelled:** `--slice-overhead`; V5 marked hypothetical; claim corrected; merge cost stated as a limitation |
+| RVO-1-7 | note | The split does not shorten completion time: the queue and the set-up do | **Published:** separation rows in SCHEDULE-COMPARISON and ODR-R10-19 |
+| RVO-1-8 | note | Smaller test gaps (some refusal codes, recompile-and-compare) | Partly covered by the new controls; the rest are open notes |
+| RVO-1-9 | note | Scope, approvals, clock, observer and gate are intact | – |
+
+The reviewer also confirmed that:
+- the published V1, V3 and V5 numbers reproduce exactly;
+- the approved scope recompiles byte-identically;
+- every requirement of the successor matches the approved scope field by field.
+
+### Round 2 (517230c): FAIL, 1 major
+
+The reviewer re-verified the round-1 fixes. RVO-1-1 holds for the cases raised (p1–p6 refused). RVO-1-2 holds: forgeries fa–fd and ff are refused, and fe, reordered items, passes. No consumer of `Scope.preflight` breaks. The plain compile is unchanged (`59bfef5a…`), and the successor reproduces (`a847f98c…`).
+
+| ID | Severity | Finding | Disposition |
+|---|---|---|---|
+| RVO-2-1 | major | A dependency cycle **across two splits** compiled, passed preflight, and gave a stack overflow in the model. The cycle check covered siblings only | **Fixed:** one acyclicity check over the whole post-split work-item graph (`SPLIT_CYCLE`); the reviewer's p7 is an offline control; the model calls `topo` before recursing |
+| RVO-2-2 | minor | The merge-order invariant cannot fire with one CI duration and no failures. **The round-1 claim that the out-of-order merge was "now caught" was wrong for the reviewer's mutation**, and M3 (restart of verified candidates), M10b and M13 were not caught | **Partly fixed:** exact repair-cost and per-slice-overhead assertions added (M10b and M13 now bite). The invariant is labelled a guard, not a proof. M2/M3 stay unprovable while the model has a single CI duration; published numbers are unaffected |
+| RVO-2-3 | minor | §7 bound the merge by tree hash, while all existing evidence binds by commit SHA | **Fixed in the spec:** the verified speculative commit must itself become main by fast-forward; control S7 (same tree, different parents); MAIN_UNHEALTHY voids the queue |
+| RVO-2-4 | note | SPLIT_DROPS_PARENT_DEPENDENCY followed siblings only, refusing some valid plans | **Fixed:** reach is computed over the whole post-split graph, including DAG tasks |
+| RVO-2-5 | note | WORK_ITEM_ALTERED is key-order sensitive; overhead also inflates repair time and priorities | Documented (SCHEDULE-COMPARISON) |
+
+### Round 3
+
+### Round 3 (1ead513): FAIL, 1 major (documentation)
+
+The reviewer worked from an independent anonymous clone of causa-data, and reproduced:
+- R1, R2 and R5 exactly;
+- the derived proposal files, byte-equal;
+- `scope preflight` PASS;
+- pinned files byte-unchanged against main.
+
+It also ran 36 invariant cases under milestone priority (all PASS) and six mutations, four of which were caught.
+
+| ID | Severity | Finding | Disposition |
+|---|---|---|---|
+| RVO-3-1 | major | M1 and M3 times were presented without the blockers the branch's own ODRs give them; only M2 was labelled blocked | **Fixed:** TIME-TO-WORKING-APPLICATION limit 1, findings 4–5, FUNCTIONAL-PRIORITY-PLAN §2 and §7, and FINAL-REPORT now qualify M1 (ODR-R10-28, -29/-25) and M3 (ODR-R10-25, -26) |
+| RVO-3-2 | minor | Milestone delivery is not cumulative, so `usableMilestonesAt` could overcount | **Fixed:** `usableAt` counts the delivered prefix; test added. Committed counts are unchanged, and reproduced by test |
+| RVO-3-3 | minor | No staleness check on derived artifacts. Emptying every `dependsOn` in the aligned slice manifest, or ranking without ancestors, went undetected | **Fixed:** model tests reproduce every committed run R0–R5. The rank test covers ancestors. A CI step regenerates both successors' slice manifests and inventories and diffs them. Both reviewer mutations are now caught |
+| RVO-3-4 | minor | Invariants never run under milestone priority | **Fixed:** 16 invariant cases (successor and aligned × depth 1/3 × fail 0/4 × CI 0/10) |
+| RVO-3-5 | minor | C1 omitted `NegativeKnowledgeEstablished` (6) and `ConclusionRecorded` (4); the stub has 27 cases, not 28 | **Fixed** in DATA-REPOSITORY-CONTRACT.md |
+| RVO-3-6 | note | ODR-R10-28 option B would browse with a write-capable token | Stands as an option; A is recommended |
+| RVO-3-7 | note | Round 3 not recorded | This section |
+
+Eight addendum checks:
+- PASS: 1 (data from GitHub), 2 (no write credential), 3 (one canonical model), 4 (no requirement lost), 5 (no test weakened), 6 (save semantics);
+- PARTIAL: 7 (runnable after each milestone: under v4.1.4 no milestone M1–M3 can pass against real data);
+- PARTIAL: 8 (no relabelling; fixed by RVO-3-1).
+
+### Round 4 (03825ca): PASS
+
+The reviewer verified the RVO-3 fixes independently:
+- the model tests (59 PASS) and the offline suite pass;
+- pinned files are byte-unchanged against main (dbcad12);
+- FINAL-REPORT's figures match the committed results;
+- both round-3 mutations are now caught, as are three new mutations: `usableAt` reverted, M1 and M2 swapped, and an obligation dropped from an inventory, which only the CI step catches.
+
+| ID | Severity | Finding | Disposition |
+|---|---|---|---|
+| RVO-4-1 | minor | The reproduction test did not compare obligations or requirements, so an edited R2 headline (527 → 600) went undetected | **Fixed:** it now compares mandatory obligations, requirements and slices by the deadline; the R2 edit is caught |
+| RVO-4-2 | minor | FINAL-REPORT claimed a round-4 result before one existed | **Fixed:** this section, and the report states the result |
+| RVO-4-3 | minor | FINAL-REPORT Q6, the addendum table and the verdict bullet were unqualified | **Fixed** |
+| RVO-4-4 | note | ODR-R10-27, SCHEDULE-COMPARISON, TIME-TO-WORKING finding 2 and CRITICAL-PATH gave M1/M2 times without their decisions | **Fixed** |
+
+The reviewer judged the PARTIALLY OPTIMIZED verdict to be supported.
+
+### Round 5 (653bfbb, the minimum-data-browser addendum): PASS
+
+The reviewer confirmed these claims:
+- the causa-data facts (independent parse: 1,363 events, CORS `*`);
+- the Rehearsal 009 timeline and its browser-side `api.github.com` path;
+- every dependency row against the DAG and the edge reasons;
+- every TIME-TO-FIRST-DATA number, and R6 reproduced from the CLI;
+- that no M0 code was committed, and the OD-INDY-22 reasoning;
+- that nothing claims replay or counts M0 toward EXT-DATA-013, T25, J1-06 or J2-08.
+
+Two mutations were caught.
+
+| ID | Severity | Finding | Disposition |
+|---|---|---|---|
+| RVO-5-1 | minor | Rehearsal 009's "accepted candidate" omitted that its release gate refused it (0/541) | **Fixed** everywhere it is cited |
+| RVO-5-2 | minor | "Working application at T+21" is a commit time, not verification | **Fixed**: commit, CI (T+42) and review fixes (T+63) are separated |
+| RVO-5-3 | minor | M0 cannot surface C1, since it does not decode events | **Fixed** in ARCHITECTURAL-LESSONS |
+| RVO-5-4 | minor | "Costs nothing" ignored persistence and integration contribution work | **Fixed**: stated as a model assumption |
+| RVO-5-5 | note | WI-GEN-EXT-DATA window 209 → 228 | **Fixed** |
+| RVO-5-6 | note | file-name, measured-value and usable-count nits | **Fixed**. R6 `usableMilestonesAt` counts M0, and is not quoted as M1-level usability |
+| RVO-5-7 | note | `Verify` consumes bytes, not parsed JSON | **Fixed**: only the adapter's bytes carry over |
+
+## The ten mission questions (from round 1 unless noted)
+
+| # | Question | Answer |
+|---|---|---|
+| 1 | Did a requirement or obligation disappear? | No. All 205 requirements are identical field by field; only work-item counts differ |
+| 2 | Did splitting change semantics? | Not the requirements. Ordering holes were found and fixed (RVO-1-1); cross-item ordering is unchanged from before (RVO-1-3) |
+| 3 | Can test reuse hide failures? | No gate code was changed. The reuse proposals are design only, and the Dokimos omitted-test gap is documented (VERIFICATION-OPTIMIZATION §2) |
+| 4 | Can parallel verification accept stale results? | Not under §7: the tree identity check plus voiding of stacked verdicts. Not built |
+| 5 | Can integration bypass current-main verification? | Not on this branch. #118 makes main's post-merge runs uncancellable |
+| 6 | Do gains depend on unrealistic assumptions? | Partly: merge cost, per-slice overhead, V5's ownership. All now labelled, with sensitivity runs |
+| 7 | Was the scope or approval digest changed without authorization? | No. Pinned files are unchanged; the successor is PROPOSED only |
+| 8 | Is the 420-minute clock immutable? | Yes. `deadline-policy.json` and T0 handling are untouched |
+| 9 | Can the observer still detect shortcuts? | Yes. Observer pins and Observer.fs are unchanged, and its scope checks apply to a successor |
+| 10 | Is recovery from interrupted sessions preserved? | Yes, for adoption before T0. A mid-run adoption would orphan Praxis records (now stated in ODR-R10-19) |
+
+### Round 6 (a8608f0, execution readiness): FAIL, 2 majors
+
+The reviewer reproduced:
+- the substitution demonstration, including `TreatWarningsAsErrors` on and off;
+- E8 and E8c from the CLI;
+- every E-table cell and every CI step timing.
+
+| ID | Severity | Finding | Disposition |
+|---|---|---|---|
+| RVO-6-1 | major | `change-impact` under-selected without failing safe: Host.cs, a project outside the graph, a new source file, Program.fs | **Fixed:** fail-safe on an empty selection or an out-of-graph source path; composition files in the presentation rule; 5 new cases, including an exhaustive "no manifest file selects nothing" |
+| RVO-6-2 | major | E8 completion is non-monotonic in queue depth (at 5-min CI, depth 1 finishes first), and the docs blamed failures although none are configured | **Fixed:** depth sweep published; completion stated as a range; recommendation re-based on M2/M3 at 10-min CI |
+| RVO-6-3 | minor | CI queue upper bound was 504 s, not 524 | **Fixed** |
+| RVO-6-4 | minor | E8 M2 is delivered before M1 and T25 | **Footnoted**: usable from the later of the two |
+| RVO-6-5 | note | Level 1/2 use needs the owner's acknowledgement; INV-LIST integrates before T17 in E8 | **Stated** in §9 and in ODR-R10-31 |
+
+### Round 7 (7c782d5): PASS
+
+The reviewer could not defeat the selection with any path a real `git diff` produces. New attacks (`..`, manifest files outside any project, fixtures, `.github/`) all fail safe, and the depth sweep reproduces.
+
+| ID | Severity | Finding | Disposition |
+|---|---|---|---|
+| RVO-7-1 | minor | "Small or absent at 5-min CI" understated: the speculative queue gains about 45 min for M2 and M3 there | **Fixed** |
+| RVO-7-2 | minor | Single-point completion (T+565) still in the main FINAL-REPORT and ODR-R10-32 | **Fixed:** stated as a range |
+| RVO-7-3 | minor | Stale case count | **Fixed** (22) |
+| RVO-7-4 | note | `TAG:` selectors undefined; `.github/` lost its dot; `..` not resolved | **Fixed:** tags defined in the matrix; paths normalised; 2 new cases |
+| RVO-7-5 | note | The other execution-readiness docs make no completion claims | – |
+
+### Round 8 (e787cbe, merge-dependency model and CF-07): FAIL, 1 major (documentation)
+
+The implementation passed: no early merge, equivalence and published runs preserved, `cyclicMergeEdges` correct, and two of three mutations caught. The CF-07 deadlock was confirmed against Ledger.fs 391–410.
+
+| ID | Severity | Finding | Disposition |
+|---|---|---|---|
+| RVO-8-1 | major | "Every published time is the optimistic bound" is false. The model is not monotone in added constraints (J2 M5 690 against 700), and Agent 2's runs are different configurations | **Fixed:** published figures are stated as the literal option A, not a bound; a three-policy table replaces the claim |
+| RVO-8-2 | minor | Counts conflated edges on cycles with edges that must be deferred | **Fixed:** the table shows on-cycle, impossible (dependsOn-only), minimal cycle-breaking and Agent 2's sets. `--defer-cyclic minimal` is implemented; it defers 21 and 36, against Agent 2's 22 and 35 |
+| RVO-8-3 | minor | J runs record no merge-dependency input or policy | **Fixed:** `mergeDependencies` (file, sha256, policy, edges deferred) is written to each result. The input lives only in PR #121, so the J runs are not in the reproduction test (stated) |
+| RVO-8-4 | minor | Test 2 did not bite | **Fixed:** it uses a merge dependency ordinary scheduling would not satisfy (T11 waits for T20), checks that it would bite, and fails when merge dependencies are ignored. A minimal-deferral case was added |
+
+### Round 9 (4947573): FAIL, 1 major (documentation)
+
+The RVO-8 fixes, the provenance record, the strengthened test, the K-* table and `contract-first-inputs.fsx` all reproduced.
+
+| ID | Severity | Finding | Disposition |
+|---|---|---|---|
+| RVO-9-1 | major | Conclusions 2 and 5 said nothing fits in 420 minutes under the stricter deferral; the table shows all three capabilities fit at 0-min CI | **Fixed:** greedy-policy K runs added in this model (`K-*-minimal.json`); conclusions rewritten from both tables |
+| RVO-9-2 | minor | "Connect and Browse past 420 in every plan" was false for Connect in J8 at 0-min CI (T+416) | **Fixed** |
+| RVO-9-3 | minor | "Minimal" is greedy, not minimum; one table was still headed "bound" | **Fixed:** renamed in the docs; the CLI value `minimal` is documented as greedy |
+| RVO-9-4 | note | No K run under this model's stricter policy | **Fixed** (10 runs, with provenance) |
+
+### Round 10 (fe6bda2): PASS
+
+The reviewer re-ran the greedy-policy table cell for cell, with provenance. Conclusion 2 and the Connect/Browse sentence now hold against both tables.
+
+| ID | Severity | Finding | Disposition |
+|---|---|---|---|
+| RVO-10-1 | minor | Conclusion 5's "80–140 minutes" held for Data Visible only | **Fixed:** 31–141, per capability |
+| RVO-10-2 | minor | The code comment still said "minimal" | **Fixed:** greedy, not a minimum set |
