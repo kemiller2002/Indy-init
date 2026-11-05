@@ -49,7 +49,9 @@ They expose CF-07: the bindings create **cyclic merge dependencies**.
   - SL-T16 needs T21, which needs T17, which needs T16;
   - SL-T19 needs T21, which needs T20, which needs T19.
 - Others are mutual journey couplings: SL-WI-GEN-EXT-DATA (bound to J1-03) needs SL-WI-INV-START, and SL-WI-INV-START (bound to J1-03 too) needs EXT-DATA.
-- The model defers these edges greedily, in a fixed order and identically in both policies, which amounts to CF-07 option A. It prints them.
+- The model defers these edges greedily, in a fixed order and identically in both policies, only until the graph is acyclic: the **minimal** deferral, and the latest times. It prints them.
+- CF-07 option A as worded defers every edge that closes a cycle through any merge dependency. The optimization agent implemented that in schedule-model.fsx (`--merge-deps`, `--defer-cyclic`): 42/42 approved and 93/126 successor edges. It gives the earliest times.
+- The truth lies between the two bounds until the owner decides CF-07. Treat the optimization agent's figures as the option-A result.
 
 Two further assumptions:
 - Under contract-first a UI slice *builds* without waiting for non-UI dependencies such as SL-T17. That is the CF-09 rule itself, and it is the source of the T+45 start.

@@ -58,7 +58,7 @@ let byId = slices |> List.map (fun s -> s.Id, s) |> Map.ofList
 /// Hidden merge dependencies that would make a slice's gate wait, directly or through other gates, for work that waits
 /// for the slice. Found over the whole merge graph (declared + hidden edges), deferred one at a time in a fixed order
 /// until the graph is acyclic, and reported (cyclicMergeDependencies). Deferring means the slice merges without them:
-/// exactly the owner decision CF-07 asks for. Applied identically to both policies.
+/// the MINIMAL deferral (latest times). CF-07 option A as worded defers every cyclic edge; schedule-model.fsx --defer-cyclic implements that bound. Applied identically to both policies.
 let hiddenOf s = hidden |> List.collect (fun (a, needs) -> if s.Assertions |> List.exists a.Contains then needs else []) |> List.distinct |> List.filter (fun d -> d <> s.Id && byId.ContainsKey d)
 let allHidden = slices |> List.collect (fun s -> hiddenOf s |> List.map (fun d -> s.Id, d))
 let reaches (edges: (string * string) list) (src: string) (target: string) =
