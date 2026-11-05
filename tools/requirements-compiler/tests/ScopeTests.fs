@@ -539,6 +539,169 @@ let v414OwnerRecordControls (source: string) : string list =
       if check approvals withoutBootstrap amendment amendment |> List.isEmpty then
           yield "v4.1.4 owner-record control: 'a request edited after it was proposed (bootstrap dropped)' was not refused" ]
 
+/// v4.1.5's owner records (FREEZE.md step 2), as a pure check. The owner's records carry no digests ("select A"), so what
+/// the owner selected is the request as it stood when the record landed: `pinsAt approval` gives the requests file at the
+/// parent of the commit that first recorded that approval id (independent review of #137). For each contract-bearing
+/// decision (ODR-V415-01, ODR-V415-IF-VIEW) the owner's latest record must select A, and every pin of that decision's
+/// `applies.A` as it stood then must hold now: each pinned contract's file digest and its contractChanges digest equal
+/// the pin and the change names that approval; T-L03 and the SM-SAVE note equal their content digests and name that
+/// approval; the project structure equals its pin. Every changed contract must be covered by some decision's pin, and
+/// the scope decisions (ODR-V415-03, ODR-V415-04) must be recorded with option A.
+let private v415Canonical (j: Json) : string =
+    let quote (s: string) =
+        let escape (c: char) =
+            match c with
+            | '"' -> "\\\""
+            | '\\' -> "\\\\"
+            | '\n' -> "\\n"
+            | '\r' -> "\\r"
+            | '\t' -> "\\t"
+            | '\b' -> "\\b"
+            | '\012' -> "\\f"
+            | c when c < ' ' -> sprintf "\\u%04x" (int c)
+            | c -> string c
+        "\"" + String.Join("", s |> Seq.map escape) + "\""
+    let rec go (j: Json) =
+        match j with
+        | JNull -> "null"
+        | JBool b -> if b then "true" else "false"
+        | JInt n -> string n
+        | JNum d -> string d
+        | JStr s -> quote s
+        | JArr xs -> "[" + String.Join(",", xs |> List.map go) + "]"
+        | JObj ps -> "{" + String.Join(",", ps |> List.sortWith (fun (a, _) (b, _) -> String.CompareOrdinal(a, b)) |> List.map (fun (k, v) -> quote k + ":" + go v)) + "}"
+    go j
+
+let v415EntryDigest (entry: Json) : string =
+    let withoutApproval = match entry with JObj ps -> JObj (ps |> List.filter (fst >> (<>) "approval")) | x -> x
+    Git.sha256Hex (Text.Encoding.UTF8.GetBytes(v415Canonical withoutApproval))
+
+let v415OwnerRecordsWith (approvals: Json list) (amendment: Json) (machines: Json) (pinsAt: string -> Result<Json list, string>) (fileSha: string -> string) : string list =
+    let get k j = strOpt k j |> Option.defaultValue ""
+    let operator (a: Json) = (field "authority" a |> Option.bind (strOpt "kind")) = Some "operator"
+    let changeOf (decision: string) (a: Json) = arr "changes" a |> List.tryFind (fun c -> strOpt "decision_id" c = Some decision)
+    let latest (decision: string) = approvals |> List.filter operator |> List.filter (changeOf decision >> Option.isSome) |> List.tryLast
+    let changes = arr "contractChanges" amendment
+    let applied (decision: string) (approval: string) =
+        pinsAt approval
+        |> Result.bind (fun rs ->
+            match rs |> List.tryFind (fun r -> get "id" r = decision) |> Option.bind (field "applies") |> Option.bind (field "A") with
+            | Some a -> Ok a
+            | None -> Error (sprintf "%s had no option A when %s was recorded" decision approval))
+    let pinned =
+        [ for decision in [ "ODR-V415-01"; "ODR-V415-IF-VIEW" ] do
+              match latest decision with
+              | None -> yield Error (sprintf "v4.1.5: %s is not recorded by the owner" decision)
+              | Some a when changeOf decision a |> Option.bind (strOpt "option") <> Some "A" ->
+                  yield Error (sprintf "v4.1.5: %s records %s other than option A" (get "id" a) decision)
+              | Some a ->
+                  match applied decision (get "id" a) with
+                  | Error e -> yield Error (sprintf "v4.1.5: what %s selected cannot be read: %s" (get "id" a) e)
+                  | Ok pins -> yield Ok (decision, get "id" a, pins) ]
+    [ for p in pinned do
+          match p with
+          | Error e -> yield e
+          | Ok (decision, approval, pins) ->
+              for c in arr "contracts" pins do
+                  let file, pin = get "file" c, get "sha256" c
+                  if fileSha file <> pin then yield sprintf "v4.1.5: %s selected %s at %s, but the file is %s" approval file pin (fileSha file)
+                  match changes |> List.filter (fun x -> get "file" x = file) with
+                  | [ x ] when get "sha256" x <> pin -> yield sprintf "v4.1.5: %s selected %s at %s, but contractChanges declares %s" approval file pin (get "sha256" x)
+                  | [ x ] when get "approval" x <> approval -> yield sprintf "v4.1.5: the change of %s names %s, not the owner's record %s" file (if get "approval" x = "" then "no approval" else get "approval" x) approval
+                  | [ _ ] -> ()
+                  | xs -> yield sprintf "v4.1.5: contractChanges declares %s %d times" file xs.Length
+              let check (kind: string) (entries: Json list) (matches: Json -> Json -> bool) =
+                  [ for pinEntry in arr kind pins do
+                        match entries |> List.filter (matches pinEntry) with
+                        | [ e ] when v415EntryDigest e <> get "sha256" pinEntry -> yield sprintf "v4.1.5: the %s entry %s differs from what %s selected" kind (v415Canonical pinEntry) approval
+                        | [ e ] when get "approval" e <> approval -> yield sprintf "v4.1.5: the %s entry %s names %s, not the owner's record %s" kind (get "machine" e) (if get "approval" e = "" then "no approval" else get "approval" e) approval
+                        | [ _ ] -> ()
+                        | xs -> yield sprintf "v4.1.5: %d %s entries match %s" xs.Length kind (v415Canonical pinEntry) ]
+              yield! check "transitions" (arr "transitions" machines) (fun pin e -> get "machine" e = get "machine" pin && get "id" e = get "id" pin)
+              yield! check "accepted" (arr "accepted" machines) (fun pin e -> get "machine" e = get "machine" pin && get "decision" e = get "decision" pin)
+              match field "projectStructure" pins with
+              | Some ps when fileSha (get "file" ps) <> get "sha256" ps -> yield sprintf "v4.1.5: %s selected %s at %s, but the file is %s" approval (get "file" ps) (get "sha256" ps) (fileSha (get "file" ps))
+              | _ -> ()
+      let covered = pinned |> List.collect (function Ok (_, _, pins) -> arr "contracts" pins |> List.map (get "file") | Error _ -> [])
+      for x in changes do
+          if not (List.contains (get "file" x) covered) then yield sprintf "v4.1.5: contractChanges declares %s, which no recorded selection pins" (get "file" x)
+      for decision in [ "ODR-V415-03"; "ODR-V415-04" ] do
+          match latest decision with
+          | Some a when changeOf decision a |> Option.bind (strOpt "option") = Some "A" -> ()
+          | Some a -> yield sprintf "v4.1.5: %s records %s other than option A" (get "id" a) decision
+          | None -> yield sprintf "v4.1.5: %s is not recorded by the owner" decision ]
+
+/// The real v4.1.5 record: the committed approvals, amendment and state-machine amendments; the requests file at the
+/// parent of the commit that first recorded each approval id; the package files' digests on disk.
+let v415OwnerRecords (source: string) : string list =
+    let approvalsPath = "kickoff/rehearsal-007/approvals.causa.json"
+    let package = "requirements-compiled/v4.1.5"
+    let text (b: byte[]) = System.Text.Encoding.UTF8.GetString b
+    let git args = Git.run source args
+    let pinsAt (approval: string) =
+        git [ "log"; "--format=%H"; "-S"; sprintf "\"%s\"" approval; "--"; approvalsPath ]
+        |> Result.map (fun b -> (text b).Split('\n', StringSplitOptions.RemoveEmptyEntries) |> List.ofArray)
+        |> Result.bind (function [] -> Error "no commit records it" | cs -> Ok (List.last cs))
+        |> Result.bind (fun c -> git [ "show"; c + "^:" + package + "/proposals/owner-decision-requests.json" ] |> Result.map (parseBytes >> arr "requests"))
+    let fileSha (path: string) =
+        let full = Path.Combine(source, package, path)
+        if File.Exists full then Git.sha256Hex (File.ReadAllBytes full) else "<missing>"
+    match git [ "rev-parse"; "--is-shallow-repository" ] |> Result.map (text >> fun t -> t.Trim()) with
+    | Ok "false" ->
+        v415OwnerRecordsWith
+            (parseFile (Path.Combine(source, approvalsPath)) |> arr "approvals")
+            (parseFile (Path.Combine(source, package, "analysis/amendment.json")))
+            (parseFile (Path.Combine(source, package, "analysis/state-machine-amendments.json")))
+            pinsAt fileSha
+    | Ok _ -> [ "v4.1.5: the history is shallow" ]
+    | Error e -> [ sprintf "v4.1.5: %s" e ]
+
+/// The v4.1.5 guard refuses what it exists for. Starting from the committed records, each mutation must be refused:
+/// a pin edited after the decision (the requests now differ from what was selected, but the package follows the edit),
+/// a contract changed after the decision, a wrong approval on a change, T-L03 or the note changed, option B, an
+/// unrecorded decision, and an unpinned contract change. The committed records must pass.
+let v415OwnerRecordControls (source: string) : string list =
+    let package = "requirements-compiled/v4.1.5"
+    let approvals = parseFile (Path.Combine(source, "kickoff/rehearsal-007/approvals.causa.json")) |> arr "approvals"
+    let amendment = parseFile (Path.Combine(source, package, "analysis/amendment.json"))
+    let machines = parseFile (Path.Combine(source, package, "analysis/state-machine-amendments.json"))
+    let requests = parseFile (Path.Combine(source, package, "proposals/owner-decision-requests.json")) |> arr "requests"
+    let fileSha (path: string) =
+        let full = Path.Combine(source, package, path)
+        if File.Exists full then Git.sha256Hex (File.ReadAllBytes full) else "<missing>"
+    let set (k: string) (v: Json) (j: Json) =
+        match j with
+        | JObj ps when ps |> List.exists (fst >> (=) k) -> JObj (ps |> List.map (fun (k', x) -> if k' = k then k', v else k', x))
+        | JObj ps -> JObj (ps @ [ k, v ])
+        | x -> x
+    let onList (k: string) (pick: Json -> bool) (f: Json -> Json) (j: Json) = set k (JArr (arr k j |> List.map (fun x -> if pick x then f x else x))) j
+    let file07 = "contracts/07-IF41-VIEW.fs"
+    let isFile f x = strOpt "file" x = Some f
+    let fakeSha = String('0', 64)
+    // As decided: the requests as they stand are what was selected.
+    let asDecided _ = Ok requests
+    // A pin edited after the decision: the package and the current requests follow the edit, the decided requests do not.
+    let editedPin = amendment |> onList "contractChanges" (isFile file07) (set "sha256" (JStr fakeSha))
+    let editedFile f = if f = file07 then fakeSha else fileSha f
+    let swap (decision: string) (option: string) (a: Json) =
+        set "changes" (JArr (arr "changes" a |> List.map (fun c -> if strOpt "decision_id" c = Some decision then set "option" (JStr option) c else c))) a
+    let withoutRecord (decision: string) = approvals |> List.filter (fun a -> not (arr "changes" a |> List.exists (fun c -> strOpt "decision_id" c = Some decision)))
+    let cases =
+        [ "a pin edited after the decision (contract and contractChanges follow it)", approvals, editedPin, machines, editedFile
+          "a contract changed after the decision", approvals, amendment, machines, editedFile
+          "a change naming the wrong approval", approvals, amendment |> onList "contractChanges" (isFile "contracts/00-DOMAIN-STUBS.fs") (set "approval" (JStr "APR-V415-OWNER-9")), machines, fileSha
+          "T-L03 changed after the decision", approvals, amendment, machines |> onList "transitions" (fun t -> strOpt "id" t = Some "T-L03") (set "guard" (JStr "always")), fileSha
+          "the SM-SAVE note changed after the decision", approvals, amendment, machines |> onList "accepted" (fun a -> strOpt "decision" a = Some "ODR-V415-01") (set "note" (JStr "changed")), fileSha
+          "ODR-V415-01 recorded as option B", approvals |> List.map (swap "ODR-V415-01" "B"), amendment, machines, fileSha
+          "ODR-V415-IF-VIEW not recorded", withoutRecord "ODR-V415-IF-VIEW", amendment, machines, fileSha
+          "ODR-V415-03 not recorded", withoutRecord "ODR-V415-03", amendment, machines, fileSha
+          "an unpinned contract change", approvals, set "contractChanges" (JArr (arr "contractChanges" amendment @ [ JObj [ "file", JStr "contracts/08-IF41-REPORT.fs"; "sha256", JStr fakeSha; "decision", JStr "ODR-V415-01"; "approval", JStr "APR-V415-OWNER-1" ] ])) amendment, machines, fileSha ]
+    [ match v415OwnerRecordsWith approvals amendment machines asDecided fileSha with
+      | [] -> ()
+      | ps -> yield sprintf "v4.1.5 owner-record control: the committed records fail: %A" ps
+      for name, aps, a, m, sha in cases do
+          if v415OwnerRecordsWith aps a m asDecided sha |> List.isEmpty then yield sprintf "v4.1.5 owner-record control: '%s' was not refused" name ]
+
 /// The committed v4.1.4 package is what the compiler produces from its inputs (`v41 --check`).
 let committedPackage (source: string) : string list =
     let code =
