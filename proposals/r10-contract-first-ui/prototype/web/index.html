@@ -1,0 +1,120 @@
+<!doctype html>
+<!-- PROPOSAL prototype (proposals/r10-contract-first-ui): the investigation-list screen with its connection region, in
+     Limen 0.9.1's declarative binding grammar (data-text, data-bind-*, data-if, data-each, data-event). Every binding
+     name is a SCREEN-MANIFEST.json id. The engine behind it is the F# fixture backend: no request reaches GitHub. -->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Investigations · Causa</title>
+  <link rel="stylesheet" href="/node_modules/@echelon-foundry/design-system/dist/all.css">
+  <link rel="stylesheet" href="causa-theme.css">
+  <link rel="stylesheet" href="causa.css">
+  <script type="module" src="main.js"></script>
+</head>
+<body>
+  <a class="ef-skip-link" href="#main">Skip to content</a>
+  <header class="ef-site-header causa-masthead">
+    <div class="ef-site-header__inner"><span class="ef-site-header__name">Causa</span></div>
+  </header>
+  <nav class="ef-navigation-shell causa-primary" aria-label="Primary" data-requirement-id="INV-041">
+    <ul class="causa-primary__list">
+      <li><a href="#/" data-bind-aria-current="nav-investigations-current">Investigations</a></li>
+      <li><a href="#/administration" data-bind-aria-current="nav-administration-current">Administration</a></li>
+      <li><a href="#/settings" data-bind-aria-current="nav-settings-current">Settings</a></li>
+    </ul>
+  </nav>
+  <main id="main" class="ef-container causa-main" tabindex="-1">
+    <template data-if="is-fixture">
+      <p class="causa-fixture-note" role="note">Fixture data, not a live repository: <span data-text="origin"></span></p>
+    </template>
+    <h1>Investigations</h1>
+
+    <template data-if="UIR-CONNECTION-visible">
+      <section class="ef-stack causa-panel" aria-labelledby="connect-heading" data-requirement-id="EXT-DATA-002">
+        <h2 id="connect-heading">Connect data repository</h2>
+        <p>Status: <span data-text="connection-state"></span></p>
+        <form class="ef-form" data-event="UIA-CONNECT">
+          <div class="ef-field">
+            <label class="ef-field__label" for="conn-owner">Repository owner</label>
+            <input id="conn-owner" name="owner" autocomplete="off" aria-required="true" data-event="UIF-CONN-OWNER">
+          </div>
+          <div class="ef-field">
+            <label class="ef-field__label" for="conn-repo">Repository</label>
+            <input id="conn-repo" name="repository" autocomplete="off" aria-required="true" data-event="UIF-CONN-REPOSITORY">
+          </div>
+          <div class="ef-field">
+            <label class="ef-field__label" for="conn-branch">Branch</label>
+            <input id="conn-branch" name="branch" autocomplete="off" aria-required="true" data-event="UIF-CONN-BRANCH">
+          </div>
+          <div class="ef-field">
+            <label class="ef-field__label" for="conn-token">Access token</label>
+            <!-- Never data-bind-value: the credential is not in the projection (PF-015). -->
+            <input id="conn-token" name="token" type="password" autocomplete="off" aria-required="true" data-event="UIF-CONN-TOKEN">
+          </div>
+          <template data-if="connection-errors-present">
+            <div class="ef-validation-summary" role="alert">
+              <ul class="ef-validation-summary__list">
+                <template data-each="connection-errors" data-key="field"><li data-text="message"></li></template>
+              </ul>
+            </div>
+          </template>
+          <template data-if="UIA-CONNECT-offered">
+            <button class="ef-button causa-primary-action" type="submit">Connect data repository</button>
+          </template>
+          <template data-if="connecting"><p role="status">Connecting</p></template>
+        </form>
+      </section>
+    </template>
+
+    <template data-if="UIA-DISCONNECT-offered">
+      <div class="causa-connected">
+        <p>Connected to <span data-text="connected-repository"></span></p>
+        <button class="ef-button" type="button" data-event="UIA-DISCONNECT">Disconnect</button>
+        <template data-if="UIA-NEW-INVESTIGATION-offered">
+          <a class="ef-button causa-primary-action" href="#/investigations/new" data-event="UIA-NEW-INVESTIGATION">New investigation</a>
+        </template>
+      </div>
+    </template>
+
+    <template data-if="list-loading">
+      <p role="status" class="causa-loading"><span class="ef-spinner" aria-hidden="true"></span> <span data-text="list-loading-text"></span></p>
+    </template>
+
+    <template data-if="list-failed">
+      <div class="ef-alert causa-failure" role="alert">
+        <p class="ef-alert__title" data-text="list-failure-what"></p>
+        <p data-text="list-failure-preserved"></p>
+        <p data-text="list-failure-next"></p>
+        <template data-if="UIA-RETRY-LOAD-offered"><button class="ef-button" type="button" data-event="UIA-RETRY-LOAD">Try again</button></template>
+      </div>
+    </template>
+
+    <template data-if="list-empty">
+      <div class="ef-empty-state"><p>There are no investigations in this repository yet.</p></div>
+    </template>
+
+    <template data-if="INV-039-visible">
+      <section aria-label="Investigations" data-requirement-id="INV-039">
+        <ul class="ef-card-grid causa-cards">
+          <template data-each="investigations" data-key="id">
+            <li>
+              <article class="ef-card">
+                <h2 class="ef-card__title"><a class="ef-card__link" data-bind-href="href" data-event="INV-040" data-text="title"></a></h2>
+                <p class="causa-copy" data-text="copy"></p>
+                <dl class="ef-facts">
+                  <div class="ef-facts__item"><dt>Status</dt><dd data-text="status"></dd></div>
+                  <div class="ef-facts__item"><dt>Last activity</dt><dd data-text="lastActivity"></dd></div>
+                  <div class="ef-facts__item"><dt>Hypotheses</dt><dd data-text="hypotheses"></dd></div>
+                  <div class="ef-facts__item"><dt>Evidence</dt><dd data-text="evidence"></dd></div>
+                  <div class="ef-facts__item"><dt>Unresolved contradictions</dt><dd data-text="contradictions"></dd></div>
+                </dl>
+              </article>
+            </li>
+          </template>
+        </ul>
+      </section>
+    </template>
+  </main>
+</body>
+</html>

@@ -1,0 +1,63 @@
+{
+  "schema": "indy-init.slice-roles/1",
+  "status": "PROPOSED (this proposal); needs the successor ownership of FILE-OWNERSHIP.json",
+  "description": "Three UI lanes per PARALLEL-EXECUTION-PLAN.md: ui-a connection and browsing, ui-b editing, ui-c analysis.",
+  "roles": {
+    "SL-T16": "ui-a",
+    "SL-WI-INV-LIST": "ui-a",
+    "SL-WI-INV-WORKSPACE-FRAME": "ui-a",
+    "SL-WI-GEN-UI-LANDING": "ui-a",
+    "SL-WI-GEN-UI-STATES": "ui-a",
+    "SL-WI-GEN-UI-LANGUAGE": "ui-a",
+    "SL-WI-GEN-UI-VERIFY": "ui-a",
+    "SL-T29": "ui-a",
+    "SL-WI-INV-START-FORM": "ui-b",
+    "SL-WI-INV-START-RULES": "ui-b",
+    "SL-WI-INV-START-ACTIONS": "ui-b",
+    "SL-WI-INV-WORKSPACE-SAVE": "ui-b",
+    "SL-WI-INV-WORKSPACE-DETAILS": "ui-b",
+    "SL-WI-INV-WORKSPACE-ROUNDTRIP": "ui-b",
+    "SL-T22": "ui-b",
+    "SL-T28": "ui-b",
+    "SL-WI-INV-WORKSPACE-HYPOTHESES": "ui-c",
+    "SL-WI-INV-WORKSPACE-EVIDENCE": "ui-c",
+    "SL-WI-INV-WORKSPACE-LINKS": "ui-c",
+    "SL-WI-INV-WORKSPACE-CONCLUSION": "ui-c",
+    "SL-WI-GEN-UI-INSPECT": "ui-c",
+    "SL-WI-GEN-WDL": "ui-c",
+    "SL-T23": "ui-c",
+    "SL-T26": "ui-c"
+  },
+  "capabilities": {
+    "data-visible": [
+      "SL-T16",
+      "SL-WI-GEN-EXT-DATA",
+      "SL-T25",
+      "SL-WI-INV-LIST",
+      "SL-WI-INV-WORKSPACE-FRAME",
+      "SL-WI-GEN-UI-LANDING",
+      "SL-WI-GEN-UI-STATES"
+    ],
+    "data-understood": [
+      "SL-T13",
+      "SL-T15",
+      "SL-WI-INV-WORKSPACE-HYPOTHESES",
+      "SL-WI-INV-WORKSPACE-EVIDENCE",
+      "SL-WI-INV-WORKSPACE-LINKS",
+      "SL-WI-INV-WORKSPACE-CONCLUSION",
+      "SL-WI-GEN-UI-INSPECT",
+      "SL-WI-GEN-WDL",
+      "SL-T23"
+    ],
+    "data-editable": [
+      "SL-T21",
+      "SL-T22",
+      "SL-WI-INV-START-FORM",
+      "SL-WI-INV-START-RULES",
+      "SL-WI-INV-START-ACTIONS",
+      "SL-WI-INV-WORKSPACE-SAVE",
+      "SL-WI-INV-WORKSPACE-DETAILS",
+      "SL-WI-INV-WORKSPACE-ROUNDTRIP"
+    ]
+  }
+}

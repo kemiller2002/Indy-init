@@ -1,0 +1,25 @@
+# Evidence: the UI contracts and the prototype screens compile inside the REAL v4.1.4 bootstrap (2026-11-05)
+#
+# 1. An empty repository was bootstrapped exactly as preflight-tooling.yml does it:
+#      git init app414
+#      dotnet requirements-compiler.dll v41 --source . --package requirements-compiled/v4.1.4 --base requirements-compiled/v4 --bootstrap app414
+#      -> "v4.1.4 validation: PASS; status: CANDIDATE"
+#    The bootstrap writes the frozen IF41 types into src/Causa.App/Engine.fs (ConnectionState, Msg, Model, Engine) and
+#    src/Causa.App/Projections.fs (SaveAction, SaveIndicatorView, ...). Every view file (Views/Investigation.fs, ...) is an
+#    empty "the owner replaces this content" stub. Causa.Domain holds the frozen stubs only: no kernel exists.
+# 2. contracts/{Ids,Types,UiStates,Navigation,Connection,InvestigationList,InvestigationDetail,InvestigationEditor,
+#    InvestigationAnalysis,System,UiActions,Bindings}.fs and prototype/screens/{Shell,ConnectionScreen,
+#    InvestigationListScreen,Events}.fs were copied unchanged (cmp: identical to this commit) into src/Causa.App/Ui/.
+#    (The frozen files are NOT linked here: the bootstrap's own files define them.)
+# 3. Compile order, as FILE-OWNERSHIP.json compileOrder proposes (review finding R1: no UI-owned file before the contracts):
+#      Engine.fs, Routes.fs, Projections.fs, Ui/Contracts/*.fs (12), Connection.fs, Ui/Screens/*.fs (4), Reporting.fs,
+#      Update.fs, Views/*, View.fs, Program.fs
+#    Projections.fs compiles before Connection.fs: its frozen types need only Engine.fs.
+# 4. dotnet build Causa.slnx -v q
+       0 Warning(s)
+   Build succeeded.
+   real 10.135s   (incremental; the first full build of the solution took 24.4 s)
+#
+# Meaning: the contract files are source-compatible with the real project at T10, so a UI agent's screen module compiles
+# in the real application from bootstrap onward, with no domain, persistence or GitHub implementation. It does not mean
+# the screens work against real data (Layer C). Reproduce: the steps above in an empty directory.

@@ -1,0 +1,2976 @@
+{
+  "schema": "indy-init.r10-contract-first-ui.screen-manifest/1",
+  "status": "PROPOSAL (proposals/r10-contract-first-ui). Derived from approved sources; changes no requirement. Not normative.",
+  "sources": {
+    "catalog": {
+      "path": "requirements/catalogs/causa-investigation.requirement-catalog.json",
+      "sha256": "7e5e8a400b52d79218e2fb42927d5cb122cc0e6c8ab002f146b33198647ce53c",
+      "status": "ratified"
+    },
+    "scopeManifest": {
+      "path": "docs/rehearsal-010-readiness/scope-manifest.json",
+      "sha256": "fa265d0b00190b1d565cc83af561d0bb202fd11297ce232f0e27d0e253d08461"
+    },
+    "journeyBindings": {
+      "path": "verification/journeys/bindings.json",
+      "sha256": "cd68237205ff8f56503c46bdb6dc925085a3b07c9306ab6f9979f2b17b9754dd"
+    },
+    "designContract": {
+      "path": "kickoff/rehearsal-010/design-contract.json",
+      "sha256": "366ed579446636d31894e77ab63877d5dc5f4ef0e935ae14f089b4360780482a"
+    },
+    "frozenContracts": "requirements-compiled/v4.1.4/contracts (IF41-APP ConnectionState, IF41-VIEW SaveIndicatorView/SaveAction, IF41-WIRE Credential, Repository)",
+    "screenContracts": "docs/SCREEN-CONTRACTS.md (S01, S02, S23, S24, URL contract)",
+    "uiRequirements": "docs/CAUSA-UI-EXPERIENCE-REQUIREMENTS.md"
+  },
+  "idConvention": "Catalog entries keep their INV-0xx id; other entries use UIF- (field), UIA- (action), UIR- (region) and cite the requirement or journey that needs them. The id is also the Limen binding/event name.",
+  "navigation": {
+    "primary": [
+      "Investigations",
+      "Administration",
+      "Settings"
+    ],
+    "primaryRegion": "INV-041",
+    "sections": [
+      "Overview",
+      "Causal Analysis",
+      "Evidence",
+      "Hypotheses",
+      "Timeline",
+      "Corrective Actions"
+    ],
+    "sectionsRegion": "INV-042",
+    "routing": "hash routes (SCREEN-CONTRACTS URL contract, D-203)"
+  },
+  "capabilityBoundaries": {
+    "DataVisible": "repository status, summaries, metadata, stored records, loading/error states; no replay claimed (Types.fs Visible<T>)",
+    "DataUnderstood": "domain-engine projections: hypotheses, evidence, relationships, timeline, conclusions, state (Types.fs Understood<T>); no conversion from Visible exists",
+    "DataEditable": "inputs, commands, validation, save progress, conflict and unknown outcome (InvestigationEditor.fs, UiIntent)"
+  },
+  "screens": [
+    {
+      "id": "investigation-list",
+      "route": "#/",
+      "structure": "route",
+      "purpose": "Before Connect: an accessible, empty, disconnected workspace with the explicit Connect data repository action. After Connect: the connected repository's investigations and the user's working copies.",
+      "catalogEntries": [
+        {
+          "id": "INV-039",
+          "kind": "ui-control",
+          "name": "Investigations",
+          "component": "region",
+          "formaPattern": "landmark-region",
+          "required": true,
+          "editable": false,
+          "verification": [
+            "mapped",
+            "exists",
+            "visible",
+            "accessible",
+            "outcome",
+            "reload"
+          ],
+          "source": "catalog CAT-CAUSA-INVESTIGATION",
+          "owner": "ui-a",
+          "notes": "A region (section or nav) holding the connected repository's investigations by title. outcome: a saved investigation appears; reload: it is still listed in a new browser context.",
+          "journeys": []
+        },
+        {
+          "id": "INV-040",
+          "kind": "action",
+          "name": "Open investigation",
+          "component": "link",
+          "formaPattern": "card (ef-card__link)",
+          "required": true,
+          "editable": false,
+          "verification": [
+            "mapped",
+            "exists",
+            "visible",
+            "accessible",
+            "activate",
+            "outcome"
+          ],
+          "source": "catalog CAT-CAUSA-INVESTIGATION",
+          "owner": "ui-a",
+          "dependsOn": [
+            "INV-039"
+          ],
+          "notes": "activate: the route becomes #/investigations/{id}; outcome: the workspace shows that investigation's problem statement.",
+          "journeys": []
+        },
+        {
+          "id": "INV-041",
+          "kind": "ui-control",
+          "name": "Primary navigation",
+          "component": "region",
+          "formaPattern": "landmark-region",
+          "required": true,
+          "editable": false,
+          "verification": [
+            "mapped",
+            "exists",
+            "visible",
+            "accessible"
+          ],
+          "source": "catalog CAT-CAUSA-INVESTIGATION",
+          "owner": "ui-a",
+          "notes": "A nav region present on every screen with the destinations Investigations, Administration and Settings. Each destination activating and marking itself current is judged by journey J3 (J3-01), which Dokimos check kinds cannot express.",
+          "journeys": []
+        }
+      ],
+      "additionalEntries": [
+        {
+          "id": "UIR-CONNECTION",
+          "kind": "region",
+          "name": "Connect data repository",
+          "component": "Region",
+          "source": "EXT-DATA-002, UI-001; J1-01",
+          "owner": "ui-a",
+          "formaPattern": "form"
+        },
+        {
+          "id": "UIF-CONN-OWNER",
+          "kind": "ui-field",
+          "name": "Repository owner",
+          "component": "TextInput",
+          "source": "EXT-DATA-003; label pattern ODR-R10-07 (support.mjs connect)",
+          "owner": "ui-a",
+          "required": true,
+          "validation": {
+            "minLength": 1
+          }
+        },
+        {
+          "id": "UIF-CONN-REPOSITORY",
+          "kind": "ui-field",
+          "name": "Repository",
+          "component": "TextInput",
+          "source": "EXT-DATA-003; ODR-R10-07",
+          "owner": "ui-a",
+          "required": true,
+          "validation": {
+            "minLength": 1
+          }
+        },
+        {
+          "id": "UIF-CONN-BRANCH",
+          "kind": "ui-field",
+          "name": "Branch",
+          "component": "TextInput",
+          "source": "EXT-DATA-003 (\"branch/workspace\"); ODR-R10-07",
+          "owner": "ui-a",
+          "required": true,
+          "validation": {
+            "minLength": 1
+          },
+          "notes": "EXT-DATA-003 also names a workspace; the frozen Repository has none (C3, OWNER-DECISIONS CF-01)."
+        },
+        {
+          "id": "UIF-CONN-TOKEN",
+          "kind": "ui-field",
+          "name": "Access token",
+          "component": "PasswordInput",
+          "source": "EXT-DATA-004, PF-015; ODR-R10-07 (token|credential)",
+          "owner": "ui-a",
+          "required": true,
+          "notes": "Never projected, bound, logged or stored (PF-015, UI-019)."
+        },
+        {
+          "id": "UIA-CONNECT",
+          "kind": "action",
+          "name": "Connect data repository",
+          "component": "Button",
+          "source": "EXT-DATA-002; J1-01, J1-02",
+          "owner": "ui-a"
+        },
+        {
+          "id": "UIA-DISCONNECT",
+          "kind": "action",
+          "name": "Disconnect",
+          "component": "Button",
+          "source": "SM-CONNECTION DisconnectConfirmed (IF41-APP)",
+          "owner": "ui-a"
+        },
+        {
+          "id": "UIA-NEW-INVESTIGATION",
+          "kind": "action",
+          "name": "New investigation",
+          "component": "Link",
+          "source": "J1-02 (support.mjs startInvestigation); route of investigation-start",
+          "owner": "ui-a",
+          "notes": "Visible only on a writable connection: undecided by the contracts (S8, OWNER-DECISIONS CF-04)."
+        },
+        {
+          "id": "UIA-RETRY-LOAD",
+          "kind": "action",
+          "name": "Try again",
+          "component": "Button",
+          "source": "UI-010 (\"Retry only when it performs a real action\")",
+          "owner": "ui-a"
+        }
+      ],
+      "regions": [
+        {
+          "id": "INV-039",
+          "name": "Investigations",
+          "component": "region",
+          "cardFields": [
+            "title",
+            "status",
+            "last activity",
+            "hypotheses",
+            "evidence",
+            "unresolved contradictions",
+            "copy kind (UI-014-O3)"
+          ],
+          "source": "UI-001, UI-022"
+        },
+        {
+          "id": "INV-041",
+          "name": "Primary",
+          "component": "navigation",
+          "source": "UI-020, UI-029"
+        }
+      ],
+      "states": [
+        "disconnected",
+        "connecting",
+        "connected-loading",
+        "connected-listed",
+        "connected-empty",
+        "unauthorized",
+        "credential-refused",
+        "network-failure",
+        "rate-limited",
+        "connection-validation-errors"
+      ],
+      "viewModel": "contracts/InvestigationList.fs InvestigationListView (+ Connection.fs ConnectionView)",
+      "actionContracts": "contracts/UiActions.fs ActionContracts.all (Screen = investigation-list)",
+      "formaComponents": [
+        "navigation-shell (design contract role, UI-029)",
+        "form, field, validation-summary",
+        "card-grid, card, facts",
+        "empty-state",
+        "alert",
+        "spinner",
+        "button",
+        "skip-link"
+      ],
+      "accessibility": [
+        "skip link first (design contract skipLinkFirst)",
+        "landmarks: banner, navigation \"Primary\", main",
+        "visible focus (J3-08)",
+        "44 px touch targets (design contract minimumTouchTarget)",
+        "labels from the catalog names; validation messages tied to fields",
+        "status announcements through a live region (frozen Politeness)",
+        "no colour-only state (UI-016)"
+      ],
+      "responsive": [
+        "390 px phone: no horizontal overflow (J3-09)",
+        "820/1180 px iPad portrait/landscape",
+        "1440 px desktop",
+        "200% text reflow (UI-011)"
+      ],
+      "requirements": [
+        "UI-001",
+        "UI-010",
+        "UI-014",
+        "UI-022",
+        "UI-024",
+        "EXT-DATA-001",
+        "EXT-DATA-002",
+        "EXT-DATA-003",
+        "EXT-DATA-004",
+        "EXT-DATA-005",
+        "EXT-DATA-006",
+        "EXT-DATA-007",
+        "EXT-DATA-012",
+        "EXT-DATA-013"
+      ],
+      "mandatoryObligations": {
+        "UI-001": [
+          "UI-001-O1",
+          "UI-001-O2",
+          "UI-001-O3",
+          "UI-001-O4",
+          "UI-001-O5",
+          "UI-001-O6"
+        ],
+        "UI-010": [
+          "UI-010-O1",
+          "UI-010-O2",
+          "UI-010-O3",
+          "UI-010-O4",
+          "UI-010-O5"
+        ],
+        "UI-014": [
+          "UI-014-O1",
+          "UI-014-O2",
+          "UI-014-O3"
+        ],
+        "UI-022": [
+          "UI-022-O1",
+          "UI-022-O2",
+          "UI-022-O3",
+          "UI-022-O4",
+          "UI-022-O5",
+          "UI-022-O6"
+        ],
+        "UI-024": [
+          "UI-024-O1",
+          "UI-024-O2",
+          "UI-024-O3",
+          "UI-024-O4",
+          "UI-024-O5",
+          "UI-024-O6"
+        ],
+        "EXT-DATA-001": [
+          "EXT-DATA-001-O1",
+          "EXT-DATA-001-O2"
+        ],
+        "EXT-DATA-002": [
+          "EXT-DATA-002-O1",
+          "EXT-DATA-002-O2"
+        ],
+        "EXT-DATA-003": [
+          "EXT-DATA-003-O1",
+          "EXT-DATA-003-O2"
+        ],
+        "EXT-DATA-004": [
+          "EXT-DATA-004-O1",
+          "EXT-DATA-004-O2",
+          "EXT-DATA-004-O3",
+          "EXT-DATA-004-O4"
+        ],
+        "EXT-DATA-005": [
+          "EXT-DATA-005-O1",
+          "EXT-DATA-005-O2"
+        ],
+        "EXT-DATA-006": [
+          "EXT-DATA-006-O1",
+          "EXT-DATA-006-O2"
+        ],
+        "EXT-DATA-007": [
+          "EXT-DATA-007-O1",
+          "EXT-DATA-007-O2"
+        ],
+        "EXT-DATA-012": [
+          "EXT-DATA-012-O1",
+          "EXT-DATA-012-O2",
+          "EXT-DATA-012-O3"
+        ],
+        "EXT-DATA-013": [
+          "EXT-DATA-013-O1",
+          "EXT-DATA-013-O2",
+          "EXT-DATA-013-O3"
+        ]
+      },
+      "journeyAssertions": [
+        "J1-01",
+        "J1-02",
+        "J1-06",
+        "J3-10"
+      ],
+      "verification": {
+        "layerA": [
+          "F# compile",
+          "SCREEN-MANIFEST completeness (tests)",
+          "field rules equal the catalog validation blocks",
+          "fixture backend scenario tests"
+        ],
+        "layerB": [
+          "rendered DOM roles and accessible names (governed journey locators)",
+          "loading/empty/failure states per fixture scenario",
+          "axe-core 4.14.0",
+          "390/820/1180/1440 px viewports (design contract)"
+        ],
+        "layerC": [
+          "governed journeys J1-01, J1-02, J1-06, J3-10 against api.github.com, Chromium and WebKit",
+          "plan tests of the mandatory obligations listed",
+          "slice-gate PASS; completion-gate COMPLETE"
+        ]
+      },
+      "owner": "ui-a",
+      "notes": "Connection is a region of this route, not a separate route: no requirement names a connection route, catalog screens[0] is #/, and support.mjs connect() finds the form on the launch page (clicking Connect first only if the fields are hidden)."
+    },
+    {
+      "id": "investigation-start",
+      "route": "#/investigations/new",
+      "structure": "route",
+      "purpose": "Create a new investigation from minimal unstructured input (S01: \"What happened?\").",
+      "catalogEntries": [
+        {
+          "id": "INV-001",
+          "kind": "ui-field",
+          "name": "Problem statement",
+          "component": "textarea",
+          "formaPattern": "textarea",
+          "required": true,
+          "editable": true,
+          "verification": [
+            "mapped",
+            "exists",
+            "visible",
+            "accessible",
+            "editable",
+            "enter",
+            "save"
+          ],
+          "source": "catalog CAT-CAUSA-INVESTIGATION",
+          "owner": "ui-b",
+          "journeys": [
+            "J1-03"
+          ]
+        },
+        {
+          "id": "INV-002",
+          "kind": "ui-field",
+          "name": "Title",
+          "component": "text-input",
+          "formaPattern": "text-field",
+          "required": false,
+          "editable": true,
+          "verification": [
+            "mapped",
+            "exists",
+            "visible",
+            "accessible",
+            "editable",
+            "enter",
+            "save"
+          ],
+          "source": "catalog CAT-CAUSA-INVESTIGATION",
+          "owner": "ui-b",
+          "journeys": [
+            "J1-03"
+          ]
+        },
+        {
+          "id": "INV-003",
+          "kind": "ui-control",
+          "name": "Domain or profile indicator",
+          "component": "display",
+          "formaPattern": "facts / record-header",
+          "required": true,
+          "editable": false,
+          "verification": [
+            "mapped",
+            "exists",
+            "visible"
+          ],
+          "source": "catalog CAT-CAUSA-INVESTIGATION",
+          "owner": "ui-b",
+          "appliesWhen": [
+            {
+              "fact": "domain-profile-selected",
+              "equals": true
+            }
+          ],
+          "journeys": []
+        },
+        {
+          "id": "INV-004",
+          "kind": "action",
+          "name": "Start investigation",
+          "component": "button",
+          "formaPattern": "button",
+          "required": true,
+          "editable": false,
+          "verification": [
+            "mapped",
+            "exists",
+            "visible",
+            "accessible",
+            "activate",
+            "outcome"
+          ],
+          "source": "catalog CAT-CAUSA-INVESTIGATION",
+          "owner": "ui-b",
+          "journeys": [
+            "J1-03"
+          ]
+        },
+        {
+          "id": "INV-005",
+          "kind": "ui-control",
+          "name": "Persistence destination indicator",
+          "component": "display",
+          "formaPattern": "facts / record-header",
+          "required": true,
+          "editable": false,
+          "verification": [
+            "mapped",
+            "exists",
+            "visible",
+            "accessible"
+          ],
+          "source": "catalog CAT-CAUSA-INVESTIGATION",
+          "owner": "ui-b",
+          "journeys": []
+        },
+        {
+          "id": "INV-006",
+          "kind": "ui-field",
+          "name": "Investigation identifier",
+          "component": "text-input",
+          "formaPattern": "text-field",
+          "required": true,
+          "editable": true,
+          "verification": [
+            "mapped",
+            "exists",
+            "visible",
+            "accessible",
+            "editable",
+            "enter",
+            "validation",
+            "rejects"
+          ],
+          "source": "catalog CAT-CAUSA-INVESTIGATION",
+          "owner": "ui-b",
+          "validation": {
+            "minLength": 1,
+            "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+          },
+          "journeys": [
+            "J1-06"
+          ]
+        },
+        {
+          "id": "INV-019",
+          "kind": "validation-rule",
+          "name": "Problem statement must not be empty",
+          "component": null,
+          "formaPattern": null,
+          "required": true,
+          "editable": false,
+          "verification": [
+            "mapped",
+            "validation",
+            "rejects"
+          ],
+          "source": "catalog CAT-CAUSA-INVESTIGATION",
+          "owner": "ui-b",
+          "validation": {
+            "minLength": 1
+          },
+          "dependsOn": [
+            "INV-001"
+          ],
+          "notes": "Open question 1: an empty or whitespace-only problem statement is refused with a field message; nothing is created.",
+          "journeys": []
+        },
+        {
+          "id": "INV-020",
+          "kind": "validation-rule",
+          "name": "Title length",
+          "component": null,
+          "formaPattern": null,
+          "required": true,
+          "editable": false,
+          "verification": [
+            "mapped",
+            "validation",
+            "rejects"
+          ],
+          "source": "catalog CAT-CAUSA-INVESTIGATION",
+          "owner": "ui-b",
+          "validation": {
+            "maxLength": 200
+          },
+          "dependsOn": [
+            "INV-002"
+          ],
+          "journeys": []
+        },
+        {
+          "id": "INV-021",
+          "kind": "validation-rule",
+          "name": "Problem statement length",
+          "component": null,
+          "formaPattern": null,
+          "required": true,
+          "editable": false,
+          "verification": [
+            "mapped",
+            "validation",
+            "rejects"
+          ],
+          "source": "catalog CAT-CAUSA-INVESTIGATION",
+          "owner": "ui-b",
+          "validation": {
+            "maxLength": 10000
+          },
+          "dependsOn": [
+            "INV-001"
+          ],
+          "journeys": []
+        },
+        {
+          "id": "INV-022",
+          "kind": "action",
+          "name": "Cancel investigation start",
+          "component": "button",
+          "formaPattern": "button",
+          "required": true,
+          "editable": false,
+          "verification": [
+            "mapped",
+            "exists",
+            "visible",
+            "accessible",
+            "activate",
+            "outcome"
+          ],
+          "source": "catalog CAT-CAUSA-INVESTIGATION",
+          "owner": "ui-b",
+          "notes": "Leaves the start screen; no investigation is created and nothing is written.",
+          "journeys": []
+        },
+        {
+          "id": "INV-023",
+          "kind": "ui-field",
+          "name": "Primary investigative question",
+          "component": "textarea",
+          "formaPattern": "textarea",
+          "required": false,
+          "editable": true,
+          "verification": [
+            "mapped",
+            "exists",
+            "visible",
+            "accessible",
+            "editable",
+            "enter",
+            "validation",
+            "rejects",
+            "save",
+            "reload",
+            "update"
+          ],
+          "source": "catalog CAT-CAUSA-INVESTIGATION",
+          "owner": "ui-b",
+          "validation": {
+            "maxLength": 10000
+          },
+          "notes": "Optional; shown in the investigation header.",
+          "journeys": [
+            "J1-03"
+          ]
+        }
+      ],
+      "additionalEntries": [],
+      "regions": [
+        {
+          "id": "INV-005",
+          "name": "Persistence destination indicator",
+          "component": "display",
+          "source": "S01"
+        },
+        {
+          "id": "INV-003",
+          "name": "Domain or profile indicator",
+          "component": "display",
+          "source": "S01",
+          "appliesWhen": "domain-profile-selected"
+        }
+      ],
+      "states": [
+        "editing",
+        "validation-errors",
+        "submitting",
+        "refused",
+        "accepted (navigates to the workspace)",
+        "destination-unknown (not connected)"
+      ],
+      "viewModel": "contracts/InvestigationEditor.fs StartView",
+      "actionContracts": "contracts/UiActions.fs ActionContracts.all (Screen = investigation-start)",
+      "formaComponents": [
+        "form, form-row, text-field, textarea, validation-message, validation-summary",
+        "facts (destination)",
+        "button"
+      ],
+      "accessibility": [
+        "skip link first (design contract skipLinkFirst)",
+        "landmarks: banner, navigation \"Primary\", main",
+        "visible focus (J3-08)",
+        "44 px touch targets (design contract minimumTouchTarget)",
+        "labels from the catalog names; validation messages tied to fields",
+        "status announcements through a live region (frozen Politeness)",
+        "no colour-only state (UI-016)",
+        "iPad/phone keyboard use (S01 completion evidence)"
+      ],
+      "responsive": [
+        "390 px phone: no horizontal overflow (J3-09)",
+        "820/1180 px iPad portrait/landscape",
+        "1440 px desktop",
+        "200% text reflow (UI-011)"
+      ],
+      "requirements": [
+        "INV-001",
+        "INV-002",
+        "INV-003",
+        "INV-004",
+        "INV-005",
+        "INV-006",
+        "INV-019",
+        "INV-020",
+        "INV-021",
+        "INV-022",
+        "INV-023",
+        "EXT-DATA-008"
+      ],
+      "mandatoryObligations": {
+        "INV-001": [
+          "INV-001/V1/mapped",
+          "INV-001/V1/exists",
+          "INV-001/V2/visible",
+          "INV-001/V2/accessible",
+          "INV-001/V3/editable",
+          "INV-001/V3/enter",
+          "INV-001/V5/save"
+        ],
+        "INV-002": [],
+        "INV-003": [
+          "INV-003/V1/mapped",
+          "INV-003/V1/exists",
+          "INV-003/V2/visible"
+        ],
+        "INV-004": [
+          "INV-004/V1/mapped",
+          "INV-004/V1/exists",
+          "INV-004/V2/visible",
+          "INV-004/V2/accessible",
+          "INV-004/V3/activate",
+          "INV-004/V4/outcome"
+        ],
+        "INV-005": [
+          "INV-005/V1/mapped",
+          "INV-005/V1/exists",
+          "INV-005/V2/visible",
+          "INV-005/V2/accessible"
+        ],
+        "INV-006": [
+          "INV-006/V1/mapped",
+          "INV-006/V1/exists",
+          "INV-006/V2/visible",
+          "INV-006/V2/accessible",
+          "INV-006/V3/editable",
+          "INV-006/V3/enter",
+          "INV-006/V4/validation",
+          "INV-006/V4/rejects"
+        ],
+        "INV-019": [
+          "INV-019/V1/mapped",
+          "INV-019/V4/validation",
+          "INV-019/V4/rejects"
+        ],
+        "INV-020": [
+          "INV-020/V1/mapped",
+          "INV-020/V4/validation",
+          "INV-020/V4/rejects"
+        ],
+        "INV-021": [
+          "INV-021/V1/mapped",
+          "INV-021/V4/validation",
+          "INV-021/V4/rejects"
+        ],
+        "INV-022": [
+          "INV-022/V1/mapped",
+          "INV-022/V1/exists",
+          "INV-022/V2/visible",
+          "INV-022/V2/accessible",
+          "INV-022/V3/activate",
+          "INV-022/V4/outcome"
+        ],
+        "INV-023": [],
+        "EXT-DATA-008": [
+          "EXT-DATA-008-O1",
+          "EXT-DATA-008-O2"
+        ]
+      },
+      "journeyAssertions": [
+        "J1-03",
+        "J1-06"
+      ],
+      "verification": {
+        "layerA": [
+          "F# compile",
+          "SCREEN-MANIFEST completeness (tests)",
+          "field rules equal the catalog validation blocks",
+          "fixture backend scenario tests"
+        ],
+        "layerB": [
+          "rendered DOM roles and accessible names (governed journey locators)",
+          "loading/empty/failure states per fixture scenario",
+          "axe-core 4.14.0",
+          "390/820/1180/1440 px viewports (design contract)"
+        ],
+        "layerC": [
+          "governed journeys J1-03, J1-06 against api.github.com, Chromium and WebKit",
+          "plan tests of the mandatory obligations listed",
+          "slice-gate PASS; completion-gate COMPLETE"
+        ]
+      },
+      "owner": "ui-b",
+      "notes": "S01 \"original text preserved\": the form keeps the text exactly as entered; Cancel writes nothing (INV-022)."
+    },
+    {
+      "id": "investigation-workspace",
+      "route": "#/investigations/{id}",
+      "structure": "route with sections",
+      "purpose": "Operate the investigation (S02): what do we know, what explains it, what should we do next. Opening leads to Overview (UI-025).",
+      "catalogEntries": [
+        {
+          "id": "INV-007",
+          "kind": "ui-control",
+          "name": "Creation timestamp",
+          "component": "display",
+          "formaPattern": "facts / record-header",
+          "required": true,
+          "editable": false,
+          "verification": [
+            "mapped",
+            "exists",
+            "visible"
+          ],
+          "source": "catalog CAT-CAUSA-INVESTIGATION",
+          "owner": "ui-a",
+          "section": "frame",
+          "placementBasis": "present on every section (INV-042 navigation, save state on every workspace view: J3-03..07)",
+          "journeys": []
+        },
+        {
+          "id": "INV-008",
+          "kind": "ui-control",
+          "name": "Original problem statement",
+          "component": "display",
+          "formaPattern": "facts / record-header",
+          "required": true,
+          "editable": false,
+          "verification": [
+            "mapped",
+            "exists",
+            "visible",
+            "outcome",
+            "reload"
+          ],
+          "source": "catalog CAT-CAUSA-INVESTIGATION",
+          "owner": "ui-a",
+          "dependsOn": [
+            "INV-001"
+          ],
+          "section": "frame",
+          "placementBasis": "present on every section (INV-042 navigation, save state on every workspace view: J3-03..07)",
+          "journeys": [
+            "J1-06"
+          ]
+        },
+        {
+          "id": "INV-009",
+          "kind": "action",
+          "name": "Record a hypothesis",
+          "component": "button",
+          "formaPattern": "button",
+          "required": true,
+          "editable": false,
+          "verification": [
+            "mapped",
+            "exists",
+            "visible",
+            "accessible",
+            "activate",
+            "outcome"
+          ],
+          "source": "catalog CAT-CAUSA-INVESTIGATION",
+          "owner": "ui-c",
+          "section": "hypotheses",
+          "placementBasis": "J2-02, J2-05",
+          "journeys": [
+            "J2-02"
+          ]
+        },
+        {
+          "id": "INV-010",
+          "kind": "ui-control",
+          "name": "Hypotheses",
+          "component": "display",
+          "formaPattern": "facts / record-header",
+          "required": true,
+          "editable": false,
+          "verification": [
+            "mapped",
+            "exists",
+            "visible",
+            "outcome"
+          ],
+          "source": "catalog CAT-CAUSA-INVESTIGATION",
+          "owner": "ui-c",
+          "dependsOn": [
+            "INV-009"
+          ],
+          "section": "hypotheses",
+          "placementBasis": "J2-02, J2-05",
+          "journeys": [
+            "J2-02"
+          ]
+        },
+        {
+          "id": "INV-011",
+          "kind": "ui-field",
+          "name": "Hypothesis explanation",
+          "component": "textarea",
+          "formaPattern": "textarea",
+          "required": true,
+          "editable": true,
+          "verification": [
+            "mapped",
+            "exists",
+            "visible",
+            "editable",
+            "enter",
+            "save"
+          ],
+          "source": "catalog CAT-CAUSA-INVESTIGATION",
+          "owner": "ui-c",
+          "dependsOn": [
+            "INV-009"
+          ],
+          "section": "hypotheses",
+          "placementBasis": "J2-02, J2-05",
+          "journeys": []
+        },
+        {
+          "id": "INV-012",
+          "kind": "ui-field",
+          "name": "Evidence original content",
+          "component": "textarea",
+          "formaPattern": "textarea",
+          "required": true,
+          "editable": true,
+          "verification": [
+            "mapped",
+            "exists",
+            "visible",
+            "editable",
+            "enter",
+            "save"
+          ],
+          "source": "catalog CAT-CAUSA-INVESTIGATION",
+          "owner": "ui-c",
+          "section": "evidence",
+          "placementBasis": "J2-03..J2-06 (link editor used from Evidence)",
+          "journeys": [
+            "J2-03"
+          ]
+        },
+        {
+          "id": "INV-013",
+          "kind": "ui-control",
+          "name": "Evidence",
+          "component": "display",
+          "formaPattern": "facts / record-header",
+          "required": true,
+          "editable": false,
+          "verification": [
+            "mapped",
+            "exists",
+            "visible"
+          ],
+          "source": "catalog CAT-CAUSA-INVESTIGATION",
+          "owner": "ui-c",
+          "section": "evidence",
+          "placementBasis": "J2-03..J2-06 (link editor used from Evidence)",
+          "journeys": [
+            "J2-03"
+          ]
+        },
+        {
+          "id": "INV-014",
+          "kind": "action",
+          "name": "Record an observation",
+          "component": "button",
+          "formaPattern": "button",
+          "required": true,
+          "editable": false,
+          "verification": [
+            "mapped",
+            "exists",
+            "visible",
+            "accessible",
+            "activate",
+            "outcome"
+          ],
+          "source": "catalog CAT-CAUSA-INVESTIGATION",
+          "owner": "ui-c",
+          "section": "overview",
+          "placementBasis": "J2-01, J2-07 (journey records observations and conclusions on Overview); UI-025",
+          "journeys": [
+            "J2-01"
+          ]
+        },
+        {
+          "id": "INV-015",
+          "kind": "action",
+          "name": "Save",
+          "component": "button",
+          "formaPattern": "button",
+          "required": true,
+          "editable": false,
+          "verification": [
+            "mapped",
+            "exists",
+            "visible",
+            "accessible",
+            "activate",
+            "outcome"
+          ],
+          "source": "catalog CAT-CAUSA-INVESTIGATION",
+          "owner": "ui-b",
+          "section": "frame",
+          "placementBasis": "present on every section (INV-042 navigation, save state on every workspace view: J3-03..07)",
+          "journeys": [
+            "J1-04"
+          ]
+        },
+        {
+          "id": "INV-016",
+          "kind": "ui-control",
+          "name": "Save state",
+          "component": "display",
+          "formaPattern": "facts / record-header",
+          "required": true,
+          "editable": false,
+          "verification": [
+            "mapped",
+            "exists",
+            "visible",
+            "accessible"
+          ],
+          "source": "catalog CAT-CAUSA-INVESTIGATION",
+          "owner": "ui-b",
+          "section": "frame",
+          "placementBasis": "present on every section (INV-042 navigation, save state on every workspace view: J3-03..07)",
+          "journeys": [
+            "J1-04",
+            "J3-03",
+            "J3-05"
+          ]
+        },
+        {
+          "id": "INV-017",
+          "kind": "workflow-outcome",
+          "name": "Reopening restores the saved investigation",
+          "component": null,
+          "formaPattern": null,
+          "required": true,
+          "editable": false,
+          "verification": [
+            "mapped",
+            "reload"
+          ],
+          "source": "catalog CAT-CAUSA-INVESTIGATION",
+          "owner": "integration",
+          "dependsOn": [
+            "INV-014",
+            "INV-015"
+          ],
+          "section": "workflow",
+          "placementBasis": "workflow outcome, judged by J1/J2 reload",
+          "journeys": [
+            "J1-06"
+          ]
+        },
+        {
+          "id": "INV-018",
+          "kind": "ui-control",
+          "name": "Investigation state",
+          "component": "display",
+          "formaPattern": "facts / record-header",
+          "required": true,
+          "editable": false,
+          "verification": [
+            "mapped",
+            "exists",
+            "visible",
+            "outcome"
+          ],
+          "source": "catalog CAT-CAUSA-INVESTIGATION",
+          "owner": "ui-a",
+          "dependsOn": [
+            "INV-004"
+          ],
+          "section": "frame",
+          "placementBasis": "present on every section (INV-042 navigation, save state on every workspace view: J3-03..07)",
+          "journeys": []
+        },
+        {
+          "id": "INV-024",
+          "kind": "ui-field",
+          "name": "Observation text",
+          "component": "textarea",
+          "formaPattern": "textarea",
+          "required": true,
+          "editable": true,
+          "verification": [
+            "mapped",
+            "exists",
+            "visible",
+            "accessible",
+            "editable",
+            "enter",
+            "validation",
+            "rejects",
+            "save",
+            "reload",
+            "update"
+          ],
+          "source": "catalog CAT-CAUSA-INVESTIGATION",
+          "owner": "ui-c",
+          "validation": {
+            "minLength": 1,
+            "maxLength": 10000
+          },
+          "dependsOn": [
+            "INV-014"
+          ],
+          "instances": "observation id",
+          "notes": "The entered text itself is shown when the observation is listed or reopened, never only a label or sequence number.",
+          "section": "overview",
+          "placementBasis": "J2-01, J2-07 (journey records observations and conclusions on Overview); UI-025",
+          "journeys": [
+            "J2-01"
+          ]
+        },
+        {
+          "id": "INV-025",
+          "kind": "ui-field",
+          "name": "Observation source reference",
+          "component": "text-input",
+          "formaPattern": "text-field",
+          "required": false,
+          "editable": true,
+          "verification": [
+            "mapped",
+            "exists",
+            "visible",
+            "accessible",
+            "editable",
+            "enter",
+            "validation",
+            "rejects",
+            "save",
+            "reload"
+          ],
+          "source": "catalog CAT-CAUSA-INVESTIGATION",
+          "owner": "ui-c",
+          "validation": {
+            "maxLength": 10000
+          },
+          "dependsOn": [
+            "INV-014"
+          ],
+          "instances": "observation id",
+          "section": "overview",
+          "placementBasis": "J2-01, J2-07 (journey records observations and conclusions on Overview); UI-025",
+          "journeys": [
+            "J2-01"
+          ]
+        },
+        {
+          "id": "INV-026",
+          "kind": "ui-field",
+          "name": "Hypothesis statement",
+          "component": "textarea",
+          "formaPattern": "textarea",
+          "required": true,
+          "editable": true,
+          "verification": [
+            "mapped",
+            "exists",
+            "visible",
+            "accessible",
+            "editable",
+            "enter",
+            "validation",
+            "rejects",
+            "save",
+            "reload",
+            "update"
+          ],
+          "source": "catalog CAT-CAUSA-INVESTIGATION",
+          "owner": "ui-c",
+          "validation": {
+            "minLength": 1,
+            "maxLength": 10000
+          },
+          "dependsOn": [
+            "INV-009"
+          ],
+          "instances": "hypothesis id",
+          "notes": "Presented as a hypothesis, distinct from observations and conclusions.",
+          "section": "hypotheses",
+          "placementBasis": "J2-02, J2-05",
+          "journeys": [
+            "J2-02"
+          ]
+        },
+        {
+          "id": "INV-027",
+          "kind": "ui-field",
+          "name": "Evidence label",
+          "component": "text-input",
+          "formaPattern": "text-field",
+          "required": true,
+          "editable": true,
+          "verification": [
+            "mapped",
+            "exists",
+            "visible",
+            "accessible",
+            "editable",
+            "enter",
+            "validation",
+            "rejects",
+            "save",
+            "reload",
+            "update"
+          ],
+          "source": "catalog CAT-CAUSA-INVESTIGATION",
+          "owner": "ui-c",
+          "validation": {
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "dependsOn": [
+            "INV-013"
+          ],
+          "instances": "evidence id",
+          "section": "evidence",
+          "placementBasis": "J2-03..J2-06 (link editor used from Evidence)",
+          "journeys": [
+            "J2-03"
+          ]
+        },
+        {
+          "id": "INV-028",
+          "kind": "ui-field",
+          "name": "Evidence source reference",
+          "component": "text-input",
+          "formaPattern": "text-field",
+          "required": false,
+          "editable": true,
+          "verification": [
+            "mapped",
+            "exists",
+            "visible",
+            "accessible",
+            "editable",
+            "enter",
+            "validation",
+            "rejects",
+            "save",
+            "reload"
+          ],
+          "source": "catalog CAT-CAUSA-INVESTIGATION",
+          "owner": "ui-c",
+          "validation": {
+            "maxLength": 10000
+          },
+          "dependsOn": [
+            "INV-013"
+          ],
+          "instances": "evidence id",
+          "section": "evidence",
+          "placementBasis": "J2-03..J2-06 (link editor used from Evidence)",
+          "journeys": [
+            "J2-03"
+          ]
+        },
+        {
+          "id": "INV-029",
+          "kind": "ui-field",
+          "name": "Evidence source URL",
+          "component": "url-input",
+          "formaPattern": "text-field",
+          "required": false,
+          "editable": true,
+          "verification": [
+            "mapped",
+            "exists",
+            "visible",
+            "accessible",
+            "editable",
+            "enter",
+            "validation",
+            "rejects",
+            "save",
+            "reload"
+          ],
+          "source": "catalog CAT-CAUSA-INVESTIGATION",
+          "owner": "ui-c",
+          "validation": {
+            "maxLength": 2000,
+            "pattern": "^https?://[^\\s]+$"
+          },
+          "dependsOn": [
+            "INV-013"
+          ],
+          "instances": "evidence id",
+          "notes": "Only absolute http(s) URLs; anything else is refused and never rendered as a link (UI-005 sanitising).",
+          "section": "evidence",
+          "placementBasis": "J2-03..J2-06 (link editor used from Evidence)",
+          "journeys": []
+        },
+        {
+          "id": "INV-030",
+          "kind": "action",
+          "name": "Link evidence to a hypothesis",
+          "component": "button",
+          "formaPattern": "button",
+          "required": true,
+          "editable": false,
+          "verification": [
+            "mapped",
+            "exists",
+            "visible",
+            "accessible",
+            "activate",
+            "outcome",
+            "save",
+            "reload",
+            "update"
+          ],
+          "source": "catalog CAT-CAUSA-INVESTIGATION",
+          "owner": "ui-c",
+          "dependsOn": [
+            "INV-013",
+            "INV-010"
+          ],
+          "notes": "The link is shown on both the evidence and the hypothesis, and survives a reload. A link to a non-existent target is refused. At most one current assessment per evidence-hypothesis pair: a second link for the pair is refused, pointing to the existing one. Reassessing or withdrawing keeps the earlier assessment and its provenance in the history (OD-INDY-23).",
+          "section": "evidence",
+          "placementBasis": "J2-03..J2-06 (link editor used from Evidence)",
+          "journeys": [
+            "J2-04",
+            "J2-05",
+            "J2-06"
+          ]
+        },
+        {
+          "id": "INV-031",
+          "kind": "ui-field",
+          "name": "Evidence relationship kind",
+          "component": "radio-group",
+          "formaPattern": "choice-group",
+          "required": true,
+          "editable": true,
+          "verification": [
+            "mapped",
+            "exists",
+            "visible",
+            "accessible",
+            "select",
+            "validation",
+            "rejects",
+            "save",
+            "reload"
+          ],
+          "source": "catalog CAT-CAUSA-INVESTIGATION",
+          "owner": "ui-c",
+          "validation": {
+            "options": [
+              "supports",
+              "contradicts",
+              "consistent-with",
+              "inconclusive"
+            ]
+          },
+          "dependsOn": [
+            "INV-030"
+          ],
+          "instances": "relationship id",
+          "notes": "A Forma choice group with no option selected initially. supports: makes the hypothesis more credible; contradicts: makes it less credible; consistent-with: fits but does not favour it over competing hypotheses it also fits; inconclusive: assessed, but whether it fits cannot yet be determined. Not assessed is the absence of a relationship, never an option (OD-INDY-23, docs/rehearsal-009-content-readiness/HYPOTHESIS-EVIDENCE-RELATIONSHIPS.md).",
+          "section": "evidence",
+          "placementBasis": "J2-03..J2-06 (link editor used from Evidence)",
+          "journeys": [
+            "J2-04"
+          ]
+        },
+        {
+          "id": "INV-032",
+          "kind": "action",
+          "name": "Record a conclusion",
+          "component": "button",
+          "formaPattern": "button",
+          "required": true,
+          "editable": false,
+          "verification": [
+            "mapped",
+            "exists",
+            "visible",
+            "accessible",
+            "activate",
+            "outcome",
+            "save",
+            "reload"
+          ],
+          "source": "catalog CAT-CAUSA-INVESTIGATION",
+          "owner": "ui-c",
+          "notes": "Records a snapshot; it does not resolve the investigation, whose existing gates are unchanged.",
+          "section": "overview",
+          "placementBasis": "J2-01, J2-07 (journey records observations and conclusions on Overview); UI-025",
+          "journeys": [
+            "J2-07"
+          ]
+        },
+        {
+          "id": "INV-033",
+          "kind": "ui-field",
+          "name": "Conclusion statement",
+          "component": "textarea",
+          "formaPattern": "textarea",
+          "required": true,
+          "editable": true,
+          "verification": [
+            "mapped",
+            "exists",
+            "visible",
+            "accessible",
+            "editable",
+            "enter",
+            "validation",
+            "rejects",
+            "save",
+            "reload"
+          ],
+          "source": "catalog CAT-CAUSA-INVESTIGATION",
+          "owner": "ui-c",
+          "validation": {
+            "minLength": 1,
+            "maxLength": 10000
+          },
+          "dependsOn": [
+            "INV-032"
+          ],
+          "instances": "conclusion id",
+          "section": "overview",
+          "placementBasis": "J2-01, J2-07 (journey records observations and conclusions on Overview); UI-025",
+          "journeys": [
+            "J2-07"
+          ]
+        },
+        {
+          "id": "INV-034",
+          "kind": "action",
+          "name": "Edit investigation details",
+          "component": "button",
+          "formaPattern": "button",
+          "required": true,
+          "editable": false,
+          "verification": [
+            "mapped",
+            "exists",
+            "visible",
+            "accessible",
+            "activate",
+            "outcome",
+            "save",
+            "reload",
+            "update"
+          ],
+          "source": "catalog CAT-CAUSA-INVESTIGATION",
+          "owner": "ui-b",
+          "dependsOn": [
+            "INV-001",
+            "INV-002",
+            "INV-023"
+          ],
+          "notes": "Title, problem statement and question can be edited; the investigation identifier (INV-006) is unchanged.",
+          "section": "overview",
+          "placementBasis": "J2-01, J2-07 (journey records observations and conclusions on Overview); UI-025",
+          "journeys": []
+        },
+        {
+          "id": "INV-035",
+          "kind": "workflow-outcome",
+          "name": "Editing keeps identity and history",
+          "component": null,
+          "formaPattern": null,
+          "required": true,
+          "editable": false,
+          "verification": [
+            "mapped",
+            "outcome",
+            "save",
+            "reload",
+            "update"
+          ],
+          "source": "catalog CAT-CAUSA-INVESTIGATION",
+          "owner": "integration",
+          "dependsOn": [
+            "INV-024",
+            "INV-026",
+            "INV-027",
+            "INV-034"
+          ],
+          "notes": "An edited observation, hypothesis, evidence item or investigation keeps its identifier; the earlier text and its provenance remain in the history.",
+          "section": "workflow",
+          "placementBasis": "workflow outcome, judged by J1/J2 reload",
+          "journeys": [
+            "J2-06",
+            "J2-09"
+          ]
+        },
+        {
+          "id": "INV-036",
+          "kind": "action",
+          "name": "Cancel a content editor",
+          "component": "button",
+          "formaPattern": "button",
+          "required": true,
+          "editable": false,
+          "verification": [
+            "mapped",
+            "exists",
+            "visible",
+            "accessible",
+            "activate",
+            "outcome"
+          ],
+          "source": "catalog CAT-CAUSA-INVESTIGATION",
+          "owner": "ui-b",
+          "instances": "editor",
+          "notes": "Closes the editor; nothing entered is recorded or written.",
+          "section": "all-content-editors",
+          "placementBasis": "INV-036 instances: editor",
+          "journeys": []
+        },
+        {
+          "id": "INV-037",
+          "kind": "workflow-outcome",
+          "name": "All content survives a reload from GitHub",
+          "component": null,
+          "formaPattern": null,
+          "required": true,
+          "editable": false,
+          "verification": [
+            "mapped",
+            "outcome",
+            "save",
+            "reload",
+            "isolation"
+          ],
+          "source": "catalog CAT-CAUSA-INVESTIGATION",
+          "owner": "integration",
+          "dependsOn": [
+            "INV-001",
+            "INV-002",
+            "INV-023",
+            "INV-024",
+            "INV-026",
+            "INV-012",
+            "INV-027",
+            "INV-028",
+            "INV-030",
+            "INV-031",
+            "INV-033"
+          ],
+          "notes": "After verified persistence, a reload from the real GitHub repository in a new browser context shows every entered value (the INVESTIGATION-CONTENT-E2E scenario, docs/rehearsal-009-content-readiness/E2E-VERIFICATION.md).",
+          "section": "workflow",
+          "placementBasis": "workflow outcome, judged by J1/J2 reload",
+          "journeys": [
+            "J1-05",
+            "J1-06",
+            "J2-09"
+          ]
+        },
+        {
+          "id": "INV-038",
+          "kind": "ui-field",
+          "name": "Evidence relationship rationale",
+          "component": "textarea",
+          "formaPattern": "textarea",
+          "required": true,
+          "editable": true,
+          "verification": [
+            "mapped",
+            "exists",
+            "visible",
+            "accessible",
+            "editable",
+            "enter",
+            "validation",
+            "rejects",
+            "save",
+            "reload"
+          ],
+          "source": "catalog CAT-CAUSA-INVESTIGATION",
+          "owner": "ui-c",
+          "validation": {
+            "minLength": 1,
+            "maxLength": 10000
+          },
+          "dependsOn": [
+            "INV-030"
+          ],
+          "instances": "relationship id",
+          "notes": "Required for every assessment, including a reassessment; a withdrawal records its own reason. The rationale is the recorded inference that separates the evidence from what it is taken to mean.",
+          "section": "evidence",
+          "placementBasis": "J2-03..J2-06 (link editor used from Evidence)",
+          "journeys": [
+            "J2-04"
+          ]
+        },
+        {
+          "id": "INV-042",
+          "kind": "ui-control",
+          "name": "Investigation sections",
+          "component": "region",
+          "formaPattern": "landmark-region",
+          "required": true,
+          "editable": false,
+          "verification": [
+            "mapped",
+            "exists",
+            "visible",
+            "accessible"
+          ],
+          "source": "catalog CAT-CAUSA-INVESTIGATION",
+          "owner": "ui-a",
+          "notes": "A nav region with Overview, Causal Analysis, Evidence, Hypotheses and Timeline (Corrective Actions where supported). Each section showing this investigation's content, and Causal Analysis listing the relationships, is judged by journey J2 (J2-08). A section that only says it is not supported fails J2-08.",
+          "section": "frame",
+          "placementBasis": "present on every section (INV-042 navigation, save state on every workspace view: J3-03..07)",
+          "journeys": []
+        },
+        {
+          "id": "INV-043",
+          "kind": "ui-control",
+          "name": "Save state outcomes",
+          "component": "display",
+          "formaPattern": "facts / record-header",
+          "required": true,
+          "editable": false,
+          "verification": [
+            "mapped",
+            "exists",
+            "visible",
+            "accessible"
+          ],
+          "source": "catalog CAT-CAUSA-INVESTIGATION",
+          "owner": "ui-b",
+          "dependsOn": [
+            "INV-016"
+          ],
+          "notes": "The Forma status lozenge. Each of the seven states driven by its real entry condition is judged by journeys J1-04 and J3-03..07; a constant label fails them (adversarial case C07).",
+          "section": "frame",
+          "placementBasis": "present on every section (INV-042 navigation, save state on every workspace view: J3-03..07)",
+          "journeys": []
+        },
+        {
+          "id": "INV-044",
+          "kind": "workflow-outcome",
+          "name": "A link is shown on both the evidence and the hypothesis",
+          "component": null,
+          "formaPattern": null,
+          "required": true,
+          "editable": false,
+          "verification": [
+            "mapped",
+            "outcome",
+            "reload"
+          ],
+          "source": "catalog CAT-CAUSA-INVESTIGATION",
+          "owner": "ui-c",
+          "dependsOn": [
+            "INV-030"
+          ],
+          "notes": "Promotes the existing INV-030 note to a checked outcome; also judged by journey J2 (J2-05).",
+          "section": "evidence+hypotheses",
+          "placementBasis": "INV-044",
+          "journeys": []
+        }
+      ],
+      "additionalEntries": [
+        {
+          "id": "UIA-RECORD-EVIDENCE",
+          "kind": "action",
+          "name": "Record evidence",
+          "component": "Button",
+          "source": "J2-03 activates /record evidence|add evidence/; no catalog entry names this action",
+          "owner": "ui-c",
+          "section": "evidence",
+          "gap": "OWNER-DECISIONS CF-02"
+        },
+        {
+          "id": "UIA-REASSESS",
+          "kind": "action",
+          "name": "Reassess",
+          "component": "Button",
+          "source": "J2-06; INV-030 notes (reassessing keeps the earlier assessment)",
+          "owner": "ui-c",
+          "section": "evidence",
+          "gap": "OWNER-DECISIONS CF-02"
+        },
+        {
+          "id": "UIF-LINK-EVIDENCE",
+          "kind": "ui-field",
+          "name": "Evidence",
+          "component": "Select",
+          "source": "J2-04 selects a combobox named /evidence/i; INV-030",
+          "owner": "ui-c",
+          "section": "evidence",
+          "formaPattern": "select"
+        },
+        {
+          "id": "UIF-LINK-HYPOTHESIS",
+          "kind": "ui-field",
+          "name": "Hypothesis",
+          "component": "Select",
+          "source": "J2-04 selects a combobox named /hypothes/i; INV-030",
+          "owner": "ui-c",
+          "section": "evidence",
+          "formaPattern": "select"
+        },
+        {
+          "id": "UIF-DETAILS-TITLE",
+          "kind": "ui-field",
+          "name": "Title",
+          "component": "TextInput",
+          "source": "INV-034 (edits INV-002; rule INV-020)",
+          "owner": "ui-b",
+          "section": "overview",
+          "validation": {
+            "maxLength": 200
+          }
+        },
+        {
+          "id": "UIF-DETAILS-PROBLEM",
+          "kind": "ui-field",
+          "name": "Problem statement",
+          "component": "TextArea",
+          "source": "INV-034 (edits INV-001; rules INV-019, INV-021)",
+          "owner": "ui-b",
+          "section": "overview",
+          "validation": {
+            "minLength": 1,
+            "maxLength": 10000
+          }
+        },
+        {
+          "id": "UIF-DETAILS-QUESTION",
+          "kind": "ui-field",
+          "name": "Primary investigative question",
+          "component": "TextArea",
+          "source": "INV-034 (edits INV-023)",
+          "owner": "ui-b",
+          "section": "overview",
+          "validation": {
+            "maxLength": 10000
+          }
+        },
+        {
+          "id": "UIA-SAVE-DETAILS",
+          "kind": "action",
+          "name": "Save details",
+          "component": "Button",
+          "source": "INV-034 outcome",
+          "owner": "ui-b",
+          "section": "overview"
+        },
+        {
+          "id": "UIA-SAVE-INDICATOR",
+          "kind": "action",
+          "name": "Save-state actions",
+          "component": "Button",
+          "source": "PERSIST-031..033; frozen IF41-VIEW SaveAction (Save, Retry, Reconnect, Check again, Review, Reapply mine, Discard mine, Export mine)",
+          "owner": "ui-b",
+          "section": "frame"
+        },
+        {
+          "id": "UIR-CONFLICT-REVIEW",
+          "kind": "region",
+          "name": "Conflict review",
+          "component": "Region",
+          "source": "S23; PERSIST-011, PERSIST-012; frozen SM-CONFLICT",
+          "owner": "ui-b",
+          "section": "frame",
+          "formaPattern": "conflict-review"
+        },
+        {
+          "id": "UIR-TIMELINE",
+          "kind": "region",
+          "name": "Timeline",
+          "component": "Region",
+          "source": "UI-003; J2-06, J2-08",
+          "owner": "ui-c",
+          "section": "timeline",
+          "formaPattern": "timeline"
+        },
+        {
+          "id": "UIR-CAUSAL-ANALYSIS",
+          "kind": "region",
+          "name": "Causal Analysis",
+          "component": "Region",
+          "source": "UI-026 (+ WDL-001..015 layout engine); J2-08 lists the relationships",
+          "owner": "ui-c",
+          "section": "causal-analysis",
+          "formaPattern": "diagram, relationship-index"
+        },
+        {
+          "id": "UIR-NEXT-STEPS",
+          "kind": "region",
+          "name": "Next steps",
+          "component": "Region",
+          "source": "UI-032",
+          "owner": "ui-c",
+          "section": "overview"
+        },
+        {
+          "id": "UIR-STORED-RECORD",
+          "kind": "region",
+          "name": "Investigation history (as stored)",
+          "component": "Region",
+          "source": "Data Visible boundary; UI-010 fail closed; UI-024 \"Investigation history\"",
+          "owner": "ui-a",
+          "section": "timeline",
+          "notes": "Shows stored events uninterpreted when no projection exists; never labelled as the investigation state."
+        }
+      ],
+      "regions": [
+        {
+          "id": "UIR-WORKSPACE-HEADER",
+          "name": "Investigation header",
+          "component": "record-header",
+          "fields": [
+            "title",
+            "INV-023 question",
+            "INV-006 identifier",
+            "INV-018 state",
+            "INV-007 creation timestamp",
+            "copy kind"
+          ],
+          "source": "INV-023 notes, UI-014"
+        },
+        {
+          "id": "INV-042",
+          "name": "Investigation sections",
+          "component": "navigation",
+          "source": "UI-029"
+        },
+        {
+          "id": "INV-016",
+          "name": "Save state",
+          "component": "status (ef-status-lozenge)",
+          "source": "UI-006, PERSIST-030; design contract role save-status"
+        }
+      ],
+      "states": [
+        "loading (\"Opening investigation\")",
+        "ready",
+        "not-found",
+        "invalid-data (fail closed)",
+        "unauthorized",
+        "offline (loaded stays visible)",
+        "projection-unavailable (CapabilityAbsent)",
+        "frozen-demonstration read-only",
+        "save: Saved",
+        "save: Unsaved",
+        "save: Saving",
+        "save: Offline",
+        "save: Conflict",
+        "save: Unknown commit outcome",
+        "save: Save failed",
+        "editor-open",
+        "editor-validation-errors"
+      ],
+      "viewModel": "contracts/InvestigationAnalysis.fs WorkspaceView (frame: InvestigationDetail.fs WorkspaceFrame; save: InvestigationEditor.fs SavePresentation)",
+      "actionContracts": "contracts/UiActions.fs ActionContracts.all (Screen = investigation-workspace)",
+      "formaComponents": [
+        "workspace-shell, navigation-shell",
+        "record-header",
+        "tabs or section navigation",
+        "status-lozenge (save state)",
+        "conflict-review",
+        "card (evidence/hypothesis articles: J2-05 uses role article)",
+        "evidence-relationship, relationship-index",
+        "choice-group (INV-031)",
+        "timeline",
+        "diagram (WDL)",
+        "provenance-trail",
+        "textarea, text-field, select, validation-message",
+        "empty-state, alert, fault-inline",
+        "skeleton/spinner"
+      ],
+      "accessibility": [
+        "skip link first (design contract skipLinkFirst)",
+        "landmarks: banner, navigation \"Primary\", main",
+        "visible focus (J3-08)",
+        "44 px touch targets (design contract minimumTouchTarget)",
+        "labels from the catalog names; validation messages tied to fields",
+        "status announcements through a live region (frozen Politeness)",
+        "no colour-only state (UI-016)",
+        "graph has a textual relationship list (UI-011, UI-026)",
+        "section links mark aria-current (J2-08)"
+      ],
+      "responsive": [
+        "390 px phone: no horizontal overflow (J3-09)",
+        "820/1180 px iPad portrait/landscape",
+        "1440 px desktop",
+        "200% text reflow (UI-011)",
+        "inspector/master-detail stacks on narrow screens (UI-034)"
+      ],
+      "requirements": [
+        "UI-003",
+        "UI-004",
+        "UI-005",
+        "UI-006",
+        "UI-013",
+        "UI-017",
+        "UI-023",
+        "UI-025",
+        "UI-026",
+        "UI-032",
+        "UI-033",
+        "UI-034",
+        "UI-038",
+        "PERSIST-030",
+        "PERSIST-031",
+        "PERSIST-032",
+        "PERSIST-033",
+        "INV-007",
+        "INV-008",
+        "INV-009",
+        "INV-010",
+        "INV-011",
+        "INV-012",
+        "INV-013",
+        "INV-014",
+        "INV-015",
+        "INV-016",
+        "INV-017",
+        "INV-018",
+        "INV-024",
+        "INV-025",
+        "INV-026",
+        "INV-027",
+        "INV-028",
+        "INV-029",
+        "INV-030",
+        "INV-031",
+        "INV-032",
+        "INV-033",
+        "INV-034",
+        "INV-035",
+        "INV-036",
+        "INV-037",
+        "INV-038",
+        "INV-042",
+        "INV-043",
+        "INV-044"
+      ],
+      "mandatoryObligations": {
+        "UI-003": [
+          "UI-003-O1",
+          "UI-003-O2",
+          "UI-003-O3",
+          "UI-003-O4"
+        ],
+        "UI-004": [
+          "UI-004-O1",
+          "UI-004-O2",
+          "UI-004-O3",
+          "UI-004-O4",
+          "UI-004-O5",
+          "UI-004-O6"
+        ],
+        "UI-005": [
+          "UI-005-O1",
+          "UI-005-O2",
+          "UI-005-O3",
+          "UI-005-O4"
+        ],
+        "UI-006": [
+          "UI-006-O1",
+          "UI-006-O2",
+          "UI-006-O3",
+          "UI-006-O4",
+          "UI-006-O5",
+          "UI-006-O6",
+          "UI-006-O7"
+        ],
+        "UI-013": [
+          "UI-013-O1",
+          "UI-013-O2",
+          "UI-013-O3",
+          "UI-013-O4"
+        ],
+        "UI-017": [
+          "UI-017-O1",
+          "UI-017-O2",
+          "UI-017-O3",
+          "UI-017-O4",
+          "UI-017-O5"
+        ],
+        "UI-023": [
+          "UI-023-O1",
+          "UI-023-O2",
+          "UI-023-O3",
+          "UI-023-O4"
+        ],
+        "UI-025": [
+          "UI-025-O1",
+          "UI-025-O2",
+          "UI-025-O3",
+          "UI-025-O4"
+        ],
+        "UI-026": [
+          "UI-026-O1",
+          "UI-026-O2",
+          "UI-026-O3",
+          "UI-026-O4"
+        ],
+        "UI-032": [
+          "UI-032-O1",
+          "UI-032-O2"
+        ],
+        "UI-033": [
+          "UI-033-O1",
+          "UI-033-O2"
+        ],
+        "UI-034": [
+          "UI-034-O1",
+          "UI-034-O2",
+          "UI-034-O3"
+        ],
+        "UI-038": [
+          "UI-038-O1",
+          "UI-038-O2"
+        ],
+        "PERSIST-030": [
+          "PERSIST-030-O1",
+          "PERSIST-030-O2",
+          "PERSIST-030-O3",
+          "PERSIST-030-O4",
+          "PERSIST-030-O5",
+          "PERSIST-030-O6",
+          "PERSIST-030-O7",
+          "PERSIST-030-O8"
+        ],
+        "PERSIST-031": [
+          "PERSIST-031-O1",
+          "PERSIST-031-O2",
+          "PERSIST-031-O3",
+          "PERSIST-031-O4",
+          "PERSIST-031-O5",
+          "PERSIST-031-O6",
+          "PERSIST-031-O7",
+          "PERSIST-031-O8",
+          "PERSIST-031-O9",
+          "PERSIST-031-O10",
+          "PERSIST-031-O11",
+          "PERSIST-031-O12",
+          "PERSIST-031-O13",
+          "PERSIST-031-O14",
+          "PERSIST-031-O15",
+          "PERSIST-031-O16",
+          "PERSIST-031-O17",
+          "PERSIST-031-O18",
+          "PERSIST-031-O19",
+          "PERSIST-031-O20",
+          "PERSIST-031-O21",
+          "PERSIST-031-O22",
+          "PERSIST-031-O23",
+          "PERSIST-031-O24"
+        ],
+        "PERSIST-032": [
+          "PERSIST-032-O1",
+          "PERSIST-032-O2",
+          "PERSIST-032-O3",
+          "PERSIST-032-O4",
+          "PERSIST-032-O5"
+        ],
+        "PERSIST-033": [
+          "PERSIST-033-O1",
+          "PERSIST-033-O2",
+          "PERSIST-033-O3"
+        ],
+        "INV-007": [
+          "INV-007/V1/mapped",
+          "INV-007/V1/exists",
+          "INV-007/V2/visible"
+        ],
+        "INV-008": [
+          "INV-008/V1/mapped",
+          "INV-008/V1/exists",
+          "INV-008/V2/visible",
+          "INV-008/V4/outcome",
+          "INV-008/V5/reload"
+        ],
+        "INV-009": [
+          "INV-009/V1/mapped",
+          "INV-009/V1/exists",
+          "INV-009/V2/visible",
+          "INV-009/V2/accessible",
+          "INV-009/V3/activate",
+          "INV-009/V4/outcome"
+        ],
+        "INV-010": [
+          "INV-010/V1/mapped",
+          "INV-010/V1/exists",
+          "INV-010/V2/visible",
+          "INV-010/V4/outcome"
+        ],
+        "INV-011": [
+          "INV-011/V1/mapped",
+          "INV-011/V1/exists",
+          "INV-011/V2/visible",
+          "INV-011/V3/editable",
+          "INV-011/V3/enter",
+          "INV-011/V5/save"
+        ],
+        "INV-012": [
+          "INV-012/V1/mapped",
+          "INV-012/V1/exists",
+          "INV-012/V2/visible",
+          "INV-012/V3/editable",
+          "INV-012/V3/enter",
+          "INV-012/V5/save"
+        ],
+        "INV-013": [
+          "INV-013/V1/mapped",
+          "INV-013/V1/exists",
+          "INV-013/V2/visible"
+        ],
+        "INV-014": [
+          "INV-014/V1/mapped",
+          "INV-014/V1/exists",
+          "INV-014/V2/visible",
+          "INV-014/V2/accessible",
+          "INV-014/V3/activate",
+          "INV-014/V4/outcome"
+        ],
+        "INV-015": [
+          "INV-015/V1/mapped",
+          "INV-015/V1/exists",
+          "INV-015/V2/visible",
+          "INV-015/V2/accessible",
+          "INV-015/V3/activate",
+          "INV-015/V4/outcome"
+        ],
+        "INV-016": [
+          "INV-016/V1/mapped",
+          "INV-016/V1/exists",
+          "INV-016/V2/visible",
+          "INV-016/V2/accessible"
+        ],
+        "INV-017": [
+          "INV-017/V1/mapped",
+          "INV-017/V5/reload"
+        ],
+        "INV-018": [
+          "INV-018/V1/mapped",
+          "INV-018/V1/exists",
+          "INV-018/V2/visible",
+          "INV-018/V4/outcome"
+        ],
+        "INV-024": [
+          "INV-024/V1/mapped",
+          "INV-024/V1/exists",
+          "INV-024/V2/visible",
+          "INV-024/V2/accessible",
+          "INV-024/V3/editable",
+          "INV-024/V3/enter",
+          "INV-024/V4/validation",
+          "INV-024/V4/rejects",
+          "INV-024/V5/save",
+          "INV-024/V5/reload",
+          "INV-024/V5/update"
+        ],
+        "INV-025": [],
+        "INV-026": [
+          "INV-026/V1/mapped",
+          "INV-026/V1/exists",
+          "INV-026/V2/visible",
+          "INV-026/V2/accessible",
+          "INV-026/V3/editable",
+          "INV-026/V3/enter",
+          "INV-026/V4/validation",
+          "INV-026/V4/rejects",
+          "INV-026/V5/save",
+          "INV-026/V5/reload",
+          "INV-026/V5/update"
+        ],
+        "INV-027": [
+          "INV-027/V1/mapped",
+          "INV-027/V1/exists",
+          "INV-027/V2/visible",
+          "INV-027/V2/accessible",
+          "INV-027/V3/editable",
+          "INV-027/V3/enter",
+          "INV-027/V4/validation",
+          "INV-027/V4/rejects",
+          "INV-027/V5/save",
+          "INV-027/V5/reload",
+          "INV-027/V5/update"
+        ],
+        "INV-028": [],
+        "INV-029": [],
+        "INV-030": [
+          "INV-030/V1/mapped",
+          "INV-030/V1/exists",
+          "INV-030/V2/visible",
+          "INV-030/V2/accessible",
+          "INV-030/V3/activate",
+          "INV-030/V4/outcome",
+          "INV-030/V5/save",
+          "INV-030/V5/reload",
+          "INV-030/V5/update"
+        ],
+        "INV-031": [
+          "INV-031/V1/mapped",
+          "INV-031/V1/exists",
+          "INV-031/V2/visible",
+          "INV-031/V2/accessible",
+          "INV-031/V3/select",
+          "INV-031/V4/validation",
+          "INV-031/V4/rejects",
+          "INV-031/V5/save",
+          "INV-031/V5/reload"
+        ],
+        "INV-032": [
+          "INV-032/V1/mapped",
+          "INV-032/V1/exists",
+          "INV-032/V2/visible",
+          "INV-032/V2/accessible",
+          "INV-032/V3/activate",
+          "INV-032/V4/outcome",
+          "INV-032/V5/save",
+          "INV-032/V5/reload"
+        ],
+        "INV-033": [
+          "INV-033/V1/mapped",
+          "INV-033/V1/exists",
+          "INV-033/V2/visible",
+          "INV-033/V2/accessible",
+          "INV-033/V3/editable",
+          "INV-033/V3/enter",
+          "INV-033/V4/validation",
+          "INV-033/V4/rejects",
+          "INV-033/V5/save",
+          "INV-033/V5/reload"
+        ],
+        "INV-034": [
+          "INV-034/V1/mapped",
+          "INV-034/V1/exists",
+          "INV-034/V2/visible",
+          "INV-034/V2/accessible",
+          "INV-034/V3/activate",
+          "INV-034/V4/outcome",
+          "INV-034/V5/save",
+          "INV-034/V5/reload",
+          "INV-034/V5/update"
+        ],
+        "INV-035": [
+          "INV-035/V1/mapped",
+          "INV-035/V4/outcome",
+          "INV-035/V5/save",
+          "INV-035/V5/reload",
+          "INV-035/V5/update"
+        ],
+        "INV-036": [
+          "INV-036/V1/mapped",
+          "INV-036/V1/exists",
+          "INV-036/V2/visible",
+          "INV-036/V2/accessible",
+          "INV-036/V3/activate",
+          "INV-036/V4/outcome"
+        ],
+        "INV-037": [
+          "INV-037/V1/mapped",
+          "INV-037/V4/outcome",
+          "INV-037/V5/save",
+          "INV-037/V5/reload",
+          "INV-037/V5/isolation"
+        ],
+        "INV-038": [
+          "INV-038/V1/mapped",
+          "INV-038/V1/exists",
+          "INV-038/V2/visible",
+          "INV-038/V2/accessible",
+          "INV-038/V3/editable",
+          "INV-038/V3/enter",
+          "INV-038/V4/validation",
+          "INV-038/V4/rejects",
+          "INV-038/V5/save",
+          "INV-038/V5/reload"
+        ],
+        "INV-042": [
+          "INV-042/V1/mapped",
+          "INV-042/V1/exists",
+          "INV-042/V2/visible",
+          "INV-042/V2/accessible"
+        ],
+        "INV-043": [
+          "INV-043/V1/mapped",
+          "INV-043/V1/exists",
+          "INV-043/V2/visible",
+          "INV-043/V2/accessible"
+        ],
+        "INV-044": [
+          "INV-044/V1/mapped",
+          "INV-044/V4/outcome",
+          "INV-044/V5/reload"
+        ]
+      },
+      "journeyAssertions": [
+        "J1-04",
+        "J1-05",
+        "J1-06",
+        "J2-01",
+        "J2-02",
+        "J2-03",
+        "J2-04",
+        "J2-05",
+        "J2-06",
+        "J2-07",
+        "J2-08",
+        "J2-09",
+        "J3-03",
+        "J3-04",
+        "J3-05",
+        "J3-06",
+        "J3-07"
+      ],
+      "verification": {
+        "layerA": [
+          "F# compile",
+          "SCREEN-MANIFEST completeness (tests)",
+          "field rules equal the catalog validation blocks",
+          "fixture backend scenario tests"
+        ],
+        "layerB": [
+          "rendered DOM roles and accessible names (governed journey locators)",
+          "loading/empty/failure states per fixture scenario",
+          "axe-core 4.14.0",
+          "390/820/1180/1440 px viewports (design contract)"
+        ],
+        "layerC": [
+          "governed journeys J1-04, J1-05, J1-06, J2-01, J2-02, J2-03, J2-04, J2-05, J2-06, J2-07, J2-08, J2-09, J3-03, J3-04, J3-05, J3-06, J3-07 against api.github.com, Chromium and WebKit",
+          "plan tests of the mandatory obligations listed",
+          "slice-gate PASS; completion-gate COMPLETE"
+        ]
+      },
+      "owner": "ui-a (frame) / ui-b (save, details) / ui-c (sections)",
+      "notes": "One route; sections are selected by the S02 `tab` query parameter (default overview). SCREEN-CONTRACTS also lists `\u2026/hypotheses` (S03) as a route; choosing between them is OWNER-DECISIONS CF-05.",
+      "sections": [
+        {
+          "id": "overview",
+          "label": "Overview",
+          "route": "#/investigations/{id}",
+          "default": true,
+          "needs": "DataUnderstood (frame: DataVisible)",
+          "requirements": [
+            "UI-025",
+            "UI-032",
+            "UI-038",
+            "INV-014",
+            "INV-024",
+            "INV-025",
+            "INV-032",
+            "INV-033",
+            "INV-034"
+          ],
+          "owner": "ui-c (content) / ui-b (details editor)"
+        },
+        {
+          "id": "causal-analysis",
+          "label": "Causal Analysis",
+          "route": "#/investigations/{id}?tab=causal-analysis",
+          "needs": "DataUnderstood",
+          "requirements": [
+            "UI-026",
+            "UI-033",
+            "WDL-001",
+            "WDL-002",
+            "WDL-003",
+            "WDL-004",
+            "WDL-005",
+            "WDL-006",
+            "WDL-007",
+            "WDL-008",
+            "WDL-009",
+            "WDL-010",
+            "WDL-011",
+            "WDL-012",
+            "WDL-014",
+            "WDL-015"
+          ],
+          "owner": "ui-c"
+        },
+        {
+          "id": "evidence",
+          "label": "Evidence",
+          "route": "#/investigations/{id}?tab=evidence",
+          "needs": "DataUnderstood",
+          "requirements": [
+            "UI-005",
+            "UI-034",
+            "INV-012",
+            "INV-013",
+            "INV-027",
+            "INV-028",
+            "INV-029",
+            "INV-030",
+            "INV-031",
+            "INV-038",
+            "INV-044"
+          ],
+          "owner": "ui-c"
+        },
+        {
+          "id": "hypotheses",
+          "label": "Hypotheses",
+          "route": "#/investigations/{id}?tab=hypotheses",
+          "needs": "DataUnderstood",
+          "requirements": [
+            "INV-009",
+            "INV-010",
+            "INV-011",
+            "INV-026",
+            "INV-044"
+          ],
+          "owner": "ui-c"
+        },
+        {
+          "id": "timeline",
+          "label": "Timeline",
+          "route": "#/investigations/{id}?tab=timeline",
+          "needs": "DataUnderstood (stored record: DataVisible)",
+          "requirements": [
+            "UI-003"
+          ],
+          "owner": "ui-c"
+        },
+        {
+          "id": "corrective-actions",
+          "label": "Corrective Actions",
+          "route": "#/investigations/{id}?tab=corrective-actions",
+          "needs": "DataUnderstood",
+          "requirements": [],
+          "owner": "ui-c",
+          "notes": "\"where supported\" (INV-042, UI-029); not in J2-08. Shown only when the projection supports it."
+        }
+      ]
+    },
+    {
+      "id": "administration",
+      "route": "#/administration",
+      "structure": "route",
+      "purpose": "System information and operational diagnostics, separately navigable and read-only (UI-018).",
+      "catalogEntries": [],
+      "additionalEntries": [
+        {
+          "id": "UIR-DIAGNOSTICS",
+          "kind": "region",
+          "name": "Diagnostics",
+          "component": "Region",
+          "source": "UI-018, UI-031; J3-02 shows provider and repository",
+          "owner": "ui-a"
+        }
+      ],
+      "regions": [
+        {
+          "id": "UIR-DIAGNOSTICS",
+          "name": "Administration",
+          "component": "facts / diagnostic-status",
+          "fields": [
+            "provider",
+            "repository",
+            "connection",
+            "catalog and version",
+            "storage contract version",
+            "application and Echelon versions",
+            "deployed commit",
+            "data validation and replay status",
+            "diagnostics"
+          ],
+          "source": "UI-018"
+        }
+      ],
+      "states": [
+        "unknown",
+        "unavailable",
+        "failed",
+        "known"
+      ],
+      "viewModel": "contracts/System.fs AdministrationView",
+      "actionContracts": "contracts/UiActions.fs ActionContracts.all (Screen = administration)",
+      "formaComponents": [
+        "facts",
+        "diagnostic-status",
+        "key-value-list",
+        "identifier"
+      ],
+      "accessibility": [
+        "skip link first (design contract skipLinkFirst)",
+        "landmarks: banner, navigation \"Primary\", main",
+        "visible focus (J3-08)",
+        "44 px touch targets (design contract minimumTouchTarget)",
+        "labels from the catalog names; validation messages tied to fields",
+        "status announcements through a live region (frozen Politeness)",
+        "no colour-only state (UI-016)"
+      ],
+      "responsive": [
+        "390 px phone: no horizontal overflow (J3-09)",
+        "820/1180 px iPad portrait/landscape",
+        "1440 px desktop",
+        "200% text reflow (UI-011)"
+      ],
+      "requirements": [
+        "UI-018",
+        "UI-031",
+        "UI-017",
+        "UI-021"
+      ],
+      "mandatoryObligations": {
+        "UI-018": [
+          "UI-018-O1",
+          "UI-018-O2",
+          "UI-018-O3",
+          "UI-018-O4",
+          "UI-018-O5",
+          "UI-018-O6"
+        ],
+        "UI-031": [
+          "UI-031-O1",
+          "UI-031-O2",
+          "UI-031-O3",
+          "UI-031-O4",
+          "UI-031-O5"
+        ],
+        "UI-017": [
+          "UI-017-O1",
+          "UI-017-O2",
+          "UI-017-O3",
+          "UI-017-O4",
+          "UI-017-O5"
+        ],
+        "UI-021": [
+          "UI-021-O1",
+          "UI-021-O2",
+          "UI-021-O3"
+        ]
+      },
+      "journeyAssertions": [
+        "J3-02"
+      ],
+      "verification": {
+        "layerA": [
+          "F# compile",
+          "SCREEN-MANIFEST completeness (tests)",
+          "field rules equal the catalog validation blocks",
+          "fixture backend scenario tests"
+        ],
+        "layerB": [
+          "rendered DOM roles and accessible names (governed journey locators)",
+          "loading/empty/failure states per fixture scenario",
+          "axe-core 4.14.0",
+          "390/820/1180/1440 px viewports (design contract)"
+        ],
+        "layerC": [
+          "governed journeys J3-02 against api.github.com, Chromium and WebKit",
+          "plan tests of the mandatory obligations listed",
+          "slice-gate PASS; completion-gate COMPLETE"
+        ]
+      },
+      "owner": "ui-a",
+      "notes": "No document fixes the path (OWNER-DECISIONS CF-05)."
+    },
+    {
+      "id": "settings",
+      "route": "#/settings",
+      "structure": "route",
+      "purpose": "User-adjustable preferences only, distinct from Administration (UI-019, S24).",
+      "catalogEntries": [],
+      "additionalEntries": [
+        {
+          "id": "UIR-PREFERENCES",
+          "kind": "region",
+          "name": "Preferences",
+          "component": "Region",
+          "source": "UI-019; J3-02 needs a radio, checkbox or combobox in main",
+          "owner": "ui-a",
+          "notes": "Which preferences exist is not specified (OWNER-DECISIONS CF-06)."
+        }
+      ],
+      "regions": [
+        {
+          "id": "UIR-PREFERENCES",
+          "name": "Settings",
+          "component": "form",
+          "source": "UI-019"
+        }
+      ],
+      "states": [
+        "effective values shown",
+        "scope per setting (session or device)"
+      ],
+      "viewModel": "contracts/System.fs SettingsView",
+      "actionContracts": "contracts/UiActions.fs ActionContracts.all (Screen = settings)",
+      "formaComponents": [
+        "form",
+        "choice-group",
+        "switch",
+        "select"
+      ],
+      "accessibility": [
+        "skip link first (design contract skipLinkFirst)",
+        "landmarks: banner, navigation \"Primary\", main",
+        "visible focus (J3-08)",
+        "44 px touch targets (design contract minimumTouchTarget)",
+        "labels from the catalog names; validation messages tied to fields",
+        "status announcements through a live region (frozen Politeness)",
+        "no colour-only state (UI-016)"
+      ],
+      "responsive": [
+        "390 px phone: no horizontal overflow (J3-09)",
+        "820/1180 px iPad portrait/landscape",
+        "1440 px desktop",
+        "200% text reflow (UI-011)"
+      ],
+      "requirements": [
+        "UI-019",
+        "UI-021"
+      ],
+      "mandatoryObligations": {
+        "UI-019": [
+          "UI-019-O1",
+          "UI-019-O2",
+          "UI-019-O3",
+          "UI-019-O4",
+          "UI-019-O5",
+          "UI-019-O6"
+        ],
+        "UI-021": [
+          "UI-021-O1",
+          "UI-021-O2",
+          "UI-021-O3"
+        ]
+      },
+      "journeyAssertions": [],
+      "verification": {
+        "layerA": [
+          "F# compile",
+          "SCREEN-MANIFEST completeness (tests)",
+          "field rules equal the catalog validation blocks",
+          "fixture backend scenario tests"
+        ],
+        "layerB": [
+          "rendered DOM roles and accessible names (governed journey locators)",
+          "loading/empty/failure states per fixture scenario",
+          "axe-core 4.14.0",
+          "390/820/1180/1440 px viewports (design contract)"
+        ],
+        "layerC": [
+          "governed journeys  against api.github.com, Chromium and WebKit",
+          "plan tests of the mandatory obligations listed",
+          "slice-gate PASS; completion-gate COMPLETE"
+        ]
+      },
+      "owner": "ui-a"
+    },
+    {
+      "id": "not-found",
+      "route": "#/{*rest}",
+      "structure": "route",
+      "purpose": "Unknown route or id: not found, not permitted or unavailable offline, with a way back (URL contract, P34.19).",
+      "catalogEntries": [],
+      "additionalEntries": [],
+      "regions": [],
+      "states": [
+        "not-found"
+      ],
+      "viewModel": "contracts/System.fs NotFoundView",
+      "actionContracts": "contracts/UiActions.fs ActionContracts.all (Screen = not-found)",
+      "formaComponents": [
+        "empty-state",
+        "alert"
+      ],
+      "accessibility": [
+        "skip link first (design contract skipLinkFirst)",
+        "landmarks: banner, navigation \"Primary\", main",
+        "visible focus (J3-08)",
+        "44 px touch targets (design contract minimumTouchTarget)",
+        "labels from the catalog names; validation messages tied to fields",
+        "status announcements through a live region (frozen Politeness)",
+        "no colour-only state (UI-016)"
+      ],
+      "responsive": [
+        "390 px phone: no horizontal overflow (J3-09)",
+        "820/1180 px iPad portrait/landscape",
+        "1440 px desktop",
+        "200% text reflow (UI-011)"
+      ],
+      "requirements": [
+        "UI-013"
+      ],
+      "mandatoryObligations": {
+        "UI-013": [
+          "UI-013-O1",
+          "UI-013-O2",
+          "UI-013-O3",
+          "UI-013-O4"
+        ]
+      },
+      "journeyAssertions": [],
+      "verification": {
+        "layerA": [
+          "F# compile",
+          "SCREEN-MANIFEST completeness (tests)",
+          "field rules equal the catalog validation blocks",
+          "fixture backend scenario tests"
+        ],
+        "layerB": [
+          "rendered DOM roles and accessible names (governed journey locators)",
+          "loading/empty/failure states per fixture scenario",
+          "axe-core 4.14.0",
+          "390/820/1180/1440 px viewports (design contract)"
+        ],
+        "layerC": [
+          "governed journeys  against api.github.com, Chromium and WebKit",
+          "plan tests of the mandatory obligations listed",
+          "slice-gate PASS; completion-gate COMPLETE"
+        ]
+      },
+      "owner": "ui-a"
+    }
+  ],
+  "crossCutting": [
+    {
+      "id": "UI-011",
+      "requirement": "UI-011",
+      "appliesTo": "every screen",
+      "journeyAssertions": [
+        "J3-08",
+        "J3-09"
+      ],
+      "mandatoryObligations": [
+        "UI-011-O1",
+        "UI-011-O2",
+        "UI-011-O3",
+        "UI-011-O4",
+        "UI-011-O5"
+      ]
+    },
+    {
+      "id": "UI-015",
+      "requirement": "UI-015",
+      "appliesTo": "every screen",
+      "journeyAssertions": [],
+      "mandatoryObligations": [
+        "UI-015-O1",
+        "UI-015-O2",
+        "UI-015-O3",
+        "UI-015-O4"
+      ]
+    },
+    {
+      "id": "UI-016",
+      "requirement": "UI-016",
+      "appliesTo": "every screen",
+      "journeyAssertions": [],
+      "mandatoryObligations": [
+        "UI-016-O1",
+        "UI-016-O2",
+        "UI-016-O3",
+        "UI-016-O4",
+        "UI-016-O5",
+        "UI-016-O6",
+        "UI-016-O7",
+        "UI-016-O8",
+        "UI-016-O9",
+        "UI-016-O10",
+        "UI-016-O11",
+        "UI-016-O12",
+        "UI-016-O13",
+        "UI-016-O14",
+        "UI-016-O15",
+        "UI-016-O16",
+        "UI-016-O17",
+        "UI-016-O18"
+      ]
+    },
+    {
+      "id": "UI-020",
+      "requirement": "UI-020",
+      "appliesTo": "every screen",
+      "journeyAssertions": [
+        "J3-01",
+        "J3-02"
+      ],
+      "mandatoryObligations": [
+        "UI-020-O1",
+        "UI-020-O2",
+        "UI-020-O3",
+        "UI-020-O4"
+      ]
+    },
+    {
+      "id": "UI-021",
+      "requirement": "UI-021",
+      "appliesTo": "every screen",
+      "journeyAssertions": [],
+      "mandatoryObligations": [
+        "UI-021-O1",
+        "UI-021-O2",
+        "UI-021-O3"
+      ]
+    },
+    {
+      "id": "UI-029",
+      "requirement": "UI-029",
+      "appliesTo": "every screen",
+      "journeyAssertions": [
+        "J2-08",
+        "J3-01",
+        "J3-08",
+        "J3-09"
+      ],
+      "mandatoryObligations": [
+        "UI-029-O1",
+        "UI-029-O2",
+        "UI-029-O3",
+        "UI-029-O4"
+      ]
+    },
+    {
+      "id": "UI-030",
+      "requirement": "UI-030",
+      "appliesTo": "every screen",
+      "journeyAssertions": [],
+      "mandatoryObligations": [
+        "UI-030-O1",
+        "UI-030-O2",
+        "UI-030-O3",
+        "UI-030-O4"
+      ]
+    },
+    {
+      "id": "UI-039",
+      "requirement": "UI-039",
+      "appliesTo": "every screen",
+      "journeyAssertions": [],
+      "mandatoryObligations": [
+        "UI-039-O1",
+        "UI-039-O2"
+      ]
+    },
+    {
+      "id": "UI-040",
+      "requirement": "UI-040",
+      "appliesTo": "every screen",
+      "journeyAssertions": [],
+      "mandatoryObligations": [
+        "UI-040-O1",
+        "UI-040-O2"
+      ]
+    }
+  ],
+  "inScopeUiRequirements": [
+    "UI-001",
+    "UI-003",
+    "UI-004",
+    "UI-005",
+    "UI-006",
+    "UI-010",
+    "UI-011",
+    "UI-013",
+    "UI-014",
+    "UI-015",
+    "UI-016",
+    "UI-017",
+    "UI-018",
+    "UI-019",
+    "UI-020",
+    "UI-021",
+    "UI-022",
+    "UI-023",
+    "UI-024",
+    "UI-025",
+    "UI-026",
+    "UI-029",
+    "UI-030",
+    "UI-031",
+    "UI-032",
+    "UI-033",
+    "UI-034",
+    "UI-038",
+    "UI-039",
+    "UI-040"
+  ],
+  "outOfScopeUiRequirements": [
+    {
+      "id": "UI-002",
+      "reason": "not in the approved scope manifest (P1 or not derived)"
+    },
+    {
+      "id": "UI-007",
+      "reason": "not in the approved scope manifest (P1 or not derived)"
+    },
+    {
+      "id": "UI-008",
+      "reason": "not in the approved scope manifest (P1 or not derived)"
+    },
+    {
+      "id": "UI-009",
+      "reason": "not in the approved scope manifest (P1 or not derived)"
+    },
+    {
+      "id": "UI-012",
+      "reason": "not in the approved scope manifest (P1 or not derived)"
+    },
+    {
+      "id": "UI-027",
+      "reason": "not in the approved scope manifest (P1 or not derived)"
+    },
+    {
+      "id": "UI-028",
+      "reason": "not in the approved scope manifest (P1 or not derived)"
+    },
+    {
+      "id": "UI-035",
+      "reason": "not in the approved scope manifest (P1 or not derived)"
+    },
+    {
+      "id": "UI-036",
+      "reason": "not in the approved scope manifest (P1 or not derived)"
+    },
+    {
+      "id": "UI-037",
+      "reason": "not in the approved scope manifest (P1 or not derived)"
+    }
+  ],
+  "notAScreen": [
+    {
+      "what": "Edit investigation",
+      "why": "INV-034 is an action on the workspace (catalog screen investigation-workspace), not a route"
+    },
+    {
+      "what": "Loading and error states",
+      "why": "states of each screen (states[]), not routes"
+    },
+    {
+      "what": "Evidence relationships",
+      "why": "INV-030/031/038/044 live in the Evidence and Hypotheses sections; Causal Analysis lists them (J2-08)"
+    },
+    {
+      "what": "Conclusions",
+      "why": "INV-032/033 are recorded on Overview (J2-07); no Conclusions section is required (INV-042 lists none)"
+    },
+    {
+      "what": "Report",
+      "why": "UI-009 is P1 and out of scope; J2-10 is P1"
+    }
+  ]
+}

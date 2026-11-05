@@ -1,0 +1,16 @@
+<!-- PROPOSAL prototype host: serves prototype/web and answers Limen transport messages from the F# fixture backend.
+     The host is the only imperative part (one in-memory map of sessions); the backend and screens stay pure. -->
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <Nullable>disable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Program.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="../screens/Causa.Ui.Prototype.Screens.fsproj" />
+    <ProjectReference Include="../../fixtures/Causa.Ui.Fixtures.fsproj" />
+  </ItemGroup>
+</Project>

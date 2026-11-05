@@ -1,0 +1,1180 @@
+{
+  "schema": "indy-init.r10-contract-first-ui.file-ownership/1",
+  "status": "PROPOSAL. Valid only through a successor package (v4.1.5) that adopts it; under v4.1.4 the frozen ownership (requirements-compiled/v4.1.4/analysis/project-structure.json) stands.",
+  "roles": {
+    "ui-a": "connection and browsing: shell, connection, investigation list, workspace frame, stored record and timeline, loading/empty/error states, administration, settings",
+    "ui-b": "investigation editing: start, details editor, validation presentation, save indicator, conflict review, history",
+    "ui-c": "investigation analysis: overview content, hypotheses, evidence, relationships, conclusions, inspector, causal graph, report",
+    "integration": "shell composition, routing, Engine/Update, the UI adapter, View.fs/Program.fs, every project and shared file",
+    "coordinator": "UI contract change control (versioned, consumers notified before merge)",
+    "domain": "unchanged (src/Causa.Domain/*)",
+    "persistence": "unchanged (src/Causa.Persistence/*, tests/Causa.TestSupport/Recordings.fs, StatefulFake.fs)"
+  },
+  "twoAgentVariant": "ui-a keeps its files; ui-b takes ui-c's files except Inspector.fs, Graph.fs, Report.fs (and their fragments and tests), which go to ui-a (schedule-inputs/roles.contract-first-2ui.json)",
+  "compileOrder": [
+    "Engine.fs",
+    "Routes.fs",
+    "Projections.fs (types)",
+    "Ui/Contracts/*",
+    "Connection.fs",
+    "Ui/UiAdapter.fs",
+    "Ui/Events.fs",
+    "Reporting.fs",
+    "Update.fs",
+    "Views/*",
+    "View.fs",
+    "Program.fs"
+  ],
+  "rules": [
+    "A file has exactly one owner; no two roles share a file.",
+    "No UI-owned file compiles before the UI contracts: everything they depend on (Engine.fs, Routes.fs, Projections.fs types) is integration-owned and frozen at bootstrap (verified: evidence/bootstrap-compile.log).",
+    "Screens emit UiIntent and read AppView only; no screen file edits Update.fs, Engine.fs, Projections.fs or View.fs.",
+    "UI contract files change only by a versioned change request through the coordinator, written by integration.",
+    "Markup lives in web/screens/<screen>.html, one file per screen; web/index.html only includes them (needs CF-08).",
+    "Unchanged from v4.1.4: integration alone writes project, solution, package and CI files; domain and persistence ownership is unchanged."
+  ],
+  "files": [
+    {
+      "path": "src/Causa.App/Engine.fs",
+      "owner": "integration",
+      "slices": [
+        "SL-T17"
+      ],
+      "implements": [
+        "IF41-APP"
+      ],
+      "dependsOn": [
+        "src/Causa.Persistence/Session.fs"
+      ],
+      "frozenOwner": "ui",
+      "note": "IF41-APP Engine; integration composes it (mission: integration owns dependency composition)"
+    },
+    {
+      "path": "src/Causa.App/Routes.fs",
+      "owner": "integration",
+      "slices": [
+        "bootstrap"
+      ],
+      "implements": [],
+      "dependsOn": [
+        "src/Causa.App/Engine.fs"
+      ],
+      "frozenOwner": "ui",
+      "note": "route table generated from contracts Navigation (UiRoute)"
+    },
+    {
+      "path": "src/Causa.App/Projections.fs",
+      "owner": "integration",
+      "slices": [
+        "bootstrap"
+      ],
+      "implements": [
+        "IF41-VIEW"
+      ],
+      "dependsOn": [
+        "src/Causa.App/Routes.fs"
+      ],
+      "frozenOwner": "ui",
+      "note": "frozen IF41-VIEW TYPES only, as the bootstrap writes them; compiled BEFORE Connection.fs (it needs only Engine.fs ConnectionState). The projection functions move to Views/SaveIndicator.fs (ui-b). Review finding R1"
+    },
+    {
+      "path": "src/Causa.App/Connection.fs",
+      "owner": "ui-a",
+      "slices": [
+        "SL-T16",
+        "SL-WI-GEN-EXT-DATA"
+      ],
+      "implements": [],
+      "dependsOn": [
+        "src/Causa.App/Ui/Contracts/Bindings.fs"
+      ],
+      "frozenOwner": "ui",
+      "note": "SM-CONNECTION, SM-NETWORK (frozen stateMachines owner: ui); compiled after the contracts, so no UI-owned file precedes them"
+    },
+    {
+      "path": "src/Causa.App/Ui/Contracts/Ids.fs",
+      "owner": "coordinator",
+      "slices": [
+        "bootstrap"
+      ],
+      "implements": [
+        "UI-CONTRACTS"
+      ],
+      "dependsOn": [
+        "src/Causa.App/Projections.fs"
+      ],
+      "note": "copied byte-for-byte from proposals/r10-contract-first-ui/contracts at bootstrap; changed only by versioned change request (like interface-specifications.json)"
+    },
+    {
+      "path": "src/Causa.App/Ui/Contracts/Types.fs",
+      "owner": "coordinator",
+      "slices": [
+        "bootstrap"
+      ],
+      "implements": [
+        "UI-CONTRACTS"
+      ],
+      "dependsOn": [
+        "src/Causa.App/Projections.fs"
+      ],
+      "note": "copied byte-for-byte from proposals/r10-contract-first-ui/contracts at bootstrap; changed only by versioned change request (like interface-specifications.json)"
+    },
+    {
+      "path": "src/Causa.App/Ui/Contracts/UiStates.fs",
+      "owner": "coordinator",
+      "slices": [
+        "bootstrap"
+      ],
+      "implements": [
+        "UI-CONTRACTS"
+      ],
+      "dependsOn": [
+        "src/Causa.App/Projections.fs"
+      ],
+      "note": "copied byte-for-byte from proposals/r10-contract-first-ui/contracts at bootstrap; changed only by versioned change request (like interface-specifications.json)"
+    },
+    {
+      "path": "src/Causa.App/Ui/Contracts/Navigation.fs",
+      "owner": "coordinator",
+      "slices": [
+        "bootstrap"
+      ],
+      "implements": [
+        "UI-CONTRACTS"
+      ],
+      "dependsOn": [
+        "src/Causa.App/Projections.fs"
+      ],
+      "note": "copied byte-for-byte from proposals/r10-contract-first-ui/contracts at bootstrap; changed only by versioned change request (like interface-specifications.json)"
+    },
+    {
+      "path": "src/Causa.App/Ui/Contracts/Connection.fs",
+      "owner": "coordinator",
+      "slices": [
+        "bootstrap"
+      ],
+      "implements": [
+        "UI-CONTRACTS"
+      ],
+      "dependsOn": [
+        "src/Causa.App/Projections.fs"
+      ],
+      "note": "copied byte-for-byte from proposals/r10-contract-first-ui/contracts at bootstrap; changed only by versioned change request (like interface-specifications.json)"
+    },
+    {
+      "path": "src/Causa.App/Ui/Contracts/InvestigationList.fs",
+      "owner": "coordinator",
+      "slices": [
+        "bootstrap"
+      ],
+      "implements": [
+        "UI-CONTRACTS"
+      ],
+      "dependsOn": [
+        "src/Causa.App/Projections.fs"
+      ],
+      "note": "copied byte-for-byte from proposals/r10-contract-first-ui/contracts at bootstrap; changed only by versioned change request (like interface-specifications.json)"
+    },
+    {
+      "path": "src/Causa.App/Ui/Contracts/InvestigationDetail.fs",
+      "owner": "coordinator",
+      "slices": [
+        "bootstrap"
+      ],
+      "implements": [
+        "UI-CONTRACTS"
+      ],
+      "dependsOn": [
+        "src/Causa.App/Projections.fs"
+      ],
+      "note": "copied byte-for-byte from proposals/r10-contract-first-ui/contracts at bootstrap; changed only by versioned change request (like interface-specifications.json)"
+    },
+    {
+      "path": "src/Causa.App/Ui/Contracts/InvestigationEditor.fs",
+      "owner": "coordinator",
+      "slices": [
+        "bootstrap"
+      ],
+      "implements": [
+        "UI-CONTRACTS"
+      ],
+      "dependsOn": [
+        "src/Causa.App/Projections.fs"
+      ],
+      "note": "copied byte-for-byte from proposals/r10-contract-first-ui/contracts at bootstrap; changed only by versioned change request (like interface-specifications.json)"
+    },
+    {
+      "path": "src/Causa.App/Ui/Contracts/InvestigationAnalysis.fs",
+      "owner": "coordinator",
+      "slices": [
+        "bootstrap"
+      ],
+      "implements": [
+        "UI-CONTRACTS"
+      ],
+      "dependsOn": [
+        "src/Causa.App/Projections.fs"
+      ],
+      "note": "copied byte-for-byte from proposals/r10-contract-first-ui/contracts at bootstrap; changed only by versioned change request (like interface-specifications.json)"
+    },
+    {
+      "path": "src/Causa.App/Ui/Contracts/System.fs",
+      "owner": "coordinator",
+      "slices": [
+        "bootstrap"
+      ],
+      "implements": [
+        "UI-CONTRACTS"
+      ],
+      "dependsOn": [
+        "src/Causa.App/Projections.fs"
+      ],
+      "note": "copied byte-for-byte from proposals/r10-contract-first-ui/contracts at bootstrap; changed only by versioned change request (like interface-specifications.json)"
+    },
+    {
+      "path": "src/Causa.App/Ui/Contracts/UiActions.fs",
+      "owner": "coordinator",
+      "slices": [
+        "bootstrap"
+      ],
+      "implements": [
+        "UI-CONTRACTS"
+      ],
+      "dependsOn": [
+        "src/Causa.App/Projections.fs"
+      ],
+      "note": "copied byte-for-byte from proposals/r10-contract-first-ui/contracts at bootstrap; changed only by versioned change request (like interface-specifications.json)"
+    },
+    {
+      "path": "src/Causa.App/Ui/Contracts/Bindings.fs",
+      "owner": "coordinator",
+      "slices": [
+        "bootstrap"
+      ],
+      "implements": [
+        "UI-CONTRACTS"
+      ],
+      "dependsOn": [
+        "src/Causa.App/Projections.fs"
+      ],
+      "note": "copied byte-for-byte from proposals/r10-contract-first-ui/contracts at bootstrap; changed only by versioned change request (like interface-specifications.json)"
+    },
+    {
+      "path": "src/Causa.App/Ui/UiAdapter.fs",
+      "owner": "integration",
+      "slices": [
+        "SL-T17"
+      ],
+      "implements": [
+        "UiBackend (IF-UI)"
+      ],
+      "dependsOn": [
+        "src/Causa.App/Ui/Contracts/UiActions.fs"
+      ],
+      "note": "the real adapter: UiIntent -> Msg, Model -> AppView (shape: real-adapter-sketch/RealAdapter.fs)"
+    },
+    {
+      "path": "src/Causa.App/Ui/Events.fs",
+      "owner": "integration",
+      "slices": [
+        "bootstrap"
+      ],
+      "implements": [],
+      "dependsOn": [
+        "src/Causa.App/Ui/Contracts/UiActions.fs"
+      ],
+      "note": "Limen SemanticEvent -> UiIntent (shape: prototype/screens/Events.fs)"
+    },
+    {
+      "path": "src/Causa.App/Reporting.fs",
+      "owner": "ui-c",
+      "slices": [
+        "SL-T26"
+      ],
+      "implements": [
+        "IF41-REPORT"
+      ],
+      "dependsOn": [
+        "src/Causa.App/Connection.fs"
+      ],
+      "frozenOwner": "ui"
+    },
+    {
+      "path": "src/Causa.App/Update.fs",
+      "owner": "integration",
+      "slices": [
+        "SL-T17"
+      ],
+      "implements": [],
+      "dependsOn": [
+        "src/Causa.App/Ui/UiAdapter.fs",
+        "src/Causa.App/Reporting.fs"
+      ],
+      "frozenOwner": "ui",
+      "note": "no screen edits it: screens emit UiIntent only"
+    },
+    {
+      "path": "src/Causa.App/Views/Shell.fs",
+      "owner": "ui-a",
+      "slices": [
+        "SL-T16"
+      ],
+      "implements": [],
+      "dependsOn": [
+        "src/Causa.App/Ui/Contracts/UiActions.fs"
+      ],
+      "frozenOwner": "ui",
+      "note": "primary navigation, header, skip link; others consume read-only"
+    },
+    {
+      "path": "src/Causa.App/Views/Connection.fs",
+      "owner": "ui-a",
+      "slices": [
+        "SL-WI-GEN-UI-LANDING"
+      ],
+      "implements": [],
+      "dependsOn": [
+        "src/Causa.App/Views/Shell.fs"
+      ],
+      "note": "connection region of investigation-list; NEW file (frozen: part of Views/Investigation.fs or Views/Dashboard.fs, owner ui)"
+    },
+    {
+      "path": "src/Causa.App/Views/InvestigationList.fs",
+      "owner": "ui-a",
+      "slices": [
+        "SL-WI-INV-LIST",
+        "SL-WI-GEN-UI-LANDING"
+      ],
+      "implements": [],
+      "dependsOn": [
+        "src/Causa.App/Views/Shell.fs"
+      ],
+      "note": "INV-039..041, UI-001, UI-022; NEW file (frozen: part of Views/Investigation.fs or Views/Dashboard.fs, owner ui)"
+    },
+    {
+      "path": "src/Causa.App/Views/States.fs",
+      "owner": "ui-a",
+      "slices": [
+        "SL-WI-GEN-UI-STATES"
+      ],
+      "implements": [],
+      "dependsOn": [
+        "src/Causa.App/Views/Shell.fs"
+      ],
+      "note": "loading/empty/failure copy (UI-010) for every screen; NEW file (frozen: part of Views/Investigation.fs or Views/Dashboard.fs, owner ui)"
+    },
+    {
+      "path": "src/Causa.App/Views/Language.fs",
+      "owner": "ui-a",
+      "slices": [
+        "SL-WI-GEN-UI-LANGUAGE"
+      ],
+      "implements": [],
+      "dependsOn": [
+        "src/Causa.App/Views/Shell.fs"
+      ],
+      "note": "UI-017, UI-023, UI-024 checks over PresentationLanguage; NEW file (frozen: part of Views/Investigation.fs or Views/Dashboard.fs, owner ui)"
+    },
+    {
+      "path": "src/Causa.App/Views/Workspace/Frame.fs",
+      "owner": "ui-a",
+      "slices": [
+        "SL-WI-INV-WORKSPACE-FRAME"
+      ],
+      "implements": [],
+      "dependsOn": [
+        "src/Causa.App/Views/Shell.fs"
+      ],
+      "note": "INV-007, INV-008, INV-018, INV-042 header and sections nav; NEW file (frozen: part of Views/Investigation.fs or Views/Dashboard.fs, owner ui)"
+    },
+    {
+      "path": "src/Causa.App/Views/Workspace/StoredRecord.fs",
+      "owner": "ui-a",
+      "slices": [
+        "SL-WI-GEN-UI-STATES"
+      ],
+      "implements": [],
+      "dependsOn": [
+        "src/Causa.App/Views/Shell.fs"
+      ],
+      "note": "Data Visible stored events; NEW file (frozen: part of Views/Investigation.fs or Views/Dashboard.fs, owner ui)"
+    },
+    {
+      "path": "src/Causa.App/Views/Administration.fs",
+      "owner": "ui-a",
+      "slices": [
+        "SL-T29"
+      ],
+      "implements": [],
+      "dependsOn": [
+        "src/Causa.App/Views/Shell.fs"
+      ],
+      "frozenOwner": "ui-2",
+      "note": "UI-018, UI-031"
+    },
+    {
+      "path": "src/Causa.App/Views/Settings.fs",
+      "owner": "ui-a",
+      "slices": [
+        "SL-T29"
+      ],
+      "implements": [],
+      "dependsOn": [
+        "src/Causa.App/Views/Shell.fs"
+      ],
+      "note": "UI-019; NEW file (frozen: part of Views/Investigation.fs or Views/Dashboard.fs, owner ui)"
+    },
+    {
+      "path": "src/Causa.App/Views/Start.fs",
+      "owner": "ui-b",
+      "slices": [
+        "SL-WI-INV-START-FORM",
+        "SL-WI-INV-START-RULES",
+        "SL-WI-INV-START-ACTIONS"
+      ],
+      "implements": [],
+      "dependsOn": [
+        "src/Causa.App/Views/Shell.fs"
+      ],
+      "note": "S01; NEW file (frozen: part of Views/Investigation.fs or Views/Dashboard.fs, owner ui)"
+    },
+    {
+      "path": "src/Causa.App/Views/Workspace/Details.fs",
+      "owner": "ui-b",
+      "slices": [
+        "SL-WI-INV-WORKSPACE-DETAILS"
+      ],
+      "implements": [],
+      "dependsOn": [
+        "src/Causa.App/Views/Shell.fs"
+      ],
+      "note": "INV-034..036; NEW file (frozen: part of Views/Investigation.fs or Views/Dashboard.fs, owner ui)"
+    },
+    {
+      "path": "src/Causa.App/Views/SaveIndicator.fs",
+      "owner": "ui-b",
+      "slices": [
+        "SL-WI-INV-WORKSPACE-SAVE",
+        "SL-T22"
+      ],
+      "implements": [],
+      "dependsOn": [
+        "src/Causa.App/Views/Shell.fs"
+      ],
+      "frozenOwner": "ui",
+      "note": "INV-015, INV-016, INV-043"
+    },
+    {
+      "path": "src/Causa.App/Views/ConflictReview.fs",
+      "owner": "ui-b",
+      "slices": [
+        "SL-T22"
+      ],
+      "implements": [],
+      "dependsOn": [
+        "src/Causa.App/Views/Shell.fs"
+      ],
+      "frozenOwner": "ui",
+      "note": "S23, SM-CONFLICT"
+    },
+    {
+      "path": "src/Causa.App/Views/History.fs",
+      "owner": "ui-b",
+      "slices": [
+        "SL-T28"
+      ],
+      "implements": [],
+      "dependsOn": [
+        "src/Causa.App/Views/Shell.fs"
+      ],
+      "frozenOwner": "ui-2",
+      "note": "S14, S15"
+    },
+    {
+      "path": "src/Causa.App/Views/Workspace/Overview.fs",
+      "owner": "ui-c",
+      "slices": [
+        "SL-WI-INV-WORKSPACE-EVIDENCE",
+        "SL-WI-INV-WORKSPACE-CONCLUSION"
+      ],
+      "implements": [],
+      "dependsOn": [
+        "src/Causa.App/Views/Shell.fs"
+      ],
+      "note": "UI-025, UI-032, observation and conclusion editors; NEW file (frozen: part of Views/Investigation.fs or Views/Dashboard.fs, owner ui)"
+    },
+    {
+      "path": "src/Causa.App/Views/Workspace/Hypotheses.fs",
+      "owner": "ui-c",
+      "slices": [
+        "SL-WI-INV-WORKSPACE-HYPOTHESES"
+      ],
+      "implements": [],
+      "dependsOn": [
+        "src/Causa.App/Views/Shell.fs"
+      ],
+      "note": "INV-009..011, INV-026; NEW file (frozen: part of Views/Investigation.fs or Views/Dashboard.fs, owner ui)"
+    },
+    {
+      "path": "src/Causa.App/Views/Workspace/Evidence.fs",
+      "owner": "ui-c",
+      "slices": [
+        "SL-WI-INV-WORKSPACE-EVIDENCE"
+      ],
+      "implements": [],
+      "dependsOn": [
+        "src/Causa.App/Views/Shell.fs"
+      ],
+      "note": "INV-012, INV-013, INV-027..029; NEW file (frozen: part of Views/Investigation.fs or Views/Dashboard.fs, owner ui)"
+    },
+    {
+      "path": "src/Causa.App/Views/Workspace/Links.fs",
+      "owner": "ui-c",
+      "slices": [
+        "SL-WI-INV-WORKSPACE-LINKS"
+      ],
+      "implements": [],
+      "dependsOn": [
+        "src/Causa.App/Views/Shell.fs"
+      ],
+      "note": "INV-030, INV-031, INV-038, INV-044, reassess; NEW file (frozen: part of Views/Investigation.fs or Views/Dashboard.fs, owner ui)"
+    },
+    {
+      "path": "src/Causa.App/Views/Workspace/Conclusions.fs",
+      "owner": "ui-c",
+      "slices": [
+        "SL-WI-INV-WORKSPACE-CONCLUSION"
+      ],
+      "implements": [],
+      "dependsOn": [
+        "src/Causa.App/Views/Shell.fs"
+      ],
+      "note": "INV-032, INV-033; NEW file (frozen: part of Views/Investigation.fs or Views/Dashboard.fs, owner ui)"
+    },
+    {
+      "path": "src/Causa.App/Views/Workspace/Timeline.fs",
+      "owner": "ui-a",
+      "slices": [
+        "SL-WI-GEN-UI-STATES"
+      ],
+      "implements": [],
+      "dependsOn": [
+        "src/Causa.App/Views/Shell.fs"
+      ],
+      "note": "UI-003 (in the successor slice of UI-010, so with ui-a); NEW file (frozen: part of Views/Investigation.fs or Views/Dashboard.fs, owner ui)"
+    },
+    {
+      "path": "src/Causa.App/Views/Workspace/Inspector.fs",
+      "owner": "ui-c",
+      "slices": [
+        "SL-WI-GEN-UI-INSPECT"
+      ],
+      "implements": [],
+      "dependsOn": [
+        "src/Causa.App/Views/Shell.fs"
+      ],
+      "note": "UI-004, UI-005, UI-034; NEW file (frozen: part of Views/Investigation.fs or Views/Dashboard.fs, owner ui)"
+    },
+    {
+      "path": "src/Causa.App/Views/Graph.fs",
+      "owner": "ui-c",
+      "slices": [
+        "SL-T23",
+        "SL-WI-GEN-WDL"
+      ],
+      "implements": [],
+      "dependsOn": [
+        "src/Causa.App/Views/Shell.fs"
+      ],
+      "frozenOwner": "ui-2",
+      "note": "UI-026 with the workflow layout engine"
+    },
+    {
+      "path": "src/Causa.App/Views/Report.fs",
+      "owner": "ui-c",
+      "slices": [
+        "SL-T26"
+      ],
+      "implements": [],
+      "dependsOn": [
+        "src/Causa.App/Views/Shell.fs"
+      ],
+      "frozenOwner": "ui-2",
+      "note": "Folio report"
+    },
+    {
+      "path": "src/Causa.App/View.fs",
+      "owner": "integration",
+      "slices": [
+        "SL-T17"
+      ],
+      "implements": [],
+      "dependsOn": [
+        "src/Causa.App/Views/Shell.fs",
+        "src/Causa.App/Views/Connection.fs",
+        "src/Causa.App/Views/InvestigationList.fs",
+        "src/Causa.App/Views/States.fs",
+        "src/Causa.App/Views/Language.fs",
+        "src/Causa.App/Views/Workspace/Frame.fs",
+        "src/Causa.App/Views/Workspace/StoredRecord.fs",
+        "src/Causa.App/Views/Administration.fs",
+        "src/Causa.App/Views/Settings.fs",
+        "src/Causa.App/Views/Start.fs",
+        "src/Causa.App/Views/Workspace/Details.fs",
+        "src/Causa.App/Views/SaveIndicator.fs",
+        "src/Causa.App/Views/ConflictReview.fs",
+        "src/Causa.App/Views/History.fs",
+        "src/Causa.App/Views/Workspace/Overview.fs",
+        "src/Causa.App/Views/Workspace/Hypotheses.fs",
+        "src/Causa.App/Views/Workspace/Evidence.fs",
+        "src/Causa.App/Views/Workspace/Links.fs",
+        "src/Causa.App/Views/Workspace/Conclusions.fs",
+        "src/Causa.App/Views/Workspace/Timeline.fs",
+        "src/Causa.App/Views/Workspace/Inspector.fs",
+        "src/Causa.App/Views/Graph.fs",
+        "src/Causa.App/Views/Report.fs"
+      ],
+      "frozenOwner": "integration",
+      "note": "composition: AppView.Screen -> the role views; written once at bootstrap with every view wired"
+    },
+    {
+      "path": "src/Causa.App/Program.fs",
+      "owner": "integration",
+      "slices": [
+        "SL-T10"
+      ],
+      "implements": [],
+      "dependsOn": [
+        "src/Causa.App/View.fs",
+        "src/Causa.App/Update.fs"
+      ],
+      "frozenOwner": "integration"
+    },
+    {
+      "path": "web/index.html",
+      "owner": "integration",
+      "slices": [
+        "SL-T10"
+      ],
+      "implements": [],
+      "dependsOn": [],
+      "frozenOwner": "integration",
+      "note": "shell only; includes the screen fragments below (build.fsx), never edited for a screen change"
+    },
+    {
+      "path": "web/screens/investigation-list.html",
+      "owner": "ui-a",
+      "slices": [],
+      "implements": [],
+      "dependsOn": [
+        "web/index.html"
+      ],
+      "note": "NEW: Limen template fragment, binding names from SCREEN-MANIFEST.json (CF-08)"
+    },
+    {
+      "path": "web/screens/investigation-list.css",
+      "owner": "ui-a",
+      "slices": [],
+      "implements": [],
+      "dependsOn": [
+        "web/causa-theme.css"
+      ],
+      "note": "NEW: screen styles, tokens only (design-contract themeBoundary)"
+    },
+    {
+      "path": "web/screens/administration.html",
+      "owner": "ui-a",
+      "slices": [],
+      "implements": [],
+      "dependsOn": [
+        "web/index.html"
+      ],
+      "note": "NEW: Limen template fragment, binding names from SCREEN-MANIFEST.json (CF-08)"
+    },
+    {
+      "path": "web/screens/administration.css",
+      "owner": "ui-a",
+      "slices": [],
+      "implements": [],
+      "dependsOn": [
+        "web/causa-theme.css"
+      ],
+      "note": "NEW: screen styles, tokens only (design-contract themeBoundary)"
+    },
+    {
+      "path": "web/screens/settings.html",
+      "owner": "ui-a",
+      "slices": [],
+      "implements": [],
+      "dependsOn": [
+        "web/index.html"
+      ],
+      "note": "NEW: Limen template fragment, binding names from SCREEN-MANIFEST.json (CF-08)"
+    },
+    {
+      "path": "web/screens/settings.css",
+      "owner": "ui-a",
+      "slices": [],
+      "implements": [],
+      "dependsOn": [
+        "web/causa-theme.css"
+      ],
+      "note": "NEW: screen styles, tokens only (design-contract themeBoundary)"
+    },
+    {
+      "path": "web/screens/not-found.html",
+      "owner": "ui-a",
+      "slices": [],
+      "implements": [],
+      "dependsOn": [
+        "web/index.html"
+      ],
+      "note": "NEW: Limen template fragment, binding names from SCREEN-MANIFEST.json (CF-08)"
+    },
+    {
+      "path": "web/screens/not-found.css",
+      "owner": "ui-a",
+      "slices": [],
+      "implements": [],
+      "dependsOn": [
+        "web/causa-theme.css"
+      ],
+      "note": "NEW: screen styles, tokens only (design-contract themeBoundary)"
+    },
+    {
+      "path": "web/screens/investigation-start.html",
+      "owner": "ui-b",
+      "slices": [],
+      "implements": [],
+      "dependsOn": [
+        "web/index.html"
+      ],
+      "note": "NEW: Limen template fragment, binding names from SCREEN-MANIFEST.json (CF-08)"
+    },
+    {
+      "path": "web/screens/investigation-start.css",
+      "owner": "ui-b",
+      "slices": [],
+      "implements": [],
+      "dependsOn": [
+        "web/causa-theme.css"
+      ],
+      "note": "NEW: screen styles, tokens only (design-contract themeBoundary)"
+    },
+    {
+      "path": "web/screens/workspace-frame.html",
+      "owner": "ui-a",
+      "slices": [],
+      "implements": [],
+      "dependsOn": [
+        "web/index.html"
+      ],
+      "note": "NEW: Limen template fragment, binding names from SCREEN-MANIFEST.json (CF-08)"
+    },
+    {
+      "path": "web/screens/workspace-frame.css",
+      "owner": "ui-a",
+      "slices": [],
+      "implements": [],
+      "dependsOn": [
+        "web/causa-theme.css"
+      ],
+      "note": "NEW: screen styles, tokens only (design-contract themeBoundary)"
+    },
+    {
+      "path": "web/screens/workspace-save.html",
+      "owner": "ui-b",
+      "slices": [],
+      "implements": [],
+      "dependsOn": [
+        "web/index.html"
+      ],
+      "note": "NEW: Limen template fragment, binding names from SCREEN-MANIFEST.json (CF-08)"
+    },
+    {
+      "path": "web/screens/workspace-save.css",
+      "owner": "ui-b",
+      "slices": [],
+      "implements": [],
+      "dependsOn": [
+        "web/causa-theme.css"
+      ],
+      "note": "NEW: screen styles, tokens only (design-contract themeBoundary)"
+    },
+    {
+      "path": "web/screens/workspace-details.html",
+      "owner": "ui-b",
+      "slices": [],
+      "implements": [],
+      "dependsOn": [
+        "web/index.html"
+      ],
+      "note": "NEW: Limen template fragment, binding names from SCREEN-MANIFEST.json (CF-08)"
+    },
+    {
+      "path": "web/screens/workspace-details.css",
+      "owner": "ui-b",
+      "slices": [],
+      "implements": [],
+      "dependsOn": [
+        "web/causa-theme.css"
+      ],
+      "note": "NEW: screen styles, tokens only (design-contract themeBoundary)"
+    },
+    {
+      "path": "web/screens/workspace-overview.html",
+      "owner": "ui-c",
+      "slices": [],
+      "implements": [],
+      "dependsOn": [
+        "web/index.html"
+      ],
+      "note": "NEW: Limen template fragment, binding names from SCREEN-MANIFEST.json (CF-08)"
+    },
+    {
+      "path": "web/screens/workspace-overview.css",
+      "owner": "ui-c",
+      "slices": [],
+      "implements": [],
+      "dependsOn": [
+        "web/causa-theme.css"
+      ],
+      "note": "NEW: screen styles, tokens only (design-contract themeBoundary)"
+    },
+    {
+      "path": "web/screens/workspace-hypotheses.html",
+      "owner": "ui-c",
+      "slices": [],
+      "implements": [],
+      "dependsOn": [
+        "web/index.html"
+      ],
+      "note": "NEW: Limen template fragment, binding names from SCREEN-MANIFEST.json (CF-08)"
+    },
+    {
+      "path": "web/screens/workspace-hypotheses.css",
+      "owner": "ui-c",
+      "slices": [],
+      "implements": [],
+      "dependsOn": [
+        "web/causa-theme.css"
+      ],
+      "note": "NEW: screen styles, tokens only (design-contract themeBoundary)"
+    },
+    {
+      "path": "web/screens/workspace-evidence.html",
+      "owner": "ui-c",
+      "slices": [],
+      "implements": [],
+      "dependsOn": [
+        "web/index.html"
+      ],
+      "note": "NEW: Limen template fragment, binding names from SCREEN-MANIFEST.json (CF-08)"
+    },
+    {
+      "path": "web/screens/workspace-evidence.css",
+      "owner": "ui-c",
+      "slices": [],
+      "implements": [],
+      "dependsOn": [
+        "web/causa-theme.css"
+      ],
+      "note": "NEW: screen styles, tokens only (design-contract themeBoundary)"
+    },
+    {
+      "path": "web/screens/workspace-causal-analysis.html",
+      "owner": "ui-c",
+      "slices": [],
+      "implements": [],
+      "dependsOn": [
+        "web/index.html"
+      ],
+      "note": "NEW: Limen template fragment, binding names from SCREEN-MANIFEST.json (CF-08)"
+    },
+    {
+      "path": "web/screens/workspace-causal-analysis.css",
+      "owner": "ui-c",
+      "slices": [],
+      "implements": [],
+      "dependsOn": [
+        "web/causa-theme.css"
+      ],
+      "note": "NEW: screen styles, tokens only (design-contract themeBoundary)"
+    },
+    {
+      "path": "web/screens/workspace-timeline.html",
+      "owner": "ui-c",
+      "slices": [],
+      "implements": [],
+      "dependsOn": [
+        "web/index.html"
+      ],
+      "note": "NEW: Limen template fragment, binding names from SCREEN-MANIFEST.json (CF-08)"
+    },
+    {
+      "path": "web/screens/workspace-timeline.css",
+      "owner": "ui-c",
+      "slices": [],
+      "implements": [],
+      "dependsOn": [
+        "web/causa-theme.css"
+      ],
+      "note": "NEW: screen styles, tokens only (design-contract themeBoundary)"
+    },
+    {
+      "path": "web/causa-theme.css",
+      "owner": "integration",
+      "slices": [
+        "bootstrap"
+      ],
+      "implements": [],
+      "dependsOn": [],
+      "note": "UI-016 tokens; derived tokens by change request"
+    },
+    {
+      "path": "web/causa.css",
+      "owner": "integration",
+      "slices": [
+        "SL-T10"
+      ],
+      "implements": [],
+      "dependsOn": [
+        "web/causa-theme.css"
+      ],
+      "frozenOwner": "integration",
+      "note": "imports the screen stylesheets; list written once"
+    },
+    {
+      "path": "tests/Causa.App.Tests/Ui/ConnectionTests.fs",
+      "owner": "ui-a",
+      "slices": [],
+      "implements": [],
+      "dependsOn": [],
+      "note": "Layer A component tests against UiFixtures"
+    },
+    {
+      "path": "tests/Causa.App.Tests/Ui/InvestigationListTests.fs",
+      "owner": "ui-a",
+      "slices": [],
+      "implements": [],
+      "dependsOn": [],
+      "note": "Layer A component tests against UiFixtures"
+    },
+    {
+      "path": "tests/Causa.App.Tests/Ui/FrameTests.fs",
+      "owner": "ui-a",
+      "slices": [],
+      "implements": [],
+      "dependsOn": [],
+      "note": "Layer A component tests against UiFixtures"
+    },
+    {
+      "path": "tests/Causa.App.Tests/Ui/AdministrationTests.fs",
+      "owner": "ui-a",
+      "slices": [],
+      "implements": [],
+      "dependsOn": [],
+      "note": "Layer A component tests against UiFixtures"
+    },
+    {
+      "path": "tests/Causa.App.Tests/Ui/SettingsTests.fs",
+      "owner": "ui-a",
+      "slices": [],
+      "implements": [],
+      "dependsOn": [],
+      "note": "Layer A component tests against UiFixtures"
+    },
+    {
+      "path": "tests/Causa.App.Tests/Ui/StatesTests.fs",
+      "owner": "ui-a",
+      "slices": [],
+      "implements": [],
+      "dependsOn": [],
+      "note": "Layer A component tests against UiFixtures"
+    },
+    {
+      "path": "tests/Causa.App.Tests/Ui/TimelineTests.fs",
+      "owner": "ui-a",
+      "slices": [],
+      "implements": [],
+      "dependsOn": [],
+      "note": "Layer A component tests against UiFixtures"
+    },
+    {
+      "path": "tests/Causa.App.Tests/Ui/StartTests.fs",
+      "owner": "ui-b",
+      "slices": [],
+      "implements": [],
+      "dependsOn": [],
+      "note": "Layer A component tests against UiFixtures"
+    },
+    {
+      "path": "tests/Causa.App.Tests/Ui/DetailsTests.fs",
+      "owner": "ui-b",
+      "slices": [],
+      "implements": [],
+      "dependsOn": [],
+      "note": "Layer A component tests against UiFixtures"
+    },
+    {
+      "path": "tests/Causa.App.Tests/Ui/SaveIndicatorTests.fs",
+      "owner": "ui-b",
+      "slices": [],
+      "implements": [],
+      "dependsOn": [],
+      "note": "Layer A component tests against UiFixtures"
+    },
+    {
+      "path": "tests/Causa.App.Tests/Ui/ConflictReviewTests.fs",
+      "owner": "ui-b",
+      "slices": [],
+      "implements": [],
+      "dependsOn": [],
+      "note": "Layer A component tests against UiFixtures"
+    },
+    {
+      "path": "tests/Causa.App.Tests/Ui/OverviewTests.fs",
+      "owner": "ui-c",
+      "slices": [],
+      "implements": [],
+      "dependsOn": [],
+      "note": "Layer A component tests against UiFixtures"
+    },
+    {
+      "path": "tests/Causa.App.Tests/Ui/HypothesesTests.fs",
+      "owner": "ui-c",
+      "slices": [],
+      "implements": [],
+      "dependsOn": [],
+      "note": "Layer A component tests against UiFixtures"
+    },
+    {
+      "path": "tests/Causa.App.Tests/Ui/EvidenceTests.fs",
+      "owner": "ui-c",
+      "slices": [],
+      "implements": [],
+      "dependsOn": [],
+      "note": "Layer A component tests against UiFixtures"
+    },
+    {
+      "path": "tests/Causa.App.Tests/Ui/LinksTests.fs",
+      "owner": "ui-c",
+      "slices": [],
+      "implements": [],
+      "dependsOn": [],
+      "note": "Layer A component tests against UiFixtures"
+    },
+    {
+      "path": "tests/Causa.App.Tests/Ui/ConclusionsTests.fs",
+      "owner": "ui-c",
+      "slices": [],
+      "implements": [],
+      "dependsOn": [],
+      "note": "Layer A component tests against UiFixtures"
+    },
+    {
+      "path": "tests/Causa.App.Tests/Ui/InspectorTests.fs",
+      "owner": "ui-c",
+      "slices": [],
+      "implements": [],
+      "dependsOn": [],
+      "note": "Layer A component tests against UiFixtures"
+    },
+    {
+      "path": "tests/Causa.App.Tests/Ui/GraphTests.fs",
+      "owner": "ui-c",
+      "slices": [],
+      "implements": [],
+      "dependsOn": [],
+      "note": "Layer A component tests against UiFixtures"
+    },
+    {
+      "path": "tests/Causa.App.Tests/Ui/CrossViewConsistencyTests.fs",
+      "owner": "ui-a",
+      "slices": [
+        "SL-WI-GEN-UI-VERIFY"
+      ],
+      "implements": [],
+      "dependsOn": [],
+      "note": "UI-013, UI-015, UI-021, UI-030, UI-039 checks across screens"
+    },
+    {
+      "path": "tests/Causa.App.Tests/Ui/RoundTripTests.fs",
+      "owner": "ui-b",
+      "slices": [
+        "SL-WI-INV-WORKSPACE-ROUNDTRIP"
+      ],
+      "implements": [],
+      "dependsOn": [],
+      "note": "INV-017, INV-037 reload restores every value (Layer A part; Layer C is J1-05, J1-06, J2-09)"
+    },
+    {
+      "path": "tests/Causa.TestSupport/UiFixtures/CausaDataExtract.g.fs",
+      "owner": "integration",
+      "slices": [
+        "bootstrap"
+      ],
+      "implements": [],
+      "dependsOn": [],
+      "note": "generated by tools/extract-fixtures.fsx at a pinned causa-data commit"
+    },
+    {
+      "path": "tests/Causa.TestSupport/UiFixtures/Scenarios.fs",
+      "owner": "integration",
+      "slices": [
+        "bootstrap"
+      ],
+      "implements": [],
+      "dependsOn": [],
+      "note": "shared scenarios; additions by change request"
+    },
+    {
+      "path": "tests/Causa.TestSupport/UiFixtures/FixtureBackend.fs",
+      "owner": "integration",
+      "slices": [
+        "bootstrap"
+      ],
+      "implements": [],
+      "dependsOn": [],
+      "note": "fixture UiBackend"
+    },
+    {
+      "path": "tests/Causa.TestSupport/UiFixtures/Scenarios.ui-a.fs",
+      "owner": "ui-a",
+      "slices": [],
+      "implements": [],
+      "dependsOn": [
+        "tests/Causa.TestSupport/UiFixtures/Scenarios.fs"
+      ],
+      "note": "role-local scenarios, so no role edits the shared file"
+    },
+    {
+      "path": "tests/Causa.TestSupport/UiFixtures/Scenarios.ui-b.fs",
+      "owner": "ui-b",
+      "slices": [],
+      "implements": [],
+      "dependsOn": [
+        "tests/Causa.TestSupport/UiFixtures/Scenarios.fs"
+      ],
+      "note": "role-local scenarios, so no role edits the shared file"
+    },
+    {
+      "path": "tests/Causa.TestSupport/UiFixtures/Scenarios.ui-c.fs",
+      "owner": "ui-c",
+      "slices": [],
+      "implements": [],
+      "dependsOn": [
+        "tests/Causa.TestSupport/UiFixtures/Scenarios.fs"
+      ],
+      "note": "role-local scenarios, so no role edits the shared file"
+    },
+    {
+      "path": "tests/browser/screens/<screen>.screen.spec.mjs",
+      "owner": "role owning the screen",
+      "slices": [],
+      "implements": [],
+      "dependsOn": [],
+      "note": "Layer B screen checks (shape: prototype/web/render.spec.mjs); one file per screen"
+    }
+  ]
+}
