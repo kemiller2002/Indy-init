@@ -71,8 +71,8 @@ let ``corrective actions appear only where supported`` () =
 [<Fact>]
 let ``failure copy says what happened, what is kept and what next, without technical words (UI-010, UI-017, UI-023)`` () =
     let failures =
-        [ InvestigationNotFound { Workspace = "w"; Role = Causa.Persistence.WorkspaceRole.Catalog; Id = InvestigationId(Guid.NewGuid()) }; InvalidData "d"; NotAuthorized; CredentialRefused; ProviderUnreachable
-          ProviderRateLimited; ProviderError "p"; CapabilityAbsent(DataUnderstood, "x") ]
+        [ UiFailure.InvestigationNotFound { Workspace = "w"; Role = Causa.Persistence.WorkspaceRole.Catalog; Id = InvestigationId(Guid.NewGuid()) }; UiFailure.InvalidData "d"; UiFailure.NotAuthorized; UiFailure.CredentialRefused; UiFailure.ProviderUnreachable
+          UiFailure.ProviderRateLimited; UiFailure.ProviderError "p"; UiFailure.CapabilityAbsent(DataUnderstood, "x") ]
     for f in failures do
         let c = PresentationLanguage.failure f
         for t in [ c.What; c.Preserved; c.NextStep ] do

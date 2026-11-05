@@ -24,8 +24,8 @@ let saveKind (s: SaveState) : SaveStateKind =
     | SaveState.SaveFailed _ -> SaveFailedKind
 
 /// The gaps, as values the views render (DATA-REPOSITORY-CONTRACT.md §6 on claude/r10-optimization; ODR-R10-25/-26).
-let listGap = CapabilityAbsent(DataVisible, "S1: the frozen Model, Msg, LoadInput and Connector have no investigation listing")
-let contentGap = CapabilityAbsent(DataUnderstood, "C1/C5: the frozen Investigation stub carries Id and Version only; content payloads are opaque")
+let listGap = UiFailure.CapabilityAbsent(DataVisible, "S1: the frozen Model, Msg, LoadInput and Connector have no investigation listing")
+let contentGap = UiFailure.CapabilityAbsent(DataUnderstood, "C1/C5: the frozen Investigation stub carries Id and Version only; content payloads are opaque")
 
 let private connect (engine: Engine) (s: State) =
     match Connection.validate s.Local.Form, s.Local.Credential with
@@ -75,12 +75,12 @@ let private connectionView (s: State) : ConnectionView =
 
 let private loadFailure (id: RouteTarget) (l: LoadFailure) =
     match l with
-    | Unverifiable fs -> InvalidData(sprintf "%d verification failure(s)" fs.Length)
-    | ProviderFailed AuthenticationFailed -> CredentialRefused
-    | ProviderFailed(PermissionDenied _) -> NotAuthorized
-    | ProviderFailed(NotFound _) -> InvestigationNotFound id
-    | ProviderFailed(ProviderError.RateLimited _) -> ProviderRateLimited
-    | ProviderFailed(ProviderError.NetworkUnavailable _) -> ProviderUnreachable
+    | Unverifiable fs -> UiFailure.InvalidData(sprintf "%d verification failure(s)" fs.Length)
+    | ProviderFailed AuthenticationFailed -> UiFailure.CredentialRefused
+    | ProviderFailed(PermissionDenied _) -> UiFailure.NotAuthorized
+    | ProviderFailed(NotFound _) -> UiFailure.InvestigationNotFound id
+    | ProviderFailed(ProviderError.RateLimited _) -> UiFailure.ProviderRateLimited
+    | ProviderFailed(ProviderError.NetworkUnavailable _) -> UiFailure.ProviderUnreachable
     | ProviderFailed e -> UiFailure.ProviderError(sprintf "%A" e)
 
 let private project (s: State) : AppView =

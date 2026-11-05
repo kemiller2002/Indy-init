@@ -12,8 +12,10 @@ type ScreenView =
     | SettingsScreen of SettingsView
     | NotFoundScreen of NotFoundView
 
-/// Who produced a view. A fixture-backed view can never be reported as an integrated feature: acceptance evidence
-/// requires Integrated, and only an integration adapter over the real engine says so (VERIFICATION-STRATEGY.md).
+/// Who produced a view: a claim, not a proof. IntegratedBackend is a public case; that only the integration adapter
+/// over the real engine produces it, and that fixtures always say FixtureBackend, are ownership rules checked in review
+/// and by the fixture tests, not type guarantees. Acceptance evidence is never this value: only Layer C (slice-gate,
+/// the governed journeys) judges an integrated feature (VERIFICATION-STRATEGY.md).
 type BackendOrigin =
     | FixtureBackend of FixtureLabel
     | IntegratedBackend

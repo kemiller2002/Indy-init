@@ -49,8 +49,8 @@ let ``connected catalog lists the four stored cases with their stored titles; un
 let ``empty, unauthorized, network failure and loading are distinct states`` () =
     let state sc = (listOf (snd (run sc InvestigationsRoute connectIntents))).State
     Assert.Equal(ScreenEmpty, state EmptyCatalog)
-    Assert.Equal(ScreenFailed NotAuthorized, state UnauthorizedRepository)
-    Assert.Equal(ScreenFailed ProviderUnreachable, state NetworkFailure)
+    Assert.Equal(ScreenFailed UiFailure.NotAuthorized, state UnauthorizedRepository)
+    Assert.Equal(ScreenFailed UiFailure.ProviderUnreachable, state NetworkFailure)
     Assert.Equal(ScreenLoading, state CatalogLoading)
 
 [<Fact>]
@@ -79,10 +79,10 @@ let ``Apollo 11 opens read-only with its stored problem statement and stored eve
 [<Fact>]
 let ``missing investigation and invalid JSON fail closed`` () =
     let _, v = run ConnectedCatalog InvestigationsRoute (connectIntents @ [ UiIntent.Navigate(WorkspaceRoute(missingTarget, Overview)) ])
-    Assert.Equal(ScreenFailed(InvestigationNotFound missingTarget), (workspaceOf v).State)
+    Assert.Equal(ScreenFailed(UiFailure.InvestigationNotFound missingTarget), (workspaceOf v).State)
     let _, v2 = run InvalidStoredJson InvestigationsRoute (connectIntents @ [ UiIntent.Navigate(WorkspaceRoute(Navigation.targetOf apollo11Ref, Overview)) ])
     let w = workspaceOf v2
-    Assert.True(match w.State, w.Stored, w.Section with ScreenFailed(InvalidData _), Failed(InvalidData _), OverviewSection(Failed _) -> true | _ -> false)
+    Assert.True(match w.State, w.Stored, w.Section with ScreenFailed(UiFailure.InvalidData _), Failed(UiFailure.InvalidData _), OverviewSection(Failed _) -> true | _ -> false)
 
 let private startIntents =
     [ UiIntent.Activate(Actions.newInvestigation, None)
