@@ -31,7 +31,7 @@ Experimental application code lives only in `experiments/exp-indy-002/`. It copi
 | 24:45 | 21:39:49 | **Wave 2: CG-6 (conclusions) released** into existing code. |
 | 25:09 | 21:40:13 | Both agents start CG-6, 24 s after release. |
 | 28:17 | 21:43:21 | **INT-2 accepted.** 39 requirements, 0 integration defects. |
-| 28:45 | 21:43:49 | Feature development stops. Final candidate `76d88cd` is pushed for required CI. |
+| 28:45 | 21:43:49 | Feature development stops. Final candidate (docs-only successor of `76d88cd`; identical application code) is pushed for required CI. |
 | — | — | Required CI on the final candidate: see section 5. |
 
 The directive's T+55 and T+75 reporting points fell after development had already finished. Both are reported here, against the shifted schedule.
@@ -143,7 +143,7 @@ PR [kemiller2002/Indy-init#140](https://github.com/kemiller2002/Indy-init/pull/1
 - On earlier heads, the offline factory passed in about 1.5 min.
 - Preflight runs on superseded heads were cancelled by newer pushes (CI-F1, CI-F2).
 
-**Final candidate `76d88cd`:** CI_RESULT_PLACEHOLDER
+**Final candidate (docs-only successor of `76d88cd`; identical application code):** CI_RESULT_PLACEHOLDER
 
 ## 6. Comparison with milestone-first (schedule C)
 
