@@ -1,0 +1,333 @@
+--- ../../requirements-compiled/v4.1.4/contracts/00-DOMAIN-STUBS.fs	2026-11-05 13:24:17.360056213 +0000
++++ v415-contracts/00-DOMAIN-STUBS.fs	2026-11-05 19:28:28.420600701 +0000
+@@ -56,13 +56,16 @@
+ type CorrectiveActionId = CorrectiveActionId of Guid
+ type ProposalId = ProposalId of Guid
+ type CausalAssertionId = CausalAssertionId of Guid
++/// v4.1.5 E1: the commands whose events now carry the wire's fields carry them too (reason; evidence ids), opaque
++/// like the other command payloads, so Decide can produce events that encode.
++type MarkHypothesis = class end
+ type CoreCommand =
+     | StartInvestigation of StartInvestigation
+     | ActivateInvestigation
+     | RecordObservation of RecordObservation
+     | RecordHypothesis of RecordHypothesis
+-    | MarkHypothesisPlausible of HypothesisId
+-    | MarkHypothesisSupported of HypothesisId
++    | MarkHypothesisPlausible of MarkHypothesis
++    | MarkHypothesisSupported of MarkHypothesis
+     | FalsifyHypothesis of FalsifyHypothesis
+     | ReopenHypothesis of ReopenHypothesis
+     | AdmitEvidence of AdmitEvidence
+@@ -84,45 +87,86 @@
+     | ReopenInvestigation of ReopenInvestigation
+     | RecordProposal of RecordProposal
+     | AcceptProposal of ProposalId
+-    | RejectProposal of ProposalId
++    | RejectProposal of ProposalId * reason: NonEmptyText
+     | AttachExtension of ExtensionEnvelope
+ type Command =
+     | Core of CoreCommand
+     | Extension of SemanticId * payloadJson: string
++/// v4.1.5 E1 (historical compatibility, OD-HC-01 A; ODR-R10-25 A): one case for every causa-storage v1.0.0 event
++/// (CONTRACT.md section 7), so every catalog history is representable without loss. Every v4.1.4 case name is kept;
++/// nine cases carry the wire's extra fields; 22 cases are added; HypothesisFalsified no longer carries a Scope the
++/// wire does not have. Payload types stay the domain owner's to define (opaque here, as in v4.1.2), with exactly
++/// the fields of their wire records: encoding then decoding any stored event must reproduce its canonical bytes.
++type Lifecycle = class end
++type HypothesisTransition = class end
++type EvidenceSupersession = class end
++type EvidenceVerificationAssessment = class end
++type UnknownTransition = class end
++type AssumptionTransition = class end
++type ContradictionTransition = class end
++type InvestigationActionTransition = class end
++type NegativeKnowledge = class end
++type CauseConfirmation = class end
++type Conclusion = class end
+ type CoreEvent =
+     | InvestigationStarted of InvestigationStarted
+-    | InvestigationActivated
++    | InvestigationActivated of from: Lifecycle
++    | InvestigationMarkedAwaitingEvidence of from: Lifecycle * reason: NonEmptyText
++    | InvestigationMarkedAwaitingVerification of from: Lifecycle
++    | InvestigationResolved of from: Lifecycle
++    | InvestigationClosed of from: Lifecycle
++    | InvestigationReopened of from: Lifecycle * reason: NonEmptyText
++    | InvestigationVerificationFailed of reason: NonEmptyText
+     | ObservationRecorded of Observation
+     | HypothesisRecorded of Hypothesis
+-    | HypothesisMarkedPlausible of HypothesisId
+-    | HypothesisMarkedSupported of HypothesisId
+-    | HypothesisFalsified of HypothesisId * reason: NonEmptyText * Scope
+-    | HypothesisReopened of HypothesisId * reason: NonEmptyText
++    | HypothesisMarkedPlausible of HypothesisTransition
++    | HypothesisMarkedSupported of HypothesisTransition
++    | HypothesisWeakened of HypothesisTransition
++    | HypothesisFalsified of HypothesisTransition
++    | HypothesisSuperseded of HypothesisTransition
++    | HypothesisReopened of HypothesisTransition
+     | EvidenceAdmitted of Evidence
++    | EvidenceSuperseded of EvidenceSupersession
++    | EvidenceVerificationAssessed of EvidenceVerificationAssessment
+     | EvidenceRelationshipRecorded of EvidenceRelationship
+     | UnknownIdentified of Unknown
++    | UnknownTransitioned of UnknownTransition
+     | AssumptionRecorded of Assumption
++    | AssumptionTransitioned of AssumptionTransition
+     | ContradictionRecorded of Contradiction
++    | ContradictionTransitioned of ContradictionTransition
+     | PredictionRecorded of Prediction
+     | InvestigationActionRecorded of InvestigationAction
++    | InvestigationActionTransitioned of InvestigationActionTransition
+     | FindingRecorded of Finding
++    | NegativeKnowledgeEstablished of NegativeKnowledge
+     | CausalAssertionRecorded of CausalAssertion
+-    | CauseConfirmed of CausalAssertionId
++    | CauseConfirmed of CauseConfirmation
+     | ConfirmedCauseReopened of CausalAssertionId * reason: NonEmptyText
+     | CorrectiveActionRecorded of CorrectiveAction
+-    | VerificationCriterionRecorded of VerificationCriterion
++    | CorrectiveActionApproved of CorrectiveActionId
++    | CorrectiveActionStarted of CorrectiveActionId
+     | CorrectiveActionImplemented of CorrectiveActionId
++    | CorrectiveActionAwaitingVerificationOfEffect of CorrectiveActionId
++    | CorrectiveActionVerifiedEffective of CorrectiveActionId
++    | CorrectiveActionVerificationFailed of CorrectiveActionId
++    | CorrectiveActionReworkRequired of CorrectiveActionId
++    | CorrectiveActionCancelled of CorrectiveActionId
++    | VerificationCriterionRecorded of VerificationCriterion
+     | VerificationRecorded of Verification
+-    | InvestigationResolved
+-    | InvestigationReopened of NonEmptyText
++    | ConclusionRecorded of Conclusion
+     | ProposalRecorded of Proposal
+-    | ProposalRejected of ProposalId
++    | ProposalAccepted of ProposalId * targetId: Guid
++    | ProposalRejected of ProposalId * reason: NonEmptyText
+     | ExtensionAttached of ExtensionEnvelope
+ type CommandEnvelope = { CommandId: Guid; Investigation: InvestigationId; ExpectedVersion: AggregateVersion option; Command: Command }
+ type EventPayload =
+     | CoreEvent of CoreEvent
+     | ExtensionEvent of SemanticId * payloadJson: string
+-type EventEnvelope = { EventId: EventId; Investigation: InvestigationId; Version: AggregateVersion; Payload: EventPayload }
++/// v4.1.5 E1: the stored envelope's provenance (occurredAt, actor, correlationId, formatVersion, semanticVersion),
++/// opaque here and the domain owner's to define with exactly the wire fields.
++type EventProvenance = class end
++type EventEnvelope = { EventId: EventId; Investigation: InvestigationId; Version: AggregateVersion; Provenance: EventProvenance; Payload: EventPayload }
+ type Blocker = { Code: string; Message: string }
+ type Decision =
+     | Allowed of EventPayload list
+--- ../../requirements-compiled/v4.1.4/contracts/02-IF41-STORAGE.fs	2026-11-05 13:24:17.360443436 +0000
++++ v415-contracts/02-IF41-STORAGE.fs	2026-11-05 19:51:40.243712052 +0000
+@@ -6,6 +6,61 @@
+ type CommitOid = CommitOid of string
+ type RepoPath = RepoPath of string
+ 
++/// v4.1.5 W1: a causa-storage workspace, the directory of the connected repository that holds `investigations/<id>/`
++/// (for example `workspaces/demo/r10`). It is derived, never typed: the catalog workspace is the one
++/// `catalog/active.json` names (EXT-DATA-013); a working copy is `workspaces/demo/<run>` (CONTRACT section 9.4).
++type Workspace = Workspace of string
++
++/// v4.1.5 W1: what a workspace may be used for. A catalog is read-only (EXT-DATA-013); only a working copy is written
++/// (CONTRACT section 9.4; EXT-DATA-006). Both are in the repository the user connected to (EXT-DATA-003).
++[<RequireQualifiedAccess>]
++type WorkspaceRole =
++    | Catalog
++    | WorkingCopy
++
++/// v4.1.5 W1: a workspace of the connected repository, with its role. The role is derived, never asserted: the
++/// representation is private, a catalog address comes only from WorkspaceAddress.catalog and a working copy only from
++/// WorkspaceAddress.workingCopy (EXT-DATA-013; EXT-DATA-006).
++[<RequireQualifiedAccess>]
++module WorkspaceAddress =
++    type T =
++        private
++            { Dir: Workspace
++              Kind: WorkspaceRole }
++        member a.Workspace = a.Dir
++        member a.Role = a.Kind
++
++    let catalog (workspace: Workspace) : T = { Dir = workspace; Kind = WorkspaceRole.Catalog }
++
++    /// The working copy `workspaces/demo/causa-app-<run>` (CONTRACT section 3, runId ^[a-z0-9][a-z0-9-]{0,63}$) for a
++    /// run matching ^[a-z0-9][a-z0-9-]{0,53}$. The reserved `causa-app-` namespace keeps every working copy apart from
++    /// the catalog workspaces (demonstration-v1, historical-v1, ...), and any workspace in `catalogs` is refused as well.
++    let workingCopy (catalogs: Workspace list) (run: string) : T option =
++        let workspace = Workspace("workspaces/demo/causa-app-" + run)
++        if System.Text.RegularExpressions.Regex.IsMatch(run, "^[a-z0-9][a-z0-9-]{0,53}\\z") && not (List.contains workspace catalogs) then
++            Some { Dir = workspace; Kind = WorkspaceRole.WorkingCopy }
++        else
++            None
++
++/// v4.1.5 W1: an investigation is identified by where it is and its id: the same case can be stored in two
++/// workspaces (causa-data holds identical cases in historical-v1 and demonstration-v1).
++type InvestigationRef = { Address: WorkspaceAddress.T; Id: InvestigationId }
++
++/// v4.1.5 W1: an address that may be written. Its only constructor refuses a Catalog, so no catalog investigation can
++/// reach a save session (EXT-DATA-013; EXT-DATA-006).
++[<RequireQualifiedAccess>]
++module Writable =
++    type T =
++        private
++        | Writable of WorkspaceAddress.T
++
++    let ofAddress (address: WorkspaceAddress.T) : T option =
++        match address.Role with
++        | WorkspaceRole.WorkingCopy -> Some(Writable address)
++        | WorkspaceRole.Catalog -> None
++
++    let address (Writable address) : WorkspaceAddress.T = address
++
+ type FileSet =
+     { Manifest: byte[]
+       Events: byte[]
+@@ -18,14 +73,23 @@
+     | SnapshotDiffersFromReplay of paths: string list
+     | MissingRequiredField of file: string * field: string
+     | ReplayRejected of ReplayError
++    /// v4.1.5 E1: a CONTRACT section 11.1 reader stage refused the file set; code is the stage's primary code, so
++    /// conforming readers agree on it.
++    | ReaderStage of code: string * file: string * line: int option * detail: string
+ 
+ type VerifiedInvestigation =
+     { Investigation: Investigation
+       History: EventEnvelope list
+       ReadAt: CommitOid
++      /// v4.1.5 W1: the workspace the history was read from.
++      Address: WorkspaceAddress.T
+       Bytes: FileSet }
+ 
+ type StorageCodec =
+-    { PathOf: InvestigationId -> RepoPath
++    { /// v4.1.5 W1: `<workspace>/investigations/<id>`.
++      PathOf: Workspace -> InvestigationId -> RepoPath
+       Encode: VerifiedInvestigation -> EventEnvelope list -> FileSet
+-      Verify: CommitOid -> FileSet -> Result<VerifiedInvestigation, VerificationFailure list> }
++      /// v4.1.5 C1: the first file set of a new investigation from its command-created history (EXT-DATA-008). It is
++      /// Ok only when Verify accepts the result, so a file set that would not verify is never sent.
++      EncodeNew: InvestigationId -> EventEnvelope list -> Result<FileSet, VerificationFailure list>
++      Verify: WorkspaceAddress.T -> CommitOid -> FileSet -> Result<VerifiedInvestigation, VerificationFailure list> }
+--- ../../requirements-compiled/v4.1.4/contracts/05-IF41-SAVE.fs	2026-11-05 13:24:17.360443436 +0000
++++ v415-contracts/05-IF41-SAVE.fs	2026-11-05 19:41:01.914727266 +0000
+@@ -137,7 +137,7 @@
+ /// SM-LOAD events.
+ [<RequireQualifiedAccess>]
+ type LoadInput =
+-    | OpenRequested of InvestigationId
++    | OpenRequested of InvestigationRef
+     | LoadVerified of VerifiedInvestigation
+     | LoadRejected of LoadFailure
+     | WentOffline
+@@ -151,7 +151,7 @@
+ 
+ type SaveEffect =
+     | Send of HttpRequest
+-    | ScheduleReconcileRead of InvestigationId * afterMilliseconds: int
++    | ScheduleReconcileRead of InvestigationRef * afterMilliseconds: int
+     | Announce of Politeness * text: string
+     | ExportCommands of CommandEnvelope list
+ 
+@@ -171,6 +171,8 @@
+ 
+ type InvestigationSession =
+     { Id: InvestigationId
++      /// v4.1.5 W1: where the investigation is saved. Only a working copy has a session (T-L03 as amended by ODR-V415-01).
++      Address: Writable.T
+       BaseHead: CommitOid
+       State: SaveState
+       Unsaved: CommandEnvelope list
+@@ -205,10 +207,50 @@
+     | ConflictEvent of ConflictInput
+     | ConflictNextRequest of ConflictView * HttpRequest
+ 
++/// v4.1.5 L1: one investigation a workspace holds. For a catalog, the title and expected state digest come from the
++/// catalog manifest (EXT-DATA-013); for a working copy they are absent until the investigation is opened.
++type ListedInvestigation = { Ref: InvestigationRef; Path: RepoPath; Title: string option; ExpectedStateSha256: string option }
++
++/// v4.1.5 L1, W1: what to list. ActiveCatalog derives the catalog workspace from `catalog/active.json`; a working copy
++/// comes only from WorkspaceAddress.workingCopy.
++type ListingTarget =
++    | ActiveCatalog
++    | WorkingCopyOf of WorkspaceAddress.T
++
++/// v4.1.5 L1: the read a listing is waiting for, so InterpretList knows what an answer means and at which commit.
++type ListingStep =
++    | ListHead
++    | ListActiveCatalogAt of CommitOid
++    | ListManifestAt of CommitOid * Workspace
++    | ListDirectoryAt of CommitOid * Workspace
++
++/// v4.1.5 L1: a workspace's investigations, all read at one commit.
++type Listing = { Address: WorkspaceAddress.T; ReadAt: CommitOid; Investigations: ListedInvestigation list }
++
++/// v4.1.5 L1: what one answer means for a listing. A listing is a read, like a load's head-then-files steps; it adds
++/// no machine state.
++type ListingInterpretation =
++    | ListingComplete of Listing
++    | ListingNextRequest of ListingStep * HttpRequest
++    | ListingFailed of LoadFailure
++
++/// v4.1.5 L1, W1: listing a workspace. Nothing is written (EXT-DATA-006). A working copy that does not exist yet lists
++/// as empty at the head read (EXT-DATA-009: a clean start).
++type WorkspaceLister =
++    { List: RequestContext -> ListingTarget -> ListingStep * HttpRequest
++      InterpretList: RequestContext -> ListingTarget -> ListingStep -> HttpOutcome -> ListingInterpretation }
++
+ /// Every operation that emits a request uses RequestContext.NextId for it (at most one per call) and records it as
+ /// Outstanding; an answer whose RequestId is not Outstanding is SupersededReply.
+ type SaveMachine =
+-    { Initial: VerifiedInvestigation -> InvestigationSession
++    { Initial: Writable.T -> VerifiedInvestigation -> InvestigationSession
++      /// v4.1.5 C1 (address, id, base head, start command, online): a new investigation's session in a working copy at the head just read, holding its
++      /// StartInvestigation command (EXT-DATA-008), the only way it starts. It starts in Unsaved when online and in
++      /// Offline when known offline (the states T-S01 and T-S02 would reach). Its first save is the existing T-S04: one
++      /// commit adding StorageCodec.EncodeNew's three files, conditional on BaseHead, Saved only from an equal read-back
++      /// (PERSIST-005..007). On a moved head, files absent at the fresh head are StaleHeadUnrelated and files present
++      /// there are StaleHeadSameInvestigation. No state, input or transition is added.
++      InitialNew: Writable.T -> InvestigationId -> CommitOid -> CommandEnvelope -> bool -> InvestigationSession
+       /// Classifies and verifies one answer (IF41-ERRORS, read-back, reconciliation) against what the session awaits.
+       Interpret: RequestContext -> InvestigationSession -> HttpOutcome -> Interpretation
+       Step: RequestContext -> InvestigationSession -> SaveInput -> Result<InvestigationSession * SaveEffect list, SaveFault>
+--- ../../requirements-compiled/v4.1.4/contracts/06-IF41-APP.fs	2026-11-05 13:24:17.360443436 +0000
++++ v415-contracts/06-IF41-APP.fs	2026-11-05 19:41:01.915397988 +0000
+@@ -37,7 +37,7 @@
+     | OnlineObserved
+ 
+ /// What a host timer is for.
+-type TimerKey = ReconcileTimer of InvestigationId
++type TimerKey = ReconcileTimer of InvestigationRef
+ 
+ type BrowserSignal =
+     | ConnectivityChanged of online: bool
+@@ -59,9 +59,13 @@
+     | Browser of BrowserSignal
+     | Connection of ConnectionInput
+     | Network of NetworkInput
+-    | SessionInput of InvestigationId * SaveInput
+-    | ConflictStep of InvestigationId * ConflictInput
+-    | LoadStep of InvestigationId * LoadInput
++    | SessionInput of InvestigationRef * SaveInput
++    | ConflictStep of InvestigationRef * ConflictInput
++    | LoadStep of InvestigationRef * LoadInput
++    /// v4.1.5 L1, W1: the user selected what to list (EXT-DATA-003: an explicit selection of the workspace).
++    | ListRequested of ListingTarget
++    /// v4.1.5 C1: the user asked to create an investigation in a working copy (EXT-DATA-006: an explicit action).
++    | CreateRequested of Writable.T * CommandEnvelope
+     | DomainCommand of CommandEnvelope
+ 
+ /// The model keeps the connection context after Connect succeeds and the next request identity of the tab.
+@@ -71,8 +75,11 @@
+       NextRequestId: RequestId
+       Network: NetworkState
+       Route: Route
+-      Loads: Map<InvestigationId, LoadState>
+-      Sessions: Map<InvestigationId, InvestigationSession> }
++      Loads: Map<InvestigationRef, LoadState>
++      Sessions: Map<InvestigationRef, InvestigationSession>
++      /// v4.1.5 L1: the latest listing of each workspace the user selected, and the listing reads in flight.
++      Listings: Map<WorkspaceAddress.T, Listing>
++      ListingsInFlight: Map<RequestId, ListingTarget * ListingStep> }
+ 
+ type Engine =
+     { Init: Route -> Model * HostEffect list
