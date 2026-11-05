@@ -6,7 +6,7 @@ module Causa.Preview.Validation
 type FieldError = { FieldId: string; RuleId: string; Message: string }
 
 /// Length in UTF-16 code units: what the HTML maxlength attribute counts.
-let length (s: string) : int = if isNull s then 0 else s.Length
+let length (s: string) : int = s.Length
 
 /// INV-019, INV-020, INV-021 (and the storage contract's non-blank title).
 let startForm (title: string) (problemStatement: string) : FieldError list = []
