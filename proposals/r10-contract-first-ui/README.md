@@ -25,7 +25,7 @@ With it, a UI agent can build, render and test a real screen from bootstrap onwa
 | `prototype/screens/` | The Connection and Investigation List screens, as pure `AppView -> Bindings` modules. They reference **only** the contracts |
 | `prototype/web/`, `prototype/host/` | The screen rendered by the real Limen 0.9.1 kernel with Forma 0.12.0. A pass-through transport carries messages to the F# fixture backend |
 | `real-adapter-sketch/` | The same `UiBackend` over the frozen `Engine`, with the exact gaps the frozen contracts leave stated as values |
-| `tests/` | Layer A: 39 xunit tests, plus 9 mutation controls (`evidence/mutations.log`) |
+| `tests/` | Layer A: 44 xunit tests (including regressions for the review findings), plus 9 mutation controls (`evidence/mutations.log`) |
 | `evidence/` | Layer A and B logs, and the bootstrap-compile proof |
 | [FILE-OWNERSHIP.json](FILE-OWNERSHIP.json), [PARALLEL-EXECUTION-PLAN.md](PARALLEL-EXECUTION-PLAN.md) | One owner per file, three UI roles mapped to PR #119's successor slices |
 | [VERIFICATION-STRATEGY.md](VERIFICATION-STRATEGY.md) | Layers A, B and C, and what each may and may not claim |

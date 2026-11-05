@@ -1,4 +1,4 @@
-# Mutation controls for the Layer A tests (2026-11-05). Each mutant was applied to a clean tree, the test project was
+# Mutation controls for the Layer A tests (2026-11-05; suite then had 39 tests, now 44 after the review regressions). Each mutant was applied to a clean tree, the test project was
 # run, and the tree was restored with git checkout. A control passes when the mutant is KILLED (the suite fails).
 M1  drop catalog entry INV-027 from SCREEN-MANIFEST.json            killed (2 tests fail)
 M2  Title maxLength 200 -> 201 in InvestigationEditor.fs           killed (1)

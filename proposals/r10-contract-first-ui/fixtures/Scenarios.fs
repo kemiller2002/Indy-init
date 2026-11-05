@@ -148,13 +148,7 @@ let emptyAnalysis : AnalysisProjection =
 
 // ---- Save presentations (the frozen IF41-VIEW SaveIndicatorView is filled for every one of the seven states) --------
 
-let saveActions kind =
-    match kind with
-    | SavedKind | SavingKind | OfflineKind -> []
-    | UnsavedKind -> [ Save ]
-    | ConflictKind -> [ Review; ReapplyMine; DiscardMine; ExportMine ]
-    | UnknownOutcomeKind -> [ CheckAgainAction ]
-    | SaveFailedKind -> [ Retry ]
+let saveActions kind = SaveChoices.forKind kind
 
 let saveText kind =
     match kind with

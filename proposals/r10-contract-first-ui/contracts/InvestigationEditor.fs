@@ -91,6 +91,17 @@ type ConflictPresentation =
       Explanation: string
       Choices: SaveAction list }
 
+/// The frozen SaveAction choices each state offers (PERSIST-031..033), one mapping for fixture and adapter alike.
+[<RequireQualifiedAccess>]
+module SaveChoices =
+    let forKind kind =
+        match kind with
+        | SavedKind | SavingKind | OfflineKind -> []
+        | UnsavedKind -> [ Save ]
+        | ConflictKind -> [ Review; ReapplyMine; DiscardMine; ExportMine ]
+        | UnknownOutcomeKind -> [ CheckAgainAction ]
+        | SaveFailedKind -> [ Retry ]
+
 type SavePresentation =
     { Kind: SaveStateKind
       /// The frozen IF41-VIEW projection; Label equals PresentationLanguage.saveState Kind (contract test).

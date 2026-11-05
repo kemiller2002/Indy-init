@@ -36,3 +36,10 @@ let ``no UI role owns a path the frozen rules reserve to integration`` () =
 let ``no two UI roles own the same view or screen fragment`` () =
     let uiOwned = files |> List.filter (fun f -> (str f "owner" |> Option.defaultValue "").StartsWith "ui-") |> List.choose (fun f -> str f "path")
     Assert.Equal(uiOwned.Length, (List.distinct uiOwned).Length)
+
+[<Fact>]
+let ``no UI-owned file compiles before the UI contracts (review R1)`` () =
+    let owner = files |> List.map (fun f -> str f "path" |> Option.get, str f "owner" |> Option.get) |> Map.ofList
+    for f in files |> List.filter (fun f -> (str f "path" |> Option.get).Contains "/Ui/Contracts/") do
+        for d in strs f "dependsOn" do
+            Assert.False((owner |> Map.tryFind d |> Option.defaultValue "").StartsWith "ui-", sprintf "%A depends on UI-owned %s" (str f "path") d)

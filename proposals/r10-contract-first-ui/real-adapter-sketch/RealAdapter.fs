@@ -8,7 +8,7 @@ open Causa.App
 open Causa.Ui.Contracts
 
 /// UI-local text the frozen Model does not hold (form fields before submit). The credential is the frozen opaque type.
-type Local = { Form: ConnectForm; Credential: Credential.T option; Errors: ValidationError list; Route: UiRoute }
+type Local = { Form: ConnectForm; Credential: Credential.T option; Errors: ValidationError list; Route: UiRoute; Drafts: Map<FieldId, string> }
 
 type State = { Model: Model; Local: Local }
 
@@ -43,7 +43,10 @@ let private dispatch (engine: Engine) (intent: UiIntent) (s: State) : State * Ho
     | Navigate r ->
         let m, fx = engine.Update (Msg.Navigate(Route(Navigation.format r))) s.Model
         { Model = m; Local = { s.Local with Route = r } }, fx
-    | Input(f, v, _) -> { s with Local = { s.Local with Form = Connection.withField f v s.Local.Form } }, []
+    | Input(f, v, _) when Connection.fields |> List.exists (fun x -> x.Field = f) ->
+        { s with Local = { s.Local with Form = Connection.withField f v s.Local.Form } }, []
+    // Start and content fields wait for the domain owner's command payloads (C1, C5); kept, not dropped.
+    | Input(f, v, _) -> { s with Local = { s.Local with Drafts = s.Local.Drafts |> Map.add f v } }, []
     | Secret(_, c) -> { s with Local = { s.Local with Credential = Some c; Form = { s.Local.Form with CredentialEntered = true } } }, []
     | Activate(a, _) when a = Actions.connect -> connect engine s
     | Activate(a, _) when a = Actions.disconnect ->
@@ -68,14 +71,14 @@ let private connectionView (s: State) : ConnectionView =
       Connected = s.Model.Context |> Option.map (fun c -> sprintf "%s/%s on %s" c.Repository.Owner c.Repository.Name c.Repository.Branch)
       WriteScope = (match s.Model.Connection with Connected true -> Writable | Connected false -> ReadOnlyConnection | _ -> WriteScopeUnknown) }
 
-let private loadFailure (l: LoadFailure) =
+let private loadFailure (id: InvestigationId) (l: LoadFailure) =
     match l with
     | Unverifiable fs -> InvalidData(sprintf "%d verification failure(s)" fs.Length)
     | ProviderFailed AuthenticationFailed -> CredentialRefused
     | ProviderFailed(PermissionDenied _) -> NotAuthorized
+    | ProviderFailed(NotFound _) -> InvestigationNotFound id
     | ProviderFailed(ProviderError.RateLimited _) -> ProviderRateLimited
     | ProviderFailed(ProviderError.NetworkUnavailable _) -> ProviderUnreachable
-    | ProviderFailed(NotFound w) -> UiFailure.ProviderError("not found: " + w)
     | ProviderFailed e -> UiFailure.ProviderError(sprintf "%A" e)
 
 let private project (s: State) : AppView =
@@ -90,7 +93,7 @@ let private project (s: State) : AppView =
             let load = s.Model.Loads |> Map.tryFind id |> Option.defaultValue NotLoaded
             let view =
                 match load with
-                | LoadFailed f -> failedWith (loadFailure f)
+                | LoadFailed f -> failedWith (loadFailure id f)
                 | LoadState.Loading _ -> { failedWith contentGap with Frame = Waiting "Opening investigation"; State = ScreenLoading }
                 // Loaded: the history is verified, but nothing in the frozen types turns it into a title, problem statement
                 // or hypotheses for the frame or the sections.
@@ -99,7 +102,13 @@ let private project (s: State) : AppView =
                 s.Model.Sessions |> Map.tryFind id |> Option.map (fun session ->
                     let kind = saveKind session.State
                     { Kind = kind
-                      Indicator = { InvestigationId = id; Label = PresentationLanguage.saveState kind; Text = ""; Glyph = ""; Actions = []; Politeness = Polite; LastSavedCommitTime = None }
+                      // The frozen machine's own projection (IF41-VIEW Projections.SaveIndicator) supplies Text, Glyph,
+                      // Politeness and the commit time; the sketch takes the label and the choices from the contracts.
+                      Indicator =
+                        { InvestigationId = id; Label = PresentationLanguage.saveState kind; Text = ""; Glyph = ""
+                          Actions = SaveChoices.forKind kind
+                          Politeness = (match kind with ConflictKind | SaveFailedKind | UnknownOutcomeKind -> Assertive | _ -> Polite)
+                          LastSavedCommitTime = None }
                       Save = (match kind with UnsavedKind | SaveFailedKind -> Available | _ -> NotOffered)
                       Conflict = None
                       NotSaved = [] })
@@ -120,6 +129,6 @@ let backend (engine: Engine) : UiBackend<State, HostEffect> =
       Init =
         fun route ->
             let m, fx = engine.Init(Route(Navigation.format route))
-            { Model = m; Local = { Form = Connection.emptyForm; Credential = None; Errors = []; Route = route } }, fx
+            { Model = m; Local = { Form = Connection.emptyForm; Credential = None; Errors = []; Route = route; Drafts = Map.empty } }, fx
       Dispatch = dispatch engine
       Project = project }

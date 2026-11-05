@@ -13,7 +13,7 @@ T10 bootstrap (29) ─┬─ T11 stack lock (15) ── T16 shell (35, ui) ─�
 ```
 
 - Every UI slice except T16 and T24 depends on **SL-T17** (`slice-execution-manifest.json`). STARTUP-INSTRUCTIONS §4 step 1 starts only slices whose dependencies are integrated.
-- T17's earliest start is T+94 (`execution-dag.json`). With CI and merge time, the first non-shell UI slice starts at T+189 (0-min CI) or T+253 (10-min CI) in this model.
+- T17's earliest start is T+94 (`execution-dag.json`). With CI and merge time, the first non-shell UI slice starts at T+189 (0-min CI) or T+252 (10-min CI) in this model.
 - What a UI agent would build against before T17:
   - IF41-VIEW has three view records only (save indicator, header, screen);
   - every content payload is an opaque `class end` stub (`00-DOMAIN-STUBS.fs`);
@@ -31,19 +31,29 @@ T10 bootstrap, now including src/Causa.App/Ui/Contracts/*.fs and the fixture bac
 - SL-T10 is integrated, and the slice's UI predecessors are *built*, not merged.
 - `evidence/bootstrap-compile.log` shows the contracts and screens compile in the real v4.1.4 bootstrap with no domain implementation.
 
-**Merge condition.** Unchanged: `slice-gate` PASS. Its journeys rule makes these hidden merge dependencies real (`schedule-inputs/hidden-merge-dependencies.json`):
+**Merge condition.** Unchanged: `slice-gate` PASS. Its journeys rule (`Ledger.fs` lines 391–410) makes these hidden merge dependencies real. They are listed per assertion in `schedule-inputs/hidden-merge-dependencies.json`, corrected after the independent review (R3):
 
-| Bound assertions | Also need integrated |
+| Bound assertions | Also need integrated (successor ids) |
 |---|---|
-| J1-02, J3-01, J3-02 | SL-WI-GEN-EXT-DATA (Connect) |
-| J1-03..05, J2-01..08, J3-03, J3-04, J3-06, J3-07 | SL-WI-GEN-EXT-DATA, SL-T21 (the run starts and saves an investigation) |
-| J1-06, J2-09, J3-05, J3-09 | SL-WI-GEN-EXT-DATA, SL-T21, SL-T25 (fresh context lists and reopens) |
+| J1-02, J3-01, J3-02 | EXT-DATA (Connect) |
+| J1-03 | EXT-DATA, START-ACTIONS (Start does not save) |
+| J2-01..J2-08 | EXT-DATA, START-ACTIONS, WORKSPACE-FRAME and that assertion's editors (EVIDENCE, HYPOTHESES, LINKS, CONCLUSION; J2-06 and J2-08 also UI-STATES and LANDING) |
+| J1-04, J1-05, J3-03, J3-04, J3-06, J3-07, J3-08 | the above plus WORKSPACE-SAVE, T22 and T21: these run after a save. J3-08 is included because the unasserted `saveAndConfirm` before it aborts the test if it fails |
+| J1-06, J2-09, J3-05, J3-09 | the above plus T25 and INV-LIST: a fresh context reloads |
 
-These rules are applied to **both** policies, so the current plan is not credited with merges its gate would refuse.
+The rules are applied to **both** policies, so the current plan is not credited with merges its gate would refuse.
 
-They expose CF-07: SL-T16 and SL-T19 have cyclic merge dependencies. The model defers those six edges in every run and says so.
+They expose CF-07: the bindings create **cyclic merge dependencies**.
+- 22 edges in the approved manifest and 36 in the successor.
+- Some cycles run through declared dependencies:
+  - SL-T16 needs T21, which needs T17, which needs T16;
+  - SL-T19 needs T21, which needs T20, which needs T19.
+- Others are mutual journey couplings: SL-WI-GEN-EXT-DATA (bound to J1-03) needs SL-WI-INV-START, and SL-WI-INV-START (bound to J1-03 too) needs EXT-DATA.
+- The model defers these edges greedily, in a fixed order and identically in both policies, which amounts to CF-07 option A. It prints them.
 
-Not modelled: ODR-R10-25/-26. Under v4.1.4 no ordering lets the historical list or content pass against real data.
+Two further assumptions:
+- Under contract-first a UI slice *builds* without waiting for non-UI dependencies such as SL-T17. That is the CF-09 rule itself, and it is the source of the T+45 start.
+- Not modelled: ODR-R10-25/-26. Under v4.1.4 no ordering lets the historical list or content pass against real data.
 
 ## 3. File ownership changes
 
@@ -51,7 +61,7 @@ See `FILE-OWNERSHIP.json` (101 files, one owner each; checked by `OwnershipTests
 - `Views/Investigation.fs` (ui) splits into `Views/Workspace/{Frame,Overview,Hypotheses,Evidence,Links,Conclusions,Timeline,Inspector,Details,StoredRecord}.fs`.
 - New `Views/{Connection,InvestigationList,States,Language,Start,Settings}.fs`.
 - `Graph.fs`, `Report.fs`, `History.fs` and `Administration.fs` move from ui-2 to ui-c, ui-c, ui-b and ui-a.
-- `Engine.fs`, `Routes.fs` and `Update.fs` move from ui to integration. Screens emit `UiIntent` only, and `Ui/UiAdapter.fs` (integration) maps it to `Msg`.
+- `Engine.fs`, `Routes.fs`, `Update.fs` and the frozen view types in `Projections.fs` move from ui to integration, so no UI-owned file compiles before the contracts (review R1); the save-indicator projection function moves to `Views/SaveIndicator.fs` (ui-b). Screens emit `UiIntent` only, and `Ui/UiAdapter.fs` (integration) maps it to `Msg`.
 - New coordinator-controlled `Ui/Contracts/*.fs`, copied at bootstrap.
 - New per-screen markup and styles `web/screens/*.html|css` (CF-08).
 - New role-local fixture scenario files, so no role edits the shared fixtures.
@@ -59,48 +69,50 @@ See `FILE-OWNERSHIP.json` (101 files, one owner each; checked by `OwnershipTests
 ## 4. Results (model; `schedule-inputs/bound-results.txt`)
 
 Inputs and settings:
-- Slices: the successor manifest of PR #119 (`proposals/slice-execution-manifest.successor.json` at e64b4f3, 53 slices).
+- Slices: the successor manifest of PR #119 (53 slices, e64b4f3).
 - Setup 45 min, merge 3 min, one serial integration queue.
-- Lanes: integration, domain, persistence, reviewer, plus the UI lanes of the role file.
+- Lanes: integration, domain, persistence, reviewer, plus the UI lanes of each role file.
 - Capability groups:
   - Data Visible = shell, connect, catalog load, list, frame, landing, states;
   - Data Understood = kernel, fixture replay, hypotheses, evidence, links, conclusion, inspector, WDL, graph;
   - Data Editable = live write path, save states, start, save, details, round-trip.
 
-| Plan | CI | Data Visible | Data Understood | Data Editable | All slices | First non-shell UI start |
-|---|---|---|---|---|---|---|
-| Current rule, frozen ownership (2 UI lanes) | 0 | T+666 | T+589 | T+693 | T+693 | T+189 |
-| | 10 | T+736 | T+762 | T+846 | T+846 | T+253 |
-| Contract-first, existing UI agent count (frozen ownership) | 0 | T+557 | T+480 | T+584 | T+584 | T+45 |
-| | 10 | T+669 | T+734 | T+760 | T+846 | T+45 |
-| Contract-first, 1 UI agent | 0 | T+710 | T+633 | T+737 | T+737 | T+80 |
-| | 10 | T+747 | T+682 | T+786 | T+806 | T+87 |
-| Contract-first, 2 UI agents (FILE-OWNERSHIP two-agent variant) | 0 | T+352 | T+374 | T+433 | T+437 | T+45 |
-| | 10 | T+591 | T+734 | T+760 | T+846 | T+45 |
-| Contract-first, 3 UI agents | 0 | T+286 | T+331 | T+343 | T+440 | T+45 |
-| | 10 | T+591 | T+734 | T+760 | T+846 | T+45 |
+**Same roles, both rules.** This isolates the effect of contract-first from the effect of re-splitting ownership (review R2):
 
-On the approved 37-slice manifest (all slices; frozen ownership):
+| UI roles | CI | Rule | Data Visible | Data Understood | Data Editable | All slices | First non-shell UI start |
+|---|---|---|---|---|---|---|---|
+| Frozen v4.1.4 ownership (2 lanes) | 0 | current | T+758 | T+764 | T+800 | T+800 | T+189 |
+| | 0 | contract-first | T+673 | T+682 | T+691 | T+787 | T+45 |
+| | 10 | current | T+967 | T+993 | T+1042 | T+1042 | T+252 |
+| | 10 | contract-first | T+894 | T+946 | T+998 | T+998 | T+45 |
+| 1 UI agent | 0 | current / contract-first | T+908 / T+826 | T+914 / T+835 | T+950 / T+844 | T+950 / T+940 | T+189 / T+80 |
+| | 10 | current / contract-first | T+1089 / T+1047 | T+1115 / T+1099 | T+1164 / T+1151 | T+1164 / T+1151 | T+252 / T+87 |
+| 2 UI agents (FILE-OWNERSHIP two-agent variant) | 0 | current / contract-first | T+808 / T+468 | T+814 / T+477 | T+830 / T+486 | T+840 / T+582 | T+189 / T+45 |
+| | 10 | current / contract-first | T+989 / T+760 | T+1015 / T+812 | T+1064 / T+864 | T+1064 / T+864 | T+252 / T+45 |
+| 3 UI agents | 0 | current / contract-first | T+659 / T+364 | T+665 / T+373 | T+681 / T+382 | T+691 / T+475 | T+189 / T+45 |
+| | 10 | current / contract-first | T+933 / T+708 | T+959 / T+760 | T+1008 / T+812 | T+1008 / T+812 | T+252 / T+45 |
+
+On the approved 37-slice manifest (frozen ownership; all slices):
 
 | Rule | 0-min CI | 10-min CI |
 |---|---|---|
-| Current | T+595 | T+690 |
-| Contract-first | T+453 | T+696 |
+| Current | T+598 | T+770 |
+| Contract-first | T+462 | T+709 |
 
 What the model says, and does not say:
-- **UI idle time before the first UI slice falls by 144–208 minutes** (T+189/253 → T+45). This is the direct effect of contract-first, and it holds in every variant.
-- **At 10-minute CI, full completion does not improve in any variant.**
-  - 53 merges × 13 minutes ≈ 690 queue-minutes, so the serial integration queue decides.
-  - UI work built early waits to merge: the built-but-unmerged UI slice-minutes rise from 1,150 to 5,192 for frozen ownership.
-  - Contract-first moves the wait from "idle" to "built, waiting for the gate". It does not remove it.
-- **At low CI the gain is large but conditional.** Full completion goes T+693 → T+437 (2 UI) and Data Editable T+693 → T+343 (3 UI). This needs the queue to clear fast: ODR-R10-22 speculative verification, or genuinely short CI.
-- **A third UI agent helps only Data Editable at low CI** (T+433 → T+343). Full completion is unchanged (T+437 versus T+440), and at 10-min CI it gives nothing.
-- The 1-UI result is slower than the frozen 2-lane baseline: one lane cannot absorb the UI work, however early it starts.
+- **Contract-first is earlier in every same-roles pair, at both CI settings.** The first non-shell UI slice starts at T+45 instead of T+189/252.
+  - With the frozen 2-lane ownership the gain is small: full completion T+1042 → T+998 at 10-min CI.
+  - The two-agent split gains far more: T+1064 → T+864.
+- **The review was right about the first version of these figures.** Before the dependency correction, the current rule beat contract-first at 10-min CI with the same roles (2 UI: T+791 against T+846), and the earlier tables compared against the frozen baseline only. With the dependencies the gate actually imposes, that reversal disappears. Treat this sensitivity as a warning: the result depends on the merge-dependency rules, which the optimization agent should re-derive independently.
+- **Built-but-unmerged UI time rises sharply** (for example 2,036 → 8,298 slice-minutes, two agents, 10-min CI). Contract-first moves waiting from "idle" to "built, waiting for the gate". The serial integration queue then dominates, and ODR-R10-22 (speculative verification) is what would convert built work into integrated work.
+- **A third UI agent** brings full completion from T+864 to T+812 at 10-min CI, and Data Editable from T+486 to T+382 at 0-min CI.
+- **One UI agent is the slowest variant** under either rule.
+- **Nothing fits 420 minutes at 10-min CI.** The best case is T+812.
 - This model differs from schedule-model.fsx:
   - it adds the hidden merge dependencies;
   - it has no rework, no speculative queue and no per-slice overhead.
   
-  Its absolute times are therefore not comparable with PR #119's (for example V1 T+720 at 0-min CI). Compare only within a column.
+  Its absolute times are therefore not comparable with PR #119's. Compare only within this table.
 
 ## 5. Overheads (estimates, not measured)
 
@@ -138,7 +150,7 @@ dotnet fsi proposals/r10-contract-first-ui/tools/contract-first-bound.fsx -- /tm
 
 ## 7. Risks of additional parallelism
 
-- **Queue saturation.** More early-built UI slices compete for the one integration authority. Without ODR-R10-22 the extra agents mostly wait.
+- **Queue saturation.** More early-built UI slices compete for the one integration authority. Built-but-unmerged time grows about fourfold (§4). Without ODR-R10-22 much of the extra building waits.
 - **Stale-target churn.** Every merge moves main, so each queued UI slice must re-merge and re-verify (`STALE_TARGET`). More parallel UI branches mean more of this. It is not modelled.
 - **Fixture drift.**
   - Fixture behaviour, for example "Save → Saved", is not provider behaviour.
@@ -148,4 +160,4 @@ dotnet fsi proposals/r10-contract-first-ui/tools/contract-first-bound.fsx -- /tm
     - keeping fixture provider outcomes within the frozen `ProviderError`/`ConnectionState` cases.
 - **Contract churn.** A mid-run contract change hits every UI agent at once. Mitigation: coordinator versioning, and no change without a consumer notice.
 - **Integration-lane load.** Moving `Engine.fs`, `Routes.fs`, `Update.fs` and the adapter to integration adds work to a lane that already carries T10, T11, T17, T21, T24 and T31–T34 plus the generated items.
-- **The circular journey bindings (CF-07)** stall the run whatever the agent count.
+- **The cyclic journey bindings (CF-07)**, 22 edges in the approved plan, stall the run whatever the agent count unless the owner decides how such assertions are judged.

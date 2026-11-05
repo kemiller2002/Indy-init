@@ -11,8 +11,23 @@
     "persistence": "unchanged (src/Causa.Persistence/*, tests/Causa.TestSupport/Recordings.fs, StatefulFake.fs)"
   },
   "twoAgentVariant": "ui-a keeps its files; ui-b takes ui-c's files except Inspector.fs, Graph.fs, Report.fs (and their fragments and tests), which go to ui-a (schedule-inputs/roles.contract-first-2ui.json)",
+  "compileOrder": [
+    "Engine.fs",
+    "Routes.fs",
+    "Projections.fs (types)",
+    "Ui/Contracts/*",
+    "Connection.fs",
+    "Ui/UiAdapter.fs",
+    "Ui/Events.fs",
+    "Reporting.fs",
+    "Update.fs",
+    "Views/*",
+    "View.fs",
+    "Program.fs"
+  ],
   "rules": [
     "A file has exactly one owner; no two roles share a file.",
+    "No UI-owned file compiles before the UI contracts: everything they depend on (Engine.fs, Routes.fs, Projections.fs types) is integration-owned and frozen at bootstrap (verified: evidence/bootstrap-compile.log).",
     "Screens emit UiIntent and read AppView only; no screen file edits Update.fs, Engine.fs, Projections.fs or View.fs.",
     "UI contract files change only by a versioned change request through the coordinator, written by integration.",
     "Markup lives in web/screens/<screen>.html, one file per screen; web/index.html only includes them (needs CF-08).",
@@ -48,6 +63,21 @@
       "note": "route table generated from contracts Navigation (UiRoute)"
     },
     {
+      "path": "src/Causa.App/Projections.fs",
+      "owner": "integration",
+      "slices": [
+        "bootstrap"
+      ],
+      "implements": [
+        "IF41-VIEW"
+      ],
+      "dependsOn": [
+        "src/Causa.App/Routes.fs"
+      ],
+      "frozenOwner": "ui",
+      "note": "frozen IF41-VIEW TYPES only, as the bootstrap writes them; compiled BEFORE Connection.fs (it needs only Engine.fs ConnectionState). The projection functions move to Views/SaveIndicator.fs (ui-b). Review finding R1"
+    },
+    {
       "path": "src/Causa.App/Connection.fs",
       "owner": "ui-a",
       "slices": [
@@ -56,26 +86,10 @@
       ],
       "implements": [],
       "dependsOn": [
-        "src/Causa.App/Engine.fs"
+        "src/Causa.App/Ui/Contracts/Bindings.fs"
       ],
       "frozenOwner": "ui",
-      "note": "SM-CONNECTION, SM-NETWORK (frozen stateMachines owner: ui)"
-    },
-    {
-      "path": "src/Causa.App/Projections.fs",
-      "owner": "ui-b",
-      "slices": [
-        "SL-T22"
-      ],
-      "implements": [
-        "IF41-VIEW"
-      ],
-      "dependsOn": [
-        "src/Causa.App/Connection.fs",
-        "src/Causa.App/Routes.fs"
-      ],
-      "frozenOwner": "ui",
-      "note": "frozen IF41-VIEW: SaveIndicator, Header, Screen"
+      "note": "SM-CONNECTION, SM-NETWORK (frozen stateMachines owner: ui); compiled after the contracts, so no UI-owned file precedes them"
     },
     {
       "path": "src/Causa.App/Ui/Contracts/Ids.fs",
@@ -281,7 +295,7 @@
         "IF41-REPORT"
       ],
       "dependsOn": [
-        "src/Causa.App/Projections.fs"
+        "src/Causa.App/Connection.fs"
       ],
       "frozenOwner": "ui"
     },

@@ -30,11 +30,14 @@ type State =
       DraftErrors: ValidationError list
       DetailsOpen: bool
       SaveKinds: Map<InvestigationId, SaveStateKind>
-      Counter: int }
+      Counter: int
+      /// Copies started so far; the next Start identifier derives from it and is never reused.
+      Started: int }
 
 /// The fixed instant fixture records use (no clock in a pure backend).
 let fixtureInstant = DateTimeOffset(2026, 11, 5, 0, 0, 0, TimeSpan.Zero)
 
+/// Fixture identifiers come from a counter that only grows, so no two copies share an id (review finding R4).
 let private newIdentifier (n: int) = sprintf "00000000-0000-4000-8000-%012d" (n + 1)
 
 /// The working copy the save scenarios start with. Synthetic text, labelled; not a historical case.
@@ -63,7 +66,8 @@ let init (scenario: Scenario) (route: UiRoute) : State =
       DraftErrors = []
       DetailsOpen = false
       SaveKinds = Map.ofList [ for c in seeded -> c.Id, UnsavedKind ]
-      Counter = 0 }
+      Counter = 0
+      Started = 0 }
 
 let private isConnectionField f = Connection.fields |> List.exists (fun s -> s.Field = f)
 let private isStartField f = StartForm.fields |> List.exists (fun s -> s.Field = f)
@@ -143,6 +147,16 @@ let private addLink (supersede: bool) s (a: AnalysisProjection) =
                       OccurredAt = fixtureInstant; Actor = None; Affects = [ link.Evidence; link.Hypothesis ] } ] }
     | _ -> a
 
+/// INV-030: "A link to a non-existent target is refused."
+let private missingTarget s =
+    match currentInvestigation s |> Option.bind (fun id -> s.Analysis |> Map.tryFind id) with
+    | Some a ->
+        [ if not (a.Evidence |> List.exists (fun e -> e.Id = draft s Fields.linkEvidence)) then
+              yield { Field = Fields.linkEvidence; Rule = Required; Message = "Choose evidence recorded in this investigation." }
+          if not (a.Hypotheses |> List.exists (fun h -> h.Id = draft s Fields.linkHypothesis)) then
+              yield { Field = Fields.linkHypothesis; Rule = Required; Message = "Choose a hypothesis recorded in this investigation." } ]
+    | None -> []
+
 /// INV-030: a second link for a pair is refused, pointing to the existing one; reassessment supersedes it instead.
 let private linkRefusal s =
     match currentInvestigation s |> Option.bind (fun id -> s.Analysis |> Map.tryFind id) with
@@ -155,13 +169,16 @@ let private timelineEntry (a: AnalysisProjection) eventType summary =
 
 let private activate (action: ActionId) (key: string option) (s: State) : State =
     if action = Actions.connect then connect s
-    elif action = Actions.disconnect then { init s.Scenario InvestigationsRoute with Copies = s.Copies }
+    elif action = Actions.disconnect then
+        // Disconnect forgets the connection, never the tab's copies, their content or their save states (PERSIST-020).
+        let fresh = init s.Scenario InvestigationsRoute
+        { s with Route = InvestigationsRoute; Connection = fresh.Connection; Form = fresh.Form; Credential = None; ConnectErrors = []; ConnectFailure = None }
     elif action = Actions.newInvestigation then (if s.Connection = Connected true then { s with Route = StartRoute } else s)
     elif action = Actions.openInvestigation then
         match key |> Option.map Guid.TryParse with
         | Some(true, g) -> { s with Route = WorkspaceRoute(InvestigationId g, Overview) }
         | _ -> s
-    elif action = Actions.cancelStart then { s with Route = InvestigationsRoute; Start = StartForm.empty (newIdentifier s.Copies.Length); StartErrors = [] }
+    elif action = Actions.cancelStart then { s with Route = InvestigationsRoute; Start = StartForm.empty (newIdentifier s.Started); StartErrors = [] }
     elif action = Actions.startInvestigation then
         match StartForm.validate s.Start, Guid.TryParse s.Start.Identifier with
         | [], (true, g) ->
@@ -172,7 +189,8 @@ let private activate (action: ActionId) (key: string option) (s: State) : State 
                 Analysis = s.Analysis |> Map.add id emptyAnalysis
                 SaveKinds = s.SaveKinds |> Map.add id UnsavedKind
                 Route = WorkspaceRoute(id, Overview)
-                Start = StartForm.empty (newIdentifier (s.Copies.Length + 1))
+                Started = s.Started + 1
+                Start = StartForm.empty (newIdentifier (s.Started + 1))
                 StartErrors = [] }
         | errors, _ -> { s with StartErrors = errors }
     elif action = Actions.recordObservation then
@@ -182,8 +200,7 @@ let private activate (action: ActionId) (key: string option) (s: State) : State 
                 Observations = a.Observations @ [ { Id = nextEntityId s; Text = text; SourceReference = (if source = "" then None else Some source); ObservedAt = None } ]
                 Timeline = timelineEntry a "ObservationRecorded" text })
     elif action = Actions.recordHypothesis then
-        // INV-011 is optional in the journeys' recording step: only the statement is checked here (CF-03).
-        s |> record [ ContentForms.hypothesis.Head ] (fun s a ->
+        s |> record ContentForms.hypothesisOnRecord (fun s a ->
             let statement = draft s Fields.hypothesisStatement
             let explanation = draft s Fields.hypothesisExplanation
             { a with
@@ -200,10 +217,14 @@ let private activate (action: ActionId) (key: string option) (s: State) : State 
                           SourceUrl = SafeUrl.tryCreate (get Fields.evidenceUrl); Category = None; CapturedAt = None; Links = [] } ]
                 Timeline = timelineEntry a "EvidenceAdmitted" (get Fields.evidenceLabel) })
     elif action = Actions.linkEvidence then
-        match linkRefusal s with
-        | Some refusal -> { s with DraftErrors = [ refusal ] }
-        | None -> s |> record ContentForms.link (addLink false)
-    elif action = Actions.reassess then s |> record ContentForms.link (addLink true)
+        match missingTarget s, linkRefusal s with
+        | (_ :: _) as errors, _ -> { s with DraftErrors = errors }
+        | [], Some refusal -> { s with DraftErrors = [ refusal ] }
+        | [], None -> s |> record ContentForms.link (addLink false)
+    elif action = Actions.reassess then
+        match missingTarget s with
+        | [] -> s |> record ContentForms.link (addLink true)
+        | errors -> { s with DraftErrors = errors }
     elif action = Actions.recordConclusion then
         s |> record ContentForms.conclusion (fun s a ->
             let statement = draft s Fields.conclusionStatement
@@ -214,6 +235,25 @@ let private activate (action: ActionId) (key: string option) (s: State) : State 
     elif action = Actions.editDetails then
         match currentInvestigation s with
         | Some id when isWorkingCopy s id -> { s with DetailsOpen = true }
+        | _ -> s
+    elif action = Actions.saveDetails then
+        match currentInvestigation s with
+        | Some id when isWorkingCopy s id && s.DetailsOpen ->
+            let copy = s.Copies |> List.find (fun c -> c.Id = id)
+            let edited =
+                { Title = s.Drafts |> Map.tryFind Fields.detailsTitle |> Option.defaultValue copy.Details.Title
+                  ProblemStatement = s.Drafts |> Map.tryFind Fields.detailsProblem |> Option.defaultValue copy.Details.ProblemStatement
+                  Question = s.Drafts |> Map.tryFind Fields.detailsQuestion |> Option.defaultValue copy.Details.Question }
+            match DetailsForm.validate edited with
+            | [] ->
+                // INV-034/INV-035: the identifier is unchanged; only the details change.
+                { s with
+                    Copies = s.Copies |> List.map (fun c -> if c.Id = id then { c with Details = edited } else c)
+                    Drafts = s.Drafts |> Map.remove Fields.detailsTitle |> Map.remove Fields.detailsProblem |> Map.remove Fields.detailsQuestion
+                    DraftErrors = []
+                    DetailsOpen = false
+                    SaveKinds = s.SaveKinds |> Map.add id UnsavedKind }
+            | errors -> { s with DraftErrors = errors }
         | _ -> s
     elif action = Actions.save then
         match currentInvestigation s with

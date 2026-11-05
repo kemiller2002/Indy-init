@@ -160,3 +160,38 @@ let ``every fixture view says it is a fixture`` () =
         match v.Origin with
         | FixtureBackend l -> Assert.StartsWith("FIXTURE: ", FixtureLabel.value l)
         | IntegratedBackend -> ()
+
+// ---- Regressions for the independent review (ADVERSARIAL-REVIEW.md R4) ----------------------------------------------
+
+[<Fact>]
+let ``R4a Save details changes the details, keeps the identifier, and makes the copy Unsaved`` () =
+    let s, v = run ConnectedCatalog InvestigationsRoute (connectIntents @ startIntents @ [ Activate(Actions.save, None); Activate(Actions.editDetails, None); Input(Fields.detailsTitle, "renamed", None); Activate(Actions.saveDetails, None) ])
+    let w = workspaceOf v
+    match w.Frame with
+    | Ready f ->
+        Assert.Equal("renamed", f.Title)
+        Assert.Equal(s.Copies.Head.Form.Identifier, f.Identifier)
+    | other -> Assert.Fail(sprintf "%A" other)
+    Assert.Equal(UnsavedKind, w.Save.Value.Kind)
+    let _, bad = run ConnectedCatalog InvestigationsRoute (connectIntents @ startIntents @ [ Activate(Actions.editDetails, None); Input(Fields.detailsProblem, "  ", None); Activate(Actions.saveDetails, None) ])
+    Assert.NotEmpty((workspaceOf bad).Drafts.Errors)
+
+[<Fact>]
+let ``R4b Disconnect keeps the tab's copies, and identifiers are never reused`` () =
+    let again =
+        [ Activate(Actions.disconnect, None) ] @ connectIntents
+        @ [ Activate(Actions.newInvestigation, None); Input(Fields.problemStatement, "second", None); Activate(Actions.startInvestigation, None) ]
+    let s, _ = run ConnectedCatalog InvestigationsRoute (connectIntents @ startIntents @ again)
+    Assert.Equal(2, s.Copies.Length)
+    Assert.Equal(2, s.Copies |> List.map (fun c -> c.Id) |> List.distinct |> List.length)
+    Assert.True(s.Copies |> List.forall (fun c -> s.Analysis.ContainsKey c.Id && s.SaveKinds.ContainsKey c.Id))
+
+[<Fact>]
+let ``R4c a link to a non-existent target is refused and records nothing (INV-030)`` () =
+    let link = [ Input(Fields.linkEvidence, "nope", None); Input(Fields.linkHypothesis, "nope", None); Input(Fields.relationshipKind, "supports", None); Input(Fields.relationshipRationale, "r", None); Activate(Actions.linkEvidence, None) ]
+    let s0, _ = run ConnectedCatalog InvestigationsRoute (connectIntents @ startIntents @ [ Activate(Actions.save, None) ])
+    let b = FixtureBackend.backend ConnectedCatalog
+    let s = link |> List.fold (fun st i -> fst (b.Dispatch i st)) s0
+    Assert.Equal(2, s.DraftErrors.Length)
+    Assert.Equal(s0.Counter, s.Counter)
+    Assert.Equal(SavedKind, s.SaveKinds[s.Copies.Head.Id])

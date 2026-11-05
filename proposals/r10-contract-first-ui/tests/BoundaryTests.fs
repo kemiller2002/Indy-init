@@ -108,3 +108,16 @@ let ``the seven frozen save states map one to one onto the presentation states``
     Assert.Equal(7, PresentationLanguage.allSaveStates.Length)
     let mapped = [ SaveState.Unsaved; SaveState.Saving; SaveState.Offline; SaveState.UnknownOutcome 1; SaveState.SaveFailed CredentialNotAccepted; SaveState.Conflict RemoteUnavailable ] |> List.map Causa.Ui.RealAdapter.Sketch.saveKind
     Assert.Equal<SaveStateKind list>([ UnsavedKind; SavingKind; OfflineKind; UnknownOutcomeKind; SaveFailedKind; ConflictKind ], mapped)
+
+[<Fact>]
+let ``R9 the adapter maps provider NotFound to InvestigationNotFound and offers the frozen conflict choices`` () =
+    let id = InvestigationId(Guid.Parse "e3adbee5-5096-5a10-bbfb-cecda86a154b")
+    let route = WorkspaceRoute(id, Overview)
+    let engine (loads: Map<InvestigationId, LoadState>) sessions : Engine =
+        { Init = fun r -> { Connection = Connected true; Context = None; NextRequestId = RequestId 1L; Network = NetworkState.Online; Route = r; Loads = loads; Sessions = sessions }, []
+          Update = fun _ m -> m, [] }
+    let b = Causa.Ui.RealAdapter.Sketch.backend (engine (Map.ofList [ id, LoadFailed(ProviderFailed(NotFound "investigation")) ]) Map.empty)
+    match (b.Project(fst (b.Init route))).Screen with
+    | WorkspaceScreen w -> Assert.Equal(ScreenFailed(InvestigationNotFound id), w.State)
+    | other -> Assert.Fail(sprintf "%A" other)
+    Assert.Equal<SaveAction list>([ Review; ReapplyMine; DiscardMine; ExportMine ], SaveChoices.forKind ConflictKind)

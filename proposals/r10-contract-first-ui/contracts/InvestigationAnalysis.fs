@@ -103,6 +103,11 @@ module ContentForms =
           // INV-011 has no validation block in the catalog; required: true.
           { Field = Fields.hypothesisExplanation; Label = "Hypothesis explanation"; Component = TextArea; Rules = [ Required ] } ]
 
+    /// The fields checked when a hypothesis is first recorded. J2-02 records with the statement only, while the catalog
+    /// marks INV-011 required: until CF-03 is decided this list checks only the statement, and `hypothesis` keeps the
+    /// catalog rule unchanged for the detail editor (S04). No requirement is weakened in the manifest.
+    let hypothesisOnRecord : FieldSpec list = [ hypothesis.Head ]
+
     let evidence : FieldSpec list =
         [ { Field = Fields.evidenceLabel; Label = "Evidence label"; Component = TextInput; Rules = [ Required; MinLength 1; MaxLength 200 ] }
           { Field = Fields.evidenceSource; Label = "Evidence source reference"; Component = TextInput; Rules = [ MaxLength 10000 ] }

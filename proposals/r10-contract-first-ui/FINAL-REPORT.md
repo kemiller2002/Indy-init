@@ -16,17 +16,19 @@ This is verified:
 - At T10 the bootstrap already writes the frozen IF41 types into `Engine.fs` and `Projections.fs`, and the view files are empty stubs.
 - So nothing in the *compiler* stops a screen at T10.
 
-Today the first non-shell UI slice starts at **T+189 (0-min CI) or T+253 (10-min CI)** (model). Five things hold it back, each verified:
+Today the first non-shell UI slice starts at **T+189 (0-min CI) or T+252 (10-min CI)** (model). Five things hold it back, each verified:
 
 | # | What prevents it today | Evidence | Removed by |
 |---|---|---|---|
 | 1 | **The start rule.** Every UI slice except T16/T24 depends on SL-T17, which needs the T13 kernel, and STARTUP-INSTRUCTIONS §4 starts only slices whose dependencies are *integrated* | `execution-dag.json` T22 ← T17 ← T13; `slice-execution-manifest.json` | CF-09: start on built UI predecessors after bootstrap; merge unchanged |
 | 2 | **Nothing to build against.** IF41-VIEW has three records (save indicator, header, screen); every content payload is an opaque `class end` stub | `requirements-compiled/v4.1.4/contracts/07-IF41-VIEW.fs`, `00-DOMAIN-STUBS.fs` | `contracts/`: screen view models, capability boundaries, validation, intents, plus the fixture backend |
 | 3 | **Ownership.** All investigation views are one `ui` file (`Views/Investigation.fs`); all markup is one integration-owned `web/index.html`; `Update.fs` is the only route from a view to the engine | `analysis/project-structure.json` | FILE-OWNERSHIP.json (101 files, one owner each) and CF-08 (per-screen fragments) |
-| 4 | **Merging needs the live path, not T17.** The slice gate requires every bound journey assertion on both engines against api.github.com. Almost every UI slice's assertions connect, start and save, so they need SL-WI-GEN-EXT-DATA, SL-T21 and often SL-T25. Under v4.1.4 they also need ODR-R10-25, because the frozen types cannot represent causa-data | `Ledger.fs` lines 391–410; `schedule-inputs/hidden-merge-dependencies.json`; `real-adapter-sketch` `listGap`, `contentGap` | Not removable by UI work. ODR-R10-25 (PR #119) |
-| 5 | **A cycle in the approved bindings.** SL-T16 (shell) and SL-T19 are bound to assertions that need slices depending on them, so as specified neither can merge | `tools/contract-first-bound.fsx` cycle detection; OWNER-DECISIONS CF-07 | CF-07 |
+| 4 | **Merging needs the live path, not T17.** The slice gate requires every bound journey assertion on both engines against api.github.com. A UI slice's assertions connect and start an investigation, and most also save and reload, so they need SL-WI-GEN-EXT-DATA, the start form, and often SL-T21, SL-T22 and SL-T25. Under v4.1.4 they also need ODR-R10-25, because the frozen types cannot represent causa-data | `Ledger.fs` lines 391–410; `schedule-inputs/hidden-merge-dependencies.json`; `real-adapter-sketch` `listGap`, `contentGap` | Not removable by UI work. ODR-R10-25 (PR #119) |
+| 5 | **Cycles in the approved bindings.** 22 merge-dependency edges form cycles: SL-T16 (shell) and SL-T19 are bound to assertions that need slices depending on them, and slices bound to the same assertion need each other (EXT-DATA and INV-START both carry J1-03). As specified, the run deadlocks | `tools/contract-first-bound.fsx` cycle detection; OWNER-DECISIONS CF-07 | CF-07 |
 
-Points 1–3 are what contract-first removes. Points 4–5 decide when the early-built screens can **integrate**. They are why, at 10-minute CI, full release does not come earlier in any variant (model: T+846 throughout). The serial integration queue, not UI building, is then the constraint.
+- Points 1–3 are what contract-first removes.
+- Points 4–5 decide when the early-built screens can **integrate**.
+- With them modelled, contract-first is earlier in every same-roles comparison, but the gain at realistic CI is bounded by the serial integration queue. At 10-min CI with two UI agents, full completion is T+1064 → T+864, still far beyond 420 minutes.
 
 ## Acceptance criteria
 
@@ -45,25 +47,30 @@ Points 1–3 are what contract-first removes. Points 4–5 decide when the early
 
 **Simpler for UI agents: yes.**
 - The contract is 12 small files of records and unions with no runtime and no framework.
-- Validation mirrors `Limen.Forms`. Bindings mirror Limen's `ViewValue`. Navigation is the catalog's routes.
+- Validation is close to `Limen.Forms` (differences in CF-12). Bindings mirror Limen's `ViewValue` exactly. Navigation is the catalog's routes.
 - A screen is a pure `AppView -> Bindings` function plus an HTML fragment.
 
 **Faster: only partly, and the model says exactly where.**
 
-| | Effect (model, successor slices) |
-|---|---|
-| First UI slice start | **T+189/253 → T+45** in every variant |
-| Full completion, 10-min CI | **no change** (T+846) for 2 or 3 UI agents; the integration queue decides |
-| Full completion, 0-min CI | T+693 → T+437 (2 UI agents) |
-| Data Editable, 0-min CI | T+693 → T+433 (2 UI) / T+343 (3 UI) |
-| Data Visible, 10-min CI | T+736 → T+591 |
-| Approved 37-slice plan, 0 / 10-min CI | T+595 → T+453 / T+690 → T+696 |
+| Same UI roles, current rule → contract-first (model, successor slices) | 0-min CI | 10-min CI |
+|---|---|---|
+| First non-shell UI slice start | T+189 → T+45 | T+252 → T+45 |
+| Full completion, frozen ownership | T+800 → T+787 | T+1042 → T+998 |
+| Full completion, 2 UI agents | T+840 → T+582 | T+1064 → T+864 |
+| Full completion, 3 UI agents | T+691 → T+475 | T+1008 → T+812 |
+| Data Editable, 2 / 3 UI agents | T+830 → T+486 / T+681 → T+382 | T+1064 → T+864 / T+1008 → T+812 |
+| Approved 37-slice plan, frozen ownership | T+598 → T+462 | T+770 → T+709 |
+
+Caveats:
+- The first version of these figures, before the independent review corrected the merge dependencies, showed the current rule *ahead* at 10-min CI (2 UI agents: T+791 against T+846). The conclusion is sensitive to those rules.
+- The model has no rework or per-slice overhead.
+- The optimization agent should reproduce these figures with its own model (SCHEDULE-INPUTS.md §6) before anyone relies on them.
 
 **Recommendation:**
 1. **Adopt the contract package and fixture backend** (CF-09) in the next successor package. It costs about 5 minutes at bootstrap (estimate), it is verified to compile in the real structure, and it makes early, parallel, reviewable UI work possible.
-2. **Fix CF-07 first.** The cyclic journey bindings stall a run under any plan.
-3. **Use two UI agents**, not three. Three pay off only with speculative verification (ODR-R10-22), and the optimization agent's model should confirm that with rework and overhead before anyone relies on it.
-4. **Do not expect contract-first alone to shorten release at realistic CI.** Its value is earlier capability (Data Visible and Data Editable) and reduced UI idle time. Turning that into earlier release needs ODR-R10-22.
+2. **Fix CF-07 first.** The cyclic journey bindings deadlock a run under any plan.
+3. **Split UI ownership** (FILE-OWNERSHIP.json). The split, not contract-first alone, carries most of the gain: with the frozen ownership, contract-first saves only 13–44 minutes. Use **two UI agents** by default. Use **three** if the optimization agent's model, with `--slice-overhead` and `--fail-every`, still shows its gain (−52 min at 10-min CI here), because unmodelled stale-target re-merges could consume it.
+4. **Do not expect any of this to fit 420 minutes at realistic CI.** The best modelled case is T+812. Converting built-but-unmerged UI work (about four times as many slice-minutes) into integrated work needs ODR-R10-22.
 5. **None of this delivers historical browsing under v4.1.4.** ODR-R10-25 remains the critical blocker.
 
 ## Integration handoff (concrete)

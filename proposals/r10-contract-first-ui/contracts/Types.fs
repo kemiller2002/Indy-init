@@ -87,7 +87,10 @@ type Availability =
     /// Not rendered at all.
     | NotOffered
 
-// ---- Validation (catalog validation blocks; the shape follows Limen.Forms' FieldSpec so it maps 1:1) -----------------
+// ---- Validation (catalog validation blocks) ----------------------------------------------------------------------
+// Close to Limen.Forms' FieldSpec, but NOT identical: Limen.Forms has Required: bool and no Pattern, counts runes, does
+// not trim and reports one error per field; this checks UTF-16 length, trims for MinLength and lists every failed rule.
+// Which semantics the product uses is CF-12.
 
 type Rule =
     | Required
