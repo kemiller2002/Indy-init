@@ -62,6 +62,16 @@ Observed by the practice builder. Persistence ran against the harness REST doubl
 - CI and owner, 0;
 - repair, about 2.5 min (compile errors in a test file, plus the defect above).
 
+## Real persistence: the v4.1.5 session's preview app (reported, not verified by the lead)
+- **What it is.** The preview app is `preview/causa/` on `main` (PR #126; record `cdcc52f`). It is an F# engine compiled to .NET 10 browser WebAssembly, using Limen 0.9.1 and Forma CSS. It is built on causa-storage v1.0.0 through `Causa.HistoricalCompatibility`.
+- **Real-write evidence** (as that session reports it): Actions run 42067851789 in `causa-testing-repo`, using that workflow's own `GITHUB_TOKEN` (contents: write on that repository only).
+  - 11/11 real-provider checks: create → byte-identical read-back → edit/save → fresh-session reload → stale-head conflict refused.
+  - 31/31 engine tests.
+  - Architecture checks A1–A7.
+  - 25/25 browser checks against the deployed GitHub Pages site.
+- **What this lead did not do.** This lead session cannot reach `causa-testing-repo` and has **not** verified that run independently. It is recorded here as the other session's evidence until someone with access checks it.
+- **Fence.** It is application code on `main`; see owner batch item 6.
+
 ## Governance timebox
 The directive allowed 45 min for the delegated-authority change.
 - **First version:** about 6 min (19:12–19:18).
