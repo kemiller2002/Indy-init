@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="GitHub.fs" />
+    <Compile Include="Writer.fs" />
+    <Compile Include="Model.fs" />
+    <Compile Include="Update.fs" />
+    <Compile Include="View.fs" />
+    <Compile Include="Dispatch.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../../../proposals/r10-historical-data-compatibility/src/Causa.HistoricalCompatibility.fsproj" />
+  </ItemGroup>
+</Project>

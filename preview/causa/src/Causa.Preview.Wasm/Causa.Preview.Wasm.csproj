@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk.WebAssembly">
+  <!-- Marshalling shim only (Limen host pattern): no application decision lives here. -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Nullable>enable</Nullable>
+    <RootNamespace>CausaPreviewWasm</RootNamespace>
+    <!-- The shim targets the browser only (SupportedPlatform below); CA1416 cannot see that for an Exe. -->
+    <NoWarn>$(NoWarn);CA1416</NoWarn>
+    <!-- FSharp.Core is not trim-safe (IL2040/IL2104); ship it untrimmed rather than hide trim warnings. -->
+    <PublishTrimmed>false</PublishTrimmed>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../Causa.Preview.Engine/Causa.Preview.Engine.fsproj" />
+    <SupportedPlatform Include="browser" />
+  </ItemGroup>
+</Project>
