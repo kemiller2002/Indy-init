@@ -57,7 +57,7 @@
         {
           "scope": "WorkspaceAddress",
           "symbol": "workingCopy",
-          "sha256": "1eea38885e6fbabb6e8e6f1c3c0be9bbdd939ae69ff909f6656dff036f5d9e21",
+          "sha256": "646e21c5a2fd91425eb2b5de85db8aa68e3d7f3bd27d3d0abafcb77977a6c56f",
           "rationale": "The only constructor of a working-copy address: the reserved workspaces/demo/causa-app-<run> namespace with a CONTRACT section 3 run id, refusing any workspace a catalog names, so no working copy can be a catalog workspace (independent review H1). Boundary code: the type is the requirement.",
           "requirements": [
             "EXT-DATA-006",

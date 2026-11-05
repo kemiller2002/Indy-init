@@ -37,7 +37,7 @@ module WorkspaceAddress =
     /// the catalog workspaces (demonstration-v1, historical-v1, ...), and any workspace in `catalogs` is refused as well.
     let workingCopy (catalogs: Workspace list) (run: string) : T option =
         let workspace = Workspace("workspaces/demo/causa-app-" + run)
-        if System.Text.RegularExpressions.Regex.IsMatch(run, "^[a-z0-9][a-z0-9-]{0,53}$") && not (List.contains workspace catalogs) then
+        if System.Text.RegularExpressions.Regex.IsMatch(run, "^[a-z0-9][a-z0-9-]{0,53}\\z") && not (List.contains workspace catalogs) then
             Some { Dir = workspace; Kind = WorkspaceRole.WorkingCopy }
         else
             None

@@ -51,3 +51,11 @@ The `07-IF41-VIEW.fs` contract text itself folds cleanly. Note also that `07` st
 | L1: proposals cited as if recorded | They are now cited as proposals and requests, never as records |
 | L2: the DA-R10-1 claim | Corrected: DA-R10-1 refuses every ODR/OD id |
 | Info: the start state of a new session | README "For builders" note |
+
+## Revision 4: the re-review (PASS at 730e2d6, with two new findings)
+
+| Finding | Resolution |
+|---|---|
+| N1: carried, owner-approved state-machine content could change with CI still green | A new CI step requires v4.1.5's `state-machine-amendments.json`, minus T-L03 and the ODR-V415-01 note, to equal v4.1.4's. ODR-V415-01 `applies` now pins the content digests of T-L03 and of the SM-SAVE note (canonical JSON without `approval`), and the step checks them. A copy with only T-S59's effects changed is refused. |
+| N2: the run regex accepted a trailing newline | It is now anchored with `\z` |
+| Info: what `approve` checks | FREEZE.md says it checks that the decisions are recorded, not which option was chosen |

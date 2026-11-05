@@ -189,7 +189,7 @@
     "EXT-DATA-013"
    ],
    "rationale": "The only constructor of a working-copy address: the reserved workspaces/demo/causa-app-<run> namespace with a CONTRACT section 3 run id, refusing any workspace a catalog names, so no working copy can be a catalog workspace (independent review H1). Boundary code: the type is the requirement.",
-   "sha256": "1eea38885e6fbabb6e8e6f1c3c0be9bbdd939ae69ff909f6656dff036f5d9e21"
+   "sha256": "646e21c5a2fd91425eb2b5de85db8aa68e3d7f3bd27d3d0abafcb77977a6c56f"
   }
  ],
  "sharedEntrypoints": {
@@ -570,7 +570,7 @@
   },
   {
    "file": "contracts/02-IF41-STORAGE.fs",
-   "sha256": "91f3d4878cc03f4dc311437008e033a452c7e97cd8cf2f4ce17f42b21bc15058",
+   "sha256": "8a3791ba50e681e6b2c3d90022655f755961a5492d311e3b63545c648f1817fd",
    "decision": "ODR-V415-01",
    "approval": "",
    "summary": "W1: Workspace, WorkspaceRole, WorkspaceAddress (private; a role is derived by WorkspaceAddress.catalog or .workingCopy, never asserted), InvestigationRef, Writable; PathOf, Verify and VerifiedInvestigation carry the workspace. C1: EncodeNew. E1: VerificationFailure.ReaderStage."

@@ -119,7 +119,7 @@
  type Decision =
      | Allowed of EventPayload list
 --- ../../requirements-compiled/v4.1.4/contracts/02-IF41-STORAGE.fs	2026-11-05 13:24:17.360443436 +0000
-+++ v415-contracts/02-IF41-STORAGE.fs	2026-11-05 19:41:12.189954515 +0000
++++ v415-contracts/02-IF41-STORAGE.fs	2026-11-05 19:51:40.243712052 +0000
 @@ -6,6 +6,61 @@
  type CommitOid = CommitOid of string
  type RepoPath = RepoPath of string
@@ -155,7 +155,7 @@
 +    /// the catalog workspaces (demonstration-v1, historical-v1, ...), and any workspace in `catalogs` is refused as well.
 +    let workingCopy (catalogs: Workspace list) (run: string) : T option =
 +        let workspace = Workspace("workspaces/demo/causa-app-" + run)
-+        if System.Text.RegularExpressions.Regex.IsMatch(run, "^[a-z0-9][a-z0-9-]{0,53}$") && not (List.contains workspace catalogs) then
++        if System.Text.RegularExpressions.Regex.IsMatch(run, "^[a-z0-9][a-z0-9-]{0,53}\\z") && not (List.contains workspace catalogs) then
 +            Some { Dir = workspace; Kind = WorkspaceRole.WorkingCopy }
 +        else
 +            None

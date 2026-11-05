@@ -560,13 +560,15 @@
       {
        "machine": "SM-LOAD",
        "id": "T-L03",
-       "replaces": true
+       "replaces": true,
+       "sha256": "208997158e7ad9dd8a1f5ef3eec7a499d193f89c23fb9adcd1987aafbd72a9b3"
       }
      ],
      "accepted": [
       {
        "machine": "SM-SAVE",
-       "decision": "ODR-V415-01"
+       "decision": "ODR-V415-01",
+       "sha256": "439b4635ef917c4537f1f8d04404404daf930220d3e57a867cff5b12e599812e"
       }
      ],
      "contracts": [
@@ -576,7 +578,7 @@
       },
       {
        "file": "contracts/02-IF41-STORAGE.fs",
-       "sha256": "91f3d4878cc03f4dc311437008e033a452c7e97cd8cf2f4ce17f42b21bc15058"
+       "sha256": "8a3791ba50e681e6b2c3d90022655f755961a5492d311e3b63545c648f1817fd"
       },
       {
        "file": "contracts/05-IF41-SAVE.fs",
@@ -586,7 +588,8 @@
        "file": "contracts/06-IF41-APP.fs",
        "sha256": "ee647592d3ff2749d8ac85ca48b87e19d093b62e62785c434a449afc72a46ed7"
       }
-     ]
+     ],
+     "contentDigest": "sha256 of the entry in analysis/state-machine-amendments.json without its 'approval' field, as JSON with sorted keys, separators (',', ':') and UTF-8 (ensure_ascii false); the approval is written in at FREEZE step 2"
     }
    }
   },
