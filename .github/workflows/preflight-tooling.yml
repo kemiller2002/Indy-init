@@ -358,9 +358,17 @@ jobs:
             jq -e '.stats.unexpected == 0 and .stats.expected > 0' "$RUNNER_TEMP/runs/$s/results.json" || { echo "::error::$s did not pass"; exit 1; }
           done
 
-  r10-adversarial:
+  # The adversarial cases run in three parallel shards (directive workstream C: the serial case step was ~16 of the
+  # job's ~21.5 minutes). r10-adversarial, the check name branch protection knows, needs the shards, runs with
+  # always() so a failed or cancelled shard can never leave it "skipped" (which would read as passing), refuses unless
+  # every shard succeeded, and proves the shards' union is the whole case list before its own steps run.
+  r10-adversarial-cases:
     runs-on: ubuntu-latest
     timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0, 1, 2]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
@@ -383,11 +391,64 @@ jobs:
           npm pack @echelon-foundry/design-system@0.13.0 > /dev/null && mkdir forma && tar -xzf echelon-foundry-design-system-0.13.0.tgz -C forma
           mkdir -p "$GITHUB_WORKSPACE/verification/harness/fixture-app/web/vendor/forma"
           cp forma/package/dist/all.css "$GITHUB_WORKSPACE/verification/harness/fixture-app/web/vendor/forma/all.css"
-      - name: Adversarial validation (18 cases)
+      - name: Adversarial validation (shard ${{ matrix.shard }} of 3)
         run: |
           git config --global user.name ci && git config --global user.email ci@example.invalid
           dotnet fsi tools/r10/adversarial.fsx -- --indy-init . --work "$RUNNER_TEMP/adv" --evidence "$RUNNER_TEMP/adv-evidence" \
-            --node-modules "$RUNNER_TEMP/pw/node_modules" --browsers true --dotnet-tests true
+            --node-modules "$RUNNER_TEMP/pw/node_modules" --browsers true --dotnet-tests true --shard ${{ matrix.shard }}/3
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: adversarial-shard-${{ matrix.shard }}
+          path: ${{ runner.temp }}/adv-evidence
+
+  r10-adversarial:
+    needs: r10-adversarial-cases
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Every adversarial shard succeeded
+        run: |
+          test "${{ needs.r10-adversarial-cases.result }}" = success || { echo "::error::adversarial shards: ${{ needs.r10-adversarial-cases.result }}"; exit 1; }
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: adversarial-shard-*
+          path: ${{ runner.temp }}/adv-shards
+      - name: The shards together ran the whole case list, and every case was validated
+        run: |
+          R="$RUNNER_TEMP/adv-shards"
+          ls "$R"/adversarial-shard-{0,1,2}/adversarial-results.json
+          jq -s -e '
+            (.[0].allCases | sort) as $all
+            | ([.[].allCases | sort] | unique | length == 1)
+            and ([.[].cases[].id] | sort) == $all
+            and ([.[].cases[] | select(.verdict != "VALIDATED" and .verdict != "NOT-RUN")] | length == 0)
+            and ($all | length) > 0' "$R"/adversarial-shard-*/adversarial-results.json \
+            || { echo "::error::the adversarial shards do not cover every case exactly once, or a case did not validate"; exit 1; }
+          jq -r '.cases[] | "\(.id) \(.verdict)"' "$R"/adversarial-shard-*/adversarial-results.json | sort
+          mkdir -p "$RUNNER_TEMP/adv-evidence" && cp -r "$R"/. "$RUNNER_TEMP/adv-evidence/"
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Pinned Conditor and the echelon-current workstation
+        run: |
+          dotnet fsi tools/r9/r9.fsx -- install-conditor --lock kickoff/rehearsal-009/toolchain.lock.json --dir "$RUNNER_TEMP/conditor"
+          dotnet fsi tools/r9/r9.fsx -- workstation --lock kickoff/rehearsal-009/toolchain.lock.json \
+            --conditor "$RUNNER_TEMP/conditor/conditor" --home "$RUNNER_TEMP/echelon" --target-id "indy-init-adv-${{ github.run_id }}"
+          echo "$RUNNER_TEMP/echelon/.local/bin" >> "$GITHUB_PATH"
+      - name: Playwright, Chromium and WebKit; Forma for the harness fixture
+        run: |
+          mkdir -p "$RUNNER_TEMP/pw" && cd "$RUNNER_TEMP/pw" && npm init -y > /dev/null
+          npm install --no-audit --no-fund @playwright/test@1.63.0 axe-core@4.14.0 > /dev/null
+          npx playwright install --with-deps chromium webkit
+          npm pack @echelon-foundry/design-system@0.13.0 > /dev/null && mkdir forma && tar -xzf echelon-foundry-design-system-0.13.0.tgz -C forma
+          mkdir -p "$GITHUB_WORKSPACE/verification/harness/fixture-app/web/vendor/forma"
+          cp forma/package/dist/all.css "$GITHUB_WORKSPACE/verification/harness/fixture-app/web/vendor/forma/all.css"
       - name: Governed journeys and the rendered design contract on the positive-control fixture, Chromium and WebKit
         run: |
           node verification/harness/github-double.mjs 4610 & node verification/harness/serve.mjs verification/harness/fixture-app/web 4620 & sleep 1
