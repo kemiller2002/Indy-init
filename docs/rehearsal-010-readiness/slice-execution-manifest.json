@@ -1,10 +1,10 @@
 {
   "schema": "indy-init.slice-execution-manifest/1",
-  "scopeSha256": "9d5a121e5f94917b0db3227ab135e09244214ee6ddb22d04a5d44bf4a2662d37",
+  "scopeSha256": "59bfef5a62a3ab43ef19c08b5915ffaf3d408bd55d8add874c5f1071e7cd087c",
   "derivedFrom": "the approved scope manifest; requirements are not rewritten",
   "coverage": {
-    "requirements": 199,
-    "inSlices": 199,
+    "requirements": 205,
+    "inSlices": 205,
     "fullRelease": 0,
     "excluded": 0,
     "unassigned": 0,
@@ -3041,6 +3041,63 @@
       "status": "not-started"
     },
     {
+      "id": "SL-WI-INV-LIST",
+      "workItem": "WI-INV-LIST",
+      "title": "Implement the CAT-CAUSA-INVESTIGATION requirements of screen LIST",
+      "requirements": [
+        "INV-039",
+        "INV-040",
+        "INV-041"
+      ],
+      "gateRequirements": [],
+      "obligations": [
+        "INV-039/V1/mapped",
+        "INV-039/V1/exists",
+        "INV-039/V2/visible",
+        "INV-039/V2/accessible",
+        "INV-039/V4/outcome",
+        "INV-039/V5/reload",
+        "INV-040/V1/mapped",
+        "INV-040/V1/exists",
+        "INV-040/V2/visible",
+        "INV-040/V2/accessible",
+        "INV-040/V3/activate",
+        "INV-040/V4/outcome",
+        "INV-041/V1/mapped",
+        "INV-041/V1/exists",
+        "INV-041/V2/visible",
+        "INV-041/V2/accessible"
+      ],
+      "mandatoryObligations": 16,
+      "dependsOn": [
+        "SL-T17"
+      ],
+      "implementationBoundary": "ui",
+      "acceptanceTests": [],
+      "producers": [
+        "DOKIMOS-REQUIREMENTS"
+      ],
+      "governedJourneys": [],
+      "governedAssertions": [],
+      "regressionTests": "every obligation integrated before this slice (computed at the gate from the ledger)",
+      "realProvider": false,
+      "formaAndAccessibility": true,
+      "mergeConditions": [
+        "every mandatory applicable obligation of the slice passes in the governed gate at the merged result",
+        "every dependency slice is integrated",
+        "every governed journey bound to the slice's requirements passes in Chromium and WebKit",
+        "every previously integrated obligation still passes (regression)",
+        "the application builds and starts at the merged result",
+        "required real-provider checks pass against api.github.com",
+        "the merged result is the candidate merged onto the current target branch",
+        "no mandatory security, accessibility or design-contract check fails",
+        "no test was removed, skipped or weakened"
+      ],
+      "estimateMinutes": null,
+      "estimateSource": "unestimated: generated work item (no DAG estimate)",
+      "status": "not-started"
+    },
+    {
       "id": "SL-WI-INV-START",
       "workItem": "WI-INV-START",
       "title": "Implement the CAT-CAUSA-INVESTIGATION requirements of screen START",
@@ -3186,7 +3243,10 @@
         "INV-035",
         "INV-036",
         "INV-037",
-        "INV-038"
+        "INV-038",
+        "INV-042",
+        "INV-043",
+        "INV-044"
       ],
       "gateRequirements": [],
       "obligations": [
@@ -3378,9 +3438,20 @@
         "INV-038/V4/validation",
         "INV-038/V4/rejects",
         "INV-038/V5/save",
-        "INV-038/V5/reload"
+        "INV-038/V5/reload",
+        "INV-042/V1/mapped",
+        "INV-042/V1/exists",
+        "INV-042/V2/visible",
+        "INV-042/V2/accessible",
+        "INV-043/V1/mapped",
+        "INV-043/V1/exists",
+        "INV-043/V2/visible",
+        "INV-043/V2/accessible",
+        "INV-044/V1/mapped",
+        "INV-044/V4/outcome",
+        "INV-044/V5/reload"
       ],
-      "mandatoryObligations": 159,
+      "mandatoryObligations": 170,
       "dependsOn": [
         "SL-T17"
       ],
