@@ -412,6 +412,8 @@ jobs:
           diff "$RUNNER_TEMP/a.json" "$RUNNER_TEMP/b.json" || { echo "::error::the committed schedule evidence is stale; regenerate it"; exit 1; }
       - name: Schedule model (docs/rehearsal-010-optimization) equals schedule.fsx under its defaults, and its invariants and controls hold
         run: dotnet fsi tools/r10/schedule-model-tests.fsx -- --indy-init .
+      - name: Change-impact selection (proposed Level 2; never the gate) holds its adversarial cases
+        run: dotnet fsi tools/r10/change-impact.fsx -- --indy-init . test
       - name: Proposed successor manifests regenerate from their scope manifests (review RVO-3-3; the committed files must not be stale or edited)
         run: |
           dotnet build tools/requirements-compiler/src -c Release -v q

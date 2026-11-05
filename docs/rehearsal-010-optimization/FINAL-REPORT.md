@@ -172,6 +172,22 @@ The read-only browser is **technically achievable, and blocked by governance**.
 
 Its wording findings RVO-5-1..7 were fixed.
 
+## Execution readiness (continuation)
+
+Full report: [execution-readiness/FINAL-REPORT.md](execution-readiness/FINAL-REPORT.md).
+
+**In summary:**
+- **Integration structure.** The frozen v4.1.4 package already provides independent module ownership, complete compile lists and one composition owner. It was demonstrated that UI code compiles against contracts and stubs with no domain engine, and that a GitHub adapter replaces a fixture without screen changes. Contract drift fails to compile only while `TreatWarningsAsErrors` stays on.
+- **Change-aware Level 1/2 selection.** Added as a builder tool with 15 adversarial cases, never part of the gate.
+- **Measurements.** The CI queue is 3–9 min; builds take seconds.
+- **The combined plan, E8** (needs ODR-R10-19..32 and the unbuilt §7 gate). At 10-min CI:
+  - M0 T+120 (data visible);
+  - M2 T+239 (authoritative list);
+  - M3 T+387 (create);
+  - full completion T+565.
+- **Without the speculative gate,** full completion is T+803.
+- **The new dominant bottleneck** is serialized verification, then the release tail T31–T34.
+
 ## Round-3 independent review
 
 Round 3 (on 1ead513) returned **FAIL** on one documentation finding. The code, data, tests and every reproduction held. All findings were fixed. Round 4 (03825ca) re-checked every fix independently, including the reviewer's own mutations, and returned **PASS**. Its three minor findings and one note were then fixed (ADVERSARIAL-REVIEW.md §B).

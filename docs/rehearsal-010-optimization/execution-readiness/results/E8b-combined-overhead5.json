@@ -1,0 +1,3612 @@
+{
+  "schema": "indy-init.schedule-model/1",
+  "note": "model results from estimates, not observations",
+  "lanes": "integration:integration,domain:domain,persistence:persistence,ui:ui,ui-2:ui-2,reviewer:reviewer",
+  "setupMinutes": 10,
+  "mergeMinutes": 3,
+  "windowMinutes": 420,
+  "priority": "milestones",
+  "queueDepth": 3,
+  "failEvery": 0,
+  "repairFraction": 0.25,
+  "scale": 1,
+  "minutesPerObligation": 1.5818181818181818,
+  "slices": [
+    {
+      "slice": "SL-M0",
+      "role": "ui",
+      "minutes": 60,
+      "source": "execution-dag",
+      "requirements": 1,
+      "mandatoryObligations": 0
+    },
+    {
+      "slice": "SL-T10",
+      "role": "integration",
+      "minutes": 34,
+      "source": "execution-dag",
+      "requirements": 5,
+      "mandatoryObligations": 15
+    },
+    {
+      "slice": "SL-T11",
+      "role": "integration",
+      "minutes": 20,
+      "source": "execution-dag",
+      "requirements": 4,
+      "mandatoryObligations": 10
+    },
+    {
+      "slice": "SL-T12",
+      "role": "domain",
+      "minutes": 20,
+      "source": "execution-dag",
+      "requirements": 4,
+      "mandatoryObligations": 15
+    },
+    {
+      "slice": "SL-T13",
+      "role": "domain",
+      "minutes": 50,
+      "source": "execution-dag",
+      "requirements": 1,
+      "mandatoryObligations": 2
+    },
+    {
+      "slice": "SL-T14",
+      "role": "domain",
+      "minutes": 25,
+      "source": "execution-dag",
+      "requirements": 0,
+      "mandatoryObligations": 0
+    },
+    {
+      "slice": "SL-T15",
+      "role": "domain",
+      "minutes": 25,
+      "source": "execution-dag",
+      "requirements": 1,
+      "mandatoryObligations": 2
+    },
+    {
+      "slice": "SL-T16",
+      "role": "ui",
+      "minutes": 40,
+      "source": "execution-dag",
+      "requirements": 5,
+      "mandatoryObligations": 34
+    },
+    {
+      "slice": "SL-T17",
+      "role": "integration",
+      "minutes": 25,
+      "source": "execution-dag",
+      "requirements": 0,
+      "mandatoryObligations": 0
+    },
+    {
+      "slice": "SL-T18",
+      "role": "persistence",
+      "minutes": 40,
+      "source": "execution-dag",
+      "requirements": 4,
+      "mandatoryObligations": 13
+    },
+    {
+      "slice": "SL-T19",
+      "role": "persistence",
+      "minutes": 65,
+      "source": "execution-dag",
+      "requirements": 22,
+      "mandatoryObligations": 115
+    },
+    {
+      "slice": "SL-T20",
+      "role": "persistence",
+      "minutes": 45,
+      "source": "execution-dag",
+      "requirements": 0,
+      "mandatoryObligations": 0
+    },
+    {
+      "slice": "SL-T21",
+      "role": "integration",
+      "minutes": 30,
+      "source": "execution-dag",
+      "requirements": 10,
+      "mandatoryObligations": 47
+    },
+    {
+      "slice": "SL-T22",
+      "role": "ui",
+      "minutes": 75,
+      "source": "execution-dag",
+      "requirements": 4,
+      "mandatoryObligations": 40
+    },
+    {
+      "slice": "SL-T23",
+      "role": "ui-2",
+      "minutes": 35,
+      "source": "execution-dag",
+      "requirements": 0,
+      "mandatoryObligations": 0
+    },
+    {
+      "slice": "SL-T24",
+      "role": "integration",
+      "minutes": 15,
+      "source": "execution-dag",
+      "requirements": 3,
+      "mandatoryObligations": 6
+    },
+    {
+      "slice": "SL-T25",
+      "role": "persistence",
+      "minutes": 25,
+      "source": "execution-dag",
+      "requirements": 1,
+      "mandatoryObligations": 3
+    },
+    {
+      "slice": "SL-T26",
+      "role": "ui-2",
+      "minutes": 30,
+      "source": "execution-dag",
+      "requirements": 0,
+      "mandatoryObligations": 0
+    },
+    {
+      "slice": "SL-T27",
+      "role": "domain",
+      "minutes": 35,
+      "source": "execution-dag",
+      "requirements": 0,
+      "mandatoryObligations": 0
+    },
+    {
+      "slice": "SL-T28",
+      "role": "ui-2",
+      "minutes": 50,
+      "source": "execution-dag",
+      "requirements": 0,
+      "mandatoryObligations": 0
+    },
+    {
+      "slice": "SL-T29",
+      "role": "ui-2",
+      "minutes": 25,
+      "source": "execution-dag",
+      "requirements": 3,
+      "mandatoryObligations": 14
+    },
+    {
+      "slice": "SL-T30",
+      "role": "reviewer",
+      "minutes": 25,
+      "source": "execution-dag",
+      "requirements": 1,
+      "mandatoryObligations": 2
+    },
+    {
+      "slice": "SL-T31",
+      "role": "integration",
+      "minutes": 50,
+      "source": "execution-dag",
+      "requirements": 11,
+      "mandatoryObligations": 46
+    },
+    {
+      "slice": "SL-T32",
+      "role": "integration",
+      "minutes": 25,
+      "source": "execution-dag",
+      "requirements": 0,
+      "mandatoryObligations": 0
+    },
+    {
+      "slice": "SL-T33",
+      "role": "reviewer",
+      "minutes": 25,
+      "source": "execution-dag",
+      "requirements": 1,
+      "mandatoryObligations": 2
+    },
+    {
+      "slice": "SL-T34",
+      "role": "integration",
+      "minutes": 25,
+      "source": "execution-dag",
+      "requirements": 3,
+      "mandatoryObligations": 14
+    },
+    {
+      "slice": "SL-T35",
+      "role": "reviewer",
+      "minutes": 20,
+      "source": "execution-dag",
+      "requirements": 0,
+      "mandatoryObligations": 0
+    },
+    {
+      "slice": "SL-T36",
+      "role": "reviewer",
+      "minutes": 20,
+      "source": "execution-dag",
+      "requirements": 1,
+      "mandatoryObligations": 5
+    },
+    {
+      "slice": "SL-WI-GEN-AR",
+      "role": "integration",
+      "minutes": 20,
+      "source": "derived",
+      "requirements": 3,
+      "mandatoryObligations": 11
+    },
+    {
+      "slice": "SL-WI-GEN-EXT-DATA",
+      "role": "integration",
+      "minutes": 34,
+      "source": "derived",
+      "requirements": 9,
+      "mandatoryObligations": 21
+    },
+    {
+      "slice": "SL-WI-GEN-PF-BOUNDARY",
+      "role": "integration",
+      "minutes": 24,
+      "source": "derived",
+      "requirements": 5,
+      "mandatoryObligations": 14
+    },
+    {
+      "slice": "SL-WI-GEN-PF-FIXTURES",
+      "role": "integration",
+      "minutes": 18,
+      "source": "derived",
+      "requirements": 4,
+      "mandatoryObligations": 9
+    },
+    {
+      "slice": "SL-WI-GEN-PF-LEVELS",
+      "role": "integration",
+      "minutes": 28,
+      "source": "derived",
+      "requirements": 6,
+      "mandatoryObligations": 17
+    },
+    {
+      "slice": "SL-WI-GEN-PF-SECURITY",
+      "role": "integration",
+      "minutes": 12,
+      "source": "derived",
+      "requirements": 1,
+      "mandatoryObligations": 5
+    },
+    {
+      "slice": "SL-WI-GEN-RECORDS",
+      "role": "reviewer",
+      "minutes": 62,
+      "source": "derived",
+      "requirements": 16,
+      "mandatoryObligations": 42
+    },
+    {
+      "slice": "SL-WI-GEN-UI-LANDING",
+      "role": "ui",
+      "minutes": 35,
+      "source": "derived",
+      "requirements": 5,
+      "mandatoryObligations": 22
+    },
+    {
+      "slice": "SL-WI-GEN-UI-INSPECT",
+      "role": "ui",
+      "minutes": 23,
+      "source": "derived",
+      "requirements": 3,
+      "mandatoryObligations": 13
+    },
+    {
+      "slice": "SL-WI-GEN-UI-STATES",
+      "role": "ui-2",
+      "minutes": 18,
+      "source": "derived",
+      "requirements": 2,
+      "mandatoryObligations": 9
+    },
+    {
+      "slice": "SL-WI-GEN-UI-LANGUAGE",
+      "role": "ui-2",
+      "minutes": 38,
+      "source": "derived",
+      "requirements": 6,
+      "mandatoryObligations": 24
+    },
+    {
+      "slice": "SL-WI-GEN-UI-VERIFY",
+      "role": "ui",
+      "minutes": 28,
+      "source": "derived",
+      "requirements": 5,
+      "mandatoryObligations": 17
+    },
+    {
+      "slice": "SL-WI-GEN-VER",
+      "role": "integration",
+      "minutes": 8,
+      "source": "derived",
+      "requirements": 1,
+      "mandatoryObligations": 2
+    },
+    {
+      "slice": "SL-WI-GEN-WDL",
+      "role": "ui-2",
+      "minutes": 38,
+      "source": "derived",
+      "requirements": 12,
+      "mandatoryObligations": 24
+    },
+    {
+      "slice": "SL-WI-INV-LIST",
+      "role": "ui-2",
+      "minutes": 27,
+      "source": "derived",
+      "requirements": 3,
+      "mandatoryObligations": 16
+    },
+    {
+      "slice": "SL-WI-INV-START-FORM",
+      "role": "ui",
+      "minutes": 35,
+      "source": "derived",
+      "requirements": 6,
+      "mandatoryObligations": 22
+    },
+    {
+      "slice": "SL-WI-INV-START-RULES",
+      "role": "ui",
+      "minutes": 18,
+      "source": "derived",
+      "requirements": 3,
+      "mandatoryObligations": 9
+    },
+    {
+      "slice": "SL-WI-INV-START-ACTIONS",
+      "role": "ui",
+      "minutes": 22,
+      "source": "derived",
+      "requirements": 2,
+      "mandatoryObligations": 12
+    },
+    {
+      "slice": "SL-WI-INV-WORKSPACE-FRAME",
+      "role": "ui",
+      "minutes": 27,
+      "source": "derived",
+      "requirements": 4,
+      "mandatoryObligations": 16
+    },
+    {
+      "slice": "SL-WI-INV-WORKSPACE-DETAILS",
+      "role": "ui",
+      "minutes": 32,
+      "source": "derived",
+      "requirements": 3,
+      "mandatoryObligations": 20
+    },
+    {
+      "slice": "SL-WI-INV-WORKSPACE-HYPOTHESES",
+      "role": "ui",
+      "minutes": 42,
+      "source": "derived",
+      "requirements": 4,
+      "mandatoryObligations": 27
+    },
+    {
+      "slice": "SL-WI-INV-WORKSPACE-EVIDENCE",
+      "role": "ui-2",
+      "minutes": 55,
+      "source": "derived",
+      "requirements": 8,
+      "mandatoryObligations": 37
+    },
+    {
+      "slice": "SL-WI-INV-WORKSPACE-LINKS",
+      "role": "ui-2",
+      "minutes": 47,
+      "source": "derived",
+      "requirements": 4,
+      "mandatoryObligations": 31
+    },
+    {
+      "slice": "SL-WI-INV-WORKSPACE-CONCLUSION",
+      "role": "ui-2",
+      "minutes": 30,
+      "source": "derived",
+      "requirements": 2,
+      "mandatoryObligations": 18
+    },
+    {
+      "slice": "SL-WI-INV-WORKSPACE-SAVE",
+      "role": "ui",
+      "minutes": 24,
+      "source": "derived",
+      "requirements": 3,
+      "mandatoryObligations": 14
+    },
+    {
+      "slice": "SL-WI-INV-WORKSPACE-ROUNDTRIP",
+      "role": "ui",
+      "minutes": 15,
+      "source": "derived",
+      "requirements": 2,
+      "mandatoryObligations": 7
+    }
+  ],
+  "scenarios": [
+    {
+      "ciMinutes": 0,
+      "allIntegratedAt": 646,
+      "fits": false,
+      "slicesByDeadline": 41,
+      "requirementsByDeadline": 161,
+      "mandatoryObligationsByDeadline": 624,
+      "criticalPathMinutes": 424,
+      "criticalSlices": [
+        "SL-T10",
+        "SL-T14",
+        "SL-T13",
+        "SL-T17",
+        "SL-T22",
+        "SL-T28",
+        "SL-T31",
+        "SL-T32",
+        "SL-T33",
+        "SL-T34"
+      ],
+      "implementationMinutes": 1719,
+      "repairMinutes": 0,
+      "verificationMinutes": 0,
+      "verificationRuns": 54,
+      "mergeMinutes": 162,
+      "queueWaitMinutes": 0,
+      "laneIdleMinutesInWindow": 1097,
+      "milestones": [
+        {
+          "id": "M0",
+          "name": "Data visible: read-only browser of the stored catalog (no replay, no editing)",
+          "deliveredAt": 110,
+          "byDeadline": true
+        },
+        {
+          "id": "M1",
+          "name": "Connect to the data repository with the real GitHub provider",
+          "deliveredAt": 254,
+          "byDeadline": true
+        },
+        {
+          "id": "M2",
+          "name": "List and open historical investigations read-only",
+          "deliveredAt": 237,
+          "byDeadline": true
+        },
+        {
+          "id": "M3",
+          "name": "Create an investigation",
+          "deliveredAt": 410,
+          "byDeadline": true
+        },
+        {
+          "id": "M4",
+          "name": "Edit and persist",
+          "deliveredAt": 502,
+          "byDeadline": false
+        },
+        {
+          "id": "M5",
+          "name": "Analysis",
+          "deliveredAt": 487,
+          "byDeadline": false
+        },
+        {
+          "id": "M6",
+          "name": "Full scope: every approved requirement",
+          "deliveredAt": 646,
+          "byDeadline": false
+        }
+      ],
+      "usableMilestonesAt": {
+        "T\u002B120": 1,
+        "T\u002B240": 1,
+        "T\u002B360": 3,
+        "T\u002B420": 4
+      },
+      "cpm": [
+        {
+          "slice": "SL-T10",
+          "earliestStart": 10,
+          "earliestFinish": 47,
+          "latestStart": 10,
+          "slack": 0,
+          "critical": true
+        },
+        {
+          "slice": "SL-M0",
+          "earliestStart": 47,
+          "earliestFinish": 110,
+          "latestStart": 361,
+          "slack": 314,
+          "critical": false
+        },
+        {
+          "slice": "SL-T11",
+          "earliestStart": 47,
+          "earliestFinish": 70,
+          "latestStart": 62,
+          "slack": 15,
+          "critical": false
+        },
+        {
+          "slice": "SL-T12",
+          "earliestStart": 47,
+          "earliestFinish": 70,
+          "latestStart": 52,
+          "slack": 5,
+          "critical": false
+        },
+        {
+          "slice": "SL-T14",
+          "earliestStart": 47,
+          "earliestFinish": 75,
+          "latestStart": 47,
+          "slack": 0,
+          "critical": true
+        },
+        {
+          "slice": "SL-T18",
+          "earliestStart": 47,
+          "earliestFinish": 90,
+          "latestStart": 67,
+          "slack": 20,
+          "critical": false
+        },
+        {
+          "slice": "SL-T13",
+          "earliestStart": 75,
+          "earliestFinish": 128,
+          "latestStart": 75,
+          "slack": 0,
+          "critical": true
+        },
+        {
+          "slice": "SL-T16",
+          "earliestStart": 70,
+          "earliestFinish": 113,
+          "latestStart": 85,
+          "slack": 15,
+          "critical": false
+        },
+        {
+          "slice": "SL-T19",
+          "earliestStart": 90,
+          "earliestFinish": 158,
+          "latestStart": 110,
+          "slack": 20,
+          "critical": false
+        },
+        {
+          "slice": "SL-T24",
+          "earliestStart": 70,
+          "earliestFinish": 88,
+          "latestStart": 231,
+          "slack": 161,
+          "critical": false
+        },
+        {
+          "slice": "SL-T35",
+          "earliestStart": 75,
+          "earliestFinish": 98,
+          "latestStart": 401,
+          "slack": 326,
+          "critical": false
+        },
+        {
+          "slice": "SL-T15",
+          "earliestStart": 128,
+          "earliestFinish": 156,
+          "latestStart": 203,
+          "slack": 75,
+          "critical": false
+        },
+        {
+          "slice": "SL-T17",
+          "earliestStart": 128,
+          "earliestFinish": 156,
+          "latestStart": 128,
+          "slack": 0,
+          "critical": true
+        },
+        {
+          "slice": "SL-T20",
+          "earliestStart": 158,
+          "earliestFinish": 206,
+          "latestStart": 178,
+          "slack": 20,
+          "critical": false
+        },
+        {
+          "slice": "SL-T27",
+          "earliestStart": 128,
+          "earliestFinish": 166,
+          "latestStart": 249,
+          "slack": 121,
+          "critical": false
+        },
+        {
+          "slice": "SL-WI-GEN-UI-LANDING",
+          "earliestStart": 113,
+          "earliestFinish": 151,
+          "latestStart": 314,
+          "slack": 201,
+          "critical": false
+        },
+        {
+          "slice": "SL-WI-GEN-WDL",
+          "earliestStart": 113,
+          "earliestFinish": 154,
+          "latestStart": 383,
+          "slack": 270,
+          "critical": false
+        },
+        {
+          "slice": "SL-WI-INV-LIST",
+          "earliestStart": 113,
+          "earliestFinish": 143,
+          "latestStart": 394,
+          "slack": 281,
+          "critical": false
+        },
+        {
+          "slice": "SL-WI-INV-START-FORM",
+          "earliestStart": 113,
+          "earliestFinish": 151,
+          "latestStart": 340,
+          "slack": 227,
+          "critical": false
+        },
+        {
+          "slice": "SL-WI-INV-WORKSPACE-FRAME",
+          "earliestStart": 113,
+          "earliestFinish": 143,
+          "latestStart": 268,
+          "slack": 155,
+          "critical": false
+        },
+        {
+          "slice": "SL-T21",
+          "earliestStart": 206,
+          "earliestFinish": 239,
+          "latestStart": 226,
+          "slack": 20,
+          "critical": false
+        },
+        {
+          "slice": "SL-T22",
+          "earliestStart": 156,
+          "earliestFinish": 234,
+          "latestStart": 156,
+          "slack": 0,
+          "critical": true
+        },
+        {
+          "slice": "SL-T23",
+          "earliestStart": 156,
+          "earliestFinish": 194,
+          "latestStart": 249,
+          "slack": 93,
+          "critical": false
+        },
+        {
+          "slice": "SL-T25",
+          "earliestStart": 206,
+          "earliestFinish": 234,
+          "latestStart": 231,
+          "slack": 25,
+          "critical": false
+        },
+        {
+          "slice": "SL-T26",
+          "earliestStart": 156,
+          "earliestFinish": 189,
+          "latestStart": 254,
+          "slack": 98,
+          "critical": false
+        },
+        {
+          "slice": "SL-T29",
+          "earliestStart": 156,
+          "earliestFinish": 184,
+          "latestStart": 259,
+          "slack": 103,
+          "critical": false
+        },
+        {
+          "slice": "SL-WI-GEN-AR",
+          "earliestStart": 156,
+          "earliestFinish": 179,
+          "latestStart": 401,
+          "slack": 245,
+          "critical": false
+        },
+        {
+          "slice": "SL-WI-GEN-EXT-DATA",
+          "earliestStart": 156,
+          "earliestFinish": 193,
+          "latestStart": 387,
+          "slack": 231,
+          "critical": false
+        },
+        {
+          "slice": "SL-WI-GEN-PF-BOUNDARY",
+          "earliestStart": 156,
+          "earliestFinish": 183,
+          "latestStart": 345,
+          "slack": 189,
+          "critical": false
+        },
+        {
+          "slice": "SL-WI-GEN-RECORDS",
+          "earliestStart": 156,
+          "earliestFinish": 221,
+          "latestStart": 359,
+          "slack": 203,
+          "critical": false
+        },
+        {
+          "slice": "SL-WI-GEN-UI-INSPECT",
+          "earliestStart": 151,
+          "earliestFinish": 177,
+          "latestStart": 367,
+          "slack": 216,
+          "critical": false
+        },
+        {
+          "slice": "SL-WI-GEN-UI-STATES",
+          "earliestStart": 151,
+          "earliestFinish": 172,
+          "latestStart": 372,
+          "slack": 221,
+          "critical": false
+        },
+        {
+          "slice": "SL-WI-GEN-UI-LANGUAGE",
+          "earliestStart": 151,
+          "earliestFinish": 192,
+          "latestStart": 352,
+          "slack": 201,
+          "critical": false
+        },
+        {
+          "slice": "SL-WI-GEN-VER",
+          "earliestStart": 156,
+          "earliestFinish": 167,
+          "latestStart": 413,
+          "slack": 257,
+          "critical": false
+        },
+        {
+          "slice": "SL-WI-INV-START-RULES",
+          "earliestStart": 151,
+          "earliestFinish": 172,
+          "latestStart": 378,
+          "slack": 227,
+          "critical": false
+        },
+        {
+          "slice": "SL-WI-INV-WORKSPACE-HYPOTHESES",
+          "earliestStart": 143,
+          "earliestFinish": 188,
+          "latestStart": 311,
+          "slack": 168,
+          "critical": false
+        },
+        {
+          "slice": "SL-WI-INV-WORKSPACE-EVIDENCE",
+          "earliestStart": 143,
+          "earliestFinish": 201,
+          "latestStart": 298,
+          "slack": 155,
+          "critical": false
+        },
+        {
+          "slice": "SL-WI-INV-WORKSPACE-SAVE",
+          "earliestStart": 143,
+          "earliestFinish": 170,
+          "latestStart": 379,
+          "slack": 236,
+          "critical": false
+        },
+        {
+          "slice": "SL-T28",
+          "earliestStart": 234,
+          "earliestFinish": 287,
+          "latestStart": 234,
+          "slack": 0,
+          "critical": true
+        },
+        {
+          "slice": "SL-T30",
+          "earliestStart": 239,
+          "earliestFinish": 267,
+          "latestStart": 259,
+          "slack": 20,
+          "critical": false
+        },
+        {
+          "slice": "SL-T36",
+          "earliestStart": 239,
+          "earliestFinish": 262,
+          "latestStart": 401,
+          "slack": 162,
+          "critical": false
+        },
+        {
+          "slice": "SL-WI-GEN-PF-FIXTURES",
+          "earliestStart": 183,
+          "earliestFinish": 204,
+          "latestStart": 372,
+          "slack": 189,
+          "critical": false
+        },
+        {
+          "slice": "SL-WI-GEN-PF-SECURITY",
+          "earliestStart": 183,
+          "earliestFinish": 198,
+          "latestStart": 409,
+          "slack": 226,
+          "critical": false
+        },
+        {
+          "slice": "SL-WI-GEN-UI-VERIFY",
+          "earliestStart": 192,
+          "earliestFinish": 223,
+          "latestStart": 393,
+          "slack": 201,
+          "critical": false
+        },
+        {
+          "slice": "SL-WI-INV-START-ACTIONS",
+          "earliestStart": 172,
+          "earliestFinish": 197,
+          "latestStart": 399,
+          "slack": 227,
+          "critical": false
+        },
+        {
+          "slice": "SL-WI-INV-WORKSPACE-DETAILS",
+          "earliestStart": 201,
+          "earliestFinish": 236,
+          "latestStart": 371,
+          "slack": 170,
+          "critical": false
+        },
+        {
+          "slice": "SL-WI-INV-WORKSPACE-LINKS",
+          "earliestStart": 201,
+          "earliestFinish": 251,
+          "latestStart": 356,
+          "slack": 155,
+          "critical": false
+        },
+        {
+          "slice": "SL-WI-INV-WORKSPACE-CONCLUSION",
+          "earliestStart": 188,
+          "earliestFinish": 221,
+          "latestStart": 373,
+          "slack": 185,
+          "critical": false
+        },
+        {
+          "slice": "SL-T31",
+          "earliestStart": 287,
+          "earliestFinish": 340,
+          "latestStart": 287,
+          "slack": 0,
+          "critical": true
+        },
+        {
+          "slice": "SL-WI-GEN-PF-LEVELS",
+          "earliestStart": 204,
+          "earliestFinish": 235,
+          "latestStart": 393,
+          "slack": 189,
+          "critical": false
+        },
+        {
+          "slice": "SL-WI-INV-WORKSPACE-ROUNDTRIP",
+          "earliestStart": 251,
+          "earliestFinish": 269,
+          "latestStart": 406,
+          "slack": 155,
+          "critical": false
+        },
+        {
+          "slice": "SL-T32",
+          "earliestStart": 340,
+          "earliestFinish": 368,
+          "latestStart": 340,
+          "slack": 0,
+          "critical": true
+        },
+        {
+          "slice": "SL-T33",
+          "earliestStart": 368,
+          "earliestFinish": 396,
+          "latestStart": 368,
+          "slack": 0,
+          "critical": true
+        },
+        {
+          "slice": "SL-T34",
+          "earliestStart": 396,
+          "earliestFinish": 424,
+          "latestStart": 396,
+          "slack": 0,
+          "critical": true
+        }
+      ],
+      "timeline": [
+        {
+          "slice": "SL-M0",
+          "lane": "ui",
+          "start": 47,
+          "implemented": 107,
+          "firstVerification": 107,
+          "integrated": 110,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-T10",
+          "lane": "integration",
+          "start": 10,
+          "implemented": 44,
+          "firstVerification": 44,
+          "integrated": 47,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-T11",
+          "lane": "integration",
+          "start": 47,
+          "implemented": 67,
+          "firstVerification": 67,
+          "integrated": 70,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-T12",
+          "lane": "domain",
+          "start": 72,
+          "implemented": 92,
+          "firstVerification": 92,
+          "integrated": 95,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-T13",
+          "lane": "domain",
+          "start": 95,
+          "implemented": 145,
+          "firstVerification": 145,
+          "integrated": 148,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-T14",
+          "lane": "domain",
+          "start": 47,
+          "implemented": 72,
+          "firstVerification": 72,
+          "integrated": 75,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-T15",
+          "lane": "domain",
+          "start": 148,
+          "implemented": 173,
+          "firstVerification": 173,
+          "integrated": 176,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-T16",
+          "lane": "ui",
+          "start": 107,
+          "implemented": 147,
+          "firstVerification": 147,
+          "integrated": 151,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-T17",
+          "lane": "integration",
+          "start": 151,
+          "implemented": 176,
+          "firstVerification": 176,
+          "integrated": 179,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-T18",
+          "lane": "persistence",
+          "start": 47,
+          "implemented": 87,
+          "firstVerification": 87,
+          "integrated": 91,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-T19",
+          "lane": "persistence",
+          "start": 95,
+          "implemented": 160,
+          "firstVerification": 160,
+          "integrated": 163,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-T20",
+          "lane": "persistence",
+          "start": 163,
+          "implemented": 208,
+          "firstVerification": 208,
+          "integrated": 214,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-T21",
+          "lane": "integration",
+          "start": 249,
+          "implemented": 279,
+          "firstVerification": 279,
+          "integrated": 282,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-T22",
+          "lane": "ui",
+          "start": 248,
+          "implemented": 323,
+          "firstVerification": 323,
+          "integrated": 326,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-T23",
+          "lane": "ui-2",
+          "start": 289,
+          "implemented": 324,
+          "firstVerification": 324,
+          "integrated": 329,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-T24",
+          "lane": "integration",
+          "start": 70,
+          "implemented": 85,
+          "firstVerification": 85,
+          "integrated": 88,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-T25",
+          "lane": "persistence",
+          "start": 214,
+          "implemented": 239,
+          "firstVerification": 239,
+          "integrated": 243,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-T26",
+          "lane": "ui-2",
+          "start": 324,
+          "implemented": 354,
+          "firstVerification": 354,
+          "integrated": 360,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-T27",
+          "lane": "domain",
+          "start": 173,
+          "implemented": 208,
+          "firstVerification": 208,
+          "integrated": 211,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-T28",
+          "lane": "ui-2",
+          "start": 354,
+          "implemented": 404,
+          "firstVerification": 404,
+          "integrated": 407,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-T29",
+          "lane": "ui-2",
+          "start": 481,
+          "implemented": 506,
+          "firstVerification": 506,
+          "integrated": 509,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-T30",
+          "lane": "reviewer",
+          "start": 326,
+          "implemented": 351,
+          "firstVerification": 351,
+          "integrated": 354,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-T31",
+          "lane": "integration",
+          "start": 509,
+          "implemented": 559,
+          "firstVerification": 559,
+          "integrated": 562,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-T32",
+          "lane": "integration",
+          "start": 562,
+          "implemented": 587,
+          "firstVerification": 587,
+          "integrated": 590,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-T33",
+          "lane": "reviewer",
+          "start": 590,
+          "implemented": 615,
+          "firstVerification": 615,
+          "integrated": 618,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-T34",
+          "lane": "integration",
+          "start": 618,
+          "implemented": 643,
+          "firstVerification": 643,
+          "integrated": 646,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-T35",
+          "lane": "reviewer",
+          "start": 95,
+          "implemented": 115,
+          "firstVerification": 115,
+          "integrated": 118,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-T36",
+          "lane": "reviewer",
+          "start": 282,
+          "implemented": 302,
+          "firstVerification": 302,
+          "integrated": 305,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-WI-GEN-AR",
+          "lane": "integration",
+          "start": 297,
+          "implemented": 317,
+          "firstVerification": 317,
+          "integrated": 320,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-WI-GEN-EXT-DATA",
+          "lane": "integration",
+          "start": 203,
+          "implemented": 237,
+          "firstVerification": 237,
+          "integrated": 240,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-WI-GEN-PF-BOUNDARY",
+          "lane": "integration",
+          "start": 179,
+          "implemented": 203,
+          "firstVerification": 203,
+          "integrated": 206,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-WI-GEN-PF-FIXTURES",
+          "lane": "integration",
+          "start": 279,
+          "implemented": 297,
+          "firstVerification": 297,
+          "integrated": 300,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-WI-GEN-PF-LEVELS",
+          "lane": "integration",
+          "start": 317,
+          "implemented": 345,
+          "firstVerification": 345,
+          "integrated": 348,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-WI-GEN-PF-SECURITY",
+          "lane": "integration",
+          "start": 237,
+          "implemented": 249,
+          "firstVerification": 249,
+          "integrated": 254,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-WI-GEN-RECORDS",
+          "lane": "reviewer",
+          "start": 179,
+          "implemented": 241,
+          "firstVerification": 241,
+          "integrated": 246,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-WI-GEN-UI-LANDING",
+          "lane": "ui",
+          "start": 151,
+          "implemented": 186,
+          "firstVerification": 186,
+          "integrated": 189,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-WI-GEN-UI-INSPECT",
+          "lane": "ui",
+          "start": 461,
+          "implemented": 484,
+          "firstVerification": 484,
+          "integrated": 487,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-WI-GEN-UI-STATES",
+          "lane": "ui-2",
+          "start": 216,
+          "implemented": 234,
+          "firstVerification": 234,
+          "integrated": 237,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-WI-GEN-UI-LANGUAGE",
+          "lane": "ui-2",
+          "start": 506,
+          "implemented": 544,
+          "firstVerification": 544,
+          "integrated": 547,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-WI-GEN-UI-VERIFY",
+          "lane": "ui",
+          "start": 547,
+          "implemented": 575,
+          "firstVerification": 575,
+          "integrated": 578,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-WI-GEN-VER",
+          "lane": "integration",
+          "start": 345,
+          "implemented": 353,
+          "firstVerification": 353,
+          "integrated": 357,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-WI-GEN-WDL",
+          "lane": "ui-2",
+          "start": 178,
+          "implemented": 216,
+          "firstVerification": 216,
+          "integrated": 220,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-WI-INV-LIST",
+          "lane": "ui-2",
+          "start": 151,
+          "implemented": 178,
+          "firstVerification": 178,
+          "integrated": 182,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-WI-INV-START-FORM",
+          "lane": "ui",
+          "start": 213,
+          "implemented": 248,
+          "firstVerification": 248,
+          "integrated": 251,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-WI-INV-START-RULES",
+          "lane": "ui",
+          "start": 323,
+          "implemented": 341,
+          "firstVerification": 341,
+          "integrated": 344,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-WI-INV-START-ACTIONS",
+          "lane": "ui",
+          "start": 383,
+          "implemented": 405,
+          "firstVerification": 405,
+          "integrated": 410,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-WI-INV-WORKSPACE-FRAME",
+          "lane": "ui",
+          "start": 186,
+          "implemented": 213,
+          "firstVerification": 213,
+          "integrated": 217,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-WI-INV-WORKSPACE-DETAILS",
+          "lane": "ui",
+          "start": 405,
+          "implemented": 437,
+          "firstVerification": 437,
+          "integrated": 440,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-WI-INV-WORKSPACE-HYPOTHESES",
+          "lane": "ui",
+          "start": 341,
+          "implemented": 383,
+          "firstVerification": 383,
+          "integrated": 386,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-WI-INV-WORKSPACE-EVIDENCE",
+          "lane": "ui-2",
+          "start": 234,
+          "implemented": 289,
+          "firstVerification": 289,
+          "integrated": 292,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-WI-INV-WORKSPACE-LINKS",
+          "lane": "ui-2",
+          "start": 404,
+          "implemented": 451,
+          "firstVerification": 451,
+          "integrated": 454,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-WI-INV-WORKSPACE-CONCLUSION",
+          "lane": "ui-2",
+          "start": 451,
+          "implemented": 481,
+          "firstVerification": 481,
+          "integrated": 484,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-WI-INV-WORKSPACE-SAVE",
+          "lane": "ui",
+          "start": 437,
+          "implemented": 461,
+          "firstVerification": 461,
+          "integrated": 464,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-WI-INV-WORKSPACE-ROUNDTRIP",
+          "lane": "ui",
+          "start": 484,
+          "implemented": 499,
+          "firstVerification": 499,
+          "integrated": 502,
+          "runs": 1,
+          "repairs": 0
+        }
+      ]
+    },
+    {
+      "ciMinutes": 5,
+      "allIntegratedAt": 681,
+      "fits": false,
+      "slicesByDeadline": 39,
+      "requirementsByDeadline": 159,
+      "mandatoryObligationsByDeadline": 612,
+      "criticalPathMinutes": 474,
+      "criticalSlices": [
+        "SL-T10",
+        "SL-T14",
+        "SL-T13",
+        "SL-T17",
+        "SL-T22",
+        "SL-T28",
+        "SL-T31",
+        "SL-T32",
+        "SL-T33",
+        "SL-T34"
+      ],
+      "implementationMinutes": 1719,
+      "repairMinutes": 0,
+      "verificationMinutes": 270,
+      "verificationRuns": 54,
+      "mergeMinutes": 162,
+      "queueWaitMinutes": 15,
+      "laneIdleMinutesInWindow": 1115,
+      "milestones": [
+        {
+          "id": "M0",
+          "name": "Data visible: read-only browser of the stored catalog (no replay, no editing)",
+          "deliveredAt": 120,
+          "byDeadline": true
+        },
+        {
+          "id": "M1",
+          "name": "Connect to the data repository with the real GitHub provider",
+          "deliveredAt": 279,
+          "byDeadline": true
+        },
+        {
+          "id": "M2",
+          "name": "List and open historical investigations read-only",
+          "deliveredAt": 251,
+          "byDeadline": true
+        },
+        {
+          "id": "M3",
+          "name": "Create an investigation",
+          "deliveredAt": 424,
+          "byDeadline": false
+        },
+        {
+          "id": "M4",
+          "name": "Edit and persist",
+          "deliveredAt": 521,
+          "byDeadline": false
+        },
+        {
+          "id": "M5",
+          "name": "Analysis",
+          "deliveredAt": 501,
+          "byDeadline": false
+        },
+        {
+          "id": "M6",
+          "name": "Full scope: every approved requirement",
+          "deliveredAt": 681,
+          "byDeadline": false
+        }
+      ],
+      "usableMilestonesAt": {
+        "T\u002B120": 1,
+        "T\u002B240": 1,
+        "T\u002B360": 3,
+        "T\u002B420": 3
+      },
+      "cpm": [
+        {
+          "slice": "SL-T10",
+          "earliestStart": 10,
+          "earliestFinish": 52,
+          "latestStart": 10,
+          "slack": 0,
+          "critical": true
+        },
+        {
+          "slice": "SL-M0",
+          "earliestStart": 52,
+          "earliestFinish": 120,
+          "latestStart": 406,
+          "slack": 354,
+          "critical": false
+        },
+        {
+          "slice": "SL-T11",
+          "earliestStart": 52,
+          "earliestFinish": 80,
+          "latestStart": 67,
+          "slack": 15,
+          "critical": false
+        },
+        {
+          "slice": "SL-T12",
+          "earliestStart": 52,
+          "earliestFinish": 80,
+          "latestStart": 57,
+          "slack": 5,
+          "critical": false
+        },
+        {
+          "slice": "SL-T14",
+          "earliestStart": 52,
+          "earliestFinish": 85,
+          "latestStart": 52,
+          "slack": 0,
+          "critical": true
+        },
+        {
+          "slice": "SL-T18",
+          "earliestStart": 52,
+          "earliestFinish": 100,
+          "latestStart": 72,
+          "slack": 20,
+          "critical": false
+        },
+        {
+          "slice": "SL-T13",
+          "earliestStart": 85,
+          "earliestFinish": 143,
+          "latestStart": 85,
+          "slack": 0,
+          "critical": true
+        },
+        {
+          "slice": "SL-T16",
+          "earliestStart": 80,
+          "earliestFinish": 128,
+          "latestStart": 95,
+          "slack": 15,
+          "critical": false
+        },
+        {
+          "slice": "SL-T19",
+          "earliestStart": 100,
+          "earliestFinish": 173,
+          "latestStart": 120,
+          "slack": 20,
+          "critical": false
+        },
+        {
+          "slice": "SL-T24",
+          "earliestStart": 80,
+          "earliestFinish": 103,
+          "latestStart": 251,
+          "slack": 171,
+          "critical": false
+        },
+        {
+          "slice": "SL-T35",
+          "earliestStart": 85,
+          "earliestFinish": 113,
+          "latestStart": 446,
+          "slack": 361,
+          "critical": false
+        },
+        {
+          "slice": "SL-T15",
+          "earliestStart": 143,
+          "earliestFinish": 176,
+          "latestStart": 218,
+          "slack": 75,
+          "critical": false
+        },
+        {
+          "slice": "SL-T17",
+          "earliestStart": 143,
+          "earliestFinish": 176,
+          "latestStart": 143,
+          "slack": 0,
+          "critical": true
+        },
+        {
+          "slice": "SL-T20",
+          "earliestStart": 173,
+          "earliestFinish": 226,
+          "latestStart": 193,
+          "slack": 20,
+          "critical": false
+        },
+        {
+          "slice": "SL-T27",
+          "earliestStart": 143,
+          "earliestFinish": 186,
+          "latestStart": 274,
+          "slack": 131,
+          "critical": false
+        },
+        {
+          "slice": "SL-WI-GEN-UI-LANDING",
+          "earliestStart": 128,
+          "earliestFinish": 171,
+          "latestStart": 349,
+          "slack": 221,
+          "critical": false
+        },
+        {
+          "slice": "SL-WI-GEN-WDL",
+          "earliestStart": 128,
+          "earliestFinish": 174,
+          "latestStart": 428,
+          "slack": 300,
+          "critical": false
+        },
+        {
+          "slice": "SL-WI-INV-LIST",
+          "earliestStart": 128,
+          "earliestFinish": 163,
+          "latestStart": 439,
+          "slack": 311,
+          "critical": false
+        },
+        {
+          "slice": "SL-WI-INV-START-FORM",
+          "earliestStart": 128,
+          "earliestFinish": 171,
+          "latestStart": 375,
+          "slack": 247,
+          "critical": false
+        },
+        {
+          "slice": "SL-WI-INV-WORKSPACE-FRAME",
+          "earliestStart": 128,
+          "earliestFinish": 163,
+          "latestStart": 298,
+          "slack": 170,
+          "critical": false
+        },
+        {
+          "slice": "SL-T21",
+          "earliestStart": 226,
+          "earliestFinish": 264,
+          "latestStart": 246,
+          "slack": 20,
+          "critical": false
+        },
+        {
+          "slice": "SL-T22",
+          "earliestStart": 176,
+          "earliestFinish": 259,
+          "latestStart": 176,
+          "slack": 0,
+          "critical": true
+        },
+        {
+          "slice": "SL-T23",
+          "earliestStart": 176,
+          "earliestFinish": 219,
+          "latestStart": 274,
+          "slack": 98,
+          "critical": false
+        },
+        {
+          "slice": "SL-T25",
+          "earliestStart": 226,
+          "earliestFinish": 259,
+          "latestStart": 251,
+          "slack": 25,
+          "critical": false
+        },
+        {
+          "slice": "SL-T26",
+          "earliestStart": 176,
+          "earliestFinish": 214,
+          "latestStart": 279,
+          "slack": 103,
+          "critical": false
+        },
+        {
+          "slice": "SL-T29",
+          "earliestStart": 176,
+          "earliestFinish": 209,
+          "latestStart": 284,
+          "slack": 108,
+          "critical": false
+        },
+        {
+          "slice": "SL-WI-GEN-AR",
+          "earliestStart": 176,
+          "earliestFinish": 204,
+          "latestStart": 446,
+          "slack": 270,
+          "critical": false
+        },
+        {
+          "slice": "SL-WI-GEN-EXT-DATA",
+          "earliestStart": 176,
+          "earliestFinish": 218,
+          "latestStart": 432,
+          "slack": 256,
+          "critical": false
+        },
+        {
+          "slice": "SL-WI-GEN-PF-BOUNDARY",
+          "earliestStart": 176,
+          "earliestFinish": 208,
+          "latestStart": 380,
+          "slack": 204,
+          "critical": false
+        },
+        {
+          "slice": "SL-WI-GEN-RECORDS",
+          "earliestStart": 176,
+          "earliestFinish": 246,
+          "latestStart": 404,
+          "slack": 228,
+          "critical": false
+        },
+        {
+          "slice": "SL-WI-GEN-UI-INSPECT",
+          "earliestStart": 171,
+          "earliestFinish": 202,
+          "latestStart": 407,
+          "slack": 236,
+          "critical": false
+        },
+        {
+          "slice": "SL-WI-GEN-UI-STATES",
+          "earliestStart": 171,
+          "earliestFinish": 197,
+          "latestStart": 412,
+          "slack": 241,
+          "critical": false
+        },
+        {
+          "slice": "SL-WI-GEN-UI-LANGUAGE",
+          "earliestStart": 171,
+          "earliestFinish": 217,
+          "latestStart": 392,
+          "slack": 221,
+          "critical": false
+        },
+        {
+          "slice": "SL-WI-GEN-VER",
+          "earliestStart": 176,
+          "earliestFinish": 192,
+          "latestStart": 458,
+          "slack": 282,
+          "critical": false
+        },
+        {
+          "slice": "SL-WI-INV-START-RULES",
+          "earliestStart": 171,
+          "earliestFinish": 197,
+          "latestStart": 418,
+          "slack": 247,
+          "critical": false
+        },
+        {
+          "slice": "SL-WI-INV-WORKSPACE-HYPOTHESES",
+          "earliestStart": 163,
+          "earliestFinish": 213,
+          "latestStart": 346,
+          "slack": 183,
+          "critical": false
+        },
+        {
+          "slice": "SL-WI-INV-WORKSPACE-EVIDENCE",
+          "earliestStart": 163,
+          "earliestFinish": 226,
+          "latestStart": 333,
+          "slack": 170,
+          "critical": false
+        },
+        {
+          "slice": "SL-WI-INV-WORKSPACE-SAVE",
+          "earliestStart": 163,
+          "earliestFinish": 195,
+          "latestStart": 419,
+          "slack": 256,
+          "critical": false
+        },
+        {
+          "slice": "SL-T28",
+          "earliestStart": 259,
+          "earliestFinish": 317,
+          "latestStart": 259,
+          "slack": 0,
+          "critical": true
+        },
+        {
+          "slice": "SL-T30",
+          "earliestStart": 264,
+          "earliestFinish": 297,
+          "latestStart": 284,
+          "slack": 20,
+          "critical": false
+        },
+        {
+          "slice": "SL-T36",
+          "earliestStart": 264,
+          "earliestFinish": 292,
+          "latestStart": 446,
+          "slack": 182,
+          "critical": false
+        },
+        {
+          "slice": "SL-WI-GEN-PF-FIXTURES",
+          "earliestStart": 208,
+          "earliestFinish": 234,
+          "latestStart": 412,
+          "slack": 204,
+          "critical": false
+        },
+        {
+          "slice": "SL-WI-GEN-PF-SECURITY",
+          "earliestStart": 208,
+          "earliestFinish": 228,
+          "latestStart": 454,
+          "slack": 246,
+          "critical": false
+        },
+        {
+          "slice": "SL-WI-GEN-UI-VERIFY",
+          "earliestStart": 217,
+          "earliestFinish": 253,
+          "latestStart": 438,
+          "slack": 221,
+          "critical": false
+        },
+        {
+          "slice": "SL-WI-INV-START-ACTIONS",
+          "earliestStart": 197,
+          "earliestFinish": 227,
+          "latestStart": 444,
+          "slack": 247,
+          "critical": false
+        },
+        {
+          "slice": "SL-WI-INV-WORKSPACE-DETAILS",
+          "earliestStart": 226,
+          "earliestFinish": 266,
+          "latestStart": 411,
+          "slack": 185,
+          "critical": false
+        },
+        {
+          "slice": "SL-WI-INV-WORKSPACE-LINKS",
+          "earliestStart": 226,
+          "earliestFinish": 281,
+          "latestStart": 396,
+          "slack": 170,
+          "critical": false
+        },
+        {
+          "slice": "SL-WI-INV-WORKSPACE-CONCLUSION",
+          "earliestStart": 213,
+          "earliestFinish": 251,
+          "latestStart": 413,
+          "slack": 200,
+          "critical": false
+        },
+        {
+          "slice": "SL-T31",
+          "earliestStart": 317,
+          "earliestFinish": 375,
+          "latestStart": 317,
+          "slack": 0,
+          "critical": true
+        },
+        {
+          "slice": "SL-WI-GEN-PF-LEVELS",
+          "earliestStart": 234,
+          "earliestFinish": 270,
+          "latestStart": 438,
+          "slack": 204,
+          "critical": false
+        },
+        {
+          "slice": "SL-WI-INV-WORKSPACE-ROUNDTRIP",
+          "earliestStart": 281,
+          "earliestFinish": 304,
+          "latestStart": 451,
+          "slack": 170,
+          "critical": false
+        },
+        {
+          "slice": "SL-T32",
+          "earliestStart": 375,
+          "earliestFinish": 408,
+          "latestStart": 375,
+          "slack": 0,
+          "critical": true
+        },
+        {
+          "slice": "SL-T33",
+          "earliestStart": 408,
+          "earliestFinish": 441,
+          "latestStart": 408,
+          "slack": 0,
+          "critical": true
+        },
+        {
+          "slice": "SL-T34",
+          "earliestStart": 441,
+          "earliestFinish": 474,
+          "latestStart": 441,
+          "slack": 0,
+          "critical": true
+        }
+      ],
+      "timeline": [
+        {
+          "slice": "SL-M0",
+          "lane": "ui",
+          "start": 52,
+          "implemented": 112,
+          "firstVerification": 112,
+          "integrated": 120,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-T10",
+          "lane": "integration",
+          "start": 10,
+          "implemented": 44,
+          "firstVerification": 44,
+          "integrated": 52,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-T11",
+          "lane": "integration",
+          "start": 52,
+          "implemented": 72,
+          "firstVerification": 72,
+          "integrated": 80,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-T12",
+          "lane": "domain",
+          "start": 77,
+          "implemented": 97,
+          "firstVerification": 97,
+          "integrated": 106,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-T13",
+          "lane": "domain",
+          "start": 106,
+          "implemented": 156,
+          "firstVerification": 156,
+          "integrated": 164,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-T14",
+          "lane": "domain",
+          "start": 52,
+          "implemented": 77,
+          "firstVerification": 77,
+          "integrated": 85,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-T15",
+          "lane": "domain",
+          "start": 164,
+          "implemented": 189,
+          "firstVerification": 189,
+          "integrated": 198,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-T16",
+          "lane": "ui",
+          "start": 112,
+          "implemented": 152,
+          "firstVerification": 152,
+          "integrated": 160,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-T17",
+          "lane": "integration",
+          "start": 164,
+          "implemented": 189,
+          "firstVerification": 189,
+          "integrated": 201,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-T18",
+          "lane": "persistence",
+          "start": 52,
+          "implemented": 92,
+          "firstVerification": 92,
+          "integrated": 100,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-T19",
+          "lane": "persistence",
+          "start": 106,
+          "implemented": 171,
+          "firstVerification": 171,
+          "integrated": 179,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-T20",
+          "lane": "persistence",
+          "start": 179,
+          "implemented": 224,
+          "firstVerification": 224,
+          "integrated": 236,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-T21",
+          "lane": "integration",
+          "start": 271,
+          "implemented": 301,
+          "firstVerification": 301,
+          "integrated": 309,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-T22",
+          "lane": "ui",
+          "start": 257,
+          "implemented": 332,
+          "firstVerification": 332,
+          "integrated": 340,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-T23",
+          "lane": "ui-2",
+          "start": 298,
+          "implemented": 333,
+          "firstVerification": 333,
+          "integrated": 343,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-T24",
+          "lane": "integration",
+          "start": 80,
+          "implemented": 95,
+          "firstVerification": 95,
+          "integrated": 103,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-T25",
+          "lane": "persistence",
+          "start": 236,
+          "implemented": 261,
+          "firstVerification": 261,
+          "integrated": 271,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-T26",
+          "lane": "ui-2",
+          "start": 333,
+          "implemented": 363,
+          "firstVerification": 363,
+          "integrated": 371,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-T27",
+          "lane": "domain",
+          "start": 189,
+          "implemented": 224,
+          "firstVerification": 224,
+          "integrated": 233,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-T28",
+          "lane": "ui-2",
+          "start": 363,
+          "implemented": 413,
+          "firstVerification": 413,
+          "integrated": 421,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-T29",
+          "lane": "ui-2",
+          "start": 490,
+          "implemented": 515,
+          "firstVerification": 515,
+          "integrated": 524,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-T30",
+          "lane": "reviewer",
+          "start": 340,
+          "implemented": 365,
+          "firstVerification": 365,
+          "integrated": 374,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-T31",
+          "lane": "integration",
+          "start": 524,
+          "implemented": 574,
+          "firstVerification": 574,
+          "integrated": 582,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-T32",
+          "lane": "integration",
+          "start": 582,
+          "implemented": 607,
+          "firstVerification": 607,
+          "integrated": 615,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-T33",
+          "lane": "reviewer",
+          "start": 615,
+          "implemented": 640,
+          "firstVerification": 640,
+          "integrated": 648,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-T34",
+          "lane": "integration",
+          "start": 648,
+          "implemented": 673,
+          "firstVerification": 673,
+          "integrated": 681,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-T35",
+          "lane": "reviewer",
+          "start": 106,
+          "implemented": 126,
+          "firstVerification": 126,
+          "integrated": 134,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-T36",
+          "lane": "reviewer",
+          "start": 309,
+          "implemented": 329,
+          "firstVerification": 329,
+          "integrated": 337,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-WI-GEN-AR",
+          "lane": "integration",
+          "start": 319,
+          "implemented": 339,
+          "firstVerification": 339,
+          "integrated": 347,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-WI-GEN-EXT-DATA",
+          "lane": "integration",
+          "start": 225,
+          "implemented": 259,
+          "firstVerification": 259,
+          "integrated": 268,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-WI-GEN-PF-BOUNDARY",
+          "lane": "integration",
+          "start": 201,
+          "implemented": 225,
+          "firstVerification": 230,
+          "integrated": 239,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-WI-GEN-PF-FIXTURES",
+          "lane": "integration",
+          "start": 301,
+          "implemented": 319,
+          "firstVerification": 319,
+          "integrated": 327,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-WI-GEN-PF-LEVELS",
+          "lane": "integration",
+          "start": 339,
+          "implemented": 367,
+          "firstVerification": 367,
+          "integrated": 377,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-WI-GEN-PF-SECURITY",
+          "lane": "integration",
+          "start": 259,
+          "implemented": 271,
+          "firstVerification": 271,
+          "integrated": 279,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-WI-GEN-RECORDS",
+          "lane": "reviewer",
+          "start": 201,
+          "implemented": 263,
+          "firstVerification": 265,
+          "integrated": 274,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-WI-GEN-UI-LANDING",
+          "lane": "ui",
+          "start": 160,
+          "implemented": 195,
+          "firstVerification": 195,
+          "integrated": 204,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-WI-GEN-UI-INSPECT",
+          "lane": "ui",
+          "start": 470,
+          "implemented": 493,
+          "firstVerification": 493,
+          "integrated": 501,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-WI-GEN-UI-STATES",
+          "lane": "ui-2",
+          "start": 225,
+          "implemented": 243,
+          "firstVerification": 243,
+          "integrated": 251,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-WI-GEN-UI-LANGUAGE",
+          "lane": "ui-2",
+          "start": 515,
+          "implemented": 553,
+          "firstVerification": 553,
+          "integrated": 561,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-WI-GEN-UI-VERIFY",
+          "lane": "ui",
+          "start": 561,
+          "implemented": 589,
+          "firstVerification": 589,
+          "integrated": 597,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-WI-GEN-VER",
+          "lane": "integration",
+          "start": 367,
+          "implemented": 375,
+          "firstVerification": 375,
+          "integrated": 383,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-WI-GEN-WDL",
+          "lane": "ui-2",
+          "start": 187,
+          "implemented": 225,
+          "firstVerification": 233,
+          "integrated": 242,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-WI-INV-LIST",
+          "lane": "ui-2",
+          "start": 160,
+          "implemented": 187,
+          "firstVerification": 187,
+          "integrated": 195,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-WI-INV-START-FORM",
+          "lane": "ui",
+          "start": 222,
+          "implemented": 257,
+          "firstVerification": 257,
+          "integrated": 265,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-WI-INV-START-RULES",
+          "lane": "ui",
+          "start": 332,
+          "implemented": 350,
+          "firstVerification": 350,
+          "integrated": 358,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-WI-INV-START-ACTIONS",
+          "lane": "ui",
+          "start": 392,
+          "implemented": 414,
+          "firstVerification": 414,
+          "integrated": 424,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-WI-INV-WORKSPACE-FRAME",
+          "lane": "ui",
+          "start": 195,
+          "implemented": 222,
+          "firstVerification": 222,
+          "integrated": 230,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-WI-INV-WORKSPACE-DETAILS",
+          "lane": "ui",
+          "start": 414,
+          "implemented": 446,
+          "firstVerification": 446,
+          "integrated": 454,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-WI-INV-WORKSPACE-HYPOTHESES",
+          "lane": "ui",
+          "start": 350,
+          "implemented": 392,
+          "firstVerification": 392,
+          "integrated": 400,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-WI-INV-WORKSPACE-EVIDENCE",
+          "lane": "ui-2",
+          "start": 243,
+          "implemented": 298,
+          "firstVerification": 298,
+          "integrated": 306,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-WI-INV-WORKSPACE-LINKS",
+          "lane": "ui-2",
+          "start": 413,
+          "implemented": 460,
+          "firstVerification": 460,
+          "integrated": 468,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-WI-INV-WORKSPACE-CONCLUSION",
+          "lane": "ui-2",
+          "start": 460,
+          "implemented": 490,
+          "firstVerification": 490,
+          "integrated": 498,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-WI-INV-WORKSPACE-SAVE",
+          "lane": "ui",
+          "start": 446,
+          "implemented": 470,
+          "firstVerification": 470,
+          "integrated": 478,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-WI-INV-WORKSPACE-ROUNDTRIP",
+          "lane": "ui",
+          "start": 498,
+          "implemented": 513,
+          "firstVerification": 513,
+          "integrated": 521,
+          "runs": 1,
+          "repairs": 0
+        }
+      ]
+    },
+    {
+      "ciMinutes": 10,
+      "allIntegratedAt": 715,
+      "fits": false,
+      "slicesByDeadline": 39,
+      "requirementsByDeadline": 159,
+      "mandatoryObligationsByDeadline": 612,
+      "criticalPathMinutes": 524,
+      "criticalSlices": [
+        "SL-T10",
+        "SL-T14",
+        "SL-T13",
+        "SL-T17",
+        "SL-T22",
+        "SL-T28",
+        "SL-T31",
+        "SL-T32",
+        "SL-T33",
+        "SL-T34"
+      ],
+      "implementationMinutes": 1719,
+      "repairMinutes": 0,
+      "verificationMinutes": 540,
+      "verificationRuns": 54,
+      "mergeMinutes": 162,
+      "queueWaitMinutes": 18,
+      "laneIdleMinutesInWindow": 1135,
+      "milestones": [
+        {
+          "id": "M0",
+          "name": "Data visible: read-only browser of the stored catalog (no replay, no editing)",
+          "deliveredAt": 130,
+          "byDeadline": true
+        },
+        {
+          "id": "M1",
+          "name": "Connect to the data repository with the real GitHub provider",
+          "deliveredAt": 303,
+          "byDeadline": true
+        },
+        {
+          "id": "M2",
+          "name": "List and open historical investigations read-only",
+          "deliveredAt": 266,
+          "byDeadline": true
+        },
+        {
+          "id": "M3",
+          "name": "Create an investigation",
+          "deliveredAt": 439,
+          "byDeadline": false
+        },
+        {
+          "id": "M4",
+          "name": "Edit and persist",
+          "deliveredAt": 541,
+          "byDeadline": false
+        },
+        {
+          "id": "M5",
+          "name": "Analysis",
+          "deliveredAt": 516,
+          "byDeadline": false
+        },
+        {
+          "id": "M6",
+          "name": "Full scope: every approved requirement",
+          "deliveredAt": 715,
+          "byDeadline": false
+        }
+      ],
+      "usableMilestonesAt": {
+        "T\u002B120": 0,
+        "T\u002B240": 1,
+        "T\u002B360": 3,
+        "T\u002B420": 3
+      },
+      "cpm": [
+        {
+          "slice": "SL-T10",
+          "earliestStart": 10,
+          "earliestFinish": 57,
+          "latestStart": 10,
+          "slack": 0,
+          "critical": true
+        },
+        {
+          "slice": "SL-M0",
+          "earliestStart": 57,
+          "earliestFinish": 130,
+          "latestStart": 451,
+          "slack": 394,
+          "critical": false
+        },
+        {
+          "slice": "SL-T11",
+          "earliestStart": 57,
+          "earliestFinish": 90,
+          "latestStart": 72,
+          "slack": 15,
+          "critical": false
+        },
+        {
+          "slice": "SL-T12",
+          "earliestStart": 57,
+          "earliestFinish": 90,
+          "latestStart": 62,
+          "slack": 5,
+          "critical": false
+        },
+        {
+          "slice": "SL-T14",
+          "earliestStart": 57,
+          "earliestFinish": 95,
+          "latestStart": 57,
+          "slack": 0,
+          "critical": true
+        },
+        {
+          "slice": "SL-T18",
+          "earliestStart": 57,
+          "earliestFinish": 110,
+          "latestStart": 77,
+          "slack": 20,
+          "critical": false
+        },
+        {
+          "slice": "SL-T13",
+          "earliestStart": 95,
+          "earliestFinish": 158,
+          "latestStart": 95,
+          "slack": 0,
+          "critical": true
+        },
+        {
+          "slice": "SL-T16",
+          "earliestStart": 90,
+          "earliestFinish": 143,
+          "latestStart": 105,
+          "slack": 15,
+          "critical": false
+        },
+        {
+          "slice": "SL-T19",
+          "earliestStart": 110,
+          "earliestFinish": 188,
+          "latestStart": 130,
+          "slack": 20,
+          "critical": false
+        },
+        {
+          "slice": "SL-T24",
+          "earliestStart": 90,
+          "earliestFinish": 118,
+          "latestStart": 271,
+          "slack": 181,
+          "critical": false
+        },
+        {
+          "slice": "SL-T35",
+          "earliestStart": 95,
+          "earliestFinish": 128,
+          "latestStart": 491,
+          "slack": 396,
+          "critical": false
+        },
+        {
+          "slice": "SL-T15",
+          "earliestStart": 158,
+          "earliestFinish": 196,
+          "latestStart": 233,
+          "slack": 75,
+          "critical": false
+        },
+        {
+          "slice": "SL-T17",
+          "earliestStart": 158,
+          "earliestFinish": 196,
+          "latestStart": 158,
+          "slack": 0,
+          "critical": true
+        },
+        {
+          "slice": "SL-T20",
+          "earliestStart": 188,
+          "earliestFinish": 246,
+          "latestStart": 208,
+          "slack": 20,
+          "critical": false
+        },
+        {
+          "slice": "SL-T27",
+          "earliestStart": 158,
+          "earliestFinish": 206,
+          "latestStart": 299,
+          "slack": 141,
+          "critical": false
+        },
+        {
+          "slice": "SL-WI-GEN-UI-LANDING",
+          "earliestStart": 143,
+          "earliestFinish": 191,
+          "latestStart": 384,
+          "slack": 241,
+          "critical": false
+        },
+        {
+          "slice": "SL-WI-GEN-WDL",
+          "earliestStart": 143,
+          "earliestFinish": 194,
+          "latestStart": 473,
+          "slack": 330,
+          "critical": false
+        },
+        {
+          "slice": "SL-WI-INV-LIST",
+          "earliestStart": 143,
+          "earliestFinish": 183,
+          "latestStart": 484,
+          "slack": 341,
+          "critical": false
+        },
+        {
+          "slice": "SL-WI-INV-START-FORM",
+          "earliestStart": 143,
+          "earliestFinish": 191,
+          "latestStart": 410,
+          "slack": 267,
+          "critical": false
+        },
+        {
+          "slice": "SL-WI-INV-WORKSPACE-FRAME",
+          "earliestStart": 143,
+          "earliestFinish": 183,
+          "latestStart": 328,
+          "slack": 185,
+          "critical": false
+        },
+        {
+          "slice": "SL-T21",
+          "earliestStart": 246,
+          "earliestFinish": 289,
+          "latestStart": 266,
+          "slack": 20,
+          "critical": false
+        },
+        {
+          "slice": "SL-T22",
+          "earliestStart": 196,
+          "earliestFinish": 284,
+          "latestStart": 196,
+          "slack": 0,
+          "critical": true
+        },
+        {
+          "slice": "SL-T23",
+          "earliestStart": 196,
+          "earliestFinish": 244,
+          "latestStart": 299,
+          "slack": 103,
+          "critical": false
+        },
+        {
+          "slice": "SL-T25",
+          "earliestStart": 246,
+          "earliestFinish": 284,
+          "latestStart": 271,
+          "slack": 25,
+          "critical": false
+        },
+        {
+          "slice": "SL-T26",
+          "earliestStart": 196,
+          "earliestFinish": 239,
+          "latestStart": 304,
+          "slack": 108,
+          "critical": false
+        },
+        {
+          "slice": "SL-T29",
+          "earliestStart": 196,
+          "earliestFinish": 234,
+          "latestStart": 309,
+          "slack": 113,
+          "critical": false
+        },
+        {
+          "slice": "SL-WI-GEN-AR",
+          "earliestStart": 196,
+          "earliestFinish": 229,
+          "latestStart": 491,
+          "slack": 295,
+          "critical": false
+        },
+        {
+          "slice": "SL-WI-GEN-EXT-DATA",
+          "earliestStart": 196,
+          "earliestFinish": 243,
+          "latestStart": 477,
+          "slack": 281,
+          "critical": false
+        },
+        {
+          "slice": "SL-WI-GEN-PF-BOUNDARY",
+          "earliestStart": 196,
+          "earliestFinish": 233,
+          "latestStart": 415,
+          "slack": 219,
+          "critical": false
+        },
+        {
+          "slice": "SL-WI-GEN-RECORDS",
+          "earliestStart": 196,
+          "earliestFinish": 271,
+          "latestStart": 449,
+          "slack": 253,
+          "critical": false
+        },
+        {
+          "slice": "SL-WI-GEN-UI-INSPECT",
+          "earliestStart": 191,
+          "earliestFinish": 227,
+          "latestStart": 447,
+          "slack": 256,
+          "critical": false
+        },
+        {
+          "slice": "SL-WI-GEN-UI-STATES",
+          "earliestStart": 191,
+          "earliestFinish": 222,
+          "latestStart": 452,
+          "slack": 261,
+          "critical": false
+        },
+        {
+          "slice": "SL-WI-GEN-UI-LANGUAGE",
+          "earliestStart": 191,
+          "earliestFinish": 242,
+          "latestStart": 432,
+          "slack": 241,
+          "critical": false
+        },
+        {
+          "slice": "SL-WI-GEN-VER",
+          "earliestStart": 196,
+          "earliestFinish": 217,
+          "latestStart": 503,
+          "slack": 307,
+          "critical": false
+        },
+        {
+          "slice": "SL-WI-INV-START-RULES",
+          "earliestStart": 191,
+          "earliestFinish": 222,
+          "latestStart": 458,
+          "slack": 267,
+          "critical": false
+        },
+        {
+          "slice": "SL-WI-INV-WORKSPACE-HYPOTHESES",
+          "earliestStart": 183,
+          "earliestFinish": 238,
+          "latestStart": 381,
+          "slack": 198,
+          "critical": false
+        },
+        {
+          "slice": "SL-WI-INV-WORKSPACE-EVIDENCE",
+          "earliestStart": 183,
+          "earliestFinish": 251,
+          "latestStart": 368,
+          "slack": 185,
+          "critical": false
+        },
+        {
+          "slice": "SL-WI-INV-WORKSPACE-SAVE",
+          "earliestStart": 183,
+          "earliestFinish": 220,
+          "latestStart": 459,
+          "slack": 276,
+          "critical": false
+        },
+        {
+          "slice": "SL-T28",
+          "earliestStart": 284,
+          "earliestFinish": 347,
+          "latestStart": 284,
+          "slack": 0,
+          "critical": true
+        },
+        {
+          "slice": "SL-T30",
+          "earliestStart": 289,
+          "earliestFinish": 327,
+          "latestStart": 309,
+          "slack": 20,
+          "critical": false
+        },
+        {
+          "slice": "SL-T36",
+          "earliestStart": 289,
+          "earliestFinish": 322,
+          "latestStart": 491,
+          "slack": 202,
+          "critical": false
+        },
+        {
+          "slice": "SL-WI-GEN-PF-FIXTURES",
+          "earliestStart": 233,
+          "earliestFinish": 264,
+          "latestStart": 452,
+          "slack": 219,
+          "critical": false
+        },
+        {
+          "slice": "SL-WI-GEN-PF-SECURITY",
+          "earliestStart": 233,
+          "earliestFinish": 258,
+          "latestStart": 499,
+          "slack": 266,
+          "critical": false
+        },
+        {
+          "slice": "SL-WI-GEN-UI-VERIFY",
+          "earliestStart": 242,
+          "earliestFinish": 283,
+          "latestStart": 483,
+          "slack": 241,
+          "critical": false
+        },
+        {
+          "slice": "SL-WI-INV-START-ACTIONS",
+          "earliestStart": 222,
+          "earliestFinish": 257,
+          "latestStart": 489,
+          "slack": 267,
+          "critical": false
+        },
+        {
+          "slice": "SL-WI-INV-WORKSPACE-DETAILS",
+          "earliestStart": 251,
+          "earliestFinish": 296,
+          "latestStart": 451,
+          "slack": 200,
+          "critical": false
+        },
+        {
+          "slice": "SL-WI-INV-WORKSPACE-LINKS",
+          "earliestStart": 251,
+          "earliestFinish": 311,
+          "latestStart": 436,
+          "slack": 185,
+          "critical": false
+        },
+        {
+          "slice": "SL-WI-INV-WORKSPACE-CONCLUSION",
+          "earliestStart": 238,
+          "earliestFinish": 281,
+          "latestStart": 453,
+          "slack": 215,
+          "critical": false
+        },
+        {
+          "slice": "SL-T31",
+          "earliestStart": 347,
+          "earliestFinish": 410,
+          "latestStart": 347,
+          "slack": 0,
+          "critical": true
+        },
+        {
+          "slice": "SL-WI-GEN-PF-LEVELS",
+          "earliestStart": 264,
+          "earliestFinish": 305,
+          "latestStart": 483,
+          "slack": 219,
+          "critical": false
+        },
+        {
+          "slice": "SL-WI-INV-WORKSPACE-ROUNDTRIP",
+          "earliestStart": 311,
+          "earliestFinish": 339,
+          "latestStart": 496,
+          "slack": 185,
+          "critical": false
+        },
+        {
+          "slice": "SL-T32",
+          "earliestStart": 410,
+          "earliestFinish": 448,
+          "latestStart": 410,
+          "slack": 0,
+          "critical": true
+        },
+        {
+          "slice": "SL-T33",
+          "earliestStart": 448,
+          "earliestFinish": 486,
+          "latestStart": 448,
+          "slack": 0,
+          "critical": true
+        },
+        {
+          "slice": "SL-T34",
+          "earliestStart": 486,
+          "earliestFinish": 524,
+          "latestStart": 486,
+          "slack": 0,
+          "critical": true
+        }
+      ],
+      "timeline": [
+        {
+          "slice": "SL-M0",
+          "lane": "ui",
+          "start": 57,
+          "implemented": 117,
+          "firstVerification": 117,
+          "integrated": 130,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-T10",
+          "lane": "integration",
+          "start": 10,
+          "implemented": 44,
+          "firstVerification": 44,
+          "integrated": 57,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-T11",
+          "lane": "integration",
+          "start": 57,
+          "implemented": 77,
+          "firstVerification": 77,
+          "integrated": 90,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-T12",
+          "lane": "domain",
+          "start": 82,
+          "implemented": 102,
+          "firstVerification": 102,
+          "integrated": 115,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-T13",
+          "lane": "domain",
+          "start": 115,
+          "implemented": 165,
+          "firstVerification": 165,
+          "integrated": 178,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-T14",
+          "lane": "domain",
+          "start": 57,
+          "implemented": 82,
+          "firstVerification": 82,
+          "integrated": 95,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-T15",
+          "lane": "domain",
+          "start": 178,
+          "implemented": 203,
+          "firstVerification": 203,
+          "integrated": 216,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-T16",
+          "lane": "ui",
+          "start": 117,
+          "implemented": 157,
+          "firstVerification": 157,
+          "integrated": 170,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-T17",
+          "lane": "integration",
+          "start": 178,
+          "implemented": 203,
+          "firstVerification": 203,
+          "integrated": 219,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-T18",
+          "lane": "persistence",
+          "start": 57,
+          "implemented": 97,
+          "firstVerification": 97,
+          "integrated": 110,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-T19",
+          "lane": "persistence",
+          "start": 115,
+          "implemented": 180,
+          "firstVerification": 180,
+          "integrated": 193,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-T20",
+          "lane": "persistence",
+          "start": 193,
+          "implemented": 238,
+          "firstVerification": 245,
+          "integrated": 258,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-T21",
+          "lane": "integration",
+          "start": 289,
+          "implemented": 319,
+          "firstVerification": 319,
+          "integrated": 332,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-T22",
+          "lane": "ui",
+          "start": 267,
+          "implemented": 342,
+          "firstVerification": 342,
+          "integrated": 355,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-T23",
+          "lane": "ui-2",
+          "start": 308,
+          "implemented": 343,
+          "firstVerification": 343,
+          "integrated": 358,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-T24",
+          "lane": "integration",
+          "start": 90,
+          "implemented": 105,
+          "firstVerification": 105,
+          "integrated": 118,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-T25",
+          "lane": "persistence",
+          "start": 258,
+          "implemented": 283,
+          "firstVerification": 283,
+          "integrated": 297,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-T26",
+          "lane": "ui-2",
+          "start": 343,
+          "implemented": 373,
+          "firstVerification": 373,
+          "integrated": 386,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-T27",
+          "lane": "domain",
+          "start": 203,
+          "implemented": 238,
+          "firstVerification": 238,
+          "integrated": 251,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-T28",
+          "lane": "ui-2",
+          "start": 373,
+          "implemented": 423,
+          "firstVerification": 423,
+          "integrated": 436,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-T29",
+          "lane": "ui-2",
+          "start": 500,
+          "implemented": 525,
+          "firstVerification": 525,
+          "integrated": 538,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-T30",
+          "lane": "reviewer",
+          "start": 355,
+          "implemented": 380,
+          "firstVerification": 380,
+          "integrated": 393,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-T31",
+          "lane": "integration",
+          "start": 538,
+          "implemented": 588,
+          "firstVerification": 588,
+          "integrated": 601,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-T32",
+          "lane": "integration",
+          "start": 601,
+          "implemented": 626,
+          "firstVerification": 626,
+          "integrated": 639,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-T33",
+          "lane": "reviewer",
+          "start": 639,
+          "implemented": 664,
+          "firstVerification": 664,
+          "integrated": 677,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-T34",
+          "lane": "integration",
+          "start": 677,
+          "implemented": 702,
+          "firstVerification": 702,
+          "integrated": 715,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-T35",
+          "lane": "reviewer",
+          "start": 115,
+          "implemented": 135,
+          "firstVerification": 135,
+          "integrated": 148,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-T36",
+          "lane": "reviewer",
+          "start": 332,
+          "implemented": 352,
+          "firstVerification": 352,
+          "integrated": 365,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-WI-GEN-AR",
+          "lane": "integration",
+          "start": 337,
+          "implemented": 357,
+          "firstVerification": 357,
+          "integrated": 370,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-WI-GEN-EXT-DATA",
+          "lane": "integration",
+          "start": 243,
+          "implemented": 277,
+          "firstVerification": 277,
+          "integrated": 290,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-WI-GEN-PF-BOUNDARY",
+          "lane": "integration",
+          "start": 219,
+          "implemented": 243,
+          "firstVerification": 248,
+          "integrated": 261,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-WI-GEN-PF-FIXTURES",
+          "lane": "integration",
+          "start": 319,
+          "implemented": 337,
+          "firstVerification": 337,
+          "integrated": 350,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-WI-GEN-PF-LEVELS",
+          "lane": "integration",
+          "start": 357,
+          "implemented": 385,
+          "firstVerification": 385,
+          "integrated": 398,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-WI-GEN-PF-SECURITY",
+          "lane": "integration",
+          "start": 277,
+          "implemented": 289,
+          "firstVerification": 290,
+          "integrated": 303,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-WI-GEN-RECORDS",
+          "lane": "reviewer",
+          "start": 219,
+          "implemented": 281,
+          "firstVerification": 281,
+          "integrated": 294,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-WI-GEN-UI-LANDING",
+          "lane": "ui",
+          "start": 170,
+          "implemented": 205,
+          "firstVerification": 210,
+          "integrated": 223,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-WI-GEN-UI-INSPECT",
+          "lane": "ui",
+          "start": 480,
+          "implemented": 503,
+          "firstVerification": 503,
+          "integrated": 516,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-WI-GEN-UI-STATES",
+          "lane": "ui-2",
+          "start": 235,
+          "implemented": 253,
+          "firstVerification": 253,
+          "integrated": 266,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-WI-GEN-UI-LANGUAGE",
+          "lane": "ui-2",
+          "start": 525,
+          "implemented": 563,
+          "firstVerification": 563,
+          "integrated": 576,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-WI-GEN-UI-VERIFY",
+          "lane": "ui",
+          "start": 576,
+          "implemented": 604,
+          "firstVerification": 604,
+          "integrated": 617,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-WI-GEN-VER",
+          "lane": "integration",
+          "start": 385,
+          "implemented": 393,
+          "firstVerification": 393,
+          "integrated": 406,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-WI-GEN-WDL",
+          "lane": "ui-2",
+          "start": 197,
+          "implemented": 235,
+          "firstVerification": 235,
+          "integrated": 248,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-WI-INV-LIST",
+          "lane": "ui-2",
+          "start": 170,
+          "implemented": 197,
+          "firstVerification": 197,
+          "integrated": 210,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-WI-INV-START-FORM",
+          "lane": "ui",
+          "start": 232,
+          "implemented": 267,
+          "firstVerification": 267,
+          "integrated": 280,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-WI-INV-START-RULES",
+          "lane": "ui",
+          "start": 342,
+          "implemented": 360,
+          "firstVerification": 360,
+          "integrated": 373,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-WI-INV-START-ACTIONS",
+          "lane": "ui",
+          "start": 402,
+          "implemented": 424,
+          "firstVerification": 424,
+          "integrated": 439,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-WI-INV-WORKSPACE-FRAME",
+          "lane": "ui",
+          "start": 205,
+          "implemented": 232,
+          "firstVerification": 232,
+          "integrated": 245,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-WI-INV-WORKSPACE-DETAILS",
+          "lane": "ui",
+          "start": 424,
+          "implemented": 456,
+          "firstVerification": 456,
+          "integrated": 469,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-WI-INV-WORKSPACE-HYPOTHESES",
+          "lane": "ui",
+          "start": 360,
+          "implemented": 402,
+          "firstVerification": 402,
+          "integrated": 415,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-WI-INV-WORKSPACE-EVIDENCE",
+          "lane": "ui-2",
+          "start": 253,
+          "implemented": 308,
+          "firstVerification": 308,
+          "integrated": 321,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-WI-INV-WORKSPACE-LINKS",
+          "lane": "ui-2",
+          "start": 423,
+          "implemented": 470,
+          "firstVerification": 470,
+          "integrated": 483,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-WI-INV-WORKSPACE-CONCLUSION",
+          "lane": "ui-2",
+          "start": 470,
+          "implemented": 500,
+          "firstVerification": 500,
+          "integrated": 513,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-WI-INV-WORKSPACE-SAVE",
+          "lane": "ui",
+          "start": 456,
+          "implemented": 480,
+          "firstVerification": 480,
+          "integrated": 493,
+          "runs": 1,
+          "repairs": 0
+        },
+        {
+          "slice": "SL-WI-INV-WORKSPACE-ROUNDTRIP",
+          "lane": "ui",
+          "start": 513,
+          "implemented": 528,
+          "firstVerification": 528,
+          "integrated": 541,
+          "runs": 1,
+          "repairs": 0
+        }
+      ]
+    }
+  ]
+}

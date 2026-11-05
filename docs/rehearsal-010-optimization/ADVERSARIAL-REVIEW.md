@@ -129,3 +129,7 @@ Two mutations were caught.
 | 8 | Is the 420-minute clock immutable? | Yes. `deadline-policy.json` and T0 handling are untouched |
 | 9 | Can the observer still detect shortcuts? | Yes. Observer pins and Observer.fs are unchanged, and its scope checks apply to a successor |
 | 10 | Is recovery from interrupted sessions preserved? | Yes, for adoption before T0. A mid-run adoption would orphan Praxis records (now stated in ODR-R10-19) |
+
+### Round 6 (execution readiness)
+
+Requested on the execution-readiness commit; result below when it completes.

@@ -1,0 +1,22 @@
+{
+  "schema": "indy-init.r10-change-impact/1",
+  "status": "PROPOSED: Level 1 and Level 2 test selection for a builder's own feedback loop. It is NOT wired into the governed gate, never marks a requirement verified, and never replaces Level 3 (the full governed gate at every slice merge, as frozen).",
+  "sources": {
+    "files": "requirements-compiled/v4.1.4/agent-file-ownership.json (path -> project)",
+    "projects": "requirements-compiled/v4.1.4/analysis/project-structure.json (projects[].references, testProjects[].references)",
+    "suites": "requirements-compiled/v4.1.4/verification-execution-plan.json (suite ids)"
+  },
+  "projectSelection": "A changed file selects its own project and every project and test project that references it, transitively. Each selected test project is run in full.",
+  "rules": [
+    { "id": "CI-ALL-GOVERNANCE", "pattern": "^(requirements-compiled/|requirements/|\\.echelon/|\\.github/|kickoff/|global\\.json$|NuGet\\.config$|Directory\\.(Build|Packages)\\.props$|Causa\\.slnx$|.*\\.fsproj$|.*\\.csproj$)", "selects": ["ALL"], "reason": "contracts, pins, project files and governance change what every test means" },
+    { "id": "CI-PROVIDER", "pattern": "^src/Causa\\.Persistence/(Wire|GitHubRequests|Classify|Session|SaveMachine|Reconcile|Conflict|LoadMachine)\\.fs$|^tests/Causa\\.TestSupport/(StatefulFake|Recordings)\\.fs$", "selects": ["SU-DOTNET-LIVE", "SU-BROWSER-LIVE"], "reason": "the GitHub adapter and the save and load machines: real-provider integration tests" },
+    { "id": "CI-REPLAY", "pattern": "^src/Causa\\.Domain/(Events|Evolve|Kernel|Semantics|Entities)\\.fs$|^src/Causa\\.Persistence/(Storage|Canonical|Reader)\\.fs$", "selects": ["TAG:historical-replay", "SU-DOTNET-LIVE"], "reason": "event shapes, replay and the storage codec: fixture replay (T15) and catalog load (EXT-DATA-011/013, T25)" },
+    { "id": "CI-UI-TRACE", "pattern": "^src/Causa\\.App/(Views/.*|Routes|Projections|Update|Engine|Connection|View)\\.fs$|^verification/journeys/|^tests/browser/", "selects": ["SU-OWN-BROWSER", "SU-BROWSER-CHROMIUM", "SU-BROWSER-WEBKIT", "TAG:traceability"], "reason": "screens, field identifiers and journeys: browser tests and requirement-to-field traceability" },
+    { "id": "CI-SHARED-PRESENTATION", "pattern": "^web/(causa\\.css|index\\.html|boundary\\.js)$|^src/Causa\\.App/Views/Shell\\.fs$|^package(-lock)?\\.json$|^playwright\\.config\\.ts$", "selects": ["SU-OWN-BROWSER", "SU-BROWSER-CHROMIUM", "SU-BROWSER-WEBKIT", "SU-BROWSER-LIVE", "TAG:design-contract", "TAG:traceability"], "reason": "shared presentation (global stylesheet, Forma, shell) reaches every screen" }
+  ],
+  "failSafe": "A path that no ownership entry and no rule recognises selects ALL. A deleted or renamed path is a changed path.",
+  "never": [
+    "A requirement is never verified because its tests were not selected.",
+    "Selection never skips the governed gate: every slice merge still runs the full plan (Level 3)."
+  ]
+}
