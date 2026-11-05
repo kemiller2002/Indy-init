@@ -59,6 +59,20 @@ The value order is R7's priority:
 
 The order always respects dependencies. At each step the builder takes the highest-value slice whose dependencies are integrated. This table is the order computed before any work starts; the ledger decides what is ready at run time.
 
+**Milestone-first (owner decision ODR-R10-27 A, APR-R10-OWNER-3).** Among the ready slices, take first the one needed by the earliest functional milestone in [`functional-milestones.json`](functional-milestones.json). A slice is needed by a milestone if it carries one of that milestone's requirements, or is an ancestor of a slice that does. Break ties by the value order above. The groupings follow ODR-R10-29 A: M1 is connect only, and UI-001 and EXT-DATA-013 are in M2. Ranks for this manifest, computed by `milestoneRank` in `tools/r10/schedule-core.fsx`:
+
+| Rank | Milestone | Slices |
+|---|---|---|
+| 1 | M1 connect | `SL-T10`, `SL-T11`, `SL-T12`, `SL-T13`, `SL-T14`, `SL-T16`, `SL-T17`, `SL-WI-GEN-EXT-DATA`, `SL-WI-GEN-PF` |
+| 2 | M2 browse (list and open) | `SL-T15`, `SL-T18`, `SL-T19`, `SL-T20`, `SL-T25`, `SL-WI-GEN-UI`, `SL-WI-INV-LIST`, `SL-WI-INV-WORKSPACE` |
+| 3 | M3 create | `SL-WI-INV-START` |
+| 4 | M4 edit and persist | `SL-T21`, `SL-T22` |
+| 5 | M5 analysis | `SL-T24`, `SL-WI-GEN-WDL` |
+| 6 | M6 the rest of the scope | `SL-T23`, `SL-T26`, `SL-T27`, `SL-T28`, `SL-T29`, `SL-T30`, `SL-T31`, `SL-T32`, `SL-T33`, `SL-T34`, `SL-T36`, `SL-WI-GEN-AR`, `SL-WI-GEN-RECORDS`, `SL-WI-GEN-VER` |
+| 7 | carries no requirement | `SL-T35` |
+
+The milestones are a planning order only. They change no requirement, obligation, gate or acceptance condition.
+
 | # | Slice | Reqs | Mandatory obligations | DAG estimate (min) | Depends on | Live | UI | Governed assertions |
 |---|---|---|---|---|---|---|---|---|
 | 1 | SL-T10 bootstrap | 5 | 15 | 29 | — | | | |
@@ -108,7 +122,7 @@ What it models:
   - for the 9 generated slices, which have none, derived estimates at the DAG's own rate of 1.35 minutes per mandatory obligation (586 minutes);
   - in total, 1,350 minutes of implementation.
 
-Results, with 45 minutes of T0 set-up and 3 minutes per merge:
+Results, with 45 minutes of T0 set-up and 3 minutes per merge. These are the committed, CI-reproduced evidence. For planning, the owner adopted 25 minutes of set-up (ODR-R10-23 A); the clock is unaffected. That planning value starts work, and shortens the critical path, 20 minutes earlier. The rows below are not recomputed (see docs/rehearsal-010-optimization/SCHEDULE-COMPARISON.md for runs at 25 minutes):
 
 | CI latency per gate run | All 37 slices integrated at | Slices integrated by T+420 |
 |---|---|---|

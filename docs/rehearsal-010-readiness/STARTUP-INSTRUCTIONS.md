@@ -106,7 +106,9 @@ Main is protected (the Conditor scaffold requires pull requests). Each record be
 
 Repeat until the deadline or a permitted stop:
 
-1. **Select** the highest-value ready slice: integrated dependencies, by the order in SLICE-EXECUTION-PLAN §3 (J1, then J2, then the design contract, then the rest of P0, then P1).
+1. **Select** the next ready slice (dependencies integrated) by SLICE-EXECUTION-PLAN §3:
+   - first by functional milestone rank (ODR-R10-27 A: connect, browse, create, edit and persist, analysis, the rest);
+   - then by value order (J1, then J2, then the design contract, then the rest of P0, then P1).
 2. **Confirm** its requirements, obligations and dependencies in `slice-execution-manifest.json`. **Start** its Praxis work item.
 3. **Implement** on the branch `slice/SL-<work item>`. Keep `main` working. A pull request that changes implementation from a branch not named for its slice is refused by the governed gate.
 4. **Run** the slice's acceptance tests and the regression set.
