@@ -769,7 +769,7 @@
   },
   {
    "file": "contracts/07-IF41-VIEW.fs",
-   "sha256": "3567712ed35903ebdddcfb6b4fd98f747ee0d960660388175298f64cf45a91e7",
+   "sha256": "e1e584862b15137d8786feecca03cf7bbf19a5b536bd925ae55876f04c554831",
    "decision": "ODR-V415-IF-VIEW",
    "approval": "",
    "summary": "CF-09 A (APR-CFUI-OWNER-1), a separate request: the frozen IF41-VIEW types unchanged, followed by namespace Causa.Ui.Contracts (screen view models, capability boundaries Visible/Understood, UiIntent with qualified access, UiBackend, routes as unresolved RouteTarget), types and signatures plus 16 boundary members. Additive; implemented by integration in src/Causa.App/Projections.fs, compiled before Connection.fs; its functions are the producer file src/Causa.App/Ui/Presentation.fs."
