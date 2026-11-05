@@ -345,6 +345,165 @@
           "review_sha256": "37487d190723e76c6858d755727db322eeac0f8c8a3d2ff0814a608bad475d41"
         }
       ]
+    },
+    {
+      "id": "APR-R10-OWNER-1",
+      "authority": {
+        "kind": "operator",
+        "id": "kemiller2002"
+      },
+      "date": "2026-11-05",
+      "changes": [
+        {
+          "decision_id": "ODR-RG-03",
+          "action": "decide",
+          "option": "A"
+        },
+        {
+          "decision_id": "ODR-RG-05",
+          "action": "decide",
+          "option": "A"
+        },
+        {
+          "decision_id": "ODR-R10-02",
+          "action": "decide",
+          "option": "A",
+          "pins": [
+            {
+              "path": "docs/rehearsal-010-readiness/proposals/causa-investigation.requirement-catalog.successor.proposed.json",
+              "sha256": "b4bd432fdcbc673718e3df752a403ca2605a72bb0497a06a5aa05086b605d6e9"
+            }
+          ]
+        },
+        {
+          "decision_id": "ODR-R10-03",
+          "action": "decide",
+          "option": "A",
+          "pins": [
+            {
+              "path": "kickoff/rehearsal-010/catalog-verification-contract.json",
+              "sha256": "808de8a9fe43a4b1f8bfe7fb9f789a6de8f5e23ab27d878dfb675c74ada02a9a"
+            }
+          ]
+        },
+        {
+          "decision_id": "ODR-R10-04",
+          "action": "decide",
+          "option": "A",
+          "pins": [
+            {
+              "path": "kickoff/rehearsal-010/catalog-verification-contract.json",
+              "sha256": "808de8a9fe43a4b1f8bfe7fb9f789a6de8f5e23ab27d878dfb675c74ada02a9a"
+            }
+          ]
+        },
+        {
+          "decision_id": "ODR-R10-05",
+          "action": "decide",
+          "option": "A",
+          "pins": [
+            {
+              "path": "kickoff/rehearsal-010/design-contract.json",
+              "sha256": "366ed579446636d31894e77ab63877d5dc5f4ef0e935ae14f089b4360780482a"
+            },
+            {
+              "path": "verification/design-contract/forma-0.13.0-inventory.json",
+              "sha256": "d71e964d94a4e189fb22f633238ba21fc3943712ecb60c5a5876611a2d110a2d"
+            }
+          ]
+        },
+        {
+          "decision_id": "ODR-R10-06",
+          "action": "decide",
+          "option": "A",
+          "pins": [
+            {
+              "path": "kickoff/rehearsal-010/deadline-policy.json",
+              "sha256": "9f6ac357b09190074efcc3bdba851ddce0ebd8cca56d3c0fe69fe7ba8499a4e0"
+            }
+          ]
+        },
+        {
+          "decision_id": "ODR-R10-07",
+          "action": "decide",
+          "option": "A",
+          "pins": [
+            {
+              "path": "verification/journeys/bindings.json",
+              "sha256": "cd68237205ff8f56503c46bdb6dc925085a3b07c9306ab6f9979f2b17b9754dd"
+            }
+          ]
+        },
+        {
+          "decision_id": "ODR-R10-08",
+          "action": "decide",
+          "option": "A"
+        },
+        {
+          "decision_id": "ODR-R10-09",
+          "action": "decide",
+          "option": "A",
+          "pins": [
+            {
+              "path": "kickoff/rehearsal-010/toolchain.lock.proposed.json",
+              "sha256": "9607e01089f2b360822db799c0e01dcdd2bb2e7123636ec3b456b1c9b84cc8da",
+              "field": "testRepository",
+              "value": "{\"owner\":\"kemiller2002\",\"repo\":\"causa-acceptance-r10\",\"branch\":\"causa-acceptance\",\"isolated\":true,\"visibility\":\"private\",\"data\":\"synthetic only; resettable; evidence lives in the governed CI artifacts\",\"credential\":\"a GitHub App installed on this repository alone (Contents: read and write); installation token minted per job by actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 (v3.3.0), scoped to this repository, revoked at job end; secrets CAUSA_ACCEPTANCE_APP_CLIENT_ID and CAUSA_ACCEPTANCE_APP_KEY\",\"approval\":\"ODR-R10-09 (pending)\"}"
+            }
+          ]
+        },
+        {
+          "decision_id": "ODR-R10-10",
+          "action": "decide",
+          "option": "A"
+        },
+        {
+          "decision_id": "ODR-R10-11",
+          "action": "decide",
+          "option": "A"
+        },
+        {
+          "decision_id": "ODR-R10-12",
+          "action": "decide",
+          "option": "A"
+        },
+        {
+          "decision_id": "ODR-R10-13",
+          "action": "decide",
+          "option": "A"
+        },
+        {
+          "decision_id": "ODR-R10-14",
+          "action": "decide",
+          "option": "A",
+          "pins": [
+            {
+              "path": "kickoff/rehearsal-010/process-evidence-rules.json",
+              "sha256": "36172c57721419714a414334cd65a1548da5c0bc6318f55f73b77a207546344d"
+            }
+          ]
+        },
+        {
+          "decision_id": "ODR-R10-15",
+          "action": "decide",
+          "option": "A"
+        },
+        {
+          "decision_id": "ODR-R10-16",
+          "action": "decide",
+          "option": "A"
+        },
+        {
+          "decision_id": "ODR-R10-17",
+          "action": "decide",
+          "option": "A"
+        },
+        {
+          "decision_id": "ODR-R10-18",
+          "action": "decide",
+          "option": "A"
+        }
+      ]
     }
   ]
 }
