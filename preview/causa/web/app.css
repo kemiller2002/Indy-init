@@ -10,3 +10,5 @@ input, textarea { width: 100%; box-sizing: border-box; }
 .causa-detail-title { font-size: clamp(1.35rem, 5.5vw, 2.25rem); line-height: 1.2; overflow-wrap: anywhere; margin: .25rem 0 0; }
 .ef-record-header__title { display: block; }
 .ef-key-value-list dd { overflow-wrap: anywhere; }
+.causa-field-errors { list-style: none; padding: 0; margin: .25rem 0 0; color: var(--ef-color-critical, #b00020); font-size: .875rem; overflow-wrap: anywhere; }
+.causa-destination, .causa-save-state { overflow-wrap: anywhere; }

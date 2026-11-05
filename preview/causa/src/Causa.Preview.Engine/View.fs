@@ -16,6 +16,20 @@ let private lineCount (files: InvestigationFiles) =
     | Some(_, bytes) -> (Encoding.UTF8.GetString bytes).TrimEnd('\n').Split('\n').Length
     | None -> 0
 
+/// INV-016: the save state of an open working copy.
+let saveState (o: Opened) (confirmed: string option) : string =
+    if not o.Unsaved.IsEmpty then $"Unsaved changes: {o.Unsaved.Length}"
+    else
+        match confirmed with
+        | Some c -> "All changes saved. " + c
+        | None -> $"All changes saved (read at commit {o.ReadAt})."
+
+/// INV-005: where a new investigation will be written.
+let destination (m: Model) : string =
+    match m.Write with
+    | Some w -> $"Saved to repository {w.Owner}/{w.Name}, branch {w.Branch}, path workspaces/demo/{m.Form.Workspace}/investigations/"
+    | None -> "No writable repository is connected; nothing can be saved."
+
 let private detail (m: Model) (o: Opened) : (string * JValue) list =
     let expected = m.Entries |> List.tryFind (fun e -> e.Source = o.Source && e.DirName = o.DirName) |> Option.bind (fun e -> e.ExpectedState)
     let raw = $"{lineCount o.Files} event lines in events.ndjson; 3 files read at commit {o.ReadAt}"
@@ -25,6 +39,7 @@ let private detail (m: Model) (o: Opened) : (string * JValue) list =
           "dReadAt", s o.ReadAt
           "dRaw", s raw
           "unsavedCount", i o.Unsaved.Length
+          "saveState", s (saveState o m.Confirmed)
           "canSave", b (o.Source = WorkingCopy && not o.Unsaved.IsEmpty && m.Pending.IsEmpty)
           "unsaved",
           items (
@@ -81,6 +96,13 @@ let private detail (m: Model) (o: Opened) : (string * JValue) list =
                       "actor", s d.Envelope.Actor.ActorId.Value ])
             ) ]
 
+/// One field's validation errors: aria-invalid, whether any is shown, and each message tagged with its rule id.
+let private fieldErrors (m: Model) (prefix: string) (fieldId: string) : (string * JValue) list =
+    let errs = m.FieldErrors |> List.filter (fun e -> e.FieldId = fieldId)
+    [ prefix + "Invalid", s (if errs.IsEmpty then "false" else "true")
+      prefix + "HasError", b (not errs.IsEmpty)
+      prefix + "Errors", items (errs |> List.mapi (fun n e -> [ "key", s (string n); "rule", s e.RuleId; "text", s e.Message ])) ]
+
 let project (m: Model) : JValue =
     let entry (e: Entry) = [ "key", s ((if e.Source = Catalog then "c:" else "w:") + e.DirName); "title", s e.Title; "detail", s e.Detail; "id", s e.DirName ]
     let base' =
@@ -112,6 +134,11 @@ let project (m: Model) : JValue =
           "cannotWrite", b m.Write.IsNone
           "catalogItems", items (m.Entries |> List.filter (fun e -> e.Source = Catalog) |> List.map entry)
           "workingItems", items (m.Entries |> List.filter (fun e -> e.Source = WorkingCopy) |> List.map entry)
-          "workingEmpty", b (m.Entries |> List.exists (fun e -> e.Source = WorkingCopy) |> not) ]
+          "workingEmpty", b (m.Entries |> List.exists (fun e -> e.Source = WorkingCopy) |> not)
+          "destination", s (destination m) ]
+        @ fieldErrors m "titleErr" "INV-002"
+        @ fieldErrors m "problemErr" "INV-001"
+        @ fieldErrors m "obsErr" "INV-024"
+        @ fieldErrors m "hypErr" "INV-026"
     let d = match m.Opened with Some o -> detail m o | None -> []
     JObj(base' @ d)

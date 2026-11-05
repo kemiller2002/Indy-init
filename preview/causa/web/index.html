@@ -123,12 +123,14 @@
               <section class="ef-stack" aria-labelledby="edit-title">
                 <h2 id="edit-title">Edit</h2>
                 <div class="ef-field"><label class="ef-field__label" for="edit-observation">Add an observation</label>
-                  <textarea id="edit-observation" rows="3" data-event="set:editObservation" data-on="input" data-bind-value="editObservation"></textarea></div>
+                  <textarea id="edit-observation" rows="3" data-requirement-id="INV-024" aria-describedby="edit-observation-e" data-bind-aria-invalid="obsErrInvalid" data-event="set:editObservation" data-on="input" data-bind-value="editObservation"></textarea>
+                  <template data-if="obsErrHasError"><ul id="edit-observation-e" class="causa-field-errors"><template data-each="obsErrErrors" data-key="key"><li data-bind-data-requirement-id="rule" data-text="text"></li></template></ul></template></div>
                 <div class="ef-actions"><button type="button" data-event="add-observation">Add observation</button></div>
                 <div class="ef-field"><label class="ef-field__label" for="edit-hypothesis">Add a hypothesis</label>
-                  <textarea id="edit-hypothesis" rows="2" data-event="set:editHypothesis" data-on="input" data-bind-value="editHypothesis"></textarea></div>
+                  <textarea id="edit-hypothesis" rows="2" data-requirement-id="INV-026" aria-describedby="edit-hypothesis-e" data-bind-aria-invalid="hypErrInvalid" data-event="set:editHypothesis" data-on="input" data-bind-value="editHypothesis"></textarea>
+                  <template data-if="hypErrHasError"><ul id="edit-hypothesis-e" class="causa-field-errors"><template data-each="hypErrErrors" data-key="key"><li data-bind-data-requirement-id="rule" data-text="text"></li></template></ul></template></div>
                 <div class="ef-actions"><button type="button" data-event="add-hypothesis">Add hypothesis</button></div>
-                <p>Unsaved changes: <span data-text="unsavedCount"></span></p>
+                <p class="causa-save-state" role="status" aria-live="polite" data-requirement-id="INV-016" data-text="saveState"></p>
                 <ul class="causa-plain"><template data-each="unsaved" data-key="key"><li data-text="text"></li></template></ul>
                 <div class="ef-actions"><button type="button" data-event="save" data-bind-disabled="notIdle">Save to GitHub</button></div>
               </section>
@@ -145,14 +147,17 @@
     <!-- 4. Investigation creation -->
     <template data-if="screenCreate">
       <section class="ef-stack" aria-labelledby="create-title">
-        <header><h1 id="create-title">New investigation</h1><p>Written to the working copy: <span data-text="writeLabel"></span></p></header>
+        <header><h1 id="create-title">New investigation</h1>
+          <p class="causa-destination" role="note" id="destination" data-requirement-id="INV-005" data-bind-aria-label="destination" data-text="destination"></p></header>
         <div class="ef-form">
           <div class="ef-field"><label class="ef-field__label" for="new-title">Title</label>
-            <input id="new-title" data-event="set:newTitle" data-on="input" data-bind-value="newTitle"></div>
-          <div class="ef-field"><label class="ef-field__label" for="new-observation">What was observed</label>
+            <input id="new-title" data-requirement-id="INV-002" aria-describedby="new-title-e" data-bind-aria-invalid="titleErrInvalid" data-event="set:newTitle" data-on="input" data-bind-value="newTitle">
+            <template data-if="titleErrHasError"><ul id="new-title-e" class="causa-field-errors"><template data-each="titleErrErrors" data-key="key"><li data-bind-data-requirement-id="rule" data-text="text"></li></template></ul></template></div>
+          <div class="ef-field"><label class="ef-field__label" for="new-observation">Problem statement</label>
             <span class="ef-field__description" id="new-observation-d">Kept verbatim as the first observation.</span>
-            <textarea id="new-observation" rows="4" aria-describedby="new-observation-d" data-event="set:newObservation" data-on="input" data-bind-value="newObservation"></textarea></div>
-          <div class="ef-actions"><button type="button" data-event="create" data-bind-disabled="notIdle">Create and save</button><button type="button" data-event="back">Cancel</button></div>
+            <textarea id="new-observation" rows="4" data-requirement-id="INV-001" aria-describedby="new-observation-d new-observation-e" data-bind-aria-invalid="problemErrInvalid" data-event="set:newObservation" data-on="input" data-bind-value="newObservation"></textarea>
+            <template data-if="problemErrHasError"><ul id="new-observation-e" class="causa-field-errors"><template data-each="problemErrErrors" data-key="key"><li data-bind-data-requirement-id="rule" data-text="text"></li></template></ul></template></div>
+          <div class="ef-actions"><button type="button" data-event="create" data-bind-disabled="notIdle">Create and save</button><button type="button" data-requirement-id="INV-022" data-event="back">Cancel</button></div>
         </div>
       </section>
     </template>

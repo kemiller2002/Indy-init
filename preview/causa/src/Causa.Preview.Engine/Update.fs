@@ -63,6 +63,27 @@ let private setField (f: Form) (name: string) (value: string) : Form =
     | "editHypothesis" -> { f with EditHypothesis = value }
     | _ -> f
 
+/// The catalog field id each form field carries (requirements/catalogs/causa-investigation.requirement-catalog.json).
+let fieldIdOf (name: string) : string option =
+    match name with
+    | "newTitle" -> Some "INV-002"
+    | "newObservation" -> Some "INV-001"
+    | "editObservation" -> Some "INV-024"
+    | "editHypothesis" -> Some "INV-026"
+    | _ -> None
+
+let private withoutField (fieldId: string option) (errors: Validation.FieldError list) =
+    match fieldId with
+    | Some id -> errors |> List.filter (fun e -> e.FieldId <> id)
+    | None -> errors
+
+/// A refused submit: the errors are kept for the view, a summary is shown, and nothing is sent.
+let private refuse (m: Model) (errors: Validation.FieldError list) : Model * Effects =
+    let summary = errors |> List.map (fun e -> e.Message) |> String.concat " "
+    { m with FieldErrors = errors; Problem = Some ("Not saved: " + summary); Confirmed = None }, []
+
+let private emptyStart (f: Form) = { f with NewTitle = ""; NewObservation = "" }
+
 let private repoOf (m: Model) (s: Source) = match s with Catalog -> m.Catalog | WorkingCopy -> m.Write
 let private headOfSource (m: Model) (s: Source) = match s with Catalog -> m.CatalogHead | WorkingCopy -> m.WriteHead
 
@@ -219,7 +240,7 @@ let update (m: Model) (msg: Msg) : Model * Effects =
     match msg with
     | Clock now -> { m with Now = Some now }, []
     | Navigated hash -> navigate m hash
-    | Field(name, value) -> { m with Form = setField m.Form name value }, []
+    | Field(name, value) -> { m with Form = setField m.Form name value; FieldErrors = withoutField (fieldIdOf name) m.FieldErrors }, []
     | Connect ->
         match RepoRef.parse m.Form.CatalogRepo m.Form.CatalogBranch with
         | None -> fail m "Enter the catalog repository as owner/name and a branch."
@@ -232,14 +253,20 @@ let update (m: Model) (msg: Msg) : Model * Effects =
                 let reqs = [ CatalogHead, fresh m (branchHead m.Form.Token catalog) ] @ (match write with Some w -> [ WriteHead, fresh m (branchHead m.Form.Token w) ] | None -> [])
                 requests m reqs
     | Disconnect -> { initial with Now = m.Now }, []
-    | Back -> { m with Screen = (if m.Catalog.IsSome then ListScreen else ConnectScreen); Problem = None }, []
-    | ShowCreate -> { m with Screen = CreateScreen; Problem = None; Confirmed = None }, []
+    | Back ->
+        // INV-022: leaving the start screen discards the start form; nothing is created or written.
+        let form = if m.Screen = CreateScreen then emptyStart m.Form else m.Form
+        { m with Screen = (if m.Catalog.IsSome then ListScreen else ConnectScreen); Problem = None; Form = form; FieldErrors = [] }, []
+    | ShowCreate -> { m with Screen = CreateScreen; Problem = None; Confirmed = None; FieldErrors = [] }, []
     | Open key ->
         let s, dir = if key.StartsWith "w:" then WorkingCopy, key.Substring 2 else Catalog, (if key.StartsWith "c:" then key.Substring 2 else key)
         match headOfSource m s with
         | Some head -> openAt { m with Confirmed = None } s dir head
         | None -> fail m "The branch head is not known yet."
+    | CreateSubmit when not (Validation.startForm m.Form.NewTitle m.Form.NewObservation).IsEmpty ->
+        refuse m (Validation.startForm m.Form.NewTitle m.Form.NewObservation)
     | CreateSubmit ->
+        let m = { m with FieldErrors = [] }
         match m.Now with
         | None -> fail m "The browser clock has not been reported yet."
         | Some now ->
@@ -254,10 +281,12 @@ let update (m: Model) (msg: Msg) : Model * Effects =
         match m.Opened with
         | Some o when o.Source = WorkingCopy && (match o.Result with StructurallyVerified _ -> true | _ -> false) ->
             let cmd, text = if msg = AddObservation then Writer.RecordObservation m.Form.EditObservation, m.Form.EditObservation else Writer.RecordHypothesis m.Form.EditHypothesis, m.Form.EditHypothesis
-            if Text.tryCreate text |> Option.isNone then fail m "Enter some text first."
+            let errors = if msg = AddObservation then Validation.observationText text else Validation.hypothesisStatement text
+            if not errors.IsEmpty then refuse m errors
+            elif Text.tryCreate text |> Option.isNone then fail m "Enter some text first."
             else
                 let form = if msg = AddObservation then { m.Form with EditObservation = "" } else { m.Form with EditHypothesis = "" }
-                { m with Opened = Some { o with Unsaved = o.Unsaved @ [ cmd ] }; Form = form; Problem = None; Confirmed = None }, []
+                { m with Opened = Some { o with Unsaved = o.Unsaved @ [ cmd ] }; Form = form; Problem = None; Confirmed = None; FieldErrors = [] }, []
         | Some o when o.Source = Catalog -> fail m "Historical catalog investigations are read-only (UI-006-O6)."
         | _ -> fail m "Open a working-copy investigation first."
     | Save ->

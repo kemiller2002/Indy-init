@@ -74,6 +74,8 @@ type Model =
       Status: string
       Problem: string option
       Confirmed: string option
+      /// Field-level validation errors of the last refused submit (INV-019..021, INV-024, INV-026); cleared per field on edit.
+      FieldErrors: Causa.Preview.Validation.FieldError list
       /// A route the browser asked for before the data it names was available (a deep link before Connect).
       PendingRoute: string option }
 
@@ -97,4 +99,5 @@ let initial =
       Status = "Not connected."
       Problem = None
       Confirmed = None
+      FieldErrors = []
       PendingRoute = None }

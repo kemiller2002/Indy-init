@@ -225,6 +225,39 @@ let main argv =
     let d = dispatch d (event "connect")
     check "after Connect the deep-linked case opens" (v d "screenDetail" = "True" && (v d "dDecoded").StartsWith "432 of 432") (v d "dDecoded")
 
+    // ---- CI-CADENCE-001 (UI): start-form validation, Cancel, save state (INV-016, INV-019..022)
+    let startWith (title: string) (problem: string) =
+        let s = connected root true
+        let s = dispatch (dispatch (dispatch s (event "show-create")) (setField "newTitle" title)) (setField "newObservation" problem)
+        dispatch s (event "create")
+    let u1 = startWith "Valid title" ""
+    check "INV-019 blank problem statement refused, nothing written" (v u1 "problemErrHasError" = "True" && v u1 "problemErrInvalid" = "true" && v u1 "screenCreate" = "True" && headOf u1.World "acme/causa-work" = "c0") (v u1 "problemErrErrors")
+    let u1b = startWith "Valid title" "   \n "
+    check "INV-019 whitespace-only problem statement refused" (v u1b "problemErrHasError" = "True" && headOf u1b.World "acme/causa-work" = "c0") (v u1b "problemErrErrors")
+    let u1c = dispatch u1 (setField "newObservation" "x")
+    check "editing the problem statement clears its error" (v u1c "problemErrHasError" = "False" && v u1c "problemErrInvalid" = "false") (v u1c "problemErrErrors")
+    let u2 = startWith (String('t', 201)) "Problem."
+    check "INV-020 a 201-character title is refused, nothing written" (v u2 "titleErrHasError" = "True" && (v u2 "titleErrErrors").Contains "INV-020" && headOf u2.World "acme/causa-work" = "c0") (v u2 "titleErrErrors")
+    let u3 = startWith (String('t', 200)) "Problem."
+    check "INV-020 a 200-character title is accepted and saved" (v u3 "titleErrHasError" = "False" && headOf u3.World "acme/causa-work" <> "c0" && v u3 "hasConfirmed" = "True") (v u3 "problem")
+    let u4 = startWith "Valid title" (String('p', 10001))
+    check "INV-021 a 10001-character problem statement is refused, nothing written" (v u4 "problemErrHasError" = "True" && (v u4 "problemErrErrors").Contains "INV-021" && headOf u4.World "acme/causa-work" = "c0") (v u4 "problemErrErrors")
+    let u5 = connected root true
+    let u5 = dispatch (dispatch (dispatch u5 (event "show-create")) (setField "newTitle" "Typed")) (setField "newObservation" "Typed problem.")
+    let u5 = dispatch u5 (event "back")
+    check "INV-022 Cancel returns to the list" (v u5 "screenList" = "True") (v u5 "screenList")
+    check "INV-022 Cancel writes nothing" (headOf u5.World "acme/causa-work" = "c0") "head changed"
+    check "INV-022 Cancel clears the start form" (v u5 "newTitle" = "" && v u5 "newObservation" = "" && v u5 "titleErrHasError" = "False") (v u5 "newTitle")
+    let u6 = dispatch u5 (event "show-create")
+    check "INV-005 the destination names repository, branch and path" ((v u6 "destination").Contains "acme/causa-work" && (v u6 "destination").Contains "main" && (v u6 "destination").Contains "workspaces/demo/preview-test/investigations/") (v u6 "destination")
+    check "INV-016 a confirmed save shows all changes saved" ((v u3 "saveState").StartsWith "All changes saved") (v u3 "saveState")
+    let u7 = dispatch (dispatch u3 (setField "editObservation" "More.")) (event "add-observation")
+    check "INV-016 an unsaved change is counted" (v u7 "saveState" = "Unsaved changes: 1") (v u7 "saveState")
+    let u8 = dispatch (dispatch u3 (setField "editObservation" "  ")) (event "add-observation")
+    check "INV-024 a blank observation is refused with a field error" (v u8 "obsErrHasError" = "True" && v u8 "saveState" <> "Unsaved changes: 1") (v u8 "obsErrErrors")
+    let u9 = dispatch (dispatch u3 (setField "editHypothesis" (String('h', 10001)))) (event "add-hypothesis")
+    check "INV-026 a 10001-character hypothesis is refused with a field error" (v u9 "hypErrHasError" = "True") (v u9 "hypErrErrors")
+
     // CI-CADENCE-001: pure validation tests (owner: domain agent).
     failures <- failures + ValidationTests.run ()
     printfn "%s" (if failures = 0 then "all engine tests passed" else $"{failures} engine test(s) FAILED")
