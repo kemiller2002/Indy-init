@@ -10,6 +10,7 @@ type Destination = { Repository: string; Branch: string; Writable: bool }
 type StartForm = { ProblemStatement: string; Title: string; Question: string; Identifier: string }
 
 /// The progress of one submitted command. Correctness is the engine's and persistence's; the UI shows the outcome.
+/// Qualified access: Refused would otherwise collide with IF41-SAVE SaveFailure.Refused.
 [<RequireQualifiedAccess>]
 type Submission =
     | NotSubmitted
