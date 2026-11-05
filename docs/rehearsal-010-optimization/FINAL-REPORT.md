@@ -71,9 +71,11 @@ At 10-min CI:
 | Full completion | T+794 | T+756 (−38) | T+563 (−231) |
 
 Time to a working application (R0 → R2, milestone-first):
-- **M1 connect:** T+681 → T+283;
+- **M1 connect:** T+681 → T+283, conditional on ODR-R10-28, and on -29 A (else -25);
 - **M2 browse:** T+794 → T+309, conditional on ODR-R10-25;
-- **M3 create:** T+739 → T+489.
+- **M3 create:** T+739 → T+489, conditional on ODR-R10-25 and -26.
+
+These are schedule figures. Under v4.1.4 as frozen, M1, M2 and M3 cannot pass against the real data repository (review RVO-3-1).
 
 **6. How many more requirements and obligations are expected to be verified within 420 minutes?**
 At 10-min CI:
@@ -111,8 +113,8 @@ None is recorded. Agents do not record approvals (RDP-003).
 **No.**
 - The critical path alone is 389–409 minutes at zero CI, and passes 420 at about 1–2 minutes of CI per integration, even with unlimited agents.
 - The best modelled plan (V5, hypothetical) finishes at T+510 at zero CI and T+563 at 10-minute CI.
-- A working application, M1 plus M2, plausibly can within the window: about T+260–310, but only with ODR-R10-19, -22, -23, -25 and -27, and the gate code for -22.
-- **M3 inside the window needs v4.1.5 ownership (R4)**, or zero CI with the milestone-aligned split (R5: T+418).
+- A working application, M1 plus M2, plausibly can within the window: about T+260–310, but only with ODR-R10-19, -22, -23, -25, -27, -28 and -29, and the gate code for -22.
+- **M3 inside the window needs v4.1.5 ownership (R4)**, or zero CI with the milestone-aligned split (R5: T+418), and in either case ODR-R10-25 and -26.
 
 **10. What is the single highest-value remaining optimization?**
 **A v4.1.5 successor package** that, in one compile, review and freeze cycle:
@@ -135,7 +137,20 @@ R2 is milestone-first ordering; R5 adds the milestone-aligned split.
 
 ## Round-3 independent review
 
-ROUND3_PLACEHOLDER
+Round 3 (on 1ead513) returned **FAIL** on one documentation finding. The code, data, tests and every reproduction held. All findings were fixed, and the fix was re-reviewed in round 4 (ADVERSARIAL-REVIEW.md §B).
+
+The addendum's eight checks:
+
+| # | Check | Verdict |
+|---|---|---|
+| 1 | Data from GitHub | PASS: independent anonymous clone; cases, counts and missing union cases confirmed |
+| 2 | No write credential for browsing | PASS |
+| 3 | One canonical model | PASS |
+| 4 | No requirement lost | PASS |
+| 5 | No test weakened | PASS |
+| 6 | Save semantics unchanged | PASS |
+| 7 | Runnable after each milestone | PARTIAL, and correctly so: under v4.1.4 no milestone M1–M3 can pass against real data |
+| 8 | No relabelling | PARTIAL until RVO-3-1 was fixed |
 
 ## Verdict
 

@@ -51,7 +51,34 @@ The reviewer re-verified the round-1 fixes. RVO-1-1 holds for the cases raised (
 
 ### Round 3
 
-Requested on 1ead513 together with the addendum's eight checks; result below when it completes.
+### Round 3 (1ead513): FAIL, 1 major (documentation)
+
+The reviewer worked from an independent anonymous clone of causa-data, and reproduced:
+- R1, R2 and R5 exactly;
+- the derived proposal files, byte-equal;
+- `scope preflight` PASS;
+- pinned files byte-unchanged against main.
+
+It also ran 36 invariant cases under milestone priority (all PASS) and six mutations, four of which were caught.
+
+| ID | Severity | Finding | Disposition |
+|---|---|---|---|
+| RVO-3-1 | major | M1 and M3 times were presented without the blockers the branch's own ODRs give them; only M2 was labelled blocked | **Fixed:** TIME-TO-WORKING-APPLICATION limit 1, findings 4–5, FUNCTIONAL-PRIORITY-PLAN §2 and §7, and FINAL-REPORT now qualify M1 (ODR-R10-28, -29/-25) and M3 (ODR-R10-25, -26) |
+| RVO-3-2 | minor | Milestone delivery is not cumulative, so `usableMilestonesAt` could overcount | **Fixed:** `usableAt` counts the delivered prefix; test added. Committed counts are unchanged, and reproduced by test |
+| RVO-3-3 | minor | No staleness check on derived artifacts. Emptying every `dependsOn` in the aligned slice manifest, or ranking without ancestors, went undetected | **Fixed:** model tests reproduce every committed run R0–R5. The rank test covers ancestors. A CI step regenerates both successors' slice manifests and inventories and diffs them. Both reviewer mutations are now caught |
+| RVO-3-4 | minor | Invariants never run under milestone priority | **Fixed:** 16 invariant cases (successor and aligned × depth 1/3 × fail 0/4 × CI 0/10) |
+| RVO-3-5 | minor | C1 omitted `NegativeKnowledgeEstablished` (6) and `ConclusionRecorded` (4); the stub has 27 cases, not 28 | **Fixed** in DATA-REPOSITORY-CONTRACT.md |
+| RVO-3-6 | note | ODR-R10-28 option B would browse with a write-capable token | Stands as an option; A is recommended |
+| RVO-3-7 | note | Round 3 not recorded | This section |
+
+Eight addendum checks:
+- PASS: 1 (data from GitHub), 2 (no write credential), 3 (one canonical model), 4 (no requirement lost), 5 (no test weakened), 6 (save semantics);
+- PARTIAL: 7 (runnable after each milestone: under v4.1.4 no milestone M1–M3 can pass against real data);
+- PARTIAL: 8 (no relabelling; fixed by RVO-3-1).
+
+### Round 4
+
+Requested on the fix commit; result below.
 
 ## The ten mission questions (from round 1 unless noted)
 

@@ -168,6 +168,61 @@ case "milestone-first delivers the first milestone no later than longest-chain-f
       for ci in [ 0.0; 5.0; 10.0 ] do
           let t prio = milestoneTimes ms suc (simulate { ownC with QueueDepth = 3; Setup = 25.0; Milestones = ms; Priority = prio } ci suc) (fun r -> r.Integrated) |> List.head |> fun (_, _, x) -> x
           if t "milestones" > t "tail" then yield sprintf "ci %.0f: M1 at %.0f milestone-first, %.0f chain-first" ci (t "milestones") (t "tail") ]
+case "usable milestones are a delivered prefix: a later milestone never counts before an earlier one (RVO-3-2)"
+    [ let times = [ "M1", "a", 300.0; "M2", "b", 200.0; "M3", "c", 250.0 ]
+      for w, want in [ 199.0, 0; 260.0, 0; 300.0, 3 ] do
+          if usableAt times w <> want then yield sprintf "T+%.0f: %d usable, expected %d" w (usableAt times w) want ]
+let alignedManifest = at "docs/rehearsal-010-optimization/proposals/slice-execution-manifest.milestone-aligned.json"
+let successorManifest = at "docs/rehearsal-010-optimization/proposals/slice-execution-manifest.successor.json"
+case "milestone rank covers every ancestor of a milestone's carriers (RVO-3-3)"
+    [ let ms = loadMilestones msFile
+      for m in [ successorManifest; alignedManifest ] do
+          let sl = loadSlices m (Some roles) ownC
+          let byId = sl |> List.map (fun s -> s.Id, s) |> Map.ofList
+          let rank = milestoneRank ms sl
+          let rec anc (id: string) : string list = id :: (byId[id].Deps |> List.collect anc)
+          for i, (mid, _, reqs) in List.indexed ms do
+              for c in sl |> List.filter (fun s -> s.Requirements |> List.exists (fun r -> List.contains r reqs)) do
+                  for a in anc c.Id |> List.distinct do
+                      if rank[a] > i + 1 then yield sprintf "%s: %s is needed by %s (via %s) but ranked %d" (Path.GetFileName m) a mid c.Id rank[a] ]
+// review RVO-3-4: the invariants hold under milestone priority too
+for name, m in [ "successor", successorManifest; "milestone-aligned", alignedManifest ] do
+    let ms = loadMilestones msFile
+    let c = { ownC with Setup = 25.0; Milestones = ms; Priority = "milestones" }
+    let sl = loadSlices m (Some roles) c
+    for depth in [ 1; 3 ] do
+        for fail in [ 0; 4 ] do
+            for ci in [ 0.0; 10.0 ] do
+                let c' = { c with QueueDepth = depth; FailEvery = fail }
+                case (sprintf "invariants, milestone priority: %s, depth %d, fail every %d, ci %.0f" name depth fail ci) (invariants c' sl (simulate c' ci sl))
+// review RVO-3-3: the committed milestone runs reproduce from their recorded configuration
+case "committed milestone runs R0-R5 reproduce (finish, obligations, milestones, usable counts)"
+    [ let ms = loadMilestones msFile
+      let v415 = at "docs/rehearsal-010-optimization/inputs/slice-roles.v415-proposed.json"
+      for file, m, r, setup, depth, prio in
+            [ "R0-baseline", manifest, roles, 45.0, 1, "tail"
+              "R1-V4-tail", successorManifest, roles, 25.0, 3, "tail"
+              "R2-V4-milestones", successorManifest, roles, 25.0, 3, "milestones"
+              "R3-V4-milestones-t20read", at "docs/rehearsal-010-optimization/results/sensitivity-t20-read-path.slices.json", roles, 25.0, 3, "milestones"
+              "R4-V5-milestones", successorManifest, v415, 25.0, 3, "milestones"
+              "R5-V4-milestones-aligned", alignedManifest, roles, 25.0, 3, "milestones" ] do
+          let committed = JsonNode.Parse(File.ReadAllText(at (sprintf "docs/rehearsal-010-optimization/results/%s.json" file)))
+          let c = { ownC with Setup = setup; QueueDepth = depth; Priority = prio; Milestones = ms }
+          let sl = loadSlices m (Some r) c
+          for sc in committed["scenarios"].AsArray() do
+              let ci = sc["ciMinutes"].GetValue<float>()
+              let recs = simulate c ci sl
+              let finish = sl |> List.map (fun s -> recs[s.Id].Integrated) |> List.max
+              if finish <> sc["allIntegratedAt"].GetValue<float>() then yield sprintf "%s ci %.0f: finish %.0f, committed %.0f" file ci finish (sc["allIntegratedAt"].GetValue<float>())
+              let times = milestoneTimes ms sl recs (fun x -> x.Integrated)
+              for (id, _, t), e in List.zip times (sc["milestones"].AsArray() |> List.ofSeq) do
+                  if t <> e["deliveredAt"].GetValue<float>() then yield sprintf "%s ci %.0f: %s at %.0f, committed %.0f" file ci id t (e["deliveredAt"].GetValue<float>())
+              for w in [ 120.0; 240.0; 360.0; 420.0 ] do
+                  let k = sprintf "T+%.0f" w
+                  let usableNode = sc["usableMilestonesAt"]
+                  let committedUsable = usableNode[k].GetValue<int>()
+                  if usableAt times w <> committedUsable then yield sprintf "%s ci %.0f: %d usable at %s, committed %d" file ci (usableAt times w) k committedUsable ]
+
 // ---- 4. refusals ---------------------------------------------------------------------------------------------------
 
 let refused (name: string) (expect: string) (f: unit -> obj) =

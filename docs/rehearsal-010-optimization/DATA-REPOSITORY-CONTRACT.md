@@ -191,13 +191,13 @@ None of these is resolved below. Each is a fact from the cited lines. Resolving 
 ### Critical
 
 **C1. Frozen event union versus the 31 wire event types.**
-- **The stub.** `00-DOMAIN-STUBS.fs`:92-120 freezes 28 `CoreEvent` cases plus `ExtensionAttached`. The case names are frozen (:11-13), and any added case is a breaking change (`interface-specifications.json` IF41-DOMAIN `versioning`).
+- **The stub.** `00-DOMAIN-STUBS.fs`:92-120 freezes 27 `CoreEvent` cases plus `ExtensionAttached` (corrected from 28 in review RVO-3-5). The case names are frozen (:11-13), and any added case is a breaking change (`interface-specifications.json` IF41-DOMAIN `versioning`).
 - **The data.** The four catalog cases use wire events and commands that have **no stub case**:
   - `HypothesisTransitioned` with `command: markWeakened` (10). The stub has only `HypothesisMarkedPlausible`, `HypothesisMarkedSupported`, `HypothesisFalsified` and `HypothesisReopened`.
   - `LifecycleChanged` with `markAwaitingVerification` (3), `markAwaitingEvidence` (1) and `verificationFailed` (1). The stub has only `InvestigationActivated`, `InvestigationResolved` and `InvestigationReopened`.
   - `EvidenceVerificationAssessed` (382), `ContradictionTransitioned` (45), `UnknownTransitioned` (9), `AssumptionTransitioned` (3) and `ActionTransitioned` (9). The stub has none of these.
   - `CorrectiveActionTransitioned` to `approved`, `inProgress`, `awaitingVerificationOfEffect`, `verifiedEffective` and `verificationFailed`. The stub has only `CorrectiveActionImplemented`.
-- **Absent from the stub altogether.** `EvidenceSuperseded` and `ProposalWasAccepted` have no case. (`CriterionRecorded` and `CausalAssertionReopened` only differ in name, from `VerificationCriterionRecorded` and `ConfirmedCauseReopened`, so they can be mapped.)
+- **Absent from the stub altogether.** `EvidenceSuperseded`, `ProposalWasAccepted`, `NegativeKnowledgeEstablished` (6 events in the catalog) and `ConclusionRecorded` (4) have no case. The last two were added after review RVO-3-5; the stub has only an `EstablishNegativeKnowledge` command. (`CriterionRecorded` and `CausalAssertionReopened` only differ in name, from `VerificationCriterionRecorded` and `ConfirmedCauseReopened`, so they can be mapped.)
 - **Consequence.** As frozen, `Replay: EventEnvelope list -> …` cannot represent the Apollo 1, Apollo 11 or Challenger histories. The only representable path would be `EventPayload.ExtensionEvent` (00-DOMAIN-STUBS.fs:124). But causa-data v1.0.0 "deliberately has no extension namespace" and refuses unknown data (CONTRACT.md:1070-1074, :232-233). EXT-DATA-013 cannot be met against this union without a versioned contract change.
 
 **C2. Admissibility authority.**

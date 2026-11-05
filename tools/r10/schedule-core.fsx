@@ -113,6 +113,11 @@ let milestoneTimes (milestones: (string * string * string list) list) (slices: S
             |> List.fold max 0.0
         id, name, t)
 
+/// How many milestones are usable at minute w: a milestone is usable only once it and every earlier milestone are
+/// delivered (nothing can be browsed before Connect works), so this counts the delivered prefix (review RVO-3-2).
+let usableAt (times: (string * string * float) list) (w: float) : int =
+    times |> List.takeWhile (fun (_, _, t) -> t <= w) |> List.length
+
 /// The minutes per mandatory obligation the derived estimates use (for the report).
 let rateOf (slices: Slice list) =
     let carrying = slices |> List.filter (fun s -> s.Source = "execution-dag" && s.MandatoryObligations > 0)
@@ -368,7 +373,7 @@ let printReport (r: Report) =
         if not s.MilestoneTimes.IsEmpty then
             printfn "         milestones: %s; usable at T+120/240/360/420: %s"
                 (s.MilestoneTimes |> List.map (fun (id, _, t) -> sprintf "%s T+%.0f" id t) |> String.concat ", ")
-                ([ 120.0; 240.0; 360.0; 420.0 ] |> List.map (fun w -> s.MilestoneTimes |> List.filter (fun (_, _, t) -> t <= w) |> List.length |> string) |> String.concat "/")
+                ([ 120.0; 240.0; 360.0; 420.0 ] |> List.map (fun w -> usableAt s.MilestoneTimes w |> string) |> String.concat "/")
 
 let private jv (x: obj) : JsonNode =
     match x with
@@ -397,7 +402,7 @@ let toJson (r: Report) : JsonNode =
                     "implementationMinutes", box s.ImplementationMinutes; "repairMinutes", box s.RepairMinutes; "verificationMinutes", box s.VerificationMinutes
                     "verificationRuns", box s.VerificationRuns; "mergeMinutes", box s.MergeMinutes; "queueWaitMinutes", box s.QueueWaitMinutes; "laneIdleMinutesInWindow", box s.LaneIdleMinutes
                     "milestones", box (arrOf (s.MilestoneTimes |> List.map (fun (id, name, t) -> obj [ "id", box id; "name", box name; "deliveredAt", box t; "byDeadline", box (t <= c.Window) ])))
-                    "usableMilestonesAt", box (obj ([ 120.0; 240.0; 360.0; 420.0 ] |> List.map (fun w -> sprintf "T+%.0f" w, box (s.MilestoneTimes |> List.filter (fun (_, _, t) -> t <= w) |> List.length))))
+                    "usableMilestonesAt", box (obj ([ 120.0; 240.0; 360.0; 420.0 ] |> List.map (fun w -> sprintf "T+%.0f" w, box (usableAt s.MilestoneTimes w))))
                     "cpm", box (arrOf (s.Cpm |> List.map (fun x -> obj [ "slice", box x.Slice; "earliestStart", box x.Es; "earliestFinish", box x.Ef; "latestStart", box x.Ls; "slack", box x.Slack; "critical", box x.Critical ])))
                     "timeline", box (arrOf (r.Slices |> List.map (fun sl -> let x = s.Records[sl.Id] in obj [ "slice", box sl.Id; "lane", box x.Lane; "start", box x.Start; "implemented", box x.Implemented; "firstVerification", box x.FirstVerification; "integrated", box x.Integrated; "runs", box x.Runs; "repairs", box x.Repairs ]))) ]))) ]
 

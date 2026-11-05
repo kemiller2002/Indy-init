@@ -36,7 +36,7 @@ DATA-REPOSITORY-CONTRACT.md is a read-only investigation of the real repository;
   - content fields with no wire form (C5);
   - no list operation (S1);
   - no creation path in the save contract (S2).
-- **Consequence:** M2 cannot be delivered under v4.1.4 at any time, whatever the schedule. That is ODR-R10-25, and it is critical. No agent may resolve it by inventing event shapes (ADRP-005-O4).
+- **Consequence:** M2 cannot be delivered under v4.1.4 at any time, whatever the schedule. M1 inherits this through EXT-DATA-013 unless ODR-R10-29 A regroups it. M3 also lacks a creation path (S2) and the INV-023 field (ODR-R10-26). That is ODR-R10-25, and it is critical. No agent may resolve it by inventing event shapes (ADRP-005-O4).
 - **Not verifiable here:** the `kemiller2002/causa` repository was not readable from this session (HTTP 403). Nothing in this plan is taken from it.
 
 ## 3. Ordering rule (implemented)
@@ -129,4 +129,4 @@ That serialization is why `ui` binds M1 and M2 in every run. ODR-R10-20 (v4.1.5 
 | Usable at T+120/240/360/420, 10-min CI | 0/0/0/0 | 0/0/2/2 | 0/0/2/2 |
 | Obligations by T+420, 10-min CI | 435 | 527 | 520 |
 
-All M2 figures are conditional on ODR-R10-25. R2 and R5 also need ODR-R10-19, -22, -23 and -27. ODR-R10-22 needs gate code and controls S1–S7 that do not exist yet. **Without them, the run launches on the approved plan, the R0 row applies, and no milestone is usable by the deadline.**
+**All M1, M2 and M3 figures are schedule figures, conditional on decisions not yet taken** (review RVO-3-1): M1 on ODR-R10-28 and on -29 A, or else -25; M2 on ODR-R10-25; M3 on ODR-R10-25 and -26. Under v4.1.4 as frozen, none of the three can pass against real data. R2 and R5 also need ODR-R10-19, -22, -23 and -27. ODR-R10-22 needs gate code and controls S1–S7 that do not exist yet. **Without them, the run launches on the approved plan, the R0 row applies, and no milestone is usable by the deadline.**
