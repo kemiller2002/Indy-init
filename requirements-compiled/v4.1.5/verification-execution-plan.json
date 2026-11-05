@@ -35,7 +35,7 @@
     "bindings": 784,
     "planTests": 660,
     "obligations": 613,
-    "ownTests": 144,
+    "ownTests": 152,
     "suites": 11
   },
   "categoryBindings": {
@@ -71,7 +71,7 @@
       "planTests": false,
       "sha": "runs on the exact candidate SHA; every result records it",
       "counts": {
-        "tests": 141,
+        "tests": 149,
         "bindings": 0,
         "obligations": 0,
         "files": 27,
@@ -122,6 +122,9 @@
         },
         {
           "id": "dotnet:Causa.Contract.Tests.App.Producer.CredentialNeverRendered"
+        },
+        {
+          "id": "dotnet:Causa.Contract.Tests.App.Producer.StateIsKeyedByWorkspaceAndId"
         },
         {
           "id": "dotnet:Causa.Contract.Tests.App.Producer.UpdateIsPure"
@@ -175,13 +178,25 @@
           "id": "dotnet:Causa.Contract.Tests.Save.ConsumerUi2.IndicatorFollowsMachine"
         },
         {
+          "id": "dotnet:Causa.Contract.Tests.Save.Producer.CatalogLoadCreatesNoSession"
+        },
+        {
           "id": "dotnet:Causa.Contract.Tests.Save.Producer.ConfirmationNotConstructibleOutside"
         },
         {
           "id": "dotnet:Causa.Contract.Tests.Save.Producer.EveryAwaitedReadIsInterpreted"
         },
         {
+          "id": "dotnet:Causa.Contract.Tests.Save.Producer.EveryListingStepIsInterpreted"
+        },
+        {
           "id": "dotnet:Causa.Contract.Tests.Save.Producer.InterpretCoversEveryReplyEvent"
+        },
+        {
+          "id": "dotnet:Causa.Contract.Tests.Save.Producer.ListingReadsAtOneCommit"
+        },
+        {
+          "id": "dotnet:Causa.Contract.Tests.Save.Producer.NewInvestigationSavesThroughExistingTransitions"
         },
         {
           "id": "dotnet:Causa.Contract.Tests.Save.Producer.ReconcileDueStaysWithinBudget"
@@ -199,7 +214,16 @@
           "id": "dotnet:Causa.Contract.Tests.Storage.Producer.EachIntegrityCheckRefusesItsForgery"
         },
         {
+          "id": "dotnet:Causa.Contract.Tests.Storage.Producer.EncodeNewVerifiesAndRoundTrips"
+        },
+        {
+          "id": "dotnet:Causa.Contract.Tests.Storage.Producer.EveryCatalogEventRoundTrips"
+        },
+        {
           "id": "dotnet:Causa.Contract.Tests.Storage.Producer.GoldenFixturesRoundTrip"
+        },
+        {
+          "id": "dotnet:Causa.Contract.Tests.Storage.Producer.WritableRefusesCatalog"
         },
         {
           "id": "dotnet:Causa.Contract.Tests.View.Producer.IndicatorTextMatchesPersist031"

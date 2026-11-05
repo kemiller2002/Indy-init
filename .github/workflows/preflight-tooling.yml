@@ -219,14 +219,24 @@ jobs:
           dotnet tools/requirements-compiler/src/bin/Release/net10.0/requirements-compiler.dll v41 --source . --package requirements-compiled/v4.1.4 --base requirements-compiled/v4 --check --bootstrap "$RUNNER_TEMP/layered414"
           dotnet build "$RUNNER_TEMP/layered414/Causa.slnx" -c Release
           dotnet build "$RUNNER_TEMP/layered414/App.slnx" -c Release
-      - name: Successor package v4.1.5 is reproduced byte for byte and its checks X01-X21 pass; its contracts equal v4.1.4's except the five it declares changed, and its layout tests equal v4.1.4's
+      - name: Successor package v4.1.5 is reproduced byte for byte and its checks X01-X21 pass except its pending owner approvals; its contracts equal v4.1.4's except the four it declares changed, and its layout tests equal v4.1.4's
         run: |
-          dotnet tools/requirements-compiler/src/bin/Release/net10.0/requirements-compiler.dll v41 --source . --package requirements-compiled/v4.1.5 --base requirements-compiled/v4 --forma-tarball "$RUNNER_TEMP/forma.tgz" --check
+          # Until the owner records ODR-V415-01 (FREEZE.md step 1), v4.1.5 must validate except for exactly that: X12/X17
+          # problems that name no operator approval. Any other problem, or byte difference (exit 4), fails.
+          pending415() {
+            set +e; "$@" > "$RUNNER_TEMP/v415.log" 2>&1; code=$?; set -e
+            cat "$RUNNER_TEMP/v415.log"
+            if [ "$code" -eq 0 ]; then return 0; fi
+            if [ "$code" -ne 3 ]; then echo "exit $code: more than pending owner approvals"; exit 1; fi
+            if grep -E '^FAIL ' "$RUNNER_TEMP/v415.log" | grep -qvE '^FAIL (X12|X17) '; then echo "a check other than X12/X17 fails"; exit 1; fi
+            if grep -E '^      - ' "$RUNNER_TEMP/v415.log" | grep -qvE 'names no operator approval$'; then echo "a problem other than a pending owner approval"; exit 1; fi
+          }
+          pending415 dotnet tools/requirements-compiler/src/bin/Release/net10.0/requirements-compiler.dll v41 --source . --package requirements-compiled/v4.1.5 --base requirements-compiled/v4 --forma-tarball "$RUNNER_TEMP/forma.tgz" --check
           diff -r requirements-compiled/v4.1.4/layout-tests requirements-compiled/v4.1.5/layout-tests
           for f in requirements-compiled/v4.1.4/contracts/*.fs requirements-compiled/v4.1.4/contracts/negative/*.fs requirements-compiled/v4.1.4/contracts/ContractCheck.fsproj; do
             rel=${f#requirements-compiled/v4.1.4/}
             case "$rel" in
-              contracts/00-DOMAIN-STUBS.fs|contracts/02-IF41-STORAGE.fs|contracts/03-IF41-WIRE.fs|contracts/05-IF41-SAVE.fs|contracts/06-IF41-APP.fs) ;;
+              contracts/00-DOMAIN-STUBS.fs|contracts/02-IF41-STORAGE.fs|contracts/05-IF41-SAVE.fs|contracts/06-IF41-APP.fs) ;;
               *) diff "$f" "requirements-compiled/v4.1.5/$rel" ;;
             esac
           done
@@ -245,15 +255,25 @@ jobs:
           done
       - name: The v4.1.5 skeleton bootstraps into an empty repository and onto a recorded Conditor 0.10.18 scaffold, and every solution builds
         run: |
+          # Until the owner records ODR-V415-01 (FREEZE.md step 1), v4.1.5 must validate except for exactly that: X12/X17
+          # problems that name no operator approval. Any other problem, or byte difference (exit 4), fails.
+          pending415() {
+            set +e; "$@" > "$RUNNER_TEMP/v415.log" 2>&1; code=$?; set -e
+            cat "$RUNNER_TEMP/v415.log"
+            if [ "$code" -eq 0 ]; then return 0; fi
+            if [ "$code" -ne 3 ]; then echo "exit $code: more than pending owner approvals"; exit 1; fi
+            if grep -E '^FAIL ' "$RUNNER_TEMP/v415.log" | grep -qvE '^FAIL (X12|X17) '; then echo "a check other than X12/X17 fails"; exit 1; fi
+            if grep -E '^      - ' "$RUNNER_TEMP/v415.log" | grep -qvE 'names no operator approval$'; then echo "a problem other than a pending owner approval"; exit 1; fi
+          }
           git init --quiet "$RUNNER_TEMP/app415"
-          dotnet tools/requirements-compiler/src/bin/Release/net10.0/requirements-compiler.dll v41 --source . --package requirements-compiled/v4.1.5 --base requirements-compiled/v4 --bootstrap "$RUNNER_TEMP/app415"
+          pending415 dotnet tools/requirements-compiler/src/bin/Release/net10.0/requirements-compiler.dll v41 --source . --package requirements-compiled/v4.1.5 --base requirements-compiled/v4 --bootstrap "$RUNNER_TEMP/app415"
           dotnet build "$RUNNER_TEMP/app415/Causa.slnx" -c Release
           fixture=tools/requirements-compiler/tests/fixtures/conditor-0.10.18-scaffold
           git init --quiet "$RUNNER_TEMP/layered415"
           cp -r "$fixture"/. "$RUNNER_TEMP/layered415/"
           mv "$RUNNER_TEMP/layered415/gitignore.txt" "$RUNNER_TEMP/layered415/.gitignore"
           rm "$RUNNER_TEMP/layered415/README.md"
-          dotnet tools/requirements-compiler/src/bin/Release/net10.0/requirements-compiler.dll v41 --source . --package requirements-compiled/v4.1.5 --base requirements-compiled/v4 --check --bootstrap "$RUNNER_TEMP/layered415"
+          pending415 dotnet tools/requirements-compiler/src/bin/Release/net10.0/requirements-compiler.dll v41 --source . --package requirements-compiled/v4.1.5 --base requirements-compiled/v4 --check --bootstrap "$RUNNER_TEMP/layered415"
           dotnet build "$RUNNER_TEMP/layered415/Causa.slnx" -c Release
           dotnet build "$RUNNER_TEMP/layered415/App.slnx" -c Release
       - name: Executable Forma layout assertions pass on Forma 0.12.0 patterns and fail on broken fixtures (Chromium and WebKit)

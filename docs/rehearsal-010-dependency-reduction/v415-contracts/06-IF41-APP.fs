@@ -37,7 +37,7 @@ type NetworkInput =
     | OnlineObserved
 
 /// What a host timer is for.
-type TimerKey = ReconcileTimer of InvestigationId
+type TimerKey = ReconcileTimer of InvestigationRef
 
 type BrowserSignal =
     | ConnectivityChanged of online: bool
@@ -59,13 +59,13 @@ type Msg =
     | Browser of BrowserSignal
     | Connection of ConnectionInput
     | Network of NetworkInput
-    | SessionInput of InvestigationId * SaveInput
-    | ConflictStep of InvestigationId * ConflictInput
-    | LoadStep of InvestigationId * LoadInput
-    /// v4.1.5 L1, W1: the user selected a derived workspace (EXT-DATA-003); the engine lists it.
-    | ListRequested of WorkspaceAddress
-    /// v4.1.5 C1: the user asked to create an investigation in the selected working copy (EXT-DATA-006: explicit).
-    | CreateRequested of WorkspaceAddress
+    | SessionInput of InvestigationRef * SaveInput
+    | ConflictStep of InvestigationRef * ConflictInput
+    | LoadStep of InvestigationRef * LoadInput
+    /// v4.1.5 L1, W1: the user selected what to list (EXT-DATA-003: an explicit selection of the workspace).
+    | ListRequested of ListingTarget
+    /// v4.1.5 C1: the user asked to create an investigation in a working copy (EXT-DATA-006: an explicit action).
+    | CreateRequested of Workspace * CommandEnvelope
     | DomainCommand of CommandEnvelope
 
 /// The model keeps the connection context after Connect succeeds and the next request identity of the tab.
@@ -75,11 +75,11 @@ type Model =
       NextRequestId: RequestId
       Network: NetworkState
       Route: Route
-      Loads: Map<InvestigationId, LoadState>
+      Loads: Map<InvestigationRef, LoadState>
+      Sessions: Map<InvestigationRef, InvestigationSession>
       /// v4.1.5 L1: the latest listing of each workspace the user selected, and the listing reads in flight.
       Listings: Map<WorkspaceAddress, Listing>
-      ListingsInFlight: Map<RequestId, WorkspaceAddress>
-      Sessions: Map<InvestigationId, InvestigationSession> }
+      ListingsInFlight: Map<RequestId, ListingTarget * ListingStep> }
 
 type Engine =
     { Init: Route -> Model * HostEffect list

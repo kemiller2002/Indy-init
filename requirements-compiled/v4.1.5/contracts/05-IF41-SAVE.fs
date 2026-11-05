@@ -137,7 +137,7 @@ type LoadState =
 /// SM-LOAD events.
 [<RequireQualifiedAccess>]
 type LoadInput =
-    | OpenRequested of WorkspaceAddress * InvestigationId
+    | OpenRequested of InvestigationRef
     | LoadVerified of VerifiedInvestigation
     | LoadRejected of LoadFailure
     | WentOffline
@@ -151,7 +151,7 @@ type Politeness =
 
 type SaveEffect =
     | Send of HttpRequest
-    | ScheduleReconcileRead of InvestigationId * afterMilliseconds: int
+    | ScheduleReconcileRead of InvestigationRef * afterMilliseconds: int
     | Announce of Politeness * text: string
     | ExportCommands of CommandEnvelope list
 
@@ -171,8 +171,8 @@ type Awaiting =
 
 type InvestigationSession =
     { Id: InvestigationId
-      /// v4.1.5 W1: where the investigation is saved; always a WorkingCopy (a catalog session is never created).
-      Address: WorkspaceAddress
+      /// v4.1.5 W1: where the investigation is saved. Only a working copy has a session (T-L03 as amended by ODR-V415-01).
+      Address: Writable.T
       BaseHead: CommitOid
       State: SaveState
       Unsaved: CommandEnvelope list
@@ -209,33 +209,50 @@ type ConflictInterpretation =
 
 /// v4.1.5 L1: one investigation a workspace holds. For a catalog, the title and expected state digest come from the
 /// catalog manifest (EXT-DATA-013); for a working copy they are absent until the investigation is opened.
-type ListedInvestigation = { Id: InvestigationId; Path: RepoPath; Title: string option; ExpectedStateSha256: string option }
+type ListedInvestigation = { Ref: InvestigationRef; Path: RepoPath; Title: string option; ExpectedStateSha256: string option }
 
-/// v4.1.5 L1: a workspace's investigations, read at one commit.
+/// v4.1.5 L1, W1: what to list. ActiveCatalog derives the catalog workspace from `catalog/active.json`; a working copy
+/// is named by WorkspaceLister.WorkingCopyFor.
+type ListingTarget =
+    | ActiveCatalog
+    | WorkingCopyOf of Workspace
+
+/// v4.1.5 L1: the read a listing is waiting for, so InterpretList knows what an answer means and at which commit.
+type ListingStep =
+    | ListHead
+    | ListActiveCatalogAt of CommitOid
+    | ListManifestAt of CommitOid * Workspace
+    | ListDirectoryAt of CommitOid * Workspace
+
+/// v4.1.5 L1: a workspace's investigations, all read at one commit.
 type Listing = { Address: WorkspaceAddress; ReadAt: CommitOid; Investigations: ListedInvestigation list }
 
-/// v4.1.5 L1: what one answer means for a listing. It adds no machine state: a listing is a read, like a load's
-/// head-then-files steps.
+/// v4.1.5 L1: what one answer means for a listing. A listing is a read, like a load's head-then-files steps; it adds
+/// no machine state.
 type ListingInterpretation =
     | ListingComplete of Listing
-    | ListingNextRequest of HttpRequest
+    | ListingNextRequest of ListingStep * HttpRequest
     | ListingFailed of LoadFailure
 
-/// v4.1.5 L1: listing a workspace. A catalog reads the head, then `catalog/active.json` and the manifest it names; a
-/// working copy reads the head, then the `investigations` directory at that commit. Nothing is written (EXT-DATA-006).
+/// v4.1.5 L1, W1: listing a workspace. Nothing is written (EXT-DATA-006). A working copy that does not exist yet lists
+/// as empty at the head read (EXT-DATA-009: a clean start).
 type WorkspaceLister =
-    { List: RequestContext -> WorkspaceAddress -> HttpRequest
-      InterpretList: RequestContext -> WorkspaceAddress -> HttpOutcome -> ListingInterpretation }
+    { /// `workspaces/demo/<run>` for a run id matching ^[a-z0-9][a-z0-9-]{0,63}$ (CONTRACT section 9.4), else None.
+      WorkingCopyFor: string -> Workspace option
+      List: RequestContext -> ListingTarget -> ListingStep * HttpRequest
+      InterpretList: RequestContext -> ListingTarget -> ListingStep -> HttpOutcome -> ListingInterpretation }
 
 /// Every operation that emits a request uses RequestContext.NextId for it (at most one per call) and records it as
 /// Outstanding; an answer whose RequestId is not Outstanding is SupersededReply.
 type SaveMachine =
-    { Initial: WorkspaceAddress -> VerifiedInvestigation -> InvestigationSession
-      /// v4.1.5 C1: a new investigation's session in a WorkingCopy at the head just read. It starts in Unsaved with no
-      /// unsaved commands; its first Edit is the StartInvestigation command (EXT-DATA-008). Its first save is the same
-      /// SM-SAVE path: one commit adding StorageCodec.EncodeNew's three files, conditional on BaseHead, and Saved only
-      /// from a read-back equal to them (PERSIST-005..007). No state or input is added.
-      InitialNew: WorkspaceAddress -> InvestigationId -> CommitOid -> InvestigationSession
+    { Initial: Writable.T -> VerifiedInvestigation -> InvestigationSession
+      /// v4.1.5 C1 (address, id, base head, start command, online): a new investigation's session in a working copy at the head just read, holding its
+      /// StartInvestigation command (EXT-DATA-008), the only way it starts. It starts in Unsaved when online and in
+      /// Offline when known offline (the states T-S01 and T-S02 would reach). Its first save is the existing T-S04: one
+      /// commit adding StorageCodec.EncodeNew's three files, conditional on BaseHead, Saved only from an equal read-back
+      /// (PERSIST-005..007). On a moved head, files absent at the fresh head are StaleHeadUnrelated and files present
+      /// there are StaleHeadSameInvestigation. No state, input or transition is added.
+      InitialNew: Writable.T -> InvestigationId -> CommitOid -> CommandEnvelope -> bool -> InvestigationSession
       /// Classifies and verifies one answer (IF41-ERRORS, read-back, reconciliation) against what the session awaits.
       Interpret: RequestContext -> InvestigationSession -> HttpOutcome -> Interpretation
       Step: RequestContext -> InvestigationSession -> SaveInput -> Result<InvestigationSession * SaveEffect list, SaveFault>

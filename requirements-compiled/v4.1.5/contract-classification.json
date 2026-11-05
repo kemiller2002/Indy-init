@@ -21,10 +21,31 @@
     },
     {
       "file": "contracts/02-IF41-STORAGE.fs",
-      "classification": "specification: types and signatures only",
+      "classification": "specification with reviewed boundary code",
       "interface": "IF41-STORAGE",
       "producerFile": "src/Causa.Persistence/Storage.fs",
-      "implementation": []
+      "implementation": [
+        {
+          "scope": "Writable",
+          "symbol": "ofAddress",
+          "sha256": "f7dd169bf5f8a1949fca0cc6154e7111c3ad54b590f37609138bf71ffb85ae84",
+          "rationale": "The only constructor of the private writable-address representation; it refuses a Catalog, so no catalog investigation can reach a save session. Boundary code: the type is the requirement.",
+          "requirements": [
+            "EXT-DATA-006",
+            "EXT-DATA-013"
+          ]
+        },
+        {
+          "scope": "Writable",
+          "symbol": "address",
+          "sha256": "1a1c2da91de006027c77b5c72221e3aaae7df409383f0f13c538194a11fb2d20",
+          "rationale": "Reads the address back out of the private representation (the path and role a save writes under). Boundary code: without it the private type cannot be used.",
+          "requirements": [
+            "EXT-DATA-006",
+            "EXT-DATA-013"
+          ]
+        }
+      ]
     },
     {
       "file": "contracts/03-IF41-WIRE.fs",

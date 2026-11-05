@@ -44,15 +44,6 @@ module Credential =
 
 type Repository = { Owner: string; Name: string; Branch: string }
 
-/// v4.1.5 W1: what a workspace may be used for. A catalog is read-only (EXT-DATA-013); only a working copy is written
-/// (CONTRACT section 9.4; EXT-DATA-006).
-type WorkspaceRole =
-    | Catalog
-    | WorkingCopy
-
-/// v4.1.5 W1: a workspace in a repository, with its role.
-type WorkspaceAddress = { Repository: Repository; Workspace: Workspace; Role: WorkspaceRole }
-
 /// What every request needs after Connect: the repository and the credential. The engine keeps it in its model.
 type ConnectionContext = { Repository: Repository; Credential: Credential.T }
 

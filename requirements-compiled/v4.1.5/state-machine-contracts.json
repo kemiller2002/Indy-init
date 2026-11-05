@@ -3359,13 +3359,15 @@
               "next": "Loaded",
               "effects": [
                 "record base head",
-                "SM-SAVE initial Saved at that commit"
+                "for a WorkingCopy address: SM-SAVE initial Saved at that commit (SaveMachine.Initial with its Writable address); for a Catalog address: no SM-SAVE session, because a catalog investigation is read-only (EXT-DATA-013, EXT-DATA-006)"
               ],
               "sources": [
                 "PERSIST-005",
-                "PERSIST-021"
+                "PERSIST-021",
+                "EXT-DATA-013"
               ],
-              "test": "dotnet:Causa.Persistence.Tests.StateMachines.SMLOAD.T-L03"
+              "test": "dotnet:Causa.Persistence.Tests.StateMachines.SMLOAD.T-L03",
+              "amendedBy": "ODR-V415-01"
             }
           ]
         },

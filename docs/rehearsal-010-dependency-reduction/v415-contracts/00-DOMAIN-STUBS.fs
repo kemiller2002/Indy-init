@@ -56,13 +56,16 @@ type HypothesisId = HypothesisId of Guid
 type CorrectiveActionId = CorrectiveActionId of Guid
 type ProposalId = ProposalId of Guid
 type CausalAssertionId = CausalAssertionId of Guid
+/// v4.1.5 E1: the commands whose events now carry the wire's fields carry them too (reason; evidence ids), opaque
+/// like the other command payloads, so Decide can produce events that encode.
+type MarkHypothesis = class end
 type CoreCommand =
     | StartInvestigation of StartInvestigation
     | ActivateInvestigation
     | RecordObservation of RecordObservation
     | RecordHypothesis of RecordHypothesis
-    | MarkHypothesisPlausible of HypothesisId
-    | MarkHypothesisSupported of HypothesisId
+    | MarkHypothesisPlausible of MarkHypothesis
+    | MarkHypothesisSupported of MarkHypothesis
     | FalsifyHypothesis of FalsifyHypothesis
     | ReopenHypothesis of ReopenHypothesis
     | AdmitEvidence of AdmitEvidence
@@ -84,7 +87,7 @@ type CoreCommand =
     | ReopenInvestigation of ReopenInvestigation
     | RecordProposal of RecordProposal
     | AcceptProposal of ProposalId
-    | RejectProposal of ProposalId
+    | RejectProposal of ProposalId * reason: NonEmptyText
     | AttachExtension of ExtensionEnvelope
 type Command =
     | Core of CoreCommand

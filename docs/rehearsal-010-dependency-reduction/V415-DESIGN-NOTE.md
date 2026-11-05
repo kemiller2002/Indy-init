@@ -1,69 +1,41 @@
 # v4.1.5 minimum: design note
 
-**Status: PROPOSED.** This is input to the compile in workstream D, not a frozen package. The contract text is `v415-contracts/`. The diff against frozen v4.1.4 is `v415-contracts/v4.1.4-to-v4.1.5.diff`.
+**Status.** v4.1.5 is compiled in `requirements-compiled/v4.1.5` as a CANDIDATE. This note explains its design. `v415-contracts/` holds the same contract text, and `v415-contracts/v4.1.4-to-v4.1.5.diff` is the diff against frozen v4.1.4.
 
-**Checked so far**
-- `dotnet build v415-contracts/ContractCheck.fsproj`: 0 warnings, 0 errors. `TreatWarningsAsErrors` is on, as in the package.
-- The `CoreEvent` case names equal the 50 cases of `proposals/r10-historical-data-compatibility/src/SuccessorContract.fs`.
-  - That union is the one checks C11/C15 proved: all 1,315 catalog events map into it and back to their exact stored bytes.
-  - Every v4.1.4 case name is kept.
+**Revision 2 (2026-11-05 ~20:00 UTC).** An adversarial pre-review returned FAIL on revision 1. Every finding is addressed below. The independent review the freeze needs is still to come.
 
-## Changed contract files
+## Contract changes
 
-Five files change. Every other file stays byte-identical, so the compiler's baseline check holds.
+All five parts belong to one decision, ODR-V415-01; the second decision, ODR-V415-02, approves the package.
 
-| File | Change | Requirement it serves |
+| Part | Files | Content |
 |---|---|---|
-| `00-DOMAIN-STUBS.fs` | **E1.** `CoreEvent` goes from 28 to 50 cases: 9 widened with the wire's extra fields, 22 added. `HypothesisFalsified` drops `Scope`, which the wire does not have. `EventEnvelope` gains `Provenance`. The payload types stay opaque and the domain owner's to define, as in v4.1.2, with exactly their wire fields. | EXT-DATA-011, -013; ODR-R10-25 A; OD-HC-01 A |
-| `02-IF41-STORAGE.fs` | **W1:** `Workspace`; `PathOf` takes it; `VerifiedInvestigation` records it; `Verify` takes it. **E1:** `VerificationFailure.ReaderStage` carries the §11.1 primary code. **C1:** `StorageCodec.EncodeNew` writes a new investigation's first file set. | EXT-DATA-003, -005, -008; CONTRACT §9.4, §11.1 |
-| `03-IF41-WIRE.fs` | **W1:** `WorkspaceRole` (`Catalog`, which is read-only, or `WorkingCopy`) and `WorkspaceAddress` (repository + workspace + role). | EXT-DATA-006, -013 |
-| `05-IF41-SAVE.fs` | **L1:** `ListedInvestigation`, `Listing`, `ListingInterpretation`, and `WorkspaceLister { List; InterpretList }`. A listing is a read, not a machine. **C1:** `SaveMachine.InitialNew`; `Initial` takes the address; `InvestigationSession.Address`; `LoadInput.OpenRequested` carries the address. | EXT-DATA-008, -013; PERSIST-005..007 |
-| `06-IF41-APP.fs` | `Msg.ListRequested` (the user selects a derived workspace), `Msg.CreateRequested` (creation is explicit), and `Model.Listings` / `ListingsInFlight`. | EXT-DATA-003, -006 |
+| E1 | 00, 02 | <ul><li>`CoreEvent` goes from 28 to 50 cases. The case names equal the C11/C15-verified `CoreEventV415`, and every v4.1.4 name is kept.</li><li>`EventEnvelope.Provenance`.</li><li>`VerificationFailure.ReaderStage`.</li><li>`MarkHypothesisPlausible`/`Supported of MarkHypothesis`, and `RejectProposal of ProposalId * reason`.</li></ul> |
+| W1 | 02, 06 | <ul><li>`Workspace`; `WorkspaceRole` (`Catalog` \| `WorkingCopy`); `WorkspaceAddress { Workspace; Role }`. Both roles are in the connected repository: CONTRACT §9.4 puts the writable area under `workspaces/demo/` of the data repository, and Connect has already checked that repository's permissions.</li><li>`InvestigationRef { Address; Id }` keys `Loads`, `Sessions`, `TimerKey` and the machine messages.</li><li>`Writable.T` is private, and its only constructor refuses a catalog.</li></ul> |
+| L1 | 05, 06 | <ul><li>`ListingTarget`: `ActiveCatalog` derives the catalog workspace from `catalog/active.json`; `WorkingCopyOf ws`.</li><li>`ListingStep`: head → active-at → manifest-at, or head → directory-at. Each step carries its commit, so one listing reads one commit.</li><li>`WorkspaceLister { WorkingCopyFor; List; InterpretList }`. `WorkingCopyFor` maps a run id to `workspaces/demo/<run>`.</li><li>A working copy that does not exist yet lists as empty (EXT-DATA-009).</li></ul> |
+| C1 | 02, 05, 06 | <ul><li>`InitialNew`: writable address, id, base head, the StartInvestigation command, and an online flag. It starts in Unsaved with `[start]`, or Offline when known offline.</li><li>`EncodeNew` returns Ok only for a file set Verify accepts.</li><li>`Msg.CreateRequested`.</li><li>T-L03 is replaced: only a working-copy load creates a save session.</li><li>A moved head: files absent at the fresh head mean `StaleHeadUnrelated`; files present there mean `StaleHeadSameInvestigation`.</li></ul> |
 
-## Why the change fits the frozen rules
+## Pre-review findings and how revision 2 addresses them
 
-- **No new state, event or contract file.**
-  - X05 compares the state and input *case names* with v4's machines.
-  - `LoadInput.OpenRequested` keeps its name; only its payload widens.
-  - No SM-SAVE, SM-LOAD, SM-CONNECTION or SM-NETWORK case is added.
-  - The listing types are plain reads, not a declared machine.
-- **Creation reuses SM-SAVE.**
-  - `InitialNew` starts in `Unsaved`, with the head just read as `BaseHead`.
-  - The first `Edit` is `StartInvestigation`.
-  - `SaveRequested` → `Saving` → a commit adding `EncodeNew`'s three files, conditional on `BaseHead` → `Saved (Confirmed)`, only from an equal read-back.
-  - A moved head is the existing `StaleHeadUnrelated` rebase path.
-  - The one rule that changes: SM-SAVE's declared `initial` is `Saved`, and a new investigation's session begins in `Unsaved`. That needs one `state-machine-amendment` request (C1-SM) with an `accepted` note. It adds no transition.
-- **Writes only to a working copy.** A session's `Address.Role` is always `WorkingCopy`. Saving in a catalog is a fail-closed `SaveFault`, an illegal pair.
-- **The workspace is derived (OD-V415-05 A).**
-  - Derivation:
-    - catalog workspace: the `workspace` field of `catalog/active.json`;
-    - working copy: `workspaces/demo/<run>` in the connected repository.
-  - The user selects among them (`ListRequested`), which satisfies EXT-DATA-003's "explicitly select". The J1 Connect form is unchanged.
+| Finding | Resolution |
+|---|---|
+| B1: a catalog load created a writable session | T-L03 is replaced, and `Writable.T` makes a catalog session unconstructible. Test: `WritableRefusesCatalog`, `CatalogLoadCreatesNoSession`. |
+| M1: an empty new session; offline creation | `InitialNew` holds the start command and takes the network state |
+| M2: the listing could not be interpreted | `ListingStep` is added to `ListingNextRequest`, `InterpretList` and `ListingsInFlight` |
+| M3: no derivation; the repository was not checked | The address has no repository field, so it is the connected one. `ActiveCatalog` and `WorkingCopyFor` derive the workspaces. |
+| M4: identity collided across workspaces | `InvestigationRef` keys |
+| M5: commands could not produce the widened events | Three commands widened (opaque payloads, as in v4.1.2) |
+| M6: approvals cited before they were recorded; requests that could not be chosen separately | The approvals are blank, so the package FAILs X12/X17 only on those. CI asserts exactly that (`pending415`). There is one request, ODR-V415-01, and the coupling is stated. The owner-record test is added at FREEZE step 2. |
+| M7: no tests for the new surface | 8 producer contract tests are bound (`AMENDMENT-4.1.5.md`) |
+| m1: A4's falsification scope | Stated as a known conflict with causa-storage v1.0.0. Scope can be recorded via `NegativeKnowledgeEstablished`; scope on the event itself is deferred to 1.1.0 with incomplete status. |
+| m2: stale head on a new investigation | Specified in the `InitialNew` comment |
+| m3: refresh after creation | A created investigation is opened (`OpenRequested`) after its first confirmed save, as any working-copy case is. That is the integration owner's composition, with no contract change. |
+| m4: stale text | This note and the package documents are rewritten |
 
-## Requests the compile needs
+## For the lead and Agent 2: the IF41-VIEW fold
 
-All are in `requirements-compiled/v4.1.5/proposals/owner-decision-requests.json`:
+Agent 2's `project-structure.delta.json` renames roles `ui` and `ui-2` to `ui-a`, `ui-b` and `ui-c`. The v4.1.x compiler cannot accept that without a code change:
+- test owners come from v4's laneOverrides and from hard-coded `"ui"` (`V41Package.fs:236, 252, 258, 297`);
+- X01 fails for 65 test files, and X18 needs the requesters to be declared roles.
 
-| Request | Kind | Contracts |
-|---|---|---|
-| ODR-V415-01 (E1) | interface-change | 00, 02 |
-| ODR-V415-02 (W1+L1) | interface-change | 02, 03, 05, 06 |
-| ODR-V415-03 (C1-SM) | state-machine-amendment | 05 |
-| ODR-V415-04 | package approval (O2) | — |
-| ODR-V415-IF-VIEW (CF-09 A, Agent 2) | interface-change | 07 |
-
-`contractChanges` declares each file once. For a file changed by several requests, it names the request that changes it most and lists the others in its summary.
-
-## Found while checking the fold, for the lead and Agent 2
-
-Agent 2's `project-structure.delta.json` replaces roles `ui` and `ui-2` with `ui-a`, `ui-b` and `ui-c`. **The v4.1.x compiler cannot accept that without a code change:**
-- Test-file owners still come from v4's tasks and laneOverrides (`T26: "ui-2"`) and from hard-coded `"ui"` (`V41Package.fs:236, 252, 258, 297`).
-- X01 then fails with "owner 'ui' is not a declared role" for 58 + 7 test files.
-- X18 needs `sharedEntrypoints.changeRequests.requesters` to be declared roles.
-- The `ruleLinesSha256` of `AGENT-RULES.md` changes.
-
-The IF41-VIEW contract text itself (`07-IF41-VIEW.fs`) folds without a compiler change. Two options:
-- (a) Keep the role names `ui`/`ui-2` and add `ui-3`, with ownership by file.
-- (b) A reviewed compiler change mapping the v4 lanes to the new roles.
-
-(a) avoids touching the compiler and keeps the core off that path.
+The `07-IF41-VIEW.fs` contract text itself folds cleanly. Note also that `07` still keys `NotSaved` by `InvestigationId`. That is unambiguous only because sessions exist for one working copy at a time; the fold should use `InvestigationRef`.

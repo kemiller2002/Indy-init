@@ -67,6 +67,8 @@ Each item keeps its source decision and the status `incomplete`. None is reporte
 | FO-1, FO-2, FO-3 | ODR-R10-20 A | incomplete, deferred to v4.1.6 (pending OD-V415-01) | v4.1.6 freeze |
 | T19/T22 split | ODR-R10-21 A | incomplete, deferred (pending OD-V415-01) | work-item split, or v4.1.6 |
 | INV-023, -025, -027, -029, -030 update, -034, -035 on historical views | ODR-R10-26 A, OD-HC-06 B | incomplete, descoped for historical views, **not weakened** | causa-storage 1.1.0 |
+| Falsification scope on the event (scenario A4, `docs/INVESTIGATION-ACCEPTANCE-SCENARIOS.md:47`). causa-storage v1.0.0 stores none; scope can be recorded via `NegativeKnowledgeEstablished`. | ODR-R10-26 A, OD-HC-06 B | incomplete, **not weakened** | causa-storage 1.1.0 |
+| Commands for the 22 added event kinds (reading needs only the events) | v4.1.5 scope (workstream D) | incomplete, deferred | domain work, or v4.1.6 |
 | Admissibility (CONTRACT §11.3) | OD-HC-03 A | incomplete. Views say "admissibility not evaluated". | `History.validate` passes C07 (35 negative fixtures) |
 
 ## 4. For the lead's owner batch

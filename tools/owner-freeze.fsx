@@ -86,7 +86,7 @@ let packages =
       // v4.1.4 (docs/release-gate-repair): corrected suite runners. 4.1.3 belonged to the withdrawn proposal.
       { Name = "v4.1.4"; Dir = "requirements-compiled/v4.1.4"; ApprovalPrefix = "APR-V414-OWNER"; PackageApprovalId = "ODR-V414-03"; Tag = "indy-init-requirements-v4.1.4" }
       // v4.1.5 (docs/rehearsal-010-dependency-reduction): the minimum contract change for real causa-data.
-      { Name = "v4.1.5"; Dir = "requirements-compiled/v4.1.5"; ApprovalPrefix = "APR-V415-OWNER"; PackageApprovalId = "ODR-V415-04"; Tag = "indy-init-requirements-v4.1.5" }
+      { Name = "v4.1.5"; Dir = "requirements-compiled/v4.1.5"; ApprovalPrefix = "APR-V415-OWNER"; PackageApprovalId = "ODR-V415-02"; Tag = "indy-init-requirements-v4.1.5" }
       // Rehearsal 010's owner decisions (docs/rehearsal-010-readiness/OWNER-APPROVAL-EXECUTION.md): decisions only, no
       // package approval and no tag.
       { Name = "rehearsal-010"; Dir = "kickoff/rehearsal-010"; ApprovalPrefix = "APR-R10-OWNER"; PackageApprovalId = ""; Tag = "" }

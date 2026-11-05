@@ -2,7 +2,7 @@
  "schema": "indy-init.v411-amendment/1",
  "packageVersion": "4.1.5",
  "description": "Successor amendment v4.1.5 of the approved, frozen package v4.1.4 (APR-V414-OWNER-2): the minimum contract change that lets the governed build read, list, create and save real causa-data investigations (ODR-R10-25 A; OD-HC-01 A; workstream D of the owner's Parallel Acceleration Directive, 2026-11-05). E1: CoreEvent represents every causa-storage v1.0.0 event without loss (50 cases; every v4.1.4 case name kept; checks C11/C15 of proposals/r10-historical-data-compatibility prove it on all 1,315 catalog events), the envelope carries provenance and VerificationFailure carries the CONTRACT section 11.1 reader stage. W1: a derived Workspace and WorkspaceAddress (catalog read-only, working copy writable). L1: listing a workspace as a read. C1: creation through the existing SM-SAVE states (SaveMachine.InitialNew starts in Unsaved). No state, event, task or contract file is added; no requirement, obligation or acceptance condition is removed or weakened.",
- "approvalDecision": "ODR-V415-04",
+ "approvalDecision": "ODR-V415-02",
  "amends": {
   "package": "requirements-compiled/v4.1.4",
   "packageVersion": "4.1.4",
@@ -20,17 +20,17 @@
   {
    "id": "V415-E1",
    "area": "contracts",
-   "summary": "ODR-V415-01: 00-DOMAIN-STUBS.fs CoreEvent 28 -> 50 cases (9 widened with the wire's fields, 22 added, HypothesisFalsified without the Scope the wire lacks), EventEnvelope.Provenance; 02-IF41-STORAGE.fs VerificationFailure.ReaderStage."
+   "summary": "ODR-V415-01: 00-DOMAIN-STUBS.fs CoreEvent 28 -> 50 cases (9 widened with the wire's fields, 22 added, HypothesisFalsified without the Scope the wire lacks), EventEnvelope.Provenance, and the commands whose events gained fields carry them (MarkHypothesisPlausible/Supported of MarkHypothesis, RejectProposal with a reason); 02-IF41-STORAGE.fs VerificationFailure.ReaderStage."
   },
   {
    "id": "V415-W1L1",
    "area": "contracts",
-   "summary": "ODR-V415-02: Workspace (02), WorkspaceRole and WorkspaceAddress (03), WorkspaceLister and Listing (05), Msg.ListRequested/CreateRequested and Model.Listings/ListingsInFlight (06); PathOf, Verify, VerifiedInvestigation, Initial and LoadInput.OpenRequested carry the workspace."
+   "summary": "ODR-V415-01: Workspace, WorkspaceRole, WorkspaceAddress (the connected repository), InvestigationRef and Writable (02); ListingTarget, ListingStep, Listing, WorkspaceLister (05); app state, timers and machine messages keyed by InvestigationRef, Msg.ListRequested/CreateRequested, Model.Listings/ListingsInFlight (06)."
   },
   {
    "id": "V415-C1",
    "area": "state machines",
-   "summary": "ODR-V415-03: a new investigation's SM-SAVE session starts in Unsaved (SaveMachine.InitialNew, StorageCodec.EncodeNew); every transition it then takes is an existing one. No state, event or transition is added."
+   "summary": "ODR-V415-01: SaveMachine.InitialNew (a new investigation's session holding its StartInvestigation command, in Unsaved or Offline) and StorageCodec.EncodeNew; T-L03 is replaced so only a working-copy load creates a save session. No state or event is added."
   }
  ],
  "bootstrap": {
@@ -125,6 +125,28 @@
    ],
    "rationale": "The only constructor: a confirmation exists only when the read-back equals what was written (one equality test). Boundary code: it is the type-level form of PERSIST-023; the negative control ForgeConfirmation.fs proves nothing else can create one. The save workflow that calls it is persistence's timed work.",
    "sha256": "f349c1d6ccf4b4c27c1c6e051d6147a507c1faa79300baed6ecd54637d3d8346"
+  },
+  {
+   "file": "02-IF41-STORAGE.fs",
+   "scope": "Writable",
+   "symbol": "ofAddress",
+   "requirements": [
+    "EXT-DATA-006",
+    "EXT-DATA-013"
+   ],
+   "rationale": "The only constructor of the private writable-address representation; it refuses a Catalog, so no catalog investigation can reach a save session. Boundary code: the type is the requirement.",
+   "sha256": "f7dd169bf5f8a1949fca0cc6154e7111c3ad54b590f37609138bf71ffb85ae84"
+  },
+  {
+   "file": "02-IF41-STORAGE.fs",
+   "scope": "Writable",
+   "symbol": "address",
+   "requirements": [
+    "EXT-DATA-006",
+    "EXT-DATA-013"
+   ],
+   "rationale": "Reads the address back out of the private representation (the path and role a save writes under). Boundary code: without it the private type cannot be used.",
+   "sha256": "1a1c2da91de006027c77b5c72221e3aaae7df409383f0f13c538194a11fb2d20"
   }
  ],
  "sharedEntrypoints": {
@@ -498,38 +520,31 @@
  "contractChanges": [
   {
    "file": "contracts/00-DOMAIN-STUBS.fs",
-   "sha256": "605c75a920ea81dbaef4436ec5dbbaef28a8bf17868fa2baa3b3ca570439d54c",
+   "sha256": "877d18e46bf17fe77eedfcfe8bdc0a85f543773cf7a8a15bec2a3e9b7c4b4e55",
    "decision": "ODR-V415-01",
-   "approval": "APR-V415-OWNER-1",
-   "summary": "E1: CoreEvent represents every causa-storage v1.0.0 event (50 cases, every v4.1.4 name kept); EventEnvelope gains Provenance."
+   "approval": "",
+   "summary": "E1: CoreEvent represents every causa-storage v1.0.0 event (50 cases, every v4.1.4 name kept); EventEnvelope gains Provenance; MarkHypothesisPlausible/Supported and RejectProposal carry what their events need."
   },
   {
    "file": "contracts/02-IF41-STORAGE.fs",
-   "sha256": "924b677eadf3d02b752e802475f2079d096fe28b2cd72d33fe5b24fd2e1b6717",
-   "decision": "ODR-V415-02",
-   "approval": "APR-V415-OWNER-1",
-   "summary": "W1: Workspace; PathOf, Verify and VerifiedInvestigation carry it. C1: StorageCodec.EncodeNew (ODR-V415-03). E1: VerificationFailure.ReaderStage (ODR-V415-01)."
-  },
-  {
-   "file": "contracts/03-IF41-WIRE.fs",
-   "sha256": "f02499fe8c099cd26e4cb4beb09fe152f784a907834163e1856349c545731f1d",
-   "decision": "ODR-V415-02",
-   "approval": "APR-V415-OWNER-1",
-   "summary": "W1: WorkspaceRole (Catalog read-only, WorkingCopy) and WorkspaceAddress."
+   "sha256": "99fe1ab2fb43f49fe5affa1f1fbb58ea23c9a83109d56940c2bb769edf5b3f74",
+   "decision": "ODR-V415-01",
+   "approval": "",
+   "summary": "W1: Workspace, WorkspaceRole, WorkspaceAddress, InvestigationRef, Writable; PathOf, Verify and VerifiedInvestigation carry the workspace. C1: EncodeNew. E1: VerificationFailure.ReaderStage."
   },
   {
    "file": "contracts/05-IF41-SAVE.fs",
-   "sha256": "7c7ffc70118c2bc821baefea24a2acf4592765d1151c5fd0013ee93426d92d2a",
-   "decision": "ODR-V415-03",
-   "approval": "APR-V415-OWNER-1",
-   "summary": "C1: SaveMachine.InitialNew; Initial takes the address; InvestigationSession.Address. L1 (ODR-V415-02): ListedInvestigation, Listing, ListingInterpretation, WorkspaceLister; LoadInput.OpenRequested carries the address."
+   "sha256": "f2be813e1a567fe84270fe57d5215f8194cd065619f8f64d1a227a03ddfe7fdb",
+   "decision": "ODR-V415-01",
+   "approval": "",
+   "summary": "C1: SaveMachine.InitialNew; Initial and InvestigationSession take a Writable address. L1: ListingTarget, ListingStep, Listing, ListingInterpretation, WorkspaceLister. LoadInput.OpenRequested and ScheduleReconcileRead carry an InvestigationRef."
   },
   {
    "file": "contracts/06-IF41-APP.fs",
-   "sha256": "413a8e7f1619dd0ff0b060d99dbcf242dc22b9778da3d053c9b0996f82df68fe",
-   "decision": "ODR-V415-02",
-   "approval": "APR-V415-OWNER-1",
-   "summary": "L1/W1: Msg.ListRequested (explicit workspace selection, EXT-DATA-003) and Msg.CreateRequested (explicit creation, EXT-DATA-006); Model.Listings and ListingsInFlight."
+   "sha256": "cf32181ffac56217f92f65a9da32410dc827017031b33d386e366ebfe16e9e65",
+   "decision": "ODR-V415-01",
+   "approval": "",
+   "summary": "Loads, Sessions, TimerKey and the machine messages keyed by InvestigationRef; Msg.ListRequested (explicit workspace selection, EXT-DATA-003) and Msg.CreateRequested (explicit creation, EXT-DATA-006); Model.Listings and ListingsInFlight."
   }
  ],
  "suiteRunners": [

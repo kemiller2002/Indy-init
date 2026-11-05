@@ -1780,6 +1780,7 @@
       "project": "Causa.Contract.Tests",
       "tests": [
         "dotnet:Causa.Contract.Tests.App.Producer.CredentialNeverRendered",
+        "dotnet:Causa.Contract.Tests.App.Producer.StateIsKeyedByWorkspaceAndId",
         "dotnet:Causa.Contract.Tests.App.Producer.UpdateIsPure"
       ],
       "requirements": []
@@ -1922,9 +1923,13 @@
       "kind": "test",
       "project": "Causa.Contract.Tests",
       "tests": [
+        "dotnet:Causa.Contract.Tests.Save.Producer.CatalogLoadCreatesNoSession",
         "dotnet:Causa.Contract.Tests.Save.Producer.ConfirmationNotConstructibleOutside",
         "dotnet:Causa.Contract.Tests.Save.Producer.EveryAwaitedReadIsInterpreted",
+        "dotnet:Causa.Contract.Tests.Save.Producer.EveryListingStepIsInterpreted",
         "dotnet:Causa.Contract.Tests.Save.Producer.InterpretCoversEveryReplyEvent",
+        "dotnet:Causa.Contract.Tests.Save.Producer.ListingReadsAtOneCommit",
+        "dotnet:Causa.Contract.Tests.Save.Producer.NewInvestigationSavesThroughExistingTransitions",
         "dotnet:Causa.Contract.Tests.Save.Producer.ReconcileDueStaysWithinBudget",
         "dotnet:Causa.Contract.Tests.Save.Producer.RequestIdsAreUniqueAndRecorded",
         "dotnet:Causa.Contract.Tests.Save.Producer.SupersededReplyNeverChangesState"
@@ -1948,7 +1953,10 @@
       "project": "Causa.Contract.Tests",
       "tests": [
         "dotnet:Causa.Contract.Tests.Storage.Producer.EachIntegrityCheckRefusesItsForgery",
-        "dotnet:Causa.Contract.Tests.Storage.Producer.GoldenFixturesRoundTrip"
+        "dotnet:Causa.Contract.Tests.Storage.Producer.EncodeNewVerifiesAndRoundTrips",
+        "dotnet:Causa.Contract.Tests.Storage.Producer.EveryCatalogEventRoundTrips",
+        "dotnet:Causa.Contract.Tests.Storage.Producer.GoldenFixturesRoundTrip",
+        "dotnet:Causa.Contract.Tests.Storage.Producer.WritableRefusesCatalog"
       ],
       "requirements": []
     },

@@ -1,6 +1,6 @@
 {
  "schema": "indy-init.v41-owner-decision-requests/1",
- "status": "Requests of v4.1 to v4.1.4 are carried as recorded (APR-V41-OWNER-1..4, APR-V411-OWNER-1/2, APR-V412-OWNER-1..3, APR-V414-OWNER-1/2). Pending: ODR-V415-01, -02 and -03 (the minimum contract change for real causa-data), then ODR-V415-04 (approve v4.1.5) for the package as compiled from those records and independently reviewed.",
+ "status": "Requests of v4.1 to v4.1.4 are carried as recorded (APR-V41-OWNER-1..4, APR-V411-OWNER-1/2, APR-V412-OWNER-1..3, APR-V414-OWNER-1/2). Pending: ODR-V415-01 (the minimum contract change for real causa-data), then ODR-V415-02 (approve v4.1.5) for the package as compiled from that record and independently reviewed.",
  "requests": [
   {
    "id": "ODR-V41-01",
@@ -541,26 +541,50 @@
   },
   {
    "id": "ODR-V415-01",
-   "kind": "interface-change",
-   "title": "E1: an event union that represents every causa-storage v1.0.0 event",
-   "question": "Frozen CoreEvent (28 cases) cannot represent 487 of the 1,315 catalog events (proposals/r10-historical-data-compatibility/SCHEMA-DIFF.md section 2). Extend it so every stored event is representable without loss?",
+   "kind": "state-machine-amendment",
+   "title": "The minimum contract change for real causa-data: E1 events, W1 workspaces, L1 listing, C1 creation",
+   "question": "Frozen v4.1.4 cannot represent 487 of the 1,315 catalog events, has no workspace or listing, and cannot create an investigation (proposals/r10-historical-data-compatibility/SCHEMA-DIFF.md sections 2 and 5; EXT-DATA-003, -008, -013). Adopt the minimum change? Its parts depend on each other (the save machine uses the workspace types; the storage file carries all three), so they are one decision.",
    "options": [
-    "A: 00-DOMAIN-STUBS.fs CoreEvent 28 -> 50 cases: every v4.1.4 case name kept, 9 widened with the wire's fields (InvestigationActivated/Resolved/Reopened carry from; the four hypothesis transitions carry a HypothesisTransition; CauseConfirmed a CauseConfirmation; ProposalRejected a reason), 22 added, HypothesisFalsified without the Scope the wire lacks; EventEnvelope gains Provenance; payloads stay opaque (the domain owner's, with exactly the wire fields); 02-IF41-STORAGE.fs VerificationFailure gains ReaderStage (CONTRACT section 11.1)",
-    "B: keep v4.1.4 and declare the catalog unreadable (ODR-R10-25 B)"
+    "A: E1: CoreEvent 28 -> 50 cases (every v4.1.4 name kept; payloads opaque, with the wire fields), EventEnvelope.Provenance, VerificationFailure.ReaderStage, MarkHypothesisPlausible/Supported and RejectProposal carry what their events need. W1/L1: Workspace, WorkspaceAddress in the connected repository, InvestigationRef keys, Writable (only a working copy is ever written), WorkspaceLister. C1: SaveMachine.InitialNew and StorageCodec.EncodeNew through existing SM-SAVE transitions; T-L03 replaced so a catalog load creates no save session. No state, event, task or contract file added.",
+    "B: keep v4.1.4 and launch with ODR-R10-25 option B's declared expected failures"
    ],
-   "recommendation": "A. It is the union checks C11/C15 proved lossless on all 1,315 catalog events, and it keeps every frozen case name.",
-   "rationale": "ODR-R10-25 A and OD-HC-01 A (recorded) commission it.",
-   "impact": "Until recorded, v4.1.5's contract changes cannot pass the offline suite.",
+   "recommendation": "A (OD-V415-04 A and -05 A). The event union is the one checks C11/C15 proved lossless on all 1,315 catalog events.",
+   "rationale": "ODR-R10-25 A and OD-HC-01 A (recorded) commission it; workstream D of the owner's Parallel Acceleration Directive (2026-11-05) scoped it to the minimum.",
+   "impact": "Until recorded, v4.1.5's contract changes and its T-L03 amendment name no approval and the package does not validate (X12, X17).",
    "approvalRecord": {
-    "how": "A change in an operator approval (recordFormat): {\"decision_id\": \"ODR-V415-01\", \"action\": \"select\", \"option\": \"A\"}, recorded by the owner with tools/owner-freeze.fsx decide v4.1.5, or under a delegated-authority record if the lead's checker is accepted by the owner-record checks. Selecting an option approves exactly what its 'applies' entry lists; the offline suite compares the package with it. Agents never write an owner record (RDP-003)."
+    "how": "A change in an operator approval (recordFormat): {\"decision_id\": \"ODR-V415-01\", \"action\": \"select\", \"option\": \"A\"}, recorded by the owner with tools/owner-freeze.fsx decide v4.1.5. Selecting A approves exactly what 'applies' lists; the offline suite compares the package with it. Agents never write an owner record (RDP-003)."
    },
    "applies": {
     "A": {
-     "transitions": [],
+     "transitions": [
+      {
+       "machine": "SM-LOAD",
+       "id": "T-L03",
+       "replaces": true
+      }
+     ],
+     "accepted": [
+      {
+       "machine": "SM-SAVE",
+       "decision": "ODR-V415-01"
+      }
+     ],
      "contracts": [
       {
        "file": "contracts/00-DOMAIN-STUBS.fs",
-       "sha256": "605c75a920ea81dbaef4436ec5dbbaef28a8bf17868fa2baa3b3ca570439d54c"
+       "sha256": "877d18e46bf17fe77eedfcfe8bdc0a85f543773cf7a8a15bec2a3e9b7c4b4e55"
+      },
+      {
+       "file": "contracts/02-IF41-STORAGE.fs",
+       "sha256": "99fe1ab2fb43f49fe5affa1f1fbb58ea23c9a83109d56940c2bb769edf5b3f74"
+      },
+      {
+       "file": "contracts/05-IF41-SAVE.fs",
+       "sha256": "f2be813e1a567fe84270fe57d5215f8194cd065619f8f64d1a227a03ddfe7fdb"
+      },
+      {
+       "file": "contracts/06-IF41-APP.fs",
+       "sha256": "cf32181ffac56217f92f65a9da32410dc827017031b33d386e366ebfe16e9e65"
       }
      ]
     }
@@ -568,79 +592,11 @@
   },
   {
    "id": "ODR-V415-02",
-   "kind": "interface-change",
-   "title": "W1 + L1: a derived workspace and listing a workspace",
-   "question": "No frozen contract can address a workspace or list the investigations it holds, so the build cannot browse the catalog (EXT-DATA-013) or find a working copy. Add them?",
-   "options": [
-    "A: Workspace (02), WorkspaceRole Catalog | WorkingCopy and WorkspaceAddress (03), WorkspaceLister/Listing as a read with no machine state (05), Msg.ListRequested/CreateRequested and Model.Listings/ListingsInFlight (06); PathOf, Verify, VerifiedInvestigation, Initial and LoadInput.OpenRequested carry the workspace. The workspace is derived (catalog: catalog/active.json; working copy: workspaces/demo/<run>) and selected by the user (EXT-DATA-003); the J1 Connect form is unchanged",
-    "B: a workspace field on the Connect form (needs owner changes to verification/journeys)"
-   ],
-   "recommendation": "A (OD-V415-05 A).",
-   "rationale": "Listing and addressing are the gap SCHEMA-DIFF.md section 5 names.",
-   "impact": "Until recorded, v4.1.5's contract changes cannot pass the offline suite.",
-   "approvalRecord": {
-    "how": "A change in an operator approval (recordFormat): {\"decision_id\": \"ODR-V415-02\", \"action\": \"select\", \"option\": \"A\"}, recorded by the owner with tools/owner-freeze.fsx decide v4.1.5, or under a delegated-authority record if the lead's checker is accepted by the owner-record checks. Selecting an option approves exactly what its 'applies' entry lists; the offline suite compares the package with it. Agents never write an owner record (RDP-003)."
-   },
-   "applies": {
-    "A": {
-     "transitions": [],
-     "contracts": [
-      {
-       "file": "contracts/02-IF41-STORAGE.fs",
-       "sha256": "924b677eadf3d02b752e802475f2079d096fe28b2cd72d33fe5b24fd2e1b6717"
-      },
-      {
-       "file": "contracts/03-IF41-WIRE.fs",
-       "sha256": "f02499fe8c099cd26e4cb4beb09fe152f784a907834163e1856349c545731f1d"
-      },
-      {
-       "file": "contracts/06-IF41-APP.fs",
-       "sha256": "413a8e7f1619dd0ff0b060d99dbcf242dc22b9778da3d053c9b0996f82df68fe"
-      }
-     ]
-    }
-   }
-  },
-  {
-   "id": "ODR-V415-03",
-   "kind": "state-machine-amendment",
-   "title": "C1: create a new investigation through the existing SM-SAVE states",
-   "question": "EXT-DATA-008 needs a command-created, round-trip-verified new investigation; SM-SAVE begins only from a verified stored history. Let a new investigation's session begin in Unsaved?",
-   "options": [
-    "A: SaveMachine.InitialNew starts in Unsaved at the head just read; the first save is one commit adding StorageCodec.EncodeNew's three files, conditional on that head, Saved only from an equal read-back; every later step is an existing transition. One 'accepted' note on SM-SAVE; no state, event or transition added",
-    "B: authorize a compiler change allowing an added SM-SAVE state"
-   ],
-   "recommendation": "A (OD-V415-04 A): X05/X12 stay as they are.",
-   "rationale": "PERSIST-005..007 already define the save; only its starting point is new.",
-   "impact": "Until recorded, v4.1.5's 05-IF41-SAVE.fs change cannot pass the offline suite.",
-   "approvalRecord": {
-    "how": "A change in an operator approval (recordFormat): {\"decision_id\": \"ODR-V415-03\", \"action\": \"select\", \"option\": \"A\"}, recorded by the owner with tools/owner-freeze.fsx decide v4.1.5, or under a delegated-authority record if the lead's checker is accepted by the owner-record checks. Selecting an option approves exactly what its 'applies' entry lists; the offline suite compares the package with it. Agents never write an owner record (RDP-003)."
-   },
-   "applies": {
-    "A": {
-     "transitions": [],
-     "accepted": [
-      {
-       "machine": "SM-SAVE",
-       "decision": "ODR-V415-03"
-      }
-     ],
-     "contracts": [
-      {
-       "file": "contracts/05-IF41-SAVE.fs",
-       "sha256": "7c7ffc70118c2bc821baefea24a2acf4592765d1151c5fd0013ee93426d92d2a"
-      }
-     ]
-    }
-   }
-  },
-  {
-   "id": "ODR-V415-04",
    "kind": "package-approval",
    "title": "Approve compiled package v4.1.5",
-   "question": "Approve requirements-compiled/v4.1.5 (successor of the approved v4.1.4) as the implementation plan: v4.1.4 plus ODR-V415-01, -02 and -03?",
+   "question": "Approve requirements-compiled/v4.1.5 (successor of the approved v4.1.4) as the implementation plan: v4.1.4 plus ODR-V415-01?",
    "options": [
-    "A: approve v4.1.5 after ODR-V415-01..03 are recorded and it is independently reviewed",
+    "A: approve v4.1.5 after ODR-V415-01 is recorded and it is independently reviewed",
     "B: request changes",
     "C: decline; build from v4.1.4 with ODR-R10-25 B's declared expected failures"
    ],
@@ -648,7 +604,7 @@
    "rationale": "Only the owner approves a package (RDP-003).",
    "impact": "Until approved and tagged, v4.1.5 is a CANDIDATE and the Rehearsal 010 lock still pins v4.1.4.",
    "approvalRecord": {
-    "how": "A change in an operator approval: {\"decision_id\": \"ODR-V415-04\", \"action\": \"approve-package\", \"package\": \"requirements-compiled/v4.1.5\", \"manifest_sha256\": \"<sha256 of package-manifest.json>\", \"review_sha256\": \"<sha256 of analysis/independent-review.json>\"}, recorded by the owner."
+    "how": "A change in an operator approval: {\"decision_id\": \"ODR-V415-02\", \"action\": \"approve-package\", \"package\": \"requirements-compiled/v4.1.5\", \"manifest_sha256\": \"<sha256 of package-manifest.json>\", \"review_sha256\": \"<sha256 of analysis/independent-review.json>\"}, recorded by the owner."
    }
   }
  ],

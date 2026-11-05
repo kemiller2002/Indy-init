@@ -186,6 +186,26 @@
    "residual": "After a known stale head nothing was written, so Unknown commit outcome's fixed words ('may or may not have reached GitHub') overstate the uncertainty. PAT-07 (PERSIST-046-O4) allows only Offline or Unknown commit outcome here, and Offline is untrue while online. Recorded as a residual for the owner, not resolved.",
    "decision": "ODR-V412-05",
    "approval": "APR-V412-OWNER-2"
+  },
+  {
+   "machine": "SM-LOAD",
+   "id": "T-L03",
+   "from": "Loading",
+   "event": "LoadVerified",
+   "to": "Loaded",
+   "guard": "current",
+   "effects": [
+    "record base head",
+    "for a WorkingCopy address: SM-SAVE initial Saved at that commit (SaveMachine.Initial with its Writable address); for a Catalog address: no SM-SAVE session, because a catalog investigation is read-only (EXT-DATA-013, EXT-DATA-006)"
+   ],
+   "sources": [
+    "PERSIST-005",
+    "PERSIST-021",
+    "EXT-DATA-013"
+   ],
+   "decision": "ODR-V415-01",
+   "approval": "",
+   "replaces": true
   }
  ],
  "accepted": [
@@ -197,9 +217,9 @@
   },
   {
    "machine": "SM-SAVE",
-   "decision": "ODR-V415-03",
-   "approval": "APR-V415-OWNER-1",
-   "note": "A new investigation's session (SaveMachine.InitialNew, v4.1.5 C1) begins in Unsaved instead of the declared initial Saved: there is no stored history to be saved against yet. From there it takes only existing transitions (Edit, SaveRequested, the Saving steps, StaleHeadUnrelated rebase, read-back to Saved Confirmed). No state, event or transition is added."
+   "decision": "ODR-V415-01",
+   "approval": "",
+   "note": "A new investigation's session (SaveMachine.InitialNew, v4.1.5 C1) begins holding its StartInvestigation command in Unsaved when online, or Offline when known offline: the states T-S01 and T-S02 reach from Saved on an Edit. It begins there because no stored history exists to be Saved against. From there it takes only existing transitions (T-S03 Edit, T-S04 SaveRequested, the Saving steps, the stale-head paths, read-back to Saved Confirmed). No state, event or transition is added."
   }
  ]
 }

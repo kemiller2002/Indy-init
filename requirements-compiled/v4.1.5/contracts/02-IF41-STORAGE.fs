@@ -6,11 +6,39 @@ open Causa.Domain
 type CommitOid = CommitOid of string
 type RepoPath = RepoPath of string
 
-/// v4.1.5 W1: a causa-storage workspace, the repository-relative directory that holds `investigations/<id>/`
-/// (for example `workspaces/demo/r10`). It is derived, never typed: a catalog workspace is the one
-/// `catalog/active.json` names (EXT-DATA-013); a working copy is the connected repository's run workspace under
-/// `workspaces/demo/` (CONTRACT section 9.4). The user selects among the derived workspaces (EXT-DATA-003).
+/// v4.1.5 W1: a causa-storage workspace, the directory of the connected repository that holds `investigations/<id>/`
+/// (for example `workspaces/demo/r10`). It is derived, never typed: the catalog workspace is the one
+/// `catalog/active.json` names (EXT-DATA-013); a working copy is `workspaces/demo/<run>` (CONTRACT section 9.4).
 type Workspace = Workspace of string
+
+/// v4.1.5 W1: what a workspace may be used for. A catalog is read-only (EXT-DATA-013); only a working copy is written
+/// (CONTRACT section 9.4; EXT-DATA-006). Both are in the repository the user connected to (EXT-DATA-003).
+[<RequireQualifiedAccess>]
+type WorkspaceRole =
+    | Catalog
+    | WorkingCopy
+
+/// v4.1.5 W1: a workspace of the connected repository, with its role.
+type WorkspaceAddress = { Workspace: Workspace; Role: WorkspaceRole }
+
+/// v4.1.5 W1: an investigation is identified by where it is and its id: the same case can be stored in two
+/// workspaces (causa-data holds identical cases in historical-v1 and demonstration-v1).
+type InvestigationRef = { Address: WorkspaceAddress; Id: InvestigationId }
+
+/// v4.1.5 W1: an address that may be written. Its only constructor refuses a Catalog, so no catalog investigation can
+/// reach a save session (EXT-DATA-013; EXT-DATA-006).
+[<RequireQualifiedAccess>]
+module Writable =
+    type T =
+        private
+        | Writable of WorkspaceAddress
+
+    let ofAddress (address: WorkspaceAddress) : T option =
+        match address.Role with
+        | WorkspaceRole.WorkingCopy -> Some(Writable address)
+        | WorkspaceRole.Catalog -> None
+
+    let address (Writable address) : WorkspaceAddress = address
 
 type FileSet =
     { Manifest: byte[]
@@ -33,14 +61,14 @@ type VerifiedInvestigation =
       History: EventEnvelope list
       ReadAt: CommitOid
       /// v4.1.5 W1: the workspace the history was read from.
-      Workspace: Workspace
+      Address: WorkspaceAddress
       Bytes: FileSet }
 
 type StorageCodec =
     { /// v4.1.5 W1: `<workspace>/investigations/<id>`.
       PathOf: Workspace -> InvestigationId -> RepoPath
       Encode: VerifiedInvestigation -> EventEnvelope list -> FileSet
-      /// v4.1.5 C1: the first file set of a new investigation from its command-created history (EXT-DATA-008), which
-      /// Verify must accept before it is written.
-      EncodeNew: EventEnvelope list -> FileSet
-      Verify: Workspace -> CommitOid -> FileSet -> Result<VerifiedInvestigation, VerificationFailure list> }
+      /// v4.1.5 C1: the first file set of a new investigation from its command-created history (EXT-DATA-008). It is
+      /// Ok only when Verify accepts the result, so a file set that would not verify is never sent.
+      EncodeNew: InvestigationId -> EventEnvelope list -> Result<FileSet, VerificationFailure list>
+      Verify: WorkspaceAddress -> CommitOid -> FileSet -> Result<VerifiedInvestigation, VerificationFailure list> }
