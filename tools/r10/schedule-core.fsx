@@ -146,9 +146,10 @@ let deferCyclic (slices: Slice list) (mergeDeps: Map<string, string list>) : Map
     let cyc = cyclicMergeEdges slices mergeDeps |> Set.ofList
     mergeDeps |> Map.map (fun s ds -> ds |> List.filter (fun d -> not (cyc.Contains(s, d))))
 
-/// A minimal cycle-breaking deferral: cyclic edges are deferred one at a time, in (slice, needed) order, re-checking
-/// after each, until the graph of dependsOn plus the remaining merge dependencies is acyclic. Defers far fewer edges
-/// than deferCyclic, which defers every edge on any cycle (review RVO-8-2). Returns the kept map and the deferred edges.
+/// A GREEDY cycle-breaking deferral (not a minimum set): cyclic edges are deferred one at a time, in sorted
+/// (slice, needed) order, re-checking after each, until dependsOn plus the remaining merge dependencies is acyclic.
+/// It defers fewer edges than deferCyclic, which defers every edge on any cycle (reviews RVO-8-2, RVO-10-2).
+/// Returns the kept map and the deferred edges.
 let deferMinimal (slices: Slice list) (mergeDeps: Map<string, string list>) : Map<string, string list> * (string * string) list =
     let rec go (md: Map<string, string list>) (deferred: (string * string) list) =
         match cyclicMergeEdges slices md |> List.sort with

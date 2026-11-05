@@ -179,6 +179,11 @@ The RVO-8 fixes, the provenance record, the strengthened test, the K-* table and
 | RVO-9-3 | minor | "Minimal" is greedy, not minimum; one table was still headed "bound" | **Fixed:** renamed in the docs; the CLI value `minimal` is documented as greedy |
 | RVO-9-4 | note | No K run under this model's stricter policy | **Fixed** (10 runs, with provenance) |
 
-### Round 10
+### Round 10 (fe6bda2): PASS
 
-Requested on the fix commit.
+The reviewer re-ran the greedy-policy table cell for cell, with provenance. Conclusion 2 and the Connect/Browse sentence now hold against both tables.
+
+| ID | Severity | Finding | Disposition |
+|---|---|---|---|
+| RVO-10-1 | minor | Conclusion 5's "80–140 minutes" held for Data Visible only | **Fixed:** 31–141, per capability |
+| RVO-10-2 | minor | The code comment still said "minimal" | **Fixed:** greedy, not a minimum set |
