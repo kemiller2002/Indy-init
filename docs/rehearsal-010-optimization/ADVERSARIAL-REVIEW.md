@@ -37,9 +37,21 @@ The reviewer also confirmed that:
 - the approved scope recompiles byte-identically;
 - every requirement of the successor matches the approved scope field by field.
 
-### Round 2
+### Round 2 (517230c): FAIL, 1 major
 
-Pending at the time of writing; see FINAL-REPORT.md.
+The reviewer re-verified the round-1 fixes. RVO-1-1 holds for the cases raised (p1–p6 refused). RVO-1-2 holds: forgeries fa–fd and ff are refused, and fe, reordered items, passes. No consumer of `Scope.preflight` breaks. The plain compile is unchanged (`59bfef5a…`), and the successor reproduces (`a847f98c…`).
+
+| ID | Severity | Finding | Disposition |
+|---|---|---|---|
+| RVO-2-1 | major | A dependency cycle **across two splits** compiled, passed preflight, and gave a stack overflow in the model. The cycle check covered siblings only | **Fixed:** one acyclicity check over the whole post-split work-item graph (`SPLIT_CYCLE`); the reviewer's p7 is an offline control; the model calls `topo` before recursing |
+| RVO-2-2 | minor | The merge-order invariant cannot fire with one CI duration and no failures. **The round-1 claim that the out-of-order merge was "now caught" was wrong for the reviewer's mutation**, and M3 (restart of verified candidates), M10b and M13 were not caught | **Partly fixed:** exact repair-cost and per-slice-overhead assertions added (M10b and M13 now bite). The invariant is labelled a guard, not a proof. M2/M3 stay unprovable while the model has a single CI duration; published numbers are unaffected |
+| RVO-2-3 | minor | §7 bound the merge by tree hash, while all existing evidence binds by commit SHA | **Fixed in the spec:** the verified speculative commit must itself become main by fast-forward; control S7 (same tree, different parents); MAIN_UNHEALTHY voids the queue |
+| RVO-2-4 | note | SPLIT_DROPS_PARENT_DEPENDENCY followed siblings only, refusing some valid plans | **Fixed:** reach is computed over the whole post-split graph, including DAG tasks |
+| RVO-2-5 | note | WORK_ITEM_ALTERED is key-order sensitive; overhead also inflates repair time and priorities | Documented (SCHEDULE-COMPARISON) |
+
+### Round 3
+
+Requested together with the addendum's eight checks; see FINAL-REPORT.md.
 
 ## The ten mission questions (from round 1 unless noted)
 

@@ -285,6 +285,7 @@ let private pass (c: Config) (ci: float) (slices: Slice list) (prio: Map<string,
 
 /// Runs the simulation to completion; returns the per-slice records.
 let simulate (c: Config) (ci: float) (slices: Slice list) : Map<string, Record> =
+    topo slices |> ignore   // refuses a cycle or an unknown dependency before anything recurses over the graph
     let prio = priorities ci slices
     let rank = if c.Priority = "milestones" then milestoneRank c.Milestones slices else slices |> List.map (fun s -> s.Id, 0) |> Map.ofList
     let empty = { Lane = ""; Start = -1.0; Implemented = -1.0; FirstVerification = -1.0; Integrated = -1.0; Runs = 0; Repairs = 0; RepairMinutes = 0.0; QueueWait = 0.0; Defective = false }

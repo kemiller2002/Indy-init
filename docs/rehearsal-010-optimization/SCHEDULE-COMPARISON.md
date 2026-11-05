@@ -95,7 +95,7 @@ The honest original is V1. The optimized plan that needs **only a successor scop
 
 ## What the split itself contributes (review RVO-1-7), and per-slice overhead (RVO-1-6)
 
-`results/table-review.tsv`: V1b = V1 + queue depth 3 + 25-min set-up, with no split. `--slice-overhead 5` adds 5 minutes to every slice for branch, pull request and context switching. That figure is a placeholder, not a measurement.
+`results/table-review.tsv`: V1b = V1 + queue depth 3 + 25-min set-up, with no split. `--slice-overhead 5` adds 5 minutes to every slice for branch, pull request and context switching. That figure is a placeholder, not a measurement. The overhead is added to the slice's estimate, so it also enlarges repair time (estimate × repair fraction) and the scheduling priority (review RVO-2-5).
 
 | 10-min CI | Finish | Mandatory obligations by T+420 |
 |---|---|---|

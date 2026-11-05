@@ -47,8 +47,9 @@ let invariants (c: Config) (slices: Slice list) (recs: Map<string, Record>) : st
       if c.Merge > 0.0 then
           for a, b in List.pairwise integrated do
               if b - a < c.Merge then yield sprintf "two merges overlap: integrations at %.0f and %.0f with %.0f-minute merges" a b c.Merge
-      // review RVO-1-5: merges follow queue order (no candidate overtakes one ahead of it). With one CI duration and no
-      // failures, queue order is the order of first verification, so integration order must equal it.
+      // Merges follow queue order (no candidate overtakes one ahead of it). With one CI duration and no failures, queue
+      // order is the order of first verification. Review RVO-2-2: in that configuration an out-of-order merge is hardly
+      // reachable, so this is a guard, not a proof of the speculative semantics (the model has one CI duration).
       if c.FailEvery = 0 then
           let byFirst = slices |> List.sortBy (fun s -> recs[s.Id].FirstVerification, recs[s.Id].Integrated) |> List.map (fun s -> recs[s.Id].Integrated)
           for a, b in List.pairwise byFirst do
@@ -133,6 +134,19 @@ case "a failed verification is repaired and verified again; stacked candidates r
       if runs <= 6 then yield sprintf "%d verification runs: the candidates stacked on a failure were not restarted" runs
       let none = simulate { threeC with FailEvery = 0 } 5.0 three
       if three |> List.exists (fun s -> none[s.Id].Repairs > 0) then yield "a slice was repaired with no failures configured" ]
+
+// review RVO-2-2: assertions that bite on the parameters the published results use
+case "a repair costs exactly ceil(estimate x repair fraction) of its lane"
+    [ let c = { cfg 0.0 "a:A,b:B,c:C" with QueueDepth = 1; FailEvery = 1; RepairFraction = 0.25 }
+      let recs = simulate c 5.0 three
+      for s in three do
+          let want = Math.Ceiling(s.Minutes * 0.25) * float recs[s.Id].Repairs
+          if recs[s.Id].RepairMinutes <> want then yield sprintf "%s repaired for %.0f lane-minutes, expected %.0f" s.Id recs[s.Id].RepairMinutes want ]
+case "per-slice overhead is charged to every slice"
+    [ let plain = loadSlices manifest None (cfg 45.0 defaultLanes)
+      let over = loadSlices manifest None { cfg 45.0 defaultLanes with SliceOverhead = 5.0 }
+      for a, b in List.zip plain over do
+          if b.Minutes <> a.Minutes + 5.0 then yield sprintf "%s: %.0f minutes with overhead 5, %.0f without" a.Id b.Minutes a.Minutes ]
 
 // ---- 4. refusals ---------------------------------------------------------------------------------------------------
 

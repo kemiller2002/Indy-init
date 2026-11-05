@@ -316,4 +316,8 @@ The current rule is `STALE_TARGET` (Ledger.fs:380): a slice is judged only if it
 | S5 | the verdict recorded for one candidate head is presented for a later head of the same branch | `TREE_NOT_VERIFIED` |
 | S6 | a failed verdict is removed from the record and the candidate re-queued unchanged | refused: the failure persists for that head |
 
+**Bind by commit, not only by tree (review RVO-2-3).** Every existing piece of evidence binds a commit SHA: the slice gate's `*_STALE` checks, r9 `sourceSha = HEAD`, and the gate's `candidate`. Ancestry checks such as `check-sequencing` and the observer rely on parents too. So the verified speculative commit T_k must **itself** become main, by fast-forward through a merge queue or `merge_group`. Then the merged commit SHA equals the verified SHA, and no SHA binding is relaxed. Two more requirements:
+- **Control S7:** the same tree with different parents is refused.
+- **MAIN_UNHEALTHY** (Ledger.fs:356) voids every verdict in the queue.
+
 The model (`--queue-depth`) assumes exactly these semantics: verification on main plus the candidates ahead, merges serialized and in queue order, and a failure restarting every candidate stacked behind it.

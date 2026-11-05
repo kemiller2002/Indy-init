@@ -613,7 +613,10 @@ let splitScope (source: string) : string list =
           "SPLIT_DROPS_PARENT_DEPENDENCY", onPart "WI-GEN-PF" "WI-GEN-PF-BOUNDARY" (setField "dependsOn" (JArr []))
           "SPLIT_DEPENDS_ON_REPLACED", onPart "WI-GEN-PF" "WI-GEN-PF-SECURITY" (setField "dependsOn" (reqs [ "WI-GEN-UI" ]))
           "SPLIT_OWNER_CHANGED", onPart "WI-GEN-PF" "WI-GEN-PF-SECURITY" (fun p -> match p with JObj ps -> JObj(ps @ [ "owner", JStr "nobody" ]) | x -> x)
-          "SPLIT_DUPLICATE_PART_ID", onPart "WI-GEN-PF" "WI-GEN-PF-SECURITY" (setField "id" (JStr "WI-GEN-UI-VERIFY")) ]
+          "SPLIT_DUPLICATE_PART_ID", onPart "WI-GEN-PF" "WI-GEN-PF-SECURITY" (setField "id" (JStr "WI-GEN-UI-VERIFY"))
+          // review RVO-2-1: a cycle across two splits (LANDING -> PF-SECURITY -> UI-VERIFY -> ... -> LANDING)
+          "SPLIT_CYCLE", (onPart "WI-GEN-PF" "WI-GEN-PF-SECURITY" (setField "dependsOn" (reqs [ "WI-GEN-PF-BOUNDARY"; "WI-GEN-UI-VERIFY" ]))
+                          |> fun pl -> pl |> mapSplits (fun sp -> if str "workItem" sp = "WI-GEN-UI" then setField "parts" (JArr(arr "parts" sp |> List.map (fun p -> if str "id" p = "WI-GEN-UI-LANDING" then setField "dependsOn" (reqs [ "T17"; "WI-GEN-PF-SECURITY" ]) p else p))) sp else sp)) ]
     [ match compileWithSplit sources plan planPath "test" with
       | Error ps -> yield sprintf "split: the proposed plan is refused: %A" (List.truncate 3 ps)
       | Ok successor ->

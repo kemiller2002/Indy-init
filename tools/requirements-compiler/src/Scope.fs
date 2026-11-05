@@ -250,11 +250,12 @@ let withScopeHash (manifest: Json) =
 /// A split plan (indy-init.work-item-split/1) divides generated work items into smaller ones:
 ///   { "splits": [ { "workItem": "WI-INV-WORKSPACE",
 ///                   "parts": [ { "id", "title", "owner"?, "dependsOn": [..], "requirements": [..] } ] } ] }
-/// A part inherits its parent's owner unless it names one. The split is refused unless every requirement of the parent
-/// is in exactly one part, every part has a requirement, ids are new and unique, dependencies name an existing work item
-/// or a sibling part and are acyclic, no other work item depends on the parent, the parent is a generated item (a DAG
-/// task is split only in a successor package), and a requirement that depends on another requirement of the same parent
-/// is in a part that reaches that requirement's part.
+/// A part keeps its parent's owner. The split is refused unless every requirement of the parent is in exactly one part,
+/// every part has a requirement, part ids are new and unique across the plan, every dependency names a work item that
+/// exists after the split (never a replaced parent), the whole post-split work-item graph is acyclic, every part still
+/// reaches (through that graph) each dependency its parent had, no other work item depends on the parent, the parent is
+/// a generated item (a DAG task is split only in a successor package), and a requirement that depends on another
+/// requirement of the same parent is in a part that reaches that requirement's part.
 let applySplit (plan: Json) (items: WorkItem list) (requirements: Requirement list) : Result<WorkItem list * Requirement list, string list> =
     let ids = items |> List.map (fun w -> w.Id) |> Set.ofList
     let reqDeps = requirements |> List.map (fun r -> r.Id, r.DependsOn) |> Map.ofList
@@ -262,6 +263,22 @@ let applySplit (plan: Json) (items: WorkItem list) (requirements: Requirement li
     let replacedParents = arr "splits" plan |> List.map (str "workItem") |> Set.ofList
     let allPartIds = arr "splits" plan |> List.collect (fun sp -> arr "parts" sp |> List.map (str "id"))
     let afterSplit = (ids - replacedParents) + Set.ofList allPartIds
+    // The whole work-item graph after the split (kept items and every part), for reachability and cycles across splits.
+    let graph =
+        (items |> List.filter (fun w -> not (replacedParents.Contains w.Id)) |> List.map (fun w -> w.Id, w.DependsOn))
+        @ (arr "splits" plan |> List.collect (fun sp -> arr "parts" sp |> List.map (fun pj -> str "id" pj, strs "dependsOn" pj)))
+        |> List.groupBy fst |> List.map (fun (k, vs) -> k, vs |> List.collect snd) |> Map.ofList
+    let rec globalReaches (from: string) (target: string) (seen: Set<string>) =
+        from = target || (not (seen.Contains from) && (graph |> Map.tryFind from |> Option.defaultValue [] |> List.exists (fun d -> globalReaches d target (seen.Add from))))
+    let globalCycle =
+        // Kahn's algorithm over the post-split graph (dependencies outside it are ignored here; unknown ones are refused per part)
+        let nodes = graph |> Map.toList |> List.map fst |> Set.ofList
+        let rec go (done': Set<string>) (rest: Set<string>) =
+            if rest.IsEmpty then Set.empty
+            else
+                let ready = rest |> Set.filter (fun n -> graph[n] |> List.forall (fun d -> done'.Contains d || not (nodes.Contains d)))
+                if ready.IsEmpty then rest else go (done' + ready) (rest - ready)
+        go Set.empty nodes
     let checkOne (sp: Json) : string list * (WorkItem * WorkItem list) option =
         let parentId = str "workItem" sp
         match items |> List.tryFind (fun w -> w.Id = parentId) with
@@ -304,7 +321,7 @@ let applySplit (plan: Json) (items: WorkItem list) (requirements: Requirement li
                           elif not (afterSplit.Contains d) then yield sprintf "SPLIT_UNKNOWN_DEPENDENCY %s depends on unknown %s" p.Id d
                       // Every part still waits for what its parent waited for (for a generated item, the kernel T17).
                       for pd in parent.DependsOn do
-                          if not (reaches p.Id pd Set.empty) then
+                          if not (globalReaches p.Id pd Set.empty) then
                               yield sprintf "SPLIT_DROPS_PARENT_DEPENDENCY %s does not wait for %s, which its parent %s waited for" p.Id pd parentId
                   if partIds |> List.distinct |> List.length <> partIds.Length then yield sprintf "SPLIT_DUPLICATE_PART_ID in %s" parentId
                   if cyclic then yield sprintf "SPLIT_CYCLE among the parts of %s" parentId
@@ -323,6 +340,7 @@ let applySplit (plan: Json) (items: WorkItem list) (requirements: Requirement li
         (perSplit |> List.collect fst)
         @ (if parents |> List.distinct |> List.length <> parents.Length then [ "SPLIT_PARENT_TWICE a work item is split more than once" ] else [])
         @ (allPartIds |> List.countBy id |> List.filter (fun (_, n) -> n > 1) |> List.map (fun (i, n) -> sprintf "SPLIT_DUPLICATE_PART_ID %s is used by %d parts across the plan" i n))
+        @ (if globalCycle.IsEmpty then [] else [ sprintf "SPLIT_CYCLE the work items after the split have a dependency cycle among %s" (globalCycle |> Set.toList |> String.concat ", ") ])
         @ (if (arr "splits" plan).IsEmpty then [ "SPLIT_EMPTY_PLAN the plan splits nothing" ] else [])
     if not problems.IsEmpty then Error problems
     else
