@@ -16,7 +16,7 @@
 | `npm ci`, suite preflight (STARTUP §2, #118) | after T0 | bootstrap | build | not measured separately |
 | `dotnet build Causa.slnx` | after T0 | bootstrap | govern | 11.4 s warm, 16.2–18.6 s cold |
 | Commit and push the bootstrap; `conditor repo create` | after T0 | all of the above | – | – |
-| First CI run green (end of T10) | after T0 | push | Praxis work-item creation | queue 3.3–8.7 min (measured, Indy-init), run length unmeasured |
+| First CI run green (end of T10) | after T0 | push | Praxis work-item creation | queue 3.3–8.4 min (measured, Indy-init), run length unmeasured |
 | Praxis: create every work item; scope checkpoint; three authorization inputs; initialization checkpoint (STARTUP §3) | after T0 | bootstrap commit | first CI run | not measured |
 
 ## The critical path

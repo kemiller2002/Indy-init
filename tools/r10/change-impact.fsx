@@ -51,12 +51,19 @@ let select (m: Model) (paths: string list) : Selection =
         let p = path.Replace('\\', '/').TrimStart('.', '/')
         let rules = m.Rules |> List.filter (fun r -> r.Pattern.IsMatch p)
         let projects = Map.tryFind p m.FileProject |> Option.map (fun pr -> Map.tryFind pr m.Dependents |> Option.defaultValue (Set.singleton pr))
+        let inGraph = Map.tryFind p m.FileProject |> Option.map (fun pr -> m.Dependents.ContainsKey pr) |> Option.defaultValue false
+        let underSource = [ "src/"; "tests/"; "verifier/" ] |> List.exists (fun d -> p.StartsWith d)
+        let selected = (projects |> Option.defaultValue Set.empty |> Set.intersect m.TestProjects |> Set.isEmpty |> not)
+                       || (rules |> List.exists (fun r -> not r.Selects.IsEmpty))
+        // review RVO-6-1: fail safe when a path is unknown, when it sits under a source tree but outside the project
+        // graph (a new file, or a project the graph lacks), or when a known path would select nothing at all
         let known = projects.IsSome || not rules.IsEmpty
-        { All = (not known) || (rules |> List.exists (fun r -> List.contains "ALL" r.Selects))
+        let failSafe = (not known) || (underSource && not inGraph) || not selected
+        { All = failSafe || (rules |> List.exists (fun r -> List.contains "ALL" r.Selects))
           TestProjects = projects |> Option.defaultValue Set.empty |> Set.intersect m.TestProjects
           Suites = rules |> List.collect (fun r -> r.Selects |> List.filter ((<>) "ALL")) |> Set.ofList
           Rules = rules |> List.map (fun r -> r.Id) |> Set.ofList
-          Unknown = if known then [] else [ p ] }
+          Unknown = if failSafe then [ p ] else [] }
     paths |> List.map one
     |> List.fold (fun a b -> { All = a.All || b.All; TestProjects = a.TestProjects + b.TestProjects; Suites = a.Suites + b.Suites; Rules = a.Rules + b.Rules; Unknown = a.Unknown @ b.Unknown })
         { All = false; TestProjects = Set.empty; Suites = Set.empty; Rules = Set.empty; Unknown = [] }
@@ -107,6 +114,18 @@ let tests (m: Model) =
     // negative control on the model itself: with the replay rule removed, the replay case must fail
     let noReplay = select { m with Rules = m.Rules |> List.filter (fun r -> r.Id <> "CI-REPLAY") } [ "src/Causa.Domain/Evolve.fs" ]
     case "control: removing the replay rule makes the replay case fail (the test can bite)" (not (noReplay.Suites.Contains "TAG:historical-replay")) (fun () -> show noReplay)
+    // review RVO-6-1: under-selection without failing safe
+    let r1 = s [ "src/Causa.Host/Host.cs" ]
+    case "the process entry (Host.cs) is never a silent no-op" (r1.All || r1.Suites.Contains "SU-BROWSER-CHROMIUM") (fun () -> show r1)
+    let r2 = s [ "verifier/Causa.Acceptance.Independent/PAT13ProvenanceComparison.fs" ]
+    case "a file of a project the graph lacks selects everything" r2.All (fun () -> show r2)
+    let r3 = s [ "src/Causa.App/Views/NewScreen.fs" ]
+    case "a new source file (not in any compile list) selects everything" r3.All (fun () -> show r3)
+    let r4 = s [ "src/Causa.App/Program.fs" ]
+    case "composition (Program.fs) selects the browser suites" (r4.All || (r4.Suites.Contains "SU-BROWSER-CHROMIUM" && r4.Suites.Contains "SU-BROWSER-LIVE")) (fun () -> show r4)
+    case "no known path ever selects nothing (every manifest file selects a test or everything)"
+        (m.FileProject |> Map.toList |> List.forall (fun (path, _) -> let x = s [ path ] in x.All || not x.TestProjects.IsEmpty || not x.Suites.IsEmpty))
+        (fun () -> m.FileProject |> Map.toList |> List.map fst |> List.filter (fun path -> let x = s [ path ] in not x.All && x.TestProjects.IsEmpty && x.Suites.IsEmpty) |> List.truncate 5 |> String.concat ", ")
     printfn "\nchange-impact tests: %s" (if failed = 0 then "all passed" else sprintf "%d failed" failed)
     failed
 

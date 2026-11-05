@@ -1,6 +1,6 @@
 # Rehearsal 010: negative controls for change-aware selection
 
-`dotnet fsi tools/r10/change-impact.fsx -- --indy-init . test` runs the cases below. All pass, and the suite runs in Preflight tooling CI.
+`dotnet fsi tools/r10/change-impact.fsx -- --indy-init . test` runs the cases below. All 20 pass, and the suite runs in Preflight tooling CI.
 
 | # | Change | Must select | Why it is adversarial |
 |---|---|---|---|
@@ -19,6 +19,11 @@
 | 13 | no change | nothing, and "verified: nothing" | Not selecting is not verifying |
 | 14 | every case | the rendered output never claims verification | – |
 | 15 | control: the replay rule removed | case 4 would fail | Shows the test can bite |
+| 16 | `src/Causa.Host/Host.cs` (process entry) | browser suites, or everything; never nothing | Review RVO-6-1: it selected nothing |
+| 17 | `verifier/Causa.Acceptance.Independent/…` (a project the graph lacks) | everything | Review RVO-6-1 |
+| 18 | `src/Causa.App/Views/NewScreen.fs` (a new file, in no compile list) | everything | Review RVO-6-1: it selected browsers only |
+| 19 | `src/Causa.App/Program.fs` (composition) | the browser suites, including live | Review RVO-6-1 |
+| 20 | **every** file in the ownership manifest | at least one test or everything | Exhaustive: no known path may select nothing |
 
 **What these controls do not cover.**
 - Semantic coupling not visible in paths, for example a JSON fixture read by name at run time. Unknown paths select everything, but a *known* file with an unmodelled reader would be under-selected. **This is why Level 2 never replaces Level 3.**

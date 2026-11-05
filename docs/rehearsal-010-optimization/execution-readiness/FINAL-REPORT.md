@@ -12,7 +12,7 @@ Combined plan E8 at 10-min CI:
 
 | Rank | Bottleneck | Evidence |
 |---|---|---|
-| 1 | **Serialized verification.** One full governed gate per slice, plus a CI queue of 3–9 min (measured) | With the frozen one-candidate-at-a-time gate (E8c), full completion goes from T+565 to T+803 at 10-min CI, and M3 (create) from T+387 to T+665 |
+| 1 | **Serialized verification**, for the early milestones at realistic CI. One full governed gate per slice, plus a CI queue of 3.3–8.4 min (measured) | Frozen depth-1 gate (E8c) against E8, at 10-min CI: M2 T+314 against T+239, M3 T+665 against T+387. **For full completion, the effect is not robust:** at 5-min CI the depth-1 gate finishes first (T+573 against T+599). See §4 |
 | 2 | **The DAG's release tail.** T17 → T22 → T28 → T31 → T32 → T33 → T34 | Critical path 474 min at 10-min CI. Seven serial integrations from T17 (T+196) to T34 (T+565) |
 | 3 | **The persistence chain to the historical list.** T18 → T19 (save machine) → T20 → T25 | T25 at T+270 (E8, 10-min CI). T19 is not needed for reading (DATA-VISIBILITY-DEPENDENCIES.md) |
 | 4 | **The `ui` lane.** One owner of `Update.fs`, `Engine.fs`, `Projections.fs` and `Views/Investigation.fs` | 406 implementation minutes even with V5 ownership, the most of any lane |
@@ -26,7 +26,7 @@ Combined plan E8 at 10-min CI:
 | Restore, cold / warm | 13.6 s / 1.4 s (64 MB) | this session |
 | Build, cold / warm / one-file | 18.6 s / 11.4 s / 3.1–3.3 s | this session |
 | Contract typecheck | 6 s here / 11 s CI | this session; CI |
-| CI queue (workflow created → job start) | 3.3–8.7 min | run 42004659389 |
+| CI queue (workflow created → job start) | 3.3–8.4 min | run 42004659389 |
 | Playwright + browsers | 65 s | CI |
 | Fixture journeys J1–J3 + design contract, both browsers | 33 s | CI |
 | R9 T0 → bootstrap commit | 2 min 10 s | R9 `evidence/t0/T0.md`, commit 8001e7c |
@@ -68,9 +68,20 @@ Combined plan E8 at 10-min CI:
 - V5 ownership (ODR-R10-20);
 - 10-min set-up.
 
+¹ In E8, M2 (T+206/223/239) is *delivered* before M1 (216/246/270) and before T25, the authoritative catalog load (212/246/270). It is *usable* only from the later of M1 and M2, for example T+216 at 0-min CI (review RVO-6-4). The "Connect screen" column for M0 plans shows the raw M0 slice.
+
 Contract preparation is *not* free in reality: plan 8b charges 5 min per slice for it and for integration overhead.
 
-**Non-monotonic:** E8 finishes at T+599 at 5-min CI and T+565 at 10-min CI. Greedy scheduling changes which slice fails first (SCHEDULE-COMPARISON.md). Read the three columns as a range, not a trend.
+**Non-monotonic, and the cause is not isolated** (corrected after review RVO-6-2; an earlier draft blamed failures, but every E run has `failEvery 0`). Full completion in the E8 configuration, by queue depth, at 0 / 5 / 10-min CI:
+
+| Queue depth | All integrated |
+|---|---|
+| 1 (frozen gate, E8c) | 560 / 573 / 803 |
+| 2 | 560 / 599 / 565 |
+| 3 (E8) | 560 / 599 / 565 |
+| 4 | 560 / 599 / 630 |
+
+A deeper queue is *not* always faster here. The existing test "a deeper speculative queue is never slower" covers only the base ownership manifests. It does not cover this configuration, and it would fail on it. The likely mechanism is greedy milestone-first assignment interacting with merge order, but this is not shown. **Treat E8's completion as a range (560–630), not a point**, and do not read the 10-min CI 565 → 803 difference as robust. The early-milestone gains of the speculative queue are consistent across this sweep at 10-min CI (M2 −75 min, M3 −278 min); at 0 and 5-min CI they are small or absent.
 
 **Exceeding 420 minutes:** no probability is given, because the evidence does not support one. Under every modelled plan, CI latency, overhead and estimate scale, **the full scope does not finish within 420 minutes**. The best is T+560. On the schedule, E8 delivers data visibility (M0), Connect (M1), the authoritative list (M2) and creation (M3) inside the window at every CI value. Analysis (M5: 424/441/473) and save (M4: 437/459/496) fall just after it. M1–M3 still need ODR-R10-25, -26, -28 and -29 to pass against real data.
 
@@ -90,11 +101,11 @@ After the domain kernel (done by T+208) and persistence (done by T+256), the **r
 | Historical replay | no, for time; **yes, for feasibility** (C1) | T25 at T+270; ODR-R10-25 |
 | GitHub persistence | binds M1 and the authoritative list, not the full scope | T18 → T19 → T20 → T25 |
 | Integration | yes, in the release tail | T31, T32, T34 are integration's |
-| Verification | **yes**: without the speculative queue, at 10-min CI M2 slips 75 min, M3 278 min and full completion 238 min | E8c |
+| Verification | **yes for M2 and M3 at 10-min CI** (without the speculative queue, M2 +75 min, M3 +278 min). **Not shown for completion**, which is non-monotonic in queue depth (§4) | E8c, depth sweep |
 | Bootstrap | no longer, at 10 min | E7 |
 | Remaining UI | partly: T22 → T28 | 406 ui-minutes |
 
-**Recommended next optimization, from these results:** build and independently review the speculative-verification gate (VERIFICATION-OPTIMIZATION.md §7, controls S1–S7, ODR-R10-22). It is the largest single sensitivity in the combined plan (E8 against E8c), and every other gain at realistic CI depends on it. Second: split T19/T20 and T22 in v4.1.5 (ODR-R10-21).
+**Recommended next optimization, from these results:** build and independently review the speculative-verification gate (VERIFICATION-OPTIMIZATION.md §7, controls S1–S7, ODR-R10-22). The evidence is the 10-min CI point for M2 and M3 (E8 against E8c). It is not the full-completion figure, which is not robust (§4), and at 0 and 5-min CI the gain is small or absent. It is still the only proposed change that addresses the per-slice queue (3.3–8.4 min measured) directly. Second: split T19/T20 and T22 in v4.1.5 (ODR-R10-21).
 
 ## 6. Owner decisions
 
@@ -129,15 +140,18 @@ Their PRs have not appeared, and nothing was cherry-picked or merged.
 | Contract preparation, merge supervision and coordination are not lane time in the model | 8b charges 5 min per slice; supervision is still unmeasured |
 | Incremental verification does not shorten a passing gate run | stated: plan 5 equals plan 2 |
 | Optimism: E8 needs eight owner decisions and one unbuilt gate | stated in §4 and §6 |
+| Review round 6 (RVO-6-1): known paths could select nothing: Host.cs, a project outside the graph, a new source file, Program.fs | **fixed:** fail-safe on an empty selection or an out-of-graph source path; composition files added to the presentation rule; 5 new cases, including "no manifest file ever selects nothing" (20 cases) |
+| RVO-6-2: completion non-monotonic in queue depth, misexplained | **fixed:** §4 depth sweep and wording; completion stated as a range |
+| RVO-6-3/4/5 | queue bound corrected to 8.4 min; M2 delivery before M1 and T25 footnoted; Level 1/2 use needs the owner's acknowledgement |
 
-An independent review of this section is requested in ADVERSARIAL-REVIEW.md, round 6.
+Independent review: ADVERSARIAL-REVIEW.md, round 6 (FAIL, fixed) and round 7.
 
 ## 9. Recommended execution plan
 
 **For a launch on the approved plan today:**
 1. Run the bootstrap preflight P1–P8.
 2. Plan 10 min of set-up.
-3. Builders use Level 1/2 locally (`change-impact.fsx`) before each PR, so fewer slices fail in the gate.
+3. Builders *may* use Level 1/2 locally (`change-impact.fsx`) before each PR, so fewer slices fail in the gate. It is a proposal, neither locked nor approved, so the owner should acknowledge it before the run. It never touches the gate (review RVO-6-5).
 4. Integration uses the handoff contract.
 5. Declare in advance the expected failures from ODR-R10-25 and -28.
 

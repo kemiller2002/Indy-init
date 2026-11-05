@@ -130,6 +130,21 @@ Two mutations were caught.
 | 9 | Can the observer still detect shortcuts? | Yes. Observer pins and Observer.fs are unchanged, and its scope checks apply to a successor |
 | 10 | Is recovery from interrupted sessions preserved? | Yes, for adoption before T0. A mid-run adoption would orphan Praxis records (now stated in ODR-R10-19) |
 
-### Round 6 (execution readiness)
+### Round 6 (a8608f0, execution readiness): FAIL, 2 majors
 
-Requested on the execution-readiness commit; result below when it completes.
+The reviewer reproduced:
+- the substitution demonstration, including `TreatWarningsAsErrors` on and off;
+- E8 and E8c from the CLI;
+- every E-table cell and every CI step timing.
+
+| ID | Severity | Finding | Disposition |
+|---|---|---|---|
+| RVO-6-1 | major | `change-impact` under-selected without failing safe: Host.cs, a project outside the graph, a new source file, Program.fs | **Fixed:** fail-safe on an empty selection or an out-of-graph source path; composition files in the presentation rule; 5 new cases, including an exhaustive "no manifest file selects nothing" |
+| RVO-6-2 | major | E8 completion is non-monotonic in queue depth (at 5-min CI, depth 1 finishes first), and the docs blamed failures although none are configured | **Fixed:** depth sweep published; completion stated as a range; recommendation re-based on M2/M3 at 10-min CI |
+| RVO-6-3 | minor | CI queue upper bound was 504 s, not 524 | **Fixed** |
+| RVO-6-4 | minor | E8 M2 is delivered before M1 and T25 | **Footnoted**: usable from the later of the two |
+| RVO-6-5 | note | Level 1/2 use needs the owner's acknowledgement; INV-LIST integrates before T17 in E8 | **Stated** in §9 and in ODR-R10-31 |
+
+### Round 7
+
+Requested on the fix commit.

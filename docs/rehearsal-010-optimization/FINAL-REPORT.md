@@ -185,7 +185,7 @@ Full report: [execution-readiness/FINAL-REPORT.md](execution-readiness/FINAL-REP
   - M2 T+239 (authoritative list);
   - M3 T+387 (create);
   - full completion T+565.
-- **Without the speculative gate,** full completion is T+803.
+- **Without the speculative gate,** M2 and M3 slip 75 and 278 min at 10-min CI. Full completion is non-monotonic in queue depth (560–803 across depths and CI values), so no single completion gain is claimed.
 - **The new dominant bottleneck** is serialized verification, then the release tail T31–T34.
 
 ## Round-3 independent review

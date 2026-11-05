@@ -21,7 +21,7 @@ Elapsed times, not aggregate queue-minutes. Details in BOOTSTRAP-MEASUREMENTS.js
 
 | Item | Measured | Source |
 |---|---|---|
-| CI queue, workflow created → first job | 3.3–8.7 min | Preflight run 42004659389 |
+| CI queue, workflow created → first job | 3.3–8.4 min | Preflight run 42004659389 |
 | Restore, cold / warm | 13.6 s / 1.4 s | this session |
 | Build of the bootstrapped solution, cold / warm / one-file incremental | 18.6 s / 11.4 s / 3.1–3.3 s | this session |
 | Contract typecheck | 6–11 s | this session; CI |
