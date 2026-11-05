@@ -209,7 +209,7 @@ type UiFailure =
 type Remote<'a> =
     | NotRequested
     /// The copy describes the user's task (UI-024 "Opening investigation"), never a fabricated progress figure.
-    | Waiting of task: string
+    | Waiting of activity: string
     | Ready of 'a
     | Failed of UiFailure
 

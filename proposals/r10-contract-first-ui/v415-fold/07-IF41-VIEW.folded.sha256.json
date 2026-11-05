@@ -1,7 +1,7 @@
 {
   "file": "proposals/r10-contract-first-ui/v415-fold/07-IF41-VIEW.folded.fs",
-  "sha256": "bfcb0e65aab256c82eb5fbb5b90eabf297d29f5314233621e4d1bbe4fe3f1bdd",
-  "bytes": 28101,
+  "sha256": "0cf59e200ccc45cd0d6fb49cd384592392d29d892517ce7c0297dc021aa9c9ae",
+  "bytes": 28105,
   "frozenPrefix": {
     "source": "requirements-compiled/v4.1.5/contracts/07-IF41-VIEW.fs (PR #135 rev 3, 730e2d6; identical to v4.1.4's)",
     "lines": 40,

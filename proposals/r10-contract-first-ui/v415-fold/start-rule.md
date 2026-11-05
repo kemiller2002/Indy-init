@@ -16,3 +16,11 @@
 - the rule that a fixture-backed result is never evidence: every fixture view carries `BackendOrigin.FixtureBackend`, and Layer C is unchanged (`../VERIFICATION-STRATEGY.md`).
 
 The schedule model needs the build/merge split this sentence states (`buildDependsOn`/`mergeDependsOn`, `../SCHEDULE-INPUTS.md` §6).
+
+**Correction (OD-INDY-22, found by the v4.1.5 session):** "builds against IF41-VIEW and the bootstrapped fixture backend" overstates what bootstrap provides.
+
+The bootstrap carries only the IF41-VIEW **types**. The fixture backend and the producer functions (`Ui/Presentation.fs`) are empty stubs that are written in the run. Read the sentence as:
+
+> … because it builds against IF41-VIEW, and against a fixture `UiBackend` written in the run (its own `Scenarios.<role>.fs`, or integration's shared one once written) …
+
+The merge rule is unchanged.
