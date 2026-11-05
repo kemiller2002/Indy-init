@@ -1,7 +1,7 @@
 {
   "schema": "exp-indy-002.requirement-matrix/1",
   "catalogCommit": "d4fdef91654d1dde113fbf56ea1c68b331fc81d1",
-  "selectedCount": 37,
+  "selectedCount": 39,
   "requirements": [
     {
       "id": "INV-001",
@@ -1230,6 +1230,89 @@
       "binding": null,
       "tests": [
         "UT-INV-044"
+      ]
+    },
+    {
+      "id": "INV-032",
+      "name": "Record a conclusion",
+      "type": "action",
+      "screen": "investigation-workspace",
+      "acceptance": [
+        "mapped",
+        "exists",
+        "visible",
+        "accessible",
+        "activate",
+        "outcome",
+        "save",
+        "reload"
+      ],
+      "validation": null,
+      "notes": "Records a snapshot; it does not resolve the investigation, whose existing gates are unchanged.",
+      "sources": [
+        {
+          "document": "docs/REQUIREMENTS.md",
+          "requirement": "R6.1"
+        },
+        {
+          "document": "docs/REQUIREMENTS.md",
+          "requirement": "R6.4"
+        },
+        {
+          "document": "docs/STATE-TRANSITION-TABLES.md",
+          "requirement": "STATE-TRANSITION-TABLES\u00A714-conclusion-behavior"
+        },
+        {
+          "document": "docs/OWNER-DECISIONS-2026-11-03.md",
+          "requirement": "OD-INDY-20"
+        }
+      ],
+      "contract": "RecordConclusion",
+      "binding": null,
+      "tests": [
+        "UT-INV-032"
+      ]
+    },
+    {
+      "id": "INV-033",
+      "name": "Conclusion statement",
+      "type": "ui-field",
+      "screen": "investigation-workspace",
+      "acceptance": [
+        "mapped",
+        "exists",
+        "visible",
+        "accessible",
+        "editable",
+        "enter",
+        "validation",
+        "rejects",
+        "save",
+        "reload"
+      ],
+      "validation": {
+        "minLength": 1,
+        "maxLength": 10000
+      },
+      "notes": null,
+      "sources": [
+        {
+          "document": "docs/REQUIREMENTS.md",
+          "requirement": "R6.4"
+        },
+        {
+          "document": "docs/DESIGN-DECISION-BOUNDARIES.md",
+          "requirement": "D-001"
+        },
+        {
+          "document": "docs/OWNER-DECISIONS-2026-11-03.md",
+          "requirement": "OD-INDY-20"
+        }
+      ],
+      "contract": "RecordConclusion",
+      "binding": "ConclusionInput.Statement",
+      "tests": [
+        "UT-INV-033"
       ]
     }
   ]

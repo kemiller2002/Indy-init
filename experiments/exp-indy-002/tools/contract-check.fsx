@@ -23,7 +23,8 @@ let selected =
     [ "INV-001"; "INV-002"; "INV-004"; "INV-005"; "INV-006"; "INV-007"; "INV-008"; "INV-009"; "INV-010"; "INV-011"
       "INV-012"; "INV-013"; "INV-014"; "INV-015"; "INV-016"; "INV-017"; "INV-018"; "INV-019"; "INV-020"; "INV-021"
       "INV-022"; "INV-023"; "INV-024"; "INV-025"; "INV-026"; "INV-027"; "INV-028"; "INV-029"; "INV-030"; "INV-031"
-      "INV-034"; "INV-035"; "INV-036"; "INV-038"; "INV-039"; "INV-040"; "INV-044" ]
+      "INV-034"; "INV-035"; "INV-036"; "INV-038"; "INV-039"; "INV-040"; "INV-044"
+      "INV-032"; "INV-033" ]
 
 let parse (path: string) = JsonNode.Parse(File.ReadAllText path)
 let catalog = parse (Path.Combine(repo, "requirements/catalogs/causa-investigation.requirement-catalog.json"))

@@ -13,6 +13,8 @@ type ObservationId = ObservationId of string
 type HypothesisId = HypothesisId of string
 type EvidenceId = EvidenceId of string
 type RelationshipId = RelationshipId of string
+/// CG-6 (second release wave).
+type ConclusionId = ConclusionId of string
 
 /// Milliseconds since the Unix epoch, UTC. Supplied by the boundary; the domain never reads a clock.
 type Timestamp = Timestamp of int64
@@ -59,6 +61,9 @@ type RelationshipInput =
       Kind: RelationshipKind option
       Rationale: string }
 
+/// CG-6. INV-033.
+type ConclusionInput = { Statement: string }
+
 /// Reassessment of an existing relationship (OD-INDY-23 (3)).
 type RelationshipRevisionInput = { Kind: RelationshipKind option; Rationale: string }
 
@@ -95,6 +100,13 @@ type Relationship =
       Rationale: string
       Status: RelationshipStatus }
 
+/// CG-6. INV-032: a snapshot record (STATE-TRANSITION-TABLES section 14). BasedOn is the IDs of the relationships that
+/// were Current when it was recorded, so later reassessment never rewrites what it was based on. The latest is current.
+type Conclusion =
+    { Id: ConclusionId
+      Statement: string
+      BasedOn: RelationshipId list }
+
 /// INV-018. An investigation is Open from the moment it is started; this slice has no resolve transition.
 type InvestigationState = | Open
 
@@ -117,6 +129,7 @@ type Command =
     | LinkEvidence of RelationshipInput
     | ReviseRelationship of RelationshipId * RelationshipRevisionInput
     | WithdrawRelationship of RelationshipId * reason: string
+    | RecordConclusion of ConclusionInput
 
 /// Events carry full bodies (ODR-V412-02), so every entered value is persisted and replayable.
 type Event =
@@ -131,6 +144,7 @@ type Event =
     | RelationshipRecorded of Relationship * at: Timestamp
     | RelationshipRevised of previous: RelationshipId * next: Relationship * at: Timestamp
     | RelationshipWithdrawn of RelationshipId * reason: string * at: Timestamp
+    | ConclusionRecorded of Conclusion * at: Timestamp
 
 /// A field-level refusal: the catalog ID of the field and a message the UI shows next to it.
 type FieldError = { FieldId: string; Message: string }
@@ -159,6 +173,7 @@ type Investigation =
       Hypotheses: Hypothesis list
       Evidence: Evidence list
       Relationships: Relationship list
+      Conclusions: Conclusion list
       History: HistoryEntry list }
 
 // ---------- Persistence boundary ----------
@@ -205,6 +220,7 @@ type ValidateObservation = ObservationInput -> Result<string * string option, Fi
 type ValidateHypothesis = HypothesisInput -> Result<string * string, FieldError list>
 type ValidateEvidence = EvidenceInput -> Result<EvidenceInput, FieldError list>
 type ValidateRelationship = RelationshipInput -> Result<RelationshipKind * string, FieldError list>
+type ValidateConclusion = ConclusionInput -> Result<string, FieldError list>
 
 /// Domain.fs: decide is total and pure; evolve folds one event; replay folds a log.
 type Decide = Investigation option -> Timestamp -> Command -> Result<Event list, DomainError>
@@ -230,6 +246,7 @@ type Editor =
     | EvidenceEditor of EvidenceId
     | NewRelationshipEditor
     | RelationshipEditor of RelationshipId
+    | NewConclusionEditor
 
 /// Every user action on the three screens. SetField carries the catalog field ID and the raw text.
 type UiAction =

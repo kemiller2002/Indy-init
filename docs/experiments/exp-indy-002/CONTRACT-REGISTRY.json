@@ -672,7 +672,49 @@
         "UT-INV-040"
       ],
       "accessibleName": "the investigation title, or the problem statement when it has no title"
+    },
+    {
+      "id": "INV-032",
+      "kind": "action",
+      "screen": "investigation-workspace",
+      "component": "Conclusions/button",
+      "label": "Record a conclusion",
+      "openLabel": "Record a conclusion",
+      "submitLabel": "Confirm",
+      "uiAction": "OpenEditor NewConclusionEditor; SubmitEditor",
+      "command": "RecordConclusion",
+      "input": "ConclusionInput",
+      "output": "[ConclusionRecorded] with BasedOn = IDs of the Current relationships at that moment",
+      "failure": "Invalid | NotStarted",
+      "transition": "snapshot appended; latest conclusion is current; Investigation.State unchanged (stays Open, never resolved); save state -\u003E Unsaved",
+      "wave": 2,
+      "tests": [
+        "UT-INV-032"
+      ]
+    },
+    {
+      "id": "INV-033",
+      "kind": "field",
+      "screen": "investigation-workspace",
+      "component": "ConclusionEditor/textarea",
+      "label": "Conclusion",
+      "record": "ConclusionInput",
+      "property": "Statement",
+      "fsType": "string",
+      "required": true,
+      "default": "",
+      "validation": [
+        "not blank",
+        "maxLength 10000"
+      ],
+      "command": "RecordConclusion",
+      "transition": "Conclusion.Statement",
+      "display": "Conclusions/list region with data-requirement-id INV-033 lists every conclusion\u0027s statement, latest marked Current",
+      "wave": 2,
+      "tests": [
+        "UT-INV-033"
+      ]
     }
   ],
-  "revision": "CR-2 (after CR-1): labels for the INV-030 evidence and hypothesis pickers and the INV-031 option labels"
+  "revision": "CG-6 (second release wave): INV-032, INV-033 added"
 }

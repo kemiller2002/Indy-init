@@ -18,6 +18,7 @@ let groups =
         "CG-3-CONTENT", [ "INV-009"; "INV-010"; "INV-011"; "INV-012"; "INV-013"; "INV-014"; "INV-024"; "INV-025"; "INV-026"; "INV-027"; "INV-028"; "INV-029" ]
         "CG-4-RELATIONSHIP", [ "INV-030"; "INV-031"; "INV-038"; "INV-044" ]
         "CG-5-PERSISTENCE", [ "INV-015"; "INV-016"; "INV-017"; "INV-039"; "INV-040" ]
+        "CG-6-CONCLUSION", [ "INV-032"; "INV-033" ]
     ]
 let statuses = set [ "DEFINED"; "VALIDATED"; "RELEASED"; "IMPLEMENTING"; "STAGED"; "INTEGRATION_READY"; "VERIFIED"; "BLOCKED" ]
 
