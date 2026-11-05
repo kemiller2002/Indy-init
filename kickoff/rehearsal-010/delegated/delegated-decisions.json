@@ -8,9 +8,15 @@
       "class": "source-ownership",
       "decision": "Workstream ownership: lead session owns integration, Workstreams A (milestones) and C (verification), docs/rehearsal-010-optimization/ and tools/r10/; the contract-first UI session owns Workstream B and proposals/r10-contract-first-ui/; the historical-compatibility session owns Workstream D's minimum v4.1.5 contract and proposals/r10-historical-data-compatibility/.",
       "rationale": "Directive sections 3-7: use existing agents, nonoverlapping ownership, lead owns integration.",
-      "actingAgent": { "kind": "agent", "session": "session_01G1iECgS2MYoyqvc2eXNdhV", "role": "lead/integration" },
+      "actingAgent": {
+        "kind": "agent",
+        "session": "session_01G1iECgS2MYoyqvc2eXNdhV",
+        "role": "lead/integration"
+      },
       "decidedAt": "2026-11-05T19:12:00Z",
-      "paths": [ "docs/rehearsal-010-optimization/acceleration/OWNERSHIP.md" ],
+      "paths": [
+        "docs/rehearsal-010-optimization/acceleration/OWNERSHIP.md"
+      ],
       "evidence": "docs/rehearsal-010-optimization/acceleration/OWNERSHIP.md"
     },
     {
@@ -18,10 +24,32 @@
       "class": "noncritical-deferral",
       "decision": "Defer FO-1..3 and T19/T22 work from v4.1.5 to v4.1.6; v4.1.5 is the staged minimum successor (event union, derived workspace, listing, creation within existing SM-SAVE states). Requirements stay in scope and incomplete; nothing is marked done.",
       "rationale": "Directive section 6: smallest contract change for the working application; v4.1.5 cost analysis FINAL-RECOMMENDATION.",
-      "actingAgent": { "kind": "agent", "session": "session_01G1iECgS2MYoyqvc2eXNdhV", "role": "lead/integration" },
+      "actingAgent": {
+        "kind": "agent",
+        "session": "session_01G1iECgS2MYoyqvc2eXNdhV",
+        "role": "lead/integration"
+      },
       "decidedAt": "2026-11-05T19:12:00Z",
-      "paths": [ "docs/rehearsal-010-optimization/acceleration/WORK-CLASSIFICATION.md" ],
+      "paths": [
+        "docs/rehearsal-010-optimization/acceleration/WORK-CLASSIFICATION.md"
+      ],
       "evidence": "docs/rehearsal-010-optimization/v415-cost-analysis/FINAL-RECOMMENDATION.md"
+    },
+    {
+      "id": "DTD-R10-003",
+      "class": "source-ownership",
+      "decision": "v4.1.5 build: the lead session is accountable for v4.1.5 (the owner named the lead); the historical-compatibility session keeps exclusive hands-on ownership of requirements-compiled/v4.1.5 on PR #135, where its compile is already under way, and the lead independently reviews, verifies and merges it. No second agent edits requirements-compiled/v4.1.5.",
+      "rationale": "The owner answered 'You' but asked that it not conflict with other updates. Moving a compile already in progress to another session would put two agents on the same package files; directive section 4/7: exclusive ownership, avoid two agents redesigning the same interface.",
+      "actingAgent": {
+        "kind": "agent",
+        "session": "session_01G1iECgS2MYoyqvc2eXNdhV",
+        "role": "lead/integration"
+      },
+      "decidedAt": "2026-11-05T19:35:00Z",
+      "paths": [
+        "requirements-compiled/v4.1.5/"
+      ],
+      "evidence": "https://github.com/kemiller2002/Indy-init/pull/135"
     }
   ]
 }
