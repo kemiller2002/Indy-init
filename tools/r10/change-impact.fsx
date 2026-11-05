@@ -48,7 +48,11 @@ type Selection = { All: bool; TestProjects: Set<string>; Suites: Set<string>; Ru
 /// What to run now for these changed paths. Pure: the same model and paths always give the same selection.
 let select (m: Model) (paths: string list) : Selection =
     let one (path: string) =
-        let p = path.Replace('\\', '/').TrimStart('.', '/')
+        // normalise: separators, a leading "./", and ".." segments (review RVO-7-4; .github/ keeps its dot)
+        let p =
+            path.Replace('\\', '/').Split('/', StringSplitOptions.RemoveEmptyEntries)
+            |> Array.fold (fun (acc: string list) seg -> match seg with "." -> acc | ".." -> (match acc with _ :: t -> t | [] -> []) | s -> s :: acc) []
+            |> List.rev |> String.concat "/"
         let rules = m.Rules |> List.filter (fun r -> r.Pattern.IsMatch p)
         let projects = Map.tryFind p m.FileProject |> Option.map (fun pr -> Map.tryFind pr m.Dependents |> Option.defaultValue (Set.singleton pr))
         let inGraph = Map.tryFind p m.FileProject |> Option.map (fun pr -> m.Dependents.ContainsKey pr) |> Option.defaultValue false
@@ -126,6 +130,10 @@ let tests (m: Model) =
     case "no known path ever selects nothing (every manifest file selects a test or everything)"
         (m.FileProject |> Map.toList |> List.forall (fun (path, _) -> let x = s [ path ] in x.All || not x.TestProjects.IsEmpty || not x.Suites.IsEmpty))
         (fun () -> m.FileProject |> Map.toList |> List.map fst |> List.filter (fun path -> let x = s [ path ] in not x.All && x.TestProjects.IsEmpty && x.Suites.IsEmpty) |> List.truncate 5 |> String.concat ", ")
+    let r5 = s [ ".github/workflows/ci.yml" ]
+    case ".github/ is matched by the governance rule itself, not only by the unknown-path fallback" (r5.All && r5.Rules.Contains "CI-ALL-GOVERNANCE") (fun () -> show r5)
+    let r6 = s [ "verification/journeys/../../src/Causa.Domain/Entities.fs" ]
+    case "'..' segments are resolved: a shared record reached through '..' still selects every dependent" (r6.TestProjects = all) (fun () -> show r6)
     printfn "\nchange-impact tests: %s" (if failed = 0 then "all passed" else sprintf "%d failed" failed)
     failed
 

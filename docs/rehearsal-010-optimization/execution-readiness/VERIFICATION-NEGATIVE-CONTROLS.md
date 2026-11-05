@@ -1,6 +1,6 @@
 # Rehearsal 010: negative controls for change-aware selection
 
-`dotnet fsi tools/r10/change-impact.fsx -- --indy-init . test` runs the cases below. All 20 pass, and the suite runs in Preflight tooling CI.
+`dotnet fsi tools/r10/change-impact.fsx -- --indy-init . test` runs the cases below. All 22 pass, and the suite runs in Preflight tooling CI.
 
 | # | Change | Must select | Why it is adversarial |
 |---|---|---|---|
@@ -24,6 +24,8 @@
 | 18 | `src/Causa.App/Views/NewScreen.fs` (a new file, in no compile list) | everything | Review RVO-6-1: it selected browsers only |
 | 19 | `src/Causa.App/Program.fs` (composition) | the browser suites, including live | Review RVO-6-1 |
 | 20 | **every** file in the ownership manifest | at least one test or everything | Exhaustive: no known path may select nothing |
+| 21 | `.github/workflows/ci.yml` | everything, through the governance rule | Review RVO-7-4: the leading dot was stripped |
+| 22 | `verification/journeys/../../src/Causa.Domain/Entities.fs` | every dependent | Review RVO-7-4: `..` was not resolved |
 
 **What these controls do not cover.**
 - Semantic coupling not visible in paths, for example a JSON fixture read by name at run time. Unknown paths select everything, but a *known* file with an unmodelled reader would be under-selected. **This is why Level 2 never replaces Level 3.**

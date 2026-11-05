@@ -178,15 +178,15 @@ Full report: [execution-readiness/FINAL-REPORT.md](execution-readiness/FINAL-REP
 
 **In summary:**
 - **Integration structure.** The frozen v4.1.4 package already provides independent module ownership, complete compile lists and one composition owner. It was demonstrated that UI code compiles against contracts and stubs with no domain engine, and that a GitHub adapter replaces a fixture without screen changes. Contract drift fails to compile only while `TreatWarningsAsErrors` stays on.
-- **Change-aware Level 1/2 selection.** Added as a builder tool with 15 adversarial cases, never part of the gate.
+- **Change-aware Level 1/2 selection.** Added as a builder tool with 22 adversarial cases, never part of the gate.
 - **Measurements.** The CI queue is 3–9 min; builds take seconds.
 - **The combined plan, E8** (needs ODR-R10-19..32 and the unbuilt §7 gate). At 10-min CI:
   - M0 T+120 (data visible);
   - M2 T+239 (authoritative list);
   - M3 T+387 (create);
-  - full completion T+565.
+  - full completion 560–630 across queue depths (not a single point: completion is non-monotonic in queue depth).
 - **Without the speculative gate,** M2 and M3 slip 75 and 278 min at 10-min CI. Full completion is non-monotonic in queue depth (560–803 across depths and CI values), so no single completion gain is claimed.
-- **The new dominant bottleneck** is serialized verification, then the release tail T31–T34.
+- **The new dominant bottleneck,** for M2 and M3 at 5–10-min CI, is serialized verification; for full completion it is the release tail T31–T34.
 
 ## Round-3 independent review
 

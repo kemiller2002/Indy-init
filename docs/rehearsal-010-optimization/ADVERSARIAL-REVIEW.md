@@ -145,6 +145,14 @@ The reviewer reproduced:
 | RVO-6-4 | minor | E8 M2 is delivered before M1 and T25 | **Footnoted**: usable from the later of the two |
 | RVO-6-5 | note | Level 1/2 use needs the owner's acknowledgement; INV-LIST integrates before T17 in E8 | **Stated** in §9 and in ODR-R10-31 |
 
-### Round 7
+### Round 7 (7c782d5): PASS
 
-Requested on the fix commit.
+The reviewer could not defeat the selection with any path a real `git diff` produces. New attacks (`..`, manifest files outside any project, fixtures, `.github/`) all fail safe, and the depth sweep reproduces.
+
+| ID | Severity | Finding | Disposition |
+|---|---|---|---|
+| RVO-7-1 | minor | "Small or absent at 5-min CI" understated: the speculative queue gains about 45 min for M2 and M3 there | **Fixed** |
+| RVO-7-2 | minor | Single-point completion (T+565) still in the main FINAL-REPORT and ODR-R10-32 | **Fixed:** stated as a range |
+| RVO-7-3 | minor | Stale case count | **Fixed** (22) |
+| RVO-7-4 | note | `TAG:` selectors undefined; `.github/` lost its dot; `..` not resolved | **Fixed:** tags defined in the matrix; paths normalised; 2 new cases |
+| RVO-7-5 | note | The other execution-readiness docs make no completion claims | – |

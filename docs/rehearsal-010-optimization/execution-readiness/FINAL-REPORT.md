@@ -81,7 +81,7 @@ Contract preparation is *not* free in reality: plan 8b charges 5 min per slice f
 | 3 (E8) | 560 / 599 / 565 |
 | 4 | 560 / 599 / 630 |
 
-A deeper queue is *not* always faster here. The existing test "a deeper speculative queue is never slower" covers only the base ownership manifests. It does not cover this configuration, and it would fail on it. The likely mechanism is greedy milestone-first assignment interacting with merge order, but this is not shown. **Treat E8's completion as a range (560–630), not a point**, and do not read the 10-min CI 565 → 803 difference as robust. The early-milestone gains of the speculative queue are consistent across this sweep at 10-min CI (M2 −75 min, M3 −278 min); at 0 and 5-min CI they are small or absent.
+A deeper queue is *not* always faster here. The existing test "a deeper speculative queue is never slower" covers only the base ownership manifests. It does not cover this configuration, and it would fail on it. The likely mechanism is greedy milestone-first assignment interacting with merge order, but this is not shown. **Treat E8's completion as a range (560–630), not a point**, and do not read the 10-min CI 565 → 803 difference as robust. The early-milestone gains of the speculative queue: none at 0-min CI; about 45 min at 5-min CI (M2 268 → 223, M3 420 → 376); and M2 −75 min, M3 −278 min at 10-min CI (corrected in review RVO-7-1).
 
 **Exceeding 420 minutes:** no probability is given, because the evidence does not support one. Under every modelled plan, CI latency, overhead and estimate scale, **the full scope does not finish within 420 minutes**. The best is T+560. On the schedule, E8 delivers data visibility (M0), Connect (M1), the authoritative list (M2) and creation (M3) inside the window at every CI value. Analysis (M5: 424/441/473) and save (M4: 437/459/496) fall just after it. M1–M3 still need ODR-R10-25, -26, -28 and -29 to pass against real data.
 
@@ -105,7 +105,7 @@ After the domain kernel (done by T+208) and persistence (done by T+256), the **r
 | Bootstrap | no longer, at 10 min | E7 |
 | Remaining UI | partly: T22 → T28 | 406 ui-minutes |
 
-**Recommended next optimization, from these results:** build and independently review the speculative-verification gate (VERIFICATION-OPTIMIZATION.md §7, controls S1–S7, ODR-R10-22). The evidence is the 10-min CI point for M2 and M3 (E8 against E8c). It is not the full-completion figure, which is not robust (§4), and at 0 and 5-min CI the gain is small or absent. It is still the only proposed change that addresses the per-slice queue (3.3–8.4 min measured) directly. Second: split T19/T20 and T22 in v4.1.5 (ODR-R10-21).
+**Recommended next optimization, from these results:** build and independently review the speculative-verification gate (VERIFICATION-OPTIMIZATION.md §7, controls S1–S7, ODR-R10-22). The evidence is the 10-min CI point for M2 and M3 (E8 against E8c). It is not the full-completion figure, which is not robust (§4), and the gain is about 45 min for M2 and M3 at 5-min CI, and none at 0-min CI. It is still the only proposed change that addresses the per-slice queue (3.3–8.4 min measured) directly. Second: split T19/T20 and T22 in v4.1.5 (ODR-R10-21).
 
 ## 6. Owner decisions
 
