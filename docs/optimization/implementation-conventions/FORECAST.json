@@ -1,0 +1,358 @@
+{
+  "schema": "indy-init.implementation-conventions.forecast/1",
+  "generatedBy": "tools/conventions/conventions.fsx forecast",
+  "pool": {
+    "conservative": 85.4,
+    "central": 316.6,
+    "optimistic": 912.5
+  },
+  "peakCumulativeNet": {
+    "conservative": 14.72,
+    "central": 179.54,
+    "optimistic": 712.42
+  },
+  "peakRank": {
+    "conservative": 15,
+    "central": 19,
+    "optimistic": 23
+  },
+  "securedByExistingChecks": {
+    "conservative": 12.27,
+    "central": 100.76,
+    "optimistic": 353.83
+  },
+  "incrementalFromNewConventions": {
+    "conservative": -4.99,
+    "central": 78.54,
+    "optimistic": 335.89
+  },
+  "eightyPercentPrefix": {
+    "conservative": 4,
+    "central": 11,
+    "optimistic": 12
+  },
+  "ranked": [
+    {
+      "rank": 1,
+      "id": "CV-02",
+      "standaloneNet": {
+        "conservative": 4.4,
+        "central": 29,
+        "optimistic": 95.58
+      },
+      "cumulativeNet": {
+        "conservative": 4.4,
+        "central": 29,
+        "optimistic": 95.58
+      }
+    },
+    {
+      "rank": 2,
+      "id": "CV-03",
+      "standaloneNet": {
+        "conservative": 3,
+        "central": 26.8,
+        "optimistic": 98
+      },
+      "cumulativeNet": {
+        "conservative": 7.4,
+        "central": 55.8,
+        "optimistic": 193.58
+      }
+    },
+    {
+      "rank": 3,
+      "id": "CV-01",
+      "standaloneNet": {
+        "conservative": 3.3,
+        "central": 17.55,
+        "optimistic": 61.65
+      },
+      "cumulativeNet": {
+        "conservative": 10.7,
+        "central": 73.35,
+        "optimistic": 255.22
+      }
+    },
+    {
+      "rank": 4,
+      "id": "CV-11",
+      "standaloneNet": {
+        "conservative": 3,
+        "central": 14.7,
+        "optimistic": 51
+      },
+      "cumulativeNet": {
+        "conservative": 13.7,
+        "central": 88.05,
+        "optimistic": 306.23
+      }
+    },
+    {
+      "rank": 5,
+      "id": "CV-09",
+      "standaloneNet": {
+        "conservative": -0.3,
+        "central": 13,
+        "optimistic": 57.8
+      },
+      "cumulativeNet": {
+        "conservative": 13.4,
+        "central": 101.05,
+        "optimistic": 364.02
+      }
+    },
+    {
+      "rank": 6,
+      "id": "CV-06",
+      "standaloneNet": {
+        "conservative": 0.5,
+        "central": 10,
+        "optimistic": 35.2
+      },
+      "cumulativeNet": {
+        "conservative": 13.9,
+        "central": 111.05,
+        "optimistic": 399.22
+      }
+    },
+    {
+      "rank": 7,
+      "id": "CV-04",
+      "standaloneNet": {
+        "conservative": -1.2,
+        "central": 8.8,
+        "optimistic": 47
+      },
+      "cumulativeNet": {
+        "conservative": 12.7,
+        "central": 119.85,
+        "optimistic": 446.22
+      }
+    },
+    {
+      "rank": 8,
+      "id": "CV-17",
+      "standaloneNet": {
+        "conservative": -0.45,
+        "central": 7.7,
+        "optimistic": 33.7
+      },
+      "cumulativeNet": {
+        "conservative": 12.25,
+        "central": 127.55,
+        "optimistic": 479.92
+      }
+    },
+    {
+      "rank": 9,
+      "id": "CV-10",
+      "standaloneNet": {
+        "conservative": -0.5,
+        "central": 7.1,
+        "optimistic": 29.2
+      },
+      "cumulativeNet": {
+        "conservative": 11.75,
+        "central": 134.65,
+        "optimistic": 509.12
+      }
+    },
+    {
+      "rank": 10,
+      "id": "CV-16",
+      "standaloneNet": {
+        "conservative": 1.05,
+        "central": 6.38,
+        "optimistic": 19.95
+      },
+      "cumulativeNet": {
+        "conservative": 12.8,
+        "central": 141.02,
+        "optimistic": 529.07
+      }
+    },
+    {
+      "rank": 11,
+      "id": "CV-15",
+      "standaloneNet": {
+        "conservative": -0.5,
+        "central": 6,
+        "optimistic": 22.8
+      },
+      "cumulativeNet": {
+        "conservative": 12.3,
+        "central": 147.02,
+        "optimistic": 551.88
+      }
+    },
+    {
+      "rank": 12,
+      "id": "CV-07",
+      "standaloneNet": {
+        "conservative": 0.7,
+        "central": 5.9,
+        "optimistic": 21.1
+      },
+      "cumulativeNet": {
+        "conservative": 13,
+        "central": 152.93,
+        "optimistic": 572.98
+      }
+    },
+    {
+      "rank": 13,
+      "id": "CV-05",
+      "standaloneNet": {
+        "conservative": 0.2,
+        "central": 5.1,
+        "optimistic": 13
+      },
+      "cumulativeNet": {
+        "conservative": 13.2,
+        "central": 158.02,
+        "optimistic": 585.98
+      }
+    },
+    {
+      "rank": 14,
+      "id": "CV-20",
+      "standaloneNet": {
+        "conservative": 0.52,
+        "central": 5.04,
+        "optimistic": 20.66
+      },
+      "cumulativeNet": {
+        "conservative": 13.72,
+        "central": 163.06,
+        "optimistic": 606.63
+      }
+    },
+    {
+      "rank": 15,
+      "id": "CV-14",
+      "standaloneNet": {
+        "conservative": 1,
+        "central": 4.9,
+        "optimistic": 17
+      },
+      "cumulativeNet": {
+        "conservative": 14.72,
+        "central": 167.96,
+        "optimistic": 623.63
+      }
+    },
+    {
+      "rank": 16,
+      "id": "CV-08",
+      "standaloneNet": {
+        "conservative": -4.1,
+        "central": 4.2,
+        "optimistic": 27.4
+      },
+      "cumulativeNet": {
+        "conservative": 10.62,
+        "central": 172.17,
+        "optimistic": 651.03
+      }
+    },
+    {
+      "rank": 17,
+      "id": "CV-21",
+      "standaloneNet": {
+        "conservative": 0.6,
+        "central": 3.6,
+        "optimistic": 16.2
+      },
+      "cumulativeNet": {
+        "conservative": 11.1,
+        "central": 174.68,
+        "optimistic": 660.75
+      }
+    },
+    {
+      "rank": 18,
+      "id": "CV-18",
+      "standaloneNet": {
+        "conservative": -0.5,
+        "central": 2.65,
+        "optimistic": 12.25
+      },
+      "cumulativeNet": {
+        "conservative": 10.6,
+        "central": 177.34,
+        "optimistic": 673
+      }
+    },
+    {
+      "rank": 19,
+      "id": "CV-12",
+      "standaloneNet": {
+        "conservative": -2.37,
+        "central": 2.2,
+        "optimistic": 16.55
+      },
+      "cumulativeNet": {
+        "conservative": 8.24,
+        "central": 179.54,
+        "optimistic": 689.55
+      }
+    },
+    {
+      "rank": 20,
+      "id": "CV-23",
+      "standaloneNet": {
+        "conservative": -0.9,
+        "central": 0.4,
+        "optimistic": 4
+      },
+      "cumulativeNet": {
+        "conservative": 7.28,
+        "central": 179.3,
+        "optimistic": 689.72
+      }
+    },
+    {
+      "rank": 21,
+      "id": "CV-19",
+      "standaloneNet": {
+        "conservative": -1,
+        "central": -0.15,
+        "optimistic": 2.05
+      },
+      "cumulativeNet": {
+        "conservative": 6.28,
+        "central": 179.15,
+        "optimistic": 691.77
+      }
+    },
+    {
+      "rank": 22,
+      "id": "CV-13",
+      "standaloneNet": {
+        "conservative": -13.2,
+        "central": -1,
+        "optimistic": 25.2
+      },
+      "cumulativeNet": {
+        "conservative": -7.01,
+        "central": 177.25,
+        "optimistic": 712.29
+      }
+    },
+    {
+      "rank": 23,
+      "id": "CV-22",
+      "standaloneNet": {
+        "conservative": -4.85,
+        "central": -1.95,
+        "optimistic": 3.5
+      },
+      "cumulativeNet": {
+        "conservative": -11.92,
+        "central": 174.67,
+        "optimistic": 712.42
+      }
+    }
+  ]
+}

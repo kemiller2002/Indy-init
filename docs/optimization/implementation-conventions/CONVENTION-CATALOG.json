@@ -1,0 +1,1878 @@
+{
+  "schema": "indy-init.implementation-conventions.catalog/1",
+  "version": "1.0.0",
+  "status": "PROPOSED. Nothing here is adopted until the owner approves it; ENFORCED-EXISTING marks conventions an existing check already enforces.",
+  "failureData": "FAILURE-DATA.json",
+  "model": {
+    "scenarios": [
+      "conservative",
+      "central",
+      "optimistic"
+    ],
+    "residualCost": "probabilityOfOccurrence x criticalPathMinutesIfOccurs x (1 - expIndy002Overlap), per failure mode, per scenario",
+    "combinedPrevention": "1 - product over adopted conventions of (1 - prevention); overlapping conventions never add past 100% of a failure mode",
+    "net": "combined residual cost prevented - sum of competitionOverheadMinutes",
+    "provenance": "criticalPathMinutesIfOccurs, probabilityOfOccurrence, prevention and overhead are MODELED assumptions, informed by but not equal to the measured minutes in FAILURE-DATA.json",
+    "probabilityOfOccurrence": "probability the failure mode occurs in one competition build if the convention set were NOT enforced (based on historical recurrence across R2-R9, discounted for maturity); conventions an existing check already enforces therefore show the value that check secures"
+  },
+  "failureModes": [
+    {
+      "id": "FM-01",
+      "title": "Run stopped or clock misread before the deadline",
+      "findings": [
+        "HF-048",
+        "HF-061",
+        "HF-057"
+      ],
+      "criticalPathMinutesIfOccurs": {
+        "conservative": 60,
+        "central": 150,
+        "optimistic": 305
+      },
+      "probabilityOfOccurrence": {
+        "conservative": 0.15,
+        "central": 0.25,
+        "optimistic": 0.35
+      },
+      "expIndy002Overlap": {
+        "conservative": 0,
+        "central": 0,
+        "optimistic": 0
+      }
+    },
+    {
+      "id": "FM-02",
+      "title": "Build target ambiguous or changing (catalog vs plan, mission text vs baseline, unstated priority)",
+      "findings": [
+        "HF-001",
+        "HF-037",
+        "HF-059",
+        "HF-038",
+        "HF-064",
+        "HF-070",
+        "HF-062"
+      ],
+      "criticalPathMinutesIfOccurs": {
+        "conservative": 60,
+        "central": 120,
+        "optimistic": 240
+      },
+      "probabilityOfOccurrence": {
+        "conservative": 0.25,
+        "central": 0.4,
+        "optimistic": 0.55
+      },
+      "expIndy002Overlap": {
+        "conservative": 0,
+        "central": 0,
+        "optimistic": 0
+      }
+    },
+    {
+      "id": "FM-03",
+      "title": "Generated commands, workflows and environment never executed before freeze",
+      "findings": [
+        "HF-028",
+        "HF-060",
+        "HF-029",
+        "HF-033",
+        "HF-047",
+        "HF-018",
+        "HF-076"
+      ],
+      "criticalPathMinutesIfOccurs": {
+        "conservative": 20,
+        "central": 45,
+        "optimistic": 90
+      },
+      "probabilityOfOccurrence": {
+        "conservative": 0.3,
+        "central": 0.5,
+        "optimistic": 0.7
+      },
+      "expIndy002Overlap": {
+        "conservative": 0,
+        "central": 0,
+        "optimistic": 0
+      }
+    },
+    {
+      "id": "FM-04",
+      "title": "Application fails to start in the WASM runtime",
+      "findings": [
+        "HF-007",
+        "HF-013"
+      ],
+      "criticalPathMinutesIfOccurs": {
+        "conservative": 30,
+        "central": 60,
+        "optimistic": 120
+      },
+      "probabilityOfOccurrence": {
+        "conservative": 0.15,
+        "central": 0.3,
+        "optimistic": 0.5
+      },
+      "expIndy002Overlap": {
+        "conservative": 0,
+        "central": 0,
+        "optimistic": 0
+      }
+    },
+    {
+      "id": "FM-05",
+      "title": "Environment literals (ports, hosts) duplicated across files",
+      "findings": [
+        "HF-014"
+      ],
+      "criticalPathMinutesIfOccurs": {
+        "conservative": 10,
+        "central": 20,
+        "optimistic": 30
+      },
+      "probabilityOfOccurrence": {
+        "conservative": 0.2,
+        "central": 0.35,
+        "optimistic": 0.5
+      },
+      "expIndy002Overlap": {
+        "conservative": 0,
+        "central": 0,
+        "optimistic": 0
+      }
+    },
+    {
+      "id": "FM-06",
+      "title": "CI workflow shape wastes or starves runs",
+      "findings": [
+        "HF-011",
+        "HF-031",
+        "HF-032",
+        "HF-075",
+        "HF-086"
+      ],
+      "criticalPathMinutesIfOccurs": {
+        "conservative": 10,
+        "central": 30,
+        "optimistic": 60
+      },
+      "probabilityOfOccurrence": {
+        "conservative": 0.3,
+        "central": 0.5,
+        "optimistic": 0.7
+      },
+      "expIndy002Overlap": {
+        "conservative": 0,
+        "central": 0,
+        "optimistic": 0
+      }
+    },
+    {
+      "id": "FM-07",
+      "title": "CI shell steps hide failures (no pipefail, swallowed output)",
+      "findings": [
+        "HF-030"
+      ],
+      "criticalPathMinutesIfOccurs": {
+        "conservative": 10,
+        "central": 20,
+        "optimistic": 40
+      },
+      "probabilityOfOccurrence": {
+        "conservative": 0.2,
+        "central": 0.4,
+        "optimistic": 0.6
+      },
+      "expIndy002Overlap": {
+        "conservative": 0,
+        "central": 0,
+        "optimistic": 0
+      }
+    },
+    {
+      "id": "FM-08",
+      "title": "Concurrent writers conflict on shared files or shared state",
+      "findings": [
+        "HF-015",
+        "HF-042",
+        "HF-043",
+        "HF-044",
+        "HF-063",
+        "HF-079"
+      ],
+      "criticalPathMinutesIfOccurs": {
+        "conservative": 15,
+        "central": 40,
+        "optimistic": 80
+      },
+      "probabilityOfOccurrence": {
+        "conservative": 0.3,
+        "central": 0.5,
+        "optimistic": 0.7
+      },
+      "expIndy002Overlap": {
+        "conservative": 0.5,
+        "central": 0.4,
+        "optimistic": 0.3
+      }
+    },
+    {
+      "id": "FM-09",
+      "title": "Save reported durable without verified provider read-back (multi-writer, stale read, API limits, retry storms)",
+      "findings": [
+        "HF-006",
+        "HF-021",
+        "HF-026",
+        "HF-040",
+        "HF-039",
+        "HF-074"
+      ],
+      "criticalPathMinutesIfOccurs": {
+        "conservative": 30,
+        "central": 60,
+        "optimistic": 120
+      },
+      "probabilityOfOccurrence": {
+        "conservative": 0.3,
+        "central": 0.5,
+        "optimistic": 0.7
+      },
+      "expIndy002Overlap": {
+        "conservative": 0,
+        "central": 0,
+        "optimistic": 0
+      }
+    },
+    {
+      "id": "FM-10",
+      "title": "State machine bypassed, faults swallowed, unknown input silently defaulted",
+      "findings": [
+        "HF-008",
+        "HF-022",
+        "HF-041"
+      ],
+      "criticalPathMinutesIfOccurs": {
+        "conservative": 15,
+        "central": 30,
+        "optimistic": 60
+      },
+      "probabilityOfOccurrence": {
+        "conservative": 0.2,
+        "central": 0.35,
+        "optimistic": 0.5
+      },
+      "expIndy002Overlap": {
+        "conservative": 0,
+        "central": 0,
+        "optimistic": 0
+      }
+    },
+    {
+      "id": "FM-11",
+      "title": "Frozen contract cannot represent the real data or the required inputs",
+      "findings": [
+        "HF-068",
+        "HF-069",
+        "HF-034"
+      ],
+      "criticalPathMinutesIfOccurs": {
+        "conservative": 30,
+        "central": 60,
+        "optimistic": 120
+      },
+      "probabilityOfOccurrence": {
+        "conservative": 0.2,
+        "central": 0.35,
+        "optimistic": 0.5
+      },
+      "expIndy002Overlap": {
+        "conservative": 0,
+        "central": 0,
+        "optimistic": 0
+      }
+    },
+    {
+      "id": "FM-12",
+      "title": "Contract or package revision needed during the build",
+      "findings": [
+        "HF-012",
+        "HF-035",
+        "HF-071",
+        "HF-072"
+      ],
+      "criticalPathMinutesIfOccurs": {
+        "conservative": 15,
+        "central": 30,
+        "optimistic": 60
+      },
+      "probabilityOfOccurrence": {
+        "conservative": 0.2,
+        "central": 0.35,
+        "optimistic": 0.5
+      },
+      "expIndy002Overlap": {
+        "conservative": 0.3,
+        "central": 0.2,
+        "optimistic": 0.1
+      }
+    },
+    {
+      "id": "FM-13",
+      "title": "Tests that cannot fail, are never written, or over-claim what they prove",
+      "findings": [
+        "HF-002",
+        "HF-009",
+        "HF-017",
+        "HF-027",
+        "HF-045",
+        "HF-046",
+        "HF-052",
+        "HF-073"
+      ],
+      "criticalPathMinutesIfOccurs": {
+        "conservative": 15,
+        "central": 30,
+        "optimistic": 60
+      },
+      "probabilityOfOccurrence": {
+        "conservative": 0.4,
+        "central": 0.6,
+        "optimistic": 0.8
+      },
+      "expIndy002Overlap": {
+        "conservative": 0,
+        "central": 0,
+        "optimistic": 0
+      }
+    },
+    {
+      "id": "FM-14",
+      "title": "Requirement clauses contradict owner decisions or each other",
+      "findings": [
+        "HF-023",
+        "HF-036"
+      ],
+      "criticalPathMinutesIfOccurs": {
+        "conservative": 10,
+        "central": 20,
+        "optimistic": 40
+      },
+      "probabilityOfOccurrence": {
+        "conservative": 0.2,
+        "central": 0.35,
+        "optimistic": 0.5
+      },
+      "expIndy002Overlap": {
+        "conservative": 0,
+        "central": 0,
+        "optimistic": 0
+      }
+    },
+    {
+      "id": "FM-15",
+      "title": "Evidence or completion claims not bound to the final candidate",
+      "findings": [
+        "HF-005",
+        "HF-016",
+        "HF-024",
+        "HF-025",
+        "HF-049",
+        "HF-051",
+        "HF-078"
+      ],
+      "criticalPathMinutesIfOccurs": {
+        "conservative": 10,
+        "central": 20,
+        "optimistic": 40
+      },
+      "probabilityOfOccurrence": {
+        "conservative": 0.3,
+        "central": 0.5,
+        "optimistic": 0.7
+      },
+      "expIndy002Overlap": {
+        "conservative": 0,
+        "central": 0,
+        "optimistic": 0
+      }
+    },
+    {
+      "id": "FM-16",
+      "title": "Approval records written or self-certified by agents; verdict not computable",
+      "findings": [
+        "HF-003",
+        "HF-050",
+        "HF-077"
+      ],
+      "criticalPathMinutesIfOccurs": {
+        "conservative": 5,
+        "central": 15,
+        "optimistic": 30
+      },
+      "probabilityOfOccurrence": {
+        "conservative": 0.3,
+        "central": 0.5,
+        "optimistic": 0.7
+      },
+      "expIndy002Overlap": {
+        "conservative": 0,
+        "central": 0,
+        "optimistic": 0
+      }
+    },
+    {
+      "id": "FM-17",
+      "title": "UI content escapes containers; application CSS re-implements or works around Forma",
+      "findings": [
+        "HF-019",
+        "HF-056",
+        "HF-080",
+        "HF-081",
+        "HF-082",
+        "HF-083",
+        "HF-084",
+        "HF-085",
+        "HF-087"
+      ],
+      "criticalPathMinutesIfOccurs": {
+        "conservative": 15,
+        "central": 30,
+        "optimistic": 60
+      },
+      "probabilityOfOccurrence": {
+        "conservative": 0.3,
+        "central": 0.5,
+        "optimistic": 0.7
+      },
+      "expIndy002Overlap": {
+        "conservative": 0,
+        "central": 0,
+        "optimistic": 0
+      }
+    },
+    {
+      "id": "FM-18",
+      "title": "Editable field binding loses typed input",
+      "findings": [
+        "HF-004"
+      ],
+      "criticalPathMinutesIfOccurs": {
+        "conservative": 5,
+        "central": 15,
+        "optimistic": 30
+      },
+      "probabilityOfOccurrence": {
+        "conservative": 0.2,
+        "central": 0.3,
+        "optimistic": 0.5
+      },
+      "expIndy002Overlap": {
+        "conservative": 0,
+        "central": 0,
+        "optimistic": 0
+      }
+    },
+    {
+      "id": "FM-19",
+      "title": "Non-text contrast below threshold for status colours",
+      "findings": [
+        "HF-020"
+      ],
+      "criticalPathMinutesIfOccurs": {
+        "conservative": 5,
+        "central": 10,
+        "optimistic": 20
+      },
+      "probabilityOfOccurrence": {
+        "conservative": 0.2,
+        "central": 0.3,
+        "optimistic": 0.4
+      },
+      "expIndy002Overlap": {
+        "conservative": 0,
+        "central": 0,
+        "optimistic": 0
+      }
+    },
+    {
+      "id": "FM-20",
+      "title": "Test hooks or secrets reach production artifacts",
+      "findings": [
+        "HF-010"
+      ],
+      "criticalPathMinutesIfOccurs": {
+        "conservative": 0,
+        "central": 5,
+        "optimistic": 15
+      },
+      "probabilityOfOccurrence": {
+        "conservative": 0.05,
+        "central": 0.1,
+        "optimistic": 0.2
+      },
+      "expIndy002Overlap": {
+        "conservative": 0,
+        "central": 0,
+        "optimistic": 0
+      }
+    },
+    {
+      "id": "FM-21",
+      "title": "Schedule or gate design contradicts ownership or deadlocks",
+      "findings": [
+        "HF-066",
+        "HF-067"
+      ],
+      "criticalPathMinutesIfOccurs": {
+        "conservative": 15,
+        "central": 45,
+        "optimistic": 90
+      },
+      "probabilityOfOccurrence": {
+        "conservative": 0.1,
+        "central": 0.2,
+        "optimistic": 0.3
+      },
+      "expIndy002Overlap": {
+        "conservative": 0.3,
+        "central": 0.2,
+        "optimistic": 0.1
+      }
+    },
+    {
+      "id": "FM-22",
+      "title": "Required dependency missing from the lock or silently dropped",
+      "findings": [
+        "HF-053",
+        "HF-055"
+      ],
+      "criticalPathMinutesIfOccurs": {
+        "conservative": 10,
+        "central": 20,
+        "optimistic": 45
+      },
+      "probabilityOfOccurrence": {
+        "conservative": 0.15,
+        "central": 0.3,
+        "optimistic": 0.45
+      },
+      "expIndy002Overlap": {
+        "conservative": 0,
+        "central": 0,
+        "optimistic": 0
+      }
+    }
+  ],
+  "conventions": [
+    {
+      "id": "CV-01",
+      "title": "Execute every generated command before freeze",
+      "level": "MANDATORY",
+      "tier": 1,
+      "problem": "Suite runners, SDK setup, deployment preconditions and browser installs generated into a package were first executed during a timed run.",
+      "evidence": [
+        "HF-028",
+        "HF-029",
+        "HF-033",
+        "HF-047",
+        "HF-076",
+        "HF-018"
+      ],
+      "prevents": [
+        {
+          "failureMode": "FM-03",
+          "prevention": {
+            "conservative": 0.5,
+            "central": 0.7,
+            "optimistic": 0.85
+          }
+        },
+        {
+          "failureMode": "FM-22",
+          "prevention": {
+            "conservative": 0.2,
+            "central": 0.3,
+            "optimistic": 0.4
+          }
+        }
+      ],
+      "competitionOverheadMinutes": {
+        "conservative": 0,
+        "central": 0,
+        "optimistic": 0
+      },
+      "preCompetitionCostMinutes": 90,
+      "scope": "requirements packages, bootstrap, workflow templates",
+      "requiredPattern": "A package is releasable only after every suite command, workflow and deploy precondition it generates has run on the pinned SDK in a clean checkout and produced its expected result (or an expected refusal).",
+      "prohibitedPatterns": [
+        "claiming readiness from synthetic gate results",
+        "patching a generated command inside a timed run without a successor package"
+      ],
+      "allowedExceptions": [
+        "live-provider suites whose credentials exist only at T0: run against the practice repository instead"
+      ],
+      "enforcement": {
+        "kind": "existing",
+        "stage": "package release",
+        "mechanism": "r9.fsx suite-preflight --require-tests; launch-preflight.fsx LP checks; Conditor scaffold CI",
+        "check": "dotnet fsi tools/r9/r9.fsx suite-preflight ...",
+        "reviewObligation": null,
+        "existingCheck": "tools/r9/r9.fsx suite-preflight; tools/r10/launch-preflight.fsx"
+      },
+      "requiredTests": [
+        "negative control: a suite command naming two test projects (MSB1008) must be refused by suite-preflight"
+      ],
+      "expectedBenefit": "see IMPACT-FORECAST.md (generated by tools/conventions/conventions.fsx forecast)",
+      "implementationCost": "about 90 min per package release (one clean-checkout execution)",
+      "dependencies": [],
+      "owner": "Indy-init owner (package release)",
+      "adoptionStatus": "ENFORCED-EXISTING (v4.1.4+); extend to deploy preconditions",
+      "correctnessOrSafety": false,
+      "ownerApprovalRequired": "none for existing checks; extending to deploy preconditions is a successor-package change",
+      "confidence": "medium",
+      "keyAssumptions": "Generated-command failures recur whenever a successor package is cut (R5, R8, R9); suite-preflight already catches the MSB1008 class, so the residual is deploy preconditions and environment setup. Impact if it occurs is 20-90 min (R8: live suites unexercised to T+94, first deploy T+129)."
+    },
+    {
+      "id": "CV-02",
+      "title": "Stop only on STOP_PERMITTED, clock from the T0 record",
+      "level": "MANDATORY",
+      "tier": 1,
+      "problem": "R9 stopped at 115 of 420 minutes; R7 projected time from stale timestamps.",
+      "evidence": [
+        "HF-048",
+        "HF-057"
+      ],
+      "prevents": [
+        {
+          "failureMode": "FM-01",
+          "prevention": {
+            "conservative": 0.6,
+            "central": 0.8,
+            "optimistic": 0.9
+          }
+        }
+      ],
+      "competitionOverheadMinutes": {
+        "conservative": 1,
+        "central": 1,
+        "optimistic": 0.5
+      },
+      "preCompetitionCostMinutes": 0,
+      "scope": "every timed run",
+      "requiredPattern": "The run clock is read from the committed T0 record; work stops only on requirements-compiler stop-decision STOP_PERMITTED or the deadline.",
+      "prohibitedPatterns": [
+        "stopping because a gate is red",
+        "estimating elapsed time from commit timestamps"
+      ],
+      "allowedExceptions": [],
+      "enforcement": {
+        "kind": "existing",
+        "stage": "during run",
+        "mechanism": "requirements-compiler stop-decision; --t0-record/--deadline-policy",
+        "check": "requirements-compiler stop-decision",
+        "reviewObligation": null,
+        "existingCheck": "AGENTS.md; docs/rehearsal-010-readiness/STARTUP-INSTRUCTIONS.md"
+      },
+      "requiredTests": [
+        "existing r9-replay negative control (tools/r10/r9-replay.fsx)"
+      ],
+      "expectedBenefit": "see IMPACT-FORECAST.md (generated by tools/conventions/conventions.fsx forecast)",
+      "implementationCost": "none (exists)",
+      "dependencies": [],
+      "owner": "run coordinator",
+      "adoptionStatus": "ENFORCED-EXISTING",
+      "correctnessOrSafety": false,
+      "ownerApprovalRequired": null,
+      "confidence": "medium",
+      "keyAssumptions": "Probability is the chance an agent stops early or misreads the clock without the stop rule (2 of the 8 observed rehearsals, R7 and R9); impact uses R9's measured 305 min as the optimistic bound."
+    },
+    {
+      "id": "CV-03",
+      "title": "One scope source, pinned and fully itemised before code",
+      "level": "MANDATORY",
+      "tier": 1,
+      "problem": "Agents built the 38-requirement catalog instead of the P0 plan; scope digest changed three times during readiness.",
+      "evidence": [
+        "HF-001",
+        "HF-037",
+        "HF-038",
+        "HF-064",
+        "HF-062"
+      ],
+      "prevents": [
+        {
+          "failureMode": "FM-02",
+          "prevention": {
+            "conservative": 0.4,
+            "central": 0.6,
+            "optimistic": 0.75
+          }
+        }
+      ],
+      "competitionOverheadMinutes": {
+        "conservative": 3,
+        "central": 2,
+        "optimistic": 1
+      },
+      "preCompetitionCostMinutes": 30,
+      "scope": "every timed run",
+      "requiredPattern": "docs/rehearsal-010-readiness/scope-manifest.json (digest pinned in the launch lock) is the only build target; every work item exists in Praxis and the scope checkpoint is committed before application code.",
+      "prohibitedPatterns": [
+        "naming a catalog or mission text as the target",
+        "changing scope without a new digest and owner approval"
+      ],
+      "allowedExceptions": [],
+      "enforcement": {
+        "kind": "existing",
+        "stage": "T0 / initialization",
+        "mechanism": "r9.fsx check-sequencing; launch-preflight LP-04 scope digest",
+        "check": "r9.fsx check-sequencing",
+        "reviewObligation": null,
+        "existingCheck": "tools/r9/r9.fsx; tools/r10/launch-preflight.fsx"
+      },
+      "requiredTests": [
+        "r9-replay WORK_ITEM_MISSING control"
+      ],
+      "expectedBenefit": "see IMPACT-FORECAST.md (generated by tools/conventions/conventions.fsx forecast)",
+      "implementationCost": "none (exists)",
+      "dependencies": [],
+      "owner": "run coordinator",
+      "adoptionStatus": "ENFORCED-EXISTING",
+      "correctnessOrSafety": false,
+      "ownerApprovalRequired": null,
+      "confidence": "medium",
+      "keyAssumptions": "Scope ambiguity recurred in R3, R8, R9 and readiness; impact if it recurs is 60-240 min of misdirected build. check-sequencing already enforces itemisation; value shown is what that enforcement secures."
+    },
+    {
+      "id": "CV-04",
+      "title": "WASM boot smoke on the first CI build; bounded view functions",
+      "level": "PREFERRED",
+      "tier": 1,
+      "problem": "R4 lost about 120 min to a WASM interpreter trap with Release debug info; R5's app could not start for 90 min (12,683 IL locals in View.project).",
+      "evidence": [
+        "HF-007",
+        "HF-013"
+      ],
+      "prevents": [
+        {
+          "failureMode": "FM-04",
+          "prevention": {
+            "conservative": 0.4,
+            "central": 0.6,
+            "optimistic": 0.8
+          }
+        }
+      ],
+      "competitionOverheadMinutes": {
+        "conservative": 3,
+        "central": 2,
+        "optimistic": 1
+      },
+      "preCompetitionCostMinutes": 20,
+      "scope": "Causa.Web and any F# view module",
+      "requiredPattern": "The first CI job publishes the WASM app in Release and loads it in a browser until first render (boot smoke). View code is composed from per-region functions; no single view function renders more than one screen region.",
+      "prohibitedPatterns": [
+        "a single projection function rendering all screens",
+        "Release builds with full debug info for WASM"
+      ],
+      "allowedExceptions": [
+        "Debug builds used only locally"
+      ],
+      "enforcement": {
+        "kind": "review",
+        "stage": "first green CI",
+        "mechanism": "boot smoke test in tier-1 CI (plan's first-render journey); review obligation for view size",
+        "check": null,
+        "reviewObligation": "Reviewer confirms the first CI run executed the boot smoke and that no view function spans more than one screen region.",
+        "existingCheck": null
+      },
+      "requiredTests": [
+        "boot smoke: page reaches first render within 60 s on Chromium"
+      ],
+      "expectedBenefit": "see IMPACT-FORECAST.md (generated by tools/conventions/conventions.fsx forecast)",
+      "implementationCost": "about 20 min to write the smoke step once",
+      "dependencies": [],
+      "owner": "integration",
+      "adoptionStatus": "PROPOSED",
+      "correctnessOrSafety": false,
+      "ownerApprovalRequired": null,
+      "confidence": "medium",
+      "keyAssumptions": "Two consecutive rehearsals (R4, R5) lost 120 and 90 min to start failures; R6-R9 did not, so occurrence is discounted to 15-50%. The boot smoke shortens detection, it does not fix the cause."
+    },
+    {
+      "id": "CV-05",
+      "title": "One source for environment literals",
+      "level": "PREFERRED",
+      "tier": 1,
+      "problem": "R5's test-site port was defined in 11 places; a partial move broke main CI for about 28 min.",
+      "evidence": [
+        "HF-014"
+      ],
+      "prevents": [
+        {
+          "failureMode": "FM-05",
+          "prevention": {
+            "conservative": 0.6,
+            "central": 0.8,
+            "optimistic": 0.9
+          }
+        }
+      ],
+      "competitionOverheadMinutes": {
+        "conservative": 1,
+        "central": 0.5,
+        "optimistic": 0.5
+      },
+      "preCompetitionCostMinutes": 5,
+      "scope": "tests, specs, workflows, scripts in the competition repository",
+      "requiredPattern": "Ports, hosts and base URLs used by tests come from one configuration file; every other file reads it.",
+      "prohibitedPatterns": [
+        "the same localhost:PORT literal in more than one file"
+      ],
+      "allowedExceptions": [
+        "documentation files (*.md)"
+      ],
+      "enforcement": {
+        "kind": "new",
+        "stage": "pre-commit / CI (seconds)",
+        "mechanism": "tools/conventions/conventions.fsx check, rule CK-02",
+        "check": "dotnet fsi tools/conventions/conventions.fsx -- check --workspace .",
+        "reviewObligation": null,
+        "existingCheck": null
+      },
+      "requiredTests": [
+        "conventions.fsx test: two files with the same port literal fail CK-02; one file passes"
+      ],
+      "expectedBenefit": "see IMPACT-FORECAST.md (generated by tools/conventions/conventions.fsx forecast)",
+      "implementationCost": "implemented in this change",
+      "dependencies": [],
+      "owner": "integration",
+      "adoptionStatus": "IMPLEMENTED-NOT-ADOPTED",
+      "correctnessOrSafety": false,
+      "ownerApprovalRequired": null,
+      "confidence": "high",
+      "keyAssumptions": "One measured occurrence (27.9 min); the check is seconds; CK-02 still finds the pattern in R9 and the preview app."
+    },
+    {
+      "id": "CV-06",
+      "title": "Workflows pass Conditor ci-policy",
+      "level": "MANDATORY",
+      "tier": 1,
+      "problem": "R4 ran 152 workflow runs with 25 failed builds; R6 had about 90 min with no main result; preflight CI ran every commit twice.",
+      "evidence": [
+        "HF-011",
+        "HF-031",
+        "HF-032",
+        "HF-075"
+      ],
+      "prevents": [
+        {
+          "failureMode": "FM-06",
+          "prevention": {
+            "conservative": 0.5,
+            "central": 0.7,
+            "optimistic": 0.85
+          }
+        }
+      ],
+      "competitionOverheadMinutes": {
+        "conservative": 1,
+        "central": 0.5,
+        "optimistic": 0.5
+      },
+      "preCompetitionCostMinutes": 0,
+      "scope": "every workflow",
+      "requiredPattern": "conditor ci-policy check passes for .github/workflows (per-ref concurrency, cancel superseded PR runs, timeouts, no duplicate push+PR triggers).",
+      "prohibitedPatterns": [],
+      "allowedExceptions": [],
+      "enforcement": {
+        "kind": "existing",
+        "stage": "bootstrap (T10)",
+        "mechanism": "conditor ci-policy check",
+        "check": "conditor ci-policy check --target .",
+        "reviewObligation": null,
+        "existingCheck": "kemiller2002/conditor docs/ci-policy.md CIP-000..008"
+      },
+      "requiredTests": [
+        "Conditor CiPolicyTests (rehearsal-006 fixtures)"
+      ],
+      "expectedBenefit": "see IMPACT-FORECAST.md (generated by tools/conventions/conventions.fsx forecast)",
+      "implementationCost": "none (exists)",
+      "dependencies": [],
+      "owner": "integration",
+      "adoptionStatus": "ENFORCED-EXISTING",
+      "correctnessOrSafety": false,
+      "ownerApprovalRequired": null,
+      "confidence": "high",
+      "keyAssumptions": "Measured: about 90 min without a main result (R6) and 152 runs with 25 failed builds (R4). Conditor ci-policy already enforces it; value shown is what it secures."
+    },
+    {
+      "id": "CV-07",
+      "title": "Workflow shell is pipefail by default",
+      "level": "MANDATORY",
+      "tier": 1,
+      "problem": "Shell steps hid failures in R6, R7 and R8 (bash -e without pipefail; tee pipelines that could not fail).",
+      "evidence": [
+        "HF-030"
+      ],
+      "prevents": [
+        {
+          "failureMode": "FM-07",
+          "prevention": {
+            "conservative": 0.6,
+            "central": 0.8,
+            "optimistic": 0.9
+          }
+        }
+      ],
+      "competitionOverheadMinutes": {
+        "conservative": 0.5,
+        "central": 0.5,
+        "optimistic": 0.5
+      },
+      "preCompetitionCostMinutes": 5,
+      "scope": "every workflow with run steps",
+      "requiredPattern": "Every workflow declares defaults.run.shell: bash (GitHub then runs bash -eo pipefail), or every run step declares a shell.",
+      "prohibitedPatterns": [
+        "run steps relying on the implicit default shell (bash -e)"
+      ],
+      "allowedExceptions": [
+        "workflows with no run steps"
+      ],
+      "enforcement": {
+        "kind": "new",
+        "stage": "bootstrap / CI (seconds)",
+        "mechanism": "tools/conventions/conventions.fsx check, rule CK-03",
+        "check": "dotnet fsi tools/conventions/conventions.fsx -- check --workspace .",
+        "reviewObligation": null,
+        "existingCheck": null
+      },
+      "requiredTests": [
+        "conventions.fsx test: a run step without a declared shell fails CK-03"
+      ],
+      "expectedBenefit": "see IMPACT-FORECAST.md (generated by tools/conventions/conventions.fsx forecast)",
+      "implementationCost": "implemented in this change; Conditor could absorb it as a CIP rule (proposal)",
+      "dependencies": [
+        "CV-06"
+      ],
+      "owner": "integration",
+      "adoptionStatus": "IMPLEMENTED-NOT-ADOPTED",
+      "correctnessOrSafety": false,
+      "ownerApprovalRequired": null,
+      "confidence": "medium",
+      "keyAssumptions": "Recurred R6-R8 (repair commits, minutes unrecorded); CK-03 finds 23 and 39 non-pipefail steps in R8 and R9. Impact per occurrence is modeled at 10-40 min of hidden red CI."
+    },
+    {
+      "id": "CV-08",
+      "title": "Single-writer files and append-only shared state",
+      "level": "MANDATORY",
+      "tier": 2,
+      "problem": "R5: 17 of 92 merges conflicted; R8: 26 of 49 merges conflicted on .ros state; strict ownership moved cost into 19 change-request commits.",
+      "evidence": [
+        "HF-015",
+        "HF-042",
+        "HF-043",
+        "HF-044",
+        "HF-079"
+      ],
+      "prevents": [
+        {
+          "failureMode": "FM-08",
+          "prevention": {
+            "conservative": 0.4,
+            "central": 0.6,
+            "optimistic": 0.75
+          }
+        }
+      ],
+      "competitionOverheadMinutes": {
+        "conservative": 5,
+        "central": 3,
+        "optimistic": 2
+      },
+      "preCompetitionCostMinutes": 30,
+      "scope": "competition repository",
+      "requiredPattern": "Every path has one owner (agent-file-ownership.json); compile lists are written once at bootstrap; tool state that every lane writes is append-only per lane or excluded from merges.",
+      "prohibitedPatterns": [
+        "two roles editing one file",
+        "per-merge reconciliation commits of tool state"
+      ],
+      "allowedExceptions": [
+        "integration applies change requests to shared files"
+      ],
+      "enforcement": {
+        "kind": "existing",
+        "stage": "bootstrap and every merge",
+        "mechanism": "agent-file-ownership.json + proposals/r10-contract-first-ui/tests/OwnershipTests.fs",
+        "check": "OwnershipTests",
+        "reviewObligation": null,
+        "existingCheck": "requirements-compiled/v4.1.5/agent-file-ownership.json"
+      },
+      "requiredTests": [
+        "OwnershipTests: every path has exactly one owner"
+      ],
+      "expectedBenefit": "see IMPACT-FORECAST.md (generated by tools/conventions/conventions.fsx forecast)",
+      "implementationCost": "none for ownership; .ros merge policy is a Praxis change",
+      "dependencies": [
+        "EXP-INDY-002 results"
+      ],
+      "owner": "integration",
+      "adoptionStatus": "PARTIALLY ENFORCED",
+      "correctnessOrSafety": false,
+      "ownerApprovalRequired": null,
+      "confidence": "low",
+      "keyAssumptions": "Conflicts are measured as counts, not minutes; EXP-INDY-002 overlap is assumed at 30-50% because its strategy targets the same failure."
+    },
+    {
+      "id": "CV-09",
+      "title": "Durable means read back from the real provider",
+      "level": "MANDATORY",
+      "tier": 1,
+      "problem": "Saves were reported durable without verified read-back in R2, R4, R5, R6, R7, R8; the double lacked GitHub's cache headers so CI missed a stale read.",
+      "evidence": [
+        "HF-006",
+        "HF-008",
+        "HF-021",
+        "HF-026",
+        "HF-039",
+        "HF-040",
+        "HF-074"
+      ],
+      "prevents": [
+        {
+          "failureMode": "FM-09",
+          "prevention": {
+            "conservative": 0.3,
+            "central": 0.5,
+            "optimistic": 0.7
+          }
+        }
+      ],
+      "competitionOverheadMinutes": {
+        "conservative": 3,
+        "central": 2,
+        "optimistic": 1
+      },
+      "preCompetitionCostMinutes": 45,
+      "scope": "Causa persistence and save state machine",
+      "requiredPattern": "A save is Saved only after the provider read-back returns the written blob SHA, read with the HTTP cache bypassed; in-memory and double results never satisfy a durability obligation; provider doubles replay recorded real responses including Cache-Control, ETag, pagination and size limits.",
+      "prohibitedPatterns": [
+        "marking an investigation Persisted before a confirmed write",
+        "restoring 'Saved' from browser storage",
+        "retry without backoff"
+      ],
+      "allowedExceptions": [],
+      "enforcement": {
+        "kind": "existing",
+        "stage": "live-provider preflight and candidate",
+        "mechanism": "live-provider preflight (J3-05); Dokimos evidence category real-provider vs double; state-machine tests",
+        "check": "tools/requirements-compiler/tests/live-provider-preflight.yml",
+        "reviewObligation": "Reviewer confirms each durability obligation cites a real-provider run, not a double.",
+        "existingCheck": "verification/journeys J3; requirements-compiled/v4.1.5/analysis/github-error-matrix.json"
+      },
+      "requiredTests": [
+        "read-back with stale cache must fail (J3-05 regression)",
+        "double replays recorded GitHub headers"
+      ],
+      "expectedBenefit": "see IMPACT-FORECAST.md (generated by tools/conventions/conventions.fsx forecast)",
+      "implementationCost": "about 45 min to record provider fixtures once",
+      "dependencies": [],
+      "owner": "persistence",
+      "adoptionStatus": "PARTIALLY ENFORCED",
+      "correctnessOrSafety": true,
+      "ownerApprovalRequired": null,
+      "confidence": "medium",
+      "keyAssumptions": "The most recurrent family (7 rehearsals/experiments) but minutes were never recorded; prevention is capped at 30-70% because each past fix covered one variant."
+    },
+    {
+      "id": "CV-10",
+      "title": "Typed errors through one state machine; no silent defaults",
+      "level": "MANDATORY",
+      "tier": 1,
+      "problem": "R4 bypassed Sync and swallowed faults; R5 stepOr swallowed book faults; R8 decided unknown commands as Observations; contract drift compiled only because warnings were errors.",
+      "evidence": [
+        "HF-008",
+        "HF-022",
+        "HF-041",
+        "HF-073"
+      ],
+      "prevents": [
+        {
+          "failureMode": "FM-10",
+          "prevention": {
+            "conservative": 0.4,
+            "central": 0.6,
+            "optimistic": 0.75
+          }
+        },
+        {
+          "failureMode": "FM-13",
+          "prevention": {
+            "conservative": 0.05,
+            "central": 0.1,
+            "optimistic": 0.15
+          }
+        }
+      ],
+      "competitionOverheadMinutes": {
+        "conservative": 2,
+        "central": 1,
+        "optimistic": 0.5
+      },
+      "preCompetitionCostMinutes": 5,
+      "scope": "all F# projects",
+      "requiredPattern": "Expected failures are Result<_, typed error>; state changes go only through the machine's step; unknown input is refused or preserved opaquely, never defaulted; TreatWarningsAsErrors stays on and FS0025/FS0026/FS0049 are never suppressed.",
+      "prohibitedPatterns": [
+        "| _ -> on a contract union in decision code",
+        "try ... with _ -> default",
+        "assigning machine state directly",
+        "NoWarn containing 25, 26 or 49"
+      ],
+      "allowedExceptions": [
+        "exhaustive wildcard after every case is listed explicitly, with a comment"
+      ],
+      "enforcement": {
+        "kind": "new",
+        "stage": "every build (seconds)",
+        "mechanism": "tools/conventions/conventions.fsx check CK-01 (warnings-as-errors) + state-machine tests (existing) + review obligation",
+        "check": "dotnet fsi tools/conventions/conventions.fsx -- check --workspace .",
+        "reviewObligation": "Reviewer confirms no wildcard/default branch on command or event unions in decision code.",
+        "existingCheck": "requirements-compiled/v4.1.5/state-machine-contracts.json"
+      },
+      "requiredTests": [
+        "conventions.fsx test: TreatWarningsAsErrors false or NoWarn 25 fails CK-01"
+      ],
+      "expectedBenefit": "see IMPACT-FORECAST.md (generated by tools/conventions/conventions.fsx forecast)",
+      "implementationCost": "CK-01 implemented in this change",
+      "dependencies": [],
+      "owner": "domain",
+      "adoptionStatus": "IMPLEMENTED-NOT-ADOPTED",
+      "correctnessOrSafety": true,
+      "ownerApprovalRequired": null,
+      "confidence": "medium",
+      "keyAssumptions": "R4, R5, R8 evidence; CK-01 is cheap; wildcard-default detection is review-only so prevention is moderate."
+    },
+    {
+      "id": "CV-11",
+      "title": "Contracts proven against real data before release",
+      "level": "MANDATORY",
+      "tier": 1,
+      "problem": "Frozen v4.1.4 cannot represent 487 of 1,315 causa-data events; the connection contract has no workspace; v4.1.1 had no command body.",
+      "evidence": [
+        "HF-068",
+        "HF-069",
+        "HF-034"
+      ],
+      "prevents": [
+        {
+          "failureMode": "FM-11",
+          "prevention": {
+            "conservative": 0.5,
+            "central": 0.7,
+            "optimistic": 0.85
+          }
+        }
+      ],
+      "competitionOverheadMinutes": {
+        "conservative": 0,
+        "central": 0,
+        "optimistic": 0
+      },
+      "preCompetitionCostMinutes": 60,
+      "scope": "requirements packages (contracts)",
+      "requiredPattern": "Before a contract is released, every event type in the pinned causa-data histories decodes to a case or to an opaque preserved Unknown, and every required input of the governing requirements has a field.",
+      "prohibitedPatterns": [
+        "releasing a contract checked only against fixtures written for it"
+      ],
+      "allowedExceptions": [],
+      "enforcement": {
+        "kind": "existing",
+        "stage": "package release",
+        "mechanism": "proposals/r10-historical-data-compatibility replay coverage (HISTORICAL-COVERAGE.json, EVENT-COMPATIBILITY-MATRIX.json)",
+        "check": null,
+        "reviewObligation": null,
+        "existingCheck": "requirements-compiled/v4.1.5 (analysis/amendment.json E1, W1); proposals/r10-historical-data-compatibility"
+      },
+      "requiredTests": [
+        "replay coverage: 0 unrepresentable events",
+        "negative control: removing a case makes coverage fail"
+      ],
+      "expectedBenefit": "see IMPACT-FORECAST.md (generated by tools/conventions/conventions.fsx forecast)",
+      "implementationCost": "about 60 min per package",
+      "dependencies": [],
+      "owner": "Indy-init owner (package release)",
+      "adoptionStatus": "PROPOSED; content addressed by v4.1.5 CANDIDATE (E1 all 50 causa-storage events, W1 workspace) pending ODR-V415-01/-02",
+      "correctnessOrSafety": false,
+      "ownerApprovalRequired": "owner: ODR-V415-01 and ODR-V415-02 (v4.1.5 approval and freeze); the convention itself (replay coverage as a release condition for every later package) is a new rule",
+      "confidence": "medium",
+      "keyAssumptions": "Not yet observed failing in a timed run because R10 did not run; the 487/1,315 gap is measured. The v4.1.5 candidate carries the fix, so the value depends on its approval."
+    },
+    {
+      "id": "CV-12",
+      "title": "Released contracts are immutable versions; consumers pin them",
+      "level": "PREFERRED",
+      "tier": 2,
+      "problem": "Contract and package revisions cost 2-19 h each and blocked mid-run change requests.",
+      "evidence": [
+        "HF-012",
+        "HF-035",
+        "HF-071",
+        "HF-072"
+      ],
+      "prevents": [
+        {
+          "failureMode": "FM-12",
+          "prevention": {
+            "conservative": 0.3,
+            "central": 0.5,
+            "optimistic": 0.65
+          }
+        }
+      ],
+      "competitionOverheadMinutes": {
+        "conservative": 3,
+        "central": 2,
+        "optimistic": 1
+      },
+      "preCompetitionCostMinutes": 0,
+      "scope": "contracts shared by parallel agents",
+      "requiredPattern": "A released contract version never changes; a change is a new version with every consumer's contract tests in the same pull request; each agent records the contract version it built against and integration refuses a mismatch.",
+      "prohibitedPatterns": [
+        "editing a released contract file in place"
+      ],
+      "allowedExceptions": [],
+      "enforcement": {
+        "kind": "existing",
+        "stage": "integration",
+        "mechanism": "frozen-package CI equality (AGENTS.md); contract tests at T14 (AGENT-RULES)",
+        "check": null,
+        "reviewObligation": "Integration confirms each merged pull request names the contract version it was built against.",
+        "existingCheck": "requirements-compiled/*/FREEZE.md"
+      },
+      "requiredTests": [
+        "contract-version mismatch must be refused at merge (to be measured in EXP-INDY-002)"
+      ],
+      "expectedBenefit": "see IMPACT-FORECAST.md (generated by tools/conventions/conventions.fsx forecast)",
+      "implementationCost": "pending EXP-INDY-002",
+      "dependencies": [
+        "EXP-INDY-002 results"
+      ],
+      "owner": "integration",
+      "adoptionStatus": "PARTIALLY ENFORCED",
+      "correctnessOrSafety": false,
+      "ownerApprovalRequired": null,
+      "confidence": "low",
+      "keyAssumptions": "Revision costs are elapsed pre-competition hours (measured) but in-run cost is modeled; depends on EXP-INDY-002."
+    },
+    {
+      "id": "CV-13",
+      "title": "Every bound test has a falsifying control",
+      "level": "PREFERRED",
+      "tier": 3,
+      "problem": "Tests credited with obligations they did not prove (R3-R9); 347 of 613 R8 obligations unverified because bound tests were never written.",
+      "evidence": [
+        "HF-002",
+        "HF-009",
+        "HF-017",
+        "HF-027",
+        "HF-045",
+        "HF-046",
+        "HF-052"
+      ],
+      "prevents": [
+        {
+          "failureMode": "FM-13",
+          "prevention": {
+            "conservative": 0.3,
+            "central": 0.5,
+            "optimistic": 0.65
+          }
+        }
+      ],
+      "competitionOverheadMinutes": {
+        "conservative": 15,
+        "central": 10,
+        "optimistic": 6
+      },
+      "preCompetitionCostMinutes": 0,
+      "scope": "P0 obligation tests",
+      "requiredPattern": "A test bound to a P0 obligation is accepted only with a recorded control that makes it fail; bootstrap stubs fail rather than skip.",
+      "prohibitedPatterns": [
+        "skipped stubs counted as written",
+        "tags on tests that never exercise the obligation"
+      ],
+      "allowedExceptions": [
+        "record obligations verified by document checks"
+      ],
+      "enforcement": {
+        "kind": "existing",
+        "stage": "slice gate",
+        "mechanism": "slice-gate/completion-gate assertion ratchet; negative controls (tools/requirements-compiler AssertionRatchet)",
+        "check": null,
+        "reviewObligation": "Reviewer samples one control per slice.",
+        "existingCheck": "tools/requirements-compiler/src/AssertionRatchet.fs"
+      },
+      "requiredTests": [
+        "mutation control per obligation family"
+      ],
+      "expectedBenefit": "see IMPACT-FORECAST.md (generated by tools/conventions/conventions.fsx forecast)",
+      "implementationCost": "10-15 min per slice in competition",
+      "dependencies": [],
+      "owner": "each implementing role",
+      "adoptionStatus": "PROPOSED",
+      "correctnessOrSafety": false,
+      "ownerApprovalRequired": null,
+      "confidence": "low",
+      "keyAssumptions": "Writing a falsifying control for every bound test costs 6-15 min of critical path per build; modeled benefit only exceeds it in the optimistic case."
+    },
+    {
+      "id": "CV-14",
+      "title": "Reconcile requirements with owner decisions before freeze",
+      "level": "MANDATORY",
+      "tier": 1,
+      "problem": "Clauses contradicting DEC-025/OD-INDY-10 and INV-04 vs SM-SAVE stayed in frozen packages and produced FAILs.",
+      "evidence": [
+        "HF-023",
+        "HF-036"
+      ],
+      "prevents": [
+        {
+          "failureMode": "FM-14",
+          "prevention": {
+            "conservative": 0.5,
+            "central": 0.7,
+            "optimistic": 0.85
+          }
+        }
+      ],
+      "competitionOverheadMinutes": {
+        "conservative": 0,
+        "central": 0,
+        "optimistic": 0
+      },
+      "preCompetitionCostMinutes": 30,
+      "scope": "requirements packages",
+      "requiredPattern": "Every owner decision that names a requirement is either applied as an amendment in the successor package or recorded as a waiver against that requirement before freeze.",
+      "prohibitedPatterns": [
+        "freezing a package while a decision contradicts a clause"
+      ],
+      "allowedExceptions": [],
+      "enforcement": {
+        "kind": "review",
+        "stage": "package release",
+        "mechanism": null,
+        "check": null,
+        "reviewObligation": "Package reviewer lists each owner decision naming a requirement and its amendment or waiver.",
+        "existingCheck": null
+      },
+      "requiredTests": [
+        "review checklist entry in the package independent review"
+      ],
+      "expectedBenefit": "see IMPACT-FORECAST.md (generated by tools/conventions/conventions.fsx forecast)",
+      "implementationCost": "about 30 min per package",
+      "dependencies": [],
+      "owner": "Indy-init owner (package release)",
+      "adoptionStatus": "PROPOSED",
+      "correctnessOrSafety": false,
+      "ownerApprovalRequired": null,
+      "confidence": "medium",
+      "keyAssumptions": "Two measured contradictions produced FAILs (R5, R8); fix is pre-competition review only."
+    },
+    {
+      "id": "CV-15",
+      "title": "Evidence is bound to the candidate SHA",
+      "level": "MANDATORY",
+      "tier": 1,
+      "problem": "Reviews and closures cited earlier commits (R4-R7); R6 re-cut a candidate (20 min); cross-session claims could not be verified.",
+      "evidence": [
+        "HF-005",
+        "HF-016",
+        "HF-024",
+        "HF-025",
+        "HF-049",
+        "HF-051",
+        "HF-078"
+      ],
+      "prevents": [
+        {
+          "failureMode": "FM-15",
+          "prevention": {
+            "conservative": 0.5,
+            "central": 0.7,
+            "optimistic": 0.85
+          }
+        }
+      ],
+      "competitionOverheadMinutes": {
+        "conservative": 2,
+        "central": 1,
+        "optimistic": 1
+      },
+      "preCompetitionCostMinutes": 0,
+      "scope": "acceptance",
+      "requiredPattern": "Completion is only completion-gate COMPLETE on the candidate SHA; every review, run and record names that SHA; a claim from another session counts only after the lead reproduces it.",
+      "prohibitedPatterns": [
+        "carrying a review forward to a later commit"
+      ],
+      "allowedExceptions": [],
+      "enforcement": {
+        "kind": "existing",
+        "stage": "slice merge and acceptance",
+        "mechanism": "slice-gate, completion-gate, catalog-acceptance",
+        "check": "requirements-compiler completion-gate",
+        "reviewObligation": null,
+        "existingCheck": "AGENTS.md (Rehearsal 010 governed verification)"
+      },
+      "requiredTests": [
+        "existing adversarial.fsx cases"
+      ],
+      "expectedBenefit": "see IMPACT-FORECAST.md (generated by tools/conventions/conventions.fsx forecast)",
+      "implementationCost": "none (exists)",
+      "dependencies": [],
+      "owner": "run coordinator",
+      "adoptionStatus": "ENFORCED-EXISTING",
+      "correctnessOrSafety": true,
+      "ownerApprovalRequired": null,
+      "confidence": "high",
+      "keyAssumptions": "Recurred R2-R9; completion-gate already enforces; value shown is what it secures."
+    },
+    {
+      "id": "CV-16",
+      "title": "Only the owner records approvals",
+      "level": "MANDATORY",
+      "tier": 1,
+      "problem": "Agents wrote or transcribed approvals in R3-R6; the R8 verdict was INVALID; DA-R10-1 certified itself.",
+      "evidence": [
+        "HF-003",
+        "HF-050",
+        "HF-077"
+      ],
+      "prevents": [
+        {
+          "failureMode": "FM-16",
+          "prevention": {
+            "conservative": 0.7,
+            "central": 0.85,
+            "optimistic": 0.95
+          }
+        }
+      ],
+      "competitionOverheadMinutes": {
+        "conservative": 0,
+        "central": 0,
+        "optimistic": 0
+      },
+      "preCompetitionCostMinutes": 0,
+      "scope": "approval records",
+      "requiredPattern": "Approval records are written only by tools/owner-freeze.fsx under the owner's signature; agents never write, edit or transcribe them (RDP-003).",
+      "prohibitedPatterns": [
+        "agent-authored approvals.causa.json",
+        "self-certifying authority records"
+      ],
+      "allowedExceptions": [],
+      "enforcement": {
+        "kind": "existing",
+        "stage": "launch preflight and acceptance",
+        "mechanism": "launch-preflight unsigned-change checks; owner-freeze.fsx",
+        "check": "tools/r10/launch-preflight.fsx",
+        "reviewObligation": null,
+        "existingCheck": "AGENTS.md"
+      },
+      "requiredTests": [
+        "launch-preflight-tests.fsx controls"
+      ],
+      "expectedBenefit": "see IMPACT-FORECAST.md (generated by tools/conventions/conventions.fsx forecast)",
+      "implementationCost": "none (exists)",
+      "dependencies": [],
+      "owner": "owner",
+      "adoptionStatus": "ENFORCED-EXISTING",
+      "correctnessOrSafety": true,
+      "ownerApprovalRequired": null,
+      "confidence": "high",
+      "keyAssumptions": "Safety rule; recurred R3-R8; enforced by RDP-003 and owner-freeze.fsx."
+    },
+    {
+      "id": "CV-17",
+      "title": "Forma first: current Forma, no containment workarounds",
+      "level": "MANDATORY",
+      "tier": 1,
+      "problem": "Forma 0.12.0 fails 48 of 78 containment checks (fixed upstream in 0.13.0); R5, R9 and the preview app re-implemented or worked around Forma in application CSS.",
+      "evidence": [
+        "HF-019",
+        "HF-056",
+        "HF-080",
+        "HF-081",
+        "HF-082",
+        "HF-084",
+        "HF-085",
+        "HF-087"
+      ],
+      "prevents": [
+        {
+          "failureMode": "FM-17",
+          "prevention": {
+            "conservative": 0.3,
+            "central": 0.5,
+            "optimistic": 0.7
+          }
+        },
+        {
+          "failureMode": "FM-19",
+          "prevention": {
+            "conservative": 0.2,
+            "central": 0.4,
+            "optimistic": 0.6
+          }
+        }
+      ],
+      "competitionOverheadMinutes": {
+        "conservative": 2,
+        "central": 1,
+        "optimistic": 0.5
+      },
+      "preCompetitionCostMinutes": 20,
+      "scope": "Causa web CSS and package.json",
+      "requiredPattern": "Pin Forma at or above 0.13.0; lay out with ef-* patterns named in the layout contract; application CSS declares no --ef-* properties and adds no overflow, radius or validation-state overrides; a Forma gap is filed upstream with a failing fixture.",
+      "prohibitedPatterns": [
+        "Forma below 0.13.0",
+        "overflow-wrap/border-radius/[aria-invalid] overrides in application CSS"
+      ],
+      "allowedExceptions": [
+        "remedies recorded in the layout contract (e.g. --ef-layout-target-min links)"
+      ],
+      "enforcement": {
+        "kind": "new",
+        "stage": "bootstrap / every merge (seconds)",
+        "mechanism": "conventions.fsx check CK-04 (Forma version) + design-contract check + layout-tests (existing)",
+        "check": "dotnet fsi tools/conventions/conventions.fsx -- check --workspace . --forma-min 0.13.0",
+        "reviewObligation": null,
+        "existingCheck": "kickoff/rehearsal-010/design-contract.json; requirements-compiled/v4.1.5/layout-tests"
+      },
+      "requiredTests": [
+        "conventions.fsx test: Forma 0.12.0 fails CK-04; 0.13.0 passes"
+      ],
+      "expectedBenefit": "see IMPACT-FORECAST.md (generated by tools/conventions/conventions.fsx forecast)",
+      "implementationCost": "CK-04 implemented in this change",
+      "dependencies": [],
+      "owner": "ui (UI-1)",
+      "adoptionStatus": "IMPLEMENTED-NOT-ADOPTED",
+      "correctnessOrSafety": false,
+      "ownerApprovalRequired": "owner: pin Forma 0.13.0 (v4.1.5 references the 0.12.0 inventory; ODR-R10-05 allows 0.12.x/0.13.x)",
+      "confidence": "medium",
+      "keyAssumptions": "Containment defects are measured (48/78 checks) and fixed upstream; minutes lost to UI rework were never recorded. Requires owner approval of the Forma 0.13.0 pin."
+    },
+    {
+      "id": "CV-18",
+      "title": "Editable fields bind on input, through the field map",
+      "level": "PREFERRED",
+      "tier": 1,
+      "problem": "A bound field without data-on=input lost typed text twice in R3; the R4 regression test could not fail.",
+      "evidence": [
+        "HF-004"
+      ],
+      "prevents": [
+        {
+          "failureMode": "FM-18",
+          "prevention": {
+            "conservative": 0.5,
+            "central": 0.7,
+            "optimistic": 0.85
+          }
+        }
+      ],
+      "competitionOverheadMinutes": {
+        "conservative": 1,
+        "central": 0.5,
+        "optimistic": 0.5
+      },
+      "preCompetitionCostMinutes": 0,
+      "scope": "every editable field",
+      "requiredPattern": "Each editable field is declared once in the screen manifest and F# field map with an input-event binding; ManifestTests compare both.",
+      "prohibitedPatterns": [
+        "binding editable fields only on change/blur"
+      ],
+      "allowedExceptions": [],
+      "enforcement": {
+        "kind": "existing",
+        "stage": "contract freeze",
+        "mechanism": "proposals/r10-contract-first-ui/tests/ManifestTests.fs",
+        "check": null,
+        "reviewObligation": null,
+        "existingCheck": "proposals/r10-contract-first-ui"
+      },
+      "requiredTests": [
+        "negative control: removing the input binding fails the test"
+      ],
+      "expectedBenefit": "see IMPACT-FORECAST.md (generated by tools/conventions/conventions.fsx forecast)",
+      "implementationCost": "none if contract-first UI is adopted",
+      "dependencies": [
+        "CF-09 A (APR-CFUI-OWNER-1)"
+      ],
+      "owner": "ui (UI-1)",
+      "adoptionStatus": "PROPOSED",
+      "correctnessOrSafety": false,
+      "ownerApprovalRequired": null,
+      "confidence": "medium",
+      "keyAssumptions": "One rehearsal (R3, twice) plus an R4 test that could not fail; cheap if contract-first UI (CF-09 A) is adopted."
+    },
+    {
+      "id": "CV-19",
+      "title": "Test-only code never ships",
+      "level": "MANDATORY",
+      "tier": 1,
+      "problem": "A live token reached Playwright traces (R4); production exposed EnableTestHooks (R5); test-only code reached production (R6).",
+      "evidence": [
+        "HF-010"
+      ],
+      "prevents": [
+        {
+          "failureMode": "FM-20",
+          "prevention": {
+            "conservative": 0.5,
+            "central": 0.7,
+            "optimistic": 0.85
+          }
+        }
+      ],
+      "competitionOverheadMinutes": {
+        "conservative": 1,
+        "central": 0.5,
+        "optimistic": 0.5
+      },
+      "preCompetitionCostMinutes": 10,
+      "scope": "build configuration",
+      "requiredPattern": "Test hooks compile only under a Test configuration; traces and logs redact Authorization headers.",
+      "prohibitedPatterns": [
+        "runtime flags that enable test hooks in Release"
+      ],
+      "allowedExceptions": [],
+      "enforcement": {
+        "kind": "review",
+        "stage": "candidate",
+        "mechanism": null,
+        "check": null,
+        "reviewObligation": "Reviewer confirms the candidate bundle contains no test hook symbol and traces are redacted.",
+        "existingCheck": null
+      },
+      "requiredTests": [
+        "bundle scan for hook names on the candidate"
+      ],
+      "expectedBenefit": "see IMPACT-FORECAST.md (generated by tools/conventions/conventions.fsx forecast)",
+      "implementationCost": "about 10 min",
+      "dependencies": [],
+      "owner": "integration",
+      "adoptionStatus": "PROPOSED",
+      "correctnessOrSafety": true,
+      "ownerApprovalRequired": null,
+      "confidence": "high",
+      "keyAssumptions": "Safety rule; R4-R6 leaks; time value is near zero, enforced regardless."
+    },
+    {
+      "id": "CV-20",
+      "title": "Schedules read the frozen ownership; gates are acyclic",
+      "level": "PREFERRED",
+      "tier": 2,
+      "problem": "The schedule model ignored file ownership (T+519 vs T+720); the slice-gate journeys rule deadlocked the plan.",
+      "evidence": [
+        "HF-066",
+        "HF-067"
+      ],
+      "prevents": [
+        {
+          "failureMode": "FM-21",
+          "prevention": {
+            "conservative": 0.5,
+            "central": 0.7,
+            "optimistic": 0.85
+          }
+        }
+      ],
+      "competitionOverheadMinutes": {
+        "conservative": 0,
+        "central": 0,
+        "optimistic": 0
+      },
+      "preCompetitionCostMinutes": 30,
+      "scope": "planning tools",
+      "requiredPattern": "The schedule model takes lanes from agent-file-ownership.json and the slice gate's merge dependencies form a DAG; both are tested before launch.",
+      "prohibitedPatterns": [],
+      "allowedExceptions": [],
+      "enforcement": {
+        "kind": "existing",
+        "stage": "pre-launch",
+        "mechanism": "tools/r10/schedule-model-tests.fsx; ODR-R10-33 deferral",
+        "check": null,
+        "reviewObligation": null,
+        "existingCheck": "tools/r10/schedule-model.fsx"
+      },
+      "requiredTests": [
+        "cycle detection on merge-dependency edges"
+      ],
+      "expectedBenefit": "see IMPACT-FORECAST.md (generated by tools/conventions/conventions.fsx forecast)",
+      "implementationCost": "exists",
+      "dependencies": [],
+      "owner": "planning",
+      "adoptionStatus": "ENFORCED-EXISTING",
+      "correctnessOrSafety": false,
+      "ownerApprovalRequired": null,
+      "confidence": "medium",
+      "keyAssumptions": "Defects found in the model and gate before any run (modeled minutes); existing tests guard them."
+    },
+    {
+      "id": "CV-21",
+      "title": "Everything mandated is in the dependency lock",
+      "level": "PREFERRED",
+      "tier": 1,
+      "problem": "Central package management dropped FSharp.Core and skipped every test assembly (R8); a mandated layout engine was outside the lock.",
+      "evidence": [
+        "HF-053",
+        "HF-055"
+      ],
+      "prevents": [
+        {
+          "failureMode": "FM-22",
+          "prevention": {
+            "conservative": 0.4,
+            "central": 0.6,
+            "optimistic": 0.8
+          }
+        }
+      ],
+      "competitionOverheadMinutes": {
+        "conservative": 0,
+        "central": 0,
+        "optimistic": 0
+      },
+      "preCompetitionCostMinutes": 20,
+      "scope": "dependency lock and bootstrap",
+      "requiredPattern": "Every package a requirement mandates, and FSharp.Core, is listed in the lock and in Directory.Packages.props; a test run that skips an assembly fails.",
+      "prohibitedPatterns": [
+        "implicit FSharp.Core under central package management"
+      ],
+      "allowedExceptions": [],
+      "enforcement": {
+        "kind": "review",
+        "stage": "package release",
+        "mechanism": null,
+        "check": null,
+        "reviewObligation": "Package reviewer lists every package named by a requirement and its lock entry.",
+        "existingCheck": null
+      },
+      "requiredTests": [
+        "bootstrap test run fails when any test assembly is skipped"
+      ],
+      "expectedBenefit": "see IMPACT-FORECAST.md (generated by tools/conventions/conventions.fsx forecast)",
+      "implementationCost": "about 20 min",
+      "dependencies": [
+        "CV-01"
+      ],
+      "owner": "Indy-init owner (package release)",
+      "adoptionStatus": "PROPOSED",
+      "correctnessOrSafety": false,
+      "ownerApprovalRequired": null,
+      "confidence": "medium",
+      "keyAssumptions": "Two R8 occurrences (FSharp.Core, forma-workflow); minutes unrecorded."
+    },
+    {
+      "id": "CV-22",
+      "title": "Standard per-feature F# file split (Contract/Domain/State/View/Tests)",
+      "level": "DISCRETIONARY",
+      "tier": 3,
+      "problem": "Proposed in the directive; no finding attributes a defect or conflict to module layout, and ownership is already fixed per file.",
+      "evidence": [
+        "HF-022"
+      ],
+      "prevents": [
+        {
+          "failureMode": "FM-10",
+          "prevention": {
+            "conservative": 0.05,
+            "central": 0.1,
+            "optimistic": 0.15
+          }
+        }
+      ],
+      "competitionOverheadMinutes": {
+        "conservative": 5,
+        "central": 3,
+        "optimistic": 1
+      },
+      "preCompetitionCostMinutes": 0,
+      "scope": "F# application code",
+      "requiredPattern": "Agents may organise modules as they choose inside their owned files; the frozen project structure decides file boundaries.",
+      "prohibitedPatterns": [],
+      "allowedExceptions": [],
+      "enforcement": {
+        "kind": "none",
+        "stage": "n/a",
+        "mechanism": null,
+        "check": null,
+        "reviewObligation": null,
+        "existingCheck": null
+      },
+      "requiredTests": [],
+      "expectedBenefit": "see IMPACT-FORECAST.md (generated by tools/conventions/conventions.fsx forecast)",
+      "implementationCost": "would require changing frozen project structure",
+      "dependencies": [],
+      "owner": "n/a",
+      "adoptionStatus": "DEFERRED",
+      "correctnessOrSafety": false,
+      "ownerApprovalRequired": null,
+      "confidence": "low",
+      "keyAssumptions": "No evidence attributes a defect to module layout; costs are a frozen-structure change."
+    },
+    {
+      "id": "CV-23",
+      "title": "Stable requirement and field IDs, decoupled from F# names",
+      "level": "PREFERRED",
+      "tier": 2,
+      "problem": "Field-mapping drift between UI and contracts; IDs module exists in the contract-first UI proposal.",
+      "evidence": [
+        "HF-004",
+        "HF-073"
+      ],
+      "prevents": [
+        {
+          "failureMode": "FM-18",
+          "prevention": {
+            "conservative": 0.1,
+            "central": 0.2,
+            "optimistic": 0.3
+          }
+        }
+      ],
+      "competitionOverheadMinutes": {
+        "conservative": 1,
+        "central": 0.5,
+        "optimistic": 0.5
+      },
+      "preCompetitionCostMinutes": 0,
+      "scope": "UI contracts",
+      "requiredPattern": "Fields and actions use UIF-/UIA-/INV- ids from the screen manifest; HTML ids and F# names map through one Ids module.",
+      "prohibitedPatterns": [
+        "deriving HTML ids from F# parameter names"
+      ],
+      "allowedExceptions": [],
+      "enforcement": {
+        "kind": "existing",
+        "stage": "contract freeze",
+        "mechanism": "proposals/r10-contract-first-ui/contracts/Ids.fs + ManifestTests",
+        "check": null,
+        "reviewObligation": null,
+        "existingCheck": "proposals/r10-contract-first-ui"
+      },
+      "requiredTests": [],
+      "expectedBenefit": "see IMPACT-FORECAST.md (generated by tools/conventions/conventions.fsx forecast)",
+      "implementationCost": "none if contract-first UI is adopted",
+      "dependencies": [
+        "CF-09 A"
+      ],
+      "owner": "ui (UI-1)",
+      "adoptionStatus": "PROPOSED",
+      "correctnessOrSafety": false,
+      "ownerApprovalRequired": null,
+      "confidence": "low",
+      "keyAssumptions": "Supports CV-18; benefit is mostly in CV-18 already."
+    }
+  ]
+}
