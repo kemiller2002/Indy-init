@@ -39,3 +39,15 @@ Agent 2's `project-structure.delta.json` renames roles `ui` and `ui-2` to `ui-a`
 - X01 fails for 65 test files, and X18 needs the requesters to be declared roles.
 
 The `07-IF41-VIEW.fs` contract text itself folds cleanly. Note also that `07` still keys `NotSaved` by `InvestigationId`. That is unambiguous only because sessions exist for one working copy at a time; the fold should use `InvestigationRef`.
+
+## Revision 3: the independent review (FAIL at f91bd7b), addressed
+
+| Finding | Resolution |
+|---|---|
+| H1: a role was asserted, so run `demonstration-v1` could write into a catalog | `WorkspaceAddress` is now a private type inside a module (`WorkspaceAddress.T`); a type private at namespace level was still constructible from other files, as a probe showed. Constructors: `WorkspaceAddress.catalog`, and `WorkspaceAddress.workingCopy catalogs run`, which accepts only `workspaces/demo/causa-app-<run>` and refuses any workspace in `catalogs`. `WorkspaceLister.WorkingCopyFor` is removed. `ListingTarget.WorkingCopyOf` and `Msg.CreateRequested` take only derived values (`WorkspaceAddress.T`, `Writable.T`). A probe that forges `{ Dir; Kind = WorkingCopy }` from another file is refused with FS1093. Test: `Storage.Producer.WorkingCopyNeverNamesACatalogWorkspace`. |
+| H2: `pending415` accepted other blanked approvals | It now compares the full sorted set of FAIL headers and problem lines with exactly the expected six, so 10 printed lines also fails. A copy with T-S59's approval blanked is refused (verified). |
+| M1: the departure from ODR-R10-32 A | It is now its own request, ODR-V415-03 (staging), and the fallback is ODR-V415-04. `approve v4.1.5` refuses until both are recorded. README, AMENDMENT and ODR-V415-02 state that approval implies neither. |
+| M2: the A4 weakening | Stated in ODR-V415-01's option A and in README and AMENDMENT as a **weakened** acceptance condition (incomplete, not dropped) |
+| L1: proposals cited as if recorded | They are now cited as proposals and requests, never as records |
+| L2: the DA-R10-1 claim | Corrected: DA-R10-1 refuses every ODR/OD id |
+| Info: the start state of a new session | README "For builders" note |

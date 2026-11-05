@@ -119,8 +119,8 @@
  type Decision =
      | Allowed of EventPayload list
 --- ../../requirements-compiled/v4.1.4/contracts/02-IF41-STORAGE.fs	2026-11-05 13:24:17.360443436 +0000
-+++ v415-contracts/02-IF41-STORAGE.fs	2026-11-05 19:28:28.421015226 +0000
-@@ -6,6 +6,40 @@
++++ v415-contracts/02-IF41-STORAGE.fs	2026-11-05 19:41:12.189954515 +0000
+@@ -6,6 +6,61 @@
  type CommitOid = CommitOid of string
  type RepoPath = RepoPath of string
  
@@ -136,12 +136,33 @@
 +    | Catalog
 +    | WorkingCopy
 +
-+/// v4.1.5 W1: a workspace of the connected repository, with its role.
-+type WorkspaceAddress = { Workspace: Workspace; Role: WorkspaceRole }
++/// v4.1.5 W1: a workspace of the connected repository, with its role. The role is derived, never asserted: the
++/// representation is private, a catalog address comes only from WorkspaceAddress.catalog and a working copy only from
++/// WorkspaceAddress.workingCopy (EXT-DATA-013; EXT-DATA-006).
++[<RequireQualifiedAccess>]
++module WorkspaceAddress =
++    type T =
++        private
++            { Dir: Workspace
++              Kind: WorkspaceRole }
++        member a.Workspace = a.Dir
++        member a.Role = a.Kind
++
++    let catalog (workspace: Workspace) : T = { Dir = workspace; Kind = WorkspaceRole.Catalog }
++
++    /// The working copy `workspaces/demo/causa-app-<run>` (CONTRACT section 3, runId ^[a-z0-9][a-z0-9-]{0,63}$) for a
++    /// run matching ^[a-z0-9][a-z0-9-]{0,53}$. The reserved `causa-app-` namespace keeps every working copy apart from
++    /// the catalog workspaces (demonstration-v1, historical-v1, ...), and any workspace in `catalogs` is refused as well.
++    let workingCopy (catalogs: Workspace list) (run: string) : T option =
++        let workspace = Workspace("workspaces/demo/causa-app-" + run)
++        if System.Text.RegularExpressions.Regex.IsMatch(run, "^[a-z0-9][a-z0-9-]{0,53}$") && not (List.contains workspace catalogs) then
++            Some { Dir = workspace; Kind = WorkspaceRole.WorkingCopy }
++        else
++            None
 +
 +/// v4.1.5 W1: an investigation is identified by where it is and its id: the same case can be stored in two
 +/// workspaces (causa-data holds identical cases in historical-v1 and demonstration-v1).
-+type InvestigationRef = { Address: WorkspaceAddress; Id: InvestigationId }
++type InvestigationRef = { Address: WorkspaceAddress.T; Id: InvestigationId }
 +
 +/// v4.1.5 W1: an address that may be written. Its only constructor refuses a Catalog, so no catalog investigation can
 +/// reach a save session (EXT-DATA-013; EXT-DATA-006).
@@ -149,19 +170,19 @@
 +module Writable =
 +    type T =
 +        private
-+        | Writable of WorkspaceAddress
++        | Writable of WorkspaceAddress.T
 +
-+    let ofAddress (address: WorkspaceAddress) : T option =
++    let ofAddress (address: WorkspaceAddress.T) : T option =
 +        match address.Role with
 +        | WorkspaceRole.WorkingCopy -> Some(Writable address)
 +        | WorkspaceRole.Catalog -> None
 +
-+    let address (Writable address) : WorkspaceAddress = address
++    let address (Writable address) : WorkspaceAddress.T = address
 +
  type FileSet =
      { Manifest: byte[]
        Events: byte[]
-@@ -18,14 +52,23 @@
+@@ -18,14 +73,23 @@
      | SnapshotDiffersFromReplay of paths: string list
      | MissingRequiredField of file: string * field: string
      | ReplayRejected of ReplayError
@@ -174,7 +195,7 @@
        History: EventEnvelope list
        ReadAt: CommitOid
 +      /// v4.1.5 W1: the workspace the history was read from.
-+      Address: WorkspaceAddress
++      Address: WorkspaceAddress.T
        Bytes: FileSet }
  
  type StorageCodec =
@@ -186,9 +207,9 @@
 +      /// v4.1.5 C1: the first file set of a new investigation from its command-created history (EXT-DATA-008). It is
 +      /// Ok only when Verify accepts the result, so a file set that would not verify is never sent.
 +      EncodeNew: InvestigationId -> EventEnvelope list -> Result<FileSet, VerificationFailure list>
-+      Verify: WorkspaceAddress -> CommitOid -> FileSet -> Result<VerifiedInvestigation, VerificationFailure list> }
++      Verify: WorkspaceAddress.T -> CommitOid -> FileSet -> Result<VerifiedInvestigation, VerificationFailure list> }
 --- ../../requirements-compiled/v4.1.4/contracts/05-IF41-SAVE.fs	2026-11-05 13:24:17.360443436 +0000
-+++ v415-contracts/05-IF41-SAVE.fs	2026-11-05 19:28:36.998161094 +0000
++++ v415-contracts/05-IF41-SAVE.fs	2026-11-05 19:41:01.914727266 +0000
 @@ -137,7 +137,7 @@
  /// SM-LOAD events.
  [<RequireQualifiedAccess>]
@@ -216,7 +237,7 @@
        BaseHead: CommitOid
        State: SaveState
        Unsaved: CommandEnvelope list
-@@ -205,10 +207,52 @@
+@@ -205,10 +207,50 @@
      | ConflictEvent of ConflictInput
      | ConflictNextRequest of ConflictView * HttpRequest
  
@@ -225,10 +246,10 @@
 +type ListedInvestigation = { Ref: InvestigationRef; Path: RepoPath; Title: string option; ExpectedStateSha256: string option }
 +
 +/// v4.1.5 L1, W1: what to list. ActiveCatalog derives the catalog workspace from `catalog/active.json`; a working copy
-+/// is named by WorkspaceLister.WorkingCopyFor.
++/// comes only from WorkspaceAddress.workingCopy.
 +type ListingTarget =
 +    | ActiveCatalog
-+    | WorkingCopyOf of Workspace
++    | WorkingCopyOf of WorkspaceAddress.T
 +
 +/// v4.1.5 L1: the read a listing is waiting for, so InterpretList knows what an answer means and at which commit.
 +type ListingStep =
@@ -238,7 +259,7 @@
 +    | ListDirectoryAt of CommitOid * Workspace
 +
 +/// v4.1.5 L1: a workspace's investigations, all read at one commit.
-+type Listing = { Address: WorkspaceAddress; ReadAt: CommitOid; Investigations: ListedInvestigation list }
++type Listing = { Address: WorkspaceAddress.T; ReadAt: CommitOid; Investigations: ListedInvestigation list }
 +
 +/// v4.1.5 L1: what one answer means for a listing. A listing is a read, like a load's head-then-files steps; it adds
 +/// no machine state.
@@ -250,9 +271,7 @@
 +/// v4.1.5 L1, W1: listing a workspace. Nothing is written (EXT-DATA-006). A working copy that does not exist yet lists
 +/// as empty at the head read (EXT-DATA-009: a clean start).
 +type WorkspaceLister =
-+    { /// `workspaces/demo/<run>` for a run id matching ^[a-z0-9][a-z0-9-]{0,63}$ (CONTRACT section 9.4), else None.
-+      WorkingCopyFor: string -> Workspace option
-+      List: RequestContext -> ListingTarget -> ListingStep * HttpRequest
++    { List: RequestContext -> ListingTarget -> ListingStep * HttpRequest
 +      InterpretList: RequestContext -> ListingTarget -> ListingStep -> HttpOutcome -> ListingInterpretation }
 +
  /// Every operation that emits a request uses RequestContext.NextId for it (at most one per call) and records it as
@@ -271,7 +290,7 @@
        Interpret: RequestContext -> InvestigationSession -> HttpOutcome -> Interpretation
        Step: RequestContext -> InvestigationSession -> SaveInput -> Result<InvestigationSession * SaveEffect list, SaveFault>
 --- ../../requirements-compiled/v4.1.4/contracts/06-IF41-APP.fs	2026-11-05 13:24:17.360443436 +0000
-+++ v415-contracts/06-IF41-APP.fs	2026-11-05 19:28:28.421829436 +0000
++++ v415-contracts/06-IF41-APP.fs	2026-11-05 19:41:01.915397988 +0000
 @@ -37,7 +37,7 @@
      | OnlineObserved
  
@@ -294,7 +313,7 @@
 +    /// v4.1.5 L1, W1: the user selected what to list (EXT-DATA-003: an explicit selection of the workspace).
 +    | ListRequested of ListingTarget
 +    /// v4.1.5 C1: the user asked to create an investigation in a working copy (EXT-DATA-006: an explicit action).
-+    | CreateRequested of Workspace * CommandEnvelope
++    | CreateRequested of Writable.T * CommandEnvelope
      | DomainCommand of CommandEnvelope
  
  /// The model keeps the connection context after Connect succeeds and the next request identity of the tab.
@@ -307,7 +326,7 @@
 +      Loads: Map<InvestigationRef, LoadState>
 +      Sessions: Map<InvestigationRef, InvestigationSession>
 +      /// v4.1.5 L1: the latest listing of each workspace the user selected, and the listing reads in flight.
-+      Listings: Map<WorkspaceAddress, Listing>
++      Listings: Map<WorkspaceAddress.T, Listing>
 +      ListingsInFlight: Map<RequestId, ListingTarget * ListingStep> }
  
  type Engine =

@@ -18,12 +18,33 @@ type WorkspaceRole =
     | Catalog
     | WorkingCopy
 
-/// v4.1.5 W1: a workspace of the connected repository, with its role.
-type WorkspaceAddress = { Workspace: Workspace; Role: WorkspaceRole }
+/// v4.1.5 W1: a workspace of the connected repository, with its role. The role is derived, never asserted: the
+/// representation is private, a catalog address comes only from WorkspaceAddress.catalog and a working copy only from
+/// WorkspaceAddress.workingCopy (EXT-DATA-013; EXT-DATA-006).
+[<RequireQualifiedAccess>]
+module WorkspaceAddress =
+    type T =
+        private
+            { Dir: Workspace
+              Kind: WorkspaceRole }
+        member a.Workspace = a.Dir
+        member a.Role = a.Kind
+
+    let catalog (workspace: Workspace) : T = { Dir = workspace; Kind = WorkspaceRole.Catalog }
+
+    /// The working copy `workspaces/demo/causa-app-<run>` (CONTRACT section 3, runId ^[a-z0-9][a-z0-9-]{0,63}$) for a
+    /// run matching ^[a-z0-9][a-z0-9-]{0,53}$. The reserved `causa-app-` namespace keeps every working copy apart from
+    /// the catalog workspaces (demonstration-v1, historical-v1, ...), and any workspace in `catalogs` is refused as well.
+    let workingCopy (catalogs: Workspace list) (run: string) : T option =
+        let workspace = Workspace("workspaces/demo/causa-app-" + run)
+        if System.Text.RegularExpressions.Regex.IsMatch(run, "^[a-z0-9][a-z0-9-]{0,53}$") && not (List.contains workspace catalogs) then
+            Some { Dir = workspace; Kind = WorkspaceRole.WorkingCopy }
+        else
+            None
 
 /// v4.1.5 W1: an investigation is identified by where it is and its id: the same case can be stored in two
 /// workspaces (causa-data holds identical cases in historical-v1 and demonstration-v1).
-type InvestigationRef = { Address: WorkspaceAddress; Id: InvestigationId }
+type InvestigationRef = { Address: WorkspaceAddress.T; Id: InvestigationId }
 
 /// v4.1.5 W1: an address that may be written. Its only constructor refuses a Catalog, so no catalog investigation can
 /// reach a save session (EXT-DATA-013; EXT-DATA-006).
@@ -31,14 +52,14 @@ type InvestigationRef = { Address: WorkspaceAddress; Id: InvestigationId }
 module Writable =
     type T =
         private
-        | Writable of WorkspaceAddress
+        | Writable of WorkspaceAddress.T
 
-    let ofAddress (address: WorkspaceAddress) : T option =
+    let ofAddress (address: WorkspaceAddress.T) : T option =
         match address.Role with
         | WorkspaceRole.WorkingCopy -> Some(Writable address)
         | WorkspaceRole.Catalog -> None
 
-    let address (Writable address) : WorkspaceAddress = address
+    let address (Writable address) : WorkspaceAddress.T = address
 
 type FileSet =
     { Manifest: byte[]
@@ -61,7 +82,7 @@ type VerifiedInvestigation =
       History: EventEnvelope list
       ReadAt: CommitOid
       /// v4.1.5 W1: the workspace the history was read from.
-      Address: WorkspaceAddress
+      Address: WorkspaceAddress.T
       Bytes: FileSet }
 
 type StorageCodec =
@@ -71,4 +92,4 @@ type StorageCodec =
       /// v4.1.5 C1: the first file set of a new investigation from its command-created history (EXT-DATA-008). It is
       /// Ok only when Verify accepts the result, so a file set that would not verify is never sent.
       EncodeNew: InvestigationId -> EventEnvelope list -> Result<FileSet, VerificationFailure list>
-      Verify: WorkspaceAddress -> CommitOid -> FileSet -> Result<VerifiedInvestigation, VerificationFailure list> }
+      Verify: WorkspaceAddress.T -> CommitOid -> FileSet -> Result<VerifiedInvestigation, VerificationFailure list> }

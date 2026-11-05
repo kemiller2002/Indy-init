@@ -1,6 +1,6 @@
 {
  "schema": "indy-init.v41-owner-decision-requests/1",
- "status": "Requests of v4.1 to v4.1.4 are carried as recorded (APR-V41-OWNER-1..4, APR-V411-OWNER-1/2, APR-V412-OWNER-1..3, APR-V414-OWNER-1/2). Pending: ODR-V415-01 (the minimum contract change for real causa-data), then ODR-V415-02 (approve v4.1.5) for the package as compiled from that record and independently reviewed.",
+ "status": "Requests of v4.1 to v4.1.4 are carried as recorded (APR-V41-OWNER-1..4, APR-V411-OWNER-1/2, APR-V412-OWNER-1..3, APR-V414-OWNER-1/2). Pending: ODR-V415-01 (the minimum contract change), ODR-V415-03 (staging, which departs from the recorded ODR-R10-32 A) and ODR-V415-04 (the fallback trigger), then ODR-V415-02 (approve v4.1.5) for the package as compiled and independently reviewed.",
  "requests": [
   {
    "id": "ODR-V41-01",
@@ -545,10 +545,10 @@
    "title": "The minimum contract change for real causa-data: E1 events, W1 workspaces, L1 listing, C1 creation",
    "question": "Frozen v4.1.4 cannot represent 487 of the 1,315 catalog events, has no workspace or listing, and cannot create an investigation (proposals/r10-historical-data-compatibility/SCHEMA-DIFF.md sections 2 and 5; EXT-DATA-003, -008, -013). Adopt the minimum change? Its parts depend on each other (the save machine uses the workspace types; the storage file carries all three), so they are one decision.",
    "options": [
-    "A: E1: CoreEvent 28 -> 50 cases (every v4.1.4 name kept; payloads opaque, with the wire fields), EventEnvelope.Provenance, VerificationFailure.ReaderStage, MarkHypothesisPlausible/Supported and RejectProposal carry what their events need. W1/L1: Workspace, WorkspaceAddress in the connected repository, InvestigationRef keys, Writable (only a working copy is ever written), WorkspaceLister. C1: SaveMachine.InitialNew and StorageCodec.EncodeNew through existing SM-SAVE transitions; T-L03 replaced so a catalog load creates no save session. No state, event, task or contract file added.",
+    "A: E1: CoreEvent 28 -> 50 cases (every v4.1.4 name kept; payloads opaque, with the wire fields), EventEnvelope.Provenance, VerificationFailure.ReaderStage, MarkHypothesisPlausible/Supported and RejectProposal carry what their events need. W1/L1: Workspace and a private WorkspaceAddress in the connected repository whose role is derived (a catalog from catalog/active.json; a working copy only as workspaces/demo/causa-app-<run>, never a catalog workspace), InvestigationRef keys, Writable (only a working copy is ever written), WorkspaceLister. C1: SaveMachine.InitialNew and StorageCodec.EncodeNew through existing SM-SAVE transitions; T-L03 replaced so a catalog load creates no save session. No state, event, task or contract file added. WEAKENS ONE ACCEPTANCE CONDITION: HypothesisFalsified loses its Scope because causa-storage v1.0.0 stores none, so scenario A4's 'the falsifying evidence and scope are recorded' (docs/INVESTIGATION-ACCEPTANCE-SCENARIOS.md:47) is satisfied for scope only through NegativeKnowledgeEstablished.scope; scope on the falsification event itself becomes incomplete until causa-storage 1.1.0 (ODR-R10-26 A, OD-HC-06 B).",
     "B: keep v4.1.4 and launch with ODR-R10-25 option B's declared expected failures"
    ],
-   "recommendation": "A (OD-V415-04 A and -05 A). The event union is the one checks C11/C15 proved lossless on all 1,315 catalog events.",
+   "recommendation": "A. The event union is the one checks C11/C15 proved lossless on all 1,315 catalog events. Workstream D's proposals OD-V415-04 A (creation in existing states) and OD-V415-05 A (derived workspace) are what option A implements; they are proposals, not records.",
    "rationale": "ODR-R10-25 A and OD-HC-01 A (recorded) commission it; workstream D of the owner's Parallel Acceleration Directive (2026-11-05) scoped it to the minimum.",
    "impact": "Until recorded, v4.1.5's contract changes and its T-L03 amendment name no approval and the package does not validate (X12, X17).",
    "approvalRecord": {
@@ -576,27 +576,59 @@
       },
       {
        "file": "contracts/02-IF41-STORAGE.fs",
-       "sha256": "99fe1ab2fb43f49fe5affa1f1fbb58ea23c9a83109d56940c2bb769edf5b3f74"
+       "sha256": "91f3d4878cc03f4dc311437008e033a452c7e97cd8cf2f4ce17f42b21bc15058"
       },
       {
        "file": "contracts/05-IF41-SAVE.fs",
-       "sha256": "f2be813e1a567fe84270fe57d5215f8194cd065619f8f64d1a227a03ddfe7fdb"
+       "sha256": "f758c8bc1dfc2f06ca0f65b3bfabefcf4a7700801b9e13766a320314d57b509e"
       },
       {
        "file": "contracts/06-IF41-APP.fs",
-       "sha256": "cf32181ffac56217f92f65a9da32410dc827017031b33d386e366ebfe16e9e65"
+       "sha256": "ee647592d3ff2749d8ac85ca48b87e19d093b62e62785c434a449afc72a46ed7"
       }
      ]
     }
    }
   },
   {
+   "id": "ODR-V415-03",
+   "kind": "scope",
+   "title": "Stage the successor: v4.1.5 is the minimum, the rest of ODR-R10-32 A follows as v4.1.6",
+   "question": "ODR-R10-32 A (recorded) commissions ONE combined v4.1.5 successor (event union, workspace, listing, creation, ownership FO-1..FO-3 / ODR-R10-20, the T19/T22 split / ODR-R10-21, the contract-first UI contracts / CF-09). v4.1.5 as compiled holds only the minimum; the contract-first UI fold follows as its own request. Depart from ODR-R10-32 A by staging?",
+   "options": [
+    "A: stage: v4.1.5 = the minimum (+ the IF41-VIEW fold if its request is recorded); FO-1..FO-3 and the T19/T22 split follow as v4.1.6, recorded as incomplete in docs/rehearsal-010-dependency-reduction/CLASSIFICATION.md section 3, not dropped",
+    "B: keep ODR-R10-32 A: v4.1.5 is not approved until it also carries FO-1..FO-3 and the T19/T22 split"
+   ],
+   "recommendation": "A (proposal OD-V415-01 in docs/rehearsal-010-optimization/v415-cost-analysis/OWNER-DECISIONS.md): the same critical path with a smaller review and no compiler extension.",
+   "rationale": "Staging changes a recorded owner decision, so only the owner can make it.",
+   "impact": "Until recorded, owner-freeze.fsx approve v4.1.5 refuses.",
+   "approvalRecord": {
+    "how": "A change in an operator approval: {\"decision_id\": \"ODR-V415-03\", \"action\": \"decide\", \"option\": \"A\"}, recorded by the owner with tools/owner-freeze.fsx decide v4.1.5."
+   }
+  },
+  {
+   "id": "ODR-V415-04",
+   "kind": "scope",
+   "title": "Fallback trigger for Rehearsal 010",
+   "question": "If the independent review of v4.1.5 has not passed by Nov 6 22:00 UTC (17:00 Eastern), launch on v4.1.4 with ODR-R10-25 option B's declaration (expected failures stated before T0)?",
+   "options": [
+    "A: agree to that trigger now",
+    "B: decide at the time"
+   ],
+   "recommendation": "A (proposal OD-V415-03): deciding in advance removes a late owner round trip.",
+   "rationale": "The fallback declares acceptance failures, which only the owner can do.",
+   "impact": "Until recorded, owner-freeze.fsx approve v4.1.5 refuses.",
+   "approvalRecord": {
+    "how": "A change in an operator approval: {\"decision_id\": \"ODR-V415-04\", \"action\": \"decide\", \"option\": \"A\"}, recorded by the owner with tools/owner-freeze.fsx decide v4.1.5."
+   }
+  },
+  {
    "id": "ODR-V415-02",
    "kind": "package-approval",
    "title": "Approve compiled package v4.1.5",
-   "question": "Approve requirements-compiled/v4.1.5 (successor of the approved v4.1.4) as the implementation plan: v4.1.4 plus ODR-V415-01?",
+   "question": "Approve requirements-compiled/v4.1.5 (successor of the approved v4.1.4) as the implementation plan: v4.1.4 plus ODR-V415-01? This approves the package only. It does not decide staging (ODR-V415-03), which departs from the recorded ODR-R10-32 A ('one combined package'), nor the fallback trigger (ODR-V415-04); owner-freeze.fsx approve refuses until both are recorded.",
    "options": [
-    "A: approve v4.1.5 after ODR-V415-01 is recorded and it is independently reviewed",
+    "A: approve v4.1.5 after ODR-V415-01, -03 and -04 are recorded and it is independently reviewed",
     "B: request changes",
     "C: decline; build from v4.1.4 with ODR-R10-25 B's declared expected failures"
    ],

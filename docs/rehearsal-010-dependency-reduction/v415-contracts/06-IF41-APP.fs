@@ -65,7 +65,7 @@ type Msg =
     /// v4.1.5 L1, W1: the user selected what to list (EXT-DATA-003: an explicit selection of the workspace).
     | ListRequested of ListingTarget
     /// v4.1.5 C1: the user asked to create an investigation in a working copy (EXT-DATA-006: an explicit action).
-    | CreateRequested of Workspace * CommandEnvelope
+    | CreateRequested of Writable.T * CommandEnvelope
     | DomainCommand of CommandEnvelope
 
 /// The model keeps the connection context after Connect succeeds and the next request identity of the tab.
@@ -78,7 +78,7 @@ type Model =
       Loads: Map<InvestigationRef, LoadState>
       Sessions: Map<InvestigationRef, InvestigationSession>
       /// v4.1.5 L1: the latest listing of each workspace the user selected, and the listing reads in flight.
-      Listings: Map<WorkspaceAddress, Listing>
+      Listings: Map<WorkspaceAddress.T, Listing>
       ListingsInFlight: Map<RequestId, ListingTarget * ListingStep> }
 
 type Engine =

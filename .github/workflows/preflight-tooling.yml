@@ -221,15 +221,25 @@ jobs:
           dotnet build "$RUNNER_TEMP/layered414/App.slnx" -c Release
       - name: Successor package v4.1.5 is reproduced byte for byte and its checks X01-X21 pass except its pending owner approvals; its contracts equal v4.1.4's except the four it declares changed, and its layout tests equal v4.1.4's
         run: |
-          # Until the owner records ODR-V415-01 (FREEZE.md step 1), v4.1.5 must validate except for exactly that: X12/X17
-          # problems that name no operator approval. Any other problem, or byte difference (exit 4), fails.
+          # Until the owner records ODR-V415-01 (FREEZE.md step 1), v4.1.5 must validate except for exactly its six empty
+          # approvals: the set of problem lines must equal the expected set, so blanking any other approval, or any other
+          # problem, fails. The compiler prints at most 10 problems per check, so 10 lines also fails. A byte difference
+          # (exit 4) fails.
           pending415() {
             set +e; "$@" > "$RUNNER_TEMP/v415.log" 2>&1; code=$?; set -e
             cat "$RUNNER_TEMP/v415.log"
             if [ "$code" -eq 0 ]; then return 0; fi
-            if [ "$code" -ne 3 ]; then echo "exit $code: more than pending owner approvals"; exit 1; fi
-            if grep -E '^FAIL ' "$RUNNER_TEMP/v415.log" | grep -qvE '^FAIL (X12|X17) '; then echo "a check other than X12/X17 fails"; exit 1; fi
-            if grep -E '^      - ' "$RUNNER_TEMP/v415.log" | grep -qvE 'names no operator approval$'; then echo "a problem other than a pending owner approval"; exit 1; fi
+            if [ "$code" -ne 3 ]; then echo "exit $code: more than the pending owner approvals"; exit 1; fi
+            printf '%s\n' \
+              'FAIL X12' 'FAIL X17' \
+              '      - amendment T-L03 names no operator approval' \
+              '      - the accepted SM-SAVE entry names no operator approval' \
+              '      - the change of contracts/00-DOMAIN-STUBS.fs names no operator approval' \
+              '      - the change of contracts/02-IF41-STORAGE.fs names no operator approval' \
+              '      - the change of contracts/05-IF41-SAVE.fs names no operator approval' \
+              '      - the change of contracts/06-IF41-APP.fs names no operator approval' | sort > "$RUNNER_TEMP/v415.expected"
+            { grep -E '^FAIL ' "$RUNNER_TEMP/v415.log" | cut -c1-8; grep -E '^      - ' "$RUNNER_TEMP/v415.log"; } | sort > "$RUNNER_TEMP/v415.actual"
+            if ! diff "$RUNNER_TEMP/v415.expected" "$RUNNER_TEMP/v415.actual"; then echo "v4.1.5 fails for more than its pending owner approvals"; exit 1; fi
           }
           pending415 dotnet tools/requirements-compiler/src/bin/Release/net10.0/requirements-compiler.dll v41 --source . --package requirements-compiled/v4.1.5 --base requirements-compiled/v4 --forma-tarball "$RUNNER_TEMP/forma.tgz" --check
           diff -r requirements-compiled/v4.1.4/layout-tests requirements-compiled/v4.1.5/layout-tests
@@ -255,15 +265,25 @@ jobs:
           done
       - name: The v4.1.5 skeleton bootstraps into an empty repository and onto a recorded Conditor 0.10.18 scaffold, and every solution builds
         run: |
-          # Until the owner records ODR-V415-01 (FREEZE.md step 1), v4.1.5 must validate except for exactly that: X12/X17
-          # problems that name no operator approval. Any other problem, or byte difference (exit 4), fails.
+          # Until the owner records ODR-V415-01 (FREEZE.md step 1), v4.1.5 must validate except for exactly its six empty
+          # approvals: the set of problem lines must equal the expected set, so blanking any other approval, or any other
+          # problem, fails. The compiler prints at most 10 problems per check, so 10 lines also fails. A byte difference
+          # (exit 4) fails.
           pending415() {
             set +e; "$@" > "$RUNNER_TEMP/v415.log" 2>&1; code=$?; set -e
             cat "$RUNNER_TEMP/v415.log"
             if [ "$code" -eq 0 ]; then return 0; fi
-            if [ "$code" -ne 3 ]; then echo "exit $code: more than pending owner approvals"; exit 1; fi
-            if grep -E '^FAIL ' "$RUNNER_TEMP/v415.log" | grep -qvE '^FAIL (X12|X17) '; then echo "a check other than X12/X17 fails"; exit 1; fi
-            if grep -E '^      - ' "$RUNNER_TEMP/v415.log" | grep -qvE 'names no operator approval$'; then echo "a problem other than a pending owner approval"; exit 1; fi
+            if [ "$code" -ne 3 ]; then echo "exit $code: more than the pending owner approvals"; exit 1; fi
+            printf '%s\n' \
+              'FAIL X12' 'FAIL X17' \
+              '      - amendment T-L03 names no operator approval' \
+              '      - the accepted SM-SAVE entry names no operator approval' \
+              '      - the change of contracts/00-DOMAIN-STUBS.fs names no operator approval' \
+              '      - the change of contracts/02-IF41-STORAGE.fs names no operator approval' \
+              '      - the change of contracts/05-IF41-SAVE.fs names no operator approval' \
+              '      - the change of contracts/06-IF41-APP.fs names no operator approval' | sort > "$RUNNER_TEMP/v415.expected"
+            { grep -E '^FAIL ' "$RUNNER_TEMP/v415.log" | cut -c1-8; grep -E '^      - ' "$RUNNER_TEMP/v415.log"; } | sort > "$RUNNER_TEMP/v415.actual"
+            if ! diff "$RUNNER_TEMP/v415.expected" "$RUNNER_TEMP/v415.actual"; then echo "v4.1.5 fails for more than its pending owner approvals"; exit 1; fi
           }
           git init --quiet "$RUNNER_TEMP/app415"
           pending415 dotnet tools/requirements-compiler/src/bin/Release/net10.0/requirements-compiler.dll v41 --source . --package requirements-compiled/v4.1.5 --base requirements-compiled/v4 --bootstrap "$RUNNER_TEMP/app415"

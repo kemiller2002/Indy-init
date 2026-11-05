@@ -1956,6 +1956,7 @@
         "dotnet:Causa.Contract.Tests.Storage.Producer.EncodeNewVerifiesAndRoundTrips",
         "dotnet:Causa.Contract.Tests.Storage.Producer.EveryCatalogEventRoundTrips",
         "dotnet:Causa.Contract.Tests.Storage.Producer.GoldenFixturesRoundTrip",
+        "dotnet:Causa.Contract.Tests.Storage.Producer.WorkingCopyNeverNamesACatalogWorkspace",
         "dotnet:Causa.Contract.Tests.Storage.Producer.WritableRefusesCatalog"
       ],
       "requirements": []

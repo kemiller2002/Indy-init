@@ -11,15 +11,19 @@ It is the smallest contract change that lets the governed build work on the real
 | Part | What it does |
 |---|---|
 | E1 | `CoreEvent` represents every causa-storage v1.0.0 event without loss: 50 cases, with every v4.1.4 name kept. The envelope carries provenance, and `VerificationFailure` carries the §11.1 reader stage. The commands whose events gained fields carry them too. |
-| W1 | `Workspace`/`WorkspaceAddress` in the connected repository; a catalog is read-only, a working copy is writable. `InvestigationRef` keys investigations by workspace and id. `Writable` is the only way to a save session, and it refuses a catalog. |
+| W1 | `Workspace` and a private `WorkspaceAddress` in the connected repository, whose role is derived, never asserted. A catalog comes from `catalog/active.json`. A working copy can only be `workspaces/demo/causa-app-<run>`, and never a workspace a catalog names. `InvestigationRef` keys investigations by workspace and id. `Writable` is the only way to a save session, and it refuses a catalog. |
 | L1 | `WorkspaceLister` lists a workspace as a read, step by step, at one commit. |
 | C1 | `SaveMachine.InitialNew` and `StorageCodec.EncodeNew` create an investigation through existing SM-SAVE transitions. T-L03 is replaced so a catalog load creates no save session. |
 
-ODR-V415-02 approves the package.
+**Two further owner decisions come with it, and approval does not imply either one.**
+- **ODR-V415-03, staging.** ODR-R10-32 A (recorded) commissions ONE combined v4.1.5 that also carries ownership FO-1..FO-3 and the T19/T22 split. This package does not carry them, so freezing it departs from that record unless the owner chooses to stage.
+- **ODR-V415-04, the fallback trigger.**
 
-No state, event, DAG task or contract file is added. No requirement, obligation or test binding is removed. Four contract files change (`analysis/amendment.json` `contractChanges`), and there is one SM-LOAD replacement and one SM-SAVE accepted note. Eight producer contract tests are added for the new surface.
+ODR-V415-02 approves the package. `owner-freeze.fsx approve v4.1.5` refuses until ODR-V415-01, -03 and -04 are all recorded.
 
-**Known requirement conflict, stated rather than hidden.** Acceptance scenario A4 says "the falsifying evidence and scope are recorded" (`docs/INVESTIGATION-ACCEPTANCE-SCENARIOS.md:47`). causa-storage v1.0.0 stores no scope on a hypothesis transition, so `HypothesisFalsified` cannot carry one. Scope can be recorded with `NegativeKnowledgeEstablished` (whose wire form has `scope`). A scope *on the falsification itself* needs causa-storage 1.1.0 (ODR-R10-26 A, OD-HC-06 B). It stays incomplete in the deferred record (`docs/rehearsal-010-dependency-reduction/CLASSIFICATION.md` §3).
+No state, event, DAG task or contract file is added. No requirement, obligation or test binding is removed. **One acceptance condition is weakened**, see below. Four contract files change (`analysis/amendment.json` `contractChanges`), and there is one SM-LOAD replacement and one SM-SAVE accepted note. Eight producer contract tests are added for the new surface.
+
+**Weakened: scenario A4's falsification scope.** Acceptance scenario A4 says "the falsifying evidence and scope are recorded" (`docs/INVESTIGATION-ACCEPTANCE-SCENARIOS.md:47`). causa-storage v1.0.0 stores no scope on a hypothesis transition, so `HypothesisFalsified` cannot carry one. Scope can be recorded with `NegativeKnowledgeEstablished` (whose wire form has `scope`). A scope *on the falsification itself* needs causa-storage 1.1.0 (ODR-R10-26 A, OD-HC-06 B). It stays incomplete in the deferred record (`docs/rehearsal-010-dependency-reduction/CLASSIFICATION.md` §3).
 
 **Not in v4.1.5; deferred with incomplete status:**
 - ownership FO-1..FO-3;
@@ -28,6 +32,8 @@ No state, event, DAG task or contract file is added. No requirement, obligation 
 - commands for the 22 added event kinds. Reading needs only the events; deciding them is domain work.
 
 The contract-first UI fold (CF-09 A) is added as a separate declared change once its role mapping compiles. See `docs/rehearsal-010-dependency-reduction/V415-DESIGN-NOTE.md`.
+
+**For builders.** The compiled `state-machine-contracts.json` still says SM-SAVE `initial: Saved`. That is the start of a loaded investigation. A *new* investigation's session starts in Unsaved (or Offline). That is stated in the `InitialNew` comment of `contracts/05-IF41-SAVE.fs`, in the SM-SAVE `accepted` note of `analysis/state-machine-amendments.json`, and by the test `Save.Producer.NewInvestigationSavesThroughExistingTransitions`.
 
 Compile it:
 

@@ -79,8 +79,8 @@ Each item keeps its source decision and the status `incomplete`. None is reporte
 | OD-V415-03 A: the fallback trigger | It declares acceptance failures (ODR-R10-25 B) |
 | O2/O3: approve and tag v4.1.5 | The freeze needs the owner's own signed record (`owner-freeze.fsx` signedByYou; launch-preflight LP-05) |
 
-These can use the lead's delegated-authority record, if its checker is accepted by the existing owner-record checks; otherwise they go in the owner batch:
-- the v4.1.5 interface-change requests for E1, W1, L1 and C1;
-- the SM-SAVE transition amendment for C1;
-- ODR-V415-IF-VIEW;
-- OD-V415-02, -04 and -05.
+These are also owner records. The lead's delegated-authority record (DA-R10-1) refuses every ODR/OD id by design:
+- ODR-V415-01, the coupled contract change for E1, W1, L1 and C1. In v4.1.5, OD-V415-01 became ODR-V415-03 and OD-V415-03 became ODR-V415-04;
+- ODR-V415-IF-VIEW.
+
+OD-V415-02, -04 and -05 are technical choices, logged by the lead as DTD entries. They satisfy no request.

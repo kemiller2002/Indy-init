@@ -35,7 +35,7 @@
     "bindings": 784,
     "planTests": 660,
     "obligations": 613,
-    "ownTests": 152,
+    "ownTests": 153,
     "suites": 11
   },
   "categoryBindings": {
@@ -71,7 +71,7 @@
       "planTests": false,
       "sha": "runs on the exact candidate SHA; every result records it",
       "counts": {
-        "tests": 149,
+        "tests": 150,
         "bindings": 0,
         "obligations": 0,
         "files": 27,
@@ -221,6 +221,9 @@
         },
         {
           "id": "dotnet:Causa.Contract.Tests.Storage.Producer.GoldenFixturesRoundTrip"
+        },
+        {
+          "id": "dotnet:Causa.Contract.Tests.Storage.Producer.WorkingCopyNeverNamesACatalogWorkspace"
         },
         {
           "id": "dotnet:Causa.Contract.Tests.Storage.Producer.WritableRefusesCatalog"

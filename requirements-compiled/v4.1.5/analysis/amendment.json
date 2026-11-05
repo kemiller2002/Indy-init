@@ -135,7 +135,7 @@
     "EXT-DATA-013"
    ],
    "rationale": "The only constructor of the private writable-address representation; it refuses a Catalog, so no catalog investigation can reach a save session. Boundary code: the type is the requirement.",
-   "sha256": "f7dd169bf5f8a1949fca0cc6154e7111c3ad54b590f37609138bf71ffb85ae84"
+   "sha256": "e9850db55677c5c15c6c0684fd43d81c0cf633610a00692244f94e8ba78107b1"
   },
   {
    "file": "02-IF41-STORAGE.fs",
@@ -146,7 +146,50 @@
     "EXT-DATA-013"
    ],
    "rationale": "Reads the address back out of the private representation (the path and role a save writes under). Boundary code: without it the private type cannot be used.",
-   "sha256": "1a1c2da91de006027c77b5c72221e3aaae7df409383f0f13c538194a11fb2d20"
+   "sha256": "c5b2b96cb6c29d09dc268521a32b5ef71a95a1cf3ed8cc796f817ea71dd21cd4"
+  },
+  {
+   "file": "02-IF41-STORAGE.fs",
+   "scope": "WorkspaceAddress.T",
+   "symbol": "Workspace",
+   "requirements": [
+    "EXT-DATA-006",
+    "EXT-DATA-013"
+   ],
+   "rationale": "Reads the workspace out of the private address representation. Boundary code: the representation is private so a role cannot be asserted.",
+   "sha256": "8873029797f0c4528b1fa0972b6468360a8c819f57a188d5bae3087c1678271f"
+  },
+  {
+   "file": "02-IF41-STORAGE.fs",
+   "scope": "WorkspaceAddress.T",
+   "symbol": "Role",
+   "requirements": [
+    "EXT-DATA-006",
+    "EXT-DATA-013"
+   ],
+   "rationale": "Reads the derived role out of the private address representation. Boundary code: the representation is private so a role cannot be asserted.",
+   "sha256": "ee59b2ea451959e18c730813a5182498f17cac5ee088aacffbdcb8f65bbb7887"
+  },
+  {
+   "file": "02-IF41-STORAGE.fs",
+   "scope": "WorkspaceAddress",
+   "symbol": "catalog",
+   "requirements": [
+    "EXT-DATA-013"
+   ],
+   "rationale": "The only constructor of a catalog address, which is read-only (Writable.ofAddress refuses it). Boundary code: the type is the requirement.",
+   "sha256": "8f41f593b819e5dbef93b527a50baaef8db5ba35ba1760510c45b8ed3f66f87c"
+  },
+  {
+   "file": "02-IF41-STORAGE.fs",
+   "scope": "WorkspaceAddress",
+   "symbol": "workingCopy",
+   "requirements": [
+    "EXT-DATA-006",
+    "EXT-DATA-013"
+   ],
+   "rationale": "The only constructor of a working-copy address: the reserved workspaces/demo/causa-app-<run> namespace with a CONTRACT section 3 run id, refusing any workspace a catalog names, so no working copy can be a catalog workspace (independent review H1). Boundary code: the type is the requirement.",
+   "sha256": "1eea38885e6fbabb6e8e6f1c3c0be9bbdd939ae69ff909f6656dff036f5d9e21"
   }
  ],
  "sharedEntrypoints": {
@@ -527,21 +570,21 @@
   },
   {
    "file": "contracts/02-IF41-STORAGE.fs",
-   "sha256": "99fe1ab2fb43f49fe5affa1f1fbb58ea23c9a83109d56940c2bb769edf5b3f74",
+   "sha256": "91f3d4878cc03f4dc311437008e033a452c7e97cd8cf2f4ce17f42b21bc15058",
    "decision": "ODR-V415-01",
    "approval": "",
-   "summary": "W1: Workspace, WorkspaceRole, WorkspaceAddress, InvestigationRef, Writable; PathOf, Verify and VerifiedInvestigation carry the workspace. C1: EncodeNew. E1: VerificationFailure.ReaderStage."
+   "summary": "W1: Workspace, WorkspaceRole, WorkspaceAddress (private; a role is derived by WorkspaceAddress.catalog or .workingCopy, never asserted), InvestigationRef, Writable; PathOf, Verify and VerifiedInvestigation carry the workspace. C1: EncodeNew. E1: VerificationFailure.ReaderStage."
   },
   {
    "file": "contracts/05-IF41-SAVE.fs",
-   "sha256": "f2be813e1a567fe84270fe57d5215f8194cd065619f8f64d1a227a03ddfe7fdb",
+   "sha256": "f758c8bc1dfc2f06ca0f65b3bfabefcf4a7700801b9e13766a320314d57b509e",
    "decision": "ODR-V415-01",
    "approval": "",
    "summary": "C1: SaveMachine.InitialNew; Initial and InvestigationSession take a Writable address. L1: ListingTarget, ListingStep, Listing, ListingInterpretation, WorkspaceLister. LoadInput.OpenRequested and ScheduleReconcileRead carry an InvestigationRef."
   },
   {
    "file": "contracts/06-IF41-APP.fs",
-   "sha256": "cf32181ffac56217f92f65a9da32410dc827017031b33d386e366ebfe16e9e65",
+   "sha256": "ee647592d3ff2749d8ac85ca48b87e19d093b62e62785c434a449afc72a46ed7",
    "decision": "ODR-V415-01",
    "approval": "",
    "summary": "Loads, Sessions, TimerKey and the machine messages keyed by InvestigationRef; Msg.ListRequested (explicit workspace selection, EXT-DATA-003) and Msg.CreateRequested (explicit creation, EXT-DATA-006); Model.Listings and ListingsInFlight."

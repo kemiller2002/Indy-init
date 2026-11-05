@@ -212,10 +212,10 @@ type ConflictInterpretation =
 type ListedInvestigation = { Ref: InvestigationRef; Path: RepoPath; Title: string option; ExpectedStateSha256: string option }
 
 /// v4.1.5 L1, W1: what to list. ActiveCatalog derives the catalog workspace from `catalog/active.json`; a working copy
-/// is named by WorkspaceLister.WorkingCopyFor.
+/// comes only from WorkspaceAddress.workingCopy.
 type ListingTarget =
     | ActiveCatalog
-    | WorkingCopyOf of Workspace
+    | WorkingCopyOf of WorkspaceAddress.T
 
 /// v4.1.5 L1: the read a listing is waiting for, so InterpretList knows what an answer means and at which commit.
 type ListingStep =
@@ -225,7 +225,7 @@ type ListingStep =
     | ListDirectoryAt of CommitOid * Workspace
 
 /// v4.1.5 L1: a workspace's investigations, all read at one commit.
-type Listing = { Address: WorkspaceAddress; ReadAt: CommitOid; Investigations: ListedInvestigation list }
+type Listing = { Address: WorkspaceAddress.T; ReadAt: CommitOid; Investigations: ListedInvestigation list }
 
 /// v4.1.5 L1: what one answer means for a listing. A listing is a read, like a load's head-then-files steps; it adds
 /// no machine state.
@@ -237,9 +237,7 @@ type ListingInterpretation =
 /// v4.1.5 L1, W1: listing a workspace. Nothing is written (EXT-DATA-006). A working copy that does not exist yet lists
 /// as empty at the head read (EXT-DATA-009: a clean start).
 type WorkspaceLister =
-    { /// `workspaces/demo/<run>` for a run id matching ^[a-z0-9][a-z0-9-]{0,63}$ (CONTRACT section 9.4), else None.
-      WorkingCopyFor: string -> Workspace option
-      List: RequestContext -> ListingTarget -> ListingStep * HttpRequest
+    { List: RequestContext -> ListingTarget -> ListingStep * HttpRequest
       InterpretList: RequestContext -> ListingTarget -> ListingStep -> HttpOutcome -> ListingInterpretation }
 
 /// Every operation that emits a request uses RequestContext.NextId for it (at most one per call) and records it as

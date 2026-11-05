@@ -26,9 +26,48 @@
       "producerFile": "src/Causa.Persistence/Storage.fs",
       "implementation": [
         {
+          "scope": "WorkspaceAddress.T",
+          "symbol": "Workspace",
+          "sha256": "8873029797f0c4528b1fa0972b6468360a8c819f57a188d5bae3087c1678271f",
+          "rationale": "Reads the workspace out of the private address representation. Boundary code: the representation is private so a role cannot be asserted.",
+          "requirements": [
+            "EXT-DATA-006",
+            "EXT-DATA-013"
+          ]
+        },
+        {
+          "scope": "WorkspaceAddress.T",
+          "symbol": "Role",
+          "sha256": "ee59b2ea451959e18c730813a5182498f17cac5ee088aacffbdcb8f65bbb7887",
+          "rationale": "Reads the derived role out of the private address representation. Boundary code: the representation is private so a role cannot be asserted.",
+          "requirements": [
+            "EXT-DATA-006",
+            "EXT-DATA-013"
+          ]
+        },
+        {
+          "scope": "WorkspaceAddress",
+          "symbol": "catalog",
+          "sha256": "8f41f593b819e5dbef93b527a50baaef8db5ba35ba1760510c45b8ed3f66f87c",
+          "rationale": "The only constructor of a catalog address, which is read-only (Writable.ofAddress refuses it). Boundary code: the type is the requirement.",
+          "requirements": [
+            "EXT-DATA-013"
+          ]
+        },
+        {
+          "scope": "WorkspaceAddress",
+          "symbol": "workingCopy",
+          "sha256": "1eea38885e6fbabb6e8e6f1c3c0be9bbdd939ae69ff909f6656dff036f5d9e21",
+          "rationale": "The only constructor of a working-copy address: the reserved workspaces/demo/causa-app-<run> namespace with a CONTRACT section 3 run id, refusing any workspace a catalog names, so no working copy can be a catalog workspace (independent review H1). Boundary code: the type is the requirement.",
+          "requirements": [
+            "EXT-DATA-006",
+            "EXT-DATA-013"
+          ]
+        },
+        {
           "scope": "Writable",
           "symbol": "ofAddress",
-          "sha256": "f7dd169bf5f8a1949fca0cc6154e7111c3ad54b590f37609138bf71ffb85ae84",
+          "sha256": "e9850db55677c5c15c6c0684fd43d81c0cf633610a00692244f94e8ba78107b1",
           "rationale": "The only constructor of the private writable-address representation; it refuses a Catalog, so no catalog investigation can reach a save session. Boundary code: the type is the requirement.",
           "requirements": [
             "EXT-DATA-006",
@@ -38,7 +77,7 @@
         {
           "scope": "Writable",
           "symbol": "address",
-          "sha256": "1a1c2da91de006027c77b5c72221e3aaae7df409383f0f13c538194a11fb2d20",
+          "sha256": "c5b2b96cb6c29d09dc268521a32b5ef71a95a1cf3ed8cc796f817ea71dd21cd4",
           "rationale": "Reads the address back out of the private representation (the path and role a save writes under). Boundary code: without it the private type cannot be used.",
           "requirements": [
             "EXT-DATA-006",
