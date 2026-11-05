@@ -89,6 +89,11 @@ let step (model: Model) (messageJson: string) : Model * string =
 let mutable private current = initial
 
 let handle (messageJson: string) : string =
-    let m, out = step current messageJson
+    // Total at the boundary: a defect becomes a reported problem with the last good model, never a dead page.
+    let m, out =
+        try step current messageJson
+        with ex ->
+            let m = { current with Problem = Some("Internal error: " + ex.Message); Pending = Map.empty }
+            m, Json.canonical (JObj [ "view", View.project m; "effects", JArr []; "cancellations", JArr [] ])
     current <- m
     out

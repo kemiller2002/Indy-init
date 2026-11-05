@@ -30,6 +30,9 @@ type Msg =
 
 type Effects = (string * HttpRequest) list
 
+/// A short display form of a commit or id; total for any length.
+let private short (s: string) = if s.Length > 8 then s.Substring(0, 8) else s
+
 let private request (m: Model) (purpose: Purpose) (r: HttpRequest) : Model * Effects =
     let id = $"r{m.NextId}"
     { m with NextId = m.NextId + 1; Pending = m.Pending.Add(id, purpose); Busy = true }, [ id, r ]
@@ -70,7 +73,7 @@ let private pathOf (m: Model) (s: Source) (dir: string) =
 let private openAt (m: Model) (s: Source) (dir: string) (commit: string) : Model * Effects =
     match repoOf m s, pathOf m s dir with
     | Some repo, Some p ->
-        let m = { m with Reads = m.Reads.Add((dir, commit), []); Problem = None; Status = $"Reading {dir} at {commit.Substring(0, 7)}…" }
+        let m = { m with Reads = m.Reads.Add((dir, commit), []); Problem = None; Status = $"Reading {dir} at {commit |> short}…" }
         StorageReader.fileNames
         |> List.map (fun f -> ReadFile(s, dir, commit, f), fileAt m.Form.Token repo commit $"{p}/{f}")
         |> requests m
@@ -91,7 +94,7 @@ let private loadFiles (m: Model) (s: Source) (dir: string) (commit: string) (ent
         Opened = Some { Source = s; DirName = dir; ReadAt = commit; Files = files; Result = result; Unsaved = [] }
         Entries = entries'
         Screen = DetailScreen
-        Status = (match result with StructurallyVerified _ -> $"Loaded {dir} at {commit.Substring(0, 7)}." | LoadRejected(e, _) -> "Refused: " + ReaderCode.code e.Code) }
+        Status = (match result with StructurallyVerified _ -> $"Loaded {dir} at {commit |> short}." | LoadRejected(e, _) -> "Refused: " + ReaderCode.code e.Code) }
 
 /// Builds the complete successor file set and sends one conditional commit (PERSIST-006).
 let private commitFiles (m: Model) (dir: string) (lines: string list) (message: string) : Model * Effects =
@@ -160,7 +163,7 @@ let private onAnswer (m: Model) (purpose: Purpose) (outcome: HttpOutcome) : Mode
         match entriesOf body with
         | Ok items ->
             let dirs = items |> List.filter (fun (n, t) -> t = "dir" && (Uuid.tryParse n).IsSome) |> List.map fst
-            let wc = dirs |> List.map (fun d -> { Source = WorkingCopy; DirName = d; Title = "Working copy " + d.Substring(0, 8); Detail = "open to read"; ExpectedState = None })
+            let wc = dirs |> List.map (fun d -> { Source = WorkingCopy; DirName = d; Title = "Working copy " + (d |> short); Detail = "open to read"; ExpectedState = None })
             settle { m with Entries = (m.Entries |> List.filter (fun e -> e.Source = Catalog)) @ wc }, []
         | Error e -> fail m ("Working copy listing: " + e)
     | ReadFile(s, dir, commit, file), Ok b64 ->
@@ -173,7 +176,7 @@ let private onAnswer (m: Model) (purpose: Purpose) (outcome: HttpOutcome) : Mode
         match commitOidOf body, m.Write with
         | Ok oid, Some repo ->
             let p = Writer.directory m.Form.Workspace dir
-            let m = { m with WriteHead = Some oid; Reads = m.Reads.Add((dir, oid), []); Status = $"Committed {oid.Substring(0, 7)}; reading it back…" }
+            let m = { m with WriteHead = Some oid; Reads = m.Reads.Add((dir, oid), []); Status = $"Committed {oid |> short}; reading it back…" }
             StorageReader.fileNames |> List.map (fun f -> ReadBack(dir, oid, f, expected), fileAt m.Form.Token repo oid $"{p}/{f}") |> requests m
         | Error e, _ -> fail m ("Save refused: " + e + ". Nothing was saved; your unsaved changes are kept. Reload before retrying if the branch moved.")
         | _, None -> fail m "Writable repository not set."
