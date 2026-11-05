@@ -64,12 +64,15 @@ Today the first non-shell UI slice starts at **T+189 (0-min CI) or T+252 (10-min
 Caveats:
 - The first version of these figures, before the independent review corrected the merge dependencies, showed the current rule *ahead* at 10-min CI (2 UI agents: T+791 against T+846). The conclusion is sensitive to those rules.
 - The model has no rework or per-slice overhead.
-- The optimization agent should reproduce these figures with its own model (SCHEDULE-INPUTS.md §6) before anyone relies on them.
+- The optimization agent has reproduced these comparisons in its own model (SCHEDULE-INPUTS.md §4b, claude/r10-optimization 4947573). The two models agree on direction. Absolute times differ with the CF-07 deferral policy.
 
 **Recommendation:**
 1. **Adopt the contract package and fixture backend** (CF-09) in the next successor package. It costs about 5 minutes at bootstrap (estimate), it is verified to compile in the real structure, and it makes early, parallel, reviewable UI work possible.
 2. **Fix CF-07 first.** The cyclic journey bindings deadlock a run under any plan.
-3. **Split UI ownership** (FILE-OWNERSHIP.json). The split, not contract-first alone, carries most of the gain: with the frozen ownership, contract-first saves only 13–44 minutes. Use **two UI agents** by default. Use **three** if the optimization agent's model, with `--slice-overhead` and `--fail-every`, still shows its gain (−52 min at 10-min CI here), because unmodelled stale-target re-merges could consume it.
+3. **Split UI ownership** (FILE-OWNERSHIP.json). The split, not contract-first alone, carries most of the gain: with the frozen ownership, contract-first saves only 13–44 minutes in this model.
+   - The optimization agent reran the comparisons in its own model (SCHEDULE-INPUTS.md §4b). **Three UI agents plus speculative verification (ODR-R10-22, depth 3)** is then the only configuration that puts Data Visible, Understood and Editable inside 420 minutes at every CI value: T+278–380, with all slices integrated at T+435–518.
+   - Without the speculative queue, use two UI agents.
+   - Before relying on the gain, confirm it with `--slice-overhead` and `--fail-every`.
 4. **Do not expect any of this to fit 420 minutes at realistic CI.** The best modelled case is T+812. Converting built-but-unmerged UI work (about four times as many slice-minutes) into integrated work needs ODR-R10-22.
 5. **None of this delivers historical browsing under v4.1.4.** ODR-R10-25 remains the critical blocker.
 

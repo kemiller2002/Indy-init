@@ -51,7 +51,12 @@ They expose CF-07: the bindings create **cyclic merge dependencies**.
 - Others are mutual journey couplings: SL-WI-GEN-EXT-DATA (bound to J1-03) needs SL-WI-INV-START, and SL-WI-INV-START (bound to J1-03 too) needs EXT-DATA.
 - The model defers these edges greedily, in a fixed order and identically in both policies, only until the graph is acyclic: the **minimal** deferral, and the latest times. It prints them.
 - CF-07 option A as worded defers every edge that closes a cycle through any merge dependency. The optimization agent implemented that in schedule-model.fsx (`--merge-deps`, `--defer-cyclic`): 42/42 approved and 93/126 successor edges. It gives the earliest times.
-- The truth lies between the two bounds until the owner decides CF-07. Treat the optimization agent's figures as the option-A result.
+- These are not monotone bounds. The optimization agent identifies three distinct policies:
+  - **literal option A**: assertions whose needs are not on main are judged at release, so merge dependencies never delay a merge. This equals its published pre-merge-dependency figures;
+  - **all cyclic edges deferred**;
+  - **minimal deferral**.
+  
+  Which one applies is the owner's CF-07 decision. §4b gives its results under the all-cyclic policy.
 
 Two further assumptions:
 - Under contract-first a UI slice *builds* without waiting for non-UI dependencies such as SL-T17. That is the CF-09 rule itself, and it is the source of the T+45 start.
@@ -115,6 +120,34 @@ What the model says, and does not say:
   - it has no rework, no speculative queue and no per-slice overhead.
   
   Its absolute times are therefore not comparable with PR #119's. Compare only within this table.
+
+## 4b. The same comparisons in the optimization agent's model
+
+Results from `schedule-model.fsx` at claude/r10-optimization 4947573 (`docs/rehearsal-010-optimization/execution-readiness/CROSS-AGENT-FINDINGS.md`):
+- These inputs were rebuilt from this PR; nothing of it is committed there.
+- Settings: setup 45, merge 3, chain-first priority, journey merge dependencies, every cyclic edge deferred.
+- Approximation: contract-first is modelled as "build after SL-T10", a little more generous than this proposal's "after UI predecessors are built".
+
+Minutes after T0 at 0 / 5 / 10-min CI:
+
+| Plan | Queue depth | Data Visible | Data Understood | Data Editable | All integrated |
+|---|---|---|---|---|---|
+| Current plan | 1 | 640/674/620 | 660/699/754 | 696/740/806 | 696/740/806 |
+| Current plan | 3 | 640/666/690 | 660/691/720 | 696/732/766 | 696/732/766 |
+| Contract-first, existing UI agents | 1 | 593/603/661 | 599/619/713 | 616/635/726 | 616/643/805 |
+| Contract-first, existing UI agents | 3 | 593/603/613 | 599/614/629 | 616/626/639 | 616/626/642 |
+| Contract-first, 1 UI agent | 1 | 746/756/766 | 752/772/792 | 769/788/818 | 769/796/831 |
+| Contract-first, 1 UI agent | 3 | 746/756/766 | 752/767/782 | 769/779/792 | 769/779/795 |
+| Contract-first, 2 UI agents | 1 | 384/429/544 | 445/485/687 | 465/517/726 | 465/585/838 |
+| Contract-first, 2 UI agents | 3 | 384/395/404 | 445/460/477 | 465/475/493 | 465/475/507 |
+| Contract-first, 3 UI agents | 1 | 278/437/583 | 340/453/635 | 328/493/726 | 435/622/838 |
+| Contract-first, **3 UI agents** | **3** | **278/290/313** | **340/351/367** | **328/348/380** | **435/471/518** |
+
+What the two models agree on:
+- Contract-first pays off only with the ownership split and more UI agents. With one UI agent it is later than the current plan.
+- **Three UI agents plus speculative verification (ODR-R10-22, depth 3) is the only configuration that puts Data Visible, Understood and Editable inside 420 minutes at every CI value.** This holds under the all-cyclic deferral. Full integration still does not fit: T+435–518.
+- Under this proposal's minimal deferral, the same plan misses 420 at 5 and 10-min CI. **The CF-07 decision is worth more than any agent-count or ordering change.**
+- Some cells are non-monotonic in CI. Read each row as a range.
 
 ## 5. Overheads (estimates, not measured)
 

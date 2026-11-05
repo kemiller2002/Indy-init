@@ -60,8 +60,8 @@ Busy is not the same as integrating sooner, though (SCHEDULE-INPUTS.md §4, mode
 The step from two to three is 52 minutes. Unmodelled stale-target re-merges and per-slice overhead could consume it. Built-but-unmerged time is already about four times the current rule's, so the integration queue is the next limit.
 
 **Recommendation:**
-- **two UI agents** by default, using the FILE-OWNERSHIP two-agent variant;
-- **three** if the optimization agent's model, with `--slice-overhead` and `--fail-every`, still shows a gain, and preferably with ODR-R10-22;
+- **three UI agents together with speculative verification** (ODR-R10-22, depth 3). In the optimization agent's model this is the only configuration that delivers Data Visible, Understood and Editable within 420 minutes at every CI value (SCHEDULE-INPUTS.md §4b);
+- **two UI agents** (the FILE-OWNERSHIP two-agent variant) if speculative verification is not adopted;
 - **never one**.
 
 ## Merge protocol
