@@ -26,7 +26,7 @@ let private evolve (inv: Investigation option) (e: Event) : Investigation option
     match inv, e with
     | None, InvestigationStarted(id, d, at) ->
         Some(add { Id = id; CreatedAt = at; State = Open; Details = d; Observations = []; Hypotheses = []
-                   Evidence = []; Relationships = []; History = [] })
+                   Evidence = []; Relationships = []; Conclusions = []; History = [] })
     | Some i, InvestigationDetailsEdited(d, _) -> Some(add { i with Details = d })
     | Some i, ObservationRecorded(o, _) -> Some(add { i with Observations = i.Observations @ [ o ] })
     | Some i, ObservationEdited(o, _) -> Some(add { i with Observations = replace (fun (x: Observation) -> x.Id) o.Id o i.Observations })
@@ -34,6 +34,7 @@ let private evolve (inv: Investigation option) (e: Event) : Investigation option
     | Some i, HypothesisEdited(h, _) -> Some(add { i with Hypotheses = replace (fun (x: Hypothesis) -> x.Id) h.Id h i.Hypotheses })
     | Some i, EvidenceAdmitted(v, _) -> Some(add { i with Evidence = i.Evidence @ [ v ] })
     | Some i, EvidenceEdited(v, _) -> Some(add { i with Evidence = replace (fun (x: Evidence) -> x.Id) v.Id v i.Evidence })
+    | Some i, ConclusionRecorded(c, _) -> Some(add { i with Conclusions = i.Conclusions @ [ c ] })
     | Some i, RelationshipRecorded(r, _) -> Some(add { i with Relationships = i.Relationships @ [ r ] })
     | Some i, RelationshipRevised(prev, next, _) ->
         let rs = i.Relationships |> List.map (fun r -> if r.Id = prev then { r with Status = Revised next.Id } else r)
@@ -91,6 +92,12 @@ let private decide (inv: Investigation option) (at: Timestamp) (cmd: Command) : 
             | Some old, Some k ->
                 ok [ RelationshipRevised(rid, { old with Id = RelationshipId(sprintf "rel-%d" (i.Relationships.Length + 1)); Kind = k; Rationale = r.Rationale; Status = Current }, at) ]
         | WithdrawRelationship(rid, reason) -> ok [ RelationshipWithdrawn(rid, reason, at) ]
+        | RecordConclusion c ->
+            match need c.Statement "INV-033" with
+            | [] ->
+                let basedOn = i.Relationships |> List.filter (fun r -> r.Status = Current) |> List.map (fun r -> r.Id)
+                ok [ ConclusionRecorded({ Id = ConclusionId(sprintf "con-%d" (i.Conclusions.Length + 1)); Statement = c.Statement.Trim(); BasedOn = basedOn }, at) ]
+            | e -> Error(Invalid e)
 
 /// The stub codec keeps documents in a process-local table keyed by a deterministic token (fake, session-only).
 let private table = System.Collections.Concurrent.ConcurrentDictionary<string, StoredInvestigation>()

@@ -20,6 +20,7 @@ let decode (name: string) (key: string option) (value: string option) : UiAction
     | "new-evidence", _ -> Some(OpenEditor NewEvidenceEditor)
     | "edit-evidence", Some id -> Some(OpenEditor(EvidenceEditor(EvidenceId id)))
     | "new-relationship", _ -> Some(OpenEditor NewRelationshipEditor)
+    | "new-conclusion", _ -> Some(OpenEditor NewConclusionEditor)
     | "reassess-relationship", Some id -> Some(OpenEditor(RelationshipEditor(RelationshipId id)))
     | "withdraw-relationship", Some id -> Some(WithdrawSelected(RelationshipId id))
     | "cancel-editor", _ -> Some CancelEditor

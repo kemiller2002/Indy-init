@@ -204,6 +204,14 @@
                     </div>
                   </form>
                 </template>
+                <template data-if="editorConclusion">
+                  <form class="ef-form ef-stack" data-event="submit-editor" novalidate>
+                    <div class="ef-field"><label class="ef-field__label" for="ed-conclusion">Conclusion</label>
+                      <textarea id="ed-conclusion" rows="4" data-event="field:INV-033" data-on="input" data-bind-value="draftINV033" data-bind-aria-invalid="InvalidINV033" aria-describedby="ed-conclusion-err"></textarea>
+                      <template data-if="HasErrINV033"><p class="ef-validation-message" id="ed-conclusion-err" data-text="ErrINV033"></p></template></div>
+                    <div class="exp-actions"><button type="submit" class="ef-button" data-variant="primary">Confirm</button><button type="button" class="ef-button" data-event="cancel-editor">Cancel</button></div>
+                  </form>
+                </template>
               </section>
             </template>
 
@@ -264,6 +272,21 @@
                     <template data-if="isCurrent"><button type="button" class="ef-button" data-event="reassess-relationship">Reassess</button></template></li>
                 </template>
               </ul>
+            </section>
+
+            <section class="ef-section ef-stack" aria-labelledby="con-heading">
+              <h2 id="con-heading">Conclusions</h2>
+              <p><button type="button" class="ef-button" data-requirement-id="INV-032" data-event="new-conclusion">Record a conclusion</button></p>
+              <section role="region" aria-label="Conclusions" data-requirement-id="INV-033">
+                <template data-if="noConclusions"><p>No conclusions yet.</p></template>
+                <ul class="exp-list">
+                  <template data-each="conclusions" data-key="id">
+                    <li class="ef-surface exp-item"><p data-text="statement"></p>
+                      <p class="exp-meta" data-text="basedOn"></p>
+                      <template data-if="isCurrent"><span class="ef-status-lozenge" data-state="ok">Current</span></template></li>
+                  </template>
+                </ul>
+              </section>
             </section>
 
             <section class="ef-section ef-stack" aria-labelledby="hist-heading" data-requirement-id="INV-035">

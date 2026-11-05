@@ -39,6 +39,7 @@ type Draft =
     | EvidenceDraft of EvidenceInput
     | RelationshipDraft of RelationshipInput
     | RevisionDraft of RelationshipRevisionInput
+    | ConclusionDraft of ConclusionInput
 
 type Workspace =
     { Id: InvestigationId
@@ -289,6 +290,7 @@ let openDraft (inv: Investigation) (editor: Editor) : Draft option =
     | NewRelationshipEditor ->
         // CR-2: no evidence or hypothesis preselected; the pickers start on an empty placeholder.
         Some(RelationshipDraft { EvidenceId = ""; HypothesisId = ""; Kind = None; Rationale = "" })
+    | NewConclusionEditor -> Some(ConclusionDraft { Statement = "" })
     | RelationshipEditor id ->
         findBy (fun (r: Relationship) -> r.Id) id inv.Relationships
         |> Option.map (fun r -> RevisionDraft { Kind = None; Rationale = "" })
@@ -312,6 +314,7 @@ let setDraftField (fieldId: string) (v: string) (d: Draft) : Draft =
     | RelationshipDraft x, "INV-038" -> RelationshipDraft { x with Rationale = v }
     | RevisionDraft x, "INV-031" -> RevisionDraft { x with Kind = kindOfText v }
     | RevisionDraft x, "INV-038" -> RevisionDraft { x with Rationale = v }
+    | ConclusionDraft _, "INV-033" -> ConclusionDraft { Statement = v }
     | other, _ -> other
 
 let setStartField (fieldId: string) (v: string) (s: StartInvestigationInput) =
@@ -333,6 +336,7 @@ let commandOf (editor: Editor) (draft: Draft) : Command option =
     | EvidenceEditor id, EvidenceDraft e -> Some(EditEvidence(id, e))
     | NewRelationshipEditor, RelationshipDraft r -> Some(LinkEvidence r)
     | RelationshipEditor id, RevisionDraft r -> Some(ReviseRelationship(id, r))
+    | NewConclusionEditor, ConclusionDraft c -> Some(RecordConclusion c)
     | _ -> None
 
 /// Runs one command through the domain. Accepted events are appended and replayed; the save state moves by Edited.
