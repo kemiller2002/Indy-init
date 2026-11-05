@@ -208,6 +208,28 @@ if (reachedWorkspace) {
   });
 }
 
+// Wave 2 (CG-6): a conclusion is a snapshot; it never resolves the investigation and survives a reload.
+if (reachedWorkspace) {
+  const conclusion = "Bearing wear is the leading explanation; inspection still pending";
+  await step("AT-19 record a conclusion; reopen restores it", ["INV-032", "INV-033", "INV-018"], async () => {
+    await page.getByRole("button", { name: "Record a conclusion" }).click();
+    await page.getByLabel("Conclusion", { exact: true }).fill("  ");
+    await confirm(page).click(); await settle(page);
+    expect(await confirm(page).isVisible(), "blank conclusion accepted");
+    await page.getByLabel("Conclusion", { exact: true }).fill(conclusion);
+    await confirm(page).click(); await settle(page);
+    expect((await req(page, "INV-033").innerText()).includes(conclusion), "conclusion not listed in INV-033 region");
+    expect(/open/i.test(await req(page, "INV-018").innerText()), "recording a conclusion changed the investigation state");
+    expect(/unsaved/i.test(await req(page, "INV-016").innerText()), "not Unsaved after recording a conclusion");
+    await page.getByRole("button", { name: "Save", exact: true }).click();
+    await page.waitForFunction(() => { const t = document.querySelector('[data-requirement-id="INV-016"]')?.textContent ?? ""; return /\bsaved\b/i.test(t) && !/unsaved/i.test(t); }, null, { timeout: 10000 });
+    await page.goto(base + "#/"); await page.reload();
+    await page.waitForSelector('[data-requirement-id="INV-039"]', { timeout: 30000 });
+    await page.getByRole("link", { name: "Pump trips (revised)" }).click();
+    await page.waitForFunction((c) => document.body.innerText.includes(c), conclusion, { timeout: 10000 });
+  });
+}
+
 // Mobile viewport: every screen fits 375 px without horizontal scrolling, and primary actions stay on screen.
 const mobile = await browser.newContext({ viewport: { width: 375, height: 812 }, isMobile: true, hasTouch: true });
 const m = await mobile.newPage();
