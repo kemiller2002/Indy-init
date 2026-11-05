@@ -13,6 +13,8 @@ PASS UI-INV-031 the relationship radio group has nothing selected initially
 PASS UI-INV-044 a link is shown on both the evidence and the hypothesis
 PASS UI-INV-038 Withdraw takes its reason from the Rationale field
 PASS UI-INV-035 edits keep identity and appear in history
+PASS UT-INV-032 Record a conclusion keeps the investigation Open and makes the save state Unsaved without a write
+PASS UT-INV-033 conclusions list every statement, the latest marked current; errors shown by FieldId INV-033
 PASS UI-ROUTE hash routes map to screens
 PASS UI-DISPATCH Limen messages decode to UiActions and responses carry view, effects, cancellations
-17 tests, 17 passed, 0 failed
+19 tests, 19 passed, 0 failed

@@ -1,7 +1,7 @@
 {
   "base": "http://localhost:4180/",
-  "at": "2026-11-05T21:38:05.886Z",
-  "passed": 21,
+  "at": "2026-11-05T21:43:21.051Z",
+  "passed": 22,
   "failed": 0,
   "results": [
     {
@@ -171,6 +171,16 @@
         "INV-039",
         "INV-040",
         "INV-008"
+      ],
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "id": "AT-19 record a conclusion; reopen restores it",
+      "requirements": [
+        "INV-032",
+        "INV-033",
+        "INV-018"
       ],
       "status": "PASS",
       "detail": ""

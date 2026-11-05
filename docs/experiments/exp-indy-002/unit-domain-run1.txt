@@ -57,4 +57,12 @@ PASS UT-INV-015 failure paths: conflict, rejection, unknown outcome, read-back m
 PASS UT-INV-016 Edited marks Unsaved from Saved/Saving/SaveFailed/UnknownOutcome; Conflict and Offline kept
 PASS UT-INV-016 retry allowed from SaveFailed and UnknownOutcome; inapplicable events leave state unchanged
 PASS UT-INV-016 Engine.ports wires the real implementations
-TOTAL 59 PASS 59 FAIL 0
+PASS UT-INV-033 conclusion statement required, not blank, <= 10000
+PASS UT-INV-033 decide refuses a blank conclusion with Invalid INV-033; no event
+PASS UT-INV-032 record conclusion before start refused with NotStarted
+PASS UT-INV-032 conclusion C-1 with no links has empty BasedOn; history appended; State stays Open
+PASS UT-INV-032 BasedOn snapshots Current relationships in order and is unaffected by later reassessment
+PASS UT-INV-032 withdrawn relationships are excluded from BasedOn
+PASS UT-INV-032 conclusions round-trip through encode/decode/replay and the store
+PASS UT-INV-032 corrupt basedOn is reported as Corrupt
+TOTAL 67 PASS 67 FAIL 0
