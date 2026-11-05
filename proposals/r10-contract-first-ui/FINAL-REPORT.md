@@ -98,3 +98,25 @@ Agent execution, approximate:
 - schedule model, ownership, documents and review: the remainder.
 
 The timebox was not exceeded to build more of the application. Only the two prototype screens exist.
+
+## Correction: what the package carries into the competition repository (2026-11-05)
+
+Found by the v4.1.5 session when it folded this file.
+
+**The rule.** The v4.1.x compiler writes interface text **only into each interface's implementing file**. Every other planned file is bootstrapped as an empty owner stub. Under OD-INDY-22 ("code starts at kickoff"), code written beforehand cannot be carried in.
+
+| Arrives at bootstrap | Must be written during the timed window |
+|---|---|
+| The IF41-VIEW presentation types, in `src/Causa.App/Projections.fs`: every view model, `UiIntent`, `UiBackend`, `RouteTarget`, the capability boundaries, and the 16 boundary members | `src/Causa.App/Ui/Presentation.fs`: validation, navigation, presentation language, form specs, action contracts, binding helpers, ids. About 474 non-blank lines in this proposal |
+| | the UiFixtures helpers: about 600 non-blank lines (backend, scenarios and the causa-data extract) |
+| | the adapter, about 110 lines in the sketch |
+| | every screen and every test |
+
+**What changes in the claims:**
+1. **UI agents can still start right after bootstrap**, but only against the types. A screen module compiles against `AppView`, `UiIntent` and the field and action ids as types. The ids' *values* (`Fields.*`, `Actions.*`) and the catalog rules (`StartForm.fields` …) live in `Presentation.fs`, so they also arrive only when integration writes that file.
+2. **Fixture-backed rendering needs a fixture first.**
+   - Recommended: integration writes `Presentation.fs` as its first post-bootstrap task.
+   - Each UI role writes a minimal fixture `UiBackend` for its own screens in its own `Scenarios.<role>.fs`, rather than waiting for a shared backend.
+   - Not measured. Model it as a per-role set-up cost before the first fixture-backed screen.
+3. **The Layer A and B evidence in this proposal** (45 tests, 9 mutants, 7 browser checks) shows that the contract design works and that the screens can be checked this way. **It is not competition evidence and does not carry over.** In the run, the same tests have to be written again against the code written at kickoff, and only Layer C judges acceptance.
+4. **A route to carrying `Presentation.fs` text** would be either a compiler change, letting a successor carry producer text, or an owner decision that such reviewed helper code counts as package content under OD-INDY-22. Both are the owner's to decide. Neither is assumed here.

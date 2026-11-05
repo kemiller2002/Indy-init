@@ -1,5 +1,7 @@
 # Verification strategy: three layers
 
+> **Correction (OD-INDY-22):** this proposal's Layer A/B code and fixtures are not carried into the competition repository. Only the IF41-VIEW types are (`v415-fold/README.md`, Correction). In the run, Layers A and B are rebuilt against code written at kickoff. The results recorded here are design evidence only.
+
 **Status:** proposal. It adds no gate and replaces none. Layer C is the existing governed verification, unchanged.
 
 Rules that hold across all three layers:

@@ -27,9 +27,9 @@ Requested by the historical-compatibility session. Each file is standalone; noth
 
 | File | What it is |
 |---|---|
-| [`07-IF41-VIEW.folded.fs`](07-IF41-VIEW.folded.fs) and [`.sha256.json`](07-IF41-VIEW.folded.sha256.json) | the folded contract, sha256 `6328f3ce3786e952178c22d42601d43f9833a5bdfb0b942b1d42ca54d2fd46ed` |
+| [`07-IF41-VIEW.folded.fs`](07-IF41-VIEW.folded.fs) and [`.sha256.json`](07-IF41-VIEW.folded.sha256.json) | the folded contract, sha256 `896800ef80d033ff69c58ed2b5d36ed83cd7f3b33269f0fac6dd6021ab22ece1`. It targets v4.1.5 revision 2: investigation identities are `InvestigationRef` (W1) |
 | [`interface-change-request.IF41-VIEW.json`](interface-change-request.IF41-VIEW.json) | one `interface-change` request (`ODR-V415-IF-VIEW`) in the owner-decision-requests format, pinning the folded file. The owner records it before the compile (`V41Package.fs:1774-1787`) |
-| [`interface-specifications.IF41-VIEW.json`](interface-specifications.IF41-VIEW.json) | the IF41-VIEW object only. Its `fsharp` equals the folded file. Producer is integration; consumers are ui-a, ui-b, ui-c and integration; there are four added operations and the producer and consumer tests |
+| [`interface-specifications.IF41-VIEW.json`](interface-specifications.IF41-VIEW.json) | the IF41-VIEW object only. Its `fsharp` equals the folded file. Producer is integration; consumers are ui, ui-2, ui-3 and integration; there are four added operations and the producer and consumer tests |
 | [`project-structure.delta.json`](project-structure.delta.json) | changes against v4.1.4's `project-structure.json`: the three UI roles (CF-10 A), the Causa.App compile order, 14 changed, 18 added and 2 split files, the UI fixture test helpers, the per-screen fragments (CF-08 A) and the rule changes |
 | [`bootstrap-fixtures.json`](bootstrap-fixtures.json) | the fixture files, what each asserts, and the generator command at causa-data `e8259df` |
 | [`start-rule.md`](start-rule.md) | the exact sentence for STARTUP-INSTRUCTIONS §4 step 1 |
@@ -56,3 +56,73 @@ They use no `Msg`, no `Model`, and no case of the event or command unions. Only 
 | CF-12 A | the contracts' own `Rule`/`Validation` |
 
 CF-06 A (Reduce motion, device scope) is the fixture's preference. CF-11 A is a theme token and CF-08 A a markup layout; both belong to the package's ownership and bootstrap, not to contract types. CF-02 A needs successor catalog entries for "Record evidence", "Reassess" and the two link choosers (catalog ratification).
+
+## Revision for v4.1.5 W1 (2026-11-05, requested by the v4.1.5 session)
+
+v4.1.5 revision 2 (PR #135, f91bd7b) keys investigations by workspace and id, as `InvestigationRef`. Every identity that dispatches back into `Update` now uses it:
+- `InvestigationSummary.Ref`;
+- `WorkspaceFrame.Ref` and `StoredRecordView.Ref`;
+- `UiRoute.WorkspaceRoute of InvestigationRef * Section`, whose route carries `ws` and `role`;
+- `UiFailure.InvestigationNotFound of InvestigationRef`;
+- the list row key, which is now the canonical route.
+
+Display-only text is unchanged. The frozen `SaveIndicatorView` and `WorkspaceHeaderView.NotSaved` still carry the bare `InvestigationId`, because they are IF41-VIEW's own v4.1.4 types, which v4.1.5 owns.
+
+**Verified:**
+- `ContractCheck.fsproj` of #135's v4.1.5 contracts, with this file as `07-IF41-VIEW.fs`: 0 warnings;
+- both negative controls refused (FS1093);
+- 44/44 Layer A tests and 7/7 Layer B.
+
+The proposal's own build links v4.1.4, plus `contracts/V415Workspace.shim.fs`: #135's W1 types copied verbatim. The shim is not part of the fold.
+
+## Revision for v4.1.5 revision 3 and the compile findings (2026-11-05)
+
+Requested by the v4.1.5 session after it folded the previous file.
+
+**Revision 3: `WorkspaceAddress.T` is private.**
+- A route can no longer build an address. `UiRoute.WorkspaceRoute` carries an unresolved `RouteTarget` (`{ Workspace: string; Role; Id }`, exactly as the URL states it).
+- `Navigation.resolve` (producer) matches a target against the references the engine listed, role included. An unresolved target is `InvestigationNotFound target`.
+- The fixture's working copy is `workspaces/demo/causa-app-fixture`, built with `WorkspaceAddress.workingCopy`.
+
+**Compile findings:**
+
+| Check | Finding | Change |
+|---|---|---|
+| X17 | 153 code members in the fold | The fold is types and signatures plus **16** boundary members that must sit beside a private representation (`FixtureLabel`, `Visible`, `Understood`, `SafeUrl`). Every other function moved to the producer file `contracts/Presentation.fs`, which becomes `src/Causa.App/Ui/Presentation.fs` (integration, compiled right after `Projections.fs`) |
+| X04 | name clash with `Msg.Navigate` | `UiIntent` is `[<RequireQualifiedAccess>]` |
+| X04 | combined operations | one operation per member |
+| X04 | integration listed as a consumer of IF41-VIEW | removed: integration is the producer |
+| X04 | unknown interface `UiBackend` | the FixtureBackend helper's `implements` is `[]` |
+| — | interface producers | IF41-APP moves to integration (`Engine.fs`) and IF41-REPORT to ui-3 (`Reporting.fs`), in `interfaceProducers` |
+| — | gaps | `ui-3` gets a fallback lane (`ui`); `Causa.TestSupport` references `Causa.App`; the screen fragments are owned through the exact integration-only path rule text in `rules.integrationOnlyPathRule` instead of a `uiFiles` key the compiler lacks |
+
+**Not package content:**
+- `start-rule.md` is for the STARTUP-INSTRUCTIONS successor (the lead's workstream A).
+- `bootstrap-fixtures.json` documents what the `testHelpers` entries in the delta contain.
+
+**Verified:**
+- #135 rev 3's `ContractCheck` with this file as `07-IF41-VIEW.fs`: 0 warnings;
+- both negative controls refused (FS1093);
+- Layer A 45/45 and Layer B 7/7.
+
+## Correction: what the package carries into the competition repository (2026-11-05)
+
+Found by the v4.1.5 session when it folded this file.
+
+**The rule.** The v4.1.x compiler writes interface text **only into each interface's implementing file**. Every other planned file is bootstrapped as an empty owner stub. Under OD-INDY-22 ("code starts at kickoff"), code written beforehand cannot be carried in.
+
+| Arrives at bootstrap | Must be written during the timed window |
+|---|---|
+| The IF41-VIEW presentation types, in `src/Causa.App/Projections.fs`: every view model, `UiIntent`, `UiBackend`, `RouteTarget`, the capability boundaries, and the 16 boundary members | `src/Causa.App/Ui/Presentation.fs`: validation, navigation, presentation language, form specs, action contracts, binding helpers, ids. About 474 non-blank lines in this proposal |
+| | the UiFixtures helpers: about 600 non-blank lines (backend, scenarios and the causa-data extract) |
+| | the adapter, about 110 lines in the sketch |
+| | every screen and every test |
+
+**What changes in the claims:**
+1. **UI agents can still start right after bootstrap**, but only against the types. A screen module compiles against `AppView`, `UiIntent` and the field and action ids as types. The ids' *values* (`Fields.*`, `Actions.*`) and the catalog rules (`StartForm.fields` …) live in `Presentation.fs`, so they also arrive only when integration writes that file.
+2. **Fixture-backed rendering needs a fixture first.**
+   - Recommended: integration writes `Presentation.fs` as its first post-bootstrap task.
+   - Each UI role writes a minimal fixture `UiBackend` for its own screens in its own `Scenarios.<role>.fs`, rather than waiting for a shared backend.
+   - Not measured. Model it as a per-role set-up cost before the first fixture-backed screen.
+3. **The Layer A and B evidence in this proposal** (45 tests, 9 mutants, 7 browser checks) shows that the contract design works and that the screens can be checked this way. **It is not competition evidence and does not carry over.** In the run, the same tests have to be written again against the code written at kickoff, and only Layer C judges acceptance.
+4. **A route to carrying `Presentation.fs` text** would be either a compiler change, letting a successor carry producer text, or an owner decision that such reviewed helper code counts as package content under OD-INDY-22. Both are the owner's to decide. Neither is assumed here.

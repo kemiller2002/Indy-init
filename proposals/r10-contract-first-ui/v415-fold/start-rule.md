@@ -8,7 +8,7 @@
 
 **Sentence to add as the second sentence of step 1:**
 
-> A UI slice (implementation boundary ui-a, ui-b or ui-c) is ready to **start** once the bootstrap (SL-T10) is integrated and every UI slice it depends on is **built** on its own branch, because it builds against IF41-VIEW and the bootstrapped fixture backend; it is ready to **merge** only as every slice is, on `slice-gate` PASS with its declared dependencies integrated and its bound journey assertions judged as ODR-R10-33 decides.
+> A UI slice (implementation boundary ui, ui-2 or ui-3) is ready to **start** once the bootstrap (SL-T10) is integrated and every UI slice it depends on is **built** on its own branch, because it builds against IF41-VIEW and the bootstrapped fixture backend; it is ready to **merge** only as every slice is, on `slice-gate` PASS with its declared dependencies integrated and its bound journey assertions judged as ODR-R10-33 decides.
 
 **What it does not change:**
 - the slice gate and the completion gate;
@@ -16,3 +16,11 @@
 - the rule that a fixture-backed result is never evidence: every fixture view carries `BackendOrigin.FixtureBackend`, and Layer C is unchanged (`../VERIFICATION-STRATEGY.md`).
 
 The schedule model needs the build/merge split this sentence states (`buildDependsOn`/`mergeDependsOn`, `../SCHEDULE-INPUTS.md` §6).
+
+**Correction (OD-INDY-22, found by the v4.1.5 session):** "builds against IF41-VIEW and the bootstrapped fixture backend" overstates what bootstrap provides.
+
+The bootstrap carries only the IF41-VIEW **types**. The fixture backend and the producer functions (`Ui/Presentation.fs`) are empty stubs that are written in the run. Read the sentence as:
+
+> … because it builds against IF41-VIEW, and against a fixture `UiBackend` written in the run (its own `Scenarios.<role>.fs`, or integration's shared one once written) …
+
+The merge rule is unchanged.

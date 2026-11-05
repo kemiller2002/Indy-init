@@ -36,31 +36,33 @@ let private connect (engine: Engine) (s: State) =
         { s with Model = m; Local = { s.Local with Errors = [] } }, fx
     | errors, _ -> { s with Local = { s.Local with Errors = errors } }, []
 
-let private currentId s = match s.Local.Route with WorkspaceRoute(id, _) -> Some id | _ -> None
+/// The route's target. Under the frozen v4.1.4 Model an investigation is keyed by its id alone; under v4.1.5 the adapter
+/// resolves the target against Model.Listings (the addresses the engine listed) and an unresolved one is not found.
+let private currentTarget s = match s.Local.Route with WorkspaceRoute(t, _) -> Some t | _ -> None
 
 let private dispatch (engine: Engine) (intent: UiIntent) (s: State) : State * HostEffect list =
     match intent with
-    | Navigate r ->
+    | UiIntent.Navigate r ->
         let m, fx = engine.Update (Msg.Navigate(Route(Navigation.format r))) s.Model
         { Model = m; Local = { s.Local with Route = r } }, fx
-    | Input(f, v, _) when Connection.fields |> List.exists (fun x -> x.Field = f) ->
+    | UiIntent.Input(f, v, _) when Connection.fields |> List.exists (fun x -> x.Field = f) ->
         { s with Local = { s.Local with Form = Connection.withField f v s.Local.Form } }, []
     // Start and content fields wait for the domain owner's command payloads (C1, C5); kept, not dropped.
-    | Input(f, v, _) -> { s with Local = { s.Local with Drafts = s.Local.Drafts |> Map.add f v } }, []
-    | Secret(_, c) -> { s with Local = { s.Local with Credential = Some c; Form = { s.Local.Form with CredentialEntered = true } } }, []
-    | Activate(a, _) when a = Actions.connect -> connect engine s
-    | Activate(a, _) when a = Actions.disconnect ->
+    | UiIntent.Input(f, v, _) -> { s with Local = { s.Local with Drafts = s.Local.Drafts |> Map.add f v } }, []
+    | UiIntent.Secret(_, c) -> { s with Local = { s.Local with Credential = Some c; Form = { s.Local.Form with CredentialEntered = true } } }, []
+    | UiIntent.Activate(a, _) when a = Actions.connect -> connect engine s
+    | UiIntent.Activate(a, _) when a = Actions.disconnect ->
         let m, fx = engine.Update (Msg.Connection ConnectionInput.DisconnectConfirmed) s.Model
         { s with Model = m }, fx
-    | Activate(a, _) when a = Actions.save ->
-        match currentId s with
-        | Some id ->
-            let m, fx = engine.Update (Msg.SessionInput(id, SaveInput.SaveRequested)) s.Model
+    | UiIntent.Activate(a, _) when a = Actions.save ->
+        match currentTarget s with
+        | Some t ->
+            let m, fx = engine.Update (Msg.SessionInput(t.Id, SaveInput.SaveRequested)) s.Model
             { s with Model = m }, fx
         | None -> s, []
     // Content commands need a CommandEnvelope whose Command payloads are opaque in the frozen stubs (C1, C5): the
     // adapter cannot build RecordObservation etc. until the domain owner defines them.
-    | Activate _ -> s, []
+    | UiIntent.Activate _ -> s, []
 
 let private connectionView (s: State) : ConnectionView =
     { State = s.Model.Connection
@@ -71,7 +73,7 @@ let private connectionView (s: State) : ConnectionView =
       Connected = s.Model.Context |> Option.map (fun c -> sprintf "%s/%s on %s" c.Repository.Owner c.Repository.Name c.Repository.Branch)
       WriteScope = (match s.Model.Connection with Connected true -> Writable | Connected false -> ReadOnlyConnection | _ -> WriteScopeUnknown) }
 
-let private loadFailure (id: InvestigationId) (l: LoadFailure) =
+let private loadFailure (id: RouteTarget) (l: LoadFailure) =
     match l with
     | Unverifiable fs -> InvalidData(sprintf "%d verification failure(s)" fs.Length)
     | ProviderFailed AuthenticationFailed -> CredentialRefused
@@ -90,7 +92,8 @@ let private project (s: State) : AppView =
                   Drafts = { Values = Map.empty; Errors = []; OpenEditor = None }
                   Details = { Open = false; Form = { Title = ""; ProblemStatement = ""; Question = "" }; Errors = []; Edit = NotOffered; SaveDetails = NotOffered; Cancel = NotOffered }
                   Save = None; State = ScreenFailed f }
-            let load = s.Model.Loads |> Map.tryFind id |> Option.defaultValue NotLoaded
+            // The frozen v4.1.4 Model is keyed by InvestigationId; v4.1.5 keys it by InvestigationRef (drop `.Id` then).
+            let load = s.Model.Loads |> Map.tryFind id.Id |> Option.defaultValue NotLoaded
             let view =
                 match load with
                 | LoadFailed f -> failedWith (loadFailure id f)
@@ -99,13 +102,13 @@ let private project (s: State) : AppView =
                 // or hypotheses for the frame or the sections.
                 | LoadState.Loaded _ | NotLoaded | UnavailableOffline -> failedWith contentGap
             let save =
-                s.Model.Sessions |> Map.tryFind id |> Option.map (fun session ->
+                s.Model.Sessions |> Map.tryFind id.Id |> Option.map (fun session ->
                     let kind = saveKind session.State
                     { Kind = kind
                       // The frozen machine's own projection (IF41-VIEW Projections.SaveIndicator) supplies Text, Glyph,
                       // Politeness and the commit time; the sketch takes the label and the choices from the contracts.
                       Indicator =
-                        { InvestigationId = id; Label = PresentationLanguage.saveState kind; Text = ""; Glyph = ""
+                        { InvestigationId = id.Id; Label = PresentationLanguage.saveState kind; Text = ""; Glyph = ""
                           Actions = SaveChoices.forKind kind
                           Politeness = (match kind with ConflictKind | SaveFailedKind | UnknownOutcomeKind -> Assertive | _ -> Polite)
                           LastSavedCommitTime = None }

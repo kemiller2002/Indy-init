@@ -47,7 +47,8 @@ test('connected catalog: J1-01/J1-02 locators find the screen; four stored cases
   await expect(page.getByRole('link', { name: /new investigation/i }).or(page.getByRole('button', { name: /new investigation/i })).first()).toBeVisible();
   await expect(page.getByRole('navigation', { name: /primary|main/i }).getByRole('link', { name: 'Investigations', exact: true })).toHaveAttribute('aria-current', 'page');
   const href = await region.getByRole('link', { name: /Apollo 11/ }).getAttribute('href');
-  expect(href).toBe('#/investigations/e3adbee5-5096-5a10-bbfb-cecda86a154b');
+  // The route carries the workspace with the id (v4.1.5 W1: the same case can be stored in two workspaces).
+  expect(href).toBe('#/investigations/e3adbee5-5096-5a10-bbfb-cecda86a154b?ws=workspaces%2Fdemo%2Fdemonstration-v1&role=catalog');
   await noSecret(page);
   expect(await axe(page)).toEqual([]);
 });

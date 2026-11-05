@@ -3,6 +3,7 @@ namespace Causa.Ui.Contracts
 open System
 open System.Text.RegularExpressions
 open Causa.Domain
+open Causa.Persistence
 
 /// A fixture's label. Every fixture value carries one, so a fixture-backed screen can never be reported as an
 /// integrated one (VERIFICATION-STRATEGY.md, Layer A/B versus Layer C). Construct only through FixtureLabel.create.
@@ -64,15 +65,6 @@ type Shown<'a> =
     | AsStored of Visible<'a>
     | AsProjected of Understood<'a>
 
-[<RequireQualifiedAccess>]
-module Shown =
-    let value s = match s with AsStored v -> Visible.value v | AsProjected u -> Understood.value u
-    let capability s = match s with AsStored _ -> DataVisible | AsProjected _ -> DataUnderstood
-    let isFixture s =
-        match s with
-        | AsStored v -> (Visible.fixtureLabel v).IsSome
-        | AsProjected u -> (Understood.fixtureLabel u).IsSome
-
 /// A count that may be unknown. Unknown is never rendered as zero (UI-022, UI-001 "where supported").
 type Count =
     | Known of int
@@ -120,35 +112,6 @@ type FieldSpec =
 
 type ValidationError = { Field: FieldId; Rule: Rule; Message: string }
 
-[<RequireQualifiedAccess>]
-module Validation =
-    let private message (label: string) rule =
-        match rule with
-        | Required -> sprintf "%s is required." label
-        | MinLength n -> sprintf "%s must have at least %d character%s." label n (if n = 1 then "" else "s")
-        | MaxLength n -> sprintf "%s must have at most %d characters." label n
-        | Pattern _ -> sprintf "%s is not in the expected form." label
-        | OneOf options -> sprintf "Choose one of: %s." (String.Join(", ", options))
-
-    let private holds (value: string) rule =
-        match rule with
-        | Required -> not (String.IsNullOrWhiteSpace value)
-        // Catalog INV-019 (OD-INDY-21): whitespace-only counts as empty for a minimum length.
-        | MinLength n -> value.Trim().Length >= n
-        | MaxLength n -> value.Length <= n
-        // An optional field that is empty is not checked against its pattern; Required/MinLength judge emptiness.
-        | Pattern p -> value = "" || Regex.IsMatch(value, p)
-        | OneOf options -> value = "" || List.contains value options
-
-    /// Pure: the field's errors for this value, in rule order.
-    let check (spec: FieldSpec) (value: string) : ValidationError list =
-        spec.Rules
-        |> List.filter (holds value >> not)
-        |> List.map (fun r -> { Field = spec.Field; Rule = r; Message = message spec.Label r })
-
-    let checkAll (specs: FieldSpec list) (values: Map<FieldId, string>) : ValidationError list =
-        specs |> List.collect (fun s -> check s (values |> Map.tryFind s.Field |> Option.defaultValue ""))
-
 /// An absolute http(s) URL, the only form INV-029 allows to be rendered as a link (UI-005 sanitising).
 type SafeUrl = private SafeUrl of string
 
@@ -161,11 +124,17 @@ module SafeUrl =
         else None
     let value (SafeUrl s) = s
 
+/// What a route asks for, exactly as the URL states it. It is not an address: v4.1.5 addresses are derived, never
+/// asserted (WorkspaceAddress.catalog / workingCopy, 02-IF41-STORAGE.fs), so whoever holds the listings resolves a target
+/// against the workspaces it actually listed, and an unresolved target is not found.
+type RouteTarget = { Workspace: string; Role: WorkspaceRole; Id: InvestigationId }
+
 // ---- Failure and loading ---------------------------------------------------------------------------------------------
 
 /// Why data is not shown. Each case has its own plain-language copy (UiStates.describe, UI-010, UI-028).
 type UiFailure =
-    | InvestigationNotFound of InvestigationId
+    /// Keyed by workspace and id (v4.1.5 W1): the same case can be stored in two workspaces.
+    | InvestigationNotFound of RouteTarget
     /// The stored files did not verify (schema, digest, replay refusal). Fails closed: nothing partial is shown.
     | InvalidData of detail: string
     | NotAuthorized
@@ -181,15 +150,6 @@ type UiFailure =
 type Remote<'a> =
     | NotRequested
     /// The copy describes the user's task (UI-024 "Opening investigation"), never a fabricated progress figure.
-    | Waiting of task: string
+    | Waiting of activity: string
     | Ready of 'a
     | Failed of UiFailure
-
-[<RequireQualifiedAccess>]
-module Remote =
-    let map f r =
-        match r with
-        | Ready x -> Ready(f x)
-        | NotRequested -> NotRequested
-        | Waiting t -> Waiting t
-        | Failed e -> Failed e

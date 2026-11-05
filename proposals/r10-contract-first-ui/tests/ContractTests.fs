@@ -35,13 +35,27 @@ let ``only absolute http(s) URLs become SafeUrl (INV-029, UI-005)`` () =
         Assert.True((SafeUrl.tryCreate bad).IsNone, bad)
 
 [<Fact>]
-let ``routes round-trip; unknown ids and paths are not-found`` () =
-    let id = InvestigationId(Guid.Parse "e3adbee5-5096-5a10-bbfb-cecda86a154b")
-    let routes = [ InvestigationsRoute; StartRoute; AdministrationRoute; SettingsRoute ] @ (Navigation.sections |> List.map (fun s -> WorkspaceRoute(id, s)))
+let ``routes round-trip; a route needs its workspace and role; unknown ids and paths are not-found`` () =
+    let t : RouteTarget = { Workspace = "workspaces/demo/demonstration-v1"; Role = Causa.Persistence.WorkspaceRole.Catalog; Id = InvestigationId(Guid.Parse "e3adbee5-5096-5a10-bbfb-cecda86a154b") }
+    let routes = [ InvestigationsRoute; StartRoute; AdministrationRoute; SettingsRoute ] @ (Navigation.sections |> List.map (fun s -> WorkspaceRoute(t, s)))
     for r in routes do Assert.Equal(r, Navigation.parse (Navigation.format r))
-    Assert.Equal("#/investigations/e3adbee5-5096-5a10-bbfb-cecda86a154b", Navigation.format (WorkspaceRoute(id, Overview)))
-    Assert.True(match Navigation.parse "#/investigations/not-a-guid" with NotFoundRoute _ -> true | _ -> false)
-    Assert.True(match Navigation.parse "#/investigations/e3adbee5-5096-5a10-bbfb-cecda86a154b?tab=bogus" with NotFoundRoute _ -> true | _ -> false)
+    Assert.Equal("#/investigations/e3adbee5-5096-5a10-bbfb-cecda86a154b?ws=workspaces%2Fdemo%2Fdemonstration-v1&role=catalog", Navigation.format (WorkspaceRoute(t, Overview)))
+    // The same id in another workspace is another route (v4.1.5 W1).
+    Assert.NotEqual<string>(Navigation.format (WorkspaceRoute(t, Overview)), Navigation.format (WorkspaceRoute({ t with Workspace = "workspaces/demo/historical-v1" }, Overview)))
+    Assert.True(match Navigation.parse "#/investigations/e3adbee5-5096-5a10-bbfb-cecda86a154b" with NotFoundRoute _ -> true | _ -> false)
+    Assert.True(match Navigation.parse "#/investigations/not-a-guid?ws=w&role=catalog" with NotFoundRoute _ -> true | _ -> false)
+    Assert.True(match Navigation.parse "#/investigations/e3adbee5-5096-5a10-bbfb-cecda86a154b?ws=w&role=catalog&tab=bogus" with NotFoundRoute _ -> true | _ -> false)
+
+[<Fact>]
+let ``a route target resolves only against listed addresses, role included (v4.1.5 rev 3)`` () =
+    let catalog = Causa.Persistence.WorkspaceAddress.catalog (Causa.Persistence.Workspace "workspaces/demo/demonstration-v1")
+    let r : Causa.Persistence.InvestigationRef = { Address = catalog; Id = InvestigationId(Guid.NewGuid()) }
+    let t = Navigation.targetOf r
+    Assert.Equal(Some r, Navigation.resolve [ r ] t)
+    // A URL that asserts the working-copy role for a catalog workspace resolves to nothing: no address is built from it.
+    Assert.Equal(None, Navigation.resolve [ r ] { t with Role = Causa.Persistence.WorkspaceRole.WorkingCopy })
+    Assert.Equal(None, Navigation.resolve [] t)
+    Assert.True((Causa.Persistence.WorkspaceAddress.workingCopy [ catalog.Workspace ] "Bad Run").IsNone)
 
 [<Fact>]
 let ``primary navigation has exactly one current destination on every route`` () =
@@ -50,14 +64,14 @@ let ``primary navigation has exactly one current destination on every route`` ()
 
 [<Fact>]
 let ``corrective actions appear only where supported`` () =
-    let id = InvestigationId(Guid.NewGuid())
+    let id : Causa.Persistence.InvestigationRef = { Address = (Causa.Persistence.WorkspaceAddress.workingCopy [] "w").Value; Id = InvestigationId(Guid.NewGuid()) }
     Assert.DoesNotContain(CorrectiveActions, Navigation.sectionLinks id Overview false |> List.map (fun l -> l.Destination))
     Assert.Contains(CorrectiveActions, Navigation.sectionLinks id Overview true |> List.map (fun l -> l.Destination))
 
 [<Fact>]
 let ``failure copy says what happened, what is kept and what next, without technical words (UI-010, UI-017, UI-023)`` () =
     let failures =
-        [ InvestigationNotFound(InvestigationId(Guid.NewGuid())); InvalidData "d"; NotAuthorized; CredentialRefused; ProviderUnreachable
+        [ InvestigationNotFound { Workspace = "w"; Role = Causa.Persistence.WorkspaceRole.Catalog; Id = InvestigationId(Guid.NewGuid()) }; InvalidData "d"; NotAuthorized; CredentialRefused; ProviderUnreachable
           ProviderRateLimited; ProviderError "p"; CapabilityAbsent(DataUnderstood, "x") ]
     for f in failures do
         let c = PresentationLanguage.failure f

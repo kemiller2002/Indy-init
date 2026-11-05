@@ -20,6 +20,12 @@ The ownership rules (FILE-OWNERSHIP.json `rules`, checked by `OwnershipTests`):
 
 ## How a UI agent works before the domain exists
 
+> **Correction (OD-INDY-22):** step 1 below carries only the IF41-VIEW *types* into the run. The contracts' producer functions (`Ui/Presentation.fs`) and the UiFixtures are empty stubs at bootstrap.
+> - Integration writes `Presentation.fs` first.
+> - Each UI role writes its own minimal fixture `UiBackend` before its first fixture-backed screen.
+>
+> See `v415-fold/README.md`, Correction.
+
 1. **Bootstrap (T10).** Integration writes:
    - `src/Causa.App/Ui/Contracts/*.fs`, copied from `proposals/r10-contract-first-ui/contracts/` (without the linked frozen files: the bootstrap defines those);
    - `tests/Causa.TestSupport/UiFixtures/*`;

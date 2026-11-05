@@ -19,6 +19,8 @@
     <Compile Include="../../../requirements-compiled/v4.1.4/contracts/06-IF41-APP.fs" Link="Frozen/06-IF41-APP.fs" />
     <Compile Include="../../../requirements-compiled/v4.1.4/contracts/07-IF41-VIEW.fs" Link="Frozen/07-IF41-VIEW.fs" />
     <Compile Include="../../../requirements-compiled/v4.1.4/contracts/08-IF41-REPORT.fs" Link="Frozen/08-IF41-REPORT.fs" />
+    <!-- v4.1.5 W1 workspace types (PR #135), verbatim, until v4.1.5 is on main. Not folded into IF41-VIEW. -->
+    <Compile Include="V415Workspace.shim.fs" />
     <!-- Presentation contracts (this proposal). -->
     <Compile Include="Ids.fs" />
     <Compile Include="Types.fs" />
@@ -32,5 +34,7 @@
     <Compile Include="System.fs" />
     <Compile Include="UiActions.fs" />
     <Compile Include="Bindings.fs" />
+    <!-- Producer implementation over the contract types (not folded into IF41-VIEW). -->
+    <Compile Include="Presentation.fs" />
   </ItemGroup>
 </Project>
