@@ -2,3 +2,11 @@
 {"t":"2026-11-05T21:22:32Z","agent":"domain","group":"CG-1-START","event":"compile-pass","detail":"Engine + Tests first build clean"}
 {"t":"2026-11-05T21:22:32Z","agent":"domain","group":"CG-1-START","event":"tests","detail":"14 pass 0 fail; contract-check PASS"}
 {"t":"2026-11-05T21:22:32Z","agent":"domain","group":"CG-1-START","event":"complete","detail":"validateStart, decide/evolve/replay for StartInvestigation","durationSec":120}
+{"t":"2026-11-05T21:22:36Z","agent":"domain","group":"CG-2-HEADER","event":"start","detail":"CG-2..CG-5 all RELEASED; merged coordinator branch"}
+{"t":"2026-11-05T21:27:27Z","agent":"domain","group":"CG-2-HEADER","event":"complete","detail":"validators + decide/evolve cases implemented; tests pass"}
+{"t":"2026-11-05T21:27:27Z","agent":"domain","group":"CG-3-CONTENT","event":"complete","detail":"validators + decide/evolve cases implemented; tests pass"}
+{"t":"2026-11-05T21:27:27Z","agent":"domain","group":"CG-4-RELATIONSHIP","event":"complete","detail":"validators + decide/evolve cases implemented; tests pass"}
+{"t":"2026-11-05T21:27:27Z","agent":"domain","group":"CG-2-HEADER","event":"repair","detail":"tooling slip (not a compile failure): a shell heredoc command blocked on stdin for 120s and was killed; rewrote Validation.fs with the file tool","durationSec":150}
+{"t":"2026-11-05T21:27:27Z","agent":"domain","group":"CG-4-RELATIONSHIP","event":"compile-pass","detail":"CG-2..4 build clean first attempt"}
+{"t":"2026-11-05T21:27:27Z","agent":"domain","group":"CG-4-RELATIONSHIP","event":"tests","detail":"48 pass 0 fail; contract-check PASS"}
+{"t":"2026-11-05T21:27:27Z","agent":"domain","group":"CG-5-PERSISTENCE","event":"start","detail":"codec, saveTransition, memory store, Engine.ports"}

@@ -2,7 +2,8 @@ module Exp002.Tests.Program
 
 open Exp002.Tests.Runner
 
-let allTests: Test list = StartTests.tests
+let allTests: Test list =
+    StartTests.tests @ DomainTests.header @ DomainTests.content @ DomainTests.relationship
 
 [<EntryPoint>]
 let main _ =

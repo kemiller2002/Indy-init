@@ -46,3 +46,59 @@ let private details (problem: string) (title: string) (question: string) : Resul
 let validateStart: ValidateStart =
     fun input ->
         both (investigationId input.InvestigationId) (details input.ProblemStatement input.Title input.PrimaryQuestion)
+
+/// INV-034: the same rules as start, without the identifier.
+let validateDetails: ValidateDetails =
+    fun input -> details input.ProblemStatement input.Title input.PrimaryQuestion
+
+/// INV-024 (required, <= 10000), INV-025 (optional, <= 10000).
+let validateObservation: ValidateObservation =
+    fun input -> both (requiredText "INV-024" 10000 input.ObservationText) (optionalText "INV-025" 10000 input.SourceReference)
+
+/// INV-026, INV-011: both required, <= 10000.
+let validateHypothesis: ValidateHypothesis =
+    fun input -> both (requiredText "INV-026" 10000 input.Statement) (requiredText "INV-011" 10000 input.Explanation)
+
+let private urlPattern = Regex(@"^https?://[^\s]+$", RegexOptions.CultureInvariant)
+
+/// INV-029: optional; blank -> None; <= 2000; ^https?://[^\s]+$.
+let sourceUrl (value: string) : Result<string option, FieldError list> =
+    optionalText "INV-029" 2000 value
+    |> Result.bind (function
+        | Some u when not (urlPattern.IsMatch u) -> Error [ err "INV-029" "Must be an http:// or https:// URL without spaces." ]
+        | v -> Ok v)
+
+/// The validated evidence fields, with optional fields normalised to options.
+let evidenceFields (input: EvidenceInput) : Result<string * string * string option * string option, FieldError list> =
+    both
+        (both (requiredText "INV-027" 200 input.Label) (requiredText "INV-012" 10000 input.OriginalContent))
+        (both (optionalText "INV-028" 10000 input.SourceReference) (sourceUrl input.SourceUrl))
+    |> Result.map (fun ((l, c), (r, u)) -> l, c, r, u)
+
+/// INV-027 (required, <= 200), INV-012 (required, <= 10000), INV-028 (optional, <= 10000), INV-029.
+/// On success returns the input with blank optional fields normalised to "".
+let validateEvidence: ValidateEvidence =
+    fun input ->
+        evidenceFields input
+        |> Result.map (fun (l, c, r, u) ->
+            { Label = l
+              OriginalContent = c
+              SourceReference = Option.defaultValue "" r
+              SourceUrl = Option.defaultValue "" u })
+
+/// INV-031: a kind must be selected (no default).
+let kind (value: RelationshipKind option) : Result<RelationshipKind, FieldError list> =
+    match value with
+    | Some k -> Ok k
+    | None -> Error [ err "INV-031" "Select a relationship." ]
+
+/// INV-038: rationale (and withdrawal reason) required, <= 10000.
+let rationale (value: string) : Result<string, FieldError list> = requiredText "INV-038" 10000 value
+
+/// INV-031, INV-038. Evidence/hypothesis existence is checked by Domain.decide against state.
+let validateRelationship: ValidateRelationship =
+    fun input -> both (kind input.Kind) (rationale input.Rationale)
+
+/// Reassessment of a relationship: the same rules as a new link (INV-031, INV-038).
+let validateRevision (input: RelationshipRevisionInput) : Result<RelationshipKind * string, FieldError list> =
+    both (kind input.Kind) (rationale input.Rationale)
