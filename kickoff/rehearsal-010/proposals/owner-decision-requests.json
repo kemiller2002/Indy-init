@@ -1,6 +1,6 @@
 {
   "schema": "indy-init.v41-owner-decision-requests/1",
-  "status": "Pending: every request below. The owner records them with tools/owner-freeze.fsx decide rehearsal-010, in the order of OWNER-APPROVAL-EXECUTION.md; requests that pin a file record its sha256 at origin/main as shown at the moment of the decision. No request here is recorded by an agent (RDP-003).",
+  "status": "Pending: every request below. The owner records them with tools/owner-freeze.fsx decide rehearsal-010, in the order of OWNER-APPROVAL-EXECUTION.md; requests that pin a file record its sha256 at origin/main as shown at the moment of the decision. No request here is recorded by an agent (RDP-003). ODR-R10-19..33 (added by the optimization work, PR #119) are not required for launch by launch-preflight LP-05; each lists every option as launchable.",
   "recordFormat": "As package v4: one operator approval in kickoff/rehearsal-007/approvals.causa.json (prefix APR-R10-OWNER), one change per decision, committed by the owner without agent trailers. A change that approves a pinned file also carries pins: [{path, sha256, field?, value?}] computed by the script from origin/main. A request lists the options Rehearsal 010 can launch with in \"launchable\" (default [\"A\"]); launch-preflight LP-05 refuses any other recorded option.",
   "requests": [
     {
@@ -321,6 +321,286 @@
           "field": "scopeSha256",
           "show": "counts"
         }
+      ]
+    },
+    {
+      "id": "ODR-R10-33",
+      "kind": "decision",
+      "title": "CF-07: how a slice gate judges bound journey assertions whose needs are not yet merged",
+      "question": "Under the frozen journeys rule (tools/requirements-compiler/src/Ledger.fs 391-410) every assertion bound to a slice must pass live at its merge. SL-T16 is bound to J2-08, which needs slices that depend on T16, and slices sharing J1-03/J1-06 need each other, so the approved plan can never merge T16 (execution-readiness/CROSS-AGENT-FINDINGS.md; PR #121 CF-07). How are such assertions judged?",
+      "options": [
+        "A: judge a bound assertion at a slice merge only once the slices it needs are integrated; otherwise judge it at the release gate (no assertion is dropped; release still requires all)",
+        "B: rebind the cyclic assertions to the slice that completes their journey (a successor slice manifest; needs a recompile and preflight)",
+        "C: keep the rule as frozen (the approved plan deadlocks at SL-T16; Rehearsal 010 cannot complete)"
+      ],
+      "recommendation": "A for Rehearsal 010; B as part of the v4.1.5 successor (ODR-R10-32).",
+      "rationale": "The deadlock is a property of the frozen bindings and gate, so only the owner can change how they are judged.",
+      "impact": "Without A or B no launch can complete. A keeps the published schedule (TIME-TO-WORKING-APPLICATION.md); a stricter reading moves Connect and Browse by hours (CROSS-AGENT-FINDINGS.md).",
+      "launchable": [
+        "A",
+        "B",
+        "C"
+      ]
+    },
+    {
+      "id": "ODR-R10-25",
+      "kind": "decision",
+      "title": "Make the contracts able to read the real causa-data catalog (event union, workspace, list, creation path)",
+      "question": "The frozen v4.1.4 CoreEvent union cannot represent the Apollo 1, Apollo 11 and Challenger histories, and the contracts lack a workspace, a list operation and a creation path (DATA-REPOSITORY-CONTRACT.md section 6 C1, C3, C4, S1, S2). Which?",
+      "options": [
+        "A: commission a v4.1.5 contract successor mirroring causa-data storage v1.0.0 (with ODR-R10-32), before Rehearsal 010",
+        "B: launch on v4.1.4 and declare in advance that EXT-DATA-013, T25 and journeys J1-06/J2-08 are expected to fail against real data",
+        "C: postpone Rehearsal 010 until A is frozen"
+      ],
+      "recommendation": "A if the launch can move; otherwise B, stated before T0 and never relabelled as success.",
+      "rationale": "Contract shapes may not be improvised by an agent (ADRP-005-O4).",
+      "impact": "Without A or C, browsing the historical catalog (M2) is never delivered.",
+      "launchable": [
+        "A",
+        "B",
+        "C"
+      ]
+    },
+    {
+      "id": "ODR-R10-26",
+      "kind": "decision",
+      "title": "Requirement content with no wire form in causa-data v1.0.0 (INV-023, 025, 027, 031 values, 034, 035)",
+      "question": "Primary question, observation source, evidence label, the consistent-with/inconclusive kinds, rename and identity-preserving edits have no field or event in causa-data v1.0.0 (DATA-REPOSITORY-CONTRACT.md section 6 C5). Which?",
+      "options": [
+        "A: causa-data storage contract v1.1 adds them (the causa-data owner)",
+        "B: amend the requirements to the v1.0.0 vocabulary",
+        "C: keep both and declare the affected journeys expected failures"
+      ],
+      "recommendation": "A or B; never assume insufficient = inconclusive.",
+      "rationale": "Changes requirements or the data contract.",
+      "impact": "Blocks M3, M4 and M5 journeys against real data.",
+      "launchable": [
+        "A",
+        "B",
+        "C"
+      ]
+    },
+    {
+      "id": "ODR-R10-28",
+      "kind": "decision",
+      "title": "Credentials and App installation for real-provider reads",
+      "question": "PF-015-O2/O3 require a read-only CAUSA_GITHUB_TOKEN and a separate write token; the live preflight supplies one write-capable App token, and the App is not yet installed on causa-acceptance-r10 (the last live run failed on that) or confirmed for causa-data. Which?",
+      "options": [
+        "A: two installation tokens (read-only on the catalog repository, read/write on the acceptance repository), the App installed on both by the owner",
+        "B: keep one write-capable token and record PF-015-O2/O3 as an exception"
+      ],
+      "recommendation": "A.",
+      "rationale": "Installation is an authenticated owner action.",
+      "impact": "Blocks a real-provider PASS for M1 and M2.",
+      "launchable": [
+        "A",
+        "B"
+      ]
+    },
+    {
+      "id": "ODR-R10-29",
+      "kind": "decision",
+      "title": "Milestone M1 boundary",
+      "question": "UI-001-O1 and EXT-DATA-013 (show the catalog after Connect) are blocked by ODR-R10-25. Move them from M1 to M2?",
+      "options": [
+        "A: M1 = connect only; UI-001-O1 and EXT-DATA-013 move to M2 (no requirement changes)",
+        "B: keep the current grouping (inputs/milestones.json)"
+      ],
+      "recommendation": "A.",
+      "rationale": "A planning grouping; changes no requirement.",
+      "impact": "Under B, M1 inherits M2's contract blocker.",
+      "launchable": [
+        "A",
+        "B"
+      ]
+    },
+    {
+      "id": "ODR-R10-19",
+      "kind": "decision",
+      "title": "Adopt a successor scope with split work items",
+      "question": "Adopt one successor scope (same 205 requirements and 890 obligations; split work items) instead of the approved 37-item scope 59bfef5a? Only before T0.",
+      "options": [
+        "A: adopt docs/rehearsal-010-optimization/proposals/scope-manifest.successor.json (53 items, a847f98c...)",
+        "B: adopt docs/rehearsal-010-optimization/proposals/scope-manifest.milestone-aligned.json (57 items, 723c9eb3...)",
+        "C: keep the approved scope 59bfef5a"
+      ],
+      "recommendation": "A or B only together with ODR-R10-22 (they need the speculative queue at realistic CI); otherwise C.",
+      "rationale": "Changes what ODR-R10-01 approves; the lock, readiness docs and STARTUP must then name the new digest.",
+      "impact": "Milestone-first ordering (ODR-R10-27) needs split items; see SCHEDULE-COMPARISON.md.",
+      "launchable": [
+        "A",
+        "B",
+        "C"
+      ],
+      "pins": [
+        {
+          "path": "docs/rehearsal-010-optimization/proposals/scope-manifest.successor.json",
+          "field": "scopeSha256",
+          "show": "counts"
+        },
+        {
+          "path": "docs/rehearsal-010-optimization/proposals/scope-manifest.milestone-aligned.json",
+          "field": "scopeSha256",
+          "show": "counts"
+        }
+      ]
+    },
+    {
+      "id": "ODR-R10-20",
+      "kind": "decision",
+      "title": "Commission a v4.1.5 package that rebalances UI file ownership",
+      "question": "Split Views/Investigation.fs into capability files and give ui-2 part of the UI work (inputs/slice-roles.v415-proposed.json)?",
+      "options": [
+        "A: commission it (X01-X21, independent review, freeze, tag) as part of ODR-R10-32",
+        "B: keep v4.1.4 ownership"
+      ],
+      "recommendation": "A, for the rehearsal after 010 unless 010 moves.",
+      "rationale": "A frozen-package change.",
+      "impact": "Model: full completion at 10-min CI T+794 -> T+563 (hypothetical ownership).",
+      "launchable": [
+        "A",
+        "B"
+      ]
+    },
+    {
+      "id": "ODR-R10-21",
+      "kind": "decision",
+      "title": "In that successor, split DAG tasks T19, T22 (and optionally T20)",
+      "question": "Split T19 (save machine) and T22 (workspace views); T20 into read and write paths optionally?",
+      "options": [
+        "A: split T19 and T22 (not T20 alone)",
+        "B: keep them"
+      ],
+      "recommendation": "A, with ODR-R10-20.",
+      "rationale": "A frozen DAG change.",
+      "impact": "T20 split alone gains about 6 minutes (run R3).",
+      "launchable": [
+        "A",
+        "B"
+      ]
+    },
+    {
+      "id": "ODR-R10-22",
+      "kind": "decision",
+      "title": "Speculative verification in the governed gate",
+      "question": "Authorize building the speculative-verification gate (VERIFICATION-OPTIMIZATION.md section 7, controls S1-S7) and, once it and an independent review exist, verify up to 3 candidates at once with merges strictly in order?",
+      "options": [
+        "A: authorize building it; adoption (N = 3) follows only after S1-S7 and an independent review pass",
+        "B: keep one candidate at a time"
+      ],
+      "recommendation": "A.",
+      "rationale": "A gate change; the verified tree must equal the merged tree (strengthened STALE_TARGET).",
+      "impact": "At 10-min CI the authoritative list and creation arrive 75 and 278 minutes earlier in the combined plan (E8 vs E8c); none at 0-min CI.",
+      "launchable": [
+        "A",
+        "B"
+      ]
+    },
+    {
+      "id": "ODR-R10-23",
+      "kind": "decision",
+      "title": "Plan set-up at 25 minutes instead of 45",
+      "question": "Use 25 minutes of set-up for planning (measured machine time 3-6 min; Rehearsal 009 reached its bootstrap commit at T+2.2)? The 420-minute clock is unaffected.",
+      "options": [
+        "A: 25",
+        "B: keep 45"
+      ],
+      "recommendation": "A (BOOTSTRAP-CRITICAL-PATH.md suggests 10 is defensible).",
+      "rationale": "A planning value only.",
+      "impact": "Critical path -20 min.",
+      "launchable": [
+        "A",
+        "B"
+      ]
+    },
+    {
+      "id": "ODR-R10-24",
+      "kind": "decision",
+      "title": "Allow a checksum-verified toolchain bundle and warm caches before T0 (no application code)",
+      "question": "Pre-install the pinned toolchain, NuGet and Playwright caches before T0, verified against the lock at T0?",
+      "options": [
+        "A: allow",
+        "B: install at T0"
+      ],
+      "recommendation": "A.",
+      "rationale": "Removes the network dependency that broke conditor init in Rehearsal 009.",
+      "impact": "About 2-4 minutes measured.",
+      "launchable": [
+        "A",
+        "B"
+      ]
+    },
+    {
+      "id": "ODR-R10-27",
+      "kind": "decision",
+      "title": "Order ready slices by functional milestone first",
+      "question": "When several slices are ready, start the one needed by the earliest functional milestone (inputs/milestones.json), then the longest chain?",
+      "options": [
+        "A: milestone-first",
+        "B: longest chain first (current)"
+      ],
+      "recommendation": "A, with ODR-R10-19.",
+      "rationale": "Reorders only work that is ready anyway.",
+      "impact": "10-min CI: M1 T+359 -> T+283, M2 T+729 -> T+309; costs about 38 obligations by T+420.",
+      "launchable": [
+        "A",
+        "B"
+      ],
+      "pins": [
+        {
+          "path": "docs/rehearsal-010-optimization/inputs/milestones.json"
+        }
+      ]
+    },
+    {
+      "id": "ODR-R10-30",
+      "kind": "decision",
+      "title": "Add a read-only data-browser slice SL-M0 depending only on T10",
+      "question": "Add SL-M0 \"Data visible (raw stored data, not replayed)\", carrying no requirement ID and verified by its own real-provider journey (M0-VERIFICATION.md section 2)?",
+      "options": [
+        "A: adopt, with ODR-R10-19, before T0",
+        "B: no"
+      ],
+      "recommendation": "A.",
+      "rationale": "Adds a work item; changes no acceptance condition.",
+      "impact": "Raw data on screen at T+116/125/135 (0/5/10-min CI).",
+      "launchable": [
+        "A",
+        "B"
+      ]
+    },
+    {
+      "id": "ODR-R10-31",
+      "kind": "decision",
+      "title": "Contract-first UI: generated UI items start after T16 instead of T17",
+      "question": "Relax \"a generated item never precedes the kernel\" for UI items only (they code against the frozen contracts and bootstrap stubs; their merges still run the full gate)?",
+      "options": [
+        "A: relax for UI items",
+        "B: keep T17"
+      ],
+      "recommendation": "A, with ODR-R10-19 and -30.",
+      "rationale": "Governance rule change.",
+      "impact": "10-min CI: M2 309 -> 270, full 769 -> 730 (model).",
+      "launchable": [
+        "A",
+        "B"
+      ]
+    },
+    {
+      "id": "ODR-R10-32",
+      "kind": "decision",
+      "title": "One combined v4.1.5 successor package",
+      "question": "Compile ODR-R10-20, -21, -25 (and -33 option B if chosen), file splits FO-2/FO-3 and the published contracts of the contract-first and historical-data agents into one package with one review and one freeze?",
+      "options": [
+        "A: one package",
+        "B: separate successors"
+      ],
+      "recommendation": "A.",
+      "rationale": "Both proposals extend the same frozen types.",
+      "impact": "Enables the combined plan (E8).",
+      "launchable": [
+        "A",
+        "B"
       ]
     }
   ]

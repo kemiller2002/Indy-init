@@ -1,0 +1,320 @@
+{
+  "schema": "indy-init.r10-integration-ownership/1",
+  "status": "Derived from the frozen v4.1.4 ownership (requirements-compiled/v4.1.4/agent-file-ownership.json); proposes no ownership change. ownerMatchesFrozen is computed, not asserted.",
+  "projectGraph": "Causa.Domain <- Causa.Persistence <- Causa.App <- Causa.Host (analysis/project-structure.json)",
+  "modules": [
+    {
+      "module": "shell / composition",
+      "owner": "integration",
+      "paths": [
+        {
+          "path": "src/Causa.App/View.fs",
+          "frozenOwner": [
+            "integration"
+          ]
+        },
+        {
+          "path": "src/Causa.App/Program.fs",
+          "frozenOwner": [
+            "integration"
+          ]
+        },
+        {
+          "path": "src/Causa.Host/",
+          "frozenOwner": [
+            "integration"
+          ]
+        },
+        {
+          "path": "web/index.html",
+          "frozenOwner": [
+            "integration"
+          ]
+        },
+        {
+          "path": "web/boundary.js",
+          "frozenOwner": [
+            "integration"
+          ]
+        },
+        {
+          "path": "web/causa.css",
+          "frozenOwner": [
+            "integration"
+          ]
+        },
+        {
+          "path": "Causa.slnx",
+          "frozenOwner": [
+            "integration"
+          ]
+        },
+        {
+          "path": "Directory.Build.props",
+          "frozenOwner": [
+            "integration"
+          ]
+        },
+        {
+          "path": "Directory.Packages.props",
+          "frozenOwner": [
+            "integration"
+          ]
+        },
+        {
+          "path": ".github/",
+          "frozenOwner": [
+            "integration"
+          ]
+        },
+        {
+          "path": "package.json",
+          "frozenOwner": [
+            "integration"
+          ]
+        },
+        {
+          "path": "playwright.config.ts",
+          "frozenOwner": [
+            "integration"
+          ]
+        }
+      ],
+      "note": "the only module that wires implementations together; owns every project and solution file",
+      "ownerMatchesFrozen": true
+    },
+    {
+      "module": "UI contracts (frozen)",
+      "owner": "coordinator",
+      "paths": [
+        {
+          "path": "requirements-compiled/v4.1.4/contracts/06-IF41-APP.fs",
+          "frozenOwner": "not in the ownership manifest (frozen package file)"
+        },
+        {
+          "path": "requirements-compiled/v4.1.4/contracts/07-IF41-VIEW.fs",
+          "frozenOwner": "not in the ownership manifest (frozen package file)"
+        },
+        {
+          "path": "requirements-compiled/v4.1.4/contracts/08-IF41-REPORT.fs",
+          "frozenOwner": "not in the ownership manifest (frozen package file)"
+        }
+      ],
+      "note": "frozen; changes only by a versioned successor through the coordinator",
+      "ownerMatchesFrozen": true
+    },
+    {
+      "module": "connection and browser UI",
+      "owner": "ui",
+      "paths": [
+        {
+          "path": "src/Causa.App/Connection.fs",
+          "frozenOwner": [
+            "ui"
+          ]
+        },
+        {
+          "path": "src/Causa.App/Routes.fs",
+          "frozenOwner": [
+            "ui"
+          ]
+        },
+        {
+          "path": "src/Causa.App/Views/Shell.fs",
+          "frozenOwner": [
+            "ui"
+          ]
+        },
+        {
+          "path": "src/Causa.App/Views/Dashboard.fs",
+          "frozenOwner": [
+            "ui"
+          ]
+        }
+      ],
+      "note": "",
+      "ownerMatchesFrozen": true
+    },
+    {
+      "module": "investigation editor UI",
+      "owner": "ui",
+      "paths": [
+        {
+          "path": "src/Causa.App/Views/Investigation.fs",
+          "frozenOwner": [
+            "ui"
+          ]
+        },
+        {
+          "path": "src/Causa.App/Views/SaveIndicator.fs",
+          "frozenOwner": [
+            "ui"
+          ]
+        },
+        {
+          "path": "src/Causa.App/Views/ConflictReview.fs",
+          "frozenOwner": [
+            "ui"
+          ]
+        }
+      ],
+      "note": "",
+      "ownerMatchesFrozen": true
+    },
+    {
+      "module": "UI state and projections (serialization point)",
+      "owner": "ui",
+      "paths": [
+        {
+          "path": "src/Causa.App/Engine.fs",
+          "frozenOwner": [
+            "ui"
+          ]
+        },
+        {
+          "path": "src/Causa.App/Update.fs",
+          "frozenOwner": [
+            "ui"
+          ]
+        },
+        {
+          "path": "src/Causa.App/Projections.fs",
+          "frozenOwner": [
+            "ui"
+          ]
+        }
+      ],
+      "note": "one frozen Update: Msg -> Model; every UI stream adds Msg handling here",
+      "ownerMatchesFrozen": true
+    },
+    {
+      "module": "analysis UI",
+      "owner": "ui-2",
+      "paths": [
+        {
+          "path": "src/Causa.App/Views/Graph.fs",
+          "frozenOwner": [
+            "ui-2"
+          ]
+        },
+        {
+          "path": "src/Causa.App/Views/Report.fs",
+          "frozenOwner": [
+            "ui-2"
+          ]
+        },
+        {
+          "path": "src/Causa.App/Views/History.fs",
+          "frozenOwner": [
+            "ui-2"
+          ]
+        },
+        {
+          "path": "src/Causa.App/Views/Administration.fs",
+          "frozenOwner": [
+            "ui-2"
+          ]
+        }
+      ],
+      "note": "Shell.fs read-only",
+      "ownerMatchesFrozen": true
+    },
+    {
+      "module": "GitHub data adapter",
+      "owner": "persistence",
+      "paths": [
+        {
+          "path": "src/Causa.Persistence/Wire.fs",
+          "frozenOwner": [
+            "persistence"
+          ]
+        },
+        {
+          "path": "src/Causa.Persistence/GitHubRequests.fs",
+          "frozenOwner": [
+            "persistence"
+          ]
+        },
+        {
+          "path": "src/Causa.Persistence/Classify.fs",
+          "frozenOwner": [
+            "persistence"
+          ]
+        },
+        {
+          "path": "src/Causa.Persistence/Storage.fs",
+          "frozenOwner": [
+            "persistence"
+          ]
+        },
+        {
+          "path": "src/Causa.Persistence/Canonical.fs",
+          "frozenOwner": [
+            "persistence"
+          ]
+        },
+        {
+          "path": "src/Causa.Persistence/Reader.fs",
+          "frozenOwner": [
+            "persistence"
+          ]
+        }
+      ],
+      "note": "",
+      "ownerMatchesFrozen": true
+    },
+    {
+      "module": "persistence state machines",
+      "owner": "persistence",
+      "paths": [
+        {
+          "path": "src/Causa.Persistence/SaveMachine.fs",
+          "frozenOwner": [
+            "persistence"
+          ]
+        },
+        {
+          "path": "src/Causa.Persistence/Reconcile.fs",
+          "frozenOwner": [
+            "persistence"
+          ]
+        },
+        {
+          "path": "src/Causa.Persistence/Conflict.fs",
+          "frozenOwner": [
+            "persistence"
+          ]
+        },
+        {
+          "path": "src/Causa.Persistence/LoadMachine.fs",
+          "frozenOwner": [
+            "persistence"
+          ]
+        },
+        {
+          "path": "src/Causa.Persistence/Session.fs",
+          "frozenOwner": [
+            "persistence"
+          ]
+        }
+      ],
+      "note": "",
+      "ownerMatchesFrozen": true
+    },
+    {
+      "module": "domain engine",
+      "owner": "domain",
+      "paths": [
+        {
+          "path": "src/Causa.Domain/",
+          "frozenOwner": [
+            "domain",
+            "integration"
+          ]
+        }
+      ],
+      "note": "references nothing",
+      "ownerMatchesFrozen": false
+    }
+  ]
+}

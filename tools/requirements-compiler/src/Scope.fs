@@ -245,20 +245,131 @@ let withScopeHash (manifest: Json) =
     | JObj ps -> JObj(ps @ [ "scopeSha256", JStr(scopeHash manifest) ])
     | j -> j
 
+// ---- work-item split (a governed successor scope; the approved scope is never rewritten in place) --------------------
+
+/// A split plan (indy-init.work-item-split/1) divides generated work items into smaller ones:
+///   { "splits": [ { "workItem": "WI-INV-WORKSPACE",
+///                   "parts": [ { "id", "title", "owner"?, "dependsOn": [..], "requirements": [..] } ] } ] }
+/// A part keeps its parent's owner. The split is refused unless every requirement of the parent is in exactly one part,
+/// every part has a requirement, part ids are new and unique across the plan, every dependency names a work item that
+/// exists after the split (never a replaced parent), the whole post-split work-item graph is acyclic, every part still
+/// reaches (through that graph) each dependency its parent had, no other work item depends on the parent, the parent is
+/// a generated item (a DAG task is split only in a successor package), and a requirement that depends on another
+/// requirement of the same parent is in a part that reaches that requirement's part.
+let applySplit (plan: Json) (items: WorkItem list) (requirements: Requirement list) : Result<WorkItem list * Requirement list, string list> =
+    let ids = items |> List.map (fun w -> w.Id) |> Set.ofList
+    let reqDeps = requirements |> List.map (fun r -> r.Id, r.DependsOn) |> Map.ofList
+    // Facts about the whole plan, so every part is judged against the work items that exist after the split.
+    let replacedParents = arr "splits" plan |> List.map (str "workItem") |> Set.ofList
+    let allPartIds = arr "splits" plan |> List.collect (fun sp -> arr "parts" sp |> List.map (str "id"))
+    let afterSplit = (ids - replacedParents) + Set.ofList allPartIds
+    // The whole work-item graph after the split (kept items and every part), for reachability and cycles across splits.
+    let graph =
+        (items |> List.filter (fun w -> not (replacedParents.Contains w.Id)) |> List.map (fun w -> w.Id, w.DependsOn))
+        @ (arr "splits" plan |> List.collect (fun sp -> arr "parts" sp |> List.map (fun pj -> str "id" pj, strs "dependsOn" pj)))
+        |> List.groupBy fst |> List.map (fun (k, vs) -> k, vs |> List.collect snd) |> Map.ofList
+    let rec globalReaches (from: string) (target: string) (seen: Set<string>) =
+        from = target || (not (seen.Contains from) && (graph |> Map.tryFind from |> Option.defaultValue [] |> List.exists (fun d -> globalReaches d target (seen.Add from))))
+    let globalCycle =
+        // Kahn's algorithm over the post-split graph (dependencies outside it are ignored here; unknown ones are refused per part)
+        let nodes = graph |> Map.toList |> List.map fst |> Set.ofList
+        let rec go (done': Set<string>) (rest: Set<string>) =
+            if rest.IsEmpty then Set.empty
+            else
+                let ready = rest |> Set.filter (fun n -> graph[n] |> List.forall (fun d -> done'.Contains d || not (nodes.Contains d)))
+                if ready.IsEmpty then rest else go (done' + ready) (rest - ready)
+        go Set.empty nodes
+    let checkOne (sp: Json) : string list * (WorkItem * WorkItem list) option =
+        let parentId = str "workItem" sp
+        match items |> List.tryFind (fun w -> w.Id = parentId) with
+        | None -> [ sprintf "SPLIT_UNKNOWN_WORK_ITEM %s is not a work item of the scope" parentId ], None
+        | Some parent ->
+            let parts =
+                arr "parts" sp |> List.map (fun pj ->
+                    { Id = str "id" pj
+                      Title = strOpt "title" pj |> Option.defaultValue (str "id" pj)
+                      Origin = "generated-split"
+                      Owner = strOpt "owner" pj |> Option.defaultValue parent.Owner   // a different owner is refused below
+                      DependsOn = strs "dependsOn" pj
+                      Requirements = strs "requirements" pj
+                      GateRequirements = [] })
+            let partIds = parts |> List.map (fun p -> p.Id)
+            let assigned = parts |> List.collect (fun p -> p.Requirements)
+            let partOf = parts |> List.collect (fun p -> p.Requirements |> List.map (fun r -> r, p.Id)) |> Map.ofList
+            let depsOf = parts |> List.map (fun p -> p.Id, p.DependsOn) |> Map.ofList
+            let rec reaches (from: string) (target: string) (seen: Set<string>) =
+                from = target || (not (seen.Contains from) && (depsOf |> Map.tryFind from |> Option.defaultValue [] |> List.exists (fun d -> reaches d target (seen.Add from))))
+            let cyclic = parts |> List.exists (fun p -> p.DependsOn |> List.exists (fun d -> List.contains d partIds && reaches d p.Id Set.empty))
+            let problems =
+                [ if parent.Origin <> "generated" then yield sprintf "SPLIT_FROZEN_TASK %s is an execution-DAG task; it is split only in a successor package" parentId
+                  if parts.Length < 2 then yield sprintf "SPLIT_TOO_FEW_PARTS %s needs at least two parts" parentId
+                  for r in parent.Requirements do
+                      match assigned |> List.filter ((=) r) |> List.length with
+                      | 0 -> yield sprintf "SPLIT_REQUIREMENT_DROPPED %s of %s is in no part" r parentId
+                      | 1 -> ()
+                      | n -> yield sprintf "SPLIT_REQUIREMENT_DUPLICATED %s of %s is in %d parts" r parentId n
+                  for r in assigned |> List.distinct do
+                      if not (List.contains r parent.Requirements) then yield sprintf "SPLIT_FOREIGN_REQUIREMENT %s is not %s's" r parentId
+                  for p in parts do
+                      if p.Requirements.IsEmpty then yield sprintf "SPLIT_EMPTY_PART %s has no requirement" p.Id
+                      if ids.Contains p.Id then yield sprintf "SPLIT_ID_TAKEN %s is already a work item" p.Id
+                      // The frozen file ownership decides who implements what: a part keeps its parent's owner.
+                      if p.Owner <> parent.Owner then yield sprintf "SPLIT_OWNER_CHANGED %s names owner %s; its parent %s is %s's (an ownership change is a successor package)" p.Id p.Owner parentId parent.Owner
+                      for d in p.DependsOn do
+                          if d = parentId then yield sprintf "SPLIT_DEPENDS_ON_PARENT %s depends on the item it replaces" p.Id
+                          elif replacedParents.Contains d then yield sprintf "SPLIT_DEPENDS_ON_REPLACED %s depends on %s, which this plan replaces" p.Id d
+                          elif not (afterSplit.Contains d) then yield sprintf "SPLIT_UNKNOWN_DEPENDENCY %s depends on unknown %s" p.Id d
+                      // Every part still waits for what its parent waited for (for a generated item, the kernel T17).
+                      for pd in parent.DependsOn do
+                          if not (globalReaches p.Id pd Set.empty) then
+                              yield sprintf "SPLIT_DROPS_PARENT_DEPENDENCY %s does not wait for %s, which its parent %s waited for" p.Id pd parentId
+                  if partIds |> List.distinct |> List.length <> partIds.Length then yield sprintf "SPLIT_DUPLICATE_PART_ID in %s" parentId
+                  if cyclic then yield sprintf "SPLIT_CYCLE among the parts of %s" parentId
+                  for w in items do
+                      if List.contains parentId w.DependsOn then yield sprintf "SPLIT_PARENT_HAS_DEPENDENTS %s depends on %s" w.Id parentId
+                  for r in parent.Requirements do
+                      for d in reqDeps |> Map.tryFind r |> Option.defaultValue [] do
+                          match partOf |> Map.tryFind r, partOf |> Map.tryFind d with
+                          | Some pr, Some pd when pr <> pd && not (cyclic) && not (reaches pr pd Set.empty) ->
+                              yield sprintf "SPLIT_BREAKS_REQUIREMENT_DEPENDENCY %s (in %s) depends on %s (in %s), which %s does not reach" r pr d pd pr
+                          | _ -> () ]
+            problems, (if problems.IsEmpty then Some(parent, parts) else None)
+    let perSplit = arr "splits" plan |> List.map checkOne
+    let parents = arr "splits" plan |> List.map (str "workItem")
+    let problems =
+        (perSplit |> List.collect fst)
+        @ (if parents |> List.distinct |> List.length <> parents.Length then [ "SPLIT_PARENT_TWICE a work item is split more than once" ] else [])
+        @ (allPartIds |> List.countBy id |> List.filter (fun (_, n) -> n > 1) |> List.map (fun (i, n) -> sprintf "SPLIT_DUPLICATE_PART_ID %s is used by %d parts across the plan" i n))
+        @ (if globalCycle.IsEmpty then [] else [ sprintf "SPLIT_CYCLE the work items after the split have a dependency cycle among %s" (globalCycle |> Set.toList |> String.concat ", ") ])
+        @ (if (arr "splits" plan).IsEmpty then [ "SPLIT_EMPTY_PLAN the plan splits nothing" ] else [])
+    if not problems.IsEmpty then Error problems
+    else
+        let done' = perSplit |> List.choose snd
+        let replaced = done' |> List.map (fun (p, _) -> p.Id) |> Set.ofList
+        let newItems = items |> List.collect (fun w -> match done' |> List.tryFind (fun (p, _) -> p.Id = w.Id) with Some(_, parts) -> parts | None -> [ w ])
+        let partOfReq = done' |> List.collect (fun (_, parts) -> parts |> List.collect (fun p -> p.Requirements |> List.map (fun r -> r, p.Id))) |> Map.ofList
+        let newReqs =
+            requirements |> List.map (fun r ->
+                { r with WorkItems = r.WorkItems |> List.map (fun w -> if replaced.Contains w then partOfReq[r.Id] else w) })
+        Ok(newItems, newReqs)
+
 // ---- compile -------------------------------------------------------------------------------------------------------
 
-let compile (s: Sources) : Json =
+/// The manifest for the given sources, with an optional transformation of the work items (a split plan) and the
+/// fields that record it. Without a transformation it is the approved scope, unchanged.
+let private build (s: Sources) (transform: WorkItem list -> Requirement list -> WorkItem list * Requirement list) (extra: (string * Json) list) : Json =
     let dagTasks = arr "tasks" s.Dag
-    let planReqs = planRequirements s dagTasks
-    let catalogReqs = catalogRequirements s
-    let requirements = planReqs @ catalogReqs
-    let planIds = planReqs |> List.map (fun r -> r.Id) |> Set.ofList
+    let planReqs0 = planRequirements s dagTasks
+    let catalogReqs0 = catalogRequirements s
+    let planIds = planReqs0 |> List.map (fun r -> r.Id) |> Set.ofList
     let gateLevel =
         arr "requirements" s.Baseline
         |> List.filter (fun r -> not (planIds.Contains(str "id" r)))
         |> List.map (fun r -> str "id" r)
         |> List.sort
-    let items = workItems dagTasks requirements gateLevel
+    let items, requirements = transform (workItems dagTasks (planReqs0 @ catalogReqs0) gateLevel) (planReqs0 @ catalogReqs0)
+    let planReqs = requirements |> List.filter (fun r -> r.Origin = "v4-plan")
+    let catalogReqs = requirements |> List.filter (fun r -> r.Origin = "catalog")
     let producers =
         arr "suites" s.ExecutionPlan
         |> List.filter (fun su -> boolOr "planTests" false su)
@@ -267,7 +378,7 @@ let compile (s: Sources) : Json =
     let obligations = requirements |> List.collect (fun r -> r.Obligations)
     let planObligations = planReqs |> List.collect (fun r -> r.Obligations)
     let count p = obligations |> List.filter p |> List.length
-    JObj
+    JObj(
         [ "schema", JStr "indy-init.approved-scope/1"
           "description", JStr "The full approved release scope of the rehearsal: every P0 requirement of the frozen plan and every requirement of the ratified catalog, each with its obligations, evidence producers, implementation work items and dependencies. A passing catalog is not this scope. Generated by `requirements-compiler scope compile`; `scope preflight` refuses any manifest that differs from what the sources give."
           "source", JObj [ "repository", JStr s.Repository; "commit", JStr s.Commit ]
@@ -318,7 +429,25 @@ let compile (s: Sources) : Json =
           JObj
               [ "rule", JStr "A P0 requirement leaves scope only through an exclusion whose approval is an authenticated operator change {requirement_id, action: exclude} in the pinned approvals file (v4 exclusionPolicy). None is recorded. A catalog requirement whose applicability fact is false is NOT_APPLICABLE, not excluded."
                 "requirements", JArr [] ] ]
+          @ extra)
     |> withScopeHash
+
+/// The approved scope of the sources.
+let compile (s: Sources) : Json = build s (fun items reqs -> items, reqs) []
+
+/// A successor scope: the sources' scope with a split plan applied, recording the plan's digest. Refused (Error) when
+/// the plan would drop, duplicate or reorder any requirement or obligation (applySplit).
+let compileWithSplit (s: Sources) (plan: Json) (planPath: string) (planSha256: string) : Result<Json, string list> =
+    let dagTasks = arr "tasks" s.Dag
+    let reqs = planRequirements s dagTasks @ catalogRequirements s
+    let planIds = planRequirements s dagTasks |> List.map (fun r -> r.Id) |> Set.ofList
+    let gateLevel = arr "requirements" s.Baseline |> List.filter (fun r -> not (planIds.Contains(str "id" r))) |> List.map (fun r -> str "id" r) |> List.sort
+    match applySplit plan (workItems dagTasks reqs gateLevel) reqs with
+    | Error e -> Error e
+    | Ok _ ->
+        build s (fun items rs -> match applySplit plan items rs with Ok x -> x | Error e -> failwithf "%A" e)
+            [ "workItemSplit", JObj [ "status", JStr "PROPOSED successor scope: it replaces the approved scope only through an owner decision (ODR-R10-01 for this scopeSha256)"; "plan", JStr planPath; "planSha256", JStr planSha256 ] ]
+        |> Ok
 
 // ---- preflight -------------------------------------------------------------------------------------------------------
 
@@ -352,6 +481,18 @@ let preflight (expected: Json) (manifest: Json) : Refusal list =
               if serialize w <> serialize h && missing.IsEmpty then yield refusal "REQUIREMENT_ALTERED" (sprintf "%s differs from what the sources give" id)
       for KeyValue(id, _) in have do
           if not (want.ContainsKey id) then yield refusal "REQUIREMENT_UNSOURCED" (sprintf "%s is in the manifest but in no approved source" id)
+      // The work items too (who implements what, in which order): a manifest whose items differ from what the sources
+      // (and, for a successor, its recorded split plan) give is refused, so a split's guarantees hold after compile.
+      let wantItems, haveItemsById = byId "workItems" expected, byId "workItems" manifest
+      for KeyValue(id, w) in wantItems do
+          match haveItemsById.TryFind id with
+          | None -> yield refusal "WORK_ITEM_MISSING" (sprintf "%s is a work item of the sources and not of the manifest" id)
+          | Some h when serialize h <> serialize w -> yield refusal "WORK_ITEM_ALTERED" (sprintf "%s (owner, dependencies or requirements) differs from what the sources give" id)
+          | Some _ -> ()
+      for KeyValue(id, _) in haveItemsById do
+          if not (wantItems.ContainsKey id) then yield refusal "WORK_ITEM_UNSOURCED" (sprintf "%s is in the manifest but the sources give no such work item" id)
+      if arr "workItems" manifest |> List.map (str "id") |> List.distinct |> List.length <> (arr "workItems" manifest).Length then
+          yield refusal "WORK_ITEM_DUPLICATED" "the manifest declares a work item id more than once"
       // Coverage inside the manifest: every executable requirement is built by a declared work item, every
       // obligation is judged by a declared producer.
       for KeyValue(id, h) in have do

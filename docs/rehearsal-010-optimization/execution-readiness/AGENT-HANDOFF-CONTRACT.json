@@ -1,0 +1,22 @@
+{
+  "schema": "indy-init.r10-agent-handoff/1",
+  "status": "PROPOSED. A view over records that already exist; it adds no authority and replaces no Praxis, Ordo or progress-event contract. A handoff that disagrees with the records is wrong, not the records.",
+  "purpose": "One message from an implementation lane to the integration coordinator per ready slice, so integration does not re-read requirements the lane already interpreted.",
+  "fields": {
+    "workItem":        { "type": "string", "example": "WI-GEN-EXT-DATA-CONNECT", "source": "Praxis work item id (scope manifest workItems[].id)" },
+    "slice":           { "type": "string", "example": "SL-WI-GEN-EXT-DATA-CONNECT", "source": "slice-execution-manifest slices[].id" },
+    "requirements":    { "type": "string[]", "source": "the slice's requirements (never more than the manifest gives it)" },
+    "obligations":     { "type": "string[]", "source": "the slice's mandatory obligations" },
+    "commit":          { "type": "sha", "source": "the branch head; the same value as the progress event implementation-completed.commit (RC/Progress.fs)" },
+    "contractVersion": { "type": "string", "example": "v4.1.4 package-manifest sha256", "source": "the lock's package digest" },
+    "filesChanged":    { "type": "string[]", "source": "git diff --name-only main...commit; each must be owned by the lane or carry an owner-approved contribution PR" },
+    "testsExecuted":   { "type": "object", "source": "Level 1/2 runs (change-impact.fsx select output) with their exit codes; informational only" },
+    "results":         { "type": "object", "source": "per test project/suite: passed, failed, skipped counts" },
+    "blockers":        { "type": "string[]", "source": "open owner decisions, change requests, failing tests" },
+    "integrationReady":{ "type": "boolean", "rule": "true only if filesChanged are all owned or approved, Level 1/2 passed, and no blocker is open. It requests the governed gate; it never replaces it." }
+  },
+  "neverMeans": [
+    "integrationReady=true is not verification; the governed gate (Level 3) decides.",
+    "testsExecuted is builder-authored evidence and never independent acceptance (AGENTS.md)."
+  ]
+}

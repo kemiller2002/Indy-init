@@ -1,0 +1,30 @@
+{
+  "schema": "indy-init.r10-bootstrap-measurements/1",
+  "note": "Measured values only, each with its source. Machine: this session's container (4 vCPU), .NET SDK 10.0.402, unless the source says GitHub Actions or Rehearsal 009.",
+  "measurements": [
+    { "step": "requirements-compiler v41 --bootstrap (v4.1.4 skeleton into an empty directory)", "seconds": 2.1, "kind": "warm", "source": "this session" },
+    { "step": "dotnet restore Causa.slnx, empty NuGet cache", "seconds": 13.6, "kind": "cold", "packagesMB": 64, "source": "this session (NUGET_PACKAGES pointed at an empty directory)" },
+    { "step": "dotnet build Causa.slnx after a cold restore (stubs)", "seconds": 18.6, "kind": "cold", "source": "this session" },
+    { "step": "dotnet restore Causa.slnx, populated cache", "seconds": 1.4, "kind": "warm", "source": "this session" },
+    { "step": "dotnet build Causa.slnx from clean obj/bin, populated cache", "seconds": 11.4, "kind": "warm", "source": "this session" },
+    { "step": "dotnet build, no change", "seconds": 1.5, "kind": "incremental", "source": "this session" },
+    { "step": "dotnet build, one App view touched", "seconds": 3.3, "kind": "incremental", "source": "this session" },
+    { "step": "dotnet build, Domain/Events.fs touched (all dependents recompile)", "seconds": 3.1, "kind": "incremental", "source": "this session; stub-sized sources, so real sources will take longer" },
+    { "step": "dotnet test Causa.slnx --no-build (bootstrap stubs, no tests yet)", "seconds": 3.6, "kind": "warm", "source": "this session" },
+    { "step": "frozen IF41 contracts typecheck (ContractCheck.fsproj)", "seconds": 6, "kind": "warm", "source": "this session (substitution demonstration); CI step 'v4.1.4 interface contracts typecheck' 11 s, Preflight run 42004659389" },
+    { "step": "Rehearsal 009: T0 to bootstrap commit (conditor init, v41 bootstrap, r9 govern, check-governance, build, ci-policy)", "seconds": 130, "kind": "cold, real run", "source": "indy-init-rehearsal-009 evidence/t0/T0.md (T0 00:30:01Z) and commit 8001e7c (00:32:11Z)" },
+    { "step": "Rehearsal 009: dotnet build Causa.slnx at T0", "seconds": 16.2, "kind": "cold, real run", "source": "indy-init-rehearsal-009 evidence/t0/build.log" },
+    { "step": "Rehearsal 009: conditor init failed once (session proxy sent a placeholder GH_TOKEN), re-run anonymously", "seconds": null, "kind": "failure", "source": "indy-init-rehearsal-009 evidence/t0/T0.md" },
+    { "step": "GitHub Actions: workflow created -> first job started", "seconds": [197, 504], "kind": "queue", "source": "Indy-init Preflight run 42004659389 (created 09:43:02Z; jobs started 09:46:19Z..09:51:25Z per the GitHub API; corrected from 524 s in review RVO-6-3)" },
+    { "step": "GitHub Actions: setup-dotnet", "seconds": [6, 8], "kind": "CI", "source": "run 42004659389 job steps" },
+    { "step": "GitHub Actions: pinned Conditor and echelon-current workstation into a disposable home", "seconds": [19, 23], "kind": "CI", "source": "run 42004659389 job steps" },
+    { "step": "GitHub Actions: Playwright with Chromium and WebKit, plus Forma", "seconds": 65, "kind": "CI", "source": "run 42004659389, r10-adversarial step 6" },
+    { "step": "GitHub Actions: governed journeys J1-J3 and design contract on the fixture, both browsers", "seconds": 33, "kind": "CI", "source": "run 42004659389, r10-adversarial step 8" },
+    { "step": "GitHub Actions: Forma layout assertions, both browsers", "seconds": 787, "kind": "CI", "source": "run 42004659389, fsharp-tooling step 22" }
+  ],
+  "notMeasured": [
+    "The governed slice gate (tools/r9/verification-gate.yml) on a real Causa candidate: no Rehearsal 010 candidate exists; Rehearsal 009's gate run durations are not readable from this session (its repository is not attached for API access).",
+    "Praxis initialization and work-item creation for 37 or 53 items.",
+    "Dokimos availability check at T0 beyond the Rehearsal 009 workstation PASS."
+  ]
+}

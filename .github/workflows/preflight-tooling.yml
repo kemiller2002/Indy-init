@@ -410,6 +410,21 @@ jobs:
           jq -S 'del(.scenarios[].timeline)' "$RUNNER_TEMP/launch-evidence/topology-a.json" > "$RUNNER_TEMP/a.json"
           jq -S 'del(.scenarios[].timeline)' docs/rehearsal-010-readiness/evidence/schedule/topology-a.json > "$RUNNER_TEMP/b.json"
           diff "$RUNNER_TEMP/a.json" "$RUNNER_TEMP/b.json" || { echo "::error::the committed schedule evidence is stale; regenerate it"; exit 1; }
+      - name: Schedule model (docs/rehearsal-010-optimization) equals schedule.fsx under its defaults, and its invariants and controls hold
+        run: dotnet fsi tools/r10/schedule-model-tests.fsx -- --indy-init .
+      - name: Change-impact selection (proposed Level 2; never the gate) holds its adversarial cases
+        run: dotnet fsi tools/r10/change-impact.fsx -- --indy-init . test
+      - name: Proposed successor manifests regenerate from their scope manifests (review RVO-3-3; the committed files must not be stale or edited)
+        run: |
+          dotnet build tools/requirements-compiler/src -c Release -v q
+          RC=tools/requirements-compiler/src/bin/Release/net10.0/requirements-compiler.dll; P=docs/rehearsal-010-optimization/proposals
+          for v in successor milestone-aligned; do
+            dotnet $RC slice-manifest --manifest $P/scope-manifest.$v.json --dag requirements-compiled/v4.1.4/execution-dag.json \
+              --journeys verification/journeys/bindings.json --out "$RUNNER_TEMP/slices.$v.json"
+            dotnet $RC scope work-plan --manifest $P/scope-manifest.$v.json --out "$RUNNER_TEMP/inventory.$v.json"
+            diff <(jq -S . "$RUNNER_TEMP/slices.$v.json") <(jq -S . $P/slice-execution-manifest.$v.json) || { echo "::error::$P/slice-execution-manifest.$v.json is stale or edited"; exit 1; }
+            diff <(jq -S . "$RUNNER_TEMP/inventory.$v.json") <(jq -S . $P/praxis-work-inventory.$v.json) || { echo "::error::$P/praxis-work-inventory.$v.json is stale or edited"; exit 1; }
+          done
       - name: Publish
         if: always()
         uses: actions/upload-artifact@v4

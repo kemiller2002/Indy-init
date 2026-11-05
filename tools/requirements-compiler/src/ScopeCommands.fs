@@ -53,9 +53,22 @@ let private finish (name: string) (refusals: Refusal list) =
     if refusals.IsEmpty then 0 else 4
 
 let private preflightAll (o: Map<string, string>) =
-    let expected = compile (sourcesOf o["--source"] o["--package"])
     let manifest = parseFile o["--manifest"]
-    let refusals = preflight expected manifest
+    let sources = sourcesOf o["--source"] o["--package"]
+    // A successor scope records the split plan it was compiled with: it is judged against the sources compiled with
+    // that plan, and only if the plan file still has the recorded digest. Any other manifest against the plain sources.
+    let expected, splitRefusals =
+        match field "workItemSplit" manifest with
+        | None -> compile sources, []
+        | Some sp ->
+            let plan = Path.Combine(o["--source"], str "plan" sp)
+            if not (File.Exists plan) then compile sources, [ { Code = "SPLIT_PLAN_MISSING"; Detail = sprintf "the manifest was compiled with %s, which does not exist" (str "plan" sp) } ]
+            elif Git.sha256Hex (File.ReadAllBytes plan) <> str "planSha256" sp then compile sources, [ { Code = "SPLIT_PLAN_CHANGED"; Detail = sprintf "%s no longer has the sha256 the manifest records" (str "plan" sp) } ]
+            else
+                match compileWithSplit sources (parseFile plan) (str "plan" sp) (str "planSha256" sp) with
+                | Ok m -> m, []
+                | Error e -> compile sources, e |> List.map (fun x -> { Code = "SPLIT_REFUSED"; Detail = x })
+    let refusals = splitRefusals @ preflight expected manifest
     let praxis = [ "--praxis-queue"; "--praxis-context" ] |> List.choose o.TryFind |> List.filter File.Exists |> List.map parseFile
     let queueRefusals = if o.ContainsKey "--praxis-queue" || o.ContainsKey "--praxis-context" then coverage manifest praxis else []
     manifest, refusals @ queueRefusals
@@ -66,11 +79,21 @@ let scopeCommand (args: string list) : int =
         let o = options rest
         match o.TryFind "--source", o.TryFind "--package", o.TryFind "--out" with
         | Some s, Some p, Some out ->
-            let m = compile (sourcesOf s p)
-            File.WriteAllText(out, serialize m)
-            printfn "scope compile: %s (%s requirements, scopeSha256 %s)" out (field "counts" m |> Option.bind (intOpt "requirements") |> Option.map string |> Option.defaultValue "?") (str "scopeSha256" m)
-            0
-        | _ -> eprintfn "usage: scope compile --source DIR --package DIR --out FILE"; 2
+            // --split PLAN: a successor scope (a split plan applied); the approved scope is compiled without it.
+            let compiled =
+                match o.TryFind "--split" with
+                | None -> Ok(compile (sourcesOf s p))
+                | Some plan -> compileWithSplit (sourcesOf s p) (parseFile plan) plan (Git.sha256Hex (File.ReadAllBytes plan))
+            match compiled with
+            | Error problems ->
+                problems |> List.iter (eprintfn "  REFUSED %s")
+                eprintfn "scope compile: REFUSED (the split plan would change the scope)"
+                4
+            | Ok m ->
+                File.WriteAllText(out, serialize m)
+                printfn "scope compile: %s (%s requirements, %s work items, scopeSha256 %s)" out (field "counts" m |> Option.bind (intOpt "requirements") |> Option.map string |> Option.defaultValue "?") (field "counts" m |> Option.bind (intOpt "workItems") |> Option.map string |> Option.defaultValue "?") (str "scopeSha256" m)
+                0
+        | _ -> eprintfn "usage: scope compile --source DIR --package DIR --out FILE [--split PLAN]"; 2
     | "preflight" :: rest ->
         let o = options rest
         if not ([ "--source"; "--package"; "--manifest" ] |> List.forall o.ContainsKey) then eprintfn "usage: scope preflight --source DIR --package DIR --manifest FILE [--praxis-queue FILE] [--out FILE]"; 2
