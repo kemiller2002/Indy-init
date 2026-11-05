@@ -5,3 +5,4 @@
 {"t":"2026-11-05T21:19:07Z","phase":"A","event":"CG-1-START RELEASED; CG-2..5 DEFINED"}
 {"t":"2026-11-05T21:23:23Z","phase":"B","event":"CR-1 released (CG-2..5 v2): control accessible names; UI agent notified"}
 {"t":"2026-11-05T21:26:01Z","phase":"B","event":"CR-2 released (CG-4 v3): picker and option labels; UI agent notified"}
+{"t":"2026-11-05T21:31:37Z","phase":"B","event":"CR-3 released (CG-5 v3, F# type change SaveEvent.ReadBackMatched); domain and UI agents notified"}

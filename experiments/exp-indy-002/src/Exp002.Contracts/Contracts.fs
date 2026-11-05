@@ -185,12 +185,13 @@ type SaveState =
     | UnknownOutcome
     | SaveFailed of reason: string
 
-/// Inputs that move the save state machine.
+/// Inputs that move the save state machine. CR-3: WriteConfirmed keeps Saving (read-back pending); only
+/// ReadBackMatched(version, at) enters Saved, so Saved is never claimed before the read-back (PERSIST-007).
 type SaveEvent =
     | Edited
     | SaveRequested
     | WriteConfirmed of version: int * at: Timestamp
-    | ReadBackMatched
+    | ReadBackMatched of version: int * at: Timestamp
     | ReadBackMismatched
     | WriteRejected of PersistenceError
     | WriteOutcomeUnknown
