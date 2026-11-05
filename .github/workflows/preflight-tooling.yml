@@ -1,4 +1,7 @@
 name: Preflight tooling
+# Browser installs (playwright --with-deps pulls apt packages) are bounded to 10 minutes and retried once: on
+# 2026-11-05 three adversarial shards stalled for the whole 45-minute job timeout inside apt before any test ran
+# (PR #139 shard 1, PR #140 shard 0, PR #145 shard 0). Two failures still fail the job; nothing is skipped.
 # Directive workstream C: a PR commit ran this workflow twice (push and pull_request events, same commit, every job),
 # doubling runner load while three sessions had PRs open. Push now runs only on main; PRs run on pull_request (the
 # merge result), and a newer commit on the same PR cancels the older run (its checks are on the old commit, so the new
@@ -314,7 +317,7 @@ jobs:
         run: |
           mkdir -p "$RUNNER_TEMP/forma" "$RUNNER_TEMP/layout"
           tar -xzf "$RUNNER_TEMP/forma.tgz" -C "$RUNNER_TEMP/forma"
-          cd "$RUNNER_TEMP/layout" && npm init -y > /dev/null && npm install --no-audit --no-fund playwright@1.63.0 axe-core@4.14.0 > /dev/null && npx playwright install --with-deps chromium webkit > /dev/null
+          cd "$RUNNER_TEMP/layout" && npm init -y > /dev/null && npm install --no-audit --no-fund playwright@1.63.0 axe-core@4.14.0 > /dev/null && (for a in 1 2; do timeout 600 npx playwright install --with-deps chromium webkit && break; if [ "$a" = 2 ]; then echo "::error::browser install failed twice"; exit 1; fi; echo "::warning::browser install attempt $a failed or exceeded 10 min (apt mirror); retrying"; done) > /dev/null
           cd "$GITHUB_WORKSPACE"
           cp -r requirements-compiled/v4.1/layout-tests/. "$RUNNER_TEMP/layout/"
           node "$RUNNER_TEMP/layout/run.mjs" --forma "$RUNNER_TEMP/forma/package" --contract requirements-compiled/v4.1/analysis/forma-layout-contract.json --inventory requirements-compiled/v4.1/analysis/forma-0.12.0-inventory.json --axe "$RUNNER_TEMP/layout/node_modules/axe-core/axe.min.js" --browsers chromium,webkit
@@ -428,7 +431,7 @@ jobs:
         run: |
           dotnet fsi tools/r9/r9.fsx -- suite-fixture --out "$RUNNER_TEMP/fx"
           dotnet fsi tools/r9/r9.fsx -- suite-fixture --out "$RUNNER_TEMP/fx-nowebkit" --without-webkit true
-          (cd "$RUNNER_TEMP/fx" && npm install --no-audit --no-fund && npx playwright install --with-deps chromium webkit)
+          (cd "$RUNNER_TEMP/fx" && npm install --no-audit --no-fund && (for a in 1 2; do timeout 600 npx playwright install --with-deps chromium webkit && break; if [ "$a" = 2 ]; then echo "::error::browser install failed twice"; exit 1; fi; echo "::warning::browser install attempt $a failed or exceeded 10 min (apt mirror); retrying"; done))
           cp -r "$RUNNER_TEMP/fx/node_modules" "$RUNNER_TEMP/fx-nowebkit/"
       - name: The frozen v4.1.2 commands are refused (MSB1008), and a missing webkit project is refused
         run: |
@@ -478,7 +481,7 @@ jobs:
         run: |
           mkdir -p "$RUNNER_TEMP/pw" && cd "$RUNNER_TEMP/pw" && npm init -y > /dev/null
           npm install --no-audit --no-fund @playwright/test@1.63.0 axe-core@4.14.0 > /dev/null
-          npx playwright install --with-deps chromium webkit
+          (for a in 1 2; do timeout 600 npx playwright install --with-deps chromium webkit && break; if [ "$a" = 2 ]; then echo "::error::browser install failed twice"; exit 1; fi; echo "::warning::browser install attempt $a failed or exceeded 10 min (apt mirror); retrying"; done)
           npm pack @echelon-foundry/design-system@0.13.0 > /dev/null && mkdir forma && tar -xzf echelon-foundry-design-system-0.13.0.tgz -C forma
           mkdir -p "$GITHUB_WORKSPACE/verification/harness/fixture-app/web/vendor/forma"
           cp forma/package/dist/all.css "$GITHUB_WORKSPACE/verification/harness/fixture-app/web/vendor/forma/all.css"
@@ -536,7 +539,7 @@ jobs:
         run: |
           mkdir -p "$RUNNER_TEMP/pw" && cd "$RUNNER_TEMP/pw" && npm init -y > /dev/null
           npm install --no-audit --no-fund @playwright/test@1.63.0 axe-core@4.14.0 > /dev/null
-          npx playwright install --with-deps chromium webkit
+          (for a in 1 2; do timeout 600 npx playwright install --with-deps chromium webkit && break; if [ "$a" = 2 ]; then echo "::error::browser install failed twice"; exit 1; fi; echo "::warning::browser install attempt $a failed or exceeded 10 min (apt mirror); retrying"; done)
           npm pack @echelon-foundry/design-system@0.13.0 > /dev/null && mkdir forma && tar -xzf echelon-foundry-design-system-0.13.0.tgz -C forma
           mkdir -p "$GITHUB_WORKSPACE/verification/harness/fixture-app/web/vendor/forma"
           cp forma/package/dist/all.css "$GITHUB_WORKSPACE/verification/harness/fixture-app/web/vendor/forma/all.css"
