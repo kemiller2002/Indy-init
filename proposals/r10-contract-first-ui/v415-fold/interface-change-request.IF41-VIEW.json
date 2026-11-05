@@ -1,0 +1,24 @@
+{
+  "schema": "indy-init.v41-owner-decision-requests/1",
+  "status": "PROPOSED input for the v4.1.5 package's own proposals/owner-decision-requests.json; the compilation owner copies the request there. Not a request the owner records from this file.",
+  "requests": [
+    {
+      "id": "ODR-V415-IF-VIEW",
+      "kind": "interface-change",
+      "title": "IF41-VIEW gains the presentation contracts Causa.Ui.Contracts (CF-09 A)",
+      "question": "Approve the change of IF41-VIEW to the folded contract at the pinned digest: the frozen v4.1.4 IF41-VIEW types unchanged, followed by the namespace Causa.Ui.Contracts (screen view models, capability boundaries Visible/Understood, validation rules from the catalog, UiIntent, UiBackend, the seven-state presentation mapping and Limen bindings)? Additive only: no existing IF41 type, case or field changes. Its implementing file src/Causa.App/Projections.fs becomes integration-owned (types only) and compiles before Connection.fs.",
+      "options": [
+        "A: approve the change as pinned (additive; consumers ui-a, ui-b, ui-c and integration)",
+        "B: decline; IF41-VIEW stays as in v4.1.4 and the UI contracts wait for a later package"
+      ],
+      "recommendation": "A. It applies CF-09 A (APR-CFUI-OWNER-1) without a compiler change. Verified: v4.1.4 ContractCheck builds with the folded file (0 warnings), both negative controls still refuse (FS1093), and the real v4.1.4 bootstrap with Projections.fs holding the folded text builds.",
+      "rationale": "V41Package.fs:1774-1787 requires every contract difference to name an interface-change decision of the package's own requests; V41Package.fs:1790 refuses new contract files, hence the fold.",
+      "impact": "Every UI role compiles against IF41-VIEW from bootstrap. IF41-VIEW's versioning rule (any union or record change is breaking) then covers the UI contracts too.",
+      "pins": [
+        {
+          "path": "proposals/r10-contract-first-ui/v415-fold/07-IF41-VIEW.folded.fs"
+        }
+      ]
+    }
+  ]
+}

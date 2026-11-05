@@ -1,0 +1,31 @@
+{
+  "schema": "indy-init.r10-contract-first-ui.bootstrap-fixtures/1",
+  "status": "PROPOSED bootstrap content for v4.1.5 (CF-09 A). Under OD-INDY-22 fixtures enter a run only as frozen-package content; the builder never writes them.",
+  "generator": {
+    "command": "dotnet fsi proposals/r10-contract-first-ui/tools/extract-fixtures.fsx -- <causa-data checkout> e8259df74add723765c57a5b1a5888d9c3f707af tests/Causa.TestSupport/UiFixtures/CausaDataExtract.g.fs",
+    "source": "kemiller2002/causa-data at e8259df74add723765c57a5b1a5888d9c3f707af (catalog/demonstration-v1)",
+    "reproducible": "re-running it at that commit reproduces fixtures/CausaDataExtract.g.fs byte for byte (verified by the independent review, ADVERSARIAL-REVIEW.md Q2)"
+  },
+  "files": [
+    {
+      "path": "tests/Causa.TestSupport/UiFixtures/CausaDataExtract.g.fs",
+      "from": "generated (above)",
+      "asserts": "nothing by itself: verbatim stored data (four catalog cases, the first six Apollo 11 events, a connected snapshot slice); labelled FIXTURE, not Causa's replay"
+    },
+    {
+      "path": "tests/Causa.TestSupport/UiFixtures/Scenarios.fs",
+      "from": "proposals/r10-contract-first-ui/fixtures/Scenarios.fs",
+      "asserts": "nine named scenarios (connected catalog, empty catalog, unauthorized, network failure, loading, invalid JSON, unsaved changes, save conflict, unknown save outcome); frozen demonstrations read-only; the seven save presentations with the frozen SaveAction choices"
+    },
+    {
+      "path": "tests/Causa.TestSupport/UiFixtures/FixtureBackend.fs",
+      "from": "proposals/r10-contract-first-ui/fixtures/FixtureBackend.fs",
+      "asserts": "the fixture UiBackend: every view carries BackendOrigin.FixtureBackend; validation before any record; a missing link target and a duplicate link are refused; reassessment keeps the earlier assessment; invalid data fails closed; Saved means only 'the fixture says so'"
+    }
+  ],
+  "tests": {
+    "source": "proposals/r10-contract-first-ui/tests (44 Layer A tests; 9 mutation controls in evidence/mutations.log)",
+    "note": "the plan binds the ones named as producerTests in interface-specifications.IF41-VIEW.json; the rest become Causa.App.Tests/Ui tests owned per FILE-OWNERSHIP.json"
+  },
+  "projectEntries": "testHelpers.additions in project-structure.delta.json"
+}
