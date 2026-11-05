@@ -1,7 +1,7 @@
 {
   "schema": "causa.contract-readiness.package-manifest/1",
   "contractPackage": "causa-precompetition 1.0.0-candidate",
-  "packageChecksum": "e3c6881643f5cf15d8b75fd2c540e095cf14a64e89c5e765bdea67944007cc4e",
+  "packageChecksum": "9c8777f9bfda5f4759585c618debe6dc31578db4f16adaf5360e3539e0338189",
   "checksumRule": "sha256 of the lines '<sha256>  <path>\\n' for every package file (except this manifest) and every validator source file, in this order",
   "dependencies": {
     "causaDataRepository": "https://github.com/kemiller2002/causa-data",
@@ -30,8 +30,12 @@
       "sha256": "af086bacb7d835cabe82d60a59f2c33c83946e579eca223155bce9daa728be74"
     },
     {
+      "path": "COMPETITION-CONSUMPTION.md",
+      "sha256": "2a3a61c41d97d3b9897fb65d6f00b6fba5d9544433b8ee16186e85d1b9ae458a"
+    },
+    {
       "path": "CONTRACT-READINESS.json",
-      "sha256": "aee9fc61131ca027ae69b50aa0fe0d71b6791b25672d5a868644ae1e6c07d0e3"
+      "sha256": "62bcd5f988b895fe0f9c6a08f0a8bf2b25ae0972e6a885e31bc4c240ec31c7b6"
     },
     {
       "path": "DOMAIN-CONTRACT.json",
@@ -42,12 +46,24 @@
       "sha256": "513c7c8c7a5583ca1b94ed423686085d0f011d990d5f2c1ccb511df87c111692"
     },
     {
+      "path": "HISTORICAL-COMPATIBILITY.md",
+      "sha256": "3cb8c929f225f0f529adceb9db183034295897631f465e587603804af30956a2"
+    },
+    {
       "path": "HISTORICAL-DATA-INVENTORY.json",
-      "sha256": "bfb85fc20ea7d4095ee243e957a3012cc897095c8dd15470b3db057a8c5e68fd"
+      "sha256": "f1365d79b68cf095e0a7d347a62d71c7356b976be5f0d74907588ec4aff5825a"
     },
     {
       "path": "OWNER-DECISIONS.proposed.json",
-      "sha256": "7ba547fcc7108bb9cd2f0590ae3b74a7c55408bda17b4dbf40030ac25182e0de"
+      "sha256": "cfb2cefb45fa8c2b7dd96894a2e5a186da1f6c86c41c25e2accd4e8a2774ffe9"
+    },
+    {
+      "path": "PERSISTENCE-CONTRACT.md",
+      "sha256": "d31ba5403df90ea38e3d6bfda56367a20acb4e8f7210a175b648cdf261282fcb"
+    },
+    {
+      "path": "SOURCE-INVENTORY.md",
+      "sha256": "af7ec7a5eacd26c858ac772ffbb20ba960d0ccc7f21b912d369d24f85c846c83"
     },
     {
       "path": "STATE-TRANSITIONS.json",
@@ -89,7 +105,7 @@
     },
     {
       "path": "tools/contract-readiness/src/Gate.fs",
-      "sha256": "93954fb5c989ccdbff634b74add8d3b4e55af6a00d7c5c5dfd0d3360327390a1"
+      "sha256": "2378b37ba03c2cd623c91e5daba7cacf00a4b65caffeb5b1b3bcfd6dc8239c8f"
     },
     {
       "path": "tools/contract-readiness/src/Historical.fs",

@@ -98,6 +98,18 @@
       "deferralConsequence": "J2-06/J2-09 evidence edits have no defined meaning."
     },
     {
+      "decisionId": "OD-CR-08",
+      "title": "Adopt this contract package and its validator as owner-controlled verification assets",
+      "blocking": true,
+      "status": "open",
+      "affects": ["COMPETITION-CONSUMPTION.md", "tools/contract-readiness", "every registry in this package"],
+      "conflictingEvidence": "OD-INDY-22 forbids a rehearsal to copy code from earlier work; OD-HC-05 B chose route R2 (freeze checks as owner-controlled verification assets that the rehearsal runs from the governed checkout). This package is agent-authored and not frozen, and no Conditor, Praxis, Dokimos or Ordo step runs it today.",
+      "alternatives": ["A: freeze the package (tag) as a governed verification asset, run from SRC like verification/ (route R2), and add `contract-readiness check --require-pass` to the T0 preflight", "B: reference only; competition agents read it but nothing enforces it", "C: fold the registries into the v4.1.6 successor package"],
+      "recommendation": "A, with C for the parts OD-CR-01 compiles into v4.1.6.",
+      "compatibilityImpact": "None on data or contracts.",
+      "deferralConsequence": "Competition agents may consume it, but it has no governed status and its gate is advisory."
+    },
+    {
       "decisionId": "OD-CR-07",
       "title": "Actor identity for UI writes",
       "blocking": true,

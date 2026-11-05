@@ -113,7 +113,10 @@ module Gate =
                   "requiredMigration", Json.s "none: every file is formatVersion/semanticVersion 1.0.0; the proposed 1.1.0 extension is additive and never rewrites v1.0.0 files (CONTRACT §13.2)" ]
         let allObserved = observed distinct |> List.map fst |> Set.ofList
         let neverObserved =
-            FieldRegistry.wireFields reg |> List.map (fun f -> f.Def.FieldId) |> List.filter (allObserved.Contains >> not)
+            // Only fields an event line can carry: manifests and snapshots are checked by CR-HIST-04, not observed here.
+            FieldRegistry.wireFields reg
+            |> List.filter (fun f -> f.Def.ObjectType = "Envelope" || f.Def.ObjectType.StartsWith "Payload." || f.Def.ObjectType = "Def.actor" || f.Def.ObjectType = "Entity.causal-member")
+            |> List.map (fun f -> f.Def.FieldId) |> List.filter (allObserved.Contains >> not)
         let nullable =
             observed distinct |> List.filter (fun (_, k) -> k = "null") |> List.map fst |> List.countBy id |> List.sortBy fst
         Json.o
@@ -130,6 +133,8 @@ module Gate =
                     "eventsActiveCatalog", Json.i (histories |> List.filter (Checks.isActiveCatalog inputs) |> List.sumBy (fun h -> h.Events.Length))
                     "eventTypesObserved", Json.i (distinct |> List.collect (fun h -> h.Events |> List.map (fun e -> e.EventType)) |> List.distinct |> List.length)
                     "variantsObserved", Json.i (distinct |> List.collect (fun h -> h.Events |> List.choose (fun e -> e.Variant |> Option.map (fun v -> v.Name))) |> List.distinct |> List.length)
+                    "eventTypesObservedHistoricalCases", Json.i (histories |> List.filter Checks.isHistorical |> List.collect (fun h -> h.Events |> List.map (fun e -> e.EventType)) |> List.distinct |> List.length)
+                    "variantsObservedHistoricalCases", Json.i (histories |> List.filter Checks.isHistorical |> List.collect (fun h -> h.Events |> List.choose (fun e -> e.Variant |> Option.map (fun v -> v.Name))) |> List.distinct |> List.length)
                     "eventTypesRegistered", Json.i 31 ]
               "storageLocations",
               Json.o
@@ -144,7 +149,7 @@ module Gate =
               "datasets", JArr(histories |> List.map caseEntry)
               "fieldsObserved", Json.o (fieldTable (observed distinct))
               "nullValuesObserved", Json.o (nullable |> List.map (fun (k, c) -> k, Json.i c))
-              "wireFieldsNeverObserved", Json.ss neverObserved
+              "eventFieldsNeverObserved", Json.ss neverObserved
               "relationshipTypes",
               Json.o
                   [ "evidenceToHypothesis", Json.s "EvidenceRelated (kind, rationale)"
