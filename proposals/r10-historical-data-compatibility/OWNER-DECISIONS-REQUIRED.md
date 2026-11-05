@@ -15,3 +15,18 @@ Agents never record, approve or self-ratify decisions (RDP-003; AGENTS.md). Each
 | **OD-HC-09** | **Access to `kemiller2002/causa`.** The brief names it as the implementation reference. This session could not reach it: `add_repo` reported "you don't have access to kemiller2002/causa", and an anonymous clone was refused. | **A:** grant access and re-run the comparison against the published causa model. **B:** accept that causa-data's CONTRACT v1.0.0 (which names the engine as its domain authority) is the reference. | **B** for this mission; **A** if the published causa model is believed to differ from causa-data v1.0.0. | failure category 9 is verified against causa-data only |
 
 No decision above is required to *read* the data correctly. The adapter already does that. The decisions settle whether, and how, that correctness reaches a rehearsal.
+
+## Recording OD-HC-01 … OD-HC-07
+
+The requests are in `proposals/owner-decision-requests.json` in this directory. `tools/owner-freeze.fsx` reads them from `origin/main`, so merge this pull request first.
+
+Then, from the directory that holds your clone:
+
+```bash
+dotnet fsi Indy-init/tools/owner-freeze.fsx -- decide historical-compatibility --repo Indy-init --dry-run   # preview, writes nothing
+dotnet fsi Indy-init/tools/owner-freeze.fsx -- decide historical-compatibility --repo Indy-init             # records APR-HC-OWNER-1
+```
+
+The script shows each request and its recommendation. It then asks for your option, with no default, and `skip` leaves a request pending. Where a request pins a file (OD-HC-01, -04, -05, -06), it records that file's sha256 at `origin/main`. Once you confirm, the script commits the record to `kickoff/rehearsal-007/approvals.causa.json` as you and opens a pull request for you to merge.
+
+OD-HC-08 and OD-HC-09 need no record. Agents cannot record these decisions: the script refuses to write when an agent runs it.
