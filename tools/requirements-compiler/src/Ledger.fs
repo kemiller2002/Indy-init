@@ -416,11 +416,22 @@ let private presentForJudging (s: State) (e: SliceEvidence) (d: string) : bool =
 let deferredAssertions (s: State) (e: SliceEvidence) : string list =
     let self = str "id" e.Slice
     let inScope = arr "workItems" s.Progress.Manifest |> List.map (fun w -> "SL-" + str "id" w) |> Set.ofList
+    // A needed slice that depends on this one, directly or transitively, cannot be on main before this merge, so the
+    // assertion is deferred whatever presentForJudging says (review CF07-R3-1: SL-T16's J3-01/J3-02 need
+    // SL-WI-GEN-EXT-DATA, which depends on SL-T16; judging them here made SL-T16 unmergeable).
+    let deps = arr "workItems" s.Progress.Manifest |> List.map (fun w -> str "id" w, strs "dependsOn" w) |> Map.ofList
+    let rec closure (seen: Set<string>) (frontier: string list) =
+        match frontier with
+        | [] -> seen
+        | x :: rest when seen.Contains x -> closure seen rest
+        | x :: rest -> closure (seen.Add x) ((Map.tryFind x deps |> Option.defaultValue []) @ rest)
+    let selfItem = self.Substring 3
+    let dependsOnSelf (n: string) = (closure Set.empty (Map.tryFind (n.Substring 3) deps |> Option.defaultValue [])).Contains selfItem
     strs "governedAssertions" e.Slice
     |> List.filter (fun a ->
         Map.tryFind a e.AssertionNeeds |> Option.defaultValue []
         |> List.filter (fun n -> n <> self && inScope.Contains n)
-        |> List.exists (fun n -> not (presentForJudging s e (n.Substring 3))))
+        |> List.exists (fun n -> dependsOnSelf n || not (presentForJudging s e (n.Substring 3))))
 
 let sliceRules : SliceRule list =
     [ { Id = "main-healthy"

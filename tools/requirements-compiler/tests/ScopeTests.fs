@@ -709,7 +709,8 @@ let cf07Deferral (source: string) : string list =
         let rs = arr "workItems" manifest |> List.find (fun w -> str "id" w = wid) |> strs "requirements" |> Set.ofList
         arr "requirements" manifest |> List.filter (fun r -> rs.Contains(str "id" r))
         |> List.collect (fun r -> arr "obligations" r |> List.filter (fun o -> boolOr "mandatory" true o && strOpt "kind" o <> Some "record" && not (strs "producers" o |> List.exists (fun p -> Ledger.liveProducers.Contains p || p = "SU-BROWSER-WEBKIT"))) |> List.map (str "id"))
-      let liveSlice (assertions: string list) = JObj [ "id", JStr "SL-T19"; "dependsOn", JArr []; "realProvider", JBool true; "governedAssertions", JArr(assertions |> List.map JStr) ]
+      let liveSlice (assertions: string list) = JObj [ "id", JStr "SL-LIVE-CASE"; "dependsOn", JArr []; "realProvider", JBool true; "governedAssertions", JArr(assertions |> List.map JStr) ]
+      // (a slice id no needed item depends on: T21 depends on T19, so SL-T19 would defer by CF07-R3-1)
       for wid in [ "T21"; "T22" ] do
           let liveCase = { evidence [ "J1-04", [ "SL-" + wid ] ] (provableOf wid) [ "J1-04" ] with Slice = liveSlice [ "J1-04" ] }
           if Ledger.deferredAssertions s liveCase <> [] then yield sprintf "cf07: %s's live or WebKit obligations deferred the assertion in a live slice" wid
@@ -741,6 +742,35 @@ let cf07Deferral (source: string) : string list =
       if not (gateYml.Contains "--assertion-needs \"$src/docs/rehearsal-010-readiness/assertion-merge-needs.json\"") then yield "cf07: the governed gate does not pass --assertion-needs"
       let t16 = { evidence [] [] [ "J2-08" ] with Slice = JObj [ "id", JStr "SL-T16"; "dependsOn", JArr []; "governedAssertions", JArr [ JStr "J2-08" ] ]; AssertionNeeds = Ledger.assertionNeedsOf governed }
       if Ledger.deferredAssertions s t16 <> [ "J2-08" ] then yield "cf07: SL-T16's J2-08 is not deferred with the governed needs file"
+      // review CF07-R3-1: a needed slice that depends on this one (transitively) cannot be on main yet, so the assertion is
+      // deferred even when that slice has nothing a merge can prove. SL-T16's J3-01/J3-02 need SL-WI-GEN-EXT-DATA.
+      let approvedSlices = arr "slices" (parseFile (Path.Combine(source, "docs/rehearsal-010-readiness/slice-execution-manifest.json")))
+      let sliceAt (id: string) = approvedSlices |> List.find (fun x -> str "id" x = id)
+      let t16Real = { evidence [] [] [] with Slice = sliceAt "SL-T16"; AssertionNeeds = Ledger.assertionNeedsOf governed }
+      for a in [ "J3-01"; "J3-02" ] do
+          if strs "governedAssertions" (sliceAt "SL-T16") |> List.contains a && not (Ledger.deferredAssertions s t16Real |> List.contains a) then
+              yield sprintf "cf07: SL-T16 judges %s, which needs SL-WI-GEN-EXT-DATA (a slice that depends on SL-T16)" a
+      // invariant over the approved manifest: with every provable obligation verified (so only the dependency rule can
+      // defer) and with nothing verified, no judged assertion needs a slice that transitively depends on the merging slice
+      let deps = arr "workItems" manifest |> List.map (fun w -> "SL-" + str "id" w, strs "dependsOn" w |> List.map ((+) "SL-")) |> Map.ofList
+      let rec reach (seen: Set<string>) = function
+          | [] -> seen
+          | x :: rest when seen.Contains x -> reach seen rest
+          | x :: rest -> reach (seen.Add x) ((Map.tryFind x deps |> Option.defaultValue []) @ rest)
+      let everything = arr "requirements" manifest |> List.collect (fun r -> arr "obligations" r |> List.map (str "id"))
+      let needs = Ledger.assertionNeedsOf governed
+      for sl in approvedSlices do
+          let id = str "id" sl
+          for verified in [ []; everything ] do
+              let e = { evidence [] verified [] with Slice = sl; AssertionNeeds = needs }
+              let deferred = Ledger.deferredAssertions s e |> Set.ofList
+              for a in strs "governedAssertions" sl |> List.filter (deferred.Contains >> not) do
+                  for n in Map.tryFind a needs |> Option.defaultValue [] do
+                      if n <> id && deps.ContainsKey n && (reach Set.empty (Map.tryFind n deps |> Option.defaultValue [])).Contains id then
+                          yield sprintf "cf07: %s judges %s, which needs %s, a slice that depends on %s" id a n id
+      // control: the rule can bite (a needed slice that does not depend on this one, fully verified, is judged)
+      if Ledger.deferredAssertions s { evidence [ "J1-03", [ "SL-WI-INV-START" ] ] (provableOf "WI-INV-START") [ "J1-03" ] with Slice = JObj [ "id", JStr "SL-WI-INV-LIST"; "governedAssertions", JArr [ JStr "J1-03" ] ] } <> [] then
+          yield "cf07 control: an independent, verified needed slice was deferred"
       // the verdict records what was deferred, so release knows what it still owes
       let verdict = Ledger.sliceVerdictJson (Ledger.deferredAssertions s deferredCase) deferredCase []
       if strs "deferredToRelease" verdict <> [ "J1-03" ] then yield "cf07: the slice verdict does not record the deferred assertion" ]
