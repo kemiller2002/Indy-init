@@ -148,6 +148,26 @@ case "per-slice overhead is charged to every slice"
       for a, b in List.zip plain over do
           if b.Minutes <> a.Minutes + 5.0 then yield sprintf "%s: %.0f minutes with overhead 5, %.0f without" a.Id b.Minutes a.Minutes ]
 
+// functional milestones (TIME-TO-WORKING-APPLICATION.md)
+let msFile = at "docs/rehearsal-010-optimization/inputs/milestones.json"
+case "a milestone is delivered when the last slice carrying any of its requirements integrates"
+    [ let ms = loadMilestones msFile
+      let recs = simulate ownC 10.0 ownSlices
+      for id, _, t in milestoneTimes ms ownSlices recs (fun r -> r.Integrated) do
+          let _, _, reqs = ms |> List.find (fun (i, _, _) -> i = id)
+          let want = ownSlices |> List.filter (fun s -> s.Requirements |> List.exists (fun r -> List.contains r reqs)) |> List.map (fun s -> recs[s.Id].Integrated) |> List.max
+          if t <> want then yield sprintf "%s delivered at %.0f, its last carrier integrates at %.0f" id t want ]
+case "milestone priority with no milestones is the default order"
+    [ let a = simulate ownC 10.0 ownSlices
+      let b = simulate { ownC with Priority = "milestones"; Milestones = [] } 10.0 ownSlices
+      for s in ownSlices do
+          if a[s.Id].Integrated <> b[s.Id].Integrated then yield sprintf "%s: %.0f by default, %.0f with an empty milestone list" s.Id a[s.Id].Integrated b[s.Id].Integrated ]
+case "milestone-first delivers the first milestone no later than longest-chain-first (real plan, ci 0/5/10)"
+    [ let ms = loadMilestones msFile
+      let suc = loadSlices (at "docs/rehearsal-010-optimization/proposals/slice-execution-manifest.successor.json") (Some roles) ownC
+      for ci in [ 0.0; 5.0; 10.0 ] do
+          let t prio = milestoneTimes ms suc (simulate { ownC with QueueDepth = 3; Setup = 25.0; Milestones = ms; Priority = prio } ci suc) (fun r -> r.Integrated) |> List.head |> fun (_, _, x) -> x
+          if t "milestones" > t "tail" then yield sprintf "ci %.0f: M1 at %.0f milestone-first, %.0f chain-first" ci (t "milestones") (t "tail") ]
 // ---- 4. refusals ---------------------------------------------------------------------------------------------------
 
 let refused (name: string) (expect: string) (f: unit -> obj) =
@@ -158,6 +178,8 @@ let refused (name: string) (expect: string) (f: unit -> obj) =
 refused "a dependency cycle is refused" "cycle" (fun () -> box (cpm 0.0 0.0 0.0 (synth [ "A", [ "B" ]; "B", [ "A" ] ] (fun _ -> "x"))))
 refused "an unknown dependency is refused" "unknown" (fun () -> box (cpm 0.0 0.0 0.0 (synth [ "A", [ "Z" ] ] (fun _ -> "x"))))
 refused "a role no lane holds is refused (no silent omission)" "deadlock" (fun () -> box (simulate (cfg 0.0 "a:A") 0.0 (synth [ "A", []; "B", [] ] id)))
+
+refused "a milestone naming a requirement no slice carries is refused" "no slice carries" (fun () -> box (milestoneTimes [ "MX", "x", [ "NOPE-1" ] ] ownSlices (simulate ownC 0.0 ownSlices) (fun r -> r.Integrated)))
 
 printfn ""
 printfn "schedule-model-tests: %s" (if failures = 0 then "all passed" else sprintf "%d failed" failures)

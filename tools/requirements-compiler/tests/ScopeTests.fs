@@ -649,6 +649,22 @@ let splitScope (source: string) : string list =
           if not (preflight successor successor).IsEmpty then yield sprintf "split: the successor fails its own preflight: %A" (preflight successor successor |> List.truncate 3)
       | Error _ -> () ]
 
+/// The milestone-aligned refinement (TIME-TO-WORKING-APPLICATION.md, R5) compiles, keeps the approved requirements,
+/// obligations, priorities and mandatory flags, and reproduces the committed proposal's digest.
+let milestoneAlignedSplit (source: string) : string list =
+    let planPath = "docs/rehearsal-010-optimization/inputs/work-item-split.milestone-aligned.proposed.json"
+    let sources = ScopeCommands.sourcesOf source "requirements-compiled/v4.1.4"
+    let content (m: Json) = arr "requirements" m |> List.map (fun r -> str "id" r, serialize (JObj [ "o", (field "obligations" r |> Option.defaultValue (JArr [])); "p", JStr(strOpt "priority" r |> Option.defaultValue ""); "m", (field "mandatory" r |> Option.defaultValue JNull) ])) |> Map.ofList
+    let committed = parseFile (Path.Combine(source, "docs/rehearsal-010-optimization/proposals/scope-manifest.milestone-aligned.json"))
+    let planSha = Git.sha256Hex (File.ReadAllBytes(Path.Combine(source, planPath)))
+    [ match compileWithSplit sources (parseFile (Path.Combine(source, planPath))) planPath planSha with
+      | Error ps -> yield sprintf "milestone-aligned split: refused: %A" (List.truncate 3 ps)
+      | Ok m ->
+          if content m <> content (compile sources) then yield "milestone-aligned split: requirements, obligations, priorities or mandatory flags differ from the approved scope"
+          if str "scopeSha256" m <> str "scopeSha256" committed then yield sprintf "milestone-aligned split: compiles to %s, the committed proposal has %s" (str "scopeSha256" m) (str "scopeSha256" committed)
+          if Option.map (str "planSha256") (field "workItemSplit" committed) <> Some planSha then yield "milestone-aligned split: the committed proposal records a different plan digest"
+          if not (preflight m committed).IsEmpty then yield sprintf "milestone-aligned split: the committed proposal fails preflight: %A" (preflight m committed |> List.truncate 3) ]
+
 let all (source: string) : string list =
     let guard name f = try f () with ex -> [ sprintf "%s threw: %s" name ex.Message ]
-    guard "adversarial" adversarial @ guard "legitimate" legitimate @ guard "recovery" recovery @ guard "real" (fun () -> real source) @ guard "suite runners" (fun () -> suiteRunners source) @ guard "v4.1.4 owner records" (fun () -> v414OwnerRecords source) @ guard "v4.1.4 owner-record controls" (fun () -> v414OwnerRecordControls source) @ guard "v4.1.4 package" (fun () -> committedPackage source) @ guard "reconciliation" (fun () -> reconciliation source) @ guard "work-item split" (fun () -> splitScope source)
+    guard "adversarial" adversarial @ guard "legitimate" legitimate @ guard "recovery" recovery @ guard "real" (fun () -> real source) @ guard "suite runners" (fun () -> suiteRunners source) @ guard "v4.1.4 owner records" (fun () -> v414OwnerRecords source) @ guard "v4.1.4 owner-record controls" (fun () -> v414OwnerRecordControls source) @ guard "v4.1.4 package" (fun () -> committedPackage source) @ guard "reconciliation" (fun () -> reconciliation source) @ guard "work-item split" (fun () -> splitScope source) @ guard "milestone-aligned split" (fun () -> milestoneAlignedSplit source)

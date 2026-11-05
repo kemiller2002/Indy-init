@@ -79,3 +79,13 @@ With 0-min CI the simulation finishes at T+720, not T+409. `ui` can't start its 
   - different roles' slices;
   - independent test groups inside one gate run (Chromium, WebKit, the deterministic dotnet suites);
   - speculative verification of several queued candidates, each on main plus the candidates ahead of it, with merges still in order (`--queue-depth`).
+
+## The critical path to a working application (addendum)
+
+The full-scope critical path above is not the path to the first usable capability. M1 (connect) and M2 (browse) do not need T22 → T28 → T31 → T34. They need:
+- the kernel chain T10 → T14 → T13 → T17 (EF T+151 with 25-min set-up, 0-min CI);
+- then the connect and landing parts of the generated items, all owned by `ui`.
+
+So the binding constraint for a working application is **the `ui` lane after T17**, not the DAG. Under longest-chain-first ordering, `ui` spends that time on the T22 chain and the large workspace items, and M1 waits until T+348 or later (R1). Milestone-first ordering (ODR-R10-27) gives M1 at T+236 and M2 at T+259 (R2, 0-min CI).
+
+**Under v4.1.4, M2 is not on any path**, because the contracts cannot decode the catalog (ODR-R10-25). Details: TIME-TO-WORKING-APPLICATION.md and FUNCTIONAL-PRIORITY-PLAN.md.

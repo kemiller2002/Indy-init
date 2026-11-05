@@ -78,3 +78,18 @@ At 0-min CI, V1 → V2 (split only) raises the work integrated by T+420:
 - mandatory obligations: 402 → 594.
 
 At 10-min CI the split alone *lowers* it (435 → 402 obligations): 53 slices queue behind one serialized gate. With the speculative queue (V3) it is 519. **Split without the speculative queue only when CI is fast.**
+
+## Milestone-aligned refinement (addendum)
+
+Several parts of the successor still carry requirements of two or more functional milestones (FUNCTIONAL-PRIORITY-PLAN.md §4). `inputs/work-item-split.milestone-aligned.proposed.json` splits them again:
+- `WI-GEN-UI-CONNECT` and `WI-GEN-UI-RECOVERY`;
+- `WI-INV-WORKSPACE-READ`;
+- `WI-GEN-EXT-DATA-CONNECT` and `WI-GEN-EXT-DATA-WRITE`.
+
+It compiles with no refusal: 57 work items, scopeSha256 `723c9eb3…`, and preflight passes. It is checked by the offline case `milestone-aligned split`. Ownership and the T17 rule are unchanged.
+
+Effect (R5 against R2):
+- M2 −26 minutes and M3 −21 minutes at 0-min CI;
+- at 10-min CI, M1 +10 minutes and −7 obligations by T+420, because more slices queue for one gate.
+
+It is an alternative under ODR-R10-19 (option A′), not adopted.

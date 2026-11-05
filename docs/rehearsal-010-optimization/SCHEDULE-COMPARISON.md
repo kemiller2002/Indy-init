@@ -125,3 +125,18 @@ The honest original is V1. The optimized plan that needs **only a successor scop
 ## Can the full scope finish within 420 minutes?
 
 **No, under any variant at any CI latency of 2 minutes or more.** The dependency critical path alone is 409 minutes at 0-min CI (389 with a 25-min set-up), and it grows by about 10 minutes per minute of CI. The best modelled plan (V5) finishes at T+510 even at 0-min CI. Only V5 with estimates 25% too high at 5-min CI comes close, at T+425.
+
+## Functional milestones (addendum)
+
+The model now also reports when each functional milestone is delivered (`--milestones inputs/milestones.json`), and can order ready work by milestone (`--priority milestones`). Runs R0–R5 and their tables are in TIME-TO-WORKING-APPLICATION.md. In summary, at 10-min CI:
+
+| | R0 approved plan | R1 V4 | R2 V4, milestone-first | R5 milestone-aligned split |
+|---|---|---|---|---|
+| M1 connect | 681 | 359 | 283 | 293 |
+| M2 browse (needs ODR-R10-25) | 794 | 729 | 309 | 284 |
+| M3 create | 739 | 746 | 489 | 468 |
+| All integrated | 794 | 756 | 769 | 771 |
+| Obligations by T+420 | 435 | 565 | 527 | 520 |
+| Milestones usable at T+420 | 0 | 1 | 2 | 2 |
+
+Milestone-first trades about 40 obligations by the deadline, and about 13 minutes of full completion, for a connected and browsable application 6½–8 hours earlier than the approved plan (R0 → R2: M1 −398 minutes, M2 −485).
