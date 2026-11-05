@@ -89,8 +89,8 @@ let private connect s =
     match Connection.validate s.Form with
     | [] ->
         match s.Scenario with
-        | UnauthorizedRepository -> { s with Connection = Disconnected; ConnectErrors = []; ConnectFailure = Some NotAuthorized }
-        | NetworkFailure -> { s with Connection = Disconnected; ConnectErrors = []; ConnectFailure = Some ProviderUnreachable }
+        | UnauthorizedRepository -> { s with Connection = Disconnected; ConnectErrors = []; ConnectFailure = Some UiFailure.NotAuthorized }
+        | NetworkFailure -> { s with Connection = Disconnected; ConnectErrors = []; ConnectFailure = Some UiFailure.ProviderUnreachable }
         | CatalogLoading -> { s with Connection = Connecting(RequestId 1L); ConnectErrors = []; ConnectFailure = None }
         | _ -> { s with Connection = Connected true; ConnectErrors = []; ConnectFailure = None }
     | errors -> { s with ConnectErrors = errors }
@@ -326,11 +326,11 @@ let private startView s : StartView =
       Destination =
         (match s.Connection with
          | Connected w -> Ready { Repository = sprintf "%s/%s" s.Form.Owner s.Form.Repository; Branch = s.Form.Branch; Writable = w }
-         | _ -> Failed(CapabilityAbsent(DataEditable, "not connected")))
+         | _ -> Failed(UiFailure.CapabilityAbsent(DataEditable, "not connected")))
       Profile = None
       Start = (if s.Connection = Connected true then Available else Unavailable "Connect a writable repository first.")
       Cancel = Available
-      Submission = NotSubmitted }
+      Submission = Submission.NotSubmitted }
 
 let private frameOf (lbl: FixtureLabel) (id: InvestigationRef) (section: Section) (title: string) (problem: Shown<string>) question created state copy supported =
     { Ref = id
@@ -363,15 +363,15 @@ let private workspaceView s (id: InvestigationRef) (section: Section) : Workspac
     let stored = CausaDataExtract.cases |> List.tryFind (fun c -> refOf c = id)
     let copy = s.Copies |> List.tryFind (fun c -> c.Id = id)
     match connected s, stored, copy with
-    | false, _, _ -> failed (CapabilityAbsent(DataVisible, "not connected"))
+    | false, _, _ -> failed (UiFailure.CapabilityAbsent(DataVisible, "not connected"))
     | true, Some c, _ when s.Scenario = InvalidStoredJson && c.Key = "apollo-11" ->
-        failed (InvalidData "events.ndjson: line 1 is not a JSON object (fixture)")
+        failed (UiFailure.InvalidData "events.ndjson: line 1 is not a JSON object (fixture)")
     | true, Some c, _ ->
         let visible x = AsStored(Visible.fixture lbl x)
         let analysis =
             match s.Analysis |> Map.tryFind id with
             | Some a -> Ready(Understood.fixture lbl a)
-            | None -> Failed(CapabilityAbsent(DataUnderstood, "no projection fixture for this case"))
+            | None -> Failed(UiFailure.CapabilityAbsent(DataUnderstood, "no projection fixture for this case"))
         let problem =
             if c.Key = "apollo-11" then
                 // The stored InvestigationStarted payload's `original`, verbatim (first stored event).
@@ -393,7 +393,7 @@ let private workspaceView s (id: InvestigationRef) (section: Section) : Workspac
         { Frame =
             Ready(frameOf lbl id section title (projected w.Details.ProblemStatement) (if w.Details.Question = "" then None else Some(projected w.Details.Question))
                         (projected fixtureInstant) (projected "active") WorkingCopy false)
-          Stored = Failed(CapabilityAbsent(DataVisible, "not yet saved to the repository"))
+          Stored = Failed(UiFailure.CapabilityAbsent(DataVisible, "not yet saved to the repository"))
           Section = sectionOf section (Ready(Understood.fixture lbl analysis))
           Drafts = drafts
           Details =
@@ -401,11 +401,11 @@ let private workspaceView s (id: InvestigationRef) (section: Section) : Workspac
               Edit = Available; SaveDetails = (if s.DetailsOpen then Available else NotOffered); Cancel = (if s.DetailsOpen then Available else NotOffered) }
           Save = Some(savePresentation id kind title)
           State = ScreenReady }
-    | true, None, None -> failed (InvestigationNotFound(Navigation.targetOf id))
+    | true, None, None -> failed (UiFailure.InvestigationNotFound(Navigation.targetOf id))
 
 /// A route whose target no listed workspace holds (or a role that does not match): not found, fail closed.
 let private notFoundView s (t: RouteTarget) (section: Section) : WorkspaceView =
-    let f = InvestigationNotFound t
+    let f = UiFailure.InvestigationNotFound t
     { Frame = Failed f; Stored = Failed f; Section = OverviewSection(Failed f)
       Drafts = { Values = s.Drafts; Errors = s.DraftErrors; OpenEditor = None }
       Details = { Open = false; Form = { Title = ""; ProblemStatement = ""; Question = "" }; Errors = []; Edit = NotOffered; SaveDetails = NotOffered; Cancel = NotOffered }
@@ -423,7 +423,7 @@ let project (s: State) : AppView =
             | None -> WorkspaceScreen(notFoundView s t section)
         | AdministrationRoute -> AdministrationScreen(administration (connectionView s).Connected)
         | SettingsRoute -> SettingsScreen settings
-        | NotFoundRoute r -> NotFoundScreen { Requested = r; Copy = PresentationLanguage.failure (CapabilityAbsent(DataVisible, "unknown route")) }
+        | NotFoundRoute r -> NotFoundScreen { Requested = r; Copy = PresentationLanguage.failure (UiFailure.CapabilityAbsent(DataVisible, "unknown route")) }
     { Route = s.Route
       Primary = Navigation.primary s.Route
       Screen = screen

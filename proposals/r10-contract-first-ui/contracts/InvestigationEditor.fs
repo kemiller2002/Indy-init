@@ -21,7 +21,8 @@ type StartView =
       Submission: Submission }
 
 /// The progress of one submitted command. Correctness is the engine's and persistence's; the UI shows the outcome.
-and Submission =
+/// Qualified access: Refused would otherwise collide with IF41-SAVE SaveFailure.Refused.
+and [<RequireQualifiedAccess>] Submission =
     | NotSubmitted
     | Submitting
     | Refused of reasons: string list

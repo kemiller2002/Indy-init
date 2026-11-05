@@ -112,7 +112,7 @@ let ``the seven frozen save states map one to one onto the presentation states``
     Assert.Equal<SaveStateKind list>([ UnsavedKind; SavingKind; OfflineKind; UnknownOutcomeKind; SaveFailedKind; ConflictKind ], mapped)
 
 [<Fact>]
-let ``R9 the adapter maps provider NotFound to InvestigationNotFound and offers the frozen conflict choices`` () =
+let ``R9 the adapter maps provider NotFound to UiFailure.InvestigationNotFound and offers the frozen conflict choices`` () =
     let r = Scenarios.apollo11Ref
     let id = r.Id
     let route = WorkspaceRoute(Navigation.targetOf r, Overview)
@@ -121,6 +121,6 @@ let ``R9 the adapter maps provider NotFound to InvestigationNotFound and offers 
           Update = fun _ m -> m, [] }
     let b = Causa.Ui.RealAdapter.Sketch.backend (engine (Map.ofList [ id, LoadFailed(ProviderFailed(NotFound "investigation")) ]) Map.empty)
     match (b.Project(fst (b.Init route))).Screen with
-    | WorkspaceScreen w -> Assert.Equal(ScreenFailed(InvestigationNotFound(Navigation.targetOf r)), w.State)
+    | WorkspaceScreen w -> Assert.Equal(ScreenFailed(UiFailure.InvestigationNotFound(Navigation.targetOf r)), w.State)
     | other -> Assert.Fail(sprintf "%A" other)
     Assert.Equal<SaveAction list>([ Review; ReapplyMine; DiscardMine; ExportMine ], SaveChoices.forKind ConflictKind)
