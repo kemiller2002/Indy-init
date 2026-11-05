@@ -42,9 +42,51 @@ The plans with merge dependencies and every cyclic edge deferred (`results/J0-*.
 
 **The truth for any adopted CF-07 option lies between these two bounds.** Every milestone time published in this directory and in TIME-TO-WORKING-APPLICATION.md, TIME-TO-FIRST-DATA.md and SCHEDULE-COMPARISON.md is the **optimistic bound**. It assumes merge-time journey dependencies do not bind.
 
+### Agent 2's requested comparisons (SCHEDULE-INPUTS.md §6)
+
+**How the runs were set up.**
+- **Inputs.** They come from PR #121 at b89465a and are rebuilt on demand by `tools/r10/contract-first-inputs.fsx prepare`, so nothing of PR #121 is committed.
+- **Settings.** The successor plan, 45-min set-up, 3-min merges, chain-first priority, and the journey merge dependencies with every cyclic edge deferred. Agent 2 confirms this deferral is the faithful reading of CF-07 option A.
+- **Contract-first.** Every UI-boundary slice is built after SL-T10, and merges after its declared `dependsOn` (`mergeDependsOn`) and its journey merge dependencies. This is an approximation: PR #121 lets a UI slice start once its UI predecessors are *built*, and this model lets it start once SL-T10 is integrated.
+- **Capability times** are the last integration among PR #121's `capabilities` slice sets (`contract-first-inputs.fsx table`).
+- **Results:** `results/K-*.json`.
+
+**Primary: option A (every cyclic edge deferred), this model.** Minutes after T0 at 0 / 5 / 10-min CI:
+
+| Plan | Queue depth | Data Visible | Data Understood | Data Editable | All integrated |
+|---|---|---|---|---|---|
+| Current plan | 1 | 640/674/620 | 660/699/754 | 696/740/806 | 696/740/806 |
+| Current plan | 3 | 640/666/690 | 660/691/720 | 696/732/766 | 696/732/766 |
+| Contract-first, existing UI agents | 1 | 593/603/661 | 599/619/713 | 616/635/726 | 616/643/805 |
+| Contract-first, existing UI agents | 3 | 593/603/613 | 599/614/629 | 616/626/639 | 616/626/642 |
+| Contract-first, 1 UI agent | 1 | 746/756/766 | 752/772/792 | 769/788/818 | 769/796/831 |
+| Contract-first, 1 UI agent | 3 | 746/756/766 | 752/767/782 | 769/779/792 | 769/779/795 |
+| Contract-first, 2 UI agents | 1 | 384/429/544 | 445/485/687 | 465/517/726 | 465/585/838 |
+| Contract-first, 2 UI agents | 3 | 384/395/404 | 445/460/477 | 465/475/493 | 465/475/507 |
+| Contract-first, 3 UI agents | 1 | 278/437/583 | 340/453/635 | 328/493/726 | 435/622/838 |
+| Contract-first, **3 UI agents** | **3** | **278/290/313** | **340/351/367** | **328/348/380** | **435/471/518** |
+
+**Sensitivity bound: minimal deferral (Agent 2's `contract-first-bound.fsx`, its own serial queue).** Data Visible / Understood / Editable / all, in minutes after T0:
+
+| Plan | 0-min CI | 5-min CI | 10-min CI |
+|---|---|---|---|
+| Current plan | 758/764/800/800 | 859/875/916/916 | 967/993/1042/1042 |
+| Contract-first, existing UI agents | 673/682/691/787 | 776/808/832/868 | 894/946/998/998 |
+| Contract-first, 1 UI agent | 826/835/844/940 | 929/961/985/1021 | 1047/1099/1151/1151 |
+| Contract-first, 2 UI agents | 468/477/486/582 | 571/603/627/663 | 760/812/864/864 |
+| Contract-first, 3 UI agents | 364/373/382/475 | 502/534/558/594 | 708/760/812/812 |
+
+**Reading the two together:**
+1. **Contract-first helps only with more UI agents.** With one UI agent it is *later* than the current plan under both deferral rules: the single lane builds everything and then waits at the queue.
+2. **Three UI agents with the speculative queue** is the only configuration that puts all three capabilities inside 420 minutes at every CI value, under option A: Data Visible T+278–313, everything integrated T+435–518. Under minimal deferral, the same plan misses 420 at every CI value.
+3. **The queue depth matters more as CI slows.** For contract-first with three UI agents at 10-min CI, depth 1 gives Data Visible T+583 and depth 3 gives T+313.
+4. **Non-monotonic cells appear here too** (the current plan, depth 1: Data Visible 674 at 5-min CI, 620 at 10-min CI). Read each row as a range.
+5. **Under the narrower deferral, nothing fits in 420 minutes.** So the CF-07 decision is worth more than any agent-count or ordering change.
+6. **Data Visible here is PR #121's capability**, including T25 and the authoritative list. It is not this branch's M0 raw browser (MINIMUM-DATA-BROWSER.md), which arrives earlier and needs no T25.
+
 ### Other Agent 2 material
 
-- **Role files** (`roles.contract-first-{1,2,3}ui.json`): keyed by this branch's successor slice ids. They were run through Agent 2's tool above. They were not added to this branch's model runs, because they depend on Agent 2's ownership proposal, which is not adopted.
+- **Role files** (`roles.contract-first-{1,2,3}ui.json`): run in this model above (`results/K-*.json`). They depend on Agent 2's ownership proposal, which is not adopted, so these are sensitivity results.
 - **OD-INDY-22 interaction:** Agent 2's fixture implementations must enter a run only as specification or frozen-package content (INTEGRATION-ARCHITECTURE.md).
 
 ## Agent 3: historical data compatibility

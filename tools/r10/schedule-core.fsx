@@ -106,7 +106,8 @@ let milestoneRank (milestones: (string * string * string list) list) (slices: Sl
             i + 1, carriers |> List.fold (fun a c -> ancestors c a) Set.empty)
     slices |> List.map (fun s -> s.Id, (needed |> List.tryFind (fun (_, set) -> set.Contains s.Id) |> Option.map fst |> Option.defaultValue (milestones.Length + 1))) |> Map.ofList
 
-/// Merge dependencies from a manifest's governedAssertions and an assertion -> needed-slices file
+/// Merge dependencies from a manifest's governedAssertions and an assertion -> needed-slices file, plus any slice's
+/// explicit "mergeDependsOn" (a contract-first plan moves a UI slice's dependsOn there: built early, merged in order)
 /// ({ "rules": [ { "assertions": [..], "needs": [..] } ] }). Ids absent from the manifest are ignored.
 let loadMergeDeps (manifestPath: string) (depsPath: string) : Map<string, string list> =
     let depsDoc = JsonNode.Parse(File.ReadAllText depsPath)
@@ -120,7 +121,8 @@ let loadMergeDeps (manifestPath: string) (depsPath: string) : Map<string, string
     slices |> List.map (fun s ->
         let id = str s "id"
         let bound = match s["governedAssertions"] with null -> [] | v -> v.AsArray() |> Seq.map string |> List.ofSeq
-        id, bound |> List.collect needs |> List.distinct |> List.filter (fun x -> x <> id && ids.Contains x))
+        let declared = match s["mergeDependsOn"] with null -> [] | v -> v.AsArray() |> Seq.map string |> List.ofSeq
+        id, (declared @ (bound |> List.collect needs)) |> List.distinct |> List.filter (fun x -> x <> id && ids.Contains x))
     |> List.filter (fun (_, d) -> not d.IsEmpty) |> Map.ofList
 
 /// The merge-dependency edges (slice, needed) that close a cycle with dependsOn and the other merge dependencies:
