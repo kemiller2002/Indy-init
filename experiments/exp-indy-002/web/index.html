@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Causa investigations · EXP-INDY-002</title>
+  <link rel="stylesheet" href="./forma/all.css">
+  <link rel="stylesheet" href="./app.css">
+  <script type="importmap">
+    { "imports": { "@echelon-foundry/limen": "./limen/index.js", "@echelon-foundry/limen/hosts/dotnet-wasm": "./limen/hosts/dotnet-wasm-transport.js", "@echelon-foundry/limen/": "./limen/" } }
+  </script>
+  <script type="module" src="./main.js"></script>
+</head>
+<body>
+<div class="ef-site">
+  <header class="ef-site-header">
+    <div class="ef-site-header__inner">
+      <span class="ef-site-header__brand"><span class="ef-site-header__name">Causa investigations</span></span>
+    </div>
+  </header>
+
+  <main class="ef-container exp-main" id="app">
+    <template data-if="busy"><p class="exp-loading" role="status" aria-live="polite"><span class="ef-status-lozenge" data-state="current" data-text="busyText">Loading…</span></p></template>
+    <template data-if="hasAlert">
+      <aside class="ef-alert" role="alert" data-tone="attention"><div class="ef-alert__icon" aria-hidden="true">!</div><div><p data-text="alertText"></p></div></aside>
+    </template>
+
+    <!-- ===== List screen #/ ===== -->
+    <template data-if="onList">
+      <section class="ef-stack exp-screen" aria-labelledby="list-heading">
+        <h1 id="list-heading">Investigations</h1>
+        <p><button type="button" class="ef-button" data-variant="primary" data-event="show-start">New investigation</button></p>
+        <section role="region" aria-label="Investigations" data-requirement-id="INV-039">
+          <template data-if="noInvestigations"><p>No saved investigations in this browser yet.</p></template>
+          <ul class="exp-list">
+            <template data-each="investigations" data-key="id">
+              <li><a data-requirement-id="INV-040" data-event="open-investigation" data-bind-href="href" data-text="title"></a></li>
+            </template>
+          </ul>
+        </section>
+      </section>
+    </template>
+
+    <!-- ===== Start screen #/investigations/new ===== -->
+    <template data-if="onStart">
+      <section class="ef-stack exp-screen" aria-labelledby="start-heading">
+        <h1 id="start-heading">Start an investigation</h1>
+        <form class="ef-form ef-stack" data-event="submit-start" novalidate>
+          <div class="ef-field" data-requirement-id="INV-006">
+            <label class="ef-field__label" for="start-id">Investigation identifier</label>
+            <input id="start-id" type="text" data-event="field:INV-006" data-on="input" data-bind-value="startINV006" data-bind-aria-invalid="startInvalidINV006" aria-describedby="start-id-err">
+            <template data-if="startHasErrINV006"><p class="ef-validation-message" id="start-id-err" data-text="startErrINV006"></p></template>
+          </div>
+          <div class="ef-field" data-requirement-id="INV-001">
+            <label class="ef-field__label" for="start-problem">Problem statement</label>
+            <textarea id="start-problem" rows="4" data-event="field:INV-001" data-on="input" data-bind-value="startINV001" data-bind-aria-invalid="startInvalidINV001" aria-describedby="start-problem-err"></textarea>
+            <div data-requirement-id="INV-021">
+              <template data-if="startHasErrINV001"><p class="ef-validation-message" id="start-problem-err" data-requirement-id="INV-019" data-text="startErrINV001"></p></template>
+            </div>
+          </div>
+          <div class="ef-field" data-requirement-id="INV-002">
+            <label class="ef-field__label" for="start-title">Title</label>
+            <input id="start-title" type="text" data-event="field:INV-002" data-on="input" data-bind-value="startINV002" data-bind-aria-invalid="startInvalidINV002" aria-describedby="start-title-err">
+            <template data-if="startHasErrINV002"><p class="ef-validation-message" id="start-title-err" data-requirement-id="INV-020" data-text="startErrINV002"></p></template>
+          </div>
+          <div class="ef-field" data-requirement-id="INV-023">
+            <label class="ef-field__label" for="start-question">Primary investigative question</label>
+            <textarea id="start-question" rows="3" data-event="field:INV-023" data-on="input" data-bind-value="startINV023" data-bind-aria-invalid="startInvalidINV023" aria-describedby="start-question-err"></textarea>
+            <template data-if="startHasErrINV023"><p class="ef-validation-message" id="start-question-err" data-text="startErrINV023"></p></template>
+          </div>
+          <p class="exp-saved-to" data-requirement-id="INV-005" data-text="savedTo">Saved to: this browser (local storage)</p>
+          <div class="exp-actions">
+            <button type="submit" class="ef-button" data-variant="primary" data-requirement-id="INV-004">Start investigation</button>
+            <button type="button" class="ef-button" data-requirement-id="INV-022" data-event="cancel-start">Cancel</button>
+          </div>
+        </form>
+      </section>
+    </template>
+
+    <!-- ===== Workspace #/investigations/{id} ===== -->
+    <template data-if="onWorkspace">
+      <div class="exp-screen" data-requirement-id="INV-017">
+        <template data-if="wsLoading"><p>Opening the investigation…</p></template>
+        <template data-if="wsLoaded">
+          <div class="ef-stack">
+            <p><button type="button" class="ef-button" data-event="show-list">All investigations</button></p>
+            <header class="ef-record-header ef-stack">
+              <h1 class="ef-record-header__title" data-text="wsTitle"></h1>
+              <dl class="exp-facts">
+                <dt>Created</dt><dd data-requirement-id="INV-007" data-text="wsCreated"></dd>
+                <dt>Problem statement</dt><dd data-requirement-id="INV-008" data-text="wsProblem"></dd>
+                <dt>Primary investigative question</dt><dd data-text="wsQuestion"></dd>
+                <dt>Investigation state</dt><dd data-requirement-id="INV-018" data-text="wsState"></dd>
+              </dl>
+              <p role="status" aria-live="polite" class="exp-save-state">Save state:
+                <span class="ef-status-lozenge" data-requirement-id="INV-016" data-bind-data-state="saveStateTone" data-text="saveStateText"></span></p>
+              <div class="exp-actions ef-record-header__actions">
+                <button type="button" class="ef-button" data-variant="primary" data-requirement-id="INV-015" data-event="save" data-bind-disabled="saveDisabled">Save</button>
+                <button type="button" class="ef-button" data-requirement-id="INV-034" data-event="edit-details">Edit details</button>
+              </div>
+            </header>
+
+            <!-- Editors: at most one open; each has Confirm and Cancel (INV-036). -->
+            <template data-if="editorOpen">
+              <section class="ef-surface exp-editor ef-stack" aria-labelledby="editor-heading" data-requirement-id="INV-036">
+                <h2 id="editor-heading" data-text="editorTitle"></h2>
+                <template data-if="editorDetails">
+                  <form class="ef-form ef-stack" data-event="submit-editor" novalidate>
+                    <div class="ef-field"><label class="ef-field__label" for="ed-problem">Problem statement</label>
+                      <textarea id="ed-problem" rows="4" data-event="field:INV-001" data-on="input" data-bind-value="draftINV001" data-bind-aria-invalid="InvalidINV001"></textarea>
+                      <template data-if="HasErrINV001"><p class="ef-validation-message" data-text="ErrINV001"></p></template></div>
+                    <div class="ef-field"><label class="ef-field__label" for="ed-title">Title</label>
+                      <input id="ed-title" type="text" data-event="field:INV-002" data-on="input" data-bind-value="draftINV002" data-bind-aria-invalid="InvalidINV002">
+                      <template data-if="HasErrINV002"><p class="ef-validation-message" data-text="ErrINV002"></p></template></div>
+                    <div class="ef-field"><label class="ef-field__label" for="ed-question">Primary investigative question</label>
+                      <textarea id="ed-question" rows="3" data-event="field:INV-023" data-on="input" data-bind-value="draftINV023" data-bind-aria-invalid="InvalidINV023"></textarea>
+                      <template data-if="HasErrINV023"><p class="ef-validation-message" data-text="ErrINV023"></p></template></div>
+                    <div class="exp-actions"><button type="submit" class="ef-button" data-variant="primary">Confirm</button><button type="button" class="ef-button" data-event="cancel-editor">Cancel</button></div>
+                  </form>
+                </template>
+                <template data-if="editorObservation">
+                  <form class="ef-form ef-stack" data-event="submit-editor" novalidate>
+                    <div class="ef-field" data-requirement-id="INV-024"><label class="ef-field__label" for="ed-obs">Observation</label>
+                      <textarea id="ed-obs" rows="3" data-event="field:INV-024" data-on="input" data-bind-value="draftINV024" data-bind-aria-invalid="InvalidINV024"></textarea>
+                      <template data-if="HasErrINV024"><p class="ef-validation-message" data-text="ErrINV024"></p></template></div>
+                    <div class="ef-field" data-requirement-id="INV-025"><label class="ef-field__label" for="ed-obs-src">Source reference</label>
+                      <input id="ed-obs-src" type="text" data-event="field:INV-025" data-on="input" data-bind-value="draftINV025" data-bind-aria-invalid="InvalidINV025">
+                      <template data-if="HasErrINV025"><p class="ef-validation-message" data-text="ErrINV025"></p></template></div>
+                    <div class="exp-actions"><button type="submit" class="ef-button" data-variant="primary">Confirm</button><button type="button" class="ef-button" data-event="cancel-editor">Cancel</button></div>
+                  </form>
+                </template>
+                <template data-if="editorHypothesis">
+                  <form class="ef-form ef-stack" data-event="submit-editor" novalidate>
+                    <div class="ef-field" data-requirement-id="INV-026"><label class="ef-field__label" for="ed-hyp">Hypothesis</label>
+                      <textarea id="ed-hyp" rows="3" data-event="field:INV-026" data-on="input" data-bind-value="draftINV026" data-bind-aria-invalid="InvalidINV026"></textarea>
+                      <template data-if="HasErrINV026"><p class="ef-validation-message" data-text="ErrINV026"></p></template></div>
+                    <div class="ef-field" data-requirement-id="INV-011"><label class="ef-field__label" for="ed-hyp-exp">What it explains</label>
+                      <textarea id="ed-hyp-exp" rows="3" data-event="field:INV-011" data-on="input" data-bind-value="draftINV011" data-bind-aria-invalid="InvalidINV011"></textarea>
+                      <template data-if="HasErrINV011"><p class="ef-validation-message" data-text="ErrINV011"></p></template></div>
+                    <div class="exp-actions"><button type="submit" class="ef-button" data-variant="primary">Confirm</button><button type="button" class="ef-button" data-event="cancel-editor">Cancel</button></div>
+                  </form>
+                </template>
+                <template data-if="editorEvidence">
+                  <form class="ef-form ef-stack" data-event="submit-editor" novalidate>
+                    <div class="ef-field" data-requirement-id="INV-027"><label class="ef-field__label" for="ed-ev-label">Evidence label</label>
+                      <input id="ed-ev-label" type="text" data-event="field:INV-027" data-on="input" data-bind-value="draftINV027" data-bind-aria-invalid="InvalidINV027">
+                      <template data-if="HasErrINV027"><p class="ef-validation-message" data-text="ErrINV027"></p></template></div>
+                    <div class="ef-field" data-requirement-id="INV-012"><label class="ef-field__label" for="ed-ev-content">Original content</label>
+                      <textarea id="ed-ev-content" rows="4" data-event="field:INV-012" data-on="input" data-bind-value="draftINV012" data-bind-aria-invalid="InvalidINV012"></textarea>
+                      <template data-if="HasErrINV012"><p class="ef-validation-message" data-text="ErrINV012"></p></template></div>
+                    <div class="ef-field" data-requirement-id="INV-028"><label class="ef-field__label" for="ed-ev-src">Source reference</label>
+                      <input id="ed-ev-src" type="text" data-event="field:INV-028" data-on="input" data-bind-value="draftINV028" data-bind-aria-invalid="InvalidINV028">
+                      <template data-if="HasErrINV028"><p class="ef-validation-message" data-text="ErrINV028"></p></template></div>
+                    <div class="ef-field" data-requirement-id="INV-029"><label class="ef-field__label" for="ed-ev-url">Source URL</label>
+                      <input id="ed-ev-url" type="url" data-event="field:INV-029" data-on="input" data-bind-value="draftINV029" data-bind-aria-invalid="InvalidINV029">
+                      <template data-if="HasErrINV029"><p class="ef-validation-message" data-text="ErrINV029"></p></template></div>
+                    <div class="exp-actions"><button type="submit" class="ef-button" data-variant="primary">Confirm</button><button type="button" class="ef-button" data-event="cancel-editor">Cancel</button></div>
+                  </form>
+                </template>
+                <template data-if="editorLink">
+                  <form class="ef-form ef-stack" data-event="submit-editor" novalidate>
+                    <div class="ef-field"><label class="ef-field__label" for="ed-rel-ev">Evidence item</label>
+                      <select id="ed-rel-ev" data-event="field:INV-030-evidence" data-bind-aria-invalid="InvalidINV030evidence">
+                        <option value="">Choose evidence…</option>
+                        <template data-each="evidenceOptions" data-key="id"><option data-bind-value="id" data-bind-selected="selected" data-text="label"></option></template>
+                      </select>
+                      <template data-if="HasErrINV030evidence"><p class="ef-validation-message" data-text="ErrINV030evidence"></p></template></div>
+                    <div class="ef-field"><label class="ef-field__label" for="ed-rel-hyp">Hypothesis to assess</label>
+                      <select id="ed-rel-hyp" data-event="field:INV-030-hypothesis" data-bind-aria-invalid="InvalidINV030hypothesis">
+                        <option value="">Choose a hypothesis…</option>
+                        <template data-each="hypothesisOptions" data-key="id"><option data-bind-value="id" data-bind-selected="selected" data-text="label"></option></template>
+                      </select>
+                      <template data-if="HasErrINV030hypothesis"><p class="ef-validation-message" data-text="ErrINV030hypothesis"></p></template></div>
+                    <fieldset class="ef-field exp-radios" data-requirement-id="INV-031"><legend class="ef-field__label">Relationship</legend>
+                      <label><input type="radio" name="rel-kind" value="supports" data-event="field:INV-031" data-bind-checked="kindSupports"> Supports</label>
+                      <label><input type="radio" name="rel-kind" value="contradicts" data-event="field:INV-031" data-bind-checked="kindContradicts"> Contradicts</label>
+                      <label><input type="radio" name="rel-kind" value="consistent-with" data-event="field:INV-031" data-bind-checked="kindConsistentWith"> Consistent with</label>
+                      <label><input type="radio" name="rel-kind" value="inconclusive" data-event="field:INV-031" data-bind-checked="kindInconclusive"> Inconclusive</label>
+                      <template data-if="HasErrINV031"><p class="ef-validation-message" data-text="ErrINV031"></p></template>
+                    </fieldset>
+                    <div class="ef-field" data-requirement-id="INV-038"><label class="ef-field__label" for="ed-rel-why">Rationale</label>
+                      <textarea id="ed-rel-why" rows="3" data-event="field:INV-038" data-on="input" data-bind-value="draftINV038" data-bind-aria-invalid="InvalidINV038"></textarea>
+                      <template data-if="HasErrINV038"><p class="ef-validation-message" data-text="ErrINV038"></p></template></div>
+                    <div class="exp-actions"><button type="submit" class="ef-button" data-variant="primary">Confirm</button><button type="button" class="ef-button" data-event="cancel-editor">Cancel</button></div>
+                  </form>
+                </template>
+                <template data-if="editorReassess">
+                  <form class="ef-form ef-stack" data-event="submit-editor" novalidate>
+                    <p data-text="reassessTarget"></p>
+                    <fieldset class="ef-field exp-radios"><legend class="ef-field__label">Relationship</legend>
+                      <label><input type="radio" name="rev-kind" value="supports" data-event="field:INV-031" data-bind-checked="kindSupports"> Supports</label>
+                      <label><input type="radio" name="rev-kind" value="contradicts" data-event="field:INV-031" data-bind-checked="kindContradicts"> Contradicts</label>
+                      <label><input type="radio" name="rev-kind" value="consistent-with" data-event="field:INV-031" data-bind-checked="kindConsistentWith"> Consistent with</label>
+                      <label><input type="radio" name="rev-kind" value="inconclusive" data-event="field:INV-031" data-bind-checked="kindInconclusive"> Inconclusive</label>
+                      <template data-if="HasErrINV031"><p class="ef-validation-message" data-text="ErrINV031"></p></template>
+                    </fieldset>
+                    <div class="ef-field"><label class="ef-field__label" for="ed-rev-why">Rationale</label>
+                      <textarea id="ed-rev-why" rows="3" data-event="field:INV-038" data-on="input" data-bind-value="draftINV038" data-bind-aria-invalid="InvalidINV038"></textarea>
+                      <template data-if="HasErrINV038"><p class="ef-validation-message" data-text="ErrINV038"></p></template></div>
+                    <div class="exp-actions">
+                      <button type="submit" class="ef-button" data-variant="primary">Confirm</button>
+                      <template data-each="reassessing" data-key="id"><button type="button" class="ef-button" data-event="withdraw-relationship">Withdraw</button></template>
+                      <button type="button" class="ef-button" data-event="cancel-editor">Cancel</button>
+                    </div>
+                  </form>
+                </template>
+              </section>
+            </template>
+
+            <section class="ef-section ef-stack" aria-labelledby="obs-heading">
+              <h2 id="obs-heading">Observations</h2>
+              <p><button type="button" class="ef-button" data-requirement-id="INV-014" data-event="new-observation">Record an observation</button></p>
+              <template data-if="noObservations"><p>No observations yet.</p></template>
+              <ul class="exp-list">
+                <template data-each="observations" data-key="id">
+                  <li class="ef-surface exp-item"><p data-text="text"></p>
+                    <template data-if="hasSource"><p class="exp-meta">Source reference: <span data-text="source"></span></p></template>
+                    <button type="button" class="ef-button" data-event="edit-observation">Edit</button></li>
+                </template>
+              </ul>
+            </section>
+
+            <section class="ef-section ef-stack" aria-labelledby="hyp-heading" data-requirement-id="INV-010">
+              <h2 id="hyp-heading">Hypotheses</h2>
+              <p><button type="button" class="ef-button" data-requirement-id="INV-009" data-event="new-hypothesis">Record a hypothesis</button></p>
+              <template data-if="noHypotheses"><p>No hypotheses yet.</p></template>
+              <ul class="exp-list">
+                <template data-each="hypotheses" data-key="id">
+                  <li class="ef-surface exp-item"><p data-text="statement"></p>
+                    <p class="exp-meta">What it explains: <span data-text="explanation"></span></p>
+                    <template data-if="hasLinks"><p class="exp-links" data-requirement-id="INV-044">Linked evidence: <span data-text="links"></span></p></template>
+                    <button type="button" class="ef-button" data-event="edit-hypothesis">Edit</button></li>
+                </template>
+              </ul>
+            </section>
+
+            <section class="ef-section ef-stack" aria-labelledby="ev-heading" data-requirement-id="INV-013">
+              <h2 id="ev-heading">Evidence</h2>
+              <p><button type="button" class="ef-button" data-event="new-evidence">Add evidence</button></p>
+              <template data-if="noEvidence"><p>No evidence yet.</p></template>
+              <ul class="exp-list">
+                <template data-each="evidence" data-key="id">
+                  <li class="ef-surface exp-item"><p><strong data-text="label"></strong></p>
+                    <p class="exp-content" data-text="content"></p>
+                    <template data-if="hasSource"><p class="exp-meta">Source reference: <span data-text="source"></span></p></template>
+                    <template data-if="hasLinkUrl"><p class="exp-meta">Source URL: <a data-bind-href="url" data-text="url" rel="noopener noreferrer" target="_blank"></a></p></template>
+                    <template data-if="hasPlainUrl"><p class="exp-meta">Source URL: <span data-text="url"></span></p></template>
+                    <template data-if="hasLinks"><p class="exp-links" data-requirement-id="INV-044">Linked hypotheses: <span data-text="links"></span></p></template>
+                    <button type="button" class="ef-button" data-event="edit-evidence">Edit</button></li>
+                </template>
+              </ul>
+            </section>
+
+            <section class="ef-section ef-stack" aria-labelledby="rel-heading" data-requirement-id="INV-030">
+              <h2 id="rel-heading">Relationships</h2>
+              <template data-if="canLink"><p><button type="button" class="ef-button" data-event="new-relationship">Link evidence to a hypothesis</button></p></template>
+              <template data-if="cannotLink"><p>Add at least one piece of evidence and one hypothesis to link them.</p></template>
+              <template data-if="noRelationships"><p>No relationships yet.</p></template>
+              <ul class="exp-list">
+                <template data-each="relationships" data-key="id">
+                  <li class="ef-surface exp-item"><p><span data-text="evidenceLabel"></span> → <span data-text="hypothesisStatement"></span>: <strong data-text="kind"></strong></p>
+                    <p class="exp-meta">Rationale: <span data-text="rationale"></span></p>
+                    <p class="exp-meta">Status: <span data-text="status"></span></p>
+                    <template data-if="isCurrent"><button type="button" class="ef-button" data-event="reassess-relationship">Reassess</button></template></li>
+                </template>
+              </ul>
+            </section>
+
+            <section class="ef-section ef-stack" aria-labelledby="hist-heading" data-requirement-id="INV-035">
+              <h2 id="hist-heading">History</h2>
+              <ol class="exp-history">
+                <template data-each="history" data-key="seq"><li data-text="text"></li></template>
+              </ol>
+            </section>
+          </div>
+        </template>
+      </div>
+    </template>
+  </main>
+</div>
+</body>
+</html>

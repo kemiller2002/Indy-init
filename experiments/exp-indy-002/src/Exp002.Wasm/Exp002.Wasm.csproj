@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk.WebAssembly">
+  <!-- Host only: one [JSExport] marshalling method (documented exception: C# shim, no application logic). -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Nullable>enable</Nullable>
+    <RootNamespace>Exp002Wasm</RootNamespace>
+    <NoWarn>$(NoWarn);CA1416</NoWarn>
+    <PublishTrimmed>false</PublishTrimmed>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../Exp002.Ui/Exp002.Ui.fsproj" />
+    <SupportedPlatform Include="browser" />
+  </ItemGroup>
+</Project>
