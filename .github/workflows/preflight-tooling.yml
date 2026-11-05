@@ -16,7 +16,7 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 jobs:
   offline-contract-tests:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -33,7 +33,7 @@ jobs:
   # Compiled package v4 is frozen at tag indy-init-requirements-v4.0.0 and is never recompiled with a later compiler:
   # its files on this commit must equal the tagged ones, and the tagged compiler and test suite reproduce them.
   frozen-v4:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
         with:
@@ -92,7 +92,7 @@ jobs:
         working-directory: ${{ runner.temp }}/v4-frozen
         run: dotnet tools/requirements-compiler/src/bin/Release/net10.0/requirements-compiler.dll v4 --source . --package requirements-compiled/v4 --registry "$GITHUB_WORKSPACE/.echelon-registry" --r7-evidence "$CAUSA_R7_EVIDENCE" --verify-test-record "$RUNNER_TEMP/v4-frozen-record.json" --check
   fsharp-tooling:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
         with:
@@ -313,11 +313,17 @@ jobs:
           pending415 dotnet tools/requirements-compiler/src/bin/Release/net10.0/requirements-compiler.dll v41 --source . --package requirements-compiled/v4.1.5 --base requirements-compiled/v4 --check --bootstrap "$RUNNER_TEMP/layered415"
           dotnet build "$RUNNER_TEMP/layered415/Causa.slnx" -c Release
           dotnet build "$RUNNER_TEMP/layered415/App.slnx" -c Release
+      - name: Restore pinned Playwright browser cache
+        id: playwright-browser-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-ubuntu2404-x64-1.63.0-chromium-webkit-v1
       - name: Executable Forma layout assertions pass on Forma 0.12.0 patterns and fail on broken fixtures (Chromium and WebKit)
         run: |
           mkdir -p "$RUNNER_TEMP/forma" "$RUNNER_TEMP/layout"
           tar -xzf "$RUNNER_TEMP/forma.tgz" -C "$RUNNER_TEMP/forma"
-          cd "$RUNNER_TEMP/layout" && npm init -y > /dev/null && npm install --no-audit --no-fund playwright@1.63.0 axe-core@4.14.0 > /dev/null && (for a in 1 2; do timeout 600 npx playwright install --with-deps chromium webkit && break; if [ "$a" = 2 ]; then echo "::error::browser install failed twice"; exit 1; fi; echo "::warning::browser install attempt $a failed or exceeded 10 min (apt mirror); retrying"; done) > /dev/null
+          cd "$RUNNER_TEMP/layout" && npm init -y > /dev/null && npm install --no-audit --no-fund playwright@1.63.0 axe-core@4.14.0 > /dev/null && (if [ "${{ steps.playwright-browser-cache.outputs.cache-hit }}" = "true" ]; then timeout 120 npx playwright install chromium webkit && node -e "const p=require('playwright'); Promise.all([p.chromium.launch(),p.webkit.launch()]).then(bs=>Promise.all(bs.map(b=>b.close()))).catch(()=>process.exit(1))" && echo "Cached browsers launched" || { echo "::warning::cache browser launch failed; falling back to dependency installation"; for a in 1 2; do timeout 600 npx playwright install --with-deps chromium webkit && break; if [ "$a" = 2 ]; then echo "::error::browser install failed twice"; exit 1; fi; done; }; else for a in 1 2; do timeout 600 npx playwright install --with-deps chromium webkit && break; if [ "$a" = 2 ]; then echo "::error::browser install failed twice"; exit 1; fi; echo "::warning::browser install attempt $a failed or exceeded 10 min (apt mirror); retrying"; done; fi) > /dev/null
           cd "$GITHUB_WORKSPACE"
           cp -r requirements-compiled/v4.1/layout-tests/. "$RUNNER_TEMP/layout/"
           node "$RUNNER_TEMP/layout/run.mjs" --forma "$RUNNER_TEMP/forma/package" --contract requirements-compiled/v4.1/analysis/forma-layout-contract.json --inventory requirements-compiled/v4.1/analysis/forma-0.12.0-inventory.json --axe "$RUNNER_TEMP/layout/node_modules/axe-core/axe.min.js" --browsers chromium,webkit
@@ -340,7 +346,7 @@ jobs:
   release-gate-repair:
     # docs/release-gate-repair: the suite-command defects Rehearsal 009 hit stay refused, the corrected v4.1.4 runners
     # execute, the Praxis ordering gate and the acceptance levels behave as specified.
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
@@ -389,7 +395,7 @@ jobs:
           path: ${{ runner.temp }}/rg-evidence
 
   r9-readiness-gates:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
@@ -420,18 +426,24 @@ jobs:
   # suite of the successor v4.1.4 lists and runs, WebKit included. The release-gate-repair harness lists the same
   # commands; this job also executes them (docs/rehearsal-010-readiness/INTEGRATION-REPORT.md).
   suite-commands:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
         with:
           global-json-file: global.json
+      - name: Restore pinned Playwright browser cache
+        id: playwright-browser-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-ubuntu2404-x64-1.63.0-chromium-webkit-v1
       - name: Fixture trees (with and without the webkit project)
         run: |
           dotnet fsi tools/r9/r9.fsx -- suite-fixture --out "$RUNNER_TEMP/fx"
           dotnet fsi tools/r9/r9.fsx -- suite-fixture --out "$RUNNER_TEMP/fx-nowebkit" --without-webkit true
-          (cd "$RUNNER_TEMP/fx" && npm install --no-audit --no-fund && (for a in 1 2; do timeout 600 npx playwright install --with-deps chromium webkit && break; if [ "$a" = 2 ]; then echo "::error::browser install failed twice"; exit 1; fi; echo "::warning::browser install attempt $a failed or exceeded 10 min (apt mirror); retrying"; done))
+          (cd "$RUNNER_TEMP/fx" && npm install --no-audit --no-fund && (if [ "${{ steps.playwright-browser-cache.outputs.cache-hit }}" = "true" ]; then timeout 120 npx playwright install chromium webkit && node -e "const p=require('playwright'); Promise.all([p.chromium.launch(),p.webkit.launch()]).then(bs=>Promise.all(bs.map(b=>b.close()))).catch(()=>process.exit(1))" && echo "Cached browsers launched" || { echo "::warning::cache browser launch failed; falling back to dependency installation"; for a in 1 2; do timeout 600 npx playwright install --with-deps chromium webkit && break; if [ "$a" = 2 ]; then echo "::error::browser install failed twice"; exit 1; fi; done; }; else for a in 1 2; do timeout 600 npx playwright install --with-deps chromium webkit && break; if [ "$a" = 2 ]; then echo "::error::browser install failed twice"; exit 1; fi; echo "::warning::browser install attempt $a failed or exceeded 10 min (apt mirror); retrying"; done; fi))
           cp -r "$RUNNER_TEMP/fx/node_modules" "$RUNNER_TEMP/fx-nowebkit/"
       - name: The frozen v4.1.2 commands are refused (MSB1008), and a missing webkit project is refused
         run: |
@@ -457,7 +469,7 @@ jobs:
   # always() so a failed or cancelled shard can never leave it "skipped" (which would read as passing), refuses unless
   # every shard succeeded, and proves the shards' union is the whole case list before its own steps run.
   r10-adversarial-cases:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 45
     strategy:
       fail-fast: false
@@ -477,11 +489,17 @@ jobs:
           dotnet fsi tools/r9/r9.fsx -- workstation --lock kickoff/rehearsal-009/toolchain.lock.json \
             --conditor "$RUNNER_TEMP/conditor/conditor" --home "$RUNNER_TEMP/echelon" --target-id "indy-init-adv-${{ github.run_id }}"
           echo "$RUNNER_TEMP/echelon/.local/bin" >> "$GITHUB_PATH"
+      - name: Restore pinned Playwright browser cache
+        id: playwright-browser-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-ubuntu2404-x64-1.63.0-chromium-webkit-v1
       - name: Playwright, Chromium and WebKit; Forma for the harness fixture
         run: |
           mkdir -p "$RUNNER_TEMP/pw" && cd "$RUNNER_TEMP/pw" && npm init -y > /dev/null
           npm install --no-audit --no-fund @playwright/test@1.63.0 axe-core@4.14.0 > /dev/null
-          (for a in 1 2; do timeout 600 npx playwright install --with-deps chromium webkit && break; if [ "$a" = 2 ]; then echo "::error::browser install failed twice"; exit 1; fi; echo "::warning::browser install attempt $a failed or exceeded 10 min (apt mirror); retrying"; done)
+          (if [ "${{ steps.playwright-browser-cache.outputs.cache-hit }}" = "true" ]; then timeout 120 npx playwright install chromium webkit && node -e "const p=require('playwright'); Promise.all([p.chromium.launch(),p.webkit.launch()]).then(bs=>Promise.all(bs.map(b=>b.close()))).catch(()=>process.exit(1))" && echo "Cached browsers launched" || { echo "::warning::cache browser launch failed; falling back to dependency installation"; for a in 1 2; do timeout 600 npx playwright install --with-deps chromium webkit && break; if [ "$a" = 2 ]; then echo "::error::browser install failed twice"; exit 1; fi; done; }; else for a in 1 2; do timeout 600 npx playwright install --with-deps chromium webkit && break; if [ "$a" = 2 ]; then echo "::error::browser install failed twice"; exit 1; fi; echo "::warning::browser install attempt $a failed or exceeded 10 min (apt mirror); retrying"; done; fi)
           npm pack @echelon-foundry/design-system@0.13.0 > /dev/null && mkdir forma && tar -xzf echelon-foundry-design-system-0.13.0.tgz -C forma
           mkdir -p "$GITHUB_WORKSPACE/verification/harness/fixture-app/web/vendor/forma"
           cp forma/package/dist/all.css "$GITHUB_WORKSPACE/verification/harness/fixture-app/web/vendor/forma/all.css"
@@ -499,7 +517,7 @@ jobs:
   r10-adversarial:
     needs: r10-adversarial-cases
     if: always()
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 45
     steps:
       - name: Every adversarial shard succeeded
@@ -535,11 +553,17 @@ jobs:
           dotnet fsi tools/r9/r9.fsx -- workstation --lock kickoff/rehearsal-009/toolchain.lock.json \
             --conditor "$RUNNER_TEMP/conditor/conditor" --home "$RUNNER_TEMP/echelon" --target-id "indy-init-adv-${{ github.run_id }}"
           echo "$RUNNER_TEMP/echelon/.local/bin" >> "$GITHUB_PATH"
+      - name: Restore pinned Playwright browser cache
+        id: playwright-browser-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-ubuntu2404-x64-1.63.0-chromium-webkit-v1
       - name: Playwright, Chromium and WebKit; Forma for the harness fixture
         run: |
           mkdir -p "$RUNNER_TEMP/pw" && cd "$RUNNER_TEMP/pw" && npm init -y > /dev/null
           npm install --no-audit --no-fund @playwright/test@1.63.0 axe-core@4.14.0 > /dev/null
-          (for a in 1 2; do timeout 600 npx playwright install --with-deps chromium webkit && break; if [ "$a" = 2 ]; then echo "::error::browser install failed twice"; exit 1; fi; echo "::warning::browser install attempt $a failed or exceeded 10 min (apt mirror); retrying"; done)
+          (if [ "${{ steps.playwright-browser-cache.outputs.cache-hit }}" = "true" ]; then timeout 120 npx playwright install chromium webkit && node -e "const p=require('playwright'); Promise.all([p.chromium.launch(),p.webkit.launch()]).then(bs=>Promise.all(bs.map(b=>b.close()))).catch(()=>process.exit(1))" && echo "Cached browsers launched" || { echo "::warning::cache browser launch failed; falling back to dependency installation"; for a in 1 2; do timeout 600 npx playwright install --with-deps chromium webkit && break; if [ "$a" = 2 ]; then echo "::error::browser install failed twice"; exit 1; fi; done; }; else for a in 1 2; do timeout 600 npx playwright install --with-deps chromium webkit && break; if [ "$a" = 2 ]; then echo "::error::browser install failed twice"; exit 1; fi; echo "::warning::browser install attempt $a failed or exceeded 10 min (apt mirror); retrying"; done; fi)
           npm pack @echelon-foundry/design-system@0.13.0 > /dev/null && mkdir forma && tar -xzf echelon-foundry-design-system-0.13.0.tgz -C forma
           mkdir -p "$GITHUB_WORKSPACE/verification/harness/fixture-app/web/vendor/forma"
           cp forma/package/dist/all.css "$GITHUB_WORKSPACE/verification/harness/fixture-app/web/vendor/forma/all.css"
