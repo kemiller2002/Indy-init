@@ -1,0 +1,12 @@
+/* Layout glue only; visual language comes from Forma (all.css). */
+.causa-status { display: flex; gap: .5rem; align-items: center; min-height: 2rem; }
+.causa-list, .causa-plain, .causa-events { list-style: none; padding: 0; margin: 0; display: grid; gap: .5rem; }
+.causa-row { width: 100%; text-align: left; display: grid; gap: .25rem; padding: .75rem 1rem; min-height: 44px; }
+.causa-row__title { font-weight: 600; overflow-wrap: anywhere; }
+.causa-row__detail { font-size: .875rem; opacity: .8; overflow-wrap: anywhere; }
+.causa-events li { font-size: .875rem; overflow-wrap: anywhere; }
+#app { padding-block: 1rem 3rem; }
+input, textarea { width: 100%; box-sizing: border-box; }
+.causa-detail-title { font-size: clamp(1.35rem, 5.5vw, 2.25rem); line-height: 1.2; overflow-wrap: anywhere; margin: .25rem 0 0; }
+.ef-record-header__title { display: block; }
+.ef-key-value-list dd { overflow-wrap: anywhere; }

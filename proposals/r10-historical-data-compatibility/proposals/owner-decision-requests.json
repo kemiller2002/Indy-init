@@ -17,8 +17,12 @@
       "rationale": "No agent may add union cases or field names to a frozen package (ADRP-005-O4); a successor needs the owner's decision first (FREEZE.md step 1).",
       "impact": "With B, 487 of the 1,315 historical events have no frozen case and no event keeps its provenance; the catalog journeys fail acceptance.",
       "pins": [
-        { "path": "proposals/r10-historical-data-compatibility/SUCCESSOR-CONTRACT.md" },
-        { "path": "proposals/r10-historical-data-compatibility/src/SuccessorContract.fs" }
+        {
+          "path": "proposals/r10-historical-data-compatibility/SUCCESSOR-CONTRACT.md"
+        },
+        {
+          "path": "proposals/r10-historical-data-compatibility/src/SuccessorContract.fs"
+        }
       ]
     },
     {
@@ -61,7 +65,11 @@
       "recommendation": "A. It meets EXT-DATA-013's 'to the states recorded in the catalog manifest' and keeps §11.3's 'MUST NOT report a history as valid'.",
       "rationale": "Separates what is proven (projection) from what is not (admissibility).",
       "impact": "With B, the M2 read journeys wait for the full admissibility kernel.",
-      "pins": [ { "path": "proposals/r10-historical-data-compatibility/REPLAY-VERIFICATION.md" } ]
+      "pins": [
+        {
+          "path": "proposals/r10-historical-data-compatibility/REPLAY-VERIFICATION.md"
+        }
+      ]
     },
     {
       "id": "OD-HC-05",
@@ -76,7 +84,11 @@
       "recommendation": "B. It keeps 'start from the requirements alone' and still gives the rehearsal an executable target. A if speed matters more than OD-INDY-22's intent.",
       "rationale": "Each route needs the owner: a release, a frozen asset, or an explicit choice to rely on rehearsal time.",
       "impact": "Determines whether the verified decoder is used before the competition.",
-      "pins": [ { "path": "proposals/r10-historical-data-compatibility/INTEGRATION-HANDOFF.md" } ]
+      "pins": [
+        {
+          "path": "proposals/r10-historical-data-compatibility/INTEGRATION-HANDOFF.md"
+        }
+      ]
     },
     {
       "id": "OD-HC-06",
@@ -91,7 +103,11 @@
       "recommendation": "B now, then A. The historical cases do not contain these fields; inventing them would fabricate history.",
       "rationale": "v1.0.0 refuses unknown data and has no extension namespace (CONTRACT §13.5).",
       "impact": "Without A, journeys J1-03, J2-01, J2-03, J2-05, J2-06 and J2-09 cannot round-trip these fields.",
-      "pins": [ { "path": "proposals/r10-historical-data-compatibility/SCHEMA-DIFF.md" } ]
+      "pins": [
+        {
+          "path": "proposals/r10-historical-data-compatibility/SCHEMA-DIFF.md"
+        }
+      ]
     },
     {
       "id": "OD-HC-07",
@@ -106,6 +122,19 @@
       "recommendation": "B, the only option that invents no meaning. A needs an explicit owner statement that the two mean the same.",
       "rationale": "No source defines whether 'insufficient' means 'inconclusive'.",
       "impact": "Decides J2-04 on the catalog cases."
+    },
+    {
+      "id": "SA-01",
+      "kind": "decision",
+      "title": "Standing delegated technical authorization through 2026-11-07",
+      "question": "Record the standing authorization of 2026-11-05 (chat directive \"Indy Init: Accelerated Readiness and Working Application Directive\", section 2): through 2026-11-07 the lead agent may select compliant technical designs; approve compatible interface-change requests and contract additions or amendments; approve file ownership, work-item sequencing and splits that preserve every requirement and obligation; adopt corrective changes independent reviewers recommend; regenerate and validate successor packages; merge preparation pull requests after mandatory checks and independent review pass; and make implementation-level decisions for the working application. Each delegated decision is recorded with rationale, alternatives, evidence and the reference SA-01, and is never represented as individually reviewed by the owner. Excluded, and still the owner's: removing or weakening requirements, obligations or acceptance criteria; bypassing mandatory validation or independent review; material security changes or expanded credential permissions; changing the purpose of Causa; reducing the approved competition scope; the final competition package freeze; starting the official timed rehearsal or competition build.",
+      "options": [
+        "A: record SA-01 as stated, valid until 2026-11-07T23:59:59Z",
+        "B: do not record it; each decision stays an individual owner decision"
+      ],
+      "recommendation": "A. It is the owner's own directive, recorded with the same provenance as every other owner decision, so delegated decisions can cite a verifiable record instead of a chat message.",
+      "rationale": "Agents never record owner decisions (RDP-003); the standing authorization itself must be the owner's record.",
+      "impact": "With B, every interface-change request of the minimum v4.1.5 needs its own owner round trip."
     }
   ]
 }

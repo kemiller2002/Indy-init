@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Causa · preview</title>
+  <link rel="stylesheet" href="./forma/all.css">
+  <link rel="stylesheet" href="./app.css">
+  <script type="importmap">
+    { "imports": { "@echelon-foundry/limen": "./limen/index.js", "@echelon-foundry/limen/hosts/dotnet-wasm": "./limen/hosts/dotnet-wasm-transport.js", "@echelon-foundry/limen/": "./limen/" } }
+  </script>
+  <script type="module" src="./main.js"></script>
+</head>
+<body>
+<div class="ef-site">
+  <header class="ef-site-header">
+    <div class="ef-site-header__inner">
+      <div class="ef-site-header__identity">
+        <span class="ef-site-header__brand"><span class="ef-site-header__mark" aria-hidden="true">C</span><span class="ef-site-header__name">Causa</span></span>
+        <p class="ef-site-header__tagline">Root-cause investigations from real records · preview build, not the competition build</p>
+      </div>
+    </div>
+  </header>
+
+  <main class="ef-container" id="app">
+    <p class="causa-status" role="status" aria-live="polite"><span data-text="status">Starting…</span>
+      <template data-if="busy"><span class="ef-status-lozenge" data-state="unknown">Working</span></template></p>
+
+    <template data-if="hasProblem">
+      <aside class="ef-alert" role="alert" data-tone="attention"><div class="ef-alert__icon" aria-hidden="true">!</div><div><p data-text="problem"></p></div></aside>
+    </template>
+    <template data-if="hasConfirmed">
+      <aside class="ef-alert" role="status" data-tone="ok"><div class="ef-alert__icon" aria-hidden="true">✓</div><div><p data-text="confirmed"></p></div></aside>
+    </template>
+
+    <!-- 1. Connection -->
+    <template data-if="screenConnect">
+      <section class="ef-stack" aria-labelledby="connect-title">
+        <header><h1 id="connect-title">Connect to GitHub</h1>
+          <p>The historical catalog is read-only. Writes go only to a working-copy workspace in a repository you name (CONTRACT §9.4.4). The token stays in memory and is sent only in the Authorization header.</p></header>
+        <div class="ef-form">
+          <div class="ef-field"><label class="ef-field__label" for="catalog-repo">Catalog repository (owner/name)</label>
+            <input id="catalog-repo" autocomplete="off" data-event="set:catalogRepo" data-on="input" data-bind-value="catalogRepo"></div>
+          <div class="ef-field"><label class="ef-field__label" for="catalog-branch">Catalog branch</label>
+            <input id="catalog-branch" autocomplete="off" data-event="set:catalogBranch" data-on="input" data-bind-value="catalogBranch"></div>
+          <div class="ef-field"><label class="ef-field__label" for="write-repo">Writable repository (owner/name, optional)</label>
+            <span class="ef-field__description" id="write-repo-d">Leave empty to browse read-only.</span>
+            <input id="write-repo" autocomplete="off" aria-describedby="write-repo-d" data-event="set:writeRepo" data-on="input" data-bind-value="writeRepo"></div>
+          <div class="ef-field"><label class="ef-field__label" for="write-branch">Writable branch</label>
+            <input id="write-branch" autocomplete="off" data-event="set:writeBranch" data-on="input" data-bind-value="writeBranch"></div>
+          <div class="ef-field"><label class="ef-field__label" for="workspace">Working-copy workspace</label>
+            <span class="ef-field__description" id="workspace-d">workspaces/demo/&lt;workspace&gt;/investigations/ — lowercase letters, digits and hyphens.</span>
+            <input id="workspace" autocomplete="off" aria-describedby="workspace-d" data-event="set:workspace" data-on="input" data-bind-value="workspace"></div>
+          <div class="ef-field"><label class="ef-field__label" for="token">GitHub token</label>
+            <span class="ef-field__description" id="token-d">Fine-grained token: Contents read on the catalog; Contents read and write on the writable repository only.</span>
+            <input id="token" type="password" autocomplete="off" aria-describedby="token-d" data-event="set:token" data-on="input"></div>
+          <div class="ef-actions"><button type="button" data-event="connect" data-bind-disabled="notIdle">Connect</button></div>
+        </div>
+      </section>
+    </template>
+
+    <!-- 2. Investigation list -->
+    <template data-if="screenList">
+      <section class="ef-stack" aria-labelledby="list-title">
+        <header><h1 id="list-title">Investigations</h1>
+          <p>Catalog: <span data-text="catalogLabel"></span> · Working copy: <span data-text="writeLabel"></span></p></header>
+        <h2>Historical catalog <span class="ef-status-lozenge" data-state="ok">read-only</span></h2>
+        <ul class="causa-list">
+          <template data-each="catalogItems" data-key="key">
+            <li><button type="button" class="causa-row" data-event="open"><span class="causa-row__title" data-text="title"></span><span class="causa-row__detail" data-text="detail"></span></button></li>
+          </template>
+        </ul>
+        <h2>Working copy</h2>
+        <template data-if="cannotWrite"><p>No writable repository connected. Reconnect with one to create investigations.</p></template>
+        <template data-if="canWrite">
+          <div class="ef-stack">
+            <template data-if="workingEmpty"><p>No investigations in this workspace yet.</p></template>
+            <ul class="causa-list">
+              <template data-each="workingItems" data-key="key">
+                <li><button type="button" class="causa-row" data-event="open"><span class="causa-row__title" data-text="title"></span><span class="causa-row__detail" data-text="id"></span></button></li>
+              </template>
+            </ul>
+            <div class="ef-actions"><button type="button" data-event="show-create" data-bind-disabled="notIdle">New investigation</button></div>
+          </div>
+        </template>
+        <div class="ef-actions"><button type="button" data-event="disconnect">Disconnect</button></div>
+      </section>
+    </template>
+
+    <!-- 3. Investigation detail (and 5. editing, for working copies) -->
+    <template data-if="screenDetail">
+      <section class="ef-stack" aria-labelledby="detail-title">
+        <header class="ef-record-header"><div class="ef-record-header__main">
+          <nav aria-label="Breadcrumb"><button type="button" data-event="back">← Investigations</button></nav>
+          <div class="ef-record-header__title"><div><span class="ef-record-header__type" data-text="dSource"></span><h2 id="detail-title" class="causa-detail-title" data-text="dTitle"></h2></div></div>
+        </div>
+        <div class="ef-record-header__actions"><button type="button" data-event="reload" data-bind-disabled="notIdle">Reload from GitHub</button></div></header>
+
+        <h2>What this view is</h2>
+        <dl class="ef-key-value-list">
+          <div><dt>Raw data</dt><dd data-text="dRaw"></dd></div>
+          <div><dt>Decoded</dt><dd data-text="dDecoded"></dd></div>
+          <div><dt>Replayed state</dt><dd data-text="dReplayed"></dd></div>
+          <div><dt>Catalog check</dt><dd data-text="dCatalogMatch"></dd></div>
+          <div><dt>Authoritative?</dt><dd><span class="ef-status-lozenge" data-state="attention" data-text="dAdmissibility"></span></dd></div>
+        </dl>
+        <template data-if="dRefused"><aside class="ef-alert" role="alert" data-tone="critical"><div class="ef-alert__icon" aria-hidden="true">×</div><div><p data-text="dRefused"></p></div></aside></template>
+
+        <template data-if="dLoaded">
+          <div class="ef-stack">
+            <dl class="ef-key-value-list">
+              <div><dt>Lifecycle</dt><dd data-text="dLifecycle"></dd></div>
+              <div><dt>Version</dt><dd data-text="dVersion"></dd></div>
+              <div><dt>Evidence items</dt><dd data-text="dEvidence"></dd></div>
+              <div><dt>Evidence relationships</dt><dd data-text="dRelationships"></dd></div>
+            </dl>
+            <h2>Observations</h2>
+            <ul class="causa-plain"><template data-each="observations" data-key="key"><li data-text="text"></li></template></ul>
+            <h2>Hypotheses</h2>
+            <ul class="causa-plain"><template data-each="hypotheses" data-key="key"><li><span class="ef-status-lozenge" data-state="unknown" data-text="state"></span> <span data-text="text"></span></li></template></ul>
+
+            <template data-if="dWritable">
+              <section class="ef-stack" aria-labelledby="edit-title">
+                <h2 id="edit-title">Edit</h2>
+                <div class="ef-field"><label class="ef-field__label" for="edit-observation">Add an observation</label>
+                  <textarea id="edit-observation" rows="3" data-event="set:editObservation" data-on="input" data-bind-value="editObservation"></textarea></div>
+                <div class="ef-actions"><button type="button" data-event="add-observation">Add observation</button></div>
+                <div class="ef-field"><label class="ef-field__label" for="edit-hypothesis">Add a hypothesis</label>
+                  <textarea id="edit-hypothesis" rows="2" data-event="set:editHypothesis" data-on="input" data-bind-value="editHypothesis"></textarea></div>
+                <div class="ef-actions"><button type="button" data-event="add-hypothesis">Add hypothesis</button></div>
+                <p>Unsaved changes: <span data-text="unsavedCount"></span></p>
+                <ul class="causa-plain"><template data-each="unsaved" data-key="key"><li data-text="text"></li></template></ul>
+                <div class="ef-actions"><button type="button" data-event="save" data-bind-disabled="notIdle">Save to GitHub</button></div>
+              </section>
+            </template>
+
+            <details><summary>Event history (<span data-text="dVersion"></span> events)</summary>
+              <ol class="causa-events"><template data-each="events" data-key="key"><li><span data-text="type"></span> · <time data-text="at"></time> · <span data-text="actor"></span></li></template></ol>
+            </details>
+          </div>
+        </template>
+      </section>
+    </template>
+
+    <!-- 4. Investigation creation -->
+    <template data-if="screenCreate">
+      <section class="ef-stack" aria-labelledby="create-title">
+        <header><h1 id="create-title">New investigation</h1><p>Written to the working copy: <span data-text="writeLabel"></span></p></header>
+        <div class="ef-form">
+          <div class="ef-field"><label class="ef-field__label" for="new-title">Title</label>
+            <input id="new-title" data-event="set:newTitle" data-on="input" data-bind-value="newTitle"></div>
+          <div class="ef-field"><label class="ef-field__label" for="new-observation">What was observed</label>
+            <span class="ef-field__description" id="new-observation-d">Kept verbatim as the first observation.</span>
+            <textarea id="new-observation" rows="4" aria-describedby="new-observation-d" data-event="set:newObservation" data-on="input" data-bind-value="newObservation"></textarea></div>
+          <div class="ef-actions"><button type="button" data-event="create" data-bind-disabled="notIdle">Create and save</button><button type="button" data-event="back">Cancel</button></div>
+        </div>
+      </section>
+    </template>
+  </main>
+</div>
+</body>
+</html>
