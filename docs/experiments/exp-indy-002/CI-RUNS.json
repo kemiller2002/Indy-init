@@ -16,6 +16,7 @@
     { "workflow": "Indy Init offline factory rehearsal", "runId": 42114773794, "head": "43d1b28", "created": "2026-11-05T21:40:32Z", "conclusion": "in progress at 21:41Z" }
   ],
   "findings": [
+    "CI-F2: the session stop hook requires every commit to be pushed before the coordinator waits, so batching pushes is not possible while waiting on agents; each push re-triggers both PR workflows and cancels Preflight on the superseded head.",
     "CI-F1 (agent coordination / CI waste): four pushes within 4 minutes while the PR was open cancelled three Preflight runs before they finished. From 21:41Z the coordinator commits locally and pushes only the final candidate."
   ]
 }
