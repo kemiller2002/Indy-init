@@ -19,17 +19,17 @@ DEFINED → VALIDATED → RELEASED → IMPLEMENTING → STAGED → INTEGRATION_R
 
 | State | Recorded by | Meaning | Gate |
 |---|---|---|---|
-| DEFINED | contract coordinator | The group's contracts are written: registry entries plus F# types, and a SHA-256 hash over both. | – |
+| DEFINED | contract coordinator (actor `coordinator`, or the package's `integration`) | The group's contracts are written: registry entries plus F# types, and a SHA-256 hash over both. | – |
 | VALIDATED | contract coordinator | `ctp-check registry` passes for every contract in the group, and the F# contract compiles. | CTP-C-* rules |
 | RELEASED | contract coordinator | Domain and UI may implement it. This version is now **immutable**. | the same hash as VALIDATED |
-| IMPLEMENTING | domain and UI agents | Each side records its own start. | – |
-| STAGED | domain and UI agents | Each side's work compiles, and its focused tests (domain) or binding checks (UI) pass against this version's hash. | Recorded once per side. |
-| INTEGRATION_READY | integration coordinator | Both sides are staged on the same version, the integrated build compiles, and unit, contract and independent browser tests pass. | CTP-L-STAGED, CTP-I-* rules |
+| IMPLEMENTING | domain-side (`domain`, `persistence`) and UI-side (`ui`, `ui-2`, `ui-3`) agents | Each side records its own start. | – |
+| STAGED | domain-side and UI-side agents | Each side's work compiles, and its focused tests (domain) or binding checks (UI) pass against this version's hash. | Recorded once per side. |
+| INTEGRATION_READY | integration coordinator (`integration`) | Every side the group declares (default: a domain side and a UI side; DEFINED may set `sides`) has STAGED this version, the integrated build compiles, and unit, contract and independent browser tests pass. | CTP-L-STAGED, CTP-I-* rules |
 | VERIFIED | integration coordinator | Required full CI passed on a candidate SHA that contains this version, and acceptance evidence is recorded. | CTP-L-VERIFIED |
 
 - **BLOCKED** is an annotation, not a state: an agent records why it waits. The group's state does not change.
 - **No state may be skipped.** A revised contract is a **new version** that starts again at DEFINED, carries `changeRequest: CR-n`, and goes back through VALIDATED and RELEASED.
-- **One version has exactly one hash** (CTP-L-IMMUTABLE).
+- **One version has exactly one hash**, and a revision's hash differs from every earlier version's (CTP-L-IMMUTABLE). Versions are integers 1..n. Rows carry an ISO time and never go back in time (CTP-L-TIME). A change request is cited as `CR-n`.
 - The log is append-only JSON lines (`CONTRACT-SCHEMA.json#/$defs/lifecycleRow`), committed alongside the work.
 
 ## 3. What a contract must state
@@ -40,11 +40,11 @@ DEFINED → VALIDATED → RELEASED → IMPLEMENTING → STAGED → INTEGRATION_R
 | Requirement IDs | `requirements` | CTP-C-REQ |
 | Stable field or contract ID | `id`, decoupled from F# names | CTP-C-ID |
 | Typed F# inputs and outputs | `fsharp.{record,property,type,input,output}` | CTP-C-FSHARP |
-| Commands and UI actions | `command`; one `controls[]` entry per UI action, each with its own `accessibleName` | CTP-C-ACTION, CTP-C-CONTROL-NAME |
-| State transitions | `transitions[]` with `from`, `event`, `to`, `carries`, `tests` | CTP-C-TRANSITION-STRUCTURE |
+| Commands and UI actions | `command`; one `controls[]` entry per UI action, each with its own, distinct `accessibleName` | CTP-C-ACTION, CTP-C-CONTROL-NAME |
+| State transitions | `transitions[]` with `from`, `event`, `to`, `carries` (what the target state holds; `["nothing"]` is explicit), `tests` | CTP-C-TRANSITION-STRUCTURE, CTP-C-TRANSITION-CARRIES |
 | Validation and error behaviour | `validation[]` with `rule` and `error` | CTP-C-VALIDATION, CTP-C-ERROR |
 | Accessible names and nested labels | `label`; `fields[]` with `label`, `component`, `type`; `options[]` with `label` | CTP-C-LABEL, CTP-C-NESTED-LABEL, CTP-C-OPTION-LABEL |
-| Persistence expectation | `persistence`: `none`, `local` or `durable-github` (the last also needs `realProviderEvidence: true`) | CTP-C-PERSISTENCE |
+| Persistence expectation | `persistence` (required): `none`, `local` or `durable-github` (the last also needs `realProviderEvidence: true`) | CTP-C-PERSISTENCE |
 | Test obligations | `tests.unit` or `tests.ui`, and `tests.acceptance`. Every transition names at least one UT-/UI- test **and** one AT- test | CTP-C-TESTS, CTP-C-TRANSITION-TEST |
 
 ## 4. Release incrementally
@@ -72,7 +72,7 @@ See AGENT-OWNERSHIP.md: contract coordinator, domain agent, UI agent, verificati
   - `integration`
   - `ownership`
   - `ci` (report only)
-  - `test`: 57 cases. 26 of them replay EXP-002's real files, committed as fixtures under `evidence/exp-002/` with `SHA256SUMS` and checked byte-for-byte against their source commits when those are in the clone.
+  - `test`: 83 cases, all passing. 21 of them work on EXP-002's real files, committed as fixtures under `evidence/exp-002/`: 8 integrity checks against SHA-256 values pinned in the checker's source, plus 13 replay cases. When PR #140's commits are in the clone, 5 more cases compare each fixture byte for byte with `git show`; without those commits they are reported as NOT-RUN, not counted as passes.
 - ADOPTION-DECISIONS.md section 3 says what each mode enforces today, and what still depends on review.
 
 ## 9. Competition use

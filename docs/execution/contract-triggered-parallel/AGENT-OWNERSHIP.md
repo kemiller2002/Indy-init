@@ -2,7 +2,7 @@
 
 - **Single-writer rule.** Each role owns its files exclusively. A file has exactly one owner, and `ctp-check ownership` refuses a file with no owner or with two.
 - **Shared wiring.** Project files, the entry point and the composition root belong to the integration coordinator.
-- **Agent logs.** Each agent writes only its own timeline. The lifecycle log is append-only and each role records only the states the protocol assigns to it (CTP-L-ROLE).
+- **Agent logs.** Each agent writes only its own timeline. The lifecycle log is append-only and each role records only the states the protocol assigns to it (CTP-L-ROLE). The `actor` field uses the package's role names where they exist: `integration` (it also acts as contract coordinator), `domain`, `persistence`, `ui`, `ui-2`, `ui-3`. The verification role (`reviewer`) writes tests and integration records, never lifecycle states.
 
 | Role | Owns | Does | Never |
 |---|---|---|---|

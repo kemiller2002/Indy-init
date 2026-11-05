@@ -1,0 +1,5 @@
+{"owners":{
+ "coordinator":["src/Exp002.Contracts/**","tools/**","Directory.Build.props",".gitignore","build.fsx","serve.fsx","src/Exp002.Wasm/**"],
+ "domain":["src/Exp002.Engine/**","tests/Exp002.Tests/**"],
+ "ui":["src/Exp002.Ui/**","tests/Exp002.Ui.Tests/**","web/**"],
+ "verification":["tests/acceptance/**"]}}

@@ -4,7 +4,7 @@
 - **Start condition.** Integrate a group the moment both implementing sides have recorded STAGED on the **same version and hash**. Do not wait for a fixed checkpoint.
 - **Evidence.** In EXP-002, integration started at T+18.4 instead of the planned T+60 (DEV-2). Holding it would only have added idle time.
 
-## 2. The integration procedure (per group, or per set of groups that became ready together)
+## 2. The integration procedure (per group; in the competition, one slice per candidate)
 1. **Verify versions.** Each side's staged hash must equal the group's latest RELEASED hash (`ctp-check integration`, CTP-I-VERSION). A mismatch is an agent-coordination defect: re-stage on the released version.
 2. **Assemble.** Merge or assemble the isolated implementations. File ownership makes this conflict-free (EXP-002: 0 conflicts across 6 agent-branch merges). Any conflict is a defect against the ownership map.
 3. **Compile the integrated application**, with real ports swapped in for stubs (EXP-002: one line).
@@ -31,7 +31,7 @@
 - **What went wrong in EXP-002.** Four pushes in 4 minutes cancelled three Preflight runs before they finished (CI-F1). The session's stop hook forced a further push that cancelled a near-complete run (CI-F2, CI-F3).
 - **The procedure that avoids it.** It works with the repository's per-PR concurrency group (`cancel-in-progress` for pull_request events):
   1. Agents commit and push to their **work branches**, which have no pull request, so the pushes trigger no PR workflow. That still satisfies a "push before waiting" stop hook.
-  2. Only the integration coordinator updates the **PR branch**, and only with a candidate (`git push origin HEAD:<pr-branch>`), once per candidate.
+  2. Only the integration coordinator updates the **PR branch**, and only with a candidate, once per candidate. In the competition repository the PR branch is the slice's own `slice/SL-<id>`, because the governed gate refuses any other (STARTUP-INSTRUCTIONS §4). So a candidate is one slice: groups that became ready together are still pushed one slice branch each.
   3. Once a candidate's required CI is running, nobody updates the PR branch until that run finishes, unless the candidate is abandoned.
 - **Enforcement status.**
   - `ctp-check ci` reports cancelled and superseded runs from the run log, so the waste is **measured**.

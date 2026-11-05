@@ -41,54 +41,73 @@ Every figure below is labelled either **observed** (measured in the run) or **mo
 - **Consequence.** This document does **not** treat EXP-002's final candidate as CI-verified. No group in its lifecycle log reached VERIFIED (confirmed by `ctp-check` replay).
 
 ## 4. CI waste, observed
-- **What happened.** Three Preflight runs were cancelled by newer pushes: on `2f7ebf7` and `c7e97c4` (cancelled), and on `99824ee` (superseded).
+- **Observed:** two Preflight runs were cancelled by newer pushes, on `2f7ebf7` and `c7e97c4`.
+- **Not observed:**
+  - The log's third entry, `99824ee`, says only "superseded by 43d1b28 (expected cancel)", which is a prediction.
+  - The cancellation on `76d88cd` (CI-F3) is described in the findings text, but it is not in the `runs` array.
 - **Causes:**
   - CI-F1: four pushes in 4 minutes;
   - CI-F2: the stop hook forced pushes;
-  - CI-F3: a forced push cancelled a near-complete run on `76d88cd`.
-- **Reproduce:** `ctp-check ci --runs <(git show 5151cdf:docs/experiments/exp-indy-002/CI-RUNS.json)` reports all three.
+  - CI-F3: a forced push cancelled a near-complete run.
+- **Reproduce:** `ctp-check ci --runs evidence/exp-002/5151cdf.CI-RUNS.json` reports exactly the 2 observed cancellations.
 
 ## 5. Protocol validation against this evidence
-- **Reproduce with:** `dotnet fsi tools/execution/ctp-check.fsx -- test --indy-init .`.
-- **Inputs.** The five EXP-002 files are committed as fixtures in `evidence/exp-002/`, with their source commits in the file names and `SHA256SUMS`. When PR #140's commits are in the clone (`git fetch origin claude/exp-indy-002-contract-first-hhlktz`), the test also checks that each fixture equals `git show <commit>:<path>` byte for byte. Without those commits, that check reports NOT-RUN.
-- **How the replay works.** It reads EXP-002's real files at their historical commits. An adapter maps EXP-002's registry onto the CTP schema field for field and **invents nothing**:
-  - a UI action listed without its own name stays unnamed;
-  - a free-text transition stays unstructured;
-  - EXP-002 registered no acceptance obligations, so none are added.
-- **Results: 57 of 57 cases pass**, including 5 provenance checks and 21 replay cases. Each claim below is backed by a named case.
+**Reproduce with** `dotnet fsi tools/execution/ctp-check.fsx -- test --indy-init .`: **83 of 83 cases pass.**
 
-| Question | Result | Mechanism | Strength |
-|---|---|---|---|
-| Would the protocol have caught the three contract revisions earlier? | **CR-1: 5 of 7 contracts caught at VALIDATED (v1, `d544ead`)**: INV-009, -013, -014, -030, -034 each list several UI actions under one label. **Not caught: INV-039 and INV-040.** Their controls were missing from the registry altogether (a missing "New investigation" action; link text unspecified), and a schema check cannot find a control that was never listed. **CR-2: caught at v1**: INV-030's nested fields have no labels; INV-031's "one of …" values have no option labels. **CR-3: the underspecified save transition (INV-015) is refused at v1** as unstructured. The rule forces from/event/to/carries per transition, which is where the missing `ReadBackMatched` payload had to be stated. | automated: CTP-C-CONTROL-NAME, -NESTED-LABEL, -OPTION-LABEL, -TRANSITION-STRUCTURE | CR-1 partial (5 of 7), CR-2 full. CR-3 is **forced to be specified, not proven**: the check refuses the free text, and a human still has to write the right payload |
-| Would it have caught the auto-save mismatch (D-3)? | INV-004's transition at v1 has only a domain unit test; the rule refuses it without an AT- (and UI-) obligation. The defect itself is caught only by **executing** that obligation, as AT-08 did. VERIFICATION-POLICY requires the independent browser test at every integration, and `ctp-check integration` refuses an integration record without an acceptance run | automated obligation (CTP-C-TRANSITION-TEST) plus integration evidence gate (CTP-I-ACCEPTANCE) | detection, not prevention |
-| Would it have preserved zero shared-file merge conflicts? | `ctp-check ownership` over EXP-002's 37 experiment files with the role map it used: 0 errors (no unowned and no shared file). EXP-002's 6 domain-labelled commits touched only domain-owned files and the domain agent's own timeline. The UI agent's commits carry no role prefix, so this cannot be attributed per commit for the UI | automated: CTP-O-SHARED, CTP-O-UNOWNED | preserves the precondition. It cannot prove absence of conflicts in future runs |
-| Would it have avoided redundant CI cancellations? | The three cancellations are **reported** by `ctp-check ci`. **Avoidance is procedural:** work branches without PRs, and the integration coordinator pushes the PR branch once per candidate (INTEGRATION-POLICY §4). No automated check can refuse such a push | review gate plus measurement | **not demonstrated by an automated check**; listed as a gap |
-| Would it have required real-provider evidence for durable GitHub persistence? | Yes, for any contract or integration that claims `durable-github`. CTP-C-PERSISTENCE refuses the contract without `realProviderEvidence`; CTP-I-REAL-PROVIDER refuses a REST double (case "durable persistence on a REST double"). EXP-002 never claimed durable persistence (localStorage; INV-037 excluded for that reason), so there is nothing to replay | automated | full for claims made in the registry |
+**Fixtures.** The EXP-002 inputs are committed in `evidence/exp-002/`:
+- the registry at `d544ead` (v1) and at `99824ee` (final);
+- the lifecycle log, the integration results and the CI log at `5151cdf`;
+- the experiment's 37 file paths and its role map.
 
-**False positives.** At v1, the control-name rule flags exactly INV-009, -013, -014, -030 and -034, and none of the other 34 contracts:
-- precision 5/5 against CR-1's contracts;
-- recall 5/7;
-- the final registry (`99824ee`) flags none.
+**How tampering is caught.**
+- Each fixture's SHA-256 is **pinned in the checker's source**. Editing a fixture without editing `ctp-check.fsx` fails in every clone, shallow ones included. A one-byte change is a test case of its own.
+- When PR #140's commits are in the clone, each fixture is also compared byte for byte with `git show <commit>:<path>`. Without those commits, that comparison is reported **NOT-RUN** and is never counted as a pass.
 
-**Adapter bias.** The adapter's naming keys (`submitLabel` and so on) are the ones CR-1 itself introduced. None of them exists at v1, so the v1 flags come only from several UI actions sharing one label.
+**The adapter** maps EXP-002's registry onto the CTP schema. It adds exactly three stated defaults, for fields EXP-002's format lacks:
+- `requirements = [its own ID]`;
+- `group = "CG-?"`;
+- `persistence = "local"` when the contract mentions persistence, otherwise `"none"`.
 
-**Lifecycle findings in EXP-002's own log** (replay):
-- CG-1-START v2 and the other re-hashed groups were RELEASED without DEFINED or VALIDATED for the new version (CTP-L-ORDER).
-- Revised versions cite no change request (CTP-L-CHANGE-REQUEST).
-- IMPLEMENTING was recorded after code had already started.
-- INTEGRATION_READY was recorded by the "verification" actor, under combined roles.
+Everything else is mapped as written. A contract's `label` names only its first UI action, and only on action contracts. Every other UI action needs its own name key, as CR-1 later added.
+
+| Question | What the replay shows (named cases) | Strength |
+|---|---|---|
+| Would the protocol have caught **CR-1** earlier? | **Contract level:** at v1 the control-name rule flags **exactly** INV-009, -013, -014, -030 and -034, the five contracts listing several UI actions under one label. It flags no other contract (precision 5/5) and none at final. **Control level:** it reports 8 unnamed controls, while CR-1 changed 13 names. **Missed:** <ul><li>INV-039: its "New investigation" control was absent from the registry.</li><li>INV-040: its control *was* listed, under a wrong name, and name correctness is not checkable.</li><li>The three per-item Edit controls: never listed as UI actions.</li></ul> Duplicate names within a contract are now refused too (synthetic case). | automated, partial: 5 of 7 contracts, 8 of 13 names |
+| **CR-2** earlier? | At v1, INV-030's nested fields have no labels and INV-031's "one of …" values have no option labels. Both pass at final. | automated, full |
+| **CR-3** earlier? | **Not demonstrable from EXP-002's data.** Its registry format has no structured transitions, so CTP-C-TRANSITION-STRUCTURE and -CARRIES refuse **every** transition, before and after the fix (format-level case). CTP-001 requires each transition to state what its target state carries (CTP-C-TRANSITION-CARRIES), which is where `Saved` needed version and time. That rule refuses an omitted payload, as a synthetic case shows. It cannot check that a stated payload is right. | rule exists; no EXP-002 replay evidence |
+| The **auto-save mismatch (D-3)**? | **Not demonstrable from EXP-002's data**, which registered no acceptance obligations. CTP-C-TRANSITION-TEST refuses a transition without both an implementer test and an AT- test (synthetic case). The defect itself is caught only by **executing** that test, which AT-08 did. CTP-I-ACCEPTANCE refuses an integration without a non-empty, fully passing independent acceptance run. | rule plus integration gate; detection by execution, not prevention |
+| **Zero shared-file merge conflicts** preserved? | Ownership over EXP-002's 37 files with its role map: none unowned, none shared (named case). The 6 domain-labelled commits touched only domain files and the domain agent's own timeline. UI commits carry no role prefix and cannot be attributed. | automated precondition; cannot prove future absence |
+| **Redundant CI cancellations** avoided? | 2 observed cancellations are **reported**. Avoidance is procedural (INTEGRATION-POLICY §4). No automated check refuses such a push. | **not demonstrated**; a gap |
+| **Real-provider evidence** for durable GitHub persistence required? | CTP-C-PERSISTENCE refuses `durable-github` without `realProviderEvidence`. CTP-I-REAL-PROVIDER refuses a REST double. With `--registry`, it also refuses an integration that records a weaker mode than the registry declares (synthetic cases). EXP-002 never claimed durable persistence. | automated, for what the registry and record declare |
+
+**Contract-level result.** Under CTP-001, EXP-002's registry would **not reach VALIDATED at all**. 27 of 37 contracts fail at v1, and 28 of 39 still fail at final, almost all on rules that EXP-002's format never had:
+- no error text on field validations (CTP-C-ERROR: 28 and 30);
+- no acceptance obligations (CTP-C-TESTS: 26 and 28);
+- unstructured transitions (18 and 20).
+
+CTP-001 is stricter by design. The CR-1 and CR-2 claims above hold **rule by rule**, not as "these contracts would have validated sooner".
+
+**Lifecycle findings in EXP-002's own log** (named cases):
+- CG-1-START v2 was RELEASED without DEFINED or VALIDATED for the new version (CTP-L-ORDER).
+- Revisions cite no CR-n id (CTP-L-CHANGE-REQUEST).
+- IMPLEMENTING and INTEGRATION_READY were recorded by "verification", reflecting combined roles (CTP-L-ROLE).
 - No group reached VERIFIED.
 
-None of these broke the run, but under CTP-001 each would be refused or corrected.
-
-**Mutation check.** Removing each of ten rules makes its named cases fail:
-- control name;
+**Mutation check.** This was run manually, not as a committed harness. For each rule, its code was changed so that it could no longer fire, and the suite was run again. Every case named for that rule then failed. The rules mutated:
+- control name, and distinct names;
 - nested label;
 - option label;
-- transition structure;
+- transition structure, and carries;
 - transition acceptance;
 - lifecycle order;
-- change request;
-- real provider;
-- independence;
-- shared file.
+- staged sides;
+- change request, and its CR-n format;
+- the VERIFIED evidence format;
+- real provider, and durable versus local;
+- independence, and case-insensitive independence;
+- acceptance with zero tests;
+- the integration staged check;
+- shared file;
+- the fixture pin.
+
+The two mutations that first survived (the evidence SHA format and the fixture pin) now have their own cases.
