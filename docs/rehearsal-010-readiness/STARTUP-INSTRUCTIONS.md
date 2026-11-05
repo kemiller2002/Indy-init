@@ -35,7 +35,7 @@ Build to what they check. The names they look for are listed in `SRC/verificatio
 
 ## 2. T0 (the bootstrap)
 
-1. **Bootstrap** exactly as `SRC/requirements-compiled/v4.1.4/AGENT-RULES.md` duty 1 says. Then:
+1. **Bootstrap** exactly as `SRC/requirements-compiled/v4.1.4/AGENT-RULES.md` duty 1 says, up to but not including its commit and its publish (`conditor repo create`): those come at step 4. Then:
    ```
    dotnet fsi SRC/tools/r9/r9.fsx -- govern --indy-init SRC --target . --lock kickoff/rehearsal-010/toolchain.lock.json
    ```
@@ -44,11 +44,14 @@ Build to what they check. The names they look for are listed in `SRC/verificatio
    {"schema": "indy-init.t0/1", "t0": "<T0 UTC>", "deadline": "<T0 + 420 min>", "windowMinutes": 420}
    ```
    It is never changed. Every recovery and every replacement agent uses it. A different T0 or window is refused as DEADLINE_RESET.
-3. Commit and push.
+3. **Before you push, run `npm ci`, then §3 step 1 (the suite preflight), on this tree.** If it refuses, fix the bootstrap in this same commit. `r9.fsx check-sequencing` exempts only the bootstrap commit: a later commit before both checkpoints that touches an implementation path (`isImplementationPath`, r9.fsx: `src/`, `tests/`, `web/`, any project or solution file, `Directory.*.props`/`.targets`, `package.json`, `package-lock.json`, `playwright.config.*`, `global.json`, `build.fsx`) is refused as application code. If the bootstrap was already published and the preflight refuses, do not repair it in a later commit: record the defect and ask the owner through `stop-decision` (reason `owner-authorized`), §6.
+4. Commit, then publish as duty 1 says (`conditor repo create`). Publishing protects main: from here on every commit reaches main through a pull request.
 
 ## 3. Before any application code
 
 Implementation is prohibited until steps 1–5 pass. They need no implementation and no verification evidence.
+
+Main is protected (the Conditor scaffold requires pull requests). Each record below reaches main through a pull request from a `setup/*` branch, merged with a merge commit; the governed gate treats these records as non-implementation, so such a pull request names no slice. The initialization checkpoint's branch starts at the authorized HEAD and holds only the checkpoint commit: `check-sequencing` requires that commit's parent to be `authorizedAtCommit`. `SRC-COMMIT` below is the Indy-init commit `govern` recorded: `jq -r .indyInitCommit .echelon/r9-governance.json`.
 
 1. **Suite preflight.** Compile the obligations, then run the preflight:
    ```
@@ -56,7 +59,7 @@ Implementation is prohibited until steps 1–5 pass. They need no implementation
      --indy-verification-plan SRC/requirements-compiled/v4/verification-plan.json --out .echelon/obligations.json
    dotnet fsi SRC/tools/r9/r9.fsx -- suite-preflight --obligations .echelon/obligations.json --root . --out evidence/t0/suite-preflight.json
    ```
-   It must PASS: every executable suite command runs (chromium and webkit defined; one `dotnet test` target each). A refusal is a T10 defect; fix it in T10.
+   It must PASS: every executable suite command runs (chromium and webkit defined; one `dotnet test` target each). It runs before the bootstrap is pushed (§2 step 3); a refusal is fixed in the bootstrap commit, never after it.
 2. **Generate the work plan, and register every work item in Praxis.** Do not write the work plan by hand.
    ```
    requirements-compiler scope work-plan --manifest SRC/docs/rehearsal-010-readiness/scope-manifest.json --out .echelon/r9-work-plan.json
@@ -72,8 +75,19 @@ Implementation is prohibited until steps 1–5 pass. They need no implementation
      --praxis-context .ros/context/current.json --at NOW --commit SRC-COMMIT --out .echelon/scope-checkpoint.json
    ```
    - It writes the checkpoint only when the manifest equals what the frozen sources give and every work item is in Praxis.
-   - Commit it. It is immutable.
-4. **Initialization checkpoint (authorization).** With the work plan of step 2 committed:
+   - Commit it. It is immutable. The Praxis files it was computed from (`.ros/work/queue.json`, `.ros/context/current.json`) must be in that commit or an earlier one: `check-sequencing` reads Praxis coverage at the commit that adds the checkpoint.
+4. **Initialization checkpoint (authorization).** It reads three inputs no other step writes. Produce them first:
+   ```
+   praxis requirements manifest compile --catalog SRC/requirements/catalogs/causa-investigation.requirement-catalog.json \
+     --source-commit SRC-COMMIT --output requirements/verification/verification-manifest.json
+   dotnet fsi SRC/tools/r9/r9.fsx -- spec-preflight --indy-init SRC --lock SRC/kickoff/rehearsal-010/toolchain.lock.json \
+     --percepta percepta --out evidence/t0/spec-preflight.json
+   conditor acceptance preflight --target SRC > evidence/t0/acceptance.log
+   ```
+   - `spec-preflight` must print `spec-preflight: PASS`; `evidence/t0/acceptance.log` must contain the line `acceptance preflight: READY`.
+   - These are records, not application code (`isImplementationPath` matches none of them). Merge them, with the work plan, through a `setup/*` pull request before the initialization checkpoint.
+
+   Then:
    ```
    dotnet fsi SRC/tools/r9/r9.fsx -- authorize-implementation --target . --catalog SRC/requirements/catalogs/causa-investigation.requirement-catalog.json \
      --obligations .echelon/obligations.json --suite-preflight evidence/t0/suite-preflight.json \

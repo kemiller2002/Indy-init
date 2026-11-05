@@ -36,8 +36,12 @@ permissions:
   pull-requests: read
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  # A pull request's runs share one group: a newer push supersedes its older run. Every other run (a push to main, a
+  # release dispatch) has a group of its own, so it is never cancelled, running or pending: each merge commit's
+  # verification is the post-merge record of that commit, and a later merge must not erase it. (A group holds one
+  # pending run and cancels it for the next, whatever cancel-in-progress says.)
+  group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.ref || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   verify:
@@ -89,7 +93,8 @@ jobs:
           # A pull request that changes implementation names its slice by its branch; the gate then judges that work item
           # at the merged result (this checkout is the merge of the head into the current base).
           src="$RUNNER_TEMP/indy-init"; slices="$src/docs/rehearsal-010-readiness/slice-execution-manifest.json"
-          impl=$(git diff --name-only HEAD^1 HEAD | grep -vE '^(docs|evidence|\.ros)/|\.md$|^\.echelon/(verification-scope|scope-checkpoint)\.json$' || true)
+          # Records, not implementation (r9.fsx isImplementationPath agrees): they reach main through a setup/* pull request.
+          impl=$(git diff --name-only HEAD^1 HEAD | grep -vE '^(docs|evidence|\.ros)/|\.md$|^\.echelon/(verification-scope|scope-checkpoint|r9-work-plan|obligations|r9-initialization-checkpoint)\.json$|^requirements/verification/verification-manifest\.json$' || true)
           slice=""; case "$HEAD_REF" in slice/SL-*) slice="${HEAD_REF#slice/}";; esac
           if [ -n "$impl" ] && [ -z "$slice" ]; then echo "::error::this pull request changes implementation but its branch does not name a slice (slice/SL-<work item>)"; exit 1; fi
           if [ -n "$slice" ]; then
