@@ -204,7 +204,7 @@
     "EXT-DATA-013"
    ],
    "decision": "ODR-V415-01",
-   "approval": "",
+   "approval": "APR-V415-OWNER-1",
    "replaces": true
   }
  ],
@@ -218,7 +218,7 @@
   {
    "machine": "SM-SAVE",
    "decision": "ODR-V415-01",
-   "approval": "",
+   "approval": "APR-V415-OWNER-1",
    "note": "A new investigation's session (SaveMachine.InitialNew, v4.1.5 C1) begins holding its StartInvestigation command in Unsaved when online, or Offline when known offline: the states T-S01 and T-S02 reach from Saved on an Edit. It begins there because no stored history exists to be Saved against. From there it takes only existing transitions (T-S03 Edit, T-S04 SaveRequested, the Saving steps, the stale-head paths, read-back to Saved Confirmed). No state, event or transition is added."
   }
  ]

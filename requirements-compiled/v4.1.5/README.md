@@ -1,6 +1,6 @@
 # Compiled package v4.1.5: real causa-data, minimum contract change
 
-**Status: CANDIDATE.** It is not approved, not frozen and not pinned by any rehearsal lock. It validates except for the owner approvals it still needs, which are pending ODR-V415-01 and ODR-V415-IF-VIEW (X12, X17: "names no operator approval").
+**Status: CANDIDATE.** It is not approved, not frozen and not pinned by any rehearsal lock. The owner has recorded ODR-V415-01, -03 and -04 (APR-V415-OWNER-1) and ODR-V415-IF-VIEW (APR-V415-OWNER-2), all option A; their approval ids are written in (FREEZE step 2) and it validates fully (X01-X21 PASS). It awaits its approval, ODR-V415-02.
 
 v4.1.5 is the successor amendment of v4.1.4, which the owner approved as APR-V414-OWNER-2. v4.1.4 is not edited.
 
