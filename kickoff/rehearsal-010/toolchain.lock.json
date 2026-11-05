@@ -1,103 +1,103 @@
 {
- "schema": "indy-init.r9-toolchain-lock/1",
- "description": "Proposed toolchain and requirements package for Rehearsal 010: Rehearsal 009's lock with the requirements package moved to the successor v4.1.4 (#101: executable suite runners). Conditor, the resolved set and the process-evidence rules are unchanged from Rehearsal 009 and are re-confirmed by the owner. Change this file only through the owner decision process.",
- "conditor": {
-  "version": "0.10.20",
-  "tag": "v0.10.20",
-  "commit": "a4c53cee6f72966ed737362be5daa5d8ddea12d8",
-  "downloadBase": "https://github.com/kemiller2002/conditor/releases/download/v0.10.20",
-  "artifacts": {
-   "linux-x64": {
-    "name": "conditor-linux-x64",
-    "sha256": "75849672f326b3f58dfe9e8de3a3a274ef4137a39d4e76bbe62889042ff326bd"
-   },
-   "linux-arm64": {
-    "name": "conditor-linux-arm64",
-    "sha256": "f9c5e76276a60224467d644b6fbfd01feeb4b62e9206c2be5b2aafe0310cf4c2"
-   },
-   "linux-musl-x64": {
-    "name": "conditor-linux-musl-x64",
-    "sha256": "9fe9e89961f38e78d54ea5d98090220896ac94e33285aca9173e7a3448d84b47"
-   },
-   "linux-musl-arm64": {
-    "name": "conditor-linux-musl-arm64",
-    "sha256": "a1278e119000b41f15ce623ff16dfe8e2683ac42cce984282a916ef9e6aa194a"
-   },
-   "osx-x64": {
-    "name": "conditor-osx-x64",
-    "sha256": "ad9d7ba890961088c0b448fcc90ad9089ea663e044a4e91ab215963a4e568a6f"
-   },
-   "osx-arm64": {
-    "name": "conditor-osx-arm64",
-    "sha256": "791343bb7daee212f481aef9a7ba6432878c3be017bf1f8bed1776e8928be2ec"
-   },
-   "win-x64": {
-    "name": "conditor-win-x64.exe",
-    "sha256": "e0fb24f8a5813fda92ddea9a135048f99d8e76226364b92bc989b80787ae54c9"
-   },
-   "win-arm64": {
-    "name": "conditor-win-arm64.exe",
-    "sha256": "c8f668ca2331dceddc0b7cb8dbcf0373d64a627ecd231f1744dcfc4f37ab6745"
-   }
-  }
- },
- "resolvedSet": {
-  "registry": "kemiller2002/echelon-registry",
-  "commit": "de72a4069af64e99fc7da188f76f0f22cfa4f89c",
-  "channel": "echelon-current",
-  "profileVersion": "1.36.0",
-  "platforms": {
-   "linux-x64": {
-    "path": "channels/echelon-current/linux-x64.json",
-    "sha256": "1189bc9bcb90dbc375d3af829569455349f17e2be3941da46230e57d83161797"
-   },
-   "linux-arm64": {
-    "path": "channels/echelon-current/linux-arm64.json",
-    "sha256": "f7cffd15abf09b37b1becd7d6ddfd489b8c304611b5faf006696c55b41f7bad6"
-   },
-   "osx-x64": {
-    "path": "channels/echelon-current/osx-x64.json",
-    "sha256": "6a20fd7129b6f266b0235b3fc0543de4fd6b0170b4da4db3af80503a529aabd1"
-   },
-   "osx-arm64": {
-    "path": "channels/echelon-current/osx-arm64.json",
-    "sha256": "82d9958c1f3f37272ce9ac9c20109351d10f10c5b5886000de9cde7b238c8465"
-   },
-   "win-x64": {
-    "path": "channels/echelon-current/win-x64.json",
-    "sha256": "d4e6be86b69d267c8f181570b0ffd10d0dacccf789fe98ce7acd27a546c3b74b"
-   }
+  "schema": "indy-init.r9-toolchain-lock/1",
+  "description": "Proposed toolchain and requirements package for Rehearsal 010: Rehearsal 009's lock with the requirements package moved to the successor v4.1.4 (#101: executable suite runners). Conditor, the resolved set and the process-evidence rules are unchanged from Rehearsal 009 and are re-confirmed by the owner. Change this file only through the owner decision process.",
+  "conditor": {
+    "version": "0.10.20",
+    "tag": "v0.10.20",
+    "commit": "a4c53cee6f72966ed737362be5daa5d8ddea12d8",
+    "downloadBase": "https://github.com/kemiller2002/conditor/releases/download/v0.10.20",
+    "artifacts": {
+      "linux-x64": {
+        "name": "conditor-linux-x64",
+        "sha256": "75849672f326b3f58dfe9e8de3a3a274ef4137a39d4e76bbe62889042ff326bd"
+      },
+      "linux-arm64": {
+        "name": "conditor-linux-arm64",
+        "sha256": "f9c5e76276a60224467d644b6fbfd01feeb4b62e9206c2be5b2aafe0310cf4c2"
+      },
+      "linux-musl-x64": {
+        "name": "conditor-linux-musl-x64",
+        "sha256": "9fe9e89961f38e78d54ea5d98090220896ac94e33285aca9173e7a3448d84b47"
+      },
+      "linux-musl-arm64": {
+        "name": "conditor-linux-musl-arm64",
+        "sha256": "a1278e119000b41f15ce623ff16dfe8e2683ac42cce984282a916ef9e6aa194a"
+      },
+      "osx-x64": {
+        "name": "conditor-osx-x64",
+        "sha256": "ad9d7ba890961088c0b448fcc90ad9089ea663e044a4e91ab215963a4e568a6f"
+      },
+      "osx-arm64": {
+        "name": "conditor-osx-arm64",
+        "sha256": "791343bb7daee212f481aef9a7ba6432878c3be017bf1f8bed1776e8928be2ec"
+      },
+      "win-x64": {
+        "name": "conditor-win-x64.exe",
+        "sha256": "e0fb24f8a5813fda92ddea9a135048f99d8e76226364b92bc989b80787ae54c9"
+      },
+      "win-arm64": {
+        "name": "conditor-win-arm64.exe",
+        "sha256": "c8f668ca2331dceddc0b7cb8dbcf0373d64a627ecd231f1744dcfc4f37ab6745"
+      }
+    }
   },
-  "expectedTools": {
-   "praxis": "3.25.0",
-   "dokimos": "0.11.0",
-   "percepta-semantic": "0.4.0",
-   "ordo": "1.20.0"
+  "resolvedSet": {
+    "registry": "kemiller2002/echelon-registry",
+    "commit": "de72a4069af64e99fc7da188f76f0f22cfa4f89c",
+    "channel": "echelon-current",
+    "profileVersion": "1.36.0",
+    "platforms": {
+      "linux-x64": {
+        "path": "channels/echelon-current/linux-x64.json",
+        "sha256": "1189bc9bcb90dbc375d3af829569455349f17e2be3941da46230e57d83161797"
+      },
+      "linux-arm64": {
+        "path": "channels/echelon-current/linux-arm64.json",
+        "sha256": "f7cffd15abf09b37b1becd7d6ddfd489b8c304611b5faf006696c55b41f7bad6"
+      },
+      "osx-x64": {
+        "path": "channels/echelon-current/osx-x64.json",
+        "sha256": "6a20fd7129b6f266b0235b3fc0543de4fd6b0170b4da4db3af80503a529aabd1"
+      },
+      "osx-arm64": {
+        "path": "channels/echelon-current/osx-arm64.json",
+        "sha256": "82d9958c1f3f37272ce9ac9c20109351d10f10c5b5886000de9cde7b238c8465"
+      },
+      "win-x64": {
+        "path": "channels/echelon-current/win-x64.json",
+        "sha256": "d4e6be86b69d267c8f181570b0ffd10d0dacccf789fe98ce7acd27a546c3b74b"
+      }
+    },
+    "expectedTools": {
+      "praxis": "3.25.0",
+      "dokimos": "0.11.0",
+      "percepta-semantic": "0.4.0",
+      "ordo": "1.20.0"
+    }
+  },
+  "requirementsPackage": {
+    "path": "requirements-compiled/v4.1.4",
+    "base": "requirements-compiled/v4",
+    "packageVersion": "4.1.4",
+    "tag": "indy-init-requirements-v4.1.4 (not yet created)",
+    "tagCommit": null,
+    "manifestSha256": "af0132f62039bf814a98cf3a3c2b60d939eea1ce3791e6ee45a202bb9210540f",
+    "verificationPlanSha256": "8254ed03b991dd3d3a56a4e0bf5897c2484bbbf11e67e2f15e80309c1482b973",
+    "approval": "the v4.1.4 package approval in docs/release-gate-repair/owner-decision-requests.json (pending)"
+  },
+  "workstationTargetId": "indy-init-r9-workstation",
+  "processEvidence": {
+    "description": "Record-bound obligations (plan suites with runner evidence-record, identities praxis:<kind>) are judged by requirements-compiler verify-process against this plan and these rules, with attestations the CI run observes itself. rulesSha256 is null until the owner confirms the rules; while it is null the record gate fails closed.",
+    "plan": "requirements-compiled/v4/verification-plan.json",
+    "planDigest": "1e3c66bcc958a60415811ffbe2795b5e7147360340749c16e1a0f43fc19c751d",
+    "rules": "kickoff/rehearsal-009/process-evidence-rules.json",
+    "rulesSha256": "b8adffc4122226cbe568dae1b0173ee85aab08b8435ded7390f9d5205ad0d115",
+    "rulesStatus": "CONFIRMED by the owner on 2026-11-03: the rules file reviewed and pinned by its SHA-256"
+  },
+  "status": "pinned by the owner",
+  "scope": {
+    "manifest": "docs/rehearsal-010-readiness/scope-manifest.json",
+    "scopeSha256": "5a8aef29cb2dff62d8ee60b7162e7df226bb42818ffb87f7f827fdcb443d9095",
+    "rule": "the gate passes the scope manifest to r9.fsx check-sequencing: the committed scope checkpoint (this scopeSha256, complete Praxis coverage) must precede implementation (STARTUP-INSTRUCTIONS.md)"
   }
- },
- "requirementsPackage": {
-  "path": "requirements-compiled/v4.1.4",
-  "base": "requirements-compiled/v4",
-  "packageVersion": "4.1.4",
-  "tag": "indy-init-requirements-v4.1.4 (not yet created)",
-  "tagCommit": null,
-  "manifestSha256": "af0132f62039bf814a98cf3a3c2b60d939eea1ce3791e6ee45a202bb9210540f",
-  "verificationPlanSha256": "8254ed03b991dd3d3a56a4e0bf5897c2484bbbf11e67e2f15e80309c1482b973",
-  "approval": "the v4.1.4 package approval in docs/release-gate-repair/owner-decision-requests.json (pending)"
- },
- "workstationTargetId": "indy-init-r9-workstation",
- "processEvidence": {
-  "description": "Record-bound obligations (plan suites with runner evidence-record, identities praxis:<kind>) are judged by requirements-compiler verify-process against this plan and these rules, with attestations the CI run observes itself. rulesSha256 is null until the owner confirms the rules; while it is null the record gate fails closed.",
-  "plan": "requirements-compiled/v4/verification-plan.json",
-  "planDigest": "1e3c66bcc958a60415811ffbe2795b5e7147360340749c16e1a0f43fc19c751d",
-  "rules": "kickoff/rehearsal-009/process-evidence-rules.json",
-  "rulesSha256": "b8adffc4122226cbe568dae1b0173ee85aab08b8435ded7390f9d5205ad0d115",
-  "rulesStatus": "CONFIRMED by the owner on 2026-11-03: the rules file reviewed and pinned by its SHA-256"
- },
- "status": "PROPOSED: not an owner pin. The owner adopts it by renaming it to toolchain.lock.json in their own commit after the v4.1.4 decisions (docs/release-gate-repair/owner-decision-requests.json) are recorded and v4.1.4 is tagged, and after a Dokimos release carrying the url-input fix (kemiller2002/dokimos#67) is registered in an approved echelon-current set and replaces the resolved set below. Until then Rehearsal 010 has no approved lock.",
- "scope": {
-  "manifest": "docs/rehearsal-010-readiness/scope-manifest.json",
-  "scopeSha256": "5a8aef29cb2dff62d8ee60b7162e7df226bb42818ffb87f7f827fdcb443d9095",
-  "rule": "the gate passes the scope manifest to r9.fsx check-sequencing: the committed scope checkpoint (this scopeSha256, complete Praxis coverage) must precede implementation (STARTUP-INSTRUCTIONS.md)"
- }
 }
