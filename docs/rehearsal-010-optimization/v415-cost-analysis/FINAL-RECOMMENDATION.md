@@ -1,5 +1,7 @@
 # Final recommendation: v4.1.5 cost and strategy
 
+> **Update, 2026-11-05 16:40 UTC.** The owner recorded **CF-09 = A** (APR-CFUI-OWNER-1, PR #127). The UI contracts are therefore **in** v4.1.5, folded into `07-IF41-VIEW.fs` (draft PR #128), and step 5 below no longer defers them to v4.1.6. Expect about 2–4 h more review volume (`WORK-BREAKDOWN.md` item 5). No compiler change is needed, because the fold changes an existing contract file.
+
 **Status:** analysis only. Nothing was compiled, regenerated or frozen. v4.1.4 is unchanged.
 
 ## Why "several days"?

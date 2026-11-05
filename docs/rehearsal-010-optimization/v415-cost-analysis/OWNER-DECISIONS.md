@@ -1,5 +1,7 @@
 # Owner decisions for the v4.1.5 strategy
 
+> **Update, 2026-11-05 16:40 UTC.** The owner recorded **CF-09 = A** (APR-CFUI-OWNER-1, PR #127): the contract-first UI contracts ship **in v4.1.5**. That supersedes OD-V415-01 option A as far as the UI contracts go, and they are no longer deferred to v4.1.6. They enter v4.1.5 through the fold route of `COMPILATION-BOTTLENECKS.md` §3 (one declared change to `07-IF41-VIEW.fs`, needing no compiler change), prepared in draft PR #128. Ownership rebalancing and the T19/T22 route stay as described in OD-V415-01 until the owner decides them.
+
 These are requests, not records. Agents never record decisions (RDP-003). Once the owner chooses, each becomes a request in a file `tools/owner-freeze.fsx` reads.
 
 | ID | Decision | Options | Recommendation | Why it is needed |
