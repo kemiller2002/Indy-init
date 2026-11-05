@@ -37,7 +37,9 @@ permissions:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  # A newer push to a pull request supersedes its older run. A run on main is never cancelled: each merge commit's
+  # verification is the post-merge record of that commit, and the next merge must not erase it.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   verify:

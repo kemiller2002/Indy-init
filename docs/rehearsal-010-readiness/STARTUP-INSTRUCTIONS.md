@@ -44,7 +44,8 @@ Build to what they check. The names they look for are listed in `SRC/verificatio
    {"schema": "indy-init.t0/1", "t0": "<T0 UTC>", "deadline": "<T0 + 420 min>", "windowMinutes": 420}
    ```
    It is never changed. Every recovery and every replacement agent uses it. A different T0 or window is refused as DEADLINE_RESET.
-3. Commit and push.
+3. **Before you push, run §3 step 1 (the suite preflight) on this tree.** If it refuses, fix the bootstrap in this same commit. `r9.fsx check-sequencing` exempts only the bootstrap commit: a later commit that touches `tests/`, a project file, `package.json`, `package-lock.json` or `playwright.config.ts` before both checkpoints is refused as application code.
+4. Commit and push.
 
 ## 3. Before any application code
 
@@ -73,7 +74,18 @@ Implementation is prohibited until steps 1–5 pass. They need no implementation
    ```
    - It writes the checkpoint only when the manifest equals what the frozen sources give and every work item is in Praxis.
    - Commit it. It is immutable.
-4. **Initialization checkpoint (authorization).** With the work plan of step 2 committed:
+4. **Initialization checkpoint (authorization).** It reads three inputs no other step writes. Produce them first, with the work plan of step 2 committed:
+   ```
+   praxis requirements manifest compile --catalog SRC/requirements/catalogs/causa-investigation.requirement-catalog.json \
+     --source-commit SRC-COMMIT --output requirements/verification/verification-manifest.json
+   dotnet fsi SRC/tools/r9/r9.fsx -- spec-preflight --indy-init SRC --lock SRC/kickoff/rehearsal-010/toolchain.lock.json \
+     --percepta percepta --out evidence/t0/spec-preflight.json
+   conditor acceptance preflight --target SRC > evidence/t0/acceptance.log
+   ```
+   - `spec-preflight` must print `spec-preflight: PASS`; `evidence/t0/acceptance.log` must contain the line `acceptance preflight: READY`.
+   - These are records, not application code; commit them with the work plan.
+
+   Then:
    ```
    dotnet fsi SRC/tools/r9/r9.fsx -- authorize-implementation --target . --catalog SRC/requirements/catalogs/causa-investigation.requirement-catalog.json \
      --obligations .echelon/obligations.json --suite-preflight evidence/t0/suite-preflight.json \
