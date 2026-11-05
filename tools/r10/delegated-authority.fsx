@@ -20,7 +20,11 @@
 //
 // CI runs the BASE (main) copy of this checker, never the PR's copy (review N1), so a PR cannot relax the policy it is
 // judged by; only the introducing PR, with no copy on main, runs its own. A PR can still edit the workflow itself:
-// that edit is visible in review, and a CODEOWNERS gate is the owner's choice (OWNER-BATCH item 8).
+// that edit is visible in review. This residual is REVIEW-gated, not owner-gated, unless the owner adds CODEOWNERS with
+// "Require review from Code Owners" (OWNER-BATCH item 8; review R3-2). Likewise a PR that weakens the checker or the
+// step without adding a DTD entry passes, and a later PR relies on it: only review catches that.
+// A checker change (e.g. a schema change) must merge on its own before any entry that uses it, since main's older copy
+// judges the PR.
 // Consequence (review N5): after merge, a PR that edits a protected path (workflows, verification/, packages, gates)
 // cannot carry a DTD entry; record the decision in its own PR first, then make the change.
 
@@ -265,9 +269,12 @@ let load (root: string) (baseRef: string option) : Inputs =
                   Decisions = run root $"show {r}:{logPath}" |> Option.map (fun s -> arr "decisions" (JsonNode.Parse s)) |> Option.defaultValue []
                   // committed changes against the base plus uncommitted ones; an unreadable diff fails closed
                   Changed =
-                    let lines (s: string) = s.Split('\n', StringSplitOptions.RemoveEmptyEntries) |> List.ofArray
-                    let committed = run root $"diff --name-only --no-renames {r} HEAD" |> Option.map lines |> Option.defaultValue [ "**/approvals-diff-unavailable.json" ]
-                    let pending = run root "status --porcelain --no-renames --untracked-files=all" |> Option.map (lines >> List.map (fun l -> l.Substring(3).Trim())) |> Option.defaultValue []
+                    // NUL-separated and unquoted (review R3-1: git quotes non-ASCII names, which then match no glob)
+                    let entries (s: string) = s.Split('\000', StringSplitOptions.RemoveEmptyEntries) |> List.ofArray
+                    let committed = run root $"-c core.quotePath=false diff --name-only --no-renames -z {r} HEAD" |> Option.map entries |> Option.defaultValue [ "**/approvals-diff-unavailable.json" ]
+                    let pending =
+                        run root "-c core.quotePath=false status --porcelain=v1 -z --no-renames --untracked-files=all"
+                        |> Option.map (entries >> List.filter (fun e -> e.Length > 3) >> List.map (fun e -> e.Substring 3)) |> Option.defaultValue []
                     committed @ pending })
       OwnerRequestIds =
         repoFiles root (fun p -> Path.GetFileName(p).StartsWith "owner-decision-requests")
