@@ -225,5 +225,7 @@ let main argv =
     let d = dispatch d (event "connect")
     check "after Connect the deep-linked case opens" (v d "screenDetail" = "True" && (v d "dDecoded").StartsWith "432 of 432") (v d "dDecoded")
 
+    // CI-CADENCE-001: pure validation tests (owner: domain agent).
+    failures <- failures + ValidationTests.run ()
     printfn "%s" (if failures = 0 then "all engine tests passed" else $"{failures} engine test(s) FAILED")
     if failures = 0 then 0 else 1
