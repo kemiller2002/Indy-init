@@ -93,7 +93,8 @@ jobs:
           # A pull request that changes implementation names its slice by its branch; the gate then judges that work item
           # at the merged result (this checkout is the merge of the head into the current base).
           src="$RUNNER_TEMP/indy-init"; slices="$src/docs/rehearsal-010-readiness/slice-execution-manifest.json"
-          impl=$(git diff --name-only HEAD^1 HEAD | grep -vE '^(docs|evidence|\.ros)/|\.md$|^\.echelon/(verification-scope|scope-checkpoint)\.json$' || true)
+          # Records, not implementation (r9.fsx isImplementationPath agrees): they reach main through a setup/* pull request.
+          impl=$(git diff --name-only HEAD^1 HEAD | grep -vE '^(docs|evidence|\.ros)/|\.md$|^\.echelon/(verification-scope|scope-checkpoint|r9-work-plan|obligations|r9-initialization-checkpoint)\.json$|^requirements/verification/verification-manifest\.json$' || true)
           slice=""; case "$HEAD_REF" in slice/SL-*) slice="${HEAD_REF#slice/}";; esac
           if [ -n "$impl" ] && [ -z "$slice" ]; then echo "::error::this pull request changes implementation but its branch does not name a slice (slice/SL-<work item>)"; exit 1; fi
           if [ -n "$slice" ]; then

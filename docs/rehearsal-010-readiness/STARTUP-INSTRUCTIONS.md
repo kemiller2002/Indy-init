@@ -35,7 +35,7 @@ Build to what they check. The names they look for are listed in `SRC/verificatio
 
 ## 2. T0 (the bootstrap)
 
-1. **Bootstrap** exactly as `SRC/requirements-compiled/v4.1.4/AGENT-RULES.md` duty 1 says. Then:
+1. **Bootstrap** exactly as `SRC/requirements-compiled/v4.1.4/AGENT-RULES.md` duty 1 says, up to but not including its commit and its publish (`conditor repo create`): those come at step 4. Then:
    ```
    dotnet fsi SRC/tools/r9/r9.fsx -- govern --indy-init SRC --target . --lock kickoff/rehearsal-010/toolchain.lock.json
    ```
@@ -44,12 +44,14 @@ Build to what they check. The names they look for are listed in `SRC/verificatio
    {"schema": "indy-init.t0/1", "t0": "<T0 UTC>", "deadline": "<T0 + 420 min>", "windowMinutes": 420}
    ```
    It is never changed. Every recovery and every replacement agent uses it. A different T0 or window is refused as DEADLINE_RESET.
-3. **Before you push, run `npm ci`, then §3 step 1 (the suite preflight), on this tree.** If it refuses, fix the bootstrap in this same commit. `r9.fsx check-sequencing` exempts only the bootstrap commit: a later commit before both checkpoints that touches an implementation path (`isImplementationPath`, r9.fsx: `src/`, `tests/`, `web/`, any project or solution file, `Directory.*.props`/`.targets`, `package.json`, `package-lock.json`, `playwright.config.*`, `global.json`, `build.fsx`) is refused as application code. If the bootstrap was already pushed and the preflight refuses, stop and report it: do not repair it in a later commit.
-4. Commit and push.
+3. **Before you push, run `npm ci`, then §3 step 1 (the suite preflight), on this tree.** If it refuses, fix the bootstrap in this same commit. `r9.fsx check-sequencing` exempts only the bootstrap commit: a later commit before both checkpoints that touches an implementation path (`isImplementationPath`, r9.fsx: `src/`, `tests/`, `web/`, any project or solution file, `Directory.*.props`/`.targets`, `package.json`, `package-lock.json`, `playwright.config.*`, `global.json`, `build.fsx`) is refused as application code. If the bootstrap was already published and the preflight refuses, do not repair it in a later commit: record the defect and ask the owner through `stop-decision` (reason `owner-authorized`), §6.
+4. Commit, then publish as duty 1 says (`conditor repo create`). Publishing protects main: from here on every commit reaches main through a pull request.
 
 ## 3. Before any application code
 
-Implementation is prohibited until steps 1–5 pass. They need no implementation and no verification evidence. `SRC-COMMIT` below is the Indy-init commit `govern` recorded: `jq -r .indyInitCommit .echelon/r9-governance.json`.
+Implementation is prohibited until steps 1–5 pass. They need no implementation and no verification evidence.
+
+Main is protected (the Conditor scaffold requires pull requests). Each record below reaches main through a pull request from a `setup/*` branch, merged with a merge commit; the governed gate treats these records as non-implementation, so such a pull request names no slice. The initialization checkpoint's branch starts at the authorized HEAD and holds only the checkpoint commit: `check-sequencing` requires that commit's parent to be `authorizedAtCommit`. `SRC-COMMIT` below is the Indy-init commit `govern` recorded: `jq -r .indyInitCommit .echelon/r9-governance.json`.
 
 1. **Suite preflight.** Compile the obligations, then run the preflight:
    ```
@@ -83,7 +85,7 @@ Implementation is prohibited until steps 1–5 pass. They need no implementation
    conditor acceptance preflight --target SRC > evidence/t0/acceptance.log
    ```
    - `spec-preflight` must print `spec-preflight: PASS`; `evidence/t0/acceptance.log` must contain the line `acceptance preflight: READY`.
-   - These are records, not application code (`isImplementationPath` matches none of them). Commit them, with the work plan, directly on main before the initialization checkpoint; through a pull request they would need a slice branch.
+   - These are records, not application code (`isImplementationPath` matches none of them). Merge them, with the work plan, through a `setup/*` pull request before the initialization checkpoint.
 
    Then:
    ```
