@@ -15,6 +15,10 @@
 //                        it is restarted. 0 (default) = no failures.
 //   --scale F            multiply every implementation estimate by F (sensitivity), default 1.
 //   --slice-overhead M   add M minutes to every slice (branch, pull request, context switching), default 0.
+//   --milestones FILE    functional milestones (indy-init.r10-milestones/1); reports when each is delivered (every slice
+//                        carrying each of its requirements integrated) and how many are usable at T+120/240/360/420.
+//   --priority P         tail (default, schedule.fsx: longest chain first) or milestones (the earliest milestone a
+//                        slice serves, directly or as an ancestor, first; ties by longest chain).
 //   --setup, --ci, --merge, --window, --lanes, --default-minutes: as in schedule.fsx.
 //
 //   dotnet fsi schedule-model.fsx -- --slices slice-execution-manifest.json --setup 45 --ci 0,2,5,10 --merge 3 \
@@ -39,6 +43,8 @@ let config =
       RepairFraction = num "--repair-fraction" 0.25
       Scale = num "--scale" 1.0
       SliceOverhead = num "--slice-overhead" 0.0
+      Milestones = opt "--milestones" |> Option.map loadMilestones |> Option.defaultValue []
+      Priority = opt "--priority" |> Option.defaultValue "tail"
       DefaultMinutes = num "--default-minutes" 20.0
       Lanes = parseLanes (opt "--lanes" |> Option.defaultValue defaultLanes) }
 let slices = loadSlices (req "--slices") (opt "--roles") config

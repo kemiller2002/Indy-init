@@ -30,6 +30,10 @@ type Config =
       RepairFraction: float
       Scale: float
       SliceOverhead: float
+      /// Functional milestones, in delivery order: (id, name, requirement ids). Empty = none.
+      Milestones: (string * string * string list) list
+      /// "tail" (schedule.fsx: the longest chain first) or "milestones" (the earliest milestone a slice serves first).
+      Priority: string
       DefaultMinutes: float
       Lanes: (string * string list) list }
 
@@ -78,6 +82,36 @@ let loadSlices (path: string) (rolesPath: string option) (c: Config) : Slice lis
           Source = source
           MandatoryObligations = o
           Requirements = reqs })
+
+/// Milestones (indy-init.r10-milestones/1: { "milestones": [ { "id", "name", "requirements": [..] } ] }), in order.
+let loadMilestones (path: string) : (string * string * string list) list =
+    (JsonNode.Parse(File.ReadAllText path)).["milestones"].AsArray()
+    |> Seq.map (fun m -> str m "id", str m "name", (m["requirements"].AsArray() |> Seq.map string |> List.ofSeq))
+    |> List.ofSeq
+
+/// The earliest milestone (1-based) each slice serves: one that carries a requirement of it, or any slice that such
+/// a slice depends on (transitively). Slices no milestone needs rank after every milestone.
+let milestoneRank (milestones: (string * string * string list) list) (slices: Slice list) : Map<string, int> =
+    let byId = slices |> List.map (fun s -> s.Id, s) |> Map.ofList
+    let rec ancestors (id: string) (acc: Set<string>) =
+        if acc.Contains id then acc else byId[id].Deps |> List.fold (fun a d -> ancestors d a) (acc.Add id)
+    let needed =
+        milestones |> List.mapi (fun i (_, _, reqs) ->
+            let carriers = slices |> List.filter (fun s -> s.Requirements |> List.exists (fun r -> List.contains r reqs)) |> List.map (fun s -> s.Id)
+            i + 1, carriers |> List.fold (fun a c -> ancestors c a) Set.empty)
+    slices |> List.map (fun s -> s.Id, (needed |> List.tryFind (fun (_, set) -> set.Contains s.Id) |> Option.map fst |> Option.defaultValue (milestones.Length + 1))) |> Map.ofList
+
+/// When each milestone is delivered: every slice carrying each of its requirements is integrated. A requirement no
+/// slice carries is an error (a milestone must not name work that is not in the plan).
+let milestoneTimes (milestones: (string * string * string list) list) (slices: Slice list) (recs: Map<string, 'r>) (integratedOf: 'r -> float) : (string * string * float) list =
+    milestones |> List.map (fun (id, name, reqs) ->
+        let t =
+            reqs |> List.map (fun r ->
+                match slices |> List.filter (fun s -> List.contains r s.Requirements) with
+                | [] -> failwithf "milestone %s names %s, which no slice carries" id r
+                | carriers -> carriers |> List.map (fun s -> integratedOf recs[s.Id]) |> List.max)
+            |> List.fold max 0.0
+        id, name, t)
 
 /// The minutes per mandatory obligation the derived estimates use (for the report).
 let rateOf (slices: Slice list) =
@@ -162,7 +196,7 @@ let priorities (ci: float) (slices: Slice list) =
 let private integratedAt (st: State) (id: string) = match st.Phases[id] with Integrated at -> Some at | _ -> None
 
 /// One fixed-point pass at minute st.T; returns the state and whether anything changed.
-let private pass (c: Config) (ci: float) (slices: Slice list) (prio: Map<string, float>) (st: State) : State * bool =
+let private pass (c: Config) (ci: float) (slices: Slice list) (prio: Map<string, float>) (rank: Map<string, int>) (st: State) : State * bool =
     let t = st.T
     let byId = slices |> List.map (fun s -> s.Id, s) |> Map.ofList
     let set id p (s: State) = { s with Phases = s.Phases.Add(id, p) }
@@ -223,7 +257,7 @@ let private pass (c: Config) (ci: float) (slices: Slice list) (prio: Map<string,
                         slices
                         |> List.filter (fun x -> s.Phases[x.Id] = Waiting && not (s.Rec[x.Id].Start >= 0.0) && List.contains x.Role roles
                                                  && x.Deps |> List.forall (fun d -> integratedAt s d |> Option.exists (fun a -> a <= t)))
-                        |> List.sortByDescending (fun x -> prio[x.Id])
+                        |> List.sortBy (fun x -> rank[x.Id], -prio[x.Id])
                     match ready with
                     | x :: _ ->
                         { s with LaneFree = s.LaneFree.Add(lane, t + x.Minutes) }
@@ -252,8 +286,9 @@ let private pass (c: Config) (ci: float) (slices: Slice list) (prio: Map<string,
 /// Runs the simulation to completion; returns the per-slice records.
 let simulate (c: Config) (ci: float) (slices: Slice list) : Map<string, Record> =
     let prio = priorities ci slices
+    let rank = if c.Priority = "milestones" then milestoneRank c.Milestones slices else slices |> List.map (fun s -> s.Id, 0) |> Map.ofList
     let empty = { Lane = ""; Start = -1.0; Implemented = -1.0; FirstVerification = -1.0; Integrated = -1.0; Runs = 0; Repairs = 0; RepairMinutes = 0.0; QueueWait = 0.0; Defective = false }
-    let rec settle st = match pass c ci slices prio st with s, true -> settle s | s, false -> s
+    let rec settle st = match pass c ci slices prio rank st with s, true -> settle s | s, false -> s
     let rec tick (st: State) =
         let st = settle st
         if st.Phases |> Map.forall (fun _ p -> match p with Integrated _ -> true | _ -> false) then st.Rec
@@ -283,6 +318,7 @@ type Scenario =
       QueueWaitMinutes: float
       LaneIdleMinutes: float
       VerificationRuns: int
+      MilestoneTimes: (string * string * float) list
       Records: Map<string, Record> }
 
 type Report = { Config: Config; Slices: Slice list; Rate: float; Scenarios: Scenario list }
@@ -312,6 +348,7 @@ let scenario (c: Config) (slices: Slice list) (ci: float) : Scenario =
       QueueWaitMinutes = recs |> Map.toList |> List.sumBy (fun (_, r) -> r.QueueWait)
       LaneIdleMinutes = idle
       VerificationRuns = recs |> Map.toList |> List.sumBy (fun (_, r) -> r.Runs)
+      MilestoneTimes = milestoneTimes c.Milestones slices recs (fun r -> r.Integrated)
       Records = recs }
 
 let run (c: Config) (slices: Slice list) (cis: float list) : Report =
@@ -327,6 +364,10 @@ let printReport (r: Report) =
         printfn "ci %3.0f min: all integrated at T+%.0f (%s %.0f); by the deadline %d slices, %d requirements, %d mandatory obligations; critical path %.0f; queue wait %.0f; verification %.0f (%d runs); repair %.0f"
             s.Ci s.Finish (if s.Finish <= c.Window then "within" else "OVER") c.Window s.SlicesByDeadline s.RequirementsByDeadline s.ObligationsByDeadline
             s.CriticalPath s.QueueWaitMinutes s.VerificationMinutes s.VerificationRuns s.RepairMinutes
+        if not s.MilestoneTimes.IsEmpty then
+            printfn "         milestones: %s; usable at T+120/240/360/420: %s"
+                (s.MilestoneTimes |> List.map (fun (id, _, t) -> sprintf "%s T+%.0f" id t) |> String.concat ", ")
+                ([ 120.0; 240.0; 360.0; 420.0 ] |> List.map (fun w -> s.MilestoneTimes |> List.filter (fun (_, _, t) -> t <= w) |> List.length |> string) |> String.concat "/")
 
 let private jv (x: obj) : JsonNode =
     match x with
@@ -345,7 +386,7 @@ let toJson (r: Report) : JsonNode =
           "note", box "model results from estimates, not observations"
           "lanes", box (c.Lanes |> List.map (fun (l, rs) -> l + ":" + String.Join("|", rs)) |> String.concat ",")
           "setupMinutes", box c.Setup; "mergeMinutes", box c.Merge; "windowMinutes", box c.Window
-          "queueDepth", box c.QueueDepth; "failEvery", box c.FailEvery; "repairFraction", box c.RepairFraction; "scale", box c.Scale
+          "priority", box c.Priority; "queueDepth", box c.QueueDepth; "failEvery", box c.FailEvery; "repairFraction", box c.RepairFraction; "scale", box c.Scale
           "minutesPerObligation", box r.Rate
           "slices", box (arrOf (r.Slices |> List.map (fun s -> obj [ "slice", box s.Id; "role", box s.Role; "minutes", box s.Minutes; "source", box s.Source; "requirements", box s.Requirements.Length; "mandatoryObligations", box s.MandatoryObligations ])))
           "scenarios", box (arrOf (r.Scenarios |> List.map (fun s ->
@@ -354,6 +395,8 @@ let toJson (r: Report) : JsonNode =
                     "criticalPathMinutes", box s.CriticalPath; "criticalSlices", box (arrOf (s.CriticalSlices |> List.map (fun x -> jv x)))
                     "implementationMinutes", box s.ImplementationMinutes; "repairMinutes", box s.RepairMinutes; "verificationMinutes", box s.VerificationMinutes
                     "verificationRuns", box s.VerificationRuns; "mergeMinutes", box s.MergeMinutes; "queueWaitMinutes", box s.QueueWaitMinutes; "laneIdleMinutesInWindow", box s.LaneIdleMinutes
+                    "milestones", box (arrOf (s.MilestoneTimes |> List.map (fun (id, name, t) -> obj [ "id", box id; "name", box name; "deliveredAt", box t; "byDeadline", box (t <= c.Window) ])))
+                    "usableMilestonesAt", box (obj ([ 120.0; 240.0; 360.0; 420.0 ] |> List.map (fun w -> sprintf "T+%.0f" w, box (s.MilestoneTimes |> List.filter (fun (_, _, t) -> t <= w) |> List.length))))
                     "cpm", box (arrOf (s.Cpm |> List.map (fun x -> obj [ "slice", box x.Slice; "earliestStart", box x.Es; "earliestFinish", box x.Ef; "latestStart", box x.Ls; "slack", box x.Slack; "critical", box x.Critical ])))
                     "timeline", box (arrOf (r.Slices |> List.map (fun sl -> let x = s.Records[sl.Id] in obj [ "slice", box sl.Id; "lane", box x.Lane; "start", box x.Start; "implemented", box x.Implemented; "firstVerification", box x.FirstVerification; "integrated", box x.Integrated; "runs", box x.Runs; "repairs", box x.Repairs ]))) ]))) ]
 

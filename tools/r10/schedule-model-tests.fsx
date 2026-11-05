@@ -27,7 +27,7 @@ let case (name: string) (problems: string list) =
         printfn "%-72s FAIL" name
         problems |> List.truncate 5 |> List.iter (printfn "    %s")
 
-let cfg setup lanes = { Setup = setup; Merge = 3.0; Window = 420.0; QueueDepth = 1; FailEvery = 0; RepairFraction = 0.25; Scale = 1.0; SliceOverhead = 0.0; DefaultMinutes = 20.0; Lanes = parseLanes lanes }
+let cfg setup lanes = { Setup = setup; Merge = 3.0; Window = 420.0; QueueDepth = 1; FailEvery = 0; RepairFraction = 0.25; Scale = 1.0; SliceOverhead = 0.0; Milestones = []; Priority = "tail"; DefaultMinutes = 20.0; Lanes = parseLanes lanes }
 let manifest = at "docs/rehearsal-010-readiness/slice-execution-manifest.json"
 let roles = at "docs/rehearsal-010-optimization/inputs/slice-roles.v414.json"
 let ownLanes = "integration:integration,domain:domain,persistence:persistence,ui:ui,ui-2:ui-2,reviewer:reviewer"
