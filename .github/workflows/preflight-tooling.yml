@@ -2,14 +2,14 @@ name: Preflight tooling
 # Directive workstream C: a PR commit ran this workflow twice (push and pull_request events, same commit, every job),
 # doubling runner load while three sessions had PRs open. Push now runs only on main; PRs run on pull_request (the
 # merge result), and a newer commit on the same PR cancels the older run (its checks are on the old commit, so the new
-# head's required checks are unaffected). main and manual runs are never cancelled.
+# head's required checks are unaffected). Pushes to main and manual runs are grouped per commit, so none is cancelled.
 on:
   push:
     branches: [main]
   pull_request:
   workflow_dispatch:
 concurrency:
-  group: preflight-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  group: preflight-${{ github.event_name }}-${{ github.event.pull_request.number || github.sha }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 jobs:
   offline-contract-tests:
@@ -483,8 +483,13 @@ jobs:
         run: dotnet fsi tools/r10/schedule-model-tests.fsx -- --indy-init .
       - name: Delegated authority (DA-R10-1) records stay in scope and are never owner approvals
         run: |
+          # review N1: judge with main's copy of the checker; only the PR that introduces it (none on main) runs its own
+          git fetch -q --depth=1 origin main
+          DA="$RUNNER_TEMP/delegated-authority.fsx"
+          git show FETCH_HEAD:tools/r10/delegated-authority.fsx > "$DA" 2>/dev/null || cp tools/r10/delegated-authority.fsx "$DA"
+          dotnet fsi "$DA" -- --indy-init . test
+          dotnet fsi "$DA" -- --indy-init . check --base-ref FETCH_HEAD
           dotnet fsi tools/r10/delegated-authority.fsx -- --indy-init . test
-          git fetch -q --depth=1 origin main && dotnet fsi tools/r10/delegated-authority.fsx -- --indy-init . check --base-ref FETCH_HEAD
       - name: Change-impact selection (proposed Level 2; never the gate) holds its adversarial cases
         run: dotnet fsi tools/r10/change-impact.fsx -- --indy-init . test
       - name: Proposed successor manifests regenerate from their scope manifests (review RVO-3-3; the committed files must not be stale or edited)

@@ -17,6 +17,12 @@
 //   - an edited or removed base entry, or an unreadable base ref (M3);
 //   - any approvals*.json anywhere that cites a delegated record (M2).
 // Every rule is a pure function from the loaded inputs to a list of refusals.
+//
+// CI runs the BASE (main) copy of this checker, never the PR's copy (review N1), so a PR cannot relax the policy it is
+// judged by; only the introducing PR, with no copy on main, runs its own. A PR can still edit the workflow itself:
+// that edit is visible in review, and a CODEOWNERS gate is the owner's choice (OWNER-BATCH item 8).
+// Consequence (review N5): after merge, a PR that edits a protected path (workflows, verification/, packages, gates)
+// cannot carry a DTD entry; record the decision in its own PR first, then make the change.
 
 open System
 open System.IO
@@ -42,12 +48,21 @@ let logPath = $"{dir}/delegated-decisions.json"
 let protectedGlobs =
     [ "**/approvals*.json"; "**/owner-decision-requests*.json"; $"{dir}/delegated-authority.json"; $"{dir}/DIRECTIVE-*.md"
       "tools/r10/delegated-authority.fsx"; "tools/owner-freeze.fsx"; "tools/r10/launch-preflight.fsx"
-      ".github/workflows/**"; ".github/CODEOWNERS"; "verification/**" ]
+      ".github/workflows/**"; "**/CODEOWNERS"; "verification/**"
+      // review N3: what defines acceptance or a gate
+      "conditor.acceptance.json"; "requirements-compiled/**"; "kickoff/*/toolchain.lock*.json"; "global.json"
+      "tools/r10/adversarial.fsx"; "tools/requirements-compiler/**" ]
 let decisionFields = set [ "id"; "class"; "decision"; "decides"; "rationale"; "evidence"; "decidedAt"; "paths"; "actingAgent" ]
 let agentFields = set [ "kind"; "session"; "role" ]
 // owner-decision-shaped ids: not preceded by a letter or digit (a hyphen before is allowed: "pre-ODR-R10-32")
-let ownerIdRx = Regex(@"(?<![A-Za-z0-9])(ODR|OD|CF|APR|RDP)-[A-Za-z0-9]+", RegexOptions.IgnoreCase)
-let normHyphens (s: string) = Regex.Replace(s, "[‐‑‒–—―−﹣－]", "-")
+let ownerIdRx = Regex(@"(?<![A-Za-z0-9])(ODR|OD|CF|APR|RDP)[-\s_.]+[A-Za-z0-9]+", RegexOptions.IgnoreCase)
+// review N4: compatibility-normalize, drop zero-width characters, map Cyrillic and Greek look-alikes, unify hyphens
+let confusables = Map.ofList [ 'О','O'; 'о','o'; 'А','A'; 'а','a'; 'Р','P'; 'р','p'; 'С','C'; 'с','c'; 'Е','E'; 'е','e'; 'Ο','O'; 'ο','o'; 'Α','A'; 'Ρ','P'; 'Ϲ','C' ]
+let normHyphens (s: string) =
+    let n = s.Normalize(NormalizationForm.FormKC)
+    let n = Regex.Replace(n, "[​-‍⁠﻿­]", "")
+    let n = String(n.ToCharArray() |> Array.map (fun c -> Map.tryFind c confusables |> Option.defaultValue c))
+    Regex.Replace(n, "[‐‑‒–—―−﹣－]", "-")
 
 // ---- json helpers (total: a missing field reads as None / empty) ----
 let field (k: string) (n: JsonNode) : JsonNode option =
@@ -163,7 +178,7 @@ let decisionRules : (Inputs -> JsonNode -> Refusal list) list =
       fun i d ->
         // reviews B1/H1: owner-decision ids anywhere in the decision, normalized, case-insensitive
         let text = strings d |> List.map normHyphens
-        let shaped = text |> List.collect (fun s -> [ for m in ownerIdRx.Matches s -> m.Value.ToUpperInvariant() ])
+        let shaped = text |> List.collect (fun s -> [ for m in ownerIdRx.Matches s -> Regex.Replace(m.Value, @"[\s_.]+", "-").ToUpperInvariant() ])
         let listed =
             i.OwnerRequestIds |> Set.filter (fun r ->
                 text |> List.exists (fun s -> Regex.IsMatch(s, $@"(?<![A-Za-z0-9]){Regex.Escape r}(?![0-9])", RegexOptions.IgnoreCase)))
@@ -204,8 +219,10 @@ let logRules : (Inputs -> Refusal list) list =
       fun i ->
         i.Approvals |> List.choose (fun (path, a) ->
             let kind = field "authority" a |> Option.map (strOr "kind") |> Option.defaultValue ""
+            let byOwner = kind = "operator" && (field "authority" a |> Option.map (strOr "id")) = Some(ownerLogin i)
             let text = a.ToJsonString().ToUpperInvariant()
-            if kind = "delegated" || text.Contains "DTD-R10" || text.Contains "DA-R10" then
+            // review N5: the owner's own record may revoke or ratify the delegation; its signature is launch-preflight's job
+            if kind = "delegated" || (not byOwner && (text.Contains "DTD-R10" || text.Contains "DA-R10")) then
                 Some(refuse "APPROVAL_LAUNDERED" (strOr "id" a) $"{path} cites a delegated record")
             else None) ]
 
@@ -249,8 +266,8 @@ let load (root: string) (baseRef: string option) : Inputs =
                   // committed changes against the base plus uncommitted ones; an unreadable diff fails closed
                   Changed =
                     let lines (s: string) = s.Split('\n', StringSplitOptions.RemoveEmptyEntries) |> List.ofArray
-                    let committed = run root $"diff --name-only {r} HEAD" |> Option.map lines |> Option.defaultValue [ "**/approvals-diff-unavailable.json" ]
-                    let pending = run root "status --porcelain" |> Option.map (lines >> List.map (fun l -> l.Substring(3).Trim())) |> Option.defaultValue []
+                    let committed = run root $"diff --name-only --no-renames {r} HEAD" |> Option.map lines |> Option.defaultValue [ "**/approvals-diff-unavailable.json" ]
+                    let pending = run root "status --porcelain --no-renames --untracked-files=all" |> Option.map (lines >> List.map (fun l -> l.Substring(3).Trim())) |> Option.defaultValue []
                     committed @ pending })
       OwnerRequestIds =
         repoFiles root (fun p -> Path.GetFileName(p).StartsWith "owner-decision-requests")
@@ -292,6 +309,9 @@ let tests (root: string) =
           "an id in no requests file (OD-V415-01)", withDecision (good |> put "decision" (jstr "Choose OD-V415-01 A")), Some "DTD_OWNER_DECISION_ID"
           "a lower-case id", withDecision (good |> put "decision" (jstr "per odr-r10-19")), Some "DTD_OWNER_DECISION_ID"
           "a lower-case id in no requests file", withDecision (good |> put "decision" (jstr "per od-v415-01")), Some "DTD_OWNER_DECISION_ID"
+          "a Cyrillic O in the id", withDecision (good |> put "decision" (jstr "per ОDR-R10-19")), Some "DTD_OWNER_DECISION_ID"
+          "a zero-width space inside the id", withDecision (good |> put "decision" (jstr "per ODR​-R10-19")), Some "DTD_OWNER_DECISION_ID"
+          "spaces instead of hyphens", withDecision (good |> put "decision" (jstr "per ODR R10 19")), Some "DTD_OWNER_DECISION_ID"
           "non-breaking hyphens", withDecision (good |> put "decision" (jstr "per ODR‑R10‑19")), Some "DTD_OWNER_DECISION_ID"
           "a hyphen before the id", withDecision (good |> put "decision" (jstr "pre-ODR-R10-32 staging")), Some "DTD_OWNER_DECISION_ID"
           "an id in the rationale", withDecision (good |> put "rationale" (jstr "as CF-07 needs")), Some "DTD_OWNER_DECISION_ID"
@@ -326,6 +346,9 @@ let tests (root: string) =
           // the real diff (B3)
           "a new decision in a change that edits an approvals file",
             withDecision good |> onBase { base' with Changed = [ logPath; "kickoff/rehearsal-007/approvals.causa.json" ] }, Some "DTD_WITH_PROTECTED_CHANGE"
+          "a new decision with a frozen package edit", withDecision good |> onBase { base' with Changed = [ logPath; "requirements-compiled/v4.1.4/package-manifest.json" ] }, Some "DTD_WITH_PROTECTED_CHANGE"
+          "a new decision with a root CODEOWNERS", withDecision good |> onBase { base' with Changed = [ logPath; "CODEOWNERS" ] }, Some "DTD_WITH_PROTECTED_CHANGE"
+          "a new decision with conditor.acceptance.json", withDecision good |> onBase { base' with Changed = [ logPath; "conditor.acceptance.json" ] }, Some "DTD_WITH_PROTECTED_CHANGE"
           "control: a protected edit with no new decision", real |> onBase { base' with Changed = [ ".github/workflows/x.yml" ] }, None
           "diff unavailable counts as protected? no: an unknown path is not protected, but a missing base is refused",
             withDecision good |> onBase { base' with Readable = false }, Some "DA_BASE_UNREADABLE"
@@ -359,6 +382,8 @@ let tests (root: string) =
           "approval with delegated authority", { real with Approvals = [ "x/approvals.json", j """{"id":"APR-X","authority":{"kind":"delegated"}}""" ] }, Some "APPROVAL_LAUNDERED"
           "approval citing a DTD as its basis", { real with Approvals = [ "kickoff/x/approvals.causa.json", j """{"id":"APR-X","authority":{"kind":"operator"},"changes":[{"basis":"dtd-r10-002"}]}""" ] }, Some "APPROVAL_LAUNDERED"
           "approval citing DA-R10-1", { real with Approvals = [ "kickoff/x/approvals.causa.json", j """{"id":"APR-X","authority":{"kind":"operator"},"note":"DA-R10-1"}""" ] }, Some "APPROVAL_LAUNDERED"
+          "control: the owner's own approval may cite DA-R10-1 (to revoke it)", { real with Approvals = [ "kickoff/x/approvals.causa.json", j """{"id":"APR-X","authority":{"kind":"operator","id":"kemiller2002"},"note":"revokes DA-R10-1"}""" ] }, None
+          "an operator approval by someone else citing DA-R10-1", { real with Approvals = [ "kickoff/x/approvals.causa.json", j """{"id":"APR-X","authority":{"kind":"operator","id":"someone"},"note":"DA-R10-1"}""" ] }, Some "APPROVAL_LAUNDERED"
           "control: the repository's real approvals are clean", { real with Approvals = real.Approvals }, None ]
     let loaderBites = [ "the loader finds approvals files", not real.Approvals.IsEmpty; "the loader finds owner request ids", real.OwnerRequestIds.Contains "ODR-R10-19" ]
     let results =
