@@ -38,7 +38,7 @@ All runs:
 | **T10 only** (own shell and pins) | 55 | **116 / 125 / 135** | **769** | **527** |
 | *(no M0: R2)* | – | – | 769 | 527 |
 
-The best variant costs nothing in the model: completion and obligations at 10-min CI equal R2's. M0 fills `ui` lane time that would otherwise wait for T17. The *after-t11* variant does cost: it delays T16, and through it the UI chain.
+The best variant costs nothing **in the model**, which is an assumption (review RVO-5-4). The model runs SL-M0 entirely on the `ui` lane. It does not charge the persistence contribution PRs (`GitHubRequests.fs`, `Classify.fs`, `Reader.fs`), the integration-owned changes (`Program.fs`, `web/main.js`, `Directory.Packages.props`), or their coordination. Within the model: completion and obligations at 10-min CI equal R2's. M0 fills `ui` lane time that would otherwise wait for T17. The *after-t11* variant does cost: it delays T16, and through it the UI chain.
 
 ## Critical path to M0, and what blocks 60–120 minutes
 
@@ -56,11 +56,12 @@ The T10-only variant:
 - **The 60–120 minute target holds only at near-zero CI with today's estimates:** 116, 125 and 135 at 0, 5 and 10-min CI.
 - **The set-up and the bootstrap estimate are the largest remaining assumptions.** Planned at their measured values (5-min set-up, about 10-min bootstrap), the same chain gives roughly 75 + 2 × CI. That is an estimate, not modelled.
 - **Rehearsal 009, measured:**
-  - first working application commit at **T+21**;
-  - accepted candidate (36/37 requirements verified) at **T+78**;
+  - first application commit at **T+21** (commit time, not verification);
+  - CI added at T+42, review fixes at T+63;
+  - catalog-level Dokimos verification (36/37) at **T+78**, but the **release gate refused the candidate** (0 of 541 plan obligations; R9 `evidence/FINAL-REPORT.md`:7, :93);
   - one agent, a single integrated gate at the end.
 
-  That is the evidence that the work fits in 60–120 minutes. The governed one-gate-per-slice process is what adds the rest.
+  That is evidence that the *implementation* fits in 60–120 minutes, not that a verified release does. The governed one-gate-per-slice process is what adds the rest.
 
 ## Measured against assumed
 

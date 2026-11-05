@@ -4,7 +4,7 @@
 
 **Short answer:**
 1. **It is technically small.** Measured:
-   - Rehearsal 009 committed a whole working F# WebAssembly Causa application, with GitHub reads and writes, at T+21.
+   - Rehearsal 009 made its first commit of an F# WebAssembly Causa application with GitHub reads and writes at T+21. That is the commit time, not a verified release: first application commit at T+21; its CI at T+42; review fixes at T+63. Its candidate passed catalog-level Dokimos verification (36/37) at T+78, but its **release gate refused it** (0 of 541 plan obligations; R9 `evidence/FINAL-REPORT.md`:7, :93). Catalog acceptance is never release acceptance.
    - A 45-line F# probe written for this investigation read the real catalog and all four histories in 1.6 seconds.
 2. **It is late because of packaging and governance, not technology.**
    - In the approved plan, "show the data" is carried only by work items that wait for the semantic kernel and its checkpoint (T13 → T17). They also wait for the save-state machine (T19 → T20) and for authoritative replay (T15 → T25).
@@ -54,7 +54,7 @@ It follows the frozen architecture. It has no new framework, and no second data 
 | States | `Update.fs`, `Engine.fs` (ui) | loading, empty catalog, unauthorized, missing file, malformed JSON, network error | probe classifies all six |
 | Host | `Program.fs`, `web/main.js` (integration) | the Limen `BrowserKernel` with a .NET WebAssembly transport, Forma CSS | R9 `web/main.js`: 28 lines |
 
-**Reusable by the authoritative engine.** The read adapter and the document reader are exactly what Verify and Replay later consume (`02-IF41-STORAGE.fs` `Verify`, `PathOf`). M0 adds no code that M1 throws away: only the raw-event view is superseded by the projection views.
+**Reusable by the authoritative engine.** The read adapter and its bytes are what `Verify` later consumes (`02-IF41-STORAGE.fs` `Verify` works on file-set bytes, `PathOf`). The generic document reader is display-only: `Verify` does not take parsed JSON (review RVO-5-7). The raw-event view is superseded by the projection views.
 
 **What M0 does not claim:**
 - authoritative replay, validation against the engine, the `expectedStateSha256` check;
@@ -80,6 +80,6 @@ See DATA-VISIBILITY-DEPENDENCIES.md for every edge, and TIME-TO-FIRST-DATA.md fo
 
 | | Result |
 |---|---|
-| Technically achievable in 60–120 minutes? | **Yes.** Rehearsal 009 committed a full working app at T+21, and its accepted candidate at T+78 (measured; one agent, no slice gate) |
+| Technically achievable in 60–120 minutes? | **Yes, for the implementation.** Rehearsal 009 (measured; one agent, no slice gate): first application commit at T+21; its CI at T+42; review fixes at T+63. Its candidate passed catalog-level Dokimos verification (36/37) at T+78, but its **release gate refused it** (0 of 541 plan obligations; R9 `evidence/FINAL-REPORT.md`:7, :93). Catalog acceptance is never release acceptance. The implementation effort fits; its verification against the plan never completed there |
 | Achievable in the governed Rehearsal 010 plan? | **Only with ODR-R10-30**, and then **T+116 at 0-min CI, T+125 at 5, T+135 at 10** (model, M0 slice after T10 only, 55-min estimate). That is inside 120 minutes only at 0-min CI |
 | Blocker | **Governance and packaging, not technology:** no work item for a non-authoritative browser; the generated-item-after-T17 rule; the save-machine edge on Connect; one full gate per slice; and OD-INDY-22 (no pre-built code) |

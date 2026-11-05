@@ -31,7 +31,7 @@ The six questions:
 | T19 save-state machine (60; 118–191) | **no** | **no** | – | **yes** | – | **yes** | dependency-graph.json:1402: "the connect flow drives the session-memory save process (ADR-R7-001)". Connect and read touch only the total `SaveMachine.Initial` (05-IF41-SAVE.fs:211) |
 | T20 Connect flow and provider: read, create, write, conflict (40; 191–244) | **yes** (read half) | – | – | the create, write and conflict half | – | the read half moves *before* T19 only in a successor that splits T20 (ODR-R10-21) | DAG T20 title |
 | T25 load the historical catalog after Connect (20; 244–283) | yes | yes | **yes**: "catalog records are v1.0.0 file sets replayed through the engine" | – | – | **its acceptance is authoritative** and stays as is. M0's raw list is not T25 | dependency-graph.json:1447; EXT-DATA-013 |
-| `WI-GEN-EXT-DATA` (Connect half) (209–270) | yes | – | – | EXT-DATA-008 only | **yes**: waits for T17 by the generated-item rule | yes, if the owner accepts a read-only exception to the rule | MILESTONE-DEPENDENCIES.md §5 (`Msg.Connection` is not `Msg.DomainCommand`, 06-IF41-APP.fs:60, :65) |
+| `WI-GEN-EXT-DATA` (Connect half) (228–270) | yes | – | – | EXT-DATA-008 only | **yes**: waits for T17 by the generated-item rule | yes, if the owner accepts a read-only exception to the rule | MILESTONE-DEPENDENCIES.md §5 (`Msg.Connection` is not `Msg.DomainCommand`, 06-IF41-APP.fs:60, :65) |
 | `WI-GEN-UI-LANDING` / `-STATES` (209–296) | – | yes | UI-026/033 analysis cards | – | **yes**: after T17 | the landing list and error states, yes; the analysis cards, no | catalog UI-001, UI-010, UI-025 |
 | T22 workspace views (70; 326–409) | no | no | yes | yes | – | yes | DAG T22 |
 

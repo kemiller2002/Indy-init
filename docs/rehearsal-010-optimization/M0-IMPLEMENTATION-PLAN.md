@@ -40,7 +40,7 @@
 
 **Kept:**
 - the read adapter;
-- the document reader, which becomes the input to `Verify` and `Replay`;
+- the read adapter's bytes, which are the input to `Verify` (the generic document reader stays display-only);
 - the Connect form and the states.
 
 **Replaced:** the raw-event view, by the projection views, once T13, T15 and T25 exist **and** ODR-R10-25 makes the union able to represent the catalog.

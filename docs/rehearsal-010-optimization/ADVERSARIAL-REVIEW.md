@@ -93,6 +93,28 @@ The reviewer verified the RVO-3 fixes independently:
 
 The reviewer judged the PARTIALLY OPTIMIZED verdict to be supported.
 
+### Round 5 (653bfbb, the minimum-data-browser addendum): PASS
+
+The reviewer confirmed these claims:
+- the causa-data facts (independent parse: 1,363 events, CORS `*`);
+- the Rehearsal 009 timeline and its browser-side `api.github.com` path;
+- every dependency row against the DAG and the edge reasons;
+- every TIME-TO-FIRST-DATA number, and R6 reproduced from the CLI;
+- that no M0 code was committed, and the OD-INDY-22 reasoning;
+- that nothing claims replay or counts M0 toward EXT-DATA-013, T25, J1-06 or J2-08.
+
+Two mutations were caught.
+
+| ID | Severity | Finding | Disposition |
+|---|---|---|---|
+| RVO-5-1 | minor | Rehearsal 009's "accepted candidate" omitted that its release gate refused it (0/541) | **Fixed** everywhere it is cited |
+| RVO-5-2 | minor | "Working application at T+21" is a commit time, not verification | **Fixed**: commit, CI (T+42) and review fixes (T+63) are separated |
+| RVO-5-3 | minor | M0 cannot surface C1, since it does not decode events | **Fixed** in ARCHITECTURAL-LESSONS |
+| RVO-5-4 | minor | "Costs nothing" ignored persistence and integration contribution work | **Fixed**: stated as a model assumption |
+| RVO-5-5 | note | WI-GEN-EXT-DATA window 209 → 228 | **Fixed** |
+| RVO-5-6 | note | file-name, measured-value and usable-count nits | **Fixed**. R6 `usableMilestonesAt` counts M0, and is not quoted as M1-level usability |
+| RVO-5-7 | note | `Verify` consumes bytes, not parsed JSON | **Fixed**: only the adapter's bytes carry over |
+
 ## The ten mission questions (from round 1 unless noted)
 
 | # | Question | Answer |

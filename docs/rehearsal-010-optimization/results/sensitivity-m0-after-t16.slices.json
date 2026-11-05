@@ -4174,5 +4174,5 @@
    "status": "not-started"
   }
  ],
- "status": "SENSITIVITY ONLY (M0-DATA-BROWSER.md): an additional read-only data-browser slice SL-M0 that depends only on SL-T16. It is not in any scope; \"M0-DATA-VISIBLE\" is a planning marker, not a requirement ID. Estimate 30 min is an assumption (uses the T16 shell; read adapter, list, detail, states, tests); basis: Rehearsal 009 measured a whole first application commit at T+21."
+ "status": "SENSITIVITY ONLY (MINIMUM-DATA-BROWSER.md): an additional read-only data-browser slice SL-M0 that depends only on SL-T16. It is not in any scope; \"M0-DATA-VISIBLE\" is a planning marker, not a requirement ID. Estimate 30 min is an assumption (uses the T16 shell; read adapter, list, detail, states, tests); basis: Rehearsal 009 measured a whole first application commit at T+21."
 }

@@ -152,16 +152,25 @@ It uses no `CoreEvent`, `Replay` or save machine.
 **Evidence that it is small:**
 - A 45-line F# probe read the real catalog and all four histories (1,363 events, each count equal to its manifest) in 1.6 s.
 - It also classified missing-file, malformed-JSON and network errors.
-- Rehearsal 009 committed a full working F# WebAssembly app, with GitHub reads and writes, at T+21 (measured).
+- Rehearsal 009 made its first application commit, with GitHub reads and writes, at T+21 (measured commit time). Its release gate later refused the candidate (0/541 plan obligations), so this is evidence of implementation effort only.
 
 **Why it is not delivered within 120 minutes:** packaging and governance, not technology (DATA-VISIBILITY-DEPENDENCIES.md).
 - Every requirement that lists or opens a case is authoritative (EXT-DATA-013, T25: "replayed through the engine").
 - Those requirements sit in items behind the kernel checkpoint (T17), the save machine (T19 → T20) and replay (T15 → T25), and each slice needs a full gate run.
 - Under OD-INDY-22, no M0 code may be written before T0, so it was not built here.
 
-**With ODR-R10-30** (one slice, no requirement claimed, depending on T10 only), the model gives **M0 at T+116 / 125 / 135** at 0, 5 and 10-min CI, at no cost to completion or obligations at 10-min CI. Inside 120 minutes only at near-zero CI on today's estimates. The remaining gap is the set-up and bootstrap estimates (25 + 29 planned; about 5 + 2 measured for their machine parts).
+**With ODR-R10-30** (one slice, no requirement claimed, depending on T10 only), the model gives **M0 at T+116 / 125 / 135** at 0, 5 and 10-min CI, at no cost to completion or obligations at 10-min CI. Inside 120 minutes only at near-zero CI on today's estimates. The remaining gap is the set-up and bootstrap estimates (25 + 29 planned; measured machine parts: 3–6 min of set-up and a 2-second bootstrap generation, plus R9's bootstrap commit at T+2).
 
 The read-only browser is **technically achievable, and blocked by governance**.
+
+**Review round 5** (653bfbb) passed. It confirmed:
+- the causa-data facts;
+- the Rehearsal 009 timeline;
+- every dependency row and every TIME-TO-FIRST-DATA number;
+- that no M0 code was committed;
+- that nothing claims replay.
+
+Its wording findings RVO-5-1..7 were fixed.
 
 ## Round-3 independent review
 

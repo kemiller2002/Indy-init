@@ -46,7 +46,7 @@ Yes, as an explicitly non-authoritative capability with three properties:
 - it is labelled as raw;
 - it is built from the same read adapter the engine later uses.
 
-That gives a runnable, real-provider application early, and exercises the riskiest external boundary (credentials, permissions, CORS, the file layout) hours before the engine needs it. In Rehearsal 010 it would have surfaced the C1 contract gap at about T+120 instead of at T25.
+That gives a runnable, real-provider application early, and exercises the riskiest external boundary (credentials, permissions, CORS, the file layout) hours before the engine needs it. It would not, by itself, detect a contract gap such as C1: M0 does not decode events into `CoreEvent` (review RVO-5-3). C1 was found before T0 by this analysis.
 
 **6. Can it be generalized without much complexity?**
 
