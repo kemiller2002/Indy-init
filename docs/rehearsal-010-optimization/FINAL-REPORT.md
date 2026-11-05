@@ -106,6 +106,7 @@ At 10-min CI:
 | ODR-R10-27 | milestone-first ordering |
 | ODR-R10-28 | read and write tokens, and the App installation on `causa-acceptance-r10` and `causa-data` |
 | ODR-R10-29 | M1's boundary |
+| **ODR-R10-30** | the read-only data-browser slice SL-M0 |
 
 None is recorded. Agents do not record approvals (RDP-003).
 
@@ -137,6 +138,31 @@ R2 is milestone-first ordering; R5 adds the milestone-aligned split.
 - **Data repository.** Apollo 1, Apollo 11 and Challenger are present in `kemiller2002/causa-data`, with 432, 431 and 452 events. The frozen contracts cannot represent them (DATA-REPOSITORY-CONTRACT.md §6 C1). This is the most important finding of the addendum. It means that a Rehearsal 010 launched on v4.1.4 will fail EXT-DATA-013, T25 and the M2 journeys against real data, whatever its throughput. That must be declared before T0, not discovered after it.
 - **The causa repository** could not be read from this session (HTTP 403). Nothing is taken from it.
 
+## Addendum 2: the minimum data browser (M0)
+
+**The smallest correct application** is MINIMUM-DATA-BROWSER.md §2:
+- the frozen Connect form and credential;
+- a read adapter for `catalog/active.json`, then the catalog manifest, then each case's `events.ndjson`;
+- a generic JSON and NDJSON reader;
+- a list view and a raw-event detail view, labelled "not replayed or validated";
+- six error states.
+
+It uses no `CoreEvent`, `Replay` or save machine.
+
+**Evidence that it is small:**
+- A 45-line F# probe read the real catalog and all four histories (1,363 events, each count equal to its manifest) in 1.6 s.
+- It also classified missing-file, malformed-JSON and network errors.
+- Rehearsal 009 committed a full working F# WebAssembly app, with GitHub reads and writes, at T+21 (measured).
+
+**Why it is not delivered within 120 minutes:** packaging and governance, not technology (DATA-VISIBILITY-DEPENDENCIES.md).
+- Every requirement that lists or opens a case is authoritative (EXT-DATA-013, T25: "replayed through the engine").
+- Those requirements sit in items behind the kernel checkpoint (T17), the save machine (T19 → T20) and replay (T15 → T25), and each slice needs a full gate run.
+- Under OD-INDY-22, no M0 code may be written before T0, so it was not built here.
+
+**With ODR-R10-30** (one slice, no requirement claimed, depending on T10 only), the model gives **M0 at T+116 / 125 / 135** at 0, 5 and 10-min CI, at no cost to completion or obligations at 10-min CI. Inside 120 minutes only at near-zero CI on today's estimates. The remaining gap is the set-up and bootstrap estimates (25 + 29 planned; about 5 + 2 measured for their machine parts).
+
+The read-only browser is **technically achievable, and blocked by governance**.
+
 ## Round-3 independent review
 
 Round 3 (on 1ead513) returned **FAIL** on one documentation finding. The code, data, tests and every reproduction held. All findings were fixed. Round 4 (03825ca) re-checked every fix independently, including the reviewer's own mutations, and returned **PASS**. Its three minor findings and one note were then fixed (ADVERSARIAL-REVIEW.md §B).
@@ -157,6 +183,8 @@ The addendum's eight checks:
 ## Verdict
 
 **PARTIALLY OPTIMIZED**
+
+M0 (addendum 2) is specified, measured with a probe, scheduled and proposed (ODR-R10-30). It is not implemented, because the contest rules (OD-INDY-22) forbid building the application before T0.
 
 What is delivered and verified:
 - the launch fixes (merged);

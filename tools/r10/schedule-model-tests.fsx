@@ -196,16 +196,21 @@ for name, m in [ "successor", successorManifest; "milestone-aligned", alignedMan
                 let c' = { c with QueueDepth = depth; FailEvery = fail }
                 case (sprintf "invariants, milestone priority: %s, depth %d, fail every %d, ci %.0f" name depth fail ci) (invariants c' sl (simulate c' ci sl))
 // review RVO-3-3: the committed milestone runs reproduce from their recorded configuration
-case "committed milestone runs R0-R5 reproduce (finish, obligations, milestones, usable counts)"
-    [ let ms = loadMilestones msFile
-      let v415 = at "docs/rehearsal-010-optimization/inputs/slice-roles.v415-proposed.json"
-      for file, m, r, setup, depth, prio in
-            [ "R0-baseline", manifest, roles, 45.0, 1, "tail"
-              "R1-V4-tail", successorManifest, roles, 25.0, 3, "tail"
-              "R2-V4-milestones", successorManifest, roles, 25.0, 3, "milestones"
-              "R3-V4-milestones-t20read", at "docs/rehearsal-010-optimization/results/sensitivity-t20-read-path.slices.json", roles, 25.0, 3, "milestones"
-              "R4-V5-milestones", successorManifest, v415, 25.0, 3, "milestones"
-              "R5-V4-milestones-aligned", alignedManifest, roles, 25.0, 3, "milestones" ] do
+case "committed milestone runs R0-R6 reproduce (finish, obligations, milestones, usable counts)"
+    [ let v415 = at "docs/rehearsal-010-optimization/inputs/slice-roles.v415-proposed.json"
+      let withM0 = at "docs/rehearsal-010-optimization/inputs/milestones-with-m0.json"
+      let m0 (v: string) = at ("docs/rehearsal-010-optimization/results/sensitivity-m0-" + v + ".slices.json")
+      for file, m, r, setup, depth, prio, msPath in
+            [ "R0-baseline", manifest, roles, 45.0, 1, "tail", msFile
+              "R1-V4-tail", successorManifest, roles, 25.0, 3, "tail", msFile
+              "R2-V4-milestones", successorManifest, roles, 25.0, 3, "milestones", msFile
+              "R3-V4-milestones-t20read", at "docs/rehearsal-010-optimization/results/sensitivity-t20-read-path.slices.json", roles, 25.0, 3, "milestones", msFile
+              "R4-V5-milestones", successorManifest, v415, 25.0, 3, "milestones", msFile
+              "R5-V4-milestones-aligned", alignedManifest, roles, 25.0, 3, "milestones", msFile
+              "R6-M0-after-t10", m0 "after-t10", roles, 25.0, 3, "milestones", withM0
+              "R6-M0-after-t11", m0 "after-t11", roles, 25.0, 3, "milestones", withM0
+              "R6-M0-after-t16", m0 "after-t16", roles, 25.0, 3, "milestones", withM0 ] do
+          let ms = loadMilestones msPath
           let committed = JsonNode.Parse(File.ReadAllText(at (sprintf "docs/rehearsal-010-optimization/results/%s.json" file)))
           let c = { ownC with Setup = setup; QueueDepth = depth; Priority = prio; Milestones = ms }
           let sl = loadSlices m (Some r) c

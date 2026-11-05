@@ -4158,5 +4158,5 @@
    "status": "not-started"
   }
  ],
- "status": "SENSITIVITY ONLY: SL-T20 (connect and read) no longer waits on SL-T19 (save-state machine); needs a successor package that splits T20 (ODR-R10-26)"
+ "status": "SENSITIVITY ONLY: SL-T20 (connect and read) no longer waits on SL-T19 (save-state machine); needs a successor package that splits T20 (ODR-R10-21)"
 }
