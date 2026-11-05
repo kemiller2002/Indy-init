@@ -837,6 +837,46 @@
           "option": "A"
         }
       ]
+    },
+    {
+      "id": "APR-IC-OWNER-1",
+      "authority": {
+        "kind": "operator",
+        "id": "kemiller2002"
+      },
+      "date": "2026-11-05",
+      "changes": [
+        {
+          "decision_id": "ODR-IC-01",
+          "action": "decide",
+          "option": "A"
+        },
+        {
+          "decision_id": "ODR-IC-02",
+          "action": "decide",
+          "option": "A"
+        },
+        {
+          "decision_id": "ODR-IC-03",
+          "action": "decide",
+          "option": "A"
+        },
+        {
+          "decision_id": "ODR-IC-04",
+          "action": "decide",
+          "option": "A"
+        },
+        {
+          "decision_id": "ODR-IC-05",
+          "action": "decide",
+          "option": "A"
+        },
+        {
+          "decision_id": "ODR-IC-06",
+          "action": "decide",
+          "option": "A"
+        }
+      ]
     }
   ]
 }
