@@ -1,0 +1,5 @@
+{"t":"2026-11-05T21:15:04Z","phase":"A","event":"T+0 timed run start; contract preparation begins"}
+{"t":"2026-11-05T21:17:00Z","phase":"A","event":"Contracts.fs (11 commands, 11 UI actions) and CONTRACT-REGISTRY.json (37 entries) written; first build 4 s"}
+{"t":"2026-11-05T21:17:40Z","phase":"A","event":"PROTOCOL CHANGE received from owner: asynchronous contract-triggered parallel development. Clock NOT reset (directive section 11). Continuing as marked deviation DEV-1."}
+{"t":"2026-11-05T21:18:12Z","phase":"A","event":"Contracts moved to their own project Exp002.Contracts and EnginePorts seam added (pre-release, so not a revision); contract-check FAIL INV-040 (registry command text) -> fixed 21:18:29 PASS"}
+{"t":"2026-11-05T21:19:07Z","phase":"A","event":"CG-1-START RELEASED; CG-2..5 DEFINED"}
