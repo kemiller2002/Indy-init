@@ -1,0 +1,33 @@
+# Workstream D: pre-competition work classified
+
+Deferred items keep their requirements and their incomplete status; nothing here is marked done. "Blocking" means the first working application, correctness, security or required acceptance depends on it.
+
+## Blocking
+| Item | Why | State |
+|---|---|---|
+| PR #132: CF-07 slice-gate deferral (ODR-R10-33 A) | without it SL-T16 deadlocks, so M2–M4 cannot integrate | review round 3 FAIL (CF07-R3-1) fixed at `7ea3d4c`; round 4 running |
+| Minimum v4.1.5: event union, derived workspace, listing, creation (ODR-R10-19/-20 inputs) | the app cannot represent historical events or list investigations without it | Agent 3 (D) |
+| Acceptance lock with the live test repository (LP-08) | real-persistence acceptance | live preflight passed on the proposed lock (run 42077412742); adoption follows v4.1.5 |
+| `causa-catalog-read` App and secrets (ODR-R10-28 A) | the catalog is read with a dedicated read-only credential | **owner action** ([OWNER-BATCH.md](OWNER-BATCH.md)) |
+| Owner records the frozen-package rules need for v4.1.5 (if any) | RDP-003: agents cannot write them | Agent 3 to confirm; batched |
+
+## Parallelizable (necessary, off the app's critical path)
+| Item | Owner |
+|---|---|
+| UI ownership map and build order (B) | Agent 2 |
+| CI sharding of the adversarial cases (C) | lead, this PR |
+| ODR-R10-22 speculative gate (S1–S7) | lead, after v4.1.5 |
+| ODR-R10-24 toolchain bundle | lead, after v4.1.5 |
+| CF07-R3-2 liveness note: a binding-clean catalog acceptance (fault-probe spec) early on main | competition plan: the first slice adds `.echelon/fault-probes.json` |
+
+## Deferrable (recorded, incomplete)
+| Item | Deferred to |
+|---|---|
+| FO-1..3, T19/T22 contract work in v4.1.5 | v4.1.6 (DTD-R10-002) |
+| Further schedule-model refinements (V5–V7 variants, new sensitivities) | after the competition |
+| Generalized workspace abstractions beyond Connect → Reload | after M4 |
+| Optional UI contract extensions; nonessential Forma refinements | after M4 |
+| Documentation beyond operational need | after the competition |
+| New framework or tooling evaluations | not before Nov 7 |
+| Re-reviews of unchanged decisions | not scheduled |
+| A catalog regression base (would close the CF-07 residual "break a merged slice's INV obligations") | after the competition; release still judges every assertion |
