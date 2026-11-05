@@ -75,7 +75,7 @@ Main is protected (the Conditor scaffold requires pull requests). Each record be
      --praxis-context .ros/context/current.json --at NOW --commit SRC-COMMIT --out .echelon/scope-checkpoint.json
    ```
    - It writes the checkpoint only when the manifest equals what the frozen sources give and every work item is in Praxis.
-   - Commit it. It is immutable.
+   - Commit it. It is immutable. The Praxis files it was computed from (`.ros/work/queue.json`, `.ros/context/current.json`) must be in that commit or an earlier one: `check-sequencing` reads Praxis coverage at the commit that adds the checkpoint.
 4. **Initialization checkpoint (authorization).** It reads three inputs no other step writes. Produce them first:
    ```
    praxis requirements manifest compile --catalog SRC/requirements/catalogs/causa-investigation.requirement-catalog.json \
