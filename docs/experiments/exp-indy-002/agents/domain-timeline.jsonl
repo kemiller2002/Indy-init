@@ -1,0 +1,4 @@
+{"t":"2026-11-05T21:20:53Z","agent":"domain","group":"CG-1-START","event":"start","detail":"read contracts/registry; begin Engine project, validateStart, decide/evolve for StartInvestigation"}
+{"t":"2026-11-05T21:22:32Z","agent":"domain","group":"CG-1-START","event":"compile-pass","detail":"Engine + Tests first build clean"}
+{"t":"2026-11-05T21:22:32Z","agent":"domain","group":"CG-1-START","event":"tests","detail":"14 pass 0 fail; contract-check PASS"}
+{"t":"2026-11-05T21:22:32Z","agent":"domain","group":"CG-1-START","event":"complete","detail":"validateStart, decide/evolve/replay for StartInvestigation","durationSec":120}
