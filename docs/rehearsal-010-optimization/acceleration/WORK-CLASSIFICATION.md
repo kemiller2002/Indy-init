@@ -11,6 +11,12 @@ Deferred items keep their requirements and their incomplete status; nothing here
 | `causa-catalog-read` App and secrets (ODR-R10-28 A) | the catalog is read with a dedicated read-only credential | **owner action** ([OWNER-BATCH.md](OWNER-BATCH.md)) |
 | Owner records the frozen-package rules need for v4.1.5 (if any) | RDP-003: agents cannot write them | Agent 3 to confirm; batched |
 
+## Competition-window cost not yet measured (UI agent, PR #134 `8b51f27`)
+- The v4.1.x compiler carries only interface text into implementing files. So at bootstrap only the IF41-VIEW types reach the competition repository.
+- `Presentation.fs` (validation, navigation, presentation language and identifiers; about 474 non-blank lines) and the UiFixtures (about 600 lines) arrive as empty stubs. They are written inside the timed window, as OD-INDY-22 requires.
+- Integration's first post-bootstrap UI task is therefore `Presentation.fs`. Each UI role writes a minimal fixture backend before its first fixture-backed screen.
+- This cost is **not in the schedule model and not measured**. Treat it as a blocking item on M1's UI path.
+
 ## Parallelizable (necessary, off the app's critical path)
 | Item | Owner |
 |---|---|
