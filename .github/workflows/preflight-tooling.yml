@@ -1,8 +1,16 @@
 name: Preflight tooling
+# Directive workstream C: a PR commit ran this workflow twice (push and pull_request events, same commit, every job),
+# doubling runner load while three sessions had PRs open. Push now runs only on main; PRs run on pull_request (the
+# merge result), and a newer commit on the same PR cancels the older run (its checks are on the old commit, so the new
+# head's required checks are unaffected). main and manual runs are never cancelled.
 on:
   push:
+    branches: [main]
   pull_request:
   workflow_dispatch:
+concurrency:
+  group: preflight-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 jobs:
   offline-contract-tests:
     runs-on: ubuntu-latest

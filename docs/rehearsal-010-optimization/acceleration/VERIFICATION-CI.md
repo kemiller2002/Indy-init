@@ -46,6 +46,18 @@ The "Indy Init offline factory" workflow takes 1.2–8.0 min per run (40 runs sa
 - **Shard selection**, checked locally: `--only C09,C10,C11,C12 --shard 1/3` ran exactly C11 (index 10 mod 3 = 1). It reported VALIDATED and recorded `allCases` = 36.
 - **Expected effect (model, not observed).** The critical path drops from about 21.5 min to about 1.7 (set-up) + 15.9/3 + 1.7 (set-up) + 4.5 (the remaining steps), roughly 13 min. This depends on free runners. The **measured** after-timing will come from this PR's own CI run and will be recorded in [MEASUREMENTS.md](MEASUREMENTS.md).
 
+## Duplicate runs (measured 19:26–19:38 UTC)
+- **The duplication.**
+  - Preflight tooling triggered on both `push` and `pull_request`, so every commit pushed to a PR branch ran every job twice.
+  - Example: PR #132 at `69c225a` has run 42093858464 (`push`) and run 42093869544 (`pull_request`), both created 19:26 for the same commit.
+  - Both were still queued at 19:38, after 12 min of waiting, while three sessions had PRs open.
+- **Superseded runs.** Earlier commits' runs are not cancelled either: #132 still had a run going for `b1307f1` after `7ea3d4c` was pushed.
+- **The change.**
+  - `push` now runs only on `main`.
+  - For a PR, a newer commit cancels the older commit's run (a concurrency group). The checks on the new head are untouched.
+  - `main` and manual runs are never cancelled.
+  - Expected effect: about half the runner demand per PR commit. This is a model figure; the after-measurement comes from the queue times on the PRs after merge.
+
 ## Not changed, deliberately
 - Required checks are not path-filtered: that would make a required check absent on some PRs.
 - No cache of build outputs between runs.
