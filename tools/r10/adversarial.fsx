@@ -658,7 +658,7 @@ let cases : Case list =
         Correct = fun o -> not (has "DEPENDENCY_NOT_INTEGRATED" o)
         Control = fun t -> sliceGateFor t "SL-T11" (eventsFile "t11-verified-b" t11Verified) (sliceEvidenceFor "T11" t11 "c29-control" [] (List.tail t10Executable @ t11Obligations) [])
         ControlOk = fun o -> has "DEPENDENCY_NOT_INTEGRATED" o
-        Mutation = [ ledger, [ "                        strOpt \"kind\" o <> Some \"record\"\n", "                        true\n" ] ] }
+        Mutation = [ ledger, [ "        strOpt \"kind\" o <> Some \"record\"\n        && (runsLive", "        true\n        && (runsLive" ] ] }
       { Id = "C30"; Title = "A stop as complete cites a completion verdict for another commit"; Requirements = [ "R6"; "review 3 (round 3)" ]; Needs = Nothing
         Expected = "stop-decision CONTINUE_REQUIRED: COMPLETION_CANDIDATE_MISMATCH (the verdict is not for the repository's HEAD on main)"
         Attack = fun t -> stopDecision t allIntegrated (request "c30" 300.0 "complete" scopeSha true) [ "--completion"; staleVerdict ]

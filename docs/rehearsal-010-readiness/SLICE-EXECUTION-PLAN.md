@@ -25,7 +25,14 @@ Validated: `slice-manifest` exits 0 only when every requirement is placed; other
 
 **Cross-cutting checks** run for every UI-bearing slice and for the release:
 - the design contract;
-- the governed journeys, judged per assertion;
+- the governed journeys, judged per assertion. An assertion whose needed slices are not present yet ([`assertion-merge-needs.json`](assertion-merge-needs.json)) is not judged at that merge; the completion gate judges every assertion at release (ODR-R10-33 A);
+  - **Not present.** A needed slice counts as not present while its merge-provable obligations are unverified at the merged result. It also counts as not present when it depends on the merging slice, directly or transitively, because it cannot be on main yet (review CF07-R3-1; without this, SL-T16 could never merge).
+  - **Conditional ordering wait (CF07-R3-2).** Until main has a catalog acceptance at the candidate with no binding refusal, catalog (INV-*) obligations do not count. While that holds, some assertions are judged rather than deferred, which fails closed:
+    - SL-WI-GEN-EXT-DATA and SL-WI-INV-START can then wait on each other for J1-03;
+    - SL-WI-GEN-UI and SL-WI-INV-WORKSPACE wait for their needed slices.
+
+    The wait ends once a binding-clean catalog acceptance is on main. So **sequence early the slice that adds `.echelon/fault-probes.json`** (the R10 catalog contract sets `requireProbeSpec`).
+  - **Residual, for owner acceptance (CF07-R4-2).** Failing the per-obligation INV checks of an already merged slice can defer an assertion that needs it until release. It cannot escape, because release judges every assertion. A catalog regression base would close it.
 - regression of every integrated obligation.
 
 A requirement never disappears because it lacks a DAG task:

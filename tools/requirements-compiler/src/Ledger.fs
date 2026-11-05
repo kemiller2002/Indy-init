@@ -206,7 +206,7 @@ let journeysOf (bindings: Json) : Journey list =
 let mergeConditions =
     [ "every mandatory applicable obligation of the slice passes in the governed gate at the merged result"
       "every dependency slice is integrated"
-      "every governed journey bound to the slice's requirements passes in Chromium and WebKit"
+      "every governed journey assertion bound to the slice passes in Chromium and WebKit, except one whose needed slices are not all present yet (their merge-provable obligations verified at the merged result; docs/rehearsal-010-readiness/assertion-merge-needs.json, ODR-R10-33 A): the completion gate judges that one at release"
       "every previously integrated obligation still passes (regression)"
       "the application builds and starts at the merged result"
       "required real-provider checks pass against api.github.com"
@@ -338,7 +338,12 @@ type SliceEvidence =
       LiveProvider: Json option
       TestIntegrity: Json option
       /// The governed catalog acceptance at the merged result (catalog slices).
-      CatalogAcceptance: Json option }
+      CatalogAcceptance: Json option
+      /// CF-07 option A (owner decision ODR-R10-33 A): for each bound assertion, the slices its journey steps need on
+      /// main. An assertion whose needed slices (other than this one, and in the scope) are not all present for judging
+      /// (deferredAssertions) is not judged at this merge; the completion gate judges every assertion at release. Empty = every bound
+      /// assertion is judged at every merge (the rule before ODR-R10-33).
+      AssertionNeeds: Map<string, string list> }
 
 type SliceRule = { Id: string; Check: State -> SliceEvidence -> Refusal list }
 
@@ -351,6 +356,83 @@ let private atCandidate (name: string) (e: SliceEvidence) (j: Json option) (ok: 
     | Some x when candidateOf x <> e.Candidate -> [ ref' (name + "_STALE") (sprintf "the %s evidence is for %s, not the merged result %s" (name.ToLowerInvariant().Replace('_', ' ')) (candidateOf x) e.Candidate) ]
     | Some x -> ok x
 
+/// Whether the work item behind slice SL-<d> is integrated: every requirement's judged mandatory obligations passed at
+/// the merged result's regression run (or the requirement is excluded), or, for a work item with nothing a pull request
+/// can judge, its Praxis record completed it.
+let private workItemIntegrated (s: State) (e: SliceEvidence) (d: string) : bool =
+    let items = arr "workItems" s.Progress.Manifest |> List.map (fun w -> str "id" w, strs "requirements" w) |> Map.ofList
+    let rs = items.TryFind d |> Option.defaultValue []
+    let headVerified = e.Regression |> Option.map (strs "passed" >> Set.ofList) |> Option.defaultValue Set.empty
+    let reqs = arr "requirements" s.Progress.Manifest |> List.map (fun r -> str "id" r, r) |> Map.ofList
+    // A dependency without requirements is a timed task; it completes by its Praxis record.
+    let runsLive = boolOr "realProvider" false e.Slice
+    let judgedHere (o: Json) =
+        strOpt "kind" o <> Some "record"
+        && (runsLive || not (strs "producers" o |> List.exists (fun p -> liveProducers.Contains p || p = "SU-BROWSER-WEBKIT")))
+    // A requirement with nothing a pull request can judge (all record, or live in a non-live slice) is not
+    // integrated vacuously: its work item must be completed by its Praxis record.
+    let integratedReq (r: Json) =
+        let judged = arr "obligations" r |> List.filter (fun o -> boolOr "mandatory" true o && judgedHere o)
+        s.ExcludedBy.ContainsKey(str "id" r)
+        || (if judged.IsEmpty then s.Progress.CompletedItems.Contains d else judged |> List.forall (fun o -> headVerified.Contains(str "id" o)))
+    if rs.IsEmpty then s.Progress.CompletedItems.Contains d else rs |> List.forall (fun r -> reqs.TryFind r |> Option.exists integratedReq)
+
+/// An assertion -> needed-slices file (indy-init.r10-contract-first-ui.merge-dependencies/1: { "rules": [ { "assertions":
+/// [..], "needs": [..] } ] }) as a map; an assertion named by several rules needs the union.
+let assertionNeedsOf (j: Json) : Map<string, string list> =
+    arr "rules" j
+    |> List.collect (fun r -> strs "assertions" r |> List.map (fun a -> a, strs "needs" r))
+    |> List.groupBy fst |> List.map (fun (a, xs) -> a, xs |> List.collect snd |> List.distinct) |> Map.ofList
+
+/// Whether a needed work item counts as present for CF-07 deferral. Unlike workItemIntegrated, this leans toward
+/// JUDGING (review CF07-1, CF07-2): only obligations that any merge's regression proves count (mandatory, not
+/// record-only, not live-only, not WebKit-only), the builder's own Praxis records are ignored, and a requirement or
+/// work item with no such obligation counts as present. So a builder cannot defer an assertion by withholding a
+/// completion event or by breaking a needed slice's live or WebKit obligations.
+let private presentForJudging (s: State) (e: SliceEvidence) (d: string) : bool =
+    let items = arr "workItems" s.Progress.Manifest |> List.map (fun w -> str "id" w, strs "requirements" w) |> Map.ofList
+    let headVerified = e.Regression |> Option.map (strs "passed" >> Set.ofList) |> Option.defaultValue Set.empty
+    let reqs = arr "requirements" s.Progress.Manifest |> List.map (fun r -> str "id" r, r) |> Map.ofList
+    // Catalog (INV-*) obligations reach the regression's passed set only through the governed catalog acceptance at the
+    // candidate. They count only when that acceptance is for this candidate and has no binding refusal (wrong commit,
+    // digest, producer, contract, facts, probe spec); otherwise a builder could withhold the catalog to defer
+    // (review CF07-R2-1), so they are treated as unprovable and the assertion is judged.
+    let catalogTrusted =
+        match e.CatalogAcceptance with
+        | Some c when candidateOf c = e.Candidate ->
+            arr "refusals" c |> List.forall (fun r -> List.contains (str "code" r) [ "CATALOG_OBLIGATION_FAILED"; "FAULT_INSENSITIVE"; "CATALOG_NOT_ACCEPTED" ])
+        | _ -> false
+    let provable (o: Json) =
+        boolOr "mandatory" true o && strOpt "kind" o <> Some "record"
+        && not (strs "producers" o |> List.exists (fun p -> liveProducers.Contains p || p = "SU-BROWSER-WEBKIT"))
+        && (catalogTrusted || not ((str "id" o).StartsWith "INV-"))
+    items.TryFind d |> Option.defaultValue []
+    |> List.forall (fun rid ->
+        s.ExcludedBy.ContainsKey rid
+        || (reqs.TryFind rid |> Option.map (fun r -> arr "obligations" r |> List.filter provable |> List.forall (fun o -> headVerified.Contains(str "id" o))) |> Option.defaultValue true))
+
+/// CF-07 option A: the bound assertions this merge does not judge, because a slice they need is not present yet.
+/// A needed slice outside the scope's work items is ignored (the needs file names approved and successor ids alike).
+let deferredAssertions (s: State) (e: SliceEvidence) : string list =
+    let self = str "id" e.Slice
+    let inScope = arr "workItems" s.Progress.Manifest |> List.map (fun w -> "SL-" + str "id" w) |> Set.ofList
+    // A needed slice that depends on this one, directly or transitively, cannot be on main before this merge, so the
+    // assertion is deferred whatever presentForJudging says (review CF07-R3-1: SL-T16's J3-01/J3-02 need
+    // SL-WI-GEN-EXT-DATA, which depends on SL-T16; judging them here made SL-T16 unmergeable).
+    let deps = arr "workItems" s.Progress.Manifest |> List.map (fun w -> str "id" w, strs "dependsOn" w) |> Map.ofList
+    let rec closure (seen: Set<string>) (frontier: string list) =
+        match frontier with
+        | [] -> seen
+        | x :: rest when seen.Contains x -> closure seen rest
+        | x :: rest -> closure (seen.Add x) ((Map.tryFind x deps |> Option.defaultValue []) @ rest)
+    let selfItem = self.Substring 3
+    let dependsOnSelf (n: string) = (closure Set.empty (Map.tryFind (n.Substring 3) deps |> Option.defaultValue [])).Contains selfItem
+    strs "governedAssertions" e.Slice
+    |> List.filter (fun a ->
+        Map.tryFind a e.AssertionNeeds |> Option.defaultValue []
+        |> List.filter (fun n -> n <> self && inScope.Contains n)
+        |> List.exists (fun n -> dependsOnSelf n || not (presentForJudging s e (n.Substring 3))))
+
 let sliceRules : SliceRule list =
     [ { Id = "main-healthy"
         Check = fun s _ -> match s.Unhealthy with Some(c, why) -> [ ref' "MAIN_UNHEALTHY" (sprintf "main is unhealthy at %s (%s); no merge until it is repaired or reverted" c why) ] | None -> [] }
@@ -358,24 +440,8 @@ let sliceRules : SliceRule list =
         Check =
           fun s e ->
               let deps = strs "dependsOn" e.Slice |> List.map (fun d -> d.Substring 3)
-              let items = arr "workItems" s.Progress.Manifest |> List.map (fun w -> str "id" w, strs "requirements" w) |> Map.ofList
               [ for d in deps do
-                    let rs = items.TryFind d |> Option.defaultValue []
-                    let headVerified = e.Regression |> Option.map (strs "passed" >> Set.ofList) |> Option.defaultValue Set.empty
-                    let reqs = arr "requirements" s.Progress.Manifest |> List.map (fun r -> str "id" r, r) |> Map.ofList
-                    // A dependency without requirements is a timed task; it completes by its Praxis record.
-                    let runsLive = boolOr "realProvider" false e.Slice
-                    let judgedHere (o: Json) =
-                        strOpt "kind" o <> Some "record"
-                        && (runsLive || not (strs "producers" o |> List.exists (fun p -> liveProducers.Contains p || p = "SU-BROWSER-WEBKIT")))
-                    // A requirement with nothing a pull request can judge (all record, or live in a non-live slice) is not
-                    // integrated vacuously: its work item must be completed by its Praxis record.
-                    let integratedReq (r: Json) =
-                        let judged = arr "obligations" r |> List.filter (fun o -> boolOr "mandatory" true o && judgedHere o)
-                        s.ExcludedBy.ContainsKey(str "id" r)
-                        || (if judged.IsEmpty then s.Progress.CompletedItems.Contains d else judged |> List.forall (fun o -> headVerified.Contains(str "id" o)))
-                    let integrated = if rs.IsEmpty then s.Progress.CompletedItems.Contains d else rs |> List.forall (fun r -> reqs.TryFind r |> Option.exists integratedReq)
-                    if not integrated then yield ref' "DEPENDENCY_NOT_INTEGRATED" (sprintf "dependency SL-%s is not integrated" d) ] }
+                    if not (workItemIntegrated s e d) then yield ref' "DEPENDENCY_NOT_INTEGRATED" (sprintf "dependency SL-%s is not integrated" d) ] }
       { Id = "current-target"
         Check = fun _ e -> if e.TargetBase <> e.TargetHead || e.TargetHead = "" then [ ref' "STALE_TARGET" (sprintf "the merged result was built on %s; the target is now %s: re-merge and re-verify" e.TargetBase e.TargetHead) ] else [] }
       { Id = "governed-gate"
@@ -390,8 +456,9 @@ let sliceRules : SliceRule list =
                     if strOpt "verdict" g <> Some "PASS" && (strs "causes" g).IsEmpty then yield ref' "GATE_NOT_PASS" (sprintf "the gate verdict is %s, not PASS" (strOpt "verdict" g |> Option.defaultValue "(none)")) ]) }
       { Id = "journeys"
         Check =
-          fun _ e ->
-              let bound = strs "governedAssertions" e.Slice
+          fun s e ->
+              let deferred = deferredAssertions s e |> Set.ofList
+              let bound = strs "governedAssertions" e.Slice |> List.filter (deferred.Contains >> not)
               if bound.IsEmpty then []
               else
                   atCandidate "JOURNEYS" e e.Journeys (fun j ->
@@ -459,13 +526,15 @@ let sliceGateWith (rules: SliceRule list) (s: State) (e: SliceEvidence) : Refusa
 
 let sliceGate s e = sliceGateWith sliceRules s e
 
-let sliceVerdictJson (e: SliceEvidence) (refusals: Refusal list) =
+let sliceVerdictJson (deferred: string list) (e: SliceEvidence) (refusals: Refusal list) =
     JObj
         [ "schema", JStr "indy-init.slice-gate/1"
           "slice", JStr(str "id" e.Slice)
           "candidate", JStr e.Candidate
           "verdict", JStr(if refusals.IsEmpty then "PASS" else "REFUSED")
           "claimsRelease", JBool false
+          // CF-07 option A: assertions not judged at this merge; the completion gate judges them at release
+          "deferredToRelease", JArr(deferred |> List.map JStr)
           "refusals", JArr(refusals |> List.map refusalJson) ]
 
 // ---- the full-scope completion gate ----------------------------------------------------------------------------------
