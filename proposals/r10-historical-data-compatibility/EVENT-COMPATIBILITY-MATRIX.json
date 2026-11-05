@@ -1,0 +1,2289 @@
+{
+  "discriminatorsInHistoricalData": 26,
+  "eventTypes": [
+    {
+      "counts": {
+        "apollo-1": 1,
+        "apollo-11": 1,
+        "challenger-sts-51l": 1,
+        "historicalTotal": 3,
+        "syntheticFixtures": 5
+      },
+      "decoderSupport": "typed: WireEvent.InvestigationStarted (src/EventDecoder.fs); no catch-all case",
+      "discriminator": "InvestigationStarted",
+      "historicalVariations": {
+        "enumValues": {},
+        "nullValues": {},
+        "payloadKeySets": [
+          "observationId,original,title"
+        ]
+      },
+      "nullableFields": [],
+      "registryIndex": 1,
+      "replay": {
+        "authoritativeReplay": "not established: admissibility (CONTRACT §11.3, engine History.validate) is not evaluated by this adapter",
+        "projection": "CONTRACT §8.3 row InvestigationStarted (src/ReplayAdapter.fs)",
+        "projectionVerifiedInCases": [
+          "apollo-1",
+          "apollo-11",
+          "challenger-sts-51l"
+        ]
+      },
+      "requiredFields": [
+        "title",
+        "observationId",
+        "original"
+      ],
+      "variants": [
+        {
+          "counts": {
+            "apollo-1": 1,
+            "apollo-11": 1,
+            "challenger-sts-51l": 1,
+            "historicalTotal": 3,
+            "syntheticFixtures": 5
+          },
+          "frozenV414": {
+            "case": "InvestigationStarted",
+            "droppedFields": [],
+            "representation": "frozen-case"
+          },
+          "proposedSuccessor": {
+            "case": "InvestigationStarted",
+            "change": "keep"
+          },
+          "variant": "InvestigationStarted"
+        }
+      ],
+      "verificationStatus": "decoded and byte-for-byte round-tripped on all 3 historical events; projection reproduced snapshot.json in 3/3 cases; admissibility not evaluated"
+    },
+    {
+      "counts": {
+        "apollo-1": 2,
+        "apollo-11": 2,
+        "challenger-sts-51l": 3,
+        "historicalTotal": 7,
+        "syntheticFixtures": 14
+      },
+      "decoderSupport": "typed: WireEvent.LifecycleChanged (src/EventDecoder.fs); no catch-all case",
+      "discriminator": "LifecycleChanged",
+      "historicalVariations": {
+        "enumValues": {
+          "command": {
+            "activateInvestigation": 3,
+            "markAwaitingEvidence": 1,
+            "markAwaitingVerification": 2,
+            "verificationFailed": 1
+          },
+          "from": {
+            "active": 3,
+            "awaitingVerification": 1,
+            "draft": 3
+          },
+          "to": {
+            "active": 4,
+            "awaitingEvidence": 1,
+            "awaitingVerification": 2
+          }
+        },
+        "nullValues": {
+          "reason": 5
+        },
+        "payloadKeySets": [
+          "command,from,reason,to"
+        ]
+      },
+      "nullableFields": [
+        "reason"
+      ],
+      "registryIndex": 2,
+      "replay": {
+        "authoritativeReplay": "not established: admissibility (CONTRACT §11.3, engine History.validate) is not evaluated by this adapter",
+        "projection": "CONTRACT §8.3 row LifecycleChanged (src/ReplayAdapter.fs)",
+        "projectionVerifiedInCases": [
+          "apollo-1",
+          "apollo-11",
+          "challenger-sts-51l"
+        ]
+      },
+      "requiredFields": [
+        "from",
+        "to",
+        "command",
+        "reason"
+      ],
+      "variants": [
+        {
+          "counts": {
+            "apollo-1": 1,
+            "apollo-11": 1,
+            "challenger-sts-51l": 1,
+            "historicalTotal": 3,
+            "syntheticFixtures": 5
+          },
+          "frozenV414": {
+            "case": "InvestigationActivated",
+            "droppedFields": [
+              "from"
+            ],
+            "representation": "frozen-case-lossy"
+          },
+          "proposedSuccessor": {
+            "case": "InvestigationActivated",
+            "change": "widen",
+            "detail": "add from"
+          },
+          "variant": "LifecycleChanged/activateInvestigation"
+        },
+        {
+          "counts": {
+            "apollo-1": 0,
+            "apollo-11": 1,
+            "challenger-sts-51l": 0,
+            "historicalTotal": 1,
+            "syntheticFixtures": 1
+          },
+          "frozenV414": {
+            "case": null,
+            "reason": "no awaiting-evidence case",
+            "representation": "no-frozen-case"
+          },
+          "proposedSuccessor": {
+            "case": "InvestigationMarkedAwaitingEvidence",
+            "change": "add"
+          },
+          "variant": "LifecycleChanged/markAwaitingEvidence"
+        },
+        {
+          "counts": {
+            "apollo-1": 1,
+            "apollo-11": 0,
+            "challenger-sts-51l": 1,
+            "historicalTotal": 2,
+            "syntheticFixtures": 3
+          },
+          "frozenV414": {
+            "case": null,
+            "reason": "no awaiting-verification case",
+            "representation": "no-frozen-case"
+          },
+          "proposedSuccessor": {
+            "case": "InvestigationMarkedAwaitingVerification",
+            "change": "add"
+          },
+          "variant": "LifecycleChanged/markAwaitingVerification"
+        },
+        {
+          "counts": {
+            "apollo-1": 0,
+            "apollo-11": 0,
+            "challenger-sts-51l": 0,
+            "historicalTotal": 0,
+            "syntheticFixtures": 2
+          },
+          "frozenV414": {
+            "case": "InvestigationResolved",
+            "droppedFields": [
+              "from"
+            ],
+            "representation": "frozen-case-lossy"
+          },
+          "proposedSuccessor": {
+            "case": "InvestigationResolved",
+            "change": "widen",
+            "detail": "add from"
+          },
+          "variant": "LifecycleChanged/resolveInvestigation"
+        },
+        {
+          "counts": {
+            "apollo-1": 0,
+            "apollo-11": 0,
+            "challenger-sts-51l": 0,
+            "historicalTotal": 0,
+            "syntheticFixtures": 1
+          },
+          "frozenV414": {
+            "case": null,
+            "reason": "no close case",
+            "representation": "no-frozen-case"
+          },
+          "proposedSuccessor": {
+            "case": "InvestigationClosed",
+            "change": "add"
+          },
+          "variant": "LifecycleChanged/closeInvestigation"
+        },
+        {
+          "counts": {
+            "apollo-1": 0,
+            "apollo-11": 0,
+            "challenger-sts-51l": 0,
+            "historicalTotal": 0,
+            "syntheticFixtures": 1
+          },
+          "frozenV414": {
+            "case": "InvestigationReopened",
+            "droppedFields": [
+              "from"
+            ],
+            "representation": "frozen-case-lossy"
+          },
+          "proposedSuccessor": {
+            "case": "InvestigationReopened",
+            "change": "widen",
+            "detail": "add from"
+          },
+          "variant": "LifecycleChanged/reopenInvestigation"
+        },
+        {
+          "counts": {
+            "apollo-1": 0,
+            "apollo-11": 0,
+            "challenger-sts-51l": 1,
+            "historicalTotal": 1,
+            "syntheticFixtures": 1
+          },
+          "frozenV414": {
+            "case": null,
+            "reason": "no verification-failed lifecycle case",
+            "representation": "no-frozen-case"
+          },
+          "proposedSuccessor": {
+            "case": "InvestigationVerificationFailed",
+            "change": "add"
+          },
+          "variant": "LifecycleChanged/verificationFailed"
+        }
+      ],
+      "verificationStatus": "decoded and byte-for-byte round-tripped on all 7 historical events; projection reproduced snapshot.json in 3/3 cases; admissibility not evaluated"
+    },
+    {
+      "counts": {
+        "apollo-1": 15,
+        "apollo-11": 36,
+        "challenger-sts-51l": 24,
+        "historicalTotal": 75,
+        "syntheticFixtures": 4
+      },
+      "decoderSupport": "typed: WireEvent.ObservationRecorded (src/EventDecoder.fs); no catch-all case",
+      "discriminator": "ObservationRecorded",
+      "historicalVariations": {
+        "enumValues": {},
+        "nullValues": {
+          "observedAt": 6
+        },
+        "payloadKeySets": [
+          "observationId,observedAt,original"
+        ]
+      },
+      "nullableFields": [
+        "observedAt"
+      ],
+      "registryIndex": 3,
+      "replay": {
+        "authoritativeReplay": "not established: admissibility (CONTRACT §11.3, engine History.validate) is not evaluated by this adapter",
+        "projection": "CONTRACT §8.3 row ObservationRecorded (src/ReplayAdapter.fs)",
+        "projectionVerifiedInCases": [
+          "apollo-1",
+          "apollo-11",
+          "challenger-sts-51l"
+        ]
+      },
+      "requiredFields": [
+        "observationId",
+        "original",
+        "observedAt"
+      ],
+      "variants": [
+        {
+          "counts": {
+            "apollo-1": 15,
+            "apollo-11": 36,
+            "challenger-sts-51l": 24,
+            "historicalTotal": 75,
+            "syntheticFixtures": 4
+          },
+          "frozenV414": {
+            "case": "ObservationRecorded",
+            "droppedFields": [],
+            "representation": "frozen-case"
+          },
+          "proposedSuccessor": {
+            "case": "ObservationRecorded",
+            "change": "keep"
+          },
+          "variant": "ObservationRecorded"
+        }
+      ],
+      "verificationStatus": "decoded and byte-for-byte round-tripped on all 75 historical events; projection reproduced snapshot.json in 3/3 cases; admissibility not evaluated"
+    },
+    {
+      "counts": {
+        "apollo-1": 12,
+        "apollo-11": 12,
+        "challenger-sts-51l": 11,
+        "historicalTotal": 35,
+        "syntheticFixtures": 14
+      },
+      "decoderSupport": "typed: WireEvent.HypothesisRecorded (src/EventDecoder.fs); no catch-all case",
+      "discriminator": "HypothesisRecorded",
+      "historicalVariations": {
+        "enumValues": {},
+        "nullValues": {
+          "mechanism": 27
+        },
+        "payloadKeySets": [
+          "hypothesisId,mechanism,statement"
+        ]
+      },
+      "nullableFields": [
+        "mechanism"
+      ],
+      "registryIndex": 4,
+      "replay": {
+        "authoritativeReplay": "not established: admissibility (CONTRACT §11.3, engine History.validate) is not evaluated by this adapter",
+        "projection": "CONTRACT §8.3 row HypothesisRecorded (src/ReplayAdapter.fs)",
+        "projectionVerifiedInCases": [
+          "apollo-1",
+          "apollo-11",
+          "challenger-sts-51l"
+        ]
+      },
+      "requiredFields": [
+        "hypothesisId",
+        "statement",
+        "mechanism"
+      ],
+      "variants": [
+        {
+          "counts": {
+            "apollo-1": 12,
+            "apollo-11": 12,
+            "challenger-sts-51l": 11,
+            "historicalTotal": 35,
+            "syntheticFixtures": 14
+          },
+          "frozenV414": {
+            "case": "HypothesisRecorded",
+            "droppedFields": [],
+            "representation": "frozen-case"
+          },
+          "proposedSuccessor": {
+            "case": "HypothesisRecorded",
+            "change": "keep"
+          },
+          "variant": "HypothesisRecorded"
+        }
+      ],
+      "verificationStatus": "decoded and byte-for-byte round-tripped on all 35 historical events; projection reproduced snapshot.json in 3/3 cases; admissibility not evaluated"
+    },
+    {
+      "counts": {
+        "apollo-1": 21,
+        "apollo-11": 23,
+        "challenger-sts-51l": 20,
+        "historicalTotal": 64,
+        "syntheticFixtures": 17
+      },
+      "decoderSupport": "typed: WireEvent.HypothesisTransitioned (src/EventDecoder.fs); no catch-all case",
+      "discriminator": "HypothesisTransitioned",
+      "historicalVariations": {
+        "enumValues": {
+          "command": {
+            "falsify": 6,
+            "markPlausible": 29,
+            "markSupported": 22,
+            "markWeakened": 7
+          },
+          "from": {
+            "plausible": 29,
+            "proposed": 35
+          },
+          "to": {
+            "falsified": 6,
+            "plausible": 29,
+            "supported": 22,
+            "weakened": 7
+          }
+        },
+        "nullValues": {},
+        "payloadKeySets": [
+          "command,evidenceIds,from,hypothesisId,reason,to"
+        ]
+      },
+      "nullableFields": [],
+      "registryIndex": 5,
+      "replay": {
+        "authoritativeReplay": "not established: admissibility (CONTRACT §11.3, engine History.validate) is not evaluated by this adapter",
+        "projection": "CONTRACT §8.3 row HypothesisTransitioned (src/ReplayAdapter.fs)",
+        "projectionVerifiedInCases": [
+          "apollo-1",
+          "apollo-11",
+          "challenger-sts-51l"
+        ]
+      },
+      "requiredFields": [
+        "hypothesisId",
+        "from",
+        "to",
+        "command",
+        "reason",
+        "evidenceIds"
+      ],
+      "variants": [
+        {
+          "counts": {
+            "apollo-1": 9,
+            "apollo-11": 11,
+            "challenger-sts-51l": 9,
+            "historicalTotal": 29,
+            "syntheticFixtures": 7
+          },
+          "frozenV414": {
+            "case": "HypothesisMarkedPlausible",
+            "droppedFields": [
+              "from",
+              "reason",
+              "evidenceIds"
+            ],
+            "representation": "frozen-case-lossy"
+          },
+          "proposedSuccessor": {
+            "case": "HypothesisMarkedPlausible",
+            "change": "widen",
+            "detail": "HypothesisTransition {from; reason; evidenceIds}"
+          },
+          "variant": "HypothesisTransitioned/markPlausible"
+        },
+        {
+          "counts": {
+            "apollo-1": 6,
+            "apollo-11": 8,
+            "challenger-sts-51l": 8,
+            "historicalTotal": 22,
+            "syntheticFixtures": 4
+          },
+          "frozenV414": {
+            "case": "HypothesisMarkedSupported",
+            "droppedFields": [
+              "from",
+              "reason",
+              "evidenceIds"
+            ],
+            "representation": "frozen-case-lossy"
+          },
+          "proposedSuccessor": {
+            "case": "HypothesisMarkedSupported",
+            "change": "widen",
+            "detail": "HypothesisTransition {from; reason; evidenceIds}"
+          },
+          "variant": "HypothesisTransitioned/markSupported"
+        },
+        {
+          "counts": {
+            "apollo-1": 3,
+            "apollo-11": 3,
+            "challenger-sts-51l": 1,
+            "historicalTotal": 7,
+            "syntheticFixtures": 1
+          },
+          "frozenV414": {
+            "case": null,
+            "reason": "no weakened case",
+            "representation": "no-frozen-case"
+          },
+          "proposedSuccessor": {
+            "case": "HypothesisWeakened",
+            "change": "add"
+          },
+          "variant": "HypothesisTransitioned/markWeakened"
+        },
+        {
+          "counts": {
+            "apollo-1": 3,
+            "apollo-11": 1,
+            "challenger-sts-51l": 2,
+            "historicalTotal": 6,
+            "syntheticFixtures": 3
+          },
+          "frozenV414": {
+            "case": "HypothesisFalsified",
+            "droppedFields": [
+              "from",
+              "evidenceIds"
+            ],
+            "representation": "frozen-case-lossy"
+          },
+          "proposedSuccessor": {
+            "case": "HypothesisFalsified",
+            "change": "widen",
+            "detail": "HypothesisTransition {from; reason; evidenceIds}; the frozen Scope argument has no wire source and is removed"
+          },
+          "variant": "HypothesisTransitioned/falsify"
+        },
+        {
+          "counts": {
+            "apollo-1": 0,
+            "apollo-11": 0,
+            "challenger-sts-51l": 0,
+            "historicalTotal": 0,
+            "syntheticFixtures": 1
+          },
+          "frozenV414": {
+            "case": null,
+            "reason": "no superseded case",
+            "representation": "no-frozen-case"
+          },
+          "proposedSuccessor": {
+            "case": "HypothesisSuperseded",
+            "change": "add"
+          },
+          "variant": "HypothesisTransitioned/supersede"
+        },
+        {
+          "counts": {
+            "apollo-1": 0,
+            "apollo-11": 0,
+            "challenger-sts-51l": 0,
+            "historicalTotal": 0,
+            "syntheticFixtures": 1
+          },
+          "frozenV414": {
+            "case": "HypothesisReopened",
+            "droppedFields": [
+              "from",
+              "evidenceIds"
+            ],
+            "representation": "frozen-case-lossy"
+          },
+          "proposedSuccessor": {
+            "case": "HypothesisReopened",
+            "change": "widen",
+            "detail": "HypothesisTransition {from; reason; evidenceIds}"
+          },
+          "variant": "HypothesisTransitioned/reopen"
+        }
+      ],
+      "verificationStatus": "decoded and byte-for-byte round-tripped on all 64 historical events; projection reproduced snapshot.json in 3/3 cases; admissibility not evaluated"
+    },
+    {
+      "counts": {
+        "apollo-1": 129,
+        "apollo-11": 119,
+        "challenger-sts-51l": 128,
+        "historicalTotal": 376,
+        "syntheticFixtures": 23
+      },
+      "decoderSupport": "typed: WireEvent.EvidenceAdmitted (src/EventDecoder.fs); no catch-all case",
+      "discriminator": "EvidenceAdmitted",
+      "historicalVariations": {
+        "enumValues": {
+          "category": {
+            "directObservation": 6,
+            "document": 201,
+            "experimentResult": 37,
+            "externalReference": 12,
+            "log": 40,
+            "measurement": 33,
+            "testimony": 47
+          },
+          "contentKind": {
+            "text": 376
+          }
+        },
+        "nullValues": {
+          "capturedAt": 316
+        },
+        "payloadKeySets": [
+          "capturedAt,category,content,contentKind,evidenceId,source"
+        ]
+      },
+      "nullableFields": [
+        "capturedAt"
+      ],
+      "registryIndex": 6,
+      "replay": {
+        "authoritativeReplay": "not established: admissibility (CONTRACT §11.3, engine History.validate) is not evaluated by this adapter",
+        "projection": "CONTRACT §8.3 row EvidenceAdmitted (src/ReplayAdapter.fs)",
+        "projectionVerifiedInCases": [
+          "apollo-1",
+          "apollo-11",
+          "challenger-sts-51l"
+        ]
+      },
+      "requiredFields": [
+        "evidenceId",
+        "contentKind",
+        "content",
+        "category",
+        "source",
+        "capturedAt"
+      ],
+      "variants": [
+        {
+          "counts": {
+            "apollo-1": 129,
+            "apollo-11": 119,
+            "challenger-sts-51l": 128,
+            "historicalTotal": 376,
+            "syntheticFixtures": 23
+          },
+          "frozenV414": {
+            "case": "EvidenceAdmitted",
+            "droppedFields": [],
+            "representation": "frozen-case"
+          },
+          "proposedSuccessor": {
+            "case": "EvidenceAdmitted",
+            "change": "keep"
+          },
+          "variant": "EvidenceAdmitted"
+        }
+      ],
+      "verificationStatus": "decoded and byte-for-byte round-tripped on all 376 historical events; projection reproduced snapshot.json in 3/3 cases; admissibility not evaluated"
+    },
+    {
+      "counts": {
+        "apollo-1": 0,
+        "apollo-11": 0,
+        "challenger-sts-51l": 0,
+        "historicalTotal": 0,
+        "syntheticFixtures": 1
+      },
+      "decoderSupport": "typed: WireEvent.EvidenceSuperseded (src/EventDecoder.fs); no catch-all case",
+      "discriminator": "EvidenceSuperseded",
+      "historicalVariations": {
+        "enumValues": {},
+        "nullValues": {},
+        "payloadKeySets": []
+      },
+      "nullableFields": [],
+      "registryIndex": 7,
+      "replay": {
+        "authoritativeReplay": "not established: admissibility (CONTRACT §11.3, engine History.validate) is not evaluated by this adapter",
+        "projection": "CONTRACT §8.3 row EvidenceSuperseded (src/ReplayAdapter.fs)",
+        "projectionVerifiedInCases": []
+      },
+      "requiredFields": [
+        "evidenceId",
+        "replacementEvidenceId",
+        "reason"
+      ],
+      "variants": [
+        {
+          "counts": {
+            "apollo-1": 0,
+            "apollo-11": 0,
+            "challenger-sts-51l": 0,
+            "historicalTotal": 0,
+            "syntheticFixtures": 1
+          },
+          "frozenV414": {
+            "case": null,
+            "reason": "no supersession case",
+            "representation": "no-frozen-case"
+          },
+          "proposedSuccessor": {
+            "case": "EvidenceSuperseded",
+            "change": "add"
+          },
+          "variant": "EvidenceSuperseded"
+        }
+      ],
+      "verificationStatus": "absent from the historical cases; decoded, round-tripped and projected against the golden states on the frozen synthetic fixtures only"
+    },
+    {
+      "counts": {
+        "apollo-1": 129,
+        "apollo-11": 119,
+        "challenger-sts-51l": 128,
+        "historicalTotal": 376,
+        "syntheticFixtures": 4
+      },
+      "decoderSupport": "typed: WireEvent.EvidenceVerificationAssessed (src/EventDecoder.fs); no catch-all case",
+      "discriminator": "EvidenceVerificationAssessed",
+      "historicalVariations": {
+        "enumValues": {
+          "verification": {
+            "partiallyVerified": 23,
+            "verified": 353
+          }
+        },
+        "nullValues": {},
+        "payloadKeySets": [
+          "evidenceId,verification"
+        ]
+      },
+      "nullableFields": [],
+      "registryIndex": 8,
+      "replay": {
+        "authoritativeReplay": "not established: admissibility (CONTRACT §11.3, engine History.validate) is not evaluated by this adapter",
+        "projection": "CONTRACT §8.3 row EvidenceVerificationAssessed (src/ReplayAdapter.fs)",
+        "projectionVerifiedInCases": [
+          "apollo-1",
+          "apollo-11",
+          "challenger-sts-51l"
+        ]
+      },
+      "requiredFields": [
+        "evidenceId",
+        "verification"
+      ],
+      "variants": [
+        {
+          "counts": {
+            "apollo-1": 129,
+            "apollo-11": 119,
+            "challenger-sts-51l": 128,
+            "historicalTotal": 376,
+            "syntheticFixtures": 4
+          },
+          "frozenV414": {
+            "case": null,
+            "reason": "no verification-assessment case",
+            "representation": "no-frozen-case"
+          },
+          "proposedSuccessor": {
+            "case": "EvidenceVerificationAssessed",
+            "change": "add"
+          },
+          "variant": "EvidenceVerificationAssessed"
+        }
+      ],
+      "verificationStatus": "decoded and byte-for-byte round-tripped on all 376 historical events; projection reproduced snapshot.json in 3/3 cases; admissibility not evaluated"
+    },
+    {
+      "counts": {
+        "apollo-1": 55,
+        "apollo-11": 66,
+        "challenger-sts-51l": 65,
+        "historicalTotal": 186,
+        "syntheticFixtures": 16
+      },
+      "decoderSupport": "typed: WireEvent.EvidenceRelated (src/EventDecoder.fs); no catch-all case",
+      "discriminator": "EvidenceRelated",
+      "historicalVariations": {
+        "enumValues": {
+          "kind": {
+            "contradicts": 22,
+            "insufficient": 9,
+            "supports": 155
+          }
+        },
+        "nullValues": {},
+        "payloadKeySets": [
+          "evidenceId,hypothesisId,kind,rationale,relationshipId"
+        ]
+      },
+      "nullableFields": [
+        "rationale"
+      ],
+      "registryIndex": 9,
+      "replay": {
+        "authoritativeReplay": "not established: admissibility (CONTRACT §11.3, engine History.validate) is not evaluated by this adapter",
+        "projection": "CONTRACT §8.3 row EvidenceRelated (src/ReplayAdapter.fs)",
+        "projectionVerifiedInCases": [
+          "apollo-1",
+          "apollo-11",
+          "challenger-sts-51l"
+        ]
+      },
+      "requiredFields": [
+        "relationshipId",
+        "evidenceId",
+        "hypothesisId",
+        "kind",
+        "rationale"
+      ],
+      "variants": [
+        {
+          "counts": {
+            "apollo-1": 55,
+            "apollo-11": 66,
+            "challenger-sts-51l": 65,
+            "historicalTotal": 186,
+            "syntheticFixtures": 16
+          },
+          "frozenV414": {
+            "case": "EvidenceRelationshipRecorded",
+            "droppedFields": [],
+            "representation": "frozen-case"
+          },
+          "proposedSuccessor": {
+            "case": "EvidenceRelationshipRecorded",
+            "change": "keep"
+          },
+          "variant": "EvidenceRelated"
+        }
+      ],
+      "verificationStatus": "decoded and byte-for-byte round-tripped on all 186 historical events; projection reproduced snapshot.json in 3/3 cases; admissibility not evaluated"
+    },
+    {
+      "counts": {
+        "apollo-1": 3,
+        "apollo-11": 4,
+        "challenger-sts-51l": 3,
+        "historicalTotal": 10,
+        "syntheticFixtures": 6
+      },
+      "decoderSupport": "typed: WireEvent.UnknownIdentified (src/EventDecoder.fs); no catch-all case",
+      "discriminator": "UnknownIdentified",
+      "historicalVariations": {
+        "enumValues": {
+          "materiality": {
+            "informational": 5,
+            "material": 4,
+            "nonMaterial": 1
+          }
+        },
+        "nullValues": {},
+        "payloadKeySets": [
+          "materiality,question,unknownId"
+        ]
+      },
+      "nullableFields": [],
+      "registryIndex": 10,
+      "replay": {
+        "authoritativeReplay": "not established: admissibility (CONTRACT §11.3, engine History.validate) is not evaluated by this adapter",
+        "projection": "CONTRACT §8.3 row UnknownIdentified (src/ReplayAdapter.fs)",
+        "projectionVerifiedInCases": [
+          "apollo-1",
+          "apollo-11",
+          "challenger-sts-51l"
+        ]
+      },
+      "requiredFields": [
+        "unknownId",
+        "question",
+        "materiality"
+      ],
+      "variants": [
+        {
+          "counts": {
+            "apollo-1": 3,
+            "apollo-11": 4,
+            "challenger-sts-51l": 3,
+            "historicalTotal": 10,
+            "syntheticFixtures": 6
+          },
+          "frozenV414": {
+            "case": "UnknownIdentified",
+            "droppedFields": [],
+            "representation": "frozen-case"
+          },
+          "proposedSuccessor": {
+            "case": "UnknownIdentified",
+            "change": "keep"
+          },
+          "variant": "UnknownIdentified"
+        }
+      ],
+      "verificationStatus": "decoded and byte-for-byte round-tripped on all 10 historical events; projection reproduced snapshot.json in 3/3 cases; admissibility not evaluated"
+    },
+    {
+      "counts": {
+        "apollo-1": 3,
+        "apollo-11": 3,
+        "challenger-sts-51l": 3,
+        "historicalTotal": 9,
+        "syntheticFixtures": 3
+      },
+      "decoderSupport": "typed: WireEvent.UnknownTransitioned (src/EventDecoder.fs); no catch-all case",
+      "discriminator": "UnknownTransitioned",
+      "historicalVariations": {
+        "enumValues": {
+          "state": {
+            "acceptedResidual": 9
+          }
+        },
+        "nullValues": {},
+        "payloadKeySets": [
+          "basis,state,unknownId"
+        ]
+      },
+      "nullableFields": [],
+      "registryIndex": 11,
+      "replay": {
+        "authoritativeReplay": "not established: admissibility (CONTRACT §11.3, engine History.validate) is not evaluated by this adapter",
+        "projection": "CONTRACT §8.3 row UnknownTransitioned (src/ReplayAdapter.fs)",
+        "projectionVerifiedInCases": [
+          "apollo-1",
+          "apollo-11",
+          "challenger-sts-51l"
+        ]
+      },
+      "requiredFields": [
+        "unknownId",
+        "state",
+        "basis"
+      ],
+      "variants": [
+        {
+          "counts": {
+            "apollo-1": 3,
+            "apollo-11": 3,
+            "challenger-sts-51l": 3,
+            "historicalTotal": 9,
+            "syntheticFixtures": 3
+          },
+          "frozenV414": {
+            "case": null,
+            "reason": "no unknown transition case",
+            "representation": "no-frozen-case"
+          },
+          "proposedSuccessor": {
+            "case": "UnknownTransitioned",
+            "change": "add"
+          },
+          "variant": "UnknownTransitioned"
+        }
+      ],
+      "verificationStatus": "decoded and byte-for-byte round-tripped on all 9 historical events; projection reproduced snapshot.json in 3/3 cases; admissibility not evaluated"
+    },
+    {
+      "counts": {
+        "apollo-1": 1,
+        "apollo-11": 1,
+        "challenger-sts-51l": 1,
+        "historicalTotal": 3,
+        "syntheticFixtures": 4
+      },
+      "decoderSupport": "typed: WireEvent.AssumptionRecorded (src/EventDecoder.fs); no catch-all case",
+      "discriminator": "AssumptionRecorded",
+      "historicalVariations": {
+        "enumValues": {
+          "materiality": {
+            "material": 3
+          }
+        },
+        "nullValues": {},
+        "payloadKeySets": [
+          "assumptionId,materiality,proposition"
+        ]
+      },
+      "nullableFields": [],
+      "registryIndex": 12,
+      "replay": {
+        "authoritativeReplay": "not established: admissibility (CONTRACT §11.3, engine History.validate) is not evaluated by this adapter",
+        "projection": "CONTRACT §8.3 row AssumptionRecorded (src/ReplayAdapter.fs)",
+        "projectionVerifiedInCases": [
+          "apollo-1",
+          "apollo-11",
+          "challenger-sts-51l"
+        ]
+      },
+      "requiredFields": [
+        "assumptionId",
+        "proposition",
+        "materiality"
+      ],
+      "variants": [
+        {
+          "counts": {
+            "apollo-1": 1,
+            "apollo-11": 1,
+            "challenger-sts-51l": 1,
+            "historicalTotal": 3,
+            "syntheticFixtures": 4
+          },
+          "frozenV414": {
+            "case": "AssumptionRecorded",
+            "droppedFields": [],
+            "representation": "frozen-case"
+          },
+          "proposedSuccessor": {
+            "case": "AssumptionRecorded",
+            "change": "keep"
+          },
+          "variant": "AssumptionRecorded"
+        }
+      ],
+      "verificationStatus": "decoded and byte-for-byte round-tripped on all 3 historical events; projection reproduced snapshot.json in 3/3 cases; admissibility not evaluated"
+    },
+    {
+      "counts": {
+        "apollo-1": 1,
+        "apollo-11": 1,
+        "challenger-sts-51l": 1,
+        "historicalTotal": 3,
+        "syntheticFixtures": 4
+      },
+      "decoderSupport": "typed: WireEvent.AssumptionTransitioned (src/EventDecoder.fs); no catch-all case",
+      "discriminator": "AssumptionTransitioned",
+      "historicalVariations": {
+        "enumValues": {
+          "state": {
+            "provisionallyAccepted": 2,
+            "verified": 1
+          }
+        },
+        "nullValues": {},
+        "payloadKeySets": [
+          "assumptionId,state"
+        ]
+      },
+      "nullableFields": [],
+      "registryIndex": 13,
+      "replay": {
+        "authoritativeReplay": "not established: admissibility (CONTRACT §11.3, engine History.validate) is not evaluated by this adapter",
+        "projection": "CONTRACT §8.3 row AssumptionTransitioned (src/ReplayAdapter.fs)",
+        "projectionVerifiedInCases": [
+          "apollo-1",
+          "apollo-11",
+          "challenger-sts-51l"
+        ]
+      },
+      "requiredFields": [
+        "assumptionId",
+        "state"
+      ],
+      "variants": [
+        {
+          "counts": {
+            "apollo-1": 1,
+            "apollo-11": 1,
+            "challenger-sts-51l": 1,
+            "historicalTotal": 3,
+            "syntheticFixtures": 4
+          },
+          "frozenV414": {
+            "case": null,
+            "reason": "no assumption transition case",
+            "representation": "no-frozen-case"
+          },
+          "proposedSuccessor": {
+            "case": "AssumptionTransitioned",
+            "change": "add"
+          },
+          "variant": "AssumptionTransitioned"
+        }
+      ],
+      "verificationStatus": "decoded and byte-for-byte round-tripped on all 3 historical events; projection reproduced snapshot.json in 3/3 cases; admissibility not evaluated"
+    },
+    {
+      "counts": {
+        "apollo-1": 13,
+        "apollo-11": 11,
+        "challenger-sts-51l": 11,
+        "historicalTotal": 35,
+        "syntheticFixtures": 2
+      },
+      "decoderSupport": "typed: WireEvent.ContradictionRecorded (src/EventDecoder.fs); no catch-all case",
+      "discriminator": "ContradictionRecorded",
+      "historicalVariations": {
+        "enumValues": {
+          "materiality": {
+            "informational": 14,
+            "material": 12,
+            "nonMaterial": 9
+          }
+        },
+        "nullValues": {},
+        "payloadKeySets": [
+          "contradictionId,evidenceIds,materiality,statement"
+        ]
+      },
+      "nullableFields": [],
+      "registryIndex": 14,
+      "replay": {
+        "authoritativeReplay": "not established: admissibility (CONTRACT §11.3, engine History.validate) is not evaluated by this adapter",
+        "projection": "CONTRACT §8.3 row ContradictionRecorded (src/ReplayAdapter.fs)",
+        "projectionVerifiedInCases": [
+          "apollo-1",
+          "apollo-11",
+          "challenger-sts-51l"
+        ]
+      },
+      "requiredFields": [
+        "contradictionId",
+        "statement",
+        "evidenceIds",
+        "materiality"
+      ],
+      "variants": [
+        {
+          "counts": {
+            "apollo-1": 13,
+            "apollo-11": 11,
+            "challenger-sts-51l": 11,
+            "historicalTotal": 35,
+            "syntheticFixtures": 2
+          },
+          "frozenV414": {
+            "case": "ContradictionRecorded",
+            "droppedFields": [],
+            "representation": "frozen-case"
+          },
+          "proposedSuccessor": {
+            "case": "ContradictionRecorded",
+            "change": "keep"
+          },
+          "variant": "ContradictionRecorded"
+        }
+      ],
+      "verificationStatus": "decoded and byte-for-byte round-tripped on all 35 historical events; projection reproduced snapshot.json in 3/3 cases; admissibility not evaluated"
+    },
+    {
+      "counts": {
+        "apollo-1": 16,
+        "apollo-11": 13,
+        "challenger-sts-51l": 16,
+        "historicalTotal": 45,
+        "syntheticFixtures": 2
+      },
+      "decoderSupport": "typed: WireEvent.ContradictionTransitioned (src/EventDecoder.fs); no catch-all case",
+      "discriminator": "ContradictionTransitioned",
+      "historicalVariations": {
+        "enumValues": {
+          "state": {
+            "acceptedResidual": 29,
+            "resolved": 6,
+            "triaged": 10
+          }
+        },
+        "nullValues": {},
+        "payloadKeySets": [
+          "basis,contradictionId,state"
+        ]
+      },
+      "nullableFields": [],
+      "registryIndex": 15,
+      "replay": {
+        "authoritativeReplay": "not established: admissibility (CONTRACT §11.3, engine History.validate) is not evaluated by this adapter",
+        "projection": "CONTRACT §8.3 row ContradictionTransitioned (src/ReplayAdapter.fs)",
+        "projectionVerifiedInCases": [
+          "apollo-1",
+          "apollo-11",
+          "challenger-sts-51l"
+        ]
+      },
+      "requiredFields": [
+        "contradictionId",
+        "state",
+        "basis"
+      ],
+      "variants": [
+        {
+          "counts": {
+            "apollo-1": 16,
+            "apollo-11": 13,
+            "challenger-sts-51l": 16,
+            "historicalTotal": 45,
+            "syntheticFixtures": 2
+          },
+          "frozenV414": {
+            "case": null,
+            "reason": "no contradiction transition case",
+            "representation": "no-frozen-case"
+          },
+          "proposedSuccessor": {
+            "case": "ContradictionTransitioned",
+            "change": "add"
+          },
+          "variant": "ContradictionTransitioned"
+        }
+      ],
+      "verificationStatus": "decoded and byte-for-byte round-tripped on all 45 historical events; projection reproduced snapshot.json in 3/3 cases; admissibility not evaluated"
+    },
+    {
+      "counts": {
+        "apollo-1": 1,
+        "apollo-11": 1,
+        "challenger-sts-51l": 1,
+        "historicalTotal": 3,
+        "syntheticFixtures": 3
+      },
+      "decoderSupport": "typed: WireEvent.PredictionRecorded (src/EventDecoder.fs); no catch-all case",
+      "discriminator": "PredictionRecorded",
+      "historicalVariations": {
+        "enumValues": {
+          "strength": {
+            "discriminating": 2,
+            "nonDiscriminating": 1
+          },
+          "timing": {
+            "retrospective": 3
+          }
+        },
+        "nullValues": {},
+        "payloadKeySets": [
+          "hypothesisId,predictionId,statement,strength,timing"
+        ]
+      },
+      "nullableFields": [],
+      "registryIndex": 16,
+      "replay": {
+        "authoritativeReplay": "not established: admissibility (CONTRACT §11.3, engine History.validate) is not evaluated by this adapter",
+        "projection": "CONTRACT §8.3 row PredictionRecorded (src/ReplayAdapter.fs)",
+        "projectionVerifiedInCases": [
+          "apollo-1",
+          "apollo-11",
+          "challenger-sts-51l"
+        ]
+      },
+      "requiredFields": [
+        "predictionId",
+        "hypothesisId",
+        "statement",
+        "strength",
+        "timing"
+      ],
+      "variants": [
+        {
+          "counts": {
+            "apollo-1": 1,
+            "apollo-11": 1,
+            "challenger-sts-51l": 1,
+            "historicalTotal": 3,
+            "syntheticFixtures": 3
+          },
+          "frozenV414": {
+            "case": "PredictionRecorded",
+            "droppedFields": [],
+            "representation": "frozen-case"
+          },
+          "proposedSuccessor": {
+            "case": "PredictionRecorded",
+            "change": "keep"
+          },
+          "variant": "PredictionRecorded"
+        }
+      ],
+      "verificationStatus": "decoded and byte-for-byte round-tripped on all 3 historical events; projection reproduced snapshot.json in 3/3 cases; admissibility not evaluated"
+    },
+    {
+      "counts": {
+        "apollo-1": 1,
+        "apollo-11": 1,
+        "challenger-sts-51l": 1,
+        "historicalTotal": 3,
+        "syntheticFixtures": 5
+      },
+      "decoderSupport": "typed: WireEvent.ActionRecorded (src/EventDecoder.fs); no catch-all case",
+      "discriminator": "ActionRecorded",
+      "historicalVariations": {
+        "enumValues": {
+          "kind": {
+            "comparison": 1,
+            "experiment": 1,
+            "test": 1
+          }
+        },
+        "nullValues": {},
+        "payloadKeySets": [
+          "actionId,kind,purpose,targetHypothesisIds"
+        ]
+      },
+      "nullableFields": [],
+      "registryIndex": 17,
+      "replay": {
+        "authoritativeReplay": "not established: admissibility (CONTRACT §11.3, engine History.validate) is not evaluated by this adapter",
+        "projection": "CONTRACT §8.3 row ActionRecorded (src/ReplayAdapter.fs)",
+        "projectionVerifiedInCases": [
+          "apollo-1",
+          "apollo-11",
+          "challenger-sts-51l"
+        ]
+      },
+      "requiredFields": [
+        "actionId",
+        "kind",
+        "purpose",
+        "targetHypothesisIds"
+      ],
+      "variants": [
+        {
+          "counts": {
+            "apollo-1": 1,
+            "apollo-11": 1,
+            "challenger-sts-51l": 1,
+            "historicalTotal": 3,
+            "syntheticFixtures": 5
+          },
+          "frozenV414": {
+            "case": "InvestigationActionRecorded",
+            "droppedFields": [],
+            "representation": "frozen-case"
+          },
+          "proposedSuccessor": {
+            "case": "InvestigationActionRecorded",
+            "change": "keep"
+          },
+          "variant": "ActionRecorded"
+        }
+      ],
+      "verificationStatus": "decoded and byte-for-byte round-tripped on all 3 historical events; projection reproduced snapshot.json in 3/3 cases; admissibility not evaluated"
+    },
+    {
+      "counts": {
+        "apollo-1": 3,
+        "apollo-11": 3,
+        "challenger-sts-51l": 3,
+        "historicalTotal": 9,
+        "syntheticFixtures": 11
+      },
+      "decoderSupport": "typed: WireEvent.ActionTransitioned (src/EventDecoder.fs); no catch-all case",
+      "discriminator": "ActionTransitioned",
+      "historicalVariations": {
+        "enumValues": {
+          "state": {
+            "approved": 3,
+            "completed": 3,
+            "inProgress": 3
+          }
+        },
+        "nullValues": {},
+        "payloadKeySets": [
+          "actionId,state"
+        ]
+      },
+      "nullableFields": [],
+      "registryIndex": 18,
+      "replay": {
+        "authoritativeReplay": "not established: admissibility (CONTRACT §11.3, engine History.validate) is not evaluated by this adapter",
+        "projection": "CONTRACT §8.3 row ActionTransitioned (src/ReplayAdapter.fs)",
+        "projectionVerifiedInCases": [
+          "apollo-1",
+          "apollo-11",
+          "challenger-sts-51l"
+        ]
+      },
+      "requiredFields": [
+        "actionId",
+        "state"
+      ],
+      "variants": [
+        {
+          "counts": {
+            "apollo-1": 3,
+            "apollo-11": 3,
+            "challenger-sts-51l": 3,
+            "historicalTotal": 9,
+            "syntheticFixtures": 11
+          },
+          "frozenV414": {
+            "case": null,
+            "reason": "no investigation-action transition case",
+            "representation": "no-frozen-case"
+          },
+          "proposedSuccessor": {
+            "case": "InvestigationActionTransitioned",
+            "change": "add"
+          },
+          "variant": "ActionTransitioned"
+        }
+      ],
+      "verificationStatus": "decoded and byte-for-byte round-tripped on all 9 historical events; projection reproduced snapshot.json in 3/3 cases; admissibility not evaluated"
+    },
+    {
+      "counts": {
+        "apollo-1": 1,
+        "apollo-11": 1,
+        "challenger-sts-51l": 1,
+        "historicalTotal": 3,
+        "syntheticFixtures": 2
+      },
+      "decoderSupport": "typed: WireEvent.FindingRecorded (src/EventDecoder.fs); no catch-all case",
+      "discriminator": "FindingRecorded",
+      "historicalVariations": {
+        "enumValues": {},
+        "nullValues": {},
+        "payloadKeySets": [
+          "actionId,findingId,interpretation,originalResult"
+        ]
+      },
+      "nullableFields": [
+        "interpretation"
+      ],
+      "registryIndex": 19,
+      "replay": {
+        "authoritativeReplay": "not established: admissibility (CONTRACT §11.3, engine History.validate) is not evaluated by this adapter",
+        "projection": "CONTRACT §8.3 row FindingRecorded (src/ReplayAdapter.fs)",
+        "projectionVerifiedInCases": [
+          "apollo-1",
+          "apollo-11",
+          "challenger-sts-51l"
+        ]
+      },
+      "requiredFields": [
+        "findingId",
+        "actionId",
+        "originalResult",
+        "interpretation"
+      ],
+      "variants": [
+        {
+          "counts": {
+            "apollo-1": 1,
+            "apollo-11": 1,
+            "challenger-sts-51l": 1,
+            "historicalTotal": 3,
+            "syntheticFixtures": 2
+          },
+          "frozenV414": {
+            "case": "FindingRecorded",
+            "droppedFields": [],
+            "representation": "frozen-case"
+          },
+          "proposedSuccessor": {
+            "case": "FindingRecorded",
+            "change": "keep"
+          },
+          "variant": "FindingRecorded"
+        }
+      ],
+      "verificationStatus": "decoded and byte-for-byte round-tripped on all 3 historical events; projection reproduced snapshot.json in 3/3 cases; admissibility not evaluated"
+    },
+    {
+      "counts": {
+        "apollo-1": 3,
+        "apollo-11": 1,
+        "challenger-sts-51l": 2,
+        "historicalTotal": 6,
+        "syntheticFixtures": 1
+      },
+      "decoderSupport": "typed: WireEvent.NegativeKnowledgeEstablished (src/EventDecoder.fs); no catch-all case",
+      "discriminator": "NegativeKnowledgeEstablished",
+      "historicalVariations": {
+        "enumValues": {},
+        "nullValues": {},
+        "payloadKeySets": [
+          "basisEvidenceIds,negativeKnowledgeId,scope,statement"
+        ]
+      },
+      "nullableFields": [],
+      "registryIndex": 20,
+      "replay": {
+        "authoritativeReplay": "not established: admissibility (CONTRACT §11.3, engine History.validate) is not evaluated by this adapter",
+        "projection": "CONTRACT §8.3 row NegativeKnowledgeEstablished (src/ReplayAdapter.fs)",
+        "projectionVerifiedInCases": [
+          "apollo-1",
+          "apollo-11",
+          "challenger-sts-51l"
+        ]
+      },
+      "requiredFields": [
+        "negativeKnowledgeId",
+        "statement",
+        "scope",
+        "basisEvidenceIds"
+      ],
+      "variants": [
+        {
+          "counts": {
+            "apollo-1": 3,
+            "apollo-11": 1,
+            "challenger-sts-51l": 2,
+            "historicalTotal": 6,
+            "syntheticFixtures": 1
+          },
+          "frozenV414": {
+            "case": null,
+            "reason": "only the EstablishNegativeKnowledge command exists; no event case",
+            "representation": "no-frozen-case"
+          },
+          "proposedSuccessor": {
+            "case": "NegativeKnowledgeEstablished",
+            "change": "add"
+          },
+          "variant": "NegativeKnowledgeEstablished"
+        }
+      ],
+      "verificationStatus": "decoded and byte-for-byte round-tripped on all 6 historical events; projection reproduced snapshot.json in 3/3 cases; admissibility not evaluated"
+    },
+    {
+      "counts": {
+        "apollo-1": 1,
+        "apollo-11": 1,
+        "challenger-sts-51l": 1,
+        "historicalTotal": 3,
+        "syntheticFixtures": 3
+      },
+      "decoderSupport": "typed: WireEvent.CausalAssertionRecorded (src/EventDecoder.fs); no catch-all case",
+      "discriminator": "CausalAssertionRecorded",
+      "historicalVariations": {
+        "enumValues": {
+          "outcome": {
+            "Fire in Command Module 012 during the Plugs-Out Integrated Test, the death of the crew and the failed rescue": 1,
+            "Five executive-overflow program alarms occurred during Apollo 11's powered descent, and the descent nevertheless continued to a safe landing, long of its target": 1,
+            "Loss of Challenger 73 seconds after launch on 28 January 1986": 1
+          }
+        },
+        "nullValues": {},
+        "payloadKeySets": [
+          "causeId,mechanism,members,outcome"
+        ]
+      },
+      "nullableFields": [
+        "mechanism"
+      ],
+      "registryIndex": 21,
+      "replay": {
+        "authoritativeReplay": "not established: admissibility (CONTRACT §11.3, engine History.validate) is not evaluated by this adapter",
+        "projection": "CONTRACT §8.3 row CausalAssertionRecorded (src/ReplayAdapter.fs)",
+        "projectionVerifiedInCases": [
+          "apollo-1",
+          "apollo-11",
+          "challenger-sts-51l"
+        ]
+      },
+      "requiredFields": [
+        "causeId",
+        "outcome",
+        "members",
+        "mechanism"
+      ],
+      "variants": [
+        {
+          "counts": {
+            "apollo-1": 1,
+            "apollo-11": 1,
+            "challenger-sts-51l": 1,
+            "historicalTotal": 3,
+            "syntheticFixtures": 3
+          },
+          "frozenV414": {
+            "case": "CausalAssertionRecorded",
+            "droppedFields": [],
+            "representation": "frozen-case"
+          },
+          "proposedSuccessor": {
+            "case": "CausalAssertionRecorded",
+            "change": "keep"
+          },
+          "variant": "CausalAssertionRecorded"
+        }
+      ],
+      "verificationStatus": "decoded and byte-for-byte round-tripped on all 3 historical events; projection reproduced snapshot.json in 3/3 cases; admissibility not evaluated"
+    },
+    {
+      "counts": {
+        "apollo-1": 1,
+        "apollo-11": 1,
+        "challenger-sts-51l": 1,
+        "historicalTotal": 3,
+        "syntheticFixtures": 3
+      },
+      "decoderSupport": "typed: WireEvent.CausalAssertionConfirmed (src/EventDecoder.fs); no catch-all case",
+      "discriminator": "CausalAssertionConfirmed",
+      "historicalVariations": {
+        "enumValues": {},
+        "nullValues": {},
+        "payloadKeySets": [
+          "causeId,policy"
+        ]
+      },
+      "nullableFields": [],
+      "registryIndex": 22,
+      "replay": {
+        "authoritativeReplay": "not established: admissibility (CONTRACT §11.3, engine History.validate) is not evaluated by this adapter",
+        "projection": "CONTRACT §8.3 row CausalAssertionConfirmed (src/ReplayAdapter.fs)",
+        "projectionVerifiedInCases": [
+          "apollo-1",
+          "apollo-11",
+          "challenger-sts-51l"
+        ]
+      },
+      "requiredFields": [
+        "causeId",
+        "policy"
+      ],
+      "variants": [
+        {
+          "counts": {
+            "apollo-1": 1,
+            "apollo-11": 1,
+            "challenger-sts-51l": 1,
+            "historicalTotal": 3,
+            "syntheticFixtures": 3
+          },
+          "frozenV414": {
+            "case": "CauseConfirmed",
+            "droppedFields": [
+              "policy"
+            ],
+            "representation": "frozen-case-lossy"
+          },
+          "proposedSuccessor": {
+            "case": "CauseConfirmed",
+            "change": "widen",
+            "detail": "add the applied policy id"
+          },
+          "variant": "CausalAssertionConfirmed"
+        }
+      ],
+      "verificationStatus": "decoded and byte-for-byte round-tripped on all 3 historical events; projection reproduced snapshot.json in 3/3 cases; admissibility not evaluated"
+    },
+    {
+      "counts": {
+        "apollo-1": 0,
+        "apollo-11": 0,
+        "challenger-sts-51l": 0,
+        "historicalTotal": 0,
+        "syntheticFixtures": 1
+      },
+      "decoderSupport": "typed: WireEvent.CausalAssertionReopened (src/EventDecoder.fs); no catch-all case",
+      "discriminator": "CausalAssertionReopened",
+      "historicalVariations": {
+        "enumValues": {},
+        "nullValues": {},
+        "payloadKeySets": []
+      },
+      "nullableFields": [],
+      "registryIndex": 23,
+      "replay": {
+        "authoritativeReplay": "not established: admissibility (CONTRACT §11.3, engine History.validate) is not evaluated by this adapter",
+        "projection": "CONTRACT §8.3 row CausalAssertionReopened (src/ReplayAdapter.fs)",
+        "projectionVerifiedInCases": []
+      },
+      "requiredFields": [
+        "causeId",
+        "reason"
+      ],
+      "variants": [
+        {
+          "counts": {
+            "apollo-1": 0,
+            "apollo-11": 0,
+            "challenger-sts-51l": 0,
+            "historicalTotal": 0,
+            "syntheticFixtures": 1
+          },
+          "frozenV414": {
+            "case": "ConfirmedCauseReopened",
+            "droppedFields": [],
+            "representation": "frozen-case"
+          },
+          "proposedSuccessor": {
+            "case": "ConfirmedCauseReopened",
+            "change": "keep"
+          },
+          "variant": "CausalAssertionReopened"
+        }
+      ],
+      "verificationStatus": "absent from the historical cases; decoded, round-tripped and projected against the golden states on the frozen synthetic fixtures only"
+    },
+    {
+      "counts": {
+        "apollo-1": 3,
+        "apollo-11": 2,
+        "challenger-sts-51l": 4,
+        "historicalTotal": 9,
+        "syntheticFixtures": 4
+      },
+      "decoderSupport": "typed: WireEvent.CorrectiveActionRecorded (src/EventDecoder.fs); no catch-all case",
+      "discriminator": "CorrectiveActionRecorded",
+      "historicalVariations": {
+        "enumValues": {
+          "kind": {
+            "correction": 5,
+            "prevention": 3,
+            "workaround": 1
+          }
+        },
+        "nullValues": {},
+        "payloadKeySets": [
+          "correctiveActionId,description,kind,targetCauseIds"
+        ]
+      },
+      "nullableFields": [],
+      "registryIndex": 24,
+      "replay": {
+        "authoritativeReplay": "not established: admissibility (CONTRACT §11.3, engine History.validate) is not evaluated by this adapter",
+        "projection": "CONTRACT §8.3 row CorrectiveActionRecorded (src/ReplayAdapter.fs)",
+        "projectionVerifiedInCases": [
+          "apollo-1",
+          "apollo-11",
+          "challenger-sts-51l"
+        ]
+      },
+      "requiredFields": [
+        "correctiveActionId",
+        "kind",
+        "description",
+        "targetCauseIds"
+      ],
+      "variants": [
+        {
+          "counts": {
+            "apollo-1": 3,
+            "apollo-11": 2,
+            "challenger-sts-51l": 4,
+            "historicalTotal": 9,
+            "syntheticFixtures": 4
+          },
+          "frozenV414": {
+            "case": "CorrectiveActionRecorded",
+            "droppedFields": [],
+            "representation": "frozen-case"
+          },
+          "proposedSuccessor": {
+            "case": "CorrectiveActionRecorded",
+            "change": "keep"
+          },
+          "variant": "CorrectiveActionRecorded"
+        }
+      ],
+      "verificationStatus": "decoded and byte-for-byte round-tripped on all 9 historical events; projection reproduced snapshot.json in 3/3 cases; admissibility not evaluated"
+    },
+    {
+      "counts": {
+        "apollo-1": 12,
+        "apollo-11": 6,
+        "challenger-sts-51l": 14,
+        "historicalTotal": 32,
+        "syntheticFixtures": 19
+      },
+      "decoderSupport": "typed: WireEvent.CorrectiveActionTransitioned (src/EventDecoder.fs); no catch-all case",
+      "discriminator": "CorrectiveActionTransitioned",
+      "historicalVariations": {
+        "enumValues": {
+          "state": {
+            "approved": 9,
+            "awaitingVerificationOfEffect": 5,
+            "implemented": 7,
+            "inProgress": 7,
+            "verificationFailed": 1,
+            "verifiedEffective": 3
+          }
+        },
+        "nullValues": {},
+        "payloadKeySets": [
+          "correctiveActionId,state"
+        ]
+      },
+      "nullableFields": [],
+      "registryIndex": 25,
+      "replay": {
+        "authoritativeReplay": "not established: admissibility (CONTRACT §11.3, engine History.validate) is not evaluated by this adapter",
+        "projection": "CONTRACT §8.3 row CorrectiveActionTransitioned (src/ReplayAdapter.fs)",
+        "projectionVerifiedInCases": [
+          "apollo-1",
+          "apollo-11",
+          "challenger-sts-51l"
+        ]
+      },
+      "requiredFields": [
+        "correctiveActionId",
+        "state"
+      ],
+      "variants": [
+        {
+          "counts": {
+            "apollo-1": 3,
+            "apollo-11": 2,
+            "challenger-sts-51l": 4,
+            "historicalTotal": 9,
+            "syntheticFixtures": 4
+          },
+          "frozenV414": {
+            "case": null,
+            "reason": "only CorrectiveActionImplemented exists",
+            "representation": "no-frozen-case"
+          },
+          "proposedSuccessor": {
+            "case": "CorrectiveActionApproved",
+            "change": "add"
+          },
+          "variant": "CorrectiveActionTransitioned/approved"
+        },
+        {
+          "counts": {
+            "apollo-1": 0,
+            "apollo-11": 0,
+            "challenger-sts-51l": 0,
+            "historicalTotal": 0,
+            "syntheticFixtures": 1
+          },
+          "frozenV414": {
+            "case": null,
+            "reason": "only CorrectiveActionImplemented exists",
+            "representation": "no-frozen-case"
+          },
+          "proposedSuccessor": {
+            "case": "CorrectiveActionCancelled",
+            "change": "add"
+          },
+          "variant": "CorrectiveActionTransitioned/cancelled"
+        },
+        {
+          "counts": {
+            "apollo-1": 3,
+            "apollo-11": 1,
+            "challenger-sts-51l": 3,
+            "historicalTotal": 7,
+            "syntheticFixtures": 4
+          },
+          "frozenV414": {
+            "case": null,
+            "reason": "only CorrectiveActionImplemented exists",
+            "representation": "no-frozen-case"
+          },
+          "proposedSuccessor": {
+            "case": "CorrectiveActionStarted",
+            "change": "add"
+          },
+          "variant": "CorrectiveActionTransitioned/inProgress"
+        },
+        {
+          "counts": {
+            "apollo-1": 3,
+            "apollo-11": 1,
+            "challenger-sts-51l": 3,
+            "historicalTotal": 7,
+            "syntheticFixtures": 4
+          },
+          "frozenV414": {
+            "case": "CorrectiveActionImplemented",
+            "droppedFields": [],
+            "representation": "frozen-case"
+          },
+          "proposedSuccessor": {
+            "case": "CorrectiveActionImplemented",
+            "change": "keep"
+          },
+          "variant": "CorrectiveActionTransitioned/implemented"
+        },
+        {
+          "counts": {
+            "apollo-1": 2,
+            "apollo-11": 1,
+            "challenger-sts-51l": 2,
+            "historicalTotal": 5,
+            "syntheticFixtures": 3
+          },
+          "frozenV414": {
+            "case": null,
+            "reason": "only CorrectiveActionImplemented exists",
+            "representation": "no-frozen-case"
+          },
+          "proposedSuccessor": {
+            "case": "CorrectiveActionAwaitingVerificationOfEffect",
+            "change": "add"
+          },
+          "variant": "CorrectiveActionTransitioned/awaitingVerificationOfEffect"
+        },
+        {
+          "counts": {
+            "apollo-1": 0,
+            "apollo-11": 0,
+            "challenger-sts-51l": 1,
+            "historicalTotal": 1,
+            "syntheticFixtures": 1
+          },
+          "frozenV414": {
+            "case": null,
+            "reason": "only CorrectiveActionImplemented exists",
+            "representation": "no-frozen-case"
+          },
+          "proposedSuccessor": {
+            "case": "CorrectiveActionVerificationFailed",
+            "change": "add"
+          },
+          "variant": "CorrectiveActionTransitioned/verificationFailed"
+        },
+        {
+          "counts": {
+            "apollo-1": 1,
+            "apollo-11": 1,
+            "challenger-sts-51l": 1,
+            "historicalTotal": 3,
+            "syntheticFixtures": 1
+          },
+          "frozenV414": {
+            "case": null,
+            "reason": "only CorrectiveActionImplemented exists",
+            "representation": "no-frozen-case"
+          },
+          "proposedSuccessor": {
+            "case": "CorrectiveActionVerifiedEffective",
+            "change": "add"
+          },
+          "variant": "CorrectiveActionTransitioned/verifiedEffective"
+        },
+        {
+          "counts": {
+            "apollo-1": 0,
+            "apollo-11": 0,
+            "challenger-sts-51l": 0,
+            "historicalTotal": 0,
+            "syntheticFixtures": 1
+          },
+          "frozenV414": {
+            "case": null,
+            "reason": "only CorrectiveActionImplemented exists",
+            "representation": "no-frozen-case"
+          },
+          "proposedSuccessor": {
+            "case": "CorrectiveActionReworkRequired",
+            "change": "add"
+          },
+          "variant": "CorrectiveActionTransitioned/reworkRequired"
+        }
+      ],
+      "verificationStatus": "decoded and byte-for-byte round-tripped on all 32 historical events; projection reproduced snapshot.json in 3/3 cases; admissibility not evaluated"
+    },
+    {
+      "counts": {
+        "apollo-1": 2,
+        "apollo-11": 1,
+        "challenger-sts-51l": 4,
+        "historicalTotal": 7,
+        "syntheticFixtures": 3
+      },
+      "decoderSupport": "typed: WireEvent.CriterionRecorded (src/EventDecoder.fs); no catch-all case",
+      "discriminator": "CriterionRecorded",
+      "historicalVariations": {
+        "enumValues": {},
+        "nullValues": {},
+        "payloadKeySets": [
+          "correctiveActionId,criterionId,expectedOutcome,method"
+        ]
+      },
+      "nullableFields": [
+        "method"
+      ],
+      "registryIndex": 26,
+      "replay": {
+        "authoritativeReplay": "not established: admissibility (CONTRACT §11.3, engine History.validate) is not evaluated by this adapter",
+        "projection": "CONTRACT §8.3 row CriterionRecorded (src/ReplayAdapter.fs)",
+        "projectionVerifiedInCases": [
+          "apollo-1",
+          "apollo-11",
+          "challenger-sts-51l"
+        ]
+      },
+      "requiredFields": [
+        "criterionId",
+        "correctiveActionId",
+        "expectedOutcome",
+        "method"
+      ],
+      "variants": [
+        {
+          "counts": {
+            "apollo-1": 2,
+            "apollo-11": 1,
+            "challenger-sts-51l": 4,
+            "historicalTotal": 7,
+            "syntheticFixtures": 3
+          },
+          "frozenV414": {
+            "case": "VerificationCriterionRecorded",
+            "droppedFields": [],
+            "representation": "frozen-case"
+          },
+          "proposedSuccessor": {
+            "case": "VerificationCriterionRecorded",
+            "change": "keep"
+          },
+          "variant": "CriterionRecorded"
+        }
+      ],
+      "verificationStatus": "decoded and byte-for-byte round-tripped on all 7 historical events; projection reproduced snapshot.json in 3/3 cases; admissibility not evaluated"
+    },
+    {
+      "counts": {
+        "apollo-1": 2,
+        "apollo-11": 1,
+        "challenger-sts-51l": 4,
+        "historicalTotal": 7,
+        "syntheticFixtures": 2
+      },
+      "decoderSupport": "typed: WireEvent.VerificationRecorded (src/EventDecoder.fs); no catch-all case",
+      "discriminator": "VerificationRecorded",
+      "historicalVariations": {
+        "enumValues": {
+          "outcome": {
+            "failed": 1,
+            "inconclusive": 1,
+            "satisfied": 5
+          }
+        },
+        "nullValues": {},
+        "payloadKeySets": [
+          "criterionId,evidenceIds,outcome,verificationId"
+        ]
+      },
+      "nullableFields": [],
+      "registryIndex": 27,
+      "replay": {
+        "authoritativeReplay": "not established: admissibility (CONTRACT §11.3, engine History.validate) is not evaluated by this adapter",
+        "projection": "CONTRACT §8.3 row VerificationRecorded (src/ReplayAdapter.fs)",
+        "projectionVerifiedInCases": [
+          "apollo-1",
+          "apollo-11",
+          "challenger-sts-51l"
+        ]
+      },
+      "requiredFields": [
+        "verificationId",
+        "criterionId",
+        "outcome",
+        "evidenceIds"
+      ],
+      "variants": [
+        {
+          "counts": {
+            "apollo-1": 2,
+            "apollo-11": 1,
+            "challenger-sts-51l": 4,
+            "historicalTotal": 7,
+            "syntheticFixtures": 2
+          },
+          "frozenV414": {
+            "case": "VerificationRecorded",
+            "droppedFields": [],
+            "representation": "frozen-case"
+          },
+          "proposedSuccessor": {
+            "case": "VerificationRecorded",
+            "change": "keep"
+          },
+          "variant": "VerificationRecorded"
+        }
+      ],
+      "verificationStatus": "decoded and byte-for-byte round-tripped on all 7 historical events; projection reproduced snapshot.json in 3/3 cases; admissibility not evaluated"
+    },
+    {
+      "counts": {
+        "apollo-1": 1,
+        "apollo-11": 1,
+        "challenger-sts-51l": 1,
+        "historicalTotal": 3,
+        "syntheticFixtures": 2
+      },
+      "decoderSupport": "typed: WireEvent.ConclusionRecorded (src/EventDecoder.fs); no catch-all case",
+      "discriminator": "ConclusionRecorded",
+      "historicalVariations": {
+        "enumValues": {
+          "strength": {
+            "acceptedWithResidualUncertainty": 1,
+            "confirmedCause": 2
+          }
+        },
+        "nullValues": {},
+        "payloadKeySets": [
+          "causeIds,conclusionId,residualUncertainty,statement,strength"
+        ]
+      },
+      "nullableFields": [
+        "residualUncertainty"
+      ],
+      "registryIndex": 28,
+      "replay": {
+        "authoritativeReplay": "not established: admissibility (CONTRACT §11.3, engine History.validate) is not evaluated by this adapter",
+        "projection": "CONTRACT §8.3 row ConclusionRecorded (src/ReplayAdapter.fs)",
+        "projectionVerifiedInCases": [
+          "apollo-1",
+          "apollo-11",
+          "challenger-sts-51l"
+        ]
+      },
+      "requiredFields": [
+        "conclusionId",
+        "statement",
+        "strength",
+        "causeIds",
+        "residualUncertainty"
+      ],
+      "variants": [
+        {
+          "counts": {
+            "apollo-1": 1,
+            "apollo-11": 1,
+            "challenger-sts-51l": 1,
+            "historicalTotal": 3,
+            "syntheticFixtures": 2
+          },
+          "frozenV414": {
+            "case": null,
+            "reason": "a Conclusion record exists (FSHARP-TYPE-SHAPES §27) but no event case",
+            "representation": "no-frozen-case"
+          },
+          "proposedSuccessor": {
+            "case": "ConclusionRecorded",
+            "change": "add"
+          },
+          "variant": "ConclusionRecorded"
+        }
+      ],
+      "verificationStatus": "decoded and byte-for-byte round-tripped on all 3 historical events; projection reproduced snapshot.json in 3/3 cases; admissibility not evaluated"
+    },
+    {
+      "counts": {
+        "apollo-1": 0,
+        "apollo-11": 0,
+        "challenger-sts-51l": 0,
+        "historicalTotal": 0,
+        "syntheticFixtures": 3
+      },
+      "decoderSupport": "typed: WireEvent.ProposalRecorded (src/EventDecoder.fs); no catch-all case",
+      "discriminator": "ProposalRecorded",
+      "historicalVariations": {
+        "enumValues": {
+          "kind": {}
+        },
+        "nullValues": {},
+        "payloadKeySets": []
+      },
+      "nullableFields": [
+        "rationale"
+      ],
+      "registryIndex": 29,
+      "replay": {
+        "authoritativeReplay": "not established: admissibility (CONTRACT §11.3, engine History.validate) is not evaluated by this adapter",
+        "projection": "CONTRACT §8.3 row ProposalRecorded (src/ReplayAdapter.fs)",
+        "projectionVerifiedInCases": []
+      },
+      "requiredFields": [
+        "proposalId",
+        "kind",
+        "text",
+        "rationale"
+      ],
+      "variants": [
+        {
+          "counts": {
+            "apollo-1": 0,
+            "apollo-11": 0,
+            "challenger-sts-51l": 0,
+            "historicalTotal": 0,
+            "syntheticFixtures": 3
+          },
+          "frozenV414": {
+            "case": "ProposalRecorded",
+            "droppedFields": [],
+            "representation": "frozen-case"
+          },
+          "proposedSuccessor": {
+            "case": "ProposalRecorded",
+            "change": "keep"
+          },
+          "variant": "ProposalRecorded"
+        }
+      ],
+      "verificationStatus": "absent from the historical cases; decoded, round-tripped and projected against the golden states on the frozen synthetic fixtures only"
+    },
+    {
+      "counts": {
+        "apollo-1": 0,
+        "apollo-11": 0,
+        "challenger-sts-51l": 0,
+        "historicalTotal": 0,
+        "syntheticFixtures": 2
+      },
+      "decoderSupport": "typed: WireEvent.ProposalWasAccepted (src/EventDecoder.fs); no catch-all case",
+      "discriminator": "ProposalWasAccepted",
+      "historicalVariations": {
+        "enumValues": {},
+        "nullValues": {},
+        "payloadKeySets": []
+      },
+      "nullableFields": [],
+      "registryIndex": 30,
+      "replay": {
+        "authoritativeReplay": "not established: admissibility (CONTRACT §11.3, engine History.validate) is not evaluated by this adapter",
+        "projection": "CONTRACT §8.3 row ProposalWasAccepted (src/ReplayAdapter.fs)",
+        "projectionVerifiedInCases": []
+      },
+      "requiredFields": [
+        "proposalId",
+        "targetId"
+      ],
+      "variants": [
+        {
+          "counts": {
+            "apollo-1": 0,
+            "apollo-11": 0,
+            "challenger-sts-51l": 0,
+            "historicalTotal": 0,
+            "syntheticFixtures": 2
+          },
+          "frozenV414": {
+            "case": null,
+            "reason": "only the AcceptProposal command exists; no event case",
+            "representation": "no-frozen-case"
+          },
+          "proposedSuccessor": {
+            "case": "ProposalAccepted",
+            "change": "add"
+          },
+          "variant": "ProposalWasAccepted"
+        }
+      ],
+      "verificationStatus": "absent from the historical cases; decoded, round-tripped and projected against the golden states on the frozen synthetic fixtures only"
+    },
+    {
+      "counts": {
+        "apollo-1": 0,
+        "apollo-11": 0,
+        "challenger-sts-51l": 0,
+        "historicalTotal": 0,
+        "syntheticFixtures": 1
+      },
+      "decoderSupport": "typed: WireEvent.ProposalWasRejected (src/EventDecoder.fs); no catch-all case",
+      "discriminator": "ProposalWasRejected",
+      "historicalVariations": {
+        "enumValues": {},
+        "nullValues": {},
+        "payloadKeySets": []
+      },
+      "nullableFields": [],
+      "registryIndex": 31,
+      "replay": {
+        "authoritativeReplay": "not established: admissibility (CONTRACT §11.3, engine History.validate) is not evaluated by this adapter",
+        "projection": "CONTRACT §8.3 row ProposalWasRejected (src/ReplayAdapter.fs)",
+        "projectionVerifiedInCases": []
+      },
+      "requiredFields": [
+        "proposalId",
+        "reason"
+      ],
+      "variants": [
+        {
+          "counts": {
+            "apollo-1": 0,
+            "apollo-11": 0,
+            "challenger-sts-51l": 0,
+            "historicalTotal": 0,
+            "syntheticFixtures": 1
+          },
+          "frozenV414": {
+            "case": "ProposalRejected",
+            "droppedFields": [
+              "reason"
+            ],
+            "representation": "frozen-case-lossy"
+          },
+          "proposedSuccessor": {
+            "case": "ProposalRejected",
+            "change": "widen",
+            "detail": "add the rejection reason"
+          },
+          "variant": "ProposalWasRejected"
+        }
+      ],
+      "verificationStatus": "absent from the historical cases; decoded, round-tripped and projected against the golden states on the frozen synthetic fixtures only"
+    }
+  ],
+  "frozenContract": "Indy-init requirements-compiled/v4.1.4/contracts/00-DOMAIN-STUBS.fs (CoreEvent :92-120, EventEnvelope :126)",
+  "frozenEnvelopeDroppedFields": [
+    "occurredAt",
+    "actor",
+    "correlationId",
+    "formatVersion",
+    "semanticVersion"
+  ],
+  "generatedBy": "dotnet run --project proposals/r10-historical-data-compatibility/tests -- --causa-data <checkout> --write",
+  "historicalEvents": 1315,
+  "historicalEventsByFrozenRepresentation": {
+    "frozenCaseFieldsDropped": 63,
+    "frozenCaseNoFieldDropped": 765,
+    "noFrozenCase": 487
+  },
+  "registeredDiscriminators": 31,
+  "schema": "r10-historical-data-compatibility/event-compatibility-matrix/1",
+  "source": "kemiller2002/causa-data@e8259df74add723765c57a5b1a5888d9c3f707af catalog/historical-v1 (workspaces/demo/historical-v1/investigations)"
+}

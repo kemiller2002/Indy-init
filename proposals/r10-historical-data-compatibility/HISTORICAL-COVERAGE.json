@@ -1,0 +1,1109 @@
+{
+  "checks": [
+    {
+      "evidence": {
+        "pinned": [
+          {
+            "caseKey": "apollo-1",
+            "eventsSha256": "c97bc96c4c48ad9ca53268b4fe66637e211c3627ebb3cbe667a1a6f1066ab3a6"
+          },
+          {
+            "caseKey": "apollo-11",
+            "eventsSha256": "e533fe7fc251a4d0d7f520838735f14373da5b9783682715dae12a7a2dff04c9"
+          },
+          {
+            "caseKey": "challenger-sts-51l",
+            "eventsSha256": "e3b442f0ff3ea178c4d81d4964cef5deda4d104cc426785f7da5a78e9bed9c25"
+          }
+        ]
+      },
+      "failures": [],
+      "id": "C00",
+      "missionCheck": "-",
+      "passed": true,
+      "title": "The causa-data checkout holds the pinned historical bytes"
+    },
+    {
+      "evidence": {
+        "results": [
+          {
+            "caseKey": "apollo-1",
+            "result": "structurally verified; admissibility not evaluated"
+          },
+          {
+            "caseKey": "apollo-11",
+            "result": "structurally verified; admissibility not evaluated"
+          },
+          {
+            "caseKey": "challenger-sts-51l",
+            "result": "structurally verified; admissibility not evaluated"
+          }
+        ]
+      },
+      "failures": [],
+      "id": "C01",
+      "missionCheck": "3",
+      "passed": true,
+      "title": "Every historical investigation loads (stages 1-14, 16, 17)"
+    },
+    {
+      "evidence": {
+        "cases": [
+          {
+            "caseKey": "apollo-1",
+            "catalogExpectedVersion": 432,
+            "decoded": 432,
+            "lines": 432,
+            "manifestEventCount": 432,
+            "rejected": 0,
+            "reportedByPriorReport": 432,
+            "unregistered": 0
+          },
+          {
+            "caseKey": "apollo-11",
+            "catalogExpectedVersion": 431,
+            "decoded": 431,
+            "lines": 431,
+            "manifestEventCount": 431,
+            "rejected": 0,
+            "reportedByPriorReport": 431,
+            "unregistered": 0
+          },
+          {
+            "caseKey": "challenger-sts-51l",
+            "catalogExpectedVersion": 452,
+            "decoded": 452,
+            "lines": 452,
+            "manifestEventCount": 452,
+            "rejected": 0,
+            "reportedByPriorReport": 452,
+            "unregistered": 0
+          }
+        ],
+        "totalEvents": 1315
+      },
+      "failures": [],
+      "id": "C02",
+      "missionCheck": "1, 11",
+      "passed": true,
+      "title": "Every historical event is accounted for: lines = outcomes = decoded = manifest = catalog"
+    },
+    {
+      "evidence": {
+        "inHistoricalCases": 26,
+        "onlyInSyntheticFixtures": [
+          "CausalAssertionReopened",
+          "EvidenceSuperseded",
+          "ProposalRecorded",
+          "ProposalWasAccepted",
+          "ProposalWasRejected"
+        ],
+        "registered": 31
+      },
+      "failures": [],
+      "id": "C03",
+      "missionCheck": "2",
+      "passed": true,
+      "title": "Every registered discriminator is decoded from real data and round-trips (historical cases + frozen synthetic fixtures)"
+    },
+    {
+      "evidence": {},
+      "failures": [],
+      "id": "C04",
+      "missionCheck": "4",
+      "passed": true,
+      "title": "Event order is preserved: decoded i = line i = aggregateVersion i, raw line kept"
+    },
+    {
+      "evidence": {
+        "commandGroups": {
+          "apollo-1": 430,
+          "apollo-11": 429,
+          "challenger-sts-51l": 448
+        },
+        "eventNamespace": "241fefd4-c810-5a3a-9cfa-4bbd968ae1cb"
+      },
+      "failures": [],
+      "id": "C05",
+      "missionCheck": "5",
+      "passed": true,
+      "title": "Event and investigation identities are preserved and the §5.2 derivation holds for every event"
+    },
+    {
+      "evidence": {
+        "eventTypes": 26,
+        "mutations": 214
+      },
+      "failures": [],
+      "id": "C06",
+      "missionCheck": "6",
+      "passed": true,
+      "title": "Required fields are validated: every field of every historical event type removed, retyped, and an undeclared field added"
+    },
+    {
+      "evidence": {
+        "agree": 53,
+        "agreeConditionalOnAdmissibility": 2,
+        "disagree": 0,
+        "fixtures": 90,
+        "notApplicable": 1,
+        "rows": [
+          {
+            "actual": "CAUSA.SCHEMA_VIOLATION",
+            "expected": "CAUSA.SCHEMA_VIOLATION",
+            "expectedDomainCode": null,
+            "name": "agent-authored-hypothesis",
+            "verdict": "agree"
+          },
+          {
+            "actual": "CAUSA.EVENTS_HASH_MISMATCH",
+            "expected": "CAUSA.EVENTS_HASH_MISMATCH",
+            "expectedDomainCode": null,
+            "name": "altered-event-without-rehash",
+            "verdict": "agree"
+          },
+          {
+            "actual": "CAUSA.SCHEMA_VIOLATION",
+            "expected": "CAUSA.SCHEMA_VIOLATION",
+            "expectedDomainCode": null,
+            "name": "artifact-not-http",
+            "verdict": "agree"
+          },
+          {
+            "actual": "CAUSA.SCHEMA_VIOLATION",
+            "expected": "CAUSA.SCHEMA_VIOLATION",
+            "expectedDomainCode": null,
+            "name": "blank-text",
+            "verdict": "agree"
+          },
+          {
+            "actual": "CAUSA.ENCODING",
+            "expected": "CAUSA.ENCODING",
+            "expectedDomainCode": null,
+            "name": "bom-in-events",
+            "verdict": "agree"
+          },
+          {
+            "actual": "CAUSA.SNAPSHOT_HASH_MISMATCH",
+            "expected": "CAUSA.SNAPSHOT_HASH_MISMATCH",
+            "expectedDomainCode": null,
+            "name": "broken-snapshot-hash",
+            "verdict": "agree-conditional-on-admissibility"
+          },
+          {
+            "actual": "CAUSA.SCHEMA_VIOLATION",
+            "expected": "CAUSA.SCHEMA_VIOLATION",
+            "expectedDomainCode": null,
+            "name": "calendar-invalid-manifest-created-at",
+            "verdict": "agree"
+          },
+          {
+            "actual": "CAUSA.SCHEMA_VIOLATION",
+            "expected": "CAUSA.SCHEMA_VIOLATION",
+            "expectedDomainCode": null,
+            "name": "calendar-invalid-occurred-at",
+            "verdict": "agree"
+          },
+          {
+            "actual": "CAUSA.CORRELATION_REUSED",
+            "expected": "CAUSA.CORRELATION_REUSED",
+            "expectedDomainCode": null,
+            "name": "correlation-reused",
+            "verdict": "agree"
+          },
+          {
+            "actual": "CAUSA.SEQUENCE_INVALID",
+            "expected": "CAUSA.SEQUENCE_INVALID",
+            "expectedDomainCode": null,
+            "name": "duplicate-aggregate-version",
+            "verdict": "agree"
+          },
+          {
+            "actual": "CAUSA.EVENT_ID_DUPLICATE",
+            "expected": "CAUSA.EVENT_ID_DUPLICATE",
+            "expectedDomainCode": null,
+            "name": "duplicate-event-id",
+            "verdict": "agree"
+          },
+          {
+            "actual": "CAUSA.JSON_MALFORMED",
+            "expected": "CAUSA.JSON_MALFORMED",
+            "expectedDomainCode": null,
+            "name": "duplicate-json-key",
+            "verdict": "agree"
+          },
+          {
+            "actual": "structurally-valid-admissibility-not-evaluated",
+            "expected": "CAUSA.HISTORY_INADMISSIBLE",
+            "expectedDomainCode": "HISTORY.INADMISSIBLE_EVENT",
+            "name": "engine-agent-repeats-falsified",
+            "verdict": "not-claimed-valid-admissibility-not-evaluated"
+          },
+          {
+            "actual": "structurally-valid-admissibility-not-evaluated",
+            "expected": "CAUSA.HISTORY_INADMISSIBLE",
+            "expectedDomainCode": "HISTORY.INADMISSIBLE_EVENT",
+            "name": "engine-awaiting-verification-without-work",
+            "verdict": "not-claimed-valid-admissibility-not-evaluated"
+          },
+          {
+            "actual": "structurally-valid-admissibility-not-evaluated",
+            "expected": "CAUSA.HISTORY_INADMISSIBLE",
+            "expectedDomainCode": "HISTORY.UNGATED_CONFIRMATION",
+            "name": "engine-cause-already-confirmed",
+            "verdict": "not-claimed-valid-admissibility-not-evaluated"
+          },
+          {
+            "actual": "structurally-valid-admissibility-not-evaluated",
+            "expected": "CAUSA.HISTORY_INADMISSIBLE",
+            "expectedDomainCode": "HISTORY.UNGATED_CONFIRMATION",
+            "name": "engine-cause-alternative-not-addressed",
+            "verdict": "not-claimed-valid-admissibility-not-evaluated"
+          },
+          {
+            "actual": "structurally-valid-admissibility-not-evaluated",
+            "expected": "CAUSA.HISTORY_INADMISSIBLE",
+            "expectedDomainCode": "HISTORY.UNGATED_CONFIRMATION",
+            "name": "engine-cause-no-root",
+            "verdict": "not-claimed-valid-admissibility-not-evaluated"
+          },
+          {
+            "actual": "structurally-valid-admissibility-not-evaluated",
+            "expected": "CAUSA.HISTORY_INADMISSIBLE",
+            "expectedDomainCode": "HISTORY.UNGATED_CONFIRMATION",
+            "name": "engine-cause-open-contradiction",
+            "verdict": "not-claimed-valid-admissibility-not-evaluated"
+          },
+          {
+            "actual": "structurally-valid-admissibility-not-evaluated",
+            "expected": "CAUSA.HISTORY_INADMISSIBLE",
+            "expectedDomainCode": "HISTORY.UNGATED_CONFIRMATION",
+            "name": "engine-cause-open-unknown",
+            "verdict": "not-claimed-valid-admissibility-not-evaluated"
+          },
+          {
+            "actual": "structurally-valid-admissibility-not-evaluated",
+            "expected": "CAUSA.HISTORY_INADMISSIBLE",
+            "expectedDomainCode": "HISTORY.UNGATED_CONFIRMATION",
+            "name": "engine-cause-unverified-assumption",
+            "verdict": "not-claimed-valid-admissibility-not-evaluated"
+          },
+          {
+            "actual": "structurally-valid-admissibility-not-evaluated",
+            "expected": "CAUSA.HISTORY_INADMISSIBLE",
+            "expectedDomainCode": "HISTORY.UNGATED_CONFIRMATION",
+            "name": "engine-cause-without-mechanism",
+            "verdict": "not-claimed-valid-admissibility-not-evaluated"
+          },
+          {
+            "actual": "structurally-valid-admissibility-not-evaluated",
+            "expected": "CAUSA.HISTORY_INADMISSIBLE",
+            "expectedDomainCode": "HISTORY.INADMISSIBLE_EVENT",
+            "name": "engine-conclusion-without-residual",
+            "verdict": "not-claimed-valid-admissibility-not-evaluated"
+          },
+          {
+            "actual": "structurally-valid-admissibility-not-evaluated",
+            "expected": "CAUSA.HISTORY_INADMISSIBLE",
+            "expectedDomainCode": "HISTORY.INADMISSIBLE_EVENT",
+            "name": "engine-confirmed-conclusion-unconfirmed-cause",
+            "verdict": "not-claimed-valid-admissibility-not-evaluated"
+          },
+          {
+            "actual": "structurally-valid-admissibility-not-evaluated",
+            "expected": "CAUSA.HISTORY_INADMISSIBLE",
+            "expectedDomainCode": "HISTORY.INADMISSIBLE_EVENT",
+            "name": "engine-content-after-resolution",
+            "verdict": "not-claimed-valid-admissibility-not-evaluated"
+          },
+          {
+            "actual": "CAUSA.HISTORY_INADMISSIBLE",
+            "expected": "CAUSA.HISTORY_INADMISSIBLE",
+            "expectedDomainCode": "HISTORY.INADMISSIBLE_EVENT",
+            "name": "engine-dangling-reference",
+            "verdict": "agree-adapter-detected"
+          },
+          {
+            "actual": "CAUSA.HISTORY_INADMISSIBLE",
+            "expected": "CAUSA.HISTORY_INADMISSIBLE",
+            "expectedDomainCode": "HISTORY.INADMISSIBLE_EVENT",
+            "name": "engine-duplicate-entity-id",
+            "verdict": "agree-adapter-detected"
+          },
+          {
+            "actual": "structurally-valid-admissibility-not-evaluated",
+            "expected": "CAUSA.HISTORY_INADMISSIBLE",
+            "expectedDomainCode": "HISTORY.INADMISSIBLE_EVENT",
+            "name": "engine-evidence-already-superseded",
+            "verdict": "not-claimed-valid-admissibility-not-evaluated"
+          },
+          {
+            "actual": "structurally-valid-admissibility-not-evaluated",
+            "expected": "CAUSA.HISTORY_INADMISSIBLE",
+            "expectedDomainCode": "HISTORY.INADMISSIBLE_EVENT",
+            "name": "engine-evidence-supersedes-itself",
+            "verdict": "not-claimed-valid-admissibility-not-evaluated"
+          },
+          {
+            "actual": "structurally-valid-admissibility-not-evaluated",
+            "expected": "CAUSA.HISTORY_INADMISSIBLE",
+            "expectedDomainCode": "HISTORY.INADMISSIBLE_EVENT",
+            "name": "engine-finding-for-rejected-action",
+            "verdict": "not-claimed-valid-admissibility-not-evaluated"
+          },
+          {
+            "actual": "structurally-valid-admissibility-not-evaluated",
+            "expected": "CAUSA.HISTORY_INADMISSIBLE",
+            "expectedDomainCode": "HISTORY.INADMISSIBLE_EVENT",
+            "name": "engine-group-time-disagreement",
+            "verdict": "not-claimed-valid-admissibility-not-evaluated"
+          },
+          {
+            "actual": "structurally-valid-admissibility-not-evaluated",
+            "expected": "CAUSA.HISTORY_INADMISSIBLE",
+            "expectedDomainCode": "HISTORY.INADMISSIBLE_EVENT",
+            "name": "engine-malformed-artifact-url",
+            "verdict": "not-claimed-valid-admissibility-not-evaluated"
+          },
+          {
+            "actual": "structurally-valid-admissibility-not-evaluated",
+            "expected": "CAUSA.HISTORY_INADMISSIBLE",
+            "expectedDomainCode": "HISTORY.INADMISSIBLE_EVENT",
+            "name": "engine-prediction-timing-forged",
+            "verdict": "not-claimed-valid-admissibility-not-evaluated"
+          },
+          {
+            "actual": "structurally-valid-admissibility-not-evaluated",
+            "expected": "CAUSA.HISTORY_INADMISSIBLE",
+            "expectedDomainCode": "HISTORY.INADMISSIBLE_EVENT",
+            "name": "engine-proposal-not-active",
+            "verdict": "not-claimed-valid-admissibility-not-evaluated"
+          },
+          {
+            "actual": "structurally-valid-admissibility-not-evaluated",
+            "expected": "CAUSA.HISTORY_INADMISSIBLE",
+            "expectedDomainCode": "HISTORY.INADMISSIBLE_EVENT",
+            "name": "engine-reopen-without-new-evidence",
+            "verdict": "not-claimed-valid-admissibility-not-evaluated"
+          },
+          {
+            "actual": "structurally-valid-admissibility-not-evaluated",
+            "expected": "CAUSA.HISTORY_INADMISSIBLE",
+            "expectedDomainCode": "HISTORY.UNGATED_RESOLUTION",
+            "name": "engine-resolve-cause-no-longer-holds",
+            "verdict": "not-claimed-valid-admissibility-not-evaluated"
+          },
+          {
+            "actual": "structurally-valid-admissibility-not-evaluated",
+            "expected": "CAUSA.HISTORY_INADMISSIBLE",
+            "expectedDomainCode": "HISTORY.UNGATED_RESOLUTION",
+            "name": "engine-resolve-correction-not-verified",
+            "verdict": "not-claimed-valid-admissibility-not-evaluated"
+          },
+          {
+            "actual": "structurally-valid-admissibility-not-evaluated",
+            "expected": "CAUSA.HISTORY_INADMISSIBLE",
+            "expectedDomainCode": "HISTORY.UNGATED_RESOLUTION",
+            "name": "engine-resolve-criterion-unsatisfied",
+            "verdict": "not-claimed-valid-admissibility-not-evaluated"
+          },
+          {
+            "actual": "structurally-valid-admissibility-not-evaluated",
+            "expected": "CAUSA.HISTORY_INADMISSIBLE",
+            "expectedDomainCode": "HISTORY.UNGATED_RESOLUTION",
+            "name": "engine-resolve-no-conclusion",
+            "verdict": "not-claimed-valid-admissibility-not-evaluated"
+          },
+          {
+            "actual": "structurally-valid-admissibility-not-evaluated",
+            "expected": "CAUSA.HISTORY_INADMISSIBLE",
+            "expectedDomainCode": "HISTORY.UNGATED_RESOLUTION",
+            "name": "engine-resolve-no-correction",
+            "verdict": "not-claimed-valid-admissibility-not-evaluated"
+          },
+          {
+            "actual": "structurally-valid-admissibility-not-evaluated",
+            "expected": "CAUSA.HISTORY_INADMISSIBLE",
+            "expectedDomainCode": "HISTORY.UNGATED_RESOLUTION",
+            "name": "engine-resolve-residual-not-stated",
+            "verdict": "not-claimed-valid-admissibility-not-evaluated"
+          },
+          {
+            "actual": "structurally-valid-admissibility-not-evaluated",
+            "expected": "CAUSA.HISTORY_INADMISSIBLE",
+            "expectedDomainCode": "HISTORY.INADMISSIBLE_EVENT",
+            "name": "engine-verification-evidence-predates-round",
+            "verdict": "not-claimed-valid-admissibility-not-evaluated"
+          },
+          {
+            "actual": "structurally-valid-admissibility-not-evaluated",
+            "expected": "CAUSA.HISTORY_INADMISSIBLE",
+            "expectedDomainCode": "HISTORY.INADMISSIBLE_EVENT",
+            "name": "engine-verification-without-criteria",
+            "verdict": "not-claimed-valid-admissibility-not-evaluated"
+          },
+          {
+            "actual": "CAUSA.NON_CANONICAL",
+            "expected": "CAUSA.NON_CANONICAL",
+            "expectedDomainCode": null,
+            "name": "event-line-non-canonical",
+            "verdict": "agree"
+          },
+          {
+            "actual": "CAUSA.ENCODING",
+            "expected": "CAUSA.ENCODING",
+            "expectedDomainCode": null,
+            "name": "events-blank-line",
+            "verdict": "agree"
+          },
+          {
+            "actual": "CAUSA.ENCODING",
+            "expected": "CAUSA.ENCODING",
+            "expectedDomainCode": null,
+            "name": "events-crlf",
+            "verdict": "agree"
+          },
+          {
+            "actual": "CAUSA.ENCODING",
+            "expected": "CAUSA.ENCODING",
+            "expectedDomainCode": null,
+            "name": "events-empty",
+            "verdict": "agree"
+          },
+          {
+            "actual": "CAUSA.ENCODING",
+            "expected": "CAUSA.ENCODING",
+            "expectedDomainCode": null,
+            "name": "events-invalid-utf8",
+            "verdict": "agree"
+          },
+          {
+            "actual": "CAUSA.ENCODING",
+            "expected": "CAUSA.ENCODING",
+            "expectedDomainCode": null,
+            "name": "events-missing-final-lf",
+            "verdict": "agree"
+          },
+          {
+            "actual": "CAUSA.PATH_INVALID",
+            "expected": "CAUSA.PATH_INVALID",
+            "expectedDomainCode": null,
+            "name": "extra-file-in-directory",
+            "verdict": "agree"
+          },
+          {
+            "actual": "CAUSA.JSON_MALFORMED",
+            "expected": "CAUSA.JSON_MALFORMED",
+            "expectedDomainCode": null,
+            "name": "feff-inside-string",
+            "verdict": "agree"
+          },
+          {
+            "actual": "CAUSA.JSON_MALFORMED",
+            "expected": "CAUSA.JSON_MALFORMED",
+            "expectedDomainCode": null,
+            "name": "float-number",
+            "verdict": "agree"
+          },
+          {
+            "actual": "structurally-valid-admissibility-not-evaluated",
+            "expected": "CAUSA.HISTORY_INADMISSIBLE",
+            "expectedDomainCode": "HISTORY.UNGATED_CONFIRMATION",
+            "name": "forged-cause-confirmation",
+            "verdict": "not-claimed-valid-admissibility-not-evaluated"
+          },
+          {
+            "actual": "CAUSA.EVENT_ID_MISMATCH",
+            "expected": "CAUSA.EVENT_ID_MISMATCH",
+            "expectedDomainCode": null,
+            "name": "forged-event-id",
+            "verdict": "agree"
+          },
+          {
+            "actual": "structurally-valid-admissibility-not-evaluated",
+            "expected": "CAUSA.HISTORY_INADMISSIBLE",
+            "expectedDomainCode": "HISTORY.UNGATED_RESOLUTION",
+            "name": "forged-resolution",
+            "verdict": "not-claimed-valid-admissibility-not-evaluated"
+          },
+          {
+            "actual": "CAUSA.SNAPSHOT_MISMATCH",
+            "expected": "CAUSA.SNAPSHOT_MISMATCH",
+            "expectedDomainCode": null,
+            "name": "forged-snapshot",
+            "verdict": "agree-conditional-on-admissibility"
+          },
+          {
+            "actual": "CAUSA.SCHEMA_VIOLATION",
+            "expected": "CAUSA.SCHEMA_VIOLATION",
+            "expectedDomainCode": null,
+            "name": "identifier-trailing-newline",
+            "verdict": "agree"
+          },
+          {
+            "actual": "CAUSA.SCHEMA_VIOLATION",
+            "expected": "CAUSA.SCHEMA_VIOLATION",
+            "expectedDomainCode": null,
+            "name": "ideographic-space-text",
+            "verdict": "agree"
+          },
+          {
+            "actual": "structurally-valid-admissibility-not-evaluated",
+            "expected": "CAUSA.HISTORY_INADMISSIBLE",
+            "expectedDomainCode": "HISTORY.INADMISSIBLE_EVENT",
+            "name": "illegal-hypothesis-transition",
+            "verdict": "not-claimed-valid-admissibility-not-evaluated"
+          },
+          {
+            "actual": "CAUSA.JSON_MALFORMED",
+            "expected": "CAUSA.JSON_MALFORMED",
+            "expectedDomainCode": null,
+            "name": "integer-out-of-range",
+            "verdict": "agree"
+          },
+          {
+            "actual": "CAUSA.SCHEMA_VIOLATION",
+            "expected": "CAUSA.SCHEMA_VIOLATION",
+            "expectedDomainCode": null,
+            "name": "invalid-enum-value",
+            "verdict": "agree"
+          },
+          {
+            "actual": "CAUSA.SCHEMA_VIOLATION",
+            "expected": "CAUSA.SCHEMA_VIOLATION",
+            "expectedDomainCode": null,
+            "name": "invalid-field-type",
+            "verdict": "agree"
+          },
+          {
+            "actual": "CAUSA.JSON_MALFORMED",
+            "expected": "CAUSA.JSON_MALFORMED",
+            "expectedDomainCode": null,
+            "name": "lone-surrogate",
+            "verdict": "agree"
+          },
+          {
+            "actual": "CAUSA.MANIFEST_MISMATCH",
+            "expected": "CAUSA.MANIFEST_MISMATCH",
+            "expectedDomainCode": null,
+            "name": "manifest-created-at-mismatch",
+            "verdict": "agree"
+          },
+          {
+            "actual": "CAUSA.MANIFEST_MISMATCH",
+            "expected": "CAUSA.MANIFEST_MISMATCH",
+            "expectedDomainCode": null,
+            "name": "manifest-event-count-mismatch",
+            "verdict": "agree"
+          },
+          {
+            "actual": "CAUSA.NON_CANONICAL",
+            "expected": "CAUSA.NON_CANONICAL",
+            "expectedDomainCode": null,
+            "name": "manifest-interior-newline",
+            "verdict": "agree"
+          },
+          {
+            "actual": "CAUSA.MANIFEST_MISMATCH",
+            "expected": "CAUSA.MANIFEST_MISMATCH",
+            "expectedDomainCode": null,
+            "name": "manifest-updated-at-mismatch",
+            "verdict": "agree"
+          },
+          {
+            "actual": "CAUSA.MANIFEST_MISMATCH",
+            "expected": "CAUSA.MANIFEST_MISMATCH",
+            "expectedDomainCode": null,
+            "name": "manifest-version-mismatch",
+            "verdict": "agree"
+          },
+          {
+            "actual": "CAUSA.MANIFEST_MISMATCH",
+            "expected": "CAUSA.MANIFEST_MISMATCH",
+            "expectedDomainCode": null,
+            "name": "manifest-wrong-investigation-id",
+            "verdict": "agree"
+          },
+          {
+            "actual": "CAUSA.PATH_INVALID",
+            "expected": "CAUSA.PATH_INVALID",
+            "expectedDomainCode": null,
+            "name": "missing-snapshot-file",
+            "verdict": "agree"
+          },
+          {
+            "actual": "CAUSA.HISTORY_INADMISSIBLE",
+            "expected": "CAUSA.HISTORY_INADMISSIBLE",
+            "expectedDomainCode": "HISTORY.NO_START",
+            "name": "missing-start",
+            "verdict": "agree-adapter-detected"
+          },
+          {
+            "actual": "CAUSA.NON_CANONICAL",
+            "expected": "CAUSA.NON_CANONICAL",
+            "expectedDomainCode": null,
+            "name": "negative-zero",
+            "verdict": "agree"
+          },
+          {
+            "actual": "CAUSA.SCHEMA_VIOLATION",
+            "expected": "CAUSA.SCHEMA_VIOLATION",
+            "expectedDomainCode": null,
+            "name": "nesting-depth-128",
+            "verdict": "agree"
+          },
+          {
+            "actual": "CAUSA.JSON_MALFORMED",
+            "expected": "CAUSA.JSON_MALFORMED",
+            "expectedDomainCode": null,
+            "name": "nesting-depth-129",
+            "verdict": "agree"
+          },
+          {
+            "actual": "CAUSA.JSON_MALFORMED",
+            "expected": "CAUSA.JSON_MALFORMED",
+            "expectedDomainCode": null,
+            "name": "nesting-too-deep",
+            "verdict": "agree"
+          },
+          {
+            "actual": "CAUSA.SCHEMA_VIOLATION",
+            "expected": "CAUSA.SCHEMA_VIOLATION",
+            "expectedDomainCode": null,
+            "name": "nil-uuid",
+            "verdict": "agree"
+          },
+          {
+            "actual": "CAUSA.NON_CANONICAL",
+            "expected": "CAUSA.NON_CANONICAL",
+            "expectedDomainCode": null,
+            "name": "non-canonical-manifest",
+            "verdict": "agree"
+          },
+          {
+            "actual": "CAUSA.SCHEMA_VIOLATION",
+            "expected": "CAUSA.SCHEMA_VIOLATION",
+            "expectedDomainCode": null,
+            "name": "non-string-format-version",
+            "verdict": "agree"
+          },
+          {
+            "actual": "CAUSA.PATH_INVALID",
+            "expected": "CAUSA.PATH_INVALID",
+            "expectedDomainCode": null,
+            "name": "path-traversal-directory",
+            "verdict": "agree"
+          },
+          {
+            "actual": "CAUSA.HISTORY_REWRITTEN",
+            "expected": "CAUSA.HISTORY_REWRITTEN",
+            "expectedDomainCode": null,
+            "name": "rewritten-history",
+            "verdict": "agree"
+          },
+          {
+            "actual": "CAUSA.SEQUENCE_INVALID",
+            "expected": "CAUSA.SEQUENCE_INVALID",
+            "expectedDomainCode": null,
+            "name": "sequence-gap",
+            "verdict": "agree"
+          },
+          {
+            "actual": "CAUSA.ENCODING",
+            "expected": "CAUSA.ENCODING",
+            "expectedDomainCode": null,
+            "name": "snapshot-missing-final-lf",
+            "verdict": "agree"
+          },
+          {
+            "actual": "CAUSA.NON_CANONICAL",
+            "expected": "CAUSA.NON_CANONICAL",
+            "expectedDomainCode": null,
+            "name": "snapshot-non-canonical",
+            "verdict": "agree"
+          },
+          {
+            "actual": "writer-side check (CAUSA.VERSION_STALE); this adapter is read-only",
+            "expected": "CAUSA.VERSION_STALE",
+            "expectedDomainCode": null,
+            "name": "stale-expected-version",
+            "verdict": "not-applicable"
+          },
+          {
+            "actual": "CAUSA.SCHEMA_VIOLATION",
+            "expected": "CAUSA.SCHEMA_VIOLATION",
+            "expectedDomainCode": null,
+            "name": "timestamp-without-milliseconds",
+            "verdict": "agree"
+          },
+          {
+            "actual": "CAUSA.JSON_MALFORMED",
+            "expected": "CAUSA.JSON_MALFORMED",
+            "expectedDomainCode": null,
+            "name": "truncated-event-line",
+            "verdict": "agree"
+          },
+          {
+            "actual": "CAUSA.SCHEMA_VIOLATION",
+            "expected": "CAUSA.SCHEMA_VIOLATION",
+            "expectedDomainCode": null,
+            "name": "unexpected-payload-field",
+            "verdict": "agree"
+          },
+          {
+            "actual": "CAUSA.UNKNOWN_EVENT_TYPE",
+            "expected": "CAUSA.UNKNOWN_EVENT_TYPE",
+            "expectedDomainCode": null,
+            "name": "unknown-event-type",
+            "verdict": "agree"
+          },
+          {
+            "actual": "CAUSA.UNSUPPORTED_VERSION",
+            "expected": "CAUSA.UNSUPPORTED_VERSION",
+            "expectedDomainCode": null,
+            "name": "unsupported-format-version",
+            "verdict": "agree"
+          },
+          {
+            "actual": "CAUSA.SCHEMA_VIOLATION",
+            "expected": "CAUSA.SCHEMA_VIOLATION",
+            "expectedDomainCode": null,
+            "name": "uppercase-uuid",
+            "verdict": "agree"
+          },
+          {
+            "actual": "CAUSA.INVESTIGATION_MISMATCH",
+            "expected": "CAUSA.INVESTIGATION_MISMATCH",
+            "expectedDomainCode": null,
+            "name": "wrong-investigation-id",
+            "verdict": "agree"
+          }
+        ],
+        "stage15AdapterDetected": 3,
+        "stage15NotClaimedValid": 31
+      },
+      "failures": [],
+      "id": "C07",
+      "missionCheck": "7",
+      "passed": true,
+      "title": "Malformed records are rejected: the 90 causa-data negative fixtures agree on the primary code, or are never reported valid"
+    },
+    {
+      "evidence": {
+        "mutatedLine": 31,
+        "result": "CAUSA.UNKNOWN_EVENT_TYPE at events.ndjson:31: eventType 'EvidenceVerificationAssessedV2' is not registered (line kept, history refused)"
+      },
+      "failures": [],
+      "id": "C08",
+      "missionCheck": "8",
+      "passed": true,
+      "title": "Unknown event types are never silently ignored: kept whole, typed as Unregistered, history refused"
+    },
+    {
+      "evidence": {
+        "fingerprints": [
+          {
+            "caseKey": "apollo-1",
+            "decodedSha256": "fe897f9278eb651da45cf877f1a8d94cb18cb12502c32e3a092e9e2347b4b95f",
+            "stateSha256": "67af9c9f05db07d67279f84bb185600f12604b5af67a3954c337581dfdd6552f"
+          },
+          {
+            "caseKey": "apollo-11",
+            "decodedSha256": "5503ed5a4beb8cbd7f90abcacdf8622d71ef7598f0aa867e744fe70f0b992960",
+            "stateSha256": "b82ac9ce37f218fbb53709945bd83283b06bc85e8cb4e4121bd1eaf1dc914f92"
+          },
+          {
+            "caseKey": "challenger-sts-51l",
+            "decodedSha256": "5e071ade4d86e9a42b50a801095bcb2b340a4d005530d0da0ef7ccb9b22a9263",
+            "stateSha256": "296bdf273968cf15a8526126a242852738cc5fa811bc853f6467fb3e3c67a7e8"
+          }
+        ]
+      },
+      "failures": [],
+      "id": "C09",
+      "missionCheck": "9",
+      "passed": true,
+      "title": "Repeated decoding and replay are deterministic (two independent reads from disk)"
+    },
+    {
+      "evidence": {
+        "cases": [
+          {
+            "actors": {
+              "historical-catalog-builder": 174,
+              "historical-source-importer": 258
+            },
+            "admittedEvidence": 129,
+            "caseKey": "apollo-1",
+            "provenanceEntries": 129
+          },
+          {
+            "actors": {
+              "historical-catalog-builder": 193,
+              "historical-source-importer": 238
+            },
+            "admittedEvidence": 119,
+            "caseKey": "apollo-11",
+            "provenanceEntries": 119
+          },
+          {
+            "actors": {
+              "historical-catalog-builder": 196,
+              "historical-source-importer": 256
+            },
+            "admittedEvidence": 128,
+            "caseKey": "challenger-sts-51l",
+            "provenanceEntries": 128
+          }
+        ]
+      },
+      "failures": [],
+      "id": "C10",
+      "missionCheck": "10",
+      "passed": true,
+      "title": "Historical provenance is preserved: every provenance record's evidence is admitted with its claim, source and URL in the stored source text; actors and occurredAt are kept per event"
+    },
+    {
+      "evidence": {},
+      "failures": [],
+      "id": "C11",
+      "missionCheck": "11",
+      "passed": true,
+      "title": "No event or field disappears: re-encoding every typed event reproduces events.ndjson byte for byte, directly and through the proposed v4.1.5 union"
+    },
+    {
+      "evidence": {
+        "cases": [
+          {
+            "caseKey": "apollo-1",
+            "expectedStateSha256": "67af9c9f05db07d67279f84bb185600f12604b5af67a3954c337581dfdd6552f",
+            "independentGolden": null,
+            "lifecycle": "awaitingVerification",
+            "stateSha256": "67af9c9f05db07d67279f84bb185600f12604b5af67a3954c337581dfdd6552f",
+            "version": 432
+          },
+          {
+            "caseKey": "apollo-11",
+            "expectedStateSha256": "b82ac9ce37f218fbb53709945bd83283b06bc85e8cb4e4121bd1eaf1dc914f92",
+            "independentGolden": null,
+            "lifecycle": "awaitingEvidence",
+            "stateSha256": "b82ac9ce37f218fbb53709945bd83283b06bc85e8cb4e4121bd1eaf1dc914f92",
+            "version": 431
+          },
+          {
+            "caseKey": "challenger-sts-51l",
+            "expectedStateSha256": "296bdf273968cf15a8526126a242852738cc5fa811bc853f6467fb3e3c67a7e8",
+            "independentGolden": null,
+            "lifecycle": "active",
+            "stateSha256": "296bdf273968cf15a8526126a242852738cc5fa811bc853f6467fb3e3c67a7e8",
+            "version": 452
+          },
+          {
+            "caseKey": "payment-failure",
+            "expectedStateSha256": "9ce1ec0eb49c83395f3a4f1d07e93075df7ed0814fd902b94dd3054105946f3b",
+            "independentGolden": "payment-failure.state.json",
+            "lifecycle": "active",
+            "stateSha256": "9ce1ec0eb49c83395f3a4f1d07e93075df7ed0814fd902b94dd3054105946f3b",
+            "version": 26
+          },
+          {
+            "caseKey": "authentication-outage",
+            "expectedStateSha256": "cd3ea94c8be64f38a8f60d99c6df7b9092488c605401701d22988147f1360c95",
+            "independentGolden": "authentication-outage.state.json",
+            "lifecycle": "resolved",
+            "stateSha256": "cd3ea94c8be64f38a8f60d99c6df7b9092488c605401701d22988147f1360c95",
+            "version": 59
+          },
+          {
+            "caseKey": "conflicting-metrics",
+            "expectedStateSha256": "f189ac3bf47f37894e0a1bcfe3e17756f2f5badbed7b6a38d68f25029bd481c5",
+            "independentGolden": "conflicting-metrics.state.json",
+            "lifecycle": "active",
+            "stateSha256": "f189ac3bf47f37894e0a1bcfe3e17756f2f5badbed7b6a38d68f25029bd481c5",
+            "version": 28
+          },
+          {
+            "caseKey": "intermittent-outage",
+            "expectedStateSha256": "289c26e5525c1b3d48b22b64cc4cf46198ed46130eb29d7fd6d2c3d03e3d7e10",
+            "independentGolden": "intermittent-outage.state.json",
+            "lifecycle": "awaitingEvidence",
+            "stateSha256": "289c26e5525c1b3d48b22b64cc4cf46198ed46130eb29d7fd6d2c3d03e3d7e10",
+            "version": 37
+          },
+          {
+            "caseKey": "api-latency",
+            "expectedStateSha256": "2ba34140daabd6286229af8b55bb09a72de7f321c2a978926f433871504273e1",
+            "independentGolden": "api-latency.state.json",
+            "lifecycle": "awaitingVerification",
+            "stateSha256": "2ba34140daabd6286229af8b55bb09a72de7f321c2a978926f433871504273e1",
+            "version": 34
+          }
+        ]
+      },
+      "failures": [],
+      "id": "C12",
+      "missionCheck": "12",
+      "passed": true,
+      "title": "Replay is verified independently of parsing: the §8.3 fold reproduces snapshot.json byte for byte and matches the catalog / root-manifest state digests and the golden states"
+    },
+    {
+      "evidence": {
+        "locations": [
+          "workspaces/demo/historical-v1/investigations",
+          "workspaces/demo/demonstration-v1/investigations",
+          "templates/historical-v1/investigations",
+          "templates/demonstration-v1/investigations"
+        ]
+      },
+      "failures": [],
+      "id": "C13",
+      "missionCheck": "3",
+      "passed": true,
+      "title": "The three historical cases are byte-identical in historical-v1, demonstration-v1 and both templates"
+    },
+    {
+      "evidence": {
+        "cases": [
+          {
+            "actual": "CAUSA.EVENTS_HASH_MISMATCH at manifest.json: eventsSha256 does not match events.ndjson",
+            "expected": "CAUSA.EVENTS_HASH_MISMATCH",
+            "mutation": "edit one event without rehash"
+          },
+          {
+            "actual": "CAUSA.SNAPSHOT_MISMATCH at snapshot.json: snapshot.json is not the projection of the replayed history (conditional on admissibility)",
+            "expected": "CAUSA.SNAPSHOT_MISMATCH",
+            "mutation": "edit one event and rehash the manifest"
+          },
+          {
+            "actual": "CAUSA.SEQUENCE_INVALID at events.ndjson:11: line 11 carries aggregateVersion 12",
+            "expected": "CAUSA.SEQUENCE_INVALID",
+            "mutation": "swap two adjacent events and rehash"
+          },
+          {
+            "actual": "CAUSA.SNAPSHOT_MISMATCH at snapshot.json: snapshot.json is not the projection of the replayed history (conditional on admissibility)",
+            "expected": "CAUSA.SNAPSHOT_MISMATCH",
+            "mutation": "drop the last event and rehash"
+          }
+        ]
+      },
+      "failures": [],
+      "id": "C17",
+      "missionCheck": "11 (adversarial)",
+      "passed": true,
+      "title": "Tampering with real Apollo 1 bytes is detected at the right stage, even when hashes are recomputed"
+    },
+    {
+      "evidence": {
+        "envelopeFieldsDroppedForEveryEvent": [
+          "occurredAt",
+          "actor",
+          "correlationId",
+          "formatVersion",
+          "semanticVersion"
+        ],
+        "events": 1315,
+        "frozenCaseFieldsDropped": 63,
+        "frozenCaseNoFieldDropped": 765,
+        "noFrozenCase": 487
+      },
+      "failures": [],
+      "id": "C14",
+      "missionCheck": "-",
+      "passed": true,
+      "title": "Measured: how many historical events the frozen v4.1.4 CoreEvent union can represent"
+    },
+    {
+      "evidence": {
+        "frozenCases": 28,
+        "widened": [
+          "InvestigationActivated",
+          "InvestigationResolved",
+          "InvestigationReopened",
+          "HypothesisMarkedPlausible",
+          "HypothesisMarkedSupported",
+          "HypothesisFalsified",
+          "HypothesisReopened",
+          "CauseConfirmed",
+          "ProposalRejected"
+        ]
+      },
+      "failures": [],
+      "id": "C15",
+      "missionCheck": "-",
+      "passed": true,
+      "title": "The proposed successor keeps every frozen case name and the compatibility table agrees with it for every event"
+    },
+    {
+      "evidence": {
+        "cases": [
+          {
+            "caseKey": "apollo-1",
+            "levelA": {
+              "status": "achieved"
+            },
+            "levelB": {
+              "status": "achieved"
+            },
+            "levelC": {
+              "reasons": [
+                "admissibility not evaluated: causa-storage v1.0.0 §11.3 names the pinned engine's History.validate (kemiller2002/indy-init-rehearsal-001@55f49f61, private) as the admissibility oracle; no requirements-derived equivalent exists yet",
+                "the approved domain representation (frozen v4.1.4 CoreEvent) cannot represent the history; the successor is only proposed"
+              ],
+              "status": "not-achieved"
+            },
+            "levelCProjection": {
+              "status": "achieved"
+            }
+          },
+          {
+            "caseKey": "apollo-11",
+            "levelA": {
+              "status": "achieved"
+            },
+            "levelB": {
+              "status": "achieved"
+            },
+            "levelC": {
+              "reasons": [
+                "admissibility not evaluated: causa-storage v1.0.0 §11.3 names the pinned engine's History.validate (kemiller2002/indy-init-rehearsal-001@55f49f61, private) as the admissibility oracle; no requirements-derived equivalent exists yet",
+                "the approved domain representation (frozen v4.1.4 CoreEvent) cannot represent the history; the successor is only proposed"
+              ],
+              "status": "not-achieved"
+            },
+            "levelCProjection": {
+              "status": "achieved"
+            }
+          },
+          {
+            "caseKey": "challenger-sts-51l",
+            "levelA": {
+              "status": "achieved"
+            },
+            "levelB": {
+              "status": "achieved"
+            },
+            "levelC": {
+              "reasons": [
+                "admissibility not evaluated: causa-storage v1.0.0 §11.3 names the pinned engine's History.validate (kemiller2002/indy-init-rehearsal-001@55f49f61, private) as the admissibility oracle; no requirements-derived equivalent exists yet",
+                "the approved domain representation (frozen v4.1.4 CoreEvent) cannot represent the history; the successor is only proposed"
+              ],
+              "status": "not-achieved"
+            },
+            "levelCProjection": {
+              "status": "achieved"
+            }
+          }
+        ]
+      },
+      "failures": [],
+      "id": "LV",
+      "missionCheck": "8",
+      "passed": true,
+      "title": "Acceptance levels A, B, C reported separately; C is never claimed without admissibility"
+    }
+  ],
+  "generatedBy": "dotnet run --project proposals/r10-historical-data-compatibility/tests -- --causa-data <checkout> --write",
+  "passed": true,
+  "schema": "r10-historical-data-compatibility/historical-coverage/1",
+  "source": "kemiller2002/causa-data@e8259df74add723765c57a5b1a5888d9c3f707af"
+}

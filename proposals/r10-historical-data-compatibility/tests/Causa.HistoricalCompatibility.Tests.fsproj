@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- An executable test runner, like tools/requirements-compiler/tests: no test-framework packages to restore. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>historical-compatibility-tests</AssemblyName>
+    <Nullable>disable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Source.fs" />
+    <Compile Include="Checks.fs" />
+    <Compile Include="Matrix.fs" />
+    <Compile Include="Program.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="../src/Causa.HistoricalCompatibility.fsproj" />
+  </ItemGroup>
+</Project>
