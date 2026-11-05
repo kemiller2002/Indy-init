@@ -251,26 +251,7 @@ jobs:
             esac
           done
       - name: v4.1.5 carries v4.1.4's owner-approved state-machine amendments unchanged, and its own two entries equal the digests ODR-V415-01 pins
-        run: |
-          python3 - <<'PY'
-          import hashlib, json, sys
-          def load(p): return json.load(open(p, encoding="utf-8"))
-          old = load("requirements-compiled/v4.1.4/analysis/state-machine-amendments.json")
-          new = load("requirements-compiled/v4.1.5/analysis/state-machine-amendments.json")
-          mine_t = lambda t: t.get("machine") == "SM-LOAD" and t.get("id") == "T-L03"
-          mine_a = lambda a: a.get("decision") == "ODR-V415-01"
-          problems = []
-          if [t for t in new["transitions"] if not mine_t(t)] != old["transitions"]: problems.append("a carried transition differs from v4.1.4")
-          if [a for a in new["accepted"] if not mine_a(a)] != old["accepted"]: problems.append("a carried accepted entry differs from v4.1.4")
-          if {k: v for k, v in new.items() if k not in ("transitions", "accepted")} != {k: v for k, v in old.items() if k not in ("transitions", "accepted")}: problems.append("another field differs from v4.1.4")
-          canon = lambda e: hashlib.sha256(json.dumps({k: v for k, v in e.items() if k != "approval"}, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode()).hexdigest()
-          req = next(r for r in load("requirements-compiled/v4.1.5/proposals/owner-decision-requests.json")["requests"] if r["id"] == "ODR-V415-01")["applies"]["A"]
-          t = [x for x in new["transitions"] if mine_t(x)]; a = [x for x in new["accepted"] if mine_a(x)]
-          if len(t) != 1 or canon(t[0]) != req["transitions"][0]["sha256"]: problems.append("T-L03 differs from the content ODR-V415-01 pins")
-          if len(a) != 1 or canon(a[0]) != req["accepted"][0]["sha256"]: problems.append("the SM-SAVE accepted note differs from the content ODR-V415-01 pins")
-          print("\n".join(problems) or "carried amendments unchanged; T-L03 and the SM-SAVE note match their pinned digests")
-          sys.exit(1 if problems else 0)
-          PY
+        run: dotnet fsi tools/v415-carried-amendments.fsx .
       - name: The v4.1.5 interface contracts typecheck, and each negative control (forged Confirmation, credential read) is refused (built outside the checkout)
         run: |
           cp -r requirements-compiled/v4.1.5/contracts "$RUNNER_TEMP/contracts415"
