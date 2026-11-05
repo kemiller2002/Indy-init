@@ -101,7 +101,7 @@
       "mergeConditions": [
         "every mandatory applicable obligation of the slice passes in the governed gate at the merged result",
         "every dependency slice is integrated",
-        "every governed journey bound to the slice's requirements passes in Chromium and WebKit",
+        "every governed journey assertion bound to the slice passes in Chromium and WebKit, except one whose needed slices are not all integrated yet (docs/rehearsal-010-readiness/assertion-merge-needs.json, ODR-R10-33 A): the completion gate judges that one at release",
         "every previously integrated obligation still passes (regression)",
         "the application builds and starts at the merged result",
         "required real-provider checks pass against api.github.com",
@@ -176,7 +176,7 @@
       "mergeConditions": [
         "every mandatory applicable obligation of the slice passes in the governed gate at the merged result",
         "every dependency slice is integrated",
-        "every governed journey bound to the slice's requirements passes in Chromium and WebKit",
+        "every governed journey assertion bound to the slice passes in Chromium and WebKit, except one whose needed slices are not all integrated yet (docs/rehearsal-010-readiness/assertion-merge-needs.json, ODR-R10-33 A): the completion gate judges that one at release",
         "every previously integrated obligation still passes (regression)",
         "the application builds and starts at the merged result",
         "required real-provider checks pass against api.github.com",
@@ -257,7 +257,7 @@
       "mergeConditions": [
         "every mandatory applicable obligation of the slice passes in the governed gate at the merged result",
         "every dependency slice is integrated",
-        "every governed journey bound to the slice's requirements passes in Chromium and WebKit",
+        "every governed journey assertion bound to the slice passes in Chromium and WebKit, except one whose needed slices are not all integrated yet (docs/rehearsal-010-readiness/assertion-merge-needs.json, ODR-R10-33 A): the completion gate judges that one at release",
         "every previously integrated obligation still passes (regression)",
         "the application builds and starts at the merged result",
         "required real-provider checks pass against api.github.com",
@@ -343,7 +343,7 @@
       "mergeConditions": [
         "every mandatory applicable obligation of the slice passes in the governed gate at the merged result",
         "every dependency slice is integrated",
-        "every governed journey bound to the slice's requirements passes in Chromium and WebKit",
+        "every governed journey assertion bound to the slice passes in Chromium and WebKit, except one whose needed slices are not all integrated yet (docs/rehearsal-010-readiness/assertion-merge-needs.json, ODR-R10-33 A): the completion gate judges that one at release",
         "every previously integrated obligation still passes (regression)",
         "the application builds and starts at the merged result",
         "required real-provider checks pass against api.github.com",
@@ -384,7 +384,7 @@
       "mergeConditions": [
         "every mandatory applicable obligation of the slice passes in the governed gate at the merged result",
         "every dependency slice is integrated",
-        "every governed journey bound to the slice's requirements passes in Chromium and WebKit",
+        "every governed journey assertion bound to the slice passes in Chromium and WebKit, except one whose needed slices are not all integrated yet (docs/rehearsal-010-readiness/assertion-merge-needs.json, ODR-R10-33 A): the completion gate judges that one at release",
         "every previously integrated obligation still passes (regression)",
         "the application builds and starts at the merged result",
         "required real-provider checks pass against api.github.com",
@@ -430,7 +430,7 @@
       "mergeConditions": [
         "every mandatory applicable obligation of the slice passes in the governed gate at the merged result",
         "every dependency slice is integrated",
-        "every governed journey bound to the slice's requirements passes in Chromium and WebKit",
+        "every governed journey assertion bound to the slice passes in Chromium and WebKit, except one whose needed slices are not all integrated yet (docs/rehearsal-010-readiness/assertion-merge-needs.json, ODR-R10-33 A): the completion gate judges that one at release",
         "every previously integrated obligation still passes (regression)",
         "the application builds and starts at the merged result",
         "required real-provider checks pass against api.github.com",
@@ -595,7 +595,7 @@
       "mergeConditions": [
         "every mandatory applicable obligation of the slice passes in the governed gate at the merged result",
         "every dependency slice is integrated",
-        "every governed journey bound to the slice's requirements passes in Chromium and WebKit",
+        "every governed journey assertion bound to the slice passes in Chromium and WebKit, except one whose needed slices are not all integrated yet (docs/rehearsal-010-readiness/assertion-merge-needs.json, ODR-R10-33 A): the completion gate judges that one at release",
         "every previously integrated obligation still passes (regression)",
         "the application builds and starts at the merged result",
         "required real-provider checks pass against api.github.com",
@@ -634,7 +634,7 @@
       "mergeConditions": [
         "every mandatory applicable obligation of the slice passes in the governed gate at the merged result",
         "every dependency slice is integrated",
-        "every governed journey bound to the slice's requirements passes in Chromium and WebKit",
+        "every governed journey assertion bound to the slice passes in Chromium and WebKit, except one whose needed slices are not all integrated yet (docs/rehearsal-010-readiness/assertion-merge-needs.json, ODR-R10-33 A): the completion gate judges that one at release",
         "every previously integrated obligation still passes (regression)",
         "the application builds and starts at the merged result",
         "required real-provider checks pass against api.github.com",
@@ -711,7 +711,7 @@
       "mergeConditions": [
         "every mandatory applicable obligation of the slice passes in the governed gate at the merged result",
         "every dependency slice is integrated",
-        "every governed journey bound to the slice's requirements passes in Chromium and WebKit",
+        "every governed journey assertion bound to the slice passes in Chromium and WebKit, except one whose needed slices are not all integrated yet (docs/rehearsal-010-readiness/assertion-merge-needs.json, ODR-R10-33 A): the completion gate judges that one at release",
         "every previously integrated obligation still passes (regression)",
         "the application builds and starts at the merged result",
         "required real-provider checks pass against api.github.com",
@@ -1047,7 +1047,7 @@
       "mergeConditions": [
         "every mandatory applicable obligation of the slice passes in the governed gate at the merged result",
         "every dependency slice is integrated",
-        "every governed journey bound to the slice's requirements passes in Chromium and WebKit",
+        "every governed journey assertion bound to the slice passes in Chromium and WebKit, except one whose needed slices are not all integrated yet (docs/rehearsal-010-readiness/assertion-merge-needs.json, ODR-R10-33 A): the completion gate judges that one at release",
         "every previously integrated obligation still passes (regression)",
         "the application builds and starts at the merged result",
         "required real-provider checks pass against api.github.com",
@@ -1097,7 +1097,7 @@
       "mergeConditions": [
         "every mandatory applicable obligation of the slice passes in the governed gate at the merged result",
         "every dependency slice is integrated",
-        "every governed journey bound to the slice's requirements passes in Chromium and WebKit",
+        "every governed journey assertion bound to the slice passes in Chromium and WebKit, except one whose needed slices are not all integrated yet (docs/rehearsal-010-readiness/assertion-merge-needs.json, ODR-R10-33 A): the completion gate judges that one at release",
         "every previously integrated obligation still passes (regression)",
         "the application builds and starts at the merged result",
         "required real-provider checks pass against api.github.com",
@@ -1247,7 +1247,7 @@
       "mergeConditions": [
         "every mandatory applicable obligation of the slice passes in the governed gate at the merged result",
         "every dependency slice is integrated",
-        "every governed journey bound to the slice's requirements passes in Chromium and WebKit",
+        "every governed journey assertion bound to the slice passes in Chromium and WebKit, except one whose needed slices are not all integrated yet (docs/rehearsal-010-readiness/assertion-merge-needs.json, ODR-R10-33 A): the completion gate judges that one at release",
         "every previously integrated obligation still passes (regression)",
         "the application builds and starts at the merged result",
         "required real-provider checks pass against api.github.com",
@@ -1400,7 +1400,7 @@
       "mergeConditions": [
         "every mandatory applicable obligation of the slice passes in the governed gate at the merged result",
         "every dependency slice is integrated",
-        "every governed journey bound to the slice's requirements passes in Chromium and WebKit",
+        "every governed journey assertion bound to the slice passes in Chromium and WebKit, except one whose needed slices are not all integrated yet (docs/rehearsal-010-readiness/assertion-merge-needs.json, ODR-R10-33 A): the completion gate judges that one at release",
         "every previously integrated obligation still passes (regression)",
         "the application builds and starts at the merged result",
         "required real-provider checks pass against api.github.com",
@@ -1438,7 +1438,7 @@
       "mergeConditions": [
         "every mandatory applicable obligation of the slice passes in the governed gate at the merged result",
         "every dependency slice is integrated",
-        "every governed journey bound to the slice's requirements passes in Chromium and WebKit",
+        "every governed journey assertion bound to the slice passes in Chromium and WebKit, except one whose needed slices are not all integrated yet (docs/rehearsal-010-readiness/assertion-merge-needs.json, ODR-R10-33 A): the completion gate judges that one at release",
         "every previously integrated obligation still passes (regression)",
         "the application builds and starts at the merged result",
         "required real-provider checks pass against api.github.com",
@@ -1496,7 +1496,7 @@
       "mergeConditions": [
         "every mandatory applicable obligation of the slice passes in the governed gate at the merged result",
         "every dependency slice is integrated",
-        "every governed journey bound to the slice's requirements passes in Chromium and WebKit",
+        "every governed journey assertion bound to the slice passes in Chromium and WebKit, except one whose needed slices are not all integrated yet (docs/rehearsal-010-readiness/assertion-merge-needs.json, ODR-R10-33 A): the completion gate judges that one at release",
         "every previously integrated obligation still passes (regression)",
         "the application builds and starts at the merged result",
         "required real-provider checks pass against api.github.com",
@@ -1543,7 +1543,7 @@
       "mergeConditions": [
         "every mandatory applicable obligation of the slice passes in the governed gate at the merged result",
         "every dependency slice is integrated",
-        "every governed journey bound to the slice's requirements passes in Chromium and WebKit",
+        "every governed journey assertion bound to the slice passes in Chromium and WebKit, except one whose needed slices are not all integrated yet (docs/rehearsal-010-readiness/assertion-merge-needs.json, ODR-R10-33 A): the completion gate judges that one at release",
         "every previously integrated obligation still passes (regression)",
         "the application builds and starts at the merged result",
         "required real-provider checks pass against api.github.com",
@@ -1582,7 +1582,7 @@
       "mergeConditions": [
         "every mandatory applicable obligation of the slice passes in the governed gate at the merged result",
         "every dependency slice is integrated",
-        "every governed journey bound to the slice's requirements passes in Chromium and WebKit",
+        "every governed journey assertion bound to the slice passes in Chromium and WebKit, except one whose needed slices are not all integrated yet (docs/rehearsal-010-readiness/assertion-merge-needs.json, ODR-R10-33 A): the completion gate judges that one at release",
         "every previously integrated obligation still passes (regression)",
         "the application builds and starts at the merged result",
         "required real-provider checks pass against api.github.com",
@@ -1620,7 +1620,7 @@
       "mergeConditions": [
         "every mandatory applicable obligation of the slice passes in the governed gate at the merged result",
         "every dependency slice is integrated",
-        "every governed journey bound to the slice's requirements passes in Chromium and WebKit",
+        "every governed journey assertion bound to the slice passes in Chromium and WebKit, except one whose needed slices are not all integrated yet (docs/rehearsal-010-readiness/assertion-merge-needs.json, ODR-R10-33 A): the completion gate judges that one at release",
         "every previously integrated obligation still passes (regression)",
         "the application builds and starts at the merged result",
         "required real-provider checks pass against api.github.com",
@@ -1658,7 +1658,7 @@
       "mergeConditions": [
         "every mandatory applicable obligation of the slice passes in the governed gate at the merged result",
         "every dependency slice is integrated",
-        "every governed journey bound to the slice's requirements passes in Chromium and WebKit",
+        "every governed journey assertion bound to the slice passes in Chromium and WebKit, except one whose needed slices are not all integrated yet (docs/rehearsal-010-readiness/assertion-merge-needs.json, ODR-R10-33 A): the completion gate judges that one at release",
         "every previously integrated obligation still passes (regression)",
         "the application builds and starts at the merged result",
         "required real-provider checks pass against api.github.com",
@@ -1730,7 +1730,7 @@
       "mergeConditions": [
         "every mandatory applicable obligation of the slice passes in the governed gate at the merged result",
         "every dependency slice is integrated",
-        "every governed journey bound to the slice's requirements passes in Chromium and WebKit",
+        "every governed journey assertion bound to the slice passes in Chromium and WebKit, except one whose needed slices are not all integrated yet (docs/rehearsal-010-readiness/assertion-merge-needs.json, ODR-R10-33 A): the completion gate judges that one at release",
         "every previously integrated obligation still passes (regression)",
         "the application builds and starts at the merged result",
         "required real-provider checks pass against api.github.com",
@@ -1778,7 +1778,7 @@
       "mergeConditions": [
         "every mandatory applicable obligation of the slice passes in the governed gate at the merged result",
         "every dependency slice is integrated",
-        "every governed journey bound to the slice's requirements passes in Chromium and WebKit",
+        "every governed journey assertion bound to the slice passes in Chromium and WebKit, except one whose needed slices are not all integrated yet (docs/rehearsal-010-readiness/assertion-merge-needs.json, ODR-R10-33 A): the completion gate judges that one at release",
         "every previously integrated obligation still passes (regression)",
         "the application builds and starts at the merged result",
         "required real-provider checks pass against api.github.com",
@@ -1961,7 +1961,7 @@
       "mergeConditions": [
         "every mandatory applicable obligation of the slice passes in the governed gate at the merged result",
         "every dependency slice is integrated",
-        "every governed journey bound to the slice's requirements passes in Chromium and WebKit",
+        "every governed journey assertion bound to the slice passes in Chromium and WebKit, except one whose needed slices are not all integrated yet (docs/rehearsal-010-readiness/assertion-merge-needs.json, ODR-R10-33 A): the completion gate judges that one at release",
         "every previously integrated obligation still passes (regression)",
         "the application builds and starts at the merged result",
         "required real-provider checks pass against api.github.com",
@@ -2004,7 +2004,7 @@
       "mergeConditions": [
         "every mandatory applicable obligation of the slice passes in the governed gate at the merged result",
         "every dependency slice is integrated",
-        "every governed journey bound to the slice's requirements passes in Chromium and WebKit",
+        "every governed journey assertion bound to the slice passes in Chromium and WebKit, except one whose needed slices are not all integrated yet (docs/rehearsal-010-readiness/assertion-merge-needs.json, ODR-R10-33 A): the completion gate judges that one at release",
         "every previously integrated obligation still passes (regression)",
         "the application builds and starts at the merged result",
         "required real-provider checks pass against api.github.com",
@@ -2048,7 +2048,7 @@
       "mergeConditions": [
         "every mandatory applicable obligation of the slice passes in the governed gate at the merged result",
         "every dependency slice is integrated",
-        "every governed journey bound to the slice's requirements passes in Chromium and WebKit",
+        "every governed journey assertion bound to the slice passes in Chromium and WebKit, except one whose needed slices are not all integrated yet (docs/rehearsal-010-readiness/assertion-merge-needs.json, ODR-R10-33 A): the completion gate judges that one at release",
         "every previously integrated obligation still passes (regression)",
         "the application builds and starts at the merged result",
         "required real-provider checks pass against api.github.com",
@@ -2132,7 +2132,7 @@
       "mergeConditions": [
         "every mandatory applicable obligation of the slice passes in the governed gate at the merged result",
         "every dependency slice is integrated",
-        "every governed journey bound to the slice's requirements passes in Chromium and WebKit",
+        "every governed journey assertion bound to the slice passes in Chromium and WebKit, except one whose needed slices are not all integrated yet (docs/rehearsal-010-readiness/assertion-merge-needs.json, ODR-R10-33 A): the completion gate judges that one at release",
         "every previously integrated obligation still passes (regression)",
         "the application builds and starts at the merged result",
         "required real-provider checks pass against api.github.com",
@@ -2169,7 +2169,7 @@
       "mergeConditions": [
         "every mandatory applicable obligation of the slice passes in the governed gate at the merged result",
         "every dependency slice is integrated",
-        "every governed journey bound to the slice's requirements passes in Chromium and WebKit",
+        "every governed journey assertion bound to the slice passes in Chromium and WebKit, except one whose needed slices are not all integrated yet (docs/rehearsal-010-readiness/assertion-merge-needs.json, ODR-R10-33 A): the completion gate judges that one at release",
         "every previously integrated obligation still passes (regression)",
         "the application builds and starts at the merged result",
         "required real-provider checks pass against api.github.com",
@@ -2215,7 +2215,7 @@
       "mergeConditions": [
         "every mandatory applicable obligation of the slice passes in the governed gate at the merged result",
         "every dependency slice is integrated",
-        "every governed journey bound to the slice's requirements passes in Chromium and WebKit",
+        "every governed journey assertion bound to the slice passes in Chromium and WebKit, except one whose needed slices are not all integrated yet (docs/rehearsal-010-readiness/assertion-merge-needs.json, ODR-R10-33 A): the completion gate judges that one at release",
         "every previously integrated obligation still passes (regression)",
         "the application builds and starts at the merged result",
         "required real-provider checks pass against api.github.com",
@@ -2278,7 +2278,7 @@
       "mergeConditions": [
         "every mandatory applicable obligation of the slice passes in the governed gate at the merged result",
         "every dependency slice is integrated",
-        "every governed journey bound to the slice's requirements passes in Chromium and WebKit",
+        "every governed journey assertion bound to the slice passes in Chromium and WebKit, except one whose needed slices are not all integrated yet (docs/rehearsal-010-readiness/assertion-merge-needs.json, ODR-R10-33 A): the completion gate judges that one at release",
         "every previously integrated obligation still passes (regression)",
         "the application builds and starts at the merged result",
         "required real-provider checks pass against api.github.com",
@@ -2374,7 +2374,7 @@
       "mergeConditions": [
         "every mandatory applicable obligation of the slice passes in the governed gate at the merged result",
         "every dependency slice is integrated",
-        "every governed journey bound to the slice's requirements passes in Chromium and WebKit",
+        "every governed journey assertion bound to the slice passes in Chromium and WebKit, except one whose needed slices are not all integrated yet (docs/rehearsal-010-readiness/assertion-merge-needs.json, ODR-R10-33 A): the completion gate judges that one at release",
         "every previously integrated obligation still passes (regression)",
         "the application builds and starts at the merged result",
         "required real-provider checks pass against api.github.com",
@@ -2446,7 +2446,7 @@
       "mergeConditions": [
         "every mandatory applicable obligation of the slice passes in the governed gate at the merged result",
         "every dependency slice is integrated",
-        "every governed journey bound to the slice's requirements passes in Chromium and WebKit",
+        "every governed journey assertion bound to the slice passes in Chromium and WebKit, except one whose needed slices are not all integrated yet (docs/rehearsal-010-readiness/assertion-merge-needs.json, ODR-R10-33 A): the completion gate judges that one at release",
         "every previously integrated obligation still passes (regression)",
         "the application builds and starts at the merged result",
         "required real-provider checks pass against api.github.com",
@@ -2507,7 +2507,7 @@
       "mergeConditions": [
         "every mandatory applicable obligation of the slice passes in the governed gate at the merged result",
         "every dependency slice is integrated",
-        "every governed journey bound to the slice's requirements passes in Chromium and WebKit",
+        "every governed journey assertion bound to the slice passes in Chromium and WebKit, except one whose needed slices are not all integrated yet (docs/rehearsal-010-readiness/assertion-merge-needs.json, ODR-R10-33 A): the completion gate judges that one at release",
         "every previously integrated obligation still passes (regression)",
         "the application builds and starts at the merged result",
         "required real-provider checks pass against api.github.com",
@@ -2588,7 +2588,7 @@
       "mergeConditions": [
         "every mandatory applicable obligation of the slice passes in the governed gate at the merged result",
         "every dependency slice is integrated",
-        "every governed journey bound to the slice's requirements passes in Chromium and WebKit",
+        "every governed journey assertion bound to the slice passes in Chromium and WebKit, except one whose needed slices are not all integrated yet (docs/rehearsal-010-readiness/assertion-merge-needs.json, ODR-R10-33 A): the completion gate judges that one at release",
         "every previously integrated obligation still passes (regression)",
         "the application builds and starts at the merged result",
         "required real-provider checks pass against api.github.com",
@@ -2642,7 +2642,7 @@
       "mergeConditions": [
         "every mandatory applicable obligation of the slice passes in the governed gate at the merged result",
         "every dependency slice is integrated",
-        "every governed journey bound to the slice's requirements passes in Chromium and WebKit",
+        "every governed journey assertion bound to the slice passes in Chromium and WebKit, except one whose needed slices are not all integrated yet (docs/rehearsal-010-readiness/assertion-merge-needs.json, ODR-R10-33 A): the completion gate judges that one at release",
         "every previously integrated obligation still passes (regression)",
         "the application builds and starts at the merged result",
         "required real-provider checks pass against api.github.com",
@@ -2746,7 +2746,7 @@
       "mergeConditions": [
         "every mandatory applicable obligation of the slice passes in the governed gate at the merged result",
         "every dependency slice is integrated",
-        "every governed journey bound to the slice's requirements passes in Chromium and WebKit",
+        "every governed journey assertion bound to the slice passes in Chromium and WebKit, except one whose needed slices are not all integrated yet (docs/rehearsal-010-readiness/assertion-merge-needs.json, ODR-R10-33 A): the completion gate judges that one at release",
         "every previously integrated obligation still passes (regression)",
         "the application builds and starts at the merged result",
         "required real-provider checks pass against api.github.com",
@@ -2842,7 +2842,7 @@
       "mergeConditions": [
         "every mandatory applicable obligation of the slice passes in the governed gate at the merged result",
         "every dependency slice is integrated",
-        "every governed journey bound to the slice's requirements passes in Chromium and WebKit",
+        "every governed journey assertion bound to the slice passes in Chromium and WebKit, except one whose needed slices are not all integrated yet (docs/rehearsal-010-readiness/assertion-merge-needs.json, ODR-R10-33 A): the completion gate judges that one at release",
         "every previously integrated obligation still passes (regression)",
         "the application builds and starts at the merged result",
         "required real-provider checks pass against api.github.com",
@@ -2918,7 +2918,7 @@
       "mergeConditions": [
         "every mandatory applicable obligation of the slice passes in the governed gate at the merged result",
         "every dependency slice is integrated",
-        "every governed journey bound to the slice's requirements passes in Chromium and WebKit",
+        "every governed journey assertion bound to the slice passes in Chromium and WebKit, except one whose needed slices are not all integrated yet (docs/rehearsal-010-readiness/assertion-merge-needs.json, ODR-R10-33 A): the completion gate judges that one at release",
         "every previously integrated obligation still passes (regression)",
         "the application builds and starts at the merged result",
         "required real-provider checks pass against api.github.com",
@@ -2981,7 +2981,7 @@
       "mergeConditions": [
         "every mandatory applicable obligation of the slice passes in the governed gate at the merged result",
         "every dependency slice is integrated",
-        "every governed journey bound to the slice's requirements passes in Chromium and WebKit",
+        "every governed journey assertion bound to the slice passes in Chromium and WebKit, except one whose needed slices are not all integrated yet (docs/rehearsal-010-readiness/assertion-merge-needs.json, ODR-R10-33 A): the completion gate judges that one at release",
         "every previously integrated obligation still passes (regression)",
         "the application builds and starts at the merged result",
         "required real-provider checks pass against api.github.com",
@@ -3078,7 +3078,7 @@
       "mergeConditions": [
         "every mandatory applicable obligation of the slice passes in the governed gate at the merged result",
         "every dependency slice is integrated",
-        "every governed journey bound to the slice's requirements passes in Chromium and WebKit",
+        "every governed journey assertion bound to the slice passes in Chromium and WebKit, except one whose needed slices are not all integrated yet (docs/rehearsal-010-readiness/assertion-merge-needs.json, ODR-R10-33 A): the completion gate judges that one at release",
         "every previously integrated obligation still passes (regression)",
         "the application builds and starts at the merged result",
         "required real-provider checks pass against api.github.com",
@@ -3164,7 +3164,7 @@
       "mergeConditions": [
         "every mandatory applicable obligation of the slice passes in the governed gate at the merged result",
         "every dependency slice is integrated",
-        "every governed journey bound to the slice's requirements passes in Chromium and WebKit",
+        "every governed journey assertion bound to the slice passes in Chromium and WebKit, except one whose needed slices are not all integrated yet (docs/rehearsal-010-readiness/assertion-merge-needs.json, ODR-R10-33 A): the completion gate judges that one at release",
         "every previously integrated obligation still passes (regression)",
         "the application builds and starts at the merged result",
         "required real-provider checks pass against api.github.com",
@@ -3211,7 +3211,7 @@
       "mergeConditions": [
         "every mandatory applicable obligation of the slice passes in the governed gate at the merged result",
         "every dependency slice is integrated",
-        "every governed journey bound to the slice's requirements passes in Chromium and WebKit",
+        "every governed journey assertion bound to the slice passes in Chromium and WebKit, except one whose needed slices are not all integrated yet (docs/rehearsal-010-readiness/assertion-merge-needs.json, ODR-R10-33 A): the completion gate judges that one at release",
         "every previously integrated obligation still passes (regression)",
         "the application builds and starts at the merged result",
         "required real-provider checks pass against api.github.com",
@@ -3313,7 +3313,7 @@
       "mergeConditions": [
         "every mandatory applicable obligation of the slice passes in the governed gate at the merged result",
         "every dependency slice is integrated",
-        "every governed journey bound to the slice's requirements passes in Chromium and WebKit",
+        "every governed journey assertion bound to the slice passes in Chromium and WebKit, except one whose needed slices are not all integrated yet (docs/rehearsal-010-readiness/assertion-merge-needs.json, ODR-R10-33 A): the completion gate judges that one at release",
         "every previously integrated obligation still passes (regression)",
         "the application builds and starts at the merged result",
         "required real-provider checks pass against api.github.com",
@@ -3370,7 +3370,7 @@
       "mergeConditions": [
         "every mandatory applicable obligation of the slice passes in the governed gate at the merged result",
         "every dependency slice is integrated",
-        "every governed journey bound to the slice's requirements passes in Chromium and WebKit",
+        "every governed journey assertion bound to the slice passes in Chromium and WebKit, except one whose needed slices are not all integrated yet (docs/rehearsal-010-readiness/assertion-merge-needs.json, ODR-R10-33 A): the completion gate judges that one at release",
         "every previously integrated obligation still passes (regression)",
         "the application builds and starts at the merged result",
         "required real-provider checks pass against api.github.com",
@@ -3459,7 +3459,7 @@
       "mergeConditions": [
         "every mandatory applicable obligation of the slice passes in the governed gate at the merged result",
         "every dependency slice is integrated",
-        "every governed journey bound to the slice's requirements passes in Chromium and WebKit",
+        "every governed journey assertion bound to the slice passes in Chromium and WebKit, except one whose needed slices are not all integrated yet (docs/rehearsal-010-readiness/assertion-merge-needs.json, ODR-R10-33 A): the completion gate judges that one at release",
         "every previously integrated obligation still passes (regression)",
         "the application builds and starts at the merged result",
         "required real-provider checks pass against api.github.com",
@@ -3509,7 +3509,7 @@
       "mergeConditions": [
         "every mandatory applicable obligation of the slice passes in the governed gate at the merged result",
         "every dependency slice is integrated",
-        "every governed journey bound to the slice's requirements passes in Chromium and WebKit",
+        "every governed journey assertion bound to the slice passes in Chromium and WebKit, except one whose needed slices are not all integrated yet (docs/rehearsal-010-readiness/assertion-merge-needs.json, ODR-R10-33 A): the completion gate judges that one at release",
         "every previously integrated obligation still passes (regression)",
         "the application builds and starts at the merged result",
         "required real-provider checks pass against api.github.com",
@@ -3565,7 +3565,7 @@
       "mergeConditions": [
         "every mandatory applicable obligation of the slice passes in the governed gate at the merged result",
         "every dependency slice is integrated",
-        "every governed journey bound to the slice's requirements passes in Chromium and WebKit",
+        "every governed journey assertion bound to the slice passes in Chromium and WebKit, except one whose needed slices are not all integrated yet (docs/rehearsal-010-readiness/assertion-merge-needs.json, ODR-R10-33 A): the completion gate judges that one at release",
         "every previously integrated obligation still passes (regression)",
         "the application builds and starts at the merged result",
         "required real-provider checks pass against api.github.com",
@@ -3627,7 +3627,7 @@
       "mergeConditions": [
         "every mandatory applicable obligation of the slice passes in the governed gate at the merged result",
         "every dependency slice is integrated",
-        "every governed journey bound to the slice's requirements passes in Chromium and WebKit",
+        "every governed journey assertion bound to the slice passes in Chromium and WebKit, except one whose needed slices are not all integrated yet (docs/rehearsal-010-readiness/assertion-merge-needs.json, ODR-R10-33 A): the completion gate judges that one at release",
         "every previously integrated obligation still passes (regression)",
         "the application builds and starts at the merged result",
         "required real-provider checks pass against api.github.com",
@@ -3694,7 +3694,7 @@
       "mergeConditions": [
         "every mandatory applicable obligation of the slice passes in the governed gate at the merged result",
         "every dependency slice is integrated",
-        "every governed journey bound to the slice's requirements passes in Chromium and WebKit",
+        "every governed journey assertion bound to the slice passes in Chromium and WebKit, except one whose needed slices are not all integrated yet (docs/rehearsal-010-readiness/assertion-merge-needs.json, ODR-R10-33 A): the completion gate judges that one at release",
         "every previously integrated obligation still passes (regression)",
         "the application builds and starts at the merged result",
         "required real-provider checks pass against api.github.com",
@@ -3767,7 +3767,7 @@
       "mergeConditions": [
         "every mandatory applicable obligation of the slice passes in the governed gate at the merged result",
         "every dependency slice is integrated",
-        "every governed journey bound to the slice's requirements passes in Chromium and WebKit",
+        "every governed journey assertion bound to the slice passes in Chromium and WebKit, except one whose needed slices are not all integrated yet (docs/rehearsal-010-readiness/assertion-merge-needs.json, ODR-R10-33 A): the completion gate judges that one at release",
         "every previously integrated obligation still passes (regression)",
         "the application builds and starts at the merged result",
         "required real-provider checks pass against api.github.com",
@@ -3885,7 +3885,7 @@
       "mergeConditions": [
         "every mandatory applicable obligation of the slice passes in the governed gate at the merged result",
         "every dependency slice is integrated",
-        "every governed journey bound to the slice's requirements passes in Chromium and WebKit",
+        "every governed journey assertion bound to the slice passes in Chromium and WebKit, except one whose needed slices are not all integrated yet (docs/rehearsal-010-readiness/assertion-merge-needs.json, ODR-R10-33 A): the completion gate judges that one at release",
         "every previously integrated obligation still passes (regression)",
         "the application builds and starts at the merged result",
         "required real-provider checks pass against api.github.com",
@@ -3965,7 +3965,7 @@
       "mergeConditions": [
         "every mandatory applicable obligation of the slice passes in the governed gate at the merged result",
         "every dependency slice is integrated",
-        "every governed journey bound to the slice's requirements passes in Chromium and WebKit",
+        "every governed journey assertion bound to the slice passes in Chromium and WebKit, except one whose needed slices are not all integrated yet (docs/rehearsal-010-readiness/assertion-merge-needs.json, ODR-R10-33 A): the completion gate judges that one at release",
         "every previously integrated obligation still passes (regression)",
         "the application builds and starts at the merged result",
         "required real-provider checks pass against api.github.com",
@@ -4027,7 +4027,7 @@
       "mergeConditions": [
         "every mandatory applicable obligation of the slice passes in the governed gate at the merged result",
         "every dependency slice is integrated",
-        "every governed journey bound to the slice's requirements passes in Chromium and WebKit",
+        "every governed journey assertion bound to the slice passes in Chromium and WebKit, except one whose needed slices are not all integrated yet (docs/rehearsal-010-readiness/assertion-merge-needs.json, ODR-R10-33 A): the completion gate judges that one at release",
         "every previously integrated obligation still passes (regression)",
         "the application builds and starts at the merged result",
         "required real-provider checks pass against api.github.com",
@@ -4089,7 +4089,7 @@
       "mergeConditions": [
         "every mandatory applicable obligation of the slice passes in the governed gate at the merged result",
         "every dependency slice is integrated",
-        "every governed journey bound to the slice's requirements passes in Chromium and WebKit",
+        "every governed journey assertion bound to the slice passes in Chromium and WebKit, except one whose needed slices are not all integrated yet (docs/rehearsal-010-readiness/assertion-merge-needs.json, ODR-R10-33 A): the completion gate judges that one at release",
         "every previously integrated obligation still passes (regression)",
         "the application builds and starts at the merged result",
         "required real-provider checks pass against api.github.com",
@@ -4146,7 +4146,7 @@
       "mergeConditions": [
         "every mandatory applicable obligation of the slice passes in the governed gate at the merged result",
         "every dependency slice is integrated",
-        "every governed journey bound to the slice's requirements passes in Chromium and WebKit",
+        "every governed journey assertion bound to the slice passes in Chromium and WebKit, except one whose needed slices are not all integrated yet (docs/rehearsal-010-readiness/assertion-merge-needs.json, ODR-R10-33 A): the completion gate judges that one at release",
         "every previously integrated obligation still passes (regression)",
         "the application builds and starts at the merged result",
         "required real-provider checks pass against api.github.com",

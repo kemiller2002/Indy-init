@@ -341,6 +341,7 @@ jobs:
             --gate "$RUNNER_TEMP/gate/gate.json" --journeys "$RUNNER_TEMP/journeys/journey-results.json" --design "$RUNNER_TEMP/journeys/design-contract.json" \
             --regression "$ev/regression.json" --build "$RUNNER_TEMP/journeys/build.json" --live "$ev/live.json" --test-integrity "$ev/test-integrity.json" \
             --catalog "$RUNNER_TEMP/catalog/catalog-acceptance.json" --approvals "$src/kickoff/acceptance/approvals.causa.json" --trusted-operator kemiller2002 \
+            --assertion-needs "$src/docs/rehearsal-010-readiness/assertion-merge-needs.json" \
             --out "$ev/slice-gate.json"
       - name: Full-scope completion gate (release; a slice PASS is never a release PASS)
         if: always() && inputs.mode == 'release'

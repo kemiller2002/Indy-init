@@ -103,7 +103,7 @@ let sliceManifestCommand (args: string list) =
 let sliceGateCommand (args: string list) =
     let o = options args
     if not (require o [ "--manifest"; "--events"; "--slices"; "--slice"; "--candidate"; "--target-base"; "--target-head"; "--out" ]) then
-        eprintfn "usage: slice-gate --manifest F --events F --slices F --slice ID --candidate SHA --target-base SHA --target-head SHA [--gate F] [--journeys F] [--design F] [--regression F] [--build F] [--live F] [--test-integrity F] --out F"; 2
+        eprintfn "usage: slice-gate --manifest F --events F --slices F --slice ID --candidate SHA --target-base SHA --target-head SHA [--gate F] [--journeys F] [--design F] [--regression F] [--build F] [--live F] [--test-integrity F] [--assertion-needs F] --out F"; 2
     else
         match Ledger.replayWith (ScopeCommands.exclusionsOf o) (parseFile o["--manifest"]) (eventsOf o["--events"]) with
         | Error why -> printfn "  REFUSED %s" why; printfn "slice-gate: REFUSED"; 4
@@ -114,9 +114,10 @@ let sliceGateCommand (args: string list) =
                 let e : Ledger.SliceEvidence =
                     { Slice = slice; Candidate = o["--candidate"]; TargetBase = o["--target-base"]; TargetHead = o["--target-head"]
                       Gate = optFile o "--gate"; Journeys = optFile o "--journeys"; DesignContract = optFile o "--design"; Regression = optFile o "--regression"
-                      Build = optFile o "--build"; LiveProvider = optFile o "--live"; TestIntegrity = optFile o "--test-integrity"; CatalogAcceptance = optFile o "--catalog" }
+                      Build = optFile o "--build"; LiveProvider = optFile o "--live"; TestIntegrity = optFile o "--test-integrity"; CatalogAcceptance = optFile o "--catalog"
+                      AssertionNeeds = optFile o "--assertion-needs" |> Option.map Ledger.assertionNeedsOf |> Option.defaultValue Map.empty }
                 let refusals = Ledger.sliceGate s e
-                report "slice-gate" o["--out"] (Ledger.sliceVerdictJson e refusals) refusals "PASS (slice only; never a release verdict)" "REFUSED (do not merge)"
+                report "slice-gate" o["--out"] (Ledger.sliceVerdictJson (Ledger.deferredAssertions s e) e refusals) refusals "PASS (slice only; never a release verdict)" "REFUSED (do not merge)"
 
 let completionGateCommand (args: string list) =
     let o = options args

@@ -665,6 +665,44 @@ let milestoneAlignedSplit (source: string) : string list =
           if Option.map (str "planSha256") (field "workItemSplit" committed) <> Some planSha then yield "milestone-aligned split: the committed proposal records a different plan digest"
           if not (preflight m committed).IsEmpty then yield sprintf "milestone-aligned split: the committed proposal fails preflight: %A" (preflight m committed |> List.truncate 3) ]
 
+/// CF-07 option A (owner decision ODR-R10-33 A): the slice gate does not judge a bound assertion while a slice it needs
+/// is not integrated; with no needs map every bound assertion is judged, as before. Built on the approved manifest.
+let cf07Deferral (source: string) : string list =
+    let manifest = parseFile (Path.Combine(source, "docs/rehearsal-010-readiness/scope-manifest.json"))
+    let s = match Ledger.replay manifest [] with Ok s -> s | Error why -> failwithf "replay: %s" why
+    let slice (assertions: string list) = JObj [ "id", JStr "SL-WI-INV-START"; "dependsOn", JArr []; "governedAssertions", JArr(assertions |> List.map JStr) ]
+    // WI-INV-LIST is integrated by its judged obligations alone (none record-only, none live-only in a non-live slice)
+    let listObligations =
+        let rs = arr "workItems" manifest |> List.find (fun w -> str "id" w = "WI-INV-LIST") |> strs "requirements" |> Set.ofList
+        arr "requirements" manifest |> List.filter (fun r -> rs.Contains(str "id" r))
+        |> List.collect (fun r -> arr "obligations" r |> List.filter (fun o -> boolOr "mandatory" true o && strOpt "kind" o <> Some "record" && not (strs "producers" o |> List.exists (fun p -> Ledger.liveProducers.Contains p || p = "SU-BROWSER-WEBKIT"))) |> List.map (str "id"))
+    let evidence (needs: (string * string list) list) (regression: string list) (assertions: string list) : Ledger.SliceEvidence =
+        { Slice = slice assertions; Candidate = "c"; TargetBase = "b"; TargetHead = "b"; Gate = None; Journeys = None; DesignContract = None
+          Regression = Some(JObj [ "candidate", JStr "c"; "passed", JArr(regression |> List.map JStr) ]); Build = None; LiveProvider = None
+          TestIntegrity = None; CatalogAcceptance = None; AssertionNeeds = Map.ofList needs }
+    let journeyCodes (e: Ledger.SliceEvidence) =
+        Ledger.sliceRules |> List.filter (fun r -> r.Id = "journeys") |> List.collect (fun r -> r.Check s e) |> List.map (fun r -> r.Code)
+    [ // a needed slice not integrated: the assertion is deferred, no journey evidence is demanded at this merge
+      let deferredCase = evidence [ "J1-03", [ "SL-WI-GEN-EXT-DATA"; "SL-WI-INV-START" ] ] [] [ "J1-03" ]
+      if Ledger.deferredAssertions s deferredCase <> [ "J1-03" ] then yield sprintf "cf07: J1-03 not deferred: %A" (Ledger.deferredAssertions s deferredCase)
+      if not (journeyCodes deferredCase).IsEmpty then yield sprintf "cf07: a deferred assertion still demanded journeys: %A" (journeyCodes deferredCase)
+      // control: no needs map -> every bound assertion is judged (the rule before ODR-R10-33)
+      if journeyCodes (evidence [] [] [ "J1-03" ]) <> [ "JOURNEYS_MISSING" ] then yield "cf07 control: without a needs map the assertion was not judged"
+      // needs only the slice itself: judged
+      if journeyCodes (evidence [ "J1-03", [ "SL-WI-INV-START" ] ] [] [ "J1-03" ]) <> [ "JOURNEYS_MISSING" ] then yield "cf07: an assertion needing only its own slice was deferred"
+      // a needed slice outside the scope is ignored: judged
+      if journeyCodes (evidence [ "J1-03", [ "SL-NOT-IN-SCOPE" ] ] [] [ "J1-03" ]) <> [ "JOURNEYS_MISSING" ] then yield "cf07: an out-of-scope needed slice deferred the assertion"
+      // the needed slice integrated (SL-T10's judged obligations passed at the merged result): judged
+      if journeyCodes (evidence [ "J1-03", [ "SL-WI-INV-LIST" ] ] listObligations [ "J1-03" ]) <> [ "JOURNEYS_MISSING" ] then yield "cf07: an assertion whose needed slice is integrated was deferred"
+      // and with one of those obligations missing, the needed slice is not integrated: deferred again
+      if Ledger.deferredAssertions s (evidence [ "J1-03", [ "SL-WI-INV-LIST" ] ] (List.tail listObligations) [ "J1-03" ]) <> [ "J1-03" ] then yield "cf07: a partly verified needed slice counted as integrated"
+      // partial: one assertion deferred, the other judged -> the judged one still demands its journey
+      let mixed = evidence [ "J1-03", [ "SL-WI-GEN-EXT-DATA" ] ] [] [ "J1-03"; "J1-06" ]
+      if Ledger.deferredAssertions s mixed <> [ "J1-03" ] || journeyCodes mixed <> [ "JOURNEYS_MISSING" ] then yield sprintf "cf07: mixed case %A %A" (Ledger.deferredAssertions s mixed) (journeyCodes mixed)
+      // the verdict records what was deferred, so release knows what it still owes
+      let verdict = Ledger.sliceVerdictJson (Ledger.deferredAssertions s deferredCase) deferredCase []
+      if strs "deferredToRelease" verdict <> [ "J1-03" ] then yield "cf07: the slice verdict does not record the deferred assertion" ]
+
 let all (source: string) : string list =
     let guard name f = try f () with ex -> [ sprintf "%s threw: %s" name ex.Message ]
-    guard "adversarial" adversarial @ guard "legitimate" legitimate @ guard "recovery" recovery @ guard "real" (fun () -> real source) @ guard "suite runners" (fun () -> suiteRunners source) @ guard "v4.1.4 owner records" (fun () -> v414OwnerRecords source) @ guard "v4.1.4 owner-record controls" (fun () -> v414OwnerRecordControls source) @ guard "v4.1.4 package" (fun () -> committedPackage source) @ guard "reconciliation" (fun () -> reconciliation source) @ guard "work-item split" (fun () -> splitScope source) @ guard "milestone-aligned split" (fun () -> milestoneAlignedSplit source)
+    guard "adversarial" adversarial @ guard "legitimate" legitimate @ guard "recovery" recovery @ guard "real" (fun () -> real source) @ guard "suite runners" (fun () -> suiteRunners source) @ guard "v4.1.4 owner records" (fun () -> v414OwnerRecords source) @ guard "v4.1.4 owner-record controls" (fun () -> v414OwnerRecordControls source) @ guard "v4.1.4 package" (fun () -> committedPackage source) @ guard "reconciliation" (fun () -> reconciliation source) @ guard "work-item split" (fun () -> splitScope source) @ guard "milestone-aligned split" (fun () -> milestoneAlignedSplit source) @ guard "CF-07 deferral" (fun () -> cf07Deferral source)

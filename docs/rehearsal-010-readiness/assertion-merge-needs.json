@@ -1,0 +1,226 @@
+{
+  "schema": "indy-init.r10-contract-first-ui.merge-dependencies/1",
+  "description": "Dependencies a slice's MERGE has but its declared dependsOn does not state: slice-gate's journeys rule (tools/requirements-compiler/src/Ledger.fs lines 391-410) requires every bound assertion to pass on both engines against api.github.com, so an assertion's steps must work live. Derived per assertion from verification/journeys/*.spec.mjs and support.mjs. Ids name both the approved (SL-WI-INV-START, ...) and the successor (SL-WI-INV-START-ACTIONS, ...) slices; the model ignores ids absent from the manifest it reads. Applied to BOTH policies. Corrected after the independent review (ADVERSARIAL-REVIEW.md R3): J1-03 and J2-01..08 do not save; UI-to-UI needs are included. Not modelled: ODR-R10-25/-26.",
+  "rules": [
+    {
+      "assertions": [
+        "J1-02",
+        "J3-01",
+        "J3-02"
+      ],
+      "why": "Connect against the real provider (support.mjs connect)",
+      "needs": [
+        "SL-WI-GEN-EXT-DATA"
+      ]
+    },
+    {
+      "assertions": [
+        "J1-03"
+      ],
+      "why": "Connect, then the start form (support.mjs startInvestigation does not save)",
+      "needs": [
+        "SL-WI-GEN-EXT-DATA",
+        "SL-WI-INV-START-ACTIONS",
+        "SL-WI-INV-START"
+      ]
+    },
+    {
+      "assertions": [
+        "J1-04",
+        "J1-05"
+      ],
+      "why": "Save reaches Saved on GitHub: start, the save indicator and the live write path",
+      "needs": [
+        "SL-WI-GEN-EXT-DATA",
+        "SL-WI-INV-START-ACTIONS",
+        "SL-WI-INV-START",
+        "SL-WI-INV-WORKSPACE-FRAME",
+        "SL-WI-INV-WORKSPACE",
+        "SL-WI-INV-WORKSPACE-SAVE",
+        "SL-T22",
+        "SL-T21"
+      ]
+    },
+    {
+      "assertions": [
+        "J1-06"
+      ],
+      "why": "a fresh context lists and opens the saved investigation",
+      "needs": [
+        "SL-WI-GEN-EXT-DATA",
+        "SL-WI-INV-START-ACTIONS",
+        "SL-WI-INV-START",
+        "SL-WI-INV-WORKSPACE-FRAME",
+        "SL-WI-INV-WORKSPACE",
+        "SL-WI-INV-WORKSPACE-SAVE",
+        "SL-T22",
+        "SL-T21",
+        "SL-T25",
+        "SL-WI-INV-LIST"
+      ]
+    },
+    {
+      "assertions": [
+        "J2-01",
+        "J2-03"
+      ],
+      "why": "observation or evidence editors after Start (no save yet)",
+      "needs": [
+        "SL-WI-GEN-EXT-DATA",
+        "SL-WI-INV-START-ACTIONS",
+        "SL-WI-INV-START",
+        "SL-WI-INV-WORKSPACE-FRAME",
+        "SL-WI-INV-WORKSPACE",
+        "SL-WI-INV-WORKSPACE-EVIDENCE"
+      ]
+    },
+    {
+      "assertions": [
+        "J2-02"
+      ],
+      "why": "hypothesis editor after Start",
+      "needs": [
+        "SL-WI-GEN-EXT-DATA",
+        "SL-WI-INV-START-ACTIONS",
+        "SL-WI-INV-START",
+        "SL-WI-INV-WORKSPACE-FRAME",
+        "SL-WI-INV-WORKSPACE",
+        "SL-WI-INV-WORKSPACE-HYPOTHESES"
+      ]
+    },
+    {
+      "assertions": [
+        "J2-04",
+        "J2-05",
+        "J2-06"
+      ],
+      "why": "link editor on recorded evidence and hypotheses; J2-06 reads the Timeline",
+      "needs": [
+        "SL-WI-GEN-EXT-DATA",
+        "SL-WI-INV-START-ACTIONS",
+        "SL-WI-INV-START",
+        "SL-WI-INV-WORKSPACE-FRAME",
+        "SL-WI-INV-WORKSPACE",
+        "SL-WI-INV-WORKSPACE-EVIDENCE",
+        "SL-WI-INV-WORKSPACE-HYPOTHESES",
+        "SL-WI-INV-WORKSPACE-LINKS",
+        "SL-WI-GEN-UI-STATES",
+        "SL-WI-GEN-UI"
+      ]
+    },
+    {
+      "assertions": [
+        "J2-07"
+      ],
+      "why": "conclusion editor",
+      "needs": [
+        "SL-WI-GEN-EXT-DATA",
+        "SL-WI-INV-START-ACTIONS",
+        "SL-WI-INV-START",
+        "SL-WI-INV-WORKSPACE-FRAME",
+        "SL-WI-INV-WORKSPACE",
+        "SL-WI-INV-WORKSPACE-HYPOTHESES",
+        "SL-WI-INV-WORKSPACE-CONCLUSION"
+      ]
+    },
+    {
+      "assertions": [
+        "J2-08"
+      ],
+      "why": "every section shows this investigation's content; Causal Analysis lists the relationships",
+      "needs": [
+        "SL-WI-GEN-EXT-DATA",
+        "SL-WI-INV-START-ACTIONS",
+        "SL-WI-INV-START",
+        "SL-WI-INV-WORKSPACE-FRAME",
+        "SL-WI-INV-WORKSPACE",
+        "SL-WI-INV-WORKSPACE-EVIDENCE",
+        "SL-WI-INV-WORKSPACE-HYPOTHESES",
+        "SL-WI-INV-WORKSPACE-LINKS",
+        "SL-WI-INV-WORKSPACE-CONCLUSION",
+        "SL-WI-GEN-UI-STATES",
+        "SL-WI-GEN-UI-LANDING",
+        "SL-WI-GEN-UI"
+      ]
+    },
+    {
+      "assertions": [
+        "J2-09"
+      ],
+      "why": "Save, then a fresh context reloads every value",
+      "needs": [
+        "SL-WI-GEN-EXT-DATA",
+        "SL-WI-INV-START-ACTIONS",
+        "SL-WI-INV-START",
+        "SL-WI-INV-WORKSPACE-FRAME",
+        "SL-WI-INV-WORKSPACE",
+        "SL-WI-INV-WORKSPACE-EVIDENCE",
+        "SL-WI-INV-WORKSPACE-HYPOTHESES",
+        "SL-WI-INV-WORKSPACE-LINKS",
+        "SL-WI-INV-WORKSPACE-CONCLUSION",
+        "SL-WI-INV-WORKSPACE-SAVE",
+        "SL-T22",
+        "SL-T21",
+        "SL-T25",
+        "SL-WI-INV-LIST"
+      ]
+    },
+    {
+      "assertions": [
+        "J3-03",
+        "J3-04",
+        "J3-06",
+        "J3-07"
+      ],
+      "why": "J3 runs saveAndConfirm (outside any assertion) before these; then records an observation",
+      "needs": [
+        "SL-WI-GEN-EXT-DATA",
+        "SL-WI-INV-START-ACTIONS",
+        "SL-WI-INV-START",
+        "SL-WI-INV-WORKSPACE-FRAME",
+        "SL-WI-INV-WORKSPACE",
+        "SL-WI-INV-WORKSPACE-EVIDENCE",
+        "SL-WI-INV-WORKSPACE-SAVE",
+        "SL-T22",
+        "SL-T21"
+      ]
+    },
+    {
+      "assertions": [
+        "J3-05",
+        "J3-09"
+      ],
+      "why": "a second context lists and opens the saved investigation",
+      "needs": [
+        "SL-WI-GEN-EXT-DATA",
+        "SL-WI-INV-START-ACTIONS",
+        "SL-WI-INV-START",
+        "SL-WI-INV-WORKSPACE-FRAME",
+        "SL-WI-INV-WORKSPACE",
+        "SL-WI-INV-WORKSPACE-EVIDENCE",
+        "SL-WI-INV-WORKSPACE-SAVE",
+        "SL-T22",
+        "SL-T21",
+        "SL-T25",
+        "SL-WI-INV-LIST"
+      ]
+    },
+    {
+      "assertions": [
+        "J3-08"
+      ],
+      "why": "runs after the unasserted saveAndConfirm in the same test, so it needs what that step needs",
+      "needs": [
+        "SL-WI-GEN-EXT-DATA",
+        "SL-WI-INV-START-ACTIONS",
+        "SL-WI-INV-START",
+        "SL-WI-INV-WORKSPACE-FRAME",
+        "SL-WI-INV-WORKSPACE",
+        "SL-WI-INV-WORKSPACE-SAVE",
+        "SL-T22",
+        "SL-T21"
+      ]
+    }
+  ],
+  "adoptedBy": "Owner decision ODR-R10-33 A (CF-07, APR-R10-OWNER-3): the slice gate judges a bound assertion only once every slice it needs (rules[].needs, other than the slice itself and present in the scope) is integrated; otherwise the completion gate judges it at release. Copied unchanged from proposals/r10-contract-first-ui/schedule-inputs/hidden-merge-dependencies.json (PR #121). An under-stated need judges an assertion early (the merge waits, nothing passes falsely); an over-stated need defers it to release, where it is still required."
+}
