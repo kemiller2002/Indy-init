@@ -1,0 +1,2 @@
+{"t":"2026-11-05T21:21:06Z","agent":"ui","group":"CG-1-START","event":"start","detail":"setup done (npm ci); reading Limen protocol"}
+{"t":"2026-11-05T21:23:33Z","agent":"ui","group":"CG-1-START","event":"start","detail":"all five groups already RELEASED at 21:21Z; building all screens together in release order"}
