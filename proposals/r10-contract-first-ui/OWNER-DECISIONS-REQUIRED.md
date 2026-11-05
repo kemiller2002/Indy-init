@@ -4,9 +4,9 @@
 - CF-07 = ODR-R10-33 A;
 - ODR-R10-20, -22, -31 and -32 A, which partly cover CF-09 and CF-10.
 
-The remaining CF requests are recorded with `tools/owner-freeze.fsx decide contract-first-ui`.
+**All remaining CF requests are recorded: APR-CFUI-OWNER-1 (PR #127), option A for CF-02, -03, -05, -06, -08, -09, -10, -11 and -12.** How CF-09 A reaches v4.1.5 without a compiler change is in [v415-fold/README.md](v415-fold/README.md).
 
-**Otherwise nothing here is decided.**
+
 - No agent records approvals (RDP-003). The owner records decisions with `tools/owner-freeze.fsx`.
 - Ids use the CF- prefix so they cannot collide with the optimization agent's ODR-R10-19..29 (PR #119).
 - None of these decisions changes the frozen scope, the launch clock or the approved acceptance criteria of Rehearsal 010.
