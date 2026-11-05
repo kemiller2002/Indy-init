@@ -21,17 +21,31 @@ Nothing in `requirements-compiled/` is edited. The v4.1.5 compilation owner take
 | Negative controls `negative/ForgeConfirmation.fs`, `negative/ReadCredential.fs` | both still refused with FS1093 |
 | The same twelve files inside the real v4.1.4 bootstrap, after `Projections.fs` | builds (`../evidence/bootstrap-compile.log`) |
 
-## What the compilation owner still needs
+## Inputs for the v4.1.5 compilation owner
 
-These are not done here, because they live in the shared v4.1.5 package:
+Requested by the historical-compatibility session. Each file is standalone; nothing in `requirements-compiled/` is edited.
 
-1. **An `interface-change` request for IF41-VIEW** in v4.1.5's own `proposals/owner-decision-requests.json`, recorded by the owner before the compile (`V41Package.fs:1774-1787`). Suggested wording: "IF41-VIEW gains the presentation contracts `Causa.Ui.Contracts` (CF-09 A): additive only; no existing IF41 type changes." The amendment's `contractChanges` declares the same change.
-2. **`analysis/interface-specifications.json`:** IF41-VIEW's description and consumers gain the UI roles.
-3. **`analysis/project-structure.json`:**
-   - `Projections.fs` (implements IF41-VIEW) becomes integration-owned, frozen types only, and compiles before `Connection.fs` (`../FILE-OWNERSHIP.json` `compileOrder`, review R1);
-   - the UI ownership split follows CF-10 A and ODR-R10-20 (`../FILE-OWNERSHIP.json`).
-4. **The bootstrap** writes the fixture backend (`../fixtures/`) to `tests/Causa.TestSupport/UiFixtures/` (CF-09 A, OD-INDY-22: fixtures enter a run only as frozen-package content).
-5. **STARTUP-INSTRUCTIONS §4:** a UI slice may start once bootstrap is integrated and its UI predecessors are built. Merging is unchanged (CF-09 A extends ODR-R10-31).
+| File | What it is |
+|---|---|
+| [`07-IF41-VIEW.folded.fs`](07-IF41-VIEW.folded.fs) and [`.sha256.json`](07-IF41-VIEW.folded.sha256.json) | the folded contract, sha256 `6328f3ce3786e952178c22d42601d43f9833a5bdfb0b942b1d42ca54d2fd46ed` |
+| [`interface-change-request.IF41-VIEW.json`](interface-change-request.IF41-VIEW.json) | one `interface-change` request (`ODR-V415-IF-VIEW`) in the owner-decision-requests format, pinning the folded file. The owner records it before the compile (`V41Package.fs:1774-1787`) |
+| [`interface-specifications.IF41-VIEW.json`](interface-specifications.IF41-VIEW.json) | the IF41-VIEW object only. Its `fsharp` equals the folded file. Producer is integration; consumers are ui-a, ui-b, ui-c and integration; there are four added operations and the producer and consumer tests |
+| [`project-structure.delta.json`](project-structure.delta.json) | changes against v4.1.4's `project-structure.json`: the three UI roles (CF-10 A), the Causa.App compile order, 14 changed, 18 added and 2 split files, the UI fixture test helpers, the per-screen fragments (CF-08 A) and the rule changes |
+| [`bootstrap-fixtures.json`](bootstrap-fixtures.json) | the fixture files, what each asserts, and the generator command at causa-data `e8259df` |
+| [`start-rule.md`](start-rule.md) | the exact sentence for STARTUP-INSTRUCTIONS §4 step 1 |
+
+**The bootstrap places the fold in `Projections.fs`.**
+- The bootstrap writes each interface's `fsharp` into its implementing file, and IF41-VIEW's is `src/Causa.App/Projections.fs`. So the UI contracts need **no separate `Ui/Contracts/*.fs` files**. This supersedes those entries in `../FILE-OWNERSHIP.json`.
+- `Projections.fs` becomes integration-owned and compiles before `Connection.fs`.
+- Verified in the real v4.1.4 bootstrap, with `Projections.fs` holding the folded text and the prototype screens after `Connection.fs`: builds with 0 warnings (`../evidence/bootstrap-compile.log`).
+
+**Frozen names the folded types use** (for joint review with the event-union change):
+- IF41-APP `ConnectionState`;
+- IF41-VIEW `SaveAction` and `SaveIndicatorView`;
+- IF41-SAVE/WIRE `Politeness`, `Credential.T` and `RequestId`;
+- domain stubs `InvestigationId`, `AggregateVersion` and `EventId`.
+
+They use no `Msg`, no `Model`, and no case of the event or command unions. Only the adapter sketch, which is not part of the contract, uses `Msg`, `Model` and `Engine`.
 
 ## Other recorded decisions this fold already carries
 
