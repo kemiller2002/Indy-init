@@ -18,8 +18,9 @@ const consoleErrors = [];
 page.on("console", (m) => { if (m.type() === "error") consoleErrors.push(m.text()); });
 try {
   await page.goto(base);
-  await page.waitForFunction(() => document.documentElement.dataset.causaReady !== undefined, null, { timeout: 120000 });
-  check("engine starts in the browser (WebAssembly)", await page.evaluate(() => document.documentElement.dataset.causaReady) === "true");
+  // "Not connected." exists only in the F# engine's projection: seeing it proves the F# application rendered the page.
+  await page.getByText("Not connected.").waitFor({ timeout: 120000 });
+  check("the F# engine renders the page (WebAssembly)", true);
   await page.screenshot({ path: `${shots}/1-connect-mobile.png`, fullPage: true });
   await page.getByRole("button", { name: "Connect" }).click();
   await page.getByRole("heading", { name: "Investigations" }).waitFor({ timeout: 60000 });
@@ -43,6 +44,20 @@ try {
     await page.getByRole("button", { name: "← Investigations" }).click();
     await page.getByRole("heading", { name: "Investigations" }).waitFor();
   }
+  // Routing is F#: the engine pushes hash routes through Limen and interprets Back and reloaded deep links.
+  const apollo = page.locator(".causa-row", { hasText: "Apollo 1 (AS-204)" }).first();
+  await apollo.click();
+  await page.getByText(/lines decoded to typed events/).waitFor({ timeout: 60000 });
+  const detailUrl = page.url();
+  check("opening a case sets its hash route", /#\/investigations\/catalog\/[0-9a-f-]{36}$/.test(detailUrl), detailUrl);
+  await page.goBack();
+  await page.getByRole("heading", { name: "Investigations" }).waitFor({ timeout: 30000 });
+  check("browser Back returns to the list", page.url().endsWith("#/investigations"), page.url());
+  await page.goto(detailUrl);
+  await page.getByText("Not connected.").or(page.getByText(/lines decoded/)).first().waitFor({ timeout: 120000 });
+  if (await page.getByRole("button", { name: "Connect" }).count()) await page.getByRole("button", { name: "Connect" }).click();
+  await page.getByText(/432 of 432 lines decoded/).waitFor({ timeout: 60000 });
+  check("a reloaded deep link opens the case after Connect", true);
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
   check("no horizontal overflow at 390 px", overflow <= 0, `overflow ${overflow}px`);
   check("no console errors", consoleErrors.length === 0, consoleErrors.slice(0, 3).join(" / "));

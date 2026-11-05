@@ -6,6 +6,8 @@
 - **Forma 0.10.0:** the UI.
 - **The real historical records:** read from `kemiller2002/causa-data`.
 
+**F# only:** see [ARCHITECTURE.md](ARCHITECTURE.md) for the two documented non-F# exceptions and the check that enforces them.
+
 **This is not the competition build and is not copied into it** (OD-INDY-22; the event rule "code starts at kickoff"). It exists so the owner can judge a running application before the event. Its decisions are in [DECISIONS.md](DECISIONS.md).
 
 ## What each screen shows, honestly
@@ -23,7 +25,8 @@
 cd preview/causa/web && npm ci && cd ..
 dotnet fsi build.fsx                      # dist/: WebAssembly app + Limen + Forma (about 1 min)
 dotnet fsi serve.fsx 4173                 # http://localhost:4173/
-dotnet run --project tests/Engine.Tests -- <causa-data checkout>          # 25 engine tests, in-process GitHub double
+dotnet fsi tests/ArchitectureCheck.fsx                                  # F#-only constraint (A1-A7)
+dotnet run --project tests/Engine.Tests -- <causa-data checkout>          # 31 engine tests, in-process GitHub double
 NODE_PATH=$(npm root -g) node tests/read-path.mjs http://localhost:4173/  # browser, real causa-data, mobile viewport
 CAUSA_TOKEN=… CAUSA_WRITE_REPO=owner/name node tests/real-provider.mjs http://localhost:4173/   # owner-run, real writes
 ```

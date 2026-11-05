@@ -73,7 +73,9 @@ type Model =
       Busy: bool
       Status: string
       Problem: string option
-      Confirmed: string option }
+      Confirmed: string option
+      /// A route the browser asked for before the data it names was available (a deep link before Connect).
+      PendingRoute: string option }
 
 let initial =
     { Screen = ConnectScreen
@@ -94,4 +96,5 @@ let initial =
       Busy = false
       Status = "Not connected."
       Problem = None
-      Confirmed = None }
+      Confirmed = None
+      PendingRoute = None }

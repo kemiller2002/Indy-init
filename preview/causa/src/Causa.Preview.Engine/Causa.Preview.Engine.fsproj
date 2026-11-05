@@ -7,6 +7,7 @@
     <Compile Include="GitHub.fs" />
     <Compile Include="Writer.fs" />
     <Compile Include="Model.fs" />
+    <Compile Include="Routing.fs" />
     <Compile Include="Update.fs" />
     <Compile Include="View.fs" />
     <Compile Include="Dispatch.fs" />

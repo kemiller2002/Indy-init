@@ -20,7 +20,7 @@ const browser = await chromium.launch(proxy ? { proxy } : {});
 const page = await (await browser.newContext({ ...devices["iPhone 13"], ignoreHTTPSErrors: !!proxy })).newPage();
 const connect = async () => {
   await page.goto(base);
-  await page.waitForFunction(() => document.documentElement.dataset.causaReady === "true", null, { timeout: 120000 });
+  await page.getByText("Not connected.").waitFor({ timeout: 120000 }); // rendered by the F# engine
   await page.fill("#write-repo", repo); await page.fill("#write-branch", branch); await page.fill("#workspace", workspace);
   await page.fill("#token", token);
   await page.getByRole("button", { name: "Connect" }).click();

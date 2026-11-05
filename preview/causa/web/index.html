@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="./forma/all.css">
   <link rel="stylesheet" href="./app.css">
   <script type="importmap">
-    { "imports": { "@echelon-foundry/limen": "./limen/index.js", "@echelon-foundry/limen/": "./limen/" } }
+    { "imports": { "@echelon-foundry/limen": "./limen/index.js", "@echelon-foundry/limen/hosts/dotnet-wasm": "./limen/hosts/dotnet-wasm-transport.js", "@echelon-foundry/limen/": "./limen/" } }
   </script>
   <script type="module" src="./main.js"></script>
 </head>
@@ -38,7 +38,7 @@
       <section class="ef-stack" aria-labelledby="connect-title">
         <header><h1 id="connect-title">Connect to GitHub</h1>
           <p>The historical catalog is read-only. Writes go only to a working-copy workspace in a repository you name (CONTRACT §9.4.4). The token stays in memory and is sent only in the Authorization header.</p></header>
-        <form class="ef-form" onsubmit="return false">
+        <div class="ef-form">
           <div class="ef-field"><label class="ef-field__label" for="catalog-repo">Catalog repository (owner/name)</label>
             <input id="catalog-repo" autocomplete="off" data-event="set:catalogRepo" data-on="input" data-bind-value="catalogRepo"></div>
           <div class="ef-field"><label class="ef-field__label" for="catalog-branch">Catalog branch</label>
@@ -55,7 +55,7 @@
             <span class="ef-field__description" id="token-d">Fine-grained token: Contents read on the catalog; Contents read and write on the writable repository only.</span>
             <input id="token" type="password" autocomplete="off" aria-describedby="token-d" data-event="set:token" data-on="input"></div>
           <div class="ef-actions"><button type="button" data-event="connect" data-bind-disabled="notIdle">Connect</button></div>
-        </form>
+        </div>
       </section>
     </template>
 
@@ -146,14 +146,14 @@
     <template data-if="screenCreate">
       <section class="ef-stack" aria-labelledby="create-title">
         <header><h1 id="create-title">New investigation</h1><p>Written to the working copy: <span data-text="writeLabel"></span></p></header>
-        <form class="ef-form" onsubmit="return false">
+        <div class="ef-form">
           <div class="ef-field"><label class="ef-field__label" for="new-title">Title</label>
             <input id="new-title" data-event="set:newTitle" data-on="input" data-bind-value="newTitle"></div>
           <div class="ef-field"><label class="ef-field__label" for="new-observation">What was observed</label>
             <span class="ef-field__description" id="new-observation-d">Kept verbatim as the first observation.</span>
             <textarea id="new-observation" rows="4" aria-describedby="new-observation-d" data-event="set:newObservation" data-on="input" data-bind-value="newObservation"></textarea></div>
           <div class="ef-actions"><button type="button" data-event="create" data-bind-disabled="notIdle">Create and save</button><button type="button" data-event="back">Cancel</button></div>
-        </form>
+        </div>
       </section>
     </template>
   </main>

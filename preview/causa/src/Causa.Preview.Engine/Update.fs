@@ -26,6 +26,8 @@ type Msg =
     | Save
     | Reload
     | Clock of Timestamp
+    /// The browser moved on its own (Back, Forward, a pasted or reloaded link): Limen LocationChanged or Initialize.
+    | Navigated of hash: string
     | Http of correlationId: string * HttpOutcome
 
 type Effects = (string * HttpRequest) list
@@ -198,9 +200,25 @@ let private onAnswer (m: Model) (purpose: Purpose) (outcome: HttpOutcome) : Mode
     | WriteHead, Error e -> fail m ("Working copy: " + e)
     | WriteListing _, Error e -> fail m ("Working copy listing: " + e)
 
+/// Applies a route the browser asked for. Data a route needs is read first; a route that needs a connection waits.
+let private navigate (m: Model) (hash: string) : Model * Effects =
+    let m = { m with PendingRoute = None }
+    let waitFor () = { m with PendingRoute = Some hash; Screen = ConnectScreen }, []
+    match Routing.parse hash with
+    | Routing.RConnect -> { m with Screen = ConnectScreen }, []
+    | Routing.RList -> if m.Catalog.IsSome then { m with Screen = ListScreen }, [] else waitFor ()
+    | Routing.RNew -> if m.Write.IsSome then { m with Screen = CreateScreen } , [] elif m.Catalog.IsSome then { m with Screen = ListScreen }, [] else waitFor ()
+    | Routing.RInvestigation(s, dir) ->
+        match m.Opened, headOfSource m s with
+        | Some o, _ when o.Source = s && o.DirName = dir -> { m with Screen = DetailScreen }, []
+        | _, Some head -> openAt m s dir head
+        | _ when m.Catalog.IsSome && not m.Pending.IsEmpty -> { m with PendingRoute = Some hash }, []
+        | _ -> waitFor ()
+
 let update (m: Model) (msg: Msg) : Model * Effects =
     match msg with
     | Clock now -> { m with Now = Some now }, []
+    | Navigated hash -> navigate m hash
     | Field(name, value) -> { m with Form = setField m.Form name value }, []
     | Connect ->
         match RepoRef.parse m.Form.CatalogRepo m.Form.CatalogBranch with
@@ -210,7 +228,7 @@ let update (m: Model) (msg: Msg) : Model * Effects =
             if not (String.IsNullOrWhiteSpace m.Form.WriteRepo) && write.IsNone then fail m "Enter the writable repository as owner/name and a branch."
             elif write.IsSome && not (Writer.validWorkspace m.Form.Workspace) then fail m "The workspace name must match ^[a-z0-9][a-z0-9-]{0,63}$."
             else
-                let m = { initial with Form = m.Form; Now = m.Now; NextId = m.NextId; Catalog = Some catalog; Write = write; Status = "Connecting…" }
+                let m = { initial with Form = m.Form; Now = m.Now; NextId = m.NextId; Catalog = Some catalog; Write = write; Status = "Connecting…"; PendingRoute = m.PendingRoute }
                 let reqs = [ CatalogHead, fresh m (branchHead m.Form.Token catalog) ] @ (match write with Some w -> [ WriteHead, fresh m (branchHead m.Form.Token w) ] | None -> [])
                 requests m reqs
     | Disconnect -> { initial with Now = m.Now }, []
@@ -286,4 +304,9 @@ let update (m: Model) (msg: Msg) : Model * Effects =
                     openAt m s dir head
                 | Error e -> fail m e
             | ReadFile(_, _, "HEAD?", ""), _ -> fail m "Reload: the branch head could not be read."
-            | _ -> onAnswer m purpose outcome
+            | _ ->
+                let m, fx = onAnswer m purpose outcome
+                // A deep link waits for the connection; apply it once every connect read has answered.
+                match m.PendingRoute with
+                | Some hash when m.Pending.IsEmpty && m.Catalog.IsSome -> let m2, fx2 = navigate m hash in m2, fx @ fx2
+                | _ -> m, fx

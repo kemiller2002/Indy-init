@@ -39,6 +39,10 @@ let messagesOf (message: JValue) : Msg list * JValue option =
     match message with
     | JObj o ->
         match str "kind" o with
+        | Some "LocationChanged" ->
+            match Json.tryField "location" o with
+            | Some(JObj l) -> [ Navigated(str "hash" l |> Option.defaultValue "") ], None
+            | _ -> [], None
         | Some "Initialize" ->
             // Echo the host's offered protocol and contract: this engine needs nothing beyond protocol 1.3 Http.
             let handshake =
@@ -46,7 +50,8 @@ let messagesOf (message: JValue) : Msg list * JValue option =
                 | Some(JObj h) ->
                     Some(JObj [ "kind", JStr "Accepted"; "protocol", (Json.tryField "protocol" h |> Option.defaultValue JNull); "contract", (Json.tryField "contract" h |> Option.defaultValue JNull); "capabilities", JArr [] ])
                 | _ -> None
-            [], handshake
+            let route = match Json.tryField "location" o with Some(JObj l) -> (str "hash" l |> Option.defaultValue "") | _ -> ""
+            (if route = "" || route = "#/" then [] else [ Navigated route ]), handshake
         | Some "Event" -> (match Json.tryField "event" o with Some(JObj e) -> (msgOfEvent e |> Option.toList), None | _ -> [], None)
         | Some "EffectResult" ->
             match Json.tryField "result" o with
@@ -54,11 +59,6 @@ let messagesOf (message: JValue) : Msg list * JValue option =
                 match str "kind" r, str "correlationId" r, Json.tryField "outcome" r with
                 | Some "HttpResult", Some id, Some(JObj out) -> [ Http(id, outcomeOf out) ], None
                 | _ -> [], None
-            | _ -> [], None
-        // The host's clock (see the delegated decision on time): a CapabilityFact { capability: "causa.clock", fact: { now } }.
-        | Some "CapabilityFact" when str "capability" o = Some "causa.clock" ->
-            match Json.tryField "fact" o with
-            | Some(JObj f) -> (match str "now" f |> Option.bind Timestamp.tryParse with Some t -> [ Clock t ], None | None -> [], None)
             | _ -> [], None
         | _ -> [], None
     | _ -> [], None
@@ -71,7 +71,8 @@ let private effectJson ((id, r): string * Causa.Preview.GitHub.HttpRequest) =
     )
 
 /// The pure step the WebAssembly export wraps: (model, message JSON) -> (model, response JSON).
-let step (model: Model) (messageJson: string) : Model * string =
+/// The pure step the WebAssembly export wraps. `now` is the clock reading the boundary supplies for user events.
+let step (now: Timestamp) (model: Model) (messageJson: string) : Model * string =
     match Json.parse messageJson with
     | Error e ->
         // A malformed message is a host bug; answer with the unchanged view and report it.
@@ -79,9 +80,17 @@ let step (model: Model) (messageJson: string) : Model * string =
         m, Json.canonical (JObj [ "view", View.project m; "effects", JArr []; "cancellations", JArr [] ])
     | Ok message ->
         let msgs, handshake = messagesOf message
+        let isUserEvent = match message with JObj o -> str "kind" o = Some "Event" | _ -> false
+        let browserMoved = msgs |> List.exists (function Navigated _ -> true | _ -> false)
+        let msgs = (if isUserEvent then [ Clock now ] else []) @ msgs
         let m, effects = msgs |> List.fold (fun (m, fx) msg -> let m', f = update m msg in m', fx @ f) (model, [])
+        // The URL follows the model (push), except when the browser itself moved: then the model followed the URL.
+        let navigation =
+            let before, after = Routing.ofModel model, Routing.ofModel m
+            if browserMoved || before = after then []
+            else [ JObj [ "kind", JStr "Navigation"; "correlationId", JStr("nav" + string m.NextId); "operation", JStr "push"; "url", JStr(Routing.toHash after) ] ]
         let response =
-            [ "view", View.project m; "effects", JArr(effects |> List.map effectJson); "cancellations", JArr [] ]
+            [ "view", View.project m; "effects", JArr((effects |> List.map effectJson) @ navigation); "cancellations", JArr [] ]
             @ (match handshake with Some h -> [ "handshake", h ] | None -> [])
         m, Json.canonical (JObj response)
 
@@ -91,7 +100,11 @@ let mutable private current = initial
 let handle (messageJson: string) : string =
     // Total at the boundary: a defect becomes a reported problem with the last good model, never a dead page.
     let m, out =
-        try step current messageJson
+        let now =
+            let t = System.DateTimeOffset.UtcNow
+            Timestamp.tryParse (t.ToString("yyyy-MM-dd'T'HH:mm:ss.fff'Z'", System.Globalization.CultureInfo.InvariantCulture))
+            |> Option.defaultWith (fun () -> failwith "the clock produced an unrepresentable instant")
+        try step now current messageJson
         with ex ->
             let m = { current with Problem = Some("Internal error: " + ex.Message); Pending = Map.empty }
             m, Json.canonical (JObj [ "view", View.project m; "effects", JArr []; "cancellations", JArr [] ])

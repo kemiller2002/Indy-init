@@ -14,10 +14,10 @@ let check name ok detail =
     if not ok then failures <- failures + 1
     printfn "%s %s%s" (if ok then "PASS" else "FAIL") name (if ok then "" else " — " + detail)
 
-type Session = { Model: Model.Model; World: World; View: (string * JValue) list; Raw: string }
+type Session = { Model: Model.Model; World: World; View: (string * JValue) list; Raw: string; Now: Timestamp; Pushed: string list }
 
 let private send (s: Session) (message: JValue) : Session * JValue list =
-    let m, out = Dispatch.step s.Model (Json.canonical message)
+    let m, out = Dispatch.step s.Now s.Model (Json.canonical message)
     match Json.parse out with
     | Ok(JObj o) ->
         let view = match Json.tryField "view" o with Some(JObj v) -> v | _ -> []
@@ -29,6 +29,9 @@ let private send (s: Session) (message: JValue) : Session * JValue list =
 let rec private settle (s: Session) (effects: JValue list) : Session =
     match effects with
     | [] -> s
+    | JObj e :: rest when Json.tryField "kind" e = Some(JStr "Navigation") ->
+        let url = match Json.tryField "url" e with Some(JStr u) -> u | _ -> ""
+        settle { s with Pushed = s.Pushed @ [ url ] } rest
     | JObj e :: rest ->
         let id = match Json.tryField "correlationId" e with Some(JStr x) -> x | _ -> ""
         let w, outcome = answer s.World e
@@ -40,7 +43,8 @@ let private dispatch (s: Session) (message: JValue) = let s', fx = send s messag
 let private event name = JObj [ "kind", JStr "Event"; "event", JObj [ "kind", JStr "Event"; "name", JStr name ] ]
 let private eventKey name key = JObj [ "kind", JStr "Event"; "event", JObj [ "kind", JStr "Event"; "name", JStr name; "key", JStr key ] ]
 let private setField name value = JObj [ "kind", JStr "Event"; "event", JObj [ "kind", JStr "Event"; "name", JStr ("set:" + name); "value", JStr value ] ]
-let private clock (iso: string) = JObj [ "kind", JStr "CapabilityFact"; "capability", JStr "causa.clock"; "version", JInt 1L; "fact", JObj [ "now", JStr iso ] ]
+/// Sets the clock the boundary supplies with the next user events (Dispatch.step's `now`).
+let private at (iso: string) (s: Session) = { s with Now = (Timestamp.tryParse iso).Value }
 
 let private v (s: Session) k = match Json.tryField k s.View with Some(JStr x) -> x | Some(JBool b) -> string b | Some(JInt n) -> string n | Some x -> Json.canonical x | None -> ""
 let private items (s: Session) k = match Json.tryField k s.View with Some(JArr xs) -> xs |> List.choose (function JObj o -> Some o | _ -> None) | _ -> []
@@ -56,8 +60,8 @@ let private catalogTree (root: string) : Map<string, byte[]> =
 
 let private connected (root: string) (writable: bool) =
     let world = seed [ "kemiller2002/causa-data", catalogTree root; "acme/causa-work", Map.ofList [ "README.md", "work\n"B ] ]
-    let s = { Model = Model.initial; World = world; View = []; Raw = "" }
-    let s = dispatch s (clock "2026-11-05T15:00:00.000Z")
+    let s = { Model = Model.initial; World = world; View = []; Raw = ""; Now = (Timestamp.tryParse "2026-11-05T15:00:00.000Z").Value; Pushed = [] }
+    let s = at "2026-11-05T15:00:00.000Z" s
     let s = dispatch s (setField "token" "test-token-not-real")
     let s = if writable then dispatch (dispatch (dispatch s (setField "writeRepo" "acme/causa-work")) (setField "writeBranch" "main")) (setField "workspace" "preview-test") else s
     dispatch s (event "connect")
@@ -83,7 +87,7 @@ let main argv =
     let s = dispatch s (event "show-create")
     let s = dispatch (dispatch s (setField "newTitle" "Kitchen breaker trips")) (setField "newObservation" "The kitchen breaker trips when the kettle and toaster run together.")
     let headBefore = headOf s.World "acme/causa-work"
-    let s = dispatch (dispatch s (clock "2026-11-05T15:01:00.000Z")) (event "create")
+    let s = dispatch (at "2026-11-05T15:01:00.000Z" s) (event "create")
     let headAfter = headOf s.World "acme/causa-work"
     check "create commits once to the writable repository" (headAfter <> headBefore) (v s "problem")
     check "create is confirmed by a byte-identical read-back" ((v s "confirmed").Contains "read back byte-identical") (v s "problem")
@@ -98,7 +102,7 @@ let main argv =
     let s = dispatch (dispatch s (setField "editObservation" "It also trips with only the kettle after 10 minutes.")) (event "add-observation")
     let s = dispatch (dispatch s (setField "editHypothesis" "The kettle draws more current than its rating.")) (event "add-hypothesis")
     check "edits stay unsaved until Save" (v s "unsavedCount" = "2") (v s "unsavedCount")
-    let s = dispatch (dispatch s (clock "2026-11-05T15:02:00.000Z")) (event "save")
+    let s = dispatch (at "2026-11-05T15:02:00.000Z" s) (event "save")
     check "save is confirmed by read-back" ((v s "confirmed").Contains "read back byte-identical") (v s "problem")
     check "after save the history has 3 events" (v s "dVersion" = "3") (v s "dVersion")
 
@@ -140,9 +144,29 @@ let main argv =
     let s6 = dispatch (dispatch (dispatch s6 (event "show-create")) (setField "newTitle" "   ")) (setField "newObservation" "x")
     let s6 = dispatch s6 (event "create")
     check "a blank title is refused before any write" ((v s6 "problem").Contains "title" && headOf s6.World "acme/causa-work" = "c0") (v s6 "problem")
-    let s7 = { Model = Model.initial; World = seed []; View = []; Raw = "" }
+    let s7 = { Model = Model.initial; World = seed []; View = []; Raw = ""; Now = (Timestamp.tryParse "2026-11-05T15:00:00.000Z").Value; Pushed = [] }
     let s7 = dispatch (dispatch (dispatch (dispatch s7 (setField "writeRepo" "acme/x")) (setField "workspace" "../../fixtures")) (event "connect")) (event "connect")
     check "a workspace name outside ^[a-z0-9][a-z0-9-]{0,63}$ is refused" ((v s7 "problem").Contains "workspace") (v s7 "problem")
+
+    // ---- routing (F#): the URL follows the model; Back and deep links drive the model
+    let r = connected root false
+    let apolloKey = items r "catalogItems" |> List.find (fun i -> (itemField "title" i).StartsWith "Apollo 1 ") |> itemField "key"
+    let apolloId = apolloKey.Substring 2
+    let r = dispatch r (eventKey "open" apolloKey)
+    check "opening a case pushes its hash route" (List.tryLast r.Pushed = Some $"#/investigations/catalog/{apolloId}") (sprintf "%A" r.Pushed)
+    let pushedBefore = r.Pushed.Length
+    let loc hash = JObj [ "kind", JStr "LocationChanged"; "location", JObj [ "path", JStr "/"; "query", JStr ""; "hash", JStr hash ] ]
+    let r = dispatch r (loc "#/investigations")
+    check "Back to #/investigations shows the list" (v r "screenList" = "True") (v r "screenList")
+    check "a browser move is never pushed again" (r.Pushed.Length = pushedBefore) (sprintf "%A" r.Pushed)
+    let r = dispatch r (loc $"#/investigations/catalog/{apolloId}")
+    check "Forward to a case shows it again" (v r "screenDetail" = "True" && (v r "dDecoded").StartsWith "432 of 432") (v r "dDecoded")
+    let d = { Model = Model.initial; World = seed [ "kemiller2002/causa-data", catalogTree root ]; View = []; Raw = ""; Now = (Timestamp.tryParse "2026-11-05T15:00:00.000Z").Value; Pushed = [] }
+    let init hash = JObj [ "kind", JStr "Initialize"; "protocolVersion", JInt 1L; "capabilities", JArr [ JStr "Http"; JStr "Navigation" ]; "location", JObj [ "path", JStr "/"; "query", JStr ""; "hash", JStr hash ] ]
+    let d = dispatch d (init $"#/investigations/catalog/{apolloId}")
+    check "a deep link before Connect waits on the Connect screen" (v d "screenConnect" = "True") (v d "screenConnect")
+    let d = dispatch d (event "connect")
+    check "after Connect the deep-linked case opens" (v d "screenDetail" = "True" && (v d "dDecoded").StartsWith "432 of 432") (v d "dDecoded")
 
     printfn "%s" (if failures = 0 then "all engine tests passed" else $"{failures} engine test(s) FAILED")
     if failures = 0 then 0 else 1
