@@ -150,7 +150,7 @@ let checkLifecycle (rows: JsonNode list) : Finding list =
           if s <> "BLOCKED" && (rank s).IsNone then err "CTP-L-STATE" (key r) $"unknown status {s}"
           if (ver r).IsNone || ver r |> Option.exists (fun v -> v < 1) then err "CTP-L-VERSION" (key r) "version must be an integer >= 1"
           if blank (str "group" r) then err "CTP-L-GROUP" (key r) "group is required"
-          if not (Regex.IsMatch(str "t" r, @"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2}(\.\d+)?)?(Z|[+-]\d{2}:\d{2})$")) then
+          if not (Regex.IsMatch(str "t" r, @"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2}(\.\d+)?)?(Z|[+-]\d{2}:\d{2})$") && fst (DateTimeOffset.TryParse(str "t" r))) then
               err "CTP-L-TIME" (key r) "t must be an ISO-8601 UTC time such as 2026-11-07T10:00:00Z"
           for sd in strs "sides" r do
               if sd <> "domain" && sd <> "ui" then err "CTP-L-SIDES" (key r) $"side '{sd}' must be domain or ui"
@@ -421,6 +421,7 @@ let tests (root: string) =
           "lifecycle: an unknown side", life (lifecycle |> List.map (fun r -> if str "status" r = "DEFINED" then r |> edit [ "sides" ] (j """["nonsense"]""") else r)), Some "CTP-L-SIDES"
           "lifecycle: a non-ISO time", life (lifecycle @ (rev2 |> List.map (edit [ "t" ] (jstr "2026-11-07 23:00")))), Some "CTP-L-TIME"
           "lifecycle: the reviewer may record a BLOCKED note", life (lifecycle @ parseLines """{"t":"2026-11-07T10:09:00Z","group":"CG-1","version":1,"status":"BLOCKED","actor":"reviewer","note":"label missing; CR raised"}"""), None
+          "lifecycle: an impossible ISO-shaped time", life (lifecycle @ (rev2 |> List.map (edit [ "t" ] (jstr "2026-13-45T99:99Z")))), Some "CTP-L-TIME"
           "lifecycle: rows out of time order", life (lifecycle @ (rev2 |> List.map (edit [ "t" ] (jstr "2026-11-07T09:00:00Z")))), Some "CTP-L-TIME"
           "lifecycle: VERIFIED without evidence", life (mapRow "VERIFIED" (edit [ "evidence" ] (j "{}"))), Some "CTP-L-VERIFIED"
           "lifecycle: VERIFIED with meaningless evidence", life (mapRow "VERIFIED" (edit [ "evidence" ] (j """{"candidateSha":"x","ciRun":"x","acceptanceRun":"x"}"""))), Some "CTP-L-VERIFIED"

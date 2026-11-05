@@ -72,7 +72,7 @@ See AGENT-OWNERSHIP.md: contract coordinator, domain agent, UI agent, verificati
   - `integration`
   - `ownership`
   - `ci` (report only)
-  - `test`: 61 synthetic cases, plus 25 on EXP-002's real files, committed as fixtures under `evidence/exp-002/`. The 25 are 8 integrity checks against SHA-256 values pinned in the checker's source and 17 replay cases. When PR #140's commits are in the clone, 5 more cases compare each fixture byte for byte with `git show`, giving 91 cases. In CI's shallow checkout those 5 are reported as NOT-RUN, not counted as passes, so CI runs 86.
+  - `test`: 62 synthetic cases, plus 25 on EXP-002's real files, committed as fixtures under `evidence/exp-002/`. The 25 are 8 integrity checks against SHA-256 values pinned in the checker's source and 17 replay cases. When PR #140's commits are in the clone, 5 more cases compare each fixture byte for byte with `git show`, giving 92 cases. In CI's shallow checkout those 5 are reported as NOT-RUN, not counted as passes, so CI runs 87.
 - ADOPTION-DECISIONS.md section 3 says what each mode enforces today, and what still depends on review.
 
 ## 9. Competition use

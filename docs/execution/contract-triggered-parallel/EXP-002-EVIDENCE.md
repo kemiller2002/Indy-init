@@ -52,7 +52,7 @@ Every figure below is labelled either **observed** (measured in the run) or **mo
 - **Reproduce:** `ctp-check ci --runs evidence/exp-002/5151cdf.CI-RUNS.json` reports exactly the 2 observed cancellations.
 
 ## 5. Protocol validation against this evidence
-**Reproduce with** `dotnet fsi tools/execution/ctp-check.fsx -- test --indy-init .`. The result is **91 of 91 cases** with PR #140's commits in the clone. In a shallow clone, such as CI's, it is **86 of 86, with 5 NOT-RUN**.
+**Reproduce with** `dotnet fsi tools/execution/ctp-check.fsx -- test --indy-init .`. The result is **92 of 92 cases** with PR #140's commits in the clone. In a shallow clone, such as CI's, it is **87 of 87, with 5 NOT-RUN**.
 
 **Fixtures.** The EXP-002 inputs are committed in `evidence/exp-002/`:
 - the registry at `d544ead` (v1) and at `99824ee` (final);
