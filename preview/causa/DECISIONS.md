@@ -21,8 +21,8 @@
 
 | Item | Why it is the owner's | Needed for |
 |---|---|---|
-| A public deployment URL | Needs a repository with GitHub Pages that this session may push to (none exists; the session cannot create repositories). Enabling Pages on Indy-init would change repository settings and publish from the requirements repository. | the "Deployed URL" deliverable |
-| A writable destination and credential for the real-provider write test | Access to the approved writable repository `causa-acceptance-r10` (ODR-R10-28) was refused for this session. Using any other repository would expand write scope. | create/save/reload against real GitHub |
+| ~~A public deployment URL~~ **Resolved 2026-11-05 by the owner** ("test repo / causa-testing-repo") | — | see D-14 |
+| ~~A writable destination and credential for the real-provider write test~~ **Resolved 2026-11-05 by the owner**: `kemiller2002/causa-testing-repo` | — | see D-14 |
 | Whether the preview may inform the competition build | OD-INDY-22 and the event rule "code starts at kickoff" forbid copying it. It is evidence for a go/no-go decision only. | the pivot decision |
 
 ## Decisions under the F#-only constraint (owner directive, 2026-11-05)
@@ -32,3 +32,4 @@
 | D-11 | **Routing is F#** (`Routing.fs`). Hash routes (D-203) are pushed through Limen navigation effects. Back, Forward and reloaded deep links arrive as `LocationChanged`/`Initialize` and are interpreted by the engine; a browser move is never pushed again. | The constraint covers navigation and routing. | engine tests (6 routing checks); browser test (hash route, Back, deep link) |
 | D-12 | **The transport is Limen's `DotnetWasmTransport`.** The application's own transport class is removed, and responses are checked by Limen's generated contract decoder. | It leaves the minimum JavaScript: 2 code lines. | `ARCHITECTURE.md` JS-1; A2 |
 | D-13 | **`tests/ArchitectureCheck.fsx` (A1–A7) enforces the constraint on every run.** Mutation runs showed it fails on an extra JS file, a `fetch` in `main.js`, a branch in the C# shim, an inline handler, and an unprojected binding. | "Verify this constraint continuously through source inspection and automated architecture checks." | mutation run in this session |
+| D-14 | **Real-provider acceptance and deployment run in `kemiller2002/causa-testing-repo` GitHub Actions** (`.github/workflows/causa-preview.yml`). The `real-provider` job runs the engine tests and then `--real` with the workflow's own `github.token` (scoped to that repository: contents write). Only if it passes does `build-and-deploy` build, re-run A1–A7 and publish to Pages. | The owner named that repository. This session's proxy blocks GraphQL writes, so the write test cannot run here. The workflow token never reaches the browser or the engine (the test executor substitutes it into the Authorization header). | run 42067851789: 31/31 offline, 11/11 real-provider, A1–A7 PASS, deployed; `tests/read-path.mjs` 25/25 against the deployed URL |
