@@ -104,8 +104,8 @@
  },
  "catalogVerification": {
   "contract": "kickoff/rehearsal-010/catalog-verification-contract.json",
-  "contractSha256": "808de8a9fe43a4b1f8bfe7fb9f789a6de8f5e23ab27d878dfb675c74ada02a9a",
-  "approval": "APR-R10-OWNER-1 (ODR-R10-03, ODR-R10-04)"
+  "contractSha256": "3d587618abce0c5f3bb470ffde05bab81c38f82f059180d68ba9b70fd8b67317",
+  "approval": "ODR-R10-03 (pending again: the contract now names the ratified catalog, so owner-freeze.fsx decide rehearsal-010 asks it again), ODR-R10-04 (APR-R10-OWNER-1)"
  },
  "designContract": {
   "contract": "kickoff/rehearsal-010/design-contract.json",
