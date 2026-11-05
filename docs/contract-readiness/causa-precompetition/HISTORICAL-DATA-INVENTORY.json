@@ -1,0 +1,3747 @@
+{
+  "schema": "causa.contract-readiness.historical-data-inventory/1",
+  "generatedBy": "tools/contract-readiness (dotnet run -- generate); do not edit by hand",
+  "source": {
+    "causaDataRepository": "https://github.com/kemiller2002/causa-data",
+    "causaDataCommitPinned": "e8259df74add723765c57a5b1a5888d9c3f707af",
+    "schemaBundleSha256": "0a68af8c93190d2e4d6c27beb2f8cb67c3aebdda586d01beb7122b71af179152",
+    "storageContract": "causa-storage v1.0.0 (contract/v1.0.0)",
+    "successorCandidate": "requirements-compiled/v4.1.5 (CANDIDATE)",
+    "successorContractsSha256": "90a1b34cfbdc0fa17437e293344d5ab27f446b218bc8ec08fb712e8d0ffd829c",
+    "frozenBaseline": "requirements-compiled/v4.1.4 (tag indy-init-requirements-v4.1.4)",
+    "frozenContractsSha256": "861a5651073d05840632649f61bc97f53a39261f5b31619b128df4e3dedab266",
+    "catalogSha256": "7e5e8a400b52d79218e2fb42927d5cb122cc0e6c8ab002f146b33198647ce53c",
+    "screenManifestSha256": "49a155be72d3d550b9f7ca3aca69ec8a4bd24efda961a513270fb346e19ed534",
+    "dotnetSdk": "10.0.402"
+  },
+  "totals": {
+    "investigationDirectories": 28,
+    "distinctHistories": 16,
+    "eventsAllCopies": 5672,
+    "eventsDistinct": 1583,
+    "eventsHistoricalCases": 1315,
+    "eventsActiveCatalog": 1363,
+    "eventTypesObserved": 31,
+    "variantsObserved": 49,
+    "eventTypesRegistered": 31
+  },
+  "storageLocations": {
+    "events": "<dataset>/investigations/<investigationId>/events.ndjson",
+    "manifest": "<dataset>/investigations/<investigationId>/manifest.json",
+    "snapshot": "<dataset>/investigations/<investigationId>/snapshot.json",
+    "activeCatalog": "catalog/active.json",
+    "catalogManifests": "catalog/<catalogId>/manifest.json",
+    "historicalProvenance": "catalog/historical-v1/provenance/<caseKey>.json",
+    "researchSources": "research/historical/<caseKey>/{claims,sources}.json"
+  },
+  "catalogs": {
+    "demonstration-v1": {
+      "active": true,
+      "cases": [
+        {
+          "caseKey": "apollo-1",
+          "path": "workspaces/demo/demonstration-v1/investigations/c6b26614-fc43-5013-a15c-cf95942ee07b"
+        },
+        {
+          "caseKey": "apollo-11",
+          "path": "workspaces/demo/demonstration-v1/investigations/e3adbee5-5096-5a10-bbfb-cecda86a154b"
+        },
+        {
+          "caseKey": "challenger-sts-51l",
+          "path": "workspaces/demo/demonstration-v1/investigations/1784da3c-7141-59ee-a495-1d5d44bf2284"
+        },
+        {
+          "caseKey": "burned-out-lightbulb",
+          "path": "workspaces/demo/demonstration-v1/investigations/fc3f71a9-4c14-5a31-8196-7ce17a7041c1"
+        }
+      ]
+    },
+    "historical-v1": {
+      "active": false,
+      "cases": [
+        {
+          "caseKey": "apollo-1",
+          "path": "workspaces/demo/historical-v1/investigations/c6b26614-fc43-5013-a15c-cf95942ee07b"
+        },
+        {
+          "caseKey": "apollo-11",
+          "path": "workspaces/demo/historical-v1/investigations/e3adbee5-5096-5a10-bbfb-cecda86a154b"
+        },
+        {
+          "caseKey": "challenger-sts-51l",
+          "path": "workspaces/demo/historical-v1/investigations/1784da3c-7141-59ee-a495-1d5d44bf2284"
+        }
+      ]
+    }
+  },
+  "datasets": [
+    {
+      "path": "fixtures/v1.0.0/investigations/6fd2ddc9-bedd-5fff-9093-5506c4d68cb3",
+      "datasetKind": "fixture",
+      "datasetId": "fixtures/v1.0.0",
+      "catalogs": [],
+      "caseKey": null,
+      "investigationId": "6fd2ddc9-bedd-5fff-9093-5506c4d68cb3",
+      "eventsSha256": "a34c241e4eb637c1554744b381fbada8c08f536d77b4bc4148efc4fbb0811960",
+      "identicalCopies": ["fixtures/v1.0.0/investigations/6fd2ddc9-bedd-5fff-9093-5506c4d68cb3"],
+      "events": 26,
+      "formatVersions": ["\"1.0.0\""],
+      "semanticVersions": ["\"1.0.0\""],
+      "eventTypes": {
+        "ActionRecorded": 1,
+        "ActionTransitioned": 2,
+        "AssumptionRecorded": 1,
+        "AssumptionTransitioned": 1,
+        "EvidenceAdmitted": 3,
+        "EvidenceRelated": 3,
+        "HypothesisRecorded": 4,
+        "HypothesisTransitioned": 2,
+        "InvestigationStarted": 1,
+        "LifecycleChanged": 1,
+        "ObservationRecorded": 1,
+        "PredictionRecorded": 1,
+        "ProposalRecorded": 2,
+        "ProposalWasAccepted": 1,
+        "ProposalWasRejected": 1,
+        "UnknownIdentified": 1
+      },
+      "variants": {
+        "ActionRecorded": 1,
+        "ActionTransitioned": 2,
+        "AssumptionRecorded": 1,
+        "AssumptionTransitioned": 1,
+        "EvidenceAdmitted": 3,
+        "EvidenceRelated": 3,
+        "HypothesisRecorded": 4,
+        "HypothesisTransitioned/markPlausible": 2,
+        "InvestigationStarted": 1,
+        "LifecycleChanged/activateInvestigation": 1,
+        "ObservationRecorded": 1,
+        "PredictionRecorded": 1,
+        "ProposalRecorded": 2,
+        "ProposalWasAccepted": 1,
+        "ProposalWasRejected": 1,
+        "UnknownIdentified": 1
+      },
+      "relationshipKinds": {
+        "contradicts": 1,
+        "supports": 2
+      },
+      "relationshipsWithRationale": 3,
+      "actorKinds": {
+        "agent": 2,
+        "human": 23,
+        "system": 1
+      },
+      "actorIds": ["investigator-01", "system", "sre-02", "assistant-01"],
+      "timestampFormat": "RFC 3339 UTC, exactly three fractional digits, Z (every value decoded as KTimestamp)",
+      "occurredAtRange": ["2026-09-08T10:00:00.000Z", "2026-09-08T11:36:00.000Z"],
+      "occurredAtNonDecreasing": true,
+      "correlationGroups": 25,
+      "unknownOrUnsupported": [],
+      "manifestProblems": [],
+      "snapshotProblems": [],
+      "integrityProblems": [],
+      "requiredMigration": "none: every file is formatVersion/semanticVersion 1.0.0; the proposed 1.1.0 extension is additive and never rewrites v1.0.0 files (CONTRACT §13.2)"
+    },
+    {
+      "path": "fixtures/v1.0.0/investigations/a6747bd3-2794-5ac7-83b8-5ea2a0c50f5e",
+      "datasetKind": "fixture",
+      "datasetId": "fixtures/v1.0.0",
+      "catalogs": [],
+      "caseKey": null,
+      "investigationId": "a6747bd3-2794-5ac7-83b8-5ea2a0c50f5e",
+      "eventsSha256": "8c47a0b8d248d773eb1d13ead13676c406dedb5f10e6d981a6584b9454060780",
+      "identicalCopies": ["fixtures/v1.0.0/investigations/a6747bd3-2794-5ac7-83b8-5ea2a0c50f5e"],
+      "events": 59,
+      "formatVersions": ["\"1.0.0\""],
+      "semanticVersions": ["\"1.0.0\""],
+      "eventTypes": {
+        "ActionRecorded": 1,
+        "ActionTransitioned": 3,
+        "AssumptionRecorded": 1,
+        "AssumptionTransitioned": 1,
+        "CausalAssertionConfirmed": 2,
+        "CausalAssertionRecorded": 1,
+        "CausalAssertionReopened": 1,
+        "ConclusionRecorded": 1,
+        "ContradictionRecorded": 1,
+        "ContradictionTransitioned": 1,
+        "CorrectiveActionRecorded": 2,
+        "CorrectiveActionTransitioned": 13,
+        "CriterionRecorded": 1,
+        "EvidenceAdmitted": 7,
+        "EvidenceRelated": 3,
+        "EvidenceVerificationAssessed": 1,
+        "FindingRecorded": 1,
+        "HypothesisRecorded": 2,
+        "HypothesisTransitioned": 3,
+        "InvestigationStarted": 1,
+        "LifecycleChanged": 8,
+        "UnknownIdentified": 1,
+        "UnknownTransitioned": 1,
+        "VerificationRecorded": 2
+      },
+      "variants": {
+        "ActionRecorded": 1,
+        "ActionTransitioned": 3,
+        "AssumptionRecorded": 1,
+        "AssumptionTransitioned": 1,
+        "CausalAssertionConfirmed": 2,
+        "CausalAssertionRecorded": 1,
+        "CausalAssertionReopened": 1,
+        "ConclusionRecorded": 1,
+        "ContradictionRecorded": 1,
+        "ContradictionTransitioned": 1,
+        "CorrectiveActionRecorded": 2,
+        "CorrectiveActionTransitioned/approved": 2,
+        "CorrectiveActionTransitioned/awaitingVerificationOfEffect": 2,
+        "CorrectiveActionTransitioned/implemented": 3,
+        "CorrectiveActionTransitioned/inProgress": 3,
+        "CorrectiveActionTransitioned/reworkRequired": 1,
+        "CorrectiveActionTransitioned/verificationFailed": 1,
+        "CorrectiveActionTransitioned/verifiedEffective": 1,
+        "CriterionRecorded": 1,
+        "EvidenceAdmitted": 7,
+        "EvidenceRelated": 3,
+        "EvidenceVerificationAssessed": 1,
+        "FindingRecorded": 1,
+        "HypothesisRecorded": 2,
+        "HypothesisTransitioned/falsify": 1,
+        "HypothesisTransitioned/markPlausible": 1,
+        "HypothesisTransitioned/markSupported": 1,
+        "InvestigationStarted": 1,
+        "LifecycleChanged/activateInvestigation": 1,
+        "LifecycleChanged/closeInvestigation": 1,
+        "LifecycleChanged/markAwaitingVerification": 2,
+        "LifecycleChanged/reopenInvestigation": 1,
+        "LifecycleChanged/resolveInvestigation": 2,
+        "LifecycleChanged/verificationFailed": 1,
+        "UnknownIdentified": 1,
+        "UnknownTransitioned": 1,
+        "VerificationRecorded": 2
+      },
+      "relationshipKinds": {
+        "contradicts": 1,
+        "supports": 2
+      },
+      "relationshipsWithRationale": 3,
+      "actorKinds": {
+        "human": 58,
+        "system": 1
+      },
+      "actorIds": ["investigator-01", "system", "sre-02"],
+      "timestampFormat": "RFC 3339 UTC, exactly three fractional digits, Z (every value decoded as KTimestamp)",
+      "occurredAtRange": ["2026-10-05T13:30:00.000Z", "2026-10-05T17:06:00.000Z"],
+      "occurredAtNonDecreasing": true,
+      "correlationGroups": 55,
+      "unknownOrUnsupported": [],
+      "manifestProblems": [],
+      "snapshotProblems": [],
+      "integrityProblems": [],
+      "requiredMigration": "none: every file is formatVersion/semanticVersion 1.0.0; the proposed 1.1.0 extension is additive and never rewrites v1.0.0 files (CONTRACT §13.2)"
+    },
+    {
+      "path": "fixtures/v1.0.0/investigations/abd5f9b5-e335-5245-b951-802f01d5a2e5",
+      "datasetKind": "fixture",
+      "datasetId": "fixtures/v1.0.0",
+      "catalogs": [],
+      "caseKey": null,
+      "investigationId": "abd5f9b5-e335-5245-b951-802f01d5a2e5",
+      "eventsSha256": "deffe3cec616f22a0660ba20f3cee74c3d58ab3f38a298b3d4ea0d9606fa975d",
+      "identicalCopies": ["fixtures/v1.0.0/investigations/abd5f9b5-e335-5245-b951-802f01d5a2e5"],
+      "events": 28,
+      "formatVersions": ["\"1.0.0\""],
+      "semanticVersions": ["\"1.0.0\""],
+      "eventTypes": {
+        "AssumptionRecorded": 2,
+        "AssumptionTransitioned": 2,
+        "CausalAssertionRecorded": 1,
+        "ConclusionRecorded": 1,
+        "ContradictionRecorded": 1,
+        "ContradictionTransitioned": 1,
+        "EvidenceAdmitted": 5,
+        "EvidenceRelated": 3,
+        "EvidenceVerificationAssessed": 1,
+        "HypothesisRecorded": 3,
+        "HypothesisTransitioned": 5,
+        "InvestigationStarted": 1,
+        "LifecycleChanged": 1,
+        "UnknownIdentified": 1
+      },
+      "variants": {
+        "AssumptionRecorded": 2,
+        "AssumptionTransitioned": 2,
+        "CausalAssertionRecorded": 1,
+        "ConclusionRecorded": 1,
+        "ContradictionRecorded": 1,
+        "ContradictionTransitioned": 1,
+        "EvidenceAdmitted": 5,
+        "EvidenceRelated": 3,
+        "EvidenceVerificationAssessed": 1,
+        "HypothesisRecorded": 3,
+        "HypothesisTransitioned/falsify": 1,
+        "HypothesisTransitioned/markPlausible": 1,
+        "HypothesisTransitioned/markSupported": 1,
+        "HypothesisTransitioned/markWeakened": 1,
+        "HypothesisTransitioned/reopen": 1,
+        "InvestigationStarted": 1,
+        "LifecycleChanged/activateInvestigation": 1,
+        "UnknownIdentified": 1
+      },
+      "relationshipKinds": {
+        "contradicts": 2,
+        "supports": 1
+      },
+      "relationshipsWithRationale": 3,
+      "actorKinds": {
+        "human": 28
+      },
+      "actorIds": ["investigator-01", "sre-02"],
+      "timestampFormat": "RFC 3339 UTC, exactly three fractional digits, Z (every value decoded as KTimestamp)",
+      "occurredAtRange": ["2026-09-21T11:00:00.000Z", "2026-09-21T12:56:00.000Z"],
+      "occurredAtNonDecreasing": true,
+      "correlationGroups": 28,
+      "unknownOrUnsupported": [],
+      "manifestProblems": [],
+      "snapshotProblems": [],
+      "integrityProblems": [],
+      "requiredMigration": "none: every file is formatVersion/semanticVersion 1.0.0; the proposed 1.1.0 extension is additive and never rewrites v1.0.0 files (CONTRACT §13.2)"
+    },
+    {
+      "path": "fixtures/v1.0.0/investigations/c57e4407-dd43-5d63-8dbe-9d6ceac6c31a",
+      "datasetKind": "fixture",
+      "datasetId": "fixtures/v1.0.0",
+      "catalogs": [],
+      "caseKey": null,
+      "investigationId": "c57e4407-dd43-5d63-8dbe-9d6ceac6c31a",
+      "eventsSha256": "90ed91e1dc3d50c94416e56eaaf4c479de69f51e57a2a0abe22fc84b4767b091",
+      "identicalCopies": ["fixtures/v1.0.0/investigations/c57e4407-dd43-5d63-8dbe-9d6ceac6c31a"],
+      "events": 37,
+      "formatVersions": ["\"1.0.0\""],
+      "semanticVersions": ["\"1.0.0\""],
+      "eventTypes": {
+        "ActionRecorded": 3,
+        "ActionTransitioned": 6,
+        "EvidenceAdmitted": 4,
+        "EvidenceRelated": 3,
+        "EvidenceSuperseded": 1,
+        "EvidenceVerificationAssessed": 2,
+        "FindingRecorded": 1,
+        "HypothesisRecorded": 2,
+        "HypothesisTransitioned": 2,
+        "InvestigationStarted": 1,
+        "LifecycleChanged": 2,
+        "NegativeKnowledgeEstablished": 1,
+        "ObservationRecorded": 3,
+        "PredictionRecorded": 1,
+        "ProposalRecorded": 1,
+        "ProposalWasAccepted": 1,
+        "UnknownIdentified": 2,
+        "UnknownTransitioned": 1
+      },
+      "variants": {
+        "ActionRecorded": 3,
+        "ActionTransitioned": 6,
+        "EvidenceAdmitted": 4,
+        "EvidenceRelated": 3,
+        "EvidenceSuperseded": 1,
+        "EvidenceVerificationAssessed": 2,
+        "FindingRecorded": 1,
+        "HypothesisRecorded": 2,
+        "HypothesisTransitioned/falsify": 1,
+        "HypothesisTransitioned/markPlausible": 1,
+        "InvestigationStarted": 1,
+        "LifecycleChanged/activateInvestigation": 1,
+        "LifecycleChanged/markAwaitingEvidence": 1,
+        "NegativeKnowledgeEstablished": 1,
+        "ObservationRecorded": 3,
+        "PredictionRecorded": 1,
+        "ProposalRecorded": 1,
+        "ProposalWasAccepted": 1,
+        "UnknownIdentified": 2,
+        "UnknownTransitioned": 1
+      },
+      "relationshipKinds": {
+        "contradicts": 1,
+        "supports": 2
+      },
+      "relationshipsWithRationale": 2,
+      "actorKinds": {
+        "agent": 1,
+        "human": 34,
+        "system": 2
+      },
+      "actorIds": ["investigator-01", "sre-02", "system", "assistant-01"],
+      "timestampFormat": "RFC 3339 UTC, exactly three fractional digits, Z (every value decoded as KTimestamp)",
+      "occurredAtRange": ["2026-09-14T06:30:00.000Z", "2026-09-14T08:42:00.000Z"],
+      "occurredAtNonDecreasing": true,
+      "correlationGroups": 34,
+      "unknownOrUnsupported": [],
+      "manifestProblems": [],
+      "snapshotProblems": [],
+      "integrityProblems": [],
+      "requiredMigration": "none: every file is formatVersion/semanticVersion 1.0.0; the proposed 1.1.0 extension is additive and never rewrites v1.0.0 files (CONTRACT §13.2)"
+    },
+    {
+      "path": "fixtures/v1.0.0/investigations/d588748e-8df9-5f27-859e-5d36d9a2b53d",
+      "datasetKind": "fixture",
+      "datasetId": "fixtures/v1.0.0",
+      "catalogs": [],
+      "caseKey": null,
+      "investigationId": "d588748e-8df9-5f27-859e-5d36d9a2b53d",
+      "eventsSha256": "a85cec5ef9e8c03ec1dde9b32723472a8d4a4de941222347f8c39a9aab87a035",
+      "identicalCopies": ["fixtures/v1.0.0/investigations/d588748e-8df9-5f27-859e-5d36d9a2b53d"],
+      "events": 34,
+      "formatVersions": ["\"1.0.0\""],
+      "semanticVersions": ["\"1.0.0\""],
+      "eventTypes": {
+        "CausalAssertionConfirmed": 1,
+        "CausalAssertionRecorded": 1,
+        "CorrectiveActionRecorded": 2,
+        "CorrectiveActionTransitioned": 6,
+        "CriterionRecorded": 2,
+        "EvidenceAdmitted": 4,
+        "EvidenceRelated": 4,
+        "HypothesisRecorded": 3,
+        "HypothesisTransitioned": 5,
+        "InvestigationStarted": 1,
+        "LifecycleChanged": 2,
+        "PredictionRecorded": 1,
+        "UnknownIdentified": 1,
+        "UnknownTransitioned": 1
+      },
+      "variants": {
+        "CausalAssertionConfirmed": 1,
+        "CausalAssertionRecorded": 1,
+        "CorrectiveActionRecorded": 2,
+        "CorrectiveActionTransitioned/approved": 2,
+        "CorrectiveActionTransitioned/awaitingVerificationOfEffect": 1,
+        "CorrectiveActionTransitioned/cancelled": 1,
+        "CorrectiveActionTransitioned/implemented": 1,
+        "CorrectiveActionTransitioned/inProgress": 1,
+        "CriterionRecorded": 2,
+        "EvidenceAdmitted": 4,
+        "EvidenceRelated": 4,
+        "HypothesisRecorded": 3,
+        "HypothesisTransitioned/markPlausible": 2,
+        "HypothesisTransitioned/markSupported": 2,
+        "HypothesisTransitioned/supersede": 1,
+        "InvestigationStarted": 1,
+        "LifecycleChanged/activateInvestigation": 1,
+        "LifecycleChanged/markAwaitingVerification": 1,
+        "PredictionRecorded": 1,
+        "UnknownIdentified": 1,
+        "UnknownTransitioned": 1
+      },
+      "relationshipKinds": {
+        "discriminates": 1,
+        "supports": 3
+      },
+      "relationshipsWithRationale": 3,
+      "actorKinds": {
+        "human": 33,
+        "system": 1
+      },
+      "actorIds": ["investigator-01", "system", "sre-02"],
+      "timestampFormat": "RFC 3339 UTC, exactly three fractional digits, Z (every value decoded as KTimestamp)",
+      "occurredAtRange": ["2026-09-28T15:00:00.000Z", "2026-09-28T17:12:00.000Z"],
+      "occurredAtNonDecreasing": true,
+      "correlationGroups": 34,
+      "unknownOrUnsupported": [],
+      "manifestProblems": [],
+      "snapshotProblems": [],
+      "integrityProblems": [],
+      "requiredMigration": "none: every file is formatVersion/semanticVersion 1.0.0; the proposed 1.1.0 extension is additive and never rewrites v1.0.0 files (CONTRACT §13.2)"
+    },
+    {
+      "path": "templates/demonstration-v1/investigations/1784da3c-7141-59ee-a495-1d5d44bf2284",
+      "datasetKind": "template",
+      "datasetId": "templates/demonstration-v1",
+      "catalogs": [],
+      "caseKey": null,
+      "investigationId": "1784da3c-7141-59ee-a495-1d5d44bf2284",
+      "eventsSha256": "e3b442f0ff3ea178c4d81d4964cef5deda4d104cc426785f7da5a78e9bed9c25",
+      "identicalCopies": ["templates/demonstration-v1/investigations/1784da3c-7141-59ee-a495-1d5d44bf2284", "templates/historical-v1/investigations/1784da3c-7141-59ee-a495-1d5d44bf2284", "workspaces/demo/demonstration-v1/investigations/1784da3c-7141-59ee-a495-1d5d44bf2284", "workspaces/demo/historical-v1/investigations/1784da3c-7141-59ee-a495-1d5d44bf2284"],
+      "events": 452,
+      "formatVersions": ["\"1.0.0\""],
+      "semanticVersions": ["\"1.0.0\""],
+      "eventTypes": {
+        "ActionRecorded": 1,
+        "ActionTransitioned": 3,
+        "AssumptionRecorded": 1,
+        "AssumptionTransitioned": 1,
+        "CausalAssertionConfirmed": 1,
+        "CausalAssertionRecorded": 1,
+        "ConclusionRecorded": 1,
+        "ContradictionRecorded": 11,
+        "ContradictionTransitioned": 16,
+        "CorrectiveActionRecorded": 4,
+        "CorrectiveActionTransitioned": 14,
+        "CriterionRecorded": 4,
+        "EvidenceAdmitted": 128,
+        "EvidenceRelated": 65,
+        "EvidenceVerificationAssessed": 128,
+        "FindingRecorded": 1,
+        "HypothesisRecorded": 11,
+        "HypothesisTransitioned": 20,
+        "InvestigationStarted": 1,
+        "LifecycleChanged": 3,
+        "NegativeKnowledgeEstablished": 2,
+        "ObservationRecorded": 24,
+        "PredictionRecorded": 1,
+        "UnknownIdentified": 3,
+        "UnknownTransitioned": 3,
+        "VerificationRecorded": 4
+      },
+      "variants": {
+        "ActionRecorded": 1,
+        "ActionTransitioned": 3,
+        "AssumptionRecorded": 1,
+        "AssumptionTransitioned": 1,
+        "CausalAssertionConfirmed": 1,
+        "CausalAssertionRecorded": 1,
+        "ConclusionRecorded": 1,
+        "ContradictionRecorded": 11,
+        "ContradictionTransitioned": 16,
+        "CorrectiveActionRecorded": 4,
+        "CorrectiveActionTransitioned/approved": 4,
+        "CorrectiveActionTransitioned/awaitingVerificationOfEffect": 2,
+        "CorrectiveActionTransitioned/implemented": 3,
+        "CorrectiveActionTransitioned/inProgress": 3,
+        "CorrectiveActionTransitioned/verificationFailed": 1,
+        "CorrectiveActionTransitioned/verifiedEffective": 1,
+        "CriterionRecorded": 4,
+        "EvidenceAdmitted": 128,
+        "EvidenceRelated": 65,
+        "EvidenceVerificationAssessed": 128,
+        "FindingRecorded": 1,
+        "HypothesisRecorded": 11,
+        "HypothesisTransitioned/falsify": 2,
+        "HypothesisTransitioned/markPlausible": 9,
+        "HypothesisTransitioned/markSupported": 8,
+        "HypothesisTransitioned/markWeakened": 1,
+        "InvestigationStarted": 1,
+        "LifecycleChanged/activateInvestigation": 1,
+        "LifecycleChanged/markAwaitingVerification": 1,
+        "LifecycleChanged/verificationFailed": 1,
+        "NegativeKnowledgeEstablished": 2,
+        "ObservationRecorded": 24,
+        "PredictionRecorded": 1,
+        "UnknownIdentified": 3,
+        "UnknownTransitioned": 3,
+        "VerificationRecorded": 4
+      },
+      "relationshipKinds": {
+        "contradicts": 6,
+        "supports": 59
+      },
+      "relationshipsWithRationale": 65,
+      "actorKinds": {
+        "system": 452
+      },
+      "actorIds": ["historical-catalog-builder", "historical-source-importer"],
+      "timestampFormat": "RFC 3339 UTC, exactly three fractional digits, Z (every value decoded as KTimestamp)",
+      "occurredAtRange": ["2026-10-23T12:00:00.000Z", "2026-10-23T19:28:00.000Z"],
+      "occurredAtNonDecreasing": true,
+      "correlationGroups": 448,
+      "unknownOrUnsupported": [],
+      "manifestProblems": [],
+      "snapshotProblems": [],
+      "integrityProblems": [],
+      "requiredMigration": "none: every file is formatVersion/semanticVersion 1.0.0; the proposed 1.1.0 extension is additive and never rewrites v1.0.0 files (CONTRACT §13.2)"
+    },
+    {
+      "path": "templates/demonstration-v1/investigations/c6b26614-fc43-5013-a15c-cf95942ee07b",
+      "datasetKind": "template",
+      "datasetId": "templates/demonstration-v1",
+      "catalogs": [],
+      "caseKey": null,
+      "investigationId": "c6b26614-fc43-5013-a15c-cf95942ee07b",
+      "eventsSha256": "c97bc96c4c48ad9ca53268b4fe66637e211c3627ebb3cbe667a1a6f1066ab3a6",
+      "identicalCopies": ["templates/demonstration-v1/investigations/c6b26614-fc43-5013-a15c-cf95942ee07b", "templates/historical-v1/investigations/c6b26614-fc43-5013-a15c-cf95942ee07b", "workspaces/demo/demonstration-v1/investigations/c6b26614-fc43-5013-a15c-cf95942ee07b", "workspaces/demo/historical-v1/investigations/c6b26614-fc43-5013-a15c-cf95942ee07b"],
+      "events": 432,
+      "formatVersions": ["\"1.0.0\""],
+      "semanticVersions": ["\"1.0.0\""],
+      "eventTypes": {
+        "ActionRecorded": 1,
+        "ActionTransitioned": 3,
+        "AssumptionRecorded": 1,
+        "AssumptionTransitioned": 1,
+        "CausalAssertionConfirmed": 1,
+        "CausalAssertionRecorded": 1,
+        "ConclusionRecorded": 1,
+        "ContradictionRecorded": 13,
+        "ContradictionTransitioned": 16,
+        "CorrectiveActionRecorded": 3,
+        "CorrectiveActionTransitioned": 12,
+        "CriterionRecorded": 2,
+        "EvidenceAdmitted": 129,
+        "EvidenceRelated": 55,
+        "EvidenceVerificationAssessed": 129,
+        "FindingRecorded": 1,
+        "HypothesisRecorded": 12,
+        "HypothesisTransitioned": 21,
+        "InvestigationStarted": 1,
+        "LifecycleChanged": 2,
+        "NegativeKnowledgeEstablished": 3,
+        "ObservationRecorded": 15,
+        "PredictionRecorded": 1,
+        "UnknownIdentified": 3,
+        "UnknownTransitioned": 3,
+        "VerificationRecorded": 2
+      },
+      "variants": {
+        "ActionRecorded": 1,
+        "ActionTransitioned": 3,
+        "AssumptionRecorded": 1,
+        "AssumptionTransitioned": 1,
+        "CausalAssertionConfirmed": 1,
+        "CausalAssertionRecorded": 1,
+        "ConclusionRecorded": 1,
+        "ContradictionRecorded": 13,
+        "ContradictionTransitioned": 16,
+        "CorrectiveActionRecorded": 3,
+        "CorrectiveActionTransitioned/approved": 3,
+        "CorrectiveActionTransitioned/awaitingVerificationOfEffect": 2,
+        "CorrectiveActionTransitioned/implemented": 3,
+        "CorrectiveActionTransitioned/inProgress": 3,
+        "CorrectiveActionTransitioned/verifiedEffective": 1,
+        "CriterionRecorded": 2,
+        "EvidenceAdmitted": 129,
+        "EvidenceRelated": 55,
+        "EvidenceVerificationAssessed": 129,
+        "FindingRecorded": 1,
+        "HypothesisRecorded": 12,
+        "HypothesisTransitioned/falsify": 3,
+        "HypothesisTransitioned/markPlausible": 9,
+        "HypothesisTransitioned/markSupported": 6,
+        "HypothesisTransitioned/markWeakened": 3,
+        "InvestigationStarted": 1,
+        "LifecycleChanged/activateInvestigation": 1,
+        "LifecycleChanged/markAwaitingVerification": 1,
+        "NegativeKnowledgeEstablished": 3,
+        "ObservationRecorded": 15,
+        "PredictionRecorded": 1,
+        "UnknownIdentified": 3,
+        "UnknownTransitioned": 3,
+        "VerificationRecorded": 2
+      },
+      "relationshipKinds": {
+        "contradicts": 5,
+        "insufficient": 6,
+        "supports": 44
+      },
+      "relationshipsWithRationale": 55,
+      "actorKinds": {
+        "system": 432
+      },
+      "actorIds": ["historical-catalog-builder", "historical-source-importer"],
+      "timestampFormat": "RFC 3339 UTC, exactly three fractional digits, Z (every value decoded as KTimestamp)",
+      "occurredAtRange": ["2026-10-23T02:00:00.000Z", "2026-10-23T09:10:00.000Z"],
+      "occurredAtNonDecreasing": true,
+      "correlationGroups": 430,
+      "unknownOrUnsupported": [],
+      "manifestProblems": [],
+      "snapshotProblems": [],
+      "integrityProblems": [],
+      "requiredMigration": "none: every file is formatVersion/semanticVersion 1.0.0; the proposed 1.1.0 extension is additive and never rewrites v1.0.0 files (CONTRACT §13.2)"
+    },
+    {
+      "path": "templates/demonstration-v1/investigations/e3adbee5-5096-5a10-bbfb-cecda86a154b",
+      "datasetKind": "template",
+      "datasetId": "templates/demonstration-v1",
+      "catalogs": [],
+      "caseKey": null,
+      "investigationId": "e3adbee5-5096-5a10-bbfb-cecda86a154b",
+      "eventsSha256": "e533fe7fc251a4d0d7f520838735f14373da5b9783682715dae12a7a2dff04c9",
+      "identicalCopies": ["templates/demonstration-v1/investigations/e3adbee5-5096-5a10-bbfb-cecda86a154b", "templates/historical-v1/investigations/e3adbee5-5096-5a10-bbfb-cecda86a154b", "workspaces/demo/demonstration-v1/investigations/e3adbee5-5096-5a10-bbfb-cecda86a154b", "workspaces/demo/historical-v1/investigations/e3adbee5-5096-5a10-bbfb-cecda86a154b"],
+      "events": 431,
+      "formatVersions": ["\"1.0.0\""],
+      "semanticVersions": ["\"1.0.0\""],
+      "eventTypes": {
+        "ActionRecorded": 1,
+        "ActionTransitioned": 3,
+        "AssumptionRecorded": 1,
+        "AssumptionTransitioned": 1,
+        "CausalAssertionConfirmed": 1,
+        "CausalAssertionRecorded": 1,
+        "ConclusionRecorded": 1,
+        "ContradictionRecorded": 11,
+        "ContradictionTransitioned": 13,
+        "CorrectiveActionRecorded": 2,
+        "CorrectiveActionTransitioned": 6,
+        "CriterionRecorded": 1,
+        "EvidenceAdmitted": 119,
+        "EvidenceRelated": 66,
+        "EvidenceVerificationAssessed": 119,
+        "FindingRecorded": 1,
+        "HypothesisRecorded": 12,
+        "HypothesisTransitioned": 23,
+        "InvestigationStarted": 1,
+        "LifecycleChanged": 2,
+        "NegativeKnowledgeEstablished": 1,
+        "ObservationRecorded": 36,
+        "PredictionRecorded": 1,
+        "UnknownIdentified": 4,
+        "UnknownTransitioned": 3,
+        "VerificationRecorded": 1
+      },
+      "variants": {
+        "ActionRecorded": 1,
+        "ActionTransitioned": 3,
+        "AssumptionRecorded": 1,
+        "AssumptionTransitioned": 1,
+        "CausalAssertionConfirmed": 1,
+        "CausalAssertionRecorded": 1,
+        "ConclusionRecorded": 1,
+        "ContradictionRecorded": 11,
+        "ContradictionTransitioned": 13,
+        "CorrectiveActionRecorded": 2,
+        "CorrectiveActionTransitioned/approved": 2,
+        "CorrectiveActionTransitioned/awaitingVerificationOfEffect": 1,
+        "CorrectiveActionTransitioned/implemented": 1,
+        "CorrectiveActionTransitioned/inProgress": 1,
+        "CorrectiveActionTransitioned/verifiedEffective": 1,
+        "CriterionRecorded": 1,
+        "EvidenceAdmitted": 119,
+        "EvidenceRelated": 66,
+        "EvidenceVerificationAssessed": 119,
+        "FindingRecorded": 1,
+        "HypothesisRecorded": 12,
+        "HypothesisTransitioned/falsify": 1,
+        "HypothesisTransitioned/markPlausible": 11,
+        "HypothesisTransitioned/markSupported": 8,
+        "HypothesisTransitioned/markWeakened": 3,
+        "InvestigationStarted": 1,
+        "LifecycleChanged/activateInvestigation": 1,
+        "LifecycleChanged/markAwaitingEvidence": 1,
+        "NegativeKnowledgeEstablished": 1,
+        "ObservationRecorded": 36,
+        "PredictionRecorded": 1,
+        "UnknownIdentified": 4,
+        "UnknownTransitioned": 3,
+        "VerificationRecorded": 1
+      },
+      "relationshipKinds": {
+        "contradicts": 11,
+        "insufficient": 3,
+        "supports": 52
+      },
+      "relationshipsWithRationale": 66,
+      "actorKinds": {
+        "system": 431
+      },
+      "actorIds": ["historical-catalog-builder", "historical-source-importer"],
+      "timestampFormat": "RFC 3339 UTC, exactly three fractional digits, Z (every value decoded as KTimestamp)",
+      "occurredAtRange": ["2026-10-23T07:00:00.000Z", "2026-10-23T14:08:00.000Z"],
+      "occurredAtNonDecreasing": true,
+      "correlationGroups": 429,
+      "unknownOrUnsupported": [],
+      "manifestProblems": [],
+      "snapshotProblems": [],
+      "integrityProblems": [],
+      "requiredMigration": "none: every file is formatVersion/semanticVersion 1.0.0; the proposed 1.1.0 extension is additive and never rewrites v1.0.0 files (CONTRACT §13.2)"
+    },
+    {
+      "path": "templates/demonstration-v1/investigations/fc3f71a9-4c14-5a31-8196-7ce17a7041c1",
+      "datasetKind": "template",
+      "datasetId": "templates/demonstration-v1",
+      "catalogs": [],
+      "caseKey": null,
+      "investigationId": "fc3f71a9-4c14-5a31-8196-7ce17a7041c1",
+      "eventsSha256": "2de5e17b1f870cbcb8f6de032af455c5aed3d18be0a1c1fee85b198b92e02a1b",
+      "identicalCopies": ["templates/demonstration-v1/investigations/fc3f71a9-4c14-5a31-8196-7ce17a7041c1", "templates/everyday-v1/investigations/fc3f71a9-4c14-5a31-8196-7ce17a7041c1", "workspaces/demo/demonstration-v1/investigations/fc3f71a9-4c14-5a31-8196-7ce17a7041c1", "workspaces/demo/everyday-v1/investigations/fc3f71a9-4c14-5a31-8196-7ce17a7041c1"],
+      "events": 48,
+      "formatVersions": ["\"1.0.0\""],
+      "semanticVersions": ["\"1.0.0\""],
+      "eventTypes": {
+        "CausalAssertionConfirmed": 1,
+        "CausalAssertionRecorded": 1,
+        "ConclusionRecorded": 1,
+        "CorrectiveActionRecorded": 1,
+        "CorrectiveActionTransitioned": 5,
+        "CriterionRecorded": 1,
+        "EvidenceAdmitted": 6,
+        "EvidenceRelated": 9,
+        "EvidenceVerificationAssessed": 6,
+        "HypothesisRecorded": 4,
+        "HypothesisTransitioned": 8,
+        "InvestigationStarted": 1,
+        "LifecycleChanged": 3,
+        "VerificationRecorded": 1
+      },
+      "variants": {
+        "CausalAssertionConfirmed": 1,
+        "CausalAssertionRecorded": 1,
+        "ConclusionRecorded": 1,
+        "CorrectiveActionRecorded": 1,
+        "CorrectiveActionTransitioned/approved": 1,
+        "CorrectiveActionTransitioned/awaitingVerificationOfEffect": 1,
+        "CorrectiveActionTransitioned/implemented": 1,
+        "CorrectiveActionTransitioned/inProgress": 1,
+        "CorrectiveActionTransitioned/verifiedEffective": 1,
+        "CriterionRecorded": 1,
+        "EvidenceAdmitted": 6,
+        "EvidenceRelated": 9,
+        "EvidenceVerificationAssessed": 6,
+        "HypothesisRecorded": 4,
+        "HypothesisTransitioned/markPlausible": 4,
+        "HypothesisTransitioned/markSupported": 1,
+        "HypothesisTransitioned/markWeakened": 3,
+        "InvestigationStarted": 1,
+        "LifecycleChanged/activateInvestigation": 1,
+        "LifecycleChanged/markAwaitingVerification": 1,
+        "LifecycleChanged/resolveInvestigation": 1,
+        "VerificationRecorded": 1
+      },
+      "relationshipKinds": {
+        "contradicts": 4,
+        "supports": 5
+      },
+      "relationshipsWithRationale": 9,
+      "actorKinds": {
+        "human": 48
+      },
+      "actorIds": ["everyday-demonstration-investigator"],
+      "timestampFormat": "RFC 3339 UTC, exactly three fractional digits, Z (every value decoded as KTimestamp)",
+      "occurredAtRange": ["2026-10-28T12:00:00.000Z", "2026-10-28T15:04:00.000Z"],
+      "occurredAtNonDecreasing": true,
+      "correlationGroups": 47,
+      "unknownOrUnsupported": [],
+      "manifestProblems": [],
+      "snapshotProblems": [],
+      "integrityProblems": [],
+      "requiredMigration": "none: every file is formatVersion/semanticVersion 1.0.0; the proposed 1.1.0 extension is additive and never rewrites v1.0.0 files (CONTRACT §13.2)"
+    },
+    {
+      "path": "templates/everyday-v1/investigations/fc3f71a9-4c14-5a31-8196-7ce17a7041c1",
+      "datasetKind": "template",
+      "datasetId": "templates/everyday-v1",
+      "catalogs": [],
+      "caseKey": null,
+      "investigationId": "fc3f71a9-4c14-5a31-8196-7ce17a7041c1",
+      "eventsSha256": "2de5e17b1f870cbcb8f6de032af455c5aed3d18be0a1c1fee85b198b92e02a1b",
+      "identicalCopies": ["templates/demonstration-v1/investigations/fc3f71a9-4c14-5a31-8196-7ce17a7041c1", "templates/everyday-v1/investigations/fc3f71a9-4c14-5a31-8196-7ce17a7041c1", "workspaces/demo/demonstration-v1/investigations/fc3f71a9-4c14-5a31-8196-7ce17a7041c1", "workspaces/demo/everyday-v1/investigations/fc3f71a9-4c14-5a31-8196-7ce17a7041c1"],
+      "events": 48,
+      "formatVersions": ["\"1.0.0\""],
+      "semanticVersions": ["\"1.0.0\""],
+      "eventTypes": {
+        "CausalAssertionConfirmed": 1,
+        "CausalAssertionRecorded": 1,
+        "ConclusionRecorded": 1,
+        "CorrectiveActionRecorded": 1,
+        "CorrectiveActionTransitioned": 5,
+        "CriterionRecorded": 1,
+        "EvidenceAdmitted": 6,
+        "EvidenceRelated": 9,
+        "EvidenceVerificationAssessed": 6,
+        "HypothesisRecorded": 4,
+        "HypothesisTransitioned": 8,
+        "InvestigationStarted": 1,
+        "LifecycleChanged": 3,
+        "VerificationRecorded": 1
+      },
+      "variants": {
+        "CausalAssertionConfirmed": 1,
+        "CausalAssertionRecorded": 1,
+        "ConclusionRecorded": 1,
+        "CorrectiveActionRecorded": 1,
+        "CorrectiveActionTransitioned/approved": 1,
+        "CorrectiveActionTransitioned/awaitingVerificationOfEffect": 1,
+        "CorrectiveActionTransitioned/implemented": 1,
+        "CorrectiveActionTransitioned/inProgress": 1,
+        "CorrectiveActionTransitioned/verifiedEffective": 1,
+        "CriterionRecorded": 1,
+        "EvidenceAdmitted": 6,
+        "EvidenceRelated": 9,
+        "EvidenceVerificationAssessed": 6,
+        "HypothesisRecorded": 4,
+        "HypothesisTransitioned/markPlausible": 4,
+        "HypothesisTransitioned/markSupported": 1,
+        "HypothesisTransitioned/markWeakened": 3,
+        "InvestigationStarted": 1,
+        "LifecycleChanged/activateInvestigation": 1,
+        "LifecycleChanged/markAwaitingVerification": 1,
+        "LifecycleChanged/resolveInvestigation": 1,
+        "VerificationRecorded": 1
+      },
+      "relationshipKinds": {
+        "contradicts": 4,
+        "supports": 5
+      },
+      "relationshipsWithRationale": 9,
+      "actorKinds": {
+        "human": 48
+      },
+      "actorIds": ["everyday-demonstration-investigator"],
+      "timestampFormat": "RFC 3339 UTC, exactly three fractional digits, Z (every value decoded as KTimestamp)",
+      "occurredAtRange": ["2026-10-28T12:00:00.000Z", "2026-10-28T15:04:00.000Z"],
+      "occurredAtNonDecreasing": true,
+      "correlationGroups": 47,
+      "unknownOrUnsupported": [],
+      "manifestProblems": [],
+      "snapshotProblems": [],
+      "integrityProblems": [],
+      "requiredMigration": "none: every file is formatVersion/semanticVersion 1.0.0; the proposed 1.1.0 extension is additive and never rewrites v1.0.0 files (CONTRACT §13.2)"
+    },
+    {
+      "path": "templates/historical-v1/investigations/1784da3c-7141-59ee-a495-1d5d44bf2284",
+      "datasetKind": "template",
+      "datasetId": "templates/historical-v1",
+      "catalogs": [],
+      "caseKey": null,
+      "investigationId": "1784da3c-7141-59ee-a495-1d5d44bf2284",
+      "eventsSha256": "e3b442f0ff3ea178c4d81d4964cef5deda4d104cc426785f7da5a78e9bed9c25",
+      "identicalCopies": ["templates/demonstration-v1/investigations/1784da3c-7141-59ee-a495-1d5d44bf2284", "templates/historical-v1/investigations/1784da3c-7141-59ee-a495-1d5d44bf2284", "workspaces/demo/demonstration-v1/investigations/1784da3c-7141-59ee-a495-1d5d44bf2284", "workspaces/demo/historical-v1/investigations/1784da3c-7141-59ee-a495-1d5d44bf2284"],
+      "events": 452,
+      "formatVersions": ["\"1.0.0\""],
+      "semanticVersions": ["\"1.0.0\""],
+      "eventTypes": {
+        "ActionRecorded": 1,
+        "ActionTransitioned": 3,
+        "AssumptionRecorded": 1,
+        "AssumptionTransitioned": 1,
+        "CausalAssertionConfirmed": 1,
+        "CausalAssertionRecorded": 1,
+        "ConclusionRecorded": 1,
+        "ContradictionRecorded": 11,
+        "ContradictionTransitioned": 16,
+        "CorrectiveActionRecorded": 4,
+        "CorrectiveActionTransitioned": 14,
+        "CriterionRecorded": 4,
+        "EvidenceAdmitted": 128,
+        "EvidenceRelated": 65,
+        "EvidenceVerificationAssessed": 128,
+        "FindingRecorded": 1,
+        "HypothesisRecorded": 11,
+        "HypothesisTransitioned": 20,
+        "InvestigationStarted": 1,
+        "LifecycleChanged": 3,
+        "NegativeKnowledgeEstablished": 2,
+        "ObservationRecorded": 24,
+        "PredictionRecorded": 1,
+        "UnknownIdentified": 3,
+        "UnknownTransitioned": 3,
+        "VerificationRecorded": 4
+      },
+      "variants": {
+        "ActionRecorded": 1,
+        "ActionTransitioned": 3,
+        "AssumptionRecorded": 1,
+        "AssumptionTransitioned": 1,
+        "CausalAssertionConfirmed": 1,
+        "CausalAssertionRecorded": 1,
+        "ConclusionRecorded": 1,
+        "ContradictionRecorded": 11,
+        "ContradictionTransitioned": 16,
+        "CorrectiveActionRecorded": 4,
+        "CorrectiveActionTransitioned/approved": 4,
+        "CorrectiveActionTransitioned/awaitingVerificationOfEffect": 2,
+        "CorrectiveActionTransitioned/implemented": 3,
+        "CorrectiveActionTransitioned/inProgress": 3,
+        "CorrectiveActionTransitioned/verificationFailed": 1,
+        "CorrectiveActionTransitioned/verifiedEffective": 1,
+        "CriterionRecorded": 4,
+        "EvidenceAdmitted": 128,
+        "EvidenceRelated": 65,
+        "EvidenceVerificationAssessed": 128,
+        "FindingRecorded": 1,
+        "HypothesisRecorded": 11,
+        "HypothesisTransitioned/falsify": 2,
+        "HypothesisTransitioned/markPlausible": 9,
+        "HypothesisTransitioned/markSupported": 8,
+        "HypothesisTransitioned/markWeakened": 1,
+        "InvestigationStarted": 1,
+        "LifecycleChanged/activateInvestigation": 1,
+        "LifecycleChanged/markAwaitingVerification": 1,
+        "LifecycleChanged/verificationFailed": 1,
+        "NegativeKnowledgeEstablished": 2,
+        "ObservationRecorded": 24,
+        "PredictionRecorded": 1,
+        "UnknownIdentified": 3,
+        "UnknownTransitioned": 3,
+        "VerificationRecorded": 4
+      },
+      "relationshipKinds": {
+        "contradicts": 6,
+        "supports": 59
+      },
+      "relationshipsWithRationale": 65,
+      "actorKinds": {
+        "system": 452
+      },
+      "actorIds": ["historical-catalog-builder", "historical-source-importer"],
+      "timestampFormat": "RFC 3339 UTC, exactly three fractional digits, Z (every value decoded as KTimestamp)",
+      "occurredAtRange": ["2026-10-23T12:00:00.000Z", "2026-10-23T19:28:00.000Z"],
+      "occurredAtNonDecreasing": true,
+      "correlationGroups": 448,
+      "unknownOrUnsupported": [],
+      "manifestProblems": [],
+      "snapshotProblems": [],
+      "integrityProblems": [],
+      "requiredMigration": "none: every file is formatVersion/semanticVersion 1.0.0; the proposed 1.1.0 extension is additive and never rewrites v1.0.0 files (CONTRACT §13.2)"
+    },
+    {
+      "path": "templates/historical-v1/investigations/c6b26614-fc43-5013-a15c-cf95942ee07b",
+      "datasetKind": "template",
+      "datasetId": "templates/historical-v1",
+      "catalogs": [],
+      "caseKey": null,
+      "investigationId": "c6b26614-fc43-5013-a15c-cf95942ee07b",
+      "eventsSha256": "c97bc96c4c48ad9ca53268b4fe66637e211c3627ebb3cbe667a1a6f1066ab3a6",
+      "identicalCopies": ["templates/demonstration-v1/investigations/c6b26614-fc43-5013-a15c-cf95942ee07b", "templates/historical-v1/investigations/c6b26614-fc43-5013-a15c-cf95942ee07b", "workspaces/demo/demonstration-v1/investigations/c6b26614-fc43-5013-a15c-cf95942ee07b", "workspaces/demo/historical-v1/investigations/c6b26614-fc43-5013-a15c-cf95942ee07b"],
+      "events": 432,
+      "formatVersions": ["\"1.0.0\""],
+      "semanticVersions": ["\"1.0.0\""],
+      "eventTypes": {
+        "ActionRecorded": 1,
+        "ActionTransitioned": 3,
+        "AssumptionRecorded": 1,
+        "AssumptionTransitioned": 1,
+        "CausalAssertionConfirmed": 1,
+        "CausalAssertionRecorded": 1,
+        "ConclusionRecorded": 1,
+        "ContradictionRecorded": 13,
+        "ContradictionTransitioned": 16,
+        "CorrectiveActionRecorded": 3,
+        "CorrectiveActionTransitioned": 12,
+        "CriterionRecorded": 2,
+        "EvidenceAdmitted": 129,
+        "EvidenceRelated": 55,
+        "EvidenceVerificationAssessed": 129,
+        "FindingRecorded": 1,
+        "HypothesisRecorded": 12,
+        "HypothesisTransitioned": 21,
+        "InvestigationStarted": 1,
+        "LifecycleChanged": 2,
+        "NegativeKnowledgeEstablished": 3,
+        "ObservationRecorded": 15,
+        "PredictionRecorded": 1,
+        "UnknownIdentified": 3,
+        "UnknownTransitioned": 3,
+        "VerificationRecorded": 2
+      },
+      "variants": {
+        "ActionRecorded": 1,
+        "ActionTransitioned": 3,
+        "AssumptionRecorded": 1,
+        "AssumptionTransitioned": 1,
+        "CausalAssertionConfirmed": 1,
+        "CausalAssertionRecorded": 1,
+        "ConclusionRecorded": 1,
+        "ContradictionRecorded": 13,
+        "ContradictionTransitioned": 16,
+        "CorrectiveActionRecorded": 3,
+        "CorrectiveActionTransitioned/approved": 3,
+        "CorrectiveActionTransitioned/awaitingVerificationOfEffect": 2,
+        "CorrectiveActionTransitioned/implemented": 3,
+        "CorrectiveActionTransitioned/inProgress": 3,
+        "CorrectiveActionTransitioned/verifiedEffective": 1,
+        "CriterionRecorded": 2,
+        "EvidenceAdmitted": 129,
+        "EvidenceRelated": 55,
+        "EvidenceVerificationAssessed": 129,
+        "FindingRecorded": 1,
+        "HypothesisRecorded": 12,
+        "HypothesisTransitioned/falsify": 3,
+        "HypothesisTransitioned/markPlausible": 9,
+        "HypothesisTransitioned/markSupported": 6,
+        "HypothesisTransitioned/markWeakened": 3,
+        "InvestigationStarted": 1,
+        "LifecycleChanged/activateInvestigation": 1,
+        "LifecycleChanged/markAwaitingVerification": 1,
+        "NegativeKnowledgeEstablished": 3,
+        "ObservationRecorded": 15,
+        "PredictionRecorded": 1,
+        "UnknownIdentified": 3,
+        "UnknownTransitioned": 3,
+        "VerificationRecorded": 2
+      },
+      "relationshipKinds": {
+        "contradicts": 5,
+        "insufficient": 6,
+        "supports": 44
+      },
+      "relationshipsWithRationale": 55,
+      "actorKinds": {
+        "system": 432
+      },
+      "actorIds": ["historical-catalog-builder", "historical-source-importer"],
+      "timestampFormat": "RFC 3339 UTC, exactly three fractional digits, Z (every value decoded as KTimestamp)",
+      "occurredAtRange": ["2026-10-23T02:00:00.000Z", "2026-10-23T09:10:00.000Z"],
+      "occurredAtNonDecreasing": true,
+      "correlationGroups": 430,
+      "unknownOrUnsupported": [],
+      "manifestProblems": [],
+      "snapshotProblems": [],
+      "integrityProblems": [],
+      "requiredMigration": "none: every file is formatVersion/semanticVersion 1.0.0; the proposed 1.1.0 extension is additive and never rewrites v1.0.0 files (CONTRACT §13.2)"
+    },
+    {
+      "path": "templates/historical-v1/investigations/e3adbee5-5096-5a10-bbfb-cecda86a154b",
+      "datasetKind": "template",
+      "datasetId": "templates/historical-v1",
+      "catalogs": [],
+      "caseKey": null,
+      "investigationId": "e3adbee5-5096-5a10-bbfb-cecda86a154b",
+      "eventsSha256": "e533fe7fc251a4d0d7f520838735f14373da5b9783682715dae12a7a2dff04c9",
+      "identicalCopies": ["templates/demonstration-v1/investigations/e3adbee5-5096-5a10-bbfb-cecda86a154b", "templates/historical-v1/investigations/e3adbee5-5096-5a10-bbfb-cecda86a154b", "workspaces/demo/demonstration-v1/investigations/e3adbee5-5096-5a10-bbfb-cecda86a154b", "workspaces/demo/historical-v1/investigations/e3adbee5-5096-5a10-bbfb-cecda86a154b"],
+      "events": 431,
+      "formatVersions": ["\"1.0.0\""],
+      "semanticVersions": ["\"1.0.0\""],
+      "eventTypes": {
+        "ActionRecorded": 1,
+        "ActionTransitioned": 3,
+        "AssumptionRecorded": 1,
+        "AssumptionTransitioned": 1,
+        "CausalAssertionConfirmed": 1,
+        "CausalAssertionRecorded": 1,
+        "ConclusionRecorded": 1,
+        "ContradictionRecorded": 11,
+        "ContradictionTransitioned": 13,
+        "CorrectiveActionRecorded": 2,
+        "CorrectiveActionTransitioned": 6,
+        "CriterionRecorded": 1,
+        "EvidenceAdmitted": 119,
+        "EvidenceRelated": 66,
+        "EvidenceVerificationAssessed": 119,
+        "FindingRecorded": 1,
+        "HypothesisRecorded": 12,
+        "HypothesisTransitioned": 23,
+        "InvestigationStarted": 1,
+        "LifecycleChanged": 2,
+        "NegativeKnowledgeEstablished": 1,
+        "ObservationRecorded": 36,
+        "PredictionRecorded": 1,
+        "UnknownIdentified": 4,
+        "UnknownTransitioned": 3,
+        "VerificationRecorded": 1
+      },
+      "variants": {
+        "ActionRecorded": 1,
+        "ActionTransitioned": 3,
+        "AssumptionRecorded": 1,
+        "AssumptionTransitioned": 1,
+        "CausalAssertionConfirmed": 1,
+        "CausalAssertionRecorded": 1,
+        "ConclusionRecorded": 1,
+        "ContradictionRecorded": 11,
+        "ContradictionTransitioned": 13,
+        "CorrectiveActionRecorded": 2,
+        "CorrectiveActionTransitioned/approved": 2,
+        "CorrectiveActionTransitioned/awaitingVerificationOfEffect": 1,
+        "CorrectiveActionTransitioned/implemented": 1,
+        "CorrectiveActionTransitioned/inProgress": 1,
+        "CorrectiveActionTransitioned/verifiedEffective": 1,
+        "CriterionRecorded": 1,
+        "EvidenceAdmitted": 119,
+        "EvidenceRelated": 66,
+        "EvidenceVerificationAssessed": 119,
+        "FindingRecorded": 1,
+        "HypothesisRecorded": 12,
+        "HypothesisTransitioned/falsify": 1,
+        "HypothesisTransitioned/markPlausible": 11,
+        "HypothesisTransitioned/markSupported": 8,
+        "HypothesisTransitioned/markWeakened": 3,
+        "InvestigationStarted": 1,
+        "LifecycleChanged/activateInvestigation": 1,
+        "LifecycleChanged/markAwaitingEvidence": 1,
+        "NegativeKnowledgeEstablished": 1,
+        "ObservationRecorded": 36,
+        "PredictionRecorded": 1,
+        "UnknownIdentified": 4,
+        "UnknownTransitioned": 3,
+        "VerificationRecorded": 1
+      },
+      "relationshipKinds": {
+        "contradicts": 11,
+        "insufficient": 3,
+        "supports": 52
+      },
+      "relationshipsWithRationale": 66,
+      "actorKinds": {
+        "system": 431
+      },
+      "actorIds": ["historical-catalog-builder", "historical-source-importer"],
+      "timestampFormat": "RFC 3339 UTC, exactly three fractional digits, Z (every value decoded as KTimestamp)",
+      "occurredAtRange": ["2026-10-23T07:00:00.000Z", "2026-10-23T14:08:00.000Z"],
+      "occurredAtNonDecreasing": true,
+      "correlationGroups": 429,
+      "unknownOrUnsupported": [],
+      "manifestProblems": [],
+      "snapshotProblems": [],
+      "integrityProblems": [],
+      "requiredMigration": "none: every file is formatVersion/semanticVersion 1.0.0; the proposed 1.1.0 extension is additive and never rewrites v1.0.0 files (CONTRACT §13.2)"
+    },
+    {
+      "path": "workspaces/demo/demonstration-v1/investigations/1784da3c-7141-59ee-a495-1d5d44bf2284",
+      "datasetKind": "workspace",
+      "datasetId": "workspaces/demo/demonstration-v1",
+      "catalogs": ["demonstration-v1"],
+      "caseKey": "challenger-sts-51l",
+      "investigationId": "1784da3c-7141-59ee-a495-1d5d44bf2284",
+      "eventsSha256": "e3b442f0ff3ea178c4d81d4964cef5deda4d104cc426785f7da5a78e9bed9c25",
+      "identicalCopies": ["templates/demonstration-v1/investigations/1784da3c-7141-59ee-a495-1d5d44bf2284", "templates/historical-v1/investigations/1784da3c-7141-59ee-a495-1d5d44bf2284", "workspaces/demo/demonstration-v1/investigations/1784da3c-7141-59ee-a495-1d5d44bf2284", "workspaces/demo/historical-v1/investigations/1784da3c-7141-59ee-a495-1d5d44bf2284"],
+      "events": 452,
+      "formatVersions": ["\"1.0.0\""],
+      "semanticVersions": ["\"1.0.0\""],
+      "eventTypes": {
+        "ActionRecorded": 1,
+        "ActionTransitioned": 3,
+        "AssumptionRecorded": 1,
+        "AssumptionTransitioned": 1,
+        "CausalAssertionConfirmed": 1,
+        "CausalAssertionRecorded": 1,
+        "ConclusionRecorded": 1,
+        "ContradictionRecorded": 11,
+        "ContradictionTransitioned": 16,
+        "CorrectiveActionRecorded": 4,
+        "CorrectiveActionTransitioned": 14,
+        "CriterionRecorded": 4,
+        "EvidenceAdmitted": 128,
+        "EvidenceRelated": 65,
+        "EvidenceVerificationAssessed": 128,
+        "FindingRecorded": 1,
+        "HypothesisRecorded": 11,
+        "HypothesisTransitioned": 20,
+        "InvestigationStarted": 1,
+        "LifecycleChanged": 3,
+        "NegativeKnowledgeEstablished": 2,
+        "ObservationRecorded": 24,
+        "PredictionRecorded": 1,
+        "UnknownIdentified": 3,
+        "UnknownTransitioned": 3,
+        "VerificationRecorded": 4
+      },
+      "variants": {
+        "ActionRecorded": 1,
+        "ActionTransitioned": 3,
+        "AssumptionRecorded": 1,
+        "AssumptionTransitioned": 1,
+        "CausalAssertionConfirmed": 1,
+        "CausalAssertionRecorded": 1,
+        "ConclusionRecorded": 1,
+        "ContradictionRecorded": 11,
+        "ContradictionTransitioned": 16,
+        "CorrectiveActionRecorded": 4,
+        "CorrectiveActionTransitioned/approved": 4,
+        "CorrectiveActionTransitioned/awaitingVerificationOfEffect": 2,
+        "CorrectiveActionTransitioned/implemented": 3,
+        "CorrectiveActionTransitioned/inProgress": 3,
+        "CorrectiveActionTransitioned/verificationFailed": 1,
+        "CorrectiveActionTransitioned/verifiedEffective": 1,
+        "CriterionRecorded": 4,
+        "EvidenceAdmitted": 128,
+        "EvidenceRelated": 65,
+        "EvidenceVerificationAssessed": 128,
+        "FindingRecorded": 1,
+        "HypothesisRecorded": 11,
+        "HypothesisTransitioned/falsify": 2,
+        "HypothesisTransitioned/markPlausible": 9,
+        "HypothesisTransitioned/markSupported": 8,
+        "HypothesisTransitioned/markWeakened": 1,
+        "InvestigationStarted": 1,
+        "LifecycleChanged/activateInvestigation": 1,
+        "LifecycleChanged/markAwaitingVerification": 1,
+        "LifecycleChanged/verificationFailed": 1,
+        "NegativeKnowledgeEstablished": 2,
+        "ObservationRecorded": 24,
+        "PredictionRecorded": 1,
+        "UnknownIdentified": 3,
+        "UnknownTransitioned": 3,
+        "VerificationRecorded": 4
+      },
+      "relationshipKinds": {
+        "contradicts": 6,
+        "supports": 59
+      },
+      "relationshipsWithRationale": 65,
+      "actorKinds": {
+        "system": 452
+      },
+      "actorIds": ["historical-catalog-builder", "historical-source-importer"],
+      "timestampFormat": "RFC 3339 UTC, exactly three fractional digits, Z (every value decoded as KTimestamp)",
+      "occurredAtRange": ["2026-10-23T12:00:00.000Z", "2026-10-23T19:28:00.000Z"],
+      "occurredAtNonDecreasing": true,
+      "correlationGroups": 448,
+      "unknownOrUnsupported": [],
+      "manifestProblems": [],
+      "snapshotProblems": [],
+      "integrityProblems": [],
+      "requiredMigration": "none: every file is formatVersion/semanticVersion 1.0.0; the proposed 1.1.0 extension is additive and never rewrites v1.0.0 files (CONTRACT §13.2)"
+    },
+    {
+      "path": "workspaces/demo/demonstration-v1/investigations/c6b26614-fc43-5013-a15c-cf95942ee07b",
+      "datasetKind": "workspace",
+      "datasetId": "workspaces/demo/demonstration-v1",
+      "catalogs": ["demonstration-v1"],
+      "caseKey": "apollo-1",
+      "investigationId": "c6b26614-fc43-5013-a15c-cf95942ee07b",
+      "eventsSha256": "c97bc96c4c48ad9ca53268b4fe66637e211c3627ebb3cbe667a1a6f1066ab3a6",
+      "identicalCopies": ["templates/demonstration-v1/investigations/c6b26614-fc43-5013-a15c-cf95942ee07b", "templates/historical-v1/investigations/c6b26614-fc43-5013-a15c-cf95942ee07b", "workspaces/demo/demonstration-v1/investigations/c6b26614-fc43-5013-a15c-cf95942ee07b", "workspaces/demo/historical-v1/investigations/c6b26614-fc43-5013-a15c-cf95942ee07b"],
+      "events": 432,
+      "formatVersions": ["\"1.0.0\""],
+      "semanticVersions": ["\"1.0.0\""],
+      "eventTypes": {
+        "ActionRecorded": 1,
+        "ActionTransitioned": 3,
+        "AssumptionRecorded": 1,
+        "AssumptionTransitioned": 1,
+        "CausalAssertionConfirmed": 1,
+        "CausalAssertionRecorded": 1,
+        "ConclusionRecorded": 1,
+        "ContradictionRecorded": 13,
+        "ContradictionTransitioned": 16,
+        "CorrectiveActionRecorded": 3,
+        "CorrectiveActionTransitioned": 12,
+        "CriterionRecorded": 2,
+        "EvidenceAdmitted": 129,
+        "EvidenceRelated": 55,
+        "EvidenceVerificationAssessed": 129,
+        "FindingRecorded": 1,
+        "HypothesisRecorded": 12,
+        "HypothesisTransitioned": 21,
+        "InvestigationStarted": 1,
+        "LifecycleChanged": 2,
+        "NegativeKnowledgeEstablished": 3,
+        "ObservationRecorded": 15,
+        "PredictionRecorded": 1,
+        "UnknownIdentified": 3,
+        "UnknownTransitioned": 3,
+        "VerificationRecorded": 2
+      },
+      "variants": {
+        "ActionRecorded": 1,
+        "ActionTransitioned": 3,
+        "AssumptionRecorded": 1,
+        "AssumptionTransitioned": 1,
+        "CausalAssertionConfirmed": 1,
+        "CausalAssertionRecorded": 1,
+        "ConclusionRecorded": 1,
+        "ContradictionRecorded": 13,
+        "ContradictionTransitioned": 16,
+        "CorrectiveActionRecorded": 3,
+        "CorrectiveActionTransitioned/approved": 3,
+        "CorrectiveActionTransitioned/awaitingVerificationOfEffect": 2,
+        "CorrectiveActionTransitioned/implemented": 3,
+        "CorrectiveActionTransitioned/inProgress": 3,
+        "CorrectiveActionTransitioned/verifiedEffective": 1,
+        "CriterionRecorded": 2,
+        "EvidenceAdmitted": 129,
+        "EvidenceRelated": 55,
+        "EvidenceVerificationAssessed": 129,
+        "FindingRecorded": 1,
+        "HypothesisRecorded": 12,
+        "HypothesisTransitioned/falsify": 3,
+        "HypothesisTransitioned/markPlausible": 9,
+        "HypothesisTransitioned/markSupported": 6,
+        "HypothesisTransitioned/markWeakened": 3,
+        "InvestigationStarted": 1,
+        "LifecycleChanged/activateInvestigation": 1,
+        "LifecycleChanged/markAwaitingVerification": 1,
+        "NegativeKnowledgeEstablished": 3,
+        "ObservationRecorded": 15,
+        "PredictionRecorded": 1,
+        "UnknownIdentified": 3,
+        "UnknownTransitioned": 3,
+        "VerificationRecorded": 2
+      },
+      "relationshipKinds": {
+        "contradicts": 5,
+        "insufficient": 6,
+        "supports": 44
+      },
+      "relationshipsWithRationale": 55,
+      "actorKinds": {
+        "system": 432
+      },
+      "actorIds": ["historical-catalog-builder", "historical-source-importer"],
+      "timestampFormat": "RFC 3339 UTC, exactly three fractional digits, Z (every value decoded as KTimestamp)",
+      "occurredAtRange": ["2026-10-23T02:00:00.000Z", "2026-10-23T09:10:00.000Z"],
+      "occurredAtNonDecreasing": true,
+      "correlationGroups": 430,
+      "unknownOrUnsupported": [],
+      "manifestProblems": [],
+      "snapshotProblems": [],
+      "integrityProblems": [],
+      "requiredMigration": "none: every file is formatVersion/semanticVersion 1.0.0; the proposed 1.1.0 extension is additive and never rewrites v1.0.0 files (CONTRACT §13.2)"
+    },
+    {
+      "path": "workspaces/demo/demonstration-v1/investigations/e3adbee5-5096-5a10-bbfb-cecda86a154b",
+      "datasetKind": "workspace",
+      "datasetId": "workspaces/demo/demonstration-v1",
+      "catalogs": ["demonstration-v1"],
+      "caseKey": "apollo-11",
+      "investigationId": "e3adbee5-5096-5a10-bbfb-cecda86a154b",
+      "eventsSha256": "e533fe7fc251a4d0d7f520838735f14373da5b9783682715dae12a7a2dff04c9",
+      "identicalCopies": ["templates/demonstration-v1/investigations/e3adbee5-5096-5a10-bbfb-cecda86a154b", "templates/historical-v1/investigations/e3adbee5-5096-5a10-bbfb-cecda86a154b", "workspaces/demo/demonstration-v1/investigations/e3adbee5-5096-5a10-bbfb-cecda86a154b", "workspaces/demo/historical-v1/investigations/e3adbee5-5096-5a10-bbfb-cecda86a154b"],
+      "events": 431,
+      "formatVersions": ["\"1.0.0\""],
+      "semanticVersions": ["\"1.0.0\""],
+      "eventTypes": {
+        "ActionRecorded": 1,
+        "ActionTransitioned": 3,
+        "AssumptionRecorded": 1,
+        "AssumptionTransitioned": 1,
+        "CausalAssertionConfirmed": 1,
+        "CausalAssertionRecorded": 1,
+        "ConclusionRecorded": 1,
+        "ContradictionRecorded": 11,
+        "ContradictionTransitioned": 13,
+        "CorrectiveActionRecorded": 2,
+        "CorrectiveActionTransitioned": 6,
+        "CriterionRecorded": 1,
+        "EvidenceAdmitted": 119,
+        "EvidenceRelated": 66,
+        "EvidenceVerificationAssessed": 119,
+        "FindingRecorded": 1,
+        "HypothesisRecorded": 12,
+        "HypothesisTransitioned": 23,
+        "InvestigationStarted": 1,
+        "LifecycleChanged": 2,
+        "NegativeKnowledgeEstablished": 1,
+        "ObservationRecorded": 36,
+        "PredictionRecorded": 1,
+        "UnknownIdentified": 4,
+        "UnknownTransitioned": 3,
+        "VerificationRecorded": 1
+      },
+      "variants": {
+        "ActionRecorded": 1,
+        "ActionTransitioned": 3,
+        "AssumptionRecorded": 1,
+        "AssumptionTransitioned": 1,
+        "CausalAssertionConfirmed": 1,
+        "CausalAssertionRecorded": 1,
+        "ConclusionRecorded": 1,
+        "ContradictionRecorded": 11,
+        "ContradictionTransitioned": 13,
+        "CorrectiveActionRecorded": 2,
+        "CorrectiveActionTransitioned/approved": 2,
+        "CorrectiveActionTransitioned/awaitingVerificationOfEffect": 1,
+        "CorrectiveActionTransitioned/implemented": 1,
+        "CorrectiveActionTransitioned/inProgress": 1,
+        "CorrectiveActionTransitioned/verifiedEffective": 1,
+        "CriterionRecorded": 1,
+        "EvidenceAdmitted": 119,
+        "EvidenceRelated": 66,
+        "EvidenceVerificationAssessed": 119,
+        "FindingRecorded": 1,
+        "HypothesisRecorded": 12,
+        "HypothesisTransitioned/falsify": 1,
+        "HypothesisTransitioned/markPlausible": 11,
+        "HypothesisTransitioned/markSupported": 8,
+        "HypothesisTransitioned/markWeakened": 3,
+        "InvestigationStarted": 1,
+        "LifecycleChanged/activateInvestigation": 1,
+        "LifecycleChanged/markAwaitingEvidence": 1,
+        "NegativeKnowledgeEstablished": 1,
+        "ObservationRecorded": 36,
+        "PredictionRecorded": 1,
+        "UnknownIdentified": 4,
+        "UnknownTransitioned": 3,
+        "VerificationRecorded": 1
+      },
+      "relationshipKinds": {
+        "contradicts": 11,
+        "insufficient": 3,
+        "supports": 52
+      },
+      "relationshipsWithRationale": 66,
+      "actorKinds": {
+        "system": 431
+      },
+      "actorIds": ["historical-catalog-builder", "historical-source-importer"],
+      "timestampFormat": "RFC 3339 UTC, exactly three fractional digits, Z (every value decoded as KTimestamp)",
+      "occurredAtRange": ["2026-10-23T07:00:00.000Z", "2026-10-23T14:08:00.000Z"],
+      "occurredAtNonDecreasing": true,
+      "correlationGroups": 429,
+      "unknownOrUnsupported": [],
+      "manifestProblems": [],
+      "snapshotProblems": [],
+      "integrityProblems": [],
+      "requiredMigration": "none: every file is formatVersion/semanticVersion 1.0.0; the proposed 1.1.0 extension is additive and never rewrites v1.0.0 files (CONTRACT §13.2)"
+    },
+    {
+      "path": "workspaces/demo/demonstration-v1/investigations/fc3f71a9-4c14-5a31-8196-7ce17a7041c1",
+      "datasetKind": "workspace",
+      "datasetId": "workspaces/demo/demonstration-v1",
+      "catalogs": ["demonstration-v1"],
+      "caseKey": "burned-out-lightbulb",
+      "investigationId": "fc3f71a9-4c14-5a31-8196-7ce17a7041c1",
+      "eventsSha256": "2de5e17b1f870cbcb8f6de032af455c5aed3d18be0a1c1fee85b198b92e02a1b",
+      "identicalCopies": ["templates/demonstration-v1/investigations/fc3f71a9-4c14-5a31-8196-7ce17a7041c1", "templates/everyday-v1/investigations/fc3f71a9-4c14-5a31-8196-7ce17a7041c1", "workspaces/demo/demonstration-v1/investigations/fc3f71a9-4c14-5a31-8196-7ce17a7041c1", "workspaces/demo/everyday-v1/investigations/fc3f71a9-4c14-5a31-8196-7ce17a7041c1"],
+      "events": 48,
+      "formatVersions": ["\"1.0.0\""],
+      "semanticVersions": ["\"1.0.0\""],
+      "eventTypes": {
+        "CausalAssertionConfirmed": 1,
+        "CausalAssertionRecorded": 1,
+        "ConclusionRecorded": 1,
+        "CorrectiveActionRecorded": 1,
+        "CorrectiveActionTransitioned": 5,
+        "CriterionRecorded": 1,
+        "EvidenceAdmitted": 6,
+        "EvidenceRelated": 9,
+        "EvidenceVerificationAssessed": 6,
+        "HypothesisRecorded": 4,
+        "HypothesisTransitioned": 8,
+        "InvestigationStarted": 1,
+        "LifecycleChanged": 3,
+        "VerificationRecorded": 1
+      },
+      "variants": {
+        "CausalAssertionConfirmed": 1,
+        "CausalAssertionRecorded": 1,
+        "ConclusionRecorded": 1,
+        "CorrectiveActionRecorded": 1,
+        "CorrectiveActionTransitioned/approved": 1,
+        "CorrectiveActionTransitioned/awaitingVerificationOfEffect": 1,
+        "CorrectiveActionTransitioned/implemented": 1,
+        "CorrectiveActionTransitioned/inProgress": 1,
+        "CorrectiveActionTransitioned/verifiedEffective": 1,
+        "CriterionRecorded": 1,
+        "EvidenceAdmitted": 6,
+        "EvidenceRelated": 9,
+        "EvidenceVerificationAssessed": 6,
+        "HypothesisRecorded": 4,
+        "HypothesisTransitioned/markPlausible": 4,
+        "HypothesisTransitioned/markSupported": 1,
+        "HypothesisTransitioned/markWeakened": 3,
+        "InvestigationStarted": 1,
+        "LifecycleChanged/activateInvestigation": 1,
+        "LifecycleChanged/markAwaitingVerification": 1,
+        "LifecycleChanged/resolveInvestigation": 1,
+        "VerificationRecorded": 1
+      },
+      "relationshipKinds": {
+        "contradicts": 4,
+        "supports": 5
+      },
+      "relationshipsWithRationale": 9,
+      "actorKinds": {
+        "human": 48
+      },
+      "actorIds": ["everyday-demonstration-investigator"],
+      "timestampFormat": "RFC 3339 UTC, exactly three fractional digits, Z (every value decoded as KTimestamp)",
+      "occurredAtRange": ["2026-10-28T12:00:00.000Z", "2026-10-28T15:04:00.000Z"],
+      "occurredAtNonDecreasing": true,
+      "correlationGroups": 47,
+      "unknownOrUnsupported": [],
+      "manifestProblems": [],
+      "snapshotProblems": [],
+      "integrityProblems": [],
+      "requiredMigration": "none: every file is formatVersion/semanticVersion 1.0.0; the proposed 1.1.0 extension is additive and never rewrites v1.0.0 files (CONTRACT §13.2)"
+    },
+    {
+      "path": "workspaces/demo/everyday-v1/investigations/fc3f71a9-4c14-5a31-8196-7ce17a7041c1",
+      "datasetKind": "workspace",
+      "datasetId": "workspaces/demo/everyday-v1",
+      "catalogs": [],
+      "caseKey": null,
+      "investigationId": "fc3f71a9-4c14-5a31-8196-7ce17a7041c1",
+      "eventsSha256": "2de5e17b1f870cbcb8f6de032af455c5aed3d18be0a1c1fee85b198b92e02a1b",
+      "identicalCopies": ["templates/demonstration-v1/investigations/fc3f71a9-4c14-5a31-8196-7ce17a7041c1", "templates/everyday-v1/investigations/fc3f71a9-4c14-5a31-8196-7ce17a7041c1", "workspaces/demo/demonstration-v1/investigations/fc3f71a9-4c14-5a31-8196-7ce17a7041c1", "workspaces/demo/everyday-v1/investigations/fc3f71a9-4c14-5a31-8196-7ce17a7041c1"],
+      "events": 48,
+      "formatVersions": ["\"1.0.0\""],
+      "semanticVersions": ["\"1.0.0\""],
+      "eventTypes": {
+        "CausalAssertionConfirmed": 1,
+        "CausalAssertionRecorded": 1,
+        "ConclusionRecorded": 1,
+        "CorrectiveActionRecorded": 1,
+        "CorrectiveActionTransitioned": 5,
+        "CriterionRecorded": 1,
+        "EvidenceAdmitted": 6,
+        "EvidenceRelated": 9,
+        "EvidenceVerificationAssessed": 6,
+        "HypothesisRecorded": 4,
+        "HypothesisTransitioned": 8,
+        "InvestigationStarted": 1,
+        "LifecycleChanged": 3,
+        "VerificationRecorded": 1
+      },
+      "variants": {
+        "CausalAssertionConfirmed": 1,
+        "CausalAssertionRecorded": 1,
+        "ConclusionRecorded": 1,
+        "CorrectiveActionRecorded": 1,
+        "CorrectiveActionTransitioned/approved": 1,
+        "CorrectiveActionTransitioned/awaitingVerificationOfEffect": 1,
+        "CorrectiveActionTransitioned/implemented": 1,
+        "CorrectiveActionTransitioned/inProgress": 1,
+        "CorrectiveActionTransitioned/verifiedEffective": 1,
+        "CriterionRecorded": 1,
+        "EvidenceAdmitted": 6,
+        "EvidenceRelated": 9,
+        "EvidenceVerificationAssessed": 6,
+        "HypothesisRecorded": 4,
+        "HypothesisTransitioned/markPlausible": 4,
+        "HypothesisTransitioned/markSupported": 1,
+        "HypothesisTransitioned/markWeakened": 3,
+        "InvestigationStarted": 1,
+        "LifecycleChanged/activateInvestigation": 1,
+        "LifecycleChanged/markAwaitingVerification": 1,
+        "LifecycleChanged/resolveInvestigation": 1,
+        "VerificationRecorded": 1
+      },
+      "relationshipKinds": {
+        "contradicts": 4,
+        "supports": 5
+      },
+      "relationshipsWithRationale": 9,
+      "actorKinds": {
+        "human": 48
+      },
+      "actorIds": ["everyday-demonstration-investigator"],
+      "timestampFormat": "RFC 3339 UTC, exactly three fractional digits, Z (every value decoded as KTimestamp)",
+      "occurredAtRange": ["2026-10-28T12:00:00.000Z", "2026-10-28T15:04:00.000Z"],
+      "occurredAtNonDecreasing": true,
+      "correlationGroups": 47,
+      "unknownOrUnsupported": [],
+      "manifestProblems": [],
+      "snapshotProblems": [],
+      "integrityProblems": [],
+      "requiredMigration": "none: every file is formatVersion/semanticVersion 1.0.0; the proposed 1.1.0 extension is additive and never rewrites v1.0.0 files (CONTRACT §13.2)"
+    },
+    {
+      "path": "workspaces/demo/historical-v1/investigations/1784da3c-7141-59ee-a495-1d5d44bf2284",
+      "datasetKind": "workspace",
+      "datasetId": "workspaces/demo/historical-v1",
+      "catalogs": ["historical-v1"],
+      "caseKey": "challenger-sts-51l",
+      "investigationId": "1784da3c-7141-59ee-a495-1d5d44bf2284",
+      "eventsSha256": "e3b442f0ff3ea178c4d81d4964cef5deda4d104cc426785f7da5a78e9bed9c25",
+      "identicalCopies": ["templates/demonstration-v1/investigations/1784da3c-7141-59ee-a495-1d5d44bf2284", "templates/historical-v1/investigations/1784da3c-7141-59ee-a495-1d5d44bf2284", "workspaces/demo/demonstration-v1/investigations/1784da3c-7141-59ee-a495-1d5d44bf2284", "workspaces/demo/historical-v1/investigations/1784da3c-7141-59ee-a495-1d5d44bf2284"],
+      "events": 452,
+      "formatVersions": ["\"1.0.0\""],
+      "semanticVersions": ["\"1.0.0\""],
+      "eventTypes": {
+        "ActionRecorded": 1,
+        "ActionTransitioned": 3,
+        "AssumptionRecorded": 1,
+        "AssumptionTransitioned": 1,
+        "CausalAssertionConfirmed": 1,
+        "CausalAssertionRecorded": 1,
+        "ConclusionRecorded": 1,
+        "ContradictionRecorded": 11,
+        "ContradictionTransitioned": 16,
+        "CorrectiveActionRecorded": 4,
+        "CorrectiveActionTransitioned": 14,
+        "CriterionRecorded": 4,
+        "EvidenceAdmitted": 128,
+        "EvidenceRelated": 65,
+        "EvidenceVerificationAssessed": 128,
+        "FindingRecorded": 1,
+        "HypothesisRecorded": 11,
+        "HypothesisTransitioned": 20,
+        "InvestigationStarted": 1,
+        "LifecycleChanged": 3,
+        "NegativeKnowledgeEstablished": 2,
+        "ObservationRecorded": 24,
+        "PredictionRecorded": 1,
+        "UnknownIdentified": 3,
+        "UnknownTransitioned": 3,
+        "VerificationRecorded": 4
+      },
+      "variants": {
+        "ActionRecorded": 1,
+        "ActionTransitioned": 3,
+        "AssumptionRecorded": 1,
+        "AssumptionTransitioned": 1,
+        "CausalAssertionConfirmed": 1,
+        "CausalAssertionRecorded": 1,
+        "ConclusionRecorded": 1,
+        "ContradictionRecorded": 11,
+        "ContradictionTransitioned": 16,
+        "CorrectiveActionRecorded": 4,
+        "CorrectiveActionTransitioned/approved": 4,
+        "CorrectiveActionTransitioned/awaitingVerificationOfEffect": 2,
+        "CorrectiveActionTransitioned/implemented": 3,
+        "CorrectiveActionTransitioned/inProgress": 3,
+        "CorrectiveActionTransitioned/verificationFailed": 1,
+        "CorrectiveActionTransitioned/verifiedEffective": 1,
+        "CriterionRecorded": 4,
+        "EvidenceAdmitted": 128,
+        "EvidenceRelated": 65,
+        "EvidenceVerificationAssessed": 128,
+        "FindingRecorded": 1,
+        "HypothesisRecorded": 11,
+        "HypothesisTransitioned/falsify": 2,
+        "HypothesisTransitioned/markPlausible": 9,
+        "HypothesisTransitioned/markSupported": 8,
+        "HypothesisTransitioned/markWeakened": 1,
+        "InvestigationStarted": 1,
+        "LifecycleChanged/activateInvestigation": 1,
+        "LifecycleChanged/markAwaitingVerification": 1,
+        "LifecycleChanged/verificationFailed": 1,
+        "NegativeKnowledgeEstablished": 2,
+        "ObservationRecorded": 24,
+        "PredictionRecorded": 1,
+        "UnknownIdentified": 3,
+        "UnknownTransitioned": 3,
+        "VerificationRecorded": 4
+      },
+      "relationshipKinds": {
+        "contradicts": 6,
+        "supports": 59
+      },
+      "relationshipsWithRationale": 65,
+      "actorKinds": {
+        "system": 452
+      },
+      "actorIds": ["historical-catalog-builder", "historical-source-importer"],
+      "timestampFormat": "RFC 3339 UTC, exactly three fractional digits, Z (every value decoded as KTimestamp)",
+      "occurredAtRange": ["2026-10-23T12:00:00.000Z", "2026-10-23T19:28:00.000Z"],
+      "occurredAtNonDecreasing": true,
+      "correlationGroups": 448,
+      "unknownOrUnsupported": [],
+      "manifestProblems": [],
+      "snapshotProblems": [],
+      "integrityProblems": [],
+      "requiredMigration": "none: every file is formatVersion/semanticVersion 1.0.0; the proposed 1.1.0 extension is additive and never rewrites v1.0.0 files (CONTRACT §13.2)"
+    },
+    {
+      "path": "workspaces/demo/historical-v1/investigations/c6b26614-fc43-5013-a15c-cf95942ee07b",
+      "datasetKind": "workspace",
+      "datasetId": "workspaces/demo/historical-v1",
+      "catalogs": ["historical-v1"],
+      "caseKey": "apollo-1",
+      "investigationId": "c6b26614-fc43-5013-a15c-cf95942ee07b",
+      "eventsSha256": "c97bc96c4c48ad9ca53268b4fe66637e211c3627ebb3cbe667a1a6f1066ab3a6",
+      "identicalCopies": ["templates/demonstration-v1/investigations/c6b26614-fc43-5013-a15c-cf95942ee07b", "templates/historical-v1/investigations/c6b26614-fc43-5013-a15c-cf95942ee07b", "workspaces/demo/demonstration-v1/investigations/c6b26614-fc43-5013-a15c-cf95942ee07b", "workspaces/demo/historical-v1/investigations/c6b26614-fc43-5013-a15c-cf95942ee07b"],
+      "events": 432,
+      "formatVersions": ["\"1.0.0\""],
+      "semanticVersions": ["\"1.0.0\""],
+      "eventTypes": {
+        "ActionRecorded": 1,
+        "ActionTransitioned": 3,
+        "AssumptionRecorded": 1,
+        "AssumptionTransitioned": 1,
+        "CausalAssertionConfirmed": 1,
+        "CausalAssertionRecorded": 1,
+        "ConclusionRecorded": 1,
+        "ContradictionRecorded": 13,
+        "ContradictionTransitioned": 16,
+        "CorrectiveActionRecorded": 3,
+        "CorrectiveActionTransitioned": 12,
+        "CriterionRecorded": 2,
+        "EvidenceAdmitted": 129,
+        "EvidenceRelated": 55,
+        "EvidenceVerificationAssessed": 129,
+        "FindingRecorded": 1,
+        "HypothesisRecorded": 12,
+        "HypothesisTransitioned": 21,
+        "InvestigationStarted": 1,
+        "LifecycleChanged": 2,
+        "NegativeKnowledgeEstablished": 3,
+        "ObservationRecorded": 15,
+        "PredictionRecorded": 1,
+        "UnknownIdentified": 3,
+        "UnknownTransitioned": 3,
+        "VerificationRecorded": 2
+      },
+      "variants": {
+        "ActionRecorded": 1,
+        "ActionTransitioned": 3,
+        "AssumptionRecorded": 1,
+        "AssumptionTransitioned": 1,
+        "CausalAssertionConfirmed": 1,
+        "CausalAssertionRecorded": 1,
+        "ConclusionRecorded": 1,
+        "ContradictionRecorded": 13,
+        "ContradictionTransitioned": 16,
+        "CorrectiveActionRecorded": 3,
+        "CorrectiveActionTransitioned/approved": 3,
+        "CorrectiveActionTransitioned/awaitingVerificationOfEffect": 2,
+        "CorrectiveActionTransitioned/implemented": 3,
+        "CorrectiveActionTransitioned/inProgress": 3,
+        "CorrectiveActionTransitioned/verifiedEffective": 1,
+        "CriterionRecorded": 2,
+        "EvidenceAdmitted": 129,
+        "EvidenceRelated": 55,
+        "EvidenceVerificationAssessed": 129,
+        "FindingRecorded": 1,
+        "HypothesisRecorded": 12,
+        "HypothesisTransitioned/falsify": 3,
+        "HypothesisTransitioned/markPlausible": 9,
+        "HypothesisTransitioned/markSupported": 6,
+        "HypothesisTransitioned/markWeakened": 3,
+        "InvestigationStarted": 1,
+        "LifecycleChanged/activateInvestigation": 1,
+        "LifecycleChanged/markAwaitingVerification": 1,
+        "NegativeKnowledgeEstablished": 3,
+        "ObservationRecorded": 15,
+        "PredictionRecorded": 1,
+        "UnknownIdentified": 3,
+        "UnknownTransitioned": 3,
+        "VerificationRecorded": 2
+      },
+      "relationshipKinds": {
+        "contradicts": 5,
+        "insufficient": 6,
+        "supports": 44
+      },
+      "relationshipsWithRationale": 55,
+      "actorKinds": {
+        "system": 432
+      },
+      "actorIds": ["historical-catalog-builder", "historical-source-importer"],
+      "timestampFormat": "RFC 3339 UTC, exactly three fractional digits, Z (every value decoded as KTimestamp)",
+      "occurredAtRange": ["2026-10-23T02:00:00.000Z", "2026-10-23T09:10:00.000Z"],
+      "occurredAtNonDecreasing": true,
+      "correlationGroups": 430,
+      "unknownOrUnsupported": [],
+      "manifestProblems": [],
+      "snapshotProblems": [],
+      "integrityProblems": [],
+      "requiredMigration": "none: every file is formatVersion/semanticVersion 1.0.0; the proposed 1.1.0 extension is additive and never rewrites v1.0.0 files (CONTRACT §13.2)"
+    },
+    {
+      "path": "workspaces/demo/historical-v1/investigations/e3adbee5-5096-5a10-bbfb-cecda86a154b",
+      "datasetKind": "workspace",
+      "datasetId": "workspaces/demo/historical-v1",
+      "catalogs": ["historical-v1"],
+      "caseKey": "apollo-11",
+      "investigationId": "e3adbee5-5096-5a10-bbfb-cecda86a154b",
+      "eventsSha256": "e533fe7fc251a4d0d7f520838735f14373da5b9783682715dae12a7a2dff04c9",
+      "identicalCopies": ["templates/demonstration-v1/investigations/e3adbee5-5096-5a10-bbfb-cecda86a154b", "templates/historical-v1/investigations/e3adbee5-5096-5a10-bbfb-cecda86a154b", "workspaces/demo/demonstration-v1/investigations/e3adbee5-5096-5a10-bbfb-cecda86a154b", "workspaces/demo/historical-v1/investigations/e3adbee5-5096-5a10-bbfb-cecda86a154b"],
+      "events": 431,
+      "formatVersions": ["\"1.0.0\""],
+      "semanticVersions": ["\"1.0.0\""],
+      "eventTypes": {
+        "ActionRecorded": 1,
+        "ActionTransitioned": 3,
+        "AssumptionRecorded": 1,
+        "AssumptionTransitioned": 1,
+        "CausalAssertionConfirmed": 1,
+        "CausalAssertionRecorded": 1,
+        "ConclusionRecorded": 1,
+        "ContradictionRecorded": 11,
+        "ContradictionTransitioned": 13,
+        "CorrectiveActionRecorded": 2,
+        "CorrectiveActionTransitioned": 6,
+        "CriterionRecorded": 1,
+        "EvidenceAdmitted": 119,
+        "EvidenceRelated": 66,
+        "EvidenceVerificationAssessed": 119,
+        "FindingRecorded": 1,
+        "HypothesisRecorded": 12,
+        "HypothesisTransitioned": 23,
+        "InvestigationStarted": 1,
+        "LifecycleChanged": 2,
+        "NegativeKnowledgeEstablished": 1,
+        "ObservationRecorded": 36,
+        "PredictionRecorded": 1,
+        "UnknownIdentified": 4,
+        "UnknownTransitioned": 3,
+        "VerificationRecorded": 1
+      },
+      "variants": {
+        "ActionRecorded": 1,
+        "ActionTransitioned": 3,
+        "AssumptionRecorded": 1,
+        "AssumptionTransitioned": 1,
+        "CausalAssertionConfirmed": 1,
+        "CausalAssertionRecorded": 1,
+        "ConclusionRecorded": 1,
+        "ContradictionRecorded": 11,
+        "ContradictionTransitioned": 13,
+        "CorrectiveActionRecorded": 2,
+        "CorrectiveActionTransitioned/approved": 2,
+        "CorrectiveActionTransitioned/awaitingVerificationOfEffect": 1,
+        "CorrectiveActionTransitioned/implemented": 1,
+        "CorrectiveActionTransitioned/inProgress": 1,
+        "CorrectiveActionTransitioned/verifiedEffective": 1,
+        "CriterionRecorded": 1,
+        "EvidenceAdmitted": 119,
+        "EvidenceRelated": 66,
+        "EvidenceVerificationAssessed": 119,
+        "FindingRecorded": 1,
+        "HypothesisRecorded": 12,
+        "HypothesisTransitioned/falsify": 1,
+        "HypothesisTransitioned/markPlausible": 11,
+        "HypothesisTransitioned/markSupported": 8,
+        "HypothesisTransitioned/markWeakened": 3,
+        "InvestigationStarted": 1,
+        "LifecycleChanged/activateInvestigation": 1,
+        "LifecycleChanged/markAwaitingEvidence": 1,
+        "NegativeKnowledgeEstablished": 1,
+        "ObservationRecorded": 36,
+        "PredictionRecorded": 1,
+        "UnknownIdentified": 4,
+        "UnknownTransitioned": 3,
+        "VerificationRecorded": 1
+      },
+      "relationshipKinds": {
+        "contradicts": 11,
+        "insufficient": 3,
+        "supports": 52
+      },
+      "relationshipsWithRationale": 66,
+      "actorKinds": {
+        "system": 431
+      },
+      "actorIds": ["historical-catalog-builder", "historical-source-importer"],
+      "timestampFormat": "RFC 3339 UTC, exactly three fractional digits, Z (every value decoded as KTimestamp)",
+      "occurredAtRange": ["2026-10-23T07:00:00.000Z", "2026-10-23T14:08:00.000Z"],
+      "occurredAtNonDecreasing": true,
+      "correlationGroups": 429,
+      "unknownOrUnsupported": [],
+      "manifestProblems": [],
+      "snapshotProblems": [],
+      "integrityProblems": [],
+      "requiredMigration": "none: every file is formatVersion/semanticVersion 1.0.0; the proposed 1.1.0 extension is additive and never rewrites v1.0.0 files (CONTRACT §13.2)"
+    },
+    {
+      "path": "workspaces/demo/live-20261022202313/investigations/caf367ec-ce37-5136-acac-fdde0dac8e83",
+      "datasetKind": "workspace",
+      "datasetId": "workspaces/demo/live-20261022202313",
+      "catalogs": [],
+      "caseKey": null,
+      "investigationId": "caf367ec-ce37-5136-acac-fdde0dac8e83",
+      "eventsSha256": "a2cbcf434554db91cb8282ca07070f3ba76029b38bec1375732fde0181317494",
+      "identicalCopies": ["workspaces/demo/live-20261022202313/investigations/caf367ec-ce37-5136-acac-fdde0dac8e83"],
+      "events": 3,
+      "formatVersions": ["\"1.0.0\""],
+      "semanticVersions": ["\"1.0.0\""],
+      "eventTypes": {
+        "InvestigationStarted": 1,
+        "LifecycleChanged": 1,
+        "ObservationRecorded": 1
+      },
+      "variants": {
+        "InvestigationStarted": 1,
+        "LifecycleChanged/activateInvestigation": 1,
+        "ObservationRecorded": 1
+      },
+      "relationshipKinds": {},
+      "relationshipsWithRationale": 0,
+      "actorKinds": {
+        "human": 3
+      },
+      "actorIds": ["live-test-operator"],
+      "timestampFormat": "RFC 3339 UTC, exactly three fractional digits, Z (every value decoded as KTimestamp)",
+      "occurredAtRange": ["2026-10-22T20:23:14.822Z", "2026-10-22T20:23:17.622Z"],
+      "occurredAtNonDecreasing": true,
+      "correlationGroups": 3,
+      "unknownOrUnsupported": [],
+      "manifestProblems": [],
+      "snapshotProblems": [],
+      "integrityProblems": [],
+      "requiredMigration": "none: every file is formatVersion/semanticVersion 1.0.0; the proposed 1.1.0 extension is additive and never rewrites v1.0.0 files (CONTRACT §13.2)"
+    },
+    {
+      "path": "workspaces/demo/live-20261022202349/investigations/04e9d966-d97b-5ab2-8691-920bcc607918",
+      "datasetKind": "workspace",
+      "datasetId": "workspaces/demo/live-20261022202349",
+      "catalogs": [],
+      "caseKey": null,
+      "investigationId": "04e9d966-d97b-5ab2-8691-920bcc607918",
+      "eventsSha256": "d20b88c342a0d6cf66aa5bfb37ad99c891c84412eadbfec055c175b3a08c641a",
+      "identicalCopies": ["workspaces/demo/live-20261022202349/investigations/04e9d966-d97b-5ab2-8691-920bcc607918"],
+      "events": 2,
+      "formatVersions": ["\"1.0.0\""],
+      "semanticVersions": ["\"1.0.0\""],
+      "eventTypes": {
+        "InvestigationStarted": 1,
+        "LifecycleChanged": 1
+      },
+      "variants": {
+        "InvestigationStarted": 1,
+        "LifecycleChanged/activateInvestigation": 1
+      },
+      "relationshipKinds": {},
+      "relationshipsWithRationale": 0,
+      "actorKinds": {
+        "human": 2
+      },
+      "actorIds": ["live-test-operator"],
+      "timestampFormat": "RFC 3339 UTC, exactly three fractional digits, Z (every value decoded as KTimestamp)",
+      "occurredAtRange": ["2026-10-22T20:24:36.881Z", "2026-10-22T20:24:36.881Z"],
+      "occurredAtNonDecreasing": true,
+      "correlationGroups": 2,
+      "unknownOrUnsupported": [],
+      "manifestProblems": [],
+      "snapshotProblems": [],
+      "integrityProblems": [],
+      "requiredMigration": "none: every file is formatVersion/semanticVersion 1.0.0; the proposed 1.1.0 extension is additive and never rewrites v1.0.0 files (CONTRACT §13.2)"
+    },
+    {
+      "path": "workspaces/demo/live-20261022202349/investigations/1309c3d5-3c71-55af-86d3-f35042b24883",
+      "datasetKind": "workspace",
+      "datasetId": "workspaces/demo/live-20261022202349",
+      "catalogs": [],
+      "caseKey": null,
+      "investigationId": "1309c3d5-3c71-55af-86d3-f35042b24883",
+      "eventsSha256": "b6cff5e0de15894f70f51253f7b3bb6faf09fe4654543644e0c850dff26f9f71",
+      "identicalCopies": ["workspaces/demo/live-20261022202349/investigations/1309c3d5-3c71-55af-86d3-f35042b24883"],
+      "events": 9,
+      "formatVersions": ["\"1.0.0\""],
+      "semanticVersions": ["\"1.0.0\""],
+      "eventTypes": {
+        "InvestigationStarted": 1,
+        "LifecycleChanged": 1,
+        "ObservationRecorded": 7
+      },
+      "variants": {
+        "InvestigationStarted": 1,
+        "LifecycleChanged/activateInvestigation": 1,
+        "ObservationRecorded": 7
+      },
+      "relationshipKinds": {},
+      "relationshipsWithRationale": 0,
+      "actorKinds": {
+        "human": 9
+      },
+      "actorIds": ["live-test-operator"],
+      "timestampFormat": "RFC 3339 UTC, exactly three fractional digits, Z (every value decoded as KTimestamp)",
+      "occurredAtRange": ["2026-10-22T20:23:50.765Z", "2026-10-22T20:24:53.258Z"],
+      "occurredAtNonDecreasing": true,
+      "correlationGroups": 9,
+      "unknownOrUnsupported": [],
+      "manifestProblems": [],
+      "snapshotProblems": [],
+      "integrityProblems": [],
+      "requiredMigration": "none: every file is formatVersion/semanticVersion 1.0.0; the proposed 1.1.0 extension is additive and never rewrites v1.0.0 files (CONTRACT §13.2)"
+    },
+    {
+      "path": "workspaces/demo/rest-39850690710/investigations/2df722d3-c3e5-50e4-86d3-70adec47ad8b",
+      "datasetKind": "workspace",
+      "datasetId": "workspaces/demo/rest-39850690710",
+      "catalogs": [],
+      "caseKey": null,
+      "investigationId": "2df722d3-c3e5-50e4-86d3-70adec47ad8b",
+      "eventsSha256": "2151c28135d0e278fbaaecf265367977b3bad9b9dfc974ede189113ca8bf0ae3",
+      "identicalCopies": ["workspaces/demo/rest-39850690710/investigations/2df722d3-c3e5-50e4-86d3-70adec47ad8b"],
+      "events": 2,
+      "formatVersions": ["\"1.0.0\""],
+      "semanticVersions": ["\"1.0.0\""],
+      "eventTypes": {
+        "InvestigationStarted": 1,
+        "LifecycleChanged": 1
+      },
+      "variants": {
+        "InvestigationStarted": 1,
+        "LifecycleChanged/activateInvestigation": 1
+      },
+      "relationshipKinds": {},
+      "relationshipsWithRationale": 0,
+      "actorKinds": {
+        "human": 2
+      },
+      "actorIds": ["live-test-operator"],
+      "timestampFormat": "RFC 3339 UTC, exactly three fractional digits, Z (every value decoded as KTimestamp)",
+      "occurredAtRange": ["2026-10-22T20:40:14.131Z", "2026-10-22T20:40:14.131Z"],
+      "occurredAtNonDecreasing": true,
+      "correlationGroups": 2,
+      "unknownOrUnsupported": [],
+      "manifestProblems": [],
+      "snapshotProblems": [],
+      "integrityProblems": [],
+      "requiredMigration": "none: every file is formatVersion/semanticVersion 1.0.0; the proposed 1.1.0 extension is additive and never rewrites v1.0.0 files (CONTRACT §13.2)"
+    },
+    {
+      "path": "workspaces/demo/rest-39850690710/investigations/959907b6-9ae7-5162-b011-47d7e4ba8eb8",
+      "datasetKind": "workspace",
+      "datasetId": "workspaces/demo/rest-39850690710",
+      "catalogs": [],
+      "caseKey": null,
+      "investigationId": "959907b6-9ae7-5162-b011-47d7e4ba8eb8",
+      "eventsSha256": "856ef61ef8086d28ded6dcc649cd9d42b7545e6897d96baafbfc2d2397ea6176",
+      "identicalCopies": ["workspaces/demo/rest-39850690710/investigations/959907b6-9ae7-5162-b011-47d7e4ba8eb8"],
+      "events": 9,
+      "formatVersions": ["\"1.0.0\""],
+      "semanticVersions": ["\"1.0.0\""],
+      "eventTypes": {
+        "InvestigationStarted": 1,
+        "LifecycleChanged": 1,
+        "ObservationRecorded": 7
+      },
+      "variants": {
+        "InvestigationStarted": 1,
+        "LifecycleChanged/activateInvestigation": 1,
+        "ObservationRecorded": 7
+      },
+      "relationshipKinds": {},
+      "relationshipsWithRationale": 0,
+      "actorKinds": {
+        "human": 9
+      },
+      "actorIds": ["live-test-operator"],
+      "timestampFormat": "RFC 3339 UTC, exactly three fractional digits, Z (every value decoded as KTimestamp)",
+      "occurredAtRange": ["2026-10-22T20:39:34.530Z", "2026-10-22T20:40:41.216Z"],
+      "occurredAtNonDecreasing": true,
+      "correlationGroups": 9,
+      "unknownOrUnsupported": [],
+      "manifestProblems": [],
+      "snapshotProblems": [],
+      "integrityProblems": [],
+      "requiredMigration": "none: every file is formatVersion/semanticVersion 1.0.0; the proposed 1.1.0 extension is additive and never rewrites v1.0.0 files (CONTRACT §13.2)"
+    },
+    {
+      "path": "workspaces/demo/rest-39875835357/investigations/88ce4871-c270-5bb9-aec6-62dff7c48aac",
+      "datasetKind": "workspace",
+      "datasetId": "workspaces/demo/rest-39875835357",
+      "catalogs": [],
+      "caseKey": null,
+      "investigationId": "88ce4871-c270-5bb9-aec6-62dff7c48aac",
+      "eventsSha256": "7e9b94143aee9c87efaaff00c12ec8e3969c478256e0f3f2f33b8e42cbd22d07",
+      "identicalCopies": ["workspaces/demo/rest-39875835357/investigations/88ce4871-c270-5bb9-aec6-62dff7c48aac"],
+      "events": 9,
+      "formatVersions": ["\"1.0.0\""],
+      "semanticVersions": ["\"1.0.0\""],
+      "eventTypes": {
+        "InvestigationStarted": 1,
+        "LifecycleChanged": 1,
+        "ObservationRecorded": 7
+      },
+      "variants": {
+        "InvestigationStarted": 1,
+        "LifecycleChanged/activateInvestigation": 1,
+        "ObservationRecorded": 7
+      },
+      "relationshipKinds": {},
+      "relationshipsWithRationale": 0,
+      "actorKinds": {
+        "human": 9
+      },
+      "actorIds": ["live-test-operator"],
+      "timestampFormat": "RFC 3339 UTC, exactly three fractional digits, Z (every value decoded as KTimestamp)",
+      "occurredAtRange": ["2026-10-23T00:04:57.257Z", "2026-10-23T00:06:02.325Z"],
+      "occurredAtNonDecreasing": true,
+      "correlationGroups": 9,
+      "unknownOrUnsupported": [],
+      "manifestProblems": [],
+      "snapshotProblems": [],
+      "integrityProblems": [],
+      "requiredMigration": "none: every file is formatVersion/semanticVersion 1.0.0; the proposed 1.1.0 extension is additive and never rewrites v1.0.0 files (CONTRACT §13.2)"
+    },
+    {
+      "path": "workspaces/demo/rest-39875835357/investigations/c61a0dcd-e666-57ba-94ff-4a90b8741740",
+      "datasetKind": "workspace",
+      "datasetId": "workspaces/demo/rest-39875835357",
+      "catalogs": [],
+      "caseKey": null,
+      "investigationId": "c61a0dcd-e666-57ba-94ff-4a90b8741740",
+      "eventsSha256": "6f39bd1f76ee5267ca9e387aa828f4d8502260fff970354a76dc8d4680a9df8a",
+      "identicalCopies": ["workspaces/demo/rest-39875835357/investigations/c61a0dcd-e666-57ba-94ff-4a90b8741740"],
+      "events": 2,
+      "formatVersions": ["\"1.0.0\""],
+      "semanticVersions": ["\"1.0.0\""],
+      "eventTypes": {
+        "InvestigationStarted": 1,
+        "LifecycleChanged": 1
+      },
+      "variants": {
+        "InvestigationStarted": 1,
+        "LifecycleChanged/activateInvestigation": 1
+      },
+      "relationshipKinds": {},
+      "relationshipsWithRationale": 0,
+      "actorKinds": {
+        "human": 2
+      },
+      "actorIds": ["live-test-operator"],
+      "timestampFormat": "RFC 3339 UTC, exactly three fractional digits, Z (every value decoded as KTimestamp)",
+      "occurredAtRange": ["2026-10-23T00:05:36.518Z", "2026-10-23T00:05:36.518Z"],
+      "occurredAtNonDecreasing": true,
+      "correlationGroups": 2,
+      "unknownOrUnsupported": [],
+      "manifestProblems": [],
+      "snapshotProblems": [],
+      "integrityProblems": [],
+      "requiredMigration": "none: every file is formatVersion/semanticVersion 1.0.0; the proposed 1.1.0 extension is additive and never rewrites v1.0.0 files (CONTRACT §13.2)"
+    }
+  ],
+  "fieldsObserved": {
+    "F.Def.actor.actorId": {
+      "occurrences": 1583,
+      "valueKinds": {
+        "text": 1583
+      }
+    },
+    "F.Def.actor.kind": {
+      "occurrences": 1583,
+      "valueKinds": {
+        "enum": 1583
+      }
+    },
+    "F.Def.actor.model": {
+      "occurrences": 3,
+      "valueKinds": {
+        "text": 3
+      }
+    },
+    "F.Def.actor.provider": {
+      "occurrences": 3,
+      "valueKinds": {
+        "text": 3
+      }
+    },
+    "F.Entity.causal-member.hypothesisId": {
+      "occurrences": 27,
+      "valueKinds": {
+        "uuid": 27
+      }
+    },
+    "F.Entity.causal-member.role": {
+      "occurrences": 27,
+      "valueKinds": {
+        "enum": 27
+      }
+    },
+    "F.Envelope.actor": {
+      "occurrences": 1583,
+      "valueKinds": {
+        "object": 1583
+      }
+    },
+    "F.Envelope.aggregateVersion": {
+      "occurrences": 1583,
+      "valueKinds": {
+        "integer": 1583
+      }
+    },
+    "F.Envelope.correlationId": {
+      "occurrences": 1583,
+      "valueKinds": {
+        "uuid": 1583
+      }
+    },
+    "F.Envelope.eventId": {
+      "occurrences": 1583,
+      "valueKinds": {
+        "uuid": 1583
+      }
+    },
+    "F.Envelope.eventType": {
+      "occurrences": 1583,
+      "valueKinds": {
+        "enum": 1583
+      }
+    },
+    "F.Envelope.formatVersion": {
+      "occurrences": 1583,
+      "valueKinds": {
+        "const": 1583
+      }
+    },
+    "F.Envelope.investigationId": {
+      "occurrences": 1583,
+      "valueKinds": {
+        "uuid": 1583
+      }
+    },
+    "F.Envelope.occurredAt": {
+      "occurrences": 1583,
+      "valueKinds": {
+        "timestamp": 1583
+      }
+    },
+    "F.Envelope.payload": {
+      "occurrences": 1583,
+      "valueKinds": {
+        "object": 1583
+      }
+    },
+    "F.Envelope.semanticVersion": {
+      "occurrences": 1583,
+      "valueKinds": {
+        "const": 1583
+      }
+    },
+    "F.Payload.ActionRecorded.actionId": {
+      "occurrences": 8,
+      "valueKinds": {
+        "uuid": 8
+      }
+    },
+    "F.Payload.ActionRecorded.kind": {
+      "occurrences": 8,
+      "valueKinds": {
+        "enum": 8
+      }
+    },
+    "F.Payload.ActionRecorded.purpose": {
+      "occurrences": 8,
+      "valueKinds": {
+        "text": 8
+      }
+    },
+    "F.Payload.ActionRecorded.targetHypothesisIds": {
+      "occurrences": 8,
+      "valueKinds": {
+        "list": 8
+      }
+    },
+    "F.Payload.ActionTransitioned.actionId": {
+      "occurrences": 20,
+      "valueKinds": {
+        "uuid": 20
+      }
+    },
+    "F.Payload.ActionTransitioned.state": {
+      "occurrences": 20,
+      "valueKinds": {
+        "enum": 20
+      }
+    },
+    "F.Payload.AssumptionRecorded.assumptionId": {
+      "occurrences": 7,
+      "valueKinds": {
+        "uuid": 7
+      }
+    },
+    "F.Payload.AssumptionRecorded.materiality": {
+      "occurrences": 7,
+      "valueKinds": {
+        "enum": 7
+      }
+    },
+    "F.Payload.AssumptionRecorded.proposition": {
+      "occurrences": 7,
+      "valueKinds": {
+        "text": 7
+      }
+    },
+    "F.Payload.AssumptionTransitioned.assumptionId": {
+      "occurrences": 7,
+      "valueKinds": {
+        "uuid": 7
+      }
+    },
+    "F.Payload.AssumptionTransitioned.state": {
+      "occurrences": 7,
+      "valueKinds": {
+        "enum": 7
+      }
+    },
+    "F.Payload.CausalAssertionConfirmed.causeId": {
+      "occurrences": 7,
+      "valueKinds": {
+        "uuid": 7
+      }
+    },
+    "F.Payload.CausalAssertionConfirmed.policy": {
+      "occurrences": 7,
+      "valueKinds": {
+        "text": 7
+      }
+    },
+    "F.Payload.CausalAssertionRecorded.causeId": {
+      "occurrences": 7,
+      "valueKinds": {
+        "uuid": 7
+      }
+    },
+    "F.Payload.CausalAssertionRecorded.mechanism": {
+      "occurrences": 7,
+      "valueKinds": {
+        "text": 7
+      }
+    },
+    "F.Payload.CausalAssertionRecorded.members": {
+      "occurrences": 7,
+      "valueKinds": {
+        "list": 7
+      }
+    },
+    "F.Payload.CausalAssertionRecorded.outcome": {
+      "occurrences": 7,
+      "valueKinds": {
+        "text": 7
+      }
+    },
+    "F.Payload.CausalAssertionReopened.causeId": {
+      "occurrences": 1,
+      "valueKinds": {
+        "uuid": 1
+      }
+    },
+    "F.Payload.CausalAssertionReopened.reason": {
+      "occurrences": 1,
+      "valueKinds": {
+        "text": 1
+      }
+    },
+    "F.Payload.ConclusionRecorded.causeIds": {
+      "occurrences": 6,
+      "valueKinds": {
+        "emptyList": 1,
+        "list": 5
+      }
+    },
+    "F.Payload.ConclusionRecorded.conclusionId": {
+      "occurrences": 6,
+      "valueKinds": {
+        "uuid": 6
+      }
+    },
+    "F.Payload.ConclusionRecorded.residualUncertainty": {
+      "occurrences": 6,
+      "valueKinds": {
+        "text": 6
+      }
+    },
+    "F.Payload.ConclusionRecorded.statement": {
+      "occurrences": 6,
+      "valueKinds": {
+        "text": 6
+      }
+    },
+    "F.Payload.ConclusionRecorded.strength": {
+      "occurrences": 6,
+      "valueKinds": {
+        "enum": 6
+      }
+    },
+    "F.Payload.ContradictionRecorded.contradictionId": {
+      "occurrences": 37,
+      "valueKinds": {
+        "uuid": 37
+      }
+    },
+    "F.Payload.ContradictionRecorded.evidenceIds": {
+      "occurrences": 37,
+      "valueKinds": {
+        "list": 37
+      }
+    },
+    "F.Payload.ContradictionRecorded.materiality": {
+      "occurrences": 37,
+      "valueKinds": {
+        "enum": 37
+      }
+    },
+    "F.Payload.ContradictionRecorded.statement": {
+      "occurrences": 37,
+      "valueKinds": {
+        "text": 37
+      }
+    },
+    "F.Payload.ContradictionTransitioned.basis": {
+      "occurrences": 47,
+      "valueKinds": {
+        "text": 47
+      }
+    },
+    "F.Payload.ContradictionTransitioned.contradictionId": {
+      "occurrences": 47,
+      "valueKinds": {
+        "uuid": 47
+      }
+    },
+    "F.Payload.ContradictionTransitioned.state": {
+      "occurrences": 47,
+      "valueKinds": {
+        "enum": 47
+      }
+    },
+    "F.Payload.CorrectiveActionRecorded.correctiveActionId": {
+      "occurrences": 14,
+      "valueKinds": {
+        "uuid": 14
+      }
+    },
+    "F.Payload.CorrectiveActionRecorded.description": {
+      "occurrences": 14,
+      "valueKinds": {
+        "text": 14
+      }
+    },
+    "F.Payload.CorrectiveActionRecorded.kind": {
+      "occurrences": 14,
+      "valueKinds": {
+        "enum": 14
+      }
+    },
+    "F.Payload.CorrectiveActionRecorded.targetCauseIds": {
+      "occurrences": 14,
+      "valueKinds": {
+        "list": 14
+      }
+    },
+    "F.Payload.CorrectiveActionTransitioned.correctiveActionId": {
+      "occurrences": 56,
+      "valueKinds": {
+        "uuid": 56
+      }
+    },
+    "F.Payload.CorrectiveActionTransitioned.state": {
+      "occurrences": 56,
+      "valueKinds": {
+        "enum": 56
+      }
+    },
+    "F.Payload.CriterionRecorded.correctiveActionId": {
+      "occurrences": 11,
+      "valueKinds": {
+        "uuid": 11
+      }
+    },
+    "F.Payload.CriterionRecorded.criterionId": {
+      "occurrences": 11,
+      "valueKinds": {
+        "uuid": 11
+      }
+    },
+    "F.Payload.CriterionRecorded.expectedOutcome": {
+      "occurrences": 11,
+      "valueKinds": {
+        "text": 11
+      }
+    },
+    "F.Payload.CriterionRecorded.method": {
+      "occurrences": 11,
+      "valueKinds": {
+        "text": 11
+      }
+    },
+    "F.Payload.EvidenceAdmitted.capturedAt": {
+      "occurrences": 405,
+      "valueKinds": {
+        "null": 321,
+        "timestamp": 84
+      }
+    },
+    "F.Payload.EvidenceAdmitted.category": {
+      "occurrences": 405,
+      "valueKinds": {
+        "enum": 405
+      }
+    },
+    "F.Payload.EvidenceAdmitted.content": {
+      "occurrences": 405,
+      "valueKinds": {
+        "httpUrl": 1,
+        "text": 404
+      }
+    },
+    "F.Payload.EvidenceAdmitted.contentKind": {
+      "occurrences": 405,
+      "valueKinds": {
+        "enum": 405
+      }
+    },
+    "F.Payload.EvidenceAdmitted.evidenceId": {
+      "occurrences": 405,
+      "valueKinds": {
+        "uuid": 405
+      }
+    },
+    "F.Payload.EvidenceAdmitted.source": {
+      "occurrences": 405,
+      "valueKinds": {
+        "text": 405
+      }
+    },
+    "F.Payload.EvidenceRelated.evidenceId": {
+      "occurrences": 211,
+      "valueKinds": {
+        "uuid": 211
+      }
+    },
+    "F.Payload.EvidenceRelated.hypothesisId": {
+      "occurrences": 211,
+      "valueKinds": {
+        "uuid": 211
+      }
+    },
+    "F.Payload.EvidenceRelated.kind": {
+      "occurrences": 211,
+      "valueKinds": {
+        "enum": 211
+      }
+    },
+    "F.Payload.EvidenceRelated.rationale": {
+      "occurrences": 211,
+      "valueKinds": {
+        "null": 2,
+        "text": 209
+      }
+    },
+    "F.Payload.EvidenceRelated.relationshipId": {
+      "occurrences": 211,
+      "valueKinds": {
+        "uuid": 211
+      }
+    },
+    "F.Payload.EvidenceSuperseded.evidenceId": {
+      "occurrences": 1,
+      "valueKinds": {
+        "uuid": 1
+      }
+    },
+    "F.Payload.EvidenceSuperseded.reason": {
+      "occurrences": 1,
+      "valueKinds": {
+        "text": 1
+      }
+    },
+    "F.Payload.EvidenceSuperseded.replacementEvidenceId": {
+      "occurrences": 1,
+      "valueKinds": {
+        "uuid": 1
+      }
+    },
+    "F.Payload.EvidenceVerificationAssessed.evidenceId": {
+      "occurrences": 386,
+      "valueKinds": {
+        "uuid": 386
+      }
+    },
+    "F.Payload.EvidenceVerificationAssessed.verification": {
+      "occurrences": 386,
+      "valueKinds": {
+        "enum": 386
+      }
+    },
+    "F.Payload.FindingRecorded.actionId": {
+      "occurrences": 5,
+      "valueKinds": {
+        "uuid": 5
+      }
+    },
+    "F.Payload.FindingRecorded.findingId": {
+      "occurrences": 5,
+      "valueKinds": {
+        "uuid": 5
+      }
+    },
+    "F.Payload.FindingRecorded.interpretation": {
+      "occurrences": 5,
+      "valueKinds": {
+        "text": 5
+      }
+    },
+    "F.Payload.FindingRecorded.originalResult": {
+      "occurrences": 5,
+      "valueKinds": {
+        "text": 5
+      }
+    },
+    "F.Payload.HypothesisRecorded.hypothesisId": {
+      "occurrences": 53,
+      "valueKinds": {
+        "uuid": 53
+      }
+    },
+    "F.Payload.HypothesisRecorded.mechanism": {
+      "occurrences": 53,
+      "valueKinds": {
+        "null": 38,
+        "text": 15
+      }
+    },
+    "F.Payload.HypothesisRecorded.statement": {
+      "occurrences": 53,
+      "valueKinds": {
+        "text": 53
+      }
+    },
+    "F.Payload.HypothesisTransitioned.command": {
+      "occurrences": 89,
+      "valueKinds": {
+        "enum": 89
+      }
+    },
+    "F.Payload.HypothesisTransitioned.evidenceIds": {
+      "occurrences": 89,
+      "valueKinds": {
+        "emptyList": 5,
+        "list": 84
+      }
+    },
+    "F.Payload.HypothesisTransitioned.from": {
+      "occurrences": 89,
+      "valueKinds": {
+        "enum": 89
+      }
+    },
+    "F.Payload.HypothesisTransitioned.hypothesisId": {
+      "occurrences": 89,
+      "valueKinds": {
+        "uuid": 89
+      }
+    },
+    "F.Payload.HypothesisTransitioned.reason": {
+      "occurrences": 89,
+      "valueKinds": {
+        "text": 89
+      }
+    },
+    "F.Payload.HypothesisTransitioned.to": {
+      "occurrences": 89,
+      "valueKinds": {
+        "enum": 89
+      }
+    },
+    "F.Payload.InvestigationStarted.observationId": {
+      "occurrences": 16,
+      "valueKinds": {
+        "uuid": 16
+      }
+    },
+    "F.Payload.InvestigationStarted.original": {
+      "occurrences": 16,
+      "valueKinds": {
+        "text": 16
+      }
+    },
+    "F.Payload.InvestigationStarted.title": {
+      "occurrences": 16,
+      "valueKinds": {
+        "text": 16
+      }
+    },
+    "F.Payload.LifecycleChanged.command": {
+      "occurrences": 31,
+      "valueKinds": {
+        "enum": 31
+      }
+    },
+    "F.Payload.LifecycleChanged.from": {
+      "occurrences": 31,
+      "valueKinds": {
+        "enum": 31
+      }
+    },
+    "F.Payload.LifecycleChanged.reason": {
+      "occurrences": 31,
+      "valueKinds": {
+        "null": 26,
+        "text": 5
+      }
+    },
+    "F.Payload.LifecycleChanged.to": {
+      "occurrences": 31,
+      "valueKinds": {
+        "enum": 31
+      }
+    },
+    "F.Payload.NegativeKnowledgeEstablished.basisEvidenceIds": {
+      "occurrences": 7,
+      "valueKinds": {
+        "list": 7
+      }
+    },
+    "F.Payload.NegativeKnowledgeEstablished.negativeKnowledgeId": {
+      "occurrences": 7,
+      "valueKinds": {
+        "uuid": 7
+      }
+    },
+    "F.Payload.NegativeKnowledgeEstablished.scope": {
+      "occurrences": 7,
+      "valueKinds": {
+        "text": 7
+      }
+    },
+    "F.Payload.NegativeKnowledgeEstablished.statement": {
+      "occurrences": 7,
+      "valueKinds": {
+        "text": 7
+      }
+    },
+    "F.Payload.ObservationRecorded.observationId": {
+      "occurrences": 101,
+      "valueKinds": {
+        "uuid": 101
+      }
+    },
+    "F.Payload.ObservationRecorded.observedAt": {
+      "occurrences": 101,
+      "valueKinds": {
+        "null": 28,
+        "timestamp": 73
+      }
+    },
+    "F.Payload.ObservationRecorded.original": {
+      "occurrences": 101,
+      "valueKinds": {
+        "text": 101
+      }
+    },
+    "F.Payload.PredictionRecorded.hypothesisId": {
+      "occurrences": 6,
+      "valueKinds": {
+        "uuid": 6
+      }
+    },
+    "F.Payload.PredictionRecorded.predictionId": {
+      "occurrences": 6,
+      "valueKinds": {
+        "uuid": 6
+      }
+    },
+    "F.Payload.PredictionRecorded.statement": {
+      "occurrences": 6,
+      "valueKinds": {
+        "text": 6
+      }
+    },
+    "F.Payload.PredictionRecorded.strength": {
+      "occurrences": 6,
+      "valueKinds": {
+        "enum": 6
+      }
+    },
+    "F.Payload.PredictionRecorded.timing": {
+      "occurrences": 6,
+      "valueKinds": {
+        "enum": 6
+      }
+    },
+    "F.Payload.ProposalRecorded.kind": {
+      "occurrences": 3,
+      "valueKinds": {
+        "enum": 3
+      }
+    },
+    "F.Payload.ProposalRecorded.proposalId": {
+      "occurrences": 3,
+      "valueKinds": {
+        "uuid": 3
+      }
+    },
+    "F.Payload.ProposalRecorded.rationale": {
+      "occurrences": 3,
+      "valueKinds": {
+        "null": 1,
+        "text": 2
+      }
+    },
+    "F.Payload.ProposalRecorded.text": {
+      "occurrences": 3,
+      "valueKinds": {
+        "text": 3
+      }
+    },
+    "F.Payload.ProposalWasAccepted.proposalId": {
+      "occurrences": 2,
+      "valueKinds": {
+        "uuid": 2
+      }
+    },
+    "F.Payload.ProposalWasAccepted.targetId": {
+      "occurrences": 2,
+      "valueKinds": {
+        "uuid": 2
+      }
+    },
+    "F.Payload.ProposalWasRejected.proposalId": {
+      "occurrences": 1,
+      "valueKinds": {
+        "uuid": 1
+      }
+    },
+    "F.Payload.ProposalWasRejected.reason": {
+      "occurrences": 1,
+      "valueKinds": {
+        "text": 1
+      }
+    },
+    "F.Payload.UnknownIdentified.materiality": {
+      "occurrences": 16,
+      "valueKinds": {
+        "enum": 16
+      }
+    },
+    "F.Payload.UnknownIdentified.question": {
+      "occurrences": 16,
+      "valueKinds": {
+        "text": 16
+      }
+    },
+    "F.Payload.UnknownIdentified.unknownId": {
+      "occurrences": 16,
+      "valueKinds": {
+        "uuid": 16
+      }
+    },
+    "F.Payload.UnknownTransitioned.basis": {
+      "occurrences": 12,
+      "valueKinds": {
+        "text": 12
+      }
+    },
+    "F.Payload.UnknownTransitioned.state": {
+      "occurrences": 12,
+      "valueKinds": {
+        "enum": 12
+      }
+    },
+    "F.Payload.UnknownTransitioned.unknownId": {
+      "occurrences": 12,
+      "valueKinds": {
+        "uuid": 12
+      }
+    },
+    "F.Payload.VerificationRecorded.criterionId": {
+      "occurrences": 10,
+      "valueKinds": {
+        "uuid": 10
+      }
+    },
+    "F.Payload.VerificationRecorded.evidenceIds": {
+      "occurrences": 10,
+      "valueKinds": {
+        "list": 10
+      }
+    },
+    "F.Payload.VerificationRecorded.outcome": {
+      "occurrences": 10,
+      "valueKinds": {
+        "enum": 10
+      }
+    },
+    "F.Payload.VerificationRecorded.verificationId": {
+      "occurrences": 10,
+      "valueKinds": {
+        "uuid": 10
+      }
+    }
+  },
+  "nullValuesObserved": {
+    "F.Payload.EvidenceAdmitted.capturedAt": 321,
+    "F.Payload.EvidenceRelated.rationale": 2,
+    "F.Payload.HypothesisRecorded.mechanism": 38,
+    "F.Payload.LifecycleChanged.reason": 26,
+    "F.Payload.ObservationRecorded.observedAt": 28,
+    "F.Payload.ProposalRecorded.rationale": 1
+  },
+  "wireFieldsNeverObserved": [
+    "F.Manifest.formatVersion",
+    "F.Manifest.investigationId",
+    "F.Manifest.schemaVersion",
+    "F.Manifest.semanticVersion",
+    "F.Manifest.aggregateVersion",
+    "F.Manifest.eventCount",
+    "F.Manifest.eventsSha256",
+    "F.Manifest.snapshotVersion",
+    "F.Manifest.snapshotSha256",
+    "F.Manifest.domainPacks",
+    "F.Manifest.createdAt",
+    "F.Manifest.updatedAt",
+    "F.Snapshot.formatVersion",
+    "F.Snapshot.investigationId",
+    "F.Snapshot.aggregateVersion",
+    "F.Snapshot.projectionVersion",
+    "F.Snapshot.semanticVersion",
+    "F.Snapshot.generatedAt",
+    "F.State.investigationId",
+    "F.State.title",
+    "F.State.lifecycle",
+    "F.State.version",
+    "F.State.createdAt",
+    "F.Entity.observation.id",
+    "F.Entity.observation.original",
+    "F.Entity.observation.observedAt",
+    "F.Def.provenance.actor",
+    "F.Def.provenance.recordedAt",
+    "F.Entity.observation.provenance",
+    "F.State.observations",
+    "F.Entity.hypothesis.id",
+    "F.Entity.hypothesis.statement",
+    "F.Entity.hypothesis.mechanism",
+    "F.Entity.hypothesis.state",
+    "F.Entity.hypothesis-change.from",
+    "F.Entity.hypothesis-change.to",
+    "F.Entity.hypothesis-change.command",
+    "F.Entity.hypothesis-change.reason",
+    "F.Entity.hypothesis-change.evidenceIds",
+    "F.Entity.hypothesis-change.at",
+    "F.Entity.hypothesis-change.aggregateVersion",
+    "F.Entity.hypothesis.history",
+    "F.Entity.hypothesis.provenance",
+    "F.State.hypotheses",
+    "F.Entity.evidence.id",
+    "F.Entity.evidence.contentKind",
+    "F.Entity.evidence.content",
+    "F.Entity.evidence.category",
+    "F.Entity.evidence.source",
+    "F.Entity.evidence.capturedAt",
+    "F.Entity.evidence.verification",
+    "F.Entity.evidence.supersededBy",
+    "F.Entity.evidence.admittedAtVersion",
+    "F.Entity.evidence.provenance",
+    "F.State.evidence",
+    "F.Entity.relationship.id",
+    "F.Entity.relationship.evidenceId",
+    "F.Entity.relationship.hypothesisId",
+    "F.Entity.relationship.kind",
+    "F.Entity.relationship.rationale",
+    "F.Entity.relationship.provenance",
+    "F.State.relationships",
+    "F.Entity.unknown.id",
+    "F.Entity.unknown.question",
+    "F.Entity.unknown.materiality",
+    "F.Entity.unknown.state",
+    "F.Entity.unknown.basis",
+    "F.Entity.unknown.provenance",
+    "F.State.unknowns",
+    "F.Entity.assumption.id",
+    "F.Entity.assumption.proposition",
+    "F.Entity.assumption.materiality",
+    "F.Entity.assumption.state",
+    "F.Entity.assumption.provenance",
+    "F.State.assumptions",
+    "F.Entity.contradiction.id",
+    "F.Entity.contradiction.statement",
+    "F.Entity.contradiction.evidenceIds",
+    "F.Entity.contradiction.materiality",
+    "F.Entity.contradiction.state",
+    "F.Entity.contradiction.basis",
+    "F.Entity.contradiction.provenance",
+    "F.State.contradictions",
+    "F.Entity.prediction.id",
+    "F.Entity.prediction.hypothesisId",
+    "F.Entity.prediction.statement",
+    "F.Entity.prediction.strength",
+    "F.Entity.prediction.timing",
+    "F.Entity.prediction.provenance",
+    "F.State.predictions",
+    "F.Entity.action.id",
+    "F.Entity.action.kind",
+    "F.Entity.action.purpose",
+    "F.Entity.action.targetHypothesisIds",
+    "F.Entity.action.state",
+    "F.Entity.action.provenance",
+    "F.State.actions",
+    "F.Entity.finding.id",
+    "F.Entity.finding.actionId",
+    "F.Entity.finding.originalResult",
+    "F.Entity.finding.interpretation",
+    "F.Entity.finding.provenance",
+    "F.State.findings",
+    "F.Entity.negative-knowledge.id",
+    "F.Entity.negative-knowledge.statement",
+    "F.Entity.negative-knowledge.scope",
+    "F.Entity.negative-knowledge.basisEvidenceIds",
+    "F.Entity.negative-knowledge.provenance",
+    "F.State.negativeKnowledge",
+    "F.Entity.cause.id",
+    "F.Entity.cause.outcome",
+    "F.Entity.cause.members",
+    "F.Entity.cause.mechanism",
+    "F.Entity.cause.state",
+    "F.Entity.cause.provenance",
+    "F.State.causes",
+    "F.Entity.corrective-action.id",
+    "F.Entity.corrective-action.kind",
+    "F.Entity.corrective-action.description",
+    "F.Entity.corrective-action.targetCauseIds",
+    "F.Entity.corrective-action.state",
+    "F.Entity.corrective-action.awaitingSinceVersion",
+    "F.Entity.corrective-action.provenance",
+    "F.State.correctiveActions",
+    "F.Entity.criterion.id",
+    "F.Entity.criterion.correctiveActionId",
+    "F.Entity.criterion.expectedOutcome",
+    "F.Entity.criterion.method",
+    "F.Entity.criterion.provenance",
+    "F.State.criteria",
+    "F.Entity.verification.id",
+    "F.Entity.verification.criterionId",
+    "F.Entity.verification.outcome",
+    "F.Entity.verification.evidenceIds",
+    "F.Entity.verification.recordedAtVersion",
+    "F.Entity.verification.provenance",
+    "F.State.verifications",
+    "F.Entity.conclusion.id",
+    "F.Entity.conclusion.statement",
+    "F.Entity.conclusion.strength",
+    "F.Entity.conclusion.causeIds",
+    "F.Entity.conclusion.residualUncertainty",
+    "F.Entity.conclusion.recordedAtVersion",
+    "F.Entity.conclusion.provenance",
+    "F.State.conclusions",
+    "F.Entity.proposal.id",
+    "F.Entity.proposal.kind",
+    "F.Entity.proposal.text",
+    "F.Entity.proposal.rationale",
+    "F.Entity.proposal.state",
+    "F.Entity.proposal.decision",
+    "F.Entity.proposal.provenance",
+    "F.State.proposals",
+    "F.Snapshot.state"
+  ],
+  "relationshipTypes": {
+    "evidenceToHypothesis": "EvidenceRelated (kind, rationale)",
+    "hypothesisCitesEvidence": "HypothesisTransitioned.evidenceIds",
+    "causalMembers": "CausalAssertionRecorded.members[] {hypothesisId, role}",
+    "evidenceSupersession": "EvidenceSuperseded.replacementEvidenceId",
+    "contradictionEvidence": "ContradictionRecorded.evidenceIds",
+    "actionTargets": "ActionRecorded.targetHypothesisIds; FindingRecorded.actionId",
+    "correctiveTargets": "CorrectiveActionRecorded.targetCauseIds; CriterionRecorded.correctiveActionId; VerificationRecorded.criterionId/evidenceIds",
+    "conclusionCauses": "ConclusionRecorded.causeIds",
+    "negativeKnowledgeBasis": "NegativeKnowledgeEstablished.basisEvidenceIds",
+    "proposalTarget": "ProposalWasAccepted.targetId"
+  },
+  "provenance": [
+    {
+      "caseKey": "apollo-1",
+      "records": 129,
+      "evidenceAdmitted": 129,
+      "recordsWithoutEvidence": [],
+      "evidenceWithoutRecord": [],
+      "urlNotInSourceText": []
+    },
+    {
+      "caseKey": "apollo-11",
+      "records": 119,
+      "evidenceAdmitted": 119,
+      "recordsWithoutEvidence": [],
+      "evidenceWithoutRecord": [],
+      "urlNotInSourceText": []
+    },
+    {
+      "caseKey": "challenger-sts-51l",
+      "records": 128,
+      "evidenceAdmitted": 128,
+      "recordsWithoutEvidence": [],
+      "evidenceWithoutRecord": [],
+      "urlNotInSourceText": []
+    }
+  ],
+  "negativeFixtures": {
+    "total": 90,
+    "withEventsFile": 89,
+    "refusedByRegistryDecode": 32,
+    "note": "Informative only. A fixture not refused here is refused by later reader stages (paths, digests, manifest, snapshot) or by admissibility (CONTRACT §11.3; OD-HC-03 A assigns that to the competition kernel).",
+    "fixtures": [
+      {
+        "name": "agent-authored-hypothesis",
+        "expectedErrorCode": "CAUSA.SCHEMA_VIOLATION",
+        "expectedDomainCode": null,
+        "refusedByRegistryDecode": true,
+        "firstProblem": "RULE eventType: if actor.kind = \"agent\" then \"ProposalRecorded\""
+      },
+      {
+        "name": "altered-event-without-rehash",
+        "expectedErrorCode": "CAUSA.EVENTS_HASH_MISMATCH",
+        "expectedDomainCode": null,
+        "refusedByRegistryDecode": false,
+        "firstProblem": null
+      },
+      {
+        "name": "artifact-not-http",
+        "expectedErrorCode": "CAUSA.SCHEMA_VIOLATION",
+        "expectedDomainCode": null,
+        "refusedByRegistryDecode": true,
+        "firstProblem": "WRONG_KIND payload.content expected httpUrl got string"
+      },
+      {
+        "name": "blank-text",
+        "expectedErrorCode": "CAUSA.SCHEMA_VIOLATION",
+        "expectedDomainCode": null,
+        "refusedByRegistryDecode": true,
+        "firstProblem": "WRONG_KIND payload.statement expected non-blank text got string"
+      },
+      {
+        "name": "bom-in-events",
+        "expectedErrorCode": "CAUSA.ENCODING",
+        "expectedDomainCode": null,
+        "refusedByRegistryDecode": true,
+        "firstProblem": "framing"
+      },
+      {
+        "name": "broken-snapshot-hash",
+        "expectedErrorCode": "CAUSA.SNAPSHOT_HASH_MISMATCH",
+        "expectedDomainCode": null,
+        "refusedByRegistryDecode": false,
+        "firstProblem": null
+      },
+      {
+        "name": "calendar-invalid-manifest-created-at",
+        "expectedErrorCode": "CAUSA.SCHEMA_VIOLATION",
+        "expectedDomainCode": null,
+        "refusedByRegistryDecode": false,
+        "firstProblem": null
+      },
+      {
+        "name": "calendar-invalid-occurred-at",
+        "expectedErrorCode": "CAUSA.SCHEMA_VIOLATION",
+        "expectedDomainCode": null,
+        "refusedByRegistryDecode": true,
+        "firstProblem": "WRONG_KIND occurredAt expected calendar-valid timestamp got 2026-02-30T10:08:00.000Z"
+      },
+      {
+        "name": "correlation-reused",
+        "expectedErrorCode": "CAUSA.CORRELATION_REUSED",
+        "expectedDomainCode": null,
+        "refusedByRegistryDecode": false,
+        "firstProblem": null
+      },
+      {
+        "name": "duplicate-aggregate-version",
+        "expectedErrorCode": "CAUSA.SEQUENCE_INVALID",
+        "expectedDomainCode": null,
+        "refusedByRegistryDecode": false,
+        "firstProblem": null
+      },
+      {
+        "name": "duplicate-event-id",
+        "expectedErrorCode": "CAUSA.EVENT_ID_DUPLICATE",
+        "expectedDomainCode": null,
+        "refusedByRegistryDecode": false,
+        "firstProblem": null
+      },
+      {
+        "name": "duplicate-json-key",
+        "expectedErrorCode": "CAUSA.JSON_MALFORMED",
+        "expectedDomainCode": null,
+        "refusedByRegistryDecode": true,
+        "firstProblem": "MALFORMED: duplicate object key"
+      },
+      {
+        "name": "engine-agent-repeats-falsified",
+        "expectedErrorCode": "CAUSA.HISTORY_INADMISSIBLE",
+        "expectedDomainCode": "HISTORY.INADMISSIBLE_EVENT",
+        "refusedByRegistryDecode": false,
+        "firstProblem": null
+      },
+      {
+        "name": "engine-awaiting-verification-without-work",
+        "expectedErrorCode": "CAUSA.HISTORY_INADMISSIBLE",
+        "expectedDomainCode": "HISTORY.INADMISSIBLE_EVENT",
+        "refusedByRegistryDecode": false,
+        "firstProblem": null
+      },
+      {
+        "name": "engine-cause-already-confirmed",
+        "expectedErrorCode": "CAUSA.HISTORY_INADMISSIBLE",
+        "expectedDomainCode": "HISTORY.UNGATED_CONFIRMATION",
+        "refusedByRegistryDecode": false,
+        "firstProblem": null
+      },
+      {
+        "name": "engine-cause-alternative-not-addressed",
+        "expectedErrorCode": "CAUSA.HISTORY_INADMISSIBLE",
+        "expectedDomainCode": "HISTORY.UNGATED_CONFIRMATION",
+        "refusedByRegistryDecode": false,
+        "firstProblem": null
+      },
+      {
+        "name": "engine-cause-no-root",
+        "expectedErrorCode": "CAUSA.HISTORY_INADMISSIBLE",
+        "expectedDomainCode": "HISTORY.UNGATED_CONFIRMATION",
+        "refusedByRegistryDecode": false,
+        "firstProblem": null
+      },
+      {
+        "name": "engine-cause-open-contradiction",
+        "expectedErrorCode": "CAUSA.HISTORY_INADMISSIBLE",
+        "expectedDomainCode": "HISTORY.UNGATED_CONFIRMATION",
+        "refusedByRegistryDecode": false,
+        "firstProblem": null
+      },
+      {
+        "name": "engine-cause-open-unknown",
+        "expectedErrorCode": "CAUSA.HISTORY_INADMISSIBLE",
+        "expectedDomainCode": "HISTORY.UNGATED_CONFIRMATION",
+        "refusedByRegistryDecode": false,
+        "firstProblem": null
+      },
+      {
+        "name": "engine-cause-unverified-assumption",
+        "expectedErrorCode": "CAUSA.HISTORY_INADMISSIBLE",
+        "expectedDomainCode": "HISTORY.UNGATED_CONFIRMATION",
+        "refusedByRegistryDecode": false,
+        "firstProblem": null
+      },
+      {
+        "name": "engine-cause-without-mechanism",
+        "expectedErrorCode": "CAUSA.HISTORY_INADMISSIBLE",
+        "expectedDomainCode": "HISTORY.UNGATED_CONFIRMATION",
+        "refusedByRegistryDecode": false,
+        "firstProblem": null
+      },
+      {
+        "name": "engine-conclusion-without-residual",
+        "expectedErrorCode": "CAUSA.HISTORY_INADMISSIBLE",
+        "expectedDomainCode": "HISTORY.INADMISSIBLE_EVENT",
+        "refusedByRegistryDecode": false,
+        "firstProblem": null
+      },
+      {
+        "name": "engine-confirmed-conclusion-unconfirmed-cause",
+        "expectedErrorCode": "CAUSA.HISTORY_INADMISSIBLE",
+        "expectedDomainCode": "HISTORY.INADMISSIBLE_EVENT",
+        "refusedByRegistryDecode": false,
+        "firstProblem": null
+      },
+      {
+        "name": "engine-content-after-resolution",
+        "expectedErrorCode": "CAUSA.HISTORY_INADMISSIBLE",
+        "expectedDomainCode": "HISTORY.INADMISSIBLE_EVENT",
+        "refusedByRegistryDecode": false,
+        "firstProblem": null
+      },
+      {
+        "name": "engine-dangling-reference",
+        "expectedErrorCode": "CAUSA.HISTORY_INADMISSIBLE",
+        "expectedDomainCode": "HISTORY.INADMISSIBLE_EVENT",
+        "refusedByRegistryDecode": false,
+        "firstProblem": null
+      },
+      {
+        "name": "engine-duplicate-entity-id",
+        "expectedErrorCode": "CAUSA.HISTORY_INADMISSIBLE",
+        "expectedDomainCode": "HISTORY.INADMISSIBLE_EVENT",
+        "refusedByRegistryDecode": false,
+        "firstProblem": null
+      },
+      {
+        "name": "engine-evidence-already-superseded",
+        "expectedErrorCode": "CAUSA.HISTORY_INADMISSIBLE",
+        "expectedDomainCode": "HISTORY.INADMISSIBLE_EVENT",
+        "refusedByRegistryDecode": false,
+        "firstProblem": null
+      },
+      {
+        "name": "engine-evidence-supersedes-itself",
+        "expectedErrorCode": "CAUSA.HISTORY_INADMISSIBLE",
+        "expectedDomainCode": "HISTORY.INADMISSIBLE_EVENT",
+        "refusedByRegistryDecode": false,
+        "firstProblem": null
+      },
+      {
+        "name": "engine-finding-for-rejected-action",
+        "expectedErrorCode": "CAUSA.HISTORY_INADMISSIBLE",
+        "expectedDomainCode": "HISTORY.INADMISSIBLE_EVENT",
+        "refusedByRegistryDecode": false,
+        "firstProblem": null
+      },
+      {
+        "name": "engine-group-time-disagreement",
+        "expectedErrorCode": "CAUSA.HISTORY_INADMISSIBLE",
+        "expectedDomainCode": "HISTORY.INADMISSIBLE_EVENT",
+        "refusedByRegistryDecode": false,
+        "firstProblem": null
+      },
+      {
+        "name": "engine-malformed-artifact-url",
+        "expectedErrorCode": "CAUSA.HISTORY_INADMISSIBLE",
+        "expectedDomainCode": "HISTORY.INADMISSIBLE_EVENT",
+        "refusedByRegistryDecode": false,
+        "firstProblem": null
+      },
+      {
+        "name": "engine-prediction-timing-forged",
+        "expectedErrorCode": "CAUSA.HISTORY_INADMISSIBLE",
+        "expectedDomainCode": "HISTORY.INADMISSIBLE_EVENT",
+        "refusedByRegistryDecode": false,
+        "firstProblem": null
+      },
+      {
+        "name": "engine-proposal-not-active",
+        "expectedErrorCode": "CAUSA.HISTORY_INADMISSIBLE",
+        "expectedDomainCode": "HISTORY.INADMISSIBLE_EVENT",
+        "refusedByRegistryDecode": false,
+        "firstProblem": null
+      },
+      {
+        "name": "engine-reopen-without-new-evidence",
+        "expectedErrorCode": "CAUSA.HISTORY_INADMISSIBLE",
+        "expectedDomainCode": "HISTORY.INADMISSIBLE_EVENT",
+        "refusedByRegistryDecode": false,
+        "firstProblem": null
+      },
+      {
+        "name": "engine-resolve-cause-no-longer-holds",
+        "expectedErrorCode": "CAUSA.HISTORY_INADMISSIBLE",
+        "expectedDomainCode": "HISTORY.UNGATED_RESOLUTION",
+        "refusedByRegistryDecode": false,
+        "firstProblem": null
+      },
+      {
+        "name": "engine-resolve-correction-not-verified",
+        "expectedErrorCode": "CAUSA.HISTORY_INADMISSIBLE",
+        "expectedDomainCode": "HISTORY.UNGATED_RESOLUTION",
+        "refusedByRegistryDecode": false,
+        "firstProblem": null
+      },
+      {
+        "name": "engine-resolve-criterion-unsatisfied",
+        "expectedErrorCode": "CAUSA.HISTORY_INADMISSIBLE",
+        "expectedDomainCode": "HISTORY.UNGATED_RESOLUTION",
+        "refusedByRegistryDecode": false,
+        "firstProblem": null
+      },
+      {
+        "name": "engine-resolve-no-conclusion",
+        "expectedErrorCode": "CAUSA.HISTORY_INADMISSIBLE",
+        "expectedDomainCode": "HISTORY.UNGATED_RESOLUTION",
+        "refusedByRegistryDecode": false,
+        "firstProblem": null
+      },
+      {
+        "name": "engine-resolve-no-correction",
+        "expectedErrorCode": "CAUSA.HISTORY_INADMISSIBLE",
+        "expectedDomainCode": "HISTORY.UNGATED_RESOLUTION",
+        "refusedByRegistryDecode": false,
+        "firstProblem": null
+      },
+      {
+        "name": "engine-resolve-residual-not-stated",
+        "expectedErrorCode": "CAUSA.HISTORY_INADMISSIBLE",
+        "expectedDomainCode": "HISTORY.UNGATED_RESOLUTION",
+        "refusedByRegistryDecode": false,
+        "firstProblem": null
+      },
+      {
+        "name": "engine-verification-evidence-predates-round",
+        "expectedErrorCode": "CAUSA.HISTORY_INADMISSIBLE",
+        "expectedDomainCode": "HISTORY.INADMISSIBLE_EVENT",
+        "refusedByRegistryDecode": false,
+        "firstProblem": null
+      },
+      {
+        "name": "engine-verification-without-criteria",
+        "expectedErrorCode": "CAUSA.HISTORY_INADMISSIBLE",
+        "expectedDomainCode": "HISTORY.INADMISSIBLE_EVENT",
+        "refusedByRegistryDecode": false,
+        "firstProblem": null
+      },
+      {
+        "name": "event-line-non-canonical",
+        "expectedErrorCode": "CAUSA.NON_CANONICAL",
+        "expectedDomainCode": null,
+        "refusedByRegistryDecode": true,
+        "firstProblem": "NOT_CANONICAL: stored text is not its RFC 8785 canonical form"
+      },
+      {
+        "name": "events-blank-line",
+        "expectedErrorCode": "CAUSA.ENCODING",
+        "expectedDomainCode": null,
+        "refusedByRegistryDecode": true,
+        "firstProblem": "framing"
+      },
+      {
+        "name": "events-crlf",
+        "expectedErrorCode": "CAUSA.ENCODING",
+        "expectedDomainCode": null,
+        "refusedByRegistryDecode": true,
+        "firstProblem": "framing"
+      },
+      {
+        "name": "events-empty",
+        "expectedErrorCode": "CAUSA.ENCODING",
+        "expectedDomainCode": null,
+        "refusedByRegistryDecode": true,
+        "firstProblem": "framing"
+      },
+      {
+        "name": "events-invalid-utf8",
+        "expectedErrorCode": "CAUSA.ENCODING",
+        "expectedDomainCode": null,
+        "refusedByRegistryDecode": true,
+        "firstProblem": "UNKNOWN_FIELD actor.k�(ind = \"human\" (preserved here, not dropped)"
+      },
+      {
+        "name": "events-missing-final-lf",
+        "expectedErrorCode": "CAUSA.ENCODING",
+        "expectedDomainCode": null,
+        "refusedByRegistryDecode": true,
+        "firstProblem": "framing"
+      },
+      {
+        "name": "extra-file-in-directory",
+        "expectedErrorCode": "CAUSA.PATH_INVALID",
+        "expectedDomainCode": null,
+        "refusedByRegistryDecode": false,
+        "firstProblem": null
+      },
+      {
+        "name": "feff-inside-string",
+        "expectedErrorCode": "CAUSA.JSON_MALFORMED",
+        "expectedDomainCode": null,
+        "refusedByRegistryDecode": true,
+        "firstProblem": "NOT_CANONICAL: stored text is not its RFC 8785 canonical form"
+      },
+      {
+        "name": "float-number",
+        "expectedErrorCode": "CAUSA.JSON_MALFORMED",
+        "expectedDomainCode": null,
+        "refusedByRegistryDecode": true,
+        "firstProblem": "MALFORMED: non-integer number 1.0"
+      },
+      {
+        "name": "forged-cause-confirmation",
+        "expectedErrorCode": "CAUSA.HISTORY_INADMISSIBLE",
+        "expectedDomainCode": "HISTORY.UNGATED_CONFIRMATION",
+        "refusedByRegistryDecode": false,
+        "firstProblem": null
+      },
+      {
+        "name": "forged-event-id",
+        "expectedErrorCode": "CAUSA.EVENT_ID_MISMATCH",
+        "expectedDomainCode": null,
+        "refusedByRegistryDecode": false,
+        "firstProblem": null
+      },
+      {
+        "name": "forged-resolution",
+        "expectedErrorCode": "CAUSA.HISTORY_INADMISSIBLE",
+        "expectedDomainCode": "HISTORY.UNGATED_RESOLUTION",
+        "refusedByRegistryDecode": false,
+        "firstProblem": null
+      },
+      {
+        "name": "forged-snapshot",
+        "expectedErrorCode": "CAUSA.SNAPSHOT_MISMATCH",
+        "expectedDomainCode": null,
+        "refusedByRegistryDecode": false,
+        "firstProblem": null
+      },
+      {
+        "name": "identifier-trailing-newline",
+        "expectedErrorCode": "CAUSA.SCHEMA_VIOLATION",
+        "expectedDomainCode": null,
+        "refusedByRegistryDecode": true,
+        "firstProblem": "WRONG_KIND eventId expected uuid got string"
+      },
+      {
+        "name": "ideographic-space-text",
+        "expectedErrorCode": "CAUSA.SCHEMA_VIOLATION",
+        "expectedDomainCode": null,
+        "refusedByRegistryDecode": true,
+        "firstProblem": "WRONG_KIND payload.statement expected non-blank text got string"
+      },
+      {
+        "name": "illegal-hypothesis-transition",
+        "expectedErrorCode": "CAUSA.HISTORY_INADMISSIBLE",
+        "expectedDomainCode": "HISTORY.INADMISSIBLE_EVENT",
+        "refusedByRegistryDecode": false,
+        "firstProblem": null
+      },
+      {
+        "name": "integer-out-of-range",
+        "expectedErrorCode": "CAUSA.JSON_MALFORMED",
+        "expectedDomainCode": null,
+        "refusedByRegistryDecode": true,
+        "firstProblem": "WRONG_KIND aggregateVersion expected integer in range got integer"
+      },
+      {
+        "name": "invalid-enum-value",
+        "expectedErrorCode": "CAUSA.SCHEMA_VIOLATION",
+        "expectedDomainCode": null,
+        "refusedByRegistryDecode": true,
+        "firstProblem": "WRONG_KIND payload.materiality expected enum materiality got string"
+      },
+      {
+        "name": "invalid-field-type",
+        "expectedErrorCode": "CAUSA.SCHEMA_VIOLATION",
+        "expectedDomainCode": null,
+        "refusedByRegistryDecode": true,
+        "firstProblem": "WRONG_KIND payload.statement expected non-blank text got integer"
+      },
+      {
+        "name": "lone-surrogate",
+        "expectedErrorCode": "CAUSA.JSON_MALFORMED",
+        "expectedDomainCode": null,
+        "refusedByRegistryDecode": true,
+        "firstProblem": "MALFORMED: Cannot read incomplete UTF-16 JSON text as string with missing low surrogate."
+      },
+      {
+        "name": "manifest-created-at-mismatch",
+        "expectedErrorCode": "CAUSA.MANIFEST_MISMATCH",
+        "expectedDomainCode": null,
+        "refusedByRegistryDecode": false,
+        "firstProblem": null
+      },
+      {
+        "name": "manifest-event-count-mismatch",
+        "expectedErrorCode": "CAUSA.MANIFEST_MISMATCH",
+        "expectedDomainCode": null,
+        "refusedByRegistryDecode": false,
+        "firstProblem": null
+      },
+      {
+        "name": "manifest-interior-newline",
+        "expectedErrorCode": "CAUSA.NON_CANONICAL",
+        "expectedDomainCode": null,
+        "refusedByRegistryDecode": false,
+        "firstProblem": null
+      },
+      {
+        "name": "manifest-updated-at-mismatch",
+        "expectedErrorCode": "CAUSA.MANIFEST_MISMATCH",
+        "expectedDomainCode": null,
+        "refusedByRegistryDecode": false,
+        "firstProblem": null
+      },
+      {
+        "name": "manifest-version-mismatch",
+        "expectedErrorCode": "CAUSA.MANIFEST_MISMATCH",
+        "expectedDomainCode": null,
+        "refusedByRegistryDecode": false,
+        "firstProblem": null
+      },
+      {
+        "name": "manifest-wrong-investigation-id",
+        "expectedErrorCode": "CAUSA.MANIFEST_MISMATCH",
+        "expectedDomainCode": null,
+        "refusedByRegistryDecode": false,
+        "firstProblem": null
+      },
+      {
+        "name": "missing-snapshot-file",
+        "expectedErrorCode": "CAUSA.PATH_INVALID",
+        "expectedDomainCode": null,
+        "refusedByRegistryDecode": false,
+        "firstProblem": null
+      },
+      {
+        "name": "missing-start",
+        "expectedErrorCode": "CAUSA.HISTORY_INADMISSIBLE",
+        "expectedDomainCode": "HISTORY.NO_START",
+        "refusedByRegistryDecode": false,
+        "firstProblem": null
+      },
+      {
+        "name": "negative-zero",
+        "expectedErrorCode": "CAUSA.NON_CANONICAL",
+        "expectedDomainCode": null,
+        "refusedByRegistryDecode": true,
+        "firstProblem": "NOT_CANONICAL: stored text is not its RFC 8785 canonical form"
+      },
+      {
+        "name": "nesting-depth-128",
+        "expectedErrorCode": "CAUSA.SCHEMA_VIOLATION",
+        "expectedDomainCode": null,
+        "refusedByRegistryDecode": true,
+        "firstProblem": "UNKNOWN_FIELD payload.deep = [[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[ (preserved here, not dropped)"
+      },
+      {
+        "name": "nesting-depth-129",
+        "expectedErrorCode": "CAUSA.JSON_MALFORMED",
+        "expectedDomainCode": null,
+        "refusedByRegistryDecode": true,
+        "firstProblem": "MALFORMED: The maximum configured depth of 128 has been exceeded. Cannot read next JSON array. LineNumber: 0 | BytePositionInLine: 479."
+      },
+      {
+        "name": "nesting-too-deep",
+        "expectedErrorCode": "CAUSA.JSON_MALFORMED",
+        "expectedDomainCode": null,
+        "refusedByRegistryDecode": true,
+        "firstProblem": "MALFORMED: The maximum configured depth of 128 has been exceeded. Cannot read next JSON array. LineNumber: 0 | BytePositionInLine: 479."
+      },
+      {
+        "name": "nil-uuid",
+        "expectedErrorCode": "CAUSA.SCHEMA_VIOLATION",
+        "expectedDomainCode": null,
+        "refusedByRegistryDecode": true,
+        "firstProblem": "WRONG_KIND payload.observationId expected uuid got string"
+      },
+      {
+        "name": "non-canonical-manifest",
+        "expectedErrorCode": "CAUSA.NON_CANONICAL",
+        "expectedDomainCode": null,
+        "refusedByRegistryDecode": false,
+        "firstProblem": null
+      },
+      {
+        "name": "non-string-format-version",
+        "expectedErrorCode": "CAUSA.SCHEMA_VIOLATION",
+        "expectedDomainCode": null,
+        "refusedByRegistryDecode": true,
+        "firstProblem": "WRONG_KIND formatVersion expected const \"1.0.0\" got integer"
+      },
+      {
+        "name": "path-traversal-directory",
+        "expectedErrorCode": "CAUSA.PATH_INVALID",
+        "expectedDomainCode": null,
+        "refusedByRegistryDecode": false,
+        "firstProblem": null
+      },
+      {
+        "name": "rewritten-history",
+        "expectedErrorCode": "CAUSA.HISTORY_REWRITTEN",
+        "expectedDomainCode": null,
+        "refusedByRegistryDecode": false,
+        "firstProblem": null
+      },
+      {
+        "name": "sequence-gap",
+        "expectedErrorCode": "CAUSA.SEQUENCE_INVALID",
+        "expectedDomainCode": null,
+        "refusedByRegistryDecode": false,
+        "firstProblem": null
+      },
+      {
+        "name": "snapshot-missing-final-lf",
+        "expectedErrorCode": "CAUSA.ENCODING",
+        "expectedDomainCode": null,
+        "refusedByRegistryDecode": false,
+        "firstProblem": null
+      },
+      {
+        "name": "snapshot-non-canonical",
+        "expectedErrorCode": "CAUSA.NON_CANONICAL",
+        "expectedDomainCode": null,
+        "refusedByRegistryDecode": false,
+        "firstProblem": null
+      },
+      {
+        "name": "stale-expected-version",
+        "expectedErrorCode": "CAUSA.VERSION_STALE",
+        "expectedDomainCode": null,
+        "refusedByRegistryDecode": false,
+        "firstProblem": null
+      },
+      {
+        "name": "timestamp-without-milliseconds",
+        "expectedErrorCode": "CAUSA.SCHEMA_VIOLATION",
+        "expectedDomainCode": null,
+        "refusedByRegistryDecode": true,
+        "firstProblem": "WRONG_KIND occurredAt expected timestamp got string"
+      },
+      {
+        "name": "truncated-event-line",
+        "expectedErrorCode": "CAUSA.JSON_MALFORMED",
+        "expectedDomainCode": null,
+        "refusedByRegistryDecode": true,
+        "firstProblem": "MALFORMED: Expected end of string, but instead reached end of data. LineNumber: 0 | BytePositionInLine: 436."
+      },
+      {
+        "name": "unexpected-payload-field",
+        "expectedErrorCode": "CAUSA.SCHEMA_VIOLATION",
+        "expectedDomainCode": null,
+        "refusedByRegistryDecode": true,
+        "firstProblem": "UNKNOWN_FIELD payload.confidence = \"high\" (preserved here, not dropped)"
+      },
+      {
+        "name": "unknown-event-type",
+        "expectedErrorCode": "CAUSA.UNKNOWN_EVENT_TYPE",
+        "expectedDomainCode": null,
+        "refusedByRegistryDecode": true,
+        "firstProblem": "WRONG_KIND eventType expected enum eventType got string"
+      },
+      {
+        "name": "unsupported-format-version",
+        "expectedErrorCode": "CAUSA.UNSUPPORTED_VERSION",
+        "expectedDomainCode": null,
+        "refusedByRegistryDecode": true,
+        "firstProblem": "WRONG_KIND formatVersion expected const \"1.0.0\" got string"
+      },
+      {
+        "name": "uppercase-uuid",
+        "expectedErrorCode": "CAUSA.SCHEMA_VIOLATION",
+        "expectedDomainCode": null,
+        "refusedByRegistryDecode": true,
+        "firstProblem": "WRONG_KIND payload.hypothesisId expected uuid got string"
+      },
+      {
+        "name": "wrong-investigation-id",
+        "expectedErrorCode": "CAUSA.INVESTIGATION_MISMATCH",
+        "expectedDomainCode": null,
+        "refusedByRegistryDecode": false,
+        "firstProblem": null
+      }
+    ]
+  }
+}

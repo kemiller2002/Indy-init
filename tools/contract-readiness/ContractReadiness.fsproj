@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Causa pre-competition contract readiness validator (docs/contract-readiness/causa-precompetition).
+       F# only (OD-INDY-14), no packages, so a clean checkout restores offline with the pinned SDK (global.json). -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <AssemblyName>contract-readiness</AssemblyName>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <WarningsAsErrors>FS0025</WarningsAsErrors>
+    <Deterministic>true</Deterministic>
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="src/Json.fs" />
+    <Compile Include="src/Schema.fs" />
+    <Compile Include="src/FieldRegistry.fs" />
+    <Compile Include="src/Codec.fs" />
+    <Compile Include="src/FsContract.fs" />
+    <Compile Include="src/Package.fs" />
+    <Compile Include="src/Historical.fs" />
+    <Compile Include="src/Checks.fs" />
+    <Compile Include="src/NegativeControls.fs" />
+    <Compile Include="src/Gate.fs" />
+    <Compile Include="src/Program.fs" />
+  </ItemGroup>
+</Project>

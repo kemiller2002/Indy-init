@@ -1,0 +1,119 @@
+{
+  "schema": "causa.contract-readiness.package-manifest/1",
+  "contractPackage": "causa-precompetition 1.0.0-candidate",
+  "packageChecksum": "e3c6881643f5cf15d8b75fd2c540e095cf14a64e89c5e765bdea67944007cc4e",
+  "checksumRule": "sha256 of the lines '<sha256>  <path>\\n' for every package file (except this manifest) and every validator source file, in this order",
+  "dependencies": {
+    "causaDataRepository": "https://github.com/kemiller2002/causa-data",
+    "causaDataCommitPinned": "e8259df74add723765c57a5b1a5888d9c3f707af",
+    "schemaBundleSha256": "0a68af8c93190d2e4d6c27beb2f8cb67c3aebdda586d01beb7122b71af179152",
+    "storageContract": "causa-storage v1.0.0 (contract/v1.0.0)",
+    "successorCandidate": "requirements-compiled/v4.1.5 (CANDIDATE)",
+    "successorContractsSha256": "90a1b34cfbdc0fa17437e293344d5ab27f446b218bc8ec08fb712e8d0ffd829c",
+    "frozenBaseline": "requirements-compiled/v4.1.4 (tag indy-init-requirements-v4.1.4)",
+    "frozenContractsSha256": "861a5651073d05840632649f61bc97f53a39261f5b31619b128df4e3dedab266",
+    "catalogSha256": "7e5e8a400b52d79218e2fb42927d5cb122cc0e6c8ab002f146b33198647ce53c",
+    "screenManifestSha256": "49a155be72d3d550b9f7ca3aca69ec8a4bd24efda961a513270fb346e19ed534",
+    "dotnetSdk": "10.0.402"
+  },
+  "schemaVersions": {
+    "causa-storage": "1.0.0 (wire); 1.1.0 proposed (OD-CR-01)",
+    "formatVersion": "1.0.0",
+    "semanticVersion": "1.0.0",
+    "projectionVersion": 1,
+    "requirementsPackage": "v4.1.5 CANDIDATE (successor of frozen v4.1.4)",
+    "catalog": "CAT-CAUSA-INVESTIGATION INV-001..044"
+  },
+  "files": [
+    {
+      "path": "COMMAND-EVENT-REGISTRY.json",
+      "sha256": "af086bacb7d835cabe82d60a59f2c33c83946e579eca223155bce9daa728be74"
+    },
+    {
+      "path": "CONTRACT-READINESS.json",
+      "sha256": "aee9fc61131ca027ae69b50aa0fe0d71b6791b25672d5a868644ae1e6c07d0e3"
+    },
+    {
+      "path": "DOMAIN-CONTRACT.json",
+      "sha256": "7cc549694cf302dd600222a2edd478de9c49ff8145b68b7a2de86fbcd0a9bad9"
+    },
+    {
+      "path": "FIELD-REGISTRY.json",
+      "sha256": "513c7c8c7a5583ca1b94ed423686085d0f011d990d5f2c1ccb511df87c111692"
+    },
+    {
+      "path": "HISTORICAL-DATA-INVENTORY.json",
+      "sha256": "bfb85fc20ea7d4095ee243e957a3012cc897095c8dd15470b3db057a8c5e68fd"
+    },
+    {
+      "path": "OWNER-DECISIONS.proposed.json",
+      "sha256": "7ba547fcc7108bb9cd2f0590ae3b74a7c55408bda17b4dbf40030ac25182e0de"
+    },
+    {
+      "path": "STATE-TRANSITIONS.json",
+      "sha256": "158fa4dbd5aefe39af986684c0e8ab4b9fcf109aa9ef4ef51b7930fae29d5619"
+    },
+    {
+      "path": "UI-FIELD-MAP.json",
+      "sha256": "e025b73b551c6d99946e698b3152331c0ba7c7e4d45ac9aff1de752d23840f05"
+    },
+    {
+      "path": "VERIFICATION-MATRIX.json",
+      "sha256": "adb0c701cdd5b9613d83f14447582455a64003fefa8e2608b0322f6f81071f01"
+    }
+  ],
+  "validator": [
+    {
+      "path": "tools/contract-readiness/.gitignore",
+      "sha256": "6c5082c7e6de3e350189c67a1aacf757485ecc26e0a3cf96683528565f3e5f12"
+    },
+    {
+      "path": "tools/contract-readiness/ContractReadiness.fsproj",
+      "sha256": "c77d1248d29a2c0cbadc7fab6fc9d5d54108d81360a96f371eed2f3daabe492a"
+    },
+    {
+      "path": "tools/contract-readiness/src/Checks.fs",
+      "sha256": "4ab41578f5e878a057b7f03cc73dd0801abe8e0cd68d0a9919a40194ac22dd05"
+    },
+    {
+      "path": "tools/contract-readiness/src/Codec.fs",
+      "sha256": "8e660e7a8692ffc744bc9422418bff59800c5aa53d17c8acd314695e297c6a60"
+    },
+    {
+      "path": "tools/contract-readiness/src/FieldRegistry.fs",
+      "sha256": "58c3a7b2efd12d577ac097d330cf670948b2a76e1431ecb77d579ee29adbdcdd"
+    },
+    {
+      "path": "tools/contract-readiness/src/FsContract.fs",
+      "sha256": "4e8876ddeaef86e4e68f7ffaf2f4577b156dc51194957e92d34866f21192d2f5"
+    },
+    {
+      "path": "tools/contract-readiness/src/Gate.fs",
+      "sha256": "93954fb5c989ccdbff634b74add8d3b4e55af6a00d7c5c5dfd0d3360327390a1"
+    },
+    {
+      "path": "tools/contract-readiness/src/Historical.fs",
+      "sha256": "921a378cb068c8ed3479062ea52ff60cbf69ee282c6a314e41de3a83157b9eb1"
+    },
+    {
+      "path": "tools/contract-readiness/src/Json.fs",
+      "sha256": "0ce21a85e1a94d893374b175ae8bd71f33c3156710504eee89c5c96a72a348b8"
+    },
+    {
+      "path": "tools/contract-readiness/src/NegativeControls.fs",
+      "sha256": "3e0813a972d338dbf9dadeac120e3ec8959f119c7dd1c85e58fabfa63a6f9eb6"
+    },
+    {
+      "path": "tools/contract-readiness/src/Package.fs",
+      "sha256": "06149f016c29ef9362ae18dce23d82ad64bf0d202d7127463594b207a34a4c18"
+    },
+    {
+      "path": "tools/contract-readiness/src/Program.fs",
+      "sha256": "846611b7f2a0019f356ab108e3ee58a7b83f16aef31dc31fce1e908be8284106"
+    },
+    {
+      "path": "tools/contract-readiness/src/Schema.fs",
+      "sha256": "4081916b86382be03e940b1685db39371801f9f8f2d5527ba0bca3969357cd03"
+    }
+  ]
+}

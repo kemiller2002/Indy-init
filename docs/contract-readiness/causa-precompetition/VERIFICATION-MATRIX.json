@@ -1,0 +1,1054 @@
+{
+  "schema": "causa.contract-readiness.verification-matrix/1",
+  "generatedBy": "tools/contract-readiness (dotnet run -- generate); do not edit by hand",
+  "note": "contract-validation and negative-control rows were executed by this validator. implementation rows are obligations for the competition build: they are not results.",
+  "counts": {
+    "obligations": 121,
+    "BLOCKED": 28,
+    "NOT-APPLICABLE": 1,
+    "PASS": 49,
+    "PENDING-IMPLEMENTATION": 42,
+    "UNVERIFIED": 1
+  },
+  "obligations": [
+    {
+      "obligationId": "CR-SRC-02",
+      "kind": "contract-validation",
+      "category": "sources",
+      "statement": "The causa-data checkout is the pinned commit",
+      "executedBy": "tools/contract-readiness check",
+      "status": "PASS"
+    },
+    {
+      "obligationId": "CR-SRC-01",
+      "kind": "contract-validation",
+      "category": "sources",
+      "statement": "Pinned historical data matches the source pin (causa-data e8259df, PR #126/#141 source-pin.json)",
+      "executedBy": "tools/contract-readiness check",
+      "status": "PASS"
+    },
+    {
+      "obligationId": "CR-REG-01",
+      "kind": "contract-validation",
+      "category": "reproducibility",
+      "statement": "FIELD-REGISTRY.json equals a fresh generation from the pinned schemas, FIELD-MAPPING.md and DOMAIN-CONTRACT.json",
+      "executedBy": "tools/contract-readiness check",
+      "status": "PASS"
+    },
+    {
+      "obligationId": "CR-REG-02",
+      "kind": "contract-validation",
+      "category": "schema",
+      "statement": "Field IDs are unique",
+      "executedBy": "tools/contract-readiness check",
+      "status": "PASS"
+    },
+    {
+      "obligationId": "CR-REG-03",
+      "kind": "contract-validation",
+      "category": "schema",
+      "statement": "Schema completeness: every event type has a payload type, every object type has fields, every reference and rule resolves",
+      "executedBy": "tools/contract-readiness check",
+      "status": "PASS"
+    },
+    {
+      "obligationId": "CR-CER-01",
+      "kind": "contract-validation",
+      "category": "registry",
+      "statement": "Command, event-variant, transition and binding IDs are unique",
+      "executedBy": "tools/contract-readiness check",
+      "status": "PASS"
+    },
+    {
+      "obligationId": "CR-CER-02",
+      "kind": "contract-validation",
+      "category": "registry",
+      "statement": "Wire variants partition every registered event type and discriminator value (no silent default)",
+      "executedBy": "tools/contract-readiness check",
+      "status": "PASS"
+    },
+    {
+      "obligationId": "CR-CER-03",
+      "kind": "contract-validation",
+      "category": "registry",
+      "statement": "Every v4.1.5 CoreEvent case is bound to exactly one variant; proposed cases are absent from v4.1.5",
+      "executedBy": "tools/contract-readiness check",
+      "status": "PASS"
+    },
+    {
+      "obligationId": "CR-CER-04",
+      "kind": "contract-validation",
+      "category": "registry",
+      "statement": "Every v4.1.5 CoreCommand case has a command entry; defined commands exist in the parsed contracts and proposed ones do not",
+      "executedBy": "tools/contract-readiness check",
+      "status": "PASS"
+    },
+    {
+      "obligationId": "CR-CER-05",
+      "kind": "contract-validation",
+      "category": "registry",
+      "statement": "Command result events, input fields, transitions and blocking decisions all resolve",
+      "executedBy": "tools/contract-readiness check",
+      "status": "PASS"
+    },
+    {
+      "obligationId": "CR-CER-06",
+      "kind": "contract-validation",
+      "category": "registry",
+      "statement": "Every required domain input has a documented input path (UI field, derivation or session), or is a named gap tied to an open owner decision",
+      "executedBy": "tools/contract-readiness check",
+      "status": "PASS"
+    },
+    {
+      "obligationId": "CR-HIST-01",
+      "kind": "contract-validation",
+      "category": "historical",
+      "statement": "Every stored event decodes strictly into registered typed fields and re-encodes to its exact stored bytes",
+      "executedBy": "tools/contract-readiness check",
+      "status": "PASS"
+    },
+    {
+      "obligationId": "CR-HIST-02",
+      "kind": "contract-validation",
+      "category": "historical",
+      "statement": "Every stored event maps to exactly one registered wire variant",
+      "executedBy": "tools/contract-readiness check",
+      "status": "PASS"
+    },
+    {
+      "obligationId": "CR-HIST-03",
+      "kind": "contract-validation",
+      "category": "historical",
+      "statement": "Envelope integrity: contiguous aggregateVersion, UUIDv5 eventId derivation, one correlation group per id, InvestigationStarted first",
+      "executedBy": "tools/contract-readiness check",
+      "status": "PASS"
+    },
+    {
+      "obligationId": "CR-HIST-04",
+      "kind": "contract-validation",
+      "category": "historical",
+      "statement": "Every manifest.json and snapshot.json decodes against the registry, round-trips, and the manifest pins the events bytes",
+      "executedBy": "tools/contract-readiness check",
+      "status": "PASS"
+    },
+    {
+      "obligationId": "CR-HIST-05",
+      "kind": "contract-validation",
+      "category": "historical",
+      "statement": "Every catalog case exists with its pinned events digest and expected version",
+      "executedBy": "tools/contract-readiness check",
+      "status": "PASS"
+    },
+    {
+      "obligationId": "CR-HIST-06",
+      "kind": "contract-validation",
+      "category": "historical",
+      "statement": "Every stored state transition is legal under the domain transition tables and its stored 'from' equals the replayed state",
+      "executedBy": "tools/contract-readiness check",
+      "status": "PASS"
+    },
+    {
+      "obligationId": "CR-HIST-07",
+      "kind": "contract-validation",
+      "category": "historical",
+      "statement": "Historical provenance records and admitted evidence correspond one to one, and each source text carries its URL",
+      "executedBy": "tools/contract-readiness check",
+      "status": "PASS"
+    },
+    {
+      "obligationId": "CR-REP-01",
+      "kind": "contract-validation",
+      "category": "historical",
+      "statement": "The successor candidate represents every pinned catalog event and every stored history losslessly (payload case and envelope)",
+      "executedBy": "tools/contract-readiness check",
+      "status": "PASS"
+    },
+    {
+      "obligationId": "CR-REP-02",
+      "kind": "contract-validation",
+      "category": "historical",
+      "statement": "Reproduce PR #141 against the frozen v4.1.4 contract: 487 of 1,315 historical events have no case, 63 more are lossy, and every event loses envelope provenance",
+      "executedBy": "tools/contract-readiness check",
+      "status": "PASS"
+    },
+    {
+      "obligationId": "CR-UI-01",
+      "kind": "contract-validation",
+      "category": "ui",
+      "statement": "Every catalog requirement has a binding whose label, accessible name source, input type, required flag, screen and validation equal the catalog",
+      "executedBy": "tools/contract-readiness check",
+      "status": "PASS"
+    },
+    {
+      "obligationId": "CR-UI-02",
+      "kind": "contract-validation",
+      "category": "ui",
+      "statement": "Binding references resolve: screens and states (equal to SCREEN-MANIFEST), commands, write and read-back field IDs, verification ids",
+      "executedBy": "tools/contract-readiness check",
+      "status": "PASS"
+    },
+    {
+      "obligationId": "CR-UI-03",
+      "kind": "contract-validation",
+      "category": "ui",
+      "statement": "Coverage is not claimed for a binding that needs a proposed field or command or a blocked command",
+      "executedBy": "tools/contract-readiness check",
+      "status": "PASS"
+    },
+    {
+      "obligationId": "CR-UI-04",
+      "kind": "contract-validation",
+      "category": "ui",
+      "statement": "Reverse coverage: every command fed by a UI field is reachable from a binding, and every bound domain action has a state transition or result event",
+      "executedBy": "tools/contract-readiness check",
+      "status": "PASS"
+    },
+    {
+      "obligationId": "CR-ST-01",
+      "kind": "contract-validation",
+      "category": "transitions",
+      "statement": "Domain transition tables use only wire states, agree with schema-pinned targets, and cover every state-changing variant",
+      "executedBy": "tools/contract-readiness check",
+      "status": "PASS"
+    },
+    {
+      "obligationId": "CR-ST-02",
+      "kind": "contract-validation",
+      "category": "persistence",
+      "statement": "Persistence machines are indexed by digest and every machine's states and inputs equal the parsed v4.1.5 F# unions (no silent default case)",
+      "executedBy": "tools/contract-readiness check",
+      "status": "PASS"
+    },
+    {
+      "obligationId": "CR-ST-03",
+      "kind": "contract-validation",
+      "category": "persistence",
+      "statement": "Save durability: seven distinct states; only provider read-back verified (SaveState.Saved) is durable or may be displayed as saved",
+      "executedBy": "tools/contract-readiness check",
+      "status": "PASS"
+    },
+    {
+      "obligationId": "CR-DOM-01",
+      "kind": "contract-validation",
+      "category": "domain",
+      "statement": "Every required domain concept is defined with a stable type ID and registered fields",
+      "executedBy": "tools/contract-readiness check",
+      "status": "PASS"
+    },
+    {
+      "obligationId": "CR-DOM-02",
+      "kind": "contract-validation",
+      "category": "domain",
+      "statement": "The proposed causa-storage 1.1.0 extension is purely additive: no v1.0.0 type changes, every proposed event has a closed payload",
+      "executedBy": "tools/contract-readiness check",
+      "status": "PASS"
+    },
+    {
+      "obligationId": "CR-DEC-01",
+      "kind": "contract-validation",
+      "category": "governance",
+      "statement": "Owner decision requests are unique and every blocker names one",
+      "executedBy": "tools/contract-readiness check",
+      "status": "PASS"
+    },
+    {
+      "obligationId": "CR-SEC-01",
+      "kind": "contract-validation",
+      "category": "security",
+      "statement": "No credential or access token appears in any contract package file or fixture",
+      "executedBy": "tools/contract-readiness check",
+      "status": "PASS"
+    },
+    {
+      "obligationId": "CR-LIVE-01",
+      "kind": "contract-validation",
+      "category": "persistence",
+      "statement": "Real-provider durability: a save shown as saved is read back from GitHub (PERSIST-023, J3-05, INV-037)",
+      "executedBy": "tools/contract-readiness check",
+      "status": "UNVERIFIED"
+    },
+    {
+      "obligationId": "NC-01",
+      "kind": "negative-control",
+      "category": "negative-control",
+      "statement": "Remove a required field (EvidenceAdmitted.source) from the field registry must make CR-HIST-01 fail",
+      "executedBy": "tools/contract-readiness check",
+      "status": "PASS"
+    },
+    {
+      "obligationId": "NC-02",
+      "kind": "negative-control",
+      "category": "negative-control",
+      "statement": "Remove an event case binding (variant EV-033 CausalAssertionConfirmed) must make CR-HIST-02, CR-CER-02, CR-CER-03 fail",
+      "executedBy": "tools/contract-readiness check",
+      "status": "PASS"
+    },
+    {
+      "obligationId": "NC-03",
+      "kind": "negative-control",
+      "category": "negative-control",
+      "statement": "Remove CoreEvent.EvidenceVerificationAssessed from the parsed v4.1.5 contract must make CR-REP-01, CR-CER-03 fail",
+      "executedBy": "tools/contract-readiness check",
+      "status": "PASS"
+    },
+    {
+      "obligationId": "NC-04",
+      "kind": "negative-control",
+      "category": "negative-control",
+      "statement": "Remove a command (CMD-REL-LINK) that UI bindings use must make CR-UI-02 fail",
+      "executedBy": "tools/contract-readiness check",
+      "status": "PASS"
+    },
+    {
+      "obligationId": "NC-05",
+      "kind": "negative-control",
+      "category": "negative-control",
+      "statement": "Remove the binding of a required UI field (UB-024, INV-024 observation text) must make CR-UI-01, CR-UI-04 fail",
+      "executedBy": "tools/contract-readiness check",
+      "status": "PASS"
+    },
+    {
+      "obligationId": "NC-06",
+      "kind": "negative-control",
+      "category": "negative-control",
+      "statement": "Duplicate a field ID must make CR-REG-02 fail",
+      "executedBy": "tools/contract-readiness check",
+      "status": "PASS"
+    },
+    {
+      "obligationId": "NC-07",
+      "kind": "negative-control",
+      "category": "negative-control",
+      "statement": "Make one stored Challenger event non-canonical (insert a space) must make CR-HIST-01 fail",
+      "executedBy": "tools/contract-readiness check",
+      "status": "PASS"
+    },
+    {
+      "obligationId": "NC-08",
+      "kind": "negative-control",
+      "category": "negative-control",
+      "statement": "Drop Provenance from the parsed v4.1.5 EventEnvelope record must make CR-REP-01 fail",
+      "executedBy": "tools/contract-readiness check",
+      "status": "PASS"
+    },
+    {
+      "obligationId": "NC-09",
+      "kind": "negative-control",
+      "category": "negative-control",
+      "statement": "Claim durability for 'Provider write acknowledged' (no read-back) must make CR-ST-03 fail",
+      "executedBy": "tools/contract-readiness check",
+      "status": "PASS"
+    },
+    {
+      "obligationId": "NC-10",
+      "kind": "negative-control",
+      "category": "negative-control",
+      "statement": "Narrow a transition table entry (DT-HYP-02 markSupported only from proposed) must make CR-HIST-06 fail",
+      "executedBy": "tools/contract-readiness check",
+      "status": "PASS"
+    },
+    {
+      "obligationId": "NC-11",
+      "kind": "negative-control",
+      "category": "negative-control",
+      "statement": "Mark a blocked binding (UB-023 primary question) as covered must make CR-UI-03 fail",
+      "executedBy": "tools/contract-readiness check",
+      "status": "PASS"
+    },
+    {
+      "obligationId": "NC-12",
+      "kind": "negative-control",
+      "category": "negative-control",
+      "statement": "Remove SaveState.Conflict from the parsed v4.1.5 contract must make CR-ST-02, CR-ST-03 fail",
+      "executedBy": "tools/contract-readiness check",
+      "status": "PASS"
+    },
+    {
+      "obligationId": "NC-13",
+      "kind": "negative-control",
+      "category": "negative-control",
+      "statement": "Add an unknown payload field to one stored event must make CR-HIST-01 fail",
+      "executedBy": "tools/contract-readiness check",
+      "status": "PASS"
+    },
+    {
+      "obligationId": "NC-14",
+      "kind": "negative-control",
+      "category": "negative-control",
+      "statement": "Give one stored event an unregistered event type must make CR-HIST-01, CR-HIST-02 fail",
+      "executedBy": "tools/contract-readiness check",
+      "status": "PASS"
+    },
+    {
+      "obligationId": "NC-15",
+      "kind": "negative-control",
+      "category": "negative-control",
+      "statement": "Tamper with the committed FIELD-REGISTRY.json must make CR-REG-01 fail",
+      "executedBy": "tools/contract-readiness check",
+      "status": "PASS"
+    },
+    {
+      "obligationId": "NC-16",
+      "kind": "negative-control",
+      "category": "negative-control",
+      "statement": "Place an access token in a contract fixture must make CR-SEC-01 fail",
+      "executedBy": "tools/contract-readiness check",
+      "status": "PASS"
+    },
+    {
+      "obligationId": "NC-17",
+      "kind": "negative-control",
+      "category": "negative-control",
+      "statement": "Remove the documented input path of a required field (ObservationRecorded.observedAt) must make CR-CER-06 fail",
+      "executedBy": "tools/contract-readiness check",
+      "status": "PASS"
+    },
+    {
+      "obligationId": "NC-18",
+      "kind": "negative-control",
+      "category": "negative-control",
+      "statement": "Remove a v4.1.5 CoreCommand case's registry entries (RecordFinding) must make CR-CER-04 fail",
+      "executedBy": "tools/contract-readiness check",
+      "status": "PASS"
+    },
+    {
+      "obligationId": "T-IMPL-CMD-INV-CREATE-01",
+      "kind": "implementation",
+      "category": "command",
+      "statement": "T-IMPL-CMD-INV-CREATE-01 accepted command emits exactly InvestigationStarted at version 1",
+      "subject": "CMD-INV-CREATE",
+      "executedBy": "competition implementation (Dokimos / domain tests)",
+      "status": "PENDING-IMPLEMENTATION"
+    },
+    {
+      "obligationId": "T-IMPL-CMD-INV-CREATE-02",
+      "kind": "implementation",
+      "category": "command",
+      "statement": "T-IMPL-CMD-INV-CREATE-02 each validationErrors row refuses and writes nothing",
+      "subject": "CMD-INV-CREATE",
+      "executedBy": "competition implementation (Dokimos / domain tests)",
+      "status": "PENDING-IMPLEMENTATION"
+    },
+    {
+      "obligationId": "T-IMPL-CMD-INV-CREATE-03",
+      "kind": "implementation",
+      "category": "command",
+      "statement": "T-IMPL-CMD-INV-CREATE-03 catalog target refused (Writable)",
+      "subject": "CMD-INV-CREATE",
+      "executedBy": "competition implementation (Dokimos / domain tests)",
+      "status": "PENDING-IMPLEMENTATION"
+    },
+    {
+      "obligationId": "T-IMPL-DT-INV-01",
+      "kind": "implementation",
+      "category": "command",
+      "statement": "T-IMPL-DT-INV-01",
+      "subject": "CMD-INV-ACTIVATE",
+      "executedBy": "competition implementation (Dokimos / domain tests)",
+      "status": "PENDING-IMPLEMENTATION"
+    },
+    {
+      "obligationId": "T-IMPL-CMD-INV-EDIT-01",
+      "kind": "implementation",
+      "category": "command",
+      "statement": "T-IMPL-CMD-INV-EDIT-01 identifier unchanged after edit (INV-034)",
+      "subject": "CMD-INV-EDIT",
+      "executedBy": "competition implementation (Dokimos / domain tests)",
+      "status": "BLOCKED"
+    },
+    {
+      "obligationId": "T-IMPL-CMD-INV-EDIT-02",
+      "kind": "implementation",
+      "category": "command",
+      "statement": "T-IMPL-CMD-INV-EDIT-02 earlier values remain in history (INV-035)",
+      "subject": "CMD-INV-EDIT",
+      "executedBy": "competition implementation (Dokimos / domain tests)",
+      "status": "BLOCKED"
+    },
+    {
+      "obligationId": "T-IMPL-CMD-OBS-ADD-01",
+      "kind": "implementation",
+      "category": "command",
+      "statement": "T-IMPL-CMD-OBS-ADD-01 text round-trips verbatim (INV-024)",
+      "subject": "CMD-OBS-ADD",
+      "executedBy": "competition implementation (Dokimos / domain tests)",
+      "status": "BLOCKED"
+    },
+    {
+      "obligationId": "T-IMPL-CMD-OBS-EDIT-01",
+      "kind": "implementation",
+      "category": "command",
+      "statement": "T-IMPL-CMD-OBS-EDIT-01 id kept, earlier text in history (INV-035)",
+      "subject": "CMD-OBS-EDIT",
+      "executedBy": "competition implementation (Dokimos / domain tests)",
+      "status": "BLOCKED"
+    },
+    {
+      "obligationId": "T-IMPL-CMD-HYP-ADD-01",
+      "kind": "implementation",
+      "category": "command",
+      "statement": "T-IMPL-CMD-HYP-ADD-01",
+      "subject": "CMD-HYP-ADD",
+      "executedBy": "competition implementation (Dokimos / domain tests)",
+      "status": "BLOCKED"
+    },
+    {
+      "obligationId": "T-IMPL-CMD-HYP-EDIT-01",
+      "kind": "implementation",
+      "category": "command",
+      "statement": "T-IMPL-CMD-HYP-EDIT-01 id kept, earlier text in history (INV-035)",
+      "subject": "CMD-HYP-EDIT",
+      "executedBy": "competition implementation (Dokimos / domain tests)",
+      "status": "BLOCKED"
+    },
+    {
+      "obligationId": "T-IMPL-CMD-EVD-ADD-01",
+      "kind": "implementation",
+      "category": "command",
+      "statement": "T-IMPL-CMD-EVD-ADD-01 content verbatim",
+      "subject": "CMD-EVD-ADD",
+      "executedBy": "competition implementation (Dokimos / domain tests)",
+      "status": "BLOCKED"
+    },
+    {
+      "obligationId": "T-IMPL-CMD-EVD-ADD-02",
+      "kind": "implementation",
+      "category": "command",
+      "statement": "T-IMPL-CMD-EVD-ADD-02 unsafe URL refused and never rendered as a link",
+      "subject": "CMD-EVD-ADD",
+      "executedBy": "competition implementation (Dokimos / domain tests)",
+      "status": "BLOCKED"
+    },
+    {
+      "obligationId": "T-IMPL-CMD-EVD-EDIT-01",
+      "kind": "implementation",
+      "category": "command",
+      "statement": "T-IMPL-CMD-EVD-EDIT-01 id kept; content unchanged; earlier label in history",
+      "subject": "CMD-EVD-EDIT",
+      "executedBy": "competition implementation (Dokimos / domain tests)",
+      "status": "BLOCKED"
+    },
+    {
+      "obligationId": "T-IMPL-CMD-REL-LINK-01",
+      "kind": "implementation",
+      "category": "command",
+      "statement": "T-IMPL-CMD-REL-LINK-01 shown on both evidence and hypothesis after reload (INV-044)",
+      "subject": "CMD-REL-LINK",
+      "executedBy": "competition implementation (Dokimos / domain tests)",
+      "status": "BLOCKED"
+    },
+    {
+      "obligationId": "T-IMPL-CMD-REL-LINK-02",
+      "kind": "implementation",
+      "category": "command",
+      "statement": "T-IMPL-CMD-REL-LINK-02 second link for the pair refused",
+      "subject": "CMD-REL-LINK",
+      "executedBy": "competition implementation (Dokimos / domain tests)",
+      "status": "BLOCKED"
+    },
+    {
+      "obligationId": "T-IMPL-CMD-REL-REVISE-01",
+      "kind": "implementation",
+      "category": "command",
+      "statement": "T-IMPL-CMD-REL-REVISE-01 earlier assessment and provenance remain in history",
+      "subject": "CMD-REL-REVISE",
+      "executedBy": "competition implementation (Dokimos / domain tests)",
+      "status": "BLOCKED"
+    },
+    {
+      "obligationId": "T-IMPL-CMD-REL-WITHDRAW-01",
+      "kind": "implementation",
+      "category": "command",
+      "statement": "T-IMPL-CMD-REL-WITHDRAW-01 pair may be linked again after withdrawal; history keeps both",
+      "subject": "CMD-REL-WITHDRAW",
+      "executedBy": "competition implementation (Dokimos / domain tests)",
+      "status": "BLOCKED"
+    },
+    {
+      "obligationId": "T-IMPL-DT-HYP-*",
+      "kind": "implementation",
+      "category": "command",
+      "statement": "T-IMPL-DT-HYP-*",
+      "subject": "CMD-HYP-ASSESS",
+      "executedBy": "competition implementation (Dokimos / domain tests)",
+      "status": "PENDING-IMPLEMENTATION"
+    },
+    {
+      "obligationId": "T-IMPL-CMD-CONCL-RECORD-01",
+      "kind": "implementation",
+      "category": "command",
+      "statement": "T-IMPL-CMD-CONCL-RECORD-01 lifecycle unchanged",
+      "subject": "CMD-CONCL-RECORD",
+      "executedBy": "competition implementation (Dokimos / domain tests)",
+      "status": "BLOCKED"
+    },
+    {
+      "obligationId": "T-IMPL-DT-INV-06",
+      "kind": "implementation",
+      "category": "command",
+      "statement": "T-IMPL-DT-INV-06",
+      "subject": "CMD-INV-REOPEN",
+      "executedBy": "competition implementation (Dokimos / domain tests)",
+      "status": "PENDING-IMPLEMENTATION"
+    },
+    {
+      "obligationId": "T-IMPL-UI-INV-022",
+      "kind": "implementation",
+      "category": "command",
+      "statement": "T-IMPL-UI-INV-022 no write after cancel",
+      "subject": "CMD-UI-CANCEL-START",
+      "executedBy": "competition implementation (Dokimos / domain tests)",
+      "status": "PENDING-IMPLEMENTATION"
+    },
+    {
+      "obligationId": "T-IMPL-UI-INV-036",
+      "kind": "implementation",
+      "category": "command",
+      "statement": "T-IMPL-UI-INV-036 no write after cancel",
+      "subject": "CMD-UI-CANCEL-EDITOR",
+      "executedBy": "competition implementation (Dokimos / domain tests)",
+      "status": "PENDING-IMPLEMENTATION"
+    },
+    {
+      "obligationId": "T-IMPL-DT-HYP-04",
+      "kind": "implementation",
+      "category": "command",
+      "statement": "T-IMPL-DT-HYP-04",
+      "subject": "CMD-DOM-01",
+      "executedBy": "competition implementation (Dokimos / domain tests)",
+      "status": "PENDING-IMPLEMENTATION"
+    },
+    {
+      "obligationId": "T-IMPL-DT-HYP-01",
+      "kind": "implementation",
+      "category": "command",
+      "statement": "T-IMPL-DT-HYP-01",
+      "subject": "CMD-DOM-02",
+      "executedBy": "competition implementation (Dokimos / domain tests)",
+      "status": "PENDING-IMPLEMENTATION"
+    },
+    {
+      "obligationId": "T-IMPL-DT-HYP-02",
+      "kind": "implementation",
+      "category": "command",
+      "statement": "T-IMPL-DT-HYP-02",
+      "subject": "CMD-DOM-03",
+      "executedBy": "competition implementation (Dokimos / domain tests)",
+      "status": "PENDING-IMPLEMENTATION"
+    },
+    {
+      "obligationId": "T-IMPL-DT-HYP-06",
+      "kind": "implementation",
+      "category": "command",
+      "statement": "T-IMPL-DT-HYP-06",
+      "subject": "CMD-DOM-04",
+      "executedBy": "competition implementation (Dokimos / domain tests)",
+      "status": "PENDING-IMPLEMENTATION"
+    },
+    {
+      "obligationId": "UI-UB-001",
+      "kind": "implementation",
+      "category": "ui-binding",
+      "statement": "INV-001 Problem statement: CMD-INV-CREATE -> F.Payload.InvestigationStarted.original, F.Entity.observation.original; verified by CATALOG:INV-001, J1-03",
+      "subject": "INV-001",
+      "executedBy": "competition implementation; Praxis manifest + Dokimos (catalog acceptance)",
+      "status": "PENDING-IMPLEMENTATION"
+    },
+    {
+      "obligationId": "UI-UB-002",
+      "kind": "implementation",
+      "category": "ui-binding",
+      "statement": "INV-002 Title: CMD-INV-CREATE -> F.Payload.InvestigationStarted.title, F.State.title; verified by CATALOG:INV-002, J1-03",
+      "subject": "INV-002",
+      "executedBy": "competition implementation; Praxis manifest + Dokimos (catalog acceptance)",
+      "status": "PENDING-IMPLEMENTATION"
+    },
+    {
+      "obligationId": "UI-UB-003",
+      "kind": "implementation",
+      "category": "ui-binding",
+      "statement": "INV-003 Domain or profile indicator: (display) -> F.Manifest.domainPacks; verified by CATALOG:INV-003",
+      "subject": "INV-003",
+      "executedBy": "competition implementation; Praxis manifest + Dokimos (catalog acceptance)",
+      "status": "NOT-APPLICABLE"
+    },
+    {
+      "obligationId": "UI-UB-004",
+      "kind": "implementation",
+      "category": "ui-binding",
+      "statement": "INV-004 Start investigation: CMD-INV-CREATE -> F.State.investigationId; verified by CATALOG:INV-004, J1-03",
+      "subject": "INV-004",
+      "executedBy": "competition implementation; Praxis manifest + Dokimos (catalog acceptance)",
+      "status": "PENDING-IMPLEMENTATION"
+    },
+    {
+      "obligationId": "UI-UB-005",
+      "kind": "implementation",
+      "category": "ui-binding",
+      "statement": "INV-005 Persistence destination indicator: (display) -> ; verified by CATALOG:INV-005",
+      "subject": "INV-005",
+      "executedBy": "competition implementation; Praxis manifest + Dokimos (catalog acceptance)",
+      "status": "PENDING-IMPLEMENTATION"
+    },
+    {
+      "obligationId": "UI-UB-006",
+      "kind": "implementation",
+      "category": "ui-binding",
+      "statement": "INV-006 Investigation identifier: CMD-INV-CREATE -> F.Envelope.investigationId, F.State.investigationId; verified by CATALOG:INV-006",
+      "subject": "INV-006",
+      "executedBy": "competition implementation; Praxis manifest + Dokimos (catalog acceptance)",
+      "status": "PENDING-IMPLEMENTATION"
+    },
+    {
+      "obligationId": "UI-UB-007",
+      "kind": "implementation",
+      "category": "ui-binding",
+      "statement": "INV-007 Creation timestamp: (display) -> F.Envelope.occurredAt, F.State.createdAt; verified by CATALOG:INV-007",
+      "subject": "INV-007",
+      "executedBy": "competition implementation; Praxis manifest + Dokimos (catalog acceptance)",
+      "status": "PENDING-IMPLEMENTATION"
+    },
+    {
+      "obligationId": "UI-UB-008",
+      "kind": "implementation",
+      "category": "ui-binding",
+      "statement": "INV-008 Original problem statement: (display) -> F.Payload.InvestigationStarted.original; verified by CATALOG:INV-008",
+      "subject": "INV-008",
+      "executedBy": "competition implementation; Praxis manifest + Dokimos (catalog acceptance)",
+      "status": "PENDING-IMPLEMENTATION"
+    },
+    {
+      "obligationId": "UI-UB-009",
+      "kind": "implementation",
+      "category": "ui-binding",
+      "statement": "INV-009 Record a hypothesis: CMD-HYP-ADD -> F.State.hypotheses; verified by CATALOG:INV-009, J2-02",
+      "subject": "INV-009",
+      "executedBy": "competition implementation; Praxis manifest + Dokimos (catalog acceptance)",
+      "status": "PENDING-IMPLEMENTATION"
+    },
+    {
+      "obligationId": "UI-UB-010",
+      "kind": "implementation",
+      "category": "ui-binding",
+      "statement": "INV-010 Hypotheses: (display) -> F.State.hypotheses, F.Entity.hypothesis.statement, F.Entity.hypothesis.state; verified by CATALOG:INV-010, J2-02",
+      "subject": "INV-010",
+      "executedBy": "competition implementation; Praxis manifest + Dokimos (catalog acceptance)",
+      "status": "PENDING-IMPLEMENTATION"
+    },
+    {
+      "obligationId": "UI-UB-011",
+      "kind": "implementation",
+      "category": "ui-binding",
+      "statement": "INV-011 Hypothesis explanation: CMD-HYP-ADD -> F.Payload.HypothesisRecorded.mechanism, F.Entity.hypothesis.mechanism; verified by CATALOG:INV-011",
+      "subject": "INV-011",
+      "executedBy": "competition implementation; Praxis manifest + Dokimos (catalog acceptance)",
+      "status": "BLOCKED"
+    },
+    {
+      "obligationId": "UI-UB-012",
+      "kind": "implementation",
+      "category": "ui-binding",
+      "statement": "INV-012 Evidence original content: CMD-EVD-ADD -> F.Payload.EvidenceAdmitted.content, F.Entity.evidence.content; verified by CATALOG:INV-012, J2-03",
+      "subject": "INV-012",
+      "executedBy": "competition implementation; Praxis manifest + Dokimos (catalog acceptance)",
+      "status": "BLOCKED"
+    },
+    {
+      "obligationId": "UI-UB-013",
+      "kind": "implementation",
+      "category": "ui-binding",
+      "statement": "INV-013 Evidence: (display) -> F.State.evidence, F.Entity.evidence.content, F.Entity.evidence.source; verified by CATALOG:INV-013, J2-03",
+      "subject": "INV-013",
+      "executedBy": "competition implementation; Praxis manifest + Dokimos (catalog acceptance)",
+      "status": "PENDING-IMPLEMENTATION"
+    },
+    {
+      "obligationId": "UI-UB-014",
+      "kind": "implementation",
+      "category": "ui-binding",
+      "statement": "INV-014 Record an observation: CMD-OBS-ADD -> F.State.observations; verified by CATALOG:INV-014, J2-01",
+      "subject": "INV-014",
+      "executedBy": "competition implementation; Praxis manifest + Dokimos (catalog acceptance)",
+      "status": "PENDING-IMPLEMENTATION"
+    },
+    {
+      "obligationId": "UI-UB-015",
+      "kind": "implementation",
+      "category": "ui-binding",
+      "statement": "INV-015 Save: CMD-WS-SAVE -> F.Manifest.eventsSha256; verified by CATALOG:INV-015, J1-04",
+      "subject": "INV-015",
+      "executedBy": "competition implementation; Praxis manifest + Dokimos (catalog acceptance)",
+      "status": "PENDING-IMPLEMENTATION"
+    },
+    {
+      "obligationId": "UI-UB-016",
+      "kind": "implementation",
+      "category": "ui-binding",
+      "statement": "INV-016 Save state: (display) -> ; verified by CATALOG:INV-016, J1-04",
+      "subject": "INV-016",
+      "executedBy": "competition implementation; Praxis manifest + Dokimos (catalog acceptance)",
+      "status": "PENDING-IMPLEMENTATION"
+    },
+    {
+      "obligationId": "UI-UB-017",
+      "kind": "implementation",
+      "category": "ui-binding",
+      "statement": "INV-017 Reopening restores the saved investigation: CMD-INV-OPEN -> F.Snapshot.state; verified by CATALOG:INV-017, J1-05",
+      "subject": "INV-017",
+      "executedBy": "competition implementation; Praxis manifest + Dokimos (catalog acceptance)",
+      "status": "PENDING-IMPLEMENTATION"
+    },
+    {
+      "obligationId": "UI-UB-018",
+      "kind": "implementation",
+      "category": "ui-binding",
+      "statement": "INV-018 Investigation state: (display) -> F.State.lifecycle; verified by CATALOG:INV-018",
+      "subject": "INV-018",
+      "executedBy": "competition implementation; Praxis manifest + Dokimos (catalog acceptance)",
+      "status": "PENDING-IMPLEMENTATION"
+    },
+    {
+      "obligationId": "UI-UB-019",
+      "kind": "implementation",
+      "category": "ui-binding",
+      "statement": "INV-019 Problem statement must not be empty: CMD-INV-CREATE -> F.Payload.InvestigationStarted.original; verified by CATALOG:INV-019",
+      "subject": "INV-019",
+      "executedBy": "competition implementation; Praxis manifest + Dokimos (catalog acceptance)",
+      "status": "PENDING-IMPLEMENTATION"
+    },
+    {
+      "obligationId": "UI-UB-020",
+      "kind": "implementation",
+      "category": "ui-binding",
+      "statement": "INV-020 Title length: CMD-INV-CREATE -> F.Payload.InvestigationStarted.title; verified by CATALOG:INV-020",
+      "subject": "INV-020",
+      "executedBy": "competition implementation; Praxis manifest + Dokimos (catalog acceptance)",
+      "status": "PENDING-IMPLEMENTATION"
+    },
+    {
+      "obligationId": "UI-UB-021",
+      "kind": "implementation",
+      "category": "ui-binding",
+      "statement": "INV-021 Problem statement length: CMD-INV-CREATE -> F.Payload.InvestigationStarted.original; verified by CATALOG:INV-021",
+      "subject": "INV-021",
+      "executedBy": "competition implementation; Praxis manifest + Dokimos (catalog acceptance)",
+      "status": "PENDING-IMPLEMENTATION"
+    },
+    {
+      "obligationId": "UI-UB-022",
+      "kind": "implementation",
+      "category": "ui-binding",
+      "statement": "INV-022 Cancel investigation start: CMD-UI-CANCEL-START -> ; verified by CATALOG:INV-022",
+      "subject": "INV-022",
+      "executedBy": "competition implementation; Praxis manifest + Dokimos (catalog acceptance)",
+      "status": "PENDING-IMPLEMENTATION"
+    },
+    {
+      "obligationId": "UI-UB-023",
+      "kind": "implementation",
+      "category": "ui-binding",
+      "statement": "INV-023 Primary investigative question: CMD-INV-CREATE -> F.Payload.InvestigationDetailsRevised.question, F.Payload.InvestigationDetailsRevised.question; verified by CATALOG:INV-023, J1-03",
+      "subject": "INV-023",
+      "executedBy": "competition implementation; Praxis manifest + Dokimos (catalog acceptance)",
+      "status": "BLOCKED"
+    },
+    {
+      "obligationId": "UI-UB-024",
+      "kind": "implementation",
+      "category": "ui-binding",
+      "statement": "INV-024 Observation text: CMD-OBS-ADD -> F.Payload.ObservationRecorded.original, F.Entity.observation.original; verified by CATALOG:INV-024, J2-01",
+      "subject": "INV-024",
+      "executedBy": "competition implementation; Praxis manifest + Dokimos (catalog acceptance)",
+      "status": "PENDING-IMPLEMENTATION"
+    },
+    {
+      "obligationId": "UI-UB-025",
+      "kind": "implementation",
+      "category": "ui-binding",
+      "statement": "INV-025 Observation source reference: CMD-OBS-ADD -> F.Payload.ObservationRevised.source, F.Payload.ObservationRevised.source; verified by CATALOG:INV-025, J2-01",
+      "subject": "INV-025",
+      "executedBy": "competition implementation; Praxis manifest + Dokimos (catalog acceptance)",
+      "status": "BLOCKED"
+    },
+    {
+      "obligationId": "UI-UB-026",
+      "kind": "implementation",
+      "category": "ui-binding",
+      "statement": "INV-026 Hypothesis statement: CMD-HYP-ADD -> F.Payload.HypothesisRecorded.statement, F.Entity.hypothesis.statement; verified by CATALOG:INV-026, J2-02",
+      "subject": "INV-026",
+      "executedBy": "competition implementation; Praxis manifest + Dokimos (catalog acceptance)",
+      "status": "PENDING-IMPLEMENTATION"
+    },
+    {
+      "obligationId": "UI-UB-027",
+      "kind": "implementation",
+      "category": "ui-binding",
+      "statement": "INV-027 Evidence label: CMD-EVD-ADD -> F.Payload.EvidenceRevised.label, F.Payload.EvidenceRevised.label; verified by CATALOG:INV-027, J2-03, J2-05",
+      "subject": "INV-027",
+      "executedBy": "competition implementation; Praxis manifest + Dokimos (catalog acceptance)",
+      "status": "BLOCKED"
+    },
+    {
+      "obligationId": "UI-UB-028",
+      "kind": "implementation",
+      "category": "ui-binding",
+      "statement": "INV-028 Evidence source reference: CMD-EVD-ADD -> F.Payload.EvidenceAdmitted.source, F.Entity.evidence.source; verified by CATALOG:INV-028, J2-03",
+      "subject": "INV-028",
+      "executedBy": "competition implementation; Praxis manifest + Dokimos (catalog acceptance)",
+      "status": "BLOCKED"
+    },
+    {
+      "obligationId": "UI-UB-029",
+      "kind": "implementation",
+      "category": "ui-binding",
+      "statement": "INV-029 Evidence source URL: CMD-EVD-ADD -> F.Payload.EvidenceRevised.sourceUrl, F.Payload.EvidenceRevised.sourceUrl; verified by CATALOG:INV-029, J2-03",
+      "subject": "INV-029",
+      "executedBy": "competition implementation; Praxis manifest + Dokimos (catalog acceptance)",
+      "status": "BLOCKED"
+    },
+    {
+      "obligationId": "UI-UB-030",
+      "kind": "implementation",
+      "category": "ui-binding",
+      "statement": "INV-030 Link evidence to a hypothesis: CMD-REL-LINK -> F.Payload.EvidenceRelated.evidenceId, F.Payload.EvidenceRelated.hypothesisId, F.Entity.relationship.evidenceId, F.Entity.relationship.hypothesisId; verified by CATALOG:INV-030, J2-04, J2-05",
+      "subject": "INV-030",
+      "executedBy": "competition implementation; Praxis manifest + Dokimos (catalog acceptance)",
+      "status": "PENDING-IMPLEMENTATION"
+    },
+    {
+      "obligationId": "UI-UB-030U",
+      "kind": "implementation",
+      "category": "ui-binding",
+      "statement": "INV-030 Link evidence to a hypothesis: CMD-REL-REVISE -> F.Payload.EvidenceRelationshipRevised.kind, F.Payload.EvidenceRelationshipRevised.rationale, F.Payload.EvidenceRelationshipWithdrawn.reason, F.Payload.EvidenceRelationshipRevised.kind; verified by CATALOG:INV-030, J2-06, J2-09",
+      "subject": "INV-030",
+      "executedBy": "competition implementation; Praxis manifest + Dokimos (catalog acceptance)",
+      "status": "BLOCKED"
+    },
+    {
+      "obligationId": "UI-UB-031",
+      "kind": "implementation",
+      "category": "ui-binding",
+      "statement": "INV-031 Evidence relationship kind: CMD-REL-LINK -> F.Payload.EvidenceRelated.kind, F.Entity.relationship.kind; verified by CATALOG:INV-031, J2-04",
+      "subject": "INV-031",
+      "executedBy": "competition implementation; Praxis manifest + Dokimos (catalog acceptance)",
+      "status": "BLOCKED"
+    },
+    {
+      "obligationId": "UI-UB-032",
+      "kind": "implementation",
+      "category": "ui-binding",
+      "statement": "INV-032 Record a conclusion: CMD-CONCL-RECORD -> F.State.conclusions; verified by CATALOG:INV-032, J2-07",
+      "subject": "INV-032",
+      "executedBy": "competition implementation; Praxis manifest + Dokimos (catalog acceptance)",
+      "status": "BLOCKED"
+    },
+    {
+      "obligationId": "UI-UB-033",
+      "kind": "implementation",
+      "category": "ui-binding",
+      "statement": "INV-033 Conclusion statement: CMD-CONCL-RECORD -> F.Payload.ConclusionRecorded.statement, F.Entity.conclusion.statement; verified by CATALOG:INV-033, J2-07",
+      "subject": "INV-033",
+      "executedBy": "competition implementation; Praxis manifest + Dokimos (catalog acceptance)",
+      "status": "BLOCKED"
+    },
+    {
+      "obligationId": "UI-UB-034",
+      "kind": "implementation",
+      "category": "ui-binding",
+      "statement": "INV-034 Edit investigation details: CMD-INV-EDIT -> F.Payload.InvestigationDetailsRevised.title, F.Payload.InvestigationDetailsRevised.problemStatement, F.Payload.InvestigationDetailsRevised.question, F.Payload.InvestigationDetailsRevised.title; verified by CATALOG:INV-034, J2-06",
+      "subject": "INV-034",
+      "executedBy": "competition implementation; Praxis manifest + Dokimos (catalog acceptance)",
+      "status": "BLOCKED"
+    },
+    {
+      "obligationId": "UI-UB-035",
+      "kind": "implementation",
+      "category": "ui-binding",
+      "statement": "INV-035 Editing keeps identity and history: CMD-OBS-EDIT -> F.Payload.ObservationRevised.original, F.Payload.HypothesisRevised.statement, F.Payload.EvidenceRevised.label, F.Payload.InvestigationDetailsRevised.title, F.Envelope.eventType; verified by CATALOG:INV-035, J2-06, J2-09",
+      "subject": "INV-035",
+      "executedBy": "competition implementation; Praxis manifest + Dokimos (catalog acceptance)",
+      "status": "BLOCKED"
+    },
+    {
+      "obligationId": "UI-UB-036",
+      "kind": "implementation",
+      "category": "ui-binding",
+      "statement": "INV-036 Cancel a content editor: CMD-UI-CANCEL-EDITOR -> ; verified by CATALOG:INV-036",
+      "subject": "INV-036",
+      "executedBy": "competition implementation; Praxis manifest + Dokimos (catalog acceptance)",
+      "status": "PENDING-IMPLEMENTATION"
+    },
+    {
+      "obligationId": "UI-UB-037",
+      "kind": "implementation",
+      "category": "ui-binding",
+      "statement": "INV-037 All content survives a reload from GitHub: CMD-INV-OPEN -> F.Snapshot.state; verified by CATALOG:INV-037, J1-05, J3-05",
+      "subject": "INV-037",
+      "executedBy": "competition implementation; Praxis manifest + Dokimos (catalog acceptance)",
+      "status": "BLOCKED"
+    },
+    {
+      "obligationId": "UI-UB-038",
+      "kind": "implementation",
+      "category": "ui-binding",
+      "statement": "INV-038 Evidence relationship rationale: CMD-REL-LINK -> F.Payload.EvidenceRelated.rationale, F.Entity.relationship.rationale; verified by CATALOG:INV-038, J2-04",
+      "subject": "INV-038",
+      "executedBy": "competition implementation; Praxis manifest + Dokimos (catalog acceptance)",
+      "status": "PENDING-IMPLEMENTATION"
+    },
+    {
+      "obligationId": "UI-UB-039",
+      "kind": "implementation",
+      "category": "ui-binding",
+      "statement": "INV-039 Investigations: CMD-WS-LIST -> F.State.title; verified by CATALOG:INV-039, J1-02",
+      "subject": "INV-039",
+      "executedBy": "competition implementation; Praxis manifest + Dokimos (catalog acceptance)",
+      "status": "PENDING-IMPLEMENTATION"
+    },
+    {
+      "obligationId": "UI-UB-040",
+      "kind": "implementation",
+      "category": "ui-binding",
+      "statement": "INV-040 Open investigation: CMD-INV-OPEN -> F.Payload.InvestigationStarted.original; verified by CATALOG:INV-040",
+      "subject": "INV-040",
+      "executedBy": "competition implementation; Praxis manifest + Dokimos (catalog acceptance)",
+      "status": "PENDING-IMPLEMENTATION"
+    },
+    {
+      "obligationId": "UI-UB-041",
+      "kind": "implementation",
+      "category": "ui-binding",
+      "statement": "INV-041 Primary navigation: (display) -> ; verified by CATALOG:INV-041, J3-01",
+      "subject": "INV-041",
+      "executedBy": "competition implementation; Praxis manifest + Dokimos (catalog acceptance)",
+      "status": "PENDING-IMPLEMENTATION"
+    },
+    {
+      "obligationId": "UI-UB-042",
+      "kind": "implementation",
+      "category": "ui-binding",
+      "statement": "INV-042 Investigation sections: (display) -> F.State.relationships, F.State.evidence, F.State.hypotheses; verified by CATALOG:INV-042, J2-08",
+      "subject": "INV-042",
+      "executedBy": "competition implementation; Praxis manifest + Dokimos (catalog acceptance)",
+      "status": "PENDING-IMPLEMENTATION"
+    },
+    {
+      "obligationId": "UI-UB-043",
+      "kind": "implementation",
+      "category": "ui-binding",
+      "statement": "INV-043 Save state outcomes: CMD-WS-SAVE -> ; verified by CATALOG:INV-043, J1-04, J3-03",
+      "subject": "INV-043",
+      "executedBy": "competition implementation; Praxis manifest + Dokimos (catalog acceptance)",
+      "status": "PENDING-IMPLEMENTATION"
+    },
+    {
+      "obligationId": "UI-UB-044",
+      "kind": "implementation",
+      "category": "ui-binding",
+      "statement": "INV-044 A link is shown on both the evidence and the hypothesis: CMD-REL-LINK -> F.Entity.relationship.evidenceId, F.Entity.relationship.hypothesisId; verified by CATALOG:INV-044, J2-05",
+      "subject": "INV-044",
+      "executedBy": "competition implementation; Praxis manifest + Dokimos (catalog acceptance)",
+      "status": "PENDING-IMPLEMENTATION"
+    }
+  ]
+}
