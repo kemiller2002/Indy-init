@@ -85,6 +85,8 @@ let packages =
       { Name = "v4.1.2"; Dir = "requirements-compiled/v4.1.2"; ApprovalPrefix = "APR-V412-OWNER"; PackageApprovalId = "ODR-V412-04"; Tag = "indy-init-requirements-v4.1.2" }
       // v4.1.4 (docs/release-gate-repair): corrected suite runners. 4.1.3 belonged to the withdrawn proposal.
       { Name = "v4.1.4"; Dir = "requirements-compiled/v4.1.4"; ApprovalPrefix = "APR-V414-OWNER"; PackageApprovalId = "ODR-V414-03"; Tag = "indy-init-requirements-v4.1.4" }
+      // v4.1.5 (docs/rehearsal-010-dependency-reduction): the minimum contract change for real causa-data.
+      { Name = "v4.1.5"; Dir = "requirements-compiled/v4.1.5"; ApprovalPrefix = "APR-V415-OWNER"; PackageApprovalId = "ODR-V415-04"; Tag = "indy-init-requirements-v4.1.5" }
       // Rehearsal 010's owner decisions (docs/rehearsal-010-readiness/OWNER-APPROVAL-EXECUTION.md): decisions only, no
       // package approval and no tag.
       { Name = "rehearsal-010"; Dir = "kickoff/rehearsal-010"; ApprovalPrefix = "APR-R10-OWNER"; PackageApprovalId = ""; Tag = "" }
@@ -464,7 +466,7 @@ let unsignedApprovalChanges repo =
 
 /// Refuses to build on an approvals file that holds a change you did not sign (v4.1.4 and Rehearsal 010 only).
 let requireSignedApprovals repo (p: Package) =
-    if p.Name = "v4.1.4" || p.Name = "rehearsal-010" || p.Name = "historical-compatibility" || p.Name = "contract-first-ui" then
+    if p.Name = "v4.1.4" || p.Name = "v4.1.5" || p.Name = "rehearsal-010" || p.Name = "historical-compatibility" || p.Name = "contract-first-ui" then
         match unsignedApprovalChanges repo with
         | [] -> ()
         | unsigned ->
@@ -542,7 +544,7 @@ let approve repo dryRun (p: Package) =
     if p.Name = "v4.1.1" && not conflicts.IsEmpty then stop $"""decide {String.Join(", ", conflicts)} first (owner-freeze.fsx decide v4.1.1): the package approval depends on it"""
     // v4.1.2: the package applies its decisions (ODR-V412-01..03, -05), so each must be recorded, and the package recompiled
     // from them, before it can be approved.
-    if (p.Name = "v4.1.2" || p.Name = "v4.1.4") && not pending.IsEmpty then stop $"""decide {String.Join(", ", pending)} first (owner-freeze.fsx decide {p.Name}); the agent then compiles {p.Name} from your records"""
+    if (p.Name = "v4.1.2" || p.Name = "v4.1.4" || p.Name = "v4.1.5") && not pending.IsEmpty then stop $"""decide {String.Join(", ", pending)} first (owner-freeze.fsx decide {p.Name}); the agent then compiles {p.Name} from your records"""
     rule ()
     let change, shown =
         if p.Name = "v4" then
@@ -795,7 +797,7 @@ let argv = fsi.CommandLineArgs |> Array.toList |> List.tail
 let flag name = List.contains name argv
 let option name = argv |> List.pairwise |> List.tryFind (fst >> (=) name) |> Option.map snd
 let repo = option "--repo" |> Option.defaultValue (Directory.GetCurrentDirectory()) |> Path.GetFullPath
-let packageNamed name = packages |> List.tryFind (fun p -> p.Name = name) |> Option.defaultWith (fun () -> stop "the package must be v4, v4.1, v4.1.1, v4.1.2, v4.1.4, rehearsal-010, historical-compatibility or contract-first-ui (historical-compatibility needs PR #120 merged and your clone on the new main)")
+let packageNamed name = packages |> List.tryFind (fun p -> p.Name = name) |> Option.defaultWith (fun () -> stop "the package must be v4, v4.1, v4.1.1, v4.1.2, v4.1.4, v4.1.5, rehearsal-010, historical-compatibility or contract-first-ui (historical-compatibility needs PR #120 merged and your clone on the new main)")
 
 /// RDP-003: a record or tag is the owner's own act. Refuses to write when an agent runs the script or nobody can type.
 let ownerAtTerminal () =
@@ -817,7 +819,7 @@ let exitCode =
         | [ "approve"; name ] -> approve repo (flag "--dry-run") (packageNamed name) |> ignore; 0
         | [ "freeze"; name ] -> freeze repo (flag "--dry-run") (packageNamed name); 0
         | [ "tag"; name ] -> tag repo (flag "--dry-run") (packageNamed name) (option "--commit"); 0
-        | _ -> say "usage: dotnet fsi Indy-init/tools/owner-freeze.fsx -- status | decide v4|v4.1|v4.1.1|v4.1.2|v4.1.4|rehearsal-010|historical-compatibility|contract-first-ui | approve v4|v4.1|v4.1.1|v4.1.2|v4.1.4 | tag v4|v4.1|v4.1.1|v4.1.2|v4.1.4 [--commit SHA] | freeze v4.1.1 | ratify rehearsal-010 | acceptance [--repo DIR] [--dry-run]"; 2
+        | _ -> say "usage: dotnet fsi Indy-init/tools/owner-freeze.fsx -- status | decide v4|v4.1|v4.1.1|v4.1.2|v4.1.4|v4.1.5|rehearsal-010|historical-compatibility|contract-first-ui | approve v4|v4.1|v4.1.1|v4.1.2|v4.1.4|v4.1.5 | tag v4|v4.1|v4.1.1|v4.1.2|v4.1.4|v4.1.5 [--commit SHA] | freeze v4.1.1 | ratify rehearsal-010 | acceptance [--repo DIR] [--dry-run]"; 2
     with Stop message -> eprintfn "stopped: %s" message; 1
 
 exit exitCode
