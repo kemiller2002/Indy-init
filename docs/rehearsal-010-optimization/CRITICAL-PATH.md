@@ -86,6 +86,6 @@ The full-scope critical path above is not the path to the first usable capabilit
 - the kernel chain T10 → T14 → T13 → T17 (EF T+151 with 25-min set-up, 0-min CI);
 - then the connect and landing parts of the generated items, all owned by `ui`.
 
-So the binding constraint for a working application is **the `ui` lane after T17**, not the DAG. Under longest-chain-first ordering, `ui` spends that time on the T22 chain and the large workspace items, and M1 waits until T+348 or later (R1). Milestone-first ordering (ODR-R10-27) gives M1 at T+236 and M2 at T+259 (R2, 0-min CI).
+So the binding constraint for a working application is **the `ui` lane after T17**, not the DAG. Under longest-chain-first ordering, `ui` spends that time on the T22 chain and the large workspace items, and M1 waits until T+348 or later (R1). Milestone-first ordering (ODR-R10-27) gives M1 at T+236 and M2 at T+259 on the schedule (R2, 0-min CI). M1 also needs ODR-R10-28 and -29 A or -25 to pass against real data.
 
 **Under v4.1.4, M2 is not on any path**, because the contracts cannot decode the catalog (ODR-R10-25). Details: TIME-TO-WORKING-APPLICATION.md and FUNCTIONAL-PRIORITY-PLAN.md.

@@ -76,9 +76,22 @@ Eight addendum checks:
 - PARTIAL: 7 (runnable after each milestone: under v4.1.4 no milestone M1–M3 can pass against real data);
 - PARTIAL: 8 (no relabelling; fixed by RVO-3-1).
 
-### Round 4
+### Round 4 (03825ca): PASS
 
-Requested on the fix commit; result below.
+The reviewer verified the RVO-3 fixes independently:
+- the model tests (59 PASS) and the offline suite pass;
+- pinned files are byte-unchanged against main (dbcad12);
+- FINAL-REPORT's figures match the committed results;
+- both round-3 mutations are now caught, as are three new mutations: `usableAt` reverted, M1 and M2 swapped, and an obligation dropped from an inventory, which only the CI step catches.
+
+| ID | Severity | Finding | Disposition |
+|---|---|---|---|
+| RVO-4-1 | minor | The reproduction test did not compare obligations or requirements, so an edited R2 headline (527 → 600) went undetected | **Fixed:** it now compares mandatory obligations, requirements and slices by the deadline; the R2 edit is caught |
+| RVO-4-2 | minor | FINAL-REPORT claimed a round-4 result before one existed | **Fixed:** this section, and the report states the result |
+| RVO-4-3 | minor | FINAL-REPORT Q6, the addendum table and the verdict bullet were unqualified | **Fixed** |
+| RVO-4-4 | note | ODR-R10-27, SCHEDULE-COMPARISON, TIME-TO-WORKING finding 2 and CRITICAL-PATH gave M1/M2 times without their decisions | **Fixed** |
+
+The reviewer judged the PARTIALLY OPTIMIZED verdict to be supported.
 
 ## The ten mission questions (from round 1 unless noted)
 

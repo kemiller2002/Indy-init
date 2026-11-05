@@ -214,6 +214,10 @@ case "committed milestone runs R0-R5 reproduce (finish, obligations, milestones,
               let recs = simulate c ci sl
               let finish = sl |> List.map (fun s -> recs[s.Id].Integrated) |> List.max
               if finish <> sc["allIntegratedAt"].GetValue<float>() then yield sprintf "%s ci %.0f: finish %.0f, committed %.0f" file ci finish (sc["allIntegratedAt"].GetValue<float>())
+              let sc' = scenario c sl ci
+              for k, got in [ "mandatoryObligationsByDeadline", float sc'.ObligationsByDeadline; "requirementsByDeadline", float sc'.RequirementsByDeadline; "slicesByDeadline", float sc'.SlicesByDeadline ] do
+                  let want = sc[k].GetValue<float>()
+                  if got <> want then yield sprintf "%s ci %.0f: %s %.0f, committed %.0f" file ci k got want
               let times = milestoneTimes ms sl recs (fun x -> x.Integrated)
               for (id, _, t), e in List.zip times (sc["milestones"].AsArray() |> List.ofSeq) do
                   if t <> e["deliveredAt"].GetValue<float>() then yield sprintf "%s ci %.0f: %s at %.0f, committed %.0f" file ci id t (e["deliveredAt"].GetValue<float>())

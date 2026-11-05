@@ -80,7 +80,7 @@ These are schedule figures. Under v4.1.4 as frozen, M1, M2 and M3 cannot pass ag
 **6. How many more requirements and obligations are expected to be verified within 420 minutes?**
 At 10-min CI:
 - **V4:** +31 requirements (111 → 142) and +130 mandatory obligations (435 → 565, +30%).
-- **Milestone-first (R2):** 527 obligations (+92) and two usable milestones instead of none.
+- **Milestone-first (R2):** 527 obligations (+92) and, on the schedule, two usable milestones instead of none. Against real data they become usable only with ODR-R10-25, -28 and -29.
 - **With a 5-minute per-slice overhead,** V4's gain falls to +40 obligations.
 - **Under rework** (every 4th slice fails once), V4 gives 482 against 302.
 
@@ -130,6 +130,8 @@ Without the second, no amount of scheduling delivers the historical browsing cap
 | Milestones usable at T+120 / 240 / 360 / 420, 0-min CI | 0 / 0 / 0 / 0 | 0 / 1 / 2 / 2 | 0 / 2 / 2 / 3 |
 | Same, 10-min CI | 0 / 0 / 0 / 0 | 0 / 0 / 2 / 2 | 0 / 0 / 2 / 2 |
 
+These are schedule counts. Under v4.1.4 as frozen, none of M1–M3 passes against real data without ODR-R10-25, -26, -28 and -29.
+
 R2 is milestone-first ordering; R5 adds the milestone-aligned split.
 
 - **Data repository.** Apollo 1, Apollo 11 and Challenger are present in `kemiller2002/causa-data`, with 432, 431 and 452 events. The frozen contracts cannot represent them (DATA-REPOSITORY-CONTRACT.md §6 C1). This is the most important finding of the addendum. It means that a Rehearsal 010 launched on v4.1.4 will fail EXT-DATA-013, T25 and the M2 journeys against real data, whatever its throughput. That must be declared before T0, not discovered after it.
@@ -137,7 +139,7 @@ R2 is milestone-first ordering; R5 adds the milestone-aligned split.
 
 ## Round-3 independent review
 
-Round 3 (on 1ead513) returned **FAIL** on one documentation finding. The code, data, tests and every reproduction held. All findings were fixed, and the fix was re-reviewed in round 4 (ADVERSARIAL-REVIEW.md §B).
+Round 3 (on 1ead513) returned **FAIL** on one documentation finding. The code, data, tests and every reproduction held. All findings were fixed. Round 4 (03825ca) re-checked every fix independently, including the reviewer's own mutations, and returned **PASS**. Its three minor findings and one note were then fixed (ADVERSARIAL-REVIEW.md §B).
 
 The addendum's eight checks:
 
@@ -162,5 +164,5 @@ What is delivered and verified:
 
 What is not delivered:
 - The largest modelled gains depend on owner decisions that are not taken, and on gate code that does not exist (§7, S1–S7).
-- The functional milestone M2 is blocked by a contract gap that only a successor package can close.
+- Under v4.1.4 as frozen, the functional milestones M1–M3 cannot pass against the real data repository. M2 needs a contract successor (ODR-R10-25); M1 and M3 depend on it and on ODR-R10-26, -28 and -29.
 - No gain has been demonstrated in an executed run.

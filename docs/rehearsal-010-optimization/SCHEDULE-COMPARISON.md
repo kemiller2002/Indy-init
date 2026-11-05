@@ -139,4 +139,4 @@ The model now also reports when each functional milestone is delivered (`--miles
 | Obligations by T+420 | 435 | 565 | 527 | 520 |
 | Milestones usable at T+420 | 0 | 1 | 2 | 2 |
 
-Milestone-first trades about 40 obligations by the deadline, and about 13 minutes of full completion, for a connected and browsable application 6½–8 hours earlier than the approved plan (R0 → R2: M1 −398 minutes, M2 −485).
+Milestone-first trades about 40 obligations by the deadline, and about 13 minutes of full completion, for a connected and browsable application 6½–8 hours earlier than the approved plan on the schedule (it passes against real data only with ODR-R10-25, -28 and -29) (R0 → R2: M1 −398 minutes, M2 −485).
