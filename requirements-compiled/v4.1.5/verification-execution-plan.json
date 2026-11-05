@@ -35,7 +35,7 @@
     "bindings": 784,
     "planTests": 660,
     "obligations": 613,
-    "ownTests": 153,
+    "ownTests": 159,
     "suites": 11
   },
   "categoryBindings": {
@@ -71,7 +71,7 @@
       "planTests": false,
       "sha": "runs on the exact candidate SHA; every result records it",
       "counts": {
-        "tests": 150,
+        "tests": 155,
         "bindings": 0,
         "obligations": 0,
         "files": 27,
@@ -229,7 +229,22 @@
           "id": "dotnet:Causa.Contract.Tests.Storage.Producer.WritableRefusesCatalog"
         },
         {
+          "id": "dotnet:Causa.Contract.Tests.View.Producer.CredentialNeverInBindings"
+        },
+        {
           "id": "dotnet:Causa.Contract.Tests.View.Producer.IndicatorTextMatchesPersist031"
+        },
+        {
+          "id": "dotnet:Causa.Contract.Tests.View.Producer.RoutesRoundTripAndResolveOnlyListedAddresses"
+        },
+        {
+          "id": "dotnet:Causa.Contract.Tests.View.Producer.SevenSaveStatesWithPersist031Words"
+        },
+        {
+          "id": "dotnet:Causa.Contract.Tests.View.Producer.UiContractSurfaceOnlyAllowlistedFrozenTypes"
+        },
+        {
+          "id": "dotnet:Causa.Contract.Tests.View.Producer.ValidationRulesEqualTheCatalog"
         },
         {
           "id": "dotnet:Causa.Contract.Tests.Wire.ConsumerIntegration.HostReturnsRawOutcome"
@@ -543,11 +558,11 @@
       "planTests": false,
       "sha": "runs on the exact candidate SHA; every result records it",
       "counts": {
-        "tests": 3,
+        "tests": 4,
         "bindings": 0,
         "obligations": 0,
-        "files": 3,
-        "fixtureSetups": 3
+        "files": 4,
+        "fixtureSetups": 4
       },
       "tests": [
         {
@@ -555,6 +570,9 @@
         },
         {
           "id": "playwright:contract/view-ui-2.spec.js > renders the projection [chromium]"
+        },
+        {
+          "id": "playwright:contract/view-ui-3.spec.js > renders the projection [chromium]"
         },
         {
           "id": "playwright:contract/view-ui.spec.js > renders the projection [chromium]"

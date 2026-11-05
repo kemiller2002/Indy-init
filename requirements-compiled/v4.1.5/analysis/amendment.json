@@ -190,6 +190,182 @@
    ],
    "rationale": "The only constructor of a working-copy address: the reserved workspaces/demo/causa-app-<run> namespace with a CONTRACT section 3 run id, refusing any workspace a catalog names, so no working copy can be a catalog workspace (independent review H1). Boundary code: the type is the requirement.",
    "sha256": "646e21c5a2fd91425eb2b5de85db8aa68e3d7f3bd27d3d0abafcb77977a6c56f"
+  },
+  {
+   "file": "07-IF41-VIEW.fs",
+   "scope": "FixtureLabel",
+   "symbol": "create",
+   "requirements": [
+    "WDL-011",
+    "UI-039"
+   ],
+   "rationale": "The only constructor of the private fixture label; it prefixes FIXTURE: so no fixture-backed value can be presented as integrated. Boundary code: the private type is the requirement. Allowed only as part of the contract change ODR-V415-IF-VIEW (CF-09 A).",
+   "sha256": "20189d5aada679746050e7e13bc95a281990e32d7c90442724451f89aae2818e"
+  },
+  {
+   "file": "07-IF41-VIEW.fs",
+   "scope": "FixtureLabel",
+   "symbol": "value",
+   "requirements": [
+    "WDL-011",
+    "UI-039"
+   ],
+   "rationale": "Read-only accessor of the private fixture label. Allowed only as part of the contract change ODR-V415-IF-VIEW (CF-09 A).",
+   "sha256": "22768da5ca187a1a954521b6746843d5ad0f0b33aca04e1f442e089344940ee1"
+  },
+  {
+   "file": "07-IF41-VIEW.fs",
+   "scope": "Visible",
+   "symbol": "stored",
+   "requirements": [
+    "UI-023",
+    "UI-039"
+   ],
+   "rationale": "Constructor of the private Data Visible representation from a stored read; there is no conversion to Understood, so stored data cannot be shown as the kernel's interpretation. Allowed only as part of the contract change ODR-V415-IF-VIEW (CF-09 A).",
+   "sha256": "146233da50c2ee61bbb9e083d9bc02faf083175f7a5ef1d2f83fb27959780a49"
+  },
+  {
+   "file": "07-IF41-VIEW.fs",
+   "scope": "Visible",
+   "symbol": "fixture",
+   "requirements": [
+    "UI-023",
+    "WDL-011"
+   ],
+   "rationale": "Constructor of a fixture Data Visible value; it carries its FixtureLabel. Allowed only as part of the contract change ODR-V415-IF-VIEW (CF-09 A).",
+   "sha256": "d47cb79380abdae6faf630d65a788900196dfa5d76d47e06c31c32fba47f5654"
+  },
+  {
+   "file": "07-IF41-VIEW.fs",
+   "scope": "Visible",
+   "symbol": "value",
+   "requirements": [
+    "UI-023",
+    "UI-039"
+   ],
+   "rationale": "Read-only accessor of the private Data Visible representation. Allowed only as part of the contract change ODR-V415-IF-VIEW (CF-09 A).",
+   "sha256": "73fa627b3c2c39d9f2378ff3699563322a77ace3eaaa8ac139f40fd172ef952e"
+  },
+  {
+   "file": "07-IF41-VIEW.fs",
+   "scope": "Visible",
+   "symbol": "fixtureLabel",
+   "requirements": [
+    "UI-023",
+    "WDL-011"
+   ],
+   "rationale": "Reads the fixture label, so a view can show that a value is a fixture. Allowed only as part of the contract change ODR-V415-IF-VIEW (CF-09 A).",
+   "sha256": "679e4647f9271f0c4eb46812fb4d7f0dd101e91da408162a989435b27471a70c"
+  },
+  {
+   "file": "07-IF41-VIEW.fs",
+   "scope": "Visible",
+   "symbol": "map",
+   "requirements": [
+    "UI-023",
+    "UI-039"
+   ],
+   "rationale": "Maps the value and keeps its provenance (stored reference or fixture label); without it the private case could not be transformed. Allowed only as part of the contract change ODR-V415-IF-VIEW (CF-09 A).",
+   "sha256": "3e2b6a34a4562c2bbf0c2f0fa200f4dd4b9ec5cd76e97891a449f312c8b59b67"
+  },
+  {
+   "file": "07-IF41-VIEW.fs",
+   "scope": "Understood",
+   "symbol": "projected",
+   "requirements": [
+    "UI-023",
+    "UI-039"
+   ],
+   "rationale": "Constructor of the private Data Understood representation; only an adapter holding a domain projection at a version calls it. Allowed only as part of the contract change ODR-V415-IF-VIEW (CF-09 A).",
+   "sha256": "54ed100a0443b45667ae7a8a3459d95264a4f5713ffe01d1d7769ee450cd61e0"
+  },
+  {
+   "file": "07-IF41-VIEW.fs",
+   "scope": "Understood",
+   "symbol": "fixture",
+   "requirements": [
+    "UI-023",
+    "WDL-011"
+   ],
+   "rationale": "Constructor of a fixture Data Understood value; it carries its FixtureLabel. Allowed only as part of the contract change ODR-V415-IF-VIEW (CF-09 A).",
+   "sha256": "be223444c335a9317c5a95599784d727981e2f766eb8a299db2228c2aab26315"
+  },
+  {
+   "file": "07-IF41-VIEW.fs",
+   "scope": "Understood",
+   "symbol": "value",
+   "requirements": [
+    "UI-023",
+    "UI-039"
+   ],
+   "rationale": "Read-only accessor of the private Data Understood representation. Allowed only as part of the contract change ODR-V415-IF-VIEW (CF-09 A).",
+   "sha256": "7ed9216d3252edef53958c28666a0267fdf705edbf19a3763fe18695f45dd8d9"
+  },
+  {
+   "file": "07-IF41-VIEW.fs",
+   "scope": "Understood",
+   "symbol": "version",
+   "requirements": [
+    "UI-023",
+    "UI-039"
+   ],
+   "rationale": "Reads the projection version; a fixture has none. Allowed only as part of the contract change ODR-V415-IF-VIEW (CF-09 A).",
+   "sha256": "2845a4dc989b192a92ea51f05b2539fec04371bed6ceb8207121d70f33605762"
+  },
+  {
+   "file": "07-IF41-VIEW.fs",
+   "scope": "Understood",
+   "symbol": "fixtureLabel",
+   "requirements": [
+    "UI-023",
+    "WDL-011"
+   ],
+   "rationale": "Reads the fixture label, so a view can show that a value is a fixture. Allowed only as part of the contract change ODR-V415-IF-VIEW (CF-09 A).",
+   "sha256": "34a1a97fb3b1cc821b1e2a09d216abbbd272f253a28f9629ca8c1526ce376dc6"
+  },
+  {
+   "file": "07-IF41-VIEW.fs",
+   "scope": "Understood",
+   "symbol": "map",
+   "requirements": [
+    "UI-023",
+    "UI-039"
+   ],
+   "rationale": "Maps the value and keeps its provenance (version or fixture label). Allowed only as part of the contract change ODR-V415-IF-VIEW (CF-09 A).",
+   "sha256": "567a67b5a170a20cfe1b1daf685c7d4477c3a6833e5405522db8bd4ccf7ee322"
+  },
+  {
+   "file": "07-IF41-VIEW.fs",
+   "scope": "SafeUrl",
+   "symbol": "pattern",
+   "requirements": [
+    "PF-015",
+    "UI-039"
+   ],
+   "rationale": "The URL pattern the only constructor enforces. Allowed only as part of the contract change ODR-V415-IF-VIEW (CF-09 A).",
+   "sha256": "fbb223d6fc15438ba6ac08ec087a07f50ff4e0ff7953c6e983f693d27960be7b"
+  },
+  {
+   "file": "07-IF41-VIEW.fs",
+   "scope": "SafeUrl",
+   "symbol": "tryCreate",
+   "requirements": [
+    "PF-015",
+    "UI-039"
+   ],
+   "rationale": "The only constructor of the private SafeUrl: an absolute http(s) URL, well formed, at most 2000 characters; any other link text is never rendered as a link. Allowed only as part of the contract change ODR-V415-IF-VIEW (CF-09 A).",
+   "sha256": "248abc3847bb5cc2a486b847b43a78cb20086c700ae02052012825c42e050d9e"
+  },
+  {
+   "file": "07-IF41-VIEW.fs",
+   "scope": "SafeUrl",
+   "symbol": "value",
+   "requirements": [
+    "PF-015",
+    "UI-039"
+   ],
+   "rationale": "Read-only accessor of the private SafeUrl. Allowed only as part of the contract change ODR-V415-IF-VIEW (CF-09 A).",
+   "sha256": "9d6afccf4e7d2e5c53065d27b45018c9e6481bd7c3dd7b6f37e4d991a958fbf1"
   }
  ],
  "sharedEntrypoints": {
@@ -201,17 +377,19 @@
    "owner": "integration",
    "requesters": [
     "ui",
-    "ui-2"
+    "ui-2",
+    "ui-3"
    ],
    "protocol": "A UI role that needs a change to a shared entrypoint does not edit it. It opens a change request naming the file, the change (the exact markup or Forma-token rule) and the task it serves; integration applies it in its own pull request, in order, and the requesting role reviews that pull request. UI roles own their view modules (src/Causa.App/Views/*) and component-level presentation; the entrypoints only load them.",
    "record": "a Praxis work item owned by integration whose title starts with CR- and names the file, linked to the requesting task's work item",
    "ruleSentence": "It changes `web/index.html` and `web/causa.css` only through a change request to integration"
   },
   "ruleLinesSha256": [
-   "e70d3310f1715942140b3d9931a4d794d322cfb487a661b45425d634044c9ca8",
-   "79f5e415d2a9133bc8ee2f25b606421cbdde0fea76492b2f0df45fa31378f0f9",
+   "fc0db8076bad3eaa043b9f5ad601cd254942eb12903279ca4ead63c2fc10a179",
+   "1a27617ff39f74d59e7acfc6527cf39030292add2fa83ab849ab3989e1f3d109",
    "580b8773a4c4a1605e928b8459544de927621e361b65050b6cb37e1edaba3a85",
-   "a3a109c75efac4da13c3f89d426beeb6066bcbb7953088e26d2e9c5140a7da23"
+   "a3a109c75efac4da13c3f89d426beeb6066bcbb7953088e26d2e9c5140a7da23",
+   "1f2a84dfbc807c24ff6b78183d2950637338d4e97e9e732b730bc732afbd44d3"
   ]
  },
  "startingState": {
@@ -588,6 +766,13 @@
    "decision": "ODR-V415-01",
    "approval": "",
    "summary": "Loads, Sessions, TimerKey and the machine messages keyed by InvestigationRef; Msg.ListRequested (explicit workspace selection, EXT-DATA-003) and Msg.CreateRequested (explicit creation, EXT-DATA-006); Model.Listings and ListingsInFlight."
+  },
+  {
+   "file": "contracts/07-IF41-VIEW.fs",
+   "sha256": "0cf59e200ccc45cd0d6fb49cd384592392d29d892517ce7c0297dc021aa9c9ae",
+   "decision": "ODR-V415-IF-VIEW",
+   "approval": "",
+   "summary": "CF-09 A (APR-CFUI-OWNER-1), a separate request: the frozen IF41-VIEW types unchanged, followed by namespace Causa.Ui.Contracts (screen view models, capability boundaries Visible/Understood, UiIntent with qualified access, UiBackend, routes as unresolved RouteTarget), types and signatures plus 16 boundary members. Additive; implemented by integration in src/Causa.App/Projections.fs, compiled before Connection.fs; its functions are the producer file src/Causa.App/Ui/Presentation.fs."
   }
  ],
  "suiteRunners": [
