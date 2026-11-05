@@ -17,7 +17,7 @@ Validated: `slice-manifest` exits 0 only when every requirement is placed; other
 
 | Requirements | 199 (205 if the catalog successor is ratified, ODR-R10-02) |
 |---|---|
-| Slices | 36: one per work item of the scope, including the 9 timed tasks without requirements |
+| Slices | 37: one per work item of the scope, including the 9 timed tasks without requirements |
 | In a slice | 199 |
 | Record-only requirements | 16: AR-001, AR-002, AR-003, AR-004, AR-007, AR-012, AR-015, AR-017, AR-018, AR-019, AR-020, AR-021, AR-024, AR-027, AR-028, AR-031. They are in `SL-WI-GEN-RECORDS` (#102's `WI-GEN-RECORDS`, reviewer lane), and their record obligations are judged at release |
 | Excluded by owner decision | 0 |
@@ -110,14 +110,14 @@ What it models:
 
 Results, with 45 minutes of T0 set-up and 3 minutes per merge:
 
-| CI latency per gate run | All 36 slices integrated at | Slices integrated by T+420 |
+| CI latency per gate run | All 37 slices integrated at | Slices integrated by T+420 |
 |---|---|---|
-| 0 min | T+503 | 29 |
-| 5 min | T+558 | 27 |
-| 10 min | T+663 | 23 |
-| 15 min | T+819 | 17 |
-| 20 min | T+977 | 14 |
-| 25 min | T+1157 | 11 |
+| 0 min | T+519 | 28 |
+| 5 min | T+568 | 27 |
+| 10 min | T+656 | 23 |
+| 15 min | T+837 | 17 |
+| 20 min | T+1011 | 14 |
+| 25 min | T+1185 | 11 |
 
 - **The full scope does not fit 420 minutes under Topology A at any CI latency, even zero.**
 - The critical path is `SL-T17`, then `SL-WI-INV-WORKSPACE`, then `SL-T31`–`SL-T34`. The workspace slice alone is 159 mandatory obligations, about 215 minutes, on one UI lane.

@@ -1,6 +1,6 @@
 {
  "schema": "indy-init.r9-toolchain-lock/1",
- "description": "Proposed toolchain, requirements package and governed contracts for Rehearsal 010: Rehearsal 009's Conditor and process-evidence pins, the successor package v4.1.4 (corrected suite runners), and the governed catalog, design and deadline contracts of the adversarial-audit remediation. The resolved set must be replaced by an echelon-current set carrying Dokimos 0.11.1 (url-input). Change this file only through the owner decision process.",
+ "description": "Proposed toolchain, requirements package and governed contracts for Rehearsal 010: Rehearsal 009's Conditor and process-evidence pins, the successor package v4.1.4 (corrected suite runners), and the governed catalog, design and deadline contracts of the adversarial-audit remediation. The resolved set is echelon-current 1.37.0, which carries Dokimos 0.11.1 (url-input). Change this file only through the owner decision process.",
  "conditor": {
   "version": "0.10.20",
   "tag": "v0.10.20",
@@ -43,37 +43,38 @@
  },
  "resolvedSet": {
   "registry": "kemiller2002/echelon-registry",
-  "commit": "de72a4069af64e99fc7da188f76f0f22cfa4f89c",
+  "commit": "575240233d1fc32b57cfa827ea1031b68609fc58",
   "channel": "echelon-current",
-  "profileVersion": "1.36.0",
+  "profileVersion": "1.37.0",
   "platforms": {
    "linux-x64": {
     "path": "channels/echelon-current/linux-x64.json",
-    "sha256": "1189bc9bcb90dbc375d3af829569455349f17e2be3941da46230e57d83161797"
+    "sha256": "bba3594ad1db8a4cee3550620c4a86dd5cbb5ce2f4bc183ea50951476b29ca91"
    },
    "linux-arm64": {
     "path": "channels/echelon-current/linux-arm64.json",
-    "sha256": "f7cffd15abf09b37b1becd7d6ddfd489b8c304611b5faf006696c55b41f7bad6"
+    "sha256": "84be0c098b6bdda425e2628fb174e5e85c10f8b87081c00600158fb8caa9072b"
    },
    "osx-x64": {
     "path": "channels/echelon-current/osx-x64.json",
-    "sha256": "6a20fd7129b6f266b0235b3fc0543de4fd6b0170b4da4db3af80503a529aabd1"
+    "sha256": "ea7682ab0d7937644a1268d14efb87ba3f5a6043ce7d44579f9fd4d1272a5c57"
    },
    "osx-arm64": {
     "path": "channels/echelon-current/osx-arm64.json",
-    "sha256": "82d9958c1f3f37272ce9ac9c20109351d10f10c5b5886000de9cde7b238c8465"
+    "sha256": "b8db37491977d810180d07f429f671adecac0e360d7a9bc3786a87c2f250c566"
    },
    "win-x64": {
     "path": "channels/echelon-current/win-x64.json",
-    "sha256": "d4e6be86b69d267c8f181570b0ffd10d0dacccf789fe98ce7acd27a546c3b74b"
+    "sha256": "d8409d60a4933320e6aeb5af8037cb73e940c37436db002793312d943ed3fb0f"
    }
   },
   "expectedTools": {
    "praxis": "3.25.0",
-   "dokimos": "0.11.0",
+   "dokimos": "0.11.1",
    "percepta-semantic": "0.4.0",
    "ordo": "1.20.0"
-  }
+  },
+  "approval": "echelon-current 1.37.0 approved by the owner (sets/echelon-current/1.37.0.json, OD-INDY-8; echelon-registry#109 merged as 5752402) after Conditor qualified it (conditor#131)"
  },
  "requirementsPackage": {
   "path": "requirements-compiled/v4.1.4",
@@ -95,7 +96,7 @@
   "proposedSha256": "36172c57721419714a414334cd65a1548da5c0bc6318f55f73b77a207546344d",
   "rulesStatus": "PINNED: the owner recorded ODR-R10-14 = A with this file's digest (APR-R10-OWNER-1)"
  },
- "status": "PROPOSED: not an owner pin. The owner adopts it by renaming it to toolchain.lock.json in their own commit after ODR-V414-01..03 are recorded and v4.1.4 is tagged, a Dokimos release carrying the url-input fix is registered in an approved echelon-current set and replaces the resolved set, and ODR-R10-01..09 are recorded. Until then Rehearsal 010 has no approved lock.",
+ "status": "PROPOSED: not an owner pin. Recorded: v4.1.4 (APR-V414-OWNER-1, -2; tag indy-init-requirements-v4.1.4), the Rehearsal 010 decisions and the ratified catalog (APR-R10-OWNER-1), echelon-current 1.37.0 with Dokimos 0.11.1 (echelon-registry#109). Still the owner's: ODR-R10-03 again (the catalog contract now names the ratified catalog) and ODR-R10-01 for this scopeSha256, then the live-provider run, then renaming this file to toolchain.lock.json in the owner's own commit (ODR-RG-04). Until then Rehearsal 010 has no approved lock.",
  "scope": {
   "manifest": "docs/rehearsal-010-readiness/scope-manifest.json",
   "scopeSha256": "59bfef5a62a3ab43ef19c08b5915ffaf3d408bd55d8add874c5f1071e7cd087c",
