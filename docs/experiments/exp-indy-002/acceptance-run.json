@@ -1,0 +1,203 @@
+{
+  "base": "http://localhost:4180/",
+  "at": "2026-11-05T21:38:05.886Z",
+  "passed": 21,
+  "failed": 0,
+  "results": [
+    {
+      "id": "AT-01 list screen",
+      "requirements": [
+        "INV-039"
+      ],
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "id": "AT-02 open start screen",
+      "requirements": [
+        "INV-005"
+      ],
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "id": "AT-03 cancel start writes nothing",
+      "requirements": [
+        "INV-022"
+      ],
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "id": "AT-04 identifier prefilled and validated",
+      "requirements": [
+        "INV-006"
+      ],
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "id": "AT-05 empty problem statement refused",
+      "requirements": [
+        "INV-019",
+        "INV-001"
+      ],
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "id": "AT-06 title over 200 refused",
+      "requirements": [
+        "INV-020",
+        "INV-002"
+      ],
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "id": "AT-07 problem statement over 10000 refused",
+      "requirements": [
+        "INV-021"
+      ],
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "id": "AT-08 start investigation",
+      "requirements": [
+        "INV-004",
+        "INV-001",
+        "INV-002",
+        "INV-023",
+        "INV-007",
+        "INV-008",
+        "INV-018",
+        "INV-016"
+      ],
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "id": "AT-09 record observation",
+      "requirements": [
+        "INV-014",
+        "INV-024",
+        "INV-025"
+      ],
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "id": "AT-10 cancel editor records nothing",
+      "requirements": [
+        "INV-036"
+      ],
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "id": "AT-11 record hypothesis",
+      "requirements": [
+        "INV-009",
+        "INV-026",
+        "INV-011",
+        "INV-010"
+      ],
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "id": "AT-12 admit evidence; unsafe URL refused",
+      "requirements": [
+        "INV-013",
+        "INV-027",
+        "INV-012",
+        "INV-028",
+        "INV-029"
+      ],
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "id": "AT-13 link evidence to hypothesis",
+      "requirements": [
+        "INV-030",
+        "INV-031",
+        "INV-038",
+        "INV-044"
+      ],
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "id": "AT-14 duplicate link refused",
+      "requirements": [
+        "INV-030"
+      ],
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "id": "AT-15 save confirmed by read-back",
+      "requirements": [
+        "INV-015",
+        "INV-016"
+      ],
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "id": "AT-16 edit details keeps identity and history",
+      "requirements": [
+        "INV-034",
+        "INV-035"
+      ],
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "id": "AT-17 reassess keeps the earlier assessment in history",
+      "requirements": [
+        "INV-030",
+        "INV-035"
+      ],
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "id": "AT-18 reopen restores the saved investigation",
+      "requirements": [
+        "INV-017",
+        "INV-039",
+        "INV-040",
+        "INV-008"
+      ],
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "id": "AT-M1 mobile list and start screens fit 375 px",
+      "requirements": [
+        "INV-039",
+        "INV-004"
+      ],
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "id": "AT-M2 mobile workspace fits 375 px",
+      "requirements": [
+        "INV-008",
+        "INV-015"
+      ],
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "id": "AT-00 no page or console errors",
+      "requirements": [],
+      "status": "PASS",
+      "detail": ""
+    }
+  ]
+}

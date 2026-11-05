@@ -1,0 +1,18 @@
+PASS UT-INV-005 start screen displays where the investigation is saved
+PASS UT-INV-022 Cancel on the start screen returns to the list without an event or a write
+PASS UT-INV-036 Cancel in an editor closes it, discards the draft and records no event
+PASS UT-INV-039 the list region shows saved investigations by title
+PASS UT-INV-040 the open link reads storage, decodes and replays into the workspace
+PASS UI-INV-006 the identifier field is prefilled with a UUID
+PASS UI-INV-019 field messages are shown by FieldId on the start screen
+PASS UI-INV-016 Save writes, reads back, compares and reaches Saved; the index is updated
+PASS UI-INV-004 Start investigation opens the workspace Unsaved and writes nothing (D-3)
+PASS UI-INV-016 the lozenge never shows Saved before the read-back (CR-3)
+PASS UI-INV-015 a read-back mismatch is not reported as Saved
+PASS UI-INV-031 the relationship radio group has nothing selected initially
+PASS UI-INV-044 a link is shown on both the evidence and the hypothesis
+PASS UI-INV-038 Withdraw takes its reason from the Rationale field
+PASS UI-INV-035 edits keep identity and appear in history
+PASS UI-ROUTE hash routes map to screens
+PASS UI-DISPATCH Limen messages decode to UiActions and responses carry view, effects, cancellations
+17 tests, 17 passed, 0 failed

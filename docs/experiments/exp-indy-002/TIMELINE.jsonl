@@ -7,3 +7,4 @@
 {"t":"2026-11-05T21:26:01Z","phase":"B","event":"CR-2 released (CG-4 v3): picker and option labels; UI agent notified"}
 {"t":"2026-11-05T21:31:37Z","phase":"B","event":"CR-3 released (CG-5 v3, F# type change SaveEvent.ReadBackMatched); domain and UI agents notified"}
 {"t":"2026-11-05T21:33:23Z","phase":"integration","event":"DEV-2: integration started at T+18 (both sides staged, no contracts left to release) instead of waiting idle for T+60"}
+{"t":"2026-11-05T21:38:05Z","phase":"integration","event":"FIRST ACCEPTED E2E: candidate 59/59 domain, 17/17 UI, contract-check --tests PASS, ui-binding-check PASS, acceptance 21/21 (37 requirements)"}
