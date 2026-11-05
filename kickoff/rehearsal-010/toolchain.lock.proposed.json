@@ -131,7 +131,7 @@
   "visibility": "private",
   "data": "synthetic only; resettable; evidence lives in the governed CI artifacts",
   "credential": "a GitHub App installed on this repository alone (Contents: read and write); installation token minted per job by actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 (v3.3.0), scoped to this repository, revoked at job end; secrets CAUSA_ACCEPTANCE_APP_CLIENT_ID and CAUSA_ACCEPTANCE_APP_KEY",
-  "approval": "APR-R10-OWNER-1 (ODR-R10-09)"
+  "approval": "ODR-R10-09 (pending)"
  },
  "ownerDecisionRequests": {
   "path": "kickoff/rehearsal-010/proposals/owner-decision-requests.json",
