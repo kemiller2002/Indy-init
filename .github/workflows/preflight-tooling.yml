@@ -571,6 +571,8 @@ jobs:
           dotnet fsi "$DA" -- --indy-init . test
           dotnet fsi "$DA" -- --indy-init . check --base-ref FETCH_HEAD
           dotnet fsi tools/r10/delegated-authority.fsx -- --indy-init . test
+      - name: CTP-001 readiness check holds its cases and its EXP-INDY-002 replay (docs/execution/contract-triggered-parallel)
+        run: dotnet fsi tools/execution/ctp-check.fsx -- test --indy-init .
       - name: Change-impact selection (proposed Level 2; never the gate) holds its adversarial cases
         run: dotnet fsi tools/r10/change-impact.fsx -- --indy-init . test
       - name: Proposed successor manifests regenerate from their scope manifests (review RVO-3-3; the committed files must not be stale or edited)
