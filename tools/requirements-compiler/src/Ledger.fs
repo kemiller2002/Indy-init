@@ -206,7 +206,7 @@ let journeysOf (bindings: Json) : Journey list =
 let mergeConditions =
     [ "every mandatory applicable obligation of the slice passes in the governed gate at the merged result"
       "every dependency slice is integrated"
-      "every governed journey assertion bound to the slice passes in Chromium and WebKit, except one whose needed slices are not all integrated yet (docs/rehearsal-010-readiness/assertion-merge-needs.json, ODR-R10-33 A): the completion gate judges that one at release"
+      "every governed journey assertion bound to the slice passes in Chromium and WebKit, except one whose needed slices are not all present yet (their merge-provable obligations verified at the merged result; docs/rehearsal-010-readiness/assertion-merge-needs.json, ODR-R10-33 A): the completion gate judges that one at release"
       "every previously integrated obligation still passes (regression)"
       "the application builds and starts at the merged result"
       "required real-provider checks pass against api.github.com"
@@ -340,8 +340,8 @@ type SliceEvidence =
       /// The governed catalog acceptance at the merged result (catalog slices).
       CatalogAcceptance: Json option
       /// CF-07 option A (owner decision ODR-R10-33 A): for each bound assertion, the slices its journey steps need on
-      /// main. An assertion whose needed slices (other than this one, and present in the scope) are not all integrated
-      /// is not judged at this merge; the completion gate judges every assertion at release. Empty = every bound
+      /// main. An assertion whose needed slices (other than this one, and in the scope) are not all present for judging
+      /// (deferredAssertions) is not judged at this merge; the completion gate judges every assertion at release. Empty = every bound
       /// assertion is judged at every merge (the rule before ODR-R10-33).
       AssertionNeeds: Map<string, string list> }
 
@@ -393,9 +393,19 @@ let private presentForJudging (s: State) (e: SliceEvidence) (d: string) : bool =
     let items = arr "workItems" s.Progress.Manifest |> List.map (fun w -> str "id" w, strs "requirements" w) |> Map.ofList
     let headVerified = e.Regression |> Option.map (strs "passed" >> Set.ofList) |> Option.defaultValue Set.empty
     let reqs = arr "requirements" s.Progress.Manifest |> List.map (fun r -> str "id" r, r) |> Map.ofList
+    // Catalog (INV-*) obligations reach the regression's passed set only through the governed catalog acceptance at the
+    // candidate. They count only when that acceptance is for this candidate and has no binding refusal (wrong commit,
+    // digest, producer, contract, facts, probe spec); otherwise a builder could withhold the catalog to defer
+    // (review CF07-R2-1), so they are treated as unprovable and the assertion is judged.
+    let catalogTrusted =
+        match e.CatalogAcceptance with
+        | Some c when candidateOf c = e.Candidate ->
+            arr "refusals" c |> List.forall (fun r -> List.contains (str "code" r) [ "CATALOG_OBLIGATION_FAILED"; "FAULT_INSENSITIVE"; "CATALOG_NOT_ACCEPTED" ])
+        | _ -> false
     let provable (o: Json) =
         boolOr "mandatory" true o && strOpt "kind" o <> Some "record"
         && not (strs "producers" o |> List.exists (fun p -> liveProducers.Contains p || p = "SU-BROWSER-WEBKIT"))
+        && (catalogTrusted || not ((str "id" o).StartsWith "INV-"))
     items.TryFind d |> Option.defaultValue []
     |> List.forall (fun rid ->
         s.ExcludedBy.ContainsKey rid

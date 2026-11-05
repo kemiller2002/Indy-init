@@ -222,5 +222,5 @@
       ]
     }
   ],
-  "adoptedBy": "Owner decision ODR-R10-33 A (CF-07, APR-R10-OWNER-3): the slice gate judges a bound assertion only once every slice it needs (rules[].needs, other than the slice itself and present in the scope) is integrated; otherwise the completion gate judges it at release. rules copied unchanged from proposals/r10-contract-first-ui/schedule-inputs/hidden-merge-dependencies.json (PR #121). An under-stated need judges an assertion early (the merge waits, nothing passes falsely); an over-stated need defers it to release, where it is still required."
+  "adoptedBy": "Owner decision ODR-R10-33 A (CF-07, APR-R10-OWNER-3): the slice gate judges a bound assertion only once every slice it needs (rules[].needs, other than the slice itself and present in the scope) is present (its merge-provable obligations verified at the merged result; Ledger.deferredAssertions); otherwise the completion gate judges it at release. rules copied unchanged from proposals/r10-contract-first-ui/schedule-inputs/hidden-merge-dependencies.json (PR #121). An under-stated need judges an assertion early (the merge waits, nothing passes falsely); an over-stated need defers it to release, where it is still required."
 }

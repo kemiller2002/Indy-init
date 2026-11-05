@@ -679,7 +679,8 @@ let cf07Deferral (source: string) : string list =
     let evidence (needs: (string * string list) list) (regression: string list) (assertions: string list) : Ledger.SliceEvidence =
         { Slice = slice assertions; Candidate = "c"; TargetBase = "b"; TargetHead = "b"; Gate = None; Journeys = None; DesignContract = None
           Regression = Some(JObj [ "candidate", JStr "c"; "passed", JArr(regression |> List.map JStr) ]); Build = None; LiveProvider = None
-          TestIntegrity = None; CatalogAcceptance = None; AssertionNeeds = Map.ofList needs }
+          // a governed catalog acceptance at the candidate with no binding refusal, so INV obligations count (CF07-R2-1)
+          TestIntegrity = None; CatalogAcceptance = Some(JObj [ "candidate", JStr "c"; "refusals", JArr [] ]); AssertionNeeds = Map.ofList needs }
     let journeyCodes (e: Ledger.SliceEvidence) =
         Ledger.sliceRules |> List.filter (fun r -> r.Id = "journeys") |> List.collect (fun r -> r.Check s e) |> List.map (fun r -> r.Code)
     [ // a needed slice not integrated: the assertion is deferred, no journey evidence is demanded at this merge
@@ -703,9 +704,29 @@ let cf07Deferral (source: string) : string list =
       // record-only or live) counts as present, so withholding its completion event cannot defer the assertion
       if journeyCodes (evidence [ "J1-03", [ "SL-WI-GEN-EXT-DATA" ] ] [] [ "J1-03" ]) <> [ "JOURNEYS_MISSING" ] then yield "cf07: a missing Praxis completion event deferred the assertion"
       // review CF07-2: in a live slice, a needed item's live or WebKit obligations do not count, so breaking them cannot defer
+      //   (review CF07-R2-2: on needed items that really have live (T21) and WebKit (T22) obligations, all of them unverified)
+      let provableOf (wid: string) =
+        let rs = arr "workItems" manifest |> List.find (fun w -> str "id" w = wid) |> strs "requirements" |> Set.ofList
+        arr "requirements" manifest |> List.filter (fun r -> rs.Contains(str "id" r))
+        |> List.collect (fun r -> arr "obligations" r |> List.filter (fun o -> boolOr "mandatory" true o && strOpt "kind" o <> Some "record" && not (strs "producers" o |> List.exists (fun p -> Ledger.liveProducers.Contains p || p = "SU-BROWSER-WEBKIT"))) |> List.map (str "id"))
       let liveSlice (assertions: string list) = JObj [ "id", JStr "SL-T19"; "dependsOn", JArr []; "realProvider", JBool true; "governedAssertions", JArr(assertions |> List.map JStr) ]
-      let liveCase = { evidence [ "J1-04", [ "SL-WI-INV-LIST" ] ] listObligations [ "J1-04" ] with Slice = liveSlice [ "J1-04" ] }
-      if Ledger.deferredAssertions s liveCase <> [] then yield "cf07: a needed item's live obligations deferred the assertion in a live slice"
+      for wid in [ "T21"; "T22" ] do
+          let liveCase = { evidence [ "J1-04", [ "SL-" + wid ] ] (provableOf wid) [ "J1-04" ] with Slice = liveSlice [ "J1-04" ] }
+          if Ledger.deferredAssertions s liveCase <> [] then yield sprintf "cf07: %s's live or WebKit obligations deferred the assertion in a live slice" wid
+          // and with its provable obligations unverified it is not present: deferred (the case can bite)
+          let notYet = { evidence [ "J1-04", [ "SL-" + wid ] ] [] [ "J1-04" ] with Slice = liveSlice [ "J1-04" ] }
+          if Ledger.deferredAssertions s notYet <> [ "J1-04" ] then yield sprintf "cf07: %s with nothing verified counted as present" wid
+      // record-only obligations never count: T10 (AR-023 is record-only) with every provable obligation verified is present
+      if Ledger.deferredAssertions s (evidence [ "J1-03", [ "SL-T10" ] ] (provableOf "T10") [ "J1-03" ]) <> [] then yield "cf07: T10's record-only obligations deferred the assertion"
+      // a needed item whose provable obligations all passed is judged, whatever its other requirements (WI-INV-START)
+      if Ledger.deferredAssertions s (evidence [ "J1-03", [ "SL-WI-INV-START" ] ] (provableOf "WI-INV-START") [ "J1-03" ]) <> [] then yield "cf07: WI-INV-START with every provable obligation verified was not present"
+      // review CF07-R2-1: without a trusted catalog acceptance, catalog obligations do not count: the item is judged
+      let noCatalog = { evidence [ "J1-03", [ "SL-WI-INV-LIST" ] ] [] [ "J1-03" ] with CatalogAcceptance = None }
+      if Ledger.deferredAssertions s noCatalog <> [] then yield "cf07: a withheld catalog acceptance deferred the assertion"
+      let refusedCatalog = { evidence [ "J1-03", [ "SL-WI-INV-LIST" ] ] [] [ "J1-03" ] with CatalogAcceptance = Some(JObj [ "candidate", JStr "c"; "refusals", JArr [ JObj [ "code", JStr "CATALOG_DIGEST_MISMATCH"; "detail", JStr "x" ] ] ]) }
+      if Ledger.deferredAssertions s refusedCatalog <> [] then yield "cf07: a catalog acceptance with a binding refusal still let catalog obligations defer"
+      let otherCandidate = { evidence [ "J1-03", [ "SL-WI-INV-LIST" ] ] [] [ "J1-03" ] with CatalogAcceptance = Some(JObj [ "candidate", JStr "other"; "refusals", JArr [] ]) }
+      if Ledger.deferredAssertions s otherCandidate <> [] then yield "cf07: a catalog acceptance of another candidate let catalog obligations defer"
       // review CF07-3: the governed needs file carries PR #121's rules unchanged, and every assertion bound in the approved
       // slice manifest is named in it or deliberately judged at every merge (J1-01 needs nothing but its own slice)
       let governed = parseFile (Path.Combine(source, "docs/rehearsal-010-readiness/assertion-merge-needs.json"))
