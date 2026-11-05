@@ -1,0 +1,91 @@
+# Clean-checkout verification run (observed)
+date_utc: 2026-11-05T23:19:11Z
+indy_init_commit: 9e42abac0dcc7459e39e5ba342e3c855c9dd386e
+causa_data_commit: e8259df74add723765c57a5b1a5888d9c3f707af
+dotnet_sdk: 10.0.402
+host: Linux 6.18.44-fc-v236
+
+## steps (name | exit code | elapsed | command)
+1-fetch-package | rc=0 | 1.6s | git clone -q --branch claude/loving-turing-ixvzqx https://github.com/kemiller2002/Indy-init SRC
+1b-fetch-data | rc=0 | 0.6s | git clone -q https://github.com/kemiller2002/causa-data causa-data
+1c-pin-data | rc=0 | 0.0s | git -C causa-data checkout -q --detach e8259df74add723765c57a5b1a5888d9c3f707af
+2-sdk | rc=0 | 0.1s | bash -c cd SRC && dotnet --version
+3-restore | rc=0 | 1.7s | dotnet restore SRC/tools/contract-readiness
+4-build | rc=0 | 5.3s | dotnet build SRC/tools/contract-readiness -c Release --no-restore
+5-check | rc=0 | 20.1s | dotnet SRC/tools/contract-readiness/bin/Release/net10.0/contract-readiness.dll check --causa-data causa-data --indy-root SRC
+6-require-pass | rc=2 | 20.9s | dotnet SRC/tools/contract-readiness/bin/Release/net10.0/contract-readiness.dll check --causa-data causa-data --indy-root SRC --require-pass
+
+## independent checksum recomputation (sha256sum over PACKAGE-MANIFEST entries)
+entries: 26, mismatches: 0, recomputed: 9c8777f9bfda5f4759585c618debe6dc31578db4f16adaf5360e3539e0338189
+
+## check output
+contract-readiness check: causa-data e8259df74add723765c57a5b1a5888d9c3f707af, SDK 10.0.402
+  CR-SRC-02   PASS       The causa-data checkout is the pinned commit
+  CR-SRC-01   PASS       Pinned historical data matches the source pin (causa-data e8259df, PR #126/#141 source-pin.json)
+  CR-REG-01   PASS       FIELD-REGISTRY.json equals a fresh generation from the pinned schemas, FIELD-MAPPING.md and DOMAIN-CONTRACT.json
+  CR-REG-02   PASS       Field IDs are unique
+  CR-REG-03   PASS       Schema completeness: every event type has a payload type, every object type has fields, every reference and rule resolves
+  CR-CER-01   PASS       Command, event-variant, transition and binding IDs are unique
+  CR-CER-02   PASS       Wire variants partition every registered event type and discriminator value (no silent default)
+  CR-CER-03   PASS       Every v4.1.5 CoreEvent case is bound to exactly one variant; proposed cases are absent from v4.1.5
+  CR-CER-04   PASS       Every v4.1.5 CoreCommand case has a command entry; defined commands exist in the parsed contracts and proposed ones do not
+  CR-CER-05   PASS       Command result events, input fields, transitions and blocking decisions all resolve
+  CR-CER-06   PASS       Every required domain input has a documented input path (UI field, derivation or session), or is a named gap tied to an open owner decision
+  CR-HIST-01  PASS       Every stored event decodes strictly into registered typed fields and re-encodes to its exact stored bytes
+  CR-HIST-02  PASS       Every stored event maps to exactly one registered wire variant
+  CR-HIST-03  PASS       Envelope integrity: contiguous aggregateVersion, UUIDv5 eventId derivation, one correlation group per id, InvestigationStarted first
+  CR-HIST-04  PASS       Every manifest.json and snapshot.json decodes against the registry, round-trips, and the manifest pins the events bytes
+  CR-HIST-05  PASS       Every catalog case exists with its pinned events digest and expected version
+  CR-HIST-06  PASS       Every stored state transition is legal under the domain transition tables and its stored 'from' equals the replayed state
+  CR-HIST-07  PASS       Historical provenance records and admitted evidence correspond one to one, and each source text carries its URL
+  CR-REP-01   PASS       The successor candidate represents every pinned catalog event and every stored history losslessly (payload case and envelope)
+  CR-REP-02   PASS       Reproduce PR #141 against the frozen v4.1.4 contract: 487 of 1,315 historical events have no case, 63 more are lossy, and every event loses envelope provenance
+  CR-UI-01    PASS       Every catalog requirement has a binding whose label, accessible name source, input type, required flag, screen and validation equal the catalog
+  CR-UI-02    PASS       Binding references resolve: screens and states (equal to SCREEN-MANIFEST), commands, write and read-back field IDs, verification ids
+  CR-UI-03    PASS       Coverage is not claimed for a binding that needs a proposed field or command or a blocked command
+  CR-UI-04    PASS       Reverse coverage: every command fed by a UI field is reachable from a binding, and every bound domain action has a state transition or result event
+  CR-ST-01    PASS       Domain transition tables use only wire states, agree with schema-pinned targets, and cover every state-changing variant
+  CR-ST-02    PASS       Persistence machines are indexed by digest and every machine's states and inputs equal the parsed v4.1.5 F# unions (no silent default case)
+  CR-ST-03    PASS       Save durability: seven distinct states; only provider read-back verified (SaveState.Saved) is durable or may be displayed as saved
+  CR-DOM-01   PASS       Every required domain concept is defined with a stable type ID and registered fields
+  CR-DOM-02   PASS       The proposed causa-storage 1.1.0 extension is purely additive: no v1.0.0 type changes, every proposed event has a closed payload
+  CR-DEC-01   PASS       Owner decision requests are unique and every blocker names one
+  CR-SEC-01   PASS       No credential or access token appears in any contract package file or fixture
+  CR-LIVE-01  UNVERIFIED Real-provider durability: a save shown as saved is read back from GitHub (PERSIST-023, J3-05, INV-037)
+  NC-01       DETECTED   Remove a required field (EvidenceAdmitted.source) from the field registry -> CR-HIST-01
+  NC-02       DETECTED   Remove an event case binding (variant EV-033 CausalAssertionConfirmed) -> CR-HIST-02,CR-CER-02,CR-CER-03
+  NC-03       DETECTED   Remove CoreEvent.EvidenceVerificationAssessed from the parsed v4.1.5 contract -> CR-REP-01,CR-CER-03
+  NC-04       DETECTED   Remove a command (CMD-REL-LINK) that UI bindings use -> CR-UI-02
+  NC-05       DETECTED   Remove the binding of a required UI field (UB-024, INV-024 observation text) -> CR-UI-01,CR-UI-04
+  NC-06       DETECTED   Duplicate a field ID -> CR-REG-02
+  NC-07       DETECTED   Make one stored Challenger event non-canonical (insert a space) -> CR-HIST-01
+  NC-08       DETECTED   Drop Provenance from the parsed v4.1.5 EventEnvelope record -> CR-REP-01
+  NC-09       DETECTED   Claim durability for 'Provider write acknowledged' (no read-back) -> CR-ST-03
+  NC-10       DETECTED   Narrow a transition table entry (DT-HYP-02 markSupported only from proposed) -> CR-HIST-06
+  NC-11       DETECTED   Mark a blocked binding (UB-023 primary question) as covered -> CR-UI-03
+  NC-12       DETECTED   Remove SaveState.Conflict from the parsed v4.1.5 contract -> CR-ST-02,CR-ST-03
+  NC-13       DETECTED   Add an unknown payload field to one stored event -> CR-HIST-01
+  NC-14       DETECTED   Give one stored event an unregistered event type -> CR-HIST-01,CR-HIST-02
+  NC-15       DETECTED   Tamper with the committed FIELD-REGISTRY.json -> CR-REG-01
+  NC-16       DETECTED   Place an access token in a contract fixture -> CR-SEC-01
+  NC-17       DETECTED   Remove the documented input path of a required field (ObservationRecorded.observedAt) -> CR-CER-06
+  NC-18       DETECTED   Remove a v4.1.5 CoreCommand case's registry entries (RecordFinding) -> CR-CER-04
+package checksum: 9c8777f9bfda5f4759585c618debe6dc31578db4f16adaf5360e3539e0338189 (committed 9c8777f9bfda5f4759585c618debe6dc31578db4f16adaf5360e3539e0338189)
+verdict: BLOCKED
+  BLOCKED: owner decision ODR-V415-02 is open: Approve package v4.1.5 (existing request, not created here)
+  BLOCKED: owner decision OD-CR-01 is open: Adopt the causa-storage 1.1.0 additive extension and a v4.1.6 successor that carries it
+  BLOCKED: owner decision OD-CR-02 is open: Evidence category on write
+  BLOCKED: owner decision OD-CR-03 is open: Evidence source reference: optional in the catalog, required on the wire
+  BLOCKED: owner decision OD-CR-04 is open: Conclusion strength on write
+  BLOCKED: owner decision OD-CR-05 is open: INV-011 'Hypothesis explanation' maps to HypothesisRecorded.mechanism
+  BLOCKED: owner decision OD-CR-06 is open: INV-035 for evidence: which parts are editable with the same id
+  BLOCKED: owner decision OD-CR-08 is open: Adopt this contract package and its validator as owner-controlled verification assets
+  BLOCKED: owner decision OD-CR-07 is open: Actor identity for UI writes
+  BLOCKED: 14 UI bindings have no defined write path: UB-011 INV-011, UB-012 INV-012, UB-023 INV-023, UB-025 INV-025, UB-027 INV-027, UB-028 INV-028, UB-029 INV-029, UB-030U INV-030, UB-031 INV-031, UB-032 INV-032, UB-033 INV-033, UB-034 INV-034, UB-035 INV-035, UB-037 INV-037
+  BLOCKED: 7 required commands are undefined in the successor candidate: CMD-INV-EDIT, CMD-OBS-EDIT, CMD-HYP-EDIT, CMD-EVD-EDIT, CMD-REL-REVISE, CMD-REL-WITHDRAW, CMD-CONCL-RECORD
+  UNVERIFIED: CR-LIVE-01: Needs a GitHub credential and a writable repository; none is available to this validator. A provider double tests protocol behaviour only and is not substituted. Run the live-provider preflight (.github/workflows/live-provider-preflight.yml).
+
+## check --require-pass (expected exit 2 while BLOCKED)
+  BLOCKED: 14 UI bindings have no defined write path: UB-011 INV-011, UB-012 INV-012, UB-023 INV-023, UB-025 INV-025, UB-027 INV-027, UB-028 INV-028, UB-029 INV-029, UB-030U INV-030, UB-031 INV-031, UB-032 INV-032, UB-033 INV-033, UB-034 INV-034, UB-035 INV-035, UB-037 INV-037
+  BLOCKED: 7 required commands are undefined in the successor candidate: CMD-INV-EDIT, CMD-OBS-EDIT, CMD-HYP-EDIT, CMD-EVD-EDIT, CMD-REL-REVISE, CMD-REL-WITHDRAW, CMD-CONCL-RECORD
+  UNVERIFIED: CR-LIVE-01: Needs a GitHub credential and a writable repository; none is available to this validator. A provider double tests protocol behaviour only and is not substituted. Run the live-provider preflight (.github/workflows/live-provider-preflight.yml).

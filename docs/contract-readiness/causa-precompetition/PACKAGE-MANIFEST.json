@@ -1,7 +1,7 @@
 {
   "schema": "causa.contract-readiness.package-manifest/1",
   "contractPackage": "causa-precompetition 1.0.0-candidate",
-  "packageChecksum": "9c8777f9bfda5f4759585c618debe6dc31578db4f16adaf5360e3539e0338189",
+  "packageChecksum": "879619b9f79880c941d19a7d25c48e55749e596afae7ad9ce23261eaec848828",
   "checksumRule": "sha256 of the lines '<sha256>  <path>\\n' for every package file (except this manifest) and every validator source file, in this order",
   "dependencies": {
     "causaDataRepository": "https://github.com/kemiller2002/causa-data",
@@ -35,7 +35,7 @@
     },
     {
       "path": "CONTRACT-READINESS.json",
-      "sha256": "62bcd5f988b895fe0f9c6a08f0a8bf2b25ae0972e6a885e31bc4c240ec31c7b6"
+      "sha256": "f6bb1d8c9af664de11d4a2e366c8eda50b2edaaa6bfddbdfdbfff979ffebf70a"
     },
     {
       "path": "DOMAIN-CONTRACT.json",
@@ -44,6 +44,10 @@
     {
       "path": "FIELD-REGISTRY.json",
       "sha256": "513c7c8c7a5583ca1b94ed423686085d0f011d990d5f2c1ccb511df87c111692"
+    },
+    {
+      "path": "FINAL-REPORT.md",
+      "sha256": "fe47948d24e91a79e72b0a93b15311060cd86db4230fe15fc8c8fc334746c1b8"
     },
     {
       "path": "HISTORICAL-COMPATIBILITY.md",
@@ -76,6 +80,10 @@
     {
       "path": "VERIFICATION-MATRIX.json",
       "sha256": "adb0c701cdd5b9613d83f14447582455a64003fefa8e2608b0322f6f81071f01"
+    },
+    {
+      "path": "evidence/clean-checkout-9e42aba.txt",
+      "sha256": "c55ccdafd0ac472c0c4fa79564a8a2dfaba30f76a536ee9d229b63344df9a9e2"
     }
   ],
   "validator": [
