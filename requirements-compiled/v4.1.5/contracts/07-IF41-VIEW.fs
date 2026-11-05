@@ -95,7 +95,10 @@ type Visible<'a> =
     | StoredValue of 'a * StoredRef
     | VisibleFixture of 'a * FixtureLabel
 
-/// A value the domain engine projected at a version (Data Understood).
+/// A value the domain engine projected at a version (Data Understood). The private representation keeps a stored value from
+/// becoming Understood without Understood.projected; it does not prove the engine produced it, because
+/// Understood.projected is public. That only the domain-engine adapter calls it is an ownership rule (integration owns the
+/// adapter, AGENT-RULES) checked in review, not a type guarantee.
 type Understood<'a> =
     private
     | Projected of 'a * AggregateVersion
@@ -191,6 +194,7 @@ type RouteTarget = { Workspace: string; Role: WorkspaceRole; Id: InvestigationId
 // ---- Failure and loading ---------------------------------------------------------------------------------------------
 
 /// Why data is not shown. Each case has its own plain-language copy (UiStates.describe, UI-010, UI-028).
+[<RequireQualifiedAccess>]
 type UiFailure =
     /// Keyed by workspace and id (v4.1.5 W1): the same case can be stored in two workspaces.
     | InvestigationNotFound of RouteTarget
@@ -408,6 +412,14 @@ type Destination = { Repository: string; Branch: string; Writable: bool }
 
 type StartForm = { ProblemStatement: string; Title: string; Question: string; Identifier: string }
 
+/// The progress of one submitted command. Correctness is the engine's and persistence's; the UI shows the outcome.
+[<RequireQualifiedAccess>]
+type Submission =
+    | NotSubmitted
+    | Submitting
+    | Refused of reasons: string list
+    | Accepted
+
 type StartView =
     { Form: StartForm
       Errors: ValidationError list
@@ -418,13 +430,6 @@ type StartView =
       Cancel: Availability
       /// Data Editable progress of the Start command (submit, refusal, accepted).
       Submission: Submission }
-
-/// The progress of one submitted command. Correctness is the engine's and persistence's; the UI shows the outcome.
-and Submission =
-    | NotSubmitted
-    | Submitting
-    | Refused of reasons: string list
-    | Accepted
 
 // ---- Edit investigation details (INV-034, INV-035) --------------------------------------------------------------------
 
@@ -637,8 +642,9 @@ type ScreenView =
     | SettingsScreen of SettingsView
     | NotFoundScreen of NotFoundView
 
-/// Who produced a view. A fixture-backed view can never be reported as an integrated feature: acceptance evidence
-/// requires Integrated, and only an integration adapter over the real engine says so (VERIFICATION-STRATEGY.md).
+/// Who produced a view. Acceptance evidence requires IntegratedBackend (VERIFICATION-STRATEGY.md). IntegratedBackend is a
+/// public case: that only integration's adapter over the real engine constructs it is an ownership rule (integration owns
+/// the adapter, AGENT-RULES) checked in review, not a type guarantee. A fixture-backed value still carries its FixtureLabel.
 type BackendOrigin =
     | FixtureBackend of FixtureLabel
     | IntegratedBackend

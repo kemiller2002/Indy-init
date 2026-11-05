@@ -646,9 +646,14 @@
      "contracts": [
       {
        "file": "contracts/07-IF41-VIEW.fs",
-       "sha256": "0cf59e200ccc45cd0d6fb49cd384592392d29d892517ce7c0297dc021aa9c9ae"
+       "sha256": "3567712ed35903ebdddcfb6b4fd98f747ee0d960660388175298f64cf45a91e7"
       }
-     ]
+     ],
+     "projectStructure": {
+      "file": "analysis/project-structure.json",
+      "sha256": "b06c6a51de2941a490549df46f6bb190b72ed83311a09f57dbe54d1740a65817",
+      "note": "the role, producer and file-owner changes the fold makes (ui-3, interfaceProducers, Ui/Presentation.fs, screen fragments, UI tests); selecting A approves exactly this file"
+     }
     }
    }
   },

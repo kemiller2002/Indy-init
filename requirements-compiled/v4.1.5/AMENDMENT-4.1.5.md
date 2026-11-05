@@ -27,6 +27,7 @@ Scenario A4 requires the falsification scope to be recorded. causa-storage v1.0.
   - IF41-STORAGE: `EveryCatalogEventRoundTrips`, `EncodeNewVerifiesAndRoundTrips`, `WritableRefusesCatalog`, `WorkingCopyNeverNamesACatalogWorkspace` (for example, run `demonstration-v1` cannot reach `workspaces/demo/demonstration-v1`);
   - IF41-SAVE: `NewInvestigationSavesThroughExistingTransitions`, `CatalogLoadCreatesNoSession`, `ListingReadsAtOneCommit`, `EveryListingStepIsInterpreted`;
   - IF41-APP: `StateIsKeyedByWorkspaceAndId`.
+- **Pins enforced before step 2** (`tools/v415-carried-amendments.fsx`, CI): every contract that ODR-V415-01 or ODR-V415-IF-VIEW pins must have that sha256 both on disk and in `contractChanges`, every changed contract must be pinned by a request, and ODR-V415-IF-VIEW's `analysis/project-structure.json` pin must match (review F1 and F5 on #137).
 - **Historical compatibility:** the `CoreEvent` case names equal `CoreEventV415` in `proposals/r10-historical-data-compatibility/src/SuccessorContract.fs`, which checks C11/C15 prove lossless on all 1,315 catalog events.
 
 Every other part of v4.1.4 is carried unchanged.
