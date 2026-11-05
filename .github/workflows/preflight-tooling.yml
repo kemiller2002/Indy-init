@@ -227,9 +227,9 @@ jobs:
           dotnet tools/requirements-compiler/src/bin/Release/net10.0/requirements-compiler.dll v41 --source . --package requirements-compiled/v4.1.4 --base requirements-compiled/v4 --check --bootstrap "$RUNNER_TEMP/layered414"
           dotnet build "$RUNNER_TEMP/layered414/Causa.slnx" -c Release
           dotnet build "$RUNNER_TEMP/layered414/App.slnx" -c Release
-      - name: Successor package v4.1.5 is reproduced byte for byte and its checks X01-X21 pass except its pending owner approvals; its contracts equal v4.1.4's except the four it declares changed, and its layout tests equal v4.1.4's
+      - name: Successor package v4.1.5 is reproduced byte for byte and its checks X01-X21 pass except its pending owner approvals; its contracts equal v4.1.4's except the five it declares changed, and its layout tests equal v4.1.4's
         run: |
-          # Until the owner records ODR-V415-01 (FREEZE.md step 1), v4.1.5 must validate except for exactly its six empty
+          # Until the owner records ODR-V415-01 and ODR-V415-IF-VIEW (FREEZE.md step 1), v4.1.5 must validate except for exactly its seven empty
           # approvals: the set of problem lines must equal the expected set, so blanking any other approval, or any other
           # problem, fails. The compiler prints at most 10 problems per check, so 10 lines also fails. A byte difference
           # (exit 4) fails.
@@ -245,7 +245,8 @@ jobs:
               '      - the change of contracts/00-DOMAIN-STUBS.fs names no operator approval' \
               '      - the change of contracts/02-IF41-STORAGE.fs names no operator approval' \
               '      - the change of contracts/05-IF41-SAVE.fs names no operator approval' \
-              '      - the change of contracts/06-IF41-APP.fs names no operator approval' | sort > "$RUNNER_TEMP/v415.expected"
+              '      - the change of contracts/06-IF41-APP.fs names no operator approval' \
+              '      - the change of contracts/07-IF41-VIEW.fs names no operator approval' | sort > "$RUNNER_TEMP/v415.expected"
             { grep -E '^FAIL ' "$RUNNER_TEMP/v415.log" | cut -c1-8; grep -E '^      - ' "$RUNNER_TEMP/v415.log"; } | sort > "$RUNNER_TEMP/v415.actual"
             if ! diff "$RUNNER_TEMP/v415.expected" "$RUNNER_TEMP/v415.actual"; then echo "v4.1.5 fails for more than its pending owner approvals"; exit 1; fi
           }
@@ -254,7 +255,7 @@ jobs:
           for f in requirements-compiled/v4.1.4/contracts/*.fs requirements-compiled/v4.1.4/contracts/negative/*.fs requirements-compiled/v4.1.4/contracts/ContractCheck.fsproj; do
             rel=${f#requirements-compiled/v4.1.4/}
             case "$rel" in
-              contracts/00-DOMAIN-STUBS.fs|contracts/02-IF41-STORAGE.fs|contracts/05-IF41-SAVE.fs|contracts/06-IF41-APP.fs) ;;
+              contracts/00-DOMAIN-STUBS.fs|contracts/02-IF41-STORAGE.fs|contracts/05-IF41-SAVE.fs|contracts/06-IF41-APP.fs|contracts/07-IF41-VIEW.fs) ;;
               *) diff "$f" "requirements-compiled/v4.1.5/$rel" ;;
             esac
           done
@@ -275,7 +276,7 @@ jobs:
           done
       - name: The v4.1.5 skeleton bootstraps into an empty repository and onto a recorded Conditor 0.10.18 scaffold, and every solution builds
         run: |
-          # Until the owner records ODR-V415-01 (FREEZE.md step 1), v4.1.5 must validate except for exactly its six empty
+          # Until the owner records ODR-V415-01 and ODR-V415-IF-VIEW (FREEZE.md step 1), v4.1.5 must validate except for exactly its seven empty
           # approvals: the set of problem lines must equal the expected set, so blanking any other approval, or any other
           # problem, fails. The compiler prints at most 10 problems per check, so 10 lines also fails. A byte difference
           # (exit 4) fails.
@@ -291,7 +292,8 @@ jobs:
               '      - the change of contracts/00-DOMAIN-STUBS.fs names no operator approval' \
               '      - the change of contracts/02-IF41-STORAGE.fs names no operator approval' \
               '      - the change of contracts/05-IF41-SAVE.fs names no operator approval' \
-              '      - the change of contracts/06-IF41-APP.fs names no operator approval' | sort > "$RUNNER_TEMP/v415.expected"
+              '      - the change of contracts/06-IF41-APP.fs names no operator approval' \
+              '      - the change of contracts/07-IF41-VIEW.fs names no operator approval' | sort > "$RUNNER_TEMP/v415.expected"
             { grep -E '^FAIL ' "$RUNNER_TEMP/v415.log" | cut -c1-8; grep -E '^      - ' "$RUNNER_TEMP/v415.log"; } | sort > "$RUNNER_TEMP/v415.actual"
             if ! diff "$RUNNER_TEMP/v415.expected" "$RUNNER_TEMP/v415.actual"; then echo "v4.1.5 fails for more than its pending owner approvals"; exit 1; fi
           }

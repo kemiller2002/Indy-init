@@ -10,6 +10,7 @@ v4.1.5 is the successor of the approved package v4.1.4 (APR-V414-OWNER-2, tag `i
 | C1 | EXT-DATA-008 needs a command-created, round-trip-verified new investigation. SM-SAVE starts only from a verified stored history. A catalog load created a writable session (T-L03). | `05`: `SaveMachine.InitialNew`, holding the StartInvestigation command; it starts in Unsaved, or Offline when known offline. `02`: `StorageCodec.EncodeNew`, which returns Ok only for a file set that Verify accepts. `06`: `Msg.CreateRequested`. **T-L03 replaced:** only a working-copy load creates a save session. **SM-SAVE accepted note:** a new session starts there. No state, event or transition is added. |
 | ODR-V415-03 | ODR-R10-32 A (recorded) commissions one combined package. | **Staging, an owner decision.** v4.1.5 omits FO-1..FO-3 and the T19/T22 split. Freezing it without this record departs from ODR-R10-32 A. |
 | ODR-V415-04 | — | The fallback trigger, an owner decision |
+| ODR-V415-IF-VIEW (separate request) | CF-09 A (APR-CFUI-OWNER-1): the UI contracts ship in the package, and the compiler refuses a new contract file. | `07-IF41-VIEW.fs`: the frozen IF41-VIEW types unchanged, then `namespace Causa.Ui.Contracts` (fold at 21cc2b0; `Remote.Waiting`'s field label `task` renamed `activity`, which X17's line scan read as the keyword). Producer integration; consumers ui, ui-2, ui-3. `project-structure.json`: role ui-3, the Causa.App views split so no two UI roles share a file, `Ui/Presentation.fs` (the producer functions), IF41-APP and IF41-VIEW produced by integration, IF41-REPORT by ui-3, UI fixture helpers, `Causa.TestSupport` referencing `Causa.App`, the screen-fragment rules. |
 | ODR-V415-02 | — | Approval of this package only. It does not imply ODR-V415-03 or -04, and `approve v4.1.5` refuses until they are recorded. |
 
 ## Weakened acceptance condition (stated in ODR-V415-01's option A)
@@ -18,14 +19,15 @@ Scenario A4 requires the falsification scope to be recorded. causa-storage v1.0.
 
 ## How the change is checked
 
-- **X01–X21** pass except X12 and X17, which fail only with "names no operator approval" for the six approvals ODR-V415-01 will supply. CI asserts that the problem lines equal exactly those six (`pending415`, a set comparison) until FREEZE step 2.
+- **X01–X21** pass except X12 and X17, which fail only with "names no operator approval" for the six approvals ODR-V415-01 will supply and the one ODR-V415-IF-VIEW will supply (the change of `07-IF41-VIEW.fs`). CI asserts that the problem lines equal exactly those seven (`pending415`, a set comparison) until FREEZE step 2.
 - **X05 and X12:** no machine gains a state or an event. `LoadInput.OpenRequested` keeps its name and only its payload changes.
-- **X17:** four contracts are declared changed with their digests. `Writable.ofAddress`/`address`, `WorkspaceAddress.catalog`/`workingCopy` and the two `WorkspaceAddress.T` members are allowlisted boundary code, pinned by digest. Every other contract equals v4.1.4's byte for byte.
+- **X17:** five contracts are declared changed with their digests (four under ODR-V415-01, `07-IF41-VIEW.fs` under ODR-V415-IF-VIEW). The fold's 16 boundary members (`FixtureLabel`, `Visible`, `Understood`, `SafeUrl`) are allowlisted by digest. `Writable.ofAddress`/`address`, `WorkspaceAddress.catalog`/`workingCopy` and the two `WorkspaceAddress.T` members are allowlisted boundary code, pinned by digest. Every other contract equals v4.1.4's byte for byte.
 - **The contracts typecheck** with `TreatWarningsAsErrors`. Both negative controls are still refused with FS1093. The skeleton bootstraps, and `Causa.slnx` builds.
 - **New producer tests:**
   - IF41-STORAGE: `EveryCatalogEventRoundTrips`, `EncodeNewVerifiesAndRoundTrips`, `WritableRefusesCatalog`, `WorkingCopyNeverNamesACatalogWorkspace` (for example, run `demonstration-v1` cannot reach `workspaces/demo/demonstration-v1`);
   - IF41-SAVE: `NewInvestigationSavesThroughExistingTransitions`, `CatalogLoadCreatesNoSession`, `ListingReadsAtOneCommit`, `EveryListingStepIsInterpreted`;
   - IF41-APP: `StateIsKeyedByWorkspaceAndId`.
+- **Pins enforced before step 2** (`tools/v415-carried-amendments.fsx`, CI): every contract that ODR-V415-01 or ODR-V415-IF-VIEW pins must have that sha256 both on disk and in `contractChanges`, every changed contract must be pinned by a request, and ODR-V415-IF-VIEW's `analysis/project-structure.json` pin must match (review F1 and F5 on #137).
 - **Historical compatibility:** the `CoreEvent` case names equal `CoreEventV415` in `proposals/r10-historical-data-compatibility/src/SuccessorContract.fs`, which checks C11/C15 prove lossless on all 1,315 catalog events.
 
 Every other part of v4.1.4 is carried unchanged.

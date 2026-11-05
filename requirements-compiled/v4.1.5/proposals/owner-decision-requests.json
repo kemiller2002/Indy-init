@@ -626,12 +626,44 @@
    }
   },
   {
+   "id": "ODR-V415-IF-VIEW",
+   "kind": "interface-change",
+   "title": "IF41-VIEW gains the presentation contracts Causa.Ui.Contracts (CF-09 A)",
+   "question": "Approve the change of IF41-VIEW to the folded contract at the pinned digest (Agent 2's fold for v4.1.5 rev 3, proposals/r10-contract-first-ui/v415-fold at 21cc2b0, with the Remote.Waiting field label task renamed activity): the frozen v4.1.4 IF41-VIEW types unchanged, followed by the namespace Causa.Ui.Contracts (screen view models, capability boundaries Visible/Understood, validation rules from the catalog, UiIntent, UiBackend, the seven-state presentation mapping and Limen bindings)? Additive only: no existing IF41 type, case or field changes. Its implementing file src/Causa.App/Projections.fs becomes integration-owned (types only) and compiles before Connection.fs.",
+   "options": [
+    "A: approve the change as pinned (additive; producer integration, consumers ui, ui-2 and ui-3)",
+    "B: decline; IF41-VIEW stays as in v4.1.4 and the UI contracts wait for a later package"
+   ],
+   "recommendation": "A. It applies CF-09 A (APR-CFUI-OWNER-1) without a compiler change. Verified: v4.1.4 ContractCheck builds with the folded file (0 warnings), both negative controls still refuse (FS1093), and the real v4.1.4 bootstrap with Projections.fs holding the folded text builds.",
+   "rationale": "V41Package.fs:1774-1787 requires every contract difference to name an interface-change decision of the package's own requests; V41Package.fs:1790 refuses new contract files, hence the fold. A separate request from ODR-V415-01, which can be decided without it. The contract is types and signatures plus 16 boundary members beside private representations (FixtureLabel, Visible, Understood, SafeUrl), allowlisted by digest; the functions over these types are the producer file src/Causa.App/Ui/Presentation.fs (integration), which the bootstrap writes as an empty namespace. With it come role ui-3, the Causa.App compile order and owners of the project-structure delta, IF41-APP and IF41-VIEW produced by integration, IF41-REPORT by ui-3, the UI fixture helpers, Causa.TestSupport referencing Causa.App and the screen-fragment rules.",
+   "impact": "Every UI role compiles against IF41-VIEW from bootstrap. IF41-VIEW's versioning rule (any union or record change is breaking) then covers the UI contracts too. Until recorded, v4.1.5's change of contracts/07-IF41-VIEW.fs names no approval and the package does not validate (X17).",
+   "approvalRecord": {
+    "how": "A change in an operator approval (recordFormat): {\"decision_id\": \"ODR-V415-IF-VIEW\", \"action\": \"select\", \"option\": \"A\"}, recorded by the owner with tools/owner-freeze.fsx decide v4.1.5. Selecting A approves exactly what 'applies' lists; the offline suite compares the package with it. Agents never write an owner record (RDP-003)."
+   },
+   "applies": {
+    "A": {
+     "transitions": [],
+     "contracts": [
+      {
+       "file": "contracts/07-IF41-VIEW.fs",
+       "sha256": "e1e584862b15137d8786feecca03cf7bbf19a5b536bd925ae55876f04c554831"
+      }
+     ],
+     "projectStructure": {
+      "file": "analysis/project-structure.json",
+      "sha256": "b06c6a51de2941a490549df46f6bb190b72ed83311a09f57dbe54d1740a65817",
+      "note": "the role, producer and file-owner changes the fold makes (ui-3, interfaceProducers, Ui/Presentation.fs, screen fragments, UI tests); selecting A approves exactly this file"
+     }
+    }
+   }
+  },
+  {
    "id": "ODR-V415-02",
    "kind": "package-approval",
    "title": "Approve compiled package v4.1.5",
-   "question": "Approve requirements-compiled/v4.1.5 (successor of the approved v4.1.4) as the implementation plan: v4.1.4 plus ODR-V415-01? This approves the package only. It does not decide staging (ODR-V415-03), which departs from the recorded ODR-R10-32 A ('one combined package'), nor the fallback trigger (ODR-V415-04); owner-freeze.fsx approve refuses until both are recorded.",
+   "question": "Approve requirements-compiled/v4.1.5 (successor of the approved v4.1.4) as the implementation plan: v4.1.4 plus ODR-V415-01 and the separate ODR-V415-IF-VIEW (the CF-09 A fold)? This approves the package only. It does not decide staging (ODR-V415-03), which departs from the recorded ODR-R10-32 A ('one combined package'), nor the fallback trigger (ODR-V415-04); owner-freeze.fsx approve refuses until both are recorded.",
    "options": [
-    "A: approve v4.1.5 after ODR-V415-01, -03 and -04 are recorded and it is independently reviewed",
+    "A: approve v4.1.5 after ODR-V415-01, -03, -04 and ODR-V415-IF-VIEW are recorded (if ODR-V415-IF-VIEW is declined, the fold is taken out and v4.1.5 recompiled) and it is independently reviewed",
     "B: request changes",
     "C: decline; build from v4.1.4 with ODR-R10-25 B's declared expected failures"
    ],

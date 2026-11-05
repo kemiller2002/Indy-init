@@ -184,10 +184,171 @@
     },
     {
       "file": "contracts/07-IF41-VIEW.fs",
-      "classification": "specification: types and signatures only",
+      "classification": "specification with reviewed boundary code",
       "interface": "IF41-VIEW",
       "producerFile": "src/Causa.App/Projections.fs",
-      "implementation": []
+      "implementation": [
+        {
+          "scope": "FixtureLabel",
+          "symbol": "create",
+          "sha256": "20189d5aada679746050e7e13bc95a281990e32d7c90442724451f89aae2818e",
+          "rationale": "The only constructor of the private fixture label; it prefixes FIXTURE: so no fixture-backed value can be presented as integrated. Boundary code: the private type is the requirement. Allowed only as part of the contract change ODR-V415-IF-VIEW (CF-09 A).",
+          "requirements": [
+            "WDL-011",
+            "UI-039"
+          ]
+        },
+        {
+          "scope": "FixtureLabel",
+          "symbol": "value",
+          "sha256": "22768da5ca187a1a954521b6746843d5ad0f0b33aca04e1f442e089344940ee1",
+          "rationale": "Read-only accessor of the private fixture label. Allowed only as part of the contract change ODR-V415-IF-VIEW (CF-09 A).",
+          "requirements": [
+            "WDL-011",
+            "UI-039"
+          ]
+        },
+        {
+          "scope": "Visible",
+          "symbol": "stored",
+          "sha256": "146233da50c2ee61bbb9e083d9bc02faf083175f7a5ef1d2f83fb27959780a49",
+          "rationale": "Constructor of the private Data Visible representation from a stored read; there is no conversion to Understood, so stored data cannot be shown as the kernel's interpretation. Allowed only as part of the contract change ODR-V415-IF-VIEW (CF-09 A).",
+          "requirements": [
+            "UI-023",
+            "UI-039"
+          ]
+        },
+        {
+          "scope": "Visible",
+          "symbol": "fixture",
+          "sha256": "d47cb79380abdae6faf630d65a788900196dfa5d76d47e06c31c32fba47f5654",
+          "rationale": "Constructor of a fixture Data Visible value; it carries its FixtureLabel. Allowed only as part of the contract change ODR-V415-IF-VIEW (CF-09 A).",
+          "requirements": [
+            "UI-023",
+            "WDL-011"
+          ]
+        },
+        {
+          "scope": "Visible",
+          "symbol": "value",
+          "sha256": "73fa627b3c2c39d9f2378ff3699563322a77ace3eaaa8ac139f40fd172ef952e",
+          "rationale": "Read-only accessor of the private Data Visible representation. Allowed only as part of the contract change ODR-V415-IF-VIEW (CF-09 A).",
+          "requirements": [
+            "UI-023",
+            "UI-039"
+          ]
+        },
+        {
+          "scope": "Visible",
+          "symbol": "fixtureLabel",
+          "sha256": "679e4647f9271f0c4eb46812fb4d7f0dd101e91da408162a989435b27471a70c",
+          "rationale": "Reads the fixture label, so a view can show that a value is a fixture. Allowed only as part of the contract change ODR-V415-IF-VIEW (CF-09 A).",
+          "requirements": [
+            "UI-023",
+            "WDL-011"
+          ]
+        },
+        {
+          "scope": "Visible",
+          "symbol": "map",
+          "sha256": "3e2b6a34a4562c2bbf0c2f0fa200f4dd4b9ec5cd76e97891a449f312c8b59b67",
+          "rationale": "Maps the value and keeps its provenance (stored reference or fixture label); without it the private case could not be transformed. Allowed only as part of the contract change ODR-V415-IF-VIEW (CF-09 A).",
+          "requirements": [
+            "UI-023",
+            "UI-039"
+          ]
+        },
+        {
+          "scope": "Understood",
+          "symbol": "projected",
+          "sha256": "54ed100a0443b45667ae7a8a3459d95264a4f5713ffe01d1d7769ee450cd61e0",
+          "rationale": "Constructor of the private Data Understood representation; only an adapter holding a domain projection at a version calls it. Allowed only as part of the contract change ODR-V415-IF-VIEW (CF-09 A).",
+          "requirements": [
+            "UI-023",
+            "UI-039"
+          ]
+        },
+        {
+          "scope": "Understood",
+          "symbol": "fixture",
+          "sha256": "be223444c335a9317c5a95599784d727981e2f766eb8a299db2228c2aab26315",
+          "rationale": "Constructor of a fixture Data Understood value; it carries its FixtureLabel. Allowed only as part of the contract change ODR-V415-IF-VIEW (CF-09 A).",
+          "requirements": [
+            "UI-023",
+            "WDL-011"
+          ]
+        },
+        {
+          "scope": "Understood",
+          "symbol": "value",
+          "sha256": "7ed9216d3252edef53958c28666a0267fdf705edbf19a3763fe18695f45dd8d9",
+          "rationale": "Read-only accessor of the private Data Understood representation. Allowed only as part of the contract change ODR-V415-IF-VIEW (CF-09 A).",
+          "requirements": [
+            "UI-023",
+            "UI-039"
+          ]
+        },
+        {
+          "scope": "Understood",
+          "symbol": "version",
+          "sha256": "2845a4dc989b192a92ea51f05b2539fec04371bed6ceb8207121d70f33605762",
+          "rationale": "Reads the projection version; a fixture has none. Allowed only as part of the contract change ODR-V415-IF-VIEW (CF-09 A).",
+          "requirements": [
+            "UI-023",
+            "UI-039"
+          ]
+        },
+        {
+          "scope": "Understood",
+          "symbol": "fixtureLabel",
+          "sha256": "34a1a97fb3b1cc821b1e2a09d216abbbd272f253a28f9629ca8c1526ce376dc6",
+          "rationale": "Reads the fixture label, so a view can show that a value is a fixture. Allowed only as part of the contract change ODR-V415-IF-VIEW (CF-09 A).",
+          "requirements": [
+            "UI-023",
+            "WDL-011"
+          ]
+        },
+        {
+          "scope": "Understood",
+          "symbol": "map",
+          "sha256": "567a67b5a170a20cfe1b1daf685c7d4477c3a6833e5405522db8bd4ccf7ee322",
+          "rationale": "Maps the value and keeps its provenance (version or fixture label). Allowed only as part of the contract change ODR-V415-IF-VIEW (CF-09 A).",
+          "requirements": [
+            "UI-023",
+            "UI-039"
+          ]
+        },
+        {
+          "scope": "SafeUrl",
+          "symbol": "pattern",
+          "sha256": "fbb223d6fc15438ba6ac08ec087a07f50ff4e0ff7953c6e983f693d27960be7b",
+          "rationale": "The URL pattern the only constructor enforces. Allowed only as part of the contract change ODR-V415-IF-VIEW (CF-09 A).",
+          "requirements": [
+            "PF-015",
+            "UI-039"
+          ]
+        },
+        {
+          "scope": "SafeUrl",
+          "symbol": "tryCreate",
+          "sha256": "248abc3847bb5cc2a486b847b43a78cb20086c700ae02052012825c42e050d9e",
+          "rationale": "The only constructor of the private SafeUrl: an absolute http(s) URL, well formed, at most 2000 characters; any other link text is never rendered as a link. Allowed only as part of the contract change ODR-V415-IF-VIEW (CF-09 A).",
+          "requirements": [
+            "PF-015",
+            "UI-039"
+          ]
+        },
+        {
+          "scope": "SafeUrl",
+          "symbol": "value",
+          "sha256": "9d6afccf4e7d2e5c53065d27b45018c9e6481bd7c3dd7b6f37e4d991a958fbf1",
+          "rationale": "Read-only accessor of the private SafeUrl. Allowed only as part of the contract change ODR-V415-IF-VIEW (CF-09 A).",
+          "requirements": [
+            "PF-015",
+            "UI-039"
+          ]
+        }
+      ]
     },
     {
       "file": "contracts/08-IF41-REPORT.fs",

@@ -6,6 +6,7 @@
     "persistence",
     "ui",
     "ui-2",
+    "ui-3",
     "integration",
     "coordinator",
     "reviewer"
@@ -14,16 +15,20 @@
     "A file has exactly one primary owner; contributors may edit only through a pull request the owner approves, never concurrently.",
     "A change to a frozen interface (interface-specifications.json) goes through the coordinator and is versioned; consumers are notified before merge.",
     "F# compile order is the order of each project's files list; a file may depend only on earlier files of its project or on referenced projects.",
-    "ui and ui-2 never own the same file; Shell.fs is ui's and ui-2 consumes it read-only.",
-    "Integration alone writes: .gitignore, every project and solution file, Directory.*.props and .targets, NuGet.config, global.json, package.json, package-lock.json, playwright.config.ts, *.runsettings, build.fsx, README.md, .github/, .echelon/, tests/fixtures/, tests/browser/support/, web/boundary.js, web/index.html, web/causa.css, src/Causa.Host/, src/Causa.App/View.fs and src/Causa.App/Program.fs (checks X02 and X18). A UI role changes web/index.html or web/causa.css only through a change request integration owns and applies (v4.1.1)."
+    "No two UI roles (ui, ui-2, ui-3) own the same file; Views/Shell.fs is ui's and the other roles consume it read-only.",
+    "No UI-owned file compiles before src/Causa.App/Projections.fs, which holds IF41-VIEW (frozen view types and Causa.Ui.Contracts) and is integration-owned.",
+    "Screens emit UiIntent and read AppView only; no UI role edits Engine.fs, Update.fs, Projections.fs or View.fs.",
+    "A UI role changes web/index.html only through its own web/screens/<screen>.html and .css fragments (CF-08 A).",
+    "Integration alone writes: .gitignore, every project and solution file, Directory.*.props and .targets, NuGet.config, global.json, package.json, package-lock.json, playwright.config.ts, *.runsettings, build.fsx, README.md, .github/, .echelon/, tests/fixtures/, tests/browser/support/, web/boundary.js, web/index.html, web/causa.css, src/Causa.Host/, src/Causa.App/View.fs and src/Causa.App/Program.fs (checks X02 and X18). A UI role changes web/index.html or web/causa.css only through a change request integration owns and applies (v4.1.1); each UI role writes only its own screen fragments web/screens/<screen>.html and web/screens/<screen>.css as proposals/r10-contract-first-ui/COMPETITION-UI-OWNERSHIP.json assigns them, and web/index.html includes them through build.fsx, which integration writes at bootstrap with every fragment listed."
   ],
   "counts": {
-    "files": 270,
+    "files": 341,
     "domain": 35,
     "persistence": 51,
-    "ui": 69,
-    "ui-2": 11,
-    "integration": 101,
+    "ui": 78,
+    "ui-2": 29,
+    "ui-3": 31,
+    "integration": 114,
     "coordinator": 1,
     "reviewer": 2
   },
@@ -64,19 +69,36 @@
       "files": [
         "src/Causa.App/Engine.fs",
         "src/Causa.App/Routes.fs",
-        "src/Causa.App/Connection.fs",
         "src/Causa.App/Projections.fs",
+        "src/Causa.App/Ui/Presentation.fs",
+        "src/Causa.App/Connection.fs",
+        "src/Causa.App/Ui/UiAdapter.fs",
+        "src/Causa.App/Ui/Events.fs",
         "src/Causa.App/Reporting.fs",
         "src/Causa.App/Update.fs",
         "src/Causa.App/Views/Shell.fs",
+        "src/Causa.App/Views/Connection.fs",
+        "src/Causa.App/Views/InvestigationList.fs",
+        "src/Causa.App/Views/States.fs",
+        "src/Causa.App/Views/Language.fs",
+        "src/Causa.App/Views/Workspace/Frame.fs",
+        "src/Causa.App/Views/Workspace/StoredRecord.fs",
+        "src/Causa.App/Views/Administration.fs",
+        "src/Causa.App/Views/Settings.fs",
+        "src/Causa.App/Views/Start.fs",
+        "src/Causa.App/Views/Workspace/Details.fs",
         "src/Causa.App/Views/SaveIndicator.fs",
         "src/Causa.App/Views/ConflictReview.fs",
-        "src/Causa.App/Views/Dashboard.fs",
-        "src/Causa.App/Views/Investigation.fs",
+        "src/Causa.App/Views/History.fs",
+        "src/Causa.App/Views/Workspace/Overview.fs",
+        "src/Causa.App/Views/Workspace/Hypotheses.fs",
+        "src/Causa.App/Views/Workspace/Evidence.fs",
+        "src/Causa.App/Views/Workspace/Links.fs",
+        "src/Causa.App/Views/Workspace/Conclusions.fs",
+        "src/Causa.App/Views/Workspace/Timeline.fs",
+        "src/Causa.App/Views/Workspace/Inspector.fs",
         "src/Causa.App/Views/Graph.fs",
         "src/Causa.App/Views/Report.fs",
-        "src/Causa.App/Views/History.fs",
-        "src/Causa.App/Views/Administration.fs",
         "src/Causa.App/View.fs",
         "src/Causa.App/Program.fs"
       ]
@@ -91,7 +113,13 @@
       "project": "Causa.TestSupport",
       "files": [
         "tests/Causa.TestSupport/Recordings.fs",
-        "tests/Causa.TestSupport/StatefulFake.fs"
+        "tests/Causa.TestSupport/StatefulFake.fs",
+        "tests/Causa.TestSupport/UiFixtures/CausaDataExtract.g.fs",
+        "tests/Causa.TestSupport/UiFixtures/Scenarios.fs",
+        "tests/Causa.TestSupport/UiFixtures/FixtureBackend.fs",
+        "tests/Causa.TestSupport/UiFixtures/Scenarios.ui.fs",
+        "tests/Causa.TestSupport/UiFixtures/Scenarios.ui-2.fs",
+        "tests/Causa.TestSupport/UiFixtures/Scenarios.ui-3.fs"
       ]
     },
     {
@@ -403,7 +431,7 @@
     },
     {
       "path": "src/Causa.App/Engine.fs",
-      "owner": "ui",
+      "owner": "integration",
       "kind": "source",
       "project": "Causa.App",
       "implements": [
@@ -412,7 +440,22 @@
     },
     {
       "path": "src/Causa.App/Routes.fs",
-      "owner": "ui",
+      "owner": "integration",
+      "kind": "source",
+      "project": "Causa.App"
+    },
+    {
+      "path": "src/Causa.App/Projections.fs",
+      "owner": "integration",
+      "kind": "source",
+      "project": "Causa.App",
+      "implements": [
+        "IF41-VIEW"
+      ]
+    },
+    {
+      "path": "src/Causa.App/Ui/Presentation.fs",
+      "owner": "integration",
       "kind": "source",
       "project": "Causa.App"
     },
@@ -423,26 +466,34 @@
       "project": "Causa.App"
     },
     {
-      "path": "src/Causa.App/Projections.fs",
-      "owner": "ui",
+      "path": "src/Causa.App/Ui/UiAdapter.fs",
+      "owner": "integration",
       "kind": "source",
-      "project": "Causa.App",
-      "implements": [
-        "IF41-VIEW"
-      ]
+      "project": "Causa.App"
+    },
+    {
+      "path": "src/Causa.App/Ui/Events.fs",
+      "owner": "integration",
+      "kind": "source",
+      "project": "Causa.App"
     },
     {
       "path": "src/Causa.App/Reporting.fs",
-      "owner": "ui",
+      "owner": "ui-3",
       "kind": "source",
       "project": "Causa.App",
+      "ownerByTopology": {
+        "A-role-lanes": "ui",
+        "B-single-lead": "ui",
+        "C-role-lanes-two-ui": "ui"
+      },
       "implements": [
         "IF41-REPORT"
       ]
     },
     {
       "path": "src/Causa.App/Update.fs",
-      "owner": "ui",
+      "owner": "integration",
       "kind": "source",
       "project": "Causa.App"
     },
@@ -453,31 +504,31 @@
       "project": "Causa.App"
     },
     {
-      "path": "src/Causa.App/Views/SaveIndicator.fs",
+      "path": "src/Causa.App/Views/Connection.fs",
       "owner": "ui",
       "kind": "source",
       "project": "Causa.App"
     },
     {
-      "path": "src/Causa.App/Views/ConflictReview.fs",
+      "path": "src/Causa.App/Views/InvestigationList.fs",
       "owner": "ui",
       "kind": "source",
       "project": "Causa.App"
     },
     {
-      "path": "src/Causa.App/Views/Dashboard.fs",
+      "path": "src/Causa.App/Views/States.fs",
       "owner": "ui",
       "kind": "source",
       "project": "Causa.App"
     },
     {
-      "path": "src/Causa.App/Views/Investigation.fs",
+      "path": "src/Causa.App/Views/Language.fs",
       "owner": "ui",
       "kind": "source",
       "project": "Causa.App"
     },
     {
-      "path": "src/Causa.App/Views/Graph.fs",
+      "path": "src/Causa.App/Views/Workspace/Frame.fs",
       "owner": "ui-2",
       "kind": "source",
       "project": "Causa.App",
@@ -487,7 +538,59 @@
       }
     },
     {
-      "path": "src/Causa.App/Views/Report.fs",
+      "path": "src/Causa.App/Views/Workspace/StoredRecord.fs",
+      "owner": "ui-2",
+      "kind": "source",
+      "project": "Causa.App",
+      "ownerByTopology": {
+        "A-role-lanes": "ui",
+        "B-single-lead": "ui"
+      }
+    },
+    {
+      "path": "src/Causa.App/Views/Administration.fs",
+      "owner": "ui",
+      "kind": "source",
+      "project": "Causa.App"
+    },
+    {
+      "path": "src/Causa.App/Views/Settings.fs",
+      "owner": "ui",
+      "kind": "source",
+      "project": "Causa.App"
+    },
+    {
+      "path": "src/Causa.App/Views/Start.fs",
+      "owner": "ui-2",
+      "kind": "source",
+      "project": "Causa.App",
+      "ownerByTopology": {
+        "A-role-lanes": "ui",
+        "B-single-lead": "ui"
+      }
+    },
+    {
+      "path": "src/Causa.App/Views/Workspace/Details.fs",
+      "owner": "ui-2",
+      "kind": "source",
+      "project": "Causa.App",
+      "ownerByTopology": {
+        "A-role-lanes": "ui",
+        "B-single-lead": "ui"
+      }
+    },
+    {
+      "path": "src/Causa.App/Views/SaveIndicator.fs",
+      "owner": "ui-2",
+      "kind": "source",
+      "project": "Causa.App",
+      "ownerByTopology": {
+        "A-role-lanes": "ui",
+        "B-single-lead": "ui"
+      }
+    },
+    {
+      "path": "src/Causa.App/Views/ConflictReview.fs",
       "owner": "ui-2",
       "kind": "source",
       "project": "Causa.App",
@@ -507,13 +610,102 @@
       }
     },
     {
-      "path": "src/Causa.App/Views/Administration.fs",
-      "owner": "ui-2",
+      "path": "src/Causa.App/Views/Workspace/Overview.fs",
+      "owner": "ui-3",
       "kind": "source",
       "project": "Causa.App",
       "ownerByTopology": {
         "A-role-lanes": "ui",
-        "B-single-lead": "ui"
+        "B-single-lead": "ui",
+        "C-role-lanes-two-ui": "ui"
+      }
+    },
+    {
+      "path": "src/Causa.App/Views/Workspace/Hypotheses.fs",
+      "owner": "ui-3",
+      "kind": "source",
+      "project": "Causa.App",
+      "ownerByTopology": {
+        "A-role-lanes": "ui",
+        "B-single-lead": "ui",
+        "C-role-lanes-two-ui": "ui"
+      }
+    },
+    {
+      "path": "src/Causa.App/Views/Workspace/Evidence.fs",
+      "owner": "ui-3",
+      "kind": "source",
+      "project": "Causa.App",
+      "ownerByTopology": {
+        "A-role-lanes": "ui",
+        "B-single-lead": "ui",
+        "C-role-lanes-two-ui": "ui"
+      }
+    },
+    {
+      "path": "src/Causa.App/Views/Workspace/Links.fs",
+      "owner": "ui-3",
+      "kind": "source",
+      "project": "Causa.App",
+      "ownerByTopology": {
+        "A-role-lanes": "ui",
+        "B-single-lead": "ui",
+        "C-role-lanes-two-ui": "ui"
+      }
+    },
+    {
+      "path": "src/Causa.App/Views/Workspace/Conclusions.fs",
+      "owner": "ui-3",
+      "kind": "source",
+      "project": "Causa.App",
+      "ownerByTopology": {
+        "A-role-lanes": "ui",
+        "B-single-lead": "ui",
+        "C-role-lanes-two-ui": "ui"
+      }
+    },
+    {
+      "path": "src/Causa.App/Views/Workspace/Timeline.fs",
+      "owner": "ui-3",
+      "kind": "source",
+      "project": "Causa.App",
+      "ownerByTopology": {
+        "A-role-lanes": "ui",
+        "B-single-lead": "ui",
+        "C-role-lanes-two-ui": "ui"
+      }
+    },
+    {
+      "path": "src/Causa.App/Views/Workspace/Inspector.fs",
+      "owner": "ui-3",
+      "kind": "source",
+      "project": "Causa.App",
+      "ownerByTopology": {
+        "A-role-lanes": "ui",
+        "B-single-lead": "ui",
+        "C-role-lanes-two-ui": "ui"
+      }
+    },
+    {
+      "path": "src/Causa.App/Views/Graph.fs",
+      "owner": "ui-3",
+      "kind": "source",
+      "project": "Causa.App",
+      "ownerByTopology": {
+        "A-role-lanes": "ui",
+        "B-single-lead": "ui",
+        "C-role-lanes-two-ui": "ui"
+      }
+    },
+    {
+      "path": "src/Causa.App/Views/Report.fs",
+      "owner": "ui-3",
+      "kind": "source",
+      "project": "Causa.App",
+      "ownerByTopology": {
+        "A-role-lanes": "ui",
+        "B-single-lead": "ui",
+        "C-role-lanes-two-ui": "ui"
       }
     },
     {
@@ -670,6 +862,387 @@
       "kind": "shared"
     },
     {
+      "path": "web/screens/investigation-list.html",
+      "owner": "ui",
+      "kind": "shared"
+    },
+    {
+      "path": "web/screens/investigation-list.css",
+      "owner": "ui",
+      "kind": "shared"
+    },
+    {
+      "path": "web/screens/administration.html",
+      "owner": "ui",
+      "kind": "shared"
+    },
+    {
+      "path": "web/screens/administration.css",
+      "owner": "ui",
+      "kind": "shared"
+    },
+    {
+      "path": "web/screens/settings.html",
+      "owner": "ui",
+      "kind": "shared"
+    },
+    {
+      "path": "web/screens/settings.css",
+      "owner": "ui",
+      "kind": "shared"
+    },
+    {
+      "path": "web/screens/not-found.html",
+      "owner": "ui",
+      "kind": "shared"
+    },
+    {
+      "path": "web/screens/not-found.css",
+      "owner": "ui",
+      "kind": "shared"
+    },
+    {
+      "path": "tests/Causa.App.Tests/Ui/ConnectionTests.fs",
+      "owner": "ui",
+      "kind": "shared"
+    },
+    {
+      "path": "tests/Causa.App.Tests/Ui/InvestigationListTests.fs",
+      "owner": "ui",
+      "kind": "shared"
+    },
+    {
+      "path": "tests/Causa.App.Tests/Ui/StatesTests.fs",
+      "owner": "ui",
+      "kind": "shared"
+    },
+    {
+      "path": "tests/Causa.App.Tests/Ui/AdministrationTests.fs",
+      "owner": "ui",
+      "kind": "shared"
+    },
+    {
+      "path": "tests/Causa.App.Tests/Ui/SettingsTests.fs",
+      "owner": "ui",
+      "kind": "shared"
+    },
+    {
+      "path": "tests/Causa.App.Tests/Ui/CrossViewConsistencyTests.fs",
+      "owner": "ui",
+      "kind": "shared"
+    },
+    {
+      "path": "web/screens/workspace-frame.html",
+      "owner": "ui-2",
+      "kind": "shared",
+      "ownerByTopology": {
+        "A-role-lanes": "ui",
+        "B-single-lead": "ui"
+      }
+    },
+    {
+      "path": "web/screens/workspace-frame.css",
+      "owner": "ui-2",
+      "kind": "shared",
+      "ownerByTopology": {
+        "A-role-lanes": "ui",
+        "B-single-lead": "ui"
+      }
+    },
+    {
+      "path": "web/screens/investigation-start.html",
+      "owner": "ui-2",
+      "kind": "shared",
+      "ownerByTopology": {
+        "A-role-lanes": "ui",
+        "B-single-lead": "ui"
+      }
+    },
+    {
+      "path": "web/screens/investigation-start.css",
+      "owner": "ui-2",
+      "kind": "shared",
+      "ownerByTopology": {
+        "A-role-lanes": "ui",
+        "B-single-lead": "ui"
+      }
+    },
+    {
+      "path": "web/screens/workspace-save.html",
+      "owner": "ui-2",
+      "kind": "shared",
+      "ownerByTopology": {
+        "A-role-lanes": "ui",
+        "B-single-lead": "ui"
+      }
+    },
+    {
+      "path": "web/screens/workspace-save.css",
+      "owner": "ui-2",
+      "kind": "shared",
+      "ownerByTopology": {
+        "A-role-lanes": "ui",
+        "B-single-lead": "ui"
+      }
+    },
+    {
+      "path": "web/screens/workspace-details.html",
+      "owner": "ui-2",
+      "kind": "shared",
+      "ownerByTopology": {
+        "A-role-lanes": "ui",
+        "B-single-lead": "ui"
+      }
+    },
+    {
+      "path": "web/screens/workspace-details.css",
+      "owner": "ui-2",
+      "kind": "shared",
+      "ownerByTopology": {
+        "A-role-lanes": "ui",
+        "B-single-lead": "ui"
+      }
+    },
+    {
+      "path": "tests/Causa.App.Tests/Ui/FrameTests.fs",
+      "owner": "ui-2",
+      "kind": "shared",
+      "ownerByTopology": {
+        "A-role-lanes": "ui",
+        "B-single-lead": "ui"
+      }
+    },
+    {
+      "path": "tests/Causa.App.Tests/Ui/StartTests.fs",
+      "owner": "ui-2",
+      "kind": "shared",
+      "ownerByTopology": {
+        "A-role-lanes": "ui",
+        "B-single-lead": "ui"
+      }
+    },
+    {
+      "path": "tests/Causa.App.Tests/Ui/DetailsTests.fs",
+      "owner": "ui-2",
+      "kind": "shared",
+      "ownerByTopology": {
+        "A-role-lanes": "ui",
+        "B-single-lead": "ui"
+      }
+    },
+    {
+      "path": "tests/Causa.App.Tests/Ui/SaveIndicatorTests.fs",
+      "owner": "ui-2",
+      "kind": "shared",
+      "ownerByTopology": {
+        "A-role-lanes": "ui",
+        "B-single-lead": "ui"
+      }
+    },
+    {
+      "path": "tests/Causa.App.Tests/Ui/ConflictReviewTests.fs",
+      "owner": "ui-2",
+      "kind": "shared",
+      "ownerByTopology": {
+        "A-role-lanes": "ui",
+        "B-single-lead": "ui"
+      }
+    },
+    {
+      "path": "tests/Causa.App.Tests/Ui/RoundTripTests.fs",
+      "owner": "ui-2",
+      "kind": "shared",
+      "ownerByTopology": {
+        "A-role-lanes": "ui",
+        "B-single-lead": "ui"
+      }
+    },
+    {
+      "path": "web/screens/workspace-overview.html",
+      "owner": "ui-3",
+      "kind": "shared",
+      "ownerByTopology": {
+        "A-role-lanes": "ui",
+        "B-single-lead": "ui",
+        "C-role-lanes-two-ui": "ui"
+      }
+    },
+    {
+      "path": "web/screens/workspace-overview.css",
+      "owner": "ui-3",
+      "kind": "shared",
+      "ownerByTopology": {
+        "A-role-lanes": "ui",
+        "B-single-lead": "ui",
+        "C-role-lanes-two-ui": "ui"
+      }
+    },
+    {
+      "path": "web/screens/workspace-hypotheses.html",
+      "owner": "ui-3",
+      "kind": "shared",
+      "ownerByTopology": {
+        "A-role-lanes": "ui",
+        "B-single-lead": "ui",
+        "C-role-lanes-two-ui": "ui"
+      }
+    },
+    {
+      "path": "web/screens/workspace-hypotheses.css",
+      "owner": "ui-3",
+      "kind": "shared",
+      "ownerByTopology": {
+        "A-role-lanes": "ui",
+        "B-single-lead": "ui",
+        "C-role-lanes-two-ui": "ui"
+      }
+    },
+    {
+      "path": "web/screens/workspace-evidence.html",
+      "owner": "ui-3",
+      "kind": "shared",
+      "ownerByTopology": {
+        "A-role-lanes": "ui",
+        "B-single-lead": "ui",
+        "C-role-lanes-two-ui": "ui"
+      }
+    },
+    {
+      "path": "web/screens/workspace-evidence.css",
+      "owner": "ui-3",
+      "kind": "shared",
+      "ownerByTopology": {
+        "A-role-lanes": "ui",
+        "B-single-lead": "ui",
+        "C-role-lanes-two-ui": "ui"
+      }
+    },
+    {
+      "path": "web/screens/workspace-causal-analysis.html",
+      "owner": "ui-3",
+      "kind": "shared",
+      "ownerByTopology": {
+        "A-role-lanes": "ui",
+        "B-single-lead": "ui",
+        "C-role-lanes-two-ui": "ui"
+      }
+    },
+    {
+      "path": "web/screens/workspace-causal-analysis.css",
+      "owner": "ui-3",
+      "kind": "shared",
+      "ownerByTopology": {
+        "A-role-lanes": "ui",
+        "B-single-lead": "ui",
+        "C-role-lanes-two-ui": "ui"
+      }
+    },
+    {
+      "path": "web/screens/workspace-timeline.html",
+      "owner": "ui-3",
+      "kind": "shared",
+      "ownerByTopology": {
+        "A-role-lanes": "ui",
+        "B-single-lead": "ui",
+        "C-role-lanes-two-ui": "ui"
+      }
+    },
+    {
+      "path": "web/screens/workspace-timeline.css",
+      "owner": "ui-3",
+      "kind": "shared",
+      "ownerByTopology": {
+        "A-role-lanes": "ui",
+        "B-single-lead": "ui",
+        "C-role-lanes-two-ui": "ui"
+      }
+    },
+    {
+      "path": "tests/Causa.App.Tests/Ui/OverviewTests.fs",
+      "owner": "ui-3",
+      "kind": "shared",
+      "ownerByTopology": {
+        "A-role-lanes": "ui",
+        "B-single-lead": "ui",
+        "C-role-lanes-two-ui": "ui"
+      }
+    },
+    {
+      "path": "tests/Causa.App.Tests/Ui/HypothesesTests.fs",
+      "owner": "ui-3",
+      "kind": "shared",
+      "ownerByTopology": {
+        "A-role-lanes": "ui",
+        "B-single-lead": "ui",
+        "C-role-lanes-two-ui": "ui"
+      }
+    },
+    {
+      "path": "tests/Causa.App.Tests/Ui/EvidenceTests.fs",
+      "owner": "ui-3",
+      "kind": "shared",
+      "ownerByTopology": {
+        "A-role-lanes": "ui",
+        "B-single-lead": "ui",
+        "C-role-lanes-two-ui": "ui"
+      }
+    },
+    {
+      "path": "tests/Causa.App.Tests/Ui/LinksTests.fs",
+      "owner": "ui-3",
+      "kind": "shared",
+      "ownerByTopology": {
+        "A-role-lanes": "ui",
+        "B-single-lead": "ui",
+        "C-role-lanes-two-ui": "ui"
+      }
+    },
+    {
+      "path": "tests/Causa.App.Tests/Ui/ConclusionsTests.fs",
+      "owner": "ui-3",
+      "kind": "shared",
+      "ownerByTopology": {
+        "A-role-lanes": "ui",
+        "B-single-lead": "ui",
+        "C-role-lanes-two-ui": "ui"
+      }
+    },
+    {
+      "path": "tests/Causa.App.Tests/Ui/TimelineTests.fs",
+      "owner": "ui-3",
+      "kind": "shared",
+      "ownerByTopology": {
+        "A-role-lanes": "ui",
+        "B-single-lead": "ui",
+        "C-role-lanes-two-ui": "ui"
+      }
+    },
+    {
+      "path": "tests/Causa.App.Tests/Ui/InspectorTests.fs",
+      "owner": "ui-3",
+      "kind": "shared",
+      "ownerByTopology": {
+        "A-role-lanes": "ui",
+        "B-single-lead": "ui",
+        "C-role-lanes-two-ui": "ui"
+      }
+    },
+    {
+      "path": "tests/Causa.App.Tests/Ui/GraphTests.fs",
+      "owner": "ui-3",
+      "kind": "shared",
+      "ownerByTopology": {
+        "A-role-lanes": "ui",
+        "B-single-lead": "ui",
+        "C-role-lanes-two-ui": "ui"
+      }
+    },
+    {
+      "path": "web/causa-theme.css",
+      "owner": "integration",
+      "kind": "shared"
+    },
+    {
       "path": "tests/Causa.TestSupport/Recordings.fs",
       "owner": "persistence",
       "kind": "test-helper",
@@ -690,6 +1263,51 @@
       "path": "tests/browser/support/layout-assertions.mjs",
       "owner": "integration",
       "kind": "test-helper"
+    },
+    {
+      "path": "tests/Causa.TestSupport/UiFixtures/CausaDataExtract.g.fs",
+      "owner": "integration",
+      "kind": "test-helper",
+      "project": "Causa.TestSupport"
+    },
+    {
+      "path": "tests/Causa.TestSupport/UiFixtures/Scenarios.fs",
+      "owner": "integration",
+      "kind": "test-helper",
+      "project": "Causa.TestSupport"
+    },
+    {
+      "path": "tests/Causa.TestSupport/UiFixtures/FixtureBackend.fs",
+      "owner": "integration",
+      "kind": "test-helper",
+      "project": "Causa.TestSupport"
+    },
+    {
+      "path": "tests/Causa.TestSupport/UiFixtures/Scenarios.ui.fs",
+      "owner": "ui",
+      "kind": "test-helper",
+      "project": "Causa.TestSupport"
+    },
+    {
+      "path": "tests/Causa.TestSupport/UiFixtures/Scenarios.ui-2.fs",
+      "owner": "ui-2",
+      "kind": "test-helper",
+      "project": "Causa.TestSupport",
+      "ownerByTopology": {
+        "A-role-lanes": "ui",
+        "B-single-lead": "ui"
+      }
+    },
+    {
+      "path": "tests/Causa.TestSupport/UiFixtures/Scenarios.ui-3.fs",
+      "owner": "ui-3",
+      "kind": "test-helper",
+      "project": "Causa.TestSupport",
+      "ownerByTopology": {
+        "A-role-lanes": "ui",
+        "B-single-lead": "ui",
+        "C-role-lanes-two-ui": "ui"
+      }
     },
     {
       "path": "tests/Causa.Acceptance/Deterministic/AR014Tests.fs",
@@ -1775,7 +2393,7 @@
     },
     {
       "path": "tests/Causa.Contract.Tests/App/Producer.fs",
-      "owner": "ui",
+      "owner": "integration",
       "kind": "test",
       "project": "Causa.Contract.Tests",
       "tests": [
@@ -1875,9 +2493,14 @@
     },
     {
       "path": "tests/Causa.Contract.Tests/Report/Producer.fs",
-      "owner": "ui",
+      "owner": "ui-3",
       "kind": "test",
       "project": "Causa.Contract.Tests",
+      "ownerByTopology": {
+        "A-role-lanes": "ui",
+        "B-single-lead": "ui",
+        "C-role-lanes-two-ui": "ui"
+      },
       "tests": [
         "dotnet:Causa.Contract.Tests.Report.Producer.UnverifiedNeverConfirmed"
       ],
@@ -1963,11 +2586,16 @@
     },
     {
       "path": "tests/Causa.Contract.Tests/View/Producer.fs",
-      "owner": "ui",
+      "owner": "integration",
       "kind": "test",
       "project": "Causa.Contract.Tests",
       "tests": [
-        "dotnet:Causa.Contract.Tests.View.Producer.IndicatorTextMatchesPersist031"
+        "dotnet:Causa.Contract.Tests.View.Producer.CredentialNeverInBindings",
+        "dotnet:Causa.Contract.Tests.View.Producer.IndicatorTextMatchesPersist031",
+        "dotnet:Causa.Contract.Tests.View.Producer.RoutesRoundTripAndResolveOnlyListedAddresses",
+        "dotnet:Causa.Contract.Tests.View.Producer.SevenSaveStatesWithPersist031Words",
+        "dotnet:Causa.Contract.Tests.View.Producer.UiContractSurfaceOnlyAllowlistedFrozenTypes",
+        "dotnet:Causa.Contract.Tests.View.Producer.ValidationRulesEqualTheCatalog"
       ],
       "requirements": []
     },
@@ -3404,6 +4032,20 @@
       },
       "tests": [
         "playwright:contract/view-ui-2.spec.js > renders the projection [chromium]"
+      ],
+      "requirements": []
+    },
+    {
+      "path": "tests/browser/contract/view-ui-3.spec.js",
+      "owner": "ui-3",
+      "kind": "test",
+      "ownerByTopology": {
+        "A-role-lanes": "ui",
+        "B-single-lead": "ui",
+        "C-role-lanes-two-ui": "ui"
+      },
+      "tests": [
+        "playwright:contract/view-ui-3.spec.js > renders the projection [chromium]"
       ],
       "requirements": []
     },

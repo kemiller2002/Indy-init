@@ -91,7 +91,46 @@ let pinned (kind: string) = items kind pins |> List.tryHead |> Option.map (str "
 let ownT, ownA = items "transitions" next |> List.filter mineT, items "accepted" next |> List.filter mineA
 let matches (own: JsonElement list) (pin: string) = match own with [ e ] -> digest e = pin | _ -> false
 
+// The contract and project-structure pins of every v4.1.5 request (ODR-V415-01, ODR-V415-IF-VIEW): each pinned file's
+// actual sha256 and its amendment contractChanges sha256 must equal the pin, and every changed contract must be pinned by
+// some request, so a contract cannot change after the owner selected it (independent review F1 on #137).
+let package = "requirements-compiled/v4.1.5"
+let fileSha (path: string) =
+    let full = Path.Combine(root, package, path)
+    if File.Exists full then (File.ReadAllBytes full |> SHA256.HashData |> Convert.ToHexString).ToLowerInvariant() else "<missing>"
+
+let contractRequests =
+    items "requests" (load (package + "/proposals/owner-decision-requests.json"))
+    |> List.filter (fun r -> str "id" r = "ODR-V415-01" || str "id" r = "ODR-V415-IF-VIEW")
+
+let appliesA (r: JsonElement) = r.GetProperty("applies").GetProperty("A")
+let contractPins =
+    contractRequests
+    |> List.collect (fun r ->
+        match (appliesA r).TryGetProperty "contracts" with
+        | true, cs -> cs.EnumerateArray() |> Seq.map (fun c -> str "id" r, str "file" c, str "sha256" c) |> List.ofSeq
+        | _ -> [])
+
+let declared =
+    items "contractChanges" (load (package + "/analysis/amendment.json")) |> List.map (fun c -> str "file" c, str "sha256" c)
+
+let pinProblems =
+    [ for (request, file, pin) in contractPins do
+          if fileSha file <> pin then sprintf "%s pins %s at %s, but the file's sha256 is %s" request file pin (fileSha file)
+          match declared |> List.tryFind (fst >> (=) file) with
+          | Some(_, sha) when sha = pin -> ()
+          | Some(_, sha) -> sprintf "%s pins %s at %s, but contractChanges declares %s" request file pin sha
+          | None -> sprintf "%s pins %s, which contractChanges does not declare" request file
+      for (file, _) in declared do
+          if not (contractPins |> List.exists (fun (_, f, _) -> f = file)) then sprintf "contractChanges declares %s, which no request pins" file
+      for r in contractRequests do
+          match (appliesA r).TryGetProperty "projectStructure" with
+          | true, ps when fileSha (str "file" ps) <> str "sha256" ps ->
+              sprintf "%s pins %s at %s, but the file's sha256 is %s" (str "id" r) (str "file" ps) (str "sha256" ps) (fileSha (str "file" ps))
+          | _ -> () ]
+
 let problems =
+    pinProblems @
     [ if not (sameList (items "transitions" next |> List.filter (mineT >> not)) (items "transitions" old)) then "a carried transition differs from v4.1.4"
       if not (sameList (items "accepted" next |> List.filter (mineA >> not)) (items "accepted" old)) then "a carried accepted entry differs from v4.1.4"
       let o, n = others old, others next
@@ -99,5 +138,5 @@ let problems =
       if not (matches ownT (pinned "transitions")) then "T-L03 differs from the content ODR-V415-01 pins"
       if not (matches ownA (pinned "accepted")) then "the SM-SAVE accepted note differs from the content ODR-V415-01 pins" ]
 
-printfn "%s" (if problems.IsEmpty then "carried amendments unchanged; T-L03 and the SM-SAVE note match their pinned digests" else String.Join("\n", problems))
+printfn "%s" (if problems.IsEmpty then "carried amendments unchanged; T-L03 and the SM-SAVE note match their pinned digests; every changed contract matches its request pin" else String.Join("\n", problems))
 exit (if problems.IsEmpty then 0 else 1)

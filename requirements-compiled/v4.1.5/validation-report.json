@@ -109,7 +109,8 @@
         "the change of contracts/00-DOMAIN-STUBS.fs names no operator approval",
         "the change of contracts/02-IF41-STORAGE.fs names no operator approval",
         "the change of contracts/05-IF41-SAVE.fs names no operator approval",
-        "the change of contracts/06-IF41-APP.fs names no operator approval"
+        "the change of contracts/06-IF41-APP.fs names no operator approval",
+        "the change of contracts/07-IF41-VIEW.fs names no operator approval"
       ]
     },
     {
