@@ -725,7 +725,10 @@ let suitePreflight () =
     let suites = sourceSuites |> List.filter (fun s -> str s "runner" = "dotnet-test" || str s "runner" = "playwright")
     let probe (s: JsonNode) =
         let id, command, runner = str s "id", str s "command", str s "runner"
-        let listed = if runner = "dotnet-test" then $"{command} --list-tests" else $"{command} --list --pass-with-no-tests"
+        // -m:1 lists the solution's test projects one after another. In parallel their output interleaves, and two
+        // processes writing at once can join a test name to another line, so a listing could lose a name and the
+        // count would vary run to run (PR #116's release-gate-repair: 3 of 4 tests on one run, 4 on the other).
+        let listed = if runner = "dotnet-test" then $"{command} --list-tests -m:1" else $"{command} --list --pass-with-no-tests"
         let code, output = run "sh" [ "-c"; listed ] root
         let count = listedTests runner output
         let cause =
