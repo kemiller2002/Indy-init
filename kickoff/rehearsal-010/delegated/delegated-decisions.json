@@ -45,11 +45,27 @@
         "session": "session_01G1iECgS2MYoyqvc2eXNdhV",
         "role": "lead/integration"
       },
-      "decidedAt": "2026-11-05T19:35:00Z",
+      "decidedAt": "2026-11-05T19:27:00Z",
       "paths": [
         "requirements-compiled/v4.1.5/"
       ],
       "evidence": "https://github.com/kemiller2002/Indy-init/pull/135"
+    },
+    {
+      "id": "DTD-R10-004",
+      "class": "technical-interface",
+      "decision": "Competition UI roles: keep the v4.1.x role names ui and ui-2 and add ui-3; assign UI-1 (shell), UI-2 (workspace) and UI-3 (hypotheses/evidence) areas by file ownership in project-structure, not by renaming roles to ui-a/ui-b/ui-c. No requirements-compiler change.",
+      "rationale": "Renaming roles fails X01 for 65 test files and X18, and changes the AGENT-RULES digest unless the compiler changes (V41Package.fs hard-codes ui; laneOverrides name ui-2). File-level ownership gives the same exclusivity with no compiler change on the critical path.",
+      "actingAgent": {
+        "kind": "agent",
+        "session": "session_01G1iECgS2MYoyqvc2eXNdhV",
+        "role": "lead/integration"
+      },
+      "decidedAt": "2026-11-05T19:30:00Z",
+      "paths": [
+        "proposals/r10-contract-first-ui/v415-fold/project-structure.delta.json"
+      ],
+      "evidence": "PR #135 (v4.1.5 session report of the X01/X18 failure); PR #134 (COMPETITION-UI-OWNERSHIP)"
     }
   ]
 }
