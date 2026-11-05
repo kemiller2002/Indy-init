@@ -17,6 +17,10 @@ let private screensAssembly = typeof<Causa.Ui.Prototype.Events.Marker>.Assembly
 let ``the prototype screens reference only the UI contracts (no domain, persistence, fixture or adapter assembly)`` () =
     let refs = screensAssembly.GetReferencedAssemblies() |> Array.map (fun a -> a.Name |> string) |> Array.filter (fun n -> not (n.StartsWith "System" || n = "netstandard" || n = "FSharp.Core"))
     Assert.Equal<string[]>([| "Causa.Ui.Contracts" |], refs)
+    // An unused ProjectReference is not emitted into the assembly, so the project file is checked as well.
+    let project = IO.File.ReadAllText(IO.Path.Combine(Causa.Ui.Tests.Support.repoRoot, "proposals/r10-contract-first-ui/prototype/screens/Causa.Ui.Prototype.Screens.fsproj"))
+    let references = Text.RegularExpressions.Regex.Matches(project, "<(ProjectReference|PackageReference|Reference) Include=\"([^\"]+)\"") |> Seq.map (fun m -> m.Groups.[2].Value) |> List.ofSeq
+    Assert.Equal<string list>([ "../../contracts/Causa.Ui.Contracts.fsproj" ], references)
 
 /// The frozen v4.1.4 types a presentation contract may expose. Anything else from Causa.Domain/Persistence/App in the
 /// contracts' public surface is a coupling to domain or persistence internals and fails this test.

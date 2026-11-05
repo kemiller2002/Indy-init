@@ -1,0 +1,9 @@
+# Layer B evidence: Playwright 1.63.0 chromium, Limen 0.9.1, Forma 0.12.0, axe-core 4.14.0, fixture backend (2026-11-05T11:50:08Z). Not a journey run; no request reaches GitHub.
+  ✓  1 [chromium] › render.spec.mjs:37:1 › connected catalog: J1-01/J1-02 locators find the screen; four stored cases listed; unknown is not zero (1.0s)
+  ✓  2 [chromium] › render.spec.mjs:55:1 › validation: an empty Connect is refused with field messages and nothing is listed (276ms)
+  ✓  3 [chromium] › render.spec.mjs:62:1 › empty catalog is shown as empty, not as an error (292ms)
+  ✓  4 [chromium] › render.spec.mjs:69:1 › unauthorized repository: what happened, what is kept, next step; no fake retry (310ms)
+  ✓  5 [chromium] › render.spec.mjs:79:1 › network failure offers a real retry (304ms)
+  ✓  6 [chromium] › render.spec.mjs:86:1 › loading describes the task, not a progress figure (301ms)
+  ✓  7 [chromium] › render.spec.mjs:92:1 › 390 px: no horizontal overflow; primary navigation reachable by keyboard (330ms)
+  7 passed (11.8s)

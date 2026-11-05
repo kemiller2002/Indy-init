@@ -1,0 +1,13 @@
+# Mutation controls for the Layer A tests (2026-11-05). Each mutant was applied to a clean tree, the test project was
+# run, and the tree was restored with git checkout. A control passes when the mutant is KILLED (the suite fails).
+M1  drop catalog entry INV-027 from SCREEN-MANIFEST.json            killed (2 tests fail)
+M2  Title maxLength 200 -> 201 in InvestigationEditor.fs           killed (1)
+M3  expose Causa.Domain.Investigation from the contracts            killed (1: allowlist)
+M4  screens project references the fixtures project (unused)        SURVIVED at first: an unused ProjectReference is
+                                                                    not emitted into assembly metadata. Fixed: the test
+                                                                    now also reads the project file. Re-run: killed (1)
+M4b screens use a fixture type                                      killed (1)
+M5  "Saved" -> "Saved!" (save-state words)                          killed (1)
+M6  a binding key naming the token                                  killed (1)
+M7  one UI file owned by two roles                                  killed (1)
+M8  fixture backend reports IntegratedBackend                       killed (1)
