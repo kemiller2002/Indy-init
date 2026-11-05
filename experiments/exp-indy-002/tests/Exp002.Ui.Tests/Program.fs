@@ -122,6 +122,16 @@ let tests: (string * (unit -> Outcome)) list =
                 check (scalar "saveStateTone" v = Some "ok") "tone"
                 check (indexWrite |> Option.exists (fun (_, _, text) -> decodeIndex text |> List.exists (fun e -> e.Title = "Pump trip"))) "index not written" ]
 
+      "UI-INV-016 the lozenge never shows Saved before the read-back (CR-3)",
+      fun () ->
+          let m1, _ = run init [ Init "#/investigations/new" ]
+          let m2, effects = run m1 [ Ui(SetField("INV-001", "p")); Ui SubmitStart ]
+          let (c, _, _) = storageSets effects |> List.head
+          let m3, _ = run m2 [ StorageResult(c, StorageValue None) ]
+          all [ check (m2.Workspace.Value.Save = Saving) "not Saving while the write is in flight"
+                check (m3.Workspace.Value.Save = Saving) (sprintf "after write, before read-back: %A" m3.Workspace.Value.Save)
+                check (scalar "saveStateText" (project m3) = Some "Saving…") "lozenge text" ]
+
       "UI-INV-015 a read-back mismatch is not reported as Saved",
       fun () ->
           let m, _ = started ()

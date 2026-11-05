@@ -250,12 +250,13 @@ let private onStorage (ports: EnginePorts) (now: Timestamp) (m0: Model) (corr: s
         | Write(id, _, _), _ when not (wsIs id) -> m, []
         | ReadBack(id, _, _), _ when not (wsIs id) -> m, []
         | Write(id, encoded, version), StorageValue _ ->
-            let m1, e = request m (ReadBack(id, encoded, version)) (fun c -> StorageGet(c, investigationKey id))
+            // CR-3: the write is confirmed (state stays Saving); Saved is entered only after the read-back matches.
+            let m1, e = request (withSave ports m [ WriteConfirmed(version, now) ]) (ReadBack(id, encoded, version)) (fun c -> StorageGet(c, investigationKey id))
             m1, [ e ]
         | Write(_, _, _), StorageFailed r ->
             { withSave ports m [ WriteRejected(StorageUnavailable r) ] with Alert = Some(describePersistenceError (StorageUnavailable r)) }, []
         | ReadBack(id, encoded, version), StorageValue(Some back) when back = encoded ->
-            let m1 = withSave ports m [ WriteConfirmed(version, now); ReadBackMatched ]
+            let m1 = withSave ports m [ ReadBackMatched(version, now) ]
             let title = m1.Workspace |> Option.map (fun ws -> displayTitle ws.Investigation.Details) |> Option.defaultValue id
             let index = (m1.Index |> List.filter (fun e -> e.Id <> id)) @ [ { Id = id; Title = title } ]
             let m2 = { m1 with Workspace = m1.Workspace |> Option.map (fun ws -> { ws with Version = version }); Index = index }

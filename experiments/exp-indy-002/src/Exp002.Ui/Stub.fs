@@ -110,9 +110,9 @@ let private saveTransition (state: SaveState) (e: SaveEvent) =
     match e with
     | Edited -> Unsaved
     | SaveRequested -> Saving
-    | WriteConfirmed(v, at) -> Saved(v, at)
-    | ReadBackMatched -> state
-    | ReadBackMismatched -> UnknownOutcome
+    | WriteConfirmed _ -> state
+    | ReadBackMatched(v, at) -> Saved(v, at)
+    | ReadBackMismatched -> SaveFailed "read-back did not match"
     | WriteRejected(VersionConflict(_, actual)) -> Conflict actual
     | WriteRejected e -> SaveFailed(sprintf "%A" e)
     | WriteOutcomeUnknown -> UnknownOutcome
