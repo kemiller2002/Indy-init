@@ -1,0 +1,6 @@
+# The repository's offline suite (AGENTS.md: dotnet run --project tools/requirements-compiler/tests -- --offline --source .)
+# 2026-11-05, .NET SDK 10.0.402, full (unshallowed) history.
+origin/main dbcad12 (worktree):                exit 0
+claude/r10-contract-first-ui-41y991 (HEAD):    exit 0   (includes the F#-only tooling check over tracked files)
+# On the initial shallow clone the same command failed 4 checks: three say "the history is shallow" and W16 depends
+# on history as well. All 4 pass with full history, on main and on this branch alike, so the proposal does not cause them.
