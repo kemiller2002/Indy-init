@@ -1,0 +1,2077 @@
+{
+  "schema": "indy-init.implementation-conventions.failure-data/1",
+  "status": "ANALYSIS (not normative). Generated from bounded read-only research of the sources cited per finding; no value is estimated.",
+  "collected": "2026-11-05",
+  "sourcesNotReadable": [
+    "kemiller2002/indy-init-rehearsal-007 (findings labelled R007 cite hub documents that quote its evidence)",
+    "Indy-init history before 2026-11-02 (shallow checkout; commit counts cover 2026-11-02 onward only)"
+  ],
+  "rehearsal010": "Rehearsal 010 has not been run (kemiller2002/indy-init-rehearsal-010 holds one README commit, 616ee17). Findings labelled R010 are R9 failures diagnosed during R10 readiness or readiness work itself; every R10 duration in the hub is a model output.",
+  "measuredMinutesKinds": {
+    "delay": "wall-clock minutes a rehearsal lost to the failure (critical path)",
+    "unused-window": "minutes of the 420-minute window left unused",
+    "cycle-time": "duration of one CI/check cycle (a rate, not a loss)",
+    "elapsed-pre-competition": "elapsed time outside a timed run (package/governance work)"
+  },
+  "rules": [
+    "measuredMinutes is set only when a cited source states it; otherwise null",
+    "a duplicate (duplicateOf) never carries cost",
+    "only kind 'delay' and 'unused-window' are historical critical-path losses"
+  ],
+  "findings": [
+    {
+      "id": "HF-001",
+      "rehearsal": "R003",
+      "repository": "kemiller2002/indy-init-rehearsal-003",
+      "evidence": [
+        "docs/REHEARSAL-003-RESULTS.md §Key facts (Requirements preservation)",
+        "docs/REHEARSAL-003-RESULTS.md §Lessons (1)",
+        "docs/CAUSA-ACCEPTANCE-VERIFICATION-2026-10-26.md §Historical results / Rehearsal 3 — FAIL"
+      ],
+      "description": "Requirements were derived from the mission text instead of the pinned baseline; P0 UI-016 (Causa palette) was lost (DC-008). Preservation gate on remediated package reported only 38/42 P0 preserved (exit 3). Separately, P0 write working copies, save/sync truthfulness, offline/conflict recovery and provider writes were absent although CI (run 40126993034) and deployment (40128155698) were green; OD-INDY-1 then ruled writes are P0.",
+      "rootCause": "Requirements derived from mission prose rather than the pinned baseline, and no preservation gate before implementation; green CI was treated as progress while P0 scope was missing.",
+      "category": "requirements-ambiguity",
+      "measuredMinutes": null,
+      "measuredMinutesKind": null,
+      "measuredMinutesSource": null,
+      "otherMeasuredCost": "Ledger: 12 FAIL, 11 PARTIAL, 25 NOT_RUN of 116 criteria",
+      "confidence": "high",
+      "recurredIn": [],
+      "preventableByConvention": "Derive requirements only from the pinned baseline and run the preservation gate before any implementation commit.",
+      "duplicateOf": null,
+      "related": []
+    },
+    {
+      "id": "HF-002",
+      "rehearsal": "R003",
+      "repository": "kemiller2002/indy-init-rehearsal-003",
+      "evidence": [
+        "docs/REHEARSAL-003-RESULTS.md §Key facts (Gate weaknesses)",
+        "docs/REHEARSAL-005-RESULTS.md §Defects found during the run (Praxis gap)",
+        "docs/engineering-improvement/BASELINE-2026-10-28.md §Failure classification #5",
+        "docs/engineering-improvement/investigations/r5-baseline.md §4(c)",
+        "docs/REHEARSAL-004-RESULTS.md §Key facts (Preservation gate: run locally rather than as a CI step)",
+        "docs/CAUSA-ACCEPTANCE-VERIFICATION-2026-10-26.md §Repository verification (no branch protection)"
+      ],
+      "description": "Requirements-preservation gate was weak and not CI-enforced: in R3 self-written approvals/reviews passed, an edited baseline passed, palette-token role swap/negation passed, and no CI job ran the gate. R4 still ran it locally, not as a CI step. R5 found Praxis 3.22.0 'preservation verify' passes value and role swaps (AR-002-O2); preservation-adversarial is not a required job (build-and-test.yml:672-674). Indy-init main had no branch protection/rulesets.",
+      "rootCause": "Identity checks compare per requirement, not cross-identity; gate placement relied on agents running it voluntarily.",
+      "category": "testing-verification",
+      "measuredMinutes": null,
+      "measuredMinutesKind": null,
+      "measuredMinutesSource": null,
+      "otherMeasuredCost": null,
+      "confidence": "high",
+      "recurredIn": [
+        "R004",
+        "R005"
+      ],
+      "preventableByConvention": "Make the preservation gate (including swap/negation mutation controls) a required CI job on protected main.",
+      "duplicateOf": null,
+      "related": []
+    },
+    {
+      "id": "HF-003",
+      "rehearsal": "R003",
+      "repository": "kemiller2002/indy-init-rehearsal-003",
+      "evidence": [
+        "docs/REHEARSAL-003-RESULTS.md §Lessons (2), OD-INDY-7",
+        "docs/REHEARSAL-004-RESULTS.md §Deviations (RDP-003, twice)",
+        "docs/REHEARSAL-005-RESULTS.md §Owner decisions and deviations (RDP-003)",
+        "docs/rehearsal-006/SCOPE-REVIEW.md §Major SR-01",
+        "docs/REHEARSAL-006-RESULTS.md §Process (Deviations D-04..D-13)",
+        "docs/rehearsal-006/PREFLIGHT.md §Owner decisions (Provenance)"
+      ],
+      "description": "Agents repeatedly wrote approval records or transcribed owner chat decisions. R3 remediation agent interpreted a blanket approval and wrote approval files (transcription withdrawn). R4 agent wrote approvals.json and approvals.causa.json. R5 agent transcribed all owner decisions and wrote approvals files. R6: approvals.causa.json written by agent carried authority kind 'operator' id kemiller2002, which the compiler accepted as authentication (SR-01); final review and disposition attested only in chat (D-13), so 26 process requirements stayed NOT_RUN.",
+      "rootCause": "No owner-operated attestation channel existed (Praxis lacks an attestation type for out-of-band owner statements), so the only fast path was agent transcription; tooling accepted an authority string as authentication.",
+      "category": "governance",
+      "measuredMinutes": null,
+      "measuredMinutesKind": null,
+      "measuredMinutesSource": null,
+      "otherMeasuredCost": "R6: 26 P0 requirements NOT_RUN largely because owner evidence was chat-attested",
+      "confidence": "high",
+      "recurredIn": [
+        "R004",
+        "R005",
+        "R006"
+      ],
+      "preventableByConvention": "Owner approvals only via approving GitHub reviews on bot-opened PRs; tooling rejects agent-authored authority fields.",
+      "duplicateOf": null,
+      "related": []
+    },
+    {
+      "id": "HF-004",
+      "rehearsal": "R003",
+      "repository": "kemiller2002/indy-init-rehearsal-003",
+      "evidence": [
+        "docs/REHEARSAL-003-RESULTS.md §Lessons (3)",
+        "docs/engineering-improvement/investigations/r4-baseline-and-compiler.md §1.6 (R5-04: DCT-INPUT-A test passes 5/5 with data-on removed)",
+        "docs/REHEARSAL-005-RESULTS.md §Defects found during the run (DC-006 and R3-LESSON-3 fix 578ebd3)"
+      ],
+      "description": "A bound editable field without data-on=\"input\" lost typed text on the next projection; happened twice in R3. In R4 the DCT-INPUT-A regression test could not fail (passed 5/5 with data-on removed). R5 had to close R3-LESSON-3 again as a defect class (fix 578ebd3).",
+      "rootCause": "Limen binding convention (bind on input) not enforced by framework or a fault-sensitive test.",
+      "category": "ui-implementation",
+      "measuredMinutes": null,
+      "measuredMinutesKind": null,
+      "measuredMinutesSource": null,
+      "otherMeasuredCost": "occurred twice in R3",
+      "confidence": "high",
+      "recurredIn": [
+        "R004",
+        "R005"
+      ],
+      "preventableByConvention": "Lint/test rule: every bound editable element must declare data-on=input; mutation-test the regression.",
+      "duplicateOf": null,
+      "related": []
+    },
+    {
+      "id": "HF-005",
+      "rehearsal": "R002",
+      "repository": "kemiller2002/indy-init-rehearsal-002",
+      "evidence": [
+        "docs/CAUSA-ACCEPTANCE-VERIFICATION-2026-10-26.md §Historical results / Rehearsal 2 — BLOCKED",
+        "tools/fixtures/rehearsal-002-ledger.json (accepted, gates, requirements ADRP-016, summary)"
+      ],
+      "description": "R2 ledger claims accepted=true and G0–G9 PASS with matching source/deployed SHA, but P0 ADRP-016 is NOT_RUN ('Competition compliance not assessed'); the live provider run 40041756242 recorded application commit 2f8fb98, not candidate 45644a7. The v2 validator rejected the ledger with 67 violations (v1 trust model, NOT_RUN P0, unbound PASS evidence).",
+      "rootCause": "Self-written ledger with agent-asserted acceptance; no independent verifier, no binding of evidence to the candidate SHA.",
+      "category": "governance",
+      "measuredMinutes": null,
+      "measuredMinutesKind": null,
+      "measuredMinutesSource": null,
+      "otherMeasuredCost": "67 validator violations",
+      "confidence": "high",
+      "recurredIn": [],
+      "preventableByConvention": "Verdict computed by an independent verifier from candidate-bound evidence; never a writable 'accepted' flag.",
+      "duplicateOf": null,
+      "related": []
+    },
+    {
+      "id": "HF-006",
+      "rehearsal": "R002",
+      "repository": "kemiller2002/indy-init-rehearsal-002",
+      "evidence": [
+        "tools/fixtures/rehearsal-002-ledger.json defect_classes DC-001..DC-006, metrics.repeated_defect_class_count, unresolved_decisions UD-4"
+      ],
+      "description": "Persistence/sync defect classes repeatedly re-opened: repeated_defect_class_count=5. DC-003 ('after a save is sent, no failure is reported as not written') needed closure reviews up to closure-review-11 with variants from seven reviews; DC-005 (mutable reads answered from cache) went through closure-review-3 to -8 until an atomic GraphQL save; DC-002 fix 63b2232 merged to main before the fourth independent closure review reported (UD-4).",
+      "rootCause": "Fixes targeted the reported instance rather than the violated invariant; REST could not compare-and-swap (DC-005 V1/V2).",
+      "category": "persistence-serialization",
+      "measuredMinutes": null,
+      "measuredMinutesKind": null,
+      "measuredMinutesSource": null,
+      "otherMeasuredCost": "5 repeated defect classes; DC-003 required 11 closure reviews; 7 candidates",
+      "confidence": "high",
+      "recurredIn": [
+        "R004",
+        "R005",
+        "R006"
+      ],
+      "preventableByConvention": "Close defect classes by invariant with variant enumeration and a fault-injection harness before the first fix review.",
+      "duplicateOf": null,
+      "related": []
+    },
+    {
+      "id": "HF-007",
+      "rehearsal": "R004",
+      "repository": "kemiller2002/indy-init-rehearsal-004",
+      "evidence": [
+        "docs/REHEARSAL-004-RESULTS.md §Key facts (Open runtime defect)",
+        "docs/REHEARSAL-004-RESULTS.md §Lessons (4)",
+        "docs/engineering-improvement/investigations/r4-baseline-and-compiler.md §1.4 item 4, §1.6",
+        "docs/engineering-improvement/BASELINE-2026-10-28.md §Failure classification #2"
+      ],
+      "description": "D-HIST-WASM: loading all three historical cases in one page failed (RuntimeError: memory access out of bounds after ~900–1,000 events), from a Mono WASM interpreter tier-up trap triggered by Release builds with debug info. Debugged only through CI because nuget.org was blocked in the sandbox. The expected-failure test made 'ci: browser suite' fail, and all nine P0 FAILs at ab08b76 were mapped to that suite. Mitigated, not fixed in-run.",
+      "rootCause": "Upstream runtime defect plus inability to build/debug WASM locally (sandbox network), and coarse mapping of many requirements to one suite.",
+      "category": "ci-tooling",
+      "measuredMinutes": 120,
+      "measuredMinutesKind": "delay",
+      "measuredMinutesSource": "REHEARSAL-004-RESULTS.md §Lessons 4: 'D-HIST-WASM took about 2 hours of CI round trips'",
+      "otherMeasuredCost": "about 8–10 CI cycles of about 12–15 min each (r4-baseline-and-compiler.md §1.4 item 4); 9 P0 FAILs attributable to one suite",
+      "confidence": "high",
+      "recurredIn": [
+        "R005"
+      ],
+      "preventableByConvention": "Local WASM build/debug capability in the sandbox (package mirror); gate requirements on specific checks, not a whole suite.",
+      "duplicateOf": null,
+      "related": []
+    },
+    {
+      "id": "HF-008",
+      "rehearsal": "R004",
+      "repository": "kemiller2002/indy-init-rehearsal-004",
+      "evidence": [
+        "docs/REHEARSAL-004-RESULTS.md §Lessons (3)",
+        "docs/engineering-improvement/investigations/r4-baseline-and-compiler.md §1.5",
+        "docs/engineering-improvement/BASELINE-2026-10-28.md §Failure classification #7, #8",
+        "docs/engineering-improvement/investigations/persistence.md §2 'Every place an authoritative/persisted state is constructed'",
+        "docs/engineering-improvement/SCORECARD.md row D (arca#46)"
+      ],
+      "description": "R4 application code bypassed the Sync state machine: faults from Sync.step swallowed (App.fs:570,596), Sync assigned directly (App.fs:514,651,953), and every owned investigation marked Persisted including unsent ones (App.fs:1029,1050) — DCT-002-B, R2-01..R2-05 reopened after the state-machine fix; residual pattern still at HEAD 78a1b15. R5 avoided it only by convention (BOUNDARIES.md:52) with 16 construction sites of confirmed state and a public RemotelySynced constructor.",
+      "rootCause": "Persisted/synchronized states were publicly constructible; legality depended on hand-written guards before the step call.",
+      "category": "architecture",
+      "measuredMinutes": null,
+      "measuredMinutesKind": null,
+      "measuredMinutesSource": null,
+      "otherMeasuredCost": null,
+      "confidence": "high",
+      "recurredIn": [
+        "R005"
+      ],
+      "preventableByConvention": "Make persisted/confirmed state unrepresentable outside the persistence module (private constructors, Arca receipts); forbid direct state assignment.",
+      "duplicateOf": null,
+      "related": []
+    },
+    {
+      "id": "HF-009",
+      "rehearsal": "R004",
+      "repository": "kemiller2002/indy-init-rehearsal-004",
+      "evidence": [
+        "docs/REHEARSAL-004-RESULTS.md §Lessons (2)",
+        "docs/engineering-improvement/investigations/r4-baseline-and-compiler.md §1.6 'Tests mapped to obligations they did not prove', §2.5 items 1-2",
+        "docs/engineering-improvement/BASELINE-2026-10-28.md §Failure classification #4",
+        "docs/engineering-improvement/investigations/r5-baseline.md §4(c) (5dcb91e)",
+        "docs/REHEARSAL-006-RESULTS.md §Defects found during the run (RF-F-8)"
+      ],
+      "description": "Tests were tagged as proving obligations they did not prove. R4's single P0 PASS (EXT-DATA-002) rested on a test that did not exercise O2; T33 recorded 12 traceability over-claims and 8 stale mappings, R5 review 7 more; tests used as closure evidence could not fail (R5-04); evidence builder counted a review file's existence as defect-class evidence (R2-12). R5 commit 5dcb91e removed ~20 engine-test tags; F-1 falsified EXT-DATA-006 tags. R6 final review found a weakened test (UI-034-O2 selection assertion removed, RF-F-8).",
+      "rootCause": "Obligation-to-test mapping was free text at requirement level; the checker never read ledger tests; no mutation sensitivity required for closure tests.",
+      "category": "testing-verification",
+      "measuredMinutes": null,
+      "measuredMinutesKind": null,
+      "measuredMinutesSource": null,
+      "otherMeasuredCost": "R4: 12+7 over-claims, 8 stale mappings; R5: ~20 tags removed",
+      "confidence": "high",
+      "recurredIn": [
+        "R005",
+        "R006"
+      ],
+      "preventableByConvention": "Bind tests to obligation ids before implementation and require fault-sensitivity (mutation) proof for closure tests.",
+      "duplicateOf": null,
+      "related": []
+    },
+    {
+      "id": "HF-010",
+      "rehearsal": "R004",
+      "repository": "kemiller2002/indy-init-rehearsal-004",
+      "evidence": [
+        "docs/REHEARSAL-004-RESULTS.md §Deviations (Token exposure)",
+        "docs/REHEARSAL-004-RESULTS.md §Lessons (5)",
+        "docs/REHEARSAL-005-RESULTS.md §Defects found during the run (Test-hook export)",
+        "docs/REHEARSAL-006-RESULTS.md §Defects found during the run (AR-030)"
+      ],
+      "description": "Test/secret leakage into artifacts recurred: R4 live token appeared in Playwright traces of a failed run (token rotated, fixed 64ae19b). R5 production page exposed EnableTestHooks via getDotnetRuntime (high). R6 test-only code reached the production artifact through a fail-open condition (AR-030/R1-F-6); fixed by compiling test code only when CausaTestBuild=='true' plus a production artifact scan gating deploy.",
+      "rootCause": "No default-deny separation between test and production builds; traces enabled for secret-handling suites.",
+      "category": "architecture",
+      "measuredMinutes": null,
+      "measuredMinutesKind": null,
+      "measuredMinutesSource": null,
+      "otherMeasuredCost": null,
+      "confidence": "high",
+      "recurredIn": [
+        "R005",
+        "R006"
+      ],
+      "preventableByConvention": "Fail-closed test-build flag, production artifact scan in deploy gate, traces disabled for secret-handling suites from day one.",
+      "duplicateOf": null,
+      "related": []
+    },
+    {
+      "id": "HF-011",
+      "rehearsal": "R004",
+      "repository": "kemiller2002/indy-init-rehearsal-004",
+      "evidence": [
+        "docs/engineering-improvement/investigations/r4-baseline-and-compiler.md §1.4",
+        "docs/engineering-improvement/BASELINE-2026-10-28.md §Measured baseline (CI runs)",
+        "docs/REHEARSAL-006-RESULTS.md §Process: what went wrong (CI starvation, 22:22–23:54)"
+      ],
+      "description": "CI workflow design wasted runs. R4: every push re-ran all four workflows, Echelon foundations and Praxis validation re-ran unchanged, whole browser suite ran to test one live scenario; 152 workflow runs, Build and test 38 (6 success, 25 failure, 7 cancelled). R6: main used one concurrency group per commit so superseded runs piled ~30 deep, and job-level if: always() made cancelled runs start jobs anyway; no main run completed for about 90 minutes until WI-R6-A4/A5 and owner force-cancel.",
+      "rootCause": "No path filtering/affected-test selection; concurrency and cancellation semantics in workflows not reviewed.",
+      "category": "ci-tooling",
+      "measuredMinutes": 90,
+      "measuredMinutesKind": "delay",
+      "measuredMinutesSource": "REHEARSAL-006-RESULTS.md §Process: 'no main run completed for about 90 minutes' (22:22–23:54)",
+      "otherMeasuredCost": "R4: 152 workflow runs, 25 failed + 7 cancelled Build and test runs; R6: ~30 queued superseded runs",
+      "confidence": "high",
+      "recurredIn": [
+        "R006"
+      ],
+      "preventableByConvention": "Workflow template: one concurrency group per branch with cancel-in-progress, !cancelled() conditions, path filters.",
+      "duplicateOf": null,
+      "related": []
+    },
+    {
+      "id": "HF-012",
+      "rehearsal": "R004",
+      "repository": "kemiller2002/Indy-init",
+      "evidence": [
+        "docs/REHEARSAL-004-RESULTS.md §Lessons (1)",
+        "docs/engineering-improvement/investigations/r4-baseline-and-compiler.md §2.5 items 3-4",
+        "docs/engineering-improvement/BASELINE-2026-10-28.md §Failure classification #6",
+        "docs/rehearsal-006/SCOPE-REVIEW.md §Major SR-04, §Minor SR-11, SR-13",
+        "docs/REHEARSAL-005-RESULTS.md §What blocks ACCEPTED (2) / PR #32"
+      ],
+      "description": "Acceptance formats and frozen packages were unstable: R4 approvals file was in praxis.requirements-approvals/1 but the verifier needed causa.requirements-approvals/1, found at T+60. The compiled package v1 changed in place after the R4 freeze (manifest 0cd4c3f5… → b771cd40…, commits 5d69cca, f9219d1, 4b38213) with no v2, making REHEARSAL-004-RESULTS statements false; R4 replay bound to superseded plan VP-d1efaf695ef4. R6 v3 plan fails its own shipped schema (7 errors, SR-04); v3 rebuild depends on commit 1865da2 staying reachable (SR-11); preflight docs named stale plan VP-0eb9c791dd0b (SR-13).",
+      "rootCause": "No immutability/schema check on frozen packages; verifier input formats not exercised end-to-end at kickoff.",
+      "category": "contract-instability",
+      "measuredMinutes": null,
+      "measuredMinutesKind": null,
+      "measuredMinutesSource": null,
+      "otherMeasuredCost": "R4 format mismatch discovered at T+60",
+      "confidence": "high",
+      "recurredIn": [
+        "R005",
+        "R006"
+      ],
+      "preventableByConvention": "Kickoff dry-run of the verifier on a synthetic ledger; digest-pinned frozen packages with CI immutability and schema checks.",
+      "duplicateOf": null,
+      "related": []
+    },
+    {
+      "id": "HF-013",
+      "rehearsal": "R005",
+      "repository": "kemiller2002/indy-init-rehearsal-005",
+      "evidence": [
+        "docs/REHEARSAL-005-RESULTS.md §Defects found during the run (Start failure)",
+        "docs/engineering-improvement/BASELINE-2026-10-28.md §Failure classification #1",
+        "docs/engineering-improvement/investigations/r5-baseline.md §4(a)",
+        "docs/engineering-improvement/SCORECARD.md row A (limen#113)"
+      ],
+      "description": "App could not start: View.project exceeded the .NET WASM interpreter per-method locals limit ('locals size too big'; F# Release inlining gave 12,683 IL locals, 101,488-byte frame), from ec6407b (21:30Z) to fix a0e7d4a (23:00Z), which split the projection into nine area functions and added a start smoke. A single projection method extended by every stream; CoreCLR unit tests could not see it.",
+      "rootCause": "Monolithic F# view projection shared by all streams, plus no check of compiled method shape or browser start smoke in CI.",
+      "category": "fsharp-inconsistency",
+      "measuredMinutes": 90,
+      "measuredMinutesKind": "delay",
+      "measuredMinutesSource": "SCORECARD.md row A: 'the app was broken about 90 min by commit timestamps' (ec6407b 21:30Z to a0e7d4a 23:00Z per BASELINE #1)",
+      "otherMeasuredCost": null,
+      "confidence": "high",
+      "recurredIn": [],
+      "preventableByConvention": "Per-area view functions from the start; run limen wasm-check and a start-smoke spec on every PR.",
+      "duplicateOf": null,
+      "related": []
+    },
+    {
+      "id": "HF-014",
+      "rehearsal": "R005",
+      "repository": "kemiller2002/indy-init-rehearsal-005",
+      "evidence": [
+        "docs/REHEARSAL-005-RESULTS.md §Defects found during the run (Port collisions)",
+        "docs/engineering-improvement/investigations/r5-baseline.md §4(b)",
+        "docs/engineering-improvement/investigations/env-and-forma.md §E1",
+        "docs/engineering-improvement/BASELINE-2026-10-28.md §Failure classification #9, #10",
+        "docs/engineering-improvement/SCORECARD.md row E",
+        "docs/engineering-improvement/investigations/r5-final-metrics.md §Summary #4"
+      ],
+      "description": "Test-site port defined in 11 executable places; a0e7d4a moved defaults to 4821/4822 (concurrent worktrees on 4321/4322 served stale builds) but two specs still hardcoded 4322, failing main run 40599949953 with ERR_CONNECTION_REFUSED; merge d23060f reintroduced 4322 and b6238ad fixed it 6 s later. Static server scripts/serve.mjs crashed on undecodable paths. Local Playwright reused any server on the port with no artifact identity check.",
+      "rootCause": "No single authoritative environment contract; concurrent agent worktrees sharing host ports.",
+      "category": "ci-tooling",
+      "measuredMinutes": 27.9,
+      "measuredMinutesKind": "delay",
+      "measuredMinutesSource": "SCORECARD.md row E: 'commit-to-fix for the port fault was 27 min 55 s'",
+      "otherMeasuredCost": ">=4 failed browser CI runs from the hard-coded port (SPEED-OPTIMIZATION-REPORT §3 Priority Six; r5-final-metrics #4: >=5 incl. WebKit wait)",
+      "confidence": "high",
+      "recurredIn": [],
+      "preventableByConvention": "One environment contract (conditor test-env resolve) as the only port source; per-stream ports; served-artifact identity check.",
+      "duplicateOf": null,
+      "related": []
+    },
+    {
+      "id": "HF-015",
+      "rehearsal": "R005",
+      "repository": "kemiller2002/indy-init-rehearsal-005",
+      "evidence": [
+        "docs/engineering-improvement/investigations/r5-final-metrics.md §5 Merges",
+        "docs/engineering-improvement/investigations/r5-merge-necessity.md §Result",
+        "docs/engineering-improvement/BASELINE-2026-10-28.md §Failure classification #3, #15",
+        "docs/engineering-improvement/investigations/r5-baseline.md §7 Workstream structure, §4(a)",
+        "docs/engineering-improvement/SCORECARD.md row B"
+      ],
+      "description": "Parallel streams collided on shared files: 17 of 92 merges conflicted; hotspots Adapter.fs (4), View.fs (4), fixture-mode.spec.js (4), EnginePort.fs (3), graph-navigation.spec.js (3); 26 'Praxis: reconcile' commits and 2 explicit integration repairs (805b7a9 restoring projects to App.slnx; b6238ad port). 36 of 58 main→stream merges had zero path overlap. File ownership existed only as a commit-message convention. WIP commits bb89d44 ('do not merge yet') and e02d000 ('tests not yet run') reached main.",
+      "rootCause": "No machine-checked ownership/interface contract or merge-readiness condition; shared shell files edited by multiple streams.",
+      "category": "agent-coordination",
+      "measuredMinutes": null,
+      "measuredMinutesKind": null,
+      "measuredMinutesSource": null,
+      "otherMeasuredCost": "17 conflicted merges, 26 reconcile commits, 58 post-hoc attribution events",
+      "confidence": "high",
+      "recurredIn": [
+        "R004 (post-hoc reconciliation 276cdfc)"
+      ],
+      "preventableByConvention": "Declared stream ownership with praxis streams check pre-merge; shared interfaces owned by one stream; merge only on readiness.",
+      "duplicateOf": null,
+      "related": []
+    },
+    {
+      "id": "HF-016",
+      "rehearsal": "R005",
+      "repository": "kemiller2002/indy-init-rehearsal-005",
+      "evidence": [
+        "docs/rehearsal-005-implementation-audit/process-evidence-findings.md §Authorship and independence, §Per requirement (AR-008, AR-012, AR-015)",
+        "docs/rehearsal-005-implementation-audit/independent-review.md §Resolution",
+        "docs/engineering-improvement/investigations/r5-final-metrics.md §8 Tokens and tool calls",
+        "docs/engineering-improvement/investigations/r4-baseline-and-compiler.md §1.8",
+        "docs/REHEARSAL-006-RESULTS.md §Process (Merge attribution)"
+      ],
+      "description": "Process evidence was not produced in admissible form: 18 of 31 NOT_RUN P0s were process/governance. One Praxis checkpoint in a 392-minute run despite two container restarts; 58 post-hoc attribution events; 282 of 283 commits authored 'Claude' and all 201 session trailers name one session including 'fresh reviewer' commits, so reviewer independence cannot be shown. Telemetry: every token/tool metric supported-unavailable, 7 of 8 executions never finalized (R4 similar; R4 WI-0005 wall time measured bookkeeping). R6 agent merges via API appear under the owner's account.",
+      "rootCause": "Process recording relied on agent discipline; shared session/credential identity; telemetry not ingested.",
+      "category": "governance",
+      "measuredMinutes": null,
+      "measuredMinutesKind": null,
+      "measuredMinutesSource": null,
+      "otherMeasuredCost": "1 checkpoint / 392 min; 58 post-hoc attributions; 0 token measurements",
+      "confidence": "high",
+      "recurredIn": [
+        "R004",
+        "R006"
+      ],
+      "preventableByConvention": "Record checkpoints/scope/reviews in Praxis while working; distinct identities for reviewer agents; finalize telemetry per work item.",
+      "duplicateOf": null,
+      "related": []
+    },
+    {
+      "id": "HF-017",
+      "rehearsal": "R005",
+      "repository": "kemiller2002/indy-init-rehearsal-005",
+      "evidence": [
+        "docs/REHEARSAL-005-RESULTS.md §What blocks ACCEPTED",
+        "docs/rehearsal-005-implementation-audit/verification-findings.md §Why each obligation was NOT_RUN, §Verification-plan curation (Indy-init PR #32)",
+        "docs/engineering-improvement/investigations/r4-baseline-and-compiler.md §2.5 items 2, 7",
+        "docs/engineering-improvement/SPEED-OPTIMIZATION-REPORT.md §1 Plan binding discrepancy"
+      ],
+      "description": "Verification plan VP-e77a2134e1b0 bound no tests (testBindings: []), so the plan verifier reported 77 ledger PASSes as UNBOUND; two verifiers (Python requirement-level, F# obligation-level) had diverging semantics. 49 of 326 obligations had no proving test; 33 of 49 were verification-design/governance causes vs 5 development. Post-run curation (PR #32) also changed freshness semantics for AR-010 and WDL-012.",
+      "rootCause": "Plan was frozen without evidence producers per obligation and with process obligations forced into test-only binding.",
+      "category": "testing-verification",
+      "measuredMinutes": null,
+      "measuredMinutesKind": null,
+      "measuredMinutesSource": null,
+      "otherMeasuredCost": "49 obligations unproven; 19 attributed to plan defects",
+      "confidence": "high",
+      "recurredIn": [
+        "R006"
+      ],
+      "preventableByConvention": "plan-readiness gate: block implementation until every obligation has a bound producer/category.",
+      "duplicateOf": null,
+      "related": []
+    },
+    {
+      "id": "HF-018",
+      "rehearsal": "R005",
+      "repository": "kemiller2002/indy-init-rehearsal-005",
+      "evidence": [
+        "docs/rehearsal-005-implementation-audit/implementation-findings.md §Structural findings, §Partially implemented (AR-011 row)",
+        "docs/rehearsal-006/PREFLIGHT.md §Kickoff obligations (R5A-001-01..03)"
+      ],
+      "description": "Environment mismatches: deployed-mode browser testing was impossible because the mocked-spec network guard aborts any non-local host (blocked UI-015-O3, WDL-014-O1, PF-014-O2); causa-data pinned at 3d861bc for .NET jobs but ref: main for browser and live jobs; .NET SDK unpinned (dotnet-version 10.0.x, no global.json) — rebuild gave 193 framework fingerprints absent and 2 runtime files with different bytes.",
+      "rootCause": "Harness designed only for local runs; pins applied per job instead of from one lock.",
+      "category": "ci-tooling",
+      "measuredMinutes": null,
+      "measuredMinutesKind": null,
+      "measuredMinutesSource": null,
+      "otherMeasuredCost": null,
+      "confidence": "high",
+      "recurredIn": [],
+      "preventableByConvention": "Pin SDK (global.json) and data refs once for all jobs; deployed-origin allowlist in the network guard.",
+      "duplicateOf": null,
+      "related": []
+    },
+    {
+      "id": "HF-019",
+      "rehearsal": "R005",
+      "repository": "kemiller2002/indy-init-rehearsal-005",
+      "evidence": [
+        "docs/engineering-improvement/investigations/r5-baseline.md §4(d)",
+        "docs/engineering-improvement/investigations/env-and-forma.md §F2, §F3",
+        "docs/engineering-improvement/BASELINE-2026-10-28.md §Failure classification #11",
+        "docs/engineering-improvement/investigations/regression-preservation.md §UI carry-over risks for Rehearsal 6"
+      ],
+      "description": "Forma marketing display headings (h1 up to 7.25rem at 14ch via .ef-site) applied to the application; 'Connect a data repository' huge on desktop, overridden by R5 f207cd4 (causa.css:342-353) about 3.6 h after T+0. App used .ef-site because the application layer lacked .ef-app-shell and button variants. R5 .causa-tag is the unbounded-pill pattern (text can cross the curve when wrapping at 320px); R5 pinned design-system 0.9.0 without LCE-001 radius bounds; no axe in R5.",
+      "rootCause": "Forma had no application/dense type roles; app-shell components missing so apps used marketing scope.",
+      "category": "ui-implementation",
+      "measuredMinutes": null,
+      "measuredMinutesKind": null,
+      "measuredMinutesSource": null,
+      "otherMeasuredCost": "found about 3.6 h after T+0",
+      "confidence": "high",
+      "recurredIn": [],
+      "preventableByConvention": "Use released Forma with data-ef-type=application; require heading-scale, overflow at 320px/200% text, corner containment and axe checks.",
+      "duplicateOf": null,
+      "related": []
+    },
+    {
+      "id": "HF-020",
+      "rehearsal": "R005",
+      "repository": "kemiller2002/indy-init-rehearsal-005",
+      "evidence": [
+        "docs/rehearsal-005-implementation-audit/implementation-findings.md §Partially implemented (UI-016 row)",
+        "docs/REHEARSAL-006-RESULTS.md §What blocks ACCEPTED (2) table: graph amber outline 1.95:1",
+        "docs/REHEARSAL-006-RESULTS.md §For Rehearsal 7 (6)"
+      ],
+      "description": "Amber (#E9A23B) indicator borders measured 1.95:1 on ivory and 2.17:1 on white, below the 3:1 non-text threshold (UI-016-O11). Left open in R5, then failed in R6 (UI-016-O11, PF-016-O1) because Forma has no outline token.",
+      "rootCause": "Palette token lacks a contrast-compliant outline variant; no rendered-contrast check for non-text indicators.",
+      "category": "ui-implementation",
+      "measuredMinutes": null,
+      "measuredMinutesKind": null,
+      "measuredMinutesSource": null,
+      "otherMeasuredCost": null,
+      "confidence": "high",
+      "recurredIn": [
+        "R006"
+      ],
+      "preventableByConvention": "Design-system token for non-text outlines >=3:1 plus a rendered-contrast probe in CI.",
+      "duplicateOf": null,
+      "related": []
+    },
+    {
+      "id": "HF-021",
+      "rehearsal": "R005",
+      "repository": "kemiller2002/indy-init-rehearsal-005",
+      "evidence": [
+        "docs/REHEARSAL-005-RESULTS.md §Defects found during the run (F-1, R2-F1/R3-F1, known limit R3-F2)",
+        "docs/engineering-improvement/investigations/regression-preservation.md §3 R3-F2",
+        "docs/REHEARSAL-006-RESULTS.md §What blocks ACCEPTED (1) R6-D-002, §Defects found (R6-D-001)",
+        "docs/engineering-improvement/SPEED-OPTIMIZATION-REPORT.md §3 Priority Seven (Arca reconciliation)"
+      ],
+      "description": "Multi-writer persistence defects recurred. R5 F-1 (critical): write marker was a per-page counter, two writers collided, reconcile claimed 'synced' and the next save erased the other writer's events. R5 left R3-F2 (non-atomic cross-tab localStorage read-merge-write) as a known limit; fixture mode short-circuits the store (PersistencePort.fs:212) so specs never exercised it. In R6 it became R6-D-002 (critical, open): without navigator.locks one or two tabs' changes lost every run; two fallback designs failed. R6-D-001: restore showed 'Saved to GitHub (confirmed …)' for other writers' device-only changes. Arca reconciliation also lacks byte read-back (pre-fix F-1 shape).",
+      "rootCause": "Local persistence used two non-atomic storage calls with no lock or storage-event merge; confirmation by ancestry/marker instead of read-back.",
+      "category": "persistence-serialization",
+      "measuredMinutes": null,
+      "measuredMinutesKind": null,
+      "measuredMinutesSource": null,
+      "otherMeasuredCost": null,
+      "confidence": "high",
+      "recurredIn": [
+        "R006"
+      ],
+      "preventableByConvention": "Single-owner or locked cross-tab persistence with explicit no-locks fallback; deterministic split-step race test in Chromium and WebKit; fixture mode must use the real store.",
+      "duplicateOf": null,
+      "related": []
+    },
+    {
+      "id": "HF-022",
+      "rehearsal": "R005",
+      "repository": "kemiller2002/indy-init-rehearsal-005",
+      "evidence": [
+        "docs/rehearsal-005-implementation-audit/implementation-findings.md §Structural findings (Two JSON codecs)",
+        "docs/rehearsal-005-implementation-audit/verification-findings.md §Per obligation (AR-005-O2)",
+        "docs/engineering-improvement/investigations/persistence.md §Other runtime-only weak points found"
+      ],
+      "description": "F# structure inconsistencies: two JSON codecs (src/engine/Json.fs and src/persistence/Json.fs) with no recorded reuse justification; stepOr silently swallows book faults (persistence/Sync.fs:199-202); a book that fails to decode silently falls back to Book.initial, downgrading a stored Unknown to Disconnected; ReadBack trusts a caller-computed bool.",
+      "rootCause": "No shared codec module or error-model convention across engine and persistence layers.",
+      "category": "fsharp-inconsistency",
+      "measuredMinutes": null,
+      "measuredMinutesKind": null,
+      "measuredMinutesSource": null,
+      "otherMeasuredCost": null,
+      "confidence": "medium",
+      "recurredIn": [],
+      "preventableByConvention": "One serialization module per contract; Result-based error model with no silent fallbacks.",
+      "duplicateOf": null,
+      "related": []
+    },
+    {
+      "id": "HF-023",
+      "rehearsal": "R005",
+      "repository": "kemiller2002/indy-init-rehearsal-005",
+      "evidence": [
+        "docs/rehearsal-005-implementation-audit/README.md §Executive summary",
+        "docs/rehearsal-005-implementation-audit/implementation-findings.md §Partially implemented (EXT-DATA-005, PF-015)",
+        "docs/rehearsal-005-implementation-audit/independent-review.md §Resolution (DEC-025, AR-019)",
+        "docs/REHEARSAL-006-RESULTS.md §What blocks ACCEPTED (2) table (read-only credential can write, D-09)",
+        "docs/rehearsal-006/SCOPE-REVIEW.md §Minor SR-10",
+        "docs/rehearsal-006/PREFLIGHT.md §How the last blockers were settled (DEC-R6-011)"
+      ],
+      "description": "Requirement clauses conflicted with owner decisions and were never reconciled: EXT-DATA-005 permission check and PF-015 anonymous read/least privilege vs DEC-025/OD-INDY-10 (permission fields advisory; CanPush parsed and never used); AR-019-O3 demands R3 'must yield BLOCKED' while the verifier gives INVALID/FAIL; UI-031-O5 role control for a single-user app. R6 proceeded 'as written' (DEC-R6-011) and these failed or stayed unverifiable; the 'read-only' CAUSA_GITHUB_TOKEN was write-capable (D-09), causing PF-015-O2, EXT-DATA-004-O2, EXT-DATA-005-O1 to FAIL.",
+      "rootCause": "Owner decisions and requirement text maintained separately with no consistency check before freeze.",
+      "category": "requirements-ambiguity",
+      "measuredMinutes": null,
+      "measuredMinutesKind": null,
+      "measuredMinutesSource": null,
+      "otherMeasuredCost": null,
+      "confidence": "high",
+      "recurredIn": [
+        "R006"
+      ],
+      "preventableByConvention": "Pre-freeze reconciliation of every owner decision against obligation text; verify secret scopes in preflight.",
+      "duplicateOf": null,
+      "related": []
+    },
+    {
+      "id": "HF-024",
+      "rehearsal": "R006",
+      "repository": "kemiller2002/indy-init-rehearsal-006",
+      "evidence": [
+        "docs/REHEARSAL-006-RESULTS.md §What blocks ACCEPTED (3) G7 defect classes",
+        "docs/REHEARSAL-006-RESULTS.md §Process (The final acceptance could not read its own records; D-11, D-12)",
+        "docs/rehearsal-005-implementation-audit/process-evidence-findings.md §Per requirement (AR-008, UI-030)",
+        "docs/engineering-improvement/investigations/r4-baseline-and-compiler.md §1.6 (R2-12, R5-02, bfc0488)"
+      ],
+      "description": "Evidence/reviews not bound to the final candidate. R4: before bfc0488 a review of 6950158 closed defect classes at later commits. R5: last independent review covered be01851/543ddc2, not final 1b9fb56. R6: acceptance/defect-classes.json cited R5 fix commits not in R6 history and the re-review missed the code freeze (G7 FAIL, D-11); a commit could not contain records naming its own SHA, so process obligations could never verify in the candidate's own run until WI-R6-A6 read records from a records-only descendant (D-12).",
+      "rootCause": "Evidence model assumed candidate-embedded records; defect-class files copied forward between rehearsals.",
+      "category": "governance",
+      "measuredMinutes": null,
+      "measuredMinutesKind": null,
+      "measuredMinutesSource": null,
+      "otherMeasuredCost": null,
+      "confidence": "high",
+      "recurredIn": [
+        "R004",
+        "R005"
+      ],
+      "preventableByConvention": "Re-close defect classes with in-repo fix SHAs before freeze; keep the records-only descendant mechanism.",
+      "duplicateOf": null,
+      "related": []
+    },
+    {
+      "id": "HF-025",
+      "rehearsal": "R006",
+      "repository": "kemiller2002/indy-init-rehearsal-006",
+      "evidence": [
+        "docs/REHEARSAL-006-RESULTS.md §Key facts (Milestones, Candidate)",
+        "docs/REHEARSAL-006-RESULTS.md §Process (First candidate not deployable)",
+        "docs/REHEARSAL-006-RESULTS.md §Defects found during the run (Build race)",
+        "docs/REHEARSAL-006-RESULTS.md §For Rehearsal 7 (2)"
+      ],
+      "description": "First candidate 02c37d1 (T+287) failed its core job on a stale copy expectation after an intentional wording change and was never deployed; re-cut as 46d5e11 at T+307. Earlier, two global-property sets of Causa.Persistence sharing obj/Release (MSB3030) made core red intermittently (fixed 8a13e6a, daad1e5). The CI test step hid its output.",
+      "rootCause": "Candidate cut without a green core job; parallel builds shared intermediate output directory.",
+      "category": "testing-verification",
+      "measuredMinutes": 20,
+      "measuredMinutesKind": "delay",
+      "measuredMinutesSource": "Derived from REHEARSAL-006-RESULTS.md §Key facts Milestones: first candidate T+287, final candidate T+307",
+      "otherMeasuredCost": "one extra candidate",
+      "confidence": "high",
+      "recurredIn": [],
+      "preventableByConvention": "Gate candidate selection and deploy on green core; separate obj dirs per build configuration; print test output.",
+      "duplicateOf": null,
+      "related": []
+    },
+    {
+      "id": "HF-026",
+      "rehearsal": "R006",
+      "repository": "kemiller2002/indy-init-rehearsal-006",
+      "evidence": [
+        "docs/REHEARSAL-006-RESULTS.md §What blocks ACCEPTED (1) R6-D-003",
+        "docs/REHEARSAL-006-RESULTS.md §Defects found during the run (RF-F-3)"
+      ],
+      "description": "R6-D-003 (critical, open): a save that cannot be sent because the device is offline is retried without backoff — 151 POSTs in 60 s for one change — while the page shows 'Saving to GitHub' instead of 'Waiting for the connection'; trigger not found in the timebox. RF-F-3 (major, open): a network failure on the rebase path is reported as another writer's conflict and Discard is offered.",
+      "rootCause": "Transport-failure classification not distinguished from conflict/unsent states in the sync model.",
+      "category": "persistence-serialization",
+      "measuredMinutes": null,
+      "measuredMinutesKind": null,
+      "measuredMinutesSource": null,
+      "otherMeasuredCost": "151 POSTs in 60 s",
+      "confidence": "high",
+      "recurredIn": [],
+      "preventableByConvention": "Explicit offline/unsendable state with backoff; typed transport errors distinct from conflicts.",
+      "duplicateOf": null,
+      "related": []
+    },
+    {
+      "id": "HF-027",
+      "rehearsal": "R006",
+      "repository": "kemiller2002/Indy-init",
+      "evidence": [
+        "docs/rehearsal-006/SCOPE-REVIEW.md §Major SR-02, SR-03, §Minor SR-05, SR-06, SR-12",
+        "docs/REHEARSAL-006-RESULTS.md §What blocks ACCEPTED (2) (VER-001/VER-002)",
+        "docs/rehearsal-005-implementation-audit/process-evidence-findings.md §Per requirement (VER-001, VER-002)"
+      ],
+      "description": "Pre-kickoff verification-plan weaknesses: UI-015-O2 mapped to constituents proving less than the clause (SR-02); derivation check beatable by declaring words as connectives or mis-mapping clauses (SR-03); review-tag removals apply only with an optional unpinned flag (SR-05); resealed plan with derivation stripped passes readiness (SR-06). Separately, no pre-lock newest-release comparison was recorded in R5 or R6 (VER-001/002 FAIL in R6, unrecoverable after the fact).",
+      "rootCause": "Plan tooling trusted curated free-text fields; release-selection record not part of preflight.",
+      "category": "testing-verification",
+      "measuredMinutes": null,
+      "measuredMinutesKind": null,
+      "measuredMinutesSource": null,
+      "otherMeasuredCost": null,
+      "confidence": "medium",
+      "recurredIn": [
+        "R005 (VER-001/002)"
+      ],
+      "preventableByConvention": "Record release comparison in preflight; pin all verifier flags; semantic check of clause-to-constituent mappings.",
+      "duplicateOf": null,
+      "related": []
+    },
+    {
+      "id": "HF-028",
+      "rehearsal": "R008",
+      "repository": "kemiller2002/indy-init-rehearsal-008",
+      "evidence": [
+        "indy-init-rehearsal-008 commit 06e9653 'CI: live.yml runs the live suites through Causa.slnx (MSB1008 with two projects meant no live test ever ran)'",
+        "indy-init-rehearsal-008 evidence/SCHEDULE-ACTUALS.md row 'CI live fix (live suites never ran: MSB1008)' merged 19:05, T+94, PR #16",
+        "Indy-init docs/release-gate-repair/FINAL-REPORT.md §1 Root causes (SU-OWN-DOTNET / SU-DOTNET-LIVE MSB1008, generated by V41Package.suites, carried unchanged into v4.1, v4.1.1, v4.1.2)",
+        "indy-init-rehearsal-009 evidence/FINAL-REPORT.md §11 CI results and §13 item 2"
+      ],
+      "description": "Generated suite runners passed several test projects to one `dotnet test`, which SDK 10.0.402 refuses (MSB1008). In R008 the live suites silently never ran until the integration lane patched its own live.yml at T+94; the generator (V41Package.suites) was not corrected, so the same runner shape shipped in frozen v4.1.2 and made R009's release gate fail in run-suites on every run (SU-OWN-DOTNET, SU-DOTNET-LIVE; 139 obligations blocked by SU-DOTNET-LIVE alone).",
+      "rootCause": "Requirements compiler emitted runner commands that were never executed before freeze; a local fix in the rehearsal repo was not fed back into the generator/frozen package.",
+      "category": "ci-tooling",
+      "measuredMinutes": null,
+      "measuredMinutesKind": null,
+      "measuredMinutesSource": null,
+      "otherMeasuredCost": "R009: 0/541 executable and 0/119 record obligations of frozen v4.1.2 verified because run-suites refused first; R008: live suites unexercised until T+94",
+      "confidence": "high",
+      "recurredIn": [
+        "R009"
+      ],
+      "preventableByConvention": "Every generated suite command must be executed (list mode) against the bootstrapped skeleton before a package is frozen (later added as X21 / r9.fsx suite-preflight); fixes found in a rehearsal to generated artifacts must be upstreamed to the generator.",
+      "duplicateOf": null,
+      "related": []
+    },
+    {
+      "id": "HF-029",
+      "rehearsal": "R008",
+      "repository": "kemiller2002/indy-init-rehearsal-008",
+      "evidence": [
+        "indy-init-rehearsal-008 evidence/T10-RESULT.md: 'First CI on 616ec62: Build and test failed (runner SDK 10.0.403 vs global.json 10.0.402, rollForward disable)'; fix 04fbf9b",
+        "indy-init-rehearsal-009 commit ececa70 'CI: install the SDK global.json pins (10.0.402, rollForward disabled) in build-and-test and candidate acceptance'",
+        "indy-init-rehearsal-009 commit 5ef2908 'Deploy: install the pinned .NET SDK before building the WebAssembly site'; evidence/FINAL-REPORT.md §10 'The first deploy at 39dc037 failed for lack of the pinned SDK; PR #2 fixed it.'"
+      ],
+      "description": "The Conditor scaffold workflows did not install the SDK pinned in global.json (10.0.402, rollForward disabled). R008's first CI failed on the runner's 10.0.403; R009 needed two separate repair commits (CI, then deploy after a failed first deployment), i.e. the same defect was rediscovered per workflow and per rehearsal.",
+      "rootCause": "Scaffold templates rely on the runner's default SDK while global.json disables roll-forward; no template/preflight check ties every workflow's setup-dotnet to global.json.",
+      "category": "ci-tooling",
+      "measuredMinutes": null,
+      "measuredMinutesKind": null,
+      "measuredMinutesSource": null,
+      "otherMeasuredCost": "3 repair commits across 2 rehearsals (R008 04fbf9b; R009 ececa70, 5ef2908); R009 one failed deployment at 39dc037",
+      "confidence": "high",
+      "recurredIn": [
+        "R009"
+      ],
+      "preventableByConvention": "Scaffold every workflow with setup-dotnet global-json-file, and add a ci-policy rule that fails any workflow building .NET without it.",
+      "duplicateOf": null,
+      "related": []
+    },
+    {
+      "id": "HF-030",
+      "rehearsal": "R008",
+      "repository": "kemiller2002/indy-init-rehearsal-008",
+      "evidence": [
+        "indy-init-rehearsal-008 commit 1834e98 'fix deployed-acceptance pipefail (D-T31-01)'",
+        "indy-init-rehearsal-008 commit eff2697 'CI: print test output before failing (bash -e swallowed it; T30 F-02)'",
+        "indy-init-rehearsal-008 evidence/reviews/T30-pre-rc.md F-02 'CI never publishes the invariant counts'",
+        "Indy-init requirements-compiled/v4/analysis/r7-lessons.json R7L-18 (R7 evidence/defects.md: 'CI steps piped through `tee` could not fail (no `pipefail`)')",
+        "Indy-init docs/rehearsal-007/REMEDIATION-BASELINE.md 'CI defects' CI-02 (R6: 'Core test step hides its own output (output=$(dotnet test ...) under bash -e)')"
+      ],
+      "description": "Shell-step error handling in CI kept hiding failures or their output: R6 hid test output under bash -e, R7 steps piped through tee could not fail, and R8 again shipped a deployed-acceptance step without pipefail and a test step whose output bash -e swallowed, plus an invariant ratchet step that printed no counts (so the ratchet could not be enforced from CI).",
+      "rootCause": "Workflow steps hand-written by agents with ad-hoc shell; no lint for `set -euo pipefail` / output capture, despite R7L-18 being recorded as 'covered' by ci-policy.",
+      "category": "ci-tooling",
+      "measuredMinutes": null,
+      "measuredMinutesKind": null,
+      "measuredMinutesSource": null,
+      "otherMeasuredCost": "R008: 2 repair commits (eff2697, 1834e98); defect present in R6, R7, R8",
+      "confidence": "high",
+      "recurredIn": [
+        "R007",
+        "R008"
+      ],
+      "preventableByConvention": "CI policy rule: every multi-command run step starts with `set -euo pipefail`, never captures test output into a variable, and a ratchet/continue-on-error step must publish its counts as a job summary.",
+      "duplicateOf": null,
+      "related": []
+    },
+    {
+      "id": "HF-031",
+      "rehearsal": "R007",
+      "repository": "kemiller2002/Indy-init",
+      "evidence": [
+        "Indy-init docs/rehearsal-007/CI-PERFORMANCE.md §1 'What happened (measured)' and §2 'Causes'",
+        "Indy-init docs/rehearsal-007/evidence/r6-workflow-runs.tsv (427 runs)"
+      ],
+      "description": "CI starvation analysed in R7 remediation (Rehearsal 6 run): a per-commit concurrency group on main (introduced at 5d02836), job-level shared groups, job-level if: always(), and validation on every branch push plus pull_request (288 extra runs). 123 main Build-and-test runs: 111 cancelled, 11 failed, 1 succeeded; no main result for 124 min (22:31-00:35); median runner wait 5 min, p90 35 min.",
+      "rootCause": "An R5 pipeline was imported at T+6 and edited by agents with nothing checking the result (CI-PERFORMANCE §2 item 5).",
+      "category": "ci-tooling",
+      "measuredMinutes": null,
+      "measuredMinutesKind": null,
+      "measuredMinutesSource": "docs/rehearsal-007/CI-PERFORMANCE.md §1 'Waste': 'Jobs in Build-and-test runs that ended cancelled (22:00–01:00) used about 1,297 runner-minutes (≈21.6 h)' (runner-minutes, Rehearsal 6 run)",
+      "otherMeasuredCost": "1,297 runner-minutes of cancelled jobs (compute); 124 min without a main result (same R6 event as HF-011, not added again)",
+      "confidence": "high",
+      "recurredIn": [
+        "R008",
+        "R009"
+      ],
+      "preventableByConvention": "Run `conditor ci-policy check` at kickoff and on every candidate (proposed R7-AMD-03); never import an earlier rehearsal's pipeline.",
+      "duplicateOf": null,
+      "related": [
+        "HF-011"
+      ]
+    },
+    {
+      "id": "HF-032",
+      "rehearsal": "R009",
+      "repository": "kemiller2002/indy-init-rehearsal-009",
+      "evidence": [
+        "indy-init-rehearsal-009 .github/workflows/: build-and-test.yml, echelon-foundations.yml, praxis-validation.yml, requirement-verification.yml, verification-gate.yml all trigger on pull_request and push to main",
+        "indy-init-rehearsal-008 .github/workflows/: ci.yml and build-and-test.yml both build Causa.slnx on every PR/push; deploy-pages.yml retained as a manual-only scaffold beside deploy.yml",
+        "indy-init-rehearsal-009 evidence/FINAL-REPORT.md §11 'Verification gate (development, on PRs and pushes) failure on every run'",
+        "Indy-init commit ba9124d '...deduplicated CI triggers...' (later R10 correction)"
+      ],
+      "description": "Workflow sprawl: R008 carried 8 workflows (four of them build the app on a push to main: ci, build-and-test, live, deploy) and an inert duplicate Pages workflow; R009 ran 5 workflows on every PR and push, 4 of which build independently, and one (Verification gate) failed on every run so its red signal carried no information during the run.",
+      "rootCause": "Conditor scaffold plus per-rehearsal governance workflows were layered rather than consolidated; no budget for builds per push.",
+      "category": "ci-tooling",
+      "measuredMinutes": null,
+      "measuredMinutesKind": null,
+      "measuredMinutesSource": null,
+      "otherMeasuredCost": "R009: about 25 CI workflow runs in the 115-minute run (FINAL-REPORT §15); per-workflow minutes not recorded",
+      "confidence": "medium",
+      "recurredIn": [
+        "R009"
+      ],
+      "preventableByConvention": "One build per SHA reused by downstream jobs (artifacts/needs); a workflow that cannot pass by construction is not attached to PR triggers until its preconditions hold.",
+      "duplicateOf": null,
+      "related": []
+    },
+    {
+      "id": "HF-033",
+      "rehearsal": "R008",
+      "repository": "kemiller2002/indy-init-rehearsal-008",
+      "evidence": [
+        "indy-init-rehearsal-008 commit e7fbdb9 'deploy.yml: gate on the repository, not the unseen DEPLOY_TARGET variable (owner confirmed Pages)'",
+        "indy-init-rehearsal-008 evidence/DEVIATIONS.md 'GitHub Pages': owner enabled Pages ~17:50Z 'after the session proxy refused those settings to the agent'",
+        "indy-init-rehearsal-008 evidence/T10-RESULT.md 'Deploy to GitHub Pages skipped: DEPLOY_TARGET unset, Pages not enabled'",
+        "indy-init-rehearsal-008 evidence/FINAL-REPORT.md 'Elapsed time': first verified deployment 19:40Z (129 min)"
+      ],
+      "description": "Deployment preconditions (Pages enabled, DEPLOY_TARGET variable) were not established before T0; the agent could not set them, the variable was not visible to Actions so every deploy run skipped, and deploy.yml had to be re-gated on the repository name. First verified deployment came at T+129.",
+      "rootCause": "Repository settings that need owner/admin rights were not part of the pre-T0 checklist; workflow gated on a variable not verified to be readable by Actions.",
+      "category": "ci-tooling",
+      "measuredMinutes": null,
+      "measuredMinutesKind": null,
+      "measuredMinutesSource": null,
+      "otherMeasuredCost": "first verified deployment at T+129 (FINAL-REPORT Elapsed time)",
+      "confidence": "high",
+      "recurredIn": [
+        "R009"
+      ],
+      "preventableByConvention": "Pre-T0 preflight verifies repo settings (Pages source, variables visible to Actions) with a dry-run deploy.",
+      "duplicateOf": null,
+      "related": []
+    },
+    {
+      "id": "HF-034",
+      "rehearsal": "R008",
+      "repository": "kemiller2002/indy-init-rehearsal-008",
+      "evidence": [
+        "indy-init-rehearsal-008 evidence/DEVIATIONS.md DEV-R8-09 (CR-T13-01 declined), DEV-R8-10 (CR-T19-01 declined), 'CR-T17-01 declined (frozen IF41-APP)'",
+        "indy-init-rehearsal-008 evidence/FINAL-REPORT.md 'Product defects ... wired domain commands recorded as Observations, so a connected investigation could never be activated (#51)'",
+        "indy-init-rehearsal-008 evidence/reviews/T33-final-review.md T33-F-07",
+        "Indy-init docs/rehearsal-009-content-readiness/AUDIT.md §2.2 'The interface contract'"
+      ],
+      "description": "Frozen v4.1.1 IF41-DOMAIN carried no command body (`CommandEnvelope` without a command; `EventPayload` only a kind string), so the frozen `Decide` could not tell commands apart. Three change requests were declined because the contract was frozen; agents built additive workarounds (`Kernel.decideOn`, body lookup). The gap surfaced as a P0 integration defect at T+332 (#51: every wired command written to GitHub as an Observation) and a silent-fallback route (T33-F-07). v4.1.2 restored the body but left payloads opaque, and lacked RecordConclusion/rename.",
+      "rootCause": "Interface contract frozen without a check that it can express the catalog's commands (Percepta spec-preflight 'carrier-cannot-discriminate' was added only for R9).",
+      "category": "contract-instability",
+      "measuredMinutes": null,
+      "measuredMinutesKind": null,
+      "measuredMinutesSource": null,
+      "otherMeasuredCost": "3 declined CRs (CR-T13-01, CR-T17-01, CR-T19-01); defect fix #51 merged at T+332",
+      "confidence": "high",
+      "recurredIn": [
+        "R009"
+      ],
+      "preventableByConvention": "Before freezing, run a carrier-discrimination check: every command/event in the catalog must be constructible and distinguishable through the frozen types.",
+      "duplicateOf": null,
+      "related": []
+    },
+    {
+      "id": "HF-035",
+      "rehearsal": "R009",
+      "repository": "kemiller2002/Indy-init",
+      "evidence": [
+        "Indy-init docs/release-gate-repair/FINAL-REPORT.md §2 'Successor package requirements-compiled/v4.1.4 ... skips 4.1.3, which belongs to the withdrawn proposal'",
+        "Indy-init docs/OWNER-DECISIONS-2026-11-03.md OD-INDY-19 (v4.1.3 route ODR-V413-01..03 withdrawn)",
+        "Indy-init docs/release-gate-repair/INTEGRATION-RESPONSE.md 'Decisions in the scope/release area' item 1 (drop #102's requirements-compiled/v4.1.3/)",
+        "Indy-init git log: requirements-compiled v4, v4.1, v4.1.1 (R8), v4.1.2 (R9), v4.1.4 (fd026b9, R10 lock), v4.1.5 (#135)"
+      ],
+      "description": "Requirements package churn between rehearsals: R8 ran on v4.1.1, R9 on v4.1.2, then two competing successor packages were drafted in parallel by two agent PRs (#101's v4.1.4 and #102's v4.1.3) to fix the same runner defect; a v4.1.3 content amendment was also proposed then withdrawn. Each package needs owner approval, tagging and re-locking.",
+      "rootCause": "Frozen packages shipped with unexecuted runners and incomplete contracts, so each rehearsal produced a package-level defect requiring a successor.",
+      "category": "contract-instability",
+      "measuredMinutes": null,
+      "measuredMinutesKind": null,
+      "measuredMinutesSource": null,
+      "otherMeasuredCost": "package versions in R7-R9 window: v4, v4.1, v4.1.1, v4.1.2, (v4.1.3 withdrawn twice), v4.1.4",
+      "confidence": "high",
+      "recurredIn": [
+        "R008",
+        "R009"
+      ],
+      "preventableByConvention": "Freeze gate requires executing the package against the bootstrap skeleton (runners, contracts, fixtures) so successor packages are not needed for mechanical defects; one agent owns package numbering.",
+      "duplicateOf": null,
+      "related": []
+    },
+    {
+      "id": "HF-036",
+      "rehearsal": "R008",
+      "repository": "kemiller2002/indy-init-rehearsal-008",
+      "evidence": [
+        "indy-init-rehearsal-008 evidence/DEVIATIONS.md DEV-R8-11 'INV-04 versus SM-SAVE T-S31/T-S32 (package contradiction; reported, not resolved)'",
+        "indy-init-rehearsal-008 evidence/DEVIATIONS.md DEV-R8-12 (SM-SAVE has no transition for a failed final reconcile read)",
+        "Indy-init docs/engineering-improvement/R9-VERIFICATION-DECISION-RECORD.md §1 ('This was detectable from the frozen tables.')"
+      ],
+      "description": "The frozen package contradicted itself: INV-04 caps reads at 4 per 60 s under network failure while SM-SAVE T-S31/T-S32 allow immediate user-driven reads with no clock; INV04 RequestBounds stayed red to the end (the only failed obligation, PERSIST-016-O5). SM-SAVE also had no legal transition for (UnknownOutcome, ReconcileReadFailed) with no reads left, which stuck sessions until a coordinator-ratified mapping.",
+      "rootCause": "No cross-check of invariants against state-machine tables before freeze.",
+      "category": "requirements-ambiguity",
+      "measuredMinutes": null,
+      "measuredMinutesKind": null,
+      "measuredMinutesSource": null,
+      "otherMeasuredCost": "1 obligation failed at final candidate (PERSIST-016-O5)",
+      "confidence": "high",
+      "recurredIn": [],
+      "preventableByConvention": "Specification preflight (Percepta spec-preflight, introduced for R9) must pass on every frozen package; contradictions become owner decisions before T0.",
+      "duplicateOf": null,
+      "related": []
+    },
+    {
+      "id": "HF-037",
+      "rehearsal": "R009",
+      "repository": "kemiller2002/Indy-init",
+      "evidence": [
+        "Indy-init docs/rehearsal-010-readiness/ROOT-CAUSE.md §1 'Which instructions made the 38-requirement catalog the implementation target' and 'Causes, ranked' C1, C2",
+        "indy-init-rehearsal-009 evidence/FINAL-REPORT.md §16 'The approved scope for this run was the content catalog'",
+        "Indy-init docs/rehearsal-009-content-readiness/FINAL-READINESS.md 'Acceptance scenarios that must pass' (P0 plan only as item 5 'Unchanged')"
+      ],
+      "description": "R009's scope was ambiguous: every readiness document named the 38-requirement content catalog as the build target, while the 161-requirement P0 plan (613 obligations) appeared only as an 'unchanged' line. Praxis exposed one mission work item; 78 of 161 P0 requirements had no DAG task. The agent built only the catalog.",
+      "rootCause": "No single compiled scope manifest / work-item inventory; scope expressed across three frozen files and a readiness checklist.",
+      "category": "requirements-ambiguity",
+      "measuredMinutes": null,
+      "measuredMinutesKind": null,
+      "measuredMinutesSource": null,
+      "otherMeasuredCost": "161 P0 requirements, 613 obligations and 660 plan tests not started (ROOT-CAUSE.md Summary)",
+      "confidence": "high",
+      "recurredIn": [],
+      "preventableByConvention": "One scope manifest compiled into Praxis work items before implementation (later scope-manifest.json, 199 requirements / 863 obligations).",
+      "duplicateOf": null,
+      "related": []
+    },
+    {
+      "id": "HF-038",
+      "rehearsal": "R008",
+      "repository": "kemiller2002/Indy-init",
+      "evidence": [
+        "Indy-init docs/rehearsal-009-content-readiness/AUDIT.md §2.1 'The content requirements exist, but at a priority the plan does not verify' and §3 'Root cause'",
+        "Indy-init docs/rehearsal-009-content-readiness/FINAL-READINESS.md 'Why Rehearsal 008 allowed the gap'"
+      ],
+      "description": "Investigation content (name, description, question, observation/hypothesis/conclusion text, evidence, relationships, editing) had priority `unstated`, so the P0-only verification plan (ODR-V4-10 A) carried no criterion or test for it. R008 shipped lifecycle buttons and counters ('Observation 2 (version 3)'), evidence 'not part of this version', with every gate green.",
+      "rootCause": "Priority-filtered verification plan dropped the product's core capability; no obligation required entering content through the UI and seeing it after reload.",
+      "category": "requirements-ambiguity",
+      "measuredMinutes": null,
+      "measuredMinutesKind": null,
+      "measuredMinutesSource": null,
+      "otherMeasuredCost": "R009 then spent its run on the content catalog only (see scope finding)",
+      "confidence": "high",
+      "recurredIn": [
+        "R009"
+      ],
+      "preventableByConvention": "Core user journeys must be P0 obligations with a UI round-trip test; a gate flags capability areas with zero P0 obligations.",
+      "duplicateOf": null,
+      "related": []
+    },
+    {
+      "id": "HF-039",
+      "rehearsal": "R008",
+      "repository": "kemiller2002/indy-init-rehearsal-008",
+      "evidence": [
+        "indy-init-rehearsal-008 evidence/reviews/T33-final-review.md T33-F-01 'the large-file re-read is not wired into save read-back or reconciliation; the bound test passes without exercising it'",
+        "indy-init-rehearsal-008 commit f6dc84b 'WI-R8-T32P: reconciliation always reaches a decision' / evidence/FINAL-REPORT.md 'reconcile stall past 250 commits ... (#48)', 'compare truncation (T36 F-01)'",
+        "Indy-init requirements-compiled/v4/analysis/r7-lessons.json R7L-19 (R7: 'compare results are not paginated'; 'files over 1 MB cannot be read back')"
+      ],
+      "description": "GitHub API limits broke save confirmation in two consecutive rehearsals: R7 recorded unpaginated compare results and unreadable files over 1 MB; R8 again hit compare truncation (T36 F-01), a reconcile stall past 250 commits (#48), and saves with any file over 1 MB that could never reach Saved (fixed #52 at T+334). Residual R8 sweep items remained (stale head past 250 commits ends in an unnecessary Conflict).",
+      "rootCause": "Error matrix built from documentation; large-file and pagination paths implemented as helpers without being wired into the save state machine.",
+      "category": "persistence-serialization",
+      "measuredMinutes": null,
+      "measuredMinutesKind": null,
+      "measuredMinutesSource": null,
+      "otherMeasuredCost": "3 R8 fix PRs (#27, #48, #52); T32L merged T+334",
+      "confidence": "high",
+      "recurredIn": [
+        "R008"
+      ],
+      "preventableByConvention": "Provider conformance probe (T18) must include >1 MB files and >250-commit histories, and SM-level tests must drive read-back through them.",
+      "duplicateOf": null,
+      "related": []
+    },
+    {
+      "id": "HF-040",
+      "rehearsal": "R007",
+      "repository": "kemiller2002/indy-init-rehearsal-007",
+      "evidence": [
+        "Indy-init docs/rehearsal-007/PERSISTENCE-ARCHITECTURE-DECISION.md 'Context' (R6-D-001, R6-D-002, R6-D-003)",
+        "Indy-init docs/rehearsal-007/DEFECT-TRACEABILITY.md 'Historical defects'",
+        "Indy-init requirements-compiled/v4/analysis/r7-lessons.json R7L-01 (R7: 'Saved could be shown without a read-back confirmation.') and R7L-12 (public SaveProcess/Load/Reply can fabricate a confirmation)"
+      ],
+      "description": "Non-durable or unverified state was presented as durable: R6 restored 'Saved to GitHub (confirmed ...)' from browser storage for device-only changes and shared one device store across tabs (lost updates every run) with an offline queue retrying 151 POSTs in 60 s while showing 'Saving'. After ADR-R7-001 removed local durability, R7 still could show Saved without a read-back confirmation, and in-process code could fabricate GitHub answers to reach a confirmation.",
+      "rootCause": "Requirements demanded device-local durable state shared by tabs (AR-035-O4, R10.5/R10.7, UI-006 'queued offline'); Saved not structurally tied to read-back.",
+      "category": "persistence-serialization",
+      "measuredMinutes": null,
+      "measuredMinutesKind": null,
+      "measuredMinutesSource": null,
+      "otherMeasuredCost": "R6-D-003: 151 POSTs in 60 s (final review) / ~5,000 failed POSTs per tab in 4-5 min (progress.json, REMEDIATION-BASELINE DX-15)",
+      "confidence": "high",
+      "recurredIn": [
+        "R007",
+        "R008"
+      ],
+      "preventableByConvention": "Saved constructible only from a read-back confirmation type (PERSIST-023); transport decoding private to the persistence module.",
+      "duplicateOf": null,
+      "related": [
+        "HF-026",
+        "HF-021"
+      ]
+    },
+    {
+      "id": "HF-041",
+      "rehearsal": "R008",
+      "repository": "kemiller2002/indy-init-rehearsal-008",
+      "evidence": [
+        "indy-init-rehearsal-008 evidence/reviews/T33-final-review.md T33-F-07 ('a command whose body is unknown falls back to the bare frozen Decide, which is RecordObservation'; 'The fallback is silent')",
+        "indy-init-rehearsal-008 evidence/reviews/T30-pre-rc.md F-03 ('Export unsaved changes exports command ids only', data loss on conflict export)",
+        "indy-init-rehearsal-008 evidence/reviews/T33-final-review.md T33-F-06 (machine faults dropped silently at the app edge)",
+        "Indy-init docs/rehearsal-009-content-readiness/AUDIT.md §1 note: catalog events 'carry only kinds into this kernel, so their content could not be shown'"
+      ],
+      "description": "Unknown/missing variants were handled by silent fallback instead of refusal: a command whose body was missing was decided and persisted as an Observation; export wrote envelopes without bodies so unsaved work could not be reapplied; typed faults were dropped at the app edge; historical catalog events were loaded but their content discarded by a kind-only kernel.",
+      "rootCause": "Workarounds around the frozen contract defaulted to the frozen Decide path rather than failing closed.",
+      "category": "persistence-serialization",
+      "measuredMinutes": null,
+      "measuredMinutesKind": null,
+      "measuredMinutesSource": null,
+      "otherMeasuredCost": null,
+      "confidence": "high",
+      "recurredIn": [],
+      "preventableByConvention": "Codec rule: an unknown or incomplete variant is a typed refusal (never a default case); export/import round-trip test with bodies.",
+      "duplicateOf": null,
+      "related": []
+    },
+    {
+      "id": "HF-042",
+      "rehearsal": "R008",
+      "repository": "kemiller2002/indy-init-rehearsal-008",
+      "evidence": [
+        "Indy-init docs/engineering-improvement/R9-VERIFICATION-DECISION-RECORD.md §1 '.ros merge conflicts | 26 of 49 merges' and §3 D8",
+        "indy-init-rehearsal-008 evidence/DEVIATIONS.md DEV-R8-07 and DEV-R8-08 ('praxis work history merge --apply refused ...'; id/line-union fallback)",
+        "indy-init-rehearsal-008 commits 9124d96, c47349c, 43a240d, 84f1cc7, 70520a9 (merges reconciled with the union fallback)"
+      ],
+      "description": "Shared Praxis state files caused constant merge conflicts across parallel lanes: all 26 conflicted merges (of 49) hit .ros/context/current.json, 20 also events.jsonl. `praxis work history merge` refused some ('divergent identity actor'), forcing a coordinator-written union fallback; one agent hand-edited .ros (forbidden), and Praxis 3.24.0 step identity broke after ingest so `praxis step` was abandoned from 18:07Z, losing step-level token attribution.",
+      "rootCause": "Per-repo single mutable state file shared by all lanes; Praxis merge driver did not handle the single-file conflict case (fix deferred past 7 November).",
+      "category": "agent-coordination",
+      "measuredMinutes": null,
+      "measuredMinutesKind": null,
+      "measuredMinutesSource": null,
+      "otherMeasuredCost": "26 of 49 merges conflicted; 5 merge commits in R008 history cite the union/reconciliation fallback; 65 of 168 non-merge commits are 'Praxis:' bookkeeping commits",
+      "confidence": "high",
+      "recurredIn": [],
+      "preventableByConvention": "Append-only per-work-item state files (no shared current.json) or a merge driver; coordinator merges reconcile .ros automatically.",
+      "duplicateOf": null,
+      "related": []
+    },
+    {
+      "id": "HF-043",
+      "rehearsal": "R008",
+      "repository": "kemiller2002/indy-init-rehearsal-008",
+      "evidence": [
+        "indy-init-rehearsal-008 git log: 19 non-merge commits whose subject contains 'CR-' (e.g. ed80167 'CR-T16-1..4 (integration applies for WI-R8-T16)', ad01164 'CR-T23-1..5 (integration applies for WI-R8-T23)', 1dfd207 CRFINAL)",
+        "indy-init-rehearsal-008 evidence/T10-RESULT.md 'Correction (17:45Z)': ten integration-owned planned files absent after the generator ran",
+        "Indy-init requirements-compiled/v4.1/optimization-report.md 'Where v4 left time on the table' ('Project-file and shared-file merge conflicts' in v4/R7)",
+        "indy-init-rehearsal-008 evidence/reviews/T30-pre-rc.md F-01 (product path not wired; ownership split ui (Engine) + integration (Program.fs, boundary.js, index.html))"
+      ],
+      "description": "Strict single-owner files (introduced after R7's shared-file conflicts) moved the cost into change requests: lanes could not edit shared files (Program.fs, boundary.js, index.html, workflows) and asked the integration lane to apply CRs, giving 19 CR commits and integration as the top lane by tokens after the coordinator (89.9 M). At T+165 the independent review found the browser product path not wired at all, because the pieces were split across ui and integration ownership.",
+      "rootCause": "Ownership map assigned glue files to one lane, so cross-lane integration happened late and serially through CRs.",
+      "category": "agent-coordination",
+      "measuredMinutes": null,
+      "measuredMinutesKind": null,
+      "measuredMinutesSource": null,
+      "otherMeasuredCost": "19 CR commits; integration lane 89.9 M tokens (FINAL-REPORT Token economics)",
+      "confidence": "medium",
+      "recurredIn": [
+        "R008"
+      ],
+      "preventableByConvention": "Schedule an end-to-end wiring task (walking skeleton) owned by one lane before parallel fan-out; CRs to shared files batched at fixed checkpoints.",
+      "duplicateOf": null,
+      "related": []
+    },
+    {
+      "id": "HF-044",
+      "rehearsal": "R009",
+      "repository": "kemiller2002/Indy-init",
+      "evidence": [
+        "Indy-init docs/release-gate-repair/FINAL-REPORT.md §10 'Coordination with #102' ('overlaps six files of this one')",
+        "Indy-init docs/release-gate-repair/INTEGRATION-RESPONSE.md (drop #102's v4.1.3, V41Package.fs, r9.fsx suite-preflight/suite-fixture/govern --lock, verification-gate.yml, CI job suite-commands)",
+        "Indy-init commit 7363896 'cite dokimos#67 (merged) instead of the duplicate #68'"
+      ],
+      "description": "After R009, two agent sessions repaired the same defects in parallel: PR #101 (release-gate repair) and PR #102 (process corrections) overlapped six files and both implemented a successor package, suite-preflight, govern --lock and a gate workflow; one side's work was discarded in integration. A duplicate Dokimos PR (#68) for the same url-input fix as #67 was also opened and closed.",
+      "rootCause": "No ownership assignment for post-rehearsal repair areas before launching parallel sessions.",
+      "category": "agent-coordination",
+      "measuredMinutes": null,
+      "measuredMinutesKind": null,
+      "measuredMinutesSource": null,
+      "otherMeasuredCost": "6 overlapping files; duplicate dokimos#68 closed; v4.1.3 + suite tooling from #102 dropped",
+      "confidence": "high",
+      "recurredIn": [],
+      "preventableByConvention": "Assign each repair area an owning session up front (as the later 'Roles (agreed)' table did) and check for open PRs touching the same files before starting.",
+      "duplicateOf": null,
+      "related": []
+    },
+    {
+      "id": "HF-045",
+      "rehearsal": "R008",
+      "repository": "kemiller2002/indy-init-rehearsal-008",
+      "evidence": [
+        "indy-init-rehearsal-008 evidence/FINAL-REPORT.md 'Unverified obligations (347 = 1 failed + 346 not run)' cause table",
+        "Indy-init docs/engineering-improvement/R9-VERIFICATION-DECISION-RECORD.md §1 ('The dominant loss (about 380 of 613 obligation-causes) is tests that the plan named exactly but nobody wrote')",
+        "indy-init-rehearsal-008 evidence/reviews/T33-final-review.md T33-F-03 ('45 of 71 tests/Causa.Acceptance/{Deterministic,Live}/*.fs files are still 2-line bootstrap stubs')"
+      ],
+      "description": "R008 verified only 266 of 613 P0 obligations (51 of 161 requirements). The dominant cause was bound tests never written: spec files absent (152 + 33), bootstrap stubs left in place (81 + 45), browser-live suite never created (17), and bound titles that drifted or never ran (38 + 16). Stubs compiled, produced no result and read as 'not run', so nothing signalled the gap while there was time; a tests-only sprint started only after T31 (T+274).",
+      "rootCause": "Bootstrap generated silent compiling stubs; no in-window coverage signal against plan identities.",
+      "category": "testing-verification",
+      "measuredMinutes": null,
+      "measuredMinutesKind": null,
+      "measuredMinutesSource": null,
+      "otherMeasuredCost": "347 of 613 obligations unverified; ~380 obligation-causes from unwritten tests",
+      "confidence": "high",
+      "recurredIn": [
+        "R009"
+      ],
+      "preventableByConvention": "Scaffolds fail loudly (Dokimos scaffold `failwith DOKIMOS-UNIMPLEMENTED`), and a per-checkpoint coverage report against plan identities runs from T0.",
+      "duplicateOf": null,
+      "related": []
+    },
+    {
+      "id": "HF-046",
+      "rehearsal": "R008",
+      "repository": "kemiller2002/indy-init-rehearsal-008",
+      "evidence": [
+        "indy-init-rehearsal-008 evidence/reviews/T33-final-review.md T33-F-01 'Test honesty: PERSIST007Tests.ReadBackOfFileOver1MB ... checks ... standalone helpers ... so it passes while the save path does not do what it claims'",
+        "indy-init-rehearsal-009 evidence/FINAL-REPORT.md §9 'The last probe survived a first local run. That showed the E2E reassessed to the kind the link already had.'",
+        "Indy-init requirements-compiled/v4/analysis/r7-lessons.json R7L-13 (R7: 'Each review round found real defects that the author's own suites, including the mutation checks, had missed.')",
+        "Indy-init docs/rehearsal-007/REMEDIATION-BASELINE.md 'Governance failures' GF-11 (R6 UI-034-O2 assertion removed)"
+      ],
+      "description": "Tests passed without exercising the claimed behaviour: R8's large-file read-back test exercised helpers, not the save machine; R9's content E2E reassessed a link to the kind it already had, so a reassessment fault survived until a fault probe exposed it; R7's own suites (including mutation checks) missed defects each review round found; R6 weakened an assertion to pass.",
+      "rootCause": "Author-written tests not checked for fault sensitivity; binding is by name, not by behaviour.",
+      "category": "testing-verification",
+      "measuredMinutes": null,
+      "measuredMinutesKind": null,
+      "measuredMinutesSource": null,
+      "otherMeasuredCost": "R9: 1 of 6 fault probes survived first run",
+      "confidence": "high",
+      "recurredIn": [
+        "R007",
+        "R008",
+        "R009"
+      ],
+      "preventableByConvention": "Fault probes (mutation of the specific behaviour) required for every P0 behavioural obligation; assertion ratchet blocks weakened tests.",
+      "duplicateOf": null,
+      "related": []
+    },
+    {
+      "id": "HF-047",
+      "rehearsal": "R009",
+      "repository": "kemiller2002/Indy-init",
+      "evidence": [
+        "Indy-init docs/rehearsal-010-readiness/ROOT-CAUSE.md §4 ('FINAL-READINESS says \"READY\", but the plan's own commands could not run on the pinned SDK. The readiness harness (76 cases) never ran a suite command of the plan, only gate logic on synthetic results.')",
+        "Indy-init docs/rehearsal-009-content-readiness/FINAL-READINESS.md 'Verdict: READY'",
+        "Indy-init docs/release-gate-repair/FINAL-REPORT.md §1 row 'Nothing caught these before the release gate'"
+      ],
+      "description": "R009 was declared READY by a readiness harness that tested gate logic on synthetic results but never executed the frozen plan's own suite commands, the gate workflow installed no browsers, and the bootstrap never wrote playwright.config.ts with a webkit project; all three made the release gate fail on its first real run.",
+      "rootCause": "Readiness evidence came from synthetic fixtures rather than the real package on a real skeleton.",
+      "category": "governance",
+      "measuredMinutes": null,
+      "measuredMinutesKind": null,
+      "measuredMinutesSource": null,
+      "otherMeasuredCost": "3 non-executable suites binding 210 obligations (SU-DOTNET-LIVE 139, SU-BROWSER-WEBKIT 71)",
+      "confidence": "high",
+      "recurredIn": [
+        "R008"
+      ],
+      "preventableByConvention": "Readiness must include a dry run of the actual release gate against the bootstrapped empty repository (suite-preflight in list mode).",
+      "duplicateOf": null,
+      "related": [
+        "HF-028"
+      ]
+    },
+    {
+      "id": "HF-048",
+      "rehearsal": "R009",
+      "repository": "kemiller2002/indy-init-rehearsal-009",
+      "evidence": [
+        "indy-init-rehearsal-009 evidence/FINAL-REPORT.md §1 'Implementation stopped / report written 2026-11-04T02:25Z (about 115 of 420 minutes)' and §16",
+        "Indy-init docs/rehearsal-010-readiness/ROOT-CAUSE.md §3 and §6 ('Was the agent authorized to continue implementing independent requirements? Yes (confirmed).')"
+      ],
+      "description": "The R009 agent stopped at about 115 of 420 minutes, citing a compute constraint and a release gate that could not pass, although implementing the remaining P0 requirements needed no owner decision and the required checks were green. Implementation status and verification status were treated as one variable, and no rule listed permitted stop conditions.",
+      "rootCause": "No stop rule; a blocked verifier looked like zero progress; possible compute-minimizing instruction in the launch prompt (ROOT-CAUSE H2, unconfirmed).",
+      "category": "governance",
+      "measuredMinutes": 305,
+      "measuredMinutesKind": "unused-window",
+      "measuredMinutesSource": "indy-init-rehearsal-009 evidence/FINAL-REPORT.md §1: report written 02:25Z, about 115 of 420 minutes (305 unused)",
+      "otherMeasuredCost": "about 305 of 420 minutes unused; 0/541 executable plan obligations implemented",
+      "confidence": "high",
+      "recurredIn": [],
+      "preventableByConvention": "Explicit permitted-stop list (deadline or owner-blocked work only); progress tracked separately for implementation and verification.",
+      "duplicateOf": null,
+      "related": []
+    },
+    {
+      "id": "HF-049",
+      "rehearsal": "R009",
+      "repository": "kemiller2002/indy-init-rehearsal-009",
+      "evidence": [
+        "indy-init-rehearsal-009 evidence/FINAL-REPORT.md §12 ('The work item was begun after the first application commits, not before them. This is a process deviation.')",
+        "Indy-init docs/release-gate-repair/FINAL-REPORT.md §4 ('On Rehearsal 009: 6 violating commits, from edde38c (the application) to 33d072d, and no checkpoint.')",
+        "indy-init-rehearsal-009 evidence/FINAL-REPORT.md §12 independent review 'not posted as a GitHub review, so no CI-observed review attestation exists'"
+      ],
+      "description": "Process gates were bypassed in R009: the only Praxis work item was created after the application commits (6 commits before any authorization checkpoint), the independent review was not posted as a GitHub review (no attestation), and `praxis telemetry ingest` was not run, so token usage is unmeasured.",
+      "rootCause": "Nothing refused implementation before work items existed; review attestation path not enforced.",
+      "category": "governance",
+      "measuredMinutes": null,
+      "measuredMinutesKind": null,
+      "measuredMinutesSource": null,
+      "otherMeasuredCost": "6 pre-authorization implementation commits; 0/119 record obligations verified",
+      "confidence": "high",
+      "recurredIn": [],
+      "preventableByConvention": "authorize-implementation checkpoint + check-sequencing in CI (added afterwards); review must be a GitHub review to count.",
+      "duplicateOf": null,
+      "related": []
+    },
+    {
+      "id": "HF-050",
+      "rehearsal": "R008",
+      "repository": "kemiller2002/indy-init-rehearsal-008",
+      "evidence": [
+        "indy-init-rehearsal-008 evidence/FINAL-REPORT.md 'Timed verdict': 'The pinned approvals file (kickoff/rehearsal-007/approvals.causa.json) fails the tool's trust checks'",
+        "Indy-init docs/engineering-improvement/R9-VERIFICATION-DECISION-RECORD.md §1 ('Approval trust invalid → verdict INVALID ... This was detectable before T0.')",
+        "Indy-init docs/engineering-improvement/R9-READINESS-HANDOFF.md §F item 1 (preflight read INVALID, 44 problems)",
+        "indy-init-rehearsal-009 evidence/FINAL-REPORT.md §12 ('Acceptance verdict ... Not computed.')",
+        "Indy-init docs/rehearsal-007/REMEDIATION-BASELINE.md GF-02, GF-03 (R6 approvals: [] and an agent-written approvals file withdrawn)"
+      ],
+      "description": "The authoritative acceptance verdict could not be computed in three consecutive rehearsals: R6 had no operator approval records (and an agent-written file withdrawn); R8 reused R7's approvals file, whose records lacked source and requirement/action form, giving INVALID; R9 had no owner-pinned approvals or evidence manifest at all.",
+      "rootCause": "Approval inputs not preflighted against the verifier before T0 (acceptance preflight added only for R9).",
+      "category": "governance",
+      "measuredMinutes": null,
+      "measuredMinutesKind": null,
+      "measuredMinutesSource": null,
+      "otherMeasuredCost": "R8 verdict INVALID; R9 NOT-COMPUTED",
+      "confidence": "high",
+      "recurredIn": [
+        "R008",
+        "R009"
+      ],
+      "preventableByConvention": "Run the verifier's --preflight on the pinned approvals at T0; per-rehearsal approvals file created by the owner before launch.",
+      "duplicateOf": null,
+      "related": []
+    },
+    {
+      "id": "HF-051",
+      "rehearsal": "R007",
+      "repository": "kemiller2002/Indy-init",
+      "evidence": [
+        "Indy-init docs/rehearsal-007/REMEDIATION-BASELINE.md 'Discrepancies between the summary and the evidence' DX-01..DX-20",
+        "Indy-init docs/rehearsal-007/REMEDIATION-BASELINE.md 'Evidence failures' EV-03, EV-09 and 'Governance failures' GF-04, GF-06..GF-08"
+      ],
+      "description": "The R7 remediation audit found the prior rehearsal's results summary unsupported in 20 places: final review run on 02c37d1 and carried to 46d5e11 while candidate CI was pending; defect classes marked PASS citing R5 fix SHAs absent from history; 775 equivalence reviews agent-transcribed naming the owner; reviews and dispositions 'attested in chat'.",
+      "rootCause": "Agent-authored summaries and attestations accepted without machine-checked evidence links.",
+      "category": "governance",
+      "measuredMinutes": null,
+      "measuredMinutesKind": null,
+      "measuredMinutesSource": null,
+      "otherMeasuredCost": "20 summary-vs-evidence discrepancies; 14 governance failures listed",
+      "confidence": "high",
+      "recurredIn": [
+        "R008"
+      ],
+      "preventableByConvention": "Results summaries generated from evidence records; attestations only as GitHub reviews/owner commits; defect closures verified against fix commits in the run's own history (verify-defect-closures).",
+      "duplicateOf": null,
+      "related": []
+    },
+    {
+      "id": "HF-052",
+      "rehearsal": "R008",
+      "repository": "kemiller2002/indy-init-rehearsal-008",
+      "evidence": [
+        "indy-init-rehearsal-008 evidence/T10-RESULT.md 'Correction (17:45Z)' ('T10 is not fully complete at first green CI ... \"T10 actual 4 min 33 s\" covers only the bootstrap through first green CI.')",
+        "indy-init-rehearsal-008 evidence/reviews/T30-pre-rc.md 'Verdict: NOT READY FOR RC. The libraries pass; the product path in the browser does not exist yet'"
+      ],
+      "description": "Completion claims ran ahead of reality in R8: T10 was reported complete at first green CI (4 min 33 s vs 29 min plan) although ten integration-owned files the plan included were still absent; by T+165 lanes had merged their tasks but the deployed page could not connect, open or save.",
+      "rootCause": "Task completion keyed to CI green / lane-local tests rather than the task's planned file set and end-to-end behaviour.",
+      "category": "testing-verification",
+      "measuredMinutes": null,
+      "measuredMinutesKind": null,
+      "measuredMinutesSource": null,
+      "otherMeasuredCost": null,
+      "confidence": "medium",
+      "recurredIn": [
+        "R009"
+      ],
+      "preventableByConvention": "Completion predicate checks the task's declared outputs (files, bound tests) exist, plus a walking-skeleton E2E after each integration checkpoint.",
+      "duplicateOf": null,
+      "related": []
+    },
+    {
+      "id": "HF-053",
+      "rehearsal": "R008",
+      "repository": "kemiller2002/indy-init-rehearsal-008",
+      "evidence": [
+        "indy-init-rehearsal-008 evidence/DEVIATIONS.md DEV-R8-04 ('central package management disables the F# SDK's implicit FSharp.Core reference, so every Causa .NET test assembly was skipped')",
+        "indy-init-rehearsal-008 evidence/SCHEDULE-ACTUALS.md row 'CR-2 FSharp.Core' (17:48, T+17, PR #3)"
+      ],
+      "description": "The v41 bootstrap's central package management silently removed FSharp.Core's implicit reference, so every Causa .NET test assembly was skipped (not failed) until an owner-ratified central FSharp.Core 10.1.402 entry was added at T+17.",
+      "rootCause": "Generator enabled CPM without the FSharp.Core PackageVersion; skipped assemblies did not fail CI.",
+      "category": "fsharp-inconsistency",
+      "measuredMinutes": null,
+      "measuredMinutesKind": null,
+      "measuredMinutesSource": null,
+      "otherMeasuredCost": "fixed T+17 (PR #3)",
+      "confidence": "high",
+      "recurredIn": [],
+      "preventableByConvention": "Bootstrap template includes the FSharp.Core central entry matching the SDK; CI fails when a test assembly is skipped/not discovered.",
+      "duplicateOf": null,
+      "related": []
+    },
+    {
+      "id": "HF-054",
+      "rehearsal": "R008",
+      "repository": "kemiller2002/Indy-init",
+      "evidence": [
+        "Indy-init docs/OWNER-DECISIONS-2026-11-01.md OD-INDY-14 ('Tooling is F# only') and 'Still to be ported to F#' (tools/compute-acceptance-verdict.py, validate-acceptance-ledger.py, simulate-rehearsal.sh)",
+        "indy-init-rehearsal-008 evidence/RC/raw/build-matrix.py, evidence/T34/raw/gen-report.py, evidence/T34/raw/run-verdict.sh; commit 70520a9 ('union_context.py fallback')",
+        "indy-init-rehearsal-009 evidence/FINAL-REPORT.md (authoritative verdict 'computed by tools/compute-acceptance-verdict.py')"
+      ],
+      "description": "Despite the F#-only rule (OD-INDY-14, 2026-11-01), the authoritative acceptance verdict remained a Python script, and R8's evidence pipeline used ad-hoc Python/shell (build-matrix.py, gen-report.py, run-verdict.sh, union_context.py); R7 also needed a C# [JSExport] shim for Limen.",
+      "rootCause": "Porting of verdict tooling deferred by the owner (option 3); agents wrote throwaway scripts in whatever language was fastest.",
+      "category": "fsharp-inconsistency",
+      "measuredMinutes": null,
+      "measuredMinutesKind": null,
+      "measuredMinutesSource": null,
+      "otherMeasuredCost": null,
+      "confidence": "medium",
+      "recurredIn": [
+        "R009"
+      ],
+      "preventableByConvention": "Evidence/verdict tooling shipped as released F# tools so rehearsal agents never script evidence ad hoc.",
+      "duplicateOf": null,
+      "related": []
+    },
+    {
+      "id": "HF-055",
+      "rehearsal": "R008",
+      "repository": "kemiller2002/indy-init-rehearsal-008",
+      "evidence": [
+        "indy-init-rehearsal-008 evidence/DEVIATIONS.md DEV-R8-05 (forma-workflow 1.2.0 'not in the locked set or the Registry channel'; owner direction mid-run)",
+        "indy-init-rehearsal-008 evidence/T24-layout-engine.md 'Finding'",
+        "Indy-init docs/rehearsal-007/REMEDIATION-BASELINE.md GF-05 (R6: forma-workflow 1.1.0 decision record agent-transcribed) and GF-14 (Arca 0.6.0 not adopted)"
+      ],
+      "description": "Required UI dependencies were not in the dependency lock: R8 discovered at T24 that the mandated workflow layout engine (@echelon-foundry/forma-workflow 1.2.0) was outside the locked set and needed an owner decision in-session; R6 had the same issue with forma-workflow 1.1.0 (agent-transcribed decision) and an unadopted Arca.",
+      "rootCause": "Dependency lock built from component names, not from an inventory of what the requirements (WDL-002, DEC-030) oblige the app to compose.",
+      "category": "architecture",
+      "measuredMinutes": null,
+      "measuredMinutesKind": null,
+      "measuredMinutesSource": null,
+      "otherMeasuredCost": null,
+      "confidence": "medium",
+      "recurredIn": [
+        "R008"
+      ],
+      "preventableByConvention": "Lock compiled from requirement-mandated components; preflight fails if a mandated engine is not in the resolved set.",
+      "duplicateOf": null,
+      "related": []
+    },
+    {
+      "id": "HF-056",
+      "rehearsal": "R007",
+      "repository": "kemiller2002/indy-init-rehearsal-007",
+      "evidence": [
+        "Indy-init requirements-compiled/v4.1/optimization-report.md 'Where v4 left time on the table' row 'Forma named, not inventoried, layout untested' ('Rehearsal 7 used Forma tokens that do not exist; layout bugs found by eye')",
+        "Indy-init docs/rehearsal-007/REMEDIATION-RESULTS.md R7-REM-009 (R6 outline contrast 1.95:1) and REMEDIATION-BASELINE.md CI-08 (R6 .causa-attention border rgb(158,100,16) vs expected #E9A23B)",
+        "indy-init-rehearsal-009 evidence/FINAL-REPORT.md §8 ('found and fixed two real defects: contrast on the destination note, and aria-controls pointing at an unmounted editor'); commit f1e0be7"
+      ],
+      "description": "Forma UI implementation defects recurred in each rehearsal: R6 shipped a 1.95:1 non-text outline and an attention colour off-spec; R7 used Forma tokens that do not exist, with layout bugs found by eye; R9's mobile suite found a contrast failure and a broken aria-controls. Detection relied on late browser runs rather than token/contract checks at authoring time.",
+      "rootCause": "No machine check of Forma token existence or contrast until v4.1 (FL-01..FL-10 layout assertions) and R7-REM-009.",
+      "category": "ui-implementation",
+      "measuredMinutes": null,
+      "measuredMinutesKind": null,
+      "measuredMinutesSource": null,
+      "otherMeasuredCost": "R9: 2 a11y defects fixed in f1e0be7",
+      "confidence": "medium",
+      "recurredIn": [
+        "R008",
+        "R009"
+      ],
+      "preventableByConvention": "Lint CSS against the published Forma token inventory; run axe + layout assertions at 320/390 px on every PR from T0.",
+      "duplicateOf": null,
+      "related": []
+    },
+    {
+      "id": "HF-057",
+      "rehearsal": "R007",
+      "repository": "kemiller2002/indy-init-rehearsal-007",
+      "evidence": [
+        "Indy-init requirements-compiled/v4/analysis/r7-lessons.json R7L-15 (R7 FINAL-REPORT: 'the agent projected the time from earlier timestamps instead of reading the clock'; 'PR #28 went green at 03:51Z.') and R7L-17 ('73 VERIFIED, 17 PARTIAL, 32 NOT_IMPLEMENTED, 9 NOT_RUN, 30 NOT_ASSESSED of 161 P0')",
+        "Indy-init docs/TOKEN-ECONOMICS.md §5 (R7 main agent 'runs to 05:52Z, about 2 minutes past the deadline')",
+        "Indy-init requirements-compiled/v4/optimization-report.md §C ('Rehearsal 7 found two classification defects only against real GitHub, late.')"
+      ],
+      "description": "R7 mis-managed the clock and delivered under half the P0 scope: the agent projected time from earlier timestamps instead of reading the clock, a critical PR went green only at 03:51Z, the main agent ran about 2 minutes past the deadline, and two GitHub classification defects were found only late against real GitHub. Result: 73 of 161 P0 requirements verified.",
+      "rootCause": "Single-lead topology could not fit the plan (v4: 765 min against 420); no clock rule or merge freeze.",
+      "category": "governance",
+      "measuredMinutes": null,
+      "measuredMinutesKind": null,
+      "measuredMinutesSource": null,
+      "otherMeasuredCost": "73/161 P0 verified; ~2 min past deadline",
+      "confidence": "high",
+      "recurredIn": [
+        "R008",
+        "R009"
+      ],
+      "preventableByConvention": "Read the wall clock at every resumption; merge freeze before delivery; live provider probe at T0.",
+      "duplicateOf": null,
+      "related": []
+    },
+    {
+      "id": "HF-058",
+      "rehearsal": "R010-readiness",
+      "repository": "kemiller2002/indy-init-rehearsal-010",
+      "evidence": [
+        "kemiller2002/indy-init-rehearsal-010 git log: single commit 616ee17 'Initial commit' (2026-11-04, README only)",
+        "kemiller2002/Indy-init docs/rehearsal-010-readiness/FINAL-READINESS.md 'Decision: READY FOR OWNER ACTION'",
+        "kemiller2002/Indy-init docs/rehearsal-010-optimization/FINAL-REPORT.md (header: 'Rehearsal 010 has not started, and its 420-minute clock has not run')"
+      ],
+      "description": "Rehearsal 010 was never launched in the evidence available: the competition repository holds one owner commit (README only), no T0 record; readiness ended as 'READY FOR OWNER ACTION', not 'READY TO LAUNCH'. Every R10 duration in the hub is a model output.",
+      "rootCause": "Launch gated on a long chain of owner-only actions (package freeze/tag, Dokimos release, registry set, test repo + App, decisions, scope approval, lock) plus a required live-provider preflight.",
+      "category": "governance",
+      "measuredMinutes": null,
+      "measuredMinutesKind": null,
+      "measuredMinutesSource": null,
+      "otherMeasuredCost": "competition repo commit count = 1",
+      "confidence": "high",
+      "recurredIn": [],
+      "preventableByConvention": "Define a launch-readiness checklist with a fixed owner-action batch and deadline so engineering readiness and owner readiness converge before the window.",
+      "duplicateOf": null,
+      "related": []
+    },
+    {
+      "id": "HF-059",
+      "rehearsal": "R010-readiness",
+      "repository": "kemiller2002/Indy-init",
+      "evidence": [
+        "kemiller2002/Indy-init docs/rehearsal-010-readiness/ROOT-CAUSE.md §1 'Which instructions made the 38-requirement catalog the implementation target' (C1)",
+        "kemiller2002/Indy-init docs/rehearsal-010-readiness/PROCESS-CORRECTIONS.md §1-§2"
+      ],
+      "description": "(R9 failure diagnosed in R10 readiness) Every working document named the 38-requirement catalog as the build target; the 161-P0 v4.1.2 plan appeared only as one 'Unchanged' line. The run built only the catalog.",
+      "rootCause": "Instruction defect: full scope existed in three frozen files but was never stated as the target; launch prompt (unavailable, Hypothesis H1) likely named only the catalog.",
+      "category": "requirements-ambiguity",
+      "measuredMinutes": null,
+      "measuredMinutesKind": null,
+      "measuredMinutesSource": null,
+      "otherMeasuredCost": "161 P0 requirements / 613 obligations / 660 plan tests not started (ROOT-CAUSE.md Summary) [same event as HF-037; cost counted there]",
+      "confidence": "high",
+      "recurredIn": [
+        "R010 corrected via scope-manifest.json (199->205 requirements)"
+      ],
+      "preventableByConvention": "One authoritative compiled scope manifest named as the target in the launch prompt; no secondary 'unchanged' scope lines.",
+      "duplicateOf": "HF-037",
+      "related": []
+    },
+    {
+      "id": "HF-060",
+      "rehearsal": "R010-readiness",
+      "repository": "kemiller2002/Indy-init",
+      "evidence": [
+        "kemiller2002/Indy-init docs/rehearsal-010-readiness/ROOT-CAUSE.md §3 'Why the agent treated the failed release gate as grounds to stop'",
+        "kemiller2002/Indy-init docs/rehearsal-010-readiness/R9-ADVERSARIAL-REPLAY.md RP-08, RP-15"
+      ],
+      "description": "(R9 failure diagnosed in R10 readiness) The frozen v4.1.2 plan's own suite commands could not execute: SU-OWN-DOTNET and SU-DOTNET-LIVE pass several projects to one `dotnet test` (MSB1008 on SDK 10.0.402), SU-BROWSER-WEBKIT names an undefined `webkit` Playwright project, and the gate workflow installed no browser. The release gate failed before judging anything.",
+      "rootCause": "Frozen package commands were never executed by the readiness harness (76 cases ran gate logic on synthetic results only).",
+      "category": "ci-tooling",
+      "measuredMinutes": null,
+      "measuredMinutesKind": null,
+      "measuredMinutesSource": null,
+      "otherMeasuredCost": "release gate: 662 refusal causes (RP-07); 0/541 plan obligations (TIME-TO-FIRST-DATA.md) [same event as HF-028; cost counted there]",
+      "confidence": "high",
+      "recurredIn": [
+        "corrected in v4.1.4 successor (#101) with suite-preflight --require-tests"
+      ],
+      "preventableByConvention": "Execute every frozen suite command against a deterministic fixture tree before freezing a package (suite-preflight).",
+      "duplicateOf": "HF-028",
+      "related": []
+    },
+    {
+      "id": "HF-061",
+      "rehearsal": "R010-readiness",
+      "repository": "kemiller2002/Indy-init",
+      "evidence": [
+        "kemiller2002/Indy-init docs/rehearsal-010-readiness/ROOT-CAUSE.md §3 items 2-4, 'Causes, ranked' C4/C5",
+        "kemiller2002/Indy-init docs/rehearsal-010-readiness/PROCESS-CORRECTIONS.md §4 (stop-decision table)",
+        "kemiller2002/Indy-init docs/rehearsal-010-readiness/R9-ADVERSARIAL-REPLAY.md RP-08"
+      ],
+      "description": "(R9 failure diagnosed in R10 readiness) Agent stopped at 02:25Z, 115 of 420 minutes, citing 'the compute constraint'; implementation and verification were one status, so a blocked runner looked like no progress, and no rule listed permitted stop conditions.",
+      "rootCause": "Model defect (single status) plus rule defect (no stop conditions); likely compute-saving wording in launch prompt (Hypothesis H2).",
+      "category": "governance",
+      "measuredMinutes": null,
+      "measuredMinutesKind": null,
+      "measuredMinutesSource": "R9-ADVERSARIAL-REPLAY.md RP-08: 'stop-decision CONTINUE_REQUIRED, NOT_A_STOP_CONDITION, 306 minutes remaining'",
+      "otherMeasuredCost": "stopped at 115 of 420 min [same event as HF-048; cost counted there]",
+      "confidence": "high",
+      "recurredIn": [],
+      "preventableByConvention": "Explicit closed list of stop conditions; separate implementation/verification axes; a verification blocker never blocks implementation.",
+      "duplicateOf": "HF-048",
+      "related": []
+    },
+    {
+      "id": "HF-062",
+      "rehearsal": "R010-readiness",
+      "repository": "kemiller2002/Indy-init",
+      "evidence": [
+        "kemiller2002/Indy-init docs/rehearsal-010-readiness/ROOT-CAUSE.md §2 and §5 'Did Praxis expose all required work items before implementation?'",
+        "kemiller2002/Indy-init docs/rehearsal-010-readiness/PROCESS-CORRECTIONS.md §3"
+      ],
+      "description": "(R9 failure diagnosed in R10 readiness) Praxis showed one mission item (COND-MISSION-001); 78 of 161 P0 requirements were covered by no DAG task; `.echelon/verification-scope.json` was empty for the whole run; the agent's own work item was created after the first application commits.",
+      "rootCause": "No step compiled the frozen scope into work items before implementation; no check refused implementation before a complete inventory.",
+      "category": "agent-coordination",
+      "measuredMinutes": null,
+      "measuredMinutesKind": null,
+      "measuredMinutesSource": null,
+      "otherMeasuredCost": "replay of R9 queue: 36 x WORK_ITEM_MISSING (evidence/coverage/r9-queue-verdict.json)",
+      "confidence": "high",
+      "recurredIn": [],
+      "preventableByConvention": "Scope checkpoint (scope preflight + coverage) required before any application commit; check-sequencing enforces it.",
+      "duplicateOf": null,
+      "related": []
+    },
+    {
+      "id": "HF-063",
+      "rehearsal": "R010-readiness",
+      "repository": "kemiller2002/Indy-init",
+      "evidence": [
+        "kemiller2002/Indy-init docs/rehearsal-010-readiness/INTEGRATION-REPORT.md 'Owner decisions applied' and 'Integration fixes found while combining'",
+        "kemiller2002/Indy-init docs/rehearsal-010-readiness/PROCESS-CORRECTIONS.md §5"
+      ],
+      "description": "Two parallel agents (#101 release-gate repair, #102 process corrections) each produced a successor package (v4.1.4 vs v4.1.3) and separate work lists; v4.1.3 was withdrawn. Combining them found #101's gate compiled the v4.1.2 plan with the Rehearsal 009 lock hardcoded, two hand-kept work lists, 16 record-only P0 requirements with no work item, and a cited FINAL-REPORT.md missing from #101's branch.",
+      "rootCause": "Overlapping mandates to concurrent agents without a single owner for the successor package and the work list.",
+      "category": "agent-coordination",
+      "measuredMinutes": null,
+      "measuredMinutesKind": null,
+      "measuredMinutesSource": null,
+      "otherMeasuredCost": "one successor package (v4.1.3) discarded; owner decision needed to pick [same event as HF-044; cost counted there]",
+      "confidence": "high",
+      "recurredIn": [
+        "post-R10: three agents feeding one v4.1.5 (INTEGRATION-ARCHITECTURE.md 'Coordination with Agents 2 and 3')"
+      ],
+      "preventableByConvention": "Assign one agent ownership of each frozen artifact (package, work plan); others submit proposals into it.",
+      "duplicateOf": "HF-044",
+      "related": []
+    },
+    {
+      "id": "HF-064",
+      "rehearsal": "R010-readiness",
+      "repository": "kemiller2002/Indy-init",
+      "evidence": [
+        "kemiller2002/Indy-init docs/rehearsal-010-readiness/FINAL-READINESS.md §2 'Scope counts'",
+        "kemiller2002/Indy-init docs/rehearsal-010-readiness/ROOT-CAUSE.md header note (scopeSha256 b407b5cc...)",
+        "kemiller2002/Indy-init docs/rehearsal-010-optimization/BASELINE.md 'Corrections to the mission's reference baseline'"
+      ],
+      "description": "The approved scope kept changing during readiness: work items 35 -> 36 -> 37, requirements 199 -> 205, obligations 863 -> 890, scopeSha256 b407b5cc... -> 59bfef5a...; the mission's expected digest no longer matched and the scope-approval transaction stopped on the difference. Baseline implementation minutes moved 1,350 -> 1,387.",
+      "rootCause": "Successive package/catalog successors (v4.1.3 withdrawn, v4.1.4, ratified catalog successor) and merges re-derived the scope after the mission text was written.",
+      "category": "contract-instability",
+      "measuredMinutes": null,
+      "measuredMinutesKind": null,
+      "measuredMinutesSource": null,
+      "otherMeasuredCost": "3 distinct scope digests; work-item count changed twice",
+      "confidence": "high",
+      "recurredIn": [],
+      "preventableByConvention": "Freeze the scope digest once and reference it by digest in every downstream document; recompute counts from the manifest instead of copying them.",
+      "duplicateOf": null,
+      "related": []
+    },
+    {
+      "id": "HF-065",
+      "rehearsal": "R010-readiness",
+      "repository": "kemiller2002/Indy-init",
+      "evidence": [
+        "kemiller2002/Indy-init docs/rehearsal-010-readiness/FINAL-READINESS.md §5 'Independent review' (rounds 1-11 table)"
+      ],
+      "description": "Readiness tooling needed 11 independent review rounds; rounds 1-9 all found blocking issues (round 1: 16 findings; e.g. checkpoint ancestry dropped, LP-05 trusted free-text authority, author not committer trusted, a merge hid a rollback from `git log -- file`, `merged_by` absent from abbreviated PR list). Round 11's fix had no round of its own.",
+      "rootCause": "Provenance/governance checks built incrementally against an adversary model that kept expanding; each fix introduced new surfaces.",
+      "category": "testing-verification",
+      "measuredMinutes": null,
+      "measuredMinutesKind": null,
+      "measuredMinutesSource": null,
+      "otherMeasuredCost": "11 review rounds; >=24 blocking findings counted in table",
+      "confidence": "high",
+      "recurredIn": [
+        "post-R10 optimization: review rounds 1-10 (ADVERSARIAL-REVIEW.md); #118 3 rounds"
+      ],
+      "preventableByConvention": "Specify the threat model and provenance rules before building the checks; review against that spec.",
+      "duplicateOf": null,
+      "related": []
+    },
+    {
+      "id": "HF-066",
+      "rehearsal": "post-R10",
+      "repository": "kemiller2002/Indy-init",
+      "evidence": [
+        "kemiller2002/Indy-init docs/rehearsal-010-optimization/BASELINE.md 'The model the baseline depends on, and what it gets wrong'",
+        "kemiller2002/Indy-init docs/rehearsal-010-optimization/FINAL-REPORT.md Q1, Q9",
+        "kemiller2002/Indy-init docs/rehearsal-010-readiness/FINAL-READINESS.md §6"
+      ],
+      "description": "The committed schedule model let either UI lane take any UI slice, contradicting frozen agent-file-ownership.json ('ui and ui-2 never own the same file'); the published T+519 (0-min CI) completion became T+720 under real ownership. Even with unlimited agents the critical path is 389-409 min at zero CI, so the full scope cannot fit 420 min.",
+      "rootCause": "Planning model built without the frozen ownership constraint; scope sized without a critical-path check against the window.",
+      "category": "architecture",
+      "measuredMinutes": null,
+      "measuredMinutesKind": null,
+      "measuredMinutesSource": null,
+      "otherMeasuredCost": "MODELED: T+519 vs T+720 completion at 0-min CI; ui lane 564 lane-minutes",
+      "confidence": "high",
+      "recurredIn": [],
+      "preventableByConvention": "Schedule models must ingest the frozen ownership manifest; check critical path vs window before approving scope.",
+      "duplicateOf": null,
+      "related": []
+    },
+    {
+      "id": "HF-067",
+      "rehearsal": "post-R10",
+      "repository": "kemiller2002/Indy-init",
+      "evidence": [
+        "kemiller2002/Indy-init docs/rehearsal-010-optimization/execution-readiness/CROSS-AGENT-FINDINGS.md 'CF-07, confirmed independently'",
+        "kemiller2002/Indy-init docs/rehearsal-010-optimization/acceleration/MEASUREMENTS.md Timeline (CF07-R3-1)",
+        "kemiller2002/Indy-init commit a293fac (#132)"
+      ],
+      "description": "The frozen slice gate's journeys rule (Ledger.fs 391-410) deadlocks the approved plan: SL-T16 (shell) is bound to J2-08, which needs slices depending on T16; all 42 merge-dependency edges lie on cycles. Fixing it via ODR-R10-33 (#132), review round 3 returned FAIL again on CF07-R3-1 (deadlock at SL-T16).",
+      "rootCause": "Journey assertions bound to slices without checking the slice dependency graph for cycles.",
+      "category": "testing-verification",
+      "measuredMinutes": null,
+      "measuredMinutesKind": null,
+      "measuredMinutesSource": null,
+      "otherMeasuredCost": "MODELED: under greedy deferral M2 moves T+239 -> T+545 [the 11 min figure in the source analysis is modeled, not measured; not counted]",
+      "confidence": "high",
+      "recurredIn": [],
+      "preventableByConvention": "Compile-time cycle check over dependsOn + journey merge dependencies whenever assertions are bound to slices.",
+      "duplicateOf": null,
+      "related": []
+    },
+    {
+      "id": "HF-068",
+      "rehearsal": "post-R10",
+      "repository": "kemiller2002/Indy-init",
+      "evidence": [
+        "kemiller2002/Indy-init docs/rehearsal-010-optimization/DATA-REPOSITORY-CONTRACT.md §6 'C1. Frozen event union versus the 31 wire event types'",
+        "kemiller2002/Indy-init proposals/r10-historical-data-compatibility/SCHEMA-DIFF.md §2",
+        "kemiller2002/Indy-init docs/rehearsal-010-dependency-reduction/CLASSIFICATION.md §1"
+      ],
+      "description": "Frozen v4.1.4 CoreEvent (27 cases + ExtensionAttached) cannot represent the real causa-data histories: 487 of 1,315 catalog events have no case (e.g. EvidenceVerificationAssessed x382, ContradictionTransitioned x45); several frozen cases are lossy. EXT-DATA-013, T25 and M2 cannot pass against real data.",
+      "rootCause": "Contracts were frozen from synthetic fixtures, never decoded against the real data repository.",
+      "category": "persistence-serialization",
+      "measuredMinutes": null,
+      "measuredMinutesKind": null,
+      "measuredMinutesSource": null,
+      "otherMeasuredCost": "487 of 1,315 events unrepresentable",
+      "confidence": "high",
+      "recurredIn": [],
+      "preventableByConvention": "Validate frozen wire contracts by decoding the real data repository before freezing.",
+      "duplicateOf": null,
+      "related": []
+    },
+    {
+      "id": "HF-069",
+      "rehearsal": "post-R10",
+      "repository": "kemiller2002/Indy-init",
+      "evidence": [
+        "kemiller2002/Indy-init docs/rehearsal-010-optimization/DATA-REPOSITORY-CONTRACT.md §6 'C3. No workspace in the connection contract' and 'C2. Admissibility authority'"
+      ],
+      "description": "Frozen `Repository = {Owner; Name; Branch}` and `ConnectSubmitted` have no workspace, though causa-data addresses data by `workspaces/demo/<runId>/...` and EXT-DATA-003 requires selecting branch/workspace. Admissibility is defined by a private pinned engine's History.validate, which the app may not use (OD-INDY-22).",
+      "rootCause": "Connection and admissibility contracts written without reading the data contract (CONTRACT.md).",
+      "category": "contract-instability",
+      "measuredMinutes": null,
+      "measuredMinutesKind": null,
+      "measuredMinutesSource": null,
+      "otherMeasuredCost": null,
+      "confidence": "high",
+      "recurredIn": [],
+      "preventableByConvention": "Trace each contract field to the data contract (requirement-to-field traceability) before freeze.",
+      "duplicateOf": null,
+      "related": []
+    },
+    {
+      "id": "HF-070",
+      "rehearsal": "post-R10",
+      "repository": "kemiller2002/Indy-init",
+      "evidence": [
+        "kemiller2002/Indy-init docs/rehearsal-010-optimization/ARCHITECTURAL-LESSONS.md §1-§3",
+        "kemiller2002/Indy-init docs/rehearsal-010-optimization/TIME-TO-FIRST-DATA.md 'Minutes after T0'"
+      ],
+      "description": "A basic data browser depended on the domain engine and save machine because every requirement touching stored cases is phrased authoritatively ('replayed through the engine'), generated items wait for T17, and T20 waits for T19. No requirement says 'display what is stored'.",
+      "rootCause": "Requirement phrasing plus packaging/governance rules, not technical necessity.",
+      "category": "requirements-ambiguity",
+      "measuredMinutes": null,
+      "measuredMinutesKind": null,
+      "measuredMinutesSource": null,
+      "otherMeasuredCost": "MODELED: visible investigation list T+720/759/794 (approved) vs T+116/125/135 with SL-M0",
+      "confidence": "high",
+      "recurredIn": [],
+      "preventableByConvention": "Include an explicit non-authoritative 'data visible' slice template depending only on the bootstrap.",
+      "duplicateOf": null,
+      "related": []
+    },
+    {
+      "id": "HF-071",
+      "rehearsal": "post-R10",
+      "repository": "kemiller2002/Indy-init",
+      "evidence": [
+        "kemiller2002/Indy-init docs/rehearsal-010-optimization/v415-cost-analysis/COMPILATION-BOTTLENECKS.md §1 'Measured facts', §2"
+      ],
+      "description": "Each v4.1.x successor package, though small in content, took 2-19 hours elapsed: v4.1.1 1h57m (5 review rounds), v4.1.2 13h06m (3 rounds), v4.1.4 19h17m candidate-to-tag, of which 10h44m waiting for owner decisions. Mechanical compile is ~1 s.",
+      "rootCause": "Elapsed time dominated by review rounds and owner round trips, not tooling.",
+      "category": "governance",
+      "measuredMinutes": 1157,
+      "measuredMinutesKind": "elapsed-pre-competition",
+      "measuredMinutesSource": "COMPILATION-BOTTLENECKS.md §1: 'v4.1.4 successor, candidate to tag | 19 h 17 min (05:42 2026-11-04 -> 00:59 2026-11-05)'",
+      "otherMeasuredCost": "v4.1.4 owner-wait 644 min ('10 h 44 min (05:42 -> 16:26)'); successor commits mentioning v4.1.4: 37, v4.1.5: 16 (Indy-init shallow log)",
+      "confidence": "high",
+      "recurredIn": [
+        "v4.1.1",
+        "v4.1.2",
+        "v4.1.4",
+        "v4.1.5 (rev 3, commit 21cc2b0)"
+      ],
+      "preventableByConvention": "Batch owner decisions with a response SLA; pre-agree review criteria to cap rounds.",
+      "duplicateOf": null,
+      "related": []
+    },
+    {
+      "id": "HF-072",
+      "rehearsal": "post-R10",
+      "repository": "kemiller2002/Indy-init",
+      "evidence": [
+        "kemiller2002/Indy-init docs/rehearsal-010-optimization/v415-cost-analysis/COMPILATION-BOTTLENECKS.md §3 (V41Package.fs:1774-1790, :189, :359, :778-780)",
+        "kemiller2002/Indy-init docs/rehearsal-010-dependency-reduction/CLASSIFICATION.md §2 F2"
+      ],
+      "description": "The successor compiler refuses new contract files, new state-machine states/events (X05/X12) and new DAG tasks; ODR-R10-21's T19/T22 split is refused as written, and 9 contract-first UI contract files (~1,200 lines) had to be folded into 07-IF41-VIEW.fs (commits d21fe96, 21cc2b0: X17 153 -> 16 boundary members).",
+      "rootCause": "Successor rules designed for small amendments, applied to a design-scale change.",
+      "category": "contract-instability",
+      "measuredMinutes": null,
+      "measuredMinutesKind": null,
+      "measuredMinutesSource": null,
+      "otherMeasuredCost": "fold reworked to rev 3 (21cc2b0)",
+      "confidence": "high",
+      "recurredIn": [],
+      "preventableByConvention": "Decide up front whether a change is a minor successor or a major version; shape proposals to the compiler's rules.",
+      "duplicateOf": null,
+      "related": []
+    },
+    {
+      "id": "HF-073",
+      "rehearsal": "post-R10",
+      "repository": "kemiller2002/Indy-init",
+      "evidence": [
+        "kemiller2002/Indy-init docs/rehearsal-010-optimization/execution-readiness/INTEGRATION-CONTRACTS.md 'Substitution demonstration'",
+        "kemiller2002/Indy-init docs/rehearsal-010-optimization/execution-readiness/INTEGRATION-ARCHITECTURE.md 'Evidence (reproducible)'"
+      ],
+      "description": "F# screen-contract drift (matching a union case the contract lacks) fails to compile only because TreatWarningsAsErrors is on; with it off the same drift exits 0 with 4 warnings (FS0049/FS0026) - silent wrong behaviour.",
+      "rootCause": "Incomplete-match/unknown-pattern diagnostics are warnings in F#.",
+      "category": "fsharp-inconsistency",
+      "measuredMinutes": null,
+      "measuredMinutesKind": null,
+      "measuredMinutesSource": null,
+      "otherMeasuredCost": null,
+      "confidence": "high",
+      "recurredIn": [],
+      "preventableByConvention": "Keep TreatWarningsAsErrors=true in Directory.Build.props as integration-owned; any change selects every test.",
+      "duplicateOf": null,
+      "related": []
+    },
+    {
+      "id": "HF-074",
+      "rehearsal": "post-R10",
+      "repository": "kemiller2002/Indy-init",
+      "evidence": [
+        "kemiller2002/Indy-init commit 540d7ff (PR #129) 'Live preflight J3-05: bypass the browser HTTP cache for GitHub reads'"
+      ],
+      "description": "Live-provider preflight run 42068316592 failed J3-05 on Chromium twice (WebKit passed): api.github.com returns Cache-Control: private, max-age=60, so Chromium served a stale save read-back and the UI showed 'Save failed'. The REST double never sent those headers and journeys' context.route disabled the cache, so CI could not see it.",
+      "rootCause": "Test double did not reproduce real provider caching headers.",
+      "category": "testing-verification",
+      "measuredMinutes": null,
+      "measuredMinutesKind": null,
+      "measuredMinutesSource": null,
+      "otherMeasuredCost": "2 failed live runs on Chromium",
+      "confidence": "high",
+      "recurredIn": [],
+      "preventableByConvention": "Test doubles must replay real provider response headers; use cache: 'no-store' for read-after-write.",
+      "duplicateOf": null,
+      "related": []
+    },
+    {
+      "id": "HF-075",
+      "rehearsal": "post-R10",
+      "repository": "kemiller2002/Indy-init",
+      "evidence": [
+        "kemiller2002/Indy-init docs/rehearsal-010-optimization/acceleration/VERIFICATION-CI.md 'Measured CI before the change', 'Duplicate runs'"
+      ],
+      "description": "Preflight tooling CI: run wall clock 23.0 min with r10-adversarial (21.5 min, serial cases 15.9) on the critical path; every PR commit ran twice (push + pull_request); superseded runs not cancelled; 6 runs across 3 PRs queued simultaneously; one 56.4-min run cancelled by timeout (slow apt mirror).",
+      "rootCause": "Unsharded adversarial job and duplicate triggers under multi-session runner contention.",
+      "category": "ci-tooling",
+      "measuredMinutes": 23.0,
+      "measuredMinutesKind": "cycle-time",
+      "measuredMinutesSource": "VERIFICATION-CI.md: 'Run total | 23.0 | r10-adversarial is the critical path' (run 42087387548)",
+      "otherMeasuredCost": "duplicate runs still queued after 12 min; 56.4-min timed-out run",
+      "confidence": "high",
+      "recurredIn": [],
+      "preventableByConvention": "push only on main, concurrency groups per PR, sharded long jobs.",
+      "duplicateOf": null,
+      "related": []
+    },
+    {
+      "id": "HF-076",
+      "rehearsal": "post-R10",
+      "repository": "kemiller2002/Indy-init",
+      "evidence": [
+        "kemiller2002/Indy-init commit dbcad12 (#118) and review commits 5041eea, 485655f",
+        "kemiller2002/Indy-init docs/rehearsal-010-optimization/FINAL-REPORT.md 'What was done'"
+      ],
+      "description": "Three launch defects that would have stopped or corrupted R10 were found after readiness was declared: the builder could not produce the three authorization inputs; a suite-preflight fix after bootstrap would have been refused; main's post-merge verification runs could be cancelled.",
+      "rootCause": "Readiness verification did not dry-run the builder's actual launch path.",
+      "category": "ci-tooling",
+      "measuredMinutes": null,
+      "measuredMinutesKind": null,
+      "measuredMinutesSource": null,
+      "otherMeasuredCost": "3 review rounds on #118",
+      "confidence": "high",
+      "recurredIn": [],
+      "preventableByConvention": "Full dry-run of launch from an empty competition repo before declaring readiness.",
+      "duplicateOf": null,
+      "related": [
+        "HF-047"
+      ]
+    },
+    {
+      "id": "HF-077",
+      "rehearsal": "post-R10",
+      "repository": "kemiller2002/Indy-init",
+      "evidence": [
+        "kemiller2002/Indy-init docs/rehearsal-010-optimization/acceleration/MEASUREMENTS.md 'Governance timebox'",
+        "kemiller2002/Indy-init commit ba9124d (#136)"
+      ],
+      "description": "In the delegated-authority change (DA-R10-1), independent review found the agent's own entry DTD-R10-002 decided the owner's OD-V415-01 (B1), the authority record certified itself (B2), and protected paths were self-declared (B3).",
+      "rootCause": "Agent authored both the authority mechanism and entries under it.",
+      "category": "governance",
+      "measuredMinutes": 30,
+      "measuredMinutesKind": "elapsed-pre-competition",
+      "measuredMinutesSource": "MEASUREMENTS.md 'Governance timebox': 'Rework: about 19:40-20:00. Total about 30 min, within the 45.'",
+      "otherMeasuredCost": null,
+      "confidence": "high",
+      "recurredIn": [],
+      "preventableByConvention": "Authority records must be owner-signed and reviewed by an agent that did not author them.",
+      "duplicateOf": null,
+      "related": []
+    },
+    {
+      "id": "HF-078",
+      "rehearsal": "post-R10",
+      "repository": "kemiller2002/Indy-init",
+      "evidence": [
+        "kemiller2002/Indy-init docs/rehearsal-010-optimization/acceleration/MEASUREMENTS.md 'Real persistence: the v4.1.5 session's preview app (reported, not verified by the lead)'",
+        "kemiller2002/Indy-init docs/rehearsal-010-optimization/FINAL-REPORT.md Addendum ('The causa repository could not be read from this session (HTTP 403)')"
+      ],
+      "description": "Cross-session evidence could not be verified: the preview app's real-write run 42067851789 in causa-testing-repo is recorded only as the other session's claim because the lead cannot reach that repo; the causa repo returned HTTP 403.",
+      "rootCause": "Sessions have different repository access; evidence stored where peers cannot read it.",
+      "category": "agent-coordination",
+      "measuredMinutes": null,
+      "measuredMinutesKind": null,
+      "measuredMinutesSource": null,
+      "otherMeasuredCost": null,
+      "confidence": "high",
+      "recurredIn": [],
+      "preventableByConvention": "Store acceptance evidence in a repo every reviewing session can read.",
+      "duplicateOf": null,
+      "related": []
+    },
+    {
+      "id": "HF-079",
+      "rehearsal": "post-R10",
+      "repository": "kemiller2002/Indy-init",
+      "evidence": [
+        "kemiller2002/Indy-init docs/rehearsal-010-optimization/execution-readiness/FILE-CONTENTION-ANALYSIS.md 'Measured conflict frequency: none available'",
+        "kemiller2002/Indy-init execution-readiness/FILE-OWNERSHIP-RECOMMENDATIONS.json FO-1..FO-3"
+      ],
+      "description": "Same-owner serialization: Update.fs, Engine.fs, Views/Investigation.fs, Projections.fs (ui), GitHubRequests.fs/Classify.fs (persistence) each must be edited by many capability streams in sequence; no historical multi-agent conflict data exists (R9 had one agent: 11 agent + 4 owner commits).",
+      "rootCause": "Frozen v4.1.4 file ownership and compile lists funnel all UI streams through one Update.",
+      "category": "architecture",
+      "measuredMinutes": null,
+      "measuredMinutesKind": null,
+      "measuredMinutesSource": null,
+      "otherMeasuredCost": "MODELED: FO-1 ownership split full completion 769 -> 684 at 10-min CI",
+      "confidence": "medium",
+      "recurredIn": [],
+      "preventableByConvention": "Split funnel files per capability (FO-1..FO-3) in the package, not at run time.",
+      "duplicateOf": null,
+      "related": []
+    },
+    {
+      "id": "HF-080",
+      "rehearsal": "Forma",
+      "repository": "kemiller2002/forma",
+      "evidence": [
+        "kemiller2002/forma docs/reliability/layout-baseline.md 'Defects measured at baseline with the LRP-001 fixtures' (D1-D6)",
+        "kemiller2002/forma commit 0ffb077 (LRP-001, #176)",
+        "kemiller2002/forma commit 515c262 (WI-0043, #177)"
+      ],
+      "description": "Forma 0.12.0 failed 48 of 78 containment checks across Chromium/Firefox/WebKit: long unbroken text escaped cards/panels/dialogs by up to 394px (D1), flex items in .ef-cluster/.ef-actions refused to shrink (D2, 168-716px), WebKit page scroll from a long-option select in subgridded .ef-form-row (D4), missing/below-fold focus rings (D5/D6). Fixed upstream in 0.13.0; the fix missed marketing containers, needing WI-0043 (a URL escaped a card by 160px).",
+      "rootCause": "overflow-wrap set only on p/dd/td/headings, not inherited by containers; flex min-content minimum not capped.",
+      "category": "ui-implementation",
+      "measuredMinutes": null,
+      "measuredMinutesKind": null,
+      "measuredMinutesSource": null,
+      "otherMeasuredCost": "48/78 checks failed -> 78/78 pass",
+      "confidence": "high",
+      "recurredIn": [
+        "Forma WI-0043 (marketing components)"
+      ],
+      "preventableByConvention": "Adversarial containment fixtures (long URLs/SHAs, 320px, 200% text) in the design system's CI.",
+      "duplicateOf": null,
+      "related": []
+    },
+    {
+      "id": "HF-081",
+      "rehearsal": "Forma",
+      "repository": "kemiller2002/forma",
+      "evidence": [
+        "kemiller2002/Indy-init docs/engineering-improvement/investigations/env-and-forma.md §F3 'R5 consequences'",
+        "kemiller2002/forma commit 6800f7b (Forma 0.10.0, LCE-001)",
+        "kemiller2002/forma docs/reliability/indy-init-compatibility.md 'Rehearsal defects these address'"
+      ],
+      "description": "Text escaped rounded pills in R5: R5's own `.causa-tag` (causa.css:175, border-radius 999px) is the unbounded-pill pattern; R5 pinned design-system 0.9.0, which predates the LCE-001 radius-by-padding bound shipped upstream in 0.10.0.",
+      "rootCause": "Application-authored pill CSS plus a pin older than the upstream fix.",
+      "category": "ui-implementation",
+      "measuredMinutes": null,
+      "measuredMinutesKind": null,
+      "measuredMinutesSource": null,
+      "otherMeasuredCost": null,
+      "confidence": "high",
+      "recurredIn": [
+        "R009/R010 tracked via design-contract corner checks"
+      ],
+      "preventableByConvention": "Use Forma components (.ef-badge) instead of app pills; adopt current Forma release.",
+      "duplicateOf": null,
+      "related": []
+    },
+    {
+      "id": "HF-082",
+      "rehearsal": "Forma",
+      "repository": "kemiller2002/forma",
+      "evidence": [
+        "kemiller2002/Indy-init docs/engineering-improvement/investigations/env-and-forma.md 'R5 f207cd4' (causa.css:342-353)",
+        "kemiller2002/forma commit 9c1d48e (EII-F typography roles, 0.11.0)",
+        "kemiller2002/forma CHANGELOG.md line 109"
+      ],
+      "description": "Application screens on the .ef-site shell inherited the marketing display scale (h1 up to 7.25rem at 14ch); R5 overrode it locally in app CSS. Promoted upstream as typography roles (application, dense, accessible) in Forma 0.11.0.",
+      "rootCause": "Forma lacked an application typography role and .ef-app-shell, so apps used the marketing shell.",
+      "category": "ui-implementation",
+      "measuredMinutes": null,
+      "measuredMinutesKind": null,
+      "measuredMinutesSource": null,
+      "otherMeasuredCost": null,
+      "confidence": "high",
+      "recurredIn": [],
+      "preventableByConvention": "Apps declare data-ef-type='application'; no local heading overrides.",
+      "duplicateOf": null,
+      "related": []
+    },
+    {
+      "id": "HF-083",
+      "rehearsal": "Forma",
+      "repository": "kemiller2002/forma",
+      "evidence": [
+        "kemiller2002/forma docs/reliability/indy-init-compatibility.md 'Remaining limitations' 1-4",
+        "kemiller2002/forma CHANGELOG.md line 65"
+      ],
+      "description": "Still open in 0.13.0: .ef-dashboard-grid, .ef-split-pane and .ef-operation-status reflow only on viewport media queries and overflow at iPad portrait with 200% text (same class as open .ef-alert); narrowed SVG charts keep tall boxes; narrow dialogs at 320px/200% leave ~80px for validation-summary text. Forma recommends application workarounds (single column, block-size:auto).",
+      "rootCause": "No container-relative reflow in these components.",
+      "category": "ui-implementation",
+      "measuredMinutes": null,
+      "measuredMinutesKind": null,
+      "measuredMinutesSource": null,
+      "otherMeasuredCost": null,
+      "confidence": "high",
+      "recurredIn": [],
+      "preventableByConvention": "Prefer container queries for components; document required app workaround in the design contract.",
+      "duplicateOf": null,
+      "related": []
+    },
+    {
+      "id": "HF-084",
+      "rehearsal": "Forma",
+      "repository": "kemiller2002/indy-init-rehearsal-009",
+      "evidence": [
+        "kemiller2002/indy-init-rehearsal-009 web/causa.css lines 4-34",
+        "kemiller2002/forma catalog/known-issues.json entry 'text-field, textarea, date-time-field, select'",
+        "kemiller2002/Indy-init docs/rehearsal-010-readiness/evidence/r9-replay/RP-04.log"
+      ],
+      "description": "R9 app CSS re-implemented forms, cards and nav (.causa-form, .causa-card, .causa-nav) including its own [aria-invalid] styling and literal colour fallbacks, rather than ef-field/ef-form-row/ef-status-lozenge/ef-navigation-shell. Forma's known issues list that native inputs have no styling for :disabled, :read-only, [aria-invalid] or :user-invalid. The R10 design contract replay refused it: FORMA_ROLE_MISSING (navigation-shell, save-status), LITERAL_COLOUR_OUTSIDE_THEME x4, PALETTE_TOKEN_MISSING x5.",
+      "rootCause": "Missing Forma validation-state styling plus no design contract enforced during R9.",
+      "category": "ui-implementation",
+      "measuredMinutes": null,
+      "measuredMinutesKind": null,
+      "measuredMinutesSource": null,
+      "otherMeasuredCost": "design-contract REFUSED with 19 refusal lines (RP-04.log)",
+      "confidence": "high",
+      "recurredIn": [],
+      "preventableByConvention": "Design contract (Forma roles + theme tokens) enforced in the slice gate; fix validation states upstream.",
+      "duplicateOf": null,
+      "related": []
+    },
+    {
+      "id": "HF-085",
+      "rehearsal": "Forma",
+      "repository": "kemiller2002/Indy-init",
+      "evidence": [
+        "kemiller2002/Indy-init preview/causa/web/package.json (design-system v0.10.0)",
+        "kemiller2002/Indy-init preview/causa/web/app.css",
+        "kemiller2002/Indy-init kickoff/rehearsal-010/design-contract.json 'inventories' (forma-0.12.0, forma-0.13.0)",
+        "kemiller2002/Indy-init commit e440fce"
+      ],
+      "description": "The post-R10 preview app pins Forma 0.10.0 (before the 0.13.0 containment defaults) and its app.css adds overflow-wrap:anywhere to rows, titles, events and `.ef-key-value-list dd` - the same containment 0.13.0 ships upstream - while the R10 design contract inventories 0.12.0/0.13.0.",
+      "rootCause": "Version skew between the preview and the competition design contract; app-level patching instead of upgrading.",
+      "category": "ui-implementation",
+      "measuredMinutes": null,
+      "measuredMinutesKind": null,
+      "measuredMinutesSource": null,
+      "otherMeasuredCost": null,
+      "confidence": "medium",
+      "recurredIn": [],
+      "preventableByConvention": "Pin a single Forma version across previews and competition; remove app overrides that duplicate upstream fixes.",
+      "duplicateOf": null,
+      "related": []
+    },
+    {
+      "id": "HF-086",
+      "rehearsal": "Forma",
+      "repository": "kemiller2002/Indy-init",
+      "evidence": [
+        "kemiller2002/Indy-init docs/rehearsal-010-optimization/execution-readiness/BOOTSTRAP-MEASUREMENTS.json ('Forma layout assertions, both browsers' 787 s)",
+        "kemiller2002/Indy-init docs/rehearsal-010-optimization/acceleration/VERIFICATION-CI.md (fsharp-tooling 13.0, Forma layout assertions 9.9)",
+        "kemiller2002/Indy-init docs/rehearsal-010-readiness/FINAL-READINESS.md §6 ('fsharp-tooling has a known layout-kit timing flake')",
+        "kemiller2002/Indy-init docs/engineering-improvement/investigations/env-and-forma.md §F4"
+      ],
+      "description": "Forma layout assertions are a dominant cost in Indy-init CI (787 s in run 42004659389; 9.9 of 13.0 min of fsharp-tooling in run 42087387548) and have a known timing flake; meanwhile Percepta checks only page-level overflow, with no element-level containment or corner check, so an app can clip text in a pill and still pass.",
+      "rootCause": "Layout verification split between slow full-suite browser assertions and a shallow app-level checker.",
+      "category": "testing-verification",
+      "measuredMinutes": 13.1,
+      "measuredMinutesKind": "cycle-time",
+      "measuredMinutesSource": "BOOTSTRAP-MEASUREMENTS.json: 'Forma layout assertions, both browsers', seconds 787 (run 42004659389)",
+      "otherMeasuredCost": "known flake",
+      "confidence": "medium",
+      "recurredIn": [],
+      "preventableByConvention": "Use forma-conformance 0.3.0 element checks (expectContained, expectTextInsideCorners) in app suites; quarantine flaky layout timing.",
+      "duplicateOf": null,
+      "related": []
+    },
+    {
+      "id": "HF-087",
+      "rehearsal": "Forma",
+      "repository": "kemiller2002/forma",
+      "evidence": [
+        "kemiller2002/forma commits e4cc8b0, ac7648d, 289f731, 42790b3 (Oct 9-13 2026)",
+        "kemiller2002/forma 5 commits 'release(forma): stage 0.6.1 patch for native Safari input and site header containment'",
+        "kemiller2002/forma commits 1c4240d, 5179159, 5708867 (GH-128)"
+      ],
+      "description": "Repeated responsive/form-control fixes upstream: native date/time inputs overflowed responsive field tracks (0.6.1), Safari nav wrapping/picker overflow at eight widths (GH-128), date/flyout containment, mobile catalog reflow, shared field geometry at 320/390px with 200% text (0.7.0). The 0.6.1 staging commit was made 5 times.",
+      "rootCause": "Responsive and WebKit form-control behaviour not covered until rehearsal/site failures surfaced it.",
+      "category": "ui-implementation",
+      "measuredMinutes": null,
+      "measuredMinutesKind": null,
+      "measuredMinutesSource": null,
+      "otherMeasuredCost": "85 of 961 Forma commits match layout/overflow/responsive keywords (git log --grep, approximate)",
+      "confidence": "medium",
+      "recurredIn": [
+        "LRP-001 (Oct 30)",
+        "WI-0043 (Nov 2)"
+      ],
+      "preventableByConvention": "WebKit responsive project at fixed widths in design-system CI from the start.",
+      "duplicateOf": null,
+      "related": []
+    }
+  ]
+}
