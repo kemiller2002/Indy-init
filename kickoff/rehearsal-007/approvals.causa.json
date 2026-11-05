@@ -782,6 +782,21 @@
           "option": "A"
         }
       ]
+    },
+    {
+      "id": "APR-HC-OWNER-2",
+      "authority": {
+        "kind": "operator",
+        "id": "kemiller2002"
+      },
+      "date": "2026-11-05",
+      "changes": [
+        {
+          "decision_id": "SA-01",
+          "action": "decide",
+          "option": "A"
+        }
+      ]
     }
   ]
 }
