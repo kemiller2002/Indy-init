@@ -253,3 +253,16 @@ Conditions:
 4. Push once per integration candidate. Avoid PR pushes that cancel required runs (CI-F1, CI-F2).
 5. Before relying on the forecast, repeat the experiment on a GitHub-backed persistence slice with the governed gates, and run a controlled milestone-first comparison on the same slice.
 6. Required CI must give its verdict inside the timebox. The `r10-adversarial` shards spend their time installing browsers (`playwright install --with-deps`) on every run. One shard hit its 45-minute timeout in that step, so the candidate had no required-CI verdict for the rest of this run. Pre-provisioned browsers or a cached runner image is a precondition for any strategy that depends on a final CI gate.
+
+## Addendum: required CI after the cutoff (reported separately, does not change the T+90 result)
+
+The confirmation run on the report head `144c4ad` (run 42122833553) finished at 23:30:07Z. It has the same application code as the final candidate.
+
+- Every job passed except `r10-adversarial-cases (1)`. Shard 0 now passed.
+- Shard 1 hit the 45-minute job timeout in the same `playwright install --with-deps` apt step, again before any test ran.
+- Across the two final runs, every adversarial shard passed at least once. Each failure was a different shard dying in runner setup.
+- Preflight runs on other branches in the same window, including `main`, were also cancelled after long runs.
+
+I judge this environmental and not this PR's change. No fix exists in the repository, and the one allowed re-run has been used. **Required CI on the final candidate therefore remains NOT GREEN**, and the contract groups stay INTEGRATION_READY.
+
+The proposed fix (CI-RUNS.json, `postCutoff.proposedFix`) is to pre-provision the Playwright browsers and OS packages, or to bound the install step with its own timeout and retry. It is outside this experiment's scope and is not applied.

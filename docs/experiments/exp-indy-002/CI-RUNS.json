@@ -112,5 +112,32 @@
     "CI-F2: the session stop hook requires every commit to be pushed before the coordinator waits, so batching pushes is not possible while waiting on agents; each push re-triggers both PR workflows and cancels Preflight on the superseded head.",
     "CI-F1 (agent coordination / CI waste): four pushes within 4 minutes while the PR was open cancelled three Preflight runs before they finished. From 21:41Z the coordinator commits locally and pushes only the final candidate.",
     "CI-F4: required-CI latency. The final candidate\u0027s verdict was not available 46 min after the push, because one adversarial shard timed out installing browsers from a slow apt mirror. Runner-minutes for the final Preflight run are about 9 jobs; the shard alone used 45.3 min (measured from job timestamps)."
-  ]
+  ],
+  "postCutoff": {
+    "reportedSeparately": true,
+    "run": {
+      "workflow": "Preflight tooling",
+      "runId": 42122833553,
+      "head": "144c4ad (report head; application code identical to 76d88cd/5151cdf)",
+      "created": "2026-11-05T22:35:51Z",
+      "completed": "2026-11-05T23:30:07Z"
+    },
+    "jobs": {
+      "suite-commands": "success",
+      "offline-contract-tests": "success",
+      "frozen-v4": "success",
+      "r9-readiness-gates": "success",
+      "release-gate-repair": "success",
+      "fsharp-tooling": "success",
+      "r10-adversarial-cases (0)": "success 22:42:14-22:50:43",
+      "r10-adversarial-cases (2)": "success",
+      "r10-adversarial-cases (1)": "CANCELLED by job timeout 22:44:38-23:29:58 in \u0027playwright install --with-deps\u0027 (apt); no test ran",
+      "r10-adversarial": "failure (aggregator: shards cancelled)",
+      "offline-factory": "success"
+    },
+    "acrossBothFinalRuns": "every adversarial shard passed at least once on identical application code (shard 0 on 144c4ad, shard 1 on 5151cdf, shard 2 on both); each failure is a different shard killed by the 45-min job timeout during browser/apt setup",
+    "repositoryWide": "Preflight runs in the same window on other branches were also cancelled after long runs: main push run 42119003736 (22:09-23:20), PR #143 and PR #145 runs; main run 42120987468 succeeded",
+    "verdict": "Required CI NOT GREEN on the final candidate. Cause judged environmental (runner setup) and not this PR\u0027s; no fix exists in the repository; the single allowed re-run was used. Contract groups stay INTEGRATION_READY, not VERIFIED.",
+    "proposedFix": "Pre-provision Playwright browsers and OS dependencies (cached runner image or actions/cache of ~/.cache/ms-playwright plus apt archives), or give the install step its own short timeout with a retry, so a slow mirror fails fast instead of consuming the 45-min job budget. Not applied: .github/ is outside this experiment\u0027s scope."
+  }
 }
