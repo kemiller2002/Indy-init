@@ -1,0 +1,87 @@
+{
+  "schema": "indy-init.v41-owner-decision-requests/1",
+  "status": "Pending: every request below. The owner records them with tools/owner-freeze.fsx decide implementation-conventions (once this file is on origin/main). No request here is recorded by an agent (RDP-003). Source: docs/optimization/implementation-conventions/PROPOSED-REQUIREMENTS-CHANGES.md.",
+  "recordFormat": "One operator approval in kickoff/rehearsal-007/approvals.causa.json (prefix APR-IC-OWNER), one change per decision {decision_id, action: decide, option}, committed by the owner without agent trailers.",
+  "requests": [
+    {
+      "id": "ODR-IC-01",
+      "kind": "decision",
+      "title": "Package release conditions: run every generated command, prove contracts against real data, reconcile requirements with owner decisions (PRC-01)",
+      "question": "Should the next successor requirements package (after v4.1.5) carry the three release conditions of docs/optimization/implementation-conventions/PROPOSED-REQUIREMENTS-CHANGES.md PRC-01 in its FREEZE.md, so that the owner does not approve a package until its independent review records: (1) every generated suite command, workflow, SDK setup step and deploy precondition executed on the pinned SDK in a clean checkout; (2) replay coverage of the pinned causa-data histories with 0 events without a case and a negative control; (3) a table of every owner decision naming a requirement with its amendment or waiver?",
+      "options": [
+        "A: yes: the next successor package carries PRC-01 release conditions 1-3 in its FREEZE.md",
+        "B: conditions 1 and 3 only (no replay-coverage condition)",
+        "C: no; release conditions stay as they are"
+      ],
+      "recommendation": "A. Each condition addresses a failure that recurred: MSB1008 and SDK setup shipped in frozen v4.1.2 (HF-028, HF-029, HF-047); 487 of 1,315 causa-data events were unrepresentable in frozen v4.1.4 (HF-068); clauses contradicting owner decisions stayed in frozen packages (HF-023, HF-036).",
+      "rationale": "CV-01, CV-11, CV-14 in docs/optimization/implementation-conventions/CONVENTION-CATALOG.json. Pre-competition cost only (about 90 + 60 + 30 min per package); nothing is added inside the timed run.",
+      "impact": "Applies from the next successor package; v4.1.5 (CANDIDATE) and every frozen package are unchanged. The agent writes the FREEZE.md text into that successor package when it is compiled."
+    },
+    {
+      "id": "ODR-IC-02",
+      "kind": "decision",
+      "title": "Pin Forma 0.13.0 (PRC-02, breaking)",
+      "question": "Should the next successor package require Forma 0.13.0 (@echelon-foundry/design-system 0.13.0, inventory verification/design-contract/forma-0.13.0-inventory.json) in place of the 0.12.0 inventory, with CK-04 refusing an earlier Forma at bootstrap, as docs/optimization/implementation-conventions/PROPOSED-REQUIREMENTS-CHANGES.md PRC-02 states?",
+      "options": [
+        "A: yes: pin Forma 0.13.0 in the next successor package and ask Conditor to install 0.13.0 in the indy-init preset",
+        "B: no; keep 0.12.0 (ODR-R10-05 continues to allow 0.12.x or 0.13.x)"
+      ],
+      "recommendation": "A. Forma 0.12.0 fails 48 of 78 containment checks and 0.13.0 passes 78 of 78 (HF-080); the layout contract must be re-checked against 0.13.0.",
+      "rationale": "CV-17.",
+      "impact": "Breaking dependency change: re-baselines the layout contract and needs a Conditor preset change."
+    },
+    {
+      "id": "ODR-IC-03",
+      "kind": "decision",
+      "title": "Bootstrap runs tools/conventions/conventions.fsx check (PRC-03)",
+      "question": "Should the next successor package's AGENT-RULES §1 (T10 bootstrap) run `dotnet fsi <indy-init>/tools/conventions/conventions.fsx -- check --workspace .` after `conditor ci-policy check`, with a finding stopping the bootstrap commit as a ci-policy finding does, as docs/optimization/implementation-conventions/PROPOSED-REQUIREMENTS-CHANGES.md PRC-03 states?",
+      "options": [
+        "A: yes: run all four checks (CK-01 warnings-as-errors, CK-02 one source per port literal, CK-03 workflow shell with pipefail, CK-04 Forma version) at bootstrap",
+        "B: yes, but CK-01..CK-03 only (CK-04 waits for ODR-IC-02)",
+        "C: no"
+      ],
+      "recommendation": "A if ODR-IC-02 is A; otherwise B, because the current Conditor scaffold pins Forma 0.12.0 and CK-04 would stop the bootstrap.",
+      "rationale": "CV-05, CV-07, CV-10, CV-17. Runs in under 1 s. Retrospectively it finds 23 (R8) and 39 (R9) workflow steps without pipefail, a duplicated port in R9 and the preview app, and Forma below 0.13.0 in R8, the preview app and the Conditor 0.10.18 scaffold.",
+      "impact": "Applies from the next successor package. Not added to protected CI and not run on every merge; no frozen package changes."
+    },
+    {
+      "id": "ODR-IC-04",
+      "kind": "decision",
+      "title": "Durable means read back from the real provider (PRC-04)",
+      "question": "Should the next successor package's AGENT-RULES carry the persistence text of docs/optimization/implementation-conventions/PROPOSED-REQUIREMENTS-CHANGES.md PRC-04?",
+      "options": [
+        "A: yes",
+        "B: no"
+      ],
+      "recommendation": "A. Persistence durability recurred in seven rehearsals or experiments (FM-09).",
+      "rationale": "CV-09.",
+      "impact": "Clarifies SM-SAVE; not breaking."
+    },
+    {
+      "id": "ODR-IC-05",
+      "kind": "decision",
+      "title": "WASM boot smoke in the first CI (PRC-05)",
+      "question": "Should the next successor package's AGENT-RULES §1 carry the boot-smoke text of docs/optimization/implementation-conventions/PROPOSED-REQUIREMENTS-CHANGES.md PRC-05?",
+      "options": [
+        "A: yes",
+        "B: no"
+      ],
+      "recommendation": "A. R4 and R5 lost about 120 and 90 minutes to start failures (HF-007, HF-013).",
+      "rationale": "CV-04.",
+      "impact": "Adds one CI step at T10."
+    },
+    {
+      "id": "ODR-IC-06",
+      "kind": "decision",
+      "title": "Test-only code never ships (PRC-06)",
+      "question": "Should the candidate review checklist carry the text of docs/optimization/implementation-conventions/PROPOSED-REQUIREMENTS-CHANGES.md PRC-06?",
+      "options": [
+        "A: yes",
+        "B: no"
+      ],
+      "recommendation": "A. Safety rule: a token reached traces (R4) and test hooks reached production (R5, R6) (HF-010).",
+      "rationale": "CV-19.",
+      "impact": "Review obligation only."
+    }
+  ]
+}
