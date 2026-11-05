@@ -1,0 +1,17 @@
+PASS real causa-data: every investigation is raw-read, decoded, replayed, and its snapshot agrees
+PASS real causa-data: event counts are the catalog's (Apollo 1 = 432, Apollo 11 = 431, Challenger = 452)
+PASS layers stay distinct: a tampered snapshot is decoded and replayed but NOT authoritative
+PASS layers stay distinct: a tampered event line is refused at decoding, nothing is replayed
+PASS create: the new file set decodes, replays and verifies; its title is the one entered
+PASS create: blank title and description are refused per field
+PASS engine: Connect -> Browse lists and verifies the 4 real investigations (in-memory provider)
+PASS engine: a listing that names a directory more than once lists it once
+PASS engine: Open shows four labelled layers
+PASS engine: Create -> Save -> read-back verified, and the new investigation is listed
+PASS engine: Reload (a fresh engine, reconnect) opens the saved investigation verified
+PASS negative: a read-back whose bytes differ from those written is NOT verified
+PASS negative: saving without a token is refused before any write
+PASS negative: a failed write is reported as a failed save, never as saved
+PASS security: the token never appears in the projected view or in the draft after connecting
+PASS protocol: an Event message round-trips through dispatch to a view with no effects
+16/16 passed

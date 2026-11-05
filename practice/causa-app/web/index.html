@@ -1,0 +1,116 @@
+<!doctype html>
+<!-- Practice only (FENCE.md). Limen-bound markup styled with Forma; every value and every decision comes from the F# engine. -->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Causa (practice)</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="./vendor/forma/all.css">
+  <link rel="stylesheet" href="./app.css">
+  <script type="importmap">{ "imports": { "@echelon-foundry/limen": "./vendor/limen/index.js" } }</script>
+</head>
+<body>
+  <header class="app-header">
+    <nav aria-label="Primary" class="app-nav">
+      <strong class="app-brand">Causa <small>practice</small></strong>
+      <template data-if="connected"><span class="app-nav-actions">
+        <button type="button" class="ef-button" data-event="showBrowse">Investigations</button>
+        <button type="button" class="ef-button" data-event="showCreate">New investigation</button>
+        <button type="button" class="ef-button" data-event="disconnect">Disconnect</button></span></template>
+    </nav>
+    <p class="app-status" data-testid="connection-status" data-text="connectionStatus">Not connected</p>
+  </header>
+  <main id="main" class="app-main">
+    <p id="app-loading">Loading Causa…</p>
+    <p role="status" aria-live="polite" data-testid="notice" data-text="notice"></p>
+    <template data-if="providerIsDouble"><div class="ef-alert" role="note" data-testid="double-warning"><p data-text="providerWarning"></p></div></template>
+
+    <template data-if="showConnect">
+      <section class="ef-surface app-card" aria-labelledby="connect-h">
+        <h1 id="connect-h">Connect to a Causa data repository</h1>
+        <form class="ef-form ef-stack" data-event="connect" novalidate>
+          <div class="ef-field"><label for="c-api">GitHub API</label>
+            <input id="c-api" autocomplete="off" data-event="draft:api" data-on="input" data-bind-value="draft_api" data-bind-aria-invalid="invalid_api">
+            <template data-if="hasError_api"><p class="app-error" role="alert" data-text="error_api"></p></template></div>
+          <div class="ef-field"><label for="c-owner">Owner</label>
+            <input id="c-owner" autocomplete="off" data-event="draft:owner" data-on="input" data-bind-value="draft_owner" data-bind-aria-invalid="invalid_owner">
+            <template data-if="hasError_owner"><p class="app-error" role="alert" data-text="error_owner"></p></template></div>
+          <div class="ef-field"><label for="c-repo">Repository</label>
+            <input id="c-repo" autocomplete="off" data-event="draft:repo" data-on="input" data-bind-value="draft_repo" data-bind-aria-invalid="invalid_repo">
+            <template data-if="hasError_repo"><p class="app-error" role="alert" data-text="error_repo"></p></template></div>
+          <div class="ef-field"><label for="c-branch">Branch</label>
+            <input id="c-branch" autocomplete="off" data-event="draft:branch" data-on="input" data-bind-value="draft_branch" data-bind-aria-invalid="invalid_branch">
+            <template data-if="hasError_branch"><p class="app-error" role="alert" data-text="error_branch"></p></template></div>
+          <div class="ef-field"><label for="c-path">Workspace folder</label>
+            <input id="c-path" autocomplete="off" data-event="draft:path" data-on="input" data-bind-value="draft_path" data-bind-aria-invalid="invalid_path">
+            <template data-if="hasError_path"><p class="app-error" role="alert" data-text="error_path"></p></template></div>
+          <div class="ef-field"><label for="c-token">Token (optional for reading; needed to save)</label>
+            <input id="c-token" type="password" autocomplete="off" data-event="draft:token" data-on="input"></div>
+          <template data-if="hasConnectError"><p class="app-error" role="alert" data-testid="connect-error" data-text="connectError"></p></template>
+          <div class="ef-actions"><button type="submit" class="ef-button" data-testid="connect">Connect</button></div>
+        </form>
+      </section>
+    </template>
+
+    <template data-if="onBrowse">
+      <section class="ef-surface app-card" aria-labelledby="browse-h">
+        <h1 id="browse-h">Investigations</h1>
+        <p data-testid="list-message" data-text="listMessage"></p>
+        <ul class="app-list" aria-label="Investigations">
+          <template data-each="investigations" data-key="id"><li class="app-row">
+            <button type="button" class="ef-button app-open" data-event="open" data-testid="open-investigation"><span data-text="title"></span></button>
+            <small class="app-muted" data-text="status"></small></li></template>
+        </ul>
+        <div class="ef-actions"><button type="button" class="ef-button" data-event="refresh">Refresh</button></div>
+      </section>
+    </template>
+
+    <template data-if="onCreate">
+      <section class="ef-surface app-card" aria-labelledby="create-h">
+        <h1 id="create-h">New investigation</h1>
+        <form class="ef-form ef-stack" data-event="create" novalidate>
+          <div class="ef-field"><label for="n-title">Title</label>
+            <input id="n-title" autocomplete="off" data-event="draft:title" data-on="input" data-bind-value="draft_title" data-bind-aria-invalid="invalid_title">
+            <template data-if="hasError_title"><p class="app-error" role="alert" data-text="error_title"></p></template></div>
+          <div class="ef-field"><label for="n-original">What happened?</label>
+            <textarea id="n-original" rows="4" data-event="draft:original" data-on="input" data-bind-value="draft_original" data-bind-aria-invalid="invalid_original"></textarea>
+            <template data-if="hasError_original"><p class="app-error" role="alert" data-text="error_original"></p></template></div>
+          <div class="ef-actions"><button type="submit" class="ef-button" data-testid="save">Create and save</button></div>
+        </form>
+      </section>
+    </template>
+
+    <template data-if="onOpen">
+      <article class="ef-surface app-card" aria-labelledby="open-h">
+        <h1 id="open-h" data-testid="open-title" data-text="open_title"></h1>
+        <p class="app-muted"><span data-text="open_id"></span> · <span data-text="open_lifecycle"></span> · version <span data-text="open_version"></span></p>
+        <template data-if="open_loading"><p>Loading from the provider…</p></template>
+        <template data-if="open_hasFailed"><p class="app-error" role="alert" data-text="open_failed"></p></template>
+        <template data-if="open_isCreated"><section class="app-save" aria-label="Save status">
+          <p data-testid="save-status" data-text="saveStatus"></p>
+          <p data-testid="readback-status" data-text="readBackStatus"></p>
+          <template data-if="canReadBack"><button type="button" class="ef-button" data-event="readBack">Read back again</button></template>
+        </section></template>
+        <template data-if="open_loaded"><section aria-label="State layers">
+          <h2>State layers</h2>
+          <ol class="app-layers">
+            <li data-testid="layer-raw" data-text="layer_raw"></li>
+            <li data-testid="layer-decoded" data-text="layer_decoded"></li>
+            <li data-testid="layer-replayed" data-text="layer_replayed"></li>
+            <li data-testid="layer-authoritative" data-text="layer_authoritative"></li>
+          </ol>
+          <h2>Description</h2><p data-text="open_original"></p>
+          <h2>Contents</h2>
+          <ul class="app-counts"><template data-each="counts" data-key="kind"><li><span data-text="kind"></span>: <strong data-text="count"></strong></li></template></ul>
+          <template data-if="hasHypotheses"><section><h2>Hypotheses</h2><ul class="app-list">
+            <template data-each="hypotheses" data-key="id"><li><span data-text="statement"></span> <small class="app-muted" data-text="state"></small></li></template></ul></section></template>
+          <template data-if="hasEvidence"><section><h2>Evidence (first 50)</h2><ul class="app-list">
+            <template data-each="evidence" data-key="id"><li><span data-text="content"></span> <small class="app-muted" data-text="source"></small></li></template></ul></section></template>
+        </section></template>
+      </article>
+    </template>
+  </main>
+  <script type="module" src="./main.js"></script>
+</body>
+</html>

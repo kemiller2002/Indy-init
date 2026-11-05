@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Practice only (FENCE.md). The F# application: layers, persistence requests, engine, view, protocol. -->
+  <ItemGroup>
+    <Compile Include="Layers.fs" />
+    <Compile Include="Create.fs" />
+    <Compile Include="GitHub.fs" />
+    <Compile Include="Engine.fs" />
+    <Compile Include="View.fs" />
+    <Compile Include="Protocol.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../../../proposals/r10-historical-data-compatibility/src/Causa.HistoricalCompatibility.fsproj" />
+  </ItemGroup>
+</Project>

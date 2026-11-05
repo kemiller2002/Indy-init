@@ -1,0 +1,13 @@
+{
+  "name": "causa-practice",
+  "private": true,
+  "description": "Practice only (FENCE.md): never merged, never copied into the competition build.",
+  "type": "module",
+  "dependencies": {
+    "@echelon-foundry/design-system": "0.13.0",
+    "@echelon-foundry/limen": "0.9.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.63.0"
+  }
+}

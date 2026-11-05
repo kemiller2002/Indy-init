@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk.WebAssembly">
+  <!-- Practice only (FENCE.md). Browser host: publishes the F# engine as .NET WebAssembly for the Limen kernel.
+       C# only because [JSExport] needs the C# source generator; it holds no application logic. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <PublishTrimmed>false</PublishTrimmed>
+    <NoWarn>$(NoWarn);IL2040;IL2104;IL2026;IL3050</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../Causa.Practice.Engine/Causa.Practice.Engine.fsproj" />
+  </ItemGroup>
+</Project>

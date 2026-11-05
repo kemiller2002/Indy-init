@@ -1,0 +1,18 @@
+/* Practice only (FENCE.md). Layout only; components come from Forma. */
+body { margin: 0; }
+.app-header { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: .5rem; padding: .75rem 1rem; border-bottom: 1px solid currentColor; }
+.app-nav { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; }
+.app-nav-actions { display: flex; flex-wrap: wrap; gap: .5rem; }
+.app-status { margin: 0; font-size: .875rem; overflow-wrap: anywhere; }
+.app-main { max-width: 60rem; margin: 0 auto; padding: 1rem; }
+.app-card { padding: 1rem; margin-block: 1rem; }
+.app-list { list-style: none; padding: 0; display: grid; gap: .5rem; }
+.app-row { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; }
+.app-open { text-align: start; min-height: 44px; }
+.app-muted { opacity: .75; }
+.app-error { color: #b00020; }
+.app-layers li { margin-block: .5rem; overflow-wrap: anywhere; }
+.app-counts { display: flex; flex-wrap: wrap; gap: .25rem 1rem; padding-inline-start: 1rem; }
+button { min-height: 44px; }
+input, textarea { max-width: 100%; box-sizing: border-box; width: 100%; }
+@media (max-width: 480px) { .app-main { padding: .5rem; } .app-card { padding: .75rem; } }
