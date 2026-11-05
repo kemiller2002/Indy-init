@@ -54,8 +54,8 @@
     {
       "id": "DTD-R10-005",
       "class": "technical-interface",
-      "decision": "v4.1.5 revision-2 interface design: a session writes only in the connected repository's workspaces/demo/<run> (no repository field on a workspace address); loads, sessions, timers and machine messages are keyed by InvestigationRef {Address; Id}; a private Writable.T guards write access; the interface changes go to the owner as one coupled request because the parts do not compile separately.",
-      "rationale": "Directive section 6 (smallest contract change) and section 7 (stable shared interfaces). Recorded by the lead on behalf of the deciding session, as that session asked; the deciding session is named below. The independent review of PR #135 at f91bd7b found the Writable.T guard incomplete (catalog role asserted by the caller); the fix is pending and this entry does not claim it works. The package contracts themselves are approved by the owner through the v4.1.5 interface request; this entry records only the design choice behind them.",
+      "decision": "v4.1.5 interface design (revision 3): a session writes only under workspaces/demo/causa-app-<run> in the connected repository, a reserved namespace that never names a catalog workspace; WorkspaceAddress.T is private and its role comes only from WorkspaceAddress.catalog and .workingCopy; loads, sessions, timers and machine messages are keyed by InvestigationRef {Address; Id}; a private Writable.T guards write access; the contract change goes to the owner as one coupled request, with staging and the fallback as separate requests.",
+      "rationale": "Directive section 6 (smallest contract change) and section 7 (stable shared interfaces). Recorded by the lead on behalf of the deciding session, as that session asked; the deciding session is named below. Revision 3 answers the independent review's finding that the role was asserted by the caller; its re-review is pending and this entry does not claim the guard works. The package contracts themselves are approved by the owner through the v4.1.5 interface request; this entry records only the design choice behind them.",
       "actingAgent": {
         "kind": "agent",
         "session": "session_01G1iECgvwA92qPWSR19ZXxX",
@@ -65,7 +65,23 @@
       "paths": [
         "docs/rehearsal-010-dependency-reduction/V415-DESIGN-NOTE.md"
       ],
-      "evidence": "PR #135 at f91bd7b, docs/rehearsal-010-dependency-reduction/V415-DESIGN-NOTE.md"
+      "evidence": "PR #135 at 730e2d6, docs/rehearsal-010-dependency-reduction/V415-DESIGN-NOTE.md"
+    },
+    {
+      "id": "DTD-R10-006",
+      "class": "technical-interface",
+      "decision": "Folded UI view contract: contract files carry types and signatures only (plus already-reviewed boundary code). Implementation code (validation, navigation, presentation language, identifiers and the like; 153 members in the first fold) moves to its producer's files under the competition UI ownership map, rather than being allowlisted as frozen contract.",
+      "rationale": "Contracts freeze what agents share; freezing implementation as contract would make 153 code members owner-approved interface and block ordinary fixes. Signatures-only keeps the contract check meaningful and does not relax it.",
+      "actingAgent": {
+        "kind": "agent",
+        "session": "session_01G1iECgS2MYoyqvc2eXNdhV",
+        "role": "lead/integration"
+      },
+      "decidedAt": "2026-11-05T19:46:00Z",
+      "paths": [
+        "proposals/r10-contract-first-ui/v415-fold/07-IF41-VIEW.folded.fs"
+      ],
+      "evidence": "v4.1.5 session report (19:45 UTC) on the fold; PR #134"
     }
   ]
 }
