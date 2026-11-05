@@ -1,6 +1,6 @@
 # Final report: contract-first parallel UI development
 
-**Every duration here is either measured on this sandbox (compile and test times) or a model result from estimates (schedule).** Each is labelled. Rehearsal 010 was not started, and nothing frozen, approved or owner-controlled was changed: `git diff --stat main...HEAD` touches only `proposals/r10-contract-first-ui/`.
+**Every duration here is either measured on this sandbox (compile and test times) or a model result from estimates (schedule).** Each is labelled. Rehearsal 010 was not started, and nothing frozen, approved or owner-controlled was changed: `git diff --stat origin/main...HEAD` touches only `proposals/r10-contract-first-ui/`.
 
 ## The question
 
