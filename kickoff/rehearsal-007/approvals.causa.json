@@ -622,6 +622,111 @@
           ]
         }
       ]
+    },
+    {
+      "id": "APR-R10-OWNER-3",
+      "authority": {
+        "kind": "operator",
+        "id": "kemiller2002"
+      },
+      "date": "2026-11-05",
+      "changes": [
+        {
+          "decision_id": "ODR-R10-33",
+          "action": "decide",
+          "option": "A"
+        },
+        {
+          "decision_id": "ODR-R10-25",
+          "action": "decide",
+          "option": "A"
+        },
+        {
+          "decision_id": "ODR-R10-26",
+          "action": "decide",
+          "option": "A"
+        },
+        {
+          "decision_id": "ODR-R10-28",
+          "action": "decide",
+          "option": "A"
+        },
+        {
+          "decision_id": "ODR-R10-29",
+          "action": "decide",
+          "option": "A"
+        },
+        {
+          "decision_id": "ODR-R10-19",
+          "action": "decide",
+          "option": "A",
+          "pins": [
+            {
+              "path": "docs/rehearsal-010-optimization/proposals/scope-manifest.successor.json",
+              "sha256": "3a0754b335bd0b8425e278129733a8f687ffe2cd6c3bc92b751aabc5b2e57cad",
+              "field": "scopeSha256",
+              "value": "\"a847f98c4a4dd13fdb96fcc7f30142960ef1d3b5bc9624f4ce00eb0f158687ec\""
+            },
+            {
+              "path": "docs/rehearsal-010-optimization/proposals/scope-manifest.milestone-aligned.json",
+              "sha256": "fd26f12da874c194e10685d2ece13a3a9665d989a1e122502c45b909a9efbcb6",
+              "field": "scopeSha256",
+              "value": "\"723c9eb335861aa32eead93c23a5923d8a841ca9e2cd8a5d472c2afdda0efdc9\""
+            }
+          ]
+        },
+        {
+          "decision_id": "ODR-R10-20",
+          "action": "decide",
+          "option": "A"
+        },
+        {
+          "decision_id": "ODR-R10-21",
+          "action": "decide",
+          "option": "A"
+        },
+        {
+          "decision_id": "ODR-R10-22",
+          "action": "decide",
+          "option": "A"
+        },
+        {
+          "decision_id": "ODR-R10-23",
+          "action": "decide",
+          "option": "A"
+        },
+        {
+          "decision_id": "ODR-R10-24",
+          "action": "decide",
+          "option": "A"
+        },
+        {
+          "decision_id": "ODR-R10-27",
+          "action": "decide",
+          "option": "A",
+          "pins": [
+            {
+              "path": "docs/rehearsal-010-optimization/inputs/milestones.json",
+              "sha256": "18b3b15dce268a96d55d3c96093058b8ec8ebe63294f5b69e5bda9f19e76dc6f"
+            }
+          ]
+        },
+        {
+          "decision_id": "ODR-R10-30",
+          "action": "decide",
+          "option": "A"
+        },
+        {
+          "decision_id": "ODR-R10-31",
+          "action": "decide",
+          "option": "A"
+        },
+        {
+          "decision_id": "ODR-R10-32",
+          "action": "decide",
+          "option": "A"
+        }
+      ]
     }
   ]
 }
