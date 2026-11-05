@@ -157,6 +157,13 @@ The reviewer could not defeat the selection with any path a real `git diff` prod
 | RVO-7-4 | note | `TAG:` selectors undefined; `.github/` lost its dot; `..` not resolved | **Fixed:** tags defined in the matrix; paths normalised; 2 new cases |
 | RVO-7-5 | note | The other execution-readiness docs make no completion claims | – |
 
-### Round 8 (merge-dependency model; cross-agent findings)
+### Round 8 (e787cbe, merge-dependency model and CF-07): FAIL, 1 major (documentation)
 
-Requested on the commit that adds `--merge-deps`; result below when it completes.
+The implementation passed: no early merge, equivalence and published runs preserved, `cyclicMergeEdges` correct, and two of three mutations caught. The CF-07 deadlock was confirmed against Ledger.fs 391–410.
+
+| ID | Severity | Finding | Disposition |
+|---|---|---|---|
+| RVO-8-1 | major | "Every published time is the optimistic bound" is false. The model is not monotone in added constraints (J2 M5 690 against 700), and Agent 2's runs are different configurations | **Fixed:** published figures are stated as the literal option A, not a bound; a three-policy table replaces the claim |
+| RVO-8-2 | minor | Counts conflated edges on cycles with edges that must be deferred | **Fixed:** the table shows on-cycle, impossible (dependsOn-only), minimal cycle-breaking and Agent 2's sets. `--defer-cyclic minimal` is implemented; it defers 21 and 36, against Agent 2's 22 and 35 |
+| RVO-8-3 | minor | J runs record no merge-dependency input or policy | **Fixed:** `mergeDependencies` (file, sha256, policy, edges deferred) is written to each result. The input lives only in PR #121, so the J runs are not in the reproduction test (stated) |
+| RVO-8-4 | minor | Test 2 did not bite | **Fixed:** it uses a merge dependency ordinary scheduling would not satisfy (T11 waits for T20), checks that it would bite, and fails when merge dependencies are ignored. A minimal-deferral case was added |

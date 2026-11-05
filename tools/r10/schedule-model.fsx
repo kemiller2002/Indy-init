@@ -47,7 +47,8 @@ let config =
       Priority = opt "--priority" |> Option.defaultValue "tail"
       DefaultMinutes = num "--default-minutes" 20.0
       Lanes = parseLanes (opt "--lanes" |> Option.defaultValue defaultLanes)
-      MergeDeps = Map.empty }
+      MergeDeps = Map.empty
+      MergeSource = "" }
 let slices = loadSlices (req "--slices") (opt "--roles") config
 // --merge-deps FILE: the journeys rule's merge-time dependencies; refused if cyclic unless --defer-cyclic (CF-07 A)
 let configWithMerge =
@@ -56,10 +57,17 @@ let configWithMerge =
     | Some f ->
         let md = loadMergeDeps (req "--slices") f
         let cyc = cyclicMergeEdges slices md
-        if not cyc.IsEmpty && opt "--defer-cyclic" <> Some "true" then
-            failwithf "%d merge-dependency edges are cyclic (the slices can never merge under the frozen gate), e.g. %s; pass --defer-cyclic true to model CF-07 option A" cyc.Length (cyc |> List.truncate 4 |> List.map (fun (a, b) -> a + "->" + b) |> String.concat ", ")
-        if not cyc.IsEmpty then eprintfn "deferred %d cyclic merge-dependency edges (CF-07 option A)" cyc.Length
-        { config with MergeDeps = deferCyclic slices md }
+        let policy = opt "--defer-cyclic" |> Option.defaultValue "none"
+        let kept, deferred =
+            match policy with
+            | "none" when cyc.IsEmpty -> md, []
+            | "none" -> failwithf "%d merge-dependency edges lie on cycles (those slices can never merge under the frozen gate), e.g. %s; pass --defer-cyclic all|minimal" cyc.Length (cyc |> List.truncate 4 |> List.map (fun (a, b) -> a + "->" + b) |> String.concat ", ")
+            | "all" | "true" -> deferCyclic slices md, cyc
+            | "minimal" -> deferMinimal slices md
+            | p -> failwithf "--defer-cyclic must be none, all or minimal, not %s" p
+        let sha = System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes f) |> System.Convert.ToHexString |> fun h -> h.ToLowerInvariant()
+        eprintfn "merge dependencies: %d edges, %d on cycles, %d deferred (%s)" (md |> Map.toList |> List.sumBy (snd >> List.length)) cyc.Length deferred.Length policy
+        { config with MergeDeps = kept; MergeSource = sprintf "%s sha256 %s; deferral %s: %d edges deferred" (System.IO.Path.GetFileName f) sha policy deferred.Length }
 let cis = (opt "--ci" |> Option.defaultValue "0,2,5,10,15,20").Split(',') |> Array.map float |> List.ofArray
 let report = run configWithMerge slices cis
 printReport report

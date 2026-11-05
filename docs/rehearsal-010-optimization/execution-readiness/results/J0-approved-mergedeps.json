@@ -5,6 +5,7 @@
   "setupMinutes": 45,
   "mergeMinutes": 3,
   "windowMinutes": 420,
+  "mergeDependencies": "hidden-merge-dependencies.json sha256 80739cb59af3c70407f4a1886b9465df05031ff14f2e25cdc955b3467bacfae6; deferral all: 42 edges deferred",
   "priority": "tail",
   "queueDepth": 1,
   "failEvery": 0,

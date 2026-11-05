@@ -40,7 +40,9 @@ type Config =
       /// assertion must pass live, so the slices its steps need must already be on main). A slice may be BUILT when
       /// its Deps are integrated, but enters the integration queue only when its MergeDeps are integrated too.
       /// Empty = none (every published run before this option).
-      MergeDeps: Map<string, string list> }
+      MergeDeps: Map<string, string list>
+      /// Provenance of MergeDeps for the report: input file, its sha256, the deferral policy, edges deferred. "" = none.
+      MergeSource: string }
 
 let defaultLanes = "integration:integration,domain:domain,persistence:persistence,ui-1:ui,ui-2:ui,reviewer:reviewer"
 
@@ -143,6 +145,16 @@ let cyclicMergeEdges (slices: Slice list) (mergeDeps: Map<string, string list>) 
 let deferCyclic (slices: Slice list) (mergeDeps: Map<string, string list>) : Map<string, string list> =
     let cyc = cyclicMergeEdges slices mergeDeps |> Set.ofList
     mergeDeps |> Map.map (fun s ds -> ds |> List.filter (fun d -> not (cyc.Contains(s, d))))
+
+/// A minimal cycle-breaking deferral: cyclic edges are deferred one at a time, in (slice, needed) order, re-checking
+/// after each, until the graph of dependsOn plus the remaining merge dependencies is acyclic. Defers far fewer edges
+/// than deferCyclic, which defers every edge on any cycle (review RVO-8-2). Returns the kept map and the deferred edges.
+let deferMinimal (slices: Slice list) (mergeDeps: Map<string, string list>) : Map<string, string list> * (string * string) list =
+    let rec go (md: Map<string, string list>) (deferred: (string * string) list) =
+        match cyclicMergeEdges slices md |> List.sort with
+        | [] -> md, List.rev deferred
+        | (s, d) :: _ -> go (md |> Map.add s (md[s] |> List.filter ((<>) d))) ((s, d) :: deferred)
+    go mergeDeps []
 
 /// When each milestone is delivered: every slice carrying each of its requirements is integrated. A requirement no
 /// slice carries is an error (a milestone must not name work that is not in the plan).
@@ -444,7 +456,7 @@ let toJson (r: Report) : JsonNode =
           "note", box "model results from estimates, not observations"
           "lanes", box (c.Lanes |> List.map (fun (l, rs) -> l + ":" + String.Join("|", rs)) |> String.concat ",")
           "setupMinutes", box c.Setup; "mergeMinutes", box c.Merge; "windowMinutes", box c.Window
-          "priority", box c.Priority; "queueDepth", box c.QueueDepth; "failEvery", box c.FailEvery; "repairFraction", box c.RepairFraction; "scale", box c.Scale
+          "mergeDependencies", box (if c.MergeSource = "" then "none" else c.MergeSource); "priority", box c.Priority; "queueDepth", box c.QueueDepth; "failEvery", box c.FailEvery; "repairFraction", box c.RepairFraction; "scale", box c.Scale
           "minutesPerObligation", box r.Rate
           "slices", box (arrOf (r.Slices |> List.map (fun s -> obj [ "slice", box s.Id; "role", box s.Role; "minutes", box s.Minutes; "source", box s.Source; "requirements", box s.Requirements.Length; "mandatoryObligations", box s.MandatoryObligations ])))
           "scenarios", box (arrOf (r.Scenarios |> List.map (fun s ->

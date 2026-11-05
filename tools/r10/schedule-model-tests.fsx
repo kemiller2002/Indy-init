@@ -27,7 +27,7 @@ let case (name: string) (problems: string list) =
         printfn "%-72s FAIL" name
         problems |> List.truncate 5 |> List.iter (printfn "    %s")
 
-let cfg setup lanes = { Setup = setup; Merge = 3.0; Window = 420.0; QueueDepth = 1; FailEvery = 0; RepairFraction = 0.25; Scale = 1.0; SliceOverhead = 0.0; Milestones = []; Priority = "tail"; DefaultMinutes = 20.0; Lanes = parseLanes lanes; MergeDeps = Map.empty }
+let cfg setup lanes = { Setup = setup; Merge = 3.0; Window = 420.0; QueueDepth = 1; FailEvery = 0; RepairFraction = 0.25; Scale = 1.0; SliceOverhead = 0.0; Milestones = []; Priority = "tail"; DefaultMinutes = 20.0; Lanes = parseLanes lanes; MergeDeps = Map.empty; MergeSource = "" }
 let manifest = at "docs/rehearsal-010-readiness/slice-execution-manifest.json"
 let roles = at "docs/rehearsal-010-optimization/inputs/slice-roles.v414.json"
 let ownLanes = "integration:integration,domain:domain,persistence:persistence,ui:ui,ui-2:ui-2,reviewer:reviewer"
@@ -242,9 +242,12 @@ case "a merge dependency delays integration, not building: B waits on main for A
       if r["B"].Integrated <= r["A"].Integrated then yield sprintf "B integrated at %.0f, before or with A at %.0f" r["B"].Integrated r["A"].Integrated ]
 case "no slice integrates before its merge dependencies (real successor plan, derived merge deps)"
     [ let suc = loadSlices successorManifest (Some roles) ownC
-      // a deterministic synthetic merge-dependency set over the real plan: every UI slice needs SL-T20 on main
-      let md = suc |> List.filter (fun s -> s.Role = "ui" && s.Id <> "SL-T16") |> List.map (fun s -> s.Id, [ "SL-T20" ]) |> Map.ofList
-      let md = deferCyclic suc md
+      // review RVO-8-4: a merge dependency ordinary scheduling would NOT satisfy: SL-T11 (normally integrated early)
+      // must wait for SL-T20 (normally much later); not cyclic, since nothing T20 waits for depends on T11
+      let md = Map.ofList [ "SL-T11", [ "SL-T20" ] ]
+      if not (cyclicMergeEdges suc md).IsEmpty then yield "the test's merge dependency is cyclic"
+      let plain = simulate { ownC with Setup = 25.0; QueueDepth = 3 } 10.0 suc
+      if plain["SL-T11"].Integrated >= plain["SL-T20"].Integrated then yield "the test would not bite: T11 already integrates after T20 without the merge dependency"
       let r = simulate { ownC with Setup = 25.0; QueueDepth = 3; MergeDeps = md } 10.0 suc
       for KeyValue(s, ds) in md do
           for d in ds do
@@ -257,7 +260,11 @@ case "cyclic merge dependencies are detected, and CF-07 deferral removes exactly
       let chain = synth [ "A", []; "B", [ "A" ] ] (fun id -> id)
       if not (cyclicMergeEdges chain (Map.ofList [ "A", [ "B" ] ])).IsEmpty |> not then yield "a merge edge against dependsOn (A needs B, B depends on A) was not found cyclic"
       if not (cyclicMergeEdges chain (Map.ofList [ "B", [ "A" ] ])).IsEmpty then yield "a merge edge along dependsOn was reported cyclic"
-      if deferCyclic two md |> Map.exists (fun _ v -> not v.IsEmpty) then yield "deferral kept a cyclic edge" ]
+      if deferCyclic two md |> Map.exists (fun _ v -> not v.IsEmpty) then yield "deferral kept a cyclic edge"
+      // minimal deferral breaks a 2-cycle by deferring one edge, and leaves no cycle
+      let kept, deferred = deferMinimal two md
+      if deferred.Length <> 1 then yield sprintf "minimal deferral deferred %d edges of a 2-cycle, expected 1" deferred.Length
+      if not (cyclicMergeEdges two kept).IsEmpty then yield "minimal deferral left a cycle" ]
 
 // ---- 4. refusals ---------------------------------------------------------------------------------------------------
 

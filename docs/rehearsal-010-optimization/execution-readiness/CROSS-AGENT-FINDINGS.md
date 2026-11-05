@@ -16,37 +16,58 @@ So a slice can merge only after every slice its journeys' earlier steps need is 
 - `SL-T16` (shell) is bound to `J2-08`, `J3-01`, `J3-02`, `J3-08` and `J3-09`. `J2-08` runs at line 85 of the single test "J2 complete investigation analysis" (`verification/journeys/j2-analysis.spec.mjs`:22, :85), after Connect, creation and analysis steps that need slices which depend on T16.
 - `J1-03` is bound to both `SL-WI-GEN-EXT-DATA` and `SL-WI-INV-START`, and `J1-06` to three slices. Each needs the others merged first.
 
-**Count.** With Agent 2's assertion-to-slice needs (`schedule-inputs/hidden-merge-dependencies.json`), this branch's model (`--merge-deps`) and an independent script both find:
-- **42 of 42** merge-dependency edges cyclic in the approved plan;
-- **93 of 126** in the successor.
+**Counts, and what they mean** (corrected after review RVO-8-2). Deadlock is a property of **slices**: a slice can never merge, as frozen, if it lies on a cycle of the combined wait-for graph (`dependsOn` plus the journeys' merge dependencies). Three edge sets matter:
 
-Agent 2 reports 22 and 36. The difference is the definition. Here, an edge is cyclic if it closes a cycle through declared dependencies **or other merge dependencies**: mutual needs, such as two slices bound to the same assertion, count. Agent 2's tool defers a narrower set (35 edges in the successor). The conclusion is the same either way: **as specified, the approved plan cannot complete. T16, the third slice on the critical path, can never merge.**
+| Plan | Merge-dependency edges | On any cycle | Closing a cycle through `dependsOn` alone (impossible whatever else is deferred) | Minimal cycle-breaking set (`--defer-cyclic minimal`) | Agent 2's deferred set |
+|---|---|---|---|---|---|
+| Approved | 42 | 42 | 9 (7 of them SL-T16's) | 21 | 22 |
+| Successor | 126 | 93 | 18 | 36 | 35 |
 
-**This is a launch blocker for Rehearsal 010 on the approved plan,** independent of every optimization. It needs the owner's decision on how such assertions are judged (Agent 2's CF-07; option A defers them to a later integration point).
+- Counts "on any cycle" are the 42 and 93 this document first reported.
+- "Impossible" counts and Agent 2's 35 are from the round-8 reviewer.
+- Agent 2's 35 edges are a subset of the 93, and deferring them alone leaves the successor graph acyclic.
+
+**The conclusion does not depend on the definition.** As specified, T16, the third slice on the critical path, can never merge, so **the approved plan cannot complete**. It needs the owner's decision on how such assertions are judged (Agent 2's CF-07).
 
 ### What it does to the published schedule figures
 
-**The model before `--merge-deps`.** It had no merge-time journey dependencies. That is equivalent to deferring **every** cyclic edge, and ignoring the non-cyclic ones.
+**The model before `--merge-deps` represented no merge-time journey dependency at all.** That matches the literal reading of CF-07 option A: "judge a slice's bound assertion only once the slices it needs are integrated, and judge it at release otherwise". Under that reading, merge dependencies never delay a merge; they move judgment of those assertions to the release gate.
 
-**The model now.** `tools/r10/schedule-core.fsx` supports merge dependencies: a slice is **built** when its `dependsOn` are integrated, and **enters the merge queue** only when its merge dependencies are integrated. Cyclic edges are refused unless `--defer-cyclic true`. Three new model tests cover this.
+`tools/r10/schedule-core.fsx` now models merge dependencies:
+- a slice is **built** when its `dependsOn` are integrated, and **enters the merge queue** only once its merge dependencies are on main;
+- cycles are refused unless `--defer-cyclic all` (every edge on a cycle) or `--defer-cyclic minimal` (a cycle-breaking set, deferred one edge at a time in a fixed order);
+- the input file, its sha256 and the policy are recorded in each result (`mergeDependencies`).
 
-The plans with merge dependencies and every cyclic edge deferred (`results/J0-*.json`, `J2-*`, `J8-*`), at 10-min CI:
+Three policies, at 10-min CI (minutes after T0):
 
-| Plan | M1 | M2 | M3 | M4 | All |
-|---|---|---|---|---|---|
-| Approved (J0) | 681 | 794 | 739 | 566 | 794 (unchanged: every edge is cyclic and deferred) |
-| Optimized (J2) | 283 | 309 | 489 | **700** (was 667) | 769 |
-| Combined (J8) | 270 | 239 | 387 | **509** (was 496) | 563 |
+| Plan | Policy | M0 | M1 | M2 | M3 | M4 | All |
+|---|---|---|---|---|---|---|---|
+| Approved | none, as frozen | – | **never** (deadlock) | never | never | never | never |
+| Approved | literal option A (published R0) | – | 681 | 794 | 739 | 566 | 794 |
+| Approved | all cyclic deferred (J0) | – | 681 | 794 | 739 | 566 | 794 |
+| Approved | minimal deferral (J0-minimal) | – | 931 | 983 | 983 | 983 | 1,153 |
+| Optimized | literal option A (published R2) | – | 283 | 309 | 489 | 667 | 769 |
+| Optimized | all cyclic deferred (J2) | – | 283 | 309 | 489 | 700 | 769 |
+| Optimized | minimal deferral (J2-minimal) | – | 721 | 747 | 495 | 808 | 834 |
+| Combined | literal option A (published E8) | 120 | 270 | 239 | 387 | 496 | 565 |
+| Combined | all cyclic deferred (J8) | 120 | 270 | 239 | 387 | 509 | 563 |
+| Combined | minimal deferral (J8-minimal) | 120 | 505 | 545 | 402 | 594 | 617 |
 
-**With Agent 2's narrower deferral,** its reference tool (`tools/contract-first-bound.fsx`, reproduced here) gives T+700 to T+1,000 at 10-min CI for every plan and agent count. The non-cyclic merge dependencies that remain then bind hard.
+Results: `results/J0-*`, `J2-*`, `J8-*`, each with and without `-minimal`.
 
-**The truth for any adopted CF-07 option lies between these two bounds.** Every milestone time published in this directory and in TIME-TO-WORKING-APPLICATION.md, TIME-TO-FIRST-DATA.md and SCHEDULE-COMPARISON.md is the **optimistic bound**. It assumes merge-time journey dependencies do not bind.
+**What this means.**
+1. **The published figures are not a bound** (corrected; review RVO-8-1). They are the result under the literal option A. The greedy model is not monotone in added constraints: some times come out *earlier* with more merge dependencies. Examples: J2 M5 690 against published 700; J8 completion 563 against 565.
+2. **Under minimal deferral, the early milestones that depend on journeys move by hours.** The combined plan's authoritative list (M2) goes from T+239 to T+545.
+3. **The raw data browser M0 is unaffected (T+101–120).** It carries no journey binding (ODR-R10-30).
+4. **The CF-07 decision decides which row applies.** Literal option A keeps the published schedule but moves those assertions' judgment to the release gate. A stricter rule pushes Connect and Browse past 420 minutes in every plan.
+5. **Agent 2's own tool** (setup 45, its role files, a serial queue) gives all-slices T+709 to T+1,164 at 10-min CI across its configurations (`bound-results.txt` at b89465a). Those are different configurations, so they are not a range for these rows.
+6. **Reproduction.** The merge-dependency input lives only in PR #121 (`schedule-inputs/hidden-merge-dependencies.json` at b89465a, sha256 recorded in each J result). The model tests therefore do not reproduce the J runs; the R0–R6 runs, which need no external input, are reproduced.
 
 ### Agent 2's requested comparisons (SCHEDULE-INPUTS.md §6)
 
 **How the runs were set up.**
 - **Inputs.** They come from PR #121 at b89465a and are rebuilt on demand by `tools/r10/contract-first-inputs.fsx prepare`, so nothing of PR #121 is committed.
-- **Settings.** The successor plan, 45-min set-up, 3-min merges, chain-first priority, and the journey merge dependencies with every cyclic edge deferred. Agent 2 confirms this deferral is the faithful reading of CF-07 option A.
+- **Settings.** The successor plan, 45-min set-up, 3-min merges, chain-first priority, and the journey merge dependencies with every cyclic edge deferred. These were run with `--defer-cyclic all`, before `minimal` existed, so their results carry no `mergeDependencies` record.
 - **Contract-first.** Every UI-boundary slice is built after SL-T10, and merges after its declared `dependsOn` (`mergeDependsOn`) and its journey merge dependencies. This is an approximation: PR #121 lets a UI slice start once its UI predecessors are *built*, and this model lets it start once SL-T10 is integrated.
 - **Capability times** are the last integration among PR #121's `capabilities` slice sets (`contract-first-inputs.fsx table`).
 - **Results:** `results/K-*.json`.
