@@ -52,12 +52,12 @@ Every figure below is labelled either **observed** (measured in the run) or **mo
 - **Reproduce:** `ctp-check ci --runs evidence/exp-002/5151cdf.CI-RUNS.json` reports exactly the 2 observed cancellations.
 
 ## 5. Protocol validation against this evidence
-**Reproduce with** `dotnet fsi tools/execution/ctp-check.fsx -- test --indy-init .`: **83 of 83 cases pass.**
+**Reproduce with** `dotnet fsi tools/execution/ctp-check.fsx -- test --indy-init .`. The result is **91 of 91 cases** with PR #140's commits in the clone. In a shallow clone, such as CI's, it is **86 of 86, with 5 NOT-RUN**.
 
 **Fixtures.** The EXP-002 inputs are committed in `evidence/exp-002/`:
 - the registry at `d544ead` (v1) and at `99824ee` (final);
 - the lifecycle log, the integration results and the CI log at `5151cdf`;
-- the experiment's 37 file paths and its role map.
+- the experiment's 37 file paths and its role map from PLAN.md, transcribed literally.
 
 **How tampering is caught.**
 - Each fixture's SHA-256 is **pinned in the checker's source**. Editing a fixture without editing `ctp-check.fsx` fails in every clone, shallow ones included. A one-byte change is a test case of its own.
@@ -76,7 +76,7 @@ Everything else is mapped as written. A contract's `label` names only its first 
 | **CR-2** earlier? | At v1, INV-030's nested fields have no labels and INV-031's "one of …" values have no option labels. Both pass at final. | automated, full |
 | **CR-3** earlier? | **Not demonstrable from EXP-002's data.** Its registry format has no structured transitions, so CTP-C-TRANSITION-STRUCTURE and -CARRIES refuse **every** transition, before and after the fix (format-level case). CTP-001 requires each transition to state what its target state carries (CTP-C-TRANSITION-CARRIES), which is where `Saved` needed version and time. That rule refuses an omitted payload, as a synthetic case shows. It cannot check that a stated payload is right. | rule exists; no EXP-002 replay evidence |
 | The **auto-save mismatch (D-3)**? | **Not demonstrable from EXP-002's data**, which registered no acceptance obligations. CTP-C-TRANSITION-TEST refuses a transition without both an implementer test and an AT- test (synthetic case). The defect itself is caught only by **executing** that test, which AT-08 did. CTP-I-ACCEPTANCE refuses an integration without a non-empty, fully passing independent acceptance run. | rule plus integration gate; detection by execution, not prevention |
-| **Zero shared-file merge conflicts** preserved? | Ownership over EXP-002's 37 files with its role map: none unowned, none shared (named case). The 6 domain-labelled commits touched only domain files and the domain agent's own timeline. UI commits carry no role prefix and cannot be attributed. | automated precondition; cannot prove future absence |
+| **Zero shared-file merge conflicts** preserved? | Ownership over EXP-002's 37 files, using PLAN.md's literal role map: **none shared**. PLAN names **no owner for 4 files**: `.gitignore`, `Directory.Build.props`, `Exp002.Contracts.fsproj` and `tests/acceptance/e2e.mjs` (named cases). CTP-001 would have refused those 4 until they had an owner. The 6 domain-labelled commits touched only domain files and the domain agent's own timeline. UI commits carry no role prefix and cannot be attributed. | automated precondition; cannot prove future absence |
 | **Redundant CI cancellations** avoided? | 2 observed cancellations are **reported**. Avoidance is procedural (INTEGRATION-POLICY §4). No automated check refuses such a push. | **not demonstrated**; a gap |
 | **Real-provider evidence** for durable GitHub persistence required? | CTP-C-PERSISTENCE refuses `durable-github` without `realProviderEvidence`. CTP-I-REAL-PROVIDER refuses a REST double. With `--registry`, it also refuses an integration that records a weaker mode than the registry declares (synthetic cases). EXP-002 never claimed durable persistence. | automated, for what the registry and record declare |
 

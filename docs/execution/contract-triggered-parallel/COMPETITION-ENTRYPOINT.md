@@ -65,7 +65,7 @@ Then open the slice's PR through the governed slice gate (STARTUP §4).
 - **Run at each merge and before stopping:**
   ```
   dotnet fsi SRC/tools/execution/ctp-check.fsx -- lifecycle --log evidence/ctp/lifecycle.jsonl
-  dotnet fsi SRC/tools/execution/ctp-check.fsx -- integration --integration evidence/ctp/integration.json --log evidence/ctp/lifecycle.jsonl
+  dotnet fsi SRC/tools/execution/ctp-check.fsx -- integration --integration evidence/ctp/integration.json --log evidence/ctp/lifecycle.jsonl --registry contracts/registry.json
   ```
   Both must pass.
 

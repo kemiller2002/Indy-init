@@ -116,6 +116,7 @@ let contractRules : (JsonNode -> Finding list) list =
 let checkRegistry (registry: JsonNode) : Finding list =
     let contracts = arr "contracts" registry
     [ if str "schema" registry <> "indy-init.ctp-registry/1" then err "CTP-C-SCHEMA" "registry" "schema must be indy-init.ctp-registry/1"
+      if contracts.IsEmpty then err "CTP-C-EMPTY" "registry" "no contracts"
       yield! contracts |> List.countBy (str "id") |> List.filter (snd >> (<) 1) |> List.map (fun (i, _) -> err "CTP-C-ID" i "duplicate contract ID")
       yield! contracts |> List.collect (fun c -> contractRules |> List.collect (fun r -> r c)) ]
 
@@ -129,8 +130,13 @@ let rank (s: string) = List.tryFindIndex ((=) s) states
 let domainSide = set [ "domain"; "persistence" ]
 let uiSide = set [ "ui"; "ui-2"; "ui-3" ]
 let coordinators = set [ "coordinator"; "integration" ]
+/// The sides a group's DEFINED row declares for a version (default: a domain side and a UI side).
+let declaredSides (log: JsonNode list) (g: string) (v: int) =
+    log |> List.tryFind (fun r -> str "group" r = g && num "version" r = Some v && str "status" r = "DEFINED")
+    |> Option.map (strs "sides") |> Option.filter (List.isEmpty >> not) |> Option.defaultValue [ "domain"; "ui" ]
+let sideActors (side: string) = if side = "ui" then uiSide else domainSide
 let roleFor = Map.ofList [ "DEFINED", coordinators; "VALIDATED", coordinators; "RELEASED", coordinators
-                           "IMPLEMENTING", domainSide + uiSide; "STAGED", domainSide + uiSide; "BLOCKED", domainSide + uiSide + coordinators
+                           "IMPLEMENTING", domainSide + uiSide; "STAGED", domainSide + uiSide; "BLOCKED", domainSide + uiSide + coordinators + set [ "verification"; "reviewer" ]
                            "INTEGRATION_READY", set [ "integration" ]; "VERIFIED", set [ "integration" ] ]
 
 let checkLifecycle (rows: JsonNode list) : Finding list =
@@ -144,9 +150,10 @@ let checkLifecycle (rows: JsonNode list) : Finding list =
           if s <> "BLOCKED" && (rank s).IsNone then err "CTP-L-STATE" (key r) $"unknown status {s}"
           if (ver r).IsNone || ver r |> Option.exists (fun v -> v < 1) then err "CTP-L-VERSION" (key r) "version must be an integer >= 1"
           if blank (str "group" r) then err "CTP-L-GROUP" (key r) "group is required"
-          match DateTimeOffset.TryParse(str "t" r) with
-          | true, _ -> ()
-          | _ -> err "CTP-L-TIME" (key r) "t must be an ISO-8601 time"
+          if not (Regex.IsMatch(str "t" r, @"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2}(\.\d+)?)?(Z|[+-]\d{2}:\d{2})$")) then
+              err "CTP-L-TIME" (key r) "t must be an ISO-8601 UTC time such as 2026-11-07T10:00:00Z"
+          for sd in strs "sides" r do
+              if sd <> "domain" && sd <> "ui" then err "CTP-L-SIDES" (key r) $"side '{sd}' must be domain or ui"
           if s <> "BLOCKED" && blank (str "hash" r) then err "CTP-L-IMMUTABLE" (key r) $"{s} row has no hash"
           match Map.tryFind s roleFor with
           | Some roles when not (roles.Contains(str "actor" r)) -> err "CTP-L-ROLE" (key r) $"""{s} recorded by '{str "actor" r}', expected one of {String.concat "/" roles}"""
@@ -174,10 +181,9 @@ let checkLifecycle (rows: JsonNode list) : Finding list =
           | None -> ()
           if seen <> (seen |> List.sort) then err "CTP-L-ORDER" k "states recorded out of order"
           // INTEGRATION_READY needs STAGED by every side the group declares (default: a domain side and a UI side)
-          let declared = rs |> List.tryFind (fun r -> str "status" r = "DEFINED") |> Option.map (strs "sides") |> Option.defaultValue []
-          let sides = if declared.IsEmpty then [ "domain"; "ui" ] else declared
+          let sides = declaredSides rs (str "group" rs.Head) (ver rs.Head |> Option.defaultValue 0)
           let staged = states' |> List.filter (fun r -> str "status" r = "STAGED") |> List.map (str "actor") |> Set.ofList
-          let missing = sides |> List.filter (fun sd -> Set.intersect staged (if sd = "ui" then uiSide else domainSide) |> Set.isEmpty)
+          let missing = sides |> List.filter (fun sd -> Set.intersect staged (sideActors sd) |> Set.isEmpty)
           if states' |> List.exists (fun r -> str "status" r = "INTEGRATION_READY") && not missing.IsEmpty then
               err "CTP-L-STAGED" k $"""INTEGRATION_READY without STAGED from the {String.concat " and " missing} side"""
           // a revised version cites its change request, CR-n
@@ -220,13 +226,19 @@ let checkIntegration (record: JsonNode) (log: JsonNode list) (registry: JsonNode
                   err "CTP-I-VERSION" name $"""{gid} integrated at v{v}, latest release is v{num "version" r |> Option.defaultValue 0} (hash must match too)"""
               | Some _, Some v ->
                   let st = stagedSides gid v
-                  if Set.intersect st domainSide |> Set.isEmpty || Set.intersect st uiSide |> Set.isEmpty then
-                      err "CTP-I-STAGED" name $"{gid} v{v} is not STAGED by both a domain-side and a UI-side owner in the lifecycle log"
+                  let missing = declaredSides log gid v |> List.filter (fun sd -> Set.intersect st (sideActors sd) |> Set.isEmpty)
+                  if not missing.IsEmpty then
+                      err "CTP-I-STAGED" name $"""{gid} v{v} is not STAGED by the {String.concat " and " missing} side in the lifecycle log"""
           match field "acceptance" i with
           | None -> err "CTP-I-ACCEPTANCE" name "no independent browser acceptance run recorded for this integration"
           | Some a ->
               if blank (str "runRef" a) then err "CTP-I-ACCEPTANCE" name "acceptance.runRef: where the run's output is"
-              let implementers = strs "implementers" a |> List.map lower
+              // the implementers are whoever the lifecycle log shows implementing the integrated groups, plus any the record names
+              let fromLog =
+                  arr "groups" i |> List.collect (fun g ->
+                      log |> List.filter (fun r -> str "group" r = str "group" g && num "version" r = num "version" g && List.contains (str "status" r) [ "IMPLEMENTING"; "STAGED" ])
+                          |> List.map (str "actor" >> lower))
+              let implementers = (strs "implementers" a |> List.map lower) @ fromLog |> List.distinct
               if blank (str "author" a) || implementers.IsEmpty then err "CTP-I-INDEPENDENT" name "acceptance.author and acceptance.implementers are required"
               elif List.contains (lower (str "author" a)) implementers then err "CTP-I-INDEPENDENT" name "the acceptance test's author implemented the code under test"
               match num "passed" a, num "total" a with
@@ -392,6 +404,7 @@ let tests (root: string) =
           "registry: no acceptance obligation", reg (good |> edit [ "contracts"; "1"; "tests"; "acceptance" ] (j "[]")), Some "CTP-C-TESTS"
           "registry: persistence not stated", reg (good |> edit [ "contracts"; "1"; "persistence" ] (jstr "")), Some "CTP-C-PERSISTENCE"
           "registry: durable persistence without real-provider evidence", reg (good |> edit [ "contracts"; "0"; "persistence" ] (jstr "durable-github")), Some "CTP-C-PERSISTENCE"
+          "registry: an empty registry", reg (j """{"schema":"indy-init.ctp-registry/1","contracts":[]}"""), Some "CTP-C-EMPTY"
           "registry: no requirement ID", reg (good |> edit [ "contracts"; "1"; "requirements" ] (j "[]")), Some "CTP-C-REQ"
           "registry: a nested field without a label", reg (good |> edit [ "contracts"; "1"; "fields" ] (j """[{"record":"R","property":"EvidenceId","type":"string","component":"select"}]""")), Some "CTP-C-NESTED-LABEL"
           "lifecycle: complete lifecycle (package role names) passes", life lifecycle, None
@@ -404,6 +417,10 @@ let tests (root: string) =
           "lifecycle: a revision without its change request", life (lifecycle @ parseLines """{"t":"2026-11-07T10:09:00Z","group":"CG-1","version":2,"status":"DEFINED","hash":"c","actor":"coordinator"}"""), Some "CTP-L-CHANGE-REQUEST"
           "lifecycle: a change request that is not CR-n", life (lifecycle @ (rev2 |> List.map (edit [ "changeRequest" ] (jstr "lol")))), Some "CTP-L-CHANGE-REQUEST"
           "lifecycle: a string version", life (lifecycle @ (rev2 |> List.map (edit [ "version" ] (jstr "2")))), Some "CTP-L-VERSION"
+          "lifecycle: a one-sided group (sides:[domain]) passes without a UI side", life ((lifecycle |> List.filter (fun r -> str "actor" r <> "ui-2")) |> List.map (fun r -> if str "status" r = "DEFINED" then r |> edit [ "sides" ] (j """["domain"]""") else r)), None
+          "lifecycle: an unknown side", life (lifecycle |> List.map (fun r -> if str "status" r = "DEFINED" then r |> edit [ "sides" ] (j """["nonsense"]""") else r)), Some "CTP-L-SIDES"
+          "lifecycle: a non-ISO time", life (lifecycle @ (rev2 |> List.map (edit [ "t" ] (jstr "2026-11-07 23:00")))), Some "CTP-L-TIME"
+          "lifecycle: the reviewer may record a BLOCKED note", life (lifecycle @ parseLines """{"t":"2026-11-07T10:09:00Z","group":"CG-1","version":1,"status":"BLOCKED","actor":"reviewer","note":"label missing; CR raised"}"""), None
           "lifecycle: rows out of time order", life (lifecycle @ (rev2 |> List.map (edit [ "t" ] (jstr "2026-11-07T09:00:00Z")))), Some "CTP-L-TIME"
           "lifecycle: VERIFIED without evidence", life (mapRow "VERIFIED" (edit [ "evidence" ] (j "{}"))), Some "CTP-L-VERIFIED"
           "lifecycle: VERIFIED with meaningless evidence", life (mapRow "VERIFIED" (edit [ "evidence" ] (j """{"candidateSha":"x","ciRun":"x","acceptanceRun":"x"}"""))), Some "CTP-L-VERIFIED"
@@ -418,7 +435,10 @@ let tests (root: string) =
           "integration: acceptance that ran no tests", ig [ "integrations"; "0"; "acceptance" ] (j """{"runRef":"r","author":"reviewer","implementers":["ui"],"passed":0,"total":0}"""), Some "CTP-I-ACCEPTANCE"
           "integration: acceptance counts missing", ig [ "integrations"; "0"; "acceptance" ] (j """{"runRef":"r","author":"reviewer","implementers":["ui"]}"""), Some "CTP-I-ACCEPTANCE"
           "integration: self-attested acceptance", ig [ "integrations"; "0"; "acceptance"; "author" ] (jstr "UI-2"), Some "CTP-I-INDEPENDENT"
-          "integration: no author or implementers", ig [ "integrations"; "0"; "acceptance"; "implementers" ] (j "[]"), Some "CTP-I-INDEPENDENT"
+          "integration: author implemented per the log, though the record lists others", ig [ "integrations"; "0"; "acceptance" ] (j """{"runRef":"r","author":"ui-2","implementers":["domain"],"passed":3,"total":3}"""), Some "CTP-I-INDEPENDENT"
+          "integration: a one-sided group (sides:[domain]) passes when its side staged",
+            integration integ ((lifecycle |> List.filter (fun r -> str "actor" r <> "ui-2")) |> List.map (fun r -> if str "status" r = "DEFINED" then r |> edit [ "sides" ] (j """["domain"]""") else r)) None, None
+          "integration: no author", ig [ "integrations"; "0"; "acceptance"; "author" ] (jstr " "), Some "CTP-I-INDEPENDENT"
           "integration: nothing integrated", integration (j """{"integrations":[]}""") lifecycle None, Some "CTP-I-EMPTY"
           "integration: no groups", ig [ "integrations"; "0"; "groups" ] (j "[]"), Some "CTP-I-EMPTY"
           "integration: a defect with no owner", ig [ "integrations"; "0"; "defects"; "0"; "owner" ] (jstr ""), Some "CTP-I-DEFECT"
@@ -448,7 +468,7 @@ let tests (root: string) =
           "5151cdf.INTEGRATION-RESULTS.json", "c8f4c70aab64b9e46acb5e21ed72f3d8d66e554660495371cd25db99ef255a76", Some("5151cdf", $"{d}/INTEGRATION-RESULTS.json")
           "5151cdf.CI-RUNS.json", "b6a0363e746c253e51cc4c2f4520994698b913cf51eb1353ff63610873a32229", Some("5151cdf", $"{d}/CI-RUNS.json")
           "files.5151cdf.txt", "e67219287d2cc75aadfa297a08bad9335209f03aaefb6d0bb43bf6af59cf1906", None
-          "ownership.json", "a6945bfe6a00e921ff7953775fd266633c3ea7874ace568161f1337640118017", None ]
+          "ownership.json", "d4b204b27ebd4121c52ec5bdb637491e4def2c45073397fefe9d260c04df58bb", None ]
     let sha (b: byte[]) = Security.Cryptography.SHA256.HashData b |> Convert.ToHexString |> fun h -> h.ToLowerInvariant()
     let bytesFx (name: string) = let p = Path.Combine(fx, name) in if File.Exists p then Some(File.ReadAllBytes p) else None
     let readFx (name: string) = bytesFx name |> Option.map Text.Encoding.UTF8.GetString
@@ -458,7 +478,7 @@ let tests (root: string) =
             match bytesFx name with
             | Some b -> $"EXP-002 fixture {name} has its pinned sha256", pinOk b pinned, (if pinOk b pinned then "" else $"sha256 {sha b}")
             | None -> $"EXP-002 fixture {name} is missing", false, ""))
-        @ [ "EXP-002 control: a fixture changed by one byte fails its pin",
+        @ [ "EXP-002 control: the pin function refuses modified bytes (the pins above are the real protection)",
             (match fixtures, bytesFx "5151cdf.CI-RUNS.json" with
              | _, Some b -> not (pinOk (Array.append b [| 32uy |]) "b6a0363e746c253e51cc4c2f4520994698b913cf51eb1353ff63610873a32229")
              | _ -> false), "" ]
@@ -508,8 +528,13 @@ let tests (root: string) =
                     && lf |> List.exists (fun f -> f.Rule = "CTP-L-ROLE" && f.Detail.StartsWith "INTEGRATION_READY recorded by 'verification'"), ""
               yield "EXP-002 lifecycle: no group reached VERIFIED", lifeRows |> List.forall (fun r -> str "status" r <> "VERIFIED"), ""
               // ownership over the experiment's 37 files
-              yield "EXP-002 ownership: 37 files, none unowned or shared",
-                    (let fs = files.Split('\n', StringSplitOptions.RemoveEmptyEntries) |> List.ofArray in fs.Length = 37 && checkOwnership (JsonNode.Parse owners) fs |> List.isEmpty), ""
+              // PLAN.md's literal map: no file has two owners; it names no owner for 4 files (stated, not reconstructed away)
+              let fs = files.Split('\n', StringSplitOptions.RemoveEmptyEntries) |> List.ofArray
+              let ow = checkOwnership (JsonNode.Parse owners) fs
+              yield "EXP-002 ownership (PLAN.md's map): 37 files, none shared", fs.Length = 37 && not (ow |> List.exists (fun f -> f.Rule = "CTP-O-SHARED")), ""
+              yield "EXP-002 ownership (PLAN.md's map): exactly 4 files have no owner (.gitignore, Directory.Build.props, Exp002.Contracts.fsproj, tests/acceptance/e2e.mjs)",
+                    (ow |> List.filter (fun f -> f.Rule = "CTP-O-UNOWNED") |> List.map (fun f -> f.Subject) |> Set.ofList)
+                      = set [ ".gitignore"; "Directory.Build.props"; "src/Exp002.Contracts/Exp002.Contracts.fsproj"; "tests/acceptance/e2e.mjs" ], ""
               // CI: observed cancellations only (99824ee's "superseded" entry is a prediction; CI-F3 is outside `runs`)
               yield "EXP-002 CI: exactly 2 observed cancelled Preflight runs in the run log", ci.Length = 2, $"{ci.Length}" ]
         | _ -> [ "EXP-002 replay: fixtures missing", false, "" ]

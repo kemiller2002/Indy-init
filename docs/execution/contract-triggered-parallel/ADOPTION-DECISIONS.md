@@ -75,6 +75,9 @@ Reviewed against the 23 conventions in `docs/optimization/implementation-convent
 6. **Combined roles weaken independence.** When the contract author also writes the acceptance test (as in EXP-002), the test is independent of the implementers but not of the contract.
 7. **CI shard installs** can stall on a slow apt mirror: PR #139, and PR #140's final candidate, shard 0. That delays VERIFIED. A cached or retried browser install is a separate CI fix. (The CTP check itself runs in the `fsharp-tooling` job, before any browser install.)
 8. **CTP-001 is strict by design.** EXP-002's own registry would not reach VALIDATED under it: 27 of 37 contracts fail at v1, and 28 of 39 at final, mostly for missing error text, acceptance obligations and structured transitions. A competition registry has to be written to this schema from the start, and that costs time early in the window.
+9. **Payload truth and cross-contract names are not checked.**
+   - `carries: ["nothing"]` passes on any transition, even CR-3's save transition.
+   - Control names must be distinct within a contract, but not across contracts on one screen. Two lists each with an "Edit" control both pass, and only the acceptance test, through the accessible name and its region, tells them apart.
 
 ## 6. Expected impact on competition execution (modelled, not observed)
 - **First accepted workflow.** EXP-002's modelled saving was about 8.4 minutes (27%) at a 39-requirement slice. At competition scale, with real GitHub, governed gates and 5–7 streams, EXP-002 itself discounts throughput to about 40% (FINAL-REPORT §8). Treat the saving as directional only.
