@@ -24,3 +24,35 @@ These are **prepared, not recorded**, and on purpose they are **not** in `kickof
 
 - **Starting generated UI items after T13 and T16 instead of T17 (V7).** The model gains about 70 obligations by T+420 at 10-min CI. But it relaxes a governance rule, "a generated item never precedes the kernel", whose purpose is correctness. It is recorded as a sensitivity result only.
 - **Any change to the 420-minute deadline, the scope's requirements or obligations, or the acceptance standard.** None was made, and none is needed for any of the gains above.
+
+## How to record them
+
+ODR-R10-19..33 are requests in `kickoff/rehearsal-010/proposals/owner-decision-requests.json`. ODR-R10-33 is CF-07 from PR #121. `owner-freeze.fsx` reads them from **main**, and the pins of ODR-R10-19 and -27 name files this PR adds, so **merge PR #119 first**.
+
+None of them is required by `launch-preflight` LP-05, and each lists every option as launchable. The proposed lock pins the new requests digest (LP-03).
+
+On your machine, in your Indy-init checkout:
+
+```bash
+git switch main && git pull --ff-only origin main
+grep -q '"ODR-R10-33"' kickoff/rehearsal-010/proposals/owner-decision-requests.json || echo "merge PR #119 first"
+dotnet fsi tools/owner-freeze.fsx -- decide rehearsal-010 --repo .
+```
+
+It asks each open request, shows what it pins, writes one signed owner approval and opens a PR. Merge that PR, then tell the agent which options you recorded. Skip leaves a request pending.
+
+**Recommended answers:**
+
+| Request | Recommendation |
+|---|---|
+| ODR-R10-33 (CF-07) | **A**. Needed before any launch |
+| ODR-R10-25 | A if the launch can move; otherwise B, with the expected failures declared before T0 |
+| ODR-R10-26 | A or B: your choice between the data contract and the requirements |
+| ODR-R10-28 | **A**, then install the App: GitHub → Settings → Developer settings → GitHub Apps → the acceptance App → Install App → *Only select repositories*: `causa-acceptance-r10` and `causa-data` |
+| ODR-R10-29 | A |
+| ODR-R10-19 | C for a launch on today's plan; A or B only together with ODR-R10-22 |
+| ODR-R10-20, -21, -32 | A, for the next rehearsal |
+| ODR-R10-22 | A authorizes *building* the gate; adoption only after S1–S7 and a review |
+| ODR-R10-23, -24 | A |
+| ODR-R10-27, -30, -31 | A only if ODR-R10-19 is A or B; otherwise B |
+
