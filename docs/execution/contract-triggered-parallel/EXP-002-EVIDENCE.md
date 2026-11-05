@@ -65,6 +65,13 @@ Every figure below is labelled either **observed** (measured in the run) or **mo
 | Would it have avoided redundant CI cancellations? | The three cancellations are **reported** by `ctp-check ci`. **Avoidance is procedural:** work branches without PRs, and the integration coordinator pushes the PR branch once per candidate (INTEGRATION-POLICY §4). No automated check can refuse such a push | review gate plus measurement | **not demonstrated by an automated check**; listed as a gap |
 | Would it have required real-provider evidence for durable GitHub persistence? | Yes, for any contract or integration that claims `durable-github`. CTP-C-PERSISTENCE refuses the contract without `realProviderEvidence`; CTP-I-REAL-PROVIDER refuses a REST double (case "durable persistence on a REST double"). EXP-002 never claimed durable persistence (localStorage; INV-037 excluded for that reason), so there is nothing to replay | automated | full for claims made in the registry |
 
+**False positives.** At v1, the control-name rule flags exactly INV-009, -013, -014, -030 and -034, and none of the other 34 contracts:
+- precision 5/5 against CR-1's contracts;
+- recall 5/7;
+- the final registry (`99824ee`) flags none.
+
+**Adapter bias.** The adapter's naming keys (`submitLabel` and so on) are the ones CR-1 itself introduced. None of them exists at v1, so the v1 flags come only from several UI actions sharing one label.
+
 **Lifecycle findings in EXP-002's own log** (replay):
 - CG-1-START v2 and the other re-hashed groups were RELEASED without DEFINED or VALIDATED for the new version (CTP-L-ORDER).
 - Revised versions cite no change request (CTP-L-CHANGE-REQUEST).
