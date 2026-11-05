@@ -577,6 +577,51 @@
           "option": "B"
         }
       ]
+    },
+    {
+      "id": "APR-R10-OWNER-2",
+      "authority": {
+        "kind": "operator",
+        "id": "kemiller2002"
+      },
+      "date": "2026-11-05",
+      "changes": [
+        {
+          "decision_id": "ODR-R10-03",
+          "action": "decide",
+          "option": "A",
+          "pins": [
+            {
+              "path": "kickoff/rehearsal-010/catalog-verification-contract.json",
+              "sha256": "3d587618abce0c5f3bb470ffde05bab81c38f82f059180d68ba9b70fd8b67317"
+            }
+          ]
+        },
+        {
+          "decision_id": "ODR-R10-04",
+          "action": "decide",
+          "option": "A",
+          "pins": [
+            {
+              "path": "kickoff/rehearsal-010/catalog-verification-contract.json",
+              "sha256": "3d587618abce0c5f3bb470ffde05bab81c38f82f059180d68ba9b70fd8b67317"
+            }
+          ]
+        },
+        {
+          "decision_id": "ODR-R10-01",
+          "action": "decide",
+          "option": "A",
+          "pins": [
+            {
+              "path": "docs/rehearsal-010-readiness/scope-manifest.json",
+              "sha256": "fa265d0b00190b1d565cc83af561d0bb202fd11297ce232f0e27d0e253d08461",
+              "field": "scopeSha256",
+              "value": "\"59bfef5a62a3ab43ef19c08b5915ffaf3d408bd55d8add874c5f1071e7cd087c\""
+            }
+          ]
+        }
+      ]
     }
   ]
 }
