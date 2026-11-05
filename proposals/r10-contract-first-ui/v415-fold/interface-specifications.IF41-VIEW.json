@@ -3,9 +3,9 @@
   "title": "View projections and presentation contracts for the UI roles",
   "producer": "integration",
   "consumers": [
-    "ui-a",
-    "ui-b",
-    "ui-c",
+    "ui",
+    "ui-2",
+    "ui-3",
     "integration"
   ],
   "file": "src/Causa.App/Projections.fs",
@@ -65,9 +65,9 @@
     "dotnet:Causa.Contract.Tests.View.Producer.CredentialNeverInBindings"
   ],
   "consumerTests": [
-    "playwright:contract/view-ui-a.spec.js > renders the projection [chromium]",
-    "playwright:contract/view-ui-b.spec.js > renders the projection [chromium]",
-    "playwright:contract/view-ui-c.spec.js > renders the projection [chromium]"
+    "playwright:contract/view-ui.spec.js > renders the projection [chromium]",
+    "playwright:contract/view-ui-2.spec.js > renders the projection [chromium]",
+    "playwright:contract/view-ui-3.spec.js > renders the projection [chromium]"
   ],
   "requirements": [
     "PERSIST-030",
@@ -80,5 +80,5 @@
     "UI-039"
   ],
   "typeShapes": [],
-  "note": "PROPOSED (CF-09 A). producerTests beyond the first correspond to proposals/r10-contract-first-ui/tests (ContractTests, ManifestTests, BoundaryTests); the plan must bind them. consumerTests replace the ui / ui-2 specs per CF-10 A."
+  "note": "PROPOSED (CF-09 A). producerTests beyond the first correspond to proposals/r10-contract-first-ui/tests (ContractTests, ManifestTests, BoundaryTests); the plan must bind them. consumerTests keep the v4.1.4 ui and ui-2 specs and add ui-3 (CF-10 A, DTD-R10-004)."
 }

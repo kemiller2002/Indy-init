@@ -1,6 +1,6 @@
 {
   "schema": "indy-init.r10-contract-first-ui.competition-ui-ownership/1",
-  "status": "Ownership record for workstream B of the owner's Parallel Acceleration Directive (2026-11-05 19:00 UTC), coordinated by the lead/integration session. Revises FILE-OWNERSHIP.json's ui-a/ui-b/ui-c to the directive's UI-1/UI-2/UI-3 areas; CF-10 A (three UI roles). Applies to the competition build; contracts and stubs only reach Indy-init main (OD-INDY-22).",
+  "status": "Ownership record for workstream B of the owner's Parallel Acceleration Directive (2026-11-05 19:00 UTC), coordinated by the lead/integration session. Revises FILE-OWNERSHIP.json's areas to the directive's UI-1/UI-2/UI-3, held by the roles ui, ui-2 and ui-3 (DTD-R10-004); CF-10 A (three UI roles). Applies to the competition build; contracts and stubs only reach Indy-init main (OD-INDY-22).",
   "agentCount": "Three UI areas. If only two UI agents are available, UI-1 and UI-2 start and UI-3 is assigned after M1 and M2 are stable (directive \u00a74).",
   "buildOrder": [
     "bootstrap: integration writes Projections.fs (IF41-VIEW with Causa.Ui.Contracts), UiFixtures, View.fs and web/index.html",
@@ -40,7 +40,7 @@
         "tests/Causa.App.Tests/Ui/AdministrationTests.fs",
         "tests/Causa.App.Tests/Ui/SettingsTests.fs",
         "tests/Causa.App.Tests/Ui/CrossViewConsistencyTests.fs",
-        "tests/Causa.TestSupport/UiFixtures/Scenarios.ui-1.fs"
+        "tests/Causa.TestSupport/UiFixtures/Scenarios.ui.fs"
       ],
       "requirements": [
         "UI-001",
@@ -92,7 +92,8 @@
             "J3-09"
           ]
         }
-      ]
+      ],
+      "role": "ui"
     },
     {
       "id": "UI-2",
@@ -191,7 +192,8 @@
             "J3-07"
           ]
         }
-      ]
+      ],
+      "role": "ui-2"
     },
     {
       "id": "UI-3",
@@ -278,7 +280,8 @@
             "J2-09"
           ]
         }
-      ]
+      ],
+      "role": "ui-3"
     },
     {
       "id": "integration",
@@ -311,7 +314,14 @@
           ],
           "journeys": []
         }
-      ]
+      ],
+      "role": "integration"
     }
-  ]
+  ],
+  "roleMapping": {
+    "UI-1": "ui",
+    "UI-2": "ui-2",
+    "UI-3": "ui-3",
+    "decision": "DTD-R10-004 (lead, PR #136): keep the v4.1.x role names ui and ui-2 and add ui-3; the compiler hard-codes 'ui' (V41Package.fs:236/252/258/297) and laneOverrides name 'ui-2', so a rename would fail X01 and X18"
+  }
 }

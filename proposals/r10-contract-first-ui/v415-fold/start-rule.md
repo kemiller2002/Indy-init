@@ -8,7 +8,7 @@
 
 **Sentence to add as the second sentence of step 1:**
 
-> A UI slice (implementation boundary ui-a, ui-b or ui-c) is ready to **start** once the bootstrap (SL-T10) is integrated and every UI slice it depends on is **built** on its own branch, because it builds against IF41-VIEW and the bootstrapped fixture backend; it is ready to **merge** only as every slice is, on `slice-gate` PASS with its declared dependencies integrated and its bound journey assertions judged as ODR-R10-33 decides.
+> A UI slice (implementation boundary ui, ui-2 or ui-3) is ready to **start** once the bootstrap (SL-T10) is integrated and every UI slice it depends on is **built** on its own branch, because it builds against IF41-VIEW and the bootstrapped fixture backend; it is ready to **merge** only as every slice is, on `slice-gate` PASS with its declared dependencies integrated and its bound journey assertions judged as ODR-R10-33 decides.
 
 **What it does not change:**
 - the slice gate and the completion gate;

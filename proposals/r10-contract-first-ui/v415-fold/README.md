@@ -29,7 +29,7 @@ Requested by the historical-compatibility session. Each file is standalone; noth
 |---|---|
 | [`07-IF41-VIEW.folded.fs`](07-IF41-VIEW.folded.fs) and [`.sha256.json`](07-IF41-VIEW.folded.sha256.json) | the folded contract, sha256 `6328f3ce3786e952178c22d42601d43f9833a5bdfb0b942b1d42ca54d2fd46ed` |
 | [`interface-change-request.IF41-VIEW.json`](interface-change-request.IF41-VIEW.json) | one `interface-change` request (`ODR-V415-IF-VIEW`) in the owner-decision-requests format, pinning the folded file. The owner records it before the compile (`V41Package.fs:1774-1787`) |
-| [`interface-specifications.IF41-VIEW.json`](interface-specifications.IF41-VIEW.json) | the IF41-VIEW object only. Its `fsharp` equals the folded file. Producer is integration; consumers are ui-a, ui-b, ui-c and integration; there are four added operations and the producer and consumer tests |
+| [`interface-specifications.IF41-VIEW.json`](interface-specifications.IF41-VIEW.json) | the IF41-VIEW object only. Its `fsharp` equals the folded file. Producer is integration; consumers are ui, ui-2, ui-3 and integration; there are four added operations and the producer and consumer tests |
 | [`project-structure.delta.json`](project-structure.delta.json) | changes against v4.1.4's `project-structure.json`: the three UI roles (CF-10 A), the Causa.App compile order, 14 changed, 18 added and 2 split files, the UI fixture test helpers, the per-screen fragments (CF-08 A) and the rule changes |
 | [`bootstrap-fixtures.json`](bootstrap-fixtures.json) | the fixture files, what each asserts, and the generator command at causa-data `e8259df` |
 | [`start-rule.md`](start-rule.md) | the exact sentence for STARTUP-INSTRUCTIONS §4 step 1 |

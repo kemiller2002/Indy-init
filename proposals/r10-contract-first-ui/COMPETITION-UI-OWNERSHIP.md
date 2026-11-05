@@ -4,6 +4,7 @@
 - The owner's Parallel Acceleration Directive (2026-11-05, 19:00 UTC), workstream B, coordinated by the lead/integration session.
 - CF-10 A: three UI roles.
 - This revises FILE-OWNERSHIP.json's ui-a, ui-b and ui-c to the directive's three areas.
+- Roles (DTD-R10-004): UI-1 is held by `ui`, UI-2 by `ui-2` and UI-3 by the new `ui-3`. The v4.1.x role names stay because the compiler hard-codes `ui`.
 
 The machine-readable form is [COMPETITION-UI-OWNERSHIP.json](COMPETITION-UI-OWNERSHIP.json): every file has exactly one owner, checked when the file was generated.
 

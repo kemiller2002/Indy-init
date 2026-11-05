@@ -8,7 +8,7 @@
       "title": "IF41-VIEW gains the presentation contracts Causa.Ui.Contracts (CF-09 A)",
       "question": "Approve the change of IF41-VIEW to the folded contract at the pinned digest: the frozen v4.1.4 IF41-VIEW types unchanged, followed by the namespace Causa.Ui.Contracts (screen view models, capability boundaries Visible/Understood, validation rules from the catalog, UiIntent, UiBackend, the seven-state presentation mapping and Limen bindings)? Additive only: no existing IF41 type, case or field changes. Its implementing file src/Causa.App/Projections.fs becomes integration-owned (types only) and compiles before Connection.fs.",
       "options": [
-        "A: approve the change as pinned (additive; consumers ui-a, ui-b, ui-c and integration)",
+        "A: approve the change as pinned (additive; consumers ui, ui-2, ui-3 and integration)",
         "B: decline; IF41-VIEW stays as in v4.1.4 and the UI contracts wait for a later package"
       ],
       "recommendation": "A. It applies CF-09 A (APR-CFUI-OWNER-1) without a compiler change. Verified: v4.1.4 ContractCheck builds with the folded file (0 warnings), both negative controls still refuse (FS1093), and the real v4.1.4 bootstrap with Projections.fs holding the folded text builds.",
