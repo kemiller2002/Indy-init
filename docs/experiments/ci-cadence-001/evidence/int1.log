@@ -1,0 +1,68 @@
+PASS connect lists the four catalog cases
+PASS open Apollo 1: 432 of 432 decoded
+PASS open Apollo 1: catalog digest matches
+PASS historical case is read-only
+PASS editing a catalog case is refused
+PASS the token never appears in the view
+PASS create commits once to the writable repository
+PASS create is confirmed by a byte-identical read-back
+PASS the three files exist only under the working-copy prefix
+PASS the catalog repository is unchanged
+PASS the stored file set passes the full reader independently
+PASS the created investigation carries the title
+PASS edits stay unsaved until Save
+PASS save is confirmed by read-back
+PASS after save the history has 3 events
+PASS a fresh session lists the stored working copy
+PASS a fresh session reads 2 observations and 1 hypothesis back
+PASS the fresh read equals what was saved
+PASS a save against a moved head is refused (expectedHeadOid)
+PASS nothing was written by the refused save
+PASS the unsaved change is kept
+PASS an unknown commit outcome is not reported as saved
+PASS a read-back that differs is NOT confirmed
+PASS a blank title is refused before any write
+PASS a workspace name outside ^[a-z0-9][a-z0-9-]{0,63}$ is refused
+PASS opening a case pushes its hash route
+PASS Back to #/investigations shows the list
+PASS a browser move is never pushed again
+PASS Forward to a case shows it again
+PASS a deep link before Connect waits on the Connect screen
+PASS after Connect the deep-linked case opens
+PASS start: a valid title and problem statement are accepted
+PASS start: a 200-character title is accepted
+PASS start: a 201-character title is refused (INV-020)
+PASS start: a 10000-character problem statement is accepted
+PASS start: a 10001-character problem statement is refused (INV-021)
+PASS start: an empty problem statement is refused (INV-019)
+PASS start: a " \t\n" problem statement is refused (INV-019)
+PASS start: a blank title is refused (STORAGE-TITLE)
+PASS start: the blank-title message names the title
+PASS start: all errors are returned, title first
+PASS start: blank title and over-long problem statement both reported
+PASS start: messages name the field and the limit
+PASS observation: 1 character is accepted
+PASS observation: 10000 characters are accepted
+PASS observation: 10001 characters are refused
+PASS observation: empty is refused
+PASS observation: whitespace-only " \t\n" is refused
+PASS observation: 10001 spaces are refused as blank and over-long
+PASS hypothesis: 1 character is accepted
+PASS hypothesis: 10000 characters are accepted
+PASS hypothesis: 10001 characters are refused
+PASS hypothesis: empty is refused
+PASS hypothesis: whitespace-only " \t\n" is refused
+PASS hypothesis: 10001 spaces are refused as blank and over-long
+PASS length counts UTF-16 code units, not runes
+PASS 5000 surrogate pairs (10000 code units) are accepted
+PASS 5000 surrogate pairs + 1 char (10001 code units, 5001 runes) are refused
+PASS a title of 101 runes but 201 code units is refused
+PASS writer: an over-long observation is refused
+PASS writer: an over-long hypothesis is refused
+PASS writer: an over-long title is refused
+PASS writer: a blank title is refused with a message naming the title
+PASS writer: all start errors are joined
+PASS writer: a boundary-length observation is accepted
+PASS writer: a boundary-length hypothesis is accepted
+PASS writer: a boundary-length start is accepted
+all engine tests passed

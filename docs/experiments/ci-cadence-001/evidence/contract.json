@@ -1,0 +1,1 @@
+{"catalog": {"catalogId": "CAT-CAUSA-INVESTIGATION", "sha256": "7e5e8a400b52d79218e2fb42927d5cb122cc0e6c8ab002f146b33198647ce53c"}, "governedProducers": ["governed-gate"], "faultSensitivity": [], "facts": {"domain-profile-selected": false}, "requireProbeSpec": false}

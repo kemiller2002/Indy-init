@@ -1,0 +1,51 @@
+{
+  "applicationDefects": [
+    {
+      "id": "D-01",
+      "agent": "lead",
+      "introduced": "2026-11-05T21:09:00Z (approx, stub written)",
+      "detected": "2026-11-05T21:09:08Z",
+      "detectedBy": "Level 1 local dotnet build",
+      "fixed": "2026-11-05T21:09:39Z",
+      "latencySeconds": "~8",
+      "repairSeconds": 31,
+      "description": "FS3261 nullness error in Validation.fs stub (isNull on non-nullable string); a commit (365dba0) was made despite the failure because the lead's command chain did not stop on the build error",
+      "foundOnlyInFullCI": false
+    },
+    {
+      "id": "D-02",
+      "agent": "ui",
+      "introduced": "~2026-11-05T21:11:00Z (agent estimate)",
+      "detected": "2026-11-05T21:12:27Z",
+      "detectedBy": "Level 1 local dotnet build (FS0039)",
+      "fixed": "2026-11-05T21:12:45Z",
+      "repairSeconds": 18,
+      "description": "View.fs: saveState used before its definition",
+      "foundOnlyInFullCI": false
+    }
+  ],
+  "expectedNonDefectFailures": [
+    {
+      "agent": "ui",
+      "ts": "2026-11-05T21:12:54Z",
+      "description": "6 engine-test failures while Validation.fs was still the T+0 stub on the ui branch; cleared by merging the domain branch (21:13:25Z). Interface-timing, not a defect."
+    }
+  ],
+  "processFindings": [
+    {
+      "id": "P-01",
+      "description": "tools/r10/change-impact.fsx does not recognise preview/causa paths; it selects EVERYTHING (fail-safe), so Level 1 selection gives no focused guidance for application code"
+    },
+    {
+      "id": "P-02",
+      "description": "read-path.mjs is flaky through the container proxy (baseline run 1: 5/6 timeout; run 2: 25/25). Pre-existing."
+    }
+  ],
+  "defectsRemainingAtStop": "unknown for browser behaviour (A1-A7 and browser tests never ran on the candidate); none known in engine tests",
+  "controlsNotCountedAsDefects": [
+    "NC-1",
+    "NC-3",
+    "NC-4",
+    "NC-5a"
+  ]
+}

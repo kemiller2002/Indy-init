@@ -1,0 +1,34 @@
+PASS connect lists the four catalog cases
+PASS open Apollo 1: 432 of 432 decoded
+PASS open Apollo 1: catalog digest matches
+PASS historical case is read-only
+PASS editing a catalog case is refused
+PASS the token never appears in the view
+PASS create commits once to the writable repository
+PASS create is confirmed by a byte-identical read-back
+PASS the three files exist only under the working-copy prefix
+PASS the catalog repository is unchanged
+PASS the stored file set passes the full reader independently
+PASS the created investigation carries the title
+PASS edits stay unsaved until Save
+PASS save is confirmed by read-back
+PASS after save the history has 3 events
+PASS a fresh session lists the stored working copy
+PASS a fresh session reads 2 observations and 1 hypothesis back
+PASS the fresh read equals what was saved
+PASS a save against a moved head is refused (expectedHeadOid)
+PASS nothing was written by the refused save
+PASS the unsaved change is kept
+PASS an unknown commit outcome is not reported as saved
+PASS a read-back that differs is NOT confirmed
+PASS a blank title is refused before any write
+PASS a workspace name outside ^[a-z0-9][a-z0-9-]{0,63}$ is refused
+PASS opening a case pushes its hash route
+PASS Back to #/investigations shows the list
+PASS a browser move is never pushed again
+PASS Forward to a case shows it again
+PASS a deep link before Connect waits on the Connect screen
+PASS after Connect the deep-linked case opens
+FAIL NC-1 intentional failing control
+1 engine test(s) FAILED
+nc1 exit=1

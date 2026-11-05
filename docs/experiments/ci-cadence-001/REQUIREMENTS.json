@@ -1,0 +1,124 @@
+{
+  "catalog": "CAT-CAUSA-INVESTIGATION (requirements/catalogs/causa-investigation.requirement-catalog.json, ratified)",
+  "acceptanceRule": "accepted only when every catalog obligation passes and an independent verifier confirms; even then a local verdict is SUPPORTING-ONLY under catalog-acceptance (PRODUCER_NOT_GOVERNED)",
+  "summary": {
+    "targeted": 6,
+    "implemented": 6,
+    "independentlyVerified": 0,
+    "accepted": 0,
+    "fieldIdsVerified": 0
+  },
+  "targeted": [
+    {
+      "id": "INV-019",
+      "obligations": [
+        "mapped",
+        "validation",
+        "rejects"
+      ],
+      "status": "IMPLEMENTED, NOT ACCEPTED",
+      "evidence": "engine tests pass (local, FakeGitHub, head unchanged); browser rendering of the field message NOT observed",
+      "branch": "experiment/ci-cadence-001-ui @ 2168342 (UI) + experiment/ci-cadence-001 @ a0834b7 merge (domain)",
+      "independentVerification": "not performed (verifier was scheduled for T+45)"
+    },
+    {
+      "id": "INV-020",
+      "obligations": [
+        "mapped",
+        "validation",
+        "rejects"
+      ],
+      "status": "IMPLEMENTED, NOT ACCEPTED",
+      "evidence": "engine tests pass: 201 refused, 200 accepted; browser NOT observed",
+      "branch": "experiment/ci-cadence-001-ui @ 2168342 (UI) + experiment/ci-cadence-001 @ a0834b7 merge (domain)",
+      "independentVerification": "not performed (verifier was scheduled for T+45)"
+    },
+    {
+      "id": "INV-021",
+      "obligations": [
+        "mapped",
+        "validation",
+        "rejects"
+      ],
+      "status": "IMPLEMENTED, NOT ACCEPTED",
+      "evidence": "engine tests pass: 10001 refused; browser NOT observed",
+      "branch": "experiment/ci-cadence-001-ui @ 2168342 (UI) + experiment/ci-cadence-001 @ a0834b7 merge (domain)",
+      "independentVerification": "not performed (verifier was scheduled for T+45)"
+    },
+    {
+      "id": "INV-022",
+      "obligations": [
+        "mapped",
+        "exists",
+        "visible",
+        "accessible",
+        "activate",
+        "outcome"
+      ],
+      "status": "IMPLEMENTED, NOT ACCEPTED",
+      "evidence": "engine test: Cancel -> list, no write, form cleared; exists/visible/accessible NOT observed in a browser",
+      "branch": "experiment/ci-cadence-001-ui @ 2168342 (UI) + experiment/ci-cadence-001 @ a0834b7 merge (domain)",
+      "independentVerification": "not performed (verifier was scheduled for T+45)"
+    },
+    {
+      "id": "INV-005",
+      "obligations": [
+        "mapped",
+        "exists",
+        "visible",
+        "accessible"
+      ],
+      "status": "IMPLEMENTED, NOT ACCEPTED",
+      "evidence": "engine projection names repo/branch/path; NOT observed in a browser",
+      "branch": "experiment/ci-cadence-001-ui @ 2168342 (UI) + experiment/ci-cadence-001 @ a0834b7 merge (domain)",
+      "independentVerification": "not performed (verifier was scheduled for T+45)"
+    },
+    {
+      "id": "INV-016",
+      "obligations": [
+        "mapped",
+        "exists",
+        "visible",
+        "accessible"
+      ],
+      "status": "IMPLEMENTED, NOT ACCEPTED",
+      "evidence": "engine projection 'Unsaved changes: 1' / 'All changes saved'; NOT observed in a browser",
+      "branch": "experiment/ci-cadence-001-ui @ 2168342 (UI) + experiment/ci-cadence-001 @ a0834b7 merge (domain)",
+      "independentVerification": "not performed (verifier was scheduled for T+45)"
+    }
+  ],
+  "partial": [
+    {
+      "id": "INV-024",
+      "status": "validation implemented (engine: blank observation refused); save/reload/update against the real provider out of scope; NOT ACCEPTED"
+    },
+    {
+      "id": "INV-026",
+      "status": "validation implemented (engine: 10001-char hypothesis refused); NOT ACCEPTED"
+    },
+    {
+      "id": "INV-001",
+      "status": "field mapped (data-requirement-id), relabelled 'Problem statement'; NOT observed in a browser; NOT ACCEPTED"
+    },
+    {
+      "id": "INV-002",
+      "status": "field mapped; open gap: catalog says optional, storage contract requires a non-blank title (owner/contract question, not taken); NOT ACCEPTED"
+    }
+  ],
+  "fieldIds": {
+    "planned": [
+      "INV-001",
+      "INV-002",
+      "INV-005",
+      "INV-016",
+      "INV-019",
+      "INV-020",
+      "INV-021",
+      "INV-022",
+      "INV-024",
+      "INV-026"
+    ],
+    "verifiedInRenderedPage": [],
+    "knownGap": "error lines carry the domain RuleId as data-requirement-id: INV-019/020/021 match plain IDs, but INV-024/INV-026 errors carry 'INV-024.minLength' etc. and the blank-title error 'STORAGE-TITLE'; the textareas carry plain INV-024/INV-026. Unverified whether that satisfies traceability (NC-5 browser half not run)."
+  }
+}

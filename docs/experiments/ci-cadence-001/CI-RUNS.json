@@ -1,0 +1,58 @@
+{
+  "experiment": "CI-CADENCE-001 (EXP-INDY-001)",
+  "status": "PAUSED, NOT COMPLETED",
+  "experimentRuns": [],
+  "experimentRunsNote": "No full-CI run was dispatched: the planned T+45 dispatch was never reached (owner stop at T+5m12s). The experiment branches were not pushed during the run, and Preflight tooling's push trigger covers main only, so no run was triggered implicitly. Nothing to cancel.",
+  "baselineRuns": [
+    {
+      "runId": 42105890806,
+      "workflow": "Preflight tooling",
+      "event": "push",
+      "ref": "main",
+      "sha": "ba9124dcddf1ad07afcb4b84783977cda6d62601",
+      "kind": "observed (Actions API)",
+      "conclusion": "success",
+      "created": "2026-11-05T20:42:37Z",
+      "completed": "2026-11-05T21:00:54Z",
+      "wallMinutes": 18.3,
+      "runnerMinutes": 60.5,
+      "queueMinutes": {
+        "initialJobs": "<=0.05",
+        "r10-adversarial": 4.1
+      },
+      "criticalPath": "fsharp-tooling 18.2 min (Forma layout assertions 13.2 min)"
+    },
+    {
+      "runId": 42087387548,
+      "workflow": "Preflight tooling",
+      "event": "pull_request",
+      "sha": "e141f86",
+      "kind": "historical (VERIFICATION-CI.md)",
+      "wallMinutes": 23.0,
+      "runnerMinutes": null,
+      "note": "before sharding"
+    },
+    {
+      "runId": 42098958019,
+      "workflow": "Preflight tooling",
+      "event": "pull_request",
+      "sha": "952c3909bfdacc5ac54a76f1a75cdf100957641b",
+      "kind": "observed (run timestamps only)",
+      "conclusion": "success",
+      "wallMinutes": 43.6,
+      "note": "after sharding, 3-session runner contention"
+    },
+    {
+      "runId": 42104590116,
+      "workflow": "Preflight tooling",
+      "event": "push",
+      "ref": "main",
+      "sha": "a293fac54b0ed4dbc3d872fd28f20b33432321db",
+      "kind": "observed (run timestamps only)",
+      "conclusion": "success",
+      "wallMinutes": 16.4,
+      "note": "before sharding"
+    }
+  ],
+  "coverageFinding": "No workflow in .github/workflows references preview/causa: required CI does not build or test the application code this experiment changed."
+}

@@ -1,0 +1,7 @@
+nc3-good exit=0
+nc3-failed exit=1
+nc3-missing exit=1
+shard-result=success step-exit=0
+shard-result=failure step-exit=1
+shard-result=cancelled step-exit=1
+shard-result=skipped step-exit=1

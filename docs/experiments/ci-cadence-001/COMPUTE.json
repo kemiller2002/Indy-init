@@ -1,0 +1,37 @@
+{
+  "agents": [
+    {
+      "agent": "domain",
+      "tokens": 83092,
+      "toolUses": 12,
+      "durationSeconds": 162.2,
+      "source": "Agent task notification (observed)",
+      "activeWindow": "21:10:37Z-21:13:01Z",
+      "idle": "stopped early: scope complete at 21:13Z, idle thereafter"
+    },
+    {
+      "agent": "ui",
+      "tokens": 121829,
+      "toolUses": 23,
+      "durationSeconds": 229.3,
+      "source": "Agent task notification (observed)",
+      "activeWindow": "21:10:36Z-21:14:06Z",
+      "blockedSeconds": 0
+    },
+    {
+      "agent": "lead",
+      "tokens": "unavailable",
+      "toolUses": "unavailable (not instrumented)",
+      "note": "lead token use is not exposed to this session"
+    }
+  ],
+  "ciRunnerMinutes": 0,
+  "ciRunnerMinutesNote": "no CI run during the experiment",
+  "localVerification": {
+    "engineBuildSeconds": "~19 cold / incremental not timed",
+    "engineTestSeconds": 2,
+    "note": "each agent builds in its own worktree on a shared 4-vCPU container"
+  },
+  "repeatedWork": "none observed",
+  "staleInterfaceRework": "none: one expected stub-period test failure, resolved by merge with no conflicts"
+}

@@ -1,0 +1,34 @@
+{"ts":"2026-11-05T21:08:51Z","agent":"lead","event":"prep.end","detail":"preparation complete (started 2026-11-05T21:02:02Z)"}
+{"ts":"2026-11-05T21:08:51Z","agent":"lead","event":"T+0","detail":"experiment start; base 48823515"}
+{"ts":"2026-11-05T21:09:05Z","agent":"lead","event":"commit","detail":"365dba0 kickoff stub (did not compile)"}
+{"ts":"2026-11-05T21:09:08Z","agent":"lead","event":"defect.detected","detail":"D-01 FS3261 nullness error in Validation.fs stub; detected by local dotnet build (Level 1)"}
+{"ts":"2026-11-05T21:10:36Z","agent":"ui","event":"start","detail":"ui agent started"}
+{"ts":"2026-11-05T21:10:37Z","agent":"domain","event":"start","detail":"domain agent started"}
+{"ts":"2026-11-05T21:10:39Z","agent":"lead","event":"agents.launched","detail":"domain and ui agents launched in background at dd078b2"}
+{"ts":"2026-11-05T21:11:20Z","agent":"lead","event":"control.nc4","detail":"catalog-acceptance: incomplete obligation -> REFUSED CATALOG_OBLIGATION_FAILED (exit 4); obligation without status -> REFUSED (exit 4); all-pass local verdict -> SUPPORTING-ONLY, never GOVERNED-ACCEPTED (PRODUCER_NOT_GOVERNED)"}
+{"ts":"2026-11-05T21:11:20Z","agent":"lead","event":"control.nc5a","detail":"catalog-acceptance: INV-022 in manifest but unjudged -> REFUSED CATALOG_REQUIREMENT_UNJUDGED (exit 4)"}
+{"ts":"2026-11-05T21:11:25Z","agent":"domain","event":"build.pass","detail":"Validation.fs implemented; 0 errors"}
+{"ts":"2026-11-05T21:11:25Z","agent":"domain","event":"test.pass","detail":"31 passed, 0 failed"}
+{"ts":"2026-11-05T21:11:25Z","agent":"domain","event":"commit","detail":"596c9a9 implement Validation interface"}
+{"ts":"2026-11-05T21:11:50Z","agent":"lead","event":"control.nc3","detail":"r10-adversarial merge-check jq: complete set exit 0; FAILED verdict exit 1; missing case exit 1; shard result failure/cancelled/skipped -> step exit 1"}
+{"ts":"2026-11-05T21:12:05Z","agent":"lead","event":"control.nc1","detail":"intentional failing unit test in ValidationTests -> '1 engine test(s) FAILED', runner exit 1; reverted (controls worktree clean)"}
+{"ts":"2026-11-05T21:12:19Z","agent":"domain","event":"build.pass","detail":"Writer.eventsOf via Validation + ValidationTests; 0 errors"}
+{"ts":"2026-11-05T21:12:19Z","agent":"domain","event":"test.pass","detail":"67 passed (31 engine + 36 validation), 0 failed"}
+{"ts":"2026-11-05T21:12:19Z","agent":"domain","event":"commit","detail":"a0834b7 Writer refuses via Validation; pure ValidationTests"}
+{"ts":"2026-11-05T21:12:27Z","agent":"domain","event":"change-impact","detail":"advisory select: run EVERYTHING (Level 3 plan); all 3 changed preview/causa paths unrecognised; verified by this selection: nothing"}
+{"ts":"2026-11-05T21:12:32Z","agent":"ui","event":"build.fail","detail":"View.fs FS0039 saveState used before definition (ordering)"}
+{"ts":"2026-11-05T21:12:32Z","agent":"ui","event":"defect.introduced","detail":"saveState defined after detail in View.fs; introduced ~21:11Z"}
+{"ts":"2026-11-05T21:12:54Z","agent":"ui","event":"defect.fixed","detail":"saveState ordering fixed; detected by local build 21:12:27Z"}
+{"ts":"2026-11-05T21:12:54Z","agent":"ui","event":"build.pass","detail":"Engine.Tests build ok"}
+{"ts":"2026-11-05T21:12:54Z","agent":"ui","event":"test.fail","detail":"engine: 39 pass, 6 fail (INV-019 x2, INV-020 201, INV-021, INV-024, INV-026) - expected: Validation.fs still stubs on domain branch"}
+{"ts":"2026-11-05T21:12:59Z","agent":"domain","event":"test.pass","detail":"mutation check (> to >= in maxLength, reverted, not committed) produced 8 FAILs; after revert rebuild 67 passed, 0 failed"}
+{"ts":"2026-11-05T21:13:01Z","agent":"domain","event":"stop","detail":"scope complete; final a0834b7; 67 passed 0 failed; no defects, build failures or blocks"}
+{"ts":"2026-11-05T21:13:25Z","agent":"ui","event":"commit","detail":"105784b CI-CADENCE-001 ui: start-form field errors, Cancel, destination, save state (WIP before domain merge)"}
+{"ts":"2026-11-05T21:13:25Z","agent":"ui","event":"merge.domain","detail":"merged a0834b7 as 2168342, no conflicts"}
+{"ts":"2026-11-05T21:13:25Z","agent":"ui","event":"build.pass","detail":"Engine.Tests build ok after merge"}
+{"ts":"2026-11-05T21:13:25Z","agent":"ui","event":"test.pass","detail":"engine 81 PASS 0 FAIL (incl. ValidationTests)"}
+{"ts":"2026-11-05T21:13:25Z","agent":"ui","event":"integration.pass","detail":"UI validation tests pass against real Validation.fs from a0834b7"}
+{"ts":"2026-11-05T21:13:42Z","agent":"lead","event":"integration.pass","detail":"merged experiment/ci-cadence-001-domain (a0834b7) into experiment/ci-cadence-001; build 0 errors 0 warnings; engine tests 67 PASS 0 FAIL, exit 0"}
+{"ts":"2026-11-05T21:14:02Z","agent":"lead","event":"owner.stop.received","detail":"owner: stop EXP-INDY-001 (= CI-CADENCE-001) at next safe checkpoint; ui agent told to commit as-is and stop; no experiment workflow runs exist (0 dispatched, experiment branches never pushed) so none to cancel"}
+{"ts":"2026-11-05T21:14:03Z","agent":"lead","event":"STOP","detail":"safe checkpoint reached (ui agent stopped, all agent work committed locally); experiment PAUSED, NOT COMPLETED; elapsed T+0 21:08:51Z -> 21:14:03Z = 5m12s"}
+{"ts":"2026-11-05T21:14:06Z","agent":"ui","event":"stop","detail":"owner stop; wasm build.fsx + ArchitectureCheck interrupted (no result observed); working tree clean at 2168342; no server started"}

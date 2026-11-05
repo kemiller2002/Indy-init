@@ -1,0 +1,19 @@
+== positive
+  REFUSED PRODUCER_NOT_GOVERNED the verdict was produced by implementer-run (run unknown); only the governed gate establishes acceptance. It is kept as supporting evidence
+catalog-acceptance: SUPPORTING-ONLY (/tmp/claude-0/-home-user/d7c25fd4-6452-5a1a-882c-aab62f8ddcd4/scratchpad/nc/out-positive.json)
+exit=4
+== nc4-incomplete
+  REFUSED CATALOG_OBLIGATION_FAILED INV-020/validation: title of 201 accepted
+  REFUSED PRODUCER_NOT_GOVERNED the verdict was produced by implementer-run (run unknown); only the governed gate establishes acceptance. It is kept as supporting evidence
+catalog-acceptance: REFUSED (/tmp/claude-0/-home-user/d7c25fd4-6452-5a1a-882c-aab62f8ddcd4/scratchpad/nc/out-nc4-incomplete.json)
+exit=4
+== nc4-nostatus
+  REFUSED CATALOG_OBLIGATION_FAILED INV-021/rejects-2: no status
+  REFUSED PRODUCER_NOT_GOVERNED the verdict was produced by implementer-run (run unknown); only the governed gate establishes acceptance. It is kept as supporting evidence
+catalog-acceptance: REFUSED (/tmp/claude-0/-home-user/d7c25fd4-6452-5a1a-882c-aab62f8ddcd4/scratchpad/nc/out-nc4-nostatus.json)
+exit=4
+== nc5-missing
+  REFUSED CATALOG_REQUIREMENT_UNJUDGED INV-022 is in the governed manifest but the verification does not judge it
+  REFUSED PRODUCER_NOT_GOVERNED the verdict was produced by implementer-run (run unknown); only the governed gate establishes acceptance. It is kept as supporting evidence
+catalog-acceptance: REFUSED (/tmp/claude-0/-home-user/d7c25fd4-6452-5a1a-882c-aab62f8ddcd4/scratchpad/nc/out-nc5-missing.json)
+exit=4
