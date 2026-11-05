@@ -1,0 +1,242 @@
+{
+ "schema": "indy-init.v4-dependency-lock-source/1",
+ "description": "PROPOSED successor of requirements-compiled/v4/analysis/dependency-lock.source.json (frozen, echelon-current 1.33.0). Selects the same systems from echelon-current 1.37.0, the set the owner approved (echelon-registry#109, OD-INDY-8) and the Rehearsal 010 toolchain lock already installs. Generated into dependency-lock.json by tools/stack-drift/stack-drift.fsx lock, which reproduces the frozen v4 lock from the v4 source (deep JSON equality) (negative and equivalence controls in its test command). Not adopted: adoption is owner decision ODR-ESU-01 and a successor requirements package (docs/optimization/echelon-stack-upgrade/OWNER-DECISIONS.md).",
+ "releaseSet": {
+  "channel": "echelon-current",
+  "version": "1.37.0",
+  "registryRepo": "echelon-registry",
+  "path": "sets/echelon-current/1.37.0.json",
+  "decision": "OD-INDY-8 (echelon-registry#109, merged 5752402); proposed for the application by ODR-ESU-01"
+ },
+ "approvedStack": [
+  "F#",
+  ".NET",
+  "Limen",
+  "Forma",
+  "Folio",
+  "GitHub-backed persistence"
+ ],
+ "forbiddenFrameworks": [
+  "Bolero",
+  "React",
+  "Angular",
+  "Vue",
+  "Blazor"
+ ],
+ "interopBoundaries": [
+  {
+   "language": "C#",
+   "scope": "a single [JSExport] host entry point, because F# does not run the JSExport source generator",
+   "source": "Rehearsal 7 KD-007 (finding, not code)"
+  },
+  {
+   "language": "JavaScript",
+   "scope": "a browser-boundary script relaying connectivity, timers and the leave warning that Limen 0.9.1 does not expose; holds no application state",
+   "source": "Rehearsal 7 KD-010 (finding, not code)"
+  }
+ ],
+ "systems": [
+  {
+   "id": "limen",
+   "kind": "registry-component",
+   "systemId": "limen",
+   "use": "runtime",
+   "runtimeCompatibility": ".NET 10 WebAssembly; browsers Chromium and WebKit (iPad Safari)",
+   "classification": "runtime",
+   "required": true,
+   "npmPackage": "@echelon-foundry/limen"
+  },
+  {
+   "id": "limen-fsharp",
+   "kind": "registry-component",
+   "systemId": "limen-fsharp",
+   "use": "runtime",
+   "runtimeCompatibility": ".NET 10, F#",
+   "classification": "runtime",
+   "required": true,
+   "nugetPackage": "EchelonFoundry.Limen.Contract"
+  },
+  {
+   "id": "forma",
+   "kind": "registry-component",
+   "systemId": "forma",
+   "use": "runtime",
+   "runtimeCompatibility": "evergreen browsers; CSS custom properties",
+   "classification": "runtime",
+   "required": true,
+   "npmPackage": "@echelon-foundry/design-system"
+  },
+  {
+   "id": "folio",
+   "kind": "registry-component",
+   "systemId": "folio",
+   "use": "runtime",
+   "runtimeCompatibility": "evergreen browsers; print CSS",
+   "classification": "runtime",
+   "required": true,
+   "npmPackage": "@echelon-foundry/print-components"
+  },
+  {
+   "id": "praxis",
+   "kind": "registry-component",
+   "systemId": "praxis",
+   "use": "process",
+   "runtimeCompatibility": "linux-x64 CI",
+   "classification": "development-tool",
+   "required": true,
+   "executable": "praxis"
+  },
+  {
+   "id": "dokimos",
+   "kind": "registry-component",
+   "systemId": "dokimos",
+   "use": "process",
+   "runtimeCompatibility": "linux-x64 CI",
+   "classification": "verification-tool",
+   "required": true,
+   "executable": "dokimos"
+  },
+  {
+   "id": "ordo",
+   "kind": "registry-component",
+   "systemId": "ordo",
+   "use": "process",
+   "runtimeCompatibility": "linux-x64 CI",
+   "classification": "development-tool",
+   "required": true,
+   "executable": "ordo"
+  },
+  {
+   "id": "percepta-semantic",
+   "kind": "registry-component",
+   "systemId": "percepta-semantic",
+   "use": "verification",
+   "runtimeCompatibility": "linux-x64 CI",
+   "classification": "verification-tool",
+   "required": true,
+   "executable": "percepta"
+  },
+  {
+   "id": "percepta",
+   "kind": "registry-component",
+   "systemId": "percepta",
+   "use": "verification",
+   "runtimeCompatibility": "linux-x64 CI",
+   "classification": "verification-tool",
+   "required": true,
+   "executable": "percepta-repo"
+  },
+  {
+   "id": "aegis",
+   "kind": "registry-component",
+   "systemId": "aegis",
+   "use": "runtime",
+   "runtimeCompatibility": ".NET 10",
+   "classification": "runtime",
+   "required": true,
+   "nugetPackage": "EchelonFoundry.Aegis.Core"
+  },
+  {
+   "id": "dotnet-sdk",
+   "kind": "sdk",
+   "version": "10.0.402",
+   "source": "global.json (rollForward disable)",
+   "use": "toolchain",
+   "runtimeCompatibility": "wasm-tools workload from the same SDK feed",
+   "classification": "build",
+   "required": true
+  },
+  {
+   "id": "conditor",
+   "kind": "tag-pinned",
+   "version": "0.10.20",
+   "repo": "conditor",
+   "tag": "v0.10.20",
+   "commit": "a4c53cee6f72966ed737362be5daa5d8ddea12d8",
+   "use": "bootstrap and CI policy",
+   "runtimeCompatibility": ".NET 10",
+   "classification": "build",
+   "required": true
+  },
+  {
+   "id": "causa-storage",
+   "kind": "tag-pinned",
+   "version": "1.0.0",
+   "repo": "causa-data",
+   "tag": "causa-storage-v1.0.0",
+   "commit": "c947c7e354be80766573a782546c8186336774cc",
+   "use": "wire contract",
+   "runtimeCompatibility": "any reader implementing section 11",
+   "classification": "runtime",
+   "required": true
+  },
+  {
+   "id": "causa-data-catalog",
+   "kind": "data",
+   "version": "demonstration-v1 (catalogVersion 1.0.0)",
+   "repo": "causa-data",
+   "commit": "e8259df74add723765c57a5b1a5888d9c3f707af",
+   "path": "catalog/demonstration-v1/manifest.json",
+   "sha256": "32badb6df8ce8b9ada765bf3d62ab3d107075c3f139361917a91f094e87af4fd",
+   "use": "demonstration data, read at runtime",
+   "runtimeCompatibility": "causa-storage 1.0.0",
+   "classification": "runtime",
+   "required": true
+  },
+  {
+   "id": "github-api",
+   "kind": "external-api",
+   "version": "GraphQL API and REST API version 2022-11-28",
+   "use": "persistence provider",
+   "runtimeCompatibility": "HTTPS from the browser with a fine-grained token (CT-017)",
+   "classification": "optional-integration",
+   "required": true
+  }
+ ],
+ "excluded": [
+  {
+   "id": "strata",
+   "reason": "installed by Conditor's workstation profile (optional in the set) but never invoked by Indy Init, its bootstrap or CI"
+  },
+  {
+   "id": "arca",
+   "reason": "R7-AMD-01 (Arca queue) withdrawn by ADR-R7-001; no project, bootstrap or workflow references it"
+  },
+  {
+   "id": "fides",
+   "reason": "no reference in the package, the bootstrap, the scaffold or CI"
+  },
+  {
+   "id": "summa-contracts",
+   "reason": "no reference"
+  },
+  {
+   "id": "visual-engineering",
+   "reason": "required repository-lifecycle component of the set, but neither Conditor 0.10.20's indy-init preset nor Indy Init installs or invokes it"
+  },
+  {
+   "id": "communication-engineering",
+   "reason": "as visual-engineering"
+  },
+  {
+   "id": "tutela",
+   "reason": "as visual-engineering"
+  },
+  {
+   "id": "vigila",
+   "reason": "not in echelon-current; mentioned only in scaffold documentation"
+  },
+  {
+   "id": "iter",
+   "reason": "not in echelon-current; no tags or releases; no reference"
+  },
+  {
+   "id": "vitium",
+   "reason": "not in the registry; no tags or releases; no reference"
+  },
+  {
+   "id": "tutors",
+   "reason": "no repository kemiller2002/tutors is reachable and the registry names no such system"
+  }
+ ]
+}
