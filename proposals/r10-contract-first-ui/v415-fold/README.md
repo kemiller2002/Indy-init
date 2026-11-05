@@ -27,7 +27,7 @@ Requested by the historical-compatibility session. Each file is standalone; noth
 
 | File | What it is |
 |---|---|
-| [`07-IF41-VIEW.folded.fs`](07-IF41-VIEW.folded.fs) and [`.sha256.json`](07-IF41-VIEW.folded.sha256.json) | the folded contract, sha256 `6328f3ce3786e952178c22d42601d43f9833a5bdfb0b942b1d42ca54d2fd46ed` |
+| [`07-IF41-VIEW.folded.fs`](07-IF41-VIEW.folded.fs) and [`.sha256.json`](07-IF41-VIEW.folded.sha256.json) | the folded contract, sha256 `896800ef80d033ff69c58ed2b5d36ed83cd7f3b33269f0fac6dd6021ab22ece1`. It targets v4.1.5 revision 2: investigation identities are `InvestigationRef` (W1) |
 | [`interface-change-request.IF41-VIEW.json`](interface-change-request.IF41-VIEW.json) | one `interface-change` request (`ODR-V415-IF-VIEW`) in the owner-decision-requests format, pinning the folded file. The owner records it before the compile (`V41Package.fs:1774-1787`) |
 | [`interface-specifications.IF41-VIEW.json`](interface-specifications.IF41-VIEW.json) | the IF41-VIEW object only. Its `fsharp` equals the folded file. Producer is integration; consumers are ui, ui-2, ui-3 and integration; there are four added operations and the producer and consumer tests |
 | [`project-structure.delta.json`](project-structure.delta.json) | changes against v4.1.4's `project-structure.json`: the three UI roles (CF-10 A), the Causa.App compile order, 14 changed, 18 added and 2 split files, the UI fixture test helpers, the per-screen fragments (CF-08 A) and the rule changes |
@@ -56,3 +56,21 @@ They use no `Msg`, no `Model`, and no case of the event or command unions. Only 
 | CF-12 A | the contracts' own `Rule`/`Validation` |
 
 CF-06 A (Reduce motion, device scope) is the fixture's preference. CF-11 A is a theme token and CF-08 A a markup layout; both belong to the package's ownership and bootstrap, not to contract types. CF-02 A needs successor catalog entries for "Record evidence", "Reassess" and the two link choosers (catalog ratification).
+
+## Revision for v4.1.5 W1 (2026-11-05, requested by the v4.1.5 session)
+
+v4.1.5 revision 2 (PR #135, f91bd7b) keys investigations by workspace and id, as `InvestigationRef`. Every identity that dispatches back into `Update` now uses it:
+- `InvestigationSummary.Ref`;
+- `WorkspaceFrame.Ref` and `StoredRecordView.Ref`;
+- `UiRoute.WorkspaceRoute of InvestigationRef * Section`, whose route carries `ws` and `role`;
+- `UiFailure.InvestigationNotFound of InvestigationRef`;
+- the list row key, which is now the canonical route.
+
+Display-only text is unchanged. The frozen `SaveIndicatorView` and `WorkspaceHeaderView.NotSaved` still carry the bare `InvestigationId`, because they are IF41-VIEW's own v4.1.4 types, which v4.1.5 owns.
+
+**Verified:**
+- `ContractCheck.fsproj` of #135's v4.1.5 contracts, with this file as `07-IF41-VIEW.fs`: 0 warnings;
+- both negative controls refused (FS1093);
+- 44/44 Layer A tests and 7/7 Layer B.
+
+The proposal's own build links v4.1.4, plus `contracts/V415Workspace.shim.fs`: #135's W1 types copied verbatim. The shim is not part of the fold.

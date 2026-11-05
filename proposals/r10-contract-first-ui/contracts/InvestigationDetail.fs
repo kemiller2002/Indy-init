@@ -2,6 +2,7 @@ namespace Causa.Ui.Contracts
 
 open System
 open Causa.Domain
+open Causa.Persistence
 
 /// One stored event as read (Data Visible): the wire record, uninterpreted. Shown, for example, when the kernel cannot
 /// yet project a history; never presented as the investigation's state (UI-010 "fail closed", UI-023).
@@ -15,7 +16,7 @@ type StoredEvent =
 
 /// The read-only record of an investigation as stored (Data Visible). No replay is claimed.
 type StoredRecordView =
-    { Id: InvestigationId
+    { Ref: InvestigationRef
       Title: string
       CreatedAt: DateTimeOffset option
       UpdatedAt: DateTimeOffset option
@@ -25,7 +26,8 @@ type StoredRecordView =
 
 /// The workspace frame every section shares (INV-007, INV-008, INV-018, INV-042, UI-013, UI-014).
 type WorkspaceFrame =
-    { Id: InvestigationId
+    { /// The identity every section dispatches with (v4.1.5 W1).
+      Ref: InvestigationRef
       /// The investigation identifier as text (INV-006 read-only after Start; INV-034 keeps it).
       Identifier: string
       Title: string

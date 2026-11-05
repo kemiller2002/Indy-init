@@ -36,12 +36,19 @@ let ``only absolute http(s) URLs become SafeUrl (INV-029, UI-005)`` () =
 
 [<Fact>]
 let ``routes round-trip; unknown ids and paths are not-found`` () =
-    let id = InvestigationId(Guid.Parse "e3adbee5-5096-5a10-bbfb-cecda86a154b")
+    let id : Causa.Persistence.InvestigationRef =
+        { Address = { Workspace = Causa.Persistence.Workspace "workspaces/demo/demonstration-v1"; Role = Causa.Persistence.WorkspaceRole.Catalog }
+          Id = InvestigationId(Guid.Parse "e3adbee5-5096-5a10-bbfb-cecda86a154b") }
     let routes = [ InvestigationsRoute; StartRoute; AdministrationRoute; SettingsRoute ] @ (Navigation.sections |> List.map (fun s -> WorkspaceRoute(id, s)))
     for r in routes do Assert.Equal(r, Navigation.parse (Navigation.format r))
-    Assert.Equal("#/investigations/e3adbee5-5096-5a10-bbfb-cecda86a154b", Navigation.format (WorkspaceRoute(id, Overview)))
+    Assert.Equal("#/investigations/e3adbee5-5096-5a10-bbfb-cecda86a154b?ws=workspaces%2Fdemo%2Fdemonstration-v1&role=catalog", Navigation.format (WorkspaceRoute(id, Overview)))
+    // The same id in another workspace is another route (v4.1.5 W1).
+    let other = { id with Address = { Workspace = Causa.Persistence.Workspace "workspaces/demo/historical-v1"; Role = Causa.Persistence.WorkspaceRole.Catalog } }
+    Assert.NotEqual<string>(Navigation.format (WorkspaceRoute(id, Overview)), Navigation.format (WorkspaceRoute(other, Overview)))
+    // Without its workspace a route identifies nothing.
+    Assert.True(match Navigation.parse "#/investigations/e3adbee5-5096-5a10-bbfb-cecda86a154b" with NotFoundRoute _ -> true | _ -> false)
     Assert.True(match Navigation.parse "#/investigations/not-a-guid" with NotFoundRoute _ -> true | _ -> false)
-    Assert.True(match Navigation.parse "#/investigations/e3adbee5-5096-5a10-bbfb-cecda86a154b?tab=bogus" with NotFoundRoute _ -> true | _ -> false)
+    Assert.True(match Navigation.parse "#/investigations/e3adbee5-5096-5a10-bbfb-cecda86a154b?ws=w&role=catalog&tab=bogus" with NotFoundRoute _ -> true | _ -> false)
 
 [<Fact>]
 let ``primary navigation has exactly one current destination on every route`` () =
@@ -50,14 +57,14 @@ let ``primary navigation has exactly one current destination on every route`` ()
 
 [<Fact>]
 let ``corrective actions appear only where supported`` () =
-    let id = InvestigationId(Guid.NewGuid())
+    let id : Causa.Persistence.InvestigationRef = { Address = { Workspace = Causa.Persistence.Workspace "w"; Role = Causa.Persistence.WorkspaceRole.WorkingCopy }; Id = InvestigationId(Guid.NewGuid()) }
     Assert.DoesNotContain(CorrectiveActions, Navigation.sectionLinks id Overview false |> List.map (fun l -> l.Destination))
     Assert.Contains(CorrectiveActions, Navigation.sectionLinks id Overview true |> List.map (fun l -> l.Destination))
 
 [<Fact>]
 let ``failure copy says what happened, what is kept and what next, without technical words (UI-010, UI-017, UI-023)`` () =
     let failures =
-        [ InvestigationNotFound(InvestigationId(Guid.NewGuid())); InvalidData "d"; NotAuthorized; CredentialRefused; ProviderUnreachable
+        [ InvestigationNotFound { Address = { Workspace = Causa.Persistence.Workspace "w"; Role = Causa.Persistence.WorkspaceRole.Catalog }; Id = InvestigationId(Guid.NewGuid()) }; InvalidData "d"; NotAuthorized; CredentialRefused; ProviderUnreachable
           ProviderRateLimited; ProviderError "p"; CapabilityAbsent(DataUnderstood, "x") ]
     for f in failures do
         let c = PresentationLanguage.failure f

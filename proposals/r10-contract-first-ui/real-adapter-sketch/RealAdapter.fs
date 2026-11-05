@@ -55,7 +55,7 @@ let private dispatch (engine: Engine) (intent: UiIntent) (s: State) : State * Ho
     | Activate(a, _) when a = Actions.save ->
         match currentId s with
         | Some id ->
-            let m, fx = engine.Update (Msg.SessionInput(id, SaveInput.SaveRequested)) s.Model
+            let m, fx = engine.Update (Msg.SessionInput(id.Id, SaveInput.SaveRequested)) s.Model
             { s with Model = m }, fx
         | None -> s, []
     // Content commands need a CommandEnvelope whose Command payloads are opaque in the frozen stubs (C1, C5): the
@@ -71,7 +71,7 @@ let private connectionView (s: State) : ConnectionView =
       Connected = s.Model.Context |> Option.map (fun c -> sprintf "%s/%s on %s" c.Repository.Owner c.Repository.Name c.Repository.Branch)
       WriteScope = (match s.Model.Connection with Connected true -> Writable | Connected false -> ReadOnlyConnection | _ -> WriteScopeUnknown) }
 
-let private loadFailure (id: InvestigationId) (l: LoadFailure) =
+let private loadFailure (id: InvestigationRef) (l: LoadFailure) =
     match l with
     | Unverifiable fs -> InvalidData(sprintf "%d verification failure(s)" fs.Length)
     | ProviderFailed AuthenticationFailed -> CredentialRefused
@@ -90,7 +90,8 @@ let private project (s: State) : AppView =
                   Drafts = { Values = Map.empty; Errors = []; OpenEditor = None }
                   Details = { Open = false; Form = { Title = ""; ProblemStatement = ""; Question = "" }; Errors = []; Edit = NotOffered; SaveDetails = NotOffered; Cancel = NotOffered }
                   Save = None; State = ScreenFailed f }
-            let load = s.Model.Loads |> Map.tryFind id |> Option.defaultValue NotLoaded
+            // The frozen v4.1.4 Model is keyed by InvestigationId; v4.1.5 keys it by InvestigationRef (drop `.Id` then).
+            let load = s.Model.Loads |> Map.tryFind id.Id |> Option.defaultValue NotLoaded
             let view =
                 match load with
                 | LoadFailed f -> failedWith (loadFailure id f)
@@ -99,13 +100,13 @@ let private project (s: State) : AppView =
                 // or hypotheses for the frame or the sections.
                 | LoadState.Loaded _ | NotLoaded | UnavailableOffline -> failedWith contentGap
             let save =
-                s.Model.Sessions |> Map.tryFind id |> Option.map (fun session ->
+                s.Model.Sessions |> Map.tryFind id.Id |> Option.map (fun session ->
                     let kind = saveKind session.State
                     { Kind = kind
                       // The frozen machine's own projection (IF41-VIEW Projections.SaveIndicator) supplies Text, Glyph,
                       // Politeness and the commit time; the sketch takes the label and the choices from the contracts.
                       Indicator =
-                        { InvestigationId = id; Label = PresentationLanguage.saveState kind; Text = ""; Glyph = ""
+                        { InvestigationId = id.Id; Label = PresentationLanguage.saveState kind; Text = ""; Glyph = ""
                           Actions = SaveChoices.forKind kind
                           Politeness = (match kind with ConflictKind | SaveFailedKind | UnknownOutcomeKind -> Assertive | _ -> Polite)
                           LastSavedCommitTime = None }

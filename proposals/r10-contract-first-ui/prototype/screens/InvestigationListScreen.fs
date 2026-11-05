@@ -21,7 +21,8 @@ let private copyText c =
 
 let private row (s: InvestigationSummary) =
     let counts = s.Counts |> Option.map Shown.value
-    [ "id", BindingPrimitive.Text(let (Causa.Domain.InvestigationId g) = s.Id in g.ToString("D"))
+    // The row key is the canonical route, so "Open" carries the workspace with the id (v4.1.5 W1).
+    [ "id", BindingPrimitive.Text s.Href
       "title", BindingPrimitive.Text s.Title
       "status", BindingPrimitive.Text(s.Status |> Option.map Shown.value |> Option.defaultValue "Not available")
       "lastActivity", BindingPrimitive.Text(s.LastActivity |> Option.map (fun d -> d.ToString("d MMMM yyyy", Globalization.CultureInfo.InvariantCulture)) |> Option.defaultValue "Not available")

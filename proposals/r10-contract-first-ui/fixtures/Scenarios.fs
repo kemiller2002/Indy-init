@@ -43,26 +43,36 @@ let label s = FixtureLabel.create (sprintf "%s (causa-data %s)" (name s) (CausaD
 let idOf (s: string) = InvestigationId(Guid.Parse s)
 let private at (s: string) = DateTimeOffset.Parse(s, Globalization.CultureInfo.InvariantCulture)
 
-/// A well-formed id that is in no fixture (the missing-investigation case).
-let missingId = InvestigationId(Guid.Parse "00000000-0000-4000-8000-000000000000")
+/// The catalog workspace a stored case lives in, from its stored path (".../investigations/<id>"). v4.1.5 W1.
+let catalogAddressOf (c: CausaDataExtract.StoredCase) : WorkspaceAddress =
+    { Workspace = Workspace(c.Path.Substring(0, c.Path.IndexOf "/investigations/")); Role = WorkspaceRole.Catalog }
+
+/// The fixture's working-copy workspace. Synthetic, labelled; not a causa-data path.
+let workingCopyAddress : WorkspaceAddress = { Workspace = Workspace "workspaces/demo/fixture-working-copy"; Role = WorkspaceRole.WorkingCopy }
+
+let refOf (c: CausaDataExtract.StoredCase) : InvestigationRef = { Address = catalogAddressOf c; Id = idOf c.Id }
+
+/// A well-formed reference that is in no fixture (the missing-investigation case).
+let missingRef : InvestigationRef =
+    { Address = catalogAddressOf CausaDataExtract.cases.Head; Id = InvestigationId(Guid.Parse "00000000-0000-4000-8000-000000000000") }
 
 let apollo11 = CausaDataExtract.cases |> List.find (fun c -> c.Key = "apollo-11")
-let apollo11Id = idOf apollo11.Id
+let apollo11Ref = refOf apollo11
 
 /// A card from a stored case. Status and counts are the stored snapshot's (Data Visible, not Causa's replay);
 /// unresolved contradictions need the domain's interpretation of contradiction states, so they are UnknownCount.
 let summary (lbl: FixtureLabel) (c: CausaDataExtract.StoredCase) : InvestigationSummary =
-    { Id = idOf c.Id
+    { Ref = refOf c
       Title = c.Title
       Status = Some(AsStored(Visible.fixture lbl c.SnapshotLifecycle))
       LastActivity = Some(at c.UpdatedAt)
       Counts =
         Some(AsStored(Visible.fixture lbl { Hypotheses = Known c.SnapshotHypotheses; Evidence = Known c.SnapshotEvidence; UnresolvedContradictions = UnknownCount }))
       Copy = FrozenDemonstration
-      Href = Navigation.format (WorkspaceRoute(idOf c.Id, Overview)) }
+      Href = Navigation.format (WorkspaceRoute(refOf c, Overview)) }
 
 let storedRecord (c: CausaDataExtract.StoredCase) : StoredRecordView =
-    { Id = idOf c.Id
+    { Ref = refOf c
       Title = c.Title
       CreatedAt = Some(at c.CreatedAt)
       UpdatedAt = Some(at c.UpdatedAt)
@@ -160,10 +170,11 @@ let saveText kind =
     | UnknownOutcomeKind -> "It is not yet known whether your last save reached the repository."
     | SaveFailedKind -> "The repository refused the save. Your changes are kept in this tab."
 
-let savePresentation (id: InvestigationId) (kind: SaveStateKind) (title: string) : SavePresentation =
+let savePresentation (id: InvestigationRef) (kind: SaveStateKind) (title: string) : SavePresentation =
     { Kind = kind
       Indicator =
-        { InvestigationId = id
+        // The frozen IF41-VIEW record still carries the bare id (v4.1.5 owns that type).
+        { InvestigationId = id.Id
           Label = PresentationLanguage.saveState kind
           Text = saveText kind
           // The glyph set is the save-indicator owner's (PERSIST-030, T22); fixtures leave it empty rather than invent one.

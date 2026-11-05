@@ -3,6 +3,7 @@ namespace Causa.Ui.Contracts
 open System
 open System.Text.RegularExpressions
 open Causa.Domain
+open Causa.Persistence
 
 /// A fixture's label. Every fixture value carries one, so a fixture-backed screen can never be reported as an
 /// integrated one (VERIFICATION-STRATEGY.md, Layer A/B versus Layer C). Construct only through FixtureLabel.create.
@@ -165,7 +166,8 @@ module SafeUrl =
 
 /// Why data is not shown. Each case has its own plain-language copy (UiStates.describe, UI-010, UI-028).
 type UiFailure =
-    | InvestigationNotFound of InvestigationId
+    /// Keyed by workspace and id (v4.1.5 W1): the same case can be stored in two workspaces.
+    | InvestigationNotFound of InvestigationRef
     /// The stored files did not verify (schema, digest, replay refusal). Fails closed: nothing partial is shown.
     | InvalidData of detail: string
     | NotAuthorized

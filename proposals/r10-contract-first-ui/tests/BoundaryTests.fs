@@ -26,6 +26,8 @@ let ``the prototype screens reference only the UI contracts (no domain, persiste
 /// contracts' public surface is a coupling to domain or persistence internals and fails this test.
 let allowedFrozen =
     set [ "Causa.Domain.InvestigationId"; "Causa.Domain.AggregateVersion"; "Causa.Domain.EventId"
+          // v4.1.5 W1 identity (02-IF41-STORAGE.fs): investigations are keyed by workspace and id.
+          "Causa.Persistence.InvestigationRef"; "Causa.Persistence.WorkspaceAddress"; "Causa.Persistence.Workspace"; "Causa.Persistence.WorkspaceRole"
           "Causa.App.ConnectionState"; "Causa.App.SaveAction"; "Causa.App.SaveIndicatorView"
           "Causa.Persistence.Politeness"; "Causa.Persistence.Credential+T"; "Causa.Persistence.RequestId" ]
 
@@ -111,13 +113,14 @@ let ``the seven frozen save states map one to one onto the presentation states``
 
 [<Fact>]
 let ``R9 the adapter maps provider NotFound to InvestigationNotFound and offers the frozen conflict choices`` () =
-    let id = InvestigationId(Guid.Parse "e3adbee5-5096-5a10-bbfb-cecda86a154b")
-    let route = WorkspaceRoute(id, Overview)
+    let r = Scenarios.apollo11Ref
+    let id = r.Id
+    let route = WorkspaceRoute(r, Overview)
     let engine (loads: Map<InvestigationId, LoadState>) sessions : Engine =
         { Init = fun r -> { Connection = Connected true; Context = None; NextRequestId = RequestId 1L; Network = NetworkState.Online; Route = r; Loads = loads; Sessions = sessions }, []
           Update = fun _ m -> m, [] }
     let b = Causa.Ui.RealAdapter.Sketch.backend (engine (Map.ofList [ id, LoadFailed(ProviderFailed(NotFound "investigation")) ]) Map.empty)
     match (b.Project(fst (b.Init route))).Screen with
-    | WorkspaceScreen w -> Assert.Equal(ScreenFailed(InvestigationNotFound id), w.State)
+    | WorkspaceScreen w -> Assert.Equal(ScreenFailed(InvestigationNotFound r), w.State)
     | other -> Assert.Fail(sprintf "%A" other)
     Assert.Equal<SaveAction list>([ Review; ReapplyMine; DiscardMine; ExportMine ], SaveChoices.forKind ConflictKind)

@@ -61,7 +61,7 @@ let ``Connect with empty fields is refused per field and sends nothing`` () =
 
 [<Fact>]
 let ``Apollo 11 opens read-only with its stored problem statement and stored events`` () =
-    let _, v = run ConnectedCatalog InvestigationsRoute (connectIntents @ [ Activate(Actions.openInvestigation, Some "e3adbee5-5096-5a10-bbfb-cecda86a154b") ])
+    let _, v = run ConnectedCatalog InvestigationsRoute (connectIntents @ [ Activate(Actions.openInvestigation, Some(Navigation.format (WorkspaceRoute(apollo11Ref, Overview)))) ])
     let w = workspaceOf v
     match w.Frame, w.Stored with
     | Ready f, Ready stored ->
@@ -78,9 +78,9 @@ let ``Apollo 11 opens read-only with its stored problem statement and stored eve
 
 [<Fact>]
 let ``missing investigation and invalid JSON fail closed`` () =
-    let _, v = run ConnectedCatalog InvestigationsRoute (connectIntents @ [ Navigate(WorkspaceRoute(missingId, Overview)) ])
-    Assert.Equal(ScreenFailed(InvestigationNotFound missingId), (workspaceOf v).State)
-    let _, v2 = run InvalidStoredJson InvestigationsRoute (connectIntents @ [ Navigate(WorkspaceRoute(apollo11Id, Overview)) ])
+    let _, v = run ConnectedCatalog InvestigationsRoute (connectIntents @ [ Navigate(WorkspaceRoute(missingRef, Overview)) ])
+    Assert.Equal(ScreenFailed(InvestigationNotFound missingRef), (workspaceOf v).State)
+    let _, v2 = run InvalidStoredJson InvestigationsRoute (connectIntents @ [ Navigate(WorkspaceRoute(apollo11Ref, Overview)) ])
     let w = workspaceOf v2
     Assert.True(match w.State, w.Stored, w.Section with ScreenFailed(InvalidData _), Failed(InvalidData _), OverviewSection(Failed _) -> true | _ -> false)
 

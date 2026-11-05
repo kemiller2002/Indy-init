@@ -40,7 +40,8 @@ type Projections =
       Screen: Model -> ScreenView }
 
 // ---- IF-UI (CF-09 A, APR-CFUI-OWNER-1): presentation contracts for screens, folded into IF41-VIEW so no new
-// contract file is added (V41Package.fs:1790). Source: proposals/r10-contract-first-ui/contracts (PR #121). ----------
+// contract file is added (V41Package.fs:1790). Source: proposals/r10-contract-first-ui/contracts. Investigation
+// identities are InvestigationRef (v4.1.5 W1, 02-IF41-STORAGE.fs). ------------------------------------------------
 
 // -- Ids.fs --
 namespace Causa.Ui.Contracts
@@ -170,6 +171,7 @@ module Regions =
 open System
 open System.Text.RegularExpressions
 open Causa.Domain
+open Causa.Persistence
 
 /// A fixture's label. Every fixture value carries one, so a fixture-backed screen can never be reported as an
 /// integrated one (VERIFICATION-STRATEGY.md, Layer A/B versus Layer C). Construct only through FixtureLabel.create.
@@ -332,7 +334,8 @@ module SafeUrl =
 
 /// Why data is not shown. Each case has its own plain-language copy (UiStates.describe, UI-010, UI-028).
 type UiFailure =
-    | InvestigationNotFound of InvestigationId
+    /// Keyed by workspace and id (v4.1.5 W1): the same case can be stored in two workspaces.
+    | InvestigationNotFound of InvestigationRef
     /// The stored files did not verify (schema, digest, replay refusal). Fails closed: nothing partial is shown.
     | InvalidData of detail: string
     | NotAuthorized
@@ -471,6 +474,7 @@ module PresentationLanguage =
 
 open System
 open Causa.Domain
+open Causa.Persistence
 
 /// The investigation sections (INV-042, UI-029). Corrective Actions only "where supported".
 type Section =
@@ -487,8 +491,10 @@ type UiRoute =
     | InvestigationsRoute
     /// `#/investigations/new` (catalog screens[1]).
     | StartRoute
-    /// `#/investigations/{id}` with `tab` (S02 query parameter, default overview) selecting the section.
-    | WorkspaceRoute of InvestigationId * Section
+    /// `#/investigations/{id}?ws=<workspace>&role=<catalog|working-copy>[&tab=<section>]`. The workspace and its role
+    /// are part of the identity (v4.1.5 W1: the same case can be stored in two workspaces); `tab` (S02, default
+    /// overview) selects the section.
+    | WorkspaceRoute of InvestigationRef * Section
     /// `#/administration`: UI-018 requires the page; no document fixes its path (OWNER-DECISIONS CF-05).
     | AdministrationRoute
     /// `#/settings` (S24).
@@ -536,13 +542,22 @@ module Navigation =
 
     let private guidText (InvestigationId g) = g.ToString("D")
 
+    let roleSlug r =
+        match r with
+        | WorkspaceRole.Catalog -> "catalog"
+        | WorkspaceRole.WorkingCopy -> "working-copy"
+
+    let private refQuery (r: InvestigationRef) =
+        let (Workspace ws) = r.Address.Workspace
+        sprintf "ws=%s&role=%s" (Uri.EscapeDataString ws) (roleSlug r.Address.Role)
+
     /// Canonical hash route. Defaults are omitted (URL contract "canonical form"): the overview tab has no `tab`.
     let format route =
         match route with
         | InvestigationsRoute -> "#/"
         | StartRoute -> "#/investigations/new"
-        | WorkspaceRoute(id, Overview) -> sprintf "#/investigations/%s" (guidText id)
-        | WorkspaceRoute(id, s) -> sprintf "#/investigations/%s?tab=%s" (guidText id) (sectionSlug s)
+        | WorkspaceRoute(r, Overview) -> sprintf "#/investigations/%s?%s" (guidText r.Id) (refQuery r)
+        | WorkspaceRoute(r, s) -> sprintf "#/investigations/%s?%s&tab=%s" (guidText r.Id) (refQuery r) (sectionSlug s)
         | AdministrationRoute -> "#/administration"
         | SettingsRoute -> "#/settings"
         | NotFoundRoute r -> "#/" + r.TrimStart('#', '/')
@@ -553,9 +568,15 @@ module Navigation =
             match raw.IndexOf('?') with
             | -1 -> raw, ""
             | i -> raw.Substring(0, i), raw.Substring(i + 1)
-        let tab =
+        let param name =
             query.Split('&', StringSplitOptions.RemoveEmptyEntries)
-            |> Array.tryPick (fun kv -> match kv.Split('=') with [| "tab"; v |] -> Some v | _ -> None)
+            |> Array.tryPick (fun kv -> match kv.Split('=') with [| k; v |] when k = name -> Some(Uri.UnescapeDataString v) | _ -> None)
+        let tab = param "tab"
+        let address =
+            match param "ws", param "role" with
+            | Some ws, Some "catalog" when ws <> "" -> Some { Workspace = Workspace ws; Role = WorkspaceRole.Catalog }
+            | Some ws, Some "working-copy" when ws <> "" -> Some { Workspace = Workspace ws; Role = WorkspaceRole.WorkingCopy }
+            | _ -> None
         let section =
             match tab with
             | None -> Some Overview
@@ -564,8 +585,8 @@ module Navigation =
         | [] -> InvestigationsRoute
         | [ "investigations"; "new" ] -> StartRoute
         | [ "investigations"; id ] ->
-            match Guid.TryParse id, section with
-            | (true, g), Some s -> WorkspaceRoute(InvestigationId g, s)
+            match Guid.TryParse id, address, section with
+            | (true, g), Some a, Some s -> WorkspaceRoute({ Address = a; Id = InvestigationId g }, s)
             | _ -> NotFoundRoute raw
         | [ "administration" ] -> AdministrationRoute
         | [ "settings" ] -> SettingsRoute
@@ -588,7 +609,7 @@ module Navigation =
         |> List.map (fun d -> { Destination = d; Label = destinationLabel d; Href = hrefOf d; Current = destinationOf route = d })
 
     /// The section navigation of a workspace; Corrective Actions appears only when the projection supports it.
-    let sectionLinks (id: InvestigationId) (current: Section) (correctiveActionsSupported: bool) : NavLink<Section> list =
+    let sectionLinks (id: InvestigationRef) (current: Section) (correctiveActionsSupported: bool) : NavLink<Section> list =
         sections
         |> List.filter (fun s -> s <> CorrectiveActions || correctiveActionsSupported)
         |> List.map (fun s -> { Destination = s; Label = sectionLabel s; Href = format (WorkspaceRoute(id, s)); Current = s = current })
@@ -661,6 +682,7 @@ module Connection =
 
 open System
 open Causa.Domain
+open Causa.Persistence
 
 /// UI-014-O3 and UI-001: frozen demonstrations are told apart from the user's writable copies.
 type CopyKind =
@@ -674,14 +696,15 @@ type SummaryCounts = { Hypotheses: Count; Evidence: Count; UnresolvedContradicti
 /// One investigation card (UI-001, UI-022). Title and last activity are Data Visible; lifecycle and counts are shown
 /// with their boundary, so a stored value is never presented as the kernel's interpretation (UI-023).
 type InvestigationSummary =
-    { Id: InvestigationId
+    { /// Where the investigation is and its id (v4.1.5 W1); opening it dispatches with this, never with the id alone.
+      Ref: InvestigationRef
       Title: string
       /// The domain lifecycle (UI-022 "actual domain lifecycle/status"), never an "expected" one.
       Status: Shown<string> option
       LastActivity: DateTimeOffset option
       Counts: Shown<SummaryCounts> option
       Copy: CopyKind
-      /// `#/investigations/{id}` (INV-040 activate).
+      /// The canonical workspace route (INV-040 activate); also the row key the open action carries.
       Href: string }
 
 type ListSort =
@@ -717,6 +740,7 @@ module InvestigationList =
 
 open System
 open Causa.Domain
+open Causa.Persistence
 
 /// One stored event as read (Data Visible): the wire record, uninterpreted. Shown, for example, when the kernel cannot
 /// yet project a history; never presented as the investigation's state (UI-010 "fail closed", UI-023).
@@ -730,7 +754,7 @@ type StoredEvent =
 
 /// The read-only record of an investigation as stored (Data Visible). No replay is claimed.
 type StoredRecordView =
-    { Id: InvestigationId
+    { Ref: InvestigationRef
       Title: string
       CreatedAt: DateTimeOffset option
       UpdatedAt: DateTimeOffset option
@@ -740,7 +764,8 @@ type StoredRecordView =
 
 /// The workspace frame every section shares (INV-007, INV-008, INV-018, INV-042, UI-013, UI-014).
 type WorkspaceFrame =
-    { Id: InvestigationId
+    { /// The identity every section dispatches with (v4.1.5 W1).
+      Ref: InvestigationRef
       /// The investigation identifier as text (INV-006 read-only after Start; INV-034 keeps it).
       Identifier: string
       Title: string

@@ -11,7 +11,7 @@ open Causa.Persistence
 open Causa.Ui.Contracts
 open Causa.Ui.Fixtures.Scenarios
 
-type WorkingCopy = { Id: InvestigationId; Form: StartForm; Details: DetailsForm }
+type WorkingCopy = { Id: InvestigationRef; Form: StartForm; Details: DetailsForm }
 
 type State =
     { Scenario: Scenario
@@ -25,11 +25,11 @@ type State =
       Start: StartForm
       StartErrors: ValidationError list
       Copies: WorkingCopy list
-      Analysis: Map<InvestigationId, AnalysisProjection>
+      Analysis: Map<InvestigationRef, AnalysisProjection>
       Drafts: Map<FieldId, string>
       DraftErrors: ValidationError list
       DetailsOpen: bool
-      SaveKinds: Map<InvestigationId, SaveStateKind>
+      SaveKinds: Map<InvestigationRef, SaveStateKind>
       Counter: int
       /// Copies started so far; the next Start identifier derives from it and is never reused.
       Started: int }
@@ -43,7 +43,7 @@ let private newIdentifier (n: int) = sprintf "00000000-0000-4000-8000-%012d" (n 
 /// The working copy the save scenarios start with. Synthetic text, labelled; not a historical case.
 let private seededCopy =
     let id = "00000000-0000-4000-8000-100000000001"
-    { Id = InvestigationId(Guid.Parse id)
+    { Id = { Address = workingCopyAddress; Id = InvestigationId(Guid.Parse id) }
       Form = { ProblemStatement = "Fixture working copy: problem statement."; Title = "Fixture working copy"; Question = ""; Identifier = id }
       Details = { Title = "Fixture working copy"; ProblemStatement = "Fixture working copy: problem statement."; Question = "" } }
 
@@ -61,7 +61,7 @@ let init (scenario: Scenario) (route: UiRoute) : State =
       Start = StartForm.empty (newIdentifier 0)
       StartErrors = []
       Copies = seeded
-      Analysis = Map.ofList [ yield apollo11Id, apollo11Analysis; for c in seeded -> c.Id, emptyAnalysis ]
+      Analysis = Map.ofList [ yield apollo11Ref, apollo11Analysis; for c in seeded -> c.Id, emptyAnalysis ]
       Drafts = Map.empty
       DraftErrors = []
       DetailsOpen = false
@@ -175,14 +175,15 @@ let private activate (action: ActionId) (key: string option) (s: State) : State 
         { s with Route = InvestigationsRoute; Connection = fresh.Connection; Form = fresh.Form; Credential = None; ConnectErrors = []; ConnectFailure = None }
     elif action = Actions.newInvestigation then (if s.Connection = Connected true then { s with Route = StartRoute } else s)
     elif action = Actions.openInvestigation then
-        match key |> Option.map Guid.TryParse with
-        | Some(true, g) -> { s with Route = WorkspaceRoute(InvestigationId g, Overview) }
+        // The row key is the canonical workspace route, so the workspace travels with the id (v4.1.5 W1).
+        match key |> Option.map Navigation.parse with
+        | Some(WorkspaceRoute(r, section)) -> { s with Route = WorkspaceRoute(r, section) }
         | _ -> s
     elif action = Actions.cancelStart then { s with Route = InvestigationsRoute; Start = StartForm.empty (newIdentifier s.Started); StartErrors = [] }
     elif action = Actions.startInvestigation then
         match StartForm.validate s.Start, Guid.TryParse s.Start.Identifier with
         | [], (true, g) ->
-            let id = InvestigationId g
+            let id = { Address = workingCopyAddress; Id = InvestigationId g }
             let copy = { Id = id; Form = s.Start; Details = { Title = s.Start.Title; ProblemStatement = s.Start.ProblemStatement; Question = s.Start.Question } }
             { s with
                 Copies = s.Copies @ [ copy ]
@@ -288,7 +289,7 @@ let private connectionView s : ConnectionView =
       WriteScope = (match s.Connection with Connected true -> Writable | Connected false -> ReadOnlyConnection | _ -> WriteScopeUnknown) }
 
 let private copySummary (lbl: FixtureLabel) (c: WorkingCopy) : InvestigationSummary =
-    { Id = c.Id
+    { Ref = c.Id
       Title = (if c.Details.Title = "" then c.Details.ProblemStatement else c.Details.Title)
       Status = Some(AsProjected(Understood.fixture lbl "active"))
       LastActivity = Some fixtureInstant
@@ -324,9 +325,9 @@ let private startView s : StartView =
       Cancel = Available
       Submission = NotSubmitted }
 
-let private frameOf (lbl: FixtureLabel) (id: InvestigationId) (section: Section) (title: string) (problem: Shown<string>) question created state copy supported =
-    { Id = id
-      Identifier = (let (InvestigationId g) = id in g.ToString("D"))
+let private frameOf (lbl: FixtureLabel) (id: InvestigationRef) (section: Section) (title: string) (problem: Shown<string>) question created state copy supported =
+    { Ref = id
+      Identifier = (let (InvestigationId g) = id.Id in g.ToString("D"))
       Title = title
       ProblemStatement = problem
       Question = question
@@ -345,14 +346,14 @@ let private sectionOf (section: Section) (analysis: Remote<Understood<AnalysisPr
     | TimelineSection -> TimelineView analysis
     | CorrectiveActions -> CorrectiveActionsView analysis
 
-let private workspaceView s (id: InvestigationId) (section: Section) : WorkspaceView =
+let private workspaceView s (id: InvestigationRef) (section: Section) : WorkspaceView =
     let lbl = label s.Scenario
     let drafts = { Values = s.Drafts; Errors = s.DraftErrors; OpenEditor = None }
     let closedDetails edit =
         { Open = false; Form = { Title = ""; ProblemStatement = ""; Question = "" }; Errors = []; Edit = edit; SaveDetails = NotOffered; Cancel = NotOffered }
     let failed f =
         { Frame = Failed f; Stored = Failed f; Section = sectionOf section (Failed f); Drafts = drafts; Details = closedDetails NotOffered; Save = None; State = ScreenFailed f }
-    let stored = CausaDataExtract.cases |> List.tryFind (fun c -> idOf c.Id = id)
+    let stored = CausaDataExtract.cases |> List.tryFind (fun c -> refOf c = id)
     let copy = s.Copies |> List.tryFind (fun c -> c.Id = id)
     match connected s, stored, copy with
     | false, _, _ -> failed (CapabilityAbsent(DataVisible, "not connected"))

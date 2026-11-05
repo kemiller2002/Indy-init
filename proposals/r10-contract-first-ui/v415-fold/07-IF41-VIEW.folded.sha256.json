@@ -1,10 +1,11 @@
 {
   "file": "proposals/r10-contract-first-ui/v415-fold/07-IF41-VIEW.folded.fs",
-  "sha256": "6328f3ce3786e952178c22d42601d43f9833a5bdfb0b942b1d42ca54d2fd46ed",
-  "bytes": 55022,
+  "sha256": "896800ef80d033ff69c58ed2b5d36ed83cd7f3b33269f0fac6dd6021ab22ece1",
+  "bytes": 56535,
   "frozenPrefix": {
-    "source": "requirements-compiled/v4.1.4/contracts/07-IF41-VIEW.fs",
+    "source": "requirements-compiled/v4.1.5/contracts/07-IF41-VIEW.fs (PR #135 f91bd7b; identical to v4.1.4's)",
     "lines": 40,
     "identical": true
-  }
+  },
+  "targets": "v4.1.5 revision 2 (PR #135 f91bd7b): uses InvestigationRef, WorkspaceAddress, Workspace and WorkspaceRole from 02-IF41-STORAGE.fs, so it no longer compiles against v4.1.4"
 }
