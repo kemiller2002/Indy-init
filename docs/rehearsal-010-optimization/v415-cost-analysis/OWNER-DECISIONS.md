@@ -1,0 +1,14 @@
+# Owner decisions for the v4.1.5 strategy
+
+These are requests, not records. Agents never record decisions (RDP-003). Once the owner chooses, each becomes a request in a file `tools/owner-freeze.fsx` reads.
+
+| ID | Decision | Options | Recommendation | Why it is needed |
+|---|---|---|---|---|
+| **OD-V415-01** | **Stage the successor.** Freeze the minimum (event union, workspace, listing, creation; `MINIMUM-SUCCESSOR.md`) as v4.1.5 before Nov 7. Ownership rebalancing (ODR-R10-20), the T19/T22 split (ODR-R10-21), FO-2/FO-3 and the UI contracts follow as v4.1.6. | **A:** stage it (v4.1.5 = minimum, v4.1.6 = the rest). **B:** keep ODR-R10-32 A, one combined package. | **A.** It is the same critical path but a smaller review, no compiler extension, and margin for a rehearsal. | ODR-R10-32 A is recorded as "one package", so staging changes a recorded decision. |
+| **OD-V415-02** | **Execution strategy.** One compilation owner writes the package; independent verifiers check event compatibility, workspace/listing/creation semantics and the UI-contract fit, but never edit it. | **A:** Scenario C. **B:** Scenario B, separate input contracts. **C:** Scenario A, one agent alone. | **A.** | `PARALLELIZATION-OPTIONS.md` |
+| **OD-V415-03** | **Fallback trigger.** If the v4.1.5 independent review has not passed by **Nov 6 22:00 UTC (17:00 Eastern)**, launch on v4.1.4 with ODR-R10-25 option B's declaration (expected failures stated before T0). | **A:** agree to that trigger now. **B:** decide at the time. | **A.** Deciding in advance removes a late owner round trip. | ODR-R10-25 is recorded A; the fallback re-decides it. |
+| **OD-V415-04** | **Creation-path constraint.** Creation must fit existing SM-SAVE states and events (X05/X12 unchanged). If it cannot, creation is deferred, not forced by relaxing a check. | **A:** existing states only. **B:** authorize a compiler change allowing state additions in v4.1.x. | **A.** The request said not to compromise X01–X21. | `COMPILATION-BOTTLENECKS.md` §3 |
+| **OD-V415-05** | **Workspace source.** Is the workspace user input on the Connect form, or derived (catalog from `catalog/active.json`, working copy from a fixed rule)? | **A:** derived, so the owner-controlled J1 Connect form is unchanged. **B:** a new form field, which needs owner changes to `verification/journeys` bindings. | **A.** | `verification/` is owner-controlled; agents cannot edit it. |
+| **OD-V415-06** | **The v4.1.5 interface-change and state-machine-amendment requests themselves** (the compiler requires them, `V41Package.fs:1774-1787`) | recorded with `owner-freeze.fsx decide v4.1.5` once the design note is verified | record them when the verified note is ready, before the compile | an inherent owner round trip (O1) |
+
+Afterwards come **O2** (approve v4.1.5) and **O3** (tag), as for every package.
