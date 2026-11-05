@@ -1,32 +1,19 @@
 {
   "schema": "indy-init.v41-owner-decision-requests/1",
-  "status": "Pending: every request below. The owner records them with tools/owner-freeze.fsx decide contract-first-ui. No request here is recorded by an agent (RDP-003). Source: proposals/r10-contract-first-ui/OWNER-DECISIONS-REQUIRED.md (PR #121).",
+  "status": "Pending: every request below. The owner records them with tools/owner-freeze.fsx decide contract-first-ui. No request here is recorded by an agent (RDP-003). Source: proposals/r10-contract-first-ui/OWNER-DECISIONS-REQUIRED.md (PR #121). CF-07 is not asked here: the owner recorded it as ODR-R10-33 (APR-R10-OWNER-3).",
   "recordFormat": "One operator approval in kickoff/rehearsal-007/approvals.causa.json (prefix APR-CFUI-OWNER), one change per decision {decision_id, action: decide, option}, committed by the owner without agent trailers.",
   "requests": [
     {
-      "id": "CF-07",
-      "kind": "decision",
-      "title": "Judge journey assertions whose prerequisite slices are not integrated yet",
-      "question": "The slice gate (tools/requirements-compiler/src/Ledger.fs, journeys rule) requires every assertion bound to a slice to pass before it merges. Several bound assertions need slices that depend on the slice itself (SL-T16 shell: J2-08, J3-01, J3-02, J3-08, J3-09; SL-T19: J1-04, J1-05, J3-05, J3-07; EXT-DATA and INV-START both carry J1-03), so as specified the approved plan deadlocks. How should such an assertion be judged?",
-      "options": [
-        "A: judge a bound assertion at a slice gate only once every slice its journey steps need is integrated; otherwise judge it at the next gate where they are, and always at release (the completion gate is unchanged)",
-        "B: rebind each such assertion to the slice that completes its path (a successor slice manifest)",
-        "C: keep the rule as it is (the run deadlocks at SL-T16)"
-      ],
-      "recommendation": "A. It keeps every assertion and the release gate intact and removes the deadlock without rewriting the bindings. Independently confirmed by the optimization agent (PR #119, CROSS-AGENT-FINDINGS.md).",
-      "rationale": "Pre-existing in the approved plan; independent of the contract-first proposal.",
-      "impact": "A or B is required before any rehearsal can complete; C leaves the critical path blocked. A changes slice-gate code (reviewed PR)."
-    },
-    {
       "id": "CF-09",
       "kind": "decision",
-      "title": "Adopt the UI contract package (IF-UI) and the build-before-merge start rule",
-      "question": "Ship proposals/r10-contract-first-ui/contracts and fixtures in the next successor package (bootstrap writes them to src/Causa.App/Ui/Contracts and tests/Causa.TestSupport/UiFixtures), and let a UI slice START once bootstrap is integrated and its UI predecessors are built, while MERGING stays exactly as gated?",
+      "title": "Put the UI contract package in the combined v4.1.5 successor and let UI slices start after bootstrap",
+      "question": "Already recorded: ODR-R10-31 A (generated UI items start after T16 instead of T17) and ODR-R10-32 A (one combined v4.1.5 package). Still open: should that v4.1.5 package also ship proposals/r10-contract-first-ui/contracts and fixtures (bootstrap writes them to src/Causa.App/Ui/Contracts and tests/Causa.TestSupport/UiFixtures, compiled before any UI-owned file), and let a UI slice START once bootstrap is integrated and its UI predecessors are built, while MERGING stays as gated?",
       "options": [
-        "A: adopt in the next successor package (v4.1.5); STARTUP-INSTRUCTIONS section 4 gains the build-before-merge rule for UI slices",
-        "B: do not adopt; v4.1.4's start rule and ownership stand"
+        "A: yes: ship the contracts and fixtures in v4.1.5 (ODR-R10-32) and start UI slices after bootstrap (T10), extending ODR-R10-31",
+        "B: ship the contracts and fixtures in v4.1.5, but keep ODR-R10-31's start after T16",
+        "C: neither; ODR-R10-31 stands alone"
       ],
-      "recommendation": "A, for Rehearsal 011 (a v4.1.5 freeze cannot complete before an R10 launch this morning). Under OD-INDY-22 the contracts and fixtures enter a run only as frozen-package content.",
+      "recommendation": "A. The contracts are verified to compile in the real v4.1.4 bootstrap with domain stubs only, so the T16 wait is no longer needed for building. Under OD-INDY-22 they enter a run only as frozen-package content, which v4.1.5 provides.",
       "rationale": "Verified: the contracts and screens compile unchanged in the real v4.1.4 bootstrap with domain stubs only (proposals/r10-contract-first-ui/evidence/bootstrap-compile.log).",
       "impact": "First non-shell UI start moves from about T+189/252 to T+45 (model). Merge timing is decided by CF-07 and the queue."
     },
@@ -34,13 +21,13 @@
       "id": "CF-10",
       "kind": "decision",
       "title": "Number of UI agents",
-      "question": "How many UI agents should the successor plan run, given the FILE-OWNERSHIP.json split?",
+      "question": "Already recorded: ODR-R10-20 A (v4.1.5 rebalances UI file ownership) and ODR-R10-22 A (build speculative verification; adoption at N = 3 after S1-S7 and a review). How many UI agents should the v4.1.5 ownership provide for?",
       "options": [
         "A: three UI agents (ui-a browsing, ui-b editing, ui-c analysis), together with speculative verification at queue depth 3 (ODR-R10-22)",
         "B: two UI agents (the FILE-OWNERSHIP two-agent variant)",
         "C: keep the v4.1.4 ownership (ui-1, ui-2)"
       ],
-      "recommendation": "A if ODR-R10-22 is adopted, otherwise B. Never one UI agent.",
+      "recommendation": "A, contingent on ODR-R10-22 actually being adopted at N = 3 after its controls pass; B if it is not.",
       "rationale": "In the optimization agent's model, three UI agents with a depth-3 queue is the only configuration that puts Data Visible, Understood and Editable inside 420 minutes at every CI value (T+278-380; all integrated T+435-518). Without the queue, two and three differ little.",
       "impact": "A and B need the successor ownership (ODR-R10-20/-21 in PR #119)."
     },

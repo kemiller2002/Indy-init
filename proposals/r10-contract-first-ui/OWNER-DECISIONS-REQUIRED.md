@@ -1,6 +1,12 @@
 # Owner decisions required
 
-**Nothing here is decided.**
+**Recorded so far (by the owner, through the Rehearsal 010 set, APR-R10-OWNER-3):**
+- CF-07 = ODR-R10-33 A;
+- ODR-R10-20, -22, -31 and -32 A, which partly cover CF-09 and CF-10.
+
+The remaining CF requests are recorded with `tools/owner-freeze.fsx decide contract-first-ui`.
+
+**Otherwise nothing here is decided.**
 - No agent records approvals (RDP-003). The owner records decisions with `tools/owner-freeze.fsx`.
 - Ids use the CF- prefix so they cannot collide with the optimization agent's ODR-R10-19..29 (PR #119).
 - None of these decisions changes the frozen scope, the launch clock or the approved acceptance criteria of Rehearsal 010.
