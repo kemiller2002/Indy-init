@@ -132,9 +132,9 @@ The model now also reports when each functional milestone is delivered (`--miles
 
 | | R0 approved plan | R1 V4 | R2 V4, milestone-first | R5 milestone-aligned split |
 |---|---|---|---|---|
-| M1 connect | 681 | 359 | 283 | 293 |
+| M1 connect (needs ODR-R10-28, and -29 A or -25) | 681 | 359 | 283 | 293 |
 | M2 browse (needs ODR-R10-25) | 794 | 729 | 309 | 284 |
-| M3 create | 739 | 746 | 489 | 468 |
+| M3 create (needs ODR-R10-25, -26) | 739 | 746 | 489 | 468 |
 | All integrated | 794 | 756 | 769 | 771 |
 | Obligations by T+420 | 435 | 565 | 527 | 520 |
 | Milestones usable at T+420 | 0 | 1 | 2 | 2 |
